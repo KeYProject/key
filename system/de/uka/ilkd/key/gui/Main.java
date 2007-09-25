@@ -24,6 +24,7 @@ import javax.swing.text.JTextComponent;
 
 import org.apache.log4j.Logger;
 
+/* mulbrich import de.mattze.tools.inspector.ObjectInspector;*/
 import de.uka.ilkd.key.gui.assistant.*;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.*;
@@ -45,7 +46,7 @@ public class Main extends JFrame {
 
     //DO NOT CHANGE THE FOLLOWING 2 LINES, UNLESS YOU KNOW ABOUT PRCS-REPLACEMENT
     /* $Format: "    private static final String PRCSVERSION = \"$ProjectVersion$\";"$ */
-    private static final String PRCSVERSION = "mulbrichRecoder08.19";
+    private static final String PRCSVERSION = "mulbrichJava5.23";
 
     
     private static final String VERSION="1.2-beta (internal: "+PRCSVERSION+")";
@@ -588,6 +589,15 @@ public class Main extends JFrame {
      * *********************** UGLY INSPECTION CODE **********************
      */
     private void setupInternalInspection() {
+ /*MULBRICH       goalView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW ).put(
+                KeyStroke.getKeyStroke(KeyEvent.VK_U, ActionEvent.CTRL_MASK), 
+        "show_inspector");
+        goalView.getActionMap().put("show_inspector", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                new ObjectInspector("Term", sequentView.getMousePosInSequent().getPosInOccurrence().subTerm()).setVisible(true);
+            } });*/
+        
+        
         goalView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW ).put(
                 KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK), 
         "show_tree");

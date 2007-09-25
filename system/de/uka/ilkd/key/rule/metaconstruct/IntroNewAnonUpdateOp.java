@@ -49,7 +49,7 @@ public class IntroNewAnonUpdateOp extends AbstractMetaOperator {
      * @see de.uka.ilkd.key.logic.op.Operator#validTopLevel(de.uka.ilkd.key.logic.Term)
      */
     public boolean validTopLevel(Term term) {
-        return term.arity()==3 && term.sub(1).sort()==Sort.FORMULA;
+        return term.arity()==3 /*Mulbrich && term.sub(1).sort()==Sort.FORMULA*/;
     }
 
     

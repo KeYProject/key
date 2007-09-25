@@ -212,6 +212,10 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     public void performActionOnExtends(Extends x) {
 	doDefaultAction(x);
     }
+    
+    public void performActionOnEnhancedFor(EnhancedFor x) {
+        doDefaultAction(x);
+    }
 
     public void performActionOnFieldDeclaration(FieldDeclaration x) {
 	doDefaultAction(x);

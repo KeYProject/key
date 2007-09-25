@@ -2,7 +2,7 @@
 <project name="ProofVisualization" default="build.jars" basedir=".">
 
 <!-- $Format: "<property name=\"version\" value=\"1.$ProjectVersion$\"/>"$ -->
-<property name="version" value="1.mulbrichRecoder08.19"/>
+<property name="version" value="1.mulbrichJava5.23"/>
 
 	<property name="basews" value="${ws}"/>
 	<property name="baseos" value="${os}"/>

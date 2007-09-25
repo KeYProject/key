@@ -361,6 +361,7 @@ public abstract class LoopStatement extends JavaStatement
 	}
 	return null;
     }
+      
 
     /**
      *      Get updates.
@@ -379,6 +380,14 @@ public abstract class LoopStatement extends JavaStatement
      */
     public IForUpdates getIForUpdates() {
         return updates;
+    }
+    
+    /**
+     * get the loop initializer as ILoopInit
+     * @return the loop initializer
+     */
+    public ILoopInit getILoopInit() {
+       return inits;
     }
 
     /**

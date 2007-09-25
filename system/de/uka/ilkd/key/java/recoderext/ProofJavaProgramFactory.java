@@ -38,6 +38,13 @@ import de.uka.ilkd.key.parser.proofjava.ParseException;
 import de.uka.ilkd.key.parser.proofjava.ProofJavaParser;
 
 public class ProofJavaProgramFactory extends JavaProgramFactory {
+    
+    /**
+     * by default allow java5 expressions such as the enum keyword
+     */
+    private static boolean ALLOW_JAVA5 =
+            System.getProperty("key.allowJava5", "true").equalsIgnoreCase(
+                    "true");
 
     /**
      Protected constructor - use {@link #getInstance} instead.
@@ -65,6 +72,10 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
               PropertyNames.JDK1_4)));
       ProofJavaParser.setJava5(StringUtils.parseBooleanProperty(settings.getProperties().getProperty(
               PropertyNames.JAVA_5)));
+ /* used to be the following in some older version:              
+      ProofJavaParser.setAwareOfAssert(true);
+      ProofJavaParser.setJava5(ALLOW_JAVA5);
+ */
   }
 
 

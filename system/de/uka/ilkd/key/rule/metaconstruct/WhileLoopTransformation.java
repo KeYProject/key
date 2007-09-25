@@ -14,6 +14,8 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.Stack;
 
+import org.apache.log4j.Logger;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.annotation.Annotation;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -533,6 +535,35 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	    	doDefaultAction(x);
 	    }
 	}
+    }
+    
+    /**
+     * perform the loop transformation on an enhanced for loop (Java5)
+     * 
+     * If the enhanced for loop is the toplevel loop nothing happens - 
+     * return the loop itself, as enhanced for loops cannot be unwound, 
+     * a log message is issued.
+     *
+     * If it is a loop deeper in the AST a new object is created if 
+     * needed or the original loop returned.
+     * 
+     * @author mulbrich
+     */
+    public void performActionOnEnhancedFor(EnhancedFor x) {
+        ExtList changeList = (ExtList)stack.peek();
+        if (replaceBreakWithNoLabel == 0) {
+            // the outermost loop
+            Logger.getRootLogger().error("Enhanced for loops may not be toplevel in WhileLoopTransformation");
+            doDefaultAction(x);
+        } else {
+            if (changeList.getFirst() == CHANGED) {
+                changeList.removeFirst();
+                addChild(new For(changeList));
+                changed();
+            } else {
+                doDefaultAction(x);
+            } 
+        }
     }
 
     public void performActionOnWhile(While x)     {

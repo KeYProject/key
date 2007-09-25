@@ -1557,6 +1557,26 @@ public abstract class TacletApp implements RuleApp {
 	return ns;
     }
 
+    /**
+     * create a new function namespace by adding all newly instantiated 
+     * skolem symbols to a new namespace.
+     * 
+     * @author mulbrich
+     * @param func_ns the original function namespace
+     * @return the new function namespace that bases on the original one
+     */
+    public Namespace extendedFunctionNameSpace(Namespace func_ns) {
+        Namespace ns = new Namespace(func_ns);
+        IteratorOfSchemaVariable it = instantiations.svIterator();
+        while(it.hasNext()) {
+            SchemaVariable sv = it.next();
+            if(sv.isSkolemTermSV()) {            
+                Term inst = (Term) instantiations.getInstantiation(sv);
+                ns.addSafely(inst.op());
+            }
+        }
+        return ns;
+    }
 
     /**
      * returns the bound SchemaVariable that causes a name conflict (i.e. there are

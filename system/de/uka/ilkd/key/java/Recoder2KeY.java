@@ -21,11 +21,13 @@ import org.apache.log4j.Logger;
 import recoder.abstraction.ClassType;
 import recoder.bytecode.ClassFile;
 import recoder.io.ClassFileRepository;
+import recoder.java.declaration.EnumConstantDeclaration;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.service.ChangeHistory;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.java.declaration.EnumClassDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.*;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.Literal;
@@ -352,8 +354,11 @@ public class Recoder2KeY implements JavaReader{
     	List<recoder.java.CompilationUnit> rcuList = new ArrayList<recoder.java.CompilationUnit>();
     	recoder.java.CompilationUnit rcu = null;
     	URL jlURL = KeYResourceManager.getManager().getResourceFile(
-    			Recoder2KeY.class, javaSrcDir + "/" + "JAVALANG.TXT");    		
-    	if (logger.isDebugEnabled()) {
+    			Recoder2KeY.class, javaSrcDir + "/" + "JAVALANG.TXT");
+        if (jlURL == null) {
+            logger.error(javaSrcDir + "/" + "JAVALANG.TXT not found!");
+        }
+    	if (jlURL != null && logger.isDebugEnabled()) {
     		logger.debug(jlURL.toString());
     	}
     	try {
@@ -392,12 +397,12 @@ public class Recoder2KeY implements JavaReader{
 	    		                JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS +" {}"));
     		rcu.makeAllParentRolesValid();
     		rcuList.add(rcu);    		    		
-    	} catch (recoder.ParserException e) {
-    		e.printStackTrace(System.out);
+    	} catch (recoder.ParserException e) {    		
+                logger.error("Error while parsing specials", e);
     		System.err.println("recoder2key: Error while parsing specials");
     		System.err.println("recoder2key: Try to continue...");
-    	} catch (IOException e) {
-    		e.printStackTrace(System.out);
+    	} catch (Exception e) {    		
+                logger.error("Error while parsing specials, someone messed up with the resources", e);
     		System.err.println("recoder2key: Error while parsing specials");
     		System.err.println("recoder2key: someone messed up with the resources");
     	}
@@ -1435,6 +1440,23 @@ public class Recoder2KeY implements JavaReader{
 	kjt.setJavaType(keYClassDecl);
 	return keYClassDecl;	
     }
+    
+    public EnumClassDeclaration convert
+        (de.uka.ilkd.key.java.recoderext.EnumClassDeclaration td) {
+
+        KeYJavaType kjt = getKeYJavaType(td);
+        ExtList classMembers = collectChildren(td);       
+
+        EnumClassDeclaration keyEnumDecl = new EnumClassDeclaration
+            (classMembers,
+             new ProgramElementName(td.getFullName()),
+             parsingLibs,
+             td.getEnumConstantDeclarations());
+
+        kjt.setJavaType(keyEnumDecl);
+        return keyEnumDecl;    
+    }
+    
             
     public InterfaceDeclaration convert
 	(recoder.java.declaration.InterfaceDeclaration td) {
@@ -1656,6 +1678,7 @@ public class Recoder2KeY implements JavaReader{
 		result = new KeYJavaType(s);
 	    } else {
 		Debug.out("recoder2key: unknown type", t);
+                logger.error("Unknown type: " +t.getClass() + " "+ t.getFullName() );
 		Debug.fail();
 		result = new KeYJavaType();
 	    }
@@ -2698,7 +2721,8 @@ public class Recoder2KeY implements JavaReader{
     protected void transformModel
 	(List<recoder.java.CompilationUnit> cUnits) {
 	RecoderModelTransformer[] transformer = 
-	    new RecoderModelTransformer[] {                 
+	    new RecoderModelTransformer[] { 
+                new EnumClassBuilder(servConf, cUnits), 
 		new ImplicitFieldAdder(servConf, cUnits),
         new InstanceAllocationMethodBuilder(servConf, cUnits),
 		new ConstructorNormalformBuilder(servConf, cUnits),

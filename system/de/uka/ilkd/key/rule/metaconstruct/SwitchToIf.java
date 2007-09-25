@@ -11,15 +11,17 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 
+import recoder.kit.TypeKit;
 import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.expression.operator.Equals;
-import de.uka.ilkd.key.java.expression.operator.LogicalAnd;
-import de.uka.ilkd.key.java.expression.operator.NotEquals;
+import de.uka.ilkd.key.java.expression.literal.NullLiteral;
+import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
@@ -84,6 +86,12 @@ public class SwitchToIf extends ProgramMetaConstruct {
 	    insertStatementInBlock(result,
 				   new Statement[]{new CopyAssignment(exV,
 								      sw.getExpression())});
+
+        // mulbrich: Added additional null check for enum constants
+        if(!(sw.getExpression().getKeYJavaType(services, ec).getJavaType() instanceof PrimitiveType))
+            result = 
+                insertStatementInBlock(result, mkIfNullCheck(services, exV));
+
 	extL.add(exV);
 	sw = changeBreaks(sw, newBreak);
 	while(i<sw.getBranchCount()){
@@ -115,6 +123,29 @@ public class SwitchToIf extends ProgramMetaConstruct {
 	    return new LabeledStatement(l, result);
 	}
     }
+
+    /**
+     * return a check of the kind
+     * <code>if(v == null) throw new NullPointerException();</code>
+     * @return an if-statement that performs a null check, wrapped in a single-element array.
+     */
+    
+    private Statement[] mkIfNullCheck(Services services, ProgramVariable var) {
+        Throw t =
+                new Throw(new New(new Expression[0], 
+                        new TypeRef(
+                        services.getJavaInfo().getKeYJavaType(
+                                "java.lang.NullPointerException")), null));
+        
+        ExtList operands = new ExtList();
+        operands.add(var);
+        operands.add(NullLiteral.NULL);
+        Expression cnd = new Equals(operands);
+        
+        If ifst = new If(cnd, new Then(t));
+        return new Statement[] { ifst };
+    }
+
 
     /** inserts the given statements at the end of the block 
      * @param b the Statementblock where to insert

@@ -74,10 +74,13 @@ tokens {
         NOTFREEIN = "\\notFreeIn";
         FREELABELIN = "\\freeLabelIn";
 	STATIC = "\\static";
+	ENUM_CONST = "\\enumConstant";
 	NOTSAMELITERAL="\\notSameLiteral";
 	ISREFERENCEARRAY="\\isReferenceArray";
+	ISARRAY="\\isArray";
 	ISREFERENCE="\\isReference";
 	ISNONIMPLICIT="\\isNonImplicit";
+        ISENUMTYPE="\\isEnumType";
         DEPENDINGON = "\\dependingOn";
         DEPENDINGONMOD = "\\dependingOnMod";
 	ISQUERY = "\\isQuery";

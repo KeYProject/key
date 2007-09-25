@@ -28,14 +28,14 @@ echo "Please set the \$JAVA_HOME environment for compiling KeY"
 echo "to the directory where you have installed Java." 
 exit 1
 fi
-#echo "Using JDK installation from:      $JAVA_HOME"
+echo "Using JDK installation from:      $JAVA_HOME"
 
 
 # standard lib location
 if [ -z "$KEY_LIB" ] ; then
    KEY_LIB="../key-ext-jars"
 fi
-#echo "Using libraries from:             $KEY_LIB"
+echo "Using libraries from:             $KEY_LIB"
 
 
 if [ -n "$TOGETHER_ENABLED" ];
@@ -43,7 +43,7 @@ then
    if [ -z "$TOGETHER_HOME"  ]
    then
       if [ -d "$KEY_LIB/TOGETHER" ] ; then
-         TOGETHER_HOME=`resolve_symlink "$KEY_LIB/TOGETHER"`
+         TOGETHER_HOME="$KEY_LIB/TOGETHER"
       else
          echo
          echo Please set the \$TOGETHER_HOME environment variable.
@@ -92,4 +92,5 @@ then
 fi
 
 export CLASSPATH
+echo Classpath: $CLASSPATH
 echo "CLASSPATH=$CLASSPATH" > Makefile.mk

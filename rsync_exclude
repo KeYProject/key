@@ -9,3 +9,4 @@ obsolete/
 /system/tags
 *.log
 /system/genSrc
+/system/doc

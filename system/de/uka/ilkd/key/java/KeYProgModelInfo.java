@@ -456,7 +456,8 @@ public class KeYProgModelInfo{
         List<? extends recoder.abstraction.Constructor> constructors =
             getRecoderConstructors(ct, signature);
         if (constructors.size()==1) {
-	    Object o = rec2key().toKeY(constructors.getConstructor(0));
+	    Object o = rec2key().
+		toKeY(constructors.get(0));
 	    if(o instanceof Constructor){
 		return (Constructor) o;
 	    }

@@ -7,7 +7,7 @@
 # See LICENSE.TXT for details.
 
 #$Format: "PRCSVERSION = \"$ProjectVersion$\""$ 
-PRCSVERSION = "mulbrichRecoder08.19"
+PRCSVERSION = "mulbrichJava5.23"
 
 SHELL=/bin/sh
 #comon prefix
@@ -254,7 +254,6 @@ GENERATED_MAPS=logic/HashMapFromNameToNamed \
 	visualdebugger/HashMapFromPosInOccurrenceToLabel \
 	logic/op/MapAsListFromQuantifiableVariableToTerm \
 	logic/op/MapAsListFromQuantifiableVariableToMetavariable 
-
 
 GENERATED_ARRAYS=java/ArrayOfProgramElementExtnullInnull \
 	java/ArrayOfStatementExtProgramElementInnull \
