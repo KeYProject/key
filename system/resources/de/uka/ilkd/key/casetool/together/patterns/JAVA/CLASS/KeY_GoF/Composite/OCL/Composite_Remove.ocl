@@ -1,0 +1,17 @@
+patternmodification#
+addMethod#remove#Composite
+
+mapping#Composite#'Composite'
+mapping#remove#'Name of method remove in class Composite'
+mapping#Component#'Component'
+mapping#children#'Supplier Role'
+
+
+postcondition#method#remove#Composite
+
+schema# 
+	self.children->select(p|p=c)->size=0
+
+
+comment#
+

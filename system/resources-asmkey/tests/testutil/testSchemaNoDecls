@@ -1,0 +1,6 @@
+SchemaDeclarationParsitorFactory
+
+schema variable asm rule #R;
+schema depending formula phi
+schema variable formula phi;
+schema x,u,u;

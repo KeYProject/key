@@ -1,0 +1,11 @@
+*~
+#*#
+/system/binary
+/system/coverage
+/instrumented-classes
+*.class
+obsolete/
+/myex
+/system/tags
+*.log
+/system/genSrc

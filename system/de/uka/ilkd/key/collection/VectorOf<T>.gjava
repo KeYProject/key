@@ -1,0 +1,147 @@
+#!/bin/sh
+# This file is part of KeY - Integrated Deductive Software Design
+# Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+#                         Universitaet Koblenz-Landau, Germany
+#                         Chalmers University of Technology, Sweden
+#
+# The KeY system is protected by the GNU General Public License. 
+# See LICENSE.TXT for details.
+#
+#
+#
+#
+#!/bin/sh
+pck=$1
+outFile=`echo $1 | sed 's!\.!/!g;'`"/"VectorOf$2".java"
+sed "s/<Pck>/$pck/g;s/<T>/$2/g;" <<END_OF_CLASS >$outFile
+
+/** This class provides a Vector allowing only elements of type <T>.
+* It supports a subset of the  
+* methods of @see{java.util.Vector}. Look their for a description of
+* the commands. They will react in the same way while replacing Object
+* through <T>
+*/ 
+
+    package <Pck>;
+
+import java.util.Vector;
+import java.util.Iterator;
+
+public class VectorOf<T> {
+
+    private Vector vec;
+
+    public VectorOf<T>() {
+	vec=new Vector();
+    }
+
+    VectorOf<T>(Vector v) {
+	vec=v;
+    }
+
+    public void add(int index, <T> element) {
+	vec.add(index,element);
+    }
+	
+    public boolean add(<T> o) {
+	return vec.add(o);
+    }
+
+    public void clear() {
+	vec.clear();
+    }
+
+    public Object clone() {
+	return new VectorOf<T>(vec);
+    }
+
+    boolean contains(<T> elem) {
+	return vec.contains(elem);
+    }
+
+    public <T> elementAt(int i) {
+	return (<T>)vec.elementAt(i);
+    }
+
+    public int size() {
+	return vec.size();
+    }
+
+    public <T> firstElement() {
+	return (<T>)vec.firstElement();
+    }
+
+    public <T> get(int index) {
+	return (<T>)vec.get(index);
+    } 
+
+	public boolean equals(Object o) {
+	return vec.equals(o);
+	}
+
+    public int hashCode() {
+	return vec.hashCode();
+    }
+    public int indexOf(<T> elem) {
+	return vec.indexOf(elem);
+    }
+
+    public IteratorOf<T> iterator() {
+	return new VectorIteratorOf<T>(this);
+    }
+
+    public boolean isEmpty() {
+	return vec.isEmpty();
+    }
+
+    public <T> lastElement() {
+	return (<T>) vec.lastElement();
+    }
+    public int lastIndexOf(<T> elem) {
+	return vec.lastIndexOf(elem);
+    }
+
+    public <T> remove(int index) {
+	return (<T>)vec.remove(index);
+    }
+
+    public boolean remove(<T> o) {
+	return vec.remove(o);		
+    }
+
+    public <T> set(int index, <T> element) {
+	return (<T>) vec.set(index,element);
+    }
+
+    public void setElementAt(<T> obj, int index) {
+	vec.setElementAt(obj,index);
+    } 
+
+    public String toString() {
+	return vec.toString();
+    }
+
+    public void trimToSize() {
+	vec.trimToSize();
+    }		
+
+    // the iterator for the VectorOf<T> class
+    class VectorIteratorOf<T> implements IteratorOf<T> {
+	private Iterator it;
+	
+	public VectorIteratorOf<T>(VectorOf<T> o) {
+	    it=vec.iterator();
+	}
+
+	public boolean hasNext() {
+	    return it.hasNext();
+	}
+
+	public <T> next() {
+	    return (<T>)it.next();
+	}
+
+    }
+
+}
+END_OF_CLASS

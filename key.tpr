@@ -1,0 +1,131 @@
+[Project]
+Language=java
+Root.0=$TGH$/lib/javax.jar
+Root.0.access=import
+Root.0.package_prefix=
+Version=3.0
+debugger.SkipClass.0=,com.sun.*,1
+debugger.SkipClass.1=,java.*,1
+debugger.SkipClass.2=,javax.*,1
+debugger.SkipClass.3=,org.omg.*,1
+debugger.SkipClass.4=,sun.*,1
+debugger.SmartStep=true
+Root.1=$PROJECT_DIR$/system
+Root.1.access=writable
+Root.1.file_types=java_source;java_class;diagram;element;vb_files;vbnet_source;idl_source;csharp_source;cpp_source;cpp_header
+Root.1.package_prefix=
+Root.1.srcControlEnabled=false
+Root.1.srcControlProject=
+Project.JDK=/amd.home/home/togetherj/vers6.2/linux/jdk
+Root.2=$TGH$/jdk/jre/lib/rt.jar
+Root.2.access=import
+Root.2.non_removable=
+projectfile.encoding=ASCII
+[model]
+alphaSort=true
+showDiagramContents=false
+showPackagesFirst=true
+[external]
+editor=$:external.editor.default$
+editor.default=nedit "$FILE_SPEC$"
+[testingframework]
+none.created=true
+server.config.0.isLocal=true
+server.config.0.name=Test Suite - GUI
+server.config.1.isLocal=true
+server.config.1.name=Test Suite - No GUI
+server.config.2.isLocal=true
+server.config.2.name=JUnit
+server.config.3.isLocal=true
+server.config.3.name=Visual Script
+server.config.0.url=http://localhost:9080/tf
+server.config.1.url=http://localhost:9080/tf
+server.config.2.url=http://localhost:9080/tf
+server.config.3.url=http://localhost:9080/tf
+[editor]
+recent.file.0=/tmp/dlohner/system/genSrc/de/uka/ilkd/key/parser/ocl/KeYOclParser.java
+recent.file.1=/tmp/dlohner/system/genSrc/de/uka/ilkd/key/parser/ocl/KeYOclLexer.java
+recent.file.2=/tmp/dlohner/system/TestKey.java
+recent.file.3=/home/gladisch/key/system/de/uka/ilkd/key/gui/ProofSettings.java
+recent.file.4=/home/gladisch/key/system/de/uka/ilkd/key/proof/init/KeYFile.java
+recent.file.5=/home/gladisch/key/system/de/uka/ilkd/key/proof/mgt/ProofEnvironment.java
+recent.file.6=/home/gladisch/key/system/de/uka/ilkd/key/proof/init/ProblemInitializer.java
+recent.file.7=/home/gladisch/key/system/de/uka/ilkd/key/proof/Proof.java
+recent.file.8=/home/gladisch/key/system/de/uka/ilkd/key/proof/ProofSaver.java
+recent.file.9=/home/gladisch/key/system/de/uka/ilkd/key/gui/GUIListener.java
+[runtimeargs]
+applet_vmoptions0=-classic
+applet_vmoptions1=-classic
+applet_vmoptions2=-classic
+applet_vmoptions3=-classic
+applet_vmoptions4=-classic
+applic_args0=
+applic_args1=
+applic_args2=
+applic_args3=
+applic_args4=
+applic_mainclass0=
+applic_mainclass1=
+applic_mainclass2=com.togethersoft.testing.TestServer
+applic_mainclass3=com.togethersoft.testing.TestServer
+applic_mainclass4=
+applic_vmoptions0=
+applic_vmoptions1=-Dtestserver.port=9580 -Dtestserver.home=/home/togetherj/vers6.0/linux/modules/com/togethersoft/modules/testingframework -Dtestserver.configuration="Test Suite - GUI" 
+applic_vmoptions2=-Dtestserver.port=9580 -Dtestserver.home=/home/togetherj/vers6.0/linux/modules/com/togethersoft/modules/testingframework -Dtestserver.configuration="Test Suite - No GUI" 
+applic_vmoptions3=-Dtestserver.port=9080 -Dtestserver.home=/home/togetherj/vers6.0/linux/modules/com/togethersoft/modules/testingframework -Dtestserver.configuration="JUnit" 
+applic_vmoptions4=-Dtestserver.port=10080 -Dtestserver.home=/home/togetherj/vers6.0/linux/modules/com/togethersoft/modules/testingframework -Dtestserver.configuration="Visual Script" 
+confname0=NoName
+confname1=Test Suite - GUI
+confname2=Test Suite - No GUI
+confname3=JUnit
+confname4=Visual Script
+default=0
+jsp_vmoptions0=-classic
+jsp_vmoptions1=-classic
+jsp_vmoptions2=-classic
+jsp_vmoptions3=-classic
+jsp_vmoptions4=-classic
+[workspace]
+Developer.CodingWorkspace={{0,2,-1,0,0,0,0,0,0,1,0,50,75,25,-1,-1,-1,-1}${0,1,-1,0,0,0,0,1,0,1,0,50,75,25,-1,-1,-1,-1}${0,3,-1,0,0,0,0,1,0,1,0,66,50,25,-1,-1,-1,-1}${0,3,-1,0,0,0,0,1,0,1,0,66,50,25,-1,-1,-1,-1}${0,-1,-1,0,0,0,0,0,0,1,0,5,5,5,-1,-1,-1,-1}${0,5,-1,0,0,0,0,0,0,1,0,50,50,25,-1,-1,-1,-1}${0,4,-1,0,0,0,0,1,0,1,1,66,50,25,-1,-1,-1,-1}${0,7,-1,0,0,0,0,0,0,1,0,50,50,75,-1,-1,-1,-1}}
+Developer.DebugWorkspace={{0,2,-1,0,0,0,0,0,0,1,0,50,75,25,-1,-1,-1,-1}${0,1,-1,0,0,0,0,1,0,1,1,50,75,25,-1,-1,-1,-1}${0,3,-1,0,0,0,0,0,0,1,0,50,50,25,-1,-1,-1,-1}${0,3,-1,0,0,0,0,0,0,1,0,50,50,25,-1,-1,-1,-1}${0,-1,-1,0,0,0,0,0,0,1,0,5,5,5,-1,-1,-1,-1}${0,4,-1,0,0,0,0,0,0,1,0,50,50,25,-1,-1,-1,-1}${0,0,-1,0,0,0,0,1,0,1,0,75,5,5,-1,-1,-1,-1}${0,7,-1,0,0,0,0,0,0,1,0,50,50,75,-1,-1,-1,-1}}
+Developer.DesignWorkspace={{0,2,-1,0,0,0,0,1,0,1,0,50,75,22,-1,-1,-1,-1}${0,1,-1,0,0,0,0,0,0,1,0,50,75,22,-1,-1,-1,-1}${0,3,-1,0,0,0,0,1,0,1,0,50,50,22,-1,-1,-1,-1}${0,3,-1,0,0,0,0,1,0,1,0,50,50,22,-1,-1,-1,-1}${0,-1,-1,0,0,0,0,0,0,1,0,5,5,5,-1,-1,-1,-1}${0,4,-1,0,0,0,0,1,0,1,1,50,50,22,-1,-1,-1,-1}${0,0,-1,0,0,0,0,0,0,1,0,75,5,5,-1,-1,-1,-1}${0,7,-1,0,0,0,0,0,0,1,0,50,50,75,-1,-1,-1,-1}}
+Developer.key={{0,2,-1,0,0,0,0,0,0,1,0,43,75,25,-1,-1,-1,-1}${0,1,-1,0,0,0,0,0,0,1,0,43,75,25,-1,-1,-1,-1}${0,3,-1,0,0,0,0,0,0,1,1,50,50,25,-1,-1,-1,-1}${0,3,-1,0,0,0,0,0,0,1,1,50,50,25,-1,-1,-1,-1}${0,-1,-1,0,0,0,0,0,0,1,0,5,5,5,-1,-1,-1,-1}${0,4,-1,0,0,0,0,0,0,1,0,50,50,25,-1,-1,-1,-1}${0,0,-1,0,0,0,0,0,0,1,0,59,5,5,-1,-1,-1,-1}${0,7,-1,0,0,0,0,0,0,1,0,50,50,75,-1,-1,-1,-1}}
+names.Developer={key,DesignWorkspace,CodingWorkspace,DebugWorkspace}
+[lastOpenProjectName]
+Developer=key
+[compiler]
+cross-bootclasspath=/amd.home/home/togetherj/vers6.2/linux/jdk/jre/lib/rt.jar
+cross-compilation_enabled=true
+cross-target=1.4
+[builder]
+userCompilingTool_enabled=false
+[parser]
+java.java14syntax=/home/gladisch/Borland/Together6.2/jdk
+[jdkit]
+homedir=/home/gladisch/Borland/Together6.2/jdk
+[vcs]
+provider.class=CVS LAN
+[findusages]
+process_subpackages=false
+search_in_classpath=false
+search_in_current_package=false
+search_in_model=true
+search_in_selected=false
+search_in_whole_project=false
+method.check_deep_inferitance=false
+method.overriding=false
+method.usages=true
+class.check_deep_inferitance=false
+class.derrived_class=false
+class.method_overriding=false
+class.skip_import_statement=false
+class.skip_itself=false
+class.usages=true
+class.usages_of_field=true
+class.usages_of_method=true
+[search]
+file.replaceWith=
+file.textToFind=is already in use	prcs	Completed	 interactiveProver	proove Completed	savep
+[lioeditor]
+scheme.java.optimal_fill=false
+scheme.java.use_tab_char=false

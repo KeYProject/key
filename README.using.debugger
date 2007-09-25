@@ -1,0 +1,53 @@
+HOWTO USE JSWAT FOR DEBUGGING KEY
+-------------------------------------
+
+This document describes howto use the java debugger "JSwat" (for 
+further information see http://www.bluemarsh.com/java/jswat/).
+
+System Requirements:
+--------------------
+
+JSwat requires a JDK 1.4 or better
+
+(1) Starting JSwat
+-------------------
+
+ (1.1) Developing at ILKD/Karlsruhe
+ - Check-out key from PRCS-repository as usual. 
+ - Run script <check-out-dir>/bin/runDebugger to start JSwat
+
+ (1.2) Developing somewhere else
+ - Get a KeY source-code distribution and unpack it to <key-dir>
+ - Get JSwat 2.x from http://www.bluemarsh.com/java/jswat/ und unpack
+   to some directory <jswat-dir>
+ - Set environment variable JSWAT_HOME to <jswat-dir>
+ - Set environment variable JAVA_1_4_HOME to the home directory
+   of your JDK 1.4 
+ - Run script <key-dir>/bin/runDebugger to start JSwat
+
+(2) Debugging KeY (stand-alone prover)
+    
+In the following, let <key-dir> be the directory where your
+KeY-source resides and let <Together-home> be the directory
+where TogetherCC is installed.
+
+ - Compile key using javac instead of jikes which seems 
+   to cause some problems during debugging. This can e.g. be done
+   be setting the environment variable JAVAC to javac before 
+   running make.
+-  Run script "runDebugger" if not already running and invoke
+   "Options"->"Set Classpath". Then add the following paths:
+   - <key-dir>/system/binary
+   - <Together-home>/lib/openapi.jar
+   - the jar-files for recoder, xerces, and antlr (these are
+     necessary to run KeY anyway)
+- Invoke "Options"->"SetSourcepath" and add <key-dir>
+- To start debugging invoke "VM"->"Start VM" and enter 
+  "de.uka.ilkd.key.gui.Main" as class name and press OK.
+- For information on how to debug see menu point "HELP" ;-)
+
+
+
+
+
+

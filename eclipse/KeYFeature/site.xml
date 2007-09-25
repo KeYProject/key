@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <description url="http://i12ww.ira.uka.de/~key/KeYDists/KeY_Feature/">
+      KeY Nightly Builds
+   </description>
+   <!-- $Format: "<feature url=\"features/KeY_Feature_1.$ProjectVersion$.jar\" id=\"KeY_Feature\" version=\"1.$ProjectVersion$\"/>"$ -->
+<feature url="features/KeY_Feature_1.0.2655.jar" id="KeY_Feature" version="1.0.2655"/>
+</site>

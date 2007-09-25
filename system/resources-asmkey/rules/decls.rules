@@ -1,0 +1,116 @@
+/* done */
+
+sorts {
+    int;
+    numbers;
+    char;
+
+    generic G;
+}
+
+schema variables {
+    G #s, #s1, #s2, #t, #t1, #t2;
+    G #c, #d;
+    G variables #x, #y, #u;
+    G depending #sk, #sk1, #sk2;
+    formula #phi, #phi1, #phi2, #psi, #post, #inv;
+   
+    asm rule #R, #R1, #R2, #R3, #S, #S1, #S2;
+    asm rule #rho;
+
+    int #i, #i0, #i1, #i2, #i3, #i4, #j, #j0, #j1;
+    int variables #k, #k1, #nv;
+    numbers #iz, #jz;
+    SequenceOfint #Li;
+
+    SetOfG #setG, #setG1, #setG2;
+    SetOfG variables #xsetG;
+    SetOfG depending #sksetG;
+
+    SequenceOfG #L1, #L2, #L3, #L;
+    SequenceOfG variables #xL, #yL;
+    SequenceOfG depending #skL;
+}
+
+functions{
+  numbers #;
+  numbers 0 (numbers);
+  numbers 1 (numbers);
+  numbers 2 (numbers);
+  numbers 3 (numbers);
+  numbers 4 (numbers);
+  numbers 5 (numbers);
+  numbers 6 (numbers);
+  numbers 7 (numbers);
+  numbers 8 (numbers);
+  numbers 9 (numbers);
+  numbers neg (numbers);
+
+  int Z (numbers);
+
+  int succ(int);
+  int pred(int);
+  int +(int,int);
+  int ~m(int);
+  int ~d(int,int);
+  
+  int mul(int, int);
+  int mod(int, int);
+  int div(int, int);
+
+  int posdiv(int, int);
+
+  char C (numbers);
+
+}
+
+predicates{
+  lt(int, int);
+  leq(int, int);
+  gt(int, int);
+  geq(int, int);
+}
+
+heuristics{
+  /* from key */
+  split;
+  simplify;
+  closure;
+  delta;
+  beta;
+  gamma;
+  gamma_destructive;
+  order_terms;
+  simplify_literals;
+  simplify_int;
+  int_arithmetic;
+  simplify_int_arith;
+  simplify_expression;
+  eval_literals;
+  expand_In_Type;
+  replace_known;
+  concrete;
+  alpha;
+  charLiteral_to_intLiteral;
+  pull_out_quantifier;
+  apply_equations;
+
+
+  /* for asmkey */
+  closure_prop;
+  unfold_upd;
+  unfold_inv;
+  unfold_acc;
+  unfold_def;
+  unfold_Con;
+  simplify_asm;
+  split_asm;
+  split_asm_if;
+  split_asm_try;
+  simplify_asm_named;
+  simplify_accT;
+  simplify_accF;
+  simplify_acc;
+  simplify_acc_named;
+  expand_joinable;
+}

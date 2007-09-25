@@ -1,0 +1,28 @@
+package id21tlvdr69aiaddr69cn7f;
+
+/**
+@version 2.0
+@physicalPackage
+@__modelType diagram 
+*/
+class diagram {
+/**
+@__ref <oiref:design#Class#idb6c7dr69aiaddr69cn84.diagram:oiref><oihard>
+@__modelType reference
+@__fqn <oiref:#Package#javacard.framework:oiref> 
+*/
+class reference {
+}}/**
+@__tags
+@shapeType ClassDiagram 
+*/
+class __tags {
+}/**
+@__options 
+*/
+class __options {
+}/**
+@__positions 
+*/
+class __positions {
+}

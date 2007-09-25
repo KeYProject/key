@@ -1,0 +1,308 @@
+/* done */
+
+taclets {
+
+  // closing goals
+  close_goal       { if (#phi ==>) find (==> #phi) close goal 
+			    heuristics(closure, closure_prop) };
+  close_goal_antec { if (==> #phi) find (#phi ==>) close goal };
+  close_by_false   { find (false ==>) close goal heuristics(closure_prop) };
+  close_by_true    { find (==> true) close goal heuristics(closure_prop) };
+  
+
+  // simplify taclets for "ReplaceKnownStrategy"
+  replace_known_left  { if ( #phi ==> ) find ( #phi )  replacewith ( true ) 
+			   heuristics(replace_known) noninteractive sameUpdateLevel };
+  replace_known_right { if ( ==> #phi ) find ( #phi )  replacewith ( false ) sameUpdateLevel };
+
+
+  // junctor taclets
+  true_left    { find (true ==>) replacewith(==>) heuristics(concrete) };
+  false_right  { find (==> false) replacewith(==>) heuristics(concrete) };
+
+  not_left  { find (! #phi ==>) replacewith(==> #phi) heuristics(alpha) };
+  not_right { find (==> ! #phi) replacewith(#phi ==>) heuristics(alpha) };
+
+  imp_left  { find (#phi -> #psi ==>) 
+		replacewith(==> #phi); 
+                replacewith(#psi ==>)
+	      heuristics(split,beta) };
+  imp_right { find (==> #phi -> #psi) replacewith(#phi ==> #psi) 
+		heuristics(alpha) };
+
+  and_left  { find (#phi & #psi ==>) replacewith(#phi, #psi ==>) heuristics(alpha) };
+  and_right { find (==> #phi & #psi) replacewith(==> #phi); replacewith(==> #psi) 
+                    heuristics(split,beta) };
+  or_left   { find (#phi | #psi ==>) replacewith(#phi ==>); replacewith(#psi ==>)
+                    heuristics(split,beta) };
+  or_right  { find (==> #phi | #psi) replacewith(==> #phi, #psi) heuristics(alpha) };
+
+//  equiv_left   { find (#phi <-> #psi ==>) 
+//		      replacewith(#phi -> #psi, #psi -> #phi ==>)
+//                    heuristics(alpha_concrete) };
+
+  equiv_left   { find (#phi <-> #psi ==>) 
+		      replacewith(#phi, #psi ==>); 
+                      replacewith(==> #phi, #psi)
+                    heuristics(split,beta) };
+  
+//  equiv_right  { find (==> #phi <-> #psi) 
+//		      replacewith(==> #phi & #psi, !#phi & !#psi)
+//                    heuristics(alpha_concrete) };
+
+  equiv_right  { find (==> #phi <-> #psi) 
+		      replacewith(#phi ==> #psi);
+                      replacewith(#psi ==> #phi)
+                    heuristics(split,beta) };
+
+  /* These `recursive' taclets are commented out, because this 
+     keyword is not yet supported.
+  imp_left_rec { find (#phi -> #psi ==>)  recursive 
+		   replacewith(==> #phi); 
+                   replacewith(#psi ==>) };
+  and_right_rec { find (==> #phi & #psi)  recursive 
+		    replacewith(==> #phi); 
+                    replacewith(==> #psi) };
+  or_left_rec { find (#phi | #psi ==>)  recursive
+		  replacewith(#phi ==>); 
+                  replacewith(#psi ==>) };
+  */
+  
+  split_or_strong { find (#phi | #psi ==>) 
+		      replacewith (#phi ==>); 
+                      replacewith(#psi ==> #phi) };
+
+  shift_paren_and { find ((#phi & #psi) & #phi1) replacewith (#phi & (#psi & #phi1))
+                        heuristics(simplify) };
+  shift_paren_or  { find ((#phi | #psi) | #phi1) replacewith (#phi | (#psi | #phi1))
+                        heuristics(simplify) };
+  commute_and { find (#phi & #psi) replacewith (#psi & #phi) };
+  commute_or  { find (#phi | #psi) replacewith (#psi | #phi) };
+  rotate_and { find (#phi & (#psi & #phi1)) replacewith (#psi & (#phi & #phi1)) };
+  rotate_or  { find (#phi | (#psi | #phi1)) replacewith (#psi | (#phi | #phi1)) };
+  
+  // equivalence replacement
+  /*insert_eqv_once_lr { find (#phi <-> #psi ==>)
+		       cond(static #phi, static #psi)
+			addrules( insert_eqv{ find(#phi) replacewith (#psi)} )
+		       heuristics(simplify) noninteractive };
+  insert_eqv_once_rl { find (#phi <-> #psi ==>) 
+		       cond(static #phi, static #psi)
+			 addrules( insert_eqv{ find(#psi) replacewith (#phi)} )
+                       heuristics(simplify) noninteractive };
+
+  insert_eqv_lr { find (#phi <-> #psi ==>)
+		  cond(static #phi, static #psi)
+		    addrules( insert_eqv{ find(#phi) replacewith (#psi) 
+					  heuristics(simplify) } ) };
+  insert_eqv_rl { find (#phi <-> #psi ==>)
+		  cond(static #phi, static #psi)
+		    addrules( insert_eqv{ find(#psi) replacewith (#phi) 
+					  heuristics(simplify) } ) };*/
+
+  // simplification
+  double_not { find ( ! ( ! #phi)) replacewith (#phi) heuristics(concrete) };
+
+  concrete_not_1  { find (! true) replacewith (false) heuristics(concrete) };
+  concrete_not_2  { find (! false) replacewith (true) heuristics(concrete) };
+
+  concrete_impl_1 { find (true -> #phi) replacewith (#phi) heuristics(concrete) };
+  concrete_impl_2 { find (false -> #phi) replacewith (true) heuristics(concrete) };
+  concrete_impl_3 { find (#phi -> false) replacewith (! #phi) heuristics(concrete) };
+  concrete_impl_4 { find (#phi -> true) replacewith (true) heuristics(concrete) };
+
+  concrete_and_1  { find(true & #phi) replacewith (#phi) heuristics(concrete) };
+  concrete_and_2  { find(false & #phi) replacewith (false) heuristics(concrete) };
+  concrete_and_3  { find(#phi & true) replacewith (#phi) heuristics(concrete) };
+  concrete_and_4  { find(#phi & false) replacewith (false) heuristics(concrete) };
+
+  concrete_or_1   { find(true | #phi) replacewith (true) heuristics(concrete) };
+  concrete_or_2   { find(false | #phi) replacewith (#phi) heuristics(concrete) };
+  concrete_or_3   { find(#phi | true) replacewith (true) heuristics(concrete) };
+  concrete_or_4   { find(#phi | false) replacewith (#phi) heuristics(concrete) };
+  
+  concrete_eq_1   { find(true <-> #phi) replacewith (#phi) heuristics(concrete) };
+  concrete_eq_2   { find(false <-> #phi) replacewith (! #phi) heuristics(concrete) };
+  concrete_eq_3   { find(#phi <-> true) replacewith (#phi) heuristics(concrete) };
+  concrete_eq_4   { find(#phi <-> false) replacewith (! #phi) heuristics(concrete) };
+  
+
+/*
+  eq_imp  { find(#phi -> #phi) replacewith (true) heuristics(simplify) };
+  eq_and  { find(#phi & #phi) replacewith (#phi) heuristics(simplify) };
+  eq_or   { find(#phi | #phi) replacewith (#phi) heuristics(simplify) };
+  eq_eq   { find(#phi <-> #phi) replacewith (true) heuristics(simplify) };
+*/
+  eq_imp  { find(#phi -> #phi) replacewith (true) };
+  eq_and  { find(#phi & #phi) replacewith (#phi) };
+  eq_or   { find(#phi | #phi) replacewith (#phi) };
+  eq_eq   { find(#phi <-> #phi) replacewith (true) };
+  
+
+
+  known_not_1_r  { if (#phi ==>) find (==> ! #phi) replacewith (==> false) 
+			      heuristics(simplify) noninteractive 
+                              displayname "known_not"};
+  known_not_1_l  { if (#phi ==>) find ( ! #phi ==>) replacewith (false ==>) 
+			      heuristics(simplify) noninteractive 
+                              displayname "known_not"};
+
+  known_not_2_r  { if (==> #phi) find (==> ! #phi) replacewith (==>true) 
+			      heuristics(simplify) noninteractive 
+                              displayname "known_not"};
+  known_not_2_l  { if (==> #phi) find (! #phi ==>) replacewith (true==>) 
+			      heuristics(simplify) noninteractive 
+                              displayname "known_not"};
+
+  known_impl_1_r { if (#phi ==>) find (==> #phi -> #psi) replacewith (==>#psi) 
+			      heuristics(simplify) noninteractive 
+                              displayname "known_impl"};
+  known_impl_1_l { if (#phi ==>) find (#phi -> #psi ==>) replacewith (#psi==>) 
+			      heuristics(simplify) noninteractive 
+                              displayname "known_impl"};
+
+  known_impl_2_r { if (==> #phi) find (==> #phi -> #psi) replacewith (==>true) 
+			      heuristics(simplify) noninteractive 
+                              displayname "known_impl"};
+  known_impl_2_l { if (==> #phi) find (#phi -> #psi ==>) replacewith (true==>) 
+			      heuristics(simplify) noninteractive 
+                              displayname "known_impl"};
+
+
+  known_impl_3_r { if (==> #phi) find (==> #psi -> #phi) replacewith (==>! #psi) 
+			      heuristics(simplify) noninteractive 
+                              displayname "known_impl"};
+  known_impl_3_l { if (==> #phi) find (#psi -> #phi ==>) replacewith (! #psi==>) 
+			      heuristics(simplify) noninteractive
+                              displayname "known_impl"};
+
+  known_impl_4_r { if (#phi ==>) find (==> #psi -> #phi) replacewith (==>true) 
+			      heuristics(simplify) noninteractive
+                              displayname "known_impl"};
+  known_impl_4_l { if (#phi ==>) find (#psi -> #phi ==>) replacewith (true==>) 
+			      heuristics(simplify) noninteractive
+                              displayname "known_impl"};
+
+  known_and_1_r  { if (#phi ==>) find(==> #phi & #psi) replacewith (==>#psi) 
+			      heuristics(simplify) noninteractive 
+                              displayname "known_and"};
+  known_and_1_l  { if (#phi ==>) find(#phi & #psi ==>) replacewith (#psi==>) 
+			      heuristics(simplify) noninteractive
+                              displayname "known_and"};
+
+  known_and_2_r  { if (==> #phi) find(==> #phi & #psi) replacewith (==>false) 
+			      heuristics(simplify) noninteractive
+                              displayname "known_and"};
+  known_and_2_l  { if (==> #phi) find(#phi & #psi ==>) replacewith (false==>) 
+			      heuristics(simplify) noninteractive
+                              displayname "known_and"};
+
+
+  known_and_3_r  { if (#phi ==>) find(==> #psi & #phi) replacewith (==>#psi) 
+			      heuristics(simplify) noninteractive
+                              displayname "known_and"};
+  known_and_3_l  { if (#phi ==>) find(#psi & #phi ==>) replacewith (#psi==>) 
+			      heuristics(simplify) noninteractive
+                              displayname "known_and"};
+
+  known_and_4_r  { if (==> #phi) find(==> #psi & #phi) replacewith (==>false) 
+			      heuristics(simplify) noninteractive
+                              displayname "known_and"};
+  known_and_4_l  { if (==> #phi) find(#psi & #phi  ==>) replacewith (false==>) 
+			      heuristics(simplify) noninteractive
+                              displayname "known_and"};
+
+  known_or_1_l   { if (#phi ==>) find(#phi | #psi ==>) replacewith (true==>) 
+			      heuristics(simplify) noninteractive 
+                              displayname "known_or"};
+  known_or_1_r   { if (#phi ==>) find(==> #phi | #psi) replacewith (==>true) 
+			      heuristics(simplify) noninteractive
+                              displayname "known_or"};
+
+  known_or_2_l   { if (==> #phi) find(#phi | #psi ==>) replacewith (#psi==>) 
+			      heuristics(simplify) noninteractive
+                              displayname "known_or"};
+  known_or_2_r   { if (==> #phi) find(==> #phi | #psi) replacewith (==>#psi) 
+			      heuristics(simplify) noninteractive
+                              displayname "known_or"};
+
+  known_or_3_l   { if (#phi ==>) find(#psi | #phi ==>) replacewith (true==>) 
+			      heuristics(simplify) noninteractive
+                              displayname "known_or"};
+  known_or_3_r   { if (#phi ==>) find(==> #psi | #phi) replacewith (==>true) 
+			      heuristics(simplify) noninteractive
+                              displayname "known_or"};
+
+  known_or_4_l   { if (==> #phi) find(#psi | #phi ==>) replacewith (#psi==>) 
+			      heuristics(simplify) noninteractive
+                              displayname "known_or"};
+  known_or_4_r   { if (==> #phi) find(==> #psi | #phi) replacewith (==>#psi) 
+			      heuristics(simplify) noninteractive
+                              displayname "known_or"};
+
+  known_eq_1_l   { if (#phi ==>) find(#phi <-> #psi ==>) replacewith (#psi==>) 
+			      heuristics(simplify) noninteractive 
+                              displayname "known_eq"};
+  known_eq_1_r   { if (#phi ==>) find(==> #phi <-> #psi) replacewith (==>#psi) 
+			      heuristics(simplify) noninteractive 
+                              displayname "known_eq"};
+  known_eq_2_l   { if (==> #phi) find(#phi <-> #psi ==>) replacewith (! #psi==>) 
+			      heuristics(simplify) noninteractive
+                              displayname "known_eq"};
+  known_eq_2_r   { if (==> #phi) find(==> #phi <-> #psi) replacewith (==>! #psi) 
+			      heuristics(simplify) noninteractive
+                              displayname "known_eq"};
+  known_eq_3_l   { if (#phi ==>) find(#psi <-> #phi ==>) replacewith (#psi==>) 
+			      heuristics(simplify) noninteractive
+                              displayname "known_eq"};
+  known_eq_3_r   { if (#phi ==>) find(==> #psi <-> #phi) replacewith (==>#psi) 
+			      heuristics(simplify) noninteractive
+                              displayname "known_eq"};
+  known_eq_4_l   { if (==> #phi) find(#psi <-> #phi ==>) replacewith (!#psi==>) 
+			      heuristics(simplify) noninteractive
+                              displayname "known_eq"};
+  known_eq_4_r   { if (==> #phi) find(==> #psi <-> #phi) replacewith (==>!#psi) 
+			      heuristics(simplify) noninteractive
+                              displayname "known_eq"};
+
+
+  // other
+  cut { find(==>) add (#phi ==>); add (==> #phi) };
+
+  cut_direct_r { find (==> #phi) replacewith (==> #phi); add (#phi ==>) };
+  cut_direct_l { find (#phi ==>) replacewith (#phi ==>); add (==> #phi) };
+
+  // proofobl not parsed yet.
+  // rule_cut { addrules (rule); add (==> proofobl(rule)) };
+
+  // not for asmkey...
+  //hide_left  { find (#phi ==>) replacewith (==>)
+  //             addrules( insert_hidden { add (#phi ==>) } ) };
+  //hide_right { find (==> #phi) replacewith (==>)
+  //             addrules( insert_hidden { add (==> #phi) } ) };
+
+  case_distinction_r { find (==> #phi)
+		       addrules( to_true  { find(==> #phi) 
+					      replacewith(==>true)  
+					    heuristics(simplify)
+					    noninteractive } );
+                       addrules( to_false { find(==> #phi) 
+					      replacewith(==>false) 
+					    heuristics(simplify) 
+					    noninteractive } )
+                       displayname "case_distinction"
+		     };
+
+  case_distinction_l { find (#phi ==>)
+		       addrules( to_true  { find(#phi ==>) 
+					      replacewith(true ==>)  
+					    heuristics(simplify)
+					    noninteractive } );
+                       addrules( to_false { find(#phi ==>) 
+					     replacewith(false ==>) 
+					    heuristics(simplify) 
+					    noninteractive } )
+                       displayname "case_distinction"
+		     };
+
+}

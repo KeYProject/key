@@ -1,0 +1,95 @@
+#!/bin/sh
+if  [ -n '$1' ]; then
+    if [ "$1" = "--with-together" ]; then
+       TOGETHER_ENABLED="true"
+    fi
+fi
+resolve_symlink  ()
+{ 
+   TARGET=`ls -l $1| awk '/\ ->\ /{print $NF}'`
+
+   if [ -n "$TARGET" ] ; then
+      RESULT="$TARGET"
+      case "$RESULT" in
+         /*) break ;;				# absolute symlink
+         *)  RESULT=`dirname $0`/"$RESULT" ;;	# relative symlink
+      esac
+   else
+      RESULT=$1
+   fi
+
+   echo "$RESULT"
+}
+
+
+
+if [ "D""$JAVA_HOME" = "D" ]; then 
+echo "Please set the \$JAVA_HOME environment for compiling KeY" 
+echo "to the directory where you have installed Java." 
+exit 1
+fi
+#echo "Using JDK installation from:      $JAVA_HOME"
+
+
+# standard lib location
+if [ -z "$KEY_LIB" ] ; then
+   KEY_LIB="../key-ext-jars"
+fi
+#echo "Using libraries from:             $KEY_LIB"
+
+
+if [ -n "$TOGETHER_ENABLED" ];
+then
+   if [ -z "$TOGETHER_HOME"  ]
+   then
+      if [ -d "$KEY_LIB/TOGETHER" ] ; then
+         TOGETHER_HOME=`resolve_symlink "$KEY_LIB/TOGETHER"`
+      else
+         echo
+         echo Please set the \$TOGETHER_HOME environment variable.
+         echo "( e.g. /home/togetherj/vers6.0/linux )"
+         exit 1
+      fi
+    fi
+fi
+#echo "Using Together installation from: $TOGETHER_HOME"
+
+
+key_ext_jars="antlr.jar recoder.jar dresden-ocl-demo.jar xerces.jar log4j.jar jargs.jar"
+
+key_dev_jars="javacc.jar junit.jar"
+
+together_jars="lib/openapi.jar lib/jgl.zip lib/together.jar modules/"
+
+
+CLASSPATH=./binary/
+
+for i in $key_ext_jars $key_dev_jars; do
+    current_jar="$KEY_LIB/$i"
+    if [ ! -f $current_jar ]
+    then
+       echo "Cannot find $current_jar."
+       echo Copy or link the file into the
+       echo "$KEY_LIB/ directory."
+       exit 1
+    else
+       CLASSPATH=$CLASSPATH:$current_jar
+    fi
+done
+
+if [ -n "$TOGETHER_ENABLED" ];
+then
+   for i in $together_jars; do
+       current_jar="$TOGETHER_HOME/$i"
+       if [ ! -r $current_jar ]
+       then
+          echo "Cannot find $current_jar. Check Together installation"
+          exit 1
+       else
+          CLASSPATH=$CLASSPATH:$current_jar
+       fi
+   done
+fi
+
+export CLASSPATH
+echo "CLASSPATH=$CLASSPATH" > Makefile.mk

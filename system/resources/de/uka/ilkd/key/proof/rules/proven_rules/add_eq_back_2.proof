@@ -1,0 +1,43 @@
+\settings {
+"#Proof-Settings-Config-File
+#Tue Jul 26 13:50:44 CEST 2005
+[General]SoundNotification=false
+[View]FontIndex=2
+[SimultaneousUpdateSimplifier]DeleteEffectLessLocations=true
+[General]SuggestiveVarNames=false
+[General]ProofAssistant=false
+[View]ShowWholeTaclet=false
+[View]MaxTooltipLines=40
+[General]StupidMode=true
+[Strategy]MaximumNumberOfAutomaticApplications=10000
+[Choice]DefaultChoices=transactionsPolicy-transactionsPolicy\:abortTransaction , programRules-programRules\:Java , initialisation-initialisation\:disableStaticInitialisation , intRules-intRules\:arithmeticSemanticsIgnoringOF , nullPointerPolicy-nullPointerPolicy\:nullCheck
+[OCLRef]Null=true
+[OCLRef]ExcThrown=true
+[Model]Source=1
+[Choice]Choices=transactionsPolicy-transactionsPolicy\:abortTransaction-transactionsPolicy\:noAbortTransaction , programRules-programRules\:ODL-programRules\:Java , initialisation-initialisation\:disableStaticInitialisation-initialisation\:enableStaticInitialisation , intRules-intRules\:arithmeticSemanticsCheckingOF-intRules\:javaSemantics-intRules\:arithmeticSemanticsIgnoringOF , nullPointerPolicy-nullPointerPolicy\:noNullCheck-nullPointerPolicy\:nullCheck
+[OCLRef]Array=true
+[DecisionProcedure]=SIMPLIFY
+[General]OuterRenaming=true
+[Strategy]ActiveStrategy=Simple JavaCardDL without unwinding loops
+"
+}
+
+\problem {
+!!(i_191 + i1_192 = i0_190 + i1_192 <-> i_191 = i0_190)
+
+}
+
+\proof {
+(keyLog "0" (keyUser "bubel" ) (keyVersion "0.1737"))
+(keyLog "1" (keyUser "bubel" ) (keyVersion "0.1737"))
+
+(branch "dummy ID"
+(rule "double_not" (formula "1"))
+(rule "switch_params" (formula "1") (term "0,0"))
+(rule "switch_params" (formula "1") (term "1,0"))
+(rule "add_eq_back" (formula "1") (term "0"))
+(rule "eq_eq" (formula "1"))
+(rule "close_by_true" (formula "1"))
+)
+
+}

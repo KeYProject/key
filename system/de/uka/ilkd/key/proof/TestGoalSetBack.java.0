@@ -1,0 +1,156 @@
+//
+//
+
+package de.uka.ilkd.key.proof;
+
+import junit.framework.*;
+import de.uka.ilkd.key.logicdata.*;
+
+/** class tests the tree of proof
+*/
+
+
+public class TestGoalSetBack extends TestCase {
+    Proof p;
+    Node n1;
+    Node n2;
+    Node n3;
+    Node n4;
+    Node n5;
+    Node n6;
+    Node n7;
+    TermFactory tf=TermFactory.DEFAULT;
+    Goal g1;
+    Goal g;
+    STSRIndex origIndex;
+    Sequent s1;
+    STSR stsr1;
+    STSR stsr2;
+    STSR stsr3;
+    STSR stsr4;
+    STSR stsr5;
+    STSR stsr6;
+    STSR stsr7;
+    ListOfGoal goallist;
+
+    public TestGoalSetBack(String name) {
+	super(name);
+    }
+
+    public void setUp() {	
+	Sort s = new PrimitiveSort(new Name("s"));
+	LogicVariable b1=new LogicVariable(new Name("b1"),s);
+	LogicVariable b2=new LogicVariable(new Name("b2"),s);
+	LogicVariable b3=new LogicVariable(new Name("b3"),s);
+	LogicVariable b4=new LogicVariable(new Name("b4"),s);
+	LogicVariable b5=new LogicVariable(new Name("b5"),s);
+	LogicVariable b6=new LogicVariable(new Name("b6"),s);
+	LogicVariable b7=new LogicVariable(new Name("b7"),s);
+
+	Term t_b1=tf.createEqualityTerm(tf.createVariableTerm(b1),
+					tf.createVariableTerm(b1));
+	Term t_b2=tf.createEqualityTerm(tf.createVariableTerm(b2),
+					tf.createVariableTerm(b2));
+	Term t_b3=tf.createEqualityTerm(tf.createVariableTerm(b3),
+					tf.createVariableTerm(b3));
+	Term t_b4=tf.createEqualityTerm(tf.createVariableTerm(b4),
+					tf.createVariableTerm(b4));
+	Term t_b5=tf.createEqualityTerm(tf.createVariableTerm(b5),
+					tf.createVariableTerm(b5));
+	Term t_b6=tf.createEqualityTerm(tf.createVariableTerm(b6),
+					tf.createVariableTerm(b6));
+	Term t_b7=tf.createEqualityTerm(tf.createVariableTerm(b7),
+					tf.createVariableTerm(b7));
+	s1=Sequent.createSequent
+	    (Semisequent.EMPTY_SEMISEQUENT.insert(0, new
+	    ConstraintFormula(t_b1, Constraint.BOTTOM)),
+	     Semisequent.EMPTY_SEMISEQUENT); 
+	Sequent s2=Sequent.createSequent
+	    (Semisequent.EMPTY_SEMISEQUENT.insert(0, new
+		ConstraintFormula(t_b2, Constraint.BOTTOM)),
+	     Semisequent.EMPTY_SEMISEQUENT); 
+	Sequent s3=Sequent.createSequent
+	    (Semisequent.EMPTY_SEMISEQUENT.insert(0, new
+		ConstraintFormula(t_b3, Constraint.BOTTOM)),
+	     Semisequent.EMPTY_SEMISEQUENT); 
+	Sequent s4=Sequent.createSequent
+	    (Semisequent.EMPTY_SEMISEQUENT.insert(0, new
+		ConstraintFormula(t_b4, Constraint.BOTTOM)),
+	     Semisequent.EMPTY_SEMISEQUENT); 
+	Sequent s5=Sequent.createSequent
+	    (Semisequent.EMPTY_SEMISEQUENT.insert(0, new
+		ConstraintFormula(t_b5, Constraint.BOTTOM)),
+	     Semisequent.EMPTY_SEMISEQUENT); 
+	Sequent s6=Sequent.createSequent
+	    (Semisequent.EMPTY_SEMISEQUENT.insert(0, new
+		ConstraintFormula(t_b6, Constraint.BOTTOM)),
+	     Semisequent.EMPTY_SEMISEQUENT); 
+	Sequent s7=Sequent.createSequent
+	    (Semisequent.EMPTY_SEMISEQUENT.insert(0, new
+		ConstraintFormula(t_b7, Constraint.BOTTOM)),
+	     Semisequent.EMPTY_SEMISEQUENT); 
+
+	TestMatchSTSRPartOne ts= new TestMatchSTSRPartOne("");
+	ts.setUp();
+	stsr1=ts.fail1;
+	stsr2=ts.fail2;
+	stsr3=ts.fail3;
+	stsr4=ts.fail4;
+	stsr5=ts.fail5;
+	stsr6=ts.fail6;
+	stsr7=ts.fail7;
+	STSRIndex stsrIndex=new STSRIndex();
+	stsrIndex.add(stsr1);
+	stsrIndex.add(stsr2);
+	stsrIndex.add(stsr3);
+
+	origIndex=stsrIndex.copy();
+	g=new Goal(new Node(s1),new RuleAppIndex(stsrIndex));
+	ListOfGoal lg=g.split(3);
+	g1=lg.head();
+	g1.addFormula(new ConstraintFormula(t_b6, Constraint.BOTTOM),
+		      true,true);
+	g1.addSTSR(stsr4);
+	Goal g2=lg.tail().head();
+	g2.addFormula(new ConstraintFormula(t_b5, 
+					    Constraint.BOTTOM),
+		      true,true);
+	g2.addSTSR(stsr5);
+	Goal g3=lg.tail().tail().head();
+	g3.addFormula(new ConstraintFormula(t_b4, 
+					    Constraint.BOTTOM),
+		      true,true);
+	g3.addSTSR(stsr6);
+	ListOfGoal lg0=g2.split(1);
+	g2=lg0.head();
+	g2.addFormula(new ConstraintFormula(t_b7, 
+					    Constraint.BOTTOM), true, true);
+	g2.addSTSR(stsr7);
+	goallist=SLListOfGoal.EMPTY_LIST.prepend(g1).prepend(g2).prepend(g3);
+    }
+
+    public void testSetBack() {
+	ListOfGoal newgoallist=g1.setBack(goallist);
+	STSRIndex newIndex=g1.ruleAppIndex().stsrIndex();
+	Sequent newSeq=g1.node().sequent();
+	assert ("new index does contain stsr5",
+		!newIndex.allSTSRs().contains(stsr5));
+	assert ("new index does contain stsr4",
+		!newIndex.allSTSRs().contains(stsr4));
+	assert ("new index does contain stsr6",
+		!newIndex.allSTSRs().contains(stsr6));
+	assert ("new index does contain stsr6",
+		!newIndex.allSTSRs().contains(stsr7));
+	assert ("new index does not contain stsr1",
+		newIndex.allSTSRs().contains(stsr1));
+	assert ("new index does not contain stsr2",
+		newIndex.allSTSRs().contains(stsr2));
+	assert ("new index does not contain stsr3",
+		newIndex.allSTSRs().contains(stsr3));
+	assert ("removals from goal list failed",newgoallist.size()==1);
+    }
+
+    
+}
+
+

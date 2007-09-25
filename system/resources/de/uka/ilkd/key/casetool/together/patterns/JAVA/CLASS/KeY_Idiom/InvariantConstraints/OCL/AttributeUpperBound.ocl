@@ -1,0 +1,17 @@
+patternmodification#
+
+addStringField#'Attribute with upper bound'
+addStringField#'Upper bound for attribute'
+addParameter#upperOperator#ComboBox#'<'#'<='
+
+mapping#self.attrib#'Attribute with upper bound'
+mapping#upperBound#'Upper bound for attribute'
+mapping#upperOperator#'upperOperator'
+
+invariant#class#selectedClass
+ 
+schema# 
+	self.attrib upperOperator upperBound
+ 
+comment#
+This idiom requires the indicated <b>numeric attribute</b> to be below the indicated <b>limit</b>. Depending on the selected <b>operator</b> the limit may or may not be reached by the attribute.

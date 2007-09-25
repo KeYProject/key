@@ -1,0 +1,64 @@
+#!/bin/sh
+# This file is part of KeY - Integrated Deductive Software Design
+# Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+#                         Universitaet Koblenz-Landau, Germany
+#                         Chalmers University of Technology, Sweden
+#
+# The KeY system is protected by the GNU General Public License. 
+# See LICENSE.TXT for details.
+#
+#
+#
+#
+#!/bin/sh
+pck=$1
+outFile=`echo $1 | sed 's!\.!/!g;'`"/"SetOf$2".java"
+sed "s/<Pck>/$pck/g;s/<T>/$2/g;" <<END_OF_CLASS >$outFile
+
+package <Pck>;
+/** interface implemented by non-destructive Sets. 
+* CONVENTION: Each SetOf<T> implementation has to offer a public static
+*    final variable called EMPTY_SET 
+*/
+
+public interface SetOf<T> extends java.io.Serializable {
+
+    /** adds an element */
+    SetOf<T> add(<T> element);
+
+    /** @return union of this set with set */
+    SetOf<T> union(SetOf<T> set);
+
+    /** @return IteratorOf<T> of the set */
+    IteratorOf<T> iterator() ;
+
+    /** @return true iff obj in set */
+    boolean contains(<T> obj);
+
+    /** @return true iff this set is subset of set s */
+    boolean subset(SetOf<T> s);
+
+    /** @return int the cardinality of the set */
+    int size();
+
+    /** @return set without element */
+    SetOf<T> remove(<T> element);
+
+    /** @return true iff the this set is subset of o and vice versa.
+     */
+    boolean equals(Object o);
+
+    /** adds an element, barfs if the element is already present
+    * @param element of type <T> that has to be added to this set
+    * @throws NotUniqueException if the element is already present
+    */
+    SetOf<T> addUnique(<T> element) 
+                    throws de.uka.ilkd.key.collection.NotUniqueException;
+
+    /**
+     * Convert the set to a Java array
+     */
+    <T>[] toArray();
+    
+}
+END_OF_CLASS

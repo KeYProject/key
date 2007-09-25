@@ -1,0 +1,48 @@
+This directory contains subdirectories with sample .key input files
+for the KeY standalone prover. 
+
+Everyone is encouraged to add new .key files in existing or new
+subdirectories. 
+
+The subdirectories categorise the problems in certain domains like
+propositional logic problems (prop_log), predicate logic problems
+(pred_log), etc.
+
+* Files in these subdirectories should NOT BE MODIFIED in a sense that the
+  original intention of the denoted problem would be changed. Updates
+  because of a changed input syntax are of course allowed and desired.
+
+* .key files should have MEANINGFUL NAMES w.r.t. the contained problem.
+
+* There is a special subdirectory `dev´ that contains examples that are
+  test cases some developers want to use to test prover behaviour. It is
+  recommended to mark files in `dev´ that should not be modified by
+  other developers with the user name as prefix, e.g. `aroth_Test1.key´.
+
+* The problems in the .key files are supposed to be PARSABLE and
+  PROVABLE by the KeY standalone prover, if not stated otherwise in a
+  comment in the file. There is one exception from this rule: .key files
+  in the `dev´ subdirectory may be not parsable or not provable even if
+  not commented.
+
+* The used KeY prover VERSION must be given in a comment line at the
+  beginning of the .key file.
+
+* It is recommended to add COMMENTS describing the problem and
+  comments of the proof, e.g. required user interactions. If some
+  problem or its proof requires further descriptions it is recommended
+  to add an EXTRA TEXT FILE (preferably a TeX source) with additional
+  comments. Additional documentation files should have the same base
+  name as the .key file: `test.tex´ should be documentation for a
+  `test.key´ file. 
+
+* If Java CLASSES are needed for the .key file they should be contained
+  in a subdirectory below the .key file. The (relative) directory name
+  is put into the java{"/path/to/classes"} section of a .key file: If
+  the classes are in ~/key/system/proofExamples/cat/classes/ and the
+  .key file is in ~/key/system/proofExamples/cat/ it is required to
+  use 
+
+    java { "classes" }
+
+  to indicate the java directory.

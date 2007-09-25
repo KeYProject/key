@@ -1,0 +1,12 @@
+Documentation for the ASM-KeY system
+------------------------------------
+
+ - ASM-KeY program extensions and documentation is located in
+   'system/de/uka/ilkd/asmkey/README'.
+
+ - There are some additional resources (e.g. taclets) for the ASM-KeY
+   system, that are loaded in addition to the standard resources, in
+   the directory 'system/resources-asmkey'.
+
+ - There are some demo '.key'-files in the directory
+   'system/proofExamples/asmkey'.

@@ -1,0 +1,495 @@
+unit FOL
+
+export *
+
+import * from Base
+import * from Bool
+
+
+//------ closing goals  ------//
+
+taclet close_goal { if (#phi ==>) find (==> #phi) close goal 
+		    rule sets(closure, closure_prop) };
+taclet close_goal_antec { if (==> #phi) find (#phi ==>) close goal };
+taclet close_by_false   { find (FALSE ==>) close goal rule sets(closure_prop) };
+taclet close_by_true    { find (==> TRUE) close goal rule sets(closure_prop) };
+
+// --- derived symbols --- //
+taclet expand_derived { find (#t) cond(derived #t) replacewith(#META_DERIVED(#t)) };
+taclet expand_derived_predicate { find (#phi) cond(derived #phi) replacewith(#META_DERIVED(#phi)) };
+
+//------ simplify taclets for "ReplaceKnownStrategy" ------//
+taclet replace_known_left  { if ( #phi ==> ) find ( #phi )  replacewith ( TRUE ) 
+			   rule sets(replace_known) noninteractive sameUpdateLevel };
+taclet replace_known_right { if ( ==> #phi ) find ( #phi )  replacewith ( FALSE ) sameUpdateLevel };
+
+
+
+//------ junctor taclets ------//
+taclet true_left    { find (TRUE ==>) replacewith(==>) rule sets(concrete) };
+taclet false_right  { find (==> FALSE) replacewith(==>) rule sets(concrete) };
+
+taclet not_left  { find (! #phi ==>) replacewith(==> #phi) rule sets(alpha) };
+taclet not_right { find (==> ! #phi) replacewith(#phi ==>) rule sets(alpha) };
+
+taclet imp_left  { find (#phi -> #psi ==>) 
+		replacewith(==> #phi); 
+                replacewith(#psi ==>)
+	      rule sets(split,beta) };
+taclet imp_right { find (==> #phi -> #psi) replacewith(#phi ==> #psi) 
+		rule sets(alpha) };
+
+taclet and_left  { find (#phi & #psi ==>) replacewith(#phi, #psi ==>) rule sets(alpha) };
+taclet and_right { find (==> #phi & #psi) replacewith(==> #phi); replacewith(==> #psi) 
+                    rule sets(split,beta) };
+taclet or_left   { find (#phi | #psi ==>) replacewith(#phi ==>); replacewith(#psi ==>)
+                    rule sets(split,beta) };
+taclet or_right  { find (==> #phi | #psi) replacewith(==> #phi, #psi) rule sets(alpha) };
+
+//  equiv_left   { find (#phi <-> #psi ==>) 
+//		      replacewith(#phi -> #psi, #psi -> #phi ==>)
+//                    rule sets(alpha_concrete) };
+
+taclet equiv_left   { find (#phi <-> #psi ==>) 
+		      replacewith(#phi, #psi ==>); 
+                      replacewith(==> #phi, #psi)
+                    rule sets(split,beta) };
+  
+//  equiv_right  { find (==> #phi <-> #psi) 
+//		      replacewith(==> #phi & #psi, !#phi & !#psi)
+//                    rule sets(alpha_concrete) };
+
+taclet equiv_right  { find (==> #phi <-> #psi) 
+		      replacewith(#phi ==> #psi);
+                      replacewith(#psi ==> #phi)
+                    rule sets(split,beta) };
+
+  /* These `recursive' taclets are commented out, because this 
+     keyword is not yet supported.
+taclet imp_left_rec { find (#phi -> #psi ==>)  recursive 
+		   replacewith(==> #phi); 
+                   replacewith(#psi ==>) };
+taclet and_right_rec { find (==> #phi & #psi)  recursive 
+		    replacewith(==> #phi); 
+                    replacewith(==> #psi) };
+taclet or_left_rec { find (#phi | #psi ==>)  recursive
+		  replacewith(#phi ==>); 
+                  replacewith(#psi ==>) };
+  */
+  
+taclet split_or_strong { find (#phi | #psi ==>) 
+		      replacewith (#phi ==>); 
+                      replacewith(#psi ==> #phi) };
+
+taclet shift_paren_and { find ((#phi & #psi) & #phi1) replacewith (#phi & (#psi & #phi1))
+                        rule sets(simplify) };
+taclet shift_paren_or  { find ((#phi | #psi) | #phi1) replacewith (#phi | (#psi | #phi1))
+                        rule sets(simplify) };
+taclet commute_and { find (#phi & #psi) replacewith (#psi & #phi) };
+taclet commute_or  { find (#phi | #psi) replacewith (#psi | #phi) };
+taclet rotate_and { find (#phi & (#psi & #phi1)) replacewith (#psi & (#phi & #phi1)) };
+taclet rotate_or  { find (#phi | (#psi | #phi1)) replacewith (#psi | (#phi | #phi1)) };
+  
+  // equivalence replacement
+  /*insert_eqv_once_lr { find (#phi <-> #psi ==>)
+		       cond(static #phi, static #psi)
+			addrules( insert_eqv{ find(#phi) replacewith (#psi)} )
+		       rule sets(simplify) noninteractive };
+taclet insert_eqv_once_rl { find (#phi <-> #psi ==>) 
+		       cond(static #phi, static #psi)
+			 addrules( insert_eqv{ find(#psi) replacewith (#phi)} )
+                       rule sets(simplify) noninteractive };
+
+taclet insert_eqv_lr { find (#phi <-> #psi ==>)
+		  cond(static #phi, static #psi)
+		    addrules( insert_eqv{ find(#phi) replacewith (#psi) 
+					  rule sets(simplify) } ) };
+taclet insert_eqv_rl { find (#phi <-> #psi ==>)
+		  cond(static #phi, static #psi)
+		    addrules( insert_eqv{ find(#psi) replacewith (#phi) 
+					  rule sets(simplify) } ) };*/
+
+  // simplification
+taclet double_not { find ( ! ( ! #phi)) replacewith (#phi) rule sets(concrete) };
+
+taclet concrete_not_1  { find (! TRUE) replacewith (FALSE) rule sets(concrete) };
+taclet concrete_not_2  { find (! FALSE) replacewith (TRUE) rule sets(concrete) };
+
+taclet concrete_impl_1 { find (TRUE -> #phi) replacewith (#phi) rule sets(concrete) };
+taclet concrete_impl_2 { find (FALSE -> #phi) replacewith (TRUE) rule sets(concrete) };
+taclet concrete_impl_3 { find (#phi -> FALSE) replacewith (! #phi) rule sets(concrete) };
+taclet concrete_impl_4 { find (#phi -> TRUE) replacewith (TRUE) rule sets(concrete) };
+
+taclet concrete_and_1  { find(TRUE & #phi) replacewith (#phi) rule sets(concrete) };
+taclet concrete_and_2  { find(FALSE & #phi) replacewith (FALSE) rule sets(concrete) };
+taclet concrete_and_3  { find(#phi & TRUE) replacewith (#phi) rule sets(concrete) };
+taclet concrete_and_4  { find(#phi & FALSE) replacewith (FALSE) rule sets(concrete) };
+
+taclet concrete_or_1   { find(TRUE | #phi) replacewith (TRUE) rule sets(concrete) };
+taclet concrete_or_2   { find(FALSE | #phi) replacewith (#phi) rule sets(concrete) };
+taclet concrete_or_3   { find(#phi | TRUE) replacewith (TRUE) rule sets(concrete) };
+taclet concrete_or_4   { find(#phi | FALSE) replacewith (#phi) rule sets(concrete) };
+  
+taclet concrete_eq_1   { find(TRUE <-> #phi) replacewith (#phi) rule sets(concrete) };
+taclet concrete_eq_2   { find(FALSE <-> #phi) replacewith (! #phi) rule sets(concrete) };
+taclet concrete_eq_3   { find(#phi <-> TRUE) replacewith (#phi) rule sets(concrete) };
+taclet concrete_eq_4   { find(#phi <-> FALSE) replacewith (! #phi) rule sets(concrete) };
+  
+
+/*
+taclet eq_imp  { find(#phi -> #phi) replacewith (TRUE) rule sets(simplify) };
+taclet eq_and  { find(#phi & #phi) replacewith (#phi) rule sets(simplify) };
+taclet eq_or   { find(#phi | #phi) replacewith (#phi) rule sets(simplify) };
+taclet eq_eq   { find(#phi <-> #phi) replacewith (TRUE) rule sets(simplify) };
+*/
+taclet eq_imp  { find(#phi -> #phi) replacewith (TRUE) };
+taclet eq_and  { find(#phi & #phi) replacewith (#phi) };
+taclet eq_or   { find(#phi | #phi) replacewith (#phi) };
+taclet eq_eq   { find(#phi <-> #phi) replacewith (TRUE) };
+  
+
+
+taclet known_not_1_r  { if (#phi ==>) find (==> ! #phi) replacewith (==> FALSE) 
+			      rule sets(simplify) noninteractive 
+                              displayname "known_not"};
+taclet known_not_1_l  { if (#phi ==>) find ( ! #phi ==>) replacewith (FALSE ==>) 
+			      rule sets(simplify) noninteractive 
+                              displayname "known_not"};
+
+taclet known_not_2_r  { if (==> #phi) find (==> ! #phi) replacewith (==>TRUE) 
+			      rule sets(simplify) noninteractive 
+                              displayname "known_not"};
+taclet known_not_2_l  { if (==> #phi) find (! #phi ==>) replacewith (TRUE==>) 
+			      rule sets(simplify) noninteractive 
+                              displayname "known_not"};
+
+taclet known_impl_1_r { if (#phi ==>) find (==> #phi -> #psi) replacewith (==>#psi) 
+			      rule sets(simplify) noninteractive 
+                              displayname "known_impl"};
+taclet known_impl_1_l { if (#phi ==>) find (#phi -> #psi ==>) replacewith (#psi==>) 
+			      rule sets(simplify) noninteractive 
+                              displayname "known_impl"};
+
+taclet known_impl_2_r { if (==> #phi) find (==> #phi -> #psi) replacewith (==>TRUE) 
+			      rule sets(simplify) noninteractive 
+                              displayname "known_impl"};
+taclet known_impl_2_l { if (==> #phi) find (#phi -> #psi ==>) replacewith (TRUE==>) 
+			      rule sets(simplify) noninteractive 
+                             displayname "known_impl"};
+
+
+taclet known_impl_3_r { if (==> #phi) find (==> #psi -> #phi) replacewith (==>! #psi) 
+			      rule sets(simplify) noninteractive 
+                              displayname "known_impl"};
+taclet known_impl_3_l { if (==> #phi) find (#psi -> #phi ==>) replacewith (! #psi==>) 
+			      rule sets(simplify) noninteractive
+                              displayname "known_impl"};
+
+taclet known_impl_4_r { if (#phi ==>) find (==> #psi -> #phi) replacewith (==>TRUE) 
+			      rule sets(simplify) noninteractive
+                              displayname "known_impl"};
+taclet known_impl_4_l { if (#phi ==>) find (#psi -> #phi ==>) replacewith (TRUE==>) 
+			      rule sets(simplify) noninteractive
+                              displayname "known_impl"};
+
+taclet known_and_1_r  { if (#phi ==>) find(==> #phi & #psi) replacewith (==>#psi) 
+			      rule sets(simplify) noninteractive 
+                              displayname "known_and"};
+taclet known_and_1_l  { if (#phi ==>) find(#phi & #psi ==>) replacewith (#psi==>) 
+			      rule sets(simplify) noninteractive
+                              displayname "known_and"};
+
+taclet known_and_2_r  { if (==> #phi) find(==> #phi & #psi) replacewith (==>FALSE) 
+			      rule sets(simplify) noninteractive
+                              displayname "known_and"};
+taclet known_and_2_l  { if (==> #phi) find(#phi & #psi ==>) replacewith (FALSE==>) 
+			      rule sets(simplify) noninteractive
+                              displayname "known_and"};
+
+
+taclet known_and_3_r  { if (#phi ==>) find(==> #psi & #phi) replacewith (==>#psi) 
+			      rule sets(simplify) noninteractive
+                              displayname "known_and"};
+taclet known_and_3_l  { if (#phi ==>) find(#psi & #phi ==>) replacewith (#psi==>) 
+			      rule sets(simplify) noninteractive
+                              displayname "known_and"};
+
+taclet known_and_4_r  { if (==> #phi) find(==> #psi & #phi) replacewith (==>FALSE) 
+			      rule sets(simplify) noninteractive
+                              displayname "known_and"};
+taclet known_and_4_l  { if (==> #phi) find(#psi & #phi  ==>) replacewith (FALSE==>) 
+			      rule sets(simplify) noninteractive
+                              displayname "known_and"};
+
+taclet known_or_1_l   { if (#phi ==>) find(#phi | #psi ==>) replacewith (TRUE==>) 
+			      rule sets(simplify) noninteractive 
+                              displayname "known_or"};
+taclet known_or_1_r   { if (#phi ==>) find(==> #phi | #psi) replacewith (==>TRUE) 
+			      rule sets(simplify) noninteractive
+                              displayname "known_or"};
+
+taclet known_or_2_l   { if (==> #phi) find(#phi | #psi ==>) replacewith (#psi==>) 
+			      rule sets(simplify) noninteractive
+                              displayname "known_or"};
+taclet known_or_2_r   { if (==> #phi) find(==> #phi | #psi) replacewith (==>#psi) 
+			      rule sets(simplify) noninteractive
+                              displayname "known_or"};
+
+taclet known_or_3_l   { if (#phi ==>) find(#psi | #phi ==>) replacewith (TRUE==>) 
+			      rule sets(simplify) noninteractive
+                              displayname "known_or"};
+taclet known_or_3_r   { if (#phi ==>) find(==> #psi | #phi) replacewith (==>TRUE) 
+			      rule sets(simplify) noninteractive
+                              displayname "known_or"};
+
+taclet known_or_4_l   { if (==> #phi) find(#psi | #phi ==>) replacewith (#psi==>) 
+			      rule sets(simplify) noninteractive
+                              displayname "known_or"};
+taclet known_or_4_r   { if (==> #phi) find(==> #psi | #phi) replacewith (==>#psi) 
+			      rule sets(simplify) noninteractive
+                              displayname "known_or"};
+
+taclet known_eq_1_l   { if (#phi ==>) find(#phi <-> #psi ==>) replacewith (#psi==>) 
+			      rule sets(simplify) noninteractive 
+                              displayname "known_eq"};
+taclet known_eq_1_r   { if (#phi ==>) find(==> #phi <-> #psi) replacewith (==>#psi) 
+			      rule sets(simplify) noninteractive 
+                              displayname "known_eq"};
+taclet known_eq_2_l   { if (==> #phi) find(#phi <-> #psi ==>) replacewith (! #psi==>) 
+			      rule sets(simplify) noninteractive
+                              displayname "known_eq"};
+taclet known_eq_2_r   { if (==> #phi) find(==> #phi <-> #psi) replacewith (==>! #psi) 
+			      rule sets(simplify) noninteractive
+                              displayname "known_eq"};
+taclet known_eq_3_l   { if (#phi ==>) find(#psi <-> #phi ==>) replacewith (#psi==>) 
+			      rule sets(simplify) noninteractive
+                              displayname "known_eq"};
+taclet known_eq_3_r   { if (#phi ==>) find(==> #psi <-> #phi) replacewith (==>#psi) 
+			      rule sets(simplify) noninteractive
+                              displayname "known_eq"};
+taclet known_eq_4_l   { if (==> #phi) find(#psi <-> #phi ==>) replacewith (!#psi==>) 
+			      rule sets(simplify) noninteractive
+                              displayname "known_eq"};
+taclet known_eq_4_r   { if (==> #phi) find(==> #psi <-> #phi) replacewith (==>!#psi) 
+			      rule sets(simplify) noninteractive
+                              displayname "known_eq"};
+
+
+  // other
+taclet cut { find(==>) add (#phi ==>); add (==> #phi) };
+
+taclet cut_direct_r { find (==> #phi) replacewith (==> #phi); add (#phi ==>) };
+taclet cut_direct_l { find (#phi ==>) replacewith (#phi ==>); add (==> #phi) };
+
+  // proofobl not parsed yet.
+  // rule_cut { addrules (rule); add (==> proofobl(rule)) };
+
+  // not for asmkey...
+  //hide_left  { find (#phi ==>) replacewith (==>)
+  //             addrules( insert_hidden { add (#phi ==>) } ) };
+  //hide_right { find (==> #phi) replacewith (==>)
+  //             addrules( insert_hidden { add (==> #phi) } ) };
+
+taclet case_distinction_r { find (==> #phi)
+		       addrules( taclet to_true  { find(==> #phi) 
+					      replacewith(==>TRUE)  
+					    rule sets(simplify)
+					    noninteractive } );
+                       addrules( taclet to_false { find(==> #phi) 
+					      replacewith(==>FALSE) 
+					    rule sets(simplify) 
+					    noninteractive } )
+                       displayname "case_distinction"
+		     };
+
+taclet case_distinction_l { find (#phi ==>)
+		       addrules( taclet to_true  { find(#phi ==>) 
+					      replacewith(TRUE ==>)  
+					    rule sets(simplify)
+					    noninteractive } );
+                       addrules( taclet to_false { find(#phi ==>) 
+					     replacewith(FALSE ==>) 
+					    rule sets(simplify) 
+					    noninteractive } )
+                       displayname "case_distinction"
+		     };
+
+//------ quantifiers ------//
+
+taclet constant {
+        find(#t)
+	cond(#sk new depending on #t)
+	add (#sk = #t ==>)
+    };
+
+// Gamma taclets
+taclet all_left { find (all #u;#phi ==>) varcond (static #t) add ({#u #t}(#phi) ==>) rule sets(gamma) };
+taclet ex_right { find (==> ex #u;#phi) varcond (static #t) add (==> {#u #t}(#phi)) rule sets(gamma) };
+taclet all_left_delete { find (all #u;#phi ==>) varcond (static #t) replacewith ({#u #t}(#phi) ==>)
+                    rule sets(gamma_destructive) };
+taclet ex_right_delete { find (==> ex #u;#phi) varcond (static #t) replacewith (==> {#u #t}(#phi))
+                    rule sets(gamma_destructive) };
+taclet inst_all { if (all #u;#phi ==>) find (#t) add ({#u #t waryEx}(#phi) ==>) };
+taclet inst_ex  { if (==> ex #u;#phi) find (#t) add (==> {#u #t waryAll}(#phi)) };
+  
+  // delta taclets
+taclet all_right { find (==> all #u;#phi) varcond ( #sk new depending on #phi )
+		replacewith (==> {#u #sk}#phi) rule sets (delta) };
+taclet ex_left { find (ex #u;#phi ==>) varcond ( #sk new depending on #phi )
+		replacewith ({#u #sk}#phi ==>) rule sets (delta) };
+  
+  // simplification
+taclet all_unused { find (all #u;#phi) varcond (#u not free in #phi) 
+		 replacewith (#phi)
+		 rule sets (simplify) };
+taclet ex_unused  { find (ex #u;#phi) varcond (#u not free in #phi)
+		 replacewith (#phi)
+		 rule sets (simplify) };
+taclet all_and_switch { find (all #u;(#phi & #psi))
+		     replacewith ((all #u;#phi) & (all #u;#psi))
+  //		     rule sets (split)
+ };
+
+taclet ex_or_switch   { find (ex #u;(#phi | #psi))
+		     replacewith ((ex #u;#phi) | (ex #u;#psi))
+  //		     rule sets (split)
+ };
+
+taclet all_pull_out0 { find ((all #u;#phi) & #psi)
+		  varcond ( #u not free in #psi )
+		  replacewith (all #u;(#phi & #psi))
+		  rule sets (pull_out_quantifier) };
+
+taclet all_pull_out1 { find (#psi & (all #u;#phi))
+		  varcond ( #u not free in #psi )
+		  replacewith (all #u;(#psi & #phi))
+		  rule sets (pull_out_quantifier) };
+
+taclet all_pull_out2 { find ((all #u;#phi) | #psi)
+		  varcond ( #u not free in #psi )
+		  replacewith (all #u;(#phi | #psi))
+		  rule sets (pull_out_quantifier) };
+
+taclet all_pull_out3 { find (#psi | (all #u;#phi))
+		  varcond ( #u not free in #psi )
+		  replacewith (all #u;(#psi | #phi))
+		  rule sets (pull_out_quantifier) };
+
+taclet all_pull_out4 { find ((all #u;#phi) -> #psi)
+		  varcond ( #u not free in #psi )
+		  replacewith (ex #u;(#phi -> #psi))
+		  rule sets (pull_out_quantifier) };
+
+taclet all_pull_out5 { find (#psi -> (all #u;#phi))
+		  varcond ( #u not free in #psi )
+		  replacewith (all #u;(#psi -> #phi))
+		  rule sets (pull_out_quantifier) };
+
+taclet all_pull_out6 { find (!(all #u;#phi))
+		  replacewith (ex #u;(!#phi))
+		  rule sets (pull_out_quantifier) };
+
+taclet ex_pull_out0 { find ((ex #u;#phi) & #psi)
+		  varcond ( #u not free in #psi )
+		  replacewith (ex #u;(#phi & #psi))
+		  rule sets (pull_out_quantifier) };
+
+taclet ex_pull_out1 { find (#psi & (ex #u;#phi))
+		  varcond ( #u not free in #psi )
+		  replacewith (ex #u;(#psi & #phi))
+		  rule sets (pull_out_quantifier) };
+
+taclet ex_pull_out2 { find ((ex #u;#phi) | #psi)
+		  varcond ( #u not free in #psi )
+		  replacewith (ex #u;(#phi | #psi))
+		  rule sets (pull_out_quantifier) };
+
+taclet ex_pull_out3 { find (#psi | (ex #u;#phi))
+		  varcond ( #u not free in #psi )
+		  replacewith (ex #u;(#psi | #phi))
+		  rule sets (pull_out_quantifier) };
+
+taclet ex_pull_out4 { find ((ex #u;#phi) -> #psi)
+		  varcond ( #u not free in #psi )
+		  replacewith (all #u;(#phi -> #psi))
+		  rule sets (pull_out_quantifier) };
+
+taclet ex_pull_out5 { find (#psi -> (ex #u;#phi))
+		  varcond ( #u not free in #psi )
+		  replacewith (ex #u;(#psi -> #phi))
+		  rule sets (pull_out_quantifier) };
+
+taclet ex_pull_out6 { find (!(ex #u;#phi))
+		  replacewith (all #u;(!#phi))
+		  rule sets (pull_out_quantifier) };
+
+
+  
+  // equality
+taclet close_eq { find (#s = #s) replacewith (true) rule sets (concrete) };
+
+
+taclet commute_eq { find(#s = #t) //varcond ( #s smaller than #t )
+               replacewith (#t = #s)
+               rule sets ( order_terms ) };
+taclet make_insert_eq { find (#s = #t ==>)
+		     addrules ( taclet insert_eq { find (#s) replacewith (#t) } )
+		     rule sets (simplify) noninteractive  };
+  //make_insert_eq_nonrigid { find (#s = #t ==>)
+//		     addrules ( taclet insert_eq_nonrigid { find (#s) 
+  //                                                   replacewith (#t)
+    //                                                 displayname "insert_eq" sameUpdateLevel } )
+	//	     rule sets (simplify) noninteractive  };
+taclet insert_eq_all  { find (#s = #t ==>)
+		     replacewith (==>)
+		     addrules ( taclet auto_insert_eq { find (#s) 
+						 replacewith (#t)
+						 rule sets (simplify) } ) };
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+taclet apply_eq { if ( #s = #t ==> ) find ( #s ) //varcond ( #t smaller than #s )
+                              replacewith ( #t )
+             rule sets ( apply_equations ) sameUpdateLevel };
+
+  //apply_eq_rigid { if ( #s = #t ==> ) find ( #s ) varcond ( #t smaller than #s )
+   //                                   replacewith ( #t )
+    //         rule sets ( apply_equations )
+     //        displayname "apply_eq" };
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+//  rewrite { find(#s) sameUpdateLevel
+//            replacewith(#t) add(#s = #t ==>);
+//            add(==> #s = #t) } ;
+
+//--------------- queries ----------------------------------------------------//
+
+/*  query_cut_1 { find (==> #s=#mr) varcond(typeof(#mr) #v new) 
+	replacewith (==> #s=#t); 
+	add (==> <{#typeof(#mr) #v=#mr; }>#v=#t)  
+        displayname "query cut" };
+
+taclet query_cut_2 { find (==> #mr=#s) varcond(typeof(#mr) #v new) 
+	replacewith (==> #t=#s); 
+	add (==> <{#typeof(#mr) #v=#mr; }>#v=#t)  
+        displayname "query cut" };
+
+taclet query_1 { find (==> #mr=#s) varcond(typeof(#mr) #v new)
+          add (==> <{#typeof(#mr) #v=#mr; }>#v=#s)  
+          displayname "query" };
+
+taclet  query_2 { find (==> #s=#mr) varcond(typeof(#mr) #v new)
+         add (==> <{#typeof(#mr) #v=#mr; }>#v=#s)
+          displayname "query" };
+
+taclet query_3 { find (#mr=#s ==>) varcond(typeof(#mr) #v new)
+          add ( ==> <{#typeof(#mr) #v=#mr; }>!#v=#s)  
+          displayname "query" };
+
+taclet query_4 { find (#s=#mr) varcond(typeof(#mr) #v new)
+          add ( ==> <{#typeof(#mr) #v=#mr; }>!#v=#s )
+          displayname "query" };
+*/

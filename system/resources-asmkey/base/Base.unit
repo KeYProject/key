@@ -1,0 +1,64 @@
+unit Base
+
+export *
+
+generic sort g
+generic sort g2	
+
+
+schema g #s, #s1, #s2, #t, #t1, #t2;
+schema g #c, #d;
+schema g2 #tacc;
+schema variable g #x, #y, #u;
+schema depending g  #sk, #sk1, #sk2;
+schema formula #phi, #phi1, #phi2, #psi, #post, #inv;
+   
+schema asm rule #R, #R1, #R2, #R3, #S, #S1, #S2, #T, #H;
+schema asm rule #rho;
+
+/* from key */
+rule set split;
+rule set simplify;
+rule set closure;
+rule set delta;
+rule set beta;
+rule set gamma;
+rule set gamma_destructive;
+rule set order_terms;
+rule set simplify_literals;
+rule set simplify_int;
+rule set int_arithmetic;
+rule set simplify_int_arith;
+rule set simplify_expression;
+rule set eval_literals;
+rule set expand_In_Type;
+rule set replace_known;
+rule set concrete;
+rule set alpha;
+rule set charLiteral_to_intLiteral;
+rule set pull_out_quantifier;
+rule set apply_equations;
+
+
+/* for asmkey */
+rule set closure_prop;
+rule set unfold_upd;
+rule set unfold_inv;
+rule set unfold_acc;
+rule set unfold_def;
+rule set unfold_Con;
+rule set simplify_asm;
+rule set split_asm;
+rule set split_asm_if;
+rule set split_asm_try;
+rule set simplify_asm_named;
+rule set simplify_accT;
+rule set simplify_accF;
+rule set simplify_acc;
+rule set simplify_acc_named;
+rule set expand_joinable;
+
+/* the names of the meta operator */
+meta #META_DERIVED;
+meta #OP_EQ_ARGS; 
+meta #ACCT_ARGS;

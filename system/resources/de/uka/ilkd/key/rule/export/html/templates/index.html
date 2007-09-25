@@ -1,0 +1,131 @@
+<div>
+
+<h2>Conventions</h2>
+
+<p>
+This sections describes the conventions used in this document.
+</p>
+
+<p>
+The definition of properties of various enitities (like rules and rule sets)
+has the following format:
+
+<dl>
+
+<dt>property name</d>
+<dd><span class="defattr">property attributes</span>
+property description</dd>
+
+</dl>
+
+</p>
+
+<p>
+There are two groups of property attributes. The first one describes how 
+the property is added to the documentation: <em>automatic</em> states that
+the property is added automatically during generation of this documentation,
+<em>manual</em> indicates that the value of property has to be added manually
+after generation of the documentation. The generator will only generate a stub
+for <em>manual</em> properties.
+</p>
+
+<p>
+The second group describes when the property is present: <em>always</em>
+indicates that the property will always be added in case of an automatic
+property, and should always be added in case of a manual property. The absence
+of the <em>always</em> attribute indicates that the property may be left out.
+For example, the <em>intersects with</em> property of rule sets may be absent
+if there are no intersecting rule sets.
+</p>
+
+</div>
+
+<?key NAVTOP ?>
+
+<div>
+
+<h2>Rule set properties</h2>
+
+<dl>
+
+<dt>name</dt>
+<dd><span class="defattr">automatic, always</span>
+The name of the rule set. Names of implicit rule sets are enclosed in angular brackets.</dd>
+
+<dt>definition</dt>
+<dd><span class="defattr">manual, always</span>
+the criterion which defines which rules are in this rule set;<br/>
+it might be a good idea to include this in the declaration of rule sets,
+so that this information can be added automatically</dd>
+
+<dt>intersects with</dt>
+<dd><span class="defattr">automatic</span>
+other rule sets that intersect the rule set, but are not supersets of it</dd>
+
+<dt>superset of</dt>
+<dd><span class="defattr">automatic</span>
+other rule sets that are subsets of the rule set, but not equal to it</dd>
+
+<dt>subset of</dt>
+<dd><span class="defattr">automatic</span>
+other rule sets that are supersets of the rule set, but not equal to it</dd>
+
+<dt>equal to</dt>
+<dd><span class="defattr">automatic</span>
+other rule sets that are equal to the rule set; indicates possibility to simplify things</dd>
+
+<dt>rules</dt>
+<dd><span class="defattr">automatic, always</span>
+the rules contained in the rule set</dd>
+
+</dl>
+
+</div>
+
+<?key NAVTOP ?>
+
+<div>
+
+<h2>Rule properties</h2>
+
+<dl>
+
+<dt>name</dt>
+<dd><span class="defattr">automatic, always</span>
+the name of the rule</dd>
+
+<dt>display name</dt>
+<dd><span class="defattr">automatic, always</span>
+the display name of the rule;
+may be equal to the name</dd>
+
+<dt>kind</dt>
+<dd><span class="defattr">automatic, always</span>
+the kind of taclet the rule belongs to, i.e. NoFindTaclet, AntecTaclet, SuccTaclet, or RewriteTaclet</dd>
+
+<dt>contained in</dt>
+<dd><span class="defattr">automatic, always</span>
+list of rule sets the rule belongs to</dd>
+
+<dt>definition</dt>
+<dd><span class="defattr">automatic, always</span>
+the definition of the rule as given in the .key file;<br/>
+this could be split up into the different clauses and declarations that can occur in a rule definition</dd>
+
+<dt>options</dt>
+<dd><span class="defattr">automatic</span>
+the choices the taclet is assigned to</dd>
+
+<dt>introduced by</dt>
+<dd><span class="defattr">automatic</span>
+for rules added by another rule, this gives the name of the introducing rule</dd>
+
+<dt>source file</dt>
+<dd><span class="defattr">automatic</span>
+name of the file in which the rule is defined</dd>
+
+</dl>
+
+</div>
+
+<?key NAVTOP ?>

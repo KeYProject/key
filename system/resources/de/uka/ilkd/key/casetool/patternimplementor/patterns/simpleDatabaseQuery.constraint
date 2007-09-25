@@ -1,0 +1,12 @@
+
+[Group] "databaseQuery", "Database Query"
+	[Void]  "Please insert the iterator name from below for  else any column name"
+	[String] "select", "SELECT", "t"
+	[Boolean] "aggregate", "Aggregate", "false"
+	[String]  "aggregateFunction", "Aggregate Function", "'sum'"
+	[String]  "from", "FROM", "tablename"
+	[String]  "fromIterator", "Iterator", "t"
+	[String]  "where", "WHERE", "true"
+	[Context] Database	
+	[Definition] if '<:select:>' = '*' then <:from:>->select(<:fromIterator:>| <:where:>) else if (<:aggregate:>) then if (<:aggregateFunction:> = 'sum') then Tuple{sum=<:from:>->select(<:fromIterator:>| <:where:>)->collect(<:fromIterator:>| <:fromIterator:>.<:select:>)->sum()} else Tuple{max=<:from:>->select(<:fromIterator:>| <:where:>)->collect(<:fromIterator:>| <:fromIterator:>.<:select:>)->max()} endif else Tuple{<:select:>=<:from:>->select(<:fromIterator:>| <:where:>)->collect(<:fromIterator:>| <:fromIterator:>.<:select:>)} endif endif
+[EndGroup]

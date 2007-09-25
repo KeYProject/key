@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<!-- This file is part of KeY - Integrated Deductive Software Design-->
+<!-- Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany-->
+<!--                         Universitaet Koblenz-Landau, Germany-->
+<!--                         Chalmers University of Technology, Sweden-->
+<!---->
+<!-- The KeY system is protected by the GNU General Public License. -->
+<!-- See LICENSE.TXT for details.-->
+<!---->
+<!---->
+<html>
+  <body>
+    Used for OCL Simplification, i.e. not for usual logic terms.
+    Instead of creating the sorts in this package directly, 
+    use the constants defined in
+    {@link de.uka.ilkd.key.logic.sort.oclsort.OclSort}.
+
+    This package contains representations of the pre-defined types
+    in OCL: <b>OclAny</b>, <b>OclType</b>, <b>Boolean</b>, <b>Real</b>, 
+    <b>Integer</b>, <b>String</b>.
+    It also contains means to represent the pre-defined Collection
+    types: <b>Collection(T)</b>, <b>Set(T)</b>, <b>Bag(T)</b>, 
+    and <b>Sequence(T)</b>, where
+    <b>T</b> is one of the types enumerated above.
+    Moreover, we need a type that represents the classifiers
+    defined in the UML model associated with a specific OCL constraint.
+    We call this representation {@link de.uka.ilkd.key.logic.sort.oclsort.ClassifierSort}. 
+    This sort can be
+    viewed as a super type of all classifiers in the model.
+    We don't need more specific type information of the classifiers, 
+    since our simplification rules are based only on our knowledge
+    of the pre-defined OCL operations - not the properties of a
+    specific UML model.
+    Finally, to be able to check for type conformance when building
+    OCL expressions, we need a sort called 
+    {@link de.uka.ilkd.key.logic.sort.oclsort.OclGenericSort}. Its existence
+    is motivated in the context of assigning an element type to
+    an empty Collection. The problem is that when we, for instance,
+    build an expression like <b>collection->forAll(s:T | e(s))</b>
+    we want to check that the element type of <b>collection</b> conforms
+    to the type <b>T</b>. This must hold also for the special case:
+    <b>Set{}->forAll(s:T | e(s))</b>. In other words, the element type of
+    <b>Set{}</b> must conform to every other basic type. At the same time,
+    when we build a collection, we want to check that the types of 
+    the elements in the collection conforms to the element type of 
+    the collection. Using the taclet syntax, <b>$insert_set(elem, $empty_set)</b>,
+    we want to check that the type of <b>elem</b> conforms to the element
+    type of <b>$empty_set/Set{}</b>. In other words, the element type of
+    <b>Set{}</b> must be such that any other basic type conforms to it.
+    We therefore need a type with the property that it conforms to
+    any other basic type, and any other basic type conforms to it.
+    {@link de.uka.ilkd.key.logic.sort.oclsort.OclGenericSort} has this property.
+
+
+<!-- Created: Thu Jan 27 15:20:36 MET 2005 -->
+<!-- hhmts start -->
+Last modified: Thu Jan 27 15:20:36 MET 2005
+<!-- hhmts end -->
+  </body>
+</html>

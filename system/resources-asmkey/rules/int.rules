@@ -1,0 +1,655 @@
+taclets{
+
+//--------------------------------------------------------------------
+// some of these taclets are from Isabelle theory IntArith
+//--------------------------------------------------------------------
+
+ //reviewed 04/16/2004, St.S.
+  less_iff_diff_less_0  {find (lt(#i0,#i1)) replacewith (lt(~d(#i0,#i1),0)) };
+
+ //reviewed 04/16/2004, St.S.
+  leq_iff_diff_leq_0    {find (leq(#i0,#i1)) replacewith (leq(~d(#i0,#i1),0))};
+
+ //reviewed 04/16/2004, St.S.
+  minus_distribute_1 { find (~m(+(#i,#i1))) replacewith (+(~m(#i),~m(#i1))) 
+	heuristics(simplify_int) 
+	displayname "minus_distribute"};
+ //reviewed 04/16/2004, St.S.
+  minus_distribute_2 { find (~m(~d(#i,#i1))) replacewith (+(~m(#i),#i1)) 
+	heuristics(simplify_int) 
+	displayname "minus_distribute"};
+
+ //reviewed 04/16/2004, St.S.
+  left_add_mult_distrib {find (+(mul(#i0,#i1), +(mul(#i2,#i1),#i3) ) ) 
+                           replacewith (+(mul(+(#i0,#i2), #i1), #i3)) };
+
+ //reviewed 04/16/2004, St.S.
+  eq_add_iff1            {find ( +(mul(#i0,#i1),#i2)=+(mul(#i3,#i1),#i4) ) 
+                           replacewith (+(mul(~d(#i0,#i3),#i1),#i2)=#i4) };
+
+ //reviewed 04/16/2004, St.S.
+  eq_add_iff2            {find (+(mul(#i0,#i1),#i2)=+(mul(#i3,#i1),#i4)) 
+                           replacewith (#i2=+(mul(~d(#i3,#i0),#i1),#i4)) };
+
+ //reviewed 04/16/2004, St.S.
+  less_add_iff1          {find (lt(+(mul(#i0,#i1),#i2),+(mul(#i3,#i1),#i4))) 
+                           replacewith (lt(+(mul(~d(#i0,#i3),#i1),#i2),#i4)) };
+
+ //reviewed 04/16/2004, St.S.
+  less_add_iff2          {find (lt(+(mul(#i0,#i1),#i2),+(mul(#i3,#i1),#i4)))
+                           replacewith (lt(#i2,+(mul(~d(#i3,#i0),#i1),#i4))) };
+
+ //reviewed 04/16/2004, St.S.
+  leq_add_iff1           {find (leq(+(mul(#i0,#i1),#i2),+(mul(#i3,#i1),#i4))) 
+                           replacewith (leq(+(mul(~d(#i0,#i3),#i1),#i2),#i4)) };
+
+ //reviewed 04/16/2004, St.S.
+  leq_add_iff2           {find (leq(+(mul(#i0,#i1),#i2),+(mul(#i3,#i1),#i4)))
+                           replacewith (leq(#i2,+(mul(~d(#i3,#i0),#i1),#i4))) };
+
+ //reviewed 04/16/2004, St.S.
+  leq_diff1_eq           {find (leq(#i0,~d(#i1,1))) 
+                           replacewith (lt(#i0,#i1)) };
+
+ //reviewed 04/16/2004, St.S.
+  le1_add1_eq_le         {find (lt(#i0,+(#i1,1))) 
+                           replacewith (leq(#i0,#i1)) };
+
+ //reviewed 04/16/2004, St.S.
+  zadd_left_cancel0      {find (#i0=+(#i0,#i1)) replacewith (#i1=0) };
+
+ //reviewed 04/16/2004, St.S.
+  int_diff_minus_eq      {find (~d(#i0,~m(#i1))) replacewith (+(#i0,#i1)) };
+
+ //reviewed 04/16/2004, St.S.
+  mult_pos               {find (lt(0,#i0) & lt(0,#i1)) 
+                           replacewith (lt(0,mul(#i0,#i1))) };
+
+ //reviewed 04/16/2004, St.S.
+  mult_neg               {find (lt(#i0,0) & lt(#i1,0)) 
+                           replacewith (lt(0,mul(#i0,#i1))) };
+
+ //reviewed 04/16/2004, St.S.
+  mult_pos_neg           {find (lt(#i0,0) & lt(0,#i1)) 
+                           replacewith (lt(mul(#i0,#i1),0)) };
+
+ //reviewed 04/16/2004, St.S.
+  0_less_mult_iff        {find (lt(0, mul(#i0,#i1))) 
+                           replacewith (lt(0,#i0) & lt(0,#i1) | lt(#i0,0) & lt(#i1,0)) 
+                           };
+
+ //reviewed 04/16/2004, St.S.  
+  0_leq_mult_iff         {find (leq(0,mul(#i0,#i1))) 
+                           replacewith (leq(0,#i0) & leq(0,#i1) | leq(#i0,0) & leq(#i1,0)) 
+                           };
+
+ //reviewed 04/16/2004, St.S.
+  mult_less_0_iff        {find (lt(mul(#i0,#i1),0)) 
+                           replacewith (lt(#i0,0) & lt(0,#i1) | lt(0,#i0) & lt(#i1,0)) 
+                           };
+
+ //reviewed 04/16/2004, St.S.
+  mult_leq_0_iff         {find ( leq(mul(#i0,#i1),0) )
+                           replacewith (leq(#i0,0) & leq(0,#i1) | leq(0,#i0) & leq(#i1,0)) 
+                           };
+
+  //reviewed 04/16/2004, St.S.
+  square_nonneg          {find (leq(0,mul(#i0,#i0))) replacewith (true) };
+
+  //reviewed 04/16/2004, St.S.
+  mult_eq_self_iff       {find (#i0=mul(#i0,#i1)) replacewith (#i0=0 | #i1=1) 
+                           };
+
+  //reviewed 04/16/2004, St.S.
+  less_1_mult            {find (lt(1,#i0) & lt(1,#i1)) 
+                           replacewith (lt(1,mul(#i0,#i1))) };
+
+  //reviewed 04/16/2004, St.S.
+  pos_mult_eq_1_iff      {find (lt(0,#i0) -> mul(#i0,#i1)=1 )
+                           replacewith (#i0=1 & #i1=1) };
+
+  //reviewed 04/16/2004, St.S.
+  mult_eq_1_iff          {find (mul(#i0,#i1)=1) 
+                           replacewith (#i0=1 & #i1=1| #i0=Z(neg(1(#))) & #i1=Z(neg(1(#))))
+                           };
+
+  //reviewed 04/16/2004, St.S.
+  multiply_distribute_1    {find (mul(+(#i0,#i1),+(#j0,#j1))) replacewith 
+                           (+( +(mul(#i0,#j0),mul(#i0,#j1)), +(mul(#i1,#j0),mul(#i1,#j1)) ))                            
+                            displayname "multiply_distribute"};                           
+
+ //reviewed 04/16/2004, St.S.
+ multiply_distribute_2    {find (mul(+(#i0,#i1),~d(#j0,#j1))) replacewith 
+                           (+( ~d(mul(#i0,#j0),mul(#i0,#j1)), ~d(mul(#i1,#j0),mul(#i1,#j1)) ))                            
+                            displayname "multiply_distribute"};
+
+ //reviewed 04/16/2004, St.S.
+ multiply_distribute_3    {find (mul(~d(#i0,#i1),~d(#j0,#j1))) replacewith 
+                           (+( ~d(mul(#i0,#j0),mul(#i0,#j1)), ~d(mul(#i1,#j1),mul(#i1,#j0)) ))                            
+                            displayname "multiply_distribute"};                           
+
+ //reviewed 04/16/2004, St.S.
+  collect_same_terms_1          {find (+(mul(#i,#j),mul(#i,#j))) 
+                           replacewith (mul(2,mul(#i,#j)))                           
+                           displayname "collect_same_terms"};                           
+
+ //reviewed 04/16/2004, St.S.
+  collect_same_terms_2          {find (+(+(mul(#i,#j),mul(#i0,#i1)),+(mul(#i,#j),mul(#j0,#j1)))) 
+                           replacewith (+(mul(2,mul(#i,#j)),+(mul(#i0,#i1),mul(#j0,#j1))))                           
+                           displayname "collect_same_terms"};
+
+ //reviewed 04/16/2004, St.S.
+  collect_same_terms_3          {find (+( +(~m(mul(#i,#j)),mul(#i0,#i1)), +(~m(mul(#i,#j)),mul(#j0,#j1)))) 
+                           replacewith (+(~m(mul(2,mul(#i,#j))), +(mul(#i0,#i1), mul(#j0,#j1))))                           
+                           displayname "collect_same_terms"};
+
+ //reviewed 04/16/2004, St.S.
+  addition_associative   {find ( +(+(#i0,#i1),+(#j0,#j1)) ) 
+                           replacewith ( +(+(#j0,#i1),+(#i0,#j1)) ) };
+
+ //reviewed 04/16/2004, St.S.
+  leq_add_one                {find (leq(#i0,#i1)) replacewith (leq(+(#i0,1),+(#i1,1)))
+			   };
+
+ //reviewed 04/16/2004, St.S.
+  less_add_one               {find (lt(#i0,#i1)) replacewith (lt(+(#i0,1),+(#i1,1)))
+			   };
+
+ //reviewed 04/16/2004, St.S.
+  geq_add_one                {find (geq(#i0,#i1)) replacewith (geq(+(#i0,1),+(#i1,1)))
+			   };
+
+ //reviewed 04/16/2004, St.S.
+  greater_add_one            {find (gt(#i0,#i1)) replacewith (gt(+(#i0,1),+(#i1,1)))
+			   };
+ //reviewed 04/16/2004, St.S.
+  equal_add_one              {find (#i0=#i1) replacewith (+(#i0,1)=+(#i1,1))
+			   };
+
+ //reviewed 04/16/2004, St.S.
+  leq_add                {find (==> leq(#i0,#i1)) replacewith (==> ex j2:int. leq(+(#i0,j2),+(#i1,j2)))
+			   };
+
+ //reviewed 04/16/2004, St.S.
+  less_add               {find (==> lt(#i0,#i1)) replacewith (==> ex j2:int. lt(+(#i0,j2),+(#i1,j2)))
+			   };
+
+ //reviewed 04/16/2004, St.S.
+  geq_add                {find (==> geq(#i0,#i1)) replacewith (==> ex j2:int. geq(+(#i0,j2),+(#i1,j2)))
+			   };
+
+ //reviewed 04/16/2004, St.S.
+  greater_add            {find (==> gt(#i0,#i1)) replacewith (==> ex j2:int. gt(+(#i0,j2),+(#i1,j2)))
+			   };
+
+ //reviewed 04/16/2004, St.S.
+  equal_add              {find (==> #i0=#i1) replacewith (==> ex j2:int. +(#i0,j2)=+(#i1,j2))
+			   };
+
+ //reviewed 04/16/2004, St.S.  
+  leq_diff_1             { find (leq(#i0,+(#i0,1))) replacewith (true)
+			   heuristics (int_arithmetic)};
+
+ //reviewed 04/16/2004, St.S.  
+  lt_diff_1              { find (lt(#i0,+(#i0,1))) replacewith (true)
+			   heuristics (int_arithmetic)};
+
+ //reviewed 04/16/2004, St.S.  
+  geq_diff_1             { find (geq(+(#i0,1),#i0)) replacewith (true)
+			   heuristics (int_arithmetic)};
+
+ //reviewed 04/16/2004, St.S.  
+  gt_diff_1              { find (gt(+(#i0,1),#i0)) replacewith (true)
+			   heuristics (int_arithmetic)};
+
+ //reviewed 04/16/2004, St.S.  
+  i_minus_i_is_zero { find (~d(#i,#i)) replacewith (0) heuristics(simplify_int) };
+
+ //reviewed 04/16/2004, St.S.  
+  add_two_inequations_1 {if (lt(#i,#i0)==>) find (lt(#j,#j0)==>) add (lt(+(#i,#j),+(#i0,#j0))==>)};
+ //reviewed 04/16/2004, St.S.  
+  add_two_inequations_2 {if (leq(#i,#i0)==>) find (leq(#j,#j0)==>) add (leq(+(#i,#j),+(#i0,#j0))==>)};
+
+
+ //reviewed 04/16/2004, St.S.  
+  relax_inequation_1 {find (lt(#i,#i0)==>)  add (lt(#j,#i0)==>); add (lt(#i,#j)==>) displayname "relax_inequation"};
+ //reviewed 04/16/2004, St.S.  
+  relax_inequation_2 {find (leq(#i,#i0)==>)  add (leq(#j,#i0)==>); add (leq(#i,#j)==>) displayname "relax_inequation"};
+ //reviewed 04/16/2004, St.S.  
+  relax_inequation_3 {find (==>lt(#i,#i0))  add (==>lt(#j,#i0) & lt(#i,#j)) displayname "relax_inequation"};
+ //reviewed 04/16/2004, St.S.  
+  relax_inequation_4 {find (==>leq(#i,#i0))  add (==>leq(#j,#i0) & leq(#i,#j)) displayname "relax_inequation"};
+
+ //reviewed 04/16/2004, St.S.  
+  relax_inequation_5 {find (gt(#i,#i0)==>)  add (gt(#j,#i0)==>); add (gt(#i,#j)==>) displayname "relax_inequation"};
+ //reviewed 04/16/2004, St.S.  
+  relax_inequation_6 {find (geq(#i,#i0)==>)  add (geq(#j,#i0)==>); add (leq(#i,#j)==>) displayname "relax_inequation"};
+ //reviewed 04/16/2004, St.S.  
+  relax_inequation_7 {find (==>gt(#i,#i0))  add (==>gt(#j,#i0) & lt(#i,#j)) displayname "relax_inequation"};
+ //reviewed 04/16/2004, St.S.  
+  relax_inequation_8 {find (==>geq(#i,#i0))  add (==>geq(#j,#i0) & leq(#i,#j)) displayname "relax_inequation"};
+
+
+ //reviewed 04/16/2004, St.S.  
+ partition_inequation {if (==>lt(#i,#i0)) find (lt(#i,#i1)==>) add (==>lt(#i1, #i0)) };
+
+  //reviewed 04/16/2004, St.S.  
+  eq_sides { find (#i=#j) replacewith ( ~d(#i,#j)=0 ) };
+
+  //reviewed 04/15/2004, St.S.
+  mod_fold_minus { find (~d(mod(#i0,#i),mod(#i1,#i))) replacewith (mod(~d(#i0,#i1),#i)) };
+  //reviewed 04/15/2004, St.S.
+  mod_fold_plus  { find ( +(mod(#i0,#i),mod(#i1,#i))) replacewith (mod( +(#i0,#i1),#i)) };
+  //reviewed 04/15/2004, St.S.
+  times2mod_left  {find (mul(#i1,#i0)=#i) replacewith (mod(#i,#i1)=0)};
+  //reviewed 04/15/2004, St.S.
+  times2mod_right {find (mul(#i1,#i0)=#i) replacewith (mod(#i,#i0)=0)};
+
+
+  //reviewed 04/15/2004, St.S.
+  times_one {find (mul(#i,1)) replacewith (#i) heuristics (simplify_int)};
+  //reviewed 04/15/2004, St.S.
+  times_minus_one {find (mul(#i,~m(1))) replacewith (~m(#i)) heuristics (simplify_int)};
+  //reviewed 04/15/2004, St.S.
+  times_zero {find (mul(#i,0)) replacewith (0) heuristics (simplify_int)};
+
+
+  //reviewed 04/15/2004, St.S.
+  leq_to_gt { find (leq(#i,#j)) replacewith(!gt(#i,#j)) 
+              heuristics (simplify_int)};
+
+  //reviewed 04/15/2004, St.S.
+  geq_to_lt { find (geq(#i,#j)) replacewith(!lt(#i,#j)) 
+              heuristics (simplify_int)};
+
+  //reviewed 04/15/2004, St.S.
+  leq_to_gt_alt {find (leq(#i,#j)) replacewith(lt(#i,#j) | #i=#j) };
+
+  //reviewed 04/15/2004, St.S.
+  geq_to_lt_alt {find (geq(#i,#j)) replacewith(gt(#i,#j) | #i=#j) };
+
+
+  //reviewed 04/15/2004, St.S.
+  mod_rewr { find ( mod(#i,#i0) = 0 ) 
+             varcond (#k not free in #i, #k not free in #i0) 
+             replacewith ( ex #k.(mul(#k, #i0)=#i) ) };
+
+  //reviewed 04/15/2004, St.S.
+  mul_assoc { find(mul(mul(#i, #i0), #i1)) replacewith(mul(#i, mul(#i0, #i1))) 
+              heuristics(simplify_int) };
+  //reviewed 04/15/2004, St.S.
+  mul_comm  { find(mul(#i0, #i1)) replacewith(mul(#i1, #i0)) };
+
+  //reviewed 04/15/2004, St.S.
+  div_same  { if(!#i0 = 0 ==>) find(div(#i0, #i0)) replacewith(1) 
+	heuristics(simplify_int) sameUpdateLevel };
+
+  //reviewed 04/15/2004, St.S.
+  division_by_1  { 
+	find (div(#i0,1)) replacewith (#i0) heuristics(simplify_int)};
+
+  //reviewed 04/15/2004, St.S.
+  division_by_minus_1  { 
+	find (div(#i0,~m(1))) replacewith (~m(#i0)) 	heuristics(simplify_int) };
+
+  //reviewed 04/15/2004, St.S.
+  mod_same  { if(!#i0 = 0 ==>) find(mod(#i0, #i0)) replacewith(0) 
+	heuristics(simplify_int) sameUpdateLevel };
+
+  //reviewed 04/15/2004, St.S.
+  succ_pred { find (pred(succ(#i))) replacewith (#i) heuristics (simplify_int) };
+  //reviewed 04/15/2004, St.S.
+  pred_succ { find (succ(pred(#i))) replacewith (#i) heuristics (simplify_int) };
+
+  //reviewed 04/15/2004, St.S.
+  succ_eq_step { find (succ(#i) = succ(#i0)) replacewith (#i = #i0) heuristics (simplify_int) };
+  //reviewed 04/15/2004, St.S.
+  pred_eq_step { find (pred(#i) = pred(#i0)) replacewith (#i = #i0) heuristics (simplify_int) };
+
+  //reviewed 04/15/2004, St.S.
+  succ_not_eq_1 { find(succ(#i) = #i) replacewith (false) heuristics (simplify_int) };
+  //reviewed 04/15/2004, St.S.
+  succ_not_eq_2 { find(succ(succ(#i)) = #i) replacewith (false) heuristics (simplify_int) };
+  //reviewed 04/15/2004, St.S.
+  pred_not_eq_1 { find(pred(#i) = #i) replacewith (false) heuristics (simplify_int) };
+  //reviewed 04/15/2004, St.S.
+  pred_not_eq_2 { find(pred(pred(#i)) = #i) replacewith (false) heuristics (simplify_int) };
+
+  //reviewed 04/15/2004, St.S.
+  greater { find(gt(#i, #i0)) replacewith (lt(#i0, #i)) heuristics (simplify_int) };
+
+ 
+  //reviewed 04/15/2004, St.S.
+  less_is_total_heu { if (==> lt(#i, #i0), (#i = #i0), lt(#i0, #i)) close goal heuristics(simplify_int) noninteractive};
+  //reviewed 04/15/2004, St.S.
+  less_is_total { find (#i) add (lt(#i, #i0) ==>); add ((#i = #i0) ==>); add (lt(#i0, #i) ==>) };
+  //reviewed 04/15/2004, St.S.
+  less_zero_is_total { find (#i) add (lt(#i, 0) ==>); add (#i = 0 ==>); add (lt(0, #i) ==>) };
+
+  //reviewed 04/15/2004, St.S.
+  less_is_alternative_1 { if (lt(#i, #i0), lt(#i0, #i) ==>) close goal heuristics(simplify_int) noninteractive };
+  //reviewed 04/15/2004, St.S.
+  less_is_alternative_2 { if (==> lt(#i, #i0)) find (==> lt(#i0, #i)) add ((#i = #i0) ==>) 
+                         heuristics(simplify_int) noninteractive };
+
+  //reviewed 04/15/2004, St.S.
+  less_trans{ if(lt(#i, #i0) ==>) find(lt(#i0, #i1) ==>) add (lt(#i, #i1) ==>) heuristics(simplify_int)};
+  //reviewed 04/15/2004, St.S.
+  leq_trans{ if(leq(#i, #i0) ==>) find(leq(#i0, #i1) ==>) add (leq(#i, #i1) ==>) heuristics(simplify_int)};
+  //reviewed 04/15/2004, St.S.
+  less_neg { find (lt(#i, #i0)) replacewith (!(lt(#i0, succ(#i)))) };
+
+  //reviewed 04/15/2004, St.S.
+  less_base { find (lt(#i, #i)) replacewith (false) heuristics(simplify_int) };
+  //reviewed 04/15/2004, St.S.
+  less_succ_step_1 { find (lt(#i, #i0)) replacewith ((succ(#i) = #i0) | lt(succ(#i), #i0)) };
+  //reviewed 04/15/2004, St.S.
+  less_succ_step_2 { find (lt(#i, #i0) ==>) add (lt(#i, succ(#i0)) ==>) };
+  //reviewed 04/15/2004, St.S.
+  less_succ_step_3 { find (==> lt(#i, #i0)) add (==> lt(succ(#i), #i0)) };
+  //reviewed 04/15/2004, St.S.
+  less_pred_step_1 { find (lt(#i, #i0)) replacewith ((#i = pred(#i0)) | lt(#i, pred(#i0))) };
+  //reviewed 04/15/2004, St.S.
+  less_pred_step_2 { find (lt(#i, #i0) ==>) add (lt(pred(#i), #i0) ==>) };
+  //reviewed 04/15/2004, St.S.
+  less_pred_step_3 { find (==> lt(#i, #i0)) add (==> lt(#i, pred(#i0))) };
+
+  //reviewed 04/15/2004, St.S.
+  less_succ_true  { find (lt(#i, succ(#i))) replacewith (true) heuristics(simplify_int) };
+  //reviewed 04/15/2004, St.S.
+  less_pred_true  { find (lt(pred(#i), #i)) replacewith (true) heuristics(simplify_int) };
+  //reviewed 04/15/2004, St.S.
+  less_succ_false { find (lt(succ(#i), #i)) replacewith (false) heuristics(simplify_int) };
+  //reviewed 04/15/2004, St.S.
+  less_pred_false { find (lt(#i, pred(#i))) replacewith (false) heuristics(simplify_int) };
+
+  //reviewed 04/15/2004, St.S.
+  add_zero_left  { find (+(0, #i)) replacewith (#i) heuristics (simplify_int) };
+  //reviewed 04/15/2004, St.S.
+  add_zero_right { find (+(#i, 0)) replacewith (#i) heuristics (simplify_int) };
+  //reviewed 04/15/2004, St.S.
+  add_succ_step_left  { find (+(succ(#i), #i0)) replacewith (succ(+(#i, #i0))) heuristics (simplify_int) };
+  //reviewed 04/15/2004, St.S.
+  add_succ_step_right { find (+(#i, succ(#i0))) replacewith (succ(+(#i, #i0))) heuristics (simplify_int) };
+  //reviewed 04/15/2004, St.S.
+  add_pred_step_left  { find (+(pred(#i), #i0)) replacewith (pred(+(#i, #i0))) heuristics (simplify_int) };
+  //reviewed 04/15/2004, St.S.
+  add_pred_step_right { find (+(#i, pred(#i0))) replacewith (pred(+(#i, #i0))) heuristics (simplify_int) };
+
+  //reviewed 04/15/2004, St.S.
+  switch_brackets { find(+(+(#i, #i0), #i1)) replacewith(+(#i, +(#i0, #i1))) heuristics(simplify_int) };
+  //reviewed 04/15/2004, St.S.
+  switch_params { find(+(#i0, #i1)) replacewith(+(#i1, #i0)) };
+  //reviewed 04/15/2004, St.S.
+  rotate_params { find(+(#i, +(#i0, #i1))) replacewith(+(#i0, +(#i, #i1))) };
+  //reviewed 04/15/2004, St.S.
+  add_eq { find(#i0 = #i1) replacewith(+(#i, #i0) = +(#i, #i1)) };
+  //reviewed 04/15/2004, St.S.
+  add_eq_back { find(+(#i1, #i) = +(#i1, #i0)) replacewith(#i = #i0) };
+
+  //reviewed 04/15/2004, St.S.
+  add_less { find(lt(#i, #i0)) replacewith(lt(+(#i1, #i), +(#i1, #i0))) };
+  //reviewed 04/15/2004, St.S.
+  add_less_back { find(lt(+(#i1, #i), +(#i1, #i0))) replacewith(lt(#i, #i0)) };
+  //reviewed 04/15/2004, St.S.
+  add_less_back_zero_1 { find(lt(#i,+(#i,#i1))) replacewith(lt(0,#i1)) displayname "add_less_back"};
+  //reviewed 04/15/2004, St.S.
+  add_less_back_zero_2 { find(lt(+(#i,#i1),#i)) replacewith(lt(#i1,0)) displayname "add_less_back"};
+
+  //reviewed 04/15/2004, St.S.
+  sub { find (~d(#i, #i0)) replacewith (+(#i, ~m(#i0)))heuristics(simplify_int) };
+  //reviewed 04/15/2004, St.S.
+  sub_succ { find (~m(succ(#i))) replacewith (pred(~m(#i))) heuristics(simplify_int) };
+  //reviewed 04/15/2004, St.S.
+  sub_pred { find (~m(pred(#i))) replacewith (succ(~m(#i))) heuristics(simplify_int) };
+  //reviewed 04/15/2004, St.S.
+  sub_zero_1 { find (Z(neg(0(#)))) replacewith (Z(0(#))) heuristics(simplify_int) };
+  //reviewed 04/15/2004, St.S.
+  sub_zero_2 { find (~d(#i,0)) replacewith (#i) heuristics(simplify_int) };
+  //reviewed 04/15/2004, St.S.
+  add_sub_elim_left  { find (+(~m(#i), #i)) replacewith (0) heuristics(simplify_int) };
+  //reviewed 04/15/2004, St.S.
+  add_sub_elim_right { find (+(#i, ~m(#i))) replacewith (0) heuristics(simplify_int) };
+  //reviewed 04/15/2004, St.S.
+  add_sub_step { find (+(~m(#i), ~m(#i0))) replacewith (~m(+(#i, #i0))) };
+  //reviewed 04/15/2004, St.S.
+  sub_sub_elim { find (~m(~m(#i))) replacewith (#i) heuristics(simplify_int) };
+  //reviewed 04/15/2004, St.S.
+  less_sub { find (lt(#i, #i0)) replacewith (lt(~m(#i0), ~m(#i))) };
+
+  //reviewed 04/15/2004, St.S.
+  less_plus { find (lt(0, +(#i0, #i1))) replacewith(lt(~m(#i0),#i1)) };
+
+  //reviewed 04/15/2004, St.S.
+  close_by_lt_leq { if (lt (#i,#j) ==>) 
+           find (==> leq(+(#i,1), #j) )
+           replacewith (==> true) };
+
+  //reviewed 04/15/2004, St.S.
+  lt_to_leq_1 {find (lt(#i,#j)|#i=#j) replacewith (leq(#i,#j))};
+
+  //reviewed 04/15/2004, St.S.
+  lt_to_leq_2 {if (==> lt(#i,#j)) 
+              find (==> #i=#j) 
+              replacewith (==> leq(#i,#j))};
+
+  //reviewed 04/15/2004, St.S.
+  lt_to_gt {find (lt(#i,#i0)) replacewith (gt(#i0,#i))};
+  //reviewed 04/15/2004, St.S.
+  gt_to_lt {find (gt(#i,#i0)) replacewith (lt(#i0,#i))};
+  //reviewed 04/15/2004, St.S.
+  leq_to_geq {find (leq(#i,#i0)) replacewith (geq(#i0,#i))};
+  //reviewed 04/15/2004, St.S.
+  geq_to_leq {find (geq(#i,#i0)) replacewith (leq(#i0,#i))};
+
+
+  //reviewed 04/15/2004, St.S.
+  succ_to_plusone { find (succ(#i)) replacewith(+(#i,1)) heuristics (simplify_int)};
+  //reviewed 04/15/2004, St.S.
+  pred_to_minusone { find (pred(#i)) replacewith(~d(#i,1)) heuristics (simplify_int)};
+
+  //reviewed 04/15/2004, St.S.
+  neg_to_literal{ find (~m(Z(#iz))) replacewith (Z(neg(#iz))) heuristics (simplify_int)};
+
+
+// ------------------------------
+// ------- modulo taclets ---------
+// ------------------------------
+
+  //reviewed 04/15/2004, St.S.
+  mod_not_necessary {
+	find (mod(#i0,#i))
+	replacewith (#i0);
+	add (==> lt(#i0,#i) & leq(0,#i0)) 
+	sameUpdateLevel
+  };
+
+  //reviewed 04/15/2004, St.S.
+  mod_lt_mod {
+	find (mod(mod(#i0,#i),#j))
+	replacewith (mod(#i0,#i)) ;
+        add  (==> leq(#i,#j) & lt(0,#i)) 
+	sameUpdateLevel
+  };
+
+  //reviewed 04/15/2004, St.S.
+  mod_gt_mod_and_multiple {
+	find (mod(mod(#i0,#i),#j))
+	replacewith (mod(#i0,#j)) ;
+        add  (==> (mod(#i,#j)=0) & lt(0,#i)) 
+	sameUpdateLevel
+  };
+
+  //reviewed 04/15/2004, St.S.
+  mod_mod_eq {
+	find (mod(mod(#i0,#i1),#i1)) 
+	replacewith (mod(#i0,#i1))
+	heuristics(simplify_int)
+  };
+ 
+  //reviewed 04/15/2004, St.S.
+  mod_plus {find ( lt(+(mod(#i,#j),#i0), #j)) 
+            replacewith (+(mod(#i,#j),#i0) = mod(+(#i,#i0), #j)) };
+
+  //reviewed 04/15/2004, St.S.
+  mod_sum_1 {
+	find (mod(+(mod(#i0,#j), mod(#i1,#j)), #j))
+	replacewith(mod(+(#i0,#i1), #j))
+	displayname "mod_sum_reduce"
+  };
+
+  //reviewed 04/15/2004, St.S.
+  mod_sum_2 {
+	find (mod(+(#i0,#i1), #j))
+	replacewith(mod(+(mod(#i0,#j), mod(#i1,#j)), #j))
+	displayname "mod_sum_expand"
+  };
+
+  //reviewed 04/15/2004, St.S.
+  mod_sum_3 {
+	find (mod(+(mod(#i0,#j), mod(#i1,#j)), #j))
+	replacewith(mod(+(#i0, mod(#i1,#j)), #j))
+	displayname "mod_sum_reduce_left"
+  };
+
+  //reviewed 04/15/2004, St.S.
+  mod_sum_4 {
+	find (mod(+(mod(#i0,#j), mod(#i1,#j)), #j))
+	replacewith(mod(+(mod(#i0,#j), #i1), #j))
+	displayname "mod_sum_reduce_right"
+  };
+
+  //reviewed 04/15/2004, St.S.
+  mod_sum_5 {
+	find (mod(+(mod(#i0,#j), #i1), #j))
+	replacewith(mod(+(#i0, #i1), #j))
+	displayname "mod_sum_reduce_left"
+  };
+
+  //reviewed 04/15/2004, St.S.
+  mod_sum_6 {
+	find (mod(+(#i0, mod(#i1,#j)), #j))
+	replacewith(mod(+(#i0, #i1), #j))
+	displayname "mod_sum_reduce_right"
+  };
+	
+  //reviewed 04/15/2004, St.S.
+  mod_negative_1 {
+	find (mod(#i0, ~m(#i1)))
+	replacewith(~m(mod(~m(#i0), #i1)))
+	displayname "mod_negative_right"
+  };
+  
+  //reviewed 04/15/2004, St.S.
+  mod_negative_3 {
+	find (mod(~m(#i0), ~m(#i1)))
+	replacewith(~m(mod(#i0, #i1)))
+	displayname "mod_negative_both"
+  };
+
+  //reviewed 04/15/2004, St.S.
+  mod_one {
+	find (mod(#i0,1))
+	replacewith(0)
+  };
+
+  //reviewed 04/15/2004, St.S.
+  mod_minus_one {
+	find (mod(#i0,~m(1)))
+	replacewith(0)
+  };
+
+
+// -------------------------------------------------------
+// ------------- Taclets for integer literals --------------
+// -------------------------------------------------------
+
+  //reviewed 04/20/2004, St.S.
+  double_unary_minus_literal { find (Z(neg(neg(#iz)))) 
+	  replacewith (Z(#iz)) 
+	  displayname "double_unary_minus"};
+
+
+ //reviewed 04/16/2004, St.S.  
+ charLiteral_to_int {find (C(#iz)) replacewith (Z(#iz)) heuristics (charLiteral_to_intLiteral)};
+
+ //reviewed 04/15/2004, St.S.
+   add_literals {find (+(Z(#iz),Z(#jz)))        
+    replacewith (#add(Z(#iz),Z(#jz)))
+    heuristics (simplify_literals)};
+
+ //reviewed 04/15/2004, St.S.
+   sub_literals {find (~d(Z(#iz),Z(#jz)))   
+    replacewith (#sub(Z(#iz),Z(#jz))) 
+    heuristics (simplify_literals)};
+
+ //reviewed 04/15/2004, St.S.
+  mul_literals {find (mul(Z(#iz),Z(#jz))) 
+    replacewith (#mul(Z(#iz),Z(#jz))) 
+    heuristics (simplify_literals)};
+
+ //reviewed 04/15/2004, St.S.
+   div_literals {find (div(Z(#iz),Z(#jz)))     
+    replacewith (#div(Z(#iz),Z(#jz))) 
+    heuristics (simplify_literals)};
+
+ //reviewed 04/15/2004, St.S.
+   mod_literals {find (mod(Z(#iz),Z(#jz)))   
+    replacewith (#mod(Z(#iz),Z(#jz)))
+    heuristics (simplify_literals)};
+
+ //reviewed 04/15/2004, St.S.
+   less_literals {find (lt(Z(#iz),Z(#jz)))   
+    replacewith (#less(Z(#iz),Z(#jz))) 
+    heuristics (simplify_literals)};
+
+ //reviewed 04/15/2004, St.S.
+   greater_literals {find (gt(Z(#iz),Z(#jz)))   
+    replacewith (#greater(Z(#iz),Z(#jz))) 
+    heuristics (simplify_literals)};
+
+ //reviewed 04/15/2004, St.S.
+   leq_literals {find (leq(Z(#iz),Z(#jz)))   
+    replacewith (#leq(Z(#iz),Z(#jz))) 
+    heuristics (simplify_literals)};
+
+ //reviewed 04/15/2004, St.S.
+   qeq_literals {find (geq(Z(#iz),Z(#jz)))   
+    replacewith (#geq(Z(#iz),Z(#jz))) 
+    heuristics (simplify_literals)};
+
+ //reviewed 04/15/2004, St.S.
+   equal_literals {find (Z(#iz)=Z(#jz))  
+    replacewith (#eq(Z(#iz),Z(#jz)))
+    heuristics (simplify_literals)};
+
+ //reviewed 04/15/2004, St.S.
+  neg_literal { find (~m(Z(#iz))) 
+    replacewith (Z(neg(#iz))) 
+    heuristics (simplify_literals)};
+
+
+
+// -------------------------------------------------------
+// ------------- integer induction taclets    --------------
+// -------------------------------------------------------
+
+
+  //reviewed 04/15/2004, St.S.
+  int_induction { "Base Case": add ( ==> {#nv 0}(#phi) );
+                  "Step Case": add ( ==> all #nv . ((geq(#nv,0) & #phi)->{#nv succ(#nv)}#phi) );
+                  "Use Case":  add ( all #nv. (geq(#nv,0) -> #phi) ==>) };
+
+
+/*  int_induction_with_less {
+    varcond (int #v0 new)
+    add (==> {#i (0(q))}(#phi));
+    add (all #i (( lt(Z(0(#)), #i) & lt(#i, #v0)) -> #phi), lt(Z(0(#)), #v0) ==> {#i #v0}(#phi));
+    add (all #i ((lt(#v0, #i) & lt(#i, Z(0(#)))) -> #phi), lt(#v0, Z(0(#))) ==> {#i #v0}(#phi));
+    add (all #i #phi ==>)
+   };
+*/
+
+
+
+}

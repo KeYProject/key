@@ -1,0 +1,9 @@
+PredicateDeclarationParsitorFactory
+
+predicate hello(int)
+predicate hello(int x)
+predicate hello(int:x)
+predicate upd(:asm rule; g, g)
+predicate upd(:asm rule #R; g, g)
+predicate upd(:asm rule:#R, asm rule; formula x, g)
+derived predicate con(:asm rule #R;) = true

@@ -1,0 +1,170 @@
+Warning: "java-es-m-modified.maude", line 208 (fmod FIELD-DECLARATION-SYNTAX):
+    declaration for _; has the same domain kinds as the declaration on
+    "java-es-m-modified.maude", line 172 (fmod DECLARATION-SYNTAX) but a
+    different range kind.
+Warning: "java-es-m-modified.maude", line 220 (fmod METHOD-DECLARATION-SYNTAX):
+    declaration for __ has the same domain kinds as the declaration on
+    "java-es-m-modified.maude", line 169 (fmod DECLARATION-SYNTAX) but a
+    different range kind.
+Warning: "java-es-m-modified.maude", line 208 (fmod FIELD-DECLARATION-SYNTAX):
+    declaration for _; has the same domain kinds as the declaration on
+    "java-es-m-modified.maude", line 172 (fmod DECLARATION-SYNTAX) but a
+    different range kind.
+Warning: "java-es-m-modified.maude", line 220 (fmod METHOD-DECLARATION-SYNTAX):
+    declaration for __ has the same domain kinds as the declaration on
+    "java-es-m-modified.maude", line 169 (fmod DECLARATION-SYNTAX) but a
+    different range kind.
+Warning: "java-es-m-modified.maude", line 499 (fmod STATE): importation of mod
+    by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 610 (fmod LOCATION-SEMANTICS):
+    importation of mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 664 (fmod ARITH-EXP-SEMANTICS):
+    importation of mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 690 (fmod REXP-SEMANTICS):
+    importation of mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 841 (fmod GET-TYPES): importation of
+    mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 842 (fmod GET-TYPES): importation of
+    mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 220 (fmod METHOD-DECLARATION-SYNTAX):
+    declaration for __ has the same domain kinds as the declaration on
+    "java-es-m-modified.maude", line 169 (fmod DECLARATION-SYNTAX) but a
+    different range kind.
+Warning: "java-es-m-modified.maude", line 220 (fmod METHOD-DECLARATION-SYNTAX):
+    declaration for __ has the same domain kinds as the declaration on
+    "java-es-m-modified.maude", line 169 (fmod DECLARATION-SYNTAX) but a
+    different range kind.
+Warning: "java-es-m-modified.maude", line 1026 (fmod BLOCK-SEMANTICS):
+    importation of mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 1036 (fmod DECLARATION-SEMANTICS):
+    importation of mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 220 (fmod METHOD-DECLARATION-SYNTAX):
+    declaration for __ has the same domain kinds as the declaration on
+    "java-es-m-modified.maude", line 169 (fmod DECLARATION-SYNTAX) but a
+    different range kind.
+Warning: "java-es-m-modified.maude", line 1065 (fmod OUTPUT-METHOD):
+    importation of mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 220 (fmod METHOD-DECLARATION-SYNTAX):
+    declaration for __ has the same domain kinds as the declaration on
+    "java-es-m-modified.maude", line 169 (fmod DECLARATION-SYNTAX) but a
+    different range kind.
+Warning: "java-es-m-modified.maude", line 1150 (fmod NEW-SEMANTICS):
+    importation of mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 1151 (fmod NEW-SEMANTICS):
+    importation of mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 220 (fmod METHOD-DECLARATION-SYNTAX):
+    declaration for __ has the same domain kinds as the declaration on
+    "java-es-m-modified.maude", line 169 (fmod DECLARATION-SYNTAX) but a
+    different range kind.
+Warning: "java-es-m-modified.maude", line 208 (fmod FIELD-DECLARATION-SYNTAX):
+    declaration for _; has the same domain kinds as the declaration on
+    "java-es-m-modified.maude", line 172 (fmod DECLARATION-SYNTAX) but a
+    different range kind.
+Warning: "java-es-m-modified.maude", line 1225 (fmod THREAD): importation of
+    mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 220 (fmod METHOD-DECLARATION-SYNTAX):
+    declaration for __ has the same domain kinds as the declaration on
+    "java-es-m-modified.maude", line 169 (fmod DECLARATION-SYNTAX) but a
+    different range kind.
+Warning: "java-es-m-modified.maude", line 208 (fmod FIELD-DECLARATION-SYNTAX):
+    declaration for _; has the same domain kinds as the declaration on
+    "java-es-m-modified.maude", line 172 (fmod DECLARATION-SYNTAX) but a
+    different range kind.
+Warning: "java-es-m-modified.maude", line 220 (fmod METHOD-DECLARATION-SYNTAX):
+    declaration for __ has the same domain kinds as the declaration on
+    "java-es-m-modified.maude", line 169 (fmod DECLARATION-SYNTAX) but a
+    different range kind.
+Warning: "java-es-m-modified.maude", line 1262 (fmod EXP-STATEMENT-SEMANTICS):
+    importation of mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 1270 (fmod IF-SEMANTICS): importation
+    of mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 1282 (fmod WHILE-SEMANTICS):
+    importation of mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 1290 (fmod DO-SEMANTICS): importation
+    of mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 1298 (fmod FOR-SEMANTICS):
+    importation of mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 1310 (fmod RETURN-SEMANTICS):
+    importation of mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 1311 (fmod RETURN-SEMANTICS):
+    importation of mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 220 (fmod METHOD-DECLARATION-SYNTAX):
+    declaration for __ has the same domain kinds as the declaration on
+    "java-es-m-modified.maude", line 169 (fmod DECLARATION-SYNTAX) but a
+    different range kind.
+Warning: "java-es-m-modified.maude", line 220 (fmod METHOD-DECLARATION-SYNTAX):
+    declaration for __ has the same domain kinds as the declaration on
+    "java-es-m-modified.maude", line 169 (fmod DECLARATION-SYNTAX) but a
+    different range kind.
+Warning: "java-es-m-modified.maude", line 220 (fmod METHOD-DECLARATION-SYNTAX):
+    declaration for __ has the same domain kinds as the declaration on
+    "java-es-m-modified.maude", line 169 (fmod DECLARATION-SYNTAX) but a
+    different range kind.
+Warning: "java-es-m-modified.maude", line 208 (fmod FIELD-DECLARATION-SYNTAX):
+    declaration for _; has the same domain kinds as the declaration on
+    "java-es-m-modified.maude", line 172 (fmod DECLARATION-SYNTAX) but a
+    different range kind.
+Warning: "java-es-m-modified.maude", line 1537 (fmod PGM-SEMANTICS): rule not
+    allowed in a functional module.
+Warning: "java-es-m-modified.maude", line 1552 (fmod PGM-SEMANTICS): rule not
+    allowed in a functional module.
+Warning: "java-es-m-modified.maude", line 1575 (fmod PGM-SEMANTICS): rule not
+    allowed in a functional module.
+Warning: "java-es-m-modified.maude", line 1607 (fmod PGM-SEMANTICS): rule not
+    allowed in a functional module.
+Warning: "java-es-m-modified.maude", line 1628 (fmod PGM-SEMANTICS): rule not
+    allowed in a functional module.
+Warning: "java-es-m-modified.maude", line 1651 (fmod PGM-SEMANTICS): rule not
+    allowed in a functional module.
+Warning: "java-es-m-modified.maude", line 1669 (fmod PGM-SEMANTICS): rule not
+    allowed in a functional module.
+Warning: "java-es-m-modified.maude", line 2091 (fmod PGM-SEMANTICS): rule not
+    allowed in a functional module.
+Warning: "java-es-m-modified.maude", line 2112 (fmod PGM-SEMANTICS): rule not
+    allowed in a functional module.
+Warning: "java-es-m-modified.maude", line 2145 (fmod PGM-SEMANTICS): rule not
+    allowed in a functional module.
+Warning: "java-es-m-modified.maude", line 2180 (fmod PGM-SEMANTICS): rule not
+    allowed in a functional module.
+Warning: "java-es-m-modified.maude", line 2221 (fmod PGM-SEMANTICS): rule not
+    allowed in a functional module.
+Warning: "java-es-m-modified.maude", line 2253 (fmod PGM-SEMANTICS): rule not
+    allowed in a functional module.
+Warning: "java-es-m-modified.maude", line 2286 (fmod PGM-SEMANTICS): rule not
+    allowed in a functional module.
+Warning: "java-es-m-modified.maude", line 2319 (fmod PGM-SEMANTICS): rule not
+    allowed in a functional module.
+Warning: "java-es-m-modified.maude", line 2356 (fmod PGM-SEMANTICS): rule not
+    allowed in a functional module.
+Warning: "java-es-m-modified.maude", line 2389 (fmod PGM-SEMANTICS): rule not
+    allowed in a functional module.
+Warning: "java-es-m-modified.maude", line 2422 (fmod PGM-SEMANTICS): rule not
+    allowed in a functional module.
+Warning: "java-es-m-modified.maude", line 2456 (fmod PGM-SEMANTICS): rule not
+    allowed in a functional module.
+Warning: "java-es-m-modified.maude", line 2492 (fmod PGM-SEMANTICS): rule not
+    allowed in a functional module.
+Warning: "java-es-m-modified.maude", line 1380 (fmod PGM-SEMANTICS):
+    importation of mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 1384 (fmod PGM-SEMANTICS):
+    importation of mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 1385 (fmod PGM-SEMANTICS):
+    importation of mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 1386 (fmod PGM-SEMANTICS):
+    importation of mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 1389 (fmod PGM-SEMANTICS):
+    importation of mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 1400 (fmod PGM-SEMANTICS):
+    importation of mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 1401 (fmod PGM-SEMANTICS):
+    importation of mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 1402 (fmod PGM-SEMANTICS):
+    importation of mod by fmod not allowed.
+Warning: "java-es-m-modified.maude", line 208 (fmod FIELD-DECLARATION-SYNTAX):
+    declaration for _; has the same domain kinds as the declaration on
+    "java-es-m-modified.maude", line 172 (fmod DECLARATION-SYNTAX) but a
+    different range kind.
+Warning: "java-es-m-modified.maude", line 220 (fmod METHOD-DECLARATION-SYNTAX):
+    declaration for __ has the same domain kinds as the declaration on
+    "java-es-m-modified.maude", line 169 (fmod DECLARATION-SYNTAX) but a
+    different range kind.

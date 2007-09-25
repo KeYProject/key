@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<!-- This file is part of KeY - Integrated Deductive Software Design -->
+<!-- Copyright (C) 2001-2003 Universitaet Karlsruhe, Germany-->
+<!--                         and Chalmers University of Technology, Sweden          -->
+<!---->
+<!-- The KeY system is protected by the GNU General Public License. -->
+<!-- See LICENSE.TXT for details.-->
+<!---->
+<html>
+
+
+<H3>Introduction</H3>
+
+Attach additional responsibilities to an object dynamically. Decorators provide
+a flexible alternative to subclassing for extending functionality.
+
+<H3>Participants:</H3>
+  <H4>Component</H4>
+  <UL>
+    <LI>Defines the interface for objects that can have responsibilities added
+to them dynamically.
+    <li>This participant cannot be read-only.
+  </UL>
+  <H4>Concrete component</H4>
+  <UL>
+    <LI>Defines an object to which additional responsibilities can be attached.
+    <li>This participant cannot be read-only.
+  </UL>
+  <H4>Decorator</H4>
+  <UL>
+    <LI>Maintains a reference to a Component object and defines an interface that
+conforms to the Component's interface.
+    <li>This participant cannot be read-only.
+    <li>This participant cannot be an interface.
+  </UL>
+In the <i>Attribute</i> field you can specify the name of a Decorator's attribute where it keeps a reference
+to a Component object.
+<p>
+The <i>Initialization variant</i> option defines the kind of initialization of that attribute.
+  <H4>Concrete decorator</H4>
+  <UL>
+    <LI>Adds responsibilities to the component.
+    <li>This participant cannot be read-only.
+    <li>This participant cannot be an interface.
+  </UL>
+<p>
+If <i>Copy documentation</i> is checked, it copies Javadoc comments from methods in interfaces
+participating in the pattern to the stubs of these methods that the pattern created in classes implementing
+such interfaces.
+<p>
+If <i>Create pattern links</i> is checked, it generates additional links that can be used by this
+pattern later to determine classes and interfaces participating in the pattern.
+This means that if you check this option and use the pattern to create a set of classes and interfaces,
+the pattern invoked for some participant later (using the Choose Pattern command on the right-click menu) will
+automatically find all other participants (if possible) and fill in participant fields
+with their names.
+<p>
+Furthermore, if you apply the pattern with this option checked and later invoke the pattern
+using the Choose Pattern command on the right-click menu for some participant, the pattern
+has an additional field called <i>Use selected class as</i>, containing possible roles for the selected
+element.
+<p>
+This option is very useful when you are planning to change something in the classes/interfaces
+participating in the pattern. For example, if this option is on and after creating the classes and
+interfaces you
+add several methods to a certain interface-participant (and this change must be reflected somehow in other
+participants), all you need to do is select this
+changed interface,
+invoke the Choose Pattern dialog for this element and select the original pattern. After that
+the pattern determines other participants and you only need to click Finish.
+The pattern will modify all other classes and interfaces according to your changes.
+
+<h3>Applicability</h3>
+Use the Decorator pattern
+<ul>
+  <li>To add responsibilities to individual objects dynamically and transparently, that is, without
+    affecting other objects.
+   <li>For responsibilities that can be withdrawn.
+   <li>When extension by subclassing is impractical. Sometimes a large number of independent extensions
+    are possible and would produce an explosion of subclasses to support every combination. Or a class
+    definition might be hidden or otherwise unavailable for subclassing.
+</ul>
+
+<h3>Documentation of OCL-Schemata</h3><ul>
+<ul>
+
+<li> Method Specifications are copied from the Component to Decorator and Concrete Decorators if the box <i>Copy Specs from Methods</i> is tagged.
+
+
+<li> Option <i>Simply Decorated</i>: 
+<ul><li> An association <i>innerDecorators</i> from Decorator to itself is created with multiplicity 0..*
+    <li> The set represented by the association is defined to contain the transitive closure of the components: <br>
+
+context Decorator<br>
+inv: if (not (self.component.oclIsKindOf(Decorator))) <br>
+then (allInnerDecorators->isEmpty) <br>
+else (allInnerDecorators=self.component.oclAsType(Decorator).allInnerDecorators-><br>
+including(self.component.oclAsType(Decorator))) endif <br>
+
+    <li> all elements of the innerDecorators set are of a concrete decorator class that is unique in the set: <br<
+context ConcreteDecorator<br>
+inv: self.allInnerDecorators->forAll(cd | not(cd.oclIsKindOf(ConcreteDecorator))) 
+</ul>
+
+
+
+
+<li> Optional tags <i>Specify Query</i>: If the query is tagged then it is specified: the value of the query in the Decorator is the same as the query on the component:<br>
+context Decorator::query(...)<br>
+post: result=self.component.query(...)<br>
+</ul>

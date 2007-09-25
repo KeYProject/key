@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+ <plugin>
+     <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            objectClass="org.eclipse.jdt.core.IMethod"
+            nameFilter="*"
+            id="KeYPlugin.methodContribution">
+         <action
+               enablesFor="1"
+               label="Select proof obligations for method"
+               icon="key-small.png"
+               class="de.uka.ilkd.key.casetool.eclipse.MethodPOAction"
+               id="KeYPlugin.methodPOAction"/>
+      </objectContribution>
+      <objectContribution
+            objectClass="org.eclipse.jdt.core.IJavaProject"
+            adaptable="false"
+            id="KeYPlugin.javaProjectContribution">
+         <action
+               label="Open JML Specification Browser for java project"
+               icon="key-small.png"
+               class="de.uka.ilkd.key.casetool.eclipse.JavaProjectJMLBrowserAction"
+               id="KeYPlugin.javaProjectAction"/>
+      </objectContribution>
+   </extension>
+   <extension
+         id="KeYPlugin.runKeY"
+         name="Run KeY"
+         point="org.eclipse.ui.actionSets">
+         <actionSet
+               description="Starts the KeY Prover in standalone mode (no project need to be selected)"
+               id="KeYPlugin.actionSet"
+               label="KeY Plugin Actions"
+               visible="true">
+    	     <action
+               class="de.uka.ilkd.key.casetool.eclipse.OpenKeYAction"
+               icon="key-small.png"
+               id="de.uka.ilkd.key.casetool.eclipse.OpenKeYAction"
+               label="Run KeY Prover (standalone)"
+               menubarPath="KeYPlugin.Verification/runProver"
+               toolbarPath="org.eclipse.debug.ui.launchActionSet"
+               tooltip="Starts the KeY Prover (standalone)">
+    	     </action>
+       		<menu label="&amp;Verification" id="KeYPlugin.Verification">
+            <separator name="runProver"/>
+            <groupMarker name="openJMLBrowser"/>
+            </menu>
+         <action
+               class="de.uka.ilkd.key.casetool.eclipse.JavaProjectJMLBrowserAction"
+               enablesFor="1"              
+               icon="key-small.png"
+               id="KeYPlugin.javaProjectAction"
+               label="Open JML Browser For Project"
+               menubarPath="KeYPlugin.Verification/openJMLBrowser">
+             <selection class="org.eclipse.jdt.core.IJavaProject"/>
+         </action>
+  		 </actionSet>
+   </extension>
+</plugin>

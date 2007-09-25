@@ -1,0 +1,73 @@
+unit Equi
+
+export *
+
+import * from Base
+import * from Bool
+import * from Asm
+
+
+    // XXX: missing
+    // nemo
+    
+taclet equi_skip_right {
+        find ([[#R par skip]] #phi)
+        replacewith ([[#R]] #phi)
+        rule sets(simplify_asm)
+    };
+    
+taclet equi_skip_left {
+        find ([[skip par #R]] #phi)
+        replacewith ([[#R]] #phi)
+        rule sets(simplify_asm)
+    };
+    
+taclet equi_com {
+        find ([[#R par #S]] #phi)
+        replacewith ([[#S par #R]] #phi)
+    };
+    
+taclet equi_ass {
+        find ([[#R1 par (#R2 par #R3)]] #phi)
+        replacewith ([[(#R1 par #R2) par #R3]] #phi)
+    };
+    
+taclet equi_idem {
+        find ([[#R par #R]] #phi)
+        replacewith ([[#R]] #phi)
+        rule sets(simplify_asm)
+    };
+    
+taclet equi_if1 {
+        find ([[if #b then #R1 else #R2 end par #S]] #phi)
+        replacewith ([[if #b then #R1 par #S else #R2 par #S end]] #phi)
+    };
+    
+taclet equi_if2 {
+        find ([[#S par if #b then #R1 else #R2 end]] #phi)
+        replacewith ([[if #b then #S par #R1 else #S par #R2 end]] #phi)
+    };
+
+
+
+taclet equi_seq_skip1 {
+        find ([[#R seq skip]] #phi)
+        replacewith ([[#R]] #phi)
+        rule sets(simplify_asm)
+    };
+    
+taclet equi_seq_skip2 {
+        find ([[skip seq #R]] #phi)
+        replacewith ([[#R]] #phi)
+        rule sets(simplify_asm)
+    };
+    
+taclet equi_seq_ass {
+        find ([[(#R1 seq #R2) seq #R3]] #phi)
+        replacewith ([[#R1 seq (#R2 seq #R3)]] #phi)
+    };
+    
+taclet equi_seq_if {
+        find ([[if #b then #R1 else #R2 end seq #S]] #phi)
+        replacewith ([[if #b then #R1 seq #S else #R2 seq #S end]] #phi)
+    };

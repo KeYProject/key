@@ -1,0 +1,73 @@
+#// This file is part of KeY - Integrated Deductive Software Design
+#// Copyright (C) 2001-2005 Universitaet Karlsruhe Germany
+#//                           Universitaet Koblenz-Landau, Germany
+#//                         and Chalmers University of Technology, Sweden
+#//
+#// The KeY system is protected by the GNU General Public License. 
+#// See LICENSE.TXT for details.
+#//
+#// This file contains rules for handling java programs
+
+eval_order_static_access1
+eval_order_static_access2
+eval_order_static_access4
+eval_order_static_access5
+eval_order_access1
+eval_order_access2
+eval_order_access3
+preincrement_assignment
+preincrement_assignment_attribute
+preincrement
+preincrement_attribute
+predecrement
+predecrement_attribute
+predecrement_assignment
+predecrement_assignment_attribute
+postincrement_assignment
+postincrement_assignment_attribute
+postincrement
+postincrement_attribute
+postdecrement
+postdecrement_attribute
+postdecrement_assignment
+postdecrement_assignment_attribute
+compound_assignment_op_mul_attr
+compound_assignment_op_mul
+compound_assignment_op_plus_attr
+compound_assignment_op_plus
+compound_assignment_op_minus_attr
+compound_assignment_op_minus
+iterated_assignments
+remove_parentheses_right
+remove_parentheses_attribute_left
+remove_parentheses_lhs_left
+compound_multiplication_1
+compound_multiplication_2
+compound_addition_1
+compound_addition_2
+compound_binary_AND_1
+compound_binary_AND_2
+compound_binary_OR_1
+compound_binary_OR_2
+compound_subtraction_1
+compound_subtraction_2
+compound_equality_comparision_1
+compound_equality_comparision_2
+compound_inequality_comparision_1
+compound_inequality_comparision_2
+compound_less_than_comparision_1
+compound_less_than_comparision_2
+compound_less_equal_than_comparision_1
+compound_less_equal_than_comparision_2
+compound_greater_than_comparision_1
+compound_greater_than_comparision_2
+compound_greater_equal_than_comparision_1
+compound_greater_equal_than_comparision_2
+eval_order_iterated_assignments_0_1
+eval_order_iterated_assignments_1_1
+eval_order_iterated_assignments_4_1
+eval_order_iterated_assignments_5_1
+iterated_assignments_0
+iterated_assignments_1
+iterated_assignments_4
+iterated_assignments_5

@@ -1,0 +1,5 @@
+FunctionDeclarationParsitorFactory
+
+static f(int);
+dynamic f_(int:x)
+derived f(int) = x + y

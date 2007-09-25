@@ -1,0 +1,330 @@
+#!/bin/sh
+
+resolve_symlink  ()
+{ 
+   TARGET=`ls -l $1| awk '/\ ->\ /{print $NF}'`
+
+   if [ -n "$TARGET" ] ; then
+      RESULT="$TARGET"
+      case "$RESULT" in
+         /*) break ;;				# absolute symlink
+         *)  RESULT=`dirname $0`/"$RESULT" ;;	# relative symlink
+      esac
+   else
+      RESULT=$1
+   fi
+
+   echo "$RESULT"
+}
+
+
+
+
+if [ -z "$JAVA_HOME" ] ; then
+    JAVA=`which java`
+    if [ -z "$JAVA" ] ; then
+      echo "Cannot find JAVA. Please set your PATH or \$JAVA_HOME."
+      exit 1
+    fi
+    JAVA_BIN=`dirname $JAVA`
+    JAVA_HOME="$JAVA_BIN/.."
+fi
+echo "Using JDK installation from:      $JAVA_HOME"
+
+
+# For debugging reasons disable JIT (otherwise strace doesn't work)
+JAVA_OPTIONS=
+#JAVA_OPTIONS=-classic
+
+#JAVA_OPTIONS='-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1234'
+
+
+UNAME=`uname -s 2>/dev/null | tr '[:upper:]' '[:lower:]'`
+ARCH=`uname -pm 2>/dev/null | tr '[:upper:]' '[:lower:]' | tr ' ' '-'`
+
+# Change that, if your java interpreter is different
+#
+# MAC OS X
+if [ "$UNAME" = "darwin" ] ; then
+    JRE=$JAVA_HOME/Home
+    JDK_RT_JAR=$JAVA_HOME/Classes/classes.jar
+    JDK_UI_JAR=$JAVA_HOME/Classes/ui.jar
+    JDK_TOOLS_JAR=$JAVA_HOME/Home/lib/ext/jpda.jar
+    JAVA=$JRE/bin/java
+# other OS
+else
+    JRE=$JAVA_HOME/jre
+    JDK_RT_JAR=$JRE/lib/rt.jar
+    JDK_TOOLS_JAR=$JAVA_HOME/lib/tools.jar
+    JAVA=$JRE/bin/java
+fi
+
+#LD_LIBRARY_PATH=$JAVA_HOME/lib/i386:$LD_LIBRARY_PATH
+#export LD_LIBRARY_PATH
+
+if [ "D""$JAVA_HOME" = "D" ]
+then
+    echo
+    echo Please provide a valid path to the recommended JDK by
+    echo either configuring the file "$0" or defining the
+    echo JAVA_HOME environment variable from the command line.
+    echo
+    echo If you have any problems or questions, please contact
+    echo "technical support (http://www.togethersoft.com/support/)"
+    exit
+else
+    if [ ! -x $JAVA ] ; then
+        echo Please be sure you have properly set the JAVA_HOME variable.
+        echo The executable file $JAVA is not found.
+        exit
+    fi
+
+    if [ ! -r $JDK_RT_JAR ] ; then
+        echo Please be sure you have properly set the JDK_RT_JAR variable.
+        echo The file $JDK_RT_JAR is not found.
+        echo
+        echo If you have any problems or questions, please contact
+        echo "technical support (http://www.togethersoft.com/support/)"
+        exit
+    fi
+
+    if [ ! -r $JDK_TOOLS_JAR ] ; then
+        echo The file $JDK_TOOLS_JAR was not found. This is probably
+        echo because you are using a JRE instead of a JDK. You will
+        echo not be able to run javac or javadoc. This is probably OK.
+    fi
+
+    if [ "$UNAME" = "darwin" ] ; then
+        if [ ! -r $JDK_UI_JAR ] ; then
+            echo Please be sure you have properly installed JDK 1.3.
+            echo The file $JDK_UI_JAR is not found.  
+            echo
+            echo If you have any problems or questions, please contact
+            echo "technical support (http://www.togethersoft.com/support/)"
+            exit
+        fi
+        JDK_RT_JAR=$JDK_RT_JAR:$JDK_UI_JAR 
+    fi
+fi
+
+
+# fixing of possible linux glibc bug for jdk 1.3.1
+# http://developer.java.sun.com/developer/bugParade/bugs/4466587.html
+if [ "$UNAME" = "linux" ] ; then
+    VERSION=`$JAVA $JAVA_OPTIONS -version 2>&1 | awk 'BEGIN {FS="\""}\
+    { for(i = 2; i<NF; i++) printf "%s", \$i }'`
+    if expr "$VERSION" : "1\\.3\\.1.*" > /dev/null 2>&1; then
+       ulimit -s 2048
+    fi
+fi
+
+
+#
+# Now $KEY_HOME  
+#
+
+if [ -z "$KEY_HOME" ] ; then
+   KEY_HOME=`resolve_symlink "$0"`	# resolve symlink name
+   KEY_HOME=`dirname $KEY_HOME`		# strip executable filename
+   KEY_HOME=`cd "$KEY_HOME";pwd`	# and now expand the path to full
+   KEY_HOME=`dirname $KEY_HOME`		# strip bin/ sirectory
+fi
+echo "Using KeY installation from:      $KEY_HOME"
+
+
+if [ -z "$KEY_LIB" ] ; then
+   KEY_LIB="$KEY_HOME/key-ext-jars"
+else
+echo "Using libraries from:             $KEY_LIB"
+fi
+
+
+##################### TOGETHER HOME ########################
+
+
+
+
+if [ -z "$TOGETHER_HOME"  ]
+then
+   if [ -d "$KEY_LIB/TOGETHER" ] ; then
+      TOGETHER_HOME=`resolve_symlink "$KEY_LIB/TOGETHER"`
+   else
+      echo
+      echo Please set the \$TOGETHER_HOME environment variable.
+      echo
+      echo If you have any problems or questions, please contact
+      echo "technical support (http://www.togethersoft.com/support/)"
+      exit
+   fi
+
+fi
+TGH="$TOGETHER_HOME"
+echo "Using Together installation from: $TGH"
+
+
+
+PATH=$TGH/bin/$UNAME/$ARCH:$TGH/bin/unix:$JAVA_HOME:$JAVA_HOME/bin:$JAVA_HOME/lib:$PATH
+export PATH
+
+if expr "`uname -s`" : "HP-UX" > /dev/null 2>&1; then
+ hpfix="-Dhpux.im.disable=true"
+fi
+
+if [ -r "$TGH/lib/jndi.jar" ]; then
+    JNDI=$TGH/lib/jndi.jar:
+else
+    JNDI=""
+fi
+
+JVM_DIR=`expr $JAVA : '\(.*\)/.*' \| $JAVA`
+
+if [ ! -x $TGH/bin/unix/oistart ]
+then
+   echo "Together installation broken (or not enough permissions)."
+   echo "Check your path."
+   exit
+fi
+
+
+#
+# KeY CLASSPATH
+#
+
+key_ext_jars="antlr.jar jargs.jar recoder.jar dresden-ocl-demo.jar xerces.jar log4j.jar"
+
+keyclasspath="$KEY_HOME/system/binary/"
+
+for i in $key_ext_jars ; do
+    current_jar="$KEY_LIB/$i"
+    if [ ! -f $current_jar ]
+    then
+       echo Cannot find $current_jar. 
+       echo Copy or link the file into the
+       echo $KEY_LIB directory.
+       exit 1
+    else
+       keyclasspath="${keyclasspath}:$current_jar"
+    fi
+done
+
+if [ x$ASPECTJRTPATH != x ]
+then
+  echo "Using AspectJ runtime from:       $ASPECTJRTPATH"
+  keyclasspath=$keyclasspath:$ASPECTJRTPATH
+fi
+
+#
+# KeY-specific command line options
+#
+
+keysysprops=""
+while [ $# -ne 0 ]; do
+    case $1 in
+        -keydebug) keysysprops="${keysysprops}-DKeyDebugFlag=on "
+            shift
+            continue;;
+
+        -debugclassloader) keysysprops="${keysysprops}-DKeyDebugClassLoader=on "
+            shift
+            continue;;
+
+        -*)  keysysprops="${keysysprops}${1} "
+            shift
+            continue;;
+
+        *)  keyarg="${keyarg}${1} "
+            shift
+            continue;;
+    esac
+done	
+
+
+#
+# User specific Together configuration
+#
+
+if [ ! -d "$HOME/.key" ]
+then
+mkdir "$HOME/.key"
+fi
+
+cat >"$HOME/.key/configDefaultSnapShot.config" <<EOF
+config.level.\$internal.group = basic
+config.level.\$internal.0 = \$TOGETHER_LIB\$/internal.config
+config.level.\$default.group = session
+config.level.\$default.0 = \$TOGETHER_CONFIG\$/*.config
+config.level.\$default.1 = $KEY_HOME/config/*.config
+config.level.\$default.write = $HOME/.key/changes.config
+config.level.\$commandLine.group = basic
+config.level.\$project.group = project
+config.level.\$workspace.group = project
+config.level.\$workspace.0 = \$PROJECT_DIR\$/*.config
+config.level.\$workspace.write = \$PROJECT_DIR\$/\$PROJECT_NAME\$.tws
+EOF
+
+
+#
+# now create a working copy of KeY pattern stuff, since it needs to be 
+# modified at runtime. If we work from a jar file the copying is performed
+# by the java code
+#
+#
+
+if [ -d "$KEY_HOME/system/binary/de/uka/ilkd/key/casetool/together/patterns" ]
+then
+mkdir -p "$HOME/.key/keypatterns/de/uka/ilkd/key/casetool/together/patterns"
+cp -r "$KEY_HOME/system/binary/de/uka/ilkd/key/casetool/together/patterns/" \
+      "$HOME/.key/keypatterns/de/uka/ilkd/key/casetool/together/"
+fi
+
+
+# Fallback for KeY-specific binaries
+PATH=${PATH}:$KEY_LIB
+export PATH
+
+#
+# This command actually runs KeY
+# 
+
+$JAVA $JAVA_OPTIONS $keysysprops $hpfix \
+-ea:de.uka.ilkd.key... \
+-noverify -Djdkit.homedir=$JVM_DIR -Xms64m -Xmx512m \
+-Dkey.home=$KEY_HOME \
+-Dkey.pattern.path=$HOME/.key/keypatterns/ \
+-Dkey.together \
+-Dkey.simplify.logdir=$KEY_SIMPLIFY_LOG_DIR \
+-Dkey.ics.logdir=$KEY_ICS_LOG_DIR \
+-Dkey.gfoptions=$GF_OPTIONS \
+-Djava.util.logging.config.file=$HOME/.key/java.util.logging.properties \
+-classpath $TGH/lib/together.jar:\
+$TGH/lib/diagramconverter.jar:\
+$TGH/lib/tgscilib.jar:\
+$TGH/lib/openapi.jar:\
+$TGH/modules:\
+$TGH/lib/gifs.zip:\
+$TGH/out/classes:\
+$TGH/lib/i18n:\
+$TGH/lib/jgl.zip:\
+$TGH/lib/jacl.jar:\
+$TGH/lib/uddi4j.jar:\
+$TGH/lib/mail.jar:\
+$TGH/lib/xalan.jar:\
+$TGH/lib/xerces.jar:\
+$JNDI\
+$TGH/lib/tcljava.jar:\
+$TGH/lib/jcvs/jars/jcvsii.jar:\
+$TGH/lib/jcpagelayout.jar:\
+$TGH/lib/misclib.zip:\
+$TGH/lib/javax.jar:\
+$JDK_TOOLS_JAR:\
+$TGH/lib/jhall.jar:\
+$TGH/help/together-help.jar:\
+$TGH/bundled/tomcat/lib/servlet.jar:\
+$TGH/lib/soap.jar:\
+$TGH/bundled/j2ee/lib/j2ee.jar:\
+$TGH/lib/guiBuilderBeanInfo.jar:\
+$TGH/modules/com/togethersoft/modules/caliberrm/lib/CaliberRM.jar:\
+$TGH/lib/xsltc.jar:\
+$keyclasspath:\
+$JDK_RT_JAR com.togethersoft.together.Main \
+-config.path=$HOME/.key/configDefaultSnapShot.config $keyarg

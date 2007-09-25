@@ -1,0 +1,235 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+//
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+package de.uka.ilkd.key.java.recoderext;
+
+import java.util.HashMap;
+
+import recoder.CrossReferenceServiceConfiguration;
+import recoder.abstraction.ClassType;
+import recoder.abstraction.Field;
+import recoder.java.CompilationUnit;
+import recoder.java.Identifier;
+import recoder.java.StatementBlock;
+import recoder.java.declaration.ClassDeclaration;
+import recoder.java.declaration.FieldDeclaration;
+import recoder.java.declaration.MethodDeclaration;
+import recoder.java.declaration.TypeDeclaration;
+import recoder.java.declaration.modifier.Private;
+import recoder.java.declaration.modifier.Protected;
+import recoder.java.reference.MethodReference;
+import recoder.java.reference.ReferencePrefix;
+import recoder.java.reference.SuperReference;
+import recoder.java.reference.ThisReference;
+import recoder.kit.ProblemReport;
+import recoder.list.*;
+import de.uka.ilkd.key.util.Debug;
+
+/**
+ * Creates the preparation method for pre-initilizing the object fields
+ * with their default settings.
+ */
+public class PrepareObjectBuilder 
+    extends RecoderModelTransformer {
+
+    public static final String 
+	IMPLICIT_OBJECT_PREPARE = "<prepare>";
+
+    public static final String 
+	IMPLICIT_OBJECT_PREPARE_ENTER = "<prepareEnter>";
+
+    private HashMap class2fields;
+
+    private ClassType javaLangObject;
+    
+
+    public PrepareObjectBuilder
+	(CrossReferenceServiceConfiguration services, 
+	 CompilationUnitMutableList units) {	
+	super(services, units);
+	class2fields = new HashMap(units.size());
+    }
+
+    /**
+     * returns all fields of the class cd in source code order. The
+     * method is a work around for a bug in recoder 0.70 as there source
+     * code order is not respected. May become obsolete if newer recoder
+     * versions are used.
+     */
+    private FieldList getFields(ClassDeclaration cd) {
+	FieldMutableList result = new FieldArrayList(cd.getChildCount());
+	for (int i = 0; i<cd.getChildCount(); i++) {
+	    if (cd.getChildAt(i) instanceof FieldDeclaration) {
+		FieldSpecificationList fields = 
+		    ((FieldDeclaration)cd.getChildAt(i)).getFieldSpecifications();
+		for (int j = 0; j<fields.size(); j++) {
+		    result.add(fields.getFieldSpecification(j));
+		}
+	    }
+	}
+	return result;	
+    }
+
+    /**
+     * Two-pass transformation have to be strictly divided up into two
+     * parts. the first part analyzes the model and collects all
+     * necessary information. In this case all class declarations are
+     * examined and for each found field a copy assignment to its
+     * default value is added to the map "class2fields".
+     *   All actions, which may cause a recoder model update have to be
+     * done here.
+     * @return status report if analyze encountered problems or not
+     */
+    public ProblemReport analyze() {
+	javaLangObject = services.getNameInfo().getJavaLangObject();
+        if (!(javaLangObject instanceof ClassDeclaration)) {
+            Debug.fail("Could not find class java.lang.Object or only as bytecode");
+        }
+	for (int unit = 0; unit<units.size(); unit++) {
+	    CompilationUnit cu = units.getCompilationUnit(unit);
+	    int typeCount = cu.getTypeDeclarationCount();
+	
+	    for (int i = 0; i < typeCount; i++) {
+		if (cu.getTypeDeclarationAt(i) instanceof ClassDeclaration)
+		    { 
+			ClassDeclaration cd = (ClassDeclaration)
+			    cu.getTypeDeclarationAt(i);
+			if (cd.getTypeDeclarationCount()>0) {
+			    Debug.out
+				("prepare object builder: Inner Class detected." + 
+				 "No class preparation method will be built" +
+				 "for inner classes of "+cd.getIdentifier());
+			}
+			
+			// collect fields for transformation phase
+
+ 			class2fields.put(cd, defaultSettings(getFields(cd)));
+			//would be nice but in Recoder0.70 the source order is not respected
+// 			class2fields.put(cd, defaultSettings(cd.getFields()));
+		    }
+	    }
+	}
+	setProblemReport(NO_PROBLEM);
+	return NO_PROBLEM;
+    }
+
+    /**
+     *  creates the assignments of the field variables to their default values
+     * and inserts them to the given body list
+     * @return the same list body that has been handed over as parameter
+     */
+    private StatementMutableList defaultSettings(FieldList fields) {
+
+	if (fields == null) {
+	    return new StatementArrayList(0);
+	} 
+	StatementMutableList result = new StatementArrayList(fields.size());
+	for (int i = 0; i<fields.size(); i++) {
+	    Field field = fields.getField(i);
+	    if (!field.isStatic()) {		
+		Identifier fieldId;
+		if (field.getName().charAt(0) != '<') {
+		    fieldId = new Identifier(field.getName());
+		    result.add
+			(assign((attribute(new ThisReference(), fieldId)),
+				getDefaultValue
+				(services.
+				 getCrossReferenceSourceInfo().getType(field))));
+		}
+	    }
+	}
+	
+	return result;
+    }
+
+    /** 
+     * creates an implicit method called 'prepare', that sets all
+     * attributes to their default values
+     */
+    protected StatementBlock createPrepareBody
+	(ReferencePrefix prefix, TypeDeclaration classType) {
+
+	StatementMutableList body = new StatementArrayList(15);
+
+	if (classType != javaLangObject) {
+	    // we can access the implementation	    	    
+	    body.add((new MethodReference
+			 (new SuperReference(), 
+			  new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE))));
+	}
+	body.add((StatementMutableList)class2fields.get(classType));
+	return new StatementBlock(body);
+    }
+    
+    /**
+     * creates the implicit <code>&lt;prepare&gt;</code> method that
+     * sets the fields of the given type to its default values
+     * @param type the TypeDeclaration for which the
+     * <code>&lt;prepare&gt;</code> is created
+     * @return the implicit <code>&lt;prepare&gt;</code> method
+     */
+    public MethodDeclaration createMethod(TypeDeclaration type) {
+	ModifierMutableList modifiers = new ModifierArrayList(1);
+	modifiers.add(new Protected());	
+	MethodDeclaration md =  new MethodDeclaration
+	    (modifiers, 
+	     null, 
+	     new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE), 
+	     new ParameterDeclarationArrayList(0), 
+	     null,
+	     createPrepareBody(new ThisReference(), type));
+	md.makeAllParentRolesValid();
+	return md;
+    }    
+
+    /**
+     * creates the implicit <code>&lt;prepareEnter&gt;</code> method that
+     * sets the fields of the given type to its default values
+     * @param type the TypeDeclaration for which the
+     * <code>&lt;prepare&gt;</code> is created
+     * @return the implicit <code>&lt;prepare&gt;</code> method
+     */
+    public MethodDeclaration createMethodPrepareEnter(TypeDeclaration type) {
+	ModifierMutableList modifiers = new ModifierArrayList(1);
+	modifiers.add(new Private());	
+	MethodDeclaration md =  new MethodDeclaration
+	    (modifiers, 
+	     null, 
+	     new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE_ENTER), 
+	     new ParameterDeclarationArrayList(0), 
+	     null,
+	     createPrepareBody(new ThisReference(), type));
+	md.makeAllParentRolesValid();
+	return md;
+    }    
+
+
+
+    /**
+     * entry method for the constructor normalform builder
+     * @param td the TypeDeclaration 
+     */
+    protected void makeExplicit(TypeDeclaration td) {
+	if (td instanceof ClassDeclaration) {
+	    attach(createMethod(td), td, td.getMembers().size());
+	    attach(createMethodPrepareEnter(td), td, td.getMembers().size());
+// 	    java.io.StringWriter sw = new java.io.StringWriter();
+// 	    services.getProgramFactory().getPrettyPrinter(sw).visitClassDeclaration((ClassDeclaration)td);
+// 	    System.out.println(sw.toString());
+// 	    try { sw.close(); } catch (Exception e) {}		
+	}
+    }
+
+}

@@ -1,0 +1,3 @@
+This directory and its subdirectories contain resources that are specific
+for the ASM-KeY system. This resources may not be added to the core
+system, because the presence of these resources may change behaviour.

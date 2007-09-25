@@ -1,0 +1,217 @@
+resolve_symlink  ()
+{ 
+   TARGET=`ls -l $1| awk '/\ ->\ /{print $NF}'`
+
+   if [ -n "$TARGET" ] ; then
+      RESULT="$TARGET"
+      case "$RESULT" in
+         /*) break ;;				# absolute symlink
+         *)  RESULT=`dirname $0`/"$RESULT" ;;	# relative symlink
+      esac
+   else
+      RESULT=$1
+   fi
+
+   echo "$RESULT"
+}
+
+
+
+
+if [ -z "$JAVA_HOME" ] ; then
+    JAVA=`which java`
+    if [ -z "$JAVA" ] ; then
+      echo "Cannot find JAVA. Please set your PATH or \$JAVA_HOME."
+      exit 1
+    fi
+    JAVA_BIN=`dirname $JAVA`
+    JAVA_HOME="$JAVA_BIN/.."
+fi
+echo "Using JDK installation from:      $JAVA_HOME"
+
+
+# For debugging reasons disable JIT (otherwise strace doesn't work)
+JAVA_OPTIONS=
+#JAVA_OPTIONS=-classic
+
+UNAME=`uname -s 2>/dev/null | tr '[:upper:]' '[:lower:]'`
+ARCH=`uname -pm 2>/dev/null | tr '[:upper:]' '[:lower:]' | tr ' ' '-'`
+
+# Change that, if your java interpreter is different
+#
+# MAC OS X
+if [ "$UNAME" = "darwin" ] ; then
+    JRE=$JAVA_HOME/Home
+    JDK_RT_JAR=$JAVA_HOME/Classes/classes.jar
+    JDK_UI_JAR=$JAVA_HOME/Classes/ui.jar
+    #not needed in MacOSX JDK_TOOLS_JAR=$JAVA_HOME/Home/lib/ext/jpda.jar
+    JAVA_OPTIONS=$JAVA_OPTIONS\ -Xdock:name="KeY"
+    JAVA=$JRE/bin/java
+# other OS
+else
+    JRE=$JAVA_HOME/jre
+    JDK_RT_JAR=$JRE/lib/rt.jar
+    JDK_TOOLS_JAR=$JAVA_HOME/lib/tools.jar
+    JAVA=$JRE/bin/java
+fi
+
+#LD_LIBRARY_PATH=$JAVA_HOME/lib/i386:$LD_LIBRARY_PATH
+#export LD_LIBRARY_PATH
+
+if [ "D""$JAVA_HOME" = "D" ]
+then
+    echo
+    echo Please provide a valid path to the recommended JDK by
+    echo either configuring the file "$0" or defining the
+    echo JAVA_HOME environment variable from the command line.
+    echo
+    echo If you have any problems or questions, please contact
+    echo "technical support (http://www.togethersoft.com/support/)"
+    exit
+else
+    if [ ! -x $JAVA ] ; then
+        echo Please be sure you have properly set the JAVA_HOME variable.
+        echo The executable file $JAVA is not found.
+        exit
+    fi
+
+    if [ ! -r $JDK_RT_JAR ] ; then
+        echo Please be sure you have properly set the JDK_RT_JAR variable.
+        echo The file $JDK_RT_JAR is not found.
+        echo
+        echo If you have any problems or questions, please contact
+        echo "technical support (http://www.togethersoft.com/support/)"
+        exit
+    fi
+
+    if [ "$UNAME" != "darwin" ] ; then
+        if [ ! -r $JDK_TOOLS_JAR ] ; then
+            echo The file $JDK_TOOLS_JAR was not found. This is probably
+            echo because you are using a JRE instead of a JDK. You will
+            echo not be able to run javac or javadoc. This is probably OK.
+        fi
+    fi
+
+
+    if [ "$UNAME" = "darwin" ] ; then
+        if [ ! -r $JDK_UI_JAR ] ; then
+            echo Please be sure you have properly installed JDK 1.3.
+            echo The file $JDK_UI_JAR is not found.  
+            echo
+            echo If you have any problems or questions, please contact
+            echo "technical support (http://www.togethersoft.com/support/)"
+            exit
+        fi
+        JDK_RT_JAR=$JDK_RT_JAR:$JDK_UI_JAR 
+    fi
+fi
+
+
+# fixing of possible linux glibc bug for jdk 1.3.1
+# http://developer.java.sun.com/developer/bugParade/bugs/4466587.html
+if [ "$UNAME" = "linux" ] ; then
+    VERSION=`$JAVA $JAVA_OPTIONS -version 2>&1 | awk 'BEGIN {FS="\""}\
+    { for(i = 2; i<NF; i++) printf "%s", \$i }'`
+    if expr "$VERSION" : "1\\.3\\.1.*" > /dev/null 2>&1; then
+       ulimit -s 2048
+    fi
+fi
+
+
+#
+# Now $KEY_HOME  
+#
+
+if [ -z "$KEY_HOME" ] ; then
+   KEY_HOME=`resolve_symlink "$0"`	# resolve symlink name
+   KEY_HOME=`dirname $KEY_HOME`		# strip executable filename
+   KEY_HOME=`cd "$KEY_HOME";pwd`	# and now expand the path to full
+   KEY_HOME=`dirname $KEY_HOME`		# strip bin/ sirectory
+fi
+echo "Using KeY installation from:      $KEY_HOME"
+
+
+if [ -z "$KEY_LIB" ] ; then
+   KEY_LIB="$KEY_HOME/key-ext-jars"
+else
+echo "Using libraries from:             $KEY_LIB"
+fi
+
+PATH=$JAVA_HOME:$JAVA_HOME/bin:$JAVA_HOME/lib:$PATH
+export PATH
+
+if expr "`uname -s`" : "HP-UX" > /dev/null 2>&1; then
+ hpfix="-Dhpux.im.disable=true"
+fi
+
+JNDI=""
+
+JVM_DIR=`expr $JAVA : '\(.*\)/.*' \| $JAVA`
+
+
+#
+# KeY CLASSPATH
+#
+
+key_ext_jars="antlr.jar recoder.jar dresden-ocl-demo.jar xerces.jar jargs.jar log4j.jar"
+
+keyclasspath="$KEY_HOME/system/key.jar:$KEY_HOME/keypatterns/"
+
+for i in $key_ext_jars ; do
+    current_jar="$KEY_LIB/$i"
+    if [ ! -f $current_jar ]
+    then
+       echo Cannot find $current_jar. 
+       echo Copy or link the file into the
+       echo $KEY_LIB directory.
+       exit 1
+    else
+       keyclasspath="${keyclasspath}:$current_jar"
+    fi
+done
+
+
+#
+# KeY-specific command line options
+#
+
+keysysprops=""
+while [ $# -ne 0 ]; do
+    case $1 in
+        -*)  keysysprops="${keysysprops}${1} "
+            shift
+            continue;;
+
+        *)  keyarg="${keyarg}${1} "
+            shift
+            continue;;
+    esac
+done	
+
+
+#
+# User specific Together configuration
+#
+
+if [ ! -d "$HOME/.key" ]
+then
+mkdir "$HOME/.key"
+fi
+
+# Fallback for KeY-specific binaries
+PATH=${PATH}:$KEY_LIB
+export PATH
+
+
+#
+# This command actually runs KeY
+#
+
+$JAVA $JAVA_OPTIONS $keysysprops $hpfix \
+-noverify -Djvm.dir=$JVM_DIR -Xms64m -Xmx512m \
+-Dkey.home=$KEY_HOME \
+-Dkey.simplify.logdir=$KEY_SIMPLIFY_LOG_DIR \
+-classpath $JNDI\
+$keyclasspath:\
+$JDK_RT_JAR de.uka.ilkd.key.gui.Main $keyarg
+

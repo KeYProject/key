@@ -1,0 +1,53 @@
+package de.uka.ilkd.key.rule.conditions;
+
+import de.uka.ilkd.key.java.Label;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.visitor.FreeLabelFinder;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.rule.VariableConditionAdapter;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+
+public class FreeLabelInVariableCondition extends VariableConditionAdapter {
+
+    private final SchemaVariable label;
+    private final SchemaVariable statement;
+    private final boolean negated;
+    private final FreeLabelFinder freeLabelFinder = new FreeLabelFinder();
+    
+    public FreeLabelInVariableCondition(SchemaVariable label, SchemaVariable statement, boolean negated) {
+        this.label = label;
+        this.statement = statement;
+        this.negated = negated;
+    }
+    
+    
+    public boolean check(SchemaVariable var, SVSubstitute instCandidate, 
+            SVInstantiations instMap, Services services) {
+        Label prgLabel = null;
+        ProgramElement program = null;
+        
+        if (var == label) {
+            prgLabel = (Label) instCandidate;
+            program = (ProgramElement) instMap.getInstantiation(statement);
+        } else if (var == statement) {            
+            prgLabel = (Label) instMap.getInstantiation(label);
+            program = (ProgramElement) instCandidate;
+        } 
+        
+        if (program == null || prgLabel == null) {
+            // not yet complete or not responsible            
+            return true;
+        }      
+        
+        final boolean freeIn = freeLabelFinder.findLabel(prgLabel, program);
+        return negated ? !freeIn : freeIn;
+    }
+    
+    public String toString() {
+        return (negated ? "\\not" : "") + "\\freeLabelIn (" + label.name() + "," + statement.name() + ")";
+    }
+
+}

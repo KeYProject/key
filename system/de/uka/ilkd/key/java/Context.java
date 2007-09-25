@@ -1,0 +1,96 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+//
+//
+package de.uka.ilkd.key.java;
+
+import recoder.java.declaration.ClassDeclaration;
+import recoder.java.declaration.TypeDeclaration;
+import recoder.list.ImportArrayList;
+import recoder.list.TypeDeclarationArrayList;
+import recoder.list.TypeDeclarationMutableList;
+import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
+import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
+
+/** this class stores recoder related contextinformation used to parse
+ * in program parts in which non-declared variables are used
+ */
+class Context {
+
+    private recoder.java.CompilationUnit compilationUnitContext;
+    private ClassDeclaration classContext;
+    public static final String PARSING_CONTEXT_CLASS_NAME = 
+        "<KeYSpecialParsing>";
+
+
+    
+    /** creates a new context object
+     * @param compilationUnitContext a
+     * recoder.java.CompilationUnit
+     * @param classContext a recoder.java.declaration.ClassDeclaration
+     */
+    public Context(KeYCrossReferenceServiceConfiguration servConf, 
+		   recoder.java.CompilationUnit compilationUnitContext, 
+		   ClassDeclaration classContext) {
+	this.compilationUnitContext = compilationUnitContext;
+	this.classContext           = classContext;
+    }
+
+    /** creates a new context object
+     * @param compilationUnitContext a
+     * recoder.java.declaration.CompilationUnit
+     */
+    public Context(KeYCrossReferenceServiceConfiguration servConf,
+		   recoder.java.CompilationUnit compilationUnitContext) {
+	this(servConf, compilationUnitContext, createClassDecl(servConf));
+    }
+    
+
+    /** creates a new context object
+     * @param classContext a recoder.java.declaration.ClassDeclaration
+     */
+    public Context(KeYCrossReferenceServiceConfiguration servConf, 
+		   ClassDeclaration classContext) {
+	this(servConf, createCompUnit(classContext), classContext);
+    }
+
+    private static recoder.java.CompilationUnit createCompUnit
+	(ClassDeclaration classContext) {
+	recoder.java.CompilationUnit cu = new recoder.java.CompilationUnit
+	    (null, new ImportArrayList(0), inList(classContext));
+	//	cu.setDataLocation(new ContextDataLocation("tmp"+counter++));
+	return cu;
+    }
+
+
+    public static TypeDeclarationMutableList inList(TypeDeclaration td) {
+	TypeDeclarationMutableList tdml = new TypeDeclarationArrayList();
+	tdml.add(td);
+	return tdml;
+    }
+
+    /** returns the compilation context */
+    public recoder.java.CompilationUnit getCompilationUnitContext() {
+	return compilationUnitContext;
+    }
+
+    /** returns the compilation context */
+    public ClassDeclaration getClassContext() {
+	return classContext;
+    }
+
+
+    private static recoder.java.declaration.ClassDeclaration createClassDecl
+	(KeYCrossReferenceServiceConfiguration servConf) {
+	return servConf.getProgramFactory().createClassDeclaration
+	    (null, new ImplicitIdentifier(PARSING_CONTEXT_CLASS_NAME),
+	     null, null, null);
+    }
+
+    
+}

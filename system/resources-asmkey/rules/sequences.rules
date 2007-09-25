@@ -1,0 +1,191 @@
+predicates {
+    empty(SequenceOfint);
+    //member(int, SequenceOfint);
+    //subset(SequenceOfG, SequenceOfG);
+    //append(SequenceOfG, SequenceOfG, SequenceOfG);
+}
+
+taclets {
+
+      head {
+	  find(head_G('<#s:#L>))
+	  replacewith(#s)
+      };
+      
+      tail {
+	  find(tail_G('<#s:#L>))
+	  replacewith(#L)
+      };
+
+      tail_eq_left {
+          find(tail_G(#L1) = tail_G(#L2) ==>)
+	  replacewith(#L1 = #L2 ==>)
+      };
+
+      tail_eq_right {
+          find(==> tail_G(#L1) = tail_G(#L2))
+	  replacewith(==> #L1 = #L2)
+      };
+
+      isNil_left {
+	  find(isNil_G(#L) ==>)
+	  replacewith(#L = 'G<> ==>)
+      };
+
+      isNil_right {
+	  find(==> isNil_G(#L))
+	  replacewith(==> #L = 'G<>)
+      };
+
+      isNil_nil_left {
+          find(isNil_G('G<>) ==>)
+	  replacewith(true ==>)
+      }; 
+
+      isNil_nil_right {
+          find(==> isNil_G('G<>))
+	  replacewith(==> true)
+      }; 
+
+      isNil_seq_left {
+          find(isNil_G('<#s:#L>) ==>)
+	  replacewith(false ==>)
+      };
+
+      isNil_seq_right {
+          find(==> isNil_G('<#s:#L>))
+	  replacewith(==> false)
+      };
+
+      member_left {
+          find(member_G (#t, #L) ==>)
+	  replacewith (!isNil_G(#L) & (#t = head_G(#L) | member_G (#t, tail_G(#L))) ==>)
+      };
+
+      member_right {
+          find(==> member_G (#t, #L))
+	  replacewith (==> !isNil_G(#L) & (#t = head_G(#L) | member_G (#t, tail_G(#L))))
+      };
+
+      member_nil_left {
+          find(member_G(#t, 'G<>) ==>)
+	  replacewith(false ==>)
+      };
+
+      member_nil_right {
+          find(==> member_G(#t, 'G<>))
+	  replacewith(==> false)
+      };
+
+      member_seq_left {
+          find(member_G (#t, '<#s:#L>) ==>)
+	  replacewith (#t = #s | member_G (#t, #L) ==>)
+      };
+
+      member_seq_right {
+          find(==> member_G (#t, '<#s:#L>))
+	  replacewith (==> #t = #s | member_G (#t, #L))
+      };
+
+      append_left {
+          find(append_G(#L1,#L2,#L3)==>)
+	  replacewith(isNil_G(#L1), #L2 = #L3 ==>);
+	  replacewith(!isNil_G(#L1), head_G(#L1) = head_G(#L3), append_G(tail_G(#L1),#L2,tail_G(#L3)) ==>)
+      };
+
+      append_right {
+          find(==> append_G(#L1,#L2,#L3))
+	  replacewith(isNil_G(#L1) ==> #L2 = #L3);
+	  replacewith(!isNil_G(#L1) ==> head_G(#L1) = head_G(#L3));
+	  replacewith(!isNil_G(#L1) ==> append_G(tail_G(#L1),#L2,tail_G(#L3)));
+      };
+
+      append_nil_left {
+          find (append_G('G<>,#L2,#L3) ==>)
+	  replacewith(#L2 = #L3 ==>)
+      };
+
+      append_nil_right {
+          find (==> append_G('G<>,#L2,#L3))
+	  replacewith(==> #L2 = #L3)
+      };
+
+      append_seq_left {
+          find (append_G('<#s:#L1>, #L2, '<#t:#L3>) ==>)
+	  replacewith ((#s = #t) & append_G(#L1, #L2, #L3) ==>)
+      };
+
+      append_seq_right {
+          find (==> append_G('<#s:#L1>, #L2, '<#t:#L3>))
+	  replacewith (==> (#s = #t) & append_G(#L1, #L2, #L3))
+      };
+
+      select_left {
+          find (select_G(#t, #L1, #L2) ==>)
+	  replacewith(!isNil_G(#L1) & ( (#t = head_G(#L1) & tail_G(#L1) = #L2) |
+	                                (head_G(#L1) = head_G(#L2) & select_G(#t, tail_G(#L1), tail_G(#L2)))) ==>)
+      };
+
+      select_right {
+          find (==> select_G(#t, #L1, #L2))
+	  replacewith(==> !isNil_G(#L1) & ( (#t = head_G(#L1) & tail_G(#L1) = #L2) |
+                                 (head_G(#L1) = head_G(#L2) & select_G(#t, tail_G(#L1), tail_G(#L2)))))
+      };
+
+      select_seq_left {
+          find (select_G(#t, '<#s:#L1>, #L2) ==>)
+	  replacewith ((#t = #s & #L1 = #L2) | select_G(#t, #L1, #L2) ==>)
+      };
+
+      select_seq_right {
+          find (==> select_G(#t, '<#s:#L1>, #L2))
+	  replacewith (==> (#t = #s & #L1 = #L2) | select_G(#t, #L1, #L2))
+      };
+
+      perm_left {
+          find(perm_G(#L1, #L2) ==>)
+	  cond (#xL not free in #L1, #xL not free in #L2)
+	  replacewith(isNil_G(#L1), isNil_G(#L2) ==>);
+	  replacewith(!isNil_G(#L1), !isNil_G(#L2),
+                       ex #xL . (select_G(head_G(#L1),#L2,#xL) & perm_G(tail_G(#L1), #xL)) ==>)
+      };
+
+      perm_right {
+          find(perm_G(#L1, #L2) ==>)
+	  cond (#xL not free in #L1, #xL not free in #L2)
+	  replacewith(!isNil_G(#L1), !isNil_G(#L2) ==>
+                      ex #xL . (select_G(head_G(#L1),#L2,#xL) & perm_G(tail_G(#L1), #xL)))
+      };
+
+      perm_nil_left {
+	  find (perm_G('G<>, 'G<>) ==>)
+	  replacewith(true ==>)
+      }; 
+
+      perm_nil_right {
+	  find (==> perm_G('G<>, 'G<>))
+	  replacewith(==> true)
+      };
+
+      perm_seq_left {
+          find (perm_G('<#s:#L1>, #L2) ==>)
+	  cond (#xL not free in #L1, #xL not free in #L2, #xL not free in #s)
+	  replacewith(!isNil_G(#L2) & ex #xL . (select_G(#s, #L2, #xL) & perm_G(#L1, #xL)) ==>)
+      };
+
+      perm_seq_right {
+          find (==> perm_G('<#s:#L1>, #L2))
+	  cond (#xL not free in #L1, #xL not free in #L2, #xL not free in #s)
+	  replacewith(==> !isNil_G(#L2) & ex #xL . (select_G(#s, #L2, #xL) & perm_G(#L1, #xL)))
+      };
+
+      perm_commute_left {
+          find (perm_G(#L1, #L2) ==>)
+	  replacewith (perm_G(#L2, #L1) ==>)
+      };
+
+      perm_commute_right {
+          find (==> perm_G(#L1, #L2))
+	  replacewith (==> perm_G(#L2, #L1))
+      };
+}

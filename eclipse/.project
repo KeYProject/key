@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>key-devel</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.jem.workbench.JavaEMFNature</nature>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>org.eclipse.jem.beaninfo.BeanInfoNature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>tcc_modules</name>
+			<type>2</type>
+			<locationURI>tcc_modules</locationURI>
+		</link>
+		<link>
+			<name>key_lib</name>
+			<type>2</type>
+			<locationURI>key_lib</locationURI>
+		</link>
+	</linkedResources>
+</projectDescription>

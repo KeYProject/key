@@ -1,0 +1,75 @@
+package id8m0fsekcp56eyekcp9928;
+
+/**
+@version 2.0
+@physicalPackage
+@__modelType diagram 
+*/
+class diagram {
+/**
+@__ref <oiref:java#Class#src.LogRecord:oiref><oihard>
+@__modelType reference 
+*/
+class reference {
+}
+/**
+@__ref <oiref:java#Class#src.LogFile:oiref><oihard>
+@__modelType reference 
+*/
+class reference6 {
+}
+/**
+@__ref <oiref:java#Class#src.Client:oiref><oihard>
+@__modelType reference 
+*/
+class reference7 {
+}
+/**
+@__ref <oiref:java#Class#src.SaleDate:oiref><oihard>
+@__modelType reference 
+*/
+class reference8 {
+}
+}/**
+@__tags
+@shapeType ClassDiagram 
+*/
+class __tags {
+}/**
+@__options 
+*/
+class __options {
+}/**
+@__positions 
+
+
+
+<oigroup:MemberLink#<oiref:java#Member#src.LogFile#log:oiref>=139,303,267,303:oigroup>
+
+
+
+
+<oigroup:<oiref:design#Class#idc6i45equnwk08equnwpxg.diagram:oiref>=161,120,83,94,1:oigroup>
+<oigroup:MemberLink#<oiref:java#Member#src.LogRecord#date:oiref>=350,235,350,146:oigroup>
+
+
+
+
+<oigroup:Composite#supplierCardinality#MemberLink#<oiref:java#Member#src.LogFile#log:oiref>=233,284,30,15,0:oigroup>
+
+<oigroup:<oiref:java#Class#src.Client:oiref>=10,10,136,136,1:oigroup>
+
+
+<oigroup:MemberLink#<oiref:java#Member#src.Client#logFile:oiref>=78,146,78,235:oigroup>
+
+<oigroup:<oiref:java#Class#src.SaleDate:oiref>=309,10,83,136,1:oigroup>
+
+<oigroup:<oiref:java#Class#src.LogFile:oiref>=18,235,121,136,1:oigroup>
+
+
+<oigroup:MemberLink#<oiref:java#Member#src.Client#currentDate:oiref>=146,78,309,78:oigroup>
+<oigroup:<oiref:java#Class#src.LogRecord:oiref>=267,235,148,182,1:oigroup>
+
+*/
+class __positions {
+}

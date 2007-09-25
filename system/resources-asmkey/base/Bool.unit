@@ -1,0 +1,9 @@
+unit Bool
+
+export *
+
+import * from Base
+
+sort bool = true | false
+
+schema bool #b, #b1, #b2;

@@ -1,0 +1,356 @@
+unit Acc
+
+export *
+
+import * from Base
+import * from Bool
+import * from Asm
+
+// taclets for the modality accT : accT(term in term)
+
+taclet accT_function_dynamic_id_left {
+        find(accT(#tacc, #s) ==>)
+	cond (op #s = #tacc,
+		 dynamic #s, staticargs #s, dynamic #tacc)
+	replacewith((#OP_EQ_ARGS(#s, #tacc)) | #ACCT_ARGS(#s, #tacc) ==>)
+	rule sets(simplify_accT)
+    };
+
+taclet accT_function_dynamic_id_right {
+        find(==> accT(#tacc, #s))
+	cond (op #s = #tacc,
+		 dynamic #s, staticargs #s, dynamic #tacc)
+	replacewith(==> (#OP_EQ_ARGS(#s, #tacc)) | #ACCT_ARGS(#s, #tacc))
+	rule sets(simplify_accT)
+    };
+
+taclet accT_function_dynamic_diff_left {
+        find(accT(#tacc, #s) ==>)
+	cond (op #s != #tacc,
+		 dynamic #s, staticargs #s, dynamic #tacc)
+	replacewith(#ACCT_ARGS(#s, #tacc) ==>)
+	rule sets(simplify_accT)
+    };    
+
+taclet accT_function_dynamic_diff_right {
+        find(==> accT(#tacc, #s))
+	cond (op #s != #tacc,
+		 dynamic #s, staticargs #s, dynamic #tacc)
+	replacewith(==> #ACCT_ARGS(#s, #tacc))
+	rule sets(simplify_accT)
+    };    
+
+taclet accT_static_left {
+        find(accT(#tacc, #s) ==>)
+	cond(static #tacc)
+	replacewith(FALSE ==>)
+	rule sets(simplify_accT)
+    };
+
+taclet accT_static_right {
+        find(==> accT(#tacc, #s))
+	cond(static #tacc)
+	replacewith(==> FALSE)
+	rule sets(simplify_accT)
+    };
+
+taclet accT_static_function_left {
+        find(accT(#tacc, #s) ==>)
+	cond(static #s)
+	replacewith(FALSE ==>)
+	rule sets(simplify_accT)
+    };
+
+taclet accT_static_function_right {
+        find(==> accT(#tacc, #s))
+	cond(static #s)
+	replacewith(==> FALSE)
+	rule sets(simplify_accT)
+    };
+
+/*taclet accT_static_function_left {
+	find(accT(#b, #s) ==>)
+	cond(static #s)
+	replacewith(FALSE ==>)
+	rule sets(simplify_accT)
+    };
+
+taclet accT_static_function_right {
+	find(==> accT(#b, #s))
+	cond(static #s)
+	replacewith(==> FALSE)
+	rule sets(simplify_accT)
+    };
+
+taclet accT_static_left {
+        find(accT(#b, #s) ==>)
+	cond(static #b)
+	replacewith(FALSE ==>)
+	rule sets(simplify_accT)
+    };
+
+taclet accT_static_right {
+        find(==> accT(#b, #s))
+	cond(static #b)
+	replacewith(==> FALSE)
+	rule sets(simplify_accT)
+    };*/
+
+taclet accT_eq_left {
+        find(accT(#t1 == #t2, #s) ==>)
+	cond(dynamic #s, staticargs #s)
+	replacewith(accT(#t1, #s) |  accT(#t2, #s) ==>)
+	rule sets(simplify_accT)
+    };
+
+taclet accT_eq_right {
+        find(==> accT(#t1 == #t2, #s))
+	cond(dynamic #s, staticargs #s)
+	replacewith(==> accT(#t1, #s) |  accT(#t2, #s))
+	rule sets(simplify_accT)
+    };
+
+taclet accT_atomic_left {
+        find(accT(#b, #s) ==>)
+	cond(dynamic #s, staticargs #s, atomic #b)
+	replacewith(#ACCT_ARGS(#s, #b) ==>)
+    };
+
+taclet accT_atomic_right {
+        find(==> accT(#b, #s))
+	cond(dynamic #s, staticargs #s, atomic #b)
+	replacewith(==> #ACCT_ARGS(#s, #b))
+    };
+
+/*taclet accT_not_left {
+        find(accT(not #b, #s) ==>)
+	cond(dynamic #s, staticargs #s)
+	replacewith(accT(#b, #s) ==>)
+	rule sets(simplify_accT)
+    };
+
+taclet accT_not_right {
+        find(==> accT(not #b, #s))
+	cond(dynamic #s, staticargs #s)
+	replacewith(==> accT(#b, #s))
+	rule sets(simplify_accT)
+    };*/
+
+taclet accT_and_left {
+        find(accT(#b1 and #b2, #s) ==>)
+	cond(dynamic #s, staticargs #s)
+	replacewith(accT(#b1, #s) | accT(#b2, #s) ==>)
+	rule sets(simplify_accT)
+    };
+
+taclet accT_and_right {
+        find(==> accT(#b1 and #b2, #s))
+	cond(dynamic #s, staticargs #s)
+	replacewith(==> accT(#b1, #s) | accT(#b2, #s))
+	rule sets(simplify_accT)
+    };
+
+taclet accT_or_left {
+        find(accT(#b1 or #b2, #s) ==>)
+	cond(dynamic #s, staticargs #s)
+	replacewith(accT(#b1, #s) | accT(#b2, #s) ==>)
+	rule sets(simplify_accT)
+    };
+
+taclet accT_or_right {
+        find(==> accT(#b1 or #b2, #s))
+	cond(dynamic #s, staticargs #s)
+	replacewith(==> accT(#b1, #s) | accT(#b2, #s))
+	rule sets(simplify_accT)
+    };
+
+taclet accT_andalso_left {
+        find(accT(#b1 and also #b2, #s) ==>)
+	cond(dynamic #s, staticargs #s)
+	replacewith(accT(#b1, #s) | (#b1 = true & accT(#b2, #s)) ==>)
+	rule sets(simplify_accT)
+    };
+
+taclet accT_andalso_right {
+        find(==> accT(#b1 and also #b2, #s))
+	cond(dynamic #s, staticargs #s)
+	replacewith(==> accT(#b1, #s) | (#b1 = true & accT(#b2, #s)))
+	rule sets(simplify_accT)
+    };
+
+taclet accT_orelse_left {
+        find(accT(#b1 or else #b2, #s) ==>)
+	cond(dynamic #s, staticargs #s)
+	replacewith(accT(#b1, #s) | (#b1 = false & accT(#b2, #s)) ==>)
+	rule sets(simplify_accT)
+    };
+
+taclet accT_orelse_right {
+        find(==> accT(#b1 or else #b2, #s))
+	cond(dynamic #s, staticargs #s)
+	replacewith(==> accT(#b1, #s) | (#b1 = false & accT(#b2, #s)))
+	rule sets(simplify_accT)
+    };
+
+    // taclets for the modality acc : acc(rule, term)
+
+taclet acc_static_left {
+        find(acc(:#R; #s) ==>)
+	cond(static #s)
+	replacewith(FALSE ==>)
+	rule sets(simplify_acc)
+    };
+
+taclet acc_static_right {
+        find(==> acc(:#R; #s))
+	cond(static #s)
+	replacewith(==> FALSE)
+	rule sets(simplify_acc)
+    };
+    
+taclet acc_static_function_left {
+	find(acc(:#R; #s) ==>)
+	cond(static #s)
+	replacewith(FALSE ==>)
+	rule sets(simplify_acc)
+    };
+
+taclet acc_static_function_right {
+	find(==> acc(:#R; #s))
+	cond(static #s)
+	replacewith(==> FALSE)
+	rule sets(simplify_acc)
+    };
+
+taclet acc_skip_left {
+        find(acc(:skip; #s) ==>)
+	cond(dynamic #s, staticargs #s)  
+	replacewith(FALSE ==>)
+	rule sets(simplify_acc)
+    }; 
+    
+taclet acc_skip_right {
+        find(==> acc(:skip; #s))
+	cond(dynamic #s, staticargs #s)  
+	replacewith(==> FALSE)
+	rule sets(simplify_acc)
+    }; 
+    
+taclet acc_assign_left {
+        find(acc(:#t1 := #t2; #s) ==>)
+	cond(dynamic #s, staticargs #s)
+	replacewith(#ACCT_ARGS(#s, #t1) | accT(#t2, #s) ==>)
+	rule sets(simplify_acc)
+    };
+
+taclet acc_assign_right {
+        find(==> acc(:#t1 := #t2; #s))
+	cond(dynamic #s, staticargs #s)
+	replacewith(==> #ACCT_ARGS(#s, #t1) | accT(#t2, #s))
+	rule sets(simplify_acc)
+    };
+
+taclet acc_par_left {
+        find(acc(:#R par #S; #s) ==>)
+	cond(dynamic #s, staticargs #s)
+	replacewith(def(:#R par #S;) & (acc(:#R; #s) | acc(:#S; #s)) ==>)
+	rule sets(simplify_acc)
+    };
+
+taclet acc_par_right {
+        find(==> acc(:#R par #S; #s))
+	cond(dynamic #s, staticargs #s)
+	replacewith(==> def(:#R par #S;) & (acc(:#R; #s) | acc(:#S; #s)))
+	rule sets(simplify_acc)
+    };
+
+taclet acc_branch_left {
+        find(acc(:if #b then #R else #S end; #s) ==>)
+	cond(dynamic #s, staticargs #s)
+	replacewith(def(if #b then #R else #S end),
+	            accT(#b, #s) |  ((#b = true & acc(:#R; #s)) |
+	                                 (#b = false & acc(:#S; #s))) ==>)
+	rule sets(simplify_acc)
+    };
+
+taclet acc_branch_right {
+        find(==> acc(:if #b then #R else #S end; #s))
+	cond(dynamic #s, staticargs #s)
+	replacewith(==> def(if #b then #R else #S end));
+	replacewith(==> accT(#b, #s) |  ((#b = true -> acc(:#R; #s)) &
+	                                 (#b = false -> acc(:#S; #s))))
+	rule sets(simplify_acc)
+    };
+
+taclet acc_let_left {
+        find(acc(:let #x = #t in #R end; #s) ==>)
+	cond(dynamic #s, staticargs #s, #x not free in #t, #x not free in #s)
+	replacewith(def(:let #x = #t in #R end;) & (accT(#t, #s) | ex #x ; (#x=#t & acc(:#R; #s))) ==>)
+	rule sets(simplify_acc)
+    };
+
+taclet acc_let_right {
+        find(==> acc(:let #x = #t in #R end; #s))
+	cond(dynamic #s, staticargs #s, #x not free in #t, #x not free in #s, #sk new depending on #t)
+	replacewith(==> def(:let #x = #t in #R end;));
+	replacewith(#sk=#t ==> accT(#t, #s), acc(:{#x #sk} #R; #s))
+	rule sets(simplify_acc)
+    };
+
+taclet acc_all_left {
+        find(acc(:forall #x with #b do #R end; #s) ==>)
+	cond(dynamic #s, staticargs #s, #x not free in #s)
+	replacewith(def(:forall #x with #b do #R end;) & (ex #x; accT(#b, #s) |
+                                                          ex #x; (#b = true & acc(:#R; #s))) ==>)
+	rule sets(simplify_acc)
+    };
+
+taclet acc_all_right {
+        find(==> acc(:forall #x with #b do #R end; #s))
+	cond(dynamic #s, staticargs #s, #x not free in #s)
+	replacewith(==> def(:forall #x with #b do #R end;) & (ex #x; accT(#b, #s) |
+                                                          ex #x; (#b = true & acc(:#R; #s))))
+	rule sets(simplify_acc)
+    };
+
+taclet acc_seq_left {
+        find(acc(:#R seq #S; #s) ==>)
+	cond(dynamic #s, staticargs #s)
+	replacewith((acc(:#R; #s) & [[#R]] def(:#S;)) |  (con(:#R;) & [[#R]] acc(:#S; #s)) ==>)
+	rule sets(simplify_acc)
+    };
+
+taclet acc_seq_right {
+        find(==> acc(:#R seq #S; #s))
+	cond(dynamic #s, staticargs #s)
+	replacewith(==> (acc(:#R; #s) & [[#R]] def(:#S;)) |  (con(:#R;) & [[#R]] acc(:#S; #s)))
+	rule sets(simplify_acc)
+    };
+
+taclet acc_try_left {
+        find(acc(:try #R else #S end; #s) ==>)
+	cond(dynamic #s, staticargs #s)
+	replacewith(acc(:#R; #s) | (def(:#R;) & ! con(:#R;) & acc(:#S; #s)) ==>)
+	rule sets(simplify_acc)
+    };
+
+taclet acc_try_right {
+        find(==> acc(:try #R else #S end; #s))
+	cond(dynamic #s, staticargs #s)
+	replacewith(==> acc(:#R; #s) | (def(:#R;) & ! con(:#R;) & acc(:#S; #s)))
+	rule sets(simplify_acc)
+    };
+
+taclet acc_name_left {
+        find(acc(:#rho; #s) ==>)
+	cond(dynamic #s, staticargs #s, derived #rho)
+	replacewith(acc(:@#META_DERIVED(#rho); #s) ==>)
+	rule sets(simplify_acc_named)
+    };
+
+taclet acc_name_right {
+        find(==> acc(:#rho; #s))
+	cond(dynamic #s, staticargs #s, derived #rho)
+	replacewith(==> acc(:@#META_DERIVED(#rho); #s))
+	rule sets(simplify_acc_named)
+    };

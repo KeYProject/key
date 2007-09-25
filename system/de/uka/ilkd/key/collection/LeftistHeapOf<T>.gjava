@@ -1,0 +1,408 @@
+#!/bin/sh
+# This file is part of KeY - Integrated Deductive Software Design
+# Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+#                         Universitaet Koblenz-Landau, Germany
+#                         Chalmers University of Technology, Sweden
+#
+# The KeY system is protected by the GNU General Public License. 
+# See LICENSE.TXT for details.
+#
+#
+pck=$1
+outFile=`echo $1 | sed 's!\.!/!g;'`"/"LeftistHeapOf$2".java"
+sed "s/<Pck>/$pck/g;s/<T>/$2/g;" <<END_OF_CLASS >$outFile
+
+package <Pck>;
+
+
+import java.util.Stack;
+import de.uka.ilkd.key.util.Debug;
+
+
+/**
+ * This class implements the leftist heap, see &quot;Functional Data
+ * Structures&quot; by Chris Okasaki
+ */
+public abstract class LeftistHeapOf<T> implements HeapOf<T> {
+
+    /**
+     * Use this element to construct new heaps
+     */
+    public static final LeftistHeapOf<T> EMPTY_HEAP = new Empty ();
+
+    /**
+     * Length of the right spine, i.e. the length of the path from the
+     * root to rightmost leaf
+     */
+    protected abstract int getRightHeight ();
+
+    /**
+     * Class for non-empty heaps
+     */
+    private static class Node extends LeftistHeapOf<T> {
+
+	/**
+	 * Length of the right spine, i.e. the length of the path from the
+	 * root to rightmost leaf
+	 */
+	private final int rightHeight;
+
+	private final int size;
+
+	private final <T> data;
+
+	/**
+	 * Children of the root of this heap
+	 */
+	private final LeftistHeapOf<T> left;
+	private final LeftistHeapOf<T> right;
+
+
+	/**
+	 * Node constructor for nodes with only empty children
+	 */
+	public Node(<T> element) {
+	    this.rightHeight = 1;
+	    this.size = 1;
+	    this.data = element;
+	    this.left = EMPTY_HEAP;
+	    this.right = EMPTY_HEAP;
+	}
+    
+	/**
+	 * Node constructor for nodes with at most one non-empty child
+	 */
+	public Node(<T> element, LeftistHeapOf<T> a) {
+	    this.rightHeight = 1;
+	    this.size = 1 + a.size();
+	    this.data = element;
+	    this.left = a;
+	    this.right = EMPTY_HEAP;
+	}
+    
+	/**
+	 * Node constructor for nodes
+	 */
+	private Node(<T> element,
+		     LeftistHeapOf<T> a,
+		     LeftistHeapOf<T> b) {
+	    data = element;
+	    size = 1 + a.size() + b.size();
+	    if (a.getRightHeight() <= b.getRightHeight()) {
+		rightHeight = a.getRightHeight() + 1;
+		left = b;
+		right = a;
+	    } else {
+		rightHeight = b.getRightHeight() + 1;
+		left = a;
+		right = b;
+	    }
+	}
+
+	/**
+	 * Length of the right spine, i.e. the length of the path from the
+	 * root to rightmost leaf
+	 */
+	protected int getRightHeight () {
+	    return rightHeight;
+	}
+
+	/**
+	 * @return true iff this heap is empty
+	 */
+	public boolean isEmpty ()
+	{
+	    return false;
+	}
+    
+	/**
+	 * Add an element to this heap object
+	 * @param element the element to be added
+	 * @return a heap that contains all elements of this heap, and
+	 * additionally <code>element</code>
+	 */
+	public HeapOf<T> insert ( <T> element ) {
+	    if (element.compareTo(data) <= 0) {
+		return new Node(element, this);
+	    } else {
+		return new Node(data,
+				(LeftistHeapOf<T>)left,
+				(LeftistHeapOf<T>)right.insert(element));
+	    }
+	}
+
+	/**
+	 * Add multiple elements to this heap object
+	 * @param h a heap containing the elements to be added
+	 * @return a heap that contains all elements of this heap, and
+	 * additionally all objects from <code>h</code>
+	 */
+	public HeapOf<T> insert ( HeapOf<T> h ) {
+	    if (h.isEmpty()) {
+		return this;
+	    } else if (h instanceof Node) {
+		Node other = (Node) h;
+		if (data.compareTo(other.data) <= 0) {
+		    return new Node(data,
+                                    (LeftistHeapOf<T>)left,
+                                    (LeftistHeapOf<T>)right.insert(other));
+		} else {
+		    return new Node(other.data,
+			            (LeftistHeapOf<T>)other.left,
+			            (LeftistHeapOf<T>)insert(other.right));
+		}
+	    } else {
+		return insert(h.iterator());
+	    }
+	}
+
+	/**
+	 * @return the minimum element of this heap, or null iff this heap
+	 * is empty (<code>isEmpty()==true</code>)
+	 */
+	public <T> findMin () {
+	    return data;
+	}
+
+	/**
+	 * Remove the minimum element from this heap
+	 * @return a heap that contains all elements of this heap except
+	 * for the minimum element
+	 */
+	public HeapOf<T> deleteMin () {
+	    return left.insert(right);
+	}
+
+	/**
+	 * Remove all elements of this heap which are <code>equal</code>
+	 * to <code>element</code>.
+	 * @return heap that has all occurrences of <code>element</code>
+	 * removed
+	 */
+	public HeapOf<T> removeAll ( <T> element ) {
+	    int c = data.compareTo ( element );
+
+	    if ( c > 0 )
+		return this;
+
+	    LeftistHeapOf<T> newLeft  =
+		(LeftistHeapOf<T>)left .removeAll ( element );
+	    LeftistHeapOf<T> newRight =
+		(LeftistHeapOf<T>)right.removeAll ( element );
+	    
+	    if ( c == 0 && data.equals ( element ) )
+		return newLeft.insert ( newRight );
+	    if ( left == newLeft && right == newRight )
+		return this;
+	    return new Node ( data, newLeft, newRight );		
+	}
+
+	/**
+	 * @return the number of elements this heap holds
+	 */
+	public int size () {
+	    return size;
+	}
+
+    }
+
+    /**
+     * Singleton class for empty heaps
+     */
+    private static class Empty extends LeftistHeapOf<T> {
+
+	/**
+	 * Length of the right spine, i.e. the length of the path from the
+	 * root to rightmost leaf
+	 */
+	protected int getRightHeight () {
+	    return 0;
+	}
+	
+	/**
+	 * @return true iff this heap is empty
+	 */
+	public boolean isEmpty () {
+	    return true;
+	}
+
+	/**
+	 * Add an element to this heap object
+	 * @param element The element to be added
+	 * @return a heap that contains all elements of this heap, and
+	 * additionally <code>element</code>
+	 */
+	public HeapOf<T> insert ( <T> element ) {
+	    return new Node (element);
+	}
+
+	/**
+	 * Add multiple elements to this heap object
+	 * @param h a heap containing the elements to be added
+	 * @return a heap that contains all elements of this heap, and
+	 * additionally all objects from <code>h</code>
+	 */
+	public HeapOf<T> insert ( HeapOf<T> h ) {
+	    return h;
+	}
+
+	/**
+	 * @return the minimum element of this heap, or null iff this heap
+	 * is empty (<code>isEmpty()==true</code>)
+	 */
+	public <T> findMin () {
+	    return null;
+	}
+
+	/**
+	 * Remove the minimum element from this heap
+	 * @return a heap that contains all elements of this heap except
+	 * for the minimum element
+	 */
+	public HeapOf<T> deleteMin () {
+	    return this;
+	}
+
+	/**
+	 * Remove all elements of this heap which are <code>equal</code>
+	 * to <code>element</code>.
+	 * @return heap that has all occurrences of <code>element</code>
+	 * removed
+	 */
+	public HeapOf<T> removeAll ( <T> element ) {
+	    return this;
+	}
+
+	/**
+	 * @return the number of elements this heap holds
+	 */
+	public int size () {
+	    return 0;
+	}
+
+    }
+
+    /**
+     * Add multiple elements to this heap object
+     * @param elements the elements to be added
+     * @return a heap that contains all elements of this heap, and
+     * additionally all objects from <code>elements</code>
+     */
+    public HeapOf<T> insert ( IteratorOf<T> elements ) {
+	// Use bottom-up strategy to compose new heap in O(n)
+
+	Stack s = new Stack();
+	s.push(this);
+	while (elements.hasNext()) {
+	    HeapOf<T> h = new Node(elements.next());
+	    do {
+		HeapOf<T> top = (HeapOf<T>) s.peek();
+		if (h.size() >= top.size()) {
+		    h = h.insert(top);
+		    s.pop();
+		} else {
+		    break;
+		}
+	    } while (!s.isEmpty());
+	    s.push(h);
+	}
+	HeapOf<T> res = (HeapOf<T>) s.pop();
+	while (!s.isEmpty()) {
+	    res = res.insert((HeapOf<T>)s.pop());
+	}
+	return res;
+    }
+
+    /**
+     * @return an iterator that returns all elements of this heap
+     */
+    public IteratorOf<T> iterator () {
+	return new UnsortedIterator ( this );
+    }
+
+    /**
+     * @return an iterator that returns all elements of this heap in
+     * increasing order
+     */
+    public IteratorOf<T> sortedIterator () {
+	return new SortedIterator ( this );
+    }
+
+
+    public String toString() {
+	IteratorOf<T> it=this.iterator();
+	StringBuffer str=new StringBuffer("[");
+	while (it.hasNext()) {
+	    str.append(""+it.next());
+	    if (it.hasNext()) {
+		str.append(",");
+	    }
+	}	
+	str.append("]");
+	return str.toString();
+    }
+
+
+    /**
+     * Class for iterating the elements of a heap in unspecified order
+     */
+    private static class UnsortedIterator implements IteratorOf<T> {
+
+	private final Stack remainder = new Stack ();
+
+	public UnsortedIterator ( LeftistHeapOf<T> heap ) {
+	    push ( heap );
+	}
+
+	private void push ( LeftistHeapOf<T> heap ) {
+	    if ( !heap.isEmpty () )
+		remainder.push ( heap );
+	}
+
+	public boolean hasNext () {
+	    return !remainder.isEmpty ();
+	}
+
+	public <T> next () {
+	    Debug.assertFalse ( remainder.isEmpty (),
+				"Missing next element in " +
+				"UnsortedIterator.next()" );
+
+	    Node heap = (Node)remainder.pop ();
+	    // descend in right-first order, this helps to keep the stack small
+	    push ( heap.left );
+	    push ( heap.right );
+	    
+	    return heap.data;
+	}
+    }
+
+
+    /**
+     * Class for iterating the elements of a heap in increasing order
+     */
+    private static class SortedIterator implements IteratorOf<T> {
+
+	private HeapOf<T> remainder;
+
+	public SortedIterator ( HeapOf<T> heap ) {
+	    remainder = heap;
+	}
+
+	public boolean hasNext () {
+	    return !remainder.isEmpty ();
+	}
+
+	public <T> next () {
+	    Debug.assertFalse ( remainder.isEmpty (),
+				"Missing next element in " +
+				"UnsortedIterator.next()" );
+
+	    <T> data = remainder.findMin ();
+	    remainder = remainder.deleteMin ();
+
+	    return data;
+	}
+    }
+
+}

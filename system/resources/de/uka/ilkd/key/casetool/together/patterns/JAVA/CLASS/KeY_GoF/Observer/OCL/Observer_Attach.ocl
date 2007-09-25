@@ -1,0 +1,15 @@
+patternmodification#
+
+addMethod#attach#Subject
+
+mapping#Subject#'Subject'
+mapping#Observer#'Observer'
+mapping#attach#'Name of method attach in class Subject'
+
+postcondition#method#attach#Subject
+
+schema# 
+		self.observers->includes(elem)
+
+comment#
+

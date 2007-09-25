@@ -1,0 +1,20 @@
+# log4j example logger configuration
+# save this .file as $HOME/.key/logger.props
+# you can change this file while KeY is running - it is re-read every 15s
+# log4j manual: http://logging.apache.org/log4j/docs/manual.html
+
+
+# Log levels: FATAL > ERROR > WARN > INFO > DEBUG
+# Some available loggers: key.threading, key.proof.reuse, key.proof.mgt
+
+
+# please leave this as it is
+log4j.rootLogger = ERROR, stdout
+
+#log4j.logger.key.threading = DEBUG
+
+log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+#log4j.appender.stdout.layout=org.apache.log4j.SimpleLayout
+log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern=%-4r [%t] %-5p %c %x - %m%n
+

@@ -1,0 +1,108 @@
+#!/bin/sh
+# This file is part of KeY - Integrated Deductive Software Design
+# Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+#                         Universitaet Koblenz-Landau, Germany
+#                         Chalmers University of Technology, Sweden
+#
+# The KeY system is protected by the GNU General Public License. 
+# See LICENSE.TXT for details.
+#
+#
+#
+#
+#!/bin/sh
+pck=$1
+outFile=`echo $1 | sed 's!\.!/!g;'`"/"ListOf$2".java"
+sed "s/<Pck>/$pck/g;s/<T>/$2/g;" <<END_OF_CLASS >$outFile
+
+package <Pck>;
+
+/** this interface has to be implemented by non-destructive lists
+ * having elements  of type <T> 
+ * CONVENTION: All implementations of this interface MUST contain a
+ * public static final class variable called EMPTY_LIST    
+*/
+public interface ListOf<T> extends java.io.Serializable {
+
+    /** prepends element to the list (non-destructive)
+     * @param element the head of the created list
+     * @return ListOf<T> with the new element as head and this list as tail
+     */
+    ListOf<T> prepend(<T> element);
+
+    /** prepends a whole list (non-destructive)
+     * @param list the list to be prepended
+     * @return ListOf<T> list++this
+     */
+
+    ListOf<T> prepend(ListOf<T> list);
+
+    /** prepends array (O(n))
+     * @param array the array of the elements to be prepended
+     * @return ListOf<T> the new list  
+     */
+    ListOf<T> prepend(<T>[] array);
+
+    /** appends element to the list (non-destructive)
+     * @param element to be added at the end
+     * @return ListOf<T> with the new element at the end
+     */
+    ListOf<T> append(<T> element);
+
+    /** appends a whole list (non-destructive)
+     * @param list the list to be appended
+     * @return ListOf<T> this++list
+     */
+
+    ListOf<T> append(ListOf<T> list);
+
+    /** appends element at end (non-destructive) (O(n))
+     * @param array the array to be appended
+     * @return ListOf<T> the new list  
+     */    
+    ListOf<T> append(<T>[] array);
+    
+    /** @return <T> the first element in list */
+    <T> head();
+
+    /** @return ListOf<T> tail of list */
+
+    ListOf<T> tail();
+
+    /** @return ListOf<T> this list without the first <code>n</code> elements  */
+    ListOf<T> take(int n);
+
+    /**
+     * Reverses this list
+     */
+    ListOf<T> reverse();
+
+    /** @return IteratorOf<T> of this list */
+    IteratorOf<T> iterator();
+
+    /** @return boolean is true iff. obj is in List */
+    boolean contains(<T> obj);
+
+    /** @return int representing number of elements in list  */
+
+    int size();
+
+    /** @return true iff the list is empty */
+    boolean isEmpty();
+
+    /** removes first occurrence of obj 
+     * @return new list 
+     */
+    ListOf<T> removeFirst(<T> obj);
+
+    /** removes all occurrences of obj 
+     * @return new list 
+     */
+    ListOf<T> removeAll(<T> obj);
+
+    /**
+     * Convert the list to a Java array (O(n))
+     */
+    <T>[] toArray();    
+}
+END_OF_CLASS

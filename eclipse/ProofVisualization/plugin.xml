@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<!-- $Format: "<plugin name=\"ProofVisualization Plug-in\" id=\"ProofVisualization\" version=\"1.$ProjectVersion$\" provider-name=\"KeY Project, University of Karlsruhe\" class=\"proofVisualization.ProofVisualizationPlugin\">"$-->
+<plugin name="ProofVisualization Plug-in" id="ProofVisualization" version="1.0.2655" provider-name="KeY Project, University of Karlsruhe" class="proofVisualization.ProofVisualizationPlugin">
+  
+   <runtime>
+      <library name="ProofVisualization.jar">
+         <export name="*"/>
+      </library>
+      <library name=".">
+         <export name="*"/>
+      </library>
+   </runtime>
+
+   <requires>
+      <import plugin="KeYPlugin"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.jface.text"/>
+      <import plugin="org.eclipse.ui.ide"/>
+   </requires>
+
+    <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="KeY"
+            id="KeY">
+      </category>
+      <view
+            name="Proof Visualization"
+            icon="/icons/key-small.png"
+            category="KeY"
+            class="proofVisualization.views.ProofVisualizationView"
+            id="proofVisualization.views.ProofVisualization">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.ui.resourcePerspective">
+         <view
+               ratio="0.5"
+               relative="org.eclipse.ui.views.TaskList"
+               relationship="right"
+               id="proofVisualization.views.ProofVisualizationView">
+         </view>
+      </perspectiveExtension>
+   </extension>
+<!--   
+  <extension point="org.eclipse.ui.ide.markerImageProviders">
+     <imageprovider
+     	markertype="ProofVisualization.pvmarker"
+     	icon = "icons/sample.gif"
+     	id = "pvMarkerImageiId"/>
+  </extension>
+ -->
+  <extension
+         id="pvmarker"
+         name="pvmarker"
+         point="org.eclipse.core.resources.markers">
+     <persistent value="false"/>
+	 <super type = "org.eclipse.core.resources.textmarker"/>
+  </extension>
+  
+<extension point="org.eclipse.ui.editors.annotationTypes">
+<type name="ProofVisualization.PVAnnotationType"
+	markerType="ProofVisualization.pvmarker"
+	super="org.eclipse.ui.workbench.texteditor.warning"
+	markerSeverity="2">
+	</type>
+</extension>
+
+<extension point="org.eclipse.ui.editors.markerAnnotationSpecification">
+	<specification
+		annotationType="ProofVisualization.PVAnnotationType"
+		verticalRulerPreferenceKey="PVAnnotationType.rulers.vertical"
+		textPreferenceKey="PVAnnotationType.text"
+		colorPreferenceKey="PVAnnotationType.color"
+		highlightPreferenceKey="PVAnnotationType.background"
+		textPreferenceValue="true"
+		textStylePreferenceValue="UNDERLINE"
+		overviewRulerPreferenceKey="PVAnnotationType.rulers.overview"
+		presentationLayer="1"
+		highlightPreferenceValue="true"
+		label="Proof Visualization"
+		icon="icons/ProofVisMarker.gif"
+		colorPreferenceValue="253,255,157"
+		verticalRulerPreferenceValue="true"
+		overviewRulerPreferenceValue="true"
+		textStylePreferenceKey="PVAnnotationType.text.style">
+	</specification>
+</extension>
+
+<extension point="org.eclipse.ui.editors.annotationTypes">
+<type name="ProofVisualization.PVAnnotationType2"
+	markerType="ProofVisualization.pvmarker"
+	super="org.eclipse.ui.workbench.texteditor.warning"
+	markerSeverity="0">
+	</type>
+</extension>
+
+<extension point="org.eclipse.ui.editors.markerAnnotationSpecification">
+	<specification
+		annotationType="ProofVisualization.PVAnnotationType2"
+		verticalRulerPreferenceKey="PVAnnotationType.rulers.vertical"
+		textPreferenceKey="PVAnnotationType2.text"
+		colorPreferenceKey="PVAnnotationType2.color"
+		highlightPreferenceKey="PVAnnotationType2.background"
+		textPreferenceValue="true"
+		textStylePreferenceValue="UNDERLINE"
+		overviewRulerPreferenceKey="PVAnnotationType2.rulers.overview"
+		presentationLayer="1"
+		highlightPreferenceValue="true"
+		label="Proof Visualization2"
+		icon="icons/ProofVisMarker2.gif"
+		colorPreferenceValue="253,255,7"
+		verticalRulerPreferenceValue="true"
+		overviewRulerPreferenceValue="true"
+		textStylePreferenceKey="PVAnnotationType2.text.style">
+	</specification>
+</extension>
+
+<extension point="org.eclipse.ui.editors.annotationTypes">
+<type name="ProofVisualization.PVAnnotationType3"
+	markerType="ProofVisualization.pvmarker"
+	super="org.eclipse.ui.workbench.texteditor.warning"
+	markerSeverity="2">
+	</type>
+</extension>
+
+<extension point="org.eclipse.ui.editors.markerAnnotationSpecification">
+	<specification
+		annotationType="ProofVisualization.PVAnnotationType3"
+		verticalRulerPreferenceKey="PVAnnotationType3.rulers.vertical"
+		textPreferenceKey="PVAnnotationType3.text"
+		colorPreferenceKey="PVAnnotationType3.color"
+		highlightPreferenceKey="PVAnnotationType3.background"
+		textPreferenceValue="true"
+		textStylePreferenceValue="UNDERLINE"
+		overviewRulerPreferenceKey="PVAnnotationType2.rulers.overview"
+		presentationLayer="4"
+		highlightPreferenceValue="true"
+		label="Proof Visualization3"
+		icon="icons/ProofVisMarker3.gif"
+		colorPreferenceValue="200,50,7"
+		verticalRulerPreferenceValue="true"
+		overviewRulerPreferenceValue="true"
+		textStylePreferenceKey="PVAnnotationType3.text.style">
+	</specification>
+</extension>
+   
+   <!-- <extension point="org.eclipse.ui.popupMenus"> 
+<objectContribution 
+      id="ProofVisualization.object"
+   objectClass="org.eclipse.core.resources.IFile"
+   nameFilter="*.java">
+   <filter
+         name="projectNature"
+         value="org.eclipse.jdt.core.javanature">
+      </filter>
+      <action
+         id="ProofVisualization.action1" 
+		icon="icons/sample.gif"
+         label="Object Action 1"
+           menubarPath="additions" 
+      class="proofVisualization.views.ObjectActionDelegation"> 
+      </action> 
+   </objectContribution> 
+</extension>
+ <extension point="org.eclipse.jdt.ui.javaEditorTextHovers">
+  <hover id="ProofVisualization.Hover"
+  			class = "proofVisualization.Hover"
+ 			label = "HOVER">
+	</hover>
+</extension>-->
+</plugin>

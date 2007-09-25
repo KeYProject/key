@@ -1,0 +1,132 @@
+/* done */
+
+taclets {
+
+    def_skip_left {
+        find (def(skip) ==>) 
+	replacewith (true ==>)
+        heuristics(simplify_asm)
+    };
+
+    def_skip_right {
+        find (==> def(skip)) 
+	replacewith (==> true)
+        heuristics(simplify_asm)
+    };
+
+    def_assign_left {
+        find (def(#s := #t) ==>)
+	replacewith (true ==>)
+        heuristics(simplify_asm)
+    };
+    
+    def_assign_right {
+        find (==> def(#s := #t))
+	replacewith (==> true)
+        heuristics(simplify_asm)
+    };
+
+    def_par_left {
+        find (def(#R par #S) ==>)
+        replacewith (def(#R) & def(#S) ==>)
+        heuristics(simplify_asm)
+    };
+    
+    def_par_right {
+        find (==> def(#R par #S))
+        replacewith (==> def(#R) & def(#S))
+        heuristics(simplify_asm)
+    };
+    
+    def_branch_left {
+        find (def(if #phi then #R else #S end) ==>)
+        replacewith (#SC_ELIMINATION(#phi), def(#R) ==>);
+	replacewith (! #SC_ELIMINATION(#phi), def(#S) ==>)
+        heuristics(split_asm_if)
+    };
+    
+    def_branch_right {
+        find (==> def(if #phi then #R else #S end))
+        replacewith (#SC_ELIMINATION(#phi) ==> def(#R));
+	replacewith (! #SC_ELIMINATION(#phi) ==> def(#S))
+        heuristics(split_asm_if)
+    };
+
+    def_branch_left_elseif {
+        find (def(elseif #phi then #R else #S end) ==>)
+        replacewith (#SC_ELIMINATION(#phi), def(#R) ==>);
+	replacewith (! #SC_ELIMINATION(#phi), def(#S) ==>)
+        heuristics(split_asm_if)
+	displayname "def_branch_left"
+    };
+    
+    def_branch_right_elseif {
+        find (==> def(elseif #phi then #R else #S end))
+        replacewith (#SC_ELIMINATION(#phi) ==> def(#R));
+	replacewith (! #SC_ELIMINATION(#phi) ==> def(#S))
+        heuristics(split_asm_if)
+	displayname "def_branch_right"
+    };
+    
+    def_let_left {
+        find (def(let #x = #s in #R end) ==>)
+	cond(#x not free in #s, #sk new depending on #s)
+        replacewith (#sk = #s, def({#x #sk} #R) ==>)
+        heuristics(simplify_asm)
+    };
+    
+    def_let_right {
+        find (==> def(let #x = #s in #R end))
+	cond(#x not free in #s, #sk new depending on #s)
+        replacewith (#sk = #s ==> def({#x #sk} #R))
+        heuristics(simplify_asm)
+    };
+   
+    def_all_left {
+        find (def(forall #x with #phi do #R end) ==>)
+	replacewith (all #x . (#SC_ELIMINATION(#phi) ->  def(#R)) ==>)
+    };
+   
+    def_all_right {
+        find (==> def(forall #x with #phi do #R end))
+	replacewith (==> all #x . (#SC_ELIMINATION(#phi) ->  def(#R)))
+    };
+    
+    def_seq_left {
+        find (def(#R seq #S) ==>)
+	replacewith (def(#R) & [#R] def(#S) ==>)
+	//heuristics(simplify_asm)
+    };
+    
+    def_seq_right {
+        find (==> def(#R seq #S))
+	replacewith (==> def(#R) & [#R] def(#S))
+	//heuristics(simplify_asm)
+    };
+    
+    def_try_left {
+        find (def(try #R else #S end) ==>)
+	replacewith (def(#R) &  (Con(#R) | def(#S)) ==>)
+        heuristics(split_asm_try)
+    };
+    
+    def_try_right {
+        find (==> def(try #R else #S end))
+	replacewith (==> def(#R) &  (Con(#R) | def(#S)))
+        heuristics(split_asm_try)
+    };
+    
+    def_name_left {
+	find (def(#rho) ==>)
+	cond (call #rho)
+	replacewith (def(@ASM_NAMED_RULE(#rho)) ==>)
+	heuristics(simplify_asm_named)
+    };
+    
+    def_name_right {
+	find (==> def(#rho))
+	cond (call #rho)
+	replacewith (==> def(@ASM_NAMED_RULE(#rho)))
+	heuristics(simplify_asm_named)
+    };
+}    

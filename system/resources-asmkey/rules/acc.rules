@@ -1,0 +1,370 @@
+/* done */
+
+taclets {
+
+    // taclets for the modality accT : accT(term in term)
+
+    accT_function_dynamic_id_left {
+        find(accT(#t, #s) ==>)
+	cond (op #s = #t,
+		 dynamic #s, staticargs #s, dynamic #t)
+	replacewith((#OP_EQ_ARGS(#s, #t)) | #ACCT_ARGS(#s, #t) ==>)
+	heuristics(simplify_accT)
+    };
+
+    accT_function_dynamic_id_right {
+        find(==> accT(#t, #s))
+	cond (op #s = #t,
+		 dynamic #s, staticargs #s, dynamic #t)
+	replacewith(==> (#OP_EQ_ARGS(#s, #t)) | #ACCT_ARGS(#s, #t))
+	heuristics(simplify_accT)
+    };
+
+    accT_function_dynamic_diff_left {
+        find(accT(#t, #s) ==>)
+	cond (op #s != #t,
+		 dynamic #s, staticargs #s, dynamic #t)
+	replacewith(#ACCT_ARGS(#s, #t) ==>)
+	heuristics(simplify_accT)
+    };    
+
+    accT_function_dynamic_diff_right {
+        find(==> accT(#t, #s))
+	cond (op #s != #t,
+		 dynamic #s, staticargs #s, dynamic #t)
+	replacewith(==> #ACCT_ARGS(#s, #t))
+	heuristics(simplify_accT)
+    };    
+
+    accT_static_left {
+        find(accT(#t, #s) ==>)
+	cond(static #t)
+	replacewith(false ==>)
+	heuristics(simplify_accT)
+    };
+
+    accT_static_right {
+        find(==> accT(#t, #s))
+	cond(static #t)
+	replacewith(==> false)
+	heuristics(simplify_accT)
+    };
+
+    accT_static_function_left {
+        find(accT(#t, #s) ==>)
+	cond(static #s)
+	replacewith(false ==>)
+	heuristics(simplify_accT)
+    };
+
+    accT_static_function_right {
+        find(==> accT(#t, #s))
+	cond(static #s)
+	replacewith(==> false)
+	heuristics(simplify_accT)
+    };
+
+    // taclets for the modality accF : accF(term in formula)
+    
+    accF_static_function_left {
+	find(accF(#phi, #s) ==>)
+	cond(static #s)
+	replacewith(false ==>)
+	heuristics(simplify_accF)
+    };
+
+    accF_static_function_right {
+	find(==> accF(#phi, #s))
+	cond(static #s)
+	replacewith(==> false)
+	heuristics(simplify_accF)
+    };
+
+    accF_static_left {
+        find(accF(#phi, #s) ==>)
+	cond(static #phi)
+	replacewith(false ==>)
+	heuristics(simplify_accF)
+    };
+
+    accF_static_right {
+        find(==> accF(#phi, #s))
+	cond(static #phi)
+	replacewith(==> false)
+	heuristics(simplify_accF)
+    };
+
+    accF_eq_left {
+        find(accF(#t1 = #t2, #s) ==>)
+	cond(dynamic #s, staticargs #s)
+	replacewith(accT(#t1, #s) |  accT(#t2, #s) ==>)
+	heuristics(simplify_accF)
+    };
+
+    accF_eq_right {
+        find(==> accF(#t1 = #t2, #s))
+	cond(dynamic #s, staticargs #s)
+	replacewith(==> accT(#t1, #s) |  accT(#t2, #s))
+	heuristics(simplify_accF)
+    };
+
+    accF_atomic_left {
+        find(accF(#phi, #s) ==>)
+	cond(dynamic #s, staticargs #s, atomic #phi)
+	replacewith(#ACCT_ARGS(#s, #phi) ==>)
+    };
+
+    accF_atomic_right {
+        find(==> accF(#phi, #s))
+	cond(dynamic #s, staticargs #s, atomic #phi)
+	replacewith(==> #ACCT_ARGS(#s, #phi))
+    };
+
+    accF_not_left {
+        find(accF(!#phi, #s) ==>)
+	cond(dynamic #s, staticargs #s)
+	replacewith(accF(#phi, #s) ==>)
+	heuristics(simplify_accF)
+    };
+
+    accF_not_right {
+        find(==> accF(!#phi, #s))
+	cond(dynamic #s, staticargs #s)
+	replacewith(==> accF(#phi, #s))
+	heuristics(simplify_accF)
+    };
+
+    accF_imply_left {
+        find(accF(#phi -> #psi, #s) ==>)
+	cond(dynamic #s, staticargs #s)
+	replacewith(accF(#phi, #s) | accF(#psi, #s) ==>)
+	heuristics(simplify_accF)
+    };
+
+    accF_imply_right {
+        find(==> accF(#phi -> #psi, #s))
+	cond(dynamic #s, staticargs #s)
+	replacewith(==> accF(#phi, #s) | accF(#phi, #s))
+	heuristics(simplify_accF)
+    };
+
+    accF_and_left {
+        find(accF(#phi & #psi, #s) ==>)
+	cond(dynamic #s, staticargs #s)
+	replacewith(accF(#phi, #s) | accF(#psi, #s) ==>)
+	heuristics(simplify_accF)
+    };
+
+    accF_and_right {
+        find(==> accF(#phi & #psi, #s))
+	cond(dynamic #s, staticargs #s)
+	replacewith(==> accF(#phi, #s) | accF(#psi, #s))
+	heuristics(simplify_accF)
+    };
+
+    accF_or_left {
+        find(accF(#phi | #psi, #s) ==>)
+	cond(dynamic #s, staticargs #s)
+	replacewith(accF(#phi, #s) | accF(#psi, #s) ==>)
+	heuristics(simplify_accF)
+    };
+
+    accF_or_right {
+        find(==> accF(#phi | #psi, #s))
+	cond(dynamic #s, staticargs #s)
+	replacewith(==> accF(#phi, #s) | accF(#psi, #s))
+	heuristics(simplify_accF)
+    };
+
+    accF_andalso_left {
+        find(accF(#phi && #psi, #s) ==>)
+	cond(dynamic #s, staticargs #s)
+	replacewith(accF(#phi, #s) | (#phi & accF(#psi, #s)) ==>)
+	heuristics(simplify_accF)
+    };
+
+    accF_andalso_right {
+        find(==> accF(#phi && #psi, #s))
+	cond(dynamic #s, staticargs #s)
+	replacewith(==> accF(#phi, #s) | (#phi & accF(#psi, #s)))
+	heuristics(simplify_accF)
+    };
+
+    accF_orelse_left {
+        find(accF(#phi || #psi, #s) ==>)
+	cond(dynamic #s, staticargs #s)
+	replacewith(accF(#phi, #s) | (!#phi & accF(#psi, #s)) ==>)
+	heuristics(simplify_accF)
+    };
+
+    accF_orelse_right {
+        find(==> accF(#phi || #psi, #s))
+	cond(dynamic #s, staticargs #s)
+	replacewith(==> accF(#phi, #s) | (!#phi & accF(#psi, #s)))
+	heuristics(simplify_accF)
+    };
+
+    // taclets for the modality acc : acc(rule, term)
+
+    acc_static_left {
+        find(acc(#R, #s) ==>)
+	cond(static #s)
+	replacewith(false ==>)
+	heuristics(simplify_acc)
+    };
+
+    acc_static_right {
+        find(==> acc(#R, #s))
+	cond(static #s)
+	replacewith(==> false)
+	heuristics(simplify_acc)
+    };
+    
+    acc_static_function_left {
+	find(acc(#R, #s) ==>)
+	cond(static #s)
+	replacewith(false ==>)
+	heuristics(simplify_acc)
+    };
+
+    acc_static_function_right {
+	find(==> acc(#R, #s))
+	cond(static #s)
+	replacewith(==> false)
+	heuristics(simplify_acc)
+    };
+
+    acc_skip_left {
+        find(acc(skip, #s) ==>)
+	cond(dynamic #s, staticargs #s)  
+	replacewith(false ==>)
+	heuristics(simplify_acc)
+    }; 
+    
+    acc_skip_right {
+        find(==> acc(skip, #s))
+	cond(dynamic #s, staticargs #s)  
+	replacewith(==> false)
+	heuristics(simplify_acc)
+    }; 
+    
+    acc_assign_left {
+        find(acc(#t1 := #t2, #s) ==>)
+	cond(dynamic #s, staticargs #s)
+	replacewith(#ACCT_ARGS(#s, #t1) | accT(#t2, #s) ==>)
+	heuristics(simplify_acc)
+    };
+
+    acc_assign_right {
+        find(==> acc(#t1 := #t2, #s))
+	cond(dynamic #s, staticargs #s)
+	replacewith(==> #ACCT_ARGS(#s, #t1) | accT(#t2, #s))
+	heuristics(simplify_acc)
+    };
+
+    acc_par_left {
+        find(acc(#R par #S, #s) ==>)
+	cond(dynamic #s, staticargs #s)
+	replacewith(def(#R par #S) & (acc(#R, #s) | acc(#S, #s)) ==>)
+	heuristics(simplify_acc)
+    };
+
+    acc_par_right {
+        find(==> acc(#R par #S, #s))
+	cond(dynamic #s, staticargs #s)
+	replacewith(==> def(#R par #S) & (acc(#R, #s) | acc(#S, #s)))
+	heuristics(simplify_acc)
+    };
+
+    acc_branch_left {
+        find(acc(if #phi then #R else #S end, #s) ==>)
+	cond(dynamic #s, staticargs #s)
+	replacewith(def(if #phi then #R else #S end),
+	            accF(#phi, #s) |  ((#SC_ELIMINATION(#phi) & acc(#R, #s)) |
+	                                 (!#SC_ELIMINATION(#phi) & acc(#S, #s))) ==>)
+	heuristics(simplify_acc)
+    };
+
+    acc_branch_right {
+        find(==> acc(if #phi then #R else #S end, #s))
+	cond(dynamic #s, staticargs #s)
+	replacewith(==> def(if #phi then #R else #S end));
+	replacewith(==> accF(#phi, #s) |  ((#SC_ELIMINATION(#phi) -> acc(#R, #s)) &
+	                                 (!#SC_ELIMINATION(#phi) -> acc(#S, #s))))
+	heuristics(simplify_acc)
+    };
+
+    acc_let_left {
+        find(acc(let #x = #t in #R end, #s) ==>)
+	cond(dynamic #s, staticargs #s, #x not free in #t, #x not free in #s)
+	replacewith(def(let #x = #t in #R end) & (accT(#t, #s) | ex #x . (#x=#t & acc(#R, #s))) ==>)
+	heuristics(simplify_acc)
+    };
+
+    acc_let_right {
+        find(==> acc(let #x = #t in #R end, #s))
+	cond(dynamic #s, staticargs #s, #x not free in #t, #x not free in #s, #sk new depending on #t)
+	replacewith(==> def(let #x = #t in #R end));
+	replacewith(#sk=#t ==> accT(#t, #s), acc({#x #sk} #R, #s))
+	heuristics(simplify_acc)
+    };
+
+    acc_all_left {
+        find(acc(forall #x with #phi do #R end, #s) ==>)
+	cond(dynamic #s, staticargs #s, #x not free in #s)
+	replacewith(def(forall #x with #phi do #R end) & (ex #x. accF(#phi, #s) |
+                                                          ex #x. (#SC_ELIMINATION(#phi) & acc(#R, #s))) ==>)
+	heuristics(simplify_acc)
+    };
+
+    acc_all_right {
+        find(==> acc(forall #x with #phi do #R end, #s))
+	cond(dynamic #s, staticargs #s, #x not free in #s)
+	replacewith(==> def(forall #x with #phi do #R end) & (ex #x. accF(#phi, #s) |
+                                                          ex #x. (#SC_ELIMINATION(#phi) & acc(#R, #s))))
+	heuristics(simplify_acc)
+    };
+
+    acc_seq_left {
+        find(acc(#R seq #S, #s) ==>)
+	cond(dynamic #s, staticargs #s)
+	replacewith((acc(#R, #s) & [#R] def(#S)) |  (Con(#R) & [#R] acc(#S, #s)) ==>)
+	heuristics(simplify_acc)
+    };
+
+    acc_seq_right {
+        find(==> acc(#R seq #S, #s))
+	cond(dynamic #s, staticargs #s)
+	replacewith(==> (acc(#R, #s) & [#R] def(#S)) |  (Con(#R) & [#R] acc(#S, #s)))
+	heuristics(simplify_acc)
+    };
+
+    acc_try_left {
+        find(acc(try #R else #S end, #s) ==>)
+	cond(dynamic #s, staticargs #s)
+	replacewith(acc(#R, #s) | (def(#R) & ! Con(#R) & acc(#S, #s)) ==>)
+	heuristics(simplify_acc)
+    };
+
+    acc_try_right {
+        find(==> acc(try #R else #S end, #s))
+	cond(dynamic #s, staticargs #s)
+	replacewith(==> acc(#R, #s) | (def(#R) & ! Con(#R) & acc(#S, #s)))
+	heuristics(simplify_acc)
+    };
+
+    acc_name_left {
+        find(acc(#rho, #s) ==>)
+	cond(dynamic #s, staticargs #s, call #rho)
+	replacewith(acc(@ASM_NAMED_RULE(#rho), #s) ==>)
+	heuristics(simplify_acc_named)
+    };
+
+    acc_name_right {
+        find(==> acc(#rho, #s))
+	cond(dynamic #s, staticargs #s, call #rho)
+	replacewith(==> acc(@ASM_NAMED_RULE(#rho), #s))
+	heuristics(simplify_acc_named)
+    };
+
+}

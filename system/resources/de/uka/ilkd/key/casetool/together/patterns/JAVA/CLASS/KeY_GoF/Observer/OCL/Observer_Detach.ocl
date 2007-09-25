@@ -1,0 +1,15 @@
+patternmodification#
+
+addMethod#detach#Subject
+
+mapping#Subject#'Subject'
+mapping#Observer#'Observer'
+mapping#detach#'Name of method detach in class Subject'
+
+postcondition#method#detach#Subject
+
+schema# 
+		self.observers->excludes(elem)
+
+comment#
+

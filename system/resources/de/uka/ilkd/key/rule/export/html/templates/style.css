@@ -1,0 +1,80 @@
+a {
+ text-decoration: none;
+ color: #f40;
+}
+
+a:link {
+}
+
+a:visited {
+ color: #a21;
+}
+
+a:hover {
+ text-decoration: underline;
+}
+
+table {
+ border-collapse: collapse;
+}
+
+thead {
+ border-bottom: solid 2px;
+}
+
+td {
+ padding: 0.1em 0.5em;
+}
+
+pre {
+ border: solid 1px #000;
+ padding: 0.5em 0.5ex;
+ background: #eef;
+ font-size: 120%;
+}
+
+.contents {
+// background: #eee;
+}
+
+.ruleset {
+// background: #eee;
+}
+
+.nav {
+// background: #ddd;
+}
+
+.navitem {
+}
+
+.navtop {
+ text-align: center;
+}
+
+.navprev {
+ text-align: left;
+}
+
+.navnext {
+ text-align: right;
+}
+
+.navprev:after, .navnext:before {
+ content: " | ";
+}
+
+.defattr {
+ font-size: 80%;
+ display: block;
+ color: #888;
+}
+
+.rule dt, .ruleset dt, .option dt {
+ color: #888;
+}
+
+.versioninfo {
+ font-size: 80%;
+ color: #888;
+}

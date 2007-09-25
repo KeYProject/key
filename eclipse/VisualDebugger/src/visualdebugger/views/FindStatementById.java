@@ -1,0 +1,111 @@
+package visualdebugger.views;
+
+import org.eclipse.jdt.core.dom.*;
+
+import de.uka.ilkd.key.visualdebugger.SourceElementId;
+
+public class FindStatementById extends ASTVisitor {
+
+    private int currentId = 0;
+    
+
+    private final int idToFind;
+    
+    private Statement st = null;
+    
+    private Expression expr=null;
+    
+    
+    
+    public FindStatementById(SourceElementId idToFind) {
+        super();
+        this.idToFind = idToFind.getId();
+    }
+
+    
+    public boolean visit(Block node){
+        for(int i=0; i < node.statements().size();i++){
+            currentId++;
+           // System.out.println(node.statements().get(i)+" "+currentId);
+            if(currentId==idToFind){
+                st = (Statement)node.statements().get(i);
+            }
+        }
+        return true;
+    }
+    
+    
+    public void endVisit(FieldAccess node) {
+        currentId++;
+        if(currentId==idToFind){
+            expr=node;
+        }
+    }
+    
+    
+    public void endVisit(QualifiedName node) {
+
+        
+        
+        if (node.getParent() instanceof QualifiedName)
+            return;
+        
+        if ((node.getQualifier().resolveBinding().getKind()==IBinding.PACKAGE))
+            return;
+
+        
+        if (node.getQualifier().resolveTypeBinding().isArray())
+            return;
+        currentId++;
+    //    System.out.println(node+" "+currentId);
+        if(currentId==idToFind){
+            expr=node;
+        }
+
+    }
+    
+    
+    
+    public void endVisit(ArrayAccess node){
+        currentId++;
+        //    System.out.println(node+" "+currentId);
+            if(currentId==idToFind){
+                expr=node;
+            }
+            
+            
+            
+
+    }
+    
+    
+    public void endVisit(ForStatement node){
+        final Expression guard = node.getExpression();
+        currentId++;
+        if(currentId==idToFind){
+            expr=guard;
+        }
+
+
+
+        
+    }
+    
+    
+    public void endVisit(WhileStatement node){
+        final Expression guard = node.getExpression();
+        currentId++;
+        if (currentId==idToFind){
+            expr=guard;
+        }      
+    }
+
+    public Statement getStatement() {
+        return st;
+    }
+    
+    public Expression getExpression(){
+        return expr;
+    }
+    
+}

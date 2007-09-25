@@ -1,0 +1,202 @@
+//This file is part of KeY - Integrated Deductive Software Design
+//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+//Universitaet Koblenz-Landau, Germany
+//Chalmers University of Technology, Sweden
+//
+//The KeY system is protected by the GNU General Public License. 
+//See LICENSE.TXT for details.
+//
+//
+
+package de.uka.ilkd.key.proof.init;
+
+import java.io.File;
+import java.util.HashMap;
+
+import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.SingleProof;
+import de.uka.ilkd.key.proof.mgt.*;
+import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.soundness.POBuilder;
+import de.uka.ilkd.key.rule.soundness.POSelectionDialog;
+import de.uka.ilkd.key.util.ProgressMonitor;
+
+public class TacletSoundnessPO extends KeYUserProblemFile 
+implements ProofOblInput{
+    
+    public boolean askUserForEnvironment () {
+        return false;
+    }
+    
+    private ProofAggregate proof;
+    
+    private NoPosTacletApp[] app;
+    
+    public TacletSoundnessPO (String name, File file, 
+            ProgressMonitor monitor) {
+        super ( name, file, monitor );
+	this.tacletFile = true;
+    }
+    
+    /** returns the proof obligation term as result of the proof obligation
+     * input. If there is still no input available because nothing has
+     * been read yet null is returned.
+     */
+    public ProofAggregate getPO () {
+        return proof;
+    }
+    
+    public NoPosTacletApp[] getTaclets () {
+        return app;
+    }
+    
+    /** starts reading the input and modifies the InitConfig of this 
+     * object with respect to the given modification
+     * strategy. 
+     */
+    public void readProblem(ModStrategy mod) throws ProofInputException {
+        
+        final InitConfig old = initConfig;
+        initConfig = old.copy ();
+        
+        // ensure that only the new taclets of the lemma file are presented to
+        // the user
+        initConfig.setTaclets ( SetAsListOfTaclet.EMPTY_SET );
+        initConfig.setTaclet2Builder ( new HashMap () );
+        
+        SetOfTaclet newTaclets=null;
+        try {
+            super.read ( ModStrategy.NO_VARS_FUNCS); // actually this
+            // reads the
+            // complete
+            // problem, which is not really
+            // needed; could be optimized
+            newTaclets = initConfig.getTaclets();
+        } finally {
+            initConfig=old;
+        }
+        // this ensures that necessary Java types are loaded
+        initConfig.getServices().getJavaInfo().readJavaBlock("{}");
+        
+        IteratorOfTaclet it = newTaclets.iterator();
+        SetOfNoPosTacletApp newTacApps = SetAsListOfNoPosTacletApp.EMPTY_SET;
+        while (it.hasNext()) {
+            newTacApps = newTacApps.add
+            (NoPosTacletApp.createNoPosTacletApp(it.next()));
+        }
+        
+        final POSelectionDialog dialog = new POSelectionDialog 
+        ( Main.getInstance().mediator (),
+                newTacApps);
+        
+        app = dialog.getSelectedTaclets ();
+                
+        if ( app == null || app.length==0)
+            throw new ProofInputException ( "No taclet was selected" );
+        
+        ProofAggregate[] singleProofs = new ProofAggregate[app.length];
+        ProofEnvironment env = initConfig.getProofEnv();
+        for (int i=0; i<app.length; i++) {
+            final POBuilder pob = new POBuilder ( app[i], initConfig.getServices() );
+            pob.build ();
+            
+            updateNamespaces ( pob );
+            String name = app.length==1 ? name() : app[i].taclet().name().toString();
+            singleProofs[i] = ProofAggregate.createProofAggregate
+            	(new Proof(name,
+                    pob.getPOTerm(),
+                    "",
+                    initConfig.createTacletIndex(),
+                    initConfig.createBuiltInRuleIndex(),
+                    initConfig.getServices()),
+                    name);            
+        }
+        if (app.length==1) {
+            proof = singleProofs[0];
+        } else {
+            proof = ProofAggregate.createProofAggregate(singleProofs, name());
+        }
+        for (int i=0; i<app.length; i++) {
+            LemmaSpec lemmaSpec = new LemmaSpec(app[i]);            
+            env.addContract(lemmaSpec);
+            env.registerProof(this, proof);
+            env.registerRule(app[i], 
+                    new RuleJustificationBySpec(lemmaSpec));
+            env.addToAllProofs(app[i], file);
+        }
+    }
+    
+    
+    private void updateNamespaces (POBuilder p_pob) {
+        NamespaceSet globalNss = initConfig.namespaces();
+        Namespace funcNs = globalNss.functions ();
+        
+        {
+            final IteratorOfNamed it =
+                p_pob.getFunctions ().allElements ().iterator ();
+            while ( it.hasNext () )
+                funcNs.add ( it.next () );
+        }
+        
+//      {
+//      final IteratorOfTacletApp it = p_pob.getTaclets ().iterator ();
+//      while ( it.hasNext () )
+//      p_tacletIndex.add((NoPosTacletApp)it.next ());
+//      }
+    }
+    
+    
+    
+    /** set the initial configuration used to read an input. It may become
+     * modified during reading depending on the modification strategy used
+     * for reading.
+     */
+    public void setInitConfig(InitConfig i) {
+        initConfig = i;
+    }
+    
+    public void readActivatedChoices() throws ProofInputException { 
+	//nothing to do 
+    }
+    
+    /** reads the include section and returns an Includes object.  
+     */
+    public Includes readIncludes() throws ProofInputException {
+        return new Includes ();
+    }
+    
+    /** returns the name of the proof obligation input.
+     */
+    public String name() {
+        if (app==null) return "Taclet proof obligation";
+        return "Proof obligation(s) for "+file;
+    }
+    
+    public Contractable[] getObjectOfContract() {
+        return app;
+    }
+    
+    public boolean initContract(Contract ct) {
+        if (!(ct instanceof LemmaSpec)) {
+            return false;
+        }
+        LemmaSpec lct = (LemmaSpec)ct;
+        Contractable[] objs = getObjectOfContract();
+        boolean found = false;
+        for (int i=0; i<objs.length; i++) {
+            if (objs[i].equals(lct.getObjectOfContract())) {
+                if (getPO() instanceof SingleProof) {
+                    ct.addCompoundProof(getPO()); 
+                } else {
+                    ct.addCompoundProof(getPO().getChildren()[i]);
+                }
+                found = true;
+            }
+        }
+        return found;
+    }
+            
+}

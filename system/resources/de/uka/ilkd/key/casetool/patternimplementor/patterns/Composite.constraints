@@ -1,0 +1,7 @@
+
+[Group] "composite_constraint1.1.1", "Composite 1.1.1"
+	[Void] "Make sure that the children association is implemented as a set.               "
+	[String] "flavor", "Flavor", "'set'"
+	[Context] Composite
+	[Invariant] <:Composite_class:>.allSubtypes()->forAll(s:OclType | s.allInstances()->forAll(i:OclClassifier | if <:flavor:> = 'set' then i.<:children_attribute:>->size() = i.<:children_attribute:>->asSet()->size() else true endif)) 
+[EndGroup]

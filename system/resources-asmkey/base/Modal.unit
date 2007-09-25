@@ -1,0 +1,209 @@
+unit Modal
+
+export *
+
+import * from Base
+import * from Bool
+import * from Asm
+
+   /** Modal taclets for asm taclets */
+
+taclet ex_not_con_ql {
+        find (==> [[#R]] #phi)
+    	replacewith (==> ! con(:#R;))
+    };
+    
+taclet static_left {
+        find ([[#R]] #phi ==>)
+    	cond (static #phi) // static implies pure
+    	replacewith (==> con(:#R;));
+        replacewith (#phi ==>)
+    };
+
+taclet static_right {
+        find (==> [[#R]] #phi)
+  	cond (static #phi) // static implies pure
+  	replacewith (==> #phi)
+    };
+
+taclet asm_skip_left { 
+        find ([[skip]] #phi ==>) 
+        replacewith (#phi ==>) 
+        rule sets(simplify_asm) 
+    };
+
+taclet asm_skip_right { 
+        find (==> [[skip]] #phi) 
+        replacewith (==> #phi) 
+        rule sets(simplify_asm) 
+    };
+    
+taclet branch_left { 
+        find ([[if #b then #R else #S end]] #phi ==>) 
+        replacewith (#b = true, [[#R]] #phi ==>);
+        replacewith (#b = false, [[#S]] #phi ==>)
+        rule sets(split_asm_if)
+    };
+    
+taclet branch_right { 
+        find (==> [[if #b then #R else #S end]] #phi)
+        replacewith (#b = true ==> [[#R]] #phi);
+        replacewith (#b = false ==> [[#S]] #phi)
+        rule sets(split_asm_if)
+    };
+
+taclet seq_left {
+        find ([[#R seq #S]] #phi ==>)
+        replacewith ([[#R]] [[#S]] #phi ==>)
+	rule sets (simplify_asm)
+    };
+    
+taclet seq_right {
+        find (==> [[#R seq #S]] #phi)
+        replacewith (==> [[#R]] [[#S]] #phi)
+	rule sets (simplify_asm)
+    };
+    
+taclet let_left {
+        find ([[let #x = #s in #R end]] #phi ==>)
+        cond (#sk new depending on #s)
+        replacewith (#sk = #s, [[{#x #sk} #R]] #phi ==>)
+        rule sets (simplify_asm)
+    };
+    
+taclet let_right {
+        find (==> [[let #x = #s in #R end]] #phi)
+        cond (#sk new depending on #s)
+        replacewith (#sk = #s ==> [[{#x #sk} #R]] #phi)
+        rule sets (simplify_asm)
+    };
+    
+taclet try_left {
+        find ([[try #R else #S end]] #phi ==>)
+        replacewith (==> def(#R));
+        replacewith (con(#R) ==> [[#R]] #phi);
+        replacewith (! con(#R) ==> [[#S]] #phi)
+        rule sets (split_asm_try)
+    };
+    
+taclet try_right {
+        find (==> [[try #R else #S end]] #phi)
+        replacewith (==> [[#R]] #phi);
+        replacewith (def(#R), ! con(#R) ==> [[#S]] #phi)
+        rule sets (split_asm_try)
+    };
+    
+taclet name_left {
+	find ([[#rho]] #phi ==>)
+	cond (derived #rho)
+	replacewith ([[@#META_DERIVED(#rho)]] #phi ==>)
+	rule sets (simplify_asm_named)
+    };
+
+taclet name_right {
+	find (==> [[#rho]] #phi)
+	cond (derived #rho)
+	replacewith (==> [[@#META_DERIVED(#rho)]] #phi)
+	rule sets (simplify_asm_named)
+    };
+
+
+    /** Modal taclets for formulas */
+    
+taclet mod_not_left {
+        find ([[#R]] ! #phi ==>)
+        replacewith (==> con(#R));
+        replacewith (! [[#R]] #phi ==>)
+    };
+    
+taclet mod_not_right {
+        find (==> [[#R]] ! #phi)
+        replacewith (==> ! [[#R]] #phi)
+        rule sets(simplify)
+    };
+    
+taclet mod_and_left {
+        find ([[#R]] (#phi1 & #phi2)==>)
+        replacewith (([[#R]] #phi1) & ([[#R]] #phi2)==>)
+        rule sets(simplify)
+    };
+    
+taclet mod_and_right {
+        find (==> [[#R]] (#phi1 & #phi2))
+        replacewith (==> ([[#R]] #phi1) & ([[#R]] #phi2))
+        rule sets(simplify)
+    };
+    
+taclet mod_or_left {
+        find ([[#R]] (#phi1 | #phi2)==>)
+        replacewith (([[#R]] #phi1) | ([[#R]] #phi2)==>)
+        //rule sets(simplify)
+    };
+
+taclet mod_or_right {
+        find (==> [[#R]] (#phi1 | #phi2))
+        replacewith (==> ([[#R]] #phi1) | ([[#R]] #phi2))
+        //rule sets(simplify)
+    };
+
+taclet mod_impl_left {
+        find ([[#R]] (#phi1 -> #phi2) ==>)
+        replacewith (([[#R]] #phi1) -> ([[#R]] #phi2) ==>)
+        //rule sets(simplify)
+    };
+
+taclet mod_impl_right {
+        find (==> [[#R]] (#phi1 -> #phi2))
+        replacewith (==> ([[#R]] #phi1) -> ([[#R]] #phi2))
+        //rule sets(simplify)
+    };
+
+taclet mod_all_left {
+        find ([[#R]] all #x;#phi ==>)
+        cond (#x not free in #R)
+        replacewith (all #x;[[#R]] #phi ==>)
+        rule sets(simplify)
+    };
+
+taclet mod_all_right {
+        find (==> [[#R]] all #x;#phi)
+        cond (#x not free in #R)
+        replacewith (==> all #x;[[#R]] #phi)
+        rule sets(simplify)
+    };
+    
+taclet mod_ex_left {
+        find ([[#R]] ex #x;#phi ==>)
+        cond (#x not free in #R)
+        replacewith (ex #x;[[#R]] #phi ==>)
+        rule sets(simplify)
+    };
+    
+taclet mod_ex_right {
+        find (==> [[#R]] ex #x;#phi)
+        cond (#x not free in #R)
+        replacewith (==> ex #x;[[#R]] #phi)
+        rule sets(simplify)
+    };
+    
+taclet mod_eq_right {
+        find (==> [[#R]] #t = #s)
+	cond (dynamic #t, staticargs #t, static #s)
+        replacewith (==> upd(#R, #t, #s) | (#t = #s & inv (#R, #t)))
+    };
+    
+taclet mod_eq_left {
+        find ([[#R]] #t = #s ==>)
+	cond (dynamic #t, staticargs #t, static #s)
+        replacewith (==> con(#R));
+        replacewith (upd(#R, #t, #s) | (inv(#R, #t) & #t = #s) ==>)
+        rule sets(split_asm)
+    };
+
+    // XXX: test: diamond
+taclet mod_diamond {
+	find (==> <<#R>> #phi)
+	replacewith (==> con(:#R;));
+	replacewith (==> [[#R]] #phi)
+        rule sets(split_asm)
+    };

@@ -1,0 +1,2595 @@
+*****************************************************
+*** This semantics has been originally developed  ***
+*** by Feng Chen at the Universit of Illinois at  ***
+*** Urbana-Champaign. You can find information    ***
+*** about this at http://fsl.cs.uiuc.edu/javafan/ ***
+***                                               ***
+*** It has been corrected and lifted by Ralf      ***
+*** Sasse at the Universität Karlsruhe. See for   ***
+*** this at URL                                   ***
+*** All changes are marked as "CHANGED" and       ***
+*** all additionas are marked as "ADDED", except  ***
+*** the end, where after "Everything BELOW is     ***
+*** ADDED" the rest was added.                    *** 
+*****************************************************
+
+
+*******************************
+*** Defining an OO Language ***
+*******************************
+
+--------------
+--- Syntax ---
+--------------
+
+fmod TYPE is pr QID .
+  sorts Type CType IType BType CTypes ITypes Types OTypes .
+  subsorts CType IType BType < Type .
+  subsort Type < Types .
+  subsort CType OTypes < CTypes < Types .
+  subsort IType OTypes < ITypes < Types .
+  ops int boolean String float double short long byte char : -> BType .
+  op Object : -> CType .
+  op #c : Qid -> CType .
+  op #i : Qid -> IType .
+  op noType : -> OTypes .
+  op _,_ : OTypes OTypes -> OTypes [assoc prec 80 id: noType] .
+  op _,_ : CTypes CTypes -> CTypes [ditto] .
+  op _,_ : ITypes ITypes -> ITypes [ditto] .
+  op _,_ : Types Types -> Types [ditto] .
+endfm
+
+fmod NAME is ex QID .
+  sorts Name MName DName NameList .
+  subsort Qid < Name < NameList .
+  op #m : Qid -> MName .
+  op #d : Qid -> DName .
+  op _[] : DName -> DName [prec 50] .
+  op `(`) : -> NameList .
+  op _,_ : NameList NameList -> NameList [assoc id: ()] .
+endfm
+
+fmod VAR-SYNTAX is ex NAME .
+  sort TacletNewVarName . ---- ADDED
+  subsort TacletNewVarName < Name . ---- ADDED
+  sorts Var Vars .
+  subsort Name < Var < Vars .
+  subsort NameList < Vars .
+  op _,_ : Vars Vars -> Vars [ditto] .
+endfm
+
+fmod GENERIC-EXP-SYNTAX is ex VAR-SYNTAX .
+  pr INT .
+  pr FLOAT .
+  pr STRING .
+  pr BOOL .
+  sorts Exp Exps StExp .
+  subsort Var StExp < Exp < Exps .
+  subsort Vars < Exps .
+  op #i : Int -> Exp .
+  op #f : Float -> Exp .
+  op #s : String -> Exp .
+  op #b : Bool -> Exp .
+  op this : -> Exp .
+  op super : -> Exp .
+  op null : -> Exp .
+  op _,_ : Exps Exps -> Exps [ditto] .
+endfm
+
+fmod UNARY-EXP-SYNTAX is ex GENERIC-EXP-SYNTAX .
+  pr TYPE .
+  op ++_ : Exp -> StExp [prec 33] .
+  op --_ : Exp -> StExp [prec 33] .
+  op _++ : Exp -> StExp [prec 34] .
+  op _-- : Exp -> StExp [prec 34] .
+  op {_}_ : Type Exp -> Exp [prec 20] .
+endfm
+
+fmod ARITH-EXP-SYNTAX is ex GENERIC-EXP-SYNTAX .
+  op _+_ : Exp Exp -> Exp [prec 40 gather(e E)] .
+  op _-_ : Exp Exp -> Exp [prec 40 gather(e E)] .
+  op _*_ : Exp Exp -> Exp [prec 35 gather(e E)] .
+  op _/_ : Exp Exp -> Exp [prec 35 gather(e E)] .
+  op _%_ : Exp Exp -> Exp [prec 35 gather(e E)] .
+endfm
+
+fmod REXP-SYNTAX is ex GENERIC-EXP-SYNTAX .
+  op _==_ : Exp Exp -> Exp [prec 45] .
+  op _!=_ : Exp Exp -> Exp [prec 45] .
+  op _<_  : Exp Exp -> Exp [prec 45] .
+  op _<=_ : Exp Exp -> Exp [prec 45] .
+  op _>_  : Exp Exp -> Exp [prec 45] .
+  op _>=_ : Exp Exp -> Exp [prec 45] .
+endfm
+
+fmod BEXP-SYNTAX is ex GENERIC-EXP-SYNTAX .
+  op !_ : Exp -> Exp [prec 47] .
+  op _&&_ : Exp Exp -> Exp [prec 49] .
+  op _||_ : Exp Exp -> Exp [prec 51] .
+endfm
+
+fmod CEXP-SYNTAX is ex GENERIC-EXP-SYNTAX .
+  op _?_:_ : Exp Exp Exp -> Exp [prec 55] .
+endfm
+
+fmod ARRAY-SYNTAX is ex TYPE .
+  ex GENERIC-EXP-SYNTAX .
+  op _[] : Type -> Type [prec 20] .
+  op _[_] : Type Exp -> Type [prec 20] .
+  op _[_] : Exp Exp -> Var [prec 30] .
+endfm
+
+fmod CLASS-MEMBER-SYNTAX is ex TYPE .
+  ex GENERIC-EXP-SYNTAX .
+  op _._ : Exp StExp -> StExp [prec 25 gather(E e)] .
+  op _._ : Exp Var -> Var [prec 25 gather(E e)] .
+  op _._ : CType StExp -> StExp [prec 25] .
+  op _._ : CType Var -> Var [prec 25] .
+  op _._ : Exp Exp -> Exp [prec 25 gather(E e)] .
+  op _._ : CType Exp -> Exp [prec 25] .
+endfm
+
+fmod METHOD-CALL-SYNTAX is ex TYPE .
+  ex GENERIC-EXP-SYNTAX .
+  op __ : MName Exps -> StExp [prec 23] .
+  op super_ : Exps -> StExp [prec 23] .
+endfm
+
+***** still have parsing problem in terms like new int [#i(10)]
+
+fmod NEW-SYNTAX is ex ARRAY-SYNTAX .
+  ex GENERIC-EXP-SYNTAX .
+  op new__ : CType Exps -> Exp [prec 25] .
+  op new_ : Type -> Exp [prec 25 gather(E)] .
+endfm
+
+fmod ASSIGNM-EXP-SYNTAX is ex GENERIC-EXP-SYNTAX .
+  op _=_ : Var Exp -> StExp [prec 60] .
+  op _+=_ : Var Exp -> StExp [prec 60] .
+  op _-=_ : Var Exp -> StExp [prec 60] .
+  op _*=_ : Var Exp -> StExp [prec 60] .
+  op _/=_ : Var Exp -> StExp [prec 60] .
+  op _%=_ : Var Exp -> StExp [prec 60] .
+endfm
+
+fmod BLOCK-SYNTAX is 
+  sorts Block BlockStatements .
+  subsort Block < BlockStatements .
+  op ; : -> Block .
+  op {_} : BlockStatements -> Block .
+  op __ : BlockStatements BlockStatements -> BlockStatements [assoc prec 125] .
+endfm
+
+fmod DECLARATION-SYNTAX is pr TYPE .
+  ex GENERIC-EXP-SYNTAX .
+  ex BLOCK-SYNTAX .
+  sort Declaration Declarator Declarators .
+---  subsort Declaration < BlockStatements .
+  subsort DName < Declarator < Declarators .
+  op __ : Type Declarators -> Declaration [prec 70] .
+  op _=_ : DName Exp -> Declarators [prec 60] .
+  op _,_ : Declarators Declarators -> Declarators [assoc prec 65] .
+  op _; : Declaration -> BlockStatements [prec 75] .
+endfm
+
+fmod CLASS-SYNTAX is pr TYPE .
+  sorts Modifier ClassMember ClassMembers ClassBody Supers Class .
+  subsort ClassMember < ClassMembers .
+  ops final static abstract public private protected volatile transient synchronized native : -> Modifier .
+  op __ : Modifier Modifier -> Modifier [comm assoc prec 30] .
+  op ; : -> ClassBody .
+  op {} : -> ClassBody .
+  op {_} : ClassMembers -> ClassBody [prec 80] .
+  op noMember : -> ClassMembers .
+  op __ : ClassMembers ClassMembers -> ClassMembers [assoc prec 100 id: noMember] .
+  op __ : Modifier ClassMember -> ClassMember [prec 98 gather(E e)] .
+  op extends_ : CType -> Supers [prec 85] .
+  op extends_implements_ : CType ITypes -> Supers [prec 85] .
+  op implements_ : IType -> Supers [prec 85] .
+  op _Class___ : Modifier Qid Supers ClassBody -> Class [prec 90] .
+  op Class___ : Qid Supers ClassBody -> Class [prec 90] .
+  op _Class__ : Modifier Qid ClassBody -> Class [prec 90] .
+  op Class__ : Qid ClassBody -> Class [prec 90] .
+  op _class___ : Modifier Qid Supers ClassBody -> Class [prec 90] .
+  op class___ : Qid Supers ClassBody -> Class [prec 90] .
+  op _class__ : Modifier Qid ClassBody -> Class [prec 90] .
+  op class__ : Qid ClassBody -> Class [prec 90] .
+  op _Interface_extends__ : Modifier Qid ITypes ClassBody -> Class [prec 90] .
+  op Interface_extends__ : Qid ITypes ClassBody -> Class [prec 90] .
+  op _Interface__ : Modifier Qid ClassBody -> Class [prec 90] .
+  op Interface__ : Qid ClassBody -> Class [prec 90] .
+endfm
+
+
+fmod FIELD-DECLARATION-SYNTAX is ex CLASS-SYNTAX .
+  ex DECLARATION-SYNTAX .
+  sort FieldDeclaration .
+  subsort FieldDeclaration < ClassMember .
+  op _; : Declaration -> FieldDeclaration [prec 75] .
+---  op __ : Modifier FieldDeclaration -> FieldDeclaration [prec 98 gather(E e)] .
+endfm
+
+fmod METHOD-DECLARATION-SYNTAX is ex CLASS-SYNTAX .
+  ex DECLARATION-SYNTAX .
+  ex TYPE .
+  sorts MethodDeclaration Parameters .
+  subsort MethodDeclaration < ClassMember .
+---  subsort Declaration < Parameters .
+  op void : -> Type .
+  op `(`) : -> Parameters .
+  op __ : Type DName -> Parameters [prec 75] .
+  op _,_ : Parameters Parameters -> Parameters [assoc prec 80 id: ()] .
+  op ____ : Type Qid Parameters Block -> MethodDeclaration [prec 95] .
+  op ___throws__ : Type Qid Parameters CTypes Block -> MethodDeclaration [prec 95] .
+---  op void___ : Qid Parameters Block -> MethodDeclaration [prec 95] .
+---  op void__throws__ : Qid Parameters CTypes Block -> MethodDeclaration [prec 95] .
+  op ___ : Qid Parameters Block -> MethodDeclaration [prec 95] .
+  op __throws__ : Qid Parameters CTypes Block -> MethodDeclaration [prec 95] .
+---  op __ : Modifier MethodDeclaration -> MethodDeclaration [prec 98 gather(E e)] .
+endfm
+
+fmod STATEMENT-SYNTAX is ex BLOCK-SYNTAX .
+  pr QID .
+  sort Statement .
+  subsort Block < Statement < BlockStatements .
+  op _:_ : Qid Statement -> Statement [prec 120] .
+endfm
+
+fmod EXP-STATEMENT-SYNTAX is ex STATEMENT-SYNTAX .
+  ex GENERIC-EXP-SYNTAX .
+  op _; : StExp -> Statement [prec 110] .
+endfm
+
+fmod IF-SYNTAX is ex STATEMENT-SYNTAX .
+  ex GENERIC-EXP-SYNTAX .
+  op if__else_fi : Exp Statement Statement -> Statement [prec 110] .
+  op if__fi : Exp Statement -> Statement [prec 110] .
+endfm
+
+fmod SWITCH-SYNTAX is ex STATEMENT-SYNTAX .
+  ex GENERIC-EXP-SYNTAX .
+  sorts SwitchLabel SwitchLabels SwitchItem SwitchItems .
+  subsort SwitchLabel < SwitchLabels .
+  subsort SwitchItem < SwitchItems .
+  op case_: : Exp -> SwitchLabel .
+  op default: : -> SwitchLabel .
+  op __ : SwitchLabels SwitchLabels -> SwitchLabels [assoc] .
+  op __ : SwitchLabels Statement -> SwitchItem [prec 115] .
+  op __ : SwitchItems SwitchItems -> SwitchItems [assoc prec 120] .
+  op switch_{_} : Exp SwitchItems -> Statement [prec 110] .
+endfm
+
+fmod WHILE-SYNTAX is ex STATEMENT-SYNTAX .
+  ex GENERIC-EXP-SYNTAX .
+  op while__ : Exp Statement -> Statement [prec 110] .
+endfm
+
+fmod DO-SYNTAX is ex STATEMENT-SYNTAX .
+  ex GENERIC-EXP-SYNTAX .
+  op do_while_; : Statement Exp -> Statement [prec 110] .
+endfm
+
+fmod FOR-SYNTAX is ex STATEMENT-SYNTAX .
+  ex GENERIC-EXP-SYNTAX .
+  ex DECLARATION-SYNTAX .
+  op for(_;_;_)_ : Exps Exp Exps Statement -> Statement [prec 110] .
+  op for(_;_;_)_ : Declaration Exp Exps Statement -> Statement [prec 110] .
+endfm
+
+fmod BREAK-SYNTAX is ex STATEMENT-SYNTAX .
+  ex GENERIC-EXP-SYNTAX .
+  op break; : -> Statement .
+  op break_; : Qid -> Statement .
+endfm
+
+fmod CONTINUE-SYNTAX is ex STATEMENT-SYNTAX .
+  ex GENERIC-EXP-SYNTAX .
+  op continue; : -> Statement .
+  op continue_; : Qid -> Statement .
+endfm
+
+fmod RETURN-SYNTAX is ex STATEMENT-SYNTAX .
+  ex GENERIC-EXP-SYNTAX .
+  op return; : -> Statement .
+  op return_; : Exp -> Statement .
+endfm
+
+fmod THROW-SYNTAX is ex STATEMENT-SYNTAX .
+  ex GENERIC-EXP-SYNTAX .
+  op throw_; : Exp -> Statement .
+endfm
+
+fmod SYNCHRONIZED-SYNTAX is ex STATEMENT-SYNTAX .
+  ex GENERIC-EXP-SYNTAX .
+  op synchronized__ : Exp Block -> Statement [prec 110] .
+endfm
+
+fmod TRY-SYNTAX is ex STATEMENT-SYNTAX .
+  ex GENERIC-EXP-SYNTAX .
+  pr TYPE .
+  sorts CatchClause Catches .
+  subsort CatchClause < Catches .
+  op catch`(__`)_ : Type DName Block -> CatchClause [prec 95] .
+  op __ : Catches Catches -> Catches [assoc prec 100] .
+  op try__finally_ : Block Catches Block -> Statement [prec 110] .
+  op try__ : Block Catches -> Statement [prec 110] .
+  op try_finally_ : Block Block -> Statement [prec 110] .
+endfm
+
+fmod CLASS-LIST is ex CLASS-SYNTAX .
+  sort Classes .
+  subsort Class < Classes .
+  op noClass : -> Classes .
+  op __ : Classes Classes -> Classes [assoc comm prec 110 id: noClass] .
+endfm
+
+fmod PGM-SYNTAX is 
+  ex UNARY-EXP-SYNTAX .
+  ex ARITH-EXP-SYNTAX .
+  ex REXP-SYNTAX .
+  ex BEXP-SYNTAX .
+  ex CEXP-SYNTAX .
+  ex ARRAY-SYNTAX .
+  ex CLASS-MEMBER-SYNTAX .
+  ex METHOD-CALL-SYNTAX .
+  ex NEW-SYNTAX .
+  ex ASSIGNM-EXP-SYNTAX .
+  ex DECLARATION-SYNTAX .
+  ex CLASS-SYNTAX .
+  ex FIELD-DECLARATION-SYNTAX .
+  ex METHOD-DECLARATION-SYNTAX .
+  ex EXP-STATEMENT-SYNTAX .
+  ex IF-SYNTAX .
+  ex SWITCH-SYNTAX .
+  ex WHILE-SYNTAX .
+  ex DO-SYNTAX .
+  ex FOR-SYNTAX .
+  ex BREAK-SYNTAX .
+  ex CONTINUE-SYNTAX .
+  ex RETURN-SYNTAX .
+  ex THROW-SYNTAX .
+  ex SYNCHRONIZED-SYNTAX .
+  ex TRY-SYNTAX .
+  ex CLASS-LIST .
+  sort Pgm .
+  op __ : Classes Exp -> Pgm [prec 120] .
+endfm
+
+--------------
+--- Semantics ---
+--------------
+
+fmod LOCATION is
+  protecting INT .
+  sorts Location LocationList .
+  sort TacletNewLocation . ---- ADDED
+  subsort TacletNewLocation < Location . ---- ADDED
+  subsort Location < LocationList .
+  op noLoc : -> LocationList .
+  op _,_ : LocationList LocationList -> LocationList [assoc id: noLoc] .
+  op l : Nat -> Location .
+  op l : Nat Nat -> LocationList .
+  vars N # : Nat .
+  eq l(N,0) = noLoc .
+  eq l(N,#) = l(N), l(N + 1, # - 1) .
+endfm
+
+fmod ENVIRONMENT is protecting LOCATION .
+  protecting NAME .
+  sort Env .
+  op noEnv : -> Env .
+  op [_,_] : Name Location -> Env .
+  op __ : Env Env -> Env [assoc comm id: noEnv] .
+  op _[_<-_] : Env NameList LocationList -> Env .
+  var X : Name .  vars Env : Env .  vars L L' : Location .
+  var Xl : NameList .  var Ll : LocationList .
+  eq Env[() <- noLoc] = Env .
+  eq ([X,L] Env)[X,Xl <- L',Ll] = ([X,L'] Env)[Xl <- Ll] .
+  eq Env[X,Xl <- L,Ll] = (Env [X,L])[Xl <- Ll] [owise] .
+endfm
+
+fmod VALUE is
+  sorts Value ValueList .
+  subsort Value < ValueList .
+  op noVal : -> ValueList .
+  op _,_ : ValueList ValueList -> ValueList [assoc id: noVal] .
+  op [_] : ValueList -> Value .
+  op ReplaceWith : Value Value -> Value .
+endfm
+
+fmod STORE is protecting LOCATION .
+  extending VALUE .
+  sort Store .
+  op noStore : -> Store .
+  op [_,_] : Location Value -> Store .
+  op __ : Store Store -> Store [assoc comm id: noStore] .
+---  op _[_<-_] : Store LocationList ValueList -> Store .
+---  op set : Location Value Store -> Store .
+---  var L : Location .  var M : Store .  vars V V' : Value .
+---  var Ll : LocationList .  var Vl : ValueList .
+---  eq M[noLoc <- noVal] = M .
+---  eq ([L,V] M)[L,Ll <- V',Vl] = set(L, V', [L,V] M)[Ll <- Vl] .
+---  eq M[L,Ll <- V',Vl] = (M [L,V'])[Ll <- Vl] [owise] .
+---  rl set(L, V', [L,V] M) => ([L,ReplaceWith(V,V')] M) .
+endfm
+
+fmod CONTINUATION is
+  sort Continuation .
+  op stop : -> Continuation .
+  op pause ->_ : Continuation -> Continuation . --- ADDED
+endfm
+
+fmod ARRAY-ENV is ex INT .
+  ex LOCATION .
+  pr TYPE .
+  sort ArrayEnv .
+  op noArrayEnv : -> ArrayEnv .
+  op [_,_] : Int Location -> ArrayEnv .
+  op __ : ArrayEnv ArrayEnv -> ArrayEnv [assoc comm id: noArrayEnv] .
+endfm
+
+fmod ARRAY is ex ARRAY-ENV .
+  ex VALUE .
+  sort Array .
+  subsort Array < Value .
+  op a : Type ArrayEnv -> Array .
+  vars T T' : Type . vars aEnv aEnv' : ArrayEnv .
+  eq ReplaceWith(a(T, aEnv), a(T', aEnv')) = a(T, aEnv') .
+endfm
+
+fmod OBJ-ENV is ex ENVIRONMENT .
+  pr TYPE .
+  sort ObjEnv .
+  op noObjEnv : -> ObjEnv .
+  op (_,_) : CType Env -> ObjEnv .
+  op __ : ObjEnv ObjEnv -> ObjEnv [comm assoc id: noObjEnv] .
+endfm
+
+fmod OBJECT is ex OBJ-ENV .
+  ex VALUE .
+  sort Object .
+  subsort Object < Value .
+  op o : CType CType ObjEnv -> Object . *** the first class is the current class, while the second is the original one --- COMMENT ADDED: in java terms the first one is the static type (of the "rich" reference this is) and the second is the dynamic type, i.e. the type this object has actually been created with.
+  vars CT CT' CT'' CT''' : CType . vars oEnv oEnv' : ObjEnv .
+  eq ReplaceWith(o(CT, CT', oEnv), o(CT'', CT''', oEnv')) = o(CT, CT''', oEnv') .
+endfm
+
+fmod SUPER-CLASS is ex CLASS-LIST .
+  ex TYPE .
+  op SuperClass : CType Classes -> [CType] [memo] .
+  op SuperOf : CType CType Classes -> Bool [memo] .
+  var Xc Xc' : Qid . var IL : ITypes . var CT : CType .
+  var m : Modifier . var CB : ClassBody .
+  var Cl : Classes . 
+  eq SuperClass(#c(Xc), ((m Class Xc extends CT implements IL CB) Cl) ) = CT .
+  eq SuperClass(#c(Xc), ((Class Xc extends CT implements IL CB) Cl)) = CT .
+  eq SuperClass(#c(Xc), ((m Class Xc extends CT CB) Cl)) = CT .
+  eq SuperClass(#c(Xc), ((Class Xc extends CT CB) Cl)) = CT .
+  eq SuperClass(#c(Xc), Cl) = Object [owise] .
+  eq SuperOf(CT, CT, Cl) = true .
+  eq SuperOf(Object, #c(Xc), Cl) = true .
+  eq SuperOf(#c(Xc), Object, Cl) = false .
+  eq SuperOf(#c(Xc), #c(Xc'), Cl) = SuperOf(#c(Xc), SuperClass(#c(Xc'), Cl), Cl) .
+endfm
+
+fmod OUTPUT is ex VALUE .
+  ex STORE .
+  sort Output .
+  op O : Value -> Output .
+  op O : Value Store -> Output .
+  op noOutput : -> Output .
+  op _,_ : Output Output -> Output [assoc id: noOutput] .
+endfm
+
+mod LOCK is ex OBJECT .
+  sorts LockStatus LockItem LockList .
+  subsort LockItem < LockList .
+  ops locked unlocked waiting ready : -> LockStatus .
+  op [_,_] : Object LockStatus -> LockItem .
+  op noLock : -> LockList .
+  op __ : LockList LockList -> LockList [assoc comm id: noLock] .
+endm
+
+fmod STATE is
+  extending CLASS-LIST .
+  extending ENVIRONMENT .
+  extending STORE .
+  extending CONTINUATION .
+  extending OBJECT .
+  ex LOCK .
+  ex OUTPUT .
+  sorts Context ContextItem StateAttribute MyState .
+  subsort StateAttribute < MyState .
+  subsort ContextItem < Context .
+  op noItem : -> Context .
+  op _,_ : Context Context -> Context [assoc comm id: noItem] .
+  op empty : -> MyState .
+  op _,_ : MyState MyState -> MyState [assoc comm id: empty] .
+  op k : Continuation -> ContextItem .
+  op e : Env -> ContextItem .
+  op o : Object -> ContextItem .
+---  op wl : Object -> ContextItem .
+  op c : Context -> StateAttribute .
+  op n : Nat -> StateAttribute .
+  op m : Store -> StateAttribute .
+  op l : LockList -> StateAttribute .
+  op w : LockList -> StateAttribute .
+  op cl (_) : Classes -> StateAttribute . *** weird, if I don't add (_), it cannot parse cl(C Cl), C is Class, Cl is Classes !!!
+  op s : ObjEnv -> StateAttribute . *** to store the static members of classes
+  op out : Output -> StateAttribute .
+endfm
+
+mod GENERIC-EXP-SEMANTICS is protecting GENERIC-EXP-SYNTAX .
+  protecting STATE .
+  op _->_ : Exps Continuation -> Continuation .
+  op _->_ : ValueList Continuation -> Continuation .
+
+  vars E E' : Exp .  var El : Exps .
+  vars V V' : Value .  var Vl Vl' : ValueList .
+  var L : Location .  var Ll : LocationList .
+  var X : Name .  var Xl : NameList .
+  var S : MyState .  vars I I' : Int .  var K : Continuation .
+  var M : Store .  vars Env Env' : Env .
+  vars f f' : Float . vars str str' : String . var cnt : Context .
+  vars obj obj' : Object .
+
+  op int : Int -> Value .
+  op fl : Float -> Value .
+  op str : String -> Value .
+  eq k(#i(I) -> K) = k(int(I) -> K) .
+  eq k(#f(f) -> K) = k(fl(f) -> K) .
+  eq k(#s(str) -> K) = k(str(str) -> K) .
+  eq ReplaceWith(int(I), int(I')) = int(I') .
+  eq ReplaceWith(fl(f), fl(f')) = fl(f') .
+  eq ReplaceWith(str(str), str(str')) = str(str') .
+
+  op [_|_] -> _ : Exps ValueList Continuation -> Continuation .
+  eq k((E,E',El) -> K) = k(E -> [E',El | noVal] -> K) .
+  eq k(V -> [() | Vl] -> K) = k((Vl,V) -> K) .
+  eq k(V -> [E,El | Vl] -> K) = k(E -> [El | Vl,V] -> K) .
+  eq k(() -> K) = k(noVal -> K) .
+
+  eq k(this -> K), o(obj) = k(obj -> K), o(obj) .
+
+******currently, there is no check for type compitibility in assignment, this can be done in ReplaceWith !!! ---- ADDED to this is stuff below which does it
+  op _->_ : LocationList Continuation -> Continuation .
+  op change (_,_) -> _ : Value Location Continuation -> Continuation .
+  
+  ---- 2 new operators which do type checking and change the memory only
+  ---- after the type check has been ok
+  op typecheck (_,_,_) -> _ : Value Value Location Continuation -> Continuation . ---- ADDED
+  op change-checked (_,_) -> _ : Value Location Continuation -> Continuation . ---- ADDED
+  ---- this is the exception which is thrown if the typecheck fails for a write
+  op ClassCastException : Value Value Location -> Exp . ---- ADDED
+
+  ---- this is the exception which is thrown if the typecheck fails for a cast
+  op ClassCastException : Type Value -> Exp . ---- ADDED
+ 
+  eq c(k(noVal -> noLoc -> K), cnt), m(M) = c(k(K), cnt), m(M) .
+  eq c(k((V, Vl) -> (L, Ll) -> K), cnt), m([L, V'] M) = c(k(change(V, L) -> (Vl -> Ll -> K)), cnt), m([L, V'] M) .
+  eq c(k((V, Vl) -> (L, Ll) -> K), cnt), m(M) = c(k(Vl -> Ll -> K), cnt), m([L, V] M) [owise] .
+
+  ---- rl c(k(change(V, L) -> K), cnt), m([L, V'] M) => c(k(K), cnt), m([L, V] M) . ---- ADDED: This is replaced by the rule below.
+  
+  ---- this has to be a rule even though we only need the static
+  ---- type of V because we want whatever is inside V to be fully
+  ---- equationally simplified before taking it out again. The first argument
+  ---- of "typecheck" is the value from the memory,
+  ---- which contains the type, resp. the static type of a reference, which we
+  ---- want, the second value is the one we want to assign to that location.
+  rl c(k(change(V, L) -> K), cnt), m([L, V'] M) => 
+       c(k(typecheck(V', V, L) -> K), cnt), m([L, V'] M) . ---- ADDED as replacement for the rule above.
+
+  ---- now this is the rule that does the actual memory write, like "change"
+  ---- did in the original version, but this is only invoked after the type
+  ---- check has been done, which happens further down.
+  rl c(k(change-checked(V, L) -> K), cnt), m([L, V'] M) 
+     => c(k(K), cnt), m([L, ReplaceWith(V', V)] M) . ---- ADDED
+
+
+  op set&fetch_->_ : LocationList Continuation -> Continuation .
+  op set&fetch(_;_)->_ : LocationList ValueList Continuation -> Continuation .
+****** what is the exact semantics for x = x + 1 under concurency? 1. set x + 1 to x, and return x + 1 directly
+****** 2. set x + 1 to x, and then get the value of x? I use the first one now. the same to x ++
+  eq k(Vl -> set&fetch(Ll) -> K) = k(Vl -> (set&fetch (Ll ; noVal) -> K)) .
+  eq c(k((V, Vl) -> set&fetch((L,Ll) ; Vl') -> K), cnt), m([L, V'] M) = c(k(change(V, L) -> (Vl -> set&fetch(Ll ; (Vl', V)) -> K)), cnt), m([L, V'] M) .
+  eq k(noVal -> set&fetch(noLoc ; Vl) -> K) = k(Vl -> K) .
+  eq c(k((V, Vl) -> set&fetch((L,Ll) ; Vl') -> K), cnt), m(M) = c(k(Vl -> set&fetch(Ll ; (Vl' , V)) -> K), cnt), m([L, V] M) [owise] .
+
+  op _->_ : Env Continuation -> Continuation .
+  eq c(k(Vl -> Env -> K), e(Env'), cnt) = c(k(Vl -> K), e(Env'), cnt) .
+  eq c(k(Env -> K), e(Env'), cnt) = c(k(K), e(Env'), cnt) .
+  op o_->_ :  Object Continuation -> Continuation .
+  eq k(Vl -> o(obj) -> K), o(obj') = k(Vl -> K), o(obj) .
+
+  op length_ : NameList -> Nat .
+  eq length() = 0 .
+  eq length(X,Xl) = 1 + length(Xl) .
+endm
+
+fmod LOCATION-SEMANTICS is ex GENERIC-EXP-SEMANTICS .
+  pr CLASS-MEMBER-SYNTAX .
+  pr ARRAY-SYNTAX .
+  pr ARRAY .
+  pr OBJECT .
+  op loc_ -> _ : Exp Continuation -> Continuation .
+  op loc -> _ : Continuation -> Continuation .
+  vars E E' : Exp .  var El : Exps .
+  var V : Value .  var Vl : ValueList .
+  var L : Location .  var Ll : LocationList .
+  var X : Name .  var Xl : NameList .
+  var S : MyState .  var I : Int .  var K : Continuation .
+  var M : Store .  vars Env Env' : Env .
+  var T : Type . var aEnv : ArrayEnv . var cnt : Context  .
+  vars CT CT' CT'' : CType . var oEnv : ObjEnv .
+  eq c(k(loc(X) -> K), e([X, L] Env), cnt) = c(k(L -> K), e([X, L] Env), cnt) .
+  eq k(loc(E [ E' ]) -> K) = k((E, E') -> loc -> K) .
+  eq k((a(T, [I,L] aEnv), int(I)) -> loc -> K) = k(L -> K) .
+endfm
+
+mod UNARY-EXP-SEMANTICS is ex UNARY-EXP-SYNTAX .
+  extending GENERIC-EXP-SEMANTICS .
+  extending LOCATION-SEMANTICS .
+  pr CONVERSION .
+  op ++? -> _ : Continuation -> Continuation .
+  op --? -> _ : Continuation -> Continuation .
+  op ?++ -> _ : Continuation -> Continuation .
+  op ?-- -> _ : Continuation -> Continuation .
+  op {_} -> _ : Type Continuation -> Continuation .
+  vars E E' : Exp .  var K : Continuation .  vars I I' : Int .
+  vars f f' : Float . vars str str' : String .
+  var L : Location . var M : Store . var cnt : Context .
+  var T : Type . var CT CT' CT'' : CType .
+  var oEnv : ObjEnv .
+  var Cl : Classes . ---- ADDED
+
+  eq k((++ E) -> K) = k( loc(E) -> ++? -> K ) .
+  rl c(k(L -> ++? -> K), cnt), m([L,int(I)] M) => c(k(int(I + 1) -> K), cnt), m([L, int(I + 1)] M) .
+  eq k((-- E) -> K) = k( loc(E) -> --? -> K ) .
+  rl c(k(L -> --? -> K), cnt), m([L,int(I)] M) => c(k(int(I - 1) -> K), cnt), m([L, int(I - 1)] M) .
+  eq k((E ++) -> K) = k( loc(E) -> ?++ -> K ) .
+  rl c(k(L -> ?++ -> K), cnt), m([L,int(I)] M) => c(k(int(I) -> K), cnt), m([L, int(I + 1)] M) .
+  eq k((E --) -> K) = k( loc(E) -> ?-- -> K ) .
+  rl c(k(L -> ?-- -> K), cnt), m([L,int(I)] M) => c(k(int(I) -> K), cnt), m([L, int(I - 1)] M) .
+  eq k(({ T } E) -> K) = k(E -> {T} -> K) .
+***** Cast expression is not complete yet
+  eq k(int(I) -> {float} -> K) = k(fl(float(I)) -> K) .
+  eq k(fl(f) -> {int} -> K) = k(int(trunc(rat(f))) -> K) .
+
+  ---- eq k(o(CT, CT', oEnv) -> {CT''} -> K) = k(o(CT'', CT', oEnv) -> K) . *** may need type check here !!! ---- ADDED: replaced by an equation in the final module, it is marked with: "ADDED-CAST-TYPE-CHECK", can not be put here because it needs "throw", "ClassCastException", "SuperOf" and so on. 
+
+endm
+
+fmod ARITH-EXP-SEMANTICS is protecting ARITH-EXP-SYNTAX .
+  extending GENERIC-EXP-SEMANTICS .
+  op + -> _ : Continuation -> Continuation .
+  op - -> _ : Continuation -> Continuation .
+  op * -> _ : Continuation -> Continuation .
+  op / -> _ : Continuation -> Continuation .
+  op % -> _ : Continuation -> Continuation .
+  vars E E' : Exp .  var K : Continuation .  vars I I' : Int .
+  vars f f' : Float . vars str str' : String .
+  eq k((E + E') -> K) = k((E,E') -> + -> K) .
+  eq k((int(I), int(I')) -> + -> K) = k(int(I + I') -> K) .
+  eq k((fl(f), fl(f')) -> + -> K) = k(fl(f + f') -> K) .
+  eq k((str(str), str(str')) -> + -> K) = k(str(str + str') -> K) .
+  eq k((E - E') -> K) = k((E,E') -> - -> K) .
+  eq k((int(I), int(I')) -> - -> K) = k(int(I - I') -> K) .
+  eq k((fl(f), fl(f')) -> - -> K) = k(fl(f - f') -> K) .
+  eq k((E * E') -> K) = k((E,E') -> * -> K) .
+  eq k((int(I), int(I')) -> * -> K) = k(int(I * I') -> K) .
+  eq k((fl(f), fl(f')) -> * -> K) = k(fl(f * f') -> K) .
+  eq k((E / E') -> K) = k((E,E') -> / -> K) .
+  eq k((int(I), int(I')) -> / -> K) = k(int(I quo I') -> K) .
+  eq k((fl(f), fl(f')) -> / -> K) = k(fl(f / f') -> K) .
+  eq k((E % E') -> K) = k((E,E') -> % -> K) .
+  eq k((int(I), int(I')) -> % -> K) = k(int(I rem I') -> K) .
+endfm
+
+fmod REXP-SEMANTICS is pr REXP-SYNTAX .
+  extending GENERIC-EXP-SEMANTICS .
+  op bool : Bool -> Value .
+  op == -> _ : Continuation -> Continuation .
+  op != -> _ : Continuation -> Continuation .
+  op < -> _  : Continuation -> Continuation .
+  op <= -> _ : Continuation -> Continuation .
+  op > -> _  : Continuation -> Continuation .
+  op >= -> _ : Continuation -> Continuation .
+  vars E E' : Exp .  var K : Continuation .
+  vars I I' : Int .  vars B B' : Bool .
+  vars f f' : Float .
+  eq k(#b(B) -> K) = k(bool(B) -> K) .
+  eq k((E == E') -> K) = k((E,E') -> == -> K) .
+  eq k((int(I),int(I')) -> == -> K) = k(bool(I == I') -> K) .
+  eq k((fl(f),fl(f')) -> == -> K) = k(bool(f == f') -> K) .
+  eq k((E != E') -> K) = k((E,E') -> != -> K) .
+  eq k((int(I),int(I')) -> != -> K) = k(bool(not (I == I')) -> K) .
+  eq k((fl(f),fl(f')) -> >= -> K) = k(bool(not (f == f')) -> K) .
+  eq k((E >= E') -> K) = k((E,E') -> >= -> K) .
+  eq k((int(I),int(I')) -> >= -> K) = k(bool(I >= I') -> K) .
+  eq k((fl(f),fl(f')) -> >= -> K) = k(bool(f >= f') -> K) .
+  eq k((E > E') -> K) = k((E,E') -> > -> K) .
+  eq k((int(I),int(I')) -> > -> K) = k(bool(I > I') -> K) .
+  eq k((fl(f),fl(f')) -> > -> K) = k(bool(f > f') -> K) .
+  eq k((E <= E') -> K) = k((E,E') -> <= -> K) .
+  eq k((int(I),int(I')) -> <= -> K) = k(bool(I <= I') -> K) .
+  eq k((fl(f),fl(f')) -> <= -> K) = k(bool(f <= f') -> K) .
+  eq k((E < E') -> K) = k((E,E') -> < -> K) .
+  eq k((int(I),int(I')) -> < -> K) = k(bool(I < I') -> K) .
+  eq k((fl(f),fl(f')) -> < -> K) = k(bool(f < f') -> K) .
+endfm
+
+fmod BEXP-SEMANTICS is protecting BEXP-SYNTAX .
+  extending REXP-SEMANTICS .
+  op ! -> _  : Continuation -> Continuation .
+  op && -> _ : Continuation -> Continuation .
+  op || -> _ : Continuation -> Continuation .
+
+  vars E E' : Exp .  var K : Continuation .
+  vars I I' : Int .  vars B B' : Bool .
+  eq k((! E) -> K) = k(E -> ! -> K) .
+  eq k(bool(B) -> ! -> K) = k(bool(not B) -> K) .
+  
+  --- the old (strict, therefore faulty) definition of &&
+  --- eq k((E && E') -> K) = k((E,E') -> && -> K) .  
+  --- eq k((bool(B),bool(B')) -> && -> K) = k(bool(B and B') -> K) .
+
+  --- fixed && to be lazily evaluated as the java spec defines it to be
+  eq k((E && E') -> K) = k(E -> && -> (E' -> K)) .
+  eq k(bool(false) -> && -> (E' -> K)) = k(bool(false) -> K) .
+  eq k(bool(B) -> && -> (bool(B') -> K)) = k(bool(B' and B) -> K) .
+  eq k(bool(B) -> && -> (E' -> K)) = k(E' -> && -> (bool(B) -> K)) [owise] .
+  
+
+  --- the old (strict, therefore faulty) definition of || 
+  --- eq k((E || E') -> K) = k((E,E') -> || -> K) .  
+  --- eq k((bool(B),bool(B')) -> || -> K) = k(bool(B or B') -> K) .
+
+  --- fixed || to be lazily evaluated as the java spec defines it to be
+  eq k((E || E') -> K) = k(E -> || -> (E' -> K)) .
+  eq k(bool(true) -> || -> (E' -> K)) = k(bool(true) -> K) .
+  eq k(bool(B) -> || -> (bool(B') -> K)) = k(bool(B' or B) -> K) .
+  eq k(bool(B) -> || -> (E' -> K)) = k(E' -> || -> (bool(B) -> K)) [owise] .
+
+endfm
+
+mod ASSIGNM-EXP-SEMANTICS is ex ASSIGNM-EXP-SYNTAX .
+  ex GENERIC-EXP-SEMANTICS .
+  ex LOCATION-SEMANTICS .
+  pr ARITH-EXP-SEMANTICS .
+  op =_ -> _ : Exp Continuation -> Continuation .
+  op +=_ -> _ : Exp Continuation -> Continuation .
+  op -=_ -> _ : Exp Continuation -> Continuation .
+  op *=_ -> _ : Exp Continuation -> Continuation .
+  op /=_ -> _ : Exp Continuation -> Continuation .
+  op %=_ -> _ : Exp Continuation -> Continuation .
+  vars E E' : Exp .  var K : Continuation .  vars I I' : Int .
+  vars f f' : Float . vars str str' : String .
+  var L : Location . var M : Store . var V : Value .
+  var T : Type . var CT CT' CT'' : CType .
+  var oEnv : ObjEnv . var X : Var . var cnt : Context .
+  eq k((X = E) -> K) = k(loc(X) -> = (E) -> K) .
+  eq k(L -> = (E) -> K) = k(E -> set&fetch(L) -> K) .
+  eq k((X += E) -> K) = k(loc(X) -> += (E) -> K) .
+  --- rl c(k(L -> += (E) -> K), cnt), m([L,V] M) => c(k([E | V] -> + -> (set&fetch(L) -> K)), cnt), m([L,V] M) . --- original but faulty!
+  rl c(k(L -> += (E) -> K), cnt), m([L,V] M) => c(k(V -> [E | noVal] -> + -> (set&fetch(L) -> K)), cnt), m([L,V] M) . --- ADDED, i.e. changed!
+  eq k((X -= E) -> K) = k(loc(X) -> -= (E) -> K) .
+  --- rl c(k(L -> -= (E) -> K), cnt), m([L,V] M) => c(k([E | V] -> - -> (set&fetch(L) -> K)), cnt), m([L,V] M) . --- original but faulty!
+  rl c(k(L -> -= (E) -> K), cnt), m([L,V] M) => c(k(V -> [E | noVal] -> - -> (set&fetch(L) -> K)), cnt), m([L,V] M) . --- ADDED, i.e. changed!
+  eq k((X *= E) -> K) = k(loc(X) -> *= (E) -> K) .
+  --- rl c(k(L -> *= (E) -> K), cnt), m([L,V] M) => c(k([E | V] -> * -> (set&fetch(L) -> K)), cnt), m([L,V] M) . --- original but faulty!
+  rl c(k(L -> *= (E) -> K), cnt), m([L,V] M) => c(k(V -> [E | noVal] -> * -> (set&fetch(L) -> K)), cnt), m([L,V] M) . --- ADDED, i.e. changed!
+  eq k((X /= E) -> K) = k(loc(X) -> /= (E) -> K) .
+  --- rl c(k(L -> /= (E) -> K), cnt), m([L,V] M) => c(k([E | V] -> / -> (set&fetch(L) -> K)), cnt), m([L,V] M) . --- original but faulty!
+  rl c(k(L -> /= (E) -> K), cnt), m([L,V] M) => c(k(V -> [E | noVal] -> / -> (set&fetch(L) -> K)), cnt), m([L,V] M) . --- ADDED, i.e. changed!
+  eq k((X %= E) -> K) = k(loc(X) -> %= (E) -> K) .
+  --- rl c(k(L -> %= (E) -> K), cnt), m([L,V] M) => c(k([E | V] -> % -> (set&fetch(L) -> K)), cnt), m([L,V] M) . --- original but faulty!
+  rl c(k(L -> %= (E) -> K), cnt), m([L,V] M) => c(k(V -> [E | noVal] -> % -> (set&fetch(L) -> K)), cnt), m([L,V] M) . --- ADDED, i.e. changed!
+endm
+
+mod ARRAY-SEMANTICS is ex ARRAY-SYNTAX  .
+  ex GENERIC-EXP-SEMANTICS .
+  ex ARRAY .
+  op [] -> _ : Continuation -> Continuation .
+  vars E E' : Exp . var T : Type . var aEnv : ArrayEnv . var M : Store .
+  var I : Int . var L : Location . var V : Value . var K : Continuation . var cnt : Context .
+  eq k((E [ E' ]) -> K) = k((E, E') -> [] -> K) .
+  rl c(k((a(T, [I,L] aEnv), int(I)) -> [] -> K), cnt), m([L,V] M) => c(k(V -> K), cnt), m([L,V] M) .
+endm
+
+mod FIELD-SEMANTICS is ex CLASS-MEMBER-SYNTAX .
+  ex GENERIC-EXP-SEMANTICS .
+  ex LOCATION-SEMANTICS .
+  pr SUPER-CLASS .
+***** based on the parsing stratage, if the member is an array, it will be handled in the array semantics
+  op ._ -> _ : Name Continuation -> Continuation .
+  op s._ -> _ : Name Continuation -> Continuation .
+  op fetch _ -> _ : Location Continuation -> Continuation .
+  vars E E' : Exp . var X : Name . var K : Continuation . var Cl : Classes .
+  vars CT CT' CT'' : CType . vars oEnv oEnv' : ObjEnv . var V : Value .
+  var Env : Env . var L : Location . var M : Store . var obj : Object . var cnt : Context .
+  eq k((E . X) -> K) = k( E -> . (X) -> K) .
+  eq k(o(CT, CT', ((CT, [X,L] Env) oEnv)) -> . (X) -> K) = k(fetch(L) -> K) .
+  eq k(o(CT, CT', oEnv) -> . (X) -> K) = k(o(CT, CT', oEnv) -> s. (X) -> K) [owise] .
+  eq c(k(o(CT, CT', oEnv) -> s. (X) -> K), cnt), s((CT,[X,L] Env) oEnv') 
+     = c(k(fetch(L) -> K), cnt), s((CT,[X,L] Env) oEnv') .
+  eq c(k(o(CT, CT', oEnv) -> s. (X) -> K), cnt), cl(Cl) = c(k(o(SuperClass(CT, Cl), CT', oEnv) -> . (X) -> K), cnt), cl(Cl) [owise] .
+  eq c(k(X -> K), e([X,L] Env), o(obj), cnt) =
+     c(k(fetch(L) -> K), e([X,L] Env), o(obj), cnt) .
+  eq c(k(X -> K), e(Env), o(obj), cnt) = c(k(obj -> . (X) -> K), e(Env), o(obj), cnt) [owise] . *** extend the semantics of variables
+  eq c(k((CT . X) -> K), cnt), s((CT,[X,L] Env) oEnv), cl(Cl)
+     = c(k(fetch(L) -> K), cnt), s((CT,[X,L] Env) oEnv), cl(Cl) .
+  eq c(k((CT . X) -> K), cnt), s(oEnv), cl(Cl) = c(k(( SuperClass(CT, Cl) . X) -> K), cnt), s(oEnv), cl(Cl) [owise] .
+*** also need to deal with the loc(X) ***
+  op sLoc_ -> _ : Name Continuation -> Continuation .
+  eq k(loc(E . X) -> K) = k(E -> loc(X) -> K) .
+  eq k(o(CT, CT', (CT, [X,L] Env) oEnv) -> loc(X) -> K) = k(L -> K) .
+  eq k(o(CT, CT', oEnv) -> loc(X) -> K) = k(o(CT, CT', oEnv) -> sLoc(X) -> K) [owise] .
+  eq c(k(o(CT, CT', oEnv) -> sLoc(X) -> K), cnt), s((CT,[X,L] Env) oEnv')
+     = c(k(L -> K), cnt), s((CT,[X,L] Env) oEnv') .
+  eq c(k(o(CT, CT', oEnv) -> sLoc(X) -> K), cnt), cl(Cl) = c(k(o(SuperClass(CT, Cl), CT', oEnv) -> loc(X) -> K), cnt), cl(Cl) [owise] .
+  eq c(k( loc(X) -> K), o(obj), cnt) = c(k(obj -> loc(X) -> K), o(obj), cnt) [owise] . *** extend the semantics of variables
+  eq c(k(loc(CT . X) -> K), cnt), s((CT,[X,L] Env) oEnv)
+     = c(k(L -> K), cnt), s((CT,[X,L] Env) oEnv) .
+  eq c(k(loc(CT . X) -> K), cnt), cl(Cl) = c(k(loc(SuperClass(CT, Cl) . X) -> K), cnt), cl(Cl) [owise] .
+
+  rl c(k(fetch(L) -> K), cnt), m([L,V] M) => c(k(V -> K), cnt), m([L,V] M) .
+endm
+
+fmod GET-TYPES is ex TYPE .
+  ex METHOD-DECLARATION-SYNTAX .
+  ex GENERIC-EXP-SEMANTICS .
+  ex ARRAY-SEMANTICS .
+  pr SUPER-CLASS .
+  var qid : Qid . var dc : Declaration . var Pl : Parameters .
+  vars T T' : Type . var dn : DName . var E : Exp . var V : Value .
+  var Vl : ValueList . var I : Int . var f : Float . var str : String .
+  vars CT CT' : CType . var oEnv : ObjEnv . var aEnv : ArrayEnv .
+  vars Tl Tl' : Types . var Cl : Classes .
+  op GetTypes : Parameters -> Types [memo] .
+  eq GetTypes(`(`)) = noType .
+  eq GetTypes((T dn), Pl) = GetType(T dn), GetTypes(Pl) .
+  op GetType : Declaration -> Type .
+  eq GetType(T #d(qid)) = T .
+  eq GetType(T dn[]) = GetType((T []) dn) .
+  eq GetType(T dn = E) = GetType(T dn) .
+  op GetTypes : ValueList -> Types .
+  eq GetTypes(noVal) = noType .
+  eq GetTypes(V, Vl) = GetType(V), GetTypes(Vl) .
+  op GetType : Value -> Type .
+  eq GetType(int(I)) = int .
+  eq GetType(fl(f)) = float .
+  eq GetType(str(str)) = String .
+  eq GetType(o(CT, CT', oEnv)) = CT .
+  eq GetType(a(T, aEnv)) = T .
+  op Assignable : Types Types Classes -> Bool .
+  eq Assignable(Tl, Tl, Cl) = true .
+  eq Assignable((T, Tl), (T, Tl'), Cl) = Assignable(Tl, Tl', Cl) .
+  eq Assignable((CT, Tl), (CT', Tl'), Cl) = SuperOf(CT, CT', Cl) and Assignable(Tl, Tl', Cl) .
+  eq Assignable((T [], Tl), (T' [], Tl'), Cl) = Assignable((T, Tl), (T', Tl'), Cl) .
+  
+  ---- Type Object can be assigned any higher-order array, reduce the order of the other array by one for this purpose  
+  eq Assignable((Object, Tl), (T' [], Tl'), Cl) = Assignable((Object, Tl), (T', Tl'), Cl) . ---- CHANGED 050317
+  
+  eq Assignable(Tl, Tl', Cl) = false [owise] .
+endfm
+
+fmod GET-METHOD-LIST is pr CLASS-LIST .
+  ex METHOD-DECLARATION-SYNTAX .
+  pr SUPER-CLASS .
+  ex GET-TYPES .
+  sorts MethodAux MethodList .
+  subsort MethodAux < MethodList .
+  op m : CType Types Parameters Block -> MethodAux .
+  op m : CType Types Parameters Block Modifier -> MethodAux .
+  op none : -> MethodList .
+  op _,_ : MethodList MethodList -> MethodList [assoc comm id: none] .
+  op GetMethods : CType MName Classes -> MethodList [memo] .
+  ---- op GetMethodList : CType MName Classes -> MethodList .
+  op GetMethodList : CType MName Classes Classes -> MethodList . ---- ADDED as replacement for the one above, need two sets of the classes here, one to work through, the other, unchanged and complete one, to find superclasses in
+  op GetMethodList : CType MName CType ClassBody -> MethodList .
+  op GetMethodList : CType MName CType ClassMembers -> MethodList .
+  op GetSMethods : CType MName Classes -> MethodList [memo] .
+  ---- op GetSMethodList : CType MName Classes -> MethodList .
+  op GetSMethodList : CType MName Classes Classes -> MethodList . ---- ADDED as replacement for the one above, same reason as above at GetMethodList
+  op GetSMethodList : CType MName CType ClassBody -> MethodList .
+  op GetSMethodList : CType MName CType ClassMembers -> MethodList .
+  vars Xc Xc' mc mc' : Qid . var mn : MName . var CT CT' : CType . var sp : Supers .
+  var md : Modifier . var cb : ClassBody . var Cl : Classes . var CTs : CTypes .
+  var CM : ClassMembers . var T : Type . vars pl pl' : Parameters . var block block' : Block .
+  var cmember : ClassMember . var Ms : MethodList . var Tl : Types .
+  var Cl' : Classes . ---- ADDED because two variables of type Classes are needed
+  ---- eq GetMethods(CT, mn, Cl) = Compact(GetMethodList(CT, mn, Cl), Cl) .
+  eq GetMethods(CT, mn, Cl) = Compact(GetMethodList(CT, mn, Cl, Cl), Cl) . ---- ADDED, as replacement for above
+---- ADDED / CHANGED, everything in the multi-line comment is replaced below it, this is necessary for checking superclasses in a correct way.
+---(
+  eq GetMethodList(CT, mn, noClass) = none .
+  eq GetMethodList(CT, mn, ((md Class Xc sp cb) Cl)) = 
+     (if SuperOf(#c(Xc), CT, Cl) then GetMethodList(CT, mn, #c(Xc), cb) else none fi), GetMethodList(CT, mn, Cl) .
+  eq GetMethodList(CT, mn, ((Class Xc sp cb) Cl)) = 
+     (if SuperOf(#c(Xc), CT, Cl) then GetMethodList(CT, mn, #c(Xc), cb) else none fi), GetMethodList(CT, mn, Cl) .
+  eq GetMethodList(CT, mn, ((md Class Xc cb) Cl)) = 
+     (if SuperOf(#c(Xc), CT, Cl) then GetMethodList(CT, mn, #c(Xc), cb) else none fi), GetMethodList(CT, mn, Cl) .
+  eq GetMethodList(CT, mn, ((Class Xc cb) Cl)) = 
+     (if SuperOf(#c(Xc), CT, Cl) then GetMethodList(CT, mn, #c(Xc), cb) else none fi), GetMethodList(CT, mn, Cl) .
+)
+---- end of the multi-line comment
+---- ADDED below
+eq GetMethodList(CT, mn, noClass, Cl') = none .
+  eq GetMethodList(CT, mn, ((md Class Xc sp cb) Cl), Cl') = 
+     (if SuperOf(#c(Xc), CT, Cl') then GetMethodList(CT, mn, #c(Xc), cb) else none fi), GetMethodList(CT, mn, Cl, Cl') .
+  eq GetMethodList(CT, mn, ((Class Xc sp cb) Cl), Cl') = 
+     (if SuperOf(#c(Xc), CT, Cl') then GetMethodList(CT, mn, #c(Xc), cb) else none fi), GetMethodList(CT, mn, Cl, Cl') .
+  eq GetMethodList(CT, mn, ((md Class Xc cb) Cl), Cl') = 
+     (if SuperOf(#c(Xc), CT, Cl') then GetMethodList(CT, mn, #c(Xc), cb) else none fi), GetMethodList(CT, mn, Cl, Cl') .
+  eq GetMethodList(CT, mn, ((Class Xc cb) Cl), Cl') = 
+     (if SuperOf(#c(Xc), CT, Cl') then GetMethodList(CT, mn, #c(Xc), cb) else none fi), GetMethodList(CT, mn, Cl, Cl') .
+---- ADDED above, replacing the multi-line comment above 
+
+  eq GetMethodList(CT, mn, CT', ;) = none .
+  eq GetMethodList(CT, mn, CT', {CM}) = GetMethodList(CT, mn, CT', CM) .
+  eq GetMethodList(CT, mn, CT', noMember) = none .
+---  eq GetMethodList(CT, mn, CT', (fd CM)) = GetMethodList(CT, mn, CT', CM) .
+  eq GetMethodList(CT, #m(mc), CT', ((md T mc pl throws CTs block) CM)) =
+     (if Static?(md) then none else if Sync?(md) then m(CT', GetTypes(pl), pl, block, synchronized) else m(CT', GetTypes(pl), pl, block) fi fi), GetMethodList(CT, #m(mc), CT', CM) .
+  eq GetMethodList(CT, #m(mc), CT', ((md T mc pl block) CM)) =
+     (if Static?(md) then none else if Sync?(md) then m(CT', GetTypes(pl), pl, block, synchronized) else m(CT', GetTypes(pl), pl, block) fi fi), GetMethodList(CT, #m(mc), CT', CM) .
+  eq GetMethodList(CT, #m(mc), CT', ((T mc pl throws CTs block) CM)) =
+     m(CT', GetTypes(pl), pl, block), GetMethodList(CT, #m(mc), CT', CM) .
+  eq GetMethodList(CT, #m(mc), CT', ((T mc pl block) CM)) =
+     m(CT', GetTypes(pl), pl, block), GetMethodList(CT, #m(mc), CT', CM) .
+  eq GetMethodList(CT, #m(mc), CT', ((md mc pl throws CTs block) CM)) =
+     (if Static?(md) then none else if Sync?(md) then m(CT', GetTypes(pl), pl, block, synchronized) else m(CT', GetTypes(pl), pl, block) fi fi), GetMethodList(CT, #m(mc), CT', CM) .
+  eq GetMethodList(CT, #m(mc), CT', ((md mc pl block) CM)) =
+     (if Static?(md) then none else if Sync?(md) then m(CT', GetTypes(pl), pl, block, synchronized) else m(CT', GetTypes(pl), pl, block) fi fi), GetMethodList(CT, #m(mc), CT', CM) .
+  eq GetMethodList(CT, #m(mc), CT', ((mc pl throws CTs block) CM)) =
+     m(CT', GetTypes(pl), pl, block), GetMethodList(CT, #m(mc), CT', CM) .
+  eq GetMethodList(CT, #m(mc), CT', ((mc pl block) CM)) =
+     m(CT', GetTypes(pl), pl, block), GetMethodList(CT, #m(mc), CT', CM) .
+  eq GetMethodList(CT, #m(mc), CT', (cmember CM)) = GetMethodList(CT, #m(mc), CT', CM) [owise] . 
+
+  ---- eq GetSMethods(CT, mn, Cl) = Compact(GetSMethodList(CT, mn, Cl), Cl) .
+  eq GetSMethods(CT, mn, Cl) = Compact(GetSMethodList(CT, mn, Cl, Cl), Cl) . ---- ADDED, for the same reasons as in "GetMethodList(...)"
+
+---- multi-line commented out, as above!
+---(
+  eq GetSMethodList(CT, mn, noClass) = none .
+  eq GetSMethodList(CT, mn, ((md Class Xc sp cb) Cl)) = 
+     (if SuperOf(#c(Xc), CT, Cl) then GetSMethodList(CT, mn, #c(Xc), cb) else none fi), GetSMethodList(CT, mn, Cl) .
+  eq GetSMethodList(CT, mn, ((Class Xc sp cb) Cl)) = 
+     (if SuperOf(#c(Xc), CT, Cl) then GetSMethodList(CT, mn, #c(Xc), cb) else none fi), GetSMethodList(CT, mn, Cl) .
+  eq GetSMethodList(CT, mn, ((md Class Xc cb) Cl)) = 
+     (if SuperOf(#c(Xc), CT, Cl) then GetSMethodList(CT, mn, #c(Xc), cb) else none fi), GetSMethodList(CT, mn, Cl) .
+  eq GetSMethodList(CT, mn, ((Class Xc cb) Cl)) = 
+     (if SuperOf(#c(Xc), CT, Cl) then GetSMethodList(CT, mn, #c(Xc), cb) else none fi), GetSMethodList(CT, mn, Cl) .
+)
+---- end of multi-line comment, see above at "GetMethods(...)" for the reason
+---- ADDED below
+  eq GetSMethodList(CT, mn, noClass, Cl') = none .
+  eq GetSMethodList(CT, mn, ((md Class Xc sp cb) Cl), Cl') = 
+     (if SuperOf(#c(Xc), CT, Cl') then GetSMethodList(CT, mn, #c(Xc), cb) else none fi), GetSMethodList(CT, mn, Cl, Cl') .
+  eq GetSMethodList(CT, mn, ((Class Xc sp cb) Cl), Cl') = 
+     (if SuperOf(#c(Xc), CT, Cl') then GetSMethodList(CT, mn, #c(Xc), cb) else none fi), GetSMethodList(CT, mn, Cl, Cl') .
+  eq GetSMethodList(CT, mn, ((md Class Xc cb) Cl), Cl') = 
+     (if SuperOf(#c(Xc), CT, Cl') then GetSMethodList(CT, mn, #c(Xc), cb) else none fi), GetSMethodList(CT, mn, Cl, Cl') .
+  eq GetSMethodList(CT, mn, ((Class Xc cb) Cl), Cl') = 
+     (if SuperOf(#c(Xc), CT, Cl') then GetSMethodList(CT, mn, #c(Xc), cb) else none fi), GetSMethodList(CT, mn, Cl, Cl') .
+---- ADDED above
+
+  eq GetSMethodList(CT, mn, CT', ;) = none .
+  eq GetSMethodList(CT, mn, CT', {CM}) = GetSMethodList(CT, mn, CT', CM) .
+  eq GetSMethodList(CT, mn, CT', noMember) = none .
+---  eq GetSMethodList(CT, mn, CT', (fd CM)) = GetSMethodList(CT, mn, CT', CM) .
+******* maybe need to support synchronized here too *********
+  eq GetSMethodList(CT, #m(mc), CT', (((static md) T mc pl throws CTs block) CM)) =
+     m(CT', GetTypes(pl), pl, block), GetSMethodList(CT, #m(mc), CT', CM) .
+  eq GetSMethodList(CT, #m(mc), CT', (((static md) T mc pl block) CM)) =
+     m(CT', GetTypes(pl), pl, block), GetSMethodList(CT, #m(mc), CT', CM) .
+  eq GetSMethodList(CT, #m(mc), CT', (((static md) mc pl throws CTs block) CM)) =
+     m(CT', GetTypes(pl), pl, block), GetSMethodList(CT, #m(mc), CT', CM) .
+  eq GetSMethodList(CT, #m(mc), CT', (((static md) mc pl block) CM)) =
+     m(CT', GetTypes(pl), pl, block), GetSMethodList(CT, #m(mc), CT', CM) .
+  eq GetSMethodList(CT, #m(mc), CT', ((static T mc pl throws CTs block) CM)) =
+     m(CT', GetTypes(pl), pl, block), GetSMethodList(CT, #m(mc), CT', CM) .
+  eq GetSMethodList(CT, #m(mc), CT', ((static T mc pl block) CM)) =
+     m(CT', GetTypes(pl), pl, block), GetSMethodList(CT, #m(mc), CT', CM) .
+  eq GetSMethodList(CT, #m(mc), CT', ((static mc pl throws CTs block) CM)) =
+     m(CT', GetTypes(pl), pl, block), GetSMethodList(CT, #m(mc), CT', CM) .
+  eq GetSMethodList(CT, #m(mc), CT', ((static mc pl block) CM)) =
+     m(CT', GetTypes(pl), pl, block), GetSMethodList(CT, #m(mc), CT', CM) .
+  eq GetSMethodList(CT, #m(mc), CT', (cmember CM)) = GetSMethodList(CT, #m(mc), CT', CM) [owise] . 
+
+  op Static? : Modifier -> Bool .
+  eq Static?(static) = true .
+  eq Static?(static md) = true .
+  eq Static?(md) = false [owise] .
+
+  op Sync? : Modifier -> Bool .
+  eq Sync?(synchronized) = true .
+  eq Sync?(synchronized md) = true .
+  eq Sync?(md) = false [owise] .
+
+  op Compact : MethodList Classes -> MethodList .
+**** no rigurous here, since we should check the types of the parameters, instead of the whole parameters
+  eq Compact((m(CT, Tl, pl, block), m(CT', Tl, pl', block'), Ms), Cl) = 
+     Compact(((if SuperOf(CT, CT', Cl) then m(CT', Tl, pl', block') else m(CT, Tl, pl, block) fi), Ms), Cl) .
+  eq Compact((m(CT, Tl, pl, block, synchronized), m(CT', Tl, pl', block'), Ms), Cl) = 
+     Compact(((if SuperOf(CT, CT', Cl) then m(CT', Tl, pl', block') else m(CT, Tl, pl, block, synchronized) fi), Ms), Cl) .
+  eq Compact((m(CT, Tl, pl, block), m(CT', Tl, pl', block', synchronized), Ms), Cl) = 
+     Compact(((if SuperOf(CT, CT', Cl) then m(CT', Tl, pl', block', synchronized) else m(CT, Tl, pl, block) fi), Ms), Cl) .
+  eq Compact((m(CT, Tl, pl, block, synchronized), m(CT', Tl, pl', block', synchronized), Ms), Cl) = 
+     Compact(((if SuperOf(CT, CT', Cl) then m(CT', Tl, pl', block', synchronized) else m(CT, Tl, pl, block, synchronized) fi), Ms), Cl) .
+  eq Compact(Ms, Cl) = Ms [owise] .
+endfm
+
+fmod BLOCK-SEMANTICS is ex BLOCK-SYNTAX .
+  ex GENERIC-EXP-SEMANTICS .
+---  op _ -> _ : Block Continuation -> Continuation .
+  op _ -> _ : BlockStatements Continuation -> Continuation .
+  var K : Continuation . var bs : BlockStatements . var Env : Env .
+  eq k( ; -> K) = k(K) .
+  eq k({bs} -> K), e(Env) = k(bs -> Env -> K), e(Env) . ---- CHANGED 050317 - uncommented this line so it is active
+----  eq k({bs} -> K), e(Env) = k(bs -> K), e(Env) . ---- CHANGED 050317 - commented out this line
+endfm
+
+fmod DECLARATION-SEMANTICS is ex DECLARATION-SYNTAX .
+  ex GENERIC-EXP-SEMANTICS .
+  ex GET-TYPES .
+  ex BLOCK-SEMANTICS .
+  op _ -> _ : Declaration Continuation -> Continuation .
+
+  var dt : Declarators . var ds : Declarators . var T : Type .
+  var K : Continuation . var dn : DName . var E : Exp . var Env : Env .
+  var V : Value . var cnt : Context . var N : Int . var M : Store .
+  var qid : Qid . var CT : CType . var dc : Declaration . var bs : BlockStatements .
+
+  eq k(((dc ;) bs) -> K) = k(dc -> bs -> K) .
+  eq k((T dt , ds) -> K) = k((T dt) -> (T ds) -> K) .
+  eq k((T dn = E) -> K) = k(E -> (T dn) -> K) .
+  eq c(k((T dn) -> K), e(Env), cnt), n(N), m(M) = 
+     c(k(K), e(Env[GetName(dn) <- l(N)]), cnt), n(N + 1), m(M[l(N), alloc(GetType(T dn))]) .
+  eq c(k(V -> (T dn) -> K), e(Env), cnt), n(N), m(M) = 
+     c(k(change(V, l(N)) -> K), e(Env[GetName(dn) <- l(N)]), cnt), n(N + 1), m(M[l(N), alloc(GetType(T dn))]) .
+  op GetName : DName -> Qid .
+  eq GetName(#d(qid)) = qid .
+  eq GetName(dn[]) = GetName(dn) .
+  op alloc : Type -> Value .
+  eq alloc(int) = int(0) .
+  eq alloc(long) = int(0) .
+  eq alloc(float) = fl(0.0) .
+  eq alloc(String) = str("") .
+  eq alloc(CT) = o(CT, CT, noObjEnv) .
+  eq alloc(T[]) = a(T[], noArrayEnv) .
+endfm
+
+fmod OUTPUT-METHOD is ex GENERIC-EXP-SEMANTICS .
+  ex CLASS-MEMBER-SYNTAX .
+  ex METHOD-CALL-SYNTAX .
+  pr OUTPUT .
+  op print -> _ : Continuation -> Continuation .
+  var E : Exp . var V : Value . var K : Continuation . var cnt : Context .
+  var O : Output .
+  eq k(('System . 'out . #m('print) (E)) -> K) = k( E -> print -> K) .
+  eq k(('System . 'out . #m('println) (E)) -> K) = k( E -> print -> K) .
+  eq c(k(V -> print -> K), cnt), out(O) = c(k(K), cnt), out(O,O(V)) .
+endfm
+
+mod METHOD-CALL-SEMANTICS is ex METHOD-CALL-SYNTAX .
+  ex CLASS-MEMBER-SYNTAX .
+  ex GENERIC-EXP-SEMANTICS .
+  ex METHOD-DECLARATION-SYNTAX .
+  ex GET-METHOD-LIST .
+  ex GET-TYPES .
+  ex DECLARATION-SEMANTICS .
+  ex BLOCK-SEMANTICS .
+  ex OUTPUT-METHOD .
+  ex LOCK .
+  op ._ -> _ : MName Continuation -> Continuation .
+  op s. (_,_) -> _ : CType MName Continuation -> Continuation .
+  op fn (_,_,_) -> _ : Object MName ValueList Continuation -> Continuation .
+  op sfn (_,_,_) -> _ : Object MName ValueList Continuation -> Continuation .
+  op endfn (_,_) -> _ : Object Env Continuation -> Continuation .
+  op endfn (_,_,_) -> _ : Object Env Object Continuation -> Continuation .
+  op set (_,_) -> _ : Parameters ValueList Continuation -> Continuation .
+  op _ -> _ : MethodAux Continuation -> Continuation .
+
+  vars E E' : Exp . var X : Name . var K : Continuation . var Cl : Classes .
+  vars CT CT' CT'' : CType . vars oEnv oEnv' : ObjEnv . var V : Value .
+  var Env Env' : Env . var L : Location . var M : Store . var obj obj' : Object .
+  var mn : MName . var El : Exps . var Vl : ValueList . var cnt : Context .
+  var pl : Parameters . var block : Block . var Ml : MethodList .
+  var Tl : Types . var dn : DName . var T : Type .
+  var Ls : LockStatus . var Ll : LockList .
+
+  eq k((mn El) -> K), o(obj) = k(obj -> [El | noVal] -> . (mn) -> K), o(obj) .
+  eq k((E . mn El) -> K) = k((E, El) -> . (mn) -> K) [owise] .
+  eq c(k((o(CT, CT', oEnv), Vl) -> . (mn) -> K), cnt), cl(Cl) = 
+     c(k(GetMethod(CT', mn, Vl, Cl) -> fn (o(CT, CT', oEnv), mn, Vl) -> K), cnt), cl(Cl) .
+  eq c(k(none -> fn(o(CT, CT', oEnv), mn, Vl) -> K), cnt), cl(Cl) = 
+     c(k(GetSMethod(CT, mn, Vl, Cl) -> sfn (o(CT, CT', oEnv), mn, Vl) -> K), cnt), cl(Cl) .
+  eq k(m(CT'', Tl, pl, block) -> fn(o(CT, CT', oEnv), mn, Vl) -> K), e(Env), o(obj) 
+     = k(set(pl, Vl) -> (block -> endfn(obj, Env) -> K)), e(noEnv), o(o(CT'', CT', oEnv)) .
+
+  op wl_->_ : Object Continuation -> Continuation .
+
+  eq c(k(m(CT'', Tl, pl, block, synchronized) -> fn(o(CT, CT', oEnv), mn, Vl) -> K), cnt), l([o(CT'', CT', oEnv), Ls] Ll)
+     = c(k(wl(o(CT'', CT', oEnv)) -> (m(CT'', Tl, pl, block, synchronized) -> fn(o(CT, CT', oEnv), mn, Vl) -> K)), cnt), l([o(CT'', CT', oEnv), Ls] Ll) .
+  eq c(k(m(CT'', Tl, pl, block, synchronized) -> fn(o(CT, CT', oEnv), mn, Vl) -> K), e(Env), o(obj)), l(Ll)
+     = c(k(set(pl, Vl) -> (block -> endfn(obj, Env, o(CT'', CT', oEnv)) -> K)), e(noEnv), o(o(CT'', CT', oEnv))), l([o(CT'', CT', oEnv), locked] Ll) [owise] .
+  rl c(k(wl(obj') -> (m(CT'', Tl, pl, block, synchronized) -> fn(o(CT, CT', oEnv), mn, Vl) -> K)), e(Env), o(obj)), l([obj', unlocked] Ll) => c(k(set(pl, Vl) -> (block -> endfn(obj, Env, obj') -> K)), e(noEnv), o(o(CT'', CT', oEnv))), l([obj', locked] Ll) .
+
+  eq k(m(CT'', Tl, pl, block) -> sfn(o(CT, CT', oEnv), mn, Vl) -> K), e(Env), o(obj) 
+     = k(set(pl, Vl) -> (block -> endfn(obj, Env) -> K)), e(noEnv), o(o(CT'', CT', oEnv)) .
+  eq k(set(`(`), noVal) -> K) = k(K) .
+  eq k(set(((T dn), pl), (V, Vl)) -> K) = k(V -> (T dn) -> (set(pl, Vl) -> K)) .
+  eq k(endfn(obj, Env) -> K), e(Env'), o(obj') = k(K), e(Env), o(obj) .
+  eq c(k(endfn(obj, Env, obj') -> K), e(Env'), o(obj')), l([obj', locked] Ll) = c(k(K), e(Env), o(obj)), l([obj', unlocked] Ll) .
+
+  eq k((CT . mn El) -> K) = k(El -> s. (CT, mn) -> K) .
+  eq c(k(Vl -> s. (CT, mn) -> K), cnt), cl(Cl) = 
+     c(k(GetSMethod(CT, mn, Vl, Cl) -> sfn (o(CT, CT, noObjEnv), mn, Vl) -> K), cnt), cl(Cl) .
+
+  op GetMethod : CType MName ValueList Classes -> MethodAux .
+  eq GetMethod(CT, mn, Vl, Cl) = GetMethod(GetMethods(CT, mn, Cl), Vl, Cl) [owise] .
+
+  op GetMethod : MethodList ValueList Classes -> MethodAux .
+  eq GetMethod((m(CT, Tl, pl, block), Ml), Vl, Cl) = 
+     if Compatible(pl, Vl, Cl) then m(CT, Tl, pl, block) else GetMethod(Ml, Vl, Cl) fi .
+  eq GetMethod((m(CT, Tl, pl, block, synchronized), Ml), Vl, Cl) = 
+     if Compatible(pl, Vl, Cl) then m(CT, Tl, pl, block, synchronized) else GetMethod(Ml, Vl, Cl) fi .
+  eq GetMethod(none, Vl, Cl) = none .
+
+  op GetSMethod : CType MName ValueList Classes -> MethodAux .
+  eq GetSMethod(CT, mn, Vl, Cl) = GetMethod(GetSMethods(CT, mn, Cl), Vl, Cl) .
+
+  op Compatible : Parameters ValueList Classes -> Bool .
+  eq Compatible(pl, Vl, Cl) = Assignable(GetTypes(pl), GetTypes(Vl), Cl) .
+endm
+
+fmod NEW-SEMANTICS is ex NEW-SYNTAX .
+  pr GENERIC-EXP-SEMANTICS .
+  ex METHOD-CALL-SEMANTICS .
+  ex FIELD-DECLARATION-SYNTAX .
+  op newObj _ -> _ : CType Continuation -> Continuation .
+  op newObj (_,_) -> _ : CType ClassBody Continuation -> Continuation .
+  op newObj (_,_) -> _ : CType ClassMembers Continuation -> Continuation .
+  op endnew (_,_,_) -> _ : ValueList Object Env Continuation -> Continuation .
+  op created -> _ : Continuation -> Continuation .
+
+  vars CT CT' : CType . var El : Exps . var K : Continuation .
+  var Env : Env . var obj : Object . var cnt : Context . var Cl : Classes .
+  var Xc Xc' : Qid . var IL : ITypes . var m : Modifier . var CB : ClassBody .
+  var sp : Supers . var oEnv : ObjEnv . var CMs : ClassMembers . var CM : ClassMember .
+  var md : MethodDeclaration . var dc : Declaration . var Vl : ValueList . var CC : Class .
+  var Nl : NameList .
+***** compute the argument firstly 
+  eq k((new CT (El)) -> K) = k((El) -> newObj (CT) -> K) .
+---  eq k((new CT (Nl)) -> K) = k((Nl) -> newObj (CT) -> K) .
+  eq k(Vl -> newObj(CT) -> K), e(Env), o(obj) = k(newObj(CT) -> endnew(Vl, obj, Env) -> K), e(Env), o(obj) .
+***** create every class in the class hierachy, the created fields is stored in the Env, and then collecte into the o(obj)
+  eq k(newObj(Object) -> K), e(Env), o(obj) = k(created -> K), e(noEnv), o(o(Object, Object, noObjEnv)) .
+  eq c(k(newObj(CT) -> K), e(Env), cnt), cl(Cl) = c(k(newObj(SuperClass(CT, Cl)) -> newObj(CT) -> K), e(noEnv), cnt), cl(Cl) [owise] .
+  eq c(k(created -> (newObj(#c(Xc)) -> K)), cnt), cl((m Class Xc sp CB) Cl) = 
+     c(k(newObj(#c(Xc), CB) -> K), cnt), cl((m Class Xc sp CB) Cl) .
+  eq c(k(created -> (newObj(#c(Xc)) -> K)), cnt), cl((Class Xc sp CB) Cl) = 
+     c(k(newObj(#c(Xc), CB) -> K), cnt), cl((Class Xc sp CB) Cl) .
+  eq c(k(created -> (newObj(#c(Xc)) -> K)), cnt), cl((m Class Xc CB) Cl) = 
+     c(k(newObj(#c(Xc), CB) -> K), cnt), cl((m Class Xc CB) Cl) .
+  eq c(k(created -> (newObj(#c(Xc)) -> K)), cnt), cl((Class Xc CB) Cl) = 
+     c(k(newObj(#c(Xc), CB) -> K), cnt), cl((Class Xc CB) Cl) .
+  eq k(newObj(CT', (;)) -> K), o(o(CT, CT, oEnv)) = k(created -> K), o(o(CT', CT', (CT', noEnv) oEnv)) .
+  eq k(newObj(CT', {}) -> K), o(o(CT, CT, oEnv)) = k(created -> K), o(o(CT', CT', (CT', noEnv) oEnv)) .
+  eq k(newObj(CT, {CMs}) -> K) = k(newObj(CT, CMs) -> K) .
+  eq k(newObj(CT, (md CMs)) -> K) = k(newObj(CT, CMs) -> K) .
+  eq k(newObj(CT, ((m md) CMs)) -> K) = k(newObj(CT, CMs) -> K) .
+  eq k(newObj(CT, (((static m) dc ;) CMs)) -> K) = k(newObj(CT, CMs) -> K) .
+  eq k(newObj(CT, ((static dc ;) CMs)) -> K) = k(newObj(CT, CMs) -> K) .
+  eq k(newObj(CT, ((m dc ;) CMs)) -> K) = k(dc -> newObj(CT, CMs) -> K) [owise] .
+  eq k(newObj(CT, ((dc ;) CMs)) -> K) = k(dc -> newObj(CT, CMs) -> K) [owise] .
+  eq k(newObj(CT, noMember) -> K), e(Env), o(o(CT', CT', oEnv)) =
+     k(created -> K), e(noEnv), o(o(CT, CT, (CT, Env) oEnv)) .
+****** at last, call the consturctor 
+  eq k(created -> (endnew(Vl, obj, Env) -> K)), e(noEnv), o(o(#c(Xc), #c(Xc), oEnv)) = 
+     k((o(#c(Xc), #c(Xc), oEnv), Vl) -> . (#m(Xc)) -> (o(#c(Xc), #c(Xc), oEnv) -> K)), e(Env), o(obj) .
+
+  op GetArrayType : Type -> Type .
+  op GetExps : Type -> Exps .
+  var BT : BType . var T : Type . var E : Exp . var V : Value . var M : Store . 
+  eq GetArrayType(BT) = BT .
+  eq GetArrayType(CT) = CT .
+  eq GetArrayType(T[E]) = GetArrayType(T) [] .
+  eq GetArrayType(T[]) = GetArrayType(T) [] .
+  eq GetExps(BT) = () .
+  eq GetExps(CT) = () .
+  eq GetExps(T[E]) = GetExps(T), E .
+  eq GetExps(T[]) = GetExps(T) .
+
+  op newArray _ -> _ : Type Continuation -> Continuation .
+  op newArray (_,_,_) -> _ : Array ValueList Int Continuation -> Continuation .
+  var array : Array . var aEnv : ArrayEnv . vars I I' N : Int . 
+  eq k((new T) -> K) = k(GetExps(T) -> newArray (GetArrayType(T)) -> K) .
+  eq k((int(I), Vl) -> newArray (T) -> K) = k(newArray(a(T, noArrayEnv), Vl, I) -> K) .
+  eq k(noVal -> newArray(int) -> K) = k(int(0) -> K) .
+  ---- eq k(noVal -> newArray(int) -> K) = k(fl(0.0) -> K) . ---- Old and WRONG
+  eq k(noVal -> newArray(float) -> K) = k(fl(0.0) -> K) . ---- ADDED, only changed the int from above to float, before there were 2 equations which had the same lefthand side but different right-hand sides!
+  eq k(noVal -> newArray(String) -> K) = k(str("") -> K) .
+  eq k(noVal -> newArray(T[]) -> K) = k(a(T[], noArrayEnv) -> K) .
+  eq k(noVal -> newArray(CT) -> K) = k((new CT ()) -> K) .
+  eq k(newArray(array, Vl, 0) -> K) = k(array -> K) .
+  eq k(newArray(a(T[], aEnv), Vl, I) -> K) = 
+     k(Vl -> newArray(T) -> (newArray(a(T[], aEnv), Vl, (I - 1)) -> K)) [owise] .
+  eq c(k(V -> newArray(a(T, aEnv), Vl, I) -> K), cnt), m(M), n(N) =
+     c(k(newArray(a(T, ([I, l(N)] aEnv)), Vl, I) -> K), cnt), m(M[l(N), V]), n(N + 1) .
+endfm
+
+fmod THREAD is ex METHOD-CALL-SEMANTICS .
+  ex NEW-SEMANTICS .
+  op startThread : -> MethodAux .
+  var Xc : Qid . var md : Modifier . var cb : ClassBody . var Cl : Classes .
+  var obj : Object . var mn : MName . var Vl : ValueList . var K : Continuation .
+  var cnt : Context . 
+  eq GetMethod(#c(Xc), #m('start), noVal, ((md Class Xc extends #c('Thread) cb) Cl)) = startThread .
+  eq GetMethod(#c(Xc), #m('start), noVal, ((Class Xc extends #c('Thread) cb) Cl)) = startThread .
+  eq c(k(startThread -> fn(obj, mn, Vl) -> K), cnt) = c(k(K), cnt), c(k((#m('run) ()) -> stop), o(obj), e(noEnv)) .
+  eq k(created -> (newObj(#c('Thread)) -> K)) = k(created -> K) .
+endfm
+
+mod WAIT is ex METHOD-CALL-SEMANTICS .
+  op wait : -> MethodAux .
+  op wait* : -> MethodAux .
+  op notifyAll : -> MethodAux .
+  var Xc : Qid . var Cl : Classes . vars K K' : Continuation . var obj : Object .
+  vars cnt cnt' : Context . var S : MyState . vars Ll Ll' : LockList . var LS : LockStatus .
+  eq GetMethod(#c(Xc), #m('wait), noVal, Cl) = wait .
+  eq GetMethod(#c(Xc), #m('notifyAll), noVal, Cl) = notifyAll .
+  eq c(k(wait -> K), o(obj), cnt), l([obj, locked] Ll), w([obj, LS] Ll') = c(k(wait* -> K), o(obj), cnt), l([obj, unlocked] Ll), w([obj, waiting] Ll') .
+  eq c(k(wait -> K), o(obj), cnt), l([obj, locked] Ll), w(Ll') = c(k(wait* -> K), o(obj), cnt), l([obj, unlocked] Ll), w([obj, waiting] Ll') [owise] .
+  eq c(k(wait* -> fn(obj, #m('wait), noVal) -> K'), o(obj), cnt'), w([obj, ready] Ll) = 
+     c(k(wl(obj) -> wait -> K'), o(obj), cnt'), w([obj, ready] Ll) .
+  eq c(k(notifyAll -> fn(obj, #m('notifyAll), noVal) -> K), cnt), w([obj, waiting] Ll) = c(k(K), cnt), w([obj, ready] Ll) .
+  eq c(k(notifyAll -> fn(obj, #m('notifyAll), noVal) -> K), cnt), w(Ll) = c(k(K), cnt), w(Ll) [owise] .
+  rl c(k(wl(obj) -> wait -> K'), cnt), l([obj, unlocked] Ll) => c(k(K'), cnt), l([obj, locked] Ll) .
+endm
+
+fmod STATEMENT-SEMANTICS is ex STATEMENT-SYNTAX .
+  ex BLOCK-SEMANTICS .
+  var st : Statement . var bs : BlockStatements .
+  var K : Continuation .
+  eq k((st bs) -> K) = k(st -> bs -> K) .
+endfm
+
+fmod EXP-STATEMENT-SEMANTICS is ex EXP-STATEMENT-SYNTAX .
+  ex GENERIC-EXP-SEMANTICS .
+  ex STATEMENT-SEMANTICS .
+  var SE : StExp . var K : Continuation . var Vl : ValueList .
+  eq k((SE ; ) -> K) = k(SE -> ; -> K) .
+  eq k(Vl -> ; -> K) = k(K) .
+endfm
+
+fmod IF-SEMANTICS is ex IF-SYNTAX .
+  ex GENERIC-EXP-SEMANTICS .
+  ex STATEMENT-SEMANTICS .
+  ex BEXP-SEMANTICS .
+  op ? (_,_) -> _ : Statement Statement Continuation -> Continuation .
+  var E : Exp . vars St St' : Statement . var K : Continuation .
+  eq k((if E St else St' fi) -> K) = k(E -> ? (St, St') -> K) .
+  eq k((if E St fi) -> K) = k(E -> ? (St, ;) -> K) .
+  eq k(bool(true) -> ? (St, St') -> K) = k(St -> K) .
+  eq k(bool(false) -> ? (St, St') -> K) = k(St' -> K) .
+endfm
+
+fmod WHILE-SEMANTICS is ex WHILE-SYNTAX .
+  ex GENERIC-EXP-SEMANTICS .
+  ex STATEMENT-SEMANTICS .
+  ex IF-SEMANTICS .
+  var E : Exp . var St : Statement . var K : Continuation .
+  eq k((while E St) -> K) = k(E -> ?({St while E St}, ;) -> K) .
+endfm
+
+fmod DO-SEMANTICS is ex DO-SYNTAX .
+  ex GENERIC-EXP-SEMANTICS .
+  ex STATEMENT-SEMANTICS .
+  ex WHILE-SEMANTICS .
+  var E : Exp . var St : Statement . var K : Continuation .
+  eq k((do St while E ;) -> K) = k(St -> (while E St) -> K) .
+endfm
+
+fmod FOR-SEMANTICS is ex FOR-SYNTAX .
+  ex GENERIC-EXP-SEMANTICS .
+  ex STATEMENT-SEMANTICS .
+  ex WHILE-SEMANTICS .
+  pr EXP-STATEMENT-SYNTAX .
+  var E : Exp . vars Se Se' : StExp . var St : Statement . var K : Continuation .
+  var dc : Declaration .
+  eq k((for (Se ; E ; Se') St) -> K) = k((Se ; while (E) { St Se' ; }) -> K) .
+  eq k((for (dc ; E ; Se') St) -> K) = k((dc ; while (E) { St Se' ; }) -> K) .
+endfm
+
+fmod RETURN-SEMANTICS is ex RETURN-SYNTAX .
+  ex STATEMENT-SEMANTICS .
+  ex METHOD-CALL-SEMANTICS .
+  ex LOCK .
+  op return -> _ : Continuation -> Continuation .
+  var E : Exp . var K : Continuation . var V : Value . var cnt : Context .
+  var bs : BlockStatements . var Env Env' : Env . var obj obj' : Object . var Ll : LockList .
+  eq k((return E ;) -> K) = k(E -> return -> K) .
+  eq k((return;) -> K) = k(return -> K) .
+  eq k(V -> return -> (bs -> K)) = k(V -> return -> K) .
+  eq k(V -> return -> (Env -> K)) = k(V -> return -> K) .
+  eq k(V -> return -> (endfn(obj, Env) -> K)), e(Env'), o(obj') = k(V -> K), e(Env), o(obj) .
+  eq c(k(V -> return -> (endfn(obj, Env, obj') -> K)), e(Env'), o(obj')), l([obj', locked] Ll) = c(k(V -> K), e(Env), o(obj)), l([obj', unlocked] Ll) .
+  eq k(return -> (bs -> K)) = k(return -> K) .
+  eq k(return -> (Env -> K)) = k(return -> K) .
+  eq k(return -> (endfn(obj, Env) -> K)), e(Env'), o(obj') = k(K), e(Env), o(obj) .
+  eq c(k(return -> (endfn(obj, Env, obj') -> K)), e(Env'), o(obj')), l([obj', locked] Ll) = c(k(K), e(Env), o(obj)), l([obj', unlocked] Ll) .
+endfm
+
+mod SYNCHRONIZED-SEMANTICS is ex SYNCHRONIZED-SYNTAX .
+  ex GENERIC-EXP-SEMANTICS .
+  ex LOCK .
+  ex STATEMENT-SEMANTICS .
+  ex METHOD-CALL-SEMANTICS .
+  op synchronized_->_ : Block Continuation -> Continuation .
+  op endSyn_->_ : Object Continuation -> Continuation .
+  var bl : Block . var obj obj' : Object . var K : Continuation .
+  var E : Exp . var cnt : Context . var Ls : LockStatus . var Ll : LockList .
+  eq k((synchronized E bl) -> K) = k(E -> synchronized(bl) -> K) .
+  eq c(k(obj -> synchronized(bl) -> K), cnt), l([obj, Ls] Ll) = c(k(wl(obj) -> synchronized(bl) -> K), cnt), l([obj, Ls] Ll) .
+  eq c(k(obj -> synchronized(bl) -> K), cnt), l(Ll) = c(k(bl -> endSyn(obj) -> K), cnt), l([obj, locked]Ll) [owise] .
+  rl c(k(wl(obj) -> synchronized(bl) -> K), cnt), l([obj, unlocked] Ll) => c(k(bl -> endSyn(obj) -> K), cnt), l([obj, locked] Ll) .
+  eq c(k(endSyn(obj) -> K), cnt), l([obj, locked]Ll) = c(k(K), cnt), l([obj, unlocked]Ll) .
+endm
+
+fmod BUILD-STATIC-MEMBERS is ex NEW-SEMANTICS .
+  op buildS _ -> _ : Classes Continuation -> Continuation .
+  op buildS (_,_) -> _ : CType ClassBody Continuation -> Continuation .
+  op buildS (_,_) -> _ : CType ClassMembers Continuation -> Continuation .
+
+  vars CT CT' : CType . var El : Exp . var K : Continuation .
+  var Env : Env . var obj : Object . var cnt : Context . var Cl : Classes .
+  var Xc Xc' : Qid . var IL : ITypes . var m : Modifier . var CB : ClassBody .
+  var sp : Supers . var oEnv : ObjEnv . var CMs : ClassMembers . var CM : ClassMember .
+  var md : MethodDeclaration . var dc : Declaration . var Vl : ValueList . var CC : Class .
+
+  eq k(buildS (noClass) -> K) = k(K) .
+  eq k(buildS((m Class Xc sp CB) Cl) -> K) =
+     k(buildS(#c(Xc), CB) -> buildS(Cl) -> K) .
+  eq k(buildS((Class Xc sp CB) Cl) -> K) =
+     k(buildS(#c(Xc), CB) -> buildS(Cl) -> K) .
+  eq k(buildS((m Class Xc CB) Cl) -> K) =
+     k(buildS(#c(Xc), CB) -> buildS(Cl) -> K) .
+  eq k(buildS((Class Xc CB) Cl) -> K) =
+     k(buildS(#c(Xc), CB) -> buildS(Cl) -> K) .
+  eq k(buildS(CT', (;)) -> K) = k(K) .
+  eq k(buildS(CT', {}) -> K) = k(K) .
+  eq k(buildS(CT, {CMs}) -> K) = k(buildS(CT, CMs) -> K) .
+  eq k(buildS(CT, (md CMs)) -> K) = k(buildS(CT, CMs) -> K) .
+  eq k(buildS(CT, ((m md) CMs)) -> K) = k(buildS(CT, CMs) -> K) .
+  eq k(buildS(CT, (((static m) dc ;) CMs)) -> K) = k(dc -> buildS(CT, CMs) -> K) .
+  eq k(buildS(CT, ((static dc ;) CMs)) -> K) = k(dc -> buildS(CT, CMs) -> K) .
+  eq k(buildS(CT, ((dc ;) CMs)) -> K) = k(buildS(CT, CMs) -> K) [owise] .
+  eq k(buildS(CT, ((m dc ;) CMs)) -> K) = k(buildS(CT, CMs) -> K) [owise] .
+  eq c(k(buildS(CT, noMember) -> K), e(Env), cnt), s(oEnv) =
+     c(k(K), e(noEnv), cnt), s((CT, Env) oEnv) .
+endfm
+
+**** not implemented : default constructor, throw, try-catch, Switch, break, continue, conditional expression
+**** interface is not completely done: declaration and parameter
+
+fmod PGM-SEMANTICS is ex PGM-SYNTAX .
+  ex UNARY-EXP-SEMANTICS .
+  ex ARITH-EXP-SEMANTICS .
+  ex REXP-SEMANTICS .
+  ex BEXP-SEMANTICS .
+  ex ASSIGNM-EXP-SEMANTICS .
+  ex ARRAY-SEMANTICS .
+  ex FIELD-SEMANTICS .
+  ex BLOCK-SEMANTICS .
+  ex DECLARATION-SEMANTICS .
+  ex METHOD-CALL-SEMANTICS .
+  ex THREAD .
+  ex NEW-SEMANTICS .
+  ex STATEMENT-SEMANTICS .
+  ex EXP-STATEMENT-SEMANTICS .
+  ex IF-SEMANTICS .
+  ex WHILE-SEMANTICS .
+  ex DO-SEMANTICS .
+  ex FOR-SEMANTICS .
+  ex RETURN-SEMANTICS .
+  ex BUILD-STATIC-MEMBERS .
+  ex LOCK .
+  ex WAIT .
+  ex SYNCHRONIZED-SEMANTICS .
+  ex OUTPUT .
+  op run (_) : Pgm -> Output . *** weird again !!!
+  op run : MyState -> Output .
+  var Cl : Classes . var E : Exp . var cnt : Context . 
+  var V : Value . var state : MyState . var M : Store .
+  var O : Output . var N : Int . var objEnv : ObjEnv . var Ll Ll' : LockList . 
+  eq run(Cl E) = run(c(k(buildS(Cl) -> E -> stop), e(noEnv), o(o(Object, Object, noObjEnv))), m(noStore), n(0), cl(Cl), s(noObjEnv), out(noOutput), l(noLock), w(noLock), nextSnapshot(0), snapshots(emptylist)) . ---- CHANGED 2005-03-02
+  eq run(c(k(V -> stop), cnt), m(M), out(O), state) = run(m(M), out(O , O(V, M)), state) .
+  eq run(c(k(stop), cnt), state) = run(state) .
+  eq run(n(N), m(M), out(O), cl(Cl), s(objEnv), l(Ll), nextSnapshot(Nn), snapshots(SNL)) = O . ---- CHANGED 2005-03-02
+  
+  eq run(n(N), m(M), out(O), cl(Cl), s(objEnv), l(Ll), w(Ll'), nextSnapshot(Nn), snapshots(SNL)) = O . ---- CHANGED 2005-03-02
+  
+  
+  --- everything BELOW is ADDED  
+  
+  var cnt' : Context . var state' : MyState . 
+  
+  --- operator to allow running tests with no copy/pasting of the
+  --- results and also taking care of the equivalence modulo new variables
+  --- by removing all new variables and their locations from the
+  --- environments and memory.
+  op compareResult : Output Output -> Bool .
+  eq compareResult(run(c(k(pause -> K), cnt), state) , 
+                   run(c(k(pause -> K), cnt'), state') ) 
+     = run(c(k(pause -> K), cnt), state) 
+       == run(c(k(pause -> K), cnt'), state') .
+
+  op removeNewVarsLocs : Output -> Output .
+  op compareResultsModNewVars : Output Output -> Bool .
+  eq compareResultsModNewVars
+         (run(c(k(pause -> K), cnt), state) ,
+          run(c(k(pause -> K), cnt'), state') )
+     = compareResult(removeNewVarsLocs(run(c(k(pause -> K), cnt), state)), 
+                     removeNewVarsLocs(run(c(k(pause -> K), cnt'), state'))) .
+
+  var SEL : SideEffectList . var L : Location . var TNL : TacletNewLocation .
+  var TNVN : TacletNewVarName .
+  var Vl : ValueList . var LocaL : LocationList .
+  var M' : Store . vars CT CT' CT'' CT''' : CType .
+  var Env : Env . var OE : ObjEnv . var K : Continuation .
+
+  eq removeNewVarsLocs(run(c(e([TNVN, TNL] Env), cnt), m([TNL, V] M), state))
+       = removeNewVarsLocs(run(c(e(Env), cnt), m(M), state)) .
+
+  eq removeNewVarsLocs(run(snapshots((snap(N), c(e([TNVN, TNL] Env), cnt), 
+                           state), SNL), state')) 
+       = removeNewVarsLocs(run(snapshots((snap(N), c(e(Env), cnt), state), SNL),
+                               state')) .
+
+  eq removeNewVarsLocs(run(snapshots((snap(N), m([TNL, V] M), state), SNL), 
+                           state')) 
+       = removeNewVarsLocs(run(snapshots((snap(N), m(M), state), SNL),
+                               state')) .
+
+  eq removeNewVarsLocs(run(state)) = run(state) [owise] .
+
+
+  --- modelling sideeffects, a sideeffect is in principle a change of
+  --- some memory locations
+  sort SideEffectList .
+  op [_;_] : LocationList ValueList -> SideEffectList .
+
+  --- This keeps the conditional change of a value because of a sideeffect 
+  --- in the memory with the meaning that if an element of the
+  --- LocationList is the Location then the value is the corresponding item
+  --- from the ValueList, otherwise it is just the Value given. No rules for
+  --- evaluating this have been given as it is not (yet?) intended for 
+  --- evaluation. All special cases are later wrapped in their according value
+  --- constructor, like int(X) for the first special case.
+  op _in_??_::_      : Location LocationList ValueList Value  -> Value .
+  
+  op _in_??_::_int    : Location LocationList ValueList Int    -> Int .
+  op _in_??_::_fl     : Location LocationList ValueList Float  -> Float .
+  op _in_??_::_str    : Location LocationList ValueList String -> String .
+  op _in_??_::_bool   : Location LocationList ValueList Bool   -> Bool .
+  op _in_??_::_alloc  : Location LocationList ValueList Type   -> Type .
+
+  op _in_??_::_ctype  : Location LocationList ValueList CType  -> CType . ---- ADDED 050401
+  op _in_??_::_objenv : Location LocationList ValueList ObjEnv -> ObjEnv . ---- ADDED 050401
+  
+  sort ExpressionName .
+  sort ExpressionEffect .
+  sort Snapshot .
+  sort SnapshotName .
+  sort SnapshotState .
+  sort SnapshotList .
+  subsort Snapshot < SnapshotList .
+
+  var EN : ExpressionName .
+  
+
+  --- this will be the command in the code representing something which could
+  --- possibly have sideeffects
+  op eval : ExpressionName ExpressionResultType -> StExp . ---- CHANGE 050223 text done too
+
+  --- operator which waits for the completion of the side effect
+  --- distribution through the memory
+  op evalResultAfterCompleted : Value -> StExp .
+
+  --- operator to induce changes on the memory from the side effect
+  op sideEffMemChange : SideEffectList Store -> Store .
+  
+  --- operator which characterizes the side effect induced changes on 
+  --- non-concrete memory
+  op sideEffMemChangeNotConcrete : SideEffectList Store -> Store .
+  
+
+  op effectof_in_ : ExpressionName SnapshotName -> ExpressionEffect .
+  op locs : ExpressionEffect -> LocationList .
+  op vals : ExpressionEffect -> ValueList .
+  
+  op snap : Nat -> SnapshotName .
+  op snapshots : SnapshotList -> StateAttribute .
+  op nextSnapshot : Nat -> StateAttribute .
+  op emptylist : -> SnapshotList .
+  op _,_ : SnapshotList SnapshotList 
+           -> SnapshotList [assoc comm id: emptylist] .
+  op (_,_) : SnapshotName MyState -> Snapshot .
+
+  var Nn : Nat . var SNL : SnapshotList .
+    
+  ---- All of the rules below are (together) responsible for evaluation of 
+  ---- expressions which could have side effects. They all cater to special 
+  ---- cases as described with each rule.
+  --- rules stating that the sideeffects take place basically right now,
+  --- after this no one (i.e. no other thread) can get to any of the old
+  --- values so this is a complete uninterruptable change on the memory on
+  --- all cells affected at the same time; this is probably not what usually
+  --- happens when an expression has more than one sideeffect though for a
+  --- sequential program this is good enough!
+
+  ---- This rule works when the result of the expression is of any primitive
+  ---- type.
+  rl [SideEffect_primitive] : 
+    c(k(eval(EN, PR) -> K), cnt), m(M) , snapshots(SNL),
+      nextSnapshot(Nn)
+      => c(k(evalResultAfterCompleted(resultof EN in snap(Nn) GetsResType PR) 
+             -> K), cnt), 
+         m(sideEffMemChange
+            ([locs(effectof EN in snap(Nn)) ; 
+              vals(effectof EN in snap(Nn))], 
+              M)
+            ) ,
+         snapshots(SNL , (snap(Nn), (c(cnt), m(M)))), 
+         nextSnapshot(Nn + 1) .
+
+  ---- This rule works when the result type is an object type andit does not
+  ---- have an explicit attribute in the memory.
+  rl [SideEffect_obj_noExplicitAttribute] : 
+    c(k(eval(EN, obj-result(CT)) -> K), cnt), 
+      m(M) , snapshots(SNL),
+      nextSnapshot(Nn)
+      => c(k(evalResultAfterCompleted(
+           ---- DynResType(EN, snap(Nn)) als dynamischer Typ!
+           o(CT, CT, RestObjEnv(EN, snap(Nn))
+             )) 
+             -> K), cnt), 
+         m(sideEffMemChange
+            ([locs(effectof EN in snap(Nn)) ; 
+              vals(effectof EN in snap(Nn))], 
+              M  
+            )
+          ) ,
+         snapshots(SNL , (snap(Nn), 
+           (c(cnt),  m(M)))), 
+         nextSnapshot(Nn + 1) .
+
+  ---- This rule works when the result of the expression is to be an object
+  ---- which has type CT and an attribute X which itself is of some primitive 
+  ---- type. Also there has been an expression which left a sideeffect in the
+  ---- memory before.
+  rl [SideEffect_obj_notFirstSE] : 
+    c(k(eval(EN, obj-result(CT, X, PR)) -> K), cnt), 
+      m(M sideEffMemChangeNotConcrete(SEL, M')) , snapshots(SNL),
+      nextSnapshot(Nn)
+      => c(k(evalResultAfterCompleted(
+           ---- DynResType(EN, snap(Nn)) als dynamischer Typ!
+           o(CT, CT, RestObjEnv(EN, snap(Nn))
+             (CT, [X, ResAttLoc(EN, snap(Nn), X)]))) 
+             -> K), cnt), 
+         m(sideEffMemChange
+            ([locs(effectof EN in snap(Nn)) ; 
+              vals(effectof EN in snap(Nn))], 
+              M  
+              sideEffMemChangeNotConcrete(SEL, 
+                  M'
+                 [ResAttLoc(EN,snap(Nn), X) , 
+                  AttVal(EN, snap(Nn), X) GetsResType PR])
+            )
+          ) ,
+         snapshots(SNL , (snap(Nn), 
+           (c(cnt),  m(M sideEffMemChangeNotConcrete(SEL, M'))))), 
+         nextSnapshot(Nn + 1) .
+
+  ---- predicate which is true in a state where already a side effect
+  ---- has happened and is left in the store surrounding a non concrete
+  ---- store .
+  op OldSideEffInside : Store -> [Bool] .
+  eq OldSideEffInside(M sideEffMemChangeNotConcrete(SEL, M')) = true .
+
+  ---- This rule works when the result of the expression is to be an object
+  ---- which has type CT and an attribute X which itself is of some primitive 
+  ---- type. Also there is no sideeffect in the memory. 
+  crl [SideEffect_obj_FirstSE] : 
+    c(k(eval(EN, obj-result(CT, X, PR)) -> K), cnt), m(M) , snapshots(SNL),
+      nextSnapshot(Nn)
+      => c(k(evalResultAfterCompleted(
+         ---- DynResType(EN, snap(Nn)) als dynamischer Typ! 
+         o(CT, CT, RestObjEnv(EN, snap(Nn))
+             (CT, [X, ResAttLoc(EN, snap(Nn), X)]))) 
+             -> K), cnt), 
+         m(sideEffMemChange
+            ([locs(effectof EN in snap(Nn)) ; 
+              vals(effectof EN in snap(Nn))], 
+              M  [ResAttLoc(EN,snap(Nn), X) , 
+                  AttVal(EN, snap(Nn), X) GetsResType PR])
+            ) ,
+         snapshots(SNL , (snap(Nn), (c(cnt), m(M)))), 
+         nextSnapshot(Nn + 1) 
+    if OldSideEffInside(M) =/= true .
+
+  ---- This rule works when the result is some array and has an explicit 
+  ---- member at the position of the integer I. There has been some side
+  ---- effect in the memory before.
+  rl [SideEffect_arr_NotFirstSE] : 
+    c(k(eval(EN, arr-result(T, I)) -> K), cnt), 
+      m(M sideEffMemChangeNotConcrete(SEL, M')) , snapshots(SNL),
+      nextSnapshot(Nn)
+      => c(k(evalResultAfterCompleted(
+          a(T, RestArrEnv(EN, snap(Nn)) [I, ResArrLoc(EN, snap(Nn), I)])) 
+             -> K), cnt), 
+         m(sideEffMemChange
+            ([locs(effectof EN in snap(Nn)) ; 
+              vals(effectof EN in snap(Nn))], 
+              M 
+              sideEffMemChangeNotConcrete(SEL, M'
+                 [ResArrLoc(EN,snap(Nn), I) , 
+                  ArrVal(EN, snap(Nn), I) GetsResType PrimResType(T)])
+            )
+          ) ,
+         snapshots(SNL , (snap(Nn), (c(cnt),
+         m(M sideEffMemChangeNotConcrete(SEL, M'))))), 
+         nextSnapshot(Nn + 1) .
+
+  ---- This rule works when the result is some array and has an explicit 
+  ---- member at the position of the integer I. There are no remainders of an
+  ---- earlier side effect in the memory.
+  crl [SideEffect_arr_FirstSE] : 
+    c(k(eval(EN, arr-result(T, I)) -> K), cnt), m(M) , snapshots(SNL),
+      nextSnapshot(Nn)
+      => c(k(evalResultAfterCompleted(
+          a(T, RestArrEnv(EN, snap(Nn)) [I, ResArrLoc(EN, snap(Nn), I)])) 
+             -> K), cnt), 
+         m(sideEffMemChange
+            ([locs(effectof EN in snap(Nn)) ; 
+              vals(effectof EN in snap(Nn))], 
+              M  [ResArrLoc(EN,snap(Nn), I) , 
+                  ArrVal(EN, snap(Nn), I) GetsResType PrimResType(T)])
+            ) ,
+         snapshots(SNL , (snap(Nn), (c(cnt), m(M)))), 
+         nextSnapshot(Nn + 1) 
+     if OldSideEffInside(M) =/= true .
+
+  ---- This rule works when the result is some array and we don't need an
+  ---- explicit member of it.
+  rl [SideEffect_arr_noindex] : 
+    c(k(eval(EN, arr-result(T)) -> K), cnt), 
+      m(M) , snapshots(SNL),
+      nextSnapshot(Nn)
+      => c(k(evalResultAfterCompleted(
+          a(T, RestArrEnv(EN, snap(Nn)))) 
+             -> K), cnt), 
+         m(sideEffMemChange
+            ([locs(effectof EN in snap(Nn)) ; 
+              vals(effectof EN in snap(Nn))], 
+              M 
+            )
+          ) ,
+         snapshots(SNL , (snap(Nn), (c(cnt), m(M)))),
+         nextSnapshot(Nn + 1) .
+
+  --- equations governing the work of the change inside the memory,
+  --- special cases are necessary whenever the value is of a "special sort",
+  --- i.e. int, fl, str, bool or alloc. Then the whole result needs to
+  --- reflect that in order to allow further evaluation.
+  eq sideEffMemChange([LocaL ; Vl], [TNL,V] M) 
+          = [TNL,  V] 
+            sideEffMemChange([LocaL ; Vl], M) .
+  
+  ceq sideEffMemChange([LocaL ; Vl], [L, int(I:Int)] M) 
+          = [L, int(L in LocaL ?? Vl :: I:Int int)] 
+            sideEffMemChange([LocaL ; Vl], M) if not L :: TacletNewLocation .
+  ceq sideEffMemChange([LocaL ; Vl], [L, fl(F:Float)] M) 
+          = [L, fl(L in LocaL ?? Vl :: F:Float fl)] 
+            sideEffMemChange([LocaL ; Vl], M) if not L :: TacletNewLocation .
+  ceq sideEffMemChange([LocaL ; Vl], [L, str(S:String)] M) 
+          = [L, str(L in LocaL ?? Vl :: S:String str)] 
+            sideEffMemChange([LocaL ; Vl], M) if not L :: TacletNewLocation .
+  ceq sideEffMemChange([LocaL ; Vl], [L, bool(B:Bool)] M) 
+          = [L, bool(L in LocaL ?? Vl :: B:Bool bool)] 
+            sideEffMemChange([LocaL ; Vl], M) if not L :: TacletNewLocation .
+  ceq sideEffMemChange([LocaL ; Vl], [L, alloc(T:Type)] M) 
+          = [L, alloc(L in LocaL ?? Vl :: T:Type alloc)] 
+            sideEffMemChange([LocaL ; Vl], M) if not L :: TacletNewLocation .
+
+   ceq sideEffMemChange([LocaL ; Vl], [L, o(ST:CType, DT:CType, OE:ObjEnv )] M) 
+          = [L, o(ST:CType, 
+                  L in LocaL ?? Vl :: DT:CType ctype, 
+                  L in LocaL ?? Vl :: OE:ObjEnv objenv)] 
+            sideEffMemChange([LocaL ; Vl], M) if not L :: TacletNewLocation . ---- ADDED 050401
+  
+  --- standard case to go through all stores
+  ceq sideEffMemChange([LocaL ; Vl], [L,V] M) 
+          = [L, L in LocaL ?? Vl :: V] 
+            sideEffMemChange([LocaL ; Vl], M) 
+          if not L :: TacletNewLocation and UndefValType(V) =/= true [owise] . ---- CHANGE 050225 text done too
+  --- case where no concrete store is left over, but there is something left
+  --- and not only the noStore
+  ceq sideEffMemChange([LocaL ; Vl], M) 
+          = sideEffMemChangeNotConcrete([LocaL ; Vl], M) 
+          if M =/= noStore [owise] .
+
+
+  --- standard case continued if there are only concrete stores they will all
+  --- be changed by the above standard case and the noStore remains which can
+  --- be thrown away as done here and the block on the continuation ends
+  ceq c(k(evalResultAfterCompleted(V) -> K ), cnt), 
+     m(M sideEffMemChange(SEL, noStore)) 
+       = c(k(V -> K), cnt), m(M) if UndefValType(V) =/= true . ---- CHANGE 050225 text done too
+  
+  --- case where some part of the memory was not concrete and thus has to
+  --- remain in the memory together with the change that *should* happen
+  ceq c(k(evalResultAfterCompleted(V) -> K ), cnt), 
+     m(M sideEffMemChangeNotConcrete(SEL, M'))
+       = c(k(V -> K), cnt),  m(M sideEffMemChangeNotConcrete(SEL, M')) 
+     if UndefValType(V) =/= true . ---- CHANGE 050225 text done too
+  
+  --- adding simultaneous updates (from the taclet language with the
+  --- semantics they have there), but restricting them to be there in the
+  --- initial configuration, they can only be executed and will never be
+  --- created by a java program
+  --- defining an update:
+  sort Update .
+  op _:=_; : Exp Exp -> Update .
+  sort UpdateList .
+  subsort Update < UpdateList .
+  op `(`) : -> UpdateList .
+  op __ : UpdateList UpdateList -> UpdateList [assoc id: ()] .
+
+  op simUpd_ -> _ : UpdateList Continuation -> Continuation .
+  op simUpdList_ | _ -> _ : Exps Exps Continuation -> Continuation .
+
+  var E' : Exp . var El El' : Exps . var UD : UpdateList .
+
+  --- The following two equations create simUpdL(El | El') from a 
+  --- simUpd(e1 := e1' ; e2 := e2' ; ...) where the order of e1, e2 in
+  --- the El list and e1', e2' in the El' list stays the same as in the
+  --- original. An empty inital update list is not allowed, then there
+  --- is no need to put an update construct anyway!
+  eq k(simUpd((E := E' ;) UD) -> simUpdList El | El' -> K) =
+       k(simUpd(UD) -> simUpdList El, E | El', E' -> K) .
+  eq k(simUpd((E := E' ;) UD) -> K) = 
+       k(simUpd(UD) -> simUpdList E | E' -> noLoc -> K) [owise] .
+  eq k(simUpd(()) -> K ) = k(K) .
+
+  --- Now we need to evaluate the lefthand sides to their locations and
+  --- keep those locations in reserve without assigning things yet.
+  eq k(simUpdList E, El | El' -> K) = 
+       k(loc(E) -> simUpdList El | El' -> K) .
+  eq k(L -> simUpdList El | El' -> LocaL -> K) =
+       k(simUpdList El | El' -> LocaL, L -> K) .
+
+  eq k(simUpdList () | E, El -> K) = k(E -> [El | noVal] -> K) .
+
+
+  vars oEnv oEnv' : ObjEnv . vars T T' : Type . 
+  vars aEnv aEnv' : ArrayEnv . var V' : Value .
+
+  ---- for objects the type check works like this: the dynamic type
+  ---- (second type in the "object" reference) of the "object" which will be
+  ---- assigned to the location (that is the second argument here) has to be
+  ---- of a sub-type of the static type (first type in the reference) of the
+  ---- "object" (which is actually a kind of rich reference) already at the
+  ---- location (which is the first argument).
+  eq c(k(typecheck(o(CT, CT', oEnv), o(CT'', CT''', oEnv'), L) 
+       -> K), cnt), cl(Cl) = 
+         c(k(if SuperOf(CT, CT''', Cl) 
+             then change-checked(o(CT'', CT''', oEnv'), L) -> K 
+             else throw ClassCastException(o(CT, CT', oEnv), 
+                                           o(CT'', CT''', oEnv'), 
+                                           L) ; -> K 
+             fi),
+           cnt), cl(Cl) . 
+
+  ---- arrays have to be treated separate for the type check, here we can
+  ---- have Type[] as types, and that also in multiple layers. we can use the
+  ---- "Assignable" check, which takes care of the [] and inside uses
+  ---- "SuperOf" as above.
+  eq c(k(typecheck(a(T, aEnv), a(T', aEnv'), L) -> K), cnt), cl(Cl) = 
+       c(k(if Assignable(T, T', Cl) 
+           then change-checked(a(T', aEnv'), L) -> K 
+           else throw ClassCastException(a(T, aEnv), a(T', aEnv'), L) ; -> K 
+           fi), cnt), cl(Cl) . 
+
+  ---- for all other cases, i.e. primitive types, we do not care about
+  ---- the types because it is the compilers job to make sure this happens
+  ---- properly!
+  eq c(k(typecheck(V', V, L) -> K), cnt), cl(Cl) = 
+       c(k(change-checked(V, L) -> K ), cnt), cl(Cl) [owise] . 
+
+  ---- this typechecks first for a cast, cast will take effect if the
+  ---- check is ok, otherwise there is an exception!
+  eq c(k(o(CT, CT', oEnv) -> {CT''} -> K), cnt), cl(Cl) = 
+       c(k(if SuperOf(CT'', CT', Cl) 
+         then o(CT'', CT', oEnv) -> K 
+         else throw ClassCastException(CT'', o(CT, CT', oEnv)) ; -> K fi), 
+         cnt), cl(Cl) . ---- ADDED-CAST-TYPE-CHECK
+
+  var I : Int . var f : Float . var str : String .
+  var B : Bool .
+
+  ---- Allowing casts of a type onto itself, implicit type check!
+  eq k(int(I) -> {int} -> K) = k(int(I) -> K) .
+  eq k(fl(f) -> {float} -> K) = k(fl(f) -> K) .
+  eq k(str(str) -> {String} -> K) = k(str(str) -> K) .
+  eq k(bool(B) -> {boolean} -> K) = k(bool(B) -> K) .
+
+  ---- Allow "ReplaceWith" to work on generic values too.
+  eq ReplaceWith(V, V') = V' [owise] . ---- ADDED 050404 - BUGFIXED 050428
+
+  ---- Create a wrapping Expression for Values, so they can appear in code.
+  op resIsValue : Value -> Exp . ---- ADDED 050404
+  eq k(resIsValue(V) -> K) = k(V -> K) . ---- ADDED 050404
+  
+************************************************************************
+  var X : Name . var PR : PrimitiveExpressionResultType .
+  
+  ---- sort that the result value shall get, i.e. we know that the "value" has
+  ---- a special type and with this we enforce the type so it is used in 
+  ---- further computation.
+  sort ExpressionResultType .
+  sort PrimitiveExpressionResultType .
+  subsort PrimitiveExpressionResultType < ExpressionResultType .
+  op int-result    : -> PrimitiveExpressionResultType .
+  op float-result  : -> PrimitiveExpressionResultType .
+  op string-result : -> PrimitiveExpressionResultType .
+  op bool-result   : -> PrimitiveExpressionResultType .
+  op non-primitive-result : -> PrimitiveExpressionResultType .
+
+  ---- these represent the result of the given expression when executed in the
+  ---- given snapshot and it has the primitive type which is indicated.
+  op resultof_in_int    : ExpressionName SnapshotName -> Int .
+  op resultof_in_float  : ExpressionName SnapshotName -> Float .
+  op resultof_in_string : ExpressionName SnapshotName -> String .
+  op resultof_in_bool   : ExpressionName SnapshotName -> Bool .
+
+  ---- this is the result when no specific primitive type is given.
+  op resultof_in_ : ExpressionName SnapshotName -> Value .
+  ---- this operator gives a generic (specificically defined, i.e. resultof, 
+  ---- attval and arrval expressions only!) value a special type, the one
+  ---- given as second argument
+  op _GetsResType_ : Value PrimitiveExpressionResultType -> Value .
+
+  ---- equations for the "resultof_in_" values to get specific type
+  eq resultof EN in snap(Nn) GetsResType int-result = 
+       int(resultof EN in snap(Nn) int) .
+  eq resultof EN in snap(Nn) GetsResType float-result = 
+       fl(resultof EN in snap(Nn) float) .
+  eq resultof EN in snap(Nn) GetsResType string-result = 
+       str(resultof EN in snap(Nn) string) .
+  eq resultof EN in snap(Nn) GetsResType bool-result = 
+       bool(resultof EN in snap(Nn) bool) .
+  eq resultof EN in snap(Nn) GetsResType non-primitive-result =
+       resultof EN in snap(Nn) .
+
+  ---- the class type is the static type of the created object; the name
+  ---- is an attribute variable, of the static type of the object; which has
+  ---- the type of the given ExpressionResultType.
+  op obj-result : CType Name PrimitiveExpressionResultType -> ExpressionResultType .
+  ---- the class type is the static type of the created object, it does not
+  ---- have any explicitly given attribute.
+  op obj-result : CType -> ExpressionResultType .
+  ---- the type is the type of the elements of the array, the int states 
+  ---- which element of the array has to be made explicit. The type of this
+  ---- element is of the type of the array, so we do not need the type of 
+  ---- it again.
+  op arr-result : Type Int -> ExpressionResultType .
+  ---- the type is the type of the elements of the array, no index is given so
+  ---- the array's environment will be one skolem constant
+  op arr-result : Type -> ExpressionResultType .
+  
+  ---- this is the location where the attribute (whose name is given) of the 
+  ---- result is put, the result is that of the expression given when
+  ---- executed in the given snapshot.
+  op ResAttLoc  : ExpressionName SnapshotName Name -> Location . 
+  ---- Value of the Attribute with the given name.
+  op AttVal     : ExpressionName SnapshotName Name -> Value .
+  ---- Dynamic Type of the resulting object.
+  op DynResType : ExpressionName SnapshotName -> CType .
+  ---- Remainder of the objects environment. 
+  op RestObjEnv : ExpressionName SnapshotName -> ObjEnv . 
+  
+  ---- Location where the array element indexed by the given int is put.
+  op ResArrLoc  : ExpressionName SnapshotName Int -> Location .
+  ---- Value of the array element at the index given by the int.
+  op ArrVal     : ExpressionName SnapshotName Int -> Value .
+  ---- Remainder of the environment of the array.
+  op RestArrEnv : ExpressionName SnapshotName -> ArrayEnv .
+
+  ---- same as the "resultof_in_TYPE" operators
+  op AttValInt    : ExpressionName SnapshotName Name -> Int .
+  op AttValFloat  : ExpressionName SnapshotName Name -> Float .
+  op AttValString : ExpressionName SnapshotName Name -> String .
+  op AttValBool   : ExpressionName SnapshotName Name -> Bool .
+  
+  ---- equations similar to those for "resultof_in_TYPE"
+  eq AttVal(EN, snap(Nn), X) GetsResType int-result =
+       int(AttValInt(EN, snap(Nn), X)) .
+  eq AttVal(EN, snap(Nn), X) GetsResType float-result =
+       fl(AttValFloat(EN, snap(Nn), X)) .
+  eq AttVal(EN, snap(Nn), X) GetsResType string-result =
+       str(AttValString(EN, snap(Nn), X)) .
+  eq AttVal(EN, snap(Nn), X) GetsResType bool-result =
+       bool(AttValBool(EN, snap(Nn), X)) .
+  eq AttVal(EN, snap(Nn), X) GetsResType non-primitive-result =
+       AttVal(EN, snap(Nn), X) .
+
+  ---- same as the "resultof_in_TYPE" and "AttValTYPE" operators
+  op ArrValInt    : ExpressionName SnapshotName Int -> Int .
+  op ArrValFloat  : ExpressionName SnapshotName Int -> Float .
+  op ArrValString : ExpressionName SnapshotName Int -> String .
+  op ArrValBool   : ExpressionName SnapshotName Int -> Bool .
+  
+  ---- equations similar to those for "resultof_in_TYPE" and "AttValTYPE"
+  eq ArrVal(EN, snap(Nn), I) GetsResType int-result =
+       int(ArrValInt(EN, snap(Nn), I)) .
+  eq ArrVal(EN, snap(Nn), I) GetsResType float-result =
+       fl(ArrValFloat(EN, snap(Nn), I)) .
+  eq ArrVal(EN, snap(Nn), I) GetsResType string-result =
+       str(ArrValString(EN, snap(Nn), I)) .
+  eq ArrVal(EN, snap(Nn), I) GetsResType bool-result =
+       bool(ArrValBool(EN, snap(Nn), I)) .
+  eq ArrVal(EN, snap(Nn), I) GetsResType non-primitive-result =
+       ArrVal(EN, snap(Nn), I) .
+  
+  ---- transforms usual types into the "PrimitiveExpressionResultType" which
+  ---- is needed for fixing the types as seen above.
+  op PrimResType : Type -> PrimitiveExpressionResultType .
+  var Ty : Type .
+  eq PrimResType(int)     = int-result .
+  eq PrimResType(float)   = float-result .
+  eq PrimResType(String)  = string-result .
+  eq PrimResType(boolean) = bool-result .
+  eq PrimResType(Ty)      = non-primitive-result [owise] .
+
+  
+  ----HANDLING OF STORES UNDER THE "NOTCONCRETE" SIDEEFF OPERATOR:  
+  --- "artificial" case, some concrete Store elements can be pushed under
+  --- this operator and they need a way out, this is it
+  eq sideEffMemChangeNotConcrete([LocaL ; Vl], [L, int(I:Int)] M) 
+        = [L, int(L in LocaL ?? Vl :: I:Int int)] 
+          sideEffMemChangeNotConcrete([LocaL ; Vl], M) .
+  eq sideEffMemChangeNotConcrete([LocaL ; Vl], [L, fl(F:Float)] M) 
+        = [L, fl(L in LocaL ?? Vl :: F:Float fl)] 
+          sideEffMemChangeNotConcrete([LocaL ; Vl], M) .
+  eq sideEffMemChangeNotConcrete([LocaL ; Vl], [L, str(S:String)] M) 
+        = [L, str(L in LocaL ?? Vl :: S:String str)] 
+          sideEffMemChangeNotConcrete([LocaL ; Vl], M) .
+  eq sideEffMemChangeNotConcrete([LocaL ; Vl], [L, bool(B:Bool)] M) 
+        = [L, bool(L in LocaL ?? Vl :: B:Bool bool)] 
+          sideEffMemChangeNotConcrete([LocaL ; Vl], M) .
+  eq sideEffMemChangeNotConcrete([LocaL ; Vl], [L, alloc(T:Type)] M) 
+        = [L, alloc(L in LocaL ?? Vl :: T:Type alloc)] 
+          sideEffMemChangeNotConcrete([LocaL ; Vl], M) .
+
+  eq sideEffMemChangeNotConcrete([LocaL ; Vl], [L, o(ST:CType, DT:CType, OE:ObjEnv )] M) 
+          = [L, o(ST:CType, 
+                  L in LocaL ?? Vl :: DT:CType ctype, 
+                  L in LocaL ?? Vl :: OE:ObjEnv objenv)] 
+            sideEffMemChangeNotConcrete([LocaL ; Vl], M) . ---- ADDED 050401
+
+  ---- This predicate checks whether there is a "GetsResType" in some value,
+  ---- that has to be executed first, so whereever that is possible there is
+  ---- a check with this predicate so that the value cannot be otherwise
+  ---- used until the "GetsResType" is evaluated.  
+  op UndefValType : Value -> [Bool] .
+  eq UndefValType(V GetsResType PR) = true .
+
+  --- base case for the "artificial" case, this can only happen after the
+  --- Value inside that location is *evaluated*, in the sense that it is
+  --- clear if it has a special primitive type or is a general value. By 
+  --- making this a rule we are sure that all equational simplification
+  --- has happened before, i.e. if the value has the "V GetResType PR" form
+  --- it will have been evaluated to its primitive type before and thus this
+  --- will not be used as one of the above equations can work.
+  ceq sideEffMemChangeNotConcrete([LocaL ; Vl], [L,V] M) 
+        = [L, L in LocaL ?? Vl :: V] 
+          sideEffMemChangeNotConcrete([LocaL ; Vl], M) 
+      if UndefValType(V) =/= true .
+
+
+  ---- This is to retain some info about the case we are currently in.
+  op caseInfo : Int Int Bool -> Bool .
+   
+  eq caseInfo(N1:Int, N2:Int, B:Bool) = B:Bool .
+
+  ---- Below there is stuff which works as INTERFACE to the Java based creation
+  ---- of the required comparisons for each taclet.
+
+  var CODE : BlockStatements . var AL : AddList .
+
+  ---- This is a special sort with one operator taking the place where later
+  ---- the actual code is put. The second operator is just the standard way
+  ---- of getting that operator into a continuation.
+  sort InitialCode .
+  op initCodePlaceHolder : -> InitialCode .
+  op _ -> _ : InitialCode Continuation -> Continuation . 
+
+  ---- This is showing where the initial code ends, so it can be easily read
+  ---- from the string Java has produced.
+  op endOfInitCode : -> Continuation .
+
+  ---- This is the starting configuration upon which we expand by the "add"
+  ---- operator.
+  op basicInitConfiguration : -> Output .
+
+  ---- To be able to define the "basicInitConfiguration" from above 
+  ---- equationally we need quite a few "Maude Constants" which from our point
+  ---- of view are skolem constants, they all start with "init" for easier
+  ---- recognition.
+  ---- These constants create junk for some of the sorts but that is ok, we
+  ---- do want these to remain in our computation. Now we do not actually 
+  ---- protect these sorts which were, in part, imported protected, but that
+  ---- is just a minor point of declaration.
+  op initRemainderOfCode  : -> Continuation .
+  op initLocalEnv         : -> Env .
+  op initStaticClassType  : -> CType .
+  op initDynamicClassType : -> CType .
+  op initObjEnv           : -> ObjEnv .
+  op initMemCounter       : -> Nat .
+  op initMemory           : -> Store .
+  op initSetOfClasses     : -> Classes .
+  op initStaticAttEnv     : -> ObjEnv .
+  op initSnapCounter      : -> Nat .
+  op initSnapList         : -> SnapshotList .
+  op initOutput           : -> Output .
+  
+  ---- This equation defines the basicInitConfiguration in terms of the above
+  ---- given constants.
+  eq basicInitConfiguration 
+       = run(c(k(initCodePlaceHolder -> pause -> initRemainderOfCode),
+               e(initLocalEnv), 
+                o( o(initStaticClassType,
+                     initDynamicClassType,
+                     initObjEnv
+                    )
+                 )), 
+             n(initMemCounter),
+             m(initMemory),
+             l(noLock), ---- no need for locks for us
+             w(noLock), ---- no need for locks for us
+             cl(initSetOfClasses),
+             s(initStaticAttEnv),
+             nextSnapshot(initSnapCounter),
+             snapshots(initSnapList),
+             out(initOutput)
+             ) .
+
+  ---- Everything which has to be added to the configuration is part of an
+  ---- "AddList" which is built like this.
+  sort AddList .
+  sort AddListElement .
+  subsort AddListElement < AddList .
+  op emptyAddList : -> AddList .
+  op __ : AddList AddList -> AddList [assoc id: emptyAddList] .
+
+  ---- First create all possibly overlapping cases, before really adding
+  ---- the elements into the configuration. I.e. here for every two variables
+  ---- which are of the same sorts, we have a rewrite which allows them to
+  ---- be identical in the memory. As we later on search over all possible
+  ---- results, all possible combinations are automatically created. What this 
+  ---- basically does for two variables "x, y" is that in the code they are
+  ---- still distinct, but in the environment both are mapped to the same 
+  ---- location. This needs to be done for all operators which add new things.
+  op add : Output AddList Continuation -> Output .
+
+  ---- This rule finishes the combination, by changing "add" to "addNow".
+  rl compareResultsModNewVars(
+       add(O:Output, A:AddList, C:Continuation) , 
+       add(O':Output, A':AddList, C':Continuation) )
+       => compareResultsModNewVars(
+       addNow(O:Output, A:AddList, C:Continuation) , 
+       addNow(O':Output, A':AddList, C':Continuation) ) .
+
+  ---- CHANGE 28-09-2005:
+  ---- Objects can not be 'cast' to ints or bools anymore (because of an extra
+  ---- condition. Identifying two objects though is possible, but only if they
+  ---- both have the same object environment, meaning they have the same
+  ---- attributes (we know of!). Technically one would need to type check the
+  ---- static types even!
+  op objtest : Value -> [Bool] .
+  eq objtest(o(CT, CT', oEnv)) = true .
+  ---- /CHANGE (large scale!), there are extra conditions which have been added
+  ---- below
+
+  ---- This rule caters to the case of two local variables, at least one of 
+  ---- which is an integer. The non-integer can not be an object. It will not 
+  ---- be a bool by the construction of the inputs we get!
+  crl compareResultsModNewVars(
+       add(O:Output, 
+              addToLocalEnv(l0:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, l0Val:Value)  
+              addToLocalEnv(l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, int(l1Val:Int))
+              A:AddList, 
+           C:Continuation) , 
+       add(O':Output, 
+              addToLocalEnv(l0:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, l0Val:Value)  
+              addToLocalEnv(l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, int(l1Val:Int))
+              A':AddList, 
+           C':Continuation) )
+       =>  
+       compareResultsModNewVars(
+       add(O:Output, 
+              addToLocalEnv(l0:Name, l1Loc:Location) 
+              addToLocalEnv(l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, int(l1Val:Int))
+              A:AddList, 
+           C:Continuation) , 
+       add(O':Output, 
+              addToLocalEnv(l0:Name, l1Loc:Location) 
+              addToLocalEnv(l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, int(l1Val:Int))
+              A':AddList, 
+           C':Continuation) ) 
+       if objtest(l0Val:Value) =/= true . 
+
+  ---- This rule caters to the case of two local variables, at least one of 
+  ---- which is a boolean. The non-integer can not be an object.
+  crl compareResultsModNewVars(
+       add(O:Output, 
+              addToLocalEnv(l0:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, l0Val:Value)  
+              addToLocalEnv(l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, bool(l1Val:Bool))
+              A:AddList, 
+           C:Continuation) , 
+       add(O':Output, 
+              addToLocalEnv(l0:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, l0Val:Value)  
+              addToLocalEnv(l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, bool(l1Val:Bool))
+              A':AddList, 
+           C':Continuation) )
+       =>  
+       compareResultsModNewVars(
+       add(O:Output, 
+              addToLocalEnv(l0:Name, l1Loc:Location) 
+              addToLocalEnv(l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, bool(l1Val:Bool))
+              A:AddList, 
+           C:Continuation) , 
+       add(O':Output, 
+              addToLocalEnv(l0:Name, l1Loc:Location) 
+              addToLocalEnv(l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, bool(l1Val:Bool))
+              A':AddList, 
+           C':Continuation) ) 
+     if objtest(l0Val:Value) =/= true . 
+
+
+  ---- This rule is for two local variables with generic values, where
+  ---- the "dropped" one cannot be an integer or boolean. Also none of them
+  ---- can be an object, there is a special rule for two objects.
+  crl compareResultsModNewVars(
+       add(O:Output, 
+              addToLocalEnv(l0:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, l0Val:Value)  
+              addToLocalEnv(l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, l1Val:Value)
+              A:AddList, 
+           C:Continuation) , 
+       add(O':Output, 
+              addToLocalEnv(l0:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, l0Val:Value)  
+              addToLocalEnv(l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, l1Val:Value)
+              A':AddList, 
+           C':Continuation) )
+       =>  
+       compareResultsModNewVars(
+       add(O:Output, 
+              addToLocalEnv(l0:Name, l0Loc:Location) 
+              addToLocalEnv(l1:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, l0Val:Value)
+              A:AddList, 
+           C:Continuation) , 
+       add(O':Output, 
+              addToLocalEnv(l0:Name, l0Loc:Location) 
+              addToLocalEnv(l1:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, l0Val:Value)
+              A':AddList, 
+           C':Continuation) ) if inttest(l1Val:Value) =/= true 
+                              /\ booltest(l1Val:Value) =/= true 
+                              /\ objtest(l0Val:Value) =/= true 
+                              /\ objtest(l1Val:Value) =/= true . 
+  
+  op inttest : Value -> [Bool] .
+  eq inttest(int(I:Int)) = true .
+  op booltest : Value -> [Bool] .
+  eq booltest(bool(B:Bool)) = true .
+
+  ---- This rule is for two local variables with both being objects.
+  ---- This should technically check whether the CT's are sub/superclasses 
+  ---- of each other.
+  rl compareResultsModNewVars(
+       add(O:Output, 
+              addToLocalEnv(l0:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, o(CT, CT', oEnv))  
+              addToLocalEnv(l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, o(CT'', CT''', oEnv))
+              A:AddList, 
+           C:Continuation) , 
+       add(O':Output, 
+              addToLocalEnv(l0:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, o(CT, CT', oEnv))  
+              addToLocalEnv(l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, o(CT'', CT''', oEnv))
+              A':AddList, 
+           C':Continuation) )
+       =>  
+       compareResultsModNewVars(
+       add(O:Output, 
+              addToLocalEnv(l0:Name, l0Loc:Location) 
+              addToLocalEnv(l1:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, o(CT, CT', oEnv))
+              A:AddList, 
+           C:Continuation) , 
+       add(O':Output, 
+              addToLocalEnv(l0:Name, l0Loc:Location) 
+              addToLocalEnv(l1:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, o(CT, CT', oEnv))
+              A':AddList, 
+           C':Continuation) ) . 
+
+  ---- This rule caters to the case of two static variables, at least one of 
+  ---- which is an integer. No object allowed.
+  crl compareResultsModNewVars(
+       add(O:Output, 
+              addToStaticEnv(C:CType, l0:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, l0Val:Value)  
+              addToStaticEnv(C':CType, l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, int(l1Val:Int))
+              A:AddList, 
+           C:Continuation) , 
+       add(O':Output, 
+              addToStaticEnv(C:CType, l0:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, l0Val:Value)  
+              addToStaticEnv(C':CType, l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, int(l1Val:Int))
+              A':AddList, 
+           C':Continuation) )
+       =>  
+       compareResultsModNewVars(
+       add(O:Output, 
+              addToStaticEnv(C:CType, l0:Name, l1Loc:Location) 
+              addToStaticEnv(C':CType, l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, int(l1Val:Int))
+              A:AddList, 
+           C:Continuation) , 
+       add(O':Output, 
+              addToStaticEnv(C:CType, l0:Name, l1Loc:Location) 
+              addToStaticEnv(C':CType, l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, int(l1Val:Int))
+              A':AddList, 
+           C':Continuation) ) 
+       if objtest(l0Val:Value) =/= true . 
+
+  ---- This rule caters to the case of two static variables, at least one of 
+  ---- which is a boolean. No object allowed.
+  crl compareResultsModNewVars(
+       add(O:Output, 
+              addToStaticEnv(C:CType, l0:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, l0Val:Value)  
+              addToStaticEnv(C':CType, l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, bool(l1Val:Bool))
+              A:AddList, 
+           C:Continuation) , 
+       add(O':Output, 
+              addToStaticEnv(C:CType, l0:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, l0Val:Value)  
+              addToStaticEnv(C':CType, l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, bool(l1Val:Bool))
+              A':AddList, 
+           C':Continuation) )
+       =>  
+       compareResultsModNewVars(
+       add(O:Output, 
+              addToStaticEnv(C:CType, l0:Name, l1Loc:Location) 
+              addToStaticEnv(C':CType, l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, bool(l1Val:Bool))
+              A:AddList, 
+           C:Continuation) , 
+       add(O':Output, 
+              addToStaticEnv(C:CType, l0:Name, l1Loc:Location) 
+              addToStaticEnv(C':CType, l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, bool(l1Val:Bool))
+              A':AddList, 
+           C':Continuation) ) 
+      if objtest(l0Val:Value) =/= true . 
+
+  ---- This rule is for two static variables with generic values, where
+  ---- the "dropped" one cannot be an integer or boolean. Both can't be objects.
+  crl compareResultsModNewVars(
+       add(O:Output, 
+              addToStaticEnv(C:CType, l0:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, l0Val:Value)  
+              addToStaticEnv(C':CType, l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, l1Val:Value)
+              A:AddList, 
+           C:Continuation) , 
+       add(O':Output, 
+              addToStaticEnv(C:CType, l0:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, l0Val:Value)  
+              addToStaticEnv(C':CType, l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, l1Val:Value)
+              A':AddList, 
+           C':Continuation) )
+       =>  
+       compareResultsModNewVars(
+       add(O:Output, 
+              addToStaticEnv(C:CType, l0:Name, l0Loc:Location) 
+              addToStaticEnv(C':CType, l1:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, l0Val:Value)
+              A:AddList, 
+           C:Continuation) , 
+       add(O':Output, 
+              addToStaticEnv(C:CType, l0:Name, l0Loc:Location) 
+              addToStaticEnv(C':CType, l1:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, l0Val:Value)
+              A':AddList, 
+           C':Continuation) ) if inttest(l1Val:Value) =/= true 
+                              /\ booltest(l1Val:Value) =/= true 
+                              /\ objtest(l0Val:Value) =/= true
+                              /\ objtest(l1Val:Value) =/= true . 
+
+
+  ---- This rule is for two static variables with both being objects.
+  ---- This should technically check whether the CT's are sub/superclasses 
+  ---- of each other.
+  rl compareResultsModNewVars(
+       add(O:Output, 
+              addToStaticEnv(C:CType, l0:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, o(CT, CT', oEnv))  
+              addToStaticEnv(C':CType, l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, o(CT'', CT''', oEnv))
+              A:AddList, 
+           C:Continuation) , 
+       add(O':Output, 
+              addToStaticEnv(C:CType, l0:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, o(CT, CT', oEnv))  
+              addToStaticEnv(C':CType, l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, o(CT'', CT''', oEnv))
+              A':AddList, 
+           C':Continuation) )
+       =>  
+       compareResultsModNewVars(
+       add(O:Output, 
+              addToStaticEnv(C:CType, l0:Name, l0Loc:Location) 
+              addToStaticEnv(C':CType, l1:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, o(CT, CT', oEnv))
+              A:AddList, 
+           C:Continuation) , 
+       add(O':Output, 
+              addToStaticEnv(C:CType, l0:Name, l0Loc:Location) 
+              addToStaticEnv(C':CType, l1:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, o(CT, CT', oEnv))
+              A':AddList, 
+           C':Continuation) ) . 
+
+
+  ---- This rule caters to the case of two attributes of the current object, 
+  ---- at least one of which is an integer. No Object allowed.
+  crl compareResultsModNewVars(
+       add(O:Output, 
+              addToCurrentObjEnv(l0:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, l0Val:Value)  
+              addToCurrentObjEnv(l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, int(l1Val:Int))
+              A:AddList, 
+           C:Continuation) , 
+       add(O':Output, 
+              addToCurrentObjEnv(l0:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, l0Val:Value)  
+              addToCurrentObjEnv(l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, int(l1Val:Int))
+              A':AddList, 
+           C':Continuation) )
+       =>  
+       compareResultsModNewVars(
+       add(O:Output, 
+              addToCurrentObjEnv(l0:Name, l1Loc:Location) 
+              addToCurrentObjEnv(l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, int(l1Val:Int))
+              A:AddList, 
+           C:Continuation) , 
+       add(O':Output, 
+              addToCurrentObjEnv(l0:Name, l1Loc:Location) 
+              addToCurrentObjEnv(l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, int(l1Val:Int))
+              A':AddList, 
+           C':Continuation) ) 
+    if objtest(l0Val:Value) =/= true . 
+
+  ---- This rule caters to the case of two attributes of the current object, 
+  ---- at least one of which is a boolean. No object allowed.
+  crl compareResultsModNewVars(
+       add(O:Output, 
+              addToCurrentObjEnv(l0:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, l0Val:Value)  
+              addToCurrentObjEnv(l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, bool(l1Val:Bool))
+              A:AddList, 
+           C:Continuation) , 
+       add(O':Output, 
+              addToCurrentObjEnv(l0:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, l0Val:Value)  
+              addToCurrentObjEnv(l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, bool(l1Val:Bool))
+              A':AddList, 
+           C':Continuation) )
+       =>  
+       compareResultsModNewVars(
+       add(O:Output, 
+              addToCurrentObjEnv(l0:Name, l1Loc:Location) 
+              addToCurrentObjEnv(l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, bool(l1Val:Bool))
+              A:AddList, 
+           C:Continuation) , 
+       add(O':Output, 
+              addToCurrentObjEnv(l0:Name, l1Loc:Location) 
+              addToCurrentObjEnv(l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, bool(l1Val:Bool))
+              A':AddList, 
+           C':Continuation) ) 
+    if objtest(l0Val:Value) =/= true . 
+
+  ---- This rule is for two attributes of the current object with generic 
+  ---- values, where the "dropped" one cannot be an integer or boolean. 
+  ---- Neither can be an object. 
+  crl compareResultsModNewVars(
+       add(O:Output, 
+              addToCurrentObjEnv(l0:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, l0Val:Value)  
+              addToCurrentObjEnv(l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, l1Val:Value)
+              A:AddList, 
+           C:Continuation) , 
+       add(O':Output, 
+              addToCurrentObjEnv(l0:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, l0Val:Value)  
+              addToCurrentObjEnv(l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, l1Val:Value)
+              A':AddList, 
+           C':Continuation) )
+       =>  
+       compareResultsModNewVars(
+       add(O:Output, 
+              addToCurrentObjEnv(l0:Name, l0Loc:Location) 
+              addToCurrentObjEnv(l1:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, l0Val:Value)
+              A:AddList, 
+           C:Continuation) , 
+       add(O':Output, 
+              addToCurrentObjEnv(l0:Name, l0Loc:Location) 
+              addToCurrentObjEnv(l1:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, l0Val:Value)
+              A':AddList, 
+           C':Continuation) ) if inttest(l1Val:Value) =/= true 
+                              /\ booltest(l1Val:Value) =/= true 
+                              /\ objtest(l0Val:Value) =/= true 
+                              /\ objtest(l1Val:Value) =/= true . 
+
+  ---- This rule is for two attributes of the current object, both of which are
+  ---- objects with the same attributes. This should technically check whether
+  ---- the CT's are sub/superclasses of each other.
+  rl compareResultsModNewVars(
+       add(O:Output, 
+              addToCurrentObjEnv(l0:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, o(CT, CT', oEnv))  
+              addToCurrentObjEnv(l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, o(CT'', CT''', oEnv))
+              A:AddList, 
+           C:Continuation) , 
+       add(O':Output, 
+              addToCurrentObjEnv(l0:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, o(CT, CT', oEnv))  
+              addToCurrentObjEnv(l1:Name, l1Loc:Location) 
+              addToMemory(l1Loc:Location, o(CT'', CT''', oEnv))
+              A':AddList, 
+           C':Continuation) )
+       =>  
+       compareResultsModNewVars(
+       add(O:Output, 
+              addToCurrentObjEnv(l0:Name, l0Loc:Location) 
+              addToCurrentObjEnv(l1:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, o(CT, CT', oEnv))
+              A:AddList, 
+           C:Continuation) , 
+       add(O':Output, 
+              addToCurrentObjEnv(l0:Name, l0Loc:Location) 
+              addToCurrentObjEnv(l1:Name, l0Loc:Location) 
+              addToMemory(l0Loc:Location, o(CT, CT', oEnv))
+              A':AddList, 
+           C':Continuation) ) . 
+  
+ 
+  ---- This builds up the starting configuration (of sort output) required
+  ---- by the taclet. It takes a current configuration and adds all elements
+  ---- of the AddList to the configuration and in the end takes the code from
+  ---- the continuation and puts it into the configuration so execution can 
+  ---- proceed.
+  op addNow : Output AddList Continuation -> Output .
+
+  ---- This equation replaces the place holder code by the real initial code
+  ---- when no further things need to be added to the configuration and allows
+  ---- the actual java semantics given herein to start. The initCodePlaceHolder
+  ---- stops all rules of the MJS from working before. Also this removes the
+  ---- wrapping "addNow" operator.
+  eq addNow(run(c(k(initCodePlaceHolder -> pause -> K), cnt), state),
+         emptyAddList, 
+         CODE -> endOfInitCode) 
+       = run(c(k(CODE -> pause -> K), cnt), state) .
+
+  ---- Now for the parts which add things into the configuration:
+
+  ---- Add a Name-Location pair to the local environment.
+  op addToLocalEnv : Name Location -> AddListElement .
+  ceq addNow(run(c(e(Env), cnt), state), 
+         addToLocalEnv(X, L) AL,
+         K)
+       = addNow(run(c(e(Env [X, L]), cnt), state), AL, K) 
+       if (not X :: TacletNewVarName) and (not L :: TacletNewLocation) .
+
+  ---- Add a Location-Value pair to the memory
+  op addToMemory : Location Value -> AddListElement .
+  ceq addNow(run(m(M), state),
+         addToMemory(L, V) AL,
+         K)
+       = addNow(run(m(M [L,V]), state),
+             AL, K)
+             if not L :: TacletNewLocation .
+
+  ---- Add a Name-Location pair to the environment of static attributes as
+  ---- an attribute of the given CType.
+  op addToStaticEnv : CType Name Location -> AddListElement .
+  ceq addNow(run(s(oEnv), state),
+          addToStaticEnv(CT, X, L) AL,
+          K)
+        = addNow(run(s(oEnv (CT, [X, L])), state), 
+              AL, K) 
+        if (not X :: TacletNewVarName) and (not L :: TacletNewLocation) .
+
+  ---- Add a Name-Location pair to the environment of the current object,
+  ---- seen as an attribute of the class type of the static type of the
+  ---- current object.
+  op addToCurrentObjEnv : Name Location -> AddListElement .
+  ceq addNow(run(c(o(o(CT, CT', oEnv)) ,cnt), state),
+          addToCurrentObjEnv(X, L) AL,
+          K)
+        = addNow(run(c(o(o(CT, CT', oEnv (CT, [X, L]))) ,cnt), state), 
+              AL, K) 
+        if (not X :: TacletNewVarName) and (not L :: TacletNewLocation) .
+
+  ---- Add a NewName-NewLoc pair to the local environment as well as the
+  ---- corresponding NewLoc-Value pair to the memory. 
+  op addNewToLocalEnvAndMem : TacletNewVarName TacletNewLocation Value 
+                              -> AddListElement .
+  eq addNow(run(c(e(Env), cnt), m(M), state),
+         addNewToLocalEnvAndMem(TNVN, TNL, V) AL,
+         K)
+       = addNow(run(c(e(Env [TNVN, TNL]), cnt), m(M [TNL, V]), state),
+             AL, K) .
+
+---- examples for the above (i.e. a few tests) can be found in 
+---- diplomarbeit/test-stuff.maude at the (currently) bottom.
+
+endfm
+  
+

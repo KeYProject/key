@@ -1,0 +1,20 @@
+DEBUG CLASSLOADER
+=================
+
+Start KeY from this directory with
+
+<<path>>/startkey -debugclassloader
+
+to reload KeY classes every time a menu item is selected.  You HAVE to
+be in the `system' directory for this, as KeY classes will be loaded from
+the directory `./binary/'. After 7 or 8 iterations you have to restart
+the system altogether due to a memory leak (find it!) congesting the
+heap.
+
+
+DEBUG OUTPUT
+============
+
+The debug output is turned on by providing the option `-keydebug' on the
+command line. This can be combined with `-debugclassloader'.
+

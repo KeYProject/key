@@ -1,0 +1,3 @@
+This directory contains example .key files used by JUnit tests. Some of them
+may intendendly be not readable and cause an exception, e.g. to test
+visibility rules.

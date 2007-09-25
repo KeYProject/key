@@ -1,0 +1,170 @@
+/* done */
+
+taclets {
+
+    upd_skip_left {
+        find (upd(skip, #t, #s) ==>)
+	cond (dynamic #t, staticargs #t, static #s)
+        replacewith (false ==>)
+        heuristics (simplify_asm)
+    };
+
+    upd_skip_right {
+        find (==> upd(skip, #t, #s))
+	cond (dynamic #t, staticargs #t, static #s)
+        replacewith (==> false)
+        heuristics (simplify_asm)
+    };
+    
+    upd_assign_id_left {
+        find (upd(#t2 := #s2, #t1, #s1) ==>)
+        cond (op #t1 = #t2,
+	         dynamic #t1, staticargs #t1, static #s1)
+        replacewith (#OP_EQ_ARGS(#t1, #t2) & #s1 = #s2 ==>)
+	heuristics(simplify_asm)
+    };
+    
+    upd_assign_id_right {
+        find (==> upd(#t2 := #s2, #t1, #s1))
+        cond (op #t1 = #t2,
+	         dynamic #t1, staticargs #t1, static #s1)
+        replacewith (==> #OP_EQ_ARGS(#t1, #t2) & #s1 = #s2)
+	heuristics(simplify_asm)
+    };
+    
+    upd_assign_diff_left {
+        find (upd(#t2 := #s2, #t1, #s1) ==>)
+        cond (op #t1 != #t2,
+	         dynamic #t1, staticargs #t1, static #s1)
+        replacewith (false ==>)
+	heuristics(simplify_asm)
+    };
+    
+    upd_assign_diff_right {
+        find (==> upd(#t2 := #s2, #t1, #s1))
+        cond (op #t1 != #t2,
+	         dynamic #t1, staticargs #t1, static #s1)
+        replacewith (==> false)
+	heuristics(simplify_asm)
+    };
+    
+    upd_par_left {
+        find (upd(#R par #S, #t, #s) ==>)
+	cond (dynamic #t, staticargs #t, static #s)
+        replacewith (def(#R par #S) & (upd(#R, #t, #s) | upd(#S, #t, #s)) ==>)
+        heuristics(split_asm)
+    };
+    
+    upd_par_right {
+        find (==> upd(#R par #S, #t, #s))
+	cond (dynamic #t, staticargs #t, static #s)
+        replacewith (==> def(#R par #S) & (upd(#R, #t, #s) | upd(#S, #t, #s)))
+        heuristics(split_asm)
+    };
+    
+    upd_branch_left {
+        find (upd(if #phi then #R else #S end, #t, #s) ==>)
+	cond (dynamic #t, staticargs #t, static #s)
+        replacewith (#SC_ELIMINATION(#phi),  upd(#R, #t, #s) ==>);
+	replacewith (! #SC_ELIMINATION(#phi),  upd(#S, #t, #s) ==>)
+        heuristics(split_asm_if)
+    };
+    
+    upd_branch_right {
+        find (==> upd(if #phi then #R else #S end, #t, #s))
+	cond (dynamic #t, staticargs #t, static #s)
+        replacewith (#SC_ELIMINATION(#phi) ==> upd(#R, #t, #s));
+	replacewith (! #SC_ELIMINATION(#phi) ==> upd(#S, #t, #s))
+        heuristics(split_asm_if)
+    };
+
+   upd_branch_left_elseif {
+        find (upd(elseif #phi then #R else #S end, #t, #s) ==>)
+	cond (dynamic #t, staticargs #t, static #s)
+        replacewith (#SC_ELIMINATION(#phi),  upd(#R, #t, #s) ==>);
+	replacewith (! #SC_ELIMINATION(#phi),  upd(#S, #t, #s) ==>)
+        heuristics(split_asm_if)
+	displayname "upd_branch_left"
+    };
+    
+    upd_branch_right_elseif {
+        find (==> upd(elseif #phi then #R else #S end, #t, #s))
+	cond (dynamic #t, staticargs #t, static #s)
+        replacewith (#SC_ELIMINATION(#phi) ==> upd(#R, #t, #s));
+	replacewith (! #SC_ELIMINATION(#phi) ==> upd(#S, #t, #s))
+        heuristics(split_asm_if)
+	displayname "upd_branch_right"
+    }; 
+    
+    upd_let_left {
+        find (upd(let #x = #s in #R end, #t1, #s1) ==>)
+	cond (dynamic #t1, staticargs #t1, static #s1, #sk new depending on #s,
+                 #x not free in #t1, #x not free in #s, #x not free in #s1)
+        replacewith (#sk = #s, upd({#x #sk} #R, #t1, #s1) ==>)
+        heuristics(simplify_asm)
+    };
+
+    upd_let_right {
+        find (==> upd(let #x = #s in #R end, #t1, #s1))
+	cond (dynamic #t1, staticargs #t1, static #s1, #sk new depending on #s,
+                 #x not free in #t1, #x not free in #s, #x not free in #s1)
+        replacewith (#sk = #s ==> upd({#x #sk} #R, #t1, #s1))
+        heuristics(simplify_asm)
+    };
+    
+    upd_all_left {
+        find (upd(forall #x with #phi do #R end, #t, #s)==>)
+        cond (#x not free in #t, #x not free in #s,
+	         dynamic #t, staticargs #t, static #s)
+        replacewith (def(forall #x with #phi do #R end) & ex #x. (#SC_ELIMINATION(#phi) & upd(#R, #t, #s))==>)
+    };
+
+    upd_all_right {
+        find ( upd(forall #x with #phi do #R end, #t, #s))
+        cond (#x not free in #t, #x not free in #s,
+	         dynamic #t, staticargs #t, static #s)
+        replacewith ( def(forall #x with #phi do #R end) & ex #x. (#SC_ELIMINATION(#phi) & upd(#R, #t, #s)))
+    };
+
+    upd_seq_left {
+        find (upd(#R seq #S, #t, #s) ==>)
+	cond (dynamic #t, staticargs #t, static #s)
+        replacewith ((upd(#R, #t, #s) & [#R] inv(#S, #t)) |
+	                 (Con(#R) & [#R] upd(#S, #t, #s)) ==>)
+    };
+
+    upd_seq_right {
+        find (==> upd(#R seq #S, #t, #s))
+	cond (dynamic #t, staticargs #t, static #s)
+        replacewith (==> (upd(#R, #t, #s) & [#R] inv(#S, #t)) |
+	                 (Con(#R) & [#R] upd(#S, #t, #s)))
+    };
+    
+    upd_try_left {
+        find (upd(try #R else #S end, #t, #s) ==>)
+	cond (dynamic #t, staticargs #t, static #s)
+	replacewith ((Con(#R) & upd(#R, #t, #s)) | (def(#R) & ! Con(#R) & upd(#S, #t, #s))==>)
+        heuristics (split_asm_try)
+    };
+
+    upd_try_right {
+        find (==> upd(try #R else #S end, #t, #s))
+	cond (dynamic #t, staticargs #t, static #s)
+	replacewith (==> (Con(#R) & upd(#R, #t, #s)) | (def(#R) & ! Con(#R) & upd(#S, #t, #s)))
+        heuristics (split_asm_try)
+    };
+    
+    upd_name_left {
+	find (upd(#rho, #t, #s)==>)
+	cond (call #rho, dynamic #t, staticargs #t, static #s)
+	replacewith (upd(@ASM_NAMED_RULE(#rho), #t, #s)==>)
+	heuristics(simplify_asm_named)
+    };
+
+    upd_name_right {
+	find (==> upd(#rho, #t, #s))
+	cond (call #rho, dynamic #t, staticargs #t, static #s)
+	replacewith (==> upd(@ASM_NAMED_RULE(#rho), #t, #s))
+	heuristics(simplify_asm_named)
+    };
+}

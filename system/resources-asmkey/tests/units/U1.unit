@@ -1,0 +1,52 @@
+unit U1
+
+export *
+
+import * from U3
+use U4
+import * from U6
+import (function k, w) from U5
+import * from Base
+
+generic sort g
+sort boolean = true | false
+
+schema int c
+schema depending int k
+schema variable int #x
+
+predicate p;
+derived predicate q = p
+//derived predicate con(:asm rule r;) = p
+derived predicate con(:asm rule r;) = And(g:f(%x)) all %x ; all g:y ; all g:z ;
+                                      (upd(:r; f(%x), y) & upd(:r; f(%x), z) -> y=z);
+predicate upd(:asm rule r; g t, g s)
+
+dynamic function int x
+dynamic function int f(int)
+dynamic function int dyn_x(int)
+static function int plus(int:x, int);
+static function bool smaller(int, int)
+derived function int mult(int:x, int y) = if y==0 then 0 else mult(x,y-1)+x end
+derived function int der(int x) = mult(1, 0)
+derived function int id(int x) = dyn_x(x)
+derived function int mut_a(int x) = mut_b(x)
+derived function int mut_b(int x) = mut_d(x)
+derived function int mut_c(int x) = mut_a(id(x))
+derived function int mut_d(int x) = mut_c(x)
+
+
+asm Merge(int l, int r) = 
+  if smaller(l,r)
+  then let int:m=l in
+         (Merge(l, m) par Merge(m,r))
+       end let
+  else skip 
+  end if
+
+asm Main = Merge(3, f_<23>(3));
+
+lemma conMerge = all int l ; all int r ; (x=l -> p);
+lemma bip = (all int varx ; p)
+
+

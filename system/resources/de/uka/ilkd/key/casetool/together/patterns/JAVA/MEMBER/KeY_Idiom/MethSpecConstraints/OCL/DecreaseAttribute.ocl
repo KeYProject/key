@@ -1,0 +1,13 @@
+patternmodification#
+
+addStringField#'Attribute to decrease'
+
+mapping#attr#'Attribute to decrease'
+
+postcondition#method#selectedMethod#selectedClass
+
+schema#
+
+self.attr=self.attr@pre-1
+
+comment#
