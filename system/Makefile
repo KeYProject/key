@@ -7,7 +7,7 @@
 # See LICENSE.TXT for details.
 
 #$Format: "PRCSVERSION = \"$ProjectVersion$\""$ 
-PRCSVERSION = "0.2655"
+PRCSVERSION = "jseidelConstructorCollector.3"
 
 SHELL=/bin/sh
 #comon prefix

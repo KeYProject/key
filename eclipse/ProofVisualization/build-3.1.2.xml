@@ -2,7 +2,7 @@
 <project name="ProofVisualization" default="build.jars" basedir=".">
 
 <!-- $Format: "<property name=\"version\" value=\"1.$ProjectVersion$\"/>"$ -->
-<property name="version" value="1.0.2655"/>
+<property name="version" value="1.jseidelConstructorCollector.3"/>
 
 	<property name="basews" value="${ws}"/>
 	<property name="baseos" value="${os}"/>

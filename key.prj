@@ -1,13 +1,14 @@
 ;; -*- Prcs -*-
 (Created-By-Prcs-Version 1 3 2)
 (Project-Description "")
-(Project-Version key 0 2655)
-(Parent-Version key 0 2643)
-(Version-Log "updateHighlight tweaks (reklov @ KO)")
+(Project-Version key jseidelConstructorCollector 3)
+(Parent-Version key jseidelConstructorCollector 2)
+(Version-Log "merged against 0.2655
+")
 (New-Version-Log "")
 
-(Checkin-Time "Fri, 21 Sep 2007 17:32:04 +0200")
-(Checkin-Login kaprcs)
+(Checkin-Time "Tue, 25 Sep 2007 22:12:07 +0200")
+(Checkin-Login jseidel)
 (Populate-Ignore ("~$"
                   "\\.wmf$"
                   "\\.class$"
@@ -252,10 +253,10 @@
   (system/de/uka/ilkd/key/java/declaration/Implements.java (key/z/49_Implements 1.11.1.1 644))
   (system/de/uka/ilkd/key/java/declaration/InheritanceSpecification.java (key/z/48_Inheritanc 1.12.1.2 644))
   (system/de/uka/ilkd/key/java/declaration/InterfaceDeclaration.java (key/C/24_InterfaceD 1.22.1.3 644))
-  (system/de/uka/ilkd/key/java/declaration/JavaDeclaration.java (key/y/37_JavaDeclar 1.5.1.8.1.3.1.5 644))
+  (system/de/uka/ilkd/key/java/declaration/JavaDeclaration.java (key/y/37_JavaDeclar 1.5.1.8.1.3.1.6 644))
   (system/de/uka/ilkd/key/java/declaration/LocalVariableDeclaration.java (key/y/45_LocalVaria 1.12.1.11.2.3.1.1 644))
   (system/de/uka/ilkd/key/java/declaration/MemberDeclaration.java (key/y/49_MemberDecl 1.7.1.1 644))
-  (system/de/uka/ilkd/key/java/declaration/MethodDeclaration.java (key/y/50_MethodDecl 1.3.1.9.1.6.1.7.1.5 644))
+  (system/de/uka/ilkd/key/java/declaration/MethodDeclaration.java (key/y/50_MethodDecl 1.3.1.9.1.6.1.7.1.5.1.1 644))
   (system/de/uka/ilkd/key/java/declaration/Modifier.java (key/y/32_Modifier.j 1.10.1.1 644))
   (system/de/uka/ilkd/key/java/declaration/ParameterDeclaration.java (key/y/40_ParameterD 1.16.1.3 644))
   (system/de/uka/ilkd/key/java/declaration/Throws.java (key/z/51_Throws.jav 1.14.1.3 644))
@@ -406,7 +407,7 @@
   (system/de/uka/ilkd/key/java/statement/LabelJumpStatement.java (key/C/12_LabelJumpS 1.2.1.7.1.4 644))
   (system/de/uka/ilkd/key/java/statement/LabeledStatement.java (key/C/16_LabeledSta 1.3.1.13.2.5 644))
   (system/de/uka/ilkd/key/java/statement/LoopStatement.java (key/C/11_LoopStatem 1.7.1.9.2.8.1.1.1.4.1.2.1.1 644))
-  (system/de/uka/ilkd/key/java/statement/MethodBodyStatement.java (key/w/b/42_MethodBody 1.4.1.12.1.1.1.14.3.1.1.1.2.4.1.1 644))
+  (system/de/uka/ilkd/key/java/statement/MethodBodyStatement.java (key/w/b/42_MethodBody 1.4.1.12.1.1.1.14.3.1.1.1.2.4.1.1.2.1 644))
   (system/de/uka/ilkd/key/java/statement/MethodFrame.java (key/t/b/48_MethodCall 1.10.1.7.2.5 644))
   (system/de/uka/ilkd/key/java/statement/Return.java (key/w/29_Return.jav 1.8.1.5.1.1 644))
   (system/de/uka/ilkd/key/java/statement/Switch.java (key/C/20_Switch.jav 1.13.1.2 644))
@@ -522,7 +523,7 @@
   
   
   (system/de/uka/ilkd/key/rule/metaconstruct/arith/MetaMul.java (key/w/b/15_MetaMul.ja 1.2.1.13.2.1 644))
-  (system/de/uka/ilkd/key/logic/op/AbstractMetaOperator.java (key/u/b/18_MetaOp.jav 1.5.1.10.1.12.1.1.1.2.3.1.1.2.1.2.1.3.1.1.1.2.1.1.2.5.1.1.1.1.1.1.6.1.2.2.3.1.3.1 644))
+  (system/de/uka/ilkd/key/logic/op/AbstractMetaOperator.java (key/u/b/18_MetaOp.jav 1.5.1.10.1.12.1.1.1.2.3.1.1.2.1.2.1.3.1.1.1.2.1.1.2.5.1.1.1.1.1.1.6.1.2.2.3.1.3.1.4.1 644))
   (system/de/uka/ilkd/key/rule/metaconstruct/arith/MetaSub.java (key/w/b/10_MetaSub.ja 1.2.1.13.2.1 644))
   (system/de/uka/ilkd/key/logic/op/Metavariable.java (key/s/34_Metavariab 1.10.2.2.1.3.1.7.1.1 644))
   
@@ -555,12 +556,12 @@
   (system/de/uka/ilkd/key/rule/inst/ProgramInstantiation.java (key/L/43_ProgramIns 1.2.1.3.1.3 644))
   (system/de/uka/ilkd/key/rule/inst/ProgramListInstantiation.java (key/t/b/30_ProgramLis 1.10 644))
   (system/de/uka/ilkd/key/rule/metaconstruct/ProgramMetaConstruct.java (key/J/25_ProgramMet 1.12.1.16.1.1 644))
-  (system/de/uka/ilkd/key/logic/op/ProgramMethod.java (key/C/22_ProgramMet 1.4.1.5.1.14.1.1.1.5.3.1.1.1.2.1.2.2.1.1.1.2.1.12.2.1.2.1.1.5.1.2.1.2.1.1 644))
+  (system/de/uka/ilkd/key/logic/op/ProgramMethod.java (key/C/22_ProgramMet 1.4.1.5.1.14.1.1.1.5.3.1.1.1.2.1.2.2.1.1.1.2.1.12.2.1.2.1.1.5.1.2.1.2.1.1.1.1 644))
   (system/de/uka/ilkd/key/java/visitor/ProgramReplaceVisitor.java (key/L/45_ProgramRep 1.21.3.3.1.1.1.7.2.11.1.4 644))
   (system/de/uka/ilkd/key/java/visitor/ProgramSVCollector.java (key/M/0_ProgramSVC 1.19.2.1.1.1 644))
   (system/de/uka/ilkd/key/rule/inst/ProgramSVEntry.java (key/J/20_ProgramSVE 1.10.1.2 644))
   (system/de/uka/ilkd/key/rule/inst/ProgramSVInstantiation.java (key/J/21_ProgramSVI 1.14 644))
-  (system/de/uka/ilkd/key/logic/sort/ProgramSVSort.java (key/L/17_ProgramSVS 1.8.1.4.2.2.2.1.1.4.2.2.2.2.1.22.2.1.1.3.1.4.5.2.1.7.1.3.1.1.2.1.1.1.1.10.1.6.1.3.1.1.1.6.2.4.1.5.2.15.1.7.1.2.1.1.1.1.2.6.1.1.2.5.1.1.1.2.1.2.3.2.4.1 644))
+  (system/de/uka/ilkd/key/logic/sort/ProgramSVSort.java (key/L/17_ProgramSVS 1.8.1.4.2.2.2.1.1.4.2.2.2.2.1.22.2.1.1.3.1.4.5.2.1.7.1.3.1.1.2.1.1.1.1.10.1.6.1.3.1.1.1.6.2.4.1.5.2.15.1.7.1.2.1.1.1.1.2.6.1.1.2.5.1.1.1.2.1.2.3.2.4.1.4.1 644))
   (system/de/uka/ilkd/key/logic/ProgramTerm.java (key/r/28_DiamondTer 1.13.1.5.1.12.1.1 644))  
   (system/de/uka/ilkd/key/logic/op/ProgramVariable.java (key/z/37_ProgramVar 1.3.1.4.1.14.1.4.1.1.1.7.1.5.1.7.1.1.1.5.1.3.1.1.1.4.1.12.1.1.1.1.2.1.1.4.1.1.1.2.2.1.2.1.1.1 644))
   
@@ -3535,7 +3536,7 @@
 ;; Files added by populate at Tue, 14 Feb 2006 14:26:19 +0100,
 ;; to version weissPOs.91(w), by andreas:
 
-  (system/de/uka/ilkd/key/rule/UseMethodContractRule.java (key/o/d/27_UseMethodC 1.28.1.10.2.1.1.1.1.1.3.1.1.1.1.1.1.1.1.1.1.1 644))
+  (system/de/uka/ilkd/key/rule/UseMethodContractRule.java (key/o/d/27_UseMethodC 1.28.1.10.2.1.1.1.1.1.3.1.1.1.1.1.1.1.1.1.1.1.2.1 644))
   (system/de/uka/ilkd/key/proof/mgt/MethodContractInstantiation.java (key/o/d/28_MethodCont 1.2 644))
   
   (system/de/uka/ilkd/key/proof/mgt/UpdatePairWithGuard.java (key/o/d/30_UpdatePair 1.2 644))
@@ -3824,7 +3825,7 @@
   (system/resources/de/uka/ilkd/key/proof/rules/instanceAllocation.key (key/v/d/6_instanceAl 1.6.1.20.1.2.1.1.2.2.1.1.1.1.2.1 644))
   (system/de/uka/ilkd/key/rule/metaconstruct/MetaNextToCreate.java (key/v/d/7_MetaNextTo 1.1 644))
   (examples/dev/bubel.key (key/v/d/8_bubel.key 1.9 644))
-  (eclipse/.settings/org.eclipse.jdt.core.prefs (key/v/d/9_org.eclips 1.1.1.1.1.7.1.6.5.2 644))
+  (eclipse/.settings/org.eclipse.jdt.core.prefs (key/v/d/9_org.eclips 1.1.1.1.1.7.1.6.5.2.3.1 644))
   (system/de/uka/ilkd/key/rule/metaconstruct/CreateInReachableStatePO.java (key/v/d/10_CreateLPSP 1.9 644))
   (system/de/uka/ilkd/key/rule/metaconstruct/InReachableStatePOBuilder.java (key/v/d/11_LPSPOBuild 1.21.1.2 644))
   (system/de/uka/ilkd/key/logic/TermBuilder.java (key/v/d/12_TermBuilde 1.7.2.1.1.1.1.3.2.2.1.1.4.1.3.1.1.1 644))
@@ -4681,10 +4682,26 @@
   (examples/_testcase/updatesimplification/testDeletion10.key (key/o/e/47_testDeleti 1.1 644))
   (examples/_testcase/updateterm/updatetermTest4.key (key/o/e/48_updateterm 1.1 644))
 
+  (system/de/uka/ilkd/key/proof/TermTacletAppIndexCache.java (key/T/d/20_TermTaclet 1.2 644))
+
+  (system/de/uka/ilkd/key/rule/encapsulation/ConstructableKeYJavaTypeCollector.java (key/g/e/36_Constructa 1.1 644))
+;; Files added by populate at Wed, 19 Sep 2007 14:49:38 +0200,
+;; to version 0.2638(w), by jseidel:
+
+  (system/de/uka/ilkd/key/rule/metaconstruct/MethodCallToUpdate.java (key/q/e/8_MethodCall 1.1 644))
+
+;; Files added by populate at Wed, 19 Sep 2007 14:52:53 +0200,
+;; to version 0.2638(w), by jseidel:
+
+  (system/resources/de/uka/ilkd/key/proof/rules/testStrictlyPureRule.key (key/q/e/9_testStrict 1.1 644))
+
+
   (eclipse/KeYPlugin/META-INF/MANIFEST.MF (key/q/e/11_MANIFEST.M 1.1 644)))
 (Merge-Parents
-  (0.2654 complete
-    (system/de/uka/ilkd/key/gui/Main.java system/de/uka/ilkd/key/gui/Main.java system/de/uka/ilkd/key/gui/Main.java r) (system/de/uka/ilkd/key/gui/ProofTreeView.java system/de/uka/ilkd/key/gui/ProofTreeView.java system/de/uka/ilkd/key/gui/ProofTreeView.java r)
+  (jseidelConstructorCollector.2 complete)
+  (0.2655 complete
+    (system/de/uka/ilkd/key/pp/InitialPositionTable.java system/de/uka/ilkd/key/pp/InitialPositionTable.java system/de/uka/ilkd/key/pp/InitialPositionTable.java r) (system/de/uka/ilkd/key/gui/Main.java system/de/uka/ilkd/key/gui/Main.java system/de/uka/ilkd/key/gui/Main.java r)
+    (system/de/uka/ilkd/key/gui/ProofTreeView.java system/de/uka/ilkd/key/gui/ProofTreeView.java system/de/uka/ilkd/key/gui/ProofTreeView.java r) (system/de/uka/ilkd/key/gui/SequentView.java system/de/uka/ilkd/key/gui/SequentView.java system/de/uka/ilkd/key/gui/SequentView.java r)
     (system/de/uka/ilkd/key/rule/metaconstruct/LocationDependentFunction.java system/de/uka/ilkd/key/rule/metaconstruct/LocationDependentFunction.java system/de/uka/ilkd/key/rule/metaconstruct/LocationDependentFunction.java r) (system/de/uka/ilkd/key/rule/RuleSet.java system/de/uka/ilkd/key/rule/RuleSet.java system/de/uka/ilkd/key/rule/RuleSet.java r)
     (system/de/uka/ilkd/key/rule/Taclet.java system/de/uka/ilkd/key/rule/Taclet.java system/de/uka/ilkd/key/rule/Taclet.java r) (system/de/uka/ilkd/key/rule/TacletApp.java system/de/uka/ilkd/key/rule/TacletApp.java system/de/uka/ilkd/key/rule/TacletApp.java r)
     (system/de/uka/ilkd/key/rule/TacletAttributes.java system/de/uka/ilkd/key/rule/TacletAttributes.java system/de/uka/ilkd/key/rule/TacletAttributes.java r) (system/de/uka/ilkd/key/rule/TacletBuilder.java system/de/uka/ilkd/key/rule/TacletBuilder.java system/de/uka/ilkd/key/rule/TacletBuilder.java r)

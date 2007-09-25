@@ -7,12 +7,15 @@ import javax.swing.JOptionPane;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
+import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.IteratorOfKeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.encapsulation.ConstructableKeYJavaTypeCollector;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.*;
@@ -347,6 +350,20 @@ public class UseMethodContractRule implements BuiltInRule {
             services.getNamespaces().programVariables().add(resultVar);
         }
         
+	ConstructableKeYJavaTypeCollector ckjtc =
+          new ConstructableKeYJavaTypeCollector( services );
+
+	ListOfKeYJavaType l = ckjtc.collect( pm,
+					     mbsPos.toSVInstantiations( services ) );
+	
+	IteratorOfKeYJavaType it = l.iterator();
+
+	System.out.println( "listing constructable types" );
+	while( it.hasNext() ) {
+	    System.out.println( "found type " + it.next() );
+	}
+
+
         MethodContractInstantiation mci 
             = new MethodContractInstantiation(receiver, insts, 
                     resultVar, modality);
@@ -621,6 +638,13 @@ public class UseMethodContractRule implements BuiltInRule {
             this.modality=mod;
             this.pio=pio;
         }
+
+	public SVInstantiations toSVInstantiations( Services services ) {
+
+            return SVInstantiations.EMPTY_SVINSTANTIATIONS.
+                   add( null, null, execContext, mbs.getProgramMethod(services) );
+            
+	}
     }
     
 }

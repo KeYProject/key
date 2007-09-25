@@ -393,6 +393,16 @@ public class MethodDeclaration
     }
 
     /**
+     * Test whether the declaration is strictly pure (the jml modifier is meant).
+     */
+
+    public boolean isStrictlyPure() {
+        return super.isStrictlyPure();
+    }
+
+   
+    
+    /**
      * Test whether the declaration is strictfp.
      */
 

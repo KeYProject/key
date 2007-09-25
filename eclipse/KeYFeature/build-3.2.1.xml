@@ -3,10 +3,10 @@
 
 
 	<!-- $Format: "<property name=\"core.version\" value=\"$ProjectVersion$\"/>"$ -->
-<property name="core.version" value="0.2655"/>
+<property name="core.version" value="jseidelConstructorCollector.3"/>
 
 	<!-- $Format: "<property name=\"version\" value=\"1.$ProjectVersion$\"/>"$ -->
-<property name="version" value="1.0.2655"/>
+<property name="version" value="1.jseidelConstructorCollector.3"/>
 
 	<target name="init">
 		<property name="feature.temp.folder" value="${basedir}/feature.temp.folder"/>

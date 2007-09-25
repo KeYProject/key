@@ -203,6 +203,22 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         return method.isStatic();
     }
 
+    /**
+     * Tests for an annotation for methods that do not have any side effects
+     * 
+     * (i.e. \@pure + does not create any object, and thus does not modify
+     * implicit fields)
+     * 
+     * @param services
+     * @return true, iff the method is annotated as "strictly_pure"
+     */
+    public boolean isStrictlyPure(Services services) {
+        if (method == null) {
+            resolveMethod(services);
+        }
+        return method.isStrictlyPure();
+    }
+
     /** calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
      * @param v the Visitor

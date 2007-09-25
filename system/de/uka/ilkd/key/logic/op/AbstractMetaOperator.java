@@ -133,6 +133,9 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     /** metaconstruct for the updateCut rule*/
     public static final AbstractMetaOperator METAEQUALUPDATES = new MetaEquivalentUpdates();
 
+    /** metaconstruct for strictly pure method calls */
+    public static final AbstractMetaOperator META_METHOD_CALL_TO_UPDATE= new MethodCallToUpdate();
+
     public static final Sort METASORT = new PrimitiveSort(new Name("Meta"));
 
     

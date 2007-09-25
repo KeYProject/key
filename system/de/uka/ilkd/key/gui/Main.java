@@ -45,7 +45,7 @@ public class Main extends JFrame {
 
     //DO NOT CHANGE THE FOLLOWING 2 LINES, UNLESS YOU KNOW ABOUT PRCS-REPLACEMENT
     /* $Format: "    private static final String PRCSVERSION = \"$ProjectVersion$\";"$ */
-    private static final String PRCSVERSION = "0.2655";
+    private static final String PRCSVERSION = "jseidelConstructorCollector.3";
 
     
     private static final String VERSION="1.2-beta (internal: "+PRCSVERSION+")";

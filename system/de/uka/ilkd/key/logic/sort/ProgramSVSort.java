@@ -96,6 +96,9 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     public static final ProgramSVSort METHODBODY
 	= new MethodBodySort();
 
+    public static final ProgramSVSort STRICTLYPUREMETHODBODY
+        = new StrictlyPureMethodBodySort();
+
     public static final ProgramSVSort NONMODELMETHODBODY
 	= new NonModelMethodBodySort();
 
@@ -763,6 +766,22 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	protected boolean canStandFor(ProgramElement check, Services services) {
 	    return (check instanceof MethodBodyStatement);
 	}
+    }
+
+    /**
+     * This sort represents a type of program schema variables that
+     * match only on method body statements
+     */    
+    private static class StrictlyPureMethodBodySort extends ProgramSVSort{
+
+        public StrictlyPureMethodBodySort() {
+            super(new Name("StrictlyPureMethodBody"));
+        }
+
+        protected boolean canStandFor(ProgramElement check, Services services) {
+            return ( (check instanceof MethodBodyStatement)
+            && ((MethodBodyStatement)check).isStrictlyPure( services ) ) ;
+        }
     }
 
     /**
