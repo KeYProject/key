@@ -164,7 +164,7 @@ public abstract class UnitNamespace extends de.uka.ilkd.key.logic.Namespace {
 	return unitPropMatcher(name);
     }
 
-    protected Named lookupLocally(Name name) {
+    public Named lookupLocally(Name name) {
 	return super.lookupLocally(name);
     }
 

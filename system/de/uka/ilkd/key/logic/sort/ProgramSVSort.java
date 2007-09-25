@@ -1571,5 +1571,22 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     public static HashMap name2sort() {
         return name2sort;
     }
-   
+    
+    /**
+     * Create a program schema variable for the given sort.
+     * Subclasses may override this method so that programSVs can
+     * implement additional interfaces.
+     * 
+     * @param name 
+     * 		the Name of the SchemaVariable
+     * @param listSV 
+     * 		a boolean which is true iff the schemavariable is
+     *		allowed to match a list of program constructs
+     * @return newly created programSV
+     * 
+     * @author oleg.myrk@gmail.com
+     */
+    public ProgramSV createProgramSV(Name name, boolean listSV) {
+        return new ProgramSV(name, this, listSV);
+    }   
 }

@@ -120,13 +120,19 @@ public class Namespace implements java.io.Serializable {
     }
     
 
-    protected Named lookupLocally(Name name){
-	if (numLocalSyms==0) return null;
-	if (numLocalSyms>1) return symbols.get(name);
-	if (localSym.name().equals(name)) {
-	    return localSym;
-	}
-	else return null;
+    /**
+     * Looks if a registered object is declared in this namespace, but does
+     * not ask its parent.
+     * @param name a Name representing the name of the symbol to look for
+     * @return Object with name "name" or null if no such an object has been found
+     */
+    public Named lookupLocally(Name name){
+    	if (numLocalSyms==0) return null;
+    	if (numLocalSyms>1) return symbols.get(name);
+    	if (localSym.name().equals(name)) {
+    		return localSym;
+    	}
+    	else return null;
     }  
 
 

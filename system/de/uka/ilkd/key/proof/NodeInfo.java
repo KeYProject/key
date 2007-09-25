@@ -6,6 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.lang.common.program.IProgramElement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
@@ -73,6 +74,13 @@ public class NodeInfo {
             Term t = pta.posInOccurrence().subTerm();
             final ProgramElement pe = t.executableJavaBlock().program();
             if (pe != null) {
+                if (pe instanceof IProgramElement) {
+                    firstStatement = pe;
+                    activeStatement = pe;
+                    determinedFstAndActiveStatement = true;
+                    return;
+                }            	
+            	
                 firstStatement = pe.getFirstElement();
                 firstStatementString = null;
 
@@ -188,7 +196,7 @@ public class NodeInfo {
                     res = arg; // use sv name instead
                 } else
                     res = ProofSaver.printAnything(val, node.proof().getServices());
-                m.appendReplacement(sb, res);
+                m.appendReplacement(sb, res.replaceAll("\\\\", "\\\\").replaceAll("\\$", "\\\\\\$"));
             }
             m.appendTail(sb);
             branchLabel = sb.toString();

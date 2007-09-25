@@ -118,7 +118,7 @@ public class SchemaVariableFactory {
     public static SchemaVariable createProgramSV(ProgramElementName name, 
 						 ProgramSVSort s,
 						 boolean listSV){
-	return new ProgramSV(name, s, listSV);
+        return s.createProgramSV(name, listSV);
     }
 
 

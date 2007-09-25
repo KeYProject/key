@@ -2,7 +2,7 @@
 <project name="KeYPlugin" default="build.jars" basedir=".">
 
 	<!-- $Format: "<property name=\"version\" value=\"1.$ProjectVersion$\"/>"$ -->
-<property name="version" value="1.0.2655"/>
+<property name="version" value="1.muerkKeYC.4"/>
 
 
 	<property name="basews" value="${ws}"/>

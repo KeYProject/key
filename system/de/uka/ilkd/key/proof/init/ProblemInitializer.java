@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,8 +28,11 @@ import de.uka.ilkd.key.gui.LibrariesSettings;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.ProofSettings;
 import de.uka.ilkd.key.java.CompilationUnit;
+import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.lang.common.services.ILangServices;
+import de.uka.ilkd.key.lang.common.services.LangServicesEnvImpl;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.IteratorOfConstrainedFormula;
 import de.uka.ilkd.key.logic.IteratorOfNamed;
@@ -76,8 +80,11 @@ public class ProblemInitializer {
         this.main       = main;
         this.profile    = main.mediator().getProfile();
         this.services   = new Services(main.mediator().getExceptionHandler());
+        ILangServices languageServices = profile.getLanguageServices(new LangServicesEnvImpl(services));
+        if (languageServices != null)
+                services.setLangServices(languageServices);                
         this.simplifier = ProofSettings.DEFAULT_SETTINGS
-                .getSimultaneousUpdateSimplifierSettings().getSimplifier();
+                .getSimultaneousUpdateSimplifierSettings().getSimplifier();        
     }
   
     
@@ -326,38 +333,56 @@ public class ProblemInitializer {
 	envInput.setInitConfig(initConfig);
 	String javaPath = envInput.readJavaPath();	                      
         
-	if(javaPath != null) {
+    if(javaPath != null) {
     	    //read Java	
-    	    reportStatus("Reading Java model");
-            ProjectSettings settings = 
-                initConfig.getServices().getJavaInfo().getKeYProgModelInfo()
-                	      .getServConf().getProjectSettings();
-            PathList searchPathList = settings.getSearchPathList();
-            
-            if(searchPathList.find(javaPath) == null) {
-                searchPathList.add(javaPath);
-            }
-            Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(), initConfig.namespaces());
-            if (javaPath == "") {             
-                r2k.parseSpecialClasses();
-                initConfig.getProofEnv().setJavaModel(JavaModel.NO_MODEL);
-            } else {                 
-                String[] cus = (String[]) getClasses(javaPath).toArray(new String[]{});
-                CompilationUnit[] compUnits = r2k.readCompilationUnitsAsFiles(cus);
-                //temporary hack
-                if(envInput instanceof KeYUserProblemFile) {
-                    KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
-                    kupf.readActivatedChoices();
-                    kupf.readJML(compUnits);
+    	    reportStatus("Reading program model");
+    	    
+    	    if (initConfig.getServices().getLangServices() != null) {
+    	        if (!javaPath.equals("")) {
+    	            // TODO: add CVS support
+    	            // @author oleg.myrk@gmail.com
+    	            String modelTag = "KeY_"+new Long((new java.util.Date()).getTime());
+                    JavaModel javaModel = new JavaModel(javaPath, modelTag);
+                    try {
+                            initConfig.getServices().getLangServices().loadProgram(initConfig.namespaces().sorts(), initConfig.namespaces().functions(), javaPath);
+                    } 
+                    catch(IOException e) {
+                            throw new ConvertException(e);
+                    }
+                    
+                    initConfig.getProofEnv().setJavaModel(javaModel);
+    	        }
+    	    }
+    	    else {
+                ProjectSettings settings = 
+                       initConfig.getServices().getJavaInfo().getKeYProgModelInfo()
+                       .getServConf().getProjectSettings();
+                PathList searchPathList = settings.getSearchPathList();
+                    
+                if(searchPathList.find(javaPath) == null) {
+                    searchPathList.add(javaPath);
                 }
-                initConfig.getServices().getJavaInfo().setJavaSourcePath(javaPath);               
-
-                //checkin Java model to CVS
-                reportStatus("Checking Java model");
-                JavaModel jmodel = getJavaModel(javaPath);
-                initConfig.getProofEnv().setJavaModel(jmodel);
-            }
-                       
+                Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(), initConfig.namespaces());
+                if (javaPath == "") {             
+                    r2k.parseSpecialClasses();
+                    initConfig.getProofEnv().setJavaModel(JavaModel.NO_MODEL);
+                } else {                 
+                    String[] cus = (String[]) getClasses(javaPath).toArray(new String[]{});
+                    CompilationUnit[] compUnits = r2k.readCompilationUnitsAsFiles(cus);
+                    //temporary hack
+                    if(envInput instanceof KeYUserProblemFile) {
+                        KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
+                        kupf.readActivatedChoices();
+                        kupf.readJML(compUnits);
+                    }
+                    initConfig.getServices().getJavaInfo().setJavaSourcePath(javaPath);               
+        
+                    //checkin Java model to CVS
+                    reportStatus("Checking Java model");
+                    JavaModel jmodel = getJavaModel(javaPath);
+                    initConfig.getProofEnv().setJavaModel(jmodel);
+                }
+    	    }
             reportReady();
             
             setUpSorts(initConfig);
@@ -388,7 +413,9 @@ public class ProblemInitializer {
 		    	 envInput.getNumberOfChars());
 	    //System.out.println("Reading envInput: " + envInput.name());
 	    envInput.setInitConfig(initConfig);
-	    envInput.read(ModStrategy.NO_VARS_GENSORTS);//envInput.read(ModStrategy.NO_VARS_FUNCS_GENSORTS);	    
+            // TODO: was "envInput.read(ModStrategy.NO_VARS_GENSORTS);"
+            // @author oleg.myrk@gmail.com
+	    envInput.read(ModStrategy.NO_VARS);//envInput.read(ModStrategy.NO_VARS_FUNCS_GENSORTS);	    
 	    reportReady();
 	    
 	    setUpSorts(initConfig);

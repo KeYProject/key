@@ -15,15 +15,19 @@ package de.uka.ilkd.key.logic;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import de.uka.ilkd.key.java.JavaProgramElement;
+import de.uka.ilkd.key.lang.common.pprinter.ProgramPrinterUtil;
+import de.uka.ilkd.key.lang.common.program.IProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
+import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.StatementBlock;
+
 
 public class JavaBlock {
     
     public static final JavaBlock EMPTY_JAVABLOCK=new JavaBlock();
-    private final JavaProgramElement prg;
+    private final ProgramElement prg;
 
 
     /** create a new empty JavaBlock as singleton 
@@ -33,17 +37,17 @@ public class JavaBlock {
     }
 
     /** create a new JavaBlock 
-     * @param prg the root JavaProgramElement for this JavaBlock
+     * @param prg the root ProgramElement for this JavaBlock
      */
-    private JavaBlock(JavaProgramElement prg) {
+    private JavaBlock(ProgramElement prg) {
 	this.prg=prg;
     }
 
     /** create a new JavaBlock 
-     * @param prg the root StatementBlock for this JavaBlock.
-     * TacletIndex relies on <code>prg</code> being indeed a StatementBlock.
+     * @param prg the root ProgramElement for this JavaBlock.
      */
-    public static JavaBlock createJavaBlock(StatementBlock prg) {
+    //TODO: TacletIndex relies on <code>prg</code> being indeed a StatementBlock.
+    public static JavaBlock createJavaBlock(ProgramElement prg) {
 	if (prg==null) {
 	    return EMPTY_JAVABLOCK;	   
 	} 
@@ -60,8 +64,8 @@ public class JavaBlock {
     }
     
     public int size() {
-	if ((program() instanceof StatementBlock))  {
-	    return ((StatementBlock)program()).getChildCount();
+	if ((program() instanceof NonTerminalProgramElement))  {
+	    return ((NonTerminalProgramElement)program()).getChildCount();
 	}
 	return 0;
     }
@@ -96,7 +100,7 @@ public class JavaBlock {
     /** returns true if the given ProgramElement is equal to the
      * one of the JavaBlock modulo renaming (see comment in SourceElement)
      */ 
-    private boolean equalsModRenaming(JavaProgramElement pe,
+    private boolean equalsModRenaming(ProgramElement pe,
 				     NameAbstractionTable nat) {
 	if (pe == null && program() == null) {
 	    return true;
@@ -107,25 +111,31 @@ public class JavaBlock {
     }
 
     /** returns the java program 
-     * @return the stored JavaProgramElement
+     * @return the stored ProgramElement
      */
-    public JavaProgramElement program() {
+    public ProgramElement program() {
 	return prg;
     }
 
     /** toString */
     public String toString() {
 	if (this==EMPTY_JAVABLOCK) return "";
-	StringWriter sw=new StringWriter();
+	String result = "";
 	try {
-	    PrettyPrinter pp=new PrettyPrinter(sw, true);
-	    pp.setIndentationLevel(0);
-	    prg.prettyPrint(pp);
+        if (prg instanceof IProgramElement)
+            result = ProgramPrinterUtil.formatProgramElementNoLF((IProgramElement)prg);
+        else {
+            StringWriter sw=new StringWriter();
+            PrettyPrinter pp=new PrettyPrinter(sw, true);
+            pp.setIndentationLevel(0);
+            prg.prettyPrint(pp);
+            result = sw.toString();
+        }
 	} catch (IOException e) {
 	    System.err.println("toString of JavaBlock failed due to :"+e);
 	    e.printStackTrace();
 	}
-	return sw.toString();
+	return result;
     }
 
 }

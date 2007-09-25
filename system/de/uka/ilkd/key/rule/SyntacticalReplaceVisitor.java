@@ -163,7 +163,10 @@ public class SyntacticalReplaceVisitor extends Visitor {
 	ProgramReplaceVisitor trans;
 	ProgramElement result = null;
 
-	if (jb.program() instanceof ContextStatementBlock) {
+        if (getServices().getLangServices() != null) {
+            ProgramElement programElement = jb.program(); 
+            result = getServices().getLangServices().instantiateProgram(services.getNamespaces().sorts(), services.getNamespaces().functions(), (de.uka.ilkd.key.lang.common.program.IProgramElement)programElement, svInst);
+        } else if (jb.program() instanceof ContextStatementBlock) {
 	    trans = new ProgramReplaceVisitor
 		(new StatementBlock(((ContextStatementBlock)jb.program()).getBody()), // TODO
 		 getServices (),
@@ -180,7 +183,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
 	    result = trans.result();
 	}
 	return (result==jb.program()) ? 
-            jb : JavaBlock.createJavaBlock((StatementBlock)result);
+            jb : JavaBlock.createJavaBlock(result);
     }
 
     private Term[] neededSubs(int n) {

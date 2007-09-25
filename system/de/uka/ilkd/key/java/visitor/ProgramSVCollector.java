@@ -81,10 +81,10 @@ public class ProgramSVCollector extends JavaASTWalker {
         } else if (node instanceof WhileInvRuleWrapper) {	    	    
 	    Term t = ((WhileInvRuleWrapper)node).unwrap();
 	    WhileInvRule wir = (WhileInvRule)t.op();	    
-	    JavaProgramElement jpe = t.sub(0).javaBlock().program();
+	    ProgramElement pe = t.sub(0).javaBlock().program();
 	    result = 
 		result.prepend(wir.neededInstantiations
-			       ((ProgramElement)jpe, instantiations));
+			       (pe, instantiations));
 	}
     }
 

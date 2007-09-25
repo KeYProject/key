@@ -604,7 +604,7 @@ public abstract class TacletApp implements RuleApp {
             } 
             if(var instanceof SortedSchemaVariable) {
                 SortedSchemaVariable sv = (SortedSchemaVariable)var;
-                if (sv.sort() == ProgramSVSort.VARIABLE) {
+                if (sv.sort() == ProgramSVSort.VARIABLE || sv.sort() instanceof de.uka.ilkd.key.lang.common.programsv.IVariableProgramSVSort) {
                     String proposal = varNamer.getSuggestiveNameProposalForProgramVariable
                     (sv, this, goal, services, proposals);
                     ProgramElement pe = 

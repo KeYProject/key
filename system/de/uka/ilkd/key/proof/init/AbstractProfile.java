@@ -4,6 +4,8 @@ import de.uka.ilkd.key.collection.SetAsListOfString;
 import de.uka.ilkd.key.collection.SetOfString;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.ProofSettings;
+import de.uka.ilkd.key.lang.common.services.ILangServices;
+import de.uka.ilkd.key.lang.common.services.ILangServicesEnv;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.decproc.JavaDecisionProcedureTranslationFactory;
@@ -216,5 +218,12 @@ public abstract class AbstractProfile implements Profile {
      /**
       * sets the given settings to some default depending on the profile
       */
-     public void updateSettings(ProofSettings settings) {}   
+     public void updateSettings(ProofSettings settings) {}
+     
+     /**
+      * @inheritDocs
+      */
+     public ILangServices getLanguageServices(ILangServicesEnv env) {
+         return null;
+     }     
 }

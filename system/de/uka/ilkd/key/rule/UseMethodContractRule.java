@@ -126,7 +126,7 @@ public class UseMethodContractRule implements BuiltInRule {
         }
 
         PosInProgram res = PosInProgram.TOP;
-        ProgramElement activeStatement = (Statement) pe;
+        ProgramElement activeStatement = pe;
         ExecutionContext ec = null;
 	
         if (activeStatement instanceof ProgramPrefix) {

@@ -103,6 +103,11 @@ public class TestKey extends TestCase {
 	de.uka.ilkd.asmkey.unit.TestFinalPass.class,
 	de.uka.ilkd.asmkey.unit.TestUnitManager.class
      };
+     
+     static Class[] clangTests = new Class[] {    
+             de.uka.ilkd.key.lang.clang.common.type.TestTypeBuilder.class,
+             de.uka.ilkd.key.lang.clang.safe.sort.TestSortBuilder.class
+     };
 
     public static TestSuite createSuite(Class[] testClasses, final String msg) {
 	TestSuite suite = new TestSuite() {
@@ -136,6 +141,8 @@ public class TestKey extends TestCase {
 	suite.addTest(createSuite(gfTests, "Testing Grammatical Framework"));
 
 	suite.addTest(createSuite(asmTests, "Running ASMKeY Tests"));
+        
+        suite.addTest(createSuite(clangTests, "Running Clang Tests"));
 
 	return suite;
     }

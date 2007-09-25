@@ -2,6 +2,8 @@ package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.SetOfString;
 import de.uka.ilkd.key.gui.ProofSettings;
+import de.uka.ilkd.key.lang.common.services.ILangServices;
+import de.uka.ilkd.key.lang.common.services.ILangServicesEnv;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -91,4 +93,12 @@ public interface Profile {
      * this profile
      */
     void updateSettings(ProofSettings settings);
+    
+    /**
+     * Returns an fresh instance of language services for this profile, may be <code>null</code>.
+     * @param env language services environment to use
+     * @return
+     * @author oleg.myrk@gmail.com
+     */
+    ILangServices getLanguageServices(ILangServicesEnv env);    
 }

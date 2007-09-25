@@ -292,7 +292,7 @@ public class ITNode {
                 HashMap result = vd.getValuesForLocation(set, pio);
                 Term val = (Term)result.get(TermFactory.DEFAULT.createVariableTerm((ProgramVariable)baseVar.op()));
                 map.put(baseVar.op(), val);
-                ProgVarReplacer pvr = new ProgVarReplacer(map);
+                ProgVarReplacer pvr = new ProgVarReplacer(serv, map);
                 Term res = pvr.replace(t);
                 programMethod = mbs.getProgramMethod(serv);
 

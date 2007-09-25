@@ -100,7 +100,7 @@ public class TermSVReplacer {
             JavaBlock jb = t.javaBlock();
 	    if (!jb.isEmpty()) {
 		jb = JavaBlock.createJavaBlock
-		    ((StatementBlock)inst((Statement)t.javaBlock().program()));
+		    (inst((Statement)t.javaBlock().program()));
 		if (jb.equals(t.javaBlock())) jb = t.javaBlock();
 	    }
 	    result = fact.createTerm(op,subTerms,quantVars,jb);	   

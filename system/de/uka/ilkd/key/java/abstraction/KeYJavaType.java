@@ -38,7 +38,9 @@ public class KeYJavaType implements Type {
     public KeYJavaType(Type javaType, Sort sort) {
 	this.javaType = javaType;
 	this.sort = sort;
-        ensureTypeSortConformance();
+	// This is too Java specific.
+	// @author oleg.myrk@gmail.com
+	// ensureTypeSortConformance();
     }
 
     /** creates a new KeYJavaType */

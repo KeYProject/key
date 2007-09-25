@@ -403,7 +403,7 @@ public class InitConfig {
      */
     public InitConfig copy() {
         InitConfig ic = new InitConfig(services.copyPreservesLDTInformation(), 
-        			       profile);
+                                       profile);
         ic.setActivatedChoices(activatedChoices);
         ic.category2DefaultChoice = ((HashMap) category2DefaultChoice.clone());
         ic.setTaclet2Builder((HashMap) taclet2Builder.clone());

@@ -171,7 +171,7 @@ public class SymbolicObjectDiagram {
                 //   ProgramVariable val = (ProgramVariable)((Term)vd.getInputPV2term().get(self)).op();
                 Term val = ((Term)vd.getInputPV2term().get(self));
                 map.put(self.op(), val);
-                ProgVarReplacer pvr = new ProgVarReplacer(map);
+                ProgVarReplacer pvr = new ProgVarReplacer(serv, map);
                 Term res = pvr.replace(t);
 
                 so = getObject(res, symbolicObjects);

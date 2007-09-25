@@ -2,6 +2,7 @@ package de.uka.ilkd.key.proof;
 
 import java.util.Map;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -9,8 +10,8 @@ import de.uka.ilkd.key.logic.op.*;
 
 public class SymbolReplacer extends ProgVarReplacer {
 
-    public SymbolReplacer(Map m) {
-        super(m);       
+    public SymbolReplacer(Services services, Map m) {
+        super(services, m);       
     }
 
     /**

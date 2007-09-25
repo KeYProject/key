@@ -24,11 +24,16 @@ header {
   import java.util.HashSet;
   import java.util.Vector;
   import java.math.BigInteger;
-
+  import java.util.Set;  
+  import java.util.Vector;
+  import java.math.BigInteger;
+  
   import de.uka.ilkd.key.collection.ListOfString;
   import de.uka.ilkd.key.collection.IteratorOfString;
   import de.uka.ilkd.key.collection.SLListOfString;
 
+  import de.uka.ilkd.key.lang.common.program.IProgramElement;
+  
   import de.uka.ilkd.key.logic.*;
   import de.uka.ilkd.key.logic.op.*;
   import de.uka.ilkd.key.logic.sort.*;
@@ -930,7 +935,7 @@ options {
         namespaces().setVariables(variables().parent());
     }
 
-    private void bindProgVars(HashSet progVars) {
+    private void bindProgVars(Set progVars) {
 	namespaces().setProgramVariables(new Namespace(programVariables()));
 	Iterator it=progVars.iterator();
 	while (it.hasNext()) {
@@ -947,8 +952,11 @@ options {
         }
     }
 
-    private HashSet progVars(JavaBlock jb) {
+    private Set progVars(JavaBlock jb) {
 	if(isGlobalDeclTermParser()) {
+          if (getServices().getLangServices() != null) {
+            return getServices().getLangServices().collectVariables((IProgramElement)jb.program());
+          }            	
   	  ProgramVariableCollector pvc
 	      = new ProgramVariableCollector(jb.program());
           pvc.start();
@@ -957,7 +965,10 @@ options {
   	  if(!isDeclParser()) {
             if ((isTermParser() || isProblemParser()) && jb==JavaBlock.EMPTY_JAVABLOCK) {
               return new HashSet();
-            }   
+            } 
+            if (getServices().getLangServices() != null) {
+              return getServices().getLangServices().collectIntroducedVariables((IProgramElement)jb.program());
+            }              
             DeclarationProgramVariableCollector pvc
                = new DeclarationProgramVariableCollector(jb.program());
             pvc.start();
@@ -1005,6 +1016,22 @@ options {
 	s = s.substring(index+1);
 	Debug.out("Modal operator name passed to getJavaBlock: ",sjb.opName);
 	Debug.out("Java block passed to getJavaBlock: ", s);
+
+	if (getServices().getLangServices() != null) {
+	    sjb.javaBlock = JavaBlock.createJavaBlock(
+		getServices().getLangServices().
+		loadStatements(
+                    namespaces().sorts(),
+                    namespaces().functions(),
+		    inSchemaMode() ? 
+                        variables() : null,
+                    !inSchemaMode() && !isGlobalDeclTermParser() ? 
+                        programVariables() : null,
+                    s
+                    )
+                );
+            return sjb;	
+        }
 
         JavaReader jr = javaReader;
 
@@ -1072,6 +1099,9 @@ options {
      * and the look up restarts
      */
      private Sort lookupSort(String name) {        
+        if (getServices().getLangServices() != null)
+            getServices().getLangServices().lazyBuildSort(sorts(), functions(), new Name(name));
+     
 	Sort result = (Sort) sorts().lookup(new Name(name));
 	if (result == null) {
   	    result = (Sort) sorts().lookup(new Name("java.lang."+name));
@@ -1089,6 +1119,8 @@ options {
      */
     private Operator lookupVarfuncId(String varfunc_name, Term[] args) 
         throws NotDeclException{
+        if (getServices().getLangServices() != null)
+            getServices().getLangServices().lazyBuildSymbol(sorts(), functions(), new Name(varfunc_name));
         // case 1: variable
         Operator v = (TermSymbol) variables().lookup(new Name(varfunc_name));
         if (v != null && (args == null || (inSchemaMode() && v instanceof OperatorSV))) {
@@ -1160,7 +1192,7 @@ options {
 
     private boolean isMetaOperator() throws TokenStreamException {  
     if((LA(1) == IDENT &&
-         AbstractMetaOperator.name2metaop(LT(1).getText())!=null)
+         getServices().getMetaOperator(new Name(LT(1).getText()))!=null)
        || LA(1) == IN_TYPE)
       return true;
     return false;
@@ -1830,6 +1862,29 @@ string_literal returns [String lit = null]
 simple_ident returns [String ident = null]
    :
      id:IDENT { ident = id.getText(); }
+   |      
+     escid:ESCIDENT 
+     { 
+        String text = escid.getText().substring("%{".length(), escid.getText().length()-"}".length());
+        
+        StringBuffer result = new StringBuffer();
+        int i = 0;
+        while (i < text.length()) {
+            if (text.startsWith("\\", i)) {
+               if (text.startsWith("\\", i + 1))
+                   result.append('\\');
+               else if (text.startsWith("}", i + 1))
+                   result.append('}');        		
+               else
+                   assert false;
+               i += 2;
+            } else {
+                result.append(text.charAt(i));
+                i++;
+            }
+        }
+        return result.toString();
+     }        
    ;
 
 simple_ident_comma_list returns [ListOfString ids = SLListOfString.EMPTY_LIST]
@@ -1869,7 +1924,7 @@ one_schema_var_decl
     { mods = new SchemaVariableModifierSet.ProgramSV (); }
     ( schema_modifiers[mods] ) ?
     id = simple_ident  {
-       s = (Sort)ProgramSVSort.name2sort().get(new Name(id));
+       s = getServices().getProgramSVSort(new Name(id));
        if (s == null) {
          semanticError
            ("Program SchemaVariable of type "+id+" not found.");
@@ -4305,7 +4360,7 @@ metaId returns [MetaOperator v = null]
 }
 :
   id = simple_ident {
-     v = AbstractMetaOperator.name2metaop(id);
+     v = getServices().getMetaOperator(new Name(id));
      if (v == null)
        semanticError("Unknown metaoperator: "+id);
   }

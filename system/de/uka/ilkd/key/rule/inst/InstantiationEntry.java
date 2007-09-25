@@ -26,7 +26,7 @@ public abstract class InstantiationEntry  {
     /** creates a new InstantiationEntry with the given SchemaVariable
      * @param sv the SchemaVariable that is instantiated
      */
-    InstantiationEntry(SchemaVariable sv) {
+    public InstantiationEntry(SchemaVariable sv) {
 	this.sv = sv; 
     }
 

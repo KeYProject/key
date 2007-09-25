@@ -18,6 +18,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
+import de.uka.ilkd.key.lang.common.program.IProgramElement;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -149,10 +150,15 @@ public class ApplyOnModality extends AbstractUpdateRule {
         }
         
         if (target.javaBlock() != JavaBlock.EMPTY_JAVABLOCK) {
-            ProgramVariableCollector pvc = 
-                new ProgramVariableCollector(target.javaBlock().program(), true);
-            pvc.start();
-            foundProgVars.addAll(pvc.result());
+            if (target.javaBlock().program() instanceof IProgramElement) {
+                foundProgVars.addAll((((IProgramElement)target.javaBlock().program()).getAllVariables()));
+            }
+            else {               
+                ProgramVariableCollector pvc = 
+                    new ProgramVariableCollector(target.javaBlock().program(), true);
+                pvc.start();
+                foundProgVars.addAll(pvc.result());
+            }
         }
         
         for (int i = 0; i<target.arity(); i++) {

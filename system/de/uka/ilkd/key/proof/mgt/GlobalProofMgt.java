@@ -96,6 +96,10 @@ public class GlobalProofMgt {
     }
 
     public void tryReuse(Proof proof) {
+    	// TODO: implement language specific reuse
+    	// @author oleg.myrk@gmail.com
+    	if (proof.getServices().getLangServices() != null)
+            return;
         Proof[] prevs = lookupPrevious(proof);
         if (prevs.length>0 && !Main.testStandalone) {
 	    String[] prevNames = new String[prevs.length];
@@ -152,6 +156,9 @@ public class GlobalProofMgt {
 		    ProofAggregate pl = (ProofAggregate) proofListIt.next();
                     Proof[] proofs = pl.getProofs();
 		    for (int i=0; i<proofs.length; i++) {
+		    	// TODO: implement language specific reuse
+		    	if (p.getServices().getLangServices() != null)
+		    	    continue;
 			if (p != proofs[i] 
 			    && p.mgt().proofSimilarTo(proofs[i])) {			    
                             result.add(proofs[i]);

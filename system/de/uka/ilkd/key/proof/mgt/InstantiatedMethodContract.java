@@ -2,6 +2,7 @@ package de.uka.ilkd.key.proof.mgt;
 
 import java.util.Map;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -21,7 +22,7 @@ public class InstantiatedMethodContract {
     private Namespace functions;
     private Namespace programVariables;
     
-    public static InstantiatedMethodContract create(Map m, Term pre, Term post, 
+    public static InstantiatedMethodContract create(Services services, Map m, Term pre, Term post, 
                                                     Term atPreAxioms,                                                       
                                                     SetOfLocationDescriptor mods, 
                                                     Modality modality,
@@ -30,7 +31,7 @@ public class InstantiatedMethodContract {
                                                     Namespace programVariables) {
         assert modality != null; 
         
-        final SymbolReplacer pvr = new SymbolReplacer(m);    
+        final SymbolReplacer pvr = new SymbolReplacer(services, m);    
         return new InstantiatedMethodContract(replace(pvr, pre), 
                                               replace(pvr, post),
                                               replace(pvr, atPreAxioms),

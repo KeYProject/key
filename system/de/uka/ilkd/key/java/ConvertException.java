@@ -11,12 +11,22 @@ package de.uka.ilkd.key.java;
 
 public class ConvertException extends RuntimeException {
     
+    Exception e;
+    
     recoder.parser.ParseException pe=null;
     
     de.uka.ilkd.key.parser.proofjava.ParseException pje;
 
     public ConvertException(String errmsg) {
 	super(""+errmsg);
+    }
+
+    /**
+     * @param e 
+     * @author oleg.myrk@gmail.com
+     */
+    public ConvertException(Exception e) {
+        this.e = e;
     }
     
     public ConvertException(recoder.parser.ParseException pe) {
@@ -26,7 +36,11 @@ public class ConvertException extends RuntimeException {
     public ConvertException(de.uka.ilkd.key.parser.proofjava.ParseException pe){
 	this.pje = pe;
     }
-
+    
+    public Exception exception() {
+    	return e;
+    }
+    
     public recoder.parser.ParseException parseException() {
 	return pe;
     }
@@ -36,6 +50,7 @@ public class ConvertException extends RuntimeException {
     }
 
     public String getMessage() {
+	if (e!=null) return e.getMessage();
 	if (pe!=null) return pe.getMessage();
 	if (pje!=null) return pje.getMessage();
 	return super.getMessage();

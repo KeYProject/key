@@ -340,8 +340,8 @@ public class ReusePoint implements Comparable {
             reuseLogger.debug("diamond "+from+"<->"+to);
             Term d1 = (Term) xDiamonds.get(new Integer(from));
             Term d2 = (Term) yDiamonds.get(new Integer(to));
-            int diamondScore = diffJava(d1.executableJavaBlock().program(),
-                                        d2.executableJavaBlock().program()) / 4;
+            int diamondScore = diffJava((JavaProgramElement)d1.executableJavaBlock().program(),
+            							(JavaProgramElement)d2.executableJavaBlock().program()) / 4;
 //            System.err.println(d1);
 //            System.err.println(d2);
             reuseLogger.debug("Diamond correspondence penalty "+ diamondScore);
@@ -420,7 +420,7 @@ public class ReusePoint implements Comparable {
 
       } else { // program similarity
          if (jy.size()>1) {
-             localScore = diffJava(jx.program(), jy.program());
+             localScore = diffJava((JavaProgramElement)jx.program(), (JavaProgramElement)jy.program());
              reuseLogger.info("Scored java diff "+localScore);
              score += localScore;
              s = s + "Program similarity "+localScore+"\n";

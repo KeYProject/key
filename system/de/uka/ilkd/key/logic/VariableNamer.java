@@ -24,6 +24,7 @@ import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTWalker;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
+import de.uka.ilkd.key.lang.common.program.IProgramElement;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
@@ -71,7 +72,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * pointer to services object
      */
-    private final Services services;
+    protected final Services services;
 
     protected HashMap map = new HashMap();
     protected HashMap renamingHistory = new HashMap();
@@ -357,6 +358,19 @@ public abstract class VariableNamer implements InstantiationProposer {
     //-------------------------------------------------------------------------
 
     /**
+     * Proposes a base name for a given type pair.
+     * @param typePair
+     * @return
+     * @author oleg.myrk@gmail.com
+     */
+    private String getBaseNameProposal(KeYJavaType typePair) {
+        if (services.getLangServices() != null)
+            return services.getLangServices().getVariableNameProposal(typePair);
+        else
+            return getBaseNameProposal(typePair.getSort());            
+    }
+    
+    /**
      * proposes a base name for a given sort
      */
     private String getBaseNameProposal(Sort sort) {
@@ -399,13 +413,16 @@ public abstract class VariableNamer implements InstantiationProposer {
         ProgramElementName result = null;
 
         Sort svSort = sv.sort();
-        if(svSort == ProgramSVSort.VARIABLE) {
+        if(svSort == ProgramSVSort.VARIABLE || svSort instanceof de.uka.ilkd.key.lang.common.programsv.IVariableProgramSVSort) {
             if(basename == null || "".equals(basename)) {
                 basename = DEFAULT_BASENAME;
             }
             int cnt = getMaxCounterInProgram(basename,
                                              getProgramFromPIO(posOfFind),
                                              posOfDeclaration) + 1;
+            // Make sure all variable names have a suffix
+            // @author oleg.myrk@gmail.com
+            if (cnt == 0) cnt++;
     
             result = createName(basename, cnt, null);
     
@@ -491,16 +508,20 @@ public abstract class VariableNamer implements InstantiationProposer {
 		if(inst instanceof Expression) {
 		    final ExecutionContext ec = 
 			app.instantiations().getExecutionContext();
-		    if (ec != null) {
-			KeYJavaType kjt = ((Expression)inst).getKeYJavaType
-			    (this.services, ec);		    
-			basename = getBaseNameProposal(kjt.getSort());
+
+		    if (ec != null || inst instanceof IProgramElement || inst instanceof IProgramVariable) {
+                KeYJavaType kjt;
+                if (services.getLangServices() != null && inst instanceof de.uka.ilkd.key.lang.common.program.ITypedProgramElement)
+                        kjt = ((de.uka.ilkd.key.lang.common.program.ITypedProgramElement)inst).getTypePair(services.getLangServices(), services.getNamespaces().sorts(), services.getNamespaces().functions());
+                else
+                        kjt = services.getTypeConverter().getKeYJavaType((Expression)inst, ec);
+                basename = getBaseNameProposal(kjt);
 		    } else {
-			// usually this should never be entered, but because of 
-			// naming issues we do not want nullpointer exceptions
-			// 'u' for unknown
-			basename = "u";
-		    }
+				// usually this should never be entered, but because of 
+				// naming issues we do not want nullpointer exceptions
+				// 'u' for unknown
+				basename = "u";
+			    }		    
 		}
 	    }
         }
@@ -539,7 +560,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 	boolean result = true;
 
 	Sort svSort = sv.sort();
-	if(svSort == ProgramSVSort.VARIABLE) {
+	if(svSort == ProgramSVSort.VARIABLE || svSort instanceof de.uka.ilkd.key.lang.common.programsv.IVariableProgramSVSort) {
 	    result = isUniqueInProgram(name,
 				       getProgramFromPIO(posOfFind),
 				       posOfDeclaration);
@@ -635,7 +656,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 						Goal goal,
 						Services services,
 						ListOfString previousProposals){
-	if(suggestive_off) {
+	if(suggestive_off || services.getLangServices() != null) {
 	    return getProposal(app, sv, services, null, previousProposals);
 	}
 

@@ -7,7 +7,7 @@
 # See LICENSE.TXT for details.
 
 #$Format: "PRCSVERSION = \"$ProjectVersion$\""$ 
-PRCSVERSION = "0.2655"
+PRCSVERSION = "muerkKeYC.4"
 
 SHELL=/bin/sh
 #comon prefix
@@ -332,8 +332,11 @@ ANTLR_PARSER= \
 	$(GENERATED_SRC_PATH)$(PFX)parser/ocl/KeYOclParser.java \
 	$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocLexer.java \
 	$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocParser.java \
-	$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocTreeWalker.java 
-
+	$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocTreeWalker.java \
+	$(GENERATED_SRC_PATH)$(PFX)lang/clang/common/loader/parser/CLexer.java \
+	$(GENERATED_SRC_PATH)$(PFX)lang/clang/common/loader/parser/CParser.java \
+	$(GENERATED_SRC_PATH)$(PFX)lang/clang/common/loader/parser/SchemaCLexer.java \
+	$(GENERATED_SRC_PATH)$(PFX)lang/clang/common/loader/parser/SchemaCParser.java
 
 JAVACC_PARSER= \
 	$(GENERATED_SRC_PATH)$(PFX)parser/schemajava/SchemaJavaParserConstants.java \
@@ -660,7 +663,19 @@ $(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocTreeWalker.java \
 	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser
 	@$(ANTLR)  -glib $(PFX)util/keydoc/parser/KeYDocParser.g -o $(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser $<
 
+$(GENERATED_SRC_PATH)$(PFX)lang/clang/common/loader/parser/CLexer.java \
+$(GENERATED_SRC_PATH)$(PFX)lang/clang/common/loader/parser/CParser.java \
+	: $(PFX)lang/clang/common/loader/parser/CParser.g
+	@echo [creating C parser]
+	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)lang/clang/common/loader/parser
+	@$(ANTLR) -o $(GENERATED_SRC_PATH)$(PFX)lang/clang/common/loader/parser $<
 
+$(GENERATED_SRC_PATH)$(PFX)lang/clang/common/loader/parser/SchemaCLexer.java \
+$(GENERATED_SRC_PATH)$(PFX)lang/clang/common/loader/parser/SchemaCParser.java \
+	: $(PFX)lang/clang/common/loader/parser/SchemaCParser.g
+	@echo [creating schema C parser]
+	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)lang/clang/common/loader/parser
+	@$(ANTLR) -o $(GENERATED_SRC_PATH)$(PFX)lang/clang/common/loader/parser $<
 
 $(BINARYPATH)$(PFX)util/make/MakefileReader.class:
 	@mkdir -p $(GENERATED_SRC_PATH)

@@ -58,7 +58,7 @@ public class DLMethodContract extends DefaultOperationContract {
 
 
     private static Statement extractStatement(Term fma) {
-        JavaProgramElement pe = fma.javaBlock().program();
+        ProgramElement pe = fma.javaBlock().program();
         return (Statement) ((NonTerminalProgramElement) pe).getChildAt(0);
     }
 

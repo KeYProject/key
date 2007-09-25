@@ -28,6 +28,7 @@ import de.uka.ilkd.key.gui.assistant.*;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.*;
 import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.lang.clang.safe.profile.ClangProfile;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.*;
@@ -45,7 +46,7 @@ public class Main extends JFrame {
 
     //DO NOT CHANGE THE FOLLOWING 2 LINES, UNLESS YOU KNOW ABOUT PRCS-REPLACEMENT
     /* $Format: "    private static final String PRCSVERSION = \"$ProjectVersion$\";"$ */
-    private static final String PRCSVERSION = "0.2655";
+    private static final String PRCSVERSION = "muerkKeYC.4";
 
     
     private static final String VERSION="1.2-beta (internal: "+PRCSVERSION+")";
@@ -2281,6 +2282,10 @@ public class Main extends JFrame {
 		    jmlSpecs = false;
 		} else if (opt[index].equals("AUTO")) {
 		    batchMode = true;
+		} else if (opt[index].equals("CLANG")) {
+                    final Profile p = new ClangProfile(null);
+                    ProofSettings.DEFAULT_SETTINGS.setProfile(p);
+                    p.updateSettings(ProofSettings.DEFAULT_SETTINGS);		    
 		} else if (opt[index].equals("TESTING") || opt[index].equals("UNIT")) {
                     if(opt[index].equals("TESTING")){
                         testStandalone = true;

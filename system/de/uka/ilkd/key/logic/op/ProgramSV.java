@@ -44,7 +44,7 @@ public class ProgramSV extends SortedSchemaVariable
      * @param listSV a boolean which is true iff the schemavariable is
      * allowed to match a list of program constructs
      */    
-    ProgramSV(Name name, ProgramSVSort s, boolean listSV) {
+    public ProgramSV(Name name, ProgramSVSort s, boolean listSV) {
 	super(name, ProgramConstruct.class, s, listSV);	
     }
     

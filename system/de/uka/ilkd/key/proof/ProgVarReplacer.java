@@ -22,9 +22,11 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.ArrayOfProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
+import de.uka.ilkd.key.lang.common.program.IProgramElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.*;
@@ -41,13 +43,19 @@ public class ProgVarReplacer {
      * map specifying the replacements to be done
      */
     protected final Map map;
-
+    
+    /**
+     * A reference to main services.
+     * @author oleg.myrk@gmail.com
+     */
+    protected final Services services;
 
     /**
      * creates a ProgVarReplacer that replaces program variables as specified
      * by the map parameter
      */
-    public ProgVarReplacer(Map m) {
+    public ProgVarReplacer(Services services, Map m) {
+    	this.services = services;
         map = m;
     }
 
@@ -368,10 +376,10 @@ public class ProgVarReplacer {
         final JavaBlock jb = t.javaBlock();
         JavaBlock newJb = jb;
         if (!jb.isEmpty()) {
-            Statement s = (Statement)jb.program();
-            Statement newS = (Statement)replace(s);
+        	ProgramElement s = jb.program();
+        	ProgramElement newS = replace(s);
             if(newS != s) {
-                newJb = JavaBlock.createJavaBlock((StatementBlock)newS);
+                newJb = JavaBlock.createJavaBlock(newS);
             }
         }
 
@@ -395,9 +403,11 @@ public class ProgVarReplacer {
     }
 
     /**
-     * replaces in a statement
+     * replaces in a program element
      */
     public ProgramElement replace(ProgramElement pe) {
+        if (services.getLangServices() != null)
+            return services.getLangServices().replaceVariables((IProgramElement)pe, map);    	
         ProgVarReplaceVisitor pvrv = new ProgVarReplaceVisitor(pe, map, false);
 	pvrv.start();
 	return pvrv.result();

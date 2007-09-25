@@ -310,6 +310,13 @@ public class TypeConverter extends TermBuilder {
     public Term convertToLogicElement(ProgramElement pe, 				    
 				      ExecutionContext ec) {
 	Debug.out("typeconverter: called for:", pe, pe.getClass());
+	
+	if (services.getLangServices() != null && pe instanceof de.uka.ilkd.key.lang.common.program.IProgramElement) {
+	    Term term = services.getLangServices().convertProgramElementToTerm(services.getNamespaces().sorts(), services.getNamespaces().functions(), (de.uka.ilkd.key.lang.common.program.IProgramElement)pe);
+	    if (term != null)
+	        return term;
+	}	
+	
 	if (pe instanceof ProgramVariable) {	    
 	    return var((ProgramVariable)pe);
 	} else if (pe instanceof FieldReference) {

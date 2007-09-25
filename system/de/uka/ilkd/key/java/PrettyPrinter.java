@@ -104,6 +104,15 @@ public class PrettyPrinter {
         this.instantiations = svi;
     }
     
+    /**
+     * Tells if the line feeds are to be printed
+     * @return
+     * @author oleg.myrk@gmail.com
+     */
+    public boolean getNoLineFeed() {
+        return this.noLinefeed;
+    }
+    
     
     /** The number of charcters that have been send to the writer */
     protected int writtenCharacters = 0; 

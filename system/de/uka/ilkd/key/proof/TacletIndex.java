@@ -13,12 +13,15 @@ package de.uka.ilkd.key.proof;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.SynchronizedBlock;
 import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.lang.common.match.IKeyedMatchPatternProgramElement;
+import de.uka.ilkd.key.lang.common.match.IKeyedMatchSourceProgramElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -93,15 +96,27 @@ public class TacletIndex  {
 	this.partialInstantiatedRuleApps = partialInstantiatedRuleApps;
     }
 
-    private Object getIndexObj(FindTaclet tac) {
+    /**
+     * Computes a set of keys used as indexes for looking up potentially applicable taclets. 
+     * @param tac
+     * @return
+     */
+    private Set getIndexObj(FindTaclet tac) {
+	Set result = new HashSet();
 	Object indexObj;
 	final Term indexTerm = tac.find();	
 	if (!indexTerm.javaBlock().isEmpty()) {
-	    final JavaProgramElement prg = indexTerm.javaBlock().program();
+	    final ProgramElement prg = indexTerm.javaBlock().program();
+        if (prg instanceof IKeyedMatchPatternProgramElement) {
+            ((IKeyedMatchPatternProgramElement)prg).addMatchPatternKeys(result);
+            return result;
+        }
+        else {
 	    indexObj = ((StatementBlock)prg).getStatementAt(0);                
             if (!(indexObj instanceof SchemaVariable)) {
-		indexObj=indexObj.getClass();       
-	    } 
+            	indexObj=indexObj.getClass();       
+            } 
+        }
 	} else {
 	    indexObj = indexTerm.op();
 	    if (indexObj instanceof AnonymousUpdate) {
@@ -136,36 +151,43 @@ public class TacletIndex  {
 		indexObj=SchemaOp.DEFAULTSVOP;
 	    }
 	}
-	return indexObj;
+	result.add(indexObj);
+	return result;
     }
 
 
     private void insertToMap(NoPosTacletApp tacletApp,
 			     HashMapFromObjectToListOfNoPosTacletApp map
 			    ) {
-	Object indexObj=getIndexObj((FindTaclet)tacletApp.taclet());
-	ListOfNoPosTacletApp opList = map.get(indexObj);	
-	if (opList == null) {
-	    opList = SLListOfNoPosTacletApp.EMPTY_LIST.prepend(tacletApp);
-	} else {
-	    opList = opList.prepend(tacletApp);
-	}
-	map.put(indexObj, opList);
+        Set indexObjects = getIndexObj((FindTaclet)tacletApp.taclet());
+        for(Iterator i = indexObjects.iterator(); i.hasNext(); ) {
+            Object indexObj = i.next();
+            ListOfNoPosTacletApp opList = map.get(indexObj);
+            if (opList == null) {
+                opList = SLListOfNoPosTacletApp.EMPTY_LIST.prepend(tacletApp);
+            } else {
+                    opList = opList.prepend(tacletApp);
+            }
+    	    map.put(indexObj, opList);
+    	}
     }
 
 
     private void removeFromMap(NoPosTacletApp tacletApp,
 			       HashMapFromObjectToListOfNoPosTacletApp map) {
-	Object op = getIndexObj((FindTaclet)tacletApp.taclet());
-	ListOfNoPosTacletApp opList = map.get(op);	
-	if (opList != null) {
-	    opList = opList.removeAll(tacletApp);
-	    if (opList == SLListOfNoPosTacletApp.EMPTY_LIST) {
-		map.remove(op);
-	    } else {
-		map.put(op, opList);
-	    }	
-	}
+        Set indexObjects = getIndexObj((FindTaclet)tacletApp.taclet());
+        for(Iterator i = indexObjects.iterator(); i.hasNext(); ) {
+            Object op = i.next();
+            ListOfNoPosTacletApp opList = map.get(op);	
+            if (opList != null) {
+                opList = opList.removeAll(tacletApp);
+                if (opList == SLListOfNoPosTacletApp.EMPTY_LIST) {
+                    map.remove(op);
+                } else {
+                    map.put(op, opList);
+                }	
+             }
+    	}
     }
 
     /**
@@ -402,6 +424,17 @@ public class TacletIndex  {
 	 ProgramElement pe,
 	 PrefixOccurrences prefixOcc) {
 	ListOfNoPosTacletApp result=SLListOfNoPosTacletApp.EMPTY_LIST;
+	if (pe instanceof IKeyedMatchSourceProgramElement) {
+        Set keys = new HashSet();
+        ((IKeyedMatchSourceProgramElement)pe).addMatchSourceKeys(keys);
+        for(Iterator i = keys.iterator(); i.hasNext();) {
+            Object key = i.next();
+            ListOfNoPosTacletApp taclets = map.get(key);
+            if (taclets != null)
+                result = result.append(taclets);
+        }
+        return result;
+	}
 	if (pe instanceof ProgramPrefix) {
  	    int next=prefixOcc.occurred(pe);
  	    NonTerminalProgramElement nt=(NonTerminalProgramElement)pe;
@@ -440,8 +473,10 @@ public class TacletIndex  {
     
 	if (!term.javaBlock().isEmpty()) {
 	    prefixOccurrences.reset();
-	    StatementBlock sb=(StatementBlock)term.javaBlock().program();
-	    result = getJavaTacletList(map, sb.getStatementAt(0),
+	    ProgramElement pe=(ProgramElement)term.javaBlock().program();
+	    // TODO: the second argument used to be "sb.getStatementAt(0)"
+	    // @author oleg.myrk@gmail.com
+	    result = getJavaTacletList(map, pe,
 				       prefixOccurrences);
 	} 
 

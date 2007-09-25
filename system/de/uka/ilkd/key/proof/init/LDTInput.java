@@ -137,6 +137,9 @@ public class LDTInput implements EnvInput {
                         	.prepend(new IntegerDomainLDT(sorts, functions))
                         	.prepend(new BooleanLDT(sorts, functions));
         initConfig.getServices().getTypeConverter().init(ldts);
+        
+        if (initConfig.getServices().getLangServices() != null)
+            initConfig.getServices().getLangServices().init(initConfig.sortNS(), initConfig.funcNS());
     }
   
     

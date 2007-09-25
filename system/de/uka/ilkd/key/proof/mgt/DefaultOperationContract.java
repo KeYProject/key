@@ -47,7 +47,7 @@ public abstract class DefaultOperationContract extends AbstractContract
         
         instantiateAuxiliarySymbols(replacementMap, localFunctions, localProgramVariables, proof.getServices());
         return InstantiatedMethodContract.create
-            (replacementMap, getPre(), getPost(), getAdditionalAxioms(),
+            (services, replacementMap, getPre(), getPost(), getAdditionalAxioms(),
              getModifies(), insts.getModality(), excVar, 
              localFunctions, localProgramVariables);
     }

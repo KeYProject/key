@@ -19,6 +19,7 @@ import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.collection.SLListOfString;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.lang.common.programsv.IVariableProgramSVSort;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
@@ -347,7 +348,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 	Sort svSort = ((SortedSchemaVariable)sv).sort();
 	if (svSort == ProgramSVSort.LABEL) {
 	    return VariableNamer.parseName(instantiation);
-	} else if (svSort == ProgramSVSort.VARIABLE ) {
+	} else if (svSort == ProgramSVSort.VARIABLE || svSort instanceof de.uka.ilkd.key.lang.common.programsv.IVariableProgramSVSort) {
 	    NewVarcond nvc = app.taclet().varDeclaredNew(sv);
 	    if (nvc != null) {
 		KeYJavaType kjt;
@@ -357,14 +358,20 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 	            final TypeConverter tc = services.getTypeConverter();
 		    final SchemaVariable peerSV=(SchemaVariable)o;
 		    final Object peerInst = app.instantiations().getInstantiation(peerSV);
-		    Expression peerInstExpr;
-		    if (peerInst instanceof Term) {
-			peerInstExpr=tc.convertToProgramElement((Term)peerInst);
-		    } else {
-			peerInstExpr=(Expression)peerInst;
-		    }
-		    kjt = tc.getKeYJavaType(peerInstExpr, app.instantiations().
-					    getContextInstantiation().activeStatementContext());
+
+                    if (services.getLangServices() != null && peerInst instanceof de.uka.ilkd.key.lang.common.program.ITypedProgramElement)
+                        kjt = ((de.uka.ilkd.key.lang.common.program.ITypedProgramElement)peerInst).getTypePair(services.getLangServices(), services.getNamespaces().sorts(), services.getNamespaces().functions());
+                    else {                    
+                        Expression peerInstExpr;
+                        if (peerInst instanceof Term) {
+                            peerInstExpr=tc.convertToProgramElement((Term)peerInst);
+                        } else {
+                            peerInstExpr=(Expression)peerInst;
+                        }
+        	        kjt = tc.getKeYJavaType(peerInstExpr, app.instantiations().
+                                                getContextInstantiation() != null ? app.instantiations().
+                                                getContextInstantiation().activeStatementContext() : null);
+                    }
 		    if(nvc.isDefinedByElementSort()){
 		        Sort s = kjt.getSort();
 			if(s instanceof ArraySort) s = ((ArraySort)s).elementSort();
@@ -373,8 +380,11 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 		} else {
 		    kjt = javaInfo.getKeYJavaType((Sort)o);
 		}
-		return new LocationVariable
-		    (VariableNamer.parseName(instantiation), kjt);
+                
+                if (services.getLangServices() != null)
+                    return services.getLangServices().buildVariable((IVariableProgramSVSort)svSort, VariableNamer.parseName(instantiation), kjt);
+                else
+                    return new LocationVariable(VariableNamer.parseName(instantiation), kjt);
 	    }
 	}
 	return null;
@@ -397,8 +407,9 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
                         instantiation,
                         sv,
                         originalApp.posInOccurrence(),
+                        originalApp.instantiations().getContextInstantiation() != null ?
                         originalApp.instantiations().getContextInstantiation()
-                                            .prefix())) {
+                                            .prefix() : null)) {
             throw new SVInstantiationParserException(instantiation,
                                                      irow,
                                                      0,

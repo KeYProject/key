@@ -767,6 +767,14 @@ options {
     )
 ;
 
+ESCIDENT
+options {
+    testLiterals = true;
+    paraphrase = "an escaped identifer";
+}
+:  '%' '{' ( ~('}'|'\\') | "\\}" | "\\\\" ) * '}' 
+;
+
 protected
 NUM_LITERAL
 options {

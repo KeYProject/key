@@ -17,9 +17,15 @@ import de.uka.ilkd.key.casetool.UMLInfo;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.jml.Implementation2SpecMap;
+import de.uka.ilkd.key.lang.common.services.ILangServices;
+import de.uka.ilkd.key.lang.common.services.LangServicesEnvImpl;
 import de.uka.ilkd.key.logic.InnerVariableNamer;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.logic.op.MetaOperator;
+import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
 import de.uka.ilkd.key.proof.Counter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -34,7 +40,7 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
  * include information on the underlying Java model and a converter to
  * transform Java program elements to logic (where possible) and back.
  */
-public class Services{
+public class Services implements de.uka.ilkd.key.lang.common.services.IMainServices {
 
     /**
      * proof specific namespaces (functions, predicates, sorts, variables)
@@ -97,7 +103,13 @@ public class Services{
 
     
     private SpecificationRepository specRepos;
-
+    
+    /**
+     * Language services, can be <code>null</code>
+     * @author oleg.myrk@gmail.com
+     */
+    private ILangServices langServices;
+    
     /**
      * creates a new Services object with a new TypeConverter and a new
      * JavaInfo object with no information stored at none of these.
@@ -239,7 +251,9 @@ public class Services{
         s.specRepos = specRepos.copy(s);
 	s.setExceptionHandler(getExceptionHandler());
 	s.setNamespaces(namespaces.copy());
-	return s;
+	if (getLangServices() != null)
+	    s.setLangServices(getLangServices().copy(new LangServicesEnvImpl(s))); 	
+        return s;
     }
 
     /**
@@ -256,6 +270,8 @@ public class Services{
 	s.setImplementation2SpecMap(specMap.copy(s));
         s.specRepos = specRepos.copy(s);
 	s.setNamespaces(namespaces.copy());
+	if (getLangServices() != null)
+	    s.setLangServices(this.getLangServices().copy(new LangServicesEnvImpl(s))); 	
 	return s;
     }
     
@@ -267,6 +283,8 @@ public class Services{
         s.setExceptionHandler(getExceptionHandler());
         s.setNamespaces(namespaces.copy());
         s.specRepos = specRepos;
+        if (getLangServices() != null)
+            s.setLangServices(this.getLangServices().copy(new LangServicesEnvImpl(s)));         
         return s;
     }
 
@@ -301,4 +319,48 @@ public class Services{
     public void setNamespaces(NamespaceSet namespaces) {
         this.namespaces = namespaces;
     }
+    
+    /**
+     * Sets the language services to use.
+     * @param languageServices
+     */
+    public void setLangServices(ILangServices langServices) {
+        this.langServices = langServices;
+    }
+    
+    /**
+     * Returns the language services, may be <code>null</code>
+     * @return
+     */
+    public ILangServices getLangServices() {
+        return langServices;
+    }
+    
+    /**
+     * Looks up {@link ProgramSVSort} by its name, returns <code>null</code> if not found.
+     * @param name
+     * @return
+     */
+    public ProgramSVSort getProgramSVSort(Name name) {
+        ProgramSVSort sort = null;
+        if (getLangServices() != null)
+                sort = getLangServices().getProgramSVSort(name);
+        if (sort == null)
+                sort = (ProgramSVSort)ProgramSVSort.name2sort().get(name);
+        return sort;          
+    }
+    
+    /**
+     * Looks up {@link MetaOperator} by its name, returns <code>null</code> if not found.
+     * @param name
+     * @return
+     */
+    public MetaOperator getMetaOperator(Name name) {
+        MetaOperator metaOp = null;
+        if (getLangServices() != null)
+                metaOp = getLangServices().getMetaOp(name);
+        if (metaOp == null)
+                metaOp = (MetaOperator)AbstractMetaOperator.name2metaop(name.toString());
+        return metaOp;          
+    }    
 }

@@ -20,6 +20,7 @@ import java.util.HashMap;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.lang.common.program.IVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -71,13 +72,15 @@ public class InnerVariableNamer extends VariableNamer {
         
         ProgramVariable newvar = var;
         
-        if (!newname.equals(name)) {        
-            newvar = new LocationVariable(newname,
-                    var.getKeYJavaType());
+        if (!newname.equals(name)) {
+            if (services.getLangServices() != null)
+                newvar = services.getLangServices().copyVariable((IVariable)var, newname, var.getKeYJavaType());
+            else
+                newvar = new LocationVariable(newname, var.getKeYJavaType());
             map.put(var, newvar);
             renamingHistory = map;
             //execute renaming
-            ProgVarReplacer pvr = new ProgVarReplacer(map);
+            ProgVarReplacer pvr = new ProgVarReplacer(services, map);
             pvr.replace(goal);
         }
         

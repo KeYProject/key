@@ -204,7 +204,7 @@ where p2' is the first assignment statement of p2.
         if(formula.op() != Op.DIA)
             throw new IllegalStateException(
                 "Diamondoperator expected at top of "+ formula+" in "+s);
-        return formula.javaBlock().program();
+        return (JavaProgramElement)formula.javaBlock().program();
     }
 
 

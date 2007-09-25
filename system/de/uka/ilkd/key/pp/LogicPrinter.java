@@ -15,11 +15,16 @@ import java.util.*;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.lang.common.pprinter.ProgramPrinterUtil;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.lang.common.sort.ISort;
+import de.uka.ilkd.key.lang.common.operator.IOperator;
+import de.uka.ilkd.key.lang.common.pprinter.IProgramPrinter;
+import de.uka.ilkd.key.lang.common.program.IProgramElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
@@ -395,7 +400,7 @@ public class LogicPrinter {
         printSchemaVariable(sv.getSchemaVariable());
         layouter.print(",").brk();
         if (sv.isDefinedByType()) {
-            layouter.print(sv.getSort().toString());
+            layouter.print(formatSort(sv.getSort()));
         } else {
             if (sv.isDefinedByElementSort()) {
                 layouter.print("\\elemTypeof (").brk();
@@ -580,10 +585,15 @@ public class LogicPrinter {
         if (pe instanceof ProgramVariable) {
             printProgramVariable((ProgramVariable) pe);
         } else {
-            StringWriter w = new StringWriter();
+            if (pe instanceof IProgramElement) {
+            	layouter.pre(ProgramPrinterUtil.formatProgramElementNoLF((IProgramElement)pe));
+            }
+            else {
+            StringWriter w = new StringWriter();            
             PrettyPrinter pp = new PrettyPrinter(w, true, instantiations);
             pe.prettyPrint(pp);
             layouter.pre(w.toString());
+            }
         }
     }
 
@@ -599,7 +609,7 @@ public class LogicPrinter {
         if (logger.isDebugEnabled()) {
             logger.debug("PP PV " + pv.name());
         }
-        layouter.beginC().print(pv.name().toString()).end();
+        layouter.beginC().print(formatSymbol(pv)).end();
     }
 
     /**
@@ -611,10 +621,15 @@ public class LogicPrinter {
      */
     public void printProgramSV(ProgramSV pe)
         throws IOException {
-        StringWriter w = new StringWriter();
-        PrettyPrinter pp = new PrettyPrinter(w, true, instantiations);
-        pe.prettyPrint(pp);
-        layouter.pre(w.toString());
+        if (pe instanceof IProgramElement) {
+        	layouter.pre(ProgramPrinterUtil.formatProgramElementNoLF((IProgramElement)pe));
+        }
+        else {    	
+        	StringWriter w = new StringWriter();
+        	PrettyPrinter pp = new PrettyPrinter(w, true, instantiations);
+        	pe.prettyPrint(pp);
+        	layouter.pre(w.toString());
+        }
     }
 
     protected void printRewrite(Term t) throws IOException {
@@ -998,7 +1013,11 @@ public class LogicPrinter {
         //
         else {
             startTerm(t.arity());
-            layouter.print(name);
+            layouter.print(t.op() instanceof IOperator ?  
+                                            formatSymbol(t.op())
+                                    :
+                                            name
+                            );
             if(t.arity()>0 || t.op() instanceof ProgramMethod) {
                 layouter.print("(").beginC(0);
                 for (int i=0;i<t.arity();i++) {
@@ -1020,7 +1039,7 @@ public class LogicPrinter {
         final CastFunctionSymbol cast = (CastFunctionSymbol)t.op();
         startTerm(t.arity());
         layouter.print(pre);
-        layouter.print(cast.getSortDependingOn().toString());
+        layouter.print(formatSort(cast.getSortDependingOn()));
         layouter.print(post);
         maybeParens(t.sub(0), ass);
     }
@@ -1309,10 +1328,10 @@ public class LogicPrinter {
                 Term t =
                     TermFactory.DEFAULT.createVariableTerm((LogicVariable) v);
                 if(notationInfo.getAbbrevMap().containsTerm(t)){
-                    layouter.print (v.sort().name().toString() + " " +
+                    layouter.print (formatSort(v.sort()) + " " +
                                     notationInfo.getAbbrevMap().getAbbrev(t));
                 }else{
-                    layouter.print ( v.sort().name() + " " + v.name ());
+                    layouter.print (formatSort(v.sort()) + " " + v.name ());
                 }
             }else{
                 layouter.print ( v.name ().toString());
@@ -1362,9 +1381,12 @@ public class LogicPrinter {
             separator[0] = "[";
             separator[1] = "]";
         } else if ( loc.arity () == 0 ) {
-            layouter.print( loc.name ().toString ().replaceAll ( "::", "." ) );
+        	// Why do we need to replace "::" with "."?
+        	// @author oleg.myrk@gmail.com
+            // layouter.print( escapeIdentifier(loc.name ().toString ().replaceAll ( "::", "." )) );
+            layouter.print( formatSymbol(loc) );
         } else {
-            layouter.print ( loc.name().toString() + "(" );
+            layouter.print ( formatSymbol(loc) + "(" );
             for ( int m = 0; m < loc.arity () - 1; m++ ) {
                 separator[m] = ",";
             }
@@ -1527,9 +1549,20 @@ public class LogicPrinter {
         prgPrinter.reset();
         prgPrinter.setWriter(sw);
         Range r=null;
-        try {
-            j.program().prettyPrint(prgPrinter);
-            r = prgPrinter.getRangeOfFirstExecutableStatement();
+        try {                
+            ProgramElement pe = j.program();
+            if (pe instanceof IProgramElement) {
+                IProgramPrinter pprinter = ((IProgramElement)pe).createDefaultPrinter();
+                pprinter.init(sw);
+                pprinter.setNoLineFeed(prgPrinter.getNoLineFeed());
+                pprinter.setIndentationLevel(prgPrinter.getIndentationLevel());
+                pprinter.print((IProgramElement)j.program());
+                r = pprinter.getFocusRange();
+            }
+            else {
+            	j.program().prettyPrint(prgPrinter);
+            	r = prgPrinter.getRangeOfFirstExecutableStatement();
+            }
         } catch (java.io.IOException e) {
             layouter.print("ERROR");
             System.err.println("Error while printing Java program \n"+e);
@@ -2260,5 +2293,56 @@ public class LogicPrinter {
                 initPosTbl.addUpdateRange(new Range(updateStart, count()));
             }
         }
+    }
+    
+    /**
+     * Formats a sort into a string.
+     * @param sort
+     * @return
+     */
+    private final String formatSort(Sort sort) {
+        if (sort instanceof ISort)
+            return escapeIdentifier(sort.name().toString());
+        else
+            return sort.name().toString();
+    }
+    
+    /**
+     * Formats a symbol into a string.
+     * @param sort
+     * @return
+     */
+    private final String formatSymbol(Operator operator) {
+        if (operator instanceof IOperator)
+            return escapeIdentifier(operator.name().toString());
+        else
+            return operator.name().toString();
+    }    
+    
+    /**
+     * Escapes identifier.
+     * @param identifier
+     * @return
+     * @author oleg.myrk@gmail.com
+     */
+    private final String escapeIdentifier(String identifier) {
+        String[] parts = identifier.split("::");
+        if (parts.length == 2)
+                return escapeIdentifierHelper(parts[0]) + "::" + escapeIdentifierHelper(parts[1]);
+        else
+                return escapeIdentifierHelper(identifier);
+    }
+
+    /**
+     * Helper method for identifier escaping.
+     * @param identifier
+     * @return
+     * @author oleg.myrk@gmail.com
+     */
+    private final String escapeIdentifierHelper(String identifier) {
+        if (!identifier.matches("[a-zA-Z_][a-zA-Z0-9_]*"))
+                return "%{" + identifier.replaceAll("\\\\", "\\\\").replaceAll("}", "\\}") + "}";
+        else
+                return identifier;            
     }
 }

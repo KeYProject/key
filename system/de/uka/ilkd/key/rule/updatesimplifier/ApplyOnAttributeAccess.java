@@ -122,10 +122,16 @@ public class ApplyOnAttributeAccess extends ApplyOnAccessTerm {
                 UpdateSimplifierTermFactory.DEFAULT.getBasicTermFactory ();
 
             Term res = getCurrentPair ().guard ();
-            final Term eqObjects =
-                compareObjects ( targetSubs.getTerm ( 0 ),
-                                 getCurrentPair ().locationSubs ()[0] );
-            res = tf.createJunctorTermAndSimplify ( Op.AND, res, eqObjects );
+            
+            // TODO: I have added this check as otherwise this thing crashed with
+            // IndexOutOfBoundsException on locations with 0 arguments.  
+            // @author oleg.myrk@gmail.com
+            if (targetSubs.size() > 0) {
+                final Term eqObjects =
+                    compareObjects ( targetSubs.getTerm ( 0 ),
+                                     getCurrentPair ().locationSubs ()[0] );
+                res = tf.createJunctorTermAndSimplify ( Op.AND, res, eqObjects );
+            }
             
             // attention we need not to take care of 
             // the case {o.a':=t}o.a --> o.a as in this case this method must not 

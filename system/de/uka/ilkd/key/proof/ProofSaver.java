@@ -21,6 +21,8 @@ import de.uka.ilkd.key.gui.ProofSettings;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.lang.common.pprinter.ProgramPrinterUtil;
+import de.uka.ilkd.key.lang.common.program.IProgramElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.EntryOfSchemaVariableAndInstantiationEntry;
 import de.uka.ilkd.key.logic.op.IteratorOfEntryOfSchemaVariableAndInstantiationEntry;
@@ -320,12 +322,18 @@ public class ProofSaver {
 
 
     public static String printProgramElement(ProgramElement pe) {
-        java.io.StringWriter sw = new java.io.StringWriter();
-        ProgramPrinter prgPrinter = new ProgramPrinter(sw);
+        String result = "";
         try{
-            pe.prettyPrint(prgPrinter);
+            if (pe instanceof IProgramElement) {
+                result = ProgramPrinterUtil.formatProgramElement((IProgramElement)pe);
+            } else {
+                java.io.StringWriter sw = new java.io.StringWriter();
+                ProgramPrinter prgPrinter = new ProgramPrinter(sw);
+                pe.prettyPrint(prgPrinter);
+                result = sw.toString();
+            }
         } catch(IOException ioe) {System.err.println(ioe);}
-        return sw.toString();
+        return result;
     }
 
 
@@ -396,7 +404,7 @@ public class ProofSaver {
             PresentationFeatures.modifyNotationInfo(ni,
                     serv.getNamespaces().functions());
         }
-        p =  new LogicPrinter(new ProgramPrinter(null), ni, (shortAttrNotation ? serv : null), true);
+        p = new LogicPrinter(new ProgramPrinter(null), ni, (shortAttrNotation ? serv : null), true);
         return p;
     }
 
