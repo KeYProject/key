@@ -50,7 +50,7 @@ import de.uka.ilkd.key.util.ProgressMonitor;
  */
 public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
 
-    private Term problemTerm = null;
+    protected Term problemTerm = null;
     private String problemHeader = "";
 
     // if false only the specifications of Object and Datagroup are read.
@@ -128,18 +128,18 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
 		 }
 	       }
 	    }
-            problemHeader = lexer.getText();
-            if(problemHeader != null && 
-	       problemHeader.lastIndexOf(searchS) != -1){
-		problemHeader = problemHeader.substring(
-		    0, problemHeader.lastIndexOf(searchS));
+            setProblemHeader(lexer.getText());
+            if(getProblemHeader() != null && 
+	       getProblemHeader().lastIndexOf(searchS) != -1){
+		setProblemHeader(getProblemHeader().substring(
+		    0, getProblemHeader().lastIndexOf(searchS)));
 	    }
 	    initConfig.setTaclets(problemParser.getTaclets());
 	    initConfig.add(normalConfig.namespaces(), mod);
 	    
 	    if(!problemOnly) {
 		initConfig.getProofEnv().addMethodContracts(
-			problemParser.getContracts(), problemHeader);
+			problemParser.getContracts(), getProblemHeader());
 	    }
 	} catch (antlr.ANTLRException e) {
 	    throw new ProofInputException(e);
@@ -190,8 +190,8 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
 	  DLMethodContract c = (DLMethodContract)fr.getContract();
 	  if(c == null) return null;
 	  // Transform the header
-	  c.setHeader(problemHeader);
-	  problemHeader = c.getHeader();
+	  c.setHeader(getProblemHeader());
+	  setProblemHeader(c.getHeader());
 	  DLHoareTriplePO poi = (DLHoareTriplePO)c.getProofOblInput(null);
 	  initConfig.getServices().getNamespaces().
 	     programVariables().add(c.getProgramVariables());
@@ -199,7 +199,7 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
 	    problemTerm = poi.getTerm();
 	    name = poi.name();
 	    ProofAggregate po = ProofAggregate.createProofAggregate(
-             new Proof(name, problemTerm, problemHeader,
+             new Proof(name, problemTerm, getProblemHeader(),
                         initConfig.createTacletIndex(), 
                         initConfig.createBuiltInRuleIndex(),
                         initConfig.getServices(), settings), name);
@@ -208,12 +208,12 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
     	    return po;
 	  }
 	  return null;
-	}else{
-          return ProofAggregate.createProofAggregate(
-           new Proof(name, problemTerm, problemHeader,
-                        initConfig.createTacletIndex(), 
-                        initConfig.createBuiltInRuleIndex(),
-                        initConfig.getServices(), settings), name);
+	} else {                                   
+	    return ProofAggregate.createProofAggregate(
+	            new Proof(name, problemTerm, getProblemHeader(),
+	                    initConfig.createTacletIndex(), 
+	                    initConfig.createBuiltInRuleIndex(),
+	                    initConfig.getServices(), settings), name);
 	}
     }
 
@@ -223,14 +223,7 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
     public File getFile(){
 	return file.file();
     }
-    
-    /**
-     * @return Returns the problemHeader.
-     */
-    protected String getProblemHeader () {
-        return problemHeader;
-    }
-
+  
     /** returns true, that is the input asks the user which
      * environment he prefers if there are multiple possibilities
      */
@@ -465,6 +458,17 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
 	} catch (FileNotFoundException fnfe) {
             throw new ProofInputException(fnfe);
         }
+    }
+
+    protected void setProblemHeader(String problemHeader) {
+        this.problemHeader = problemHeader;
+    }
+
+    /**
+     * @return Returns the problemHeader.
+     */
+    protected String getProblemHeader() {
+        return problemHeader;
     }
     
 

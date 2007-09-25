@@ -13,7 +13,6 @@ import de.uka.ilkd.key.gui.LibrariesSettings;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.IteratorOfNamed;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ldt.BooleanLDT;
 import de.uka.ilkd.key.logic.ldt.ByteLDT;

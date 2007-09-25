@@ -18,6 +18,8 @@ import javax.swing.*;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.hoare.gui.HoareLoopInvRuleMenuItem;
+import de.uka.ilkd.hoare.rule.HoareLoopInvariantRule;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IteratorOfSchemaVariable;
@@ -151,12 +153,15 @@ class TacletMenu extends JMenu {
      */
     private void addBuiltInRuleItem(BuiltInRule builtInRule,
 				    MenuControl control) {
-        JMenuItem item;
+        final JMenuItem item;
         if (builtInRule instanceof UseMethodContractRule) {
             item = new UseMethodContractRuleItem(mediator.mainFrame(),
                                                  (UseMethodContractRule)builtInRule,
                                                  mediator.getSelectedProof(), 
                                                  pos.getPosInOccurrence());           
+        } else if (builtInRule instanceof HoareLoopInvariantRule) { 
+            item = new HoareLoopInvRuleMenuItem(pos.getPosInOccurrence(),
+                    mediator.getSelectedGoal());
         } else {
             item = new DefaultBuiltInRuleMenuItem(builtInRule);                       
         }
@@ -352,7 +357,10 @@ class TacletMenu extends JMenu {
             } else if (e.getSource() instanceof UseMethodContractRuleItem) {
                 mediator.selectedUseMethodContractRule
                     (((UseMethodContractRuleItem) e.getSource()).getRuleApp());   
-            } else if (e.getSource() instanceof BuiltInRuleMenuItem) {
+            } else if (e.getSource() instanceof HoareLoopInvRuleMenuItem) {
+                mediator.selectedHoareLoopInvRule
+                (((HoareLoopInvRuleMenuItem) e.getSource()).getRuleApp());   
+            }  else if (e.getSource() instanceof BuiltInRuleMenuItem) {
                         mediator.selectedBuiltInRule
                     (((BuiltInRuleMenuItem) e.getSource()).connectedTo(), 
                      pos.getPosInOccurrence());

@@ -23,6 +23,7 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 
+import de.uka.ilkd.hoare.init.HoareProfile;
 import de.uka.ilkd.key.logic.ListOfInteger;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -43,10 +44,17 @@ public class NonGoalInfoView extends JTextArea {
 	filter = new ConstraintSequentPrintFilter 
 	    ( node.sequent (), 
 	      mediator.getUserConstraint ().getConstraint () );
-	printer = new LogicPrinter
-	    (new ProgramPrinter(null), 
-	     mediator.getNotationInfo(),
-	     mediator.getServices());
+	if (mediator.getProfile() instanceof HoareProfile) {
+            printer = new HoareLogicPrettyPrinter
+            (new ProgramPrinter(null), 
+                    mediator.getNotationInfo(),
+                    mediator.getServices());
+        } else {
+            printer = new LogicPrinter
+            (new ProgramPrinter(null), 
+                    mediator.getNotationInfo(),
+                    mediator.getServices());
+        }
 	printer.printSequent (null, filter);
 	String s = printer.toString();
 	RuleApp app = node.getAppliedRuleApp();

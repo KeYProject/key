@@ -1,3 +1,4 @@
 Manifest-Version: 1.0
-Main-Class: de.uka.ilkd.key.util.install.DummyInstaller
+Class-Path: lib/antlr.jar lib/dresden-ocl-demo.jar lib/recoder.jar jargs.jar lib/javacc.jar  lib/junit.jar lib/log4j.jar lib/xerces.jar
+Main-Class: de.uka.ilkd.key.gui.Main
 SplashScreen-Image: de/uka/ilkd/key/gui/images/key-color.gif

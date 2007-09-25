@@ -18,7 +18,6 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -39,7 +38,9 @@ public class StrategySelectionView extends JPanel {
 	"VBT Strategy", "VBTStrategy", false, false);
     final JRadioButtonHashMap bDebuggerStrategy = new JRadioButtonHashMap(
         "Debugger Strategy", "DebuggerStrategy", false, false);
-
+    final JRadioButtonHashMap bHoareStrategy = new JRadioButtonHashMap(
+            "Hoare with Updates", HoareStrategy.STRATEGY_NAME.toString(), false, false);
+    
     
     ButtonGroup stratGroup = new ButtonGroup();
     ButtonGroup splittingGroup = new ButtonGroup();
@@ -423,6 +424,7 @@ public class StrategySelectionView extends JPanel {
 
         Box box = Box.createVerticalBox();
         stratGroup.add(bSimpleFOLStrategy);
+        stratGroup.add(bHoareStrategy);
         stratGroup.add(bSimpleJavaCardDLStrategy);
         stratGroup.add(bSimplificationOfOCLStrategy);
         stratGroup.add(bVBTStrategy);
@@ -495,6 +497,8 @@ public class StrategySelectionView extends JPanel {
         box.add(Box.createVerticalStrut(8));
         bSimpleFOLStrategy.setAlignmentX(Component.LEFT_ALIGNMENT);
         box.add(bSimpleFOLStrategy);
+        bHoareStrategy.setAlignmentX(Component.LEFT_ALIGNMENT);
+        box.add(bHoareStrategy);        
         bSimpleJavaCardDLStrategy.setAlignmentX(Component.LEFT_ALIGNMENT);
         box.add(bSimpleJavaCardDLStrategy);
         javaDLOptionsScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);

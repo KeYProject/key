@@ -67,7 +67,7 @@ public abstract class LDT extends ADT {
         assert sort != null;
 	addSort(sort);	
 	keyJavaType.put(type, new KeYJavaType(type, sort));	
-    }
+    }   
 
     /**
      * adds a function to the LDT 

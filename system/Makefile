@@ -7,7 +7,7 @@
 # See LICENSE.TXT for details.
 
 #$Format: "PRCSVERSION = \"$ProjectVersion$\""$ 
-PRCSVERSION = "0.2655"
+PRCSVERSION = "hoareWithUpdates.17"
 
 SHELL=/bin/sh
 #comon prefix
@@ -51,7 +51,7 @@ endif
 
 
 ifeq "$(JAVAC)" ""
-JAVAC=jikes
+JAVAC=javac
 endif
 
 ifeq "$(ANTLR)" ""

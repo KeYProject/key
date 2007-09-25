@@ -1,0 +1,109 @@
+\settings {
+"#Proof-Settings-Config-File
+#Thu Sep 06 16:39:55 CEST 2007
+[General]SoundNotification=false
+[DecisionProcedure]SmtBenchmarkArchiving=false
+[View]FontIndex=3
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_NONE
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_EXPAND
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[SimultaneousUpdateSimplifier]DeleteEffectLessLocations=true
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NONE
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
+[General]SuggestiveVarNames=false
+[View]ShowWholeTaclet=false
+[General]ProofAssistant=false
+[View]MaxTooltipLines=40
+[General]DnDDirectionSensitive=true
+[SimultaneousUpdateSimplifier]EagerSimplification=true
+[General]StupidMode=true
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=1000
+[Libraries]Default=acc.key-false, stringRules.key-false, deprecatedRules.key-false
+[StrategyProperty]QUERY_OPTIONS_KEY=QUERY_NONE
+[Choice]DefaultChoices=transactions-transactions\:transactionsOn , programRules-programRules\:Java , throughout-throughout\:toutOn , transactionAbort-transactionAbort\:abortOn , initialisation-initialisation\:disableStaticInitialisation , intRules-intRules\:arithmeticSemanticsIgnoringOF , assertions-assertions\:on , nullPointerPolicy-nullPointerPolicy\:nullCheck
+[DecisionProcedure]SmtZipProblemDir=false
+[DecisionProcedureForTest]=SIMPLIFY
+[Model]Source=1
+[Choice]Choices=transactions-transactions\:transactionsOff-transactions\:transactionsOn , programRules-programRules\:ODL-programRules\:Java , transactionAbort-transactionAbort\:abortOff-transactionAbort\:abortOn , initialisation-initialisation\:disableStaticInitialisation-initialisation\:enableStaticInitialisation , throughout-throughout\:toutOff-throughout\:toutOn , intRules-intRules\:arithmeticSemanticsCheckingOF-intRules\:javaSemantics-intRules\:arithmeticSemanticsIgnoringOF , assertions-assertions\:safe-assertions\:off-assertions\:on , nullPointerPolicy-nullPointerPolicy\:noNullCheck-nullPointerPolicy\:nullCheck
+[DecisionProcedure]SmtUseQuantifiers=true
+[View]HideIntermediateProofsteps=false
+[DecisionProcedure]=SIMPLIFY
+[General]OuterRenaming=false
+[Strategy]ActiveStrategy=HoareStrategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_NORMAL
+"
+}
+
+null\problem {
+\[{
+    while ( i>0 ) {
+      i=i-1;
+    }
+  }\] i = 0
+
+}
+
+\proof {
+(keyLog "0" (keyUser "bubel" ) (keyVersion "hoareWithUpdates.5"))
+
+(branch "dummy ID"
+(builtin "Loop Invariant" (formula "2") (hoareLoopInvariant "geq(i,Z(0(#)))"))
+(branch " Invariant Initially Valid"
+   (rule "close_goal" (formula "2") (ifseqformula "1"))
+)
+(branch " Preserves Invariant"
+   (rule "assignment" (formula "2") (userinteraction))
+   (rule "translateJavaSubInt" (formula "2") (term "0"))
+   (rule "polySimp_elimSub" (formula "2") (term "0"))
+   (rule "mul_literals" (formula "2") (term "1,0"))
+   (rule "polySimp_addComm0" (formula "2") (term "0"))
+   (rule "exit" (formula "2") (userinteraction))
+   (builtin "Update Simplification" (formula "2"))
+   (rule "and_left" (formula "1"))
+   (rule "del_cast_1" (formula "3") (term "0"))
+   (rule "inEqSimp_geqRight" (formula "3"))
+   (rule "times_zero_1" (formula "1") (term "1,0,0"))
+   (rule "add_zero_right" (formula "1") (term "0,0"))
+   (rule "inEqSimp_gtToGeq" (formula "3"))
+   (rule "times_zero_1" (formula "3") (term "1,0,0"))
+   (rule "add_zero_right" (formula "3") (term "0,0"))
+   (rule "polySimp_addAssoc" (formula "1") (term "0"))
+   (rule "add_literals" (formula "1") (term "0,0"))
+   (rule "add_zero_left" (formula "1") (term "0"))
+   (rule "inEqSimp_sepPosMonomial1" (formula "3"))
+   (rule "mul_literals" (formula "3") (term "1"))
+   (rule "inEqSimp_subsumption1" (formula "2") (ifseqformula "3"))
+   (rule "leq_literals" (formula "2") (term "0"))
+   (rule "concrete_or_1" (formula "2"))
+   (rule "true_left" (formula "2"))
+   (rule "inEqSimp_contradInEq1" (formula "1") (ifseqformula "2"))
+   (rule "qeq_literals" (formula "1") (term "0"))
+   (rule "concrete_and_2" (formula "1"))
+   (rule "close_by_false" (formula "1"))
+)
+(branch " Use Invariant"
+   (rule "exit" (formula "2") (userinteraction))
+   (rule "and_left" (formula "1"))
+   (rule "not_left" (formula "2"))
+   (rule "inEqSimp_gtRight" (formula "2"))
+   (rule "times_zero_1" (formula "1") (term "0,0"))
+   (rule "add_zero_left" (formula "1") (term "0"))
+   (rule "inEqSimp_strengthen0" (formula "1") (ifseqformula "3"))
+   (rule "add_zero_right" (formula "1") (term "1"))
+   (rule "inEqSimp_contradEq3" (formula "3") (ifseqformula "1"))
+   (rule "times_zero_1" (formula "3") (term "1,0,0"))
+   (rule "add_zero_right" (formula "3") (term "0,0"))
+   (rule "qeq_literals" (formula "3") (term "0"))
+   (rule "concrete_and_2" (formula "3"))
+   (rule "false_right" (formula "3"))
+   (rule "inEqSimp_contradInEq1" (formula "1") (ifseqformula "2"))
+   (rule "qeq_literals" (formula "1") (term "0"))
+   (rule "concrete_and_2" (formula "1"))
+   (rule "close_by_false" (formula "1"))
+)
+)
+
+}

@@ -107,7 +107,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         doDefaultAction(x);
     }
 
-    public void performActionOnStatementBlock(StatementBlock x) {
+    public void performActionOnStatementBlock(StatementBlock x) {        
         DefaultAction def = new DefaultAction(x) {
             ProgramElement createNewElement(ExtList changeList) {
                 return new StatementBlock(changeList);

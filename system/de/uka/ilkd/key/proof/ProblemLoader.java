@@ -19,6 +19,9 @@ import java.util.LinkedList;
 import java.util.Stack;
 import java.util.Vector;
 
+import de.uka.ilkd.hoare.init.HoareProfile;
+import de.uka.ilkd.hoare.rule.HoareLoopInvRuleApp;
+import de.uka.ilkd.hoare.rule.HoareLoopInvariantRule;
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -48,6 +51,7 @@ public class ProblemLoader implements Runnable {
     Goal currGoal = null;
     String currTacletName = null;
     int currFormula = 0;
+    private String hoareLoopInv;    
     PosInTerm currPosInTerm = PosInTerm.TOP_LEVEL;
     OldOperationContract currContract = null;
     Stack stack = new Stack();
@@ -65,7 +69,7 @@ public class ProblemLoader implements Runnable {
     /** the profile to be used */
     private Profile profile;
     
-    private SwingWorker worker;    
+    private SwingWorker worker;
     
     public ProblemLoader(File file, Main main, Profile profile) {
         this(file, main, profile, false);
@@ -147,10 +151,14 @@ public class ProblemLoader implements Runnable {
             
         } else if (filename.endsWith(".key") || 
                 filename.endsWith(".proof")) {
-            // KeY problem specification or saved proof
-            return new KeYUserProblemFile(filename, file, 
-                    main.getProgressMonitor(), Main.jmlSpecs);
-            
+            if (profile instanceof HoareProfile) {
+                return new HoareUserProblemFile(filename, file,
+                        main.getProgressMonitor(), Main.jmlSpecs);
+            } else {
+                // KeY problem specification or saved proof
+                return new KeYUserProblemFile(filename, file, 
+                        main.getProgressMonitor(), Main.jmlSpecs);
+            }            
         } else if (file.isDirectory()){ 
             // directory containing JML-enriched java sources
             // prompt the 
@@ -307,6 +315,9 @@ public class ProblemLoader implements Runnable {
         case 'c' : //contract
             currContract = (OldOperationContract) proof.getServices()
                              .getSpecificationRepository().getContractByName(s);
+            break;        
+        case 'z' : //hoare loop invariant rule
+            hoareLoopInv = s; 
             break;
         }
     }
@@ -373,6 +384,14 @@ public class ProblemLoader implements Runnable {
             ourApp = new MethodContractRuleApp(UseMethodContractRule.INSTANCE,
                     pos, userConstraint, currContract);
             currContract=null;
+            return ourApp;
+        }
+        
+        if (hoareLoopInv != null) {
+            Namespace varNS = currGoal.proof().getNamespaces().variables();
+            final Term inv = parseTerm(hoareLoopInv, proof, varNS, currGoal.createGlobalProgVarNamespace());
+            ourApp = new HoareLoopInvRuleApp(inv, HoareLoopInvariantRule.INSTANCE, pos, userConstraint);
+            hoareLoopInv = null;
             return ourApp;
         }
 

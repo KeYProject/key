@@ -24,6 +24,7 @@ import javax.swing.text.JTextComponent;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.hoare.init.HoareProfile;
 import de.uka.ilkd.key.gui.assistant.*;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.*;
@@ -45,10 +46,10 @@ public class Main extends JFrame {
 
     //DO NOT CHANGE THE FOLLOWING 2 LINES, UNLESS YOU KNOW ABOUT PRCS-REPLACEMENT
     /* $Format: "    private static final String PRCSVERSION = \"$ProjectVersion$\";"$ */
-    private static final String PRCSVERSION = "0.2655";
+    private static final String PRCSVERSION = "hoareWithUpdates.17";
 
     
-    private static final String VERSION="1.2-beta (internal: "+PRCSVERSION+")";
+    private static final String VERSION="0.1.0 (internal: "+PRCSVERSION+")";
     private static final String COPYRIGHT="(C) Copyright 2001-2007 "
         +"Universit\u00e4t Karlsruhe, Universit\u00e4t Koblenz-Landau, "
         +"and Chalmers University of Technology";
@@ -1712,11 +1713,19 @@ public class Main extends JFrame {
             new ConstraintSequentPrintFilter ( sequent,
                     mediator ().getUserConstraint ()
                     .getConstraint () );
-        final LogicPrinter printer = new LogicPrinter
-        (new ProgramPrinter(null), 
-                mediator().getNotationInfo(),
-                mediator.getServices());
-                
+        
+        
+        final LogicPrinter printer;
+        
+        if (mediator.getProfile() instanceof HoareProfile) {            
+            printer = new HoareLogicPrettyPrinter(new ProgramPrinter(null), 
+                    mediator().getNotationInfo(),
+                    mediator.getServices());
+        } else {
+            printer = new LogicPrinter(new ProgramPrinter(null), 
+                    mediator().getNotationInfo(),
+                    mediator.getServices());
+        }         
         sequentView.setPrinter(printer, filter, null);
         sequentView.printSequent();
         
@@ -2264,6 +2273,7 @@ public class Main extends JFrame {
     
     public static void evaluateOptions(String[] opt) {
 	int index = 0;
+        boolean loadJavaProfile = false;
 	while (opt.length > index) {	    
 	    if ((new File(opt[index])).exists()) {
 		fileNameOnStartUp=opt[index];
@@ -2311,12 +2321,10 @@ public class Main extends JFrame {
                     ProofSettings.DEFAULT_SETTINGS.setProfile(p);
                     p.updateSettings(ProofSettings.DEFAULT_SETTINGS);
                     testMode = true;
-                } 
-                
-                
-                
-                else if (opt[index].equals("FOL")) {                     
-                   ProofSettings.DEFAULT_SETTINGS.setProfile(new PureFOLProfile());
+                } else if (opt[index].equals("FOL")) {                     
+                    ProofSettings.DEFAULT_SETTINGS.setProfile(new PureFOLProfile());
+                } else if (opt[index].equals("JAVA")) {                    
+                    loadJavaProfile = true;
                 } else if (opt[index].equals("TIMEOUT")) {
                     long timeout = -1;
                     try {
@@ -2341,6 +2349,10 @@ public class Main extends JFrame {
 	    }
 	    index++;
 	}	
+        if (!loadJavaProfile) {
+            // ok hoare
+            ProofSettings.DEFAULT_SETTINGS.setProfile(new HoareProfile());
+        }
 	if (Debug.ENABLE_DEBUG) {
 	    System.out.println("Running in debug mode ...");
 	} else {

@@ -37,14 +37,14 @@ public class BooleanLDT extends LDT {
     
 
     public BooleanLDT(Namespace sorts, Namespace functions) {
-        super(new Name("boolean"), sorts, PrimitiveType.JAVA_BOOLEAN);
+        super(new Name("boolean"), sorts, 
+                PrimitiveType.JAVA_BOOLEAN);
         
         bool_true  = addFunction((Function)functions.lookup(new Name("TRUE")));
 	term_bool_true  = TermFactory.DEFAULT.createFunctionTerm(bool_true);
 	bool_false = addFunction((Function)functions.lookup(new Name("FALSE")));
-	term_bool_false  = TermFactory.DEFAULT.createFunctionTerm(bool_false);
+	term_bool_false  = TermFactory.DEFAULT.createFunctionTerm(bool_false);    
     }
-
 
     /** returns true if the LDT is responsible for this kind of literals 
      * @param lit the Literal 

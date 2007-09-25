@@ -17,6 +17,7 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
+import de.uka.ilkd.hoare.init.HoareProfile;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -159,7 +160,9 @@ public class InteractiveProver {
                     mediator().indicateReuse(rl.getBestReusePoint());
                 } else {
                     mediator().indicateNoReuse();
-                    Goal.applyUpdateSimplifier ( goalList );
+                    if (!(mediator().getProfile() instanceof HoareProfile)) {
+                        Goal.applyUpdateSimplifier ( goalList );
+                    }
                 }
             }
         }

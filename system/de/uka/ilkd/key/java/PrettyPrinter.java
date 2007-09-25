@@ -1673,7 +1673,8 @@ public class PrettyPrinter {
 
     public void printWhile(While x) throws java.io.IOException {
         printHeader(x);
-        writeInternalIndentation(x);
+        writeIndentation(1, getIndentation());
+        //writeInternalIndentation(x);
 	output();
 	noLinefeed=true;
 	noSemicolons=true;
@@ -1708,7 +1709,8 @@ public class PrettyPrinter {
 
     public void printIf(If x) throws java.io.IOException {
         printHeader(x);
-        writeInternalIndentation(x);
+        writeIndentation(1, getIndentation());
+        //writeInternalIndentation(x);
 	output();
 	
 	noLinefeed   = true;

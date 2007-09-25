@@ -104,8 +104,7 @@ public class NotationInfo {
 	return (NotationInfo) Service.find(NotationInfo.class.getName(),
 					   NotationInfo.class.getName());
     }
-    
-    
+
     /** This maps operators and classes of operators to {@link
      * Notation}s.  The idea is that we first look wether the operator has
      * a Notation registered.  Otherwise, we see if there is one for the
@@ -136,10 +135,10 @@ public class NotationInfo {
      * which corresponds to the parser syntax. 
      */
     private void createDefaultNotationTable() {
-		tbl=new HashMap();
-		createDefaultOpNotation();
-		createDefaultTermSymbolNotation();
-		scm = new AbbrevMap();
+        tbl=new HashMap();
+        createDefaultOpNotation();
+        createDefaultTermSymbolNotation();
+        scm = new AbbrevMap();
     }
 
     /**
@@ -290,6 +289,10 @@ public class NotationInfo {
 	tbl.put(op, new Notation.CharLiteral());
     }
 
+    
+    public void put(Class op, Notation not) {
+        tbl.put(op, not);
+    }
 
     public void createStringLitNotation(Operator op, Operator eps) {
 	Notation.StringLiteral stringLiteral =  new Notation.StringLiteral();

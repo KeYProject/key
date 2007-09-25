@@ -149,6 +149,7 @@ tokens {
 
 	RULES = "\\rules";
         PROBLEM = "\\problem";
+        HOARE = "\\hoare";
         CHOOSECONTRACT = "\\chooseContract";
         PROOF = "\\proof";
         CONTRACTS = "\\contracts";
@@ -786,7 +787,7 @@ options {
     testLiterals = true;
     paraphrase = "All possible modalities, including schema.";
 }
-:	'\\' ( (LETTER | '_')+ | "<" | "[" | "[[") {
+:	'\\' ( (LETTER | '_')+ | "<" | "[" | "[[" ) {
 	   modalityBegin = text.toString();
            Debug.out("modalityBegin == ", modalityBegin);
            int literalTest = testLiteralsTable(MODALITY);
@@ -866,7 +867,7 @@ options {
 protected MODALITYEND
 options {
 }
-:	'\\' ( "endmodality" | ">" | "]" | "]]")  {
+:	'\\' ( "endmodality" | ">" | "]" | "]]" )  {
 	   modalityEnd = new String(text.getBuffer(), _begin, text.length() - _begin);
            Debug.out("modalityEnd == ", modalityEnd);
 	}

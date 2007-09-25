@@ -1,0 +1,250 @@
+package de.uka.ilkd.hoare.rule;
+
+import java.util.LinkedList;
+
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.QuanUpdateOperator;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.IteratorOfGoal;
+import de.uka.ilkd.key.proof.ListOfGoal;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.updatesimplifier.Update;
+
+/**
+ * 
+ * realises the loop invariant rule for the Hoare logic with updates
+ *
+ */
+public class HoareLoopInvariantRule implements BuiltInRule {
+
+    private final static Name LOOP_INV_RULENAME = new Name("Loop Invariant");
+    public static final HoareLoopInvariantRule INSTANCE = new HoareLoopInvariantRule();
+    
+    private HoareLoopInvariantRule() {
+        
+    }
+    
+    public boolean isApplicable(Goal goal, PosInOccurrence pio,
+            Constraint userConstraint) {
+        
+        if (pio == null || pio.isInAntec() || !pio.isTopLevel() || 
+                !goal.ruleAppIndex().tacletIndex().getPartialInstantiatedApps().isEmpty()) {
+            return false;
+        }
+                        
+        final ConstrainedFormula cf = pio.constrainedFormula();
+        Term progFormula = cf.formula();
+        
+        while (progFormula.op() instanceof QuanUpdateOperator) {
+            progFormula = ((QuanUpdateOperator)progFormula.op()).target(progFormula);
+        }
+        
+        if (progFormula.op() != Op.BOX) {
+            return false;
+        }
+        
+        final ProgramElement prg = progFormula.javaBlock().program();
+        
+        if (prg == null) {
+            return false;
+        }
+        
+        assert prg instanceof StatementBlock;
+        
+        final PosInProgram firstActiveChildPos = ((StatementBlock)prg).getFirstActiveChildPos();
+        
+        if (firstActiveChildPos == null) {
+            return false;
+        }
+        
+        return firstActiveChildPos.getProgram(prg) instanceof While;        
+    }
+
+    public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
+        assert ruleApp instanceof HoareLoopInvRuleApp;
+        
+        final HoareLoopInvRuleApp app = (HoareLoopInvRuleApp)ruleApp;
+        
+        final ListOfGoal goals = goal.split(3);
+        
+        final IteratorOfGoal it = goals.iterator();
+        
+        createUseCaseBranch(app, it.next());
+
+        createPreservesBranch(app, it.next());
+               
+        createInitialBranch(app, it.next());
+        
+        return goals;
+    }
+
+    private Term getCondition(RuleApp app, Services services) {
+
+        final While whileS = getWhileStatement(app);        
+
+        return services.getTypeConverter().
+        convertToLogicElement(whileS.getGuardExpression());
+    }
+
+    private While getWhileStatement(RuleApp app) {
+        Term progFormula = app.posInOccurrence().constrainedFormula().formula();
+        
+        
+        while (progFormula.op() instanceof QuanUpdateOperator) {
+            progFormula = ((QuanUpdateOperator)progFormula.op()).target(progFormula);
+        }
+                
+        final ProgramElement prg = progFormula.javaBlock().program();
+        
+        final While whileS = (While)((StatementBlock)prg).getFirstActiveChildPos().getProgram(prg);
+        return whileS;
+    }
+    
+    
+    private void createUseCaseBranch(HoareLoopInvRuleApp ruleApp, Goal goal) {
+        removeContextFormulas(goal);
+
+        final Services services = goal.proof().getServices();
+        final TermBuilder tb = TermBuilder.DF;
+        
+        Term loopCondition = getCondition(ruleApp, services);
+
+        if (loopCondition.sort() != Sort.FORMULA) {
+            loopCondition = tb.equals(loopCondition, tb.FALSE(services));
+        } else {
+            loopCondition = tb.not(loopCondition);
+        }
+        
+        final Term inv = ruleApp.getInvariant();
+        
+        Term progFormula = ruleApp.posInOccurrence().constrainedFormula().formula();        
+        
+        while (progFormula.op() instanceof QuanUpdateOperator) {
+            progFormula = ((QuanUpdateOperator)progFormula.op()).target(progFormula);
+        }
+        
+        assert progFormula.op() == Op.BOX;
+                
+        final ProgramElement prg = progFormula.javaBlock().program();
+        
+        final PosInProgram whileIdx = ((StatementBlock)prg).getFirstActiveChildPos();
+        
+        assert whileIdx.last() == 0;
+        
+        PosInProgram idx = whileIdx.up();
+        
+        LinkedList statementList = new LinkedList();
+        while (idx != PosInProgram.TOP && 
+                idx.getProgram(prg) instanceof NonTerminalProgramElement) {
+            final NonTerminalProgramElement ntpe = (NonTerminalProgramElement) idx.getProgram(prg);
+                        
+            for (int i = idx.last() + 1; i<ntpe.getChildCount(); i++) {
+                statementList.add(ntpe);
+            }
+            idx = idx.up();
+        }
+        
+        final JavaBlock programTail;
+
+        if (statementList.isEmpty()) {
+            programTail = JavaBlock.createJavaBlock(new StatementBlock());
+        } else if (statementList.size() > 1 || !(statementList.getFirst() instanceof StatementBlock)) {
+            programTail = JavaBlock.createJavaBlock(new StatementBlock(new ArrayOfStatement(statementList)));
+        } else {
+            programTail = JavaBlock.createJavaBlock((StatementBlock) statementList.getFirst());             
+        }
+        
+        goal.addFormula(new ConstrainedFormula(tb.and(inv, loopCondition)), true, true);
+        
+        final Term useCaseFormula = tb.box(programTail, progFormula.sub(0));
+
+        goal.addFormula(new ConstrainedFormula(useCaseFormula, ruleApp.constraint()), false, true);
+        
+        goal.setBranchLabel("Use Invariant");
+    }
+    
+    private void createPreservesBranch(HoareLoopInvRuleApp ruleApp, Goal goal) {
+               
+        removeContextFormulas(goal);
+        
+        Term inv = ruleApp.getInvariant();
+
+        final Services services = goal.proof().getServices();
+        final TermBuilder tb = TermBuilder.DF;
+        
+        Term loopCondition = getCondition(ruleApp, services);
+
+        if (loopCondition.sort() != Sort.FORMULA) {
+            loopCondition = tb.equals(loopCondition, tb.TRUE(services));
+        }
+                
+        goal.addFormula(new ConstrainedFormula(tb.and(inv, loopCondition)), true, true);
+                
+        JavaProgramElement loopBody = (JavaProgramElement) getWhileStatement(ruleApp).getBody(); 
+        
+        if (!(loopBody instanceof StatementBlock)) {
+            loopBody = new StatementBlock((Statement)loopBody);
+        }
+        final Term loopFormula = tb.box(JavaBlock.createJavaBlock((StatementBlock) loopBody), inv);
+        goal.addFormula(new ConstrainedFormula(loopFormula, ruleApp.constraint()), false, true);     
+        
+        goal.setBranchLabel("Preserves Invariant");
+    }
+
+    private void removeContextFormulas(Goal goal) {
+        final IteratorOfConstrainedFormula itAntec = goal.sequent().antecedent().iterator();        
+        while (itAntec.hasNext()) {
+            goal.removeFormula(new PosInOccurrence(itAntec.next(), PosInTerm.TOP_LEVEL, true));
+        }
+                
+        final IteratorOfConstrainedFormula itSucc = goal.sequent().succedent().iterator();
+        while (itSucc.hasNext()) {
+            goal.removeFormula(new PosInOccurrence(itSucc.next(), PosInTerm.TOP_LEVEL, false));
+        }
+    }
+
+    private void createInitialBranch(HoareLoopInvRuleApp ruleApp, Goal goal) {
+        final ConstrainedFormula cf = ruleApp.posInOccurrence().constrainedFormula();
+        
+        Term formula = cf.formula();       
+       
+        Term inv = ruleApp.getInvariant();
+        
+        final UpdateFactory uf = new UpdateFactory(goal.proof().getServices(), goal.simplifier());
+        
+        inv = prependUpdatePrefix(formula, inv, uf);
+                
+        goal.removeFormula(ruleApp.posInOccurrence());
+        goal.addFormula(new ConstrainedFormula(inv, 
+                ruleApp.constraint()), false, true);
+        goal.setBranchLabel("Invariant Initially Valid");
+                
+    }
+
+    private Term prependUpdatePrefix(Term formula, Term inv, UpdateFactory uf) {
+        
+        if (formula.op() instanceof QuanUpdateOperator) {
+            return uf.prepend(Update.createUpdate(formula), 
+                    prependUpdatePrefix(((QuanUpdateOperator)formula.op()).target(formula), inv, uf));
+        }
+        return inv;
+    }
+
+    public String displayName() {        
+        return "Loop Invariant";
+    }
+
+    public Name name() {
+        return LOOP_INV_RULENAME;
+    }
+
+    public String toString() {
+        return displayName();
+    }
+    
+}

@@ -21,7 +21,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.oclop.OclOp;
 import de.uka.ilkd.key.logic.sort.ObjectSort;
@@ -68,7 +67,7 @@ public class LogicPrinter {
      * The ProgramPrinter used to pretty-print Java blocks in
      * formulae.
      */
-    private ProgramPrinter prgPrinter;
+    protected ProgramPrinter prgPrinter;
 
     /** Contains information on the concrete syntax of operators. */
     private final NotationInfo notationInfo;
@@ -1207,7 +1206,6 @@ public class LogicPrinter {
      * @param ass2    associativity for the new values
      * @param ass3    associativity for phi
      */
-
     public void printQuanUpdateTerm (String l,
                                      String asgn,
                                      String r,
@@ -1279,7 +1277,7 @@ public class LogicPrinter {
     }
 
 
-    private void printUpdateQuantification (Term t,
+    protected void printUpdateQuantification (Term t,
                                             QuanUpdateOperator op,
                                             int locationNum) throws IOException {
         final ArrayOfQuantifiableVariable boundVars =
@@ -1538,7 +1536,6 @@ public class LogicPrinter {
         }
         // send first executable statement range
         printMarkingFirstStatement(sw.toString(),r);
-
     }
 
     /** Print a string marking a range as first statement.  The range
@@ -1552,7 +1549,7 @@ public class LogicPrinter {
      * @param s   the string containing a program
      * @param r   the range of the first statement
      */
-    private void printMarkingFirstStatement(String s,Range r)
+    protected void printMarkingFirstStatement(String s,Range r)
         throws IOException    {
 
         int iEnd   = r.end()<=s.length()?r.end():s.length();
@@ -2016,7 +2013,7 @@ public class LogicPrinter {
      * startTerm mark will construct a ModalityPositionTable
      * instead of the usual PositionTable.
      * Needed for PositionTable construction.*/
-    private static final Object MARK_MODPOSTBL = new Object();
+    protected static final Object MARK_MODPOSTBL = new Object();
     /** Mark the start of an update.*/
     private static final Object MARK_START_UPDATE = new Object();
     /** Mark the end of an update.*/

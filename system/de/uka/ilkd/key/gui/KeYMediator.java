@@ -19,6 +19,7 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
 
+import de.uka.ilkd.hoare.rule.HoareLoopInvRuleApp;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -508,6 +509,23 @@ public class KeYMediator {
      * rule 
      */
     public boolean selectedUseMethodContractRule(MethodContractRuleApp app) {
+        Goal goal = keySelectionModel.getSelectedGoal();
+        Debug.assertTrue(goal != null);        
+        if (!getProof().mgt().ruleApplicable(app, goal)) {
+            barfRuleNotApplicable(app);
+            return false;
+        }
+        applyInteractive(app, goal); 
+        return true;
+    }
+    
+    /** selected rule to apply
+     * @param rule the selected built-in rule
+     * @param pos the PosInSequent describes the position where to apply the
+     * rule 
+     */
+    public boolean selectedHoareLoopInvRule(HoareLoopInvRuleApp app) {
+        if (app == null) return false;
         Goal goal = keySelectionModel.getSelectedGoal();
         Debug.assertTrue(goal != null);        
         if (!getProof().mgt().ruleApplicable(app, goal)) {

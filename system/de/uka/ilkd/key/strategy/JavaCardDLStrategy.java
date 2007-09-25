@@ -15,15 +15,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.TermSymbol;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -81,8 +73,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         instantiationF = setupGlobalF ( instantiationDispatcher, p_proof );
         approvalF = add ( setupApprovalF ( p_proof ), approvalDispatcher );
     }
-
-    private Feature setupGlobalF(Feature dispatcher, Proof p_proof) {
+    
+    protected Feature[] getGlobalFSumComponents(Feature dispatcher, Proof p_proof) {
         final Feature simplifierF = selectSimplifier ( -10000 );
         
         final Feature ifMatchedF = ifZero ( MatchedIfFeature.INSTANCE,
@@ -112,16 +104,20 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         } else throw new RuntimeException("Unexpected strategy property "+
             methProp);
         
-        return SumFeature.createSum ( new Feature [] {
+        return new Feature [] {
               AutomatedRuleFeature.INSTANCE,
 //              splitF,
               dispatcher,
               NonDuplicateAppFeature.INSTANCE,
               strengthenConstraints, AgeFeature.INSTANCE,
               simplifierF, methodSpecF, ifMatchedF,
-              ifThenElseF } );
+              ifThenElseF };
     }
 
+    private Feature setupGlobalF(RuleSetDispatchFeature dispatchFeature, Proof p_proof) {
+        return SumFeature.createSum ( getGlobalFSumComponents(dispatchFeature, p_proof) );
+    }
+    
     private Feature methodSpecFeature(Feature cost) {
         return ConditionalFeature.createConditional(
             UseMethodContractRuleFilter.INSTANCE, cost );        

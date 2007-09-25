@@ -9,10 +9,7 @@
 //
 package de.uka.ilkd.key.java.visitor;
 
-import de.uka.ilkd.key.java.ArrayOfProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -84,14 +81,12 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
     protected void doDefaultAction(SourceElement x) {
 	addChild(x);
     }
-
-
     
     public void performActionOnSchemaVariable(SchemaVariable sv) {
 	final Object inst = svinsts.getInstantiation(sv);
 	if (inst instanceof ProgramElement) {
 	    Debug.out("ProgramReplace SV:", sv);
-	    Debug.out("ProgramReplace:", inst);
+	    Debug.out("ProgramReplace:", inst);	             
 	    addChild((ProgramElement)inst);
 	} else if (inst instanceof ArrayOfProgramElement) {
 	    addChildren((ArrayOfProgramElement)inst);

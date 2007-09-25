@@ -1,13 +1,14 @@
 ;; -*- Prcs -*-
 (Created-By-Prcs-Version 1 3 2)
 (Project-Description "")
-(Project-Version key 0 2655)
-(Parent-Version key 0 2643)
-(Version-Log "updateHighlight tweaks (reklov @ KO)")
+(Project-Version key hoareWithUpdates 17)
+(Parent-Version key hoareWithUpdates 16)
+(Version-Log "merge with 0.2655. Prepare git move
+")
 (New-Version-Log "")
 
-(Checkin-Time "Fri, 21 Sep 2007 17:32:04 +0200")
-(Checkin-Login kaprcs)
+(Checkin-Time "Tue, 25 Sep 2007 23:43:13 +0200")
+(Checkin-Login bubel)
 (Populate-Ignore ("~$"
                   "\\.wmf$"
                   "\\.class$"
@@ -32,7 +33,7 @@
   (system/KeY.tws (key/q/47_KeY.tws 1.8.1.20.1.1.1.2 644))
   (system/build.xml (key/y/b/34_build.xml 1.7.1.1.1.8 644))
   (system/local.properties (key/y/b/35_local.prop 1.1 644))
-  (system/Makefile (key/s/9_Makefile 1.49.1.22.1.7.1.4.2.1.2.4.1.12.1.1.1.5.1.3.1.13.3.1.2.1.1.5.1.7.1.1.1.2.2.3.1.1.1.1.1.1.2.5.2.2.5.1.2.4.2.2.4.1.1.4.3.4.1.2.3.1.3.1.7.8.4.2.2.3.3.1.1.1.1.2.1.1.1.4.2.3.1.1.2.3.1.2.2.1.3.1.1.3.2.6.1.3.3.1.4.1.1.1.1.3.3.2.1.4.4.5.1.1.4.1.4.1.4.1.1.2.2.1.2.1.1.1.2.1.3.2.4.2.2.7.1.2.1.1.1.1.1.2.2.1.3.1.2.1.5.2.5.2.1.2.4.1.4.3.5.2.6.4.2.1 644))
+  (system/Makefile (key/s/9_Makefile 1.49.1.22.1.7.1.4.2.1.2.4.1.12.1.1.1.5.1.3.1.13.3.1.2.1.1.5.1.7.1.1.1.2.2.3.1.1.1.1.1.1.2.5.2.2.5.1.2.4.2.2.4.1.1.4.3.4.1.2.3.1.3.1.7.8.4.2.2.3.3.1.1.1.1.2.1.1.1.4.2.3.1.1.2.3.1.2.2.1.3.1.1.3.2.6.1.3.3.1.4.1.1.1.1.3.3.2.1.4.4.5.1.1.4.1.4.1.4.1.1.2.2.1.2.1.1.1.2.1.3.2.4.2.2.7.1.2.1.1.1.1.1.2.2.1.3.1.2.1.5.2.5.2.1.2.4.1.4.3.5.2.6.4.2.1.9.1 644))
   (system/README (key/0_README 1.4 644))
   (system/README.keydebug (key/w/b/45_README.key 1.2 644))
   
@@ -129,6 +130,7 @@
   (system/de/uka/ilkd/key/gui/ApplyTacletDialog.java (key/D/11_ApplySTSRD 1.25.1.1.1.1.1.4.1.20.1.8 644))
   
   (system/de/uka/ilkd/key/gui/Config.java (key/t/b/7_Config.jav 1.12.1.5.1.2 644))
+  
   (system/de/uka/ilkd/key/gui/GUIAbstractTreeNode.java (key/t/b/12_GUIAbstrac 1.6.1.9 644))
   (system/de/uka/ilkd/key/gui/GUIBranchNode.java (key/t/b/13_GUIBranchN 1.14.1.3.1.6 644))
   (system/de/uka/ilkd/key/gui/GUIEvent.java (key/E/19_GUIEvent.j 1.7 644))
@@ -141,21 +143,21 @@
   (system/de/uka/ilkd/key/gui/IconFactory.java (key/I/17_IconFactor 1.14.1.4.1.3.2.3.2.2.1.4 644))
   (system/de/uka/ilkd/key/pp/InitialPositionTable.java (key/D/3_InitialPos 1.2.1.6.1.2.1.14 644))
   (system/de/uka/ilkd/key/gui/RuleAppListener.java (key/E/17_Interactiv 1.7.1.5 644))
-  (system/de/uka/ilkd/key/gui/InteractiveProver.java (key/E/16_Interactiv 1.6.1.2.1.3.1.3.1.10.1.7.1.7.1.3.1.1.1.1.2.11.2.1.1.3.1.1.1.1.1.2.1.19.1.1.1.8.2.3.1.1.1.3.1.2.1.22.1.10 644))
+  (system/de/uka/ilkd/key/gui/InteractiveProver.java (key/E/16_Interactiv 1.6.1.2.1.3.1.3.1.10.1.7.1.7.1.3.1.1.1.1.2.11.2.1.1.3.1.1.1.1.1.2.1.19.1.1.1.8.2.3.1.1.1.3.1.2.1.22.1.10.1.1 644))
   (system/de/uka/ilkd/key/gui/KeYListener.java (key/D/16_ProofListe 1.2.1.6.1.5 644))
-  (system/de/uka/ilkd/key/gui/KeYMediator.java (key/D/10_KeYMediato 1.21.1.2.1.14.1.16.1.9.1.2.1.2.1.4.2.3.1.1.1.1.2.3.2.1.1.8.1.4.1.3.2.1.1.14.1.2.1.1.3.1.1.2.1.1.1.8.2.2.1.3.1.4.1.5.1.1.1.9.2.1.1.7.1.2.1.6.2.1.2.1.6.3.2.2.1.2.2.2.2.2.1.1.1.1.2.3.1.4.1.3.1.1.4.3.5.1.2.2.4.2 644))
+  (system/de/uka/ilkd/key/gui/KeYMediator.java (key/D/10_KeYMediato 1.21.1.2.1.14.1.16.1.9.1.2.1.2.1.4.2.3.1.1.1.1.2.3.2.1.1.8.1.4.1.3.2.1.1.14.1.2.1.1.3.1.1.2.1.1.1.8.2.2.1.3.1.4.1.5.1.1.1.9.2.1.1.7.1.2.1.6.2.1.2.1.6.3.2.2.1.2.2.2.2.2.1.1.1.1.2.3.1.4.1.3.1.1.4.3.5.1.2.2.4.3 644))
   (system/de/uka/ilkd/key/gui/KeYSelectionEvent.java (key/t/b/22_SelectedNo 1.5 644))
   (system/de/uka/ilkd/key/gui/KeYSelectionListener.java (key/t/b/23_SelectedNo 1.5 644))
   (system/de/uka/ilkd/key/gui/KeYSelectionModel.java (key/t/b/21_SelectedNo 1.4.1.4.1.6.1.6 644))
   
   
-  (system/de/uka/ilkd/key/gui/Main.java (key/D/9_Main.java 1.17.1.2.1.10.1.1.1.8.1.14.1.3.1.10.1.1.1.2.1.13.4.5.1.3.1.2.1.5.1.1.2.1.1.5.1.1.1.2.1.1.1.1.4.2.2.3.1.10.1.3.2.1.2.6.1.11.1.5.1.2.2.4.1.5.1.7.4.1.1.1.2.2.4.2.1.1.2.1.4.1.1.8.2.3.1.3.4.6.1.5.2.3.2.5.2.3.1.10.3.1.2.1.1.5.1.2.2.3.4.5.6.1.2.1.3.1.4.1.2.1.1.1.3.4.3.7.1.4.2.1.1.1.2.2.1.1.2.2.6.1.2.1.2.3.1.1.1.7.1.3.3.20.2.2.1.3.2.1.1.2.2.1.1.1.4.1.9.1.1.2.6.11.1.1.2.2.9.3.3.1.2.1.3.1 644))
-  (system/de/uka/ilkd/key/gui/NonGoalInfoView.java (key/I/16_NonGoalInf 1.9.1.1.2.2.1.5.1.9.2.1.1.1.1.5 644))
+  (system/de/uka/ilkd/key/gui/Main.java (key/D/9_Main.java 1.17.1.2.1.10.1.1.1.8.1.14.1.3.1.10.1.1.1.2.1.13.4.5.1.3.1.2.1.5.1.1.2.1.1.5.1.1.1.2.1.1.1.1.4.2.2.3.1.10.1.3.2.1.2.6.1.11.1.5.1.2.2.4.1.5.1.7.4.1.1.1.2.2.4.2.1.1.2.1.4.1.1.8.2.3.1.3.4.6.1.5.2.3.2.5.2.3.1.10.3.1.2.1.1.5.1.2.2.3.4.5.6.1.2.1.3.1.4.1.2.1.1.1.3.4.3.7.1.4.2.1.1.1.2.2.1.1.2.2.6.1.2.1.2.3.1.1.1.7.1.3.3.20.2.2.1.3.2.1.1.2.2.1.1.1.4.1.9.1.1.2.6.11.1.1.2.2.9.3.3.1.2.1.3.1.7.1 644))
+  (system/de/uka/ilkd/key/gui/NonGoalInfoView.java (key/I/16_NonGoalInf 1.9.1.1.2.2.1.5.1.9.2.1.1.1.1.5.2.1 644))
   (system/de/uka/ilkd/key/pp/Notation.java (key/C/48_Notation.j 1.4.2.9.1.7.2.4.1.2.1.6.1.5.1.3.1.2.2.13.1.1.1.1.1.4.1.1.3.1.1.2.1.2.1.6.2.1.1.1.1.1.1.5.1.4.1.1.1.9.3.3.2.5.3.3.1.1.1.1.1.6.1.3.2.1.3.2.1.1.1.5 644))
-  (system/de/uka/ilkd/key/pp/NotationInfo.java (key/C/46_NotationIn 1.9.1.2.2.8.1.8.1.2.1.7.1.2.1.1.1.1.1.1.1.5.2.1.1.5.2.3.1.4.2.2.1.1.1.1.1.7.1.4.1.1.1.7.1.1.2.2.2.4.3.4.1.1.1.2.2.9.2.1.1.1.1.4.1.1 644))
+  (system/de/uka/ilkd/key/pp/NotationInfo.java (key/C/46_NotationIn 1.9.1.2.2.8.1.8.1.2.1.7.1.2.1.1.1.1.1.1.1.5.2.1.1.5.2.3.1.4.2.2.1.1.1.1.1.7.1.4.1.1.1.7.1.1.2.2.2.4.3.4.1.1.1.2.2.9.2.1.1.1.1.4.1.1.5.2 644))
   (system/de/uka/ilkd/key/pp/PosInSequent.java (key/C/47_PosInSeque 1.15.1.1 644))
   (system/de/uka/ilkd/key/pp/PositionTable.java (key/D/0_PositionTa 1.2.1.5.1.3.1.6.1.2 644))
-  (system/de/uka/ilkd/key/pp/PresentationFeatures.java (key/w/b/34_Presentati 1.1.2.7.1.19 644))
+  (system/de/uka/ilkd/key/pp/PresentationFeatures.java (key/w/b/34_Presentati 1.1.2.7.1.19.3.1 644))
   (system/de/uka/ilkd/key/pp/ModalityPositionTable.java (key/D/2_ProgramPos 1.11 644))
   (system/de/uka/ilkd/key/pp/ProgramPrinter.java (key/C/51_ProgramPri 1.17.1.1 644))
   (system/de/uka/ilkd/key/proof/ProofEvent.java (key/D/17_ProofEvent 1.2.1.12.1.3.1.6 644))
@@ -165,8 +167,8 @@
   (system/de/uka/ilkd/key/pp/Range.java (key/u/b/7_Range.java 1.8.1.1 644))	
   (system/de/uka/ilkd/key/gui/TacletIfSelectionDialog.java (key/E/31_STSRIfSele 1.12.1.8.1.4 644))
   (system/de/uka/ilkd/key/gui/TacletMatchCompletionDialog.java (key/E/32_STSRMatchC 1.1.1.21.1.2.1.1.1.15.1.18.1.7 644))
-  (system/de/uka/ilkd/key/gui/TacletMenu.java (key/D/13_STSRMenu.j 1.6.1.5.1.4.1.8.1.3.1.3.2.1.1.4.1.1.1.11.1.30.1.7.1.1 644))
-  (system/de/uka/ilkd/key/pp/LogicPrinter.java (key/C/50_SequentPri 1.9.1.2.2.15.1.1.1.15.1.2.1.6.2.7.1.2.1.1.1.25.2.4.2.2.1.1.1.1.2.1.3.11.2.1.3.2.1.1.1.1.1.33.2.4.1.1.2.6.3.2.1.1.1.3.1.1.1.1.1.1.2.1.2.2.1.6.2.2.3.1.3.1.3.1.1.1.1.1.1.4.1.2.1.1.2.1.2.2.7.1.1.2.11.1.3.1 644))
+  (system/de/uka/ilkd/key/gui/TacletMenu.java (key/D/13_STSRMenu.j 1.6.1.5.1.4.1.8.1.3.1.3.2.1.1.4.1.1.1.11.1.30.1.7.1.1.4.1.3.1 644))
+  (system/de/uka/ilkd/key/pp/LogicPrinter.java (key/C/50_SequentPri 1.9.1.2.2.15.1.1.1.15.1.2.1.6.2.7.1.2.1.1.1.25.2.4.2.2.1.1.1.1.2.1.3.11.2.1.3.2.1.1.1.1.1.33.2.4.1.1.2.6.3.2.1.1.1.3.1.1.1.1.1.1.2.1.2.2.1.6.2.2.3.1.3.1.3.1.1.1.1.1.1.4.1.2.1.1.2.1.2.2.7.1.1.2.11.1.3.1.8.1 644))
   (system/de/uka/ilkd/key/gui/SequentView.java (key/C/45_SequentVie 1.12.1.13.1.3.1.9.1.1.1.16.1.20.1.1.1.1.1.1.1.1.1.4.4.1.1.2 644))
   (system/de/uka/ilkd/key/gui/Settings.java (key/x/b/8_Settings.j 1.5 644))
   (system/de/uka/ilkd/key/gui/SettingsListener.java (key/x/b/9_SettingsLi 1.6 644))
@@ -206,9 +208,9 @@
   (system/de/uka/ilkd/key/java/ParentIsInterfaceDeclaration.java (key/z/44_ParentIsIn 1.6 644))
   (system/de/uka/ilkd/key/java/Position.java (key/C/26_Position.j 1.9 644))
   (system/de/uka/ilkd/key/java/PositionInfo.java (key/C/25_PositionIn 1.7.1.1.1.1.1.1.1.3 644))
-  (system/de/uka/ilkd/key/java/PrettyPrinter.java (key/z/41_PrettyPrin 1.2.1.13.1.25.1.1.1.4.3.1.1.5.3.4.1.1.2.1.2.7.1.1.3.1.1.2.1.13.1.1.1.3.3.1.3.3.2.1.1.1.1.9.1.2.1.1.4.2 644))
+  (system/de/uka/ilkd/key/java/PrettyPrinter.java (key/z/41_PrettyPrin 1.2.1.13.1.25.1.1.1.4.3.1.1.5.3.4.1.1.2.1.2.7.1.1.3.1.1.2.1.13.1.1.1.3.3.1.3.3.2.1.1.1.1.9.1.2.1.1.4.2.6.2 644))
   (system/de/uka/ilkd/key/java/ProgramElement.java (key/v/44_ProgramEle 1.10.2.2.1.1 644))
-;  (system/de/uka/ilkd/key/java/ProgramElementArray.java (key/C/23_ProgramEle 1.8 644))
+  
   (system/de/uka/ilkd/key/java/visitor/ProgramVariableCollector.java (key/s/b/50_ProgramVar 1.1.1.6.2.5.1.3.2.1.1.3 644))
   (system/de/uka/ilkd/key/java/ProgramVariableName.java (key/s/b/43_ProgramVar 1.4 644))
   (system/de/uka/ilkd/key/java/Recoder2KeY.java (key/A/11_Compost2Ke 1.3.1.16.1.3.1.23.1.8.3.1.1.4.1.10.1.1.1.1.2.2.1.5.2.18.1.2.1.2.1.7.1.4.2.4.1.10.1.2.2.3.1.4.1.5.1.2.2.4.1.3.5.1.1.4.1.5.1.17.1.3.1.6.1.2.1.1.1.3.1.1.3.2.1.1.1.10.1.5.1.5.1.13.1.4.2.4.1.4.1.7.2.1.1.9.1.1.1.1.2.2.2.4.1.2.2.1.2.4.3.1.4.1.1.2.1.3.1.3.2.2.3.6.1.1.1.3.2.1.1.2.1.1.2.1.5.1.4.1.1.1.1.1 644))
@@ -428,7 +430,7 @@
   (system/de/uka/ilkd/key/logic/Axiom.java (key/L/11_Axiom.java 1.5.1.11 644))
   (system/de/uka/ilkd/key/logic/sort/BagSort.java (key/y/b/18_BagSort.ja 1.7.1.3.1.2 644))
   (system/de/uka/ilkd/key/logic/BooleanContainer.java (key/s/39_BooleanCon 1.8 644))
-  (system/de/uka/ilkd/key/logic/ldt/BooleanLDT.java (key/w/b/50_BooleanLDT 1.3.1.3.2.5.1.1.3.8.2.3.1.4.1.1 644))
+  (system/de/uka/ilkd/key/logic/ldt/BooleanLDT.java (key/w/b/50_BooleanLDT 1.3.1.3.2.5.1.1.3.8.2.3.1.4.1.2 644))
   (system/de/uka/ilkd/key/rule/BoundUniquenessChecker.java (key/F/29_BoundUniqu 1.11.1.2 644))
   (system/de/uka/ilkd/key/logic/BoundVarsVisitor.java (key/v/32_BoundVarsV 1.11.1.2 644))
   (system/de/uka/ilkd/key/logic/CExProblem.java (key/L/12_CounterExa 1.4.1.6 644))
@@ -442,11 +444,11 @@
   
   (system/de/uka/ilkd/key/rule/inst/ContextInstantiationEntry.java (key/L/41_ContextIns 1.16.1.2 644))
   (system/de/uka/ilkd/key/java/ContextStatementBlock.java (key/J/19_ContextTer 1.4.1.9.1.9.1.3.1.2.1.1.1.1.2.1.1.1 644))
-  (system/de/uka/ilkd/key/rule/inst/ContextStatementBlockInstantiation.java (key/J/23_ContextTer 1.1.1.9.1.9.1.1.1.1 644))
+  (system/de/uka/ilkd/key/rule/inst/ContextStatementBlockInstantiation.java (key/J/23_ContextTer 1.1.1.9.1.9.1.2 644))
   (system/de/uka/ilkd/key/rule/CreateTacletForTests.java (key/D/39_CreateSTSR 1.6.1.18.1.2.1.3.1.18.1.3.1.1 644))
-  (system/de/uka/ilkd/key/java/visitor/CreatingASTVisitor.java (key/w/b/21_CreatingAS 1.3.1.1.1.2.2.2.1.3.1.1.1.3.1.2.1.4.1.1.1.1.2.2.1.2.1.6.1.1.1.5.1.3.1.1.2.12.1.1.1.1.1.1.1.1.6.6.1.1 644))
+  (system/de/uka/ilkd/key/java/visitor/CreatingASTVisitor.java (key/w/b/21_CreatingAS 1.3.1.1.1.2.2.2.1.3.1.1.1.3.1.2.1.4.1.1.1.1.2.2.1.2.1.6.1.1.1.5.1.3.1.1.2.12.1.1.1.1.1.1.1.1.6.6.1.1.4.1 644))
   (system/de/uka/ilkd/key/rule/metaconstruct/DoBreak.java (key/K/39_RemoveLabe 1.17 644))
-  (system/de/uka/ilkd/key/rule/metaconstruct/LocationDependentFunction.java (key/n/e/23_LocationDe 1.1.1.2 644))   (system/de/uka/ilkd/key/rule/metaconstruct/AtPreEquations.java (key/n/e/24_AtPreEquat 1.1.1.1 644))
+  
   
   (system/de/uka/ilkd/key/logic/op/Equality.java (key/C/38_Equality.j 1.2.1.4.2.15.1.2.1.3.1.3.1.5 644))
   (system/de/uka/ilkd/key/rule/metaconstruct/ExpandMethodBody.java (key/w/b/43_ExpandMeth 1.5.1.1.1.10.1.1.1.6.2.17.1.1.1.2.1.2 644))
@@ -468,7 +470,7 @@
   (system/de/uka/ilkd/key/logic/JavaBlock.java (key/r/22_JavaBlock. 1.10.1.7.1.3.1.2.1.1.1.8.2.1.1.2.3.1 644))
   
   (system/de/uka/ilkd/key/logic/op/Junctor.java (key/r/21_Junctor.ja 1.15.1.4.2.2 644))
-  (system/de/uka/ilkd/key/logic/ldt/LDT.java (key/s/b/48_LDT.java 1.3.1.5.1.3.2.4.1.10.1.1 644))
+  (system/de/uka/ilkd/key/logic/ldt/LDT.java (key/s/b/48_LDT.java 1.3.1.5.1.3.2.4.1.10.1.1.1.1 644))
   (system/de/uka/ilkd/key/logic/LVRCollector.java (key/E/0_LVRCollect 1.11 644))
   (system/de/uka/ilkd/key/logic/op/LogicVariable.java (key/D/42_LogicVaria 1.6.1.3.1.1.1.9.1.1 644))
   
@@ -522,7 +524,7 @@
   
   
   (system/de/uka/ilkd/key/rule/metaconstruct/arith/MetaMul.java (key/w/b/15_MetaMul.ja 1.2.1.13.2.1 644))
-  (system/de/uka/ilkd/key/logic/op/AbstractMetaOperator.java (key/u/b/18_MetaOp.jav 1.5.1.10.1.12.1.1.1.2.3.1.1.2.1.2.1.3.1.1.1.2.1.1.2.5.1.1.1.1.1.1.6.1.2.2.3.1.3.1 644))
+  (system/de/uka/ilkd/key/logic/op/AbstractMetaOperator.java (key/u/b/18_MetaOp.jav 1.5.1.10.1.12.1.1.1.2.3.1.1.2.1.2.1.3.1.1.1.2.1.1.2.5.1.1.1.1.1.1.6.1.2.2.3.1.3.1.1.1 644))
   (system/de/uka/ilkd/key/rule/metaconstruct/arith/MetaSub.java (key/w/b/10_MetaSub.ja 1.2.1.13.2.1 644))
   (system/de/uka/ilkd/key/logic/op/Metavariable.java (key/s/34_Metavariab 1.10.2.2.1.3.1.7.1.1 644))
   
@@ -556,7 +558,7 @@
   (system/de/uka/ilkd/key/rule/inst/ProgramListInstantiation.java (key/t/b/30_ProgramLis 1.10 644))
   (system/de/uka/ilkd/key/rule/metaconstruct/ProgramMetaConstruct.java (key/J/25_ProgramMet 1.12.1.16.1.1 644))
   (system/de/uka/ilkd/key/logic/op/ProgramMethod.java (key/C/22_ProgramMet 1.4.1.5.1.14.1.1.1.5.3.1.1.1.2.1.2.2.1.1.1.2.1.12.2.1.2.1.1.5.1.2.1.2.1.1 644))
-  (system/de/uka/ilkd/key/java/visitor/ProgramReplaceVisitor.java (key/L/45_ProgramRep 1.21.3.3.1.1.1.7.2.11.1.4 644))
+  (system/de/uka/ilkd/key/java/visitor/ProgramReplaceVisitor.java (key/L/45_ProgramRep 1.21.3.3.1.1.1.7.2.11.1.4.1.1 644))
   (system/de/uka/ilkd/key/java/visitor/ProgramSVCollector.java (key/M/0_ProgramSVC 1.19.2.1.1.1 644))
   (system/de/uka/ilkd/key/rule/inst/ProgramSVEntry.java (key/J/20_ProgramSVE 1.10.1.2 644))
   (system/de/uka/ilkd/key/rule/inst/ProgramSVInstantiation.java (key/J/21_ProgramSVI 1.14 644))
@@ -632,7 +634,7 @@
   
   
   
-  (system/de/uka/ilkd/key/java/TypeConverter.java (key/s/b/32_TypeConver 1.24.1.1.1.4.1.10.1.3.1.2.2.1.1.1.1.6.1.9.1.6.1.1.1.5.2.4.1.3.3.5.1.1.2.16.1.4.1.2.1.4.1.3.2.1.1.1.1.1.1.1.1.2.2.4.1.9.1.1.1.1.1.1.4.1 644))
+  (system/de/uka/ilkd/key/java/TypeConverter.java (key/s/b/32_TypeConver 1.24.1.1.1.4.1.10.1.3.1.2.2.1.1.1.1.6.1.9.1.6.1.1.1.5.2.4.1.3.3.5.1.1.2.16.1.4.1.2.1.4.1.3.2.1.1.1.1.1.1.1.1.2.2.4.1.9.1.1.1.1.1.1.4.1.3.1 644))
   (system/de/uka/ilkd/key/rule/metaconstruct/TypeOf.java (key/u/b/4_TypeOf.jav 1.4.1.4.1.11.2.2 644))
   (system/de/uka/ilkd/key/rule/metaconstruct/UnwindLoop.java (key/J/26_UnwindLoop 1.22.1.3 644))
 ;  (system/de/uka/ilkd/key/logic/op/UpdateOp.java (key/L/38_UpdateOp.j 1.2.1.5.1.5 644))
@@ -709,7 +711,7 @@
   (system/de/uka/ilkd/key/parser/WarningException.java (key/r/40_WarningExc 1.8 644))
 ;  (system/de/uka/ilkd/key/parser/decls.g (key/E/2_decls.g 1.1.1.4.1.6.2.2.1.1.1.4.2.1.1.9.2.5.1.2.1.1.1.2.3.2.1.1.1.4.3.4.1.4.2.2.1.6.3.3.1.1.1.2.1.2.1.4.1.9.1.12.4.1.3.2.1.1.1.3.2.2.2.9.1.1.3.1.1.1.1.2.1.5.1.3.2.1.2.1 644))
 ;  (system/de/uka/ilkd/key/parser/globalDeclarationTerms.g (key/F/28_globalDecl 1.3.1.7.1.1.1.9.2.2.1.2.1.2.1.3.2.3.2.9.1.3.2.2.1.1.1.9.1.1.3.3.1.5 644))
-  (system/de/uka/ilkd/key/parser/lexer.g (key/D/44_lexer.g 1.4.1.6.1.1.1.6.2.1.1.2.2.1.1.3.2.1.1.6.1.1.1.3.2.2.1.5.2.1.1.2.3.2.1.2.1.1.1.1.3.7.2.11.3.2.1.1.2.3.1.4.2.2.1.2.4.2.1.3.1.4.1.7.2.1.1.2.2.13.3.2.1.2.4.1.1.23.1.5.2.1.1.1.1.2.1.4.2.3.2.1.1.1.2.2.2.3.1.2.2.1.1.2.1.3.1.1.1.1.1.1.3.4.1.6.2.1.1.3.5.1.2.1.1.1.2.1.3.1.2.1 644))
+  (system/de/uka/ilkd/key/parser/lexer.g (key/D/44_lexer.g 1.4.1.6.1.1.1.6.2.1.1.2.2.1.1.3.2.1.1.6.1.1.1.3.2.2.1.5.2.1.1.2.3.2.1.2.1.1.1.1.3.7.2.11.3.2.1.1.2.3.1.4.2.2.1.2.4.2.1.3.1.4.1.7.2.1.1.2.2.13.3.2.1.2.4.1.1.23.1.5.2.1.1.1.1.2.1.4.2.3.2.1.1.1.2.2.2.3.1.2.2.1.1.2.1.3.1.1.1.1.1.1.3.4.1.6.2.1.1.3.5.1.2.1.1.1.2.1.3.1.2.1.6.1 644))
 ;  (system/de/uka/ilkd/key/parser/problem.g (key/E/8_problem.g 1.1.1.4.1.4.1.4.1.1.1.1.1.4.1.2.1.9.1.1.2.2.1.2.1.2.1.14.1.2.2.5.1.3.1.3.1.3.1.3.1.5.3.7.1.6.1.12.1.2.2.3.1.5.1.2.1.1.1.4.1.4.1.2.2.1 644))
   (system/de/uka/ilkd/key/parser/schemajava/ () :directory)
   (system/de/uka/ilkd/key/parser/schemajava/SchemaJavaParser.jj (key/K/34_schemaJava 1.2.1.7.1.2.1.1.2.4.1.2.1.4.1.4.1.2.2.4.1.5.6.2.1.4.1.1.1.2.2.8.1.2.1.3.1.6.1.1.1.3.2.2.3.1 644))
@@ -795,7 +797,7 @@
   (system/resources/de/uka/ilkd/key/gui/images/keyproved.gif (key/I/15_keyproved. 1.2 644) :no-keywords)
   (system/resources/de/uka/ilkd/key/casetool/together/uml.dtd (key/I/45_uml.dtd 1.1 644))
   (system/resources/de/uka/ilkd/key/proof/proofheader.tex (key/T/b/16_proofheade 1.1 644))
-  (system/resources/de/uka/ilkd/key/proof/rules/booleanRules.key (key/s/b/36_booleanRul 1.3.2.9.3.4.1.8 644))
+  (system/resources/de/uka/ilkd/key/proof/rules/booleanRules.key (key/s/b/36_booleanRul 1.3.2.9.3.4.1.9 644))
   (system/resources/de/uka/ilkd/key/proof/rules/intRules.key (key/s/b/35_intRules.k 1.6.2.1.1.1.1.5.1.1.1.1.1.33.3.1.1.4.2.2.1.2.1.2.1.1.1.2.1.5.1.4.4.1.1.1.1.2.1.3.1.2.1.8.1.6.1.2.1.12.3.2 644))
   (system/resources/de/uka/ilkd/key/proof/rules/intRulesArith.key (key/v/b/25_intRulesAr 1.5.1.17.1.5.3.1.1.4.2.1.1.1.1.10.3.1.1.1.1.3.1.3.1.4.1.10.2.2.1.2.2.1.1.11.1.2.2.3 644))
   (system/resources/de/uka/ilkd/key/proof/rules/javaRules.key (key/t/b/2_javaRules. 1.11.1.5.1.1.1.11.2.2.1.1.3.2.1.1.1.2.2.1.2.11.1.3.1.14.1.8.2.6.1.13.3.3.6.5.1.2.2.5.1.6.1.1.4.1.1.1.3.2.2.2.1.2.1.8.1.3.1.12.1.3.2.1.4.1.1.1.4.3.1.3.2.1.3.5.3.1.1.2.1.5.2.6.1.8.1.7.1.3.1.5.1.24.1.3.1.21.1.9.1.2.1.3.1.1.1.4.1.1.1.1.1.1.1.8.1.1.1.17.1.9.1.8.1.1.1.1.2.1.1.1.2.1.1.1.2.1.2.4.2.5.1.2.1.8.1.4.1.1.1.3.2.5.2.1.1.1.2.2.1.2.2.1.2.21.1.2.1.1.1.1.1.1.1.2.2.2.1.1.3.2.1.1.1.10.6.3.3.1 644))
@@ -829,8 +831,7 @@
   
 
   
-  
-  (system/de/uka/ilkd/key/casetool/together/scripts/menuextension/GlobalMenuPoint1_5.java (key/C/b/40_GlobalMenu 1.4.1.4.1.1.2.5 644))
+ 
   (system/resources/de/uka/ilkd/key/gui/images/key-color-icon-square.png (key/A/b/29_key-color- 1.1 644) :no-keywords)
 
   (system/resources/de/uka/ilkd/key/casetool/together/patterns/JAVA/CLASS/KeY_Idiom/InvariantConstraints/OCL/AttributeLowerBound.ocl (key/A/b/32_AttributeL 1.2 644))
@@ -839,7 +840,7 @@
 
 
   (system/de/uka/ilkd/key/collection/NotUniqueException.java (key/A/b/35_NotUniqueE 1.4 644))
-  (system/de/uka/ilkd/key/proof/ProblemLoader.java (key/A/b/36_ProblemLoa 1.6.2.5.1.4.1.10.1.3.2.2.1.2.1.2.1.10.1.2.1.1.2.1.1.1.2.1.1.2.2.6.1.3.1.20.1.3.1.2.2.5.1.7.1.1.2.5.1.1.1.2.1.1.1.1.1.4.2.2.2.2.1.1.3.1.1.1 644))
+  (system/de/uka/ilkd/key/proof/ProblemLoader.java (key/A/b/36_ProblemLoa 1.6.2.5.1.4.1.10.1.3.2.2.1.2.1.2.1.10.1.2.1.1.2.1.1.1.2.1.1.2.2.6.1.3.1.20.1.3.1.2.2.5.1.7.1.1.2.5.1.1.1.2.1.1.1.1.1.4.2.2.2.2.1.1.3.1.1.1.3.2.3.1 644))
 
   
   
@@ -857,7 +858,7 @@
   (system/de/uka/ilkd/key/util/install/InstallationPathChooser.java (key/B/b/4_Installati 1.8.1.1 644))
   (system/de/uka/ilkd/key/util/install/Installer.java (key/B/b/5_Installer. 1.6.1.4 644))
 
-  (system/de/uka/ilkd/key/proof/ProofSaver.java (key/B/b/16_ProofSaver 1.11.1.2.1.1.1.1.1.8.1.26.1.4.1.2.1.3.1.10 644))
+  (system/de/uka/ilkd/key/proof/ProofSaver.java (key/B/b/16_ProofSaver 1.11.1.2.1.1.1.1.1.8.1.26.1.4.1.2.1.3.1.10.3.2 644))
   (system/de/uka/ilkd/key/proof/ProofSaverLatex.java (key/T/b/17_ProofSaver 1.10.1.2 644))
 
   (system/de/uka/ilkd/key/util/pp/package.html (key/B/b/17_package.ht 1.4 644))
@@ -897,7 +898,7 @@
   (system/de/uka/ilkd/key/proof/init/InitConfig.java (key/B/b/42_InitConfig 1.7.1.3.1.3.2.1.1.6.1.7.1.2.2.1.2.6.3.4.2.4.1.5.3.4.1.1.3.1.2.2.3.2.1.2.1.3.1.3.1.1.1.2.2.5.1.3.1.11.2.1.1.1 644))
   (system/de/uka/ilkd/key/proof/init/KeYFile.java (key/B/b/43_KeYFile.ja 1.5.1.9.1.6.1.6.1.3.2.4.1.4.1.2.1.4.1.1.1.3.4.2.1.2.1.6.3.1.2.5.2.20.1.2.1.1.1.11.2.1.1.2.1.11.1.1.1.1.1.2.1.1.1.2.2.1.2.1 644))
   
-  (system/de/uka/ilkd/key/proof/init/LDTInput.java (key/B/b/45_LDTInput.j 1.10.1.3.1.1.1.3.1.2.1.2.1.1.2.3.1.2.1.2.3.1.1.6.1.8 644))
+  (system/de/uka/ilkd/key/proof/init/LDTInput.java (key/B/b/45_LDTInput.j 1.10.1.3.1.1.1.3.1.2.1.2.1.1.2.3.1.2.1.2.3.1.1.6.1.8.2.1 644))
   (system/de/uka/ilkd/key/logic/NamespaceSet.java (key/B/b/46_NamespaceS 1.3.2.3.1.9 644))
   (system/de/uka/ilkd/key/proof/init/ProofOblInput.java (key/B/b/47_ProofOblIn 1.4.1.5.2.8.1.1.1.1.2.1.1.7.2.1.1.2.1.5 644))
   (system/de/uka/ilkd/key/proof/init/ModStrategy.java (key/B/b/48_ModStrateg 1.7.1.1.1.2.2.1 644))
@@ -917,6 +918,8 @@
   (system/de/uka/ilkd/key/parser/Location.java (key/C/b/36_Location.j 1.6 644))
   (system/de/uka/ilkd/key/parser/DefaultTermParser.java (key/C/b/37_DefaultTer 1.9.1.2.1.13.1.1 644))
   (system/de/uka/ilkd/key/logic/op/Operator2.java (key/C/b/38_Operator2. 1.5.1.1 644))
+
+  (system/de/uka/ilkd/key/casetool/together/scripts/menuextension/GlobalMenuPoint1_5.java (key/C/b/40_GlobalMenu 1.4.1.4.1.1.2.5 644))
 
   (system/de/uka/ilkd/key/logic/op/MetaOperator.java (key/C/b/49_MetaOperat 1.9.2.1.2.2.2.1.1.1 644))
 
@@ -941,7 +944,7 @@
   (system/de/uka/ilkd/key/ocl/gf/TempGrammarFiles.java (key/D/b/17_TempGramma 1.3.1.8.2.6.1.6 644))
 
   (system/de/uka/ilkd/key/parser/JavaParserException.java (key/D/b/24_JavaParser 1.3.1.4.1.1 644))
-  (rsync_exclude (key/D/b/34_rsync_excl 1.8.3.2 644))
+  (rsync_exclude (key/D/b/34_rsync_excl 1.8 644))
   (system/de/uka/ilkd/key/java/PosConvertException.java (key/D/b/44_PosConvert 1.3 644))
 
   (system/de/uka/ilkd/key/rule/SimplifyIntegerRule.java (key/E/b/35_SimplifyTa 1.8.1.12.1.2.1.2 644))
@@ -965,14 +968,14 @@
   (examples/pred_log/simpleEps.key (key/F/b/2_simpleEps. 1.1.1.4 644))
   (examples/pred_log/specialNat.key (key/F/b/3_specialNat 1.1.1.2 644))
   (examples/pred_log/steam1.key (key/F/b/4_steam1.key 1.3.1.2 644))
-  (examples/pred_log/functions.key (key/F/b/5_functions. 1.1.1.3.1.1 644))
+  (examples/pred_log/functions.key (key/F/b/5_functions. 1.1.1.2 644))
   (examples/pred_log/count.key (key/V/b/49_count.key 1.3.1.2.1.3.1.1 644))
   (examples/pred_log/count2.key (key/V/b/50_count2.key 1.1.1.2.1.2.2.2 644))
   (examples/pred_log/count3.key (key/W/b/3_count3.key 1.1.1.2.1.2 644))
   (examples/pred_log/equalities.key (key/F/b/6_equalities 1.2.1.4 644))
   (examples/pred_log/equalities2.key (key/W/b/5_equalities 1.1.1.2 644))
   (examples/pred_log/equalities3.key (key/W/b/6_equalities 1.1.1.4 644))
-  (examples/pred_log/quantifiers.key (key/F/b/7_quantifier 1.1.2.2.2.1 644))
+  (examples/pred_log/quantifiers.key (key/F/b/7_quantifier 1.1.2.2.1.1 644))
   (examples/arith/complexExpressions.key (key/F/b/8_complexExp 1.4 644))
   (examples/arith/divByZero.key (key/K/b/35_divByZero. 1.6 644))
   (examples/arith/divByZero2.key (key/k/c/21_divByZero2 1.2 644))
@@ -1096,7 +1099,7 @@
   (system/de/uka/ilkd/key/rule/metaconstruct/MethodCall.java (key/K/b/34_MethodCall 1.3.2.2.1.3.1.11.2.24.1.6.1.11.2.2.1.1.1.2.1.1 644))
 
   (system/de/uka/ilkd/key/parser/DeclPicker.java (key/K/b/41_DeclPicker 1.1.1.5.1.4 644))
-  (system/de/uka/ilkd/key/proof/init/KeYUserProblemFile.java (key/K/b/42_KeYUserPro 1.7.1.2.1.1.1.3.1.5.3.1.3.1.1.4.1.1.2.1.1.18.1.8.1.1.1.5.1.13.1.1.1.1.2.7.2.2.2.1.2.1.1.6.3.1.4.1.1.3.1.1.1.11.2.1.2.9.2.5.2.1.2.1 644))
+  (system/de/uka/ilkd/key/proof/init/KeYUserProblemFile.java (key/K/b/42_KeYUserPro 1.7.1.2.1.1.1.3.1.5.3.1.3.1.1.4.1.1.2.1.1.18.1.8.1.1.1.5.1.13.1.1.1.1.2.7.2.2.2.1.2.1.1.6.3.1.4.1.1.3.1.1.1.11.2.1.2.9.2.5.2.1.2.1.1.2 644))
 
   (system/de/uka/ilkd/key/proof/incclosure/BranchRestricter.java (key/K/b/46_BranchRest 1.2.1.3.2.1 644))
   (system/de/uka/ilkd/key/proof/incclosure/Restricter.java (key/K/b/47_Restricter 1.4.1.1.2.1 644))
@@ -1198,7 +1201,7 @@
   (system/de/uka/ilkd/key/util/install/KeYInstallerException.java (key/u/b/27_KeYInstall 1.3.1.1 644))
   (system/de/uka/ilkd/key/util/install/KeYInstaller.java (key/u/b/28_KeYInstall 1.10.1.5 644))
   (system/de/uka/ilkd/key/util/install/DummyInstaller.java (key/u/b/37_DummyInsta 1.5.1.1 644))
-  (system/resources/MANIFEST.MF (key/u/b/38_MANIFEST.M 1.2 644))
+  (system/resources/MANIFEST.MF (key/u/b/38_MANIFEST.M 1.3 644))
   (system/resources/de/uka/ilkd/key/util/install/startkey_win_6.0.1 (key/u/b/39_startkey_w 1.10 644))
   (system/resources/de/uka/ilkd/key/util/install/startkey_linux_6.0 (key/u/b/40_startkey_l 1.5 644))
   (system/resources/de/uka/ilkd/key/util/install/key.config (key/u/b/41_key.config 1.1 644))
@@ -1351,7 +1354,7 @@
   (system/de/uka/ilkd/key/parser/IdDeclaration.java (key/u/b/47_IdDeclarat 1.3 644))
   (system/de/uka/ilkd/key/proof/MissingSortException.java (key/u/b/48_MissingSor 1.2.1.2 644))
   (system/de/uka/ilkd/key/proof/SortMismatchException.java (key/u/b/49_SortMismat 1.4 644))
-  (system/resources/de/uka/ilkd/key/proof/rules/genericRules.key (key/u/b/50_genericRul 1.3.1.1.1.1.1.9.1.6.1.2.1.1.1.5.1.2.3.1.3.6.3.3.4.6.2.1.1.3.1.2.2.6.1.1.1.3.1.3.1.1.1.1.1.2.2.10.3.6.2.3.3.1.2.1.1.5.3.2 644))
+  (system/resources/de/uka/ilkd/key/proof/rules/genericRules.key (key/u/b/50_genericRul 1.3.1.1.1.1.1.9.1.6.1.2.1.1.1.5.1.2.3.1.3.6.3.3.4.6.2.1.1.3.1.2.2.6.1.1.1.3.1.3.1.1.1.1.1.2.2.10.3.6.2.3.3.1.2.1.1.5.3.2.1.1 644))
   (examples/generic/instanceof.key (key/I/8_instanceof 1.1.1.6 644))
   (examples/generic/classes/A.java (key/I/9_A.java 1.1 644))
   (examples/generic/classes/B.java (key/I/10_B.java 1.1 644))
@@ -1442,7 +1445,7 @@
   (system/de/uka/ilkd/key/java/declaration/ImplicitFieldSpecification.java (key/R/b/51_ImplicitFi 1.5.1.1 644))
   (system/de/uka/ilkd/key/rule/metaconstruct/CreateObject.java (key/S/b/1_CreateObje 1.2.1.9.1.7.1.2 644))
   (examples/dev/creation.key (key/S/b/2_creation.k 1.1.1.7.1.21 644))
-  (system/de/uka/ilkd/key/rule/metaconstruct/ConstructorCall.java (key/S/b/5_Constructo 1.11.1.4 644))
+  (system/de/uka/ilkd/key/rule/metaconstruct/ConstructorCall.java (key/S/b/5_Constructo 1.11.1.2 644))
   (system/de/uka/ilkd/key/rule/metaconstruct/SpecialConstructorCall.java (key/S/b/6_SpecialCon 1.13.1.1 644))
   (system/de/uka/ilkd/key/java/reference/ExecutionContext.java (key/S/b/39_ExecutionC 1.11.1.3 644))
   (system/de/uka/ilkd/key/rule/SVNameCorrespondenceCollector.java (key/S/b/38_SVNameCorr 1.1.1.4.1.2 644))
@@ -1666,7 +1669,7 @@
   (examples/arith/compound_unaryMinus.key (key/X/b/11_compound_u 1.2 644))
   (system/resources/de/uka/ilkd/key/proof/rules/standardRules.key (key/W/b/38_standardRu 1.2.1.2.1.1.4.3.2.1.1.3.2.1.3.1.5.1.3.1.1.2.2.2 644))
   (system/resources/de/uka/ilkd/key/proof/rules/LDTsForTestsOnly.key (key/X/b/1_LDTsForTes 1.1.2.3 644))
-  (system/resources/de/uka/ilkd/key/proof/rules/ruleSetsDeclarations.key (key/W/b/42_heuristics 1.2.1.2.1.2.1.2.1.1.1.1.6.2.1.1.2.1.1.1.1.4.1.16.1.1.1.7.1.8.1.1.2.1.1.9.1.2.3.4.1.8.2.1 644))
+  (system/resources/de/uka/ilkd/key/proof/rules/ruleSetsDeclarations.key (key/W/b/42_heuristics 1.2.1.2.1.2.1.2.1.1.1.1.6.2.1.1.2.1.1.1.1.4.1.16.1.1.1.7.1.8.1.1.2.1.1.9.1.2.3.4.1.8.2.2 644))
   (system/de/uka/ilkd/key/proof/init/Includes.java (key/X/b/12_Includes.j 1.4.1.2 644))
   (system/de/uka/ilkd/key/proof/MethodSpecTransformation.java (key/Y/b/10_MethodSpec 1.8.1.2 644))
   (system/de/uka/ilkd/key/proof/TermSVReplacer.java (key/Y/b/11_TermSVRepl 1.4.1.13.2.2 644))
@@ -1688,7 +1691,7 @@
   (examples/staticInitialisation/java/FailedStaticInit.java (key/X/b/31_FailedStat 1.1 644))
   (examples/staticInitialisation/java/B.java (key/X/b/32_B.java 1.1 644))
   (examples/staticInitialisation/java/A.java (key/X/b/33_A.java 1.2 644))
-  (examples/staticInitialisation/cascadeStaticInitialisation.key (key/X/b/34_cascadeSta 1.1.1.11 644))
+  (examples/staticInitialisation/cascadeStaticInitialisation.key (key/X/b/34_cascadeSta 1.1.1.9 644))
   (system/de/uka/ilkd/key/java/recoderext/JVMIsTransientMethodBuilder.java (key/X/b/36_JVMIsTrans 1.8 644))
   (system/de/uka/ilkd/key/java/declaration/SuperArrayDeclaration.java (key/X/b/35_SuperArray 1.6.1.6.1.3 644))
   (system/de/uka/ilkd/key/gui/DecisionProcedureSettings.java (key/X/b/38_DecisionPr 1.5.2.10 644))
@@ -1888,7 +1891,7 @@
   (examples/pred_log/tptp/PUZ/PUZ001p1-eq.key (key/b/c/31_PUZ001p1-e 1.1.1.1 644))
   
   (system/de/uka/ilkd/key/gui/StrategySettings.java (key/b/c/48_StrategySe 1.8.1.7 644))
-  (system/de/uka/ilkd/key/strategy/JavaCardDLStrategy.java (key/c/c/11_SimpleJava 1.3.1.1.2.1.1.1.1.6.1.2.1.2.1.1.1.1.2.7.1.21.1.3.1.1.1.6.2.1.1.2.1.2.1.1.2.15.1.2.3.16.4.1.3.2.1.6.1.5.1.1.1.4.4.1.2.4.2.18.1.3.5.2 644))
+  (system/de/uka/ilkd/key/strategy/JavaCardDLStrategy.java (key/c/c/11_SimpleJava 1.3.1.1.2.1.1.1.1.6.1.2.1.2.1.1.1.1.2.7.1.21.1.3.1.1.1.6.2.1.1.2.1.2.1.1.2.15.1.2.3.16.4.1.3.2.1.6.1.5.1.1.1.4.4.1.2.4.2.18.1.3.5.2.4.1 644))
   (system/de/uka/ilkd/key/strategy/AbstractFeatureStrategy.java (key/c/c/12_AbstractFe 1.2.1.4.2.17.1.5.1.1.1.1 644))
   (system/de/uka/ilkd/key/strategy/StrategyFactory.java (key/c/c/13_StrategyFa 1.1.1.1.2.2.1.1.1.1.2.4.1.1.5.1.4.3.3.2.1.4 644))
   (system/de/uka/ilkd/key/strategy/feature/EqNonDuplicateAppFeature.java (key/c/c/14_EqDuplicat 1.4.1.7 644))
@@ -2944,7 +2947,7 @@
 ;; Files added by populate at Mon, 02 May 2005 16:45:02 +0200,
 ;; to version wojParser.1(w), by most:
 
-  (system/de/uka/ilkd/key/parser/keyparser.g (key/O/c/6_keyparser. 1.14.1.1.2.29.1.1.1.7.3.1.1.1.6.2.1.2.1.2.4.2.2.8.1.2.4.1.2.1.2.3.1.12.2.2.2.1.2.1.1.1.4.3.3.6.1.1.1.1.1.1.1.1.3.1.4.2.1.1.7.2.1.3.2.3.1.1.2.1.3.1.1.5.1.3.1.2.3.3.5.1.1.1.3.6.1.5.1.10.1.3.1.1.1.3.6.2.2.1.3.1.2.2.1.1.1.1.1.1.7.1.4.2.3.1.2.1.5.1.6.1 644))
+  (system/de/uka/ilkd/key/parser/keyparser.g (key/O/c/6_keyparser. 1.14.1.1.2.29.1.1.1.7.3.1.1.1.6.2.1.2.1.2.4.2.2.8.1.2.4.1.2.1.2.3.1.12.2.2.2.1.2.1.1.1.4.3.3.6.1.1.1.1.1.1.1.1.3.1.4.2.1.1.7.2.1.3.2.3.1.1.2.1.3.1.1.5.1.3.1.2.3.3.5.1.1.1.3.6.1.5.1.10.1.3.1.1.1.3.6.2.2.1.3.1.2.2.1.1.1.1.1.1.7.1.4.2.3.1.2.1.5.1.6.1.10.1 644))
 
 ;; Files added by populate at Mon, 02 May 2005 16:53:41 +0200,
 ;; to version wojParser.1(w), by most:
@@ -3209,7 +3212,7 @@
   (system/de/uka/ilkd/key/strategy/SimpleJavaCardDLOptions.java (key/f/d/22_SimpleJava 1.2.1.3 644))
 
   
-  (eclipse/KeYPlugin/.project (key/R/c/39_.project 1.2 644))
+  (eclipse/KeYPlugin/.project (key/R/c/39_.project 1.4 644))
   (eclipse/KeYPlugin/plugin.xml (key/R/c/40_plugin.xml 1.5.2.1.1.9 644))
   (eclipse/KeYPlugin/build.properties (key/R/c/41_build.prop 1.2.1.3.1.1.1.5.1.2 644))
   (eclipse/KeYPlugin/.classpath (key/R/c/42_.classpath 1.2.3.2.1.3 644))
@@ -3451,7 +3454,7 @@
   (system/de/uka/ilkd/key/parser/ocl/BuiltInPropertyResolver.java (key/n/d/14_BuiltInPro 1.3.1.24.1.2.1.2.2.1.1.1.2.1 644))
 
   (system/de/uka/ilkd/key/rule/inst/NameInstantiationEntry.java (key/j/d/33_NameInstan 1.1.1.1 644))
-  (system/de/uka/ilkd/key/gui/StrategySelectionView.java (key/j/d/40_StrategySe 1.2.1.3.1.3.1.16.3.1.2.2.2.1.1.3.3.4.3.1.5.1 644))
+  (system/de/uka/ilkd/key/gui/StrategySelectionView.java (key/j/d/40_StrategySe 1.2.1.3.1.3.1.16.3.1.2.2.2.1.1.3.3.4.3.1.5.1.2.1 644))
   (system/de/uka/ilkd/key/gui/ReuseListenerDummy.java (key/j/d/39_ReuseListe 1.2.1.3 644))
   (examples/java_dl/iteratedAssignment.key (key/j/d/7_iteratedAs 1.4 644))
   (examples/java_dl/anonymousUpdateOnNonrigidTerm.key (key/j/d/32_anonymousU 1.4 644))
@@ -3663,7 +3666,7 @@
   
   (system/de/uka/ilkd/key/gui/UseMethodContractRuleItem.java (key/s/d/33_UseMethodC 1.6 644))
   (system/de/uka/ilkd/key/gui/DefaultBuiltInRuleMenuItem.java (key/s/d/34_DefaultBui 1.2 644))
-  (system/de/uka/ilkd/key/gui/BuiltInRuleMenuItem.java (key/s/d/35_BuiltInRul 1.2 644))
+  (system/de/uka/ilkd/key/gui/BuiltInRuleMenuItem.java (key/s/d/35_BuiltInRul 1.3 644))
 
 ;; Files added by populate at Wed, 12 Apr 2006 08:23:38 +0200,
 ;; to version rothContracts.17(w), by andreas:
@@ -3709,13 +3712,63 @@
   (eclipse/ProofVisualization/src/proofVisualization/views/ModelSelectionDialog.java (key/g/d/44_ModelSelec 1.6 644))
   
   
+  (eclipse/VisualDebugger/.classpath (key/P/d/37_.classpath 1.1 644))
+  (eclipse/VisualDebugger/.project (key/P/d/38_.project 1.1 644))
+  (eclipse/VisualDebugger/build.properties (key/P/d/39_build.prop 1.7 644))
+  (eclipse/VisualDebugger/plugin.xml (key/P/d/40_plugin.xml 1.6 644))
+  (eclipse/VisualDebugger/icons/sample.gif (key/P/d/41_sample.gif 1.1 644))
+  (eclipse/VisualDebugger/META-INF/MANIFEST.MF (key/P/d/42_MANIFEST.M 1.4.1.10 644))
+  (eclipse/VisualDebugger/src/visualdebugger/Activator.java (key/P/d/43_Activator. 1.2.1.6 644))
+  (eclipse/VisualDebugger/src/visualdebugger/VBTBuilder.java (key/g/e/14_VBTBuilder 1.1.1.1 644))
+  (eclipse/VisualDebugger/src/visualdebugger/VBTestRunListener.java (key/g/e/15_VBTestRunL 1.2 644))
+  (eclipse/VisualDebugger/src/visualdebugger/views/VisualDebuggerView.java (key/P/d/44_VisualDebu 1.3.1.2 644))
+  (eclipse/VisualDebugger/src/visualdebugger/views/BreakpointEclipse.java (key/P/d/45_Breakpoint 1.2 644))
+  (eclipse/VisualDebugger/src/visualdebugger/views/BreakpointView.java (key/P/d/46_Breakpoint 1.3.1.3 644))
+  (eclipse/VisualDebugger/src/visualdebugger/views/FindStatementVisitor.java (key/P/d/47_FindStatem 1.3.1.1 644))
+  (eclipse/VisualDebugger/src/visualdebugger/views/InsertSepVisitor.java (key/P/d/48_InsertSepV 1.3.1.2 644))
+  (eclipse/VisualDebugger/src/visualdebugger/views/ExecutionTreeView.java (key/Q/d/48_ExecutionT 1.3.1.5 644))
+  (eclipse/VisualDebugger/src/visualdebugger/views/SymbolicStateView.java (key/a/e/27_SymbolicSt 1.2.1.2 644))
+  (eclipse/VisualDebugger/src/visualdebugger/draw2d/BranchLayout.java (key/Q/d/49_BranchLayo 1.1 644))
+  (eclipse/VisualDebugger/src/visualdebugger/draw2d/NormalLayout.java (key/Q/d/50_NormalLayo 1.2 644))
+  (eclipse/VisualDebugger/src/visualdebugger/draw2d/SourceElementFigure.java (key/a/e/28_SourceElem 1.2.1.1 644))
+  (eclipse/VisualDebugger/src/visualdebugger/draw2d/MethodInvocationFigure.java (key/a/e/29_MethodInvo 1.2.1.1 644))
+  (eclipse/VisualDebugger/src/visualdebugger/draw2d/TreeBranch.java (key/R/d/0_TreeBranch 1.2.1.1 644))
+  (eclipse/VisualDebugger/src/visualdebugger/draw2d/TreeLayout.java (key/R/d/1_TreeLayout 1.1 644))
+  (eclipse/VisualDebugger/src/visualdebugger/draw2d/TreeRoot.java (key/R/d/2_TreeRoot.j 1.2 644))
+  (eclipse/VisualDebugger/icons/stepinto_co.gif (key/a/e/30_stepinto_c 1.1 644) :no-keywords)
+  (eclipse/VisualDebugger/icons/stepover_co.gif (key/a/e/31_stepover_c 1.1 644) :no-keywords)
+  (eclipse/VisualDebugger/icons/run_exc.gif (key/a/e/32_run_exc.gi 1.2 644) :no-keywords)
+  (eclipse/VisualDebugger/icons/key-small.png (key/a/e/33_key-small. 1.1 644) :no-keywords)
+
+
+  (eclipse/VisualDebugger/src/visualdebugger/actions/StartVisualDebuggerAction.java (key/P/d/49_StartVisua 1.5.1.7 644))
+  (system/de/uka/ilkd/key/visualdebugger/VisualDebugger.java (key/P/d/50_VisualDebu 1.5.1.5 644))
+  (system/de/uka/ilkd/key/visualdebugger/Breakpoint.java (key/P/d/51_Breakpoint 1.1.1.3 644))
+  (system/de/uka/ilkd/key/visualdebugger/SourceElementId.java (key/i/e/38_SourceElem 1.5 644))
+  (system/de/uka/ilkd/key/visualdebugger/BreakpointManager.java (key/Q/d/1_Breakpoint 1.3.1.5 644))
+  (system/de/uka/ilkd/key/visualdebugger/ITNode.java (key/N/d/38_ITNode.jav 1.3.1.4.1.1 644))
+  (system/de/uka/ilkd/key/visualdebugger/ETNode.java (key/a/e/34_ETNode.jav 1.1.1.4 644))
+  (system/de/uka/ilkd/key/visualdebugger/ProofStarter.java (key/a/e/35_ProofStart 1.2.1.2 644))
+  (system/de/uka/ilkd/key/visualdebugger/DebuggerPO.java (key/a/e/36_DebuggerPO 1.2.1.3.1.1 644))
+
+  (system/de/uka/ilkd/key/visualdebugger/ETStatementNode.java (key/a/e/37_ETStatemen 1.1.1.2 644))
+  (system/de/uka/ilkd/key/visualdebugger/ETMethodInvocationNode.java (key/a/e/38_ETMethodIn 1.1.1.2 644))
+  (system/de/uka/ilkd/key/visualdebugger/ETMethodReturnNode.java (key/a/e/39_ETMethodRe 1.1.1.3 644))
+  (system/de/uka/ilkd/key/visualdebugger/ETLeafNode.java (key/a/e/40_ETLeafNode 1.2.1.3 644))
+  (system/de/uka/ilkd/key/visualdebugger/StateVisualization.java (key/a/e/41_StateVisua 1.2.1.2 644))
+  (system/de/uka/ilkd/key/visualdebugger/SymbolicObjectDiagram.java (key/i/e/39_SymbolicOb 1.3 644))
+  (system/de/uka/ilkd/key/visualdebugger/SymbolicObject.java (key/a/e/43_SymbolicOb 1.1.1.2 644))
+
+  (system/de/uka/ilkd/key/visualdebugger/Label.java (key/N/d/39_Label.java 1.1.1.1 644))
+  (system/de/uka/ilkd/key/visualdebugger/PCLabel.java (key/N/d/40_PCLabel.ja 1.2.1.1 644))
+  (system/de/uka/ilkd/key/visualdebugger/ExecutionTree.java (key/i/e/40_ExecutionT 1.9 644))
+  (system/de/uka/ilkd/key/visualdebugger/UpdateLabelListener.java (key/N/d/42_UpdateLabe 1.3.1.2 644))
+  (system/de/uka/ilkd/key/visualdebugger/DebuggerLP.java (key/a/e/44_DebuggerLP 1.2.1.1 644))
+  (system/de/uka/ilkd/key/strategy/feature/BreakpointFeature.java (key/Q/d/2_Breakpoint 1.4.1.3 644))
+  (system/de/uka/ilkd/key/strategy/feature/LabelFeature.java (key/N/d/43_LabelFeatu 1.4 644))
+  (system/de/uka/ilkd/key/strategy/DebuggerStrategy.java (key/Q/d/3_DebuggerSt 1.5 644))
   
-  
-  
-  
-  
-  
-  
+  (system/resources/de/uka/ilkd/key/proof/rules/debuggerRules.key (key/a/e/45_debuggerRu 1.2 644))
   
   
   
@@ -3783,7 +3836,7 @@
   (examples/inEqSimp/simplify1.key (key/u/d/48_simplify1. 1.3 644))
   (examples/polySimp/simplify15.key (key/u/d/49_simplify15 1.1 644))
   (eclipse/KeYExternalLibraries/META-INF/MANIFEST.MF (key/u/d/22_MANIFEST.M 1.2.1.2.1.1 644))
-  (eclipse/KeYExternalLibraries/build.properties (key/u/d/23_build.prop 1.4 644))
+  (eclipse/KeYExternalLibraries/build.properties (key/u/d/23_build.prop 1.6 644))
   (eclipse/KeYExternalLibraries/.classpath (key/u/d/24_.classpath 1.2 644))
   (eclipse/KeYExternalLibraries/xerces.jar (../../key-ext-jars/xerces.jar) :symlink)
   (eclipse/KeYExternalLibraries/recoder.jar (../../key-ext-jars/recoder.jar) :symlink)
@@ -3987,6 +4040,77 @@
   (system/de/uka/ilkd/key/unittest/cogent/CogentTranslation.java (key/o/d/15_CogentTran 1.11 644))
   (system/de/uka/ilkd/key/unittest/DecProdModelGenerator.java (key/o/d/16_DecProdMod 1.1 644))
 
+  (system/de/uka/ilkd/key/proof/decproc/translation/TermTranslationVisitor.java (key/i/d/25_TermTransl 1.2.1.7 600))
+  (system/de/uka/ilkd/key/proof/decproc/translation/IOperatorTranslation.java (key/i/d/26_IOperatorT 1.4 600))
+  (system/de/uka/ilkd/key/proof/decproc/smtlib/Benchmark.java (key/i/d/33_Benchmark. 1.2.1.10 600))
+  
+  
+  (system/de/uka/ilkd/key/proof/decproc/smtlib/Term.java (key/i/d/36_Term.java 1.2.1.3.2.8 644))
+  (system/de/uka/ilkd/key/proof/decproc/smtlib/Formula.java (key/i/d/37_Formula.ja 1.2.1.2.2.6 600))
+  (system/de/uka/ilkd/key/logic/op/DecisionProcedureSmtAufliaOp.java (key/i/d/48_DecisionPr 1.4 644))
+  (system/de/uka/ilkd/key/proof/decproc/SmtAufliaTranslation.java (key/i/d/49_SmtAufliaT 1.1.2.9.1.1 600))
+  
+  
+  (system/de/uka/ilkd/key/proof/decproc/smtlib/TermVariable.java (key/k/d/19_TermVariab 1.2.2.7 600))
+  (system/de/uka/ilkd/key/proof/decproc/smtlib/NumberConstantTerm.java (key/k/d/20_NumberCons 1.1.2.6 600))
+  (system/de/uka/ilkd/key/proof/decproc/smtlib/InterpretedFuncTerm.java (key/k/d/21_Interprete 1.1.2.5 600))
+  (system/de/uka/ilkd/key/proof/decproc/smtlib/UninterpretedFuncTerm.java (key/k/d/22_Uninterpre 1.2.2.5 644))
+  (system/de/uka/ilkd/key/proof/decproc/smtlib/IteTerm.java (key/k/d/23_IteTerm.ja 1.1.2.5 600))
+  (system/de/uka/ilkd/key/proof/decproc/smtlib/TruthValueFormula.java (key/l/d/19_TruthValue 1.1.2.6 644))
+  (system/de/uka/ilkd/key/proof/decproc/smtlib/FormulaVariable.java (key/l/d/20_FormulaVar 1.1.2.6 600))
+  (system/de/uka/ilkd/key/proof/decproc/smtlib/PredicateFormula.java (key/l/d/21_PredicateF 1.1.2.6 600))
+  (system/de/uka/ilkd/key/proof/decproc/smtlib/UninterpretedPredFormula.java (key/l/d/22_Uninterpre 1.1.2.6 644))
+  (system/de/uka/ilkd/key/proof/decproc/smtlib/ConnectiveFormula.java (key/l/d/23_Connective 1.1.2.5 600))
+  (system/de/uka/ilkd/key/proof/decproc/smtlib/LetFormula.java (key/l/d/24_LetFormula 1.1.2.6 600))
+  (system/de/uka/ilkd/key/proof/decproc/smtlib/FletFormula.java (key/l/d/25_FletFormul 1.1.2.6 600))
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  (system/de/uka/ilkd/key/proof/decproc/smtlib/Signature.java (key/m/d/46_Signature. 1.5 600))
+  (system/de/uka/ilkd/key/proof/decproc/DecisionProcedureSmtAuflia.java (key/p/d/10_DecisionPr 1.9.1.2.1.1 755))
+  (system/de/uka/ilkd/key/proof/decproc/TypeBoundTranslation.java (key/s/d/46_TypeBoundT 1.1 600))
+  (system/de/uka/ilkd/key/proof/decproc/translation/PreTranslationVisitor.java (key/p/d/11_PreTransla 1.6 600))
+  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateArrayOp.java (key/s/d/47_TranslateA 1.5 600))
+  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateAttributeOp.java (key/p/d/12_TranslateA 1.6 600))
+  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateEquality.java (key/p/d/13_TranslateE 1.4 600))
+  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateFunction.java (key/p/d/14_TranslateF 1.5 600))
+  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateIfThenElse.java (key/p/d/15_TranslateI 1.3 600))
+  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateIUpdateOperator.java (key/p/d/16_TranslateI 1.2 600))
+  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateJunctor.java (key/p/d/17_TranslateJ 1.3 600))
+  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateModality.java (key/p/d/18_TranslateM 1.2 600))
+  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateMetavariable.java (key/p/d/19_TranslateM 1.2 600))
+  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateProgramMethod.java (key/p/d/20_TranslateP 1.2 600))
+  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateProgramVariable.java (key/p/d/21_TranslateP 1.5 600))
+  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateQuantifier.java (key/p/d/22_TranslateQ 1.5 600))
+  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateUnknownOp.java (key/s/d/48_TranslateU 1.1 600))
+  (system/de/uka/ilkd/key/rule/CVCLiteIntegerRule.java (key/x/d/1_CVCLiteInt 1.2 644))
+  (system/de/uka/ilkd/key/proof/decproc/DecisionProcedureCVCLite.java (key/x/d/2_DecisionPr 1.3 644))
+  (system/de/uka/ilkd/key/rule/SVCIntegerRule.java (key/x/d/36_SVCInteger 1.2 644))
+  (system/de/uka/ilkd/key/proof/decproc/DecisionProcedureSVC.java (key/x/d/37_DecisionPr 1.1 644))
+  (system/de/uka/ilkd/key/rule/SmtTranslationIntegerRule.java (key/C/d/9_SmtTransla 1.2 700))
+  (system/de/uka/ilkd/key/proof/decproc/DecisionProcedureDummyTranslation.java (key/C/d/10_DecisionPr 1.1 700)) 
+  (system/de/uka/ilkd/key/rule/YicesIntegerRule.java (key/N/d/49_YicesInteg 1.1 755))
+  (system/de/uka/ilkd/key/proof/decproc/DecisionProcedureYices.java (key/N/d/50_DecisionPr 1.1.1.1 755))
+    
+  (examples/smtlib/Func_imp_add_overflow.key.proof (key/z/d/21_Func_imp_a 1.3 755))
+  
+  (examples/smtlib/Func_imp_dist.key.proof (key/z/d/23_Func_imp_d 1.1 755))
+  (examples/smtlib/Func_imp_dist2_unclosed.key.proof (key/z/d/24_Func_imp_d 1.1 755))
+  (examples/smtlib/imp_true_true.key.proof (key/z/d/25_imp_true_t 1.1 755))
+  (examples/smtlib/imp_false_true.key.proof (key/z/d/26_imp_false_ 1.1 755))
+  (examples/smtlib/imp_false_false.key.proof (key/z/d/27_imp_false_ 1.1 755))
+  (examples/smtlib/imp_true_false_unclosed.key.proof (key/z/d/28_imp_true_f 1.1 755))  
+  (examples/smtlib/Pred-imp_and.key.proof (key/z/d/29_Pred-imp_a 1.1 755))
+  (examples/smtlib/Pred-imp_dist.key.proof (key/z/d/30_Pred-imp_d 1.1 755))
+  (examples/smtlib/Pred-imp_dist2.key.proof (key/z/d/31_Pred-imp_d 1.1 755))
+  (examples/smtlib/Pred-imp_or.key.proof (key/z/d/32_Pred-imp_o 1.1 755))
+    
   (examples/BookExamples/chap10UsingKey/updates.key (key/y/d/23_updates.ke 1.1 644))
   (examples/BookExamples/chap10UsingKey/symbolicExecution.key (key/y/d/24_symbolicEx 1.1 644))
   (examples/BookExamples/chap10UsingKey/quantifyProgVals.key (key/y/d/25_quantifyPr 1.1 644))
@@ -4016,20 +4140,12 @@
   (examples/BookExamples/chap10UsingKey/Bank-JML/AccountStatementRequest.java (key/y/d/49_AccountSta 1.1 644))
   (examples/BookExamples/chap10UsingKey/Bank-JML/ATM.java (key/y/d/50_ATM.java 1.1 644))
   (examples/BookExamples/chap10UsingKey/Bank-JML/Account.java (key/y/d/51_Account.ja 1.1 644))
-;; Files added by populate at Wed, 12 Jul 2006 16:43:18 +0200,
-;; to version 0.2239(w), by richard:
-
   (system/de/uka/ilkd/key/strategy/feature/ImplicitCastNecessary.java (key/z/d/0_ImplicitCa 1.6 644))
   (system/de/uka/ilkd/key/strategy/feature/SortComparisionFeature.java (key/z/d/1_SortCompar 1.3 644))
-
-;; Files added by populate at Fri, 21 Jul 2006 16:50:54 +0200,
-;; to version 0.2255(w), by richard:
 
   (examples/java_dl/assert.key (key/A/d/16_assert.key 1.5 644))
   (system/resources/de/uka/ilkd/key/proof/rules/assertions.key (key/A/d/17_assertions 1.5 644))
   (system/de/uka/ilkd/key/java/statement/Assert.java (key/A/d/18_Assert.jav 1.3 644))
-
-
 
   (system/de/uka/ilkd/key/strategy/RuleAppCostCollector.java (key/A/d/1_RuleAppCos 1.2 644))
   (system/de/uka/ilkd/key/strategy/termgenerator/TermGenerator.java (key/A/d/2_TermGenera 1.3 644))
@@ -4046,59 +4162,161 @@
   (system/de/uka/ilkd/key/strategy/feature/LetFeature.java (key/A/d/22_LetFeature 1.2 644))
   (system/de/uka/ilkd/key/strategy/feature/TacletRequiringInstantiationFeature.java (key/A/d/23_TacletRequ 1.1 644))
   (system/de/uka/ilkd/key/strategy/termProjection/CoeffGcdProjection.java (key/A/d/24_CoeffGcdPr 1.2 644))
+  (system/resources/de/uka/ilkd/key/proof/rules/standardRules-FOL.key (key/A/d/37_standardRu 1.3 644))
+  (system/resources/de/uka/ilkd/key/proof/rules/standardRules-testGen.key (key/A/d/38_standardRu 1.3 644))
+  (system/de/uka/ilkd/key/unittest/UseMethodContractRuleForTestGen.java (key/A/d/39_UseMethodC 1.1 644))
+  (system/de/uka/ilkd/key/proof/init/AbstractProfile.java (key/A/d/40_AbstractPr 1.10 644))
+  (system/de/uka/ilkd/key/proof/init/PureFOLProfile.java (key/A/d/41_PureFOLPro 1.3 644))
+  (system/de/uka/ilkd/key/proof/init/JavaTestGenerationProfile.java (key/A/d/42_JavaTestGe 1.5.1.2 644))
+  (system/de/uka/ilkd/key/proof/init/JavaProfile.java (key/A/d/43_JavaProfil 1.3.1.3.3.1 644))
+  (system/de/uka/ilkd/key/proof/init/Profile.java (key/A/d/44_Profile.ja 1.10 644))
+  (system/de/uka/ilkd/key/proof/init/RuleCollection.java (key/A/d/47_RuleCollec 1.2 644))
+  (system/de/uka/ilkd/key/proof/init/AbstractExecDecproc.java (key/N/d/28_AbstractEx 1.1 644))
+  (system/de/uka/ilkd/key/proof/init/ConcreteExecDecproc.java (key/N/d/29_ConcreteEx 1.3 644))
+  (system/de/uka/ilkd/key/proof/init/ExecSVC.java (key/N/d/30_ExecSVC.ja 1.1 644))
+  (system/de/uka/ilkd/key/proof/BalancedGoalChooserBuilder.java (key/B/d/17_BalancedGo 1.2 644))
+  (system/de/uka/ilkd/key/proof/BalancedLoopGC.java (key/B/d/18_BalancedLo 1.4 644))
+  (system/de/uka/ilkd/key/proof/DefaultGoalChooserBuilder.java (key/B/d/19_DefaultGoa 1.3 644))
+  (system/de/uka/ilkd/key/proof/GoalChooserBuilder.java (key/B/d/20_GoalChoose 1.2 644))
+  (system/de/uka/ilkd/key/proof/IGoalChooser.java (key/B/d/21_IGoalChoos 1.1 644))
+  (examples/java_dl/DLContractChooser/example.key (key/B/d/31_example.ke 1.3 644))
+  (examples/java_dl/DLContractChooser/code/MyClass.java (key/B/d/32_MyClass.ja 1.1 644))
+
+  (examples/java_dl/list_reversal/reversal.proof (key/D/d/1_reversal.p 1.1 644))
+  (examples/java_dl/list_reversal/reversal.key (key/D/d/2_reversal.k 1.2 644))
+  (examples/java_dl/list_reversal/src/list.java (key/D/d/3_list.java 1.1 644))
+
+  (examples/java_dl/jc_transactions/bookex2.key (key/N/d/35_bookex2.ke 1.2 644))
+  (examples/java_dl/jc_transactions/bookex1.key (key/N/d/36_bookex1.ke 1.2 644))
+  (system/de/uka/ilkd/key/gui/IncrementalSearch.java (key/N/d/51_Incrementa 1.2 644))
+
+  (examples/inEqSimp/nonLinInEqExample0.key (key/O/d/0_nonLinInEq 1.3 644))
+  (system/de/uka/ilkd/key/strategy/termgenerator/SequentFormulasGenerator.java (key/O/d/2_SequentFor 1.3 644))
+  (system/de/uka/ilkd/key/strategy/feature/ComprehendedSumFeature.java (key/O/d/3_Comprehend 1.2 644))
   
+  (system/de/uka/ilkd/key/strategy/termProjection/SubtermProjection.java (key/O/d/5_SubtermPro 1.2 644))
+  (examples/inEqSimp/quadraticInEq3.key (key/O/d/19_quadraticI 1.3 644))
+  (examples/inEqSimp/division.key (key/O/d/20_division.k 1.4 644))
+  (system/de/uka/ilkd/key/strategy/termgenerator/SubtermGenerator.java (key/O/d/21_SubtermGen 1.6 644))
+  (system/de/uka/ilkd/key/strategy/termfeature/EqTermFeature.java (key/O/d/22_EqTermFeat 1.2 644))
+  (examples/inEqSimp/quadraticInEq4.key (key/O/d/26_quadraticI 1.3 644))
+  (system/de/uka/ilkd/key/strategy/feature/TermSmallerThanFeature.java (key/O/d/27_TermSmalle 1.3 644))
+  (system/de/uka/ilkd/key/strategy/feature/FindRightishFeature.java (key/O/d/28_FindRighti 1.3 644))
+  (system/de/uka/ilkd/key/strategy/termProjection/AssumptionProjection.java (key/O/d/30_Assumption 1.2 644))
+  (system/de/uka/ilkd/key/strategy/termfeature/SortExtendsTransTermFeature.java (key/O/d/31_SortExtend 1.2 644))
+  (examples/inEqSimp/nonLinInEqExample1.key (key/O/d/32_nonLinInEq 1.1 644))
+  (examples/inEqSimp/nonLinInEqExample3.key (key/O/d/34_nonLinInEq 1.3 644))
+  (examples/inEqSimp/nonLinInEqExample2.key (key/O/d/35_nonLinInEq 1.4 644))
+  (system/de/uka/ilkd/key/strategy/termProjection/DivideMonomialsProjection.java (key/O/d/36_DivideMono 1.2 644))
+  (examples/inEqSimp/nonLinInEqExample4.key (key/O/d/37_nonLinInEq 1.3 644))
+  (system/de/uka/ilkd/key/strategy/feature/instantiator/OneOfCP.java (key/O/d/47_OneOfCP.ja 1.1 644))
+  (system/de/uka/ilkd/key/strategy/termProjection/TermConstructionProjection.java (key/O/d/48_TermConstr 1.2 644))
+  (system/de/uka/ilkd/key/strategy/feature/TopLevelFindFeature.java (key/O/d/49_FindInAnte 1.4 644))
+  
+  (examples/inEqSimp/subsumptionExample.key (key/P/d/17_subsumptio 1.3 644))
+  (examples/inEqSimp/simplify5.key (key/P/d/18_simplify5. 1.3 644))
+  (system/de/uka/ilkd/key/strategy/termgenerator/RootsGenerator.java (key/P/d/19_RootsGener 1.2 644))
+  (examples/arith/overflow1_add.proof (key/P/d/23_overflow1_ 1.1 644))
+
+  
+  (system/de/uka/ilkd/key/proof/init/DefaultEnvInput.java (key/O/d/18_DefaultEnv 1.7 644))
+  (system/de/uka/ilkd/key/casetool/together/TogetherEnvInput.java (key/Q/d/23_TogetherEn 1.1 644))
+  (system/de/uka/ilkd/key/speclang/FormulaWithAxioms.java (key/C/d/11_FormulaWit 1.2 644))
+  (system/de/uka/ilkd/key/speclang/OperationContract.java (key/C/d/12_OperationC 1.2.1.2 644))
+  (system/de/uka/ilkd/key/speclang/AbstractOperationContract.java (key/C/d/15_AbstractOp 1.1 644))
+  (system/de/uka/ilkd/key/speclang/AbstractClassInvariant.java (key/C/d/16_AbstractCl 1.1 644))
+  (system/de/uka/ilkd/key/speclang/DLOperationContract.java (key/C/d/17_DLOperatio 1.2.1.1 644))
+  (system/de/uka/ilkd/key/speclang/jml/JMLOperationContract.java (key/C/d/18_JMLOperati 1.2 644))
+  (system/de/uka/ilkd/key/speclang/jml/JMLClassInvariant.java (key/C/d/20_JMLInstanc 1.4 644))
+  (system/de/uka/ilkd/key/speclang/jml/JMLTranslator.java (key/C/d/21_JMLTransla 1.2 644))
+  (system/de/uka/ilkd/key/speclang/ocl/OCLOperationContract.java (key/C/d/22_OCLOperati 1.2.1.2 644))
+  (system/de/uka/ilkd/key/speclang/ocl/OCLClassInvariant.java (key/C/d/23_OCLClassIn 1.4.1.2 644))
+  (system/de/uka/ilkd/key/speclang/ocl/OCLTranslator.java (key/C/d/24_OCLTransla 1.6.1.2 644))
+
+  (system/de/uka/ilkd/key/util/keydoc/html/KeYDoc.java (key/D/d/8_Keydoc.jav 1.9.1.3 644))
+  (system/de/uka/ilkd/key/util/keydoc/html/KeYToHTMLBuilder.java (key/D/d/9_KeyToHTMLB 1.3 644))
+  (system/de/uka/ilkd/key/util/keydoc/html/HTMLFile.java (key/D/d/10_HTMLFile.j 1.3 644))
+  (system/de/uka/ilkd/key/util/keydoc/html/Director.java (key/D/d/11_Director.j 1.17.1.2.1.1 644))
+  (system/de/uka/ilkd/key/util/keydoc/html/BoxedFile.java (key/D/d/12_BoxedFile. 1.6 644))
+  (system/de/uka/ilkd/key/util/keydoc/html/KDFilenameFilter.java (key/Q/d/5_KDFilename 1.3.1.1 644))
+  (system/de/uka/ilkd/key/util/keydoc/html/KDKeYToHTMLBuilder.java (key/Q/d/6_KDKeyToHTM 1.3 644))
+  (system/de/uka/ilkd/key/util/keydoc/parser/KeYDocLexer.g (key/Q/d/8_KeyDocLexe 1.3 644))
+  (system/de/uka/ilkd/key/util/keydoc/parser/KeYDocParser.g (key/Q/d/9_KeyDocPars 1.4 644))
+  (system/de/uka/ilkd/key/util/keydoc/parser/KeYDocTreeWalker.g (key/Q/d/10_KeyDocTree 1.4 644))
+  (bin/runKeYDoc (key/Q/d/11_runKeYDoc 1.3 755))
+;; Files added by populate at Wed, 04 Apr 2007 11:35:35 +0200,
+;; to version baumVisualDebugger.5(w), by baum:
+  
+  (system/resources/de/uka/ilkd/key/proof/rules/standardRules-debugger.key (key/a/e/46_standardRu 1.2 644))
+  (system/de/uka/ilkd/key/strategy/feature/InUpdateFeature.java (key/a/e/47_InUpdateFe 1.4 644))
+  (system/de/uka/ilkd/key/visualdebugger/DebuggerListener.java (key/a/e/48_DebuggerLi 1.1.1.1 644))
+  (system/de/uka/ilkd/key/visualdebugger/SymbolicArrayObject.java (key/a/e/49_SymbolicAr 1.2.1.2 644))
+  (system/de/uka/ilkd/key/visualdebugger/DebuggerEvent.java (key/a/e/50_DebuggerEv 1.2.1.1 644))
+  (eclipse/VisualDebugger/src/visualdebugger/draw2d/LeafNode.java (key/a/e/51_LeafNode.j 1.1.1.1 644))
+  (eclipse/VisualDebugger/src/visualdebugger/draw2d/ArrayObjectFigure.java (key/b/e/0_ArrayObjec 1.2.1.2 644))
+  (eclipse/VisualDebugger/src/visualdebugger/draw2d/MethodReturnFigure.java (key/b/e/1_MethodRetu 1.1.1.1 644))
+  (eclipse/VisualDebugger/src/visualdebugger/draw2d/FixedConnectionAnchor.java (key/b/e/2_FixedConne 1.1 644))
+  (eclipse/VisualDebugger/src/visualdebugger/draw2d/BCLabel.java (key/b/e/3_BCLabel.ja 1.1 644))
+  (eclipse/VisualDebugger/src/visualdebugger/draw2d/ObjectFigure.java (key/b/e/4_ObjectFigu 1.2.1.1 644))
+  (eclipse/VisualDebugger/src/visualdebugger/views/FindStatementById.java (key/b/e/5_FindStatem 1.2.1.3 644))
 
 
+  (system/de/uka/ilkd/key/proof/decproc/translation/TranslationVisitor.java (key/T/d/46_Translatio 1.1 644))
+  (system/de/uka/ilkd/key/proof/decproc/smtlib/QuantifierFormula.java (key/O/d/46_Quantifier 1.2 644))
+  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateLogicVariable.java (key/P/d/9_TranslateL 1.3 644))
+  (system/de/uka/ilkd/key/proof/decproc/translation/CreateTypePred.java (key/T/d/22_CreateType 1.3 644))
+  (examples/smtlib/Quant_all-ex_ex-all_unclosed.key.proof (key/P/d/29_Quant_all- 1.2 644))
+  (examples/smtlib/Quant_all_ex.key.proof (key/P/d/30_Quant_all_ 1.1 644))
+  (examples/smtlib/Quant_all_or.key.proof (key/P/d/31_Quant_all_ 1.1 644))
+  (examples/smtlib/Quant_all_or_unclosed.key.proof (key/P/d/32_Quant_all_ 1.1 644))
+  (examples/smtlib/Quant_ex-all_all-ex.key.proof (key/P/d/33_Quant_ex-a 1.2 644))
+  (examples/smtlib/Quant_ex_all_unclosed.key.proof (key/P/d/34_Quant_ex_a 1.1 644))
+  (examples/smtlib/TypePred_ex_int_A_unclosed.key (key/U/d/6_TypePred_e 1.1 644))
+  (examples/smtlib/TypePred_exists_A_AAA_unclosed.key (key/U/d/7_TypePred_e 1.1 644))
+  (examples/smtlib/TypePred_forall_AA_A_unclosed.key (key/U/d/8_TypePred_f 1.1 644))
+  (examples/smtlib/TypePred_forall_AB_AAA_unclosed.key (key/U/d/9_TypePred_f 1.1 644))
+  (examples/smtlib/TypePred_forall_B_A_unclosed.key (key/U/d/10_TypePred_f 1.1 644))
+  (examples/smtlib/TypePred_forall_A_AB&AAAA.key (key/U/d/11_TypePred_f 1.1 644))
+  (examples/smtlib/classes/A.java (key/U/d/12_A.java 1.1 644))
+  (examples/smtlib/classes/AA.java (key/U/d/13_AA.java 1.1 644))
+  (examples/smtlib/classes/AAA.java (key/U/d/14_AAA.java 1.1 644))
+  (examples/smtlib/classes/AAAA.java (key/U/d/15_AAAA.java 1.1 644))
+  (examples/smtlib/classes/AB.java (key/U/d/16_AB.java 1.1 644))
+  (examples/smtlib/classes/B.java (key/U/d/17_B.java 1.1 644))
+  
+  (examples/java_dl/arrayUpdateSimp.key (key/T/d/24_arrayUpdat 1.1 644))
+  (examples/pred_log/unprovable_onlyOneInteger.key (key/T/d/47_unprovable 1.1 644))
+  (system/de/uka/ilkd/key/speclang/SLTranslationError.java (key/T/d/12_SLTranslat 1.2.1.1 644))
+  (system/de/uka/ilkd/key/parser/ocl/OCLTranslationError.java (key/T/d/13_OCLTransla 1.2.1.1 644))
+  (system/de/uka/ilkd/key/proof/init/ComputeSpecificationPONew.java (key/T/d/27_ComputeSpe 1.1.2.1.2.1 644))
+  (system/de/uka/ilkd/key/logic/op/ProgramConstant.java (key/X/d/13_ProgramCon 1.2 644))
+  (system/de/uka/ilkd/key/logic/op/LocationVariable.java (key/X/d/14_LocationVa 1.2 644))
+  (system/de/uka/ilkd/key/java/TestJavaCardDLJavaExtensions.java (key/X/d/18_TestJavaCa 1.2 644))
+  (examples/_testcase/javacardDLExtensions/typeResolutionInMethodFrame2.key (key/X/d/19_typeResolu 1.1 644))
+  (examples/_testcase/javacardDLExtensions/typeResolutionInMethodFrame.key (key/X/d/20_typeResolu 1.1 644))
+  (examples/_testcase/javacardDLExtensions/src/test/TestJavaCardDLExtensions.java (key/X/d/21_TestJavaCa 1.1 644))
+  (eclipse/KeYFeature/build-3.2.1.xml (key/Y/d/10_build-3.2. 1.1.1.1 644))
+  (eclipse/ProofVisualization/build-3.2.1.xml (key/Y/d/11_build-3.2. 1.1 644))
+  (eclipse/KeYPlugin/build-3.2.1.xml (key/Y/d/12_build-3.2. 1.3 644))
+  (examples/_testcase/README (key/Y/d/26_README 1.1 600))
+  (system/resources/de/uka/ilkd/key/proof/rules/standardRules-junit.key (key/Y/d/40_standardRu 1.2 644))
+  (system/de/uka/ilkd/key/proof/init/JUnitTestProfile.java (key/Y/d/41_JUnitTestP 1.1 644))
+  (system/de/uka/ilkd/key/rule/conditions/NewJumpLabelCondition.java (key/Y/d/50_NewJumpLab 1.1 644))
+  (system/de/uka/ilkd/key/java/recoderext/JumpLabelSVWrapper.java (key/Y/d/51_JumpLabelS 1.1 644))
+  (system/de/uka/ilkd/key/java/visitor/LabelCollector.java (key/Z/d/0_LabelColle 1.2 644))
+  (system/de/uka/ilkd/key/rule/metaconstruct/MetaAttribute.java (key/Z/d/26_MetaAttrib 1.2 644))
 
-;;add by quantifier heurisitcs
-
-  (system/de/uka/ilkd/key/strategy/termfeature/ClosedExpressionTermFeature.java (key/O/d/9_ClosedExpr 1.3 644)) 
+  (system/de/uka/ilkd/key/strategy/termfeature/ClosedExpressionTermFeature.java (key/O/d/9_ClosedExpr 1.3 644))
   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/HeuristicInstantiation.java (key/O/d/14_HeuristicI 1.16 644))
-
-
-;; Files added by populate at Thu, 21 Sep 2006 17:17:39 +0200,
-;; to version quantifierHeuristics.10(w), by ruemmer1:
-
   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/TriggerUtils.java (key/O/d/15_TriggerUti 1.7 644))
   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/Trigger.java (key/O/d/16_Trigger.ja 1.5.1.3 644))
   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/Substitution.java (key/O/d/17_Substituti 1.5.1.5 644))
-
-;; Files added by populate at Tue, 26 Sep 2006 16:01:39 +0200,
-;; to version quantifierHeuristics.12(w), by ruemmer1:
-
-
-;; Files added by populate at Wed, 04 Oct 2006 13:16:55 +0200,
-;; to version quantifierHeuristics.13(w), by kaprcs:
-
-
-;; Files added by populate at Thu, 05 Oct 2006 19:07:27 +0200,
-;; to version quantifierHeuristics.14(w), by ruemmer1:
-
   (system/de/uka/ilkd/key/strategy/feature/OnlyInScopeOfQuantifiersFeature.java (key/P/d/13_OnlyInScop 1.2 644))
   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/ExistentiallyConnectedFormulasFeature.java (key/P/d/14_Existentia 1.6 644))
-
-;; Files added by populate at Thu, 05 Oct 2006 19:07:34 +0200,
-;; to version quantifierHeuristics.14(w), by ruemmer1:
-
   (system/de/uka/ilkd/key/strategy/termProjection/FocusFormulaProjection.java (key/P/d/15_FocusFormu 1.1 644))
-
-;; Files added by populate at Thu, 05 Oct 2006 19:07:41 +0200,
-;; to version quantifierHeuristics.14(w), by ruemmer1:
-
   (system/de/uka/ilkd/key/strategy/termfeature/AtomTermFeature.java (key/P/d/16_AtomTermFe 1.5 644))
-
-;; Files added by populate at Wed, 11 Oct 2006 23:09:22 +0200,
-;; to version quantifierHeuristics.15(w), by kaprcs:
-
-
   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/RecAndExistentiallyConnectedClausesFeature.java (key/P/d/26_RecAndExis 1.5 644))
-
-
   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/InstantiationCost.java (key/A/d/13_Instantiat 1.9 644))
-
-;; Files added by populate at Mon, 20 Nov 2006 16:07:35 +0100,
-;; to version quantifierHeuristics.22(w), by kaprcs:
-
   (examples/dev/quantifierHeuristics/proved/unify.key (key/R/d/31_unify.key 1.1 644))
   (examples/dev/quantifierHeuristics/proved/test.key (key/R/d/32_test.key 1.1 644))
   (examples/dev/quantifierHeuristics/proved/simpleForall.key (key/R/d/33_simpleFora 1.1 644))
@@ -4139,16 +4357,9 @@
   (examples/dev/quantifierHeuristics/testCNF/not_andANDleft_or_and.key (key/S/d/16_not_andAND 1.1 644))
   (examples/dev/quantifierHeuristics/testCNF/not_forallANDnot_exists.key (key/S/d/17_not_forall 1.1 644))
   (examples/dev/quantifierHeuristics/testCNF/not_orANDright_or_and.key (key/S/d/18_not_orANDr 1.1 644))
-
-
-
-   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/Instantiation.java (key/S/d/22_Instantiat 1.2.1.12 644))
+  (system/de/uka/ilkd/key/strategy/quantifierHeuristics/Instantiation.java (key/S/d/22_Instantiat 1.2.1.12 644))
   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/HandleArith.java (key/S/d/23_HandleArit 1.5 644))
   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/ClausesGraph.java (key/S/d/24_ClausesGra 1.2.1.7 644))
-
-;; Files added by populate at Mon, 20 Nov 2006 18:59:38 +0100,
-;; to version quantifierHeuristics.23(w), by kaprcs:
-
   (examples/dev/quantifierHeuristics/presentation/unify.key (key/S/d/26_unify.key 1.1 644))
   (examples/dev/quantifierHeuristics/presentation/match1.key (key/S/d/27_match1.key 1.1 644))
   (examples/dev/quantifierHeuristics/presentation/tptp/PUZ001p1-eq.key.proof (key/S/d/28_PUZ001p1-e 1.1 644))
@@ -4161,202 +4372,16 @@
   (examples/dev/quantifierHeuristics/presentation/present/present2.key (key/S/d/35_present2.k 1.1 644))
   (examples/dev/quantifierHeuristics/presentation/present/present1.key (key/S/d/36_present1.k 1.1 644))
   (examples/dev/quantifierHeuristics/presentation/present/present.key (key/S/d/37_present.ke 1.1 644))
-
-
-;; Files added by populate at Thu, 23 Nov 2006 21:37:05 +0100,
-;; to version quantifierHeuristics.24(w), by kaprcs:
   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/UniTrigger.java (key/T/d/4_UniTrigger 1.6 644))
   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/TriggersSet.java (key/T/d/5_TriggersSe 1.11 644))
   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/MultiTrigger.java (key/T/d/6_MultiTrigg 1.3 644))
-
-;; Files added by populate at Sat, 25 Nov 2006 23:44:46 +0100,
-;; to version quantifierHeuristics.25(w), by kaprcs:
-
   (examples/dev/quantifierHeuristics/problem/testjint.key (key/T/d/8_testjint.k 1.1 644))
-
-;; Files added by populate at Sun, 26 Nov 2006 18:17:41 +0100,
-;; to version quantifierHeuristics.26(w), by kaprcs:
   (examples/dev/quantifierHeuristics/problem/arith5.key (key/T/d/11_arith5.key 1.1 644))
-
-
-;; Files added by populate at Sat, 30 Dec 2006 01:18:40 +0100,
-;; to version quantifierHeuristics.29(w), by kaprcs:
-
   (examples/dev/quantifierHeuristics/presentation/present2.key (key/U/d/18_present2.k 1.1 644))
   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/ReplacerOfQuanVariablesWithMetavariables.java (key/U/d/19_UnifierOfQ 1.4 644))
   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/TestTriggersSet.java (key/U/d/20_TestTrigge 1.2 644))
   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/PredictCostProver.java (key/U/d/21_PredictCos 1.8 644))
   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/Matching.java (key/U/d/22_Matching.j 1.5 644))
-
-
-  (system/de/uka/ilkd/key/proof/decproc/translation/TermTranslationVisitor.java (key/i/d/25_TermTransl 1.2.1.7 644))
-  (system/de/uka/ilkd/key/proof/decproc/translation/TranslationVisitor.java (key/T/d/46_Translatio 1.1 644))
-  (system/de/uka/ilkd/key/proof/decproc/translation/IOperatorTranslation.java (key/i/d/26_IOperatorT 1.4 644))
-  (system/de/uka/ilkd/key/proof/decproc/smtlib/Benchmark.java (key/i/d/33_Benchmark. 1.2.1.10 644))
-  (system/de/uka/ilkd/key/proof/decproc/smtlib/Term.java (key/i/d/36_Term.java 1.2.1.3.2.8 644))
-  (system/de/uka/ilkd/key/proof/decproc/smtlib/Formula.java (key/i/d/37_Formula.ja 1.2.1.2.2.6 644))
-  (system/de/uka/ilkd/key/logic/op/DecisionProcedureSmtAufliaOp.java (key/i/d/48_DecisionPr 1.4 644))
-  (system/de/uka/ilkd/key/proof/decproc/SmtAufliaTranslation.java (key/i/d/49_SmtAufliaT 1.1.2.9.1.1 644))
-  (system/de/uka/ilkd/key/proof/decproc/smtlib/TermVariable.java (key/k/d/19_TermVariab 1.2.2.7 644))
-  (system/de/uka/ilkd/key/proof/decproc/smtlib/NumberConstantTerm.java (key/k/d/20_NumberCons 1.1.2.6 644))
-  (system/de/uka/ilkd/key/proof/decproc/smtlib/InterpretedFuncTerm.java (key/k/d/21_Interprete 1.1.2.5 644))
-  (system/de/uka/ilkd/key/proof/decproc/smtlib/UninterpretedFuncTerm.java (key/k/d/22_Uninterpre 1.2.2.5 644))
-  (system/de/uka/ilkd/key/proof/decproc/smtlib/IteTerm.java (key/k/d/23_IteTerm.ja 1.1.2.5 644))
-  (system/de/uka/ilkd/key/proof/decproc/smtlib/TruthValueFormula.java (key/l/d/19_TruthValue 1.1.2.6 644))
-  (system/de/uka/ilkd/key/proof/decproc/smtlib/FormulaVariable.java (key/l/d/20_FormulaVar 1.1.2.6 644))
-  (system/de/uka/ilkd/key/proof/decproc/smtlib/PredicateFormula.java (key/l/d/21_PredicateF 1.1.2.6 644))
-  (system/de/uka/ilkd/key/proof/decproc/smtlib/UninterpretedPredFormula.java (key/l/d/22_Uninterpre 1.1.2.6 644))
-  (system/de/uka/ilkd/key/proof/decproc/smtlib/ConnectiveFormula.java (key/l/d/23_Connective 1.1.2.5 644))
-  (system/de/uka/ilkd/key/proof/decproc/smtlib/LetFormula.java (key/l/d/24_LetFormula 1.1.2.6 644))
-  (system/de/uka/ilkd/key/proof/decproc/smtlib/FletFormula.java (key/l/d/25_FletFormul 1.1.2.6 644))
-  (system/de/uka/ilkd/key/proof/decproc/smtlib/QuantifierFormula.java (key/O/d/46_Quantifier 1.2 644))
-  (system/de/uka/ilkd/key/proof/decproc/smtlib/Signature.java (key/m/d/46_Signature. 1.5 644))
-  (system/de/uka/ilkd/key/proof/decproc/DecisionProcedureSmtAuflia.java (key/p/d/10_DecisionPr 1.9.1.2.2.1 644))
-  (system/de/uka/ilkd/key/proof/decproc/TypeBoundTranslation.java (key/s/d/46_TypeBoundT 1.1 644))
-  (system/de/uka/ilkd/key/proof/decproc/translation/PreTranslationVisitor.java (key/p/d/11_PreTransla 1.6 644))
-  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateArrayOp.java (key/s/d/47_TranslateA 1.5 644))
-  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateAttributeOp.java (key/p/d/12_TranslateA 1.6 644))
-  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateEquality.java (key/p/d/13_TranslateE 1.4 644))
-  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateFunction.java (key/p/d/14_TranslateF 1.5 644))
-  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateIfThenElse.java (key/p/d/15_TranslateI 1.3 644))
-  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateIUpdateOperator.java (key/p/d/16_TranslateI 1.2 644))
-  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateJunctor.java (key/p/d/17_TranslateJ 1.3 644))
-  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateModality.java (key/p/d/18_TranslateM 1.2 644))
-  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateMetavariable.java (key/p/d/19_TranslateM 1.2 644))
-  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateProgramMethod.java (key/p/d/20_TranslateP 1.2 644))
-  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateProgramVariable.java (key/p/d/21_TranslateP 1.5 644))
-  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateQuantifier.java (key/p/d/22_TranslateQ 1.5 644))
-  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateLogicVariable.java (key/P/d/9_TranslateL 1.3 644))
-  (system/de/uka/ilkd/key/proof/decproc/translation/TranslateUnknownOp.java (key/s/d/48_TranslateU 1.1 644))
-  (system/de/uka/ilkd/key/proof/decproc/translation/CreateTypePred.java (key/T/d/22_CreateType 1.3 644))
-  (system/de/uka/ilkd/key/rule/CVCLiteIntegerRule.java (key/x/d/1_CVCLiteInt 1.2 644))
-  (system/de/uka/ilkd/key/proof/decproc/DecisionProcedureCVCLite.java (key/x/d/2_DecisionPr 1.3 644))
-  (system/de/uka/ilkd/key/rule/SVCIntegerRule.java (key/x/d/36_SVCInteger 1.2 644))
-  (system/de/uka/ilkd/key/proof/decproc/DecisionProcedureSVC.java (key/x/d/37_DecisionPr 1.1 644))
-  (system/de/uka/ilkd/key/rule/SmtTranslationIntegerRule.java (key/C/d/9_SmtTransla 1.2 700))
-  (system/de/uka/ilkd/key/proof/decproc/DecisionProcedureDummyTranslation.java (key/C/d/10_DecisionPr 1.1 644))
-  (system/de/uka/ilkd/key/rule/YicesIntegerRule.java (key/N/d/49_YicesInteg 1.1 755))
-  (system/de/uka/ilkd/key/proof/decproc/DecisionProcedureYices.java (key/N/d/50_DecisionPr 1.1.1.1 644))
-  (examples/smtlib/Func_imp_add_overflow.key.proof (key/z/d/21_Func_imp_a 1.3 644))
-  (examples/smtlib/Func_imp_dist.key.proof (key/z/d/23_Func_imp_d 1.1 644))
-  (examples/smtlib/Func_imp_dist2_unclosed.key.proof (key/z/d/24_Func_imp_d 1.1 644))
-  (examples/smtlib/imp_true_true.key.proof (key/z/d/25_imp_true_t 1.1 644))
-  (examples/smtlib/imp_false_true.key.proof (key/z/d/26_imp_false_ 1.1 644))
-  (examples/smtlib/imp_false_false.key.proof (key/z/d/27_imp_false_ 1.1 644))
-  (examples/smtlib/imp_true_false_unclosed.key.proof (key/z/d/28_imp_true_f 1.1 644))
-  (examples/smtlib/Pred-imp_and.key.proof (key/z/d/29_Pred-imp_a 1.1 644))
-  (examples/smtlib/Pred-imp_dist.key.proof (key/z/d/30_Pred-imp_d 1.1 644))
-  (examples/smtlib/Pred-imp_dist2.key.proof (key/z/d/31_Pred-imp_d 1.1 644))
-  (examples/smtlib/Pred-imp_or.key.proof (key/z/d/32_Pred-imp_o 1.1 644))
-  (examples/smtlib/Quant_all-ex_ex-all_unclosed.key.proof (key/P/d/29_Quant_all- 1.2 644))
-  (examples/smtlib/Quant_all_ex.key.proof (key/P/d/30_Quant_all_ 1.1 644))
-  (examples/smtlib/Quant_all_or.key.proof (key/P/d/31_Quant_all_ 1.1 644))
-  (examples/smtlib/Quant_all_or_unclosed.key.proof (key/P/d/32_Quant_all_ 1.1 644))
-  (examples/smtlib/Quant_ex-all_all-ex.key.proof (key/P/d/33_Quant_ex-a 1.2 644))
-  (examples/smtlib/Quant_ex_all_unclosed.key.proof (key/P/d/34_Quant_ex_a 1.1 644))
-  (examples/smtlib/TypePred_ex_int_A_unclosed.key (key/U/d/6_TypePred_e 1.1 644))
-  (examples/smtlib/TypePred_exists_A_AAA_unclosed.key (key/U/d/7_TypePred_e 1.1 644))
-  (examples/smtlib/TypePred_forall_AA_A_unclosed.key (key/U/d/8_TypePred_f 1.1 644))
-  (examples/smtlib/TypePred_forall_AB_AAA_unclosed.key (key/U/d/9_TypePred_f 1.1 644))
-  (examples/smtlib/TypePred_forall_B_A_unclosed.key (key/U/d/10_TypePred_f 1.1 644))
-  (examples/smtlib/TypePred_forall_A_AB&AAAA.key (key/U/d/11_TypePred_f 1.1 644))
-  (examples/smtlib/classes/A.java (key/U/d/12_A.java 1.1 644))
-  (examples/smtlib/classes/AA.java (key/U/d/13_AA.java 1.1 644))
-  (examples/smtlib/classes/AAA.java (key/U/d/14_AAA.java 1.1 644))
-  (examples/smtlib/classes/AAAA.java (key/U/d/15_AAAA.java 1.1 644))
-  (examples/smtlib/classes/AB.java (key/U/d/16_AB.java 1.1 644))
-  (examples/smtlib/classes/B.java (key/U/d/17_B.java 1.1 644))
-  (system/resources/de/uka/ilkd/key/proof/rules/standardRules-FOL.key (key/A/d/37_standardRu 1.3 644))
-  (system/resources/de/uka/ilkd/key/proof/rules/standardRules-testGen.key (key/A/d/38_standardRu 1.3 644))
-  (system/de/uka/ilkd/key/unittest/UseMethodContractRuleForTestGen.java (key/A/d/39_UseMethodC 1.1 644))
-  (system/de/uka/ilkd/key/proof/init/AbstractProfile.java (key/A/d/40_AbstractPr 1.10 644))
-  (system/de/uka/ilkd/key/proof/init/PureFOLProfile.java (key/A/d/41_PureFOLPro 1.3 644))
-  (system/de/uka/ilkd/key/proof/init/JavaTestGenerationProfile.java (key/A/d/42_JavaTestGe 1.5 644))
-  (system/de/uka/ilkd/key/proof/init/JavaProfile.java (key/A/d/43_JavaProfil 1.3.1.3.3.1 644))
-  (system/de/uka/ilkd/key/proof/init/Profile.java (key/A/d/44_Profile.ja 1.10 644))
-  (system/de/uka/ilkd/key/proof/init/RuleCollection.java (key/A/d/47_RuleCollec 1.2 644))
-  (system/de/uka/ilkd/key/proof/init/AbstractExecDecproc.java (key/N/d/28_AbstractEx 1.1 644))
-  (system/de/uka/ilkd/key/proof/init/ConcreteExecDecproc.java (key/N/d/29_ConcreteEx 1.3 644))
-  (system/de/uka/ilkd/key/proof/init/ExecSVC.java (key/N/d/30_ExecSVC.ja 1.1 644))
-  (system/de/uka/ilkd/key/proof/BalancedGoalChooserBuilder.java (key/B/d/17_BalancedGo 1.2 644))
-  (system/de/uka/ilkd/key/proof/BalancedLoopGC.java (key/B/d/18_BalancedLo 1.4 644))
-  (system/de/uka/ilkd/key/proof/DefaultGoalChooserBuilder.java (key/B/d/19_DefaultGoa 1.3 644))
-  (system/de/uka/ilkd/key/proof/GoalChooserBuilder.java (key/B/d/20_GoalChoose 1.2 644))
-  (system/de/uka/ilkd/key/proof/IGoalChooser.java (key/B/d/21_IGoalChoos 1.1 644))
-  (examples/java_dl/DLContractChooser/example.key (key/B/d/31_example.ke 1.3 644))
-  (examples/java_dl/DLContractChooser/code/MyClass.java (key/B/d/32_MyClass.ja 1.1 644))
-  (examples/java_dl/list_reversal/reversal.proof (key/D/d/1_reversal.p 1.1 644))
-  (examples/java_dl/list_reversal/reversal.key (key/D/d/2_reversal.k 1.2 644))
-  (examples/java_dl/list_reversal/src/list.java (key/D/d/3_list.java 1.1 644))
-  (examples/java_dl/jc_transactions/bookex2.key (key/N/d/35_bookex2.ke 1.2 644))
-  (examples/java_dl/jc_transactions/bookex1.key (key/N/d/36_bookex1.ke 1.2 644))
-  (system/de/uka/ilkd/key/gui/IncrementalSearch.java (key/N/d/51_Incrementa 1.2 644))
-  (examples/inEqSimp/nonLinInEqExample0.key (key/O/d/0_nonLinInEq 1.3 644))
-  (system/de/uka/ilkd/key/strategy/termgenerator/SequentFormulasGenerator.java (key/O/d/2_SequentFor 1.3 644))
-  (system/de/uka/ilkd/key/strategy/feature/ComprehendedSumFeature.java (key/O/d/3_Comprehend 1.2 644))
-  
-  (system/de/uka/ilkd/key/strategy/termProjection/SubtermProjection.java (key/O/d/5_SubtermPro 1.2 644))
-  (examples/inEqSimp/quadraticInEq3.key (key/O/d/19_quadraticI 1.3 644))
-  (examples/inEqSimp/division.key (key/O/d/20_division.k 1.4 644))
-  (system/de/uka/ilkd/key/strategy/termgenerator/SubtermGenerator.java (key/O/d/21_SubtermGen 1.6 644))
-  (system/de/uka/ilkd/key/strategy/termfeature/EqTermFeature.java (key/O/d/22_EqTermFeat 1.2 644))
-  (examples/inEqSimp/quadraticInEq4.key (key/O/d/26_quadraticI 1.3 644))
-  (system/de/uka/ilkd/key/strategy/feature/TermSmallerThanFeature.java (key/O/d/27_TermSmalle 1.3 644))
-  (system/de/uka/ilkd/key/strategy/feature/FindRightishFeature.java (key/O/d/28_FindRighti 1.3 644))
-  (system/de/uka/ilkd/key/strategy/termProjection/AssumptionProjection.java (key/O/d/30_Assumption 1.2 644))
-  (system/de/uka/ilkd/key/strategy/termfeature/SortExtendsTransTermFeature.java (key/O/d/31_SortExtend 1.2 644))
-  (examples/inEqSimp/nonLinInEqExample1.key (key/O/d/32_nonLinInEq 1.1 644))
-  (examples/inEqSimp/nonLinInEqExample3.key (key/O/d/34_nonLinInEq 1.3 644))
-  (examples/inEqSimp/nonLinInEqExample2.key (key/O/d/35_nonLinInEq 1.4 644))
-  (system/de/uka/ilkd/key/strategy/termProjection/DivideMonomialsProjection.java (key/O/d/36_DivideMono 1.2 644))
-  (examples/inEqSimp/nonLinInEqExample4.key (key/O/d/37_nonLinInEq 1.3 644))
-  (system/de/uka/ilkd/key/strategy/feature/instantiator/OneOfCP.java (key/O/d/47_OneOfCP.ja 1.1 644))
-  (system/de/uka/ilkd/key/strategy/termProjection/TermConstructionProjection.java (key/O/d/48_TermConstr 1.2 644))
-  (system/de/uka/ilkd/key/strategy/feature/TopLevelFindFeature.java (key/O/d/49_FindInAnte 1.4 644))
-  
-  (examples/inEqSimp/subsumptionExample.key (key/P/d/17_subsumptio 1.3 644))
-  (examples/inEqSimp/simplify5.key (key/P/d/18_simplify5. 1.3 644))
-  (system/de/uka/ilkd/key/strategy/termgenerator/RootsGenerator.java (key/P/d/19_RootsGener 1.2 644))
-  (examples/arith/overflow1_add.proof (key/P/d/23_overflow1_ 1.1 644))
-  
-  (system/de/uka/ilkd/key/proof/init/DefaultEnvInput.java (key/O/d/18_DefaultEnv 1.7 644))
-  (system/de/uka/ilkd/key/casetool/together/TogetherEnvInput.java (key/Q/d/23_TogetherEn 1.1 644))
-  (system/de/uka/ilkd/key/speclang/FormulaWithAxioms.java (key/C/d/11_FormulaWit 1.2 644))
-  (system/de/uka/ilkd/key/speclang/OperationContract.java (key/C/d/12_OperationC 1.2.1.2 644))
-  (system/de/uka/ilkd/key/speclang/AbstractOperationContract.java (key/C/d/15_AbstractOp 1.1 644))
-  (system/de/uka/ilkd/key/speclang/AbstractClassInvariant.java (key/C/d/16_AbstractCl 1.1 644))
-  (system/de/uka/ilkd/key/speclang/DLOperationContract.java (key/C/d/17_DLOperatio 1.2.1.1 644))
-  (system/de/uka/ilkd/key/speclang/jml/JMLOperationContract.java (key/C/d/18_JMLOperati 1.2 644))
-  (system/de/uka/ilkd/key/speclang/jml/JMLClassInvariant.java (key/C/d/20_JMLInstanc 1.4 644))
-  (system/de/uka/ilkd/key/speclang/jml/JMLTranslator.java (key/C/d/21_JMLTransla 1.2 644))
-  (system/de/uka/ilkd/key/speclang/ocl/OCLOperationContract.java (key/C/d/22_OCLOperati 1.2.1.2 644))
-  (system/de/uka/ilkd/key/speclang/ocl/OCLClassInvariant.java (key/C/d/23_OCLClassIn 1.4.1.2 644))
-  (system/de/uka/ilkd/key/speclang/ocl/OCLTranslator.java (key/C/d/24_OCLTransla 1.6.1.2 644))
-  (system/de/uka/ilkd/key/util/keydoc/html/KeYDoc.java (key/D/d/8_Keydoc.jav 1.9.1.3 644))
-  (system/de/uka/ilkd/key/util/keydoc/html/KeYToHTMLBuilder.java (key/D/d/9_KeyToHTMLB 1.3 644))
-  (system/de/uka/ilkd/key/util/keydoc/html/HTMLFile.java (key/D/d/10_HTMLFile.j 1.3 644))
-  (system/de/uka/ilkd/key/util/keydoc/html/Director.java (key/D/d/11_Director.j 1.17.1.2.1.1 644))
-  (system/de/uka/ilkd/key/util/keydoc/html/BoxedFile.java (key/D/d/12_BoxedFile. 1.6 644))
-  (system/de/uka/ilkd/key/util/keydoc/html/KDFilenameFilter.java (key/Q/d/5_KDFilename 1.3.1.1 644))
-  (system/de/uka/ilkd/key/util/keydoc/html/KDKeYToHTMLBuilder.java (key/Q/d/6_KDKeyToHTM 1.3 644))
-  (system/de/uka/ilkd/key/util/keydoc/parser/KeYDocLexer.g (key/Q/d/8_KeyDocLexe 1.3 644))
-  (system/de/uka/ilkd/key/util/keydoc/parser/KeYDocParser.g (key/Q/d/9_KeyDocPars 1.4 644))
-  (system/de/uka/ilkd/key/util/keydoc/parser/KeYDocTreeWalker.g (key/Q/d/10_KeyDocTree 1.4 644))
-  (bin/runKeYDoc (key/Q/d/11_runKeYDoc 1.3 755))
-  (examples/java_dl/arrayUpdateSimp.key (key/T/d/24_arrayUpdat 1.1 644))
-  (examples/pred_log/unprovable_onlyOneInteger.key (key/T/d/47_unprovable 1.1 644))
-  (system/de/uka/ilkd/key/speclang/SLTranslationError.java (key/T/d/12_SLTranslat 1.2.1.1 644))
-  (system/de/uka/ilkd/key/parser/ocl/OCLTranslationError.java (key/T/d/13_OCLTransla 1.2.1.1 644))
-  (system/de/uka/ilkd/key/proof/init/ComputeSpecificationPONew.java (key/T/d/27_ComputeSpe 1.1.2.1.2.1 644))
-  (system/de/uka/ilkd/key/logic/op/ProgramConstant.java (key/X/d/13_ProgramCon 1.2 644))
-  (system/de/uka/ilkd/key/logic/op/LocationVariable.java (key/X/d/14_LocationVa 1.2 644))
-  (system/de/uka/ilkd/key/java/TestJavaCardDLJavaExtensions.java (key/X/d/18_TestJavaCa 1.2 644))
-  (examples/_testcase/javacardDLExtensions/typeResolutionInMethodFrame2.key (key/X/d/19_typeResolu 1.1 644))
-  (examples/_testcase/javacardDLExtensions/typeResolutionInMethodFrame.key (key/X/d/20_typeResolu 1.1 644))
-  (examples/_testcase/javacardDLExtensions/src/test/TestJavaCardDLExtensions.java (key/X/d/21_TestJavaCa 1.1 644))
-;; Files added by populate at Wed, 31 Jan 2007 20:43:02 +0100,
-;; to version quantifierHeuristics.35(w), by ruemmer1:
-
   (examples/quantifiers/normalisation9.key (key/X/d/47_normalisat 1.4 644))
   (examples/quantifiers/normalisation8.key (key/X/d/48_normalisat 1.4 644))
   (examples/quantifiers/normalisation7.key (key/X/d/49_normalisat 1.4 644))
@@ -4368,89 +4393,20 @@
   (examples/quantifiers/normalisation1.key (key/Y/d/3_normalisat 1.4 644))
   (examples/quantifiers/normalisation10.key (key/Y/d/4_normalisat 1.5 644))
   (examples/quantifiers/normalisation0.key (key/Y/d/5_normalisat 1.4 644))
-
-;; Files added by populate at Wed, 31 Jan 2007 20:43:13 +0100,
-;; to version quantifierHeuristics.35(w), by ruemmer1:
-
   (system/resources/de/uka/ilkd/key/proof/rules/formulaNormalisationRules.key (key/Y/d/6_formulaNor 1.13.1.5 644))
-
-;; Files added by populate at Mon, 05 Feb 2007 00:50:41 +0100,
-;; to version quantifierHeuristics.38(w), by ruemmer1:
-
   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/LiteralsSmallerThanFeature.java (key/Y/d/13_LiteralsSm 1.4 644))
-
-;; Files added by populate at Mon, 05 Feb 2007 00:50:47 +0100,
-;; to version quantifierHeuristics.38(w), by ruemmer1:
-
   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/QuanEliminationAnalyser.java (key/Y/d/14_QuanElimin 1.2 644))
-
-;; Files added by populate at Mon, 05 Feb 2007 00:50:53 +0100,
-;; to version quantifierHeuristics.38(w), by ruemmer1:
-
   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/EliminableQuantifierTF.java (key/Y/d/15_Eliminable 1.3 644))
-
-;; Files added by populate at Wed, 07 Feb 2007 22:41:24 +0100,
-;; to version quantifierHeuristics.39(w), by ruemmer1:
-
   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/ClausesSmallerThanFeature.java (key/Y/d/20_ClausesSma 1.4 644))
-
-;; Files added by populate at Wed, 07 Feb 2007 22:41:48 +0100,
-;; to version quantifierHeuristics.39(w), by ruemmer1:
-
   (system/de/uka/ilkd/key/strategy/termgenerator/SuperTermGenerator.java (key/Y/d/21_SuperTermG 1.4 644))
-
-
-  (eclipse/KeYFeature/build-3.2.1.xml (key/Y/d/10_build-3.2. 1.1.1.1 644))
-  (eclipse/ProofVisualization/build-3.2.1.xml (key/Y/d/11_build-3.2. 1.1 644))
-  (eclipse/KeYPlugin/build-3.2.1.xml (key/Y/d/12_build-3.2. 1.3 644))
-  (examples/_testcase/README (key/Y/d/26_README 1.1 600))
-;; Files added by populate at Sun, 18 Feb 2007 18:08:51 +0100,
-;; to version quantifierHeuristics.40(w), by ruemmer1:
-
   (system/de/uka/ilkd/key/strategy/feature/FocusInAntecFeature.java (key/Z/d/5_FocusInAnt 1.2 644))
-
-;; Files added by populate at Sun, 18 Feb 2007 18:08:55 +0100,
-;; to version quantifierHeuristics.40(w), by ruemmer1:
-
   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/SplittableQuantifiedFormulaFeature.java (key/Z/d/6_Splittable 1.3 644))
-
-
-  (system/resources/de/uka/ilkd/key/proof/rules/standardRules-junit.key (key/Y/d/40_standardRu 1.2 644))
-  (system/de/uka/ilkd/key/proof/init/JUnitTestProfile.java (key/Y/d/41_JUnitTestP 1.1 644))
-  (system/de/uka/ilkd/key/rule/conditions/NewJumpLabelCondition.java (key/Y/d/50_NewJumpLab 1.1 644))
-  (system/de/uka/ilkd/key/java/recoderext/JumpLabelSVWrapper.java (key/Y/d/51_JumpLabelS 1.1 644))
-  (system/de/uka/ilkd/key/java/visitor/LabelCollector.java (key/Z/d/0_LabelColle 1.2 644))
-
-  (system/de/uka/ilkd/key/rule/metaconstruct/MetaAttribute.java (key/Z/d/26_MetaAttrib 1.2 644))
-;; Files added by populate at Tue, 13 Mar 2007 18:32:49 +0100,
-;; to version quantifierHeuristics.42(w), by ruemmer1:
-
   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/InstantiationCostScalerFeature.java (key/a/e/3_Instantiat 1.3 644))
-
-;; Files added by populate at Tue, 10 Apr 2007 19:58:22 +0200,
-;; to version quantifierHeuristics.49(w), by ruemmer1:
-
   (examples/quantifiers/elimination0.key (key/b/e/6_eliminatio 1.4 644))
-
-;; Files added by populate at Tue, 10 Apr 2007 19:59:25 +0200,
-;; to version quantifierHeuristics.49(w), by ruemmer1:
-
   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/TwoSidedMatching.java (key/b/e/8_TwoSidedMa 1.2 644))
   (system/de/uka/ilkd/key/strategy/quantifierHeuristics/BasicMatching.java (key/b/e/9_BasicMatch 1.1 644))
-
-;; Files added by populate at Wed, 11 Apr 2007 15:28:12 +0200,
-;; to version quantifierHeuristics.50(w), by ruemmer1:
-
   (examples/quantifiers/triggers0.key (key/b/e/17_triggers0. 1.4 644))
-
-;; Files added by populate at Tue, 17 Apr 2007 18:22:32 +0200,
-;; to version quantifierHeuristics.53(w), by ruemmer1:
-
   (system/de/uka/ilkd/key/strategy/feature/FocusHasConstraintFeature.java (key/b/e/31_FocusHasCo 1.2 644))
-
-;; Files added by populate at Sun, 13 May 2007 19:40:19 +0200,
-;; to version bubelIntegerRuleDesignChange.1(w), by bubel:
-
   (examples/integerSemantics/selectedAssignmentsNoOF.key (key/c/e/48_selectedAs 1.1 644))
   (examples/integerSemantics/selectedAssignmentsJavaSemanticsNoOF.key (key/c/e/49_selectedAs 1.1 644))
   (examples/integerSemantics/addSemanticsNoOF.key (key/c/e/50_addSemanti 1.1 644))
@@ -4464,8 +4420,6 @@
   (system/resources/de/uka/ilkd/key/proof/rules/integerAssignment2UpdateRulesTout.key (key/d/e/6_integerAss 1.3 644))
   (system/resources/de/uka/ilkd/key/proof/rules/activeUse.key (key/d/e/7_activeUse. 1.2 644))
   (system/resources/de/uka/ilkd/key/proof/rules/integerHeader.key (key/d/e/8_integerHea 1.2 644))
-
-
   (examples/dev/arith_definitions.key (key/n/d/26_arith_defi 1.1 644))
   (examples/arith/check_jdiv.key (key/n/d/27_check_jdiv 1.4 644))
   (examples/polySimp/simplify16.key (key/n/d/28_simplify16 1.1 644))
@@ -4543,132 +4497,107 @@
   (examples/java_dl/query_java/A.java (key/g/e/20_A.java 1.1 644))
   (examples/java_dl/quantifiedQuery.key (key/g/e/21_quantified 1.1 644))
   (system/de/uka/ilkd/key/gui/MaxRuleAppSlider.java (key/g/e/31_MaxRuleApp 1.2 644))
-;; Files added by populate at Sun, 22 Jul 2007 13:25:41 +0200,
-;; to version 0.2584(w), by ruemmer1:
-
   (examples/java_dl/symmArray.key (key/h/e/45_symmArray. 1.1 644))
   (examples/java_dl/splittingWithQueries.key (key/h/e/46_splittingW 1.1 644))
-
-;; Files added by populate at Sun, 22 Jul 2007 13:25:59 +0200,
-;; to version 0.2584(w), by ruemmer1:
-
   (examples/java_dl/symmArray_java/SymmArray.java (key/h/e/47_SymmArray. 1.1 644))
-
-;; Files added by populate at Sun, 22 Jul 2007 13:26:15 +0200,
-;; to version 0.2584(w), by ruemmer1:
-
   (examples/pred_log/jbyteIfEx.key (key/h/e/48_jbyteIfEx. 1.1 644))
-
-;; Files added by populate at Sun, 22 Jul 2007 13:26:24 +0200,
-;; to version 0.2584(w), by ruemmer1:
-
   (examples/quantifiers/normalisation13.key (key/h/e/49_normalisat 1.1 644))
   (examples/quantifiers/normalisation12.key (key/h/e/50_normalisat 1.1 644))
-
-;; Files added by populate at Mon, 23 Jul 2007 10:46:19 +0200,
-;; to version 0.2586(w), by ruemmer1:
-
   (system/de/uka/ilkd/key/proof/TermTacletAppIndexCacheSet.java (key/h/e/51_TermTaclet 1.5 644))
   (system/de/uka/ilkd/key/proof/PrefixTermTacletAppIndexCache.java (key/i/e/0_PrefixTerm 1.2 644))
   (system/de/uka/ilkd/key/proof/PrefixTermTacletAppIndexCacheImpl.java (key/i/e/1_PrefixTerm 1.4 644))
   (system/de/uka/ilkd/key/proof/ITermTacletAppIndexCache.java (key/i/e/2_ITermTacle 1.2 644))
-
-
   (system/de/uka/ilkd/key/rule/conditions/IsUpdatedVariableCondition.java (key/i/e/8_IsUpdatedV 1.1 644))
   (system/de/uka/ilkd/key/rule/metaconstruct/MetaEquivalentUpdates.java (key/i/e/9_MetaEquiva 1.3 644))
-;; Files added by populate at Fri, 03 Aug 2007 16:17:11 +0200,
-;; to version ruemmerNewCache.3(w), by ruemmer1:
-
   (examples/java_dl/postConditionTaclets2.key (key/i/e/23_postCondit 1.1 644))
   (examples/java_dl/postConditionTaclets1.key (key/i/e/24_postCondit 1.1 644))
-
-;; Files added by populate at Wed, 08 Aug 2007 16:50:27 +0200,
-;; to version 0.2599(w), by bubel:
-
   (system/de/uka/ilkd/key/rule/CVC3IntegerRule.java (key/i/e/30_CVC3Intege 1.1 644))
   (system/de/uka/ilkd/key/proof/decproc/DecisionProcedureCVC3.java (key/i/e/31_DecisionPr 1.1 644))
+;; Files added by populate at Thu, 30 Aug 2007 13:38:21 +0200,
+;; to version baumVisualDebuggerFinal.3(w), by bubel:
 
-
-  (eclipse/VisualDebugger/.classpath (key/P/d/37_.classpath 1.1 644))
-  (eclipse/VisualDebugger/.project (key/P/d/38_.project 1.1 644))
-  (eclipse/VisualDebugger/build.properties (key/P/d/39_build.prop 1.7 644))
-  (eclipse/VisualDebugger/plugin.xml (key/P/d/40_plugin.xml 1.6 644))
-  (eclipse/VisualDebugger/icons/sample.gif (key/P/d/41_sample.gif 1.1 644))
-  (eclipse/VisualDebugger/META-INF/MANIFEST.MF (key/P/d/42_MANIFEST.M 1.4.1.10 644))
-  (eclipse/VisualDebugger/src/visualdebugger/Activator.java (key/P/d/43_Activator. 1.2.1.6 644))
-  (eclipse/VisualDebugger/src/visualdebugger/VBTBuilder.java (key/g/e/14_VBTBuilder 1.1.1.1 644))
-  (eclipse/VisualDebugger/src/visualdebugger/VBTestRunListener.java (key/g/e/15_VBTestRunL 1.2 644))
-  (eclipse/VisualDebugger/src/visualdebugger/views/VisualDebuggerView.java (key/P/d/44_VisualDebu 1.3.1.2 644))
-  (eclipse/VisualDebugger/src/visualdebugger/views/BreakpointEclipse.java (key/P/d/45_Breakpoint 1.2 644))
-  (eclipse/VisualDebugger/src/visualdebugger/views/BreakpointView.java (key/P/d/46_Breakpoint 1.3.1.3 644))
-  (eclipse/VisualDebugger/src/visualdebugger/views/FindStatementVisitor.java (key/P/d/47_FindStatem 1.3.1.1 644))
-  (eclipse/VisualDebugger/src/visualdebugger/views/InsertSepVisitor.java (key/P/d/48_InsertSepV 1.3.1.2 644))
-  (eclipse/VisualDebugger/src/visualdebugger/views/ExecutionTreeView.java (key/Q/d/48_ExecutionT 1.3.1.5 644))
-  (eclipse/VisualDebugger/src/visualdebugger/views/SymbolicStateView.java (key/a/e/27_SymbolicSt 1.2.1.2 644))
-  (eclipse/VisualDebugger/src/visualdebugger/draw2d/BranchLayout.java (key/Q/d/49_BranchLayo 1.1 644))
-  (eclipse/VisualDebugger/src/visualdebugger/draw2d/NormalLayout.java (key/Q/d/50_NormalLayo 1.2 644))
-  (eclipse/VisualDebugger/src/visualdebugger/draw2d/SourceElementFigure.java (key/a/e/28_SourceElem 1.2.1.1 644))
-  (eclipse/VisualDebugger/src/visualdebugger/draw2d/MethodInvocationFigure.java (key/a/e/29_MethodInvo 1.2.1.1 644))
-  (eclipse/VisualDebugger/src/visualdebugger/draw2d/TreeBranch.java (key/R/d/0_TreeBranch 1.2.1.1 644))
-  (eclipse/VisualDebugger/src/visualdebugger/draw2d/TreeLayout.java (key/R/d/1_TreeLayout 1.1 644))
-  (eclipse/VisualDebugger/src/visualdebugger/draw2d/TreeRoot.java (key/R/d/2_TreeRoot.j 1.2 644))
-  (eclipse/VisualDebugger/icons/stepinto_co.gif (key/a/e/30_stepinto_c 1.1 644) :no-keywords)
-  (eclipse/VisualDebugger/icons/stepover_co.gif (key/a/e/31_stepover_c 1.1 644) :no-keywords)
-  (eclipse/VisualDebugger/icons/run_exc.gif (key/a/e/32_run_exc.gi 1.2 644) :no-keywords)
-  (eclipse/VisualDebugger/icons/key-small.png (key/a/e/33_key-small. 1.1 644) :no-keywords)
-  (eclipse/VisualDebugger/src/visualdebugger/actions/StartVisualDebuggerAction.java (key/P/d/49_StartVisua 1.5.1.7 644))
-  (system/de/uka/ilkd/key/visualdebugger/VisualDebugger.java (key/P/d/50_VisualDebu 1.5.1.5 644))
-  (system/de/uka/ilkd/key/visualdebugger/Breakpoint.java (key/P/d/51_Breakpoint 1.1.1.3 644))
-  (system/de/uka/ilkd/key/visualdebugger/SourceElementId.java (key/i/e/38_SourceElem 1.5 644))
-  (system/de/uka/ilkd/key/visualdebugger/BreakpointManager.java (key/Q/d/1_Breakpoint 1.3.1.5 644))
-  (system/de/uka/ilkd/key/visualdebugger/ITNode.java (key/N/d/38_ITNode.jav 1.3.1.4.1.1 644))
-  (system/de/uka/ilkd/key/visualdebugger/ETNode.java (key/a/e/34_ETNode.jav 1.1.1.4 644))
-  (system/de/uka/ilkd/key/visualdebugger/ProofStarter.java (key/a/e/35_ProofStart 1.2.1.2 644))
-  (system/de/uka/ilkd/key/visualdebugger/DebuggerPO.java (key/a/e/36_DebuggerPO 1.2.1.3.1.1 644))
-  (system/de/uka/ilkd/key/visualdebugger/ETStatementNode.java (key/a/e/37_ETStatemen 1.1.1.2 644))
-  (system/de/uka/ilkd/key/visualdebugger/ETMethodInvocationNode.java (key/a/e/38_ETMethodIn 1.1.1.2 644))
-  (system/de/uka/ilkd/key/visualdebugger/ETMethodReturnNode.java (key/a/e/39_ETMethodRe 1.1.1.3 644))
-  (system/de/uka/ilkd/key/visualdebugger/ETLeafNode.java (key/a/e/40_ETLeafNode 1.2.1.3 644))
-  (system/de/uka/ilkd/key/visualdebugger/StateVisualization.java (key/a/e/41_StateVisua 1.2.1.2 644))
-  (system/de/uka/ilkd/key/visualdebugger/SymbolicObjectDiagram.java (key/i/e/39_SymbolicOb 1.3 644))
-  (system/de/uka/ilkd/key/visualdebugger/SymbolicObject.java (key/a/e/43_SymbolicOb 1.1.1.2 644))
-  (system/de/uka/ilkd/key/visualdebugger/Label.java (key/N/d/39_Label.java 1.1.1.1 644))
-  (system/de/uka/ilkd/key/visualdebugger/PCLabel.java (key/N/d/40_PCLabel.ja 1.2.1.1 644))
-  (system/de/uka/ilkd/key/visualdebugger/ExecutionTree.java (key/i/e/40_ExecutionT 1.9 644))
-  (system/de/uka/ilkd/key/visualdebugger/UpdateLabelListener.java (key/N/d/42_UpdateLabe 1.3.1.2 644))
-  (system/de/uka/ilkd/key/visualdebugger/DebuggerLP.java (key/a/e/44_DebuggerLP 1.2.1.1 644))
-  (system/de/uka/ilkd/key/strategy/feature/BreakpointFeature.java (key/Q/d/2_Breakpoint 1.4.1.3 644))
-  (system/de/uka/ilkd/key/strategy/feature/LabelFeature.java (key/N/d/43_LabelFeatu 1.4 644))
-  (system/de/uka/ilkd/key/strategy/DebuggerStrategy.java (key/Q/d/3_DebuggerSt 1.5 644))
-  (system/resources/de/uka/ilkd/key/proof/rules/debuggerRules.key (key/a/e/45_debuggerRu 1.2 644))
-  (system/resources/de/uka/ilkd/key/proof/rules/standardRules-debugger.key (key/a/e/46_standardRu 1.2 644))
-  (system/de/uka/ilkd/key/strategy/feature/InUpdateFeature.java (key/a/e/47_InUpdateFe 1.4 644))
-  (system/de/uka/ilkd/key/visualdebugger/DebuggerListener.java (key/a/e/48_DebuggerLi 1.1.1.1 644))
-  (system/de/uka/ilkd/key/visualdebugger/SymbolicArrayObject.java (key/a/e/49_SymbolicAr 1.2.1.2 644))
-  (system/de/uka/ilkd/key/visualdebugger/DebuggerEvent.java (key/a/e/50_DebuggerEv 1.2.1.1 644))
-  (eclipse/VisualDebugger/src/visualdebugger/draw2d/LeafNode.java (key/a/e/51_LeafNode.j 1.1.1.1 644))
-  (eclipse/VisualDebugger/src/visualdebugger/draw2d/ArrayObjectFigure.java (key/b/e/0_ArrayObjec 1.2.1.2 644))
-  (eclipse/VisualDebugger/src/visualdebugger/draw2d/MethodReturnFigure.java (key/b/e/1_MethodRetu 1.1.1.1 644))
-  (eclipse/VisualDebugger/src/visualdebugger/draw2d/FixedConnectionAnchor.java (key/b/e/2_FixedConne 1.1 644))
-  (eclipse/VisualDebugger/src/visualdebugger/draw2d/BCLabel.java (key/b/e/3_BCLabel.ja 1.1 644))
-  (eclipse/VisualDebugger/src/visualdebugger/draw2d/ObjectFigure.java (key/b/e/4_ObjectFigu 1.2.1.1 644))
-  (eclipse/VisualDebugger/src/visualdebugger/views/FindStatementById.java (key/b/e/5_FindStatem 1.2.1.3 644))
   (eclipse/VisualDebugger/.settings () :directory)
   (system/de/uka/ilkd/key/proof/proofevent/NodeRedundantAddChange.java (key/n/e/10_NodeRedund 1.1 644))
   (system/de/uka/ilkd/key/proof/init/DebuggerProfile.java (key/n/e/11_DebuggerPr 1.1 644))
+
+;; Files added by populate at Thu, 30 Aug 2007 15:42:24 +0200,
+;; to version baumVisualDebuggerFinal.5(w), by bubel:
+
   (system/de/uka/ilkd/key/visualdebugger/VisualDebuggerState.java (key/n/e/12_VisualDebu 1.1 644))
+
+
   (examples/java_dl/equivalentUpdates.key (key/n/e/13_equivalent 1.1 644))
+;; Files added by populate at Thu, 30 Aug 2007 21:15:31 +0200,
+;; to version 0.2615(w), by bubel:
+
   (eclipse/VisualDebugger/build-3.2.1.xml (key/n/e/16_build-3.2. 1.3 644))
+
+;; Files added by populate at Fri, 31 Aug 2007 23:16:14 +0200,
+;; to version 0.2623(w), by bubel:
+
   (examples/_testcase/updatesimplification/testHeapDependent2.key (key/n/e/19_testHeapDe 1.1 644))
   (examples/_testcase/updatesimplification/testHeapDependent1.key (key/n/e/20_testHeapDe 1.1 644))
   (system/de/uka/ilkd/key/rule/updatesimplifier/ApplyOnHeapDependentLocation.java (key/n/e/21_ApplyOnHea 1.1 644))
   (system/de/uka/ilkd/key/logic/op/NonRigidHeapDependentFunction.java (key/n/e/22_NonRigidHe 1.1 644))
-;; Files added by populate at Tue, 11 Sep 2007 10:56:19 +0200,
-;; to version 0.2631(w), by bubel:
+
+;; Files added by populate at Mon, 03 Sep 2007 16:58:51 +0200,
+;; to version 0.2624(w), by bubel:
+
+  (examples/hoare/test1.key (key/n/e/27_test1.key 1.1 644))
+  (system/resources/de/uka/ilkd/key/proof/rules/standardRules-hoare.key (key/n/e/28_standardRu 1.1 644))
+  (system/resources/de/uka/ilkd/key/proof/rules/hoareProgramLogicRules.key (key/n/e/29_hoareProgr 1.1.3.5 644))
+  (system/de/uka/ilkd/hoare/init/HoareProfile.java (key/n/e/30_HoareProfi 1.2.3.2 644))
+  (system/de/uka/ilkd/key/pp/HoareLogicPrettyPrinter.java (key/n/e/31_HoareLogic 1.8 644))
+
+;; Files added by populate at Wed, 05 Sep 2007 15:41:58 +0200,
+;; to version hoareWithUpdates.1(w), by bubel:
+
+  (examples/hoare/testWhile.key (key/n/e/47_testWhile. 1.1 644))
+  (system/de/uka/ilkd/hoare/rule/HoareLoopInvariantRule.java (key/n/e/48_WhileInvar 1.1.3.4 644))
+  (system/de/uka/ilkd/hoare/rule/HoareLoopInvRuleApp.java (key/n/e/49_HoareLoopI 1.2 644))
+  (system/de/uka/ilkd/hoare/gui/HoareLoopInvRuleMenuItem.java (key/n/e/50_HoareLoopI 1.1.3.2 644))
+
+;; Files added by populate at Wed, 05 Sep 2007 16:10:40 +0200,
+;; to version hoareWithUpdates.1(w), by bubel:
+
+  (examples/hoare/testWhile2.key (key/n/e/51_testWhile2 1.1 644))
+
+;; Files added by populate at Wed, 05 Sep 2007 18:48:24 +0200,
+;; to version hoareWithUpdates.2(w), by bubel:
+
+  (examples/hoare/multiplyNM.key (key/o/e/0_multiplyNM 1.1.3.3 644))
+  (examples/hoare/testWhile2.proof (key/o/e/1_testWhile2 1.1 644))
+  (examples/hoare/decrementToZero.key (key/o/e/2_decrementT 1.2 644))
+  (system/de/uka/ilkd/key/proof/init/HoareUserProblemFile.java (key/o/e/3_HoareUserP 1.2 644))
+
+;; Files added by populate at Wed, 05 Sep 2007 23:19:14 +0200,
+;; to version hoareWithUpdates.3(w), by bubel:
+
+  (system/de/uka/ilkd/key/strategy/HoareStrategy.java (key/o/e/16_HoareStrat 1.4 644))
+  (system/de/uka/ilkd/hoare/strategy/HoareLoopInvariantRuleFilter.java (key/o/e/17_HoareLoopI 1.1 644))
+  (examples/hoare/multiplyNM.proof (key/o/e/18_multiplyNM 1.2 644))
+  (examples/hoare/decrementToZero.proof (key/o/e/19_decrementT 1.2 644))
+
+;; Files added by populate at Thu, 06 Sep 2007 01:31:07 +0200,
+;; to version hoareWithUpdates.4(w), by bubel:
+
+  (examples/hoare/informationFlow.key (key/o/e/20_informatio 1.3 644))
+  (system/de/uka/ilkd/key/logic/op/MetaBool2Logic.java (key/o/e/21_MetaBool2L 1.1 644))
+
+
+;; Files added by populate at Thu, 06 Sep 2007 21:26:50 +0200,
+;; to version hoareWithUpdates.8(w), by bubel:
+
+  (examples/hoare/informationFlow.proof (key/o/e/30_informatio 1.1 644))
+  (examples/hoare/informationFlow_nonSecure.key (key/o/e/31_informatio 1.1 644))
+  (examples/hoare/exchange.key (key/o/e/32_exchange.k 1.1 644))
+  (examples/hoare/exchange.proof (key/o/e/33_exchange.p 1.1 644))
+
+
+  (system/de/uka/ilkd/key/rule/metaconstruct/LocationDependentFunction.java (key/n/e/23_LocationDe 1.1.1.2 644))
+  (system/de/uka/ilkd/key/rule/metaconstruct/AtPreEquations.java (key/n/e/24_AtPreEquat 1.1.1.1 644))
 
   (system/resources/KeY.jnlp (key/o/e/37_KeY.jnlp 1.4 644))
-
-
   (examples/_testcase/updatesimplification/testQuantified5.key (key/o/e/38_testQuanti 1.1 644))
   (examples/_testcase/updatesimplification/testDeletion9.key (key/o/e/39_testDeleti 1.1 644))
   (examples/_testcase/updatesimplification/testDeletion8.key (key/o/e/40_testDeleti 1.1 644))
@@ -4680,36 +4609,48 @@
   (examples/_testcase/updatesimplification/testDeletion11.key (key/o/e/46_testDeleti 1.1 644))
   (examples/_testcase/updatesimplification/testDeletion10.key (key/o/e/47_testDeleti 1.1 644))
   (examples/_testcase/updateterm/updatetermTest4.key (key/o/e/48_updateterm 1.1 644))
-
   (eclipse/KeYPlugin/META-INF/MANIFEST.MF (key/q/e/11_MANIFEST.M 1.1 644)))
 (Merge-Parents
-  (0.2654 complete
-    (system/de/uka/ilkd/key/gui/Main.java system/de/uka/ilkd/key/gui/Main.java system/de/uka/ilkd/key/gui/Main.java r) (system/de/uka/ilkd/key/gui/ProofTreeView.java system/de/uka/ilkd/key/gui/ProofTreeView.java system/de/uka/ilkd/key/gui/ProofTreeView.java r)
-    (system/de/uka/ilkd/key/rule/metaconstruct/LocationDependentFunction.java system/de/uka/ilkd/key/rule/metaconstruct/LocationDependentFunction.java system/de/uka/ilkd/key/rule/metaconstruct/LocationDependentFunction.java r) (system/de/uka/ilkd/key/rule/RuleSet.java system/de/uka/ilkd/key/rule/RuleSet.java system/de/uka/ilkd/key/rule/RuleSet.java r)
-    (system/de/uka/ilkd/key/rule/Taclet.java system/de/uka/ilkd/key/rule/Taclet.java system/de/uka/ilkd/key/rule/Taclet.java r) (system/de/uka/ilkd/key/rule/TacletApp.java system/de/uka/ilkd/key/rule/TacletApp.java system/de/uka/ilkd/key/rule/TacletApp.java r)
-    (system/de/uka/ilkd/key/rule/TacletAttributes.java system/de/uka/ilkd/key/rule/TacletAttributes.java system/de/uka/ilkd/key/rule/TacletAttributes.java r) (system/de/uka/ilkd/key/rule/TacletBuilder.java system/de/uka/ilkd/key/rule/TacletBuilder.java system/de/uka/ilkd/key/rule/TacletBuilder.java r)
-    (system/de/uka/ilkd/key/parser/lexer.g system/de/uka/ilkd/key/parser/lexer.g system/de/uka/ilkd/key/parser/lexer.g r) (system/resources/de/uka/ilkd/key/proof/rules/javaRules.key system/resources/de/uka/ilkd/key/proof/rules/javaRules.key system/resources/de/uka/ilkd/key/proof/rules/javaRules.key r)
-    (system/resources/de/uka/ilkd/key/proof/rules/propRule.key system/resources/de/uka/ilkd/key/proof/rules/propRule.key system/resources/de/uka/ilkd/key/proof/rules/propRule.key r) (system/de/uka/ilkd/key/proof/init/InitConfig.java system/de/uka/ilkd/key/proof/init/InitConfig.java system/de/uka/ilkd/key/proof/init/InitConfig.java r)
-    (README.install.source README.install.source README.install.source r) (system/resources/de/uka/ilkd/key/util/install/startkey_linux_6.0 system/resources/de/uka/ilkd/key/util/install/startkey_linux_6.0 system/resources/de/uka/ilkd/key/util/install/startkey_linux_6.0 r)
-    (system/resources/de/uka/ilkd/key/util/install/startkey_linux_6.0.1 system/resources/de/uka/ilkd/key/util/install/startkey_linux_6.0.1 system/resources/de/uka/ilkd/key/util/install/startkey_linux_6.0.1 r) (README.install.bytecode README.install.bytecode README.install.bytecode r)
-    (system/resources/de/uka/ilkd/key/proof/rules/genericRules.key system/resources/de/uka/ilkd/key/proof/rules/genericRules.key system/resources/de/uka/ilkd/key/proof/rules/genericRules.key r) (system/de/uka/ilkd/key/gui/TaskTree.java system/de/uka/ilkd/key/gui/TaskTree.java system/de/uka/ilkd/key/gui/TaskTree.java r)
+  (0.2655 complete
+    (system/Makefile system/Makefile system/Makefile m) (system/de/uka/ilkd/key/gui/GUIProofTreeModel.java system/de/uka/ilkd/key/gui/GUIProofTreeModel.java system/de/uka/ilkd/key/gui/GUIProofTreeModel.java r)
+    (system/de/uka/ilkd/key/pp/InitialPositionTable.java system/de/uka/ilkd/key/pp/InitialPositionTable.java system/de/uka/ilkd/key/pp/InitialPositionTable.java r) (system/de/uka/ilkd/key/gui/Main.java system/de/uka/ilkd/key/gui/Main.java system/de/uka/ilkd/key/gui/Main.java m)
+    (system/de/uka/ilkd/key/gui/ProofTreeView.java system/de/uka/ilkd/key/gui/ProofTreeView.java system/de/uka/ilkd/key/gui/ProofTreeView.java r) (system/de/uka/ilkd/key/pp/LogicPrinter.java system/de/uka/ilkd/key/pp/LogicPrinter.java system/de/uka/ilkd/key/pp/LogicPrinter.java m)
+    (system/de/uka/ilkd/key/gui/SequentView.java system/de/uka/ilkd/key/gui/SequentView.java system/de/uka/ilkd/key/gui/SequentView.java r) (system/de/uka/ilkd/key/rule/metaconstruct/LocationDependentFunction.java system/de/uka/ilkd/key/rule/metaconstruct/LocationDependentFunction.java system/de/uka/ilkd/key/rule/metaconstruct/LocationDependentFunction.java r)
+    (system/de/uka/ilkd/key/rule/RuleSet.java system/de/uka/ilkd/key/rule/RuleSet.java system/de/uka/ilkd/key/rule/RuleSet.java r) (system/de/uka/ilkd/key/rule/Taclet.java system/de/uka/ilkd/key/rule/Taclet.java system/de/uka/ilkd/key/rule/Taclet.java r)
+    (system/de/uka/ilkd/key/rule/TacletApp.java system/de/uka/ilkd/key/rule/TacletApp.java system/de/uka/ilkd/key/rule/TacletApp.java r) (system/de/uka/ilkd/key/rule/TacletAttributes.java system/de/uka/ilkd/key/rule/TacletAttributes.java system/de/uka/ilkd/key/rule/TacletAttributes.java r)
+    (system/de/uka/ilkd/key/rule/TacletBuilder.java system/de/uka/ilkd/key/rule/TacletBuilder.java system/de/uka/ilkd/key/rule/TacletBuilder.java r) (system/de/uka/ilkd/key/parser/lexer.g system/de/uka/ilkd/key/parser/lexer.g system/de/uka/ilkd/key/parser/lexer.g m)
+    (system/resources/de/uka/ilkd/key/proof/rules/javaRules.key system/resources/de/uka/ilkd/key/proof/rules/javaRules.key system/resources/de/uka/ilkd/key/proof/rules/javaRules.key r) (system/resources/de/uka/ilkd/key/proof/rules/propRule.key system/resources/de/uka/ilkd/key/proof/rules/propRule.key system/resources/de/uka/ilkd/key/proof/rules/propRule.key r)
+    (system/de/uka/ilkd/key/proof/init/InitConfig.java system/de/uka/ilkd/key/proof/init/InitConfig.java system/de/uka/ilkd/key/proof/init/InitConfig.java r) (README.install.source README.install.source README.install.source r)
+    (system/resources/de/uka/ilkd/key/util/install/startkey_linux_6.0 system/resources/de/uka/ilkd/key/util/install/startkey_linux_6.0 system/resources/de/uka/ilkd/key/util/install/startkey_linux_6.0 r) (system/resources/de/uka/ilkd/key/util/install/startkey_linux_6.0.1 system/resources/de/uka/ilkd/key/util/install/startkey_linux_6.0.1 system/resources/de/uka/ilkd/key/util/install/startkey_linux_6.0.1 r)
+    (README.install.bytecode README.install.bytecode README.install.bytecode r) (system/resources/de/uka/ilkd/key/proof/rules/genericRules.key system/resources/de/uka/ilkd/key/proof/rules/genericRules.key system/resources/de/uka/ilkd/key/proof/rules/genericRules.key m)
+    (system/de/uka/ilkd/key/gui/SequentViewListener.java system/de/uka/ilkd/key/gui/SequentViewListener.java system/de/uka/ilkd/key/gui/SequentViewListener.java r) (system/de/uka/ilkd/key/gui/TaskTree.java system/de/uka/ilkd/key/gui/TaskTree.java system/de/uka/ilkd/key/gui/TaskTree.java r)
     (system/resources/de/uka/ilkd/key/proof/rules/integerSimplificationRules.key system/resources/de/uka/ilkd/key/proof/rules/integerSimplificationRules.key system/resources/de/uka/ilkd/key/proof/rules/integerSimplificationRules.key r) (system/resources/de/uka/ilkd/key/util/install/startkey_linux_6.2 system/resources/de/uka/ilkd/key/util/install/startkey_linux_6.2 system/resources/de/uka/ilkd/key/util/install/startkey_linux_6.2 r)
-    (system/de/uka/ilkd/key/proof/LoopInvariantProposer.java system/de/uka/ilkd/key/proof/LoopInvariantProposer.java system/de/uka/ilkd/key/proof/LoopInvariantProposer.java r) (system/de/uka/ilkd/key/parser/keyparser.g system/de/uka/ilkd/key/parser/keyparser.g system/de/uka/ilkd/key/parser/keyparser.g r)
+    (system/de/uka/ilkd/key/logic/TestUpdatetermNormalisation.java system/de/uka/ilkd/key/logic/TestUpdatetermNormalisation.java system/de/uka/ilkd/key/logic/TestUpdatetermNormalisation.java r) (examples/_testcase/updateterm/updatetermTest3.key examples/_testcase/updateterm/updatetermTest3.key examples/_testcase/updateterm/updatetermTest3.key r)
+    (examples/_testcase/updateterm/updatetermTest2.key examples/_testcase/updateterm/updatetermTest2.key examples/_testcase/updateterm/updatetermTest2.key r) (system/de/uka/ilkd/key/rule/TestUpdateSimplifier.java system/de/uka/ilkd/key/rule/TestUpdateSimplifier.java system/de/uka/ilkd/key/rule/TestUpdateSimplifier.java r)
+    (system/de/uka/ilkd/key/proof/LoopInvariantProposer.java system/de/uka/ilkd/key/proof/LoopInvariantProposer.java system/de/uka/ilkd/key/proof/LoopInvariantProposer.java r) (system/de/uka/ilkd/key/logic/op/QuanUpdateOperator.java system/de/uka/ilkd/key/logic/op/QuanUpdateOperator.java system/de/uka/ilkd/key/logic/op/QuanUpdateOperator.java r)
+    (system/de/uka/ilkd/key/rule/updatesimplifier/GuardSimplifier.java system/de/uka/ilkd/key/rule/updatesimplifier/GuardSimplifier.java system/de/uka/ilkd/key/rule/updatesimplifier/GuardSimplifier.java r) (examples/_testcase/updatesimplification/testQuantified2.key examples/_testcase/updatesimplification/testQuantified2.key examples/_testcase/updatesimplification/testQuantified2.key r)
+    (examples/_testcase/updatesimplification/testQuantified1.key examples/_testcase/updatesimplification/testQuantified1.key examples/_testcase/updatesimplification/testQuantified1.key r) (system/de/uka/ilkd/key/parser/keyparser.g system/de/uka/ilkd/key/parser/keyparser.g system/de/uka/ilkd/key/parser/keyparser.g m)
     (eclipse/KeYPlugin/plugin.xml eclipse/KeYPlugin/plugin.xml eclipse/KeYPlugin/plugin.xml r) (eclipse/KeYPlugin/build.properties eclipse/KeYPlugin/build.properties eclipse/KeYPlugin/build.properties r)
-    (eclipse/KeYPlugin/src/de/uka/ilkd/key/casetool/eclipse/KeYPlugin.java eclipse/KeYPlugin/src/de/uka/ilkd/key/casetool/eclipse/KeYPlugin.java eclipse/KeYPlugin/src/de/uka/ilkd/key/casetool/eclipse/KeYPlugin.java r) (eclipse/KeYPlugin/build-3.1.1.xml eclipse/KeYPlugin/build-3.1.1.xml eclipse/KeYPlugin/build-3.1.1.xml r)
-    (eclipse/ProofVisualization/src/proofVisualization/views/ProofVisualizationView.java eclipse/ProofVisualization/src/proofVisualization/views/ProofVisualizationView.java eclipse/ProofVisualization/src/proofVisualization/views/ProofVisualizationView.java r) (eclipse/KeYPlugin/build-3.1.2.xml eclipse/KeYPlugin/build-3.1.2.xml eclipse/KeYPlugin/build-3.1.2.xml r)
-    (system/de/uka/ilkd/key/visualization/ProofVisualization.java system/de/uka/ilkd/key/visualization/ProofVisualization.java system/de/uka/ilkd/key/visualization/ProofVisualization.java r) (system/de/uka/ilkd/key/visualization/SimpleVisualizationStrategy.java system/de/uka/ilkd/key/visualization/SimpleVisualizationStrategy.java system/de/uka/ilkd/key/visualization/SimpleVisualizationStrategy.java r)
-    (system/de/uka/ilkd/key/visualization/VisualizationModel.java system/de/uka/ilkd/key/visualization/VisualizationModel.java system/de/uka/ilkd/key/visualization/VisualizationModel.java r) (eclipse/KeYPlugin/build-3.1.1_64.xml eclipse/KeYPlugin/build-3.1.1_64.xml eclipse/KeYPlugin/build-3.1.1_64.xml r)
-    (eclipse/KeYExternalLibraries/META-INF/MANIFEST.MF eclipse/KeYExternalLibraries/META-INF/MANIFEST.MF eclipse/KeYExternalLibraries/META-INF/MANIFEST.MF r) (system/resources/de/uka/ilkd/key/proof/rules/instanceAllocation.key system/resources/de/uka/ilkd/key/proof/rules/instanceAllocation.key system/resources/de/uka/ilkd/key/proof/rules/instanceAllocation.key r)
+    (eclipse/KeYPlugin/src/de/uka/ilkd/key/casetool/eclipse/KeYPlugin.java eclipse/KeYPlugin/src/de/uka/ilkd/key/casetool/eclipse/KeYPlugin.java eclipse/KeYPlugin/src/de/uka/ilkd/key/casetool/eclipse/KeYPlugin.java r) (system/de/uka/ilkd/key/gui/StrategySelectionView.java system/de/uka/ilkd/key/gui/StrategySelectionView.java system/de/uka/ilkd/key/gui/StrategySelectionView.java m)
+    (eclipse/KeYPlugin/build-3.1.1.xml eclipse/KeYPlugin/build-3.1.1.xml eclipse/KeYPlugin/build-3.1.1.xml r) (eclipse/ProofVisualization/src/proofVisualization/views/ProofVisualizationView.java eclipse/ProofVisualization/src/proofVisualization/views/ProofVisualizationView.java eclipse/ProofVisualization/src/proofVisualization/views/ProofVisualizationView.java r)
+    (eclipse/KeYPlugin/build-3.1.2.xml eclipse/KeYPlugin/build-3.1.2.xml eclipse/KeYPlugin/build-3.1.2.xml r) (system/de/uka/ilkd/key/visualization/ProofVisualization.java system/de/uka/ilkd/key/visualization/ProofVisualization.java system/de/uka/ilkd/key/visualization/ProofVisualization.java r)
+    (system/de/uka/ilkd/key/visualization/SimpleVisualizationStrategy.java system/de/uka/ilkd/key/visualization/SimpleVisualizationStrategy.java system/de/uka/ilkd/key/visualization/SimpleVisualizationStrategy.java r) (system/de/uka/ilkd/key/visualization/VisualizationModel.java system/de/uka/ilkd/key/visualization/VisualizationModel.java system/de/uka/ilkd/key/visualization/VisualizationModel.java r)
+    (eclipse/KeYPlugin/build-3.1.1_64.xml eclipse/KeYPlugin/build-3.1.1_64.xml eclipse/KeYPlugin/build-3.1.1_64.xml r) (eclipse/KeYExternalLibraries/META-INF/MANIFEST.MF eclipse/KeYExternalLibraries/META-INF/MANIFEST.MF eclipse/KeYExternalLibraries/META-INF/MANIFEST.MF r)
+    (system/resources/de/uka/ilkd/key/proof/rules/instanceAllocation.key system/resources/de/uka/ilkd/key/proof/rules/instanceAllocation.key system/resources/de/uka/ilkd/key/proof/rules/instanceAllocation.key r) (system/de/uka/ilkd/key/logic/TermBuilder.java system/de/uka/ilkd/key/logic/TermBuilder.java system/de/uka/ilkd/key/logic/TermBuilder.java r)
     (system/de/uka/ilkd/key/logic/OpCollector.java system/de/uka/ilkd/key/logic/OpCollector.java system/de/uka/ilkd/key/logic/OpCollector.java r) (system/de/uka/ilkd/key/unittest/TestGenerator.java system/de/uka/ilkd/key/unittest/TestGenerator.java system/de/uka/ilkd/key/unittest/TestGenerator.java r)
     (examples/BookExamples/chap10UsingKey/projectionAutomat.proof examples/BookExamples/chap10UsingKey/projectionAutomat.proof examples/BookExamples/chap10UsingKey/projectionAutomat.proof r) (examples/BookExamples/chap10UsingKey/andCommutes.proof examples/BookExamples/chap10UsingKey/andCommutes.proof examples/BookExamples/chap10UsingKey/andCommutes.proof r)
-    (eclipse/KeYPlugin/build-3.2.1.xml eclipse/KeYPlugin/build-3.2.1.xml eclipse/KeYPlugin/build-3.2.1.xml r) (eclipse/VisualDebugger/build.properties eclipse/VisualDebugger/build.properties eclipse/VisualDebugger/build.properties r)
-    (eclipse/VisualDebugger/plugin.xml eclipse/VisualDebugger/plugin.xml eclipse/VisualDebugger/plugin.xml r) (eclipse/VisualDebugger/META-INF/MANIFEST.MF eclipse/VisualDebugger/META-INF/MANIFEST.MF eclipse/VisualDebugger/META-INF/MANIFEST.MF r)
-    (eclipse/VisualDebugger/src/visualdebugger/Activator.java eclipse/VisualDebugger/src/visualdebugger/Activator.java eclipse/VisualDebugger/src/visualdebugger/Activator.java r) (eclipse/VisualDebugger/src/visualdebugger/views/ExecutionTreeView.java eclipse/VisualDebugger/src/visualdebugger/views/ExecutionTreeView.java eclipse/VisualDebugger/src/visualdebugger/views/ExecutionTreeView.java r)
-    (eclipse/VisualDebugger/src/visualdebugger/actions/StartVisualDebuggerAction.java eclipse/VisualDebugger/src/visualdebugger/actions/StartVisualDebuggerAction.java eclipse/VisualDebugger/src/visualdebugger/actions/StartVisualDebuggerAction.java r) (system/de/uka/ilkd/key/visualdebugger/VisualDebugger.java system/de/uka/ilkd/key/visualdebugger/VisualDebugger.java system/de/uka/ilkd/key/visualdebugger/VisualDebugger.java r)
-    (system/de/uka/ilkd/key/visualdebugger/ITNode.java system/de/uka/ilkd/key/visualdebugger/ITNode.java system/de/uka/ilkd/key/visualdebugger/ITNode.java r) (system/de/uka/ilkd/key/visualdebugger/ETNode.java system/de/uka/ilkd/key/visualdebugger/ETNode.java system/de/uka/ilkd/key/visualdebugger/ETNode.java r)
-    (system/de/uka/ilkd/key/visualdebugger/DebuggerPO.java system/de/uka/ilkd/key/visualdebugger/DebuggerPO.java system/de/uka/ilkd/key/visualdebugger/DebuggerPO.java r) (system/de/uka/ilkd/key/visualdebugger/ExecutionTree.java system/de/uka/ilkd/key/visualdebugger/ExecutionTree.java system/de/uka/ilkd/key/visualdebugger/ExecutionTree.java r)
-    (() () eclipse/KeYPlugin/META-INF/MANIFEST.MF a) 
-  )
+    (system/de/uka/ilkd/key/proof/decproc/DecisionProcedureYices.java system/de/uka/ilkd/key/proof/decproc/DecisionProcedureYices.java system/de/uka/ilkd/key/proof/decproc/DecisionProcedureYices.java r) (eclipse/KeYPlugin/build-3.2.1.xml eclipse/KeYPlugin/build-3.2.1.xml eclipse/KeYPlugin/build-3.2.1.xml r)
+    (eclipse/VisualDebugger/build.properties eclipse/VisualDebugger/build.properties eclipse/VisualDebugger/build.properties r) (eclipse/VisualDebugger/plugin.xml eclipse/VisualDebugger/plugin.xml eclipse/VisualDebugger/plugin.xml r)
+    (eclipse/VisualDebugger/META-INF/MANIFEST.MF eclipse/VisualDebugger/META-INF/MANIFEST.MF eclipse/VisualDebugger/META-INF/MANIFEST.MF r) (eclipse/VisualDebugger/src/visualdebugger/Activator.java eclipse/VisualDebugger/src/visualdebugger/Activator.java eclipse/VisualDebugger/src/visualdebugger/Activator.java r)
+    (eclipse/VisualDebugger/src/visualdebugger/views/ExecutionTreeView.java eclipse/VisualDebugger/src/visualdebugger/views/ExecutionTreeView.java eclipse/VisualDebugger/src/visualdebugger/views/ExecutionTreeView.java r) (eclipse/VisualDebugger/src/visualdebugger/actions/StartVisualDebuggerAction.java eclipse/VisualDebugger/src/visualdebugger/actions/StartVisualDebuggerAction.java eclipse/VisualDebugger/src/visualdebugger/actions/StartVisualDebuggerAction.java r)
+    (system/de/uka/ilkd/key/visualdebugger/VisualDebugger.java system/de/uka/ilkd/key/visualdebugger/VisualDebugger.java system/de/uka/ilkd/key/visualdebugger/VisualDebugger.java r) (system/de/uka/ilkd/key/visualdebugger/ITNode.java system/de/uka/ilkd/key/visualdebugger/ITNode.java system/de/uka/ilkd/key/visualdebugger/ITNode.java r)
+    (system/de/uka/ilkd/key/visualdebugger/ETNode.java system/de/uka/ilkd/key/visualdebugger/ETNode.java system/de/uka/ilkd/key/visualdebugger/ETNode.java r) (system/de/uka/ilkd/key/visualdebugger/DebuggerPO.java system/de/uka/ilkd/key/visualdebugger/DebuggerPO.java system/de/uka/ilkd/key/visualdebugger/DebuggerPO.java r)
+    (system/de/uka/ilkd/key/visualdebugger/ExecutionTree.java system/de/uka/ilkd/key/visualdebugger/ExecutionTree.java system/de/uka/ilkd/key/visualdebugger/ExecutionTree.java r) (() () system/resources/KeY.jnlp a)
+    (() () examples/_testcase/updatesimplification/testQuantified5.key a) (() () examples/_testcase/updatesimplification/testDeletion9.key a)
+    (() () examples/_testcase/updatesimplification/testDeletion8.key a) (() () examples/_testcase/updatesimplification/testDeletion7.key a)
+    (() () examples/_testcase/updatesimplification/testDeletion6.key a) (() () examples/_testcase/updatesimplification/testDeletion5.key a)
+    (() () examples/_testcase/updatesimplification/testDeletion4.key a) (() () examples/_testcase/updatesimplification/testDeletion3.key a)
+    (() () examples/_testcase/updatesimplification/testDeletion11.key a) (() () examples/_testcase/updatesimplification/testDeletion10.key a)
+    (() () examples/_testcase/updateterm/updatetermTest4.key a) (() () eclipse/KeYPlugin/META-INF/MANIFEST.MF a))
 )
 (New-Merge-Parents)

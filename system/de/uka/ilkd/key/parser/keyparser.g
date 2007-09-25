@@ -42,6 +42,7 @@ header {
   import de.uka.ilkd.key.rule.*;
   import de.uka.ilkd.key.rule.conditions.*;
   import de.uka.ilkd.key.rule.metaconstruct.*;
+  import de.uka.ilkd.key.rule.updatesimplifier.Update;
 
   import de.uka.ilkd.key.util.*;
 
@@ -93,6 +94,7 @@ options {
       prooflabel2tag.put("keySettings", new Character('s'));
       prooflabel2tag.put("contract", new Character('c'));	
       prooflabel2tag.put("userinteraction", new Character('a'));
+      prooflabel2tag.put("hoareLoopInvariant", new Character('z'));	
    }
 
     private NamespaceSet nss;
@@ -4412,12 +4414,15 @@ one_contract
 
 problem returns [ Term a = null ]
 {
+    Term a2 = null;
+    PairOfStringAndJavaBlock sjb = null;
     Taclet s = null;
     SetOfChoice choices=SetAsListOfChoice.EMPTY_SET;
     Choice c = null;
     ListOfString stlist = null;
     Namespace funcNSForSelectedChoices = new Namespace();
     String pref = null;
+    Update updatePrefix = null;
 }
     :
 
@@ -4481,18 +4486,90 @@ problem returns [ Term a = null ]
             RBRACE {choices=SetAsListOfChoice.EMPTY_SET;}
         ) *
         ((PROBLEM LBRACE 
-            {switchToNormalMode(); 
-	     namespaces().setFunctions(funcNSForSelectedChoices);
-	     if (capturer != null) capturer.capture();}
-                a = formula 
-            RBRACE) | CHOOSECONTRACT {
-	                if (capturer != null) capturer.capture();
-	                chooseContract = true;
-		      })?
+            {
+              switchToNormalMode(); 
+	          namespaces().setFunctions(funcNSForSelectedChoices);
+	          if (capturer != null) capturer.capture();
+            }
+            a = formula 
+            RBRACE) 
+        | CHOOSECONTRACT {
+	           if (capturer != null) capturer.capture();
+	           chooseContract = true;
+		  } 	   	    
+	    | (
+	    
+	      HOARE LBRACE
+	      {
+	       switchToNormalMode(); 
+	       namespaces().setFunctions(funcNSForSelectedChoices);
+	       if (capturer != null) capturer.capture();
+	      }
+ 
+               LBRACE (a = formula)? RBRACE
+	        
+	        (updatePrefix = updates)? 
+	        
+	        modality : MODALITY
+     	        { 
+	          sjb = getJavaBlock(modality);
+	          bindProgVars(progVars(sjb.javaBlock));
+	        }
+	       LBRACE a2 = formula RBRACE 	       	       
+	       { 
+	          a2 = tf.createBoxTerm(sjb.javaBlock, a2);
+	          if (updatePrefix != null && updatePrefix.locationCount() > 0) {
+		     final UpdateFactory uf = new UpdateFactory(getServices(), null);
+		     a2 = uf.prepend(updatePrefix, a2);
+	          }
+	          if (a == null) {
+	            a = a2;
+	          } else {
+	            a = tf.createJunctorTerm(Op.IMP, a, a2);  	            
+	          }
+	      }
+	      RBRACE)) ?
         {
-			setChoiceHelper(SetAsListOfChoice.EMPTY_SET, "");
+	   setChoiceHelper(SetAsListOfChoice.EMPTY_SET, "");
         }
    ;
+
+updates returns [Update result = null] 
+{ 
+    SingleUpdateData sud = null;
+    List locations = new LinkedList();
+    List values    = new LinkedList();
+    List guards    = new LinkedList();
+    List boundVars = new LinkedList();
+} :        
+         LBRACKET (sud = singleupdate {
+            locations.add(sud.a0); 
+            values.add(sud.a1); 
+            guards.add(sud.guard);
+            boundVars.add(sud.boundVars);
+          } (  PARALLEL                 
+                sud = singleupdate {
+                locations.add(sud.a0); 
+                values.add(sud.a1); 
+                guards.add(sud.guard);
+                boundVars.add(sud.boundVars);
+          })*) RBRACKET
+        {   
+            result = Update.createUpdate(tf.createQuanUpdateTerm
+                                   ((ArrayOfQuantifiableVariable[])boundVars.toArray
+                                    (new ArrayOfQuantifiableVariable[boundVars.size()]),
+                                    (Term[])guards.toArray(new Term[guards.size()]),
+                                    (Term[])locations.toArray(new Term[locations.size()]),
+                                    (Term[])values.toArray(new Term[values.size()]),
+                                    tf.createFunctionTerm(new NonRigidFunction(new Name("PSEUDO"),
+                                     Sort.FORMULA, new Sort[0]))));
+        }
+   ; exception
+        catch [TermCreationException ex] {
+              keh.reportException
+		(new KeYSemanticException
+			(ex.getMessage(), getFilename(), getLine(), getColumn()));
+        }
 
 javaSource returns [ListOfString ids = SLListOfString.EMPTY_LIST]
 { 

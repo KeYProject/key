@@ -13,8 +13,11 @@ package de.uka.ilkd.key.java;
 import java.util.HashMap;
 
 import recoder.service.ConstantEvaluator;
+import de.uka.ilkd.hoare.init.HoareProfile;
+import de.uka.ilkd.key.gui.ProofSettings;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
@@ -210,8 +213,30 @@ public class TypeConverter extends TermBuilder {
 	LDT responsibleLDT = null;
 	if (intLDT.isResponsible(op, subs, services, ec)) {
 	    responsibleLDT = intLDT;
-	} else if (booleanLDT.isResponsible(op, subs, services, ec)) {
+	} else if (booleanLDT.isResponsible(op, subs, services, ec)
+                || hoareHack(op, subs)) {
 	    responsibleLDT = booleanLDT;
+            if (op instanceof Equals) {
+                 return subs[0].sort() == Sort.FORMULA ?
+                    equiv(subs[0], subs[1]) :
+                    equals(subs[0], subs[1]);
+            } else if (op instanceof BinaryAnd) {
+                final Term left = subs[0].sort() == Sort.FORMULA ?
+                        subs[0] : equals(subs[0],TRUE(services));
+                final Term right = subs[1].sort() == Sort.FORMULA ?
+                        subs[1] : equals(subs[1],TRUE(services));
+                return and(left, right);
+            } else if (op instanceof BinaryOr) {
+                final Term left = subs[0].sort() == Sort.FORMULA ?
+                        subs[0] : equals(subs[0],TRUE(services));
+                final Term right = subs[1].sort() == Sort.FORMULA ?
+                        subs[1] : equals(subs[1],TRUE(services));
+                return or(left, right);
+            } else if (op instanceof LogicalNot) {
+                final Term left = subs[0].sort() == Sort.FORMULA ?
+                        subs[0] : equals(subs[0],TRUE(services));
+                return not(left);
+            }
 	} else{
 	    Debug.out("typeconverter: no data type model "+
 		      "available to convert:", op, op.getClass());		
@@ -220,7 +245,29 @@ public class TypeConverter extends TermBuilder {
 	}
 	return func(responsibleLDT.getFunctionFor(op, services, ec), subs);
     }
-   
+
+    private boolean sortsFmlOrBool(Term[] subs) {
+        for (int i = 0; i<subs.length; i++) {
+            if (subs[i].sort() != Sort.FORMULA && 
+                subs[i].sort() != getBooleanLDT().targetSort()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean hoareHack(Operator op, Term[] subs) {        
+        if (!(ProofSettings.DEFAULT_SETTINGS.getProfile() 
+                instanceof HoareProfile)) {
+            return false;
+        }
+            
+        return op instanceof Equals || 
+            ( (op instanceof BinaryAnd ||
+                    op instanceof BinaryOr || 
+                    op instanceof LogicalNot) && 
+                sortsFmlOrBool(subs));
+    }
 
     private Term convertReferencePrefix(ReferencePrefix prefix, 
 					ExecutionContext ec) {
