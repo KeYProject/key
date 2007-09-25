@@ -15,17 +15,23 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Field;
 import recoder.java.CompilationUnit;
 import recoder.java.Identifier;
+import recoder.java.Statement;
 import recoder.java.StatementBlock;
 import recoder.java.declaration.ClassDeclaration;
 import recoder.java.declaration.FieldDeclaration;
+import recoder.java.declaration.FieldSpecification;
 import recoder.java.declaration.MethodDeclaration;
+import recoder.java.declaration.DeclarationSpecifier;
+import recoder.java.declaration.ParameterDeclaration;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.java.declaration.modifier.Private;
 import recoder.java.declaration.modifier.Protected;
@@ -34,7 +40,8 @@ import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.SuperReference;
 import recoder.java.reference.ThisReference;
 import recoder.kit.ProblemReport;
-import recoder.list.*;
+import recoder.list.generic.ASTArrayList;
+import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -50,16 +57,16 @@ public class PrepareObjectBuilder
     public static final String 
 	IMPLICIT_OBJECT_PREPARE_ENTER = "<prepareEnter>";
 
-    private HashMap class2fields;
+    private HashMap<TypeDeclaration, ASTList<Statement>> class2fields;
 
     private ClassType javaLangObject;
     
 
     public PrepareObjectBuilder
 	(CrossReferenceServiceConfiguration services, 
-	 CompilationUnitMutableList units) {	
+	 List<CompilationUnit> units) {	
 	super(services, units);
-	class2fields = new HashMap(units.size());
+	class2fields = new HashMap<TypeDeclaration, ASTList<Statement>>(units.size());
     }
 
     /**
@@ -68,14 +75,14 @@ public class PrepareObjectBuilder
      * code order is not respected. May become obsolete if newer recoder
      * versions are used.
      */
-    private FieldList getFields(ClassDeclaration cd) {
-	FieldMutableList result = new FieldArrayList(cd.getChildCount());
+    private List<Field> getFields(ClassDeclaration cd) {
+	List<Field> result = new ArrayList<Field>(cd.getChildCount());
 	for (int i = 0; i<cd.getChildCount(); i++) {
 	    if (cd.getChildAt(i) instanceof FieldDeclaration) {
-		FieldSpecificationList fields = 
+		ASTList<FieldSpecification> fields = 
 		    ((FieldDeclaration)cd.getChildAt(i)).getFieldSpecifications();
 		for (int j = 0; j<fields.size(); j++) {
-		    result.add(fields.getFieldSpecification(j));
+		    result.add(fields.get(j));
 		}
 	    }
 	}
@@ -98,7 +105,7 @@ public class PrepareObjectBuilder
             Debug.fail("Could not find class java.lang.Object or only as bytecode");
         }
 	for (int unit = 0; unit<units.size(); unit++) {
-	    CompilationUnit cu = units.getCompilationUnit(unit);
+	    CompilationUnit cu = units.get(unit);
 	    int typeCount = cu.getTypeDeclarationCount();
 	
 	    for (int i = 0; i < typeCount; i++) {
@@ -130,14 +137,14 @@ public class PrepareObjectBuilder
      * and inserts them to the given body list
      * @return the same list body that has been handed over as parameter
      */
-    private StatementMutableList defaultSettings(FieldList fields) {
+    private ASTList<Statement> defaultSettings(List<Field> fields) {
 
 	if (fields == null) {
-	    return new StatementArrayList(0);
+	    return new ASTArrayList<Statement>(0);
 	} 
-	StatementMutableList result = new StatementArrayList(fields.size());
+	ASTList<Statement> result = new ASTArrayList<Statement>(fields.size());
 	for (int i = 0; i<fields.size(); i++) {
-	    Field field = fields.getField(i);
+	    Field field = fields.get(i);
 	    if (!field.isStatic()) {		
 		Identifier fieldId;
 		if (field.getName().charAt(0) != '<') {
@@ -161,7 +168,7 @@ public class PrepareObjectBuilder
     protected StatementBlock createPrepareBody
 	(ReferencePrefix prefix, TypeDeclaration classType) {
 
-	StatementMutableList body = new StatementArrayList(15);
+	ASTList<Statement> body = new ASTArrayList<Statement>(15);
 
 	if (classType != javaLangObject) {
 	    // we can access the implementation	    	    
@@ -169,7 +176,7 @@ public class PrepareObjectBuilder
 			 (new SuperReference(), 
 			  new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE))));
 	}
-	body.add((StatementMutableList)class2fields.get(classType));
+	body.addAll(class2fields.get(classType));
 	return new StatementBlock(body);
     }
     
@@ -181,13 +188,13 @@ public class PrepareObjectBuilder
      * @return the implicit <code>&lt;prepare&gt;</code> method
      */
     public MethodDeclaration createMethod(TypeDeclaration type) {
-	ModifierMutableList modifiers = new ModifierArrayList(1);
+	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(1);
 	modifiers.add(new Protected());	
 	MethodDeclaration md =  new MethodDeclaration
 	    (modifiers, 
 	     null, 
 	     new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE), 
-	     new ParameterDeclarationArrayList(0), 
+	     new ASTArrayList<ParameterDeclaration>(0), 
 	     null,
 	     createPrepareBody(new ThisReference(), type));
 	md.makeAllParentRolesValid();
@@ -202,13 +209,13 @@ public class PrepareObjectBuilder
      * @return the implicit <code>&lt;prepare&gt;</code> method
      */
     public MethodDeclaration createMethodPrepareEnter(TypeDeclaration type) {
-	ModifierMutableList modifiers = new ModifierArrayList(1);
+	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(1);
 	modifiers.add(new Private());	
 	MethodDeclaration md =  new MethodDeclaration
 	    (modifiers, 
 	     null, 
 	     new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE_ENTER), 
-	     new ParameterDeclarationArrayList(0), 
+	     new ASTArrayList<ParameterDeclaration>(0), 
 	     null,
 	     createPrepareBody(new ThisReference(), type));
 	md.makeAllParentRolesValid();

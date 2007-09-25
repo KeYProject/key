@@ -16,15 +16,21 @@ public class ConvertException extends RuntimeException {
     de.uka.ilkd.key.parser.proofjava.ParseException pje;
 
     public ConvertException(String errmsg) {
-	super(""+errmsg);
+	super(errmsg);
     }
     
     public ConvertException(recoder.parser.ParseException pe) {
+        super(pe);
 	this.pe=pe;
     }
 
     public ConvertException(de.uka.ilkd.key.parser.proofjava.ParseException pe){
+        super(pe);
 	this.pje = pe;
+    }
+    
+    public ConvertException(String errmsg, Throwable cause) {
+        super(errmsg, cause);
     }
 
     public recoder.parser.ParseException parseException() {
@@ -40,5 +46,5 @@ public class ConvertException extends RuntimeException {
 	if (pje!=null) return pje.getMessage();
 	return super.getMessage();
     }
-
+    
 }

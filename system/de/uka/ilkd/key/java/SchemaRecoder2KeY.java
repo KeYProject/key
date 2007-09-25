@@ -13,7 +13,11 @@ package de.uka.ilkd.key.java;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashMap;
+import java.util.List;
 
+import recoder.java.declaration.TypeDeclaration;
+import recoder.list.generic.ASTArrayList;
+import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -304,13 +308,13 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader{
 	    context.getCompilationUnitContext();
 
 	// add class to compilation unit
-	recoder.list.TypeDeclarationMutableList typeDecls = 	    
+	ASTList<TypeDeclaration> typeDecls = 	    
 	    cUnit.getDeclarations();
 
 	if (typeDecls==null) {
-	    typeDecls=new recoder.list.TypeDeclarationArrayList(0); 
+	    typeDecls=new ASTArrayList<TypeDeclaration>(0); 
 	} else {
-	    typeDecls = (recoder.list.TypeDeclarationMutableList) 
+	    typeDecls = (ASTList<TypeDeclaration>) 
 		typeDecls.deepClone();
 	}
 	typeDecls.add(classDecl);
@@ -378,11 +382,11 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader{
 	IForUpdates ifu;
 	IGuard iGuard;
 	if (f.getInitializers()!=null && 
-	    f.getInitializers().getLoopInitializer(0) 
+	    f.getInitializers().get(0) 
 	    instanceof de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) {
 	    de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper esvw
 		= (de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper)
-		f.getInitializers().getLoopInitializer(0); //brrrr!
+		f.getInitializers().get(0); //brrrr!
 	    li = (ProgramSV)esvw.getSV();
 	} else {
 	    li = convertLoopInitializers(f);
@@ -399,11 +403,11 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader{
 	}
 
        
-	if (f.getUpdates() != null && f.getUpdates().getExpression(0) 
+	if (f.getUpdates() != null && f.getUpdates().get(0) 
 	    instanceof de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) {
 	    de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper esvw
 		= (de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper)
-		f.getUpdates().getExpression(0);
+		f.getUpdates().get(0);
 	    ifu = (ProgramSV)esvw.getSV();
 	} else {
 	    ifu = convertUpdates(f);
@@ -440,20 +444,20 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader{
      public LocalVariableDeclaration
  	convert(recoder.java.declaration.LocalVariableDeclaration lvd) {  
  	if (lvd.getTypeReference() instanceof TypeSVWrapper) {
- 	    recoder.list.VariableSpecificationList rspecs = lvd.getVariables();
+ 	    List<recoder.java.declaration.VariableSpecification> rspecs = lvd.getVariables();
  	    VariableSpecification[] varspecs
  		= new VariableSpecification[rspecs.size()];
  	    for (int i=0; i<rspecs.size(); i++) {
  		varspecs[i] = convertVarSpecWithSVType
- 		    (rspecs.getVariableSpecification(i));
+ 		    (rspecs.get(i));
  	    }
  	    SchemaVariable typesv
  		= ((TypeSVWrapper)lvd.getTypeReference()).getSV();
 
-	    recoder.list.ModifierList mods = lvd.getModifiers();
+	    List<recoder.java.declaration.Modifier> mods = lvd.getModifiers();
 	    Modifier[] modifiers = new Modifier[mods==null? 0 : mods.size()];
 	    for (int i = 0; i<modifiers.length; i++) {
-		modifiers[i] = (Modifier) callConvert(mods.getModifier(i));
+		modifiers[i] = (Modifier) callConvert(mods.get(i));
 	    }
 	    
  	    return new LocalVariableDeclaration(modifiers, 
@@ -572,7 +576,7 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader{
 	MethodName name = (MethodName) callConvert(mr.getIdentifier());
 	
 	// convert arguments
-	recoder.list.ExpressionMutableList recoderArgs = mr.getArguments();
+	ASTList<recoder.java.Expression> recoderArgs = mr.getArguments();
 	final Expression[] keyArgs;
 	if (recoderArgs != null) {
 	    keyArgs = new Expression[recoderArgs.size()];
@@ -580,7 +584,7 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader{
 	    keyArgs = new Expression[0];
 	}
 	for (int i = 0, sz = keyArgs.length; i<sz; i++) {
-	    keyArgs[i] = (Expression)callConvert(recoderArgs.getExpression(i));
+	    keyArgs[i] = (Expression)callConvert(recoderArgs.get(i));
 	}
 
 	return new MethodReference(new ArrayOfExpression(keyArgs), name, prefix);

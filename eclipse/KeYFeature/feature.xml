@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- $Format: "<feature id=\"KeY_Feature\" label=\"KeY Feature\" version=\"1.$ProjectVersion$\" provider-name=\"KeY Project, University of Karlsruhe\">"$ -->
-<feature id="KeY_Feature" label="KeY Feature" version="1.0.2655" provider-name="KeY Project, University of Karlsruhe">
+<feature id="KeY_Feature" label="KeY Feature" version="1.mulbrichRecoder08.19" provider-name="KeY Project, University of Karlsruhe">
 
    <description url="http://www.key-project.org/">
       KeY is a tool that provides facilities for formal specification
@@ -78,18 +78,18 @@ POSSIBILITY OF SUCH DAMAGES.
    </requires>
 
   <!-- $Format: "  <plugin id=\"KeYPlugin\" download-size=\"0\" install-size=\"0\" version=\"1.$ProjectVersion$\" unpack=\"false\"/> "$ -->
-  <plugin id="KeYPlugin" download-size="0" install-size="0" version="1.0.2655" unpack="false"/> 
+  <plugin id="KeYPlugin" download-size="0" install-size="0" version="1.mulbrichRecoder08.19" unpack="false"/> 
 
   <!-- $Format: "  <plugin id=\"ProofVisualization\" download-size=\"0\" install-size=\"0\" version=\"1.$ProjectVersion$\" unpack=\"false\"/> "$ -->
-  <plugin id="ProofVisualization" download-size="0" install-size="0" version="1.0.2655" unpack="false"/> 
+  <plugin id="ProofVisualization" download-size="0" install-size="0" version="1.mulbrichRecoder08.19" unpack="false"/> 
 
   <!-- $Format: "  <plugin id=\"VisualDebugger\" download-size=\"0\" install-size=\"0\" version=\"1.$ProjectVersion$\" unpack=\"false\"/> "$ -->
-  <plugin id="VisualDebugger" download-size="0" install-size="0" version="1.0.2655" unpack="false"/> 
+  <plugin id="VisualDebugger" download-size="0" install-size="0" version="1.mulbrichRecoder08.19" unpack="false"/> 
 
   <!-- $Format: "  <plugin id=\"KeYExternalLibraries\" download-size=\"0\" install-size=\"0\" version=\"1.$ProjectVersion$\" unpack=\"false\"/> "$ -->
-  <plugin id="KeYExternalLibraries" download-size="0" install-size="0" version="1.0.2655" unpack="false"/> 
+  <plugin id="KeYExternalLibraries" download-size="0" install-size="0" version="1.mulbrichRecoder08.19" unpack="false"/> 
   
   <!-- $Format: "  <plugin id=\"org.key_project.core\" download-size=\"0\" install-size=\"0\" version=\"$ProjectVersion$.0\" unpack=\"false\"/> "$ -->
-  <plugin id="org.key_project.core" download-size="0" install-size="0" version="0.2655.0" unpack="false"/> 
+  <plugin id="org.key_project.core" download-size="0" install-size="0" version="mulbrichRecoder08.19.0" unpack="false"/> 
 
 </feature>

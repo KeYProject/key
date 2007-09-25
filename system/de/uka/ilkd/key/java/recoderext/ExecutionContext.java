@@ -101,7 +101,7 @@ public class ExecutionContext
     public void accept(SourceVisitor visitor) {       
     }
 
-    public Object deepClone() {
+    public ExecutionContext deepClone() {
 	return new ExecutionContext(classContext, runtimeInstance);
     }
 

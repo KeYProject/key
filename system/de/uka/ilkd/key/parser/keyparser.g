@@ -1038,8 +1038,7 @@ options {
                 colOffset=e.parseException().currentToken.next.beginColumn;
                 e.parseException().currentToken.next.beginLine=getLine()-1;
                 e.parseException().currentToken.next.beginColumn=getColumn();
-                throw new JavaParserException(e.parseException().getMessage(), t, 
-                    getFilename(), -1, -1);  // row/columns already in text
+                throw new JavaParserException(e, t, getFilename(), -1, -1);  // row/columns already in text
             }       
             if (e.proofJavaException()!=null
             &&  e.proofJavaException().currentToken != null
@@ -1048,11 +1047,10 @@ options {
                 colOffset=e.proofJavaException().currentToken.next.beginColumn;
                 e.proofJavaException().currentToken.next.beginLine=getLine();
                 e.proofJavaException().currentToken.next.beginColumn =getColumn();
-                 throw  new JavaParserException(e.proofJavaException().
-                    getMessage(), t, getFilename(), lineOffset, colOffset); 
+                 throw  new JavaParserException(e, t, getFilename(), lineOffset, colOffset); 
                             
             }   
-            throw new JavaParserException(e.getMessage(), t, getFilename());
+            throw new JavaParserException(e, t, getFilename());
         } 
         return sjb;
     }

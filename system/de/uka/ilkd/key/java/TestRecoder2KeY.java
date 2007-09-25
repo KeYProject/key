@@ -70,7 +70,7 @@ public class TestRecoder2KeY extends TestCase {
 
     private static String[] jclasses=new String[] {
 	"class A1 { public A1() { }} ",
-	"package qwe.rty; import uio.pas; import dfg.hjk.*; import java.util.*;"	
+	"package qwe.rty; import qwe.rty.A; import dfg.hjk.*; import java.util.*;"	
 	+"public abstract class A implements Z{"
 	+"static {d=3; Vector v = new Vector();}"
 	+"public static int d;"
@@ -86,7 +86,7 @@ public class TestRecoder2KeY extends TestCase {
 	+"private synchronized A ghi(A a) { a=ghi(a); ghi(a); A a1=null; "
 	+" a1=ghi(a1); a=def(a); return null;}"
 	+"protected abstract int[] jkl(A a, int i);"
-	+"protected Object o() {if (s instanceof Class) return s.class;}"
+	+"protected Object o() {if (s instanceof Class) return A.class;}"
 	+"}"
 	+"interface Z { public int d=0; }"
 	+"interface Z0 extends Z {}"

@@ -15,6 +15,8 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.List;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ArrayType;
 import recoder.abstraction.ClassType;
@@ -32,7 +34,7 @@ import recoder.java.reference.FieldReference;
 import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.TypeReference;
 import recoder.kit.TwoPassTransformation;
-import recoder.list.CompilationUnitMutableList;
+import recoder.list.generic.*;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -52,7 +54,7 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class RecoderModelTransformer extends TwoPassTransformation {
 
     protected CrossReferenceServiceConfiguration services;
-    protected CompilationUnitMutableList units;
+    protected List<CompilationUnit> units;
 
     /**
      * creates a transormder for the recoder model
@@ -63,7 +65,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
      */
     public RecoderModelTransformer
 	(CrossReferenceServiceConfiguration services, 
-	 CompilationUnitMutableList units) {	
+	 List<CompilationUnit> units) {	
 	super(services);
 	this.services = services;
 	this.units = units;
@@ -162,7 +164,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
      */
     public void makeExplicit() {
 	for (int i = 0; i<units.size(); i++) {
-	    CompilationUnit unit = units.getCompilationUnit(i);
+	    CompilationUnit unit = units.get(i);
 	    int typeCount = unit.getTypeDeclarationCount();
 	    for (int j = 0; j<typeCount; j++) {
 		makeExplicit(unit.getTypeDeclarationAt(j));

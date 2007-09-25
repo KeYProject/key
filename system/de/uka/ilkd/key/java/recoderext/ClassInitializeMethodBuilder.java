@@ -16,6 +16,7 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.HashMap;
+import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
@@ -30,7 +31,7 @@ import recoder.java.expression.operator.New;
 import recoder.java.reference.*;
 import recoder.java.statement.*;
 import recoder.kit.ProblemReport;
-import recoder.list.*;
+import recoder.list.generic.*;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -64,12 +65,12 @@ public class ClassInitializeMethodBuilder
      * which are declared in one of the given compilation units. 
      * @param services the CrossReferenceServiceConfiguration with the
      * information about the recoder model
-     * @param units the CompilationUnitMutableList with the classes to
+     * @param units the ASTList<CompilationUnit> with the classes to
      * be transformed
      */
     public ClassInitializeMethodBuilder
 	(CrossReferenceServiceConfiguration services, 
-	 CompilationUnitMutableList units) {	
+	 List<CompilationUnit> units) {	
 	super(services, units);
 	class2initializers = new HashMap(10*units.size());
 	class2super = new HashMap(2*units.size());
@@ -104,15 +105,15 @@ public class ClassInitializeMethodBuilder
      * specification that contains an initializer a corresponding copy
      * assignment. Thereby only non constant fields are considered.
      */
-    private StatementList 
+    private ASTList<Statement> 
 	fieldInitializersToAssignments(FieldDeclaration fd) {
 	
-	FieldSpecificationList specs = fd.getFieldSpecifications();
-	StatementMutableList result = 
-	    new StatementArrayList(specs.size());		
+	ASTList<FieldSpecification> specs = fd.getFieldSpecifications();
+	ASTList<Statement> result = 
+	    new ASTArrayList<Statement>(specs.size());		
 	
 	for (int i = 0; i < specs.size(); i++) {
-	    FieldSpecification fs = specs.getFieldSpecification(i);
+	    FieldSpecification fs = specs.get(i);
 	    if (fs.isStatic() && fs.getInitializer() != null &&
 		!isConstantField(fs)) {
 		result.add
@@ -135,9 +136,9 @@ public class ClassInitializeMethodBuilder
      * @param typeDeclaration the ClassDeclaration whose fields have to be prepared 
      * @return the list of copy assignments 
      */
-    private StatementList getInitializers(TypeDeclaration typeDeclaration) {
+    private ASTList<Statement> getInitializers(TypeDeclaration typeDeclaration) {
 	
-	StatementMutableList result = new StatementArrayList
+	ASTList<Statement> result = new ASTArrayList<Statement>
 	    (typeDeclaration.getChildCount());		
 		      
 	for (int i = 0; i<typeDeclaration.getChildCount(); i++) {
@@ -145,7 +146,7 @@ public class ClassInitializeMethodBuilder
 		result.add((Statement)((ClassInitializer)typeDeclaration.
 			    getChildAt(i)).getBody().deepClone());
 	    } else if (typeDeclaration.getChildAt(i) instanceof FieldDeclaration) {
-		result.add(fieldInitializersToAssignments
+		result.addAll(fieldInitializersToAssignments
 			   ((FieldDeclaration)typeDeclaration.getChildAt(i)));
 	    }
 	}
@@ -158,7 +159,7 @@ public class ClassInitializeMethodBuilder
             Debug.fail("Could not find class java.lang.Object or only as bytecode");
         }
         for (int unit = 0; unit<units.size(); unit++) {
-            CompilationUnit cu = units.getCompilationUnit(unit);
+            CompilationUnit cu = units.get(unit);
             int typeCount = cu.getTypeDeclarationCount();
             
             for (int i = 0; i < typeCount; i++) {		
@@ -219,7 +220,7 @@ public class ClassInitializeMethodBuilder
     private Catch createCatchClause
 	(String caughtType, String caughtParam, Throw t) {
 
-	StatementMutableList catcher = new StatementArrayList(3);  	
+	ASTList<Statement> catcher = new ASTArrayList<Statement>(3);  	
 
 	CopyAssignment resetInitInProgress = 
 	    assign(passiveFieldReference
@@ -257,16 +258,16 @@ public class ClassInitializeMethodBuilder
     private Try createInitializerExecutionTryBlock(TypeDeclaration td) {
 
 	// try block
-	StatementMutableList initializerExecutionBody;
+	ASTList<Statement> initializerExecutionBody;
 
-	initializerExecutionBody = (StatementMutableList) class2initializers.get(td);
+	initializerExecutionBody = (ASTList<Statement>) class2initializers.get(td);
 	if (initializerExecutionBody == null) {
-	    initializerExecutionBody = new StatementArrayList(20);
+	    initializerExecutionBody = new ASTArrayList<Statement>(20);
 	}
 
 	if (td instanceof ClassDeclaration && td!=javaLangObject) {
 	    ClassDeclaration cd = (ClassDeclaration) td;
-	    initializerExecutionBody.insert
+	    initializerExecutionBody.add
 		(0, new PassiveExpression
 		 (new MethodReference
 		  ((TypeReference)
@@ -278,15 +279,15 @@ public class ClassInitializeMethodBuilder
 	// catch clauses
 
 
-       	BranchMutableList catchClauses = new BranchArrayList(2);
+       	ASTList<Branch> catchClauses = new ASTArrayList<Branch>(2);
 
 	catchClauses.add
 	    (createCatchClause
 	     ("Error", "err", 
 	      new Throw(new VariableReference(new Identifier("err")))));
 
-	ExpressionMutableList exceptionInInitializerArguments = 
-	    new ExpressionArrayList(1);
+	ASTList<Expression> exceptionInInitializerArguments = 
+	    new ASTArrayList<Expression>(1);
 	exceptionInInitializerArguments.add
 	    (new VariableReference(new Identifier("twa")));
 
@@ -309,11 +310,11 @@ public class ClassInitializeMethodBuilder
      */
     private StatementBlock createInitializeMethodBody(TypeDeclaration td) {
 
-	StatementMutableList methodBody = new StatementArrayList(1);	
-	StatementMutableList clInitializeBody = new StatementArrayList(2);	
-	StatementMutableList clInitNotInProgressBody = new StatementArrayList(20);	
+	ASTList<Statement> methodBody = new ASTArrayList<Statement>(1);	
+	ASTList<Statement> clInitializeBody = new ASTArrayList<Statement>(2);	
+	ASTList<Statement> clInitNotInProgressBody = new ASTArrayList<Statement>(20);	
 
-	StatementMutableList clNotPreparedBody = new StatementArrayList(1);
+	ASTList<Statement> clNotPreparedBody = new ASTArrayList<Statement>(1);
  	clNotPreparedBody.add
  	    (new PassiveExpression
  	     (new MethodReference
@@ -330,7 +331,7 @@ public class ClassInitializeMethodBuilder
 	clInitNotInProgressBody.add(isClassPrepared);
 
 
-	StatementMutableList clErroneousBody = new StatementArrayList(1);
+	ASTList<Statement> clErroneousBody = new ASTArrayList<Statement>(1);
 	clErroneousBody.add
 	    (new Throw(new New(null, 
 			       new TypeReference
@@ -406,14 +407,14 @@ public class ClassInitializeMethodBuilder
      * @return the created class preparation method
      */
     private MethodDeclaration createInitializeMethod(TypeDeclaration td) {
-	ModifierMutableList modifiers = new ModifierArrayList(2);
+	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(2);
 	modifiers.add(new Static());
 	modifiers.add(new Public());
 	return new MethodDeclaration(modifiers, 
 				     null,  // return type is void
 				     new ImplicitIdentifier
 				     (CLASS_INITIALIZE_IDENTIFIER),
-				     new ParameterDeclarationArrayList(0), 
+				     new ASTArrayList<ParameterDeclaration>(0), 
 				     null, // no declared throws
 				     createInitializeMethodBody(td));
     }

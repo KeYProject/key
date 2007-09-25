@@ -15,20 +15,23 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.List;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
+import recoder.java.CompilationUnit;
 import recoder.java.Identifier;
 import recoder.java.declaration.ClassDeclaration;
 import recoder.java.declaration.FieldDeclaration;
+import recoder.java.declaration.DeclarationSpecifier;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.java.declaration.modifier.Private;
 import recoder.java.declaration.modifier.Public;
 import recoder.java.declaration.modifier.Static;
 import recoder.java.reference.TypeReference;
 import recoder.kit.ProblemReport;
-import recoder.list.CompilationUnitMutableList;
-import recoder.list.ModifierArrayList;
-import recoder.list.ModifierMutableList;
+import recoder.list.generic.ASTArrayList;
+import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -74,7 +77,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
      */
     public ImplicitFieldAdder
 	(CrossReferenceServiceConfiguration services, 
-	 CompilationUnitMutableList units) {	
+	 List<CompilationUnit> units) {	
 	super(services, units);
     }
 
@@ -90,7 +93,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	(String typeName, String fieldName, 
 	 boolean isStatic, boolean isPrivate) {
 	
-	ModifierMutableList modifiers = new ModifierArrayList
+	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>
 	    (1 + (isStatic ? 1 : 0));
 
 	if (isStatic) {

@@ -15,7 +15,9 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
@@ -30,7 +32,8 @@ import recoder.java.declaration.modifier.Public;
 import recoder.java.expression.operator.CopyAssignment;
 import recoder.java.reference.*;
 import recoder.kit.ProblemReport;
-import recoder.list.*;
+import recoder.list.generic.*;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -48,20 +51,20 @@ public class ConstructorNormalformBuilder
     public static final String 
 	OBJECT_INITIALIZER_IDENTIFIER = "<objectInitializer>";
         
-    private HashMap class2constructors;
-    private HashMap class2initializers;
-    private HashMap class2methodDeclaration;
+    private HashMap<TypeDeclaration, List<Constructor>> class2constructors;
+    private HashMap<TypeDeclaration, ASTList<Statement>> class2initializers;
+    private HashMap<TypeDeclaration, ASTList<MethodDeclaration>> class2methodDeclaration;
 
     private ClassType javaLangObject;
 
     /** creates the constructor normalform builder */
     public ConstructorNormalformBuilder
 	(CrossReferenceServiceConfiguration services, 
-	 CompilationUnitMutableList units) {	
+	 List<CompilationUnit> units) {	
 	super(services, units);
-	class2constructors = new HashMap(4*units.size());
-	class2initializers = new HashMap(10*units.size());
-	class2methodDeclaration = new HashMap(10*units.size());
+	class2constructors = new HashMap<TypeDeclaration, List<Constructor>>(4*units.size());
+	class2initializers = new HashMap<TypeDeclaration, ASTList<Statement>>(10*units.size());
+	class2methodDeclaration = new HashMap<TypeDeclaration, ASTList<MethodDeclaration>>(10*units.size());
     }
 
 
@@ -98,15 +101,15 @@ public class ConstructorNormalformBuilder
      * @return the list of copy assignments and method references
      * realising the initializers. 
      */
-    private StatementList collectInitializers(ClassDeclaration cd) {
-	StatementMutableList result = new StatementArrayList(20);
-	MethodDeclarationMutableList mdl = new MethodDeclarationArrayList(5);
+    private ASTList<Statement> collectInitializers(ClassDeclaration cd) {
+	ASTList<Statement> result = new ASTArrayList<Statement>(20);
+	ASTList<MethodDeclaration> mdl = new ASTArrayList<MethodDeclaration>(5);
 	int childCount = cd.getChildCount();
 	for (int i = 0; i<childCount; i++) {
 	    if (cd.getChildAt(i) instanceof ClassInitializer &&
 		!((ClassInitializer)cd.getChildAt(i)).isStatic()) {
 
-		ModifierMutableList mods = new ModifierArrayList(1);
+		ASTList<DeclarationSpecifier> mods = new ASTArrayList<DeclarationSpecifier>(1);
 		mods.add(new Private());
 		String name = OBJECT_INITIALIZER_IDENTIFIER + mdl.size();
 		MethodDeclaration initializerMethod = 
@@ -114,7 +117,7 @@ public class ConstructorNormalformBuilder
 		    (mods,
 		     null, //return type is void
 		     new ImplicitIdentifier(name),
-		     new ParameterDeclarationArrayList(0),
+		     new ASTArrayList<ParameterDeclaration>(0),
 		     null,
 		     (StatementBlock)
 		     ((ClassInitializer)cd.getChildAt(i)).getBody().deepClone());		
@@ -125,17 +128,17 @@ public class ConstructorNormalformBuilder
 			    new ImplicitIdentifier(name)));			   
 	    } else if (cd.getChildAt(i) instanceof FieldDeclaration &&
 		       !((FieldDeclaration)cd.getChildAt(i)).isStatic()) {
-		FieldSpecificationList specs =
+		ASTList<FieldSpecification> specs =
 		    ((FieldDeclaration)cd.getChildAt(i)).getFieldSpecifications();
 		for (int j = 0; j < specs.size(); j++) {
 		    Expression fieldInit = null;
-		    if ((fieldInit = specs.getFieldSpecification(j).			 
+		    if ((fieldInit = specs.get(j).			 
 			 getInitializer()) != null) {
 			CopyAssignment fieldCopy = 
 			    new CopyAssignment
 			    (new FieldReference
 			     (new ThisReference(), 
-			      specs.getFieldSpecification(j).getIdentifier()),
+			      specs.get(j).getIdentifier()),
                               (Expression)fieldInit.deepClone());
 			result.add(fieldCopy);
 		    }
@@ -161,7 +164,7 @@ public class ConstructorNormalformBuilder
 	     Debug.fail("Could not find class java.lang.Object or only as bytecode");
 	 }
         for (int unit = 0; unit<units.size(); unit++) {
-	    CompilationUnit cu = units.getCompilationUnit(unit);
+	    CompilationUnit cu = units.get(unit);
 	    int typeCount = cu.getTypeDeclarationCount();
 	
 	    for (int i = 0; i < typeCount; i++) {
@@ -177,9 +180,9 @@ public class ConstructorNormalformBuilder
 			}
 			
 			// collect constructors for transformation phase
-			ConstructorMutableList constructors = 
-			    new ConstructorArrayList(10);
-			constructors.add(services.getSourceInfo().getConstructors(cd));
+			List<Constructor> constructors = 
+			    new ArrayList<Constructor>(10);
+			constructors.addAll(services.getSourceInfo().getConstructors(cd));
 			class2constructors.put(cd, constructors);
 						
 			// collect initializers for transformation phase
@@ -203,22 +206,22 @@ public class ConstructorNormalformBuilder
     private MethodDeclaration normalform(ClassDeclaration cd, 
 					 Constructor cons) {	
 	
-	ModifierMutableList mods = new ModifierArrayList(5);
-	ParameterDeclarationMutableList parameters;
+	ASTList<DeclarationSpecifier> mods = new ASTArrayList<DeclarationSpecifier>(5);
+	ASTList<ParameterDeclaration> parameters;
 	Throws recThrows;
 	StatementBlock body;
 	
 	if (!(cons instanceof ConstructorDeclaration)) {
 	    mods.add(new Public());
-	    parameters = new ParameterDeclarationArrayList(0);
+	    parameters = new ASTArrayList<ParameterDeclaration>(0);
 	    recThrows = null;
 	    body = new StatementBlock();	    
 	} else {
 	    ConstructorDeclaration consDecl = (ConstructorDeclaration)cons;
-	    mods = (ModifierMutableList)
-		(consDecl.getModifiers()==null ? null : consDecl.getModifiers().deepClone());	    
+	    mods = (ASTList<DeclarationSpecifier>)
+		(consDecl.getDeclarationSpecifiers()==null ? null : consDecl.getDeclarationSpecifiers().deepClone());	    
 	    parameters = 
-		(ParameterDeclarationMutableList)consDecl.getParameters().deepClone();
+		(ASTList<ParameterDeclaration>)consDecl.getParameters().deepClone();
 	    recThrows = (Throws) (consDecl.getThrown() == null ? null : 
 				  consDecl.getThrown().deepClone());
 	    body = (StatementBlock) consDecl.getBody().deepClone();
@@ -232,7 +235,7 @@ public class ConstructorNormalformBuilder
 	    // first statement has to be a this or super constructor call	
 	    if (!(first instanceof SpecialConstructorReference)) {
 		if (body.getBody() == null) {
-		    body.setBody(new StatementArrayList());
+		    body.setBody(new ASTArrayList<Statement>());
 		}
 		attach(new MethodReference
 		    (new SuperReference(), new ImplicitIdentifier
@@ -253,11 +256,10 @@ public class ConstructorNormalformBuilder
 	    // the instance initializers have to be added in source code
 	    // order
 	    if (!(first instanceof ThisConstructorReference)) {
-		StatementMutableList initializers = (StatementMutableList)
-		    class2initializers.get(cd);
+		ASTList<Statement> initializers = class2initializers.get(cd);
 		for (int i = 0; i<initializers.size(); i++) {
 		    attach((Statement) 
-			   initializers.getStatement(i).deepClone(),
+			   initializers.get(i).deepClone(),
 			   body, i+1);
 		}
 	    }
@@ -281,17 +283,16 @@ public class ConstructorNormalformBuilder
      */
     protected void makeExplicit(TypeDeclaration td) {
 	if (td instanceof ClassDeclaration) {
-	    ConstructorMutableList constructors = 
-		(ConstructorMutableList) class2constructors.get(td);
+	    List<Constructor> constructors = class2constructors.get(td);
 	    for (int i = 0; i < constructors.size(); i++) {
 		attach(normalform
 		       ((ClassDeclaration)td, 
-			constructors.getConstructor(i)), td, 0);
+			constructors.get(i)), td, 0);
 	    }	    
 
-	    MethodDeclarationList mdl = (MethodDeclarationList)class2methodDeclaration.get(td);
+	    ASTList<MethodDeclaration> mdl = class2methodDeclaration.get(td);
 	    for (int i = 0; i < mdl.size(); i++) {
-		attach(mdl.getMethodDeclaration(i), td, 0);
+		attach(mdl.get(i), td, 0);
 	    }
 
 /*  	    java.io.StringWriter sw = new java.io.StringWriter();

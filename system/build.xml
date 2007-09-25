@@ -68,7 +68,7 @@
 
   <target name="coverage" depends="instrument, test">
    <mkdir dir="${instrument.dir}" />
-   <report srcdir="${src.dir}" destdir="${basedir}/coverage/" />
+ srcdir="${src.dir}" destdir="${basedir}/coverage/" />
    <delete dir="${instrument.dir}" />   
    <delete file="${basedir}/jcoverage.ser" />
   </target>
@@ -99,12 +99,12 @@
   </target>
 
 
-  <taskdef name="javacc"
+<!--  <taskdef name="javacc"
            classname="org.apache.tools.ant.taskdefs.optional.javacc.JavaCC">
     <classpath>
       <pathelement location="${ant.home}/lib"/>
     </classpath>
-  </taskdef>
+  </taskdef>-->
 
   <target name="compile.clean">
     <delete>

@@ -11,6 +11,9 @@ package de.uka.ilkd.key.java;
 
 import java.util.*;
 
+import recoder.abstraction.ClassType;
+import recoder.list.generic.ASTArrayList;
+import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
@@ -90,7 +93,7 @@ public class KeYProgModelInfo{
     }
 
 
-    private recoder.list.MethodList getAllRecoderMethods(KeYJavaType kjt){
+    private List<recoder.abstraction.Method> getAllRecoderMethods(KeYJavaType kjt){
 	if (kjt.getJavaType() instanceof TypeDeclaration) {
 	    Object o = rec2key().toRecoder(kjt);
 	    if (o instanceof recoder.abstraction.ClassType) {
@@ -99,7 +102,7 @@ public class KeYProgModelInfo{
 		return rtd.getAllMethods();
 	    }
 	}
-	return new recoder.list.MethodArrayList();
+	return new ArrayList<recoder.abstraction.Method>();
 	
     }
 
@@ -111,10 +114,10 @@ public class KeYProgModelInfo{
      */
 
     public ListOfMethod getAllMethods(KeYJavaType kjt) {
-        recoder.list.MethodList rmethods=getAllRecoderMethods(kjt);
+        List<recoder.abstraction.Method> rmethods=getAllRecoderMethods(kjt);
         ListOfMethod result = SLListOfMethod.EMPTY_LIST;
         for (int i=rmethods.size()-1; i>=0; i--) {
-            recoder.abstraction.Method rm=rmethods.getMethod(i);
+            recoder.abstraction.Method rm=rmethods.get(i);
             Method m= 
 		((ProgramMethod)rec2key().toKeY(rm)).getMethodDeclaration();
             result=result.prepend(m);
@@ -130,10 +133,10 @@ public class KeYProgModelInfo{
      */
 
     public ListOfProgramMethod getAllProgramMethods(KeYJavaType kjt) {
-        recoder.list.MethodList rmethods=getAllRecoderMethods(kjt);
+        List<recoder.abstraction.Method> rmethods=getAllRecoderMethods(kjt);
         ListOfProgramMethod result = SLListOfProgramMethod.EMPTY_LIST;
         for (int i=rmethods.size()-1; i>=0; i--) {
-            recoder.abstraction.Method rm=rmethods.getMethod(i);
+            recoder.abstraction.Method rm=rmethods.get(i);
             ProgramMethod m=(ProgramMethod)rec2key().toKeY(rm);
 	    if (m!=null) {
 		result=result.prepend(m);
@@ -144,13 +147,13 @@ public class KeYProgModelInfo{
 
 
 
-    private recoder.list.TypeList getRecoderTypes(ListOfType types) {
+    private List<recoder.abstraction.Type> getRecoderTypes(ListOfType types) {
         if (types==null) {
             return null;
         }
         IteratorOfType it=types.iterator();
-        recoder.list.TypeArrayList tl
-            = new recoder.list.TypeArrayList(types.size());
+        ArrayList<recoder.abstraction.Type> tl
+            = new ArrayList<recoder.abstraction.Type>(types.size());
         while (it.hasNext()) {
 	    Type n = it.next();
             tl.add( (recoder.abstraction.Type) rec2key().toRecoder(n));
@@ -158,13 +161,13 @@ public class KeYProgModelInfo{
         return tl;
     }
 
-    private recoder.list.TypeList getRecoderTypes(ListOfKeYJavaType types) {
+    private List<recoder.abstraction.Type> getRecoderTypes(ListOfKeYJavaType types) {
         if (types==null) {
             return null;
         }
         IteratorOfKeYJavaType it=types.iterator();
-        recoder.list.TypeArrayList tl
-            = new recoder.list.TypeArrayList(types.size());
+        ArrayList<recoder.abstraction.Type> tl
+            = new ArrayList<recoder.abstraction.Type>(types.size());
         while (it.hasNext()) {
             final KeYJavaType kjt = it.next();  
             tl.add( (recoder.abstraction.Type) rec2key().toRecoder(kjt));
@@ -309,19 +312,19 @@ public class KeYProgModelInfo{
 	return false;
     }
 
-    private recoder.list.MethodList getRecoderMethods(KeYJavaType ct){
+    private List<recoder.abstraction.Method> getRecoderMethods(KeYJavaType ct){
         recoder.abstraction.ClassType rct
             = (recoder.abstraction.ClassType) rec2key().toRecoder(ct);
         return rct.getProgramModelInfo().getMethods(rct);
     }
     
-    private recoder.list.ConstructorList getRecoderConstructors(KeYJavaType ct){
+    private List<recoder.abstraction.Constructor> getRecoderConstructors(KeYJavaType ct){
         recoder.abstraction.ClassType rct
             = (recoder.abstraction.ClassType) rec2key().toRecoder(ct);
         return rct.getProgramModelInfo().getConstructors(rct);
     }    
 
-    private recoder.list.MethodList getRecoderMethods
+    private List<recoder.abstraction.Method> getRecoderMethods
 	(KeYJavaType ct, String m, ListOfType signature, KeYJavaType context){
         recoder.abstraction.ClassType rct
             = (recoder.abstraction.ClassType) rec2key().toRecoder(ct);
@@ -329,11 +332,12 @@ public class KeYProgModelInfo{
             = (recoder.abstraction.ClassType) rec2key().toRecoder(context);
         return rct.getProgramModelInfo().getMethods(rct, m,
 						    getRecoderTypes(signature),
+						    null,  // no generic type variables yet
 						    rcontext);
     }
 
 
-    private recoder.list.MethodList getRecoderMethods
+    private List<recoder.abstraction.Method> getRecoderMethods
 	(KeYJavaType ct, String m, ListOfKeYJavaType signature, 
 	 KeYJavaType context){
         final recoder.abstraction.ClassType rct
@@ -342,14 +346,15 @@ public class KeYProgModelInfo{
             = (recoder.abstraction.ClassType) rec2key().toRecoder(context); 
         return rct.getProgramModelInfo().getMethods(rct, m,
 						    getRecoderTypes(signature),
+						    null, // no generic type arguments yet
 						    rcontext);
     }
 
-    private recoder.list.ConstructorList getRecoderConstructors
+    private List<? extends recoder.abstraction.Constructor> getRecoderConstructors
 	(KeYJavaType ct, ListOfKeYJavaType signature){
         recoder.abstraction.ClassType rct
             = (recoder.abstraction.ClassType) rec2key().toRecoder(ct);
-	recoder.list.ConstructorList res = rct.getProgramModelInfo().getConstructors
+	List<? extends recoder.abstraction.Constructor> res = rct.getProgramModelInfo().getConstructors
 	    (rct, getRecoderTypes(signature));
 	return res;
     }
@@ -368,11 +373,11 @@ public class KeYProgModelInfo{
 
     public ListOfMethod getMethods(KeYJavaType ct, String m,
 				   ListOfType signature, KeYJavaType context){
-        recoder.list.MethodList rml = 
+        List<recoder.abstraction.Method> rml = 
 	    getRecoderMethods(ct, m, signature, context);
         ListOfMethod result = SLListOfMethod.EMPTY_LIST;
         for (int i=rml.size()-1; i>=0; i--) {
-            recoder.abstraction.Method rm=rml.getMethod(i);
+            recoder.abstraction.Method rm=rml.get(i);
             Method method=(Method)rec2key().toKeY(rm);
             result=result.prepend(method);
         }
@@ -388,10 +393,10 @@ public class KeYProgModelInfo{
 	 */
 
     public ListOfMethod getMethods(KeYJavaType ct){
-        recoder.list.MethodList rml = getRecoderMethods(ct);
+        List<recoder.abstraction.Method> rml = getRecoderMethods(ct);
         ListOfMethod result = SLListOfMethod.EMPTY_LIST;
         for (int i=rml.size()-1; i>=0; i--) {
-            recoder.abstraction.Method rm=rml.getMethod(i);
+            recoder.abstraction.Method rm=rml.get(i);
 	    if(!(rm instanceof recoder.bytecode.MethodInfo)){
 		Method m = ((ProgramMethod) rec2key().toKeY(rm)).
 		    getMethodDeclaration();
@@ -408,10 +413,10 @@ public class KeYProgModelInfo{
 	 * @param ct a class type.
 	 */
     public ListOfProgramMethod getAllProgramMethodsLocallyDeclared(KeYJavaType ct){
-        recoder.list.MethodList rml = getRecoderMethods(ct);
+        List<recoder.abstraction.Method> rml = getRecoderMethods(ct);
         ListOfProgramMethod result = SLListOfProgramMethod.EMPTY_LIST;
         for (int i=rml.size()-1; i>=0; i--) {
-            recoder.abstraction.Method rm=rml.getMethod(i);
+            recoder.abstraction.Method rm=rml.get(i);
 	    if(!(rm instanceof recoder.bytecode.MethodInfo)){
 		result = result.prepend((ProgramMethod) rec2key().toKeY(rm));
 	    }
@@ -427,10 +432,10 @@ public class KeYProgModelInfo{
 	 */
 
     public ListOfProgramMethod getConstructors(KeYJavaType ct){
-        recoder.list.ConstructorList rcl = getRecoderConstructors(ct);
+        List<recoder.abstraction.Constructor> rcl = getRecoderConstructors(ct);
         ListOfProgramMethod result = SLListOfProgramMethod.EMPTY_LIST;
         for (int i=rcl.size()-1; i>=0; i--) {
-            recoder.abstraction.Method rm=rcl.getConstructor(i);
+            recoder.abstraction.Method rm=rcl.get(i);
 	    ProgramMethod m=(ProgramMethod) rec2key().toKeY(rm);
 	    if(m != null){
 		result=result.prepend(m);
@@ -448,7 +453,7 @@ public class KeYProgModelInfo{
      */
     public Constructor getConstructor(KeYJavaType ct, 
 				      ListOfKeYJavaType signature) {
-        recoder.list.ConstructorList constructors =
+        List<? extends recoder.abstraction.Constructor> constructors =
             getRecoderConstructors(ct, signature);
         if (constructors.size()==1) {
 	    Object o = rec2key().toKeY(constructors.getConstructor(0));
@@ -513,10 +518,10 @@ public class KeYProgModelInfo{
 	    return getImplicitMethod(ct, m);
 	}
         
-        recoder.list.MethodList methodlist =
+        List<recoder.abstraction.Method> methodlist =
             getRecoderMethods(ct, m, signature, context);		
         if (methodlist.size()==1) {
-            return (ProgramMethod) rec2key().toKeY(methodlist.getMethod(0));
+            return (ProgramMethod) rec2key().toKeY(methodlist.get(0));
         } 
         
         Debug.out("Program Method not found: ", m);
@@ -543,11 +548,11 @@ public class KeYProgModelInfo{
             return getImplicitMethod(ct, m);
 	}
      
-	recoder.list.MethodList methodlist = 
+	List<recoder.abstraction.Method> methodlist = 
             getRecoderMethods(ct, m, signature, context);		
 
         if (methodlist.size()==1) {
-            return (ProgramMethod) rec2key().toKeY(methodlist.getMethod(0));
+            return (ProgramMethod) rec2key().toKeY(methodlist.get(0));
         } else if (methodlist.size()==0) {
             Debug.out("javainfo: Program Method not found: ", m);
             return null;
@@ -561,10 +566,10 @@ public class KeYProgModelInfo{
     /**
      * returns the same fields as given in <tt>rfl</tt> and returns 
      * their KeY representation
-     * @param rfl the ListOfField to be looked up
+     * @param rfl the List of fields to be looked up
      * @return list with the corresponding fields as KeY datastructures
      */
-    private ListOfField asKeYFields(recoder.list.FieldList rfl) {
+    private ListOfField asKeYFields(List<? extends recoder.abstraction.Field> rfl) {
         ListOfField result = SLListOfField.EMPTY_LIST;
         if(rfl == null){
             // this occurs for the artificial Null object at the moment
@@ -572,7 +577,7 @@ public class KeYProgModelInfo{
             return result;
         }
         for (int i=rfl.size()-1; i>=0; i--) {
-            recoder.abstraction.Field rf = rfl.getField(i);
+            recoder.abstraction.Field rf = rfl.get(i);
             Field f = (Field)rec2key().toKeY(rf);
             if (f != null) { 
                 result = result.prepend(f);
@@ -619,7 +624,7 @@ public class KeYProgModelInfo{
         
         recoder.abstraction.ClassType rct
         = (recoder.abstraction.ClassType) rec2key().toRecoder(ct);
-        recoder.list.FieldList rfl =
+        List<recoder.abstraction.Field> rfl =
             rct.getProgramModelInfo().getAllFields(rct);        
         return asKeYFields(rfl);
     }
@@ -666,7 +671,7 @@ public class KeYProgModelInfo{
     /**
      * returns all proper subtypes of class <code>ct</code> (i.e. without <code>ct</code> itself)      
      */
-    private recoder.list.ClassTypeList getAllRecoderSubtypes(KeYJavaType ct){
+    private List<recoder.abstraction.ClassType> getAllRecoderSubtypes(KeYJavaType ct){
         return sc.getCrossReferenceSourceInfo().
             getAllSubtypes((recoder.abstraction.ClassType)rec2key().toRecoder(ct));
     }
@@ -675,7 +680,7 @@ public class KeYProgModelInfo{
      * returns all supertypes of the given class type with the type itself as
      * first element    
      */
-    private recoder.list.ClassTypeList getAllRecoderSupertypes(KeYJavaType ct){
+    private List<recoder.abstraction.ClassType> getAllRecoderSupertypes(KeYJavaType ct){
         return sc.getCrossReferenceSourceInfo().
            getAllSupertypes((recoder.abstraction.ClassType)rec2key().toRecoder(ct));
     }
@@ -684,14 +689,14 @@ public class KeYProgModelInfo{
     /**
      * returns a list of KeYJavaTypes representing the given recoder types in
      * the same order
-     * @param rctl the ClassTypeList to be converted
+     * @param rctl the ASTList<ClassType> to be converted
      * @return list of KeYJavaTypes representing the given recoder types in
      * the same order
      */
-    private ListOfKeYJavaType asKeYJavaTypes(final recoder.list.ClassTypeList rctl) {
+    private ListOfKeYJavaType asKeYJavaTypes(final List<recoder.abstraction.ClassType> rctl) {
         ListOfKeYJavaType result = SLListOfKeYJavaType.EMPTY_LIST;
         for (int i=rctl.size()-1; i>=0 ; i--){
-            final recoder.abstraction.ClassType rct = rctl.getClassType(i);
+            final recoder.abstraction.ClassType rct = rctl.get(i);
             final KeYJavaType kct = (KeYJavaType)rec2key().toKeY(rct);
             result = result.prepend(kct);
         }
@@ -753,12 +758,12 @@ public class KeYProgModelInfo{
         recoder.abstraction.ClassType rct =
          (recoder.abstraction.ClassType) rec2key().toRecoder(ct);
         // transform the signature up to recoder conventions
-        recoder.list.TypeArrayList rsignature = 
-            new recoder.list.TypeArrayList(signature.size());
+        ArrayList<recoder.abstraction.Type> rsignature = 
+            new ArrayList<recoder.abstraction.Type>(signature.size());
         IteratorOfKeYJavaType i = signature.iterator();
         int j = 0;
         while (i.hasNext()) {
-            rsignature.insert(j, (recoder.abstraction.Type)
+            rsignature.add(j, (recoder.abstraction.Type)
             rec2key().toRecoder(i.next()));
             j++;
         }
@@ -777,13 +782,13 @@ public class KeYProgModelInfo{
 
         if ( !declaresApplicableMethods(rct, name, rsignature)) {
             // ct has no implementation, go up
-            recoder.list.ClassTypeList superTypes = rct.getAllSupertypes();
+            List<recoder.abstraction.ClassType> superTypes = rct.getAllSupertypes();
             int k=0;
             while (k<superTypes.size() &&
-		   !declaresApplicableMethods(superTypes.getClassType(k),
+		   !declaresApplicableMethods(superTypes.get(k),
                                               name, rsignature)) k++;
 	    if (k<superTypes.size()) {
-		rct = superTypes.getClassType(k);
+		rct = superTypes.get(k);
 		KeYJavaType r = (KeYJavaType)mapping.toKeY(rct);
 		if (r==null) {
 		    System.out.println("Type "+rct.getName());
@@ -800,7 +805,7 @@ public class KeYProgModelInfo{
     private ListOfKeYJavaType recFindImplementations(
                                         recoder.abstraction.ClassType ct,
                                         String name,
-                                        recoder.list.TypeList signature,
+                                        List<recoder.abstraction.Type> signature,
 					ListOfKeYJavaType result) {
         recoder.service.CrossReferenceSourceInfo si 
 	    = getServConf().getCrossReferenceSourceInfo();
@@ -814,19 +819,15 @@ public class KeYProgModelInfo{
 	    }
         }
 
-        recoder.list.ClassTypeList classes = si.getSubtypes(ct);
+        List<recoder.abstraction.ClassType> classes = si.getSubtypes(ct);
 
 
         //alpha sorting to make order deterministic
         recoder.abstraction.ClassType[] classesArray = 
-            classes.toClassTypeArray();
-        java.util.Arrays.sort(classesArray, new java.util.Comparator() {
-            public int compare(Object o1, Object o2) {
-                recoder.abstraction.ClassType c1 = 
-                    (recoder.abstraction.ClassType) o1;
-                recoder.abstraction.ClassType c2 = 
-                    (recoder.abstraction.ClassType) o2;
-                return -c1.getFullName().compareTo(c2.getFullName());
+            classes.toArray(new recoder.abstraction.ClassType[0]);
+        java.util.Arrays.sort(classesArray, new java.util.Comparator<recoder.abstraction.ClassType>() {
+            public int compare(ClassType o1, ClassType o2) {                
+                return -o1.getFullName().compareTo(o2.getFullName());
             }
         });
 
@@ -840,15 +841,15 @@ public class KeYProgModelInfo{
 
     private boolean declaresApplicableMethods(recoder.abstraction.ClassType ct,
 					      String name,
-					      recoder.list.TypeList signature) {
+					      List<recoder.abstraction.Type> signature) {
         recoder.service.CrossReferenceSourceInfo si 
 	    = getServConf().getCrossReferenceSourceInfo();
 	
-	recoder.list.MethodList list = si.getMethods(ct);
+	List<recoder.abstraction.Method> list = si.getMethods(ct);
 	int s = list.size();
 	int i = 0;
 	while (i < s) {
-	    recoder.abstraction.Method m = list.getMethod(i);
+	    recoder.abstraction.Method m = list.get(i);
 	    if (name.equals(m.getName())
 		&& si.isCompatibleSignature(signature, m.getSignature())
 		&& si.isVisibleFor(m, ct)

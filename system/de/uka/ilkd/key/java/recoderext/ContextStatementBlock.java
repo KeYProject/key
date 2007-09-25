@@ -13,8 +13,9 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
+import recoder.java.Statement;
 import recoder.java.StatementBlock;
-import recoder.list.StatementMutableList;
+import recoder.list.generic.ASTList;
 
 /**
    Statement block.
@@ -52,7 +53,7 @@ public class ContextStatementBlock
      @param block a statement mutable list.
      */
     public ContextStatementBlock(TypeSVWrapper tr, ExpressionSVWrapper runtime, 
-				 StatementMutableList block) {
+				 ASTList<Statement> block) {
 	super(block);
 	if (tr != null) {
 	    this.ec = new ExecutionContext(tr, runtime);

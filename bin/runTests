@@ -238,6 +238,7 @@ COMPLETEOPTIONS="$JAVA_OPTIONS $keysysprops  $hpfix \
 -ea:de.uka.ilkd.key... -noverify -Djvm.dir=$JVM_DIR -Xms64m -Xmx512m \
 -Dkey.home=$KEY_HOME \
 -Dkey.pattern.path=$HOME/.key/keypatterns/ \
+-Djava5=false \
 -Dasmkey.home.path=$KEY_HOME \
 -Dasmkey.base.path=$KEY_HOME/system/resources-asmkey/base/ \
 -classpath $TGH/lib/together.jar:\

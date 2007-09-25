@@ -14,17 +14,15 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 
 import recoder.abstraction.ClassType;
 import recoder.bytecode.ClassFile;
-import recoder.list.ClassTypeList;
-import recoder.list.ExpressionMutableList;
-import recoder.list.LoopInitializerMutableList;
+import recoder.io.ClassFileRepository;
+import recoder.list.generic.ASTArrayList;
+import recoder.list.generic.ASTList;
 import recoder.service.ChangeHistory;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
@@ -241,20 +239,20 @@ public class Recoder2KeY implements JavaReader{
         
         
 	// add method to memberdeclaration list
-	recoder.list.MemberDeclarationMutableList memberList = 
+	ASTList<recoder.java.declaration.MemberDeclaration> memberList = 
 	    classContext.getMembers();
 
 	if (memberList == null) {
-	    memberList = new recoder.list.MemberDeclarationArrayList(1); 
+	    memberList = new ASTArrayList<recoder.java.declaration.MemberDeclaration>(1); 
 	    classContext.setMembers(memberList);
 	} 
 
 	for (int i=0, sz=memberList.size(); i<sz; i++) {
-	    if (memberList.getMemberDeclaration(i) 
+	    if (memberList.get(i) 
 		instanceof recoder.java.declaration.MethodDeclaration) {
 		recoder.java.declaration.MethodDeclaration olddecl
 		    = (recoder.java.declaration.MethodDeclaration) 
-		    memberList.getMemberDeclaration(i);
+		    memberList.get(i);
 		if (olddecl.getName().equals(mdecl.getName())) {
 		    memberList.remove(i);
 		}
@@ -270,12 +268,12 @@ public class Recoder2KeY implements JavaReader{
     }  
 
 
-    protected recoder.list.CompilationUnitMutableList recoderCompilationUnits
+    protected ASTList<recoder.java.CompilationUnit> recoderCompilationUnits
 	(String[] cUnitStrings) {
 	recoder.util.Debug.setLevel(500);
 	parseSpecialClasses();
-	recoder.list.CompilationUnitMutableList cUnits
-	    = new recoder.list.CompilationUnitArrayList();	
+	ASTList<recoder.java.CompilationUnit> cUnits
+	    = new ASTArrayList<recoder.java.CompilationUnit>();	
 	int current = 0;
 	try {
 	    for (int i=0; i<cUnitStrings.length; i++) {
@@ -288,8 +286,8 @@ public class Recoder2KeY implements JavaReader{
             final ChangeHistory changeHistory = servConf.getChangeHistory();
 	    for (int i=0, sz = cUnits.size(); i<sz; i++) {
 		current = i;
-                cUnits.getCompilationUnit(i).makeAllParentRolesValid();
-		changeHistory.attached(cUnits.getCompilationUnit(i));
+                cUnits.get(i).makeAllParentRolesValid();
+		changeHistory.attached(cUnits.get(i));
 	    }
             
             if (changeHistory.needsUpdate()) {
@@ -317,16 +315,16 @@ public class Recoder2KeY implements JavaReader{
 	return cUnits;
     }
 
-    protected recoder.list.CompilationUnitMutableList recoderCompilationUnitsAsFiles(String[] cUnitStrings) {
-	recoder.list.CompilationUnitMutableList cUnits
-	    = new recoder.list.CompilationUnitArrayList();
+    protected List<recoder.java.CompilationUnit> recoderCompilationUnitsAsFiles(String[] cUnitStrings) {
+	List<recoder.java.CompilationUnit> cUnits
+	    = new ArrayList<recoder.java.CompilationUnit>();
 	parseSpecialClasses();
 	try {
 	    cUnits = servConf.getProgramFactory().parseCompilationUnits(cUnitStrings);
 	    final ChangeHistory changeHistory = servConf.getChangeHistory();
             for (int i = 0, sz = cUnits.size(); i<sz; i++) {
-		cUnits.getCompilationUnit(i).makeAllParentRolesValid();
-		changeHistory.attached(cUnits.getCompilationUnit(i));
+		cUnits.get(i).makeAllParentRolesValid();
+		changeHistory.attached(cUnits.get(i));
 	    }
             
             if (changeHistory.needsUpdate()) {
@@ -349,9 +347,9 @@ public class Recoder2KeY implements JavaReader{
      * have to be available in Recoder and KeY form, e.g. Exceptions
      * TODO
      */
-    private recoder.list.CompilationUnitMutableList parseSpecial(boolean parseLibs) {
+    private List<recoder.java.CompilationUnit> parseSpecial(boolean parseLibs) {
     	recoder.ProgramFactory pf = servConf.getProgramFactory();
-    	recoder.list.CompilationUnitMutableList rcuList = new recoder.list.CompilationUnitArrayList();
+    	List<recoder.java.CompilationUnit> rcuList = new ArrayList<recoder.java.CompilationUnit>();
     	recoder.java.CompilationUnit rcu = null;
     	URL jlURL = KeYResourceManager.getManager().getResourceFile(
     			Recoder2KeY.class, javaSrcDir + "/" + "JAVALANG.TXT");    		
@@ -374,9 +372,12 @@ public class Recoder2KeY implements JavaReader{
 			jl = jl.trim();
     			URL jlf = KeYResourceManager.getManager().getResourceFile(
     	    			Recoder2KeY.class, javaSrcDir + "/" + jl);
-    			Reader f = new BufferedReader
-			    (new InputStreamReader(jlf.openStream()));
+                        InputStream is = jlf.openStream();
+                        if(is == null)
+                            throw new IOException("Resource cannot be opened for reading: " + jlf);
+    			Reader f = new BufferedReader(new InputStreamReader(is));
     			rcu = pf.parseCompilationUnit(f);
+                        rcu.setDataLocation(new URLDataLocation(jlf));
     			rcu.makeAllParentRolesValid();
     			rcuList.add(rcu);
     			if (logger.isDebugEnabled()) {
@@ -412,12 +413,12 @@ public class Recoder2KeY implements JavaReader{
 	}
 	parsingLibs(true);
 
-	final recoder.list.
-	    CompilationUnitMutableList specialClasses = parseSpecial(KeYUserProblemFile.parseLibSpecs);
+	final 
+	    List<recoder.java.CompilationUnit> specialClasses = parseSpecial(KeYUserProblemFile.parseLibSpecs);
 	final ChangeHistory changeHistory = servConf.getChangeHistory();
 	for (int i = 0, sz = specialClasses.size(); i<sz; i++) {
-	    specialClasses.getCompilationUnit(i).makeAllParentRolesValid();
-	    changeHistory.attached(specialClasses.getCompilationUnit(i));
+	    specialClasses.get(i).makeAllParentRolesValid();
+	    changeHistory.attached(specialClasses.get(i));
 	}
 	
 	if (changeHistory.needsUpdate()) {
@@ -427,7 +428,7 @@ public class Recoder2KeY implements JavaReader{
 	transformModel(specialClasses);
 
 	for (int i=0, sz = specialClasses.size(); i<sz; i++) {
-	    callConvert(specialClasses.getCompilationUnit(i));
+	    callConvert(specialClasses.get(i));
 	}
 
 	rec2key().parsedSpecial(true);
@@ -435,13 +436,13 @@ public class Recoder2KeY implements JavaReader{
     }
 
     public CompilationUnit[] readCompilationUnitsAsFiles(String[] cUnitStrings) {
-	recoder.list.CompilationUnitMutableList cUnits =
+	List<recoder.java.CompilationUnit> cUnits =
 	    recoderCompilationUnitsAsFiles(cUnitStrings);
 	CompilationUnit[] result = new CompilationUnit[cUnits.size()];
 	for (int i=0, sz = cUnits.size(); i<sz; i++) {
 	    Debug.out("R2K: ", cUnitStrings[i]);
             currentClass = cUnitStrings[i];
-	    result[i] = convert(cUnits.getCompilationUnit(i));
+	    result[i] = convert(cUnits.get(i));
             currentClass = null;
 	}
 	return result;
@@ -449,7 +450,7 @@ public class Recoder2KeY implements JavaReader{
 
     public CompilationUnit readCompilationUnit(String cUnitString) { 
 	final recoder.java.CompilationUnit cc = recoderCompilationUnits
-	    (new String[]{cUnitString}).getCompilationUnit(0);
+	    (new String[]{cUnitString}).get(0);
 	return (CompilationUnit) callConvert(cc);
     }
 
@@ -489,7 +490,7 @@ public class Recoder2KeY implements JavaReader{
 	int[] pos = extractPositionInfo(e.toString());
 	final RuntimeException rte;
 	if (pos.length > 0) {
-	    rte = new PosConvertException(message, pos[0], pos[1]);
+	    rte = (PosConvertException)new PosConvertException(message, pos[0], pos[1]).initCause(e);
 	} else {
 	    if(e instanceof recoder.parser.ParseException){
 		rte = new ConvertException((recoder.parser.ParseException) e);
@@ -497,10 +498,10 @@ public class Recoder2KeY implements JavaReader{
 		rte = new ConvertException((de.uka.ilkd.key.parser.
 					    proofjava.ParseException) e);
 	    }else{
-		rte = new ConvertException(message);
+		rte = new ConvertException(message, e);
 	    }
 	}	
-	throw (RuntimeException) rte.initCause(e);
+	throw rte;
     }
 
     /** 
@@ -687,7 +688,8 @@ public class Recoder2KeY implements JavaReader{
 	    } else {
 		//ite.getTargetException().printStackTrace();
 		throw new ConvertException
-		    ("recoder2key: called method "+ m + " threw exception:" +
+		    ("recoder2key: called method "+ m + " threw exception:" 
+                            + ite.getTargetException().getMessage(),                            
 		     ite.getTargetException());
 	    }
 	}
@@ -770,10 +772,10 @@ public class Recoder2KeY implements JavaReader{
             pe.getChildCount(); i<childCount; i++) {
 	    children.add(callConvert(pe.getChildAt(i)));
 	}
-	recoder.list.CommentList l = pe.getComments();
+	ASTList<recoder.java.Comment> l = pe.getComments();
 	if(l!=null){
 	    for(int i = 0, sz = l.size(); i < sz; i++){
-		children.add(convert(l.getComment(i)));
+		children.add(convert(l.get(i)));
 	    }
 	}
 	children.add(positionInfo(pe));
@@ -788,10 +790,10 @@ public class Recoder2KeY implements JavaReader{
      */
     protected ExtList collectComments(recoder.java.ProgramElement pe){
 	ExtList children = new ExtList();
-	recoder.list.CommentList l = pe.getComments();
+	ASTList<recoder.java.Comment> l = pe.getComments();
 	if(l!=null){
 	    for(int i=0, sz = l.size(); i<sz; i++){
-		children.add(convert(l.getComment(i)));
+		children.add(convert(l.get(i)));
 	    }
 	}
 	return children;
@@ -1300,12 +1302,12 @@ public class Recoder2KeY implements JavaReader{
             callConvert(rmbs.getReferencePrefix());        
         final ProgramElementName methodName = convert(rmbs.getMethodName());
        
-        final ExpressionMutableList args = rmbs.getArguments(); 
+        final ASTList<recoder.java.Expression> args = rmbs.getArguments(); 
         final Expression[] keyArgs;
         if (args != null) {
             keyArgs = new Expression[args.size()];
             for (int i = 0, sz = args.size(); i<sz; i++) {
-                keyArgs[i] = (Expression) callConvert(args.getExpression(i));           
+                keyArgs[i] = (Expression) callConvert(args.get(i));           
             }
         } else {
             keyArgs = new Expression[0];
@@ -1556,10 +1558,10 @@ public class Recoder2KeY implements JavaReader{
     private SetOfSort directSuperSorts
 	(recoder.abstraction.ClassType classType) {
 
-	recoder.list.ClassTypeList supers=classType.getSupertypes();
+	List<ClassType> supers=classType.getSupertypes();
 	SetOfSort ss=SetAsListOfSort.EMPTY_SET;
 	for (int i=0; i<supers.size(); i++) {
-	    ss = ss.add(getKeYJavaType(supers.getClassType(i)).getSort());	    
+	    ss = ss.add(getKeYJavaType(supers.get(i)).getSort());	    
 	}
 
 	if (ss==SetAsListOfSort.EMPTY_SET && !isObject(classType)) {
@@ -1685,8 +1687,8 @@ public class Recoder2KeY implements JavaReader{
         final Modifier[] modifiers = getModifiers(cf);   
         final ProgramElementName name = new ProgramElementName(cf.getName());
         final ProgramElementName fullname = new ProgramElementName(cf.getFullName());
-                
-        ClassTypeList supertype = cf.getSupertypes();
+                 
+        List<ClassType> supertype = cf.getSupertypes();
         
         TypeReference[] implementsTypes = null;
         TypeReference extendType        = null;
@@ -1694,7 +1696,7 @@ public class Recoder2KeY implements JavaReader{
         LinkedList implementsList = new LinkedList();
         if (supertype != null ) {
             for (int i = 0; i<supertype.size(); i++) {
-                recoder.abstraction.ClassType ct = supertype.getClassType(i);
+                recoder.abstraction.ClassType ct = supertype.get(i);
                 final KeYJavaType kjt = getKeYJavaType(ct);    
                 final TypeReference tr = new TypeRef
                 (new ProgramElementName(ct.getFullName()), 0, null, kjt);
@@ -2381,10 +2383,22 @@ public class Recoder2KeY implements JavaReader{
 		       convertBody(f),
 		       collectComments(f),positionInfo(f));
     }
+    
+    /**
+     * converts a java5-enhanced-for.
+     * @param f the EnhancedFor of recoder
+     * @return the EnhancedFor of KeY
+     */
+    public EnhancedFor convert(recoder.java.statement.EnhancedFor f) {
+        return new EnhancedFor(convertLoopInitializers(f), convertGuard(f),
+                convertBody(f),collectComments(f),positionInfo(f));
+    }
 
     /**
      * converts a While.
-     * @param w the While of recoder
+     * 
+     * @param w
+     *            the While of recoder
      * @return the While of KeY
      */
     public While convert(recoder.java.statement.While w) {
@@ -2430,12 +2444,12 @@ public class Recoder2KeY implements JavaReader{
     protected ForUpdates
 	convertUpdates(recoder.java.statement.LoopStatement ls) {
 	    final ExtList updates = new ExtList();
-	    final ExpressionMutableList recLoopUpdates = ls.getUpdates();
+	    final ASTList<recoder.java.Expression> recLoopUpdates = ls.getUpdates();
 	     inLoopInit = true;
             if (recLoopUpdates!=null) {
 		for (int i=0, sz=recLoopUpdates.size(); i<sz; i++) {
 		    updates.add
-			(callConvert(recLoopUpdates.getExpression(i)));
+			(callConvert(recLoopUpdates.get(i)));
 		}	 
     inLoopInit = false;
     return new ForUpdates(updates, positionInfo(ls));
@@ -2452,7 +2466,7 @@ public class Recoder2KeY implements JavaReader{
         
         final LoopInit loopInit;
         
-        final LoopInitializerMutableList initializers = 
+        final ASTList<recoder.java.LoopInitializer> initializers = 
             ls.getInitializers();
         if (initializers!=null) {
             final LoopInitializer[] result = 
@@ -2460,7 +2474,7 @@ public class Recoder2KeY implements JavaReader{
             for (int i=0, sz = initializers.size(); i<sz; i++) {
 		inLoopInit = true;
                 result[i] = (LoopInitializer) callConvert(initializers.
-                        getLoopInitializer(i));	            
+                        get(i));	            
 		inLoopInit = false;
             }
             loopInit = new LoopInit(result);
@@ -2530,13 +2544,13 @@ public class Recoder2KeY implements JavaReader{
      */
     public New convert(recoder.java.expression.operator.New n) {
 
-	final recoder.list.ExpressionMutableList args = n.getArguments();		
+	final ASTList<recoder.java.Expression> args = n.getArguments();		
 	final recoder.java.reference.ReferencePrefix rp = n.getReferencePrefix();
 	final recoder.java.reference.TypeReference tr = n.getTypeReference();
 	
 	Expression[] arguments = new Expression[args != null ? args.size() : 0];
 	for (int i = 0; i<arguments.length; i++) {
-	    arguments[i] = (Expression)callConvert(args.getExpression(i));
+	    arguments[i] = (Expression)callConvert(args.get(i));
 	}
 	if (rp == null) {
 	    return new New(arguments , 
@@ -2623,9 +2637,9 @@ public class Recoder2KeY implements JavaReader{
 	HashMap names2var = new HashMap();	
 	IteratorOfProgramVariable it = vars.iterator();
 	java.util.HashSet names = new java.util.HashSet();
-	recoder.list.MemberDeclarationMutableList list = classContext.getMembers();
+	ASTList<recoder.java.declaration.MemberDeclaration> list = classContext.getMembers();
 	if (list == null) {
-	    list = new recoder.list.MemberDeclarationArrayList();
+	    list = new ASTArrayList<recoder.java.declaration.MemberDeclaration>();
 	    classContext.setMembers(list);
 	}
 	    l: while (it.hasNext()) {
@@ -2657,12 +2671,12 @@ public class Recoder2KeY implements JavaReader{
 		list.add(recVar);
 		classContext.makeAllParentRolesValid();
 		recoder.java.declaration.VariableSpecification rvarspec
-		    = recVar.getVariables().getVariableSpecification(0);
+		    = recVar.getVariables().get(0);
 		names2var.put(var.name().toString(), rvarspec);
 
 		rvarspec.setProgramModelInfo(csi);
 		insertToMap(recVar.getVariables()
-			    .getVariableSpecification(0), keyVarSpec);
+			    .get(0), keyVarSpec);
 	    }
 
 	((KeYCrossReferenceSourceInfo) csi).setNames2Vars(names2var);
@@ -2682,11 +2696,11 @@ public class Recoder2KeY implements JavaReader{
     
     // invoke model transformers
     protected void transformModel
-	(recoder.list.CompilationUnitMutableList cUnits) {
+	(List<recoder.java.CompilationUnit> cUnits) {
 	RecoderModelTransformer[] transformer = 
-	    new RecoderModelTransformer[] { 
+	    new RecoderModelTransformer[] {                 
 		new ImplicitFieldAdder(servConf, cUnits),
-                new InstanceAllocationMethodBuilder(servConf, cUnits),
+        new InstanceAllocationMethodBuilder(servConf, cUnits),
 		new ConstructorNormalformBuilder(servConf, cUnits),
 		new ClassPreparationMethodBuilder(servConf, cUnits),
 		new ClassInitializeMethodBuilder(servConf, cUnits),

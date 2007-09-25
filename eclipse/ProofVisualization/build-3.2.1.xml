@@ -15,7 +15,7 @@
 	<property name="compilerArg" value=""/>
 
 	<!-- $Format: "<property name=\"version\" value=\"1.$ProjectVersion$\"/>"$ -->
-<property name="version" value="1.0.2655"/>
+<property name="version" value="1.mulbrichRecoder08.19"/>
 
 	<path id="path_bootclasspath">
 		<fileset dir="${java.home}/lib">

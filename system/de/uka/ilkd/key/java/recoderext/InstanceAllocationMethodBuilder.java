@@ -1,17 +1,20 @@
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.List;
+
 import recoder.CrossReferenceServiceConfiguration;
+import recoder.java.CompilationUnit;
 import recoder.java.Identifier;
 import recoder.java.declaration.ClassDeclaration;
 import recoder.java.declaration.MethodDeclaration;
+import recoder.java.declaration.DeclarationSpecifier;
+import recoder.java.declaration.ParameterDeclaration;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.java.declaration.modifier.Private;
 import recoder.java.declaration.modifier.Static;
 import recoder.java.reference.TypeReference;
-import recoder.list.CompilationUnitMutableList;
-import recoder.list.ModifierArrayList;
-import recoder.list.ModifierMutableList;
-import recoder.list.ParameterDeclarationArrayList;
+import recoder.list.generic.ASTArrayList;
+import recoder.list.generic.ASTList;
 
 public class InstanceAllocationMethodBuilder extends RecoderModelTransformer {
 
@@ -20,7 +23,7 @@ public class InstanceAllocationMethodBuilder extends RecoderModelTransformer {
 
     public InstanceAllocationMethodBuilder
     (CrossReferenceServiceConfiguration services, 
-            CompilationUnitMutableList units) {
+            List<CompilationUnit> units) {
         super(services, units);      
     }
     
@@ -30,11 +33,11 @@ public class InstanceAllocationMethodBuilder extends RecoderModelTransformer {
      * The functionality will be described using taclets
      */
     private MethodDeclaration createAllocateMethod(ClassDeclaration type) {
-        ModifierMutableList modifiers = new ModifierArrayList(2);
+        ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(2);
         modifiers.add(new Private());
         modifiers.add(new Static());    
         
-        ParameterDeclarationArrayList pdal = new ParameterDeclarationArrayList(0);
+        ASTArrayList<ParameterDeclaration> pdal = new ASTArrayList<ParameterDeclaration>(0);
   
         MethodDeclaration md =  new MethodDeclaration
             (modifiers, 

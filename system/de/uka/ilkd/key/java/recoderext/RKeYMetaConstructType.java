@@ -158,7 +158,7 @@ public class RKeYMetaConstructType extends TypeReference
     }
     
     //???
-    public Object deepClone() {
+    public TypeReference deepClone() {
 	return null;
     }
 

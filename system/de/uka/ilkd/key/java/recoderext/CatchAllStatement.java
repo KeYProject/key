@@ -176,7 +176,7 @@ public class CatchAllStatement extends JavaStatement implements
     }
 
     //don't think we need it
-    public Object deepClone() {
+    public SourceElement deepClone() {
 	throw new IllegalStateException("Not implemented in "
 					+"CatchAllStatement");
     }    

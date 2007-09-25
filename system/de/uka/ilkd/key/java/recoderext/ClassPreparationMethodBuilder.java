@@ -16,16 +16,20 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.CompilationUnit;
 import recoder.java.Identifier;
+import recoder.java.Statement;
 import recoder.java.StatementBlock;
 import recoder.java.declaration.ClassDeclaration;
+import recoder.java.declaration.DeclarationSpecifier;
 import recoder.java.declaration.FieldSpecification;
 import recoder.java.declaration.MethodDeclaration;
+import recoder.java.declaration.ParameterDeclaration;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.java.declaration.modifier.Private;
 import recoder.java.declaration.modifier.Static;
@@ -33,7 +37,7 @@ import recoder.java.expression.literal.BooleanLiteral;
 import recoder.java.expression.operator.CopyAssignment;
 import recoder.java.reference.FieldReference;
 import recoder.kit.ProblemReport;
-import recoder.list.*;
+import recoder.list.generic.*;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -62,12 +66,12 @@ public class ClassPreparationMethodBuilder
      * which are declared in one of the given compilation units. 
      * @param services the CrossReferenceServiceConfiguration with the
      * information about the recoder model
-     * @param units the CompilationUnitMutableList with the classes to
+     * @param units the ASTList<CompilationUnit> with the classes to
      * be transformed
      */
     public ClassPreparationMethodBuilder
 	(CrossReferenceServiceConfiguration services, 
-	 CompilationUnitMutableList units) {	
+	 List<CompilationUnit> units) {	
 	super(services, units);
 	class2staticFields = new HashMap(10*units.size());
     }
@@ -105,14 +109,14 @@ public class ClassPreparationMethodBuilder
      * @param typeDeclaration the ClassDeclaration whose fields have to be prepared 
      * @return the list of copy assignments 
      */
-    private StatementList prepareFields(TypeDeclaration typeDeclaration) {
+    private ASTList<Statement> prepareFields(TypeDeclaration typeDeclaration) {
 
-	StatementMutableList result = new StatementArrayList(20);
+	ASTList<Statement> result = new ASTArrayList<Statement>(20);
 
-	FieldSpecificationList fields = typeDeclaration.getFieldsInScope();
+	List<FieldSpecification> fields = typeDeclaration.getFieldsInScope();
 
 	for (int i = 0; i < fields.size(); i++) {
-	    FieldSpecification spec = fields.getFieldSpecification(i);
+	    FieldSpecification spec = fields.get(i);
 	    if (spec.isStatic() && !isConstantField(spec)) {
 		Identifier ident = spec.getIdentifier();
 		if (ident instanceof ImplicitIdentifier) {	    
@@ -143,7 +147,7 @@ public class ClassPreparationMethodBuilder
     
     public ProblemReport analyze() {
 	for (int unit = 0; unit<units.size(); unit++) {
-	    CompilationUnit cu = units.getCompilationUnit(unit);
+	    CompilationUnit cu = units.get(unit);
 	    int typeCount = cu.getTypeDeclarationCount();
 	    
 	    for (int i = 0; i < typeCount; i++) {
@@ -174,17 +178,17 @@ public class ClassPreparationMethodBuilder
      * @return the created class preparation method
      */
     private MethodDeclaration createPrepareMethod(TypeDeclaration td) {
-	ModifierMutableList modifiers = new ModifierArrayList(2);
+	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(2);
 	modifiers.add(new Static());
 	modifiers.add(new Private());
 	return new MethodDeclaration(modifiers, 
 				     null,  // return type is void
 				     new ImplicitIdentifier
 				     (CLASS_PREPARE_IDENTIFIER),
-				     new ParameterDeclarationArrayList(0), 
+				     new ASTArrayList<ParameterDeclaration>(0), 
 				     null, // no throws
 				     new StatementBlock
-				     ((StatementMutableList)
+				     ((ASTList<Statement>)
 				      class2staticFields.get(td)));
     }
 

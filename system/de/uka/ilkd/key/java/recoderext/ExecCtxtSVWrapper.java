@@ -42,8 +42,8 @@ public class ExecCtxtSVWrapper extends ExecutionContext
 	return this;
     }
 
-    public Object deepClone() {
-	return new StatementSVWrapper(sv);
+    public ExecutionContext deepClone() {
+	return new ExecCtxtSVWrapper(sv);
     }
 
     //don't think we need it
