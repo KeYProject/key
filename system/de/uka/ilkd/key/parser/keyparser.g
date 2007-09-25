@@ -55,8 +55,8 @@ header {
   import de.uka.ilkd.key.java.Recoder2KeY;
   import de.uka.ilkd.key.java.SchemaRecoder2KeY;
   import de.uka.ilkd.key.java.recoderext.*;
-  import de.uka.ilkd.key.pp.AbbrevMap;
-  import de.uka.ilkd.key.pp.LogicPrinter;
+  import de.uka.ilkd.key.java.declaration.ArrayOfParameterDeclaration;
+  import de.uka.ilkd.key.pp.*;
 }
 
 /** 
@@ -3103,6 +3103,8 @@ term130 returns [Term a = null]
     |   "false" { a = tf.createJunctorTerm(Op.FALSE); }
     |   a = ifThenElseTerm
     |   a = ifExThenElseTerm
+    |   a = workingspaceterm
+    |   a = workingspacenonrigidterm
     //Used for OCL Simplification.
     //WATCHOUT: Woj: some time we will need to have support for strings in Java DL too,
     // what then? This here is specific to OCL, isn't it?
@@ -3125,6 +3127,141 @@ term130 returns [Term a = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
+workingspaceterm returns [Term a=null]
+{
+    Sort s1,s2;
+    ListOfKeYJavaType sig = SLListOfKeYJavaType.EMPTY_LIST;
+    KeYJavaType classType = null;
+    String methodName;
+    Term pre;
+    HashSet progVars = new HashSet();
+    int argCount = 0;
+    ProgramMethod pm = null;
+}
+    :
+        WORKINGSPACE LBRACE s1=any_sortId_check[true] 
+        {
+            classType = getJavaInfo().getKeYJavaType(s1);
+        }
+        DOUBLECOLON
+        methodName=simple_ident
+        LPAREN
+        (
+            s2=any_sortId_check[true] (id:IDENT)?
+            {
+                sig = sig.append(getJavaInfo().getKeYJavaType(s2));
+            }
+            (
+                COMMA
+                s2=any_sortId_check[true] (id2:IDENT)?
+                {
+                    sig = sig.append(getJavaInfo().getKeYJavaType(s2));
+                }
+            )*
+        )?
+        RPAREN
+        {
+            pm = getJavaInfo().getProgramMethod(classType,
+                methodName, sig, classType);
+            ArrayOfParameterDeclaration params = 
+                pm.getMethodDeclaration().getParameters();
+            for(int i=0; i<params.size(); i++){
+                ProgramVariable p = (ProgramVariable) params.
+                getParameterDeclaration(i). 
+                getVariableSpecification().getProgramVariable();
+                progVars.add(p);
+            }
+            bindProgVars(progVars);
+        }
+        RBRACE
+        LPAREN pre=term RPAREN
+        {
+            unbindProgVars();
+            WorkingSpaceOp op = (WorkingSpaceOp) functions().lookup(
+                new Name(WorkingSpaceOp.makeName(pm)));
+            if(op==null){
+                a = tf.createWorkingSpaceTerm(pm, pre, (Sort) sorts().lookup(
+                        new Name("int")));
+                functions().add(a.op());
+            }else{
+                a = tf.createWorkingSpaceTerm(op, pre);
+            }
+        }
+    ;
+
+workingspacenonrigidterm returns [Term a=null]
+{
+    Sort s1,s2;
+    ListOfKeYJavaType sig = SLListOfKeYJavaType.EMPTY_LIST;
+    KeYJavaType classType = null;
+    String methodName,s;
+    Term pre, t1, t2;
+    HashSet progVars = new HashSet();
+    int argCount = 0;
+    ProgramMethod pm = null;
+    String pvr = "{";
+}
+    :
+        WORKINGSPACENONRIGID LBRACE s1=any_sortId_check[true] 
+        {
+            classType = getJavaInfo().getKeYJavaType(s1);
+        }
+        DOUBLECOLON
+        methodName=simple_ident
+        LPAREN
+        (
+            s2=any_sortId_check[true] (id:IDENT)?
+            {
+                sig = sig.append(getJavaInfo().getKeYJavaType(s2));
+            }
+            (
+                COMMA
+                s2=any_sortId_check[true] (id2:IDENT)?
+                {
+                    sig = sig.append(getJavaInfo().getKeYJavaType(s2));
+                }
+            )*
+        )?
+        RPAREN
+        {
+            pm = getJavaInfo().getProgramMethod(classType,
+                methodName, sig, classType);
+        }
+        RBRACE
+        LBRACE
+        (
+            t1=funcpredvarterm EQUALS t2=funcpredvarterm
+            {
+                pvr+=t1+"="+t2;
+            }
+        )?
+        (
+            COMMA t1=funcpredvarterm EQUALS t2=funcpredvarterm
+            {
+                pvr+=", "+t1+"="+t2;
+/*                    lp.reset();
+                    lp.printTerm(t1);
+                    s=lp.toString();
+                    s=s.substring(0, s.length()-1);
+                    pvr+=", "+s;
+                    lp.reset();
+                    pvr+="=";
+                    lp.printTerm(t2);
+                    s=lp.toString();
+                    s=s.substring(0, s.length()-1);
+                    pvr+=s;*/
+            }
+        )*
+        RBRACE
+        {
+            pvr+="}";
+            WorkingSpaceNonRigidOp op = (WorkingSpaceNonRigidOp) 
+                functions().lookup(
+                    new Name(WorkingSpaceNonRigidOp.makeNameWithoutSR(pm, pvr)));
+            System.out.println(op);
+            a = tf.createWorkingSpaceNonRigidTerm(op);
+        }
+    ;
 
 abbreviation returns [Term a=null]
 { 
@@ -3879,6 +4016,9 @@ varexp[TacletBuilder b]
     | varcond_hassort[b] | varcond_query[b]
     | varcond_non_implicit[b] | varcond_non_implicit_query[b]
     | varcond_inReachableState[b] 
+    | varcond_equal_ws_op[b]
+    | varcond_ws_non_rigid_op[b]
+    | varcond_ws_op[b]
   ) 
   | 
   ( (NOT {negated = true;} )? 
@@ -4011,6 +4151,37 @@ varcond_literal [TacletBuilder b]
    }
 ;
 
+varcond_equal_ws_op [TacletBuilder b]
+{
+  ParsableVariable x = null, y = null;
+}
+:
+    EQUALWORKINGSPACEOP LPAREN x=varId COMMA y=varId RPAREN {
+     b.addVariableCondition(new TestEqualWorkingSpaceOp(
+       (SchemaVariable) x, (SchemaVariable) y));          
+   }
+;
+
+varcond_ws_non_rigid_op [TacletBuilder b]
+{
+  ParsableVariable x = null;
+}
+:
+    TESTWORKINGSPACENONRIGIDOP LPAREN x=varId RPAREN {
+     b.addVariableCondition(new TestWorkingSpaceNonRigidOp(
+       (SchemaVariable) x));          
+   }
+;
+
+varcond_ws_op [TacletBuilder b]
+{
+  ParsableVariable x = null;
+}
+:
+    TESTWORKINGSPACEOP LPAREN x=varId RPAREN {
+     b.addVariableCondition(new TestWorkingSpaceOp((SchemaVariable) x));
+   }
+;
 
 
 varcond_hassort [TacletBuilder b]

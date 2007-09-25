@@ -3,7 +3,7 @@
 
 
 	<!-- $Format: "<property name=\"version\" value=\"1.$ProjectVersion$\"/>"$ -->
-<property name="version" value="1.0.2655"/>
+<property name="version" value="1.engelcMemoryConsumption.25"/>
 
 
 	<property name="basews" value="${ws}"/>

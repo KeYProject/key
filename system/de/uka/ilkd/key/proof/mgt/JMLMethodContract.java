@@ -129,6 +129,10 @@ public class JMLMethodContract extends DefaultOperationContract {
     public Term getPre() {
         return spec.getCompletePre(false, false, modality == Op.DIA);
     }
+    
+    public Term getWorkingSpace(){
+        return spec.getWorkingSpace();
+    }
 
     public String getPreText() {
         return ProofSaver.printTerm(getPre(), spec.getServices()).toString();

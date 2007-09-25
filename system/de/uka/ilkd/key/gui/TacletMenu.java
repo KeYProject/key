@@ -157,6 +157,11 @@ class TacletMenu extends JMenu {
                                                  (UseMethodContractRule)builtInRule,
                                                  mediator.getSelectedProof(), 
                                                  pos.getPosInOccurrence());           
+        } else if (builtInRule instanceof UseWorkingSpaceContractRule) {
+            item = new UseWorkingSpaceContractRuleItem(mediator.mainFrame(),
+                    (UseWorkingSpaceContractRule)builtInRule,
+                    mediator.getSelectedProof(), 
+                    pos.getPosInOccurrence());           
         } else {
             item = new DefaultBuiltInRuleMenuItem(builtInRule);                       
         }
@@ -352,6 +357,9 @@ class TacletMenu extends JMenu {
             } else if (e.getSource() instanceof UseMethodContractRuleItem) {
                 mediator.selectedUseMethodContractRule
                     (((UseMethodContractRuleItem) e.getSource()).getRuleApp());   
+            }else if (e.getSource() instanceof UseWorkingSpaceContractRuleItem) {
+                mediator.selectedUseWorkingSpaceContractRule
+                (((UseWorkingSpaceContractRuleItem) e.getSource()).getRuleApp());   
             } else if (e.getSource() instanceof BuiltInRuleMenuItem) {
                         mediator.selectedBuiltInRule
                     (((BuiltInRuleMenuItem) e.getSource()).connectedTo(), 

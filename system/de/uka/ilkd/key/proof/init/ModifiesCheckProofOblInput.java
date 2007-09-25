@@ -326,7 +326,7 @@ public class ModifiesCheckProofOblInput implements ProofOblInput {
 	    Op.NOT, tf.createEqualityTerm(ov, nullTerm));
 
         Term eqc = UsefulTools.isCreated(ov, initConfig.getServices());
-        ProgramVariable ci = 
+	/*        ProgramVariable ci = 
 	    initConfig.getServices().getJavaInfo().
 	    getAttribute(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED, 
 	            (ObjectSort) oprime.sort());
@@ -334,7 +334,7 @@ public class ModifiesCheckProofOblInput implements ProofOblInput {
 	Term eqi = tf.createEqualityTerm(
 	    tf.createVariableTerm(ci), initConfig.getServices().
 	    getTypeConverter().convertToLogicElement(BooleanLiteral.TRUE));
-	eqc = tf.createJunctorTermAndSimplify(Op.AND, eqc, eqi);
+	    eqc = tf.createJunctorTermAndSimplify(Op.AND, eqc, eqi);*/
 	classSubFormula = tf.createJunctorTermAndSimplify(
 	    Op.IMP, tf.createJunctorTerm(Op.AND, nn, eqc), classSubFormula);
 	return classSubFormula;

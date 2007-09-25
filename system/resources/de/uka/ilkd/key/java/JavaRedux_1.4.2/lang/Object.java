@@ -6,6 +6,10 @@ package java.lang;
 import gnu.classpath.Configuration;
 public class Object {  
 
+    //@ public invariant memoryArea!=null; 
+
+    public javax.realtime.ScopedMemory memoryArea;
+
     /** A data group for the state of this object.  This is used to
      * allow side effects on unknown variables in methods such as
      * equals, clone, and toString. It also provides a convenient way

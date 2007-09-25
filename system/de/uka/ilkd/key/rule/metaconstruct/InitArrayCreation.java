@@ -37,6 +37,7 @@ import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
@@ -152,13 +153,26 @@ public class InitArrayCreation extends InitArray {
 					 Expression resultVar,
 					 KeYJavaType arrayType,
 					 ProgramVariable[] dimensions,
-					 Services services) {
-	bodyStmnts.add
-	    (assign(resultVar,
-		    new MethodReference
-		    (new ArrayOfExpression(dimensions[0]),
-		     new ProgramElementName(createArrayName),
-		     new TypeRef(arrayType))));
+					 Services services,
+                                         ArrayOfExpression args) {
+	TypeReference baseTypeRef =
+	    ((ArrayType)arrayType.getJavaType()).getBaseType();
+	KeYJavaType baseType = baseTypeRef.getKeYJavaType();
+
+        if(ProgramSVSort.SIMPLEEXPRESSION.canStandFor(args.getProgramElement(0),
+                null, services)){
+            bodyStmnts.add(assign(resultVar,
+                    new MethodReference
+                    (new ArrayOfExpression(dimensions[0]),
+                            new ProgramElementName(createArrayName),
+                            new TypeRef(arrayType))));
+        }else{
+            Expression[] dim = new Expression[1];
+            dim[0] = dimensions[0];
+            bodyStmnts.add(assign(resultVar,
+                       new NewArray
+                       (dim, baseTypeRef, arrayType, null, 0)));  
+        }
 
 	if (dimensions.length > 1) {
 	    Expression[] baseDim = new Expression[dimensions.length-1];
@@ -177,14 +191,10 @@ public class InitArrayCreation extends InitArray {
 	    final ProgramVariable pv = (ProgramVariable)forInit.getVariables().
 		getVariableSpecification(0).getProgramVariable();
 
-	    TypeReference baseTypeRef =
-		((ArrayType)arrayType.getJavaType()).getBaseType();
-
-	    KeYJavaType baseType = baseTypeRef.getKeYJavaType();
-            
             for(int i=0; i<dimensions.length-1; i++){
-                baseTypeRef = ((ArrayType) baseType.getJavaType()).getBaseType();
-                baseType = baseTypeRef.getKeYJavaType();                  
+                baseTypeRef = ((ArrayType) baseTypeRef.getKeYJavaType().
+			       getJavaType()).getBaseType();
+		//                baseType = baseTypeRef.getKeYJavaType();                  
             }
 
 	    final For forLoop = 
@@ -195,8 +205,10 @@ public class InitArrayCreation extends InitArray {
 			       ((ReferencePrefix)resultVar, new Expression[]{pv}),
 			       new NewArray
 			       (baseDim, baseTypeRef, baseType, null, 
-				(baseType.getJavaType() instanceof ArrayType)?
-                                        ((ArrayType)baseType.getJavaType()).getDimension() : 0)
+				//				(baseType.getJavaType() instanceof ArrayType)?
+				//                                        ((ArrayType)baseType.getJavaType()).
+				//				getDimension() : 
+				0)
 			       )
 			);
 
@@ -236,7 +248,7 @@ public class InitArrayCreation extends InitArray {
  	final KeYJavaType arrayType = na.getKeYJavaType(services);
 
 	createNDimensionalArray(bodyStmnts, newObject, arrayType, 
-				dimensions, services);
+				dimensions, services, na.getArguments());
 
  	return new StatementBlock((Statement[])bodyStmnts.toArray
 				  (new Statement[bodyStmnts.size()]));

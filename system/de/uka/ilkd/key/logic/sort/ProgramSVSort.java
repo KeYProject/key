@@ -560,6 +560,10 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 		return true;
 	    }
 
+	    if(pe instanceof CurrentMemoryAreaReference){
+		return true;
+	    }
+
 	    return VARIABLE.canStandFor(pe, services);    
 	}
     }

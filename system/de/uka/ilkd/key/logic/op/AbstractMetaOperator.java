@@ -46,6 +46,26 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     
     public static final AbstractMetaOperator META_NEXT_TO_CREATE = new MetaNextToCreate();
 
+    public static final AbstractMetaOperator META_ARRAY_SIZE = new ArraySize();
+    
+    public static final AbstractMetaOperator META_OBJECT_SIZE = new ObjectSize();
+    
+    public static final AbstractMetaOperator META_UNIQUE_ANON_UPDATE = new UniqueAnonUpdate(); 
+    
+    public static final AbstractMetaOperator META_CALCULATE_ARRAY_SIZE = 
+        new CalculateArraySize();
+    
+    public static final AbstractMetaOperator META_WC_ARRAY_SIZE = 
+        new WorstCaseArraySize();
+    
+    public static final AbstractMetaOperator META_BC_ARRAY_SIZE = 
+        new BestCaseArraySize();
+    
+    public static final AbstractMetaOperator META_PRECONDITION_FOR_WS = 
+        new PreconditionForWS();
+    
+    public static final AbstractMetaOperator META_PRE_VALID_IN_STATE_OF_WS = 
+        new PreValidInStateOfWS();
 
     public static final AbstractMetaOperator META_TRAINITIALIZED = new MetaTraInitialized();
 

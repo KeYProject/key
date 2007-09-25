@@ -179,6 +179,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                                   newOlds, 
                                                   newVariant,
 						  newPost,
+                                                  lia.getWorkingSpace(),
 						  newSelfVar);
                 
 		addToTopOfStack(newLia);

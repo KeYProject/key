@@ -897,6 +897,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                  longConst ( -15 ),
                                  applyTF ( "distCoeff", tf.polynomial ) ),
                         applyTF ( "distSummand0", tf.polynomial ),
+
                         applyTF ( "distSummand1", tf.polynomial ),
                         longConst ( -35 ) } ) );
 

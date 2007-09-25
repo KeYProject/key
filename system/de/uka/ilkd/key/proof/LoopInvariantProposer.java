@@ -25,6 +25,7 @@ import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.*;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.rule.*;
 
 public class LoopInvariantProposer implements InstantiationProposer {
@@ -175,7 +176,14 @@ public class LoopInvariantProposer implements InstantiationProposer {
 		inst = or.replace(firstLoopInvAnnot.variant());
 	    } else if(varName.equals("#old")) {
 		inst = convertToListOfTerm(firstLoopInvAnnot.olds());
-	    }
+	    } else if(varName.equals("wsOneIt")
+                    && firstLoopInvAnnot.getWorkingSpace() != null) {
+                inst = or.replace(firstLoopInvAnnot.getWorkingSpace());
+            } else if(varName.equals("heapSpace")){
+                inst = TermBuilder.DF.var((ProgramVariable)
+                        services.getNamespaces().programVariables().
+                        lookup(new Name(ProblemInitializer.heapSpaceName)));
+            }
 	}
         
 	return inst;

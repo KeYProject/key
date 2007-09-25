@@ -402,4 +402,8 @@ public class ProgVarReplacer {
 	pvrv.start();
 	return pvrv.result();
     }
+
+    public String toString(){
+	return map.toString();
+    }
 }

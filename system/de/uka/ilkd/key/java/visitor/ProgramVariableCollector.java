@@ -113,6 +113,10 @@ public class ProgramVariableCollector extends JavaASTVisitor {
 			performActionOnTerm(lia.post());
 		    }
 
+                    if(lia.getWorkingSpace()!=null){
+                        performActionOnTerm(lia.getWorkingSpace());
+                    }
+                    
                     final ArrayOfTerm terms = lia.olds();
                     for (int j = 0, len = terms.size(); j<len; j++) {
                         performActionOnTerm(terms.getTerm(j));

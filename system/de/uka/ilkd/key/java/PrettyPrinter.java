@@ -1063,15 +1063,21 @@ public class PrettyPrinter {
 
     public void printFieldReference(FieldReference x) throws java.io.IOException {
         printHeader(x);
-        if (x.getReferencePrefix() != null) {
-            boolean wasNoSemicolons = noSemicolons;
-            noSemicolons = true;
-            writeElement(x.getReferencePrefix());
-            noSemicolons = wasNoSemicolons;
-            writeToken(".", x);
-        }
-        if (x.getProgramElementName() != null) {
-            writeElement(x.getProgramElementName());
+        if (x.getName()!=null && 
+                "javax.realtime.ScopedMemory::currentMemoryArea".
+                equals(x.getName().toString())){
+            write("<currentMemoryArea>");
+        }else{
+            if (x.getReferencePrefix() != null) {     
+                boolean wasNoSemicolons = noSemicolons;
+                noSemicolons = true;
+                writeElement(x.getReferencePrefix());
+                noSemicolons = wasNoSemicolons;
+                writeToken(".", x);
+            }
+            if (x.getProgramElementName() != null) {
+                writeElement(x.getProgramElementName());
+            }
         }
         printFooter(x);
     }
@@ -2454,6 +2460,10 @@ public class PrettyPrinter {
 	throws java.io.IOException {
 	write("source=");
 	writeElement(x.getTypeReference());
+	if(x.getMemoryArea() != null){
+	    write(",memoryArea=");
+	    writeElement(x.getMemoryArea());
+	}
 	if (x.getRuntimeInstance() != null) {
 	    write(",this=");
 	    writeElement(x.getRuntimeInstance());
@@ -2520,7 +2530,7 @@ public class PrettyPrinter {
 	markEnd(0,x);
         printFooter(x);
     }
-
+    
     public void printArrayLengthReference(ArrayLengthReference x) 
 	throws java.io.IOException {
         printHeader(x);

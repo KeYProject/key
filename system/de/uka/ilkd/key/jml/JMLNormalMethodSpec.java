@@ -81,6 +81,9 @@ public class JMLNormalMethodSpec extends JMLMethodSpec {
 		    }
 		}
 	    }
+	    if(getWorkingSpace()!=null && desugar){
+	        post = and(post, workingSpacePost());
+	    }
 	    post = updatePrefix(post);
 	    post = UsefulTools.addRepresents(post, services,(ProgramVariable)
 					     cSpec.getInstancePrefix());
@@ -101,6 +104,9 @@ public class JMLNormalMethodSpec extends JMLMethodSpec {
 		    }
 		}
 	    }
+            if(getWorkingSpace()!=null && desugar){
+                post = and(post, workingSpacePost());
+            }
 	    post = updatePrefix(post);
 	    post = UsefulTools.addRepresents(post, services,(ProgramVariable)
 					     cSpec.getInstancePrefix());

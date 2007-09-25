@@ -33,6 +33,8 @@ public class ExecutionContext
      * the reference to the active object
      */
     private ReferencePrefix runtimeInstance;
+    
+    private ReferencePrefix memoryArea;
 
 
     protected ExecutionContext() {}
@@ -45,9 +47,11 @@ public class ExecutionContext
      * is currently active/executed
      */
     public ExecutionContext(TypeReference classContext, 
-			    ReferencePrefix runtimeInstance) {
+            ReferencePrefix memoryArea,
+            ReferencePrefix runtimeInstance) {
 	this.classContext = classContext;
 	this.runtimeInstance  = runtimeInstance;
+	this.memoryArea = memoryArea;
 	makeParentRoleValid();
     }
 
@@ -60,6 +64,7 @@ public class ExecutionContext
 	int count = 0;
 	if (runtimeInstance != null) count++;
 	if (classContext != null) count++;
+	if (memoryArea != null) count++;
 	return count;
     }
 
@@ -74,6 +79,10 @@ public class ExecutionContext
     public ProgramElement getChildAt(int index) {
 	if (classContext != null) {
 	    if (index == 0) return classContext;
+	    index--;
+	}
+	if (memoryArea != null) {
+	    if (index == 0) return memoryArea;
 	    index--;
 	}
 	if (runtimeInstance != null) {
@@ -95,6 +104,9 @@ public class ExecutionContext
 	if (runtimeInstance != null) {
 	    if (child == runtimeInstance) return (1 << 4 | 1);
 	}
+	if (memoryArea != null) {
+	    if (child == memoryArea) return (1 << 5 | 1);
+	}
 	return -1;
     }
 
@@ -102,7 +114,7 @@ public class ExecutionContext
     }
 
     public Object deepClone() {
-	return new ExecutionContext(classContext, runtimeInstance);
+	return new ExecutionContext(classContext, memoryArea, runtimeInstance);
     }
 
     public NonTerminalProgramElement getASTParent() {
@@ -119,7 +131,9 @@ public class ExecutionContext
 	    classContext = (TypeReference) newChild;
 	} else if (child == runtimeInstance) {
 	    runtimeInstance = (ReferencePrefix)newChild;
-	} else {
+	} else if (child == memoryArea) {
+            memoryArea = (ReferencePrefix)newChild;
+        } else {
 	    return false;
 	}
 	makeParentRoleValid();
@@ -136,6 +150,9 @@ public class ExecutionContext
         }
         if (runtimeInstance != null) {
             ((Expression)runtimeInstance).setExpressionContainer(this);
+        }
+        if (memoryArea != null) {
+            ((Expression)memoryArea).setExpressionContainer(this);
         }
     }
     
@@ -154,14 +171,22 @@ public class ExecutionContext
 
 
     public Expression getExpressionAt(int index) {
-	if (runtimeInstance != null && index == 0) {
-	    return (Expression) runtimeInstance;
-	}
+        if (memoryArea != null) {
+            if (index == 0) return (Expression) memoryArea;
+            index--;
+        }
+        if (runtimeInstance != null) {
+            if (index == 0) return (Expression) runtimeInstance;
+            index--;
+        }
 	throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getExpressionCount() {
-	return runtimeInstance == null ? 0 : 1;    
+        int count = 0;
+        if (memoryArea != null) count++;
+        if (runtimeInstance != null) count++;
+        return count;
     }
 
 
@@ -180,6 +205,10 @@ public class ExecutionContext
      */
     public ReferencePrefix getRuntimeInstance() {
 	return runtimeInstance;
+    }
+    
+    public ReferencePrefix getMemoryArea() {
+        return memoryArea;
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

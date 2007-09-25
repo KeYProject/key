@@ -811,7 +811,10 @@ public class JMLClassSpec extends JMLSpec {
 	            (ProgramVariable) getInstancePrefix(),
 	            n
 	    ));
-            mBS = new StatementBlock(new MethodFrame(null, new ExecutionContext(typeRef, null), mBS));
+            mBS = new StatementBlock(new MethodFrame(null, 
+                    new ExecutionContext(typeRef, 
+                            services.getJavaInfo().getDefaultMemoryArea(), null),
+                            mBS));
 	}
 	return mBS;
     }

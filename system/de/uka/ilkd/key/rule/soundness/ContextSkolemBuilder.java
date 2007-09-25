@@ -269,7 +269,7 @@ public class ContextSkolemBuilder extends AbstractSkolemBuilder {
 	    ( refName, getJavaInfo ().getJavaLangObject () );
 	VariableReference  ref     = new VariableReference  ( refVar );
 	ExecutionContext  context = new ExecutionContext
-	    ( new TypeRef ( getJavaInfo ().getJavaLangObject () ), ref );
+	    ( new TypeRef ( getJavaInfo ().getJavaLangObject () ), null, ref );
 	return context;
     }
 

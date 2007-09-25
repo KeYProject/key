@@ -32,6 +32,7 @@ header {
     import de.uka.ilkd.key.java.declaration.*;
     import de.uka.ilkd.key.java.declaration.modifier.*;
     import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
+    import de.uka.ilkd.key.java.expression.literal.IntLiteral;
     import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
     import de.uka.ilkd.key.java.reference.ReferencePrefix;
     import de.uka.ilkd.key.java.reference.TypeRef;
@@ -44,6 +45,8 @@ header {
     import de.uka.ilkd.key.logic.sort.*;
     import de.uka.ilkd.key.parser.KeYSemanticException;
     import de.uka.ilkd.key.parser.NotDeclException;
+    import de.uka.ilkd.key.proof.init.ProblemInitializer;
+    import de.uka.ilkd.key.proof.SymbolReplacer;
     import de.uka.ilkd.key.util.ExtList;
 }
 
@@ -61,6 +64,7 @@ options {
     static int mmCount = 0;
     private JMLTranslator translator;
     private ArithOpProvider aOP;
+    private WorkingSpaceArithOpProvider waOP;
     private SetOfJMLMethodSpec specs = SetAsListOfJMLMethodSpec.EMPTY_SET;
     private TermFactory tf;
     private TermBuilder df;
@@ -90,6 +94,7 @@ options {
     private KeYJavaType dt;
     private String dummyString;
     private JMLSpec currentSpec = null;
+    private HashMap argMap;
 
     //used for parsing packagereferences
     private String packageName = "";
@@ -123,6 +128,8 @@ options {
         this.md = pm;        
         staticMode = md != null && md.isStatic();
         this.aOP = aOP;
+        waOP = new WorkingSpaceArithOpProvider(aOP.getFunctions(), 
+            aOP.javaSemantics());
         this.translator = new JMLTranslator(cld, services, this, aOP);      
         variable2term = new LinkedHashMap();
         param_ns = UsefulTools.buildParamNamespace(md!=null ? 
@@ -288,6 +295,11 @@ options {
         if (named == null) {
             named = param_ns == null ? null : param_ns.lookup(name);
             param = true;
+            // happens only in \working_space expressions
+            if(argMap != null && !argMap.isEmpty() && named != null){
+                ProgramVariable pv = (ProgramVariable) argMap.get(named);
+                return getTermForVariable(pv);
+            }
         }
         if(named != null){
             if(named instanceof ProgramVariable){
@@ -310,6 +322,12 @@ options {
             try{
                 kjt = getJavaInfo().getTypeByClassName(n);
             }catch(RuntimeException e){
+            }
+            if(kjt == null){
+                String type = 
+                    translator.getCLDKeYJavaType().getSort().name().toString();
+                kjt = getJavaInfo().getTypeByClassName(type.substring(0,
+                    type.lastIndexOf(".")+1)+n);
             }
             if (kjt==null){
                 throw new NotDeclException("type", 
@@ -428,6 +446,42 @@ options {
             }
         }
         return arg;
+    }
+
+    private int determineElementSize(KeYJavaType kjt, int dim){
+        if(dim>0){
+            return 4;
+        }
+        String baseType = kjt.getSort().toString();
+        if(baseType.equals("jbyte") || baseType.equals("boolean")){
+            return 1;
+        }else if(baseType.equals("jshort") || baseType.equals("jchar")){
+            return 2;
+        }else if(baseType.equals("jlong")){
+            return 8;
+        }else{
+            return 4;
+        }
+    }
+
+    private Term createArraySizeTerm(int size, ListOfTerm l){
+        Term elSize = l.tail().isEmpty() ?
+        services.getTypeConverter().convertToLogicElement(
+            new IntLiteral(""+size)) :
+        services.getTypeConverter().convertToLogicElement(
+            new IntLiteral("4"));
+        Function arraySize = 
+            (Function) functions().lookup(new Name("arraySize"));
+        Function mul = (Function) functions().lookup(new Name("mul"));
+        Function add = (Function) functions().lookup(new Name("add"));
+        Term headSize = tf.createFunctionTerm(arraySize, elSize, l.head());
+        if(l.tail().isEmpty()){
+            return headSize;
+        }else{
+            return tf.createFunctionTerm(add, headSize, 
+                tf.createFunctionTerm(mul, l.head(), 
+                    createArraySizeTerm(size,l.tail())));
+        }
     }
 
     private ListOfKeYJavaType getTypeList(ListOfTerm tl){
@@ -612,6 +666,15 @@ loop_spec [LoopInvariant l]
 {
     this.term2old = l.getTerm2Old();
     isOldAllowed = false;
+    Term t;
+    setPreMode(true);
+    ArithOpProvider oldAop=null;
+    ProgramVariable heap = (ProgramVariable) namespaces().
+    programVariables().lookup(
+        new Name(ProblemInitializer.heapSpaceName));
+    Term heapTerm = tf.createVariableTerm(heap);
+    l.addAssignable(new BasicLocationDescriptor(tf.createJunctorTerm(Op.TRUE), 
+            heapTerm));
 }:
         (   
             "set"
@@ -624,6 +687,11 @@ loop_spec [LoopInvariant l]
             assignableclause[l]
         |
             variant_function[l]
+        |
+            WORKING_SPACE_SINGLE_ITERATION 
+            {oldAop=aOP; aOP = waOP;}
+            t = specexpression 
+            {l.setWorkingSpace(t); aOP = oldAop;}
         |
             loop_post[l]
         )+
@@ -893,7 +961,7 @@ maps_spec_array_dim
 {
     ArraySpecIndexBound l;
 }:
-        "[" l = specarrayrefexpr[null] "]"
+        LBRACKET l = specarrayrefexpr[null] RBRACKET
     ;
 
 //   <---   not implemented
@@ -1540,13 +1608,31 @@ durationkeyword:
         "duration_redundantly"
     ;
 
-//not implemented
-workingspaceclause[JMLMethodSpec s] :
-        workingspacekeyword 
+workingspaceclause[JMLMethodSpec s]
+{
+    Term t;
+    ArithOpProvider oldAop = null;
+} :
+        workingspacekeyword {setPreMode(true); oldAop = aOP; aOP = waOP;}
         (
             NOT_SPECIFIED
         |
-            dummy = specexpression (IF dummy = predicate)?
+            t = specexpression 
+            {
+                aOP = oldAop;
+                s.setWorkingSpace(t);
+                ProgramVariable heap = (ProgramVariable) namespaces().
+                programVariables().lookup(
+                    new Name(ProblemInitializer.heapSpaceName));
+                Term heapTerm = tf.createVariableTerm(heap);
+                currentSpec.getProgramVariableNS().add(
+                    (LocationVariable) getOld(heapTerm).op());
+                getOld(t);
+//                s.addAssignable(
+//                    new BasicLocationDescriptor(tf.createJunctorTerm(Op.TRUE),
+//                    heapTerm));
+            } 
+            (IF dummy = predicate)?
         )
         ";"
     ;
@@ -1751,7 +1837,7 @@ storerefnamesuffix[Term localPrefix, KeYJavaType kjt] returns [Term t=null]
                 }
             }
         |
-            "[" aib = specarrayrefexpr[localPrefix] "]"
+            LBRACKET aib = specarrayrefexpr[localPrefix] RBRACKET
             {
                 if(aib != null && localPrefix != null){
                     Term indexTerm;
@@ -2489,7 +2575,7 @@ primarysuffix[KeYJavaType kjt, Term t] returns [Term result = null]{
             this.tempkjt = pm.getKeYJavaType();
         }
     |
-        "["arg = expression "]"
+        LBRACKET arg = expression RBRACKET
         {
             result = df.array(t, arg);
             this.tempkjt = services.getTypeConverter().getKeYJavaType(result);
@@ -2502,9 +2588,15 @@ primarysuffix[KeYJavaType kjt, Term t] returns [Term result = null]{
 new_expr returns [Term t=null]
 {
     KeYJavaType kjt;
-    ListOfTerm l;
 }:
-        "new" kjt=type l = new_suffix
+        "new" kjt=type t = new_suffix[kjt]
+    ;
+
+new_suffix [KeYJavaType kjt] returns [Term t = null]
+{
+    ListOfTerm l = SLListOfTerm.EMPTY_LIST;
+}:
+        "(" ( l=expressionlist )? ")" 
         {
             final ListOfKeYJavaType sig = getTypeList(l);
             final Constructor c = 
@@ -2513,8 +2605,8 @@ new_expr returns [Term t=null]
                 throw new NotSupportedExpressionException("Default Constructor");
             }            
             ProgramMethod cm = 
-                new ProgramMethod((ConstructorDeclaration) c, kjt, 
-                                   translator.getCLDKeYJavaType(), PositionInfo.UNDEFINED);
+                new ProgramMethod((ConstructorDeclaration) c, kjt, kjt,
+                                  PositionInfo.UNDEFINED);
             
             int i=0;
             final Term[] sub = new Term[sig.size()];
@@ -2539,11 +2631,29 @@ new_expr returns [Term t=null]
             }
             this.tempkjt = kjt;            
         }
+    |
+        t=array_decl[kjt]
+        
     ;
 
-new_suffix returns [ListOfTerm l = SLListOfTerm.EMPTY_LIST]:
-        "(" ( l=expressionlist )? ")" 
-    ;
+/**
+ * new type[i_1]..[i_n][]..[] not a valid term in JavaDL (or is it?). 
+ * array_decl returns therefore a term representing the result of
+ * \space(new type[i_1]..[i_n][]..[]) instead. Thus array_decl may
+ * only occur as argument of JML's \space construct.
+ */
+array_decl [KeYJavaType kjt] returns [Term t=null]
+{
+    ListOfTerm l;
+    int d=0;
+}:
+        l=dim_exprs 
+        ((LBRACKET RBRACKET) => d=dims )?
+        {
+            int size = determineElementSize(kjt, d);
+            t = createArraySizeTerm(size, l);
+        }
+;
 
 expressionlist returns [ListOfTerm l = SLListOfTerm.EMPTY_LIST]
 {
@@ -2584,7 +2694,13 @@ decimalnumeral returns [Term t=null]:
 
 jmlprimary returns [Term t=null]
 {
-    KeYJavaType dummykjt;
+    KeYJavaType dummykjt, kjt;
+    ProgramMethod method;
+    Term pre=null;
+    Namespace old_param_ns = param_ns;
+    JMLClassSpec old_cSpec = cSpec;
+    JMLTranslator old_translator = translator;  
+    LinkedList args=null;
 }:
         RESULT 
         {
@@ -2649,15 +2765,95 @@ jmlprimary returns [Term t=null]
             throw new NotSupportedExpressionException("JML construct "+
                 "\\duration");
         }
-    |   SPACE "(" dummy = specexpression ")" 
+    |   SPACE 
+        "("
+            t = new_expr
+        ")"
         {
-            throw new NotSupportedExpressionException("JML construct "+
-                "\\space");
+            if(t.op() instanceof ProgramMethod/* && 
+                ((ProgramMethod) t.op()).getMethodDeclaration() instanceof
+                ConstructorDeclaration*/){
+                int size = services.getJavaInfo().getSizeInBytes(
+                    ((ProgramMethod) t.op()).getKeYJavaType());
+                IntLiteral sizeLit = new IntLiteral(size+"");
+                t = services.getTypeConverter().convertToLogicElement(sizeLit);
+            }/*else{
+                OpCollector oc = new OpCollector();
+                t.execPostOrder(oc);
+                if(!oc.contains((Operator) functions().lookup(
+                            new Name("arraySize")))){
+                    throw new KeYSemanticException("Only constructor calls "+
+                    "allowed in \\space", getLine(), getColumn(), getFilename());
+                }
+            }*/
         }
-    |   WORKINGSPACE "(" dummy = expression ")"
+    |   WORKINGSPACE "(" t=expression ")"
         {
-            throw new NotSupportedExpressionException("JML construct "+
-                "\\working_space");
+            if(!(t.op() instanceof ProgramMethod)){
+                throw new KeYSemanticException("Only method calls "+
+                    "allowed in \\working_space", getLine(), getColumn(), 
+                    getFilename());               
+            }
+            HashMap map = new HashMap();
+            ProgramMethod pm = (ProgramMethod) t.op();
+            int j=0;
+            if(!pm.isStatic()){
+                cSpec = services.getImplementation2SpecMap().getSpecForClass(
+                    pm.getContainerType());
+                map.put(cSpec.getInstancePrefix(), t.sub(0));
+                j++;
+            }
+            for(int i=0; i<t.arity()-j; i++){
+                map.put(pm.getParameterDeclarationAt(i).
+                    getVariableSpecification().getProgramVariable(),
+                    t.sub(i+j));
+            }
+            t = tf.createWorkingSpaceNonRigidTerm(pm, new SymbolReplacer(map), 
+                (Sort) sorts().lookup(new Name("int")));
+            functions().add(t.op());
+        }
+
+    |   WORKINGSPACERIGID {args=new LinkedList();}
+        "(" method = methodsignature[args] 
+        {
+            argMap = new HashMap();
+            param_ns = UsefulTools.buildParamNamespace(
+                method.getMethodDeclaration(), args, argMap);
+            TypeDeclaration cld = 
+                (TypeDeclaration) method.getContainerType().getJavaType();
+            translator = new JMLTranslator(cld, services, this, aOP);
+            cSpec = services.getImplementation2SpecMap().getSpecForClass(
+                method.getContainerType());
+        }
+        (COMMA pre = expression)?")"
+        {
+           WorkingSpaceOp op = (WorkingSpaceOp) functions().lookup(
+                new Name(WorkingSpaceOp.makeName(method)));
+            if(pre==null){
+                pre = tf.createJunctorTerm(Op.TRUE);
+            }
+            if(!method.isStatic()){
+                ProgramVariable local_self = 
+                    (ProgramVariable) cSpec.getInstancePrefix();
+                Term t_self = df.var(local_self);
+                //adds self!=null && self.<created> == true or 
+                //self.<classInitialized> == true to the precondition
+                if(!(method.getMethodDeclaration() instanceof Constructor)){
+                    pre = df.and(pre, df.not(df.equals(t_self, df.NULL(services))));
+                    pre = df.and(pre, UsefulTools.isCreated(t_self, services));
+                }
+            }
+            if(op==null){
+                t = tf.createWorkingSpaceTerm(method, pre, 
+                    (Sort) sorts().lookup(new Name("int")));
+                functions().add(t.op());
+            }else{
+                t = tf.createWorkingSpaceTerm(op, pre);
+            }
+            param_ns = old_param_ns;
+            translator = old_translator;
+            cSpec = old_cSpec;
+            argMap = null;
         }
 //    |   QUANTIFIER "(" dummy = expression ")"
     |   TYPEOF "(" dummy = specexpression ")"
@@ -2712,6 +2908,59 @@ jmlprimary returns [Term t=null]
 
 ;
 
+methodsignature[LinkedList args] returns [ProgramMethod pm=null]
+{
+    String prefix=null;
+    String methodName=null;
+    KeYJavaType kjt, classType=null;
+    ListOfKeYJavaType sig = SLListOfKeYJavaType.EMPTY_LIST;
+    String argName=null;
+}:
+        prefix=name
+        {
+            int i = prefix.lastIndexOf(".");
+            if(i==-1){
+                classType = translator.getCLDKeYJavaType();
+                methodName = prefix;
+            }else{
+                classType = getJavaInfo().getKeYJavaType(prefix.substring(0,i));
+                methodName = prefix.substring(i);
+            }
+        }
+        "("
+        (
+            kjt=type (argName=name)?
+            {
+                sig = sig.append(kjt);
+                if(argName!=null){
+                    args.add(new LocationVariable(new ProgramElementName(
+                                argName),
+                            kjt));
+                    argName = null;
+                }
+            }
+            (
+                COMMA
+                kjt=type (argName=name)?
+                {
+                    sig = sig.append(kjt);
+                    if(argName!=null){
+                        args.add(new LocationVariable(new ProgramElementName(
+                                    argName),
+                                kjt));
+                        argName = null;
+                    }
+                }
+            )*
+        )?
+        ")"
+        {
+            pm = getJavaInfo().getProgramMethod(classType,
+                methodName, sig, classType);
+        }
+    ;
+
+
 specquantifiedexpression returns [Term t=null]
 {
     Term a=null; 
@@ -2759,8 +3008,32 @@ typespec returns [KeYJavaType kjt = null]{
         )?
 ;
 
-dims returns [int dim = 0]:
-        ("[" "]" {dim++;} )+
+dim_exprs returns [ListOfTerm d = SLListOfTerm.EMPTY_LIST]
+{
+    Term t;
+}:
+        d=dim_helper[d]
+ ;
+
+dim_helper [ListOfTerm d] 
+    returns [ListOfTerm dim = d]
+{
+    Term t;
+}:
+        LBRACKET t=expression {dim=dim.append(t);} RBRACKET
+        ((LBRACKET expression) => dim = dim_helper[dim])?
+;
+
+dims returns [int dim=0]:
+        dim=dims_helper
+ ;
+
+dims_helper returns [int dim = 0]
+{
+    int dim2=0;
+}:
+        LBRACKET RBRACKET {dim++;}
+        ((LBRACKET RBRACKET) => dim2 = dims_helper {dim+=dim2;})?
     ;
 
 type returns [KeYJavaType kjt = null]:

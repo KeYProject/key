@@ -17,6 +17,7 @@
 package de.uka.ilkd.key.logic;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -24,6 +25,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
+import de.uka.ilkd.key.rule.soundness.TermProgramVariableCollector;
 
 
 public class InnerVariableNamer extends VariableNamer {
@@ -82,5 +84,49 @@ public class InnerVariableNamer extends VariableNamer {
         }
         
         return newvar;
+    }
+    
+    /**
+     * Renames all program variables in <code>t</code> that would cause name clashes with
+     * program variables in <code>goal</code>. The newly introduced variables 
+     * are added to <code>goal</code>'s namespace. 
+     * @param t
+     * @param goal
+     * @return
+     */
+    public Term renameAndAddToNS(Term t, Goal goal){
+        Globals globals = wrapGlobals(goal.getGlobalProgVars());
+        map = new HashMap();
+        
+        TermProgramVariableCollector pvColl = new TermProgramVariableCollector();
+        t.execPreOrder(pvColl);
+        Iterator it = pvColl.result().iterator();
+        while(it.hasNext()){
+            ProgramVariable var = (ProgramVariable) it.next();
+            ProgramElementName name = var.getProgramElementName();
+            BasenameAndIndex bai = getBasenameAndIndex(name);
+            NameCreationInfo nci = getMethodStack(null);
+            ProgramElementName newname = createName(bai.basename, bai.index, nci);
+            if(!isUniqueInGlobals(newname.toString(), globals)) {
+                int newcounter = getMaxCounterInGlobalsAndProgram(
+                        bai.basename,
+                        globals,
+                        getProgramFromPIO(null),
+                        null) + 1; 
+                newname = createName(bai.basename, newcounter, nci);
+            }
+        
+            ProgramVariable newvar;
+        
+            if (!newname.equals(name)) {        
+                newvar = new LocationVariable(newname, var.getKeYJavaType());
+                map.put(var, newvar);
+                goal.addProgramVariable(newvar);
+                renamingHistory = map;
+            }
+        }
+        //execute renaming
+        ProgVarReplacer pvr = new ProgVarReplacer(map);
+        return pvr.replace(t);
     }
 }

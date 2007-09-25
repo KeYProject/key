@@ -75,6 +75,9 @@ tokens {
         FREELABELIN = "\\freeLabelIn";
 	STATIC = "\\static";
 	NOTSAMELITERAL="\\notSameLiteral";
+    EQUALWORKINGSPACEOP="\\equalWorkingSpaceOp";
+    TESTWORKINGSPACENONRIGIDOP = "\\testWorkingSpaceNonRigidOp";
+    TESTWORKINGSPACEOP = "\\testWorkingSpaceOp";
 	ISREFERENCEARRAY="\\isReferenceArray";
 	ISREFERENCE="\\isReference";
 	ISNONIMPLICIT="\\isNonImplicit";
@@ -85,6 +88,8 @@ tokens {
 	HASSORT = "\\hasSort";
 	ISLOCALVARIABLE = "\\isLocalVariable";
 	NOTISLOCALVARIABLE = "\\notIsLocalVariable";
+    WORKINGSPACE = "\\workingSpace";
+    WORKINGSPACENONRIGID = "\\workingSpaceNonRigid";
 	ISUPDATED = "\\isUpdated";
 
 

@@ -489,6 +489,21 @@ public abstract class Notation {
 	    }
 	}
     }
+    
+    static class WorkingSpaceOp extends Notation {
+        
+        protected WorkingSpaceOp(int priority) {
+            super(priority);
+        }
+        
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
+                sp.printTerm(t);
+            }else{
+                sp.printFunctionTerm(t.op().name().toString(), t);
+            }
+        }
+    }
 
     /**
          * The standard concrete syntax for attribute terms <code>o.a</code>.

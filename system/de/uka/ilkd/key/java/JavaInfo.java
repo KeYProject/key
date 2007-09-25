@@ -9,25 +9,16 @@
 //
 package de.uka.ilkd.key.java;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
+import java.util.*;
 
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ldt.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.IteratorOfSort;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LRUCache;
 
@@ -107,7 +98,8 @@ public class JavaInfo {
      */
     private ExecutionContext defaultExecutionContext;
                 
-
+    private LocationVariable defaultMemoryArea;    
+    
     /**
      * a term with the constant 'null'
      */
@@ -130,7 +122,7 @@ public class JavaInfo {
      */
     JavaInfo(KeYProgModelInfo kpmi, Services s) {
 	this.kpmi 	= kpmi;
-	services	= s;	  	
+	services	= s;	 
     }
 
     private JavaInfo(JavaInfo proto, Services s) {
@@ -935,6 +927,48 @@ public class JavaInfo {
 	return null;
     }
 
+    public int getSizeInBytes(KeYJavaType classType){
+	int size = 8;
+        size += getSizeInBytesRec(classType);
+        if(size % 8 == 0){
+            return size;
+        }else{
+            return (size/8+1)*8;
+        }
+    }
+    
+    private int getSizeInBytesRec(KeYJavaType classType){
+        if(classType == getJavaLangObject() || classType == null) return 0;
+        int size = 0;
+        ListOfField l = kpmi.getAllFieldsLocallyDeclaredIn(classType);
+        size += sizeInBytes(l);
+        size += getSizeInBytesRec(getSuperclass(classType));
+        return size;
+    }
+    
+    private int sizeInBytes(ListOfField l){
+        int size = 0;
+        while(!l.isEmpty()){
+            if(l.head() instanceof ImplicitFieldSpecification){
+                l = l.tail();
+                continue;
+            }
+            String fType = l.head().getProgramVariable().getKeYJavaType().
+                getSort().toString();
+            l = l.tail();
+            if(fType.equals("jbyte") || fType.equals("boolean")){
+                size += 1;
+            }else if(fType.equals("jshort") || fType.equals("jchar")){
+                size += 2;
+            }else if(fType.equals("jlong")){
+                size += 8;
+            }else{
+                size += 4;
+            }
+        }
+        return size;
+    }
+
     /**
      * returns an attribute named <tt>attributeName</tt> declared locally 
      * in object type <tt>s</tt>    
@@ -1111,9 +1145,29 @@ public class JavaInfo {
             final KeYJavaType kjt = 
                 getKeYJavaTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);                     
             defaultExecutionContext = 
-                new ExecutionContext(new TypeRef(kjt), null);
+                new ExecutionContext(new TypeRef(kjt), getDefaultMemoryArea(),
+                        null);
         }
         return defaultExecutionContext;
+    }
+    
+    public LocationVariable getDefaultMemoryArea(){
+        if(defaultMemoryArea==null){
+            // ensure that default classes are available
+            if (!kpmi.rec2key().parsedSpecial()) {
+                readJava("{}");                
+            }
+            defaultMemoryArea = (LocationVariable) services.getNamespaces().
+                programVariables().lookup(new Name("initialMemoryArea"));
+            KeYJavaType kjt = getTypeByClassName("javax.realtime.ScopedMemory");
+            if(defaultMemoryArea == null){
+                defaultMemoryArea = 
+                    new LocationVariable(new ProgramElementName("initialMemoryArea"),
+                            kjt);
+                services.getNamespaces().programVariables().add(defaultMemoryArea);
+            }
+        }
+        return defaultMemoryArea;
     }
     
     

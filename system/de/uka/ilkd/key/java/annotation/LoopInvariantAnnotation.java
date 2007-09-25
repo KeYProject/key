@@ -24,6 +24,7 @@ public class LoopInvariantAnnotation implements Annotation {
     private final Term invariant;
     private final Term variant;
     private final Term post;
+    private final Term workingSpace;
     private final SetOfLocationDescriptor assignable;
     // array containing terms at indices 2n and program variables for
     // storing the initial values of these terms at indices 2n+1 
@@ -36,6 +37,7 @@ public class LoopInvariantAnnotation implements Annotation {
 				   ArrayOfTerm olds, 
                                    Term variant, 
 				   Term post,
+                                   Term workingSpace,
 				   ProgramVariable selfVar){
 	this.invariant = invariant;
 	this.variant = variant;
@@ -43,6 +45,7 @@ public class LoopInvariantAnnotation implements Annotation {
 	this.assignable = assignable == null ? SetAsListOfLocationDescriptor.EMPTY_SET : assignable;
 	this.olds = olds == null ? new ArrayOfTerm() :  olds;
 	this.selfVar = selfVar;
+        this.workingSpace = workingSpace;
     }    
 
     public Term invariant(){
@@ -71,6 +74,7 @@ public class LoopInvariantAnnotation implements Annotation {
 
     public String toString(){
 	String result = "invariant: "+invariant+"\nvariant: "+variant+
+            "\nworking_space (one iteration): "+workingSpace+
 	    "\nassignable: ";
         IteratorOfLocationDescriptor it = assignable.iterator();
         while(it.hasNext()) {
@@ -118,5 +122,9 @@ public class LoopInvariantAnnotation implements Annotation {
     public boolean equalsModRenaming(SourceElement se, 
                                      NameAbstractionTable nat){
         return false;
+    }
+
+    public Term getWorkingSpace() {
+        return workingSpace;
     }
 }

@@ -30,20 +30,28 @@ public class ExecutionContext
      * the reference to the active object
      */
     protected final ReferencePrefix runtimeInstance;
-
+    
+    /**
+     * the current memory area
+     */
+    protected final ReferencePrefix memoryArea;
 
     /**
      * creates an execution context reference
      * @param classContext the TypeReference refering to the next enclosing
      * class 
+     * @param memoryArea the memory area used for allocation within this execution
+     * context
      * @param runtimeInstance a ReferencePrefix to the object that
      * is currently active/executed
      */
     public ExecutionContext(TypeReference classContext, 
-			    ReferencePrefix runtimeInstance) {
-	if (classContext == null) Debug.printStackTrace();
-	this.classContext = classContext;
-	this.runtimeInstance = runtimeInstance;
+            ReferencePrefix memoryArea,
+            ReferencePrefix runtimeInstance) {
+        if (classContext == null) Debug.printStackTrace();
+        this.classContext = classContext;
+        this.runtimeInstance = runtimeInstance;
+        this.memoryArea = memoryArea;
     }
 
     /**
@@ -57,7 +65,10 @@ public class ExecutionContext
 	    { System.out.println("||||"+children); Debug.printStackTrace(); }
 
 	children.remove(this.classContext);
-	this.runtimeInstance = (ReferencePrefix) children.get(ReferencePrefix.class);
+        this.memoryArea = (ReferencePrefix) children.removeFirstOccurrence(
+                ReferencePrefix.class); 
+	this.runtimeInstance = (ReferencePrefix) children.removeFirstOccurrence(
+	        ReferencePrefix.class);
     }
 
 
@@ -69,6 +80,7 @@ public class ExecutionContext
     public int getChildCount() {
 	int count = 0;
 	if (classContext != null) count++;
+        if (memoryArea != null) count++;
 	if (runtimeInstance != null) count++;
 	return count;
     }
@@ -84,6 +96,10 @@ public class ExecutionContext
     public ProgramElement getChildAt(int index) {
 	if (classContext != null) {
 	    if (index == 0) return classContext;
+	    index--;
+	}
+	if (memoryArea != null) {
+	    if (index == 0) return memoryArea;
 	    index--;
 	}
 	if (runtimeInstance != null) {
@@ -108,6 +124,10 @@ public class ExecutionContext
     public ReferencePrefix getRuntimeInstance() {
 	return runtimeInstance;
     }
+    
+    public ReferencePrefix getMemoryArea() {
+        return memoryArea;
+    }
 
 
     /** calls the corresponding method of a visitor in order to
@@ -123,7 +143,8 @@ public class ExecutionContext
     }
 
     public String toString() {
-        return "Context: "+classContext+" Instance: "+runtimeInstance;
+        return "Context: "+classContext+" MemoryArea: "+memoryArea+
+        " Instance: "+runtimeInstance;
     }
     
 }

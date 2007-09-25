@@ -350,11 +350,11 @@ public class JMLTranslator extends TermBuilder {
                 if (isLong(t) && aOP.getCastToLong() != null) {
                     old = func(aOP.getCastToLong(), old);
                 }               
-            } else {          
-                final ProgramVariable oldV = 
-                    new LocationVariable(new ProgramElementName(getNameForOld(t)), 
-                            getTypeForOld(t));
-                
+            } else {
+		final ProgramVariable oldV = 
+		    new LocationVariable(new ProgramElementName(
+						      getNameForOld(t)), 
+						getTypeForOld(t));
                 currentSpec.getProgramVariableNS().add(oldV);
                 old = var(oldV);                
             }
@@ -368,20 +368,24 @@ public class JMLTranslator extends TermBuilder {
     }
     
     private KeYJavaType getTypeForOld(Term t) {
-        final KeYJavaType type4old;
+        KeYJavaType type4old;
         if (t.sort() == Sort.FORMULA) {
             type4old = getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
         } else {
             if (isLong(t)) {
-                type4old = getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
+                type4old = 
+		    getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
             } else {
                 if (t.op() instanceof ProgramVariable) {
                     type4old = ((ProgramVariable) t.op()).getKeYJavaType();
                 } else {
                     type4old = getJavaInfo().getKeYJavaType(t.sort());
                 }
-            }                    
+            }
         }
+	if(type4old == null){
+	    type4old = getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
+	}
         return type4old;
     }
     

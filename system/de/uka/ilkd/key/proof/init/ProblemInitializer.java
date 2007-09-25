@@ -18,11 +18,10 @@ import java.util.Iterator;
 import java.util.Vector;
 import java.util.Map.Entry;
 
-import recoder.io.PathList;
-import recoder.io.ProjectSettings;
-
 import org.apache.log4j.Logger;
 
+import recoder.io.PathList;
+import recoder.io.ProjectSettings;
 import de.uka.ilkd.key.gui.LibrariesSettings;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.ProofSettings;
@@ -33,8 +32,10 @@ import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.IteratorOfConstrainedFormula;
 import de.uka.ilkd.key.logic.IteratorOfNamed;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
@@ -67,7 +68,10 @@ public class ProblemInitializer {
     
     private final HashSet alreadyParsed = new HashSet();
     
-    
+    private ProgramVariable heapSpace;
+
+    public static final String heapSpaceName = "heapSpace";
+
     //-------------------------------------------------------------------------
     //constructors
     //------------------------------------------------------------------------- 
@@ -207,6 +211,11 @@ public class ProblemInitializer {
 	//read LDT includes
 	readLDTIncludes(in, initConfig, readLibraries);
 	
+/*	heapSpace = 
+	    new LocationVariable((new ProgramElementName(heapSpaceName)),
+				 initConfig.getServices().getJavaInfo().
+				 getKeYJavaType("int"));*/
+
 	//read normal includes
 	Iterator it = in.getIncludes().iterator();
 	while(it.hasNext()){
@@ -382,7 +391,7 @@ public class ProblemInitializer {
 	    if(readLibraries) {
 	    	readLibraries(envInput, initConfig);
 	    }
-	    
+            
 	    //read envInput itself
 	    reportStatus("Reading "+envInput.name(), 
 		    	 envInput.getNumberOfChars());
@@ -424,6 +433,13 @@ public class ProblemInitializer {
      */
     private void populateNamespaces(Proof proof) {
 	NamespaceSet namespaces = proof.getNamespaces();
+        heapSpace = 
+            new LocationVariable((new ProgramElementName(heapSpaceName)),
+                    lastBaseConfig.getServices().getJavaInfo().
+                    getKeYJavaType("int"));
+	namespaces.programVariables().add(heapSpace);
+//	namespaces.programVariables().add(proof.getServices().
+//	        getJavaInfo().getDefaultMemoryArea());
 	IteratorOfConstrainedFormula it = proof.root().sequent().iterator();
 	while(it.hasNext()) {
 	    ConstrainedFormula cf = it.next();
@@ -540,9 +556,22 @@ public class ProblemInitializer {
     	    initConfig.getProofEnv().registerRule(r, 
     		    				  profile.getJustification(r));
         }
-	
+
+        if(heapSpace==null){
+            heapSpace = 
+                    new LocationVariable((new ProgramElementName(heapSpaceName)),
+                            lastBaseConfig.getServices().getJavaInfo().
+                            getKeYJavaType("int"));
+        }
+        initConfig.namespaces().programVariables().add(heapSpace);  
+//        initConfig.namespaces().programVariables().add(initConfig.getServices().
+//                getJavaInfo().getDefaultMemoryArea());  
+        
 	//read envInput
 	readEnvInput(envInput, initConfig);
+	
+	initConfig.namespaces().programVariables().add(initConfig.getServices().
+	        getJavaInfo().getDefaultMemoryArea()); 
 	
 	startInterface();	
 	return initConfig;

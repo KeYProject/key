@@ -13,9 +13,12 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
+import de.uka.ilkd.key.jml.JMLMethodSpec;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.mgt.*;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
@@ -358,7 +361,7 @@ public class UseMethodContractRule implements BuiltInRule {
         }
         
         return applyInstantiatedContract(goal, ruleApp.posInOccurrence(), 
-                ctInst, mbsPos, services);
+                ctInst, ct, mbsPos, services);
     }
     
     
@@ -373,13 +376,42 @@ public class UseMethodContractRule implements BuiltInRule {
      * @return the new goals created by applying the method contract rule 
      */
     private ListOfGoal applyInstantiatedContract(Goal goal, PosInOccurrence pos, 
-            InstantiatedMethodContract iCt, 
+            InstantiatedMethodContract iCt, OldOperationContract ct,
             MbsInfo mbsPos, Services services) {
      
-        services.getNamespaces().functions().add(iCt.getAdditionalFunctions());
+        NamespaceSet nss = services.getNamespaces();
+        nss.functions().add(iCt.getAdditionalFunctions());
 
         final UpdateFactory uf = new UpdateFactory(services, goal.simplifier());
-        final Update u = updateToRigid(iCt, uf, services, pos);       
+
+        Update u = updateToRigid(iCt, uf, services, pos);    
+        
+        ProgramMethod method = null;
+//        Term pre = null;
+        Term ws = null;
+        
+        if(ct instanceof JMLMethodContract){
+            JMLMethodSpec spec = ((JMLMethodContract) ct).getSpec();
+//            pre = spec.getPre();      
+            method = spec.getProgramMethod();
+//            ws = iCt.getWorkingSpace();
+        }else{
+//            pre = ((DLMethodContract) ct).getPre();
+            method = ct.createDLMethodContract(null).getProgramMethod();
+        }
+        
+        TermFactory tf = TermFactory.DEFAULT;
+        Term heapTerm = tf.createVariableTerm(
+                (ProgramVariable) nss.programVariables().lookup(new Name(
+                        ProblemInitializer.heapSpaceName)));
+        if(ws == null){
+            ws = tf.createWorkingSpaceNonRigidTerm(method, iCt.getProgramVariableReplacer(),
+                    (Sort) nss.sorts().lookup(new Name("int")));
+            nss.functions().add(ws.op());
+        }
+        Function add = (Function) nss.functions().lookup(new Name("add"));
+        u = uf.parallel(u, uf.elementaryUpdate(heapTerm, 
+                tf.createFunctionTerm(add, heapTerm, ws)));
         
         final boolean openExceptionalBranch = iCt.getExceptionVariable() != null;                                                
         
@@ -389,12 +421,12 @@ public class UseMethodContractRule implements BuiltInRule {
         final IteratorOfGoal goalIt = result.iterator();
 
         if (openExceptionalBranch) {        
-            openBranch(pos, iCt, mbsPos, excPostFma(iCt, mbsPos, uf, u, services), 
+            openBranch(pos, iCt, mbsPos, excPostFma(iCt, mbsPos, uf, u, services, ws), 
                     goalIt.next(), getExceptionalLabel(), services);                     
         }
  
-        openBranch(pos, iCt, mbsPos, postFma(iCt, mbsPos, uf, u, services), 
-                goalIt.next(), getPostLabel() ,services);
+        openBranch(pos, iCt, mbsPos, postFma(iCt, mbsPos, uf, u, services, ws), 
+                goalIt.next(), getPostLabel(), services);
     	       
  
         openBranch(pos, iCt, mbsPos, preFma(iCt, mbsPos, uf, u, services), 
@@ -494,7 +526,7 @@ public class UseMethodContractRule implements BuiltInRule {
     }
     protected Term postFma(InstantiatedMethodContract iCt, 
                          MbsInfo mbsPos, UpdateFactory uf, 
-                         Update u, Services services) {
+                         Update u, Services services, Term wsNonRigid) {
         StatementBlock methodReplaceStatements = new StatementBlock();
         Term extraPre;
         if (iCt.getExceptionVariable()!=null) {           
@@ -503,7 +535,8 @@ public class UseMethodContractRule implements BuiltInRule {
             extraPre = tb.tt();
         }
         extraPre = tb.and(extraPre, iCt.getAtPreAxioms());        
-        return postFmaHelp(iCt, mbsPos, uf, u, methodReplaceStatements, extraPre);
+        return postFmaHelp(iCt, mbsPos, uf, u, methodReplaceStatements, 
+                extraPre, wsNonRigid, services);
     }
     
     protected String getExceptionalLabel() {
@@ -511,7 +544,8 @@ public class UseMethodContractRule implements BuiltInRule {
     }
     
     protected Term excPostFma(InstantiatedMethodContract iCt, MbsInfo mbsPos, 
-                            UpdateFactory uf, Update u, Services services) {
+                            UpdateFactory uf, Update u, Services services,
+                            Term wsNonRigid) {
             
         final StatementBlock methodReplaceStatements 
             = new StatementBlock(new Throw(iCt.getExceptionVariable()));
@@ -519,12 +553,13 @@ public class UseMethodContractRule implements BuiltInRule {
             tb.and(
             		tb.not(tb.equals(tb.var(iCt.getExceptionVariable()), tb.NULL(services))),
             		iCt.getAtPreAxioms());                
-        return postFmaHelp(iCt, mbsPos, uf, u, methodReplaceStatements, extraPre);
+        return postFmaHelp(iCt, mbsPos, uf, u, methodReplaceStatements, extraPre,
+                wsNonRigid, services);
     }
     
     private Term postFmaHelp(InstantiatedMethodContract iCt, MbsInfo mbsPos, 
                              UpdateFactory uf, Update u, StatementBlock methodReplaceStmts, 
-                             Term extraPre) {
+                             Term extraPre, Term wsNonRigid, Services services) {
         JavaNonTerminalProgramElement all 
         = (JavaNonTerminalProgramElement)mbsPos.pio.subTerm().javaBlock().program();     
         NonTerminalProgramElement npe = replaceStatement(all, mbsPos, methodReplaceStmts);
@@ -533,6 +568,10 @@ public class UseMethodContractRule implements BuiltInRule {
                                             mbsPos.pio.subTerm().sub(0));        
         
         restFma = uf.apply(u, restFma);
+        if(iCt.getWorkingSpace()!=null){
+            extraPre = tb.and(extraPre, tb.leq(wsNonRigid, iCt.getWorkingSpace(),
+                    services));
+        }
         final Term methodReplacement = tb.and(tb.and(extraPre, iCt.getPre()), 
                 uf.apply(u, iCt.getPost()));        
         return tb.imp(methodReplacement, restFma);

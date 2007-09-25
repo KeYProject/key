@@ -23,6 +23,7 @@ lang/Boolean.java
 lang/Byte.java
 lang/Short.java
 lang/Character.java
+lang/Runnable.java
 lang/Integer.java
 lang/IllegalArgumentException.java
 lang/System.java
@@ -95,6 +96,16 @@ util/TimeZone.java
 util/Calendar.java
 util/GregorianCalendar.java
 org/jmlspecs/lang/JMLDataGroup.java
+javax/realtime/SizeEstimator.java
+javax/realtime/MemoryArea.java
+javax/realtime/ImmortalMemory.java
+javax/realtime/InaccessableAreaException.java
+javax/realtime/ScopedMemory.java
+javax/realtime/ScopedCycleException.java
+javax/realtime/LTMemory.java
+javax/realtime/VTMemory.java
+javax/realtime/ThrowBoundaryError.java
+javax/realtime/MemoryStack.java
 +org/jmlspecs/models/JMLType.java
 +org/jmlspecs/models/JMLCollection.java
 +org/jmlspecs/models/JMLIterator.java

@@ -9,7 +9,7 @@
 		<property name="core.dist.folder" value="${basedir}/dist"/>
 		<property name="core.destination" value="${basedir}"/>
 		<!-- $Format: "<property name=\"core.version\" value=\"$ProjectVersion$\"/>"$-->
-<property name="core.version" value="0.2655"/>
+<property name="core.version" value="engelcMemoryConsumption.25"/>
 	</target>
 
 	<target name="build.update.jar">

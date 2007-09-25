@@ -9,6 +9,7 @@ import de.uka.ilkd.key.rule.ListOfBuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UpdateSimplificationRule;
 import de.uka.ilkd.key.rule.UseMethodContractRule;
+import de.uka.ilkd.key.rule.UseWorkingSpaceContractRule;
 import de.uka.ilkd.key.strategy.FOLStrategy;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.SetOfStrategyFactory;
@@ -56,11 +57,17 @@ public class JavaProfile extends AbstractProfile {
         return UpdateSimplificationRule.INSTANCE;
     }
     
+    protected UseWorkingSpaceContractRule getWorkingSpaceRule(){
+        return UseWorkingSpaceContractRule.INSTANCE;
+    }
+    
     protected ListOfBuiltInRule initBuiltInRules() {       
        
         // update simplifier
         ListOfBuiltInRule builtInRules = super.initBuiltInRules().
             prepend(getUpdateSimplificationRule());
+        
+        builtInRules = builtInRules.prepend(getWorkingSpaceRule());
   
         //contract insertion rule, ATTENTION: ProofMgt relies on the fact 
         // that Contract insertion rule is the FIRST element of this list!

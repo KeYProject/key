@@ -169,7 +169,8 @@ public class Implementation2SpecMap{
 	    loop.addLoopInvariant(new LoopInvariantAnnotation(
 				      li.getInvariant(), assignable, 
 				      new ArrayOfTerm(olds), li.getVariant(),
-				      li.getPost(), li.getSelfVar()));
+				      li.getPost(), li.getWorkingSpace(),
+                                      li.getSelfVar()));
 	}
     }
  

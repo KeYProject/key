@@ -47,8 +47,8 @@ public abstract class DefaultOperationContract extends AbstractContract
         
         instantiateAuxiliarySymbols(replacementMap, localFunctions, localProgramVariables, proof.getServices());
         return InstantiatedMethodContract.create
-            (replacementMap, getPre(), getPost(), getAdditionalAxioms(),
-             getModifies(), insts.getModality(), excVar, 
+            (replacementMap, getPre(), getPost(), getWorkingSpace(), 
+             getAdditionalAxioms(), getModifies(), insts.getModality(), excVar, 
              localFunctions, localProgramVariables);
     }
     
@@ -118,5 +118,8 @@ public abstract class DefaultOperationContract extends AbstractContract
 
     protected abstract void instantiateAtPreSymbols(Map replacementMap,
             Namespace localFunctions, Namespace localProgramVariables);
-
+    
+    public Term getWorkingSpace(){
+        return null;
+    }
 }

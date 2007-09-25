@@ -46,14 +46,14 @@ public class Comment extends JavaSourceElement {
 	if(text == null){
 	    return false;
 	}
-	return text.trim().startsWith("/*@") || text.trim().startsWith("//@")||
+	return text.trim().startsWith("/*@") && text.trim().endsWith("@*/") || text.trim().startsWith("//@")||
 	    text.trim().startsWith("/*+@") || text.trim().startsWith("/*-@")||
 	    text.indexOf("<jml>")!=-1 && text.indexOf("</jml>")!=-1;
     }
 
     public String getJMLSpec(){
 	if(!containsJMLSpec()) return null;
-	if(text.trim().startsWith("/*@")){
+	if(text.trim().startsWith("/*@") && text.trim().endsWith("@*/")){
 	    return text.trim().substring(3,text.length()-3);
 	}
 	if(text.trim().startsWith("/*+@")){

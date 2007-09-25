@@ -517,7 +517,19 @@ public class KeYMediator {
         applyInteractive(app, goal); 
         return true;
     }
-        
+    
+    public boolean selectedUseWorkingSpaceContractRule(
+            WorkingSpaceContractRuleApp app) {
+        Goal goal = keySelectionModel.getSelectedGoal();
+        Debug.assertTrue(goal != null);        
+        if (!getProof().mgt().ruleApplicable(app, goal)) {
+            barfRuleNotApplicable(app);
+            return false;
+        }
+        applyInteractive(app, goal); 
+        return true;
+    }
+      
     /**
      * Apply a RuleApp and continue with update simplification or strategy
      * application according to current settings.

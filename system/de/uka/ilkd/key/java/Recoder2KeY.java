@@ -644,7 +644,6 @@ public class Recoder2KeY implements JavaReader{
 
 	assert pe != null;
 
-
 	final HashMap methodCache = getMethodCache();
 	final Class contextClass = pe.getClass();
 	Method m = (Method) methodCache.get(contextClass);
@@ -685,6 +684,7 @@ public class Recoder2KeY implements JavaReader{
 	    if (ite.getTargetException() instanceof ConvertException) {
 		throw (ConvertException)ite.getTargetException();
 	    } else {
+		ite.getTargetException().printStackTrace();
 		//ite.getTargetException().printStackTrace();
 		throw new ConvertException
 		    ("recoder2key: called method "+ m + " threw exception:" +
@@ -696,6 +696,26 @@ public class Recoder2KeY implements JavaReader{
             ! (o instanceof SchemaVariable)) {
             ((JavaProgramElement)o).setParentClass(currentClass);
 	}
+	/*	if(pe instanceof recoder.java.reference.MethodReference &&
+	   de.uka.ilkd.key.java.reference.CurrentMemoryAreaReference.
+	   NAME.equals(
+		((recoder.java.reference.MethodReference) pe).getName())){
+	    System.out.println("pe: "+pe);
+	    return de.uka.ilkd.key.java.reference.CurrentMemoryAreaReference.
+		getInstance();
+		}*/
+
+	/*	if(o!=null && 
+	   o instanceof de.uka.ilkd.key.java.reference.FieldReference){
+	    de.uka.ilkd.key.java.reference.FieldReference fr = 
+		(de.uka.ilkd.key.java.reference.FieldReference) o;
+	    if(fr.getName()!=null && 
+	       "javax.realtime.ScopedMemory::currentMemoryArea".
+	       equals(fr.getName().toString())){
+		return de.uka.ilkd.key.java.reference.
+		    CurrentMemoryAreaReference.getInstance();
+	    }
+	    }*/
 
 	return o;
     }
@@ -1843,7 +1863,11 @@ public class Recoder2KeY implements JavaReader{
 	 return new ThisReference((TypeReference)prefix);
     }
 
-
+    public de.uka.ilkd.key.java.reference.CurrentMemoryAreaReference
+    convert(de.uka.ilkd.key.java.recoderext.CurrentMemoryAreaReference c){
+        return new de.uka.ilkd.key.java.reference.CurrentMemoryAreaReference();
+    }
+   
     public SuperReference 
 	convert(recoder.java.reference.SuperReference sr) {	
 	
@@ -1908,7 +1932,7 @@ public class Recoder2KeY implements JavaReader{
 	} 
 	methodsDeclaring.put(md, result);
 	if (!rec2key.mapped(md)) {
-	    final MethodDeclaration methDecl
+	    MethodDeclaration methDecl
 		= new MethodDeclaration
 		    (collectChildren(md), 
                      md.getASTParent() 
@@ -1916,9 +1940,14 @@ public class Recoder2KeY implements JavaReader{
 	    recoder.abstraction.ClassType cont = 
 		servConf.getCrossReferenceSourceInfo().
 		getContainingClassType((recoder.abstraction.Member)md);
-	           
+
+	    /*	    ReplaceFieldWithCurrentMemoryVisitor rf = 
+		 new ReplaceFieldWithCurrentMemoryVisitor(methDecl);
+	    rf.start();
+
+	    if(rf.replaced) System.out.println("md: "+md.getName());*/
 	    result = new ProgramMethod
-		(methDecl, getKeYJavaType(cont), 
+		(methDecl /*(MethodDeclaration) rf.result()*/, getKeYJavaType(cont), 
                  getKeYJavaType(md.getReturnType()), positionInfo(md));
 	    
             insertToMap(md, result);
@@ -2254,6 +2283,8 @@ public class Recoder2KeY implements JavaReader{
      public Expression convert(recoder.java.reference.FieldReference fr) {
 	 ProgramVariable pv;
 
+	 FieldReference result = null;
+
 	 recoder.java.declaration.FieldSpecification recoderVarSpec
 	     = (recoder.java.declaration.FieldSpecification) getRecoderVarSpec(fr);
 
@@ -2280,7 +2311,7 @@ public class Recoder2KeY implements JavaReader{
 		  getKeYJavaType(recField.getContainingClassType()),
 		  recField.isStatic());
 	     insertToMap(fs, new FieldSpecification(pv));	     	     
-	     return new FieldReference(pv, prefix);
+	     result = new FieldReference(pv, prefix);
 	 } 
 
 	 pv = getProgramVariableForFieldSpecification ( recoderVarSpec );
@@ -2296,7 +2327,11 @@ public class Recoder2KeY implements JavaReader{
              return pv;
 	 } 
 
-	 return new FieldReference(pv, prefix);
+	 if(result==null){
+	     result = new FieldReference(pv, prefix);
+	 }
+
+	return result;
      }
  
 

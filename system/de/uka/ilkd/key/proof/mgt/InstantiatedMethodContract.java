@@ -15,14 +15,16 @@ public class InstantiatedMethodContract {
     private Term pre;
     private Term post;
     private Term atPreAxioms;
+    private Term ws;
     private SetOfLocationDescriptor modifies;
     private Modality modality;
     private ProgramVariable exc;
     private Namespace functions;
     private Namespace programVariables;
+    private SymbolReplacer pvr;
     
     public static InstantiatedMethodContract create(Map m, Term pre, Term post, 
-                                                    Term atPreAxioms,                                                       
+                                                    Term ws, Term atPreAxioms,                                                       
                                                     SetOfLocationDescriptor mods, 
                                                     Modality modality,
                                                     ProgramVariable exc,                                                   
@@ -33,10 +35,11 @@ public class InstantiatedMethodContract {
         final SymbolReplacer pvr = new SymbolReplacer(m);    
         return new InstantiatedMethodContract(replace(pvr, pre), 
                                               replace(pvr, post),
+                                              ws!=null ? replace(pvr, ws) : null,
                                               replace(pvr, atPreAxioms),
                                               replace(pvr, mods),                                              
                                               modality, exc,                                               
-                                              functions, programVariables);
+                                              functions, programVariables, pvr);
     }
     
     /**
@@ -68,18 +71,22 @@ public class InstantiatedMethodContract {
     }
     
     
-    private InstantiatedMethodContract(Term pre, Term post, Term atPreAxioms,
-                                      SetOfLocationDescriptor mods, 
-                                      Modality modality, ProgramVariable exc,
-                                      Namespace functions, Namespace programVariables) {
+    private InstantiatedMethodContract(Term pre, Term post, Term ws, 
+                                       Term atPreAxioms,
+                                       SetOfLocationDescriptor mods, 
+                                       Modality modality, ProgramVariable exc,
+                                       Namespace functions, Namespace programVariables,
+                                       SymbolReplacer pvr) {
         this.pre = pre;
         this.atPreAxioms = atPreAxioms;
+        this.ws = ws;
         this.post = post;
         this.modifies = mods;
         this.modality = modality;
         this.exc = exc;
         this.functions = functions;
         this.programVariables = programVariables;
+        this.pvr = pvr;
     }
     
     public Term getPre() {
@@ -106,12 +113,20 @@ public class InstantiatedMethodContract {
         return exc;
     }
     
+    public Term getWorkingSpace(){
+        return ws;
+    }
+    
     public Namespace getAdditionalProgramVariables() {
         return programVariables;
     }
         
     public Namespace getAdditionalFunctions() {
         return functions;
+    }
+    
+    public SymbolReplacer getProgramVariableReplacer(){
+        return pvr;
     }
     
 }

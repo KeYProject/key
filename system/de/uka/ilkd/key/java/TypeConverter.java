@@ -22,10 +22,7 @@ import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ldt.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
+import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -216,7 +213,7 @@ public class TypeConverter extends TermBuilder {
 	    Debug.out("typeconverter: no data type model "+
 		      "available to convert:", op, op.getClass());		
 	    throw new IllegalArgumentException("TypeConverter could not handle"
-					       +" this");
+					       +" this: "+op);
 	}
 	return func(responsibleLDT.getFunctionFor(op, services, ec), subs);
     }
@@ -244,7 +241,9 @@ public class TypeConverter extends TermBuilder {
 	    return convertArrayReference((ArrayReference)prefix, ec);
 	} else if (prefix instanceof ThisReference) {	 
 	    return convertToLogicElement(ec.getRuntimeInstance());
-	} else {            
+	} else if (prefix instanceof CurrentMemoryAreaReference) {   
+            return convertToLogicElement(ec.getMemoryArea());
+        } else {            
 	    Debug.out("typeconverter: WARNING: unknown reference prefix:", 
 		      prefix, prefix == null ? null : prefix.getClass());
 	    throw new IllegalArgumentException("TypeConverter failed to convert "
@@ -257,7 +256,10 @@ public class TypeConverter extends TermBuilder {
 	Debug.out("TypeConverter: FieldReference: ",fr);
 	final ReferencePrefix prefix = fr.getReferencePrefix();
 	final ProgramVariable var = fr.getProgramVariable();
-	if (var.isStatic()) {
+	if("javax.realtime.ScopedMemory::currentMemoryArea".
+	               equals(fr.getName().toString())){
+	    return convertToLogicElement(ec.getMemoryArea());
+	}else if (var.isStatic()) {
 	    return var(var);
 	} else if (prefix == null) {
 	    if (var.isMember()) {
@@ -343,7 +345,9 @@ public class TypeConverter extends TermBuilder {
 	    }
 	} else if (pe instanceof ThisReference) {
 	    return convertReferencePrefix((ThisReference)pe, ec);
-	} else if (pe instanceof ParenthesizedExpression) {
+	} else if (pe instanceof CurrentMemoryAreaReference) {   
+            return convertToLogicElement(ec.getMemoryArea());
+        } else if (pe instanceof ParenthesizedExpression) {
             return convertToLogicElement
                 (((ParenthesizedExpression)pe).getChildAt(0), ec);
         } else if (pe instanceof Instanceof) {

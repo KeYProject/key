@@ -34,6 +34,10 @@ public class DefaultArithOpProvider implements ArithOpProvider{
     public Namespace getFunctions(){
 	return functions;
     }
+
+    public boolean javaSemantics(){
+	return javaSemantics;
+    }
     
     public void setFunctions(Namespace functions){
 	this.functions = functions;
@@ -122,7 +126,7 @@ public class DefaultArithOpProvider implements ArithOpProvider{
 	return (Function) functions.lookup(new Name("moduloLong"));
     }
 
-    private Function getFunction(boolean l, String sLong, String sInt, 
+    protected Function getFunction(boolean l, String sLong, String sInt, 
 				 String sDefault, String description){
 	Function f = null;
 	if (javaSemantics) {

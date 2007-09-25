@@ -251,7 +251,6 @@ public class ApplyStrategy {
     }
 
     private void finishedBatchMode (Object result) {
-        
         if ( Main.statisticsFile != null )
             printStatistics ( Main.statisticsFile, result );
         

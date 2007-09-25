@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: KeYExternalLibraries Plug-in
 Bundle-SymbolicName: KeYExternalLibraries
 PRCS-KEY: $Format: "Bundle-Version: 1.$ProjectVersion$"$
-Bundle-Version: 1.0.2655
+Bundle-Version: 1.engelcMemoryConsumption.25
 Bundle-ClassPath: antlr.jar,
  dresden-ocl-demo.jar,
  jargs.jar,

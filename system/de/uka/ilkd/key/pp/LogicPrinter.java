@@ -21,7 +21,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.oclop.OclOp;
 import de.uka.ilkd.key.logic.sort.ObjectSort;

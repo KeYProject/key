@@ -18,6 +18,7 @@ package de.uka.ilkd.key.jml;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Services;
@@ -432,6 +433,12 @@ public class UsefulTools {
     }
 
     public static Namespace buildParamNamespace(MethodDeclaration md){
+	return buildParamNamespace(md, null, null);
+    }
+
+    public static Namespace buildParamNamespace(MethodDeclaration md, 
+						LinkedList args,
+						HashMap argMap){
 	Namespace param_ns = new Namespace();
         if(md != null && md.getParameters().size() != 0){
             ArrayOfParameterDeclaration params = md.getParameters();
@@ -439,7 +446,12 @@ public class UsefulTools {
                 ProgramVariable p = (ProgramVariable) params.
 		    getParameterDeclaration(i).
 		    getVariableSpecification().getProgramVariable();
-                param_ns.add(p);
+		if(argMap!=null && args!=null && !args.isEmpty()){
+		    param_ns.add((ProgramVariable) args.get(i));
+		    argMap.put(args.get(i), p);
+		}else{
+		    param_ns.add(p);
+		}
             }
         }
 	return param_ns;

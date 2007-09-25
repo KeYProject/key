@@ -22,6 +22,8 @@ import de.uka.ilkd.key.logic.op.Function;
 public interface ArithOpProvider{
 
     public Namespace getFunctions();
+
+    public boolean javaSemantics();
     
     public void setFunctions(Namespace functions);
 

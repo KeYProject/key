@@ -1549,7 +1549,7 @@ ExecutionContext ExecutionContext() :
 {
     tr = TypeSV() "(" (instance = ExpressionSV())? ")" 
     {
-	return new ExecutionContext(tr, instance);
+	return new ExecutionContext(tr, null, instance);
     } 
 } 
 
@@ -3052,19 +3052,20 @@ StatementBlock StartBlock() :
     Statement stat;
     ExecCtxtSVWrapper ec = null;
     TypeSVWrapper tr = null;
-    ExpressionSVWrapper sv = null;
+    ExpressionSVWrapper sv = null, sv1 = null;
 }
 { 
    "{" (   LOOKAHEAD(2)
            ( <DOT> ( LOOKAHEAD(2) 
-		     tr = TypeSV() "(" (sv = ExpressionSV())? ")" |  
+		     tr = TypeSV() "(" (sv = ExpressionSV() ","
+					sv1 = ExpressionSV())? ")" |  
 	             ec = ExecutionContextSV() ))? 
             <CONTEXTSTART> 
             {
               if (ec != null) {
                  result = factory.createContextStatementBlock(ec);
 	      } else { 
-                 result = factory.createContextStatementBlock(tr, sv);
+                 result = factory.createContextStatementBlock(tr, sv, sv1);
 	      }
               setPrefixInfo(result);
             }        

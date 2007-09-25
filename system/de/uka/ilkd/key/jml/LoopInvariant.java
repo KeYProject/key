@@ -16,6 +16,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.SetAsListOfLocationDescriptor;
 import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
+import de.uka.ilkd.key.logic.LocationDescriptor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Op;
@@ -35,6 +36,8 @@ public class LoopInvariant extends JMLSpec implements AssignableSpec {
 
     private Term variant = null;
     private Term invariant = null;
+
+    private Term workingSpace = null;
 
     //post condition for loop. Only used by VBT specific rules.
     private Term post;
@@ -81,6 +84,10 @@ public class LoopInvariant extends JMLSpec implements AssignableSpec {
 	assignableLocations = assignableLocations.union(locations);
     }
 
+    public void addAssignable(LocationDescriptor location){       
+        assignableLocations = assignableLocations.add(location);
+    }
+
     public SetOfLocationDescriptor getAssignable(){
 	return assignableLocations;
     }
@@ -117,6 +124,14 @@ public class LoopInvariant extends JMLSpec implements AssignableSpec {
     
     public ProgramVariable getSelfVar() {
 	return selfVar;
+    }
+
+    public Term getWorkingSpace() {
+        return workingSpace;
+    }
+
+    public void setWorkingSpace(Term workingSpace) {
+        this.workingSpace = workingSpace;
     }
 
 }

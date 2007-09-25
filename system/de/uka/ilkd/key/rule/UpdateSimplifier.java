@@ -56,7 +56,8 @@ public class UpdateSimplifier {
      */
     public UpdateSimplifier(boolean deletionEnabled, boolean eager) {
 	this.eager = eager;
-        ListOfIUpdateRule usRules = SLListOfIUpdateRule.EMPTY_LIST.    
+        ListOfIUpdateRule usRules = SLListOfIUpdateRule.EMPTY_LIST.  
+        append(new ApplyOnWorkingSpaceNonRigid(this)).
         append(new ApplyOnAnonymousUpdate(this)).
         append(new ApplyAnonymousUpdateOnNonRigid(this)).
         append(new ApplyOnUpdate(this)).

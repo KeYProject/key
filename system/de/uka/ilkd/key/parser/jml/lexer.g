@@ -24,7 +24,7 @@ class KeYJMLLexer extends Lexer;
 
 options {
     charVocabulary = '\3'..'\377';  
-	k=7;
+	k=16;
 }
 
 tokens {
@@ -93,8 +93,8 @@ tokens {
     COMMA = ",";
     LPAREN = "(";
     RPAREN = ")";
-    LBRACKET = "[";
-    RBRACKET = "]";
+//    LBRACKET = "[";
+//    RBRACKET = "]";
     SHIFTRIGHT = ">>";
     SHIFTLEFT = "<<";
     UNSIGNEDSHIFTRIGHT = ">>>";
@@ -133,6 +133,7 @@ tokens {
     CONTINUES = "continues";
     WORKING_SPACE = "working_space";
     WORKING_SPACE_REDUNDANTLY = "working_space_redundantly";
+    WORKING_SPACE_SINGLE_ITERATION = "working_space_single_iteration";
     DURATION = "duration";
     DURATION_REDUNDANTLY = "duration_redundantly";
     MAPS = "maps";
@@ -166,7 +167,9 @@ tokens {
     DECREASES = "decreases";
     DECREASES_REDUNDANTLY = "decreases_redundantly";
     SPEC_VAR_DECL_OLD = "old";
-    SPEC_VAR_DECL_FORALL = "forall";   
+    SPEC_VAR_DECL_FORALL = "forall"; 
+//    WORKINGSPACE = "\\working_space";
+//    WORKINGSPACERIGID = "\\working_space_rigid";
 }
 
 LARROW : "<-";
@@ -224,6 +227,7 @@ REAL : "\\real";
 DURATION : "\\duration";
 SPACE : "\\space";
 WORKINGSPACE : "\\working_space";
+WORKINGSPACERIGID : "\\working_space_rigid";
 TYPEOF : "\\typeof";
 ELEMTYPE : "\\elemtype";
 TYPE_SMALL : "\\type";
@@ -253,7 +257,7 @@ options {
 
 LBRACKET
 options {
-  paraphrase = "`['";
+  paraphrase = "[";
 }
 	:
 	'[' 
@@ -261,7 +265,7 @@ options {
 
 RBRACKET
 options {
-  paraphrase = "`]'";
+  paraphrase = "]";
 }
 	:
 	']' 

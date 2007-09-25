@@ -33,6 +33,7 @@ import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
 import de.uka.ilkd.key.proof.ProofSaver;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.mgt.JavaModelMethod;
 import de.uka.ilkd.key.proof.mgt.ListOfQuantifierPrefixEntry;
 import de.uka.ilkd.key.proof.mgt.QuantifierPrefixEntry;
@@ -274,6 +275,7 @@ public class JMLMethodSpec extends JMLSpec implements JMLLemmaMethodSpec,
     protected ProgramMethod pm;
     private Term post; 
     private Term pre;
+    private Term workingSpace;
     protected ProgramVariable resultVar = null;
     /**
      * Specification variables (see JML Reference
@@ -352,6 +354,10 @@ public class JMLMethodSpec extends JMLSpec implements JMLLemmaMethodSpec,
     
     public void addAssignable(SetOfLocationDescriptor locations){	
         assignableVariables = assignableVariables.union(locations);
+    }
+    
+    public void addAssignable(LocationDescriptor location){       
+        assignableVariables = assignableVariables.add(location);
     }
     
     public SetOfLocationDescriptor getAssignable() {
@@ -638,6 +644,14 @@ public class JMLMethodSpec extends JMLSpec implements JMLLemmaMethodSpec,
 	    post = and(post, t);
 	}
     }
+    
+    public void setWorkingSpace(Term t){
+        workingSpace = t;
+    }
+    
+    public Term getWorkingSpace(){
+        return workingSpace;
+    }
 
     public void setSpecVars(ListOfNamed svs){
 	specVars = svs;
@@ -691,6 +705,9 @@ public class JMLMethodSpec extends JMLSpec implements JMLLemmaMethodSpec,
 	    excPost = imp ( not ( equals (excVarTerm, nullTerm) ), excPost);
 	    post    = and(post, excPost);
 	}
+        if(workingSpace!=null && desugar){
+            post = and(post, workingSpacePost());
+        }
 	if(withInv && !services.getImplementation2SpecMap().
 	   getModifiers(pm).contains("helper")){
 	    post = cSpec.addClassSpec2Post(post, true, !allInv, pm, cSpec); 
@@ -715,6 +732,17 @@ public class JMLMethodSpec extends JMLSpec implements JMLLemmaMethodSpec,
 	return c;
     }
 
+    protected Term workingSpacePost(){
+        ProgramVariable heap = (ProgramVariable) nss.programVariables().lookup(
+                new Name(ProblemInitializer.heapSpaceName));
+        Term heapTerm = tf.createVariableTerm(heap);    
+        Term oldHeap = (Term) term2old.get(heapTerm);
+        Function add = (Function) nss.functions().lookup(new Name("add"));
+        Function leq = (Function) nss.functions().lookup(new Name("leq")); 
+        return func(leq, heapTerm, func(add, oldHeap, workingSpace.isRigid() ?
+                workingSpace : (Term) term2old.get(workingSpace)));
+    }
+    
     /**
      * creates and sets the self (this) prefix variable. In addition implicit
      * method preconditions are added. Implicit means the JML semantics requires them to
@@ -728,6 +756,19 @@ public class JMLMethodSpec extends JMLSpec implements JMLLemmaMethodSpec,
             Services services, JMLClassSpec cSpec) {
         self = (ProgramVariable)cSpec.getInstancePrefix();
         Term t_self = var(self);
+        ProgramVariable initialMemoryArea = services.getJavaInfo().
+            getDefaultMemoryArea();
+        Term t_mem = var(initialMemoryArea);
+        addPre(not(equals(t_mem, nullTerm)));
+        addPre(UsefulTools.isCreated(t_mem, services));
+        
+        final TermBuilder df = TermBuilder.DF;
+        final ProgramVariable stack = services.getJavaInfo().getAttribute(
+                "stack", initialMemoryArea.getKeYJavaType());
+        Term mem_stack = df.dot(t_mem, stack);
+        addPre(not(equals(mem_stack, nullTerm)));
+        addPre(UsefulTools.isCreated(mem_stack, services));
+                
         //adds self!=null && self.<created> == true or 
         //self.<classInitialized> == true to the precondition
         if(!(pm.getMethodDeclaration() instanceof Constructor)){
@@ -1098,7 +1139,8 @@ public class JMLMethodSpec extends JMLSpec implements JMLLemmaMethodSpec,
 		New n = new New(aop, (TypeReference) cSpec.getStaticPrefix(), null);
 		MethodFrame fakeFrame = new MethodFrame
 		    (null, 
-		     new ExecutionContext((TypeReference) cSpec.getStaticPrefix(), null), 
+		     new ExecutionContext((TypeReference) cSpec.getStaticPrefix(), 
+		             services.getJavaInfo().getDefaultMemoryArea(), null), 
 		     new StatementBlock(new CopyAssignment((ProgramVariable) getPrefix(), n)));
 		mBS = new StatementBlock(fakeFrame);
 	    }
