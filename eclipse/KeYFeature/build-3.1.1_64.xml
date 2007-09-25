@@ -3,11 +3,11 @@
 
 
 	<!-- $Format: "<property name=\"core.version\" value=\"$ProjectVersion$\"/>"$ -->
-<property name="core.version" value="0.2655"/>
+<property name="core.version" value="mulbrichRec2Key.6"/>
 
 
 	<!-- $Format: "<property name=\"version\" value=\"1.$ProjectVersion$\"/>"$ -->
-<property name="version" value="1.0.2655"/>
+<property name="version" value="1.mulbrichRec2Key.6"/>
 	<target name="init">
 		<property name="feature.temp.folder" value="${basedir}/feature.temp.folder"/>
 		<property name="feature.destination" value="${basedir}"/>

@@ -42,7 +42,7 @@ JAVA_OPTIONS=
 #JAVA_OPTIONS=-classic
 
 # Uncomment the following definition for remote debugging on port 1234
-#JAVA_OPTIONS='-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1234'
+#JAVA_OPTIONS='-DKeyDebugFlag=on -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=1234'
 
 # Change that, if your java interpreter is different
 #
@@ -117,13 +117,13 @@ fi
 
 # fixing of possible linux glibc bug for jdk 1.3.1
 # http://developer.java.sun.com/developer/bugParade/bugs/4466587.html
-if [ "$UNAME" = "linux" ] ; then
-    VERSION=`$JAVA $JAVA_OPTIONS -version 2>&1 | awk 'BEGIN {FS="\""}\
-    { for(i = 2; i<NF; i++) printf "%s", \$i }'`
-    if expr "$VERSION" : "1\\.3\\.1.*" > /dev/null 2>&1; then
-       ulimit -s 2048
-    fi
-fi
+#if [ "$UNAME" = "linux" ] ; then
+#    VERSION=`$JAVA $JAVA_OPTIONS -version 2>&1 | awk 'BEGIN {FS="\""}\
+#    { for(i = 2; i<NF; i++) printf "%s", \$i }'`
+#    if expr "$VERSION" : "1\\.3\\.1.*" > /dev/null 2>&1; then
+#       ulimit -s 2048
+#    fi
+#fi
 
 
 #
@@ -269,6 +269,7 @@ $TGH/lib/guiBuilderBeanInfo.jar:\
 $keyclasspath:\
 $JDK_RT_JAR"
 
+echo $JAVA $COMPLETEOPTIONS junit.textui.TestRunner $testcase
 $JAVA $COMPLETEOPTIONS junit.textui.TestRunner $testcase
 
 if [ "$testcase" = "TestKey" ]; then

@@ -3464,6 +3464,15 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
    }
    )
       |
+      "#loop-to-while" "(" stat = Statement ")"
+  {
+      result = factory.createRKeYMetaConstruct();
+      setPrefixInfo(result);
+      result.setChild(stat);
+      result.setName("#loop-to-while");
+      return result; 
+  }
+      |
       <SWITCHTOIF> "(" stat = Statement() ")"
   {  
       result = factory.createRKeYMetaConstruct();

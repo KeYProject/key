@@ -121,7 +121,7 @@ public class TestKey extends TestCase {
     }
 
     public static junit.framework.Test suite() {
-	de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false; 	
+//	de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false; 	
         
 	TestSuite suite = new TestSuite();
 	

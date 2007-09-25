@@ -256,6 +256,8 @@ public class ProblemInitializer {
     
         
     /**
+     * get a vector of Strings containing all .java file names 
+     * in the cfile directory.
      * Helper for readJava().
      */
     private Vector getClasses(String f) throws ProofInputException  {

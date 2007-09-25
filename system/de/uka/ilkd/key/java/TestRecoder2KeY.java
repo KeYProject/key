@@ -13,6 +13,8 @@ package de.uka.ilkd.key.java;
 import java.io.FileReader;
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
+
 import junit.framework.TestCase;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
@@ -27,8 +29,9 @@ import de.uka.ilkd.key.logic.op.SLListOfProgramVariable;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 public class TestRecoder2KeY extends TestCase {
-
-    
+	
+	
+	
     public TestRecoder2KeY(String name) {
 	super(name);
     }
@@ -98,7 +101,9 @@ public class TestRecoder2KeY extends TestCase {
 	" class circ_A {   static int a = circ_B.b;   } "
 	+"class circ_B {   static int b = circ_A.a;   }",
 	" class circ2_A {   static final int a = circ2_B.b;   } " // This fails for an
-	+"class circ2_B {   static final int b = circ2_A.a;   }"  // unpatched recoder library
+	+"class circ2_B {   static final int b = circ2_A.a;   }",  // unpatched recoder library
+	"class Cycle1 { void m(Cycle2 c) {} } "  // cyclic references as method arguments
+	+"class Cycle2 { void m(Cylce1 c) {} }"
     };
 
     /** removes blanks and line feeds from a given string*/

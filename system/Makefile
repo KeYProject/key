@@ -7,7 +7,7 @@
 # See LICENSE.TXT for details.
 
 #$Format: "PRCSVERSION = \"$ProjectVersion$\""$ 
-PRCSVERSION = "0.2655"
+PRCSVERSION = "mulbrichRec2Key.6"
 
 SHELL=/bin/sh
 #comon prefix

@@ -4,5 +4,5 @@
       KeY Nightly Builds
    </description>
    <!-- $Format: "<feature url=\"features/KeY_Feature_1.$ProjectVersion$.jar\" id=\"KeY_Feature\" version=\"1.$ProjectVersion$\"/>"$ -->
-<feature url="features/KeY_Feature_1.0.2655.jar" id="KeY_Feature" version="1.0.2655"/>
+<feature url="features/KeY_Feature_1.mulbrichRec2Key.6.jar" id="KeY_Feature" version="1.mulbrichRec2Key.6"/>
 </site>
