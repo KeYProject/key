@@ -5,8 +5,9 @@
 *~
 system/genSrc
 system/binary
-*#*#
+*#*
 system/key.jar
 system/setup.jar
 system/GenMakefile
 system/Makefile.mk
+
