@@ -44,11 +44,11 @@ JIKESPATH=$(CLASSPATH):$(GENERATED_SRC_PATH):$(JAVA_HOME)/jre/lib/rt.jar
 COMMON_OPTIONS=-g -d $(BINARYPATH) 
 OPTIONS=$(COMMON_OPTIONS)
 
+GIT=$(shell which git)
 
 ifeq "$(KEYVERS)" ""
 KEYVERS=$(PRCSVERSION)
 endif
-
 
 ifeq "$(JAVAC)" ""
 JAVAC=jikes
@@ -456,6 +456,7 @@ clean:
 
 #help files of the makefile (without the GenMakefile)
 
+	@rm -f javaFiles.tmp
 	@rm -f msg.txt
 	@rm -f argfile.aspects
 	@rm -f argfile.generic
@@ -518,11 +519,15 @@ else
 	@echo [GF skipped]
 endif
 
-listJavaFiles: 
-	@git ls-files | grep *.java | grep -v "system/resources/" > listJavaFiles
-argfile.normal: listJavaFiles
-	@echo [reading project file]
-	@cat listJavaFiles > argfile.normal
+javaFiles.tmp: javaFiles
+ifneq ("$(GIT)","")
+	@git ls-files | grep ".java" | grep -v "aspects" | grep -v "gjava" | grep -v ".java." | grep -v "resources/" > javaFiles
+endif
+	@cat javaFiles > javaFiles.tmp
+
+argfile.normal: javaFiles.tmp
+	@echo [Collecting Java files to compile]
+	@cat javaFiles.tmp > argfile.normal
 	@echo "TestKey.java" >> argfile.normal 
 ## make gjava -> java
 
