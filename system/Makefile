@@ -457,6 +457,7 @@ clean:
 #help files of the makefile (without the GenMakefile)
 
 	@rm -f javaFiles.tmp
+	@rm -f unit_manager.log 
 	@rm -f msg.txt
 	@rm -f argfile.aspects
 	@rm -f argfile.generic
