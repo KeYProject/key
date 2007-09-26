@@ -6,13 +6,9 @@
 # The KeY system is protected by the GNU General Public License. 
 # See LICENSE.TXT for details.
 
-#$Format: "PRCSVERSION = \"$ProjectVersion$\""$ 
-PRCSVERSION = "0.2655"
-
 SHELL=/bin/sh
 #comon prefix
 PFX=de/uka/ilkd/key/
-
 
 #
 #the path where to put the binaries.  This should be different from
@@ -46,8 +42,20 @@ OPTIONS=$(COMMON_OPTIONS)
 
 GIT=$(shell which git)
 
+
+ifneq "$(GIT)" ""
+SHA1=$(shell git show | grep commit)
+SHA1:=$(wordlist 2,2,$(SHA1))
+SEQVERSION=$(shell git log --pretty=one | wc -l)
+SEQVERSION:=$(wordlist 1,1,$(SEQVERSION))
+SEQVERSION:=1.1.$(SEQVERSION)
+else
+SHA1=ownVersion
+SEQVERSION=0.0.0
+endif
+
 ifeq "$(KEYVERS)" ""
-KEYVERS=$(PRCSVERSION)
+KEYVERS=$(SEQVERSION)_$(SHA1)
 endif
 
 ifeq "$(JAVAC)" ""
@@ -393,15 +401,15 @@ doc: argfile $(JAVAFILES)
 	-link http://java.sun.com/j2se/1.3/docs/api \
 	-link http://www.antlr.org \
 	-windowtitle "KeY API Documentation" \
-	-doctitle "KeY API Documentation ($(PRCSVERSION))" \
-	-header "KeY $(PRCSVERSION)" \
+	-doctitle "KeY API Documentation ($(KEYVERS))" \
+	-header "KeY $(KEYVERS)" \
 	-private -author -version -J-Xmx256m
 
 
 
 ## create distribution package
 .PHONY: dist
-dist:	all
+dist:	branding all
 	@echo "[creating distribution directory structure]"
 	@mkdir -p ../dist
 	@mkdir -p dist/key/
@@ -432,7 +440,7 @@ jar:	all
 	@jar cfm key.jar resources/MANIFEST.MF -C binary/ .
 
 .PHONY: dist_src
-dist_src: distclean
+dist_src: branding distclean
 	@rm -rf /tmp/keydist-$(USER)
 	@echo "[creating source archive]"
 	@mkdir -p /tmp/keydist-$(USER)
@@ -519,6 +527,18 @@ ifeq ("$(COMPILE_GF)","--with-gf")
 else
 	@echo [GF skipped]
 endif
+
+branding:
+	@echo "[Branding]"
+	@echo $(SHA1) > resources/de/uka/ilkd/key/util/sha1
+	@echo $(SEQVERSION) > resources/de/uka/ilkd/key/util/version
+	@./brandManifest.sh ../eclipse/KeYExternalLibraries/META-INF/MANIFEST.MF $(SEQVERSION)
+	@./brandManifest.sh ../eclipse/org.key-project.core/META-INF/MANIFEST.MF $(SEQVERSION)
+	@./brandManifest.sh ../eclipse/KeYPlugin/META-INF/MANIFEST.MF $(SEQVERSION)
+	@./brandManifest.sh ../eclipse/VisualDebugger/META-INF/MANIFEST.MF $(SEQVERSION)
+	@./brandPlugin.sh ../eclipse/KeYFeature/site.xml $(SEQVERSION)
+	@./brandPlugin.sh ../eclipse/KeYFeature/feature.xml $(SEQVERSION)
+	@./brandPlugin.sh ../eclipse/ProofVisualization/plugin.xml $(SEQVERSION)
 
 javaFiles.tmp: javaFiles
 ifneq ("$(GIT)","")
