@@ -12,7 +12,9 @@
 #
 #!/bin/sh
 pck=$1
-outFile=`echo $1 | sed 's!\.!/!g;'`"/ArrayOf"$2".java"
+outDir=$GENERATED_SRC_PATH`echo $1 | sed 's!\.!/!g;'`
+mkdir -p $outDir
+outFile=$outDir"/ArrayOf"$2".java"
 ext="extends ArrayOf"$3
 cons0="super()"
 cons1="super(arr)"

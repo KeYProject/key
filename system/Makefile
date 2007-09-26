@@ -21,7 +21,7 @@ PFX=de/uka/ilkd/key/
 BINARYPATH=binary/
 
 # generated source path
-GENERATED_SRC_PATH=genSrc/
+export GENERATED_SRC_PATH=genSrc/
 
 #the path where the resources are put (images etc.)
 RESOURCEPATH=./resources/
@@ -673,7 +673,7 @@ $(BINARYPATH)$(PFX)util/make/GenericParser.class: $(BINARYPATH)$(PFX)util/make/M
 	@$(JAVAC) $(OPTIONS) $(PFX)util/make/GenericParser.java 2>&1 
 
 genericMakefile: $(BINARYPATH)$(PFX)util/make/GenericParser.class
-	@$(JAVA) -cp $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH) de.uka.ilkd.key.util.make.GenericParser GenMakefile argfile.generic $(JAVAFILES)
+	@$(JAVA) -cp $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH) de.uka.ilkd.key.util.make.GenericParser $(GENERATED_SRC_PATH) GenMakefile argfile.generic $(JAVAFILES)
 
 
 GenMakefile:;
