@@ -16,17 +16,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.zip.GZIPOutputStream;
 
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.rule.export.*;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 
 
 public abstract class HTMLFile extends HTMLContainer {
-    //  DO NOT CHANGE THE FOLLOWING 2 LINES, UNLESS YOU KNOW ABOUT PRCS-REPLACEMENT
-    /* $Format: "    private static final String PRCSVERSION = \"$ProjectVersion$\";"$ */
-    private static final String PRCSVERSION = "engelcMemoryConsumption.25";
-
-
+    
+    private static final String PRCSVERSION = Main.INTERNAL_VERSION;
     
     static KeYResourceManager resManager = KeYResourceManager.getManager();
 

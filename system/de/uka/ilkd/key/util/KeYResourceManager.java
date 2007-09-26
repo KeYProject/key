@@ -16,9 +16,7 @@
 
 package de.uka.ilkd.key.util;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
@@ -29,6 +27,9 @@ public class KeYResourceManager {
     private static final KeYResourceManager instance 
 	= new KeYResourceManager();
 
+    private String version = null;
+    private String sha1 = null;
+
     private KeYResourceManager() {
     }
 
@@ -37,6 +38,59 @@ public class KeYResourceManager {
      */
     public static KeYResourceManager getManager() {
 	return instance;
+    }
+
+
+    /**
+     * reads a version string or returns "x.z.y" in case of failures
+     */
+    private String readVersionString(URL url) {
+	String result = "";
+	if (url != null) {
+	    try {
+		final InputStream io = 
+                    new BufferedInputStream(url.openStream()); 
+		int c;
+		while ((c=io.read()) !=-1) {
+		    result += (char)c;
+		}
+	    } catch (IOException ioe) {
+		// who cares it is just a version number
+		result = "x.z.y";
+	    }
+	} else {
+	    result = "x.z.y";
+	}
+	return result.trim();
+    }
+
+    /**
+     * returns the SHA 1 git code from which this version has been 
+     * derived
+     * @return returns the SHA1 hash uniquely identifying the version
+     */
+    public String getSHA1() {
+	if (sha1 != null) {
+	    return sha1;
+	}
+	sha1 = 
+	    readVersionString(getResourceFile(this, "sha1")); 
+
+	return sha1;
+    }
+
+    /**
+     * returns a readable customizable versin number    
+     * @return 
+     */
+    public String getVersion() {      
+	if (version != null) {
+	    return version;
+	}
+	version = 
+	    readVersionString(getResourceFile(this, "version")); 
+
+	return version;
     }
 
     /**
