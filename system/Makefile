@@ -378,7 +378,7 @@ keybase: javahomeset
 
 ## create javadoc
 .PHONY: doc
-doc: $(BINARYPATH)$(PFX)util/make/ListJavaFiles.class $(JAVAFILES)
+doc: argfile $(JAVAFILES)
 	@mkdir -p doc
 ## old doc generation	
 #	@find de/ | grep "\.java" | grep -v "\~" | xargs javadoc -use -classpath $(CLASSPATH):$(BINARYPATH) -d doc 
@@ -518,9 +518,11 @@ else
 	@echo [GF skipped]
 endif
 
-argfile.normal: $(BINARYPATH)$(PFX)util/make/ListJavaFiles.class ../key.prj
+listJavaFiles: 
+	@git ls-files | grep *.java | grep -v "system/resources/" > listJavaFiles
+argfile.normal: listJavaFiles
 	@echo [reading project file]
-	@$(JAVA) -cp $(CLASSPATH):$(BINARYPATH) de.uka.ilkd.key.util.make.ListJavaFiles <../key.prj >argfile.normal
+	@cat listJavaFiles > argfile.normal
 	@echo "TestKey.java" >> argfile.normal 
 ## make gjava -> java
 
@@ -545,16 +547,6 @@ $(DIFF_PARSER) \
 	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)parser/diffparser
 	@rm -f $(GENERATED_SRC_PATH)$(PFX)parser/diffparser/*.java $@
 	@$(JAVA) -cp $(CLASSPATH) $(JAVACC_MAIN) -OUTPUT_DIRECTORY=$(GENERATED_SRC_PATH)$(PFX)parser/diffparser $< 
-
-$(BINARYPATH)$(PFX)util/make/ListJavaFiles.class: $(GENERATED_SRC_PATH)$(PFX)util/make/ListJavaFiles.java
-	@echo [compile project file reader]
-	@$(JAVAC) $(OPTIONS) $< 2>&1 | (grep -v "Caution\|Warning" || true)
-
-$(GENERATED_SRC_PATH)$(PFX)util/make/ListJavaFiles.java: $(PFX)util/make/prcs.g
-	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)util/make/
-	@echo [creating project file reader]
-	@$(ANTLR) -o $(GENERATED_SRC_PATH)$(PFX)/util/make $<  
-
 
 $(GENERATED_SRC_PATH)$(PFX)parser/dictionary/DictionaryLexer.java \
 $(GENERATED_SRC_PATH)$(PFX)parser/dictionary/DictionaryLexerTokenTypes.txt \
