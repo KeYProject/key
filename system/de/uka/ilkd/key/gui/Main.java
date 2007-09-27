@@ -44,12 +44,13 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 
 public class Main extends JFrame {
 
-    //DO NOT CHANGE THE FOLLOWING 2 LINES, UNLESS YOU KNOW ABOUT PRCS-REPLACEMENT
-    /* $Format: "    private static final String PRCSVERSION = \"$ProjectVersion$\";"$ */
-    private static final String PRCSVERSION = "muerkKeYC.4";
+    public static final String INTERNAL_VERSION = 
+	KeYResourceManager.getManager().getSHA1();
 
-    
-    private static final String VERSION="1.2-beta (internal: "+PRCSVERSION+")";
+    private static final String VERSION = 
+	KeYResourceManager.getManager().getVersion() + 
+	"-beta (internal: "+INTERNAL_VERSION+")";
+
     private static final String COPYRIGHT="(C) Copyright 2001-2007 "
         +"Universit\u00e4t Karlsruhe, Universit\u00e4t Koblenz-Landau, "
         +"and Chalmers University of Technology";
@@ -298,7 +299,7 @@ public class Main extends JFrame {
     }
     
     public String getPrcsVersion() {
-        return PRCSVERSION;
+        return INTERNAL_VERSION;
     }
     
     public void updateUI() {
