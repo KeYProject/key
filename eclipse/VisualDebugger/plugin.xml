@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
-<!-- $Format: " <plugin id=\"VisualDebugger\" name=\"Visual Debugger\" version=\"1.$ProjectVersion$\" provider-name=\"KeY Project\" class=\"visualdebugger.Activator\">"$ -->
- <plugin id="VisualDebugger" name="Visual Debugger" version="1.mulbrichRecoder08.19" provider-name="KeY Project" class="visualdebugger.Activator">
+ <plugin 
+    id="VisualDebugger" 
+    name="Visual Debugger" 
+    version="1.0.2655" 
+    provider-name="KeY Project" 
+    class="visualdebugger.Activator">
 
      <extension
          point="org.eclipse.ui.views">
