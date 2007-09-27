@@ -2,8 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: KeY eclipse plug-in
 Bundle-SymbolicName: KeYPlugin; singleton:=true
-PRCS-KEY: $Format: "Bundle-Version: 1.$ProjectVersion$"$
-Bundle-Version: 1.jseidelConstructorCollector.3
+Bundle-Version: 1.0.2655
 Bundle-ClassPath: KeYPlugin.jar,
  .
 Bundle-Activator: de.uka.ilkd.key.casetool.eclipse.KeYPlugin

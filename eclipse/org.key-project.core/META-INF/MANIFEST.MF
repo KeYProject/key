@@ -2,8 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Core Plug-in
 Bundle-SymbolicName: org.key_project.core
-PRCS-KEY: $Format: "Bundle-Version: $ProjectVersion$"$
-Bundle-Version: jseidelConstructorCollector.3
+Bundle-Version: 0.2655
 Bundle-ClassPath: key.jar
 Bundle-Vendor: KeY-Project, Universities of Chalmers, Koblenz and Karlsruhe
 Bundle-Localization: plugin
