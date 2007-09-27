@@ -12,7 +12,9 @@
 #
 #!/bin/sh
 pck=$1
-outFile=`echo $1 | sed 's!\.!/!g;'`"/HashMapFrom"$2"To"$3".java"
+outDir=$GENERATED_SRC_PATH`echo $1 | sed 's!\.!/!g;'`
+mkdir -p $outDir
+outFile=$outDir"/HashMapFrom"$2"To"$3".java"
 sed "s/<Pck>/$pck/g;s/<S>/$2/g;s/<T>/$3/g;" <<END_OF_CLASS >$outFile
 
 
