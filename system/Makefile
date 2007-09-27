@@ -54,8 +54,9 @@ SHA1=ownVersion
 SEQVERSION=0.0.0
 endif
 
-ifeq "$(KEYVERS)" ""
-KEYVERS=$(SEQVERSION)_$(SHA1)
+ifeq "$(KEY_VERSION_LONG)" ""
+KEY_VERSION_LONG=$(SEQVERSION)_$(SHA1)
+export KEY_VERSION_LONG
 endif
 
 ifeq "$(JAVAC)" ""
@@ -401,8 +402,8 @@ doc: argfile $(JAVAFILES)
 	-link http://java.sun.com/j2se/1.3/docs/api \
 	-link http://www.antlr.org \
 	-windowtitle "KeY API Documentation" \
-	-doctitle "KeY API Documentation ($(KEYVERS))" \
-	-header "KeY $(KEYVERS)" \
+	-doctitle "KeY API Documentation ($(KEY_VERSION_LONG))" \
+	-header "KeY $(KEY_VERSION_LONG)" \
 	-private -author -version -J-Xmx256m
 
 
@@ -429,8 +430,8 @@ dist:	branding all
 	@echo "[creating jar-file]"
 	@jar cfm key.jar resources/MANIFEST.MF -C dist/key/ .
 	@jar cfm setup.jar resources/de/uka/ilkd/key/util/install/MANIFEST.MF -C dist/setup/ .
-	@tar -czvf ../dist/KeY-$(KEYVERS).tgz key.jar setup.jar -C ../ LICENSE.TXT
-	@cp ../README.install.bytecode ../dist/README-$(KEYVERS).txt
+	@tar -czvf ../dist/KeY-$(KEY_VERSION_LONG).tgz key.jar setup.jar -C ../ LICENSE.TXT
+	@cp ../README.install.bytecode ../dist/README-$(KEY_VERSION_LONG).txt
 	@echo "[deleting distribution directory structure]"
 	@rm -rf dist
 
@@ -444,12 +445,12 @@ dist_src: branding distclean
 	@rm -rf /tmp/keydist-$(USER)
 	@echo "[creating source archive]"
 	@mkdir -p /tmp/keydist-$(USER)
-	@ln -s $(shell cd ..;pwd) /tmp/keydist-$(USER)/key-$(KEYVERS)
+	@ln -s $(shell cd ..;pwd) /tmp/keydist-$(USER)/key-$(KEY_VERSION_LONG)
 	@tar -C/tmp/keydist-$(USER) --dereference  \
-        -cvzf /tmp/keydist-$(USER)/KeY-$(KEYVERS)-src.tgz \
-        --exclude=key-$(KEYVERS)/key-ext-jars/'*' --exclude=key-$(KEYVERS)/eclipse/'*'     key-$(KEYVERS)
-	@mv /tmp/keydist-$(USER)/KeY-$(KEYVERS)-src.tgz ..
-	@cp /tmp/keydist-$(USER)/key-$(KEYVERS)/README.install.source ../README-$(KEYVERS)-src.txt
+        -cvzf /tmp/keydist-$(USER)/KeY-$(KEY_VERSION_LONG)-src.tgz \
+        --exclude=key-$(KEY_VERSION_LONG)/key-ext-jars/'*' --exclude=key-$(KEY_VERSION_LONG)/eclipse/'*'     key-$(KEY_VERSION_LONG)
+	@mv /tmp/keydist-$(USER)/KeY-$(KEY_VERSION_LONG)-src.tgz ..
+	@cp /tmp/keydist-$(USER)/key-$(KEY_VERSION_LONG)/README.install.source ../README-$(KEY_VERSION_LONG)-src.txt
 	@echo "[done]"
 
 
@@ -760,7 +761,7 @@ $(GENERATED_SRC_PATH)de/uka/ilkd/asmkey/parser/antlr/AsmKeyParser.java \
 
 # eclipse plug-in:
 eclipse-plug-in: dist
-	cd ../eclipse/KeYFeature && $(MAKE)
+	@cd ../eclipse/KeYFeature && $(MAKE)
 	@rm -fr $(BINARYPATH)$(PFX)casetool/eclipse
 	@mkdir -p $(BINARYPATH)$(PFX)casetool/eclipse/KeY_Feature/features
 	@mkdir -p $(BINARYPATH)$(PFX)casetool/eclipse/KeY_Feature/plugins
@@ -770,4 +771,3 @@ eclipse-plug-in: dist
 	@cp  ../eclipse/ProofVisualization/ProofVisualization_*.jar $(BINARYPATH)$(PFX)casetool/eclipse/KeY_Feature/plugins
 	@cp  ../eclipse/org.key-project.core/org.key_project.core_* $(BINARYPATH)$(PFX)casetool/eclipse/KeY_Feature/plugins
 	@cp  ../eclipse/KeYExternalLibraries/KeYExternalLibraries_1* $(BINARYPATH)$(PFX)casetool/eclipse/KeY_Feature/plugins
-

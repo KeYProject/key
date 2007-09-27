@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?eclipse version="3.2"?>
+<?xml version="1.1.13" encoding="UTF-8"?>
+<?eclipse version="1.1.13"?>
 <plugin 
    name="ProofVisualization Plug-in" 
    id="ProofVisualization" 
-   version="0.0.0"
+   version="1.1.13"
    provider-name="KeY Project, University of Karlsruhe" 
    class="proofVisualization.ProofVisualizationPlugin">
   

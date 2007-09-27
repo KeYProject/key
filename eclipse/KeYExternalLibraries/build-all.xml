@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="zip.distribution" name="build">
 
+        <property environment="env"/>
+
 	<target name="clean">
           <delete file="KeYExternalLibraries*"/>
 	</target>
@@ -30,6 +32,7 @@
 	</target>
 
 	<target name="zip.distribution" depends="init">
+	  
 		<antcall target="gather.bin.parts">
 			<param name="arch" value="*"/>
 			<param name="ws" value="*"/>
@@ -38,7 +41,7 @@
 			<param name="key.external.base" value="${key.external.dist.folder}"/>
 			<param name="os" value="*"/>
 		</antcall>
-		<jar jarfile="${key.external.destination}/KeYExternalLibraries_${version}.jar" 
+		<jar jarfile="${key.external.destination}/KeYExternalLibraries_${env.KEY_VERSION_LONG}.jar" 
 	        	manifest="${basedir}/META-INF/MANIFEST.MF" 
 			basedir="${key.external.dist.folder}" 
                         filesonly="false" whenempty="skip" update="false"/>		
