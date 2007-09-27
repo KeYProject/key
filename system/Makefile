@@ -542,7 +542,7 @@ branding:
 
 javaFiles.tmp: javaFiles
 ifneq ("$(GIT)","")
-	@git ls-files | grep ".java" | grep -v "aspects" | grep -v "gjava" | grep -v ".java." | grep -v "resources/" > javaFiles
+	@git ls-files | grep ".java" | grep -v "aspects" | grep -v "gjava" | grep -v ".java." | grep -v "resources/" | sort > javaFiles
 endif
 	@cat javaFiles > javaFiles.tmp
 
