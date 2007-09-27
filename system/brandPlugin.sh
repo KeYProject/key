@@ -1,7 +1,4 @@
 #!/bin/sh
-sed '/version=/ c\
-version="'$2'"
-
-' $1 > tmp.plugin
+sed 's/version=\"[^\"]*\"/version=\"'$2'\"/g;' $1 > tmp.plugin
 mv tmp.plugin $1
 
