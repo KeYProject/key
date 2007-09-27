@@ -6,13 +6,9 @@
 # The KeY system is protected by the GNU General Public License. 
 # See LICENSE.TXT for details.
 
-#$Format: "PRCSVERSION = \"$ProjectVersion$\""$ 
-PRCSVERSION = "jseidelConstructorCollector.3"
-
 SHELL=/bin/sh
 #comon prefix
 PFX=de/uka/ilkd/key/
-
 
 #
 #the path where to put the binaries.  This should be different from
@@ -21,7 +17,7 @@ PFX=de/uka/ilkd/key/
 BINARYPATH=binary/
 
 # generated source path
-GENERATED_SRC_PATH=genSrc/
+export GENERATED_SRC_PATH=genSrc/
 
 #the path where the resources are put (images etc.)
 RESOURCEPATH=./resources/
@@ -44,11 +40,23 @@ JIKESPATH=$(CLASSPATH):$(GENERATED_SRC_PATH):$(JAVA_HOME)/jre/lib/rt.jar
 COMMON_OPTIONS=-g -d $(BINARYPATH) 
 OPTIONS=$(COMMON_OPTIONS)
 
+GIT=$(shell which git)
 
-ifeq "$(KEYVERS)" ""
-KEYVERS=$(PRCSVERSION)
+
+ifneq "$(GIT)" ""
+SHA1=$(shell git show | grep commit)
+SHA1:=$(wordlist 2,2,$(SHA1))
+SEQVERSION=$(shell git log --pretty=one | wc -l)
+SEQVERSION:=$(wordlist 1,1,$(SEQVERSION))
+SEQVERSION:=1.1.$(SEQVERSION)
+else
+SHA1=ownVersion
+SEQVERSION=0.0.0
 endif
 
+ifeq "$(KEYVERS)" ""
+KEYVERS=$(SEQVERSION)_$(SHA1)
+endif
 
 ifeq "$(JAVAC)" ""
 JAVAC=jikes
@@ -378,7 +386,7 @@ keybase: javahomeset
 
 ## create javadoc
 .PHONY: doc
-doc: $(BINARYPATH)$(PFX)util/make/ListJavaFiles.class $(JAVAFILES)
+doc: argfile $(JAVAFILES)
 	@mkdir -p doc
 ## old doc generation	
 #	@find de/ | grep "\.java" | grep -v "\~" | xargs javadoc -use -classpath $(CLASSPATH):$(BINARYPATH) -d doc 
@@ -393,15 +401,15 @@ doc: $(BINARYPATH)$(PFX)util/make/ListJavaFiles.class $(JAVAFILES)
 	-link http://java.sun.com/j2se/1.3/docs/api \
 	-link http://www.antlr.org \
 	-windowtitle "KeY API Documentation" \
-	-doctitle "KeY API Documentation ($(PRCSVERSION))" \
-	-header "KeY $(PRCSVERSION)" \
+	-doctitle "KeY API Documentation ($(KEYVERS))" \
+	-header "KeY $(KEYVERS)" \
 	-private -author -version -J-Xmx256m
 
 
 
 ## create distribution package
 .PHONY: dist
-dist:	all
+dist:	branding all
 	@echo "[creating distribution directory structure]"
 	@mkdir -p ../dist
 	@mkdir -p dist/key/
@@ -432,7 +440,7 @@ jar:	all
 	@jar cfm key.jar resources/MANIFEST.MF -C binary/ .
 
 .PHONY: dist_src
-dist_src: distclean
+dist_src: branding distclean
 	@rm -rf /tmp/keydist-$(USER)
 	@echo "[creating source archive]"
 	@mkdir -p /tmp/keydist-$(USER)
@@ -456,6 +464,8 @@ clean:
 
 #help files of the makefile (without the GenMakefile)
 
+	@rm -f javaFiles.tmp
+	@rm -f unit_manager.log 
 	@rm -f msg.txt
 	@rm -f argfile.aspects
 	@rm -f argfile.generic
@@ -518,9 +528,27 @@ else
 	@echo [GF skipped]
 endif
 
-argfile.normal: $(BINARYPATH)$(PFX)util/make/ListJavaFiles.class ../key.prj
-	@echo [reading project file]
-	@$(JAVA) -cp $(CLASSPATH):$(BINARYPATH) de.uka.ilkd.key.util.make.ListJavaFiles <../key.prj >argfile.normal
+branding:
+	@echo "[Branding]"
+	@echo $(SHA1) > resources/de/uka/ilkd/key/util/sha1
+	@echo $(SEQVERSION) > resources/de/uka/ilkd/key/util/version
+	@./brandManifest.sh ../eclipse/KeYExternalLibraries/META-INF/MANIFEST.MF $(SEQVERSION)
+	@./brandManifest.sh ../eclipse/org.key-project.core/META-INF/MANIFEST.MF $(SEQVERSION)
+	@./brandManifest.sh ../eclipse/KeYPlugin/META-INF/MANIFEST.MF $(SEQVERSION)
+	@./brandManifest.sh ../eclipse/VisualDebugger/META-INF/MANIFEST.MF $(SEQVERSION)
+	@./brandPlugin.sh ../eclipse/KeYFeature/site.xml $(SEQVERSION)
+	@./brandPlugin.sh ../eclipse/KeYFeature/feature.xml $(SEQVERSION)
+	@./brandPlugin.sh ../eclipse/ProofVisualization/plugin.xml $(SEQVERSION)
+
+javaFiles.tmp: javaFiles
+ifneq ("$(GIT)","")
+	@git ls-files | grep ".java" | grep -v "aspects" | grep -v "gjava" | grep -v ".java." | grep -v "resources/" > javaFiles
+endif
+	@cat javaFiles > javaFiles.tmp
+
+argfile.normal: javaFiles.tmp
+	@echo [Collecting Java files to compile]
+	@cat javaFiles.tmp > argfile.normal
 	@echo "TestKey.java" >> argfile.normal 
 ## make gjava -> java
 
@@ -545,16 +573,6 @@ $(DIFF_PARSER) \
 	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)parser/diffparser
 	@rm -f $(GENERATED_SRC_PATH)$(PFX)parser/diffparser/*.java $@
 	@$(JAVA) -cp $(CLASSPATH) $(JAVACC_MAIN) -OUTPUT_DIRECTORY=$(GENERATED_SRC_PATH)$(PFX)parser/diffparser $< 
-
-$(BINARYPATH)$(PFX)util/make/ListJavaFiles.class: $(GENERATED_SRC_PATH)$(PFX)util/make/ListJavaFiles.java
-	@echo [compile project file reader]
-	@$(JAVAC) $(OPTIONS) $< 2>&1 | (grep -v "Caution\|Warning" || true)
-
-$(GENERATED_SRC_PATH)$(PFX)util/make/ListJavaFiles.java: $(PFX)util/make/prcs.g
-	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)util/make/
-	@echo [creating project file reader]
-	@$(ANTLR) -o $(GENERATED_SRC_PATH)$(PFX)/util/make $<  
-
 
 $(GENERATED_SRC_PATH)$(PFX)parser/dictionary/DictionaryLexer.java \
 $(GENERATED_SRC_PATH)$(PFX)parser/dictionary/DictionaryLexerTokenTypes.txt \
@@ -673,7 +691,7 @@ $(BINARYPATH)$(PFX)util/make/GenericParser.class: $(BINARYPATH)$(PFX)util/make/M
 	@$(JAVAC) $(OPTIONS) $(PFX)util/make/GenericParser.java 2>&1 
 
 genericMakefile: $(BINARYPATH)$(PFX)util/make/GenericParser.class
-	@$(JAVA) -cp $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH) de.uka.ilkd.key.util.make.GenericParser GenMakefile argfile.generic $(JAVAFILES)
+	@$(JAVA) -cp $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH) de.uka.ilkd.key.util.make.GenericParser $(GENERATED_SRC_PATH) GenMakefile argfile.generic $(JAVAFILES)
 
 
 GenMakefile:;
