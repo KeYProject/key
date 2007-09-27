@@ -50,7 +50,7 @@
 		<antcall target="gather.bin.parts">
 			<param name="destination.temp.folder" value="${temp.folder}/"/>
 		</antcall>
-		<zip destfile="${plugin.destination}/ProofVisualization_${env.KEY_VERSION_LONG}.jar" basedir="${temp.folder}/ProofVisualization_${env.KEY_VERSION_LONG}" filesonly="false" whenempty="skip" update="false"/>
+		<zip destfile="${plugin.destination}/ProofVisualization_${env.KEY_VERSION_SHORT}.jar" basedir="${temp.folder}/ProofVisualization_${env.KEY_VERSION_SHORT}" filesonly="false" whenempty="skip" update="false"/>
 		<delete dir="${temp.folder}"/>
 	</target>
 
@@ -120,11 +120,11 @@
 	</target>
 
 	<target name="gather.bin.parts" depends="init" if="destination.temp.folder">
-		<mkdir dir="${destination.temp.folder}/ProofVisualization_${env.KEY_VERSION_LONG}"/>
-		<copy todir="${destination.temp.folder}/ProofVisualization_${env.KEY_VERSION_LONG}" failonerror="true" overwrite="false">
+		<mkdir dir="${destination.temp.folder}/ProofVisualization_${env.KEY_VERSION_SHORT}"/>
+		<copy todir="${destination.temp.folder}/ProofVisualization_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false">
 			<fileset dir="${build.result.folder}" includes="ProofVisualization.jar"			/>
 		</copy>
-		<copy todir="${destination.temp.folder}/ProofVisualization_${env.KEY_VERSION_LONG}" failonerror="true" overwrite="false">
+		<copy todir="${destination.temp.folder}/ProofVisualization_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false">
 			<fileset dir="${basedir}" includes="plugin.xml,icons/,ProofVisualization.jar"		/>
 		</copy>
 	</target>
@@ -133,23 +133,23 @@
 	</target>
 
 	<target name="gather.sources" depends="init" if="destination.temp.folder">
-		<mkdir dir="${destination.temp.folder}/ProofVisualization_${env.KEY_VERSION_LONG}"/>
-		<copy file="${build.result.folder}/ProofVisualizationsrc.zip" todir="${destination.temp.folder}/ProofVisualization_${env.KEY_VERSION_LONG}" failonerror="false" overwrite="false"/>
-		<copy todir="${destination.temp.folder}/ProofVisualization_${env.KEY_VERSION_LONG}" failonerror="false" overwrite="false">
+		<mkdir dir="${destination.temp.folder}/ProofVisualization_${env.KEY_VERSION_SHORT}"/>
+		<copy file="${build.result.folder}/ProofVisualizationsrc.zip" todir="${destination.temp.folder}/ProofVisualization_${env.KEY_VERSION_SHORT}" failonerror="false" overwrite="false"/>
+		<copy todir="${destination.temp.folder}/ProofVisualization_${env.KEY_VERSION_SHORT}" failonerror="false" overwrite="false">
 			<fileset dir="${basedir}" includes="src/,plugin.xml,icons/,ProofVisualization.jar"			/>
 		</copy>
 	</target>
 
 	<target name="gather.logs" depends="init" if="destination.temp.folder">
-		<mkdir dir="${destination.temp.folder}/ProofVisualization_${env.KEY_VERSION_LONG}"/>
-		<copy file="${temp.folder}/ProofVisualization.jar.bin.log" todir="${destination.temp.folder}/ProofVisualization_${env.KEY_VERSION_LONG}" failonerror="false" overwrite="false"/>
+		<mkdir dir="${destination.temp.folder}/ProofVisualization_${env.KEY_VERSION_SHORT}"/>
+		<copy file="${temp.folder}/ProofVisualization.jar.bin.log" todir="${destination.temp.folder}/ProofVisualization_${env.KEY_VERSION_SHORT}" failonerror="false" overwrite="false"/>
 	</target>
 
 	<target name="clean" depends="init" description="Clean the plug-in: ProofVisualization of all the zips, jars and logs created.">
 		<delete file="${build.result.folder}/ProofVisualization.jar"/>
 		<delete file="${build.result.folder}/ProofVisualizationsrc.zip"/>
-		<delete file="${plugin.destination}/ProofVisualization_${env.KEY_VERSION_LONG}.jar"/>
-		<delete file="${plugin.destination}/ProofVisualization_${env.KEY_VERSION_LONG}.zip"/>
+		<delete file="${plugin.destination}/ProofVisualization_${env.KEY_VERSION_SHORT}.jar"/>
+		<delete file="${plugin.destination}/ProofVisualization_${env.KEY_VERSION_SHORT}.zip"/>
 		<delete dir="${temp.folder}"/>
 	</target>
 
@@ -172,7 +172,7 @@
 		<delete>
 			<fileset dir="${temp.folder}" includes="**/*.bin.log"			/>
 		</delete>
-		<zip destfile="${plugin.destination}/ProofVisualization_${env.KEY_VERSION_LONG}.zip" basedir="${temp.folder}" filesonly="true" whenempty="skip" update="false"/>
+		<zip destfile="${plugin.destination}/ProofVisualization_${env.KEY_VERSION_SHORT}.zip" basedir="${temp.folder}" filesonly="true" whenempty="skip" update="false"/>
 		<delete dir="${temp.folder}"/>
 	</target>
 

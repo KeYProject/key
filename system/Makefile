@@ -46,18 +46,20 @@ GIT=$(shell which git)
 ifneq "$(GIT)" ""
 SHA1=$(shell git show | grep commit)
 SHA1:=$(wordlist 2,2,$(SHA1))
-SEQVERSION=$(shell git log --pretty=one | wc -l)
-SEQVERSION:=$(wordlist 1,1,$(SEQVERSION))
-SEQVERSION:=1.1.$(SEQVERSION)
+KEY_VERSION_SHORT=$(shell git log --pretty=one | wc -l)
+KEY_VERSION_SHORT:=$(wordlist 1,1,$(KEY_VERSION_SHORT))
+KEY_VERSION_SHORT:=1.1.$(KEY_VERSION_SHORT)
 else
 SHA1=ownVersion
-SEQVERSION=0.0.0
+KEY_VERSION_SHORT=0.0.0
 endif
 
 ifeq "$(KEY_VERSION_LONG)" ""
-KEY_VERSION_LONG=$(SEQVERSION)_$(SHA1)
-export KEY_VERSION_LONG
+KEY_VERSION_LONG=$(KEY_VERSION_SHORT)_$(SHA1)
 endif
+
+export KEY_VERSION_LONG
+export KEY_VERSION_SHORT
 
 ifeq "$(JAVAC)" ""
 JAVAC=jikes
@@ -532,16 +534,16 @@ endif
 branding:
 	@echo "[Branding]"
 	@echo $(SHA1) > resources/de/uka/ilkd/key/util/sha1
-	@echo $(SEQVERSION) > resources/de/uka/ilkd/key/util/version
-	@./brandManifest.sh ../eclipse/KeYExternalLibraries/META-INF/MANIFEST.MF $(SEQVERSION)
-	@./brandManifest.sh ../eclipse/org.key-project.core/META-INF/MANIFEST.MF $(SEQVERSION)
-	@./brandManifest.sh ../eclipse/KeYPlugin/META-INF/MANIFEST.MF $(SEQVERSION)
-	@./brandManifest.sh ../eclipse/VisualDebugger/META-INF/MANIFEST.MF $(SEQVERSION)
-	@./brandPlugin.sh ../eclipse/ProofVisualization/plugin.xml $(SEQVERSION)
+	@echo $(KEY_VERSION_SHORT) > resources/de/uka/ilkd/key/util/version
+	@./brandManifest.sh ../eclipse/KeYExternalLibraries/META-INF/MANIFEST.MF $(KEY_VERSION_SHORT)
+	@./brandManifest.sh ../eclipse/org.key-project.core/META-INF/MANIFEST.MF $(KEY_VERSION_SHORT)
+	@./brandManifest.sh ../eclipse/KeYPlugin/META-INF/MANIFEST.MF $(KEY_VERSION_SHORT)
+	@./brandManifest.sh ../eclipse/VisualDebugger/META-INF/MANIFEST.MF $(KEY_VERSION_SHORT)
+	@./brandPlugin.sh ../eclipse/ProofVisualization/plugin.xml $(KEY_VERSION_SHORT)
 # we must replace the feature url and version tag in site.xml 
-	@./brandPlugin.sh ../eclipse/KeYFeature/site.xml $(SEQVERSION)
-	@./brandPlugin.sh ../eclipse/KeYFeature/feature.xml $(SEQVERSION)
-	@./brandFeatureSite.sh ../eclipse/KeYFeature/site.xml $(SEQVERSION)
+	@./brandPlugin.sh ../eclipse/KeYFeature/site.xml $(KEY_VERSION_SHORT)
+	@./brandPlugin.sh ../eclipse/KeYFeature/feature.xml $(KEY_VERSION_SHORT)
+	@./brandFeatureSite.sh ../eclipse/KeYFeature/site.xml $(KEY_VERSION_SHORT)
 
 
 javaFiles.tmp: javaFiles

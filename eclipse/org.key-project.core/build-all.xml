@@ -31,7 +31,7 @@
 			<param name="core.base" value="${core.dist.folder}"/>
 			<param name="os" value="*"/>
 		</antcall>
-		<jar jarfile="${core.destination}/org.key_project.core_${env.KEY_VERSION_LONG}.jar" 
+		<jar jarfile="${core.destination}/org.key_project.core_${env.KEY_VERSION_SHORT}.jar" 
 	                manifest="${basedir}/META-INF/MANIFEST.MF" 
 			basedir="${core.dist.folder}" filesonly="false" whenempty="skip" update="false"/>		
 		<delete dir="${core.dist.folder}"/>

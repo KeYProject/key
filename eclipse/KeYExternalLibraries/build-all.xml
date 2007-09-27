@@ -41,7 +41,7 @@
 			<param name="key.external.base" value="${key.external.dist.folder}"/>
 			<param name="os" value="*"/>
 		</antcall>
-		<jar jarfile="${key.external.destination}/KeYExternalLibraries_${env.KEY_VERSION_LONG}.jar" 
+		<jar jarfile="${key.external.destination}/KeYExternalLibraries_${env.KEY_VERSION_SHORT}.jar" 
 	        	manifest="${basedir}/META-INF/MANIFEST.MF" 
 			basedir="${key.external.dist.folder}" 
                         filesonly="false" whenempty="skip" update="false"/>		
