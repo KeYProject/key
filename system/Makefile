@@ -539,9 +539,9 @@ branding:
 	@./brandManifest.sh ../eclipse/VisualDebugger/META-INF/MANIFEST.MF $(SEQVERSION)
 	@./brandPlugin.sh ../eclipse/ProofVisualization/plugin.xml $(SEQVERSION)
 # we must replace the feature url and version tag in site.xml 
-	@./brandFeatureSite.sh ../eclipse/KeYFeature/site.xml $(KEY_VERSION_LONG)
 	@./brandPlugin.sh ../eclipse/KeYFeature/site.xml $(SEQVERSION)
 	@./brandPlugin.sh ../eclipse/KeYFeature/feature.xml $(SEQVERSION)
+	@./brandFeatureSite.sh ../eclipse/KeYFeature/site.xml $(SEQVERSION)
 
 
 javaFiles.tmp: javaFiles

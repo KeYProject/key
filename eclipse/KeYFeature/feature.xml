@@ -64,7 +64,7 @@ POSSIBILITY OF SUCH DAMAGES.
 
 
    <url>
-     <update label="Nghtly Build Update Site" url="http://i12www.ira.uka.de/~key/KeYDists/KeY_Feature/"/>
+     <update label="Nightly Build Update Site" url="http://i12www.ira.uka.de/~key/KeYDists/KeY_Feature/"/>
      <discovery label="KeY Project" url="http://www.key-project.org/"/>
    </url>
   <requires>
