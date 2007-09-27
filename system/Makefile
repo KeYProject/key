@@ -449,9 +449,11 @@ dist_src: branding distclean
 	@mkdir -p /tmp/keydist-$(USER)
 	@ln -s $(shell cd ..;pwd) /tmp/keydist-$(USER)/key-$(KEY_VERSION_LONG)
 	@tar -C/tmp/keydist-$(USER) --dereference  \
-        -cvzf /tmp/keydist-$(USER)/KeY-$(KEY_VERSION_LONG)-src.tgz --exclude=key-$(KEY_VERSION_LONG)/.git/'*' \
-	--exclude=key-$(KEY_VERSION_LONG)/key-ext-jars/'*' --exclude=key-$(KEY_VERSION_LONG)/eclipse/'*' key-$(KEY_VERSION_LONG)
-	@mv /tmp/keydist-$(USER)/KeY-$(KEY_VERSION_LONG)-src.tgz ..
+        -cvf /tmp/keydist-$(USER)/KeY-$(KEY_VERSION_LONG)-src.tar --exclude=key-$(KEY_VERSION_LONG)/.git/'*' \
+	--exclude=key-$(KEY_VERSION_LONG)/key-ext-jars/'*' --exclude=key-$(KEY_VERSION_LONG)/eclipse key-$(KEY_VERSION_LONG)
+	@tar -rf /tmp/keydist-$(USER)/KeY-$(KEY_VERSION_LONG)-src.tar -C /tmp/keydist-$(USER) key-$(KEY_VERSION_LONG)/eclipse/
+	@gzip /tmp/keydist-$(USER)/KeY-$(KEY_VERSION_LONG)-src.tar
+	@mv /tmp/keydist-$(USER)/KeY-$(KEY_VERSION_LONG)-src.tar.gz ../KeY-$(KEY_VERSION_LONG)-src.tgz
 	@cp /tmp/keydist-$(USER)/key-$(KEY_VERSION_LONG)/README.install.source ../README-$(KEY_VERSION_LONG)-src.txt
 	@echo "[done]"
 
