@@ -71,6 +71,8 @@ public class GenericParser {
 	{"SimpleStackOf<T>.gjava","IteratorOf%1.java"}
     };
     
+    public static String generatedSrcPath;
+
     // Hashes rules that have been created
     private static HashSet ruleSet=new HashSet();
 
@@ -108,8 +110,12 @@ public class GenericParser {
    // MAIN - MAIN - MAIN - MAIN - MAIN - MAIN 
     /** run parser and create makestr */
     public static void main(String[] args) {
-	File genericMakefile = new File(args[0]);
-	compileListFileName = args[1];
+	generatedSrcPath = args[0];
+	if (!generatedSrcPath.endsWith("/")) {
+	    generatedSrcPath = generatedSrcPath+"/";
+	}
+	File genericMakefile = new File(args[1]);
+	compileListFileName = args[2];
 	ruleSet = new MakefileReader(genericMakefile).getRules();
 	ByteArrayOutputStream bos = new ByteArrayOutputStream();
  	try {
@@ -125,7 +131,7 @@ public class GenericParser {
 	    if (args.length > 1) {
 		System.out.print("[creating Makefile entries ");
 	    }
-	    for (int i = 2; i < args.length; i++) {
+	    for (int i = 3; i < args.length; i++) {
 		bos.write(parse(args[i]).getBytes());
 	    }
  	    FileOutputStream fw = new FileOutputStream(genericMakefile);
@@ -155,7 +161,10 @@ public class GenericParser {
 	    if (t.id()==matchGenClass("ArrayOf")) {
 		fileName=fileName.substring(0,fileName.indexOf("Ext"));
 	    }
-	    makeStr+="\t@echo "+path+""+fileName+".java >>" +
+	    if (path.startsWith("./")) {
+		path = path.substring(2);
+	    }
+	    makeStr+="\t@echo "+generatedSrcPath+path+""+fileName+".java >>" +
 		compileListFileName + "\n";
 	} else {
 	    makeStr="";

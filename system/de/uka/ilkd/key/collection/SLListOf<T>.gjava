@@ -9,7 +9,9 @@
 #
 #
 pck=$1
-outFile=`echo $1 | sed 's!\.!/!g;'`"/"SLListOf$2".java"
+outDir=$GENERATED_SRC_PATH`echo $1 | sed 's!\.!/!g;'`
+mkdir -p $outDir
+outFile=$outDir"/"SLListOf$2".java"
 sed "s/<Pck>/$pck/g;s/<T>/$2/g;" <<END_OF_CLASS >$outFile
 
 package <Pck>;
