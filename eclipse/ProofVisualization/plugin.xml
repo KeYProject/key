@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?eclipse version="3.0"?>
-<!-- $Format: "<plugin name=\"ProofVisualization Plug-in\" id=\"ProofVisualization\" version=\"1.$ProjectVersion$\" provider-name=\"KeY Project, University of Karlsruhe\" class=\"proofVisualization.ProofVisualizationPlugin\">"$-->
-<plugin name="ProofVisualization Plug-in" id="ProofVisualization" version="1.engelcMemoryConsumption.25" provider-name="KeY Project, University of Karlsruhe" class="proofVisualization.ProofVisualizationPlugin">
+<?eclipse version="3.2"?>
+<plugin 
+   name="ProofVisualization Plug-in" 
+   id="ProofVisualization" 
+   version="0.0.0"
+   provider-name="KeY Project, University of Karlsruhe" 
+   class="proofVisualization.ProofVisualizationPlugin">
   
    <runtime>
       <library name="ProofVisualization.jar">
