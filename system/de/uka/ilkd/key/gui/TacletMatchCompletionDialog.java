@@ -749,8 +749,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
         private static final String SEPARATOR2 = ">>>>>>";
 
-        // TODO Get OS depending line end
-        private static final String LINE_END = "\n";
+        private static final String LINE_END = System
+                .getProperty("line.separator");
 
         private static final int SAVE_COUNT = 5;
 
