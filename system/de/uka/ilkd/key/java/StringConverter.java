@@ -51,7 +51,7 @@ public  class StringConverter{
 		charArray = ((StringLiteral) lit).getValue().toCharArray();
 	    else return null;
 	    if (intLDT==null) throw new IllegalArgumentException("IntLDT is needed for StringLiteral translation");//return term_epsilon;
-	    for (int i= charArray.length-2;i>0;i--){
+	    for (int i= charArray.length-1;i>=0;i--){
 		result = TermFactory.DEFAULT.createFunctionTerm(cat,
 		    intLDT.translateLiteral(new IntLiteral(charArray[i])),result);
 	    }
