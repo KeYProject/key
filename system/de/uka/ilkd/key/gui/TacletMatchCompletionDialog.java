@@ -37,9 +37,6 @@ import javax.swing.table.TableCellRenderer;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
@@ -123,33 +120,14 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
                     if (origInstModels[i].tableModel().getRowCount() - start ==
                             instantiations.size()) {
-                        TacletApp newTApp = null;
+                        ApplyTacletDialogModel m = createModel(tA,
+                                goal, medi);
+                        recentInstModels.add(m);
+                        ListIterator instIt = instantiations.listIterator();
 
-                        if (tA instanceof NoPosTacletApp) {
-                            newTApp = NoPosTacletApp.createNoPosTacletApp(tA
-                                    .taclet(), tA.instantiations(), tA
-                                    .constraint(), tA.newMetavariables(), tA
-                                    .ifFormulaInstantiations());
-                        } else if (tA instanceof PosTacletApp) {
-                            newTApp = PosTacletApp.createPosTacletApp(
-                                    (FindTaclet) tA.taclet(), tA
-                                    .instantiations(), tA.constraint(),
-                                    tA.newMetavariables(), tA
-                                    .ifFormulaInstantiations(), tA
-                                    .posInOccurrence());
-                        }
-
-                        if (newTApp != null) {
-                            ApplyTacletDialogModel m = createModel(newTApp,
-                                    goal, medi);
-                            recentInstModels.add(m);
-                            ListIterator instIt = instantiations.listIterator();
-
-                            while (instIt.hasNext()) {
-                                m.tableModel().setValueAt(instIt.next(),
-                                        start++, 1);
-                            }
-
+                        while (instIt.hasNext()) {
+                            m.tableModel().setValueAt(instIt.next(),
+                                    start++, 1);
                         }
 
                     }
