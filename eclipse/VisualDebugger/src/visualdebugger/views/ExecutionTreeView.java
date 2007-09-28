@@ -621,7 +621,6 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
         ListOfGoal goals = SLListOfGoal.EMPTY_LIST;
         for (int i=0;i<itNodes.length;i++){
             final ListOfGoal g = vd.getMediator().getProof().getSubtreeGoals((itNodes[i].getNode()));
-            //vd.getMediator().getProof().
             goals = goals.prepend(g);
         }
         return goals;

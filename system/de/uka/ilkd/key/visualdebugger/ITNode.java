@@ -142,17 +142,18 @@ public class ITNode {
         if (parent == null) {
             return false;    
         }
-        int stackSize1 = vd.getMethodStackSize(parent.node);
-        int stackSize2 = vd.getMethodStackSize(node);
 
-        if (stackSize2 < 0) {
+        final int stackSize1 = vd.getMethodStackSize(parent.node);
+        final int stackSize2 = vd.getMethodStackSize(node);
+
+        if (stackSize1 <= 0) {
             return false;
         }
         
         if (this.activeStatement instanceof Throw) {
             return false;
         }
-        return stackSize2<stackSize1;
+        return (stackSize1 - stackSize2) == 1;
     }
 
 
