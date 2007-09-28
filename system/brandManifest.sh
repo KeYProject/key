@@ -1,7 +1,4 @@
 #!/bin/sh
-sed '/Bundle-Version:/ c\
-Bundle-Version: '$2'
-
-' $1 > tmp.mf
-#mv tmp.mf $1
+sed 's/Bundle-Version:[^$]*$/Bundle-Version: '$2'/g;' $1 > tmp.manifest
+mv tmp.manifest $1
 

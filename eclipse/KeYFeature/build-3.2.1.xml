@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="KeY_Feature" default="build.update.jar" basedir=".">
 
-
-	<!-- $Format: "<property name=\"core.version\" value=\"$ProjectVersion$\"/>"$ -->
-<property name="core.version" value="mulbrichRec2Key.6"/>
-
-	<!-- $Format: "<property name=\"version\" value=\"1.$ProjectVersion$\"/>"$ -->
-<property name="version" value="1.mulbrichRec2Key.6"/>
+        <property environment="env"/>
 
 	<target name="init">
 		<property name="feature.temp.folder" value="${basedir}/feature.temp.folder"/>
@@ -69,7 +64,7 @@
 			<param name="os" value="*"/>
 			<param name="feature.base" value="${feature.temp.folder}"/>
 		</antcall>
-		<jar destfile="${feature.destination}/KeY_Feature_${version}.jar" basedir="${feature.temp.folder}/features/KeY_Feature_${version}"/>
+		<jar destfile="${feature.destination}/KeY_Feature_${env.KEY_VERSION_SHORT}.jar" basedir="${feature.temp.folder}/features/KeY_Feature_${env.KEY_VERSION_SHORT}"/>
 		<delete dir="${feature.temp.folder}"/>
 	</target>
 
@@ -78,17 +73,21 @@
 			<param name="destination.temp.folder" value="${feature.base}/plugins"/>
 			<param name="target" value="gather.bin.parts"/>
 		</antcall>
-		<mkdir dir="${feature.base}/features/KeY_Feature_${version}"/>
-		<copy todir="${feature.base}/features/KeY_Feature_${version}" failonerror="true" overwrite="false">
+		<mkdir dir="${feature.base}/features/KeY_Feature_${env.KEY_VERSION_SHORT}"/>
+		<copy todir="${feature.base}/features/KeY_Feature_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false">
 			<fileset dir="${basedir}" includes="feature.xml"			/>
 		</copy>
-		<eclipse.idReplacer featureFilePath="${feature.base}/features/KeY_Feature_${version}/feature.xml"  selfVersion="${version}" featureIds="" pluginIds="KeYPlugin,${version},ProofVisualization,${version},"/>
+		<eclipse.idReplacer featureFilePath="${feature.base}/features/KeY_Feature_${env.KEY_VERSION_SHORT}/feature.xml"  
+                                                     selfVersion="${env.KEY_VERSION_SHORT}" featureIds="" 
+                                                     pluginIds="KeYPlugin, ${env.KEY_VERSION_SHORT}, 
+                                                                ProofVisualization, ${env.KEY_VERSION_SHORT},"/>
 
 	</target>
 	<target name="rootFiles*_*_*">
 	</target>
 
-	<target name="zip.distribution" depends="init" description="Create a zip containing all the plug-ins and features for the feature: KeY_Feature.">
+	<target name="zip.distribution" depends="init" 
+                description="Create a zip containing all the plug-ins and features for the feature: KeY_Feature.">
 		<delete dir="${feature.temp.folder}"/>
 		<mkdir dir="${feature.temp.folder}"/>
 		<antcall target="gather.bin.parts">
@@ -101,7 +100,7 @@
 		</antcall>
                 <ant antfile="build-all.xml" dir="../KeYExternalLibraries/" target="zip.distribution"></ant>
                 <ant antfile="build-all.xml" dir="../org.key-project.core/" target="zip.distribution"></ant>
-		<zip destfile="${feature.destination}/KeY_Feature_${version}.bin.dist.zip" basedir="${feature.temp.folder}" filesonly="false" whenempty="skip" update="false"/>
+		<zip destfile="${feature.destination}/KeY_Feature_${env.KEY_VERSION_SHORT}.bin.dist.zip" basedir="${feature.temp.folder}" filesonly="false" whenempty="skip" update="false"/>
 		<delete dir="${feature.temp.folder}"/>
 	</target>
 
@@ -109,11 +108,11 @@
 		<delete dir="${feature.temp.folder}"/>
 		<mkdir dir="${feature.temp.folder}"/>
 		<antcall target="all.children">
-			<param name="destination.temp.folder" value="${feature.temp.folder}/plugins/KeY_Feature.source_${version}/src"/>
+			<param name="destination.temp.folder" value="${feature.temp.folder}/plugins/KeY_Feature.source_${env.KEY_VERSION_SHORT}/src"/>
 			<param name="include.children" value="true"/>
 			<param name="target" value="gather.sources"/>
 		</antcall>
-		<zip destfile="${feature.destination}/KeY_Feature_${version}.src.zip" basedir="${feature.temp.folder}" filesonly="true" whenempty="skip" update="false"/>
+		<zip destfile="${feature.destination}/KeY_Feature_${env.KEY_VERSION_SHORT}.src.zip" basedir="${feature.temp.folder}" filesonly="true" whenempty="skip" update="false"/>
 		<delete dir="${feature.temp.folder}"/>
 	</target>
 
@@ -125,15 +124,15 @@
 			<param name="include.children" value="true"/>
 			<param name="target" value="gather.logs"/>
 		</antcall>
-		<zip destfile="${feature.destination}/KeY_Feature_${version}.log.zip" basedir="${feature.temp.folder}" filesonly="true" whenempty="skip" update="false"/>
+		<zip destfile="${feature.destination}/KeY_Feature_${env.KEY_VERSION_SHORT}.log.zip" basedir="${feature.temp.folder}" filesonly="true" whenempty="skip" update="false"/>
 		<delete dir="${feature.temp.folder}"/>
 	</target>
 
 	<target name="clean" depends="init" description="Clean the feature: KeY_Feature of all the zips, jars and logs created.">
-		<delete file="${feature.destination}/KeY_Feature_${version}.jar"/>
-		<delete file="${feature.destination}/KeY_Feature_${version}.bin.dist.zip"/>
-		<delete file="${feature.destination}/KeY_Feature_${version}.log.zip"/>
-		<delete file="${feature.destination}/KeY_Feature_${version}.src.zip"/>
+		<delete file="${feature.destination}/KeY_Feature_${env.KEY_VERSION_SHORT}.jar"/>
+		<delete file="${feature.destination}/KeY_Feature_${env.KEY_VERSION_SHORT}.bin.dist.zip"/>
+		<delete file="${feature.destination}/KeY_Feature_${env.KEY_VERSION_SHORT}.log.zip"/>
+		<delete file="${feature.destination}/KeY_Feature_${env.KEY_VERSION_SHORT}.src.zip"/>
 		<delete dir="${feature.temp.folder}"/>
 		<antcall target="all.children">
 			<param name="target" value="clean"/>
@@ -149,7 +148,7 @@
 	</target>
 	<target name="gather.sources">
 		<antcall target="children">
-			<param name="destination.temp.folder" value="${feature.temp.folder}/plugins/KeY_Feature.source_${version}/src"/>
+			<param name="destination.temp.folder" value="${feature.temp.folder}/plugins/KeY_Feature.source_${env.KEY_VERSION_SHORT}/src"/>
 			<param name="target" value="gather.sources"/>
 		</antcall>
 	</target>
