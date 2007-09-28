@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="zip.distribution" name="build">
 
+        <property environment="env"/>
+
 	<target name="clean">
           <delete file="org.key-project.core_*"/>
 	</target>
@@ -8,8 +10,6 @@
 	<target name="init">
 		<property name="core.dist.folder" value="${basedir}/dist"/>
 		<property name="core.destination" value="${basedir}"/>
-		<!-- $Format: "<property name=\"core.version\" value=\"$ProjectVersion$\"/>"$-->
-<property name="core.version" value="mulbrichRecoder08.19"/>
 	</target>
 
 	<target name="build.update.jar">
@@ -31,8 +31,8 @@
 			<param name="core.base" value="${core.dist.folder}"/>
 			<param name="os" value="*"/>
 		</antcall>
-		<jar jarfile="${core.destination}/org.key_project.core_${core.version}.0.jar" 
-	        manifest="${basedir}/META-INF/MANIFEST.MF" 
+		<jar jarfile="${core.destination}/org.key_project.core_${env.KEY_VERSION_SHORT}.jar" 
+	                manifest="${basedir}/META-INF/MANIFEST.MF" 
 			basedir="${core.dist.folder}" filesonly="false" whenempty="skip" update="false"/>		
 		<delete dir="${core.dist.folder}"/>
 	</target>

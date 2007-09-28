@@ -50,18 +50,21 @@ GIT=$(shell which git)
 ifneq "$(GIT)" ""
 SHA1=$(shell git show | grep commit)
 SHA1:=$(wordlist 2,2,$(SHA1))
-SEQVERSION=$(shell git log --pretty=one | wc -l)
-SEQVERSION:=$(wordlist 1,1,$(SEQVERSION))
-SEQVERSION:=1.1.$(SEQVERSION)
+KEY_VERSION_SHORT=$(shell git log --pretty=one | wc -l)
+KEY_VERSION_SHORT:=$(wordlist 1,1,$(KEY_VERSION_SHORT))
+KEY_VERSION_SHORT:=1.1.$(KEY_VERSION_SHORT)
 else
 SHA1=ownVersion
-SEQVERSION=0.0.0
+KEY_VERSION_SHORT=0.0.0
 >>>>>>> cd5160c81af6413abd0afbe0091fc2ba123de808:system/Makefile
 endif
 
-ifeq "$(KEYVERS)" ""
-KEYVERS=$(SEQVERSION)_$(SHA1)
+ifeq "$(KEY_VERSION_LONG)" ""
+KEY_VERSION_LONG=$(KEY_VERSION_SHORT)_$(SHA1)
 endif
+
+export KEY_VERSION_LONG
+export KEY_VERSION_SHORT
 
 ifeq "$(JAVAC)" ""
 JAVAC=jikes
@@ -403,8 +406,8 @@ doc: argfile $(JAVAFILES)
 	-link http://java.sun.com/j2se/1.3/docs/api \
 	-link http://www.antlr.org \
 	-windowtitle "KeY API Documentation" \
-	-doctitle "KeY API Documentation ($(KEYVERS))" \
-	-header "KeY $(KEYVERS)" \
+	-doctitle "KeY API Documentation ($(KEY_VERSION_LONG))" \
+	-header "KeY $(KEY_VERSION_LONG)" \
 	-private -author -version -J-Xmx256m
 
 
@@ -431,8 +434,8 @@ dist:	branding all
 	@echo "[creating jar-file]"
 	@jar cfm key.jar resources/MANIFEST.MF -C dist/key/ .
 	@jar cfm setup.jar resources/de/uka/ilkd/key/util/install/MANIFEST.MF -C dist/setup/ .
-	@tar -czvf ../dist/KeY-$(KEYVERS).tgz key.jar setup.jar -C ../ LICENSE.TXT
-	@cp ../README.install.bytecode ../dist/README-$(KEYVERS).txt
+	@tar -czvf ../dist/KeY-$(KEY_VERSION_LONG).tgz key.jar setup.jar -C ../ LICENSE.TXT
+	@cp ../README.install.bytecode ../dist/README-$(KEY_VERSION_LONG).txt
 	@echo "[deleting distribution directory structure]"
 	@rm -rf dist
 
@@ -446,12 +449,14 @@ dist_src: branding distclean
 	@rm -rf /tmp/keydist-$(USER)
 	@echo "[creating source archive]"
 	@mkdir -p /tmp/keydist-$(USER)
-	@ln -s $(shell cd ..;pwd) /tmp/keydist-$(USER)/key-$(KEYVERS)
+	@ln -s $(shell cd ..;pwd) /tmp/keydist-$(USER)/key-$(KEY_VERSION_LONG)
 	@tar -C/tmp/keydist-$(USER) --dereference  \
-        -cvzf /tmp/keydist-$(USER)/KeY-$(KEYVERS)-src.tgz \
-        --exclude=key-$(KEYVERS)/key-ext-jars/'*' --exclude=key-$(KEYVERS)/eclipse/'*'     key-$(KEYVERS)
-	@mv /tmp/keydist-$(USER)/KeY-$(KEYVERS)-src.tgz ..
-	@cp /tmp/keydist-$(USER)/key-$(KEYVERS)/README.install.source ../README-$(KEYVERS)-src.txt
+        -cvf /tmp/keydist-$(USER)/KeY-$(KEY_VERSION_LONG)-src.tar --exclude=key-$(KEY_VERSION_LONG)/.git/'*' \
+	--exclude=key-$(KEY_VERSION_LONG)/key-ext-jars/'*' --exclude=key-$(KEY_VERSION_LONG)/eclipse key-$(KEY_VERSION_LONG)
+	@tar -rf /tmp/keydist-$(USER)/KeY-$(KEY_VERSION_LONG)-src.tar -C /tmp/keydist-$(USER) key-$(KEY_VERSION_LONG)/eclipse/
+	@gzip /tmp/keydist-$(USER)/KeY-$(KEY_VERSION_LONG)-src.tar
+	@mv /tmp/keydist-$(USER)/KeY-$(KEY_VERSION_LONG)-src.tar.gz ../KeY-$(KEY_VERSION_LONG)-src.tgz
+	@cp /tmp/keydist-$(USER)/key-$(KEY_VERSION_LONG)/README.install.source ../README-$(KEY_VERSION_LONG)-src.txt
 	@echo "[done]"
 
 
@@ -533,18 +538,21 @@ endif
 branding:
 	@echo "[Branding]"
 	@echo $(SHA1) > resources/de/uka/ilkd/key/util/sha1
-	@echo $(SEQVERSION) > resources/de/uka/ilkd/key/util/version
-	@./brandManifest.sh ../eclipse/KeYExternalLibraries/META-INF/MANIFEST.MF $(SEQVERSION)
-	@./brandManifest.sh ../eclipse/org.key-project.core/META-INF/MANIFEST.MF $(SEQVERSION)
-	@./brandManifest.sh ../eclipse/KeYPlugin/META-INF/MANIFEST.MF $(SEQVERSION)
-	@./brandManifest.sh ../eclipse/VisualDebugger/META-INF/MANIFEST.MF $(SEQVERSION)
-	@./brandPlugin.sh ../eclipse/KeYFeature/site.xml $(SEQVERSION)
-	@./brandPlugin.sh ../eclipse/KeYFeature/feature.xml $(SEQVERSION)
-	@./brandPlugin.sh ../eclipse/ProofVisualization/plugin.xml $(SEQVERSION)
+	@echo $(KEY_VERSION_SHORT) > resources/de/uka/ilkd/key/util/version
+	@./brandManifest.sh ../eclipse/KeYExternalLibraries/META-INF/MANIFEST.MF $(KEY_VERSION_SHORT)
+	@./brandManifest.sh ../eclipse/org.key-project.core/META-INF/MANIFEST.MF $(KEY_VERSION_SHORT)
+	@./brandManifest.sh ../eclipse/KeYPlugin/META-INF/MANIFEST.MF $(KEY_VERSION_SHORT)
+	@./brandManifest.sh ../eclipse/VisualDebugger/META-INF/MANIFEST.MF $(KEY_VERSION_SHORT)
+	@./brandPlugin.sh ../eclipse/ProofVisualization/plugin.xml $(KEY_VERSION_SHORT)
+# we must replace the feature url and version tag in site.xml 
+	@./brandPlugin.sh ../eclipse/KeYFeature/site.xml $(KEY_VERSION_SHORT)
+	@./brandPlugin.sh ../eclipse/KeYFeature/feature.xml $(KEY_VERSION_SHORT)
+	@./brandFeatureSite.sh ../eclipse/KeYFeature/site.xml $(KEY_VERSION_SHORT)
+
 
 javaFiles.tmp: javaFiles
 ifneq ("$(GIT)","")
-	@git ls-files | grep ".java" | grep -v "aspects" | grep -v "gjava" | grep -v ".java." | grep -v "resources/" > javaFiles
+	@git ls-files | grep ".java" | grep -v "aspects" | grep -v "gjava" | grep -v ".java." | grep -v "resources/" | sort > javaFiles
 endif
 	@cat javaFiles > javaFiles.tmp
 
@@ -764,7 +772,7 @@ $(GENERATED_SRC_PATH)de/uka/ilkd/asmkey/parser/antlr/AsmKeyParser.java \
 
 # eclipse plug-in:
 eclipse-plug-in: dist
-	cd ../eclipse/KeYFeature && $(MAKE)
+	@cd ../eclipse/KeYFeature && $(MAKE)
 	@rm -fr $(BINARYPATH)$(PFX)casetool/eclipse
 	@mkdir -p $(BINARYPATH)$(PFX)casetool/eclipse/KeY_Feature/features
 	@mkdir -p $(BINARYPATH)$(PFX)casetool/eclipse/KeY_Feature/plugins
@@ -774,4 +782,3 @@ eclipse-plug-in: dist
 	@cp  ../eclipse/ProofVisualization/ProofVisualization_*.jar $(BINARYPATH)$(PFX)casetool/eclipse/KeY_Feature/plugins
 	@cp  ../eclipse/org.key-project.core/org.key_project.core_* $(BINARYPATH)$(PFX)casetool/eclipse/KeY_Feature/plugins
 	@cp  ../eclipse/KeYExternalLibraries/KeYExternalLibraries_1* $(BINARYPATH)$(PFX)casetool/eclipse/KeY_Feature/plugins
-

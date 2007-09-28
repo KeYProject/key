@@ -10,4 +10,5 @@ system/key.jar
 system/setup.jar
 system/GenMakefile
 system/Makefile.mk
-
+system/resources/de/uka/ilkd/key/util/version
+system/resources/de/uka/ilkd/key/util/sha1
