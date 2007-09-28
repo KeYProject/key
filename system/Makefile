@@ -534,6 +534,9 @@ else
 endif
 
 branding:
+ifeq "$(BRANDING)" ""
+	@echo "[No Branding. Set environment variable BRANDING to activate branding.]"
+else
 	@echo "[Branding]"
 	@echo $(SHA1) > resources/de/uka/ilkd/key/util/sha1
 	@echo $(KEY_VERSION_SHORT) > resources/de/uka/ilkd/key/util/version
@@ -546,7 +549,7 @@ branding:
 	@./brandPlugin.sh ../eclipse/KeYFeature/site.xml $(KEY_VERSION_SHORT)
 	@./brandPlugin.sh ../eclipse/KeYFeature/feature.xml $(KEY_VERSION_SHORT)
 	@./brandFeatureSite.sh ../eclipse/KeYFeature/site.xml $(KEY_VERSION_SHORT)
-
+endif
 
 javaFiles.tmp: javaFiles
 ifneq ("$(GIT)","")
