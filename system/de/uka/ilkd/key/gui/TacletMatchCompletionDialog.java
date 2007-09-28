@@ -92,67 +92,87 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 				       KeYMediator mediator) { 
 	this(new ApplyTacletDialogModel[]{model}, goal, mediator);
     }
-    
-    
-    public static void completeAndApplyApp(TacletApp app, Goal goal, 
-                                           KeYMediator medi) {
+
+    public static void completeAndApplyApp(TacletApp app, Goal goal,
+            KeYMediator medi) {
         LinkedList l = new LinkedList();
         l.add(app);
         completeAndApplyApp(l, goal, medi);
     }
 
+    public static void completeAndApplyApp(java.util.List l, Goal goal,
+            KeYMediator medi) {
+        ApplyTacletDialogModel[] origInstModels = new ApplyTacletDialogModel[l
+                .size()];
+        LinkedList recentInstModels = new LinkedList();
+        ListIterator tacletAppIt = l.listIterator();
 
+        for (int i = 0; i < l.size(); i++) {
+            TacletApp tA = (TacletApp) tacletAppIt.next();
+            origInstModels[i] = createModel(tA, goal, medi);
 
-    public static void completeAndApplyApp(java.util.List l, Goal goal, 
-                                           KeYMediator medi) {
-        
-        // TODO Remove Sysout
-        long before = System.currentTimeMillis();
-        ApplyTacletDialogModel[] models1 = new ApplyTacletDialogModel[l.size()];
-        LinkedList l2 = new LinkedList();
-        ListIterator it = l.listIterator();
-        for (int i=0; i<l.size(); i++) {
-            TacletApp c = (TacletApp) it.next();
-            models1[i] = createModel(c, goal, medi);
-            if (AlternativeHandler.hasAlternativeFor(c.taclet())) {
-                ListIterator it2 = AlternativeHandler.getAlternativeFor(c.taclet()).listIterator();
-                while (it2.hasNext()) {
-                    java.util.List l3 = (java.util.List) it2.next();
-                    int j = c.instantiations().size();
-                    if (models1[i].tableModel().getRowCount() - j == l3.size()) {
-                        ListIterator it3 = l3.listIterator();
-                        TacletApp newApp = null;
-                        if (c instanceof NoPosTacletApp) {
-                            newApp = NoPosTacletApp.createNoPosTacletApp(c.taclet(), c.instantiations(), c.constraint(), c.newMetavariables(), c.ifFormulaInstantiations());
-                        } else if (c instanceof PosTacletApp) {
-                            newApp = PosTacletApp.createPosTacletApp((FindTaclet) c.taclet(), c.instantiations(), c.constraint(), c.newMetavariables(), c.ifFormulaInstantiations(), c.posInOccurrence());
+            if (InstantiationFileHandler.hasInstantiationListsFor(tA.taclet())) {
+                ListIterator instListIt = InstantiationFileHandler.getInstantiationListsFor(
+                        tA.taclet()).listIterator();
+
+                while (instListIt.hasNext()) {
+                    java.util.List instantiations = (java.util.List) instListIt.next();
+                    int start = tA.instantiations().size();
+
+                    if (origInstModels[i].tableModel().getRowCount()
+                            - start == instantiations.size()) {
+                        TacletApp newTApp = null;
+
+                        if (tA instanceof NoPosTacletApp) {
+                            newTApp = NoPosTacletApp.createNoPosTacletApp(tA
+                                    .taclet(), tA.instantiations(), tA
+                                    .constraint(), tA.newMetavariables(), tA
+                                    .ifFormulaInstantiations());
+                        } else if (tA instanceof PosTacletApp) {
+                            newTApp = PosTacletApp.createPosTacletApp(
+                                    (FindTaclet) tA.taclet(), tA
+                                    .instantiations(), tA.constraint(),
+                                    tA.newMetavariables(), tA
+                                    .ifFormulaInstantiations(), tA
+                                    .posInOccurrence());
                         }
-                        if (newApp != null) {
-                            ApplyTacletDialogModel m = createModel(newApp, goal, medi);
-                            l2.add(m);
-                            while (it3.hasNext()) {
-                                m.tableModel().setValueAt(it3.next(), j++, 1);
+
+                        if (newTApp != null) {
+                            ApplyTacletDialogModel m = createModel(newTApp,
+                                    goal, medi);
+                            recentInstModels.add(m);
+                            ListIterator instIt = instantiations.listIterator();
+
+                            while (instIt.hasNext()) {
+                                m.tableModel().setValueAt(instIt.next(), start++, 1);
                             }
+
                         }
+
                     }
+
                 }
+
             }
+
         }
-        ApplyTacletDialogModel[] models = new ApplyTacletDialogModel[models1.length+l2.size()];
+
+        ApplyTacletDialogModel[] models = new ApplyTacletDialogModel[origInstModels.length
+                + recentInstModels.size()];
         int i;
-        for (i = 0; i < models1.length; i++) {
-            models[i] = models1[i];
+
+        for (i = 0; i < origInstModels.length; i++) {
+            models[i] = origInstModels[i];
         }
-        it = l2.listIterator();
-        while (it.hasNext()) {
-            models[i++] = (ApplyTacletDialogModel) it.next();
+
+        ListIterator recentInstModelIt = recentInstModels.listIterator();
+
+        while (recentInstModelIt.hasNext()) {
+            models[i++] = (ApplyTacletDialogModel) recentInstModelIt.next();
         }
-        // TODO Remove Sysout
-        System.out.println(System.currentTimeMillis()-before);
-                                           
+
         new TacletMatchCompletionDialog(models, goal, medi);
     }
-    
 
     public static ApplyTacletDialogModel createModel(TacletApp app, Goal goal, 
                                                      KeYMediator medi) {
@@ -380,7 +400,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 		    mediator().getExceptionHandler().clear();
 		    return ;
 		} 
-		AlternativeHandler.saveListFor(model[current()]);
+		InstantiationFileHandler.saveListFor(model[current()]);
 		closeDialog();
 	    }
 	}
@@ -717,7 +737,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 	void requestFocus();
     }
 
-    private static class AlternativeHandler {
+    private static class InstantiationFileHandler {
         private static final String ALTERNATIVE_DIR = System.getProperty("user.home")
     + File.separator + ".key" + File.separator + "instantiations";
         private static final String SEPARATOR1 = "<<<<<<";
@@ -726,15 +746,15 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         private static final int SAVE_COUNT = 5;
         private static HashMap hm;
         
-        private static boolean hasAlternativeFor(Taclet taclet) {
+        private static boolean hasInstantiationListsFor(Taclet taclet) {
             if (hm == null) {
                 createHashMap();
             }
             return hm.containsKey(taclet.name().toString());
         }
         
-        private static java.util.List getAlternativeFor(Taclet taclet) {
-            if (hasAlternativeFor(taclet)) {
+        private static java.util.List getInstantiationListsFor(Taclet taclet) {
+            if (hasInstantiationListsFor(taclet)) {
                 if (hm.get(taclet.name().toString()) == null) {
                     createListFor(taclet);
                 }
@@ -806,7 +826,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             Taclet taclet = model.taclet();
             TacletInstantiationsTableModel tableModel = model.tableModel();
             int start = model.tacletApp().instantiations().size();
-            java.util.List l = getAlternativeFor(taclet);
+            java.util.List l = getInstantiationListsFor(taclet);
             try {
                 BufferedWriter bw = new BufferedWriter(new FileWriter(ALTERNATIVE_DIR+File.separator+taclet.name().toString()));
                 StringBuffer sb = new StringBuffer();
