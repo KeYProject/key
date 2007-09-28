@@ -118,29 +118,20 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                 ListIterator it2 = AlternativeHandler.getAlternativeFor(c.taclet()).listIterator();
                 while (it2.hasNext()) {
                     java.util.List l3 = (java.util.List) it2.next();
-                    if (models1[i].tableModel().getRowCount() == l3.size()) {
+                    int j = c.instantiations().size();
+                    if (models1[i].tableModel().getRowCount() - j == l3.size()) {
                         ListIterator it3 = l3.listIterator();
-                        int j = c.instantiations().size();
-                        boolean b = true;
-                        for (int k = 0; k < j; k++) {
-                            if (!it3.next().toString().equals(models1[i].tableModel().getValueAt(k, 1))) {
-                                b = false;
-                                break;
-                            }
+                        TacletApp newApp = null;
+                        if (c instanceof NoPosTacletApp) {
+                            newApp = NoPosTacletApp.createNoPosTacletApp(c.taclet(), c.instantiations(), c.constraint(), c.newMetavariables(), c.ifFormulaInstantiations());
+                        } else if (c instanceof PosTacletApp) {
+                            newApp = PosTacletApp.createPosTacletApp((FindTaclet) c.taclet(), c.instantiations(), c.constraint(), c.newMetavariables(), c.ifFormulaInstantiations(), c.posInOccurrence());
                         }
-                        if (b) {
-                            TacletApp newApp = null;
-                            if (c instanceof NoPosTacletApp) {
-                                newApp = NoPosTacletApp.createNoPosTacletApp(c.taclet(), c.instantiations(), c.constraint(), c.newMetavariables(), c.ifFormulaInstantiations());
-                            } else if (c instanceof PosTacletApp) {
-                                newApp = PosTacletApp.createPosTacletApp((FindTaclet) c.taclet(), c.instantiations(), c.constraint(), c.newMetavariables(), c.ifFormulaInstantiations(), c.posInOccurrence());
-                            }
-                            if (newApp != null) {
-                                ApplyTacletDialogModel m = createModel(newApp, goal, medi);
-                                l2.add(m);
-                                while (it3.hasNext()) {
-                                    m.tableModel().setValueAt(it3.next(), j++, 1);
-                                }
+                        if (newApp != null) {
+                            ApplyTacletDialogModel m = createModel(newApp, goal, medi);
+                            l2.add(m);
+                            while (it3.hasNext()) {
+                                m.tableModel().setValueAt(it3.next(), j++, 1);
                             }
                         }
                     }
@@ -389,7 +380,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 		    mediator().getExceptionHandler().clear();
 		    return ;
 		} 
-		AlternativeHandler.saveListFor(model[current()].taclet(), model[current()].tableModel());
+		AlternativeHandler.saveListFor(model[current()]);
 		closeDialog();
 	    }
 	}
@@ -811,13 +802,16 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             hm.put(taclet.name().toString(), l);
         }
         
-        private static void saveListFor(Taclet taclet, TacletInstantiationsTableModel tableModel) {
+        private static void saveListFor(ApplyTacletDialogModel model) {
+            Taclet taclet = model.taclet();
+            TacletInstantiationsTableModel tableModel = model.tableModel();
+            int start = model.tacletApp().instantiations().size();
             java.util.List l = getAlternativeFor(taclet);
             try {
                 BufferedWriter bw = new BufferedWriter(new FileWriter(ALTERNATIVE_DIR+File.separator+taclet.name().toString()));
                 StringBuffer sb = new StringBuffer();
-                for (int i = 0; i < tableModel.getRowCount(); i++) {
-                    if (i > 0) {
+                for (int i = start; i < tableModel.getRowCount(); i++) {
+                    if (i > start) {
                         sb.append(SEPARATOR2).append(LINE_END);
                     }
                     sb.append(tableModel.getValueAt(i, 1)).append(LINE_END);
