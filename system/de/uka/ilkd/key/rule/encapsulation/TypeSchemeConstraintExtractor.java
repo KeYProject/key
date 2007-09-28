@@ -703,9 +703,9 @@ class TypeSchemeConstraintExtractor implements Visitor {
         //nothing to do
     }
     
-    public void performActionOnCurrentMemoryAreaReference(CurrentMemoryAreaReference x){
+/*    public void performActionOnCurrentMemoryAreaReference(CurrentMemoryAreaReference x){
         //nothing to do
-    }
+    }*/
     
     public void performActionOnMethodDeclaration(MethodDeclaration x) {
         failUnexpected(x);

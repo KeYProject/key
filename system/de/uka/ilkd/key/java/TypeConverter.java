@@ -241,9 +241,9 @@ public class TypeConverter extends TermBuilder {
 	    return convertArrayReference((ArrayReference)prefix, ec);
 	} else if (prefix instanceof ThisReference) {	 
 	    return convertToLogicElement(ec.getRuntimeInstance());
-	} else if (prefix instanceof CurrentMemoryAreaReference) {   
+	} /*else if (prefix instanceof CurrentMemoryAreaReference) {   
             return convertToLogicElement(ec.getMemoryArea());
-        } else {            
+        } */else {            
 	    Debug.out("typeconverter: WARNING: unknown reference prefix:", 
 		      prefix, prefix == null ? null : prefix.getClass());
 	    throw new IllegalArgumentException("TypeConverter failed to convert "
@@ -345,9 +345,9 @@ public class TypeConverter extends TermBuilder {
 	    }
 	} else if (pe instanceof ThisReference) {
 	    return convertReferencePrefix((ThisReference)pe, ec);
-	} else if (pe instanceof CurrentMemoryAreaReference) {   
+	} /*else if (pe instanceof CurrentMemoryAreaReference) {   
             return convertToLogicElement(ec.getMemoryArea());
-        } else if (pe instanceof ParenthesizedExpression) {
+        } */else if (pe instanceof ParenthesizedExpression) {
             return convertToLogicElement
                 (((ParenthesizedExpression)pe).getChildAt(0), ec);
         } else if (pe instanceof Instanceof) {

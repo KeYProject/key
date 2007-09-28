@@ -96,9 +96,9 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         cml.add(c);
     }
     
-    public CurrentMemoryAreaReference createCurrentMemoryAreaReference(){
+/*    public CurrentMemoryAreaReference createCurrentMemoryAreaReference(){
         return new CurrentMemoryAreaReference();
-    }
+    }*/
 
     /**
        Perform post work on the created element. Creates parent links

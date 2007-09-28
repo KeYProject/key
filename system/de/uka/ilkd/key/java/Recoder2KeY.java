@@ -1863,10 +1863,10 @@ public class Recoder2KeY implements JavaReader{
 	 return new ThisReference((TypeReference)prefix);
     }
 
-    public de.uka.ilkd.key.java.reference.CurrentMemoryAreaReference
-    convert(de.uka.ilkd.key.java.recoderext.CurrentMemoryAreaReference c){
-        return new de.uka.ilkd.key.java.reference.CurrentMemoryAreaReference();
-    }
+//    public de.uka.ilkd.key.java.reference.CurrentMemoryAreaReference
+//    convert(de.uka.ilkd.key.java.recoderext.CurrentMemoryAreaReference c){
+//        return new de.uka.ilkd.key.java.reference.CurrentMemoryAreaReference();
+//    }
    
     public SuperReference 
 	convert(recoder.java.reference.SuperReference sr) {	

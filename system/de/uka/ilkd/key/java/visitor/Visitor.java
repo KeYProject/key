@@ -264,7 +264,7 @@ public interface Visitor {
 
      void performActionOnThisReference(ThisReference x); 
      
-     void performActionOnCurrentMemoryAreaReference(CurrentMemoryAreaReference x); 
+//     void performActionOnCurrentMemoryAreaReference(CurrentMemoryAreaReference x); 
 
      void performActionOnArrayLengthReference(ArrayLengthReference x); 
 

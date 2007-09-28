@@ -490,8 +490,10 @@ de/uka/ilkd/key/gui/TestTacletPopup.java
 de/uka/ilkd/key/gui/UsedMethodContractsList.java
 de/uka/ilkd/key/gui/UseMethodContractRuleItem.java
 de/uka/ilkd/key/gui/UserConstraintView.java
+de/uka/ilkd/key/gui/UseWorkingSpaceContractRuleItem.java
 de/uka/ilkd/key/gui/ViewSelector.java
 de/uka/ilkd/key/gui/ViewSettings.java
+de/uka/ilkd/key/gui/WorkingSpaceContractDialog.java
 de/uka/ilkd/key/jml/AmbigiousModelElementException.java
 de/uka/ilkd/key/jml/AssignableSpec.java
 de/uka/ilkd/key/jml/Implementation2SpecMap.java
@@ -651,6 +653,8 @@ de/uka/ilkd/key/logic/op/TermSV.java
 de/uka/ilkd/key/logic/op/TermSymbol.java
 de/uka/ilkd/key/logic/op/VariableSV.java
 de/uka/ilkd/key/logic/op/WarySubstOp.java
+de/uka/ilkd/key/logic/op/WorkingSpaceNonRigidOp.java
+de/uka/ilkd/key/logic/op/WorkingSpaceOp.java
 de/uka/ilkd/key/logic/PairOfTermArrayAndBoundVarsArray.java
 de/uka/ilkd/key/logic/PIOPathIterator.java
 de/uka/ilkd/key/logic/PosInOccurrence.java
@@ -795,6 +799,7 @@ de/uka/ilkd/key/parser/jml/DefaultArithOpProvider.java
 de/uka/ilkd/key/parser/jml/JMLSpecBuilder.java
 de/uka/ilkd/key/parser/jml/JMLTranslator.java
 de/uka/ilkd/key/parser/jml/NotSupportedExpressionException.java
+de/uka/ilkd/key/parser/jml/WorkingSpaceArithOpProvider.java
 de/uka/ilkd/key/parser/KeYSemanticException.java
 de/uka/ilkd/key/parser/LhsUpdateData.java
 de/uka/ilkd/key/parser/Location.java
@@ -1139,9 +1144,12 @@ de/uka/ilkd/key/rule/conditions/NewJumpLabelCondition.java
 de/uka/ilkd/key/rule/conditions/NonImplicitTypeCondition.java
 de/uka/ilkd/key/rule/conditions/StaticMethodCondition.java
 de/uka/ilkd/key/rule/conditions/StaticReferenceCondition.java
+de/uka/ilkd/key/rule/conditions/TestEqualWorkingSpaceOp.java
 de/uka/ilkd/key/rule/conditions/TestLiteral.java
 de/uka/ilkd/key/rule/conditions/TestNonImplicitQuery.java
 de/uka/ilkd/key/rule/conditions/TestQuery.java
+de/uka/ilkd/key/rule/conditions/TestWorkingSpaceNonRigidOp.java
+de/uka/ilkd/key/rule/conditions/TestWorkingSpaceOp.java
 de/uka/ilkd/key/rule/conditions/TypeComparisionCondition.java
 de/uka/ilkd/key/rule/conditions/TypeCondition.java
 de/uka/ilkd/key/rule/conditions/TypeResolver.java
@@ -1229,6 +1237,7 @@ de/uka/ilkd/key/rule/inst/TermInstantiation.java
 de/uka/ilkd/key/rule/inst/TestGenericSortInstantiations.java
 de/uka/ilkd/key/rule/IUpdateRule.java
 de/uka/ilkd/key/rule/MatchConditions.java
+de/uka/ilkd/key/rule/metaconstruct/arith/CalculateArraySize.java
 de/uka/ilkd/key/rule/metaconstruct/arith/DivideLCRMonomials.java
 de/uka/ilkd/key/rule/metaconstruct/arith/DivideMonomials.java
 de/uka/ilkd/key/rule/metaconstruct/arith/MetaAdd.java
@@ -1257,8 +1266,10 @@ de/uka/ilkd/key/rule/metaconstruct/arith/Polynomial.java
 de/uka/ilkd/key/rule/metaconstruct/ArrayBaseInstanceOf.java
 de/uka/ilkd/key/rule/metaconstruct/ArrayLength.java
 de/uka/ilkd/key/rule/metaconstruct/ArrayPostDecl.java
+de/uka/ilkd/key/rule/metaconstruct/ArraySize.java
 de/uka/ilkd/key/rule/metaconstruct/ArrayStoreStaticAnalyse.java
 de/uka/ilkd/key/rule/metaconstruct/AtPreEquations.java
+de/uka/ilkd/key/rule/metaconstruct/BestCaseArraySize.java
 de/uka/ilkd/key/rule/metaconstruct/BreakToBeReplaced.java
 de/uka/ilkd/key/rule/metaconstruct/ConstantValue.java
 de/uka/ilkd/key/rule/metaconstruct/ConstructorCall.java
@@ -1289,7 +1300,10 @@ de/uka/ilkd/key/rule/metaconstruct/MetaTransient.java
 de/uka/ilkd/key/rule/metaconstruct/MethodCallContract.java
 de/uka/ilkd/key/rule/metaconstruct/MethodCall.java
 de/uka/ilkd/key/rule/metaconstruct/MultipleVarDecl.java
+de/uka/ilkd/key/rule/metaconstruct/ObjectSize.java
 de/uka/ilkd/key/rule/metaconstruct/PostWork.java
+de/uka/ilkd/key/rule/metaconstruct/PreconditionForWS.java
+de/uka/ilkd/key/rule/metaconstruct/PreValidInStateOfWS.java
 de/uka/ilkd/key/rule/metaconstruct/ProgramMetaConstruct.java
 de/uka/ilkd/key/rule/metaconstruct/ReplaceWhileLoop.java
 de/uka/ilkd/key/rule/metaconstruct/ResolveQuery.java
@@ -1298,6 +1312,7 @@ de/uka/ilkd/key/rule/metaconstruct/StaticInitialisation.java
 de/uka/ilkd/key/rule/metaconstruct/SwitchToIf.java
 de/uka/ilkd/key/rule/metaconstruct/TestProgramMetaConstructs.java
 de/uka/ilkd/key/rule/metaconstruct/TypeOf.java
+de/uka/ilkd/key/rule/metaconstruct/UniqueAnonUpdate.java
 de/uka/ilkd/key/rule/metaconstruct/Universes.java
 de/uka/ilkd/key/rule/metaconstruct/Unpack.java
 de/uka/ilkd/key/rule/metaconstruct/UnwindLoop.java
@@ -1305,6 +1320,7 @@ de/uka/ilkd/key/rule/metaconstruct/WhileInvariantTransformation.java
 de/uka/ilkd/key/rule/metaconstruct/WhileInvRule.java
 de/uka/ilkd/key/rule/metaconstruct/WhileInvRuleWrapper.java
 de/uka/ilkd/key/rule/metaconstruct/WhileLoopTransformation.java
+de/uka/ilkd/key/rule/metaconstruct/WorstCaseArraySize.java
 de/uka/ilkd/key/rule/MethodContractRuleApp.java
 de/uka/ilkd/key/rule/NewDependingOn.java
 de/uka/ilkd/key/rule/NewVarcond.java
@@ -1414,6 +1430,7 @@ de/uka/ilkd/key/rule/updatesimplifier/ApplyOnProgramMethod.java
 de/uka/ilkd/key/rule/updatesimplifier/ApplyOnRigidOperatorTerm.java
 de/uka/ilkd/key/rule/updatesimplifier/ApplyOnRigidTerm.java
 de/uka/ilkd/key/rule/updatesimplifier/ApplyOnUpdate.java
+de/uka/ilkd/key/rule/updatesimplifier/ApplyOnWorkingSpaceNonRigid.java
 de/uka/ilkd/key/rule/updatesimplifier/AssignmentPairImpl.java
 de/uka/ilkd/key/rule/updatesimplifier/AssignmentPair.java
 de/uka/ilkd/key/rule/updatesimplifier/AssignmentPairLazy.java
@@ -1425,8 +1442,10 @@ de/uka/ilkd/key/rule/updatesimplifier/QuanAssignmentPairLazy.java
 de/uka/ilkd/key/rule/updatesimplifier/Update.java
 de/uka/ilkd/key/rule/updatesimplifier/UpdateSimplifierTermFactory.java
 de/uka/ilkd/key/rule/UseMethodContractRule.java
+de/uka/ilkd/key/rule/UseWorkingSpaceContractRule.java
 de/uka/ilkd/key/rule/VariableConditionAdapter.java
 de/uka/ilkd/key/rule/VariableCondition.java
+de/uka/ilkd/key/rule/WorkingSpaceContractRuleApp.java
 de/uka/ilkd/key/rule/YicesIntegerRule.java
 de/uka/ilkd/key/speclang/AbstractClassInvariant.java
 de/uka/ilkd/key/speclang/AbstractOperationContract.java

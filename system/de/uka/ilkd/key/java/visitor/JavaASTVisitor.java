@@ -127,9 +127,9 @@ public abstract class JavaASTVisitor extends JavaASTWalker
 	doDefaultAction(x);
     }
     
-    public void performActionOnCurrentMemoryAreaReference(CurrentMemoryAreaReference x){
+  /*  public void performActionOnCurrentMemoryAreaReference(CurrentMemoryAreaReference x){
         doDefaultAction(x);
-    }
+    }*/
  
     public void performActionOnClassDeclaration(ClassDeclaration x) {
 	doDefaultAction(x);
