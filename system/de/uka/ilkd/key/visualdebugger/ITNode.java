@@ -128,6 +128,8 @@ public class ITNode {
 
         if (activeStatement instanceof MethodBodyStatement) {
             final MethodBodyStatement mbs = (MethodBodyStatement) activeStatement;
+            // FIXME: do not lookup for method using Strings use the real AST objects instead
+            //        This is likely to break as soon as a method ending with sep is present
             if (mbs.getMethodReference().getMethodName().toString().endsWith(
                     "sep")) {
                 if (mbs.getArguments().size() > 1) { // is expression sep, no
@@ -141,6 +143,7 @@ public class ITNode {
             }
         }
 
+        // FIXME: What happens here
         if (true)
             return false;
 
@@ -194,7 +197,8 @@ public class ITNode {
 
             if (act != null && act instanceof MethodReference) {
                 MethodReference mr = (MethodReference) act;
-
+                // FIXME: do not lookup for method using Strings use the real AST objects instead
+                //        This is likely to break.
                 if (mr.getMethodName().toString().equals("sep")
                         && mr.getArgumentAt(0) instanceof IntLiteral) {// TODO
                                                                         // sep(11,expr)

@@ -325,11 +325,12 @@ public class ProblemInitializer {
         
 	if(javaPath != null) {
     	    //read Java	
-    	    reportStatus("Reading Java model");
+            reportStatus("Reading Java model");
             ProjectSettings settings = 
                 initConfig.getServices().getJavaInfo().getKeYProgModelInfo()
                 	      .getServConf().getProjectSettings();
             PathList searchPathList = settings.getSearchPathList();
+            
             
             if(searchPathList.find(javaPath) == null) {
                 searchPathList.add(javaPath);

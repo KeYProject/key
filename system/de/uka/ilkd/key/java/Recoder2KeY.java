@@ -325,7 +325,7 @@ public class Recoder2KeY implements JavaReader{
 	    cUnits = servConf.getProgramFactory().parseCompilationUnits(cUnitStrings);
 	    final ChangeHistory changeHistory = servConf.getChangeHistory();
             for (int i = 0, sz = cUnits.size(); i<sz; i++) {
-		cUnits.getCompilationUnit(i).makeAllParentRolesValid();
+                cUnits.getCompilationUnit(i).makeAllParentRolesValid();
 		changeHistory.attached(cUnits.getCompilationUnit(i));
 	    }
             
