@@ -50,8 +50,13 @@ public class UpdateLabelListener implements RuleAppListener {
         return false;
     }
 
+    // FIXME: What is a BC Taclet and this broke because of a test of taclets starting with 
+    // inst_ after we have renamed taclets this set of rules changed so that a replacement
+    // with inst is not possible! Workaround by assumption ...
     private boolean isBCTaclet(PosTacletApp tap, Node n) {
-        return !(tap.taclet().name().toString().startsWith("inst_"));
+       
+        return !(tap.taclet().name().toString().startsWith("instAll") ||
+                tap.taclet().name().toString().startsWith("instEx"));
     }
 
     // TODO duplication in prooflistner
@@ -169,7 +174,7 @@ public class UpdateLabelListener implements RuleAppListener {
             final PosTacletApp tapp = (PosTacletApp) app;
             final PosInOccurrence pio = tapp.posInOccurrence().topLevel();
 
-            if ((labels.containsKey(pio) && isBCTaclet(tapp, parent))) {
+            if (labels.containsKey(pio) && isBCTaclet(tapp, parent)) {
                 labels = setAssumeLabel(labels, n, tapp
                         .ifFormulaInstantiations());
 
@@ -180,9 +185,7 @@ public class UpdateLabelListener implements RuleAppListener {
                     id = ((PCLabel) labels.get(pio)).getId();
                     looking = ((PCLabel) labels.get(pio)).isLooking();
                 }
-
                 analyseNodeChanges(nr, id, looking, labels);
-
             }
         } else {
             // build in rule

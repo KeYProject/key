@@ -49,12 +49,12 @@ public class ExecutionTree implements AutoModeListener {
 
     private LinkedList listeners = new LinkedList();
 
-    private KeYMediator m;
+    private KeYMediator mediator;
 
     private VisualDebugger vd = VisualDebugger.getVisualDebugger();
 
     public ExecutionTree(Proof p, KeYMediator m, boolean b) {
-        this.m = m;
+        this.mediator = m;
         intro_post = b;
     }
 
@@ -80,6 +80,7 @@ public class ExecutionTree implements AutoModeListener {
         } else
             vd.fireDebuggerEvent(new DebuggerEvent(DebuggerEvent.EXEC_FINISHED,
                     null));
+       
         final Runnable execTreeThread = new Runnable() {
             public void run() {
                 // new StateVisualization(node,mediator);
@@ -88,7 +89,7 @@ public class ExecutionTree implements AutoModeListener {
         };
         // mediator.invokeAndWait(interfaceSignaller);
 
-        startThread(execTreeThread);
+        if (mediator.getProof() != null) startThread(execTreeThread);
     }
 
     public void buildETree(ITNode n, ListOfTerm terms, ETNode parent, String exc) {
@@ -290,13 +291,13 @@ public class ExecutionTree implements AutoModeListener {
     }
 
     private void createExecutionTree() {
-        if (m.getProof() == null) {
+        if (mediator.getProof() == null) {
             itNodeRoot = null;
             etNodeRoot = null;
             return;
         }
-        ITNode root = new ITNode(m.getProof().root());
-        buildITTree(m.getProof().root(), -1, false, root,
+        ITNode root = new ITNode(mediator.getProof().root());
+        buildITTree(mediator.getProof().root(), -1, false, root,
                 SLListOfTerm.EMPTY_LIST);
         ETNode etrr = new ETNode(SLListOfTerm.EMPTY_LIST, null);
         itNodeRoot = root;
@@ -438,7 +439,7 @@ public class ExecutionTree implements AutoModeListener {
     }
 
     private void intro_post() {
-        ListOfGoal goals = m.getProof().getSubtreeGoals(m.getProof().root());
+        ListOfGoal goals = mediator.getProof().getSubtreeGoals(mediator.getProof().root());
 
         IteratorOfGoal it = goals.iterator();
         while (it.hasNext()) {
@@ -452,7 +453,7 @@ public class ExecutionTree implements AutoModeListener {
                 PosInOccurrence pio = new PosInOccurrence(cfm,
                         PosInTerm.TOP_LEVEL, false);
 
-                SetOfTacletApp set = m.getTacletApplications(g,
+                SetOfTacletApp set = mediator.getTacletApplications(g,
                         "introduce_post_predicate", pio);
 
                 // SetOfTacletApp set = m.getTacletApplications(g,
@@ -466,7 +467,7 @@ public class ExecutionTree implements AutoModeListener {
                     vd.extractPrecondition(g.node(), pio);
 
                     // VisualDebugger.getVisualDebugger().bpManager.clearSteps();
-                    m.getInteractiveProver().applyInteractive(tapp, g);
+                    mediator.getInteractiveProver().applyInteractive(tapp, g);
 
                 }
 
@@ -686,7 +687,7 @@ public class ExecutionTree implements AutoModeListener {
     }
 
     private void startThread(final Runnable r) {
-        m.stopInterface(false);
+        mediator.stopInterface(false);
         Thread appThread = new Thread() {
             public void run() {
                 try {
@@ -695,8 +696,8 @@ public class ExecutionTree implements AutoModeListener {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                m.startInterface(false);
-                m.setInteractive(true);
+                mediator.startInterface(false);
+                mediator.setInteractive(true);
                 VisualDebugger.print("Finished creation of ET "
                         + Thread.currentThread());
             }

@@ -31,13 +31,6 @@ public class InsertSepVisitor extends ASTVisitor {
         replaceNode(index, inv);
     }
 
-    public void endVisit(CastExpression node) {
-
-    }
-
-    public void endVisit(DoStatement node) {
-
-    }
 
     public void endVisit(FieldAccess node) {
         final ITypeBinding expressionTypeBinding = node.getExpression().resolveTypeBinding();
@@ -55,16 +48,6 @@ public class InsertSepVisitor extends ASTVisitor {
         replaceNode(guard, getSepStatement(guard.getAST(), ++id, guard));
     }
 
-    public void endVisit(InfixExpression node) {
-        if (node.getOperator() == InfixExpression.Operator.DIVIDE) {
-
-        }
-
-    }
-
-    public void endVisit(MethodInvocation node) {
-
-    }
 
     public void endVisit(QualifiedName node) {
 
@@ -104,9 +87,6 @@ public class InsertSepVisitor extends ASTVisitor {
         replaceNode(node, fa);
    }
 
-    public void endVisit(SwitchStatement node) {
-
-    }
 
     public void endVisit(WhileStatement node) {
         final Expression guard = node.getExpression();
@@ -147,10 +127,7 @@ public class InsertSepVisitor extends ASTVisitor {
 
         methodInvocation.arguments().add(literal);
         methodInvocation.arguments().add((Expression) ex2);
-
-        // ExpressionStatement expressionStatement =
-        // ast.newExpressionStatement(methodInvocation);
-        // System.out.println(methodInvocation);
+      
         return methodInvocation;
     }
 
@@ -158,8 +135,7 @@ public class InsertSepVisitor extends ASTVisitor {
         return types;
     }
 
-    public boolean visit(ASTNode node) {
-        // System.out.println("Node: "+node.toString());
+    public boolean visit(ASTNode node) {        
         return true;
     }
 

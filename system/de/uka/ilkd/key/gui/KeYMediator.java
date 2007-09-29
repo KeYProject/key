@@ -881,10 +881,12 @@ public class KeYMediator {
      */
     public void setInteractive ( boolean b ) {
         interactiveProver.setInteractive ( b );
-        if ( b && proof != null ) {
-            proof.setRuleAppIndexToInteractiveMode ();
-        } else {
-            proof.setRuleAppIndexToAutoMode ();
+        if (proof != null) {
+            if ( b  ) {
+                proof.setRuleAppIndexToInteractiveMode ();
+            } else {
+                proof.setRuleAppIndexToAutoMode ();
+            }
         }
     }
 
