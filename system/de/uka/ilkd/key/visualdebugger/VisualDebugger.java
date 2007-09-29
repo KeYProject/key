@@ -228,8 +228,8 @@ public class VisualDebugger {
     }
 
     /**
-     * determines the first and active statement if the applied taclet worked on
-     * a modality
+     * determines and returns the first and active statement if the applied taclet worked on
+     * a modality. If the applied taclet performs no symbolic execution <tt>null</tt> is returned
      */
     public SourceElement determineFirstAndActiveStatement(Node node) {
         final RuleApp ruleApp = node.getAppliedRuleApp();
@@ -342,7 +342,7 @@ public class VisualDebugger {
             if (statement instanceof LabeledStatement) {
                 statement = ((LabeledStatement) statement).getBody();
             } else if (statement == statement.getFirstElement()) {
-                return statement;
+               break;
             } else {
                 statement = statement.getFirstElement();
             }
