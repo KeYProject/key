@@ -35,6 +35,7 @@ import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.jml.JMLMethodSpec;
 import de.uka.ilkd.key.jml.JMLSpec;
 import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 
@@ -125,7 +126,10 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
             problemInit.startProver(input, input);
             error = "";
         } catch (ProofInputException pie) {
-            error = pie.getMessage();
+            error = pie.getMessage();            
+        } catch (ExceptionHandlerException ehe) {
+            error =  ehe.getCause() == null ? ehe.getMessage() : 
+                ehe.getCause().getMessage();
         }
 
         if (error.length() == 0) {
@@ -482,6 +486,7 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
      */
     public void run(IAction action) {
 
+        
         if (selection == null) {
             return;
         }
@@ -495,6 +500,7 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
             keyProver.closeTaskWithoutIntercation();
         }
 
+
         VisualDebugger.getVisualDebugger();// .prepareKeY();
 
         if (selection != null && selection instanceof StructuredSelection) {
@@ -505,7 +511,7 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
             if (srcFile == null) {
                 MessageDialog.openError(PlatformUI.getWorkbench()
                         .getActiveWorkbenchWindow().getShell(),
-                        "Not source method",
+                        "No Source Found.",
                         "The method you selected does not exist in source form. "
                                 + "It cannot be used for a proof.");
                 return;
@@ -535,6 +541,8 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
             // assure the sources are parsed
             int status = assertProjectParsed(project, false);
 
+
+            
             if (status == PROJECT_ALREADY_OPEN
                     || status == PROJECT_LOAD_SUCESSFUL) {
                 // determine the encapsulating class of the selected method
