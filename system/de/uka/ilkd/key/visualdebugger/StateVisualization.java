@@ -320,8 +320,7 @@ public class StateVisualization  {
       po.setProofSettings(mediator.getProof().getSettings());
       po.setConfig(mediator.getProof().env().getInitConfig());
       ps.init(po);
-      ps.getProof().setActiveStrategy((DebuggerStrategy.Factory.create(ps.getProof(), "DebuggerStrategy", null)));
-      //ps.getProof().root().setLabels(itNode.getNode().getLabels());          
+      vd.setProofStrategy(ps.getProof(), true, false);
     }
     
     
@@ -335,8 +334,7 @@ public class StateVisualization  {
         po.setProofSettings(mediator.getProof().getSettings());
         po.setConfig(mediator.getProof().env().getInitConfig());
         ps.init(po);
-        ps.getProof().setActiveStrategy((DebuggerStrategy.Factory.create(ps.getProof(), "DebuggerStrategy", null)));
-      //  ps.getProof().root().setLabels(itNode.getNode().getLabels());          
+        vd.setProofStrategy(ps.getProof(), true, false);
       }
     
     
@@ -350,8 +348,7 @@ public class StateVisualization  {
         po.setProofSettings(mediator.getProof().getSettings());
         po.setConfig(mediator.getProof().env().getInitConfig());
         ps.init(po);
-        ps.getProof().setActiveStrategy((DebuggerStrategy.Factory.create(ps.getProof(), "DebuggerStrategy", null)));
-    //    ps.getProof().root().setLabels(itNode.getNode().getLabels());          
+        vd.setProofStrategy(ps.getProof(), true, false);
       }
 
     

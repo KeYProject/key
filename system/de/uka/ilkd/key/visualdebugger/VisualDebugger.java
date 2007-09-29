@@ -1026,7 +1026,7 @@ public class VisualDebugger {
                 .sequent());
     }
 
-    private void setProofStrategy(final Proof proof,
+    public void setProofStrategy(final Proof proof,
             boolean splittingAllowed, boolean inUpdateAndAssumes) {
         StrategyProperties strategyProperties  = DebuggerStrategy.
         getDebuggerStrategyProperties(splittingAllowed, inUpdateAndAssumes, isInitPhase());
