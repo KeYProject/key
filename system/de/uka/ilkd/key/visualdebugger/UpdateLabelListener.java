@@ -50,13 +50,15 @@ public class UpdateLabelListener implements RuleAppListener {
         return false;
     }
 
-    // FIXME: What is a BC Taclet and this broke because of a test of taclets starting with 
-    // inst_ after we have renamed taclets this set of rules changed so that a replacement
+    // FIXME: What is a BC Taclet and this broke because of a test of taclets
+    // starting with
+    // inst_ after we have renamed taclets this set of rules changed so that a
+    // replacement
     // with inst is not possible! Workaround by assumption ...
     private boolean isBCTaclet(PosTacletApp tap, Node n) {
-       
-        return !(tap.taclet().name().toString().startsWith("instAll") ||
-                tap.taclet().name().toString().startsWith("instEx"));
+
+        return !(tap.taclet().name().toString().startsWith("instAll") || tap
+                .taclet().name().toString().startsWith("instEx"));
     }
 
     // TODO duplication in prooflistner
@@ -66,17 +68,12 @@ public class UpdateLabelListener implements RuleAppListener {
         if (this.modalityTopLevel(pio)
                 && !this.containsIfTerm(pio.constrainedFormula().formula()))
             return true;
-        if (op == Op.AND
-                || op == Op.OR
-                || op == Op.IF_THEN_ELSE
-                || op == Op.IF_EX_THEN_ELSE
-                || op == Op.EQV
-                || op == Op.IMP
-                || op == Op.AND
-                || (op instanceof IUpdateOperator/*
-                                                     * &&
-                                                     * !containsJavaBlock(pio.constrainedFormula().formula()
-                                                     */))
+        if (op == Op.AND || op == Op.OR || op == Op.IF_THEN_ELSE
+                || op == Op.IF_EX_THEN_ELSE || op == Op.EQV || op == Op.IMP
+                || op == Op.AND || (op instanceof IUpdateOperator/*
+                                                                     * &&
+                                                                     * !containsJavaBlock(pio.constrainedFormula().formula()
+                                                                     */))
             return false;
         final OpCollector col = new OpCollector();
         f.execPostOrder(col);
@@ -95,7 +92,6 @@ public class UpdateLabelListener implements RuleAppListener {
         return false;
     }
 
- 
     public void ruleApplied(ProofEvent e) {
         RuleAppInfo info = e.getRuleAppInfo();
         setStepInfos(info);

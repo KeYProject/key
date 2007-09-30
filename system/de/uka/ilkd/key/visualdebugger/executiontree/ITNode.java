@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.visualdebugger;
+package de.uka.ilkd.key.visualdebugger.executiontree;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,6 +31,8 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
+import de.uka.ilkd.key.visualdebugger.SourceElementId;
+import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 
 public class ITNode {
     private SourceElement activeStatement;
@@ -128,12 +130,14 @@ public class ITNode {
 
         if (activeStatement instanceof MethodBodyStatement) {
             final MethodBodyStatement mbs = (MethodBodyStatement) activeStatement;
-            // FIXME: do not lookup for method using Strings use the real AST objects instead
-            //        This is likely to break as soon as a method ending with sep is present
+            // FIXME: do not lookup for method using Strings use the real AST
+            // objects instead
+            // This is likely to break as soon as a method ending with sep is
+            // present
             if (mbs.getMethodReference().getMethodName().toString().endsWith(
                     "sep")) {
                 if (mbs.getArguments().size() > 1) { // is expression sep, no
-                                                        // statment sep
+                    // statment sep
                     this.expressionResultVar = (ProgramVariable) mbs
                             .getArguments().getExpression(1);
 
@@ -143,7 +147,7 @@ public class ITNode {
             }
         }
 
-        // FIXME: What happens here
+        // FIXME: What happens here?
         if (true)
             return false;
 
@@ -156,15 +160,15 @@ public class ITNode {
                 return false;
 
             if (mf.getProgramMethod().name().toString().endsWith("sep") // TODO
-                                                                        // remove
-                                                                        // taclet
-                                                                        // names...
-                                                                        // with
-                                                                        // special
-                                                                        // tacltes
-                                                                        // for
-                                                                        // sep,
-                                                                        // eg.
+                    // remove
+                    // taclet
+                    // names...
+                    // with
+                    // special
+                    // tacltes
+                    // for
+                    // sep,
+                    // eg.
                     && node.getAppliedRuleApp().rule().displayName().toString()
                             .equals("method_call_return"))
                 return true;
@@ -177,7 +181,6 @@ public class ITNode {
      * 
      * @return
      */
-
     private SourceElementId calcExprId() {
         if (parent != null && parent.getExprId() != null)
             this.lastExpressionId = parent;
@@ -197,11 +200,12 @@ public class ITNode {
 
             if (act != null && act instanceof MethodReference) {
                 MethodReference mr = (MethodReference) act;
-                // FIXME: do not lookup for method using Strings use the real AST objects instead
-                //        This is likely to break.
+                // FIXME: do not lookup for method using Strings use the real
+                // AST objects instead
+                // This is likely to break.
                 if (mr.getMethodName().toString().equals("sep")
                         && mr.getArgumentAt(0) instanceof IntLiteral) {// TODO
-                                                                        // sep(11,expr)
+                    // sep(11,expr)
 
                     if (node.getAppliedRuleApp() instanceof PosTacletApp) {
 
@@ -241,6 +245,7 @@ public class ITNode {
             final MethodBodyStatement mbs = (MethodBodyStatement) activeStatement;
             final String name = mbs.getMethodReference().getMethodName()
                     .toString();
+            // FIXME: do no use Strings to identify these methods
             if (name.startsWith("<alloc") || name.endsWith("sep")) {
                 return false; // no element added to method stack
             }
