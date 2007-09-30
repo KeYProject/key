@@ -1,12 +1,6 @@
 package visualdebugger.draw2d;
 
-import org.eclipse.draw2d.Border;
-import org.eclipse.draw2d.ColorConstants;
-import org.eclipse.draw2d.Figure;
-import org.eclipse.draw2d.Graphics;
-import org.eclipse.draw2d.Label;
-import org.eclipse.draw2d.LineBorder;
-import org.eclipse.draw2d.StackLayout;
+import org.eclipse.draw2d.*;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.swt.graphics.Color;
@@ -17,9 +11,9 @@ import de.uka.ilkd.key.logic.SLListOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IteratorOfProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.visualdebugger.ETMethodInvocationNode;
-import de.uka.ilkd.key.visualdebugger.ETNode;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
+import de.uka.ilkd.key.visualdebugger.executiontree.ETMethodInvocationNode;
+import de.uka.ilkd.key.visualdebugger.executiontree.ETNode;
 
 public class MethodInvocationFigure extends Figure {
 

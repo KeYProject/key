@@ -1,23 +1,11 @@
 package visualdebugger.draw2d;
 
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Set;
 
-import org.eclipse.draw2d.ColorConstants;
-import org.eclipse.draw2d.Figure;
-import org.eclipse.draw2d.Graphics;
-import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.Label;
-import org.eclipse.draw2d.LineBorder;
-import org.eclipse.draw2d.MarginBorder;
-import org.eclipse.draw2d.MouseListener;
-import org.eclipse.draw2d.PositionConstants;
-import org.eclipse.draw2d.ToolbarLayout;
+import org.eclipse.draw2d.*;
 import org.eclipse.draw2d.geometry.Insets;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
-import org.eclipse.draw2d.graph.Node;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -27,23 +15,15 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ArrayOfParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.logic.IteratorOfTerm;
 import de.uka.ilkd.key.logic.ListOfTerm;
 import de.uka.ilkd.key.logic.SLListOfTerm;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IteratorOfProgramVariable;
-import de.uka.ilkd.key.logic.op.ListOfProgramVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SetOfProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.visualdebugger.SymbolicArrayObject;
-import de.uka.ilkd.key.visualdebugger.SymbolicObject;
-import de.uka.ilkd.key.visualdebugger.SymbolicObjectDiagram;
-
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
+import de.uka.ilkd.key.visualdebugger.statevisualisation.SymbolicObject;
+import de.uka.ilkd.key.visualdebugger.statevisualisation.SymbolicObjectDiagram;
 
 public class ObjectFigure extends Figure{
     private Figure instanceName;

@@ -31,7 +31,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 import de.uka.ilkd.key.visualdebugger.*;
-
+import de.uka.ilkd.key.visualdebugger.executiontree.*;
 
 
 

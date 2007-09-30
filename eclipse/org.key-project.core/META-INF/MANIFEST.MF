@@ -124,5 +124,7 @@ Export-Package: de.uka.ilkd.asmkey.gui,
  de.uka.ilkd.key.util.make,
  de.uka.ilkd.key.util.pp,
  de.uka.ilkd.key.visualization,
- de.uka.ilkd.key.visualdebugger
+ de.uka.ilkd.key.visualdebugger,
+ de.uka.ilkd.key.visualdebugger.executiontree,
+ de.uka.ilkd.key.visualdebugger.statevisualisation
 Require-Bundle: KeYExternalLibraries

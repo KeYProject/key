@@ -43,6 +43,7 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.decproc.DecProcRunner;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.visualdebugger.*;
+import de.uka.ilkd.key.visualdebugger.executiontree.*;
 
 public class ExecutionTreeView extends ViewPart implements DebuggerListener {
     private static final boolean debug = false;
