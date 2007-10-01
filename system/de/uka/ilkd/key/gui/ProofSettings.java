@@ -13,8 +13,6 @@ import java.io.*;
 import java.net.URL;
 import java.util.*;
 
-import javax.swing.JMenuItem;
-
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.util.Debug;
@@ -60,20 +58,13 @@ public class ProofSettings {
 
     /** the default listener to settings */
     private ProofSettingsListener listener = new ProofSettingsListener();
-    /** is set to true if a setting object has changed but the proof
-     * settings have not been saved yet
-     */
-    private boolean changed;
 
-    /** the item displayed in the main options menu */
-    private JMenuItem proofSettingsItem;
     
     /** profile */
     private Profile profile;
 
     /** create a proof settings object */
     public ProofSettings() {       	
-	setChanged(false);
 	settings = new Settings[] {
             new StrategySettings(),
 	    new ModelSourceSettings(),
@@ -104,7 +95,6 @@ public class ProofSettings {
             settings[i].readSettings(result);
         }
         initialized = true;
-        setChanged(false);
         setProfile(toCopy.getProfile());
     }
 
@@ -115,22 +105,7 @@ public class ProofSettings {
 	    initialized=true;	
 	}
     }
-
     
-    /** returns the item displayed in the main options menu */
-    public JMenuItem item() {
-	if (proofSettingsItem == null) {
-	    proofSettingsItem = new JMenuItem("Save Settings");
-	    proofSettingsItem.setEnabled(changed);
-	}
-	return proofSettingsItem;
-    }
-    
-    /** sets the changed variable */
-    private void setChanged(boolean chg) {
-	changed = chg;
-	if (proofSettingsItem != null) proofSettingsItem.setEnabled(changed);
-    }
     
     public void setProfile(Profile profile) {
         ensureInitialized();
@@ -155,7 +130,6 @@ public class ProofSettings {
 	    s[i].writeSettings(result);
 	    }
 	    result.store(out, "Proof-Settings-Config-File");
-	    setChanged(false);
 	} catch (IOException e){
 	    System.err.println("Warning: could not save proof-settings.");
 	    System.err.println(e);
@@ -173,7 +147,7 @@ public class ProofSettings {
 	    }
 	    FileOutputStream out = 
 		new FileOutputStream(PROVER_CONFIG_FILE);
-        settingsToStream(settings,out);
+	    settingsToStream(settings,out);
 	} catch (IOException e){
 	    System.err.println("Warning: could not save proof-settings.");
 	    System.err.println(e);
@@ -187,40 +161,39 @@ public class ProofSettings {
         return new String(out.toByteArray());
     }
 
-    /** Used by loadSettings() and loadSettingsFromString(...) */
-    public void loadSettingsFromStream(InputStream in) {
-    Properties defaultProps = new Properties ();
-  
-    if ( PROVER_CONFIG_FILE_TEMPLATE == null )
-	    System.err.println
-	    ("Warning: default proof-settings file could not be found.");
-	else {
-	    try {
-	    defaultProps.load ( PROVER_CONFIG_FILE_TEMPLATE.openStream () );
-	    } catch (IOException e){
-	    System.err.println
-	        ("Warning: default proof-settings could not be loaded.");
-	    Debug.out(e);
+	/** Used by loadSettings() and loadSettingsFromString(...) */
+	public void loadSettingsFromStream(InputStream in) {
+	    Properties defaultProps = new Properties ();
+
+	    if ( PROVER_CONFIG_FILE_TEMPLATE == null )
+	        System.err.println
+	        ("Warning: default proof-settings file could not be found.");
+	    else {
+	        try {
+	            defaultProps.load ( PROVER_CONFIG_FILE_TEMPLATE.openStream () );
+	        } catch (IOException e){
+	            System.err.println
+	            ("Warning: default proof-settings could not be loaded.");
+	            Debug.out(e);
+	        }
 	    }
+
+	    Properties props = new Properties ( defaultProps );
+	    try {            
+	        props.load(in);
+	    } catch (IOException e){
+	        System.err.println
+	        ("Warning: no proof-settings could be loaded, using defaults");
+	        Debug.out(e);
+	    }
+
+	    for (int i = settings.length-1; i>=0 ;i--) { 
+	        settings[i].readSettings(props); 
+	    }
+
+	    initialized = true;
 	}
 
-    Properties props = new Properties ( defaultProps );
-    try {            
-        props.load(in);
-	} catch (IOException e){
-            System.err.println
-	    ("Warning: no proof-settings could be loaded, using defaults");
-	    Debug.out(e);
-	}
-
-    for (int i = settings.length-1; i>=0 ;i--) { 
-	    settings[i].readSettings(props); 
-	}
-    
-    initialized = true;
-    setChanged(false);
-
-    }
     /**
      * Loads the the former settings from configuration file.
      */
@@ -297,17 +270,6 @@ public class ProofSettings {
 	return (ViewSettings) settings[6];
     }
 
-    
-    /** returns true iff the settings have not been saved yet but a
-     * setting object has been changed 
-     * @return  true iff the settings have not been saved yet but a
-     * setting object has been changed
-     */
-    public boolean changed() {
-	return changed;
-    }
-
-
     private class ProofSettingsListener implements SettingsListener {
 	
 	ProofSettingsListener() {
@@ -318,7 +280,7 @@ public class ProofSettings {
 	 * @param e the Event sent to the listener
 	 */
 	public void settingsChanged(GUIEvent e) {	    
-	    setChanged(true);
+	    saveSettings();
 	}
 
     }

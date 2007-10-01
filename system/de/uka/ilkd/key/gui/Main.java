@@ -3002,14 +3002,7 @@ public class Main extends JFrame {
                     "\nopens after "+
                     "termination of the symbolic execution.</pre>");
             options.add(methodSelectionButton);
-            
-            ProofSettings.DEFAULT_SETTINGS.item().addActionListener
-                (new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        ProofSettings.DEFAULT_SETTINGS.saveSettings();
-                    }});
 
-//            options.add(ProofSettings.DEFAULT_SETTINGS.item());
             return options;
         }
         
