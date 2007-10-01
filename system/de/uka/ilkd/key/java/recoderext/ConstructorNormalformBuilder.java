@@ -212,7 +212,7 @@ public class ConstructorNormalformBuilder
 	    mods.add(new Public());
 	    parameters = new ParameterDeclarationArrayList(0);
 	    recThrows = null;
-	    body = new StatementBlock();	    
+	    body = null;    
 	} else {
 	    ConstructorDeclaration consDecl = (ConstructorDeclaration)cons;
 	    mods = (ModifierMutableList)
@@ -221,10 +221,15 @@ public class ConstructorNormalformBuilder
 		(ParameterDeclarationMutableList)consDecl.getParameters().deepClone();
 	    recThrows = (Throws) (consDecl.getThrown() == null ? null : 
 				  consDecl.getThrown().deepClone());
-	    body = (StatementBlock) consDecl.getBody().deepClone();
+            
+	    StatementBlock origBody = consDecl.getBody();
+            if(origBody == null) // may happen if a stub is defined with an empty constructor
+                body = null;
+            else
+                body = (StatementBlock) origBody.deepClone();
 	}
 
-	if (cd != javaLangObject) {
+	if (cd != javaLangObject && body != null) {
 	    // remember original first statement
 	    Statement first = body.getStatementCount() > 0 ?
 		body.getStatementAt(0) : null;

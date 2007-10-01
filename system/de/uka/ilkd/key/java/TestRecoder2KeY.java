@@ -103,7 +103,8 @@ public class TestRecoder2KeY extends TestCase {
 	" class circ2_A {   static final int a = circ2_B.b;   } " // This fails for an
 	+"class circ2_B {   static final int b = circ2_A.a;   }",  // unpatched recoder library
 	"class Cycle1 { void m(Cycle2 c) {} } "  // cyclic references as method arguments
-	+"class Cycle2 { void m(Cylce1 c) {} }"
+	+"class Cycle2 { void m(Cycle1 c) {} }",
+        "class EmptyConstr { EmptyConstr(); } "  // empty constructors for stubs 
     };
 
     /** removes blanks and line feeds from a given string*/
@@ -157,9 +158,14 @@ public class TestRecoder2KeY extends TestCase {
     }
 
     private void testClass(String is) {
-	c2k = new Recoder2KeY(TacletForTests.services(), new NamespaceSet());
-	CompilationUnit cu = c2k.readCompilationUnit(is);
-	
+        try {
+            c2k = new Recoder2KeY(TacletForTests.services(), new NamespaceSet());
+            CompilationUnit cu = c2k.readCompilationUnit(is);
+        } catch (RuntimeException e) {
+            System.err.println("An error occured while parsing: '" + is + "'");
+            throw e;
+        }
+
     }
 
   
