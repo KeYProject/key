@@ -834,7 +834,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             bindRuleSet ( d, "inEqSimp_nonLin", inftyConst () );
 
         // polynomial division, simplification of fractions and mods
-        bindRuleSet ( d, "polyDivision", -4100 );
+        bindRuleSet ( d, "polyDivision", -3600 );
 
     }
 
