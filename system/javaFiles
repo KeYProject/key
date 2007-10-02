@@ -226,6 +226,11 @@ de/uka/ilkd/asmkey/util/graph/TestGraphTraversal.java
 de/uka/ilkd/asmkey/util/graph/TestPathFinder.java
 de/uka/ilkd/asmkey/util/graph/TestTopologicalOrder.java
 de/uka/ilkd/asmkey/util/graph/TopologicalOrder.java
+de/uka/ilkd/hoare/gui/HoareLoopInvRuleMenuItem.java
+de/uka/ilkd/hoare/init/HoareProfile.java
+de/uka/ilkd/hoare/rule/HoareLoopInvRuleApp.java
+de/uka/ilkd/hoare/rule/HoareLoopInvariantRule.java
+de/uka/ilkd/hoare/strategy/HoareLoopInvariantRuleFilter.java
 de/uka/ilkd/key/ProverFacade.java
 de/uka/ilkd/key/casetool/Association.java
 de/uka/ilkd/key/casetool/AssociationEnd.java
@@ -635,6 +640,7 @@ de/uka/ilkd/key/logic/op/ListSV.java
 de/uka/ilkd/key/logic/op/Location.java
 de/uka/ilkd/key/logic/op/LocationVariable.java
 de/uka/ilkd/key/logic/op/LogicVariable.java
+de/uka/ilkd/key/logic/op/MetaBool2Logic.java
 de/uka/ilkd/key/logic/op/MetaOperator.java
 de/uka/ilkd/key/logic/op/Metavariable.java
 de/uka/ilkd/key/logic/op/ModalOperatorSV.java
@@ -834,6 +840,7 @@ de/uka/ilkd/key/pp/AbbrevException.java
 de/uka/ilkd/key/pp/AbbrevMap.java
 de/uka/ilkd/key/pp/AbstractAsmPrinter.java
 de/uka/ilkd/key/pp/ConstraintSequentPrintFilter.java
+de/uka/ilkd/key/pp/HoareLogicPrettyPrinter.java
 de/uka/ilkd/key/pp/InitialPositionTable.java
 de/uka/ilkd/key/pp/LogicPrinter.java
 de/uka/ilkd/key/pp/ModalityPositionTable.java
@@ -1020,6 +1027,7 @@ de/uka/ilkd/key/proof/init/EnsuresPO.java
 de/uka/ilkd/key/proof/init/EnsuresPostPO.java
 de/uka/ilkd/key/proof/init/EnvInput.java
 de/uka/ilkd/key/proof/init/ExecSVC.java
+de/uka/ilkd/key/proof/init/HoareUserProblemFile.java
 de/uka/ilkd/key/proof/init/Includes.java
 de/uka/ilkd/key/proof/init/InitConfig.java
 de/uka/ilkd/key/proof/init/InvariantSelectionStrategy.java
@@ -1451,6 +1459,7 @@ de/uka/ilkd/key/strategy/FIFOStrategy.java
 de/uka/ilkd/key/strategy/FOLStrategy.java
 de/uka/ilkd/key/strategy/FindTacletAppContainer.java
 de/uka/ilkd/key/strategy/FocussedRuleApplicationManager.java
+de/uka/ilkd/key/strategy/HoareStrategy.java
 de/uka/ilkd/key/strategy/JavaCardDLStrategy.java
 de/uka/ilkd/key/strategy/LongRuleAppCost.java
 de/uka/ilkd/key/strategy/NoFindTacletAppContainer.java
