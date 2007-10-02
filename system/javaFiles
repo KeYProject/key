@@ -617,9 +617,6 @@ de/uka/ilkd/key/logic/op/AttributeOp.java
 de/uka/ilkd/key/logic/op/CastFunctionSymbol.java
 de/uka/ilkd/key/logic/op/ComputeSpecOp.java
 de/uka/ilkd/key/logic/op/ConstructorFunction.java
-de/uka/ilkd/key/logic/op/DecisionProcedureICSOp.java
-de/uka/ilkd/key/logic/op/DecisionProcedureSimplifyOp.java
-de/uka/ilkd/key/logic/op/DecisionProcedureSmtAufliaOp.java
 de/uka/ilkd/key/logic/op/Equality.java
 de/uka/ilkd/key/logic/op/ExactInstanceSymbol.java
 de/uka/ilkd/key/logic/op/ExpressionOperator.java
@@ -940,10 +937,13 @@ de/uka/ilkd/key/proof/decproc/DecisionProcedureCVC3.java
 de/uka/ilkd/key/proof/decproc/DecisionProcedureCVCLite.java
 de/uka/ilkd/key/proof/decproc/DecisionProcedureDummyTranslation.java
 de/uka/ilkd/key/proof/decproc/DecisionProcedureICS.java
+de/uka/ilkd/key/proof/decproc/DecisionProcedureICSOp.java
 de/uka/ilkd/key/proof/decproc/DecisionProcedureResult.java
 de/uka/ilkd/key/proof/decproc/DecisionProcedureSVC.java
 de/uka/ilkd/key/proof/decproc/DecisionProcedureSimplify.java
+de/uka/ilkd/key/proof/decproc/DecisionProcedureSimplifyOp.java
 de/uka/ilkd/key/proof/decproc/DecisionProcedureSmtAuflia.java
+de/uka/ilkd/key/proof/decproc/DecisionProcedureSmtAufliaOp.java
 de/uka/ilkd/key/proof/decproc/DecisionProcedureTranslationFactory.java
 de/uka/ilkd/key/proof/decproc/DecisionProcedureYices.java
 de/uka/ilkd/key/proof/decproc/ICSTranslation.java

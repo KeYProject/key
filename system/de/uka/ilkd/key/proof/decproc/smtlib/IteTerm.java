@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.proof.decproc.smtlib;
 
-import de.uka.ilkd.key.logic.op.DecisionProcedureSmtAufliaOp;
+import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAufliaOp;
 
 
 /** Represents an if-then-else (ite) construct for terms as defined in the SMT-Lib 

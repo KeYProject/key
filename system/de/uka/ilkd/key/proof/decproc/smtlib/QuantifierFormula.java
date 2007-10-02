@@ -13,7 +13,7 @@ package de.uka.ilkd.key.proof.decproc.smtlib;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.op.DecisionProcedureSmtAufliaOp;
+import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAufliaOp;
 
 /** Represents a quantified formula as defined in the SMT-Lib specification, and specialized in
  * the (QF_)AUFLIA sublogic.<br>

@@ -10,10 +10,11 @@
 
 package de.uka.ilkd.key.proof.decproc.smtlib;
 
-import de.uka.ilkd.key.logic.op.DecisionProcedureSmtAufliaOp;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
+
+import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAufliaOp;
 
 
 /** Represents a signature for the uninterpreted terms and formulae of the SMT-Lib specification
