@@ -26,26 +26,12 @@ public class SourceElementId {
 
     }
     
-    public SourceElementId(String cl, int id,boolean isStatement) {
-        this(cl,id);
-        this.isStatement = isStatement;
-    }
-    
-    public SourceElementId(String cl, String id,boolean isStatement) {
-        this(cl,id);
-        this.isStatement=isStatement;
-
-    }
-    
     public SourceElementId(String cl, String id,boolean isStatement,boolean isBoolean) {
         this(cl,id);
-        this.isStatement=isStatement;
-        this.isBoolean=isBoolean;
+        this.isStatement = isStatement;
+        this.isBoolean   = isBoolean;
     }
     
-    public SourceElementId(int id) {
-        this("", id);
-    }
 
     public SourceElementId(String id) {
         this("", new Integer(id).intValue());

@@ -236,16 +236,13 @@ public class ProblemInitializer {
             final String fileName = (String) entry.getKey();
             final Boolean  sel =  (Boolean) entry.getValue();
             if (sel.booleanValue()) {
-                File file;
+                RuleSource rs;
                 if (!fileName.startsWith(File.separator)) {
-                    KeYResourceManager rm = KeYResourceManager.getManager();
-                    URL url = rm.getResourceFile(RuleSource.class,
-                                                path+fileName);
-                    file = new File(url.getFile());
+                    rs = RuleSource.initRuleFile(path+fileName);
                 } else {
-                    file = new File(fileName);
+                    rs = RuleSource.initRuleFile(fileName);
                 }
-                KeYFile keyFile = new KeYFile(fileName, file, 
+                KeYFile keyFile = new KeYFile(fileName, rs, 
                             (main == null) ? null : main
                         .getProgressMonitor());
                 readEnvInput(keyFile, initConfig);
@@ -328,11 +325,12 @@ public class ProblemInitializer {
         
 	if(javaPath != null) {
     	    //read Java	
-    	    reportStatus("Reading Java model");
+            reportStatus("Reading Java model");
             ProjectSettings settings = 
                 initConfig.getServices().getJavaInfo().getKeYProgModelInfo()
                 	      .getServConf().getProjectSettings();
             PathList searchPathList = settings.getSearchPathList();
+            
             
             if(searchPathList.find(javaPath) == null) {
                 searchPathList.add(javaPath);

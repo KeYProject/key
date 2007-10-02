@@ -563,7 +563,13 @@ public class ProofTreeView extends JPanel {
 						      boolean expanded,
 						      boolean leaf,
 						      int row,
-						      boolean hasFocus) {	    
+						      boolean hasFocus) {
+	    if (proof == null) {
+	        // print dummy tree;
+	        return super.getTreeCellRendererComponent(tree, value, sel, 
+	                expanded, leaf, row, hasFocus);
+	    }
+	    
             if (!(value instanceof GUIProofTreeNode)) {
 		super.getTreeCellRendererComponent
 		    (tree, value, sel, expanded, leaf, row, hasFocus);

@@ -2,12 +2,17 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.visualdebugger.HashMapFromPosInOccurrenceToLabel;
 import de.uka.ilkd.key.visualdebugger.PCLabel;
 
 
 
 public class LabelFeature extends BinaryFeature {
+    
+    public static final LabelFeature INSTANCE = new LabelFeature();
     
     private LabelFeature(){        
     }
@@ -16,25 +21,28 @@ public class LabelFeature extends BinaryFeature {
         if (goal.node().root())
             return false;
 
-        if (goal.node().parent().getAppliedRuleApp().posInOccurrence()==null)
+        final Node parent = goal.node().parent();
+        final RuleApp previouslyAppliedRuleApp = parent.getAppliedRuleApp();
+        if (previouslyAppliedRuleApp.posInOccurrence()==null)
             return false;
 
-        PosInOccurrence pio = goal.node().parent().getAppliedRuleApp().posInOccurrence().topLevel();
-        if( goal.node().parent().getNodeInfo().getVisualDebuggerState().getLabels().containsKey(pio)){
-            if (((PCLabel)goal.node().parent().getNodeInfo().getVisualDebuggerState().getLabels().get(pio)).isLooking())
+        final PosInOccurrence pio = previouslyAppliedRuleApp.posInOccurrence().topLevel();
+        
+        final NodeInfo nodeInfo = parent.getNodeInfo();
+        final HashMapFromPosInOccurrenceToLabel debugLabels = 
+            nodeInfo.getVisualDebuggerState().getLabels();
+        
+        if( debugLabels.containsKey(pio)){
+            if (((PCLabel)debugLabels.get(pio)).isLooking()) {
                 return true;
-            if( goal.node().parent().getNodeInfo().getActiveStatement()!=null)
+            }
+            if( nodeInfo.getActiveStatement()!=null) {
                 return true; //TODO act statement in prog mod
-
+            }
         }
 
         return false;
     }
-    
-    public static LabelFeature create(){
-        return new LabelFeature();
-    }
-
 }
 
 

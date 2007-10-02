@@ -65,8 +65,11 @@ public class BreakpointManager {
     }
 
 
-    public boolean suspendByStep(Node n, SourceElementId id){      
-        return n.parent().getNodeInfo().getVisualDebuggerState().getStatementIdcount()==0;                
+    public boolean suspendByStep(Node n, SourceElementId id){  
+        if (n.parent() != null) {
+            return n.parent().getNodeInfo().getVisualDebuggerState().getStatementIdcount()==0;
+        } 
+        return false;
     }
 
     public boolean suspendByStepOver(Node n, SourceElementId id) {   

@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="KeYPlugin" default="build.jars" basedir=".">
 
-
-	<!-- $Format: "<property name=\"version\" value=\"1.$ProjectVersion$\"/>"$ -->
-<property name="version" value="1.hoareWithUpdates.17"/>
-
-
 	<property name="basews" value="${ws}" />
 	<property name="baseos" value="${os}" />
 	<property name="basearch" value="${arch}" />
 	<property name="basenl" value="${nl}" />
 
 	<property environment="env" />
+
 	<!-- Compiler settings. -->
 	<property name="javacFailOnError" value="false" />
 	<property name="javacDebugInfo" value="on" />
@@ -79,7 +75,7 @@
 		<antcall target="gather.bin.parts">
 			<param name="destination.temp.folder" value="${temp.folder}/" />
 		</antcall>
-		<zip destfile="${plugin.destination}/KeYPlugin_${version}.jar" basedir="${temp.folder}/KeYPlugin_${version}" filesonly="false" whenempty="skip" update="false" />
+		<zip destfile="${plugin.destination}/KeYPlugin_${env.KEY_VERSION_SHORT}.jar" basedir="${temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" filesonly="false" whenempty="skip" update="false" />
 		<delete dir="${temp.folder}" />
 	</target>
 
@@ -119,11 +115,11 @@
 	</target>
 
 	<target name="gather.bin.parts" depends="init" if="destination.temp.folder">
-		<mkdir dir="${destination.temp.folder}/KeYPlugin_${version}" />
-		<copy todir="${destination.temp.folder}/KeYPlugin_${version}" failonerror="true" overwrite="false">
+		<mkdir dir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" />
+		<copy todir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false">
 			<fileset dir="${build.result.folder}" includes="KeYPlugin.jar" />
 		</copy>
-		<copy todir="${destination.temp.folder}/KeYPlugin_${version}" failonerror="true" overwrite="false">
+		<copy todir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false">
 			<fileset dir="${basedir}" includes="plugin.xml,README,META-INF/, key-small.png,KeYPlugin.jar,jars/" />
 		</copy>
 	</target>
@@ -132,23 +128,23 @@
 	</target>
 
 	<target name="gather.sources" depends="init" if="destination.temp.folder">
-		<mkdir dir="${destination.temp.folder}/KeYPlugin_${version}" />
-		<copy file="${build.result.folder}/KeYPluginsrc.zip" todir="${destination.temp.folder}/KeYPlugin_${version}" failonerror="false" overwrite="false" />
-		<copy todir="${destination.temp.folder}/KeYPlugin_${version}" failonerror="false" overwrite="false">
+		<mkdir dir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" />
+		<copy file="${build.result.folder}/KeYPluginsrc.zip" todir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" failonerror="false" overwrite="false" />
+		<copy todir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" failonerror="false" overwrite="false">
 			<fileset dir="${basedir}" includes="src/,jars/antlr.jar,jars/dresden-ocl-demo.jar,jars/jargs.jar,jars/javacc.jar,jars/jcoverage.jar,jars/junit.jar,jars/log4j.jar,jars/recoder.jar,jars/xerces.jar,plugin.xml,README,META-INF/,key-small.png" />
 		</copy>
 	</target>
 
 	<target name="gather.logs" depends="init" if="destination.temp.folder">
-		<mkdir dir="${destination.temp.folder}/KeYPlugin_${version}" />
-		<copy file="${temp.folder}/KeYPlugin.jar.bin.log" todir="${destination.temp.folder}/KeYPlugin_${version}" failonerror="false" overwrite="false" />
+		<mkdir dir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" />
+		<copy file="${temp.folder}/KeYPlugin.jar.bin.log" todir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" failonerror="false" overwrite="false" />
 	</target>
 
 	<target name="clean" depends="init" description="Clean the plug-in: KeYPlugin of all the zips, jars and logs created.">
 		<delete file="${build.result.folder}/KeYPlugin.jar" />
 		<delete file="${build.result.folder}/KeYPluginsrc.zip" />
-		<delete file="${plugin.destination}/KeYPlugin_${version}.jar" />
-		<delete file="${plugin.destination}/KeYPlugin_${version}.zip" />
+		<delete file="${plugin.destination}/KeYPlugin_${env.KEY_VERSION_SHORT}.jar" />
+		<delete file="${plugin.destination}/KeYPlugin_${env.KEY_VERSION_SHORT}.zip" />
 		<delete dir="${temp.folder}" />
 	</target>
 
@@ -171,7 +167,7 @@
 		<delete>
 			<fileset dir="${temp.folder}" includes="**/*.bin.log" />
 		</delete>
-		<zip destfile="${plugin.destination}/KeYPlugin_${version}.zip" basedir="${temp.folder}" filesonly="true" whenempty="skip" update="false" />
+		<zip destfile="${plugin.destination}/KeYPlugin_${env.KEY_VERSION_SHORT}.zip" basedir="${temp.folder}" filesonly="true" whenempty="skip" update="false" />
 		<delete dir="${temp.folder}" />
 	</target>
 
