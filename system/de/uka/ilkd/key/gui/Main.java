@@ -1415,12 +1415,17 @@ public class Main extends JFrame {
 
  	// listen to the state of the assistant in order to hold the
  	// item and state consistent
- 	assistant.addChangeListener(new ChangeListener() {
- 		public void stateChanged(ChangeEvent e) {
- 		    assistantOption.setSelected
- 			(((ProofAssistantController)e.getSource()).getState());
- 		}
- 	    });
+	assistant.addChangeListener(new ChangeListener() {
+	    public void stateChanged(ChangeEvent e) {
+	        final boolean assistentEnabled = 
+                    ((ProofAssistantController)e.getSource()).getState();
+	        assistantOption.setSelected(assistentEnabled);
+	        // setSelected does not trigger an action event so we have
+	        // to make the change explicitly permanent
+	        ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().
+	        setProofAssistantMode(assistentEnabled);
+	    }
+	});
 
 	assistantOption.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent e) {
@@ -1430,9 +1435,7 @@ public class Main extends JFrame {
 	    }});
 
 	registerAtMenu(options, assistantOption);
-	
-	addSeparator(options);
-        
+	        
         return options;
     }
 
