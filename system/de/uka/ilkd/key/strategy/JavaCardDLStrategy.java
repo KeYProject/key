@@ -1717,20 +1717,56 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         final TermBuffer denomLC = new TermBuffer ();
         final TermBuffer numTerm = new TermBuffer ();
+        final TermBuffer left = new TermBuffer (), right = new TermBuffer ();
+        final TermBuffer equation = new TermBuffer ();
+        
+        final Feature instCoeff =
+            add ( instantiate ( "polyDivCoeff",
+                                ReduceMonomialsProjection.create ( numTerm, denomLC ) ),
+                  inftyConst () );
+        
+        // exact polynomial division
         
         final Feature checkNumTerm =
             ifZero ( add ( not ( applyTF ( numTerm, tf.addF ) ),
                            ReducibleMonomialsFeature.createReducible ( numTerm,
                                                                        denomLC ) ),
-                     add ( instantiate ( "polyDivCoeff",
-                                         ReduceMonomialsProjection
-                                                  .create ( numTerm, denomLC ) ),
-                           inftyConst () ) );
+                     instCoeff );
 
         final Feature isReduciblePoly =
             sum ( numTerm,
                   SubtermGenerator.rightTraverse ( instOf ( "divNum" ), tf.addF ),
                   checkNumTerm );
+        
+        // polynomial division modulo one equation of the antecedent
+        
+        final Feature checkNumTermE =
+            ifZero ( add ( not ( applyTF ( numTerm, tf.addF ) ),
+                           ReducibleMonomialsFeature.createDivides ( numTerm,
+                                                                     denomLC ) ),
+                     instCoeff );
+
+        final Feature applyEqAndCheck =
+            ifZero ( ReducibleMonomialsFeature.createDivides ( numTerm, right ),
+                     let ( numTerm,
+                           opTerm ( tf.mul,
+                                    ReduceMonomialsProjection.create ( numTerm, right ),
+                                    left ),
+                           checkNumTermE ) );
+        
+        final Feature isReduciblePolyE =
+            sum ( numTerm,
+                  SubtermGenerator.rightTraverse ( instOf ( "divNum" ), tf.addF ),
+                  sum ( equation,
+                        SequentFormulasGenerator.antecedent (),
+                        ifZero ( applyTF ( equation, tf.monomialEquation ),
+                                 add ( let ( left, sub ( equation, 0 ),
+                                       let ( right, sub ( equation, 1 ),                              
+                                             applyEqAndCheck ) ),
+                                       let ( left, sub ( equation, 1 ),
+                                       let ( right, sub ( equation, 0 ),                              
+                                             applyEqAndCheck ) )
+                        ) ) ) );
         
         bindRuleSet ( d, "defOps_divModPullOut",
            SumFeature.createSum ( new Feature[] {
@@ -1740,7 +1776,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
              applyTF ( "divDenom", tf.polynomial ),
              ifZero ( applyTF ( "divDenom", tf.addF ),
                       let ( denomLC, sub ( instOf ( "divDenom" ), 1 ),
-                            not ( isReduciblePoly ) ),
+                            ifZero ( add ( isReduciblePoly, isReduciblePolyE ),
+                                     longConst ( -POLY_DIVISION_COST ) ) ) ),
                       let ( denomLC, instOf ( "divDenom" ),
                             not ( isReduciblePoly ) ) ),
              longConst ( 100 ) } ) );
@@ -1988,6 +2025,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                   add ( intF, polynomial ) );
             linearEquation = opSub ( eq, linearMonomial,
                                      add ( intF, polynomial ) );
+            monomialEquation = opSub ( eq, add ( intF, nonNegMonomial ),
+                                       add ( intF, monomial ) );
             intInEquation = add ( or ( leqF, geqF ),
                                   sub ( nonNegMonomial, polynomial ) );
             linearInEquation = add ( or ( leqF, geqF ),
@@ -2056,6 +2095,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         final TermFeature intEquation;
         final TermFeature linearEquation;
+        final TermFeature monomialEquation;
         final TermFeature intInEquation;
         final TermFeature linearInEquation;
         final TermFeature intRelation;
