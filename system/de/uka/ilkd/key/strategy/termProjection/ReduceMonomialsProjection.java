@@ -21,11 +21,11 @@ import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 /**
  * Projection for dividing one monomial by another.
  */
-public class DivideMonomialsProjection implements ProjectionToTerm {
+public class ReduceMonomialsProjection implements ProjectionToTerm {
 
     private final ProjectionToTerm dividend, divisor;
 
-    private DivideMonomialsProjection(ProjectionToTerm dividend,
+    private ReduceMonomialsProjection(ProjectionToTerm dividend,
                                       ProjectionToTerm divisor) {
         this.dividend = dividend;
         this.divisor = divisor;
@@ -33,7 +33,7 @@ public class DivideMonomialsProjection implements ProjectionToTerm {
 
     public static ProjectionToTerm create(ProjectionToTerm dividend,
                                           ProjectionToTerm divisor) {
-        return new DivideMonomialsProjection ( dividend, divisor );
+        return new ReduceMonomialsProjection ( dividend, divisor );
     }
     
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
@@ -44,6 +44,6 @@ public class DivideMonomialsProjection implements ProjectionToTerm {
         final Monomial mDividend = Monomial.create ( dividendT, services );
         final Monomial mDivisor = Monomial.create ( divisorT, services );
 
-        return mDivisor.divide ( mDividend ).toTerm ( services );
+        return mDivisor.reduce ( mDividend ).toTerm ( services );
     }
 }

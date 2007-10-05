@@ -121,7 +121,7 @@ public class Monomial {
      * @return the result of dividing the monomial <code>m</code> by the
      *         monomial <code>this</code>
      */
-    public Monomial divide(Monomial m) {
+    public Monomial reduce(Monomial m) {
         final BigInteger a = m.coefficient;
         final BigInteger c = this.coefficient;
 
