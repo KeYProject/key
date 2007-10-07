@@ -462,10 +462,9 @@ dist_src: distclean branding javaFiles
 ## clean
 clean:
 	@echo [deleting generated .java-files]
-	@(cat argfile.generic | xargs -n 1 rm -f )2>error.msg
+	@/bin/rm -rf $(GENERATED_SRC_PATH)
 	@echo [deleting binaries]
 	@/bin/rm -rf $(BINARYPATH)
-	@/bin/rm -rf $(GENERATED_SRC_PATH)
 
 #help files of the makefile (without the GenMakefile)
 
@@ -710,7 +709,7 @@ GenMakefile:;
 sinclude GenMakefile
 
 %.java: $(BINARYPATH)$(PFX)util/make/GenericParser.class
-	@$(JAVA) -cp $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH) de.uka.ilkd.key.util.make.GenericParser GenMakefile argfile.generic $(JAVAFILES)
+	@$(JAVA) -cp $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH) de.uka.ilkd.key.util.make.GenericParser $(GENERATED_SRC_PATH) GenMakefile argfile.generic $(JAVAFILES)
 	@$(MAKE) -s -w -f GenMakefile $@ >msg.txt
 
 
