@@ -804,7 +804,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     ////////////////////////////////////////////////////////////////////////////
 
     private static final int IN_EQ_SIMP_NON_LIN_COST = 1000;
-    private static final int POLY_DIVISION_COST = -3600;
+    private static final int POLY_DIVISION_COST = -2250;
     
     private void setupArithPrimaryCategories(RuleSetDispatchFeature d) {
         // Gaussian elimination + Euclidian algorithm for linear equations;
@@ -815,7 +815,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "polySimp_directEquations", -3000 );
         bindRuleSet ( d, "polySimp_pullOutGcd", -2250 );
         bindRuleSet ( d, "polySimp_leftNonUnit", -2000 );
-        bindRuleSet ( d, "polySimp_saturate", -1500 );
+        bindRuleSet ( d, "polySimp_saturate", 0 );
 
         // Omega test for handling linear arithmetic and inequalities over the
         // integers; cross-multiplication + case distinctions for nonlinear
@@ -1721,20 +1721,16 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermBuffer equation = new TermBuffer ();
         final TermBuffer divCoeff = new TermBuffer ();
         
-        final Feature instCoeff =
-            let ( divCoeff, ReduceMonomialsProjection.create ( numTerm, denomLC ),
-                  ifZero ( eq ( divCoeff, FocusProjection.create ( 0 ) ),
-                           longConst ( 0 ),
-                           add ( instantiate ( "polyDivCoeff", divCoeff ),
-                                 inftyConst () ) ) );
-        
         // exact polynomial division
         
         final Feature checkNumTerm =
             ifZero ( add ( not ( applyTF ( numTerm, tf.addF ) ),
-                           ReducibleMonomialsFeature.createReducible ( numTerm,
-                                                                       denomLC ) ),
-                     instCoeff );
+                           ReducibleMonomialsFeature
+                                       .createReducible ( numTerm, denomLC ) ),
+                     add ( instantiate ( "polyDivCoeff",
+                                         ReduceMonomialsProjection
+                                                .create ( numTerm, denomLC )),
+                           inftyConst () ) );
 
         final Feature isReduciblePoly =
             sum ( numTerm,
@@ -1745,7 +1741,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         final Feature checkNumTermE =
             ifZero ( ReducibleMonomialsFeature.createDivides ( numTerm, denomLC ),
-                     instCoeff );
+                     let ( divCoeff,
+                           ReduceMonomialsProjection.create ( numTerm, denomLC ),
+                           ifZero ( TermSmallerThanFeature
+                                      .create ( divCoeff,
+                                                FocusProjection.create ( 0 ) ),
+                                    add ( instantiate ( "polyDivCoeff", divCoeff ),
+                                          inftyConst () ) ) ) );
 
         final Feature applyEqAndCheck =
             ifZero ( ReducibleMonomialsFeature.createDivides ( numTerm, right ),
@@ -1753,7 +1755,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                            opTerm ( tf.mul,
                                     ReduceMonomialsProjection.create ( numTerm, right ),
                                     left ),
-                           add ( println(numTerm), checkNumTermE ) ) );
+                           checkNumTermE ) );
         
         final Feature isReduciblePolyE =
             sum ( numTerm,
@@ -1763,8 +1765,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                            sum ( equation,
                                  SequentFormulasGenerator.antecedent (),
                                  ifZero ( applyTF ( equation, tf.monomialEquation ),
-                                          add ( println(equation),
-                                                let ( left, sub ( equation, 0 ),
+                                          add ( let ( left, sub ( equation, 0 ),
                                                 let ( right, sub ( equation, 1 ),                              
                                                       applyEqAndCheck ) ),
                                                 let ( left, sub ( equation, 1 ),
