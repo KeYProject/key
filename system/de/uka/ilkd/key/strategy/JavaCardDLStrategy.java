@@ -1719,11 +1719,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermBuffer numTerm = new TermBuffer ();
         final TermBuffer left = new TermBuffer (), right = new TermBuffer ();
         final TermBuffer equation = new TermBuffer ();
+        final TermBuffer divCoeff = new TermBuffer ();
         
         final Feature instCoeff =
-            add ( instantiate ( "polyDivCoeff",
-                                ReduceMonomialsProjection.create ( numTerm, denomLC ) ),
-                  inftyConst () );
+            let ( divCoeff, ReduceMonomialsProjection.create ( numTerm, denomLC ),
+                  ifZero ( eq ( divCoeff, FocusProjection.create ( 0 ) ),
+                           longConst ( 0 ),
+                           add ( instantiate ( "polyDivCoeff", divCoeff ),
+                                 inftyConst () ) ) );
         
         // exact polynomial division
         
@@ -1741,9 +1744,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // polynomial division modulo one equation of the antecedent
         
         final Feature checkNumTermE =
-            ifZero ( add ( not ( applyTF ( numTerm, tf.addF ) ),
-                           ReducibleMonomialsFeature.createDivides ( numTerm,
-                                                                     denomLC ) ),
+            ifZero ( ReducibleMonomialsFeature.createDivides ( numTerm, denomLC ),
                      instCoeff );
 
         final Feature applyEqAndCheck =
@@ -1752,21 +1753,24 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                            opTerm ( tf.mul,
                                     ReduceMonomialsProjection.create ( numTerm, right ),
                                     left ),
-                           checkNumTermE ) );
+                           add ( println(numTerm), checkNumTermE ) ) );
         
         final Feature isReduciblePolyE =
             sum ( numTerm,
                   SubtermGenerator.rightTraverse ( instOf ( "divNum" ), tf.addF ),
-                  sum ( equation,
-                        SequentFormulasGenerator.antecedent (),
-                        ifZero ( applyTF ( equation, tf.monomialEquation ),
-                                 add ( let ( left, sub ( equation, 0 ),
-                                       let ( right, sub ( equation, 1 ),                              
-                                             applyEqAndCheck ) ),
-                                       let ( left, sub ( equation, 1 ),
-                                       let ( right, sub ( equation, 0 ),                              
-                                             applyEqAndCheck ) )
-                        ) ) ) );
+                  ifZero ( applyTF ( numTerm, tf.addF ),
+                           longConst ( 0 ),
+                           sum ( equation,
+                                 SequentFormulasGenerator.antecedent (),
+                                 ifZero ( applyTF ( equation, tf.monomialEquation ),
+                                          add ( println(equation),
+                                                let ( left, sub ( equation, 0 ),
+                                                let ( right, sub ( equation, 1 ),                              
+                                                      applyEqAndCheck ) ),
+                                                let ( left, sub ( equation, 1 ),
+                                                let ( right, sub ( equation, 0 ),                              
+                                                      applyEqAndCheck ) )
+                        ) ) ) ) );
         
         bindRuleSet ( d, "defOps_divModPullOut",
            SumFeature.createSum ( new Feature[] {
@@ -1776,10 +1780,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
              applyTF ( "divDenom", tf.polynomial ),
              ifZero ( applyTF ( "divDenom", tf.addF ),
                       let ( denomLC, sub ( instOf ( "divDenom" ), 1 ),
+                            not ( isReduciblePoly ) ),
+                      let ( denomLC, instOf ( "divDenom" ),
                             ifZero ( add ( isReduciblePoly, isReduciblePolyE ),
                                      longConst ( -POLY_DIVISION_COST ) ) ) ),
-                      let ( denomLC, instOf ( "divDenom" ),
-                            not ( isReduciblePoly ) ) ),
              longConst ( 100 ) } ) );
         
     }

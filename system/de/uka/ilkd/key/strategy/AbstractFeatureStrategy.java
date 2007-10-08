@@ -326,6 +326,10 @@ public abstract class AbstractFeatureStrategy implements Strategy {
         return let ( buf, t1, applyTF ( t2, eq ( buf ) ) );
     }
     
+    protected Feature println(ProjectionToTerm t) {
+        return applyTF ( t, PrintTermFeature.INSTANCE );
+    }
+    
     protected TermFeature extendsTrans(Sort s) {
         return SortExtendsTransTermFeature.create ( s );
     }
