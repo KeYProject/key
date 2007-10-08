@@ -20,10 +20,10 @@ import org.apache.log4j.Logger;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.op.DecisionProcedureSmtAufliaOp;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAufliaOp;
 import de.uka.ilkd.key.proof.decproc.SmtAufliaTranslation;
 import de.uka.ilkd.key.proof.decproc.smtlib.*;
 

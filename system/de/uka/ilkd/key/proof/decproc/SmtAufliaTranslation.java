@@ -15,7 +15,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.DecisionProcedureSmtAufliaOp;
+import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAufliaOp;
 import de.uka.ilkd.key.proof.decproc.smtlib.Benchmark;
 import de.uka.ilkd.key.proof.decproc.smtlib.ConnectiveFormula;
 import de.uka.ilkd.key.proof.decproc.smtlib.Formula;

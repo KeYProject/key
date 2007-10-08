@@ -443,7 +443,7 @@ jar:	all
 	@jar cfm key.jar resources/MANIFEST.MF -C binary/ .
 
 .PHONY: dist_src
-dist_src: branding distclean
+dist_src: distclean branding javaFiles
 	@rm -rf /tmp/keydist-$(USER)
 	@echo "[creating source archive]"
 	@mkdir -p /tmp/keydist-$(USER)
@@ -462,14 +462,13 @@ dist_src: branding distclean
 ## clean
 clean:
 	@echo [deleting generated .java-files]
-	@(cat argfile.generic | xargs -n 1 rm -f )2>error.msg
+	@/bin/rm -rf $(GENERATED_SRC_PATH)
 	@echo [deleting binaries]
 	@/bin/rm -rf $(BINARYPATH)
-	@/bin/rm -rf $(GENERATED_SRC_PATH)
 
 #help files of the makefile (without the GenMakefile)
 
-	@rm -f javaFiles.tmp
+	@rm -f javaFiles
 	@rm -f unit_manager.log 
 	@rm -f msg.txt
 	@rm -f argfile.aspects
@@ -492,6 +491,7 @@ realclean: clean
 
 .PHONY: distclean
 distclean: realclean
+	@rm -f setup.jar
 	@rm -f key.jar
 	@rm -f KeY.tgz
 	@rm -f keySource.tgz
@@ -551,15 +551,14 @@ else
 	@./brandFeatureSite.sh ../eclipse/KeYFeature/site.xml $(KEY_VERSION_SHORT)
 endif
 
-javaFiles.tmp: javaFiles
+javaFiles: 
 ifneq ("$(GIT)","")
 	@git ls-files | grep ".java" | grep -v "aspects" | grep -v "gjava" | grep -v ".java." | grep -v "resources/" | sort > javaFiles
 endif
-	@cat javaFiles > javaFiles.tmp
 
-argfile.normal: javaFiles.tmp
+argfile.normal: javaFiles
 	@echo [Collecting Java files to compile]
-	@cat javaFiles.tmp > argfile.normal
+	@cat javaFiles > argfile.normal
 	@echo "TestKey.java" >> argfile.normal 
 ## make gjava -> java
 
@@ -710,7 +709,7 @@ GenMakefile:;
 sinclude GenMakefile
 
 %.java: $(BINARYPATH)$(PFX)util/make/GenericParser.class
-	@$(JAVA) -cp $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH) de.uka.ilkd.key.util.make.GenericParser GenMakefile argfile.generic $(JAVAFILES)
+	@$(JAVA) -cp $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH) de.uka.ilkd.key.util.make.GenericParser $(GENERATED_SRC_PATH) GenMakefile argfile.generic $(JAVAFILES)
 	@$(MAKE) -s -w -f GenMakefile $@ >msg.txt
 
 
