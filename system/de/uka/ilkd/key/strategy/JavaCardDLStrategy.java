@@ -1717,8 +1717,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         final TermBuffer denomLC = new TermBuffer ();
         final TermBuffer numTerm = new TermBuffer ();
-        final TermBuffer left = new TermBuffer (), right = new TermBuffer ();
-        final TermBuffer equation = new TermBuffer ();
         final TermBuffer divCoeff = new TermBuffer ();
         
         // exact polynomial division
@@ -1739,39 +1737,21 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         // polynomial division modulo one equation of the antecedent
         
-        final Feature checkNumTermE =
-            ifZero ( ReducibleMonomialsFeature.createDivides ( numTerm, denomLC ),
-                     let ( divCoeff,
-                           ReduceMonomialsProjection.create ( numTerm, denomLC ),
-                           ifZero ( TermSmallerThanFeature
-                                      .create ( divCoeff,
-                                                FocusProjection.create ( 0 ) ),
-                                    add ( instantiate ( "polyDivCoeff", divCoeff ),
-                                          inftyConst () ) ) ) );
+        final Feature checkCoeffE =
+            ifZero ( TermSmallerThanFeature
+                             .create ( divCoeff, FocusProjection.create ( 0 ) ),
+                     add ( instantiate ( "polyDivCoeff", divCoeff ),
+                           inftyConst () ) );
 
-        final Feature applyEqAndCheck =
-            ifZero ( ReducibleMonomialsFeature.createDivides ( numTerm, right ),
-                     let ( numTerm,
-                           opTerm ( tf.mul,
-                                    ReduceMonomialsProjection.create ( numTerm, right ),
-                                    left ),
-                           checkNumTermE ) );
-        
         final Feature isReduciblePolyE =
             sum ( numTerm,
                   SubtermGenerator.rightTraverse ( instOf ( "divNum" ), tf.addF ),
                   ifZero ( applyTF ( numTerm, tf.addF ),
                            longConst ( 0 ),
-                           sum ( equation,
-                                 SequentFormulasGenerator.antecedent (),
-                                 ifZero ( applyTF ( equation, tf.monomialEquation ),
-                                          add ( let ( left, sub ( equation, 0 ),
-                                                let ( right, sub ( equation, 1 ),                              
-                                                      applyEqAndCheck ) ),
-                                                let ( left, sub ( equation, 1 ),
-                                                let ( right, sub ( equation, 0 ),                              
-                                                      applyEqAndCheck ) )
-                        ) ) ) ) );
+                           sum ( divCoeff,
+                                 MultiplesModEquationsGenerator
+                                                .create ( numTerm, denomLC ),
+                                 add(println(divCoeff),checkCoeffE) ) ) );
         
         bindRuleSet ( d, "defOps_divModPullOut",
            SumFeature.createSum ( new Feature[] {

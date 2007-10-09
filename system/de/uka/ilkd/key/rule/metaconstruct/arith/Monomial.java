@@ -216,6 +216,17 @@ public class Monomial {
         return res;        
     }
     
+    public String toString() {
+        final StringBuffer res = new StringBuffer ();
+        res.append ( coefficient );
+        
+        final IteratorOfTerm it = parts.iterator ();
+        if ( it.hasNext () )
+            res.append ( " * " + it.next () );
+
+        return res.toString ();
+    }
+    
     private static class Analyser {
         public BigInteger coeff = BigInteger.ONE;
         public ListOfTerm parts = SLListOfTerm.EMPTY_LIST;
