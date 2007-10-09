@@ -221,7 +221,7 @@ public class Monomial {
         res.append ( coefficient );
         
         final IteratorOfTerm it = parts.iterator ();
-        if ( it.hasNext () )
+        while ( it.hasNext () )
             res.append ( " * " + it.next () );
 
         return res.toString ();

@@ -10,17 +10,16 @@
 
 package de.uka.ilkd.key.strategy.termgenerator;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.IteratorOfConstrainedFormula;
 import de.uka.ilkd.key.logic.IteratorOfTerm;
+import de.uka.ilkd.key.logic.ListOfTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SLListOfTerm;
 import de.uka.ilkd.key.logic.Term;
@@ -28,7 +27,9 @@ import de.uka.ilkd.key.logic.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.metaconstruct.arith.IteratorOfMonomial;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
+import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 /**
@@ -62,85 +63,72 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         final Monomial targetM =
             Monomial.create ( target.toTerm ( app, pos, goal ), services );
 
-        if ( targetM.divides ( sourceM ) ) {
-            final Term quotient = targetM.reduce ( sourceM ).toTerm ( services );
-            return SLListOfTerm.EMPTY_LIST.prepend ( quotient ).iterator ();
-        }
+        if ( targetM.divides ( sourceM ) )
+            return toIterator ( targetM.reduce ( sourceM ).toTerm ( services ) );
 
-        final List monoEquations = extractEquations ( goal, services );
-        if ( monoEquations.isEmpty () ) return SLListOfTerm.EMPTY_LIST.iterator ();
+        final List cofactorPolys = extractPolys ( goal, services );
+
+        if ( cofactorPolys.isEmpty () )
+            return SLListOfTerm.EMPTY_LIST.iterator ();
         
-        final Iterator monoIt =
-            computeMultiples ( sourceM, targetM, monoEquations, services )
-            .iterator ();
-        
-        return new IteratorOfTerm () {
-            public boolean hasNext() {
-                return monoIt.hasNext ();
-            }
-            public Term next() {
-                final Monomial mono = (Monomial)monoIt.next ();
-                return targetM.reduce ( mono ).toTerm ( services );
-            }
-        };
+        return computeMultiples(sourceM, targetM, cofactorPolys, services)
+               .iterator();
     }
 
-    private List computeMultiples(Monomial sourceM, Monomial targetM,
-                                        List monoEquations, Services services) {
-        final List res = new LinkedList ();
-        
-        final Set done = new HashSet ();
-        final List todo = new LinkedList ();
+    private IteratorOfTerm toIterator(Term quotient) {
+        return SLListOfTerm.EMPTY_LIST.prepend ( quotient ).iterator ();
+    }
 
-        todo.add ( sourceM );
+    private ListOfTerm computeMultiples(Monomial sourceM, Monomial targetM,
+                                        List cofactorPolys, Services services) {
+        ListOfTerm res = SLListOfTerm.EMPTY_LIST;
         
-        int limit = Math.max ( 5, monoEquations.size () * 3 );
-        
-        while ( limit > 0 && !todo.isEmpty () ) {
-            final Monomial mono = (Monomial)todo.remove ( 0 );
+        final List cofactorMonos = new ArrayList ();
+        cofactorMonos.add ( new CofactorMonomial ( targetM, Polynomial.ONE ) );
 
-            if ( done.contains ( mono ) ) continue;
+        boolean changed = true;
+        while ( changed ) {
+            changed = false;
             
-            --limit;
-            
-            final Iterator it = monoEquations.iterator ();
-            while ( it.hasNext () ) {
-                final MonoEquation eq = (MonoEquation)it.next ();
-                final Monomial rewrittenMono = eq.applyRightToLeft ( mono );
-                
-                if ( rewrittenMono == null || done.contains ( rewrittenMono ) )
-                    continue;
-                
-                if ( targetM.divides ( rewrittenMono ) )
-                    addToRes ( rewrittenMono, targetM, res, services );
-                else
-                    todo.add ( rewrittenMono );
+            final Iterator polyIt = cofactorPolys.iterator ();
+            while ( polyIt.hasNext () ) {
+                CofactorPolynomial poly = (CofactorPolynomial)polyIt.next ();
+
+                final Iterator monoIt = cofactorMonos.iterator ();
+                while ( monoIt.hasNext () ) {
+                    final CofactorMonomial mono = (CofactorMonomial)monoIt.next ();
+                    final CofactorItem reduced = poly.reduce ( mono );
+                    if ( reduced instanceof CofactorMonomial ) {
+                        polyIt.remove ();
+                        cofactorMonos.add ( reduced );
+                        res = addRes ( (CofactorMonomial)reduced, sourceM,
+                                       res, services );
+                        changed = true;
+                        break;
+                    } else {
+                        poly = (CofactorPolynomial)reduced;
+                    }
+                }
             }
-
-            done.add ( mono );
         }
-        
+
         return res;
     }
 
-    private void addToRes(Monomial mono, Monomial targetM, List res,
-                          Services services) {
-        final Iterator it = res.iterator ();
-
-        // do subsumption checks to ensure that no redundant monomials are
-        // returned
-        while ( it.hasNext () ) {
-            final Monomial oldMono = (Monomial)it.next ();
-            if ( mono.divides ( oldMono ) )
-                it.remove ();
-            else if ( oldMono.divides ( mono ) )
-                return;
+    private ListOfTerm addRes(CofactorMonomial newMono, Monomial sourceM,
+                              ListOfTerm res, Services services) {
+        if ( newMono.mono.divides ( sourceM ) ) {
+            final Polynomial quotient =
+                newMono.cofactor.multiply ( newMono.mono.reduce ( sourceM ) );
+            return res.prepend ( quotient.toTerm ( services ) );
         }
-
-        res.add ( mono );
+        return res;
     }
 
-    private List extractEquations(Goal goal, Services services) {
+    private List extractPolys(Goal goal, Services services) {
+        final IntegerLDT numbers =
+            services.getTypeConverter ().getIntegerLDT ();
+
         final List res = new ArrayList ();
 
         final IteratorOfConstrainedFormula it =
@@ -148,49 +136,71 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         while ( it.hasNext () ) {
             final ConstrainedFormula cfm = it.next ();
             if ( !cfm.constraint ().isBottom () ) continue;
-            
-            final MonoEquation eq =
-                MonoEquation.create ( cfm.formula (), services );
-            if ( eq == null ) continue;
-            
-            res.add ( eq );
+
+            final Term t = cfm.formula();
+            if ( t.op () != Op.EQUALS
+                 || !t.sub ( 0 ).sort ().extendsTrans ( numbers.targetSort () )
+                 || !t.sub ( 1 ).sort ().extendsTrans ( numbers.targetSort () ) )
+                continue;
+
+            final Polynomial left = Polynomial.create ( t.sub ( 0 ), services );
+            final Polynomial right = Polynomial.create ( t.sub ( 1 ), services );
+
+            res.add ( new CofactorPolynomial ( left.sub ( right ),
+                                               Polynomial.ZERO ) );
         }
 
         return res;
     }
+
+    private static abstract class CofactorItem {
+        public final Polynomial cofactor;
+
+        public CofactorItem(Polynomial cofactor) {
+            this.cofactor = cofactor;
+        }        
+    }
     
-    private static class MonoEquation {
-        private final Monomial left;
-        private final Monomial right;
-        
-        private MonoEquation(Monomial left, Monomial right) {
-            this.left = left;
-            this.right = right;
-        }
-        
-        public static MonoEquation create(Term t, Services services) {
-            final IntegerLDT numbers =
-                services.getTypeConverter ().getIntegerLDT ();
+    private static class CofactorMonomial extends CofactorItem {
+        public final Monomial mono;
 
-            if ( t.op () != Op.EQUALS
-                 || !t.sub ( 0 ).sort ().extendsTrans ( numbers.targetSort () )
-                 || !t.sub ( 1 ).sort ().extendsTrans ( numbers.targetSort () )
-                 || t.sub ( 1 ).op () == numbers.getArithAddition () )
-                return null;
-            
-            final Monomial left = Monomial.create ( t.sub ( 0 ), services );
-            final Monomial right = Monomial.create ( t.sub ( 1 ), services );
-
-            return new MonoEquation ( left, right );
-        }
-        
-        public Monomial applyRightToLeft(Monomial ori) {
-            if ( !right.divides ( ori ) ) return null;
-            return right.reduce ( ori ).multiply ( left );
-        }
-        
-        public String toString() {
-            return "" + left + " = " + right;
+        public CofactorMonomial(Monomial mono, Polynomial cofactor) {
+            super ( cofactor );
+            this.mono = mono;
         }
     }
+    
+    private static class CofactorPolynomial extends CofactorItem {
+        public final Polynomial poly;
+
+        public CofactorPolynomial(Polynomial poly, Polynomial cofactor) {
+            super ( cofactor );
+            this.poly = poly;
+        }
+        
+        public CofactorPolynomial add(CofactorMonomial mono, Monomial coeff) {
+            return new CofactorPolynomial
+                         ( poly.add ( mono.mono.multiply ( coeff ) ),
+                           cofactor.add ( mono.cofactor.multiply ( coeff ) ) );
+        }
+        
+        public CofactorItem reduce(CofactorMonomial mono) {
+            CofactorPolynomial res = this;
+            final IteratorOfMonomial it = poly.getParts ().iterator ();
+            while ( it.hasNext () ) {
+                final Monomial part = it.next ();
+                if ( mono.mono.divides ( part ) ) {
+                    final Monomial coeff = mono.mono.reduce ( part );
+                    res = res.add ( mono,
+                                    coeff.multiply ( BigInteger.valueOf ( -1 ) ) );
+                }
+            }
+            if ( res.poly.getParts ().size () == 1
+                 && res.poly.getConstantTerm ().signum () == 0 )
+                return new CofactorMonomial ( res.poly.getParts ().head (),
+                                              res.cofactor );
+            return res;
+        }
+    }
+
 }
