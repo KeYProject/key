@@ -328,13 +328,6 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
     }
 
     public void insertSeps(ICompilationUnit unit) {
-
-        boolean junit = false;
-
-        if (unit.getImport("junit.framework.*").exists()) {
-            junit = true;
-        }
-
         String source = "";
 
         try {

@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.visualdebugger;
+package de.uka.ilkd.key.visualdebugger.executiontree;
 
 import java.util.LinkedList;
 
@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.visualdebugger.*;
 
 public class ExecutionTree implements AutoModeListener {
 
@@ -80,7 +81,7 @@ public class ExecutionTree implements AutoModeListener {
         } else
             vd.fireDebuggerEvent(new DebuggerEvent(DebuggerEvent.EXEC_FINISHED,
                     null));
-       
+
         final Runnable execTreeThread = new Runnable() {
             public void run() {
                 // new StateVisualization(node,mediator);
@@ -89,7 +90,8 @@ public class ExecutionTree implements AutoModeListener {
         };
         // mediator.invokeAndWait(interfaceSignaller);
 
-        if (mediator.getProof() != null) startThread(execTreeThread);
+        if (mediator.getProof() != null)
+            startThread(execTreeThread);
     }
 
     public void buildETree(ITNode n, ListOfTerm terms, ETNode parent, String exc) {
@@ -101,7 +103,7 @@ public class ExecutionTree implements AutoModeListener {
         } else {
             bc = null;
         }
-        
+
         if (n.getStatementId() != null) {
             branch = new ETStatementNode(bc, n.getStatementId(), parent);
             branch.addITNode(n);
@@ -132,10 +134,10 @@ public class ExecutionTree implements AutoModeListener {
             newExc = null;
         } else if (n.getChildren().length > 1
                 || (n.getChildren().length == 1 && n.getChildren()[0].getBc() == null)) {// this
-                                                                                            // case
-                                                                                            // should
-                                                                                            // not
-                                                                                            // happen
+            // case
+            // should
+            // not
+            // happen
             branch = new ETNode(bc, parent);
             branch.addITNode(n);
             if (n.isNobc())
@@ -152,7 +154,7 @@ public class ExecutionTree implements AutoModeListener {
         if (bc == null) {
             bc = SLListOfTerm.EMPTY_LIST;
         }
-        
+
         if (n.getActStatement() instanceof Throw) {
             newExc = n.getActStatement().toString();
         }
@@ -208,7 +210,8 @@ public class ExecutionTree implements AutoModeListener {
                             if (t.op() == Op.NOT) {
                                 l = l.append(t.sub(0));
                             } else
-                                l = l.append(TermFactory.DEFAULT
+                                l = l
+                                        .append(TermFactory.DEFAULT
                                                 .createJunctorTermAndSimplify(
                                                         Op.NOT, t));
                         }
@@ -439,7 +442,8 @@ public class ExecutionTree implements AutoModeListener {
     }
 
     private void intro_post() {
-        ListOfGoal goals = mediator.getProof().getSubtreeGoals(mediator.getProof().root());
+        ListOfGoal goals = mediator.getProof().getSubtreeGoals(
+                mediator.getProof().root());
 
         IteratorOfGoal it = goals.iterator();
         while (it.hasNext()) {
@@ -487,9 +491,14 @@ public class ExecutionTree implements AutoModeListener {
         if (this.modalityTopLevel(pio)) {
             return true;
         }
-        if (op == Op.AND || op == Op.OR || op == Op.IF_THEN_ELSE
-                || op == Op.IF_EX_THEN_ELSE || op == Op.EQV || op == Op.IMP
-                || op == Op.AND || (op instanceof IUpdateOperator
+        if (op == Op.AND
+                || op == Op.OR
+                || op == Op.IF_THEN_ELSE
+                || op == Op.IF_EX_THEN_ELSE
+                || op == Op.EQV
+                || op == Op.IMP
+                || op == Op.AND
+                || (op instanceof IUpdateOperator
                 /* && !containsJavaBlock(pio.constrainedFormula().formula() */)) {
             return false;
         }

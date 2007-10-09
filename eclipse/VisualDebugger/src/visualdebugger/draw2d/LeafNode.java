@@ -1,19 +1,10 @@
 package visualdebugger.draw2d;
 
 
-import java.io.File;
+import org.eclipse.draw2d.*;
 
-import org.eclipse.draw2d.Border;
-import org.eclipse.draw2d.ColorConstants;
-import org.eclipse.draw2d.Ellipse;
-import org.eclipse.draw2d.Figure;
-import org.eclipse.draw2d.Label;
-import org.eclipse.draw2d.LineBorder;
-import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.dom.Statement;
-
-import de.uka.ilkd.key.visualdebugger.ETLeafNode;
 import de.uka.ilkd.key.visualdebugger.SourceElementId;
+import de.uka.ilkd.key.visualdebugger.executiontree.ETLeafNode;
 
 public class LeafNode extends Ellipse {
 

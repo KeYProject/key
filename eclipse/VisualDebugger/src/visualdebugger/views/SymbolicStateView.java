@@ -30,7 +30,13 @@ import visualdebugger.draw2d.ObjectFigure;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IteratorOfProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.visualdebugger.*;
+import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
+import de.uka.ilkd.key.visualdebugger.DebuggerListener;
+import de.uka.ilkd.key.visualdebugger.VisualDebugger;
+import de.uka.ilkd.key.visualdebugger.statevisualisation.StateVisualization;
+import de.uka.ilkd.key.visualdebugger.statevisualisation.SymbolicArrayObject;
+import de.uka.ilkd.key.visualdebugger.statevisualisation.SymbolicObject;
+import de.uka.ilkd.key.visualdebugger.statevisualisation.SymbolicObjectDiagram;
 
 public class SymbolicStateView extends ViewPart implements DebuggerListener {
 

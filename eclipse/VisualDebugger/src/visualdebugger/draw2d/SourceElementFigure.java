@@ -1,13 +1,6 @@
 package visualdebugger.draw2d;
 
-import org.eclipse.draw2d.Border;
-import org.eclipse.draw2d.ColorConstants;
-import org.eclipse.draw2d.Figure;
-import org.eclipse.draw2d.Graphics;
-import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.Label;
-import org.eclipse.draw2d.LineBorder;
-import org.eclipse.draw2d.StackLayout;
+import org.eclipse.draw2d.*;
 import org.eclipse.draw2d.geometry.Insets;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -16,9 +9,9 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 
-import de.uka.ilkd.key.visualdebugger.ETNode;
-import de.uka.ilkd.key.visualdebugger.ETStatementNode;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
+import de.uka.ilkd.key.visualdebugger.executiontree.ETNode;
+import de.uka.ilkd.key.visualdebugger.executiontree.ETStatementNode;
 
 public class SourceElementFigure extends Figure {
 

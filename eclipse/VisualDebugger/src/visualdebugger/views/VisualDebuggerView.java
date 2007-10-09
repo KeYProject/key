@@ -16,7 +16,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.part.ViewPart;
@@ -24,8 +23,11 @@ import org.osgi.framework.Bundle;
 
 import visualdebugger.actions.StartVisualDebuggerAction;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.visualdebugger.*;
-
+import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
+import de.uka.ilkd.key.visualdebugger.DebuggerListener;
+import de.uka.ilkd.key.visualdebugger.VisualDebugger;
+import de.uka.ilkd.key.visualdebugger.executiontree.ETNode;
+import de.uka.ilkd.key.visualdebugger.executiontree.ITNode;
 
 
 public class VisualDebuggerView extends ViewPart implements DebuggerListener {

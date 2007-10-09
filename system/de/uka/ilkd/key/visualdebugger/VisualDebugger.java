@@ -37,6 +37,10 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.visualdebugger.executiontree.ExecutionTree;
+import de.uka.ilkd.key.visualdebugger.executiontree.ITNode;
+import de.uka.ilkd.key.visualdebugger.statevisualisation.StateVisualization;
+import de.uka.ilkd.key.visualdebugger.statevisualisation.SymbolicObject;
 
 public class VisualDebugger {
     public static final String debugClass = "Debug";
@@ -228,8 +232,9 @@ public class VisualDebugger {
     }
 
     /**
-     * determines and returns the first and active statement if the applied taclet worked on
-     * a modality. If the applied taclet performs no symbolic execution <tt>null</tt> is returned
+     * determines and returns the first and active statement if the applied
+     * taclet worked on a modality. If the applied taclet performs no symbolic
+     * execution <tt>null</tt> is returned
      */
     public SourceElement determineFirstAndActiveStatement(Node node) {
         final RuleApp ruleApp = node.getAppliedRuleApp();
@@ -289,7 +294,7 @@ public class VisualDebugger {
                                 || (selfPV2 != null && selfPV2.equals(op
                                         .location(f, i).op()))) {
                             map.put(op.value(f, i), op.location(f, i));
-                            map2.put(op.location(f, i), op.value(f, i));                                               
+                            map2.put(op.location(f, i), op.value(f, i));
                         }
                     }
                 }
@@ -342,7 +347,7 @@ public class VisualDebugger {
             if (statement instanceof LabeledStatement) {
                 statement = ((LabeledStatement) statement).getBody();
             } else if (statement == statement.getFirstElement()) {
-               break;
+                break;
             } else {
                 statement = statement.getFirstElement();
             }
@@ -473,13 +478,13 @@ public class VisualDebugger {
 
     public MethodFrame getMethodFrame(SourceElement context) {
         MethodFrame frame = null;
-        if (context instanceof ProgramPrefix) {            
-            final ArrayOfProgramPrefix prefixElements = 
-                ((ProgramPrefix)context).getPrefixElements();
-            for (int i = 0, len = prefixElements.size(); i<len; i++) {
-              if (prefixElements.getProgramPrefix(i) instanceof MethodFrame) {
-                  frame = (MethodFrame) prefixElements.getProgramPrefix(i);
-              }
+        if (context instanceof ProgramPrefix) {
+            final ArrayOfProgramPrefix prefixElements = ((ProgramPrefix) context)
+                    .getPrefixElements();
+            for (int i = 0, len = prefixElements.size(); i < len; i++) {
+                if (prefixElements.getProgramPrefix(i) instanceof MethodFrame) {
+                    frame = (MethodFrame) prefixElements.getProgramPrefix(i);
+                }
             }
         }
         return frame;
@@ -498,14 +503,14 @@ public class VisualDebugger {
      * statement
      */
     private int getMethodStackSize(SourceElement context) {
-        int size = 0;       
-        if (context instanceof ProgramPrefix) {            
-          final ArrayOfProgramPrefix prefixElements = 
-              ((ProgramPrefix)context).getPrefixElements();
-          for (int i = 0, len = prefixElements.size(); i<len; i++)
-            if (prefixElements.getProgramPrefix(i) instanceof MethodFrame) {
-                size++;
-            }
+        int size = 0;
+        if (context instanceof ProgramPrefix) {
+            final ArrayOfProgramPrefix prefixElements = ((ProgramPrefix) context)
+                    .getPrefixElements();
+            for (int i = 0, len = prefixElements.size(); i < len; i++)
+                if (prefixElements.getProgramPrefix(i) instanceof MethodFrame) {
+                    size++;
+                }
         }
         return size;
     }
@@ -515,7 +520,7 @@ public class VisualDebugger {
         if (result instanceof Node) {
             return (Node) result;
         }
-        return null;        
+        return null;
     }
 
     public HashSet getParam(MethodBodyStatement mbs) {
@@ -640,7 +645,7 @@ public class VisualDebugger {
 
     /**
      * @param locs
-     *            set of Terms (ops)
+     *                set of Terms (ops)
      * @return term2term
      */
     public HashMap getValuesForLocation(HashSet locs, PosInOccurrence pio) {
@@ -673,7 +678,7 @@ public class VisualDebugger {
         // lListener.setListeners(listeners);
         Goal.addRuleAppListener(lListener);
         mediator.setMaxAutomaticSteps(20000);
-        
+
         // Extract ProgramVariables of the context program
         JavaInfo info = mediator.getServices().getJavaInfo();
         Set kjts = info.getAllKeYJavaTypes();
@@ -706,7 +711,7 @@ public class VisualDebugger {
 
         this.initPhase = true;
         bpManager.setNoEx(true);
-        
+
         setProofStrategy(mediator.getProof(), true, false);
         run();
     }
@@ -949,6 +954,17 @@ public class VisualDebugger {
         this.inputPV2term = inputPV2term;
     }
 
+    public void setProofStrategy(final Proof proof, boolean splittingAllowed,
+            boolean inUpdateAndAssumes) {
+        StrategyProperties strategyProperties = DebuggerStrategy
+                .getDebuggerStrategyProperties(splittingAllowed,
+                        inUpdateAndAssumes, isInitPhase());
+
+        final StrategyFactory factory = new DebuggerStrategy.Factory();
+
+        proof.setActiveStrategy((factory.create(proof, strategyProperties)));
+    }
+
     public void setSelfPV(ProgramVariable selfPV) {
         this.selfPV = selfPV;
     }
@@ -1000,41 +1016,27 @@ public class VisualDebugger {
         DebuggerPO po = new DebuggerPO("DebuggerPo");
         ProofStarter ps = new ProofStarter();
         po.setTerms(terms);
-        
+
         final ProofEnvironment proofEnvironment = mediator.getProof().env();
-        
-        po.setIndices(proofEnvironment.getInitConfig()
-                .createTacletIndex(), proofEnvironment.getInitConfig()
-                .createBuiltInRuleIndex());
+
+        po.setIndices(proofEnvironment.getInitConfig().createTacletIndex(),
+                proofEnvironment.getInitConfig().createBuiltInRuleIndex());
         po.setProofSettings(mediator.getProof().getSettings());
         po.setConfig(proofEnvironment.getInitConfig());
         po.setTerms(terms);
         ps.init(po);
 
         final Proof proof = ps.getProof();
-        
+
         setProofStrategy(proof, false, false);
-        
+
         ps.run(proofEnvironment);
 
         setProofStrategy(proof, true, false);
-        
-        
-        
+
         proof.openGoals().iterator().next().node().sequent();
         return collectResult(proof.openGoals().iterator().next().node()
                 .sequent());
-    }
-
-    public void setProofStrategy(final Proof proof,
-            boolean splittingAllowed, boolean inUpdateAndAssumes) {
-        StrategyProperties strategyProperties  = DebuggerStrategy.
-        getDebuggerStrategyProperties(splittingAllowed, inUpdateAndAssumes, isInitPhase());
-        
-        final StrategyFactory factory = new DebuggerStrategy.Factory();        
-        
-        proof.setActiveStrategy(
-                (factory.create(proof, strategyProperties)));
     }
 
     private void startThread(final Runnable r) {
@@ -1088,7 +1090,7 @@ public class VisualDebugger {
 
     public boolean stepToFirstSep() {
         if (!mediator.autoMode()) {
-            
+
             final Proof proof = mediator.getProof();
             removeStepOver(proof.openGoals());
             setSteps(proof.openGoals(), 0);

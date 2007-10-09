@@ -15,9 +15,9 @@ public class VisualDebuggerState {
 
     private HashMapFromPosInOccurrenceToLabel labels = new HashMapFromPosInOccurrenceToLabel();
 
-    private int statementIdcount = -1;
-
     private boolean looking = false;
+
+    private int statementIdcount = -1;
 
     private int stepOver = -1;
 
@@ -35,40 +35,40 @@ public class VisualDebuggerState {
         return this.labels;
     }
 
-    public void setLabels(HashMapFromPosInOccurrenceToLabel labels) {
-        this.labels = labels;
+    public int getStatementIdcount() {
+        return this.statementIdcount;
     }
 
-    public void setStepOverFrom(int stepOverFrom) {
-        this.stepOverFrom = stepOverFrom;
+    public int getStepOver() {
+        return this.stepOver;
     }
     
     public int getStepOverFrom() {
         return stepOverFrom;
     }
 
-    public void setStepOver(int stepOver) {
-        this.stepOver = stepOver;
+    public boolean isLooking() {
+        return looking;
     }
 
-    public int getStepOver() {
-        return this.stepOver;
+    public void setLabels(HashMapFromPosInOccurrenceToLabel labels) {
+        this.labels = labels;
     }
 
     public void setLooking(boolean looking) {
         this.looking = looking;
     }
 
-    public boolean isLooking() {
-        return looking;
-    }
-
     public void setStatementIdcount(int statementIdcount) {
         this.statementIdcount = statementIdcount;
     }
 
-    public int getStatementIdcount() {
-        return this.statementIdcount;
+    public void setStepOver(int stepOver) {
+        this.stepOver = stepOver;
+    }
+
+    public void setStepOverFrom(int stepOverFrom) {
+        this.stepOverFrom = stepOverFrom;
     }
     
 }

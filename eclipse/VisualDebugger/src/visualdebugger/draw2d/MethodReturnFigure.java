@@ -3,19 +3,13 @@ package visualdebugger.draw2d;
 
 
 
-import org.eclipse.draw2d.Border;
-import org.eclipse.draw2d.ColorConstants;
-import org.eclipse.draw2d.Figure;
-import org.eclipse.draw2d.Graphics;
-import org.eclipse.draw2d.Label;
-import org.eclipse.draw2d.LineBorder;
-import org.eclipse.draw2d.StackLayout;
+import org.eclipse.draw2d.*;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.swt.graphics.Color;
 
-import de.uka.ilkd.key.visualdebugger.ETMethodReturnNode;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
+import de.uka.ilkd.key.visualdebugger.executiontree.ETMethodReturnNode;
 
 public class MethodReturnFigure extends Figure {
 
