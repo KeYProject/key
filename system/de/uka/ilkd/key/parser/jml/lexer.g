@@ -88,6 +88,7 @@ tokens {
     EQV = "<==>";
     ANTIV = "<=!=>";
     NOT = "!";
+    IN_OUTER_SCOPE = "inOuterScope";
     BITWISENOT = "~";
     SEMI = ";";
     COMMA = ",";

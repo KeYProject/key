@@ -2697,6 +2697,7 @@ jmlprimary returns [Term t=null]
     KeYJavaType dummykjt, kjt;
     ProgramMethod method;
     Term pre=null;
+    Term o1, o2;
     Namespace old_param_ns = param_ns;
     JMLClassSpec old_cSpec = cSpec;
     JMLTranslator old_translator = translator;  
@@ -2759,6 +2760,12 @@ jmlprimary returns [Term t=null]
         {
             throw new NotSupportedExpressionException("JML construct "+
                 "\\reach");
+        }
+    |
+        IN_OUTER_SCOPE "("o1 = specexpression "," o2 = specexpression ")"
+        {
+            TermSymbol ios = (TermSymbol) nss.functions().lookup(new Name("inOuterScope"));
+            t = tf.createFunctionTerm(ios, o1, o2);
         }
     |   DURATION "(" dummy = expression ")" 
         {

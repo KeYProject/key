@@ -5,6 +5,7 @@ public class Test extends SuperTest{
     int attr;
     int[] arr;
     byte b0, b1;
+    Object[] oArr;
 
     /*@ public normal_behavior
       @  working_space \space(new Test());
@@ -31,6 +32,14 @@ public class Test extends SuperTest{
 	    return new int[a+1-1];
 	}
 	return null;
+    }
+
+    /*@ public normal_behavior
+      @  requires oArr!=null && oArr.length>1 && oArr.memoryArea==o.memoryArea && inOuterScope(o, oArr);
+      @  ensures true;
+      @*/
+    public void assignToObjectArray(Object o){
+	oArr[0] = o;
     }
 
     /*@ public normal_behavior

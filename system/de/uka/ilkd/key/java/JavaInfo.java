@@ -45,7 +45,7 @@ public class JavaInfo {
         
         public boolean equals(Object o) {
             if (o instanceof CacheKey) {
-                final CacheKey snd = (CacheKey)o;                
+                final CacheKey snd = (CacheKey)o;               
                 return snd.o1.equals(o1) && snd.o2.equals(o2);
             } 
             return false;
@@ -73,7 +73,7 @@ public class JavaInfo {
      *    java.lang.Object, java.lang.Clonable, java.io.Serializable
      * in </em>in this order</em>
      */
-    private KeYJavaType[] commonTypes = new KeYJavaType[3];
+    private KeYJavaType[] commonTypes = new KeYJavaType[4];
 
     //some caches for the getKeYJavaType methods.
     private HashMap sort2KJTCache = null;
@@ -1040,7 +1040,8 @@ public class JavaInfo {
     private void fillCommonTypesCache() {
         if (commonTypesCacheValid) return;
         final String[] fullNames = {"java.lang.Object", 
-                "java.lang.Cloneable", "java.lang.Serializable"};
+                "java.lang.Cloneable", "java.lang.Serializable",
+                "javax.realtime.ScopedMemory"};
         
         for (int i = 0; i<fullNames.length; i++) {
             commonTypes[i] = getKeYJavaTypeByClassName(fullNames[i]);            
@@ -1077,6 +1078,16 @@ public class JavaInfo {
             commonTypes[2] = getKeYJavaTypeByClassName("java.io.Serializable");
         }
         return commonTypes[2];
+    }
+    
+    /**
+     * returns the KeYJavaType for class <tt>java.realtime.ScopedMemory</tt>
+     */
+    public KeYJavaType getJavaxRealtimeScopedMemory() {
+        if (commonTypes[3] == null) {
+            commonTypes[3] = getKeYJavaTypeByClassName("javax.realtime.ScopedMemory");
+        }
+        return commonTypes[3];
     }
 
 

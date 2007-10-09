@@ -2,12 +2,14 @@ package javax.realtime;
 
 public class MemoryStack{
 
-    //@ private ghost ScopedMemory[] stack;
+    private ScopedMemory[] stack;
 
     //@ public static ghost MemoryStack EMPTY_STACK;
 
-    /*@ public invariant stack!=null && EMPTY_STACK!=null && 
-      @       EMPTY_STACK.size()==0;
+    /*@ public static invariant EMPTY_STACK!=null && EMPTY_STACK.stack.length==0;
+      @*/
+
+    /*@ public invariant stack!=null;
       @*/
 
     /*@ public invariant (\forall int i,j; 0<=i && i<stack.length && 
@@ -43,7 +45,7 @@ public class MemoryStack{
     /*@ public normal_behavior
       @  ensures \result==stack.length;
       @*/ 
-    public /*@pure@*/ int size(){}
+    public /*@pure@*/ int size(){return stack.length;}
 
     /*@ public normal_behavior
       @  ensures \result==stack[stack.length-1];

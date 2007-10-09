@@ -9,7 +9,7 @@ public class ScopedMemory extends MemoryArea{
     //@ public static invariant counter>=1;
     private static long counter=1;
 
-    //@ public invariant (\forall ScopedMemory m; m.id==id; m==this);
+    //@ public invariant (\forall ScopedMemory m; m!=null && m.id==id; m==this);
     private long id = counter++;
 
     /*@ public invariant referenceCount>=0 && (referenceCount>0 <==>
@@ -17,8 +17,12 @@ public class ScopedMemory extends MemoryArea{
       @*/
     private int referenceCount=0;
 
-    //@ public invariant stack!=null ==> stack.top()==this;
-    private MemoryStack stack;
+    //@ public invariant stack!=null ==> (stack.top()==this && stack.stack.length>0);
+    public MemoryStack stack;
+
+    public MemoryStack stack(){
+	return stack;
+    }
 
     public ScopedMemory parent=null;
 
