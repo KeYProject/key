@@ -12,10 +12,10 @@ package de.uka.ilkd.key.proof.decproc.translation;
 
 import org.apache.log4j.Logger;
 
-import de.uka.ilkd.key.logic.op.DecisionProcedureSmtAufliaOp;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAufliaOp;
 import de.uka.ilkd.key.proof.decproc.smtlib.ConnectiveFormula;
 import de.uka.ilkd.key.proof.decproc.smtlib.Formula;
 import de.uka.ilkd.key.proof.decproc.smtlib.TruthValueFormula;

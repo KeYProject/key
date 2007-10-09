@@ -40,7 +40,7 @@ public class UpdateSimplifier {
      * if set to true, the update simplifier is a bit more eagerly when
      * applying updates
      */
-    private boolean eager = false;
+    private boolean eager = true;
     
     
     private Constraint formulaConstraint = Constraint.BOTTOM;

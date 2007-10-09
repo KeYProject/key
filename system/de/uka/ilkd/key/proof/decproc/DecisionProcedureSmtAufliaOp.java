@@ -9,7 +9,7 @@
 //
 
 
-package de.uka.ilkd.key.logic.op;
+package de.uka.ilkd.key.proof.decproc;
 
 
 /**
