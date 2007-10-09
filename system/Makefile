@@ -534,12 +534,13 @@ else
 endif
 
 branding:
+# always update SHA1 hash in order to get useful bug reports	
+	@echo $(SHA1) > resources/de/uka/ilkd/key/util/sha1
+	@echo $(KEY_VERSION_SHORT) > resources/de/uka/ilkd/key/util/version
 ifeq "$(BRANDING)" ""
 	@echo "[No Branding. Set environment variable BRANDING to activate branding.]"
 else
 	@echo "[Branding]"
-	@echo $(SHA1) > resources/de/uka/ilkd/key/util/sha1
-	@echo $(KEY_VERSION_SHORT) > resources/de/uka/ilkd/key/util/version
 	@./brandManifest.sh ../eclipse/KeYExternalLibraries/META-INF/MANIFEST.MF $(KEY_VERSION_SHORT)
 	@./brandManifest.sh ../eclipse/org.key-project.core/META-INF/MANIFEST.MF $(KEY_VERSION_SHORT)
 	@./brandManifest.sh ../eclipse/KeYPlugin/META-INF/MANIFEST.MF $(KEY_VERSION_SHORT)
