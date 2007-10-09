@@ -21,7 +21,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.IteratorOfConstrainedFormula;
 import de.uka.ilkd.key.logic.IteratorOfTerm;
-import de.uka.ilkd.key.logic.ListOfTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SLListOfTerm;
 import de.uka.ilkd.key.logic.Term;
@@ -63,20 +62,32 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         final Monomial targetM =
             Monomial.create ( target.toTerm ( app, pos, goal ), services );
 
-        if ( targetM.divides ( sourceM ) )
-            return addToRes ( sourceM, targetM,
-                              SLListOfTerm.EMPTY_LIST, services ).iterator ();
-            
+        if ( targetM.divides ( sourceM ) ) {
+            final Term quotient = targetM.reduce ( sourceM ).toTerm ( services );
+            return SLListOfTerm.EMPTY_LIST.prepend ( quotient ).iterator ();
+        }
+
         final List monoEquations = extractEquations ( goal, services );
         if ( monoEquations.isEmpty () ) return SLListOfTerm.EMPTY_LIST.iterator ();
         
-        return computeMultiples ( sourceM, targetM, monoEquations, services )
-               .iterator ();
+        final Iterator monoIt =
+            computeMultiples ( sourceM, targetM, monoEquations, services )
+            .iterator ();
+        
+        return new IteratorOfTerm () {
+            public boolean hasNext() {
+                return monoIt.hasNext ();
+            }
+            public Term next() {
+                final Monomial mono = (Monomial)monoIt.next ();
+                return targetM.reduce ( mono ).toTerm ( services );
+            }
+        };
     }
 
-    private ListOfTerm computeMultiples(Monomial sourceM, Monomial targetM,
+    private List computeMultiples(Monomial sourceM, Monomial targetM,
                                         List monoEquations, Services services) {
-        ListOfTerm res = SLListOfTerm.EMPTY_LIST;
+        final List res = new LinkedList ();
         
         final Set done = new HashSet ();
         final List todo = new LinkedList ();
@@ -101,7 +112,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
                     continue;
                 
                 if ( targetM.divides ( rewrittenMono ) )
-                    res = addToRes ( rewrittenMono, targetM, res, services );
+                    addToRes ( rewrittenMono, targetM, res, services );
                 else
                     todo.add ( rewrittenMono );
             }
@@ -112,10 +123,21 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         return res;
     }
 
-    private ListOfTerm addToRes(Monomial mono, Monomial targetM,
-                                ListOfTerm oldRes, Services services) {
-        final Term quotient = targetM.reduce ( mono ).toTerm ( services );
-        return oldRes.prepend ( quotient );
+    private void addToRes(Monomial mono, Monomial targetM, List res,
+                          Services services) {
+        final Iterator it = res.iterator ();
+
+        // do subsumption checks to ensure that no redundant monomials are
+        // returned
+        while ( it.hasNext () ) {
+            final Monomial oldMono = (Monomial)it.next ();
+            if ( mono.divides ( oldMono ) )
+                it.remove ();
+            else if ( oldMono.divides ( mono ) )
+                return;
+        }
+
+        res.add ( mono );
     }
 
     private List extractEquations(Goal goal, Services services) {
