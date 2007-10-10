@@ -375,7 +375,7 @@ DIFF_PARSER= \
 JAVAFILES=$(GEN_FILES:%=$(PFX)%.java) $(GENERATED_COLLECTIONS_ASMKEY)
 
 .PHONY: all
-all:	javahomeset
+all:	javahomeset branding
 	@$(MAKE) -s all_gen
 
 
@@ -502,6 +502,12 @@ all_gen: genericMakefile
 
 .PHONY: all_hlp
 all_hlp: argfile.normal $(JAVAFILES) $(ANTLR_PARSER) $(JAVACC_PARSER) $(PROOFJAVA_PARSER) $(KEYDOC_JAVAS) $(DIFF_PARSER) copyResources $(GRAMMARLIST)
+ifeq "$(BRANDING)" ""
+# always update SHA1 hash in order to get useful bug reports		
+	@echo $(SHA1) > ${BINARYPATH}/de/uka/ilkd/key/util/sha1
+	@echo $(KEY_VERSION_SHORT) > ${BINARYPATH}/de/uka/ilkd/key/util/version
+else
+fi
 	@rm -f error.msg
 	@rm -f critical.msg
 	@rm -f warning.msg
@@ -534,13 +540,12 @@ else
 endif
 
 branding:
-# always update SHA1 hash in order to get useful bug reports	
-	@echo $(SHA1) > resources/de/uka/ilkd/key/util/sha1
-	@echo $(KEY_VERSION_SHORT) > resources/de/uka/ilkd/key/util/version
 ifeq "$(BRANDING)" ""
 	@echo "[No Branding. Set environment variable BRANDING to activate branding.]"
 else
 	@echo "[Branding]"
+	@echo $(SHA1) > resources/de/uka/ilkd/key/util/sha1
+	@echo $(KEY_VERSION_SHORT) > resources/de/uka/ilkd/key/util/version
 	@./brandManifest.sh ../eclipse/KeYExternalLibraries/META-INF/MANIFEST.MF $(KEY_VERSION_SHORT)
 	@./brandManifest.sh ../eclipse/org.key-project.core/META-INF/MANIFEST.MF $(KEY_VERSION_SHORT)
 	@./brandManifest.sh ../eclipse/KeYPlugin/META-INF/MANIFEST.MF $(KEY_VERSION_SHORT)
