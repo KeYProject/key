@@ -87,23 +87,6 @@ public class TestKey extends TestCase {
      };
 
 
-     static Class[] asmTests = new Class[] {    
- 	de.uka.ilkd.asmkey.util.graph.TestDependancyGraph.class,
-	de.uka.ilkd.asmkey.util.graph.TestGraphTraversal.class,
-	de.uka.ilkd.asmkey.util.graph.TestPathFinder.class,
-	de.uka.ilkd.asmkey.util.graph.TestAcyclicDependancyGraph.class,
-	de.uka.ilkd.asmkey.util.graph.TestTopologicalOrder.class,
-	de.uka.ilkd.asmkey.logic.TestDynamicFunction.class,
-	de.uka.ilkd.asmkey.storage.TestStorage.class,
-	de.uka.ilkd.asmkey.parser.TestAst.class,
-	de.uka.ilkd.asmkey.unit.TestUnit.class,
-	de.uka.ilkd.asmkey.unit.base.TestBase.class,
-	de.uka.ilkd.asmkey.unit.TestEarlyPass.class,
-	de.uka.ilkd.asmkey.unit.TestSecondPass.class,
-	de.uka.ilkd.asmkey.unit.TestFinalPass.class,
-	de.uka.ilkd.asmkey.unit.TestUnitManager.class
-     };
-
     public static TestSuite createSuite(Class[] testClasses, final String msg) {
 	TestSuite suite = new TestSuite() {
 		public void run(TestResult result) {
@@ -134,8 +117,6 @@ public class TestKey extends TestCase {
 	suite.addTest(createSuite(javaTests, "Testing Java Datastructures"));
 	suite.addTest(createSuite(logicModelTests, "Testing Logic Engine"));
 	suite.addTest(createSuite(gfTests, "Testing Grammatical Framework"));
-
-	suite.addTest(createSuite(asmTests, "Running ASMKeY Tests"));
 
 	return suite;
     }

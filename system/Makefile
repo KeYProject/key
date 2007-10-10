@@ -302,28 +302,6 @@ GENERATED_HEAPS= logic/LeftistHeapOfInteger \
 GENERATED_VECTORS_STACKS= rule/VectorOfTaclet \
 	util/SimpleStackOfExtList 
 
-GENERATED_COLLECTIONS_ASMKEY = de/uka/ilkd/asmkey/logic/HashMapFromAsmProgramToInteger.java \
-	de/uka/ilkd/asmkey/logic/HashMapFromAsmRuleToAsmProgram.java \
-	de/uka/ilkd/asmkey/logic/ListOfAsmProgram.java \
-	de/uka/ilkd/asmkey/logic/SLListOfAsmProgram.java \
-	de/uka/ilkd/asmkey/logic/HashMapFromAsmProgramToListOfAsmProgram.java \
-	de/uka/ilkd/asmkey/logic/IteratorOfFormalParameter.java \
-	de/uka/ilkd/asmkey/logic/HashMapFromNameToFormalParameter.java \
-	de/uka/ilkd/asmkey/logic/IteratorOfDerivedFunction.java \
-	de/uka/ilkd/asmkey/logic/sort/ListOfGenericSort.java \
-	de/uka/ilkd/asmkey/logic/sort/ListOfAsmSort.java \
-	de/uka/ilkd/asmkey/logic/sort/SLListOfGenericSort.java \
-	de/uka/ilkd/asmkey/logic/sort/SLListOfAsmSort.java \
-	de/uka/ilkd/asmkey/logic/sort/MapFromGenericSortToAsmSort.java \
-	de/uka/ilkd/asmkey/logic/sort/MapAsListFromGenericSortToAsmSort.java \
-	de/uka/ilkd/asmkey/unit/ListOfImportInfo.java \
-	de/uka/ilkd/asmkey/unit/ListOfUnit.java \
-	de/uka/ilkd/asmkey/unit/SLListOfUnit.java \
-	de/uka/ilkd/asmkey/unit/HashMapFromNameToUnit.java \
-	de/uka/ilkd/asmkey/util/graph/IteratorOfEdge.java \
-	de/uka/ilkd/asmkey/parser/ast/HashMapFromNameToAstUnit.java \
-	de/uka/ilkd/asmkey/parser/ast/IteratorOfAstUnit.java
-
 GEN_FILES=$(GENERATED_MAPS) $(GENERATED_VECTORS_STACKS) $(GENERATED_ARRAYS) $(GENERATED_LISTS) $(GENERATED_SETS) \
 	$(GENERATED_ITERATORS) $(GENERATED_HEAPS)
 
@@ -334,7 +312,6 @@ ANTLR_PARSER= \
 	$(GENERATED_SRC_PATH)$(PFX)parser/dictionary/DictionaryLexer.java \
 	$(GENERATED_SRC_PATH)$(PFX)parser/dictionary/DictionaryLexerTokenTypes.java \
 	$(GENERATED_SRC_PATH)$(PFX)parser/dictionary/DictionaryParser.java \
-	$(GENERATED_SRC_PATH)de/uka/ilkd/asmkey/parser/antlr/AsmKeyParser.java \
 	$(GENERATED_SRC_PATH)$(PFX)parser/jml/KeYJMLLexer.java \
 	$(GENERATED_SRC_PATH)$(PFX)parser/jml/KeYJMLParser.java \
 	$(GENERATED_SRC_PATH)$(PFX)parser/simplify/SimplifyLexer.java \
@@ -372,7 +349,7 @@ DIFF_PARSER= \
 
 
 ## generic java support
-JAVAFILES=$(GEN_FILES:%=$(PFX)%.java) $(GENERATED_COLLECTIONS_ASMKEY)
+JAVAFILES=$(GEN_FILES:%=$(PFX)%.java) 
 
 .PHONY: all
 all:	javahomeset branding
@@ -755,24 +732,6 @@ help:
 javahomeset:
 	@./checkEnvironment $(TOGETHER_ENABLED)
 	@mkdir -p $(BINARYPATH)
-
-
-## AsmKey
-
-$(GENERATED_SRC_PATH)de/uka/ilkd/asmkey/parser/antlr/AsmKeyLexer.java \
-$(GENERATED_SRC_PATH)de/uka/ilkd/asmkey/parser/antlr/AsmKeyLexerTokenTypes.txt \
-$(GENERATED_SRC_PATH)de/uka/ilkd/asmkey/parser/antlr/AsmKeyLexerTokenTypes.java \
-	: de/uka/ilkd/asmkey/parser/antlr/AsmKeyLexer.g
-	@echo "[creating $(basename $(notdir $@))]"
-	@install -d $(dir $@)
-	@$(ANTLR) -o $(dir $@) $<
-
-$(GENERATED_SRC_PATH)de/uka/ilkd/asmkey/parser/antlr/AsmKeyParser.java \
-	: de/uka/ilkd/asmkey/parser/antlr/AsmKeyParser.g \
-	$(GENERATED_SRC_PATH)de/uka/ilkd/asmkey/parser/antlr/AsmKeyLexerTokenTypes.txt
-	@echo "[creating $(basename $(notdir $@))]"
-	@install -d $(dir $@)
-	@$(ANTLR) -o $(dir $@) $<
 
 # eclipse plug-in:
 eclipse-plug-in: dist
