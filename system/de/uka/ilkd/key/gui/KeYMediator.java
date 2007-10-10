@@ -1037,9 +1037,13 @@ public class KeYMediator {
 	}
 
 	public void proofPruned(ProofTreeEvent e) {
-	    ProofTreeRemovedNodeEvent ev = (ProofTreeRemovedNodeEvent) e;
+	    final ProofTreeRemovedNodeEvent ev = (ProofTreeRemovedNodeEvent) e;
 	    if (ev.getRemovedNode() == getSelectedNode()) {
-		keySelectionModel.setSelectedNode(e.getNode());
+		SwingUtilities.invokeLater(new Runnable() {
+		    public void run() {
+			keySelectionModel.setSelectedNode(ev.getNode());
+		    }
+		});
 	    }
 	}
     
