@@ -37,6 +37,9 @@ public class Monomial {
     
     private static final LRUCache monomialCache = new LRUCache ( 2000 );
     
+    public static final Monomial ONE = new Monomial ( SLListOfTerm.EMPTY_LIST,
+                                                      BigInteger.ONE );
+    
     public static Monomial create(Term monoTerm, Services services) {
         Monomial res = (Monomial)monomialCache.get ( monoTerm );
         if ( res == null ) {

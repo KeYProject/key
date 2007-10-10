@@ -117,10 +117,18 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
 
     private ListOfTerm addRes(CofactorMonomial newMono, Monomial sourceM,
                               ListOfTerm res, Services services) {
-        if ( newMono.mono.divides ( sourceM ) ) {
+        final Monomial mono = newMono.mono;
+        final Polynomial cofactor = newMono.cofactor;
+
+        if ( mono.divides ( sourceM ) ) {
             final Polynomial quotient =
-                newMono.cofactor.multiply ( newMono.mono.reduce ( sourceM ) );
-            return res.prepend ( quotient.toTerm ( services ) );
+                cofactor.multiply ( mono.reduce ( sourceM ) );
+
+            // if the coefficient vanishes, a polynomial division step is
+            // meaningless with this parameter
+            if ( !quotient.getParts ().isEmpty ()
+                 || quotient.getConstantTerm ().signum () != 0 )
+                return res.prepend ( quotient.toTerm ( services ) );
         }
         return res;
     }
@@ -196,8 +204,13 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
                 }
             }
             if ( res.poly.getParts ().size () == 1
-                 && res.poly.getConstantTerm ().signum () == 0 )
+                 && res.poly.getConstantTerm ().signum () == 0 )                  
                 return new CofactorMonomial ( res.poly.getParts ().head (),
+                                              res.cofactor );
+            if ( res.poly.getParts ().size () == 0
+                 && res.poly.getConstantTerm ().signum () != 0 )
+                return new CofactorMonomial ( Monomial.ONE.multiply
+                                                ( res.poly.getConstantTerm () ),
                                               res.cofactor );
             return res;
         }

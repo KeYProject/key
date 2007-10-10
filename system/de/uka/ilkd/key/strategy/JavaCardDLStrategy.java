@@ -1735,7 +1735,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                   SubtermGenerator.rightTraverse ( instOf ( "divNum" ), tf.addF ),
                   checkNumTerm );
         
-        // polynomial division modulo one equation of the antecedent
+        // polynomial division modulo equations of the antecedent
         
         final Feature checkCoeffE =
             ifZero ( TermSmallerThanFeature
@@ -1751,7 +1751,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                            sum ( divCoeff,
                                  MultiplesModEquationsGenerator
                                                 .create ( numTerm, denomLC ),
-                                 add(println(divCoeff),checkCoeffE) ) ) );
+                                 checkCoeffE ) ) );
         
         bindRuleSet ( d, "defOps_divModPullOut",
            SumFeature.createSum ( new Feature[] {
@@ -1760,11 +1760,16 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
              applyTF ( "divNum", tf.polynomial ),
              applyTF ( "divDenom", tf.polynomial ),
              ifZero ( applyTF ( "divDenom", tf.addF ),
-                      let ( denomLC, sub ( instOf ( "divDenom" ), 1 ),
-                            not ( isReduciblePoly ) ),
-                      let ( denomLC, instOf ( "divDenom" ),
-                            ifZero ( add ( isReduciblePoly, isReduciblePolyE ),
-                                     longConst ( -POLY_DIVISION_COST ) ) ) ),
+                let ( denomLC, sub ( instOf ( "divDenom" ), 1 ),
+                      not ( isReduciblePoly ) ),
+                let ( denomLC, instOf ( "divDenom" ),
+                      ifZero ( isReduciblePoly,
+                               // no possible division has been found so far
+                               add ( NotInScopeOfModalityFeature.INSTANCE,
+                                     ifZero ( isReduciblePolyE,
+                                              // try again later
+                                              longConst ( -POLY_DIVISION_COST )
+                      ) ) ) ) ),
              longConst ( 100 ) } ) );
         
     }
