@@ -182,6 +182,10 @@ public class TaskTree extends JPanel {
 		    
 	    }
 	}
+        
+        public void mouseReleased(MouseEvent e) {
+            mousePressed(e);
+        }
     }
 
 

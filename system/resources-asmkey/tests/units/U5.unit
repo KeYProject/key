@@ -1,8 +1,0 @@
-unit U5
-
-import * from U6
-
-predicate hasLength(U6.hex i, [U6.hex]:xs)
-
-static function U6.hex k(U6.hex)
-dynamic function U6.hex w(U6.hex)

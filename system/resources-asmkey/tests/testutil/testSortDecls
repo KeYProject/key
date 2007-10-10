@@ -1,6 +1,0 @@
-SortDeclarationParsitorFactory
-
-generic sort g
-sort int
-sort bool = true | false;
-sort number = int
