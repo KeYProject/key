@@ -325,6 +325,14 @@ public abstract class AbstractFeatureStrategy implements Strategy {
         final TermBuffer buf = new TermBuffer ();
         return let ( buf, t1, applyTF ( t2, eq ( buf ) ) );
     }
+
+    protected Feature contains(ProjectionToTerm bigTerm,
+                               ProjectionToTerm searchedTerm) {
+        final TermBuffer buf = new TermBuffer ();
+        return let ( buf, searchedTerm,
+                     applyTF ( bigTerm,
+                               not ( rec ( any (), not ( eq ( buf ) ) ) ) ) );
+    }
     
     protected Feature println(ProjectionToTerm t) {
         return applyTF ( t, PrintTermFeature.INSTANCE );

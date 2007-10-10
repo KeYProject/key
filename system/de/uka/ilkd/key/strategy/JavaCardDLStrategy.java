@@ -1738,8 +1738,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // polynomial division modulo equations of the antecedent
         
         final Feature checkCoeffE =
-            ifZero ( TermSmallerThanFeature
-                             .create ( divCoeff, FocusProjection.create ( 0 ) ),
+            ifZero ( contains ( divCoeff, FocusProjection.create ( 0 ) ),
+                     // do not apply if the result contains the original term
+                     longConst ( 0 ),
                      add ( instantiate ( "polyDivCoeff", divCoeff ),
                            inftyConst () ) );
 
