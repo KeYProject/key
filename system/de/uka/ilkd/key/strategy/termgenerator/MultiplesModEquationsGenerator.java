@@ -34,10 +34,19 @@ import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 /**
  * Try to rewrite a monomial (term) <code>source</code> so that it becomes a
- * multiple of another monomial <code>target</code>, using the equations of
- * the antecedent. This should really be done with Groebner bases, but for the
- * time being we just perform a naive search. The result is a list of
- * quotients source/target (modulo equations).
+ * multiple of another monomial <code>target</code>, using the integer
+ * equations of the antecedent. The output of the term generator is a list of
+ * polynomials <code>x</code> such that
+ * <code>x * target = source (modulo ...)</code>. This is done using the
+ * method introduced in "Automating elementary number-theoretic proofs using
+ * Groebner bases", 2007, John Harrison. Compared to the paper, we only perform
+ * a simplified Groebner basis computation, basically only consisting of
+ * reduction steps with polynomials that have a single monomial. This is already
+ * enough to handle many practical cases and to significantly improve polynomial
+ * division modulo equations.
+ * 
+ * In the future, this class should also be used for instantiating explicit
+ * quantifiers over the integers.
  */
 public class MultiplesModEquationsGenerator implements TermGenerator {
 
@@ -79,6 +88,14 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         return SLListOfTerm.EMPTY_LIST.prepend ( quotient ).iterator ();
     }
 
+    /**
+     * Compute multiples of <code>targetM</code> that are congruent to
+     * <code>sourceM</code> modulo the polynomials in
+     * <code>cofactorPolys</code>. The result is a list of terms x with the
+     * property <code>x * targetM = sourceM (modulo ...)</code>.
+     * 
+     * This method will change the object <code>cofactorPolys</code>.
+     */
     private ListOfTerm computeMultiples(Monomial sourceM, Monomial targetM,
                                         List cofactorPolys, Services services) {
         ListOfTerm res = SLListOfTerm.EMPTY_LIST;
@@ -124,8 +141,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
             final Polynomial quotient =
                 cofactor.multiply ( mono.reduce ( sourceM ) );
 
-            // if the coefficient vanishes, a polynomial division step is
-            // meaningless with this parameter
+            // do not return zero, that's too easy
             if ( !quotient.getParts ().isEmpty ()
                  || quotient.getConstantTerm ().signum () != 0 )
                 return res.prepend ( quotient.toTerm ( services ) );
@@ -133,6 +149,14 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         return res;
     }
 
+    /**
+     * Extract all integer equations of the antecedent and convert them into
+     * <code>Polynomial</code>s.
+     * 
+     * @returns a list of polynomials, stored in objects of
+     *          <code>CofactorPolynomial</code>. The initial cofactor is set
+     *          to zero.
+     */
     private List extractPolys(Goal goal, Services services) {
         final IntegerLDT numbers =
             services.getTypeConverter ().getIntegerLDT ();
@@ -161,6 +185,9 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         return res;
     }
 
+    // Some classes to hold pairs of monomials/polynomials and cofactors (again
+    // polynomials).
+    
     private static abstract class CofactorItem {
         public final Polynomial cofactor;
 
@@ -186,12 +213,23 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
             this.poly = poly;
         }
         
+        /**
+         * Add <code>coeff</code> times <code>mono</code> to this
+         * polynomial, adjusting the cofactor accordingly
+         */
         public CofactorPolynomial add(CofactorMonomial mono, Monomial coeff) {
             return new CofactorPolynomial
                          ( poly.add ( mono.mono.multiply ( coeff ) ),
                            cofactor.add ( mono.cofactor.multiply ( coeff ) ) );
         }
         
+        /**
+         * Reduce the polynomial by adding a multiple of the monomial
+         * <code>mono</code>. The result is either
+         * <code>CofactorPolynomial</code> or <code>CofactorMonomial</code>,
+         * depending on whether the resulting polynomial has one or multiple
+         * monomials
+         */
         public CofactorItem reduce(CofactorMonomial mono) {
             CofactorPolynomial res = this;
             final IteratorOfMonomial it = poly.getParts ().iterator ();

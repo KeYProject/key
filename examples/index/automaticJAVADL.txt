@@ -11,6 +11,7 @@
 ./arith/divByZero.key
 ./arith/divisionAssoc.key
 ./arith/divisionBy2.key
+./arith/euclidean/gcdHelp-post.key
 ./arith/gemplusDecimal/add.key
 ./arith/jdivevenodd.key
 ./arith/median.key
