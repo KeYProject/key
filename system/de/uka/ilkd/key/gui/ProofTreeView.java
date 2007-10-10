@@ -63,6 +63,10 @@ public class ProofTreeView extends JPanel {
     private GUIProofTreeProofListener proofListener;
     private GUITreeSelectionListener treeSelectionListener;
     private GUIProofTreeGUIListener guiListener;
+
+    /** KeYStroke for the serach panel */
+    private final static KeyStroke searchKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0);
+
     
     /**
      * Roots of subtrees containing all nodes to which rules have been
@@ -124,9 +128,10 @@ public class ProofTreeView extends JPanel {
                 public void mouseReleased(MouseEvent e) {
                     mousePressed(e);
                 }
-	    };
+	    };	    	
 	
 	delegateView.addMouseListener(ml);
+
 	setMediator(mediator);
 
 // 	UIManager.addPropertyChangeListener(
@@ -154,13 +159,25 @@ public class ProofTreeView extends JPanel {
 	this.setLayout(new BorderLayout());
 	this.add(new JScrollPane(delegateView), BorderLayout.CENTER);
 	this.proofTreeSearchPanel = new ProofTreeSearchPanel();
-	this.add(proofTreeSearchPanel, BorderLayout.SOUTH);
-	layoutKeYComponent();
-
+	this.add(proofTreeSearchPanel, BorderLayout.SOUTH);	
+	
+	layoutKeYComponent();	
+	
 	Proof selProof = mediator.getSelectedProof();
 	if (selProof != null) {
 	    setProof(selProof);
 	}
+	
+	
+	final ActionListener keyboardAction = new ActionListener() {
+	    public void actionPerformed(ActionEvent e) {
+	        proofTreeSearchPanel.setVisible(true);
+	    }               
+	};
+	
+	registerKeyboardAction(keyboardAction, 
+	        searchKeyStroke,
+	                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
     private void setProofTreeFont() {
@@ -720,6 +737,7 @@ public class ProofTreeView extends JPanel {
 			.getNode();
 	    }
 	    create();
+	    search.setAccelerator(searchKeyStroke);
 	}
 
 	private void create() {
