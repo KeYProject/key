@@ -978,13 +978,9 @@ public class ProofTreeView extends JPanel {
             TreeModelListener {
 
         private JTextField searchString = new JTextField(20);
+        private JButton prev = new JButton("Prev");
         private JButton next = new JButton("Next");
-        private JPanel panel = new JPanel();
-        private JRadioButton searchDown =
-            new JRadioButton("Down");
-        private JRadioButton searchUp =
-            new JRadioButton("Up");
-        private ButtonGroup group = new ButtonGroup();
+        private JPanel panel = new JPanel();        
         private JButton close = new JButton("Close");
         private int startRow = 0;
         private int currentRow = 0;
@@ -994,45 +990,40 @@ public class ProofTreeView extends JPanel {
                 setVisible(false);
             }
         };
-        private ActionListener searchNext = new ActionListener() {
+        private ActionListener search = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                    if (e.getSource() == next) {
-                        searchString.requestFocusInWindow();
-                    }
-                    searchNext();
-            }
-        };
-        private ActionListener setDirection = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                    if (e.getSource() == searchDown) {
-                        direction = Position.Bias.Forward;
-                    } else {
-                        direction = Position.Bias.Backward;
-                    }
+                if (e.getSource() == next) {        
+                    direction = Position.Bias.Forward;
                     searchString.requestFocusInWindow();
+                } else if (e.getSource() == prev) {
+                    direction = Position.Bias.Backward;
+                    searchString.requestFocusInWindow();
+                } else {
+                    // if e.g. called by pressing enter, perform a forward search
+                    direction = Position.Bias.Forward;
+                }
+                searchNext();
             }
         };
-
+   
         public ProofTreeSearchPanel() {
             registerKeyboardAction(closePanel, KeyStroke
                 .getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent
                 .WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-            registerKeyboardAction(searchNext, KeyStroke
+            registerKeyboardAction(search, KeyStroke
                 .getKeyStroke(KeyEvent.VK_ENTER, 0), JComponent
                 .WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
             searchString.getDocument().addDocumentListener(this);
-            next.addActionListener(searchNext);
-            searchDown.addActionListener(setDirection);
-            searchDown.setSelected(true);
-            searchUp.addActionListener(setDirection);
-            group.add(searchDown);
-            group.add(searchUp);
+            prev.addActionListener(search);
+            next.addActionListener(search);
             close.addActionListener(closePanel);
             setLayout(new BorderLayout());
             add(searchString, BorderLayout.NORTH);
+            panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
+            panel.add(Box.createHorizontalGlue());
+            panel.add(prev);
             panel.add(next);
-            panel.add(searchDown);
-            panel.add(searchUp);
+            panel.add(Box.createHorizontalGlue());
             panel.add(close);
             add(panel, BorderLayout.SOUTH);
             super.setVisible(false);
