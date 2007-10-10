@@ -20,6 +20,7 @@
 ./arith/mod7.key
 ./arith/overflow_hija.key
 ./arith/poly_division0.key
+./arith/poly_division1.key
 ./inEqSimp/division.key
 ./inEqSimp/inequations0.key
 ./inEqSimp/inequations1.key
