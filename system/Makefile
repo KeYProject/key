@@ -507,7 +507,7 @@ ifeq "$(BRANDING)" ""
 	@echo $(SHA1) > ${BINARYPATH}/de/uka/ilkd/key/util/sha1
 	@echo $(KEY_VERSION_SHORT) > ${BINARYPATH}/de/uka/ilkd/key/util/version
 else
-fi
+endif
 	@rm -f error.msg
 	@rm -f critical.msg
 	@rm -f warning.msg
