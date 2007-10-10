@@ -251,6 +251,8 @@ public class SequentView extends JEditorPane implements Autoscroll {
      * then gets a new list of updates to highlight
      */
     public void updateUpdateHighlights() {
+        if (printer == null) return;
+
         Iterator it = updateHighlights.iterator();
 
         while (it.hasNext()) {
@@ -258,7 +260,7 @@ public class SequentView extends JEditorPane implements Autoscroll {
         }
 
         updateHighlights.clear();
-        Range[] ranges = printer().getPositionTable().getUpdateRanges();
+        Range[] ranges = printer.getPositionTable().getUpdateRanges();
 
         if (ranges != null) {
             for (int i = 0; i < ranges.length; i++) {
