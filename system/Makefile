@@ -40,10 +40,6 @@ JIKESPATH=$(CLASSPATH):$(GENERATED_SRC_PATH):$(JAVA_HOME)/jre/lib/rt.jar
 COMMON_OPTIONS=-g -d $(BINARYPATH)
 OPTIONS=$(COMMON_OPTIONS)
 
-<<<<<<< HEAD:system/Makefile
-ifeq "$(KEYVERS)" ""
-KEYVERS=$(PRCSVERSION)
-=======
 GIT=$(shell which git)
 
 
@@ -56,7 +52,6 @@ KEY_VERSION_SHORT:=1.1.$(KEY_VERSION_SHORT)
 else
 SHA1=ownVersion
 KEY_VERSION_SHORT=0.0.0
->>>>>>> cd5160c81af6413abd0afbe0091fc2ba123de808:system/Makefile
 endif
 
 ifeq "$(KEY_VERSION_LONG)" ""
