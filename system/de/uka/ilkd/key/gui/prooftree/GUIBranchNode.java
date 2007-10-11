@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.prooftree;
 /** this class implements a TreeModel that can be displayed using the
  * JTree class framework 
  */

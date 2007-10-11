@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.prooftree;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -22,6 +22,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import de.uka.ilkd.key.gui.ProofSettings;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.util.Debug;
 
@@ -34,8 +35,8 @@ import de.uka.ilkd.key.util.Debug;
  * new sutrees are displayed for branching points.
  *
  * <p>There are thus two kinds of node in this TreeModel, 
- * {@link de.uka.ilkd.key.gui.GUIProofTreeNode}s, representing nodes of
- * the displayed proof, and {@link de.uka.ilkd.key.gui.GUIBranchNode}s
+ * {@link de.uka.ilkd.key.gui.prooftree.GUIProofTreeNode}s, representing nodes of
+ * the displayed proof, and {@link de.uka.ilkd.key.gui.prooftree.GUIBranchNode}s
  * representing branching points.  (There is also one at the root.)
  */
 
