@@ -32,6 +32,9 @@ import javax.swing.text.Position;
 import javax.swing.tree.*;
 
 import de.uka.ilkd.key.gui.*;
+import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
+import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.util.Debug;
 

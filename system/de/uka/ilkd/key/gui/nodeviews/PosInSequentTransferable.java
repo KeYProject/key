@@ -1,7 +1,7 @@
 /*
  * Created on Apr 17, 2005
  */
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;

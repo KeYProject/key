@@ -667,7 +667,7 @@ public class KeYMediator {
      * @return a list of Taclets with all applicable FindTaclets
      */
 
-    protected ListOfTacletApp getFindTaclet(PosInSequent pos) {
+    public ListOfTacletApp getFindTaclet(PosInSequent pos) {
     	return interactiveProver.getFindTaclet(pos);
     }
 
@@ -675,7 +675,7 @@ public class KeYMediator {
      * (called by the SequentViewer)
      * @return a list of Taclets with all applicable RewriteTaclets
      */
-    protected ListOfTacletApp getRewriteTaclet(PosInSequent pos) {
+    public ListOfTacletApp getRewriteTaclet(PosInSequent pos) {
     	return interactiveProver.getRewriteTaclet(pos);    
     }
 
@@ -683,7 +683,7 @@ public class KeYMediator {
      * (called by the SequentViewer)
      * @return a list of Taclets with all applicable NoFindTaclets
      */
-    protected ListOfTacletApp getNoFindTaclet() {	
+    public ListOfTacletApp getNoFindTaclet() {	
     	return interactiveProver.getNoFindTaclet();
     }
 
