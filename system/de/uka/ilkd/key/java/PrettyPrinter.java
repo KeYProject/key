@@ -8,6 +8,7 @@
 //
 //
 
+
 package de.uka.ilkd.key.java;
 
 import java.io.IOException;
@@ -28,7 +29,6 @@ import de.uka.ilkd.key.java.expression.*;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.recoderext.StatementSVWrapper;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -38,30 +38,30 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramMetaConstruct;
 import de.uka.ilkd.key.rule.soundness.ProgramSVProxy;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.java.recoderext.StatementSVWrapper;
 
 /**
- * A configurable pretty printer for Java source elements originally from
- * COMPOST.
- * 
- * @author AL
- * 
- * CHANGED FOR KeY. Comments are not printed!
+   A configurable pretty printer for Java source elements originally from COMPOST.
+
+   @author AL
+   
+   CHANGED FOR KeY. Comments are not printed!
  */
 public class PrettyPrinter {
 
     /**
-     * Line number, not directly used.
-     */
+       Line number, not directly used.
+    */
     private int line = 0;
 
     /**
-     * Column number. Used to keep track of indentations.
-     */
+       Column number. Used to keep track of indentations.
+    */
     private int column = 0;
 
     /**
-     * Level.
-     */
+       Level.
+    */
     protected int level = 0;
     protected Writer out;
     protected StringBuffer outBuf;
@@ -80,18 +80,19 @@ public class PrettyPrinter {
 
     /** creates a new PrettyPrinter */
     public PrettyPrinter(Writer o) {
-        setWriter(o);
-        outBuf = new StringBuffer();
+	setWriter(o);
+	outBuf = new StringBuffer();
     }
 
-    public PrettyPrinter(Writer o, boolean noLinefeed, boolean fileWriterMode) {
-        this(o, noLinefeed);
-        this.fileWriterMode = fileWriterMode;
+    public PrettyPrinter(Writer o, boolean noLinefeed, 
+			 boolean fileWriterMode) {
+	this(o, noLinefeed);
+	this.fileWriterMode = fileWriterMode;
     }
-
+    
     public PrettyPrinter(Writer o, SVInstantiations svi) {
-        this(o);
-        this.instantiations = svi;
+    	this(o);
+    	this.instantiations = svi;
     }
 
     public PrettyPrinter(Writer o, boolean noLinefeed) {
@@ -103,36 +104,32 @@ public class PrettyPrinter {
         this(o, noLinefeed);
         this.instantiations = svi;
     }
-
+    
+    
     /** The number of charcters that have been send to the writer */
-    protected int writtenCharacters = 0;
+    protected int writtenCharacters = 0; 
 
     protected void output() throws IOException {
-        if (noSemicolons)
-            removeChar(outBuf, ';');
-        if (noLinefeed)
-            removeChar(outBuf, '\n');
-        String toWrite = outBuf.toString();
-        writtenCharacters += toWrite.length();
-        out.write(toWrite);
-        outBuf = new StringBuffer();
-
+	if (noSemicolons) removeChar(outBuf, ';');
+	if (noLinefeed) removeChar(outBuf, '\n');
+	String toWrite = outBuf.toString();
+	writtenCharacters += toWrite.length();
+	out.write(toWrite);
+	outBuf=new StringBuffer();
+	
     }
 
     /** Numbers of generated characters */
-    protected int getCurrentPos() {
-        return writtenCharacters + outBuf.length();
+    protected int getCurrentPos(){
+	return writtenCharacters + outBuf.length();
     }
 
     /**
      * Marks the start of the first executable statement ...
-     * 
-     * @param n
-     *            offset from the current position
-     * @param stmt
-     *            current statement;
+     * @param n offset from the current position
+     * @param stmt current statement;
      */
-    protected void markStart(int n, Object stmt) {
+    protected void markStart(int n, Object stmt){
         if (!startAlreadyMarked) {
 
             // System.err.println("Mark start ... called");
@@ -145,54 +142,54 @@ public class PrettyPrinter {
 
     /**
      * Marks the end of the first executable statement ...
-     * 
-     * @param n
-     *            offset from the current position
+     * @param n offset from the current position
      */
-    protected void markEnd(int n, Object stmt) {
-        if (!endAlreadyMarked && (firstStatement == stmt)) {
-
-            // System.err.println("Mark end ... called ");
-
-            firstStatementEnd = getCurrentPos() + n;
-            endAlreadyMarked = true;
-        }
+    protected void markEnd(int n, Object stmt){
+	if (!endAlreadyMarked && (firstStatement == stmt)) {
+	    
+	    //  System.err.println("Mark end ... called ");
+							
+	    firstStatementEnd = getCurrentPos() + n;
+	    endAlreadyMarked = true;
+	}
     }
 
     /**
-     * @return the range of the first executable statement that means the
-     *         corresponding start and end position in the string representation
+     * @return the range of the first executable statement that means
+     * the corresponding start and end position in the string representation
      */
-    public Range getRangeOfFirstExecutableStatement() {
-        return new Range(firstStatementStart, firstStatementEnd);
+    public Range getRangeOfFirstExecutableStatement(){
+	return new Range(firstStatementStart,firstStatementEnd);
     }
 
     /**
      * Resets the state of this pretty printer ...
      */
-    public void reset() {
-        firstStatementStart = -1;
-        firstStatementEnd = -1;
-        firstStatement = null;
-        startAlreadyMarked = false;
-        endAlreadyMarked = false;
-        writtenCharacters = 0;
-        outBuf = new StringBuffer();
+    public void reset(){
+	firstStatementStart = -1;
+	firstStatementEnd = -1;
+	firstStatement = null;
+	startAlreadyMarked = false;
+	endAlreadyMarked = false;
+	writtenCharacters = 0;
+	outBuf = new StringBuffer();
     }
+    
 
     /**
-     * Flag to indicate if a single line comment is being put out. Needed to
-     * disable the worklist meanwhile.
-     */
+       Flag to indicate if a single line comment is being put out.
+       Needed to disable the worklist meanwhile.
+    */
     private boolean isPrintingSingleLineComments = false;
 
-    private HashMap indentMap = new HashMap();
+
+    private HashMap indentMap=new HashMap();
 
     /**
-     * Set a new stream to write to. Useful to redirect the output while
-     * retaining all other settings. Resets the current source positions and
-     * comments.
-     */
+       Set a new stream to write to. Useful to redirect the output
+       while retaining all other settings. Resets the current source
+       positions and comments.
+    */
     public void setWriter(Writer out) {
         this.out = out;
         column = 0;
@@ -200,57 +197,49 @@ public class PrettyPrinter {
     }
 
     /**
-     * Get current line number.
-     * 
-     * @return the line number, starting with 0.
-     */
+       Get current line number.
+       @return the line number, starting with 0.
+    */
     public int getLine() {
         return line;
     }
 
     /**
-     * Get current column number.
-     * 
-     * @return the column number, starting with 0.
-     */
+       Get current column number.
+       @return the column number, starting with 0.
+    */
     public int getColumn() {
         return column;
     }
 
     /**
-     * Get indentation level.
-     * 
-     * @return the int value.
-     */
+       Get indentation level.
+       @return the int value.
+    */
     public int getIndentationLevel() {
         return level;
     }
 
     /**
-     * Set indentation level.
-     * 
-     * @param level
-     *            an int value.
-     */
+       Set indentation level.
+       @param level an int value.
+    */
     public void setIndentationLevel(int level) {
         this.level = level;
     }
 
     /**
-     * Get total indentation.
-     * 
-     * @return the int value.
-     */
+       Get total indentation.
+       @return the int value.
+    */
     public int getTotalIndentation() {
         return indentation * level;
     }
 
     /**
-     * Change level.
-     * 
-     * @param delta
-     *            an int value.
-     */
+       Change level.
+       @param delta an int value.
+    */
     public void changeLevel(int delta) {
         level += delta;
     }
@@ -269,83 +258,70 @@ public class PrettyPrinter {
     }
 
     /**
-     * Convenience method to write indentation chars.
-     */
+       Convenience method to write indentation chars.
+    */
     protected void writeIndentation(int lf, int blanks) throws IOException {
-        if (!noLinefeed) {
-            if (lf > 0) {
-                do {
-                    int n = Math.min(lf, FEEDS.length);
-                    write(FEEDS, 0, n);
-                    lf -= n;
-                } while (lf > 0);
-            }
-            while (blanks > 0) {
-                int n = Math.min(blanks, BLANKS.length);
-                write(BLANKS, 0, n);
-                blanks -= n;
-            }
-        }
+	if (!noLinefeed) {
+	    if (lf > 0) {
+		do {
+		    int n = Math.min(lf, FEEDS.length);
+		    write(FEEDS, 0, n);
+		    lf -= n;
+		} while (lf > 0);
+	    }
+	    while (blanks > 0) {
+		int n = Math.min(blanks, BLANKS.length);
+		write(BLANKS, 0, n);
+		blanks -= n;
+	    }	
+	}
     }
 
     /**
-     * Convenience method to write indentation chars.
-     */
+       Convenience method to write indentation chars.
+    */
     protected void writeIndentation(Position relative) throws IOException {
         writeIndentation(relative.getLine(), relative.getColumn());
     }
 
     /**
-     * Write indentation.
-     * 
-     * @param elem
-     *            a source element.
-     * @exception IOException
-     *                occasionally thrown.
-     */
+       Write indentation.
+       @param elem a source element.
+       @exception IOException occasionally thrown.
+    */
     protected void writeIndentation(SourceElement elem) throws IOException {
         writeIndentation(getRelativePosition(elem.getFirstElement()));
     }
 
     /**
-     * Write internal indentation.
-     * 
-     * @param elem
-     *            a source element.
-     * @exception IOException
-     *                occasionally thrown.
-     */
-    protected void writeInternalIndentation(SourceElement elem)
-            throws IOException {
+       Write internal indentation.
+       @param elem a source element.
+       @exception IOException occasionally thrown.
+    */
+    protected void writeInternalIndentation(SourceElement elem) throws IOException {
         writeIndentation(getRelativePosition(elem));
     }
 
+
     /**
-     * Write symbol.
-     * 
-     * @param lf
-     *            an int value.
-     * @param levelChange
-     *            an int value.
-     * @param symbol
-     *            a string.
-     * @exception IOException
-     *                occasionally thrown.
-     */
-    protected void writeSymbol(int lf, int levelChange, String symbol)
-            throws IOException {
+       Write symbol.
+       @param lf an int value.
+       @param levelChange an int value.
+       @param symbol a string.
+       @exception IOException occasionally thrown.
+    */
+    protected void writeSymbol(int lf, int levelChange, String symbol) throws IOException {
         level += levelChange;
         writeIndentation(lf, getTotalIndentation());
         write(symbol);
     }
 
     /**
-     * Replace all unicode characters above ? by their explicite representation.
-     * 
-     * @param str
-     *            the input string.
-     * @return the encoded string.
-     */
+       Replace all unicode characters above ?
+       by their explicite representation.
+       @param str the input string.
+       @return the encoded string.
+    */
     protected static String encodeUnicodeChars(String str) {
         int len = str.length();
         StringBuffer buf = new StringBuffer(len + 4);
@@ -365,20 +341,18 @@ public class PrettyPrinter {
     }
 
     /**
-     * Store the given comment until the next line feed is written.
-     * 
-     * @param slc
-     *            the comment to delay.
+       Store the given comment until the next line feed is written.
+       @param slc the comment to delay.
      */
     protected void scheduleComment(SingleLineComment slc) {
     }
 
     /**
-     * Adds indentation for a program element if necessary and if required, but
-     * does not print the indentation itself.
-     */
-    protected void writeElement(int lf, int levelChange, int blanks,
-            SourceElement elem) throws IOException {
+       Adds indentation for a program element if necessary and if required,
+       but does not print the indentation itself.       
+    */
+    protected void writeElement(int lf, int levelChange, int blanks, 
+				SourceElement elem) throws IOException {
         level += levelChange;
         if (lf > 0) {
             blanks += getTotalIndentation();
@@ -388,10 +362,10 @@ public class PrettyPrinter {
         if (indent == Position.UNDEFINED) {
             indent = new Position(lf, blanks);
         } else {
-            if (lf > indent.getLine()) {
+            if (lf > indent.getLine()) { 
                 indent = new Position(lf, indent.getColumn());
             }
-            if (blanks > indent.getColumn()) {
+            if (blanks > indent.getColumn()) {  
                 indent = new Position(indent.getLine(), blanks);
             }
         }
@@ -400,25 +374,24 @@ public class PrettyPrinter {
     }
 
     private Position getRelativePosition(SourceElement first) {
-        // System.out.println(indentMap);
-        if (indentMap.containsKey(first)) {
-            return (Position) indentMap.get(first);
-        } else {
-            if (first != null)
-                return first.getRelativePosition();
-            else
-                return Position.UNDEFINED;
-        }
+	//	System.out.println(indentMap);
+	if (indentMap.containsKey(first)) {
+	    return (Position)indentMap.get(first);
+	} else {
+	    if (first!=null) return first.getRelativePosition();
+	    else return Position.UNDEFINED;
+	}
     }
 
     /**
-     * Writes an implicit terminal token of a NonTerminal, including its
-     * indentation. Sets the indentation if it is necessary or required.
-     * 
-     * @see SourceElement#prettyPrint
-     */
+       Writes an implicit terminal token of a NonTerminal, including
+       its indentation. Sets the indentation if it is necessary or
+       required.
+       @see SourceElement#prettyPrint
+    */    
     protected void writeToken(int lf, int blanks, String image,
-            NonTerminalProgramElement parent) throws IOException {
+			      NonTerminalProgramElement parent)
+        throws IOException {
         if (lf > 0) {
             blanks += getTotalIndentation();
         }
@@ -427,192 +400,162 @@ public class PrettyPrinter {
             indent = new Position(lf, blanks);
         } else {
             if (lf > indent.getLine()) {
-                indent = new Position(lf, indent.getColumn());
+                indent=new Position(lf, indent.getColumn());
             }
             if (blanks > indent.getColumn()) {
-                indent = new Position(indent.getLine(), blanks);
+                indent=new Position(indent.getLine(), blanks);
             }
         }
-        indentMap.put(parent.getFirstElement(), indent); // needed ?????
+	indentMap.put(parent.getFirstElement(), indent); //needed ?????
         writeIndentation(indent);
-        // if (overwriteParsePositions) {
-        // parent.setInternalParsedLine(line);
-        // parent.setInternalParsedColumn(column);
-        // }
+        //	if (overwriteParsePositions) {
+        //	    parent.setInternalParsedLine(line);
+        //	    parent.setInternalParsedColumn(column);
+        //	}
         write(image);
     }
 
     protected final void writeToken(int blanks, String image,
-            NonTerminalProgramElement parent) throws IOException {
+                                 NonTerminalProgramElement parent)
+        throws IOException {
         writeToken(0, blanks, image, parent);
     }
 
-    protected final void writeToken(String image,
-            NonTerminalProgramElement parent) throws IOException {
+    protected final void writeToken(String image, NonTerminalProgramElement parent)
+        throws IOException {
         writeToken(0, 0, image, parent);
     }
 
     /**
-     * Write a source element.
-     * 
-     * @param lf
-     *            an int value.
-     * @param blanks
-     *            an int value.
-     * @param elem
-     *            a source element.
-     * @exception IOException
-     *                occasionally thrown.
-     */
-    protected void writeElement(int lf, int blanks, SourceElement elem)
-            throws IOException {
+       Write a source element.
+       @param lf an int value.
+       @param blanks an int value.
+       @param elem a source element.
+       @exception IOException occasionally thrown.
+    */
+    protected void writeElement(int lf, int blanks, SourceElement elem) throws IOException {
         writeElement(lf, 0, blanks, elem);
     }
 
     /**
-     * Write source element.
-     * 
-     * @param blanks
-     *            an int value.
-     * @param elem
-     *            a source element.
-     * @exception IOException
-     *                occasionally thrown.
-     */
-    protected void writeElement(int blanks, SourceElement elem)
-            throws IOException {
+       Write source element.
+       @param blanks an int value.
+       @param elem a source element.
+       @exception IOException occasionally thrown.
+    */
+    protected void writeElement(int blanks, SourceElement elem) throws IOException {
         writeElement(0, 0, blanks, elem);
     }
 
     /**
-     * Write source element.
-     * 
-     * @param elem
-     *            a source element.
-     * @exception IOException
-     *                occasionally thrown.
-     */
+       Write source element.
+       @param elem a source element.
+       @exception IOException occasionally thrown.
+	*/
     protected void writeElement(SourceElement elem) throws IOException {
         writeElement(0, 0, 0, elem);
     }
 
     /**
-     * Write a complete ArrayOfProgramElement.
-     */
-    protected void writeArrayOfProgramElement(int firstLF, int levelChange,
-            int firstBlanks, String separationSymbol, int separationLF,
-            int separationBlanks, ArrayOfProgramElement list)
-            throws IOException {
+       Write a complete ArrayOfProgramElement.
+    */
+    protected void writeArrayOfProgramElement(int firstLF,
+                                        int levelChange,
+                                        int firstBlanks,
+                                        String separationSymbol,
+                                        int separationLF,
+                                        int separationBlanks,
+                                        ArrayOfProgramElement list)
+        throws IOException {
         int s = list.size();
         if (s == 0) {
             return;
         }
-        writeElement(firstLF, levelChange, firstBlanks, list
-                .getProgramElement(0));
+        writeElement(firstLF, levelChange, firstBlanks,
+                            list.getProgramElement(0));
         for (int i = 1; i < s; i += 1) {
             write(separationSymbol);
-            writeElement(separationLF, separationBlanks, list
-                    .getProgramElement(i));
+            writeElement(separationLF, separationBlanks,
+                                list.getProgramElement(i));
         }
     }
 
     /**
-     * Write a complete ArrayOfProgramElement using "Keyword" style.
-     */
-    protected void writeKeywordList(int firstLF, int levelChange,
-            int firstBlanks, ArrayOfProgramElement list) throws IOException {
-        writeArrayOfProgramElement(firstLF, levelChange, firstBlanks, "", 0, 1,
-                list);
+       Write a complete ArrayOfProgramElement using "Keyword" style.
+    */
+    protected void writeKeywordList(int firstLF, int levelChange, int firstBlanks, 
+				    ArrayOfProgramElement list) throws IOException {
+        writeArrayOfProgramElement(firstLF, levelChange, firstBlanks, "", 0, 1, list);
     }
 
     /**
-     * Write keyword list.
-     * 
-     * @param list
-     *            a program element list.
-     * @exception IOException
-     *                occasionally thrown.
-     */
-    protected void writeKeywordList(ArrayOfProgramElement list)
-            throws IOException {
+       Write keyword list.
+       @param list a program element list.
+       @exception IOException occasionally thrown.
+    */
+    protected void writeKeywordList(ArrayOfProgramElement list) throws IOException {
         writeArrayOfProgramElement(0, 0, 0, "", 0, 1, list);
     }
 
     /**
-     * Write a complete ArrayOfProgramElement using "Comma" style.
-     */
-    protected void writeCommaList(int firstLF, int levelChange,
-            int firstBlanks, ArrayOfProgramElement list) throws IOException {
-        writeArrayOfProgramElement(firstLF, levelChange, firstBlanks, ",", 0,
-                1, list);
+       Write a complete ArrayOfProgramElement using "Comma" style.
+    */
+    protected void writeCommaList(int firstLF, int levelChange, int firstBlanks, 
+				  ArrayOfProgramElement list) throws IOException {
+        writeArrayOfProgramElement(firstLF, levelChange, 
+				   firstBlanks, ",", 0, 1, list);
     }
 
     /**
-     * Write comma list.
-     * 
-     * @param list
-     *            a program element list.
-     * @exception IOException
-     *                occasionally thrown.
-     */
-    protected void writeCommaList(int separationBlanks,
-            ArrayOfProgramElement list) throws IOException {
+       Write comma list.
+       @param list a program element list.
+       @exception IOException occasionally thrown.
+    */
+    protected void writeCommaList(int separationBlanks, ArrayOfProgramElement list)
+        throws IOException {
         writeArrayOfProgramElement(0, 0, 0, ",", 0, separationBlanks, list);
     }
 
     /**
-     * Write comma list.
-     * 
-     * @param list
-     *            a program element list.
-     * @exception IOException
-     *                occasionally thrown.
-     */
-    protected void writeCommaList(ArrayOfProgramElement list)
-            throws IOException {
+       Write comma list.
+       @param list a program element list.
+       @exception IOException occasionally thrown.
+    */
+    protected void writeCommaList(ArrayOfProgramElement list) throws IOException {
         writeArrayOfProgramElement(0, 0, 0, ",", 0, 1, list);
     }
 
     /**
-     * Write a complete ArrayOfProgramElement using "Line" style.
-     */
-    protected void writeLineList(int firstLF, int levelChange, int firstBlanks,
-            ArrayOfProgramElement list) throws IOException {
-        writeArrayOfProgramElement(firstLF, levelChange, firstBlanks, "", 1, 0,
-                list);
+       Write a complete ArrayOfProgramElement using "Line" style.
+    */
+    protected void writeLineList(int firstLF, int levelChange, int firstBlanks, 
+				 ArrayOfProgramElement list) throws IOException {
+        writeArrayOfProgramElement(firstLF, levelChange, firstBlanks, "", 1, 0, list);
     }
 
     /**
-     * Write line list.
-     * 
-     * @param list
-     *            a program element list.
-     * @exception IOException
-     *                occasionally thrown.
-     */
+       Write line list.
+       @param list a program element list.
+       @exception IOException occasionally thrown.
+    */
     protected void writeLineList(ArrayOfProgramElement list) throws IOException {
         writeArrayOfProgramElement(0, 0, 0, "", 1, 0, list);
     }
 
     /**
-     * Write a complete ArrayOfProgramElement using "Block" style.
-     */
-    protected void writeBlockList(int firstLF, int levelChange,
-            int firstBlanks, ArrayOfProgramElement list) throws IOException {
-        writeArrayOfProgramElement(firstLF, levelChange, firstBlanks, "", 2, 0,
-                list);
+       Write a complete ArrayOfProgramElement using "Block" style.
+    */
+    protected void writeBlockList(int firstLF, int levelChange, int firstBlanks, 
+				  ArrayOfProgramElement list) throws IOException {
+        writeArrayOfProgramElement(firstLF, levelChange, firstBlanks, "", 2, 0, list);
     }
 
     /**
-     * Write block list.
-     * 
-     * @param list
-     *            a program element list.
-     * @exception IOException
-     *                occasionally thrown.
-     */
-    protected void writeBlockList(ArrayOfProgramElement list)
-            throws IOException {
+       Write block list.
+       @param list a program element list.
+       @exception IOException occasionally thrown.
+    */
+    protected void writeBlockList(ArrayOfProgramElement list) throws IOException {
         writeArrayOfProgramElement(0, 0, 0, "", 2, 0, list);
     }
 
@@ -620,13 +563,10 @@ public class PrettyPrinter {
     }
 
     /**
-     * Write.
-     * 
-     * @param c
-     *            an int value.
-     * @exception IOException
-     *                occasionally thrown.
-     */
+       Write.
+       @param c an int value.
+       @exception IOException occasionally thrown.
+    */
     public void write(int c) throws IOException {
         if (c == '\n') {
             if (!isPrintingSingleLineComments) {
@@ -641,29 +581,21 @@ public class PrettyPrinter {
     }
 
     /**
-     * Write.
-     * 
-     * @param cbuf
-     *            a char value.
-     * @exception IOException
-     *                occasionally thrown.
-     */
+       Write.
+       @param cbuf a char value.
+       @exception IOException occasionally thrown.
+    */
     public void write(char[] cbuf) throws IOException {
         write(cbuf, 0, cbuf.length);
     }
 
     /**
-     * Write.
-     * 
-     * @param cbuf
-     *            an array of char.
-     * @param off
-     *            an int value.
-     * @param len
-     *            an int value.
-     * @exception IOException
-     *                occasionally thrown.
-     */
+       Write.
+       @param cbuf an array of char.
+       @param off an int value.
+       @param len an int value.
+       @exception IOException occasionally thrown.
+    */
     public void write(char[] cbuf, int off, int len) throws IOException {
         boolean col = false;
 
@@ -681,22 +613,20 @@ public class PrettyPrinter {
         }
         if (!col) {
             column += len;
-            /*
-             * int i; for (i = off + len - 1; (i >= off && cbuf[i] != '\n'); i -=
-             * 1) ; column = (i >= off) ? (off + len - 1 - i) : (column + len);
-             */
+	    /*
+	      int i;
+	      for (i = off + len - 1; (i >= off && cbuf[i] != '\n'); i -= 1) ;
+	      column = (i >= off) ? (off + len - 1 - i) : (column + len);
+	    */
         }
         outBuf.append(cbuf, off, len);
     }
 
     /**
-     * Write.
-     * 
-     * @param str
-     *            a string.
-     * @exception IOException
-     *                occasionally thrown.
-     */
+       Write.
+       @param str a string.
+       @exception IOException occasionally thrown.
+    */
     public void write(String str) throws IOException {
         int i = str.lastIndexOf('\n');
         if (i >= 0) {
@@ -713,129 +643,107 @@ public class PrettyPrinter {
     }
 
     /**
-     * Write.
-     * 
-     * @param str
-     *            a string.
-     * @param off
-     *            an int value.
-     * @param len
-     *            an int value.
-     * @exception IOException
-     *                occasionally thrown.
-     */
+       Write.
+       @param str a string.
+       @param off an int value.
+       @param len an int value.
+       @exception IOException occasionally thrown.
+    */
     public void write(String str, int off, int len) throws IOException {
         write(str.substring(off, off + len));
     }
 
+
     /**
-     * Indentation (cached).
-     */
-    private int indentation = 2;
+       Indentation (cached).
+    */
+    private int indentation=2;
 
     /*
-     * Wrap threshold (cached). private int wrap;
-     */
+       Wrap threshold (cached).
+       private int wrap;
+    */
 
     /**
-     * Overwrite indentation flag (cached).
-     */
+       Overwrite indentation flag (cached).
+    */
     private boolean overwriteIndentation;
 
     /**
-     * Overwrite parse positions flag (cached).
+       Overwrite parse positions flag (cached).
      */
     private boolean overwriteParsePositions;
+    
 
     /**
-     * Get indentation amount (blanks per level).
-     * 
-     * @return the value of getIntegerProperty("indentationAmount").
-     */
+       Get indentation amount (blanks per level).
+       @return the value of getIntegerProperty("indentationAmount").
+    */
     protected int getIndentation() {
         return indentation;
     }
 
     /**
-     * Returns true if the pretty printer should also reformat existing code.
-     * 
-     * @return the value of the overwriteIndentation property.
-     */
+       Returns true if the pretty printer should also reformat existing
+       code. 
+       @return the value of the overwriteIndentation property.
+    */
     protected boolean isOverwritingIndentation() {
         return overwriteIndentation;
     }
 
     /**
-     * Returns true if the pretty printer should reset the parse positions
-     * accordingly.
-     * 
-     * @return the value of the overwriteParsePositions property.
-     */
+       Returns true if the pretty printer should reset the parse positions
+       accordingly.
+       @return the value of the overwriteParsePositions property.
+    */
     protected boolean isOverwritingParsePositions() {
         return overwriteParsePositions;
     }
 
     /**
-     * Print program element header.
-     * 
-     * @param lf
-     *            an int value.
-     * @param blanks
-     *            an int value.
-     * @param elem
-     *            a program element.
-     * @exception IOException
-     *                occasionally thrown.
-     */
-    protected void printHeader(int lf, int blanks, ProgramElement elem)
-            throws IOException {
-
+       Print program element header.
+       @param lf an int value.
+       @param blanks an int value.
+       @param elem a program element.
+       @exception IOException occasionally thrown.
+    */
+    protected void printHeader(int lf, int blanks, ProgramElement elem) 
+	throws IOException {
+	
         printHeader(lf, 0, blanks, elem);
     }
 
     /**
-     * Print program element header.
-     * 
-     * @param blanks
-     *            an int value.
-     * @param elem
-     *            a program element.
-     * @exception IOException
-     *                occasionally thrown.
-     */
-    protected void printHeader(int blanks, ProgramElement elem)
-            throws IOException {
+       Print program element header.
+       @param blanks an int value.
+       @param elem a program element.
+       @exception IOException occasionally thrown.
+    */
+    protected void printHeader(int blanks, ProgramElement elem) throws IOException {
         printHeader(0, 0, blanks, elem);
     }
 
     /**
-     * Print program element header.
-     * 
-     * @param elem
-     *            a program element.
-     * @exception IOException
-     *                occasionally thrown.
-     */
+       Print program element header.
+       @param elem a program element.
+       @exception IOException occasionally thrown.
+    */
     protected void printHeader(ProgramElement elem) throws IOException {
         printHeader(0, 0, 0, elem);
     }
 
+
     /**
-     * Print program element header.
-     * 
-     * @param lf
-     *            number of line feeds.
-     * @param levelChange
-     *            the level change.
-     * @param blanks
-     *            number of white spaces.
-     * @param x
-     *            the program element.
-     * @exception IOException
-     *                occasionally thrown.
-     */
-    protected void printHeader(int lf, int levelChange, int blanks,
-            ProgramElement x) throws IOException {
+       Print program element header.
+       @param lf number of line feeds.
+       @param levelChange the level change.
+       @param blanks number of white spaces.
+       @param x the program element.
+       @exception IOException occasionally thrown.
+    */
+    protected void printHeader(int lf, int levelChange, int blanks, ProgramElement x)
+	throws IOException {
 
         level += levelChange;
         if (lf > 0) {
@@ -846,53 +754,53 @@ public class PrettyPrinter {
         if (indent == Position.UNDEFINED) {
             indent = new Position(lf, blanks);
         } else {
-            if (lf > indent.getLine()) {
-                indent = new Position(lf, indent.getColumn());
+	    if (lf > indent.getLine()) {
+                indent=new Position(lf, indent.getColumn());
             }
             if (blanks > indent.getColumn()) {
-                indent = new Position(indent.getLine(), blanks);
+                indent=new Position(indent.getLine(), blanks);
             }
         }
         indentMap.put(first, indent);
     }
 
+
     /**
-     * Print program element footer.
-     * 
-     * @param x
-     *            the program element.
-     * @exception IOException
-     *                occasionally thrown.
-     */
+       Print program element footer.
+       @param x the program element.
+       @exception IOException occasionally thrown.
+    */
     protected void printFooter(ProgramElement x) throws IOException {
-        output();
+	output();
     }
 
-    protected void printOperator(Operator x, String symbol)
-            throws java.io.IOException {
+
+    protected void printOperator(Operator x, String symbol) 
+    throws java.io.IOException {
 
         // Mark statement start ...
-        markStart(0, x);
+        markStart(0,x);
+
 
         ArrayOfExpression children = x.getArguments();
         if (children != null) {
-            // boolean addParentheses = x.isToBeParenthesized();
-            // if (addParentheses) {
-            // write('(');
-            // } //????
+//          boolean addParentheses = x.isToBeParenthesized();
+//          if (addParentheses) {
+//          write('(');
+//          }  //????
 
             if (!noLinefeed) {
-                writeSymbol(1, 0, "");
+                writeSymbol(1,0, "");
             }
             output();
 
             boolean wasNoSemicolons = noSemicolons;
-            boolean wasNoLinefeed = noLinefeed;
+            boolean wasNoLinefeed   = noLinefeed;
             noSemicolons = true;
-            // noLinefeed=true;
+            //	    noLinefeed=true;
             switch (x.getArity()) {
             case 2:
-                noLinefeed = true;
+                noLinefeed=true;
                 writeElement(0, children.getExpression(0));
                 writeToken(0, symbol, x);
                 output();
@@ -917,29 +825,31 @@ public class PrettyPrinter {
             }
             output();
             noSemicolons = wasNoSemicolons;
-            noLinefeed = wasNoLinefeed;
-            // if (addParentheses) {
-            // write(')');
-            // } //???? as above
+            noLinefeed   = wasNoLinefeed;
+            //           if (addParentheses) {
+            //    write(')');
+            // }   //???? as above
             if (x instanceof Assignment) {
-                // if (((Assignment)x).getStatementContainer() != null) {
-                write(";"); // ????
+                // 		if (((Assignment)x).getStatementContainer() != null) {
+                write(";");    //????
 
-                // }
+
+                // 		}
             }
             output();
             // Mark statement end ...
-            markEnd(0, x);
+            markEnd(0,x);
 
-            /*
-             * if (!noLinefeed) { writeSymbol(1,0, ""); }
-             */
+            /*if (!noLinefeed) {
+    		writeSymbol(1,0, "");
+            }*/          
         }
     }
 
+    
     public void printProgramElementName(ProgramElementName x)
-            throws java.io.IOException {
-
+	throws java.io.IOException {
+	
         printHeader(x);
         writeInternalIndentation(x);
         write(x.getProgramName());
@@ -947,20 +857,21 @@ public class PrettyPrinter {
     }
 
     public void printProgramVariable(ProgramVariable x)
-            throws java.io.IOException {
-
+	throws java.io.IOException {
+	
         printHeader(x);
         writeInternalIndentation(x);
-        if (fileWriterMode) {
-            write(x.name().toString().substring(
-                    x.name().toString().lastIndexOf(":") + 1));
-        } else {
-            write(x.name().toString());
-        }
+	if(fileWriterMode){
+	    write(x.name().toString().substring(x.name().toString().
+						lastIndexOf(":")+1));
+	}else{
+	    write(x.name().toString());
+	}
         printFooter(x);
     }
-
-    public void printProgramMethod(ProgramMethod x) throws java.io.IOException {
+    
+    public void printProgramMethod(ProgramMethod x)
+	throws java.io.IOException {
 
         printHeader(x);
         writeInternalIndentation(x);
@@ -969,35 +880,35 @@ public class PrettyPrinter {
     }
 
     public void printProgramMetaConstruct(ProgramMetaConstruct x)
-            throws java.io.IOException {
+	throws java.io.IOException {
         printHeader(x);
         write(x.name().toString());
         writeToken("(", x);
-        boolean oldNoLinefeed = noLinefeed;
-        noLinefeed = true;
+    	boolean oldNoLinefeed = noLinefeed;
+    	noLinefeed = true;
         if (x.getChildAt(0) != null) {
             writeElement(1, +1, 0, x.getChildAt(0));
             writeSymbol(1, -1, ")");
         } else {
             write(")");
         }
-        noLinefeed = oldNoLinefeed;
+    	noLinefeed = oldNoLinefeed;
         printFooter(x);
     }
 
     public void printContextStatementBlock(ContextStatementBlock x)
-            throws java.io.IOException {
+	throws java.io.IOException {
         printHeader(x);
-
+        
         if (x.getStatementCount() > 0) {
-            writeToken("{ .. ", x);
-            writeLineList(1, +1, 0, x.getBody());
-            writeSymbol(1, -1, " ... }");
+        	writeToken("{ .. ", x);
+        	writeLineList(1, +1, 0, x.getBody());           
+        	writeSymbol(1, -1, " ... }");           
         } else {
-            markStart(0, x);
-            writeToken("{ .. ", x);
-            write(" ... }");
-            markEnd(0, x);
+        	markStart(0, x);
+        	writeToken("{ .. ", x);
+            write(" ... }");           
+            markEnd(0,x);        	
         }
         printFooter(x);
     }
@@ -1009,8 +920,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printBooleanLiteral(BooleanLiteral x)
-            throws java.io.IOException {
+    public void printBooleanLiteral(BooleanLiteral x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
         write(x.getValue() ? "true" : "false");
@@ -1020,15 +930,15 @@ public class PrettyPrinter {
     public void printStringLiteral(StringLiteral x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
-        if (fileWriterMode
-                && !encodeUnicodeChars(x.getValue()).startsWith("\"")) {
-            write("\"");
-        }
+	if(fileWriterMode && 
+	   !encodeUnicodeChars(x.getValue()).startsWith("\"")){
+	    write("\"");
+	}
         write(encodeUnicodeChars(x.getValue()));
-        if (fileWriterMode
-                && !encodeUnicodeChars(x.getValue()).startsWith("\"")) {
-            write("\"");
-        }
+	if(fileWriterMode && 
+	   !encodeUnicodeChars(x.getValue()).startsWith("\"")){ 
+	    write("\"");
+	}
         printFooter(x);
     }
 
@@ -1067,8 +977,8 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printPackageSpecification(PackageSpecification x)
-            throws java.io.IOException {
+    public void printPackageSpecification(PackageSpecification x) 
+	throws java.io.IOException {
 
         printHeader(x);
         writeInternalIndentation(x);
@@ -1077,66 +987,65 @@ public class PrettyPrinter {
         write(";");
         printFooter(x);
     }
-
+    
     public void printAssert(Assert x) throws java.io.IOException {
-        printHeader(x);
+        printHeader(x);       
 
         // Mark statement start ...
-        markStart(0, x);
-
-        boolean wasNoLinefeed = noLinefeed;
+        markStart(0,x);
+       
+        boolean wasNoLinefeed  = noLinefeed;
         boolean wasNoSemicolon = noSemicolons;
+        
 
-        write("assert ");
+        write("assert ");        
 
-        noLinefeed = true;
+        noLinefeed   = true;
         noSemicolons = true;
         writeElement(0, x.getCondition());
-
+        
         if (x.getMessage() != null) {
-            write(" : ");
+            write(" : ");        
             writeElement(0, x.getMessage());
-        }
+        }                
 
         noSemicolons = wasNoSemicolon;
-        noLinefeed = wasNoLinefeed;
-
-        write(";");
+        noLinefeed   = wasNoLinefeed;       
+        
+        write(";"); 
 
         output();
         // Mark statement end ...
-        markEnd(0, x);
+        markEnd(0,x);                
 
     }
-
-    public void printArrayDeclaration(ArrayDeclaration type)
-            throws java.io.IOException {
-        Type baseType = type.getBaseType().getKeYJavaType().getJavaType();
-        if (baseType instanceof ArrayDeclaration) {
-            printArrayDeclaration((ArrayDeclaration) baseType);
-        } else {
-            writeSymbol(1, 0, baseType.getFullName());
-        }
-        write("[]");
+ 
+    public void printArrayDeclaration(ArrayDeclaration type) throws java.io.IOException {
+	Type baseType = type.getBaseType().getKeYJavaType().getJavaType();
+	if (baseType instanceof ArrayDeclaration) {
+	    printArrayDeclaration((ArrayDeclaration)baseType);
+	} else {
+	    writeSymbol(1, 0, baseType.getFullName());
+	}
+	write("[]");
     }
 
     public void printTypeReference(TypeReference x) throws java.io.IOException {
-        if (x.getKeYJavaType().getJavaType() instanceof ArrayDeclaration) {
-            printArrayDeclaration((ArrayDeclaration) x.getKeYJavaType()
-                    .getJavaType());
-        } else if (x.getProgramElementName() != null) {
-            printHeader(x);
-            if (x.getReferencePrefix() != null) {
-                writeElement(x.getReferencePrefix());
-                writeToken(".", x);
-            }
+	if (x.getKeYJavaType().getJavaType() instanceof ArrayDeclaration) {
+	    printArrayDeclaration
+		((ArrayDeclaration)x.getKeYJavaType().getJavaType());
+	} else if (x.getProgramElementName() != null) {
+	    printHeader(x);
+	    if (x.getReferencePrefix() != null) {
+		writeElement(x.getReferencePrefix());
+		writeToken(".", x);
+	    }   
             writeElement(x.getProgramElementName());
         }
         printFooter(x);
     }
 
-    public void printSchemaTypeReference(SchemaTypeReference x)
-            throws java.io.IOException {
+    public void printSchemaTypeReference(SchemaTypeReference x) throws java.io.IOException {
         printHeader(x);
         if (x.getReferencePrefix() != null) {
             boolean wasNoSemicolons = noSemicolons;
@@ -1146,14 +1055,14 @@ public class PrettyPrinter {
             writeToken(".", x);
         }
 
-        if (x.getProgramElementName() != null) {
+	if (x.getProgramElementName() != null) {
             writeElement(x.getProgramElementName());
         }
         printFooter(x);
     }
 
-    public void printFieldReference(FieldReference x)
-            throws java.io.IOException {
+
+    public void printFieldReference(FieldReference x) throws java.io.IOException {
         printHeader(x);
         if (x.getReferencePrefix() != null) {
             boolean wasNoSemicolons = noSemicolons;
@@ -1168,8 +1077,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printPackageReference(PackageReference x)
-            throws java.io.IOException {
+    public void printPackageReference(PackageReference x) throws java.io.IOException {
         printHeader(x);
         if (x.getReferencePrefix() != null) {
             writeElement(x.getReferencePrefix());
@@ -1180,28 +1088,30 @@ public class PrettyPrinter {
         }
         printFooter(x);
     }
+
+    
 
     public void printThrows(Throws x) throws java.io.IOException {
         printHeader(x);
         if (x.getExceptions() != null) {
             writeInternalIndentation(x);
-            write("throws");
-
-            writeCommaList(0, 0, 1, x.getExceptions());
+            write("throws");	    
+            
+	    writeCommaList(0, 0, 1, x.getExceptions());
         }
         printFooter(x);
     }
 
-    public void printArrayInitializer(ArrayInitializer x)
-            throws java.io.IOException {
+    public void printArrayInitializer(ArrayInitializer x) 
+	throws java.io.IOException {
 
         printHeader(x);
         writeToken("{", x);
         if (x.getArguments() != null) {
             writeCommaList(0, 0, 1, x.getArguments());
         }
-        if (x.getArguments() != null && x.getArguments().size() > 0
-                && getRelativePosition(x).getLine() > 0) {
+        if (x.getArguments() != null && x.getArguments().size() > 0 
+	    && getRelativePosition(x).getLine() > 0) {
 
             writeSymbol(1, 0, "}");
         } else {
@@ -1210,23 +1120,21 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printCompilationUnit(CompilationUnit x)
-            throws java.io.IOException {
+    public void printCompilationUnit(CompilationUnit x) throws java.io.IOException {
         printHeader(x);
         setIndentationLevel(0);
         boolean hasPackageSpec = (x.getPackageSpecification() != null);
         if (hasPackageSpec) {
             writeElement(x.getPackageSpecification());
         }
-        boolean hasImports = (x.getImports() != null)
-                && (x.getImports().size() > 0);
+        boolean hasImports = (x.getImports() != null) && (x.getImports().size() > 0);
         if (hasImports) {
-            writeLineList((x.getPackageSpecification() != null) ? 2 : 0, 0, 0,
-                    x.getImports());
+            writeLineList((x.getPackageSpecification() != null) ? 2 : 0,
+			  0, 0, x.getImports());
         }
         if (x.getDeclarations() != null) {
-            writeBlockList((hasImports || hasPackageSpec) ? 2 : 0, 0, 0, x
-                    .getDeclarations());
+            writeBlockList((hasImports || hasPackageSpec) ? 2 : 0, 0, 0,
+			   x.getDeclarations());
         }
         printFooter(x);
         // we do this linefeed here to allow flushing of the pretty printer
@@ -1234,21 +1142,21 @@ public class PrettyPrinter {
         writeIndentation(1, 0);
     }
 
-    public void printClassDeclaration(ClassDeclaration x)
-            throws java.io.IOException {
-        if (fileWriterMode) {
-            classToPrint = x;
-        }
+    public void printClassDeclaration(ClassDeclaration x) 
+	throws java.io.IOException {
+	if(fileWriterMode){
+	    classToPrint = x;
+	}
         printHeader(x);
         int m = 0;
         if (x.getModifiers() != null) {
             m = x.getModifiers().size();
         }
         if (m > 0) {
-            ArrayOfModifier mods = x.getModifiers();
-            if (fileWriterMode) {
-                mods = replacePrivateByPublic(mods);
-            }
+	    ArrayOfModifier mods = x.getModifiers();
+	    if(fileWriterMode){
+		mods = replacePrivateByPublic(mods);
+	    }
             writeKeywordList(mods);
             m = 1;
         }
@@ -1268,36 +1176,36 @@ public class PrettyPrinter {
             write("{");
         }
         if (x.getMembers() != null) {
-            // services.getJavaInfo().getKeYProgModelInfo().getConstructors(kjt)
-            if (fileWriterMode && !containsDefaultConstructor(x.getMembers())) {
-                write("\n   public " + x.getProgramElementName() + "(){}\n");
-            }
+//	    services.getJavaInfo().getKeYProgModelInfo().getConstructors(kjt)
+	    if(fileWriterMode && !containsDefaultConstructor(x.getMembers())){
+		write("\n   public "+x.getProgramElementName()+"(){}\n");
+	    }
             writeBlockList(2, 1, 0, x.getMembers());
         }
         writeSymbol(1, (x.getMembers() != null) ? -1 : 0, "}");
         printFooter(x);
-        if (fileWriterMode) {
-            classToPrint = null;
-        }
+	if(fileWriterMode){
+	    classToPrint = null;
+	}
     }
 
-    private boolean containsDefaultConstructor(ArrayOfMemberDeclaration members) {
-        for (int i = 0; i < members.size(); i++) {
-            MemberDeclaration md = members.getMemberDeclaration(i);
-            if (md instanceof ProgramMethod) {
-                md = ((ProgramMethod) md).getMethodDeclaration();
-            }
-            if ((md instanceof ConstructorDeclaration)
-                    && ((ConstructorDeclaration) md)
-                            .getParameterDeclarationCount() == 0) {
-                return true;
-            }
-        }
-        return false;
+    private boolean containsDefaultConstructor(ArrayOfMemberDeclaration members){
+	for(int i=0; i<members.size(); i++){
+	    MemberDeclaration md = members.getMemberDeclaration(i);
+	    if(md instanceof ProgramMethod){
+		md = ((ProgramMethod) md).getMethodDeclaration();
+	    }
+	    if((md instanceof ConstructorDeclaration) && 
+	       ((ConstructorDeclaration) md).
+	       getParameterDeclarationCount() == 0){
+		return true;
+	    }
+	}
+	return false;
     }
 
-    public void printInterfaceDeclaration(InterfaceDeclaration x)
-            throws java.io.IOException {
+    public void printInterfaceDeclaration(InterfaceDeclaration x) 
+       throws java.io.IOException {
 
         printHeader(x);
         int m = 0;
@@ -1429,142 +1337,45 @@ public class PrettyPrinter {
 	return typeName.replace('.','_');
     }
 
-    private ArrayOfModifier replacePrivateByPublic(ArrayOfModifier ma) {
-        LinkedList l = new LinkedList();
-        boolean publicFound = false;
-        for (int i = 0; i < ma.size(); i++) {
-            if (ma.getModifier(i) instanceof Private) {
-                l.add(new Public());
-                publicFound = true;
-            } else if (ma.getModifier(i) instanceof Public) {
-                l.add(ma.getModifier(i));
-                publicFound = true;
-            } else if (ma.getModifier(i) instanceof Protected) {
-                l.add(new Public());
-                publicFound = true;
-            } else {
-                l.add(ma.getModifier(i));
-            }
-        }
-        if (!publicFound) {
-            l.add(new Public());
-        }
-        return new ArrayOfModifier(l);
-    }
-
-    public void printFieldDeclaration(FieldDeclaration x)
-            throws java.io.IOException {
-        if (!fileWriterMode
-                || !((ProgramVariable) x.getVariables()
-                        .lastVariableSpecification().getProgramVariable())
-                        .isImplicit()) {
-            printHeader(x);
-            int m = 0;
-            if (x.getModifiers() != null) {
-                ArrayOfModifier mods = x.getModifiers();
-                m = mods.size();
-                if (fileWriterMode
-                        && x.isFinal()
-                        && (!x.isStatic() || ((ProgramVariable) x
-                                .getVariables().getVariableSpecification(0)
-                                .getProgramVariable()).getCompileTimeConstant() == null)) {
-                    m--;
-                    mods = removeFinal(mods);
-                }
-                writeKeywordList(mods);
-            }
-            writeElement((m > 0) ? 1 : 0, x.getTypeReference());
-            final ArrayOfVariableSpecification varSpecs = x.getVariables();
-            assert varSpecs != null : "Strange: a field declaration without a"
-                    + " variable specification";
-            writeCommaList(0, 0, 1, varSpecs);
-            write(";");
-            printFooter(x);
-            // provides a set method for each field. Necessary for unittest
-            // generation.
-            if (fileWriterMode) {
-                for (int i = 0; i < varSpecs.size(); i++) {
-                    VariableSpecification varSpec = varSpecs
-                            .getVariableSpecification(i);
-                    ProgramVariable pv = (ProgramVariable) varSpec
-                            .getProgramVariable();
-                    if (!(x.isFinal() && x.isStatic() && pv
-                            .getCompileTimeConstant() != null)) {
-                        final String pvName = pv.getProgramElementName()
-                                .getProgramName();
-                        String typeName;
-                        final Type javaType = pv.getKeYJavaType().getJavaType();
-                        if (javaType instanceof ArrayType) {
-                            typeName = ((ArrayType) javaType)
-                                    .getAlternativeNameRepresentation();
-                        } else {
-                            typeName = javaType.getFullName();
-                        }
-
-                        String typeNameNoBrackets = getTypeNameForAccessMethods(pv
-                                .getKeYJavaType().getName());
-                        printHeader(x);
-                        write("\n\npublic " + (x.isStatic() ? "static " : "")
-                                + "void _set" + pvName + typeNameNoBrackets
-                                + "(" + typeName + " _" + pvName + "){\n");
-                        write("    " + pvName + " = _" + pvName + ";\n");
-                        write("}");
-                        write("\n\npublic " + (x.isStatic() ? "static " : "")
-                                + typeName + " _" + pvName + typeNameNoBrackets
-                                + "(){\n");
-                        write("    return " + pvName + ";\n");
-                        write("}");
-                        printFooter(x);
-                    }
-                }
-            }
-        }
-    }
-
-    public static String getTypeNameForAccessMethods(String typeName) {
-        typeName = typeName.replace('[', '_');
-        return typeName.replace('.', '_');
-    }
-
-    public void printLocalVariableDeclaration(LocalVariableDeclaration x)
-            throws java.io.IOException {
+    public void printLocalVariableDeclaration(LocalVariableDeclaration x) 
+	throws java.io.IOException {
         printHeader(x);
-        // Mark statement start ...
-        markStart(0, x);
+	// Mark statement start ...
+	markStart(0,x);
         int m = 0;
         if (x.getModifiers() != null) {
             m = x.getModifiers().size();
             writeKeywordList(x.getModifiers());
         }
         writeElement((m > 0) ? 1 : 0, x.getTypeReference());
-        write(" ");
+	write(" ");
         ArrayOfVariableSpecification varSpecs = x.getVariables();
-        boolean wasNoSemicolons = noSemicolons;
-        boolean wasNoLinefeed = noLinefeed;
-        noSemicolons = true;
-        noLinefeed = true;
+	boolean wasNoSemicolons = noSemicolons;
+	boolean wasNoLinefeed   = noLinefeed;
+	noSemicolons = true;
+	noLinefeed   = true;
         if (varSpecs != null) {
             writeCommaList(0, 0, 1, varSpecs);
         }
         // !!!!!!!!!! HAS TO BE CHANGED
-        // if (!(x.getStatementContainer() instanceof LoopStatement)) {
+        //       if (!(x.getStatementContainer() instanceof LoopStatement)) {
         write(";");
-        // }
+        //        }
 
         // Mark statement end ...
-        markEnd(0, x);
+        markEnd(0,x);
         noSemicolons = wasNoSemicolons;
-        noLinefeed = wasNoLinefeed;
+        noLinefeed   = wasNoLinefeed;
         printFooter(x);
     }
 
-    public void printVariableDeclaration(VariableDeclaration x)
-            throws java.io.IOException {
+    public void printVariableDeclaration(VariableDeclaration x) 
+	throws java.io.IOException {
 
         printHeader(x);
-
-        // Mark statement start ...
-        markStart(0, x);
+	
+	// Mark statement start ...
+	markStart(0,x);
 
         int m = 0;
         if (x.getModifiers() != null) {
@@ -1572,72 +1383,73 @@ public class PrettyPrinter {
             writeKeywordList(x.getModifiers());
         }
         writeElement((m > 0) ? 1 : 0, x.getTypeReference());
-        write(" ");
+	write(" ");
         ArrayOfVariableSpecification varSpecs = x.getVariables();
         if (varSpecs != null) {
             writeCommaList(0, 0, 1, varSpecs);
         }
-
-        // Mark statement end ...
-        markEnd(0, x);
+	
+	// Mark statement end ...
+	markEnd(0,x);
 
         printFooter(x);
     }
 
-    public void printMethodDeclaration(MethodDeclaration x)
-            throws java.io.IOException {
-        if (!fileWriterMode || x.getFullName().indexOf("<") == -1) {
-            printHeader(x);
-            Comment[] c = x.getComments();
-            int m = c.length;
-            for (int i = 0; i < c.length; i++) {
-                printComment(c[i]);
-            }
-            if (x.getModifiers() != null) {
-                ArrayOfModifier mods = x.getModifiers();
-                if ((x instanceof ConstructorDeclaration) && fileWriterMode) {
-                    mods = replacePrivateByPublic(mods);
-                }
-                m += mods.size();
-                writeKeywordList(mods);
-            }
-            if (x.getTypeReference() != null) {
-                if (m > 0) {
-                    writeElement(1, x.getTypeReference());
-                } else {
-                    writeElement(x.getTypeReference());
-                }
-                writeElement(1, x.getProgramElementName());
-            } else if (x.getTypeReference() == null
-                    && !(x instanceof ConstructorDeclaration)) {
-                write(" void ");
-                writeElement(1, x.getProgramElementName());
-            } else {
-                if (m > 0) {
-                    writeElement(1, x.getProgramElementName());
-                } else {
-                    writeElement(x.getProgramElementName());
-                }
-            }
-            write(" (");
-            if (x.getParameters() != null) {
-                writeCommaList(1, x.getParameters());
-            }
-            write(")");
-            if (x.getThrown() != null) {
-                writeElement(1, x.getThrown());
-            }
-            if (x.getBody() != null) {
-                writeElement(1, x.getBody());
-            } else {
-                write(";");
-            }
-            printFooter(x);
-        }
+    public void printMethodDeclaration(MethodDeclaration x) 
+	throws java.io.IOException {
+	if(!fileWriterMode || x.getFullName().indexOf("<")==-1){
+	    printHeader(x);
+	    Comment[] c = x.getComments();
+	    int m = c.length;
+	    for(int i=0; i<c.length; i++){
+		printComment(c[i]);
+	    }
+	    if (x.getModifiers() != null) {
+		ArrayOfModifier mods = x.getModifiers();
+		if((x instanceof ConstructorDeclaration) && 
+		   fileWriterMode){
+		    mods = replacePrivateByPublic(mods);
+		}
+		m += mods.size();
+		writeKeywordList(mods);
+	    }
+	    if (x.getTypeReference() != null) {
+		if (m > 0) {
+		    writeElement(1, x.getTypeReference());
+		} else {
+		    writeElement(x.getTypeReference());
+		}
+		writeElement(1, x.getProgramElementName());
+	    }else if (x.getTypeReference() == null && 
+		      !(x instanceof ConstructorDeclaration)) {
+		write(" void ");
+		writeElement(1, x.getProgramElementName());
+	    } else {
+		if (m > 0) {
+		    writeElement(1, x.getProgramElementName());
+		} else {
+		    writeElement(x.getProgramElementName());
+		}
+	    }
+	    write(" (");
+	    if (x.getParameters() != null) {
+		writeCommaList(1, x.getParameters());
+	    }
+	    write(")");
+	    if (x.getThrown() != null) {
+		writeElement(1, x.getThrown());
+	    }
+	    if (x.getBody() != null) {
+		writeElement(1, x.getBody());
+	    } else {
+		write(";");
+	    }
+	    printFooter(x);
+	}
     }
 
-    public void printClassInitializer(ClassInitializer x)
-            throws java.io.IOException {
+    public void printClassInitializer(ClassInitializer x) 
+	throws java.io.IOException {
 
         printHeader(x);
         int m = 0;
@@ -1651,54 +1463,53 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printStatementBlock(StatementBlock x)
-            throws java.io.IOException {
+    public void printStatementBlock(StatementBlock x) throws java.io.IOException {
         printHeader(x);
 
-        if (!(x.getBody() != null && x.getBody().size() > 0)) {
-            // We have an empty statement block ...
+	if (!(x.getBody() != null && x.getBody().size() > 0)) {
+	    // We have an empty statement block ...
+	    
+	    // Mark statement start ...
+	    markStart(0,x);
 
-            // Mark statement start ...
-            markStart(0, x);
+	}
 
-        }
+	// Hack to insert space after "if (cond)", etc. but not
+	// at beginning of diamond.
+	if (column!=0) {
+	    write(" ");
+	}
+	write("{");	
+	if (x.getBody() != null && x.getBody().size() > 0) {
+	    writeLineList(1, +1, 0, x.getBody());
+	    writeSymbol(1, -1, "}");
+	} else {
+	    write("}");
 
-        // Hack to insert space after "if (cond)", etc. but not
-        // at beginning of diamond.
-        if (column != 0) {
-            write(" ");
-        }
-        write("{");
-        if (x.getBody() != null && x.getBody().size() > 0) {
-            writeLineList(1, +1, 0, x.getBody());
-            writeSymbol(1, -1, "}");
-        } else {
-            write("}");
+	    // Mark statement end ...
+	    markEnd(0,x);
 
-            // Mark statement end ...
-            markEnd(0, x);
-
-        }
-        printFooter(x);
+	}
+	printFooter(x);
     }
 
     public void printBreak(Break x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
-
-        // Mark statement start ...
-        markStart(0, x);
+	
+	// Mark statement start ...
+	markStart(0,x);
 
         write("break ");
-        noLinefeed = true;
+	noLinefeed=true;
         if (x.getProgramElementName() != null) {
             writeElement(1, x.getProgramElementName());
         }
         write(";");
-        noLinefeed = false;
+	noLinefeed=false;
 
-        // Mark statement end ...
-        markEnd(0, x);
+	// Mark statement end ...
+	markEnd(0,x);
 
         printFooter(x);
     }
@@ -1707,19 +1518,19 @@ public class PrettyPrinter {
         printHeader(x);
         writeInternalIndentation(x);
 
-        // Mark statement start ...
-        markStart(0, x);
+	// Mark statement start ...
+	markStart(0,x);
 
         write("continue ");
-        noLinefeed = true;
+	noLinefeed=true;
         if (x.getProgramElementName() != null) {
             writeElement(1, x.getProgramElementName());
         }
         write(";");
-        noLinefeed = false;
+	noLinefeed=false;
 
-        // Mark statement end ...
-        markEnd(0, x);
+	// Mark statement end ...
+	markEnd(0,x);
 
         printFooter(x);
     }
@@ -1727,20 +1538,20 @@ public class PrettyPrinter {
     public void printReturn(Return x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
-
-        // Mark statement start ...
-        markStart(0, x);
+	
+	// Mark statement start ...
+	markStart(0,x);
 
         write("return ");
         if (x.getExpression() != null) {
             noSemicolons = true;
             writeElement(1, x.getExpression());
-            noSemicolons = false;
+            noSemicolons = false;            
         }
         write(";");
 
-        // Mark statement end ...
-        markEnd(0, x);
+	// Mark statement end ...
+	markEnd(0,x);
 
         printFooter(x);
     }
@@ -1749,8 +1560,8 @@ public class PrettyPrinter {
         printHeader(x);
         writeInternalIndentation(x);
 
-        // Mark statement start ...
-        markStart(0, x);
+	// Mark statement start ...
+	markStart(0,x);
 
         write("throw ");
         if (x.getExpression() != null) {
@@ -1760,8 +1571,8 @@ public class PrettyPrinter {
         }
         write(";");
 
-        // Mark statement end ...
-        markEnd(0, x);
+	// Mark statement end ...
+	markEnd(0,x);
 
         printFooter(x);
     }
@@ -1770,46 +1581,46 @@ public class PrettyPrinter {
         printHeader(x);
         writeInternalIndentation(x);
 
-        // Mark statement start ...
-        markStart(0, x);
+	// Mark statement start ...
+	markStart(0,x);
 
         write("do");
         if (x.getBody() == null || x.getBody() instanceof EmptyStatement) {
             write(";");
-            // w.writeElement(1, body);
+            //w.writeElement(1, body);
         } else {
-            if (x.getBody() instanceof StatementBlock) {
-                writeElement(1, 0, x.getBody());
-            } else {
-                writeElement(1, +1, 0, x.getBody());
-                changeLevel(-1);
-            }
-        }
-        writeSymbol(1, 0, "while");
-        noLinefeed = true;
-        noSemicolons = true;
-        write(" (");
+	    if (x.getBody() instanceof StatementBlock) {
+                    writeElement(1, 0, x.getBody());
+                } else {
+                    writeElement(1, +1, 0, x.getBody());
+                    changeLevel(-1);
+                }
+	}        
+	writeSymbol(1, 0, "while");
+	noLinefeed=true;
+	noSemicolons=true;
+	write(" (");
         if (x.getGuardExpression() != null) {
-            write(" ");
+	    write(" ");
             writeElement(x.getGuardExpression());
-            write(" ");
+	    write(" ");
         }
-        noLinefeed = false;
-        noSemicolons = false;
+	noLinefeed=false;
+	noSemicolons=false;
         write(");");
 
-        // Mark statement end ...
-        markEnd(0, x);
-
+	// Mark statement end ...
+	markEnd(0,x);
+	
         printFooter(x);
     }
 
     private static void removeChar(StringBuffer sb, char c) {
-        for (int i = 0; i < sb.length(); i++) {
-            if (sb.charAt(i) == c) {
-                sb.deleteCharAt(i);
-            }
-        }
+	for (int i=0; i<sb.length(); i++) {
+	    if (sb.charAt(i)==c) {
+		sb.deleteCharAt(i);
+	    }
+	}
     }
 
     public void printEnhancedFor(EnhancedFor x) throws IOException {
@@ -1919,35 +1730,34 @@ public class PrettyPrinter {
     public void printWhile(While x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
-        output();
-        noLinefeed = true;
-        noSemicolons = true;
+	output();
+	noLinefeed=true;
+	noSemicolons=true;
 
-        // Mark statement start ...
-        markStart(0, x);
+	// Mark statement start ...
+	markStart(0,x);
 
-        write("while (");
-        write(" ");
+	write("while (");
+	write(" ");
         if (x.getGuardExpression() != null) {
             writeElement(x.getGuardExpression());
         }
-        write(" )");
-        output();
-        noLinefeed = false;
-        noSemicolons = false;
+	write(" )"); output();
+	noLinefeed=false;
+	noSemicolons=false;
         if (x.getBody() == null || x.getBody() instanceof EmptyStatement) {
             write(";");
         } else {
-            if (x.getBody() instanceof StatementBlock) {
-                writeElement(0, 0, x.getBody());
-            } else {
-                writeElement(1, +1, 0, x.getBody());
-                changeLevel(-1);
-            }
+	    if (x.getBody() instanceof StatementBlock) {
+		writeElement(0, 0, x.getBody());
+	    } else {
+		writeElement(1, +1, 0, x.getBody());
+		changeLevel(-1);
+	    }
         }
 
-        // Mark statement end ...
-        markEnd(0, x);
+	// Mark statement end ...
+	markEnd(0,x);
 
         printFooter(x);
     }
@@ -1955,37 +1765,37 @@ public class PrettyPrinter {
     public void printIf(If x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
-        output();
+	output();
+	
+	noLinefeed   = true;
+	noSemicolons = true;	
 
-        noLinefeed = true;
-        noSemicolons = true;
+	// Mark statement start ...
+	markStart(0,x);
 
-        // Mark statement start ...
-        markStart(0, x);
-
-        write("if (");
+	write("if (");
         if (x.getExpression() != null) {
-            writeElement(1, x.getExpression());
+	    writeElement(1, x.getExpression());
         }
-        write(")");
+	write(")");
 
-        noLinefeed = false;
+        noLinefeed = false;        
         noSemicolons = false;
-
+        
         if (x.getThen() != null) {
-            if (x.getThen().getBody() instanceof StatementBlock) {
-                writeElement(1, 0, x.getThen());
-            } else {
-                writeElement(1, +1, 0, x.getThen());
-                changeLevel(-1);
-            }
+	    if (x.getThen().getBody() instanceof StatementBlock) {
+		writeElement(1, 0, x.getThen());
+	    } else {
+		writeElement(1, +1, 0, x.getThen());
+		changeLevel(-1);
+	    }
         }
         if (x.getElse() != null) {
-            writeElement(1, 0, x.getElse());
+	    writeElement(1, 0, x.getElse());
         }
 
-        // Mark statement end ...
-        markEnd(0, x);
+	// Mark statement end ...
+	markEnd(0,x);
 
         printFooter(x);
     }
@@ -1994,11 +1804,11 @@ public class PrettyPrinter {
         printHeader(x);
         writeInternalIndentation(x);
 
-        // Mark statement start ...
-        markStart(0, x);
+	// Mark statement start ...
+	markStart(0,x);
 
         write("switch (");
-        if (x.getExpression() != null) {
+        if (x.getExpression() != null) {           
             noSemicolons = true;
             writeElement(x.getExpression());
             noSemicolons = false;
@@ -2008,9 +1818,9 @@ public class PrettyPrinter {
             writeLineList(1, 0, 0, x.getBranchList());
         }
         writeSymbol(1, 0, "}");
-
-        // Mark statement end ...
-        markEnd(0, x);
+	
+	// Mark statement end ...
+	markEnd(0,x);
 
         printFooter(x);
     }
@@ -2019,125 +1829,128 @@ public class PrettyPrinter {
         printHeader(x);
         writeInternalIndentation(x);
 
-        // // Mark statement start ...
-        // markStart(0,x);
+	// // Mark statement start ...
+	// markStart(0,x);
 
         write("try");
 
         if (x.getBody() != null) {
-            writeElement(0, 0, x.getBody());
+                writeElement(0, 0, x.getBody());
         }
         if (x.getBranchList() != null) {
-            writeLineList(1, 0, 0, x.getBranchList());
+	    writeLineList(1, 0, 0, x.getBranchList());
         }
 
-        // // Mark statement end ...
-        // markEnd(0,x);
+	// // Mark statement end ...
+	// markEnd(0,x);
 
         printFooter(x);
     }
 
-    public void printLabeledStatement(LabeledStatement x)
-            throws java.io.IOException {
+    public void printLabeledStatement(LabeledStatement x) 
+	throws java.io.IOException {
 
         printHeader(x);
-
+	
+	
         if (x.getLabel() != null) {
             writeElement(x.getLabel());
             writeToken(":", x);
-        }
+        } 
 
         if (x.getBody() != null) {
-            writeElement(1, 0, x.getBody());
+	    writeElement(1, 0, x.getBody());
         }
 
         printFooter(x);
     }
 
-    public void printMethodFrame(MethodFrame x) throws java.io.IOException {
+    public void printMethodFrame(MethodFrame x) 
+	throws java.io.IOException {
 
         printHeader(x);
 
-        noLinefeed = false;
+	noLinefeed   = false;
 
-        write("method-frame(");
-        IProgramVariable pvar = x.getProgramVariable();
-        if (pvar != null) {
-            write("result->");
-            writeElement(pvar);
+	write("method-frame(");
+	IProgramVariable pvar = x.getProgramVariable();
+	if (pvar != null) {
+	    write("result->");
+	    writeElement(pvar);
             write(", ");
-        }
+	} 
 
-        if (x.getExecutionContext() instanceof ExecutionContext) {
-            writeElement(x.getExecutionContext());
-        } else {
-            printSchemaVariable((SchemaVariable) x.getExecutionContext());
-        }
+	if (x.getExecutionContext() instanceof ExecutionContext) {
+	    writeElement(x.getExecutionContext());
+	} else {
+	    printSchemaVariable((SchemaVariable)x.getExecutionContext());
+	} 
 
-        write(")");
-        writeToken(":", x);
-
-        noLinefeed = false;
-        noSemicolons = false;
+	write(")");	
+	writeToken(":", x);
+	
+	noLinefeed = false;
+	noSemicolons = false;
 
         if (x.getBody() != null) {
-            writeElement(0, 0, x.getBody());
+	    writeElement(0, 0, x.getBody());
         }
 
         printFooter(x);
     }
 
-    public void printCatchAllStatement(CatchAllStatement x)
-            throws java.io.IOException {
+    public void printCatchAllStatement(CatchAllStatement x) 
+	throws java.io.IOException {
         printHeader(x);
-        markStart(0, x);
-        write("#catchAll");
-        write("(");
-        writeElement(x.getParameterDeclaration());
-        write(")");
-        writeElement(1, x.getBody());
+	markStart(0,x);
+	write("#catchAll");
+	write("(");
+	writeElement(x.getParameterDeclaration());
+	write(")");
+	writeElement(1, x.getBody());        
         printFooter(x);
 
     }
 
-    public void printMethodBodyStatement(MethodBodyStatement x)
-            throws java.io.IOException {
+    public void printMethodBodyStatement(MethodBodyStatement x) 
+	throws java.io.IOException {
 
-        boolean wasNoLinefeed = noLinefeed;
-        noLinefeed = false;
-
+	boolean wasNoLinefeed   = noLinefeed;
+	noLinefeed   = false;
+        
         printHeader(x);
         writeInternalIndentation(x);
-        markStart(0, x);
+	markStart(0,x);
 
-        IProgramVariable pvar = x.getResultVariable();
-        if (pvar != null) {
-            writeElement(pvar);
-            write("=");
-        }
+	IProgramVariable pvar = x.getResultVariable();
+	if (pvar != null) {
+	    writeElement(pvar);
+	    write("=");
+	} 
 
         printMethodReference(x.getMethodReference(), false);
 //CHG:
     if(!fileWriterMode){
         write("@");
-        final TypeReference tr = x.getBodySourceAsTypeReference();
+	final TypeReference tr = x.getBodySourceAsTypeReference();
         if (tr instanceof SchemaTypeReference) {
-            printSchemaTypeReference((SchemaTypeReference) tr);
+            printSchemaTypeReference((SchemaTypeReference)tr);
         } else if (tr instanceof SchemaVariable) {
-            printSchemaVariable((SchemaVariable) tr);
+            printSchemaVariable((SchemaVariable)tr);
         } else {
             printTypeReference(tr);
         }
     }
         write(";");
-        markEnd(0, x);
+	markEnd(0,x);
         printFooter(x);
 
-        noLinefeed = wasNoLinefeed;
+	noLinefeed   = wasNoLinefeed;
     }
 
-    public void printSynchronizedBlock(SynchronizedBlock x)
-            throws java.io.IOException {
+
+    public void printSynchronizedBlock(SynchronizedBlock x) 
+	throws java.io.IOException {
 
         printHeader(x);
         writeInternalIndentation(x);
@@ -2166,6 +1979,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
+
     public void printExtends(Extends x) throws java.io.IOException {
         printHeader(x);
         if (x.getSupertypes() != null) {
@@ -2187,7 +2001,7 @@ public class PrettyPrinter {
     }
 
     public void printVariableSpecification(VariableSpecification x)
-            throws java.io.IOException {
+    throws java.io.IOException {
 
         printHeader(x);
 
@@ -2195,12 +2009,12 @@ public class PrettyPrinter {
         markStart(0, x);
 
         x.getProgramVariable().prettyPrint(this);
-        // writeElement(x.getProgramElementName());
+        //writeElement(x.getProgramElementName());
         for (int i = 0; i < x.getDimensions(); i += 1) {
             write("[]");
         }
         if (x.getInitializer() != null) {
-            // w.writeIndentation(getInternalLinefeeds(),
+            //            w.writeIndentation(getInternalLinefeeds(),
             // getInternalIndentation());
             write(" = ");
             writeElement(0, 0, 1, x.getInitializer());
@@ -2214,143 +2028,137 @@ public class PrettyPrinter {
 
     public void printBinaryAnd(BinaryAnd x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "&");
+        printOperator(x,  "&");
         printFooter(x);
     }
 
-    public void printBinaryAndAssignment(BinaryAndAssignment x)
-            throws java.io.IOException {
+    public void printBinaryAndAssignment(BinaryAndAssignment x) 
+	throws java.io.IOException {
 
         printHeader(x);
-        printOperator(x, "&=");
+        printOperator(x,  "&=");
         printFooter(x);
     }
 
-    public void printBinaryOrAssignment(BinaryOrAssignment x)
-            throws java.io.IOException {
+    public void printBinaryOrAssignment(BinaryOrAssignment x) 
+	throws java.io.IOException {
 
         printHeader(x);
-        printOperator(x, "|=");
+        printOperator(x,  "|=");
         printFooter(x);
     }
 
-    public void printBinaryXOrAssignment(BinaryXOrAssignment x)
-            throws java.io.IOException {
+    public void printBinaryXOrAssignment(BinaryXOrAssignment x) 
+	throws java.io.IOException {
 
         printHeader(x);
-        printOperator(x, "^=");
+        printOperator(x,  "^=");
         printFooter(x);
     }
 
-    public void printCopyAssignment(CopyAssignment x)
-            throws java.io.IOException {
+    public void printCopyAssignment(CopyAssignment x) throws java.io.IOException {
         printHeader(x);
-        // output();
-        // noLinefeed=true;
-        printOperator(x, "=");
-        // noLinefeed=false;
-        // write("\n");
+	//output();
+	//	noLinefeed=true;
+        printOperator(x,  "=");
+	//	noLinefeed=false;
+	//write("\n");
+        printFooter(x);	
+    }
+
+    public void printDivideAssignment(DivideAssignment x) throws java.io.IOException {
+        printHeader(x);
+        printOperator(x,  "/=");
         printFooter(x);
     }
 
-    public void printDivideAssignment(DivideAssignment x)
-            throws java.io.IOException {
+    public void printMinusAssignment(MinusAssignment x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "/=");
+        printOperator(x,  "-=");
         printFooter(x);
     }
 
-    public void printMinusAssignment(MinusAssignment x)
-            throws java.io.IOException {
+    public void printModuloAssignment(ModuloAssignment x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "-=");
+        printOperator(x,  "%=");
         printFooter(x);
     }
 
-    public void printModuloAssignment(ModuloAssignment x)
-            throws java.io.IOException {
+    public void printPlusAssignment(PlusAssignment x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "%=");
-        printFooter(x);
-    }
-
-    public void printPlusAssignment(PlusAssignment x)
-            throws java.io.IOException {
-        printHeader(x);
-        printOperator(x, "+=");
+        printOperator(x,  "+=");
         printFooter(x);
     }
 
     public void printPostDecrement(PostDecrement x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "--");
+        printOperator(x,  "--");
         printFooter(x);
     }
 
     public void printPostIncrement(PostIncrement x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "++");
+        printOperator(x,  "++");
         printFooter(x);
     }
 
     public void printPreDecrement(PreDecrement x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "--");
+        printOperator(x,  "--");
         printFooter(x);
     }
 
     public void printPreIncrement(PreIncrement x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "++");
+        printOperator(x,  "++");
         printFooter(x);
     }
 
-    public void printShiftLeftAssignment(ShiftLeftAssignment x)
-            throws java.io.IOException {
+    public void printShiftLeftAssignment(ShiftLeftAssignment x) 
+	throws java.io.IOException {
 
         printHeader(x);
-        printOperator(x, "<<=");
+        printOperator(x,  "<<=");
         printFooter(x);
     }
 
-    public void printShiftRightAssignment(ShiftRightAssignment x)
-            throws java.io.IOException {
+    public void printShiftRightAssignment(ShiftRightAssignment x) 
+	throws java.io.IOException {
 
         printHeader(x);
-        printOperator(x, ">>=");
+        printOperator(x,  ">>=");
         printFooter(x);
     }
 
-    public void printTimesAssignment(TimesAssignment x)
-            throws java.io.IOException {
+    public void printTimesAssignment(TimesAssignment x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "*=");
+        printOperator(x,  "*=");
         printFooter(x);
     }
 
-    public void printUnsignedShiftRightAssignment(UnsignedShiftRightAssignment x)
-            throws java.io.IOException {
+    public void printUnsignedShiftRightAssignment(UnsignedShiftRightAssignment x) 
+	throws java.io.IOException {
 
         printHeader(x);
-        printOperator(x, ">>>=");
+        printOperator(x,  ">>>=");
         printFooter(x);
     }
 
     public void printBinaryNot(BinaryNot x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "~");
+        printOperator(x,  "~");
         printFooter(x);
     }
 
     public void printBinaryOr(BinaryOr x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "|");
+        printOperator(x,  "|");
         printFooter(x);
     }
 
     public void printBinaryXOr(BinaryXOr x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "^");
+        printOperator(x,  "^");
         printFooter(x);
     }
 
@@ -2376,44 +2184,43 @@ public class PrettyPrinter {
 
     public void printDivide(Divide x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "/");
+        printOperator(x,  "/");
         printFooter(x);
     }
 
     public void printEquals(Equals x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "==");
+        printOperator(x,  "==");
         printFooter(x);
     }
 
-    public void printGreaterOrEquals(GreaterOrEquals x)
-            throws java.io.IOException {
+    public void printGreaterOrEquals(GreaterOrEquals x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, ">=");
+        printOperator(x,  ">=");
         printFooter(x);
     }
 
     public void printGreaterThan(GreaterThan x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, ">");
+        printOperator(x,  ">");
         printFooter(x);
     }
 
     public void printLessOrEquals(LessOrEquals x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "<=");
+        printOperator(x,  "<=");
         printFooter(x);
     }
 
     public void printLessThan(LessThan x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "<");
+        printOperator(x,  "<");
         printFooter(x);
     }
 
     public void printNotEquals(NotEquals x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "!=");
+        printOperator(x,  "!=");
         printFooter(x);
     }
 
@@ -2466,8 +2273,8 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printExactInstanceof(ExactInstanceof x)
-            throws java.io.IOException {
+
+    public void printExactInstanceof(ExactInstanceof x) throws java.io.IOException {
         printHeader(x);
         boolean addParentheses = x.isToBeParenthesized();
         if (addParentheses) {
@@ -2487,11 +2294,13 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
+
+
     public void printNew(New x) throws java.io.IOException {
         printHeader(x);
 
-        // Mark statement start ...
-        markStart(0, x);
+	// Mark statement start ...
+	markStart(0,x);
 
         boolean addParentheses = x.isToBeParenthesized();
         if (addParentheses) {
@@ -2504,7 +2313,7 @@ public class PrettyPrinter {
         writeInternalIndentation(x);
         write("new ");
         writeElement(1, x.getTypeReference());
-        write(" (");
+	write(" (");
         if (x.getArguments() != null) {
             writeCommaList(x.getArguments());
         }
@@ -2515,13 +2324,13 @@ public class PrettyPrinter {
         if (addParentheses) {
             write(")");
         }
-        // !!!!!!!!!! HAS TO BE CHANGED
-        // if (x.getStatementContainer() != null && fileWriterMode) {
-        // write(";");
-        // }
+	// !!!!!!!!!! HAS TO BE CHANGED
+//	if (x.getStatementContainer() != null && fileWriterMode) {
+//	   write(";");
+//	}
 
-        // Mark statement end ...
-        markEnd(0, x);
+	// Mark statement end ...
+	markEnd(0,x);
         printFooter(x);
     }
 
@@ -2548,80 +2357,79 @@ public class PrettyPrinter {
 
     public void printLogicalAnd(LogicalAnd x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "&&");
+        printOperator(x,  "&&");
         printFooter(x);
     }
 
     public void printLogicalNot(LogicalNot x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "!");
+        printOperator(x,  "!");
         printFooter(x);
     }
 
     public void printLogicalOr(LogicalOr x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "||");
+        printOperator(x,  "||");
         printFooter(x);
     }
 
     public void printMinus(Minus x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "-");
+        printOperator(x,  "-");
         printFooter(x);
     }
 
     public void printModulo(Modulo x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "%");
+        printOperator(x,  "%");
         printFooter(x);
     }
 
     public void printNegative(Negative x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "-");
+        printOperator(x,  "-");
         printFooter(x);
     }
 
     public void printPlus(Plus x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "+");
+        printOperator(x,  "+");
         printFooter(x);
     }
 
     public void printPositive(Positive x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "+");
+        printOperator(x,  "+");
         printFooter(x);
     }
 
     public void printShiftLeft(ShiftLeft x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "<<");
+        printOperator(x,  "<<");
         printFooter(x);
     }
 
     public void printShiftRight(ShiftRight x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, ">>");
+        printOperator(x,  ">>");
         printFooter(x);
     }
 
     public void printTimes(Times x) throws java.io.IOException {
         printHeader(x);
-        printOperator(x, "*");
+        printOperator(x,  "*");
         printFooter(x);
     }
 
-    public void printUnsignedShiftRight(UnsignedShiftRight x)
-            throws java.io.IOException {
+    public void printUnsignedShiftRight(UnsignedShiftRight x) 
+	throws java.io.IOException {
 
         printHeader(x);
-        printOperator(x, ">>>");
+        printOperator(x,  ">>>");
         printFooter(x);
     }
 
-    public void printArrayReference(ArrayReference x)
-            throws java.io.IOException {
+    public void printArrayReference(ArrayReference x) throws java.io.IOException {
         printHeader(x);
         if (x.getReferencePrefix() != null) {
             writeElement(x.getReferencePrefix());
@@ -2637,8 +2445,8 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printMetaClassReference(MetaClassReference x)
-            throws java.io.IOException {
+    public void printMetaClassReference(MetaClassReference x) 
+	throws java.io.IOException {
 
         printHeader(x);
         if (x.getTypeReference() != null) {
@@ -2649,126 +2457,128 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printMethodReference(MethodReference x)
-            throws java.io.IOException {
+    public void printMethodReference(MethodReference x) 
+	throws java.io.IOException {       
         printMethodReference(x, !noSemicolons);
     }
 
-    private void printMethodReference(MethodReference x, boolean withSemicolon)
-            throws java.io.IOException {
-        printHeader(x);
-        // Mark statement start ...
-        markStart(0, x);
+
+    private void printMethodReference(MethodReference x,
+            boolean withSemicolon) 
+	throws java.io.IOException {      
+	printHeader(x);       
+	// Mark statement start ...
+	markStart(0,x);
 
         if (x.getReferencePrefix() != null) {
             writeElement(x.getReferencePrefix());
             write(".");
         }
         if (x.getProgramElementName() != null) {
-            x.getMethodName().prettyPrint(this);
-            // writeElement(x.getProgramElementName());
+        	x.getMethodName().prettyPrint(this);
+            //writeElement(x.getProgramElementName());
         }
-
-        write("(");
-        boolean wasNoSemicolons = noSemicolons;
-        boolean wasNoLinefeed = noLinefeed;
-        noLinefeed = true;
-        noSemicolons = true;
+ 
+	write("(");
+	boolean wasNoSemicolons = noSemicolons;
+	boolean wasNoLinefeed   = noLinefeed;
+	noLinefeed   = true;
+	noSemicolons = true;      
         if (x.getArguments() != null) {
             writeCommaList(x.getArguments());
+        }	
+	write(")");
+	if (withSemicolon) {
+            write(";");           
         }
-        write(")");
-        if (withSemicolon) {
-            write(";");
-        }
-        noLinefeed = wasNoLinefeed;
-        noSemicolons = wasNoSemicolons;
-        output();
+	noLinefeed   = wasNoLinefeed;
+	noSemicolons = wasNoSemicolons;       
+	output();
 
-        // Mark statement end ...
-        markEnd(0, x);
-
+	// Mark statement end ...
+	markEnd(0,x);
+	
     }
 
     public void printMethod(ProgramMethod x) throws java.io.IOException {
-        // printHeader(x);
-        write(x.name().toString());
-        // printFooter(x);
+	//        printHeader(x);
+	write(x.name().toString());
+	//        printFooter(x);
     }
 
-    public void printExecutionContext(ExecutionContext x)
-            throws java.io.IOException {
-        write("source=");
-        writeElement(x.getTypeReference());
-        if (x.getRuntimeInstance() != null) {
-            write(",this=");
-            writeElement(x.getRuntimeInstance());
-        }
+    public void printExecutionContext(ExecutionContext x) 
+	throws java.io.IOException {
+	write("source=");
+	writeElement(x.getTypeReference());
+	if (x.getRuntimeInstance() != null) {
+	    write(",this=");
+	    writeElement(x.getRuntimeInstance());
+	}
     }
 
-    public void printSuperConstructorReference(SuperConstructorReference x)
-            throws java.io.IOException {
+
+    public void printSuperConstructorReference(SuperConstructorReference x) 
+	throws java.io.IOException {
 
         printHeader(x);
-        markStart(0, x);
+	markStart(0,x);
 
         if (x.getReferencePrefix() != null) {
             writeElement(x.getReferencePrefix());
             write(".");
         }
-        writeToken("super (", x);
+	writeToken("super (", x);
         if (x.getArguments() != null) {
             writeCommaList(0, 0, 0, x.getArguments());
         }
         write(");");
-        markEnd(0, x);
+	markEnd(0,x);
         printFooter(x);
     }
 
-    public void printThisConstructorReference(ThisConstructorReference x)
-            throws java.io.IOException {
+    public void printThisConstructorReference(ThisConstructorReference x) 
+	throws java.io.IOException {
 
         printHeader(x);
-        markStart(0, x);
+	markStart(0,x);
         writeInternalIndentation(x);
-        write("this (");
+	write("this (");
         if (x.getArguments() != null) {
             writeCommaList(x.getArguments());
         }
         write(");");
-        markEnd(0, x);
+	markEnd(0,x);
         printFooter(x);
     }
 
-    public void printSuperReference(SuperReference x)
-            throws java.io.IOException {
+    public void printSuperReference(SuperReference x) throws java.io.IOException {
         printHeader(x);
-        markStart(0, x);
+	markStart(0,x);
         if (x.getReferencePrefix() != null) {
             writeElement(x.getReferencePrefix());
             writeToken(".super", x);
         } else {
             writeToken("super", x);
         }
-        markEnd(0, x);
+	markEnd(0,x);
         printFooter(x);
     }
 
     public void printThisReference(ThisReference x) throws java.io.IOException {
         printHeader(x);
-        markStart(0, x);
+	markStart(0,x);
         if (x.getReferencePrefix() != null) {
             writeElement(x.getReferencePrefix());
             writeToken(".this", x);
         } else {
             writeToken("this", x);
         }
-        markEnd(0, x);
+	markEnd(0,x);
         printFooter(x);
     }
 
-    public void printArrayLengthReference(ArrayLengthReference x)
-            throws java.io.IOException {
+    public void printArrayLengthReference(ArrayLengthReference x) 
+	throws java.io.IOException {
         printHeader(x);
         if (x.getReferencePrefix() != null) {
             writeElement(x.getReferencePrefix());
@@ -2791,14 +2601,14 @@ public class PrettyPrinter {
         writeInternalIndentation(x);
         write("else");
         if (x.getBody() != null) {
-            if (x.getBody() instanceof StatementBlock) {
-                writeElement(1, 0, x.getBody());
-            } else {
-                writeElement(1, +1, 0, x.getBody());
-                changeLevel(-1);
-            }
-        }
-
+	    if (x.getBody() instanceof StatementBlock) {
+		writeElement(1, 0, x.getBody());
+	    } else {
+		writeElement(1, +1, 0, x.getBody());
+		changeLevel(-1);
+	    }
+	}
+        
         printFooter(x);
     }
 
@@ -2822,15 +2632,15 @@ public class PrettyPrinter {
 
     public void printCatch(Catch x) throws java.io.IOException {
         printHeader(x);
-        writeToken("catch (", x);
+	writeToken("catch (", x);
         if (x.getParameterDeclaration() != null) {
-            noLinefeed = true;
+	    noLinefeed=true;           
             noSemicolons = true;
             writeElement(x.getParameterDeclaration());
         }
         write(")");
         noSemicolons = false;
-        noLinefeed = false;
+	noLinefeed=false;
         if (x.getBody() != null) {
             writeElement(1, x.getBody());
         }
@@ -2851,9 +2661,9 @@ public class PrettyPrinter {
     public void printFinally(Finally x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
-        noLinefeed = true;
-        output();
-        noLinefeed = false;
+	noLinefeed = true;
+	output();
+	noLinefeed = false;
         write("finally");
         if (x.getBody() != null) {
             writeElement(1, x.getBody());
@@ -2868,121 +2678,121 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printSchemaVariable(SchemaVariable x)
-            throws java.io.IOException {
-        if (x instanceof ProgramSV) {
-            if (!noSemicolons) {
-                markStart(0, x);
-            }
-            Object o = instantiations.getInstantiation(x);
-            if (o == null) {
-                printHeader((ProgramSV) x);
-                writeInternalIndentation((ProgramSV) x);
-                write(x.name().toString());
-                printFooter((ProgramSV) x);
-            } else {
-                // logger.debug(o.toString() + " " + o.getClass().getName());
-                // Debug.assertTrue(o instanceof ProgramElement);
-                if (o instanceof ProgramElement) {
-                    ((ProgramElement) o).prettyPrint(this);
-                } else if (o instanceof ArrayOfProgramElement) {
-                    writeBlockList((ArrayOfProgramElement) o);
-                } else {
-                    logger.warn("No PrettyPrinting available for "
-                            + o.getClass().getName());
-                }
-            }
-            if (!noSemicolons) {
-                markEnd(0, x);
-            }
-        } else {
-            Debug
-                    .fail("That cannot happen! Don't know how to pretty print non program SV in programs.");
-        }
-
+    public void printSchemaVariable(SchemaVariable x) throws java.io.IOException {
+    	if(x instanceof ProgramSV){
+    		if (!noSemicolons) {
+    			markStart(0,x);
+    		}
+    		Object o = instantiations.getInstantiation(x); 
+    		if (o == null) {
+    		    printHeader((ProgramSV)x);
+    		    writeInternalIndentation((ProgramSV)x);
+    		    write(x.name().toString());
+    		    printFooter((ProgramSV)x);
+    		} else {
+    		    //logger.debug(o.toString() + "  " + o.getClass().getName());
+    			//Debug.assertTrue(o instanceof ProgramElement);
+    			if (o instanceof ProgramElement) {
+    				((ProgramElement)o).prettyPrint(this);
+    			} else if (o instanceof ArrayOfProgramElement) {
+    				writeBlockList((ArrayOfProgramElement)o);
+    			} else {
+    				logger.warn("No PrettyPrinting available for " + o.getClass().getName());
+    			}
+    		}
+    		if (!noSemicolons) {
+    			markEnd(0,x);
+    		}
+    	}else{
+    	    Debug.fail("That cannot happen! Don't know how to pretty print non program SV in programs.");
+    	}
+    	
     }
+   
 
-    public void printEmptyStatement(EmptyStatement x)
-            throws java.io.IOException {
+    public void printEmptyStatement(EmptyStatement x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
-
-        // Mark statement start ...
-        markStart(0, x);
-
+	
+	// Mark statement start ...
+	markStart(0,x);
+       	
         write(";");
-
-        // Mark statement end ...
-        markEnd(0, x);
-
-        printFooter(x);
+        
+	// Mark statement end ...
+	markEnd(0,x);
+       	
+	printFooter(x);
     }
 
     public void printComment(Comment x) throws java.io.IOException {
-        if (fileWriterMode) {
-            write("\n");
-            if (x.getText().startsWith("/*")) {
-                write(x.getText());
-                if (x.getText().indexOf("*/") == -1) {
-                    write("*/");
-                }
-            } else {
-                write("/*" + x.getText() + "*/");
-            }
-        }
+	if(fileWriterMode){
+	    write("\n");
+	    if(x.getText().startsWith("/*")){
+		write(x.getText());
+		if(x.getText().indexOf("*/")==-1){
+		    write("*/");
+		}
+	    }else{
+		write("/*"+x.getText()+"*/");
+	    }
+	}
     }
 
-    public void printParenthesizedExpression(ParenthesizedExpression x)
-            throws IOException {
+    public void printParenthesizedExpression(ParenthesizedExpression x) 
+	throws IOException {
 
         writeToken("(", x);
         if (x.getArguments() != null) {
             writeElement(x.getArguments().getExpression(0));
         }
         write(")");
-        output();
-    }
+	output();
+    }    
 
-    public void printProgramSVProxy(ProgramSVProxy x)
-            throws java.io.IOException {
 
-        printHeader(x);
+    public void printProgramSVProxy(ProgramSVProxy x) 
+	throws java.io.IOException {      
+
+	printHeader(x);
         writeInternalIndentation(x);
 
-        // Mark statement start ...
-        markStart(0, x);
+	// Mark statement start ...
+	markStart(0,x);
 
-        writeElement(x.op());
+	writeElement(x.op ());
+ 
+	write(" (");
+	boolean wasNoSemicolons = noSemicolons;
+	boolean wasNoLinefeed   = noLinefeed;
+	noLinefeed   = true;
+	noSemicolons = true;      
+	writeCommaList ( 1, x.getInfluencingPVs () );
+	noSemicolons = false;
+	write("; ");
+	output();
+	noLinefeed   = wasNoLinefeed;
+	noSemicolons = wasNoSemicolons;
+	writeKeywordList ( x.getJumpTable      () );
+	write(")");
+	write(";");
+	output();
 
-        write(" (");
-        boolean wasNoSemicolons = noSemicolons;
-        boolean wasNoLinefeed = noLinefeed;
-        noLinefeed = true;
-        noSemicolons = true;
-        writeCommaList(1, x.getInfluencingPVs());
-        noSemicolons = false;
-        write("; ");
-        output();
-        noLinefeed = wasNoLinefeed;
-        noSemicolons = wasNoSemicolons;
-        writeKeywordList(x.getJumpTable());
-        write(")");
-        write(";");
-        output();
+	// Mark statement end ...
+	markEnd(0,x);
+	
+    }    
 
-        // Mark statement end ...
-        markEnd(0, x);
 
-    }
-
-    public void printPassiveExpression(PassiveExpression x) throws IOException {
+    public void printPassiveExpression(PassiveExpression x) 
+	throws IOException {
 
         writeToken("@(", x);
         if (x.getArguments() != null) {
             writeElement(x.getArguments().getExpression(0));
         }
         write(")");
-        output();
-    }
+	output();
+    }    
 
 }

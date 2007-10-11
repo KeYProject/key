@@ -1623,15 +1623,15 @@ public class Recoder2KeY implements JavaReader{
 	    }else{
 		s = createObjectSort(ct, directSuperSorts(ct));
 	    }
-	    recoder.list.ConstructorList cl = 
+	    List<recoder.abstraction.Constructor> cl = 
 		t.getProgramModelInfo().
 		getConstructors((recoder.abstraction.ClassType) t);
 	    addKeYJavaType(t, s);
 	    if(cl.size()==1 && 
-	       (cl.getConstructor(0) instanceof 
+	       (cl.get(0) instanceof 
 		recoder.abstraction.DefaultConstructor)){
 		convert((recoder.abstraction.DefaultConstructor) 
-			cl.getConstructor(0));
+			cl.get(0));
 	    }
 	} else if (t instanceof recoder.abstraction.ArrayType){
 	    recoder.abstraction.Type bt

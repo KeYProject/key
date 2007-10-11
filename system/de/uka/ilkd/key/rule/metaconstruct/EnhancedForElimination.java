@@ -1,6 +1,11 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.ArrayOfExpression;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
@@ -12,6 +17,7 @@ import de.uka.ilkd.key.java.statement.EnhancedFor;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.ExtList;
@@ -132,7 +138,7 @@ public class EnhancedForElimination extends ProgramMetaConstruct {
         KeYJavaType iteratorType =
                 services.getJavaInfo().getTypeByName("java.util.Iterator");
         ProgramElementName nextMeth = new ProgramElementName("next");
-        ProgramVariable itVar = new ProgramVariable(itName, iteratorType);
+        ProgramVariable itVar = new LocationVariable(itName, iteratorType);
         MethodReference methodCall =
                 new MethodReference(new ArrayOfExpression(), nextMeth, itVar);
 
@@ -159,7 +165,7 @@ public class EnhancedForElimination extends ProgramMetaConstruct {
         KeYJavaType iteratorType =
                 services.getJavaInfo().getTypeByName("java.util.Iterator");
         ProgramElementName hasNextMeth = new ProgramElementName("hasNext");
-        ProgramVariable itVar = new ProgramVariable(itName, iteratorType);
+        ProgramVariable itVar = new LocationVariable(itName, iteratorType);
         MethodReference methodCall =
                 new MethodReference(new ArrayOfExpression(), hasNextMeth, itVar);
 
@@ -177,7 +183,7 @@ public class EnhancedForElimination extends ProgramMetaConstruct {
 
         KeYJavaType iteratorType =
                 services.getJavaInfo().getTypeByName("java.util.Iterator");
-        ProgramVariable itVar = new ProgramVariable(itName, iteratorType);
+        ProgramVariable itVar = new LocationVariable(itName, iteratorType);
 
         //
         // expression.iterator();
