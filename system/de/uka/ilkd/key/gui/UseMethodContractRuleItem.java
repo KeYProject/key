@@ -9,6 +9,7 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 
+import de.uka.ilkd.key.gui.nodeviews.BuiltInRuleMenuItem;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Proof;

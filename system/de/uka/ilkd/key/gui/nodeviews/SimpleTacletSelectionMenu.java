@@ -1,7 +1,7 @@
 /*
  * Created on Apr 18, 2005
  */
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.event.ActionListener;
 
@@ -14,10 +14,10 @@ import de.uka.ilkd.key.rule.ListOfPosTacletApp;
 /**
  * This simple taclet menu displays the user a list of applicable taclets
  * and lets select her/him one of those. It is similar to 
- * {@link de.uka.ilkd.key.gui.TacletMenu} but with some important differences:
+ * {@link de.uka.ilkd.key.gui.nodeviews.TacletMenu} but with some important differences:
  * <ul>
  * <li> it returns the selected taclet app and does not initiate any further
- * action as the original {@link de.uka.ilkd.key.gui.TacletMenu} </li>
+ * action as the original {@link de.uka.ilkd.key.gui.nodeviews.TacletMenu} </li>
  * <li> it does not display any additional menu entries like: 
  *    Apply strategies here, built-in rules, abbreviation etc.
  * </li>

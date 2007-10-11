@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.nodeviews;
 
 import java.util.Collection;
 import java.util.Comparator;

@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Color;
 import java.awt.event.FocusEvent;
@@ -11,6 +11,7 @@ import java.util.regex.PatternSyntaxException;
 
 import javax.swing.JComponent;
 
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.pp.Range;
 
 /**

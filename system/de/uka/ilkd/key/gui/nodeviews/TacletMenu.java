@@ -7,7 +7,7 @@
 // See LICENSE.TXT for details.
 //
 //
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -18,6 +18,10 @@ import javax.swing.*;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.UseMethodContractRuleItem;
+import de.uka.ilkd.key.gui.nodeviews.*;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IteratorOfSchemaVariable;

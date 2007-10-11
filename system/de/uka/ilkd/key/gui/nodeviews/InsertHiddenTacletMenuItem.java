@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.nodeviews;
 
 import javax.swing.JFrame;
 

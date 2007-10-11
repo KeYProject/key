@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Color;
 import java.awt.Point;
@@ -25,6 +25,7 @@ import javax.swing.event.PopupMenuListener;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.PosInSequent;

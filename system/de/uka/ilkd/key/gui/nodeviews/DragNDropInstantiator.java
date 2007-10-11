@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Point;
 import java.awt.datatransfer.Transferable;
@@ -22,6 +22,8 @@ import java.io.IOException;
 
 import javax.swing.JPopupMenu;
 
+import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.PosInSequentTransferable;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Constraint;
