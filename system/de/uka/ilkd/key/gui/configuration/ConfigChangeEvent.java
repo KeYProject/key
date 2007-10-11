@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.configuration;
 
 /** An event that indicates that the users focused node or proof has
  * changed */ 

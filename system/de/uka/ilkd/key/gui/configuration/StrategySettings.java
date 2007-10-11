@@ -8,12 +8,13 @@
 //
 //
 
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.configuration;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Properties;
 
+import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.strategy.SimpleJavaCardDLOptions;
 import de.uka.ilkd.key.strategy.StrategyProperties;

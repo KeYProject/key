@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.configuration;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
@@ -19,6 +19,8 @@ import java.awt.event.ItemListener;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+
+import de.uka.ilkd.key.gui.KeYMediator;
 
 public class SimultaneousUpdateSimplifierConfiguration extends JDialog {
 

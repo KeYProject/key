@@ -7,7 +7,9 @@
 // See LICENSE.TXT for details.
 //
 //
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.configuration;
+
+import de.uka.ilkd.key.gui.GUIEvent;
 
 
 /** This interface is implemented by objects that listen to settings

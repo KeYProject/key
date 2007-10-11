@@ -7,13 +7,15 @@
 // See LICENSE.TXT for details.
 //
 //
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.configuration;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+
+import de.uka.ilkd.key.gui.GUIEvent;
 
 /** 
  * This class encapsulates information about:

@@ -18,7 +18,7 @@ package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
 
-import de.uka.ilkd.key.gui.ProofSettings;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.CompilationUnit;
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.util.ProgressMonitor;

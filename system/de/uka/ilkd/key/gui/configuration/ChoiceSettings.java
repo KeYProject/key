@@ -7,11 +7,12 @@
 // See LICENSE.TXT for details.
 //
 //
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.configuration;
 
 import java.util.*;
 import java.util.Map.Entry;
 
+import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.logic.*;
 
 public class ChoiceSettings implements Settings {

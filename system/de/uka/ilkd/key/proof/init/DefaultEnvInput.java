@@ -9,8 +9,8 @@
 //
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.gui.LibrariesSettings;
-import de.uka.ilkd.key.gui.ProofSettings;
+import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 
 
 

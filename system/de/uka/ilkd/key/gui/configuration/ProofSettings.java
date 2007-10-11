@@ -7,12 +7,15 @@
 // See LICENSE.TXT for details.
 //
 //
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.configuration;
 
 import java.io.*;
 import java.net.URL;
 import java.util.*;
 
+import de.uka.ilkd.key.gui.DecisionProcedureSettings;
+import de.uka.ilkd.key.gui.GUIEvent;
+import de.uka.ilkd.key.gui.ModelSourceSettings;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.util.Debug;

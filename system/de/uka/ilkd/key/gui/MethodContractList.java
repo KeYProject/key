@@ -22,6 +22,7 @@ import java.util.List;
 
 import javax.swing.*;
 
+import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.mgt.Contract;

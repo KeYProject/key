@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.visualdebugger;
 
-import de.uka.ilkd.key.gui.ProofSettings;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;

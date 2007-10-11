@@ -2,9 +2,9 @@ package de.uka.ilkd.key.proof.init;
 
 import java.util.HashMap;
 
-import de.uka.ilkd.key.gui.ChoiceSettings;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.ProofSettings;
+import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.BalancedGoalChooserBuilder;
 import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;

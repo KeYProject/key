@@ -16,8 +16,8 @@ import java.io.InputStream;
 import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.collection.ListOfString;
-import de.uka.ilkd.key.gui.LibrariesSettings;
-import de.uka.ilkd.key.gui.ProofSettings;
+import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.parser.KeYLexer;

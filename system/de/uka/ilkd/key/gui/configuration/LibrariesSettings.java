@@ -7,10 +7,12 @@
 // See LICENSE.TXT for details.
 //
 //
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.configuration;
 
 import java.io.File;
 import java.util.*;
+
+import de.uka.ilkd.key.gui.GUIEvent;
 
 /** This class encapsulates the information about the active
  * libraries settings

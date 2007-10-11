@@ -21,7 +21,7 @@ import de.uka.ilkd.key.casetool.ModelManager;
 import de.uka.ilkd.key.casetool.OCLModelFacade;
 import de.uka.ilkd.key.casetool.UMLOCLModel;
 import de.uka.ilkd.key.gui.ModelSourceSettings;
-import de.uka.ilkd.key.gui.ProofSettings;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 

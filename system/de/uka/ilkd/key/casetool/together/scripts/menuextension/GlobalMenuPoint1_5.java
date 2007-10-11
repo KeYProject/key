@@ -14,7 +14,7 @@ package de.uka.ilkd.key.casetool.together.scripts.menuextension;
 
 import com.togethersoft.openapi.ide.window.IdeWindowManager;
 
-import de.uka.ilkd.key.gui.ChoiceSelector;
+import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
 
 
 public class GlobalMenuPoint1_5 implements GlobalMenu{

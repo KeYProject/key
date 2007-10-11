@@ -3,7 +3,7 @@ package de.uka.ilkd.key.proof.init;
 import de.uka.ilkd.key.collection.SetAsListOfString;
 import de.uka.ilkd.key.collection.SetOfString;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.ProofSettings;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.decproc.JavaDecisionProcedureTranslationFactory;
