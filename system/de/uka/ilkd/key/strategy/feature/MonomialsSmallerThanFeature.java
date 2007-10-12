@@ -138,7 +138,9 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
     private int degree(Term t) {
         int res = 0;
         
-        if ( t.op () == mul ) ++res;
+        if ( t.op () == mul
+             && t.sub ( 0 ).op () != Z && t.sub ( 1 ).op () != Z )
+            ++res;
 
         for ( int i = 0; i != t.arity (); ++i )
             res += degree ( t.sub ( i ) );
