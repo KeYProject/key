@@ -20,6 +20,16 @@ public class ScopedMemory extends MemoryArea{
     //@ public invariant stack!=null ==> (stack.top()==this && stack.stack.length>0);
     public MemoryStack stack;
 
+    /*@ public invariant (\forall ScopedMemory m; (outerScope(m, this) <==>
+      @      (stack!=null && (\exists int i; i>=0 && i<stack.stack.length; 
+      @                       stack.stack[i]==m))));
+      @*/
+
+    /*@ public invariant (\forall MemoryStack ms; (\exists int i; i>=0 && i<ms.stack.length;
+      @                                            ms.stack[i] == this) <==>
+      @                                           ms.stack[stack.stack.length-1]==this);
+      @*/
+
     public MemoryStack stack(){
 	return stack;
     }

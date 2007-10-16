@@ -354,7 +354,7 @@ public class UseMethodContractRule implements BuiltInRule {
             = new MethodContractInstantiation(receiver, insts, 
                     resultVar, modality);
         final InstantiatedMethodContract ctInst = 
-            ct.instantiate(mci, goal.node().proof()); 
+            ct.instantiate(mci, goal.node().proof(), mbsPos.execContext); 
         
         if (ctInst == null) {            
             return SLListOfGoal.EMPTY_LIST.prepend(goal.split(1));

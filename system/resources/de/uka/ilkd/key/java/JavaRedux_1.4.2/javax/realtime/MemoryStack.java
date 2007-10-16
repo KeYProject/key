@@ -4,16 +4,16 @@ public class MemoryStack{
 
     private ScopedMemory[] stack;
 
-    //@ public static ghost MemoryStack EMPTY_STACK;
-
-    /*@ public static invariant EMPTY_STACK!=null && EMPTY_STACK.stack.length==0;
-      @*/
-
     /*@ public invariant stack!=null;
       @*/
 
     /*@ public invariant (\forall int i,j; 0<=i && i<stack.length && 
-      @    i<j && j<stack.length; stack[i]!=null && stack[i]!=stack[j]);
+      @    i<j && j<stack.length; stack[i]!=null && stack[i]!=stack[j] &&
+      @    outerScope(stack[i], stack[j]));
+      @*/
+
+    /*@ public invariant (\forall int i; 1<=i && i<stack.length; 
+      @    stack[i].parent == stack[i-1]);
       @*/
 
     /*@ public normal_behavior

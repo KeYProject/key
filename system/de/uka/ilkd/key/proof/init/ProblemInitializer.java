@@ -569,6 +569,8 @@ public class ProblemInitializer {
 	
 	initConfig.namespaces().programVariables().add(initConfig.getServices().
 	        getJavaInfo().getDefaultMemoryArea()); 
+	initConfig.namespaces().programVariables().add(initConfig.getServices().
+	        getJavaInfo().getImmortalMemoryArea()); 
 	
 	startInterface();	
 	return initConfig;

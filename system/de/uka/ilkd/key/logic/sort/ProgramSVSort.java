@@ -51,7 +51,9 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 
     public static final ProgramSVSort STATICVARIABLE
 	= new StaticVariableSort();
-
+    
+    public static final ProgramSVSort LOCALVARIABLE
+        = new LocalVariableSort();
 
     public static final ProgramSVSort SIMPLEEXPRESSION 
 	= new SimpleExpressionSort();
@@ -514,6 +516,25 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	    }
 	    return false;
 	}
+
+    }
+    
+    private static class LocalVariableSort 
+        extends LeftHandSideSort {
+
+        public LocalVariableSort() {
+            super (new Name("LocalVariable"));
+        }
+
+        public boolean canStandFor(Term t) {       
+            return t.op() instanceof ProgramVariable &&
+            !((ProgramVariable)t.op()).isStatic();
+        }
+
+        protected boolean canStandFor(ProgramElement pe,
+                Services services) {
+            return pe instanceof ProgramVariable && !((ProgramVariable) pe).isStatic();
+        }
 
     }
     

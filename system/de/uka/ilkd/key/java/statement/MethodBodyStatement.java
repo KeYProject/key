@@ -62,7 +62,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     /** cache resolved method */
     private ProgramMethod method;
 
-    /** indicates whether this stands for the specifiction of 
+    /** indicates whether this stands for the specification of 
      * a method rather than the concrete body*/
     private boolean useSpecification;
     

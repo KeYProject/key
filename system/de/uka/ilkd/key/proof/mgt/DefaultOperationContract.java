@@ -1,14 +1,12 @@
 package de.uka.ilkd.key.proof.mgt;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Proof;
@@ -22,7 +20,7 @@ public abstract class DefaultOperationContract extends AbstractContract
     protected abstract Term getAdditionalAxioms();
     
     public InstantiatedMethodContract instantiate(MethodContractInstantiation insts, 
-            Proof proof) {
+            Proof proof, ExecutionContext ec) {
         
         final Services services = proof.getServices();
         
@@ -38,6 +36,8 @@ public abstract class DefaultOperationContract extends AbstractContract
         
         instantiateMethodReturnVariable(insts, replacementMap, 
                 localFunctions, localProgramVariables);
+        
+        instantiateMemoryScope(replacementMap, ec, services);
        
         final ProgramVariable excVar = 
             instantiateCatchAllStatement(getCatchAllStatement(), 
@@ -118,6 +118,11 @@ public abstract class DefaultOperationContract extends AbstractContract
 
     protected abstract void instantiateAtPreSymbols(Map replacementMap,
             Namespace localFunctions, Namespace localProgramVariables);
+    
+    protected void instantiateMemoryScope(Map replacementMap,
+            ExecutionContext ec, Services services){
+        replacementMap.put(services.getJavaInfo().getDefaultMemoryArea(), ec.getMemoryArea());
+    }
     
     public Term getWorkingSpace(){
         return null;

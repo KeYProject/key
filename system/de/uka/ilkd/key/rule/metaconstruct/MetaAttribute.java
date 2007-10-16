@@ -12,8 +12,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.MetaOperator;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -23,7 +22,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * caanot be described with the taclet scheme (or trying to do so would
  * result in a huge number of rules)
  */
-public class MetaAttribute extends MetaField {
+public class MetaAttribute extends MetaField implements Location{
 
     private String attrName;
 
@@ -38,14 +37,8 @@ public class MetaAttribute extends MetaField {
 
     /** calculates the resulting term. */
     public Term calculate(Term term, SVInstantiations svInst, Services services) {
-        System.out.println("term.sub(0): "+term.sub(0));
-        System.out.println("term.sub(0).sort(): "+term.sub(0).sort());
-        System.out.println("getKJT(term.sub(0).sort()): "+services.getJavaInfo().getKeYJavaType(term.sub(0).sort()));
-        System.out.println("getKJT(term.sub(0).sort().toString()): "+services.getJavaInfo().getKeYJavaType(term.sub(0).sort().toString()));
         KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(term.sub(0).sort());
-/*        if(kjt==null){
-            kjt = services.getJavaInfo().getKeYJavaType(term.sub(0).sort().toString());
-        }*/
+        System.out.println("term.sub(0): "+term.sub(0));
         // This is still not really right, one would need something of the `@' notation thing
         return termFactory.createAttributeTerm
 	    (services.getJavaInfo().getAllAttributes
@@ -60,6 +53,10 @@ public class MetaAttribute extends MetaField {
     public MatchConditions match(SVSubstitute subst, MatchConditions mc,
             Services services) {
         return null;
+    }
+    
+    public boolean mayBeAliasedBy(Location loc) {
+        return true;
     }
     
     public MetaOperator getParamMetaOperator(String param) {

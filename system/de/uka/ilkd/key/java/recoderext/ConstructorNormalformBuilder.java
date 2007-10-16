@@ -202,7 +202,6 @@ public class ConstructorNormalformBuilder
      */
     private MethodDeclaration normalform(ClassDeclaration cd, 
 					 Constructor cons) {	
-	
 	ModifierMutableList mods = new ModifierArrayList(5);
 	ParameterDeclarationMutableList parameters;
 	Throws recThrows;
@@ -224,53 +223,51 @@ public class ConstructorNormalformBuilder
 	    body = (StatementBlock) consDecl.getBody().deepClone();
 	}
 
-	if (cd != javaLangObject) {
-	    // remember original first statement
-	    Statement first = body.getStatementCount() > 0 ?
-		body.getStatementAt(0) : null;
+	// remember original first statement
+	Statement first = body.getStatementCount() > 0 ? body.getStatementAt(0) : null;
 	    
-	    // first statement has to be a this or super constructor call	
-	    if (!(first instanceof SpecialConstructorReference)) {
-		if (body.getBody() == null) {
-		    body.setBody(new StatementArrayList());
-		}
-		attach(new MethodReference
-		    (new SuperReference(), new ImplicitIdentifier
-			(CONSTRUCTOR_NORMALFORM_IDENTIFIER)), body, 0);
-	    } else {
-		body.getBody().remove(0);
-		ReferencePrefix referencePrefix;
-		referencePrefix = 
-		    first instanceof ThisConstructorReference ?
-		    (ReferencePrefix)new ThisReference() : 
-		    (ReferencePrefix)new SuperReference();		
-		attach(new MethodReference
-		    (referencePrefix, new ImplicitIdentifier
-			(CONSTRUCTOR_NORMALFORM_IDENTIFIER), 
-		     ((SpecialConstructorReference)first).getArguments()), body, 0);
+	// first statement has to be a this or super constructor call	
+	if (!(first instanceof SpecialConstructorReference)) {
+	    if (body.getBody() == null) {
+	        body.setBody(new StatementArrayList());
 	    }
-	    // if the first statement is not a this constructor reference
-	    // the instance initializers have to be added in source code
-	    // order
-	    if (!(first instanceof ThisConstructorReference)) {
-		StatementMutableList initializers = (StatementMutableList)
-		    class2initializers.get(cd);
-		for (int i = 0; i<initializers.size(); i++) {
-		    attach((Statement) 
-			   initializers.getStatement(i).deepClone(),
-			   body, i+1);
-		}
+	    if(cd != javaLangObject){
+	        attach(new MethodReference
+	                (new SuperReference(), new ImplicitIdentifier
+	                        (CONSTRUCTOR_NORMALFORM_IDENTIFIER)), body, 0);
+	    }
+	} else {
+	    body.getBody().remove(0);
+	    ReferencePrefix referencePrefix;
+	    referencePrefix = 
+	        first instanceof ThisConstructorReference ?
+	                (ReferencePrefix)new ThisReference() : 
+	                    (ReferencePrefix)new SuperReference();		
+	    attach(new MethodReference
+	            (referencePrefix, new ImplicitIdentifier
+	                    (CONSTRUCTOR_NORMALFORM_IDENTIFIER), 
+	                    ((SpecialConstructorReference)first).getArguments()), body, 0);
+	}
+	// if the first statement is not a this constructor reference
+	// the instance initializers have to be added in source code
+	// order
+	if (!(first instanceof ThisConstructorReference)) {
+	    StatementMutableList initializers = (StatementMutableList)
+	    class2initializers.get(cd);
+	    for (int i = 0; i<initializers.size(); i++) {
+	        attach((Statement) 
+	                initializers.getStatement(i).deepClone(),
+	                body, i+(cd == javaLangObject ? 0 : 1));
 	    }
 	}
 
 	
-	MethodDeclaration nf =  new MethodDeclaration
-	    (mods,
-	     new TypeReference(cd.getIdentifier()),
-	     new ImplicitIdentifier(CONSTRUCTOR_NORMALFORM_IDENTIFIER),
-	     parameters,
-	     recThrows,
-	     body);
+	MethodDeclaration nf =  new MethodDeclaration(mods,
+	        new TypeReference(cd.getIdentifier()),
+	        new ImplicitIdentifier(CONSTRUCTOR_NORMALFORM_IDENTIFIER),
+	        parameters,
+	        recThrows,
+	        body);
 	nf.makeAllParentRolesValid();
 	return nf;
     }

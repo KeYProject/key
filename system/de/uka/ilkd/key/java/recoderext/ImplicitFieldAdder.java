@@ -57,7 +57,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
     
     public static final String IMPLICIT_INITIALIZED = "<initialized>";
     public static final String IMPLICIT_TRANSIENT = "<transient>";
- 
+    
     /** flag set if java.lang.Object has been already transformed */
     private boolean transformedObject = false;
     private ClassType javaLangObject;

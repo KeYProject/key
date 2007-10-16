@@ -10,11 +10,12 @@ public class Object {
 
     //@ public invariant memoryArea!=null && memoryArea.stack!=null; 
 
-    public javax.realtime.ScopedMemory memoryArea;
+    public javax.realtime.ScopedMemory memoryArea = <currentMemoryArea>;
+	//	javax.realtime.ScopedMemory.currentMemoryArea;
 
-    public javax.realtime.ScopedMemory memoryArea(){
+    /*    public javax.realtime.ScopedMemory memoryArea(){
 	return memoryArea;
-    }
+	}*/
 
     /** A data group for the state of this object.  This is used to
      * allow side effects on unknown variables in methods such as

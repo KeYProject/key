@@ -2762,9 +2762,16 @@ jmlprimary returns [Term t=null]
                 "\\reach");
         }
     |
-        IN_OUTER_SCOPE "("o1 = specexpression "," o2 = specexpression ")"
+    	IN_OUTER_SCOPE "("o1 = specexpression "," o2 = specexpression ")"
         {
-            TermSymbol ios = (TermSymbol) nss.functions().lookup(new Name("inOuterScope"));
+            TermSymbol ios = (TermSymbol) nss.functions().lookup(new Name("outerScope"));
+            ProgramVariable attr = getJavaInfo().getAttribute("memoryArea", getJavaInfo().getJavaLangObject());
+            t = tf.createFunctionTerm(ios, df.dot(o1, attr), df.dot(o2, attr));
+        }
+    |
+        OUTER_SCOPE "("o1 = specexpression "," o2 = specexpression ")"
+        {
+            TermSymbol ios = (TermSymbol) nss.functions().lookup(new Name("outerScope"));
             t = tf.createFunctionTerm(ios, o1, o2);
         }
     |   DURATION "(" dummy = expression ")" 
@@ -2772,6 +2779,27 @@ jmlprimary returns [Term t=null]
             throw new NotSupportedExpressionException("JML construct "+
                 "\\duration");
         }
+    |   CURRENT_MEMORY_AREA
+    	{
+    		ProgramVariable v = services.getJavaInfo().getDefaultMemoryArea();
+    		t = tf.createVariableTerm(v);
+    	}
+    |   IN_IMMORTAL_MEMORY "(" t = expression ")" 
+    	{
+    		TermSymbol im = (TermSymbol) nss.functions().lookup(new Name("immortal"));
+    		ProgramVariable ma = getJavaInfo().getAttribute("memoryArea", getJavaInfo().getJavaLangObject());
+    		t = df.dot(t, ma);
+    		t = tf.createFunctionTerm(im, t);
+ /*   		ProgramVariable v = services.getJavaInfo().getDefaultMemoryArea();
+    		Term t1 = tf.createVariableTerm(v);
+    		ProgramVariable ma = getJavaInfo().getAttribute("memoryArea", getJavaInfo().getJavaLangObject());
+    		t = df.dot(t, ma);
+    		ProgramVariable stack = getJavaInfo().getAttribute("stack", 
+    			getJavaInfo().getTypeByClassName("javax.realtime.ScopedMemory"));
+    		ProgramVariable stackArray = getJavaInfo().getAttribute("stack", 
+    			getJavaInfo().getTypeByClassName("javax.realtime.MemoryStack"));
+    		t = df.equals(t, df.array(df.dot(df.dot(t1, stack), stackArray), toZNotation("0")));*/
+    	}
     |   SPACE 
         "("
             t = new_expr

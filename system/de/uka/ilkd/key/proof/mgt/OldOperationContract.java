@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.proof.mgt;
 
 import de.uka.ilkd.key.casetool.ModelMethod;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -33,7 +34,7 @@ public interface OldOperationContract extends Contract{
     
     ModelMethod getModelMethod();
     
-    InstantiatedMethodContract instantiate(MethodContractInstantiation l, Proof proof);
+    InstantiatedMethodContract instantiate(MethodContractInstantiation l, Proof proof, ExecutionContext ec);
    
     DLMethodContract createDLMethodContract(Proof proof);
     

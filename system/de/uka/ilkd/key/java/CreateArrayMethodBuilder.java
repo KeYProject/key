@@ -187,6 +187,8 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         if (var == null && objectType.getJavaType() != null) {
             final ListOfField objectFields = filterImplicitFields(filterField(((ClassDeclaration) objectType
                     .getJavaType()).getMembers()));
+//            final ListOfField objectFields = filterField(((ClassDeclaration) objectType
+//                    .getJavaType()).getMembers());
             var = find(name, objectFields);
             if (var != null) { // may be null if object is currently created
                 cache.put(name, var);
@@ -310,7 +312,7 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         body.add(assign(attribute(thisRef,
                 findInObjectFields(ImplicitFieldAdder.IMPLICIT_INITIALIZED)),
                 BooleanLiteral.TRUE));
-
+        
         body.add(new Return(thisRef));
 
         return new StatementBlock((Statement[]) body.toArray(new Statement[body

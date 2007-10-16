@@ -99,6 +99,7 @@ public class JavaInfo {
     private ExecutionContext defaultExecutionContext;
                 
     private LocationVariable defaultMemoryArea;    
+    private LocationVariable immortalMemoryArea;    
     
     /**
      * a term with the constant 'null'
@@ -1179,6 +1180,25 @@ public class JavaInfo {
             }
         }
         return defaultMemoryArea;
+    }
+    
+    public LocationVariable getImmortalMemoryArea(){
+        if(immortalMemoryArea==null){
+            // ensure that default classes are available
+            if (!kpmi.rec2key().parsedSpecial()) {
+                readJava("{}");                
+            }
+            immortalMemoryArea = (LocationVariable) services.getNamespaces().
+                programVariables().lookup(new Name("immortalMemoryArea"));
+            KeYJavaType kjt = getTypeByClassName("javax.realtime.ScopedMemory");
+            if(immortalMemoryArea == null){
+                immortalMemoryArea = 
+                    new LocationVariable(new ProgramElementName("immortalMemoryArea"),
+                            kjt);
+                services.getNamespaces().programVariables().add(immortalMemoryArea);
+            }
+        }
+        return immortalMemoryArea;
     }
     
     

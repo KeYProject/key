@@ -89,6 +89,7 @@ tokens {
     ANTIV = "<=!=>";
     NOT = "!";
     IN_OUTER_SCOPE = "inOuterScope";
+    OUTER_SCOPE = "outerScope";
     BITWISENOT = "~";
     SEMI = ";";
     COMMA = ",";
@@ -239,7 +240,8 @@ LBLNEG : "\\lblneg";
 LBLPOS : "\\lblpos";
 TYPE : "\\TYPE";
 NOWARN : "\\nowarn";
-
+CURRENT_MEMORY_AREA : "\\currentMemoryArea";
+IN_IMMORTAL_MEMORY : "\\inImmortalMemory";
 
 LPAREN
 options {

@@ -1,5 +1,5 @@
 public class SuperTest{
 
-    private int pf;
+    private int pf=4;
 
 }

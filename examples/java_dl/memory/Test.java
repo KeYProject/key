@@ -2,18 +2,63 @@ import javax.realtime.*;
 
 public class Test extends SuperTest{
 
-    int attr;
+    //@ public invariant oArr!=null && oArr.length>1 && next!=null;
+
+    int attr=3;
     int[] arr;
     byte b0, b1;
     Object[] oArr;
+    Test next;
+    public static Object sa; 
 
     /*@ public normal_behavior
-      @  working_space \space(new Test());
-      @ also public normal_behavior
-      @  working_space 24;
+      @  requires oArr.memoryArea == \currentMemoryArea;
+      @   {|
+      @      assignable oArr[0];
+      @      working_space \space(new Test());
+      @     also
+      @      assignable oArr[0];
+      @      working_space 32;
+      @   |}
       @*/
     public void createObj(){
-	new Test();
+	oArr[0] = new Test();
+    }
+
+    /*@ public normal_behavior
+      @  requires oArr.memoryArea == \currentMemoryArea;
+      @   {|
+      @      working_space \space(new Test());
+      @     also
+      @      working_space 32;
+      @   |}
+      @*/
+    public void createObjectWithContract(){
+	createObj();
+    }
+
+    /*@ public normal_behavior
+      @  requires outerScope(o.memoryArea, \currentMemoryArea);
+      @  ensures true;
+      @*/
+    public void createArrayWithInitializers(Object o){
+	this.oArr = new Object[]{o};
+    }
+
+    /*@ public normal_behavior
+      @  requires o1!=null && \inImmortalMemory(o1) && inOuterScope(o2, o1);
+      @  ensures true;
+      @*/
+    public void assignToStaticField(Test o1, Test o2){
+	sa = oArr[0];
+    }
+
+    /*@ public normal_behavior
+      @  //requires inOuterScope(o1, this.next.next) && this.next.next!=null;
+      @  ensures true;
+      @*/
+    public void assignToInstanceField(Test o1){
+	this.next = o1;
     }
 
     /*@ public normal_behavior
@@ -26,20 +71,29 @@ public class Test extends SuperTest{
       @  working_space 0;
       @*/
     public int[] createArray(int a){
-	TestRunnable t = new TestRunnable();
+	/*	TestRunnable t = new TestRunnable();
 	MemoryArea.getMemoryArea(this).executeInArea(t);
 	if(a>0){
 	    return new int[a+1-1];
 	}
-	return null;
+	return null;*/
+	oArr = new Object[3];
     }
 
     /*@ public normal_behavior
-      @  requires oArr!=null && oArr.length>1 && oArr.memoryArea==o.memoryArea && inOuterScope(o, oArr);
+      @  requires next.next!=null && next.next.next!=null && inOuterScope(this, oArr);
+      @  ensures true;
+      @*/
+    public void outerScopeTransitive(){
+	oArr[0] = next.next.next.next;
+    }
+
+    /*@ public normal_behavior
+      @  requires oArr!=null && oArr.length>1  && inOuterScope(o, oArr);
       @  ensures true;
       @*/
     public void assignToObjectArray(Object o){
-	oArr[0] = o;
+	oArr[0] = oArr[1];
     }
 
     /*@ public normal_behavior

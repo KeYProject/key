@@ -138,6 +138,7 @@ public class SchemaJavaParser {
     private static boolean isLeftHandSide(Sort s) {
 	return  s == ProgramSVSort.VARIABLE ||
 	    s == ProgramSVSort.STATICVARIABLE ||
+	    s == ProgramSVSort.LOCALVARIABLE ||
 	    s == ProgramSVSort.IMPLICITVARIABLE ||
 	    s == ProgramSVSort.EXPLICITVARIABLE ||
 	    s == ProgramSVSort.LEFTHANDSIDE  ||
@@ -364,6 +365,7 @@ public class SchemaJavaParser {
 	static final int QUALIFIED_NAME   =  6;
 	/** production was <pre>"@(" Expression ")"</pre> */
 	static final int PASSIVE_EXPR =  7;    
+//	static final int CURRENT_MEMORY_AREA = 8; 
     
 	/** indicates the type of the result */
 	int           type    = UNDEFINED;
@@ -513,6 +515,7 @@ TOKEN :
 		    | < TYPEOF: "#typeof" >
 		    | < SWITCHTOIF: "#switch-to-if" >
 		    | < UNPACK: "#unpack" >
+//		    | < CURRENTMEMORYAREA: "<currentMemoryArea>" >
 		    }
 
 /* LITERALS */
@@ -1545,11 +1548,12 @@ ExecutionContext ExecutionContext() :
     ExecutionContext ctxt = null;
     TypeSVWrapper tr = null;
     ExpressionSVWrapper instance = null;
+    ExpressionSVWrapper memoryArea = null;
 }
 {
-    tr = TypeSV() "(" (instance = ExpressionSV())? ")" 
+    tr = TypeSV() "(" ( memoryArea = ExpressionSV() "," instance = ExpressionSV())? ")" 
     {
-	return new ExecutionContext(tr, null, instance);
+	return new ExecutionContext(tr, memoryArea, instance);
     } 
 } 
 
@@ -2365,6 +2369,17 @@ Expression PrimaryExpression() :
 		throw new ParseException("No type as prefix of `this'");
 	    }
 	    break;
+/*	    case PrimaryPrefixReturnValue.CURRENT_MEMORY_AREA:
+    	  	Identifier id = factory.createIdentifier("ScopedMemory");    
+    	  	setPrefixInfo(id);
+    	  	setPostfixInfo(id);
+      	    	tmpResult = factory.createUncollatedReferenceQualifier(id);
+	  	id = factory.createIdentifier("currentMemoryArea");	
+          	tmpResult = factory.createUncollatedReferenceQualifier(tmpResult,id);
+          	setPrefixInfo(tmpResult);
+	  	setPostfixInfo(tmpResult);
+            break;*/
+	    
 	    case PrimarySuffixReturnValue.ALLOCATION_EXPR:
 	    if (suffix.expr instanceof New) {
 		((New)suffix.expr).setReferencePrefix(tmpResult);
@@ -2486,6 +2501,11 @@ PrimaryPrefixReturnValue PrimaryPrefix() :
     {
 	prefix.type = PrimaryPrefixReturnValue.THIS;      
     }
+/*    |
+    "<currentMemoryArea>"
+    {
+        prefix.type = PrimaryPrefixReturnValue.CURRENT_MEMORY_AREA;   
+    }*/
       | 
       LOOKAHEAD(3) lit = Literal()
 	{
@@ -3057,8 +3077,8 @@ StatementBlock StartBlock() :
 { 
    "{" (   LOOKAHEAD(2)
            ( <DOT> ( LOOKAHEAD(2) 
-		     tr = TypeSV() "(" (sv = ExpressionSV() ","
-					sv1 = ExpressionSV())? ")" |  
+		     tr = TypeSV() "(" (sv = ExpressionSV() (","
+					sv1 = ExpressionSV())?)? ")" |  
 	             ec = ExecutionContextSV() ))? 
             <CONTEXTSTART> 
             {
