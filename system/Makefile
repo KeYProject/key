@@ -48,7 +48,7 @@ SHA1=$(shell git show | grep commit)
 SHA1:=$(wordlist 2,2,$(SHA1))
 KEY_VERSION_SHORT=$(shell git log --pretty=one | wc -l)
 KEY_VERSION_SHORT:=$(wordlist 1,1,$(KEY_VERSION_SHORT))
-KEY_VERSION_SHORT:=1.1.$(KEY_VERSION_SHORT)
+KEY_VERSION_SHORT:=1.2.$(KEY_VERSION_SHORT)
 else
 SHA1=ownVersion
 KEY_VERSION_SHORT=0.0.0
