@@ -437,8 +437,6 @@ public class ProblemLoader implements Runnable {
         ourApp = ourApp.setIfFormulaInstantiations(ifSeqFormulaList,
                                                    services, userC);
 
-        ourApp = ourApp.createSkolemFunctions ( mediator.func_ns (), services );
-
         if (!ourApp.sufficientlyComplete()) {
             ourApp = ourApp.tryToInstantiate(currGoal, proof.getServices());
         }
