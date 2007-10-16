@@ -6,6 +6,12 @@ import org.eclipse.draw2d.*;
 import de.uka.ilkd.key.visualdebugger.SourceElementId;
 import de.uka.ilkd.key.visualdebugger.executiontree.ETLeafNode;
 
+/**
+ * Paints a leaf node of the execution tree. A leaf node is
+ * displayed as a filled circle whose color gives an indication whether 
+ * the state is reachable, and if so, if the program terminated 
+ * due to an uncaught exception or normally.
+ */
 public class LeafNode extends Ellipse {
 
     static final Border BORDER =          new LineBorder(ColorConstants.black,1);
