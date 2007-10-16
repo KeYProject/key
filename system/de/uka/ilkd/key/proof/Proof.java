@@ -306,11 +306,6 @@ public class Proof implements Named {
             it.next ().setGoalStrategy(ourStrategy);
     }
 
-    /** counter required to give the taclets a unique name */
-    public int getUniqueTacletNr(Node undoAnchor) {
-        return getServices().getCounter("tacletNumber").getCountPlusPlus(undoAnchor);
-    }
-    
     /** 
      * returns the default simplifier to be used (may be overwritten by branch
      * specific simplifiers in the future)
