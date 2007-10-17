@@ -38,7 +38,8 @@ public class Test extends SuperTest{
     }
 
     /*@ public normal_behavior
-      @  requires outerScope(o.memoryArea, \currentMemoryArea);
+      @  requires outerScope(\currentMemoryArea, oArr.memoryArea) &&
+      @           outerScope(o.memoryArea, \currentMemoryArea);
       @  ensures true;
       @*/
     public void createArrayWithInitializers(Object o){
@@ -46,38 +47,70 @@ public class Test extends SuperTest{
     }
 
     /*@ public normal_behavior
-      @  requires o1!=null && \inImmortalMemory(o1) && inOuterScope(o2, o1);
+      @  requires \inImmortalMemory(next) && this.next.next!=null;
       @  ensures true;
       @*/
-    public void assignToStaticField(Test o1, Test o2){
+    public void assignToStaticField1(){
+	sa = next.next.next;
+    }
+
+    /*@ public normal_behavior
+      @  requires \inImmortalMemory(oArr);
+      @  ensures true;
+      @*/
+    public void assignToStaticField2(){
 	sa = oArr[0];
     }
 
     /*@ public normal_behavior
-      @  //requires inOuterScope(o1, this.next.next) && this.next.next!=null;
+      @  requires inOuterScope(o1, this);
       @  ensures true;
       @*/
-    public void assignToInstanceField(Test o1){
+    public void assignToInstanceField1(Test o1){
 	this.next = o1;
     }
 
     /*@ public normal_behavior
-      @  requires a>0;
+      @  requires inOuterScope(o1, next);
+      @  ensures true;
+      @*/
+    public void assignToInstanceField2(Test o1){
+	next.next = o1;
+    }
+
+    /*@ public normal_behavior
+      @  ensures true;
+      @*/
+    public void assignToInstanceFieldNull1(){
+	this.next = null;
+    }
+
+    /*@ public normal_behavior
+      @  ensures true;
+      @*/
+    public void assignToInstanceFieldNull2(){
+	next.next = null;
+    }
+
+    /*@ public normal_behavior
+      @  requires a>0 && outerScope(\currentMemoryArea, oArr.memoryArea);
       @  assignable \nothing;
       @  working_space 16+a*4;
       @ also public normal_behavior
-      @  requires a<=0;
+      @  requires a<=0 && outerScope(\currentMemoryArea, oArr.memoryArea);
       @  assignable \nothing;
       @  working_space 0;
       @*/
-    public int[] createArray(int a){
+    public void createArray(int a){
 	/*	TestRunnable t = new TestRunnable();
 	MemoryArea.getMemoryArea(this).executeInArea(t);
 	if(a>0){
 	    return new int[a+1-1];
 	}
 	return null;*/
-	oArr = new Object[3];
+	if(a>0){
+	    oArr = new Object[a];
+	}]
     }
 
     /*@ public normal_behavior
@@ -93,7 +126,15 @@ public class Test extends SuperTest{
       @  ensures true;
       @*/
     public void assignToObjectArray(Object o){
-	oArr[0] = oArr[1];
+	oArr[0] = o;
+    }
+
+    /*@ public normal_behavior
+      @  requires oArr!=null && oArr.length>1  && inOuterScope(o, oArr);
+      @  ensures true;
+      @*/
+    public void assignToObjectArrayNull(Object o){
+	oArr[0] = null;
     }
 
     /*@ public normal_behavior

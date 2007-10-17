@@ -168,8 +168,8 @@ public class PrepareObjectBuilder
 	    body.add((new MethodReference
 			 (new SuperReference(), 
 			  new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE))));
+	    body.add((StatementMutableList)class2fields.get(classType));
 	}
-	body.add((StatementMutableList)class2fields.get(classType));
 	return new StatementBlock(body);
     }
     
