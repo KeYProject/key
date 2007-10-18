@@ -1551,7 +1551,7 @@ ExecutionContext ExecutionContext() :
     ExpressionSVWrapper memoryArea = null;
 }
 {
-    tr = TypeSV() "(" ( memoryArea = ExpressionSV() "," instance = ExpressionSV())? ")" 
+    tr = TypeSV() "(" ( memoryArea = ExpressionSV() ("," instance = ExpressionSV())?)? ")" 
     {
 	return new ExecutionContext(tr, memoryArea, instance);
     } 

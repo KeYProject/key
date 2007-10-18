@@ -401,17 +401,20 @@ public class UseMethodContractRule implements BuiltInRule {
         }
         
         TermFactory tf = TermFactory.DEFAULT;
-        Term heapTerm = tf.createVariableTerm(
-                (ProgramVariable) nss.programVariables().lookup(new Name(
-                        ProblemInitializer.heapSpaceName)));
+        Term mTerm = tf.createVariableTerm((ProgramVariable) mbsPos.execContext.getMemoryArea());
+        Term mCons = tf.createAttributeTerm(services.getJavaInfo().getAttribute(
+                "consumed", "javax.realtime.MemoryArea"), mTerm);
+//        Term heapTerm = tf.createVariableTerm(
+//                (ProgramVariable) nss.programVariables().lookup(new Name(
+//                        ProblemInitializer.heapSpaceName)));
         if(ws == null){
             ws = tf.createWorkingSpaceNonRigidTerm(method, iCt.getProgramVariableReplacer(),
                     (Sort) nss.sorts().lookup(new Name("int")));
             nss.functions().add(ws.op());
         }
         Function add = (Function) nss.functions().lookup(new Name("add"));
-        u = uf.parallel(u, uf.elementaryUpdate(heapTerm, 
-                tf.createFunctionTerm(add, heapTerm, ws)));
+        u = uf.parallel(u, uf.elementaryUpdate(mCons, 
+                tf.createFunctionTerm(add, mCons, ws)));
         
         final boolean openExceptionalBranch = iCt.getExceptionVariable() != null;                                                
         
