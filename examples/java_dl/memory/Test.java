@@ -39,7 +39,7 @@ public class Test extends SuperTest{
 
     /*@ public normal_behavior
       @  requires outerScope(\currentMemoryArea, oArr.memoryArea) &&
-      @           outerScope(o.memoryArea, \currentMemoryArea);
+      @           outerScope(o.memoryArea, \currentMemoryArea); 
       @  ensures true;
       @*/
     public void createArrayWithInitializers(Object o){
@@ -101,7 +101,7 @@ public class Test extends SuperTest{
       @  assignable \nothing;
       @  working_space 0;
       @*/
-    public void createArray(int a){
+    public Object[] createArray(int a){
 	/*	TestRunnable t = new TestRunnable();
 	MemoryArea.getMemoryArea(this).executeInArea(t);
 	if(a>0){
@@ -109,8 +109,8 @@ public class Test extends SuperTest{
 	}
 	return null;*/
 	if(a>0){
-	    oArr = new Object[a];
-	}]
+	    return oArr = new Object[a];
+	}
     }
 
     /*@ public normal_behavior
@@ -168,10 +168,12 @@ public class Test extends SuperTest{
 	  @ working_space_single_iteration \space(new int[3]);
 	  @*/
 	while(i>0){
-	    int[] arr = new int[3];
-	    if(i==10) break;
-	    if(i==5) continue;
 	    i--;
+	    int[] arr = new int[3];
+	    if(i==10){
+		break;
+	    }
+	    if(i==5) continue;
 	}
     }
 

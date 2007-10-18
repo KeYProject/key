@@ -733,13 +733,19 @@ public class JMLMethodSpec extends JMLSpec implements JMLLemmaMethodSpec,
     }
 
     protected Term workingSpacePost(){
-        ProgramVariable heap = (ProgramVariable) nss.programVariables().lookup(
-                new Name(ProblemInitializer.heapSpaceName));
-        Term heapTerm = tf.createVariableTerm(heap);    
-        Term oldHeap = (Term) term2old.get(heapTerm);
+//        ProgramVariable heap = (ProgramVariable) nss.programVariables().lookup(
+//                new Name(ProblemInitializer.heapSpaceName));
+//        Term heapTerm = tf.createVariableTerm(heap);    
+//        Term oldHeap = (Term) term2old.get(heapTerm);        
+        ProgramVariable initialMemoryArea = services.getJavaInfo().
+            getDefaultMemoryArea();
+        Term t_mem = var(initialMemoryArea);
+        Term imCons = tf.createAttributeTerm(services.getJavaInfo().getAttribute(
+                "consumed", "javax.realtime.MemoryArea"), t_mem);
+        Term oldImCons = (Term) term2old.get(imCons);
         Function add = (Function) nss.functions().lookup(new Name("add"));
         Function leq = (Function) nss.functions().lookup(new Name("leq")); 
-        return func(leq, heapTerm, func(add, oldHeap, workingSpace.isRigid() ?
+        return func(leq, imCons, func(add, oldImCons, workingSpace.isRigid() ?
                 workingSpace : (Term) term2old.get(workingSpace)));
     }
     

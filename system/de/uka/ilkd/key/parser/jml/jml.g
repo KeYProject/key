@@ -1628,6 +1628,13 @@ workingspaceclause[JMLMethodSpec s]
                 currentSpec.getProgramVariableNS().add(
                     (LocationVariable) getOld(heapTerm).op());
                 getOld(t);
+             	ProgramVariable initialMemoryArea = services.getJavaInfo().
+            		getDefaultMemoryArea();
+            	Term imTerm = tf.createVariableTerm(initialMemoryArea);
+            	Term imCons = tf.createAttributeTerm(services.getJavaInfo().getAttribute(
+            		"consumed", "javax.realtime.MemoryArea"), imTerm);
+            	currentSpec.getProgramVariableNS().add(
+                    (LocationVariable) getOld(imCons).op());
 //                s.addAssignable(
 //                    new BasicLocationDescriptor(tf.createJunctorTerm(Op.TRUE),
 //                    heapTerm));

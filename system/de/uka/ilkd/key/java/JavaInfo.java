@@ -930,6 +930,7 @@ public class JavaInfo {
 
     public int getSizeInBytes(KeYJavaType classType){
 	int size = 8;
+	if(classType.toString().indexOf("[")!=-1) return 0;
         size += getSizeInBytesRec(classType);
         if(size % 8 == 0){
             return size;

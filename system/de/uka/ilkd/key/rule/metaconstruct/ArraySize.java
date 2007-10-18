@@ -19,7 +19,7 @@ public class ArraySize extends AbstractMetaOperator {
 
   
     public ArraySize() {
-        super(new Name("#arraySize"), 1);
+        super(new Name("#arraySize"), 2);
     }
 
     /**
@@ -51,9 +51,12 @@ public class ArraySize extends AbstractMetaOperator {
             return term.sub(0);
         }
         Namespace funcs = services.getNamespaces().functions();
-        ProgramVariable heapSpace = (ProgramVariable) services.getNamespaces().
-            programVariables().lookup(new Name(ProblemInitializer.heapSpaceName));
-        Term heapSpaceTerm = tf.createVariableTerm(heapSpace);
+        ProgramVariable consumed = services.getJavaInfo().getAttribute("consumed", 
+                services.getJavaInfo().getKeYJavaTypeByClassName("javax.realtime.MemoryArea"));
+        Term heapSpaceTerm = tf.createAttributeTerm(consumed, term.sub(1));
+//        ProgramVariable heapSpace = (ProgramVariable) services.getNamespaces().
+//            programVariables().lookup(new Name(ProblemInitializer.heapSpaceName));
+//        Term heapSpaceTerm = tf.createVariableTerm(heapSpace);
         Function sizeFunc;
         String baseType = ((ArrayType) na.getKeYJavaType().getJavaType()).
             getBaseType().getKeYJavaType().getSort().toString();
