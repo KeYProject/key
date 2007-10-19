@@ -62,7 +62,8 @@ public class VariableNameProposer implements InstantiationProposer {
 	    return getNameProposalForSkolemTermVariable(app,
 	    					       var,
 						       services,
-						       undoAnchor);
+						       undoAnchor,
+                                                       previousProposals);
 	} else if(var.isVariableSV()) {
 	    return getNameProposalForVariableSV(app,
 	    					var,
@@ -87,11 +88,13 @@ public class VariableNameProposer implements InstantiationProposer {
     private String getNameProposalForSkolemTermVariable(TacletApp p_app,
     						       SchemaVariable p_var,
 						       Services services,
-						       Node undoAnchor) {
+						       Node undoAnchor,
+                                                       ListOfString previousProposals) {
 	return getNameProposalForSkolemTermVariable
 	    ( createBaseNameProposalBasedOnCorrespondence ( p_app, p_var ),
 	      services,
-	      undoAnchor );
+	      undoAnchor,
+              previousProposals);
     }
 
 
@@ -130,7 +133,8 @@ public class VariableNameProposer implements InstantiationProposer {
 
     private String getNameProposalForSkolemTermVariable(String name,
     						       Services services,
-						       Node undoAnchor) {
+						       Node undoAnchor,
+                                                       ListOfString previousProposals) {
 
 	final NamespaceSet nss = services.getNamespaces();
 	Name l_name;
@@ -139,8 +143,10 @@ public class VariableNameProposer implements InstantiationProposer {
 	    name = basename + services.getCounter(SKOLEMTERMVARCOUNTER_PREFIX + name)
 		.getCountPlusPlusWithParent(undoAnchor);	    
 	    l_name = new Name(name);
-	} while (nss.lookup(l_name) != null);
-	
+	} while (nss.lookup(l_name) != null &&
+                !previousProposals.contains(name));
+        
+        	
 	return name;
     }
 

@@ -634,10 +634,14 @@ public abstract class TacletApp implements RuleApp {
                     if ( app == null ) return null;
     
                     String proposal = VariableNameProposer.DEFAULT
-                        .getProposal(app, sv, services, goal.node(), null);
+                        .getProposal(app, sv, services, goal.node(), proposals);
+
+                    proposals = proposals.append(proposal);
+
                     app = app.createSkolemConstant ( proposal,
     						        sv,
     						        true, services );
+
                 } else if ( sv.isVariableSV () ) {
                     // if the sort of the schema variable is generic,
                     // ensure that it is instantiated
