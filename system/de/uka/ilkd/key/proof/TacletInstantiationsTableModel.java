@@ -483,7 +483,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 		    } else {
 		        // sv.isSkolemTermSV ()
                         
-                        Named n = services.getNamespaces().
+                        Named n = namespaces().
                             lookupLogicSymbol(new Name(idd.getName()));
                         if (n == null) { 
                             result = result.createSkolemConstant
