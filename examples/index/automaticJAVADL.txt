@@ -76,6 +76,7 @@
 ./java_dl/postConditionTaclets1.key
 ./java_dl/postConditionTaclets2.key
 ./java_dl/quantifiedQuery.key
+./java_dl/query_anon_updates.key
 ./java_dl/reverseArray.key
 ./java_dl/reverseArray2.key
 ./java_dl/simpleAssignment.key
