@@ -566,6 +566,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                    add (
                    CheckApplyEqFeature.INSTANCE,
                    let ( equation, AssumptionProjection.create ( 0 ),
+                         add ( not ( applyTF ( equation, ff.update ) ),
+                         // there might be updates in front of the assumption
+                         // formula; in this case we wait until the updates have
+                         // been applied
                    let ( left, sub ( equation, 0 ),
                    let ( right, sub ( equation, 1 ),
                          ifZero ( applyTF ( left, tf.intF ),
@@ -574,7 +578,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                         MonomialsSmallerThanFeature
                                         .create ( right, left, numbers ) ),
                                   TermSmallerThanFeature.create ( right, left ) )
-                            ) ) ) ) ),
+                            ) ) ) ) ) ),
                  longConst ( -4000 ) } ) );
     }
 

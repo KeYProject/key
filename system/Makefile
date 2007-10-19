@@ -536,7 +536,7 @@ endif
 
 javaFiles: 
 ifneq ("$(GIT)","")
-	@git ls-files | grep ".java" | grep -v "aspects" | grep -v "gjava" | grep -v ".java." | grep -v "resources/" | sort > javaFiles
+	@git ls-files | grep "\.java" | grep -v "aspects" | grep -v "gjava" | grep -v "\.java\." | grep -v "resources/" | sort > javaFiles
 endif
 
 argfile.normal: javaFiles
