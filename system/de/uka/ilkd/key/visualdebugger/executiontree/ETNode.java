@@ -254,15 +254,16 @@ public class ETNode {
         DebuggerPO po = new DebuggerPO("DebuggerPO: redundant pc");
 
         po.setPCImpl(n1.getPc(), n2.getPc());
-        // po.setSpecFormula( TermFactory.DEFAULT.createJunctorTerm(Op.FALSE));
+
         po.setIndices(mediator.getProof().env().getInitConfig()
                 .createTacletIndex(), mediator.getProof().env().getInitConfig()
                 .createBuiltInRuleIndex());
+        
         po.setProofSettings(mediator.getProof().getSettings());
-        po.setConfig(mediator.getProof().env().getInitConfig());
-        // vd.getMediator().getProof().env().getInitConfig().
 
-        ProofStarter ps = new ProofStarter();
+        po.setConfig(mediator.getProof().env().getInitConfig());        
+        
+        final ProofStarter ps = new ProofStarter();
         ps.init(po);
         ps.getProof().setActiveStrategy(
                 (DebuggerStrategy.Factory.create(ps.getProof(),
@@ -270,5 +271,4 @@ public class ETNode {
         ps.run(mediator.getProof().env());
         return ps.getProof().closed();
     }
-
 }

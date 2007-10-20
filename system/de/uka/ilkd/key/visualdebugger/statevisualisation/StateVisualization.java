@@ -17,6 +17,8 @@ import de.uka.ilkd.key.logic.sort.ListOfSort;
 import de.uka.ilkd.key.logic.sort.SLListOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.updatesimplifier.*;
@@ -92,7 +94,7 @@ public class StateVisualization {
         // System.out.println("Program Pio "+programPio);
         simplifyUpdate();
         // System.out.println("Simpified Program PIo "+programPio);
-        setUpProof();
+        setUpProof(null, false);
 
         locations = vd.getLocations(programPio);
         arrayIndexTerms = vd.getArrayIndex(programPio);
@@ -112,24 +114,13 @@ public class StateVisualization {
         // statePred = this.createPredicate(locations);
 
         VisualDebugger.print("Add Rememberpres " + programPio2);
-        // IteratorOfTerm it1 = this.nonPrimTerms.iterator();
-        // IteratorOfTerm it2 = this.nonPrimTerms.iterator();
-
         applyCuts(refInPC);
-
-        VisualDebugger
-                .print("----------- Open Goals after ref case distinctions -------");
-        VisualDebugger.print(ps.getProof().openGoals());
 
         computeInstanceConfigurations();
         this.indexConfigurations = new SetOfTerm[this.instanceConfigurations.length][];
         for (int i = 0; i < instanceConfigurations.length; i++) {
-            setUpProof(instanceConfigurations[i]);
-            applyCuts(arrayIndexTerms);
-            VisualDebugger
-                    .print("----------- Open Goals after array case dist ---------");
-            VisualDebugger.print("InstanceConf " + instanceConfigurations[i]);
-            VisualDebugger.print(ps.getProof().openGoals());
+            setUpProof(instanceConfigurations[i], false);
+            applyCuts(arrayIndexTerms);            
             computeArrayConfigurations(i);
         }
 
@@ -137,8 +128,8 @@ public class StateVisualization {
         for (int i = 0; i < instanceConfigurations.length; i++) {
             postValues[i] = new ListOfTerm[indexConfigurations[i].length];
             for (int j = 0; j < indexConfigurations[i].length; j++) {
-                this.setUpProofForPostValues(instanceConfigurations[i]
-                        .union(indexConfigurations[i][j]));
+                this.setUpProof(instanceConfigurations[i]
+                        .union(indexConfigurations[i][j]), true);
                 VisualDebugger.print("Determining Post Values");
                 vd.setDeterminePostValue(true);
                 ps.run(mediator.getProof().env());
@@ -150,18 +141,11 @@ public class StateVisualization {
             }
         }
 
-        // for(IteratorOfGoal it =
-        // ps.getProof().openGoals().iterator();it.hasNext();)
-        // applyCutsForPost(it.next());
-        // getPostStates(ps.getProof().openGoals());
         VisualDebugger.getVisualDebugger().fireDebuggerEvent(
                 new DebuggerEvent(DebuggerEvent.VIS_STATE, this));
     }
 
     private Term addRememberPrestateUpdates(Term target) {
-        // QuanUpdateOperator op =
-        // QuanUpdateOperator.createUpdateOp(this.refsInPreState.toArray(), new
-        // boolean[locations.size()]);
         Term locs[] = locations.toArray();
         postAttributes = new Term[locs.length];
 
@@ -206,10 +190,6 @@ public class StateVisualization {
 
                 postAttributes[i] = TermFactory.DEFAULT.createArrayTerm(
                         (ArrayOp) locs[i].op(), t, indexT);
-
-                // aps[i]= new AssignmentPairImpl(pv_array_ref, new Term[0],
-                // locs[i].sub(0));
-
             }
 
         }
@@ -217,12 +197,8 @@ public class StateVisualization {
         ArrayOfAssignmentPair apOld = up.getAllAssignmentPairs();
         AssignmentPair[] aps = new AssignmentPair[newAP.size() + apOld.size()];
 
-        // System.out.println(apOld.size()+" "+newAP.size());
         for (int i = newAP.size(); i < apOld.size() + newAP.size(); i++) {
-            // System.out.println(i);
-
             aps[i] = apOld.getAssignmentPair(i - newAP.size());
-
         }
 
         for (int i = 0; i < newAP.size(); i++) {
@@ -447,49 +423,37 @@ public class StateVisualization {
         return false;
     }
 
-    private void setUpProof() {
-        po = new DebuggerPO("DebuggerPo");
+    private void initProofStarter(ProofOblInput po) {
         ps = new ProofStarter();
-        po.setUp(vd.getPrecondition(), itNode);
-        po.setIndices(mediator.getProof().env().getInitConfig()
-                .createTacletIndex(), mediator.getProof().env().getInitConfig()
-                .createBuiltInRuleIndex());
-        po.setProofSettings(mediator.getProof().getSettings());
-        po.setConfig(mediator.getProof().env().getInitConfig());
         ps.init(po);
         vd.setProofStrategy(ps.getProof(), true, false);
     }
-
-    private void setUpProof(SetOfTerm indexConf) {
+    
+    private void setUpProof(SetOfTerm indexConf, boolean forPostValues) {
         po = new DebuggerPO("DebuggerPo");
-        ps = new ProofStarter();
-        po.setUp(vd.getPrecondition(), itNode, indexConf);
-        po.setIndices(mediator.getProof().env().getInitConfig()
-                .createTacletIndex(), mediator.getProof().env().getInitConfig()
-                .createBuiltInRuleIndex());
-        po.setProofSettings(mediator.getProof().getSettings());
-        po.setConfig(mediator.getProof().env().getInitConfig());
-        ps.init(po);
-        vd.setProofStrategy(ps.getProof(), true, false);
-    }
-
-    private void setUpProofForPostValues(SetOfTerm indexConf) {
-        po = new DebuggerPO("DebuggerPo");
-        ps = new ProofStarter();
-        po.setUp(vd.getPrecondition(), itNode, indexConf, programPio2);
-        po.setIndices(mediator.getProof().env().getInitConfig()
-                .createTacletIndex(), mediator.getProof().env().getInitConfig()
-                .createBuiltInRuleIndex());
-        po.setProofSettings(mediator.getProof().getSettings());
-        po.setConfig(mediator.getProof().env().getInitConfig());
-        ps.init(po);
-        vd.setProofStrategy(ps.getProof(), true, false);
+        if (forPostValues) {
+            po.setUp(vd.getPrecondition(), itNode, indexConf, programPio2);
+        } else {
+            if (indexConf == null) {
+                po.setUp(vd.getPrecondition(), itNode);                
+            } else {
+                po.setUp(vd.getPrecondition(), itNode, indexConf);
+            }
+        }        
+        final Proof proof = mediator.getProof();
+        final InitConfig initConfig = proof.env().getInitConfig();
+        po.setIndices(initConfig.createTacletIndex(), 
+                initConfig.createBuiltInRuleIndex());
+        po.setProofSettings(proof.getSettings());
+        po.setConfig(initConfig);
+        
+        initProofStarter(po);
     }
 
     private void simplifyUpdate() {
         this.setUpProof(SetAsListOfTerm.EMPTY_SET.add(TermFactory.DEFAULT
                 .createJunctorTerm(Op.NOT, programPio.constrainedFormula()
-                        .formula())));
+                        .formula())), false);
 
         VisualDebugger.getVisualDebugger().setInitPhase(true);
         VisualDebugger.getVisualDebugger().getBpManager().setNoEx(true);
