@@ -6,15 +6,11 @@ import java.util.List;
 
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.decproc.JavaDecisionProcedureTranslationFactory;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.proofevent.IteratorOfNodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.BuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.SimplifyIntegerRule;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -36,14 +32,13 @@ public class ProofStarter {
 
     private List progressMonitors = new LinkedList();
     
-    private final static BuiltInRule SIMPLIFY_RULE = new SimplifyIntegerRule(false,
-            new JavaDecisionProcedureTranslationFactory());
-
     /** creates an instance of this proof starter */
     public ProofStarter() {
-        this.goalChooser = new DefaultGoalChooser();
-    }
-
+        this.goalChooser = new DefaultGoalChooser();            
+    }    
+    
+    
+    
     /**
      * applies rules that are chosen by the active strategy
      * 
@@ -114,25 +109,22 @@ public class ProofStarter {
     }
 
     // - Note: This should be removed
-    public void applySimplificationOnGoals(ListOfGoal goals) {
+    private void applySimplificationOnGoals(ListOfGoal goals, 
+            BuiltInRule decisionProcedureRule) {
         if (goals.isEmpty()) {
             return;
         }
             
         final Proof p = goals.head().node().proof();
-        
-        if (p.getSettings().getDecisionProcedureSettings().useSimplify()) {
-            final IteratorOfGoal i = goals.iterator();                      
-            
-            p.env().registerRule(SIMPLIFY_RULE,
-                    de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
 
-            while (i.hasNext()) {
-                final Goal g = i.next();
-                final BuiltInRuleApp birApp = new BuiltInRuleApp(SIMPLIFY_RULE, null, p
-                        .getUserConstraint().getConstraint());
-                g.apply(birApp);
-            }
+        final IteratorOfGoal i = goals.iterator();                      
+        p.env().registerRule(decisionProcedureRule,
+                de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
+        while (i.hasNext()) {
+            final Goal g = i.next();
+            final BuiltInRuleApp birApp = new BuiltInRuleApp(decisionProcedureRule, null, p
+                    .getUserConstraint().getConstraint());
+            g.apply(birApp);
         }
     }
 
@@ -237,6 +229,8 @@ public class ProofStarter {
             setMaxSteps(proof.getSettings().getStrategySettings().getMaxSteps());
         }
 
+        final BuiltInRule decisionProcedureRule = findSimplifyRule();
+        
         env.registerProof(po, po.getPO());
 
         goalChooser.init(proof, proof.openGoals());
@@ -254,7 +248,9 @@ public class ProofStarter {
                     informProgressMonitors(countApplied);
                 }
             }
-            applySimplificationOnGoals(proof.openGoals());
+            if (decisionProcedureRule != null) {
+                applySimplificationOnGoals(proof.openGoals(), decisionProcedureRule);
+            }
             VisualDebugger.print("ProofStarter: Applied " + countApplied
                     + " Rules");
         } catch (Throwable e) {
@@ -267,6 +263,26 @@ public class ProofStarter {
         }
 
         return true;
+    }
+
+
+    /**
+     * returns the decision procedure rule invoking simplify, if available otherwise null
+     * is returned
+     * @return the decision procedure calling Simplify or null if none has been found
+     */
+    private BuiltInRule findSimplifyRule() {
+        BuiltInRule decisionProcedureRule = null;
+        final IteratorOfBuiltInRule builtinRules = 
+            proof.getSettings().getProfile().getStandardRules().getStandardBuiltInRules().iterator();
+        while (builtinRules.hasNext()) {
+            final BuiltInRule bir = builtinRules.next();
+            if (bir instanceof SimplifyIntegerRule) {
+                decisionProcedureRule = bir;
+                break;
+            }
+        }
+        return decisionProcedureRule;
     }
 
 
