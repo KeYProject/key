@@ -57,12 +57,12 @@ public class StrategyProperties extends Properties {
     static Properties defaultMap = new Properties();
     
     static {
-        defaultMap.setProperty(SPLITTING_OPTIONS_KEY, SPLITTING_NORMAL);
-        defaultMap.setProperty(LOOP_OPTIONS_KEY, LOOP_EXPAND);
+        defaultMap.setProperty(SPLITTING_OPTIONS_KEY, SPLITTING_DELAYED);
+        defaultMap.setProperty(LOOP_OPTIONS_KEY, LOOP_INVARIANT);
         defaultMap.setProperty(METHOD_OPTIONS_KEY, METHOD_EXPAND);
         defaultMap.setProperty(QUERY_OPTIONS_KEY, QUERY_NONE);
         defaultMap.setProperty(NON_LIN_ARITH_OPTIONS_KEY, NON_LIN_ARITH_NONE);
-        defaultMap.setProperty(QUANTIFIERS_OPTIONS_KEY, QUANTIFIERS_NONE);
+        defaultMap.setProperty(QUANTIFIERS_OPTIONS_KEY, QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)
             defaultMap.setProperty(USER_TACLETS_OPTIONS_KEY(i), USER_TACLETS_OFF);
     }
