@@ -29,6 +29,9 @@ public class ProofStarter {
 
     private Strategy strategy;
 
+    private final static BuiltInRule SIMPLIFY_RULE = new SimplifyIntegerRule(false,
+            new JavaDecisionProcedureTranslationFactory());
+
     /** creates an instance of this proof starter */
     public ProofStarter() {
         this.goalChooser = new DefaultGoalChooser();
@@ -105,19 +108,22 @@ public class ProofStarter {
 
     // - Note: This should be removed
     public void applySimplificationOnGoals(ListOfGoal goals) {
-        IteratorOfGoal i = goals.iterator();
-        BuiltInRule simpRule = null;
-        while (i.hasNext()) {
-            final Goal g = i.next();
-            final Proof p = g.node().proof();
+        if (goals.isEmpty()) {
+            return;
+        }
+            
+        final Proof p = goals.head().node().proof();
+        
+        if (p.getSettings().getDecisionProcedureSettings().useSimplify()) {
+            final IteratorOfGoal i = goals.iterator();                      
+            
+            p.env().registerRule(SIMPLIFY_RULE,
+                    de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
 
-            if (p.getSettings().getDecisionProcedureSettings().useSimplify()) {
-                simpRule = new SimplifyIntegerRule(false,
-                        new JavaDecisionProcedureTranslationFactory());
-                BuiltInRuleApp birApp = new BuiltInRuleApp(simpRule, null, p
+            while (i.hasNext()) {
+                final Goal g = i.next();
+                final BuiltInRuleApp birApp = new BuiltInRuleApp(SIMPLIFY_RULE, null, p
                         .getUserConstraint().getConstraint());
-                p.env().registerRule(simpRule,
-                        de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
                 g.apply(birApp);
             }
         }
@@ -150,6 +156,7 @@ public class ProofStarter {
         this.proof = po.getPO().getFirstProof();
     }
 
+   
     public boolean run(ProofEnvironment env) {
         if (proof == null) {
             throw new IllegalStateException(
