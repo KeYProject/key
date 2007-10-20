@@ -146,7 +146,8 @@ public class ETNode {
 
     public void computeSimplifiedBC() {
         if (this.bc != null)
-            this.simplifiedBC = VisualDebugger.getVisualDebugger().simplify(
+            this.simplifiedBC = 
+                VisualDebugger.getVisualDebugger().simplify(
                     this.bc);
         else
             simplifiedBC = null;

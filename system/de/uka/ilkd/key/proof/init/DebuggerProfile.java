@@ -20,8 +20,7 @@ public class  DebuggerProfile extends JavaProfile {
     private final static StrategyFactory DEFAULT = 
         new DebuggerStrategy.Factory();
     
-    public DebuggerProfile(Main main) {
-        //super("standardRules-testGen.key", 
+    public DebuggerProfile(Main main) {       
         super("standardRules-debugger.key",//TODO
                 SetAsListOfGoalChooserBuilder.EMPTY_SET.
                 add(new DefaultGoalChooserBuilder()).

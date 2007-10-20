@@ -31,14 +31,16 @@ public class ProofStarter {
     private Strategy strategy;
 
     private List progressMonitors = new LinkedList();
+
+    private boolean useDecisionProcedures;
     
     /** creates an instance of this proof starter */
     public ProofStarter() {
-        this.goalChooser = new DefaultGoalChooser();            
+        this.goalChooser = new DefaultGoalChooser();
+        // for the moment to maintain old default
+        useDecisionProcedures = true;
     }    
-    
-    
-    
+        
     /**
      * applies rules that are chosen by the active strategy
      * 
@@ -229,7 +231,12 @@ public class ProofStarter {
             setMaxSteps(proof.getSettings().getStrategySettings().getMaxSteps());
         }
 
-        final BuiltInRule decisionProcedureRule = findSimplifyRule();
+        final BuiltInRule decisionProcedureRule;
+        if (useDecisionProcedures) {
+             decisionProcedureRule = findSimplifyRule();
+        } else {
+            decisionProcedureRule = null;
+        }
         
         env.registerProof(po, po.getPO());
 
@@ -248,7 +255,7 @@ public class ProofStarter {
                     informProgressMonitors(countApplied);
                 }
             }
-            if (decisionProcedureRule != null) {
+            if (useDecisionProcedures && decisionProcedureRule != null) {
                 applySimplificationOnGoals(proof.openGoals(), decisionProcedureRule);
             }
             VisualDebugger.print("ProofStarter: Applied " + countApplied
@@ -342,6 +349,16 @@ public class ProofStarter {
             }
         }
 
+    }
+
+    /**
+     * if activated the proof starter will run decision procedures on all open goals
+     * after the normal proof search has stopped.  
+     * @param useDecisionProcedures the boolean if <tt>true</tt> activates otherwise disables 
+     * running the decision procedures  
+     */
+    public void setUseDecisionProcedure(boolean useDecisionProcedures) {
+       this.useDecisionProcedures = useDecisionProcedures;
     }
 
 }

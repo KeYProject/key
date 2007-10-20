@@ -113,16 +113,13 @@ public class VisualDebugger {
 
             args[0] = "DEBUGGER";
             args[1] = "LOOP";
-            // args[1]= "DEBUsG";
-            // Main.main(args);
+            
             Main.evaluateOptions(args);
             Main key = Main.getInstance(false);
             key.loadCommandLineFile();
 
             singleton.main = Main.getInstance(false);
             singleton.mediator = singleton.main.mediator();
-            // singleton.ip = singleton.mediator.getInteractiveProver();
-
         }
         return singleton;
     }
@@ -163,6 +160,8 @@ public class VisualDebugger {
 
     private Main main;
 
+    protected int maxProofStepsForStateVisComputation = 8000;
+
     // InteractiveProver ip;
     private KeYMediator mediator;
 
@@ -182,9 +181,11 @@ public class VisualDebugger {
 
     private ClassType type;
 
+    private boolean useDecisionProcedures = false;
+
     protected VisualDebugger() {
         bpManager = new BreakpointManager(this);
-
+        
         // main = Main.getInstance();
     }
 
@@ -850,8 +851,6 @@ public class VisualDebugger {
     // alternative: { } <sep(-1);>\phi
 
     public String prettyPrint(Term l, LinkedList sos, SymbolicObject so) {
-        // KeYMediator mediator=
-        // VisualDebugger.getVisualDebugger().getMediator();
         final LogicPrinter lp = new DebuggerLP(new ProgramPrinter(null),
                 mediator.getNotationInfo(), mediator.getServices(),
                 term2InputPV, sos, so);
@@ -932,10 +931,6 @@ public class VisualDebugger {
         }
         return false;
     }
-
-    // public void setRunLimit(int runLimit) {
-    // this.runLimit = runLimit;
-    // }
 
     private void runProver(final ListOfGoal goals) {
         this.refreshRuleApps();
@@ -1030,6 +1025,7 @@ public class VisualDebugger {
 
         setProofStrategy(proof, false, false);
 
+        ps.setUseDecisionProcedure(useDecisionProcedures);
         ps.run(proofEnvironment);
 
         setProofStrategy(proof, true, false);
@@ -1107,11 +1103,11 @@ public class VisualDebugger {
 
         final Runnable interfaceSignaller = new Runnable() {
             public void run() {
-                new StateVisualization(node, mediator);
-
+                new StateVisualization(node, mediator, 
+                        maxProofStepsForStateVisComputation,
+                        useDecisionProcedures);
             }
         };
-
         startThread(interfaceSignaller);
     }
 

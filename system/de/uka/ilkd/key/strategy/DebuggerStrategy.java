@@ -43,12 +43,14 @@ public class DebuggerStrategy extends VBTStrategy {
                 StrategyProperties.METHOD_EXPAND);
         res.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,
                 StrategyProperties.QUERY_NONE);
-        if (VisualDebugger.quan_splitting)
+        if (VisualDebugger.quan_splitting) {
             res.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
                     StrategyProperties.QUANTIFIERS_INSTANTIATE);
-        else res.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, 
-                StrategyProperties.QUANTIFIERS_NON_SPLITTING);
-
+        } else {
+            res.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, 
+                StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
+        }
+        
         res.setProperty(VISUAL_DEBUGGER_SPLITTING_RULES_KEY, 
                 splittingRulesAllowed ? VISUAL_DEBUGGER_TRUE :
                     VISUAL_DEBUGGER_FALSE);
@@ -115,11 +117,6 @@ public class DebuggerStrategy extends VBTStrategy {
                    ifZero(inUpdateFeature, inftyConst(),longConst(0)));
        }
    }
-
-
-
-    
-    
 
     public Name name() {
         return new Name("DebuggerStrategy");

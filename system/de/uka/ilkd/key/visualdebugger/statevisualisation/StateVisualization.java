@@ -71,13 +71,21 @@ public class StateVisualization {
 
     private VisualDebugger vd = VisualDebugger.getVisualDebugger();
 
-    public StateVisualization(ITNode itn, KeYMediator mediator) {
+    private int maxProofSteps;
+
+    private boolean useDecisionProcedures;
+
+    public StateVisualization(ITNode itn, KeYMediator mediator, 
+            int maxProofSteps, boolean useDecisionProcedures) {
         this.itNode = itn;
 
         this.mediator = mediator;
 
         this.serv = mediator.getServices();
 
+        this.maxProofSteps = maxProofSteps;
+        this.useDecisionProcedures = useDecisionProcedures;
+        
         refInPC = getReferences(itNode.getPc());
         VisualDebugger.print("References in PC: ");
         VisualDebugger.print(refInPC);
@@ -101,19 +109,10 @@ public class StateVisualization {
 
         // getRefsInPreState(locations);
         arrayLocations = vd.getArrayLocations(programPio);
-        VisualDebugger.print("Locations " + locations);
-        // System.out.println("Refs in Locations "+this.changedObjects);
-        // System.out.println("AttributeOps "+this.changedAttributes);
-        VisualDebugger.print("Array Index Terms " + this.arrayIndexTerms);
-
-        VisualDebugger.print("Formual"
-                + programPio.constrainedFormula().formula());
-
         programPio2 = addRememberPrestateUpdates(programPio
                 .constrainedFormula().formula());
         // statePred = this.createPredicate(locations);
 
-        VisualDebugger.print("Add Rememberpres " + programPio2);
         applyCuts(refInPC);
 
         computeInstanceConfigurations();
@@ -130,14 +129,11 @@ public class StateVisualization {
             for (int j = 0; j < indexConfigurations[i].length; j++) {
                 this.setUpProof(instanceConfigurations[i]
                         .union(indexConfigurations[i][j]), true);
-                VisualDebugger.print("Determining Post Values");
                 vd.setDeterminePostValue(true);
                 ps.run(mediator.getProof().env());
                 vd.setDeterminePostValue(false);
                 postValues[i][j] = getPostState(ps.getProof().openGoals()
                         .iterator().next().node().sequent());
-                VisualDebugger.print("Open goals after res Updates");
-                VisualDebugger.print(ps.getProof().openGoals());
             }
         }
 
@@ -375,9 +371,6 @@ public class StateVisualization {
     }
 
     private SetOfTerm getReferences(Term t) {
-        // System.out.println(t);
-        // if (t.sort()!= Sort.FORMULA && !this.isBool(t)&&!this.isInt(t))
-
         SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
         if (referenceSort(t.sort()) && t.freeVars().size() == 0)
             result = result.add(t);
@@ -391,14 +384,12 @@ public class StateVisualization {
             boolean pre) {
         for (int j = 0; j < indexConfigurations[i].length; j++) {
             if (indexTerms.subset(indexConfigurations[i][j])) {
-                VisualDebugger.print("Found " + j);
                 final ListOfTerm pt = postValues[i][j];
                 SymbolicObjectDiagram s = new SymbolicObjectDiagram(itNode,
                         mediator.getServices(), itNode.getPc(), refInPC,
                         locations, pt, pre, this.arrayLocations,
                         indexConfigurations[i], indexConfigurations[i][j],
                         instanceConfigurations[i]);
-
                 return s;
             }
         }
@@ -413,7 +404,6 @@ public class StateVisualization {
     private boolean referenceSort(Sort s) {
         JavaInfo info = serv.getJavaInfo();
         KeYJavaType kjt = info.getKeYJavaType(s);
-        // System.out.println(kjt);
         if (kjt == null)
             return false;
         if (kjt.getJavaType() instanceof ClassType
@@ -426,6 +416,8 @@ public class StateVisualization {
     private void initProofStarter(ProofOblInput po) {
         ps = new ProofStarter();
         ps.init(po);
+        ps.setMaxSteps(maxProofSteps);
+        ps.setUseDecisionProcedure(useDecisionProcedures);
         vd.setProofStrategy(ps.getProof(), true, false);
     }
     
@@ -455,6 +447,7 @@ public class StateVisualization {
                 .createJunctorTerm(Op.NOT, programPio.constrainedFormula()
                         .formula())), false);
 
+        
         VisualDebugger.getVisualDebugger().setInitPhase(true);
         VisualDebugger.getVisualDebugger().getBpManager().setNoEx(true);
 
@@ -477,7 +470,6 @@ public class StateVisualization {
 
         proof.setActiveStrategy(factory.create(proof, strategyProperties));
 
-        // System.out.println(ps.getProof().openGoals().iterator().next().sequent());
         this.programPio = VisualDebugger.getVisualDebugger().getProgramPIO(
                 ps.getProof().openGoals().iterator().next().sequent());
         if (programPio == null) {
