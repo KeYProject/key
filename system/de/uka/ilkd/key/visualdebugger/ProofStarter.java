@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.visualdebugger;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.decproc.JavaDecisionProcedureTranslationFactory;
@@ -12,6 +16,7 @@ import de.uka.ilkd.key.rule.BuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SimplifyIntegerRule;
 import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.util.ProgressMonitor;
 
 /**
  * Starts and runs a proof attempt mostly separated from the rest of the KeY
@@ -29,6 +34,8 @@ public class ProofStarter {
 
     private Strategy strategy;
 
+    private List progressMonitors = new LinkedList();
+    
     private final static BuiltInRule SIMPLIFY_RULE = new SimplifyIntegerRule(false,
             new JavaDecisionProcedureTranslationFactory());
 
@@ -156,7 +163,64 @@ public class ProofStarter {
         this.proof = po.getPO().getFirstProof();
     }
 
-   
+    /**
+     * informs the registered progress monitors about the current progress (i.e. 
+     * the number of rules applied until now)
+     * @param progress the int counting the number of applied rules
+     */
+    private void informProgressMonitors(int progress) {
+        final Iterator it = progressMonitors.iterator();
+        while (it.hasNext()) {
+            ((ProgressMonitor)it.next()).setProgress(progress);
+        }        
+    }
+
+    /**
+     * initialises the registered progress monitors with the maximal
+     * steps to be performed
+     * @param maxSteps an int indicating the maximal steps to be performed
+     */
+    private void initProgressMonitors(int maxSteps) {
+        final Iterator it = progressMonitors.iterator();
+        while (it.hasNext()) {
+            ((ProgressMonitor)it.next()).setMaximum(maxSteps);
+        }        
+    }
+    
+    /**     
+     * adds a progress monitor to the proof starter. The progress monitor will
+     * be informed about the progress when performing a proof search. Therefore
+     * its {@link ProgressMonitor#setMaximum(int)} will be called handing over the 
+     * maximal number of rule steps to be performed before the proof attempt is stopped. 
+     * After each rule application the monitor will receive a call to 
+     * {@link ProgressMonitor#setProgress(int)} 
+     * 
+     * @param pm the ProgressMonitor to be added
+     */
+    public void addProgressMonitor(ProgressMonitor pm) {
+        synchronized(progressMonitors) {
+            if (!progressMonitors.contains(pm)) {
+                progressMonitors.add(pm);
+            }
+        }
+    }
+
+    /**
+     * removes <code>pm</code> from the list of progress monitor to be informed 
+     * @param pm the ProgressMonitor to be removed
+     */
+    public void removeProgressMonitor(ProgressMonitor pm) {
+        synchronized(progressMonitors) {
+            progressMonitors.remove(pm);
+        }
+    }
+    
+    /**
+     * starts a proof attempt
+     * @param env the ProofEnvironment to which the proof object will be registered
+     * @return <code>true</code> if the proof attempt terminated normally (i.e. no error has occured).
+     * In particular <code>true</code> does <em>not</em> mean that the proof has been closed.
+     */
     public boolean run(ProofEnvironment env) {
         if (proof == null) {
             throw new IllegalStateException(
@@ -179,12 +243,16 @@ public class ProofStarter {
         final ProofListener pl = new ProofListener();
 
         Goal.addRuleAppListener(pl);
-
+        
         try {
 
             int countApplied = 0;
-            while (countApplied < maxSteps && applyAutomaticRule()) {
-                countApplied++;
+            synchronized (progressMonitors) {
+                initProgressMonitors(maxSteps);
+                while (countApplied < maxSteps && applyAutomaticRule()) {
+                    countApplied++;
+                    informProgressMonitors(countApplied);
+                }
             }
             applySimplificationOnGoals(proof.openGoals());
             VisualDebugger.print("ProofStarter: Applied " + countApplied
@@ -200,6 +268,7 @@ public class ProofStarter {
 
         return true;
     }
+
 
     /**
      * sets the maximal amount of steps to be performed
