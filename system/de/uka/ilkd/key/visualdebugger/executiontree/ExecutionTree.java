@@ -78,10 +78,11 @@ public class ExecutionTree implements AutoModeListener {
             vd.setInitPhase(false);
             vd.getBpManager().setNoEx(false);
             vd.stepToFirstSep();
-        } else
+        } else {
             vd.fireDebuggerEvent(new DebuggerEvent(DebuggerEvent.EXEC_FINISHED,
                     null));
-
+        }
+        
         final Runnable execTreeThread = new Runnable() {
             public void run() {
                 // new StateVisualization(node,mediator);
@@ -90,8 +91,9 @@ public class ExecutionTree implements AutoModeListener {
         };
         // mediator.invokeAndWait(interfaceSignaller);
 
-        if (mediator.getProof() != null)
+        if (mediator.getProof() != null) {
             startThread(execTreeThread);
+        }
     }
 
     public void buildETree(ITNode n, ListOfTerm terms, ETNode parent, String exc) {
