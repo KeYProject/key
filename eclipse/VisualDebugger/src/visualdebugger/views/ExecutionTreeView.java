@@ -400,8 +400,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
             }
 
             public void widgetSelected(SelectionEvent event) {
-                vd
-                        .visualize(((SourceElementFigure) ExecutionTreeView.this.selected)
+                vd.visualize(((SourceElementFigure) ExecutionTreeView.this.selected)
                                 .getETNode().getITNodesArray()[0]);
 
             }

@@ -71,45 +71,7 @@ public class ProofStarter {
         return true;
     }
 
-    public boolean applyRule(Goal g, RuleApp app, ProofEnvironment env) {
-        if (proof == null) {
-            throw new IllegalStateException(
-                    "Proofstarter must be initialized before.");
-        }
-
-        if (strategy == null) {
-            // in this case take the strategy of the proof settings
-            setStrategy(proof.getActiveStrategy());
-        }
-
-        if (maxSteps == -1) {
-            // take default settings
-            setMaxSteps(proof.getSettings().getStrategySettings().getMaxSteps());
-        }
-
-        env.registerProof(po, po.getPO());
-
-        goalChooser.init(proof, proof.openGoals());
-        final ProofListener pl = new ProofListener();
-
-        Goal.addRuleAppListener(pl);
-
-        try {
-            g.apply(app);
-
-            VisualDebugger.print("ProofStarter: Applied rule ");
-        } catch (Throwable e) {
-            System.err.println(e);
-            e.printStackTrace();
-            return false;
-        } finally {
-            Goal.removeRuleAppListener(pl);
-            env.removeProofList(po.getPO());
-        }
-
-        return true;
-    }
-
+ 
     // - Note: This should be removed
     private void applySimplificationOnGoals(ListOfGoal goals, 
             BuiltInRule decisionProcedureRule) {
@@ -221,9 +183,12 @@ public class ProofStarter {
                     "Proofstarter must be initialized before.");
         }
 
+        final Strategy oldStrategy = proof.getActiveStrategy();
         if (strategy == null) {
             // in this case take the strategy of the proof settings
             setStrategy(proof.getActiveStrategy());
+        } else {
+            proof.setActiveStrategy(strategy);
         }
 
         if (maxSteps == -1) {
@@ -233,11 +198,11 @@ public class ProofStarter {
 
         final BuiltInRule decisionProcedureRule;
         if (useDecisionProcedures) {
-             decisionProcedureRule = findSimplifyRule();
+            decisionProcedureRule = findSimplifyRule();
         } else {
             decisionProcedureRule = null;
         }
-        
+
         env.registerProof(po, po.getPO());
 
         goalChooser.init(proof, proof.openGoals());
@@ -257,9 +222,7 @@ public class ProofStarter {
             }
             if (useDecisionProcedures && decisionProcedureRule != null) {
                 applySimplificationOnGoals(proof.openGoals(), decisionProcedureRule);
-            }
-            VisualDebugger.print("ProofStarter: Applied " + countApplied
-                    + " Rules");
+            }            
         } catch (Throwable e) {
             System.err.println(e);
             e.printStackTrace();
@@ -267,6 +230,7 @@ public class ProofStarter {
         } finally {
             Goal.removeRuleAppListener(pl);
             env.removeProofList(po.getPO());
+            proof.setActiveStrategy(oldStrategy);
         }
 
         return true;

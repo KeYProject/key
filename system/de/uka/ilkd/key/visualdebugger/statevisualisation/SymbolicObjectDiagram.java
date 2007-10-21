@@ -62,8 +62,8 @@ public class SymbolicObjectDiagram {
         final Operator op = t.op();
         return op instanceof AttributeOp
                 && checkIndices(t, serv)
-                && !((ProgramVariable) ((AttributeOp) op).attribute())
-                        .isImplicit() || op instanceof ProgramVariable
+                && !((ProgramVariable) ((AttributeOp) op).attribute()).isImplicit() 
+                || op instanceof ProgramVariable
                 && !((ProgramVariable) op).isImplicit()
                 || op instanceof ArrayOp && checkIndices(t, serv)
                 // TODO Why is a RigidFunction a location? 
@@ -248,17 +248,18 @@ public class SymbolicObjectDiagram {
     }
 
     private boolean containsJavaBlock(Term t) {
-        boolean result = false;
-        if (t.op() == vd.getPostPredicate())
+        if (t.op() == vd.getPostPredicate()) {
             return true; // TODO
+        }
         if (t.javaBlock() != JavaBlock.EMPTY_JAVABLOCK) {
             return true;
         }
         for (int i = 0; i < t.arity(); i++) {
-            if (containsJavaBlock(t.sub(i)))
-                result = true;
+            if (containsJavaBlock(t.sub(i))) {
+                return true;
+            }
         }
-        return result;
+        return false;
     }
 
     private void createEquivalenceClassesAndConstraints() {
