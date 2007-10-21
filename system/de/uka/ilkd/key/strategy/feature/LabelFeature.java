@@ -36,7 +36,7 @@ public class LabelFeature extends BinaryFeature {
             if (((PCLabel)debugLabels.get(pio)).isLooking()) {
                 return true;
             }
-            if( nodeInfo.getActiveStatement()!=null) {
+            if( nodeInfo.getActiveStatement() != null) {
                 return true; //TODO act statement in prog mod
             }
         }
