@@ -44,7 +44,7 @@ public class DebuggerStrategy extends VBTStrategy {
         res.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,
                 StrategyProperties.QUERY_NONE);
         res.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
-                StrategyProperties.NON_LIN_ARITH_NONE);
+                StrategyProperties.NON_LIN_ARITH_DEF_OPS);
         if (VisualDebugger.quan_splitting) {
             res.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
                     StrategyProperties.QUANTIFIERS_INSTANTIATE);
