@@ -153,8 +153,6 @@ public class VisualDebugger {
 
     private ProgramMethod debuggingMethod;
 
-    private boolean determinePostValue = false;
-
     private boolean initPhase = false;
 
     private HashMap inputPV2term = new HashMap();
@@ -425,13 +423,10 @@ public class VisualDebugger {
             final Term f = cfm.formula();
             if (f.op() instanceof QuanUpdateOperator) {
                 final Term subOp = f.sub(f.arity() - 1);
-                if (subOp.op() == postPredicate
-                        && subOp.javaBlock() == JavaBlock.EMPTY_JAVABLOCK) {
+                if (subOp.op() == postPredicate) {
                     return new PosInOccurrence(cfm, PosInTerm.TOP_LEVEL, false);
                 }
-
             }
-
         }
         return null;
     }
@@ -730,10 +725,6 @@ public class VisualDebugger {
         run();
     }
 
-    public boolean isDeterminePostValue() {
-        return determinePostValue;
-    }
-
     public boolean isInitPhase() {
         return initPhase;
     }
@@ -949,10 +940,6 @@ public class VisualDebugger {
     private void runProver(final ListOfGoal goals) {
         this.refreshRuleApps();
         mediator.startAutoMode(goals);
-    }
-
-    public void setDeterminePostValue(boolean determinePostValue) {
-        this.determinePostValue = determinePostValue;
     }
 
     public void setInitPhase(boolean initPhase) {

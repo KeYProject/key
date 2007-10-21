@@ -467,8 +467,6 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
                         .getSo());
             else     {   
                 this.setConstraints(currentState.getConstraints(al.getValueterm()),symbolicObjects,al.getSo());
-                System.out.println(currentState.getConstraints(al.getValueterm()));
-                System.out.println((al.getValueterm()));
             }
 
 //            else
@@ -520,12 +518,13 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
             }
 
             if (result>-1){
-                if (!preState)
-                currentState = stateVis.getSymbolicState(prestateForTracesSlider.getSelection(),possibleIndexTerms[result],false);
-                else
+                if (!preState) {
+                    currentState = stateVis.getSymbolicState(prestateForTracesSlider.getSelection(),possibleIndexTerms[result],false);
+                } else {
                     currentState = stateVis.getSymbolicState(prestateForTracesSlider.getSelection(),possibleIndexTerms[result],true);
+                }
                 arrayIndexSlider.setSelection(result);
-            refreshVisualizedState();
+                refreshVisualizedState();
             } else {
                 MessageDialog.openInformation(PlatformUI.getWorkbench()
                         .getActiveWorkbenchWindow().getShell(),
@@ -668,7 +667,7 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
             startRefreshThread();
         } else if (event.getType() == DebuggerEvent.PROJECT_LOADED_SUCCESSFUL) {
             stateVis = null;
-              startRefreshThread();
+            startRefreshThread();
         }
     }
 
