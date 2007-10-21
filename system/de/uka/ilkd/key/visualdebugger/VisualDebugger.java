@@ -32,6 +32,7 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
@@ -68,6 +69,8 @@ public class VisualDebugger {
             + File.separator;
 
     public static final boolean vdInDebugMode = false;
+
+    private static final Name POST_PREDICATE_NAME = new Name("POST");
 
     static {
         symbolicExecNames.add(new Name("simplify_prog"));
@@ -182,6 +185,8 @@ public class VisualDebugger {
     private ClassType type;
 
     private boolean useDecisionProcedures = false;
+
+    private Function postPredicate;
 
     protected VisualDebugger() {
         bpManager = new BreakpointManager(this);
@@ -420,7 +425,7 @@ public class VisualDebugger {
             final Term f = cfm.formula();
             if (f.op() instanceof QuanUpdateOperator) {
                 final Term subOp = f.sub(f.arity() - 1);
-                if (subOp.op().name().toString().equals("POST")
+                if (subOp.op() == postPredicate
                         && subOp.javaBlock() == JavaBlock.EMPTY_JAVABLOCK) {
                     return new PosInOccurrence(cfm, PosInTerm.TOP_LEVEL, false);
                 }
@@ -530,6 +535,10 @@ public class VisualDebugger {
             result.add(mbs.getArguments().getExpression(i));
         }
         return result;
+    }
+
+    public Function getPostPredicate() {
+        return postPredicate;
     }
 
     public Sequent getPrecondition() {
@@ -705,7 +714,8 @@ public class VisualDebugger {
             }
         }
 
-        ExecutionTree pl = new ExecutionTree(mediator.getProof(), mediator,
+        final Proof proof = mediator.getProof();
+        ExecutionTree pl = new ExecutionTree(proof, mediator,
                 true);
         pl.setListeners(listeners);
         mediator.addAutoModeListener(pl);
@@ -713,7 +723,10 @@ public class VisualDebugger {
         this.initPhase = true;
         bpManager.setNoEx(true);
 
-        setProofStrategy(mediator.getProof(), true, false);
+        postPredicate = (Function) 
+            proof.getNamespaces().functions().lookup(POST_PREDICATE_NAME);  
+        
+        setProofStrategy(proof, true, false);
         run();
     }
 
@@ -917,8 +930,9 @@ public class VisualDebugger {
         if (!mediator.autoMode()) {
             run(mediator.getProof().openGoals());
             return true;
-        } else
+        } else {
             return false;
+        }
     }
 
     public boolean run(ListOfGoal goals) {
@@ -1008,16 +1022,17 @@ public class VisualDebugger {
     public ListOfTerm simplify(ListOfTerm terms) {
         if (terms.size() == 0)
             return terms;
-        DebuggerPO po = new DebuggerPO("DebuggerPo");
-        ProofStarter ps = new ProofStarter();
+        final DebuggerPO po = new DebuggerPO("DebuggerPo");
+        final ProofStarter ps = new ProofStarter();
         po.setTerms(terms);
 
         final ProofEnvironment proofEnvironment = mediator.getProof().env();
-
-        po.setIndices(proofEnvironment.getInitConfig().createTacletIndex(),
-                proofEnvironment.getInitConfig().createBuiltInRuleIndex());
+        final InitConfig initConfig = proofEnvironment.getInitConfig();
+        
+        po.setIndices(initConfig.createTacletIndex(),
+                initConfig.createBuiltInRuleIndex());
         po.setProofSettings(mediator.getProof().getSettings());
-        po.setConfig(proofEnvironment.getInitConfig());
+        po.setConfig(initConfig);
         po.setTerms(terms);
         ps.init(po);
 
@@ -1030,7 +1045,6 @@ public class VisualDebugger {
 
         setProofStrategy(proof, true, false);
 
-        proof.openGoals().iterator().next().node().sequent();
         return collectResult(proof.openGoals().iterator().next().node()
                 .sequent());
     }
@@ -1147,6 +1161,5 @@ public class VisualDebugger {
         public String toString() {
             return "File: " + file + " Method: " + method;
         }
-
     }
 }

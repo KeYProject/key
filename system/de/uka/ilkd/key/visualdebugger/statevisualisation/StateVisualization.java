@@ -347,16 +347,14 @@ public class StateVisualization {
 
     private ListOfTerm getPostState(Sequent s) {
         ListOfTerm result = SLListOfTerm.EMPTY_LIST;
-        for (IteratorOfConstrainedFormula it = s.succedent().iterator(); it
-                .hasNext();) {
-            ConstrainedFormula cfm = it.next();
-            if (cfm.formula().op() == stateOp) {
-                for (int i = 0; i < cfm.formula().arity(); i++) {
-                    result = result.append(cfm.formula().sub(i));
+        for (final IteratorOfConstrainedFormula it = s.succedent().iterator(); 
+             it.hasNext();) {
+            final Term formula = it.next().formula();
+            if (formula.op() == stateOp) {
+                for (int i = 0, ar = formula.arity(); i < ar; i++) {
+                    result = result.prepend(formula.sub(i));
                 }
-
             }
-
         }
         return result;
     }
@@ -385,7 +383,7 @@ public class StateVisualization {
         for (int j = 0; j < indexConfigurations[i].length; j++) {
             if (indexTerms.subset(indexConfigurations[i][j])) {
                 final ListOfTerm pt = postValues[i][j];
-                SymbolicObjectDiagram s = new SymbolicObjectDiagram(itNode,
+                final SymbolicObjectDiagram s = new SymbolicObjectDiagram(itNode,
                         mediator.getServices(), itNode.getPc(), refInPC,
                         locations, pt, pre, this.arrayLocations,
                         indexConfigurations[i], indexConfigurations[i][j],
@@ -402,15 +400,12 @@ public class StateVisualization {
     }
 
     private boolean referenceSort(Sort s) {
-        JavaInfo info = serv.getJavaInfo();
-        KeYJavaType kjt = info.getKeYJavaType(s);
+        final JavaInfo info = serv.getJavaInfo();
+        final KeYJavaType kjt = info.getKeYJavaType(s);
         if (kjt == null)
             return false;
-        if (kjt.getJavaType() instanceof ClassType
-                || kjt.getJavaType() instanceof ArrayDeclaration) // TODO ??
-            return true;
-
-        return false;
+        // a ClassType represents classes, interfaces, arrays and null
+        return kjt.getJavaType() instanceof ClassType;
     }
 
     private void initProofStarter(ProofOblInput po) {
@@ -442,40 +437,39 @@ public class StateVisualization {
         initProofStarter(po);
     }
 
-    private void simplifyUpdate() {
+    private void simplifyUpdate() {                        
         this.setUpProof(SetAsListOfTerm.EMPTY_SET.add(TermFactory.DEFAULT
                 .createJunctorTerm(Op.NOT, programPio.constrainedFormula()
                         .formula())), false);
 
         
-        VisualDebugger.getVisualDebugger().setInitPhase(true);
-        VisualDebugger.getVisualDebugger().getBpManager().setNoEx(true);
+        vd.setInitPhase(true);
+        vd.getBpManager().setNoEx(true);
 
         final Proof proof = mediator.getProof();
 
         StrategyProperties strategyProperties = DebuggerStrategy
-                .getDebuggerStrategyProperties(true, true, VisualDebugger
-                        .getVisualDebugger().isInitPhase());
+                .getDebuggerStrategyProperties(true, true, 
+                        vd.isInitPhase());
 
         StrategyFactory factory = new DebuggerStrategy.Factory();
         proof.setActiveStrategy(factory.create(proof, strategyProperties));
 
         ps.run(proof.env());
 
-        VisualDebugger.getVisualDebugger().setInitPhase(false);
-        VisualDebugger.getVisualDebugger().getBpManager().setNoEx(false);
+        vd.setInitPhase(false);
+        vd.getBpManager().setNoEx(false);
 
         strategyProperties = DebuggerStrategy.getDebuggerStrategyProperties(
-                true, false, VisualDebugger.getVisualDebugger().isInitPhase());
+                true, false, vd.isInitPhase());
 
         proof.setActiveStrategy(factory.create(proof, strategyProperties));
 
-        this.programPio = VisualDebugger.getVisualDebugger().getProgramPIO(
-                ps.getProof().openGoals().iterator().next().sequent());
+        this.programPio = vd.getProgramPIO(
+                proof.openGoals().iterator().next().sequent());
         if (programPio == null) {
-            programPio = VisualDebugger.getVisualDebugger()
-                    .getExecutionTerminatedNormal(
-                            ps.getProof().openGoals().iterator().next().node());
+            programPio = vd.getExecutionTerminatedNormal(
+                            proof.openGoals().iterator().next().node());
         }
     }
 
