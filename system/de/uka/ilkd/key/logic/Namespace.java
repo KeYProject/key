@@ -204,7 +204,7 @@ public class Namespace implements java.io.Serializable {
     }
 
     public void add(Namespace source) {
-	IteratorOfNamed it=source.elements().iterator();
+	IteratorOfNamed it=source.allElements().iterator();
 	while (it.hasNext()) {
 	    add(it.next());
 	}

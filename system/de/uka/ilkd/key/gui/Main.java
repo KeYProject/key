@@ -25,6 +25,7 @@ import javax.swing.text.JTextComponent;
 import org.apache.log4j.Logger;
 
 import de.uka.ilkd.hoare.init.HoareProfile;
+import de.uka.ilkd.hoare.pp.HoareLogicPrettyPrinter;
 import de.uka.ilkd.key.gui.assistant.*;
 import de.uka.ilkd.key.gui.configuration.*;
 import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;

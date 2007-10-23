@@ -76,7 +76,6 @@ public class HoareUserProblemFile extends KeYUserProblemFile {
             
             initConfig.setTaclets(problemParser.getTaclets());
             initConfig.add(normalConfig.namespaces(), mod);
-
             if(!problemOnly) {
                 initConfig.getProofEnv().addMethodContracts(
                         problemParser.getContracts(), getProblemHeader());

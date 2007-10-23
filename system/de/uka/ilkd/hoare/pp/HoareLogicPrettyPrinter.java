@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.pp;
+package de.uka.ilkd.hoare.pp;
 
 import java.io.IOException;
 
@@ -6,6 +6,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.*;
+import de.uka.ilkd.key.pp.Notation.AnonymousUpdate;
 import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 

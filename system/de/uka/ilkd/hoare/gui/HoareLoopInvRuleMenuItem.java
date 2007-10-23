@@ -56,9 +56,10 @@ public class HoareLoopInvRuleMenuItem extends JMenuItem implements BuiltInRuleMe
         throws ParserException
     {
         NamespaceSet copy = goal.proof().getNamespaces().copy();
-        copy.setVariables(varNS);
+        copy.programVariables().add(varNS);
         Term term = TermParserFactory.createInstance().parse(
-           new StringReader(s), null, goal.proof().getServices(), copy, goal.proof().abbreviations());
+           new StringReader(s), null, goal.proof().getServices(), 
+           copy, goal.proof().abbreviations());
         return term;
     }
      

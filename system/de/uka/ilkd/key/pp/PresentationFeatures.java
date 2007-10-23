@@ -29,14 +29,14 @@ public class PresentationFeatures {
 	notInfo.createInfixNotation((Function) functions.lookup(new Name(op)), token);
     }
 
-    static void putInfixNotation(NotationInfo notInfo, 
+    public static void putInfixNotation(NotationInfo notInfo, 
 					 Namespace functions,
 					 String op,
 					 String token, int prio, int lass, int rass) {
 	notInfo.createInfixNotation((Function) functions.lookup(new Name(op)), token, prio, lass, rass);
     }
 
-    static void putPrefixNotation(NotationInfo notInfo, 
+    public static void putPrefixNotation(NotationInfo notInfo, 
 					  Namespace functions,
 					  String op,
 					  String token) {

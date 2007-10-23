@@ -172,7 +172,7 @@ public class Proof implements Named {
                                   new RuleAppIndex(new TacletAppIndex(rules),
 						   new BuiltInRuleAppIndex(builtInRules)));
 	openGoals = openGoals.prepend(firstGoal);
-
+        
 	if (closed())
 	    fireProofClosed();
     }

@@ -24,6 +24,7 @@ import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 
 import de.uka.ilkd.hoare.init.HoareProfile;
+import de.uka.ilkd.hoare.pp.HoareLogicPrettyPrinter;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;

@@ -87,7 +87,7 @@ public class LogicPrinter {
 
     /** The constraint used for metavariable instantiations of the
      * current formula */
-    Constraint formulaConstraint = null;
+    protected Constraint formulaConstraint = null;
 
     /**If pure is true the PositionTable will not be calculated */
     private boolean pure = false;
@@ -1350,7 +1350,7 @@ public class LogicPrinter {
 
     }
 
-    String[] setupUpdateSeparators (final Operator loc, final Term t)
+    protected String[] setupUpdateSeparators (final Operator loc, final Term t)
                                                 throws IOException {
         String[] separator = new String [loc.arity ()];
         if ( loc instanceof AttributeOp ) {
