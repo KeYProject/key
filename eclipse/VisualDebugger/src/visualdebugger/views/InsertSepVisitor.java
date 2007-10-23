@@ -8,15 +8,20 @@ import org.eclipse.jdt.core.dom.*;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 
 public class InsertSepVisitor extends ASTVisitor {
-    
+
     public static void replaceNode(ASTNode oldNode, ASTNode newNode) {
+
         ASTNode parent = oldNode.getParent();
         StructuralPropertyDescriptor location = oldNode.getLocationInParent();
+
         if (location.isChildProperty()) {
+
             parent.setStructuralProperty(location, newNode);
+
         } else if (location.isChildListProperty()) {
+
             List list = (List) parent.getStructuralProperty(location);
-            int index = list.indexOf(oldNode);           
+            int index = list.indexOf(oldNode);
             list.set(index, newNode);
         }
     }
@@ -31,9 +36,9 @@ public class InsertSepVisitor extends ASTVisitor {
         replaceNode(index, inv);
     }
 
-
     public void endVisit(FieldAccess node) {
-        final ITypeBinding expressionTypeBinding = node.getExpression().resolveTypeBinding();
+        final ITypeBinding expressionTypeBinding = node.getExpression()
+                .resolveTypeBinding();
         if (expressionTypeBinding != null) {
 
             types.add(expressionTypeBinding);
@@ -48,36 +53,35 @@ public class InsertSepVisitor extends ASTVisitor {
         replaceNode(guard, getSepStatement(guard.getAST(), ++id, guard));
     }
 
-
     public void endVisit(QualifiedName node) {
 
         if (node.getParent() instanceof QualifiedName) {
             return;
         }
-            
+
         final Name qualifier = node.getQualifier();
-        
+
         final IBinding qualifierBinding = qualifier.resolveBinding();
-        
+
         if (qualifierBinding.getKind() == IBinding.PACKAGE) {
             return;
-        }                   
-        
+        }
+
         final IBinding simpleNameBinding = node.getName().resolveBinding();
-        if (simpleNameBinding == null || 
-                Modifier.isStatic(simpleNameBinding.getModifiers())) {           
+        if (simpleNameBinding == null
+                || Modifier.isStatic(simpleNameBinding.getModifiers())) {
             return;
         }
-        
-        if (qualifier.resolveTypeBinding() == null ||
-                qualifier.resolveTypeBinding().isArray()) {
-            return;               
+
+        if (qualifier.resolveTypeBinding() == null
+                || qualifier.resolveTypeBinding().isArray()) {
+            return;
         }
-        
+
         types.add(qualifier.resolveTypeBinding());
 
-        MethodInvocation inv = getSepStatement(qualifier.getAST(),
-                ++id, qualifier);
+        MethodInvocation inv = getSepStatement(qualifier.getAST(), ++id,
+                qualifier);
 
         FieldAccess fa = node.getAST().newFieldAccess();
 
@@ -85,8 +89,7 @@ public class InsertSepVisitor extends ASTVisitor {
         fa.setExpression(inv);
 
         replaceNode(node, fa);
-   }
-
+    }
 
     public void endVisit(WhileStatement node) {
         final Expression guard = node.getExpression();
@@ -127,7 +130,7 @@ public class InsertSepVisitor extends ASTVisitor {
 
         methodInvocation.arguments().add(literal);
         methodInvocation.arguments().add((Expression) ex2);
-      
+
         return methodInvocation;
     }
 
@@ -135,7 +138,7 @@ public class InsertSepVisitor extends ASTVisitor {
         return types;
     }
 
-    public boolean visit(ASTNode node) {        
+    public boolean visit(ASTNode node) {
         return true;
     }
 
@@ -152,4 +155,3 @@ public class InsertSepVisitor extends ASTVisitor {
     }
 
 }
-

@@ -45,59 +45,98 @@ import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.visualdebugger.*;
 import de.uka.ilkd.key.visualdebugger.executiontree.*;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ExecutionTreeView.
+ */
 public class ExecutionTreeView extends ViewPart implements DebuggerListener {
+
+    /** The Constant debug. */
     private static final boolean debug = false;
 
+    /** The bc labels. */
     private boolean bcLabels = true;
 
+    /** The bc list control. */
     List bcListControl;
 
+    /** The class menu. */
     Menu classMenu;
 
+    /** The current root. */
     ITNode currentRoot = null;
 
+    /** The cut tree. */
     private boolean cutTree = false;
 
+    /** The figure canvas. */
     FigureCanvas figureCanvas;
 
+    /** The hide infeasible. */
     boolean hideInfeasible = true;
 
+    /** The labels. */
     HashSet labels = new HashSet();
 
+    /** The lws. */
     LightweightSystem lws;
 
+    /** The maxmerge. */
     int maxmerge = 0;
 
+    /** The merged. */
     int merged = 0;
 
+    /** The mslet action. */
     private Action msletAction;
 
+    /** The parent. */
     Composite parent;
 
+    /** The root. */
     TreeRoot root;
 
+    /** The selected. */
     private Figure selected;
 
+    /** The selected min. */
     private MethodInvocationFigure selectedMIN = null;
 
+    /** The shell. */
     Shell shell;
 
+    /** The slet action. */
     private Action sletAction;
 
+    /** The decision procedure action. */
     private Action testCaseAction, decisionProcedureAction;
 
+    /** The unit of the last exception marker. */
     private ICompilationUnit unitOfLastExceptionMarker = null;
 
+    /** The use branch labels action. */
     private Action useBranchLabelsAction;
 
+    /** The Visual Debugger */
     final VisualDebugger vd;
 
+    /**
+     * Instantiates a new execution tree view.
+     */
     public ExecutionTreeView() {
         vd = VisualDebugger.getVisualDebugger();
         vd.addListener(this);
 
     }
 
+    /**
+     * Builds the raw tree.
+     * 
+     * @param n
+     *            the ITNode
+     * 
+     * @return the tree branch
+     */
     public synchronized TreeBranch buildRawTree(ITNode n) {
         SourceElementFigure statementNode = createNode("Node: " + n.getId()
                 + "\n" + n.getActStatement(), true);
@@ -116,6 +155,16 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
         return branch;
     }
 
+    /**
+     * Builds the tree branch.
+     * 
+     * @param n
+     *            the n
+     * @param parent
+     *            the parent
+     * 
+     * @return the tree branch
+     */
     public synchronized TreeBranch buildTreeBranch(ETNode n, TreeBranch parent) {
         try {
             IFigure statementNode = createNode(n);
@@ -157,12 +206,29 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
         return null;
     }
 
+    /**
+     * Contribute to action bars.
+     */
     private void contributeToActionBars() {
         IActionBars bars = getViewSite().getActionBars();
         // fillLocalPullDown(bars.getMenuManager());
         fillLocalToolBar(bars.getToolBarManager());
     }
 
+    /**
+     * Creates the connection.
+     * 
+     * @param figFrom
+     *            the fig from
+     * @param figTo
+     *            the fig to
+     * @param text
+     *            the text
+     * @param withLabel
+     *            the with label
+     * 
+     * @return the connection
+     */
     private Connection createConnection(IFigure figFrom, IFigure figTo,
             String text, boolean withLabel) {
         PolylineConnection con = new PolylineConnection();
@@ -198,6 +264,14 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
         return con;
     }
 
+    /**
+     * Creates the node.
+     * 
+     * @param etNode
+     *            the et node
+     * 
+     * @return the figure
+     */
     private Figure createNode(ETNode etNode) {
         if (etNode instanceof ETStatementNode) {
             final SourceElementFigure node = new SourceElementFigure(
@@ -283,6 +357,16 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
     }
 
+    /**
+     * Creates the node.
+     * 
+     * @param title
+     *            the title
+     * @param listener
+     *            the listener
+     * 
+     * @return the source element figure
+     */
     private SourceElementFigure createNode(String title, boolean listener) {
 
         final SourceElementFigure node = new SourceElementFigure(title);
@@ -305,6 +389,9 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
     /**
      * This is a callback that will allow us to create the viewer and initialize
      * it.
+     * 
+     * @param parent
+     *            the parent
      */
     public void createPartControl(Composite parent) {
         shell = parent.getShell();
@@ -345,6 +432,9 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
         }
     }
 
+    /**
+     * Creates the righ click context menu.
+     */
     private void createRighClickContextMenu() {
         classMenu = new Menu(shell, SWT.POP_UP);
 
@@ -464,6 +554,12 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
     }
 
+    /**
+     * Double click.
+     * 
+     * @param node
+     *            the node
+     */
     void doubleClick(SourceElementFigure node) {
         ICompilationUnit cu = node.getUnit();
         try {
@@ -485,6 +581,12 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
         this.merged = 0;
     }
 
+    /**
+     * Fill local tool bar.
+     * 
+     * @param manager
+     *            the manager
+     */
     private void fillLocalToolBar(IToolBarManager manager) {
         // manager.add(sletAction);
         // manager.add(msletAction);
@@ -497,6 +599,16 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
         // manager.add(stepOverAction);
     }
 
+    /**
+     * Find branch.
+     * 
+     * @param b
+     *            the b
+     * @param etn
+     *            the etn
+     * 
+     * @return the tree branch
+     */
     private TreeBranch findBranch(TreeBranch b, ETMethodInvocationNode etn) {
 
         while (b != null) {
@@ -515,6 +627,14 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
     }
 
     // TODO move to VisualDebugger
+    /**
+     * Gets the subtree goals for et node.
+     * 
+     * @param etNode
+     *            the et node
+     * 
+     * @return the subtree goals for et node
+     */
     private ListOfGoal getSubtreeGoalsForETNode(ETNode etNode) {
         final ITNode[] itNodes = etNode.getITNodesArray();
         ListOfGoal goals = SLListOfGoal.EMPTY_LIST;
@@ -527,6 +647,9 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
     }
 
+    /**
+     * Hook shell.
+     */
     private void hookShell() {
         Composite localShell = new Composite(parent, 0);
         // localShell.set
@@ -679,6 +802,9 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
     }
 
+    /**
+     * Make actions.
+     */
     private void makeActions() {
         sletAction = new Action("SLET", IAction.AS_RADIO_BUTTON) {
             public void run() {
@@ -776,6 +902,9 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
         decisionProcedureAction.setText("Run Decision Procedure");
     }
 
+    /**
+     * Refresh.
+     */
     public synchronized void refresh() {
         try {
             if (currentRoot == null) {
@@ -813,6 +942,9 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
         }
     }
 
+    /**
+     * Removes the selection.
+     */
     private void removeSelection() {
         // remove exception marker
         if (this.unitOfLastExceptionMarker != null) {
@@ -845,6 +977,9 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
     }
 
+    /**
+     * Repaint connections.
+     */
     private void repaintConnections() {
 
         IFigure contents = root.getContentsPane();
@@ -856,6 +991,12 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
     }
 
+    /**
+     * Sets the branch condition text.
+     * 
+     * @param etn
+     *            the new branch condition text
+     */
     private void setBranchConditionText(ETNode etn) {
 
         if (etn != null && etn.getSimplifiedBc() != null
@@ -883,6 +1024,12 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
     }
 
+    /**
+     * Sets the leaf node selected.
+     * 
+     * @param node
+     *            the new leaf node selected
+     */
     private void setLeafNodeSelected(LeafNode node) {
         this.removeSelection();
 
@@ -942,6 +1089,12 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
     }
 
+    /**
+     * Sets the selected.
+     * 
+     * @param node
+     *            the new selected
+     */
     void setSelected(MethodReturnFigure node) {
         this.removeSelection();
         selected = node;
@@ -958,6 +1111,12 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                 node.getETNode()));
     }
 
+    /**
+     * Sets the selected.
+     * 
+     * @param node
+     *            the new selected
+     */
     void setSelected(SourceElementFigure node) {
         this.removeSelection();
         selected = node;
@@ -969,6 +1128,9 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                 node.getETNode()));
     }
 
+    /**
+     * Start refresh thread.
+     */
     public void startRefreshThread() {
         Display display = shell.getDisplay();
         final Thread barThread = new Thread("PBarThread") {
@@ -979,16 +1141,29 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
         display.asyncExec(barThread);
     }
 
+    /**
+     * To list.
+     * 
+     * @param it
+     *            the it
+     * 
+     * @return the list of node
+     */
     private ListOfNode toList(IteratorOfNode it) {
         ListOfNode result = SLListOfNode.EMPTY_LIST;
+       
         while (it.hasNext()) {
             result = result.append(it.next());
-
         }
         return result;
 
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.uka.ilkd.key.visualdebugger.DebuggerListener#update(de.uka.ilkd.key.visualdebugger.DebuggerEvent)
+     */
     public synchronized void update(DebuggerEvent event) {
         if (event.getType() == DebuggerEvent.TREE_CHANGED) {
             this.currentRoot = (ITNode) event.getSubject();
@@ -997,6 +1172,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
             final VisualDebugger.TestCaseIdentifier tci = (VisualDebugger.TestCaseIdentifier) event
                     .getSubject();
             Display display = shell.getDisplay();
+
             final Thread barThread = new Thread("Failed Test C Thread") {
                 public void run() {
                     VisualDebugger.print("Execution Tree view: failed tc: "

@@ -126,10 +126,10 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
             problemInit.startProver(input, input);
             error = "";
         } catch (ProofInputException pie) {
-            error = pie.getMessage();            
+            error = pie.getMessage();
         } catch (ExceptionHandlerException ehe) {
-            error =  ehe.getCause() == null ? ehe.getMessage() : 
-                ehe.getCause().getMessage();
+            error = ehe.getCause() == null ? ehe.getMessage() : ehe.getCause()
+                    .getMessage();
         }
 
         if (error.length() == 0) {
@@ -150,10 +150,11 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
      * representing breakpoints.
      * 
      * @param ast
-     *                the AST with the environment where to insert the class
+     *            the AST with the environment where to insert the class
      * @return the compilation unit containing the created class
      */
     private CompilationUnit createDebuggerClass(AST ast) {
+
         CompilationUnit unit = ast.newCompilationUnit();
 
         PackageDeclaration packageDeclaration = ast.newPackageDeclaration();
@@ -444,13 +445,13 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
                         .newPrimitiveType(PrimitiveType.BOOLEAN)));
         td.bodyDeclarations().add(getSepMethodDeclaration(debugCU.getAST()));
 
-               
         String projectPath = project.getPath().toOSString().substring(1);
-        
-        final String pathToDebugPackage = VisualDebugger.tempDir + projectPath + File.separator
-                + VisualDebugger.debugPackage + File.separator;
 
-        final String pathToDebugClass = pathToDebugPackage  + VisualDebugger.debugClass + ".java";
+        final String pathToDebugPackage = VisualDebugger.tempDir + projectPath
+                + File.separator + VisualDebugger.debugPackage + File.separator;
+
+        final String pathToDebugClass = pathToDebugPackage
+                + VisualDebugger.debugClass + ".java";
 
         new File(pathToDebugPackage).mkdirs();
 
@@ -463,7 +464,8 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 
         try {
             final FileWriter fw = new FileWriter(pcFile);
-            // FIXME: toString is only for debugging purpose, no warranty that it will
+            // FIXME: toString is only for debugging purpose, no warranty that
+            // it will
             // always generate a compilable output
             fw.write(debugCU.toString());
             fw.flush();
@@ -479,7 +481,6 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
      */
     public void run(IAction action) {
 
-        
         if (selection == null) {
             return;
         }
@@ -492,7 +493,6 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
         while (VisualDebugger.getVisualDebugger().getMediator().getProof() != null) {
             keyProver.closeTaskWithoutIntercation();
         }
-
 
         VisualDebugger.getVisualDebugger();// .prepareKeY();
 
@@ -534,8 +534,6 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
             // assure the sources are parsed
             int status = assertProjectParsed(project, false);
 
-
-            
             if (status == PROJECT_ALREADY_OPEN
                     || status == PROJECT_LOAD_SUCESSFUL) {
                 // determine the encapsulating class of the selected method
