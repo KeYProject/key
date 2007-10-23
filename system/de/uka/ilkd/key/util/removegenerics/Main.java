@@ -16,9 +16,51 @@ import recoder.io.PathList;
 import recoder.java.CompilationUnit;
 import recoder.java.PackageSpecification;
 import recoder.java.reference.PackageReference;
-import recoder.kit.TwoPassTransformation;
 
+/**
+ * That's the entry point when the transformation is to be applied outside from
+ * the KeY-tool.
+ * 
+ * It contains only static methods and {@link #main(String[])} is the one
+ * entry-point.
+ * 
+ * The following parameters are supported:
+ * <dl>
+ * <dt>-cp or -classpath</dt>
+ * <dd>Set a location to look for .java or .class files</dd>
+ * <dt>-d</dt>
+ * <dd>Set the output directory. Files will be placed according to their
+ * package</dd>
+ * <dt>-v</dt>
+ * <dd>be verbose with the output. lots of internal information will pop up.</dd>
+ * <dt><i>file name</i></dt>
+ * <dd>add a .java-file to examine</dd>
+ * <dt><i>firectory name</i></dt>
+ * <dd>add a directory to examine. every .java within the named directory tree
+ * will be considered</dd>
+ * <dt>@<i>filename</i></dt>
+ *      <dd>take every line of the file <i>filename</i> and add it as a file
+ *      to consider</dd>
+ *      <dt>jar file name</dt>
+ *      <dd>add a jar-file to examine. every .java file within the
+ *      jar-repository will be considered</dd>
+ *      </dl>
+ * 
+ * All considered java source files are parsed in. If needed, source or class
+ * files will be searched for in the specified -cp files, repositories and
+ * directories.
+ * 
+ * Generics are removed and the result is written to the output directory ('.'
+ * by default).
+ * 
+ * @author MU
+ * 
+ */
 public class Main {
+
+    // hide constructor
+    private Main() {
+    }
 
     private static CrossReferenceServiceConfiguration sc;
 
@@ -26,14 +68,12 @@ public class Main {
 
     private static LinkedHashMap<CompilationUnit, String> allUnits = new LinkedHashMap<CompilationUnit, String>();
 
-    public static boolean dbg = false;
-
     /**
      * @param args
      * @throws
      */
     public static void main(String[] args) throws Exception {
-        
+
         System.out.println("Version - 071019 - 1546");
 
         sc = new CrossReferenceServiceConfiguration();
@@ -41,6 +81,9 @@ public class Main {
         PathList searchPaths = sc.getProjectSettings().getSearchPathList();
 
         List<String> files = new ArrayList<String>();
+
+        if (args.length == 0)
+            usage();
 
         for (int i = 0; i < args.length; i++) {
 
@@ -52,7 +95,7 @@ public class Main {
                         searchPaths.add(s);
                 } else if (args[i].startsWith("@")) {
                     addLinesFromFile(args[i].substring(1), files);
-                } else if(args[i].equals("-v")){
+                } else if (args[i].equals("-v")) {
                     GenericResolutionTransformation.DEBUG_OUTPUT = true;
                 } else {
                     files.add(args[i]);
@@ -62,8 +105,8 @@ public class Main {
             }
 
         }
-        
-        if(!outDir.exists()) {
+
+        if (!outDir.exists()) {
             System.err.println("The output directory does not exist");
             System.exit(1);
         }
@@ -77,47 +120,48 @@ public class Main {
         }
 
         List<ResolveGenerics> allTransformations = new ArrayList<ResolveGenerics>();
-        
+
         System.out.println("Analysing ...");
-        
+
         sc.getChangeHistory().updateModel();
-        
+
         for (CompilationUnit cu : allUnits.keySet()) {
             ResolveGenerics transformation = new ResolveGenerics(sc, cu);
-            
-            // add also the empty transformation ... so that unchanged files are copied
+
+            // add also the empty transformation ... so that unchanged files are
+            // copied
             transformation.analyze();
             allTransformations.add(transformation);
         }
-        
+
         System.out.println("Transformation ...");
-        for(ResolveGenerics transformation : allTransformations) {
+        for (ResolveGenerics transformation : allTransformations) {
             transformation.transform();
             CompilationUnit cu = transformation.getCU();
-            
+
             // repair spacing around single line comments
             SingleLineCommentRepairer.repairSingleLineComments(cu);
-            
+
             // determine target subdirectory with trailing '/'
             File targetdir;
             PackageSpecification packageSpecification = cu.getPackageSpecification();
-            if(packageSpecification != null) {
+            if (packageSpecification != null) {
                 String pack = toString(packageSpecification.getPackageReference());
                 String subdir = pack.replace('.', File.separatorChar);
                 targetdir = new File(outDir, subdir);
             } else {
                 targetdir = outDir;
             }
-            
+
             // retrieve filename
             String filename = allUnits.get(cu);
             File outFile = new File(targetdir, filename);
-            
+
             // make directory if not existant
             targetdir.mkdirs();
 
             GenericResolutionTransformation.debugOut("output file", outFile);
-            
+
             Writer w = new FileWriter(outFile);
             w.write(cu.toSource());
             w.close();
@@ -125,17 +169,46 @@ public class Main {
 
     }
 
+    private static void usage() {
+        System.out.println("This program can be used to transform a Java program with generics into one without.");
+        System.out.println();
+        System.out.println("The following arguments are supported");
+        System.out.println("   -cp or -classpath ");
+        System.out.println("     Set a location to look for .java or .class files");
+        System.out.println("   -d");
+        System.out.println("     Set the output directory. Files will be placed according to their package");
+        System.out.println("   -v");
+        System.out.println("     be verbose with the output. lots of internal information will pop up.");
+        System.out.println("   <file-name>");
+        System.out.println("     add a .java-source file to examine");
+        System.out.println("   <directory-name>");
+        System.out.println("     add a directory to examine. every .java within the named directory tree will be considered");
+        System.out.println("   @filename");
+        System.out.println("     take every line of the file filename and add it as a file to consider");
+        System.out.println("   <jar-file-name>");
+        System.out.println("     add a jar-file to examine. every .java file within the jar-repository will be considered");
+        System.out.println();
+        System.exit(0);
+    }
+
+    /**
+     * make a string out of a packageReference.
+     * 
+     * For some reason {@link PackageReference#toSource()} does not work here.
+     * @param packageReference refrence to make string of, not null
+     * @return a string, possibly with dots.
+     */
     private static String toString(PackageReference packageReference) {
-        
+
         String ret = packageReference.getIdentifier().getText();
         packageReference = packageReference.getPackageReference();
-        
-        while(packageReference != null)
-        do {
-            ret = packageReference.getIdentifier().getText() + "." + ret;
-            packageReference = packageReference.getPackageReference();
-        } while(packageReference != null);
-        
+
+        while (packageReference != null)
+            do {
+                ret = packageReference.getIdentifier().getText() + "." + ret;
+                packageReference = packageReference.getPackageReference();
+            } while (packageReference != null);
+
         return ret;
     }
 
@@ -167,7 +240,7 @@ public class Main {
             System.out.println(" ... does not exist");
             return;
         }
-        
+
         if (!file.canRead()) {
             System.out.println(" ... cannot be read");
             return;
@@ -175,7 +248,7 @@ public class Main {
 
         CompilationUnit cu = sc.getSourceFileRepository().getCompilationUnitFromFile(file.getPath());
         String filename = file.getName();
-        
+
         allUnits.put(cu, filename);
     }
 

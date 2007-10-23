@@ -6,7 +6,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 
     public static Test suite() {
-        TestSuite suite = new TestSuite("Test for de.uka.ilkd.key.tools");
+        TestSuite suite = new TestSuite("Test for de.uka.ilkd.key.util.removegenerics");
         //$JUnit-BEGIN$
         suite.addTestSuite(TestMultipleBounds.class);
         suite.addTestSuite(TestTypeReference.class);

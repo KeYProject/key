@@ -9,6 +9,17 @@ import recoder.java.SingleLineComment;
 import recoder.java.SourceElement;
 import recoder.java.SourceElement.Position;
 
+/**
+ * This class has been used to repair a bug in recoder. It can be removed as
+ * soon as this bug is solved.
+ * 
+ * The problem is that sometimes comments do not print a newline in the end,
+ * which is ensured by {@link #repairSingleLineComments(ProgramElement)}
+ * 
+ * TODO remove as soon as recoder is patched
+ * 
+ * @author MU
+ */
 public class SingleLineCommentRepairer {
 
     public static void repairSingleLineComments(ProgramElement programElement) {

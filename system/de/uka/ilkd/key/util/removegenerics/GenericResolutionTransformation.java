@@ -10,11 +10,23 @@ import recoder.abstraction.Type;
 import recoder.abstraction.TypeParameter;
 import recoder.java.NamedProgramElement;
 import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
 import recoder.java.declaration.MethodDeclaration;
 import recoder.java.declaration.TypeParameterDeclaration;
 import recoder.kit.TwoPassTransformation;
 
+/**
+ * This is the base class to all transformations used in the generics removal
+ * process.
+ * 
+ * It allows 2 things: 1) calculating the target type of a type (which is the
+ * type when type variables are no longer) and 2) to print out debug info.
+ * 
+ * String creation is a little tedious in recoder so {@link #toString(Object)}
+ * does a lot of it.
+ * 
+ * @author MU
+ * 
+ */
 public class GenericResolutionTransformation extends TwoPassTransformation {
 
     // allow debug output
@@ -90,6 +102,21 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
         }
     }
 
+    /**
+     * if the global debug flag {@link #DEBUG_OUTPUT} is set to true print out a
+     * message.
+     * 
+     * First the message-head is printed followed by a ':', followed by a
+     * ;-separated list of the arguments. Each argument is converted to a string
+     * using the {@link #toString(Object)}.
+     * 
+     * @param msg
+     *            the message's head
+     * @param arg
+     *            0 or more objects that will be expanded to a ;-separated list
+     *            after the message
+     */
+
     public static void debugOut(String msg, Object... arg) {
         if (DEBUG_OUTPUT) {
             System.out.print(msg);
@@ -102,20 +129,35 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
         }
     }
 
+    /**
+     * convert an object to a String.
+     * 
+     * For some classes {@link Object#toString()} is lame, so that the following
+     * classes are caught here:
+     * <ul>
+     * <li> {@link MethodDeclaration}
+     * <li> {@link NamedModelElement}
+     * <li> {@link Collection} - which handle each element with toString </li>
+     * Anything else will be transoformed using {@link Object#toString()}.
+     * 
+     * @param object
+     *            the object to be transformed, may be null
+     * @return a String representing the object.
+     */
     public static String toString(Object object) {
-        
+
         if (object instanceof MethodDeclaration) {
             MethodDeclaration md = (MethodDeclaration) object;
             return md.getFullName() + toString(md.getSignature());
         }
-        
+
         if (object instanceof NamedModelElement) {
             NamedModelElement ne = (NamedModelElement) object;
             String name = ne.getName();
-            if(object instanceof NamedProgramElement) {
-                ProgramElement parent = ((NamedProgramElement)ne).getASTParent();
+            if (object instanceof NamedProgramElement) {
+                ProgramElement parent = ((NamedProgramElement) ne).getASTParent();
                 if (parent instanceof NamedModelElement) {
-                    NamedModelElement p= (NamedModelElement) parent;
+                    NamedModelElement p = (NamedModelElement) parent;
                     return p.getName() + "::" + name;
                 }
             } else
@@ -128,8 +170,12 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
             for (Object o : coll) {
                 ret += toString(o) + " ";
             }
-            return ret+"]";
+            return ret + "]";
         }
+
+        if (object == null)
+            return "(null)";
+
         return object.toString();
     }
 

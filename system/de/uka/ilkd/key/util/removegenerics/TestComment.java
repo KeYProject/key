@@ -8,6 +8,13 @@ import recoder.java.declaration.FieldDeclaration;
 import recoder.java.reference.TypeReference;
 import recoder.kit.TypeKit;
 
+/**
+ * This class has been used to point out a bug in recoder.
+ * It can be removed as soon as this bug is solved.
+ * 
+ * @author MU
+ */
+
 public class TestComment {
     
     protected static CrossReferenceServiceConfiguration sc = new CrossReferenceServiceConfiguration();
