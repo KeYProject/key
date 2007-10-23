@@ -1,5 +1,0 @@
-FunctionDeclarationParsitorFactory
-
-static function int f(int);
-dynamic function g oeu(int:x, int y, g)
-derived function u eu(int:x, int y) = x+ y

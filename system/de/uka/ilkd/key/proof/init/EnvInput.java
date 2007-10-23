@@ -9,7 +9,7 @@
 //
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.gui.LibrariesSettings;
+import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
 
 
 /** Represents an entity read to produce an environment to read a proof

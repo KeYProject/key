@@ -32,8 +32,6 @@ public class DebuggerStrategy extends VBTStrategy {
     public static final String VISUAL_DEBUGGER_FALSE = "FALSE";
 
 
-    private ListOfNamed h;
-
     public static StrategyProperties getDebuggerStrategyProperties(boolean splittingRulesAllowed,
             boolean inUpdateAndAssumes, boolean inInitPhase) {
         final StrategyProperties res = new StrategyProperties();
@@ -43,12 +41,21 @@ public class DebuggerStrategy extends VBTStrategy {
                 StrategyProperties.METHOD_EXPAND);
         res.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,
                 StrategyProperties.QUERY_NONE);
-        if (VisualDebugger.quan_splitting)
+        res.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
+                StrategyProperties.NON_LIN_ARITH_DEF_OPS);
+
+        res.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
+                StrategyProperties.SPLITTING_NORMAL);
+
+        
+        if (VisualDebugger.quan_splitting) {
             res.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
                     StrategyProperties.QUANTIFIERS_INSTANTIATE);
-        else res.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, 
-                StrategyProperties.QUANTIFIERS_NON_SPLITTING);
-
+        } else {
+            res.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, 
+                StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
+        }
+        
         res.setProperty(VISUAL_DEBUGGER_SPLITTING_RULES_KEY, 
                 splittingRulesAllowed ? VISUAL_DEBUGGER_TRUE :
                     VISUAL_DEBUGGER_FALSE);
@@ -80,22 +87,22 @@ public class DebuggerStrategy extends VBTStrategy {
 
        bindRuleSet(d, "test_gen_quan", inftyConst());
 
-       bindRuleSet ( d, "instanceof_to_exists",  inftyConst());
-
+       bindRuleSet( d, "instanceof_to_exists",  inftyConst());
 
        bindRuleSet ( d, "split_cond",
-               ifZero(LabelFeature.INSTANCE,longConst(-200000),longConst(0)));
+              ifZero(LabelFeature.INSTANCE,longConst(-3000), longConst(0)));
 
        bindRuleSet ( d, "beta",
-               ifZero(LabelFeature.INSTANCE,longConst(-200000),longConst(0)));
-
+               ifZero(LabelFeature.INSTANCE,longConst(-3000),longConst(0)));
+    
+       
        final NamespaceSet nss = p_proof.getNamespaces ();
 
        assert nss != null : "Rule set namespace not available.";               
 
        // FIXME: do not add it for each rule set add it as sum feature
        
-       h = nss.ruleSets().allElements();
+       final ListOfNamed h = nss.ruleSets().allElements();
 
        final boolean isSplittingAllowed = props.
            get(VISUAL_DEBUGGER_SPLITTING_RULES_KEY).equals(VISUAL_DEBUGGER_TRUE);
@@ -109,17 +116,13 @@ public class DebuggerStrategy extends VBTStrategy {
        final Feature inUpdateFeature = InUpdateFeature.create(isSplittingAllowed, 
                inUpdateAndAssumes, inInitPhase);
        
-       final IteratorOfNamed it =h.iterator();
+       final IteratorOfNamed it = h.iterator();
        while (it.hasNext()){
-           bindRuleSet ( d, it.next().name().toString(),                    
-                   ifZero(inUpdateFeature, inftyConst(),longConst(0)));
+           final String ruleSetName = it.next().name().toString();
+           bindRuleSet ( d, ruleSetName,                    
+                   ifZero(inUpdateFeature, inftyConst(), longConst(0)));
        }
    }
-
-
-
-    
-    
 
     public Name name() {
         return new Name("DebuggerStrategy");

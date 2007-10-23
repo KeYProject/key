@@ -23,6 +23,7 @@ import de.uka.ilkd.hoare.init.HoareProfile;
 import de.uka.ilkd.hoare.rule.HoareLoopInvRuleApp;
 import de.uka.ilkd.hoare.rule.HoareLoopInvariantRule;
 import de.uka.ilkd.key.gui.*;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -454,8 +455,6 @@ public class ProblemLoader implements Runnable {
 
         ourApp = ourApp.setIfFormulaInstantiations(ifSeqFormulaList,
                                                    services, userC);
-
-        ourApp = ourApp.createSkolemFunctions ( mediator.func_ns (), services );
 
         if (!ourApp.sufficientlyComplete()) {
             ourApp = ourApp.tryToInstantiate(currGoal, proof.getServices());

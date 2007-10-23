@@ -701,5 +701,18 @@ public class Node {
 	}
     }
 
+    private int getIntroducedRulesCount() {
+        int c = 0;
+
+        if (parent != null) {
+            c = parent.getIntroducedRulesCount();
+        }
+
+        return c + localIntroducedRules.size();
+    }
+
+    public int getUniqueTacletNr() {
+        return getIntroducedRulesCount();
+    }
 
  }

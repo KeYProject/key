@@ -9,8 +9,8 @@
 //
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.gui.LibrariesSettings;
 import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.IteratorOfNamed;
 import de.uka.ilkd.key.logic.Namespace;

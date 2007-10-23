@@ -27,7 +27,7 @@ import de.uka.ilkd.key.proof.decproc.DecisionProcedureTranslationFactory;
 public abstract class AbstractIntegerRule implements BuiltInRule {
 
     private final Name name;
-    protected boolean showResults = true;
+    protected final boolean showResults;
     protected final DecisionProcedureTranslationFactory dptf;
     
 

@@ -9,10 +9,10 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.visualdebugger.SymbolicArrayObject;
-import de.uka.ilkd.key.visualdebugger.SymbolicObject;
-import de.uka.ilkd.key.visualdebugger.SymbolicObjectDiagram;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
+import de.uka.ilkd.key.visualdebugger.statevisualisation.SymbolicArrayObject;
+import de.uka.ilkd.key.visualdebugger.statevisualisation.SymbolicObject;
+import de.uka.ilkd.key.visualdebugger.statevisualisation.SymbolicObjectDiagram;
 
 public class ArrayObjectFigure extends ObjectFigure {
 

@@ -20,6 +20,7 @@ import javax.swing.*;
 import javax.swing.event.EventListenerList;
 
 import de.uka.ilkd.hoare.rule.HoareLoopInvRuleApp;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -684,7 +685,7 @@ public class KeYMediator {
      * @return a list of Taclets with all applicable FindTaclets
      */
 
-    protected ListOfTacletApp getFindTaclet(PosInSequent pos) {
+    public ListOfTacletApp getFindTaclet(PosInSequent pos) {
     	return interactiveProver.getFindTaclet(pos);
     }
 
@@ -692,7 +693,7 @@ public class KeYMediator {
      * (called by the SequentViewer)
      * @return a list of Taclets with all applicable RewriteTaclets
      */
-    protected ListOfTacletApp getRewriteTaclet(PosInSequent pos) {
+    public ListOfTacletApp getRewriteTaclet(PosInSequent pos) {
     	return interactiveProver.getRewriteTaclet(pos);    
     }
 
@@ -700,7 +701,7 @@ public class KeYMediator {
      * (called by the SequentViewer)
      * @return a list of Taclets with all applicable NoFindTaclets
      */
-    protected ListOfTacletApp getNoFindTaclet() {	
+    public ListOfTacletApp getNoFindTaclet() {	
     	return interactiveProver.getNoFindTaclet();
     }
 
@@ -1055,9 +1056,13 @@ public class KeYMediator {
 	}
 
 	public void proofPruned(ProofTreeEvent e) {
-	    ProofTreeRemovedNodeEvent ev = (ProofTreeRemovedNodeEvent) e;
+	    final ProofTreeRemovedNodeEvent ev = (ProofTreeRemovedNodeEvent) e;
 	    if (ev.getRemovedNode() == getSelectedNode()) {
-		keySelectionModel.setSelectedNode(e.getNode());
+		SwingUtilities.invokeLater(new Runnable() {
+		    public void run() {
+			keySelectionModel.setSelectedNode(ev.getNode());
+		    }
+		});
 	    }
 	}
     

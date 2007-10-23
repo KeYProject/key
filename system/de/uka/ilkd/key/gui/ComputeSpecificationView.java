@@ -17,6 +17,7 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 import de.uka.ilkd.key.cspec.ComputeSpecification;
+import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;

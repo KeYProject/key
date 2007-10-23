@@ -26,8 +26,12 @@ import org.apache.log4j.Logger;
 
 import de.uka.ilkd.hoare.init.HoareProfile;
 import de.uka.ilkd.key.gui.assistant.*;
+import de.uka.ilkd.key.gui.configuration.*;
+import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
+import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.*;
+import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
