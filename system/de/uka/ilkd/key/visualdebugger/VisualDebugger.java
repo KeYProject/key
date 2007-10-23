@@ -32,6 +32,7 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
@@ -68,6 +69,8 @@ public class VisualDebugger {
             + File.separator;
 
     public static final boolean vdInDebugMode = false;
+
+    private static final Name POST_PREDICATE_NAME = new Name("POST");
 
     static {
         symbolicExecNames.add(new Name("simplify_prog"));
@@ -113,16 +116,13 @@ public class VisualDebugger {
 
             args[0] = "DEBUGGER";
             args[1] = "LOOP";
-            // args[1]= "DEBUsG";
-            // Main.main(args);
+            
             Main.evaluateOptions(args);
             Main key = Main.getInstance(false);
             key.loadCommandLineFile();
 
             singleton.main = Main.getInstance(false);
             singleton.mediator = singleton.main.mediator();
-            // singleton.ip = singleton.mediator.getInteractiveProver();
-
         }
         return singleton;
     }
@@ -153,8 +153,6 @@ public class VisualDebugger {
 
     private ProgramMethod debuggingMethod;
 
-    private boolean determinePostValue = false;
-
     private boolean initPhase = false;
 
     private HashMap inputPV2term = new HashMap();
@@ -162,6 +160,8 @@ public class VisualDebugger {
     private LinkedList listeners = new LinkedList();
 
     private Main main;
+
+    protected int maxProofStepsForStateVisComputation = 8000;
 
     // InteractiveProver ip;
     private KeYMediator mediator;
@@ -182,9 +182,13 @@ public class VisualDebugger {
 
     private ClassType type;
 
+    private boolean useDecisionProcedures = false;
+
+    private Function postPredicate;
+
     protected VisualDebugger() {
         bpManager = new BreakpointManager(this);
-
+        
         // main = Main.getInstance();
     }
 
@@ -419,13 +423,10 @@ public class VisualDebugger {
             final Term f = cfm.formula();
             if (f.op() instanceof QuanUpdateOperator) {
                 final Term subOp = f.sub(f.arity() - 1);
-                if (subOp.op().name().toString().equals("POST")
-                        && subOp.javaBlock() == JavaBlock.EMPTY_JAVABLOCK) {
+                if (subOp.op() == postPredicate) {
                     return new PosInOccurrence(cfm, PosInTerm.TOP_LEVEL, false);
                 }
-
             }
-
         }
         return null;
     }
@@ -529,6 +530,10 @@ public class VisualDebugger {
             result.add(mbs.getArguments().getExpression(i));
         }
         return result;
+    }
+
+    public Function getPostPredicate() {
+        return postPredicate;
     }
 
     public Sequent getPrecondition() {
@@ -704,7 +709,8 @@ public class VisualDebugger {
             }
         }
 
-        ExecutionTree pl = new ExecutionTree(mediator.getProof(), mediator,
+        final Proof proof = mediator.getProof();
+        ExecutionTree pl = new ExecutionTree(proof, mediator,
                 true);
         pl.setListeners(listeners);
         mediator.addAutoModeListener(pl);
@@ -712,12 +718,11 @@ public class VisualDebugger {
         this.initPhase = true;
         bpManager.setNoEx(true);
 
-        setProofStrategy(mediator.getProof(), true, false);
+        postPredicate = (Function) 
+            proof.getNamespaces().functions().lookup(POST_PREDICATE_NAME);  
+        
+        setProofStrategy(proof, true, false);
         run();
-    }
-
-    public boolean isDeterminePostValue() {
-        return determinePostValue;
     }
 
     public boolean isInitPhase() {
@@ -850,8 +855,6 @@ public class VisualDebugger {
     // alternative: { } <sep(-1);>\phi
 
     public String prettyPrint(Term l, LinkedList sos, SymbolicObject so) {
-        // KeYMediator mediator=
-        // VisualDebugger.getVisualDebugger().getMediator();
         final LogicPrinter lp = new DebuggerLP(new ProgramPrinter(null),
                 mediator.getNotationInfo(), mediator.getServices(),
                 term2InputPV, sos, so);
@@ -918,8 +921,9 @@ public class VisualDebugger {
         if (!mediator.autoMode()) {
             run(mediator.getProof().openGoals());
             return true;
-        } else
+        } else {
             return false;
+        }
     }
 
     public boolean run(ListOfGoal goals) {
@@ -933,17 +937,9 @@ public class VisualDebugger {
         return false;
     }
 
-    // public void setRunLimit(int runLimit) {
-    // this.runLimit = runLimit;
-    // }
-
     private void runProver(final ListOfGoal goals) {
         this.refreshRuleApps();
         mediator.startAutoMode(goals);
-    }
-
-    public void setDeterminePostValue(boolean determinePostValue) {
-        this.determinePostValue = determinePostValue;
     }
 
     public void setInitPhase(boolean initPhase) {
@@ -1013,16 +1009,17 @@ public class VisualDebugger {
     public ListOfTerm simplify(ListOfTerm terms) {
         if (terms.size() == 0)
             return terms;
-        DebuggerPO po = new DebuggerPO("DebuggerPo");
-        ProofStarter ps = new ProofStarter();
+        final DebuggerPO po = new DebuggerPO("DebuggerPo");
+        final ProofStarter ps = new ProofStarter();
         po.setTerms(terms);
 
         final ProofEnvironment proofEnvironment = mediator.getProof().env();
-
-        po.setIndices(proofEnvironment.getInitConfig().createTacletIndex(),
-                proofEnvironment.getInitConfig().createBuiltInRuleIndex());
+        final InitConfig initConfig = proofEnvironment.getInitConfig();
+        
+        po.setIndices(initConfig.createTacletIndex(),
+                initConfig.createBuiltInRuleIndex());
         po.setProofSettings(mediator.getProof().getSettings());
-        po.setConfig(proofEnvironment.getInitConfig());
+        po.setConfig(initConfig);
         po.setTerms(terms);
         ps.init(po);
 
@@ -1030,11 +1027,11 @@ public class VisualDebugger {
 
         setProofStrategy(proof, false, false);
 
+        ps.setUseDecisionProcedure(useDecisionProcedures);
         ps.run(proofEnvironment);
 
         setProofStrategy(proof, true, false);
 
-        proof.openGoals().iterator().next().node().sequent();
         return collectResult(proof.openGoals().iterator().next().node()
                 .sequent());
     }
@@ -1107,11 +1104,11 @@ public class VisualDebugger {
 
         final Runnable interfaceSignaller = new Runnable() {
             public void run() {
-                new StateVisualization(node, mediator);
-
+                new StateVisualization(node, mediator, 
+                        maxProofStepsForStateVisComputation,
+                        useDecisionProcedures);
             }
         };
-
         startThread(interfaceSignaller);
     }
 
@@ -1151,6 +1148,5 @@ public class VisualDebugger {
         public String toString() {
             return "File: " + file + " Method: " + method;
         }
-
     }
 }

@@ -11,6 +11,8 @@ import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.ldt.BooleanLDT;
+import de.uka.ilkd.key.logic.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -31,7 +33,7 @@ public class SymbolicObjectDiagram {
             return checkIndices(t.sub(0), serv);
         }
         if (t.op() instanceof ArrayOp) {
-            if (t.sub(1).op().name().toString().equals("Z")) {
+            if (serv.getTypeConverter().getIntegerLDT().getNumberSymbol() == t.sub(1).op()) {
                 if (AbstractMetaOperator.convertToDecimalString(t.sub(1), serv)
                         .startsWith("-")) {
                     return false;
@@ -48,17 +50,31 @@ public class SymbolicObjectDiagram {
         if (oc.contains(Op.NULL)) {
             return false;
         }
-        return t.op() instanceof AttributeOp
+        
+        final IntegerLDT iLDT = serv.getTypeConverter().getIntegerLDT();
+        final BooleanLDT bLDT = serv.getTypeConverter().getBooleanLDT();
+        
+        final Function numberTerminator = iLDT.getNumberTerminator();
+        final Function boolTRUE = bLDT.getTrueConst();
+        final Function boolFALSE = bLDT.getFalseConst();
+        
+        
+        final Operator op = t.op();
+        return op instanceof AttributeOp
                 && checkIndices(t, serv)
-                && !((ProgramVariable) ((AttributeOp) t.op()).attribute())
-                        .isImplicit() || t.op() instanceof ProgramVariable
-                && !((ProgramVariable) t.op()).isImplicit()
-                || t.op() instanceof ArrayOp && checkIndices(t, serv)
-                || t.op() instanceof RigidFunction && t.arity() == 0
-                && !"#".equals(t.op().name().toString())
-                && !"TRUE".equals(t.op().name().toString())
-                && !"FALSE".equals(t.op().name().toString())
-                && t.op().name().toString().indexOf("undef(") == -1;
+                && !((ProgramVariable) ((AttributeOp) op).attribute()).isImplicit() 
+                || op instanceof ProgramVariable
+                && !((ProgramVariable) op).isImplicit()
+                || op instanceof ArrayOp && checkIndices(t, serv)
+                // TODO Why is a RigidFunction a location? 
+                // Was a ProgramConstant intended? if so replace the rest
+                // by instanceof ProgramConstant
+                || op instanceof RigidFunction && t.arity() == 0
+                && numberTerminator != op
+                && boolTRUE != op
+                && boolFALSE != op
+                // TODO remove string comparison in next line
+                && op.name().toString().indexOf("undef(") == -1;
     }
 
     private ListOfTerm ante = SLListOfTerm.EMPTY_LIST,
@@ -232,17 +248,18 @@ public class SymbolicObjectDiagram {
     }
 
     private boolean containsJavaBlock(Term t) {
-        boolean result = false;
-        if (t.toString().toUpperCase().equals("POST"))
+        if (t.op() == vd.getPostPredicate()) {
             return true; // TODO
+        }
         if (t.javaBlock() != JavaBlock.EMPTY_JAVABLOCK) {
             return true;
         }
         for (int i = 0; i < t.arity(); i++) {
-            if (containsJavaBlock(t.sub(i)))
-                result = true;
+            if (containsJavaBlock(t.sub(i))) {
+                return true;
+            }
         }
-        return result;
+        return false;
     }
 
     private void createEquivalenceClassesAndConstraints() {
@@ -402,12 +419,7 @@ public class SymbolicObjectDiagram {
 
                 if (t.op() instanceof AttributeOp) {
                     Term sub = t.sub(0);
-                    AttributeOp op = (AttributeOp) t.op();
-                    // System.out.println("addRef ");
-                    // System.out.println(op.attribute());
-                    // System.out.println(op.convertToProgram(t, l));
-                    // System.out.println(op.referencePrefix(t));
-                    // System.out.println(sub);
+                    AttributeOp op = (AttributeOp) t.op();                
                     if (refInPC.contains(t) || postTerms.contains(t)) // TODO
                                                                         // ???//only
                                                                         // assoc
@@ -418,9 +430,6 @@ public class SymbolicObjectDiagram {
                                                                         // pc
                         addReference(op, sub, so, result);
                 } else if (t.op() instanceof ArrayOp) {
-                    // System.out.println("Arrayop");
-                    // System.out.println(t.sub(0));
-                    // System.out.println(t.sub(1));
                     if (refInPC.contains(t) || postTerms.contains(t)) // TODO??
                         addIndexReference(t.sub(0), t.sub(1), so, result);
 
@@ -440,7 +449,6 @@ public class SymbolicObjectDiagram {
             }
         }
 
-        // VisualDebugger.print("Collection prim Attributes in "+pc);
         for (IteratorOfTerm it2 = pc.iterator(); it2.hasNext();) {
             Term currentTerm = it2.next();
             SetOfTerm locs = collectLocations2(currentTerm);
@@ -449,12 +457,10 @@ public class SymbolicObjectDiagram {
 
                 Term t2 = it3.next();
                 if (!referenceSort(t2.sort())) {
-                    // System.out.println("no ref sort"+t2);
                     if (t2.op() instanceof AttributeOp) {
                         addAttribute(result, (AttributeOp) t2.op(), t2.sub(0),
                                 currentTerm);
                     } else if (t2.op() instanceof ArrayOp) {
-                        // if (isInt(t2))
                         this.addArrayEntry(result, t2.sub(0), t2.sub(1),
                                 currentTerm);
                     } else if (t2.op() instanceof ProgramVariable) {
@@ -473,12 +479,7 @@ public class SymbolicObjectDiagram {
                 }
 
             }
-
-            // attResult = attResult.union(collectLocations2(t));
-
         }
-        // System.out.println(attResult);
-
         setInstanceNames(result);
         symbolicObjects = result;
     }
@@ -491,13 +492,9 @@ public class SymbolicObjectDiagram {
                 Term sub = next.sub(0);
 
                 if (getObject(sub, this.symbolicObjects) == null) {
-                    // VisualDebugger.print("NEW "+sub);
-
-                    // System.out.println(serv.getJavaInfo().getKeYJavaType(sub.sort()).get);
                     symbolicObjects.add(new SymbolicObject(sub,
                             (ClassType) serv.getJavaInfo().getKeYJavaType(
                                     sub.sort()).getJavaType(), this.serv));
-
                 }
 
             }

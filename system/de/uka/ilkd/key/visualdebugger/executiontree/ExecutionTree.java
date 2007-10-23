@@ -78,10 +78,11 @@ public class ExecutionTree implements AutoModeListener {
             vd.setInitPhase(false);
             vd.getBpManager().setNoEx(false);
             vd.stepToFirstSep();
-        } else
+        } else {
             vd.fireDebuggerEvent(new DebuggerEvent(DebuggerEvent.EXEC_FINISHED,
                     null));
-
+        }
+        
         final Runnable execTreeThread = new Runnable() {
             public void run() {
                 // new StateVisualization(node,mediator);
@@ -90,8 +91,9 @@ public class ExecutionTree implements AutoModeListener {
         };
         // mediator.invokeAndWait(interfaceSignaller);
 
-        if (mediator.getProof() != null)
+        if (mediator.getProof() != null) {
             startThread(execTreeThread);
+        }
     }
 
     public void buildETree(ITNode n, ListOfTerm terms, ETNode parent, String exc) {
@@ -282,7 +284,7 @@ public class ExecutionTree implements AutoModeListener {
 
     private boolean containsJavaBlock(Term t) {
         if (!t.javaBlock().isEmpty()
-                || t.toString().toUpperCase().equals("POST")) {
+                || t.op() == vd.getPostPredicate()) {
             return true; // TODO
         }
         for (int i = 0, ar = t.arity(); i < ar; i++) {
@@ -367,7 +369,7 @@ public class ExecutionTree implements AutoModeListener {
             final Term f = cfm.formula();
             if (f.op() instanceof QuanUpdateOperator) {
                 final Term subOp = ((QuanUpdateOperator) f.op()).target(f);
-                if (subOp.op().name().toString().equals("POST")
+                if (subOp.op() == vd.getPostPredicate()
                         && subOp.javaBlock().isEmpty()) {
                     return true;
                 }
@@ -613,7 +615,7 @@ public class ExecutionTree implements AutoModeListener {
     }
 
     /**
-     * FIXME get rid of POST and reuse method in VisualDebugger
+     * FIXME reuse method in VisualDebugger
      * 
      * @param pio
      * @return
@@ -626,7 +628,7 @@ public class ExecutionTree implements AutoModeListener {
                 cf = ((QuanUpdateOperator) cf.op()).target(cf);
             }
             if (cf.op() instanceof Modality
-                    || cf.toString().toUpperCase().equals("POST")) {
+                    || cf.op() == vd.getPostPredicate()) {
                 return true;
             }
         }
@@ -634,7 +636,7 @@ public class ExecutionTree implements AutoModeListener {
     }
 
     // TODO allow all rules that are not of the form assume(non pc) fing(pc)
-    // TODO spliitting rules in updates
+    // TODO splitting rules in updates
     private boolean onlyBCInvolvedInTacletApp(Node n, int newId) {
         HashMapFromPosInOccurrenceToLabel labels = n.getNodeInfo()
                 .getVisualDebuggerState().getLabels();

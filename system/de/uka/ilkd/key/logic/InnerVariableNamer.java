@@ -60,12 +60,14 @@ public class InnerVariableNamer extends VariableNamer {
 	//prepare renaming of inner var
 	final NameCreationInfo nci = getMethodStack(posOfFind);
 	ProgramElementName newname = createName(bai.basename, bai.index, nci);
-	if(!isUniqueInGlobals(newname.toString(), globals)) {
-	    int newcounter = getMaxCounterInGlobalsAndProgram(
-	    					bai.basename,
-					    	globals,
-					    	getProgramFromPIO(posOfFind),
-					    	null) + 1; 
+        int newcounter = getMaxCounterInGlobalsAndProgram(
+                        bai.basename,
+                        globals,
+                        getProgramFromPIO(posOfFind),
+                        null);
+        while (!isUniqueInGlobals(newname.toString(), globals) ||
+                goal.proof().getServices().getNamespaces().lookupLogicSymbol(newname)!=null) {
+	    newcounter += 1; 
 	    newname = createName(bai.basename, newcounter, nci);
 	}
         
