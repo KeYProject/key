@@ -188,7 +188,11 @@ public class ProofSaver {
                 tree.append("\")");
             } else if (appliedRuleApp instanceof HoareLoopInvRuleApp) {
                 tree.append(" (hoareLoopInvariant \"");
-                tree.append(((HoareLoopInvRuleApp)appliedRuleApp).getInvariant());
+                String inv =
+                    printTerm(((HoareLoopInvRuleApp)appliedRuleApp).getInvariant(), 
+                        proof.getServices()).toString().trim();
+                inv = inv.replaceAll("\\\\","\\\\\\\\");
+                tree.append(inv);
                 tree.append("\")");
             }
             tree.append(")\n");

@@ -7,7 +7,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.*;
-import de.uka.ilkd.key.pp.Notation.AnonymousUpdate;
 import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 
@@ -60,8 +59,7 @@ public class HoareLogicPrettyPrinter extends LogicPrinter {
         PresentationFeatures.putInfixNotation(notInfo, services.getNamespaces().functions(), "javaMulLong", "*", 100, 100, 101);
         PresentationFeatures.putInfixNotation(notInfo, services.getNamespaces().functions(), "javaDivInt" , "/", 100, 100, 101);
         PresentationFeatures.putInfixNotation(notInfo, services.getNamespaces().functions(), "javaDivLong", "/", 100, 100, 101);
-        PresentationFeatures.putInfixNotation(notInfo, services.getNamespaces().functions(), "javaModInt" , "%", 100, 100, 101);
-        PresentationFeatures.putInfixNotation(notInfo, services.getNamespaces().functions(), "javaModLong", "%", 100, 100, 101);        
+        PresentationFeatures.putInfixNotation(notInfo, services.getNamespaces().functions(), "javaMod" , "%", 100, 100, 101);
     
         notInfo.put(QuanUpdateOperator.class, new QuanUpdate());
     }

@@ -136,17 +136,21 @@ public class HoareLoopInvariantRule implements BuiltInRule {
         
         assert whileIdx.last() == 0;
         
-        PosInProgram idx = whileIdx.up();
         
         LinkedList statementList = new LinkedList();
+
+        PosInProgram idx = whileIdx;
+
         while (idx != PosInProgram.TOP && 
-                idx.getProgram(prg) instanceof NonTerminalProgramElement) {
+                idx.up().getProgram(prg) instanceof NonTerminalProgramElement) {
+
+            idx = idx.up();
+
             final NonTerminalProgramElement ntpe = (NonTerminalProgramElement) idx.getProgram(prg);
                         
-            for (int i = idx.last() + 1; i<ntpe.getChildCount(); i++) {
-                statementList.add(ntpe);
+            for (int i = 1; i<ntpe.getChildCount(); i++) {
+                statementList.add(ntpe.getChildAt(i));
             }
-            idx = idx.up();
         }
         
         final JavaBlock programTail;
