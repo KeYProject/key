@@ -10,6 +10,7 @@ import de.uka.ilkd.key.proof.ListOfNode;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.SLListOfNode;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.visualdebugger.DebuggerPO;
 import de.uka.ilkd.key.visualdebugger.ProofStarter;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
@@ -268,7 +269,7 @@ public class ETNode {
         ps.init(po);
         ps.getProof().setActiveStrategy(
                 (DebuggerStrategy.Factory.create(ps.getProof(),
-                        "DebuggerStrategy", null)));
+                        "DebuggerStrategy", new StrategyProperties())));
         ps.run(mediator.getProof().env());
         return ps.getProof().closed();
     }
