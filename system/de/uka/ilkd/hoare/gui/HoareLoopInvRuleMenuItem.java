@@ -8,8 +8,8 @@ import javax.swing.JOptionPane;
 
 import de.uka.ilkd.hoare.rule.HoareLoopInvRuleApp;
 import de.uka.ilkd.hoare.rule.HoareLoopInvariantRule;
-import de.uka.ilkd.key.gui.BuiltInRuleMenuItem;
 import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.nodeviews.BuiltInRuleMenuItem;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
