@@ -19,7 +19,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 /** this class implements the interface for
  * MetaAdderators. MetaAdderators are used to do complex term
  * transformation when applying a taclet. Often these transformation
- * caanot be described with the taclet scheme (or trying to do so would
+ * cannot be described with the taclet scheme (or trying to do so would
  * result in a huge number of rules)
  */
 public class MetaAttribute extends MetaField implements Location{

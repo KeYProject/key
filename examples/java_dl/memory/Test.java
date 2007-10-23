@@ -10,6 +10,7 @@ public class Test extends SuperTest{
     Object[] oArr;
     Test next;
     public static Object sa; 
+    public static Test st;
 
     /*@ public normal_behavior
       @  requires oArr.memoryArea == \currentMemoryArea;
@@ -114,7 +115,18 @@ public class Test extends SuperTest{
     }
 
     /*@ public normal_behavior
-      @  requires next.next!=null && next.next.next!=null && inOuterScope(this, oArr);
+      @  requires true;
+      @  ensures true;
+      @*/
+    public void enterScope(){
+	TestRunnable t = new TestRunnable(new Test());
+	ScopedMemory sm = new ScopedMemory(100000);
+	sm.enter(t);
+    }
+
+    /*@ public normal_behavior
+      @  requires next.next!=null && next.next.next!=null && 
+      @           inOuterScope(this, oArr);
       @  ensures true;
       @*/
     public void outerScopeTransitive(){

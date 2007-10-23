@@ -1,5 +1,13 @@
 public class TestRunnable implements Runnable{
+
+    Test t;
+
+    public TestRunnable(Test t){
+	this.t = t;
+    }
+
     public void run(){
-	int[] a = new int[3];
+	Test nt = new Test();
+	nt.next = t; 
     }
 }

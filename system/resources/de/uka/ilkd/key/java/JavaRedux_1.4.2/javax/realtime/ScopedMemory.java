@@ -34,6 +34,7 @@ public class ScopedMemory extends MemoryArea{
 	return stack;
     }
 
+    //@ public invariant parent!=null ==> outerScope(parent, this);
     public ScopedMemory parent=null;
 
     public ScopedMemory(long size){

@@ -22,12 +22,12 @@ public class MemoryStack{
       @          \result.stack[stack.length]==m && (\forall int i; i>=0 &&
       @            i<stack.length; \result.stack[i]==stack[i]);
       @*/
-    public MemoryStack push(ScopedMemory m){}
+    public MemoryStack push(ScopedMemory m);
 
     /*@ public normal_behavior
       @  ensures \result==(\exists int i; i>=0 && i<stack.length; stack[i]==m);
       @*/
-    public /*@pure@*/ boolean contains(ScopedMemory m){}
+    public /*@pure@*/ boolean contains(ScopedMemory m);
 
     /*@ public normal_behavior
       @  ensures \result==((o instanceof MemoryStack) && 
@@ -35,12 +35,12 @@ public class MemoryStack{
       @      (\forall int i; 0<=i && i<stack.length; 
       @       stack[i]==((MemoryStack) o).stack[i]));
       @*/
-    public /*@pure@*/ boolean equals(Object o){}
+    public /*@pure@*/ boolean equals(Object o);
 
     /*@ public normal_behavior
       @  ensures \result==stack[i];
       @*/
-    public /*@pure@*/ ScopedMemory get(int i){}
+    public /*@pure@*/ ScopedMemory get(int i);
 
     /*@ public normal_behavior
       @  ensures \result==stack.length;
@@ -50,5 +50,5 @@ public class MemoryStack{
     /*@ public normal_behavior
       @  ensures \result==stack[stack.length-1];
       @*/
-    public /*@pure@*/ ScopedMemory top(){}
+    public /*@pure@*/ ScopedMemory top();
 }

@@ -2772,14 +2772,17 @@ jmlprimary returns [Term t=null]
     	IN_OUTER_SCOPE "("o1 = specexpression "," o2 = specexpression ")"
         {
             TermSymbol ios = (TermSymbol) nss.functions().lookup(new Name("outerScope"));
-            ProgramVariable attr = getJavaInfo().getAttribute("memoryArea", getJavaInfo().getJavaLangObject());
-            t = tf.createFunctionTerm(ios, df.dot(o1, attr), df.dot(o2, attr));
+            ProgramVariable ma = getJavaInfo().getAttribute("memoryArea", getJavaInfo().getJavaLangObject());
+      	  	ProgramVariable stack = getJavaInfo().getAttribute("stack", ma.getKeYJavaType());
+            t = tf.createFunctionTerm(ios, df.dot(df.dot(o1, ma), stack), df.dot(df.dot(o2, ma), stack));
         }
     |
         OUTER_SCOPE "("o1 = specexpression "," o2 = specexpression ")"
         {
             TermSymbol ios = (TermSymbol) nss.functions().lookup(new Name("outerScope"));
-            t = tf.createFunctionTerm(ios, o1, o2);
+            ProgramVariable ma = getJavaInfo().getAttribute("memoryArea", getJavaInfo().getJavaLangObject());
+      	  	ProgramVariable stack = getJavaInfo().getAttribute("stack", ma.getKeYJavaType());
+            t = tf.createFunctionTerm(ios, df.dot(o1, stack), df.dot(o2, stack));
         }
     |   DURATION "(" dummy = expression ")" 
         {
@@ -2795,7 +2798,8 @@ jmlprimary returns [Term t=null]
     	{
     		TermSymbol im = (TermSymbol) nss.functions().lookup(new Name("immortal"));
     		ProgramVariable ma = getJavaInfo().getAttribute("memoryArea", getJavaInfo().getJavaLangObject());
-    		t = df.dot(t, ma);
+    		ProgramVariable stack = getJavaInfo().getAttribute("stack", ma.getKeYJavaType());
+    		t = df.dot(df.dot(t, ma), stack);
     		t = tf.createFunctionTerm(im, t);
  /*   		ProgramVariable v = services.getJavaInfo().getDefaultMemoryArea();
     		Term t1 = tf.createVariableTerm(v);
