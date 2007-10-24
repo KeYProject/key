@@ -14,9 +14,12 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.logic.ldt.AbstractIntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.IteratorOfSort;
+import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
@@ -115,7 +118,8 @@ public class LexPathOrdering implements TermOrdering {
         if ( oneSubGeq ( p_a, p_b ) ) return GREATER;
         if ( oneSubGeq ( p_b, p_a ) ) return LESS;
         
-        final int opComp = compare ( p_a.op (), p_b.op () );
+        final int opComp = compare ( p_a.op (), p_a.sort (),
+                                     p_b.op (), p_b.sort () );
         if ( opComp == 0 ) {
             final CompRes lexComp = compareSubsLex ( p_a, p_b );
             if ( lexComp.eq () ) {
@@ -176,42 +180,97 @@ public class LexPathOrdering implements TermOrdering {
      * @return a number negative, zero or a number positive if <code>p_a</code>
      *         is less than, equal, or greater than <code>p_b</code>
      */
-    private int compare (Operator p_a, Operator p_b) {
-        if ( p_a == p_b ) return 0;
+    private int compare (Operator aOp, Sort aSort, Operator bOp, Sort bSort) {
+        if ( aOp == bOp ) return 0;
 
-        int v = 0;
         // Search for special symbols
-        {
-            Integer w = getWeight ( p_a );
-            if ( w == null ) {
-                if ( getWeight ( p_b ) != null ) return 1;
-            } else {
-                v = w.intValue ();
-                w = getWeight ( p_b );
-                if ( w == null )
-                    return -1;
-                else
-                    v -= w.intValue ();
-            }
-        }
+        int v = compareWeights ( aOp, bOp );
         if ( v != 0 ) return v;
 
-        if ( isVar ( p_a ) ) {
-            if ( !isVar ( p_b ) ) return 1;
+        if ( isVar ( aOp ) ) {
+            if ( !isVar ( bOp ) ) return 1;
         } else {
-            if ( isVar ( p_b ) ) return -1;
+            if ( isVar ( bOp ) ) return -1;
         }
-            
+        
+        // compare the sorts of the symbols: more specific sorts are smaller
+        v = getSortDepth ( bSort ) - getSortDepth ( aSort );
+        if ( v != 0 ) return v;
+        
 	    // smaller arity is smaller
-	    v = p_a.arity () - p_b.arity ();
+	    v = aOp.arity () - bOp.arity ();
 	    if ( v != 0 ) return v;
 
 	    // use the names of the symbols
-	    v = p_a.name ().compareTo ( p_b.name () );
+	    v = aOp.name ().compareTo ( bOp.name () );
 	    if ( v != 0 ) return v;
 
 	    // HACK: compare the hash values of the two symbols
-	    return sign ( p_b.hashCode () - p_a.hashCode () );
+	    return sign ( bOp.hashCode () - aOp.hashCode () );
+    }
+
+    
+    /**
+     * Hashmap from <code>Sort</code> to <code>Integer</code>, storing the
+     * lengths of maximal paths from a sort to the top element of the sort
+     * lattice.
+     */
+    private final WeakHashMap sortDepthCache = new WeakHashMap ();
+    
+    /**
+     * @return the length of the longest path from <code>s</code> to the top
+     *         element of the sort lattice. Probably this length is not computed
+     *         correctly here, because the representation of sorts in key is 
+     *         completely messed up, but you get the idea
+     */
+    private int getSortDepth(Sort s) {
+        Integer res = (Integer)sortDepthCache.get ( s );
+        if ( res == null ) {
+            res = new Integer ( getSortDepthHelp ( s ) );
+            sortDepthCache.put ( s, res );
+        }
+        return res.intValue ();
+    }
+    
+    private int getSortDepthHelp(Sort s) {
+        int res = -1;
+
+        // HACKish: ensure that object sorts are bigger than primitive sorts
+        final String sName = s.name ().toString ();
+        if ( "int".equals ( sName ) ) res = 10000;
+        if ( "boolean".equals ( sName ) ) res = 20000;
+
+        final IteratorOfSort it = s.extendsSorts ().iterator ();
+        while ( it.hasNext () )
+            res = Math.max ( res, getSortDepth ( it.next () ) );
+
+        return res + 1;
+    }
+    
+    
+    /**
+     * Compare the weights of two symbols using the function
+     * <code>getWeight</code>.
+     * 
+     * @return a number negative, zero or a number positive if the weight of
+     *         <code>p_a</code> is less than, equal, or greater than the
+     *         weight of <code>p_b</code>
+     */
+    private int compareWeights(Operator p_a, Operator p_b) {
+        final Integer aWeight = getWeight ( p_a );
+        final Integer bWeight = getWeight ( p_b );
+        
+        if ( aWeight == null ) {
+            if ( bWeight == null )
+                return 0;
+            else
+                return 1;
+        } else {
+            if ( bWeight == null )
+                return -1;
+            else
+                return aWeight.intValue () - bWeight.intValue ();
+        }
     }
 
     /**
@@ -233,20 +292,22 @@ public class LexPathOrdering implements TermOrdering {
         if ( p_op instanceof Function
              && ( opStr.equals ( "TRUE" ) | opStr.equals ( "FALSE" ) ) )
                 return new Integer ( 3 );
-        if ( p_op instanceof SortDependingSymbol ) return new Integer ( 10 );
-        if ( p_op instanceof AttributeOp ) return new Integer ( 20 );
+        
+//        if ( p_op instanceof SortDependingSymbol ) return new Integer ( 10 );
+        
+//        if ( p_op instanceof AttributeOp ) return new Integer ( 20 );
 
         if ( opStr.equals ( "add" ) ) return new Integer ( 6 );
         if ( opStr.equals ( "mul" ) ) return new Integer ( 7 );
         if ( opStr.equals ( "div" ) ) return new Integer ( 8 );
         if ( opStr.equals ( "jdiv" ) ) return new Integer ( 9 );
 
-        if ( p_op instanceof ProgramVariable ) {
+/*        if ( p_op instanceof ProgramVariable ) {
             final ProgramVariable var = (ProgramVariable)p_op;
             if ( var.isStatic () ) return new Integer ( 30 );
             if ( var.isMember () ) return new Integer ( 31 );
             return new Integer ( 32 );
-        }
+        } */
         
         return null;
     }
