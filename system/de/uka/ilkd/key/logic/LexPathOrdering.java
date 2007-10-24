@@ -28,23 +28,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 public class LexPathOrdering implements TermOrdering {
 
-    private final Set literalFunctionNames = new HashSet ();
-    {
-        literalFunctionNames.add("#");
-        literalFunctionNames.add("0");
-        literalFunctionNames.add("1");
-        literalFunctionNames.add("2");
-        literalFunctionNames.add("3");
-        literalFunctionNames.add("4");
-        literalFunctionNames.add("5");
-        literalFunctionNames.add("6");
-        literalFunctionNames.add("7");
-        literalFunctionNames.add("8");
-        literalFunctionNames.add("9");
-        literalFunctionNames.add("Z");
-        literalFunctionNames.add("neglit");
-    }
-    
     public int compare (Term p_a, Term p_b) {
         final CompRes res = compareHelp ( p_a, p_b );
         if ( res.lt () )
@@ -183,8 +166,8 @@ public class LexPathOrdering implements TermOrdering {
     private int compare (Operator aOp, Sort aSort, Operator bOp, Sort bSort) {
         if ( aOp == bOp ) return 0;
 
-        // Search for special symbols
-        int v = compareWeights ( aOp, bOp );
+        // Search for literals
+        int v = literalWeighter.compareWeights ( aOp, bOp );
         if ( v != 0 ) return v;
 
         if ( isVar ( aOp ) ) {
@@ -196,7 +179,11 @@ public class LexPathOrdering implements TermOrdering {
         // compare the sorts of the symbols: more specific sorts are smaller
         v = getSortDepth ( bSort ) - getSortDepth ( aSort );
         if ( v != 0 ) return v;
-        
+
+        // Search for special function symbols
+        v = functionWeighter.compareWeights ( aOp, bOp );
+        if ( v != 0 ) return v;
+
 	    // smaller arity is smaller
 	    v = aOp.arity () - bOp.arity ();
 	    if ( v != 0 ) return v;
@@ -247,71 +234,120 @@ public class LexPathOrdering implements TermOrdering {
         return res + 1;
     }
     
+    ////////////////////////////////////////////////////////////////////////////
     
     /**
-     * Compare the weights of two symbols using the function
-     * <code>getWeight</code>.
-     * 
-     * @return a number negative, zero or a number positive if the weight of
-     *         <code>p_a</code> is less than, equal, or greater than the
-     *         weight of <code>p_b</code>
+     * Base class for metrics on symbols that are used to construct an ordering
      */
-    private int compareWeights(Operator p_a, Operator p_b) {
-        final Integer aWeight = getWeight ( p_a );
-        final Integer bWeight = getWeight ( p_b );
+    private static abstract class Weighter {
         
-        if ( aWeight == null ) {
-            if ( bWeight == null )
-                return 0;
-            else
-                return 1;
-        } else {
-            if ( bWeight == null )
-                return -1;
-            else
-                return aWeight.intValue () - bWeight.intValue ();
+        /**
+         * Compare the weights of two symbols using the function
+         * <code>getWeight</code>.
+         * 
+         * @return a number negative, zero or a number positive if the weight of
+         *         <code>p_a</code> is less than, equal, or greater than the
+         *         weight of <code>p_b</code>
+         */
+        public int compareWeights(Operator p_a, Operator p_b) {
+            final Integer aWeight = getWeight ( p_a );
+            final Integer bWeight = getWeight ( p_b );
+            
+            if ( aWeight == null ) {
+                if ( bWeight == null )
+                    return 0;
+                else
+                    return 1;
+            } else {
+                if ( bWeight == null )
+                    return -1;
+                else
+                    return aWeight.intValue () - bWeight.intValue ();
+            }
+        }
+        
+        protected abstract Integer getWeight(Operator p_op);
+    }
+    
+    /**
+     * Explicit ordering of literals (symbols assigned a weight by this
+     * class are regarded as smaller than all other symbols)
+     */
+    private static class LiteralWeighter extends Weighter {
+
+        private final Set intFunctionNames = new HashSet ();
+        {
+            intFunctionNames.add("#");
+            intFunctionNames.add("0");
+            intFunctionNames.add("1");
+            intFunctionNames.add("2");
+            intFunctionNames.add("3");
+            intFunctionNames.add("4");
+            intFunctionNames.add("5");
+            intFunctionNames.add("6");
+            intFunctionNames.add("7");
+            intFunctionNames.add("8");
+            intFunctionNames.add("9");
+            intFunctionNames.add("Z");
+            intFunctionNames.add("neglit");
+        }
+
+        protected Integer getWeight(Operator p_op) {
+            final String opStr = p_op.name ().toString ();
+
+            if ( intFunctionNames.contains ( opStr ) )
+                return new Integer ( 0 );
+
+            if ( opStr.equals ( "neg" ) ) return new Integer ( 1 );
+            if ( p_op.name ().equals ( AbstractIntegerLDT.CHAR_ID_NAME ) )
+                return new Integer ( 1 );
+            if ( p_op instanceof Function
+                 && ( (Function)p_op ).sort () == Sort.NULL )
+                return new Integer ( 2 );
+            if ( p_op instanceof Function
+                 && ( opStr.equals ( "TRUE" ) | opStr.equals ( "FALSE" ) ) )
+                return new Integer ( 3 );
+
+            if ( opStr.equals ( "add" ) ) return new Integer ( 6 );
+            if ( opStr.equals ( "mul" ) ) return new Integer ( 7 );
+            if ( opStr.equals ( "div" ) ) return new Integer ( 8 );
+            if ( opStr.equals ( "jdiv" ) ) return new Integer ( 9 );
+
+            return null;
         }
     }
 
     /**
-     * Explicit ordering of some symbols (symbols assigned a weight by this
-     * method are regarded as smaller than other symbols); symbols are ordered
-     * according to their weight
+     * Explicit ordering for different kinds of function symbols; symbols like
+     * C::<get> or C.<nextToCreate> should be smaller than other symbols
      */
-    private Integer getWeight (final Operator p_op) {
-        final String opStr = p_op.name ().toString ();
-        
-        if ( literalFunctionNames.contains ( opStr ) )
-                return new Integer ( 0 );
-        
-        if ( opStr.equals ( "neg" ) ) return new Integer ( 1 );
-        if ( p_op.name().equals(AbstractIntegerLDT.CHAR_ID_NAME) ) return new Integer ( 1 );
-        if ( p_op instanceof Function
-             && ( (Function)p_op ).sort () == Sort.NULL )
-                return new Integer ( 2 );
-        if ( p_op instanceof Function
-             && ( opStr.equals ( "TRUE" ) | opStr.equals ( "FALSE" ) ) )
-                return new Integer ( 3 );
-        
-//        if ( p_op instanceof SortDependingSymbol ) return new Integer ( 10 );
-        
-//        if ( p_op instanceof AttributeOp ) return new Integer ( 20 );
+    private static class FunctionWeighter extends Weighter {
+        protected Integer getWeight(Operator p_op) {
+            final String opStr = p_op.name ().toString ();
 
-        if ( opStr.equals ( "add" ) ) return new Integer ( 6 );
-        if ( opStr.equals ( "mul" ) ) return new Integer ( 7 );
-        if ( opStr.equals ( "div" ) ) return new Integer ( 8 );
-        if ( opStr.equals ( "jdiv" ) ) return new Integer ( 9 );
+            if ( opStr.endsWith ( "::<get>" ) ) return new Integer ( 10 );
+            if ( opStr.endsWith ( "<nextToCreate>" ) ) return new Integer ( 20 );
 
-/*        if ( p_op instanceof ProgramVariable ) {
-            final ProgramVariable var = (ProgramVariable)p_op;
-            if ( var.isStatic () ) return new Integer ( 30 );
-            if ( var.isMember () ) return new Integer ( 31 );
-            return new Integer ( 32 );
-        } */
-        
-        return null;
+/*            if ( p_op instanceof SortDependingSymbol ) return new Integer ( 10 );
+
+            if ( p_op instanceof AttributeOp ) return new Integer ( 20 );
+
+            if ( p_op instanceof ProgramVariable ) {
+                final ProgramVariable var = (ProgramVariable)p_op;
+                if ( var.isStatic () ) return new Integer ( 30 );
+                if ( var.isMember () ) return new Integer ( 31 );
+                return new Integer ( 32 );
+            } */ 
+
+            return null;            
+        }
     }
-
+    
+    private final Weighter literalWeighter = new LiteralWeighter ();
+    private final Weighter functionWeighter = new FunctionWeighter ();
+    
+    ////////////////////////////////////////////////////////////////////////////
+    
     /**
      * @return true iff <code>op</code> is a logic variable
      */
