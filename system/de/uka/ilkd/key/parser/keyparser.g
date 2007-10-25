@@ -2024,7 +2024,7 @@ pred_decl
                  	  case HEAP_DEPENDENT: p = new NonRigidHeapDependentFunction(predicate, Sort.FORMULA, argSorts);      
                  	      break;
                  	  default:
-                 	     semanticError("Unknwon modifier used in declaration of non-rigid predicate "+predicate);
+                 	     semanticError("Unknown modifier used in declaration of non-rigid predicate "+predicate);
                  	}
                     }
 

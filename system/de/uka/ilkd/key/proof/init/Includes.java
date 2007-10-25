@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
