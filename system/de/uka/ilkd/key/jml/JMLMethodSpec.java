@@ -20,23 +20,13 @@ import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.recoderext.ClassInitializeMethodBuilder;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.CatchAllStatement;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
+import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.proof.ProofSaver;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.mgt.JavaModelMethod;
-import de.uka.ilkd.key.proof.mgt.ListOfQuantifierPrefixEntry;
-import de.uka.ilkd.key.proof.mgt.QuantifierPrefixEntry;
+import de.uka.ilkd.key.proof.mgt.*;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
 import de.uka.ilkd.key.util.Debug;
 
@@ -574,6 +564,7 @@ public class JMLMethodSpec extends JMLSpec implements JMLLemmaMethodSpec,
 	}else{
 	    t1 = cSpec.addClassSpec2Pre(t1, pm, cSpec);
 	}
+	t1 = addInitialMemorySize(t1);
 	t2 = getPost();
 	if(t2 == null){
 	    result= createModalityTermForEnsures(tt(), true, 
@@ -771,6 +762,7 @@ public class JMLMethodSpec extends JMLSpec implements JMLLemmaMethodSpec,
         final TermBuilder df = TermBuilder.DF;
         final ProgramVariable stack = services.getJavaInfo().getAttribute(
                 "stack", initialMemoryArea.getKeYJavaType());
+        
         Term mem_stack = df.dot(t_mem, stack);
         addPre(not(equals(mem_stack, nullTerm)));
         addPre(UsefulTools.isCreated(mem_stack, services));
@@ -873,6 +865,20 @@ public class JMLMethodSpec extends JMLSpec implements JMLLemmaMethodSpec,
         return replaceFreeVarsWithConsts(t);
     }
 
+    protected Term addInitialMemorySize(Term t){
+        ProgramVariable initialMemoryArea = services.getJavaInfo().getDefaultMemoryArea();
+        Term t_mem = var(initialMemoryArea);
+        final ProgramVariable size = services.getJavaInfo().getAttribute(
+                "size", "javax.realtime.MemoryArea");
+        final ProgramVariable consumed = services.getJavaInfo().getAttribute(
+                "consumed", "javax.realtime.MemoryArea");
+        Function add = (Function) nss.functions().lookup(new Name("add"));
+        Function leq = (Function) nss.functions().lookup(new Name("leq")); 
+        return and(t, func(leq, func(add, dot(t_mem,consumed), 
+                workingSpace==null ? zTerm(services, "4294967296") : workingSpace), //2^32 by default
+                dot(t_mem, size)));
+    }
+    
     /** 
      * returns the precondition + represents for model fields
      * (+ invariants iff withClassSpec = true, + the negation of the diverges

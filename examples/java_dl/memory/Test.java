@@ -120,7 +120,7 @@ public class Test extends SuperTest{
       @*/
     public void enterScope(){
 	TestRunnable t = new TestRunnable(new Test());
-	ScopedMemory sm = new ScopedMemory(100000);
+	ScopedMemory sm = new ScopedMemory(40);
 	sm.enter(t);
     }
 

@@ -19,6 +19,8 @@ lang/Error.java
 lang/NoSuchFieldException.java
 lang/NoSuchMethodException.java
 lang/CloneNotSupportedException.java
+lang/OutOfMemoryError.java
+lang/VirtualMachineError.java
 lang/Boolean.java
 lang/Byte.java
 lang/Short.java
