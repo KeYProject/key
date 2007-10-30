@@ -51,11 +51,17 @@ public abstract class MemoryArea{
 	return object.memoryArea;
     }
 
-    public long memoryConsumed(){
+    /*@ normal_behavior
+      @  working_space 0;
+      @*/
+    public /*@pure@*/ long memoryConsumed(){
 	return consumed;
     }
 
-    public long memoryRemaining(){
+    /*@ normal_behavior
+      @  working_space 0;
+      @*/
+    public /*@pure@*/ long memoryRemaining(){
 	return size-consumed;
     }
 

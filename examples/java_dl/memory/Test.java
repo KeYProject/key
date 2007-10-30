@@ -125,6 +125,16 @@ public class Test extends SuperTest{
     }
 
     /*@ public normal_behavior
+      @  requires sm!=null && sm.memoryRemaining()>\space(new Test()) &&
+      @           outerScope(sm, \currentMemoryArea);
+      @  working_space 2*\space(new Test())+\space(new TestRunnable(null));
+      @*/
+    public void executeRunnableInArea(ScopedMemory sm){
+	TestRunnable t = new TestRunnable(new Test());
+	sm.executeInArea(t);	
+    }
+
+    /*@ public normal_behavior
       @  requires next.next!=null && next.next.next!=null && 
       @           inOuterScope(this, oArr);
       @  ensures true;

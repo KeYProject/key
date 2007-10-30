@@ -8,6 +8,6 @@ public class TestRunnable implements Runnable{
 
     public void run(){
 	Test nt = new Test();
-	nt.next = t; 
+	t.next = nt; 
     }
 }

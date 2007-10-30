@@ -108,11 +108,18 @@ public class ScopedMemory extends MemoryArea{
     }
 
     public void	executeInArea(java.lang.Runnable logic){
-	if(!<currentMemoryArea>.stack.contains(this)){
+	//	if(!<currentMemoryArea>.stack.contains(this)){
+	if(!outerScopeM(this, <currentMemoryArea>)){
 	    throw new InaccessableAreaException();
 	}
 	super.executeInArea(logic);
     }
+
+    /*@ public normal_behavior
+      @  working_space 0;
+      @  ensures \result==outerScope(a,b);
+      @*/
+    public static /*@pure@*/ boolean outerScopeM(MemoryArea a, MemoryArea b);
 
     public long	getMaximumSize(){
 	return size();

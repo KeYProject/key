@@ -26,6 +26,8 @@ public class MemoryStack{
 
     /*@ public normal_behavior
       @  ensures \result==(\exists int i; i>=0 && i<stack.length; stack[i]==m);
+      @ also public normal_behavior
+      @  ensures \result == outerScope(m, stack[stack.length-1]);
       @*/
     public /*@pure@*/ boolean contains(ScopedMemory m);
 
