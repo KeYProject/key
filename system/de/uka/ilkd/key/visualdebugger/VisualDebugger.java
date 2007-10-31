@@ -8,6 +8,7 @@ import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.java.ArrayOfExpression;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -38,6 +39,7 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.visualdebugger.executiontree.ExecutionTree;
 import de.uka.ilkd.key.visualdebugger.executiontree.ITNode;
 import de.uka.ilkd.key.visualdebugger.statevisualisation.StateVisualization;
@@ -63,6 +65,8 @@ public class VisualDebugger {
     private static VisualDebugger singleton;
 
     private static List symbolicExecNames = new ArrayList(5);
+
+    private ProgressMonitor etProgressMonitor = null;
 
     public static final String tempDir = System.getProperty("user.home")
             + File.separator + "tmp" + File.separator + "visualdebugger"
@@ -116,7 +120,7 @@ public class VisualDebugger {
 
             args[0] = "DEBUGGER";
             args[1] = "LOOP";
-            
+
             Main.evaluateOptions(args);
             Main key = Main.getInstance(false);
             key.loadCommandLineFile();
@@ -188,7 +192,7 @@ public class VisualDebugger {
 
     protected VisualDebugger() {
         bpManager = new BreakpointManager(this);
-        
+
         // main = Main.getInstance();
     }
 
@@ -650,7 +654,7 @@ public class VisualDebugger {
 
     /**
      * @param locs
-     *                set of Terms (ops)
+     *            set of Terms (ops)
      * @return term2term
      */
     public HashMap getValuesForLocation(HashSet locs, PosInOccurrence pio) {
@@ -710,17 +714,16 @@ public class VisualDebugger {
         }
 
         final Proof proof = mediator.getProof();
-        ExecutionTree pl = new ExecutionTree(proof, mediator,
-                true);
+        ExecutionTree pl = new ExecutionTree(proof, mediator, true);
         pl.setListeners(listeners);
         mediator.addAutoModeListener(pl);
 
         this.initPhase = true;
         bpManager.setNoEx(true);
 
-        postPredicate = (Function) 
-            proof.getNamespaces().functions().lookup(POST_PREDICATE_NAME);  
-        
+        postPredicate = (Function) proof.getNamespaces().functions().lookup(
+                POST_PREDICATE_NAME);
+
         setProofStrategy(proof, true, false);
         run();
     }
@@ -902,7 +905,7 @@ public class VisualDebugger {
     }
 
     private String removeLineBreaks(String s) {
-        return s.replace('\n', ' ');
+        return s;// s.replace('\n', ' ');
     }
 
     private void removeStepOver(ListOfGoal goals) {
@@ -932,6 +935,7 @@ public class VisualDebugger {
             this.setSteps(goals, this.runLimit);
             setProofStrategy(mediator.getProof(), true, false);
             runProver(goals);
+            mediator.removeProverTaskListener(etProgressMonitor);
             return true;
         }
         return false;
@@ -940,6 +944,7 @@ public class VisualDebugger {
     private void runProver(final ListOfGoal goals) {
         this.refreshRuleApps();
         mediator.startAutoMode(goals);
+        mediator.addProverTaskListener(new ProverProgress(etProgressMonitor));
     }
 
     public void setInitPhase(boolean initPhase) {
@@ -1011,13 +1016,16 @@ public class VisualDebugger {
             return terms;
         final DebuggerPO po = new DebuggerPO("DebuggerPo");
         final ProofStarter ps = new ProofStarter();
+        if (etProgressMonitor != null) {
+            ps.addProgressMonitor(etProgressMonitor);
+        }
         po.setTerms(terms);
 
         final ProofEnvironment proofEnvironment = mediator.getProof().env();
         final InitConfig initConfig = proofEnvironment.getInitConfig();
-        
-        po.setIndices(initConfig.createTacletIndex(),
-                initConfig.createBuiltInRuleIndex());
+
+        po.setIndices(initConfig.createTacletIndex(), initConfig
+                .createBuiltInRuleIndex());
         po.setProofSettings(mediator.getProof().getSettings());
         po.setConfig(initConfig);
         po.setTerms(terms);
@@ -1031,7 +1039,9 @@ public class VisualDebugger {
         ps.run(proofEnvironment);
 
         setProofStrategy(proof, true, false);
-
+        if (etProgressMonitor != null) {
+            ps.removeProgressMonitor(etProgressMonitor);
+        }
         return collectResult(proof.openGoals().iterator().next().node()
                 .sequent());
     }
@@ -1104,7 +1114,7 @@ public class VisualDebugger {
 
         final Runnable interfaceSignaller = new Runnable() {
             public void run() {
-                new StateVisualization(node, mediator, 
+                new StateVisualization(node, mediator,
                         maxProofStepsForStateVisComputation,
                         useDecisionProcedures);
             }
@@ -1149,4 +1159,47 @@ public class VisualDebugger {
             return "File: " + file + " Method: " + method;
         }
     }
+
+    public void addPMtoProofStarter(ProgressMonitor pm) {
+        this.etProgressMonitor = pm;
+    }
+
+    /**
+     * The Nested Class ProgMon.
+     * 
+     * Implements the ProverTaskListener Interface. Serves as a wrapper for a
+     * progressmonitor in the ExcecutionTreeView.
+     * 
+     */
+    static class ProverProgress implements ProverTaskListener {
+
+        private ProgressMonitor pm = null;
+
+        /**
+         * Instantiates a new PM.
+         * 
+         * @param pb
+         *            the pb
+         */
+        public ProverProgress(ProgressMonitor pm) {
+            this.pm = pm;
+        }
+
+        public void taskFinished() {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void taskProgress(int position) {
+            pm.setProgress(position);
+
+        }
+
+        public void taskStarted(String message, int size) {
+            // TODO Auto-generated method stub
+
+        }
+
+    }
+
 }

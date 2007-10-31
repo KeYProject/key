@@ -249,9 +249,9 @@ public class Main extends JFrame {
         guiListener = new MainGUIListener();
         constraintListener = new MainConstraintTableListener();
         taskListener = new MainTaskListener();
-        
+
         setMediator(new KeYMediator(this));
-        
+        mediator.addProverTaskListener(taskListener);
         initNotification();
         initProofList();
         layoutMain();

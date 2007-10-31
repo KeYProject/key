@@ -14,6 +14,7 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
+
 /**
  * Starts and runs a proof attempt mostly separated from the rest of the KeY
  * system. It may be used for non-user visible sub proofs.

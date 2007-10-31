@@ -15,6 +15,8 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
@@ -38,6 +40,7 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.visualization.ProofVisualization;
 
 
@@ -76,6 +79,8 @@ public class KeYMediator {
     private boolean stupidMode; // minimize user interaction
 
     private boolean autoMode; // autoModeStarted has been fired
+    
+    private List proverTaskListeners = new LinkedList();
 
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
@@ -383,8 +388,8 @@ public class KeYMediator {
     	return interactiveProver.getBuiltInRuleAppsForName(name, pos);
     }
     
-    public ProverTaskListener getProverTaskListener() {
-        return mainFrame.getProverTaskListener();
+    public List getProverTaskListener() {
+        return proverTaskListeners;
     }
 
 
@@ -1169,5 +1174,29 @@ public class KeYMediator {
            proof.getSettings().getStrategySettings().setTimeout(timeout);
        }
        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
+    }
+    
+    /**     
+     * adds a proverTaskListener to the mediator. 
+     * 
+     * @param pm the ProverTaskListener to be added
+     */
+    public void addProverTaskListener(ProverTaskListener ptl) {
+        synchronized(proverTaskListeners) {
+            if (!proverTaskListeners.contains(ptl)) {
+                proverTaskListeners.add(ptl);
+            }
+        }
+    }
+
+    /**
+     * removes <code>ptl</code> from the list of proverTaskListeners
+     *  
+     * @param ptl the proverTaskListener to be removed
+     */
+    public void removeProverTaskListener(ProgressMonitor ptl) {
+        synchronized(proverTaskListeners) {
+            proverTaskListeners.remove(ptl);
+        }
     }
 }

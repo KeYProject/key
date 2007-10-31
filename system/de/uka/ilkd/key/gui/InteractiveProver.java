@@ -27,6 +27,7 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.ProgressMonitor;
 
 public class InteractiveProver {
 
@@ -69,7 +70,12 @@ public class InteractiveProver {
 	this.mediator = mediator;
 	mediator.addKeYSelectionListener(selListener);
 	applyStrategy = new ApplyStrategy(mediator);
-	applyStrategy.addProverTaskObserver(mediator().getProverTaskListener());
+        
+        final Iterator it = mediator().getProverTaskListener().iterator();
+        while (it.hasNext()) {
+            applyStrategy.addProverTaskObserver( ((ProverTaskListener)it.next()));
+        }
+	//applyStrategy.addProverTaskObserver(mediator().getProverTaskListener());
     }
 
     /** returns the KeYMediator */
