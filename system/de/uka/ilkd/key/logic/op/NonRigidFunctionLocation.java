@@ -49,4 +49,8 @@ public class NonRigidFunctionLocation extends Function implements NonRigid, Loca
     public boolean mayBeAliasedBy(Location loc){
 	return (this==loc);
     }
+    
+    public String proofToString() {
+        return "\\nonRigid[Location] " + super.proofToString();
+    }
 }
