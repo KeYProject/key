@@ -935,7 +935,7 @@ public class VisualDebugger {
             this.setSteps(goals, this.runLimit);
             setProofStrategy(mediator.getProof(), true, false);
             runProver(goals);
-            mediator.removeProverTaskListener(etProgressMonitor);
+            
             return true;
         }
         return false;
@@ -943,8 +943,11 @@ public class VisualDebugger {
 
     private void runProver(final ListOfGoal goals) {
         this.refreshRuleApps();
+       
+        
         mediator.startAutoMode(goals);
-        mediator.addProverTaskListener(new ProverProgress(etProgressMonitor));
+       // mediator.getInteractiveProver().removeProverTaskListener(proverTaskListener);
+        
     }
 
     public void setInitPhase(boolean initPhase) {
@@ -1162,41 +1165,49 @@ public class VisualDebugger {
 
     public void addPMtoProofStarter(ProgressMonitor pm) {
         this.etProgressMonitor = pm;
+        ETProverTaskListener proverTaskListener = new ETProverTaskListener(
+                etProgressMonitor);
+        mediator.getInteractiveProver().addProverTaskListener(proverTaskListener);
+        
     }
 
     /**
-     * The Nested Class ProgMon.
+     * The Nested Class ETProverTaskListener.
      * 
-     * Implements the ProverTaskListener Interface. Serves as a wrapper for a
-     * progressmonitor in the ExcecutionTreeView.
+     * Implements the ProverTaskListener Interface. Serves as wrapper for the
+     * ExcecutionTreeView's progressmonitor. The Instance of
+     * ETProverTaskListener is registered to the KeYMediator.
      * 
      */
-    static class ProverProgress implements ProverTaskListener {
+    static class ETProverTaskListener implements ProverTaskListener {
 
         private ProgressMonitor pm = null;
 
         /**
          * Instantiates a new PM.
          * 
-         * @param pb
-         *            the pb
+         * @param pm
+         *            the ProgressMonitor
          */
-        public ProverProgress(ProgressMonitor pm) {
+        public ETProverTaskListener(ProgressMonitor pm) {
             this.pm = pm;
         }
-
+        //reset progressbar when task is finished
         public void taskFinished() {
-            // TODO Auto-generated method stub
+            System.out.println("task finished");
 
         }
 
         public void taskProgress(int position) {
+            
+            System.out.println("taskProgress -position:" + position);
             pm.setProgress(position);
 
         }
 
         public void taskStarted(String message, int size) {
-            // TODO Auto-generated method stub
+            System.out.println("taskStarted -size:" + size);
+            pm.setMaximum(size);
 
         }
 

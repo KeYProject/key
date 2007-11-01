@@ -7,8 +7,21 @@ import org.eclipse.jdt.core.dom.*;
 
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class InsertSepVisitor
+ * 
+ * This Class inserts Debug._sep(intlit) methods into the original sourcecode
+ * 
+ */
 public class InsertSepVisitor extends ASTVisitor {
 
+    /**
+     * Replace node.
+     * 
+     * @param oldNode the old node
+     * @param newNode the new node
+     */
     public static void replaceNode(ASTNode oldNode, ASTNode newNode) {
 
         ASTNode parent = oldNode.getParent();
@@ -26,16 +39,24 @@ public class InsertSepVisitor extends ASTVisitor {
         }
     }
 
+    /** The id. */
     private int id = 0;
 
+    /** The types. */
     private final HashSet types = new HashSet();
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jdt.core.dom.ASTVisitor#endVisit(org.eclipse.jdt.core.dom.ArrayAccess)
+     */
     public void endVisit(ArrayAccess node) {
         Expression index = node.getIndex();
         MethodInvocation inv = getSepStatement(index.getAST(), ++id, index);
         replaceNode(index, inv);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jdt.core.dom.ASTVisitor#endVisit(org.eclipse.jdt.core.dom.FieldAccess)
+     */
     public void endVisit(FieldAccess node) {
         final ITypeBinding expressionTypeBinding = node.getExpression()
                 .resolveTypeBinding();
@@ -48,11 +69,17 @@ public class InsertSepVisitor extends ASTVisitor {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jdt.core.dom.ASTVisitor#endVisit(org.eclipse.jdt.core.dom.ForStatement)
+     */
     public void endVisit(ForStatement node) {
         final Expression guard = node.getExpression();
         replaceNode(guard, getSepStatement(guard.getAST(), ++id, guard));
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jdt.core.dom.ASTVisitor#endVisit(org.eclipse.jdt.core.dom.QualifiedName)
+     */
     public void endVisit(QualifiedName node) {
 
         if (node.getParent() instanceof QualifiedName) {
@@ -91,12 +118,23 @@ public class InsertSepVisitor extends ASTVisitor {
         replaceNode(node, fa);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jdt.core.dom.ASTVisitor#endVisit(org.eclipse.jdt.core.dom.WhileStatement)
+     */
     public void endVisit(WhileStatement node) {
         final Expression guard = node.getExpression();
         MethodInvocation inv = getSepStatement(guard.getAST(), ++id, guard);
         replaceNode(guard, inv);
     }
 
+    /**
+     * Gets the sep statement.
+     * 
+     * @param ast the ast
+     * @param id the id
+     * 
+     * @return the sep statement
+     */
     private ExpressionStatement getSepStatement(AST ast, int id) {
         MethodInvocation methodInvocation = ast.newMethodInvocation();
 
@@ -111,6 +149,15 @@ public class InsertSepVisitor extends ASTVisitor {
         return expressionStatement;
     }
 
+    /**
+     * Gets the sep statement.
+     * 
+     * @param ast the ast
+     * @param id the id
+     * @param ex the ex
+     * 
+     * @return the sep statement
+     */
     private MethodInvocation getSepStatement(AST ast, int id, Expression ex) {
         MethodInvocation methodInvocation = ast.newMethodInvocation();
         methodInvocation.setExpression(ast
@@ -134,14 +181,29 @@ public class InsertSepVisitor extends ASTVisitor {
         return methodInvocation;
     }
 
+    /**
+     * Gets the types.
+     * 
+     * @return the types
+     */
     public HashSet getTypes() {
         return types;
     }
 
+    /**
+     * Visit.
+     * 
+     * @param node the node
+     * 
+     * @return true, if successful
+     */
     public boolean visit(ASTNode node) {
         return true;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jdt.core.dom.ASTVisitor#visit(org.eclipse.jdt.core.dom.Block)
+     */
     public boolean visit(Block node) {
         AST ast = node.getAST();
         for (int i = 0; i < node.statements().size(); i++) {

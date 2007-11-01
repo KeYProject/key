@@ -27,7 +27,6 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ProgressMonitor;
 
 public class InteractiveProver {
 
@@ -70,12 +69,7 @@ public class InteractiveProver {
 	this.mediator = mediator;
 	mediator.addKeYSelectionListener(selListener);
 	applyStrategy = new ApplyStrategy(mediator);
-        
-        final Iterator it = mediator().getProverTaskListener().iterator();
-        while (it.hasNext()) {
-            applyStrategy.addProverTaskObserver( ((ProverTaskListener)it.next()));
-        }
-	//applyStrategy.addProverTaskObserver(mediator().getProverTaskListener());
+
     }
 
     /** returns the KeYMediator */
@@ -572,6 +566,26 @@ public class InteractiveProver {
             }
         }
        	return result;
+    }
+
+    /**     
+     * adds a proverTaskListener to the mediator. 
+     * 
+     * @param pm the ProverTaskListener to be added
+     * @param mediator TODO
+     * @param ptl TODO
+     */
+    public void addProverTaskListener(ProverTaskListener ptl) {
+        applyStrategy.addProverTaskObserver(ptl);
+    }
+
+    /**
+     * removes <code>ptl</code> from the list of proverTaskListeners
+     *  
+     * @param ptl the proverTaskListener to be removed
+     */
+    public void removeProverTaskListener(ProverTaskListener ptl) {      
+        applyStrategy.removeProverTaskObserver(ptl);        
     }
     
 }

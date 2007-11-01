@@ -251,7 +251,7 @@ public class Main extends JFrame {
         taskListener = new MainTaskListener();
 
         setMediator(new KeYMediator(this));
-        mediator.addProverTaskListener(taskListener);
+        mediator.getInteractiveProver().addProverTaskListener(taskListener);
         initNotification();
         initProofList();
         layoutMain();

@@ -39,20 +39,34 @@ import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class StartVisualDebuggerAction.
+ */
 public class StartVisualDebuggerAction implements IObjectActionDelegate {
 
+    /** The all invariants. */
     public static boolean allInvariants = false;
 
     // public static boolean allInvariants=false;
 
+    /** The Constant PROJECT_ALREADY_OPEN. */
     protected static final int PROJECT_ALREADY_OPEN = 1;
 
+    /** The Constant PROJECT_LOAD_CANCELED. */
     protected static final int PROJECT_LOAD_CANCELED = 3;
 
+    /** The Constant PROJECT_LOAD_FAILED. */
     protected static final int PROJECT_LOAD_FAILED = 4;
 
+    /** The Constant PROJECT_LOAD_SUCESSFUL. */
     protected static final int PROJECT_LOAD_SUCESSFUL = 2;
 
+    /**
+     * Delete tree.
+     * 
+     * @param path the path
+     */
     public static void deleteTree(File path) {
 
         final File[] files = path.listFiles();
@@ -64,6 +78,9 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
         path.delete();
     }
 
+    /**
+     * Delete temporary directory.
+     */
     public static void delTemporaryDirectory() {
         File dir = new File(VisualDebugger.tempDir);
         StartVisualDebuggerAction.deleteTree(dir);
@@ -72,17 +89,23 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 
     }
 
+    /** The debug CompilationUnit. */
     private CompilationUnit debugCU;
 
     // quick-and-dirty for syncExec(dialog.open()) in swt thread
+    /** The dialog. */
     MethodPOSelectionDialog dialog;
 
+    /** The nokey. */
     boolean nokey = false;
 
+    /** The selection. */
     ISelection selection;
 
+    /** The state. */
     int state;
 
+    /** The types. */
     HashSet types = new HashSet();
 
     /**
@@ -92,6 +115,14 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
         super();
     }
 
+    /**
+     * Assert project parsed.
+     * 
+     * @param project the project
+     * @param jmlBrowserIntended the jml browser intended
+     * 
+     * @return the int
+     */
     protected synchronized int assertProjectParsed(IProject project,
             boolean jmlBrowserIntended) {
 
@@ -149,8 +180,8 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
      * creates class <tt>Debug</tt> implementing the <tt>sep</tt> methods
      * representing breakpoints.
      * 
-     * @param ast
-     *            the AST with the environment where to insert the class
+     * @param ast the AST with the environment where to insert the class
+     * 
      * @return the compilation unit containing the created class
      */
     private CompilationUnit createDebuggerClass(AST ast) {
@@ -175,6 +206,13 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
         return unit;
     }
 
+    /**
+     * Gets the method spec.
+     * 
+     * @param methodSpecs the method specs
+     * 
+     * @return the method spec
+     */
     private JMLMethodSpec getMethodSpec(Vector methodSpecs) {
         for (Iterator it = methodSpecs.iterator(); it.hasNext();) {
             Object next = it.next();
@@ -187,6 +225,13 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
         return null;
     }
 
+    /**
+     * Gets the sep method declaration.
+     * 
+     * @param ast the ast
+     * 
+     * @return the sep method declaration
+     */
     private MethodDeclaration getSepMethodDeclaration(AST ast) {
 
         MethodDeclaration methodDeclaration = ast.newMethodDeclaration();
@@ -211,6 +256,14 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
         return methodDeclaration;
     }
 
+    /**
+     * Gets the sep method declaration.
+     * 
+     * @param ast the ast
+     * @param type the type
+     * 
+     * @return the sep method declaration
+     */
     private MethodDeclaration getSepMethodDeclaration(AST ast, Type type) {
 
         MethodDeclaration methodDeclaration = ast.newMethodDeclaration();
@@ -250,6 +303,14 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
         return methodDeclaration;
     }
 
+    /**
+     * Gets the sep method declaration deprecated.
+     * 
+     * @param ast the ast
+     * @param type the type
+     * 
+     * @return the sep method declaration deprecated
+     */
     private MethodDeclaration getSepMethodDeclarationDEPRECATED(AST ast,
             ITypeBinding type) {
 
@@ -294,10 +355,25 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
         return methodDeclaration;
     }
 
+    /**
+     * Gets the type.
+     * 
+     * @param ast the ast
+     * @param bind the bind
+     * 
+     * @return the type
+     */
     private Type getType(AST ast, ITypeBinding bind) {// TODO !!!!!!!!!
         return ast.newSimpleType(ast.newName(bind.getQualifiedName()));
     }
 
+    /**
+     * Gets the types.
+     * 
+     * @param javaproject the javaproject
+     * 
+     * @return the types
+     */
     public final ICompilationUnit[] getTypes(IJavaProject javaproject) {
         ArrayList typeList = new ArrayList();
         try {
@@ -328,6 +404,11 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
         return (ICompilationUnit[]) typeList.toArray(types);
     }
 
+    /**
+     * Insert seps.
+     * 
+     * @param unit the unit
+     */
     public void insertSeps(ICompilationUnit unit) {
         String source = "";
 
@@ -415,6 +496,11 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 
     }
 
+    /**
+     * Insert seps.
+     * 
+     * @param project the project
+     */
     public void insertSeps(IJavaProject project) {
         ICompilationUnit[] units = getTypes(project);
         types = new HashSet();
@@ -477,6 +563,10 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
     }
 
     /**
+     * Run.
+     * 
+     * @param action the action
+     * 
      * @see IActionDelegate#rune(IAction)
      */
     public void run(IAction action) {
@@ -517,7 +607,8 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
             } else {
                 location.mkdirs();
             }
-
+            
+            // Inserts the separator statements
             insertSeps(srcFile.getJavaProject());
 
             // TODO generalize to consider packageFragmentRoots (needed to
@@ -636,6 +727,11 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
     }
 
     /**
+     * Selection changed.
+     * 
+     * @param action the action
+     * @param selection the selection
+     * 
      * @see IActionDelegate#selectionChanged(IAction, ISelection)
      */
     public void selectionChanged(IAction action, ISelection selection) {
@@ -643,6 +739,11 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
     }
 
     /**
+     * Sets the active part.
+     * 
+     * @param action the action
+     * @param targetPart the target part
+     * 
      * @see IObjectActionDelegate#setActivePart(IAction, IWorkbenchPart)
      */
     public void setActivePart(IAction action, IWorkbenchPart targetPart) {
@@ -652,6 +753,16 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
         action.setEnabled(true);
     }
 
+    /**
+     * Start prover.
+     * 
+     * @param debuggerEventMsg the debugger event msg
+     * @param provider the provider
+     * @param spec the spec
+     * @param allInvariants the all invariants
+     * @param invPost the inv post
+     * @param assignable the assignable
+     */
     private void startProver(String debuggerEventMsg,
             final JMLPOAndSpecProvider provider, final JMLSpec spec,
             final boolean allInvariants, final boolean invPost,
