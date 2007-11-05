@@ -4,6 +4,9 @@ public class MemoryStack{
 
     private ScopedMemory[] stack;
 
+    //@ public static invariant EMPTY_STACK!=null && EMPTY_STACK.size()==0;
+    private static MemoryStack EMPTY_STACK;
+
     /*@ public invariant stack!=null;
       @*/
 

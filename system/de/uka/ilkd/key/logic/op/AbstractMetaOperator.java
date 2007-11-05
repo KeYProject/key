@@ -41,6 +41,8 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     public static final AbstractMetaOperator META_LENGTH = new MetaLength();
 
     public static final AbstractMetaOperator META_ATTRIBUTE = new MetaAttribute();
+    
+    public static final AbstractMetaOperator META_INSTANCE = new MetaInstance();
 
     public static final AbstractMetaOperator META_CREATED = new MetaCreated();
     

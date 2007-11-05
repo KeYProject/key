@@ -389,33 +389,33 @@ public class UseMethodContractRule implements BuiltInRule {
         ProgramMethod method = null;
 //        Term pre = null;
         Term ws = null;
+        TermFactory tf = TermFactory.DEFAULT;
         
         if(ct instanceof JMLMethodContract){
             JMLMethodSpec spec = ((JMLMethodContract) ct).getSpec();
 //            pre = spec.getPre();      
             method = spec.getProgramMethod();
 //            ws = iCt.getWorkingSpace();
+        
+            Term mTerm = services.getTypeConverter().convertToLogicElement(
+                    mbsPos.execContext.getMemoryArea(), mbsPos.execContext);
+            Term mCons = tf.createAttributeTerm(services.getJavaInfo().getAttribute(
+                "consumed", "javax.realtime.MemoryArea"), mTerm);
+//              Term heapTerm = tf.createVariableTerm(
+//             (ProgramVariable) nss.programVariables().lookup(new Name(
+//                                ProblemInitializer.heapSpaceName)));
+            if(ws == null && ct instanceof JMLMethodContract){
+                ws = tf.createWorkingSpaceNonRigidTerm(method, iCt.getProgramVariableReplacer(),
+                        (Sort) nss.sorts().lookup(new Name("int")));
+                nss.functions().add(ws.op());
+            }
+            Function add = (Function) nss.functions().lookup(new Name("add"));
+            u = uf.parallel(u, uf.elementaryUpdate(mCons, 
+                    tf.createFunctionTerm(add, mCons, ws)));
         }else{
 //            pre = ((DLMethodContract) ct).getPre();
             method = ct.createDLMethodContract(null).getProgramMethod();
         }
-        
-        TermFactory tf = TermFactory.DEFAULT;
-        Term mTerm = tf.createVariableTerm((ProgramVariable) mbsPos.execContext.getMemoryArea());
-        Term mCons = tf.createAttributeTerm(services.getJavaInfo().getAttribute(
-                "consumed", "javax.realtime.MemoryArea"), mTerm);
-//        Term heapTerm = tf.createVariableTerm(
-//                (ProgramVariable) nss.programVariables().lookup(new Name(
-//                        ProblemInitializer.heapSpaceName)));
-        if(ws == null){
-            ws = tf.createWorkingSpaceNonRigidTerm(method, iCt.getProgramVariableReplacer(),
-                    (Sort) nss.sorts().lookup(new Name("int")));
-            nss.functions().add(ws.op());
-        }
-        Function add = (Function) nss.functions().lookup(new Name("add"));
-        u = uf.parallel(u, uf.elementaryUpdate(mCons, 
-                tf.createFunctionTerm(add, mCons, ws)));
-        
         final boolean openExceptionalBranch = iCt.getExceptionVariable() != null;                                                
         
         final ListOfGoal result = 

@@ -116,21 +116,42 @@ public class Test extends SuperTest{
 
     /*@ public normal_behavior
       @  requires true;
+      @//  working_space 2*\space(new Test())+\space(new TestRunnable(null, false))+
+      @  //       \space(new ScopedMemory(40));
       @  ensures true;
       @*/
     public void enterScope(){
-	TestRunnable t = new TestRunnable(new Test());
-	ScopedMemory sm = new ScopedMemory(40);
+	TestRunnable t = new TestRunnable(new Test(), false);
+	ScopedMemory sm = new ScopedMemory(48);
 	sm.enter(t);
     }
 
     /*@ public normal_behavior
+      @  requires sm1!=null && sm2!=null && sm1!=sm2 &&
+      @        sm1.memoryRemaining()>1000 && sm2.memoryRemaining()>1000 && 
+      @        sm1.parent==null && sm2.parent==null && 
+      @        outerScope(sm1.memoryArea, \currentMemoryArea) &&
+      @        outerScope(sm2.memoryArea, \currentMemoryArea);
+      @ //       sm1.memoryArea == \currentMemoryArea.memoryArea &&
+      @ //       sm2.memoryArea == \currentMemoryArea.memoryArea;
+      @ // working_space 2*\space(new Test())+\space(new TestRunnable(null, false))+
+      @   //    2*\space(new EnterScopeRunnable(null, null))+\space(new ScopedMemory(100));
+      @  ensures true;
+      @*/
+    public void testScopeCycle(ScopedMemory sm1, ScopedMemory sm2){
+	TestRunnable t = new TestRunnable(new Test(), false);
+	EnterScopeRunnable esr = new EnterScopeRunnable(sm2,t);
+	EnterScopeRunnable esr1 = new EnterScopeRunnable(sm1, esr);
+	sm2.enter(esr1);
+    }
+
+    /*@ public normal_behavior
       @  requires sm!=null && sm.memoryRemaining()>\space(new Test()) &&
-      @           outerScope(sm, \currentMemoryArea);
-      @  working_space 2*\space(new Test())+\space(new TestRunnable(null));
+      @           outerScope(sm, \currentMemoryArea) && sm!=\currentMemoryArea;
+      @  working_space \space(new Test())+\space(new TestRunnable(null, false));
       @*/
     public void executeRunnableInArea(ScopedMemory sm){
-	TestRunnable t = new TestRunnable(new Test());
+	TestRunnable t = new TestRunnable(new Test(), true);
 	sm.executeInArea(t);	
     }
 

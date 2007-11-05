@@ -13,7 +13,7 @@ public class ScopedMemory extends MemoryArea{
     private long id = counter++;
 
     /*@ public invariant referenceCount>=0 && (referenceCount>0 <==>
-      @      stack!=null);
+      @      stack!=null) && (referenceCount>0 <==> parent!=null);
       @*/
     private int referenceCount=0;
 
@@ -58,7 +58,8 @@ public class ScopedMemory extends MemoryArea{
 	   !<currentMemoryArea>.stack.push(this).equals(stack)){
 	    throw new ScopedCycleException();
 	    }*/
-	if(parent!=null && parent!=<currentMemoryArea>){
+	if(stack!=null && outerScopeM(this, <currentMemoryArea>) ||
+	   parent!=null && parent!=<currentMemoryArea>){
 	    throw new ScopedCycleException();
 	}
 	parent = <currentMemoryArea>;
@@ -85,7 +86,8 @@ public class ScopedMemory extends MemoryArea{
 	   !<currentMemoryArea>.stack.push(this).equals(stack)){
 	    throw new ScopedCycleException();
 	    }*/
-	if(parent!=null && parent!=<currentMemoryArea>){
+	if(stack!=null && outerScopeM(this, <currentMemoryArea>) ||
+	   parent!=null && parent!=<currentMemoryArea>){
 	    throw new ScopedCycleException();
 	}
 	parent = <currentMemoryArea>;
