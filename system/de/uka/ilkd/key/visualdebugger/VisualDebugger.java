@@ -8,10 +8,7 @@ import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.java.ArrayOfExpression;
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ArrayOfParameterDeclaration;
@@ -49,8 +46,6 @@ public class VisualDebugger {
     private static boolean debuggingMode = false;
 
     public static final String debugPackage = "visualdebugger";
-
-    static boolean keyBuggerMode;
 
     public static boolean quan_splitting = false;
 
@@ -204,22 +199,22 @@ public class VisualDebugger {
     public ListOfProgramVariable arrayOfExpression2ListOfProgVar(
             ArrayOfExpression aoe, int start) {
         ListOfProgramVariable lopv = SLListOfProgramVariable.EMPTY_LIST;
-        for (int i = start; i < aoe.size(); i++) {
-            lopv = lopv.append((ProgramVariable) aoe.getExpression(i));
+        for (int i = aoe.size() - 1; i >= start ; i--) {
+            lopv = lopv.prepend((ProgramVariable) aoe.getExpression(i));
         }
         return lopv;
     }
 
     private ListOfTerm collectResult(Sequent s) {
-        IteratorOfConstrainedFormula itc = s.antecedent().iterator();
+        final IteratorOfConstrainedFormula itAntec = s.antecedent().iterator();
         ListOfTerm result = SLListOfTerm.EMPTY_LIST;
-        while (itc.hasNext()) {
-            result = result.append(itc.next().formula());
+        while (itAntec.hasNext()) {
+            result = result.append(itAntec.next().formula());
         }
-        itc = s.succedent().iterator();
-        while (itc.hasNext()) {
+        final IteratorOfConstrainedFormula itSucc = s.succedent().iterator();
+        while (itSucc.hasNext()) {
             result = result.append(TermFactory.DEFAULT.createJunctorTerm(
-                    Op.NOT, itc.next().formula()));
+                    Op.NOT, itSucc.next().formula()));
         }
 
         return result;
@@ -261,27 +256,25 @@ public class VisualDebugger {
         JavaBlock jb = this.modalityTopLevel(pio);
         print("Extracting Symbolic Input Values-----------------------");
         ProgramVariable selfPV2 = null;
-        MethodBodyStatement mbs = (MethodBodyStatement) this
-                .getActStatement(modalityTopLevel(pio).program());
-        ReferencePrefix ref = mbs.getMethodReference().getReferencePrefix();
 
+        final MethodBodyStatement mbs = (MethodBodyStatement) 
+            getActStatement(modalityTopLevel(pio).program());
+        final ReferencePrefix ref = mbs.getMethodReference().getReferencePrefix();
+
+        final Services services = n.proof().getServices();
+        debuggingMethod = mbs.getProgramMethod(services);
+        
+        assert debuggingMethod != null : "Cannot determine method to debug.";
+
+        setStaticMethod(debuggingMethod.isStatic());
+        
         if (ref instanceof ProgramVariable) {
             setSelfPV((ProgramVariable) ref);
-            setStaticMethod(false);
             selfPV2 = (ProgramVariable) ref;
-
-            print("SelfPV " + ref);
-
         } else {
-
-            final KeYJavaType kjt = ((TypeRef) ref).getKeYJavaType();
-            setStaticMethod(true);
-            setType((ClassType) kjt.getJavaType());
-            print("Static Method of Type " + kjt.getJavaType());
-
+            setType((ClassType) mbs.getBodySource().getJavaType());
         }
 
-        debuggingMethod = mbs.getProgramMethod(mediator.getServices());
         // debuggingMethod.getVariableSpecification(index)
 
         ArrayOfExpression args = mbs.getArguments();
@@ -292,38 +285,29 @@ public class VisualDebugger {
             if (f.op() instanceof QuanUpdateOperator) {
                 final QuanUpdateOperator op = (QuanUpdateOperator) f.op();
                 for (int i = 0; i < op.locationCount(); i++) {
-                    if (op.location(f, i).op() instanceof ProgramVariable) {
-                        if (contains(args, (ProgramVariable) op.location(f, i)
-                                .op())
-                                || (selfPV2 != null && selfPV2.equals(op
-                                        .location(f, i).op()))) {
-                            map.put(op.value(f, i), op.location(f, i));
-                            map2.put(op.location(f, i), op.value(f, i));
+                    final Term location = op.location(f, i);
+                    if (location.op() instanceof ProgramVariable) {
+                        if (contains(args, (ProgramVariable) location.op())
+                                || (selfPV2 != null && selfPV2.equals(location.op()))) {
+                            map.put(op.value(f, i), location);
+                            map2.put(location, op.value(f, i));
                         }
                     }
                 }
-
             }
-
         }
 
         // set symb input values as list;
         this.symbolicInputValuesAsList = SLListOfTerm.EMPTY_LIST;
-        for (int i = 0; i < args.size(); i++) {
+        for (int i = args.size() - 1; i>=0 ; i--) {
             ProgramVariable next = (ProgramVariable) args.getExpression(i);
-            Term val = (Term) map2.get(TermFactory.DEFAULT
-                    .createVariableTerm(next));// TODO
-            this.symbolicInputValuesAsList = this.symbolicInputValuesAsList
-                    .append(val);
-
+            final Term val = (Term) 
+                map2.get(TermFactory.DEFAULT.createVariableTerm(next));// TODO
+            this.symbolicInputValuesAsList = 
+                this.symbolicInputValuesAsList.prepend(val);
         }
-
         setTerm2InputPV(map);
-        setInputPV2term(map2);
-        print("t2i " + map);
-        print("i2t " + map2);
-        print("Symbolic Input Values as list " + this.symbolicInputValuesAsList);
-
+        setInputPV2term(map2);        
     }
 
     public void extractPrecondition(Node node, PosInOccurrence pio) {
@@ -449,7 +433,7 @@ public class VisualDebugger {
                     .constrainedFormula().formula().op();
             Term f = pio.constrainedFormula().formula();
             for (int i = 0; i < op.locationCount(); i++) {
-                Term t = (op.location(f, i));
+                Term t = op.location(f, i);
                 if (t.op() instanceof AttributeOp /*
                                                      * && !((ProgramVariable)
                                                      * ((AttributeOp)
@@ -1032,8 +1016,10 @@ public class VisualDebugger {
 
         setProofStrategy(proof, true, false);
 
-        return collectResult(proof.openGoals().iterator().next().node()
-                .sequent());
+        final ListOfGoal openGoals = proof.openGoals();
+        assert openGoals.size() == 1;
+        
+        return collectResult(openGoals.head().sequent());
     }
 
     private void startThread(final Runnable r) {
