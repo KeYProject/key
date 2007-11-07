@@ -398,9 +398,7 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
     }
 
     static void buildNodeFigure(Figure contents, Node node, ObjectFigure of) {
-
-        contents
-                .add(of, new Rectangle(node.x, node.y, node.width, node.height));
+        contents.add(of, new Rectangle(node.x, node.y, node.width, node.height));
         new Dragger(of);
     }
 
@@ -674,6 +672,9 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
     static class Dragger extends MouseMotionListener.Stub implements
             MouseListener {
         public Dragger(IFigure figure) {
+            figure.removeMouseMotionListener(this);
+            figure.removeMouseListener(this);                
+            
             figure.addMouseMotionListener(this);
             figure.addMouseListener(this);
         }
