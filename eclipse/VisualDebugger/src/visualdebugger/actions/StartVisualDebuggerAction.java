@@ -491,7 +491,7 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 		s = newSource;
 		// s = astRoot.toString();
 
-		String fn = unit.getPath().toString();
+		String fn = unit.getPath().toOSString();
 		/** 
 		 * @author marcel 
 		 * 
