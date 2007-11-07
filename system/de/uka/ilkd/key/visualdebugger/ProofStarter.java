@@ -38,7 +38,7 @@ public class ProofStarter {
     public ProofStarter() {
         this.goalChooser = new DefaultGoalChooser();
         // for the moment to maintain old default
-        useDecisionProcedures = true;
+        useDecisionProcedures = false;
     }    
         
     /**

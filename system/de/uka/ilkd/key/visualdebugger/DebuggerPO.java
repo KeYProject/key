@@ -51,18 +51,11 @@ public class DebuggerPO implements ProofOblInput {
     private Term createConjunction(ListOfTerm list) {
         Term result = null;
         for (IteratorOfTerm it = list.iterator(); it.hasNext();) {
-            Term t = it.next();
-            if (result == null)
-                result = t;
-            else
-                result = TermFactory.DEFAULT.createJunctorTerm(Op.AND, result,
-                        t);
-
+            result = (result == null ? it.next() : 
+                TermFactory.DEFAULT.createJunctorTerm(Op.AND, result, it.next()));
         }
-        if (result == null)
-            result = TermFactory.DEFAULT.createJunctorTerm(Op.TRUE);
-        return result;
-
+        return result == null ? TermFactory.DEFAULT.createJunctorTerm(Op.TRUE) : 
+            result;
     }
 
     public String getJavaPath() throws ProofInputException {
@@ -245,9 +238,8 @@ public class DebuggerPO implements ProofOblInput {
     }
 
     public void setTerms(ListOfTerm terms) {
-        this.specFormula = this.createConjunction(terms);
         specFormula = TermFactory.DEFAULT
-                .createJunctorTerm(Op.NOT, specFormula);
+          .createJunctorTerm(Op.NOT, createConjunction(terms));
     }
 
     public void setUp(Sequent precondition, ITNode n) {
