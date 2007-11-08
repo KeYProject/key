@@ -22,18 +22,18 @@ public class Pretty {
 	public static void main(String[] args) {
 
 		Pretty pretty = new Pretty();
-		pretty.initMyArray(50);
-		pretty.complexDemo();
-		
+		int[] i = pretty.initMyArray(50);
+		System.out.println(pretty.simpleDemo2(pretty.randomValue(i)));
+
 	}
 
 	/**
 	 * Complex Demo.
 	 * 
 	 * This method creates a branched execution tree to show malformed
-	 * branchconditions, i.e. not readable for humans.
-	 * A randomly initialized integer array is used build up 
-	 *  
+	 * branchconditions, i.e. not readable for humans. A randomly initialized
+	 * integer array is used to build up a complex structure.
+	 * 
 	 * @return the int
 	 * 
 	 * required minimal jml spec to make the VD work
@@ -42,32 +42,91 @@ public class Pretty {
 	public int complexDemo() {
 
 		int result = 0;
-		if (max(myArray) < 50) {
+
+		if (max(myArray) < 20) {
+			result = 10;
+		} else {
+
 			if (max(myArray) < 30) {
-				result = 30;
+				result = 20;
 			} else {
-				if (max(myArray) < 20) {
-					result = 20;
+
+				if (max(myArray) < 40) {
+					result = 30;
 				} else {
-					if (max(myArray) < 10)
-						result = 10;
+
+					if (max(myArray) < 50)
+						result = 40;
 
 				}
 			}
+		}
+
+		if (max(myArray) > 90) {
+			result = 80;
 		} else {
-		if (max(myArray) > 50) {
-			if (max(myArray) > 60) {
-				result = 60;
+			if (max(myArray) > 80) {
+				result = 70;
 			} else {
 				if (max(myArray) > 70) {
-					result = 70;
+					result = 60;
 				} else {
-					if (max(myArray) > 80)
-						result = 80;
+					if (max(myArray) > 60)
+						result = 50;
+				}
+
+			}
+		}
+		return result;
+	}
+	/**
+	 * Simple Demo 2.
+	 * 
+	 * More or less the same as simpleDemo() with a random
+	 * T 
+	 * @return the int
+	 * 
+	 * required minimal jml spec to make the VD work
+	 */
+	/*@ public normal_behavior requires true; ensures true; @*/
+	public int simpleDemo2(int j) {
+
+		int result = 0;
+
+		if (j < 20) {
+			result = 10;
+		} else {
+
+			if (j < 30) {
+				result = 20;
+			} else {
+
+				if (j < 40) {
+					result = 30;
+				} else {
+
+					if (j < 50)
+						result = 40;
 
 				}
 			}
-		} }
+		}
+
+		if (j > 90) {
+			result = 80;
+		} else {
+			if (j > 80) {
+				result = 70;
+			} else {
+				if (j > 70) {
+					result = 60;
+				} else {
+					if (j > 60)
+						result = 50;
+				}
+
+			}
+		}
 		return result;
 	}
 
@@ -87,33 +146,43 @@ public class Pretty {
 	/*@ public normal_behavior requires true; ensures true; @*/
 	public int simpleDemo(int i) {
 
-		if (i < 50) {
+		int result = 0;
+
+		if (i < 20) {
+			result = 10;
+		} else {
+
 			if (i < 30) {
-				return 30;
+				result = 20;
 			} else {
-				if (i < 20) {
-					return 20;
+
+				if (i < 40) {
+					result = 30;
 				} else {
-					if (i < 10)
-						return 10;
+
+					if (i < 50)
+						result = 40;
 
 				}
 			}
 		}
-		if (i > 50) {
-			if (i > 60) {
-				return 60;
+
+		if (i > 90) {
+			result = 80;
+		} else {
+			if (i > 80) {
+				result = 70;
 			} else {
 				if (i > 70) {
-					return 70;
+					result = 60;
 				} else {
-					if (i > 80)
-						return 80;
-
+					if (i > 60)
+						result = 50;
 				}
+
 			}
 		}
-		return i;
+		return result;
 	}
 
 	// some helper methods
@@ -132,7 +201,6 @@ public class Pretty {
 		for (int i = 0; i < 10; i++) {
 			myArray[i] = nextValue.nextInt(max);
 		}
-
 		return myArray;
 	}
 
@@ -147,6 +215,7 @@ public class Pretty {
 	 * @return the int
 	 * 
 	 */
+	/*@ public normal_behavior ensures true; @*/
 	public int max(int[] values) {
 
 		int max = values[0];
@@ -158,5 +227,21 @@ public class Pretty {
 			}
 		}
 		return max;
+	}
+	/**
+	 * randomValue.
+	 * 
+	 * Returns a random value out of a given array.
+	 * 
+	 * @param values
+	 *            the array
+	 * 
+	 * @return the int
+	 * 
+	 */
+	public int randomValue(int[] values) {
+
+		Random position = new Random();
+		return values[position.nextInt(values.length-1)];
 	}
 }
