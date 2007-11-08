@@ -52,4 +52,9 @@ public class NonRigidFunction extends Function implements NonRigid {
     public boolean isRigid (Term term) {
 	return false;
     }
+    
+    
+    public String proofToString() {
+        return "\\nonRigid " + super.proofToString(); 
+    }
 }

@@ -12,9 +12,12 @@ package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.SingleProof;
@@ -22,6 +25,7 @@ import de.uka.ilkd.key.proof.mgt.*;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.soundness.POBuilder;
 import de.uka.ilkd.key.rule.soundness.POSelectionDialog;
+import de.uka.ilkd.key.rule.soundness.SVSkolemFunction;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 public class TacletSoundnessPO extends KeYUserProblemFile 
@@ -108,7 +112,7 @@ implements ProofOblInput{
             singleProofs[i] = ProofAggregate.createProofAggregate
             	(new Proof(name,
                     pob.getPOTerm(),
-                    "",
+                    createProofHeader(),
                     initConfig.createTacletIndex(),
                     initConfig.createBuiltInRuleIndex(),
                     initConfig.getServices()),
@@ -122,11 +126,11 @@ implements ProofOblInput{
         for (int i=0; i<app.length; i++) {
             LemmaSpec lemmaSpec = new LemmaSpec(app[i]);            
             env.addContract(lemmaSpec);
-            env.registerProof(this, proof);
             env.registerRule(app[i], 
                     new RuleJustificationBySpec(lemmaSpec));
             env.addToAllProofs(app[i], file);
         }
+        env.registerProof(this, proof);
     }
     
     
@@ -198,5 +202,33 @@ implements ProofOblInput{
         }
         return found;
     }
-            
+    
+    
+    /**
+     * Creates declarations necessary to save/load proof in textual form.
+     */
+    private String createProofHeader() throws ProofInputException {
+        String result = "";
+        
+        //includes of taclet file must be copied        
+        Iterator it = super.readIncludes().getIncludes().iterator();
+        while(it.hasNext()) {            
+            String fileName = (String) it.next();
+            result += "\\include \"" + fileName + "\";\n";
+        }
+        
+        //created SVSkolemFunctions must be declared 
+        result += "\n\\functions {\n";
+        IteratorOfNamed it2 
+            = initConfig.namespaces().functions().allElements().iterator();
+        while(it2.hasNext()) {
+            Function f = (Function) it2.next();
+            if(f instanceof SVSkolemFunction) {
+                result += f.proofToString();
+            }
+        }
+        result += "}\n\n";
+                
+        return result;
+    }
 }
