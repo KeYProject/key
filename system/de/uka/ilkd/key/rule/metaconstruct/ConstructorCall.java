@@ -21,12 +21,13 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.expression.operator.New;
+import de.uka.ilkd.key.java.recoderext.AreaAllocationMethodBuilder;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -106,15 +107,22 @@ public class ConstructorCall extends ProgramMetaConstruct {
     
 	final MethodBodyStatement mbs = new MethodBodyStatement(method, newObject, null, 
                new ArrayOfExpression(argumentVariables)); 
-    
-	//   the assignment statements + the method body statement
-	final Statement[] stmnts = new Statement[evaluatedArgs.size() + 1];
-    
+	
+        //   the assignment statements + the method body statement + <allocateArea> for memory areas  
+        Statement[] stmnts;
+	if(classType == services.getJavaInfo().getKeYJavaType("javax.realtime.PhysicalMemoryArea")){
+	    stmnts = new Statement[evaluatedArgs.size() + 2];
+	    stmnts[stmnts.length-2] = new MethodReference(new ArrayOfExpression(argumentVariables[0]),
+	            new ProgramElementName(AreaAllocationMethodBuilder.IMPLICIT_AREA_ALLOCATE), 
+	            constructorReference.getTypeReference());
+	}else{
+            stmnts = new Statement[evaluatedArgs.size() + 1];	    
+	}
+	stmnts[stmnts.length-1] = mbs; 
+	
 	for (int i = 0, sz=evaluatedArgs.size(); i<sz; i++) {
 	    stmnts[i] = (Statement)evaluatedArgs.get(i); 
 	}
-	
-	stmnts[stmnts.length-1] = mbs;
     
 	return new StatementBlock(stmnts);
     	

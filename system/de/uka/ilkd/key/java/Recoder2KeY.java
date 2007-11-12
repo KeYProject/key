@@ -2722,6 +2722,7 @@ public class Recoder2KeY implements JavaReader{
 	    new RecoderModelTransformer[] { 
 		new ImplicitFieldAdder(servConf, cUnits),
                 new InstanceAllocationMethodBuilder(servConf, cUnits),
+                new AreaAllocationMethodBuilder(servConf, cUnits),             
 		new ConstructorNormalformBuilder(servConf, cUnits),
 		new ClassPreparationMethodBuilder(servConf, cUnits),
 		new ClassInitializeMethodBuilder(servConf, cUnits),

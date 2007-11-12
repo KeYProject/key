@@ -15,19 +15,15 @@ import java.util.Iterator;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.*;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
-import de.uka.ilkd.key.java.expression.operator.Instanceof;
-import de.uka.ilkd.key.java.expression.operator.Negative;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.expression.operator.NewArray;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.java.recoderext.InstanceAllocationMethodBuilder;
-import de.uka.ilkd.key.java.recoderext.JVMIsTransientMethodBuilder;
+import de.uka.ilkd.key.java.expression.operator.*;
+import de.uka.ilkd.key.java.recoderext.*;
 import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.soundness.ProgramSVProxy;
@@ -334,6 +330,10 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     public static final ProgramSVSort ALLOCATE
         = new SpecificMethodNameSort(new ProgramElementName
                 (InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE));
+    
+    public static final ProgramSVSort ALLOCATEAREA
+    = new SpecificMethodNameSort(new ProgramElementName
+            (AreaAllocationMethodBuilder.IMPLICIT_AREA_ALLOCATE));
     
     public static final ProgramSVSort SEP //TODO
         = new SpecificMethodNameSort(new ProgramElementName("sep"));

@@ -1635,9 +1635,9 @@ workingspaceclause[JMLMethodSpec s]
             		"consumed", "javax.realtime.MemoryArea"), imTerm);
             	currentSpec.getProgramVariableNS().add(
                     (LocationVariable) getOld(imCons).op());
-//                s.addAssignable(
-//                    new BasicLocationDescriptor(tf.createJunctorTerm(Op.TRUE),
-//                    heapTerm));
+                s.addAssignable(
+                    new BasicLocationDescriptor(tf.createJunctorTerm(Op.TRUE),
+                    heapTerm));
             } 
             (IF dummy = predicate)?
         )

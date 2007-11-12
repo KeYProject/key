@@ -109,6 +109,7 @@ javax/realtime/LTMemory.java
 javax/realtime/VTMemory.java
 javax/realtime/ThrowBoundaryError.java
 javax/realtime/MemoryStack.java
+javax/realtime/PhysicalMemoryArea.java
 +org/jmlspecs/models/JMLType.java
 +org/jmlspecs/models/JMLCollection.java
 +org/jmlspecs/models/JMLIterator.java

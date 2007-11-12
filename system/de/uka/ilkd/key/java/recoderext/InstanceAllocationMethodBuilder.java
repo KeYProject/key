@@ -25,7 +25,7 @@ public class InstanceAllocationMethodBuilder extends RecoderModelTransformer {
     }
     
     /**
-     * creates a method declaration whith no implementation. The methods intention is
+     * creates a method declaration with no implementation. The methods intention is
      * to allocate a new object of the type it is declared in and to return it.
      * The functionality will be described using taclets
      */
