@@ -924,6 +924,7 @@ de/uka/ilkd/key/proof/TacletIndex.java
 de/uka/ilkd/key/proof/TacletInstantiationsTableModel.java
 de/uka/ilkd/key/proof/TermSVReplacer.java
 de/uka/ilkd/key/proof/TermTacletAppIndex.java
+de/uka/ilkd/key/proof/TermTacletAppIndexCache.java
 de/uka/ilkd/key/proof/TermTacletAppIndexCacheSet.java
 de/uka/ilkd/key/proof/TestGoal.java
 de/uka/ilkd/key/proof/TestProofTree.java
@@ -1212,6 +1213,7 @@ de/uka/ilkd/key/rule/conditions/TestQuery.java
 de/uka/ilkd/key/rule/conditions/TypeComparisionCondition.java
 de/uka/ilkd/key/rule/conditions/TypeCondition.java
 de/uka/ilkd/key/rule/conditions/TypeResolver.java
+de/uka/ilkd/key/rule/encapsulation/ConstructableKeYJavaTypeCollector.java
 de/uka/ilkd/key/rule/encapsulation/FreeProgramVariableDetector.java
 de/uka/ilkd/key/rule/encapsulation/NullScheme.java
 de/uka/ilkd/key/rule/encapsulation/PeerScheme.java
@@ -1317,6 +1319,7 @@ de/uka/ilkd/key/rule/metaconstruct/MetaTransactionCounter.java
 de/uka/ilkd/key/rule/metaconstruct/MetaTransient.java
 de/uka/ilkd/key/rule/metaconstruct/MethodCall.java
 de/uka/ilkd/key/rule/metaconstruct/MethodCallContract.java
+de/uka/ilkd/key/rule/metaconstruct/MethodCallToUpdate.java
 de/uka/ilkd/key/rule/metaconstruct/MultipleVarDecl.java
 de/uka/ilkd/key/rule/metaconstruct/PostWork.java
 de/uka/ilkd/key/rule/metaconstruct/ProgramMetaConstruct.java
