@@ -33,9 +33,9 @@ public class AreaAllocationMethodBuilder extends RecoderModelTransformer {
         pdal.add(new ParameterDeclaration(new TypeReference(new Identifier("long")),
                 new Identifier("size")));
         MethodDeclaration md =  new MethodDeclaration
-            (modifiers, 
-             new TypeReference
-             ((Identifier)type.getIdentifier().deepClone()), 
+            (modifiers, null,
+//             new TypeReference
+//             ((Identifier)type.getIdentifier().deepClone()), 
              new ImplicitIdentifier(IMPLICIT_AREA_ALLOCATE), 
              pdal, 
              null, null);

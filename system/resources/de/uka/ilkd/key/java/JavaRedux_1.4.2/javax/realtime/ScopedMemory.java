@@ -1,6 +1,6 @@
 package javax.realtime;
 
-public class ScopedMemory extends MemoryArea{
+public abstract class ScopedMemory extends MemoryArea{
 
     private Object portal;
 

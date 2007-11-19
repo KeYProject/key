@@ -117,12 +117,12 @@ public class Test extends SuperTest{
     /*@ public normal_behavior
       @  requires true;
       @//  working_space 2*\space(new Test())+\space(new TestRunnable(null, false))+
-      @  //       \space(new ScopedMemory(40));
+      @  //       \space(new LTMemory(48));
       @  ensures true;
       @*/
     public void enterScope(){
 	TestRunnable t = new TestRunnable(new Test(), false);
-	ScopedMemory sm = new ScopedMemory(48);
+	ScopedMemory sm = new LTMemory(48);
 	sm.enter(t);
     }
 
