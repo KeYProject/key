@@ -104,16 +104,6 @@ public void createTestCase(){
 }
          
      
-     
-
-    
-    
-    
-    
-    
-    
-    
-    
     private IProject createTestCaseProject(String testFilePath) throws URISyntaxException, CoreException{
         String projectName = "TestCases";
         VisualDebugger.print("Creating new Project in path: "+testFilePath);

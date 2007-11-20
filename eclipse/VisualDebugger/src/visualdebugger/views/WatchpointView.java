@@ -32,11 +32,10 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
 import de.uka.ilkd.key.visualdebugger.*;
 import de.uka.ilkd.key.visualdebugger.executiontree.*;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class BreakpointView.
+ * The Class WatchpointView.
  */
-public class BreakpointView extends ViewPart {
+public class WatchpointView extends ViewPart {
 
     /** The viewer. */
     private TableViewer viewer;
@@ -153,7 +152,7 @@ public class BreakpointView extends ViewPart {
     /**
      * Instantiates a new breakpoint view.
      */
-    public BreakpointView() {
+    public WatchpointView() {
         bpManager = VisualDebugger.getVisualDebugger().getBpManager();
     }
 
@@ -175,17 +174,17 @@ public class BreakpointView extends ViewPart {
         TableColumn column;
 
         column = new TableColumn(table, SWT.NONE, 0);
-        column.setWidth(100);
-        column.setText("File");
+        column.setWidth(200);
+        column.setText("Watch Expression");
         column = new TableColumn(table, SWT.NONE, 1);
         column.setWidth(100);
-        column.setText("Method");
+        column.setText("File");
         column = new TableColumn(table, SWT.NONE, 2);
+        column.setWidth(100);
+        column.setText("Method");
+        column = new TableColumn(table, SWT.NONE, 3);
         column.setWidth(70);
         column.setText("Statement");
-        column = new TableColumn(table, SWT.NONE, 3);
-        column.setWidth(100);
-        column.setText("Breakpoint Condition");
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
         viewer.setContentProvider(new BpContentProvider());
@@ -276,7 +275,7 @@ public class BreakpointView extends ViewPart {
         menuMgr.setRemoveAllWhenShown(true);
         menuMgr.addMenuListener(new IMenuListener() {
             public void menuAboutToShow(IMenuManager manager) {
-                BreakpointView.this.fillContextMenu(manager);
+            	WatchpointView.this.fillContextMenu(manager);
             }
         });
         Menu menu = menuMgr.createContextMenu(viewer.getControl());

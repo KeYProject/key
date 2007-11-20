@@ -32,10 +32,12 @@ import de.uka.ilkd.key.collection.SLListOfString;
 import de.uka.ilkd.key.gui.JMLEclipseAdapter;
 import de.uka.ilkd.key.gui.JMLPOAndSpecProvider;
 import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.jml.JMLMethodSpec;
 import de.uka.ilkd.key.jml.JMLSpec;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
+import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 
@@ -815,3 +817,53 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 				assignable);
 	}
 }
+
+/**
+	* The Nested Class ETProverTaskListener.
+	*
+	* Implements the ProverTaskListener Interface. Serves as wrapper for the
+	* ExcecutionTreeView's progressmonitor. The Instance of
+	* ETProverTaskListener is registered to the KeYMediator.
+	*/
+	 class ETProverTaskListener implements ProverTaskListener {
+	
+	/** The pm. */
+	private ProgressMonitor pm = null;
+	
+	/**
+	* Instantiates a new PM.
+	*
+	* @param pm the ProgressMonitor
+	*/
+	public ETProverTaskListener(ProgressMonitor pm) {
+	this.pm = pm;
+	}
+	//reset progressbar when task is finished
+	/* (non-Javadoc)
+	* @see de.uka.ilkd.key.gui.ProverTaskListener#taskFinished()
+	*/
+	public void taskFinished() {
+	System.out.println("task finished");
+	
+	}
+	
+	/* (non-Javadoc)
+	* @see de.uka.ilkd.key.gui.ProverTaskListener#taskProgress(int)
+	*/
+	public void taskProgress(int position) {
+	
+	System.out.println("taskProgress -position:" + position);
+	pm.setProgress(position);
+	
+	}
+	
+   /* (non-Javadoc)
+	* @see de.uka.ilkd.key.gui.ProverTaskListener#taskStarted(java.lang.String, int)
+	*/
+	public void taskStarted(String message, int size) {
+	System.out.println("taskStarted -size:" + size);
+	pm.setMaximum(size);
+	
+	}
+	
+	}

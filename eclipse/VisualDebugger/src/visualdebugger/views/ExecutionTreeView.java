@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-
 import de.uka.ilkd.key.util.ProgressMonitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.draw2d.*;
@@ -53,8 +52,6 @@ import de.uka.ilkd.key.visualdebugger.executiontree.*;
 
 // TODO: Auto-generated Javadoc
 
-
-
 /**
  * This code was edited or generated using CloudGarden's Jigloo
  * SWT/Swing GUI Builder, which is free for non-commercial
@@ -71,7 +68,7 @@ import de.uka.ilkd.key.visualdebugger.executiontree.*;
  * The Class ExecutionTreeView.
  */
 public class ExecutionTreeView extends ViewPart implements DebuggerListener {
-	
+
 	/** The Constant debug. */
 	private static final boolean debug = false;
 
@@ -125,7 +122,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
 	/** The shell. */
 	Shell shell;
-	
+
 	/** The progress bar1. */
 	private ProgressBar progressBar1;
 
@@ -162,7 +159,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Builds the raw tree.
 	 * 
-	 * @param n the n
+	 * @param n
+	 *            the n
 	 * 
 	 * @return the tree branch
 	 */
@@ -187,8 +185,10 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Builds the tree branch.
 	 * 
-	 * @param n the n
-	 * @param parent the parent
+	 * @param n
+	 *            the ETNode
+	 * @param parent
+	 *            the parent
 	 * 
 	 * @return the tree branch
 	 */
@@ -211,10 +211,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 				for (int i = 0; i < children.length; i++) {
 					TreeBranch subTree = buildTreeBranch(children[i], branch);
 					branch.addBranch(subTree, children[i].getBC() + "");
-					// subTree.getNode()
-
-					// subTree.
-
+					
 					final Connection c = createConnection(statementNode,
 							subTree.getNode(), children[i].getBC() != null ? vd
 									.prettyPrint(children[i].getSimplifiedBc())
@@ -245,10 +242,14 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Creates the connection.
 	 * 
-	 * @param figFrom the fig from
-	 * @param figTo the fig to
-	 * @param text the text
-	 * @param withLabel the with label
+	 * @param figFrom
+	 *            the fig from
+	 * @param figTo
+	 *            the fig to
+	 * @param text
+	 *            the text
+	 * @param withLabel
+	 *            the with label
 	 * 
 	 * @return the connection
 	 */
@@ -290,7 +291,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Creates the node.
 	 * 
-	 * @param etNode the et node
+	 * @param etNode
+	 *            the et node
 	 * 
 	 * @return the figure
 	 */
@@ -382,8 +384,10 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Creates the node.
 	 * 
-	 * @param title the title
-	 * @param listener the listener
+	 * @param title
+	 *            the title
+	 * @param listener
+	 *            the listener
 	 * 
 	 * @return the source element figure
 	 */
@@ -410,7 +414,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	 * This is a callback that will allow us to create the viewer and initialize
 	 * it.
 	 * 
-	 * @param parent the parent
+	 * @param parent
+	 *            the parent
 	 */
 	public void createPartControl(Composite parent) {
 		shell = parent.getShell();
@@ -456,7 +461,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	 */
 	private void createRighClickContextMenu() {
 		classMenu = new Menu(shell, SWT.POP_UP);
-		//create run menu item
+		// create run menu item
 		MenuItem item = new MenuItem(classMenu, SWT.PUSH);
 		item.setText("Run");
 		item.addSelectionListener(new SelectionListener() {
@@ -513,6 +518,56 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 						.visualize(((SourceElementFigure) ExecutionTreeView.this.selected)
 								.getETNode().getITNodesArray()[0]);
 
+			}
+
+		});
+		// TODO
+		// collapse all other paths
+		item = new MenuItem(classMenu, SWT.PUSH);
+		item.setText("Collapse all others");
+		item.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent event) {
+			}
+
+			public void widgetSelected(SelectionEvent event) {
+				// TODO
+				System.out.println("collapsing...");
+				//get the root
+				// the selected node
+				ETNode leaf = ((LeafNode) ExecutionTreeView.this.selected)
+				.getETLeafNode();
+				// go back to root
+				
+				ETNode parent = leaf.getParent();
+				while(parent!=null){
+					parent = parent.getParent();
+					
+				}
+				buildTreeBranch(leaf, (TreeBranch)root.getNode());
+				refresh();
+				if (ExecutionTreeView.this.selected.getParent()!= null) {
+
+				} else {
+					MessageDialog.openInformation(PlatformUI.getWorkbench()
+							.getActiveWorkbenchWindow().getShell(),
+							"Collapse Tree", "Failed to collapse tree! Please select a leaf node.");
+				}
+
+			}
+
+		});
+		// show all other paths
+		item = new MenuItem(classMenu, SWT.PUSH);
+		item.setText("Show all others");
+		item.setEnabled(false);
+		item.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent event) {
+			}
+
+			public void widgetSelected(SelectionEvent event) {
+				// TODO
+				System.out.println("Show complete Tree");
+				
 			}
 
 		});
@@ -576,7 +631,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Double click.
 	 * 
-	 * @param node the node
+	 * @param node
+	 *            the node
 	 */
 	void doubleClick(SourceElementFigure node) {
 		ICompilationUnit cu = node.getUnit();
@@ -602,7 +658,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Fill local tool bar.
 	 * 
-	 * @param manager the manager
+	 * @param manager
+	 *            the manager
 	 */
 	private void fillLocalToolBar(IToolBarManager manager) {
 		// manager.add(sletAction);
@@ -619,8 +676,10 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Find branch.
 	 * 
-	 * @param b the b
-	 * @param etn the etn
+	 * @param b
+	 *            the b
+	 * @param etn
+	 *            the etn
 	 * 
 	 * @return the tree branch
 	 */
@@ -645,7 +704,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Gets the subtree goals for et node.
 	 * 
-	 * @param etNode the et node
+	 * @param etNode
+	 *            the et node
 	 * 
 	 * @return the subtree goals for et node
 	 */
@@ -675,28 +735,29 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 		localShell.setLayout(new GridLayout());
 
 		Group progressGroup = new Group(localShell, 0);
-		RowLayout progressGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+		RowLayout progressGroupLayout = new RowLayout(
+				org.eclipse.swt.SWT.HORIZONTAL);
 		progressGroup.setLayout(progressGroupLayout);
 		GridData progressGroupLData = new GridData();
 		progressGroupLData.widthHint = 237;
 		progressGroupLData.heightHint = 23;
 		progressGroup.setLayoutData(progressGroupLData);
 		progressGroup.setText("Progress");
-		
-			RowData progressBar1LData = new RowData();
-			progressBar1LData.width = 227;
-			progressBar1LData.height = 12;
-			progressBar1 = new ProgressBar(progressGroup, SWT.NONE);
-			progressBar1.setLayoutData(progressBar1LData);
-			progressBar1.setMinimum(0);
-						
-			// Instaniate a new ProgressMonitor to provide feedback over long running task
-			PM pm = new PM(progressBar1);
-			// Register Progressmonitor to the VisualDebugger
-		
-			vd.addPMtoProofStarter(pm);
-			
-			
+
+		RowData progressBar1LData = new RowData();
+		progressBar1LData.width = 227;
+		progressBar1LData.height = 12;
+		progressBar1 = new ProgressBar(progressGroup, SWT.NONE);
+		progressBar1.setLayoutData(progressBar1LData);
+		progressBar1.setMinimum(0);
+
+		// Instaniate a new ProgressMonitor to provide feedback over long
+		// running task
+		PM pm = new PM(progressBar1);
+		// Register Progressmonitor to the VisualDebugger
+
+		vd.addPMtoProofStarter(pm);
+
 		Group rootGroup = new Group(localShell, 0);
 		rootGroup.setText("Properties");
 		FontData data = rootGroup.getFont().getFontData()[0];
@@ -760,11 +821,11 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 			FontData data2 = rootGroup2.getFont().getFontData()[0];
 			data2.setStyle(SWT.BOLD);
 			rootGroup2.setLayout(new GridLayout());
-			
+
 			final Button hideInfButton = new Button(rootGroup2, SWT.CHECK);
 			hideInfButton.setText("Hide Infeasible Paths");
 			hideInfButton.setSelection(hideInfeasible);
-			
+
 			hideInfButton.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent e) {
 					hideInfeasible = hideInfButton.getSelection();
@@ -831,7 +892,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 		bcGroupLData.grabExcessVerticalSpace = true;
 		bcGroup.setLayoutData(bcGroupLData);
 		bcGroup.setLayout(new GridLayout());
-		
+
 		// list to display the branch conditions
 		bcListControl = new List(bcGroup, SWT.READ_ONLY | SWT.MULTI
 				| SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
@@ -841,23 +902,23 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 		bcListControlLData.grabExcessHorizontalSpace = true;
 		bcListControlLData.grabExcessVerticalSpace = true;
 		bcListControl.setLayoutData(bcListControlLData);
-		
-		//handle clicks in the list
+
+		// handle clicks in the list
 		bcListControl.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				
+
 				bcText.setText(bcListControl.getSelection()[0]);
 				refresh();
 			}
 		});
-		
-		bcText = new Text(bcGroup, SWT.MULTI );
-			
-			GridData bcTextLData = new GridData();
-			bcTextLData.widthHint = 203;
-		//	bcTextLData.heightHint = 41;
-			bcText.setLayoutData(bcTextLData);
-		
+
+		bcText = new Text(bcGroup, SWT.MULTI);
+
+		GridData bcTextLData = new GridData();
+		bcTextLData.widthHint = 203;
+		// bcTextLData.heightHint = 41;
+		bcText.setLayoutData(bcTextLData);
+
 	}
 
 	/**
@@ -968,10 +1029,9 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	 * Draws a new Execution Tree after 5 Steps
 	 */
 	public synchronized void refresh() {
-		
-		
-		//progressGroup.setText("Done");
-		
+
+		// progressGroup.setText("Done");
+
 		try {
 			if (currentRoot == null) {
 				return;
@@ -985,7 +1045,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 				((Figure) contents).removeAll();
 				this.root.removeLabels();
 			}
-
+            
 			if (ExecutionTree.getETNode() == null) {
 				return;
 			}
@@ -1060,7 +1120,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Sets the branch condition text.
 	 * 
-	 * @param etn the new branch condition text
+	 * @param etn
+	 *            the new branch condition text
 	 */
 	private void setBranchConditionText(ETNode etn) {
 
@@ -1073,7 +1134,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
 			for (int i = 0; i < bc.length; i++) {
 				termsString[i] = (vd.prettyPrint(bc[i]));
-				
+
 			}
 
 			bcListControl.setItems(termsString);
@@ -1092,7 +1153,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Sets the leaf node selected.
 	 * 
-	 * @param node the new leaf node selected
+	 * @param node
+	 *            the new leaf node selected
 	 */
 	private void setLeafNodeSelected(LeafNode node) {
 		this.removeSelection();
@@ -1156,7 +1218,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Sets the selected.
 	 * 
-	 * @param node the new selected
+	 * @param node
+	 *            the new selected
 	 */
 	void setSelected(MethodReturnFigure node) {
 		this.removeSelection();
@@ -1177,7 +1240,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Sets the selected.
 	 * 
-	 * @param node the new selected
+	 * @param node
+	 *            the new selected
 	 */
 	void setSelected(SourceElementFigure node) {
 		this.removeSelection();
@@ -1206,7 +1270,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * To list.
 	 * 
-	 * @param it the it
+	 * @param it
+	 *            the it
 	 * 
 	 * @return the list of node
 	 */
@@ -1220,7 +1285,9 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.uka.ilkd.key.visualdebugger.DebuggerListener#update(de.uka.ilkd.key.visualdebugger.DebuggerEvent)
 	 */
 	public synchronized void update(DebuggerEvent event) {
@@ -1279,13 +1346,13 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	public ProgressBar getProgressBar1() {
 		return progressBar1;
 	}
-	
+
 	/**
 	 * The Nested Class PM.
 	 * 
-	 * Implements the ProgressMonitor Interface to provide feedback
-	 * over the creation of the ET in the ExecutionTreeView, since
-	 * this task can take some time.
+	 * Implements the ProgressMonitor Interface to provide feedback over the
+	 * creation of the ET in the ExecutionTreeView, since this task can take
+	 * some time.
 	 */
 	static class PM implements ProgressMonitor {
 
@@ -1295,40 +1362,42 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 		/**
 		 * Instantiates a new PM.
 		 * 
-		 * @param pb the pb
+		 * @param pb
+		 *            the pb
 		 */
 		public PM(ProgressBar pb) {
 			this.pb = pb;
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see de.uka.ilkd.key.util.ProgressMonitor#setProgress(int)
 		 */
 		public void setProgress(final int progress) {
-			
-			Display.getDefault().syncExec(
-					new Runnable() {
-						public void run() {
-							System.out.println(progress+":" + pb.getMaximum());
-							pb.setSelection(progress);
-						}
-					}
-			);
+
+			Display.getDefault().syncExec(new Runnable() {
+				public void run() {
+					System.out.println(progress + ":" + pb.getMaximum());
+					pb.setSelection(progress);
+				}
+			});
 		}
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see de.uka.ilkd.key.util.ProgressMonitor#setMaximum(int)
 		 */
 		public void setMaximum(final int maximum) {
-			Display.getDefault().syncExec(
-					new Runnable() {
-						public void run() {
-							pb.setMaximum(maximum);
-						}
-					}
-			);
-			
+			Display.getDefault().syncExec(new Runnable() {
+				public void run() {
+					pb.setMaximum(maximum);
+				}
+			});
+
 		}
 
-	    }
+	}
 
 }

@@ -52,10 +52,6 @@ public class MethodInvocationFigure extends Figure {
     private Label label = new Label();
     
    
-
-    
-
-
     public MethodInvocationFigure(ETMethodInvocationNode etNode){
         super();
         setBorder(BORDER);
@@ -79,15 +75,10 @@ public class MethodInvocationFigure extends Figure {
         
         st += ")";
         
-        
-        
         label.setText(st);
         miNode = etNode;
         String toolTip = "";
-        
-
-
-        
+       
         toolTip += VisualDebugger.getMethodString(etNode.getMethod().getMethodDeclaration())+"\n";
         toolTip += "@"+etNode.getMethod().getContainerType().getSort()+"\n";
         if (etNode.getValues().size()>0){
@@ -101,10 +92,7 @@ public class MethodInvocationFigure extends Figure {
         }
         this.setToolTip(new Label(toolTip)); 
     }
-    
-    
  
-
     /**
      * @see org.eclipse.draw2d.Figure#paintFigure(org.eclipse.draw2d.Graphics)
      */
@@ -116,16 +104,13 @@ public class MethodInvocationFigure extends Figure {
         } else {        
                 g.setForegroundColor(ColorConstants.white);
                 g.setBackgroundColor(ColorConstants.white);
-                
-        
+         
 //            g.setForegroundColor(gradient1);
 //            g.setBackgroundColor(gradient2);
          
         }
           g.fillGradient(getBounds().getResized(-1, -1), true);
-
-                
-                
+             
     }
 
     public void setSelected(boolean value) {
@@ -163,5 +148,4 @@ public class MethodInvocationFigure extends Figure {
   return null;
     }
     
-  
 }
