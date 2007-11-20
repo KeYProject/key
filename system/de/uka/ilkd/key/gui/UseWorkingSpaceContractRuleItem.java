@@ -12,7 +12,7 @@ import javax.swing.JMenuItem;
 import de.uka.ilkd.key.jml.JMLMethodSpec;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.op.WorkingSpaceOp;
+import de.uka.ilkd.key.logic.op.WorkingSpaceRigidOp;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.UseWorkingSpaceContractRule;

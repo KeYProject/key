@@ -34,7 +34,7 @@ import de.uka.ilkd.key.logic.op.QuanUpdateOperator;
 import de.uka.ilkd.key.logic.op.ShadowArrayOp;
 import de.uka.ilkd.key.logic.op.ShadowAttributeOp;
 import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
-import de.uka.ilkd.key.logic.op.WorkingSpaceOp;
+import de.uka.ilkd.key.logic.op.WorkingSpaceRigidOp;
 import de.uka.ilkd.key.util.Service;
 
 
@@ -214,7 +214,7 @@ public class NotationInfo {
         tbl.put(ProgramConstant.class, new Notation.VariableNotation());
 	tbl.put(ProgramMethod.class, new Notation.ProgramMethod(121));
 	tbl.put(Equality.class, new Notation.Infix("=", 70, 80, 80)); 
-        tbl.put(WorkingSpaceOp.class, new Notation.WorkingSpaceOp(121));
+        tbl.put(WorkingSpaceRigidOp.class, new Notation.WorkingSpaceOp(121));
 	tbl.put(QuanUpdateOperator.class, new Notation.QuanUpdate());
 	tbl.put(AnonymousUpdate.class, new Notation.AnonymousUpdate());
 	tbl.put(ShadowAttributeOp.class, new Notation.ShadowAttribute(121,121));

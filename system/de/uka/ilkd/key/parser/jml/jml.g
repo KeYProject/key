@@ -2873,11 +2873,9 @@ jmlprimary returns [Term t=null]
         }
         (COMMA pre = expression)?")"
         {
-           WorkingSpaceOp op = (WorkingSpaceOp) functions().lookup(
-                new Name(WorkingSpaceOp.makeName(method)));
             if(pre==null){
                 pre = tf.createJunctorTerm(Op.TRUE);
-            }
+            }           
             if(!method.isStatic()){
                 ProgramVariable local_self = 
                     (ProgramVariable) cSpec.getInstancePrefix();
@@ -2888,13 +2886,15 @@ jmlprimary returns [Term t=null]
                     pre = df.and(pre, df.not(df.equals(t_self, df.NULL(services))));
                     pre = df.and(pre, UsefulTools.isCreated(t_self, services));
                 }
-            }
+            }            
+            WorkingSpaceRigidOp op = (WorkingSpaceRigidOp) functions().lookup(
+                new Name(WorkingSpaceRigidOp.makeName(method, pre, services)));
             if(op==null){
                 t = tf.createWorkingSpaceTerm(method, pre, 
-                    (Sort) sorts().lookup(new Name("int")));
+                    (Sort) sorts().lookup(new Name("int")), services);
                 functions().add(t.op());
             }else{
-                t = tf.createWorkingSpaceTerm(op, pre);
+                t = tf.createWorkingSpaceTerm(op);
             }
             param_ns = old_param_ns;
             translator = old_translator;

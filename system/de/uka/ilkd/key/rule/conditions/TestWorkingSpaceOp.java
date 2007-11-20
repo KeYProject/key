@@ -2,10 +2,7 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.WorkingSpaceOp;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -26,7 +23,7 @@ public class TestWorkingSpaceOp extends VariableConditionAdapter {
         while(ws1.op() instanceof IUpdateOperator){
             ws1 = ((IUpdateOperator) ws1.op()).target(ws1);
         }
-        return ws1.op() instanceof WorkingSpaceOp;
+        return ws1.op() instanceof WorkingSpaceRigidOp || ws1.op() instanceof WorkingSpaceNonRigidOp;
     }
     
     public String toString(){

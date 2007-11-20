@@ -2287,7 +2287,7 @@ public class Recoder2KeY implements JavaReader{
 
 	 recoder.java.declaration.FieldSpecification recoderVarSpec
 	     = (recoder.java.declaration.FieldSpecification) getRecoderVarSpec(fr);
-
+	 
 	 ReferencePrefix prefix = null;	
 
 	 if (fr.getReferencePrefix() != null) {
@@ -2315,7 +2315,6 @@ public class Recoder2KeY implements JavaReader{
 	 } 
 
 	 pv = getProgramVariableForFieldSpecification ( recoderVarSpec );
-	 	 
 
 	 if (!pv.isMember()) {	 
 	     // in case of a cut, induction rule or s.th. else recoder will resolve 

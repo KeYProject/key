@@ -42,8 +42,8 @@ public class UseWorkingSpaceContractRule implements BuiltInRule {
             t = ((IUpdateOperator) t.op()).target(t);
         }
       
-        return t.op() instanceof  WorkingSpaceOp &&
-        getSpecs(((WorkingSpaceOp) t.op()).getProgramMethod(), services).size()!=0;   
+        return t.op() instanceof  IWorkingSpaceOp &&
+        getSpecs(((IWorkingSpaceOp) t.op()).getProgramMethod(), services).size()!=0;   
     }
     
     public LinkedList getSpecs(ProgramMethod pm, Services services){
@@ -94,7 +94,7 @@ public class UseWorkingSpaceContractRule implements BuiltInRule {
         Term ws = ruleApp.posInOccurrence().subTerm();
         TermFactory tf = TermFactory.DEFAULT;
         
-        if(!(ws.op() instanceof WorkingSpaceOp) || !ws.op().isRigid(ws)) {
+        if(!(ws.op() instanceof WorkingSpaceRigidOp) || !ws.op().isRigid(ws)) {
             Goal g = goalIt.next();
             openBranch(tf.createEqualityTerm(ws, 
                     PreValidInStateOfWS.applySeqUpdateToPreRec(
@@ -110,7 +110,7 @@ public class UseWorkingSpaceContractRule implements BuiltInRule {
             
         }else{
         
-            Term preWS = ws.sub(0);
+            Term preWS = ((WorkingSpaceRigidOp) ws.op()).getPre();
             Function leq = (Function) services.getNamespaces().
                 functions().lookup(new Name("leq"));
             //        InnerVariableNamer ivn = new InnerVariableNamer(services); 
@@ -194,11 +194,11 @@ public class UseWorkingSpaceContractRule implements BuiltInRule {
             t = ((IUpdateOperator) t.op()).target(t);
         }
         
-        ProgramMethod pm = ((WorkingSpaceOp) t.op()).getProgramMethod();                
-
+        ProgramMethod pm = ((IWorkingSpaceOp) t.op()).getProgramMethod();  
         wscd.setSpecifications(getSpecs(pm ,services));
-        if(!(t.op() instanceof WorkingSpaceNonRigidOp)){
-            wscd.setCondition(pos.subTerm().sub(0));
+        
+        if(t.op() instanceof WorkingSpaceRigidOp){
+            wscd.setCondition(((WorkingSpaceRigidOp) pos.subTerm().op()).getPre());
         }else{
             wscd.setCondition(null);
         }

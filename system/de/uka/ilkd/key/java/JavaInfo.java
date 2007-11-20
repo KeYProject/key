@@ -1042,7 +1042,7 @@ public class JavaInfo {
     private void fillCommonTypesCache() {
         if (commonTypesCacheValid) return;
         final String[] fullNames = {"java.lang.Object", 
-                "java.lang.Cloneable", "java.lang.Serializable",
+                "java.lang.Cloneable", "java.io.Serializable",
                 "javax.realtime.ScopedMemory"};
         
         for (int i = 0; i<fullNames.length; i++) {

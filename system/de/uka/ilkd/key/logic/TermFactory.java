@@ -11,42 +11,10 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import de.uka.ilkd.key.logic.op.AccessOp;
-import de.uka.ilkd.key.logic.op.AnonymousUpdate;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.ArrayOp;
-import de.uka.ilkd.key.logic.op.AttributeOp;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
-import de.uka.ilkd.key.logic.op.IfExThenElse;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.MetaOperator;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.Operator2;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuanUpdateOperator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.ShadowArrayOp;
-import de.uka.ilkd.key.logic.op.ShadowAttributeOp;
-import de.uka.ilkd.key.logic.op.ShadowedOperator;
-import de.uka.ilkd.key.logic.op.SubstOp;
-import de.uka.ilkd.key.logic.op.TermSymbol;
-import de.uka.ilkd.key.logic.op.WorkingSpaceNonRigidOp;
-import de.uka.ilkd.key.logic.op.WorkingSpaceOp;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.SymbolReplacer;
@@ -722,8 +690,8 @@ public class TermFactory {
 	    return createIfThenElseTerm ( subTerms[0], subTerms[1], subTerms[2] );
 	} else if (op instanceof MetaOperator) {
 	    return createMetaTerm((MetaOperator)op, subTerms);
-	} else if(op instanceof WorkingSpaceOp){
-            return createWorkingSpaceTerm((WorkingSpaceOp) op, subTerms[0]);  
+	} else if(op instanceof WorkingSpaceRigidOp){
+            return createWorkingSpaceTerm((WorkingSpaceRigidOp) op);  
         } else if(op instanceof WorkingSpaceNonRigidOp){
             return createWorkingSpaceNonRigidTerm((WorkingSpaceNonRigidOp) op);  
         } else {
@@ -1065,13 +1033,13 @@ public class TermFactory {
      * @param sort the sort workingSpace
      * @return
      */
-    public Term createWorkingSpaceTerm(ProgramMethod pm, Term pre, Sort sort){
+    public Term createWorkingSpaceTerm(ProgramMethod pm, Term pre, Sort sort, Services serv){
         return createWorkingSpaceTerm(
-                new WorkingSpaceOp(pm ,sort), pre).checked();
+                new WorkingSpaceRigidOp(pm, sort, pre, serv)).checked();
     }
     
-    public Term createWorkingSpaceTerm(WorkingSpaceOp op, Term pre){
-        return new OpTerm(op, new Term[]{pre}).checked();
+    public Term createWorkingSpaceTerm(WorkingSpaceRigidOp op){
+        return new OpTerm(op, new Term[0]).checked();
     }
     
     public Term createWorkingSpaceNonRigidTerm(ProgramMethod pm, SymbolReplacer pvr, 

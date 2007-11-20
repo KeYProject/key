@@ -5,13 +5,17 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.SymbolReplacer;
 
-public class WorkingSpaceNonRigidOp extends WorkingSpaceOp {
+public class WorkingSpaceNonRigidOp extends Op implements IWorkingSpaceOp{
 
     public static final Name name = new Name("workingSpaceNonRigid");
     private SymbolReplacer pvr;
+    private final ProgramMethod pm;
+    private final Sort sort;
     
     public WorkingSpaceNonRigidOp(ProgramMethod pm, SymbolReplacer pvr, Sort sort){
-        super(pm, sort, new Name(makeName(pm, pvr)));
+        super(new Name(makeName(pm, pvr)));
+        this.pm = pm;
+        this.sort = sort;
         this.pvr = pvr;
     }
     
@@ -24,7 +28,13 @@ public class WorkingSpaceNonRigidOp extends WorkingSpaceOp {
     }
     
     public static String makeNameWithoutSR(ProgramMethod p, String pvr){
-        return WorkingSpaceOp.makeNameHelp(p, name.toString())+pvr;       
+        String result = "\\"+name+"{";
+        result += p.getContainerType().getSort()+"::"+p.getName()+"(";
+        for(int i=0; i<p.getParameterDeclarationCount(); i++){
+            result+=p.getParameterType(i).getSort()+(i<p.getParameterDeclarationCount()-1 ? "," : "");
+        }
+        result += ")}";
+        return result+pvr;  
     }
     
     public static String sortSymbols(SymbolReplacer pvr){
@@ -68,6 +78,18 @@ public class WorkingSpaceNonRigidOp extends WorkingSpaceOp {
     
     public SymbolReplacer getProgramVariableReplacer(){
         return pvr;
+    }
+    
+    public Sort sort(Term[] t){
+        return sort;
+    }
+    
+    public Sort sort(){
+        return sort;
+    }
+    
+    public ProgramMethod getProgramMethod() {
+        return pm;
     }
     
     public boolean equals(Object o){

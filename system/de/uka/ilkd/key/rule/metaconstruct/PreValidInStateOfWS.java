@@ -5,10 +5,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.UpdateFactory;
-import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
-import de.uka.ilkd.key.logic.op.WorkingSpaceNonRigidOp;
-import de.uka.ilkd.key.logic.op.WorkingSpaceOp;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -21,22 +18,22 @@ public class PreValidInStateOfWS extends AbstractMetaOperator {
     }
     
     public Term calculate(Term term, SVInstantiations svInst, Services services) {
-        if(!(term.sub(1).op() instanceof WorkingSpaceOp) || 
-                term.sub(1).arity()!=1){
+        if(!(term.sub(1).op() instanceof WorkingSpaceRigidOp)){
             return TermBuilder.DF.ff();
         }
         Term t0 = term.sub(0);
         while(t0.op() instanceof IUpdateOperator){
             t0 = ((IUpdateOperator) t0.op()).target(t0);
         }
-        if(!((WorkingSpaceOp) t0.op()).getProgramMethod().equals(
-                ((WorkingSpaceOp) term.sub(1).op()).getProgramMethod())){
+        if(!((IWorkingSpaceOp) t0.op()).getProgramMethod().equals(
+                ((IWorkingSpaceOp) term.sub(1).op()).getProgramMethod())){
             return TermBuilder.DF.ff();
         }
         if(!(term.sub(0).op() instanceof IUpdateOperator)){
-            return term.sub(1).sub(0);
+            return ((WorkingSpaceRigidOp) term.sub(1).op()).getPre();
         }
-        return applySeqUpdateToPreRec(term.sub(0), term.sub(1).sub(0), 
+        return applySeqUpdateToPreRec(term.sub(0),
+                ((WorkingSpaceRigidOp) term.sub(1).op()).getPre(), 
                 new UpdateFactory(services, new UpdateSimplifier()));
     }
     

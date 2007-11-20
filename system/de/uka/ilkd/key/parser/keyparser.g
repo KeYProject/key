@@ -3174,17 +3174,17 @@ workingspaceterm returns [Term a=null]
             bindProgVars(progVars);
         }
         RBRACE
-        LPAREN pre=term RPAREN
+        LBRACE pre=term RBRACE
         {
             unbindProgVars();
-            WorkingSpaceOp op = (WorkingSpaceOp) functions().lookup(
-                new Name(WorkingSpaceOp.makeName(pm)));
+            WorkingSpaceRigidOp op = (WorkingSpaceRigidOp) functions().lookup(
+                new Name(WorkingSpaceRigidOp.makeName(pm, pre, getServices())));
             if(op==null){
                 a = tf.createWorkingSpaceTerm(pm, pre, (Sort) sorts().lookup(
-                        new Name("int")));
+                        new Name("int")), getServices());
                 functions().add(a.op());
             }else{
-                a = tf.createWorkingSpaceTerm(op, pre);
+                a = tf.createWorkingSpaceTerm(op);
             }
         }
     ;
