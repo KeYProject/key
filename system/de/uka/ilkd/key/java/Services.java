@@ -159,6 +159,11 @@ public class Services{
         return javainfo;
     }
     
+    public void setJavaInfo(JavaInfo ji) {
+        javainfo = ji;
+    }
+    
+    
     /**
      * Returns the UMLInfo associated with this Services object.
      */

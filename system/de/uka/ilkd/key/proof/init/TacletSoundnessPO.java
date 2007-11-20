@@ -63,6 +63,7 @@ implements ProofOblInput{
         assert initConfig != null;
         final InitConfig old = initConfig;
         initConfig = old.copy ();
+        initConfig.getServices().setJavaInfo(old.getServices().getJavaInfo());
         
         // ensure that only the new taclets of the lemma file are presented to
         // the user
