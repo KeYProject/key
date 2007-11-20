@@ -584,6 +584,7 @@ de/uka/ilkd/key/logic/op/IfThenElse.java
 de/uka/ilkd/key/logic/op/InstanceofSymbol.java
 de/uka/ilkd/key/logic/op/IProgramVariable.java
 de/uka/ilkd/key/logic/op/IUpdateOperator.java
+de/uka/ilkd/key/logic/op/IWorkingSpaceOp.java
 de/uka/ilkd/key/logic/op/Junctor.java
 de/uka/ilkd/key/logic/op/ListSV.java
 de/uka/ilkd/key/logic/op/Location.java
@@ -654,7 +655,7 @@ de/uka/ilkd/key/logic/op/TermSymbol.java
 de/uka/ilkd/key/logic/op/VariableSV.java
 de/uka/ilkd/key/logic/op/WarySubstOp.java
 de/uka/ilkd/key/logic/op/WorkingSpaceNonRigidOp.java
-de/uka/ilkd/key/logic/op/WorkingSpaceOp.java
+de/uka/ilkd/key/logic/op/WorkingSpaceRigidOp.java
 de/uka/ilkd/key/logic/PairOfTermArrayAndBoundVarsArray.java
 de/uka/ilkd/key/logic/PIOPathIterator.java
 de/uka/ilkd/key/logic/PosInOccurrence.java
@@ -1279,6 +1280,7 @@ de/uka/ilkd/key/rule/metaconstruct/DoBreak.java
 de/uka/ilkd/key/rule/metaconstruct/EvaluateArgs.java
 de/uka/ilkd/key/rule/metaconstruct/ExpandDynamicType.java
 de/uka/ilkd/key/rule/metaconstruct/ExpandMethodBody.java
+de/uka/ilkd/key/rule/metaconstruct/HeapSpace.java
 de/uka/ilkd/key/rule/metaconstruct/InitArrayCreation.java
 de/uka/ilkd/key/rule/metaconstruct/InitArray.java
 de/uka/ilkd/key/rule/metaconstruct/InReachableStatePOBuilder.java
@@ -1291,6 +1293,7 @@ de/uka/ilkd/key/rule/metaconstruct/MetaAttribute.java
 de/uka/ilkd/key/rule/metaconstruct/MetaCreated.java
 de/uka/ilkd/key/rule/metaconstruct/MetaEquivalentUpdates.java
 de/uka/ilkd/key/rule/metaconstruct/MetaField.java
+de/uka/ilkd/key/rule/metaconstruct/MetaInstance.java
 de/uka/ilkd/key/rule/metaconstruct/MetaLength.java
 de/uka/ilkd/key/rule/metaconstruct/MetaNextToCreate.java
 de/uka/ilkd/key/rule/metaconstruct/MetaShadow.java
