@@ -110,7 +110,7 @@ public class LabeledStatement extends JavaStatement
 
 
     public SourceElement getFirstElement() {
-        return getChildAt(0).getFirstElement();
+        return getBody().getFirstElement();
     }
 
     public SourceElement getLastElement() {
