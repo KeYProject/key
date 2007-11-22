@@ -15,48 +15,36 @@ import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 import de.uka.ilkd.key.visualdebugger.executiontree.ETMethodInvocationNode;
 import de.uka.ilkd.key.visualdebugger.executiontree.ETNode;
 
-public class MethodInvocationFigure extends Figure {
+public class MethodInvocationFigure extends DrawableNode {
 
     private boolean selected;
-
+    
+    /** some color definitions  */
     static final Color gradient1 = new Color(null, 132, 132, 240);
-
     static final Color gradient2 = new Color(null, 76, 84, 216);
-    
-    
     static final Color gradient12 = new Color(null, 202, 202, 210);
-
     static final Color gradient22 = new Color(null, 146, 154, 186);
-    
-
     static final Color corner1 = new Color(null, 200, 208, 223);
-
-   static final Color corner2 = new Color(null, 160, 172, 200);
-
+    static final Color corner2 = new Color(null, 160, 172, 200);
     static final Color blue = new Color(null, 152, 168, 200);
-
     static final Color shadow = new Color(null, 202, 202, 202);
-
     static final int CORNER_SIZE = 00;
-    
     
     final ETMethodInvocationNode miNode;
     
      ICompilationUnit unit;
 
-
     static final Border BORDER =  new LineBorder(ColorConstants.black,1);
-
-    
 
     private Label label = new Label();
     
-   
+  
     public MethodInvocationFigure(ETMethodInvocationNode etNode){
-        super();
+        
+    	super(etNode);
         setBorder(BORDER);
         setLayoutManager(new StackLayout());
-//        label.setText("hallo");
+
         add(label);
         String st="";
         if (etNode.getMethodReference()!=null)
@@ -134,11 +122,6 @@ public class MethodInvocationFigure extends Figure {
         super.validate();
     }
     
-    public ETNode getETNode(){
-        return miNode;
-    }
-
- 
     public ICompilationUnit getUnit() {
         //unit.get
         return unit;

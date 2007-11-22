@@ -177,15 +177,20 @@ public class BreakpointView extends ViewPart {
         column = new TableColumn(table, SWT.NONE, 0);
         column.setWidth(100);
         column.setText("File");
+        
         column = new TableColumn(table, SWT.NONE, 1);
         column.setWidth(100);
         column.setText("Method");
+        
         column = new TableColumn(table, SWT.NONE, 2);
         column.setWidth(70);
         column.setText("Statement");
+        
         column = new TableColumn(table, SWT.NONE, 3);
         column.setWidth(100);
         column.setText("Breakpoint Condition");
+        column.setData("true", new Object());
+        
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
         viewer.setContentProvider(new BpContentProvider());

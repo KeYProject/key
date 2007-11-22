@@ -16,23 +16,16 @@ import de.uka.ilkd.key.visualdebugger.executiontree.ETStatementNode;
 public class SourceElementFigure extends Figure {
 
     private boolean selected;
-
+    
+    /** some color definitions  */
     static final Color gradient1 = new Color(null, 232, 232, 240);
-
     static final Color gradient2 = new Color(null, 176, 184, 216);
-
     static final Color gradient12 = new Color(null, 236, 152, 188);
-
     static final Color gradient22 = new Color(null, 236, 196, 213);
-
     static final Color corner1 = new Color(null, 200, 208, 223);
-
     static final Color corner2 = new Color(null, 160, 172, 200);
-
     static final Color blue = new Color(null, 152, 168, 200);
-
     static final Color shadow = new Color(null, 202, 202, 202);
-
     static final int CORNER_SIZE = 00;
 
     ETNode etNode = null;
@@ -95,7 +88,7 @@ public class SourceElementFigure extends Figure {
 
     public SourceElementFigure(ETStatementNode etNode) {
         // this();
-
+    	
         setLayoutManager(new StackLayout());
         add(label);
         String labelText = "";

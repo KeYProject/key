@@ -168,6 +168,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 		SourceElementFigure statementNode = createNode("Node: " + n.getId()
 				+ "\n" + n.getActStatement(), true);
 		TreeBranch branch = new TreeBranch(statementNode, null);
+
 		ITNode[] children = n.getChildren();
 		if (children != null && children.length > 0) {
 			for (int i = 0; i < children.length; i++) {
@@ -192,7 +193,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	 * 
 	 * @return the tree branch
 	 */
-	public synchronized TreeBranch buildTreeBranch(ETNode n, TreeBranch parent) {
+	public synchronized TreeBranch buildTreeBranch(ETNode n, TreeBranch parent,
+			Filter f) {
 		try {
 			IFigure statementNode = createNode(n);
 			statementNode.addMouseListener(new MouseListener.Stub() {
@@ -207,11 +209,17 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
 			TreeBranch branch = new TreeBranch(statementNode, parent);
 			ETNode[] children = n.getChildren();
+
 			if (children != null && children.length > 0) {
 				for (int i = 0; i < children.length; i++) {
-					TreeBranch subTree = buildTreeBranch(children[i], branch);
+
+					TreeBranch subTree = null;
+					if (f.filter(children[i])) {
+						subTree = buildTreeBranch(children[i], branch, f);
+					}
+
 					branch.addBranch(subTree, children[i].getBC() + "");
-					
+
 					final Connection c = createConnection(statementNode,
 							subTree.getNode(), children[i].getBC() != null ? vd
 									.prettyPrint(children[i].getSimplifiedBc())
@@ -521,6 +529,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 			}
 
 		});
+		item = new MenuItem(classMenu, SWT.SEPARATOR);
 		// TODO
 		// collapse all other paths
 		item = new MenuItem(classMenu, SWT.PUSH);
@@ -531,26 +540,51 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
 			public void widgetSelected(SelectionEvent event) {
 				// TODO
-				System.out.println("collapsing...");
-				//get the root
-				// the selected node
-				ETNode leaf = ((LeafNode) ExecutionTreeView.this.selected)
-				.getETLeafNode();
-				// go back to root
-				
-				ETNode parent = leaf.getParent();
-				while(parent!=null){
-					parent = parent.getParent();
-					
-				}
-				buildTreeBranch(leaf, (TreeBranch)root.getNode());
-				refresh();
-				if (ExecutionTreeView.this.selected.getParent()!= null) {
 
-				} else {
-					MessageDialog.openInformation(PlatformUI.getWorkbench()
-							.getActiveWorkbenchWindow().getShell(),
-							"Collapse Tree", "Failed to collapse tree! Please select a leaf node.");
+				try {
+					System.out.println("collapsing...");
+
+					// handle types --> will b changed in future
+					ETNode rootNode = null;
+					ETNode currentNode = null;
+					ETNode endNode = null;
+
+					// set the end
+					if (ExecutionTreeView.this.selected instanceof SourceElementFigure) {
+
+						SourceElementFigure sef = (SourceElementFigure) ExecutionTreeView.this.selected;
+						endNode = sef.getETNode();
+					} else {
+
+						if (ExecutionTreeView.this.selected instanceof LeafNode) {
+
+							LeafNode ln = (LeafNode) ExecutionTreeView.this.selected;
+							endNode = ln.getETLeafNode();
+						} else {
+							endNode = ((DrawableNode) (ExecutionTreeView.this.selected))
+									.getETNode();
+						}
+						
+						currentNode = endNode;
+						// find the root
+						while (currentNode != null) {
+
+							currentNode = currentNode.getParent();
+						}
+						// set the root
+						rootNode = currentNode;
+						buildTreeBranch(endNode, null, new BranchFilter(
+								new ETPath(rootNode, endNode)));
+
+					}
+
+				} catch (RuntimeException e) {
+					MessageDialog
+							.openInformation(PlatformUI.getWorkbench()
+									.getActiveWorkbenchWindow().getShell(),
+									"Collapse Tree",
+									"Failed to collapse tree! Please select a leaf node.");
+					e.printStackTrace();
 				}
 
 			}
@@ -567,11 +601,11 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 			public void widgetSelected(SelectionEvent event) {
 				// TODO
 				System.out.println("Show complete Tree");
-				
+
 			}
 
 		});
-
+		item = new MenuItem(classMenu, SWT.SEPARATOR);
 		// create test case button
 		item = new MenuItem(classMenu, SWT.PUSH);
 		item.setText("Create Test Cases For Path");
@@ -1045,19 +1079,19 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 				((Figure) contents).removeAll();
 				this.root.removeLabels();
 			}
-            
+
 			if (ExecutionTree.getETNode() == null) {
 				return;
 			}
 
 			if (ExecutionTree.treeStyle == ExecutionTree.SLET2) {
 				this.root.addBranch(s = buildTreeBranch(ExecutionTree
-						.getEtTreeBeforeMerge(), null));
+						.getEtTreeBeforeMerge(), null, new TreeFilter()));
 			} else
 
 			if (ExecutionTree.treeStyle == ExecutionTree.SLET3) {
 				this.root.addBranch(s = buildTreeBranch(ExecutionTree
-						.getETNode(), null));
+						.getETNode(), null, new TreeFilter()));
 			} else if (ExecutionTree.treeStyle == ExecutionTree.RAWTREE)
 				root.addBranch(s = buildRawTree(currentRoot));
 			if (s != null)

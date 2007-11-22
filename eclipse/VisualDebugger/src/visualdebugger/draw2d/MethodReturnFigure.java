@@ -8,7 +8,7 @@ import org.eclipse.swt.graphics.Color;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 import de.uka.ilkd.key.visualdebugger.executiontree.ETMethodReturnNode;
 
-public class MethodReturnFigure extends Figure {
+public class MethodReturnFigure extends DrawableNode {
 
     private boolean selected;
 
@@ -39,7 +39,7 @@ public class MethodReturnFigure extends Figure {
     private Label label = new Label();
 
     public MethodReturnFigure(ETMethodReturnNode etNode) {
-        super();
+        super(etNode);
         setBorder(BORDER);
         setLayoutManager(new StackLayout());
 
