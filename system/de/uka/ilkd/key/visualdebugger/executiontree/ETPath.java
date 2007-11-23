@@ -5,53 +5,60 @@ import java.util.LinkedList;
 /**
  * The Class ETPath.
  * 
- * Instances of this class describe a path in a execution tree
- * from a certain node to a certain node using a LinkedList.
- * If only a target node is given the path will start from the root.
+ * Instances of this class describe a path in a execution tree from a certain
+ * node to a certain node using a LinkedList. If only a target node is given the
+ * path will start from the root.
  */
 public class ETPath {
-    
+
     /** The node from where the path starts. */
     private ETNode fromNode = null;
-    
+
     /** The node where the path ends. */
     private ETNode toNode = null;
-    
+
     /** A temporary variable. */
     private ETNode currentNode = null;
-    
+
     /** The path. */
     private LinkedList path = new LinkedList();
-    
+
     /**
      * Instantiates a new ETPath.
      * 
-     * @param from the start
-     * @param to the end
+     * @param from
+     *                the start
+     * @param to
+     *                the end
      */
-    public ETPath(ETNode from, ETNode to){
-        
+    public ETPath(ETNode from, ETNode to) {
+
         fromNode = from;
         toNode = to;
         buildPath();
-        
+
     }
-    
+
     /**
      * Builds the path.
      */
     public void buildPath() {
-        
+
         currentNode = toNode;
-       // while(!currentNode.equals(fromNode)){
-        while(currentNode!=fromNode){   
-            path.add(currentNode);
-            currentNode = toNode.getParent();
-            System.out.println("added "+currentNode.toString()+"to the path");
+
+        if (!(toNode.equals(fromNode))) {
+
+            while (!(currentNode.equals(fromNode))) {
+
+                path.add(currentNode);
+                currentNode = currentNode.getParent();
+            }
+        } else {
+            System.out.println("End = Start.");
         }
-        
+
     }
-    
+
     /**
      * Gets the path.
      * 
@@ -60,22 +67,23 @@ public class ETPath {
     public LinkedList getPath() {
         return path;
     }
-    
+
     /**
      * Contains.
      * 
      * Contains returns true, if a given ETNode is part of the path.
      * 
-     * @param etn the ETNode
+     * @param etn
+     *                the ETNode
      * @return true, if successful
      */
     public boolean contains(ETNode etn) {
-        
-        if(path.contains(etn)){
+
+        if (path.contains(etn)) {
             return true;
-        }
-        else return false;
-        
+        } else
+            return false;
+
     }
-    
+
 }

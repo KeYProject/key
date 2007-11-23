@@ -186,6 +186,18 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Builds the tree branch.
 	 * 
+	 * This function builds the ExecutionTree in the View. 
+	 * Is draws the passed ETNode according to its type by
+	 * calling createNode(ETNode).
+	 * For every child of this node the function is called recursively.
+	 * On the return from the calls the connections between 
+	 * the nodes are painted.
+	 * 
+	 * You can specify a Filter to display only certain nodes. The basic 
+	 * type is TreeFilter which displays every node. BranchFilter are used
+	 * to isolate a certain path.
+	 * 
+	 * 
 	 * @param n
 	 *            the ETNode
 	 * @param parent
@@ -196,7 +208,9 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	public synchronized TreeBranch buildTreeBranch(ETNode n, TreeBranch parent,
 			Filter f) {
 		try {
+			//draw node n
 			IFigure statementNode = createNode(n);
+			//attach MouseListner
 			statementNode.addMouseListener(new MouseListener.Stub() {
 				public void mousePressed(MouseEvent event) {
 					if (event.button == 3) {
@@ -209,16 +223,18 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
 			TreeBranch branch = new TreeBranch(statementNode, parent);
 			ETNode[] children = n.getChildren();
-
+			
 			if (children != null && children.length > 0) {
+				
 				for (int i = 0; i < children.length; i++) {
 
 					TreeBranch subTree = null;
+				
+					// display only the children that pass the filter
 					if (f.filter(children[i])) {
 						subTree = buildTreeBranch(children[i], branch, f);
-					}
-
-					branch.addBranch(subTree, children[i].getBC() + "");
+						branch.addBranch(subTree, children[i].getBC() + "");
+						System.out.println("Children added to view:"+children[i].toString().substring(0,11));
 
 					final Connection c = createConnection(statementNode,
 							subTree.getNode(), children[i].getBC() != null ? vd
@@ -230,6 +246,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 					root.addLabel(c);
 					// }
 				}
+			  }
 			}
 			return branch;
 		} catch (Throwable t) {
@@ -544,7 +561,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 				try {
 					System.out.println("collapsing...");
 
-					// handle types --> will b changed in future
+					// handle types due to nonuniform interface for nodes
 					ETNode rootNode = null;
 					ETNode currentNode = null;
 					ETNode endNode = null;
@@ -564,19 +581,19 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 							endNode = ((DrawableNode) (ExecutionTreeView.this.selected))
 									.getETNode();
 						}
-						
-						currentNode = endNode;
-						// find the root
-						while (currentNode != null) {
-
-							currentNode = currentNode.getParent();
-						}
-						// set the root
-						rootNode = currentNode;
-						buildTreeBranch(endNode, null, new BranchFilter(
-								new ETPath(rootNode, endNode)));
-
+												
 					}
+					currentNode = endNode;
+					// find the root
+					while (currentNode.getParent() != null) {
+
+						currentNode = currentNode.getParent();
+					}
+					// set the root
+					rootNode = currentNode;
+					buildTreeBranch(rootNode, null, new BranchFilter(
+							new ETPath(rootNode, endNode)));
+					
 
 				} catch (RuntimeException e) {
 					MessageDialog
