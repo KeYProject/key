@@ -147,6 +147,10 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/** The progress group. */
 	private Label progressGroup;
 
+	private MenuItem itemAll;
+
+	private MenuItem itemIsolated;
+
 	/**
 	 * Instantiates a new execution tree view.
 	 */
@@ -159,8 +163,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Builds the raw tree.
 	 * 
-	 * @param n
-	 *            the n
+	 * @param n the n
 	 * 
 	 * @return the tree branch
 	 */
@@ -186,22 +189,20 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Builds the tree branch.
 	 * 
-	 * This function builds the ExecutionTree in the View. 
+	 * This function builds the ExecutionTree in the View.
 	 * Is draws the passed ETNode according to its type by
 	 * calling createNode(ETNode).
 	 * For every child of this node the function is called recursively.
-	 * On the return from the calls the connections between 
+	 * On the return from the calls the connections between
 	 * the nodes are painted.
 	 * 
-	 * You can specify a Filter to display only certain nodes. The basic 
+	 * You can specify a Filter to display only certain nodes. The basic
 	 * type is TreeFilter which displays every node. BranchFilter are used
 	 * to isolate a certain path.
 	 * 
-	 * 
-	 * @param n
-	 *            the ETNode
-	 * @param parent
-	 *            the parent
+	 * @param n the ETNode
+	 * @param parent the parent
+	 * @param f the f
 	 * 
 	 * @return the tree branch
 	 */
@@ -267,14 +268,10 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Creates the connection.
 	 * 
-	 * @param figFrom
-	 *            the fig from
-	 * @param figTo
-	 *            the fig to
-	 * @param text
-	 *            the text
-	 * @param withLabel
-	 *            the with label
+	 * @param figFrom the fig from
+	 * @param figTo the fig to
+	 * @param text the text
+	 * @param withLabel the with label
 	 * 
 	 * @return the connection
 	 */
@@ -316,8 +313,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Creates the node.
 	 * 
-	 * @param etNode
-	 *            the et node
+	 * @param etNode the et node
 	 * 
 	 * @return the figure
 	 */
@@ -409,10 +405,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Creates the node.
 	 * 
-	 * @param title
-	 *            the title
-	 * @param listener
-	 *            the listener
+	 * @param title the title
+	 * @param listener the listener
 	 * 
 	 * @return the source element figure
 	 */
@@ -439,28 +433,28 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	 * This is a callback that will allow us to create the viewer and initialize
 	 * it.
 	 * 
-	 * @param parent
-	 *            the parent
+	 * @param parent the parent
 	 */
 	public void createPartControl(Composite parent) {
 		shell = parent.getShell();
+		
+		// Put the LWS on the newly created Canvas.
+		lws = new LightweightSystem(shell);
+		
 		this.parent = parent;
-		// parent.setLayout(new GridLayout(2, false));
+
+		// create left side of the view window
 		parent.setLayout(new GridLayout(2, false));
 		figureCanvas = new FigureCanvas(parent, SWT.NONE);
 		figureCanvas.setScrollBarVisibility(FigureCanvas.AUTOMATIC);
 
 		figureCanvas.getViewport().setContentsTracksHeight(true);
 		figureCanvas.getViewport().setContentsTracksWidth(true);
-		figureCanvas.getViewport().setContentsTracksHeight(true);
-		figureCanvas.getViewport().setContentsTracksWidth(true);
+
 		figureCanvas.setLayoutData(new GridData(GridData.FILL_BOTH));
-
+		// create right side of the view window
 		hookShell();
-
-		// Put the LWS on the newly created Canvas.
-		// lws = new LightweightSystem(canvas);
-
+		// Create "Start" Node
 		root = new TreeRoot(createNode("Start", false));
 		root.setMajorSpacing(40);
 		root.setMinorSpacing(30);
@@ -547,25 +541,60 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
 		});
 		item = new MenuItem(classMenu, SWT.SEPARATOR);
-		// TODO
-		// collapse all other paths
+
+		// collapse tree below
 		item = new MenuItem(classMenu, SWT.PUSH);
-		item.setText("Collapse all others");
+		item.setText("Collapse Node");
 		item.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent event) {
 			}
 
 			public void widgetSelected(SelectionEvent event) {
-				// TODO
+				//TODO
+				// clear the View
+				clearView();
+				
+				ETNode currentNode = null;
+				// set the end
+				if (ExecutionTreeView.this.selected instanceof SourceElementFigure) {
 
+					SourceElementFigure sef = (SourceElementFigure) ExecutionTreeView.this.selected;
+					currentNode = sef.getETNode();
+				} else {
+
+					if (ExecutionTreeView.this.selected instanceof LeafNode) {
+
+						LeafNode ln = (LeafNode) ExecutionTreeView.this.selected;
+						currentNode = ln.getETLeafNode();
+					} else {
+						currentNode = ((DrawableNode) (ExecutionTreeView.this.selected))
+								.getETNode();
+					}
+											
+				}
+				currentNode.getChildren();
+
+			}
+		});
+		
+		// collapse all other paths
+		itemIsolated = new MenuItem(classMenu, SWT.PUSH);
+		itemIsolated.setText("Isolate Path");
+		itemIsolated.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent event) {
+			}
+
+			public void widgetSelected(SelectionEvent event) {
+				
 				try {
-					System.out.println("collapsing...");
-
+					
+					// clear the View
+					clearView();
 					// handle types due to nonuniform interface for nodes
 					ETNode rootNode = null;
 					ETNode currentNode = null;
 					ETNode endNode = null;
-
+								
 					// set the end
 					if (ExecutionTreeView.this.selected instanceof SourceElementFigure) {
 
@@ -584,16 +613,24 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 												
 					}
 					currentNode = endNode;
-					// find the root
+					// find and set the root
 					while (currentNode.getParent() != null) {
 
 						currentNode = currentNode.getParent();
 					}
-					// set the root
 					rootNode = currentNode;
-					buildTreeBranch(rootNode, null, new BranchFilter(
+					TreeBranch tb = buildTreeBranch(rootNode, null, new BranchFilter(
 							new ETPath(rootNode, endNode)));
+
+					// add the isolated path
+					root.addBranch(tb);
 					
+					if (tb != null)
+						root.addLabel(createConnection(root.getNode(), tb.getNode(), "",
+								false));
+					//handle menu status
+					itemAll.setEnabled(true);
+					itemIsolated.setEnabled(false);
 
 				} catch (RuntimeException e) {
 					MessageDialog
@@ -608,16 +645,17 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
 		});
 		// show all other paths
-		item = new MenuItem(classMenu, SWT.PUSH);
-		item.setText("Show all others");
-		item.setEnabled(false);
-		item.addSelectionListener(new SelectionListener() {
+		itemAll = new MenuItem(classMenu, SWT.PUSH);
+		itemAll.setText("Show all");
+		itemAll.setEnabled(false);
+		itemAll.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent event) {
 			}
 
 			public void widgetSelected(SelectionEvent event) {
-				// TODO
-				System.out.println("Show complete Tree");
+				
+				itemIsolated.setEnabled(true);
+				refresh();
 
 			}
 
@@ -682,8 +720,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Double click.
 	 * 
-	 * @param node
-	 *            the node
+	 * @param node the node
 	 */
 	void doubleClick(SourceElementFigure node) {
 		ICompilationUnit cu = node.getUnit();
@@ -709,8 +746,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Fill local tool bar.
 	 * 
-	 * @param manager
-	 *            the manager
+	 * @param manager the manager
 	 */
 	private void fillLocalToolBar(IToolBarManager manager) {
 		// manager.add(sletAction);
@@ -727,10 +763,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Find branch.
 	 * 
-	 * @param b
-	 *            the b
-	 * @param etn
-	 *            the etn
+	 * @param b the b
+	 * @param etn the etn
 	 * 
 	 * @return the tree branch
 	 */
@@ -755,8 +789,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Gets the subtree goals for et node.
 	 * 
-	 * @param etNode
-	 *            the et node
+	 * @param etNode the et node
 	 * 
 	 * @return the subtree goals for et node
 	 */
@@ -1088,31 +1121,33 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 				return;
 			}
 
-			IFigure contents = root.getContentsPane();
+			clearView();
 
 			labels = new HashSet();
-			TreeBranch s = null;
-			if (!contents.getChildren().isEmpty()) {
-				((Figure) contents).removeAll();
-				this.root.removeLabels();
-			}
-
+			TreeBranch treebranch = null;
 			if (ExecutionTree.getETNode() == null) {
 				return;
 			}
 
 			if (ExecutionTree.treeStyle == ExecutionTree.SLET2) {
-				this.root.addBranch(s = buildTreeBranch(ExecutionTree
-						.getEtTreeBeforeMerge(), null, new TreeFilter()));
+				
+				treebranch = buildTreeBranch(ExecutionTree
+						.getEtTreeBeforeMerge(), null, new TreeFilter());
+				this.root.addBranch(treebranch);
 			} else
 
 			if (ExecutionTree.treeStyle == ExecutionTree.SLET3) {
-				this.root.addBranch(s = buildTreeBranch(ExecutionTree
-						.getETNode(), null, new TreeFilter()));
-			} else if (ExecutionTree.treeStyle == ExecutionTree.RAWTREE)
-				root.addBranch(s = buildRawTree(currentRoot));
-			if (s != null)
-				root.addLabel(createConnection(root.getNode(), s.getNode(), "",
+				treebranch = buildTreeBranch(ExecutionTree
+						.getETNode(), null, new TreeFilter());
+				this.root.addBranch(treebranch);
+				
+			} else if (ExecutionTree.treeStyle == ExecutionTree.RAWTREE) {
+				treebranch = buildRawTree(currentRoot);
+				root.addBranch(treebranch);
+				}
+			
+			if (treebranch != null)
+				root.addLabel(createConnection(root.getNode(), treebranch.getNode(), "",
 						false));
 		} catch (Throwable t) {
 			t.printStackTrace();
@@ -1171,8 +1206,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Sets the branch condition text.
 	 * 
-	 * @param etn
-	 *            the new branch condition text
+	 * @param etn the new branch condition text
 	 */
 	private void setBranchConditionText(ETNode etn) {
 
@@ -1204,8 +1238,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Sets the leaf node selected.
 	 * 
-	 * @param node
-	 *            the new leaf node selected
+	 * @param node the new leaf node selected
 	 */
 	private void setLeafNodeSelected(LeafNode node) {
 		this.removeSelection();
@@ -1269,8 +1302,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Sets the selected.
 	 * 
-	 * @param node
-	 *            the new selected
+	 * @param node the new selected
 	 */
 	void setSelected(MethodReturnFigure node) {
 		this.removeSelection();
@@ -1291,8 +1323,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Sets the selected.
 	 * 
-	 * @param node
-	 *            the new selected
+	 * @param node the new selected
 	 */
 	void setSelected(SourceElementFigure node) {
 		this.removeSelection();
@@ -1321,8 +1352,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * To list.
 	 * 
-	 * @param it
-	 *            the it
+	 * @param it the it
 	 * 
 	 * @return the list of node
 	 */
@@ -1390,6 +1420,28 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	}
 
 	/**
+	 * Clear the view.
+	 */
+	private void clearView() {
+		
+		IFigure contents = root.getContentsPane();
+		// remove all existing children
+		if (!contents.getChildren().isEmpty()) {
+			((Figure) contents).removeAll();
+			root.removeLabels();
+		}
+	}
+
+	/**
+	 * Creates a new root node labeled with Start.
+	 */
+	private void createRootNode() {
+		root = new TreeRoot(createNode("Start", false));
+		root.setMajorSpacing(40);
+		root.setMinorSpacing(30);
+	}
+	
+	/**
 	 * Gets the progress bar1.
 	 * 
 	 * @return the progress bar1
@@ -1413,8 +1465,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 		/**
 		 * Instantiates a new PM.
 		 * 
-		 * @param pb
-		 *            the pb
+		 * @param pb the pb
 		 */
 		public PM(ProgressBar pb) {
 			this.pb = pb;
