@@ -1752,6 +1752,7 @@ public class VisualDebugger {
          * @see de.uka.ilkd.key.gui.ProverTaskListener#taskFinished()
          */
         public void taskFinished() {
+            pm.setProgress(300);
             System.out.println("task finished");
 
         }
@@ -1760,8 +1761,7 @@ public class VisualDebugger {
          * @see de.uka.ilkd.key.gui.ProverTaskListener#taskProgress(int)
          */
         public void taskProgress(int position) {
-            
-            System.out.println("taskProgress -position:" + position);
+
             pm.setProgress(position);
 
         }
@@ -1770,8 +1770,8 @@ public class VisualDebugger {
          * @see de.uka.ilkd.key.gui.ProverTaskListener#taskStarted(java.lang.String, int)
          */
         public void taskStarted(String message, int size) {
-            System.out.println("taskStarted -size:" + size);
-            pm.setMaximum(size);
+            //System.out.println("taskStarted -size:" + size);
+            pm.setMaximum(300);
 
         }
 

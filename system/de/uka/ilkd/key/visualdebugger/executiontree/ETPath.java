@@ -79,10 +79,7 @@ public class ETPath {
      */
     public boolean contains(ETNode etn) {
 
-        if (path.contains(etn)) {
-            return true;
-        } else
-            return false;
+        return path.contains(etn);
 
     }
 
