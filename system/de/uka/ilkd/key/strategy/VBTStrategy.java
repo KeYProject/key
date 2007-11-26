@@ -40,6 +40,10 @@ public class VBTStrategy extends JavaCardDLStrategy {
         bindRuleSet ( getCostComputationDispatcher (), "test_gen",
                       add ( longConst ( -1000 ),
                             NonDuplicateAppModPositionFeature.INSTANCE));
+        clearRuleSetBindings ( getCostComputationDispatcher (), "test_gen_quan_num" );
+        bindRuleSet ( getCostComputationDispatcher (), "test_gen_quan_num",
+                      add ( longConst ( 30000 ),
+                            NonDuplicateAppModPositionFeature.INSTANCE));
         clearRuleSetBindings ( getCostComputationDispatcher (), "split_cond" );
         bindRuleSet ( getCostComputationDispatcher (), "split_cond", -1000);
         clearRuleSetBindings ( getCostComputationDispatcher (), "split" );
@@ -66,6 +70,10 @@ public class VBTStrategy extends JavaCardDLStrategy {
         
         this ( p_proof, setupStrategyProperties () );
 
+    }
+
+    protected boolean arithDefOps() {
+	return true;
     }
 
     

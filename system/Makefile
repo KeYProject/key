@@ -68,7 +68,7 @@ export KEY_VERSION_LONG
 export KEY_VERSION_SHORT
 
 ifeq "$(JAVAC)" ""
-JAVAC=jikes
+JAVAC=javac
 endif
 
 ifeq "$(ANTLR)" ""

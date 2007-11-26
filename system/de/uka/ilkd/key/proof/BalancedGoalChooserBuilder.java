@@ -2,7 +2,7 @@ package de.uka.ilkd.key.proof;
 
 /**
  * builds a goal chooser taking care that loops are equally often 
- * unwound across diffferent branches 
+ * unwound across different branches 
  *
  */
 public class BalancedGoalChooserBuilder implements GoalChooserBuilder {
