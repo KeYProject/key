@@ -321,8 +321,7 @@ public class ProblemInitializer {
     private void readJava(EnvInput envInput, InitConfig initConfig) 
     		throws ProofInputException {
 	envInput.setInitConfig(initConfig);
-	String javaPath = envInput.readJavaPath();	                      
-        
+	String javaPath = envInput.readJavaPath();
 	if(javaPath != null) {
     	    //read Java	
             reportStatus("Reading Java model");
@@ -374,17 +373,20 @@ public class ProblemInitializer {
 	    readIncludes(envInput, initConfig, readLibraries);
 	    	    
 	    //read Java
-	    readJava(envInput, initConfig);
+//	    readJava(envInput, initConfig);
 	    
 	    //read libraries
 	    if(readLibraries) {
 	    	readLibraries(envInput, initConfig);
 	    }
 	    
+            //read Java
+            readJava(envInput, initConfig);	
+            
 	    //read envInput itself
 	    reportStatus("Reading "+envInput.name(), 
 		    	 envInput.getNumberOfChars());
-	    //System.out.println("Reading envInput: " + envInput.name());
+//	    System.out.println("Reading envInput: " + envInput.name());
 	    envInput.setInitConfig(initConfig);
 	    envInput.read(ModStrategy.NO_VARS_GENSORTS);//envInput.read(ModStrategy.NO_VARS_FUNCS_GENSORTS);	    
 	    reportReady();
