@@ -54,6 +54,8 @@ header {
   import de.uka.ilkd.key.java.visitor.*;
   import de.uka.ilkd.key.java.Recoder2KeY;
   import de.uka.ilkd.key.java.SchemaRecoder2KeY;
+  import de.uka.ilkd.key.java.StatementBlock;
+  import de.uka.ilkd.key.java.declaration.VariableDeclaration;
   import de.uka.ilkd.key.java.recoderext.*;
   import de.uka.ilkd.key.pp.AbbrevMap;
   import de.uka.ilkd.key.pp.LogicPrinter;
@@ -1765,8 +1767,11 @@ keyjavatype returns [KeYJavaType kjt=null]
        kjt = getJavaInfo().getKeYJavaType(guess);       
        if (array) {
           try {
-            getJavaInfo().readJavaBlock("{" + type + " k;}");
-            kjt = getJavaInfo().getKeYJavaType(type);
+            JavaBlock jb = getJavaInfo().readJavaBlock("{" + type + " k;}");
+            kjt = ((VariableDeclaration) 
+                    ((StatementBlock) jb.program()).getChildAt(0)).
+                        getTypeReference().getKeYJavaType();
+//            kjt = getJavaInfo().getKeYJavaType(type);
           } catch (Exception e) {
              kjt = null;
           }          
