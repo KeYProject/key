@@ -84,6 +84,12 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/** The current root. */
 	ITNode currentRoot = null;
 
+	/**
+	 * The currentETRootNode. Used to keep track of the rootNode in the View.
+	 * This one is independent from the model and just for displaying purposes.
+	 */
+	ETNode currentETRootNode = null;
+
 	/** The cut tree. */
 	private boolean cutTree = false;
 
@@ -96,7 +102,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/** The labels. */
 	HashSet labels = new HashSet();
 
-	/** The lws. */
+	/** The LightweightSystem of Draw2D. */
 	LightweightSystem lws;
 
 	/** The maxmerge. */
@@ -147,9 +153,14 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/** The progress group. */
 	private Label progressGroup;
 
+	/** The item all. */
 	private MenuItem itemAll;
 
+	/** The item isolated. */
 	private MenuItem itemIsolated;
+
+	/** The collapse filter. */
+	private CollapseFilter collapseFilter; 
 
 	/**
 	 * Instantiates a new execution tree view.
@@ -450,7 +461,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 		shell = parent.getShell();
 
 		// Put the LWS on the newly created Canvas.
-		// lws = new LightweightSystem(shell);
+		lws = new LightweightSystem(shell);
 
 		this.parent = parent;
 
@@ -479,6 +490,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 		// hookContextMenu();
 		// hookDoubleClickAction();
 		contributeToActionBars();
+		collapseFilter = new CollapseFilter();
 
 		if (vd.getCurrentTree() != null) {
 			this.currentRoot = vd.getCurrentTree();
@@ -499,6 +511,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 			}
 
 			public void widgetSelected(SelectionEvent event) {
+				
+				collapseFilter.clear();
 				final ListOfGoal goals = getSubtreeGoalsForETNode(((SourceElementFigure) ExecutionTreeView.this.selected)
 						.getETNode());
 				vd.run(goals);
@@ -564,11 +578,11 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
 				// clear the View
 				clearView();
-				ETNode currentNode = getSelectedNode();
+				currentETRootNode = getSelectedNode();
 
 				// set the current node as root
-				TreeBranch treeBranch = buildTreeBranch(currentNode, null,
-						new TreeFilter());
+				TreeBranch treeBranch = buildTreeBranch(getSelectedNode(),
+						null, collapseFilter);
 				root.addBranch(treeBranch);
 				sketchStartUpConnection(treeBranch);
 				// handle menu status
@@ -583,17 +597,22 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 			}
 
 			public void widgetSelected(SelectionEvent event) {
-				
+
 				// clear the View
 				clearView();
+				// make sure that there is a root node
+				currentETRootNode = getCurrentETRootNode();
+				if (currentETRootNode == null) {
+					//if nothing was set take standard root
+					currentETRootNode = getRootETNode(getSelectedNode());
+				}
+				// save the actual root
+				setCurrentETRootNode(currentETRootNode);
+				collapseFilter.addNodetoCollapse(getSelectedNode());
+				TreeBranch tb = buildTreeBranch(currentETRootNode, null,
+						collapseFilter);
 
-				ETNode currentNode = getSelectedNode();
-				ETNode rootNode = getRootETNode(currentNode);
-				
-				TreeBranch tb = buildTreeBranch(rootNode, null,
-						new CollapseFilter(currentNode));
-
-				// add the isolated path
+				// draw the new view of the tree
 				root.addBranch(tb);
 				// refresh();
 				sketchStartUpConnection(tb);
@@ -604,6 +623,37 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
 		});
 
+		// expand current node
+		item = new MenuItem(classMenu, SWT.PUSH);
+		item.setText("Expand Node");
+		item.addSelectionListener(new SelectionListener() {
+			public void widgetDefaultSelected(SelectionEvent event) {
+			}
+
+			public void widgetSelected(SelectionEvent event) {
+
+				// clear the View
+				clearView();
+				// make sure that there is a root node
+				currentETRootNode = getCurrentETRootNode();
+				if (currentETRootNode == null) {
+					//if nothing was set take standard root
+					currentETRootNode = getRootETNode(getSelectedNode());
+				}
+				// save the actual root
+				setCurrentETRootNode(currentETRootNode);
+				collapseFilter.removeNodetoCollapse(getSelectedNode());
+				TreeBranch tb = buildTreeBranch(currentETRootNode, null,
+						collapseFilter);
+
+				// draw the new view of the tree
+				root.addBranch(tb);
+				// refresh();
+				sketchStartUpConnection(tb);
+				// handle menu status
+				itemAll.setEnabled(true);
+			}
+		});
 		// collapse all other paths
 		itemIsolated = new MenuItem(classMenu, SWT.PUSH);
 		itemIsolated.setText("Isolate Path");
@@ -661,6 +711,10 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
 			public void widgetSelected(SelectionEvent event) {
 
+				// clean up
+				collapseFilter.clear();
+				// set new root
+				setCurrentETRootNode(getRootETNode(getSelectedNode()));
 				itemIsolated.setEnabled(true);
 				refresh();
 
@@ -1450,15 +1504,6 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	}
 
 	/**
-	 * Creates a new root node labeled with Start.
-	 */
-	private void createRootNode() {
-		root = new TreeRoot(createNode("Start", false));
-		root.setMajorSpacing(40);
-		root.setMinorSpacing(30);
-	}
-
-	/**
 	 * Gets the progress bar1.
 	 * 
 	 * @return the progress bar1
@@ -1498,7 +1543,10 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	}
 
 	/**
+	 * Sketch start up connection.
+	 * 
 	 * @param treeBranch
+	 *            the tree branch
 	 */
 	private void sketchStartUpConnection(TreeBranch treeBranch) {
 		// draw connection to start node
@@ -1508,10 +1556,13 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	}
 
 	/**
-	 * This method returns the rootETNode.
-	 * The parameter can be a arbitrary node in the tree.
+	 * This method returns the rootETNode. The parameter can be a arbitrary node
+	 * in the tree.
+	 * 
 	 * @param currentNode
-	 * @return
+	 *            the current node
+	 * 
+	 * @return the root et node
 	 */
 	private ETNode getRootETNode(ETNode currentNode) {
 		while (currentNode.getParent().getParent() != null) {
@@ -1572,6 +1623,26 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
 		}
 
+	}
+
+	/**
+	 * Sets the current ETRootNode.
+	 * 
+	 * @param currentETRootNode
+	 *            the new current root ETNode
+	 */
+	private void setCurrentETRootNode(ETNode currentETRootNode) {
+		this.currentETRootNode = currentETRootNode;
+	}
+
+	/**
+	 * Gets the current et root node.
+	 * 
+	 * @return the current et root node
+	 */
+	private ETNode getCurrentETRootNode() {
+
+		return currentETRootNode;
 	}
 
 }

@@ -7,12 +7,11 @@ import de.uka.ilkd.key.visualdebugger.executiontree.ETNode;
 /**
  * The Class CollapseFilter.
  * 
- * The CollapseFilter hides all children of the passed ETNode.
+ * The CollapseFilter hides all children of added ETNodes.
  */
 public class CollapseFilter implements Filter {
 
-	/** The node to be collapsed */
-	ETNode etn = null;
+	/** The children to hide. */
 	LinkedList children = null;
 
 	/**
@@ -21,10 +20,8 @@ public class CollapseFilter implements Filter {
 	 * @param etn
 	 *            the ETNode to be collapsed.
 	 */
-	public CollapseFilter(ETNode etn) {
+	public CollapseFilter() {
 		super();
-		this.etn = etn;
-		this.children = etn.getChildrenList();
 	}
 
 	/*
@@ -41,6 +38,47 @@ public class CollapseFilter implements Filter {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Add a node that should be collapsed.
+	 * 
+	 * @param etnode
+	 *            the ETNode to be collapsed.
+	 */
+	public void addNodetoCollapse(ETNode etnode) {
+
+		if (children == null) {
+			this.children = etnode.getChildrenList();
+		} else {
+			children.addAll(etnode.getChildrenList());
+		}
+
+	}
+
+	/**
+	 * Remove a node that was collapsed. Used to expand single nodes.
+	 * 
+	 * @param etnode
+	 *            the ETNode to be collapsed.
+	 */
+	public void removeNodetoCollapse(ETNode etnode) {
+
+		LinkedList childrenList = etnode.getChildrenList();
+		if (children.containsAll(childrenList)) {
+			children.removeAll(childrenList);
+		}
+
+	}
+
+	/**
+	 * Clear the list.
+	 */
+	public void clear() {
+
+		if (children != null) {
+			children.removeAll(children);
+		}
 	}
 
 }
