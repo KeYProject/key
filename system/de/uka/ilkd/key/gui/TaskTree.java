@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -20,6 +20,7 @@ import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 
+import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.notification.events.AbandonTaskEvent;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.mgt.*;
@@ -182,6 +183,10 @@ public class TaskTree extends JPanel {
 		    
 	    }
 	}
+        
+        public void mouseReleased(MouseEvent e) {
+            mousePressed(e);
+        }
     }
 
 

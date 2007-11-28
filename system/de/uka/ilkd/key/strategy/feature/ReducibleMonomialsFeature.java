@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -25,7 +25,7 @@ import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
  * (in the polynomial reduction ordering) by adding or subtracting
  * <code>divisorSV</code>
  */
-public class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
+public abstract class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
     private final ProjectionToTerm dividend, divisor;
 
     private ReducibleMonomialsFeature(ProjectionToTerm dividend,
@@ -34,11 +34,26 @@ public class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
         this.divisor = divisor;
     }
 
-    public static Feature create(ProjectionToTerm dividend,
-                                 ProjectionToTerm divisor) {
-        return new ReducibleMonomialsFeature ( dividend, divisor );
+    public static Feature createReducible(ProjectionToTerm dividend,
+                                          ProjectionToTerm divisor) {
+        return new ReducibleMonomialsFeature ( dividend, divisor ) {
+            protected boolean checkReducibility(Monomial mDividend,
+                                                Monomial mDivisor) {
+                return mDivisor.reducible ( mDividend );
+            }            
+        };
     }
-    
+
+    public static Feature createDivides(ProjectionToTerm dividend,
+                                        ProjectionToTerm divisor) {
+        return new ReducibleMonomialsFeature ( dividend, divisor ) {
+            protected boolean checkReducibility(Monomial mDividend,
+                                                Monomial mDivisor) {
+                return mDivisor.divides ( mDividend );
+            }            
+        };
+    }
+
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {        
         final Term dividendT = dividend.toTerm ( app, pos, goal );
         final Term divisorT = divisor.toTerm ( app, pos, goal );
@@ -47,6 +62,9 @@ public class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
         final Monomial mDividend = Monomial.create ( dividendT, services );
         final Monomial mDivisor = Monomial.create ( divisorT, services );
         
-        return mDivisor.reducible ( mDividend );
+        return checkReducibility ( mDividend, mDivisor );
     }
+
+    protected abstract boolean checkReducibility(Monomial mDividend,
+                                                 Monomial mDivisor);
 }

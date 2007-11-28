@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -27,7 +27,7 @@ import de.uka.ilkd.key.proof.decproc.DecisionProcedureTranslationFactory;
 public abstract class AbstractIntegerRule implements BuiltInRule {
 
     private final Name name;
-    protected boolean showResults = true;
+    protected final boolean showResults;
     protected final DecisionProcedureTranslationFactory dptf;
     
 

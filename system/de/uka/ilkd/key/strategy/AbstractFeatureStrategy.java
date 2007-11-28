@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -324,6 +324,18 @@ public abstract class AbstractFeatureStrategy implements Strategy {
     protected Feature eq(ProjectionToTerm t1, ProjectionToTerm t2) {
         final TermBuffer buf = new TermBuffer ();
         return let ( buf, t1, applyTF ( t2, eq ( buf ) ) );
+    }
+
+    protected Feature contains(ProjectionToTerm bigTerm,
+                               ProjectionToTerm searchedTerm) {
+        final TermBuffer buf = new TermBuffer ();
+        return let ( buf, searchedTerm,
+                     applyTF ( bigTerm,
+                               not ( rec ( any (), not ( eq ( buf ) ) ) ) ) );
+    }
+    
+    protected Feature println(ProjectionToTerm t) {
+        return applyTF ( t, PrintTermFeature.INSTANCE );
     }
     
     protected TermFeature extendsTrans(Sort s) {

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -21,7 +21,7 @@ import de.uka.ilkd.key.casetool.ModelManager;
 import de.uka.ilkd.key.casetool.OCLModelFacade;
 import de.uka.ilkd.key.casetool.UMLOCLModel;
 import de.uka.ilkd.key.gui.ModelSourceSettings;
-import de.uka.ilkd.key.gui.ProofSettings;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -24,7 +24,8 @@ import recoder.io.PathList;
 import recoder.io.ProjectSettings;
 import de.uka.ilkd.key.gui.LibrariesSettings;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.ProofSettings;
+import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.CompilationUnit;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
@@ -330,15 +331,15 @@ public class ProblemInitializer {
     private void readJava(EnvInput envInput, InitConfig initConfig) 
     		throws ProofInputException {
 	envInput.setInitConfig(initConfig);
-	String javaPath = envInput.readJavaPath();	                      
-        
+	String javaPath = envInput.readJavaPath();
 	if(javaPath != null) {
     	    //read Java	
-    	    reportStatus("Reading Java model");
+            reportStatus("Reading Java model");
             ProjectSettings settings = 
                 initConfig.getServices().getJavaInfo().getKeYProgModelInfo()
                 	      .getServConf().getProjectSettings();
             PathList searchPathList = settings.getSearchPathList();
+            
             
             if(searchPathList.find(javaPath) == null) {
                 searchPathList.add(javaPath);
@@ -382,17 +383,20 @@ public class ProblemInitializer {
 	    readIncludes(envInput, initConfig, readLibraries);
 	    	    
 	    //read Java
-	    readJava(envInput, initConfig);
+//	    readJava(envInput, initConfig);
 	    
 	    //read libraries
 	    if(readLibraries) {
 	    	readLibraries(envInput, initConfig);
 	    }
+	    
+            //read Java
+            readJava(envInput, initConfig);	
             
 	    //read envInput itself
 	    reportStatus("Reading "+envInput.name(), 
 		    	 envInput.getNumberOfChars());
-	    //System.out.println("Reading envInput: " + envInput.name());
+//	    System.out.println("Reading envInput: " + envInput.name());
 	    envInput.setInitConfig(initConfig);
 	    envInput.read(ModStrategy.NO_VARS_GENSORTS);//envInput.read(ModStrategy.NO_VARS_FUNCS_GENSORTS);	    
 	    reportReady();

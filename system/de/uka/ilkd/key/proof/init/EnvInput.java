@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -9,7 +9,7 @@
 //
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.gui.LibrariesSettings;
+import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
 
 
 /** Represents an entity read to produce an environment to read a proof

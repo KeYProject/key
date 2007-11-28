@@ -1,4 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+// This file is part of KeY - Integrated Deductive Software Design
 // Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
 // Universitaet Koblenz-Landau, Germany
 // Chalmers University of Technology, Sweden
@@ -25,8 +32,12 @@ import javax.swing.text.JTextComponent;
 import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.gui.assistant.*;
+import de.uka.ilkd.key.gui.configuration.*;
+import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
+import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.*;
+import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
@@ -48,7 +59,7 @@ public class Main extends JFrame {
 
     private static final String VERSION = 
 	KeYResourceManager.getManager().getVersion() + 
-	"-beta (internal: "+INTERNAL_VERSION+")";
+	"(internal: "+INTERNAL_VERSION+")";
     private static final String COPYRIGHT="(C) Copyright 2001-2007 "
         +"Universit\u00e4t Karlsruhe, Universit\u00e4t Koblenz-Landau, "
         +"and Chalmers University of Technology";
@@ -816,48 +827,22 @@ public class Main extends JFrame {
         }
     }
     
-    /** saves settings */
-    private void saveSettings() {
-        ProofSettings.DEFAULT_SETTINGS.saveSettings();
-        recentFiles.store(RECENT_FILES_STORAGE);
-    }
-    
     /** exit */
     protected void exitMain() {
-        boolean quit = false;
-        if (ProofSettings.DEFAULT_SETTINGS.changed()) {
-            final int option = JOptionPane.showOptionDialog
-            (Main.this, "Settings have changed. "+
-                    "Should they be saved before quitting?", 
-                    "Exit", 
-                    JOptionPane.YES_NO_CANCEL_OPTION,
-                    JOptionPane.QUESTION_MESSAGE,
-                    null,
-                    new String[]{"Save and Quit", 
-                    "Just Quit", 
-            "Cancel"},
-            null);   
-            if (option == 0) {
-                saveSettings();
-                quit = true;
-            } else if (option == 1) {
-                // do not save but quit
-                quit = true;
-            }
-        } else {
-            final int option = JOptionPane.showConfirmDialog
-            (Main.this, "Really Quit?", "Exit", 
-                    JOptionPane.YES_NO_OPTION);		   	    
-            if (option == JOptionPane.YES_OPTION) {
-                quit = true;
-            } 
-        }
-        
+        boolean quit = false;       
+        final int option = JOptionPane.showConfirmDialog
+        (Main.this, "Really Quit?", "Exit", 
+                JOptionPane.YES_NO_OPTION);		   	    
+        if (option == JOptionPane.YES_OPTION) {
+            quit = true;
+        } 
+
+
         recentFiles.store(RECENT_FILES_STORAGE);
-        
+
         if (quit) {            
             mediator.fireShutDown(new GUIEvent(this));
-            
+
             if (standalone) {
                 // wait some seconds; give notification sound a bit time
                 try {
@@ -1441,12 +1426,17 @@ public class Main extends JFrame {
 
  	// listen to the state of the assistant in order to hold the
  	// item and state consistent
- 	assistant.addChangeListener(new ChangeListener() {
- 		public void stateChanged(ChangeEvent e) {
- 		    assistantOption.setSelected
- 			(((ProofAssistantController)e.getSource()).getState());
- 		}
- 	    });
+	assistant.addChangeListener(new ChangeListener() {
+	    public void stateChanged(ChangeEvent e) {
+	        final boolean assistentEnabled = 
+                    ((ProofAssistantController)e.getSource()).getState();
+	        assistantOption.setSelected(assistentEnabled);
+	        // setSelected does not trigger an action event so we have
+	        // to make the change explicitly permanent
+	        ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().
+	        setProofAssistantMode(assistentEnabled);
+	    }
+	});
 
 	assistantOption.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent e) {
@@ -1456,16 +1446,7 @@ public class Main extends JFrame {
 	    }});
 
 	registerAtMenu(options, assistantOption);
-	
-	addSeparator(options);
-
-	ProofSettings.DEFAULT_SETTINGS.item().addActionListener
-	    (new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-			ProofSettings.DEFAULT_SETTINGS.saveSettings();
-		    }});
-
-	registerAtMenu(options, ProofSettings.DEFAULT_SETTINGS.item());
+	        
         return options;
     }
 
@@ -3003,13 +2984,6 @@ public class Main extends JFrame {
                     "termination of the symbolic execution.</pre>");
             options.add(methodSelectionButton);
             
-            ProofSettings.DEFAULT_SETTINGS.item().addActionListener
-                (new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        ProofSettings.DEFAULT_SETTINGS.saveSettings();
-                    }});
-
-//            options.add(ProofSettings.DEFAULT_SETTINGS.item());
             return options;
         }
         

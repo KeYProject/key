@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Vector;
 
 import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.gui.ProofSettings;
-import de.uka.ilkd.key.gui.SettingsListener;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -306,11 +306,6 @@ public class Proof implements Named {
             it.next ().setGoalStrategy(ourStrategy);
     }
 
-    /** counter required to give the taclets a unique name */
-    public int getUniqueTacletNr(Node undoAnchor) {
-        return getServices().getCounter("tacletNumber").getCountPlusPlus(undoAnchor);
-    }
-    
     /** 
      * returns the default simplifier to be used (may be overwritten by branch
      * specific simplifiers in the future)

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -634,10 +634,14 @@ public abstract class TacletApp implements RuleApp {
                     if ( app == null ) return null;
     
                     String proposal = VariableNameProposer.DEFAULT
-                        .getProposal(app, sv, services, goal.node(), null);
+                        .getProposal(app, sv, services, goal.node(), proposals);
+
+                    proposals = proposals.append(proposal);
+
                     app = app.createSkolemConstant ( proposal,
     						        sv,
     						        true, services );
+
                 } else if ( sv.isVariableSV () ) {
                     // if the sort of the schema variable is generic,
                     // ensure that it is instantiated

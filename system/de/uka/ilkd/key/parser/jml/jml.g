@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -979,10 +979,13 @@ variabledeclarator[KeYJavaType type, SetOfString mods]
             if(dim!=0){
                 type = getArrayTypeAndEnsureExistence(type.getSort(), dim);
             }
+
             cSpec.addModelVariable(new LocationVariable(
                     new ProgramElementName(id.getText()),type, 
                     translator.getCLDKeYJavaType(),
-                    mods != null && mods.contains("static"),
+                    mods != null && mods.contains("static") ||
+                        translator.isInterface() &&
+                        !mods.contains("instance"),
                     mods.contains("model"), mods.contains("ghost")));
         }
     ;

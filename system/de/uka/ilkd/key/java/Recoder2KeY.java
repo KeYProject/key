@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -325,7 +325,7 @@ public class Recoder2KeY implements JavaReader{
 	    cUnits = servConf.getProgramFactory().parseCompilationUnits(cUnitStrings);
 	    final ChangeHistory changeHistory = servConf.getChangeHistory();
             for (int i = 0, sz = cUnits.size(); i<sz; i++) {
-		cUnits.getCompilationUnit(i).makeAllParentRolesValid();
+                cUnits.getCompilationUnit(i).makeAllParentRolesValid();
 		changeHistory.attached(cUnits.getCompilationUnit(i));
 	    }
             

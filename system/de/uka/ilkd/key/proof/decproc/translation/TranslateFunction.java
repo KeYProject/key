@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -14,11 +14,11 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.HashSet;
 import org.apache.log4j.Logger;
-import de.uka.ilkd.key.logic.op.DecisionProcedureSmtAufliaOp;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAufliaOp;
 import de.uka.ilkd.key.proof.decproc.SmtAufliaTranslation;
 import de.uka.ilkd.key.proof.decproc.TypeBoundTranslation;
 import de.uka.ilkd.key.proof.decproc.smtlib.*;

@@ -1,10 +1,17 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package de.uka.ilkd.key.proof.init;
 
 import java.util.HashMap;
 
-import de.uka.ilkd.key.gui.ChoiceSettings;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.ProofSettings;
+import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.BalancedGoalChooserBuilder;
 import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
@@ -20,8 +27,7 @@ public class  DebuggerProfile extends JavaProfile {
     private final static StrategyFactory DEFAULT = 
         new DebuggerStrategy.Factory();
     
-    public DebuggerProfile(Main main) {
-        //super("standardRules-testGen.key", 
+    public DebuggerProfile(Main main) {       
         super("standardRules-debugger.key",//TODO
                 SetAsListOfGoalChooserBuilder.EMPTY_SET.
                 add(new DefaultGoalChooserBuilder()).

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -54,6 +54,8 @@ header {
   import de.uka.ilkd.key.java.visitor.*;
   import de.uka.ilkd.key.java.Recoder2KeY;
   import de.uka.ilkd.key.java.SchemaRecoder2KeY;
+  import de.uka.ilkd.key.java.StatementBlock;
+  import de.uka.ilkd.key.java.declaration.VariableDeclaration;
   import de.uka.ilkd.key.java.recoderext.*;
   import de.uka.ilkd.key.java.declaration.ArrayOfParameterDeclaration;
   import de.uka.ilkd.key.pp.*;
@@ -1765,8 +1767,11 @@ keyjavatype returns [KeYJavaType kjt=null]
        kjt = getJavaInfo().getKeYJavaType(guess);       
        if (array) {
           try {
-            getJavaInfo().readJavaBlock("{" + type + " k;}");
-            kjt = getJavaInfo().getKeYJavaType(type);
+            JavaBlock jb = getJavaInfo().readJavaBlock("{" + type + " k;}");
+            kjt = ((VariableDeclaration) 
+                    ((StatementBlock) jb.program()).getChildAt(0)).
+                        getTypeReference().getKeYJavaType();
+//            kjt = getJavaInfo().getKeYJavaType(type);
           } catch (Exception e) {
              kjt = null;
           }          
@@ -2024,7 +2029,7 @@ pred_decl
                  	  case HEAP_DEPENDENT: p = new NonRigidHeapDependentFunction(predicate, Sort.FORMULA, argSorts);      
                  	      break;
                  	  default:
-                 	     semanticError("Unknwon modifier used in declaration of non-rigid predicate "+predicate);
+                 	     semanticError("Unknown modifier used in declaration of non-rigid predicate "+predicate);
                  	}
                     }
 

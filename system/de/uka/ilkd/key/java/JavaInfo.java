@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -282,6 +282,8 @@ public class JavaInfo {
             return "[J";
         else if ("jshort[]".equals(s) || "short[]".equals(s))
             return "[S";
+        else if ("jchar[]".equals(s) || "char[]".equals(s))
+            return "[C";
 // Strangely, this one is not n
 //        else if ("boolean[]".equals(s))
 //            return "[Z";

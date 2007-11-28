@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -36,8 +36,8 @@ public class LibrarySettingsPane extends InstallationPane {
 	text.setLineWrap ( true );
 	text.setWrapStyleWord ( true );
 	text.setText ( "KeY makes use of several external libraries. " +
-		       "You can downloaded them from the KeY-Homepage: " +
-		       "http://www.key-project.org/download/\n"+
+		       "You can download them from the KeY-Homepage: " +
+		       "http://www.key-project.org/download/3rdparty.html\n"+
 		       "Please make sure that all required libraries are "+
 		       "located in the indicated library path." );
 	text.setEditable ( false );

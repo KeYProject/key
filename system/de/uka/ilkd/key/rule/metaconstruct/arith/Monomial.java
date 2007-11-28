@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -36,6 +36,9 @@ public class Monomial {
     }
     
     private static final LRUCache monomialCache = new LRUCache ( 2000 );
+    
+    public static final Monomial ONE = new Monomial ( SLListOfTerm.EMPTY_LIST,
+                                                      BigInteger.ONE );
     
     public static Monomial create(Term monoTerm, Services services) {
         Monomial res = (Monomial)monomialCache.get ( monoTerm );
@@ -121,7 +124,7 @@ public class Monomial {
      * @return the result of dividing the monomial <code>m</code> by the
      *         monomial <code>this</code>
      */
-    public Monomial divide(Monomial m) {
+    public Monomial reduce(Monomial m) {
         final BigInteger a = m.coefficient;
         final BigInteger c = this.coefficient;
 
@@ -214,6 +217,17 @@ public class Monomial {
             res = TermFactory.DEFAULT.createFunctionTerm ( mul, res, cTerm );
         
         return res;        
+    }
+    
+    public String toString() {
+        final StringBuffer res = new StringBuffer ();
+        res.append ( coefficient );
+        
+        final IteratorOfTerm it = parts.iterator ();
+        while ( it.hasNext () )
+            res.append ( " * " + it.next () );
+
+        return res.toString ();
     }
     
     private static class Analyser {

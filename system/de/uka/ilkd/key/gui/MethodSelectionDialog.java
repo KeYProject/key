@@ -1,9 +1,17 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.unittest.*;
 import de.uka.ilkd.key.unittest.simplify.*;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 
 import java.awt.event.ActionListener;

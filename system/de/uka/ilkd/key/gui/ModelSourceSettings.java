@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -13,6 +13,9 @@ package de.uka.ilkd.key.gui;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Properties;
+
+import de.uka.ilkd.key.gui.configuration.Settings;
+import de.uka.ilkd.key.gui.configuration.SettingsListener;
 
 public class ModelSourceSettings implements Settings{
 

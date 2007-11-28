@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -126,23 +126,30 @@ public class BooleanLDT extends LDT {
 
 
     public Term getFalseTerm() {
-	return term_bool_false;
+        return term_bool_false;
     }
 
     public Term getTrueTerm() {
-	return term_bool_true;
+        return term_bool_true;
     }
 
-    /*    //HACK
-    public boolean hasLiteralFunction(Function f) {
-	return (f==bool_true || f==bool_false) && f.arity()==0;
+    /**
+     * returns the function representing the boolean value <tt>FALSE</tt>
+     * @return the function representing the boolean value <tt>FALSE</tt>
+     */
+    public Function getFalseConst() {
+        return bool_false;
     }
 
-    //HACK
-    public boolean containsFunction(Function op) {
-	return op==bool_and || op==bool_or || op==bool_not;
-	}*/
+    /**
+     * returns the function representing the boolean value <tt>TRUE</tt>
+     * @return the function representing the boolean value <tt>TRUE</tt>
+     */
+    public Function getTrueConst() {
+        return bool_true;
+    }
 
+   
     public boolean hasLiteralFunction(Function f) {
 	return containsFunction(f) && f.arity()==0;
     }

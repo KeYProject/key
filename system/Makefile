@@ -40,15 +40,21 @@ JIKESPATH=$(CLASSPATH):$(GENERATED_SRC_PATH):$(JAVA_HOME)/jre/lib/rt.jar
 COMMON_OPTIONS=-g -d $(BINARYPATH) 
 OPTIONS=$(COMMON_OPTIONS)
 
+
+
+GIT_AVAILABLE=$(shell which git)
+ 
+ifneq ($(strip $(wordlist 1,1,$(GIT_AVAILABLE))),no) 
 GIT=$(shell which git)
+endif
 
 
 ifneq "$(GIT)" ""
-SHA1=$(shell git show | grep commit)
+SHA1=$(shell $(GIT) show | grep commit)
 SHA1:=$(wordlist 2,2,$(SHA1))
-KEY_VERSION_SHORT=$(shell git log --pretty=one | wc -l)
+KEY_VERSION_SHORT=$(shell $(GIT) log --pretty=one | wc -l)
 KEY_VERSION_SHORT:=$(wordlist 1,1,$(KEY_VERSION_SHORT))
-KEY_VERSION_SHORT:=1.1.$(KEY_VERSION_SHORT)
+KEY_VERSION_SHORT:=1.2.$(KEY_VERSION_SHORT)
 else
 SHA1=ownVersion
 KEY_VERSION_SHORT=0.0.0
@@ -302,28 +308,6 @@ GENERATED_HEAPS= logic/LeftistHeapOfInteger \
 GENERATED_VECTORS_STACKS= rule/VectorOfTaclet \
 	util/SimpleStackOfExtList 
 
-GENERATED_COLLECTIONS_ASMKEY = de/uka/ilkd/asmkey/logic/HashMapFromAsmProgramToInteger.java \
-	de/uka/ilkd/asmkey/logic/HashMapFromAsmRuleToAsmProgram.java \
-	de/uka/ilkd/asmkey/logic/ListOfAsmProgram.java \
-	de/uka/ilkd/asmkey/logic/SLListOfAsmProgram.java \
-	de/uka/ilkd/asmkey/logic/HashMapFromAsmProgramToListOfAsmProgram.java \
-	de/uka/ilkd/asmkey/logic/IteratorOfFormalParameter.java \
-	de/uka/ilkd/asmkey/logic/HashMapFromNameToFormalParameter.java \
-	de/uka/ilkd/asmkey/logic/IteratorOfDerivedFunction.java \
-	de/uka/ilkd/asmkey/logic/sort/ListOfGenericSort.java \
-	de/uka/ilkd/asmkey/logic/sort/ListOfAsmSort.java \
-	de/uka/ilkd/asmkey/logic/sort/SLListOfGenericSort.java \
-	de/uka/ilkd/asmkey/logic/sort/SLListOfAsmSort.java \
-	de/uka/ilkd/asmkey/logic/sort/MapFromGenericSortToAsmSort.java \
-	de/uka/ilkd/asmkey/logic/sort/MapAsListFromGenericSortToAsmSort.java \
-	de/uka/ilkd/asmkey/unit/ListOfImportInfo.java \
-	de/uka/ilkd/asmkey/unit/ListOfUnit.java \
-	de/uka/ilkd/asmkey/unit/SLListOfUnit.java \
-	de/uka/ilkd/asmkey/unit/HashMapFromNameToUnit.java \
-	de/uka/ilkd/asmkey/util/graph/IteratorOfEdge.java \
-	de/uka/ilkd/asmkey/parser/ast/HashMapFromNameToAstUnit.java \
-	de/uka/ilkd/asmkey/parser/ast/IteratorOfAstUnit.java
-
 GEN_FILES=$(GENERATED_MAPS) $(GENERATED_VECTORS_STACKS) $(GENERATED_ARRAYS) $(GENERATED_LISTS) $(GENERATED_SETS) \
 	$(GENERATED_ITERATORS) $(GENERATED_HEAPS)
 
@@ -334,7 +318,6 @@ ANTLR_PARSER= \
 	$(GENERATED_SRC_PATH)$(PFX)parser/dictionary/DictionaryLexer.java \
 	$(GENERATED_SRC_PATH)$(PFX)parser/dictionary/DictionaryLexerTokenTypes.java \
 	$(GENERATED_SRC_PATH)$(PFX)parser/dictionary/DictionaryParser.java \
-	$(GENERATED_SRC_PATH)de/uka/ilkd/asmkey/parser/antlr/AsmKeyParser.java \
 	$(GENERATED_SRC_PATH)$(PFX)parser/jml/KeYJMLLexer.java \
 	$(GENERATED_SRC_PATH)$(PFX)parser/jml/KeYJMLParser.java \
 	$(GENERATED_SRC_PATH)$(PFX)parser/simplify/SimplifyLexer.java \
@@ -372,10 +355,10 @@ DIFF_PARSER= \
 
 
 ## generic java support
-JAVAFILES=$(GEN_FILES:%=$(PFX)%.java) $(GENERATED_COLLECTIONS_ASMKEY)
+JAVAFILES=$(GEN_FILES:%=$(PFX)%.java) 
 
 .PHONY: all
-all:	javahomeset
+all:	javahomeset branding
 	@$(MAKE) -s all_gen
 
 
@@ -443,7 +426,7 @@ jar:	all
 	@jar cfm key.jar resources/MANIFEST.MF -C binary/ .
 
 .PHONY: dist_src
-dist_src: branding distclean
+dist_src: distclean branding javaFiles
 	@rm -rf /tmp/keydist-$(USER)
 	@echo "[creating source archive]"
 	@mkdir -p /tmp/keydist-$(USER)
@@ -462,14 +445,13 @@ dist_src: branding distclean
 ## clean
 clean:
 	@echo [deleting generated .java-files]
-	@(cat argfile.generic | xargs -n 1 rm -f )2>error.msg
+	@/bin/rm -rf $(GENERATED_SRC_PATH)
 	@echo [deleting binaries]
 	@/bin/rm -rf $(BINARYPATH)
-	@/bin/rm -rf $(GENERATED_SRC_PATH)
 
 #help files of the makefile (without the GenMakefile)
 
-	@rm -f javaFiles.tmp
+	@rm -f javaFiles
 	@rm -f unit_manager.log 
 	@rm -f msg.txt
 	@rm -f argfile.aspects
@@ -492,6 +474,7 @@ realclean: clean
 
 .PHONY: distclean
 distclean: realclean
+	@rm -f setup.jar
 	@rm -f key.jar
 	@rm -f KeY.tgz
 	@rm -f keySource.tgz
@@ -502,6 +485,12 @@ all_gen: genericMakefile
 
 .PHONY: all_hlp
 all_hlp: argfile.normal $(JAVAFILES) $(ANTLR_PARSER) $(JAVACC_PARSER) $(PROOFJAVA_PARSER) $(KEYDOC_JAVAS) $(DIFF_PARSER) copyResources $(GRAMMARLIST)
+ifeq "$(BRANDING)" ""
+# always update SHA1 hash in order to get useful bug reports		
+	@echo $(SHA1) > ${BINARYPATH}/de/uka/ilkd/key/util/sha1
+	@echo $(KEY_VERSION_SHORT) > ${BINARYPATH}/de/uka/ilkd/key/util/version
+else
+endif
 	@rm -f error.msg
 	@rm -f critical.msg
 	@rm -f warning.msg
@@ -551,15 +540,14 @@ else
 	@./brandFeatureSite.sh ../eclipse/KeYFeature/site.xml $(KEY_VERSION_SHORT)
 endif
 
-javaFiles.tmp: javaFiles
+javaFiles: 
 ifneq ("$(GIT)","")
-	@git ls-files | grep ".java" | grep -v "aspects" | grep -v "gjava" | grep -v ".java." | grep -v "resources/" | sort > javaFiles
+	@$(GIT) ls-files | grep "\.java" | grep -v "aspects" | grep -v "gjava" | grep -v "\.java\." | grep -v "resources/" | sort > javaFiles
 endif
-	@cat javaFiles > javaFiles.tmp
 
-argfile.normal: javaFiles.tmp
+argfile.normal: javaFiles
 	@echo [Collecting Java files to compile]
-	@cat javaFiles.tmp > argfile.normal
+	@cat javaFiles > argfile.normal
 	@echo "TestKey.java" >> argfile.normal 
 ## make gjava -> java
 
@@ -710,7 +698,7 @@ GenMakefile:;
 sinclude GenMakefile
 
 %.java: $(BINARYPATH)$(PFX)util/make/GenericParser.class
-	@$(JAVA) -cp $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH) de.uka.ilkd.key.util.make.GenericParser GenMakefile argfile.generic $(JAVAFILES)
+	@$(JAVA) -cp $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH) de.uka.ilkd.key.util.make.GenericParser $(GENERATED_SRC_PATH) GenMakefile argfile.generic $(JAVAFILES)
 	@$(MAKE) -s -w -f GenMakefile $@ >msg.txt
 
 
@@ -750,24 +738,6 @@ help:
 javahomeset:
 	@./checkEnvironment $(TOGETHER_ENABLED)
 	@mkdir -p $(BINARYPATH)
-
-
-## AsmKey
-
-$(GENERATED_SRC_PATH)de/uka/ilkd/asmkey/parser/antlr/AsmKeyLexer.java \
-$(GENERATED_SRC_PATH)de/uka/ilkd/asmkey/parser/antlr/AsmKeyLexerTokenTypes.txt \
-$(GENERATED_SRC_PATH)de/uka/ilkd/asmkey/parser/antlr/AsmKeyLexerTokenTypes.java \
-	: de/uka/ilkd/asmkey/parser/antlr/AsmKeyLexer.g
-	@echo "[creating $(basename $(notdir $@))]"
-	@install -d $(dir $@)
-	@$(ANTLR) -o $(dir $@) $<
-
-$(GENERATED_SRC_PATH)de/uka/ilkd/asmkey/parser/antlr/AsmKeyParser.java \
-	: de/uka/ilkd/asmkey/parser/antlr/AsmKeyParser.g \
-	$(GENERATED_SRC_PATH)de/uka/ilkd/asmkey/parser/antlr/AsmKeyLexerTokenTypes.txt
-	@echo "[creating $(basename $(notdir $@))]"
-	@install -d $(dir $@)
-	@$(ANTLR) -o $(dir $@) $<
 
 # eclipse plug-in:
 eclipse-plug-in: dist

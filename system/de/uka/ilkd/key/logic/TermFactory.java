@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -707,14 +707,6 @@ public class TermFactory {
 			   JavaBlock javaBlock) {
 	if (op==null) {
 	    throw new IllegalArgumentException("null-Operator at TermFactory");
-	} else if (op instanceof Operator2) {
-	    /* If the operator is an instance of Operator2, the
-	     * operator can create the term by itself. Operator2
-	     * supports no Java blocks and no ruleVar. */
-	    if (javaBlock != JavaBlock.EMPTY_JAVABLOCK) {
-		throw new IllegalArgumentException("Non-empty JavaBlock in Operator2.");
-	    } 
-	    return ((Operator2) op).createTerm(vars, subTerms);
 	} else if (op instanceof Quantifier) {
 	    return createQuantifierTerm((Quantifier)op, vars, subTerms[0]);
 	} else if ( op instanceof QuanUpdateOperator ) {
@@ -744,29 +736,6 @@ public class TermFactory {
 			  JavaBlock javaBlock) {
 	if (op==null) {
 	    throw new IllegalArgumentException("null-Operator at TermFactory");
-	} else if (op instanceof Operator2) {
-	    /* 
-	     * If the operator is an instance of Operator2, the
-	     * operator can create the term by itself. Operator2
-	     * supports no Java blocks and no ruleVar. 
-	     *
-	     * Operator2 restrict the use of quantified variables. 
-	     */
-	    if (javaBlock != JavaBlock.EMPTY_JAVABLOCK) {
-		throw new IllegalArgumentException("Non-empty JavaBlock in Operator2.");
-	    } 
-	    List list = new ArrayList();
-	    if (bv != null) {
-		for (int i = 0; i < bv.length; ++i) {
-		    for (int j = 0; j < bv[i].size(); ++j) {
-			list.add(bv[i].getQuantifiableVariable(j));
-		    }
-		}
-	    }
-	    final QuantifiableVariable[] vars = (QuantifiableVariable[]) list.
-		toArray(new QuantifiableVariable[list.size()]);
-	    return ((Operator2) op).createTerm
-		(new ArrayOfQuantifiableVariable(vars), subTerms);
 	} else if (op instanceof Quantifier) {
 	    return createQuantifierTerm((Quantifier)op, bv[0], subTerms[0]);
 	} else if (op instanceof QuanUpdateOperator) {

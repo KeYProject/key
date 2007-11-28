@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -28,6 +28,8 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 
 import de.uka.ilkd.key.gui.*;
+import de.uka.ilkd.key.gui.configuration.GeneralSettings;
+import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.rule.RuleApp;
 

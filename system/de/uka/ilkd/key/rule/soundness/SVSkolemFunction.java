@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -13,7 +13,6 @@ package de.uka.ilkd.key.rule.soundness;
 
 import de.uka.ilkd.key.java.abstraction.ArrayOfKeYJavaType;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.NonRigidFunction;
 import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -56,13 +55,4 @@ public class SVSkolemFunction extends NonRigidFunction
 
 	return new ArrayOfSort ( res );
     }
-
-    /**
-     * @return true if the value of "term" having this operator as
-     * top-level operator and must not be changed by modalities
-     */
-    public boolean isRigid (Term term) {
-	return false;
-    }
-
 }

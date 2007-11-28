@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -46,7 +46,7 @@ public class DivideMonomials extends AbstractMetaOperator {
         final Monomial m1 = Monomial.create ( arg1, services );
         final Monomial m2 = Monomial.create ( arg2, services );
 
-        final Monomial res = m2.divide ( m1 );
+        final Monomial res = m2.reduce ( m1 );
         return res.toTerm ( services );
     }
 

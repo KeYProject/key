@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,8 +11,13 @@
 package de.uka.ilkd.key.proof.decproc.translation;
 
 import org.apache.log4j.Logger;
+
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.proof.decproc.smtlib.*;
+import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAufliaOp;
+import de.uka.ilkd.key.proof.decproc.smtlib.ConnectiveFormula;
+import de.uka.ilkd.key.proof.decproc.smtlib.Formula;
+import de.uka.ilkd.key.proof.decproc.smtlib.QuantifierFormula;
+import de.uka.ilkd.key.proof.decproc.smtlib.TermVariable;
 
 /** This class represents the translation rule for <tt>Quantifier</tt>s.<br>
  * They are supported only in AUFLIA, not in QF_AUFLIA. 

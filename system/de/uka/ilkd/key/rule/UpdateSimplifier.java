@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -40,7 +40,7 @@ public class UpdateSimplifier {
      * if set to true, the update simplifier is a bit more eagerly when
      * applying updates
      */
-    private boolean eager = false;
+    private boolean eager = true;
     
     
     private Constraint formulaConstraint = Constraint.BOTTOM;

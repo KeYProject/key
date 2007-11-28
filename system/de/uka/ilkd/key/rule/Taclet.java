@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -1403,7 +1403,7 @@ public abstract class Taclet implements Rule, Named {
 */
             if ("".equals(uniqueTail)) { // otherwise just number it
                de.uka.ilkd.key.proof.Node n = goal.node();
-               uniqueTail = AUTONAME+n.proof().getUniqueTacletNr(n);
+               uniqueTail = AUTONAME+n.getUniqueTacletNr()+"_"+n.siblingNr();
             }
 
             tacletToAdd=tacletToAdd.setName(tacletToAdd.name()+uniqueTail);

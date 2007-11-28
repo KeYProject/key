@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -62,12 +62,14 @@ public class InnerVariableNamer extends VariableNamer {
 	//prepare renaming of inner var
 	final NameCreationInfo nci = getMethodStack(posOfFind);
 	ProgramElementName newname = createName(bai.basename, bai.index, nci);
-	if(!isUniqueInGlobals(newname.toString(), globals)) {
-	    int newcounter = getMaxCounterInGlobalsAndProgram(
-	    					bai.basename,
-					    	globals,
-					    	getProgramFromPIO(posOfFind),
-					    	null) + 1; 
+        int newcounter = getMaxCounterInGlobalsAndProgram(
+                        bai.basename,
+                        globals,
+                        getProgramFromPIO(posOfFind),
+                        null);
+        while (!isUniqueInGlobals(newname.toString(), globals) ||
+                goal.proof().getServices().getNamespaces().lookupLogicSymbol(newname)!=null) {
+	    newcounter += 1; 
 	    newname = createName(bai.basename, newcounter, nci);
 	}
         

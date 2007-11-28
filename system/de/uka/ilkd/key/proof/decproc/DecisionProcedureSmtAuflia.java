@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 //This file is part of KeY - Integrated Deductive Software Design
 //Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
 //                      Universitaet Koblenz-Landau, Germany
@@ -10,23 +17,13 @@
 
 package de.uka.ilkd.key.proof.decproc;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.HashMap;
+import java.io.*;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Layout;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
+import org.apache.log4j.*;
 
 import de.uka.ilkd.key.gui.DecisionProcedureSettings;
 import de.uka.ilkd.key.java.Services;
@@ -102,7 +99,7 @@ public abstract class DecisionProcedureSmtAuflia extends AbstractDecisionProcedu
     private static String currentArchiveDir;
     
     /** */
-    private static Map fromProofToArchive = new HashMap();
+    private static Map fromProofToArchive = new WeakHashMap();
         
     /* String constants for creation of the log file and benchmark archives */
     private static final String pointKeyDir = 

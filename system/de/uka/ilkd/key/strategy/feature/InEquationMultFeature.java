@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -50,8 +50,8 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
                                            mult2Candidate,
                                            targetCandidate ) {
             protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {
-                return !mult2M.divide ( targetM ).variablesDisjoint ( mult1M )
-                       && !mult1M.divide ( targetM ).variablesDisjoint ( mult2M );
+                return !mult2M.reduce ( targetM ).variablesDisjoint ( mult1M )
+                       && !mult1M.reduce ( targetM ).variablesDisjoint ( mult2M );
             }            
         };
     }

@@ -1,29 +1,32 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.ListOfNamed;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuanUpdateOperator;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.visualdebugger.BreakpointManager;
-import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 
 
 public class InUpdateFeature extends BinaryFeature {
-
-
-    public static boolean inUpdateAndAssume = false;
     
-    BreakpointManager bpManager;
-    ListOfNamed h;
-    public static boolean splitting_rules=true;
+    private final boolean inUpdateAndAssume;
+    private final boolean splittingRules;
+    private final boolean inInitPhase;
     
-    private InUpdateFeature(Proof p){        
- 
+    private InUpdateFeature(boolean splittingRules, boolean inUpdateAndAssume, 
+            boolean inInitPhase) { 
+        this.inUpdateAndAssume = inUpdateAndAssume;        
+        this.splittingRules = splittingRules;
+        this.inInitPhase = inInitPhase;
     }
     
     //true wenn nicht erlaubt
@@ -31,27 +34,18 @@ public class InUpdateFeature extends BinaryFeature {
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
         if (app.rule() instanceof Taclet){
             Taclet taclet = (Taclet)app.rule();
-            if (taclet.goalTemplates().size()>1 && !splitting_rules){
+            if (taclet.goalTemplates().size()>1 && (!splittingRules || inInitPhase)){
                 return true;                
             }
-    
-            if (taclet.goalTemplates().size()>1 && VisualDebugger.getVisualDebugger().isInitPhase()){
-                return true;                
-            }
-            
-            if (taclet.ifSequent()==Sequent.EMPTY_SEQUENT)//&&
-                    //(((Taclet)app.rule()).goalTemplates().size()==1||inState(pos))){
+                
+            if (taclet.ifSequent()==Sequent.EMPTY_SEQUENT) {
                 return false;
-           // }
+            }
         }
         return  inUpdate(pos) && !inUpdateAndAssume;
     }
     
-    public static InUpdateFeature create(Proof p){
-        return new InUpdateFeature(p);
-    }
-    
-    
+ 
     public boolean inUpdate(PosInOccurrence pio2){
         if (pio2 == null) {
             return false;
@@ -84,6 +78,11 @@ public class InUpdateFeature extends BinaryFeature {
         }
         
         return false;
+    }
+
+    public static Feature create(boolean isSplittingAllowed,
+            boolean inUpdateAndAssumes, boolean inInitPhase) {
+        return new InUpdateFeature(isSplittingAllowed, inUpdateAndAssumes, inInitPhase);
     }
 
     

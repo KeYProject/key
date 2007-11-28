@@ -1,4 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+// This file is part of KeY - Integrated Deductive Software Design
 // Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
@@ -20,6 +27,7 @@ import java.util.Stack;
 import java.util.Vector;
 
 import de.uka.ilkd.key.gui.*;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -435,8 +443,6 @@ public class ProblemLoader implements Runnable {
 
         ourApp = ourApp.setIfFormulaInstantiations(ifSeqFormulaList,
                                                    services, userC);
-
-        ourApp = ourApp.createSkolemFunctions ( mediator.func_ns (), services );
 
         if (!ourApp.sufficientlyComplete()) {
             ourApp = ourApp.tryToInstantiate(currGoal, proof.getServices());
