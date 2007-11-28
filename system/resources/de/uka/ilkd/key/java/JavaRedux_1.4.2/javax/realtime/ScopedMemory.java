@@ -128,7 +128,11 @@ public abstract class ScopedMemory extends MemoryArea{
     }
 
     public java.lang.Object getPortal(){
-	return portal;
+	if(outerScopeM(this, <currentMemoryArea>)){
+	    return portal;
+	}else{
+	    throw new IllegalAssignmentError();
+	}
     }
 
     //    public int getReferenceCount(){ }
@@ -154,7 +158,11 @@ public abstract class ScopedMemory extends MemoryArea{
     //	java.lang.Object[] args){}
 
     public void setPortal(java.lang.Object object){
-	portal = object;
+	if(this==object.memoryArea){
+	    portal = object;
+	}else{
+	    throw new IllegalAssignmentError();
+	}
     }
 
     public java.lang.String toString(){
