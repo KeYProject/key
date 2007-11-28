@@ -41,7 +41,7 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * The Class StartVisualDebuggerAction.
  */

@@ -913,7 +913,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 		rootGroupLData.widthHint = 237;
 		rootGroupLData.heightHint = 112;
 		rootGroup.setLayoutData(rootGroupLData);
-
+		// for development purpose...disabled in normal runs
 		if (debug) {
 			final Button orientation = new Button(rootGroup, SWT.RADIO);
 			orientation.setText("Raw Tree");
@@ -1176,6 +1176,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	 */
 	public synchronized void refresh() {
 
+		collapseFilter = new CollapseFilter();
 		try {
 			if (currentRoot == null) {
 				return;
