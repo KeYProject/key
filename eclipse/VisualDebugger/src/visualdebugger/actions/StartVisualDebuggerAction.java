@@ -852,7 +852,7 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 	*/
 	public void taskProgress(int position) {
 	
-	System.out.println("taskProgress -position:" + position);
+	//System.out.println("taskProgress -position:" + position);
 	pm.setProgress(position);
 	
 	}
@@ -861,7 +861,7 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 	* @see de.uka.ilkd.key.gui.ProverTaskListener#taskStarted(java.lang.String, int)
 	*/
 	public void taskStarted(String message, int size) {
-	System.out.println("taskStarted -size:" + size);
+	//System.out.println("taskStarted -size:" + size);
 	pm.setMaximum(size);
 	
 	}

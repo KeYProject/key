@@ -11,8 +11,8 @@ import de.uka.ilkd.key.visualdebugger.executiontree.ETNode;
  */
 public class CollapseFilter implements Filter {
 
-	/** The children to hide. */
-	LinkedList children = null;
+	/** The children to hide. Ensures that children is never null. */
+	LinkedList<ETNode> children = new LinkedList<ETNode>();
 
 	/**
 	 * Instantiates a new collapse filter.
@@ -48,11 +48,7 @@ public class CollapseFilter implements Filter {
 	 */
 	public void addNodetoCollapse(ETNode etnode) {
 
-		if (children == null) {
-			this.children = etnode.getChildrenList();
-		} else {
-			children.addAll(etnode.getChildrenList());
-		}
+		children.addAll(etnode.getChildrenList());
 
 	}
 
@@ -64,8 +60,8 @@ public class CollapseFilter implements Filter {
 	 */
 	public void removeNodetoCollapse(ETNode etnode) {
 
-		LinkedList childrenList = etnode.getChildrenList();
-		if (children.containsAll(childrenList)) {
+		LinkedList<ETNode> childrenList = etnode.getChildrenList();
+		if (children.containsAll(childrenList) && childrenList.size() > 0) {
 			children.removeAll(childrenList);
 		}
 

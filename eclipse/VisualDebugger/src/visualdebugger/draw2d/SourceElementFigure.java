@@ -13,188 +13,189 @@ import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 import de.uka.ilkd.key.visualdebugger.executiontree.ETNode;
 import de.uka.ilkd.key.visualdebugger.executiontree.ETStatementNode;
 
-public class SourceElementFigure extends Figure {
+public class SourceElementFigure extends Figure implements DrawableNode {
 
-    private boolean selected;
-    
-    /** some color definitions  */
-    static final Color gradient1 = new Color(null, 232, 232, 240);
-    static final Color gradient2 = new Color(null, 176, 184, 216);
-    static final Color gradient12 = new Color(null, 236, 152, 188);
-    static final Color gradient22 = new Color(null, 236, 196, 213);
-    static final Color corner1 = new Color(null, 200, 208, 223);
-    static final Color corner2 = new Color(null, 160, 172, 200);
-    static final Color blue = new Color(null, 152, 168, 200);
-    static final Color shadow = new Color(null, 202, 202, 202);
-    static final int CORNER_SIZE = 00;
+	private boolean selected;
 
-    ETNode etNode = null;
+	/** some color definitions */
+	static final Color gradient1 = new Color(null, 232, 232, 240);
+	static final Color gradient2 = new Color(null, 176, 184, 216);
+	static final Color gradient12 = new Color(null, 236, 152, 188);
+	static final Color gradient22 = new Color(null, 236, 196, 213);
+	static final Color corner1 = new Color(null, 200, 208, 223);
+	static final Color corner2 = new Color(null, 160, 172, 200);
+	static final Color blue = new Color(null, 152, 168, 200);
+	static final Color shadow = new Color(null, 202, 202, 202);
+	static final int CORNER_SIZE = 00;
 
-    final ETStatementNode sNode;
+	ETNode etNode = null;
 
-    Statement statement;
+	final ETStatementNode sNode;
 
-    Expression expression;
+	Statement statement;
 
-    ICompilationUnit unit;
+	Expression expression;
 
-    // static final Border BORDER = new CompoundBorder(new FoldedPageBorder(),
-    // new MarginBorder(4, 4, 8, 3));
-    static final Border BORDER = new LineBorder(ColorConstants.black, 1);
+	ICompilationUnit unit;
 
-    static final Border BREAKMODEBORDER = new LineBorder(ColorConstants.red, 2);
+	// static final Border BORDER = new CompoundBorder(new FoldedPageBorder(),
+	// new MarginBorder(4, 4, 8, 3));
+	static final Border BORDER = new LineBorder(ColorConstants.black, 1);
 
-    static final Border ROUNDEDBORDER = new RoundedBorder(ColorConstants.black,
-            1);
+	static final Border BREAKMODEBORDER = new LineBorder(ColorConstants.red, 2);
 
-    public static class RoundedBorder extends LineBorder {
+	static final Border ROUNDEDBORDER = new RoundedBorder(ColorConstants.black,
+			1);
 
-        public RoundedBorder(Color color, int width) {
-            super(color, width);
-        }
+	public static class RoundedBorder extends LineBorder {
 
-        public void paint(IFigure figure, Graphics graphics, Insets insets) {
-            tempRect.setBounds(getPaintRectangle(figure, insets));
-            if (getWidth() % 2 == 1) {
-                tempRect.width--;
-                tempRect.height--;
-            }
-            tempRect.shrink(getWidth() / 2, getWidth() / 2);
-            graphics.setLineWidth(getWidth());
-            if (getColor() != null)
-                graphics.setForegroundColor(getColor());
-            graphics.drawRoundRectangle(tempRect, 12, 12);
-        }
-    }
+		public RoundedBorder(Color color, int width) {
+			super(color, width);
+		}
 
-    private Label label = new Label();
+		public void paint(IFigure figure, Graphics graphics, Insets insets) {
+			tempRect.setBounds(getPaintRectangle(figure, insets));
+			if (getWidth() % 2 == 1) {
+				tempRect.width--;
+				tempRect.height--;
+			}
+			tempRect.shrink(getWidth() / 2, getWidth() / 2);
+			graphics.setLineWidth(getWidth());
+			if (getColor() != null)
+				graphics.setForegroundColor(getColor());
+			graphics.drawRoundRectangle(tempRect, 12, 12);
+		}
+	}
 
-    public SourceElementFigure(String text) {
-        this();
-        if (text.length() > 20)
-            text = text.substring(0, 20);
-        label.setFont(Display.getCurrent().getSystemFont());
-        label.setText(text);
-    }
+	private Label label = new Label();
 
-    public SourceElementFigure() {
-        setBorder(BORDER);
-        setLayoutManager(new StackLayout());
-        add(label);
-        sNode = null;
-        statement = null;
-        unit = null;
-    }
+	public SourceElementFigure(String text) {
+		this();
+		if (text.length() > 20)
+			text = text.substring(0, 20);
+		label.setFont(Display.getCurrent().getSystemFont());
+		label.setText(text);
+	}
 
-    public SourceElementFigure(ETStatementNode etNode) {
-        // this();
-    	
-        setLayoutManager(new StackLayout());
-        add(label);
-        String labelText = "";
-        String st = "";
-        boolean breakpoint = false;
-        // if (etNode.getStatementId()!=null){
-        if (etNode.getStatementId().isStatement()) {
+	public SourceElementFigure() {
+		setBorder(BORDER);
+		setLayoutManager(new StackLayout());
+		add(label);
+		sNode = null;
+		statement = null;
+		unit = null;
+	}
 
-            if (VisualDebugger.getVisualDebugger().getBpManager()
-                    .suspendByBreakpoint(etNode.getStatementId())) {
-                breakpoint = true;
-                setBorder(BREAKMODEBORDER);
-            } else
-                setBorder(BORDER);
-            statement = (Statement) visualdebugger.Activator.getDefault()
-                    .getASTNodeForStatementId(etNode.getStatementId());
+	public SourceElementFigure(ETStatementNode etNode) {
+		// this();
 
-            unit = visualdebugger.Activator.getDefault().getCompilationUnit(
-                    etNode.getStatementId());
-            st = statement.toString();
-        } else {
-            expression = visualdebugger.Activator.getDefault().getExpression(etNode.getStatementId());
-            setBorder(ROUNDEDBORDER);
-            unit = visualdebugger.Activator.getDefault().getCompilationUnit(
-                    etNode.getStatementId());          
-            st = expression.toString();            
-        }
+		setLayoutManager(new StackLayout());
+		add(label);
+		String labelText = "";
+		String st = "";
+		boolean breakpoint = false;
+		// if (etNode.getStatementId()!=null){
+		if (etNode.getStatementId().isStatement()) {
 
-        labelText = st;
-        int i = st.indexOf("\n");
-        if (i > -1)
-            labelText = st.substring(0, i);
-        label.setText(labelText);
-        // }
+			if (VisualDebugger.getVisualDebugger().getBpManager()
+					.suspendByBreakpoint(etNode.getStatementId())) {
+				breakpoint = true;
+				setBorder(BREAKMODEBORDER);
+			} else
+				setBorder(BORDER);
+			statement = (Statement) visualdebugger.Activator.getDefault()
+					.getASTNodeForStatementId(etNode.getStatementId());
 
-        sNode = etNode;
-        if (breakpoint)
-            st = "Statement Breakpoint is reached...\n" + st;
-        this.setToolTip(new Label(st));
-    }
+			unit = visualdebugger.Activator.getDefault().getCompilationUnit(
+					etNode.getStatementId());
+			st = statement.toString();
+		} else {
+			expression = visualdebugger.Activator.getDefault().getExpression(
+					etNode.getStatementId());
+			setBorder(ROUNDEDBORDER);
+			unit = visualdebugger.Activator.getDefault().getCompilationUnit(
+					etNode.getStatementId());
+			st = expression.toString();
+		}
 
-    /**
-     * @see org.eclipse.draw2d.Figure#paintFigure(org.eclipse.draw2d.Graphics)
-     */
-    protected void paintFigure(Graphics g) {
-        super.paintFigure(g);
-        if (selected) {
-            g.setForegroundColor(ColorConstants.menuBackgroundSelected);
-            g.setBackgroundColor(ColorConstants.titleGradient);
-        } else {
-            if (statement != null || label.getText().equals("Start")) {
-                g.setForegroundColor(gradient1);
-                g.setBackgroundColor(gradient2);
-            } else {
-                g.setForegroundColor(gradient12);
-                g.setBackgroundColor(gradient22);
+		labelText = st;
+		int i = st.indexOf("\n");
+		if (i > -1)
+			labelText = st.substring(0, i);
+		label.setText(labelText);
+		// }
 
-            }
-        }
-        g.fillGradient(getBounds().getResized(-1, -1), true);
+		sNode = etNode;
+		if (breakpoint)
+			st = "Statement Breakpoint is reached...\n" + st;
+		this.setToolTip(new Label(st));
+	}
 
-    }
+	/**
+	 * @see org.eclipse.draw2d.Figure#paintFigure(org.eclipse.draw2d.Graphics)
+	 */
+	protected void paintFigure(Graphics g) {
+		super.paintFigure(g);
+		if (selected) {
+			g.setForegroundColor(ColorConstants.menuBackgroundSelected);
+			g.setBackgroundColor(ColorConstants.titleGradient);
+		} else {
+			if (statement != null || label.getText().equals("Start")) {
+				g.setForegroundColor(gradient1);
+				g.setBackgroundColor(gradient2);
+			} else {
+				g.setForegroundColor(gradient12);
+				g.setBackgroundColor(gradient22);
 
-    public void setSelected(boolean value) {
-        this.selected = value;
-        if (selected)
-            label.setForegroundColor(ColorConstants.white);
-        else
-            label.setForegroundColor(null);
-        repaint();
-    }
+			}
+		}
+		g.fillGradient(getBounds().getResized(-1, -1), true);
 
-    /**
-     * @see java.lang.Object#toString()
-     */
-    public String toString() {
-        // return ((Label) getChildren().get(0)).getText();
-        if (getETNode() != null)
-            if (getETNode().getITNodesArray()[0] != null)
-                return getETNode().getITNodesArray()[0].getId() + "";
+	}
 
-        return "nullds";
-    }
+	public void setSelected(boolean value) {
+		this.selected = value;
+		if (selected)
+			label.setForegroundColor(ColorConstants.white);
+		else
+			label.setForegroundColor(null);
+		repaint();
+	}
 
-    public void validate() {
-        repaint();
-        super.validate();
-    }
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString() {
+		// return ((Label) getChildren().get(0)).getText();
+		if (getETNode() != null)
+			if (getETNode().getITNodesArray()[0] != null)
+				return getETNode().getITNodesArray()[0].getId() + "";
 
-    public ETNode getETNode() {
-        return sNode;
-    }
+		return "nullds";
+	}
 
-    public Statement getStatement() {
-        return statement;
-    }
+	public void validate() {
+		repaint();
+		super.validate();
+	}
 
-    public ICompilationUnit getUnit() {
-        return unit;
-    }
+	public ETNode getETNode() {
+		return sNode;
+	}
 
-    public ASTNode getASTNode() {
-        if (statement != null)
-            return statement;
-        else
-            return expression;
-    }
+	public Statement getStatement() {
+		return statement;
+	}
+
+	public ICompilationUnit getUnit() {
+		return unit;
+	}
+
+	public ASTNode getASTNode() {
+		if (statement != null)
+			return statement;
+		else
+			return expression;
+	}
 
 }

@@ -160,7 +160,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	private MenuItem itemIsolated;
 
 	/** The collapse filter. */
-	private CollapseFilter collapseFilter; 
+	private CollapseFilter collapseFilter;
 
 	/**
 	 * Instantiates a new execution tree view.
@@ -331,12 +331,15 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Creates the node.
 	 * 
+	 * This method draws the passed ETNode according to its specific type.
+	 * 
 	 * @param etNode
 	 *            the et node
 	 * 
 	 * @return the figure
 	 */
 	private Figure createNode(ETNode etNode) {
+
 		if (etNode instanceof ETStatementNode) {
 			final SourceElementFigure node = new SourceElementFigure(
 					(ETStatementNode) etNode);
@@ -511,7 +514,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 			}
 
 			public void widgetSelected(SelectionEvent event) {
-				
+
 				collapseFilter.clear();
 				final ListOfGoal goals = getSubtreeGoalsForETNode(((SourceElementFigure) ExecutionTreeView.this.selected)
 						.getETNode());
@@ -603,7 +606,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 				// make sure that there is a root node
 				currentETRootNode = getCurrentETRootNode();
 				if (currentETRootNode == null) {
-					//if nothing was set take standard root
+					// if nothing was set take standard root
 					currentETRootNode = getRootETNode(getSelectedNode());
 				}
 				// save the actual root
@@ -637,7 +640,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 				// make sure that there is a root node
 				currentETRootNode = getCurrentETRootNode();
 				if (currentETRootNode == null) {
-					//if nothing was set take standard root
+					// if nothing was set take standard root
 					currentETRootNode = getRootETNode(getSelectedNode());
 				}
 				// save the actual root
@@ -667,19 +670,12 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
 					// clear the View
 					clearView();
-					// handle types due to nonuniform interface for nodes
-					ETNode rootNode = null;
-					ETNode currentNode = null;
-					ETNode endNode = null;
 
-					// set the end
-					endNode = getSelectedNode();
-
-					currentNode = endNode;
-					// find and set the root
-					rootNode = getRootETNode(currentNode);
-					TreeBranch tb = buildTreeBranch(rootNode, null,
-							new BranchFilter(new ETPath(rootNode, endNode)));
+					TreeBranch tb = buildTreeBranch(
+							getRootETNode(getSelectedNode()), null,
+							new BranchFilter(new ETPath(
+									getRootETNode(getSelectedNode()),
+									getSelectedNode())));
 
 					// add the isolated path
 					root.addBranch(tb);
@@ -1180,8 +1176,6 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	 */
 	public synchronized void refresh() {
 
-		// progressGroup.setText("Done");
-
 		try {
 			if (currentRoot == null) {
 				return;
@@ -1515,31 +1509,13 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * getSelectedNode
 	 * 
-	 * This method returns the node that is currently selected. Therefore it
-	 * checks for the specific type. Note: This should be changed soon providing
-	 * a uniform Interface for the DrawableNode
+	 * This method returns the node that is currently selected.
 	 * 
 	 * @return currentNode - the actual selected node
 	 */
 	public ETNode getSelectedNode() {
-		ETNode currentNode;
-		if (ExecutionTreeView.this.selected instanceof SourceElementFigure) {
 
-			SourceElementFigure sef = (SourceElementFigure) ExecutionTreeView.this.selected;
-			currentNode = sef.getETNode();
-		} else {
-
-			if (ExecutionTreeView.this.selected instanceof LeafNode) {
-
-				LeafNode ln = (LeafNode) ExecutionTreeView.this.selected;
-				currentNode = ln.getETLeafNode();
-			} else {
-				currentNode = ((DrawableNode) (ExecutionTreeView.this.selected))
-						.getETNode();
-			}
-
-		}
-		return currentNode;
+		return ((DrawableNode) (ExecutionTreeView.this.selected)).getETNode();
 	}
 
 	/**

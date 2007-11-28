@@ -15,33 +15,60 @@ import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 import de.uka.ilkd.key.visualdebugger.executiontree.ETMethodInvocationNode;
 import de.uka.ilkd.key.visualdebugger.executiontree.ETNode;
 
-public class MethodInvocationFigure extends DrawableNode {
+// TODO: Auto-generated Javadoc
+/**
+ * The Class MethodInvocationFigure.
+ */
+public class MethodInvocationFigure extends Figure implements DrawableNode {
 
+    /** The selected. */
     private boolean selected;
     
-    /** some color definitions  */
+    /** some color definitions. */
     static final Color gradient1 = new Color(null, 132, 132, 240);
+    
+    /** The Constant gradient2. */
     static final Color gradient2 = new Color(null, 76, 84, 216);
+    
+    /** The Constant gradient12. */
     static final Color gradient12 = new Color(null, 202, 202, 210);
+    
+    /** The Constant gradient22. */
     static final Color gradient22 = new Color(null, 146, 154, 186);
+    
+    /** The Constant corner1. */
     static final Color corner1 = new Color(null, 200, 208, 223);
+    
+    /** The Constant corner2. */
     static final Color corner2 = new Color(null, 160, 172, 200);
+    
+    /** The Constant blue. */
     static final Color blue = new Color(null, 152, 168, 200);
+    
+    /** The Constant shadow. */
     static final Color shadow = new Color(null, 202, 202, 202);
+    
+    /** The Constant CORNER_SIZE. */
     static final int CORNER_SIZE = 00;
     
+    /** The mi node. */
     final ETMethodInvocationNode miNode;
     
-     ICompilationUnit unit;
-
+    /** The Constant BORDER. */
     static final Border BORDER =  new LineBorder(ColorConstants.black,1);
 
+    /** The label. */
     private Label label = new Label();
     
   
+    /**
+     * Instantiates a new method invocation figure.
+     * 
+     * @param etNode the et node
+     */
     public MethodInvocationFigure(ETMethodInvocationNode etNode){
         
-    	super(etNode);
+    	super();
         setBorder(BORDER);
         setLayoutManager(new StackLayout());
 
@@ -82,6 +109,10 @@ public class MethodInvocationFigure extends DrawableNode {
     }
  
     /**
+     * Paint figure.
+     * 
+     * @param g the g
+     * 
      * @see org.eclipse.draw2d.Figure#paintFigure(org.eclipse.draw2d.Graphics)
      */
     protected void paintFigure(Graphics g) {
@@ -101,6 +132,11 @@ public class MethodInvocationFigure extends DrawableNode {
              
     }
 
+    /**
+     * Sets the selected.
+     * 
+     * @param value the new selected
+     */
     public void setSelected(boolean value) {
         this.selected = value;
         if (selected)
@@ -111,24 +147,29 @@ public class MethodInvocationFigure extends DrawableNode {
     }
 
     /**
+     * To string.
+     * 
+     * @return the string
+     * 
      * @see java.lang.Object#toString()
      */
     public String toString() {
         return ((Label) getChildren().get(0)).getText();
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.draw2d.Figure#validate()
+     */
     public void validate() {
         repaint();
         super.validate();
     }
     
-    public ICompilationUnit getUnit() {
-        //unit.get
-        return unit;
-    }
-    
-    public ASTNode getASTNode(){
-  return null;
-    }
+	/* (non-Javadoc)
+	 * @see visualdebugger.draw2d.DrawableNode#getETNode()
+	 */
+	public ETNode getETNode() {
+		return miNode;
+	}
     
 }

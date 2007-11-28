@@ -8,7 +8,7 @@ import org.eclipse.swt.graphics.Color;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 import de.uka.ilkd.key.visualdebugger.executiontree.ETMethodReturnNode;
 
-public class MethodReturnFigure extends DrawableNode {
+public class MethodReturnFigure extends Figure implements DrawableNode {
 
     private boolean selected;
 
@@ -32,14 +32,12 @@ public class MethodReturnFigure extends DrawableNode {
 
     final ETMethodReturnNode mrNode;
 
-    ICompilationUnit unit;
-
     static final Border BORDER = new LineBorder(ColorConstants.black, 1);
 
     private Label label = new Label();
 
     public MethodReturnFigure(ETMethodReturnNode etNode) {
-        super(etNode);
+        super();
         setBorder(BORDER);
         setLayoutManager(new StackLayout());
 
@@ -109,14 +107,6 @@ public class MethodReturnFigure extends DrawableNode {
 
     public ETMethodReturnNode getETNode() {
         return mrNode;
-    }
-
-    public ICompilationUnit getUnit() {
-        return unit;
-    }
-
-    public ASTNode getASTNode() {
-        return null;
     }
 
 }

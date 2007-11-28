@@ -1715,7 +1715,7 @@ public class VisualDebugger {
     }
 
     /**
-     * Adds the p mto proof starter.
+     * Adds the pm to proof starter.
      * 
      * @param pm the pm
      */
@@ -1754,16 +1754,14 @@ public class VisualDebugger {
         public void taskFinished() {
             pm.setProgress(300);
             System.out.println("task finished");
-
         }
 
         /* (non-Javadoc)
          * @see de.uka.ilkd.key.gui.ProverTaskListener#taskProgress(int)
          */
         public void taskProgress(int position) {
-
+            
             pm.setProgress(position);
-
         }
 
         /* (non-Javadoc)
@@ -1774,7 +1772,5 @@ public class VisualDebugger {
             pm.setMaximum(300);
 
         }
-
     }
-
 }
