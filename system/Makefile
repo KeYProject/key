@@ -43,23 +43,26 @@ OPTIONS=$(COMMON_OPTIONS)
 
 
 GIT_AVAILABLE=$(shell which git)
- 
+
 ifneq ($(strip $(wordlist 1,1,$(GIT_AVAILABLE))),no) 
 GIT=$(shell which git)
 endif
 
+GIT_REPOS_AVAILABLE=$(wildcard ../.git/objects)
 
-ifneq "$(GIT)" ""
-SHA1=$(shell $(GIT) show | grep commit)
-SHA1:=$(wordlist 2,2,$(SHA1))
-ifeq "$(KEY_VERSION_SHORT)" "" 
-KEY_VERSION_SHORT=$(shell $(GIT) log --pretty=one | wc -l)
-KEY_VERSION_SHORT:=$(wordlist 1,1,$(KEY_VERSION_SHORT))
-KEY_VERSION_SHORT:=1.2.$(KEY_VERSION_SHORT)
-endif
-else
 SHA1=ownVersion
 KEY_VERSION_SHORT=0.0.0
+
+ifneq "$(GIT)" "" 
+ ifneq "$(GIT_REPOS_AVAILABLE)" ""
+   SHA1:=$(shell $(GIT) show | grep commit)
+   SHA1:=$(wordlist 2,2,$(SHA1))
+   ifeq "$(KEY_VERSION_SHORT)" "0.0.0" 
+     KEY_VERSION_SHORT:=$(shell $(GIT) log --pretty=one | wc -l)
+     KEY_VERSION_SHORT:=$(wordlist 1,1,$(KEY_VERSION_SHORT))
+     KEY_VERSION_SHORT:=1.2.$(KEY_VERSION_SHORT)
+   endif
+ endif
 endif
 
 ifeq "$(KEY_VERSION_LONG)" ""
