@@ -15,7 +15,6 @@ import java.util.*;
 
 import de.uka.ilkd.key.gui.DecisionProcedureSettings;
 import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.ModelSourceSettings;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -46,7 +45,7 @@ public class ProofSettings {
 
     static {     
 	PROVER_CONFIG_FILE = new File
-	    (Main.KEY_CONFIG_DIR+File.separator+"proof-settings.props");
+	    (Config.KEY_CONFIG_DIR+File.separator+"proof-settings.props");
 	PROVER_CONFIG_FILE_TEMPLATE =
 	    KeYResourceManager.getManager ().getResourceFile
 	    ( ProofSettings.class, "default-proof-settings.props" );
@@ -145,7 +144,7 @@ public class ProofSettings {
     public void saveSettings() {
 	try {
 	    if (!PROVER_CONFIG_FILE.exists()) {	                       
-                new File(Main.KEY_CONFIG_DIR+File.separator).mkdirs();
+                new File(Config.KEY_CONFIG_DIR+File.separator).mkdirs();
                 PROVER_CONFIG_FILE.createNewFile();
 	    }            
 	    FileOutputStream out = 
