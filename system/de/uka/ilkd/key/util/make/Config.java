@@ -31,12 +31,12 @@ public class Config {
     //these two can't be made local to, say, GFinterface because of 
     //static loading
     public static File GF_PATH_FILE = new File
-	(de.uka.ilkd.key.gui.configuration.Config.KEY_CONFIG_DIR+File.separator+"gf-path.props");
+	(de.uka.ilkd.key.gui.configuration.PathConfig.KEY_CONFIG_DIR+File.separator+"gf-path.props");
 
     public static final String GF_PATH_KEY = "[GFPath]";
 
     public static File SIMPLIFY_PATH_FILE = new File
-	(de.uka.ilkd.key.gui.configuration.Config.KEY_CONFIG_DIR+File.separator+"simplify-path.props");
+	(de.uka.ilkd.key.gui.configuration.PathConfig.KEY_CONFIG_DIR+File.separator+"simplify-path.props");
 
     public static final String SIMPLIFY_PATH_KEY = "[SimplifyPath]";
 
@@ -139,7 +139,7 @@ public class Config {
     private static void writeToKeYConfig(File file, String header, 
 					 String key, String prop) {
 	if (!file.exists()) {
-	    new File(de.uka.ilkd.key.gui.configuration.Config.KEY_CONFIG_DIR+File.separator).mkdir();
+	    new File(de.uka.ilkd.key.gui.configuration.PathConfig.KEY_CONFIG_DIR+File.separator).mkdir();
 	}
 	try {
 	    FileOutputStream out = 

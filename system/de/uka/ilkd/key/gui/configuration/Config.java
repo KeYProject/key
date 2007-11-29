@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.gui.configuration;
 
 import java.awt.Font;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -50,10 +49,6 @@ public class Config {
 
     /** the listeners to this Config */
     private List listenerList = new ArrayList(5);
-
-    /** directory where to find the KeY configuration files */ 
-    public static final String KEY_CONFIG_DIR = System.getProperty("user.home")
-        + File.separator + ".key-1.2";
 
     private Config() {
     }

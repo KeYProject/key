@@ -45,7 +45,7 @@ public class ProofSettings {
 
     static {     
 	PROVER_CONFIG_FILE = new File
-	    (Config.KEY_CONFIG_DIR+File.separator+"proof-settings.props");
+	    (PathConfig.KEY_CONFIG_DIR+File.separator+"proof-settings.props");
 	PROVER_CONFIG_FILE_TEMPLATE =
 	    KeYResourceManager.getManager ().getResourceFile
 	    ( ProofSettings.class, "default-proof-settings.props" );
@@ -144,7 +144,7 @@ public class ProofSettings {
     public void saveSettings() {
 	try {
 	    if (!PROVER_CONFIG_FILE.exists()) {	                       
-                new File(Config.KEY_CONFIG_DIR+File.separator).mkdirs();
+                new File(PathConfig.KEY_CONFIG_DIR+File.separator).mkdirs();
                 PROVER_CONFIG_FILE.createNewFile();
 	    }            
 	    FileOutputStream out = 
