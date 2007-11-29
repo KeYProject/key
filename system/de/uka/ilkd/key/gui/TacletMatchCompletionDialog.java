@@ -34,7 +34,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
-import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.*;
@@ -721,7 +721,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
     private static class InstantiationFileHandler {
         private static final String INSTANTIATION_DIR = 
-            Config.KEY_CONFIG_DIR + File.separator + "instantiations";
+            PathConfig.KEY_CONFIG_DIR + File.separator + "instantiations";
 
         private static final String SEPARATOR1 = "<<<<<<";
 
