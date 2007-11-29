@@ -52,9 +52,11 @@ endif
 ifneq "$(GIT)" ""
 SHA1=$(shell $(GIT) show | grep commit)
 SHA1:=$(wordlist 2,2,$(SHA1))
+ifeq "$(KEY_VERSION_SHORT)" "" 
 KEY_VERSION_SHORT=$(shell $(GIT) log --pretty=one | wc -l)
 KEY_VERSION_SHORT:=$(wordlist 1,1,$(KEY_VERSION_SHORT))
 KEY_VERSION_SHORT:=1.2.$(KEY_VERSION_SHORT)
+endif
 else
 SHA1=ownVersion
 KEY_VERSION_SHORT=0.0.0
