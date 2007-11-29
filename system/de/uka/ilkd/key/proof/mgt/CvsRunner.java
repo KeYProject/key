@@ -25,6 +25,7 @@ import java.io.*;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -33,9 +34,7 @@ public class CvsRunner {
 //    private static final File tmpdir = new File("/tmp");
     public static boolean debug = true;
     
-    private static final String DOT_KEY = System.getProperty("user.home")+
-       File.separator+".key";
-    private static final String REP_ROOT = DOT_KEY+File.separator+"CVS-PO-REP"+
+    private static final String REP_ROOT = Main.KEY_CONFIG_DIR+File.separator+"CVS-PO-REP"+
        File.separator;
 //    private static final String ROOT_OPT = "-d "+REP_ROOT;
 
@@ -241,7 +240,7 @@ public class CvsRunner {
     
     private void initRep() throws CvsException {
        File rep = new File(REP_ROOT+File.separator+"CVSROOT");
-       File anchor = new File(DOT_KEY+File.separator+"CVS_ANCHOR_DIR"+
+       File anchor = new File(Main.KEY_CONFIG_DIR+File.separator+"CVS_ANCHOR_DIR"+
                               File.separator+"KEY_CVS_ANCHOR");
                            
        try {

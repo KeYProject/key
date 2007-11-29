@@ -719,9 +719,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
     }
 
     private static class InstantiationFileHandler {
-        private static final String INSTANTIATION_DIR = System
-                .getProperty("user.home")
-                + File.separator + ".key" + File.separator + "instantiations";
+        private static final String INSTANTIATION_DIR = 
+            Main.KEY_CONFIG_DIR + File.separator + "instantiations";
 
         private static final String SEPARATOR1 = "<<<<<<";
 
