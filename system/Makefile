@@ -51,7 +51,10 @@ endif
 GIT_REPOS_AVAILABLE=$(wildcard ../.git/objects)
 
 SHA1=ownVersion
+
+ifeq "$(KEY_VERSION_SHORT)" "" 
 KEY_VERSION_SHORT=0.0.0
+endif
 
 ifneq "$(GIT)" "" 
  ifneq "$(GIT_REPOS_AVAILABLE)" ""
