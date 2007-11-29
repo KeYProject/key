@@ -56,7 +56,7 @@ public class Main extends JFrame {
 
     /** directory where to find the KeY configuration files */ 
     public static final String KEY_CONFIG_DIR = System.getProperty("user.home")
-        + File.separator + ".key";
+        + File.separator + ".key-1.2";
     
     public static final String INTERNAL_VERSION = 
 	KeYResourceManager.getManager().getSHA1();
