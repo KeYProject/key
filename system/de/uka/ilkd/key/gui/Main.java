@@ -54,10 +54,6 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 
 public class Main extends JFrame {
 
-    /** directory where to find the KeY configuration files */ 
-    public static final String KEY_CONFIG_DIR = System.getProperty("user.home")
-        + File.separator + ".key-1.2";
-    
     public static final String INTERNAL_VERSION = 
 	KeYResourceManager.getManager().getSHA1();
 
@@ -77,10 +73,10 @@ public class Main extends JFrame {
      * In which file to store the recent files.
      */
     private static final String RECENT_FILES_STORAGE = 
-        Main.KEY_CONFIG_DIR + File.separator + "recentFiles.props";
+        Config.KEY_CONFIG_DIR + File.separator + "recentFiles.props";
     
     /** Name of the config file controlling logging with log4j */
-    private static final String LOGGER_CONFIGURATION = Main.KEY_CONFIG_DIR + File.separator + "logger.props";
+    private static final String LOGGER_CONFIGURATION = Config.KEY_CONFIG_DIR + File.separator + "logger.props";
     
     static {
         // @xxx preliminary: better store along with other settings.
