@@ -72,16 +72,16 @@ public abstract class NotificationTask {
         }
         // notify thread safe
         if (SwingUtilities.isEventDispatchThread()) {
-           executeImpl(event, manager);
-       } else {
-           final NotificationEvent eventObject = event;
-           final NotificationManager notManager = manager;
-           SwingUtilities.invokeLater(new Runnable() {                                    
-            public void run() {                
-                executeImpl(eventObject, notManager);
-            }               
-           });
-       }
+            executeImpl(event, manager);
+        } else {
+            final NotificationEvent eventObject = event;
+            final NotificationManager notManager = manager;
+            SwingUtilities.invokeLater(new Runnable() {                                    
+                public void run() {                
+                    executeImpl(eventObject, notManager);
+                }               
+            });
+        }
     }
 
 
