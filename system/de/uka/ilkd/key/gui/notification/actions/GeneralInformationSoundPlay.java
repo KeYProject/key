@@ -3,7 +3,6 @@
  */
 package de.uka.ilkd.key.gui.notification.actions;
 
-import java.io.File;
 import java.net.URL;
 
 import de.uka.ilkd.key.gui.notification.NotificationTask;
@@ -24,7 +23,7 @@ public class GeneralInformationSoundPlay extends PlaySound {
             KeYResourceManager.getManager().getResourceFile
         (NotificationTask.class, "sounds/information.wav");
         if (internalSoundFile != null) {
-            setSoundFile(new File(internalSoundFile.getFile()));
+            setSoundURL(internalSoundFile);
         }        
     }
 
