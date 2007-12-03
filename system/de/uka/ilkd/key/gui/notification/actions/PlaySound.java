@@ -3,8 +3,7 @@
  */
 package de.uka.ilkd.key.gui.notification.actions;
 
-import java.io.File;
-import java.net.MalformedURLException;
+import java.net.URL;
 
 import de.uka.ilkd.key.gui.notification.NotificationAction;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
@@ -16,18 +15,18 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class PlaySound implements NotificationAction {
 
-    /** the file where the sound to play is stored */
-    private File soundFile;
+    /** the URL where to find the sound file to play */
+    private URL soundURL;
            
     public PlaySound() {        
     }
     
     /**
-     * sets the file to be played
-     * @param file the File to be played
+     * sets the URL pointing to the location of the sound to be played
+     * @param url the URL refering to the sound to be played
      */
-    public void setSoundFile(File file) {
-        this.soundFile = file;
+    public void setSoundURL(URL url) {
+        this.soundURL = url;
     }
     
     /**
@@ -35,13 +34,8 @@ public class PlaySound implements NotificationAction {
      * @see de.uka.ilkd.key.gui.notification.NotificationAction#execute(NotificationEvent)
      */
     public boolean execute(NotificationEvent event) {       
-        if (soundFile != null) {
-            try {               
-                java.applet.Applet.newAudioClip(soundFile.toURL()).play();                
-            } catch (MalformedURLException mue) {
-                Debug.out("Failure playing soundfile ", mue);
-                return false;
-            } 
+        if (soundURL != null) {       
+            java.applet.Applet.newAudioClip(soundURL).play();            
             return true;
         }
         Debug.out("No sound file found.");

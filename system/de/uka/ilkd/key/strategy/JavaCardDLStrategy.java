@@ -399,7 +399,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                  ( StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY ) );
     }
 
-    private boolean arithDefOps() {
+    protected boolean arithDefOps() {
         return
           StrategyProperties.NON_LIN_ARITH_DEF_OPS.equals (
             strategyProperties.getProperty

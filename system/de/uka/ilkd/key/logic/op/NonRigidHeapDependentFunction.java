@@ -34,6 +34,8 @@ public class NonRigidHeapDependentFunction extends NonRigidFunction {
         super(name, sort, argSorts);      
     }
     
-    
-
+    public String proofToString() {
+        return "\\nonRigid[HeapDependent] " 
+                + super.proofToString().substring("\\nonRigid ".length());
+    }
 }

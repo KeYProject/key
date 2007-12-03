@@ -54,7 +54,7 @@ public class NodeInfo {
     static {
         symbolicExecNames.add(new Name("simplify_prog"));
         symbolicExecNames.add(new Name("simplify_autoname"));
-        symbolicExecNames.add(new Name("simplify_int"));
+        symbolicExecNames.add(new Name("executeIntegerAssignment"));
         symbolicExecNames.add(new Name("simplify_object_creation"));
     }
 

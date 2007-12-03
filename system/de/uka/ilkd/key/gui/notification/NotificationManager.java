@@ -60,6 +60,7 @@ public class NotificationManager {
             new GeneralInformationNotification();
         final AbandonNotification an = new AbandonNotification();
         final ExitKeYNotification en = new ExitKeYNotification();
+
         if (sound) {            
             pcn.addNotificationAction(new ProofClosedSoundPlay());                                     
             gfn.addNotificationAction(new GeneralFailureSoundPlay());            
@@ -71,7 +72,7 @@ public class NotificationManager {
         gfn.addNotificationAction(new GeneralFailureJTextPaneDisplay(mediator.mainFrame()));
         gin.addNotificationAction(new GeneralInformationJTextPaneDisplay(mediator.mainFrame()));
         pcn.addNotificationAction(new ProofClosedJTextPaneDisplay(mediator.mainFrame()));
-                
+        
         addNotificationTask(pcn);
         addNotificationTask(gfn);
         addNotificationTask(gin);

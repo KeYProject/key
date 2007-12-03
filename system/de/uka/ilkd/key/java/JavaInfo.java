@@ -289,6 +289,8 @@ public class JavaInfo {
             return "[J";
         else if ("jshort[]".equals(s) || "short[]".equals(s))
             return "[S";
+        else if ("jchar[]".equals(s) || "char[]".equals(s))
+            return "[C";
 // Strangely, this one is not n
 //        else if ("boolean[]".equals(s))
 //            return "[Z";

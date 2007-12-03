@@ -1,3 +1,4 @@
+./BookExamples/chap02FirstOrderLogic/Ex2.58.key
 ./arith/binomial1.key
 ./arith/binomial2.key
 ./arith/check_jdiv.key

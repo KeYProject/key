@@ -80,7 +80,12 @@ public class TacletIfSelectionDialog extends JPanel{
 		}
 	    };
 	    p.add(label);
-	    JComboBox ifChoice = new JComboBox(model.ifChoiceModel(i));
+	    JComboBox ifChoice = new JComboBox(model.ifChoiceModel(i)) {
+                public java.awt.Dimension getPreferredSize() {
+                    return new java.awt.Dimension(800,
+                        (int)super.getPreferredSize().getHeight());
+                }
+            };
 	    IfComboRenderer rend = new IfComboRenderer(ifChoice.getRenderer(),
                     model.proof().getServices());
 	    ifChoice.setRenderer(rend);	    
@@ -200,8 +205,9 @@ public class TacletIfSelectionDialog extends JPanel{
 	        list.setToolTipText(valStr);                
 	    }
                        	 
-	    return defaultRenderer.
-            getListCellRendererComponent(list, valStr, index, isSelected, cellHasFocus);
+	    Component c = defaultRenderer.getListCellRendererComponent(
+                list, valStr, index, isSelected, cellHasFocus);
+            return c;
 	}
     }
 
