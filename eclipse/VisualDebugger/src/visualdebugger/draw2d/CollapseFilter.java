@@ -1,5 +1,6 @@
 package visualdebugger.draw2d;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.visualdebugger.executiontree.ETNode;
@@ -12,7 +13,7 @@ import de.uka.ilkd.key.visualdebugger.executiontree.ETNode;
 public class CollapseFilter implements Filter {
 
 	/** The children to hide. Ensures that children is never null. */
-	LinkedList<ETNode> children = new LinkedList<ETNode>();
+	private LinkedList<ETNode> children = new LinkedList<ETNode>();
 
 	/**
 	 * Instantiates a new collapse filter.
@@ -34,7 +35,6 @@ public class CollapseFilter implements Filter {
 
 		// hide all nodes that are in the list of children
 		if (children.contains(etnode)) {
-
 			return false;
 		}
 		return true;
@@ -48,6 +48,7 @@ public class CollapseFilter implements Filter {
 	 */
 	public void addNodetoCollapse(ETNode etnode) {
 
+		etnode.setCollapsed(true);
 		children.addAll(etnode.getChildrenList());
 
 	}
@@ -58,8 +59,10 @@ public class CollapseFilter implements Filter {
 	 * @param etnode
 	 *            the ETNode to be collapsed.
 	 */
+
 	public void removeNodetoCollapse(ETNode etnode) {
 
+		etnode.setCollapsed(false);
 		LinkedList<ETNode> childrenList = etnode.getChildrenList();
 		if (children.containsAll(childrenList) && childrenList.size() > 0) {
 			children.removeAll(childrenList);
@@ -72,9 +75,23 @@ public class CollapseFilter implements Filter {
 	 */
 	public void clear() {
 
-		if (children != null) {
-			children.removeAll(children);
+		children = new LinkedList<ETNode>();
+	}
+
+	/**
+	 * Remove the overlays indicating that a node is collapsed
+	 * beginning from the passed ETNode.
+	 */
+	public void clearCollapseMarkers(ETNode etn) {
+
+		etn.setCollapsed(false);
+		Iterator<ETNode> childrenIterator = etn.getChildrenList().iterator();
+		while (childrenIterator.hasNext()) {
+			ETNode theNode = (ETNode) childrenIterator.next();
+			theNode.setCollapsed(false);
+			clearCollapseMarkers(theNode);
 		}
+
 	}
 
 }

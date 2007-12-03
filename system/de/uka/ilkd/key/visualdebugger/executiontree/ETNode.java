@@ -25,6 +25,7 @@ import de.uka.ilkd.key.visualdebugger.VisualDebugger;
  * been wanted. This bug applies to all subclasses as well.
  */
 public class ETNode {
+    
     private LinkedList children = new LinkedList();
 
     private ETMethodInvocationNode lastMethodInvocation = null;
@@ -42,7 +43,8 @@ public class ETNode {
     private LinkedList itNodes = new LinkedList();
 
     private boolean nobc = false;
-
+    private boolean isCollapsed = false;
+    
     private ListOfTerm simplifiedBC = null;
 
     public ETNode(ListOfTerm bc, ETNode parent) {
@@ -272,5 +274,13 @@ public class ETNode {
                         "DebuggerStrategy", new StrategyProperties())));
         ps.run(mediator.getProof().env());
         return ps.getProof().closed();
+    }
+
+    public boolean isCollapsed() {
+        return isCollapsed;
+    }
+
+    public void setCollapsed(boolean isCollapsed) {
+        this.isCollapsed = isCollapsed;
     }
 }

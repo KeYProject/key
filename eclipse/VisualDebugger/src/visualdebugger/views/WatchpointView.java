@@ -1,13 +1,22 @@
 package visualdebugger.views;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JTextArea;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.draw2d.ColorConstants;
+import org.eclipse.draw2d.LightweightSystem;
 import org.eclipse.jdt.core.*;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -19,15 +28,31 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.viewers.*;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.ProgressBar;
+import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.*;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.MarkerUtilities;
+
+import visualdebugger.views.ExecutionTreeView.PM;
 
 import de.uka.ilkd.key.visualdebugger.*;
 import de.uka.ilkd.key.visualdebugger.executiontree.*;
@@ -37,473 +62,386 @@ import de.uka.ilkd.key.visualdebugger.executiontree.*;
  */
 public class WatchpointView extends ViewPart {
 
-    /** The viewer. */
-    private TableViewer viewer;
+	/** The viewer. */
+	private TableViewer viewer;
 
-    /** The delete action. */
-    private Action deleteAction;
+	/** The delete action. */
+	private Action removeAction;
 
-    /** The add action. */
-    private Action addAction;
+	/** The add action. */
+	private Action addAction;
 
-    /** The bp manager. */
-    private BreakpointManager bpManager;
+	/** The bp manager. */
+	private BreakpointManager bpManager;
 
-    /**
-     * The Class BpContentProvider.
-     */
-    class BpContentProvider implements IStructuredContentProvider {
+	private Composite parent;
 
-        /**
-         * Input changed.
-         * 
-         * @param v
-         *            the v
-         * @param oldInput
-         *            the old input
-         * @param newInput
-         *            the new input
-         */
-        public void inputChanged(Viewer v, Object oldInput, Object newInput) {
-        }
+	/**
+	 * The Class BpContentProvider.
+	 */
+	class BpContentProvider implements IStructuredContentProvider {
 
-        /**
-         * Dispose.
-         */
-        public void dispose() {
-        }
+		/**
+		 * Input changed.
+		 * 
+		 * @param v
+		 *            the v
+		 * @param oldInput
+		 *            the old input
+		 * @param newInput
+		 *            the new input
+		 */
+		public void inputChanged(Viewer v, Object oldInput, Object newInput) {
+		}
 
-        /**
-         * Gets the elements.
-         * 
-         * @param parent
-         *            the parent
-         * 
-         * @return the elements
-         */
-        public Object[] getElements(Object parent) {
-            if (parent instanceof BreakpointManager) {
-                return ((BreakpointManager) parent).getBreapoints();
-            } else
-                return new String[] { "One", "Two", "Three" };
-        }
-    }
+		/**
+		 * Dispose.
+		 */
+		public void dispose() {
+		}
 
-    /**
-     * The Class BpLabelProvider.
-     */
-    class BpLabelProvider extends LabelProvider implements ITableLabelProvider {
+		/**
+		 * Gets the elements.
+		 * 
+		 * @param parent
+		 *            the parent
+		 * 
+		 * @return the elements
+		 */
+		public Object[] getElements(Object parent) {
+			if (parent instanceof BreakpointManager) {
+				return ((BreakpointManager) parent).getBreapoints();
+			} else
+				return new String[] { "One", "Two", "Three" };
+		}
+	}
 
-        /**
-         * Gets the column text.
-         * 
-         * @param obj
-         *            the obj
-         * @param index
-         *            the index
-         * 
-         * @return the column text
-         */
-        public String getColumnText(Object obj, int index) {
-            if (obj instanceof BreakpointEclipse) {
-                BreakpointEclipse b = (BreakpointEclipse) obj;
-                if (index == 2) {
-                    final String s = b.getStatement().toString();
-                    return s.substring(0, s.lastIndexOf("\n"));
-                } else if (index == 0) {
-                    return b.getCompilationUnit().getResource().getName();
-                } else if (index == 1) {
-                    return b.getMethod().getElementName();
-                }
+	/**
+	 * The Class BpLabelProvider.
+	 */
+	class BpLabelProvider extends LabelProvider implements ITableLabelProvider {
 
-                return b.getId().getId() + "";
-            }
-            return "UNKNOWN CONTENT";
-        }
+		/**
+		 * Gets the column text.
+		 * 
+		 * @param obj
+		 *            the obj
+		 * @param index
+		 *            the index
+		 * 
+		 * @return the column text
+		 */
+		public String getColumnText(Object obj, int index) {
+			if (obj instanceof BreakpointEclipse) {
+				BreakpointEclipse b = (BreakpointEclipse) obj;
+				if (index == 2) {
+					final String s = b.getStatement().toString();
+					return s.substring(0, s.lastIndexOf("\n"));
+				} else if (index == 0) {
+					return b.getCompilationUnit().getResource().getName();
+				} else if (index == 1) {
+					return b.getMethod().getElementName();
+				}
 
-        /**
-         * Gets the column image.
-         * 
-         * @param obj
-         *            the obj
-         * @param index
-         *            the index
-         * 
-         * @return the column image
-         */
-        public Image getColumnImage(Object obj, int index) {
-            return null;
-        }
+				return b.getId().getId() + "";
+			}
+			return "UNKNOWN CONTENT";
+		}
 
-        /**
-         * Gets the image.
-         * 
-         * @param obj
-         *            the obj
-         * 
-         * @return the image
-         */
-        public Image getImage(Object obj) {
-            return PlatformUI.getWorkbench().getSharedImages().getImage(
-                    ISharedImages.IMG_OBJ_ELEMENT);
-        }
-    }
+		/**
+		 * Gets the column image.
+		 * 
+		 * @param obj
+		 *            the obj
+		 * @param index
+		 *            the index
+		 * 
+		 * @return the column image
+		 */
+		public Image getColumnImage(Object obj, int index) {
+			return null;
+		}
 
-    /**
-     * Instantiates a new breakpoint view.
-     */
-    public WatchpointView() {
-        bpManager = VisualDebugger.getVisualDebugger().getBpManager();
-    }
+		/**
+		 * Gets the image.
+		 * 
+		 * @param obj
+		 *            the obj
+		 * 
+		 * @return the image
+		 */
+		public Image getImage(Object obj) {
+			return PlatformUI.getWorkbench().getSharedImages().getImage(
+					ISharedImages.IMG_OBJ_ELEMENT);
+		}
+	}
 
-    /**
-     * This is a callback that will allow us to create the viewer and initialize
-     * it.
-     * 
-     * @param parent
-     *            the parent
-     */
-    public void createPartControl(Composite parent) {
-        viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL
-                | SWT.V_SCROLL | SWT.SEPARATOR);
+	/**
+	 * Instantiates a new breakpoint view.
+	 */
+	public WatchpointView() {
+		bpManager = VisualDebugger.getVisualDebugger().getBpManager();
+	}
 
-        // viewer.setSorter(new NameSorter());
+	/**
+	 * This is a callback that will allow us to create the viewer and initialize
+	 * it.
+	 * 
+	 * @param parent
+	 *            the parent
+	 */
+	public void createPartControl(Composite parent) {
+		Composite shell = parent.getShell();
+		this.parent = parent;
+		// create left side of the view window
+		parent.setLayout(new GridLayout(2, false));
+		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL
+				| SWT.V_SCROLL | SWT.SEPARATOR);
 
-        Table table = viewer.getTable();
-        // table.setLayoutData(new GridData(GridData.FILL_BOTH));
-        TableColumn column;
+		// viewer.setSorter(new NameSorter());
 
-        column = new TableColumn(table, SWT.NONE, 0);
-        column.setWidth(200);
-        column.setText("Watch Expression");
-        column = new TableColumn(table, SWT.NONE, 1);
-        column.setWidth(100);
-        column.setText("File");
-        column = new TableColumn(table, SWT.NONE, 2);
-        column.setWidth(100);
-        column.setText("Method");
-        column = new TableColumn(table, SWT.NONE, 3);
-        column.setWidth(70);
-        column.setText("Statement");
-        table.setHeaderVisible(true);
-        table.setLinesVisible(true);
-        viewer.setContentProvider(new BpContentProvider());
-        viewer.setLabelProvider(new BpLabelProvider());
+		Table table = viewer.getTable();
+	    table.setLayoutData(new GridData(GridData.FILL_BOTH));
+		TableColumn column;
 
-        viewer.setInput(bpManager);
+		column = new TableColumn(table, SWT.NONE, 0);
+		column.setWidth(200);
+		column.setText("Watch Expression");
+		column = new TableColumn(table, SWT.NONE, 1);
+		column.setWidth(100);
+		column.setText("File");
+		column = new TableColumn(table, SWT.NONE, 2);
+		column.setWidth(100);
+		column.setText("Method");
+		column = new TableColumn(table, SWT.NONE, 3);
+		column.setWidth(70);
+		column.setText("Statement");
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+		viewer.setContentProvider(new BpContentProvider());
+		viewer.setLabelProvider(new BpLabelProvider());
 
-        hookListener();
-        makeActions();
-        hookContextMenu();
+		viewer.setInput(bpManager);
+		
+		hookShell();
+		hookListener();
+		makeActions();
+		hookContextMenu();
 
-        contributeToActionBars();
-    }
+		contributeToActionBars();
+	}
 
-    /**
-     * Hook listener.
-     */
-    private void hookListener() {
-        viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            public void selectionChanged(SelectionChangedEvent event) {
-                // if the selection is empty clear the label
-                if (event.getSelection().isEmpty()) {
+	private void hookShell() {
+		
+		Composite localShell = new Composite(parent, 0);
+		// localShell.set
+		GridData gdata = new GridData(GridData.FILL_VERTICAL);
+		// gdata.minimumWidth=30;
+		// gdata.grabExcessHorizontalSpace=true;
+		localShell.setLayoutData(gdata);
 
-                    return;
-                }
-                if (event.getSelection() instanceof IStructuredSelection) {
-                    IStructuredSelection selection = (IStructuredSelection) event
-                            .getSelection();
+		localShell.setLayout(new GridLayout());
 
-                    Object domain = selection.getFirstElement();
-                    if (domain instanceof BreakpointEclipse) { // TODO !!!!!
-                        BreakpointEclipse bp = (BreakpointEclipse) domain;
-                        // ICompilationUnit unit = bp.getCompilationUnit();
-                        ISourceViewer viewer = null;
-                        IWorkbench workbench = PlatformUI.getWorkbench();
-                        IWorkbenchPage page = workbench
-                                .getActiveWorkbenchWindow().getActivePage();
-                        IMarker marker = null;
-                        // TODO add marker attribute to BreakpointEclipse
-                        try {
-                            IMarker[] markers = bp.getCompilationUnit()
-                                    .getResource().findMarkers(
-                                            "VisualDebugger.bpmarker", true, 1);
-                            for (int i = 0; i < markers.length; i++) {
+		Group progressGroup = new Group(localShell, 0);
+		RowLayout progressGroupLayout = new RowLayout(
+				org.eclipse.swt.SWT.HORIZONTAL);
+		progressGroup.setLayout(progressGroupLayout);
+		GridData progressGroupLData = new GridData();
+		progressGroupLData.widthHint = 237;
+		progressGroupLData.heightHint = 23;
+		progressGroup.setLayoutData(progressGroupLData);
+		progressGroup.setText("Progress");
 
-                                if (((Integer) markers[i]
-                                        .getAttribute("StatementId"))
-                                        .intValue() == bp.getId().getId()) {
-                                    marker = markers[i];
-                                }
-                            }
-                        } catch (CoreException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
+		RowData progressBar1LData = new RowData();
 
-                        try {
-                            IEditorPart ed = org.eclipse.ui.ide.IDE.openEditor(
-                                    page, marker, true);
-                            viewer = (ISourceViewer) ed
-                                    .getAdapter(ITextOperationTarget.class);
-                        } catch (Exception e) {
-                            e.printStackTrace();
 
-                        }
 
-                        // IEditorPart editor
-                        // =PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-                        /*
-                         * //bp.getAnnotation().getSourceViewer().setSelectedRange(bp.getSelection().getOffset(),
-                         * bp.getSelection().getLength()); if (editor instanceof
-                         * ITextEditor){ ITextEditor tedit= (ITextEditor)
-                         * editor;
-                         * tedit.getSelectionProvider().setSelection(bp.getSelection()); }
-                         */
+		Group rootGroup = new Group(localShell, 0);
+		rootGroup.setText("Properties");
+		FontData data = rootGroup.getFont().getFontData()[0];
+		data.setStyle(SWT.BOLD);
+		rootGroup.setLayout(new GridLayout());
+		GridData rootGroupLData = new GridData();
+		rootGroupLData.widthHint = 237;
+		rootGroupLData.heightHint = 112;
+		rootGroup.setLayoutData(rootGroupLData);
 
-                    }
-                }
-            }
-        });
-    }
 
-    /**
-     * Hook context menu.
-     */
-    private void hookContextMenu() {
-        MenuManager menuMgr = new MenuManager("#PopupMenu");
-        menuMgr.setRemoveAllWhenShown(true);
-        menuMgr.addMenuListener(new IMenuListener() {
-            public void menuAboutToShow(IMenuManager manager) {
-            	WatchpointView.this.fillContextMenu(manager);
-            }
-        });
-        Menu menu = menuMgr.createContextMenu(viewer.getControl());
-        viewer.getControl().setMenu(menu);
-        getSite().registerContextMenu(menuMgr, viewer);
-    }
+		Group bcGroup = new Group(localShell, 0);
+		bcGroup.setBackground(ColorConstants.white);
+		bcGroup.setText("Branch Condition");
 
-    /**
-     * Contribute to action bars.
-     */
-    private void contributeToActionBars() {
-        IActionBars bars = getViewSite().getActionBars();
-        fillLocalPullDown(bars.getMenuManager());
-        fillLocalToolBar(bars.getToolBarManager());
-    }
+		GridData bcGroupLData = new GridData();
+		bcGroupLData.verticalAlignment = GridData.FILL;
+		bcGroupLData.horizontalAlignment = GridData.FILL;
+		bcGroupLData.grabExcessHorizontalSpace = true;
+		bcGroupLData.grabExcessVerticalSpace = true;
+		bcGroup.setLayoutData(bcGroupLData);
+		bcGroup.setLayout(new GridLayout());
+		
+	}
 
-    /**
-     * Fill local pull down.
-     * 
-     * @param manager
-     *            the manager
-     */
-    private void fillLocalPullDown(IMenuManager manager) {
+	/**
+	 * Hook listener.
+	 */
+	private void hookListener() {
+		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			public void selectionChanged(SelectionChangedEvent event) {
+				// if the selection is empty clear the label
+				if (event.getSelection().isEmpty()) {
 
-        manager.add(addAction);
-        manager.add(new Separator());
-        manager.add(deleteAction);
-    }
+					return;
+				}
+				if (event.getSelection() instanceof IStructuredSelection) {
+					IStructuredSelection selection = (IStructuredSelection) event
+							.getSelection();
 
-    /**
-     * Fill context menu.
-     * 
-     * @param manager
-     *            the manager
-     */
-    private void fillContextMenu(IMenuManager manager) {
-        manager.add(addAction);
-        manager.add(deleteAction);
-        // Other plug-ins can contribute there actions here
-        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-    }
+					Object domain = selection.getFirstElement();
+					if (domain instanceof BreakpointEclipse) { // TODO !!!!!
+						BreakpointEclipse bp = (BreakpointEclipse) domain;
+						// ICompilationUnit unit = bp.getCompilationUnit();
+						ISourceViewer viewer = null;
+						IWorkbench workbench = PlatformUI.getWorkbench();
+						IWorkbenchPage page = workbench
+								.getActiveWorkbenchWindow().getActivePage();
+						IMarker marker = null;
+						// TODO add marker attribute to BreakpointEclipse
+						try {
+							IMarker[] markers = bp.getCompilationUnit()
+									.getResource().findMarkers(
+											"VisualDebugger.bpmarker", true, 1);
+							for (int i = 0; i < markers.length; i++) {
 
-    /**
-     * Fill local tool bar.
-     * 
-     * @param manager
-     *            the manager
-     */
-    private void fillLocalToolBar(IToolBarManager manager) {
-        manager.add(addAction);
-        manager.add(deleteAction);
-    }
+								if (((Integer) markers[i]
+										.getAttribute("StatementId"))
+										.intValue() == bp.getId().getId()) {
+									marker = markers[i];
+								}
+							}
+						} catch (CoreException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 
-    /**
-     * Make actions.
-     */
-    private void makeActions() {
-        addAction = new Action() {
-            public void run() {
-                IEditorPart editor = PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow().getActivePage()
-                        .getActiveEditor();
-                if (editor instanceof ITextEditor) {
-                    ITextEditor tedit = (ITextEditor) editor;
+						try {
+							IEditorPart ed = org.eclipse.ui.ide.IDE.openEditor(
+									page, marker, true);
+							viewer = (ISourceViewer) ed
+									.getAdapter(ITextOperationTarget.class);
+						} catch (Exception e) {
+							e.printStackTrace();
 
-                    ISelection sel = tedit.getSelectionProvider()
-                            .getSelection();
-                    ITextSelection tsel = (ITextSelection) sel;
-                    IFile file = (IFile) tedit.getEditorInput().getAdapter(
-                            IFile.class);
+						}
 
-                    String fileName = file.getProjectRelativePath().toString();
-                    System.out.println(fileName);
-                    System.out.println("FileName " + fileName);
+						// IEditorPart editor
+						// =PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+						/*
+						 * //bp.getAnnotation().getSourceViewer().setSelectedRange(bp.getSelection().getOffset(),
+						 * bp.getSelection().getLength()); if (editor instanceof
+						 * ITextEditor){ ITextEditor tedit= (ITextEditor)
+						 * editor;
+						 * tedit.getSelectionProvider().setSelection(bp.getSelection()); }
+						 */
 
-                    ICompilationUnit unit = JavaCore
-                            .createCompilationUnitFrom(file);
-                    IMethod method = null;
-                    try {
-                        IJavaElement je = unit.getElementAt(tsel.getOffset());
-                        if (je instanceof IMethod) {
-                            method = (IMethod) je;
-                        }
+					}
+				}
+			}
+		});
+	}
 
-                        // System.out.println(method);
-                        // System.out.println(method.getClass());
-                    } catch (JavaModelException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
+	/**
+	 * Hook context menu.
+	 */
+	private void hookContextMenu() {
+		MenuManager menuMgr = new MenuManager("#PopupMenu");
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(IMenuManager manager) {
+				WatchpointView.this.fillContextMenu(manager);
+			}
+		});
+		Menu menu = menuMgr.createContextMenu(viewer.getControl());
+		viewer.getControl().setMenu(menu);
+		getSite().registerContextMenu(menuMgr, viewer);
+	}
 
-                    // -------- get File
-                    IProject project = unit.getJavaProject().getProject();
-                    File location = project.getLocation().toFile();
-                    File f = new File(location + fileName);
-                    System.out.println(location + "/" + fileName);
-                    // ----------------------
+	/**
+	 * Contribute to action bars.
+	 */
+	private void contributeToActionBars() {
+		IActionBars bars = getViewSite().getActionBars();
+		fillLocalPullDown(bars.getMenuManager());
+		fillLocalToolBar(bars.getToolBarManager());
+	}
 
-                    ASTParser parser = ASTParser.newParser(AST.JLS3);
-                    parser.setResolveBindings(true);
-                    parser.setSource(unit);
-                    CompilationUnit astRoot = (CompilationUnit) parser
-                            .createAST(null);
+	/**
+	 * Fill local pull down.
+	 * 
+	 * @param manager
+	 *            the manager
+	 */
+	private void fillLocalPullDown(IMenuManager manager) {
 
-                    FindStatementVisitor visitor = new FindStatementVisitor(
-                            tsel.getOffset());
-                    astRoot.accept(visitor);
+		manager.add(addAction);
+		manager.add(new Separator());
+		manager.add(removeAction);
+	}
 
-                    if (visitor.getStatement() == null) {
-                        MessageDialog
-                                .openError(PlatformUI.getWorkbench()
-                                        .getActiveWorkbenchWindow().getShell(),
-                                        "Adding Statement Breakpoint",
-                                        "Please select a Java statement in the Java Editor");
-                        return;
-                    }
-                    // ISourceViewer sviewer = getSourceViewer(file);
+	/**
+	 * Fill context menu.
+	 * 
+	 * @param manager
+	 *            the manager
+	 */
+	private void fillContextMenu(IMenuManager manager) {
+		manager.add(addAction);
+		manager.add(removeAction);
+		// Other plug-ins can contribute there actions here
+		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+	}
 
-                    // BreakpointAnnotation annotation = new
-                    // BreakpointAnnotation("VisualDebugger.BpAnnotationType",true,"Statement
-                    // Breakpoint",sviewer);
-                    // new
-                    // BreakpointAnnotation("VisualDebugger.BpAnnotationType",marker);
-                    // System.out.println("P " +annotation.isPersistent());
-                    BreakpointEclipse bp = new BreakpointEclipse(
-                            new SourceElementId("", visitor.getStatementId()),
-                            visitor.getTextSelection(), visitor.getStatement(),
-                            unit, method);
-                    if (!bpManager.addBreakpoint(bp))
-                        return;
-                    try {
-                        Map map = new HashMap();
-                        map.put("StatementId", new Integer(visitor
-                                .getStatementId()));
-                        // MarkerUtilities.setLineNumber(map, 10);
-                        MarkerUtilities.setCharStart(map, visitor
-                                .getTextSelection().getOffset());
-                        MarkerUtilities.setCharEnd(map, visitor
-                                .getTextSelection().getOffset()
-                                + visitor.getTextSelection().getLength());
+	/**
+	 * Fill local tool bar.
+	 * 
+	 * @param manager
+	 *            the manager
+	 */
+	private void fillLocalToolBar(IToolBarManager manager) {
+		manager.add(addAction);
+		manager.add(removeAction);
+	}
 
-                        MarkerUtilities.createMarker(unit.getResource(), map,
-                                "VisualDebugger.bpmarker");
+	/**
+	 * Make actions.
+	 */
+	private void makeActions() {
+		addAction = new Action() {
+			public void run() {
+				
+				//TODO
 
-                    } catch (CoreException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    // --------------------------------------------------------
+			}
 
-                    // TODO start/end line
-                    // IDocument doc =
-                    // tedit.getDocumentProvider().getDocument(null);
-                    // IRegion i =
-                    // doc.getLineInformationOfOffset(bp.getSelection().getOffset());
-                    // Line Tracker...
+		};
+		addAction.setText("Add");
+		addAction.setToolTipText("Adds an expression that should be watched");
 
-                    // sviewer.getAnnotationModel().
-                    // addAnnotation(annotation,
-                    // new Position(visitor.getTextSelection().getOffset(),
-                    // visitor.getTextSelection().getLength()));
-                    // sviewer.revealRange(visitor.getTextSelection().getOffset(),
-                    // visitor.getTextSelection().getOffset());
+		removeAction = new Action() {
+			public void run() {
 
-                    viewer.setInput(bpManager);
-                    DebuggerEvent event = new DebuggerEvent(
-                            DebuggerEvent.TREE_CHANGED, ExecutionTree
-                                    .getITNode());
-                    VisualDebugger.getVisualDebugger().fireDebuggerEvent(event);
+					// TODO
+			}
 
-                }
-            }
-        };
-        addAction.setText("Add");
-        addAction.setToolTipText("Adds a statement breakpoint");
-        // addAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
-        // getImageDescriptor(ISharedImages.IMG_OBJ_FILE));
+		};
+		removeAction.setText("Remove");
+		removeAction.setToolTipText("Remove watchpoint");
 
-        deleteAction = new Action() {
-            public void run() {
-                IStructuredSelection sel = (IStructuredSelection) viewer
-                        .getSelection();
+	}
 
-                Object domain = sel.getFirstElement();
-                if (domain instanceof BreakpointEclipse) {
-                    BreakpointEclipse bp = (BreakpointEclipse) domain;
-                    try {
-                        IMarker[] markers = bp.getCompilationUnit()
-                                .getResource().findMarkers(
-                                        "VisualDebugger.bpmarker", true, 1);
-                        for (int i = 0; i < markers.length; i++) {
-                            if (((Integer) markers[i]
-                                    .getAttribute("StatementId")).intValue() == bp
-                                    .getId().getId()) {
-                                markers[i].delete();
-                            }
-                        }
-                    } catch (CoreException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-
-                    // ISourceViewer sviewer =
-                    // bp.getAnnotation().getSourceViewer();
-                    // sviewer.getAnnotationModel().removeAnnotation(bp.getAnnotation());
-                    bpManager.remove(bp);
-                    viewer.setInput(bpManager);
-                    DebuggerEvent event = new DebuggerEvent(
-                            DebuggerEvent.TREE_CHANGED, ExecutionTree
-                                    .getITNode());
-                    VisualDebugger.getVisualDebugger().fireDebuggerEvent(event);
-
-                    // showMessage("Action 1 executed");
-
-                }
-            }
-        };
-        deleteAction.setText("Remove");
-        deleteAction.setToolTipText("Removes the selected breakpoint");
-        // deleteAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
-        // getImageDescriptor(ISharedImages.IMG_TOOL_DELETE));
-
-    }
-
-    /**
-     * Passing the focus request to the viewer's control.
-     */
-    public void setFocus() {
-        viewer.getControl().setFocus();
-    }
+	/**
+	 * Passing the focus request to the viewer's control.
+	 */
+	public void setFocus() {
+		viewer.getControl().setFocus();
+	}
 }

@@ -162,13 +162,15 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/** The collapse filter. */
 	private CollapseFilter collapseFilter;
 
+	private MenuItem itemExpand;
+			
+		
 	/**
 	 * Instantiates a new execution tree view.
 	 */
 	public ExecutionTreeView() {
 		vd = VisualDebugger.getVisualDebugger();
 		vd.addListener(this);
-
 	}
 
 	/**
@@ -392,9 +394,6 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
 		else if (etNode instanceof ETMethodReturnNode) {
 
-			// if (true)
-			// return new Label("TEST");
-
 			final MethodReturnFigure node = new MethodReturnFigure(
 					(ETMethodReturnNode) etNode);
 
@@ -409,7 +408,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 			});
 			return node;
 		}
-
+// only visible for debug = true && statement level ET 2
 		else {
 			final Ellipse node = new Ellipse();
 			node.setPreferredSize(10, 10);
@@ -514,8 +513,10 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 			}
 
 			public void widgetSelected(SelectionEvent event) {
-
+				
 				collapseFilter.clear();
+				//make sure that all information available is contained in the root node
+				currentETRootNode = null;
 				final ListOfGoal goals = getSubtreeGoalsForETNode(((SourceElementFigure) ExecutionTreeView.this.selected)
 						.getETNode());
 				vd.run(goals);
@@ -590,6 +591,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 				sketchStartUpConnection(treeBranch);
 				// handle menu status
 				itemAll.setEnabled(true);
+				itemExpand.setEnabled(true);
 			}
 		});
 		// collapse tree below
@@ -601,8 +603,6 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
 			public void widgetSelected(SelectionEvent event) {
 
-				// clear the View
-				clearView();
 				// make sure that there is a root node
 				currentETRootNode = getCurrentETRootNode();
 				if (currentETRootNode == null) {
@@ -612,6 +612,10 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 				// save the actual root
 				setCurrentETRootNode(currentETRootNode);
 				collapseFilter.addNodetoCollapse(getSelectedNode());
+							
+				// clear the View
+				clearView();
+				
 				TreeBranch tb = buildTreeBranch(currentETRootNode, null,
 						collapseFilter);
 
@@ -621,22 +625,23 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 				sketchStartUpConnection(tb);
 				// handle menu status
 				itemAll.setEnabled(true);
+				itemExpand.setEnabled(true);
 
 			}
 
 		});
 
 		// expand current node
-		item = new MenuItem(classMenu, SWT.PUSH);
-		item.setText("Expand Node");
-		item.addSelectionListener(new SelectionListener() {
+		itemExpand = new MenuItem(classMenu, SWT.PUSH);
+		itemExpand.setText("Expand Node");
+		itemExpand.setEnabled(false);
+		itemExpand.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent event) {
 			}
 
 			public void widgetSelected(SelectionEvent event) {
 
-				// clear the View
-				clearView();
+				
 				// make sure that there is a root node
 				currentETRootNode = getCurrentETRootNode();
 				if (currentETRootNode == null) {
@@ -646,6 +651,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 				// save the actual root
 				setCurrentETRootNode(currentETRootNode);
 				collapseFilter.removeNodetoCollapse(getSelectedNode());
+				// clear the View
+				clearView();
 				TreeBranch tb = buildTreeBranch(currentETRootNode, null,
 						collapseFilter);
 
@@ -655,6 +662,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 				sketchStartUpConnection(tb);
 				// handle menu status
 				itemAll.setEnabled(true);
+				itemExpand.setEnabled(true);
 			}
 		});
 		// collapse all other paths
@@ -707,10 +715,13 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
 			public void widgetSelected(SelectionEvent event) {
 
-				// clean up
-				collapseFilter.clear();
 				// set new root
 				setCurrentETRootNode(getRootETNode(getSelectedNode()));
+
+				// clean up
+				collapseFilter.clearCollapseMarkers(currentETRootNode);
+				collapseFilter.clear();
+				
 				itemIsolated.setEnabled(true);
 				refresh();
 
@@ -891,7 +902,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 		progressGroup.setText("Progress");
 
 		RowData progressBar1LData = new RowData();
-		progressBar1LData.width = 227;
+		progressBar1LData.width = 230;
 		progressBar1LData.height = 12;
 		progressBar1 = new ProgressBar(progressGroup, SWT.NONE);
 		progressBar1.setLayoutData(progressBar1LData);
@@ -1176,14 +1187,18 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	 */
 	public synchronized void refresh() {
 
-		collapseFilter = new CollapseFilter();
 		try {
 			if (currentRoot == null) {
 				return;
 			}
 
 			clearView();
-
+			
+			/**
+			 * This distinction is only for debugging purposes and should be
+			 * removed in the final release. SLET3 is what the user normally sees.
+			 * 
+			 */
 			labels = new HashSet();
 			TreeBranch treebranch = null;
 			if (ExecutionTree.getETNode() == null) {
@@ -1609,13 +1624,15 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	 *            the new current root ETNode
 	 */
 	private void setCurrentETRootNode(ETNode currentETRootNode) {
+		
 		this.currentETRootNode = currentETRootNode;
 	}
 
 	/**
-	 * Gets the current et root node.
+	 * Gets the current ETRootNode. The parameter can be an arbitrary 
+	 * node from the actual tree. This makes sure we can track all children.
 	 * 
-	 * @return the current et root node
+	 * @return the currentETRootNode
 	 */
 	private ETNode getCurrentETRootNode() {
 
