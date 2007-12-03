@@ -64,7 +64,7 @@ public class HoareStrategy extends JavaCardDLStrategy {
             
             try {
                 highPriority = 
-                    System.getenv("GOD_SORRY_TEACHER_MODE") != null;
+                    System.getenv("TEACHER_MODE") != null;
             } catch (Throwable t) {
                 
             }
