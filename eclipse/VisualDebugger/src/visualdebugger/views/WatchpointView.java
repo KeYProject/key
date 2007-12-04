@@ -44,14 +44,18 @@ import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Scale;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.*;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
+import visualdebugger.views.BreakpointView.BpContentProvider;
+import visualdebugger.views.BreakpointView.BpLabelProvider;
 import visualdebugger.views.ExecutionTreeView.PM;
 
 import de.uka.ilkd.key.visualdebugger.*;
@@ -59,6 +63,7 @@ import de.uka.ilkd.key.visualdebugger.executiontree.*;
 
 /**
  * The Class WatchpointView.
+ * 
  */
 public class WatchpointView extends ViewPart {
 
@@ -71,109 +76,70 @@ public class WatchpointView extends ViewPart {
 	/** The add action. */
 	private Action addAction;
 
-	/** The bp manager. */
+	/** The Breakpoint manager. */
 	private BreakpointManager bpManager;
 
 	private Composite parent;
 
-	/**
-	 * The Class BpContentProvider.
-	 */
-	class BpContentProvider implements IStructuredContentProvider {
+	private Table table;
 
-		/**
-		 * Input changed.
-		 * 
-		 * @param v
-		 *            the v
-		 * @param oldInput
-		 *            the old input
-		 * @param newInput
-		 *            the new input
-		 */
-		public void inputChanged(Viewer v, Object oldInput, Object newInput) {
-		}
+	private static final String[] columnNames = { "Watch Expression", "File",
+			"Method", "Statement" };
 
-		/**
-		 * Dispose.
-		 */
-		public void dispose() {
-		}
+	class WatchPointContentProvider implements IStructuredContentProvider {
 
-		/**
-		 * Gets the elements.
-		 * 
-		 * @param parent
-		 *            the parent
-		 * 
-		 * @return the elements
-		 */
-		public Object[] getElements(Object parent) {
-			if (parent instanceof BreakpointManager) {
-				return ((BreakpointManager) parent).getBreapoints();
-			} else
+		@Override
+		public Object[] getElements(Object inputElement) {
+			
 				return new String[] { "One", "Two", "Three" };
 		}
-	}
 
-	/**
-	 * The Class BpLabelProvider.
-	 */
-	class BpLabelProvider extends LabelProvider implements ITableLabelProvider {
+		@Override
+		public void dispose() {
+			// TODO Auto-generated method stub
 
-		/**
-		 * Gets the column text.
-		 * 
-		 * @param obj
-		 *            the obj
-		 * @param index
-		 *            the index
-		 * 
-		 * @return the column text
-		 */
-		public String getColumnText(Object obj, int index) {
-			if (obj instanceof BreakpointEclipse) {
-				BreakpointEclipse b = (BreakpointEclipse) obj;
-				if (index == 2) {
-					final String s = b.getStatement().toString();
-					return s.substring(0, s.lastIndexOf("\n"));
-				} else if (index == 0) {
-					return b.getCompilationUnit().getResource().getName();
-				} else if (index == 1) {
-					return b.getMethod().getElementName();
-				}
-
-				return b.getId().getId() + "";
-			}
-			return "UNKNOWN CONTENT";
 		}
 
-		/**
-		 * Gets the column image.
-		 * 
-		 * @param obj
-		 *            the obj
-		 * @param index
-		 *            the index
-		 * 
-		 * @return the column image
-		 */
-		public Image getColumnImage(Object obj, int index) {
+		@Override
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+			// TODO Auto-generated method stub
+
+		}
+
+	}
+
+	class WatchPointLabelProvider extends LabelProvider implements
+			ITableLabelProvider {
+
+		@Override
+		public Image getColumnImage(Object element, int columnIndex) {
+			// TODO Auto-generated method stub
 			return null;
 		}
 
-		/**
-		 * Gets the image.
-		 * 
-		 * @param obj
-		 *            the obj
-		 * 
-		 * @return the image
-		 */
-		public Image getImage(Object obj) {
-			return PlatformUI.getWorkbench().getSharedImages().getImage(
-					ISharedImages.IMG_OBJ_ELEMENT);
+		@Override
+		public String getColumnText(Object element, int columnIndex) {
+			String result = "";
+			
+			switch (columnIndex) {
+				case 0:  // COMPLETED_COLUMN
+					result = element.toString();
+					break;
+				case 1 :
+					result = element.toString();
+					break;
+				case 2 :
+					result = element.toString();
+					break;
+				case 3 :
+					result = element.toString();
+					break;
+				default :
+					break; 	
+			}
+			return result;
 		}
+
 	}
 
 	/**
@@ -191,94 +157,43 @@ public class WatchpointView extends ViewPart {
 	 *            the parent
 	 */
 	public void createPartControl(Composite parent) {
-		Composite shell = parent.getShell();
-		this.parent = parent;
-		// create left side of the view window
-		parent.setLayout(new GridLayout(2, false));
+
 		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL
 				| SWT.V_SCROLL | SWT.SEPARATOR);
 
-		// viewer.setSorter(new NameSorter());
-
 		Table table = viewer.getTable();
-	    table.setLayoutData(new GridData(GridData.FILL_BOTH));
+
 		TableColumn column;
 
 		column = new TableColumn(table, SWT.NONE, 0);
-		column.setWidth(200);
-		column.setText("Watch Expression");
-		column = new TableColumn(table, SWT.NONE, 1);
 		column.setWidth(100);
 		column.setText("File");
-		column = new TableColumn(table, SWT.NONE, 2);
+
+		column = new TableColumn(table, SWT.NONE, 1);
 		column.setWidth(100);
 		column.setText("Method");
-		column = new TableColumn(table, SWT.NONE, 3);
+
+		column = new TableColumn(table, SWT.NONE, 2);
 		column.setWidth(70);
 		column.setText("Statement");
+
+		column = new TableColumn(table, SWT.NONE, 3);
+		column.setWidth(100);
+		column.setText("Breakpoint Condition");
+		column.setData("true", new Object());
+
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
-		viewer.setContentProvider(new BpContentProvider());
-		viewer.setLabelProvider(new BpLabelProvider());
+		viewer.setContentProvider(new WatchPointContentProvider());
+		viewer.setLabelProvider(new WatchPointLabelProvider());
 
 		viewer.setInput(bpManager);
-		
-		hookShell();
-		hookListener();
+
+		// hookListener();
 		makeActions();
-		hookContextMenu();
+		// hookContextMenu();
 
 		contributeToActionBars();
-	}
-
-	private void hookShell() {
-		
-		Composite localShell = new Composite(parent, 0);
-		// localShell.set
-		GridData gdata = new GridData(GridData.FILL_VERTICAL);
-		// gdata.minimumWidth=30;
-		// gdata.grabExcessHorizontalSpace=true;
-		localShell.setLayoutData(gdata);
-
-		localShell.setLayout(new GridLayout());
-
-		Group progressGroup = new Group(localShell, 0);
-		RowLayout progressGroupLayout = new RowLayout(
-				org.eclipse.swt.SWT.HORIZONTAL);
-		progressGroup.setLayout(progressGroupLayout);
-		GridData progressGroupLData = new GridData();
-		progressGroupLData.widthHint = 237;
-		progressGroupLData.heightHint = 23;
-		progressGroup.setLayoutData(progressGroupLData);
-		progressGroup.setText("Progress");
-
-		RowData progressBar1LData = new RowData();
-
-
-
-		Group rootGroup = new Group(localShell, 0);
-		rootGroup.setText("Properties");
-		FontData data = rootGroup.getFont().getFontData()[0];
-		data.setStyle(SWT.BOLD);
-		rootGroup.setLayout(new GridLayout());
-		GridData rootGroupLData = new GridData();
-		rootGroupLData.widthHint = 237;
-		rootGroupLData.heightHint = 112;
-		rootGroup.setLayoutData(rootGroupLData);
-
-
-		Group bcGroup = new Group(localShell, 0);
-		bcGroup.setBackground(ColorConstants.white);
-		bcGroup.setText("Branch Condition");
-
-		GridData bcGroupLData = new GridData();
-		bcGroupLData.verticalAlignment = GridData.FILL;
-		bcGroupLData.horizontalAlignment = GridData.FILL;
-		bcGroupLData.grabExcessHorizontalSpace = true;
-		bcGroupLData.grabExcessVerticalSpace = true;
-		bcGroup.setLayoutData(bcGroupLData);
-		bcGroup.setLayout(new GridLayout());
-		
 	}
 
 	/**
@@ -352,18 +267,16 @@ public class WatchpointView extends ViewPart {
 	/**
 	 * Hook context menu.
 	 */
-	private void hookContextMenu() {
-		MenuManager menuMgr = new MenuManager("#PopupMenu");
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(IMenuManager manager) {
-				WatchpointView.this.fillContextMenu(manager);
-			}
-		});
-		Menu menu = menuMgr.createContextMenu(viewer.getControl());
-		viewer.getControl().setMenu(menu);
-		getSite().registerContextMenu(menuMgr, viewer);
-	}
+	/*
+	 * private void hookContextMenu() { MenuManager menuMgr = new
+	 * MenuManager("#PopupMenu"); menuMgr.setRemoveAllWhenShown(true);
+	 * menuMgr.addMenuListener(new IMenuListener() { public void
+	 * menuAboutToShow(IMenuManager manager) {
+	 * WatchpointView.this.fillContextMenu(manager); } }); Menu menu =
+	 * menuMgr.createContextMenu(viewer.getControl());
+	 * viewer.getControl().setMenu(menu); getSite().registerContextMenu(menuMgr,
+	 * viewer); }
+	 */
 
 	/**
 	 * Contribute to action bars.
@@ -416,9 +329,17 @@ public class WatchpointView extends ViewPart {
 	 */
 	private void makeActions() {
 		addAction = new Action() {
+			private Shell shell = new Shell();
+
 			public void run() {
-				
-				//TODO
+
+				WatchExpressionDialog dialog = new WatchExpressionDialog(shell);
+
+				String[] data = dialog.open();
+				if (data != null) {
+					TableItem item = new TableItem(table, SWT.NONE);
+					item.setText(data);
+				}
 
 			}
 
@@ -429,7 +350,7 @@ public class WatchpointView extends ViewPart {
 		removeAction = new Action() {
 			public void run() {
 
-					// TODO
+				// TODO
 			}
 
 		};

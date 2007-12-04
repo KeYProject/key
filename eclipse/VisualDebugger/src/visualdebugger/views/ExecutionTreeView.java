@@ -922,7 +922,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 		rootGroup.setLayout(new GridLayout());
 		GridData rootGroupLData = new GridData();
 		rootGroupLData.widthHint = 237;
-		rootGroupLData.heightHint = 112;
+		rootGroupLData.heightHint = 120;
 		rootGroup.setLayoutData(rootGroupLData);
 		// for development purpose...disabled in normal runs
 		if (debug) {
@@ -1039,7 +1039,6 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 		});
 
 		Group bcGroup = new Group(localShell, 0);
-		bcGroup.setBackground(ColorConstants.white);
 		bcGroup.setText("Branch Condition");
 
 		GridData bcGroupLData = new GridData();
@@ -1069,10 +1068,10 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 			}
 		});
 
-		bcText = new Text(bcGroup, SWT.MULTI);
+		bcText = new Text(bcGroup, SWT.BORDER);
 
 		GridData bcTextLData = new GridData();
-		bcTextLData.widthHint = 203;
+		//bcTextLData.widthHint = 203;
 		// bcTextLData.heightHint = 41;
 		bcText.setLayoutData(bcTextLData);
 
