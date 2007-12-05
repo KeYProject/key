@@ -1068,13 +1068,6 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 			}
 		});
 
-		bcText = new Text(bcGroup, SWT.BORDER);
-
-		GridData bcTextLData = new GridData();
-		//bcTextLData.widthHint = 203;
-		// bcTextLData.heightHint = 41;
-		bcText.setLayoutData(bcTextLData);
-
 	}
 
 	/**

@@ -76,22 +76,17 @@ public class WatchpointView extends ViewPart {
 	/** The add action. */
 	private Action addAction;
 
-	/** The Breakpoint manager. */
-	private BreakpointManager bpManager;
-
-	private Composite parent;
+	private WatchPointManager watchPointManager;
 
 	private Table table;
-
-	private static final String[] columnNames = { "Watch Expression", "File",
-			"Method", "Statement" };
 
 	class WatchPointContentProvider implements IStructuredContentProvider {
 
 		@Override
 		public Object[] getElements(Object inputElement) {
-			
-				return new String[] { "One", "Two", "Three" };
+
+			WatchPointManager wpm = (WatchPointManager) inputElement;
+			return wpm.getWatchPointsAsArray();
 		}
 
 		@Override
@@ -120,22 +115,25 @@ public class WatchpointView extends ViewPart {
 		@Override
 		public String getColumnText(Object element, int columnIndex) {
 			String result = "";
-			
+			WatchPoint wp = (WatchPoint) element;
 			switch (columnIndex) {
-				case 0:  // COMPLETED_COLUMN
-					result = element.toString();
-					break;
-				case 1 :
-					result = element.toString();
-					break;
-				case 2 :
-					result = element.toString();
-					break;
-				case 3 :
-					result = element.toString();
-					break;
-				default :
-					break; 	
+			case 0:
+				result = wp.getExpression();
+				break;
+			case 1:
+				result = wp.getScope();
+				break;
+			case 2:
+				result = wp.getMethod();
+				break;
+			case 3:
+				result = wp.getStatement();
+				break;
+			case 4:
+				result = wp.getFile();
+				break;
+			default:
+				break;
 			}
 			return result;
 		}
@@ -146,7 +144,7 @@ public class WatchpointView extends ViewPart {
 	 * Instantiates a new breakpoint view.
 	 */
 	public WatchpointView() {
-		bpManager = VisualDebugger.getVisualDebugger().getBpManager();
+
 	}
 
 	/**
@@ -158,42 +156,56 @@ public class WatchpointView extends ViewPart {
 	 */
 	public void createPartControl(Composite parent) {
 
+		watchPointManager = new WatchPointManager();
 		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL
 				| SWT.V_SCROLL | SWT.SEPARATOR);
 
-		Table table = viewer.getTable();
-
-		TableColumn column;
-
-		column = new TableColumn(table, SWT.NONE, 0);
-		column.setWidth(100);
-		column.setText("File");
-
-		column = new TableColumn(table, SWT.NONE, 1);
-		column.setWidth(100);
-		column.setText("Method");
-
-		column = new TableColumn(table, SWT.NONE, 2);
-		column.setWidth(70);
-		column.setText("Statement");
-
-		column = new TableColumn(table, SWT.NONE, 3);
-		column.setWidth(100);
-		column.setText("Breakpoint Condition");
-		column.setData("true", new Object());
-
+		Table table = createTable();
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
+
 		viewer.setContentProvider(new WatchPointContentProvider());
 		viewer.setLabelProvider(new WatchPointLabelProvider());
 
-		viewer.setInput(bpManager);
+		viewer.setInput(watchPointManager);
 
 		// hookListener();
 		makeActions();
 		// hookContextMenu();
 
 		contributeToActionBars();
+	}
+
+	/**
+	 * Creates the table.
+	 * 
+	 * @return the table
+	 */
+	private Table createTable() {
+		Table table = viewer.getTable();
+
+		TableColumn column;
+
+		column = new TableColumn(table, SWT.NONE, 0);
+		column.setWidth(150);
+		column.setText("Watch Expression");
+
+		column = new TableColumn(table, SWT.NONE, 1);
+		column.setWidth(100);
+		column.setText("Scope");
+
+		column = new TableColumn(table, SWT.NONE, 2);
+		column.setWidth(100);
+		column.setText("Method");
+
+		column = new TableColumn(table, SWT.NONE, 3);
+		column.setWidth(100);
+		column.setText("Statement");
+
+		column = new TableColumn(table, SWT.NONE, 4);
+		column.setWidth(100);
+		column.setText("File");
+		return table;
 	}
 
 	/**
@@ -247,16 +259,6 @@ public class WatchpointView extends ViewPart {
 							e.printStackTrace();
 
 						}
-
-						// IEditorPart editor
-						// =PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-						/*
-						 * //bp.getAnnotation().getSourceViewer().setSelectedRange(bp.getSelection().getOffset(),
-						 * bp.getSelection().getLength()); if (editor instanceof
-						 * ITextEditor){ ITextEditor tedit= (ITextEditor)
-						 * editor;
-						 * tedit.getSelectionProvider().setSelection(bp.getSelection()); }
-						 */
 
 					}
 				}
@@ -335,10 +337,17 @@ public class WatchpointView extends ViewPart {
 
 				WatchExpressionDialog dialog = new WatchExpressionDialog(shell);
 
-				String[] data = dialog.open();
-				if (data != null) {
-					TableItem item = new TableItem(table, SWT.NONE);
-					item.setText(data);
+				String[] information = getWatchPointInf();
+				if (information != null) {
+					String[] data = dialog.open();
+					if (data != null) {
+
+						watchPointManager.addWatchPoint(new WatchPoint(data[0],
+								data[1], information[0], information[1],
+								information[2]));
+						viewer.refresh();
+
+					}
 				}
 
 			}
@@ -350,9 +359,17 @@ public class WatchpointView extends ViewPart {
 		removeAction = new Action() {
 			public void run() {
 
-				// TODO
-			}
+				IStructuredSelection sel = (IStructuredSelection) viewer
+						.getSelection();
 
+				Object element = sel.getFirstElement();
+				if (element instanceof WatchPoint) {
+
+					watchPointManager.removeWatchPoint((WatchPoint) element);
+					viewer.refresh();
+
+				}
+			}
 		};
 		removeAction.setText("Remove");
 		removeAction.setToolTipText("Remove watchpoint");
@@ -364,5 +381,67 @@ public class WatchpointView extends ViewPart {
 	 */
 	public void setFocus() {
 		viewer.getControl().setFocus();
+	}
+
+	public WatchPointManager getWatchPointManager() {
+		return watchPointManager;
+	}
+
+	private String[] getWatchPointInf() {
+
+		String[] information = new String[3];
+
+		IEditorPart editor = PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+		if (editor instanceof ITextEditor) {
+			ITextEditor tedit = (ITextEditor) editor;
+
+			ISelection sel = tedit.getSelectionProvider().getSelection();
+			ITextSelection tsel = (ITextSelection) sel;
+			IFile file = (IFile) tedit.getEditorInput().getAdapter(IFile.class);
+
+			String fileName = file.getProjectRelativePath().toString();
+
+			information[2] = fileName;
+
+			ICompilationUnit unit = JavaCore.createCompilationUnitFrom(file);
+			IMethod method = null;
+			try {
+				IJavaElement je = unit.getElementAt(tsel.getOffset());
+				if (je instanceof IMethod) {
+					method = (IMethod) je;
+					information[0] = je.getElementName();
+				}
+
+			} catch (JavaModelException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			// -------- get File
+			IProject project = unit.getJavaProject().getProject();
+			File location = project.getLocation().toFile();
+			File f = new File(location + fileName);
+
+			ASTParser parser = ASTParser.newParser(AST.JLS3);
+			parser.setResolveBindings(true);
+			parser.setSource(unit);
+			CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
+
+			FindStatementVisitor visitor = new FindStatementVisitor(tsel
+					.getOffset());
+			astRoot.accept(visitor);
+
+			if (visitor.getStatement() == null) {
+				MessageDialog.openError(PlatformUI.getWorkbench()
+						.getActiveWorkbenchWindow().getShell(),
+						"Adding WatchPoint",
+						"Please select a Java statement in the Java Editor");
+				return null;
+			}
+
+		}
+		return information;
+
 	}
 }

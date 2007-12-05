@@ -17,7 +17,6 @@ public class WatchExpressionDialog {
 	public WatchExpressionDialog(Shell parent) {
 		shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
 		shell.setText("Enter watch expression");
-		shell.setSize(400, 200);
 		shell.setLayout(new GridLayout());
 	}
 
@@ -34,6 +33,7 @@ public class WatchExpressionDialog {
 			public void widgetSelected(SelectionEvent e) {
 
 				if (isValid(text.getText())) {
+					
 					values[0] = text.getText();
 					shell.close();
 				} else {
