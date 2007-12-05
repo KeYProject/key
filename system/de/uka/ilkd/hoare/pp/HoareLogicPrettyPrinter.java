@@ -307,9 +307,10 @@ public class HoareLogicPrettyPrinter extends LogicPrinter {
     public void printCast(String pre, String post,
             Term t, int ass) throws IOException {
         startTerm(t.arity());
-        markStartSub();
-        printTerm(t.sub(0));
-        markEndSub();
+        //markStartSub();
+        maybeParens(t.sub(0), ass);
+        //printTerm(t.sub(0));
+        //markEndSub();
     }
         
     private void printQuanPrefix(Term term) throws IOException {              
