@@ -1306,7 +1306,7 @@ public class VisualDebugger {
      * @return the string
      */
     private String removeLineBreaks(String s) {
-        return s;// s.replace('\n', ' ');
+        return s.replace('\n', ' ');
     }
 
     /**

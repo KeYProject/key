@@ -1,25 +1,54 @@
 package visualdebugger.views;
 
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.jface.text.Document;
 import org.eclipse.swt.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.*;
 
-import sun.awt.HorizBagLayout;
-
+// TODO: Auto-generated Javadoc
+/**
+ * The Class WatchExpressionDialog.
+ */
 public class WatchExpressionDialog {
 
-	Shell shell;
-	String[] values = new String[2];
-	String[] labels = { "Expression:", "Scope:       " };
-	Text text;
+	/** The shell. */
+	private Shell shell;
 
-	public WatchExpressionDialog(Shell parent) {
+	/** The expression. */
+	private String expression;
+
+	/** The expression. */
+	private String source;
+	/** The text. */
+	private Text text;
+
+	private int line;
+
+	/**
+	 * Instantiates a new watch expression dialog.
+	 * 
+	 * @param parent
+	 *            the parent
+	 */
+	public WatchExpressionDialog(Shell parent, int line, String source) {
 		shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
 		shell.setText("Enter watch expression");
 		shell.setLayout(new GridLayout());
+		this.source = source;
+		this.line = line;
 	}
 
+	/**
+	 * Creates the control buttons.
+	 */
 	private void createControlButtons() {
 		Composite composite = new Composite(shell, SWT.NONE);
 		composite.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
@@ -33,12 +62,12 @@ public class WatchExpressionDialog {
 			public void widgetSelected(SelectionEvent e) {
 
 				if (isValid(text.getText())) {
-					
-					values[0] = text.getText();
+
+					expression = text.getText();
 					shell.close();
 				} else {
 					// if expression is not valid clear values
-					values = null;
+					expression = null;
 					shell.close();
 				}
 			}
@@ -48,7 +77,7 @@ public class WatchExpressionDialog {
 		cancelButton.setText("Cancel");
 		cancelButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				values = null;
+				expression = null;
 				shell.close();
 			}
 		});
@@ -56,43 +85,42 @@ public class WatchExpressionDialog {
 		shell.setDefaultButton(okButton);
 	}
 
-	private void createScopeButtons() {
-		Composite composite = new Composite(shell, SWT.NONE);
-		composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 3;
-		composite.setLayout(layout);
-
-		Label label = new Label(composite, SWT.LEFT);
-		label.setText(labels[1]);
-
-		Button globalButton = new Button(composite, SWT.RADIO | SWT.RIGHT);
-		globalButton.setText("Global");
-		globalButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				values[1] = "Global";
-			}
-		});
-
-		Button localButton = new Button(composite, SWT.RADIO| SWT.RIGHT);
-		localButton.setText("Local");
-		localButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				values[1] = "Local";
-			}
-		});
-
-		shell.setDefaultButton(globalButton);
-	}
-
-	protected boolean isValid(String str) {
+	/**
+	 * Checks if the given expression is valid in this context.
+	 * 
+	 * @param expression
+	 *            the expression
+	 * 
+	 * @return true, if expression is valid
+	 */
+	protected boolean isValid(String expression) {
 		// TODO Auto-generated method stub
-		// check if expression is valid in given context
+		String temp_var = "dummy =" + expression;
+
+		Document doc = new Document(source);
+		ASTParser parser = ASTParser.newParser(AST.JLS3);
+		parser.setSource(doc.get().toCharArray());
+		CompilationUnit cu = (CompilationUnit) parser.createAST(null);
+		cu.recordModifications();
+		AST ast = cu.getAST();
+		
+		VariableDeclarationFragment vdf = ast.newVariableDeclarationFragment();
+		vdf.setName(ast.newSimpleName("dummy"));
+		VariableDeclarationStatement vds = ast.newVariableDeclarationStatement(vdf);
+		
+		vds.setType(ast.newSimpleType(ast.newSimpleName("boolean")));
+		
+		// id.setName(ast.newName(new String[] {"java", "util", "Set"});
+		// cu.imports().add(id); // add import declaration at end
+
 		return true;
 	}
 
-	private void createTextWidgets() {
-
+	/**
+	 * Creates the text widget.
+	 */
+	private void createTextWidget() {
+		
 		Composite composite = new Composite(shell, SWT.NONE);
 		composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		GridLayout layout = new GridLayout();
@@ -100,7 +128,7 @@ public class WatchExpressionDialog {
 		composite.setLayout(layout);
 
 		Label label = new Label(composite, SWT.RIGHT);
-		label.setText(labels[0]);
+		label.setText("Expression:");
 		text = new Text(composite, SWT.BORDER);
 		GridData gridData = new GridData();
 		gridData.widthHint = 400;
@@ -108,10 +136,11 @@ public class WatchExpressionDialog {
 
 	}
 
-	public String[] getLabels() {
-		return labels;
-	}
-
+	/**
+	 * Gets the title.
+	 * 
+	 * @return the title
+	 */
 	public String getTitle() {
 		return shell.getText();
 	}
@@ -123,20 +152,18 @@ public class WatchExpressionDialog {
 	 * @return String[] The contents of the text widgets of the dialog. May
 	 *         return null if all text widgets are empty.
 	 */
-	public String[] getValues() {
-		return values;
+	public String getExpression() {
+		return expression;
 	}
 
 	/**
 	 * Opens the dialog in the given state. Sets <code>Text</code> widget
 	 * contents and dialog behaviour accordingly.
 	 * 
-	 * @param dialogState
-	 *            int The state the dialog should be opened in.
+	 * @return the string
 	 */
-	public String[] open() {
-		createTextWidgets();
-		createScopeButtons(); // specify the scope
+	public String open() {
+		createTextWidget();
 		createControlButtons();
 		shell.pack();
 		shell.open();
@@ -146,6 +173,6 @@ public class WatchExpressionDialog {
 				display.sleep();
 		}
 
-		return getValues();
+		return getExpression();
 	}
 }

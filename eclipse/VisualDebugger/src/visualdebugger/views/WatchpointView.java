@@ -1,69 +1,45 @@
 package visualdebugger.views;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JTextArea;
-
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.draw2d.ColorConstants;
-import org.eclipse.draw2d.LightweightSystem;
-import org.eclipse.jdt.core.*;
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jface.action.*;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextSelection;
-import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.jface.viewers.*;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.List;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.ProgressBar;
-import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.*;
+import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.ITextEditor;
-import org.eclipse.ui.texteditor.MarkerUtilities;
 
-import visualdebugger.views.BreakpointView.BpContentProvider;
-import visualdebugger.views.BreakpointView.BpLabelProvider;
-import visualdebugger.views.ExecutionTreeView.PM;
-
-import de.uka.ilkd.key.visualdebugger.*;
-import de.uka.ilkd.key.visualdebugger.executiontree.*;
+import de.uka.ilkd.key.visualdebugger.WatchPoint;
+import de.uka.ilkd.key.visualdebugger.WatchPointManager;
 
 /**
  * The Class WatchpointView.
- * 
  */
 public class WatchpointView extends ViewPart {
 
@@ -76,12 +52,19 @@ public class WatchpointView extends ViewPart {
 	/** The add action. */
 	private Action addAction;
 
+	/** The watch point manager. */
 	private WatchPointManager watchPointManager;
 
-	private Table table;
-
+	/**
+	 * The Class WatchPointContentProvider.
+	 */
 	class WatchPointContentProvider implements IStructuredContentProvider {
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+		 */
 		@Override
 		public Object[] getElements(Object inputElement) {
 
@@ -89,12 +72,23 @@ public class WatchpointView extends ViewPart {
 			return wpm.getWatchPointsAsArray();
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+		 */
 		@Override
 		public void dispose() {
 			// TODO Auto-generated method stub
 
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
+		 *      java.lang.Object, java.lang.Object)
+		 */
 		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			// TODO Auto-generated method stub
@@ -103,15 +97,30 @@ public class WatchpointView extends ViewPart {
 
 	}
 
+	/**
+	 * The Class WatchPointLabelProvider.
+	 */
 	class WatchPointLabelProvider extends LabelProvider implements
 			ITableLabelProvider {
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object,
+		 *      int)
+		 */
 		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object,
+		 *      int)
+		 */
 		@Override
 		public String getColumnText(Object element, int columnIndex) {
 			String result = "";
@@ -121,15 +130,12 @@ public class WatchpointView extends ViewPart {
 				result = wp.getExpression();
 				break;
 			case 1:
-				result = wp.getScope();
-				break;
-			case 2:
 				result = wp.getMethod();
 				break;
-			case 3:
-				result = wp.getStatement();
+			case 2:
+				result = wp.getStatement_line();
 				break;
-			case 4:
+			case 3:
 				result = wp.getFile();
 				break;
 			default:
@@ -169,7 +175,6 @@ public class WatchpointView extends ViewPart {
 
 		viewer.setInput(watchPointManager);
 
-		// hookListener();
 		makeActions();
 		// hookContextMenu();
 
@@ -192,78 +197,16 @@ public class WatchpointView extends ViewPart {
 
 		column = new TableColumn(table, SWT.NONE, 1);
 		column.setWidth(100);
-		column.setText("Scope");
+		column.setText("Method");
 
 		column = new TableColumn(table, SWT.NONE, 2);
 		column.setWidth(100);
-		column.setText("Method");
+		column.setText("Line");
 
 		column = new TableColumn(table, SWT.NONE, 3);
 		column.setWidth(100);
-		column.setText("Statement");
-
-		column = new TableColumn(table, SWT.NONE, 4);
-		column.setWidth(100);
 		column.setText("File");
 		return table;
-	}
-
-	/**
-	 * Hook listener.
-	 */
-	private void hookListener() {
-		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			public void selectionChanged(SelectionChangedEvent event) {
-				// if the selection is empty clear the label
-				if (event.getSelection().isEmpty()) {
-
-					return;
-				}
-				if (event.getSelection() instanceof IStructuredSelection) {
-					IStructuredSelection selection = (IStructuredSelection) event
-							.getSelection();
-
-					Object domain = selection.getFirstElement();
-					if (domain instanceof BreakpointEclipse) { // TODO !!!!!
-						BreakpointEclipse bp = (BreakpointEclipse) domain;
-						// ICompilationUnit unit = bp.getCompilationUnit();
-						ISourceViewer viewer = null;
-						IWorkbench workbench = PlatformUI.getWorkbench();
-						IWorkbenchPage page = workbench
-								.getActiveWorkbenchWindow().getActivePage();
-						IMarker marker = null;
-						// TODO add marker attribute to BreakpointEclipse
-						try {
-							IMarker[] markers = bp.getCompilationUnit()
-									.getResource().findMarkers(
-											"VisualDebugger.bpmarker", true, 1);
-							for (int i = 0; i < markers.length; i++) {
-
-								if (((Integer) markers[i]
-										.getAttribute("StatementId"))
-										.intValue() == bp.getId().getId()) {
-									marker = markers[i];
-								}
-							}
-						} catch (CoreException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-
-						try {
-							IEditorPart ed = org.eclipse.ui.ide.IDE.openEditor(
-									page, marker, true);
-							viewer = (ISourceViewer) ed
-									.getAdapter(ITextOperationTarget.class);
-						} catch (Exception e) {
-							e.printStackTrace();
-
-						}
-
-					}
-				}
-			}
-		});
 	}
 
 	/**
@@ -335,15 +278,16 @@ public class WatchpointView extends ViewPart {
 
 			public void run() {
 
-				WatchExpressionDialog dialog = new WatchExpressionDialog(shell);
-
 				String[] information = getWatchPointInf();
+				WatchExpressionDialog dialog = new WatchExpressionDialog(shell,
+						java.lang.Integer.parseInt(information[1]),
+						information[3]);
 				if (information != null) {
-					String[] data = dialog.open();
-					if (data != null) {
+					String expression = dialog.open();
+					if (expression != null) {
 
-						watchPointManager.addWatchPoint(new WatchPoint(data[0],
-								data[1], information[0], information[1],
+						watchPointManager.addWatchPoint(new WatchPoint(
+								expression, information[0], information[1],
 								information[2]));
 						viewer.refresh();
 
@@ -383,33 +327,66 @@ public class WatchpointView extends ViewPart {
 		viewer.getControl().setFocus();
 	}
 
+	/**
+	 * Gets the watch point manager.
+	 * 
+	 * @return the watch point manager
+	 */
 	public WatchPointManager getWatchPointManager() {
 		return watchPointManager;
 	}
 
+	/**
+	 * Gets the watch point inf.
+	 * 
+	 * @return the watch point inf
+	 */
 	private String[] getWatchPointInf() {
 
-		String[] information = new String[3];
+		String[] information = new String[4];
 
 		IEditorPart editor = PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+
 		if (editor instanceof ITextEditor) {
 			ITextEditor tedit = (ITextEditor) editor;
 
 			ISelection sel = tedit.getSelectionProvider().getSelection();
 			ITextSelection tsel = (ITextSelection) sel;
+			// set current line
+			information[1] = (1 + tsel.getStartLine()) + "";
+
 			IFile file = (IFile) tedit.getEditorInput().getAdapter(IFile.class);
-
 			String fileName = file.getProjectRelativePath().toString();
-
+			// set filename
 			information[2] = fileName;
 
 			ICompilationUnit unit = JavaCore.createCompilationUnitFrom(file);
-			IMethod method = null;
+
+			String source = "";
+
+			try {
+				source = unit.getBuffer().getContents();
+			} catch (JavaModelException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			information[3] = source;
+
+			// creation of DOM/AST from a ICompilationUnit
+			ASTParser parser = ASTParser.newParser(AST.JLS3);
+			parser.setResolveBindings(true);
+			parser.setSource(unit);
+
+			CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
+
+			astRoot.recordModifications();
+
 			try {
 				IJavaElement je = unit.getElementAt(tsel.getOffset());
 				if (je instanceof IMethod) {
-					method = (IMethod) je;
+
 					information[0] = je.getElementName();
 				}
 
@@ -417,16 +394,6 @@ public class WatchpointView extends ViewPart {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
-			// -------- get File
-			IProject project = unit.getJavaProject().getProject();
-			File location = project.getLocation().toFile();
-			File f = new File(location + fileName);
-
-			ASTParser parser = ASTParser.newParser(AST.JLS3);
-			parser.setResolveBindings(true);
-			parser.setSource(unit);
-			CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
 
 			FindStatementVisitor visitor = new FindStatementVisitor(tsel
 					.getOffset());
