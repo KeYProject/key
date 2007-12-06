@@ -1,19 +1,32 @@
 package visualdebugger.views;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.IJavaModelMarker;
+import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.FieldDeclaration;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
-import org.eclipse.swt.*;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.layout.*;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class WatchExpressionDialog.
  */
@@ -30,7 +43,7 @@ public class WatchExpressionDialog {
 	/** The text. */
 	private Text text;
 
-	private int line;
+	private int offset;
 
 	/**
 	 * Instantiates a new watch expression dialog.
@@ -38,12 +51,12 @@ public class WatchExpressionDialog {
 	 * @param parent
 	 *            the parent
 	 */
-	public WatchExpressionDialog(Shell parent, int line, String source) {
+	public WatchExpressionDialog(Shell parent, int offset, String source) {
 		shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
 		shell.setText("Enter watch expression");
 		shell.setLayout(new GridLayout());
 		this.source = source;
-		this.line = line;
+		this.offset = offset;
 	}
 
 	/**
@@ -94,33 +107,78 @@ public class WatchExpressionDialog {
 	 * @return true, if expression is valid
 	 */
 	protected boolean isValid(String expression) {
-		// TODO Auto-generated method stub
-		String temp_var = "dummy =" + expression;
-
+		
+		String dummyVar = "\nboolean myDummy = "+expression +"\n";
+		
 		Document doc = new Document(source);
+		try {
+			int pos = doc.getLineOffset(offset);
+			String part1 = source.substring(0, pos);
+			String part2 = source.substring(pos);
+			String newSource = part1 + dummyVar + part2;
+			doc.set(newSource);
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		ASTParser parser = ASTParser.newParser(AST.JLS3);
 		parser.setSource(doc.get().toCharArray());
-		CompilationUnit cu = (CompilationUnit) parser.createAST(null);
-		cu.recordModifications();
-		AST ast = cu.getAST();
-		
-		VariableDeclarationFragment vdf = ast.newVariableDeclarationFragment();
-		vdf.setName(ast.newSimpleName("dummy"));
-		VariableDeclarationStatement vds = ast.newVariableDeclarationStatement(vdf);
-		
-		vds.setType(ast.newSimpleType(ast.newSimpleName("boolean")));
-		
-		// id.setName(ast.newName(new String[] {"java", "util", "Set"});
-		// cu.imports().add(id); // add import declaration at end
+		parser.setResolveBindings(true);
+		parser.setBindingsRecovery(true);
+		CompilationUnit unit = (CompilationUnit) parser.createAST(null);
+
+		// CREATE ICOMPILATION UNIT TO DETECT PROBLEMS IN SOURCE CODE
+//		IFile file = (IFile) tedit.getEditorInput().getAdapter(
+//           IFile.class);
+//
+//        String fileName = file.getProjectRelativePath().toString();
+//		ICompilationUnit icu = JavaCore.createCompilationUnitFrom(file);
+		//check for compilation errors
+
+		IProblem[] problems = unit.getProblems();
+		for (int i = 0; i < problems.length; i++) {
+			
+		   IProblem problem = problems[i];
+		   StringBuffer buffer = new StringBuffer();
+		   buffer.append(problem.getMessage());
+		   buffer.append(" line: ");
+		   buffer.append(problem.getSourceLineNumber());
+		   String msg = buffer.toString(); 
+
+
+		   if(problem.isError()) {
+		      msg = "Error:\n" + msg;
+		      System.out.println(msg);  
+		      MessageDialog.openError(PlatformUI.getWorkbench()
+						.getActiveWorkbenchWindow().getShell(),
+						"Error creating WatchPoint",
+						msg);
+		      return false;
+		   }	
+		   else 
+		      if(problem.isWarning())
+		         msg = "Warning:\n" + msg;
+		   		
+		   System.out.println(msg);  
+		   return true;
+		}
 
 		return true;
 	}
-
+	   public IMarker[] findJavaProblemMarkers(ICompilationUnit cu) 
+	      throws CoreException {
+	      IResource javaSourceFile = cu.getUnderlyingResource();
+	      IMarker[] markers = 
+	         javaSourceFile.findMarkers(IJavaModelMarker.JAVA_MODEL_PROBLEM_MARKER,
+	            true, IResource.DEPTH_INFINITE);
+		return markers;
+	   }
 	/**
 	 * Creates the text widget.
 	 */
 	private void createTextWidget() {
-		
+
 		Composite composite = new Composite(shell, SWT.NONE);
 		composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		GridLayout layout = new GridLayout();
