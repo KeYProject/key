@@ -5,12 +5,18 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IOpenable;
+import org.eclipse.jdt.core.IProblemRequestor;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.IJavaModelMarker;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.WorkingCopyOwner;
 import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.Message;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -25,7 +31,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
  * The Class WatchExpressionDialog.
@@ -123,17 +131,79 @@ public class WatchExpressionDialog {
 		}
 		
 		ASTParser parser = ASTParser.newParser(AST.JLS3);
+	
 		parser.setSource(doc.get().toCharArray());
 		parser.setResolveBindings(true);
-		parser.setBindingsRecovery(true);
+		//parser.setBindingsRecovery(true);
 		CompilationUnit unit = (CompilationUnit) parser.createAST(null);
 
+		
+		IEditorPart editor = PlatformUI.getWorkbench()
+		.getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+		
+
 		// CREATE ICOMPILATION UNIT TO DETECT PROBLEMS IN SOURCE CODE
-//		IFile file = (IFile) tedit.getEditorInput().getAdapter(
-//           IFile.class);
-//
-//        String fileName = file.getProjectRelativePath().toString();
-//		ICompilationUnit icu = JavaCore.createCompilationUnitFrom(file);
+		IFile file = (IFile) ((ITextEditor)editor).getEditorInput().getAdapter(
+           IFile.class);
+
+        String fileName = file.getProjectRelativePath().toString();
+		ICompilationUnit icu = JavaCore.createCompilationUnitFrom(file);
+
+		final IProblemRequestor problemRequestor = new IProblemRequestor() {
+
+			public void acceptProblem(IProblem problem) {
+				System.out.println(problem.getMessage());
+				
+			}
+
+			public void beginReporting() {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void endReporting() {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public boolean isActive() {
+				// TODO Auto-generated method stub
+				return true;
+			}
+			
+		};
+		
+		
+		WorkingCopyOwner owner = new WorkingCopyOwner() {
+			public IProblemRequestor getProblemRequestor(ICompilationUnit unit) {
+				return problemRequestor;
+			}
+		};
+		
+		System.out.println("1");
+		ICompilationUnit workingCopy = null;
+		try {
+			 workingCopy = icu.getWorkingCopy(owner, problemRequestor, null);
+			 workingCopy.getBuffer().setContents(doc.get().toCharArray());
+		} catch (JavaModelException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+		
+		System.out.println("2");
+	
+		
+		try {
+			workingCopy.reconcile(ICompilationUnit.NO_AST, true, null, null);
+		} catch (JavaModelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println("3");
+
 		//check for compilation errors
 
 		IProblem[] problems = unit.getProblems();
