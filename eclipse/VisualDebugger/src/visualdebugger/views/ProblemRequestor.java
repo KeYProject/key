@@ -8,8 +8,7 @@ public class ProblemRequestor implements IProblemRequestor{
 	private IProblem problem = null;
 	
 	public void acceptProblem(IProblem problem) {
-		System.out.println("");
-		
+
 		this.problem=problem;
 						
 	}

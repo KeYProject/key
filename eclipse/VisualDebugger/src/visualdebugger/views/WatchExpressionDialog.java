@@ -1,19 +1,11 @@
 package visualdebugger.views;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IJavaModelMarker;
 import org.eclipse.jdt.core.IProblemRequestor;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.WorkingCopyOwner;
-import org.eclipse.jdt.core.compiler.IProblem;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -149,6 +141,7 @@ public class WatchExpressionDialog {
 		try {
 			workingCopy = icu.getWorkingCopy(owner, problemRequestor, null);
 			workingCopy.getBuffer().setContents(doc.get().toCharArray());
+
 		} catch (JavaModelException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -157,11 +150,17 @@ public class WatchExpressionDialog {
 		}
 
 		// reconcile to inform problemRequestor about potential problems
-		try {
-			workingCopy.reconcile(ICompilationUnit.NO_AST, true, null, null);
-		} catch (JavaModelException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		finally {
+			try {
+				workingCopy
+						.reconcile(ICompilationUnit.NO_AST, true, null, null);
+				// clean up in the end
+				workingCopy.discardWorkingCopy();
+			} catch (JavaModelException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 		}
 
 		// check for compilation errors
@@ -170,6 +169,7 @@ public class WatchExpressionDialog {
 					.getActiveWorkbenchWindow().getShell(),
 					"Error creating WatchPoint", problemRequestor.getProblem()
 							.toString());
+
 			return false;
 		} else {
 			return true;

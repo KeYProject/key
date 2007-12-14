@@ -337,9 +337,17 @@ public class WatchpointView extends ViewPart {
 	}
 
 	/**
-	 * Gets the watch point inf.
+	 * Gets the WatchPoint information.
 	 * 
-	 * @return the watch point inf
+	 * Collects the necessary information to create a watchpoint.
+	 * 
+	 * @return information where
+	 * 
+	 * 			information[0]= The name of the JavaElement where the WatchPoint was set.
+	 *			information[1]= The line offset where the text selection begins.
+	 * 			information[2]= The name of the file in which the WatchPoint was set.
+	 * 			information[3]= The actual the source code for validating the WatchPoint.
+	 * 
 	 */
 	private String[] getWatchPointInf() {
 
