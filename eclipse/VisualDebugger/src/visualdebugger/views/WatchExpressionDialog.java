@@ -5,18 +5,15 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IOpenable;
+import org.eclipse.jdt.core.IJavaModelMarker;
 import org.eclipse.jdt.core.IProblemRequestor;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.IJavaModelMarker;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.WorkingCopyOwner;
 import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.Message;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -115,135 +112,70 @@ public class WatchExpressionDialog {
 	 * @return true, if expression is valid
 	 */
 	protected boolean isValid(String expression) {
-		
-		String dummyVar = "\nboolean myDummy = "+expression +"\n";
-		
+
+		// construct temporary source
+		String dummyVar = "\nboolean myDummy = " + expression + ";\n";
 		Document doc = new Document(source);
 		try {
+
 			int pos = doc.getLineOffset(offset);
-			String part1 = source.substring(0, pos);
-			String part2 = source.substring(pos);
-			String newSource = part1 + dummyVar + part2;
-			doc.set(newSource);
+			StringBuffer buffer = new StringBuffer();
+			buffer.append(source.substring(0, pos));
+			buffer.append(dummyVar);
+			buffer.append(source.substring(pos));
+			doc.set(buffer.toString());
+
 		} catch (BadLocationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		ASTParser parser = ASTParser.newParser(AST.JLS3);
-	
-		parser.setSource(doc.get().toCharArray());
-		parser.setResolveBindings(true);
-		//parser.setBindingsRecovery(true);
-		CompilationUnit unit = (CompilationUnit) parser.createAST(null);
 
-		
 		IEditorPart editor = PlatformUI.getWorkbench()
-		.getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-		
+				.getActiveWorkbenchWindow().getActivePage().getActiveEditor();
 
-		// CREATE ICOMPILATION UNIT TO DETECT PROBLEMS IN SOURCE CODE
-		IFile file = (IFile) ((ITextEditor)editor).getEditorInput().getAdapter(
-           IFile.class);
+		IFile file = (IFile) ((ITextEditor) editor).getEditorInput()
+				.getAdapter(IFile.class);
 
-        String fileName = file.getProjectRelativePath().toString();
 		ICompilationUnit icu = JavaCore.createCompilationUnitFrom(file);
 
-		final IProblemRequestor problemRequestor = new IProblemRequestor() {
+		final ProblemRequestor problemRequestor = new ProblemRequestor();
 
-			public void acceptProblem(IProblem problem) {
-				System.out.println(problem.getMessage());
-				
-			}
-
-			public void beginReporting() {
-				// TODO Auto-generated method stub
-				
-			}
-
-			public void endReporting() {
-				// TODO Auto-generated method stub
-				
-			}
-
-			public boolean isActive() {
-				// TODO Auto-generated method stub
-				return true;
-			}
-			
-		};
-		
-		
 		WorkingCopyOwner owner = new WorkingCopyOwner() {
 			public IProblemRequestor getProblemRequestor(ICompilationUnit unit) {
-				return problemRequestor;
+				return (IProblemRequestor) problemRequestor;
 			}
 		};
-		
-		System.out.println("1");
 		ICompilationUnit workingCopy = null;
 		try {
-			 workingCopy = icu.getWorkingCopy(owner, problemRequestor, null);
-			 workingCopy.getBuffer().setContents(doc.get().toCharArray());
+			workingCopy = icu.getWorkingCopy(owner, problemRequestor, null);
+			workingCopy.getBuffer().setContents(doc.get().toCharArray());
 		} catch (JavaModelException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
-		
-		System.out.println("2");
-	
-		
+
+		// reconcile to inform problemRequestor about potential problems
 		try {
 			workingCopy.reconcile(ICompilationUnit.NO_AST, true, null, null);
 		} catch (JavaModelException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		System.out.println("3");
 
-		//check for compilation errors
-
-		IProblem[] problems = unit.getProblems();
-		for (int i = 0; i < problems.length; i++) {
-			
-		   IProblem problem = problems[i];
-		   StringBuffer buffer = new StringBuffer();
-		   buffer.append(problem.getMessage());
-		   buffer.append(" line: ");
-		   buffer.append(problem.getSourceLineNumber());
-		   String msg = buffer.toString(); 
-
-
-		   if(problem.isError()) {
-		      msg = "Error:\n" + msg;
-		      System.out.println(msg);  
-		      MessageDialog.openError(PlatformUI.getWorkbench()
-						.getActiveWorkbenchWindow().getShell(),
-						"Error creating WatchPoint",
-						msg);
-		      return false;
-		   }	
-		   else 
-		      if(problem.isWarning())
-		         msg = "Warning:\n" + msg;
-		   		
-		   System.out.println(msg);  
-		   return true;
+		// check for compilation errors
+		if (problemRequestor.isError()) {
+			MessageDialog.openError(PlatformUI.getWorkbench()
+					.getActiveWorkbenchWindow().getShell(),
+					"Error creating WatchPoint", problemRequestor.getProblem()
+							.toString());
+			return false;
+		} else {
+			return true;
 		}
-
-		return true;
 	}
-	   public IMarker[] findJavaProblemMarkers(ICompilationUnit cu) 
-	      throws CoreException {
-	      IResource javaSourceFile = cu.getUnderlyingResource();
-	      IMarker[] markers = 
-	         javaSourceFile.findMarkers(IJavaModelMarker.JAVA_MODEL_PROBLEM_MARKER,
-	            true, IResource.DEPTH_INFINITE);
-		return markers;
-	   }
+
 	/**
 	 * Creates the text widget.
 	 */

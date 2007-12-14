@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.visualdebugger;
 
-
-// TODO: Auto-generated Javadoc
 /**
  * The Class WatchPoint.
  */
