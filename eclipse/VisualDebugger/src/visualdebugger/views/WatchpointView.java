@@ -362,8 +362,8 @@ public class WatchpointView extends ViewPart {
 			ISelection sel = tedit.getSelectionProvider().getSelection();
 			ITextSelection tsel = (ITextSelection) sel;
 			// set current line
-			information[1] = (1 + tsel.getStartLine()) + "";
-			
+			information[1] = (1 + tsel.getEndLine()) + "";
+						
 			IFile file = (IFile) tedit.getEditorInput().getAdapter(IFile.class);
 			String fileName = file.getProjectRelativePath().toString();
 			// set filename

@@ -71,14 +71,20 @@ public class WatchExpressionDialog {
 		okButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 
-				if (isValid(text.getText())) {
+				try {
+					if (isValid(text.getText())) {
 
-					expression = text.getText();
-					shell.close();
-				} else {
-					// if expression is not valid clear values
-					expression = null;
-					shell.close();
+						expression = text.getText();
+						shell.close();
+					} else {
+						// if expression is not valid clear values
+						expression = null;
+						shell.close();
+					}
+
+				} catch (JavaModelException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
 			}
 		});
@@ -102,12 +108,20 @@ public class WatchExpressionDialog {
 	 *            the expression
 	 * 
 	 * @return true, if expression is valid
+	 * @throws JavaModelException
 	 */
-	protected boolean isValid(String expression) {
+	protected boolean isValid(String expression) throws JavaModelException {
+
+		//test name
+		String varName = "myDummy";
+		while(source.indexOf(varName) > (-1)){
+			varName  = varName.concat("x");
+		}
 
 		// construct temporary source
-		String dummyVar = "\nboolean myDummy = " + expression + ";\n";
+		String dummyVar = "\nboolean "+ varName + " = " + expression + ";\n"; 
 		Document doc = new Document(source);
+		
 		try {
 
 			int pos = doc.getLineOffset(offset);
@@ -130,7 +144,7 @@ public class WatchExpressionDialog {
 
 		ICompilationUnit icu = JavaCore.createCompilationUnitFrom(file);
 
-		final ProblemRequestor problemRequestor = new ProblemRequestor();
+		final WatchPointProblemRequestor problemRequestor = new WatchPointProblemRequestor();
 
 		WorkingCopyOwner owner = new WorkingCopyOwner() {
 			public IProblemRequestor getProblemRequestor(ICompilationUnit unit) {
@@ -138,33 +152,23 @@ public class WatchExpressionDialog {
 			}
 		};
 		ICompilationUnit workingCopy = null;
+
 		try {
 			workingCopy = icu.getWorkingCopy(owner, problemRequestor, null);
 			workingCopy.getBuffer().setContents(doc.get().toCharArray());
-
-		} catch (JavaModelException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
 
 		// reconcile to inform problemRequestor about potential problems
-		finally {
-			try {
-				workingCopy
-						.reconcile(ICompilationUnit.NO_AST, true, null, null);
-				// clean up in the end
-				workingCopy.discardWorkingCopy();
-			} catch (JavaModelException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		workingCopy.reconcile(ICompilationUnit.NO_AST, true, null, null);
 
-		}
+		// clean up in the end
+		workingCopy.discardWorkingCopy();
 
-		// check for compilation errors
-		if (problemRequestor.isError()) {
+		// check for compilation errors and report the last detected problem
+		if (problemRequestor.hasErrors()) {
 			MessageDialog.openError(PlatformUI.getWorkbench()
 					.getActiveWorkbenchWindow().getShell(),
 					"Error creating WatchPoint", problemRequestor.getProblem()
