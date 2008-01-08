@@ -558,7 +558,7 @@ STRING_LITERAL
 options {
   paraphrase = "a string in double quotes";
 }
-    : '"' ( ESC | '\n' { newline(); } |~('\n' | '"' | '\\') )* '"' ;
+    : '"' ( ESC | '\n' { newline(); } |~('\n' | '"' | '\\' | '\uFFFF') )* '"' ;
 
 
 LESS_DISPATCH
