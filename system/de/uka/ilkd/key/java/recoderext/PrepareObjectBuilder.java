@@ -15,24 +15,17 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.HashMap;
+import java.util.*;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Field;
-import recoder.java.CompilationUnit;
 import recoder.java.Identifier;
 import recoder.java.StatementBlock;
-import recoder.java.declaration.ClassDeclaration;
-import recoder.java.declaration.FieldDeclaration;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.TypeDeclaration;
+import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Private;
 import recoder.java.declaration.modifier.Protected;
-import recoder.java.reference.MethodReference;
-import recoder.java.reference.ReferencePrefix;
-import recoder.java.reference.SuperReference;
-import recoder.java.reference.ThisReference;
+import recoder.java.reference.*;
 import recoder.kit.ProblemReport;
 import recoder.list.*;
 import de.uka.ilkd.key.util.Debug;
@@ -97,7 +90,13 @@ public class PrepareObjectBuilder
         if (!(javaLangObject instanceof ClassDeclaration)) {
             Debug.fail("Could not find class java.lang.Object or only as bytecode");
         }
-	for (int unit = 0; unit<units.size(); unit++) {
+        HashSet cds = classDeclarations();
+        Iterator it = cds.iterator();
+        while(it.hasNext()){
+            ClassDeclaration cd = (ClassDeclaration) it.next();
+            class2fields.put(cd, defaultSettings(getFields(cd)));
+        }
+	/*for (int unit = 0; unit<units.size(); unit++) {
 	    CompilationUnit cu = units.getCompilationUnit(unit);
 	    int typeCount = cu.getTypeDeclarationCount();
 	
@@ -120,7 +119,7 @@ public class PrepareObjectBuilder
 // 			class2fields.put(cd, defaultSettings(cd.getFields()));
 		    }
 	    }
-	}
+	}*/
 	setProblemReport(NO_PROBLEM);
 	return NO_PROBLEM;
     }

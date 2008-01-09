@@ -30,6 +30,11 @@ public class ExecutionContext
      * the reference to the active object
      */
     protected final ReferencePrefix runtimeInstance;
+   
+    /**
+     * the outer execution context of this execution context
+     */
+    protected final ExecutionContext parent;
 
 
     /**
@@ -40,12 +45,19 @@ public class ExecutionContext
      * is currently active/executed
      */
     public ExecutionContext(TypeReference classContext, 
-			    ReferencePrefix runtimeInstance) {
+			    ReferencePrefix runtimeInstance,
+			    ExecutionContext parent) {
 	if (classContext == null) Debug.printStackTrace();
 	this.classContext = classContext;
 	this.runtimeInstance = runtimeInstance;
+	this.parent = parent;
     }
-
+    
+    public ExecutionContext(TypeReference classContext, 
+            ReferencePrefix runtimeInstance){
+        this(classContext, runtimeInstance, null);
+    }
+    
     /**
      * creates an execution context reference
      * @param children an ExtList with the required children of the execution
@@ -58,6 +70,7 @@ public class ExecutionContext
 
 	children.remove(this.classContext);
 	this.runtimeInstance = (ReferencePrefix) children.get(ReferencePrefix.class);
+	parent = (ExecutionContext) children.get(ExecutionContext.class);
     }
 
 
@@ -70,6 +83,7 @@ public class ExecutionContext
 	int count = 0;
 	if (classContext != null) count++;
 	if (runtimeInstance != null) count++;
+	if(parent!=null) count++;
 	return count;
     }
 
@@ -90,6 +104,10 @@ public class ExecutionContext
 	    if (index == 0) return runtimeInstance;
 	    index--;
 	}
+	if (parent != null) {
+	    if (index == 0) return parent;
+	    index--;
+	}
 	throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -107,6 +125,10 @@ public class ExecutionContext
      */
     public ReferencePrefix getRuntimeInstance() {
 	return runtimeInstance;
+    }
+    
+    public ExecutionContext getParent(){
+        return parent;
     }
 
 

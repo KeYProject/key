@@ -15,22 +15,16 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.HashSet;
+import java.util.Iterator;
+
 import recoder.CrossReferenceServiceConfiguration;
-import recoder.abstraction.ArrayType;
-import recoder.abstraction.ClassType;
-import recoder.abstraction.PrimitiveType;
-import recoder.abstraction.Type;
-import recoder.java.CompilationUnit;
-import recoder.java.Expression;
-import recoder.java.Identifier;
-import recoder.java.declaration.LocalVariableDeclaration;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.TypeDeclaration;
+import recoder.abstraction.*;
+import recoder.java.*;
+import recoder.java.declaration.*;
 import recoder.java.expression.literal.*;
 import recoder.java.expression.operator.CopyAssignment;
-import recoder.java.reference.FieldReference;
-import recoder.java.reference.ReferencePrefix;
-import recoder.java.reference.TypeReference;
+import recoder.java.reference.*;
 import recoder.kit.TwoPassTransformation;
 import recoder.list.CompilationUnitMutableList;
 import de.uka.ilkd.key.util.Debug;
@@ -53,6 +47,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
 
     protected CrossReferenceServiceConfiguration services;
     protected CompilationUnitMutableList units;
+    protected HashSet classDeclarations=null;
 
     /**
      * creates a transormder for the recoder model
@@ -150,25 +145,56 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
     protected LocalVariableDeclaration declare
 	(String name, TypeDeclaration type) {
 	return new LocalVariableDeclaration
-	    (new TypeReference
-	     ((Identifier)type.getIdentifier().deepClone()), 
+	    (new TypeReference(getId(type)), 
 	     new Identifier(name));
     }
-
+    
+    protected Identifier getId(TypeDeclaration td){
+//        System.out.println("getAllSuperTypes: "+td.getAllSupertypes());
+        return td.getIdentifier()==null ? 
+                getId((TypeDeclaration) td.getAllSupertypes().getClassType(1)) :
+                    (Identifier)td.getIdentifier().deepClone();
+    }
 
     /**
      * invokes model transformation for each top level type declaration
      * in any compilation unit. <emph>Not</emph> for inner classes.
      */
     public void makeExplicit() {
+        ClassDeclarationCollector cdc = new ClassDeclarationCollector();
 	for (int i = 0; i<units.size(); i++) {
 	    CompilationUnit unit = units.getCompilationUnit(i);
+	    cdc.walk(unit);
+	    /*
 	    int typeCount = unit.getTypeDeclarationCount();
 	    for (int j = 0; j<typeCount; j++) {
 		makeExplicit(unit.getTypeDeclarationAt(j));
-	    }
-	}
+	    }*/
+	}         
+	HashSet s = classDeclarations();
+	Iterator it = s.iterator();
+	while(it.hasNext()) {
+	    ClassDeclaration cd = (ClassDeclaration) it.next();
+  //          System.out.println("RecoderModelTransformer: classdecl: "+cd.getFullName());
+            makeExplicit(cd);
+        }
     }
+    
+    protected HashSet classDeclarations(){
+        if(classDeclarations==null){
+            ClassDeclarationCollector cdc = new ClassDeclarationCollector();
+            for (int i = 0; i<units.size(); i++) {
+                CompilationUnit unit = units.getCompilationUnit(i);
+                cdc.walk(unit);
+            }
+            classDeclarations = cdc.result();
+        }
+        return classDeclarations;       
+    }
+    
+ /*   protected String getNameForAnonClass(TypeDeclaration cd){
+        return cd.getAllSupertypes().getClassType(1).getFullName();
+    }*/
 
     /**
      * Starts the transformation. 
@@ -176,6 +202,35 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
     public void transform() {
 	super.transform();
 	makeExplicit();
+    }
+    
+    class ClassDeclarationCollector extends SourceVisitor{
+        
+        HashSet result = new HashSet();
+        
+        public ClassDeclarationCollector(){
+            super();
+        }
+        
+        public void walk(SourceElement s){
+            s.accept(this);
+            if(s instanceof NonTerminalProgramElement){
+                NonTerminalProgramElement pe = (NonTerminalProgramElement) s;
+                for(int i=0; i<pe.getChildCount(); i++){
+                    walk(pe.getChildAt(i));
+                }
+            }
+        }
+        
+        public void visitClassDeclaration(ClassDeclaration cld){
+            result.add(cld);
+//            System.out.println("ClassDeclarationCollector: classdecl: "+cld.getName());
+            super.visitClassDeclaration(cld);
+        }
+        
+        public HashSet result(){
+            return result;
+        }
     }
 
 }

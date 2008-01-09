@@ -1549,8 +1549,19 @@ public class Recoder2KeY implements JavaReader{
 				  SetOfSort supers) {
         final boolean abstractOrInterface = ct.isAbstract() ||
             ct.isInterface();
-        return new ClassInstanceSortImpl(new Name(ct.getFullName()), 
+        return new ClassInstanceSortImpl(new Name(makeAdmissibleName(ct.getFullName())), 
 					 supers, abstractOrInterface);
+    }
+    
+    private String makeAdmissibleName(String s){
+        int i = s.indexOf(".");
+        while(i!=-1){
+            if(s.charAt(i+1)<='9' && s.charAt(i+1)>='0'){
+                s = s.substring(0, i)+"_"+s.substring(i+1);
+            }
+            i = s.indexOf(".", i+1);
+        }
+        return s;
     }
 
     private SetOfSort directSuperSorts
@@ -1875,8 +1886,9 @@ public class Recoder2KeY implements JavaReader{
 
 	    final ProgramElementName name = VariableNamer.
                 parseName(recoderVarSpec.getName());
+	    System.out.println("r2k: name, final: "+recoderVarSpec.getName()+" , "+recoderVarSpec.isFinal());
 	    final ProgramVariable pv = new LocationVariable(name,
-	            getKeYJavaType(recoderType));	   
+	            getKeYJavaType(recoderType), recoderVarSpec.isFinal());	   
 	    varSpec = new VariableSpecification
 		(collectChildren(recoderVarSpec), pv, 
                  recoderVarSpec.getDimensions(),
@@ -2128,15 +2140,15 @@ public class Recoder2KeY implements JavaReader{
      */
      public ProgramVariable convert
 	 (recoder.java.reference.VariableReference vr) {
-
+         System.out.println("r2k varref: "+vr.getName());
 	 final recoder.java.declaration.VariableSpecification 
 	     recoderVarspec = getRecoderVarSpec(vr);	 
-
+	 System.out.println("r2k recVarSpec, final: "+recoderVarspec.getName()+" "+recoderVarspec.isFinal());
 	 if (!rec2key.mapped(recoderVarspec)) {
+	     System.out.println("r2k not mapped: "+recoderVarspec);
 	     insertToMap(recoderVarspec, 
 			 convert(recoderVarspec));
 	 }
-
 	 return (ProgramVariable)
 	     ((VariableSpecification)rec2key.
 	      toKeY(recoderVarspec)).getProgramVariable();
@@ -2537,14 +2549,22 @@ public class Recoder2KeY implements JavaReader{
 	Expression[] arguments = new Expression[args != null ? args.size() : 0];
 	for (int i = 0; i<arguments.length; i++) {
 	    arguments[i] = (Expression)callConvert(args.getExpression(i));
-	}
+	}      
+	TypeReference maybeAnonClass = (TypeReference) callConvert(tr);
+        if(n.getClassDeclaration()!=null){
+            System.out.println("r2k convert(New): class declaration: "+n.getClassDeclaration().toSource());
+            callConvert(n.getClassDeclaration());
+            KeYJavaType kjt = getKeYJavaType(n.getClassDeclaration());
+            System.out.println("r2k kjt: "+kjt);
+            maybeAnonClass = new TypeRef(kjt);
+        }
 	if (rp == null) {
 	    return new New(arguments , 
-			   (TypeReference) callConvert(tr), 
+			   maybeAnonClass, 
 			   (ReferencePrefix)null);
 	} else {
 	    return new New(arguments , 
-			   (TypeReference) callConvert(tr), 
+			   maybeAnonClass, 
 			   (ReferencePrefix)callConvert(rp));
 	}
     }

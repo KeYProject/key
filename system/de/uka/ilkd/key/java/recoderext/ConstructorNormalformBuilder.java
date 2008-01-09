@@ -15,15 +15,12 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.HashMap;
+import java.util.*;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Constructor;
-import recoder.java.CompilationUnit;
-import recoder.java.Expression;
-import recoder.java.Statement;
-import recoder.java.StatementBlock;
+import recoder.java.*;
 import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Private;
 import recoder.java.declaration.modifier.Public;
@@ -160,11 +157,24 @@ public class ConstructorNormalformBuilder
 	 if (!(javaLangObject instanceof ClassDeclaration)) {
 	     Debug.fail("Could not find class java.lang.Object or only as bytecode");
 	 }
-        for (int unit = 0; unit<units.size(); unit++) {
-	    CompilationUnit cu = units.getCompilationUnit(unit);
-	    int typeCount = cu.getTypeDeclarationCount();
+	 HashSet cds = classDeclarations();
+	 Iterator it = cds.iterator();
+	 while(it.hasNext()){
+	     ClassDeclaration cd = (ClassDeclaration) it.next();
+       
+	     // collect constructors for transformation phase
+             ConstructorMutableList constructors = new ConstructorArrayList(10);
+             constructors.add(services.getSourceInfo().getConstructors(cd));
+             class2constructors.put(cd, constructors);
+                                 
+             // collect initializers for transformation phase
+             class2initializers.put(cd, collectInitializers(cd)); 
+	 }
+	 /*for (int unit = 0; unit<units.size(); unit++) {
+	     CompilationUnit cu = units.getCompilationUnit(unit);
+	     int typeCount = cu.getTypeDeclarationCount();
 	
-	    for (int i = 0; i < typeCount; i++) {
+	     for (int i = 0; i < typeCount; i++) {
 		if (cu.getTypeDeclarationAt(i) instanceof ClassDeclaration)
 		    { 
 			ClassDeclaration cd = (ClassDeclaration)
@@ -186,7 +196,7 @@ public class ConstructorNormalformBuilder
 			class2initializers.put(cd, collectInitializers(cd));
 		    }
 	    }	
-	}
+	}*/
 	setProblemReport(NO_PROBLEM);
 	return NO_PROBLEM;
     }

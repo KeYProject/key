@@ -1,17 +1,11 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.CrossReferenceServiceConfiguration;
-import recoder.java.Identifier;
-import recoder.java.declaration.ClassDeclaration;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.TypeDeclaration;
+import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Private;
 import recoder.java.declaration.modifier.Static;
 import recoder.java.reference.TypeReference;
-import recoder.list.CompilationUnitMutableList;
-import recoder.list.ModifierArrayList;
-import recoder.list.ModifierMutableList;
-import recoder.list.ParameterDeclarationArrayList;
+import recoder.list.*;
 
 public class InstanceAllocationMethodBuilder extends RecoderModelTransformer {
 
@@ -38,8 +32,7 @@ public class InstanceAllocationMethodBuilder extends RecoderModelTransformer {
   
         MethodDeclaration md =  new MethodDeclaration
             (modifiers, 
-             new TypeReference
-             ((Identifier)type.getIdentifier().deepClone()), 
+             new TypeReference(getId(type)), 
              new ImplicitIdentifier(IMPLICIT_INSTANCE_ALLOCATE), 
              pdal, 
              null, null);

@@ -104,12 +104,16 @@ public class ApplyOnModality extends AbstractUpdateRule {
      * @return
      */
     private boolean protectedLocation(Location loc, HashSet protectedProgVars) {
+        System.out.println("Location: "+loc);
+        System.out.println("pv: "+(loc instanceof ProgramVariable));
+        System.out.println("pv&final: "+(loc instanceof ProgramVariable && ((ProgramVariable) loc).isFinal()));
         // currently it would be safe to comment the PROTECTED_HEAP part out as 
         // heap locations are generally not thrown away. But in principle one can think
         // of a more finegrained control
         return protectedProgVars.contains(PROTECT_ALL) ||
               (protectedProgVars.contains(PROTECT_HEAP) && isHeapLocation(loc)) || 
               (isHeapLocation(loc) || protectedProgVars.contains(loc) ||
+                      (loc instanceof ProgramVariable && ((ProgramVariable) loc).isFinal()) ||
 	    loc.name().equals(new ProgramElementName("<transactionCounter>")));                           
     }
 

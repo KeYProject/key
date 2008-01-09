@@ -38,7 +38,7 @@ public abstract class ProgramVariable extends TermSymbol
     private final boolean isStatic;
     private final boolean isModel;
     private final boolean isGhost;
-
+    private final boolean isFinal;
 
     // the type where this program variable is declared if and only if
     // the program variable denotes a field
@@ -50,16 +50,28 @@ public abstract class ProgramVariable extends TermSymbol
 			    KeYJavaType        containingType,
 			    boolean            isStatic,
 			    boolean            isModel,
-			    boolean            isGhost) {
+			    boolean            isGhost,
+			    boolean            isFinal) {
 	super(name, s);
 	this.type = t;
 	this.containingType = containingType;	
 	this.isStatic = isStatic;
 	this.isModel = isModel;
 	this.isGhost = isGhost;
+	this.isFinal = isFinal;
 	// remove this as soon as possible %%%
 	id = COUNTER;
 	COUNTER++;
+    }
+    
+    protected ProgramVariable(ProgramElementName name, 
+            Sort               s,
+            KeYJavaType        t, 
+            KeYJavaType        containingType,
+            boolean            isStatic,
+            boolean            isModel,
+            boolean            isGhost) {
+        this(name, s, t, containingType, isStatic, isModel, isGhost, false);
     }
  
     /** returns unique id %%%% HACK */
@@ -103,6 +115,13 @@ public abstract class ProgramVariable extends TermSymbol
      */
     public boolean isGhost() {
 	return isGhost;
+    }
+    
+    /**
+     * returns true if the program variable has been declared as final
+     */
+    public boolean isFinal() {
+        return isFinal;
     }
 
     /**

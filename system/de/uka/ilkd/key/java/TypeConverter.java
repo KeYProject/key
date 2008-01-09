@@ -243,6 +243,12 @@ public class TypeConverter extends TermBuilder {
 	}  else if (prefix instanceof ArrayReference) {	   
 	    return convertArrayReference((ArrayReference)prefix, ec);
 	} else if (prefix instanceof ThisReference) {	 
+	    if(prefix.getReferencePrefix()!=null && (prefix.getReferencePrefix() instanceof TypeReference)){
+	        while(ec.getTypeReference().getKeYJavaType() != 
+	            ((TypeReference) prefix.getReferencePrefix()).getKeYJavaType()){
+	            ec = ec.getParent();
+	        }
+	    }
 	    return convertToLogicElement(ec.getRuntimeInstance());
 	} else {            
 	    Debug.out("typeconverter: WARNING: unknown reference prefix:", 
@@ -310,7 +316,9 @@ public class TypeConverter extends TermBuilder {
     public Term convertToLogicElement(ProgramElement pe, 				    
 				      ExecutionContext ec) {
 	Debug.out("typeconverter: called for:", pe, pe.getClass());
-	if (pe instanceof ProgramVariable) {	    
+	System.out.println("typeconverter: called for: "+pe+" "+pe.getClass());
+	if (pe instanceof ProgramVariable) {	  
+	    System.out.println("typeconverter: pv final: "+((ProgramVariable) pe).isFinal());   
 	    return var((ProgramVariable)pe);
 	} else if (pe instanceof FieldReference) {
 	    return convertVariableReference((FieldReference)pe, ec);

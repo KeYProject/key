@@ -71,7 +71,7 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
             (assign(new VariableReference
                     (new Identifier(NEW_OBJECT_VAR_NAME)),
                     new MethodReference(new TypeReference
-                         ((Identifier) recoderClass.getIdentifier().deepClone()), 
+                         (getId(recoderClass)), 
                          new ImplicitIdentifier
                          (InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
                          arguments)));
@@ -101,10 +101,10 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
 	ModifierMutableList modifiers = new ModifierArrayList(2);
 	modifiers.add(new Public());
 	modifiers.add(new Static());	
+
 	MethodDeclaration md =  new MethodDeclaration
 	    (modifiers, 
-	     new TypeReference
-	     ((Identifier)type.getIdentifier().deepClone()), 
+	     new TypeReference(getId(type)), 
 	     new ImplicitIdentifier(IMPLICIT_OBJECT_CREATE), 
 	     new ParameterDeclarationArrayList(0), 
 	     null,

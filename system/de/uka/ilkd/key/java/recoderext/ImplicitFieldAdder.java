@@ -169,9 +169,9 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	addImplicitRecoderFields(td);
 
 	int typeCount = td.getTypeDeclarationCount();
-	for (int j = 0; j<typeCount; j++) {
+	/*for (int j = 0; j<typeCount; j++) {
 	    makeExplicit(td.getTypeDeclarationAt(j));
-	}
+	}*/
 
 	if (!transformedObject && td == javaLangObject) {	   
 	    addGlobalImplicitRecoderFields(td);
