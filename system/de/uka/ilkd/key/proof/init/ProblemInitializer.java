@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -52,7 +51,6 @@ import de.uka.ilkd.key.proof.mgt.RuleConfig;
 import de.uka.ilkd.key.rule.IteratorOfBuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
-import de.uka.ilkd.key.util.KeYResourceManager;
 
 
 public class ProblemInitializer {
@@ -450,18 +448,18 @@ public class ProblemInitializer {
 	env.setRuleConfig(ruleConfig);
 	
 	//possibly reuse an existing proof environment
-	if(main != null) {
+	if(main != null && po.askUserForEnvironment()) {
     	    ProofEnvironment envChosen = 
     	    GlobalProofMgt.getInstance().getProofEnvironment(
     						env.getJavaModel(), 
-    						env.getRuleConfig(),
-    						po.askUserForEnvironment());
+    						env.getRuleConfig());
         	
             if(envChosen != null) {
         	assert envChosen.getInitConfig().getProofEnv() == envChosen;
         	return envChosen.getInitConfig();
             } 
 	}
+	
 	
 	//register the proof environment
 	if(main != null) {

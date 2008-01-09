@@ -79,8 +79,8 @@ public class ProofEnvironment {
     /** adds a contract to the specifications of this environment.
      */
     public Contract addContract(Contract ct) {
+        ct.setProofEnv(this);
 	Contract ctResult = getSpecificationRepository().add(ct);
-        ctResult.setProofEnv(this);
         return ctResult;
     }
 
