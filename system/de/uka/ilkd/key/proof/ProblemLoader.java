@@ -113,13 +113,13 @@ public class ProblemLoader implements Runnable {
 				       mediator.getSelectedProof());
 		    }
 		    if (Main.batchMode) {
-			//System.out.println("Proof: " +proof.openGoals());
-			if(proof.openGoals().size()==0) {
-			    System.out.println("proof.openGoals.size=" + 
-                                    proof.openGoals().size());
+                        //System.out.println("Proof: " +proof.openGoals());
+                        if(proof.openGoals().size()==0) {
+                            System.out.println("proof.openGoals.size=" + 
+                                     proof.openGoals().size());		 
 			    System.exit(0);
 			}
-		        mediator.startAutoMode();
+			mediator.startAutoMode();
 		    }		   
 		}
 	    };
@@ -276,10 +276,19 @@ public class ProblemLoader implements Runnable {
 	case 'h' :
 	    //             Debug.fail("Detected use of heuristics!");
 	    break;
-	case 'q' : // ifseqformula
-            Sequent seq = currGoal.sequent();
-            ifSeqFormulaList = ifSeqFormulaList.append(
-                new IfFormulaInstSeq(seq, Integer.parseInt(s)));
+	case 'q' : // ifseqformula      
+	    // mu 2008-jan-09
+            // bugfix: without this if-check,
+	    // proofs with meta variables cannot be loaded.
+            // when loading, rules are applied in an order different to the original one
+            // Thus the goal might already have been closed.
+            // Just ignore this ifseqforumla then
+            if(currGoal != null) {
+                Sequent seq = currGoal.sequent();
+                ifSeqFormulaList = ifSeqFormulaList.append(
+                        new IfFormulaInstSeq(seq, Integer.parseInt(s)));    
+            }
+            
             break;
         case 'u' : //UserLog
             if(proof.userLog==null)
@@ -325,6 +334,14 @@ public class ProblemLoader implements Runnable {
             }
             break;
         case 'r' :
+            // mu 2008-jan-09
+            // bugfix: without this, proofs with meta variables cannot be loaded.
+            // when loading, rules are applied in an order different to the original one
+            // Thus the goal might already have been closed.
+            // Just ignore this rule then
+            if(currGoal == null)
+                break;
+            
             try{
                currGoal.apply(constructApp());
                children = currNode.childrenIterator();
@@ -335,6 +352,14 @@ public class ProblemLoader implements Runnable {
             }
             break;
         case 'n' :
+            // mu 2008-jan-09
+            // bugfix: without this, proofs with meta variables cannot be loaded.
+            // when loading, rules are applied in an order different to the original one
+            // Thus the goal might already have been closed.
+            // Just ignore this rule then
+            if(currGoal == null)
+                break;
+
             try {
                 currGoal.apply(constructBuiltinApp());
                 children = currNode.childrenIterator();
