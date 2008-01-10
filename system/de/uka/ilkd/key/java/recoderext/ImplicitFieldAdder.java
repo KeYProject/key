@@ -137,12 +137,12 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
     (recoder.java.declaration.TypeDeclaration td) {
 
 	// static
-	String className = td.getName(); 
+/*	String className = td.getName(); 
 	if (className == null) {
 	    Debug.out("makeImplicitMembersExplicit: anonymous class will not add" +
 		      "implicit fields");
 	    return;
-	}
+	}*/
 	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INIT_IN_PROGRESS, true, true), td, 0);
 	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_ERRONEOUS, true, true), td, 0);
 	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INITIALIZED, true, true), td, 0);
@@ -168,7 +168,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 
 	addImplicitRecoderFields(td);
 
-	int typeCount = td.getTypeDeclarationCount();
+//	int typeCount = td.getTypeDeclarationCount();
 	/*for (int j = 0; j<typeCount; j++) {
 	    makeExplicit(td.getTypeDeclarationAt(j));
 	}*/

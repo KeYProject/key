@@ -75,6 +75,8 @@ public class ConstructorCall extends ProgramMetaConstruct {
 	    (ProgramVariable) svInst.getInstantiation(newObjectSV);
 	KeYJavaType classType = constructorReference.getTypeReference().getKeYJavaType();		
 
+	System.out.println("constructorCall: classType: "+classType);
+	
 	final ExecutionContext ec = svInst.getExecutionContext();	
     
 	if (!(classType.getJavaType() instanceof ClassDeclaration)) {

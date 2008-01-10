@@ -34,7 +34,7 @@ public class ExecutionContext
     /**
      * the outer execution context of this execution context
      */
-    protected final ExecutionContext parent;
+    protected final IExecutionContext parent;
 
 
     /**
@@ -46,7 +46,7 @@ public class ExecutionContext
      */
     public ExecutionContext(TypeReference classContext, 
 			    ReferencePrefix runtimeInstance,
-			    ExecutionContext parent) {
+			    IExecutionContext parent) {
 	if (classContext == null) Debug.printStackTrace();
 	this.classContext = classContext;
 	this.runtimeInstance = runtimeInstance;
@@ -127,7 +127,7 @@ public class ExecutionContext
 	return runtimeInstance;
     }
     
-    public ExecutionContext getParent(){
+    public IExecutionContext getParent(){
         return parent;
     }
 
@@ -145,7 +145,7 @@ public class ExecutionContext
     }
 
     public String toString() {
-        return "Context: "+classContext+" Instance: "+runtimeInstance;
+        return "Context: "+classContext+" Instance: "+runtimeInstance+" Parent: "+parent;
     }
     
 }

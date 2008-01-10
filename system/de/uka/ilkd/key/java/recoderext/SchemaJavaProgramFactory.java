@@ -101,8 +101,9 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     }
 
     public ContextStatementBlock createContextStatementBlock(TypeSVWrapper typeRef,
-							     ExpressionSVWrapper var) {
-	return new ContextStatementBlock(typeRef, var);
+							     ExpressionSVWrapper var,
+							     ExecCtxtSVWrapper ec) {
+	return new ContextStatementBlock(typeRef, var, ec);
     }
 
     public ContextStatementBlock createContextStatementBlock(ExecCtxtSVWrapper ec) {

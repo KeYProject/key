@@ -246,7 +246,7 @@ public class TypeConverter extends TermBuilder {
 	    if(prefix.getReferencePrefix()!=null && (prefix.getReferencePrefix() instanceof TypeReference)){
 	        while(ec.getTypeReference().getKeYJavaType() != 
 	            ((TypeReference) prefix.getReferencePrefix()).getKeYJavaType()){
-	            ec = ec.getParent();
+	            ec = (ExecutionContext) ec.getParent();
 	        }
 	    }
 	    return convertToLogicElement(ec.getRuntimeInstance());

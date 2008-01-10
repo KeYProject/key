@@ -248,10 +248,10 @@ public class WhileInvRule extends AbstractMetaOperator {
         Statement resSta;
         if (svInst.getExecutionContext() != null){
             resSta = new MethodFrame(null, svInst.getExecutionContext(), s);
-            ExecutionContext ec = svInst.getExecutionContext().getParent();
+            ExecutionContext ec = (ExecutionContext) svInst.getExecutionContext().getParent();
             while(ec!=null && ec!=services.getJavaInfo().getDefaultExecutionContext()){
                 resSta = new MethodFrame(null, ec, new StatementBlock(resSta));
-                ec = ec.getParent();
+                ec = (ExecutionContext) ec.getParent();
             }
         }else{
             resSta = s;

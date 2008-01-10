@@ -1886,7 +1886,6 @@ public class Recoder2KeY implements JavaReader{
 
 	    final ProgramElementName name = VariableNamer.
                 parseName(recoderVarSpec.getName());
-	    System.out.println("r2k: name, final: "+recoderVarSpec.getName()+" , "+recoderVarSpec.isFinal());
 	    final ProgramVariable pv = new LocationVariable(name,
 	            getKeYJavaType(recoderType), recoderVarSpec.isFinal());	   
 	    varSpec = new VariableSpecification
@@ -2140,12 +2139,9 @@ public class Recoder2KeY implements JavaReader{
      */
      public ProgramVariable convert
 	 (recoder.java.reference.VariableReference vr) {
-         System.out.println("r2k varref: "+vr.getName());
 	 final recoder.java.declaration.VariableSpecification 
 	     recoderVarspec = getRecoderVarSpec(vr);	 
-	 System.out.println("r2k recVarSpec, final: "+recoderVarspec.getName()+" "+recoderVarspec.isFinal());
 	 if (!rec2key.mapped(recoderVarspec)) {
-	     System.out.println("r2k not mapped: "+recoderVarspec);
 	     insertToMap(recoderVarspec, 
 			 convert(recoderVarspec));
 	 }

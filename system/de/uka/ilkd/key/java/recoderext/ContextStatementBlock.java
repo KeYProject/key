@@ -36,8 +36,8 @@ public class ContextStatementBlock
     /**
      Statement block.
      */
-    public ContextStatementBlock(TypeSVWrapper tr, ExpressionSVWrapper runtime) {
-	this(tr != null ? new ExecutionContext(tr, runtime) : null);
+    public ContextStatementBlock(TypeSVWrapper tr, ExpressionSVWrapper runtime, ExecCtxtSVWrapper ec) {
+	this(tr != null ? new ExecutionContext(tr, runtime, ec) : null);
     }
 
     /**

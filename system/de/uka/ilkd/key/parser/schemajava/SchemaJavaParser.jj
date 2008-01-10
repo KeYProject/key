@@ -1545,11 +1545,12 @@ ExecutionContext ExecutionContext() :
     ExecutionContext ctxt = null;
     TypeSVWrapper tr = null;
     ExpressionSVWrapper instance = null;
+    ExecCtxtSVWrapper ex = null;
 }
 {
-    tr = TypeSV() "(" (instance = ExpressionSV())? ")" 
+    tr = TypeSV() "(" (instance = ExpressionSV())? ("," ex = ExecutionContextSV())? ")" 
     {
-	return new ExecutionContext(tr, instance);
+	return new ExecutionContext(tr, instance, ex);
     } 
 } 
 
@@ -3057,14 +3058,14 @@ StatementBlock StartBlock() :
 { 
    "{" (   LOOKAHEAD(2)
            ( <DOT> ( LOOKAHEAD(2) 
-		     tr = TypeSV() "(" (sv = ExpressionSV())? ")" |  
+		     tr = TypeSV() "(" (sv = ExpressionSV())? ("," ec = ExecutionContextSV())? ")" |  
 	             ec = ExecutionContextSV() ))? 
             <CONTEXTSTART> 
             {
-              if (ec != null) {
+              if (tr == null) {
                  result = factory.createContextStatementBlock(ec);
 	      } else { 
-                 result = factory.createContextStatementBlock(tr, sv);
+                 result = factory.createContextStatementBlock(tr, sv, ec);
 	      }
               setPrefixInfo(result);
             }        

@@ -150,6 +150,9 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
     }
     
     protected Identifier getId(TypeDeclaration td){
+      /*  return td.getIdentifier()==null ? 
+            new Identifier(td.getFullName()) :
+                (Identifier)td.getIdentifier().deepClone();*/
 //        System.out.println("getAllSuperTypes: "+td.getAllSupertypes());
         return td.getIdentifier()==null ? 
                 getId((TypeDeclaration) td.getAllSupertypes().getClassType(1)) :

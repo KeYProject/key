@@ -357,6 +357,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 	            final TypeConverter tc = services.getTypeConverter();
 		    final SchemaVariable peerSV=(SchemaVariable)o;
 		    final Object peerInst = app.instantiations().getInstantiation(peerSV);
+		    System.out.println("peerSV: "+peerSV);
 		    Expression peerInstExpr;
 		    if (peerInst instanceof Term) {
 			peerInstExpr=tc.convertToProgramElement((Term)peerInst);
