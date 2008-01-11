@@ -924,7 +924,6 @@ public class JavaInfo {
             return res;
 	} else {
 	    final ListOfField list   = kpmi.getAllFieldsLocallyDeclaredIn(classType);
-	    System.out.println("ji: classType: "+classType+" fields: "+list.size());
 	    final IteratorOfField it = list.iterator();	   
             while (it.hasNext()) {
 		final Field f = it.next();

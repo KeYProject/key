@@ -1105,6 +1105,31 @@ public class JMLMethodSpec extends JMLSpec implements JMLLemmaMethodSpec,
 	}
 	return mBS;
     }
+    
+    public StatementBlock buildOuterClassesContext(StatementBlock mbs){
+        System.out.println("JMLMethodSpec: class: "+cSpec.getClassDeclaration().getFullName());
+        System.out.println("JMLMethodSpec: ji.getKJT(class fullname): "+ji.getKeYJavaType(cSpec.getClassDeclaration().getFullName()));
+        System.out.println("JMLMethodSpec: parent class: "+cSpec.getClassDeclaration().getParentClass());
+        ExecutionContext ec = buildExecutionContext(cSpec.getClassDeclaration().getFullName());
+        System.out.println("JMLMethodSpec: ec: "+ec);
+        StatementBlock sb = mbs;
+        while(ec!=null){
+            sb = new StatementBlock(new MethodFrame(null, ec, sb));
+            ec = (ExecutionContext) ec.getParent();
+        }
+        return sb;
+    }
+    
+    private ExecutionContext buildExecutionContext(String fullName){
+        int end = fullName.lastIndexOf(".");
+        if(end==-1 || ji.getKeYJavaType(fullName.substring(0, end))==null){
+            return null;
+        }
+        KeYJavaType outer = ji.getKeYJavaType(fullName.substring(0, end));
+        TypeReference tr = new TypeRef(outer);
+        ReferencePrefix rp = services.getImplementation2SpecMap().getSpecForClass(outer).getInstancePrefix();
+        return new ExecutionContext(tr, rp, buildExecutionContext(fullName.substring(0, end)));
+    }
 
     private ProgramVariable makeResultVar(){
 	if(pm.getTypeReference()==null){

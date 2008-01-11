@@ -2548,10 +2548,8 @@ public class Recoder2KeY implements JavaReader{
 	}      
 	TypeReference maybeAnonClass = (TypeReference) callConvert(tr);
         if(n.getClassDeclaration()!=null){
-            System.out.println("r2k convert(New): class declaration: "+n.getClassDeclaration().toSource());
             callConvert(n.getClassDeclaration());
             KeYJavaType kjt = getKeYJavaType(n.getClassDeclaration());
-            System.out.println("r2k kjt: "+kjt);
             maybeAnonClass = new TypeRef(kjt);
         }
 	if (rp == null) {
@@ -2700,7 +2698,8 @@ public class Recoder2KeY implements JavaReader{
     protected void transformModel
 	(recoder.list.CompilationUnitMutableList cUnits) {
 	RecoderModelTransformer[] transformer = 
-	    new RecoderModelTransformer[] { 
+	    new RecoderModelTransformer[] {
+//	        new AnonymousClassRenamer(servConf, cUnits),
 		new ImplicitFieldAdder(servConf, cUnits),
                 new InstanceAllocationMethodBuilder(servConf, cUnits),
 		new ConstructorNormalformBuilder(servConf, cUnits),

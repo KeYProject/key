@@ -43,7 +43,6 @@ public class MetaNextToCreate extends MetaField implements Location {
             throw new RuntimeException("Wrong usage of meta operator " + this +
                     ". Sort of subterm is not an ObjectSort, but "+s);
         }
-        System.out.println("ObjectSort: "+s);
         return termFactory.createVariableTerm(services.getJavaInfo().
                 getAttribute(ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE, (ObjectSort)s));
     }

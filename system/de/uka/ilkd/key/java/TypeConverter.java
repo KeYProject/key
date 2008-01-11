@@ -316,9 +316,7 @@ public class TypeConverter extends TermBuilder {
     public Term convertToLogicElement(ProgramElement pe, 				    
 				      ExecutionContext ec) {
 	Debug.out("typeconverter: called for:", pe, pe.getClass());
-	System.out.println("typeconverter: called for: "+pe+" "+pe.getClass());
 	if (pe instanceof ProgramVariable) {	  
-	    System.out.println("typeconverter: pv final: "+((ProgramVariable) pe).isFinal());   
 	    return var((ProgramVariable)pe);
 	} else if (pe instanceof FieldReference) {
 	    return convertVariableReference((FieldReference)pe, ec);

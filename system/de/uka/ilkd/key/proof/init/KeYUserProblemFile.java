@@ -372,6 +372,7 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
                     if (typeDecl instanceof InterfaceDeclaration
                             || typeDecl instanceof ClassDeclaration) {
                         result = result.append(typeDecl);
+                        result = result.append(getInnerClasses(typeDecl));
                     }
                 }
             }
@@ -383,6 +384,18 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
             result = result.append(ji.getKeYJavaType("java.lang.Throwable")
                     .getJavaType());
 
+        }
+        return result;
+    }
+    
+    private ListOfType getInnerClasses(TypeDeclaration td){
+        ListOfType result = SLListOfType.EMPTY_LIST;
+        for(int i=0; i<td.getTypeDeclarationCount(); i++){
+            if (td.getTypeDeclarationAt(i) instanceof InterfaceDeclaration
+                    || td.getTypeDeclarationAt(i) instanceof ClassDeclaration) {
+                result = result.append(td.getTypeDeclarationAt(i));
+                result = result.append(getInnerClasses(td.getTypeDeclarationAt(i)));
+            }      
         }
         return result;
     }

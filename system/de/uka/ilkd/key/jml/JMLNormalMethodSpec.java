@@ -69,7 +69,7 @@ public class JMLNormalMethodSpec extends JMLMethodSpec {
 	}
 	if(diverges == null || ff().equals(diverges)){
 	    JavaBlock jb = 
-		JavaBlock.createJavaBlock(new StatementBlock(makeMBS()));
+		JavaBlock.createJavaBlock(new StatementBlock(buildOuterClassesContext(makeMBS())));
 	    if(withInv && !services.getImplementation2SpecMap().
 	       getModifiers(pm).contains("helper")){
 		post = cSpec.addClassSpec2Post(post, true, !allInv, pm, cSpec);
