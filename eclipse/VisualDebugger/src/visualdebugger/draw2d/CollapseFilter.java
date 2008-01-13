@@ -30,7 +30,6 @@ public class CollapseFilter implements Filter {
 	 * 
 	 * @see visualdebugger.draw2d.Filter#filter(de.uka.ilkd.key.visualdebugger.executiontree.ETNode)
 	 */
-	@Override
 	public boolean filter(ETNode etnode) {
 
 		// hide all nodes that are in the list of children

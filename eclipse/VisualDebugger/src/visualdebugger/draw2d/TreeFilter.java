@@ -11,7 +11,6 @@ public class TreeFilter implements Filter {
 	/* (non-Javadoc)
 	 * @see visualdebugger.draw2d.Filter#filter(de.uka.ilkd.key.visualdebugger.executiontree.ETNode)
 	 */
-	@Override
 	public boolean filter(ETNode etnode) {
 		return true;
 	}
