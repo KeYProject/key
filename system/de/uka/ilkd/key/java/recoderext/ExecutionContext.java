@@ -34,11 +34,6 @@ public class ExecutionContext
      */
     private ReferencePrefix runtimeInstance;
     
-    /**
-     * the outer execution context of this context
-     */
-    private ExecutionContext parent;
-
     protected ExecutionContext() {}
 
     /**
@@ -47,30 +42,14 @@ public class ExecutionContext
      * class 
      * @param runtimeInstance a ReferencePrefix to the object that
      * is currently active/executed
-     * @param parent the outer execution context of this
      */
     public ExecutionContext(TypeReference classContext, 
-			    ReferencePrefix runtimeInstance,
-			    ExecutionContext parent) {
+			    ReferencePrefix runtimeInstance) {
 	this.classContext = classContext;
 	this.runtimeInstance  = runtimeInstance;
-	this.parent = parent;
 	makeParentRoleValid();
     }
     
-    /**
-     * creates an execution context reference
-     * @param classContext the TypeReference refering to the next enclosing
-     * class 
-     * @param runtimeInstance a ReferencePrefix to the object that
-     * is currently active/executed
-     */
-    public ExecutionContext(TypeReference classContext, 
-                            ReferencePrefix runtimeInstance) {
-        this(classContext, runtimeInstance, null);
-    }
-
-
     /**
      * Returns the number of children of this node.
      * @return an int giving the number of children of this node
@@ -79,7 +58,6 @@ public class ExecutionContext
 	int count = 0;
 	if (runtimeInstance != null) count++;
 	if (classContext != null) count++;
-	if (parent != null) count++;
 	return count;
     }
 
@@ -100,10 +78,6 @@ public class ExecutionContext
 	    if (index == 0) return runtimeInstance;
 	    index--;
 	}
-	if (parent != null) {
-	    if (index == 0) return parent;
-	    index--;
-	}
 	throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -119,9 +93,6 @@ public class ExecutionContext
 	if (runtimeInstance != null) {
 	    if (child == runtimeInstance) return (1 << 4 | 1);
 	}
-	if (parent != null) {
-	    if (child == parent) return (1 << 5 | 1);
-	}
 	return -1;
     }
 
@@ -129,7 +100,7 @@ public class ExecutionContext
     }
 
     public Object deepClone() {
-	return new ExecutionContext(classContext, runtimeInstance, parent);
+	return new ExecutionContext(classContext, runtimeInstance);
     }
 
     public NonTerminalProgramElement getASTParent() {
@@ -146,9 +117,7 @@ public class ExecutionContext
 	    classContext = (TypeReference) newChild;
 	} else if (child == runtimeInstance) {
 	    runtimeInstance = (ReferencePrefix)newChild;
-	} else if (child == parent) {
-            parent = (ExecutionContext)newChild;
-        } else {
+	} else {
 	    return false;
 	}
 	makeParentRoleValid();
@@ -202,11 +171,6 @@ public class ExecutionContext
 	return classContext;
     }
     
-    public ExecutionContext getParent(){
-        return parent;
-    }
-    
-
     /**
      * returns the runtime instance object
      * @return the runtime instance object

@@ -878,7 +878,7 @@ class TypeSchemeConstraintExtractor implements Visitor {
                                 = x.getDesignatedContext();
                 final ExecutionContext executionContext 
                                 = new ExecutionContext(classContext, 
-                                                       runtimeInstance, svInst.getExecutionContext());
+                                                       runtimeInstance);
                                                        
                 //save context information
                 final SVInstantiations oldSvInst 

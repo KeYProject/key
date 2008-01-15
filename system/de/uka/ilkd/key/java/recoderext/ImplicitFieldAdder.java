@@ -18,17 +18,12 @@ package de.uka.ilkd.key.java.recoderext;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.java.Identifier;
-import recoder.java.declaration.ClassDeclaration;
-import recoder.java.declaration.FieldDeclaration;
-import recoder.java.declaration.TypeDeclaration;
-import recoder.java.declaration.modifier.Private;
-import recoder.java.declaration.modifier.Public;
-import recoder.java.declaration.modifier.Static;
+import recoder.java.NonTerminalProgramElement;
+import recoder.java.declaration.*;
+import recoder.java.declaration.modifier.*;
 import recoder.java.reference.TypeReference;
 import recoder.kit.ProblemReport;
-import recoder.list.CompilationUnitMutableList;
-import recoder.list.ModifierArrayList;
-import recoder.list.ModifierMutableList;
+import recoder.list.*;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -57,6 +52,8 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
     
     public static final String IMPLICIT_INITIALIZED = "<initialized>";
     public static final String IMPLICIT_TRANSIENT = "<transient>";
+    
+    public static final String IMPLICIT_ENCLOSING_THIS = "<enclosingThis>";
  
     /** flag set if java.lang.Object has been already transformed */
     private boolean transformedObject = false;
@@ -146,7 +143,24 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INIT_IN_PROGRESS, true, true), td, 0);
 	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_ERRONEOUS, true, true), td, 0);
 	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INITIALIZED, true, true), td, 0);
-	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_PREPARED, true, true), td, 0);	
+	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_PREPARED, true, true), td, 0);
+	
+	if(td instanceof ClassDeclaration && 
+	        (td.getName()==null || 
+	                ((ClassDeclaration) td).getStatementContainer() !=null ||
+	                ((ClassDeclaration) td).getContainingClassType()!=null)){
+	    ClassDeclaration container = containingClass(td);
+	    ModifierMutableList modifiers = new ModifierArrayList(1);
+	    modifiers.add(new Private());
+	    Identifier id = getId(container);
+        
+            FieldDeclaration fd = new FieldDeclaration
+                (modifiers, new TypeReference(id), 
+                        new ImplicitIdentifier(IMPLICIT_ENCLOSING_THIS), null);
+            fd.makeAllParentRolesValid();
+	    attach(fd, td, 0);
+	}
+	  
         
 	if (!td.isInterface() && !td.isAbstract()) {	  
 	    attach(createImplicitRecoderField("int", 

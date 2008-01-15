@@ -18,14 +18,12 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
+import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ldt.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
+import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -244,10 +242,9 @@ public class TypeConverter extends TermBuilder {
 	    return convertArrayReference((ArrayReference)prefix, ec);
 	} else if (prefix instanceof ThisReference) {	 
 	    if(prefix.getReferencePrefix()!=null && (prefix.getReferencePrefix() instanceof TypeReference)){
-	        while(ec.getTypeReference().getKeYJavaType() != 
-	            ((TypeReference) prefix.getReferencePrefix()).getKeYJavaType()){
-	            ec = (ExecutionContext) ec.getParent();
-	        }
+	        TypeReference tr = (TypeReference) prefix.getReferencePrefix();
+	        KeYJavaType kjt = tr.getKeYJavaType();
+	        return findThisForSort(kjt.getSort(), ec);
 	    }
 	    return convertToLogicElement(ec.getRuntimeInstance());
 	} else {            
@@ -255,7 +252,18 @@ public class TypeConverter extends TermBuilder {
 		      prefix, prefix == null ? null : prefix.getClass());
 	    throw new IllegalArgumentException("TypeConverter failed to convert "
 					       + prefix);
-	}	
+	}
+    }
+    
+    public Term findThisForSort(Sort s, ExecutionContext ec){
+        ProgramVariable inst = (ProgramVariable) ec.getRuntimeInstance();
+        Term result = var(inst);
+        while(!inst.sort().extendsTrans(s)){
+            inst = services.getJavaInfo().getAttribute(
+                    ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, inst.getKeYJavaType());
+            result = dot(result, inst);
+        }
+        return result;      
     }
 
     public Term convertVariableReference(VariableReference fr,
@@ -267,7 +275,8 @@ public class TypeConverter extends TermBuilder {
 	    return var(var);
 	} else if (prefix == null) {
 	    if (var.isMember()) {
-		return dot(convertReferencePrefix(thisReference, ec), var);
+		return dot(findThisForSort(var.getContainerType().getSort(), ec), 
+		        var);
 	    }
 	    return var(var); 
 	} else if (!(prefix instanceof PackageReference) ) {

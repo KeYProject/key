@@ -276,8 +276,7 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader{
 	convert(de.uka.ilkd.key.java.recoderext.ExecutionContext ec) {
 	return new ExecutionContext
 	    ((TypeReference)callConvert(ec.getTypeReference()), 
-	     ec.getRuntimeInstance()!=null? (ReferencePrefix)callConvert(ec.getRuntimeInstance()) : null,
-	     ec.getParent()!=null? (IExecutionContext)callConvert(ec.getParent()) : null);
+	     ec.getRuntimeInstance()!=null? (ReferencePrefix)callConvert(ec.getRuntimeInstance()) : null);
     }
 
     public SchemaVariable

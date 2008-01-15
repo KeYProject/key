@@ -1106,7 +1106,7 @@ public class JMLMethodSpec extends JMLSpec implements JMLLemmaMethodSpec,
 	return mBS;
     }
     
-    public StatementBlock buildOuterClassesContext(StatementBlock mbs){
+/*    public StatementBlock buildOuterClassesContext(StatementBlock mbs){
         System.out.println("JMLMethodSpec: class: "+cSpec.getClassDeclaration().getFullName());
         System.out.println("JMLMethodSpec: ji.getKJT(class fullname): "+ji.getKeYJavaType(cSpec.getClassDeclaration().getFullName()));
         System.out.println("JMLMethodSpec: parent class: "+cSpec.getClassDeclaration().getParentClass());
@@ -1129,7 +1129,7 @@ public class JMLMethodSpec extends JMLSpec implements JMLLemmaMethodSpec,
         TypeReference tr = new TypeRef(outer);
         ReferencePrefix rp = services.getImplementation2SpecMap().getSpecForClass(outer).getInstancePrefix();
         return new ExecutionContext(tr, rp, buildExecutionContext(fullName.substring(0, end)));
-    }
+    }*/
 
     private ProgramVariable makeResultVar(){
 	if(pm.getTypeReference()==null){

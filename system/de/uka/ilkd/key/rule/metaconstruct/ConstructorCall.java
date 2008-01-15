@@ -81,23 +81,36 @@ public class ConstructorCall extends ProgramMetaConstruct {
 	    // no implementation available
 	    return pe;
 	}
-	    
+	ClassDeclaration cd = (ClassDeclaration) classType.getJavaType();
 	
 	final ArrayOfExpression arguments = 
 	    constructorReference.getArguments();
 	
 	final ArrayList evaluatedArgs = new ArrayList();
-    
+	
+	int j=0;
+	if(cd.isLocalClass() || cd.isAnonymousClass() || cd.isInnerClass()){
+	    j=1;
+	}
 	final ProgramVariable[] argumentVariables =  
-	    new ProgramVariable[arguments.size()]; 	
+	    new ProgramVariable[arguments.size()+j]; 	
                
 	for (int i = 0, sz = arguments.size(); i<sz; i++) {
 	    argumentVariables[i] = 
 	        EvaluateArgs.evaluate(arguments.getExpression(i), evaluatedArgs, 
-	                services, svInst.getExecutionContext());	  
+	                services, ec);	  
 	}
         
-	final ProgramMethod method = services.getJavaInfo().
+	if(j==1){
+	    Expression enclosingThis = (Expression) (constructorReference.getReferencePrefix() instanceof Expression?
+	            constructorReference.getReferencePrefix() :
+	                ec.getRuntimeInstance());
+	    argumentVariables[argumentVariables.length-1] = 
+	        EvaluateArgs.evaluate(enclosingThis, evaluatedArgs, 
+	                        services, ec);    
+	}
+	
+	ProgramMethod method = services.getJavaInfo().
 	  getProgramMethod(classType, NORMALFORM_IDENTIFIER, 
               (ProgramVariable[])argumentVariables, ec.
               getTypeReference().getKeYJavaType());

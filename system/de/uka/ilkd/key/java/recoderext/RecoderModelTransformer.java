@@ -158,6 +158,19 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
                 getId((TypeDeclaration) td.getAllSupertypes().getClassType(1)) :
                     (Identifier)td.getIdentifier().deepClone();
     }
+    
+    protected ClassDeclaration containingClass(TypeDeclaration td){
+        System.out.println("rmt: td: "+td.getFullName());
+        System.out.println("rmt: td.containingClassType: "+td.getContainingClassType());
+        NonTerminalProgramElement container = (ClassDeclaration) td.getContainingClassType();
+        if(container == null){
+            container = td.getASTParent();
+        }
+        while(!(container instanceof ClassDeclaration)){
+            container = container.getASTParent();
+        }
+        return (ClassDeclaration) container;
+    }
 
     /**
      * invokes model transformation for each top level type declaration

@@ -10,28 +10,25 @@
 
 package de.uka.ilkd.key.java;
 import java.io.*;
+import java.lang.reflect.*;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 
 import recoder.abstraction.ClassType;
 import recoder.bytecode.ClassFile;
-import recoder.list.ClassTypeList;
-import recoder.list.ExpressionMutableList;
-import recoder.list.LoopInitializerMutableList;
+import recoder.list.*;
 import recoder.service.ChangeHistory;
 import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.java.abstraction.Field;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.modifier.*;
-import de.uka.ilkd.key.java.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
+import de.uka.ilkd.key.java.expression.*;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
@@ -45,9 +42,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ExtList;
-import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.key.util.*;
 
 public class Recoder2KeY implements JavaReader{
     
@@ -1427,8 +1422,9 @@ public class Recoder2KeY implements JavaReader{
 	ClassDeclaration keYClassDecl = new ClassDeclaration
 	    (classMembers,
 	     new ProgramElementName(td.getFullName()),
-	     parsingLibs);
-
+	     parsingLibs, td.getContainingClassType()!=null,
+	     td.getName()==null, td.getStatementContainer() !=null
+	     );
 
 	kjt.setJavaType(keYClassDecl);
 	return keYClassDecl;	

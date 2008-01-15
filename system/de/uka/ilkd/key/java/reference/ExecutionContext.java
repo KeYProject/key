@@ -32,12 +32,6 @@ public class ExecutionContext
     protected final ReferencePrefix runtimeInstance;
    
     /**
-     * the outer execution context of this execution context
-     */
-    protected final IExecutionContext parent;
-
-
-    /**
      * creates an execution context reference
      * @param classContext the TypeReference refering to the next enclosing
      * class 
@@ -45,17 +39,10 @@ public class ExecutionContext
      * is currently active/executed
      */
     public ExecutionContext(TypeReference classContext, 
-			    ReferencePrefix runtimeInstance,
-			    IExecutionContext parent) {
+			    ReferencePrefix runtimeInstance) {
 	if (classContext == null) Debug.printStackTrace();
 	this.classContext = classContext;
 	this.runtimeInstance = runtimeInstance;
-	this.parent = parent;
-    }
-    
-    public ExecutionContext(TypeReference classContext, 
-            ReferencePrefix runtimeInstance){
-        this(classContext, runtimeInstance, null);
     }
     
     /**
@@ -70,7 +57,6 @@ public class ExecutionContext
 
 	children.remove(this.classContext);
 	this.runtimeInstance = (ReferencePrefix) children.get(ReferencePrefix.class);
-	parent = (ExecutionContext) children.get(ExecutionContext.class);
     }
 
 
@@ -83,7 +69,6 @@ public class ExecutionContext
 	int count = 0;
 	if (classContext != null) count++;
 	if (runtimeInstance != null) count++;
-	if(parent!=null) count++;
 	return count;
     }
 
@@ -102,10 +87,6 @@ public class ExecutionContext
 	}
 	if (runtimeInstance != null) {
 	    if (index == 0) return runtimeInstance;
-	    index--;
-	}
-	if (parent != null) {
-	    if (index == 0) return parent;
 	    index--;
 	}
 	throw new ArrayIndexOutOfBoundsException();
@@ -127,11 +108,6 @@ public class ExecutionContext
 	return runtimeInstance;
     }
     
-    public IExecutionContext getParent(){
-        return parent;
-    }
-
-
     /** calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
      * @param v the Visitor
@@ -145,7 +121,7 @@ public class ExecutionContext
     }
 
     public String toString() {
-        return "Context: "+classContext+" Instance: "+runtimeInstance+" Parent: "+parent;
+        return "Context: "+classContext+" Instance: "+runtimeInstance;
     }
     
 }

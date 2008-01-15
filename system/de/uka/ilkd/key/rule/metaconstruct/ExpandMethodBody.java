@@ -88,7 +88,7 @@ public class ExpandMethodBody extends ProgramMetaConstruct {
 
         return 
 	    new MethodFrame(mbs.getResultVariable(),
-			    new ExecutionContext(classContext, newCalled, svInst.getExecutionContext()),
+			    new ExecutionContext(classContext, newCalled),
 			    result,
                             pm, PositionInfo.UNDEFINED); 
     }
