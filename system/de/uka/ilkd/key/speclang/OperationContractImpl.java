@@ -13,6 +13,7 @@ package de.uka.ilkd.key.speclang;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
@@ -272,17 +273,20 @@ public class OperationContractImpl implements OperationContract {
         return or.replace(originalModifies);
     }
 
-    
     public String getHTMLText(Services services) {
+        final String pre = LogicPrinter.quickPrintTerm(originalPre.getFormula(), 
+                services);
+        final String post = LogicPrinter.quickPrintTerm(originalPost.getFormula(), 
+                services);
+        final String locDesc = LogicPrinter.quickPrintLocationDescriptors(originalModifies, 
+                services);
+                      
         return "<html><b>pre</b> "
-                + LogicPrinter.quickPrintTerm(originalPre.getFormula(), 
-                                              services)
+                + LogicPrinter.escapeHTML(pre)
                 + "<br><b>post</b> "
-                + LogicPrinter.quickPrintTerm(originalPost.getFormula(), 
-                                              services)
+                + LogicPrinter.escapeHTML(post)
                 + "<br><b>modifies</b> "
-                + LogicPrinter.quickPrintLocationDescriptors(originalModifies, 
-                                                             services)
+                + LogicPrinter.escapeHTML(locDesc)
                 + "<br><b>termination</b> "
                 + getModality()
                 + "</html>";
