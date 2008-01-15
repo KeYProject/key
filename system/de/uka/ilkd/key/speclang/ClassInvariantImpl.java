@@ -123,9 +123,11 @@ public class ClassInvariantImpl implements ClassInvariant {
 
     
     public String getHTMLText(Services services) {
+        final String inv = LogicPrinter.quickPrintTerm(originalInv.getFormula(), 
+                services);
+        
         return "<html>"
-               + LogicPrinter.quickPrintTerm(originalInv.getFormula(), 
-                                             services)
+               + LogicPrinter.escapeHTML(inv) 
                + "</html>";
     }
     

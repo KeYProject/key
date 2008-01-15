@@ -106,8 +106,14 @@ public class LogicPrinter {
     public static String quickPrintLocationDescriptors(
                                         SetOfLocationDescriptor locations,
                                         Services services) {
+        
+        final NotationInfo ni = NotationInfo.createInstance();
+        if (services != null) {
+            PresentationFeatures.modifyNotationInfo(ni,
+                    services.getNamespaces().functions());
+        }
         LogicPrinter p = new LogicPrinter(null, 
-        				  NotationInfo.createInstance(), 
+        				  ni, 
         				  services);
         try {
             p.printLocationDescriptors(locations);
@@ -119,8 +125,13 @@ public class LogicPrinter {
     
     
     public static String quickPrintTerm(Term t, Services services) {
+        final NotationInfo ni = NotationInfo.createInstance();
+        if (services != null) {
+            PresentationFeatures.modifyNotationInfo(ni,
+                    services.getNamespaces().functions());
+        }
         LogicPrinter p = new LogicPrinter(null, 
-                                          NotationInfo.createInstance(), 
+                                          ni, 
                                           services);
         try {
             p.printTerm(t);
@@ -2121,6 +2132,62 @@ public class LogicPrinter {
     public boolean printInShortForm(String programName, Sort sort) {
         return printInShortForm(programName, sort, services);
     }
+
+    /**
+     * escapes special characters by their HTML encoding 
+     * @param text the String to be displayed as part of an HTML side
+     * @return the text with special characters replaced
+     */
+    public static String escapeHTML(String text) {
+         StringBuffer sb = new StringBuffer();
+        
+         for (int i = 0, sz = text.length(); i < sz; i++) {
+             char c = text.charAt(i); 
+             switch (c) {
+             case  '<':
+                 sb.append("&lt;");
+                 break;
+             case '>': 
+                 sb.append("&gt;");
+                 break;
+             case '&': 
+                 sb.append("&amp;");
+                 break;
+             case '\"': 
+                 sb.append("&quot;");
+                 break;
+             case '\'': 
+                 sb.append("&#039;");
+                 break;
+             case '(': 
+                 sb.append("&#040;");
+                 break;
+             case ')': 
+                 sb.append("&#041;");
+                 break;
+             case '#': 
+                 sb.append("&#035;");
+                 break;
+             case '+': 
+                 sb.append("&#043;");
+                 break;
+             case '-': 
+                 sb.append("&#045;");
+                 break;
+             case '%': 
+                 sb.append("&#037;");
+                 break;
+             case ';': 
+                 sb.append("&#059;");
+                 break;
+             default:
+                 sb.append(c);
+             }
+             
+         }
+         return sb.toString();
+    }
+
 
     /**
      * tests if the program name together with the prefix sort
