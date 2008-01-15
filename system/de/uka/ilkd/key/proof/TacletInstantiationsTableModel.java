@@ -367,12 +367,13 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 					    getContextInstantiation().activeStatementContext());
 		    if(nvc.isDefinedByElementSort()){
 		        Sort s = kjt.getSort();
-			if(s instanceof ArraySort) s = ((ArraySort)s).elementSort();
+			if(s instanceof ArraySort) s = ((ArraySort)s).elementSort();              
 			kjt = javaInfo.getKeYJavaType(s);
 		    }
 		} else {
 		    kjt = javaInfo.getKeYJavaType((Sort)o);
 		}
+                assert kjt != null;
 		return new LocationVariable
 		    (VariableNamer.parseName(instantiation), kjt);
 	    }

@@ -29,12 +29,15 @@ import recoder.service.ChangeHistory;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.*;
+import de.uka.ilkd.key.java.declaration.modifier.Ghost;
+import de.uka.ilkd.key.java.declaration.modifier.Model;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
+import de.uka.ilkd.key.java.expression.operator.SetAssignment;
 import de.uka.ilkd.key.java.recoderext.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -44,7 +47,6 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.*;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.KeYResourceManager;
@@ -413,7 +415,7 @@ public class Recoder2KeY implements JavaReader{
 	parsingLibs(true);
 
 	final recoder.list.
-	    CompilationUnitMutableList specialClasses = parseSpecial(KeYUserProblemFile.parseLibSpecs);
+	    CompilationUnitMutableList specialClasses = parseSpecial(false);
 	final ChangeHistory changeHistory = servConf.getChangeHistory();
 	for (int i = 0, sz = specialClasses.size(); i<sz; i++) {
 	    specialClasses.getCompilationUnit(i).makeAllParentRolesValid();
@@ -706,11 +708,11 @@ public class Recoder2KeY implements JavaReader{
      * @return String containing the KeY-Classname
      */
     protected String getKeYName(Class recoderClass) {
-	// value of recoderPrefixLength is: "recoder.".length()
-	final int recoderPrefixLength = 8;
+        // value of recoderPrefixLength is: "recoder.".length()
+        final int recoderPrefixLength = 8;
 
-	return "de.uka.ilkd.key." + 
-	    recoderClass.getName().substring(recoderPrefixLength);
+        return "de.uka.ilkd.key." + 
+            recoderClass.getName().substring(recoderPrefixLength);
     }
 
     
@@ -877,7 +879,7 @@ public class Recoder2KeY implements JavaReader{
      * converts the recoder.java.Comment to the KeYDependance
      */
     public Comment convert(recoder.java.Comment rc){
-	return new Comment(rc.getText());
+        return new Comment(rc.getText(), positionInfo(rc));
     }
 
     /** 
@@ -906,6 +908,14 @@ public class Recoder2KeY implements JavaReader{
      */
     public CopyAssignment convert(recoder.java.expression.operator.CopyAssignment ass){	
 	return new CopyAssignment(collectChildren(ass));
+    }
+    
+    /** 
+     * converts the de.uka.ilkd.key.recoderext.java.expression.operator.SetAssignment
+     * node to the KeYDependance
+     */
+    public SetAssignment convert(de.uka.ilkd.key.java.recoderext.SetAssignment ass){ 
+        return new SetAssignment(collectChildren(ass));
     }
 
     /** 
@@ -1390,6 +1400,20 @@ public class Recoder2KeY implements JavaReader{
      */
     public Synchronized convert(recoder.java.declaration.modifier.Synchronized m) {
 	return new Synchronized(collectComments(m));
+    }
+
+    /**
+     * converts the recoder ghost modifier to the KeY modifier
+     */
+    public Ghost convert(de.uka.ilkd.key.java.recoderext.Ghost m) {
+        return new Ghost(collectComments(m));
+    }
+    
+    /**
+     * converts the recoder model modifier to the KeY modifier
+     */
+    public Model convert(de.uka.ilkd.key.java.recoderext.Model m) {
+        return new Model(collectComments(m));
     }
 
     //------------------- declaration ---------------------
@@ -2681,26 +2705,28 @@ public class Recoder2KeY implements JavaReader{
     }
     
     // invoke model transformers
-    protected void transformModel
-	(recoder.list.CompilationUnitMutableList cUnits) {
-	RecoderModelTransformer[] transformer = 
-	    new RecoderModelTransformer[] { 
-		new ImplicitFieldAdder(servConf, cUnits),
-                new InstanceAllocationMethodBuilder(servConf, cUnits),
-		new ConstructorNormalformBuilder(servConf, cUnits),
-		new ClassPreparationMethodBuilder(servConf, cUnits),
-		new ClassInitializeMethodBuilder(servConf, cUnits),
-		new PrepareObjectBuilder(servConf, cUnits),
-		new CreateBuilder(servConf, cUnits),		
-		new CreateObjectBuilder(servConf, cUnits),		
-		new JVMIsTransientMethodBuilder(servConf, cUnits)	
-	    };
+    protected void transformModel(recoder.list.CompilationUnitMutableList cUnits) {
+        RecoderModelTransformer[] transformer =
 
-	final ChangeHistory cHistory = servConf.getChangeHistory();
-	for (int i = 0; i<transformer.length; i++) {
-	    if (logger.isDebugEnabled()) {
-		logger.debug("current transformer : " + transformer[i].toString());
-	    }
+        new RecoderModelTransformer[] {
+                new JMLTransformer(servConf, cUnits, parsingLibs),
+                new ImplicitFieldAdder(servConf, cUnits),
+                new InstanceAllocationMethodBuilder(servConf, cUnits),
+                new ConstructorNormalformBuilder(servConf, cUnits),
+                new ClassPreparationMethodBuilder(servConf, cUnits),
+                new ClassInitializeMethodBuilder(servConf, cUnits),
+                new PrepareObjectBuilder(servConf, cUnits),
+                new CreateBuilder(servConf, cUnits),
+                new CreateObjectBuilder(servConf, cUnits),
+                new JVMIsTransientMethodBuilder(servConf, cUnits)
+                };
+
+        final ChangeHistory cHistory = servConf.getChangeHistory();
+        for (int i = 0; i < transformer.length; i++) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("current transformer : "
+                        + transformer[i].toString());
+            }
 	    transformer[i].execute();	    
 	}
         if (cHistory.needsUpdate()) {

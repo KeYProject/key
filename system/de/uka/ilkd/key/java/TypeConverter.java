@@ -41,7 +41,7 @@ public class TypeConverter extends TermBuilder {
     private CharLDT charLDT;
     private BooleanLDT booleanLDT;
     private IntegerLDT integerLDT;
-    private IntegerDomainLDT absIntegerLDT;
+    private IntegerDomainLDT integerDomainLDT;
     private ListOfLDT models = SLListOfLDT.EMPTY_LIST;
 
 
@@ -76,7 +76,7 @@ public class TypeConverter extends TermBuilder {
         } else if (ldt instanceof IntegerLDT) {
             this.integerLDT = (IntegerLDT)ldt;
         } else if (ldt instanceof IntegerDomainLDT) {
-            this.absIntegerLDT = (IntegerDomainLDT)ldt;
+            this.integerDomainLDT = (IntegerDomainLDT)ldt;
         } 
         this.models = this.models.prepend(ldt);
         Debug.out("Initialize LDTs: ", ldt);
@@ -151,7 +151,7 @@ public class TypeConverter extends TermBuilder {
     }
     
     public IntegerDomainLDT getIntegerDomainLDT() {
-        return absIntegerLDT;
+        return integerDomainLDT;
     }
     
     public ByteLDT getByteLDT() {
@@ -324,10 +324,10 @@ public class TypeConverter extends TermBuilder {
 	        && ((Negative)pe).getChildAt(0) instanceof IntLiteral) {
 	    String val = ((IntLiteral)((Negative)pe).getChildAt(0)).getValue();
 	    if (val.charAt(0)=='-') {
-		return integerLDT.translateLiteral
+		return intLDT.translateLiteral
 		    (new IntLiteral(val.substring(1)));
 	    } else {
-		return integerLDT.translateLiteral
+		return intLDT.translateLiteral
 		    (new IntLiteral("-"+val));
 	    }
 	} else if (pe instanceof Negative 
@@ -335,10 +335,10 @@ public class TypeConverter extends TermBuilder {
 	    String val = ((LongLiteral)
 			  ((Negative)pe).getChildAt(0)).getValue();
 	    if (val.charAt(0)=='-') {
-		return integerLDT.translateLiteral
+		return intLDT.translateLiteral
 		    (new LongLiteral(val.substring(1)));
 	    } else {
-		return integerLDT.translateLiteral
+		return intLDT.translateLiteral
 		    (new LongLiteral("-"+val));
 	    }
 	} else if (pe instanceof ThisReference) {
@@ -351,7 +351,7 @@ public class TypeConverter extends TermBuilder {
 	} else if (pe instanceof de.uka.ilkd.key.java.expression.Operator) {
 	    return translateOperator
 		((de.uka.ilkd.key.java.expression.Operator)pe,
-		 integerLDT, booleanLDT, ec);
+		 intLDT, booleanLDT, ec);
 	} else if (pe instanceof PrimitiveType) {
 	    throw new IllegalArgumentException("TypeConverter could not handle"
 					       +" this primitive type");
@@ -374,13 +374,13 @@ public class TypeConverter extends TermBuilder {
         } else if (lit instanceof NullLiteral) {
             return services.getJavaInfo().getNullConst();
         } else if (lit instanceof IntLiteral) {
-            return integerLDT.translateLiteral(lit);
+            return intLDT.translateLiteral(lit);
         } else if (lit instanceof CharLiteral) {
-            return integerLDT.translateLiteral(lit);
+            return intLDT.translateLiteral(lit);
         } else if (lit instanceof LongLiteral) {
-            return integerLDT.translateLiteral(lit);
+            return intLDT.translateLiteral(lit);
         } else if (lit instanceof StringLiteral) {
-            return stringConverter.translateLiteral(lit,integerLDT,services);
+            return stringConverter.translateLiteral(lit,intLDT,services);
         } else {
             Debug.fail("Unknown literal type", lit);                 
             return null;
@@ -528,7 +528,7 @@ public class TypeConverter extends TermBuilder {
         final IteratorOfLDT it = models.iterator();
         while (it.hasNext() ) {
             final LDT model = it.next();
-            if (model.containsFunction((Function)term.op())) {
+            if (model.containsFunction((Function)term.op())) {             
                 return model.translateTerm(term, children);
             }  
 	    }
@@ -542,7 +542,7 @@ public class TypeConverter extends TermBuilder {
 	    return services.getJavaInfo().getKeYJavaType(t.sort());
 	}
         
-        KeYJavaType result = services.getJavaInfo().getKeYJavaType(t.sort());
+        KeYJavaType result = services.getJavaInfo().getKeYJavaType(t.sort());        
         if (result == null) {
            result = getKeYJavaType(convertToProgramElement(t));
         }

@@ -29,8 +29,13 @@ import de.uka.ilkd.key.parser.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PresentationFeatures;
 import de.uka.ilkd.key.proof.init.*;
-import de.uka.ilkd.key.proof.mgt.OldOperationContract;
+import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.speclang.SLEnvInput;
+import de.uka.ilkd.key.speclang.SetAsListOfClassInvariant;
+import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAuflia;
@@ -50,7 +55,7 @@ public class ProblemLoader implements Runnable {
     String currTacletName = null;
     int currFormula = 0;
     PosInTerm currPosInTerm = PosInTerm.TOP_LEVEL;
-    OldOperationContract currContract = null;
+    ContractWithInvs currContract = null;
     Stack stack = new Stack();
     LinkedList loadedInsts = null;
     ListOfIfFormulaInstantiation ifSeqFormulaList =
@@ -135,29 +140,25 @@ public class ProblemLoader implements Runnable {
      * @throws IllegalArgumentException if the user has selected a file with an unsupported extension
      *                          an exception is thrown to indicate this
      */
-    protected KeYUserProblemFile createProblemFile(File file) 
+    protected EnvInput createEnvInput(File file) 
     throws FileNotFoundException {                
         
         final String filename = file.getName();
         
         if (filename.endsWith(".java")){ 
-            // java file, probably enriched by JML specifications
-            return new KeYJMLInput(filename, file, 
-                    profile instanceof JavaTestGenerationProfile,
-                    main.getProgressMonitor());
+            // java file, probably enriched by specifications
+            return new SLEnvInput(file.getParentFile().getAbsolutePath());
             
         } else if (filename.endsWith(".key") || 
                 filename.endsWith(".proof")) {
             // KeY problem specification or saved proof
             return new KeYUserProblemFile(filename, file, 
-                    main.getProgressMonitor(), Main.jmlSpecs);
+                    main.getProgressMonitor(), Main.enableSpecs);
             
         } else if (file.isDirectory()){ 
-            // directory containing JML-enriched java sources
-            // prompt the 
-            return new JavaInputWithJMLSpecBrowser(file.getPath(), file, 
-                    profile instanceof JavaTestGenerationProfile, 
-                    main.getProgressMonitor());            
+            // directory containing java sources, probably enriched 
+            // by specifications
+            return new SLEnvInput(file.getPath());
         } else {
             if (filename.lastIndexOf('.') != -1) {
                 throw new IllegalArgumentException
@@ -175,13 +176,30 @@ public class ProblemLoader implements Runnable {
 
    private Object doWork() {
        String status = "";
-       KeYUserProblemFile problemFile = null;
+       ProofOblInput po = null;
        try{
            try{
                if (!keepProblem) {
-                   problemFile = createProblemFile(file);                  
-	           init = new ProblemInitializer(main);            
-                   init.startProver(problemFile, problemFile);
+        	   EnvInput envInput = createEnvInput(file);
+        	   init = new ProblemInitializer(main); 
+        	   InitConfig initConfig = init.prepare(envInput);
+        	   
+        	   if(envInput instanceof ProofOblInput
+                       && !(envInput instanceof KeYFile 
+                            && ((KeYFile) envInput).chooseContract())) {
+        	       po = (ProofOblInput) envInput;
+        	   } else {
+                       if(envInput instanceof KeYFile) {
+                           initConfig.setOriginalKeYFileName(envInput.name());
+                       }
+        	       POBrowser poBrowser = new POBrowser(initConfig);        	       
+        	       po = poBrowser.getPO();
+        	       if(po == null) {
+        		   return "Aborted.";
+        	       }
+        	   }
+        	   
+        	   init.startProver(initConfig, po);
                }
                proof = mediator.getSelectedProof();
                mediator.stopInterface(true); // first stop (above) is not enough
@@ -191,7 +209,7 @@ public class ProblemLoader implements Runnable {
                children = currNode.childrenIterator(); // --"--
                iconfig = proof.env().getInitConfig();
                if (!keepProblem) {
-                   init.tryReadProof(this, problemFile);
+                   init.tryReadProof(this, po);
                } else {
                    main.setStatusLine("Loading proof", (int)file.length());
                    CountingBufferedInputStream cinp =
@@ -226,8 +244,8 @@ public class ProblemLoader implements Runnable {
 	       status =  ex.toString();
        }
        finally {
-           if (problemFile != null && problemFile instanceof KeYUserProblemFile){
-               ((KeYUserProblemFile) problemFile).close();
+           if (po != null && po instanceof KeYUserProblemFile){
+               ((KeYUserProblemFile) po).close();
            }
        }
        return status;
@@ -315,8 +333,10 @@ public class ProblemLoader implements Runnable {
             currPosInTerm = PosInTerm.TOP_LEVEL;
             break;
         case 'c' : //contract
-            currContract = (OldOperationContract) proof.getServices()
-                             .getSpecificationRepository().getContractByName(s);
+            currContract = new ContractWithInvs(s, proof.getServices());
+            if(currContract == null) {
+                throw new RuntimeException("Error loading proof: contract \"" + s + "\" not found.");
+            }
             break;
         }
     }
@@ -396,8 +416,9 @@ public class ProblemLoader implements Runnable {
                         .getConstraint();
         
         if (currContract!=null) {
-            ourApp = new MethodContractRuleApp(UseMethodContractRule.INSTANCE,
-                    pos, userConstraint, currContract);
+            ourApp = new UseOperationContractRuleApp(pos, 
+                                                     userConstraint, 
+                                                     currContract);
             currContract=null;
             return ourApp;
         }
@@ -410,7 +431,7 @@ public class ProblemLoader implements Runnable {
                 throw new BuiltInConstructionException
                 (currTacletName +
                     " is missing. Most probably the binary "+
-                    "for this built-in rule ist not in your path or " +
+                    "for this built-in rule is not in your path or " +
                     "you do not have the permission to execute it.");
             } else {
                 throw new BuiltInConstructionException

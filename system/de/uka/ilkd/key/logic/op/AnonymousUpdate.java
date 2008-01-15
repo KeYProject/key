@@ -140,7 +140,7 @@ public class AnonymousUpdate implements IUpdateOperator {
 
     public int[] getLocationPos (Operator loc) {
         Debug.fail("Method not implemented for anonymous update");
-        return null; // unreachable
+        return new int[0]; // unreachable
     }
     
     public Location location (int n) {

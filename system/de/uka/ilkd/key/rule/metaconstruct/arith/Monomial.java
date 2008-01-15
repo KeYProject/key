@@ -197,7 +197,7 @@ public class Monomial {
     
     public Term toTerm (Services services) {
         final TermSymbol mul = 
-	    services.getTypeConverter().getIntegerLDT().getArithMultiplication();
+	    services.getTypeConverter().getIntegerLDT().getMul();
         Term res = null;
         
         final IteratorOfTerm it = parts.iterator ();
@@ -238,9 +238,9 @@ public class Monomial {
         	
         public Analyser(final Services services) {
             this.services = services;
-	    final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
-            numbers = intLDT.getNumberSymbol();
-            mul     = intLDT.getArithMultiplication();
+	    final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+            numbers = integerLDT.getNumberSymbol();
+            mul     = integerLDT.getMul();
         }
         
         public void analyse(Term monomial) {

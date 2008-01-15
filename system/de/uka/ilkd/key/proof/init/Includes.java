@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,7 +36,7 @@ public class Includes{
     public Includes(){
 	includes = new LinkedList();
 	ldtIncludes = new LinkedList();
-	name2Source = new HashMap();
+	name2Source = new LinkedHashMap();
     }
     
     private void put(String name, RuleSource source, List list){

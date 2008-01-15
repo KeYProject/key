@@ -72,9 +72,6 @@ public class FindTacletAppContainer extends TacletAppContainer {
 	    return false;
 	if ( subformulaOrPreceedingUpdateHasChanged ( p_goal ) )
 	    return false;
-	if (!p_goal.proof().mgt().ruleApplicable(getRuleApp(), p_goal)) {
-		return false;
-	}
 	return true;
     }
 

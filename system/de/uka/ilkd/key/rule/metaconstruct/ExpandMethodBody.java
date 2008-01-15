@@ -82,7 +82,7 @@ public class ExpandMethodBody extends ProgramMetaConstruct {
 		    argsAsParam.getExpression(i));
 	}
 	ProgVarReplaceVisitor paramRepl = 
-	    new ProgVarReplaceVisitor(result, map); 
+	    new ProgVarReplaceVisitor(result, map, services); 
 	paramRepl.start();	
 	result = (StatementBlock) paramRepl.result();
 

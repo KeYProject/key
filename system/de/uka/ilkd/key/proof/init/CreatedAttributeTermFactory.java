@@ -87,7 +87,7 @@ public class CreatedAttributeTermFactory {
                 Term guardTerm
                         = (nullForbidden
                            ? createCreatedAndNotNullTerm(services, variableTerm)
-                           : createCreatedTerm(services, variableTerm));
+                           : createCreatedOrNullTerm(services, variableTerm));
                 guardConjunctionTerm 
                        = TB.and(guardConjunctionTerm, guardTerm);
             }
@@ -131,5 +131,32 @@ public class CreatedAttributeTermFactory {
 	                                          q,
 				                  new LogicVariable[] {var},
 				                  subTerm);
+    }
+
+    
+    /**
+     * Creates a quantifier term where the quantification only covers 
+     * objects which have already been created and which are not null.
+     */
+    public Term createCreatedOrNullQuantifierTerm(Services services,
+                                                   Quantifier q, 
+                                                   LogicVariable[] vars, 
+                                                   Term subTerm) {
+        return createQuantifierTerm(services, q, vars, subTerm, false);
+    }
+    
+
+    /**
+     * Creates a quantifier term where the quantification only covers 
+     * objects which have already been created and which are not null.
+     */
+    public Term createCreatedOrNullQuantifierTerm(Services services,
+                                                   Quantifier q,
+                                                   LogicVariable var,
+                                                   Term subTerm) {
+        return createCreatedOrNullQuantifierTerm(services,
+                                                  q,
+                                                  new LogicVariable[] {var},
+                                                  subTerm);
     }
 }

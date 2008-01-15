@@ -80,7 +80,8 @@ public class TestDeclarationProgramVariableCollector  extends TestCase {
     public void testVisitor() {
 	DeclarationProgramVariableCollector dpvc;
 	for (int i = 0; i < jblocks.length; i++) {
-	    dpvc = new DeclarationProgramVariableCollector(test_block[i].program());
+	    dpvc = new DeclarationProgramVariableCollector(test_block[i].program(), 
+                                                           TacletForTests.services());
 	    dpvc.start();
 	    HashSet names = toNames(dpvc.result());
 

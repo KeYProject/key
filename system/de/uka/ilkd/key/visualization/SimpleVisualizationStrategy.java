@@ -1537,7 +1537,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
             while (it.hasNext()){
                 RenamingTable rt =  it.next();
                 HashMap hm = rt.getHashMap();
-                ProgVarReplacer pvr = new ProgVarReplacer(hm);
+                ProgVarReplacer pvr = new ProgVarReplacer(hm, services);
                 SemisequentChangeInfo sci =pvr.replace(semi);
                 semi = sci.semisequent();
             }
@@ -1553,7 +1553,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
             while (it.hasNext()){
                 RenamingTable rt = it.next();
 		HashMap hm = rt.getHashMap();
-		ProgVarReplacer pvr = new ProgVarReplacer(hm);
+		ProgVarReplacer pvr = new ProgVarReplacer(hm, services);
 		formula = pvr.replace(formula);
             }
         }

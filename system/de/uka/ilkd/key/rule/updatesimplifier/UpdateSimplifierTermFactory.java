@@ -123,7 +123,7 @@ public class UpdateSimplifierTermFactory {
             values   [i] = assignmentPair.valueUnsafe();
             if (assignmentPair.location() == Update.StarLocation.ALL) {
                 Debug.assertTrue(
-                                assignmentPairs.size() == 1,
+                                i == assignmentPairs.size() - 1,
                                 "Special star operator tried to escape. "
                                         + "(not allowed as long as no generalized terms)");
                 return tf.createAnonymousUpdateTerm(

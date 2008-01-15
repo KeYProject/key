@@ -135,7 +135,7 @@ public abstract class Op implements Operator {
 
     /** control operator required for specification computation */
     public static final Junctor COMPUTE_SPEC_OP = new ComputeSpecOp();
-   
+    
     protected final Name name;
    	
     protected Op(Name name) {

@@ -25,12 +25,11 @@ public class GeneralSettings implements Settings {
 
     private static final String STUPID_MODE_KEY = "[General]StupidMode";
     private static final String PROOF_ASSISTANT_MODE_KEY = "[General]ProofAssistant";
-    private static final String SUGG_VARNAMES_KEY = "[General]SuggestiveVarNames";
-    private static final String OUTER_RENAMING_KEY = "[General]OuterRenaming";
 
     private static final String SOUND_NOTIFICATION_KEY = "[General]SoundNotification";
     private static final String DND_DIRECTION_SENSITIVE_KEY = 
         "[General]DnDDirectionSensitive";
+    private static final String USE_JML_KEY = "[General]UseJML";
     
     /** minimize interaction is on by default */
     private boolean stupidMode = true;
@@ -41,14 +40,15 @@ public class GeneralSettings implements Settings {
     /** suggestive var names are off by default */
     private boolean suggestiveVarNames = false;
 
-    /** outer renaming is on by default */
-    private boolean outerRenaming = false;
-
     /** sound notification is on by default */
     private boolean soundNotification = true;
 
     /** is drag and drop instantiation direction sensitive */
     private boolean dndDirectionSensitive = true;
+    
+    /** JML is used by default (otherwise OCL is used) */
+    private boolean useJML = true;
+    
 
     private LinkedList listenerList = new LinkedList();
 
@@ -58,28 +58,31 @@ public class GeneralSettings implements Settings {
 	return stupidMode;
     }
 
+    
     public boolean proofAssistantMode() {
 	return proofAssistantMode;
     }
 
+    
     public boolean suggestiveVarNames() {
 	return suggestiveVarNames;
     }
     
-    public boolean outerRenaming() {
-    	return outerRenaming;
-    }
 
     public boolean soundNotification() {
         return soundNotification;
     }
 
-    /**
-     * returns true if drag and drop shall be direction sensitive   
-     */
+
     public boolean isDndDirectionSensitive() {        
         return dndDirectionSensitive;
     }
+    
+    
+    public boolean useJML() {
+        return useJML;
+    }
+    
 
     // setter
     public void setStupidMode(boolean b) {
@@ -89,6 +92,7 @@ public class GeneralSettings implements Settings {
         }
     }
 
+    
     public void setProofAssistantMode(boolean b) {
         if(proofAssistantMode != b) {
 	  proofAssistantMode = b;
@@ -96,19 +100,6 @@ public class GeneralSettings implements Settings {
 	}
     }
     
-    public void setSuggestiveVarNames(boolean b) {
-        if(suggestiveVarNames != b) {
-	  suggestiveVarNames = b;
-	  fireSettingsChanged();
-	}
-    }
-    
-    public void setOuterRenaming(boolean b) {
-        if (outerRenaming != b) {
-    	  outerRenaming = b;
-	  fireSettingsChanged();
-	}
-    }
 
     public void setSoundNotification(boolean b) {
         if (soundNotification != b) {
@@ -117,6 +108,7 @@ public class GeneralSettings implements Settings {
 	}
     }
 
+    
     public void setDnDDirectionSensitivity(boolean b) {
         if (dndDirectionSensitive != b) {
           dndDirectionSensitive = b;
@@ -125,6 +117,13 @@ public class GeneralSettings implements Settings {
     }
 
     
+    public void setUseJML(boolean b) {
+        if (useJML != b) {
+            useJML = b;
+          fireSettingsChanged();
+        }
+    }
+
 
     
     /** gets a Properties object and has to perform the necessary
@@ -141,16 +140,6 @@ public class GeneralSettings implements Settings {
 	if (val != null) {
 	    proofAssistantMode = Boolean.valueOf(val).booleanValue();
 	}
-
-	val = props.getProperty(SUGG_VARNAMES_KEY);
-	if (val != null) {
-	    suggestiveVarNames = Boolean.valueOf(val).booleanValue();
-	} 
-
-	val = props.getProperty(OUTER_RENAMING_KEY);
-	if (val != null) {
-	    outerRenaming = Boolean.valueOf(val).booleanValue();
-	} 
     
 	val = props.getProperty(SOUND_NOTIFICATION_KEY);
 	if (val != null) {
@@ -161,7 +150,11 @@ public class GeneralSettings implements Settings {
         if (val != null) {
             dndDirectionSensitive = Boolean.valueOf(val).booleanValue();
         }         
-
+        
+        val = props.getProperty(USE_JML_KEY);
+        if (val != null) {
+            useJML = Boolean.valueOf(val).booleanValue();
+        }         
     }
 
 
@@ -173,10 +166,9 @@ public class GeneralSettings implements Settings {
     public void writeSettings(Properties props) {
 	props.setProperty(STUPID_MODE_KEY, "" + stupidMode);
 	props.setProperty(PROOF_ASSISTANT_MODE_KEY, "" + proofAssistantMode);
-	props.setProperty(SUGG_VARNAMES_KEY, "" + suggestiveVarNames);
-	props.setProperty(OUTER_RENAMING_KEY, "" + outerRenaming);
         props.setProperty(SOUND_NOTIFICATION_KEY, "" + soundNotification);
         props.setProperty(DND_DIRECTION_SENSITIVE_KEY, "" + dndDirectionSensitive);
+        props.setProperty(USE_JML_KEY, "" + useJML);
     }
 
     /** sends the message that the state of this setting has been
@@ -189,6 +181,7 @@ public class GeneralSettings implements Settings {
 	}
     }
 
+    
     /** 
      * adds a listener to the settings object 
      * @param l the listener
@@ -196,6 +189,4 @@ public class GeneralSettings implements Settings {
     public void addSettingsListener(SettingsListener l) {
 	listenerList.add(l);
     }
-
-
 }

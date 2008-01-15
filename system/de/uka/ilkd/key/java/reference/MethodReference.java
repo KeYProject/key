@@ -286,10 +286,6 @@ public class MethodReference extends JavaNonTerminalProgramElement
         final String methodName = name.toString();
         ProgramMethod pm = services.getJavaInfo().getProgramMethod(classType, 
                 methodName, signature, context);
-	if(pm == null){
-	    pm = services.getImplementation2SpecMap().
-		lookupModelMethod(classType, new Name(methodName));
-	}
 	return pm;
     }
     

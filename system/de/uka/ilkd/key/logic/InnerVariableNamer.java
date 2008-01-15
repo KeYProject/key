@@ -55,7 +55,7 @@ public class InnerVariableNamer extends VariableNamer {
 	ProgramElementName name = var.getProgramElementName();
 	BasenameAndIndex bai = getBasenameAndIndex(name);
 	Globals globals = wrapGlobals(goal.getGlobalProgVars());
-	map = new HashMap();
+	map.clear();
 
 	//prepare renaming of inner var
 	final NameCreationInfo nci = getMethodStack(posOfFind);
@@ -79,7 +79,7 @@ public class InnerVariableNamer extends VariableNamer {
             map.put(var, newvar);
             renamingHistory = map;
             //execute renaming
-            ProgVarReplacer pvr = new ProgVarReplacer(map);
+            ProgVarReplacer pvr = new ProgVarReplacer(map, services);
             pvr.replace(goal);
         }
         

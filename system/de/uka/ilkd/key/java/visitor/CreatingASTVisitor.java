@@ -12,7 +12,6 @@
 package de.uka.ilkd.key.java.visitor;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.annotation.Annotation;
 import de.uka.ilkd.key.java.declaration.ClassInitializer;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
@@ -47,16 +46,11 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
      * @param root
      *           the ProgramElement where to begin
      */
-    public CreatingASTVisitor(ProgramElement root, boolean preservesPos) {
-        super(root);
+    public CreatingASTVisitor(ProgramElement root, 
+                              boolean preservesPos,
+                              Services services) {
+        super(root, services);
 	this.preservesPositionInfo = preservesPos;
-    }
-
-    /**
-     * the action that is performed just before leaving the node the last time
-     */
-    protected void doAction(ProgramElement node) {
-        node.visit(this);
     }
 
     public boolean preservesPositionInfo() {
@@ -115,12 +109,13 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         };
         def.doAction(x);
     }
-
-    protected void performActionOnAnnotationArray(Annotation[] a){
-	for(int i = 0; i<a.length; i++){
-	    addToTopOfStack(a[i]);
-	}
+    
+    
+    protected void performActionOnLoopInvariant(LoopStatement oldLoop, 
+                                                LoopStatement newLoop) {
+        //do nothing
     }
+
 
     // eee
     public void performActionOnWhile(While x) {
@@ -136,10 +131,10 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             Expression guard = g == null ? null : g.getExpression();
             Statement body = (Statement) changeList
                     .removeFirstOccurrence(Statement.class);
-            Annotation[] a = (Annotation[]) changeList
-                    .collect(Annotation.class);
-	    
-            addChild(new While(guard, body, pos, a));
+            
+            While newX = new While(guard, body, pos);
+            performActionOnLoopInvariant(x, newX);
+            addChild(newX);
 
             changed();
         } else {
@@ -161,9 +156,10 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
                     .removeFirstOccurrence(Statement.class);
             Guard g = (Guard) changeList.removeFirstOccurrence(Guard.class);
             Expression guard = g == null ? null : g.getExpression();
-            Annotation[] a = (Annotation[]) changeList
-                    .collect(Annotation.class);
-            addChild(new Do(guard, body, pos, a));
+            
+            Do newX = new Do(guard, body, pos);
+            performActionOnLoopInvariant(x, newX);
+            addChild(newX);
 
             changed();
         } else {
@@ -396,7 +392,9 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnFor(For x) {
         DefaultAction def = new DefaultAction(x) {
             ProgramElement createNewElement(ExtList changeList) {
-                return new For(changeList);
+                For newFor = new For(changeList);
+                performActionOnLoopInvariant((For)pe, newFor);
+                return newFor;
             }
         };
         def.doAction(x);
@@ -480,6 +478,15 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             }
         };
         def.doAction(x);
+    }
+    
+    public void performActionOnSetAssignment(SetAssignment x) {        
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new SetAssignment(changeList);
+            }
+        };
+        def.doAction(x);        
     }
 
     public void performActionOnPreIncrement(PreIncrement x) {

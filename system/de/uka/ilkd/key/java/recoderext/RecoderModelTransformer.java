@@ -6,13 +6,8 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -39,7 +34,7 @@ import de.uka.ilkd.key.util.Debug;
  * The Java DL requires some implicit fields, that are available in each
  * Java class. The name of the implicit fields is usually enclosed
  * between two angle brackets. 
- * Two access the fields in a uniform way, they are added as usual
+ * To access the fields in a uniform way, they are added as usual
  * fields to the classes, in particular this allows us to parse them in
  * more easier.
  *   For further information see also
@@ -114,7 +109,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
 
     /**
      * returns if changes have to be reported to the change history
-     * @return true, iff changes have to be reported to the change history
+     * @return true, if changes have to be reported to the change history
      */
     public boolean isVisible() {
 	return true;
@@ -123,7 +118,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
     /**
      * The method is called for each type declaration of the compilation
      * unit and initiates the syntactical transformation. If you want to
-     * descend in inner classes you have to implement the recusrsion by
+     * descend in inner classes you have to implement the recursion by
      * yourself.
      */
     protected abstract void makeExplicit(TypeDeclaration td);

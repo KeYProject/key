@@ -20,8 +20,6 @@ import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.UseMethodContractRuleItem;
-import de.uka.ilkd.key.gui.nodeviews.*;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IteratorOfSchemaVariable;
@@ -156,14 +154,7 @@ class TacletMenu extends JMenu {
     private void addBuiltInRuleItem(BuiltInRule builtInRule,
 				    MenuControl control) {
         JMenuItem item;
-        if (builtInRule instanceof UseMethodContractRule) {
-            item = new UseMethodContractRuleItem(mediator.mainFrame(),
-                                                 (UseMethodContractRule)builtInRule,
-                                                 mediator.getSelectedProof(), 
-                                                 pos.getPosInOccurrence());           
-        } else {
-            item = new DefaultBuiltInRuleMenuItem(builtInRule);                       
-        }
+        item = new DefaultBuiltInRuleMenuItem(builtInRule);                       
         item.addActionListener(control);
         add(item);
     }
@@ -353,9 +344,6 @@ class TacletMenu extends JMenu {
 		((SequentView)(getPopupMenu().getInvoker()))
 		    .selectedTaclet(((TacletMenuItem) e.getSource()).connectedTo(), 
 				    pos);
-            } else if (e.getSource() instanceof UseMethodContractRuleItem) {
-                mediator.selectedUseMethodContractRule
-                    (((UseMethodContractRuleItem) e.getSource()).getRuleApp());   
             } else if (e.getSource() instanceof BuiltInRuleMenuItem) {
                         mediator.selectedBuiltInRule
                     (((BuiltInRuleMenuItem) e.getSource()).connectedTo(), 
@@ -608,7 +596,5 @@ class TacletMenu extends JMenu {
 	
 	    return 0;
 	}
-	
     }
-    
 }

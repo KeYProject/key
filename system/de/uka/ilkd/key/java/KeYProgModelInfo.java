@@ -99,8 +99,7 @@ public class KeYProgModelInfo{
 		return rtd.getAllMethods();
 	    }
 	}
-	return new recoder.list.MethodArrayList();
-	
+	return new recoder.list.MethodArrayList();	
     }
 
 
@@ -309,10 +308,16 @@ public class KeYProgModelInfo{
 	return false;
     }
 
-    private recoder.list.MethodList getRecoderMethods(KeYJavaType ct){
-        recoder.abstraction.ClassType rct
-            = (recoder.abstraction.ClassType) rec2key().toRecoder(ct);
-        return rct.getProgramModelInfo().getMethods(rct);
+    private recoder.list.MethodList getRecoderMethods(KeYJavaType kjt){
+        if (kjt.getJavaType() instanceof TypeDeclaration) {
+            Object o = rec2key().toRecoder(kjt);
+            if (o instanceof recoder.abstraction.ClassType) {
+                recoder.abstraction.ClassType rct
+                    = (recoder.abstraction.ClassType) o;
+                return rct.getProgramModelInfo().getMethods(rct);
+            }
+        }
+        return new recoder.list.MethodArrayList();
     }
     
     private recoder.list.ConstructorList getRecoderConstructors(KeYJavaType ct){

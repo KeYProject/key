@@ -39,7 +39,7 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
 
     private Term quotient(BigInteger monoCoeff, Term rightPoly, Services services) {
         final TermSymbol add = 
-            services.getTypeConverter ().getIntegerLDT ().getArithAddition ();
+            services.getTypeConverter ().getIntegerLDT ().getAdd ();
         if ( rightPoly.op () == add ) {
             final Term left = quotient ( monoCoeff, rightPoly.sub ( 0 ),
                                          services );

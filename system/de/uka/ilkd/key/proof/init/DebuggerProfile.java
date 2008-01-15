@@ -9,11 +9,9 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.BalancedGoalChooserBuilder;
 import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
 import de.uka.ilkd.key.proof.SetAsListOfGoalChooserBuilder;
-import de.uka.ilkd.key.rule.UseMethodContractRule;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
 import de.uka.ilkd.key.strategy.SetOfStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
-import de.uka.ilkd.key.unittest.UseMethodContractRuleForTestGen;
 
 public class  DebuggerProfile extends JavaProfile {
    
@@ -32,11 +30,7 @@ public class  DebuggerProfile extends JavaProfile {
         return
             super.getStrategyFactories().add(DEFAULT);
     }
-    
-    protected UseMethodContractRule getContractRule() {
-        return UseMethodContractRuleForTestGen.INSTANCE;
-    }
-      
+         
     public String name() {
         return "Debugger  Profile";
     }

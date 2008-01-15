@@ -36,16 +36,17 @@ header {
 
   import de.uka.ilkd.key.proof.*;
   import de.uka.ilkd.key.proof.init.*;
-  import de.uka.ilkd.key.proof.mgt.*;
-
 
   import de.uka.ilkd.key.rule.*;
   import de.uka.ilkd.key.rule.conditions.*;
   import de.uka.ilkd.key.rule.metaconstruct.*;
+ 
+  import de.uka.ilkd.key.speclang.SetAsListOfOperationContract;
+  import de.uka.ilkd.key.speclang.SetOfOperationContract;
+  import de.uka.ilkd.key.speclang.dl.translation.DLSpecFactory;
 
   import de.uka.ilkd.key.util.*;
 
-  import de.uka.ilkd.key.jml.*;
   import de.uka.ilkd.key.java.JavaInfo;
   import de.uka.ilkd.key.java.Services;
   import de.uka.ilkd.key.java.JavaReader;
@@ -139,7 +140,7 @@ options {
     private ProgramMethod pm = null;
 
     private SetOfTaclet taclets = SetAsListOfTaclet.EMPTY_SET; 
-    private ContractSet contracts = new ContractSet();
+    private SetOfOperationContract contracts = SetAsListOfOperationContract.EMPTY_SET;
 
     private ParserConfig schemaConfig;
     private ParserConfig normalConfig;
@@ -417,7 +418,7 @@ options {
         return taclets;
     }
 
-    public ContractSet getContracts(){
+    public SetOfOperationContract getContracts(){
         return contracts;
     }
     
@@ -728,11 +729,6 @@ options {
                         "you use an array or object type in a .key-file with missing " + 
                         "\\javaSource section.");
                 }
-                result = getServices().getImplementation2SpecMap().
-                lookupModelField(prefixKJT, attributeName); 
-                if(result != null){
-                    return result;
-                }
                 // WATCHOUT why not in DECLARATION MODE	   
                 if(!isDeclParser()) {			      	
                     if (prefixSort == Sort.NULL) {
@@ -952,7 +948,7 @@ options {
     private HashSet progVars(JavaBlock jb) {
 	if(isGlobalDeclTermParser()) {
   	  ProgramVariableCollector pvc
-	      = new ProgramVariableCollector(jb.program());
+	      = new ProgramVariableCollector(jb.program(), getServices());
           pvc.start();
           return pvc.result();
         }else 
@@ -961,7 +957,7 @@ options {
               return new HashSet();
             }   
             DeclarationProgramVariableCollector pvc
-               = new DeclarationProgramVariableCollector(jb.program());
+               = new DeclarationProgramVariableCollector(jb.program(), getServices());
             pvc.start();
             return pvc.result();
           }
@@ -1194,21 +1190,8 @@ options {
 		   break;
 		 }
                }
-	       if(!result) {
-               JMLClassSpec cs = getServices().getImplementation2SpecMap().getSpecForClass(kjt);
-               if(cs != null){
-                  try {
-                    cs.lookupModelMethod(new Name(LT(n+2).getText()));
-		    result = true;
-                  }catch(AmbigiousModelElementException e){
-                    result = false;
-                  }
-               }
-	       }
            }   
-        }else{
-          result = false;
-	}
+        }
     } catch (antlr.TokenStreamException tse) {
         // System.out.println("an exception occured"+tse);
         result = false;
@@ -2904,25 +2887,8 @@ query [Term prefix] returns [Term result = null]
        if (argsWithBoundVars != null) {
          args = argsWithBoundVars.getTerms();
        }
-       try{
-           result = getServices().getJavaInfo().getProgramMethodTerm
+       result = getServices().getJavaInfo().getProgramMethodTerm
                 (prefix, mid.getText(), args, classRef);
-       }catch(java.lang.IllegalArgumentException e){
-           ProgramMethod pm = 
-                getServices().getImplementation2SpecMap().
-                lookupModelMethod(
-                    getServices().getJavaInfo().getKeYJavaType(prefix.sort()), 
-                    new Name(mid.getText()));
-           if(pm == null){
-               throw e;
-           }
-           Term[] argTerms = new Term[args.length + 1];
-           argTerms[0] = prefix;
-           for(int i = 0; i<args.length; i++){
-               argTerms[i+1] = args[i];
-           }
-           result = tf.createFunctionTerm(pm, argTerms);
-       } 
     }        
  ; exception
         catch [TermCreationException ex] {
@@ -2960,18 +2926,7 @@ static_query returns [Term result = null]
 		semanticError("Found logic sort for " + className + 
 		 " but no corresponding java type (e.g. int is only " +
 		 " available as logic sort not as java type use (jint, jbyte, jshort etc. instead)");
-          }
-
-          
-          JMLClassSpec cs = getServices().getImplementation2SpecMap().getSpecForClass(kjt);
-          if (cs != null) {
-             try {
-               ts = (TermSymbol)cs.lookupModelMethod(new Name(qname));
-             }catch(AmbigiousModelElementException e){
-               e.printStackTrace();
-             }
-	     result = tf.createFunctionWithBoundVarsTerm(ts, argsWithBoundVars);
-          }
+          }          
        }
 	    
     }        
@@ -4403,10 +4358,16 @@ one_contract
      fma = formula MODIFIES (modifiesClause = location_list)?
      (rs=rulesets)?   // for backward compatibility
      (DISPLAYNAME displayName = string_literal)?
-     { //Syntax check fma
-       contracts.add(new DLMethodContract(fma, 
-           modifiesClause,
-	   contractName, displayName, getServices(), namespaces()));
+     {
+       DLSpecFactory dsf = new DLSpecFactory(getServices());
+       try {
+         contracts = contracts.add(dsf.createDLOperationContract(contractName,
+	       					                 displayName,
+       					                         fma, 
+           				                         modifiesClause));
+       } catch(ProofInputException e) {
+         semanticError(e.getMessage());
+       }
      } RBRACE SEMI {
      // dump local program variable declarations and @pre functions
      namespaces().setProgramVariables(programVariables().parent());

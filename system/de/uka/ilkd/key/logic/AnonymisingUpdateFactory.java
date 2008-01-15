@@ -278,7 +278,7 @@ public class AnonymisingUpdateFactory {
             return guardTerm;
             
         ProgramVariable lengthPV = services.getJavaInfo ().getArrayLength ();
-        Function sub = services.getTypeConverter ().getIntegerLDT ().getArithSubstraction ();
+        Function sub = services.getTypeConverter ().getIntegerLDT ().getSub ();
 
         Term varTerm = TB.var ( (LogicVariable)locTerm.sub ( 1 ).op () );
         Term lengthTerm = TB.dot ( locTerm.sub ( 0 ), lengthPV );

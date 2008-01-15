@@ -472,7 +472,9 @@ public class TermFactory {
                 return createJunctorTerm(Op.FALSE);
             } else if (t1.op() == Op.FALSE) {
                 return createJunctorTerm(Op.TRUE);
-            }
+            } else if (t1.op() == Op.NOT) {
+		return t1.sub(0);
+	    }
         }
         return createJunctorTerm(op, t1);
     }

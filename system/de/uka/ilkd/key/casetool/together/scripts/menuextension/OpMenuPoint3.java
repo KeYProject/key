@@ -10,8 +10,9 @@
 
 package de.uka.ilkd.key.casetool.together.scripts.menuextension;
 
-import de.uka.ilkd.key.casetool.FunctionalityOnModel;
-import de.uka.ilkd.key.casetool.ModelMethod;
+import de.uka.ilkd.key.casetool.together.FunctionalityOnModel;
+import de.uka.ilkd.key.casetool.together.TogetherModelMethod;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 
 
 /**
@@ -31,7 +32,9 @@ public class OpMenuPoint3 extends OpMenu {
 	return null;
     }
 
-    protected String runCore(ModelMethod modelMethod){
-        return FunctionalityOnModel.computeSpecification(modelMethod);
+    protected String runCore(TogetherModelMethod modelMethod)
+    		throws ProofInputException {
+        FunctionalityOnModel.computeSpecification(modelMethod);
+        return "";
     }
 }

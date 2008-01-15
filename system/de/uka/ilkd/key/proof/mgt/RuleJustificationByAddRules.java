@@ -22,30 +22,22 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 
 
 public class RuleJustificationByAddRules implements RuleJustification{
 
-    private Node node;
+    private final Node node;
+    private final boolean isAxiom;
 
-    public RuleJustificationByAddRules(Node node) {
+    public RuleJustificationByAddRules(Node node, boolean isAxiom) {
 	this.node = node;
-    }
-    
-    public List getProofList() {
-	return new LinkedList();
-    }
-
-    public DepAnalysis dependsOn(Proof p) {
-	return DepAnalysis.getInstance(false, null, p); //correctness ensured
-	                                                //by taclet mechanism
+        this.isAxiom = isAxiom;
     }
     
     public boolean isAxiomJustification() {
-	return true;
+	return isAxiom;
     }
 
     public RuleApp motherTaclet() {
@@ -62,5 +54,4 @@ public class RuleJustificationByAddRules implements RuleJustification{
 	return "added rule justification \nintroduced at node "
                 + node.serialNr() + " by rule \n" + tacPrinter;
     }
-
 }

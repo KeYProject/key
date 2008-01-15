@@ -591,7 +591,7 @@ public abstract class TacletApp implements RuleApp {
         while (it.hasNext()) {
             SchemaVariable var = it.next();
             
-            if (LoopInvariantProposer.inLoopInvariantRuleSet(taclet().ruleSets())){ 
+            if (LoopInvariantProposer.DEFAULT.inLoopInvariantRuleSet(taclet())){ 
                 Object inv = LoopInvariantProposer.DEFAULT.tryToInstantiate(this, var, services);              
                 if (inv instanceof Term){
                     app = app.addCheckedInstantiation(var, (Term)inv, services, true);

@@ -62,19 +62,19 @@ public class LogicPrinter {
     public static final int DEFAULT_LINE_WIDTH = 55;
 
     /** The max. number of characters to put in one line */
-    private int lineWidth = DEFAULT_LINE_WIDTH;
+    protected int lineWidth = DEFAULT_LINE_WIDTH;
 
     /**
      * The ProgramPrinter used to pretty-print Java blocks in
      * formulae.
      */
-    private ProgramPrinter prgPrinter;
+    protected ProgramPrinter prgPrinter;
 
     /** Contains information on the concrete syntax of operators. */
     private final NotationInfo notationInfo;
 
     /** the services object */
-    private final Services services;
+    protected final Services services;
 
     /** The sequent we are pretty-printing */
     //private Sequent            seq;
@@ -84,7 +84,7 @@ public class LogicPrinter {
     protected Layouter layouter;
 
     /** The backend <code>layouter</code> will write to. */
-    private Backend backend;
+    protected Backend backend;
 
     /** The constraint used for metavariable instantiations of the
      * current formula */
@@ -100,7 +100,7 @@ public class LogicPrinter {
         are pretty-printed the right way. */
     private boolean oclPrettyPrinting = false;
 
-    static Logger logger = Logger.getLogger(LogicPrinter.class.getName());
+    protected static Logger logger = Logger.getLogger(LogicPrinter.class.getName());
 
 
     public static String quickPrintLocationDescriptors(
@@ -116,6 +116,20 @@ public class LogicPrinter {
         }
         return p.result().toString();
     }
+    
+    
+    public static String quickPrintTerm(Term t, Services services) {
+        LogicPrinter p = new LogicPrinter(null, 
+                                          NotationInfo.createInstance(), 
+                                          services);
+        try {
+            p.printTerm(t);
+        } catch (IOException ioe) {
+            return t.toString();
+        }
+        return p.result().toString();
+    }
+    
 
     /**
      * Creates a LogicPrinter.  Sets the sequent to be printed, as
@@ -933,10 +947,10 @@ public class LogicPrinter {
     }
 
     /**
-     * Pretty-prints a list of terms.
+     * Pretty-prints a set of terms.
      * @param terms the terms to be printed
      */
-    public void printTerm(ListOfTerm terms)
+    public void printTerm(SetOfTerm terms)
         throws IOException {
         getLayouter().print("{");
         IteratorOfTerm it = terms.iterator();
@@ -1298,7 +1312,7 @@ public class LogicPrinter {
         }
     }
 
-    private void printVariables (ArrayOfQuantifiableVariable vars)
+    protected void printVariables (ArrayOfQuantifiableVariable vars)
                                             throws IOException {
         int size = vars.size ();
         if(size != 1)

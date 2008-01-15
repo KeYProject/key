@@ -45,7 +45,8 @@ public class ApplyOnAttributeAccess extends ApplyOnAccessTerm {
      * attribute operator
      */
     public boolean isApplicable (Update update, Term target) {
-        return (target.op () instanceof AttributeOp)|| (target.op() instanceof NonRigidFunctionLocation);
+        return (target.op () instanceof AttributeOp)
+                || (target.op() instanceof NonRigidFunctionLocation && target.op().arity() > 0);
     }    
 
     /**

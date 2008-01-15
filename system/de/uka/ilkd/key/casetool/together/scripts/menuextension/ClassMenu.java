@@ -20,7 +20,6 @@ import com.togethersoft.openapi.ide.window.IdeDialogType;
 import com.togethersoft.openapi.ide.window.IdeWindowManager;
 import com.togethersoft.openapi.rwi.*;
 
-import de.uka.ilkd.key.casetool.UMLModelClass;
 import de.uka.ilkd.key.casetool.together.TogetherModelClass;
 
 import javax.swing.ProgressMonitor;
@@ -45,13 +44,19 @@ public abstract class  ClassMenu {
 	TogetherModelClass modelClass 
 		= new TogetherModelClass(selectedNode, rwiModel, rwiDiagram);
 
-	String result = runCore(modelClass);
-
+	String result = "";
+	try {
+	    result = runCore(modelClass);
+	} catch(Exception e) {
+	    e.printStackTrace(System.out);
+	    result = e.toString();
+	}
 	if (!result.equals("")){
             if (pm!=null) pm.close();
 	    winMan.showMessageDialog("Result", IdeDialogType.INFORMATION, result);
 	}
     }
 
-    protected abstract String runCore(UMLModelClass aReprModelClass);
+    protected abstract String runCore(TogetherModelClass aReprModelClass) 
+    							throws Exception;
 }

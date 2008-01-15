@@ -105,7 +105,8 @@ public class TacletPORule implements BuiltInRule {
 		app = it.next ();
 		p_goal.addTaclet ( app.taclet         (),
 				   app.instantiations (),
-				   app.constraint     () );
+				   app.constraint     (),
+                                   false);
 	    }
 	}
     }

@@ -684,7 +684,7 @@ public class VisualDebugger {
 
                     if (m != null) {
                         ProgramVariableCollector pvc = new ProgramVariableCollector(
-                                m);
+                                m, mediator.getServices());
                         pvc.start();
                         pvs.addAll(pvc.result());
                     }

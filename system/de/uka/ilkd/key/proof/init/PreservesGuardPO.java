@@ -11,20 +11,17 @@ package de.uka.ilkd.key.proof.init;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.casetool.IteratorOfModelClass;
-import de.uka.ilkd.key.casetool.ListOfModelClass;
-import de.uka.ilkd.key.casetool.ModelClass;
-import de.uka.ilkd.key.casetool.ModelMethod;
 import de.uka.ilkd.key.gui.DependsClauseDialog;
+import de.uka.ilkd.key.java.abstraction.IteratorOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.abstraction.SetOfKeYJavaType;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.IteratorOfClassInvariant;
-import de.uka.ilkd.key.speclang.ListOfClassInvariant;
-import de.uka.ilkd.key.speclang.SLTranslationError;
+import de.uka.ilkd.key.speclang.SetAsListOfClassInvariant;
+import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -33,20 +30,21 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class PreservesGuardPO extends EnsuresPO {
     
-    private final ListOfClassInvariant guardedInvs;
-    private final ListOfModelClass guard;
+    private final SetOfClassInvariant guardedInvs;
+    private final SetOfKeYJavaType guard;
     private Term encapsulationFormula = null;
     private ListOfProofOblInput dependsPOs = SLListOfProofOblInput.EMPTY_LIST;
 
     
-    public PreservesGuardPO(ModelMethod modelMethod, 
-                            ListOfClassInvariant guardedInvs,
-                            ListOfModelClass guard,
-                            InvariantSelectionStrategy invStrategy) {
-        super("PreservesGuard", 
-              modelMethod, 
+    public PreservesGuardPO(InitConfig initConfig,
+	    		    ProgramMethod programMethod,
+                            SetOfClassInvariant guardedInvs,
+                            SetOfKeYJavaType guard) {
+        super(initConfig,
+              "PreservesGuard", 
+              programMethod, 
               Op.BOX, 
-              invStrategy, 
+              SetAsListOfClassInvariant.EMPTY_SET,
               false);
         this.guardedInvs = guardedInvs;
         this.guard       = guard;
@@ -117,11 +115,9 @@ public class PreservesGuardPO extends EnsuresPO {
                }
                
                if(containingKjt != null) {
-                   IteratorOfModelClass it2 = guard.iterator();
+                   IteratorOfKeYJavaType it2 = guard.iterator();
                    while(it2.hasNext()) {
-                       ModelClass guardClass = it2.next();
-                       KeYJavaType guardKjt 
-                           = javaInfo.getKeYJavaType(guardClass.getFullClassName());
+                       KeYJavaType guardKjt = it2.next();
                        if(containingKjt.equals(guardKjt)) {
                            clause = clause.remove(loc);
                        }
@@ -156,13 +152,13 @@ public class PreservesGuardPO extends EnsuresPO {
             }
             BasicLocationDescriptor bloc1 = (BasicLocationDescriptor) loc1;
             
-            Term predLoc1Term = tf.createFunctionTerm(pred, 
+            Term predLoc1Term = TF.createFunctionTerm(pred, 
                                                       bloc1.getLocTerm());
-            Term freeLoc1Term = tf.createJunctorTerm(Op.AND, 
+            Term freeLoc1Term = TF.createJunctorTerm(Op.AND, 
                                                      bloc1.getFormula(), 
                                                      predLoc1Term); 
             Term boundLoc1Term 
-                = tf.createQuantifierTerm(Op.ALL, 
+                = TF.createQuantifierTerm(Op.ALL, 
                                           freeLoc1Term.freeVars().toArray(), 
                                           freeLoc1Term);
             
@@ -175,13 +171,13 @@ public class PreservesGuardPO extends EnsuresPO {
                 }
                 BasicLocationDescriptor bloc2 = (BasicLocationDescriptor) loc2;
                 
-                Term predLoc2Term = tf.createFunctionTerm(pred, 
+                Term predLoc2Term = TF.createFunctionTerm(pred, 
                                                           bloc2.getLocTerm());
-                Term freeLoc2Term = tf.createJunctorTerm(Op.AND, 
+                Term freeLoc2Term = TF.createJunctorTerm(Op.AND, 
                                                          bloc2.getFormula(), 
                                                          predLoc2Term); 
                 Term boundLoc2Term 
-                    = tf.createQuantifierTerm(Op.ALL, 
+                    = TF.createQuantifierTerm(Op.ALL, 
                                               freeLoc2Term.freeVars().toArray(), 
                                               freeLoc2Term);
                 
@@ -206,14 +202,11 @@ public class PreservesGuardPO extends EnsuresPO {
      * Determines a depends clause for an invariant
      * (helper for buildEncapsulationFormula).
      */
-    private SetOfLocationDescriptor getDependsClauseForInv(ClassInvariant inv) {
+    private SetOfLocationDescriptor getDependsClauseForInv(ClassInvariant inv) 
+    		throws ProofInputException {
         Term invTerm = null;
         
-    	try {
-        	invTerm = translateInv(inv);
-        } catch (SLTranslationError e) {        	
-            e.printStackTrace();
-        }
+        invTerm = translateInv(inv);
         
         SetOfLocationDescriptor extractedClause 
                 = extractDependsClauseFromTerm(invTerm);
@@ -227,7 +220,9 @@ public class PreservesGuardPO extends EnsuresPO {
             result = dlg.getDependsClause();
             
             if(!equalsModRenaming(result, extractedClause)) {
-                ProofOblInput dependsPO = new CorrectDependsPO(result, inv);
+                ProofOblInput dependsPO = new CorrectDependsPO(initConfig, 
+                					       result, 
+                					       inv);
                 dependsPOs = dependsPOs.prepend(dependsPO);
             }
         }
@@ -236,13 +231,11 @@ public class PreservesGuardPO extends EnsuresPO {
     }
     
         
-    private Term createInstanceOf(ModelClass modelClass, Term term) {
-        Name name = new Name(modelClass.getFullClassName() + "::instance");
-        Function instanceFunc = (Function) initConfig.funcNS().lookup(name);
-        Term instanceTerm = tf.createFunctionTerm(instanceFunc, term);
-        Term trueLitTerm = services.getTypeConverter()
-                                   .convertToLogicElement(BooleanLiteral.TRUE);
-        return tf.createEqualityTerm(instanceTerm, trueLitTerm);
+    private Term createInstanceOf(KeYJavaType kjt, Term term) {
+        Name n = new Name(kjt.getFullName() + "::instance");
+        Function instanceFunc = (Function) initConfig.funcNS().lookup(n);
+        Term instanceTerm = TB.func(instanceFunc, term);
+        return TB.equals(instanceTerm, TB.TRUE(services));
     }
     
     
@@ -267,7 +260,7 @@ public class PreservesGuardPO extends EnsuresPO {
         }
         
         //create the formula
-        encapsulationFormula = tf.createJunctorTerm(Op.TRUE);
+        encapsulationFormula = TF.createJunctorTerm(Op.TRUE);
         IteratorOfLocationDescriptor it2 = dependsClause.iterator();
         while(it2.hasNext()) {
             LocationDescriptor loc = it2.next();
@@ -280,41 +273,41 @@ public class PreservesGuardPO extends EnsuresPO {
             
             LogicVariable y = new LogicVariable(new Name("y"), 
                                                 javaLangObjectSort);
-            Term yTerm = tf.createVariableTerm(y);
+            Term yTerm = TF.createVariableTerm(y);
             Term dTerm = bloc.getLocTerm().sub(0);
             Term phiTerm = bloc.getFormula();
 
             //create "Acc(y, d_k') & phi_k"
-            Term accTerm = tf.createFunctionTerm(accPred, 
+            Term accTerm = TF.createFunctionTerm(accPred, 
                                                  yTerm,
                                                  dTerm);
-            Term premiseTerm = tf.createJunctorTermAndSimplify(Op.AND, 
+            Term premiseTerm = TF.createJunctorTermAndSimplify(Op.AND, 
                                                                accTerm, 
                                                                phiTerm);
             
             //create disjunction of "C::Instance(y)" for all guards C
-            Term isGuardTerm = tf.createJunctorTerm(Op.FALSE);
-            IteratorOfModelClass it3 = guard.iterator();
+            Term isGuardTerm = TF.createJunctorTerm(Op.FALSE);
+            IteratorOfKeYJavaType it3 = guard.iterator();
             while(it3.hasNext()) {
-                ModelClass guardClass = it3.next();
-                Term instanceOfTerm = createInstanceOf(guardClass, yTerm);
+                KeYJavaType guardKJT = it3.next();
+                Term instanceOfTerm = createInstanceOf(guardKJT, yTerm);
                 isGuardTerm 
-                    = tf.createJunctorTermAndSimplify(Op.OR, 
+                    = TF.createJunctorTermAndSimplify(Op.OR, 
                                                       isGuardTerm, 
                                                       instanceOfTerm);
             }
 
             //create "phi_k & y = d_k'"  
-            Term yEqualTerm = tf.createEqualityTerm(yTerm, dTerm);
-            Term isWithinTerm = tf.createJunctorTermAndSimplify(Op.AND, 
+            Term yEqualTerm = TF.createEqualityTerm(yTerm, dTerm);
+            Term isWithinTerm = TF.createJunctorTermAndSimplify(Op.AND, 
                                                                 phiTerm, 
                                                                 yEqualTerm);
             
             //create implication
             Term impTerm 
-                = tf.createJunctorTerm(Op.IMP,
+                = TF.createJunctorTerm(Op.IMP,
                                        premiseTerm,
-                                       tf.createJunctorTerm(Op.OR, 
+                                       TF.createJunctorTerm(Op.OR, 
                                                             isWithinTerm, 
                                                             isGuardTerm));
             
@@ -330,12 +323,12 @@ public class PreservesGuardPO extends EnsuresPO {
                     = bloc.getLocTerm().freeVars();
             quantifierTerm = (freeVars.size() == 0
                               ? quantifierTerm
-                              : tf.createQuantifierTerm(Op.ALL, 
+                              : TF.createQuantifierTerm(Op.ALL, 
                                                         freeVars.toArray(), 
                                                         quantifierTerm));
             
             encapsulationFormula 
-                    = tf.createJunctorTermAndSimplify(Op.AND, 
+                    = TF.createJunctorTermAndSimplify(Op.AND, 
                                                       encapsulationFormula, 
                                                       quantifierTerm);
         } 
@@ -350,10 +343,10 @@ public class PreservesGuardPO extends EnsuresPO {
                                     Function accPred) {
         LogicVariable x = new LogicVariable(new Name("x"), 
                                             javaLangObjectSort);
-        Term accTerm = tf.createFunctionTerm(accPred, 
-                                             tf.createVariableTerm(x), 
-                                             tf.createVariableTerm(v));
-        return tf.createQuantifierTerm(Op.EX, x, accTerm);
+        Term accTerm = TF.createFunctionTerm(accPred, 
+                                             TF.createVariableTerm(x), 
+                                             TF.createVariableTerm(v));
+        return TF.createQuantifierTerm(Op.EX, x, accTerm);
     }
     
     
@@ -362,7 +355,7 @@ public class PreservesGuardPO extends EnsuresPO {
                               ProgramVariable resultVar,
                               ProgramVariable exceptionVar,
                               Map atPreFunctions) throws ProofInputException {
-        Term result = tf.createJunctorTerm(Op.TRUE);
+        Term result = TF.createJunctorTerm(Op.TRUE);
         Function accPred = getAccPred();
         Sort javaLangObjectSort = javaInfo.getJavaLangObjectAsSort();
         
@@ -374,7 +367,7 @@ public class PreservesGuardPO extends EnsuresPO {
             Term paramAccTerm = createAccessedTerm(paramVar,
                                                    javaLangObjectSort, 
                                                    accPred);
-            result = tf.createJunctorTermAndSimplify(Op.AND, 
+            result = TF.createJunctorTermAndSimplify(Op.AND, 
                                                      result, 
                                                      paramAccTerm);
         }
@@ -384,14 +377,14 @@ public class PreservesGuardPO extends EnsuresPO {
             Term selfAccTerm = createAccessedTerm(selfVar, 
                                                   javaLangObjectSort, 
                                                   accPred); 
-            result = tf.createJunctorTermAndSimplify(Op.AND, 
+            result = TF.createJunctorTermAndSimplify(Op.AND, 
                                                      result, 
                                                      selfAccTerm);
         }
         
         //add main formula
         buildEncapsulationFormula();
-        result = tf.createJunctorTermAndSimplify(Op.AND, 
+        result = TF.createJunctorTermAndSimplify(Op.AND, 
                                                  result, 
                                                  encapsulationFormula);
         
@@ -404,7 +397,7 @@ public class PreservesGuardPO extends EnsuresPO {
                                ProgramVariable resultVar,
                                ProgramVariable exceptionVar,
                                Map atPreFunctions) throws ProofInputException {
-        Term result = tf.createJunctorTerm(Op.TRUE);
+        Term result = TF.createJunctorTerm(Op.TRUE);
         Function accPred = getAccPred();
         Sort javaLangObjectSort = javaInfo.getJavaLangObjectAsSort();
 
@@ -415,7 +408,7 @@ public class PreservesGuardPO extends EnsuresPO {
         
         //add main formula
         buildEncapsulationFormula();
-        result = tf.createJunctorTermAndSimplify(Op.IMP, 
+        result = TF.createJunctorTermAndSimplify(Op.IMP, 
                                                  result, 
                                                  encapsulationFormula);
         
@@ -425,12 +418,11 @@ public class PreservesGuardPO extends EnsuresPO {
     
     
     //-------------------------------------------------------------------------
-    //methods of ProofOblInput interface
+    //public interface
     //-------------------------------------------------------------------------    
     
     public void readProblem(ModStrategy mod) throws ProofInputException {
         super.readProblem(mod);
-        setInitConfig(initConfig);
         
         Debug.assertTrue(poTerms.length == 1);
         Debug.assertTrue(poNames == null);
@@ -451,13 +443,20 @@ public class PreservesGuardPO extends EnsuresPO {
             poNames[i] = dependsPO.name();
         }
     }
-
     
-    public void setInitConfig(InitConfig conf) {
-        super.setInitConfig(conf);
-        IteratorOfProofOblInput it = dependsPOs.iterator();
-        while(it.hasNext()) {
-            it.next().setInitConfig(conf);
+    
+    public boolean equals(Object o) {
+        if(!(o instanceof PreservesGuardPO)) {
+            return false;
         }
+        PreservesGuardPO po = (PreservesGuardPO) o;
+        return super.equals(po)
+               && guardedInvs.equals(po.guardedInvs)
+               && guard.equals(po.guard);
+    }
+    
+    
+    public int hashCode() {
+        return super.hashCode() + guardedInvs.hashCode() + guard.hashCode();
     }
 }

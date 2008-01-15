@@ -41,8 +41,8 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
         super ( numbers );
         this.left = left;
         this.right = right;
-        this.add = numbers.getArithAddition ();
-        this.mul = numbers.getArithMultiplication ();
+        this.add = numbers.getAdd();
+        this.mul = numbers.getMul ();
         this.Z = numbers.getNumberSymbol ();
         
         hasCoeff = createHasCoeffTermFeature ( numbers );
@@ -51,7 +51,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
     static TermFeature createHasCoeffTermFeature(final IntegerLDT numbers) {
         return
             BinarySumTermFeature.createSum (
-                  OperatorTF.create ( numbers.getArithMultiplication() ),
+                  OperatorTF.create ( numbers.getMul() ),
                   SubTermFeature.create ( new TermFeature[] {
                         ConstTermFeature.createConst ( LongRuleAppCost.ZERO_COST ),
                         OperatorTF.create ( numbers.getNumberSymbol()) } ) );

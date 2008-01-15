@@ -6,13 +6,7 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
+// 
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -166,24 +160,24 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
     
     protected void makeExplicit(TypeDeclaration td) {
 
-	addImplicitRecoderFields(td);
+    	addImplicitRecoderFields(td);
 
-	int typeCount = td.getTypeDeclarationCount();
-	for (int j = 0; j<typeCount; j++) {
-	    makeExplicit(td.getTypeDeclarationAt(j));
-	}
+    	int typeCount = td.getTypeDeclarationCount();
+    	for (int j = 0; j<typeCount; j++) {
+    	    makeExplicit(td.getTypeDeclarationAt(j));
+    	}
 
-	if (!transformedObject && td == javaLangObject) {	   
-	    addGlobalImplicitRecoderFields(td);
-	    transformedObject = true;			    
-	}
-	td.makeAllParentRolesValid();
-// 	if (td instanceof ClassDeclaration) {
-// 	    java.io.StringWriter sw = new java.io.StringWriter();
-// 	    services.getProgramFactory().getPrettyPrinter(sw).visitClassDeclaration((ClassDeclaration)td);
-// 	    System.out.println(sw.toString());
-// 	    try { sw.close(); } catch (Exception e) {}	   
-// 	}
+    	if (!transformedObject && td == javaLangObject) {	   
+    	    addGlobalImplicitRecoderFields(td);
+    	    transformedObject = true;			    
+    	}
+    	td.makeAllParentRolesValid();
+//     	if (td instanceof ClassDeclaration) {
+//     	    java.io.StringWriter sw = new java.io.StringWriter();
+//     	    services.getProgramFactory().getPrettyPrinter(sw).visitClassDeclaration((ClassDeclaration)td);
+//     	    System.out.println(sw.toString());
+//     	    try { sw.close(); } catch (Exception e) {}	   
+//     	}
 
-    }
+        }
 }

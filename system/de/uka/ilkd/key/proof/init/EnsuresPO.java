@@ -10,17 +10,17 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import de.uka.ilkd.key.casetool.ModelClass;
-import de.uka.ilkd.key.casetool.ModelMethod;
 import de.uka.ilkd.key.java.ArrayOfExpression;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
@@ -39,22 +39,20 @@ import de.uka.ilkd.key.logic.ldt.LDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
-import de.uka.ilkd.key.proof.mgt.Contract;
-import de.uka.ilkd.key.proof.mgt.Contractable;
-import de.uka.ilkd.key.proof.mgt.OldOperationContract;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.speclang.*;
-import de.uka.ilkd.key.util.Debug;
 
 
 /**
  * The "Ensures" proof obligation. 
  */
 public abstract class EnsuresPO extends AbstractPO {
-
-    public final ModelMethod modelMethod;
-    public final Modality modality;
-    private final InvariantSelectionStrategy invStrategy;
+    
+    private final ProgramMethod programMethod;
+    private final Modality modality;
+    private final SetOfClassInvariant assumedInvs;
+    
     private final boolean skipPreconditions;
     
     private SetOfTaclet invTaclets = SetAsListOfTaclet.EMPTY_SET;
@@ -65,16 +63,18 @@ public abstract class EnsuresPO extends AbstractPO {
     //constructors
     //-------------------------------------------------------------------------
     
-    public EnsuresPO(String name,
-		     ModelMethod modelMethod,
+    public EnsuresPO(InitConfig initConfig,
+	    	     String name,
+		     ProgramMethod programMethod,
 		     Modality modality,
-                     InvariantSelectionStrategy invStrategy,
+                     SetOfClassInvariant assumedInvs,
                      boolean skipPreconditions) {
-    	super(name + " of " + modelMethod, 
-              modelMethod.getContainingClass());
-    	this.modelMethod       = modelMethod;
+    	super(initConfig, 
+    	      name + " of " + programMethod, 
+    	      programMethod.getContainerType());
+    	this.programMethod     = programMethod;
     	this.modality          = modality; 
-        this.invStrategy       = invStrategy;
+        this.assumedInvs       = assumedInvs;
         this.skipPreconditions = skipPreconditions;
     }
     
@@ -89,7 +89,7 @@ public abstract class EnsuresPO extends AbstractPO {
                                        ProgramVariable resultVar,
                                        ProgramVariable exceptionVar,
                                        Map atPreFunctions) 
-                                                    throws ProofInputException, SLTranslationError;
+                                                    throws ProofInputException;
     
     
     protected abstract Term getPostTerm(ProgramVariable selfVar, 
@@ -97,7 +97,7 @@ public abstract class EnsuresPO extends AbstractPO {
                                         ProgramVariable resultVar,
                                         ProgramVariable exceptionVar,
                                         Map atPreFunctions)
-                                                    throws ProofInputException, SLTranslationError;
+                                                    throws ProofInputException;
     
 
  
@@ -105,63 +105,47 @@ public abstract class EnsuresPO extends AbstractPO {
     //-------------------------------------------------------------------------
     //local helper methods
     //-------------------------------------------------------------------------    
-    
-    /**
-     * Returns the program method associated with this proof obligation.
-     */
-    private ProgramMethod getProgramMethod(ListOfProgramVariable paramVars) {
-        //get class type
-        String className = modelClass.getFullClassName();
-        KeYJavaType classType = javaInfo.getTypeByClassName(className); 
-        Debug.assertTrue(classType != null);
-                
-        //get program method
-        return javaInfo.getProgramMethod(classType, 
-                                         modelMethod.getName(), 
-                                         paramVars.toArray(), 
-                                         classType);
-    }
-    
 
     /**
      * (helper for buildAssumedInvs())
-     * @throws SLTranslationError 
-     * @throws ProofInputException 
      */
-    private Term buildInvariantsForClass(ModelClass modelClass) throws SLTranslationError  {
-        String className = modelClass.getFullClassName();
-        KeYJavaType classType = javaInfo.getTypeByClassName(className);
-        
+    private Term buildImplicitInvariantsForClass(KeYJavaType classKJT) 
+    		throws ProofInputException {
+	assert classKJT.getJavaType() instanceof ClassType;
+	Term result = TB.tt();
+	
         //add "C.<classErroneous> = FALSE"
         ProgramVariable erroneousField 
             = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CLASS_ERRONEOUS, 
-                                    classType);
-        Term result = tb.equals(tb.var(erroneousField), tb.FALSE(services)); 
+                                    classKJT);
+        if(erroneousField != null) {
+            result = TB.and(result, 
+        	    	    TB.equals(TB.var(erroneousField), 
+        	    		      TB.FALSE(services)));
+        }
         
         //add "C.<classInitialisationInProgress> = FALSE"
         ProgramVariable initField 
             = javaInfo.getAttribute(
                         ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS, 
-                        classType);
-        Term initFalseTerm = tb.equals(tb.var(initField), tb.FALSE(services));
-        result = tb.and(result, initFalseTerm);
+                        classKJT);
+        if(initField != null) {
+            Term initFalseTerm = TB.equals(TB.var(initField), TB.FALSE(services));
+            result = TB.and(result, initFalseTerm);
+        }
         
-        //add explicit invariants
-        ListOfClassInvariant invs = modelClass.getMyClassInvariants();
-        invs = invs.append(modelClass.getMyThroughoutClassInvariants());
-    	Term invTerm = translateInvs(invs);
-    	result = tb.and(result, invTerm);
-
         return result;
     }
     
     
     /**
-     * (helper for buildAssumedInvs())
-     * @throws SLTranslationError 
+     * (helper for buildAssumedInvs()) 
      */
-    private void buildInvariantTacletsForClass(ModelClass modelClass) throws SLTranslationError {
-        Term invTerm = buildInvariantsForClass(modelClass);
+    private void buildInvariantTacletsForClass(KeYJavaType classKJT) 
+    		throws ProofInputException {
+	assert classKJT.getJavaType() instanceof ClassType;
+	
+        Term invTerm = buildImplicitInvariantsForClass(classKJT);
         ConstrainedFormula cf = new ConstrainedFormula(invTerm);
         Semisequent ante 
             = Semisequent.EMPTY_SEMISEQUENT.insertLast(cf).semisequent();
@@ -172,8 +156,8 @@ public abstract class EnsuresPO extends AbstractPO {
                                      SLListOfTaclet.EMPTY_LIST);
         
         NoFindTacletBuilder tacletBuilder = new NoFindTacletBuilder();
-        String name = "Insert invariants of " + modelClass.getClassName();
-        tacletBuilder.setName(new Name(name));
+        String s = "Insert implicit invariants of " + classKJT.getName();
+        tacletBuilder.setName(new Name(s));
         tacletBuilder.addTacletGoalTemplate(template);
         Taclet taclet = tacletBuilder.getNoFindTaclet();
         invTaclets = invTaclets.add(taclet);
@@ -182,33 +166,23 @@ public abstract class EnsuresPO extends AbstractPO {
     }
     
     
-    private Term buildAssumedInvs() throws SLTranslationError {
-        Debug.assertTrue(invStrategy != null);
-        String ownFullName    = modelClass.getFullClassName();
-        String ownPackageName = modelClass.getContainingPackage();
-        if(ownPackageName == null) {
-            ownPackageName = "";
+    private Term buildAssumedInvs() throws ProofInputException {
+        //inReachableState
+        Term result = TB.func(javaInfo.getInReachableState());
+        
+        //assumed invariants
+        IteratorOfClassInvariant it = assumedInvs.iterator();
+        while(it.hasNext()) {
+            result = TB.and(result, translateInv(it.next()));
         }
         
-        //inReachableState
-        Term result = tb.func(javaInfo.getInReachableState());
-        
-        //collect all translated invariants of all classes
-        Set allClasses = modelClass.getAllClasses();
-        Iterator it = allClasses.iterator();
-        while(it.hasNext()) {
-            ModelClass mc = (ModelClass)(it.next());
-
-            //display only those designated by the invariant display strategy
-            if(invStrategy.preselectAll()
-               || (invStrategy.preselectPackage()
-                    && ownPackageName.equals(mc.getContainingPackage())) 
-               || (invStrategy.preselectClass() 
-                    && ownFullName.equals(mc.getFullClassName()))) {
-                Term classInvTerm = buildInvariantsForClass(mc);
-                result = tb.and(result, classInvTerm);
-            } else {
-                buildInvariantTacletsForClass(mc);
+        //implicit invariants as taclets
+        Set allKJTs = javaInfo.getAllKeYJavaTypes();
+        Iterator it2 = allKJTs.iterator();
+        while(it2.hasNext()) {
+            KeYJavaType kjt = (KeYJavaType) it2.next();
+            if(kjt.getJavaType() instanceof ClassType) {
+                buildInvariantTacletsForClass(kjt);
             }
         }
         
@@ -217,11 +191,11 @@ public abstract class EnsuresPO extends AbstractPO {
     
     
     /**
-     * Builds the "general assumption" for a set of assumed invariants.
-     * @throws SLTranslationError 
+     * Builds the "general assumption" for a set of assumed invariants. 
      */
     private Term buildGeneralAssumption(ProgramVariable selfVar,
-                                        ListOfProgramVariable paramVars) throws SLTranslationError {
+                                        ListOfProgramVariable paramVars) 
+    		throws ProofInputException {
         Term result = null;
         
         //build conjunction of invariants
@@ -230,53 +204,52 @@ public abstract class EnsuresPO extends AbstractPO {
         
         //build disjunction of preconditions
         if(!skipPreconditions) {
-            Term anyPreTerm = tb.ff();
-            ListOfOperationContract contracts 
-                = modelMethod.getMyOperationContracts();
+            Term anyPreTerm = TB.ff();
+            SetOfOperationContract contracts 
+                = specRepos.getOperationContracts(programMethod);
             IteratorOfOperationContract it = contracts.iterator();
             while(it.hasNext()) {
                 OperationContract contract = it.next();
                 Term term = translatePre(contract, selfVar, toPV(paramVars));
-                anyPreTerm = tb.or(anyPreTerm, term); 
+                anyPreTerm = TB.or(anyPreTerm, term); 
             }
-            result = tb.and(result, anyPreTerm);
+            result = TB.and(result, anyPreTerm);
         }
         
         //build "self.<created> = TRUE & self != null"
         if(selfVar != null) {
             Term selfCreatedAndNotNullTerm
                 = createdFactory.createCreatedAndNotNullTerm(services,
-                                                             tb.var(selfVar));
-            result = tb.and(result, selfCreatedAndNotNullTerm);
+                                                             TB.var(selfVar));
+            result = TB.and(result, selfCreatedAndNotNullTerm);
         }
         
         //build conjunction of... 
         //- "p_i.<created> = TRUE | p_i = null" for object parameters, and
         //- "inBounds(p_i)" for integer parameters
-        Term paramsLegalTerm = tb.tt();
+        Term paramsLegalTerm = TB.tt();
         IteratorOfProgramVariable it2 = paramVars.iterator();
         while(it2.hasNext()) {
             ProgramVariable paramVar = it2.next();
-            Term paramLegalTerm = tb.tt();
+            Term paramLegalTerm = TB.tt();
             if(paramVar.sort() instanceof ObjectSort) {
                 paramLegalTerm
                     = createdFactory.createCreatedOrNullTerm(services, 
-                                                             tb.var(paramVar)); 
+                                                             TB.var(paramVar)); 
             } else {
-        	LDT ldt 
-        	    = services.getTypeConverter().getModelFor(paramVar.sort());
-        	if(ldt instanceof AbstractIntegerLDT) {
-        	    Function inBoundsPredicate 
-        	    	= ((AbstractIntegerLDT)ldt).getInBoundsPredicate();
-        	    if(inBoundsPredicate != null) {
-        		paramLegalTerm = tb.func(inBoundsPredicate, 
-        					 tb.var(paramVar));
-        	    }
-        	}
+                Type paramType = paramVar.getKeYJavaType().getJavaType();
+                LDT ldt = services.getTypeConverter().getModelFor(paramType);
+                
+                if(ldt instanceof AbstractIntegerLDT) {
+                    Function inBoundsPred 
+                        = ((AbstractIntegerLDT) ldt).getInBounds();
+                    paramLegalTerm = TB.func(inBoundsPred, TB.var(paramVar));
+                }
             }
-            paramsLegalTerm = tb.and(paramsLegalTerm, paramLegalTerm);
+            paramsLegalTerm = TB.and(paramsLegalTerm, paramLegalTerm);
         }
-        result = tb.and(result, paramsLegalTerm);
+        result = TB.and(result, paramsLegalTerm);
+        
         return result;        
     }
     
@@ -340,10 +313,10 @@ public abstract class EnsuresPO extends AbstractPO {
         //create formal parameters
         ProgramVariable[] formalParVars = new ProgramVariable[parVars.length];
         for(int i = 0; i < parVars.length; i++) {
-            ProgramElementName name 
+            ProgramElementName pen 
                     = new ProgramElementName("_" + parVars[i].name());
             formalParVars[i] 
-                    = new LocationVariable(name, parVars[i].getKeYJavaType());
+                    = new LocationVariable(pen, parVars[i].getKeYJavaType());
             registerInNamespaces(formalParVars[i]);
         }
         
@@ -355,16 +328,16 @@ public abstract class EnsuresPO extends AbstractPO {
                                       exceptionVar);
         
         //create program term
-        Term programTerm = tf.createProgramTerm(modality, jb, postTerm);
+        Term programTerm = TF.createProgramTerm(modality, jb, postTerm);
         
         //add updates
         Term[] locs   = new Term[parVars.length];
         Term[] values = new Term[parVars.length];
         for(int i = 0; i < parVars.length; i++) {
-            locs[i]   = tb.var(formalParVars[i]);
-            values[i] = tb.var(parVars[i]);
+            locs[i]   = TB.var(formalParVars[i]);
+            values[i] = TB.var(parVars[i]);
         }
-        Term updateTerm = tf.createUpdateTerm(locs, values, programTerm);
+        Term updateTerm = TF.createUpdateTerm(locs, values, programTerm);
         
         return updateTerm;
     }
@@ -372,69 +345,57 @@ public abstract class EnsuresPO extends AbstractPO {
     
     
     //-------------------------------------------------------------------------
-    //methods of ProofOblInput interface
+    //public interface
     //-------------------------------------------------------------------------        
     
     public void readProblem(ModStrategy mod) throws ProofInputException {
-        //make sure initConfig has been set
-        if(initConfig == null) {
-            throw new IllegalStateException("InitConfig not set.");
-        }
-        
         //prepare variables, program method and container for @pre-functions
-        ListOfProgramVariable paramVars = buildParamVars(modelMethod);
-        ProgramMethod programMethod = getProgramMethod(paramVars);
+        ListOfProgramVariable paramVars = buildParamVars(programMethod);
         ProgramVariable selfVar = null;
         if(programMethod != null && !programMethod.isStatic()) {
             selfVar = buildSelfVarAsProgVar();
         }
-        ProgramVariable resultVar = buildResultVar(modelMethod);
+        ProgramVariable resultVar = buildResultVar(programMethod);
         ProgramVariable exceptionVar = buildExcVar();
-        Map atPreFunctions = new HashMap();
+        Map atPreFunctions = new LinkedHashMap();
         
-        try {
-        	//build general assumption
-	        Term gaTerm = buildGeneralAssumption(selfVar, paramVars);
-	        
-	        //get precondition defined by subclass
-	        Term preTerm = getPreTerm(selfVar, 
-	                                  paramVars, 
-	                                  resultVar, 
-	                                  exceptionVar, 
-	                                  atPreFunctions);
-	        
-	        //get postcondition defined by subclass
-	        Term postTerm = getPostTerm(selfVar, 
-	                                    paramVars, 
-	                                    resultVar, 
-	                                    exceptionVar, 
-	                                    atPreFunctions);
-	        
-	        //build program term
-	        Term programTerm = buildProgramTerm(paramVars.toArray(),
-	                                            programMethod,
-	                                            selfVar,
-	                                            resultVar,
-	                                            exceptionVar,
-	                                            postTerm);
+        //build general assumption
+        Term gaTerm = buildGeneralAssumption(selfVar, paramVars);
         
-	        //build definitions for @pre-functions
-	        Term atPreDefinitionsTerm = buildAtPreDefinitions(atPreFunctions);
-	        
-	        //put everything together
-	        Term result = tb.and(atPreDefinitionsTerm, gaTerm);
-	        result = tb.and(result, preTerm);
-	        result = tb.imp(result, programTerm);
-	        
-	
-	        //save in field
-	        poTerms = new Term[]{result};
-	        poTaclets = new SetOfTaclet[]{invTaclets};
-	        
-        } catch (SLTranslationError e) {
-            throw new ProofInputException(e);
-        }
-
+        //get precondition defined by subclass
+        Term preTerm = getPreTerm(selfVar, 
+                                  paramVars, 
+                                  resultVar, 
+                                  exceptionVar, 
+                                  atPreFunctions);
+        
+        //get postcondition defined by subclass
+        Term postTerm = getPostTerm(selfVar, 
+                                    paramVars, 
+                                    resultVar, 
+                                    exceptionVar, 
+                                    atPreFunctions);
+        
+        //build program term
+        Term programTerm = buildProgramTerm(paramVars.toArray(),
+                                            programMethod,
+                                            selfVar,
+                                            resultVar,
+                                            exceptionVar,
+                                            postTerm);
+        
+        //build definitions for @pre-functions
+        Update atPreDefinitions = APF.createAtPreDefinitions(atPreFunctions, 
+                                                             services);
+        
+        //put everything together
+        Term result = TB.imp(TB.and(gaTerm, preTerm), 
+                             uf.apply(atPreDefinitions, programTerm));
+        
+        //save in field
+        poTerms = new Term[]{result};
+        poTaclets = new SetOfTaclet[]{invTaclets};
+        
         //register everything in namespaces
         registerInNamespaces(selfVar);
         registerInNamespaces(paramVars);
@@ -442,26 +403,27 @@ public abstract class EnsuresPO extends AbstractPO {
         registerInNamespaces(exceptionVar);
         registerInNamespaces(atPreFunctions);
     }
-
-
-    public Contractable[] getObjectOfContract() {
-        return new Contractable[] { modelMethod };
-    }
-
     
-    public boolean initContract(Contract ct) {
-        if(!(ct instanceof OldOperationContract)) {
+    
+    public ProgramMethod getProgramMethod() {
+        return programMethod;
+    }
+    
+    
+    public boolean equals(Object o) {
+        if(!(o instanceof EnsuresPO)) {
             return false;
         }
-        
-        OldOperationContract mct = (OldOperationContract)ct;
-        
-        if(! (mct.getModelMethod().equals(modelMethod)
-                && mct.getModality().equals(modality))) {
-            return false;
-        }
-        
-        ct.addCompoundProof(getPO());
-        return true;
+        EnsuresPO po = (EnsuresPO) o;
+        return programMethod.equals(po.programMethod)
+               && modality.equals(po.modality)
+               && assumedInvs.equals(po.assumedInvs);
+    }
+    
+    
+    public int hashCode() {
+        return programMethod.hashCode() 
+               + modality.hashCode() 
+               + assumedInvs.hashCode();
     }
 }

@@ -52,6 +52,8 @@ public class IconFactory {
 	getImage("images/toolbar/decisionProcedureSimplify.png");
 
     private static Image junit = getImage("images/toolbar/junit_logo.png");
+    private static Image jml   = getImage("images/toolbar/jml.png");
+    private static Image uml   = getImage("images/toolbar/uml.png");
 
     private static Image openKeYFile = 
         getImage("images/toolbar/open.png");
@@ -125,6 +127,14 @@ public class IconFactory {
 
     public static ImageIcon junitLogo(int size) {
 	return scaleIcon(junit, size, size);
+    }
+    
+    public static ImageIcon jmlLogo(int size) {
+        return scaleIcon(jml, size, size);
+    }
+    
+    public static ImageIcon umlLogo(int size) {
+        return scaleIcon(uml, size, size);
     }
 
     public static ImageIcon icsLogo(int size) {

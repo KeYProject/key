@@ -36,6 +36,7 @@ public class TermCreationException extends RuntimeException {
             Term[] subs = new Term[failed.arity()];
             for (int i = 0; i<subs.length; i++) {
                 subs[i] = failed.sub(i);
+                assert subs[i] != null;
             }            
             
             errorMessage = 
