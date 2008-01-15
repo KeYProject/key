@@ -563,6 +563,9 @@ storerefname returns [JMLExpression result = null] throws SLTranslationException
     id:IDENT
     {
     	result = lookupIdentifier(id.getText(), null, null);
+    	if(result == null) {
+    	    raiseError("identifier not found: " + id.getText());
+    	}
     }
     | "super"
     {
@@ -1455,6 +1458,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
         	
         	if (!nullable) {
         		if (declVars.head().sort() instanceof ObjectSort) {
+        			p = tb.tt();
         			IteratorOfLogicVariable it = declVars.iterator();
         			while (it.hasNext()) {
         				p = tb.and(p,

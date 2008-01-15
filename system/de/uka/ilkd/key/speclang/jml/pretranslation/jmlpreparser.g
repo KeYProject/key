@@ -133,8 +133,8 @@ classlevel_element[ListOfString mods]
 :
         result=class_invariant[mods]
     |   result=method_specification[mods]
-    |   (field_declaration[mods]) => result=field_declaration[mods]
-    |   result=method_declaration[mods]
+    |   (method_declaration[mods]) => result=method_declaration[mods]
+    |   result=field_declaration[mods]    
     |   result=history_constraint[mods]
     |   result=represents_clause[mods]
     |   result=initially_clause[mods]
@@ -701,7 +701,10 @@ field_declaration[ListOfString mods]
 :
     type:IDENT 	      { sb.append(type.getText() + " "); } 
     name:IDENT 	      { sb.append(name.getText()); }
-    init:INITIALISER  { sb.append(init.getText()); }
+    (
+    	    init:INITIALISER  { sb.append(init.getText()); }
+    	|   semi:SEMICOLON    { sb.append(semi.getText()); }
+    )
     {
         PositionedString ps = createPositionedString(sb.toString(), type);
     	TextualJMLFieldDecl fd = new TextualJMLFieldDecl(mods, ps);
@@ -726,7 +729,10 @@ method_declaration[ListOfString mods]
     type:IDENT 	   	{ sb.append(type.getText() + " "); } 
     name:IDENT 	   	{ sb.append(name.getText()); }
     params:PARAM_LIST   { sb.append(params.getText()); }
-    body:BODY	   	{ sb.append(body.getText()); }
+    (
+    	    body:BODY  	    { sb.append(body.getText()); }
+    	|   semi:SEMICOLON  { sb.append(semi.getText()); }
+    )
     {
         PositionedString ps = createPositionedString(sb.toString(), type);
     	TextualJMLMethodDecl md 

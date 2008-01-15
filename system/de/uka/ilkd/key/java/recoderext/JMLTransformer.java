@@ -148,7 +148,7 @@ public class JMLTransformer extends RecoderModelTransformer {
         for(IteratorOfString it = mods.iterator(); it.hasNext(); ) {
             String mod = it.next();
             if(!javaMods.contains(mod)) {
-                sb.append(mod);
+                sb.append(mod + " ");
             }
         }
         
@@ -246,9 +246,9 @@ public class JMLTransformer extends RecoderModelTransformer {
         //determine parent, child index
         NonTerminalProgramElement astParent
             = originalComments[0].getParent().getASTParent();
-        int childIndex 
-            = astParent.getIndexOfChild(originalComments[0].getParent());
-        
+        int childIndex = 0;
+            //= astParent.getIndexOfChild(originalComments[0].getParent());
+
         //parse declaration, attach to AST
         Declaration ghostDecl;
         try {
@@ -318,8 +318,8 @@ public class JMLTransformer extends RecoderModelTransformer {
         //determine parent, child index
         TypeDeclaration astParent
             = (TypeDeclaration) originalComments[0].getParent().getASTParent();
-        int childIndex 
-            = astParent.getIndexOfChild(originalComments[0].getParent());
+        int childIndex = 0; 
+            //= astParent.getIndexOfChild(originalComments[0].getParent());
         
         //parse declaration, attach to AST
         MethodDeclaration methodDecl;

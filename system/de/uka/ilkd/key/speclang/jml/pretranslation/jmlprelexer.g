@@ -18,7 +18,7 @@ class KeYJMLPreLexer extends Lexer;
 
 options {
     charVocabulary = '\3'..'\377';
-    k=3;
+    k=2;
 }
 
 
@@ -151,16 +151,37 @@ options {
         (~('*').|'*'~'/')
         =>
         (	'\n'         { newline(); }
-            | 	~('@'|'\n')
+            | 	~'@'
         )
     	( 
     	    options { greedy = false; } 
             : 
             	'\n'     { newline(); }
-            |	~('\n') 
+            |	~'\n' 
     	)*
     )? 
     "*/" 
+;
+
+
+protected LETTER
+options {
+    paraphrase = "a letter";
+}
+:
+        'a'..'z'
+    |   'A'..'Z'
+    |   '_'
+    |   '$'
+;
+
+
+protected DIGIT
+options {
+    paraphrase = "a digit";
+}
+:	
+    '0'..'9'
 ;
 
 
@@ -180,7 +201,7 @@ options {
     	|   '\r'
     	|   {acceptAt}? '@'
     	|   ("//@") => "//@"
-    	|   "/*@"
+    	|   ("/*@") => "/*@"
     	|   "@*/"
     	|   "*/"
     	|   SL_COMMENT
@@ -192,22 +213,6 @@ options {
 ;
 
 
-protected LETTER
-options {
-    paraphrase = "letter";
-}
-:
-        'a'..'z'
-    |   'A'..'Z'
-    |   '_'
-    |   '$'
-;
-
-
-protected DIGIT
-:	
-    '0'..'9'
-;
 
 
 IDENT
@@ -230,12 +235,20 @@ options {
 PARAM_LIST
 options {
     paraphrase = "a parameter list";
+    ignore = WS;
 }
 :
     {!expressionMode}?
     '(' 
-    (IDENT IDENT)?
-    (',' IDENT IDENT)* 
+    (
+    	IDENT  { $append(" "); } 
+    	IDENT
+        (
+            ',' 
+            IDENT  { $append(" "); } 
+            IDENT
+        )*
+    )? 
     ')'
 ;   
 
@@ -251,10 +264,10 @@ options {
     {!expressionMode}?
     '{'
     (
-            '{'                      { braceCounter++; }
-        |   {braceCounter > 0}? '}'  { braceCounter--; }
-        |   '\n'                     { newline(); }
-        |   ~'}'
+	    '{'                      { braceCounter++; }
+    	|   {braceCounter > 0}? '}'  { braceCounter--; }
+    	|   '\n'                     { newline(); }
+    	|   ~'}'
     )* 
     {braceCounter == 0}? '}'
 ;
@@ -267,13 +280,21 @@ options {
 :
     {!expressionMode}?
     (
-	    ';'
-	|   (
-	    	'='         { setExpressionMode(true); }
-	    	EXPRESSION  { setExpressionMode(false); }
-	    )
-     )
+	'='         { setExpressionMode(true); }
+	EXPRESSION  { setExpressionMode(false); }
+    )
 ;
+
+
+SEMICOLON
+options {
+    paraphrase = "a semicolon";
+}
+:
+    {!expressionMode}?
+    ';'
+;
+
 
 
 EXPRESSION
@@ -291,6 +312,6 @@ EXPRESSION
     )* 
     {parenthesesCounter == 0}? ';'
     {
-    	expressionMode = false;
+    	setExpressionMode(false);
     }
 ;
