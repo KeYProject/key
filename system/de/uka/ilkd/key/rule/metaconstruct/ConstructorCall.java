@@ -89,7 +89,9 @@ public class ConstructorCall extends ProgramMetaConstruct {
 	final ArrayList evaluatedArgs = new ArrayList();
 	
 	int j=0;
-	if(cd.isLocalClass() || cd.isAnonymousClass() || cd.isInnerClass()){
+	if(cd.isLocalClass() || cd.isInnerClass() || 
+	        cd.isAnonymousClass() && (constructorReference.getReferencePrefix() instanceof Expression ||
+	                ec.getRuntimeInstance()!=null)){
 	    j=1;
 	}
 	final ProgramVariable[] argumentVariables =  

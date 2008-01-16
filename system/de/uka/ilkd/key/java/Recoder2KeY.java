@@ -1418,6 +1418,14 @@ public class Recoder2KeY implements JavaReader{
 
 	KeYJavaType kjt = getKeYJavaType(td);
 	ExtList classMembers = collectChildren(td);       
+	
+/*	if(td.getName() == null){
+	    // anonymous class
+	    classMembers.removeFirstOccurrence(Extends.class);
+	    System.out.println("1 new Extends: "+td.getSupertypes().getClassType(0).getFullName());
+	    classMembers.add(new Extends(new TypeRef(getKeYJavaType(td.getSupertypes().getClassType(0)))));
+	    System.out.println("2 new Extends: "+td.getSupertypes().getClassType(0).getFullName());
+	}*/
 
 	ClassDeclaration keYClassDecl = new ClassDeclaration
 	    (classMembers,
@@ -1564,9 +1572,15 @@ public class Recoder2KeY implements JavaReader{
 	(recoder.abstraction.ClassType classType) {
 
 	recoder.list.ClassTypeList supers=classType.getSupertypes();
+	System.out.println("classType: "+classType.getFullName());
 	SetOfSort ss=SetAsListOfSort.EMPTY_SET;
 	for (int i=0; i<supers.size(); i++) {
-	    ss = ss.add(getKeYJavaType(supers.getClassType(i)).getSort());	    
+	    ss = ss.add(getKeYJavaType(supers.getClassType(i)).getSort());
+	    System.out.println("super: "+supers.getClassType(i).getFullName());
+	}
+	
+	if(classType.getName()==null){
+	    
 	}
 
 	if (ss==SetAsListOfSort.EMPTY_SET && !isObject(classType)) {
@@ -1943,7 +1957,7 @@ public class Recoder2KeY implements JavaReader{
     public FieldSpecification
  	convert(recoder.java.declaration.FieldSpecification recoderVarSpec){
 
-	if (recoderVarSpec == null) { //%%%%%%%%%%%%%	   
+        if (recoderVarSpec == null) { //%%%%%%%%%%%%%	   
             return new FieldSpecification();
 	}
 

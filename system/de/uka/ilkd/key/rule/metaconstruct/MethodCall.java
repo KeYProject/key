@@ -126,8 +126,12 @@ public class MethodCall extends ProgramMetaConstruct {
 	    return ((FieldReference)refPrefix).getProgramVariable()
 		.getKeYJavaType();
 	} else if (refPrefix instanceof SuperReference) {
-	    return services.getJavaInfo().getSuperclass
-		(execContext.getTypeReference().getKeYJavaType()); 	
+	    System.out.println("execContext.getTypeReference().getKeYJavaType(): "+execContext.getTypeReference().getKeYJavaType());
+	    System.out.println("supertype: "+services.getJavaInfo().getSuperclass
+	                (execContext.getTypeReference().getKeYJavaType()));
+	    KeYJavaType st = services.getJavaInfo().getSuperclass
+                (execContext.getTypeReference().getKeYJavaType());
+	    return st; 	
 	} else {
 	    throw new de.uka.ilkd.key.util.NotSupported
 		("Unsupported method invocation mode\n"+

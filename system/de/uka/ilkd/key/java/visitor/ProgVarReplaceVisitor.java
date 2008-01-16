@@ -101,9 +101,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     	ProgramElementName name = pv.getProgramElementName();
     	//%%% HACK: final local variables are not renamed since they can occur in an
     	// anonymous class declared in their scope of visibility.
-    	if(pv.isFinal()){
+/*    	if(pv.isFinal()){
     	    return pv;
-    	}
+    	}*/
 	return new LocationVariable
 	    (VariableNamer.parseName(name.toString() + postFix,
 	    			     name.getCreationInfo()),

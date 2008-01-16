@@ -350,7 +350,7 @@ public class ConstructorNormalformBuilder
 		StatementMutableList initializers = (StatementMutableList)
 		    class2initializers.get(cd);
 		if(ca!=null){
-		    attach(ca, body, 1);
+		    attach(ca, body, 0);
 		}
 		for (int i = 0; i<initializers.size(); i++) {
 		    attach((Statement) 

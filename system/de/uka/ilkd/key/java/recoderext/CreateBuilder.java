@@ -18,7 +18,7 @@ package de.uka.ilkd.key.java.recoderext;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.StatementBlock;
 import recoder.java.declaration.*;
-import recoder.java.declaration.modifier.Private;
+import recoder.java.declaration.modifier.Public;
 import recoder.java.expression.literal.BooleanLiteral;
 import recoder.java.expression.literal.IntLiteral;
 import recoder.java.reference.*;
@@ -90,7 +90,7 @@ public class CreateBuilder extends RecoderModelTransformer {
      */
     public MethodDeclaration createMethod(ClassDeclaration type) {
 	ModifierMutableList modifiers = new ModifierArrayList(2);
-	modifiers.add(new Private());        
+	modifiers.add(new Public());        
 	MethodDeclaration md =  new MethodDeclaration
 	    (modifiers, 
 	     new TypeReference(getId(type)), 

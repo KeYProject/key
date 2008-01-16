@@ -143,9 +143,9 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
     }
 
     protected LocalVariableDeclaration declare
-	(String name, TypeDeclaration type) {
+	(String name, Identifier type) {
 	return new LocalVariableDeclaration
-	    (new TypeReference(getId(type)), 
+	    (new TypeReference(type), 
 	     new Identifier(name));
     }
     

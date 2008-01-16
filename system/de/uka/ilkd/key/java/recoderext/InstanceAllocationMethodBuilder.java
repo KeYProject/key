@@ -2,7 +2,7 @@ package de.uka.ilkd.key.java.recoderext;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.declaration.*;
-import recoder.java.declaration.modifier.Private;
+import recoder.java.declaration.modifier.Public;
 import recoder.java.declaration.modifier.Static;
 import recoder.java.reference.TypeReference;
 import recoder.list.*;
@@ -19,13 +19,13 @@ public class InstanceAllocationMethodBuilder extends RecoderModelTransformer {
     }
     
     /**
-     * creates a method declaration whith no implementation. The methods intention is
+     * creates a method declaration with no implementation. The methods intention is
      * to allocate a new object of the type it is declared in and to return it.
      * The functionality will be described using taclets
      */
     private MethodDeclaration createAllocateMethod(ClassDeclaration type) {
         ModifierMutableList modifiers = new ModifierArrayList(2);
-        modifiers.add(new Private());
+        modifiers.add(new Public());
         modifiers.add(new Static());    
         
         ParameterDeclarationArrayList pdal = new ParameterDeclarationArrayList(0);
