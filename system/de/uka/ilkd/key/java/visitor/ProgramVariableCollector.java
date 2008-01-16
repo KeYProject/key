@@ -10,11 +10,18 @@
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.HashSet;
+import java.util.Map;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.BasicLocationDescriptor;
+import de.uka.ilkd.key.logic.EverythingLocationDescriptor;
+import de.uka.ilkd.key.logic.IteratorOfLocationDescriptor;
 import de.uka.ilkd.key.logic.IteratorOfTerm;
+import de.uka.ilkd.key.logic.LocationDescriptor;
+import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
+import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -29,7 +36,6 @@ import de.uka.ilkd.key.speclang.LoopInvariant;
  */
 public class ProgramVariableCollector extends JavaASTVisitor {
 
-    private static final TermBuilder TB = TermBuilder.DF;
     private final HashSet result = new HashSet();
 
     /**
@@ -74,14 +80,38 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     public void performActionOnLoopInvariant(LoopInvariant x) {
         TermProgramVariableCollector tpvc = 
             new TermProgramVariableCollector(services);
-        Term pseudoSelfTerm = x.getSelfVar() == null 
-                              ? null 
-                              : TB.var(x.getSelfVar());
-        x.getInvariant(pseudoSelfTerm).execPostOrder(tpvc);
-        IteratorOfTerm it = x.getPredicates(pseudoSelfTerm).iterator();
-        while(it.hasNext()) {
+        Term selfTerm = x.getInternalSelfTerm();
+        Map atPreFunctions = x.getInternalAtPreFunctions();
+        
+        //invariant
+        x.getInvariant(selfTerm, atPreFunctions, services).execPostOrder(tpvc);
+        
+        //predicates
+        SetOfTerm preds = x.getPredicates(selfTerm, atPreFunctions, services);
+        for(IteratorOfTerm it = preds.iterator(); it.hasNext(); ) {
             it.next().execPostOrder(tpvc);
         }
+        
+        //modifies
+        SetOfLocationDescriptor mod 
+            = x.getModifies(selfTerm, atPreFunctions, services);
+        for(IteratorOfLocationDescriptor it = mod.iterator(); it.hasNext(); ) {
+            LocationDescriptor loc = it.next();
+            if(loc instanceof BasicLocationDescriptor) {
+                BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
+                bloc.getFormula().execPostOrder(tpvc);
+                bloc.getLocTerm().execPostOrder(tpvc);
+            } else {
+                assert loc instanceof EverythingLocationDescriptor;
+            }
+        }
+        
+        //variant
+        Term v = x.getVariant(selfTerm, atPreFunctions, services);
+        if(v != null) {
+            v.execPostOrder(tpvc);
+        }
+
         result.addAll(tpvc.result());
     }
 }

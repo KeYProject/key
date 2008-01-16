@@ -335,7 +335,7 @@ options {
     private Term convertToOld(Term term) {
         assert atPreFunctions != null;
         Operator newOp;
-        if(term.op() instanceof NonRigid) {
+        if(term.op() instanceof NonRigid && term.op() != selfVar) {
             Function atPreFunc = (Function) atPreFunctions.get(term.op());
             if(atPreFunc == null) {
                 atPreFunc = APF.createAtPreFunction(term.op(), services);
@@ -344,13 +344,13 @@ options {
             }        	
             newOp = atPreFunc;
         } else {
-        	newOp = term.op();
+            newOp = term.op();
         }
         
         Term[] subTerms = getSubTerms(term);
         Term[] newSubTerms = new Term[subTerms.length];
         for(int i = 0; i < subTerms.length; i++) {
-        	newSubTerms[i] = convertToOld(subTerms[i]);
+            newSubTerms[i] = convertToOld(subTerms[i]);
         }
         
         Term result = tb.tf().createTerm(newOp, 

@@ -652,7 +652,7 @@ public class JMLSpecFactory {
                                      predicates,
                                      assignable,
                                      variant,
-                                     selfVar,
+                                     TB.var(selfVar),
                                      atPreFunctions,
                                      true);
     }

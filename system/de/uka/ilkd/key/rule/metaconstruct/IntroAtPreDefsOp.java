@@ -9,9 +9,15 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.IteratorOfLoopStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -19,6 +25,8 @@ import de.uka.ilkd.key.java.statement.SetAsListOfLoopStatement;
 import de.uka.ilkd.key.java.statement.SetOfLoopStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
+import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.UpdateFactory;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
@@ -26,6 +34,7 @@ import de.uka.ilkd.key.proof.AtPreFactory;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 
 
 /**
@@ -48,38 +57,70 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
         assert pe != null;
                 
         //collect all loops in the innermost method frame
-        SetOfLoopStatement loops = new JavaASTVisitor(pe, services) {
-            private SetOfLoopStatement result = SetAsListOfLoopStatement.EMPTY_SET;
-            private boolean done = false;
+        Object[] frameAndLoops = new JavaASTVisitor(pe, services) {
+            private MethodFrame frame = null;
+            private SetOfLoopStatement loops = SetAsListOfLoopStatement.EMPTY_SET;
             protected void doDefaultAction(SourceElement node) {
                 if(node instanceof MethodFrame) {
-                    done = true;
-                } else if(node instanceof LoopStatement && !done) {
-                    result = result.add((LoopStatement) node);
+                    frame = (MethodFrame) node;
+                } else if(frame == null && node instanceof LoopStatement) {
+                    loops = loops.add((LoopStatement) node);
                 }
             }
-            public SetOfLoopStatement run() {
+            public Object[] run() {
                 walk(root());
-                return result;
+                return new Object[]{frame, loops};
             }
         }.run();
+        MethodFrame frame = (MethodFrame) frameAndLoops[0];
+        SetOfLoopStatement loops = (SetOfLoopStatement) frameAndLoops[1];
         
-        //create update defining all atPre symbols used in these loops
-        UpdateFactory uf = new UpdateFactory(services, 
-                                             services.getProof().simplifier());
-        Update atPreUpdate = uf.skip();
-        IteratorOfLoopStatement it = loops.iterator();
-        while(it.hasNext()) {
+        //determine "self"
+        Term selfTerm;
+        ExecutionContext ec = (ExecutionContext) frame.getExecutionContext();
+        ReferencePrefix rp = ec.getRuntimeInstance();
+        if(rp == null || rp instanceof TypeReference) {
+            selfTerm = null;
+        } else {
+            selfTerm = services.getTypeConverter().convertToLogicElement(rp);
+        }
+
+        //collect atPre-functions, update loop invariants
+        Map atPreFunctions = new LinkedHashMap();
+        for(IteratorOfLoopStatement it = loops.iterator(); it.hasNext(); ) {
             LoopStatement loop = it.next();
-            LoopInvariant inv = services.getSpecificationRepository()
-                                        .getLoopInvariant(loop);
+            LoopInvariant inv 
+                = services.getSpecificationRepository().getLoopInvariant(loop);
             if(inv != null) {
-                Update u = APF.createAtPreDefinitions(inv.getAtPreFunctions(), 
-                                                      services);                
-                atPreUpdate = uf.parallel(atPreUpdate, u);
+                Term newInvariant 
+                    = inv.getInvariant(selfTerm, atPreFunctions, services);
+                SetOfTerm newPredicates
+                    = inv.getPredicates(selfTerm, atPreFunctions, services);
+                SetOfLocationDescriptor newModifies
+                    = inv.getModifies(selfTerm, atPreFunctions, services);
+                Term newVariant
+                    = inv.getVariant(selfTerm, atPreFunctions, services);
+                boolean newPredicateHeuristicsAllowed
+                    = inv.getPredicateHeuristicsAllowed();
+                
+                LoopInvariant newInv 
+                    = new LoopInvariantImpl(loop, 
+                                            newInvariant, 
+                                            newPredicates,
+                                            newModifies, 
+                                            newVariant, 
+                                            selfTerm,
+                                            atPreFunctions,
+                                            newPredicateHeuristicsAllowed);
+                services.getSpecificationRepository().setLoopInvariant(newInv);                
             }
         }
         
+        //define atPre symbols
+        UpdateFactory uf 
+            = new UpdateFactory(services, services.getProof().simplifier());
+        Update atPreUpdate 
+            = APF.createAtPreDefinitions(atPreFunctions, services);
         return uf.apply(atPreUpdate, target);
     }
 }

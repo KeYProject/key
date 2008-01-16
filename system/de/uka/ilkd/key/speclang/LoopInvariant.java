@@ -12,12 +12,12 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.Map;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
 import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
 
 
 /**
@@ -34,22 +34,35 @@ public interface LoopInvariant {
     /**
      * Returns the invariant formula.
      */
-    public Term getInvariant(Term selfTerm);
+    public Term getInvariant(Term selfTerm, 
+                             /*inout*/ Map /*Operator (normal) 
+                             -> Function (atPre)*/ atPreFunctions,
+                             Services services);
     
     /**
      * Returns the set of loop predicates.
      */
-    public SetOfTerm getPredicates(Term selfTerm);
+    public SetOfTerm getPredicates(Term selfTerm, 
+                                   /*inout*/ Map /*Operator (normal) 
+                                   -> Function (atPre)*/ atPreFunctions,
+                                   Services services);
     
     /**
      * Returns the modifier set.
      */
-    public SetOfLocationDescriptor getModifies(Term selfTerm);
+    public SetOfLocationDescriptor getModifies(
+                                    Term selfTerm, 
+                                    /*inout*/ Map /*Operator (normal) 
+                                    -> Function (atPre)*/ atPreFunctions,
+                                    Services services);
     
     /**
      * Returns the variant term. 
      */
-    public Term getVariant(Term selfTerm);
+    public Term getVariant(Term selfTerm, 
+                           /*inout*/ Map /*Operator (normal) 
+                           -> Function (atPre)*/ atPreFunctions,
+                           Services services);
     
     /**
      * Tells whether using heuristics for generating additional loop predicates 
@@ -58,15 +71,16 @@ public interface LoopInvariant {
     public boolean getPredicateHeuristicsAllowed();
     
     /**
-     * Returns the variable used for self.
+     * Returns the term internally used for self. 
+     * Use with care - it is likely that this is *not* the right "self" for you.
      */
-    public ParsableVariable getSelfVar();
-
+    public Term getInternalSelfTerm();
+    
     /**
-     * Returns the map of atPre-functions.
+     * Returns a copy of the internal map of atPre-functions.
      */
-    public /*inout*/ Map /*Operator (normal) 
-                           -> Function (atPre)*/ getAtPreFunctions();
+    public Map /*Operator (normal) -> Function (atPre)*/ 
+                                                getInternalAtPreFunctions();
     
     /**
      * Returns a new loop invariant where the loop reference has been
@@ -79,13 +93,21 @@ public interface LoopInvariant {
      * repaced with the passed one. Take care: the variables used for
      * the receiver, parameters, and local variables must stay the same!
      */
-    public LoopInvariant setInvariant(Term invariant, Term selfTerm); 
+    public LoopInvariant setInvariant(Term invariant, 
+                                      Term selfTerm,
+                                      /*inout*/ Map /*Operator (normal) 
+                                      -> Function (atPre)*/ atPreFunctions,
+                                      Services services); 
     
     /**
      * Returns a new loop invariant where the loop predicates have been 
      * replaced with the passed ones.
      */
-    public LoopInvariant setPredicates(SetOfTerm predicates, Term selfTerm);
+    public LoopInvariant setPredicates(SetOfTerm predicates, 
+                                       Term selfTerm,
+                                       /*inout*/ Map /*Operator (normal) 
+                                       -> Function (atPre)*/ atPreFunctions,
+                                       Services services);
     
     /**
      * Returns a new loop invariant where the flag for predicate generation

@@ -272,38 +272,50 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                              LoopStatement newLoop) {
         LoopInvariant inv 
             = services.getSpecificationRepository().getLoopInvariant(oldLoop);
-        if(inv != null) {
-            ParsableVariable selfVar = ((LoopInvariantImpl) inv).getSelfVar();
-            Term selfTerm = (selfVar != null 
-                             ? TermBuilder.DF.var(selfVar) 
-                             : null);
-            Term newInvariant 
-                = replaceVariablesInTerm(inv.getInvariant(selfTerm));
-            SetOfTerm newPredicates 
-                = replaceVariablesInTerms(inv.getPredicates(selfTerm));
-            boolean newPredicateHeuristicsAllowed
-                = inv.getPredicateHeuristicsAllowed();
-            SetOfLocationDescriptor newModifies
-                = replaceVariablesInLocs(inv.getModifies(selfTerm));
-            Term newVariant
-                = replaceVariablesInTerm(inv.getVariant(selfTerm));
-            ParsableVariable newSelfVar
-                = (ProgramVariable)replaceMap.get(selfVar);
-            Map newAtPreFunctions
-                = replaceVariablesInMap(inv.getAtPreFunctions());
-            if(newSelfVar == null) {
-                newSelfVar = selfVar;
-            }
-            LoopInvariant newInv 
-                = new LoopInvariantImpl(newLoop, 
-                                        newInvariant, 
-                                        newPredicates,
-                                        newModifies, 
-                                        newVariant, 
-                                        newSelfVar,
-                                        newAtPreFunctions,
-                                        newPredicateHeuristicsAllowed);
-            services.getSpecificationRepository().setLoopInvariant(newInv);
+        if(inv == null) {
+            return;
         }
+        Term selfTerm = inv.getInternalSelfTerm();
+        Map atPreFunctions = inv.getInternalAtPreFunctions();
+        
+        //invariant
+        Term newInvariant 
+            = replaceVariablesInTerm(inv.getInvariant(selfTerm, 
+                                                      atPreFunctions, 
+                                                      services));
+        
+        //predicates
+        SetOfTerm newPredicates 
+            = replaceVariablesInTerms(inv.getPredicates(selfTerm, 
+                                                        atPreFunctions, 
+                                                        services));
+        
+        //modifies
+        SetOfLocationDescriptor newModifies
+            = replaceVariablesInLocs(inv.getModifies(selfTerm, 
+                                                     atPreFunctions, 
+                                                     services));
+        
+        //variant
+        Term newVariant
+            = replaceVariablesInTerm(inv.getVariant(selfTerm, 
+                                                    atPreFunctions, 
+                                                    services));
+        
+        Term newSelfTerm = replaceVariablesInTerm(selfTerm); 
+        Map newAtPreFunctions = replaceVariablesInMap(atPreFunctions);
+        boolean newPredicateHeuristicsAllowed
+            = inv.getPredicateHeuristicsAllowed();
+
+        LoopInvariant newInv 
+            = new LoopInvariantImpl(newLoop, 
+                                    newInvariant, 
+                                    newPredicates,
+                                    newModifies, 
+                                    newVariant, 
+                                    newSelfTerm,
+                                    newAtPreFunctions,
+                                    newPredicateHeuristicsAllowed);
+        services.getSpecificationRepository().setLoopInvariant(newInv);
     }
 }

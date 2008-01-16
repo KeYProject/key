@@ -13,7 +13,6 @@ package de.uka.ilkd.key.speclang;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
@@ -82,7 +81,7 @@ public class OperationContractImpl implements OperationContract {
             		         ListOfParsableVariable paramVars,
             		         ParsableVariable resultVar,
             		         ParsableVariable excVar,
-                                 /*inout*/ Map /*Operator (normal) 
+                                 /*in*/ Map /*Operator (normal) 
                                  -> Function (atPre)*/ atPreFunctions) {
         assert name != null && !name.equals("");
         assert displayName != null && !displayName.equals("");

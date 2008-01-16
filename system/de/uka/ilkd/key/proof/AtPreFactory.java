@@ -95,6 +95,9 @@ public class AtPreFactory {
             //HACK: Oddly, the length attribute is contained in a kjt "(SuperArray, null)",
             //i.e. its argument does not have a sort. Therefore, we have to treat this case 
             //separately.
+            //This hack works to a point, but it can lead to unparseable 
+            //formulas, since the length attribute is not actually defined on 
+            //java.lang.Object. We need a SuperArray sort! /BW
             if(aop.attribute().equals(services.getJavaInfo()
                                               .getArrayLength())) {
                 Sort objectSort 
