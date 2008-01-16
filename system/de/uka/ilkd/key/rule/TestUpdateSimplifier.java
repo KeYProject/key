@@ -1512,6 +1512,20 @@ public class TestUpdateSimplifier extends TestCase {
             t1.sub(1));
     }
 
+    public void testLocationFunction() {
+        for (int i=1;i<4;i++) {
+            ProofAggregate proofList = helper.parse(new File(testRules
+                    + File.separator + "testLocationFunction" + i + ".key"));
+            Term t1 = helper.extractProblemTerm(proofList.getFirstProof());
+            UpdateSimplifier us = new UpdateSimplifier(true, false);
+            assertEqualsModRenaming(
+                    us.simplify(t1.sub(0), 
+                            proofList.getFirstProof().getServices()), 
+                            t1.sub(1));
+        }
+    }
+
+    
     public static void main(String[] args) {
         TestUpdateSimplifier tsus = new TestUpdateSimplifier("t");
         tsus.setUp();
