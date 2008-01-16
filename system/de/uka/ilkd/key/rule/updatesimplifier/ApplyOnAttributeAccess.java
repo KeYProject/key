@@ -1,3 +1,4 @@
+
 // This file is part of KeY - Integrated Deductive Software Design
 // Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
@@ -45,7 +46,10 @@ public class ApplyOnAttributeAccess extends ApplyOnAccessTerm {
      * attribute operator
      */
     public boolean isApplicable (Update update, Term target) {
-        return (target.op () instanceof AttributeOp)|| (target.op() instanceof NonRigidFunctionLocation);
+        return (target.op () instanceof AttributeOp)
+                || 
+                (target.op() instanceof NonRigidFunctionLocation && 
+                        target.op().arity() > 0);
     }    
 
     /**
@@ -122,24 +126,27 @@ public class ApplyOnAttributeAccess extends ApplyOnAccessTerm {
                 UpdateSimplifierTermFactory.DEFAULT.getBasicTermFactory ();
 
             Term res = getCurrentPair ().guard ();
-            final Term eqObjects =
-                compareObjects ( targetSubs.getTerm ( 0 ),
-                                 getCurrentPair ().locationSubs ()[0] );
-            res = tf.createJunctorTermAndSimplify ( Op.AND, res, eqObjects );
             
-            // attention we need not to take care of 
-            // the case {o.a':=t}o.a --> o.a as in this case this method must not 
-            // be called (hint:update.getAssignmentPairs ( (Location)target.op () )
-            // returns only possible aliased assignement pairs)
-            if ( targetLoc instanceof ShadowedOperator &&
-                getCurrentPair().location() instanceof ShadowedOperator ) {
-                // in this case a conjunction of conditions has to be used
-                // as the transaction number needs to be checked as well  
-                final Term eqTrans =
-                    tf.createEqualityTerm(targetSubs.getTerm ( 1 ),
-                                          getCurrentPair ().locationSubs ()[1]);
-                res = tf.createJunctorTermAndSimplify ( Op.AND, res, eqTrans );
+            assert (targetLoc instanceof ShadowedOperator &&
+		    getCurrentPair().location() instanceof AttributeOp)
+		||targetSubs.size() == getCurrentPair().locationSubs().length;
+
+            for (int i = 0, arity = targetSubs.size(); i < arity; i++) {
+//              attention we need not to take care of 
+                // the case {o.a':=t}o.a --> o.a as in this case this method must not 
+                // be called (hint:update.getAssignmentPairs ( (Location)target.op () )
+                // returns only possible aliased assignement pairs)
+                if ( !(targetLoc instanceof ShadowedOperator) ||
+                    getCurrentPair().location() instanceof ShadowedOperator || i != 1) {               
+                    final Term eqObjects =
+                        compareObjects ( targetSubs.getTerm ( i ),
+                                getCurrentPair ().locationSubs ()[i] );
+                    res = tf.createJunctorTermAndSimplify ( Op.AND, res, eqObjects );
+                }
             }
+                
+            
+            
             
             return res;
         }
