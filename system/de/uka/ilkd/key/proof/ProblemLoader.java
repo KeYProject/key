@@ -260,6 +260,7 @@ public class ProblemLoader implements Runnable {
             if (currNode == null) currNode = children.next();
             // otherwise we already fetched the node at branch point
             currGoal      = proof.getGoal(currNode);
+            mediator.getSelectionModel().setSelectedGoal(currGoal);
             currTacletName= s;
             // set default state
             currFormula   = 0;
@@ -307,7 +308,7 @@ public class ProblemLoader implements Runnable {
         case 'n' : //BuiltIn rules
             if (currNode == null) currNode = children.next();
             currGoal      = proof.getGoal(currNode);
-
+            mediator.getSelectionModel().setSelectedGoal(currGoal);
             currTacletName = s;
             // set default state
             currFormula   = 0;
