@@ -211,7 +211,8 @@ public class TermBuilder {
 	} else if(v instanceof LogicVariable) {
 	    return var((LogicVariable) v);
 	} else {
-	    throw new IllegalArgumentException("Wrong parsablevariable kind.");
+	    throw new IllegalArgumentException("Wrong parsablevariable kind: " 
+	                                        + v.getClass());
 	}
     }
 
