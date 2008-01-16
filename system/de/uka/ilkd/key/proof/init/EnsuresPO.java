@@ -389,7 +389,7 @@ public abstract class EnsuresPO extends AbstractPO {
                                                              services);
         
         //put everything together
-        Term result = TB.imp(TB.and(gaTerm, preTerm), 
+        Term result = TB.imp(TB.and(gaTerm, uf.apply(atPreDefinitions, preTerm)), 
                              uf.apply(atPreDefinitions, programTerm));
         
         //save in field

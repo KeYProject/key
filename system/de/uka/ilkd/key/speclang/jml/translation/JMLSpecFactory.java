@@ -647,12 +647,13 @@ public class JMLSpecFactory {
         }
         
         //create loop invariant annotation
+        Term selfTerm = selfVar == null ? null : TB.var(selfVar);
         return new LoopInvariantImpl(loop,
                                      invariant,
                                      predicates,
                                      assignable,
                                      variant,
-                                     selfVar,
+                                     selfTerm,
                                      atPreFunctions,
                                      true);
     }

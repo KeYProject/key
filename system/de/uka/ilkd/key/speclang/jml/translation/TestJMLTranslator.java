@@ -231,7 +231,7 @@ public class TestJMLTranslator extends TestCase {
 
         assert result != null;
         assertTrue(result.getAxioms().isEmpty());
-        assertTrue(atPreDefs.size() == 2); // one for "this" and one for "i"
+        assertTrue(atPreDefs.size() == 1); // for "i"
         assertTrue(result.getFormula().op().equals(Op.EQUALS));
     }
 

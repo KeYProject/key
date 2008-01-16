@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.proof;
 
 import java.io.IOException;
+import java.util.Map;
 
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -171,21 +172,22 @@ public class LoopInvariantProposer implements InstantiationProposer {
             
             //determine instantiation
             final Term selfTerm = getInnermostSelfTerm(pos.subTerm(), services);
+            final Map atPreFunctions = inv.getInternalAtPreFunctions();
             final String varName = var.name().toString();
             if (varName.equals("inv")) {
                 assert var.isFormulaSV();
-                inst = inv.getInvariant(selfTerm);
+                inst = inv.getInvariant(selfTerm, atPreFunctions, services);
             } else if(varName.equals("predicates")) {
                 assert var.isListSV();
                 assert var.matchType() == Term.class;
-                inst =inv.getPredicates(selfTerm);
+                inst =inv.getPredicates(selfTerm, atPreFunctions, services);
             } else if(varName.equals("#modifies")) {
                 assert var.isListSV();
                 assert var.matchType() == LocationDescriptor.class;
-                inst = inv.getModifies(selfTerm);
+                inst = inv.getModifies(selfTerm, atPreFunctions, services);
             } else if(varName.equals("variant")) {
                 assert var.isTermSV();
-                inst = inv.getVariant(selfTerm);
+                inst = inv.getVariant(selfTerm, atPreFunctions, services);
             }
         }
         
