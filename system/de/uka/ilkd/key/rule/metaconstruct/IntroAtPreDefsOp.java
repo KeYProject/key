@@ -92,6 +92,10 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
             LoopInvariant inv 
                 = services.getSpecificationRepository().getLoopInvariant(loop);
             if(inv != null) {
+                if(selfTerm != null && inv.getInternalSelfTerm() == null) {
+                    //we're calling a static method from an instance context
+                    selfTerm = null;
+                }
                 Term newInvariant 
                     = inv.getInvariant(selfTerm, atPreFunctions, services);
                 SetOfTerm newPredicates
