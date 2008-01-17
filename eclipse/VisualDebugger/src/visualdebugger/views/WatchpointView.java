@@ -35,6 +35,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 import de.uka.ilkd.key.visualdebugger.WatchPoint;
 import de.uka.ilkd.key.visualdebugger.WatchPointManager;
 
@@ -54,6 +55,8 @@ public class WatchpointView extends ViewPart {
 
 	/** The watch point manager. */
 	private WatchPointManager watchPointManager;
+	
+	private VisualDebugger vd = null;
 
 	/**
 	 * The Class WatchPointContentProvider.
@@ -145,7 +148,7 @@ public class WatchpointView extends ViewPart {
 	 * Instantiates a new breakpoint view.
 	 */
 	public WatchpointView() {
-
+		vd = VisualDebugger.getVisualDebugger();
 	}
 
 	/**
@@ -281,9 +284,10 @@ public class WatchpointView extends ViewPart {
 					String expression = dialog.open();
 					if (expression != null) {
 
-						watchPointManager.addWatchPoint(new WatchPoint(
+						watchPointManager.addWatchPoint(new WatchPoint(information[4],
 								expression, information[0], information[1],
 								information[2]));
+						vd.setWatchPointManager(watchPointManager);
 						viewer.refresh();
 
 					}
@@ -342,11 +346,12 @@ public class WatchpointView extends ViewPart {
 	 *			information[1]= The line offset where the text selection begins.
 	 * 			information[2]= The name of the file in which the WatchPoint was set.
 	 * 			information[3]= The actual the source code for validating the WatchPoint.
-	 * 
+	 * 			information[4]= The unique name of the boolean variable that is used to validate the watchpoint.
 	 */
 	private String[] getWatchPointInf() {
-
-		String[] information = new String[4];
+		
+		String[] information = new String[5];
+		String varName = "myDummy";
 
 		IEditorPart editor = PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow().getActivePage().getActiveEditor();
@@ -370,13 +375,19 @@ public class WatchpointView extends ViewPart {
 
 			try {
 				source = unit.getBuffer().getContents();
+				
+				while(source.indexOf(varName) > (-1)){
+					varName  = varName.concat("x");
+				}
+				
 			} catch (JavaModelException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
 			information[3] = source;
-
+			information[4] = varName;
+			
 			// creation of DOM/AST from a ICompilationUnit
 			ASTParser parser = ASTParser.newParser(AST.JLS3);
 			parser.setResolveBindings(true);
@@ -411,6 +422,7 @@ public class WatchpointView extends ViewPart {
 			}
 
 		}
+		
 		return information;
 
 	}

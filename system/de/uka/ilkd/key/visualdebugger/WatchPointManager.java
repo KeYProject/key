@@ -8,14 +8,14 @@ import java.util.LinkedList;
 public class WatchPointManager {
 
     /** The watch points. */
-    private LinkedList watchPoints = new LinkedList();
+    private LinkedList<WatchPoint> watchPoints = new LinkedList<WatchPoint>();
 
     /**
      * Gets the watch points.
      * 
      * @return the watch points
      */
-    public LinkedList getWatchPoints() {
+    public LinkedList<WatchPoint> getWatchPoints() {
         return watchPoints;
     }
     

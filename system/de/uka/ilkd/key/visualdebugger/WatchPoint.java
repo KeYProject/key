@@ -4,6 +4,9 @@ package de.uka.ilkd.key.visualdebugger;
  * The Class WatchPoint.
  */
 public class WatchPoint {
+
+    /** The name of the temporary variable in the file. ... boolean name_of_watchpoint = expr; */
+    private String name;
     
     /** The watch expression. */
     private String expression;
@@ -25,9 +28,10 @@ public class WatchPoint {
      * @param method the method
      * @param statement_line the statement_line
      */
-    public WatchPoint(String expression, String method,
+    public WatchPoint(String name, String expression, String method,
             String statement_line, String file) {
         super();
+        this.name = name;
         this.expression = expression;
         this.method = method;
         this.statement_line = statement_line;
@@ -70,6 +74,11 @@ public class WatchPoint {
      */
     public String getStatement_line() {
         return statement_line;
+    }
+
+
+    public String getName() {
+        return name;
     }
 
 

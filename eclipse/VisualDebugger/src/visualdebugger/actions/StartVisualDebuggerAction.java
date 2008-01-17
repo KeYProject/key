@@ -843,7 +843,7 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 	* @see de.uka.ilkd.key.gui.ProverTaskListener#taskFinished()
 	*/
 	public void taskFinished() {
-	System.out.println("task finished");
+	//System.out.println("task finished");
 	
 	}
 	

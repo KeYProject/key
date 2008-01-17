@@ -519,6 +519,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 				currentETRootNode = null;
 				final ListOfGoal goals = getSubtreeGoalsForETNode(((SourceElementFigure) ExecutionTreeView.this.selected)
 						.getETNode());
+	            int i = vd.translateWatchpoints();
 				vd.run(goals);
 			}
 
@@ -1587,7 +1588,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
 			Display.getDefault().syncExec(new Runnable() {
 				public void run() {
-					System.out.println(progress + ":" + pb.getMaximum());
+					//System.out.println(progress + ":" + pb.getMaximum());
 					pb.setSelection(progress);
 				}
 			});

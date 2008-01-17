@@ -11,6 +11,7 @@ import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.java.ArrayOfExpression;
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.ListOfExpression;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.ClassType;
@@ -83,6 +84,11 @@ public class VisualDebugger {
 
     /** The ExecutionTreeView's progress monitor. */
     private ProgressMonitor etProgressMonitor = null;
+    
+    private WatchPointManager watchPointManager = null;
+    
+    // Key representation of watchpoints
+    private ListOfExpression listOfExpression = null;
 
     /** The Constant tempDir. A temporary directory in the users home: ~/tmp/visualdebugger. */
     public static final String tempDir = System.getProperty("user.home")
@@ -273,6 +279,7 @@ public class VisualDebugger {
      */
     protected VisualDebugger() {
         bpManager = new BreakpointManager(this);
+        watchPointManager = new WatchPointManager();
 
         // main = Main.getInstance();
     }
@@ -1753,8 +1760,7 @@ public class VisualDebugger {
          */
         public void taskFinished() {
             pm.setProgress(300);
-            System.out.println("task finished");
-        }
+           }
 
         /* (non-Javadoc)
          * @see de.uka.ilkd.key.gui.ProverTaskListener#taskProgress(int)
@@ -1771,6 +1777,50 @@ public class VisualDebugger {
             //System.out.println("taskStarted -size:" + size);
             pm.setMaximum(300);
 
+        }
+    }
+
+    public WatchPointManager getWatchPointManager() {
+        return watchPointManager;
+    }
+
+    public void setWatchPointManager(WatchPointManager watchPointManager) {
+        this.watchPointManager = watchPointManager;
+    }
+    /**
+     * Translates the WatchPoints into KeY data structures.
+     * */
+    public int translateWatchpoints() {
+
+        LinkedList<WatchPoint> watchpoints = watchPointManager.getWatchPoints();
+        int count = watchpoints.size();
+
+        if (watchpoints == null || count == 0) {
+            System.out.println("No watches created so far");
+            return 0;
+        } else {
+            for (int i = 0; i < count; i++) {
+                
+            WatchPoint wp = watchpoints.get(i);
+            StringBuffer buffer = new StringBuffer();
+            buffer.append("\\<{A self; }>");
+           
+            String file = wp.getFile();
+            // Pretty.java
+            String self = file.substring(file.lastIndexOf("/") + 1);
+            // Pretty
+            self = self.substring(0, self.indexOf("."));
+            file = file.substring(0,file.indexOf("."));
+            file = file.replace("/", ".");    
+            
+            buffer.append("<{method-frame( source=" + file + ", this=self_" + self);
+            buffer.append(" ) : }{boolean " + wp.getName() + " = " + wp.getExpression());
+            buffer.append(";} }\\> true");
+            System.out.println(buffer.toString());
+            ProblemLoader.parseTerm(buffer.toString(), this.getMediator().getProof());           
+            
+            }
+            return count;
         }
     }
 }

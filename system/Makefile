@@ -81,7 +81,7 @@ endif
 ifeq ($(JAVAC),jikes) 
 VERSION=$(shell jikes -version | grep "Version" )
 VERSION:=$(wordlist 5,5,$(VERSION))
-OPTIONS=$(COMMON_OPTIONS) +D +E +P -source 1.4 -classpath $(JIKESPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
+OPTIONS=$(COMMON_OPTIONS) +D +E +P -source 5 -classpath $(JIKESPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
 ifeq ($(VERSION), 1.19)
 else 
 OPTIONS:=+Peffective-java $(OPTIONS) 
@@ -93,7 +93,7 @@ else
     ifeq ($(JAVAC),ejc)      
        OPTIONS=$(COMMON_OPTIONS) -warn:uselessTypeCheck,localHiding,fieldHiding,tasks\(TODO\|HACK\|%%%\)  -source 1.4 -classpath $(JAVA_HOME)/jre/lib/rt.jar:$(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
     else 
-      OPTIONS=$(COMMON_OPTIONS) -J-Xmx512m -nowarn -source 1.4 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
+      OPTIONS=$(COMMON_OPTIONS) -J-Xmx512m -nowarn -source 5 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
     endif
   endif
 endif
