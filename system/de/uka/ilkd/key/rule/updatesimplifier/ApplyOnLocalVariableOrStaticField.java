@@ -10,9 +10,7 @@ package de.uka.ilkd.key.rule.updatesimplifier;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.SetAsListOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.AbstractUpdateRule;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
 
@@ -41,7 +39,9 @@ public class ApplyOnLocalVariableOrStaticField extends AbstractUpdateRule {
      * variable
      */
     public boolean isApplicable(Update update, Term target) {	
-	return target.op() instanceof LocationVariable;	    
+        return target.op() instanceof LocationVariable
+                       || target.op() instanceof NonRigidFunctionLocation 
+                            && target.op().arity() == 0; 
     }
 
     /**     
@@ -60,7 +60,7 @@ public class ApplyOnLocalVariableOrStaticField extends AbstractUpdateRule {
     
     private PVIfExCascade createCascade (Update update, Term target) {
         return new PVIfExCascade ( update.getAssignmentPairs
-                                   ( (LocationVariable)target.op () ) );
+                                   ( (Location)target.op () ) );
     }
 
     private static class PVIfExCascade extends IterateAssignmentPairsIfExCascade {

@@ -150,6 +150,8 @@ tokens {
 	RULES = "\\rules";
         PROBLEM = "\\problem";
         HOARE = "\\hoare";
+        HOARE_TOTAL = "\\hoareTotal";
+        HOARE_ET = "\\hoareET";
         CHOOSECONTRACT = "\\chooseContract";
         PROOF = "\\proof";
         CONTRACTS = "\\contracts";

@@ -14,6 +14,8 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.parser.TermParserFactory;
@@ -29,11 +31,14 @@ public class HoareLoopInvRuleMenuItem extends JMenuItem implements BuiltInRuleMe
     private final PosInOccurrence pio;
     private final Goal goal;
     private Term inv;
-   
+    private Term decreases;
+    private final Modality modus;
+    
     public HoareLoopInvRuleMenuItem(PosInOccurrence posInOccurrence, Goal goal) {
         super(HoareLoopInvariantRule.INSTANCE.displayName());
         this.pio = posInOccurrence;
         this.goal = goal;        
+        this.modus = ((HoareLoopInvariantRule)connectedTo()).modus(pio);
     }
     
     protected void fireActionPerformed(ActionEvent event) {
@@ -65,33 +70,52 @@ public class HoareLoopInvRuleMenuItem extends JMenuItem implements BuiltInRuleMe
      
     public HoareLoopInvRuleApp getRuleApp() {        
         if (inv != null) {
-            return new HoareLoopInvRuleApp(inv, connectedTo(), pio, goal.proof().getUserConstraint().getConstraint());            
+            if (modus == Op.DIA || modus == Op.DIATRC) {
+                if (decreases != null) {
+                    return new HoareLoopInvRuleApp(inv, decreases, connectedTo(), pio, goal.proof().getUserConstraint().getConstraint());
+                }
+            } else {                
+                return new HoareLoopInvRuleApp(inv, connectedTo(), pio, goal.proof().getUserConstraint().getConstraint());
+            }
         }
         return null;
     }
     
     private void openDialog() {
-        String invText = "";
+        inv       = getInstantiation("Enter Loop Invariant:", Sort.FORMULA);
+                
+        if ((modus == Op.DIA || modus == Op.DIATRC) && inv != null) {
+            decreases = getInstantiation("Enter Decreasing Term:", 
+                    goal.proof().getServices().getTypeConverter().
+                    getIntegerLDT().targetSort());
+        }
+    }
+
+    private Term getInstantiation(String message, Sort sort) {
+        Term inputTerm = null;
+        String inputText;
         do {
-            invText = JOptionPane.showInputDialog("Enter Loop Invariant:");
-            if (invText != null) {
+            inputText = JOptionPane.showInputDialog(message);
+            if (inputText != null) {
                 try {
-                    inv = parseTerm(invText, goal.getVariableNamespace(new Namespace()));         
+                    inputTerm = parseTerm(inputText, goal.getVariableNamespace(new Namespace()));         
                 } catch (ParserException pe) {
                     JOptionPane.showMessageDialog(Main.getInstance(), pe.getMessage());
                 } catch (ExceptionHandlerException ehe) {
                     JOptionPane.showMessageDialog(Main.getInstance(), ehe.getCause() != null ? 
                             ehe.getCause().getMessage() : ehe.getMessage());
                 } 
-                if (inv != null && inv.sort() != Sort.FORMULA) {
-                    JOptionPane.showMessageDialog(Main.getInstance(), "An invariant must be a formula and no boolean " +
-                    "or integer valued term.");
-                    inv = null;
+                if (inputTerm != null && !inputTerm.sort().extendsTrans(sort)) {
+                    JOptionPane.showMessageDialog(Main.getInstance(),
+                            "The entered " + (sort == Sort.FORMULA ? "invariant must be a formula, but is of type " + sort : 
+                                "decreases term must have sort int."));
+                    inputTerm = null;
                 }
             } else {
-                inv = null;
+                inputTerm = null;
             }
-        } while (inv == null && invText != null);
+        } while (inputTerm == null && inputText != null);
+        return inputTerm;
     }
     
 }

@@ -267,7 +267,7 @@ public class HoareLogicPrettyPrinter extends LogicPrinter {
             printQuanPrefix(programFormula);
             programFormula = ((QuanUpdateOperator)programFormula.op()).target(programFormula);
             count ++;
-            if (programFormula.op() != Op.BOX) {
+            if (!(programFormula.op() instanceof Modality)) {
                 layouter.print(", ");
                 markStartSub();
             }  
@@ -420,7 +420,7 @@ public class HoareLogicPrettyPrinter extends LogicPrinter {
     private boolean hasProgram(Term formula) {
         if (formula.sort() != Sort.FORMULA) {
             return false;
-        } else if (formula.op() == Op.BOX) {
+        } else if (formula.op() instanceof Modality) {
             return true;
         }
         assert !(formula.op() instanceof Modality) : "Hoare Tuple Normalform hurt.";

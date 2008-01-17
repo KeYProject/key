@@ -4428,6 +4428,7 @@ problem returns [ Term a = null ]
     Namespace funcNSForSelectedChoices = new Namespace();
     String pref = null;
     Update updatePrefix = null;
+    Operator modalityOp = null;
 }
     :
 
@@ -4502,9 +4503,10 @@ problem returns [ Term a = null ]
 	           if (capturer != null) capturer.capture();
 	           chooseContract = true;
 		  } 	   	    
-	    | (
-	    
-	      HOARE LBRACE
+	    | (	    
+	      (HOARE {modalityOp = Op.BOX;} | 
+	       HOARE_TOTAL {modalityOp = Op.DIA;} | 
+	       HOARE_ET {modalityOp = Op.DIATRC;})  LBRACE
 	      {
 	       switchToNormalMode(); 
 	       namespaces().setFunctions(funcNSForSelectedChoices);
@@ -4515,14 +4517,13 @@ problem returns [ Term a = null ]
 	        
 	        (updatePrefix = updates)? 
 	        
-	        modality : MODALITY
-     	        { 
+	       modality:MODALITY { 
 	          sjb = getJavaBlock(modality);
 	          bindProgVars(progVars(sjb.javaBlock));
 	        }
 	       LBRACE a2 = formula RBRACE 	       	       
 	       { 
-	          a2 = tf.createBoxTerm(sjb.javaBlock, a2);
+	          a2 = tf.createProgramTerm(modalityOp, sjb.javaBlock, a2);
 	          if (updatePrefix != null && updatePrefix.locationCount() > 0) {
 		     final UpdateFactory uf = new UpdateFactory(getServices(), null);
 		     a2 = uf.prepend(updatePrefix, a2);

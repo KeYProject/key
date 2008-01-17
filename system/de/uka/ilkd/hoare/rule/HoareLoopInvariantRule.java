@@ -5,14 +5,13 @@ import java.util.LinkedList;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.QuanUpdateOperator;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IteratorOfGoal;
 import de.uka.ilkd.key.proof.ListOfGoal;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
 
 /**
@@ -44,7 +43,7 @@ public class HoareLoopInvariantRule implements BuiltInRule {
             progFormula = ((QuanUpdateOperator)progFormula.op()).target(progFormula);
         }
         
-        if (progFormula.op() != Op.BOX) {
+        if (!(progFormula.op() instanceof Modality)) {
             return false;
         }
         
@@ -74,11 +73,13 @@ public class HoareLoopInvariantRule implements BuiltInRule {
         
         final IteratorOfGoal it = goals.iterator();
         
-        createUseCaseBranch(app, it.next());
+        final Modality modus = modus(ruleApp.posInOccurrence());
+        
+        createUseCaseBranch(modus, app, it.next());
 
-        createPreservesBranch(app, it.next());
+        createPreservesBranch(modus, app, it.next());
                
-        createInitialBranch(app, it.next());
+        createInitialBranch(modus, app, it.next());
         
         return goals;
     }
@@ -91,22 +92,29 @@ public class HoareLoopInvariantRule implements BuiltInRule {
         convertToLogicElement(whileS.getGuardExpression());
     }
 
-    private While getWhileStatement(RuleApp app) {
-        Term progFormula = app.posInOccurrence().constrainedFormula().formula();
+    public Modality modus(PosInOccurrence pos) {
+        return (Modality) getModalityTerm(pos).op();
+    }
+    
+    private Term getModalityTerm(PosInOccurrence pos) {
+        Term progFormula = pos.constrainedFormula().formula();
         
         
         while (progFormula.op() instanceof QuanUpdateOperator) {
             progFormula = ((QuanUpdateOperator)progFormula.op()).target(progFormula);
         }
-                
-        final ProgramElement prg = progFormula.javaBlock().program();
+        return progFormula;
+    }
+    
+    private While getWhileStatement(RuleApp app) {
+        final ProgramElement prg = 
+            getModalityTerm(app.posInOccurrence()).javaBlock().program();
         
-        final While whileS = (While)((StatementBlock)prg).getFirstActiveChildPos().getProgram(prg);
-        return whileS;
+        return (While)((StatementBlock)prg).getFirstActiveChildPos().getProgram(prg);
     }
     
     
-    private void createUseCaseBranch(HoareLoopInvRuleApp ruleApp, Goal goal) {
+    private void createUseCaseBranch(Modality modus, HoareLoopInvRuleApp ruleApp, Goal goal) {
         removeContextFormulas(goal);
 
         final Services services = goal.proof().getServices();
@@ -172,7 +180,7 @@ public class HoareLoopInvariantRule implements BuiltInRule {
         goal.setBranchLabel("Use Invariant");
     }
     
-    private void createPreservesBranch(HoareLoopInvRuleApp ruleApp, Goal goal) {
+    private void createPreservesBranch(Modality modus, HoareLoopInvRuleApp ruleApp, Goal goal) {
                
         removeContextFormulas(goal);
         
@@ -189,6 +197,29 @@ public class HoareLoopInvariantRule implements BuiltInRule {
                 
         goal.addFormula(new ConstrainedFormula(tb.and(inv, loopCondition)), true, true);
                 
+        
+        if (modus == Op.DIA || modus == Op.DIATRC) {
+            final Term decreasesTerm = ruleApp.getDecreases();
+            
+            final Metavariable[] mvs = decreasesTerm.metaVars().toArray();
+                                   
+            final Function oldDecreasesFunc = 
+                getNewFunctionSymbol("oldDecreasesVal", decreasesTerm.sort(), 
+                        toSorts(mvs), goal.proof().getServices());
+            
+            goal.proof().getServices().getNamespaces().functions().add(oldDecreasesFunc);
+            
+            Term oldDecreases = tb.func(oldDecreasesFunc, toTerms(mvs));
+           
+            final Term atPreAx = tb.equals(oldDecreases, 
+                    decreasesTerm);
+            goal.addFormula(new ConstrainedFormula(atPreAx, ruleApp.constraint()), true, true);            
+
+            inv = tb.and(inv, 
+                    tb.and(tb.lt(decreasesTerm, oldDecreases, services), 
+                            tb.geq(decreasesTerm,tb.zero(services), services)));
+        }
+
         JavaProgramElement loopBody = (JavaProgramElement) getWhileStatement(ruleApp).getBody(); 
         
         if (!(loopBody instanceof StatementBlock)) {
@@ -198,6 +229,33 @@ public class HoareLoopInvariantRule implements BuiltInRule {
         goal.addFormula(new ConstrainedFormula(loopFormula, ruleApp.constraint()), false, true);     
         
         goal.setBranchLabel("Preserves Invariant");
+    }
+
+    private Term[] toTerms(Metavariable[] mvs) {
+        final Term[] mvTerms = new Term[mvs.length];
+        for (int i = 0; i<mvTerms.length; i++) {
+            mvTerms[i] = TermBuilder.DF.var(mvs[i]);
+        }
+        return mvTerms;
+    }
+
+    private Sort[] toSorts(Metavariable[] mvs) {
+        final Sort[] mvSorts = new Sort[mvs.length];
+        for (int i = 0; i<mvSorts.length; i++) {
+            mvSorts[i] =mvs[i].sort();
+        }
+        return mvSorts;
+    }
+
+    private Function getNewFunctionSymbol(String basename, 
+            Sort targetSort, Sort[] argumentSorts, Services services) {
+        int counter = 0;
+        Name funcName = new Name(basename);
+        while (services.getNamespaces().lookup(funcName) != null) {
+            funcName = new Name(basename + "" + counter);
+            counter ++;
+        }
+        return new RigidFunction(funcName, targetSort, argumentSorts);
     }
 
     private void removeContextFormulas(Goal goal) {
@@ -212,14 +270,21 @@ public class HoareLoopInvariantRule implements BuiltInRule {
         }
     }
 
-    private void createInitialBranch(HoareLoopInvRuleApp ruleApp, Goal goal) {
+    private void createInitialBranch(Modality modus, HoareLoopInvRuleApp ruleApp, Goal goal) {
         final ConstrainedFormula cf = ruleApp.posInOccurrence().constrainedFormula();
         
         Term formula = cf.formula();       
        
         Term inv = ruleApp.getInvariant();
         
-        final UpdateFactory uf = new UpdateFactory(goal.proof().getServices(), goal.simplifier());
+        final UpdateFactory uf = new UpdateFactory(goal.proof().getServices(), goal.simplifier());        
+
+        final Services services = goal.proof().getServices();
+        
+        if (modus == Op.DIA || modus == Op.DIATRC) {
+            inv = TermBuilder.DF.and(inv, 
+                    TermBuilder.DF.geq(ruleApp.getDecreases(), TermBuilder.DF.zero(services), services)); 
+        }
         
         inv = prependUpdatePrefix(formula, inv, uf);
                 
@@ -239,6 +304,7 @@ public class HoareLoopInvariantRule implements BuiltInRule {
         return inv;
     }
 
+    
     public String displayName() {        
         return "Loop Invariant";
     }
