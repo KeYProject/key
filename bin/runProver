@@ -231,7 +231,7 @@ export PATH
 #-XX:CompileThreshold=1500 \
 
 $JAVA $JAVA_OPTIONS $keysysprops $hpfix \
--ea:de.uka.ilkd.key... -noverify -Djvm.dir=$JVM_DIR -Xms64m -Xmx1024m \
+-ea:de.uka.ilkd... -noverify -Djvm.dir=$JVM_DIR -Xms64m -Xmx1024m \
 -Dkey.home=$KEY_HOME \
 -Dkey.pattern.path=$HOME/.key/keypatterns/ \
 -Dkey.simplify.logdir=$KEY_SIMPLIFY_LOG_DIR \
