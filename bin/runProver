@@ -156,7 +156,7 @@ fi
 # KeY CLASSPATH
 #
 
-key_ext_jars="antlr.jar jargs.jar recoder.jar dresden-ocl-demo.jar xerces.jar log4j.jar"
+key_ext_jars="antlr.jar jargs.jar recoder.jar dresden-ocl-demo.jar xerces.jar log4j.jar cetus.jar"
 
 keyclasspath="$KEY_HOME/system/binary/"
 

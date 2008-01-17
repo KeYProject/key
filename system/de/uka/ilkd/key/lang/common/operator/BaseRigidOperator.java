@@ -1,8 +1,7 @@
 package de.uka.ilkd.key.lang.common.operator;
 
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.op.NonRigidFunction;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
+import de.uka.ilkd.key.logic.op.RigidFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -10,7 +9,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * 
  * @author oleg.myrk@gmail.com
  */
-public abstract class BaseRigidOperator extends NonRigidFunction implements IOperator {
+public abstract class BaseRigidOperator extends RigidFunction implements IOperator {
         public BaseRigidOperator(Name name, Sort sort, Sort[] argSorts) {
                 super(name, sort, argSorts);
         }

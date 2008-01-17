@@ -6,7 +6,6 @@ import de.uka.ilkd.key.lang.common.program.IProgramElement;
 import de.uka.ilkd.key.lang.common.services.ILangServices;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;

@@ -108,6 +108,10 @@ public class Loader {
                 this.initBlockProtocol();
         }
 
+        /**
+         * Sets the current conversion context, useful for error reporting.
+         * @param conversionContext
+         */
         private void setConversionContext(LoadingContext conversionContext) {
                 this.currentContext = conversionContext;
         }
@@ -272,7 +276,6 @@ public class Loader {
         private void loadClassDeclaration(
                         cetus.hir.ClassDeclaration classDeclaration)
                         throws ConversionException {
-                // TODO: introduce accessor fields
                 cetus.hir.Identifier name = (cetus.hir.Identifier) readHiddenField(
                                 classDeclaration, "name");
 
@@ -294,7 +297,6 @@ public class Loader {
                         ILoaderConfiguration.StructSortInfo structSortInfo = configuration.getStructSortInfo(id);
                         
                         // If this declaration also declares members
-                        // TODO: what happens to empty declarations?
                         if (classDeclaration.getChildren() != null) {
                                 if (structDecl.getMembersDefined())
                                         throw buildConvertException(
@@ -724,7 +726,7 @@ public class Loader {
                         Name name = realName;
 
                         // Check for name clashes
-                        if (isBlockVariableDuplicte(realName))
+                        if (isBlockVariableDuplicate(realName))
                                 throw buildConvertException(
                                                 "Variable declared multiple times",
                                                 declarator);
@@ -818,7 +820,6 @@ public class Loader {
                                 recognized = true;
                         } else if (specifier instanceof cetus.hir.UserSpecifier) {
                                 cetus.hir.UserSpecifier userSpecifier = (cetus.hir.UserSpecifier) specifier;
-                                // TODO: add accessor method to Cetus class
                                 cetus.hir.IDExpression idExpression = (cetus.hir.IDExpression) readHiddenField(
                                                 userSpecifier, "usertype");
                                 if (idExpression instanceof cetus.hir.Identifier) {
@@ -847,6 +848,7 @@ public class Loader {
                 }
 
                 // TODO: detect error cases
+                // @author oleg.myrk@gmail.com
 
                 // char
                 if (hadChar && !hadSigned && !hadUnsigned)
@@ -1367,7 +1369,6 @@ public class Loader {
                                 if (functionCall.getArgument(0) instanceof cetus.hir.SizeofExpression) {
                                         cetus.hir.SizeofExpression sizeofExpression = (cetus.hir.SizeofExpression) functionCall
                                                         .getArgument(0);
-                                        // TODO: create real accessor
                                         LinkedList specs = (LinkedList) readHiddenField(
                                                         sizeofExpression,
                                                         "specs");
@@ -1392,7 +1393,6 @@ public class Loader {
                                 if (functionCall.getArgument(1) instanceof cetus.hir.SizeofExpression) {
                                         cetus.hir.SizeofExpression sizeofExpression = (cetus.hir.SizeofExpression) functionCall
                                                         .getArgument(1);
-                                        // TODO: create real accessor
                                         LinkedList specs = (LinkedList) readHiddenField(
                                                         sizeofExpression,
                                                         "specs");
@@ -1595,7 +1595,7 @@ public class Loader {
          * @param name
          * @return
          */
-        private boolean isBlockVariableDuplicte(Name name) {
+        private boolean isBlockVariableDuplicate(Name name) {
                 return blockRenamedVariableNS.lookupLocally(name) != null;
         }
 
@@ -1683,7 +1683,10 @@ public class Loader {
         }
 
         private LoadingContext getContext(cetus.hir.Printable element) {
-                // TODO: doesn't work with encodings in general
+                // TODO: Correct behavior depends on the platform's default character encoding 
+                // and consequently works reliably only with the first 128 unicode characters.
+                // However, this limitation comes from Cetus and there is nothing we can do.
+                // @author oleg.myrk@gmail.com
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 element.print(new PrintStream(baos));
                 return new LoadingContext(currentContext

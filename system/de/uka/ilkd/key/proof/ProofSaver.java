@@ -387,7 +387,11 @@ public class ProofSaver {
                     return null;
                 }
                 else {
-                    System.err.println("Don't know how to prettyprint "+val.getClass());
+                    // Removed this warning because this method is used to print
+                    // InstantiationEntry's values.
+                    // @author oleg.myrk@gmail.com
+                    // System.err.println("Don't know how to prettyprint "+val.getClass());
+                        
                     // try to String by chance
                     return val.toString();
                 }

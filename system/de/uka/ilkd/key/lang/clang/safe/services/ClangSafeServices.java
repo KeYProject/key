@@ -47,7 +47,6 @@ import de.uka.ilkd.key.lang.common.services.ILangServices;
 import de.uka.ilkd.key.lang.common.services.ILangServicesEnv;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -236,14 +235,14 @@ public class ClangSafeServices implements IClangServices {
         /**
          * @inheritDocs
          */
-        public BaseVariable buildVariable(IVariableProgramSVSort programSVSort, ProgramElementName name, KeYJavaType typePair) {
+        public BaseVariable buildVariable(IVariableProgramSVSort programSVSort, Name name, KeYJavaType typePair) {
                 return new Variable(name, typePair);
         }
         
         /**
          * @inheritDocs
          */
-        public BaseVariable copyVariable(IVariable prototypeVariable, ProgramElementName name, KeYJavaType typePair) {
+        public BaseVariable copyVariable(IVariable prototypeVariable, Name name, KeYJavaType typePair) {
                 return new Variable(name, typePair);
         }
         
@@ -251,7 +250,6 @@ public class ClangSafeServices implements IClangServices {
          * @inheritDocs
          */
         public String getVariableNameProposal(KeYJavaType typePair) {
-                // TODO: work on type structure
                 return typePair.getJavaType().getName().toString().replaceAll(
                                 "struct ", "struct_").replaceAll("@", "_obj")
                                 .replaceAll("\\*", "_ptr").replaceAll("\\[",

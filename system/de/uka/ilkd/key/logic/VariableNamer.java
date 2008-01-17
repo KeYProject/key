@@ -24,7 +24,6 @@ import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTWalker;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
-import de.uka.ilkd.key.lang.common.program.IProgramElement;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
@@ -505,17 +504,19 @@ public abstract class VariableNamer implements InstantiationProposer {
 	    } else {
 		SchemaVariable psv = nv.getPeerSchemaVariable();
 		Object inst = app.instantiations().getInstantiation(psv);
-		if(inst instanceof Expression) {
+		if(inst instanceof Expression || inst instanceof de.uka.ilkd.key.lang.common.program.ITypedProgramElement) {
 		    final ExecutionContext ec = 
 			app.instantiations().getExecutionContext();
-
-		    if (ec != null || inst instanceof IProgramElement || inst instanceof IProgramVariable) {
-                KeYJavaType kjt;
-                if (services.getLangServices() != null && inst instanceof de.uka.ilkd.key.lang.common.program.ITypedProgramElement)
+                
+                    if (services.getLangServices() != null && inst instanceof de.uka.ilkd.key.lang.common.program.ITypedProgramElement) {
+                        KeYJavaType kjt;
                         kjt = ((de.uka.ilkd.key.lang.common.program.ITypedProgramElement)inst).getTypePair(services.getLangServices(), services.getNamespaces().sorts(), services.getNamespaces().functions());
-                else
+                        basename = getBaseNameProposal(kjt);
+                    }
+                    else if (ec != null) {
+                        KeYJavaType kjt;
                         kjt = services.getTypeConverter().getKeYJavaType((Expression)inst, ec);
-                basename = getBaseNameProposal(kjt);
+                        basename = getBaseNameProposal(kjt);
 		    } else {
 				// usually this should never be entered, but because of 
 				// naming issues we do not want nullpointer exceptions

@@ -14,7 +14,6 @@ import de.uka.ilkd.key.lang.common.programsv.BaseProgramSVSort;
 import de.uka.ilkd.key.lang.common.programsv.IVariableProgramSVSort;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -134,7 +133,7 @@ public interface ILangServices {
          * @return
          */
         BaseVariable buildVariable(IVariableProgramSVSort programSVSort,
-                        ProgramElementName name, KeYJavaType typePair);
+                        Name name, KeYJavaType typePair);
 
         /**
          * Builds a program variable with given name and type pair for given
@@ -147,7 +146,7 @@ public interface ILangServices {
          * @return
          */
         BaseVariable copyVariable(IVariable prototypeVariable,
-                        ProgramElementName name, KeYJavaType typePair);
+                        Name name, KeYJavaType typePair);
 
         /**
          * Creates variable name proposal based on the type pair.
