@@ -187,13 +187,28 @@ public class ProofSaver {
                 tree.append(((MethodContractRuleApp)appliedRuleApp).getMethodContract().getName());
                 tree.append("\")");
             } else if (appliedRuleApp instanceof HoareLoopInvRuleApp) {
-                tree.append(" (hoareLoopInvariant \"");
+                tree.append(" (inst \"");
+                HoareLoopInvRuleApp hoareLoopInvRuleApp = (HoareLoopInvRuleApp)appliedRuleApp;
                 String inv =
-                    printTerm(((HoareLoopInvRuleApp)appliedRuleApp).getInvariant(), 
+                    printTerm(hoareLoopInvRuleApp.getInvariant(), 
                         proof.getServices()).toString().trim();
                 inv = inv.replaceAll("\\\\","\\\\\\\\");
                 tree.append(inv);
-                tree.append("\")");
+                tree.append("\")");                
+                if (hoareLoopInvRuleApp.getDecreases() != null) {
+                    tree.append("(inst \"");
+                    String dec =
+                        printTerm(hoareLoopInvRuleApp.getDecreases(), 
+                            proof.getServices()).toString().trim();
+                    dec = dec.replaceAll("\\\\","\\\\\\\\");
+                    tree.append(dec);
+                    tree.append("\")");
+                    tree.append(" (inst \"");
+                    tree.append(hoareLoopInvRuleApp.
+                            getDecreaseAtPreFuncName().toString().
+                            replaceAll("\\\\","\\\\\\\\"));                    
+                    tree.append("\")");
+                }
             }
             tree.append(")\n");
         }

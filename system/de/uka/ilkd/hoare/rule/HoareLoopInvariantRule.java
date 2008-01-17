@@ -10,8 +10,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IteratorOfGoal;
 import de.uka.ilkd.key.proof.ListOfGoal;
-import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
 
 /**
@@ -23,6 +23,7 @@ public class HoareLoopInvariantRule implements BuiltInRule {
 
     private final static Name LOOP_INV_RULENAME = new Name("Loop Invariant");
     public static final HoareLoopInvariantRule INSTANCE = new HoareLoopInvariantRule();
+    private static final Name EXECTIME = new Name("executionTime");
     
     private HoareLoopInvariantRule() {
         
@@ -135,8 +136,8 @@ public class HoareLoopInvariantRule implements BuiltInRule {
         while (progFormula.op() instanceof QuanUpdateOperator) {
             progFormula = ((QuanUpdateOperator)progFormula.op()).target(progFormula);
         }
-        
-        assert progFormula.op() == Op.BOX;
+                
+        assert progFormula.op() instanceof Modality;
                 
         final ProgramElement prg = progFormula.javaBlock().program();
         
@@ -173,11 +174,34 @@ public class HoareLoopInvariantRule implements BuiltInRule {
         
         goal.addFormula(new ConstrainedFormula(tb.and(inv, loopCondition)), true, true);
         
-        final Term useCaseFormula = tb.box(programTail, progFormula.sub(0));
+        Term useCaseFormula =
+            tb.tf().createProgramTerm(modus, programTail, progFormula.sub(0));
 
+        if (modus == Op.DIATRC) {
+            useCaseFormula = increaseExecutionTime(goal, services, useCaseFormula);
+        }
+        
         goal.addFormula(new ConstrainedFormula(useCaseFormula, ruleApp.constraint()), false, true);
         
         goal.setBranchLabel("Use Invariant");
+    }
+
+    private Term increaseExecutionTime(Goal goal, final Services services, Term useCaseFormula) {
+        final TermBuilder tb = TermBuilder.DF;
+        final UpdateFactory uf = new UpdateFactory(services, goal.simplifier());
+
+        final Function execTimeF = 
+            (Function) services.getNamespaces().functions().lookup(EXECTIME);
+        Term execTime = tb.func(execTimeF);
+
+
+        final Function addF = 
+            services.getTypeConverter().getIntegerLDT().getArithAddition();
+
+        useCaseFormula = 
+            uf.apply(uf.elementaryUpdate(execTime, 
+                    tb.func(addF, execTime, tb.one(services))), useCaseFormula);
+        return useCaseFormula;
     }
     
     private void createPreservesBranch(Modality modus, HoareLoopInvRuleApp ruleApp, Goal goal) {
@@ -204,8 +228,8 @@ public class HoareLoopInvariantRule implements BuiltInRule {
             final Metavariable[] mvs = decreasesTerm.metaVars().toArray();
                                    
             final Function oldDecreasesFunc = 
-                getNewFunctionSymbol("oldDecreasesVal", decreasesTerm.sort(), 
-                        toSorts(mvs), goal.proof().getServices());
+                new RigidFunction(ruleApp.getDecreaseAtPreFuncName(), 
+                        decreasesTerm.sort(), toSorts(mvs));
             
             goal.proof().getServices().getNamespaces().functions().add(oldDecreasesFunc);
             
@@ -224,8 +248,15 @@ public class HoareLoopInvariantRule implements BuiltInRule {
         
         if (!(loopBody instanceof StatementBlock)) {
             loopBody = new StatementBlock((Statement)loopBody);
+        }               
+        
+        Term loopFormula = tb.tf().
+            createProgramTerm(modus, JavaBlock.createJavaBlock((StatementBlock) loopBody), inv);
+      
+        if (modus == Op.DIATRC) {
+            loopFormula = increaseExecutionTime(goal, services, loopFormula);
         }
-        final Term loopFormula = tb.box(JavaBlock.createJavaBlock((StatementBlock) loopBody), inv);
+        
         goal.addFormula(new ConstrainedFormula(loopFormula, ruleApp.constraint()), false, true);     
         
         goal.setBranchLabel("Preserves Invariant");
@@ -245,17 +276,6 @@ public class HoareLoopInvariantRule implements BuiltInRule {
             mvSorts[i] =mvs[i].sort();
         }
         return mvSorts;
-    }
-
-    private Function getNewFunctionSymbol(String basename, 
-            Sort targetSort, Sort[] argumentSorts, Services services) {
-        int counter = 0;
-        Name funcName = new Name(basename);
-        while (services.getNamespaces().lookup(funcName) != null) {
-            funcName = new Name(basename + "" + counter);
-            counter ++;
-        }
-        return new RigidFunction(funcName, targetSort, argumentSorts);
     }
 
     private void removeContextFormulas(Goal goal) {

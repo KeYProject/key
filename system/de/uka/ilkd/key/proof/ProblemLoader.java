@@ -22,7 +22,10 @@ import java.util.Vector;
 import de.uka.ilkd.hoare.init.HoareProfile;
 import de.uka.ilkd.hoare.rule.HoareLoopInvRuleApp;
 import de.uka.ilkd.hoare.rule.HoareLoopInvariantRule;
-import de.uka.ilkd.key.gui.*;
+import de.uka.ilkd.key.gui.ExceptionDialog;
+import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.SwingWorker;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -31,12 +34,12 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.parser.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PresentationFeatures;
+import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAuflia;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.OldOperationContract;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
-import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAuflia;
 
 public class ProblemLoader implements Runnable {
 
@@ -52,7 +55,10 @@ public class ProblemLoader implements Runnable {
     Goal currGoal = null;
     String currTacletName = null;
     int currFormula = 0;
-    private String hoareLoopInv;    
+    
+    // got Hoare Loop Rule Loading; OLD
+    private String hoareLoopInv;     
+    
     PosInTerm currPosInTerm = PosInTerm.TOP_LEVEL;
     OldOperationContract currContract = null;
     Stack stack = new Stack();
@@ -310,6 +316,7 @@ public class ProblemLoader implements Runnable {
             currGoal      = proof.getGoal(currNode);
             mediator.getSelectionModel().setSelectedGoal(currGoal);
             currTacletName = s;
+            loadedInsts = null;
             // set default state
             currFormula   = 0;
             currPosInTerm = PosInTerm.TOP_LEVEL;
@@ -317,9 +324,9 @@ public class ProblemLoader implements Runnable {
         case 'c' : //contract
             currContract = (OldOperationContract) proof.getServices()
                              .getSpecificationRepository().getContractByName(s);
-            break;        
-        case 'z' : //hoare loop invariant rule
-            hoareLoopInv = s; 
+            break;             
+        case 'z': // old save mode only for compatibility
+            hoareLoopInv = s;
             break;
         }
     }
@@ -388,13 +395,45 @@ public class ProblemLoader implements Runnable {
             currContract=null;
             return ourApp;
         }
-        
+
+        // old loading code
         if (hoareLoopInv != null) {
             Namespace varNS = currGoal.proof().getNamespaces().variables();
-            final Term inv = parseTerm(hoareLoopInv, proof, varNS, currGoal.createGlobalProgVarNamespace());
-            ourApp = new HoareLoopInvRuleApp(inv, HoareLoopInvariantRule.INSTANCE, pos, userConstraint);
+            
+            final Term inv = 
+                parseTerm(hoareLoopInv, proof, varNS, currGoal.createGlobalProgVarNamespace());
+            
+            ourApp = 
+                new HoareLoopInvRuleApp(inv,  
+                        HoareLoopInvariantRule.INSTANCE, pos, userConstraint);
             hoareLoopInv = null;
             return ourApp;
+        }
+        
+        if ("Loop Invariant".equals(currTacletName)) {
+            Namespace varNS = currGoal.proof().getNamespaces().variables();
+            
+            String str = (String) loadedInsts.removeFirst();
+            final Term inv = parseTerm(str, proof, varNS, currGoal.createGlobalProgVarNamespace());                
+
+            Term decreases = null;
+            Name atPreDecFunc = null;
+            if (loadedInsts.size()>0) {
+                str = (String) loadedInsts.removeFirst();
+                decreases = 
+                    parseTerm(str, proof, varNS, currGoal.createGlobalProgVarNamespace());                
+                
+                str = (String) loadedInsts.removeFirst();
+                atPreDecFunc = new Name(str);                                
+            }            
+            ourApp = 
+                new HoareLoopInvRuleApp(inv, decreases, 
+                        atPreDecFunc, 
+                        HoareLoopInvariantRule.INSTANCE, pos, userConstraint);
+            hoareLoopInv = null;
+            loadedInsts  = null;
+            return ourApp;
+            
         }
 
         final SetOfRuleApp ruleApps =
