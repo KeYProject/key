@@ -112,9 +112,13 @@ public class MethodCall extends ProgramMetaConstruct {
 
 
     private KeYJavaType getStaticPrefixType(ReferencePrefix refPrefix) {
-	if (refPrefix==null || refPrefix instanceof ThisReference) {
+	if (refPrefix==null || refPrefix instanceof ThisReference && 
+	        ((ThisReference) refPrefix).getReferencePrefix()==null){ 
 	    return execContext.getTypeReference().getKeYJavaType();
-	} else if (refPrefix instanceof TypeRef) {
+	} else if(refPrefix instanceof ThisReference){
+	    return ((TypeReference) ((ThisReference) refPrefix).getReferencePrefix()).getKeYJavaType();
+	    //((ProgramVariable) services.getTypeConverter().convertToLogicElement(refPrefix).op()).getKeYJavaType();
+	}else if (refPrefix instanceof TypeRef) {
 	    KeYJavaType t = ((TypeRef)refPrefix).getKeYJavaType();
 	    if (t == null) { //%%%
 		Debug.fail();
@@ -219,8 +223,13 @@ public class MethodCall extends ProgramMetaConstruct {
 		 staticPrefixType);	    
 	}
         newContext = methRef.getReferencePrefix();
-	if (newContext == null || newContext instanceof ThisReference) {
-	    newContext = execContext.getRuntimeInstance();
+	if (newContext == null){
+	    newContext = (ReferencePrefix) services.getTypeConverter().convertToProgramElement(
+	            services.getTypeConverter().findThisForSort(pm.getContainerType().getSort(), execContext));
+	} else if(newContext instanceof ThisReference){
+	    newContext = (ReferencePrefix) services.getTypeConverter().convertToProgramElement(
+                services.getTypeConverter().convertToLogicElement((ThisReference) newContext, execContext));
+	    execContext.getRuntimeInstance();
 	} else if (newContext instanceof FieldReference) {
 	    final FieldReference fieldContext = (FieldReference) newContext;
             if (fieldContext.referencesOwnInstanceField())

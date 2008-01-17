@@ -257,13 +257,13 @@ public class TypeConverter extends TermBuilder {
     
     public Term findThisForSort(Sort s, ExecutionContext ec){
         ProgramVariable inst = (ProgramVariable) ec.getRuntimeInstance();
-        System.out.println("inst: "+inst+" inst.kjt: "+inst.getKeYJavaType());
         Term result = var(inst);
         KeYJavaType classType = ec.getTypeReference().getKeYJavaType();
-        while(!inst.sort().extendsTrans(s)){
+        System.out.println("inst.sort(): "+inst.sort());
+        System.out.println("s: "+s);
+        while(!classType.getSort().extendsTrans(s)){
             inst = services.getJavaInfo().getAttribute(
                     ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, classType);
-            System.out.println("inst: "+inst+" inst.kjt: "+inst.getKeYJavaType());
             result = dot(result, inst);
             classType = inst.getKeYJavaType();
         }
