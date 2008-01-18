@@ -229,7 +229,6 @@ public class MethodCall extends ProgramMetaConstruct {
 	} else if(newContext instanceof ThisReference){
 	    newContext = (ReferencePrefix) services.getTypeConverter().convertToProgramElement(
                 services.getTypeConverter().convertToLogicElement((ThisReference) newContext, execContext));
-	    execContext.getRuntimeInstance();
 	} else if (newContext instanceof FieldReference) {
 	    final FieldReference fieldContext = (FieldReference) newContext;
             if (fieldContext.referencesOwnInstanceField())

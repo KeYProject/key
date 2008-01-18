@@ -15,8 +15,7 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.*;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.*;
@@ -27,6 +26,7 @@ import recoder.java.expression.operator.CopyAssignment;
 import recoder.java.reference.*;
 import recoder.kit.TwoPassTransformation;
 import recoder.list.CompilationUnitMutableList;
+import recoder.service.DefaultCrossReferenceSourceInfo;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -48,6 +48,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
     protected CrossReferenceServiceConfiguration services;
     protected CompilationUnitMutableList units;
     protected HashSet classDeclarations=null;
+    protected HashMap localClass2finalVar=null;
 
     /**
      * creates a transormder for the recoder model
@@ -62,6 +63,11 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
 	super(services);
 	this.services = services;
 	this.units = units;
+	localClass2finalVar=new HashMap();
+    }
+    
+    public HashMap getLocalClass2FinalVar(){
+        return localClass2finalVar;
     }
 
     /** 
@@ -160,8 +166,6 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
     }
     
     protected ClassDeclaration containingClass(TypeDeclaration td){
-        System.out.println("rmt: td: "+td.getFullName());
-        System.out.println("rmt: td.containingClassType: "+td.getContainingClassType());
         NonTerminalProgramElement container = (ClassDeclaration) td.getContainingClassType();
         if(container == null){
             container = td.getASTParent();
@@ -171,22 +175,20 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
         }
         return (ClassDeclaration) container;
     }
+    
+    protected MethodDeclaration containingMethod(TypeDeclaration td){
+        NonTerminalProgramElement container = td.getASTParent();
+        while(container!=null && !(container instanceof MethodDeclaration)){
+            container = container.getASTParent();
+        }
+        return (MethodDeclaration) container;
+    }
 
     /**
      * invokes model transformation for each top level type declaration
      * in any compilation unit. <emph>Not</emph> for inner classes.
      */
     public void makeExplicit() {
-        ClassDeclarationCollector cdc = new ClassDeclarationCollector();
-	for (int i = 0; i<units.size(); i++) {
-	    CompilationUnit unit = units.getCompilationUnit(i);
-	    cdc.walk(unit);
-	    /*
-	    int typeCount = unit.getTypeDeclarationCount();
-	    for (int j = 0; j<typeCount; j++) {
-		makeExplicit(unit.getTypeDeclarationAt(j));
-	    }*/
-	}         
 	HashSet s = classDeclarations();
 	Iterator it = s.iterator();
 	while(it.hasNext()) {
@@ -220,6 +222,41 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
 	makeExplicit();
     }
     
+    class FinalOuterVarsCollector extends SourceVisitor{
+        
+        public FinalOuterVarsCollector(){
+            super();
+        }
+        
+        public void walk(SourceElement s){
+            s.accept(this);
+            if(s instanceof NonTerminalProgramElement){
+                NonTerminalProgramElement pe = (NonTerminalProgramElement) s;
+                for(int i=0; i<pe.getChildCount(); i++){
+                    walk(pe.getChildAt(i));
+                }
+            }
+        }
+        
+       public void visitVariableReference(VariableReference vr){
+           DefaultCrossReferenceSourceInfo si = (DefaultCrossReferenceSourceInfo) services.getSourceInfo();
+           Variable v = si.getVariable(vr.getName(), vr);
+           if((v instanceof VariableSpecification) && !(v instanceof FieldSpecification) &&
+                   si.getContainingClassType((ProgramElement) v) != si.getContainingClassType(vr)){
+               LinkedList vars = (LinkedList) localClass2finalVar.get(si.getContainingClassType(vr));
+               if(vars == null){
+                   vars = new LinkedList();
+               }
+               if(!vars.contains(v)){
+                   vars.add(v);
+               }
+               System.out.println("v: "+v.getName()+" class: "+si.getContainingClassType(vr).getName());
+               localClass2finalVar.put(si.getContainingClassType(vr), vars);
+           }
+       }
+        
+    }
+    
     class ClassDeclarationCollector extends SourceVisitor{
         
         HashSet result = new HashSet();
@@ -243,7 +280,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
 //            System.out.println("ClassDeclarationCollector: classdecl: "+cld.getName());
             super.visitClassDeclaration(cld);
         }
-        
+               
         public HashSet result(){
             return result;
         }

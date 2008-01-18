@@ -50,6 +50,8 @@ public class ConstructorNormalformBuilder
     private HashMap class2initializers;
     private HashMap class2identifier;
     private HashMap class2methodDeclaration;
+    private HashMap v2t;
+//    private HashMap class2fieldsForFinalVars;
 
     private ClassType javaLangObject;
 
@@ -64,6 +66,8 @@ public class ConstructorNormalformBuilder
 	class2enclosingThis = new HashMap(units.size());
 	class2enclosingClass = new HashMap(units.size());
 	class2identifier = new HashMap(units.size());
+	v2t = new HashMap(units.size());
+//	class2fieldsForFinalVars = new HashMap(units.size());
     }
 
 
@@ -166,7 +170,7 @@ public class ConstructorNormalformBuilder
 	 Iterator it = cds.iterator();
 	 while(it.hasNext()){
 	     ClassDeclaration cd = (ClassDeclaration) it.next();
-       
+	     (new FinalOuterVarsCollector()).walk(cd);
 	     // collect constructors for transformation phase
              ConstructorMutableList constructors = new ConstructorArrayList(10);
              constructors.add(services.getSourceInfo().getConstructors(cd));
@@ -179,10 +183,17 @@ public class ConstructorNormalformBuilder
              class2identifier.put(cd, getId(cd));
              
              class2enclosingThis.put(cd, getImplicitEnclosingThis(cd));
+             
+             LinkedList outerVars = (LinkedList) localClass2finalVar.get(cd);
+             for(int i=0; outerVars!=null && i<outerVars.size(); i++){
+                 v2t.put(outerVars.get(i), ((Variable) outerVars.get(i)).getType());
+             }
+             
              if(cd.getName()==null || 
                      cd.getStatementContainer() !=null ||
                      cd.getContainingClassType()!=null){
                  class2enclosingClass.put(cd, containingClass(cd));
+//                 class2fieldsForFinalVars.put(cd, getFieldsForFinalVars(cd));
              }
              
              // collect initializers for transformation phase
@@ -218,6 +229,18 @@ public class ConstructorNormalformBuilder
 	setProblemReport(NO_PROBLEM);
 	return NO_PROBLEM;
     }
+    
+/*    private HashSet getFieldsForFinalVars(ClassDeclaration cd){
+        HashSet result = new HashSet(3);
+        HashSet vars = (HashSet) localClass2finalVar.get(cd);
+        if(vars!=null){
+            Iterator it = vars.iterator();
+            while(it.hasNext()){
+                VariableSpecification
+            }
+        }
+        return result;
+    }*/
     
     protected Field getImplicitEnclosingThis(ClassDeclaration cd){
         FieldList fl = cd.getAllFields();
@@ -275,7 +298,9 @@ public class ConstructorNormalformBuilder
 	StatementBlock body;
 	Field et = (Field) class2enclosingThis.get(cd);
 	TypeDeclaration td = (TypeDeclaration) class2enclosingClass.get(cd);
+	LinkedList outerVars = (LinkedList) localClass2finalVar.get(cd);
 	int j = et==null? 0 : 1;
+	if(outerVars!=null) j+=outerVars.size();
 	ParameterDeclaration pd=null;
         CopyAssignment ca = null;
         String etId = "_ENCLOSING_THIS";
@@ -302,6 +327,20 @@ public class ConstructorNormalformBuilder
 				  consDecl.getThrown().deepClone());
 	    body = (StatementBlock) consDecl.getBody().deepClone();
 	}
+	
+	if(outerVars!=null && !outerVars.isEmpty()){     
+	    if(parameters.isEmpty()){
+                attachDefaultConstructor(cd);
+            }
+	    Iterator it = outerVars.iterator();
+	    while(it.hasNext()){
+	        Variable v = (Variable) it.next();
+	        parameters.add(new ParameterDeclaration(
+	                new TypeReference(new Identifier(((Type) v2t.get(v)).getName())), 
+	                new Identifier(v.getName())));
+	    }
+	}
+	
 	if(pd!=null){    
 	    if(parameters.isEmpty()){
 	        attachDefaultConstructor(cd);
@@ -352,11 +391,19 @@ public class ConstructorNormalformBuilder
 		if(ca!=null){
 		    attach(ca, body, 0);
 		}
+		for(int i = 0; outerVars!=null && i<outerVars.size(); i++){
+		    attach(new CopyAssignment(new FieldReference(new ThisReference(), 
+		            new ImplicitIdentifier(ImplicitFieldAdder.FINAL_VAR_PREFIX+
+		                    ((Variable) outerVars.get(i)).getName())),
+		            new VariableReference(new Identifier(((Variable) outerVars.get(i)).getName()))), body, 
+		            i+(ca!=null?1:0));
+		}      
 		for (int i = 0; i<initializers.size(); i++) {
 		    attach((Statement) 
 			   initializers.getStatement(i).deepClone(),
 			   body, i+1+j);
 		}
+
 	    }
 	}
 

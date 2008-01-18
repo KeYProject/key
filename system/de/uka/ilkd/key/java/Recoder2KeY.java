@@ -69,6 +69,8 @@ public class Recoder2KeY implements JavaReader{
      *  ProgramMethod.
      */
     protected HashMap methodsDeclaring = new HashMap();
+    
+    protected HashMap locClass2finalVar = null;
 
     /**
      * Hashmap from
@@ -1572,11 +1574,11 @@ public class Recoder2KeY implements JavaReader{
 	(recoder.abstraction.ClassType classType) {
 
 	recoder.list.ClassTypeList supers=classType.getSupertypes();
-	System.out.println("classType: "+classType.getFullName());
+//	System.out.println("classType: "+classType.getFullName());
 	SetOfSort ss=SetAsListOfSort.EMPTY_SET;
 	for (int i=0; i<supers.size(); i++) {
 	    ss = ss.add(getKeYJavaType(supers.getClassType(i)).getSort());
-	    System.out.println("super: "+supers.getClassType(i).getFullName());
+//	    System.out.println("super: "+supers.getClassType(i).getFullName());
 	}
 	
 	if(classType.getName()==null){
@@ -2552,10 +2554,20 @@ public class Recoder2KeY implements JavaReader{
 	final recoder.java.reference.ReferencePrefix rp = n.getReferencePrefix();
 	final recoder.java.reference.TypeReference tr = n.getTypeReference();
 	
-	Expression[] arguments = new Expression[args != null ? args.size() : 0];
-	for (int i = 0; i<arguments.length; i++) {
+	LinkedList outerVars = null;
+	if(locClass2finalVar!=null){
+	    outerVars = (LinkedList) locClass2finalVar.get(n.getClassDeclaration());
+	}
+	int numVars = outerVars!=null? outerVars.size() : 0;
+	Expression[] arguments = new Expression[(args != null ? args.size() : 0)+numVars];
+	for (int i = 0; i<arguments.length-numVars; i++) {
 	    arguments[i] = (Expression)callConvert(args.getExpression(i));
 	}      
+	for (int i = arguments.length-numVars; i<arguments.length; i++) {
+            arguments[i] = (ProgramVariable) convert((recoder.java.declaration.VariableSpecification) outerVars.get(i)).
+                getProgramVariable();    	    
+	}
+	
 	TypeReference maybeAnonClass = (TypeReference) callConvert(tr);
         if(n.getClassDeclaration()!=null){
             callConvert(n.getClassDeclaration());
@@ -2718,7 +2730,8 @@ public class Recoder2KeY implements JavaReader{
 		new PrepareObjectBuilder(servConf, cUnits),
 		new CreateBuilder(servConf, cUnits),		
 		new CreateObjectBuilder(servConf, cUnits),		
-		new JVMIsTransientMethodBuilder(servConf, cUnits)	
+		new JVMIsTransientMethodBuilder(servConf, cUnits),
+		new LocalClassTransformation(servConf, cUnits)
 	    };
 
 	final ChangeHistory cHistory = servConf.getChangeHistory();
@@ -2728,6 +2741,7 @@ public class Recoder2KeY implements JavaReader{
 	    }
 	    transformer[i].execute();	    
 	}
+	locClass2finalVar = transformer[2].getLocalClass2FinalVar();
         if (cHistory.needsUpdate()) {
             cHistory.updateModel();    
         }
