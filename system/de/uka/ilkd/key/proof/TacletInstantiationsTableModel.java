@@ -33,6 +33,7 @@ import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.inst.RigidnessException;
 import de.uka.ilkd.key.rule.inst.SortException;
+import de.uka.ilkd.key.util.Array;
 
 
 public class TacletInstantiationsTableModel extends AbstractTableModel {
@@ -529,7 +530,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
                 } else if (sv.isListSV()){
                     try{
                         SetOfLocationDescriptor s = parseLocationList(irow);
-                        result = result.addInstantiation(sv, s.toArray(), true);
+                        result = result.addInstantiation(sv, Array.reverse(s.toArray()), true);
                     }catch (ParserException pe) {
                         Location loc = pe.getLocation();
                         if (loc != null) {
