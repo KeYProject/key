@@ -158,6 +158,10 @@ public class JMLSpecExtractor implements SpecExtractor {
         
         ArrayOfTypeReference exceptions = pm.getThrown().getExceptions();
 
+        if (exceptions == null) {
+            return "\\nothing;";
+        }
+        
         String exceptionsString = "";
 
         for (int i = 0; i < exceptions.size(); i++) {
