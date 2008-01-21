@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.abstraction.ListOfField;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.FieldDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.reference.ArrayOfTypeReference;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.NonRigidHeapDependentFunction;
@@ -149,6 +150,39 @@ public class JMLSpecExtractor implements SpecExtractor {
     }
     
     
+    private String getDefautlSignalsOnly(ProgramMethod pm) {
+
+        if (pm.getThrown() == null) {
+            return "\\nothing;";
+        }
+        
+        ArrayOfTypeReference exceptions = pm.getThrown().getExceptions();
+
+        String exceptionsString = "";
+
+        for (int i = 0; i < exceptions.size(); i++) {
+            //only subtypes of java.lang.Exception are in the default
+            //signals-only
+            if (services.getJavaInfo().isSubtype(
+                    exceptions.getTypeReference(i).getKeYJavaType(),
+                    services.getJavaInfo()
+                            .getKeYJavaType("java.lang.Exception"))) {
+                exceptionsString += exceptions.getTypeReference(i).getName()
+                        + ", ";
+            }
+        }
+
+        if (exceptionsString.equals("")) {
+            exceptionsString = "\\nothing";
+        } else {
+            //delete the last ", "
+            exceptionsString = exceptionsString.substring(0, exceptionsString
+                    .length() - 2);
+        }
+        return exceptionsString + ";";
+    }
+
+
     
     //-------------------------------------------------------------------------
     //public interface
@@ -344,6 +378,13 @@ public class JMLSpecExtractor implements SpecExtractor {
                 specCase.addEnsures(new PositionedString(nonNull));
             }
             
+            // add implicit signals-only if omitted
+            if (specCase.getSignalsOnly().isEmpty()
+                    && specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR) {
+                specCase.addSignalsOnly(new PositionedString(
+                        getDefautlSignalsOnly(pm)));
+            }
+            
             SetOfOperationContract contracts 
                 = jsf.createJMLOperationContractsAndInherit(pm, specCase);
             result = result.union(contracts);
@@ -358,7 +399,6 @@ public class JMLSpecExtractor implements SpecExtractor {
     }
     
     
-
     public LoopInvariant extractLoopInvariant(ProgramMethod pm, 
                                               LoopStatement loop) 
             throws SLTranslationException {
