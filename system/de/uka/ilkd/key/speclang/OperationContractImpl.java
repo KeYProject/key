@@ -130,7 +130,7 @@ public class OperationContractImpl implements OperationContract {
 	
         //self
 	if(selfVar != null) {
-	    assert originalSelfVar.sort().equals(selfVar.sort());
+            assert selfVar.sort().extendsTrans(originalSelfVar.sort());
 	    result.put(originalSelfVar, selfVar);
 	}
 	
