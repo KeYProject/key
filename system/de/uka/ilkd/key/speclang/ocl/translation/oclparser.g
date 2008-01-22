@@ -17,7 +17,9 @@ header {
     import de.uka.ilkd.key.collection.SLListOfString;
     import de.uka.ilkd.key.java.abstraction.KeYJavaType;
     import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+    import de.uka.ilkd.key.java.declaration.TypeDeclaration;
     import de.uka.ilkd.key.java.JavaInfo;
+    import de.uka.ilkd.key.java.Position;
     import de.uka.ilkd.key.java.Services;
     import de.uka.ilkd.key.logic.*;
     import de.uka.ilkd.key.logic.op.*;
@@ -25,6 +27,7 @@ header {
     import de.uka.ilkd.key.speclang.translation.AxiomCollector;
     import de.uka.ilkd.key.speclang.translation.JavaIntegerSemanticsHelper;
     import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+    import de.uka.ilkd.key.speclang.translation.SLTranslationExceptionManager;
     import de.uka.ilkd.key.util.Debug;
     import de.uka.ilkd.key.proof.AtPreFactory;
     
@@ -67,6 +70,7 @@ options {
     private PropertyManager propertyManager;
     private AxiomCollector axiomCollector;
     private JavaIntegerSemanticsHelper intHelper;
+    private SLTranslationExceptionManager excManager;
     
     private boolean preConditionParser;    
 
@@ -74,15 +78,16 @@ options {
      * @param lexer the associated lexer
      */
     public KeYOCLParser(TokenStream lexer,
- 			Services services,
- 			            KeYJavaType specInClass,  
-                        AxiomCollector ac,
-                        ParsableVariable selfVar,
-                        ListOfParsableVariable paramVars,
-                        ParsableVariable resultVar,
-                        ParsableVariable excVar,
-                        /*inout*/ Map /*operator (normal) 
-                        -> function (atPre)*/ atPreFunctions) {
+                        Position offsetPos,
+                        Services services,
+ 			            KeYJavaType specInClass,
+ 			            AxiomCollector ac,
+ 			            ParsableVariable selfVar,
+ 			            ListOfParsableVariable paramVars,
+ 			            ParsableVariable resultVar,
+ 			            ParsableVariable excVar,
+ 			            /*inout*/ Map /*operator (normal)
+ 			            -> function (atPre)*/ atPreFunctions) {
         this(lexer);
         
     	//save parameters        
@@ -97,6 +102,17 @@ options {
         this.resultVar      = resultVar;
         this.excVar         = excVar;
         this.atPreFunctions = atPreFunctions;
+        
+        String fileName = "no file";
+        if (specInClass.getJavaType() instanceof TypeDeclaration) {
+        	fileName = ((TypeDeclaration)specInClass.getJavaType())
+                                .getPositionInfo().getFileName();
+        }
+        
+        this.excManager = new SLTranslationExceptionManager(this,
+                                fileName, 
+                                offsetPos);
+                                
                 
         //set axiomCollector
         axiomCollector = ac;
@@ -108,7 +124,11 @@ options {
         intHelper = new JavaIntegerSemanticsHelper(services);
         
         //initialise property manager
-        propertyManager = new PropertyManager(services, specInClass, formulaBoolConverter, excVar);
+        propertyManager = new PropertyManager(services,
+                                              specInClass,
+                                              formulaBoolConverter,
+                                              excVar,
+                                              excManager);
         propertyManager.pushLocalVariablesNamespace();
         if(selfVar != null) {
 	        propertyManager.putIntoTopLocalVariablesNamespace(selfVar);
@@ -152,13 +172,13 @@ options {
     }   
     
     
-    private void raiseError(Exception e) throws SLTranslationException {
-    	throw new SLTranslationException(e.getMessage(), "no file", getLine(), getColumn());
+    private void raiseError(antlr.ANTLRException e) throws SLTranslationException {
+        throw excManager.convertException(e);
     }
     
     
     private void raiseError(String message) throws SLTranslationException {
-	    throw new SLTranslationException("OCL Parser Error: " + message, "no file", getLine(), getColumn());
+        throw excManager.createException("OCL Parser Error: " + message);
     }
        
     
@@ -566,32 +586,24 @@ additiveExpression returns [OCLEntity result=null] throws SLTranslationException
 	    (
 	        PLUS a=multiplicativeExpression
 	        {
-	        	try {
-	        		if (!result.isTerm() | !a.isTerm()) {
-	        			raiseError("Wrong expression in additive expression. One of the summands is not a term.");
-	        		}
+           		if (!result.isTerm() | !a.isTerm()) {
+	       			raiseError("Wrong expression in additive expression. One of the summands is not a term.");
+	       		}
 	        		
-        	        result = new OCLEntity(
-        	                intHelper.buildAddExpression(result.getTerm(),a.getTerm()));
-        	    } catch (SLTranslationException e) {
-        	        raiseError(e);
-        	    }
+       	        result = new OCLEntity(
+       	                intHelper.buildAddExpression(result.getTerm(),a.getTerm()));
 	        }
 
 	        |
 
 	        MINUS a=multiplicativeExpression
 	        {
-	        	try {
-	        		if (!result.isTerm() | !a.isTerm()) {
-	        			raiseError("Wrong expression in subtractive expression. One of the summands is not a term.");
-	        		}
+        		if (!result.isTerm() | !a.isTerm()) {
+        			raiseError("Wrong expression in subtractive expression. One of the summands is not a term.");
+        		}
 	        		
-        	        result = new OCLEntity(
-        	                intHelper.buildSubExpression(result.getTerm(),a.getTerm()));
-        	    } catch (SLTranslationException e) {
-        	        raiseError(e);
-        	    }
+       	        result = new OCLEntity(
+       	                intHelper.buildSubExpression(result.getTerm(),a.getTerm()));
 	        }
     	)*
 	;
@@ -607,16 +619,12 @@ multiplicativeExpression returns [OCLEntity result=null] throws SLTranslationExc
 	    ( 
 	        MULT a=unaryExpression
 	        {
-	        	try {
-	        		if (!result.isTerm() | !a.isTerm()) {
-	        			raiseError("Wrong expression in multiplicative expression. One of the factors is not a term.");
-	        		}
-	        		
-        	        result = new OCLEntity(
-        	                intHelper.buildMulExpression(result.getTerm(),a.getTerm()));
-        	    } catch (SLTranslationException e) {
-        	        raiseError(e);
-        	    }
+        		if (!result.isTerm() | !a.isTerm()) {
+        			raiseError("Wrong expression in multiplicative expression. One of the factors is not a term.");
+        		}
+        		
+       	        result = new OCLEntity(
+       	                intHelper.buildMulExpression(result.getTerm(),a.getTerm()));
 	        }
 	        
 	        |
@@ -794,13 +802,9 @@ propertyCall[OCLEntity receiver] returns [OCLEntity result = null] throws SLTran
 		}
         (parameters=propertyCallParameters[receiver, needVarDeclaration])?
         {
-        	try {       		
-        	    result = (OCLEntity) propertyManager.resolve(receiver, 
-    								    		 propertyName, 
-    									    	 parameters);
-        	} catch (SLTranslationException e) {
-        		raiseError(e);
-        	}
+       	    result = (OCLEntity) propertyManager.resolve(receiver, 
+   								    		 propertyName, 
+   									    	 parameters);
  
          	if(result == null) {
     			raiseError("The property call \"" + propertyName 

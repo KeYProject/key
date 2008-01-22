@@ -194,21 +194,21 @@ modifiers
 
 
 modifier returns [String result = null]:
-	fin:FINAL	    		{ result = fin.getText(); }
-    |   gho:GHOST           		{ result = gho.getText(); } 
-    |   hel:HELPER          		{ result = hel.getText(); }
-    |   ins:INSTANCE        		{ result = ins.getText(); }
-    |   mod:MODEL           		{ result = mod.getText(); }
-    |   nnu:NON_NULL        		{ result = nnu.getText(); }
-    |   nul:NULLABLE	    		{ result = nul.getText(); }
-    |   nbd:NULLABLE_BY_DEFAULT 	{ result = nbd.getText(); }
-    |	pri:PRIVATE         		{ result = pri.getText(); }
-    |   pro:PROTECTED       		{ result = pro.getText(); }
-    |   pub:PUBLIC          		{ result = pub.getText(); }
-    |   pur:PURE            		{ result = pur.getText(); }
-    |   spr:SPEC_PROTECTED  		{ result = spr.getText(); }
-    |   spu:SPEC_PUBLIC     		{ result = spu.getText(); }
-    |   sta:STATIC          		{ result = sta.getText(); }
+    fin:FINAL                   { result = fin.getText(); }
+    |   gho:GHOST               { result = gho.getText(); } 
+    |   hel:HELPER              { result = hel.getText(); }
+    |   ins:INSTANCE            { result = ins.getText(); }
+    |   mod:MODEL               { result = mod.getText(); }
+    |   nnu:NON_NULL            { result = nnu.getText(); }
+    |   nul:NULLABLE            { result = nul.getText(); } 
+    |   nld:NULLABLE_BY_DEFAULT { result = nld.getText(); }
+    |   pri:PRIVATE             { result = pri.getText(); }
+    |   pro:PROTECTED           { result = pro.getText(); }
+    |   pub:PUBLIC              { result = pub.getText(); }
+    |   pur:PURE                { result = pur.getText(); }
+    |   spr:SPEC_PROTECTED      { result = spr.getText(); }
+    |   spu:SPEC_PUBLIC         { result = spu.getText(); }
+    |   sta:STATIC              { result = sta.getText(); }
 ;
 
 

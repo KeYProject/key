@@ -13,8 +13,10 @@ class SLTypeResolver extends SLExpressionResolver {
         return receiver == null;
     }
 
-    protected SLExpression doResolving(SLExpression receiver, String name,
-            SLParameters parameters) throws SLTranslationException {
+    protected SLExpression doResolving(SLExpression receiver,
+                                       String name,
+                                       SLParameters parameters)
+                                   throws SLTranslationException {
 
         try {
             KeYJavaType type = javaInfo.getTypeByClassName(name);

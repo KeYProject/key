@@ -289,6 +289,16 @@ options {
 ;
 
 protected
+HEXDIGIT
+options {
+  paraphrase = "a hexadecimal digit";
+}
+    :
+        DIGIT | 'a' .. 'f'
+              | 'A' .. 'F'
+;
+
+protected
 LETTERORDIGIT
     :
         LETTER | DIGIT
@@ -300,6 +310,11 @@ options {
     paraphrase = "an identifier";
 }:
         LETTER (LETTERORDIGIT)*
+;
+
+HEXNUMERAL
+    :
+        '0'! ('x'!|'X'!) (HEXDIGIT)+
 ;
 
 DIGITS

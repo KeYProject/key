@@ -31,9 +31,11 @@ public abstract class SLResolverManager {
         resolvers = SLListOfSLExpressionResolver.EMPTY_LIST;
 
     protected final KeYJavaType specInClass;
+    protected final SLTranslationExceptionManager excManager;
     
     protected SLResolverManager(JavaInfo javaInfo,
             KeYJavaType specInClass,
+            SLTranslationExceptionManager eManager,
            boolean typeResolver, 
            boolean methodResolver,
            boolean attributeResolver) {
@@ -41,6 +43,7 @@ public abstract class SLResolverManager {
         Debug.assertTrue(javaInfo != null);
         this.javaInfo = javaInfo;
         this.specInClass = specInClass;
+        this.excManager = eManager;
         
         if (typeResolver) {
             resolvers = resolvers.prepend(new SLTypeResolver(javaInfo, this));            

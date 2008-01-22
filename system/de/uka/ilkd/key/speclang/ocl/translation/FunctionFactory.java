@@ -287,7 +287,7 @@ class FunctionFactory {
     /**
      * 
      * creates an appropriate function-symbol representing collect for the given term
-     * and adds the axioms that specifie the meaning of this function-symbol to the
+     * and adds the axioms that specify the meaning of this function-symbol to the
      * local axiom-list
      * 
      * c->collect(e | b)

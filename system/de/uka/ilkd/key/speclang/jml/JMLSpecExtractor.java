@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.abstraction.ListOfField;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.FieldDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.reference.ArrayOfTypeReference;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.NonRigidHeapDependentFunction;
@@ -38,6 +39,7 @@ import de.uka.ilkd.key.speclang.SetOfOperationContract;
 import de.uka.ilkd.key.speclang.SpecExtractor;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.IteratorOfTextualJMLConstruct;
+import de.uka.ilkd.key.speclang.jml.pretranslation.SLListOfTextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassInv;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLFieldDecl;
@@ -148,6 +150,43 @@ public class JMLSpecExtractor implements SpecExtractor {
     }
     
     
+    private String getDefautlSignalsOnly(ProgramMethod pm) {
+
+        if (pm.getThrown() == null) {
+            return "\\nothing;";
+        }
+        
+        ArrayOfTypeReference exceptions = pm.getThrown().getExceptions();
+
+        if (exceptions == null) {
+            return "\\nothing;";
+        }
+        
+        String exceptionsString = "";
+
+        for (int i = 0; i < exceptions.size(); i++) {
+            //only subtypes of java.lang.Exception are in the default
+            //signals-only
+            if (services.getJavaInfo().isSubtype(
+                    exceptions.getTypeReference(i).getKeYJavaType(),
+                    services.getJavaInfo()
+                            .getKeYJavaType("java.lang.Exception"))) {
+                exceptionsString += exceptions.getTypeReference(i).getName()
+                        + ", ";
+            }
+        }
+
+        if (exceptionsString.equals("")) {
+            exceptionsString = "\\nothing";
+        } else {
+            //delete the last ", "
+            exceptionsString = exceptionsString.substring(0, exceptionsString
+                    .length() - 2);
+        }
+        return exceptionsString + ";";
+    }
+
+
     
     //-------------------------------------------------------------------------
     //public interface
@@ -252,22 +291,30 @@ public class JMLSpecExtractor implements SpecExtractor {
         
         //determine purity 
         final boolean isPure = JMLInfoExtractor.isPure(pm);
-        
+
         //get comments
         Comment[] comments = pm.getComments();
-        if(comments.length == 0) {
+        if(comments.length == 0 && !isPure) {
             return result;
         }
         
-        //concatenate comments, determine position
-        String concatenatedComment = concatenate(comments);
-        Position pos = comments[0].getStartPosition();
+        ListOfTextualJMLConstruct constructs;
         
-        //call preparser
-        KeYJMLPreParser preParser 
-            = new KeYJMLPreParser(concatenatedComment, fileName, pos);
-        ListOfTextualJMLConstruct constructs 
-            = preParser.parseClasslevelComment();
+        if (comments.length != 0) {
+            //concatenate comments, determine position
+            String concatenatedComment = concatenate(comments);
+            Position pos = comments[0].getStartPosition();
+            //call preparser
+            KeYJMLPreParser preParser 
+                = new KeYJMLPreParser(concatenatedComment, fileName, pos);
+            constructs = preParser.parseClasslevelComment();
+        } else {
+            // method is declared pure and has no other comments
+            assert isPure;
+            constructs = SLListOfTextualJMLConstruct.EMPTY_LIST;
+        }
+        
+        assert constructs != null;
         
         //if pure, add default contract
         if(isPure) {
@@ -279,15 +326,21 @@ public class JMLSpecExtractor implements SpecExtractor {
 
         //create JML contracts out of constructs, add them to result
         TextualJMLConstruct[] constructsArray = constructs.toArray();
+        
         int startPos;
         if(pm.isModel()) {
             startPos = getIndexOfMethodDecl(pm, constructsArray) - 1;
+            assert startPos != constructsArray.length - 1;
         } else {
             startPos = constructsArray.length - 1;
         }
-        for(int i = startPos; 
-            i >= 0 && constructsArray[i] instanceof TextualJMLSpecCase; 
-            i--) {
+        int i;
+        if (isPure) {
+            i = constructsArray.length - 1;
+        } else {
+            i = startPos;
+        }
+        while (i >= 0 && constructsArray[i] instanceof TextualJMLSpecCase) {
             TextualJMLSpecCase specCase 
                 = (TextualJMLSpecCase) constructsArray[i];
             
@@ -329,16 +382,27 @@ public class JMLSpecExtractor implements SpecExtractor {
                 specCase.addEnsures(new PositionedString(nonNull));
             }
             
+            // add implicit signals-only if omitted
+            if (specCase.getSignalsOnly().isEmpty()
+                    && specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR) {
+                specCase.addSignalsOnly(new PositionedString(
+                        getDefautlSignalsOnly(pm)));
+            }
+            
             SetOfOperationContract contracts 
                 = jsf.createJMLOperationContractsAndInherit(pm, specCase);
             result = result.union(contracts);
+            if (i == startPos && isPure && pm.isModel()) {
+                i = getIndexOfMethodDecl(pm, constructsArray) - 1;
+            } else {
+                i--;
+            }
         }
         
         return result;          
     }
     
     
-
     public LoopInvariant extractLoopInvariant(ProgramMethod pm, 
                                               LoopStatement loop) 
             throws SLTranslationException {
