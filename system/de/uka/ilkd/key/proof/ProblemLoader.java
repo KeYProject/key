@@ -192,7 +192,7 @@ public class ProblemLoader implements Runnable {
                        if(envInput instanceof KeYFile) {
                            initConfig.setOriginalKeYFileName(envInput.name());
                        }
-        	       POBrowser poBrowser = new POBrowser(initConfig);        	       
+        	       POBrowser poBrowser = POBrowser.showInstance(initConfig);        	       
         	       po = poBrowser.getPO();
         	       if(po == null) {
         		   return "Aborted.";

@@ -901,7 +901,7 @@ public class Main extends JFrame {
 	    (new GeneralFailureEvent("Please load a proof first"));
 	}else{
 	    POBrowser poBrowser 
-	    	= new POBrowser(mediator.getProof().env().getInitConfig());
+	    	= POBrowser.showInstance(mediator.getProof().env().getInitConfig());
 	    if(poBrowser.getPO() != null) {
 		ProblemInitializer pi = new ProblemInitializer(this);
 		try {

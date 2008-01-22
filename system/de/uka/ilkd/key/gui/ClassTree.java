@@ -29,12 +29,17 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.logic.op.IteratorOfProgramMethod;
 import de.uka.ilkd.key.logic.op.ListOfProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 
 
 class ClassTree extends JTree {
+    
+    private static final String INIT_NAME 
+        =  ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
+    
     
     //-------------------------------------------------------------------------
     //constructors
@@ -151,7 +156,7 @@ class ClassTree extends JTree {
             IteratorOfProgramMethod it = pms.iterator();
             while(it.hasNext()) {
                 ProgramMethod pm = it.next();
-                if (!(pm.isImplicit())
+                if ((!pm.isImplicit() || pm.getName().equals(INIT_NAME))
                         && pm.getMethodDeclaration().getBody() != null) {
                     StringBuffer sb = new StringBuffer(pm.getName());
                     sb.append("(");

@@ -55,6 +55,8 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 
 
 public class POBrowser extends JDialog {
+    
+    private static POBrowser instance;
 
     private final InitConfig initConfig;
     private final Services services;
@@ -73,7 +75,7 @@ public class POBrowser extends JDialog {
     //constructors
     //-------------------------------------------------------------------------
 
-    public POBrowser(InitConfig initConfig, String title) {
+    protected POBrowser(InitConfig initConfig, String title) {
 	super(Main.getInstance(), title, true);
 	this.initConfig = initConfig;
 	this.services   = initConfig.getServices();
@@ -183,10 +185,16 @@ public class POBrowser extends JDialog {
 	setLocation(70, 70);
     }
 
-
-    public POBrowser(InitConfig initConfig) {
-	this(initConfig, "Proof Obligation Browser");
-        setVisible(true);
+    
+    public static POBrowser showInstance(InitConfig initConfig) {
+        if(instance == null
+           || instance.initConfig != initConfig
+           || !instance.initConfig.equals(initConfig)) {
+            instance = new POBrowser(initConfig, "Proof Obligation Browser");
+        }
+        instance.po = null;
+        instance.setVisible(true);
+        return instance;
     }
 
     
