@@ -617,21 +617,19 @@ specarrayrefexpr[JMLExpression receiver] returns [BasicLocationDescriptor result
         | MULT
     )
     {
-       	if (rangeFrom == null) {
-    		// We have a star
-    		Function sub = services.getTypeConverter().getIntegerLDT().getSub();
-    		rangeFrom = tb.zTerm(services, "0");
-    		rangeTo = tb.func(sub, 
-    		                  tb.dot(receiver.getTerm(), javaInfo.getArrayLength()), 
-    		                  tb.zTerm(services, "1"));
-    	}
- 
     	Term indexTerm;
     	Term guardTerm;
-    	
-    	if (rangeTo != null) {
+
+       	if (rangeFrom == null) {
+    		// We have a star. A star includes all components of an array even
+    		// those out of bound. This makes proving easier.    		
 		    LogicVariable indexVar = new LogicVariable(new Name("i"), 
-		   	   		   (Sort) services.getNamespaces().sorts().lookup(new Name("int")));
+		   	   		   services.getTypeConverter().getIntegerLDT().targetSort());
+		    indexTerm = tb.var(indexVar);		
+		    guardTerm = tb.tt();		    
+    	} else if (rangeTo != null) {
+		    LogicVariable indexVar = new LogicVariable(new Name("i"), 
+		   	   		   services.getTypeConverter().getIntegerLDT().targetSort());
 		    indexTerm = tb.var(indexVar);
             guardTerm = tb.and(
                 tb.leq(rangeFrom, indexTerm, services),

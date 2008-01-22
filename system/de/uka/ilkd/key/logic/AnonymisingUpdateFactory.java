@@ -248,7 +248,7 @@ public class AnonymisingUpdateFactory {
                 BasicLocationDescriptor bloc 
                         = (BasicLocationDescriptor) locations[i];
                 final Term locTerm = bloc.getLocTerm();
-                final Term guardTerm = createGuard ( bloc, services );
+                final Term guardTerm = bloc.getFormula();
                 
                 //create elementary update
                 final Term[] argTerms =
@@ -283,37 +283,6 @@ public class AnonymisingUpdateFactory {
         return result;        
     }
 
-
-    private Term createGuard(BasicLocationDescriptor bloc, Services services) {
-        final Term locTerm = bloc.getLocTerm();
-        Term guardTerm = bloc.getFormula();
-
-        //optimisation: for location descriptors of the form
-        //"\for int x; \if(0 <= x & x < a.length) a[x]" 
-        //(resulting e.g. from parsing "a[*]"),
-        //we skip the guard in order to simplify the result.
-        if ( !( locTerm.op () instanceof ArrayOp
-                && locTerm.sub ( 1 ).op () instanceof LogicVariable ) ) 
-            return guardTerm;
-            
-        ProgramVariable lengthPV = services.getJavaInfo ().getArrayLength ();
-        Function sub = services.getTypeConverter ().getIntegerLDT ().getSub ();
-
-        Term varTerm = TB.var ( (LogicVariable)locTerm.sub ( 1 ).op () );
-        Term lengthTerm = TB.dot ( locTerm.sub ( 0 ), lengthPV );
-        Term lengthMinusOneTerm = TB.func ( sub, lengthTerm, TB.one ( services ) );
-
-        Term lowerBoundTerm = TB.leq ( TB.zero ( services ), varTerm, services );
-        Term upperBoundTerm1 = TB.lt ( varTerm, lengthTerm, services );
-        Term upperBoundTerm2 = TB.leq ( varTerm, lengthMinusOneTerm, services );
-        if ( guardTerm.equals ( TB.and ( lowerBoundTerm, upperBoundTerm1 ) )
-             || guardTerm.equals ( TB.and ( lowerBoundTerm, upperBoundTerm2 ) ) ) {
-            guardTerm = TB.tt ();
-        }
-
-        return guardTerm;
-    }
-    
     /**
      * Creates the anonymising update for the passed locations using new
      * uninterpreted functions.
