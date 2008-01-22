@@ -130,9 +130,6 @@ public class MethodCall extends ProgramMetaConstruct {
 	    return ((FieldReference)refPrefix).getProgramVariable()
 		.getKeYJavaType();
 	} else if (refPrefix instanceof SuperReference) {
-	    System.out.println("execContext.getTypeReference().getKeYJavaType(): "+execContext.getTypeReference().getKeYJavaType());
-	    System.out.println("supertype: "+services.getJavaInfo().getSuperclass
-	                (execContext.getTypeReference().getKeYJavaType()));
 	    KeYJavaType st = services.getJavaInfo().getSuperclass
                 (execContext.getTypeReference().getKeYJavaType());
 	    return st; 	

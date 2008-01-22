@@ -250,7 +250,6 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
                if(!vars.contains(v)){
                    vars.add(v);
                }
-               System.out.println("v: "+v.getName()+" class: "+si.getContainingClassType(vr).getName());
                localClass2finalVar.put(si.getContainingClassType(vr), vars);
            }
        }

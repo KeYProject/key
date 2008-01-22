@@ -1127,7 +1127,9 @@ options {
         try {
             int n = 1; 
             StringBuffer className = new StringBuffer(LT(n).getText());
-	    while (isPackage(className.toString())) {	   	   
+	    while (isPackage(className.toString()) || LA(n+2)==NUM_LITERAL || 
+	    		(LT(n+2).getText().charAt(0)<='Z' && LT(n+2).getText().charAt(0)>='A' && 
+	    		(LT(n+2).getText().length()==1 || LT(n+2).getText().charAt(1)<='z' && LT(n+2).getText().charAt(1)>='a'))){  	   
                 if (LA(n+1) != DOT && LA(n+1) != EMPTYBRACKETS) return false;
                 className.append(".");	       
                 className.append(LT(n+2).getText());
@@ -1717,7 +1719,9 @@ simple_ident_dots returns [ String ident = ""; ]
 }
 :
   id = simple_ident { ident += id; }  
-    (DOT id = simple_ident {ident += "." + id;})* 
+    (DOT 
+ 	(id = simple_ident | num:NUM_LITERAL {id=num.getText();}) 
+ 	{ident += "." + id;})* 
  ;
 
 extends_sorts returns [Sort[] extendsSorts = null] 
@@ -2389,7 +2393,7 @@ funcpred_name returns [String result = null]
     (sort_name DOUBLECOLON) => (prefix = sort_name 
         DOUBLECOLON name = simple_ident {result = prefix + "::" + name;})
   | 
-    (prefix = simple_ident {result = prefix;})
+    (prefix = simple_ident {result = prefix; })
 ;
 
 
@@ -2799,12 +2803,20 @@ transactionNumber returns [Term trans = null]
 staticAttributeOrQueryReference returns [String attrReference = ""]
 :
         
-        id:IDENT {
+      //  attrReference=simple_ident_dots 
+      id:IDENT
+        {
             attrReference = id.getText(); 
-            while (isPackage(attrReference)) {
+            while (isPackage(attrReference) || LA(2)==NUM_LITERAL || 
+                (LT(2).getText().charAt(0)<='Z' && LT(2).getText().charAt(0)>='A' && 
+	    		(LT(2).getText().length()==1 || LT(2).getText().charAt(1)<='z' && LT(2).getText().charAt(1)>='a'))) {
                 match(DOT);
                 attrReference += "." + LT(1).getText();
-                match(IDENT);
+                if(LA(1)==NUM_LITERAL){
+                	match(NUM_LITERAL);
+                }else{
+               	 	match(IDENT);
+                }
             }      
         }
         (EMPTYBRACKETS {attrReference += "[]";})*    
@@ -2836,9 +2848,15 @@ static_attribute_suffix returns [Term result = null]
     :   
         attributeName = staticAttributeOrQueryReference
         {   
-	       String className = 
-		   attributeName.substring(0, attributeName.indexOf(':')); 		
-	       v = getAttribute(getTypeByClassName(className).getSort(), attributeName); 
+         	String className;
+            if(attributeName.indexOf(':')!=-1){	
+	       		className = 
+		   			attributeName.substring(0, attributeName.indexOf(':'));
+            }else{
+          		className = 
+		   			attributeName.substring(0, attributeName.lastIndexOf("."));	
+            }	
+	       	v = getAttribute(getTypeByClassName(className).getSort(), attributeName); 
 	    }
         (shadowNumber = transactionNumber)?
         { result = createAttributeTerm(null, v, shadowNumber); }                   
@@ -3621,7 +3639,7 @@ funcpredvarterm returns [Term a = null]
 	((LPAREN)=>argsWithBoundVars = argument_list)? 
         //argsWithBoundVars==null indicates no argument list
         //argsWithBoundVars.size()==0 indicates open-close-parens ()
-        {   
+        {  
             Operator op = lookupVarfuncId(varfuncid, argsWithBoundVars);            
             if (op instanceof ParsableVariable) {
                 a = termForParsedVariable((ParsableVariable)op);

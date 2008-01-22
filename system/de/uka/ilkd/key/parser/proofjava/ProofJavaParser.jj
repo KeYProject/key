@@ -1523,7 +1523,7 @@ UncollatedReferenceQualifier Name() :
     result = factory.createUncollatedReferenceQualifier(id);
   })
 
-  (
+   (
     LOOKAHEAD(2) "." { setPrefixInfo(result); }
     ( <IDENTIFIER>
       {
@@ -1535,6 +1535,14 @@ UncollatedReferenceQualifier Name() :
         id = factory.createImplicitIdentifier(token.image);
       }
     )
+    
+  /*  |
+    <FLOATING_POINT_LITERAL>
+      {
+      	id = factory.createObjectTypeIdentifier(token.image.substring(1));
+      	System.out.println("parsed int identifier: "+id.toSource());
+      }
+      )*/
     {
       setPrefixInfo(id);
       setPostfixInfo(id);

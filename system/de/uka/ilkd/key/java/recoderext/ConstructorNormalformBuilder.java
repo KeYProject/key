@@ -24,6 +24,7 @@ import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Private;
 import recoder.java.declaration.modifier.Public;
 import recoder.java.expression.operator.CopyAssignment;
+import recoder.java.expression.operator.New;
 import recoder.java.reference.*;
 import recoder.kit.ProblemReport;
 import recoder.list.*;
@@ -175,7 +176,6 @@ public class ConstructorNormalformBuilder
              ConstructorMutableList constructors = new ConstructorArrayList(10);
              constructors.add(services.getSourceInfo().getConstructors(cd));
              if(constructors.size()==0){
-                 System.out.println("no constructors: "+cd.getFullName());
                  constructors.add(new DefaultConstructor(cd));
              }
              class2constructors.put(cd, constructors);
@@ -199,33 +199,6 @@ public class ConstructorNormalformBuilder
              // collect initializers for transformation phase
              class2initializers.put(cd, collectInitializers(cd)); 
 	 }
-	 /*for (int unit = 0; unit<units.size(); unit++) {
-	     CompilationUnit cu = units.getCompilationUnit(unit);
-	     int typeCount = cu.getTypeDeclarationCount();
-	
-	     for (int i = 0; i < typeCount; i++) {
-		if (cu.getTypeDeclarationAt(i) instanceof ClassDeclaration)
-		    { 
-			ClassDeclaration cd = (ClassDeclaration)
-			    cu.getTypeDeclarationAt(i);
-			if (cd.getTypeDeclarationCount()>0) {
-			    Debug.out
-				("consNFBuilder: Inner Class detected." + 
-				 "No constructor normalform will be built" +
-				 "for the inner classes of "+cd.getIdentifier());
-			}
-			
-			// collect constructors for transformation phase
-			ConstructorMutableList constructors = 
-			    new ConstructorArrayList(10);
-			constructors.add(services.getSourceInfo().getConstructors(cd));
-			class2constructors.put(cd, constructors);
-						
-			// collect initializers for transformation phase
-			class2initializers.put(cd, collectInitializers(cd));
-		    }
-	    }	
-	}*/
 	setProblemReport(NO_PROBLEM);
 	return NO_PROBLEM;
     }
@@ -416,8 +389,30 @@ public class ConstructorNormalformBuilder
 	     recThrows,
 	     body);
 	nf.makeAllParentRolesValid();
-	System.out.println("nf.toSource: "+nf.toSource());
 	return nf;
+    }
+    
+    private ConstructorDeclaration attachConstructorDecl(TypeDeclaration td){
+        if(td.getASTParent() instanceof New){
+            New n = (New) td.getASTParent();
+            if(n.getArguments()==null || n.getArguments().size()==0) return null;
+            ConstructorDeclaration constr = services.getCrossReferenceSourceInfo().getConstructorDeclaration(      
+                    services.getCrossReferenceSourceInfo().getConstructor(n));
+            constr = (ConstructorDeclaration) constr.deepClone();
+            SuperConstructorReference sr = new SuperConstructorReference(
+                    n.getArguments()!=null ? (ExpressionMutableList) n.getArguments().deepClone() : 
+                        new ExpressionArrayList(0));
+            constr.setBody(new StatementBlock(new StatementArrayList(sr)));
+            constr.makeAllParentRolesValid();
+            attach(constr, td, 0);
+            return constr;
+//            recoder.kit.transformation.AppendMember am = 
+//                new recoder.kit.transformation.AppendMember(servConf, true, constr, cd);
+//            am.analyze();
+//            am.transform();
+//            System.out.println(((ConstructorDeclaration) servConf.getCrossReferenceSourceInfo().getConstructors(cd).getConstructor(0)).toSource());
+        }
+        return null;
     }
       
     /**
@@ -426,13 +421,18 @@ public class ConstructorNormalformBuilder
      */
     protected void makeExplicit(TypeDeclaration td) {
 	if (td instanceof ClassDeclaration) {
+	    ConstructorDeclaration anonConstr=null;
+	    if(td.getName()==null){
+	        anonConstr = attachConstructorDecl(td);
+	    }
 	    ConstructorMutableList constructors = 
 		(ConstructorMutableList) class2constructors.get(td);
+	    constructors.add(anonConstr);
 	    for (int i = 0; i < constructors.size(); i++) {
 		attach(normalform
 		       ((ClassDeclaration)td, 
 			constructors.getConstructor(i)), td, 0);
-	    }	    
+	    }
 
 	    MethodDeclarationList mdl = (MethodDeclarationList)class2methodDeclaration.get(td);
 	    for (int i = 0; i < mdl.size(); i++) {

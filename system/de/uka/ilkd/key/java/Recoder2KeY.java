@@ -1232,7 +1232,10 @@ public class Recoder2KeY implements JavaReader{
 
     /** convert a recoder StamentBlock to a KeY StatementBlock*/
     public StatementBlock convert(recoder.java.StatementBlock block) {
-	return new StatementBlock(collectChildren(block));
+        ExtList children = collectChildren(block);
+        //remove local classes
+        while(children.removeFirstOccurrence(ClassDeclaration.class)!=null){}
+	return new StatementBlock(children);
     }
     
     /** convert a recoder StamentBlock to a KeY StatementBlock*/    
@@ -1421,17 +1424,9 @@ public class Recoder2KeY implements JavaReader{
 	KeYJavaType kjt = getKeYJavaType(td);
 	ExtList classMembers = collectChildren(td);       
 	
-/*	if(td.getName() == null){
-	    // anonymous class
-	    classMembers.removeFirstOccurrence(Extends.class);
-	    System.out.println("1 new Extends: "+td.getSupertypes().getClassType(0).getFullName());
-	    classMembers.add(new Extends(new TypeRef(getKeYJavaType(td.getSupertypes().getClassType(0)))));
-	    System.out.println("2 new Extends: "+td.getSupertypes().getClassType(0).getFullName());
-	}*/
-
 	ClassDeclaration keYClassDecl = new ClassDeclaration
 	    (classMembers,
-	     new ProgramElementName(td.getFullName()),
+	     new ProgramElementName(makeAdmissibleName(td.getFullName())),
 	     parsingLibs, td.getContainingClassType()!=null,
 	     td.getName()==null, td.getStatementContainer() !=null
 	     );
@@ -1560,25 +1555,24 @@ public class Recoder2KeY implements JavaReader{
     }
     
     private String makeAdmissibleName(String s){
-        int i = s.indexOf(".");
+        return s;
+/*        int i = s.indexOf(".");
         while(i!=-1){
             if(s.charAt(i+1)<='9' && s.charAt(i+1)>='0'){
                 s = s.substring(0, i)+"_"+s.substring(i+1);
             }
             i = s.indexOf(".", i+1);
         }
-        return s;
+        return s;*/
     }
 
     private SetOfSort directSuperSorts
 	(recoder.abstraction.ClassType classType) {
 
 	recoder.list.ClassTypeList supers=classType.getSupertypes();
-//	System.out.println("classType: "+classType.getFullName());
 	SetOfSort ss=SetAsListOfSort.EMPTY_SET;
 	for (int i=0; i<supers.size(); i++) {
 	    ss = ss.add(getKeYJavaType(supers.getClassType(i)).getSort());
-//	    System.out.println("super: "+supers.getClassType(i).getFullName());
 	}
 	
 	if(classType.getName()==null){
@@ -1706,8 +1700,8 @@ public class Recoder2KeY implements JavaReader{
         final KeYJavaType classType = getKeYJavaType(cf);
 
         final Modifier[] modifiers = getModifiers(cf);   
-        final ProgramElementName name = new ProgramElementName(cf.getName());
-        final ProgramElementName fullname = new ProgramElementName(cf.getFullName());
+        final ProgramElementName name = new ProgramElementName(makeAdmissibleName(cf.getName()));
+        final ProgramElementName fullname = new ProgramElementName(makeAdmissibleName(cf.getFullName()));
                 
         ClassTypeList supertype = cf.getSupertypes();
         
@@ -1897,7 +1891,7 @@ public class Recoder2KeY implements JavaReader{
 		(servConf.getSourceInfo()).getType(recoderVarSpec);
 
 	    final ProgramElementName name = VariableNamer.
-                parseName(recoderVarSpec.getName());
+                parseName(makeAdmissibleName(recoderVarSpec.getName()));
 	    final ProgramVariable pv = new LocationVariable(name,
 	            getKeYJavaType(recoderType), recoderVarSpec.isFinal());	   
 	    varSpec = new VariableSpecification
@@ -2011,8 +2005,8 @@ public class Recoder2KeY implements JavaReader{
 		final ClassType recContainingClassType = 
 		    recoderVarSpec.getContainingClassType();
 		final ProgramElementName pen = 
-		    new ProgramElementName(recoderVarSpec.getName(),
-		            recContainingClassType.getFullName());		
+		    new ProgramElementName(makeAdmissibleName(recoderVarSpec.getName()),
+		            makeAdmissibleName(recContainingClassType.getFullName()));		
 		
                                 
                 final Literal compileTimeConstant = 
@@ -2294,8 +2288,8 @@ public class Recoder2KeY implements JavaReader{
 		 = new recoder.java.declaration.FieldSpecification
 		 (fr.getIdentifier());
 	     pv = new LocationVariable
-		 (new ProgramElementName(fs.getName(), 
-		         recField.getContainingClassType().getFullName()),
+		 (new ProgramElementName(makeAdmissibleName(fs.getName()), 
+		         makeAdmissibleName(recField.getContainingClassType().getFullName())),
 		  getKeYJavaType(recoderType),
 		  getKeYJavaType(recField.getContainingClassType()),
 		  recField.isStatic());
@@ -2553,10 +2547,11 @@ public class Recoder2KeY implements JavaReader{
 	final recoder.list.ExpressionMutableList args = n.getArguments();		
 	final recoder.java.reference.ReferencePrefix rp = n.getReferencePrefix();
 	final recoder.java.reference.TypeReference tr = n.getTypeReference();
+	final recoder.java.declaration.ClassDeclaration cd = n.getClassDeclaration();
 	
 	LinkedList outerVars = null;
 	if(locClass2finalVar!=null){
-	    outerVars = (LinkedList) locClass2finalVar.get(n.getClassDeclaration());
+	    outerVars = (LinkedList) locClass2finalVar.get(cd);
 	}
 	int numVars = outerVars!=null? outerVars.size() : 0;
 	Expression[] arguments = new Expression[(args != null ? args.size() : 0)+numVars];
@@ -2564,8 +2559,9 @@ public class Recoder2KeY implements JavaReader{
 	    arguments[i] = (Expression)callConvert(args.getExpression(i));
 	}      
 	for (int i = arguments.length-numVars; i<arguments.length; i++) {
-            arguments[i] = (ProgramVariable) convert((recoder.java.declaration.VariableSpecification) outerVars.get(i)).
-                getProgramVariable();    	    
+            arguments[i] = (ProgramVariable) convert(
+                    (recoder.java.declaration.VariableSpecification) outerVars.get(i-arguments.length+numVars)).
+                getProgramVariable();    
 	}
 	
 	TypeReference maybeAnonClass = (TypeReference) callConvert(tr);
@@ -2633,18 +2629,20 @@ public class Recoder2KeY implements JavaReader{
 	String baseType = TypeNameTranslator.getBaseType(typeName);
 	int idx = baseType.indexOf('.');
 	int lastIndex = 0;
-	while (idx != -1) {	    
+	String anonType="";
+	while (idx != -1 && baseType.charAt(lastIndex)>='a' && baseType.charAt(lastIndex)<='z') {	
+	    String s = baseType.substring(lastIndex, idx);
 	    pr = new recoder.java.reference.PackageReference
-		(pr, new recoder.java.Identifier(baseType.substring(lastIndex, idx)));	    
+	            (pr, new recoder.java.Identifier(s));
 	    lastIndex = idx + 1;
 	    idx = baseType.indexOf('.', lastIndex);
 	}
-
+	baseType = anonType+baseType;
 	recoder.java.Identifier typeId;
 	if (baseType.charAt(0) == '<') {
 	    typeId = new ImplicitIdentifier(baseType.substring(lastIndex));
 	} else {	
-	    typeId = new recoder.java.Identifier(baseType.substring(lastIndex));
+	    typeId = new ObjectTypeIdentifier(baseType.substring(lastIndex));
 	}
 	recoder.java.reference.TypeReference result = 
 	    new recoder.java.reference.TypeReference(pr, typeId);
@@ -2822,8 +2820,8 @@ public class Recoder2KeY implements JavaReader{
 
 	ImplicitFieldSpecification varSpec = 
 	    new ImplicitFieldSpecification
-	    (new LocationVariable(new ProgramElementName(name, 
-	            prefix.getSort().name().toString()),
+	    (new LocationVariable(new ProgramElementName(makeAdmissibleName(name), 
+	            makeAdmissibleName(prefix.getSort().name().toString())),
 	            typeRef.getKeYJavaType(), prefix, 
 	            isStatic), 
 	     typeRef.getKeYJavaType());	

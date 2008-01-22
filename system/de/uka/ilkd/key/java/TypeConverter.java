@@ -259,8 +259,6 @@ public class TypeConverter extends TermBuilder {
         ProgramVariable inst = (ProgramVariable) ec.getRuntimeInstance();
         Term result = var(inst);
         KeYJavaType classType = ec.getTypeReference().getKeYJavaType();
-        System.out.println("inst.sort(): "+inst.sort());
-        System.out.println("s: "+s);
         while(!classType.getSort().extendsTrans(s)){
             inst = services.getJavaInfo().getAttribute(
                     ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, classType);
