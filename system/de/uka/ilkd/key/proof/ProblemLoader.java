@@ -36,6 +36,7 @@ import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.speclang.SetAsListOfClassInvariant;
 import de.uka.ilkd.key.speclang.SetOfClassInvariant;
+import de.uka.ilkd.key.util.Array;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAuflia;
@@ -522,7 +523,7 @@ public class ProblemLoader implements Runnable {
 	    result = app.createSkolemConstant ( value, sv, true, services );
         } else if (sv.isListSV()) {
             SetOfLocationDescriptor s = parseLocationList(value, targetGoal);
-            result = app.addInstantiation(sv, s.toArray(), true);
+            result = app.addInstantiation(sv, Array.reverse(s.toArray()), true);
         } else {
             Namespace varNS = p.getNamespaces().variables();
 	    varNS = app.extendVarNamespaceForSV(varNS, sv);

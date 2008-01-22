@@ -100,9 +100,20 @@ public class SLTranslationExceptionManager {
     
     
     /**
-     * Converts an ANTLRException into an SLTranslationException with the 
-     * same message and stack trace, and with current absolute position 
-     * information.
+     * Creates an SLTranslationException with the position information of the
+     * passed token.
+     */
+    public SLTranslationException createException(String message, Token t) {
+        return new SLTranslationException(message,
+                                          fileName,
+                                          createAbsolutePosition(t.getLine(),
+                                                                 t.getColumn()));
+    }
+
+    
+    /**
+     * Converts an ANTLRException into an SLTranslationException with the same
+     * message and stack trace, and with current absolute position information.
      */
     public SLTranslationException convertException(ANTLRException e) {
         Position pos;

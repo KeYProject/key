@@ -399,7 +399,7 @@ public class JMLTransformer extends RecoderModelTransformer {
             }
             
             //concatenate comments of child, determine position
-            String concatenatedComment = concatenate(comments);            
+            String concatenatedComment = concatenate(comments);
             Position recoderPos = comments[0].getStartPosition();
             de.uka.ilkd.key.java.Position pos 
                 = new de.uka.ilkd.key.java.Position(recoderPos.getLine(), 

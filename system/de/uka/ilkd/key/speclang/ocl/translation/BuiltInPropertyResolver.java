@@ -92,7 +92,10 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
     }
 
 
-    protected SLExpression doResolving(SLExpression receiver, String name, SLParameters parameters) throws SLTranslationException {
+    protected SLExpression doResolving(SLExpression receiver,
+                                       String name,
+                                       SLParameters parameters)
+                                   throws SLTranslationException {
 
         OCLParameters oclParameters = null;
         

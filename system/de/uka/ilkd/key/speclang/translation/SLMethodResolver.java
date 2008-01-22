@@ -15,8 +15,10 @@ class SLMethodResolver extends SLExpressionResolver {
         super(javaInfo, manager);
     }
 
-    protected SLExpression doResolving(SLExpression receiver, String methodName,
-            SLParameters parameters) throws SLTranslationException {
+    protected SLExpression doResolving(SLExpression receiver,
+                                       String methodName,
+                                       SLParameters parameters)
+                                   throws SLTranslationException {
 
         if(parameters == null || !parameters.isListOfTerm()) {
             return null;
@@ -45,7 +47,9 @@ class SLMethodResolver extends SLExpressionResolver {
         
         if (!pm.isStatic()) {
             if (!receiver.isTerm()) {
-                throw new SLTranslationException("non-static method invocation on Type " + receiver.getType());
+                throw manager.excManager.createException(
+                        "non-static method ( " + methodName + " ) invocation" +
+                        " on Type " + receiver.getType());
             }
             subs = new Term[parameters.getParameters().size()+1];
             subs[0] = receiver.getTerm();

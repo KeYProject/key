@@ -16,6 +16,7 @@ import java.util.Map;
 import antlr.RecognitionException;
 import antlr.TokenStreamException;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ListOfInteger;
@@ -63,6 +64,7 @@ class OCLTranslator {
                                            -> Function (atPre)*/ atPreFunctions) 
     		throws SLTranslationException {
 	assert expr != null && !expr.equals("");
+	assert specInClass != null;
 	AxiomCollector ac = new AxiomCollector();
 	FunctionFactory.INSTANCE.resetFactory(services, ac);
 	
@@ -72,14 +74,15 @@ class OCLTranslator {
         //create lexer and parser
         StringReader stream = new StringReader(expr);
         KeYOCLLexer lexer   = new KeYOCLLexer(stream);
-        KeYOCLParser parser = new KeYOCLParser(lexer, 
-    	    				   services,
+        KeYOCLParser parser = new KeYOCLParser(lexer,
+                                               Position.UNDEFINED, //TODO
+    	    				       services,
                                                specInClass,
-        				       	   ac, 
-        				       	   selfVar, 
-        				       	   paramVars, 
-        				       	   resultVar, 
-        				       	   excVar,
+        				       ac, 
+        				       selfVar, 
+        				       paramVars, 
+        				       resultVar, 
+        				       excVar,
                                                atPreFunctions);
         
         //initialise counters

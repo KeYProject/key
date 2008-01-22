@@ -65,6 +65,7 @@ header {
     import de.uka.ilkd.key.util.Debug;
 
     import java.lang.RuntimeException;
+    import java.math.BigInteger;
     import java.util.Map;
     import java.util.LinkedHashMap;
 }
@@ -133,7 +134,9 @@ options {
 	this.atPreFunctions = atPreFunctions;
 
 	// initialize helper objects
-	this.resolverManager = new JMLResolverManager(this.javaInfo, specInClass);
+	this.resolverManager = new JMLResolverManager(this.javaInfo,
+	                                              specInClass,
+	                                              this.excManager);
 
 	// initialize namespaces
 	resolverManager.pushLocalVariablesNamespace();
@@ -188,6 +191,9 @@ options {
         throw excManager.createException(msg);
     }
     
+    private void raiseError(String msg, Token t) throws SLTranslationException {
+    	throw excManager.createException(msg, t);
+    }
     
     private void raiseNotSupported(String feature) 
     		throws SLTranslationException {
@@ -361,46 +367,52 @@ options {
     }
 
 
-    private JMLExpression lookupIdentifier(String id, JMLExpression receiver, ListOfTerm callingParameters) throws SLTranslationException {
+    private JMLExpression lookupIdentifier(String lookupName,
+                                           JMLExpression receiver,
+                                           ListOfTerm callingParameters,
+                                           Token t)
+                                       throws SLTranslationException {
 
-	// Identifier with suffix in parantheses? Probably a method call
-	// parse in the parameter list and call again
-	try {
-	    if (LA(1) == LPAREN) {
-		return receiver;
-	    }
-	} catch (TokenStreamException e) {
-	    if(currentlyParsing) {
-		raiseError("internal Error: no further Token in Stream");
-	    }
-	}
+        // Identifier with suffix in parantheses? Probably a method call
+        // parse in the parameter list and call again
+        try {
+            if (LA(1) == LPAREN) {
+            return receiver;
+        }
+        } catch (TokenStreamException e) {
+            if(currentlyParsing) {
+                raiseError("internal Error: no further Token in Stream");
+            }
+        }
 
-
-	ListOfSLExpression paramList = null;
-	SLParameters params = null;
-	if (callingParameters != null) {
-	    paramList = SLListOfSLExpression.EMPTY_LIST;
-
-	    IteratorOfTerm it = callingParameters.iterator();
-	    while(it.hasNext()) {
-		paramList = paramList.append(new JMLExpression(it.next()));
-	    }
-	    params = new SLParameters(paramList);
-	}
-
-        JMLExpression result = (JMLExpression) resolverManager.resolve(receiver, id, params);
-	if (result != null) {
-	    return result;
-	}
-
-	// no identifier found, maybe it was just a package prefix.
-	// but package prefixes don't have a receiver!
-
-	if (receiver != null) {
-	    raiseError("Identifier " + id + " not found!");
-	}
-
-	return null;
+        ListOfSLExpression paramList = null;
+        SLParameters params = null;
+        if (callingParameters != null) {
+            paramList = SLListOfSLExpression.EMPTY_LIST;
+            IteratorOfTerm it = callingParameters.iterator();
+            while(it.hasNext()) {
+                paramList = paramList.append(new JMLExpression(it.next()));
+            }
+            params = new SLParameters(paramList);
+        }
+        
+        JMLExpression result = (JMLExpression) resolverManager.resolve(
+                receiver,
+                lookupName,
+                params);
+        
+        if (result != null) {
+            return result;
+        }
+    
+        // no identifier found, maybe it was just a package prefix.
+        // but package prefixes don't have a receiver!
+        
+        if (receiver != null) {
+            raiseError("Identifier " + lookupName + " not found!", t);
+        }
+        
+        return null;
     }
 
 
@@ -533,7 +545,7 @@ storereflist returns [SetOfLocationDescriptor result=SetAsListOfLocationDescript
 storeref returns [LocationDescriptor ld=null] throws SLTranslationException
 :
         ld=storerefexpression
-    |   { raiseError("informal descriptions not supported (for obvious reason)\n Ignoring it"); }
+    |   { raiseError("informal descriptions not supported (for obvious reason)"); }
 //TODO: should be a warning!
 //    |   { raiseWarning("informal descriptions not supported (for obvious reason)\n Ignoring it"); }
         LPAREN MULT
@@ -562,7 +574,7 @@ storerefname returns [JMLExpression result = null] throws SLTranslationException
 :
     id:IDENT
     {
-    	result = lookupIdentifier(id.getText(), null, null);
+    	result = lookupIdentifier(id.getText(), null, null, id);
     	if(result == null) {
     	    raiseError("identifier not found: " + id.getText());
     	}
@@ -585,7 +597,7 @@ storerefnamesuffix[JMLExpression receiver] returns [BasicLocationDescriptor ld=n
 :
     DOT id:IDENT
     {
-	JMLExpression expr = lookupIdentifier(id.getText(), receiver, null);
+	JMLExpression expr = lookupIdentifier(id.getText(), receiver, null, id);
 	if (!expr.isTerm()) {
 	    raiseError("Error in store-ref-suffix");
 	}
@@ -617,21 +629,19 @@ specarrayrefexpr[JMLExpression receiver] returns [BasicLocationDescriptor result
         | MULT
     )
     {
-       	if (rangeFrom == null) {
-    		// We have a star
-    		Function sub = services.getTypeConverter().getIntegerLDT().getSub();
-    		rangeFrom = tb.zTerm(services, "0");
-    		rangeTo = tb.func(sub, 
-    		                  tb.dot(receiver.getTerm(), javaInfo.getArrayLength()), 
-    		                  tb.zTerm(services, "1"));
-    	}
- 
     	Term indexTerm;
     	Term guardTerm;
-    	
-    	if (rangeTo != null) {
+
+       	if (rangeFrom == null) {
+    		// We have a star. A star includes all components of an array even
+    		// those out of bound. This makes proving easier.    		
 		    LogicVariable indexVar = new LogicVariable(new Name("i"), 
-		   	   		   (Sort) services.getNamespaces().sorts().lookup(new Name("int")));
+		   	   		   services.getTypeConverter().getIntegerLDT().targetSort());
+		    indexTerm = tb.var(indexVar);		
+		    guardTerm = tb.tt();		    
+    	} else if (rangeTo != null) {
+		    LogicVariable indexVar = new LogicVariable(new Name("i"), 
+		   	   		   services.getTypeConverter().getIntegerLDT().targetSort());
 		    indexTerm = tb.var(indexVar);
             guardTerm = tb.and(
                 tb.leq(rangeFrom, indexTerm, services),
@@ -1158,7 +1168,7 @@ primaryexpr returns [JMLExpression result=null] throws SLTranslationException
 }
 :
         t=constant   { result = new JMLExpression(t); }
-    |   id:IDENT     { result = lookupIdentifier(id.getText(), null, null); }
+    |   id:IDENT     { result = lookupIdentifier(id.getText(), null, null, id); }
     |   "true"       { result = new JMLExpression(tb.tt()); }
     |   "false"      { result = new JMLExpression(tb.ff()); }
     |   "null"       { result = new JMLExpression(tb.NULL(services)); }
@@ -1187,10 +1197,10 @@ primarysuffix[JMLExpression receiver, String fullyQualifiedName] returns [JMLExp
         	} else {
         		lookupName = id.getText();
         	}
-        	result = lookupIdentifier(lookupName, receiver, null);
+        	result = lookupIdentifier(lookupName, receiver, null, id);
         }
     |
-        LPAREN (callingParameters=expressionlist)? RPAREN
+        l:LPAREN (callingParameters=expressionlist)? RPAREN
         {
 /*
         	System.out.println("Looking up: " + lookupName);
@@ -1199,10 +1209,10 @@ primarysuffix[JMLExpression receiver, String fullyQualifiedName] returns [JMLExp
         	System.out.println("and receiver: " + receiver);
         	System.out.println();
 */
-        	result = lookupIdentifier(lookupName, receiver, callingParameters);
+        	result = lookupIdentifier(lookupName, receiver, callingParameters, l);
         	if (result == null) {
         		// method calls must result in an object!
-        		raiseError("Method " + lookupName + " not found!");
+        		raiseError("Method " + lookupName + " not found!",l);
         	}
         }
     |
@@ -1271,6 +1281,17 @@ javaliteral returns [Term result=null] throws SLTranslationException
 integerliteral returns [Term result=null] throws SLTranslationException
 :
         result=decimalintegerliteral
+    |
+        result=hexintegerliteral
+;
+
+hexintegerliteral returns [Term result=null] throws SLTranslationException
+:
+    n:HEXNUMERAL
+    {
+    	BigInteger decInteger = new BigInteger(n.getText(),16);
+        result = castToJint(tb.zTerm(services,decInteger.toString()));
+    }
 ;
 
 decimalintegerliteral returns [Term result=null] throws SLTranslationException

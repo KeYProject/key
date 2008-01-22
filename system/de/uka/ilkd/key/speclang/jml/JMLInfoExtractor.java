@@ -100,8 +100,8 @@ class JMLInfoExtractor {
     // Information about Methods...
    
     /**
-     * Returns true, if the <code>pos</code>-th parameter of the given method is
-     * declared "nullable" (implicit or explicit). 
+     * Returns true, iff the <code>pos</code>-th parameter of the given method
+     * is declared "nullable" (implicit or explicit). 
      */
     public static boolean parameterIsNullable(ProgramMethod pm, int pos) {
 
@@ -154,7 +154,7 @@ class JMLInfoExtractor {
     
     
     /**
-     * Returns true, if the JML modifier "pure" is attached to the given method.
+     * Returns true, if the given method is specified "pure".
      */
     public static  boolean isPure(ProgramMethod pm) {
         ListOfComment coms = SLListOfComment.EMPTY_LIST;
@@ -175,11 +175,46 @@ class JMLInfoExtractor {
                 return true;
         }
         
-        return false;
+        return isPureByDefault(pm.getContainerType());
     }
     
     
     // Information about Types
+    
+    
+    /**
+     * Returns true if the given type is specified as pure, i.e. all
+     * methods and constructors are by default specified "pure"
+     * 
+     * If t is not a reference type, false is returned.
+     */
+    public static boolean isPureByDefault(KeYJavaType t) {
+        
+        if (!(t.getJavaType() instanceof TypeDeclaration)) {
+            return false;
+        }
+        
+        TypeDeclaration td = (TypeDeclaration) t.getJavaType();
+        
+        // Collect all comments preceding the type declaration or the modifiers.
+        ListOfComment coms = SLListOfComment.EMPTY_LIST;
+        coms = coms.prepend(td.getComments());
+        coms = coms.prepend(td.getProgramElementName().getComments());
+        ArrayOfModifier mods = td.getModifiers();
+        for (int i=0; i < mods.size(); i++) {
+            coms = coms.prepend(mods.getModifier(i).getComments());
+        }
+        
+        // Check if a comment is a JML annotation containing
+        // "nullable_by_default"
+        for (IteratorOfComment it = coms.iterator(); it.hasNext(); ) {
+            if (checkFor("pure", it.next().getText()))
+                return true;
+        }
+    
+        return false;
+    }
+
     
     /**
      * Returns true if the given type is specified as nullable, i.e. all fields
@@ -195,6 +230,7 @@ class JMLInfoExtractor {
         
         TypeDeclaration td = (TypeDeclaration) t.getJavaType();
         
+        // Collect all comments preceding the type declaration or the modifiers.
         ListOfComment coms = SLListOfComment.EMPTY_LIST;
         coms = coms.prepend(td.getComments());
         coms = coms.prepend(td.getProgramElementName().getComments());
@@ -203,6 +239,8 @@ class JMLInfoExtractor {
             coms = coms.prepend(mods.getModifier(i).getComments());
         }
         
+        // Check if a comment is a JML annotation containing
+        // "nullable_by_default"
         for (IteratorOfComment it = coms.iterator(); it.hasNext(); ) {
             if (checkFor("nullable_by_default", it.next().getText()))
                 return true;
@@ -214,6 +252,10 @@ class JMLInfoExtractor {
     
     //---------------- Helper methods ----------------------//
     
+    /**
+     * Checks whether <code>comment</code> is a JML comment of the form
+     * \/* <code>key</code> *\/.
+     */
     private static boolean checkFor(String key, String comment) {
         if (comment.length() < key.length() + 3 )
             return false;
