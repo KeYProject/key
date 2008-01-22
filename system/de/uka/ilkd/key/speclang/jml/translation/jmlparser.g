@@ -65,6 +65,7 @@ header {
     import de.uka.ilkd.key.util.Debug;
 
     import java.lang.RuntimeException;
+    import java.math.BigInteger;
     import java.util.Map;
     import java.util.LinkedHashMap;
 }
@@ -1282,6 +1283,17 @@ javaliteral returns [Term result=null] throws SLTranslationException
 integerliteral returns [Term result=null] throws SLTranslationException
 :
         result=decimalintegerliteral
+    |
+        result=hexintegerliteral
+;
+
+hexintegerliteral returns [Term result=null] throws SLTranslationException
+:
+    n:HEXNUMERAL
+    {
+    	BigInteger decInteger = new BigInteger(n.getText(),16);
+        result = castToJint(tb.zTerm(services,decInteger.toString()));
+    }
 ;
 
 decimalintegerliteral returns [Term result=null] throws SLTranslationException
