@@ -46,7 +46,10 @@ class OCLAttributeResolver extends SLExpressionResolver {
     }
 
 
-    protected SLExpression doResolving(SLExpression receiver, String name, SLParameters parameters) throws SLTranslationException {
+    protected SLExpression doResolving(SLExpression receiver,
+                                       String name,
+                                       SLParameters parameters)
+                                   throws SLTranslationException {
         
         if(parameters != null) {
             return null;

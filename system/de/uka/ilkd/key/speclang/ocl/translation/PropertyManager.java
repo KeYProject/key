@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.speclang.translation.SLResolverManager;
 import de.uka.ilkd.key.speclang.translation.SLCollection;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
+import de.uka.ilkd.key.speclang.translation.SLTranslationExceptionManager;
 
 
 /**
@@ -26,8 +27,12 @@ import de.uka.ilkd.key.speclang.translation.SLExpression;
  */
 class PropertyManager extends SLResolverManager {
     
-    public PropertyManager(Services services, KeYJavaType specInClass, FormulaBoolConverter fbc, ParsableVariable excVar) {
-        super(services.getJavaInfo(), specInClass, true, true, true);
+    public PropertyManager(Services services,
+                           KeYJavaType specInClass,
+                           FormulaBoolConverter fbc,
+                           ParsableVariable excVar,
+                           SLTranslationExceptionManager eManager) {
+        super(services.getJavaInfo(), specInClass, eManager, true, true, true);
         resolvers = resolvers.append(new OCLAttributeResolver(services, this));
         resolvers = resolvers.append(new OCLMethodResolver(services, fbc, this));
         resolvers = resolvers.append(new BuiltInPropertyResolver(services, excVar, this));

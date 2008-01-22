@@ -38,13 +38,16 @@ class SLAttributeResolver extends SLExpressionResolver {
         
         if(attribute != null) {
             if(receiver.getTerm() == null && !attribute.isStatic()) {
-                throw new SLTranslationException("Reference to non-static field without receiver: " + attribute.name());
+                throw manager.excManager.createException(
+                        "Reference to non-static field without receiver: " +
+                        attribute.name());
             }
             try {
                 Term attributeTerm = tb.dot(receiver.getTerm(), attribute);
                 return manager.createSLExpression(attributeTerm);
             } catch (TermCreationException e) {
-                throw new SLTranslationException("Wrong attribute reference " + name + ".");
+                throw manager.excManager.createException(
+                        "Wrong attribute reference " + name + ".");
             }
         }   
         

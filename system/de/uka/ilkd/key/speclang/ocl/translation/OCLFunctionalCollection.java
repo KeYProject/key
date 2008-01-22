@@ -199,7 +199,8 @@ class OCLFunctionalCollection {
      * @return new functional description of the appropriate collection
      * @throws SLTranslationException 
      */
-    public OCLFunctionalCollection collect(Term collectTerm) throws SLTranslationException {
+    public OCLFunctionalCollection collect(Term collectTerm)
+                               throws SLTranslationException {
 
         // is this right? 
         // or are there any collect-expressions which don't have the collectorVar as first subterm?

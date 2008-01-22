@@ -16,13 +16,16 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.speclang.translation.SLResolverManager;
 import de.uka.ilkd.key.speclang.translation.SLCollection;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
+import de.uka.ilkd.key.speclang.translation.SLTranslationExceptionManager;
 import de.uka.ilkd.key.util.Debug;
 
 
 class JMLResolverManager extends SLResolverManager {
 
-    public JMLResolverManager(JavaInfo javaInfo, KeYJavaType specInClass) {
-        super(javaInfo, specInClass, true, true, true);
+    public JMLResolverManager(JavaInfo javaInfo,
+                              KeYJavaType specInClass,
+                              SLTranslationExceptionManager eManager) {
+        super(javaInfo, specInClass, eManager, true, true, true);
     }
 
     public SLExpression createSLExpression(Term t) {

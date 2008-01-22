@@ -246,7 +246,10 @@ class OCLCollection extends SLCollection{
      * @return the appropriate collection (hopefully) :)
      * @throws SLTranslationException 
      */
-    public OCLCollection collect(Services services, Association assoc, String name) throws SLTranslationException {
+    public OCLCollection collect(Services services,
+                                 Association assoc,
+                                 String name)
+                             throws SLTranslationException {
         
         Function assocFunc = getAssociationFunction(assoc, name);
         
