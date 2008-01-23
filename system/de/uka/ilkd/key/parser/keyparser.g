@@ -60,6 +60,8 @@ header {
   import de.uka.ilkd.key.java.recoderext.*;
   import de.uka.ilkd.key.pp.AbbrevMap;
   import de.uka.ilkd.key.pp.LogicPrinter;
+  
+  import de.uka.ilkd.hoare.parser.*;
 }
 
 /** 
@@ -4518,8 +4520,23 @@ problem returns [ Term a = null ]
 	        (updatePrefix = updates)? 
 	        
 	       modality:MODALITY { 
-	          sjb = getJavaBlock(modality);
-	          bindProgVars(progVars(sjb.javaBlock));
+	        String text=modality.getText();
+		int index = text.indexOf("\n");
+		index = text.indexOf('{');
+		text = text.substring(index+1,text.lastIndexOf('}'));
+	
+		KeYHoareLexer khl = new KeYHoareLexer(new StringReader(text));	
+		khl.setFilename(getFilename());	
+		KeYHoareParser khp = new KeYHoareParser(khl, programVariables(), getLine()-1);
+		khp.setFilename(getFilename());
+		try {
+		   khp.program();
+		} catch(Exception pe) {
+	            keh.reportException(pe);	           
+		}
+		
+                sjb = getJavaBlock(modality);
+	        bindProgVars(progVars(sjb.javaBlock));
 	        }
 	       LBRACE a2 = formula RBRACE 	       	       
 	       { 

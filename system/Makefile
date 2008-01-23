@@ -9,6 +9,8 @@
 SHELL=/bin/sh
 #comon prefix
 PFX=de/uka/ilkd/key/
+#hoare prefix
+PFX_HOARE=de/uka/ilkd/hoare/
 
 #
 #the path where to put the binaries.  This should be different from
@@ -337,7 +339,9 @@ ANTLR_PARSER= \
 	$(GENERATED_SRC_PATH)$(PFX)parser/ocl/KeYOclParser.java \
 	$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocLexer.java \
 	$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocParser.java \
-	$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocTreeWalker.java 
+	$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocTreeWalker.java \
+	$(GENERATED_SRC_PATH)$(PFX_HOARE)parser/KeYHoareLexer.java \
+	$(GENERATED_SRC_PATH)$(PFX_HOARE)parser/KeYHoareParser.java
 
 
 JAVACC_PARSER= \
@@ -599,6 +603,23 @@ $(GENERATED_SRC_PATH)$(PFX)parser/dictionary/DictionaryParser.java \
 	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)parser/dictionary
 	@$(ANTLR)  -glib $(PFX)parser/dictionary/dictionaryLexer.g \
 			 -o $(GENERATED_SRC_PATH)$(PFX)parser/dictionary $<
+
+$(GENERATED_SRC_PATH)$(PFX_HOARE)parser/KeYHoareLexer.java \
+$(GENERATED_SRC_PATH)$(PFX_HOARE)parser/KeYHoareLexerTokenTypes.txt \
+$(GENERATED_SRC_PATH)$(PFX_HOARE)parser/KeYHoareLexerTokenTypes.java \
+	: $(PFX_HOARE)parser/hoareLexer.g
+	@echo [creating KeYHoareLexer]
+	@mkdir -p $(GENERATED_SRC_PATH)$(PFX_HOARE)parser
+	@$(ANTLR)  -o $(GENERATED_SRC_PATH)$(PFX_HOARE)parser $<
+
+$(GENERATED_SRC_PATH)$(PFX_HOARE)parser/KeYHoareParser.java \
+	: $(PFX_HOARE)parser/hoare.g \
+	  $(GENERATED_SRC_PATH)$(PFX_HOARE)parser/KeYHoareLexerTokenTypes.txt
+	@echo [creating KeYHoare parser]
+	@mkdir -p $(GENERATED_SRC_PATH)$(PFX_HOARE)parser
+	@$(ANTLR) -glib $(PFX_HOARE)parser/hoareLexer.g \
+			 -o $(GENERATED_SRC_PATH)$(PFX_HOARE)parser $<
+
 
 $(GENERATED_SRC_PATH)$(PFX)parser/KeYLexer.java \
 $(GENERATED_SRC_PATH)$(PFX)parser/KeYLexerTokenTypes.txt \

@@ -219,7 +219,14 @@ public class TypeConverter extends TermBuilder {
 	} else if (booleanLDT.isResponsible(op, subs, services, ec)
                 || hoareHack(op, subs)) {
 	    responsibleLDT = booleanLDT;
-            if (op instanceof Equals) {
+            if (op instanceof Equals) {        
+                if (subs[0].sort() == Sort.FORMULA && 
+                         subs[1].sort() == getBooleanLDT().targetSort()) {
+                     subs[1] = equals(subs[1], TRUE(services));
+                 } else if (subs[1].sort() == Sort.FORMULA && 
+                         subs[0].sort() == getBooleanLDT().targetSort()) {
+                     subs[0] = equals(subs[0], TRUE(services));                     
+                 }                
                  return subs[0].sort() == Sort.FORMULA ?
                     equiv(subs[0], subs[1]) :
                     equals(subs[0], subs[1]);
