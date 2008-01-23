@@ -38,6 +38,7 @@ header {
     import de.uka.ilkd.key.logic.TermBuilder;
     import de.uka.ilkd.key.logic.TermCreationException;
     import de.uka.ilkd.key.logic.ldt.AbstractIntegerLDT;
+    import de.uka.ilkd.key.logic.op.ExactInstanceSymbol;
     import de.uka.ilkd.key.logic.op.Function;
     import de.uka.ilkd.key.logic.op.InstanceofSymbol;
     import de.uka.ilkd.key.logic.op.IteratorOfLogicVariable;
@@ -105,38 +106,38 @@ options {
     // Helper attributes
     private boolean currentlyParsing = false;
     private static int varCounter = 0;
-
+    
     public KeYJMLParser(TokenStream lexer,
-    			String fileName,
-    			Position offsetPos,
-	    		Services services,
-	    		KeYJavaType specInClass,
-	    		AxiomCollector ac,
-	    		ParsableVariable self,
-	    		ListOfParsableVariable paramVars,
-	    		ParsableVariable result,
-	    		ParsableVariable exc,
-	    		/*inout*/ Map /*operator (normal) 
-                            -> function (atPre)*/ atPreFunctions) {
+		String fileName,
+		Position offsetPos,
+		Services services,
+		KeYJavaType specInClass,
+		AxiomCollector ac,
+		ParsableVariable self,
+		ListOfParsableVariable paramVars,
+		ParsableVariable result,
+		ParsableVariable exc,
+		/*inout*/ Map /*operator (normal) 
+			    -> function (atPre)*/ atPreFunctions) {
 	this(lexer);
 
 	// save parameters
 	this.services       = services;
 	this.javaInfo       = services.getJavaInfo();
 	this.excManager     = new SLTranslationExceptionManager(this,
-								fileName, 
-								offsetPos);
+				    fileName, 
+				    offsetPos);
 	this.axiomCollector = ac;
-	this.selfVar        = self;
+	this.selfVar	= self;
 	this.paramVars      = paramVars;
 	this.resultVar      = result;
-	this.excVar         = exc;
+	this.excVar	 = exc;
 	this.atPreFunctions = atPreFunctions;
 
 	// initialize helper objects
 	this.resolverManager = new JMLResolverManager(this.javaInfo,
-	                                              specInClass,
-	                                              this.excManager);
+						      specInClass,
+						      this.excManager);
 
 	// initialize namespaces
 	resolverManager.pushLocalVariablesNamespace();
@@ -146,7 +147,7 @@ options {
 	if (paramVars != null) {
 	    IteratorOfParsableVariable it = paramVars.iterator(); 
 	    while(it.hasNext()) {
-		resolverManager.putIntoTopLocalVariablesNamespace(it.next());
+	    resolverManager.putIntoTopLocalVariablesNamespace(it.next());
 	    }
 	}
 	if (resultVar != null) {
@@ -164,15 +165,15 @@ options {
     
     
     public KeYJMLParser(PositionedString ps,
-	    		Services services,
-	    		KeYJavaType specInClass,
-	    		AxiomCollector ac,
-	    		ParsableVariable self,
-	    		ListOfParsableVariable paramVars,
-	    		ParsableVariable result,
-	    		ParsableVariable exc,
-	    		/*inout*/ Map /*operator (normal) 
-                            -> function (atPre)*/ atPreFunctions) {
+		Services services,
+		KeYJavaType specInClass,
+		AxiomCollector ac,
+		ParsableVariable self,
+		ListOfParsableVariable paramVars,
+		ParsableVariable result,
+		ParsableVariable exc,
+		/*inout*/ Map /*operator (normal) 
+			    -> function (atPre)*/ atPreFunctions) {
 	this(new KeYJMLLexer(new StringReader(ps.text)), 
 	     ps.fileName, 
 	     ps.pos,
@@ -188,24 +189,24 @@ options {
 
 
     private void raiseError(String msg) throws SLTranslationException {
-        throw excManager.createException(msg);
+	throw excManager.createException(msg);
     }
     
     private void raiseError(String msg, Token t) throws SLTranslationException {
-    	throw excManager.createException(msg, t);
+	throw excManager.createException(msg, t);
     }
     
     private void raiseNotSupported(String feature) 
-    		throws SLTranslationException {
-    	throw excManager.createException("JML feature not supported: " 
-    					 + feature);
+	    throws SLTranslationException {
+	throw excManager.createException("JML feature not supported: " 
+			 + feature);
     }
-        
+	
 
     private Term castToJint(Term intTerm) {
 	return tb.tf().createCastTerm((AbstractSort)services.getTypeConverter()
-		.getIntLDT().targetSort(), 
-		intTerm);
+	    .getIntLDT().targetSort(), 
+	    intTerm);
     }
 
 
@@ -265,12 +266,12 @@ options {
 	while (it.hasNext()) {
 	    KeYJavaType kjt = it.next();
 	    SortDefiningSymbols os = (SortDefiningSymbols)(kjt.getSort());
-            Function instance
-                    = (InstanceofSymbol) os.lookupSymbol(InstanceofSymbol.NAME);
+		Function instance
+			= (InstanceofSymbol) os.lookupSymbol(InstanceofSymbol.NAME);
 	    result = tb.or( result,
-		    tb.equals(
-			    tb.func(instance, tb.var(this.excVar)),
-			    trueLitTerm));
+		tb.equals(
+		    tb.func(instance, tb.var(this.excVar)),
+		    trueLitTerm));
 	}
 
 	return new FormulaWithAxioms(result);
@@ -339,80 +340,80 @@ options {
      * Creates and saves new atPreFunctions when necessary.
      */
     private Term convertToOld(Term term) {
-        assert atPreFunctions != null;
-        Operator newOp;
-        if(term.op() instanceof NonRigid && term.op() != selfVar) {
-            Function atPreFunc = (Function) atPreFunctions.get(term.op());
-            if(atPreFunc == null) {
-                atPreFunc = APF.createAtPreFunction(term.op(), services);
-                atPreFunctions.put(term.op(), atPreFunc);
-                assert atPreFunc != null;
-            }        	
-            newOp = atPreFunc;
-        } else {
-            newOp = term.op();
-        }
-        
-        Term[] subTerms = getSubTerms(term);
-        Term[] newSubTerms = new Term[subTerms.length];
-        for(int i = 0; i < subTerms.length; i++) {
-            newSubTerms[i] = convertToOld(subTerms[i]);
-        }
-        
-        Term result = tb.tf().createTerm(newOp, 
-                                         newSubTerms, 
-                                         term.varsBoundHere(0), 
-                                         term.javaBlock());
-        return result;	
+	assert atPreFunctions != null;
+	Operator newOp;
+	if(term.op() instanceof NonRigid && term.op() != selfVar) {
+	    Function atPreFunc = (Function) atPreFunctions.get(term.op());
+	    if(atPreFunc == null) {
+		atPreFunc = APF.createAtPreFunction(term.op(), services);
+		atPreFunctions.put(term.op(), atPreFunc);
+		assert atPreFunc != null;
+	    }	    
+	    newOp = atPreFunc;
+	} else {
+	    newOp = term.op();
+	}
+	
+	Term[] subTerms = getSubTerms(term);
+	Term[] newSubTerms = new Term[subTerms.length];
+	for(int i = 0; i < subTerms.length; i++) {
+	    newSubTerms[i] = convertToOld(subTerms[i]);
+	}
+	
+	Term result = tb.tf().createTerm(newOp, 
+					 newSubTerms, 
+					 term.varsBoundHere(0), 
+					 term.javaBlock());
+	return result;    
     }
 
 
     private JMLExpression lookupIdentifier(String lookupName,
-                                           JMLExpression receiver,
-                                           ListOfTerm callingParameters,
-                                           Token t)
-                                       throws SLTranslationException {
+					   JMLExpression receiver,
+					   ListOfTerm callingParameters,
+					   Token t)
+				       throws SLTranslationException {
 
-        // Identifier with suffix in parantheses? Probably a method call
-        // parse in the parameter list and call again
-        try {
-            if (LA(1) == LPAREN) {
-            return receiver;
-        }
-        } catch (TokenStreamException e) {
-            if(currentlyParsing) {
-                raiseError("internal Error: no further Token in Stream");
-            }
-        }
+	// Identifier with suffix in parantheses? Probably a method call
+	// parse in the parameter list and call again
+	try {
+	    if (LA(1) == LPAREN) {
+	    return receiver;
+	}
+	} catch (TokenStreamException e) {
+	    if(currentlyParsing) {
+		raiseError("internal Error: no further Token in Stream");
+	    }
+	}
 
-        ListOfSLExpression paramList = null;
-        SLParameters params = null;
-        if (callingParameters != null) {
-            paramList = SLListOfSLExpression.EMPTY_LIST;
-            IteratorOfTerm it = callingParameters.iterator();
-            while(it.hasNext()) {
-                paramList = paramList.append(new JMLExpression(it.next()));
-            }
-            params = new SLParameters(paramList);
-        }
-        
-        JMLExpression result = (JMLExpression) resolverManager.resolve(
-                receiver,
-                lookupName,
-                params);
-        
-        if (result != null) {
-            return result;
-        }
+	ListOfSLExpression paramList = null;
+	SLParameters params = null;
+	if (callingParameters != null) {
+	    paramList = SLListOfSLExpression.EMPTY_LIST;
+	    IteratorOfTerm it = callingParameters.iterator();
+	    while(it.hasNext()) {
+		paramList = paramList.append(new JMLExpression(it.next()));
+	    }
+	    params = new SLParameters(paramList);
+	}
+	
+	JMLExpression result = (JMLExpression) resolverManager.resolve(
+		receiver,
+		lookupName,
+		params);
+	
+	if (result != null) {
+	    return result;
+	}
     
-        // no identifier found, maybe it was just a package prefix.
-        // but package prefixes don't have a receiver!
-        
-        if (receiver != null) {
-            raiseError("Identifier " + lookupName + " not found!", t);
-        }
-        
-        return null;
+	// no identifier found, maybe it was just a package prefix.
+	// but package prefixes don't have a receiver!
+	
+	if (receiver != null) {
+	    raiseError("Identifier " + lookupName + " not found!", t);
+	}
+	
+	return null;
     }
 
 
@@ -426,6 +427,28 @@ options {
 	return a;
     }
 
+    private Term buildEqualityTerm(JMLExpression a, JMLExpression b)
+	throws SLTranslationException {
+    
+	if (a.isTerm() && b.isTerm()) {
+	    return buildEqualityTerm(a.getTerm(), b.getTerm());
+	}
+	
+	if (a.isType() && b.isType()) {
+	    assert a.getTypeofTerm() != null;
+	    
+	    SortDefiningSymbols os = (SortDefiningSymbols)(b.getType().getSort());
+	    Function ioFunc = (Function) os.lookupSymbol(ExactInstanceSymbol.NAME);
+	     
+	    return tb.equals(
+		tb.func(ioFunc, a.getTypeofTerm()),
+		trueLitTerm);
+	}
+	
+	return null;
+    }
+    
+    
     private Term buildEqualityTerm(Term a, Term b) throws SLTranslationException {
 
 	Term result = null;
@@ -449,10 +472,6 @@ options {
 
 	return result;
     }
-
-
-
-
 
 
     /**
@@ -486,9 +505,9 @@ options {
 	n = javaInfo.getAttribute(progVarName, className);
 
 	result = tb.and(result,
-		tb.equals(
-			tb.func(y),
-			tb.var(n)));
+	    tb.equals(
+		tb.func(y),
+		tb.var(n)));
 
 	Term t = tb.func(y);
 
@@ -500,31 +519,31 @@ options {
 
 	t = tb.all(qVars.toArray(), tb.imp(pred,t));
 	t = tb.and(
-		t,
-		tb.ex(qVars.toArray(),
-			tb.and(
-				pred,
-				tb.equals(
-					body,
-					tb.func(y)))));
+	    t,
+	    tb.ex(qVars.toArray(),
+		tb.and(
+		    pred,
+		    tb.equals(
+			body,
+			tb.func(y)))));
 
 	result = tb.or(result, t);
 
 	return result;
-    }	
+    }    
 }
 
 top throws SLTranslationException
 {
-	Term t;
+    Term t;
 }
 :
-	t=expression
-	{ 
-	    Debug.fail("Should be never entered. Only workaround of an antlr bug."); 
-	}
-	;
-	
+    t=expression
+    { 
+	Debug.fail("Should be never entered. Only workaround of an antlr bug."); 
+    }
+    ;
+    
 
 assignableclause returns [SetOfLocationDescriptor result=SetAsListOfLocationDescriptor.EMPTY_SET] throws SLTranslationException
 :
@@ -534,22 +553,22 @@ assignableclause returns [SetOfLocationDescriptor result=SetAsListOfLocationDesc
 
 storereflist returns [SetOfLocationDescriptor result=SetAsListOfLocationDescriptor.EMPTY_SET] throws SLTranslationException
 {
-	LocationDescriptor ld=null;
+    LocationDescriptor ld=null;
 }
 :
     ld=storeref { if (ld != null) { result = result.add(ld); } }
-        ("," ld=storeref { if (ld != null) { result = result.add(ld); } })*
+	("," ld=storeref { if (ld != null) { result = result.add(ld); } })*
     ;
 
 
 storeref returns [LocationDescriptor ld=null] throws SLTranslationException
 :
-        ld=storerefexpression
+	ld=storerefexpression
     |   { raiseError("informal descriptions not supported (for obvious reason)"); }
 //TODO: should be a warning!
 //    |   { raiseWarning("informal descriptions not supported (for obvious reason)\n Ignoring it"); }
-        LPAREN MULT
-        //informaldescription
+	LPAREN MULT
+	//informaldescription
     |   ld=storerefkeyword
     ;
 
@@ -560,12 +579,12 @@ storerefexpression returns [BasicLocationDescriptor ld=null] throws SLTranslatio
 :
     expr=storerefname 
     (
-    	ld=storerefnamesuffix[expr]   { expr = new JMLExpression(ld.getLocTerm()); }
+	ld=storerefnamesuffix[expr]   { expr = new JMLExpression(ld.getLocTerm()); }
     )*
     {
-    	if(ld == null) {
-    	    ld = new BasicLocationDescriptor(expr.getTerm());
-    	}
+	if(ld == null) {
+	    ld = new BasicLocationDescriptor(expr.getTerm());
+	}
     }
     ;
 
@@ -574,25 +593,25 @@ storerefname returns [JMLExpression result = null] throws SLTranslationException
 :
     id:IDENT
     {
-    	result = lookupIdentifier(id.getText(), null, null, id);
-    	if(result == null) {
-    	    raiseError("identifier not found: " + id.getText());
-    	}
+	result = lookupIdentifier(id.getText(), null, null, id);
+	if(result == null) {
+	    raiseError("identifier not found: " + id.getText());
+	}
     }
     | "super"
     {
-    	raiseNotSupported("location \"super\"");
+	raiseNotSupported("location \"super\"");
     }
     | "this"
     {
-    	result = new JMLExpression(tb.var(selfVar));
+	result = new JMLExpression(tb.var(selfVar));
     }
     ;
     
 
 storerefnamesuffix[JMLExpression receiver] returns [BasicLocationDescriptor ld=null] throws SLTranslationException
 {
-	Term refTerm=null;
+    Term refTerm=null;
 }
 :
     DOT id:IDENT
@@ -620,46 +639,46 @@ storerefnamesuffix[JMLExpression receiver] returns [BasicLocationDescriptor ld=n
 
 specarrayrefexpr[JMLExpression receiver] returns [BasicLocationDescriptor result=null] throws SLTranslationException
 {
-	Term rangeFrom=null;
-	Term rangeTo=null;
+    Term rangeFrom=null;
+    Term rangeTo=null;
 }
 :
     (
-        ( rangeFrom=specexpression (DOTDOT rangeTo=specexpression)? )
-        | MULT
+	( rangeFrom=specexpression (DOTDOT rangeTo=specexpression)? )
+	| MULT
     )
     {
-    	Term indexTerm;
-    	Term guardTerm;
+	Term indexTerm;
+	Term guardTerm;
 
-       	if (rangeFrom == null) {
-    		// We have a star. A star includes all components of an array even
-    		// those out of bound. This makes proving easier.    		
-		    LogicVariable indexVar = new LogicVariable(new Name("i"), 
-		   	   		   services.getTypeConverter().getIntegerLDT().targetSort());
-		    indexTerm = tb.var(indexVar);		
-		    guardTerm = tb.tt();		    
-    	} else if (rangeTo != null) {
-		    LogicVariable indexVar = new LogicVariable(new Name("i"), 
-		   	   		   services.getTypeConverter().getIntegerLDT().targetSort());
-		    indexTerm = tb.var(indexVar);
-            guardTerm = tb.and(
-                tb.leq(rangeFrom, indexTerm, services),
-                tb.leq(indexTerm, rangeTo, services)
-                );
-    	} else {
-            indexTerm = rangeFrom;
-            guardTerm = tb.tt();
-    	}
+	   if (rangeFrom == null) {
+	    // We have a star. A star includes all components of an array even
+	    // those out of bound. This makes proving easier.	    
+	    LogicVariable indexVar = new LogicVariable(new Name("i"), 
+			     services.getTypeConverter().getIntegerLDT().targetSort());
+	    indexTerm = tb.var(indexVar);	
+	    guardTerm = tb.tt();	    
+	} else if (rangeTo != null) {
+	    LogicVariable indexVar = new LogicVariable(new Name("i"), 
+			     services.getTypeConverter().getIntegerLDT().targetSort());
+	    indexTerm = tb.var(indexVar);
+	    guardTerm = tb.and(
+		tb.leq(rangeFrom, indexTerm, services),
+		tb.leq(indexTerm, rangeTo, services)
+		);
+	} else {
+	    indexTerm = rangeFrom;
+	    guardTerm = tb.tt();
+	}
  
-        try {
-        	Term resTerm = tb.array(receiver.getTerm(), indexTerm);
-        	result = new BasicLocationDescriptor(guardTerm, resTerm);
-        } catch (TermCreationException e) {
-        	raiseError(e.getMessage());
-        } catch (IllegalArgumentException e) {
-        	raiseError(e.getMessage());
-        }
+	try {
+	    Term resTerm = tb.array(receiver.getTerm(), indexTerm);
+	    result = new BasicLocationDescriptor(guardTerm, resTerm);
+	} catch (TermCreationException e) {
+	    raiseError(e.getMessage());
+	} catch (IllegalArgumentException e) {
+	    raiseError(e.getMessage());
+	}
     }
     ;
 
@@ -673,99 +692,99 @@ storerefkeyword returns [LocationDescriptor ld=null] throws SLTranslationExcepti
 
 signalsonlyclause returns [ListOfKeYJavaType result = SLListOfKeYJavaType.EMPTY_LIST] throws SLTranslationException
 {
-	KeYJavaType t=null;
+    KeYJavaType t=null;
 }
 :
-        NOTHING
+	NOTHING
     |   t=referencetype { result = result.append(t); } ("," t=referencetype { result = result.append(t); })*
     ;
     
 signalsclause returns [Term result=null] throws SLTranslationException
 {
-	KeYJavaType excType = null;
-	Term pred = null;
-	String vName = null;
-	LogicVariable eVar = null;
+    KeYJavaType excType = null;
+    Term pred = null;
+    String vName = null;
+    LogicVariable eVar = null;
 }
 :
-        LPAREN excType=referencetype (id:IDENT { vName = id.getText(); })? RPAREN
-        {
-        	if (vName != null) {
-        		eVar = new LogicVariable(new Name(vName), excType.getSort());
-        		resolverManager.pushLocalVariablesNamespace();
-        		resolverManager.putIntoTopLocalVariablesNamespace(eVar);
-        	}
-        }
-        (result = predornot)?
-        {
-        	if (vName != null) {
-        		resolverManager.popLocalVariablesNamespace();
-        	}
-        	if (result == null) {
-        		result = tb.tt();
-        	} else {
-                Map /* Operator -> Operator */ replaceMap = new LinkedHashMap();
-                replaceMap.put(eVar, excVar);
-                OpReplacer excVarReplacer = new OpReplacer(replaceMap);
-                
-                SortDefiningSymbols os = (SortDefiningSymbols)(excType.getSort());
-	        Function instance
-                    = (InstanceofSymbol) os.lookupSymbol(InstanceofSymbol.NAME);
-                
-                result = tb.imp(
-                    tb.equals(tb.func(instance, tb.var(excVar)), trueLitTerm),
-                    convertToFormula(excVarReplacer.replace(result)));
-        	}
-        }
+	LPAREN excType=referencetype (id:IDENT { vName = id.getText(); })? RPAREN
+	{
+	    if (vName != null) {
+		eVar = new LogicVariable(new Name(vName), excType.getSort());
+		resolverManager.pushLocalVariablesNamespace();
+		resolverManager.putIntoTopLocalVariablesNamespace(eVar);
+	    }
+	}
+	(result = predornot)?
+	{
+	    if (vName != null) {
+		resolverManager.popLocalVariablesNamespace();
+	    }
+	    if (result == null) {
+		result = tb.tt();
+	    } else {
+		Map /* Operator -> Operator */ replaceMap = new LinkedHashMap();
+		replaceMap.put(eVar, excVar);
+		OpReplacer excVarReplacer = new OpReplacer(replaceMap);
+		
+		SortDefiningSymbols os = (SortDefiningSymbols)(excType.getSort());
+		Function instance
+		    = (InstanceofSymbol) os.lookupSymbol(InstanceofSymbol.NAME);
+		
+		result = tb.imp(
+		    tb.equals(tb.func(instance, tb.var(excVar)), trueLitTerm),
+		    convertToFormula(excVarReplacer.replace(result)));
+	    }
+	}
     ;
 
 predornot returns [Term result=null] throws SLTranslationException
 :
-        result=predicate
+	result=predicate
     |   "\\not_specified"
     |   "\\same"
     ;
     
 predicate returns [Term result=null] throws SLTranslationException
 :
-        result=specexpression
+	result=specexpression
     ;
 
 specexpression returns [Term result=null] throws SLTranslationException
 :
-        result=expression
+	result=expression
     ;
 
 spec_expression_list throws SLTranslationException
 {
-	Term t;
+    Term t;
 }
 :
-        t=specexpression ("," t=specexpression)*
+	t=specexpression ("," t=specexpression)*
     ;
 
 expression returns [Term result=null] throws SLTranslationException
 :
-        result=assignmentexpr
+	result=assignmentexpr
     ;
 
 assignmentexpr returns [Term result=null] throws SLTranslationException
 {
-	Term t;
+    Term t;
 }
 :
-        result=conditionalexpr
+	result=conditionalexpr
 // not used in JML expressions
-//        (
-//            assignmentOp t=assignmentexpr
-//        )?
+//	(
+//	    assignmentOp t=assignmentexpr
+//	)?
     ;
 
 
 /* not used JML expressions
 assignmentOp
 :
-		"=" 
+	"=" 
     |   "+="
     |   "-="
     |   "*="
@@ -778,468 +797,666 @@ assignmentOp
     |   "|="
     |   "^="
     ;
-*/        
+*/	
 conditionalexpr returns [Term result=null] throws SLTranslationException
 {
-	Term a,b;
+    Term a,b;
 }
 :
-        result=equivalenceexpr 
-        (
-            "?" a=conditionalexpr ":" b=conditionalexpr
-            {
-            	result = tb.ife(convertToFormula(result),a,b);
-            }
-        )?
+	result=equivalenceexpr 
+	(
+	    "?" a=conditionalexpr ":" b=conditionalexpr
+	    {
+		result = tb.ife(convertToFormula(result),a,b);
+	    }
+	)?
     ;
 
 equivalenceexpr returns [Term result=null] throws SLTranslationException
 {
-	Term t;
+    Term t;
 }
 :
-        result=impliesexpr 
-        (
-            EQV t=equivalenceexpr
-            {
-            	result = buildEqualityTerm(result,t);
-            } 
-            
-        |
-            ANTIV t=equivalenceexpr
-            {
-            	t = buildEqualityTerm(result,t);
-            	result = tb.not(t);
-            } 
-            
-        )?
+	result=impliesexpr 
+	(
+	    EQV t=equivalenceexpr
+	    {
+		result = buildEqualityTerm(result,t);
+	    } 
+	    
+	|
+	    ANTIV t=equivalenceexpr
+	    {
+		t = buildEqualityTerm(result,t);
+		result = tb.not(t);
+	    } 
+	    
+	)?
     ;
-        
+	
 impliesexpr returns [Term result=null] throws SLTranslationException
 {
-	Term t;
+    Term t;
 }
 :
-        result=logicalorexpr 
-        (
-            "==>" t=impliesnonbackwardexpr
-            {
-            	result = tb.imp(convertToFormula(result),convertToFormula(t));
-            }
-            
-          |
-            (
-                "<==" t=logicalorexpr
-                {
-                	result = tb.imp(convertToFormula(t),convertToFormula(result));
-                }
-            )+
-        )?
+	result=logicalorexpr 
+	(
+	    "==>" t=impliesnonbackwardexpr
+	    {
+		result = tb.imp(convertToFormula(result),convertToFormula(t));
+	    }
+	    
+	  |
+	    (
+		"<==" t=logicalorexpr
+		{
+		    result = tb.imp(convertToFormula(t),convertToFormula(result));
+		}
+	    )+
+	)?
 ;
 
 impliesnonbackwardexpr returns [Term result=null] throws SLTranslationException
 {
-	Term t;
+    Term t;
 }
 :
-        result=logicalorexpr
-        (
-            "==>" t=impliesnonbackwardexpr
-            {
-            	result = tb.imp(convertToFormula(result),convertToFormula(t));
-            }
-        )?
-;        
+	result=logicalorexpr
+	(
+	    "==>" t=impliesnonbackwardexpr
+	    {
+		result = tb.imp(convertToFormula(result),convertToFormula(t));
+	    }
+	)?
+;	
 
 logicalorexpr returns [Term result=null] throws SLTranslationException
 {
-	Term t;
+    Term t;
 }
 :
-        result=logicalandexpr
-        (
-            "||" t=logicalorexpr
-            {
-                result = intHelper.buildOrExpression(t,result);
-            }
-        )?
+	result=logicalandexpr
+	(
+	    "||" t=logicalandexpr
+	    {
+		result = intHelper.buildOrExpression(t,result);
+	    }
+	)?
 ;
 
 logicalandexpr returns [Term result=null] throws SLTranslationException
 {
-	Term t;
+    Term t;
 }
 :
-        result=inclusiveorexpr
-        (
-            "&&" t=logicalandexpr
-            {
-            	result = intHelper.buildAndExpression(t,result);
-            }
-        )?
+	result=inclusiveorexpr
+	(
+	    "&&" t=inclusiveorexpr
+	    {
+		result = intHelper.buildAndExpression(t,result);
+	    }
+	)?
 ;
 
 
 inclusiveorexpr returns [Term result=null] throws SLTranslationException
 {
-	Term t;
+    Term t;
 }
 :
-        result=exclusiveorexpr 
-        (
-            "|" t=inclusiveorexpr
-            {
-       		result = intHelper.buildPromotedOrExpression(result,t);
-            }
-        )?
+	result=exclusiveorexpr 
+	(
+	    "|" t=inclusiveorexpr
+	    {
+	       result = intHelper.buildPromotedOrExpression(result,t);
+	    }
+	)?
 ;
 
 
 exclusiveorexpr returns [Term result=null] throws SLTranslationException
 {
-	Term t;
+    Term t;
 }
 :
-        result=andexpr 
-        (
-            XOR t=exclusiveorexpr
-            {
-        	result = intHelper.buildPromotedXorExpression(result,t);
-            }
-        )?
+	result=andexpr 
+	(
+	    XOR t=andexpr
+	    {
+	    result = intHelper.buildPromotedXorExpression(result,t);
+	    }
+	)?
 ;
 
 
 andexpr returns [Term result=null] throws SLTranslationException
 {
-	Term t;
+    Term t;
 }
 :
-        result=equalityexpr
-        (
-            "&" t=andexpr
-            {
-	        result = intHelper.buildPromotedAndExpression(result,t);
-            }
-        )?
+	result=equalityexpr
+	(
+	    "&" t=equalityexpr
+	    {
+	    result = intHelper.buildPromotedAndExpression(result,t);
+	    }
+	)?
 ;
 
 
 equalityexpr returns [Term result=null] throws SLTranslationException
 {
-	Term t;
+    Term t;
+    JMLExpression left, right;
 }
 :
-        result=relationalexpr 
-        (
-            "==" t=equalityexpr
-            {
-            	result = buildEqualityTerm(result,t);
-            }
-        |
-            "!=" t=equalityexpr
-            {
-            	t = buildEqualityTerm(result,t);
-            	result = tb.not(t);
-            }
-            
-        )?
+	left=relationalexpr 
+	(
+	    eq:"==" right=relationalexpr
+	    {
+		if (left.isType() ^ right.isType()) {
+		    raiseError("Cannot build equality expression between term " +
+			"and type.", eq);
+		}
+		result = buildEqualityTerm(left, right);
+	    }
+	|
+	    ne:"!=" right=relationalexpr
+	    {
+		if (left.isType() ^ right.isType()) {
+		    raiseError("Cannot build equality expression between term " +
+			"and type.", ne);
+		}
+		t = buildEqualityTerm(left, right);
+		result = tb.not(t);
+	    }
+	    
+	)?
+	{
+	    if (result == null) {
+		if (left.isType()) {
+		    raiseError("Error in expression: " + left.getType());
+		}
+		assert left.isTerm();
+		
+		result = left.getTerm();
+	    }
+	    
+	    assert result != null;
+	}
 ;
 
-relationalexpr returns [Term result=null] throws SLTranslationException
+relationalexpr returns [JMLExpression result=null] throws SLTranslationException
 {
-	Term t = null;
-	Function f = null;
-	KeYJavaType type = null;
+    Function f = null;
+    KeYJavaType type = null;
+    JMLExpression right = null;
+    Token opToken = null;
 }
 :
-        result=shiftexpr
-        (
-            LT t=shiftexpr 
-            {
-            	f = services.getTypeConverter().getIntegerLDT().getLessThan();
-            }
-        |
-            GT t=shiftexpr
-            {
-            	f = services.getTypeConverter().getIntegerLDT().getGreaterThan();
-            }
-        |
-            LEQ t=shiftexpr
-            {
-            	f = services.getTypeConverter().getIntegerLDT().getLessOrEquals();
-            }
-        |
-            GEQ t=shiftexpr
-            {
-            	f = services.getTypeConverter().getIntegerLDT().getGreaterOrEquals();
-            }
-        |
-            INSTANCEOF type=typespec 
-            {
-            	SortDefiningSymbols os = (SortDefiningSymbols)(type.getSort());
-            	f = (InstanceofSymbol) os.lookupSymbol(InstanceofSymbol.NAME);
-            }
-        |
-            ST t=shiftexpr
-            {
-            	raiseNotSupported("<:");
-            }
-        )?
-        {
-    	    if (f != null) {
-    		try {
-    		    result = (t == null ? tb.func(f, result) : tb.func(f,result,t));
-    		} catch (TermCreationException e) {
+	result=shiftexpr
+	(
+	    lt:LT right=shiftexpr 
+	    {
+		f = services.getTypeConverter().getIntegerLDT().getLessThan();
+		opToken = lt;
+	    }
+	|
+	    gt:GT right=shiftexpr
+	    {
+		f = services.getTypeConverter().getIntegerLDT().getGreaterThan();
+		opToken = gt;
+	    }
+	|
+	    leq:LEQ right=shiftexpr
+	    {
+		f = services.getTypeConverter().getIntegerLDT().getLessOrEquals();
+		opToken = leq;
+	    }
+	|
+	    geq:GEQ right=shiftexpr
+	    {
+		f = services.getTypeConverter().getIntegerLDT().getGreaterOrEquals();
+		opToken = geq;
+	    }
+	|
+	    io:INSTANCEOF type=typespec 
+	    {
+		SortDefiningSymbols os = (SortDefiningSymbols)(type.getSort());
+		f = (InstanceofSymbol) os.lookupSymbol(InstanceofSymbol.NAME);
+		opToken = io;
+	    }
+	|
+	    st:ST right=shiftexpr
+	    {
+		if (result.isTerm() || right.isTerm()) {
+		    raiseError("Cannot build subtype expression from terms.", st);
+		}
+		assert result.isType();
+		assert right.isType();
+		
+		if (result.getTypeofTerm() == null) {
+		    raiseError("subtype expression <: only supported for" +
+			" \\typeof() arguments on the left side.", st);
+		}
+		
+		SortDefiningSymbols os = (SortDefiningSymbols)(right.getType().getSort());
+		Function ioFunc = (InstanceofSymbol) os.lookupSymbol(InstanceofSymbol.NAME);
+		
+		result = new JMLExpression(
+		    tb.equals(
+			tb.func(ioFunc, result.getTypeofTerm()),
+			trueLitTerm));
+	    }
+	)?
+	{
+	    if (f != null) {
+		assert opToken != null;
+		if (result.isType()) {
+		    raiseError("Cannot build relational expression from type " +
+			result.getType().getName() + ".", opToken);
+		}
+		assert result.isTerm();
+		
+		try {
+			if (right == null) {
+			    // instanceof-expression
+			    result = new JMLExpression(
+				tb.func(f, result.getTerm()));
+			} else {
+			    if (right.isType()) {
+			    raiseError("Cannot build relational expression from type " +
+				right.getType().getName() + ".", opToken);
+			    }
+			    assert right.isTerm();
+			    
+			    result = new JMLExpression(
+				tb.func(f,result.getTerm(),right.getTerm()));
+			}
+		} catch (TermCreationException e) {
 		    raiseError("Error in relational expression.");
-    		} catch (IllegalArgumentException e) {
-    		    raiseError("Internal error.");
-    		}
-    	    }
-        }
+		} catch (IllegalArgumentException e) {
+		    raiseError("Internal error.");
+		}
+	    }
+	}
 ;
 
-shiftexpr returns [Term result=null] throws SLTranslationException
+shiftexpr returns [JMLExpression result=null] throws SLTranslationException
 {
-	Term t;
+    JMLExpression e;
 }
 :
-        result=additiveexpr
-        (
-            ">>" t=additiveexpr
-            {
-        	result = intHelper.buildRightShiftExpression(result,t);
-            }
-        |   
-            "<<" t=additiveexpr 
-            {
-                result = intHelper.buildLeftShiftExpression(result,t);
-            }
-        |   
-            ">>>" t=additiveexpr 
-            {
-                result = intHelper.buildUnsignedRightShiftExpression(result,t);
-            }
-        )*
+    result=additiveexpr
+    (
+	">>" e=additiveexpr
+	{
+	    if (result.isType()) {
+		raiseError("Cannot build shift expression from type " +
+		    result.getType().getName() + ".");
+	    }
+	    if (e.isType()) {
+		raiseError("Cannot shift right by type " +
+		    e.getType().getName() + ".");
+	    }
+	    assert result.isTerm();
+	    assert e.isTerm();
+
+	    result = new JMLExpression(
+		intHelper.buildRightShiftExpression(result.getTerm(),e.getTerm()));
+	}
+    |   
+	"<<" e=additiveexpr 
+	{
+	    if (result.isType()) {
+		raiseError("Cannot build shift expression from type " +
+		    result.getType().getName() + ".");
+	    }
+	    if (e.isType()) {
+		raiseError("Cannot shift left by type " +
+		    e.getType().getName() + ".");
+	    }
+	    assert result.isTerm();
+	    assert e.isTerm();
+
+	    result = new JMLExpression(
+		intHelper.buildLeftShiftExpression(result.getTerm(),e.getTerm()));
+	}
+    |   
+	">>>" e=additiveexpr 
+	{
+	    if (result.isType()) {
+		raiseError("Cannot build shift expression from type " +
+		    result.getType().getName() + ".");
+	    }
+	    if (e.isType()) {
+		raiseError("Cannot shift right (unsigned) by type " +
+		    e.getType().getName() + ".");
+	    }
+	    assert result.isTerm();
+	    assert e.isTerm();
+
+	    result = new JMLExpression(
+		intHelper.buildUnsignedRightShiftExpression(result.getTerm(),e.getTerm()));
+	}
+    )*
 ; 
 
 
-additiveexpr returns [Term result=null] throws SLTranslationException
+additiveexpr returns [JMLExpression result=null] throws SLTranslationException
 {
-	Term t;
+    JMLExpression e;
 }
 :
-        result=multexpr
-        (
-            "+" t=multexpr
-            {
-	        result = intHelper.buildAddExpression(result,t);
-            }
-        |
-            "-" t=multexpr
-            {
-                result = intHelper.buildSubExpression(result,t);
-            }
-        )*
+    result=multexpr
+    (
+	"+" e=multexpr
+	{
+	    if (result.isType()) {
+		raiseError("Cannot build additive expression from type " +
+		    result.getType().getName() + ".");
+	    }
+	    if (e.isType()) {
+		raiseError("Cannot add type " +
+		    e.getType().getName() + ".");
+	    }
+	    assert result.isTerm();
+	    assert e.isTerm();
+
+	    result = new JMLExpression(
+		intHelper.buildAddExpression(result.getTerm(),e.getTerm()));
+	}
+    |
+	"-" e=multexpr
+	{
+	    if (result.isType()) {
+		raiseError("Cannot build additive expression from type " +
+		    result.getType().getName() + ".");
+	    }
+	    if (e.isType()) {
+		raiseError("Cannot subtract type " +
+		    e.getType().getName() + ".");
+	    }
+	    assert result.isTerm();
+	    assert e.isTerm();
+
+	    result = new JMLExpression(
+		intHelper.buildSubExpression(result.getTerm(),e.getTerm()));
+	}
+    )*
 ;
 
 
-multexpr returns [Term result=null] throws SLTranslationException
+multexpr returns [JMLExpression result=null] throws SLTranslationException
 {
-	Term t;
+    JMLExpression e;
 }
 :
-        result=unaryexpr
-        (
-            MULT t=unaryexpr
-            {
-	        result = intHelper.buildMulExpression(result,t);
-            }
-        |
-            DIV t=unaryexpr
-            {
-                result = intHelper.buildDivExpression(result,t);
-            }
-        |
-            "%" t=unaryexpr
-            {
-                result = intHelper.buildModExpression(result,t);
-            }
-        )*
+    result=unaryexpr
+    (
+	MULT e=unaryexpr
+	{
+	    if (result.isType()) {
+		raiseError("Cannot build multiplicative expression from type " +
+		    result.getType().getName() + ".");
+	    }
+	    if (e.isType()) {
+		raiseError("Cannot multiply by type " +
+		    e.getType().getName() + ".");
+	    }
+	    assert result.isTerm();
+	    assert e.isTerm();
+	
+	    result = new JMLExpression(
+		intHelper.buildMulExpression(result.getTerm(),e.getTerm()));
+	}
+    |
+	DIV e=unaryexpr
+	{
+	    if (result.isType()) {
+		raiseError("Cannot build multiplicative expression from type " +
+		    result.getType().getName() + ".");
+	    }
+	    if (e.isType()) {
+		raiseError("Cannot divide by type " +
+		    e.getType().getName() + ".");
+	    }
+	    assert result.isTerm();
+	    assert e.isTerm();
+
+	    result = new JMLExpression(
+		intHelper.buildDivExpression(result.getTerm(),e.getTerm()));
+	}
+    |
+	"%" e=unaryexpr
+	{
+	    if (result.isType()) {
+		raiseError("Cannot build multiplicative expression from type " +
+		    result.getType().getName() + ".");
+	    }
+	    if (e.isType()) {
+		raiseError("Cannot build modulo expression from type " +
+		    e.getType().getName() + ".");
+	    }
+	    assert result.isTerm();
+	    assert e.isTerm();
+
+	    result = new JMLExpression(
+		intHelper.buildModExpression(result.getTerm(),e.getTerm()));
+	}
+    )*
 ;
 
 
-unaryexpr returns [Term result=null] throws SLTranslationException
+unaryexpr returns [JMLExpression result=null] throws SLTranslationException
 {
-	KeYJavaType type = null;
+    KeYJavaType type = null;
 }
 :
 (
        "+" result=unaryexpr
-        {
-	   result = intHelper.buildPromotedUnaryPlusExpression(result);
-        }
+	{
+	    if (result.isType()) {
+		raiseError("Cannot build  +" + result.getType().getName() + ".");
+	    }
+	    assert result.isTerm();
+	    
+	    result = new JMLExpression(
+		intHelper.buildPromotedUnaryPlusExpression(result.getTerm()));
+	}
     |
-        "-" result=unaryexpr
-        {
-	   result = intHelper.buildUnaryMinusExpression(result);
-        }
+	"-" result=unaryexpr
+	{
+	    if (result.isType()) {
+		raiseError("Cannot build  -" + result.getType().getName() + ".");
+	    }
+	    assert result.isTerm();
+
+	    result = new JMLExpression(
+		intHelper.buildUnaryMinusExpression(result.getTerm()));
+	}
     |
-        ("(" type=builtintype ")") =>
-	    "(" type=builtintype ")" result=unaryexpr
-	        
-	|
-	    ("(" type=referencetype ")" ) => 
-	       "(" type=referencetype ")" result=unaryexpr
-    	
+	("(" type=builtintype ")") =>
+	"(" type=builtintype ")" result=unaryexpr
+	    
     |
-        result=unaryexprnotplusminus
+	("(" type=referencetype ")" ) => 
+	   "(" type=referencetype ")" result=unaryexpr
+	
+    |
+	result=unaryexprnotplusminus
 )
-     	{
-     		if (type != null) {
-	       	    if (!(type.getSort() instanceof AbstractSort)) {
-	       	    	raiseError("Wrong type argument in cast expression.");
-	       	    }
-	       	    
-	       	    result = tb.tf().createCastTerm(
-	       	        (AbstractSort) type.getSort(),
-	       	        result);
-     		}
-    	}
+	 {
+	     if (type != null) {
+		 if (result.isType()) {
+		     raiseError("Casting of type variables not (yet) supported.");
+		 }
+		 assert result.isTerm();
+
+		 if (!(type.getSort() instanceof AbstractSort)) {
+		     raiseError("Wrong type argument in cast expression.");
+		 }
+		 
+   	         final Function castFunction;
+		 if (type.getSort().extendsTrans(services.getTypeConverter().
+		    getIntegerLDT().targetSort())) {
+		      castFunction = ((AbstractIntegerLDT)services.getTypeConverter().
+		      	getModelFor(type.getSort())).getCast();		         
+		 } else {
+		     castFunction = ((AbstractSort) type.getSort()).getCastSymbol();
+		 }
+		 
+  		 result = new JMLExpression(
+  		     tb.func(castFunction, result.getTerm()));
+	     }
+	}
 ;
 
 
-unaryexprnotplusminus returns [Term result=null] throws SLTranslationException
+unaryexprnotplusminus returns [JMLExpression result=null] throws SLTranslationException
 {
-	Term t;
+    JMLExpression e;
 }
 :
-        "!" t=unaryexpr
-        {
-        	if (t.sort() == Sort.FORMULA) {
-            	result = tb.not(t);
-        	} else if (t.sort() == boolSort) {
-        		result = tb.not(tb.equals(t,trueLitTerm));
-        	} else {
-        		raiseError("Wrong type in not-expression: " + t);
-        	}
-        }
+	"!" e=unaryexpr
+	{
+	    if (e.isType()) {
+		raiseError("Cannot negate type " + e.getType().getName() + ".");
+	    }
+	    
+	    Term t = e.getTerm();
+	    assert t != null;
+	    
+	    if (t.sort() == Sort.FORMULA) {
+		result = new JMLExpression(tb.not(t));
+	    } else if (t.sort() == boolSort) {
+		result = new JMLExpression(tb.not(tb.equals(t,trueLitTerm)));
+	    } else {
+		raiseError("Wrong type in not-expression: " + t);
+	    }
+	}
+    |   
+	"~" e=unaryexpr
+	{
+	    if (e.isType()) {
+		raiseError("Cannot negate type " + e.getType().getName() + ".");
+	    }
+		
+	    result = new JMLExpression(
+			 intHelper.buildPromotedNegExpression(e.getTerm()));
+	}
+	
     |
-        "~" result=unaryexpr
-        {
-	    result = intHelper.buildPromotedNegExpression(result);
-        }
-        
-    |
-        result=postfixexpr
+	result=postfixexpr
 ;
 
 
-postfixexpr returns [Term result=null] throws SLTranslationException
+postfixexpr returns [JMLExpression result=null] throws SLTranslationException
 {
-	String fullyQualifiedName = "";
-	JMLExpression expr = null;
+    String fullyQualifiedName = "";
+    JMLExpression expr = null;
 }
 :
-        expr=primaryexpr
-        {
-            fullyQualifiedName = LT(0).getText();
-        }
-        (
-            expr=primarysuffix[expr, fullyQualifiedName]
-            {
-        		fullyQualifiedName += "." + LT(0).getText();
-            }
-        )*
-        
-        {
-        	if (expr == null || !expr.isTerm()) {
-        		raiseError("Expression " + fullyQualifiedName + " not found!");
-        	}
-        	
-        	result = expr.getTerm();
-        }
-        	
+	expr=primaryexpr
+	{
+	    fullyQualifiedName = LT(0).getText();
+	}
+	(
+	    expr=primarysuffix[expr, fullyQualifiedName]
+	    {
+		fullyQualifiedName += "." + LT(0).getText();
+	    }
+	)*
+	
+	{
+/*
+	    if (expr == null || !expr.isTerm()) {
+		raiseError("Expression " + fullyQualifiedName + " not found!");
+	    }
+*/	    
+	    result = expr; //.getTerm();
+	}
+	    
 ;
 
 primaryexpr returns [JMLExpression result=null] throws SLTranslationException
 {
-	Term t;
+    Term t;
 }
 :
-        t=constant   { result = new JMLExpression(t); }
+	t=constant   { result = new JMLExpression(t); }
     |   id:IDENT     { result = lookupIdentifier(id.getText(), null, null, id); }
     |   "true"       { result = new JMLExpression(tb.tt()); }
     |   "false"      { result = new JMLExpression(tb.ff()); }
     |   "null"       { result = new JMLExpression(tb.NULL(services)); }
-    |   t=jmlprimary { result = new JMLExpression(t); } 
+    |   result=jmlprimary 
     |   "this"       { result = new JMLExpression(tb.var(selfVar)); }
     |   new_expr
 ;   
 
 primarysuffix[JMLExpression receiver, String fullyQualifiedName] returns [JMLExpression result=null] throws SLTranslationException
 {
-	Term t;
-	String lookupName = null;
-	
-	ListOfTerm callingParameters = SLListOfTerm.EMPTY_LIST;
+    Term t;
+    String lookupName = null;
+    
+    ListOfTerm callingParameters = SLListOfTerm.EMPTY_LIST;
 }
 :
 {
-	lookupName = fullyQualifiedName;
+    lookupName = fullyQualifiedName;
 }
 (
-        DOT id:IDENT
-        {
-        	if (receiver == null) {
-        		// Receiver was only a package/classname prefix
-        		lookupName = fullyQualifiedName + "." + id.getText();
-        	} else {
-        		lookupName = id.getText();
-        	}
-        	result = lookupIdentifier(lookupName, receiver, null, id);
-        }
+	DOT id:IDENT
+	{
+	    if (receiver == null) {
+		// Receiver was only a package/classname prefix
+		lookupName = fullyQualifiedName + "." + id.getText();
+	    } else {
+		lookupName = id.getText();
+	    }
+	    result = lookupIdentifier(lookupName, receiver, null, id);
+	}
     |
-        l:LPAREN (callingParameters=expressionlist)? RPAREN
-        {
+	l:LPAREN (callingParameters=expressionlist)? RPAREN
+	{
 /*
-        	System.out.println("Looking up: " + lookupName);
-        	System.out.println("method lookup with parameters:");
-        	System.out.println(callingParameters.toString());
-        	System.out.println("and receiver: " + receiver);
-        	System.out.println();
+	    System.out.println("Looking up: " + lookupName);
+	    System.out.println("method lookup with parameters:");
+	    System.out.println(callingParameters.toString());
+	    System.out.println("and receiver: " + receiver);
+	    System.out.println();
 */
-        	result = lookupIdentifier(lookupName, receiver, callingParameters, l);
-        	if (result == null) {
-        		// method calls must result in an object!
-        		raiseError("Method " + lookupName + " not found!",l);
-        	}
-        }
+	    result = lookupIdentifier(lookupName, receiver, callingParameters, l);
+	    if (result == null) {
+		// method calls must result in an object!
+		raiseError("Method " + lookupName + " not found!",l);
+	    }
+	}
     |
-        "[" t=expression "]"
-        {
-        	if (receiver==null || !receiver.isTerm()) {
-        		raiseError("Error in Array-Expression.");
-        	}
-        	
-        	try {
-       		 	result = new JMLExpression(tb.array(receiver.getTerm(),t));
-        	} catch (TermCreationException e) {
-        		raiseError(e.getMessage());
-        	} catch (IllegalArgumentException e) {
-        		raiseError(e.getMessage());
-        	}
-        }
-)        
+	"[" t=expression "]"
+	{
+	    if (receiver==null || !receiver.isTerm()) {
+		raiseError("Error in Array-Expression.");
+	    }
+	    
+	    try {
+		    result = new JMLExpression(tb.array(receiver.getTerm(),t));
+	    } catch (TermCreationException e) {
+		raiseError(e.getMessage());
+	    } catch (IllegalArgumentException e) {
+		raiseError(e.getMessage());
+	    }
+	}
+)	
 ;
 
 new_expr throws SLTranslationException
 {
-	KeYJavaType typ = null;
+    KeYJavaType typ = null;
 }
 :
-        "new" typ=type new_suffix
-        
+	"new" typ=type new_suffix
+	
     ;
 
 new_suffix throws SLTranslationException
@@ -1247,210 +1464,220 @@ new_suffix throws SLTranslationException
     ListOfTerm terms;
 }
 :
-        "(" ( terms=expressionlist )? ")" 
+	"(" ( terms=expressionlist )? ")" 
     ;
 
 expressionlist returns [ListOfTerm result=SLListOfTerm.EMPTY_LIST] throws SLTranslationException
 { 
-	Term t;
+    Term t;
 }
 :
-        t=expression { result = result.append(t); } ("," t=expression {result = result.append(t);} )* 
+	t=expression { result = result.append(t); } ("," t=expression {result = result.append(t);} )* 
 ;
 
 constant returns [Term result=null] throws SLTranslationException
 :
-        result=javaliteral
+	result=javaliteral
 ;
 
 javaliteral returns [Term result=null] throws SLTranslationException
 :
-        result=integerliteral
+	result=integerliteral
     |
-        STRING_LITERAL 
-        {
-        	raiseNotSupported("string literals");
-        }
+	STRING_LITERAL 
+	{
+	    raiseNotSupported("string literals");
+	}
     |
-        CHAR_LITERAL 
-        {
-        	raiseNotSupported("character literals");
-        }
+	CHAR_LITERAL 
+	{
+	    raiseNotSupported("character literals");
+	}
     ;
 
 integerliteral returns [Term result=null] throws SLTranslationException
 :
-        result=decimalintegerliteral
+	result=decimalintegerliteral
     |
-        result=hexintegerliteral
+	result=hexintegerliteral
 ;
 
 hexintegerliteral returns [Term result=null] throws SLTranslationException
 :
     n:HEXNUMERAL
     {
-    	BigInteger decInteger = new BigInteger(n.getText(),16);
-        result = castToJint(tb.zTerm(services,decInteger.toString()));
+	BigInteger decInteger = new BigInteger(n.getText(),16);
+	result = castToJint(tb.zTerm(services,decInteger.toString()));
     }
 ;
 
 decimalintegerliteral returns [Term result=null] throws SLTranslationException
 :
-        result=decimalnumeral
+	result=decimalnumeral
 ;
 
 decimalnumeral returns [Term result=null] throws SLTranslationException
 :
-        n:DIGITS
-        {
-        	result = castToJint(tb.zTerm(services,n.getText()));
-        }
+	n:DIGITS
+	{
+	    result = castToJint(tb.zTerm(services,n.getText()));
+	}
 ;
 
-jmlprimary returns [Term result=null] throws SLTranslationException
+jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 {
-	Term t;
-	KeYJavaType typ;
+    Term t;
+    KeYJavaType typ;
 }
 :
-        RESULT
-        {
-        	if (resultVar==null) {
-        		raiseError("\\result used in wrong context");
-        	}
-        	result = tb.var(resultVar);
-        }
+	RESULT
+	{
+	    if (resultVar==null) {
+		raiseError("\\result used in wrong context");
+	    }
+	    result = new JMLExpression(tb.var(resultVar));
+	}
     |
-        ("(" QUANTIFIER) => result=specquantifiedexpression
+	("(" QUANTIFIER) => t=specquantifiedexpression
+	{
+	    result = new JMLExpression(t);
+	}
     |
-        (OLD | PRE) "(" t=specexpression ")"
-        {
-        	if (atPreFunctions == null) {
-        		raiseError("JML construct " +
-                           "\\old not allowed in this context.");
-        	}
-        	
-        	result = convertToOld(t);
-        }
+	(OLD | PRE) "(" t=specexpression ")"
+	{
+	    if (atPreFunctions == null) {
+		raiseError("JML construct " +
+			   "\\old not allowed in this context.");
+	    }
+	    
+	    result = new JMLExpression(convertToOld(t));
+	}
     |   
-        CREATED "(" t=specexpression ")"
-        {
-        	if (t.sort() instanceof ObjectSort) {
-        		result = CreatedAttributeTermFactory.INSTANCE.
-        				createCreatedTerm(services, t);
-        	} else {
-        		raiseError("\\created only allowed for reference types.");
-        	}
-        }
-        
+	CREATED "(" t=specexpression ")"
+	{
+	    if (t.sort() instanceof ObjectSort) {
+		result = new JMLExpression(
+		    CreatedAttributeTermFactory.INSTANCE.
+			createCreatedTerm(services, t));
+	    } else {
+		raiseError("\\created only allowed for reference types.");
+	    }
+	}
+	
     |
-        NONNULLELEMENTS "(" t=specexpression ")"
-        {
-        	result = tb.not(tb.equals(t, tb.NULL(services)));
-        	
-        	if (t.sort() instanceof ArraySort) {
-        		LogicVariable i = new LogicVariable(new Name("i"), javaInfo
-                                .getKeYJavaType(PrimitiveType.JAVA_INT)
-                                .getSort());
-                
-                // See JML reference manual
-                // http://www.cs.iastate.edu/~leavens/JML/jmlrefman/jmlrefman_11.html#SEC139                
-        		Term range = tb.and(
-        		    tb.leq(tb.zTerm(services, "0"), tb.var(i), services),
-        		    tb.leq(tb.var(i), tb.dot(t,javaInfo.getArrayLength()), services));
-        		Term body = tb.equals(
-        		    tb.array(t, tb.var(i)),
-        		    tb.NULL(services));
-        		body = tb.not(body);
-        		body = tb.imp(range, body);
-        		
-        		result = tb.and(result, tb.all(i, body));
-        	}
-        }
-        
+	NONNULLELEMENTS "(" t=specexpression ")"
+	{
+	    Term resTerm = tb.not(tb.equals(t, tb.NULL(services)));
+
+	    if (t.sort() instanceof ArraySort) {
+		LogicVariable i = new LogicVariable(new Name("i"), javaInfo
+				.getKeYJavaType(PrimitiveType.JAVA_INT)
+				.getSort());
+
+		// See JML reference manual
+		// http://www.cs.iastate.edu/~leavens/JML/jmlrefman/jmlrefman_11.html#SEC139		
+		Term range = tb.and(
+		    tb.leq(tb.zTerm(services, "0"), tb.var(i), services),
+		    tb.leq(tb.var(i), tb.dot(t,javaInfo.getArrayLength()), services));
+		Term body = tb.equals(
+		    tb.array(t, tb.var(i)),
+		    tb.NULL(services));
+		body = tb.not(body);
+		body = tb.imp(range, body);
+
+		result = new JMLExpression(tb.and(resTerm, tb.all(i, body)));
+	    }
+	}
+	
     |   INFORMAL_DESCRIPTION 
-        {
-        	raiseNotSupported("informal predicates");
-        }
+	{
+	    raiseNotSupported("informal predicates");
+	}
 //    |   NOT_MODIFIED "(" storereflist ")" 
-        
+	
     |   FRESH "(" spec_expression_list ")"
-        {
-        	raiseNotSupported("\\fresh");
-        } 
-        
+	{
+	    raiseNotSupported("\\fresh");
+	} 
+	
     |   REACH "(" t=specexpression ")"
-        {
-        	raiseNotSupported("\\reach");
-        } 
-        
+	{
+	    raiseNotSupported("\\reach");
+	} 
+	
     |   DURATION "(" t=expression ")" 
-        {
-        	raiseNotSupported("\\duration");
-        } 
-        
+	{
+	    raiseNotSupported("\\duration");
+	} 
+	
     |   SPACE "(" t=specexpression ")" 
-        {
-        	raiseNotSupported("\\space");
-        } 
-        
+	{
+	    raiseNotSupported("\\space");
+	} 
+	
     |   WORKINGSPACE "(" t=expression ")"
-        {
-        	raiseNotSupported("\\working_space");
-        } 
-        
+	{
+	    raiseNotSupported("\\working_space");
+	} 
+	
     |   TYPEOF "(" t=specexpression ")"
-        {
-        	raiseNotSupported("\\typeof");
-        } 
-        
+	{
+	    result = new JMLExpression(services.getTypeConverter().getKeYJavaType(t),t);
+	} 
+	
     |   ELEMTYPE "(" t=specexpression ")" 
-        {
-        	raiseNotSupported("\\elemtype");
-        } 
-        
+	{
+	    raiseNotSupported("\\elemtype");
+	} 
+	
     |   TYPE_SMALL "(" typ=type ")" 
-        {
-        	raiseNotSupported("\\type");
-        } 
-        
+	{
+	    result = new JMLExpression(typ);
+	} 
+	
     |   LOCKSET
-        {
-        	raiseNotSupported("\\lockset");
-        } 
-        
+	{
+	    raiseNotSupported("\\lockset");
+	} 
+	
     |   IS_INITIALIZED "(" typ=referencetype ")" 
-        {
-        	result = tb.equals(
-        	    tb.var(
-        	        javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED, 
-                                          typ)),
-                tb.TRUE(services));
-        } 
-        
+	{
+	    Term resTerm = tb.equals(
+		tb.var(
+		    javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED, 
+					  typ)),
+		tb.TRUE(services));
+	    result = new JMLExpression(resTerm);
+	} 
+	
     |   INVARIANT_FOR "(" t=specexpression ")" 
-        {
-        	raiseNotSupported("\\invariant_for");
-        } 
-        
-    |   ( "(" LBLNEG ) => "(" LBLNEG IDENT result=specexpression ")"
-        {
-//        	raiseNotSupported("\\lblneg");
-        } 
-        
-    |   ( "(" LBLPOS ) => "(" LBLPOS IDENT result=specexpression ")" 
-        {
-//        	raiseNotSupported("\\lblpos");
-        } 
-        
+	{
+	    raiseNotSupported("\\invariant_for");
+	} 
+	
+    |   ( "(" LBLNEG ) => "(" LBLNEG IDENT t=specexpression ")"
+	{
+	    result = new JMLExpression(t);
+//	    raiseNotSupported("\\lblneg");
+	} 
+	
+    |   ( "(" LBLPOS ) => "(" LBLPOS IDENT t=specexpression ")" 
+	{
+	    result = new JMLExpression(t);
+//	    raiseNotSupported("\\lblpos");
+	} 
+	
     |
-        NOWARN 
-        {
-        	raiseNotSupported("\\nowarn");
-        } 
+	NOWARN 
+	{
+	    raiseNotSupported("\\nowarn");
+	} 
 
     |   
-        "(" result=expression ")"
+	"(" t=expression ")"
+	{
+	    result = new JMLExpression(t);
+	}
 ;
 
 specquantifiedexpression returns [Term result = null] throws SLTranslationException
@@ -1461,248 +1688,248 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
     ListOfLogicVariable declVars = null;
 }
 :
-        "("
-        q:QUANTIFIER (nullable=boundvarmodifiers)? declVars=quantifiedvardecls ";"
-        
-        {
-        	resolverManager.pushLocalVariablesNamespace();
-        	resolverManager.putIntoTopLocalVariablesNamespace(declVars);
-        } 
-        (
-            ((p=predicate)? ";" ) => (p=predicate)? ";" t=specexpression
-        |
-            (";")? t=specexpression 
-        )
-        
-        {
-        	resolverManager.popLocalVariablesNamespace();
-        	
-        	if (!nullable) {
-        		if (declVars.head().sort() instanceof ObjectSort) {
-        			p = tb.tt();
-        			IteratorOfLogicVariable it = declVars.iterator();
-        			while (it.hasNext()) {
-        				p = tb.and(p,
-        				        tb.not(
-        				            tb.equals(
-        				                tb.var(it.next()),
-        				                tb.NULL(services))));
-        			}
-        		}
-        	}
-        	
-        	t = convertToFormula(t);
-        	
-        	if (q.getText().equals("\\forall")) {
-        		if (p != null) {
-        			t = tb.imp(p, t);
-        		}
-        		result = tb.all(declVars.toArray(), t);
-        	}
-        	else if (q.getText().equals("\\exists")) {
-        		if (p != null) {
-        			t = tb.and(p, t);
-        		}
-        		result = tb.ex(declVars.toArray(), t);
-        	}
-        	else if (q.getText().equals("\\min")) {
-        		Function y = new RigidFunction(
-        			new Name("_jml_ymin"+(varCounter++)),
-        			declVars.head().sort(),
-        			new Sort[] {});
-        		axiomCollector.collectAxiom(y,
-        			buildMaxMinAxiom(false, y, declVars, p, t));
-        		result = tb.func(y);
-        		services.getNamespaces().functions().addSafely(y);
-        	}
-        	else if (q.getText().equals("\\max")) {
-        		Function y = new RigidFunction(
-        			new Name("_jml_ymax"+(varCounter++)),
-        			declVars.head().sort(),
-        			new Sort[] {});
-        		axiomCollector.collectAxiom(y,
-        			buildMaxMinAxiom(true, y, declVars, p, t));
-        		result = tb.func(y);
-        		services.getNamespaces().functions().addSafely(y);
-        	}
-        	else if (q.getText().equals("\\num_of")) {
-        		raiseNotSupported("\\num_of");
-        	}
-        	else if (q.getText().equals("\\product")) {
-        		raiseNotSupported("\\product");
-        	}
-        	else if (q.getText().equals("\\sum")) {
-        		raiseNotSupported("\\sum");
-        	}
-        	else {
-			    raiseError("Unknown quantifier: " + q.getText() + "!");
-        	}
-        }
-        ")"
+	"("
+	q:QUANTIFIER (nullable=boundvarmodifiers)? declVars=quantifiedvardecls ";"
+	
+	{
+	    resolverManager.pushLocalVariablesNamespace();
+	    resolverManager.putIntoTopLocalVariablesNamespace(declVars);
+	} 
+	(
+	    ((p=predicate)? ";" ) => (p=predicate)? ";" t=specexpression
+	|
+	    (";")? t=specexpression 
+	)
+	
+	{
+	    resolverManager.popLocalVariablesNamespace();
+	    
+	    if (!nullable) {
+		if (declVars.head().sort() instanceof ObjectSort) {
+		    p = tb.tt();
+		    IteratorOfLogicVariable it = declVars.iterator();
+		    while (it.hasNext()) {
+			p = tb.and(p,
+				tb.not(
+				    tb.equals(
+					tb.var(it.next()),
+					tb.NULL(services))));
+		    }
+		}
+	    }
+	    
+	    t = convertToFormula(t);
+	    
+	    if (q.getText().equals("\\forall")) {
+		if (p != null) {
+		    t = tb.imp(p, t);
+		}
+		result = tb.all(declVars.toArray(), t);
+	    }
+	    else if (q.getText().equals("\\exists")) {
+		if (p != null) {
+		    t = tb.and(p, t);
+		}
+		result = tb.ex(declVars.toArray(), t);
+	    }
+	    else if (q.getText().equals("\\min")) {
+		Function y = new RigidFunction(
+		    new Name("_jml_ymin"+(varCounter++)),
+		    declVars.head().sort(),
+		    new Sort[] {});
+		axiomCollector.collectAxiom(y,
+		    buildMaxMinAxiom(false, y, declVars, p, t));
+		result = tb.func(y);
+		services.getNamespaces().functions().addSafely(y);
+	    }
+	    else if (q.getText().equals("\\max")) {
+		Function y = new RigidFunction(
+		    new Name("_jml_ymax"+(varCounter++)),
+		    declVars.head().sort(),
+		    new Sort[] {});
+		axiomCollector.collectAxiom(y,
+		    buildMaxMinAxiom(true, y, declVars, p, t));
+		result = tb.func(y);
+		services.getNamespaces().functions().addSafely(y);
+	    }
+	    else if (q.getText().equals("\\num_of")) {
+		raiseNotSupported("\\num_of");
+	    }
+	    else if (q.getText().equals("\\product")) {
+		raiseNotSupported("\\product");
+	    }
+	    else if (q.getText().equals("\\sum")) {
+		raiseNotSupported("\\sum");
+	    }
+	    else {
+		raiseError("Unknown quantifier: " + q.getText() + "!");
+	    }
+	}
+	")"
 ;
 
 quantifiedvardecls returns [ListOfLogicVariable vars = SLListOfLogicVariable.EMPTY_LIST] throws SLTranslationException
 {
-	KeYJavaType t = null;
-	LogicVariable v = null;
+    KeYJavaType t = null;
+    LogicVariable v = null;
 }
 :
-        t=typespec v=quantifiedvariabledeclarator[t] 
-        
-        { vars = vars.append(v); }
-        
-        (
-            "," v=quantifiedvariabledeclarator[t]
-            
-            { vars = vars.append(v); }
-        )*
+	t=typespec v=quantifiedvariabledeclarator[t] 
+	
+	{ vars = vars.append(v); }
+	
+	(
+	    "," v=quantifiedvariabledeclarator[t]
+	    
+	    { vars = vars.append(v); }
+	)*
 ;
 
 boundvarmodifiers returns [boolean nullable = false] throws SLTranslationException
 :
-		NON_NULL | NULLABLE { nullable = true; }
+	NON_NULL | NULLABLE { nullable = true; }
 ;
 
 typespec returns [KeYJavaType t = null] throws SLTranslationException
 {
-	int dim = 0;
+    int dim = 0;
 }
 :
-        t=type 
-        (
-            dim=dims
-            {
-            	String fullName = t.getFullName();
-            	for (int i=0; i < dim; i++) {
-            		fullName += "[]";
-            	}
-            	t = javaInfo.getKeYJavaType(fullName);
-		if(t == null && dim > 0) {
-		    //try to create missing array type
-  		    try {
-			javaInfo.readJavaBlock("{" + fullName + " k;}");
-			t = javaInfo.getKeYJavaType(fullName);
-		    } catch (Exception e) {
-			t = null;
-	            }
-	        }
-            }
-        )?
+	t=type 
+	(
+	    dim=dims
+	    {
+		String fullName = t.getFullName();
+		for (int i=0; i < dim; i++) {
+		    fullName += "[]";
+		}
+		t = javaInfo.getKeYJavaType(fullName);
+	if(t == null && dim > 0) {
+	    //try to create missing array type
+	      try {
+	    javaInfo.readJavaBlock("{" + fullName + " k;}");
+	    t = javaInfo.getKeYJavaType(fullName);
+	    } catch (Exception e) {
+	    t = null;
+		}
+	    }
+	    }
+	)?
 ;
 
 dims returns [int dimension = 0] throws SLTranslationException
 :
-        ("[" "]" { dimension++; } )+
+	("[" "]" { dimension++; } )+
     ;
 
 type returns [KeYJavaType t = null] throws SLTranslationException
 :
-        (builtintype) => t=builtintype
+	(builtintype) => t=builtintype
     |
-        t=referencetype
+	t=referencetype
     |
-        TYPE
-        {
-        	raiseNotSupported("\\TYPE");
-        }
-        
+	TYPE
+	{
+	    raiseNotSupported("\\TYPE");
+	}
+	
 ;
 
 referencetype returns [KeYJavaType type = null] throws SLTranslationException
 {
-	String typename;
+    String typename;
 }
 :
-        typename=name
-        {
-        	try {
-        		type = resolverManager.resolve(null, typename, null).getKeYJavaType(javaInfo);
-        	} catch (NullPointerException e) {
-        		raiseError("Type " + typename + " not found.");
-        	}
-        }
+	typename=name
+	{
+	    try {
+		type = resolverManager.resolve(null, typename, null).getKeYJavaType(javaInfo);
+	    } catch (NullPointerException e) {
+		raiseError("Type " + typename + " not found.");
+	    }
+	}
 ;   
 
 builtintype returns [KeYJavaType type = null] throws SLTranslationException
 :
-        (
-            "byte" 
-            {
-            	type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_BYTE);
-            }
-        |
-            "short" 
-            {
-            	type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_SHORT);
-            }
-        |
-            "int" 
-            {
-            	type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT);
-            }
-        |
-            "long" 
-            {
-            	type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_LONG);
-            }
-        |
-            "boolean" 
-            {
-            	type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
-            }
-        |
-            "void" 
-            {
-            	type = null;
-            }
-        |
-            BIGINT
-            {
-            	raiseNotSupported("\\bigint");
-            } 
-        |
-            REAL
-            {
-            	raiseNotSupported("\\real");
-            } 
-        )
-        
+	(
+	    "byte" 
+	    {
+		type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_BYTE);
+	    }
+	|
+	    "short" 
+	    {
+		type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_SHORT);
+	    }
+	|
+	    "int" 
+	    {
+		type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT);
+	    }
+	|
+	    "long" 
+	    {
+		type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_LONG);
+	    }
+	|
+	    "boolean" 
+	    {
+		type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
+	    }
+	|
+	    "void" 
+	    {
+		type = null;
+	    }
+	|
+	    BIGINT
+	    {
+		raiseNotSupported("\\bigint");
+	    } 
+	|
+	    REAL
+	    {
+		raiseNotSupported("\\real");
+	    } 
+	)
+	
 ;
 
 name returns [String result = ""] throws SLTranslationException
 :
-        id:IDENT
-        { result += id.getText(); }
-        (
-            DOT id1:IDENT 
-            { result += "." + id1.getText(); }
-        )*
+	id:IDENT
+	{ result += id.getText(); }
+	(
+	    DOT id1:IDENT 
+	    { result += "." + id1.getText(); }
+	)*
 ;
 
 quantifiedvariabledeclarator[KeYJavaType t] returns [LogicVariable v = null] throws SLTranslationException
 {
-	int dim = 0;
-	KeYJavaType varType = null;
+    int dim = 0;
+    KeYJavaType varType = null;
 }
 :
    id:IDENT (dim=dims)?
    {
-   	   if (dim > 0) {
-        	String fullName;
-        	if (t.getJavaType() instanceof ArrayType) {
-        		fullName = ((ArrayType) t.getJavaType()).getAlternativeNameRepresentation();
-        	} else {
-        		fullName = t.getFullName();
-        	}
-        	for (int i=0; i < dim; i++) {
-        		fullName += "[]";
-        	}
-        	
-        	varType = javaInfo.getKeYJavaType(fullName);
-   	   } else {
-   	   	    varType = t;
-   	   }
-   	   
-   	   v = new LogicVariable(new Name(id.getText()), varType.getSort());
+	  if (dim > 0) {
+	    String fullName;
+	    if (t.getJavaType() instanceof ArrayType) {
+		fullName = ((ArrayType) t.getJavaType()).getAlternativeNameRepresentation();
+	    } else {
+		fullName = t.getFullName();
+	    }
+	    for (int i=0; i < dim; i++) {
+		fullName += "[]";
+	    }
+	    
+	    varType = javaInfo.getKeYJavaType(fullName);
+	  } else {
+		  varType = t;
+	  }
+	  
+	  v = new LogicVariable(new Name(id.getText()), varType.getSort());
    }
 ;

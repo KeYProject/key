@@ -321,4 +321,21 @@ public class TestJMLTranslator extends TestCase {
         assertTrue(result.getAxioms().isEmpty());
         assertTrue(result.getFormula().sub(0).op().equals(pm));
     }
+    
+    public void testSubtypeExpression() {
+        FormulaWithAxioms result = null;
+
+        ProgramVariable selfVar = buildSelfVarAsProgVar();
+
+        try {
+            result = translator.translateExpression(
+                    new PositionedString("( \\exists TestClass t; t != null; \\typeof(t) <: \\type(java.lang.Object) )"), testClassType, selfVar,
+                    null, null, null, new LinkedHashMap());
+        } catch (SLTranslationException e) {
+            e.printStackTrace();
+            assertTrue(false);
+        }
+
+        assertTrue(result != null);
+    }
 }

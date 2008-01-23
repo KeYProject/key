@@ -290,9 +290,7 @@ public abstract class AbstractIntegerLDT extends LDT {
     
     public abstract Function getMod();
     
-    
-    public abstract Function getShiftLeft();
-    
+    public abstract Function getShiftLeft();    
     
     public abstract Function getShiftRight();
     
