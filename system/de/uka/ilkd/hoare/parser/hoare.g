@@ -239,9 +239,7 @@ comparisonOperator returns [Token t = null]
     ;
 
 intExpression returns [int type = NONE]
-{
-    int rightType = NONE;
-} :
+{} :
         type=weakIntExpression
     ;
 
