@@ -877,7 +877,7 @@ logicalorexpr returns [Term result=null] throws SLTranslationException
 :
 	result=logicalandexpr
 	(
-	    "||" t=logicalandexpr
+	    "||" t=logicalorexpr
 	    {
 		result = intHelper.buildOrExpression(t,result);
 	    }
@@ -891,7 +891,7 @@ logicalandexpr returns [Term result=null] throws SLTranslationException
 :
 	result=inclusiveorexpr
 	(
-	    "&&" t=inclusiveorexpr
+	    "&&" t=logicalandexpr
 	    {
 		result = intHelper.buildAndExpression(t,result);
 	    }
@@ -921,7 +921,7 @@ exclusiveorexpr returns [Term result=null] throws SLTranslationException
 :
 	result=andexpr 
 	(
-	    XOR t=andexpr
+	    XOR t=exclusiveorexpr
 	    {
 	    result = intHelper.buildPromotedXorExpression(result,t);
 	    }
@@ -931,44 +931,50 @@ exclusiveorexpr returns [Term result=null] throws SLTranslationException
 
 andexpr returns [Term result=null] throws SLTranslationException
 {
+    JMLExpression left;
     Term t;
 }
 :
-	result=equalityexpr
-	(
-	    "&" t=equalityexpr
-	    {
-	    result = intHelper.buildPromotedAndExpression(result,t);
+	left=equalityexpr
+	{
+	    if(!left.isTerm()) {
+	        raiseError("Found a type where only a term is allowed: " 
+	                   + left);
 	    }
+	    result = left.getTerm();
+	}
+	(
+	    "&" t=andexpr
+	    { 
+	    	result = intHelper.buildPromotedAndExpression(result,t);
+            }
 	)?
 ;
 
 
-equalityexpr returns [Term result=null] throws SLTranslationException
+equalityexpr returns [JMLExpression result=null] throws SLTranslationException
 {
-    Term t;
     JMLExpression left, right;
 }
 :
 	left=relationalexpr 
 	(
-	    eq:"==" right=relationalexpr
+	    eq:"==" right=equalityexpr
 	    {
 		if (left.isType() ^ right.isType()) {
 		    raiseError("Cannot build equality expression between term " +
 			"and type.", eq);
 		}
-		result = buildEqualityTerm(left, right);
+		result = new JMLExpression(buildEqualityTerm(left, right));
 	    }
 	|
-	    ne:"!=" right=relationalexpr
+	    ne:"!=" right=equalityexpr
 	    {
 		if (left.isType() ^ right.isType()) {
 		    raiseError("Cannot build equality expression between term " +
 			"and type.", ne);
 		}
-		t = buildEqualityTerm(left, right);
-		result = tb.not(t);
+		result = new JMLExpression(tb.not(buildEqualityTerm(left, right)));
 	    }
 	    
 	)?
@@ -979,7 +985,7 @@ equalityexpr returns [Term result=null] throws SLTranslationException
 		}
 		assert left.isTerm();
 		
-		result = left.getTerm();
+		result = left;
 	    }
 	    
 	    assert result != null;
