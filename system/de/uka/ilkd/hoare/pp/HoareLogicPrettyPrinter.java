@@ -184,6 +184,9 @@ public class HoareLogicPrettyPrinter extends LogicPrinter {
             startTerm(antec.size()+succ.size());
             layouter.beginC(0).ind();
             layouter.print("|-").brk(1,2);
+            
+            boolean formulaInAntec = antec.size() > 0;
+            
             printSemisequent(antec, true, false);            
 
             if (succ.size() > 0) { 
@@ -195,9 +198,10 @@ public class HoareLogicPrettyPrinter extends LogicPrinter {
                             layouter.print(SEMI_SEQ_SEP_ANTEC).brk(1);
                         }            
                     }
+                    formulaInAntec = formulaInAntec || succ.size() > 1;
                     printSemisequent(succ.remove(idx).semisequent(), false, true);                
                 }
-                layouter.brk(1,-1).print("->").brk(1,2);
+                if (formulaInAntec) layouter.brk(1,-1).print("->").brk(1,2);
                 if (idx >= 0) {
                     markStartSub();
                     printConstrainedFormula(succ.get(idx));
@@ -497,5 +501,7 @@ public class HoareLogicPrettyPrinter extends LogicPrinter {
         }
         formulaConstraint = null;
     }
+ 
+    
     
 }
