@@ -45,8 +45,7 @@ public class JavaIntegerSemanticsHelper {
 
 	if (a.sort() == boolSort) {
 	    return tb.equals(a, trueLitTerm);
-	}
-
+	}        
 	return a;
     }
 
@@ -349,5 +348,5 @@ public class JavaIntegerSemanticsHelper {
 
 	return tb.tf().createCastTerm((AbstractSort) resultType.getSort(), a);
     }
-
+    
 }
