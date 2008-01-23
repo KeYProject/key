@@ -1297,17 +1297,20 @@ unaryexpr returns [JMLExpression result=null] throws SLTranslationException
 		     raiseError("Wrong type argument in cast expression.");
 		 }
 		 
-   	         final Function castFunction;
+		 Term resultTerm = result.getTerm(); 
+   	         Function castFunction;
 		 if (type.getSort().extendsTrans(services.getTypeConverter().
 		    getIntegerLDT().targetSort())) {
 		      castFunction = ((AbstractIntegerLDT)services.getTypeConverter().
-		      	getModelFor(type.getSort())).getCast();		         
-		 } else {
-		     castFunction = ((AbstractSort) type.getSort()).getCastSymbol();
-		 }
+		      	getModelFor(type.getSort())).getCast();	
+		    resultTerm = tb.func(castFunction, resultTerm);
+		 } 
+		 
+		 castFunction = ((AbstractSort) type.getSort()).getCastSymbol();
+		 
 		 
   		 result = new JMLExpression(
-  		     tb.func(castFunction, result.getTerm()));
+  		     tb.func(castFunction, resultTerm));
 	     }
 	}
 ;
