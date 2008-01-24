@@ -113,7 +113,7 @@ public class AtPreFactory {
             ArrayOp aop = (ArrayOp) op;
             Sort[] argSorts = new Sort[] {aop.arraySort(), 
                                           services.getTypeConverter()
-                                                  .getIntLDT()
+                                                  .getIntegerLDT()
                                                   .targetSort()};
             return new ArrayOfSort(argSorts);
         } else if(op instanceof ProgramVariable && op.arity() == 0) {
