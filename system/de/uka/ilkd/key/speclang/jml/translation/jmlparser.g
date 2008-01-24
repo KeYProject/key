@@ -1639,7 +1639,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	    raiseNotSupported("\\elemtype");
 	} 
 	
-    |   TYPE_SMALL "(" typ=type ")" 
+    |   TYPE_SMALL "(" typ=typespec ")" 
 	{
 	    result = new JMLExpression(typ);
 	} 
