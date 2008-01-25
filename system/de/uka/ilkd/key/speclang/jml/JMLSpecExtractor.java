@@ -137,10 +137,23 @@ public class JMLSpecExtractor implements SpecExtractor {
                                                      splittedDecl[1].length() 
                                                          - 1);
         
-        Sort sort = services.getJavaInfo().getTypeByName(typeName).getSort();
-        ArrayOfSort argSorts = decl.getMods().contains("static")
-                               ? new ArrayOfSort()
-                               : new ArrayOfSort(classKjt.getSort());
+        Sort sort;
+        ArrayOfSort argSorts;
+        try {
+            sort 
+                = services.getJavaInfo().getTypeByClassName(typeName).getSort();
+            argSorts = decl.getMods().contains("static")
+                       ? new ArrayOfSort()
+                       : new ArrayOfSort(classKjt.getSort());
+        } catch(Throwable e) {
+            throw new SLTranslationException(e.getMessage()
+                                             + " (" 
+                                             + e.getClass().getName() 
+                                             + ")",                                              
+                                             decl.getDecl().fileName, 
+                                             decl.getDecl().pos,
+                                             e.getStackTrace());
+        }
                                    
         NonRigidHeapDependentFunction f
             = new NonRigidHeapDependentFunction(new Name(fieldName), 

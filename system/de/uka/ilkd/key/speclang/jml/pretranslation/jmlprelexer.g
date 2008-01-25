@@ -51,9 +51,11 @@ tokens {
     EXCEPTIONAL_BEHAVIOR 	= "exceptional_behavior";
     EXCEPTIONAL_BEHAVIOUR 	= "exceptional_behaviour";
     FINAL 			= "final";
+    FOR_EXAMPLE			= "for_example";
     FORALL			= "forall";
     GHOST 			= "ghost";
     HELPER 			= "helper";
+    IMPLIES_THAT		= "implies_that";
     IN				= "in";
     IN_RED			= "in_redundantly";
     INITIALLY			= "initially";
@@ -79,6 +81,7 @@ tokens {
     NORMAL_BEHAVIOUR 		= "normal_behaviour";
     NULLABLE 			= "nullable";
     NULLABLE_BY_DEFAULT 	= "nullable_by_default";
+    OLD				= "old";
     PRIVATE 			= "private";
     PROTECTED 			= "protected";
     PUBLIC			= "public";
@@ -164,6 +167,32 @@ options {
 ;
 
 
+protected PARAM_DECL
+options {
+    paraphrase = "a parameter declaration";
+    ignore = WS;
+}
+:
+    (
+    	("non_null" | "nullable")
+    	=>
+    	{
+    	    $append("/*@");
+    	}
+    	(
+		"non_null"
+    	    |   "nullable"
+    	)
+    	{
+    	    $append("@*/");
+        }
+    )?
+    IDENT  { $append(" "); } 
+    IDENT
+;
+
+
+
 protected LETTER
 options {
     paraphrase = "a letter";
@@ -173,6 +202,7 @@ options {
     |   'A'..'Z'
     |   '_'
     |   '$'
+    |   '\\'
 ;
 
 
@@ -241,16 +271,27 @@ options {
     {!expressionMode}?
     '(' 
     (
-    	IDENT  { $append(" "); } 
-    	IDENT
+        PARAM_DECL
         (
             ',' 
-            IDENT  { $append(" "); } 
-            IDENT
+            PARAM_DECL
         )*
     )? 
     ')'
 ;   
+
+
+NEST_START
+:
+    {!expressionMode}?
+    "{|"
+;
+
+NEST_END
+:
+    {!expressionMode}?
+    "|}"
+;
 
 
 BODY

@@ -24,7 +24,6 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSetStatement;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import recoder.CrossReferenceServiceConfiguration;
-import recoder.ParserException;
 import recoder.java.Comment;
 import recoder.java.CompilationUnit;
 import recoder.java.Declaration;
@@ -273,7 +272,7 @@ public class JMLTransformer extends RecoderModelTransformer {
                        (StatementBlock) astParent, 
                        childIndex);
             }
-        } catch(ParserException e) {
+        } catch(Throwable e) {
             throw new SLTranslationException(e.getMessage()
                                              + " (" 
                                              + e.getClass().getName() 
@@ -328,7 +327,7 @@ public class JMLTransformer extends RecoderModelTransformer {
                                  .parseMethodDeclaration(declWithMods.text);
             updatePositionInformation(methodDecl, declWithMods.pos);
             attach(methodDecl, astParent, childIndex);
-        } catch(ParserException e) {
+        } catch(Throwable e) {
             throw new SLTranslationException(e.getMessage()
                                              + " (" 
                                              + e.getClass().getName() 
@@ -375,7 +374,7 @@ public class JMLTransformer extends RecoderModelTransformer {
             SetAssignment setStmt = new SetAssignment(assignStmt);
             updatePositionInformation(setStmt, stat.getAssignment().pos);
             attach(setStmt, astParent, childIndex);
-        } catch(ParserException e) {
+        } catch(Throwable e) {
             throw new SLTranslationException(e.getMessage()
                                              + " (" 
                                              + e.getClass().getName() 

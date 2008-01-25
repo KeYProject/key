@@ -429,7 +429,9 @@ public class Recoder2KeY implements JavaReader{
 	transformModel(specialClasses);
 
 	for (int i=0, sz = specialClasses.size(); i<sz; i++) {
+	    currentClass = specialClasses.getCompilationUnit(i).getName(); //TODO: use the real file name here
 	    callConvert(specialClasses.getCompilationUnit(i));
+	    currentClass = null;
 	}
 
 	rec2key().parsedSpecial(true);

@@ -251,12 +251,12 @@ method_specification[ListOfString mods]
     ListOfTextualJMLConstruct list = SLListOfTextualJMLConstruct.EMPTY_LIST;
 }
 :
-    (ALSO)?
+    (also_keyword)*
     result=spec_case[mods]
     (
     	options { greedy = true; }
     	:
-    	also_keyword list=spec_case[SLListOfString.EMPTY_LIST]  
+    	(also_keyword)+ list=spec_case[SLListOfString.EMPTY_LIST]  
     	{ 
     	    result = result.append(list); 
     	}
@@ -406,7 +406,10 @@ spec_var_decls throws SLTranslationException
     PositionedString ps;
 }
 :
-    (FORALL ps=expression)+
+    (	
+    	    FORALL ps=expression
+    	|   OLD ps=expression
+    )+
     {
     	raiseNotSupported("specification variables");
     }
@@ -453,9 +456,11 @@ generic_spec_body[ListOfString mods, Behavior b]
 :
     result=simple_spec_body[mods, b]
     | 
-    "{|" 
-    result=generic_spec_case_seq[mods, b] 
-    "|}"
+    (
+        NEST_START 
+    	result=generic_spec_case_seq[mods, b] 
+    	NEST_END
+    )    	
 ;
 
 
@@ -468,7 +473,7 @@ generic_spec_case_seq[ListOfString mods, Behavior b]
 :
     result=generic_spec_case[mods, b]
     (
-        also_keyword 
+        (also_keyword)+ 
         list=generic_spec_case[mods, b]
         { 
             result = result.append(list); 
@@ -777,8 +782,7 @@ represents_clause[ListOfString mods]
 :
     represents_keyword ps=expression
     {
-    	//TODO
-    	//raiseNotSupported("represents clauses");
+    	raiseNotSupported("represents clauses");
     }
 ;
 

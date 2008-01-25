@@ -70,7 +70,7 @@ class JMLTranslator {
     	
     	FormulaWithAxioms result = null;
     	
-//    	System.out.println("JMLTranslator.translateExpression("+expr+")");
+//    	System.out.println("JMLTranslator.translateExpression("+expr+")" + " in " + expr.fileName);
     	
     	result = parser.parseExpression();
     	
