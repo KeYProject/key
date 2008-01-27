@@ -67,17 +67,26 @@ public class NonGoalInfoView extends JTextArea {
         if ( app != null ) {
             s = s + "\n \nUpcoming rule application: \n";
             if (app.rule() instanceof Taclet) {
-		LogicPrinter tacPrinter = new LogicPrinter 
+                LogicPrinter tacPrinter;
+                if (mediator.getProfile() instanceof HoareProfile) {
+                    tacPrinter = new HoareLogicPrettyPrinter
+                    (new ProgramPrinter(null),
+                            mediator.getNotationInfo(),
+                            mediator.getServices(), true);
+                    ((HoareLogicPrettyPrinter)tacPrinter).printTaclet((TacletApp)app);    
+                } else {
+                    tacPrinter = new LogicPrinter                 
 		    (new ProgramPrinter(null),	                     
 		     mediator.getNotationInfo(),
 		     mediator.getServices(),
 		     true);	 
-		tacPrinter.printTaclet((Taclet)(app.rule()));	 
+                    tacPrinter.printTaclet((Taclet)(app.rule()));    
+                }
 		s += tacPrinter;
 	    } else {
 	    	s = s + app.rule();
 	    }
-
+            
 	    if ( app instanceof TacletApp ) {
 		TacletApp tapp = (TacletApp)app;
 		if ( tapp.instantiations ().getGenericSortInstantiations () !=

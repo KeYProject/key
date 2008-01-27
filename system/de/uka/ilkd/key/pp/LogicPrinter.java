@@ -73,7 +73,7 @@ public class LogicPrinter {
     private final NotationInfo notationInfo;
 
     /** the services object */
-    private final Services services;
+    protected final Services services;
 
     /** The sequent we are pretty-printing */
     //private Sequent            seq;

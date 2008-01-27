@@ -2,11 +2,14 @@ package de.uka.ilkd.hoare.pp;
 
 import java.io.IOException;
 
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.*;
+import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
 
@@ -271,7 +274,8 @@ public class HoareLogicPrettyPrinter extends LogicPrinter {
             printQuanPrefix(programFormula);
             programFormula = ((QuanUpdateOperator)programFormula.op()).target(programFormula);
             count ++;
-            if (!(programFormula.op() instanceof Modality)) {
+            if (!(programFormula.op() instanceof Modality || 
+                    programFormula.op() instanceof ModalOperatorSV)) {
                 layouter.print(", ");
                 markStartSub();
             }  
@@ -422,17 +426,20 @@ public class HoareLogicPrettyPrinter extends LogicPrinter {
      * @return
      */
     private boolean hasProgram(Term formula) {
+        final Operator op = formula.op();
         if (formula.sort() != Sort.FORMULA) {
             return false;
-        } else if (formula.op() instanceof Modality) {
+        } else if (op instanceof Modality || 
+                op instanceof ModalOperatorSV) {
             return true;
         }
-        assert !(formula.op() instanceof Modality) : "Hoare Tuple Normalform hurt.";
+        assert !(op instanceof Modality || 
+                op instanceof ModalOperatorSV) : "Hoare Tuple Normalform hurt.";
 
-        if (formula.op() instanceof QuanUpdateOperator) {
-            return hasProgram(((QuanUpdateOperator)formula.op()).target(formula));
+        if (op instanceof QuanUpdateOperator) {
+            return hasProgram(((QuanUpdateOperator)op).target(formula));
         }
-        
+
         return false;
     }
 
@@ -501,7 +508,309 @@ public class HoareLogicPrettyPrinter extends LogicPrinter {
         }
         formulaConstraint = null;
     }
- 
+
+    public void printTaclet(TacletApp t) {
+        if (services == null) {
+            super.printTaclet(t.taclet());
+            return;
+        }
+        
+        try {
+            if (t.taclet().name().toString().equals("conditional")) {
+                printConditionalTaclet(t.instantiations());
+            } else if (t.taclet().name().toString().equals("assignment")) {
+                printAssignmentTaclet(t.instantiations());
+            } else if (t.taclet().name().toString().equals("skip")) {
+                printSkipTaclet(t.instantiations());
+            }else {
+                super.printTaclet(t.taclet());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     
+    public void printText(String s) throws IOException {
+        layouter.beginI(0);
+        final String[] chunks = s.split(" ");
+        for (int i = 0; i<chunks.length; i++) {
+            layouter.print(chunks[i]).brk(1);
+        }
+        layouter.end();
+    }
+    
+    public void printConditionalTaclet(SVInstantiations svInst) throws IOException {
+        final ProgramElement guard = (ProgramElement) svInst.lookupValue(new Name("#guard"));
+        final ProgramElement thenS = (ProgramElement) svInst.lookupValue(new Name("#thenStatement"));
+        final ProgramElement elseS = (ProgramElement) svInst.lookupValue(new Name("#elseStatement"));
+        
+        
+        layouter.beginC(0);
+        
+        layouter.nl();
+        printSimpleIfTaclet(guard, thenS, elseS);
+        layouter.nl();
+        
+        printText("The conditional rule matches on a Hoare Triple whose first " +
+            "statement is an \"if-then-else\" statement:");
+
+        layouter.nl();
+        
+        layouter.ind(0,2); 
+        printIfConclusion(guard, thenS, elseS);
+            
+        layouter.nl().nl();
+
+        printText("The proof splits up into two branches. The first branch:");
+
+        layouter.nl();
+                           
+        layouter.ind(0,2); 
+        printIfThen(guard, thenS);
+        
+        layouter.nl().nl();
+
+        
+        printText("treats the case where the \"if\"-condition is true. Thus only the \"then\" path " +
+            "needs to be considered.");
+        
+        layouter.nl().nl();
+
+        printText("The second branch treats the case when the \"if\"-condition " +
+            "is false and only the \"else\" path of the conditional is executed:");
+
+        layouter.nl();
+
+        layouter.ind(0,2); 
+        printIfElse(guard, elseS);
+        
+        layouter.nl().nl();
+        
+        layouter.end();    
+    }
+
+    private void printSimpleIfTaclet(final ProgramElement guard, final ProgramElement thenS, final ProgramElement elseS) throws IOException {
+        layouter.beginI(0);
+       
+        layouter.beginC(2);
+        layouter.print("Then Branch:").brk(1);        
+        printIfThen(guard, thenS);
+        layouter.end().nl();
+
+        layouter.beginC(2);
+        layouter.print("Else Branch:").brk(1);
+        printIfElse(guard, thenS);
+        layouter.end().nl();
+        
+        layouter.print("----").nl();
+        
+        layouter.beginC(2);
+        layouter.print("Conclusion:").brk(1);
+        printIfConclusion(guard, thenS, elseS);
+        layouter.end();
+        layouter.nl();                   
+        
+        layouter.end();
+    }
+
+    private void printIfElse(final ProgramElement guard, final ProgramElement elseS) throws IOException {
+        layouter.beginI(2);        
+          printHoarePreconditon("P", new Term[]{
+                  TermBuilder.DF.not(services.getTypeConverter().convertToLogicElement(guard))});    
+          printHoareUpdate("U");                
+        
+          layouter.beginC(2);        
+              printProgramElement(elseS);
+              layouter.brk();
+              layouter.print("s").brk(2);
+          layouter.end();                
+        
+          printHoarePost();        
+        layouter.end();
+    }
+
+    private void printIfThen(final ProgramElement guard, final ProgramElement thenS) throws IOException {
+        layouter.beginI(2);
+        printHoarePreconditon("P", new Term[]{services.getTypeConverter().convertToLogicElement(guard)});    
+        printHoareUpdate("U");                
+        
+        layouter.beginC(2);                        
+        printProgramElement(thenS);
+        layouter.brk();
+        layouter.print("s").brk(2,0);                
+        layouter.end();
+        
+        printHoarePost();        
+        layouter.end();
+    }
+
+    private void printIfConclusion(final ProgramElement guard, final ProgramElement thenS, final ProgramElement elseS) throws IOException {
+        layouter.beginI(2);
+        printHoarePreconditon();    
+        printHoareUpdate("U");                
+        printConditional(guard, thenS, elseS);               
+        printHoarePost();                        
+        layouter.end();
+    }
+
+    private void printHoareUpdate(String update) throws IOException {
+        printHoareUpdate(update, null, null);
+    }
+    
+    private void printHoareUpdate(String update, ProgramElement location, 
+            ProgramElement value) throws IOException {
+        layouter.beginC(2);
+        
+        layouter.print("["+update);
+        if (location != null) {
+            layouter.print(",").brk(1);
+            if (services != null) {
+                printTerm(services.getTypeConverter().convertToLogicElement(location));
+                layouter.brk().print(":=").brk();
+                printTerm(services.getTypeConverter().convertToLogicElement(value));                
+            } else {
+                printProgramElement(location);
+                layouter.brk().print(":=").brk();
+                printProgramElement(value);                
+            }
+        }
+        layouter.print("]").brk(1);
+
+        layouter.end();
+    }
+
+    private void printHoarePreconditon() throws IOException {
+        printHoarePreconditon("P", new Term[0]);
+    }
+    
+    private void printHoarePreconditon(String prefix, Term[] add) throws IOException {
+        layouter.beginC(2).
+            print("{").print(prefix);
+        for (int i = 0; i<add.length; i++) {
+            layouter.brk(1).print("&").brk(1);
+            printTerm(add[i]);
+        }
+        layouter.print("}").
+        brk(2).end();
+    }
+
+    private void printHoarePost() throws IOException {
+        layouter.beginC(2).
+            print("{").print("Q").print("}").
+        brk(1).end();
+    }
+
+    private void printConditional(ProgramElement guard, 
+            ProgramElement thenS, ProgramElement elseS) throws IOException {
+        layouter.beginC().print("if (");        
+        printProgramElement(guard);
+        layouter.print(")").brk();
+        layouter.beginC(2);
+    
+        printProgramElement(thenS);
+        layouter.end();
+    
+        layouter.brk();
+        
+        layouter.beginC(2).print("else").brk(1);
+        printProgramElement(elseS);
+        layouter.end();
+
+        layouter.brk();
+
+        layouter.print("s").brk(2).end();        
+    }
+
+    public void printAssignmentTaclet(SVInstantiations svInst) throws IOException {
+        layouter.beginC(0);
+        
+        printText("The assignment rule matches on a Hoare Triple whose first " +
+            "statement is an assignment:");
+
+        layouter.nl();
+        
+        layouter.beginI(2).nl();
+            printHoarePreconditon();    
+            printHoareUpdate("U");                
+            
+            layouter.beginC(2);        
+              printProgramElement((ProgramElement) svInst.lookupValue(new Name("#leftVar"))); 
+              layouter.brk(1).print("=").brk(1);                
+              printProgramElement((ProgramElement) svInst.lookupValue(new Name("#rightExp")));
+              layouter.print(";").brk();                
+              layouter.print("s").brk(2,0);                
+            layouter.end();
+            
+            printHoarePost();                        
+        layouter.end();
+            
+        layouter.nl().nl();
+
+        printText("The assignment in the program is moved outside into an update and sequentially " +
+                        "concatenated to a possible existing one:");
+
+        layouter.nl();
+        
+        layouter.beginI(2).nl();
+            printHoarePreconditon();
+            
+            printHoareUpdate("U", 
+                    (ProgramElement) svInst.lookupValue(new Name("#leftVar")), 
+                    (ProgramElement) svInst.lookupValue(new Name("#rightExp")));                
+        
+            layouter.beginC(2);        
+               layouter.print("s").brk(2,0);                
+            layouter.end();
+        printHoarePost();        
+        layouter.end();
+        
+        layouter.nl().nl();
+        
+        layouter.end();    
+    }
+    
+    public void printSkipTaclet(SVInstantiations svInst) throws IOException {
+        layouter.beginC(0);
+        
+        printText("The skip rule matches on a Hoare Triple whose first " +
+            "statement is an empty statement:");
+
+        layouter.nl();
+        
+        layouter.beginI(2).nl();
+            printHoarePreconditon();    
+            printHoareUpdate("U");                
+            
+            layouter.beginC(2);        
+              layouter.print(";").brk();                
+              layouter.print("s").brk(2,0);                
+            layouter.end();
+            
+            printHoarePost();                        
+        layouter.end();
+            
+        layouter.nl().nl();
+
+        printText("The empty statement has no effect at all and can be simply removed:");
+
+        layouter.nl();
+        
+        layouter.beginI(2).nl();
+            printHoarePreconditon();
+            
+            printHoareUpdate("U");                
+        
+            layouter.beginC(2);        
+               layouter.print("s").brk(2,0);                
+            layouter.end();
+        printHoarePost();        
+        layouter.end();
+        
+        layouter.nl().nl();
+        
+        layouter.end();    
+    }
     
 }
+    
+

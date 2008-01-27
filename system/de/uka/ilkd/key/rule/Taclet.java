@@ -1762,5 +1762,6 @@ public abstract class Taclet implements Rule, Named {
     */
     public ListOfSchemaVariable writeSet() {
 	return SLListOfSchemaVariable.EMPTY_LIST; 
-    }         
+    }
+
 }
