@@ -263,14 +263,18 @@ public class ProblemInitializer {
 	Vector v=new Vector();
 	if (cfile.isDirectory()) {
 	    String[] list=cfile.list();
-	    for (int i=0; i<list.length; i++) {
-		String fullName = cfile.getPath()+File.separator+list[i];
-		File n=new File(fullName);
-		if (n.isDirectory()) {		    
-		    v.addAll(getClasses(fullName));
-		} else if (list[i].endsWith(".java")) {
-		    v.add(fullName);	
-		}
+	    // mu(2008-jan-28): if the directory is not readable for the current user
+	    // list is set to null, which results in a NullPointerException.
+	    if(list != null) {
+	        for (int i=0; i<list.length; i++) {
+	            String fullName = cfile.getPath()+File.separator+list[i];
+	            File n=new File(fullName);
+	            if (n.isDirectory()) {		    
+	                v.addAll(getClasses(fullName));
+	            } else if (list[i].endsWith(".java")) {
+	                v.add(fullName);	
+	            }
+	        }
 	    }
 	    return v;
 	} else {
