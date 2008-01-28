@@ -1283,12 +1283,8 @@ unaryexpr returns [JMLExpression result=null] throws SLTranslationException
 		intHelper.buildUnaryMinusExpression(result.getTerm()));
 	}
     |
-	("(" type=builtintype ")") =>
-	"(" type=builtintype ")" result=unaryexpr
-	    
-    |
-	("(" type=referencetype ")" ) => 
-	   "(" type=referencetype ")" result=unaryexpr
+	("(" typespec ")" ) => 
+	   "(" type=typespec ")" result=unaryexpr
 	
     |
 	result=unaryexprnotplusminus
