@@ -432,13 +432,21 @@ options {
 	}
 	
 	if (a.isType() && b.isType()) {
-	    assert a.getTypeofTerm() != null;
+	    JMLExpression typeofExpr;
+	    JMLExpression typeExpr;
+	    if(a.getTypeofTerm() != null) {
+	    	typeofExpr = a;
+	    	typeExpr = b;
+	    } else {
+	    	typeofExpr = b;
+	    	typeExpr = a;
+	    }
 	    
-	    SortDefiningSymbols os = (SortDefiningSymbols)(b.getType().getSort());
+	    SortDefiningSymbols os = (SortDefiningSymbols)(typeExpr.getType().getSort());
 	    Function ioFunc = (Function) os.lookupSymbol(ExactInstanceSymbol.NAME);
 	     
 	    return tb.equals(
-		tb.func(ioFunc, a.getTypeofTerm()),
+		tb.func(ioFunc, typeofExpr.getTypeofTerm()),
 		trueLitTerm);
 	}
 	
@@ -955,42 +963,30 @@ andexpr returns [Term result=null] throws SLTranslationException
 
 equalityexpr returns [JMLExpression result=null] throws SLTranslationException
 {
-    JMLExpression left, right;
+    JMLExpression right;
 }
 :
-	left=relationalexpr 
+	result=relationalexpr 
 	(
 	    eq:"==" right=equalityexpr
 	    {
-		if (left.isType() ^ right.isType()) {
+		if (result.isType() ^ right.isType()) {
 		    raiseError("Cannot build equality expression between term " +
 			"and type.", eq);
 		}
-		result = new JMLExpression(buildEqualityTerm(left, right));
+		result = new JMLExpression(buildEqualityTerm(result, right));
 	    }
 	|
 	    ne:"!=" right=equalityexpr
 	    {
-		if (left.isType() ^ right.isType()) {
+		if (result.isType() ^ right.isType()) {
 		    raiseError("Cannot build equality expression between term " +
 			"and type.", ne);
 		}
-		result = new JMLExpression(tb.not(buildEqualityTerm(left, right)));
+		result = new JMLExpression(tb.not(buildEqualityTerm(result, right)));
 	    }
 	    
 	)?
-	{
-	    if (result == null) {
-		if (left.isType()) {
-		    raiseError("Error in expression: " + left.getType());
-		}
-		assert left.isTerm();
-		
-		result = left;
-	    }
-	    
-	    assert result != null;
-	}
 ;
 
 relationalexpr returns [JMLExpression result=null] throws SLTranslationException
