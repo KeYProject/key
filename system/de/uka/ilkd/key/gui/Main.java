@@ -24,6 +24,7 @@ import javax.swing.text.JTextComponent;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.hoare.gui.InnerNodeView;
 import de.uka.ilkd.hoare.init.HoareProfile;
 import de.uka.ilkd.hoare.pp.HoareLogicPrettyPrinter;
 import de.uka.ilkd.key.gui.assistant.*;
@@ -2021,9 +2022,15 @@ public class Main extends JFrame {
                     !mediator.getUserConstraint ().displayClosed ( goal.node () ) ){
                 printSequentView(goal.sequent());
             } else {
-                NonGoalInfoView innerNodeView = 
-                    new NonGoalInfoView(mediator().getSelectedNode(), 
+                NonGoalInfoView innerNodeView;
+                if (mediator().getProfile() instanceof HoareProfile) {
+                    innerNodeView = new InnerNodeView(mediator().getSelectedNode(), 
                             mediator());
+                } else {
+                    innerNodeView = 
+                        new NonGoalInfoView(mediator().getSelectedNode(), 
+                                mediator());
+                }
                 updateGoalView("Inner Node", innerNodeView);
             }
         }

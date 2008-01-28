@@ -23,7 +23,7 @@ public class HoareLoopInvariantRule implements BuiltInRule {
 
     private final static Name LOOP_INV_RULENAME = new Name("Loop Invariant");
     public static final HoareLoopInvariantRule INSTANCE = new HoareLoopInvariantRule();
-    private static final Name EXECTIME = new Name("executionTime");
+    public static final Name EXECTIME = new Name("executionTime");
     
     private HoareLoopInvariantRule() {
         
@@ -85,7 +85,13 @@ public class HoareLoopInvariantRule implements BuiltInRule {
         return goals;
     }
 
-    private Term getCondition(RuleApp app, Services services) {
+    /**
+     * returns the loop condition as term 
+     * @param app the RuleApp with position of program
+     * @param services the Services
+     * @return a Term representing the while condition
+     */
+    public Term getCondition(RuleApp app, Services services) {
 
         final While whileS = getWhileStatement(app);        
 
@@ -97,7 +103,7 @@ public class HoareLoopInvariantRule implements BuiltInRule {
         return (Modality) getModalityTerm(pos).op();
     }
     
-    private Term getModalityTerm(PosInOccurrence pos) {
+    public Term getModalityTerm(PosInOccurrence pos) {
         Term progFormula = pos.constrainedFormula().formula();
         
         
@@ -107,7 +113,12 @@ public class HoareLoopInvariantRule implements BuiltInRule {
         return progFormula;
     }
     
-    private While getWhileStatement(RuleApp app) {
+    /**
+     * returns the body of the while loop
+     * @param app the RuleApp 
+     * @return the body of the while loop
+     */
+    public While getWhileStatement(RuleApp app) {
         final ProgramElement prg = 
             getModalityTerm(app.posInOccurrence()).javaBlock().program();
         
@@ -141,6 +152,23 @@ public class HoareLoopInvariantRule implements BuiltInRule {
                 
         final ProgramElement prg = progFormula.javaBlock().program();
         
+        final JavaBlock programTail = getProgramAfterLoop(prg);
+        
+        goal.addFormula(new ConstrainedFormula(tb.and(inv, loopCondition)), true, true);
+        
+        Term useCaseFormula =
+            tb.tf().createProgramTerm(modus, programTail, progFormula.sub(0));
+
+        if (modus == Op.DIATRC) {
+            useCaseFormula = increaseExecutionTime(goal, services, useCaseFormula);
+        }
+        
+        goal.addFormula(new ConstrainedFormula(useCaseFormula, ruleApp.constraint()), false, true);
+        
+        goal.setBranchLabel("Use Invariant");
+    }
+
+    public JavaBlock getProgramAfterLoop(final ProgramElement prg) {
         final PosInProgram whileIdx = ((StatementBlock)prg).getFirstActiveChildPos();
         
         assert whileIdx.last() == 0;
@@ -171,22 +199,10 @@ public class HoareLoopInvariantRule implements BuiltInRule {
         } else {
             programTail = JavaBlock.createJavaBlock((StatementBlock) statementList.getFirst());             
         }
-        
-        goal.addFormula(new ConstrainedFormula(tb.and(inv, loopCondition)), true, true);
-        
-        Term useCaseFormula =
-            tb.tf().createProgramTerm(modus, programTail, progFormula.sub(0));
-
-        if (modus == Op.DIATRC) {
-            useCaseFormula = increaseExecutionTime(goal, services, useCaseFormula);
-        }
-        
-        goal.addFormula(new ConstrainedFormula(useCaseFormula, ruleApp.constraint()), false, true);
-        
-        goal.setBranchLabel("Use Invariant");
+        return programTail;
     }
 
-    private Term increaseExecutionTime(Goal goal, final Services services, Term useCaseFormula) {
+    private Term increaseExecutionTime(Goal goal, final Services services, Term target) {
         final TermBuilder tb = TermBuilder.DF;
         final UpdateFactory uf = new UpdateFactory(services, goal.simplifier());
 
@@ -198,10 +214,10 @@ public class HoareLoopInvariantRule implements BuiltInRule {
         final Function addF = 
             services.getTypeConverter().getIntegerLDT().getArithAddition();
 
-        useCaseFormula = 
+        target = 
             uf.apply(uf.elementaryUpdate(execTime, 
-                    tb.func(addF, execTime, tb.one(services))), useCaseFormula);
-        return useCaseFormula;
+                    tb.func(addF, execTime, tb.one(services))), target);
+        return target;
     }
     
     private void createPreservesBranch(Modality modus, HoareLoopInvRuleApp ruleApp, Goal goal) {

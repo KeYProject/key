@@ -23,8 +23,6 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 
-import de.uka.ilkd.hoare.init.HoareProfile;
-import de.uka.ilkd.hoare.pp.HoareLogicPrettyPrinter;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
@@ -35,30 +33,28 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.export.html.HTMLFileTaclet;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.rule.export.html.HTMLFileTaclet;
 
 
 public class NonGoalInfoView extends JTextArea {
     	 
-    private LogicPrinter printer;	 
-    private SequentPrintFilter filter;
+    protected LogicPrinter printer;	 
+    protected SequentPrintFilter filter;
     
     public NonGoalInfoView (Node node, KeYMediator mediator) {
+        printInnerNode(node, mediator);
+    }
+
+    protected void printInnerNode(Node node, KeYMediator mediator) {
         filter = new ConstraintSequentPrintFilter 
-        ( node.sequent (), mediator.getUserConstraint ().getConstraint () );
-        if (mediator.getProfile() instanceof HoareProfile) {
-            printer = new HoareLogicPrettyPrinter
-            (new ProgramPrinter(null),
-                    mediator.getNotationInfo(),
-                    mediator.getServices());
-        } else {
-            printer = new LogicPrinter                 
-            (new ProgramPrinter(null), 
-                    mediator.getNotationInfo(),
-                    mediator.getServices());
-        }
+        ( node.sequent (), mediator.getUserConstraint ().getConstraint () );        
+        printer = new LogicPrinter                 
+        (new ProgramPrinter(null), 
+                mediator.getNotationInfo(),
+                mediator.getServices());
+
         printer.printSequent (null, filter);
         String s = printer.toString();
         RuleApp app = node.getAppliedRuleApp();
@@ -67,46 +63,37 @@ public class NonGoalInfoView extends JTextArea {
         if ( app != null ) {
             s = s + "\n \nUpcoming rule application: \n";
             if (app.rule() instanceof Taclet) {
-                LogicPrinter tacPrinter;
-                if (mediator.getProfile() instanceof HoareProfile) {
-                    tacPrinter = new HoareLogicPrettyPrinter
-                    (new ProgramPrinter(null),
-                            mediator.getNotationInfo(),
-                            mediator.getServices(), true);
-                    ((HoareLogicPrettyPrinter)tacPrinter).printTaclet((TacletApp)app);    
-                } else {
-                    tacPrinter = new LogicPrinter                 
-		    (new ProgramPrinter(null),	                     
-		     mediator.getNotationInfo(),
-		     mediator.getServices(),
-		     true);	 
-                    tacPrinter.printTaclet((Taclet)(app.rule()));    
-                }
-		s += tacPrinter;
-	    } else {
-	    	s = s + app.rule();
-	    }
-            
-	    if ( app instanceof TacletApp ) {
-		TacletApp tapp = (TacletApp)app;
-		if ( tapp.instantiations ().getGenericSortInstantiations () !=
-		     GenericSortInstantiations.EMPTY_INSTANTIATIONS ) {
-		    s = s + "\n\nWith sorts:\n";
-		    s = s +
-			tapp.instantiations ().getGenericSortInstantiations ();
-		}
+                LogicPrinter tacPrinter = new LogicPrinter                 
+                (new ProgramPrinter(null),	                     
+                        mediator.getNotationInfo(),
+                        mediator.getServices(),
+                        true);	 
+                tacPrinter.printTaclet((Taclet)(app.rule()));                    
+                s += tacPrinter;
+            } else {
+                s = s + app.rule();
+            }
 
-		StringBuffer sb = new StringBuffer("\n\n");
+            if ( app instanceof TacletApp ) {
+                TacletApp tapp = (TacletApp)app;
+                if ( tapp.instantiations ().getGenericSortInstantiations () !=
+                    GenericSortInstantiations.EMPTY_INSTANTIATIONS ) {
+                    s = s + "\n\nWith sorts:\n";
+                    s = s +
+                    tapp.instantiations ().getGenericSortInstantiations ();
+                }
+
+                StringBuffer sb = new StringBuffer("\n\n");
                 HTMLFileTaclet.writeTacletSchemaVariablesHelper(
-		    sb,tapp.taclet());
-		s = s + sb;
-	    }
-            
+                        sb,tapp.taclet());
+                s = s + sb;
+            }
+
             s = s + "\n\nApplication justified by: ";
             s = s + mediator.getSelectedProof().env().getJustifInfo()
-                                .getJustification(app, mediator.getServices())+"\n";
-            
-	}
+            .getJustification(app, mediator.getServices())+"\n";
+
+        }
 
 /* Removed for the book version
         s = s + "\nActive statement from:\n"+
@@ -148,7 +135,7 @@ public class NonGoalInfoView extends JTextArea {
 	.DefaultHighlightPainter(new Color(0.8f,1.0f,0.8f));	 
  	 
  	 
-    private void highlightRuleAppPosition(RuleApp app) {	 
+    protected void highlightRuleAppPosition(RuleApp app) {	 
 	try {	 
 	    setHighlighter ( new DefaultHighlighter () );	 
 
