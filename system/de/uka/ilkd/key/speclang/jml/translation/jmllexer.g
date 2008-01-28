@@ -68,14 +68,12 @@ tokens {
     UNSIGNEDSHIFTRIGHT = ">>>";
     NULL = "null";
     IF = "if";
-    INSTANCE = "instance";
     INSTANCEOF = "instanceof";
     COLON = ":";
     QUESTIONMARK = "?";
     THIS = "this";
     SUPER = "super";
     MODEL = "model";
-    LARROW = "<-";
     RETURNS = "returns";
     UNINITIALIZED = "uninitialized";
     SPEC_JAVA_MATH = "spec_java_math";

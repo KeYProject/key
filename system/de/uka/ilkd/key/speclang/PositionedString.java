@@ -35,7 +35,7 @@ public class PositionedString {
     
     
     public PositionedString(String text, String fileName) {
-        this(text, null, null);
+        this(text, fileName, null);
     }
     
     

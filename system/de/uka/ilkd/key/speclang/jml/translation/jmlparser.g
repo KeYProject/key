@@ -95,9 +95,6 @@ options {
     private ParsableVariable excVar;
     private Map atPreFunctions;
     
-    private String fileName;
-    private Position offsetPos;
-
     // Helper objects
     private JMLResolverManager resolverManager;
     private AxiomCollector axiomCollector;
@@ -128,10 +125,10 @@ options {
 				    fileName, 
 				    offsetPos);
 	this.axiomCollector = ac;
-	this.selfVar	= self;
+	this.selfVar	    = self;
 	this.paramVars      = paramVars;
 	this.resultVar      = result;
-	this.excVar	 = exc;
+	this.excVar	     = exc;
 	this.atPreFunctions = atPreFunctions;
 
 	// initialize helper objects
@@ -583,7 +580,11 @@ storerefexpression returns [BasicLocationDescriptor ld=null] throws SLTranslatio
     )*
     {
 	if(ld == null) {
-	    ld = new BasicLocationDescriptor(expr.getTerm());
+	    try {
+	    	ld = new BasicLocationDescriptor(expr.getTerm());
+	    } catch(IllegalArgumentException e) {
+	    	raiseError(e.getMessage());
+	    }
 	}
     }
     ;
