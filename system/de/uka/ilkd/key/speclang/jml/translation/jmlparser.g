@@ -432,13 +432,25 @@ options {
 	}
 	
 	if (a.isType() && b.isType()) {
-	    assert a.getTypeofTerm() != null;
+	    JMLExpression typeofExpr;
+	    JMLExpression typeExpr;
+	    if(a.getTypeofTerm() != null) {
+		typeofExpr = a;
+		typeExpr = b;
+	    } else {
+		if (b.getTypeofTerm() == null) {
+		    raiseError("Type equality only supported for expressions " +
+			" of shape \"\\typeof(term) == \\type(Typename)\"");
+		}
+		typeofExpr = b;
+		typeExpr = a;
+	    }
 	    
-	    SortDefiningSymbols os = (SortDefiningSymbols)(b.getType().getSort());
+	    SortDefiningSymbols os = (SortDefiningSymbols)(typeExpr.getType().getSort());
 	    Function ioFunc = (Function) os.lookupSymbol(ExactInstanceSymbol.NAME);
 	     
 	    return tb.equals(
-		tb.func(ioFunc, a.getTypeofTerm()),
+		tb.func(ioFunc, typeofExpr.getTypeofTerm()),
 		trueLitTerm);
 	}
 	
@@ -581,9 +593,9 @@ storerefexpression returns [BasicLocationDescriptor ld=null] throws SLTranslatio
     {
 	if(ld == null) {
 	    try {
-	    	ld = new BasicLocationDescriptor(expr.getTerm());
+		ld = new BasicLocationDescriptor(expr.getTerm());
 	    } catch(IllegalArgumentException e) {
-	    	raiseError(e.getMessage());
+		raiseError(e.getMessage());
 	    }
 	}
     }
@@ -939,58 +951,46 @@ andexpr returns [Term result=null] throws SLTranslationException
 	left=equalityexpr
 	{
 	    if(!left.isTerm()) {
-	        raiseError("Found a type where only a term is allowed: " 
-	                   + left);
+		raiseError("Found a type where only a term is allowed: " 
+			   + left);
 	    }
 	    result = left.getTerm();
 	}
 	(
 	    "&" t=andexpr
 	    { 
-	    	result = intHelper.buildPromotedAndExpression(result,t);
-            }
+		result = intHelper.buildPromotedAndExpression(result,t);
+	    }
 	)?
 ;
 
 
 equalityexpr returns [JMLExpression result=null] throws SLTranslationException
 {
-    JMLExpression left, right;
+    JMLExpression right;
 }
 :
-	left=relationalexpr 
+	result=relationalexpr 
 	(
 	    eq:"==" right=equalityexpr
 	    {
-		if (left.isType() ^ right.isType()) {
+		if (result.isType() ^ right.isType()) {
 		    raiseError("Cannot build equality expression between term " +
 			"and type.", eq);
 		}
-		result = new JMLExpression(buildEqualityTerm(left, right));
+		result = new JMLExpression(buildEqualityTerm(result, right));
 	    }
 	|
 	    ne:"!=" right=equalityexpr
 	    {
-		if (left.isType() ^ right.isType()) {
+		if (result.isType() ^ right.isType()) {
 		    raiseError("Cannot build equality expression between term " +
 			"and type.", ne);
 		}
-		result = new JMLExpression(tb.not(buildEqualityTerm(left, right)));
+		result = new JMLExpression(tb.not(buildEqualityTerm(result, right)));
 	    }
 	    
 	)?
-	{
-	    if (result == null) {
-		if (left.isType()) {
-		    raiseError("Error in expression: " + left.getType());
-		}
-		assert left.isTerm();
-		
-		result = left;
-	    }
-	    
-	    assert result != null;
-	}
 ;
 
 relationalexpr returns [JMLExpression result=null] throws SLTranslationException
@@ -1301,19 +1301,19 @@ unaryexpr returns [JMLExpression result=null] throws SLTranslationException
 		 }
 		 
 		 Term resultTerm = result.getTerm(); 
-   	         Function castFunction;
+		 Function castFunction;
 		 if (type.getSort().extendsTrans(services.getTypeConverter().
 		    getIntegerLDT().targetSort())) {
 		      castFunction = ((AbstractIntegerLDT)services.getTypeConverter().
-		      	getModelFor(type.getSort())).getCast();	
+			getModelFor(type.getSort())).getCast();	
 		    resultTerm = tb.func(castFunction, resultTerm);
 		 } 
 		 
 		 castFunction = ((AbstractSort) type.getSort()).getCastSymbol();
 		 
 		 
-  		 result = new JMLExpression(
-  		     tb.func(castFunction, resultTerm));
+		 result = new JMLExpression(
+		     tb.func(castFunction, resultTerm));
 	     }
 	}
 ;
@@ -1375,11 +1375,9 @@ postfixexpr returns [JMLExpression result=null] throws SLTranslationException
 	)*
 	
 	{
-/*
-	    if (expr == null || !expr.isTerm()) {
+	    if (expr == null) {
 		raiseError("Expression " + fullyQualifiedName + " not found!");
 	    }
-*/	    
 	    result = expr; //.getTerm();
 	}
 	    
