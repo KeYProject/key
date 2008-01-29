@@ -2,6 +2,7 @@ package visualdebugger.views;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaCore;
@@ -55,7 +56,7 @@ public class WatchpointView extends ViewPart {
 
 	/** The watch point manager. */
 	private WatchPointManager watchPointManager;
-	
+
 	private VisualDebugger vd = null;
 
 	/**
@@ -277,19 +278,29 @@ public class WatchpointView extends ViewPart {
 			public void run() {
 
 				String[] information = getWatchPointInf();
-				WatchExpressionDialog dialog = new WatchExpressionDialog(shell,
-						java.lang.Integer.parseInt(information[1]),
-						information[3]);
-				if (information != null) {
-					String expression = dialog.open();
-					if (expression != null) {
+				if (information == null) {
+					MessageDialog
+							.openError(PlatformUI.getWorkbench()
+									.getActiveWorkbenchWindow().getShell(),
+									"Adding WatchPoint",
+									"Please select a global field or a constant in the Java Editor");
+				} else {
+					WatchExpressionDialog dialog = new WatchExpressionDialog(
+							shell, java.lang.Integer.parseInt(information[1]),
+							information[3]);
+					
+					if (information != null) {
+						
+						String expression = dialog.open();
+						
+						if (expression != null) {
 
-						watchPointManager.addWatchPoint(new WatchPoint(information[4],
-								expression, information[0], information[1],
-								information[2]));
-						vd.setWatchPointManager(watchPointManager);
-						viewer.refresh();
-
+							watchPointManager.addWatchPoint(new WatchPoint(
+									information[4], expression, information[0],
+									information[1], information[2]));
+							vd.setWatchPointManager(watchPointManager);
+							viewer.refresh();
+						}
 					}
 				}
 
@@ -342,14 +353,15 @@ public class WatchpointView extends ViewPart {
 	 * 
 	 * @return information where
 	 * 
-	 * 			information[0]= The name of the JavaElement where the WatchPoint was set.
-	 *			information[1]= The line offset where the text selection begins.
-	 * 			information[2]= The name of the file in which the WatchPoint was set.
-	 * 			information[3]= The actual the source code for validating the WatchPoint.
-	 * 			information[4]= The unique name of the boolean variable that is used to validate the watchpoint.
+	 * information[0]= The name of the JavaElement where the WatchPoint was set.
+	 * information[1]= The line offset where the text selection begins.
+	 * information[2]= The name of the file in which the WatchPoint was set.
+	 * information[3]= The actual the source code for validating the WatchPoint.
+	 * information[4]= The unique name of the boolean variable that is used to
+	 * validate the watchpoint.
 	 */
 	private String[] getWatchPointInf() {
-		
+
 		String[] information = new String[5];
 		String varName = "myDummy";
 
@@ -363,7 +375,7 @@ public class WatchpointView extends ViewPart {
 			ITextSelection tsel = (ITextSelection) sel;
 			// set current line
 			information[1] = (1 + tsel.getEndLine()) + "";
-						
+
 			IFile file = (IFile) tedit.getEditorInput().getAdapter(IFile.class);
 			String fileName = file.getProjectRelativePath().toString();
 			// set filename
@@ -375,11 +387,11 @@ public class WatchpointView extends ViewPart {
 
 			try {
 				source = unit.getBuffer().getContents();
-				
-				while(source.indexOf(varName) > (-1)){
-					varName  = varName.concat("x");
+
+				while (source.indexOf(varName) > (-1)) {
+					varName = varName.concat("x");
 				}
-				
+
 			} catch (JavaModelException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -387,43 +399,23 @@ public class WatchpointView extends ViewPart {
 
 			information[3] = source;
 			information[4] = varName;
-			
-			// creation of DOM/AST from a ICompilationUnit
-			ASTParser parser = ASTParser.newParser(AST.JLS3);
-			parser.setResolveBindings(true);
-			parser.setSource(unit);
-
-			CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
-
-			astRoot.recordModifications();
 
 			try {
 				IJavaElement je = unit.getElementAt(tsel.getOffset());
-				if (je instanceof IMethod) {
+
+				if (je instanceof IField) {
 
 					information[0] = je.getElementName();
+				} else {
+
+					return null;
 				}
 
 			} catch (JavaModelException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
-			FindStatementVisitor visitor = new FindStatementVisitor(tsel
-					.getOffset());
-			astRoot.accept(visitor);
-
-			if (visitor.getStatement() == null) {
-				MessageDialog.openError(PlatformUI.getWorkbench()
-						.getActiveWorkbenchWindow().getShell(),
-						"Adding WatchPoint",
-						"Please select a Java statement in the Java Editor");
-				return null;
-			}
-
 		}
-		
 		return information;
-
 	}
 }

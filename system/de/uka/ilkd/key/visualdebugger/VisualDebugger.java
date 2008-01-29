@@ -10,20 +10,29 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.java.ArrayOfExpression;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.IteratorOfExpression;
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.ListOfExpression;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.SLListOfExpression;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ArrayOfParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.ArrayOfVariableSpecification;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -37,6 +46,7 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.metaconstruct.StaticInitialisation;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -1794,7 +1804,8 @@ public class VisualDebugger {
 
         LinkedList<WatchPoint> watchpoints = watchPointManager.getWatchPoints();
         int count = watchpoints.size();
-
+        listOfExpression = SLListOfExpression.EMPTY_LIST;
+        
         if (watchpoints == null || count == 0) {
             System.out.println("No watches created so far");
             return 0;
@@ -1803,7 +1814,6 @@ public class VisualDebugger {
                 
             WatchPoint wp = watchpoints.get(i);
             StringBuffer buffer = new StringBuffer();
-            buffer.append("\\<{A self; }>");
            
             String file = wp.getFile();
             // Pretty.java
@@ -1811,14 +1821,30 @@ public class VisualDebugger {
             // Pretty
             self = self.substring(0, self.indexOf("."));
             file = file.substring(0,file.indexOf("."));
-            file = file.replace("/", ".");    
-            
-            buffer.append("<{method-frame( source=" + file + ", this=self_" + self);
-            buffer.append(" ) : }{boolean " + wp.getName() + " = " + wp.getExpression());
+            file = file.replace("/", ".");
+            file = file.substring(4);
+            buffer.append("\\<{"+ file +" self; }\\>");
+            buffer.append("\\<{method-frame( source=" + file + ",this=self_" + self);
+            buffer.append(" ) : {boolean " + wp.getName() + " = " + wp.getExpression());
             buffer.append(";} }\\> true");
-            System.out.println(buffer.toString());
-            ProblemLoader.parseTerm(buffer.toString(), this.getMediator().getProof());           
+       
+            Term term = ProblemLoader.parseTerm(buffer.toString(), this.getMediator().getProof());           
+
+            MethodFrame mf = (MethodFrame) term.sub(0).javaBlock().program().getFirstElement();
+            StatementBlock sb = (StatementBlock) mf.getChildAt(1);
+            LocalVariableDeclaration lvd = (LocalVariableDeclaration) sb.getChildAt(0);
+            VariableSpecification vs = lvd.getVariableSpecifications().getVariableSpecification(0);
+            Expression watchpoint = vs.getInitializer();
             
+            listOfExpression = listOfExpression.append(watchpoint);
+            IteratorOfExpression iter = listOfExpression.iterator();
+            
+            while(iter.hasNext()){
+                Expression e = iter.next();
+                System.out.println(e.toString());
+                
+            }
+
             }
             return count;
         }
