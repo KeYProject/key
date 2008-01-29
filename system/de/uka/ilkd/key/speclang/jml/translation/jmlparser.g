@@ -435,11 +435,15 @@ options {
 	    JMLExpression typeofExpr;
 	    JMLExpression typeExpr;
 	    if(a.getTypeofTerm() != null) {
-	    	typeofExpr = a;
-	    	typeExpr = b;
+		typeofExpr = a;
+		typeExpr = b;
 	    } else {
-	    	typeofExpr = b;
-	    	typeExpr = a;
+		if (b.getTypeofTerm() == null) {
+		    raiseError("Type equality only supported for expressions " +
+			" of shape \"\\typeof(term) == \\type(Typename)\"");
+		}
+		typeofExpr = b;
+		typeExpr = a;
 	    }
 	    
 	    SortDefiningSymbols os = (SortDefiningSymbols)(typeExpr.getType().getSort());
@@ -589,9 +593,9 @@ storerefexpression returns [BasicLocationDescriptor ld=null] throws SLTranslatio
     {
 	if(ld == null) {
 	    try {
-	    	ld = new BasicLocationDescriptor(expr.getTerm());
+		ld = new BasicLocationDescriptor(expr.getTerm());
 	    } catch(IllegalArgumentException e) {
-	    	raiseError(e.getMessage());
+		raiseError(e.getMessage());
 	    }
 	}
     }
@@ -947,16 +951,16 @@ andexpr returns [Term result=null] throws SLTranslationException
 	left=equalityexpr
 	{
 	    if(!left.isTerm()) {
-	        raiseError("Found a type where only a term is allowed: " 
-	                   + left);
+		raiseError("Found a type where only a term is allowed: " 
+			   + left);
 	    }
 	    result = left.getTerm();
 	}
 	(
 	    "&" t=andexpr
 	    { 
-	    	result = intHelper.buildPromotedAndExpression(result,t);
-            }
+		result = intHelper.buildPromotedAndExpression(result,t);
+	    }
 	)?
 ;
 
@@ -1297,19 +1301,19 @@ unaryexpr returns [JMLExpression result=null] throws SLTranslationException
 		 }
 		 
 		 Term resultTerm = result.getTerm(); 
-   	         Function castFunction;
+		 Function castFunction;
 		 if (type.getSort().extendsTrans(services.getTypeConverter().
 		    getIntegerLDT().targetSort())) {
 		      castFunction = ((AbstractIntegerLDT)services.getTypeConverter().
-		      	getModelFor(type.getSort())).getCast();	
+			getModelFor(type.getSort())).getCast();	
 		    resultTerm = tb.func(castFunction, resultTerm);
 		 } 
 		 
 		 castFunction = ((AbstractSort) type.getSort()).getCastSymbol();
 		 
 		 
-  		 result = new JMLExpression(
-  		     tb.func(castFunction, resultTerm));
+		 result = new JMLExpression(
+		     tb.func(castFunction, resultTerm));
 	     }
 	}
 ;
@@ -1371,11 +1375,9 @@ postfixexpr returns [JMLExpression result=null] throws SLTranslationException
 	)*
 	
 	{
-/*
-	    if (expr == null || !expr.isTerm()) {
+	    if (expr == null) {
 		raiseError("Expression " + fullyQualifiedName + " not found!");
 	    }
-*/	    
 	    result = expr; //.getTerm();
 	}
 	    
