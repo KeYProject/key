@@ -365,6 +365,22 @@ options {
     }
 
 
+    private String createSignatureString(ListOfTerm signature) {
+	if (signature == null || signature.isEmpty()) {
+	    return "";
+	}
+	String sigString = "";
+	
+	for(IteratorOfTerm it=signature.iterator(); it.hasNext(); ) {
+	    sigString += 
+		services.getTypeConverter()
+		    .getKeYJavaType(it.next()).getFullName() + ", ";
+	}
+	
+	return sigString.substring(0, sigString.length() - 2);
+    }
+    
+    
     private JMLExpression lookupIdentifier(String lookupName,
 					   JMLExpression receiver,
 					   ListOfTerm callingParameters,
@@ -1433,14 +1449,19 @@ primarysuffix[JMLExpression receiver, String fullyQualifiedName] returns [JMLExp
 	    result = lookupIdentifier(lookupName, receiver, callingParameters, l);
 	    if (result == null) {
 		// method calls must result in an object!
-		raiseError("Method " + lookupName + " not found!",l);
+		raiseError("Method " + lookupName + "("
+		    + createSignatureString(callingParameters) + ") not found!",l);
 	    }
 	}
     |
-	"[" t=expression "]"
+	lbrack:"[" t=expression "]"
 	{
-	    if (receiver==null || !receiver.isTerm()) {
-		raiseError("Error in Array-Expression.");
+	    if (receiver == null) {
+		raiseError("Array \"" + fullyQualifiedName + "\" not found.", lbrack);
+	    }
+	    if (receiver.isType()) {
+		raiseError("Error in array expression: \"" + fullyQualifiedName +
+		    "\" is a type.", lbrack);
 	    }
 	    
 	    try {
