@@ -619,7 +619,7 @@ public class HoareLogicPrettyPrinter extends LogicPrinter {
 
         layouter.beginC(2);
         layouter.print("Else Branch:").brk(1);
-        printIfElse(guard, thenS, wcet);
+        printIfElse(guard, elseS, wcet);
         layouter.end().nl();
 
         layouter.print("----").nl();
