@@ -17,7 +17,6 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
-import de.uka.ilkd.key.util.Debug;
 
 /**
  * Binary feature that return zero if two given projection term is CS-Releated.
@@ -38,8 +37,7 @@ public class ExistentiallyConnectedFormulasFeature extends
     }
 
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
-        Debug.assertFalse ( pos == null,
-                            "Feature is only applicable to rules with find" );
+        assert pos != null : "Feature is only applicable to rules with find";
 
         final ClausesGraph graph =
             ClausesGraph.create ( pos.constrainedFormula ().formula () );

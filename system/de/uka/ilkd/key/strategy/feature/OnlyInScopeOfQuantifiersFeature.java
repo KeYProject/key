@@ -17,7 +17,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.util.Debug;
 
 
 /**
@@ -31,8 +30,7 @@ public class OnlyInScopeOfQuantifiersFeature extends BinaryTacletAppFeature {
     private OnlyInScopeOfQuantifiersFeature() {}
     
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
-        Debug.assertFalse ( pos == null,
-                            "Feature is only applicable to rules with find" );
+        assert pos != null : "Feature is only applicable to rules with find";
 
         final PIOPathIterator it = pos.iterator ();
         while ( it.next () != -1 ) {
