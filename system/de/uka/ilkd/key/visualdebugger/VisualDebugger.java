@@ -1849,4 +1849,16 @@ public class VisualDebugger {
             return count;
         }
     }
+    /**
+     * Gets the listOfExpression containing the watchpoints.
+     * 
+     * @return the listOfExpression
+     */
+
+    public ListOfExpression getListOfExpression() {
+        if(listOfExpression == null) {
+            return SLListOfExpression.EMPTY_LIST;
+        }
+        return listOfExpression;
+    }
 }

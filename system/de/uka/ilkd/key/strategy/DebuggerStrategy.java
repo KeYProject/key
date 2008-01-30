@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.strategy;
 
+import de.uka.ilkd.key.java.ListOfExpression;
+import de.uka.ilkd.key.java.SLListOfExpression;
 import de.uka.ilkd.key.logic.IteratorOfNamed;
 import de.uka.ilkd.key.logic.ListOfNamed;
 import de.uka.ilkd.key.logic.Name;
@@ -22,18 +24,24 @@ import de.uka.ilkd.key.visualdebugger.VisualDebugger;
  * Strategy tailored to VBT aimed symbolic execution.
  */
 public class DebuggerStrategy extends VBTStrategy {
-    
+
     public static final String VISUAL_DEBUGGER_SPLITTING_RULES_KEY = "VD_SPLITTING_RULES_KEY";
-    public static final String VISUAL_DEBUGGER_IN_UPDATE_AND_ASSUMES_KEY = 
-        "VD_IN_UPDATE_AND_ASSUMES_RULES_KEY";
+
+    public static final String VISUAL_DEBUGGER_IN_UPDATE_AND_ASSUMES_KEY = "VD_IN_UPDATE_AND_ASSUMES_RULES_KEY";
+
     public static final String VISUAL_DEBUGGER_IN_INIT_PHASE_KEY = "VD_IN_INIT_PHASE_KEY";
 
-    public static final String VISUAL_DEBUGGER_TRUE= "TRUE";
+    public static final String VISUAL_DEBUGGER_TRUE = "TRUE";
+
     public static final String VISUAL_DEBUGGER_FALSE = "FALSE";
 
+    private static VisualDebugger vd = null;
 
-    public static StrategyProperties getDebuggerStrategyProperties(boolean splittingRulesAllowed,
-            boolean inUpdateAndAssumes, boolean inInitPhase) {
+    private ListOfExpression watchpoints = null;
+
+    public static StrategyProperties getDebuggerStrategyProperties(
+            boolean splittingRulesAllowed, boolean inUpdateAndAssumes,
+            boolean inInitPhase) {
         final StrategyProperties res = new StrategyProperties();
         res.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
                 StrategyProperties.LOOP_EXPAND);
@@ -47,82 +55,85 @@ public class DebuggerStrategy extends VBTStrategy {
         res.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
                 StrategyProperties.SPLITTING_NORMAL);
 
-        
         if (VisualDebugger.quan_splitting) {
             res.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
                     StrategyProperties.QUANTIFIERS_INSTANTIATE);
         } else {
-            res.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, 
-                StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
+            res.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
+                    StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
         }
-        
-        res.setProperty(VISUAL_DEBUGGER_SPLITTING_RULES_KEY, 
-                splittingRulesAllowed ? VISUAL_DEBUGGER_TRUE :
-                    VISUAL_DEBUGGER_FALSE);
 
-        res.setProperty(VISUAL_DEBUGGER_IN_UPDATE_AND_ASSUMES_KEY, 
-                inUpdateAndAssumes ? VISUAL_DEBUGGER_TRUE :
-                    VISUAL_DEBUGGER_FALSE);
+        res.setProperty(VISUAL_DEBUGGER_SPLITTING_RULES_KEY,
+                splittingRulesAllowed ? VISUAL_DEBUGGER_TRUE
+                        : VISUAL_DEBUGGER_FALSE);
 
-        res.setProperty(VISUAL_DEBUGGER_IN_INIT_PHASE_KEY, 
-                inInitPhase ? VISUAL_DEBUGGER_TRUE :
-                    VISUAL_DEBUGGER_FALSE);
+        res.setProperty(VISUAL_DEBUGGER_IN_UPDATE_AND_ASSUMES_KEY,
+                inUpdateAndAssumes ? VISUAL_DEBUGGER_TRUE
+                        : VISUAL_DEBUGGER_FALSE);
+
+        res.setProperty(VISUAL_DEBUGGER_IN_INIT_PHASE_KEY,
+                inInitPhase ? VISUAL_DEBUGGER_TRUE : VISUAL_DEBUGGER_FALSE);
 
         return res;
     }
 
-   protected DebuggerStrategy(Proof p_proof, StrategyProperties props) {
-       super ( p_proof, props );
+    protected DebuggerStrategy(Proof p_proof, StrategyProperties props,
+            ListOfExpression watchpoints) {
+        
+        super(p_proof, props);
+        this.watchpoints = watchpoints;
+        
+        RuleSetDispatchFeature d = getCostComputationDispatcher();
 
-       RuleSetDispatchFeature d = getCostComputationDispatcher();
+        bindRuleSet(d, "simplify_autoname", ifZero(BreakpointFeature.create(),
+                inftyConst(), longConst(0)));
+        bindRuleSet(d, "method_expand", ifZero(BreakpointFeature.create(),
+                inftyConst(), longConst(0)));
+        bindRuleSet(d, "debugger", inftyConst());
+        bindRuleSet(d, "statement_sep", longConst(-200));
 
-       bindRuleSet(d, "simplify_autoname", ifZero(BreakpointFeature.create(),
-               inftyConst(), longConst(0)));
-       bindRuleSet(d, "method_expand", ifZero(BreakpointFeature.create(),
-               inftyConst(), longConst(0)));   
-       bindRuleSet(d, "debugger", inftyConst());
-       bindRuleSet(d, "statement_sep", longConst(-200));
+        bindRuleSet(d, "test_gen_empty_modality_hide", inftyConst());
 
-       bindRuleSet(d, "test_gen_empty_modality_hide", inftyConst());
+        bindRuleSet(d, "test_gen_quan", inftyConst());
 
-       bindRuleSet(d, "test_gen_quan", inftyConst());
+        bindRuleSet(d, "instanceof_to_exists", inftyConst());
 
-       bindRuleSet( d, "instanceof_to_exists",  inftyConst());
+        bindRuleSet(d, "split_cond", ifZero(LabelFeature.INSTANCE,
+                longConst(-3000), longConst(0)));
 
-       bindRuleSet ( d, "split_cond",
-              ifZero(LabelFeature.INSTANCE,longConst(-3000), longConst(0)));
+        bindRuleSet(d, "beta", ifZero(LabelFeature.INSTANCE, longConst(-3000),
+                longConst(0)));
 
-       bindRuleSet ( d, "beta",
-               ifZero(LabelFeature.INSTANCE,longConst(-3000),longConst(0)));
-    
-       
-       final NamespaceSet nss = p_proof.getNamespaces ();
+        final NamespaceSet nss = p_proof.getNamespaces();
 
-       assert nss != null : "Rule set namespace not available.";               
+        assert nss != null : "Rule set namespace not available.";
 
-       // FIXME: do not add it for each rule set add it as sum feature
-       
-       final ListOfNamed h = nss.ruleSets().allElements();
+        // FIXME: do not add it for each rule set add it as sum feature
 
-       final boolean isSplittingAllowed = props.
-           get(VISUAL_DEBUGGER_SPLITTING_RULES_KEY).equals(VISUAL_DEBUGGER_TRUE);
+        final ListOfNamed h = nss.ruleSets().allElements();
 
-       final boolean inUpdateAndAssumes = props.
-          get(VISUAL_DEBUGGER_IN_UPDATE_AND_ASSUMES_KEY).equals(VISUAL_DEBUGGER_TRUE);
+        final boolean isSplittingAllowed = props.get(
+                VISUAL_DEBUGGER_SPLITTING_RULES_KEY).equals(
+                VISUAL_DEBUGGER_TRUE);
 
-       final boolean inInitPhase = props.
-          get(VISUAL_DEBUGGER_IN_INIT_PHASE_KEY).equals(VISUAL_DEBUGGER_TRUE);
-              
-       final Feature inUpdateFeature = InUpdateFeature.create(isSplittingAllowed, 
-               inUpdateAndAssumes, inInitPhase);
-       
-       final IteratorOfNamed it = h.iterator();
-       while (it.hasNext()){
-           final String ruleSetName = it.next().name().toString();
-           bindRuleSet ( d, ruleSetName,                    
-                   ifZero(inUpdateFeature, inftyConst(), longConst(0)));
-       }
-   }
+        final boolean inUpdateAndAssumes = props.get(
+                VISUAL_DEBUGGER_IN_UPDATE_AND_ASSUMES_KEY).equals(
+                VISUAL_DEBUGGER_TRUE);
+
+        final boolean inInitPhase = props
+                .get(VISUAL_DEBUGGER_IN_INIT_PHASE_KEY).equals(
+                        VISUAL_DEBUGGER_TRUE);
+
+        final Feature inUpdateFeature = InUpdateFeature.create(
+                isSplittingAllowed, inUpdateAndAssumes, inInitPhase);
+
+        final IteratorOfNamed it = h.iterator();
+        while (it.hasNext()) {
+            final String ruleSetName = it.next().name().toString();
+            bindRuleSet(d, ruleSetName, ifZero(inUpdateFeature, inftyConst(),
+                    longConst(0)));
+        }
+    }
 
     public Name name() {
         return new Name("DebuggerStrategy");
@@ -135,25 +146,29 @@ public class DebuggerStrategy extends VBTStrategy {
 
         public Strategy create(Proof p_proof,
                 StrategyProperties strategyProperties) {
-            
+
             injectDebuggerDefaultOptionsIfUnset(strategyProperties);
-            
-            return new DebuggerStrategy(p_proof, strategyProperties);
+            vd = VisualDebugger.getVisualDebugger();
+            return new DebuggerStrategy(p_proof, strategyProperties, vd
+                    .getListOfExpression());
         }
 
         private void injectDebuggerDefaultOptionsIfUnset(
                 StrategyProperties props) {
 
             if (!props.containsKey(VISUAL_DEBUGGER_SPLITTING_RULES_KEY)) {
-                props.put(VISUAL_DEBUGGER_SPLITTING_RULES_KEY, VISUAL_DEBUGGER_TRUE);
+                props.put(VISUAL_DEBUGGER_SPLITTING_RULES_KEY,
+                        VISUAL_DEBUGGER_TRUE);
             }
 
             if (!props.containsKey(VISUAL_DEBUGGER_IN_UPDATE_AND_ASSUMES_KEY)) {
-                props.put(VISUAL_DEBUGGER_IN_UPDATE_AND_ASSUMES_KEY, VISUAL_DEBUGGER_FALSE);
+                props.put(VISUAL_DEBUGGER_IN_UPDATE_AND_ASSUMES_KEY,
+                        VISUAL_DEBUGGER_FALSE);
             }
 
             if (!props.containsKey(VISUAL_DEBUGGER_IN_INIT_PHASE_KEY)) {
-                props.put(VISUAL_DEBUGGER_IN_INIT_PHASE_KEY, VISUAL_DEBUGGER_TRUE);
+                props.put(VISUAL_DEBUGGER_IN_INIT_PHASE_KEY,
+                        VISUAL_DEBUGGER_TRUE);
             }
         }
 
