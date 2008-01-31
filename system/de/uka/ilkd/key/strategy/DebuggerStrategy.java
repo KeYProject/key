@@ -26,6 +26,7 @@ import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 public class DebuggerStrategy extends VBTStrategy {
 
     public static final String VISUAL_DEBUGGER_SPLITTING_RULES_KEY = "VD_SPLITTING_RULES_KEY";
+    public static final String VISUAL_DEBUGGER_WATCHPOINTS_KEY = "WATCHPOINTS_KEY";
 
     public static final String VISUAL_DEBUGGER_IN_UPDATE_AND_ASSUMES_KEY = "VD_IN_UPDATE_AND_ASSUMES_RULES_KEY";
 
@@ -35,13 +36,9 @@ public class DebuggerStrategy extends VBTStrategy {
 
     public static final String VISUAL_DEBUGGER_FALSE = "FALSE";
 
-    private static VisualDebugger vd = null;
-
-    private ListOfExpression watchpoints = null;
-
     public static StrategyProperties getDebuggerStrategyProperties(
             boolean splittingRulesAllowed, boolean inUpdateAndAssumes,
-            boolean inInitPhase) {
+            boolean inInitPhase, ListOfExpression watchpoints) {
         final StrategyProperties res = new StrategyProperties();
         res.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
                 StrategyProperties.LOOP_EXPAND);
@@ -51,7 +48,7 @@ public class DebuggerStrategy extends VBTStrategy {
                 StrategyProperties.QUERY_NONE);
         res.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
                 StrategyProperties.NON_LIN_ARITH_DEF_OPS);
-
+        res.put(VISUAL_DEBUGGER_WATCHPOINTS_KEY, watchpoints);
         res.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
                 StrategyProperties.SPLITTING_NORMAL);
 
@@ -79,10 +76,9 @@ public class DebuggerStrategy extends VBTStrategy {
 
     protected DebuggerStrategy(Proof p_proof, StrategyProperties props,
             ListOfExpression watchpoints) {
-        
+
         super(p_proof, props);
-        this.watchpoints = watchpoints;
-        
+
         RuleSetDispatchFeature d = getCostComputationDispatcher();
 
         bindRuleSet(d, "simplify_autoname", ifZero(BreakpointFeature.create(),
@@ -91,6 +87,8 @@ public class DebuggerStrategy extends VBTStrategy {
                 inftyConst(), longConst(0)));
         bindRuleSet(d, "debugger", inftyConst());
         bindRuleSet(d, "statement_sep", longConst(-200));
+        bindRuleSet(d, "statement_sep", ifZero(WatchPointFeature.create(),
+                inftyConst(), longConst(0)));
 
         bindRuleSet(d, "test_gen_empty_modality_hide", inftyConst());
 
@@ -147,10 +145,12 @@ public class DebuggerStrategy extends VBTStrategy {
         public Strategy create(Proof p_proof,
                 StrategyProperties strategyProperties) {
 
+            ListOfExpression watchpoints = (ListOfExpression) strategyProperties
+                    .get("WATCHPOINTS_KEY");
             injectDebuggerDefaultOptionsIfUnset(strategyProperties);
-            vd = VisualDebugger.getVisualDebugger();
-            return new DebuggerStrategy(p_proof, strategyProperties, vd
-                    .getListOfExpression());
+            
+            return new DebuggerStrategy(p_proof, strategyProperties,
+                     watchpoints);
         }
 
         private void injectDebuggerDefaultOptionsIfUnset(

@@ -1419,7 +1419,7 @@ public class VisualDebugger {
             boolean inUpdateAndAssumes) {
         StrategyProperties strategyProperties = DebuggerStrategy
                 .getDebuggerStrategyProperties(splittingAllowed,
-                        inUpdateAndAssumes, isInitPhase());
+                        inUpdateAndAssumes, isInitPhase(),getListOfExpression());
 
         final StrategyFactory factory = new DebuggerStrategy.Factory();
 
