@@ -87,7 +87,7 @@ public class DebuggerStrategy extends VBTStrategy {
                 inftyConst(), longConst(0)));
         bindRuleSet(d, "debugger", inftyConst());
         bindRuleSet(d, "statement_sep", longConst(-200));
-        bindRuleSet(d, "statement_sep", ifZero(WatchPointFeature.create(),
+        bindRuleSet(d, "statement_sep", ifZero(WatchPointFeature.create(watchpoints),
                 inftyConst(), longConst(0)));
 
         bindRuleSet(d, "test_gen_empty_modality_hide", inftyConst());
@@ -146,7 +146,7 @@ public class DebuggerStrategy extends VBTStrategy {
                 StrategyProperties strategyProperties) {
 
             ListOfExpression watchpoints = (ListOfExpression) strategyProperties
-                    .get("WATCHPOINTS_KEY");
+                    .get("VISUAL_DEBBUGER_WATCHPOINTS_KEY");
             injectDebuggerDefaultOptionsIfUnset(strategyProperties);
             
             return new DebuggerStrategy(p_proof, strategyProperties,

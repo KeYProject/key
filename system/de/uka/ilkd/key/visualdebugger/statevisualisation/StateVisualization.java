@@ -6,6 +6,7 @@ import java.util.LinkedList;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.SLListOfExpression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -386,7 +387,7 @@ public class StateVisualization {
         ps.init(po);
         ps.setMaxSteps(maxProofSteps);
         ps.setUseDecisionProcedure(useDecisionProcedures);
-        vd.setProofStrategy(ps.getProof(), true, false);
+        vd.setProofStrategy(ps.getProof(), true, false, SLListOfExpression.EMPTY_LIST);
     }
     
     private void setUpProof(SetOfTerm indexConf, Term forPostValues) {
@@ -423,7 +424,7 @@ public class StateVisualization {
         final Proof simplificationProof = ps.getProof();
         
         StrategyProperties strategyProperties = DebuggerStrategy
-                .getDebuggerStrategyProperties(true, true, vd.isInitPhase());
+                .getDebuggerStrategyProperties(true, true, vd.isInitPhase(),SLListOfExpression.EMPTY_LIST);
 
         StrategyFactory factory = new DebuggerStrategy.Factory();
         
@@ -436,7 +437,7 @@ public class StateVisualization {
         vd.getBpManager().setNoEx(false);
 
         strategyProperties = 
-            DebuggerStrategy.getDebuggerStrategyProperties(true, false, vd.isInitPhase());
+            DebuggerStrategy.getDebuggerStrategyProperties(true, false, vd.isInitPhase(),SLListOfExpression.EMPTY_LIST);
         
         mediator.getProof().
         setActiveStrategy(factory.create(mediator.getProof(), strategyProperties));

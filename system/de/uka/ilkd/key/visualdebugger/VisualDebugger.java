@@ -1050,7 +1050,7 @@ public class VisualDebugger {
         postPredicate = (Function) proof.getNamespaces().functions().lookup(
                 POST_PREDICATE_NAME);
 
-        setProofStrategy(proof, true, false);
+        setProofStrategy(proof, true, false, SLListOfExpression.EMPTY_LIST);
         run();
     }
 
@@ -1368,7 +1368,7 @@ public class VisualDebugger {
         if (!mediator.autoMode()) {
             this.removeStepOver(goals);
             this.setSteps(goals, this.runLimit);
-            setProofStrategy(mediator.getProof(), true, false);
+            setProofStrategy(mediator.getProof(), true, false, getListOfExpression());
             runProver(goals);
             
             return true;
@@ -1416,10 +1416,10 @@ public class VisualDebugger {
      * @param inUpdateAndAssumes the in update and assumes
      */
     public void setProofStrategy(final Proof proof, boolean splittingAllowed,
-            boolean inUpdateAndAssumes) {
+            boolean inUpdateAndAssumes, ListOfExpression watchpoints) {
         StrategyProperties strategyProperties = DebuggerStrategy
                 .getDebuggerStrategyProperties(splittingAllowed,
-                        inUpdateAndAssumes, isInitPhase(),getListOfExpression());
+                        inUpdateAndAssumes, isInitPhase(),watchpoints);
 
         final StrategyFactory factory = new DebuggerStrategy.Factory();
 
@@ -1531,12 +1531,12 @@ public class VisualDebugger {
 
         final Proof proof = ps.getProof();
 
-        setProofStrategy(proof, false, false);
+        setProofStrategy(proof, false, false, SLListOfExpression.EMPTY_LIST);
 
         ps.setUseDecisionProcedure(useDecisionProcedures);
         ps.run(proofEnvironment);
 
-        setProofStrategy(proof, true, false);
+        setProofStrategy(proof, true, false, SLListOfExpression.EMPTY_LIST);
         if (etProgressMonitor != null) {
             ps.removeProgressMonitor(etProgressMonitor);
         }
@@ -1600,7 +1600,7 @@ public class VisualDebugger {
             final Proof proof = mediator.getProof();
             removeStepOver(proof.openGoals());
             this.setSteps(goals, steps);
-            setProofStrategy(proof, true, false);
+            setProofStrategy(proof, true, false, getListOfExpression());
             runProver(goals);
             return true;
         }
@@ -1622,7 +1622,7 @@ public class VisualDebugger {
     public void stepOver(ListOfGoal goals) {
         setStepOver(goals);
         this.setSteps(goals, runLimit);
-        setProofStrategy(mediator.getProof(), true, false);
+        setProofStrategy(mediator.getProof(), true, false,getListOfExpression());
         runProver(goals);
     }
 
@@ -1637,7 +1637,7 @@ public class VisualDebugger {
             final Proof proof = mediator.getProof();
             removeStepOver(proof.openGoals());
             setSteps(proof.openGoals(), 0);
-            setProofStrategy(proof, true, false);
+            setProofStrategy(proof, true, false, getListOfExpression());
             runProver(proof.openGoals());
             return true;
         }
