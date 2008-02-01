@@ -37,6 +37,7 @@ header {
     import de.uka.ilkd.key.logic.Term;
     import de.uka.ilkd.key.logic.TermBuilder;
     import de.uka.ilkd.key.logic.TermCreationException;
+    import de.uka.ilkd.key.logic.ldt.LDT;
     import de.uka.ilkd.key.logic.ldt.AbstractIntegerLDT;
     import de.uka.ilkd.key.logic.op.ExactInstanceSymbol;
     import de.uka.ilkd.key.logic.op.Function;
@@ -1708,7 +1709,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 specquantifiedexpression returns [Term result = null] throws SLTranslationException
 {
     Term t = null;
-    Term p = null;
+    Term p = tb.tt();
     boolean nullable = false;
     ListOfLogicVariable declVars = null;
 }
@@ -1721,7 +1722,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	    resolverManager.putIntoTopLocalVariablesNamespace(declVars);
 	} 
 	(
-	    ((p=predicate)? ";" ) => (p=predicate)? ";" t=specexpression
+	    ((predicate)? ";" ) => (p=predicate)? ";" t=specexpression
 	|
 	    (";")? t=specexpression 
 	)
@@ -1729,19 +1730,28 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	{
 	    resolverManager.popLocalVariablesNamespace();
 	    
-	    if (!nullable) {
-		if (declVars.head().sort() instanceof ObjectSort) {
-		    p = tb.tt();
-		    IteratorOfLogicVariable it = declVars.iterator();
-		    while (it.hasNext()) {
-			p = tb.and(p,
-				tb.not(
-				    tb.equals(
-					tb.var(it.next()),
-					tb.NULL(services))));
-		    }
-		}
-	    }
+	    //add implicit "non-null" guards for reference types, 
+	    //"in-bounds" guards for integer types
+	    Term nullTerm = tb.NULL(services);
+	    for(IteratorOfLogicVariable it = declVars.iterator(); 
+	        it.hasNext(); ) {
+	        LogicVariable lv = it.next();
+	        
+	    	if(lv.sort() instanceof ObjectSort && !nullable) {
+		    p = tb.and(p, tb.not(tb.equals(tb.var(lv), nullTerm)));
+		} else {
+	    	    LDT ldt 
+	    	    	= services.getTypeConverter().getModelFor(lv.sort());
+		    if(ldt instanceof AbstractIntegerLDT) {
+	    		Function inBounds 
+	    			= ((AbstractIntegerLDT) ldt).getInBounds();
+	    		assert inBounds != null;
+	    		assert p != null;
+	    		assert lv != null;
+	    	    	p = tb.and(p, tb.func(inBounds, tb.var(lv)));
+	    	    }
+	    	}
+	    }	    
 	    
 	    t = convertToFormula(t);
 	    
