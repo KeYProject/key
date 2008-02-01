@@ -1745,9 +1745,6 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 		    if(ldt instanceof AbstractIntegerLDT) {
 	    		Function inBounds 
 	    			= ((AbstractIntegerLDT) ldt).getInBounds();
-	    		assert inBounds != null;
-	    		assert p != null;
-	    		assert lv != null;
 	    	    	p = tb.and(p, tb.func(inBounds, tb.var(lv)));
 	    	    }
 	    	}
