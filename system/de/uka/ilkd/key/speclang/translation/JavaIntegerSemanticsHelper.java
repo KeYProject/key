@@ -1,3 +1,13 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+//
+//
+
 package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.Services;
@@ -50,9 +60,8 @@ public class JavaIntegerSemanticsHelper {
     }
 
 
-    public Term castToJint(Term intTerm) {
-	return tb.tf().createCastTerm(
-		(AbstractSort) tc.getIntLDT().targetSort(), intTerm);
+    public Term castToLDTSort(Term intTerm, AbstractIntegerLDT ldt) {
+	return tb.tf().createCastTerm((AbstractSort) ldt.targetSort(), intTerm);
     }
 
 
@@ -101,8 +110,9 @@ public class JavaIntegerSemanticsHelper {
 
 	assert resultType != null;
 
-	return castToJint(tb.func(((AbstractIntegerLDT) tc
-		.getModelFor(resultType.getSort())).getBitwiseOr(), a, b));
+	AbstractIntegerLDT ldt 
+	    = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
+	return castToLDTSort(tb.func(ldt.getBitwiseOr(), a, b), ldt);
     }
 
 
@@ -124,8 +134,9 @@ public class JavaIntegerSemanticsHelper {
 
 	assert resultType != null;
 
-	return castToJint(tb.func(((AbstractIntegerLDT) tc
-		.getModelFor(resultType.getSort())).getBitwiseAnd(), a, b));
+	AbstractIntegerLDT ldt 
+	    = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
+	return castToLDTSort(tb.func(ldt.getBitwiseAnd(), a, b), ldt);
     }
 
 
@@ -143,8 +154,9 @@ public class JavaIntegerSemanticsHelper {
 
 	assert resultType != null;
 
-	return castToJint(tb.func(((AbstractIntegerLDT) tc
-		.getModelFor(resultType.getSort())).getBitwiseXor(), a, b));
+	AbstractIntegerLDT ldt 
+	    = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
+	return castToLDTSort(tb.func(ldt.getBitwiseXor(), a, b), ldt);
     }
 
 
@@ -160,8 +172,9 @@ public class JavaIntegerSemanticsHelper {
 
 	assert resultType != null;
 
-	return castToJint(tb.func(((AbstractIntegerLDT) tc
-		.getModelFor(resultType.getSort())).getBitwiseNegation(), a));
+	AbstractIntegerLDT ldt 
+	    = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
+	return castToLDTSort(tb.func(ldt.getBitwiseNegation(), a), ldt);
     }
 
 
@@ -179,8 +192,9 @@ public class JavaIntegerSemanticsHelper {
 
 	assert resultType != null;
 
-	return castToJint(tb.func(((AbstractIntegerLDT) tc
-		.getModelFor(resultType.getSort())).getAdd(), a, b));
+	AbstractIntegerLDT ldt 
+	    = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
+	return castToLDTSort(tb.func(ldt.getAdd(), a, b), ldt);
     }
 
 
@@ -198,8 +212,9 @@ public class JavaIntegerSemanticsHelper {
 
 	assert resultType != null;
 
-	return castToJint(tb.func(((AbstractIntegerLDT) tc
-		.getModelFor(resultType.getSort())).getSub(), a, b));
+        AbstractIntegerLDT ldt 
+            = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
+	return castToLDTSort(tb.func(ldt.getSub(), a, b), ldt);
     }
 
 
@@ -217,8 +232,10 @@ public class JavaIntegerSemanticsHelper {
 
 	assert resultType != null;
 
-	return castToJint(tb.func(((AbstractIntegerLDT) tc
-		.getModelFor(resultType.getSort())).getMul(), a, b));
+        AbstractIntegerLDT ldt 
+            = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
+	return castToLDTSort(tb.func(((AbstractIntegerLDT) tc
+		.getModelFor(resultType.getSort())).getMul(), a, b), ldt);
     }
 
 
@@ -236,8 +253,9 @@ public class JavaIntegerSemanticsHelper {
 
 	assert resultType != null;
 
-	return castToJint(tb.func(((AbstractIntegerLDT) tc
-		.getModelFor(resultType.getSort())).getDiv(), a, b));
+	AbstractIntegerLDT ldt 
+	    = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
+	return castToLDTSort(tb.func(ldt.getDiv(), a, b), ldt);
     }
 
 
@@ -255,8 +273,9 @@ public class JavaIntegerSemanticsHelper {
 
 	assert resultType != null;
 
-	return castToJint(tb.func(((AbstractIntegerLDT) tc
-		.getModelFor(resultType.getSort())).getMod(), a, b));
+	AbstractIntegerLDT ldt 
+	    = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
+	return castToLDTSort(tb.func(ldt.getMod(), a, b), ldt);
     }
 
 
@@ -273,9 +292,10 @@ public class JavaIntegerSemanticsHelper {
 	}
 
 	assert resultType != null;
-
-	return castToJint(tb.func(((AbstractIntegerLDT) tc
-		.getModelFor(resultType.getSort())).getShiftRight(), a, b));
+	
+        AbstractIntegerLDT ldt 
+            = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
+	return castToLDTSort(tb.func(ldt.getShiftRight(), a, b), ldt);
     }
 
 
@@ -293,8 +313,9 @@ public class JavaIntegerSemanticsHelper {
 
 	assert resultType != null;
 
-	return castToJint(tb.func(((AbstractIntegerLDT) tc
-		.getModelFor(resultType.getSort())).getShiftLeft(), a, b));
+	AbstractIntegerLDT ldt 
+	    = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
+	return castToLDTSort(tb.func(ldt.getShiftLeft(), a, b), ldt);
     }
 
 
@@ -312,9 +333,9 @@ public class JavaIntegerSemanticsHelper {
 
 	assert resultType != null;
 
-	return castToJint(tb.func(((AbstractIntegerLDT) tc
-		.getModelFor(resultType.getSort())).getUnsignedShiftRight(), a,
-		b));
+	AbstractIntegerLDT ldt 
+	    = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
+	return castToLDTSort(tb.func(ldt.getUnsignedShiftRight(), a, b), ldt);
     }
 
 
@@ -329,8 +350,9 @@ public class JavaIntegerSemanticsHelper {
 
 	assert resultType != null;
 
-	return castToJint(tb.func(((AbstractIntegerLDT) tc
-		.getModelFor(resultType.getSort())).getNeg(), a));
+        AbstractIntegerLDT ldt 
+            = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
+	return castToLDTSort(tb.func(ldt.getNeg(), a), ldt);
     }
 
 
@@ -346,7 +368,8 @@ public class JavaIntegerSemanticsHelper {
 
 	assert resultType != null;
 
-	return tb.tf().createCastTerm((AbstractSort) resultType.getSort(), a);
+	AbstractIntegerLDT ldt 
+	    = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
+	return castToLDTSort(a, ldt);
     }
-    
 }

@@ -201,13 +201,6 @@ options {
     }
 	
 
-    private Term castToJint(Term intTerm) {
-	return tb.tf().createCastTerm((AbstractSort)services.getTypeConverter()
-	    .getIntLDT().targetSort(), 
-	    intTerm);
-    }
-
-
     public FormulaWithAxioms parseExpression() throws SLTranslationException {
     
 	Term result = null;
@@ -1533,7 +1526,10 @@ hexintegerliteral returns [Term result=null] throws SLTranslationException
     n:HEXNUMERAL
     {
 	BigInteger decInteger = new BigInteger(n.getText(),16);
-	result = castToJint(tb.zTerm(services,decInteger.toString()));
+	Term intTerm = tb.zTerm(services,decInteger.toString());
+	result = intHelper.castToLDTSort(intTerm, 
+					 services.getTypeConverter()
+					         .getIntLDT());
     }
 ;
 
@@ -1544,10 +1540,13 @@ decimalintegerliteral returns [Term result=null] throws SLTranslationException
 
 decimalnumeral returns [Term result=null] throws SLTranslationException
 :
-	n:DIGITS
-	{
-	    result = castToJint(tb.zTerm(services,n.getText()));
-	}
+    n:DIGITS
+    {
+	Term intTerm = tb.zTerm(services,n.getText());
+	result = intHelper.castToLDTSort(intTerm, 
+					 services.getTypeConverter()
+					     	 .getIntLDT());
+    }
 ;
 
 jmlprimary returns [JMLExpression result=null] throws SLTranslationException
