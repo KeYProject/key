@@ -183,9 +183,9 @@ public class TestJMLTranslator extends TestCase {
         assert result != null;
         assertTrue(result.getAxioms().isEmpty());
         assertTrue(result.getFormula().op().equals(Op.ALL));
-        assertTrue(result.getFormula().sub(0).op().equals(Op.AND));
+        assertTrue(result.getFormula().sub(0).op().equals(Op.IMP));
         assertTrue(result.getFormula().sub(0).sub(0).op() instanceof Function);
-        assertTrue(((Function) result.getFormula().sub(0).sub(0).op()).name()
+        assertTrue(((Function) result.getFormula().sub(0).sub(1).sub(0).op()).name()
                 .toString().equals("leq"));
     }
 
