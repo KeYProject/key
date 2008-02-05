@@ -1128,8 +1128,10 @@ options {
             int n = 1; 
             StringBuffer className = new StringBuffer(LT(n).getText());
 	    while (isPackage(className.toString()) || LA(n+2)==NUM_LITERAL || 
-	    		(LT(n+2).getText().charAt(0)<='Z' && LT(n+2).getText().charAt(0)>='A' && 
-	    		(LT(n+2).getText().length()==1 || LT(n+2).getText().charAt(1)<='z' && LT(n+2).getText().charAt(1)>='a'))){  	   
+	    		(LT(n+2)!=null && LT(n+2).getText()!=null && 
+	    		LT(n+2).getText().charAt(0)<='Z' && LT(n+2).getText().charAt(0)>='A' && 
+	    		(LT(n+2).getText().length()==1 || 
+	    		 LT(n+2).getText().charAt(1)<='z' && LT(n+2).getText().charAt(1)>='a'))){  	   
                 if (LA(n+1) != DOT && LA(n+1) != EMPTYBRACKETS) return false;
                 className.append(".");	       
                 className.append(LT(n+2).getText());
