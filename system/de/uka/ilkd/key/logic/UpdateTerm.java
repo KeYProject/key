@@ -16,7 +16,7 @@ import de.uka.ilkd.key.logic.op.AnonymousUpdate;
  * for general (quantified) updates that is an own class 
  * <code>QuanUpdateTerm</code>
  */
-class UpdateTerm extends OpTerm {
+class UpdateTerm extends OpTerm.UnaryOpTerm {
 
     /** 
      * creates a UpdateTerm
@@ -25,6 +25,7 @@ class UpdateTerm extends OpTerm {
      */
     UpdateTerm(AnonymousUpdate op, Term[] subs) {	
 	super(op, subs);
+        fillCaches();
     }
  
     public JavaBlock executableJavaBlock() {
@@ -39,4 +40,5 @@ class UpdateTerm extends OpTerm {
         sb.append ( sub ( arity () - 1 ) );
         return sb.toString ();
     }
+
 }
