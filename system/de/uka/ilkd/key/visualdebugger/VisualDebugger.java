@@ -2,7 +2,13 @@ package de.uka.ilkd.key.visualdebugger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 import javax.swing.SwingUtilities;
 
@@ -10,43 +16,71 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.java.ArrayOfExpression;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.IteratorOfExpression;
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.ListOfExpression;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SLListOfExpression;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.ArrayOfParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.ArrayOfVariableSpecification;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.ArrayOfProgramPrefix;
+import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.IteratorOfConstrainedFormula;
+import de.uka.ilkd.key.logic.IteratorOfTerm;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.ListOfTerm;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.SLListOfTerm;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SetAsListOfTerm;
+import de.uka.ilkd.key.logic.SetOfTerm;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.ArrayOp;
+import de.uka.ilkd.key.logic.op.AttributeOp;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IteratorOfProgramMethod;
+import de.uka.ilkd.key.logic.op.ListOfProgramMethod;
+import de.uka.ilkd.key.logic.op.ListOfProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuanUpdateOperator;
+import de.uka.ilkd.key.logic.op.SLListOfProgramVariable;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.IteratorOfGoal;
+import de.uka.ilkd.key.proof.ListOfGoal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.ProblemLoader;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.metaconstruct.StaticInitialisation;
+import de.uka.ilkd.key.rule.ListOfRuleSet;
+import de.uka.ilkd.key.rule.PosTacletApp;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -61,7 +95,7 @@ import de.uka.ilkd.key.visualdebugger.statevisualisation.SymbolicObject;
  * The Class VisualDebugger.
  */
 public class VisualDebugger {
-    
+
     /** The Constant debugClass. */
     public static final String debugClass = "Debug";
 
@@ -94,13 +128,16 @@ public class VisualDebugger {
 
     /** The ExecutionTreeView's progress monitor. */
     private ProgressMonitor etProgressMonitor = null;
-    
-    private WatchPointManager watchPointManager = null;
-    
-    // Key representation of watchpoints
-    private ListOfExpression listOfExpression = null;
 
-    /** The Constant tempDir. A temporary directory in the users home: ~/tmp/visualdebugger. */
+    private WatchPointManager watchPointManager = null;
+
+    // Key representation of watchpoints
+    private ListOfTerm listOfWatchpoints = null;
+
+    /**
+     * The Constant tempDir. A temporary directory in the users home:
+     * ~/tmp/visualdebugger.
+     */
     public static final String tempDir = System.getProperty("user.home")
             + File.separator + "tmp" + File.separator + "visualdebugger"
             + File.separator;
@@ -122,7 +159,8 @@ public class VisualDebugger {
     /**
      * Contains implicit attr.
      * 
-     * @param t the t
+     * @param t
+     *                the t
      * 
      * @return true, if successful
      */
@@ -144,7 +182,8 @@ public class VisualDebugger {
     /**
      * Gets the method string.
      * 
-     * @param md the md
+     * @param md
+     *                the md
      * 
      * @return the method string
      */
@@ -197,7 +236,8 @@ public class VisualDebugger {
     /**
      * Prints the.
      * 
-     * @param o the o
+     * @param o
+     *                the o
      */
     public static void print(Object o) {
         if (vdInDebugMode)
@@ -207,7 +247,8 @@ public class VisualDebugger {
     /**
      * Prints the.
      * 
-     * @param s the s
+     * @param s
+     *                the s
      */
     public static void print(String s) {
         if (vdInDebugMode)
@@ -217,7 +258,8 @@ public class VisualDebugger {
     /**
      * Sets the debugging mode.
      * 
-     * @param mode the new debugging mode
+     * @param mode
+     *                the new debugging mode
      */
     public static void setDebuggingMode(boolean mode) {
         debuggingMode = mode;
@@ -297,7 +339,8 @@ public class VisualDebugger {
     /**
      * Adds the listener.
      * 
-     * @param listener the listener
+     * @param listener
+     *                the listener
      */
     public void addListener(DebuggerListener listener) {
         listeners.add(listener);
@@ -306,9 +349,12 @@ public class VisualDebugger {
     /**
      * Adds the test case.
      * 
-     * @param file the file
-     * @param method the method
-     * @param n the n
+     * @param file
+     *                the file
+     * @param method
+     *                the method
+     * @param n
+     *                the n
      */
     public void addTestCase(String file, String method, Node n) {
         tc2node.put(new TestCaseIdentifier(file, method), n);
@@ -318,8 +364,10 @@ public class VisualDebugger {
     /**
      * Array of expression2 list of prog var.
      * 
-     * @param aoe the aoe
-     * @param start the start
+     * @param aoe
+     *                the aoe
+     * @param start
+     *                the start
      * 
      * @return the list of program variable
      */
@@ -335,7 +383,8 @@ public class VisualDebugger {
     /**
      * Collect result.
      * 
-     * @param s the s
+     * @param s
+     *                the s
      * 
      * @return the list of term
      */
@@ -357,8 +406,10 @@ public class VisualDebugger {
     /**
      * Contains.
      * 
-     * @param aoe the aoe
-     * @param pv the pv
+     * @param aoe
+     *                the aoe
+     * @param pv
+     *                the pv
      * 
      * @return true, if successful
      */
@@ -377,7 +428,8 @@ public class VisualDebugger {
      * taclet worked on a modality. If the applied taclet performs no symbolic
      * execution <tt>null</tt> is returned
      * 
-     * @param node the node
+     * @param node
+     *                the node
      * 
      * @return the source element
      */
@@ -401,8 +453,10 @@ public class VisualDebugger {
     /**
      * Extract input.
      * 
-     * @param n the n
-     * @param pio the pio
+     * @param n
+     *                the n
+     * @param pio
+     *                the pio
      */
     public void extractInput(Node n, PosInOccurrence pio) {
         JavaBlock jb = this.modalityTopLevel(pio);
@@ -476,8 +530,10 @@ public class VisualDebugger {
     /**
      * Extract precondition.
      * 
-     * @param node the node
-     * @param pio the pio
+     * @param node
+     *                the node
+     * @param pio
+     *                the pio
      */
     public void extractPrecondition(Node node, PosInOccurrence pio) {
         this.precondition = node.sequent().removeFormula(pio).sequent();
@@ -486,7 +542,8 @@ public class VisualDebugger {
     /**
      * Fire debugger event.
      * 
-     * @param event the event
+     * @param event
+     *                the event
      */
     public void fireDebuggerEvent(DebuggerEvent event) {
         synchronized (listeners) {
@@ -506,7 +563,8 @@ public class VisualDebugger {
     /**
      * Gets the act statement.
      * 
-     * @param statement the statement
+     * @param statement
+     *                the statement
      * 
      * @return the act statement
      */
@@ -527,7 +585,8 @@ public class VisualDebugger {
     /**
      * Gets the array index.
      * 
-     * @param pio2 the pio2
+     * @param pio2
+     *                the pio2
      * 
      * @return the array index
      */
@@ -554,7 +613,8 @@ public class VisualDebugger {
     /**
      * Gets the array locations.
      * 
-     * @param pio2 the pio2
+     * @param pio2
+     *                the pio2
      * 
      * @return the array locations
      */
@@ -617,7 +677,8 @@ public class VisualDebugger {
     /**
      * Gets the execution terminated normal.
      * 
-     * @param n the n
+     * @param n
+     *                the n
      * 
      * @return the execution terminated normal
      */
@@ -649,7 +710,8 @@ public class VisualDebugger {
     /**
      * Gets the locations.
      * 
-     * @param pio2 the pio2
+     * @param pio2
+     *                the pio2
      * 
      * @return the locations
      */
@@ -698,7 +760,8 @@ public class VisualDebugger {
     /**
      * Gets the method frame.
      * 
-     * @param context the context
+     * @param context
+     *                the context
      * 
      * @return the method frame
      */
@@ -719,7 +782,8 @@ public class VisualDebugger {
     /**
      * Gets the method stack size.
      * 
-     * @param n the n
+     * @param n
+     *                the n
      * 
      * @return the method stack size
      */
@@ -735,7 +799,8 @@ public class VisualDebugger {
      * computes the depth of the method frame stack up to the first active
      * statement.
      * 
-     * @param context the context
+     * @param context
+     *                the context
      * 
      * @return the method stack size
      */
@@ -755,8 +820,10 @@ public class VisualDebugger {
     /**
      * Gets the node for tc.
      * 
-     * @param file the file
-     * @param method the method
+     * @param file
+     *                the file
+     * @param method
+     *                the method
      * 
      * @return the node for tc
      */
@@ -771,7 +838,8 @@ public class VisualDebugger {
     /**
      * Gets the param.
      * 
-     * @param mbs the mbs
+     * @param mbs
+     *                the mbs
      * 
      * @return the param
      */
@@ -804,7 +872,8 @@ public class VisualDebugger {
     /**
      * Gets the program counter.
      * 
-     * @param jb the jb
+     * @param jb
+     *                the jb
      * 
      * @return the program counter
      */
@@ -832,7 +901,8 @@ public class VisualDebugger {
     /**
      * Gets the program counter.
      * 
-     * @param n the n
+     * @param n
+     *                the n
      * 
      * @return the program counter
      */
@@ -870,7 +940,8 @@ public class VisualDebugger {
     /**
      * Gets the program counter.
      * 
-     * @param pio the pio
+     * @param pio
+     *                the pio
      * 
      * @return the program counter
      */
@@ -886,7 +957,8 @@ public class VisualDebugger {
     /**
      * Gets the program pio.
      * 
-     * @param s the s
+     * @param s
+     *                the s
      * 
      * @return the program pio
      */
@@ -975,8 +1047,10 @@ public class VisualDebugger {
     /**
      * Gets the values for location.
      * 
-     * @param locs set of Terms (ops)
-     * @param pio the pio
+     * @param locs
+     *                set of Terms (ops)
+     * @param pio
+     *                the pio
      * 
      * @return term2term
      */
@@ -1050,7 +1124,7 @@ public class VisualDebugger {
         postPredicate = (Function) proof.getNamespaces().functions().lookup(
                 POST_PREDICATE_NAME);
 
-        setProofStrategy(proof, true, false, SLListOfExpression.EMPTY_LIST);
+        setProofStrategy(proof, true, false, SLListOfTerm.EMPTY_LIST);
         run();
     }
 
@@ -1066,7 +1140,8 @@ public class VisualDebugger {
     /**
      * Checks if is sep statement.
      * 
-     * @param pe the pe
+     * @param pe
+     *                the pe
      * 
      * @return true, if is sep statement
      */
@@ -1093,7 +1168,8 @@ public class VisualDebugger {
     /**
      * Checks if is symbolic execution.
      * 
-     * @param t the t
+     * @param t
+     *                the t
      * 
      * @return true, if is symbolic execution
      */
@@ -1113,7 +1189,8 @@ public class VisualDebugger {
     /**
      * Modality top level.
      * 
-     * @param pio the pio
+     * @param pio
+     *                the pio
      * 
      * @return the java block
      */
@@ -1134,7 +1211,8 @@ public class VisualDebugger {
     /**
      * Pretty print.
      * 
-     * @param l the l
+     * @param l
+     *                the l
      * 
      * @return the string
      */
@@ -1167,9 +1245,12 @@ public class VisualDebugger {
     /**
      * Pretty print.
      * 
-     * @param l the l
-     * @param objects the objects
-     * @param thisObject the this object
+     * @param l
+     *                the l
+     * @param objects
+     *                the objects
+     * @param thisObject
+     *                the this object
      * 
      * @return the string
      */
@@ -1203,9 +1284,12 @@ public class VisualDebugger {
     /**
      * Pretty print.
      * 
-     * @param l the l
-     * @param objects the objects
-     * @param thisObject the this object
+     * @param l
+     *                the l
+     * @param objects
+     *                the objects
+     * @param thisObject
+     *                the this object
      * 
      * @return the string
      */
@@ -1218,7 +1302,8 @@ public class VisualDebugger {
     /**
      * Pretty print.
      * 
-     * @param l the l
+     * @param l
+     *                the l
      * 
      * @return the string
      */
@@ -1249,9 +1334,12 @@ public class VisualDebugger {
     /**
      * Pretty print.
      * 
-     * @param l the l
-     * @param sos the sos
-     * @param so the so
+     * @param l
+     *                the l
+     * @param sos
+     *                the sos
+     * @param so
+     *                the so
      * 
      * @return the string
      */
@@ -1299,7 +1387,8 @@ public class VisualDebugger {
     /**
      * Removes the implicite.
      * 
-     * @param list the list
+     * @param list
+     *                the list
      * 
      * @return the list of term
      */
@@ -1318,7 +1407,8 @@ public class VisualDebugger {
     /**
      * Removes the line breaks.
      * 
-     * @param s the s
+     * @param s
+     *                the s
      * 
      * @return the string
      */
@@ -1329,7 +1419,8 @@ public class VisualDebugger {
     /**
      * Removes the step over.
      * 
-     * @param goals the goals
+     * @param goals
+     *                the goals
      */
     private void removeStepOver(ListOfGoal goals) {
         IteratorOfGoal it = goals.iterator();
@@ -1360,7 +1451,8 @@ public class VisualDebugger {
     /**
      * Run.
      * 
-     * @param goals the goals
+     * @param goals
+     *                the goals
      * 
      * @return true, if successful
      */
@@ -1368,9 +1460,10 @@ public class VisualDebugger {
         if (!mediator.autoMode()) {
             this.removeStepOver(goals);
             this.setSteps(goals, this.runLimit);
-            setProofStrategy(mediator.getProof(), true, false, getListOfExpression());
+            setProofStrategy(mediator.getProof(), true, false,
+                    getListOfWatchpoints());
             runProver(goals);
-            
+
             return true;
         }
         return false;
@@ -1379,21 +1472,22 @@ public class VisualDebugger {
     /**
      * Run prover.
      * 
-     * @param goals the goals
+     * @param goals
+     *                the goals
      */
     private void runProver(final ListOfGoal goals) {
+
         this.refreshRuleApps();
-       
-        
         mediator.startAutoMode(goals);
-       // mediator.getInteractiveProver().removeProverTaskListener(proverTaskListener);
-        
+        // mediator.getInteractiveProver().removeProverTaskListener(proverTaskListener);
+
     }
 
     /**
      * Sets the inits the phase.
      * 
-     * @param initPhase the new inits the phase
+     * @param initPhase
+     *                the new inits the phase
      */
     public void setInitPhase(boolean initPhase) {
         this.initPhase = initPhase;
@@ -1402,7 +1496,8 @@ public class VisualDebugger {
     /**
      * Sets the input p v2term.
      * 
-     * @param inputPV2term the new input p v2term
+     * @param inputPV2term
+     *                the new input p v2term
      */
     public void setInputPV2term(HashMap inputPV2term) {
         this.inputPV2term = inputPV2term;
@@ -1411,15 +1506,18 @@ public class VisualDebugger {
     /**
      * Sets the proof strategy.
      * 
-     * @param proof the proof
-     * @param splittingAllowed the splitting allowed
-     * @param inUpdateAndAssumes the in update and assumes
+     * @param proof
+     *                the proof
+     * @param splittingAllowed
+     *                the splitting allowed
+     * @param inUpdateAndAssumes
+     *                the in update and assumes
      */
     public void setProofStrategy(final Proof proof, boolean splittingAllowed,
-            boolean inUpdateAndAssumes, ListOfExpression watchpoints) {
+            boolean inUpdateAndAssumes, ListOfTerm watchpoints) {
         StrategyProperties strategyProperties = DebuggerStrategy
                 .getDebuggerStrategyProperties(splittingAllowed,
-                        inUpdateAndAssumes, isInitPhase(),watchpoints);
+                        inUpdateAndAssumes, isInitPhase(), watchpoints);
 
         final StrategyFactory factory = new DebuggerStrategy.Factory();
 
@@ -1429,7 +1527,8 @@ public class VisualDebugger {
     /**
      * Sets the self pv.
      * 
-     * @param selfPV the new self pv
+     * @param selfPV
+     *                the new self pv
      */
     public void setSelfPV(ProgramVariable selfPV) {
         this.selfPV = selfPV;
@@ -1438,7 +1537,8 @@ public class VisualDebugger {
     /**
      * Sets the static method.
      * 
-     * @param staticMethod the new static method
+     * @param staticMethod
+     *                the new static method
      */
     public void setStaticMethod(boolean staticMethod) {
         this.staticMethod = staticMethod;
@@ -1447,7 +1547,8 @@ public class VisualDebugger {
     /**
      * Sets the step over.
      * 
-     * @param goals the new step over
+     * @param goals
+     *                the new step over
      */
     private void setStepOver(ListOfGoal goals) {
         IteratorOfGoal it = goals.iterator();
@@ -1466,8 +1567,10 @@ public class VisualDebugger {
     /**
      * Sets the steps.
      * 
-     * @param goals the goals
-     * @param steps the steps
+     * @param goals
+     *                the goals
+     * @param steps
+     *                the steps
      */
     private void setSteps(ListOfGoal goals, int steps) {
         IteratorOfGoal it = goals.iterator();
@@ -1487,7 +1590,8 @@ public class VisualDebugger {
     /**
      * Sets the term2 input pv.
      * 
-     * @param inputValues the new term2 input pv
+     * @param inputValues
+     *                the new term2 input pv
      */
     public void setTerm2InputPV(HashMap inputValues) {
         this.term2InputPV = inputValues;
@@ -1496,7 +1600,8 @@ public class VisualDebugger {
     /**
      * Sets the type.
      * 
-     * @param type the new type
+     * @param type
+     *                the new type
      */
     public void setType(ClassType type) {
         this.type = type;
@@ -1505,7 +1610,8 @@ public class VisualDebugger {
     /**
      * Simplify.
      * 
-     * @param terms the terms
+     * @param terms
+     *                the terms
      * 
      * @return the list of term
      */
@@ -1531,12 +1637,11 @@ public class VisualDebugger {
 
         final Proof proof = ps.getProof();
 
-        setProofStrategy(proof, false, false, SLListOfExpression.EMPTY_LIST);
-
+        setProofStrategy(proof, false, false, SLListOfTerm.EMPTY_LIST);
         ps.setUseDecisionProcedure(useDecisionProcedures);
         ps.run(proofEnvironment);
 
-        setProofStrategy(proof, true, false, SLListOfExpression.EMPTY_LIST);
+        setProofStrategy(proof, true, false, SLListOfTerm.EMPTY_LIST);
         if (etProgressMonitor != null) {
             ps.removeProgressMonitor(etProgressMonitor);
         }
@@ -1547,7 +1652,8 @@ public class VisualDebugger {
     /**
      * Start thread.
      * 
-     * @param r the r
+     * @param r
+     *                the r
      */
     private void startThread(final Runnable r) {
         mediator.stopInterface(false);
@@ -1579,7 +1685,8 @@ public class VisualDebugger {
     /**
      * Step into.
      * 
-     * @param goals the goals
+     * @param goals
+     *                the goals
      * 
      * @return true, if successful
      */
@@ -1590,8 +1697,10 @@ public class VisualDebugger {
     /**
      * Step into.
      * 
-     * @param goals the goals
-     * @param steps the steps
+     * @param goals
+     *                the goals
+     * @param steps
+     *                the steps
      * 
      * @return true, if successful
      */
@@ -1600,7 +1709,7 @@ public class VisualDebugger {
             final Proof proof = mediator.getProof();
             removeStepOver(proof.openGoals());
             this.setSteps(goals, steps);
-            setProofStrategy(proof, true, false, getListOfExpression());
+            setProofStrategy(proof, true, false, getListOfWatchpoints());
             runProver(goals);
             return true;
         }
@@ -1617,12 +1726,14 @@ public class VisualDebugger {
     /**
      * Step over.
      * 
-     * @param goals the goals
+     * @param goals
+     *                the goals
      */
     public void stepOver(ListOfGoal goals) {
         setStepOver(goals);
         this.setSteps(goals, runLimit);
-        setProofStrategy(mediator.getProof(), true, false,getListOfExpression());
+        setProofStrategy(mediator.getProof(), true, false,
+                getListOfWatchpoints());
         runProver(goals);
     }
 
@@ -1637,7 +1748,7 @@ public class VisualDebugger {
             final Proof proof = mediator.getProof();
             removeStepOver(proof.openGoals());
             setSteps(proof.openGoals(), 0);
-            setProofStrategy(proof, true, false, getListOfExpression());
+            setProofStrategy(proof, true, false, getListOfWatchpoints());
             runProver(proof.openGoals());
             return true;
         }
@@ -1647,7 +1758,8 @@ public class VisualDebugger {
     /**
      * Visualize.
      * 
-     * @param n the n
+     * @param n
+     *                the n
      */
     public synchronized void visualize(ITNode n) {
         mediator = main.mediator();
@@ -1677,15 +1789,19 @@ public class VisualDebugger {
         /**
          * Instantiates a new test case identifier.
          * 
-         * @param file the file
-         * @param method the method
+         * @param file
+         *                the file
+         * @param method
+         *                the method
          */
         public TestCaseIdentifier(String file, String method) {
             this.file = file;
             this.method = method;
         }
 
-        /* (non-Javadoc)
+        /*
+         * (non-Javadoc)
+         * 
          * @see java.lang.Object#equals(java.lang.Object)
          */
         public boolean equals(Object o) {
@@ -1716,14 +1832,18 @@ public class VisualDebugger {
             return method;
         }
 
-        /* (non-Javadoc)
+        /*
+         * (non-Javadoc)
+         * 
          * @see java.lang.Object#hashCode()
          */
         public int hashCode() {
             return (method.concat(file)).hashCode();
         }
 
-        /* (non-Javadoc)
+        /*
+         * (non-Javadoc)
+         * 
          * @see java.lang.Object#toString()
          */
         public String toString() {
@@ -1734,14 +1854,16 @@ public class VisualDebugger {
     /**
      * Adds the pm to proof starter.
      * 
-     * @param pm the pm
+     * @param pm
+     *                the pm
      */
     public void addPMtoProofStarter(ProgressMonitor pm) {
         this.etProgressMonitor = pm;
         ETProverTaskListener proverTaskListener = new ETProverTaskListener(
                 etProgressMonitor);
-        mediator.getInteractiveProver().addProverTaskListener(proverTaskListener);
-        
+        mediator.getInteractiveProver().addProverTaskListener(
+                proverTaskListener);
+
     }
 
     /**
@@ -1759,32 +1881,41 @@ public class VisualDebugger {
         /**
          * Instantiates a new PM.
          * 
-         * @param pm the ProgressMonitor
+         * @param pm
+         *                the ProgressMonitor
          */
         public ETProverTaskListener(ProgressMonitor pm) {
             this.pm = pm;
         }
-        //reset progressbar when task is finished
-        /* (non-Javadoc)
+
+        // reset progressbar when task is finished
+        /*
+         * (non-Javadoc)
+         * 
          * @see de.uka.ilkd.key.gui.ProverTaskListener#taskFinished()
          */
         public void taskFinished() {
             pm.setProgress(300);
-           }
+        }
 
-        /* (non-Javadoc)
+        /*
+         * (non-Javadoc)
+         * 
          * @see de.uka.ilkd.key.gui.ProverTaskListener#taskProgress(int)
          */
         public void taskProgress(int position) {
-            
+
             pm.setProgress(position);
         }
 
-        /* (non-Javadoc)
-         * @see de.uka.ilkd.key.gui.ProverTaskListener#taskStarted(java.lang.String, int)
+        /*
+         * (non-Javadoc)
+         * 
+         * @see de.uka.ilkd.key.gui.ProverTaskListener#taskStarted(java.lang.String,
+         *      int)
          */
         public void taskStarted(String message, int size) {
-            //System.out.println("taskStarted -size:" + size);
+            // System.out.println("taskStarted -size:" + size);
             pm.setMaximum(300);
 
         }
@@ -1797,68 +1928,77 @@ public class VisualDebugger {
     public void setWatchPointManager(WatchPointManager watchPointManager) {
         this.watchPointManager = watchPointManager;
     }
+
     /**
      * Translates the WatchPoints into KeY data structures.
-     * */
+     */
     public int translateWatchpoints() {
 
         LinkedList<WatchPoint> watchpoints = watchPointManager.getWatchPoints();
         int count = watchpoints.size();
-        listOfExpression = SLListOfExpression.EMPTY_LIST;
-        
+        listOfWatchpoints = SLListOfTerm.EMPTY_LIST;
+
         if (watchpoints == null || count == 0) {
             System.out.println("No watches created so far");
             return 0;
         } else {
             for (int i = 0; i < count; i++) {
-                
-            WatchPoint wp = watchpoints.get(i);
-            StringBuffer buffer = new StringBuffer();
-           
-            String file = wp.getFile();
-            // Pretty.java
-            String self = file.substring(file.lastIndexOf("/") + 1);
-            // Pretty
-            self = self.substring(0, self.indexOf("."));
-            file = file.substring(0,file.indexOf("."));
-            file = file.replace("/", ".");
-            file = file.substring(4);
-            buffer.append("\\<{"+ file +" self; }\\>");
-            buffer.append("\\<{method-frame( source=" + file + ",this=self_" + self);
-            buffer.append(" ) : {boolean " + wp.getName() + " = " + wp.getExpression());
-            buffer.append(";} }\\> true");
-       
-            Term term = ProblemLoader.parseTerm(buffer.toString(), this.getMediator().getProof());           
 
-            MethodFrame mf = (MethodFrame) term.sub(0).javaBlock().program().getFirstElement();
-            StatementBlock sb = (StatementBlock) mf.getChildAt(1);
-            LocalVariableDeclaration lvd = (LocalVariableDeclaration) sb.getChildAt(0);
-            VariableSpecification vs = lvd.getVariableSpecifications().getVariableSpecification(0);
-            Expression watchpoint = vs.getInitializer();
-            
-            listOfExpression = listOfExpression.append(watchpoint);
-            IteratorOfExpression iter = listOfExpression.iterator();
-            
-            while(iter.hasNext()){
-                Expression e = iter.next();
-                System.out.println(e.toString());
-                
-            }
+                WatchPoint wp = watchpoints.get(i);
+                StringBuffer buffer = new StringBuffer();
+                String file = wp.getFile();
+                String self = file.substring(file.lastIndexOf("/") + 1);
+                self = self.substring(0, self.indexOf("."));
+                file = file.substring(0, file.indexOf("."));
+                file = file.replace("/", ".");
+                file = file.substring(4);
 
+                Namespace progVarNS = new Namespace();
+              
+                JavaInfo ji = mediator.getServices().getJavaInfo();
+
+                ProgramVariable var_self = new LocationVariable(
+                        new ProgramElementName("self"), ji.getKeYJavaType(file));
+                ProgramVariable var_dummy = new LocationVariable(
+                        new ProgramElementName(wp.getName()), ji.getKeYJavaType("boolean"));
+                progVarNS.add(var_self);
+                progVarNS.add(var_dummy);
+
+                buffer.append("\\<{method-frame( source=" + file
+                        + ",this=self");
+                buffer.append(" ) : { " + wp.getName() + " = "
+                        + wp.getExpression());
+                buffer.append(";} }\\>" + wp.getName() + " = TRUE");
+                System.out.println(buffer.toString());
+
+                Term term = ProblemLoader.parseTerm(buffer.toString(), this
+                        .getMediator().getProof(), new Namespace(), progVarNS);
+
+                // MethodFrame mf = (MethodFrame)
+                // term.sub(0).javaBlock().program().getFirstElement();
+                // StatementBlock sb = (StatementBlock) mf.getChildAt(1);
+                // LocalVariableDeclaration lvd = (LocalVariableDeclaration)
+                // sb.getChildAt(0);
+                // VariableSpecification vs =
+                // lvd.getVariableSpecifications().getVariableSpecification(0);
+                // Expression watchpoint = vs.getInitializer();
+
+                listOfWatchpoints = listOfWatchpoints.append(term); 
             }
             return count;
         }
     }
+
     /**
      * Gets the listOfExpression containing the watchpoints.
      * 
      * @return the listOfExpression
      */
 
-    public ListOfExpression getListOfExpression() {
-        if(listOfExpression == null) {
-            return SLListOfExpression.EMPTY_LIST;
+    public ListOfTerm getListOfWatchpoints() {
+        if (listOfWatchpoints == null) {
+            return SLListOfTerm.EMPTY_LIST;
         }
-        return listOfExpression;
+        return listOfWatchpoints;
     }
 }

@@ -387,7 +387,7 @@ public class StateVisualization {
         ps.init(po);
         ps.setMaxSteps(maxProofSteps);
         ps.setUseDecisionProcedure(useDecisionProcedures);
-        vd.setProofStrategy(ps.getProof(), true, false, SLListOfExpression.EMPTY_LIST);
+        vd.setProofStrategy(ps.getProof(), true, false, SLListOfTerm.EMPTY_LIST);
     }
     
     private void setUpProof(SetOfTerm indexConf, Term forPostValues) {
@@ -424,7 +424,7 @@ public class StateVisualization {
         final Proof simplificationProof = ps.getProof();
         
         StrategyProperties strategyProperties = DebuggerStrategy
-                .getDebuggerStrategyProperties(true, true, vd.isInitPhase(),SLListOfExpression.EMPTY_LIST);
+                .getDebuggerStrategyProperties(true, true, vd.isInitPhase(),SLListOfTerm.EMPTY_LIST);
 
         StrategyFactory factory = new DebuggerStrategy.Factory();
         
@@ -437,7 +437,7 @@ public class StateVisualization {
         vd.getBpManager().setNoEx(false);
 
         strategyProperties = 
-            DebuggerStrategy.getDebuggerStrategyProperties(true, false, vd.isInitPhase(),SLListOfExpression.EMPTY_LIST);
+            DebuggerStrategy.getDebuggerStrategyProperties(true, false, vd.isInitPhase(),SLListOfTerm.EMPTY_LIST);
         
         mediator.getProof().
         setActiveStrategy(factory.create(mediator.getProof(), strategyProperties));

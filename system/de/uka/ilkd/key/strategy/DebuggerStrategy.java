@@ -10,10 +10,9 @@
 
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.java.ListOfExpression;
-import de.uka.ilkd.key.java.SLListOfExpression;
 import de.uka.ilkd.key.logic.IteratorOfNamed;
 import de.uka.ilkd.key.logic.ListOfNamed;
+import de.uka.ilkd.key.logic.ListOfTerm;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.Proof;
@@ -38,7 +37,7 @@ public class DebuggerStrategy extends VBTStrategy {
 
     public static StrategyProperties getDebuggerStrategyProperties(
             boolean splittingRulesAllowed, boolean inUpdateAndAssumes,
-            boolean inInitPhase, ListOfExpression watchpoints) {
+            boolean inInitPhase, ListOfTerm watchpoints) {
         final StrategyProperties res = new StrategyProperties();
         res.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
                 StrategyProperties.LOOP_EXPAND);
@@ -75,7 +74,7 @@ public class DebuggerStrategy extends VBTStrategy {
     }
 
     protected DebuggerStrategy(Proof p_proof, StrategyProperties props,
-            ListOfExpression watchpoints) {
+            ListOfTerm watchpoints) {
 
         super(p_proof, props);
 
@@ -145,8 +144,8 @@ public class DebuggerStrategy extends VBTStrategy {
         public Strategy create(Proof p_proof,
                 StrategyProperties strategyProperties) {
 
-            ListOfExpression watchpoints = (ListOfExpression) strategyProperties
-                    .get("VISUAL_DEBBUGER_WATCHPOINTS_KEY");
+            ListOfTerm watchpoints = (ListOfTerm) strategyProperties
+                    .get(VISUAL_DEBUGGER_WATCHPOINTS_KEY);
             injectDebuggerDefaultOptionsIfUnset(strategyProperties);
             
             return new DebuggerStrategy(p_proof, strategyProperties,
