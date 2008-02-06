@@ -312,7 +312,6 @@ GENERATED_ARRAYS=java/ArrayOfProgramElementExtnullInnull \
 	logic/op/ArrayOfIProgramVariableExtProgramElementInde.uka.ilkd.key.java \
 	logic/ArrayOfTermExtnullInnull \
 	logic/sort/ArrayOfSortExtnullInnull \
-	logic/sort/ArrayOfGenSortExtSortInnull \
 	java/abstraction/ArrayOfKeYJavaTypeExtnullInde.uka.ilkd.key.java.abstraction \
 	strategy/feature/ArrayOfFeatureExtnullInnull \
 	rule/updatesimplifier/ArrayOfAssignmentPairExtnullInnull

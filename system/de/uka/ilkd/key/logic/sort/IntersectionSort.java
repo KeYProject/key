@@ -383,9 +383,6 @@ public class IntersectionSort extends AbstractSort {
                      
        for (int i = 0, sz = memberCount(); i<sz; i++) {
            final Sort s = getComponent(i);         
-           Debug.assertTrue(!(s instanceof GenSort), 
-                            "Cannot compute iff a domain is empty " +
-                            "in case of generic sorts.");
            if (s instanceof PrimitiveSort) {
                nonReferenceType = true;
            } else if (s instanceof IntersectionSort) {               

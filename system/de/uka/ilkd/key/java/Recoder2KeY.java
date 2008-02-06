@@ -1893,7 +1893,7 @@ public class Recoder2KeY implements JavaReader{
 
 	VariableSpecification varSpec
 	    = (VariableSpecification)rec2key.toKeY(recoderVarSpec);
-
+             
 
 	if (varSpec == null) {
 	    recoder.abstraction.Type recoderType =

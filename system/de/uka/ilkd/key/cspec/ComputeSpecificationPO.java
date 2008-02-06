@@ -15,10 +15,7 @@ import de.uka.ilkd.key.java.statement.Branch;
 import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Try;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.init.AbstractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ModStrategy;
@@ -27,13 +24,11 @@ import de.uka.ilkd.key.logic.op.*;
 
 
 public class ComputeSpecificationPO extends AbstractPO {
-
-    private static final TermBuilder tb = TermBuilder.DF;
     
 	private ProgramMethod programMethod;
 	private Modality modality;
-	
-	public ComputeSpecificationPO(InitConfig initConfig, 
+
+        public ComputeSpecificationPO(InitConfig initConfig, 
 					 ProgramMethod programMethod) {
 		super(initConfig, 
 		      "ComputeSpecification", 

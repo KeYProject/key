@@ -142,9 +142,8 @@ public class ApplyOnModality extends AbstractUpdateRule {
             foundProgVars.add(targetOp);
         } else if (targetOp instanceof NonRigidHeapDependentFunction) {
             foundProgVars.add(PROTECT_HEAP);
-        } else if (targetOp == Op.COMPUTE_SPEC_OP ||         
-		   (targetOp instanceof NonRigidFunction && 
-                   !(targetOp instanceof ProgramMethod))) {
+        } else if (targetOp instanceof NonRigidFunction && 
+                   !(targetOp instanceof ProgramMethod)) {
             foundProgVars.add(PROTECT_ALL);
             return foundProgVars;
         }

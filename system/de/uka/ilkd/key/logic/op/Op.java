@@ -130,9 +130,6 @@ public abstract class Op implements Operator {
 
     /** the 'ifEx-then-else' operator */
     public static final IfExThenElse IF_EX_THEN_ELSE = new IfExThenElse ();
-
-    /** control operator required for specification computation */
-    public static final Junctor COMPUTE_SPEC_OP = new ComputeSpecOp();
     
     protected final Name name;
    	

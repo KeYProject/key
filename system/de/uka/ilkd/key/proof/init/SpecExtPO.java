@@ -12,11 +12,11 @@ package de.uka.ilkd.key.proof.init;
 
 import java.util.Map;
 
+import de.uka.ilkd.key.cspec.ComputeSpecification;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ListOfProgramVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Proof;
@@ -57,8 +57,7 @@ public class SpecExtPO extends EnsuresPostPO {
             ListOfProgramVariable paramVars, ProgramVariable resultVar,
             ProgramVariable exceptionVar, Map atPreFunctions)
             throws ProofInputException {
-        return TermBuilder.DF.tf().createJunctorTerm(Op.COMPUTE_SPEC_OP,
-                TermBuilder.DF.tf().createJunctorTerm(Op.TRUE));
+        return TermBuilder.DF.func(ComputeSpecification.ACCUMULATOR);
     }
 
     public ProofAggregate getPO() {
