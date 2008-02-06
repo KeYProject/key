@@ -12,6 +12,7 @@ package de.uka.ilkd.key.util;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.DefaultServiceConfiguration;
@@ -22,7 +23,6 @@ import recoder.io.SourceFileRepository;
 import recoder.java.CompilationUnit;
 import recoder.java.ProgramElement;
 import recoder.java.reference.TypeReference;
-import recoder.list.CompilationUnitList;
 import recoder.service.SourceInfo;
 import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
 
@@ -54,9 +54,9 @@ public class ReferenceLister {
         SourceFileRepository sfr = sc.getSourceFileRepository();
         SourceInfo si = sc.getSourceInfo();
 
-        CompilationUnitList cus = sfr.getCompilationUnits();
+        List<CompilationUnit> cus = sfr.getCompilationUnits();
         for (int i = 0; i < cus.size(); i++) {
-            TreeWalker walker = new TreeWalker(cus.getProgramElement(i));
+            TreeWalker walker = new TreeWalker(cus.get(i));
             while (walker.next()) {
                 ProgramElement pe = walker.getProgramElement();
                 if (pe instanceof TypeReference) {

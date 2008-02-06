@@ -1769,7 +1769,7 @@ ConstructorDeclaration ConstructorDeclaration() :
       setPostfixInfo(id);
   }
   pdl = FormalParameters()
-  [ "throws" nl = NameList() ]
+  [ "throws" nl = TypedNameList() ]
   ( "{"
   {
       body = factory.createStatementBlock();

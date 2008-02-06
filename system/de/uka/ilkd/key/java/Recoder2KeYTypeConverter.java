@@ -12,14 +12,14 @@ package de.uka.ilkd.key.java;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import recoder.ServiceConfiguration;
 import recoder.abstraction.ClassType;
+import recoder.abstraction.Constructor;
 import recoder.abstraction.DefaultConstructor;
 import recoder.abstraction.Type;
 import recoder.bytecode.ClassFile;
-import recoder.list.ClassTypeList;
-import recoder.list.ConstructorList;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.ListOfField;
@@ -199,13 +199,13 @@ public class Recoder2KeYTypeConverter {
 			} else {
 				s = createObjectSort(ct, directSuperSorts(ct));
 			}
-			ConstructorList cl = t.getProgramModelInfo().getConstructors(
+			List<Constructor> cl = t.getProgramModelInfo().getConstructors(
 					(recoder.abstraction.ClassType) t);
 			addKeYJavaType(t, s);
 			if (cl.size() == 1
-					&& (cl.getConstructor(0) instanceof recoder.abstraction.DefaultConstructor)) {
+					&& (cl.get(0) instanceof recoder.abstraction.DefaultConstructor)) {
 				getRecoder2KeYConverter().processDefaultConstructor(
-						(DefaultConstructor) cl.getConstructor(0));
+						(DefaultConstructor) cl.get(0));
 			}
 		} else if (t instanceof recoder.abstraction.ArrayType) {
 			recoder.abstraction.Type bt = ((recoder.abstraction.ArrayType) t)
@@ -306,10 +306,10 @@ public class Recoder2KeYTypeConverter {
 	 */
 	private SetOfSort directSuperSorts(ClassType classType) {
 
-		ClassTypeList supers = classType.getSupertypes();
+		List<ClassType> supers = classType.getSupertypes();
 		SetOfSort ss = SetAsListOfSort.EMPTY_SET;
 		for (int i = 0; i < supers.size(); i++) {
-			ss = ss.add(getKeYJavaType(supers.getType(i)).getSort());
+			ss = ss.add(getKeYJavaType(supers.get(i)).getSort());
 		}
 
 		if (ss == SetAsListOfSort.EMPTY_SET && !isObject(classType)) {
@@ -361,7 +361,7 @@ public class Recoder2KeYTypeConverter {
 		ProgramElementName name = new ProgramElementName(cf.getName());
 		ProgramElementName fullname = new ProgramElementName(cf.getFullName());
 
-		ClassTypeList supertype = cf.getSupertypes();
+		List<ClassType> supertype = cf.getSupertypes();
 
 		TypeReference[] implementsTypes = null;
 		TypeReference extendType = null;
@@ -370,7 +370,7 @@ public class Recoder2KeYTypeConverter {
 		LinkedList implementsList = new LinkedList();
 		if (supertype != null) {
 			for (int i = 0; i < supertype.size(); i++) {
-				recoder.abstraction.ClassType ct = supertype.getClassType(i);
+				recoder.abstraction.ClassType ct = supertype.get(i);
 				final KeYJavaType kjt = getKeYJavaType(ct);
 				final TypeReference tr = new TypeRef(new ProgramElementName(ct
 						.getFullName()), 0, null, kjt);

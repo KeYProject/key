@@ -33,10 +33,6 @@ public class ConvertException extends RuntimeException {
 		super(errmsg, cause);
 	}
     
-    public ConvertException(String errmsg, Throwable cause) {
-        super(errmsg, cause);
-    }
-
 	public recoder.parser.ParseException parseException() {
 		if (getCause() instanceof recoder.parser.ParseException) {
 			return (recoder.parser.ParseException) getCause();
