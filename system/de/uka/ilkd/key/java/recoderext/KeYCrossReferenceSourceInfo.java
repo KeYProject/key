@@ -22,7 +22,7 @@ import recoder.java.declaration.InheritanceSpecification;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.java.declaration.VariableDeclaration;
 import recoder.java.declaration.VariableSpecification;
-import recoder.list.ImportList;
+import recoder.list.generic.ASTList;
 import recoder.service.AmbiguousReferenceException;
 import recoder.service.DefaultCrossReferenceSourceInfo;
 import recoder.service.NameInfo;
@@ -305,17 +305,18 @@ public class KeYCrossReferenceSourceInfo
         // now the outer scope is null, so we have arrived at the top
         CompilationUnit cu = (CompilationUnit) scope;
 
-        ImportList il = cu.getImports();
+        ASTList<Import> il = cu.getImports();
         if (il != null) {
             // first check type imports
-            result = getClassTypeFromTypeImports(name, il);
+            result = getFromTypeImports(name, il);
         }
         if (result == null) {
             // then check same package
-            result = getClassTypeFromUnitPackage(name, cu);
+            result = getFromUnitPackage(name, cu);
             if (result == null && il != null) {
                 // then check package imports
-                result = getClassTypeFromPackageImports(name, il);
+                // TODO: Is this right: cu.getPrimaryTypeDeclaration()??
+                result = getFromPackageImports(name, il, cu.getPrimaryTypeDeclaration());
             }
         }
         if (result == null) {

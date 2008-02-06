@@ -26,7 +26,7 @@ public class Ghost extends Modifier {
     }
     
 
-    public Object deepClone() {
+    public Ghost deepClone() {
         return new Ghost(this);
     }
 

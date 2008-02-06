@@ -3824,7 +3824,7 @@ LocalVariableDeclaration SVLocalVariableDeclaration() :
     {
     	Ghost g = new Ghost();
     	setPrefixInfo(g);
-    	result.setModifiers(new ModifierArrayList(g));
+    	result.setDeclarationSpecifiers(new ASTArrayList<DeclarationSpecifier>(g));
     } 
     ]
 	(tr = TypeMC() | tr = TypeSV() | tr = Type() ) 

@@ -461,7 +461,7 @@ public class KeYProgModelInfo{
         List<? extends recoder.abstraction.Constructor> constructors =
             getRecoderConstructors(ct, signature);
         if (constructors.size()==1) {
-	    Object o = rec2key().toKeY(constructors.getConstructor(0));
+	    Object o = rec2key().toKeY(constructors.get(0));
 	    if(o instanceof Constructor){
 		return (Constructor) o;
 	    }
@@ -777,7 +777,7 @@ public class KeYProgModelInfo{
 	// need to start the search "upstairs"
 
         while(rct.isInterface() && !isDeclaringInterface(rct, name, rsignature)) {
-	     rct = rct.getAllSupertypes().getClassType(1);
+	     rct = rct.getAllSupertypes().get(1);
 	}
 
 
@@ -866,17 +866,17 @@ public class KeYProgModelInfo{
 
     private boolean isDeclaringInterface(recoder.abstraction.ClassType ct,
 					 String name,
-					 recoder.list.TypeList signature) {
+					 List<recoder.abstraction.Type> signature) {
         recoder.service.CrossReferenceSourceInfo si 
 	    = getServConf().getCrossReferenceSourceInfo();
 	
 	Debug.assertTrue(ct.isInterface());
 	
-	recoder.list.MethodList list = si.getMethods(ct);
+	List<recoder.abstraction.Method> list = si.getMethods(ct);
 	int s = list.size();
 	int i = 0;
 	while (i < s) {
-	    recoder.abstraction.Method m = list.getMethod(i);
+	    recoder.abstraction.Method m = list.get(i);
 	    if (name.equals(m.getName())
 		&& si.isCompatibleSignature(signature, m.getSignature())
 		&& si.isVisibleFor(m, ct)) return true;

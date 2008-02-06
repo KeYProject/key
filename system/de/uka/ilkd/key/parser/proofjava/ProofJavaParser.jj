@@ -656,7 +656,7 @@ TOKEN :
 }
 
 /* special attention is paid to "<".
- * it will always be mapped to TL, but if an implicit identifier
+ * it will always be mapped to LT, but if an implicit identifier
  * is built, this is stored in the "<" token, so that later we
  * can distinguish "< a>" from "<a>".
  */

@@ -1627,15 +1627,14 @@ public class Recoder2KeY implements JavaReader{
 	    }else{
 		s = createObjectSort(ct, directSuperSorts(ct));
 	    }
-	    recoder.list.ConstructorList cl = 
-		t.getProgramModelInfo().
+	    List<recoder.abstraction.Constructor> cl = t.getProgramModelInfo().
 		getConstructors((recoder.abstraction.ClassType) t);
 	    addKeYJavaType(t, s);
 	    if(cl.size()==1 && 
-	       (cl.getConstructor(0) instanceof 
+	       (cl.get(0) instanceof 
 		recoder.abstraction.DefaultConstructor)){
 		convert((recoder.abstraction.DefaultConstructor) 
-			cl.getConstructor(0));
+			cl.get(0));
 	    }
 	} else if (t instanceof recoder.abstraction.ArrayType){
 	    recoder.abstraction.Type bt
@@ -2415,10 +2414,12 @@ public class Recoder2KeY implements JavaReader{
      * @param f the EnhancedFor of recoder
      * @return the EnhancedFor of KeY
      */
+    /* will come with java5
     public EnhancedFor convert(recoder.java.statement.EnhancedFor f) {
         return new EnhancedFor(convertLoopInitializers(f), convertGuard(f),
                 convertBody(f),collectComments(f),positionInfo(f));
     }
+    */
 
     /**
      * converts a While.
