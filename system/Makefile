@@ -63,7 +63,6 @@ ifneq "$(GIT)" ""
      KEY_VERSION_SHORT:=1.3.$(KEY_VERSION_SHORT)
    endif
  endif
->>>>>>> cd5160c81af6413abd0afbe0091fc2ba123de808:system/Makefile
 endif
 
 ifeq "$(KEY_VERSION_LONG)" ""
