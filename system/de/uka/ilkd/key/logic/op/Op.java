@@ -10,8 +10,6 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import java.io.ObjectStreamException;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -142,41 +140,6 @@ public abstract class Op implements Operator {
 	this.name=name;
     }
     
-    protected boolean equalsForResolve(Operator op) {
-	if (op.name().equals(this.name())) {
-	    if (op.getClass() == this.getClass()) {
-		if (op instanceof Junctor) {
-		    if (((Junctor)op).arity() == ((Junctor)this).arity()) {
-			return true;
-		    } 
-		} else {
-		    return true;
-		}
-	    } 
-	}
-	return false;
-    }
-
-    
-    protected Object readResolve() 
-	throws ObjectStreamException {	
-
-	Op[] op = {Op.NOT, Op.AND, Op.OR, Op.IMP,
-		   Op.ALL, Op.EX,
-		   Op.DIA, Op.BOX, Op.TOUT,
-		   Op.DIATRC, Op.BOXTRC, Op.TOUTTRC,
-		   Op.DIATRA, Op.BOXTRA, Op.TOUTTRA,
-		   Op.DIASUSP, Op.BOXSUSP, Op.TOUTSUSP,
-                   Op.SUBST, Op.TRUE,
-		   Op.FALSE};
-	for (int i=0;i<op.length;i++) {
-	    if (equalsForResolve(op[i])) {
-		return op[i];
-	    }
-	}
-	return this;
-    }
-    
     /**
      * Returns a modality corresponding to a string
      * @param str name of the modality to return
@@ -185,6 +148,10 @@ public abstract class Op implements Operator {
 	return (Modality)Modality.getNameMap().get(str);
     }
 
+    /**
+     * returns the name of the operator
+     * @return the operator's name
+     */
     public Name name() {
 	return name;
     }

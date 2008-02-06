@@ -17,16 +17,31 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-/** An OpTerm is an object that contains an Operator and several subterms. Can be used
- * to represent e.g., function terms or quantifier terms. Instances should never be 
- * accessed via 
- * this interface, use the interface of the superclass Term and construct instances only via
- * a TermFactory instead.
+/** 
+ * The OpTerm class is used to represent a term whose top level operator does not bind 
+ * variables and that has no program. For example terms with a function symbol on top or
+ * formulas with a predicates symbol but also more complex ones with the usual propositional
+ * connectives. It is for example not used in cases where the top level operator represents
+ * a quantifier, modality, an update or an ifex-then-else operator.  
+ *   Instances <strong>must never</strong> be accessed via this interface, use the interface
+ * of the superclass Term and construct instances only via a TermFactory instead. The 
+ * OpTerm class contains four different implementations for nullary, unary, binary and 
+ * arbitrary (but fixed) arity. The ratinale behind this is to avoid unneccessary allocation
+ * of array for the most common cases.
  */
 abstract class OpTerm extends Term {
 
 
-    public static OpTerm createOpTerm(Operator op, Term[] subs) {        
+    /**
+     * creates an OpTerm and selects the most sepcific implementation
+     * of OpTerm.
+     * @param op the Operator on the top 
+     * @param subs an array of Term containing the sub terms or formulas. The array may 
+     * not be null neither one its components. To create a nullary term the given array 
+     * must have length zero.
+     * @return the created term <tt>op(subs[0],...,subs[subs.length-1])</tt>
+     */
+    public static Term createOpTerm(Operator op, Term[] subs) {        
         if (subs.length == 0) {
             return new ConstantOpTerm(op);
         } else if (subs.length == 1) {
@@ -38,18 +53,45 @@ abstract class OpTerm extends Term {
         return new ArbitraryOpTerm(op, subs);
     }
     
-    public static OpTerm createBinaryOpTerm(Operator op, Term left, Term right) {
+    /**
+     * creates a binary term <tt>op(left, right)</tt>
+     * @param op the operator on the top
+     * @param left a Term used as first subterm (must not be null)
+     * @param right a Term used as second subterm (must not be null)
+     * @return the created term <tt>op(left, right)</tt>
+     */
+    public static Term createBinaryOpTerm(Operator op, Term left, Term right) {
         return new BinaryOpTerm(op, new Term[]{left, right});
     }
     
-    public static OpTerm createUnaryOpTerm(Operator op, Term sub) {
+    /**
+     * creates a unary term <tt>op(sub)></tt>
+     * @param op the operator on the top
+     * @param sub the Term  to be used as subterm (must not be null)
+     * @return the created term <tt>op(sub)</tt>
+     */
+    public static Term createUnaryOpTerm(Operator op, Term sub) {
         return new UnaryOpTerm(op, new Term[]{sub});
     }
 
-    public static OpTerm createConstantOpTerm(Operator op) {
+    /**
+     * creates a nullary/constant term <tt>op</tt>
+     * @param op the operator on the top
+     * @return the created term <tt>op</tt>
+     */
+    public static Term createConstantOpTerm(Operator op) {
         return new ConstantOpTerm(op);
     }
     
+    /** 
+     * initialises the term with the given operator and sort.
+     * It updates the set of free variables and meta variables by 
+     * adding the operator if necessary. 
+     * <em>Attention:</em> The constructor of the subclasses have to invoke 
+     * {@link #fillCaches()} at the end.
+     * @param op the Operator on top
+     * @param sort the Sort of the term
+     */
     protected OpTerm(Operator op, Sort sort) {
         super(op, sort);       
         
@@ -60,15 +102,25 @@ abstract class OpTerm extends Term {
         }
     }
     
+    /**
+     * an instance of an {@link OpTerm} binds no variables on its top level
+     * therefore we return the empty list here.
+     */
     public ArrayOfQuantifiableVariable varsBoundHere(int n) {
         return EMPTY_VAR_LIST;
     }
 
+    /**
+     * represents an term of an arbitrary arity. While this implementation works
+     * for any arity. There exist special faster and memory resource saving
+     * implementation for arities lesser or equal than two.
+     */
     static class ArbitraryOpTerm extends OpTerm {
 
-
+        /** the arry containing the sub terms */
         private final ArrayOfTerm subTerm;
 
+        /** the depth of the term */
         private int depth = -1;
         
         /** creates an OpTerm with top operator op, some subterms and a sort
@@ -85,6 +137,10 @@ abstract class OpTerm extends Term {
             fillCaches();	
         }   
 
+        /**
+         * computes the maximal depth of the term and caches its value. Afterwards
+         * the fillCaches of the superclass is invoked. 
+         */
         protected void fillCaches() {
             int max_depth = -1;
             for (int i = 0, sz = arity(); i < sz; i++) {
@@ -98,8 +154,7 @@ abstract class OpTerm extends Term {
 
             super.fillCaches();
         }
-  
-        
+          
         /** @return arity of the term */
         public int arity() {
             return subTerm.size();
@@ -115,18 +170,32 @@ abstract class OpTerm extends Term {
             return EMPTY_VAR_LIST;
         }
 
+        /** @return the maximal depth of the term */
         public int depth() {
             return depth;
         }
     }
      
+    /**
+     * this implementation represents an OpTerm with exactly two 
+     * sub terms
+     */
     static class BinaryOpTerm extends OpTerm {
 
+        /** the first subterm */
         private final Term left;
+        /** the second subterm */
         private final Term right;
 
+        /** the terms maximal depth */
         private int depth = -1;
         
+        /**
+         * creates a binary term
+         * @param op the Operator on the top
+         * @param subs the array of Term containing the subterms to be used
+         * <strong>must have</strong> length two and be non-null for all its components.
+         */
         BinaryOpTerm(Operator op, Term[] subs) {
             super(op,op.sort(subs));
             assert subs.length == 2 : "Tried to create a binary term with more or less" +
@@ -137,10 +206,16 @@ abstract class OpTerm extends Term {
             fillCaches();
         }
            
+        /** 
+         * returns the arity of the term which is in this case <tt>2</tt>
+         */
         public int arity() {
             return 2;
         }
 
+        /**
+         * returns the depth of the term 
+         */
         public int depth() {
             if (depth == -1) {
                 final int leftDepth = left.depth();
@@ -150,6 +225,9 @@ abstract class OpTerm extends Term {
             return depth;
         }
 
+        /**
+         * returns the <tt>nr</tt> sub terms
+         */
         public Term sub(int nr) {
             if (nr < 0 || nr >= arity()) {
                 throw new IndexOutOfBoundsException("Term " + this + " has arity " + arity());
@@ -158,17 +236,30 @@ abstract class OpTerm extends Term {
         }
     }
 
+    /**
+     * this implementation is tailored towards unary terms 
+     */
     static class UnaryOpTerm extends OpTerm {
 
+        /** the subterm */
         private final Term sub;
 
+        /** the Term's depth */
         private int depth = -1;
         
-        public UnaryOpTerm(Operator op, Term sub) {
+        /** creates a unary term         
+         * @param op the Operator on top
+         * @param sub the Term used as the one subterm (<em>must not</em> be null)
+         */
+        UnaryOpTerm(Operator op, Term sub) {
             this(op, new Term[]{sub});
         }
         
-        public UnaryOpTerm(Operator op, Term[] subs) {
+        /** creates a unary term         
+         * @param op the Operator on top
+         * @param sub the array of Term of length one with the one subterm (<em>must not</em> be null)
+         */
+        UnaryOpTerm(Operator op, Term[] subs) {
             super(op,op.sort(subs));
             assert subs.length == 1 : "Tried to create a unary term with more or less" +
                         " than one sub term";
@@ -176,10 +267,17 @@ abstract class OpTerm extends Term {
             fillCaches();
         }
            
+        /**
+         * returns the arity of the term which is for a unary one simply <tt>1</tt>
+         */
         public int arity() {
             return 1;
         }
 
+        /**
+         * retrieves the terms depth
+         * @return the depth of the term
+         */
         public int depth() {
             if (depth == -1) {
                 depth = sub.depth() + 1; 
@@ -187,6 +285,9 @@ abstract class OpTerm extends Term {
             return depth;
         }
 
+        /** 
+         * returns the <nr>-th subterm
+         */
         public Term sub(int nr) {
             if (nr != 0) {
                 throw new IndexOutOfBoundsException("Term " + this + " has arity " + arity());
@@ -195,11 +296,18 @@ abstract class OpTerm extends Term {
         }       
     }
 
+    /**
+     * Represents a nullary OpTerm.
+     */
     static class ConstantOpTerm extends OpTerm {
 
         private final static Term[] NOSUBS = new Term[0];
         
-        public ConstantOpTerm(Operator op) {
+        /**
+         * creates the nullary op term
+         * @param op the Operator on the top
+         */
+        ConstantOpTerm(Operator op) {
             super(op,op.sort(NOSUBS));
             fillCaches();
         }
