@@ -30,13 +30,9 @@ class ProgramTerm extends Term {
 
     /**  sub term */
     private final ArrayOfTerm subTerm; 
-    
-    private final Term subSingle;
 
     /** caches depth */
     private int depth=-1;
-
-    private int arity;
 
     /** 
      * creates a diamond term, so there is an additional
@@ -52,42 +48,32 @@ class ProgramTerm extends Term {
 		JavaBlock javaBlock, 
 		Term[] subTerm) {
 	super(op, op.sort(subTerm));
-        if (subTerm.length == 1) {
-            this.subTerm   = null;
-            this.subSingle = subTerm[0];
-            this.arity = 1;
-        } else {
-            this.subTerm   = new ArrayOfTerm(subTerm);
-            this.subSingle = null;
-            this.arity = subTerm.length;
-        }
+	this.subTerm=new ArrayOfTerm(subTerm);
 	this.javaBlock=javaBlock;
 	fillCaches();
     }
 
     /** @return n-th subterm (always the only one)*/    
     public Term sub(int n) {
-        if (n>=arity) throw new IndexOutOfBoundsException();
-	return arity > 1 ? subTerm.getTerm(n) : subSingle;
+	return subTerm.getTerm(n);
     }	
    
     /** @return arity of the quantifier term 1 as int */
     public int arity() {
-	return arity;
+	return subTerm.size();
     } 
 
     /**@return depth of the term */
     public int depth() {
-        if (this.depth == -1) {
-            int localdepth = 0;
-            for (int i=0,sz=arity(); i<sz; i++) {
-                final int subDepth = sub(i).depth();
-                if (subDepth > localdepth)
-                    localdepth = subDepth;
-            }
-            this.depth = localdepth + 1;
-        }
-        return this.depth;
+	if(this.depth == -1) {
+	    int localdepth = 0;
+	    for(int i=0;i<subTerm.size();i++) {
+		if(subTerm.getTerm(i).depth() > localdepth)
+		    localdepth = subTerm.getTerm(i).depth();
+	    }
+	    this.depth = localdepth + 1;
+	}
+	return this.depth;
     }
 
     /** @return JavaBlock if term has diamond */
@@ -112,8 +98,8 @@ class ProgramTerm extends Term {
 	    //	    sb.append("???Some Strange Modality???").append(javaBlock);
 	    sb.append("\\modality{"+op().name()).append("}").append(javaBlock).append("\\endmodality ");
 	}
-	for(int i=0; i<arity(); i++)
-           sb.append("(").append(sub(i)).append(")");
+	for(int i=0; i<subTerm.size(); i++)
+           sb.append("(").append(subTerm.getTerm(i)).append(")");
 
 	return sb.toString();
     }
