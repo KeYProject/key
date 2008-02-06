@@ -15,6 +15,7 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.List;
 
+<<<<<<< HEAD:system/de/uka/ilkd/key/java/SchemaRecoder2KeY.java
 import recoder.java.declaration.TypeDeclaration;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
@@ -28,33 +29,32 @@ import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+=======
+import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
+import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
+import de.uka.ilkd.key.java.recoderext.SchemaJavaProgramFactory;
+>>>>>>> origin/mulbrichRec2KeY:system/de/uka/ilkd/key/java/SchemaRecoder2KeY.java
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
-public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader{
-    
-    /** the namespace containing the program schema variables allowed here*/
-    protected Namespace svns;
+public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
 
-    public static KeYJavaType typeSVType = new KeYJavaType(PrimitiveType.PROGRAM_SV, ProgramSVSort.TYPE);
+	/** the namespace containing the program schema variables allowed here */
+	protected Namespace svns;
 
-    /** caches access to methods for reflection */
-    private final static HashMap schemaCt2meth = new HashMap(400);
+	/** caches access to methods for reflection */
+	private final static HashMap schemaCt2meth = new HashMap(400);
 
-    /** caches constructor access for reflection */
-    private final static HashMap recClass2schemakeyClassCons = new HashMap(400);
+	/** caches constructor access for reflection */
+	private final static HashMap recClass2schemakeyClassCons = new HashMap(400);
 
-    // could this be the servConf of the super class?
-    private static SchemaCrossReferenceServiceConfiguration schemaServConf = 
-	new SchemaCrossReferenceServiceConfiguration(new KeYRecoderExcHandler());
+	// could this be the servConf of the super class?
+	private static SchemaCrossReferenceServiceConfiguration schemaServConf = new SchemaCrossReferenceServiceConfiguration(
+			new KeYRecoderExcHandler());
 
+<<<<<<< HEAD:system/de/uka/ilkd/key/java/SchemaRecoder2KeY.java
     public SchemaRecoder2KeY(Services services,
 			     NamespaceSet nss) {
 	super(services, nss);
@@ -168,63 +168,25 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader{
 	    throw new ConvertException("Program meta construct "
 				       +mc.toString()
 				       +" unknown.");	
+=======
+	public SchemaRecoder2KeY(Services services, NamespaceSet nss) {
+		super(services, nss);
+>>>>>>> origin/mulbrichRec2KeY:system/de/uka/ilkd/key/java/SchemaRecoder2KeY.java
 	}
-    }
- 	
-
-    public ProgramMetaConstruct 
-	convert(de.uka.ilkd.key.java.recoderext.RKeYMetaConstructExpression mc) {
-	ExtList list=new ExtList();
-	String mcName = mc.getName();
-	list.add(callConvert(mc.getChild()));
-	if ("#create-object".equals(mcName)) {
-	    return new CreateObject((Expression)list.get(Expression.class));
-	} else if ("#isstatic".equals(mc.getName())) {
-	    return new IsStatic((Expression)list.get(Expression.class));	    
-	} else if ("#length-reference".equals(mcName)) {
-	    return new ArrayLength((Expression)list.get(Expression.class));
-	} else {
-	    throw new ConvertException("Program meta construct "
-				       + mc.toString()
-				       + " unknown.");	
+	
+	protected Recoder2KeYConverter makeConverter() {
+		return new SchemaRecoder2KeYConverter(this);
 	}
-    }
 
-
-    public ProgramMetaConstruct 
-	convert(de.uka.ilkd.key.java.recoderext.RKeYMetaConstructType mc) {
-	ExtList list = new ExtList();
-	list.add(callConvert(mc.getChild()));
-	if ("#typeof".equals(mc.getName0())) {
-	    return new TypeOf
-		((Expression)list.get(Expression.class));
-	} else {
-	    throw new ConvertException("Program meta construct "
-				       +mc.toString()
-				       +" unknown.");	
+	/**
+	 * returns the hashmap of a concrete RecodeR class to the constructor of its
+	 * corresponding KeY class. Speeds up reflection. Attention must be
+	 * overwritten by subclasses!
+	 */
+	protected HashMap getKeYClassConstructorCache() {
+		return recClass2schemakeyClassCons;
 	}
-    }
-
-    public MethodFrame 
-	convert(de.uka.ilkd.key.java.recoderext.RMethodCallStatement l) {
-	ProgramVariableSVWrapper svw = l.getVariableSV();
-	return new MethodFrame
-	    ((IProgramVariable) (svw != null ? svw.getSV() : null), 
-	     (IExecutionContext) callConvert(l.getExecutionContext()),
-	     (StatementBlock)callConvert(l.getBody()));
-    }
- 
-    public MethodBodyStatement 
-        convert(de.uka.ilkd.key.java.recoderext.RMethodBodyStatement l) { 
-        final IProgramVariable resVar = (IProgramVariable) 
-        ( l.getResultVar() == null ? null : l.getResultVar().getSV());
-                
-	final TypeReference tr;
-	if (l.getBodySource() instanceof TypeSVWrapper) {
-	    tr = (TypeReference)((TypeSVWrapper)l.getBodySource()).getSV();
-	} else {
-	    tr = convert(l.getBodySource());
-	}
+<<<<<<< HEAD:system/de/uka/ilkd/key/java/SchemaRecoder2KeY.java
 	               
         return new MethodBodyStatement(tr, resVar, convert(l.getMethodReference()));
     }
@@ -315,15 +277,22 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader{
 	// add class to compilation unit
 	ASTList<TypeDeclaration> typeDecls = 	    
 	    cUnit.getDeclarations();
+=======
+>>>>>>> origin/mulbrichRec2KeY:system/de/uka/ilkd/key/java/SchemaRecoder2KeY.java
 
+<<<<<<< HEAD:system/de/uka/ilkd/key/java/SchemaRecoder2KeY.java
 	if (typeDecls==null) {
 	    typeDecls=new ASTArrayList<TypeDeclaration>(0); 
 	} else {
 	    typeDecls = (ASTList<TypeDeclaration>) 
 		typeDecls.deepClone();
+=======
+	protected HashMap getMethodCache() {
+		return schemaCt2meth;
+>>>>>>> origin/mulbrichRec2KeY:system/de/uka/ilkd/key/java/SchemaRecoder2KeY.java
 	}
-	typeDecls.add(classDecl);
 
+<<<<<<< HEAD:system/de/uka/ilkd/key/java/SchemaRecoder2KeY.java
  	recoder.java.CompilationUnit compUnitContext
  	    = (recoder.java.CompilationUnit)cUnit.deepClone();
 	
@@ -405,8 +374,13 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader{
 	    iGuard = (ProgramSV)esvw.getSV();
 	} else {
 	    iGuard = convertGuard(f);
+=======
+	public void setSVNamespace(Namespace svns) {
+		this.svns = svns;
+>>>>>>> origin/mulbrichRec2KeY:system/de/uka/ilkd/key/java/SchemaRecoder2KeY.java
 	}
 
+<<<<<<< HEAD:system/de/uka/ilkd/key/java/SchemaRecoder2KeY.java
        
 	if (f.getUpdates() != null && f.getUpdates().get(0) 
 	    instanceof de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) {
@@ -416,8 +390,21 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader{
 	    ifu = (ProgramSV)esvw.getSV();
 	} else {
 	    ifu = convertUpdates(f);
+=======
+	/**
+	 * creates an empty RECODER compilation unit
+	 * 
+	 * @return the recoder.java.CompilationUnit
+	 */
+	public Context createEmptyContext() {
+		return new Context(schemaServConf, new recoder.java.CompilationUnit(),
+				schemaServConf.getProgramFactory().createClassDeclaration(null,
+						new ImplicitIdentifier("<KeYSpecialParsing>"), null,
+						null, null));
+>>>>>>> origin/mulbrichRec2KeY:system/de/uka/ilkd/key/java/SchemaRecoder2KeY.java
 	}
 
+<<<<<<< HEAD:system/de/uka/ilkd/key/java/SchemaRecoder2KeY.java
 	return new For(li, iGuard, ifu, convertBody(f));
     }
 
@@ -544,23 +531,85 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader{
  	return varSpec;
      }
 
+=======
+	/**
+	 * wraps a RECODER ClassDeclaration in a compilation unit
+	 * 
+	 * @param classDecl
+	 *            the recoder.java.ClassDeclaration to wrap
+	 * @param cUnit
+	 *            the recoder.java.CompilationUnit where the class is wrapped
+	 * @return the enclosing recoder.java.CompilationUnit
+	 */
+	protected recoder.java.CompilationUnit embedClass(
+			recoder.java.declaration.ClassDeclaration classDecl, Context context) {
 
-    public Expression convert
-	 (recoder.java.reference.FieldReference fr) {
+		recoder.java.CompilationUnit cUnit = context
+				.getCompilationUnitContext();
 
-	 ReferencePrefix prefix = null;	
-	 if (fr.getReferencePrefix() != null) {
-	     prefix = (ReferencePrefix)callConvert(fr.getReferencePrefix());
-	 }
+		// add class to compilation unit
+		recoder.list.TypeDeclarationMutableList typeDecls = cUnit
+				.getDeclarations();
 
-         SchemaVariable suffix = (SchemaVariable) callConvert(fr.getIdentifier());
-         
-         return new SchematicFieldReference(suffix, prefix);
-    }
+		if (typeDecls == null) {
+			typeDecls = new recoder.list.TypeDeclarationArrayList(0);
+		} else {
+			typeDecls = (recoder.list.TypeDeclarationMutableList) typeDecls
+					.deepClone();
+		}
+		typeDecls.add(classDecl);
+>>>>>>> origin/mulbrichRec2KeY:system/de/uka/ilkd/key/java/SchemaRecoder2KeY.java
 
-    public MethodReference convert
-	 (recoder.java.reference.MethodReference mr) {
+		recoder.java.CompilationUnit compUnitContext = (recoder.java.CompilationUnit) cUnit
+				.deepClone();
 
+		compUnitContext.setDeclarations(typeDecls);
+		compUnitContext.makeParentRoleValid();
+		schemaServConf.getChangeHistory().attached(compUnitContext);
+		schemaServConf.getChangeHistory().updateModel();
+		return compUnitContext;
+	}
+
+	/**
+	 * parses a given JavaBlock using the context to determine the right
+	 * references and returns a statement block of recoder.
+	 * 
+	 * @param block
+	 *            a String describing a java block
+	 * @param context
+	 *            recoder.java.CompilationUnit in which the block has to be
+	 *            interpreted
+	 * @return the parsed and resolved recoder statement block
+	 */
+	protected recoder.java.StatementBlock recoderBlock(String block,
+			Context context) {
+		recoder.java.StatementBlock bl = null;
+
+		SchemaJavaProgramFactory factory = (SchemaJavaProgramFactory) schemaServConf
+				.getProgramFactory();
+		factory.setSVNamespace(svns);
+		try {
+			bl = factory.parseStatementBlock(new StringReader(block));
+		} catch (recoder.ParserException e) {
+			Debug.out("readSchemaJavaBlock(Reader,CompilationUnit)"
+					+ " caused the " + "exception:\n", e);
+			Debug.out(e);
+			throw new ConvertException("Parsing: \n **** BEGIN ****\n " + block
+					+ "\n **** END ****\n failed. Thrown Exception:"
+					+ e.toString());
+		} catch (IOException ioe) {
+			Debug.out("readSchemaJavaBlock(Reader,CompilationUnit)"
+					+ " caused the IO exception:\n", ioe);
+			Debug.out(ioe);
+			throw new ConvertException(
+					"IO Error when parsing: \n **** BEGIN ****\n " + block
+							+ "\n **** END ****\n failed. Thrown IOException:"
+							+ ioe.toString());
+		}
+
+		embedClass(embedMethod(embedBlock(bl), context), context);
+
+<<<<<<< HEAD:system/de/uka/ilkd/key/java/SchemaRecoder2KeY.java
 	 // convert reference prefix    
 	final ReferencePrefix prefix;	
 	if (mr.getReferencePrefix() instanceof recoder.java.reference.UncollatedReferenceQualifier) {
@@ -590,11 +639,16 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader{
 	}
 	for (int i = 0, sz = keyArgs.length; i<sz; i++) {
 	    keyArgs[i] = (Expression)callConvert(recoderArgs.get(i));
+=======
+		return bl;
+>>>>>>> origin/mulbrichRec2KeY:system/de/uka/ilkd/key/java/SchemaRecoder2KeY.java
 	}
 
-	return new MethodReference(new ArrayOfExpression(keyArgs), name, prefix);
-    }
-    
-    public void parseSpecialClasses() {
-    }
-} 
+	/**
+	 * there is no need to parse special classes in this case, so
+	 * this is empty
+	 * @see de.uka.ilkd.key.java.Recoder2KeY#parseSpecialClasses()
+	 */
+	public void parseSpecialClasses() {
+	}
+}

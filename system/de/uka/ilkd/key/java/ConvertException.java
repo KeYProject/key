@@ -9,42 +9,56 @@
 //
 package de.uka.ilkd.key.java;
 
+/**
+ * This exception class is mainly thrown by Recoder2KeY and its companions.
+ * 
+ * It stores its reason not only by the cause mechanism of Exceptions but also
+ * separately if it is a parser error.
+ * 
+ * This information is then read by the KeYParser to produce helpful error
+ * messages.
+ * 
+ */
 public class ConvertException extends RuntimeException {
-    
-    recoder.parser.ParseException pe=null;
-    
-    de.uka.ilkd.key.parser.proofjava.ParseException pje;
 
-    public ConvertException(String errmsg) {
-	super(errmsg);
-    }
-    
-    public ConvertException(recoder.parser.ParseException pe) {
-        super(pe);
-	this.pe=pe;
-    }
+	public ConvertException(String errmsg) {
+		super(errmsg);
+	}
 
-    public ConvertException(de.uka.ilkd.key.parser.proofjava.ParseException pe){
+	public ConvertException(Throwable pe) {
         super(pe);
-	this.pje = pe;
-    }
+	}
+
+	public ConvertException(String errmsg, Throwable cause) {
+		super(errmsg, cause);
+	}
     
     public ConvertException(String errmsg, Throwable cause) {
         super(errmsg, cause);
     }
 
-    public recoder.parser.ParseException parseException() {
-	return pe;
-    }
+	public recoder.parser.ParseException parseException() {
+		if (getCause() instanceof recoder.parser.ParseException) {
+			return (recoder.parser.ParseException) getCause();
+		} else {
+			return null;
+		}
+	}
 
-    public de.uka.ilkd.key.parser.proofjava.ParseException proofJavaException(){
-	return pje;
-    }
+	public de.uka.ilkd.key.parser.proofjava.ParseException proofJavaException() {
+		if (getCause() instanceof de.uka.ilkd.key.parser.proofjava.ParseException) {
+			return (de.uka.ilkd.key.parser.proofjava.ParseException) getCause();
+		} else {
+			return null;
+		}
+	}
 
-    public String getMessage() {
-	if (pe!=null) return pe.getMessage();
-	if (pje!=null) return pje.getMessage();
-	return super.getMessage();
-    }
+	public String getMessage() {
+		String mess = super.getMessage();
+		if (getCause() != null && getCause().getMessage() != null) {
+			return mess + " - " + getCause().getMessage();
+		}
+		return mess;
+	}
     
 }

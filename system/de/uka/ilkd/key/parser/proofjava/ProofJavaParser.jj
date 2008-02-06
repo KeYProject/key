@@ -1769,9 +1769,8 @@ ConstructorDeclaration ConstructorDeclaration() :
       setPostfixInfo(id);
   }
   pdl = FormalParameters()
-
-  [ "throws" nl = TypedNameList() ]
-  "{"
+  [ "throws" nl = NameList() ]
+  ( "{"
   {
       body = factory.createStatementBlock();
       setPrefixInfo(body); 
@@ -1786,7 +1785,10 @@ ConstructorDeclaration ConstructorDeclaration() :
     ( stat = BlockStatement()
       { stats.add(stat); }
     )*
-  "}"
+    "}"
+  |
+    ";" { body = null; }
+  )
   {
       setPostfixInfo(body); 
       result.setIdentifier(id);
