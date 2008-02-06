@@ -392,6 +392,22 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     }
     
     /**
+     * Create a comment.
+     * @param text comment text
+     */
+    public Comment createComment(String text) {
+        return new Comment(text);
+    }
+    
+    /**
+     * Create a comment.
+     * @param text comment text
+     */
+    public Comment createComment(String text, boolean prefixed) {
+        return new Comment(text, prefixed);
+    }
+    
+    /**
      * Create an {@link ImplicitIdentifier}.
      */
     public ImplicitIdentifier createImplicitIdentifier(String text) {
@@ -402,6 +418,4 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     public Identifier createIdentifier(String text) {
         return new ExtendedIdentifier(text);
     }
-
-
 }

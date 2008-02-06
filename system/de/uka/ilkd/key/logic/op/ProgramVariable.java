@@ -15,7 +15,6 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.annotation.Annotation;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
@@ -193,17 +192,6 @@ public abstract class ProgramVariable extends TermSymbol
     public KeYJavaType getKeYJavaType(Services javaServ, 
 				      ExecutionContext ec) {
 	return getKeYJavaType();
-    }
-
-    /**
-     *@return the annotations.
-     */
-    public Annotation[] getAnnotations(){
-	return new Annotation[0];
-    }
-
-    public int getAnnotationCount(){
-	return 0;
     }
 
     

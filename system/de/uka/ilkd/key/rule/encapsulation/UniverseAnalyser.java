@@ -99,7 +99,8 @@ public class UniverseAnalyser {
 
         //check if pi contains any predefined local reference variables 
         //(not allowed)
-        FreeProgramVariableDetector fpvd = new FreeProgramVariableDetector(pi);
+        FreeProgramVariableDetector fpvd 
+            = new FreeProgramVariableDetector(pi, services);
         if(fpvd.findFreePV()) {
             verbose("There is a predefined local reference variable in pi. "
                     + "Canceling.");

@@ -6,15 +6,6 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//Universitaet Koblenz-Landau, Germany
-//Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
-//
-//
 
 
 package de.uka.ilkd.key.proof;
@@ -25,37 +16,26 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 
-import de.uka.ilkd.key.casetool.ModelMethod;
-import de.uka.ilkd.key.proof.mgt.Contract;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
-import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.*;
 
 public class RuleTreeModel extends DefaultTreeModel {
     
     protected Goal goal;
-    protected MutableTreeNode axiomTacletRoot 
-    = new DefaultMutableTreeNode("Taclet Base");
     protected MutableTreeNode builtInRoot 
     = new DefaultMutableTreeNode("Built-In");
-    protected MutableTreeNode lemmaRoot = new DefaultMutableTreeNode("Lemmas");
-    protected MutableTreeNode methcontrRoot 
-    = new DefaultMutableTreeNode("Method Contracts");
-    protected MutableTreeNode contrRoot 
-    = new DefaultMutableTreeNode("DL Contracts");
+    protected MutableTreeNode axiomTacletRoot 
+    = new DefaultMutableTreeNode("Taclet Base");
     protected MutableTreeNode proveableTacletsRoot 
-    = new DefaultMutableTreeNode("Auxiliary Taclets");
+    = new DefaultMutableTreeNode("Lemmas");
     
     public RuleTreeModel(Goal g) {
         super(new DefaultMutableTreeNode("Rule Base"));
         this.goal = g;
         insertAsLast(builtInRoot, (MutableTreeNode) getRoot());
         insertAsLast(axiomTacletRoot, (MutableTreeNode) getRoot());
-        insertAsLast(lemmaRoot, (MutableTreeNode) getRoot());
-        insertAsLast(proveableTacletsRoot, lemmaRoot);
-        insertAsLast(methcontrRoot, lemmaRoot);
-        insertAsLast(contrRoot, lemmaRoot);
+        insertAsLast(proveableTacletsRoot, (MutableTreeNode) getRoot());
         if (g!=null) rulesForGoal(g);
     }
 
@@ -110,24 +90,11 @@ public class RuleTreeModel extends DefaultTreeModel {
             RuleJustification just = mgt().getJustification(app);
             if (just==null) continue; // do not break system because of this
             if (just.isAxiomJustification()) {
-                insertAndGroup(new DefaultMutableTreeNode
-                        (app.taclet()), 
-                        axiomTacletRoot);
-            } else if (just instanceof RuleJustificationBySpec) {
-                RuleJustificationBySpec specJust 
-                = (RuleJustificationBySpec) just;
-                Contract ct = specJust.getContract();
-                if (ct.getObjectOfContract() instanceof ModelMethod) {
-                    insertMethodNodeInto((ModelMethod) 
-                            ct.getObjectOfContract(), ct);
-                } else if (ct.getObjectOfContract() instanceof NoPosTacletApp) {
-                    insertAndGroup
-                    (new DefaultMutableTreeNode(app.taclet()),
-                            proveableTacletsRoot);
-                } else {
-                    insertAsLast
-                    (new DefaultMutableTreeNode(ct), contrRoot);
-                }
+                insertAndGroup(new DefaultMutableTreeNode(app.taclet()), 
+                               axiomTacletRoot);
+            } else {
+                insertAndGroup(new DefaultMutableTreeNode(app.taclet()),
+                               proveableTacletsRoot);
             }
         }
     }
@@ -147,21 +114,6 @@ public class RuleTreeModel extends DefaultTreeModel {
             } 
         });
         return l;
-    }
-    
-    private void insertMethodNodeInto(ModelMethod meth, Contract ct) {
-        MutableTreeNode methNode = null;
-        for (int i=0; i<methcontrRoot.getChildCount(); i++) {
-            if (((DefaultMutableTreeNode)methcontrRoot.getChildAt(i)).
-	            getUserObject().equals(meth)) {
-                methNode = (MutableTreeNode) methcontrRoot.getChildAt(i);
-            }
-        }
-        if (methNode==null) {
-            methNode = new DefaultMutableTreeNode(meth);
-            insertAsLast(methNode, methcontrRoot);
-        }
-        insertAsLast(new DefaultMutableTreeNode(ct), methNode);
     }
     
     private TacletIndex getTacletIndex() {
@@ -184,5 +136,4 @@ public class RuleTreeModel extends DefaultTreeModel {
     public Goal getGoal() {
         return goal;
     }
-    
 }

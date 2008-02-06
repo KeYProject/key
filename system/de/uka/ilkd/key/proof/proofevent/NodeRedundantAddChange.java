@@ -23,7 +23,7 @@ public class NodeRedundantAddChange implements NodeChange {
      * returns the PosInOccurrence of the formula that has been tried to add
      * @return the PosInOccurrrence 
      */
-    public PosInOccurrence getPio() {
+    public PosInOccurrence getPos() {
         return pio;
     }
     

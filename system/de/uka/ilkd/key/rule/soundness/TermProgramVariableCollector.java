@@ -12,6 +12,7 @@ package de.uka.ilkd.key.rule.soundness;
 
 import java.util.HashSet;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
@@ -21,7 +22,14 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 public class TermProgramVariableCollector extends Visitor {
 
-    private HashSet result = new HashSet ();
+    private final HashSet result = new HashSet ();
+    private final Services services;
+    
+    
+    public TermProgramVariableCollector(Services services) {
+        this.services = services;        
+    }
+    
 
     /** is called by the execPostOrder-method of a term 
      * @param Term to checked if it is a program variable and if true the
@@ -34,7 +42,7 @@ public class TermProgramVariableCollector extends Visitor {
 	
 	if ( t.javaBlock () != JavaBlock.EMPTY_JAVABLOCK ) {
 	    ProgramVariableCollector pvc
-		= new ProgramVariableCollector ( t.javaBlock ().program () );
+		= new ProgramVariableCollector ( t.javaBlock ().program (), services );
 	    pvc.start();
 	    result.addAll ( pvc.result () );
 	}

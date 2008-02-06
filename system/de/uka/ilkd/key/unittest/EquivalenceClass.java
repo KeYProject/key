@@ -403,10 +403,8 @@ public class EquivalenceClass{
 	while(it.hasNext()){
 	    Term t = it.next();
 	    Operator op = t.op();
-            // Do you really want the addition operators below or should it be
-            // getJavaAddInt, getJavaAddLong? (RB)
-	    if(op == serv.getTypeConverter().getIntegerLDT().getArithAddition() || 
-	       op == serv.getTypeConverter().getIntLDT().getArithJavaIntAddition()){
+	    if(op == serv.getTypeConverter().getIntLDT().getAdd() || 
+	       op == serv.getTypeConverter().getLongLDT().getAdd()){
 		Integer res = null;
 		for(int i=0; i<2; i++){
 		    EquivalenceClass ec = 

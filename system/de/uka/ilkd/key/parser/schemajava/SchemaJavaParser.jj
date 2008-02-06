@@ -536,6 +536,7 @@ TOKEN :
 		    | < FINALLY: "finally" >
 		    | < FLOAT: "float" >
 		    | < FOR: "for" >
+		    | < GHOST: "ghost" >
 		    | < GOTO: "goto" >
 		    | < IF: "if" >
 		    | < IMPLEMENTS: "implements" >
@@ -576,6 +577,7 @@ TOKEN :
 		    | < TYPEOF: "#typeof" >
 		    | < SWITCHTOIF: "#switch-to-if" >
 		    | < UNPACK: "#unpack" >
+		    | < SET: "#set" >
 		    }
 
 /* LITERALS */
@@ -3719,24 +3721,24 @@ Statement BlockStatement() :
 {    
     (LOOKAHEAD((AnnotationUse())* [ "final" ]<TYPEOF> "(" <SVIDENTIFIER> ")")
      result = SVLocalVariableDeclaration() ";"
-     |  LOOKAHEAD((AnnotationUse())* [ "final" ] <SVIDENTIFIER> <SVIDENTIFIER> ";" ,
+     |  LOOKAHEAD((AnnotationUse())* [ "final" | "ghost" ] <SVIDENTIFIER> <SVIDENTIFIER> ";" ,
 	 {
-	     isLocalVariable((getToken(1).kind == FINAL ? getToken(3) : getToken(2)).toString())
+	     isLocalVariable((getToken(1).kind == FINAL || getToken(1).kind == GHOST ? getToken(3) : getToken(2)).toString())
 	 })
      result = SVLocalVariableDeclaration() ";" 
-     |  LOOKAHEAD((AnnotationUse())* [ "final" ] <SVIDENTIFIER> <SVIDENTIFIER> "=" <SVIDENTIFIER> ,
+     |  LOOKAHEAD((AnnotationUse())* [ "final" | "ghost" ] <SVIDENTIFIER> <SVIDENTIFIER> "=" <SVIDENTIFIER> ,
 	 {
-	     isLocalVariable((getToken(1).kind == FINAL ? getToken(3) : getToken(2)).toString())
+	     isLocalVariable((getToken(1).kind == FINAL || getToken(1).kind == GHOST ? getToken(3) : getToken(2)).toString())
 	 })
      result = SVLocalVariableDeclaration() ";" 	
-     |  LOOKAHEAD((AnnotationUse())* [ "final" ] Type() <SVIDENTIFIER> ";" ,
+     |  LOOKAHEAD((AnnotationUse())* [ "final" | "ghost" ] Type() <SVIDENTIFIER> ";" ,
 	 {
-	     isLocalVariable((getToken(1).kind == FINAL ? getToken(3) : getToken(2)).toString())
+	     isLocalVariable((getToken(1).kind == FINAL || getToken(1).kind == GHOST ? getToken(3) : getToken(2)).toString())
 	 })
      result = SVLocalVariableDeclaration() ";" 
-     |  LOOKAHEAD((AnnotationUse())* [ "final" ] Type() <SVIDENTIFIER> "=" <SVIDENTIFIER> ,
+     |  LOOKAHEAD((AnnotationUse())* [ "final" | "ghost" ] Type() <SVIDENTIFIER> "=" <SVIDENTIFIER> ,
 	 {
-	     isLocalVariable((getToken(1).kind == FINAL ? getToken(3) : getToken(2)).toString())
+	     isLocalVariable((getToken(1).kind == FINAL || getToken(1).kind == GHOST ? getToken(3) : getToken(2)).toString())
 	 })
      result = SVLocalVariableDeclaration() ";" 
      |
@@ -3816,6 +3818,13 @@ LocalVariableDeclaration SVLocalVariableDeclaration() :
 	Final fi = factory.createFinal(); 
 	setPrefixInfo(fi);
 	result.setDeclarationSpecifiers(new ASTArrayList<DeclarationSpecifier>(fi));
+    }
+    |
+      "ghost"
+    {
+    	Ghost g = new Ghost();
+    	setPrefixInfo(g);
+    	result.setModifiers(new ModifierArrayList(g));
     } 
     ]
 	(tr = TypeMC() | tr = TypeSV() | tr = Type() ) 
@@ -3883,6 +3892,17 @@ Expression StatementExpression() :
 	     )
 	]
 	)
+     | (
+         "#set"
+         result = PrimaryExpression()
+         "="
+         expr = Expression()
+         {
+             op = new SetAssignment(result, expr);
+             testLeftHandSide(result);
+             result = op;             
+         }
+       )
      )
 	{
 	    checkConstruction(result);
@@ -4097,7 +4117,20 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
        return result;
    }
    )
-      |
+      | 
+(      "#for-to-while" "(" innerLabel = JumpLabelSV() "," outerLabel = JumpLabelSV() "," 
+      (   stat = Statement()
+      ) ")"
+  {
+      result = factory.createRKeYMetaConstruct();
+      setPrefixInfo(result);
+      result.setChild(stat);
+      result.addSV(innerLabel);
+      result.addSV(outerLabel);
+      result.setName("#for-to-while");
+      return result; 
+  }
+)      |
       <SWITCHTOIF> "(" stat = Statement() ")"
   {  
       result = factory.createRKeYMetaConstruct();

@@ -16,11 +16,13 @@ import java.math.BigInteger;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
 import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.op.TermSymbol;
 import de.uka.ilkd.key.util.LRUCache;
 
 /**
@@ -38,7 +40,12 @@ public class Polynomial {
     
     private static final LRUCache polynomialCache = new LRUCache ( 2000 );
     private static final BigInteger MINUS_ONE = BigInteger.valueOf ( -1 );
-    
+
+    public final static Polynomial ZERO =
+        new Polynomial ( SLListOfMonomial.EMPTY_LIST, BigInteger.ZERO );    
+    public final static Polynomial ONE =
+        new Polynomial ( SLListOfMonomial.EMPTY_LIST, BigInteger.ONE );    
+
     public static Polynomial create(Term polyTerm, Services services) {
         Polynomial res = (Polynomial)polynomialCache.get ( polyTerm );
         if ( res == null ) {
@@ -65,6 +72,23 @@ public class Polynomial {
         return new Polynomial ( newParts, constantPart.multiply ( c ) );
     }
 
+    public Polynomial multiply(Monomial m) {
+        if ( m.getCoefficient ().signum () == 0 )
+            return new Polynomial ( SLListOfMonomial.EMPTY_LIST, BigInteger.ZERO );
+        
+        ListOfMonomial newParts = SLListOfMonomial.EMPTY_LIST;
+        final IteratorOfMonomial it = parts.iterator ();
+        while ( it.hasNext () )
+            newParts = newParts.prepend ( it.next ().multiply ( m ) );
+
+        if ( m.getParts ().isEmpty () )
+            return new Polynomial ( newParts,
+                                    constantPart.multiply ( m.getCoefficient () ) );
+        
+        newParts = addPart ( newParts, m.multiply ( constantPart ) );
+        return new Polynomial ( newParts, BigInteger.ZERO );
+    }
+
     public Polynomial add(BigInteger c) {
         return new Polynomial ( parts, constantPart.add ( c ) );
     }
@@ -76,6 +100,24 @@ public class Polynomial {
         final IteratorOfMonomial it = p.getParts ().iterator ();
         while ( it.hasNext () )
             newParts = addPart ( newParts, it.next ().multiply ( MINUS_ONE ) );
+        return new Polynomial ( newParts, newConst );
+    }
+    
+    public Polynomial add(Monomial m) {
+        if ( m.getParts ().isEmpty () )
+            return new Polynomial ( parts,
+                                    constantPart.add ( m.getCoefficient () ) );
+
+        return new Polynomial ( addPart ( parts, m ), constantPart );
+    }
+    
+    public Polynomial add(Polynomial p) {
+        final BigInteger newConst =
+            getConstantTerm ().add ( p.getConstantTerm () );
+        ListOfMonomial newParts = parts;
+        final IteratorOfMonomial it = p.getParts ().iterator ();
+        while ( it.hasNext () )
+            newParts = addPart ( newParts, it.next () );
         return new Polynomial ( newParts, newConst );
     }
     
@@ -153,6 +195,40 @@ public class Polynomial {
         return difference ( parts, p.parts ).isEmpty ();
     }
     
+    public Term toTerm (Services services) {
+        final TermSymbol add = 
+            services.getTypeConverter().getIntegerLDT().getAdd();
+        Term res = null;
+        
+        final IteratorOfMonomial it = parts.iterator ();
+        if ( it.hasNext () ) {
+            res = it.next ().toTerm ( services );
+            while ( it.hasNext () )
+                res = TermFactory.DEFAULT.createFunctionTerm
+                              ( add, res, it.next ().toTerm ( services ) );
+        }
+        
+        final Term cTerm = TermBuilder.DF.zTerm(services, constantPart.toString());
+        
+        if ( res == null )
+            res = cTerm;
+        else if ( !BigInteger.ZERO.equals ( constantPart ) )
+            res = TermFactory.DEFAULT.createFunctionTerm ( add, cTerm, res );
+        
+        return res;        
+    }
+    
+    public String toString() {
+        final StringBuffer res = new StringBuffer ();
+        res.append ( constantPart );
+        
+        final IteratorOfMonomial it = parts.iterator ();
+        while ( it.hasNext () )
+            res.append ( " + " + it.next () );
+
+        return res.toString ();        
+    }
+    
     private static class Analyser {
         public BigInteger constantPart = BigInteger.ZERO;
         public ListOfMonomial parts = SLListOfMonomial.EMPTY_LIST;
@@ -165,7 +241,7 @@ public class Polynomial {
             this.tc = services.getTypeConverter ();
             final IntegerLDT intLDT = tc.getIntegerLDT ();
             numbers = intLDT.getNumberSymbol ();
-            add = intLDT.getArithAddition ();
+            add = intLDT.getAdd();
         }
         
         public void analyse(Term polynomial) {

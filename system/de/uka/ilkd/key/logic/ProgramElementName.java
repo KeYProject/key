@@ -14,7 +14,6 @@ package de.uka.ilkd.key.logic;
 import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.annotation.Annotation;
 import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.ReferenceSuffix;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -178,17 +177,6 @@ public class ProgramElementName extends Name
 
     public NameCreationInfo getCreationInfo() {
     	return creationInfo;
-    }
-
-    /**
-     *@return the annotations.
-     */
-    public Annotation[] getAnnotations(){
-	return new Annotation[0];
-    }
-
-    public int getAnnotationCount(){
-	return 0;
     }
 
     public MatchConditions match(SourceData source, MatchConditions matchCond) {

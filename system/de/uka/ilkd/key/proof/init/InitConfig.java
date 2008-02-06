@@ -11,10 +11,11 @@ package de.uka.ilkd.key.proof.init;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.NoSuchElementException;
 import java.util.Map.Entry;
 
-import de.uka.ilkd.key.gui.ProofSettings;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Op;
@@ -53,7 +54,7 @@ public class InitConfig {
      * maps categories to their default choice (both represented as Strings),
      * which is used if no other choice is specified in the problemfile
      */
-    private HashMap category2DefaultChoice = new HashMap();
+    private HashMap category2DefaultChoice = new LinkedHashMap();
 
     /**
      * maps taclets to their TacletBuilders. This information is needed when
@@ -62,7 +63,7 @@ public class InitConfig {
      * GoalTemplates whose options are activated and those who don't belong
      * to any specific option.
      */
-    private HashMap taclet2Builder = new HashMap();
+    private HashMap taclet2Builder = new LinkedHashMap();
 
     /**
      * Set of the rule options activated for the current proof. The rule options
@@ -73,6 +74,8 @@ public class InitConfig {
     
     /** HashMap for quick lookups taclet name->taclet */
     private HashMapFromNameToNamed quickTacletMap;
+    
+    private String originalKeYFileName;
     
     
     
@@ -374,6 +377,7 @@ public class InitConfig {
 	try {
             someProof = ((ProofAggregate)getProofEnv().getProofs().iterator().next());
 	}catch(NoSuchElementException ne){
+	    throw new RuntimeException(ne);
 	}
         if (someProof!=null) {
             return defaultSettings.setChoiceSettings(
@@ -394,6 +398,16 @@ public class InitConfig {
         if (mod.modifyHeuristics()) ruleSetNS().add(ns.ruleSets());
         if (mod.modifyChoices()) choiceNS().add(ns.choices());
     }
+    
+    
+    public void setOriginalKeYFileName(String name) {
+        originalKeYFileName = name;
+    }
+    
+    
+    public String getOriginalKeYFileName() {
+        return originalKeYFileName;
+    }
 
    
     
@@ -408,6 +422,7 @@ public class InitConfig {
         ic.category2DefaultChoice = ((HashMap) category2DefaultChoice.clone());
         ic.setTaclet2Builder((HashMap) taclet2Builder.clone());
         ic.setTaclets(taclets);
+        ic.originalKeYFileName = originalKeYFileName;
         return ic;
     }
 

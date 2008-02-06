@@ -87,24 +87,14 @@ public class TestKey extends TestCase {
      };
 
 
-     static Class[] asmTests = new Class[] {    
- 	de.uka.ilkd.asmkey.util.graph.TestDependancyGraph.class,
-	de.uka.ilkd.asmkey.util.graph.TestGraphTraversal.class,
-	de.uka.ilkd.asmkey.util.graph.TestPathFinder.class,
-	de.uka.ilkd.asmkey.util.graph.TestAcyclicDependancyGraph.class,
-	de.uka.ilkd.asmkey.util.graph.TestTopologicalOrder.class,
-	de.uka.ilkd.asmkey.logic.TestDynamicFunction.class,
-	de.uka.ilkd.asmkey.storage.TestStorage.class,
-	de.uka.ilkd.asmkey.parser.TestAst.class,
-	de.uka.ilkd.asmkey.unit.TestUnit.class,
-	de.uka.ilkd.asmkey.unit.base.TestBase.class,
-	de.uka.ilkd.asmkey.unit.TestEarlyPass.class,
-	de.uka.ilkd.asmkey.unit.TestSecondPass.class,
-	de.uka.ilkd.asmkey.unit.TestFinalPass.class,
-	de.uka.ilkd.asmkey.unit.TestUnitManager.class
-     };
+     static Class[] speclangTests = new Class[] {
+        de.uka.ilkd.key.speclang.jml.translation.TestJMLTranslator.class,
+        de.uka.ilkd.key.speclang.ocl.translation.TestOCLTranslator.class,
+        de.uka.ilkd.key.speclang.jml.pretranslation.TestJMLPreTranslator.class
+      };
 
-    public static TestSuite createSuite(Class[] testClasses, final String msg) {
+     
+     public static TestSuite createSuite(Class[] testClasses, final String msg) {
 	TestSuite suite = new TestSuite() {
 		public void run(TestResult result) {
 		    System.out.print("[" + msg + "]: ");
@@ -120,13 +110,11 @@ public class TestKey extends TestCase {
 	return suite;
     }
 
+     
     public static junit.framework.Test suite() {
-	de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false; 	
+	de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false;
         
 	TestSuite suite = new TestSuite();
-	
-	de.uka.ilkd.key.proof.init.KeYUserProblemFile.parseLibSpecs = false;
-
 	suite.addTest(createSuite(utilityTests, "Testing Utilities and Collections"));
 	suite.addTest(createSuite(parserTests, "Testing Parsers"));
 	suite.addTest(createSuite(ruleTests, "Testing Rule Engine"));
@@ -134,9 +122,8 @@ public class TestKey extends TestCase {
 	suite.addTest(createSuite(javaTests, "Testing Java Datastructures"));
 	suite.addTest(createSuite(logicModelTests, "Testing Logic Engine"));
 	suite.addTest(createSuite(gfTests, "Testing Grammatical Framework"));
-
-	suite.addTest(createSuite(asmTests, "Running ASMKeY Tests"));
-
+        suite.addTest(createSuite(speclangTests, "Testing JML/OCL support"));
+        
 	return suite;
     }
 

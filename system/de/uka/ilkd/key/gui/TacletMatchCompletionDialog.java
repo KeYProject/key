@@ -17,7 +17,15 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.ListIterator;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -26,9 +34,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
+import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
@@ -80,29 +90,71 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 				       KeYMediator mediator) { 
 	this(new ApplyTacletDialogModel[]{model}, goal, mediator);
     }
-    
-    
-    public static void completeAndApplyApp(TacletApp app, Goal goal, 
-                                           KeYMediator medi) {
-        new TacletMatchCompletionDialog(
-            createModel(app, goal, medi), goal, medi);
+
+    public static void completeAndApplyApp(TacletApp app, Goal goal,
+            KeYMediator medi) {
+        LinkedList l = new LinkedList();
+        l.add(app);
+        completeAndApplyApp(l, goal, medi);
     }
 
+    public static void completeAndApplyApp(java.util.List l, Goal goal,
+            KeYMediator medi) {
+        ApplyTacletDialogModel[] origInstModels = new ApplyTacletDialogModel[l
+                .size()];
+        LinkedList recentInstModels = new LinkedList();
+        ListIterator tacletAppIt = l.listIterator();
 
+        for (int i = 0; i < l.size(); i++) {
+            TacletApp tA = (TacletApp) tacletAppIt.next();
+            origInstModels[i] = createModel(tA, goal, medi);
 
-    public static void completeAndApplyApp(java.util.List l, Goal goal, 
-                                           KeYMediator medi) {
-        
-        ApplyTacletDialogModel[] models = new ApplyTacletDialogModel[l.size()];
-        java.util.ListIterator it = l.listIterator();
-        for (int i=0; i<l.size(); i++) {
-            models[i] = createModel((TacletApp)it.next(), goal, medi);
-        
+            if (InstantiationFileHandler.hasInstantiationListsFor(tA
+                    .taclet())) {
+                ListIterator instListIt = InstantiationFileHandler
+                        .getInstantiationListsFor(tA.taclet()).listIterator();
+
+                while (instListIt.hasNext()) {
+                    java.util.List instantiations = (java.util.List) instListIt
+                        .next();
+                    int start = tA.instantiations().size();
+
+                    if (origInstModels[i].tableModel().getRowCount() - start ==
+                            instantiations.size()) {
+                        ApplyTacletDialogModel m = createModel(tA,
+                                goal, medi);
+                        recentInstModels.add(m);
+                        ListIterator instIt = instantiations.listIterator();
+
+                        while (instIt.hasNext()) {
+                            m.tableModel().setValueAt(instIt.next(),
+                                    start++, 1);
+                        }
+
+                    }
+
+                }
+
+            }
+
         }
-                                           
+
+        ApplyTacletDialogModel[] models = new ApplyTacletDialogModel[
+                origInstModels.length + recentInstModels.size()];
+        int i;
+
+        for (i = 0; i < origInstModels.length; i++) {
+            models[i] = origInstModels[i];
+        }
+
+        ListIterator recentInstModelIt = recentInstModels.listIterator();
+
+        while (recentInstModelIt.hasNext()) {
+            models[i++] = (ApplyTacletDialogModel) recentInstModelIt.next();
+        }
+
         new TacletMatchCompletionDialog(models, goal, medi);
     }
-    
 
     public static ApplyTacletDialogModel createModel(TacletApp app, Goal goal, 
                                                      KeYMediator medi) {
@@ -330,6 +382,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 		    mediator().getExceptionHandler().clear();
 		    return ;
 		} 
+		InstantiationFileHandler.saveListFor(model[current()]);
 		closeDialog();
 	    }
 	}
@@ -665,4 +718,144 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 	void validate();
 	void requestFocus();
     }
+
+    private static class InstantiationFileHandler {
+        private static final String INSTANTIATION_DIR = 
+            PathConfig.KEY_CONFIG_DIR + File.separator + "instantiations";
+
+        private static final String SEPARATOR1 = "<<<<<<";
+
+        private static final String SEPARATOR2 = ">>>>>>";
+
+        private static final String LINE_END = System
+                .getProperty("line.separator");
+
+        private static final int SAVE_COUNT = 5;
+
+        private static HashMap hm;
+
+        private static boolean hasInstantiationListsFor(Taclet taclet) {
+            if (hm == null) {
+                createHashMap();
+            }
+            return hm.containsKey(taclet.name().toString());
+        }
+
+        private static java.util.List getInstantiationListsFor(Taclet taclet) {
+            if (hasInstantiationListsFor(taclet)) {
+                if (hm.get(taclet.name().toString()) == null) {
+                    createListFor(taclet);
+                }
+                return (java.util.List) hm.get(taclet.name().toString());
+            }
+            return null;
+        }
+
+        private static void createHashMap() {
+            File dir = new File(INSTANTIATION_DIR);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            String[] instFiles = dir.list();
+            if (instFiles == null) {
+                hm = new HashMap(0);
+            } else {
+                // Avoid resizing of HashMap
+                hm = new HashMap(instFiles.length + 1, 1);
+                for (int i = 0; i < instFiles.length; i++) {
+                    hm.put(instFiles[i], null);
+                }
+            }
+        }
+
+        private static void createListFor(Taclet taclet) {
+            java.util.List instList = new LinkedList();
+            java.util.List instantiations = new LinkedList();
+            try {
+                BufferedReader br = new BufferedReader(new FileReader(
+                        INSTANTIATION_DIR + File.separator
+                                + taclet.name().toString()));
+                String line = br.readLine();
+                StringBuffer sb = new StringBuffer();
+                while (line != null) {
+                    if (line.equals(SEPARATOR1)) {
+                        if (sb.length() > 0) {
+                            instantiations.add(sb.toString());
+                        }
+                        sb = new StringBuffer();
+                        if (instantiations.size() > 0) {
+                            instList.add(instantiations);
+                        }
+                        instantiations = new LinkedList();
+                    } else if (line.equals(SEPARATOR2)) {
+                        if (sb.length() > 0) {
+                            instantiations.add(sb.toString());
+                        }
+                        sb = new StringBuffer();
+                    } else {
+                        if (sb.length() > 0) {
+                            sb.append(LINE_END);
+                        }
+                        sb.append(line);
+                    }
+                    line = br.readLine();
+                }
+                if (sb.length() > 0) {
+                    instantiations.add(sb.toString());
+                }
+                br.close();
+            } catch (IOException e) {
+            }
+            if (instantiations.size() > 0) {
+                instList.add(instantiations);
+            }
+            hm.put(taclet.name().toString(), instList);
+        }
+
+        private static void saveListFor(ApplyTacletDialogModel model) {
+            Taclet taclet = model.taclet();
+            TacletInstantiationsTableModel tableModel = model.tableModel();
+            int start = model.tacletApp().instantiations().size();
+            java.util.List instList = getInstantiationListsFor(taclet);
+            try {
+                BufferedWriter bw = new BufferedWriter(new FileWriter(
+                        INSTANTIATION_DIR + File.separator
+                                + taclet.name().toString()));
+                StringBuffer sb = new StringBuffer();
+                for (int i = start; i < tableModel.getRowCount(); i++) {
+                    if (i > start) {
+                        sb.append(SEPARATOR2).append(LINE_END);
+                    }
+                    sb.append(tableModel.getValueAt(i, 1)).append(LINE_END);
+                }
+                String newInst = sb.toString();
+                bw.write(newInst);
+                if (instList != null) {
+                    ListIterator instListIt = instList.listIterator();
+                    int count = 1;
+                    while (instListIt.hasNext() && count < SAVE_COUNT) {
+                        ListIterator instIt = ((java.util.List) instListIt
+                                .next()).listIterator();
+                        sb = new StringBuffer();
+                        for (int i = 0; instIt.hasNext(); i++) {
+                            if (i > 0) {
+                                sb.append(SEPARATOR2).append(LINE_END);
+                            }
+                            sb.append(instIt.next()).append(LINE_END);
+                        }
+                        String oldInst = sb.toString();
+                        if (!oldInst.equals(newInst)) {
+                            bw.write(SEPARATOR1 + LINE_END + oldInst);
+                            count++;
+                        }
+                    }
+                }
+                bw.close();
+            } catch (IOException e) {
+            }
+            hm.put(taclet.name().toString(), null);
+        }
+
+    }
+
 }

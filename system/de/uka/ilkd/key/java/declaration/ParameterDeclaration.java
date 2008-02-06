@@ -70,7 +70,7 @@ public class ParameterDeclaration extends VariableDeclaration {
         super(children,parentIsInterfaceDeclaration);
 	this.varSpec = new ArrayOfVariableSpecification(new
 	    VariableSpecification[]{(VariableSpecification)
-	        children.get(VariableSpecification.class)});
+	        children.get(VariableSpecification.class)});        
     }
 
 

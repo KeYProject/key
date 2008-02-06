@@ -19,6 +19,7 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
 
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -413,11 +414,6 @@ public class KeYMediator {
 	IteratorOfTacletApp it = applics.iterator();	
 	if (applics.size() == 1) {
 	    TacletApp firstApp = it.next();
-	    if (!getProof().mgt().ruleApplicable(firstApp, goal)) {
-                barfRuleNotApplicable(firstApp);
-                return false;
-            }
-
             boolean ifSeqInteraction = 
                firstApp.taclet().ifSequent() != Sequent.EMPTY_SEQUENT ;
             if (stupidMode && !firstApp.complete()) {                
@@ -448,13 +444,11 @@ public class KeYMediator {
             
 	    for (int i = 0; i < applics.size(); i++) {
 		rapp = it.next();
-                if (getProof().mgt().ruleApplicable(rapp, goal)) {
-                    appList.add(rapp);
-                }
+                appList.add(rapp);
             }
             
             if (appList.size()==0) {
-                 barfRuleNotApplicable(rapp);
+                 assert false;
                  return false;
             }
 
@@ -465,15 +459,6 @@ public class KeYMediator {
         return true;
     }
     
-    private void barfRuleNotApplicable(RuleApp rapp) {
-        JOptionPane.showMessageDialog
-	    (mainFrame, 
-	     "Rule not applicable." + "\n" + rapp.rule().name()
-	     +"\n"+getProof().mgt().getLastAnalysisInfo(), 
-	     "Correctness Management",
-	     JOptionPane.ERROR_MESSAGE);
-    }
-
 
     /** selected rule to apply
      * @param rule the selected built-in rule
@@ -502,22 +487,7 @@ public class KeYMediator {
 	}
     }
      
-    /** selected rule to apply
-     * @param rule the selected built-in rule
-     * @param pos the PosInSequent describes the position where to apply the
-     * rule 
-     */
-    public boolean selectedUseMethodContractRule(MethodContractRuleApp app) {
-        Goal goal = keySelectionModel.getSelectedGoal();
-        Debug.assertTrue(goal != null);        
-        if (!getProof().mgt().ruleApplicable(app, goal)) {
-            barfRuleNotApplicable(app);
-            return false;
-        }
-        applyInteractive(app, goal); 
-        return true;
-    }
-        
+      
     /**
      * Apply a RuleApp and continue with update simplification or strategy
      * application according to current settings.
@@ -666,7 +636,7 @@ public class KeYMediator {
      * @return a list of Taclets with all applicable FindTaclets
      */
 
-    protected ListOfTacletApp getFindTaclet(PosInSequent pos) {
+    public ListOfTacletApp getFindTaclet(PosInSequent pos) {
     	return interactiveProver.getFindTaclet(pos);
     }
 
@@ -674,7 +644,7 @@ public class KeYMediator {
      * (called by the SequentViewer)
      * @return a list of Taclets with all applicable RewriteTaclets
      */
-    protected ListOfTacletApp getRewriteTaclet(PosInSequent pos) {
+    public ListOfTacletApp getRewriteTaclet(PosInSequent pos) {
     	return interactiveProver.getRewriteTaclet(pos);    
     }
 
@@ -682,7 +652,7 @@ public class KeYMediator {
      * (called by the SequentViewer)
      * @return a list of Taclets with all applicable NoFindTaclets
      */
-    protected ListOfTacletApp getNoFindTaclet() {	
+    public ListOfTacletApp getNoFindTaclet() {	
     	return interactiveProver.getNoFindTaclet();
     }
 
@@ -881,10 +851,12 @@ public class KeYMediator {
      */
     public void setInteractive ( boolean b ) {
         interactiveProver.setInteractive ( b );
-        if ( b && proof != null ) {
-            proof.setRuleAppIndexToInteractiveMode ();
-        } else {
-            proof.setRuleAppIndexToAutoMode ();
+        if (proof != null) {
+            if ( b  ) {
+                proof.setRuleAppIndexToInteractiveMode ();
+            } else {
+                proof.setRuleAppIndexToAutoMode ();
+            }
         }
     }
 
@@ -1035,9 +1007,13 @@ public class KeYMediator {
 	}
 
 	public void proofPruned(ProofTreeEvent e) {
-	    ProofTreeRemovedNodeEvent ev = (ProofTreeRemovedNodeEvent) e;
+	    final ProofTreeRemovedNodeEvent ev = (ProofTreeRemovedNodeEvent) e;
 	    if (ev.getRemovedNode() == getSelectedNode()) {
-		keySelectionModel.setSelectedNode(e.getNode());
+		SwingUtilities.invokeLater(new Runnable() {
+		    public void run() {
+			keySelectionModel.setSelectedNode(ev.getNode());
+		    }
+		});
 	    }
 	}
     

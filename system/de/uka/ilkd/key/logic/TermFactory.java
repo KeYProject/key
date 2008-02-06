@@ -100,7 +100,7 @@ public class TermFactory {
             throw new IllegalArgumentException("null-Operator at"+                    
 							 "TermFactory");
         }      
-        return new OpTerm(op, new Term[]{t, index}).checked();
+        return OpTerm.createBinaryOpTerm(op, t, index).checked();
     }
 
 
@@ -124,7 +124,7 @@ public class TermFactory {
 	    throw new IllegalArgumentException("Creation of a shadowed array access term" +
                         "failed due to missing operator."); 
 	}
-	return new OpTerm(op, new Term[]{t, index, shadownum}).checked();
+	return OpTerm.createOpTerm(op, new Term[]{t, index, shadownum}).checked();
     }
 
     /** 
@@ -153,7 +153,7 @@ public class TermFactory {
         for(int i=0;i<index.length;i++){
 	    t1[1] = index[i];
 	    t1[2] = shadownum;
-	    t1[0] = new OpTerm(op, t1).checked();
+	    t1[0] = OpTerm.createOpTerm(op, t1).checked();
 	}
 	
         return t1[0];
@@ -172,13 +172,12 @@ public class TermFactory {
 	if (op == null) {
 	    throw new IllegalArgumentException("null-Operator at TermFactory"); 
 	}
-        final Term[] t1 = new Term[2];
-        t1[0]=t;
+        Term array = t;
         for(int i=0;i<index.length;i++){
-	    t1[1] = index[i];
-	    t1[0] = new OpTerm(op, t1).checked();
+	    final Term idx = index[i];
+	    array = OpTerm.createBinaryOpTerm(op, array, idx).checked();
 	}
-	return t1[0];
+	return array;
     }
 
     /**
@@ -198,12 +197,12 @@ public class TermFactory {
            final CacheKey key = new CacheKey(arrayOp, subs[0], subs[1]);
            arrayTerm = (Term) cache.get(key);
            if (arrayTerm == null) {
-               arrayTerm = new OpTerm(arrayOp, subs).checked();
+               arrayTerm = OpTerm.createOpTerm(arrayOp, subs).checked();
                cache.put(key, arrayTerm);
            }
            
        } else {
-           arrayTerm = new OpTerm(arrayOp, subs).checked();
+           arrayTerm = OpTerm.createOpTerm(arrayOp, subs).checked();
        }
  
        return arrayTerm;
@@ -215,9 +214,9 @@ public class TermFactory {
 			  "Tried to create a shadowed attribute.");
 	if (op.attribute() instanceof ProgramVariable && 
 	    ((ProgramVariable)op.attribute()).isStatic()) {
-	    return new OpTerm(op.attribute(), NO_SUBTERMS).checked();
+	    return OpTerm.createConstantOpTerm(op.attribute()).checked();
 	} 
-	return new OpTerm(op, new Term[]{term}).checked();
+	return OpTerm.createUnaryOpTerm(op, term).checked();
     }
     
     /**
@@ -251,8 +250,7 @@ public class TermFactory {
         final CacheKey key = new CacheKey(var, term);
         Term attrTerm = (Term) cache.get(key);
         if (attrTerm == null){
-            attrTerm = new OpTerm(AttributeOp.getAttributeOp(var),
-                    new Term[]{term}).checked();
+            attrTerm = OpTerm.createUnaryOpTerm(AttributeOp.getAttributeOp(var), term).checked();
             cache.put(key, attrTerm);
         } 
         return attrTerm;
@@ -266,9 +264,7 @@ public class TermFactory {
      * @return the attribute term "term.var"
      */
     public Term createAttributeTerm(SchemaVariable var, Term term) {
-	return new OpTerm
-	    (AttributeOp.getAttributeOp((IProgramVariable)var), 
-	     new Term[]{term}).checked();
+	return OpTerm.createUnaryOpTerm(AttributeOp.getAttributeOp((IProgramVariable)var), term).checked();
     }
 
 
@@ -287,7 +283,7 @@ public class TermFactory {
      * CARE! THERE IS NO CHECK THAT THE EQUALITY OPERATOR MATCHES THE TERMS.
      */
     public Term createEqualityTerm(Equality op, Term[] subTerms) {	
-        return new OpTerm(op, subTerms).checked();
+        return OpTerm.createOpTerm(op, subTerms).checked();
     }
 
     /**
@@ -363,7 +359,7 @@ public class TermFactory {
 	if (op==null) throw new IllegalArgumentException("null-Operator at"+
 							 "TermFactory");
 	
-	return new OpTerm(op, subTerms).checked();
+	return OpTerm.createOpTerm(op, subTerms).checked();
     }
 
 
@@ -398,8 +394,7 @@ public class TermFactory {
      * Create an 'if-then-else' term (or formula)
      */
     public Term createIfThenElseTerm(Term condF, Term thenT, Term elseT) {
-        return new OpTerm ( Op.IF_THEN_ELSE,
-                            new Term [] { condF, thenT, elseT } );
+        return OpTerm.createOpTerm(Op.IF_THEN_ELSE, new Term [] { condF, thenT, elseT });
     }
     
 
@@ -459,7 +454,7 @@ public class TermFactory {
     public Term createJunctorTerm(Junctor op, Term[] subTerms) {
 	if (op==null) throw new IllegalArgumentException("null-Operator at"+
 							 "TermFactory");
-	return new OpTerm(op, subTerms).checked();
+	return OpTerm.createOpTerm(op, subTerms).checked();
     }
     
     /** some methods for the creation of junctor terms with automatically performed simplification
@@ -472,7 +467,9 @@ public class TermFactory {
                 return createJunctorTerm(Op.FALSE);
             } else if (t1.op() == Op.FALSE) {
                 return createJunctorTerm(Op.TRUE);
-            }
+            } else if (t1.op() == Op.NOT) {
+		return t1.sub(0);
+	    }
         }
         return createJunctorTerm(op, t1);
     }
@@ -534,7 +531,7 @@ public class TermFactory {
     public Term createMetaTerm(MetaOperator op, Term[] subTerms) {
 	if (op==null) throw new IllegalArgumentException("null-Operator at"+
 							 "TermFactory");    
-	return new OpTerm(op, subTerms).checked();
+	return OpTerm.createOpTerm(op, subTerms).checked();
     }
 
     public Term createProgramTerm(Operator op, 
@@ -612,20 +609,18 @@ public class TermFactory {
 
     public Term createShadowAttributeTerm(ProgramVariable var, 
 					    Term term, Term shadownum) {
-	return new OpTerm(ShadowAttributeOp.getShadowAttributeOp(var), 
-	        new Term[]{term, shadownum}).checked();
+	return OpTerm.createOpTerm(ShadowAttributeOp.getShadowAttributeOp(var), new Term[]{term, shadownum}).checked();
     }
 
 
     public Term createShadowAttributeTerm(SchemaVariable var,
 					    Term term, Term shadownum) {
-	return new OpTerm(ShadowAttributeOp.getShadowAttributeOp((IProgramVariable)var), 
-	        new Term[]{term, shadownum}).checked();
+	return OpTerm.createOpTerm(ShadowAttributeOp.getShadowAttributeOp((IProgramVariable)var), new Term[]{term, shadownum}).checked();
     }
     
     public Term createShadowAttributeTerm(ShadowAttributeOp op, 
 					    Term term, Term shadownum) {
-	return new OpTerm(op, new Term[]{term, shadownum}).checked();
+	return OpTerm.createOpTerm(op, new Term[]{term, shadownum}).checked();
     }
 
 
@@ -700,14 +695,6 @@ public class TermFactory {
 			   JavaBlock javaBlock) {
 	if (op==null) {
 	    throw new IllegalArgumentException("null-Operator at TermFactory");
-	} else if (op instanceof Operator2) {
-	    /* If the operator is an instance of Operator2, the
-	     * operator can create the term by itself. Operator2
-	     * supports no Java blocks and no ruleVar. */
-	    if (javaBlock != JavaBlock.EMPTY_JAVABLOCK) {
-		throw new IllegalArgumentException("Non-empty JavaBlock in Operator2.");
-	    } 
-	    return ((Operator2) op).createTerm(vars, subTerms);
 	} else if (op instanceof Quantifier) {
 	    return createQuantifierTerm((Quantifier)op, vars, subTerms[0]);
 	} else if ( op instanceof QuanUpdateOperator ) {
@@ -737,29 +724,6 @@ public class TermFactory {
 			  JavaBlock javaBlock) {
 	if (op==null) {
 	    throw new IllegalArgumentException("null-Operator at TermFactory");
-	} else if (op instanceof Operator2) {
-	    /* 
-	     * If the operator is an instance of Operator2, the
-	     * operator can create the term by itself. Operator2
-	     * supports no Java blocks and no ruleVar. 
-	     *
-	     * Operator2 restrict the use of quantified variables. 
-	     */
-	    if (javaBlock != JavaBlock.EMPTY_JAVABLOCK) {
-		throw new IllegalArgumentException("Non-empty JavaBlock in Operator2.");
-	    } 
-	    List list = new ArrayList();
-	    if (bv != null) {
-		for (int i = 0; i < bv.length; ++i) {
-		    for (int j = 0; j < bv[i].size(); ++j) {
-			list.add(bv[i].getQuantifiableVariable(j));
-		    }
-		}
-	    }
-	    final QuantifiableVariable[] vars = (QuantifiableVariable[]) list.
-		toArray(new QuantifiableVariable[list.size()]);
-	    return ((Operator2) op).createTerm
-		(new ArrayOfQuantifiableVariable(vars), subTerms);
 	} else if (op instanceof Quantifier) {
 	    return createQuantifierTerm((Quantifier)op, bv[0], subTerms[0]);
 	} else if (op instanceof QuanUpdateOperator) {
@@ -984,7 +948,7 @@ public class TermFactory {
     public Term createVariableTerm(LogicVariable v) {
         Term varTerm = (Term)cache.get(v);
         if (varTerm == null) {
-            varTerm = new OpTerm(v, NO_SUBTERMS).checked();
+            varTerm = OpTerm.createConstantOpTerm(v).checked();
             cache.put(v, varTerm);
         }
         return varTerm;
@@ -998,7 +962,7 @@ public class TermFactory {
     public Term createVariableTerm(ProgramVariable v) {
         Term varTerm = (Term)cache.get(v);
         if (varTerm == null) {
-            varTerm = new OpTerm(v, NO_SUBTERMS).checked();
+            varTerm = OpTerm.createConstantOpTerm(v).checked();
             cache.put(v, varTerm);
         }
         return varTerm;
@@ -1012,7 +976,7 @@ public class TermFactory {
     public Term createVariableTerm(SchemaVariable v) {
         Term varTerm = (Term)cache.get(v);
         if (varTerm == null) {
-            varTerm = new OpTerm(v, NO_SUBTERMS).checked();
+            varTerm = OpTerm.createConstantOpTerm(v).checked();
             cache.put(v, varTerm);
         } 
         return varTerm;

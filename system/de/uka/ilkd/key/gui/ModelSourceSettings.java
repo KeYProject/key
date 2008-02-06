@@ -14,6 +14,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Properties;
 
+import de.uka.ilkd.key.gui.configuration.Settings;
+import de.uka.ilkd.key.gui.configuration.SettingsListener;
+
 public class ModelSourceSettings implements Settings{
 
     private static final String MODEL_SOURCE_KEY = "[Model]Source";

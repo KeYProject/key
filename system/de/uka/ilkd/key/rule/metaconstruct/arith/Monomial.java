@@ -37,6 +37,9 @@ public class Monomial {
     
     private static final LRUCache monomialCache = new LRUCache ( 2000 );
     
+    public static final Monomial ONE = new Monomial ( SLListOfTerm.EMPTY_LIST,
+                                                      BigInteger.ONE );
+    
     public static Monomial create(Term monoTerm, Services services) {
         Monomial res = (Monomial)monomialCache.get ( monoTerm );
         if ( res == null ) {
@@ -121,7 +124,7 @@ public class Monomial {
      * @return the result of dividing the monomial <code>m</code> by the
      *         monomial <code>this</code>
      */
-    public Monomial divide(Monomial m) {
+    public Monomial reduce(Monomial m) {
         final BigInteger a = m.coefficient;
         final BigInteger c = this.coefficient;
 
@@ -194,7 +197,7 @@ public class Monomial {
     
     public Term toTerm (Services services) {
         final TermSymbol mul = 
-	    services.getTypeConverter().getIntegerLDT().getArithMultiplication();
+	    services.getTypeConverter().getIntegerLDT().getMul();
         Term res = null;
         
         final IteratorOfTerm it = parts.iterator ();
@@ -216,6 +219,17 @@ public class Monomial {
         return res;        
     }
     
+    public String toString() {
+        final StringBuffer res = new StringBuffer ();
+        res.append ( coefficient );
+        
+        final IteratorOfTerm it = parts.iterator ();
+        while ( it.hasNext () )
+            res.append ( " * " + it.next () );
+
+        return res.toString ();
+    }
+    
     private static class Analyser {
         public BigInteger coeff = BigInteger.ONE;
         public ListOfTerm parts = SLListOfTerm.EMPTY_LIST;
@@ -224,9 +238,9 @@ public class Monomial {
         	
         public Analyser(final Services services) {
             this.services = services;
-	    final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
-            numbers = intLDT.getNumberSymbol();
-            mul     = intLDT.getArithMultiplication();
+	    final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+            numbers = integerLDT.getNumberSymbol();
+            mul     = integerLDT.getMul();
         }
         
         public void analyse(Term monomial) {

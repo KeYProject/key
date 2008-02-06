@@ -13,6 +13,7 @@ package de.uka.ilkd.key.java.visitor;
 import java.util.HashSet;
 
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.declaration.ImplicitFieldSpecification;
@@ -37,15 +38,9 @@ public class DeclarationProgramVariableCollector extends JavaASTVisitor {
 
 
     /** creates a new declaration visitor */
-    public DeclarationProgramVariableCollector(ProgramElement root) {
-	super(root);
-    }
-
-    /** the action that is performed just before leaving the node the
-     * last time 
-     */
-    protected void doAction(ProgramElement node) {
-	node.visit(this);
+    public DeclarationProgramVariableCollector(ProgramElement root, 
+                                               Services services) {
+	super(root, services);
     }
     
     /** starts the walker*/

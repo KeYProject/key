@@ -11,7 +11,6 @@
 
 package de.uka.ilkd.key.java;
 
-import de.uka.ilkd.key.java.annotation.Annotation;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 /**
@@ -27,12 +26,6 @@ public interface ProgramElement extends SourceElement, ModelElement {
      */
     Comment[] getComments();
 
-    /**
-     *@return the annotations.
-     */
-    Annotation[] getAnnotations();
-
-    int getAnnotationCount();
 
        
     /**

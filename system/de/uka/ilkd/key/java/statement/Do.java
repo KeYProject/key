@@ -12,7 +12,6 @@
 package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.annotation.Annotation;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -51,9 +50,8 @@ public class Do extends LoopStatement {
      *      @param guard an expression.
      *      @param body a statement.
      */
-    public Do(Expression guard, Statement body, PositionInfo pos, 
-	      Annotation[] a) {
-        super(guard, body, a, pos);	
+    public Do(Expression guard, Statement body, PositionInfo pos) {
+        super(guard, body, pos);	
     }
 
  

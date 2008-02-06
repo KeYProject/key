@@ -1,6 +1,6 @@
 		*********************************
 		* KeY Source Code Installation  * 
-		* Version 1.0.0                 *
+		* Version 1.2.0                 *
 		*********************************
 
 
@@ -28,7 +28,7 @@ Needed additional Libraries:
 Optionally, KeY can make use of the following binaries:
 	Grammatical Framework
 	ESC Java's decision procedure `Simplify´
-        SMT-LIB provers: bindings exist currently for Yices, CVSLite and SVC
+        SMT-LIB provers: bindings exist currently for Yices, CVCLite, CVC3 and SVC
               (export to SMT input file possible)        
 
 (2) Contents of the KeY-Distribution

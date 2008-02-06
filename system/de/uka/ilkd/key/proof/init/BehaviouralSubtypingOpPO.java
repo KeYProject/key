@@ -13,13 +13,9 @@ package de.uka.ilkd.key.proof.init;
 import java.util.Iterator;
 import java.util.Map;
 
-import de.uka.ilkd.key.casetool.ModelClass;
-import de.uka.ilkd.key.casetool.UMLModelClass;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.proof.mgt.Contract;
-import de.uka.ilkd.key.proof.mgt.Contractable;
 import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.util.Debug;
 
 
 /**
@@ -35,12 +31,14 @@ public class BehaviouralSubtypingOpPO extends AbstractPO {
     //constructors
     //-------------------------------------------------------------------------
   
-    public BehaviouralSubtypingOpPO(UMLModelClass subtype, 
-                                    ModelClass supertype, 
+    public BehaviouralSubtypingOpPO(InitConfig initConfig,
+	    			    KeYJavaType subKJT, 
+                                    KeYJavaType superKJT, 
                                     Map contractPairs) {
-        super("BehaviouralSubtypingOp of " + subtype.getClassName() + " and " 
-                                           + supertype.getClassName(),
-              subtype);
+        super(initConfig,
+              "BehaviouralSubtypingOp of " + subKJT.getName() + " and " 
+                                           + superKJT.getName(),
+              subKJT);
         pairPOs = SLListOfProofOblInput.EMPTY_LIST;
         
         Iterator it = contractPairs.entrySet().iterator();
@@ -49,11 +47,12 @@ public class BehaviouralSubtypingOpPO extends AbstractPO {
             OperationContract subContract   = (OperationContract)(e.getKey());
             OperationContract superContract = (OperationContract)(e.getValue());
             ProofOblInput pairPO 
-                    = new BehaviouralSubtypingOpPairPO(subContract, 
+                    = new BehaviouralSubtypingOpPairPO(initConfig,
+                	    			       subContract, 
                                                        superContract); 
             pairPOs = pairPOs.append(pairPO); 
         }        
-        Debug.assertFalse(pairPOs.isEmpty());
+        assert !pairPOs.isEmpty();
     }
     
   
@@ -78,24 +77,5 @@ public class BehaviouralSubtypingOpPO extends AbstractPO {
             poTerms[i]   = pairPO.getTerm2();
             poNames[i++] = pairPO.name() + " - Post";
         }
-    }
-
-    
-    public void setInitConfig(InitConfig conf) {
-        super.setInitConfig(conf);
-        IteratorOfProofOblInput it = pairPOs.iterator();
-        while(it.hasNext()) {
-            it.next().setInitConfig(conf);
-        }
-    }
-
-
-    public Contractable[] getObjectOfContract() {
-        return new Contractable[0];
-    }
-
-  
-    public boolean initContract(Contract ct) {
-        return false;
     }
 }

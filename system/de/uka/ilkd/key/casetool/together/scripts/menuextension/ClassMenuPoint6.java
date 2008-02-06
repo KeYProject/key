@@ -10,15 +10,18 @@
 
 package de.uka.ilkd.key.casetool.together.scripts.menuextension;
 
-import de.uka.ilkd.key.casetool.FunctionalityOnModel;
-import de.uka.ilkd.key.casetool.UMLModelClass;
+import de.uka.ilkd.key.casetool.together.FunctionalityOnModel;
+import de.uka.ilkd.key.casetool.together.TogetherModelClass;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 
 public class ClassMenuPoint6 extends ClassMenu {
     public String getMenuEntry(){
-        return "BehaviouralSubtypingInv";
+        return "BehaviouralSubtypingOp";
     }
 
-    protected String runCore(UMLModelClass modelClass){
-        return FunctionalityOnModel.proveBehaviouralSubtypingInv(modelClass);
+    protected String runCore(TogetherModelClass modelClass)
+    		throws ProofInputException {
+        FunctionalityOnModel.proveBehaviouralSubtypingOp(modelClass);
+        return "";
     }
 }

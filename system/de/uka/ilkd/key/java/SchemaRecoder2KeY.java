@@ -105,6 +105,11 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader{
                         (LoopStatement)list.get(LoopStatement.class));	 
 	} else if ("#unpack".equals(mcName)) {	
 	    return new Unpack((For)list.get(For.class));
+	} else if ("#for-to-while".equals(mcName)) {
+		final ProgramSV[] labels = mc.getSV();
+        return new ForToWhile
+        (labels[0], labels[1], 
+                    (Statement)list.get(Statement.class));	
 	} else if ("#do-break".equals(mcName)) {	
 	    return new DoBreak((LabeledStatement)list.get(LabeledStatement.class));
 	} else if ("#expand-method-body".equals(mcName)) {		    
@@ -350,7 +355,7 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader{
 	    Debug.out("readSchemaJavaBlock(Reader,CompilationUnit)"
 		      + " caused the " +
 		      "exception:\n", e);
-	    Debug.printStackTrace(e);
+	    Debug.printStackTrace(e); 
 	    throw new ConvertException
 		("Parsing: \n **** BEGIN ****\n "+ block + 
 		 "\n **** END ****\n failed. Thrown Exception:" +

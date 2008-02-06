@@ -20,8 +20,10 @@ import de.uka.ilkd.key.strategy.feature.*;
  */
 public class VBTStrategy extends JavaCardDLStrategy {
 
-    protected  static StrategyProperties setupStrategyProperties() {
+    protected static StrategyProperties setupStrategyProperties() {
         final StrategyProperties res = new StrategyProperties ();
+        res.setProperty( StrategyProperties.SPLITTING_OPTIONS_KEY,
+                StrategyProperties.SPLITTING_NORMAL);  
         res.setProperty ( StrategyProperties.LOOP_OPTIONS_KEY,
                           StrategyProperties.LOOP_EXPAND );
         res.setProperty ( StrategyProperties.METHOD_OPTIONS_KEY,
@@ -33,14 +35,17 @@ public class VBTStrategy extends JavaCardDLStrategy {
         return res;
     }
     
-    protected VBTStrategy(Proof p_proof) {
-        
-        super ( p_proof, setupStrategyProperties () );
+    protected VBTStrategy(Proof p_proof, StrategyProperties strategyProperties) {
+        super(p_proof, strategyProperties);
 
         clearRuleSetBindings ( getCostComputationDispatcher (), "test_gen" );
         bindRuleSet ( getCostComputationDispatcher (), "test_gen",
                       add ( longConst ( -1000 ),
-			    NonDuplicateAppModPositionFeature.INSTANCE));
+                            NonDuplicateAppModPositionFeature.INSTANCE));
+        clearRuleSetBindings ( getCostComputationDispatcher (), "test_gen_quan_num" );
+        bindRuleSet ( getCostComputationDispatcher (), "test_gen_quan_num",
+                      add ( longConst ( 30000 ),
+                            NonDuplicateAppModPositionFeature.INSTANCE));
         clearRuleSetBindings ( getCostComputationDispatcher (), "split_cond" );
         bindRuleSet ( getCostComputationDispatcher (), "split_cond", -1000);
         clearRuleSetBindings ( getCostComputationDispatcher (), "split" );
@@ -54,18 +59,24 @@ public class VBTStrategy extends JavaCardDLStrategy {
                 inftyConst () );
         clearRuleSetBindings ( getCostComputationDispatcher (), "cut_direct" );
         bindRuleSet ( getCostComputationDispatcher (), "cut_direct",
-		      inftyConst ());
+                      inftyConst ());
         clearRuleSetBindings ( getCostComputationDispatcher (), "simplify_prog" );
         bindRuleSet ( getCostComputationDispatcher (), "simplify_prog",
-		      10000);
+                      10000);
         clearRuleSetBindings ( getCostComputationDispatcher (), "simplify_prog_subset" );
         bindRuleSet ( getCostComputationDispatcher (), "simplify_prog_subset",
-		      10000);
+                      10000);   
+    }
+    
+    protected VBTStrategy(Proof p_proof) {
+        
+        this ( p_proof, setupStrategyProperties () );
+
     }
 
-    
-
-    
+    protected boolean arithDefOps() {
+	return true;
+    }   
     
     public Name name () {
         return new Name("VBTStrategy");

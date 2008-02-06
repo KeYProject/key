@@ -10,190 +10,223 @@
 
 package de.uka.ilkd.key.proof.mgt;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import de.uka.ilkd.key.casetool.ModelMethod;
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
-import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
-import de.uka.ilkd.key.jml.JMLClassSpec;
-import de.uka.ilkd.key.logic.IteratorOfTerm;
-import de.uka.ilkd.key.logic.SetOfTerm;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IteratorOfProgramMethod;
-import de.uka.ilkd.key.logic.op.ListOfProgramMethod;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.SetAsListOfProof;
+import de.uka.ilkd.key.proof.SetOfProof;
+import de.uka.ilkd.key.proof.init.EnsuresPO;
+import de.uka.ilkd.key.proof.init.EnsuresPostPO;
+import de.uka.ilkd.key.proof.init.PreservesInvPO;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.init.RespectsModifiesPO;
 import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.ListOfClassInvariant;
-import de.uka.ilkd.key.speclang.SLListOfClassInvariant;
-import de.uka.ilkd.key.speclang.TranslatedClassInvariant;
+import de.uka.ilkd.key.speclang.IteratorOfClassInvariant;
+import de.uka.ilkd.key.speclang.IteratorOfOperationContract;
+import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.speclang.SetAsListOfClassInvariant;
+import de.uka.ilkd.key.speclang.SetAsListOfOperationContract;
+import de.uka.ilkd.key.speclang.SetOfClassInvariant;
+import de.uka.ilkd.key.speclang.SetOfOperationContract;
 
-/** 
- * The repository where all specification (contracts) of a proof
- * environment are contained. An instance must belong to only one
- * {@link ProofEnvironment}.
- */
+
 public class SpecificationRepository {
     
-    private Map contracts = new HashMap();
-    private LinkedHashMap invariants = null;
-    private Services services;
-     
-    public SpecificationRepository(Services services) {
-        this.services = services;
-    }
+    private final Map /*ProgramMethod -> SetOfOperationContract*/ contracts 
+    		= new LinkedHashMap();
+    private final Map /*String -> OperationContract*/ contractsByName
+                = new LinkedHashMap();
+    private final Map /*KeYJavaType -> SetOfClassInvariant*/ invs
+    		= new LinkedHashMap();
+    private final Map /*String -> ClassInvariant*/ invsByName
+                = new LinkedHashMap();
+    private final Map /*KeYJavaType -> SetOfClassInvariant*/ throughoutInvs
+    		= new LinkedHashMap();
+    private final Map /*String -> ClassInvariant*/ throughoutInvsByName
+                = new LinkedHashMap();
+    private final Map /*EnsuresPO -> SetOfProof*/ proofs
+                = new LinkedHashMap();
+    private final Map /*LoopStatement -> LoopInvariant*/ loopInvs
+                = new LinkedHashMap();
     
-    // TODO: ensure fixed order (?)
-    private void createClassInvariants() {   
-        final SortedSet allClassesSorted = 
-            new TreeSet(new KeYJavaType.LexicographicalKeYJavaTypeOrder());
-        allClassesSorted.addAll(services.getJavaInfo().getAllKeYJavaTypes());
-        
-        final Iterator it = allClassesSorted.iterator();
-        invariants = new LinkedHashMap();
-        while (it.hasNext()) {
-            final KeYJavaType kjt    = (KeYJavaType) it.next();
-            final JMLClassSpec jmlcs = services.getImplementation2SpecMap().getSpecForClass(kjt);
-            if (jmlcs!=null) {
-                SetOfTerm terms = jmlcs.getAllQuantifiedInvariants();
-                IteratorOfTerm it2 = terms.iterator();
-                while (it2.hasNext()) {
-                    Term t = it2.next();
-                    if (t!=null) {
-                        ClassInvariant inv = new TranslatedClassInvariant(
-                                new JavaModelClass(kjt, 
-                                        services.getJavaInfo().getJavaSourcePath(), 
-                                        services), t, services);
-                        ListOfClassInvariant invs = (ListOfClassInvariant) invariants.get(kjt);
-                        if (invs==null) {
-                            invs = SLListOfClassInvariant.EMPTY_LIST;
-                        }
-                        invariants.put(kjt, invs.prepend(inv));
-                    }
-                }
-            }
-        }                  
-    }
-    
-    /** returns an iterator of specifications ({@link Contract})
-     * contained in this repository. Modifications to the underlying
-     * set are not allowed.
-     */
-    public Iterator getSpecs() {
-	return contracts.values().iterator();
-    }
 
-    public Contract getContractByName(String name) {
-        Iterator it = contracts.entrySet().iterator();
-        while (it.hasNext()) {
-            Contract ct = (Contract)((ContractSet) 
-                     ((Map.Entry)it.next()).getValue()).iterator().next();
-            if (ct.getName().equals(name)) {
-                return ct;
+    //-------------------------------------------------------------------------
+    //public interface
+    //------------------------------------------------------------------------- 
+    
+    public SetOfOperationContract getOperationContracts(ProgramMethod pm) {
+	SetOfOperationContract result 
+            = (SetOfOperationContract) contracts.get(pm);
+        return result == null ? SetAsListOfOperationContract.EMPTY_SET : result;
+    }
+    
+    
+    public SetOfOperationContract getOperationContracts(ProgramMethod pm, 
+	    						Modality modality) {
+	SetOfOperationContract result = getOperationContracts(pm);
+	IteratorOfOperationContract it = result.iterator();
+	while(it.hasNext()) {
+	    OperationContract contract = it.next();
+	    if(!contract.getModality().equals(modality)) {
+		result = result.remove(contract);
+	    }
+	}
+	return result;
+    }
+    
+
+    public OperationContract getOperationContractByName(String name) {
+        return (OperationContract) contractsByName.get(name);
+    }
+    
+    
+    public SetOfClassInvariant getClassInvariants(KeYJavaType kjt) {
+	SetOfClassInvariant result = (SetOfClassInvariant) invs.get(kjt);
+	return result == null ? SetAsListOfClassInvariant.EMPTY_SET : result;
+    }
+    
+
+    public ClassInvariant getClassInvariantByName(String name) {
+        return (ClassInvariant) invsByName.get(name);
+    }
+    
+    
+    public SetOfClassInvariant getThroughoutClassInvariants(KeYJavaType kjt) {
+	SetOfClassInvariant result 
+		= (SetOfClassInvariant) throughoutInvs.get(kjt);
+        return result == null ? SetAsListOfClassInvariant.EMPTY_SET : result;
+    }
+    
+    public ClassInvariant getThroughoutClassInvariantByName(String name) {
+        return (ClassInvariant) throughoutInvsByName.get(name);
+    }
+    
+    
+    public SetOfProof getProofs(ProofOblInput po) {
+        SetOfProof result = (SetOfProof) proofs.get(po);
+        return result == null ? SetAsListOfProof.EMPTY_SET : result; 
+    }
+    
+    
+    public SetOfProof getProofs(ProgramMethod pm) {
+        SetOfProof result = SetAsListOfProof.EMPTY_SET;
+        Iterator it = proofs.entrySet().iterator();
+        while(it.hasNext()) {
+            Map.Entry entry = (Map.Entry) it.next();
+            EnsuresPO po = (EnsuresPO) entry.getKey();
+            SetOfProof sop = (SetOfProof) entry.getValue();
+            if(po.getProgramMethod().equals(pm)) {
+                result = result.union(sop);
+            }
+        }
+        return result;
+    }
+    
+    
+    public ProgramMethod getOperationForProof(Proof proof) {
+        Iterator it = proofs.entrySet().iterator();
+        while(it.hasNext()) {
+            Map.Entry entry = (Map.Entry) it.next();
+            EnsuresPO po = (EnsuresPO) entry.getKey();
+            SetOfProof sop = (SetOfProof) entry.getValue();
+            if(sop.contains(proof)) {
+                return po.getProgramMethod();
             }
         }
         return null;
     }
     
-    /** returns a set of contracts with the argument as identifying
-     * contracted object.
-     */
-    public ContractSet getContract(Object objOfContract) {
-    	Object o = objOfContract;
-    	if(objOfContract instanceof ModelMethod) {
-    		o = convertToProgramMethod((ModelMethod)objOfContract);
-    	}
-	    return (ContractSet) contracts.get(o);
+    
+    public LoopInvariant getLoopInvariant(LoopStatement loop) {
+        return (LoopInvariant) loopInvs.get(loop);
+    }
+
+        
+    public void addOperationContract(OperationContract contract) {
+	ProgramMethod pm = contract.getProgramMethod();
+        String name = contract.getName();
+        assert contractsByName.get(name) == null 
+               : "Tried to add a contract with a non-unique name!";
+        contracts.put(pm, getOperationContracts(pm).add(contract));
+        contractsByName.put(name, contract);
     }
     
-    /** returns a set of contracts with one of the elements in 
-     * the argument list as identifying contracted object.
-     */
-    public ContractSet getContracts(ListOfProgramMethod objsOfContract,
-                                    Modality modality) {
-        ContractSet ctSet = new ContractSet();
-        IteratorOfProgramMethod it = objsOfContract.iterator();
-        while (it.hasNext()) {
-            ContractSet cs = getContract(it.next());
-            if (cs!=null) {
-                ctSet.addAll(cs.getMethodContracts(modality));
+    
+    public void addOperationContracts(SetOfOperationContract contracts) {
+        IteratorOfOperationContract it = contracts.iterator();
+        while(it.hasNext()) {
+            addOperationContract(it.next());
+        }
+    }
+    
+    
+    public void addClassInvariant(ClassInvariant inv) {
+	KeYJavaType kjt = inv.getKJT();
+        String name = inv.getName();
+        assert invsByName.get(name) == null
+               : "Tried to add an invariant with a non-unique name!";
+	invs.put(kjt, getClassInvariants(kjt).add(inv));
+        invsByName.put(name, inv);
+    }
+    
+    
+    public void addClassInvariants(SetOfClassInvariant invs) {
+        IteratorOfClassInvariant it = invs.iterator();
+        while(it.hasNext()) {
+            addClassInvariant(it.next());
+        }
+    }
+    
+    
+    public void addThroughoutClassInvariant(ClassInvariant inv) {
+	KeYJavaType kjt = inv.getKJT();
+        String name = inv.getName();
+        assert throughoutInvsByName.get(name) == null
+               : "Tried to add an invariant with a non-unique name!";
+	throughoutInvs.put(kjt, getThroughoutClassInvariants(kjt).add(inv));
+        throughoutInvsByName.put(name, inv);
+    }
+    
+    
+    public void addThroughoutClassInvariants(SetOfClassInvariant invs) {
+        IteratorOfClassInvariant it = invs.iterator();
+        while(it.hasNext()) {
+            addThroughoutClassInvariant(it.next());
+        }
+    }
+    
+    
+    public void registerProof(ProofOblInput po, Proof proof) {
+        if(po instanceof EnsuresPostPO 
+           || po instanceof PreservesInvPO 
+           || po instanceof RespectsModifiesPO) {
+            proofs.put(po, getProofs(po).add(proof));
+        }
+    }    
+    
+    
+    public void removeProof(Proof proof) {
+        Iterator it = proofs.entrySet().iterator();
+        while(it.hasNext()) {
+            Map.Entry entry = (Map.Entry) it.next();
+            SetOfProof sop = (SetOfProof) entry.getValue();
+            if(sop.contains(proof)) {
+                proofs.put(entry.getKey(), sop.remove(proof));
+                return;
             }
         }
-        return ctSet;
     }
     
-    /** returns a set of contracts with the argument as identifying
-     * contracted object.
-     */
-    public ContractSet getContract(Object objOfContract, Modality modality) {
-        ContractSet ctSet = getContract(objOfContract);
-        if (ctSet==null) {
-            return new ContractSet();            
-        }
-        ctSet = ctSet.getMethodContracts(modality);
-        if (ctSet==null) {
-            return new ContractSet();
-        }
-        return ctSet;
-    }
-        
     
-    /** adds a contract to this specification repository.
-     */
-    public Contract add(Contract ct) {
-	Object o = ct.getObjectOfContract();
-	if (o instanceof ModelMethod) {
-		o = convertToProgramMethod((ModelMethod)o);
-	}
-	ContractSet cs =(ContractSet) contracts.get(o);
-	if (cs==null) {
-	    cs = new ContractSet();
-	    contracts.put(o, cs);
-	}	
-	return cs.add(ct);
+    public void setLoopInvariant(LoopInvariant inv) {
+        LoopStatement loop = inv.getLoop();
+        loopInvs.put(loop, inv);
     }
-    
-    public void removeProofList(ProofAggregate pl) {
-	Iterator it = getSpecs();
-	while (it.hasNext()) {
-	    Object o = it.next();
-	    ((ContractSet) o).removeProofList(pl);
-	}
-    }
-    
-    public ListOfClassInvariant getAllInvariantsForType(KeYJavaType kjt) {
-        if (invariants == null) {
-            createClassInvariants();
-        }
-        return invariants.containsKey(kjt) ? (ListOfClassInvariant) invariants.get(kjt)
-                : SLListOfClassInvariant.EMPTY_LIST;
-    }
-        
-    public SpecificationRepository copy(Services s) {
-        final SpecificationRepository res = new SpecificationRepository(s);
-        res.contracts  = this.contracts; //TODO deepcopy
-        res.invariants = this.invariants; //TODO
-        return res;
-    }
-
-//------------------------ Helper methods -----------------------------//
-    
-    private ProgramMethod convertToProgramMethod(ModelMethod m) {
-    	JavaInfo javaInfo = services.getJavaInfo();
-    	KeYJavaType containingClass = javaInfo.getKeYJavaTypeByClassName(m.getContainingClassName());
-    	String name = m.getName();
-    	
-    	ListOfKeYJavaType signature = SLListOfKeYJavaType.EMPTY_LIST;    	
-    	for(int i=0;i<m.getNumParameters();i++) {
-    		signature = signature.append(javaInfo.getKeYJavaType(m.getParameterTypeAt(i)));
-    	}
-    	
-    	return javaInfo.getProgramMethod(containingClass,name,signature,javaInfo.getJavaLangObject());
-    }
-    
 }
-

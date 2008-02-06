@@ -16,7 +16,6 @@ import javax.swing.ProgressMonitor;
 
 import org.apache.log4j.Logger;
 
-import de.uka.ilkd.key.casetool.ModelMethod;
 import de.uka.ilkd.key.casetool.together.TogetherGFInterface;
 import de.uka.ilkd.key.casetool.together.TogetherModelMethod;
 import de.uka.ilkd.key.ocl.gf.CallbackPrePost;
@@ -34,7 +33,7 @@ public class OpMenuPoint2 extends OpMenu {
 	return null;
     }
 
-    protected String runCore(ModelMethod modelMethod){
+    protected String runCore(TogetherModelMethod modelMethod){
 	if (timelogger.isDebugEnabled()) {
 		timelogger.debug(System.currentTimeMillis() + "  ObMenuPoint6 runCore");
 	}

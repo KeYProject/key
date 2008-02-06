@@ -1,26 +1,26 @@
 [rules]
-and_left  = "Here could stand your slogan. Edit <tt>assistantDictionary.dct</tt>"
-and_right = "Splitting goals is fun."
+andLeft  = "Here could stand your slogan. Edit <tt>assistantDictionary.dct</tt>"
+andRight = "Splitting goals is fun."
 
-or_left   =  "Here could stand your slogan. Edit <tt>assistantDictionary.dct</tt>"
-or_right  =  "Alpha rules are boring, am I right?"
+orLeft   =  "Here could stand your slogan. Edit <tt>assistantDictionary.dct</tt>"
+orRight  =  "Alpha rules are boring, am I right?"
 
-all_left  =  "You applied rule all_left. Do you know that you do not necessary need to enter an instantiation. Just press Apply. You can also apply this rule via drag and drop, just drag the quantified formula on the term you want it to instantiate with."
-ex_right  =  "You applied rule ex_right. Do you know that you do not necessary need to enter an instantiation. Just press Apply. You can also apply this rule via drag and drop, just drag the quantified formula on the term you want it to instantiate with."
+allLeft  =  "You applied rule all_left. Do you know that you do not necessary need to enter an instantiation. Just press Apply. You can also apply this rule via drag and drop, just drag the quantified formula on the term you want it to instantiate with."
+exRight  =  "You applied rule ex_right. Do you know that you do not necessary need to enter an instantiation. Just press Apply. You can also apply this rule via drag and drop, just drag the quantified formula on the term you want it to instantiate with."
 
-all_left_hide = "The quantified formula has been hidden. Add it to the sequent again by applying rule 'insertHidden'. You can also apply this rule via drag and drop, just drag the quantified formula on the term you want it to instantiate with."
-ex_right_hide = "The quantified formula has been hidden. Add it to the sequent again by applying rule 'insertHidden'. You can also apply this rule via drag and drop, just drag the quantified formula on the term you want it to instantiate with."
+allLeftHide = "The quantified formula has been hidden. Add it to the sequent again by applying rule 'insertHidden'. You can also apply this rule via drag and drop, just drag the quantified formula on the term you want it to instantiate with."
+exRightHide = "The quantified formula has been hidden. Add it to the sequent again by applying rule 'insertHidden'. You can also apply this rule via drag and drop, just drag the quantified formula on the term you want it to instantiate with."
 
-inst_all  =  "You have instantiated a quantifier. Next time try to drag the term on the quantifier."
-inst_ex   =  "You have instantiated a quantifier. Next time try to drag the term on the quantifier."
+instAll  =  "You have instantiated a quantifier. Next time try to drag the term on the quantifier."
+instEx   =  "You have instantiated a quantifier. Next time try to drag the term on the quantifier."
 
 int_induction  = "It looks like you are trying to prove a loop. Do you want to:
 	    <ul> <li> bite into your desk </li>
     		 <li> postpone till tomorrow </li>
     		 <li> despair and give up now? </li> </ul>" 
 
-apply_eq_rigid = "Alternatively you can drag and drop the equation on the term you want to replace."
-apply_eq = "Alternatively you can drag and drop the equation on the term you want to replace."
+applyEqRigid = "Alternatively you can drag and drop the equation on the term you want to replace."
+applyEq = "Alternatively you can drag and drop the equation on the term you want to replace."
 
 make_insert_eq = "Alternatively, you can click on the term where you want to apply the equation and use rule <tt>apply_eq</tt>"
 make_insert_eq_nonrigid = "Alternatively, you can click on the term where you want to apply the equation and use rule <tt>apply_eq</tt>"
@@ -28,14 +28,15 @@ make_insert_eq_nonrigid = "Alternatively, you can click on the term where you wa
 cut_direct_r = "This rule is rather useless. You may looking for rule <tt>cut</tt> which can be found by clicking on the sequent arrow."
 cut_direct_l = "This rule is rather useless. You may looking for rule <tt>cut</tt> which can be found by clicking on the sequent arrow."
 
-instance_of_static_eval = "Applying this rule may not have any effect, if <tt>instanceof</tt> cannot be resolved in a static manner.
-			   Use then rule <tt>instanceof_to_exist_true</tt> instead."
 
-method_call = "You have executed a method call. The if cascade is used to resolve the dynamical binding of methods."
-method_call_with_assignment = "You have executed a method call. The if-cascade is used to resolve the dynamical binding of methods."
+methodCall = "You have executed a method call. The if cascade is used to resolve the dynamical binding of methods."
+methodCallWithAssignment = "You have executed a method call. The if-cascade is used to resolve the dynamical binding of methods."
 
-unwind_while = "This rule unwinds a while loop exactly once. Breaks and continues are handled accordingly by introducing up to two new labels."
+loopUnwind = "This rule unwinds a while loop exactly once. Breaks and continues are handled accordingly by introducing up to two new labels."
 
+whileInvBox = "When you have annotated the loop invariant in the source code, you do not need to enter the invariant manually. Further you can then set the strategy option 'Loop Treatment' to 'Invariant', which causes the invariant rule to be applied automatically." 
+whileInvDiamond = "When you have annotated the loop invariant in the source code, you do not need to enter the invariant manually. Using this rule will most probably urge you to do an induction. It is often easier to use a variant (non-negative, steady decreasing expression), so you should consider using the rule 'whileInvDiamondDec' instead." 
+whileInvDiamondDec = "When you have annotated the loop invariant in the source code, you do not need to enter the invariant manually. Further you can then set the strategy option 'Loop Treatment' to 'Invariant', which causes the invariant rule to be applied automatically." 
 
 [toolbar]
 goalBack = "You have set back a goal. For pruning complete subtrees, right click on the node above the subtree in the proof tree view and select Prune Proof."

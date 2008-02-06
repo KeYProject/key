@@ -13,6 +13,7 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -61,8 +62,10 @@ public class ReplaceWhileLoop extends CreatingASTVisitor {
      * @param innerLabel
      *           the ProgramElementName of the inner label
      */
-    public ReplaceWhileLoop(ProgramElement root, StatementBlock toInsert) {	
-        super(root, true);
+    public ReplaceWhileLoop(ProgramElement root, 
+                            StatementBlock toInsert, 
+                            Services services) {	
+        super(root, true, services);
 	this.toInsert = toInsert;
         firstWhileFound = false;
     }
@@ -76,8 +79,8 @@ public class ReplaceWhileLoop extends CreatingASTVisitor {
      *           the SVInstantiations if available
      */
     public ReplaceWhileLoop(ProgramElement root, SVInstantiations inst,
-			    StatementBlock toInsert) {
-        super(root, true);
+			    StatementBlock toInsert, Services services) {
+        super(root, true, services);
 	this.toInsert = toInsert;
         firstWhileFound = false;
         instantiations = (inst == null ? 

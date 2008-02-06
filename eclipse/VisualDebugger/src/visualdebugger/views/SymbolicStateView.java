@@ -30,7 +30,13 @@ import visualdebugger.draw2d.ObjectFigure;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IteratorOfProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.visualdebugger.*;
+import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
+import de.uka.ilkd.key.visualdebugger.DebuggerListener;
+import de.uka.ilkd.key.visualdebugger.VisualDebugger;
+import de.uka.ilkd.key.visualdebugger.statevisualisation.StateVisualization;
+import de.uka.ilkd.key.visualdebugger.statevisualisation.SymbolicArrayObject;
+import de.uka.ilkd.key.visualdebugger.statevisualisation.SymbolicObject;
+import de.uka.ilkd.key.visualdebugger.statevisualisation.SymbolicObjectDiagram;
 
 public class SymbolicStateView extends ViewPart implements DebuggerListener {
 
@@ -392,9 +398,7 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
     }
 
     static void buildNodeFigure(Figure contents, Node node, ObjectFigure of) {
-
-        contents
-                .add(of, new Rectangle(node.x, node.y, node.width, node.height));
+        contents.add(of, new Rectangle(node.x, node.y, node.width, node.height));
         new Dragger(of);
     }
 
@@ -461,8 +465,6 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
                         .getSo());
             else     {   
                 this.setConstraints(currentState.getConstraints(al.getValueterm()),symbolicObjects,al.getSo());
-                System.out.println(currentState.getConstraints(al.getValueterm()));
-                System.out.println((al.getValueterm()));
             }
 
 //            else
@@ -514,12 +516,13 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
             }
 
             if (result>-1){
-                if (!preState)
-                currentState = stateVis.getSymbolicState(prestateForTracesSlider.getSelection(),possibleIndexTerms[result],false);
-                else
+                if (!preState) {
+                    currentState = stateVis.getSymbolicState(prestateForTracesSlider.getSelection(),possibleIndexTerms[result],false);
+                } else {
                     currentState = stateVis.getSymbolicState(prestateForTracesSlider.getSelection(),possibleIndexTerms[result],true);
+                }
                 arrayIndexSlider.setSelection(result);
-            refreshVisualizedState();
+                refreshVisualizedState();
             } else {
                 MessageDialog.openInformation(PlatformUI.getWorkbench()
                         .getActiveWorkbenchWindow().getShell(),
@@ -662,13 +665,16 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
             startRefreshThread();
         } else if (event.getType() == DebuggerEvent.PROJECT_LOADED_SUCCESSFUL) {
             stateVis = null;
-              startRefreshThread();
+            startRefreshThread();
         }
     }
 
     static class Dragger extends MouseMotionListener.Stub implements
             MouseListener {
         public Dragger(IFigure figure) {
+            figure.removeMouseMotionListener(this);
+            figure.removeMouseListener(this);                
+            
             figure.addMouseMotionListener(this);
             figure.addMouseListener(this);
         }

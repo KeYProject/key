@@ -96,7 +96,7 @@ class HandleArith {
         Term cd = formatArithTerm ( problem, services );
         Term ab = formatArithTerm ( axiom, services );
         if ( cd.op() == Op.FALSE || ab.op() == Op.FALSE ) return problem;
-        Function addfun = services.getTypeConverter ().getIntegerLDT ().getArithAddition ();
+        Function addfun = services.getTypeConverter ().getIntegerLDT ().getAdd();
         Term arithTerm = tb.geq ( tb.func ( addfun, cd.sub ( 0 ), ab.sub ( 1 ) ),
                                   tb.func ( addfun, ab.sub ( 0 ), cd.sub ( 1 ) ),
                                   services );
@@ -133,7 +133,7 @@ class HandleArith {
         if ( op == geq ) {
             if ( opNot )
                         pro = tb.geq ( pro.sub ( 1 ),
-                                       tb.func ( ig.getArithAddition (),
+                                       tb.func ( ig.getAdd(),
                                                  pro.sub ( 0 ),
                                                  tb.zTerm ( services, "1" ) ),
                                        services );
@@ -141,7 +141,7 @@ class HandleArith {
             if ( op == leq ) {
                 if ( opNot )
                     pro = tb.geq ( pro.sub ( 0 ),
-                                   tb.func ( ig.getArithAddition (),
+                                   tb.func ( ig.getAdd (),
                                              pro.sub ( 1 ),
                                              tb.zTerm ( services, "1" ) ),
                                    services );

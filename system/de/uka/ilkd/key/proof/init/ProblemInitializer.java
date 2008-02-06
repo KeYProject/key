@@ -11,10 +11,10 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Vector;
 import java.util.Map.Entry;
 
@@ -23,9 +23,9 @@ import recoder.io.ProjectSettings;
 
 import org.apache.log4j.Logger;
 
-import de.uka.ilkd.key.gui.LibrariesSettings;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.ProofSettings;
+import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.CompilationUnit;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
@@ -52,7 +52,6 @@ import de.uka.ilkd.key.proof.mgt.RuleConfig;
 import de.uka.ilkd.key.rule.IteratorOfBuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
-import de.uka.ilkd.key.util.KeYResourceManager;
 
 
 public class ProblemInitializer {
@@ -65,7 +64,7 @@ public class ProblemInitializer {
     private final Services services;
     private final UpdateSimplifier simplifier;
     
-    private final HashSet alreadyParsed = new HashSet();
+    private final HashSet alreadyParsed = new LinkedHashSet();
     
     
     //-------------------------------------------------------------------------
@@ -81,10 +80,8 @@ public class ProblemInitializer {
     }
   
     
-    /**
-     * For tests only
-     */
-    public ProblemInitializer(Profile profile) { 
+    public ProblemInitializer(Profile profile) {
+	assert profile != null;
 	this.main       = null;
         this.profile    = profile;
         this.services   = new Services();
@@ -182,8 +179,10 @@ public class ProblemInitializer {
 	    String name = (String) it.next();
 	    keyFile[i++] = new KeYFile(name, 
 				       in.get(name), 
-				       (main==null) ? null : 
-				       main.getProgressMonitor());
+				       (main == null 
+                                        ? null 
+				        : main.getProgressMonitor()),
+                                        false);
 	}
 	LDTInput ldtInp = new LDTInput(keyFile, main);
 	
@@ -214,7 +213,8 @@ public class ProblemInitializer {
 	    KeYFile keyFile = new KeYFile(fileName, 
 					  in.get(fileName),
 					  (main==null) ?
-					  null : main.getProgressMonitor());
+					  null : main.getProgressMonitor(),
+                                          false);
 	    readEnvInput(keyFile, initConfig, readLibraries);
 	}
     }
@@ -236,18 +236,18 @@ public class ProblemInitializer {
             final String fileName = (String) entry.getKey();
             final Boolean  sel =  (Boolean) entry.getValue();
             if (sel.booleanValue()) {
-                File file;
+                RuleSource rs;
                 if (!fileName.startsWith(File.separator)) {
-                    KeYResourceManager rm = KeYResourceManager.getManager();
-                    URL url = rm.getResourceFile(RuleSource.class,
-                                                path+fileName);
-                    file = new File(url.getFile());
+                    rs = RuleSource.initRuleFile(path+fileName);
                 } else {
-                    file = new File(fileName);
+                    rs = RuleSource.initRuleFile(fileName);
                 }
-                KeYFile keyFile = new KeYFile(fileName, file, 
-                            (main == null) ? null : main
-                        .getProgressMonitor());
+                KeYFile keyFile = new KeYFile(fileName, 
+					      rs, 
+                                              (main == null 
+                                               ? null 
+                                               : main.getProgressMonitor()),
+                                               false);
                 readEnvInput(keyFile, initConfig);
             }
         }
@@ -263,14 +263,18 @@ public class ProblemInitializer {
 	Vector v=new Vector();
 	if (cfile.isDirectory()) {
 	    String[] list=cfile.list();
-	    for (int i=0; i<list.length; i++) {
-		String fullName = cfile.getPath()+File.separator+list[i];
-		File n=new File(fullName);
-		if (n.isDirectory()) {		    
-		    v.addAll(getClasses(fullName));
-		} else if (list[i].endsWith(".java")) {
-		    v.add(fullName);	
-		}
+	    // mu(2008-jan-28): if the directory is not readable for the current user
+	    // list is set to null, which results in a NullPointerException.
+	    if(list != null) {
+	        for (int i=0; i<list.length; i++) {
+	            String fullName = cfile.getPath()+File.separator+list[i];
+	            File n=new File(fullName);
+	            if (n.isDirectory()) {		    
+	                v.addAll(getClasses(fullName));
+	            } else if (list[i].endsWith(".java")) {
+	                v.add(fullName);	
+	            }
+	        }
 	    }
 	    return v;
 	} else {
@@ -324,14 +328,13 @@ public class ProblemInitializer {
     private void readJava(EnvInput envInput, InitConfig initConfig) 
     		throws ProofInputException {
 	envInput.setInitConfig(initConfig);
-	String javaPath = envInput.readJavaPath();	                      
-        
+	String javaPath = envInput.readJavaPath();
 	if(javaPath != null) {
     	    //read Java	
-    	    reportStatus("Reading Java model");
+            reportStatus("Reading Java model");
             ProjectSettings settings = 
                 initConfig.getServices().getJavaInfo().getKeYProgModelInfo()
-                	      .getServConf().getProjectSettings();
+                	  .getServConf().getProjectSettings();
             PathList searchPathList = settings.getSearchPathList();
             
             if(searchPathList.find(javaPath) == null) {
@@ -344,12 +347,6 @@ public class ProblemInitializer {
             } else {                 
                 String[] cus = (String[]) getClasses(javaPath).toArray(new String[]{});
                 CompilationUnit[] compUnits = r2k.readCompilationUnitsAsFiles(cus);
-                //temporary hack
-                if(envInput instanceof KeYUserProblemFile) {
-                    KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
-                    kupf.readActivatedChoices();
-                    kupf.readJML(compUnits);
-                }
                 initConfig.getServices().getJavaInfo().setJavaSourcePath(javaPath);               
 
                 //checkin Java model to CVS
@@ -376,17 +373,20 @@ public class ProblemInitializer {
 	    readIncludes(envInput, initConfig, readLibraries);
 	    	    
 	    //read Java
-	    readJava(envInput, initConfig);
+//	    readJava(envInput, initConfig);
 	    
 	    //read libraries
 	    if(readLibraries) {
 	    	readLibraries(envInput, initConfig);
 	    }
 	    
+            //read Java
+            readJava(envInput, initConfig);	
+            
 	    //read envInput itself
 	    reportStatus("Reading "+envInput.name(), 
 		    	 envInput.getNumberOfChars());
-	    //System.out.println("Reading envInput: " + envInput.name());
+//	    System.out.println("Reading envInput: " + envInput.name());
 	    envInput.setInitConfig(initConfig);
 	    envInput.read(ModStrategy.NO_VARS_GENSORTS);//envInput.read(ModStrategy.NO_VARS_FUNCS_GENSORTS);	    
 	    reportReady();
@@ -438,7 +438,6 @@ public class ProblemInitializer {
 	ProofEnvironment env = initConfig.getProofEnv();
 	
 	//read activated choices
-	po.setInitConfig(initConfig);
 	po.readActivatedChoices();
     	initConfig.createNamespacesForActivatedChoices();
         
@@ -450,12 +449,11 @@ public class ProblemInitializer {
 	env.setRuleConfig(ruleConfig);
 	
 	//possibly reuse an existing proof environment
-	if(main != null) {
+	if(main != null && po.askUserForEnvironment()) {
     	    ProofEnvironment envChosen = 
     	    GlobalProofMgt.getInstance().getProofEnvironment(
     						env.getJavaModel(), 
-    						env.getRuleConfig(),
-    						po.askUserForEnvironment());
+    						env.getRuleConfig());
         	
             if(envChosen != null) {
         	assert envChosen.getInitConfig().getProofEnv() == envChosen;
@@ -463,15 +461,12 @@ public class ProblemInitializer {
             } 
 	}
 	
+	
 	//register the proof environment
 	if(main != null) {
 	    GlobalProofMgt.getInstance().registerProofEnvironment(env);
 	}
     	               	
-	//read specs (TODO)
-	po.setInitConfig(initConfig);
-	po.readSpecs();
-
 	return initConfig;
     }
 
@@ -522,9 +517,12 @@ public class ProblemInitializer {
 	    RuleSource tacletBase = profile.getStandardRules().getTacletBase();
 	    if(tacletBase != null) {
     	    	KeYFile tacletBaseFile
-    	    		= new KeYFile("taclet base", 
-		 	      profile.getStandardRules().getTacletBase(),
-			      (main==null) ? null : main.getProgressMonitor());
+    	    	    = new KeYFile("taclet base", 
+    	    		          profile.getStandardRules().getTacletBase(),
+			          (main == null 
+                                   ? null 
+                                   : main.getProgressMonitor()),
+                                   false);
     	    	readEnvInput(tacletBaseFile, lastBaseConfig, false);
 	    }
 	}
@@ -554,13 +552,12 @@ public class ProblemInitializer {
 	assert initConfig != null;
 	stopInterface();
         
-        try{
+        try {
             //determine environment
             initConfig = determineEnvironment(po, initConfig);
            
             //read problem
     	    reportStatus("Loading problem \""+po.name()+"\"");
-    	    po.setInitConfig(initConfig);
     	    po.readProblem(ModStrategy.NO_FUNCS);
     	    reportReady();
     	    
@@ -596,10 +593,10 @@ public class ProblemInitializer {
     
     public void tryReadProof(ProblemLoader prl, ProofOblInput problem) 
     		throws ProofInputException {
-	if (problem instanceof KeYFile) {
-	    KeYFile proof = (KeYFile)problem;
-	    reportStatus("Loading proof", proof.getNumberOfChars());
-	    proof.readProof(prl);
+	if(problem instanceof KeYUserProblemFile) {
+	    KeYUserProblemFile kupf = (KeYUserProblemFile)problem;
+	    reportStatus("Loading proof", kupf.getNumberOfChars());
+	    kupf.readProof(prl);
 	}
     }
 }

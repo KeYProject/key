@@ -33,6 +33,7 @@ import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.inst.RigidnessException;
 import de.uka.ilkd.key.rule.inst.SortException;
+import de.uka.ilkd.key.util.Array;
 
 
 public class TacletInstantiationsTableModel extends AbstractTableModel {
@@ -367,12 +368,13 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 					    getContextInstantiation().activeStatementContext());
 		    if(nvc.isDefinedByElementSort()){
 		        Sort s = kjt.getSort();
-			if(s instanceof ArraySort) s = ((ArraySort)s).elementSort();
+			if(s instanceof ArraySort) s = ((ArraySort)s).elementSort();              
 			kjt = javaInfo.getKeYJavaType(s);
 		    }
 		} else {
 		    kjt = javaInfo.getKeYJavaType((Sort)o);
 		}
+                assert kjt != null;
 		return new LocationVariable
 		    (VariableNamer.parseName(instantiation), kjt);
 	    }
@@ -483,7 +485,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 		    } else {
 		        // sv.isSkolemTermSV ()
                         
-                        Named n = services.getNamespaces().
+                        Named n = namespaces().
                             lookupLogicSymbol(new Name(idd.getName()));
                         if (n == null) { 
                             result = result.createSkolemConstant
@@ -528,7 +530,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
                 } else if (sv.isListSV()){
                     try{
                         SetOfLocationDescriptor s = parseLocationList(irow);
-                        result = result.addInstantiation(sv, s.toArray(), true);
+                        result = result.addInstantiation(sv, Array.reverse(s.toArray()), true);
                     }catch (ParserException pe) {
                         Location loc = pe.getLocation();
                         if (loc != null) {

@@ -37,7 +37,7 @@ public class FindRightishFeature implements Feature {
     }
 
     private FindRightishFeature(IntegerLDT numbers) {
-        add = numbers.getArithAddition ();
+        add = numbers.getAdd();
     }
     
     public RuleAppCost compute ( RuleApp app, PosInOccurrence pos, Goal goal ) {

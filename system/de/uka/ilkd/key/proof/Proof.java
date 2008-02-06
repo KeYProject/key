@@ -16,14 +16,16 @@ import java.util.List;
 import java.util.Vector;
 
 import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.gui.ProofSettings;
-import de.uka.ilkd.key.gui.SettingsListener;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.init.SpecExtPO;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.DefaultProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
@@ -110,12 +112,14 @@ public class Proof implements Named {
    
     
     private Strategy activeStrategy;
+//    implemented by mbender for jmltest
+    private SpecExtPO specExtPO;
     
     /** constructs a new empty proof with name */
     private Proof(Name name, Services services, ProofSettings settings) {
-	this.name = name;
+        this.name = name;
         assert services != null : "Tried to create proof without valid services.";
-	this.services = services.copyProofSpecific();
+	this.services = services.copyProofSpecific(this);
         this.settings = settings;
         
         metavariableDeliverer = new MetavariableDeliverer ( this );
@@ -306,11 +310,6 @@ public class Proof implements Named {
             it.next ().setGoalStrategy(ourStrategy);
     }
 
-    /** counter required to give the taclets a unique name */
-    public int getUniqueTacletNr(Node undoAnchor) {
-        return getServices().getCounter("tacletNumber").getCountPlusPlus(undoAnchor);
-    }
-    
     /** 
      * returns the default simplifier to be used (may be overwritten by branch
      * specific simplifiers in the future)
@@ -796,11 +795,6 @@ public class Proof implements Named {
 	}
     }
     
-    public void addRuleSource(RuleSource src) {
-        problemHeader += src.getInclusionString()+"\n";
-    }
-    
-    
 
     /**
      * retrieves number of branches
@@ -826,6 +820,27 @@ public class Proof implements Named {
 	result.append("\nProoftree:\n");
 	result.append(root.toString());
 	return result.toString();
+    }
+
+    // implemented by mbender for jmltest
+
+    /**
+     * This method is just used for jmltest
+     * 
+     * @param specExtPO
+     *                The Specification Extraction Proof Obligation to be set
+     */
+    public void setPO(SpecExtPO specExtPO) {
+        this.specExtPO = specExtPO;
+    }
+
+    /**
+     * This method is just used for jmltest
+     * 
+     * @return The Specification Extraction Proof Obligation used for this proof
+     */
+    public SpecExtPO getPO() {
+        return specExtPO;
     }
 
   

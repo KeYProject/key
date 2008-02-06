@@ -29,9 +29,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
 
     /** used to extract branch labels
      */
-    private static final String[] WHILE_TACLETS = { "while_inv_box",
-        "while_inv_diamond", "while_inv_diamond_dec", "while_inv_box_trc",
-        "while_inv_diamond_trc", "while_inv_diamond_dec_trc" };
+    private static final String LOOP_INVARIANT_PROPOSAL_RULESET = "loop_invariant_proposal";
 
 
     private Services services;
@@ -1539,7 +1537,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
             while (it.hasNext()){
                 RenamingTable rt =  it.next();
                 HashMap hm = rt.getHashMap();
-                ProgVarReplacer pvr = new ProgVarReplacer(hm);
+                ProgVarReplacer pvr = new ProgVarReplacer(hm, services);
                 SemisequentChangeInfo sci =pvr.replace(semi);
                 semi = sci.semisequent();
             }
@@ -1555,7 +1553,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
             while (it.hasNext()){
                 RenamingTable rt = it.next();
 		HashMap hm = rt.getHashMap();
-		ProgVarReplacer pvr = new ProgVarReplacer(hm);
+		ProgVarReplacer pvr = new ProgVarReplacer(hm, services);
 		formula = pvr.replace(formula);
             }
         }
@@ -1569,7 +1567,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
      */
     
     private void setLabel(ContextTraceElement ste) {
-        if (tacletWithLabel(ste.node(), WHILE_TACLETS)) {
+        if (tacletWithLabel(ste.node(), LOOP_INVARIANT_PROPOSAL_RULESET)) {
             final TraceElement next = ste.getNextInProof();
             if (next != TraceElement.END) {
 		final IteratorOfNode it = ste.node().childrenIterator();
@@ -1585,14 +1583,15 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
     }
 
     
-    private boolean tacletWithLabel(Node n, String[] names) {
+    private boolean tacletWithLabel(Node n, String ruleSet) {
         if (n.getAppliedRuleApp() instanceof TacletApp) {
-            String name = ((TacletApp) n.getAppliedRuleApp()).taclet().name()
-                    .toString();
-            for (int i = 0; i < names.length; i++) {
-                if (names[i].equals(name)) {
+            final Name ruleSetName = new Name(ruleSet); 
+            final IteratorOfRuleSet rs =  ((TacletApp) n.getAppliedRuleApp()).taclet().ruleSets();
+    
+            while (rs.hasNext()) {
+                if (rs.next().name().equals(ruleSetName)) {
                     return true;
-		}
+                }
             }
         }
         return false;

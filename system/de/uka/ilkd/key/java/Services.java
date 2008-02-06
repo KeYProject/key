@@ -16,15 +16,13 @@ import java.util.Iterator;
 import de.uka.ilkd.key.casetool.UMLInfo;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
-import de.uka.ilkd.key.jml.Implementation2SpecMap;
 import de.uka.ilkd.key.logic.InnerVariableNamer;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.proof.Counter;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.speclang.jml.JMLTranslator;
-import de.uka.ilkd.key.speclang.ocl.OCLTranslator;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
@@ -35,6 +33,11 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
  * transform Java program elements to logic (where possible) and back.
  */
 public class Services{
+    
+    /**
+     * the proof
+     */
+    private Proof proof;
 
     /**
      * proof specific namespaces (functions, predicates, sorts, variables)
@@ -62,27 +65,9 @@ public class Services{
     private UMLInfo umlinfo;
     
     /**
-     * a translator for OCL expressions
-     */
-    private final OCLTranslator oclTranslator = new OCLTranslator(this);
-    
-    /**
-     * a translator for JML expressions
-     */
-    private final JMLTranslator jmlTranslator = new JMLTranslator(this);
-
-
-    /**
-     * mapping for jml specifications
-     * @deprecated
-     */
-    private Implementation2SpecMap specMap;
-
-    /**
      * variable namer for inner renaming
      */
-    private VariableNamer innerVarNamer = new InnerVariableNamer(this);
-
+    private final VariableNamer innerVarNamer = new InnerVariableNamer(this);
 
     /**
      * the exception-handler
@@ -95,8 +80,10 @@ public class Services{
      */
     private HashMap counters = new HashMap();
 
-    
-    private SpecificationRepository specRepos;
+    /**
+     * specification repository
+     */
+    private SpecificationRepository specRepos = new SpecificationRepository();
 
     /**
      * creates a new Services object with a new TypeConverter and a new
@@ -112,8 +99,6 @@ public class Services{
 	}
         javainfo = new JavaInfo
         (new KeYProgModelInfo(typeconverter, exceptionHandler), this);
-        specMap = new Implementation2SpecMap(this);
-        specRepos = new SpecificationRepository(this);
     }
 
     public Services(){
@@ -137,9 +122,7 @@ public class Services{
       */
      public Services(JavaInfo ji){
          javainfo = ji;
-         typeconverter = new TypeConverter(this);
-         specMap = new Implementation2SpecMap(this);	 
-         specRepos = new SpecificationRepository(this);
+         typeconverter = new TypeConverter(this);	 
 	 exceptionHandler = new KeYRecoderExcHandler();
      }
 
@@ -176,6 +159,11 @@ public class Services{
         return javainfo;
     }
     
+    public void setJavaInfo(JavaInfo ji) {
+        javainfo = ji;
+    }
+    
+    
     /**
      * Returns the UMLInfo associated with this Services object.
      */
@@ -188,9 +176,11 @@ public class Services{
         this.umlinfo = umlinfo;
     }
     
+    
     public SpecificationRepository getSpecificationRepository() {
-        return specRepos;
+	return specRepos;
     }
+    
     
     /**
      * Returns the VariableNamer associated with this Services object.
@@ -199,27 +189,6 @@ public class Services{
         return innerVarNamer;
     }
     
-    public OCLTranslator getOCLTranslator() {
-	return oclTranslator;
-    }
-    
-    
-    public JMLTranslator getJMLTranslator() {
-	return jmlTranslator;
-    }
-
-
-    /**
-     * Returns the Implementation2SpecMap associated with this Services object.
-     * @deprecated
-     */
-    public Implementation2SpecMap getImplementation2SpecMap(){
-	return specMap;
-    }
-
-    private void setImplementation2SpecMap(Implementation2SpecMap map){
-	specMap = map;
-    }
 
     /**
      * creates a new services object containing a copy of the java info of
@@ -234,11 +203,11 @@ public class Services{
 	Services s = new Services
 	    (getJavaInfo().getKeYProgModelInfo().getServConf(),
 	     getJavaInfo().getKeYProgModelInfo().rec2key().copy());
+        s.specRepos = specRepos;
 	s.setTypeConverter(getTypeConverter().copy(s));
-	s.setImplementation2SpecMap(specMap.copy(s));
-        s.specRepos = specRepos.copy(s);
 	s.setExceptionHandler(getExceptionHandler());
 	s.setNamespaces(namespaces.copy());
+        s.setUMLInfo(umlinfo);
 	return s;
     }
 
@@ -252,21 +221,22 @@ public class Services{
 	       instanceof SchemaCrossReferenceServiceConfiguration),
 	     "services: tried to copy schema cross reference service config.");
 	Services s = new Services(getExceptionHandler());
+        s.specRepos = new SpecificationRepository();        
 	s.setTypeConverter(getTypeConverter().copy(s));
-	s.setImplementation2SpecMap(specMap.copy(s));
-        s.specRepos = specRepos.copy(s);
 	s.setNamespaces(namespaces.copy());
+        s.setUMLInfo(umlinfo);
 	return s;
     }
     
-    public Services copyProofSpecific() {
+    public Services copyProofSpecific(Proof proof) {
         final Services s = new Services(getJavaInfo().getKeYProgModelInfo().getServConf(),
                 getJavaInfo().getKeYProgModelInfo().rec2key());
+        s.proof = proof;
+        s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
-        s.setImplementation2SpecMap(specMap.copy(s));
         s.setExceptionHandler(getExceptionHandler());
         s.setNamespaces(namespaces.copy());
-        s.specRepos = specRepos;
+        s.setUMLInfo(umlinfo);
         return s;
     }
 
@@ -300,5 +270,14 @@ public class Services{
      */
     public void setNamespaces(NamespaceSet namespaces) {
         this.namespaces = namespaces;
+    }
+    
+    
+    /**
+     * Returns the proof to which this object belongs, or null if it does not 
+     * belong to any proof.
+     */
+    public Proof getProof() {
+	return proof;
     }
 }

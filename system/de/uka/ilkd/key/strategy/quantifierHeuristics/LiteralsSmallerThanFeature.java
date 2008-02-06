@@ -174,7 +174,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
 
         private void findNextMonomial() {
             while ( nextMonomial == null && polynomial != null ) {
-                if ( polynomial.op () == numbers.getArithAddition () ) {
+                if ( polynomial.op () == numbers.getAdd() ) {
                     nextMonomial = polynomial.sub ( 1 );
                     polynomial = polynomial.sub ( 0 );
                 } else {

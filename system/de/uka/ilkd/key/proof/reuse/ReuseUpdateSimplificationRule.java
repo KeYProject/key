@@ -99,9 +99,6 @@ public class ReuseUpdateSimplificationRule {
            return null;
        } else {
            final RuleApp app = new BuiltInRuleApp(rule, pos, userC);
-           if (!g.proof().mgt().ruleApplicable(app, g)) {
-               return null;
-           }
            return app;
        }
    }

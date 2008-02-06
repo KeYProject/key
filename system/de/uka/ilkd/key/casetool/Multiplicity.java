@@ -74,9 +74,9 @@ public class Multiplicity {
                      boundaries[count]=nr;
                      count++;
                  }                 
-                 final int min = boundaries[0];
-                 final int max = count > 1 ? boundaries[1] : boundaries[0];
-                 return new Multiplicity(min, max);
+                 final int min1 = boundaries[0];
+                 final int max1 = count > 1 ? boundaries[1] : boundaries[0];
+                 return new Multiplicity(min1, max1);
              }
         }
 	return null;

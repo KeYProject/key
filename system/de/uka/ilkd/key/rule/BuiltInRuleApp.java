@@ -35,7 +35,7 @@ public class BuiltInRuleApp implements RuleApp {
 			  Constraint userConstraint) {
 	this.builtInRule    = builtInRule;
 	this.pio            = pio;
-	this.userConstraint = userConstraint;
+	this.userConstraint = userConstraint;        
     }
 
     /**

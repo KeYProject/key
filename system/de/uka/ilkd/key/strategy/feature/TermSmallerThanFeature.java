@@ -12,8 +12,6 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
@@ -33,21 +31,6 @@ public class TermSmallerThanFeature extends SmallerThanFeature {
     private TermSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right) {
         this.left = left;
         this.right = right;
-    }
-
-    /**
-     * this overwrites the method of <code>SmallerThanFeature</code>
-     */
-    protected boolean lessThan(Term t1, Term t2) {
-        
-        final Sort sort1 = t1.sort ();
-        final Sort sort2 = t2.sort ();
-        if ( !sort1.equals ( sort2 ) ) {
-            if ( sort1.extendsTrans ( sort2 ) ) return true;
-            if ( sort2.extendsTrans ( sort1 ) ) return false;
-        }
-        
-        return super.lessThan ( t1, t2 );
     }
 
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {

@@ -285,10 +285,12 @@ public class JavaInfo {
             return "[B";
         else if ("jint[]".equals(s) || "int[]".equals(s))
             return "[I";
-        else if ("jlong[]".equals(s) || "long[]".equals("s"))
+        else if ("jlong[]".equals(s) || "long[]".equals(s))
             return "[J";
         else if ("jshort[]".equals(s) || "short[]".equals(s))
             return "[S";
+        else if ("jchar[]".equals(s) || "char[]".equals(s))
+            return "[C";
 // Strangely, this one is not n
 //        else if ("boolean[]".equals(s))
 //            return "[Z";

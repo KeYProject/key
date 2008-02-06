@@ -165,7 +165,7 @@ public class KeYResourceManager {
 	    System.out.println("No resource "+ resourcename + " found");
 	    return false;
 	} 
-
+        
 	// copying the resource to the target if targetfile 
 	// does not exist yet
 	boolean result = false;

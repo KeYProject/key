@@ -20,6 +20,7 @@ import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 
+import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.notification.events.AbandonTaskEvent;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.mgt.*;
@@ -182,6 +183,10 @@ public class TaskTree extends JPanel {
 		    
 	    }
 	}
+        
+        public void mouseReleased(MouseEvent e) {
+            mousePressed(e);
+        }
     }
 
 
@@ -330,8 +335,9 @@ public class TaskTree extends JPanel {
 
 	public void actionPerformed(ActionEvent e) {
 	    if (e.getSource() == mcList) {
-		JDialog fr = new UsedMethodContractsList(invokedNode, mediator);
-		fr.setVisible(true);
+                new UsedSpecificationsDialog(
+                            mediator.getServices(), 
+                            invokedNode.getUsedSpecs());
 	    } else if (e.getSource() == removeTask) {
 	        removeTask(invokedNode);
             } else if (e.getSource() == loadProof) {

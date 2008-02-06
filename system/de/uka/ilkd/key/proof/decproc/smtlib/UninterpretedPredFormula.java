@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.proof.decproc.smtlib;
 
-import de.uka.ilkd.key.logic.op.DecisionProcedureSmtAufliaOp;
+import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAufliaOp;
 
 /** Represents an uninterpreted predicate formula as defined in the SMT-Lib specification, and
  * specialized in the (QF_)AUFLIA sublogic.

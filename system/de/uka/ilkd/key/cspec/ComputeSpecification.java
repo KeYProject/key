@@ -17,10 +17,8 @@ import java.util.List;
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.IteratorOfGoal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -31,7 +29,7 @@ import de.uka.ilkd.key.util.Debug;
  * program. It contains algorithms for and controls the computation of specifications.
  * <h3>Internals</h3>
  * Usually, the method {@link
- * de.uka.ilkd.key.casetool.FunctionalityOnModel#computeSpecification(ReprModelMethod)}
+ * de.uka.ilkd.key.casetool.together.FunctionalityOnModel#computeSpecification(ReprModelMethod)}
  * is triggered by the user interface, and will start the
  * specification construction process and thereby invoke {@link
  * de.uka.ilkd.key.proof.init.ComputeSpecificationPO} to construct the
@@ -44,9 +42,9 @@ import de.uka.ilkd.key.util.Debug;
  *
  * @author Andr&eacute; Platzer
  * @version 0.1, 2003-01-28
- * @version-revision $Revision: 1.16.3.1.2.1.3.1.1.3.2.1 $, $Date: Wed, 17 Jan 2007 20:17:31 +0100 $
+ * @version-revision $Revision: 1.16.3.1.2.1.3.1.1.3.2.2 $, $Date: Mon, 22 Jan 2007 15:50:58 +0100 $
  * @see de.uka.ilkd.key.gui.ComputeSpecificationView
- * @see de.uka.ilkd.key.casetool.FunctionalityOnModel#computeSpecification(ReprModelMethod)
+ * @see de.uka.ilkd.key.casetool.together.FunctionalityOnModel#computeSpecification(ReprModelMethod)
  */
 public class ComputeSpecification {
     /**
@@ -157,6 +155,13 @@ public class ComputeSpecification {
 	return poststateRemember;
     }
     
+    /**
+     * This uninterpreted function is used to accumulate updates instead of throwing
+     * the state change information away. 
+     */
+    public static final Function ACCUMULATOR = 
+        new NonRigidFunction(new Name("acc"), Sort.FORMULA, new Sort[0]);
+    
     public ComputeSpecification() {
 	
     }
@@ -170,6 +175,7 @@ public class ComputeSpecification {
      * #computeSpecification(Proof)} will result in the specification.
      * @param program the program of which to compute a specification.
      * @param programVariables the variables that program possibly modifies.
+     * @param accPredicate the Function modelling an uninterpreted non-rigid predicate
      * @return the term required for constructing the specification.
      */
     public static Term createSpecificationComputationTerm(JavaBlock program,
@@ -178,7 +184,7 @@ public class ComputeSpecification {
 	// x = xpre & y = ypre -> <{program}> (xpost = x & ypost = y)
 	Term precondition = termFactory.createJunctorTerm(Op.TRUE);
 	Term postcondition = termFactory.createJunctorTerm(Op.TRUE);
-	
+	       
         ListOfTerm prestateLocations = SLListOfTerm.EMPTY_LIST;
 	ListOfTerm prestateValues = SLListOfTerm.EMPTY_LIST; 
 	for (IteratorOfNamed i = programVariables.elements().iterator();
@@ -237,10 +243,7 @@ public class ComputeSpecification {
 	    break;
 	case POSTSTATE_REMEMBER_STATE_CHANGE_ACCUMULATION:
 	    /* alter already assigned postcondition */
-	    postcondition = termFactory.createJunctorTerm(
-							  Op.COMPUTE_SPEC_OP,
-							  termFactory.createJunctorTerm(Op.TRUE)
-							  );
+	    postcondition = TermBuilder.DF.func(ACCUMULATOR);
 	    break;
 	default:
 	    throw new IllegalStateException("illegal kind of poststate remembering terms: " + getPoststateRemember());

@@ -67,64 +67,11 @@ public class ProofEnvironment {
     public void setRuleConfig(RuleConfig rc) {
 	ruleConfig=rc;
     }
-    
-    public SpecificationRepository getSpecificationRepository() {
-        return getInitialServices().getSpecificationRepository();
-    }
-    
+        
     public Services getInitialServices() {
         return initConfig.getServices();
     }
 
-    /** adds a contract to the specifications of this environment.
-     */
-    public Contract addContract(Contract ct) {
-	Contract ctResult = getSpecificationRepository().add(ct);
-        ctResult.setProofEnv(this);
-        return ctResult;
-    }
-
-    /** adds contracts to the specifications of this environment.
-     */
-    public void addContracts(ContractSet ct, String header) {
-	Iterator it = ct.iterator();
-	while (it.hasNext()) {
-            Contract c = (Contract) it.next();
-            c.setHeader(header);
-	    addContract(c);
-	}
-    }
-    
-    /** adds a method contract to the specifications of this environment
-     * and inserts the contract to the complex contract rule justification
-     */
-    public OldOperationContract addMethodContract(OldOperationContract ct) {
-        OldOperationContract ctResult = (OldOperationContract) addContract(ct);
-        
-        ((ComplexRuleJustificationBySpec) getJustifInfo().getContractJustification())
-           .add(ctResult, new RuleJustificationBySpec(ctResult));
-        return ctResult;
-    }
-
-    /** adds method contracts to the specifications of this environment 
-     * and inserts the contracts to the complex contract rule justification
-     */
-    public void addMethodContracts(ContractSet ct, String header) {
-        Iterator it = ct.iterator();
-        while (it.hasNext()) {
-            Contract c = (Contract) it.next();
-            c.setHeader(header);
-            addMethodContract((OldOperationContract) c);
-        }
-    }
-    
-
-    /** retrieves an iterator on all specifications contained in this
-     * environment.
-     */
-    public Iterator getSpecs() {
-	return getSpecificationRepository().getSpecs();
-    }
 
     /** returns the object managing the rules in this environement and
      * their justifications. The object is unique to this environment. 
@@ -146,21 +93,13 @@ public class ProofEnvironment {
      * is found. In all cases the proof is added to the proofs of this 
      * environment and the proofs are marked to belong to this environment.
      */
-    public void registerProof(ProofOblInput input, ProofAggregate pl) {
-        Contractable[] contracteds = input.getObjectOfContract();
-        for (int i=0; i<contracteds.length; i++) {
-            ContractSet cset = getSpecificationRepository().getContract(contracteds[i]);
-            if (cset!=null) {
-                Iterator it = cset.iterator();
-                boolean found = false;
-                while (it.hasNext()) {
-                    Contract ct = (Contract) it.next();
-                    found = input.initContract(ct) || found;                    
-                }
-            }
-        }
+    public void registerProof(ProofOblInput po, ProofAggregate pl) {
         pl.setProofEnv(this);
         proofs.add(pl);
+        if(pl.size() == 1) {
+            getInitialServices().getSpecificationRepository()
+                                .registerProof(po, pl.getFirstProof());
+        }        
     }
 
     /** registers a rule with the given justification at the
@@ -171,31 +110,12 @@ public class ProofEnvironment {
 	justifInfo.addJustification(r, j);
     }
 
-    public void registerRuleIntroducedAtNode(RuleApp r, Node node) {
+    public void registerRuleIntroducedAtNode(RuleApp r, 
+                                             Node node, 
+                                             boolean isAxiom) {
         justifInfo.addJustification(r.rule(), 
-                                    new RuleJustificationByAddRules(node));
-    }
-
-    public void registerRule(RuleApp r, RuleJustification j) {
-	justifInfo.addJustification(r, j);
-    }
-
-    public void addToAllProofs(NoPosTacletApp r, RuleSource src) {
-        boolean newSource = !extraRuleSources.contains(src);
-        if (newSource) extraRuleSources.add(src);
-        Iterator it = proofs.iterator();
-        while (it.hasNext()) {
-            ProofAggregate pl = (ProofAggregate)it.next();
-            Proof[] ps = pl.getProofs();
-            for (int i=0; i<ps.length; i++) {
-                Proof p=ps[i];
-                if (newSource) p.addRuleSource(src);
-                IteratorOfGoal goalIt = p.getSubtreeGoals(p.root()).iterator();
-                while (goalIt.hasNext()) {
-                    goalIt.next().addNoPosTacletApp(r);
-                }
-            }
-        }
+                                    new RuleJustificationByAddRules(node, 
+                                                                    isAxiom));
     }
 
     /** registers a set of rules with the given justification at the
@@ -231,7 +151,10 @@ public class ProofEnvironment {
 
     public void removeProofList(ProofAggregate pl) {
 	proofs.remove(pl);
-	getSpecificationRepository().removeProofList(pl);
+        if(pl.size() == 1) {
+            getInitialServices().getSpecificationRepository()
+                                .removeProof(pl.getFirstProof());
+        }
     }
 
 
