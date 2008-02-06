@@ -2743,8 +2743,8 @@ classReference returns [String classReference = ""]
 
 transactionNumber returns [Term trans = null]
 :
-     // "^" is required which is called compute spec. As 
-     // the compute specification operator cannot be used here overloading is safe
+     EXP LPAREN trans = term60 RPAREN
+     |
      p:PRIMES {
        int primes = p.getText().length();
        if(parsingContracts) {
