@@ -96,8 +96,6 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-
-        assert result != null;
         assertTrue(result.getFormula().equals(tb.tt()));
         assertTrue(result.getAxioms().isEmpty());
     }
@@ -116,7 +114,6 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-        assert result != null;
         assertTrue(result.getFormula().equals(tb.var(selfVar)));
         assertTrue(result.getAxioms().isEmpty());
     }
@@ -136,8 +133,6 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-
-        assert result != null;
         assertTrue(result.getFormula().equals(tb.dot(tb.var(selfVar), i)));
         assertTrue(result.getAxioms().isEmpty());
     }
@@ -159,8 +154,6 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-
-        assert result != null;
         assertTrue(result.getFormula().equals(queryTerm));
         assertTrue(result.getAxioms().isEmpty());
     }
@@ -179,8 +172,6 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-
-        assert result != null;
         assertTrue(result.getAxioms().isEmpty());
         assertTrue(result.getFormula().op().equals(Op.ALL));
         assertTrue(result.getFormula().sub(0).op().equals(Op.IMP));
@@ -203,8 +194,6 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-
-        assert result != null;
         assertTrue(result.getAxioms().isEmpty());
         assertTrue(result.getFormula().op().equals(Op.EX));
         assertTrue(result.getFormula().sub(0).op().equals(Op.AND));
@@ -228,8 +217,6 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-
-        assert result != null;
         assertTrue(result.getAxioms().isEmpty());
         assertTrue(atPreDefs.size() == 1); // for "i"
         assertTrue(result.getFormula().op().equals(Op.EQUALS));
@@ -250,7 +237,7 @@ public class TestJMLTranslator extends TestCase {
 
         try {
             result = translator.translateExpression(
-                    new PositionedString("this.m((long) 4 + 2) == this.m(l+i)"), testClassType,
+                    new PositionedString("this.m((int)4 + 2) == this.m(i)"), testClassType,
                     selfVar, null, null, null, new LinkedHashMap());
         } catch (SLTranslationException e) {
             e.printStackTrace();
@@ -258,8 +245,6 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-
-        assert result != null;
         assertTrue(result.getAxioms().isEmpty());
         assertTrue(result.getFormula().sub(0).op().equals(pm));
         assertTrue(result.getFormula().sub(1).op().equals(pm));
@@ -280,7 +265,7 @@ public class TestJMLTranslator extends TestCase {
 
         try {
             result = translator.translateExpression(
-                    new PositionedString("this.m(l) == this.m((long)i)"), testClassType, selfVar,
+                    new PositionedString("this.m(l) == this.m((long)i + 3)"), testClassType, selfVar,
                     null, null, null, new LinkedHashMap());
         } catch (SLTranslationException e) {
             e.printStackTrace();
@@ -288,8 +273,6 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-
-        assert result != null;
         assertTrue(result.getAxioms().isEmpty());
         assertTrue(result.getFormula().sub(0).op().equals(pm));
         assertTrue(result.getFormula().sub(1).op().equals(pm));
@@ -315,9 +298,7 @@ public class TestJMLTranslator extends TestCase {
             assertTrue(false);
         }
 
-        assertTrue(result != null);
-
-        assert result != null;
+        assertTrue(result != null);;
         assertTrue(result.getAxioms().isEmpty());
         assertTrue(result.getFormula().sub(0).op().equals(pm));
     }

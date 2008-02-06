@@ -272,7 +272,7 @@ public class TestOCLTranslator extends TestCase {
 
         try {
             result = translator.translateExpression(
-                    "self.m(4 + 2) = self.m(l + i)", testClassType, selfVar,
+                    "self.m(4 + 2) = self.m(i)", testClassType, selfVar,
                     null, null, null, new LinkedHashMap());
         } catch (SLTranslationException e) {
             e.printStackTrace();
