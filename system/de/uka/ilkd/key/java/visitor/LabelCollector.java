@@ -4,6 +4,7 @@ import java.util.HashSet;
 
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 
 /**
@@ -13,8 +14,10 @@ public class LabelCollector extends JavaASTVisitor {
 
     private HashSet labels;
     
-    public LabelCollector(ProgramElement root, HashSet labels) {
-        super(root);        
+    public LabelCollector(ProgramElement root, 
+                          HashSet labels, 
+                          Services services) {
+        super(root, services);        
         this.labels = labels;
     }
     

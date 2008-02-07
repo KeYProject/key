@@ -268,10 +268,6 @@ public class MethodCall extends ProgramMetaConstruct {
 		    services.getJavaInfo().getKeYProgModelInfo().findImplementations
 		    (staticPrefixType, methRef.getName(), getTypes(arguments));
 
-		if (imps == SLListOfKeYJavaType.EMPTY_LIST) {
-		    imps = services.getImplementation2SpecMap().
-			findSpecifications(methRef.getName(), staticPrefixType);
-		} 
 		if (imps.isEmpty()) {
 		    Type staticPrefix = staticPrefixType.getJavaType();
 		    if (staticPrefix instanceof ClassType &&

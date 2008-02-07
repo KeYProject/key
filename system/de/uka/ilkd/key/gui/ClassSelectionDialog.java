@@ -16,11 +16,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
-import de.uka.ilkd.key.casetool.*;
+import de.uka.ilkd.key.java.abstraction.ClassType;
+import de.uka.ilkd.key.java.abstraction.IteratorOfKeYJavaType;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.SetAsListOfKeYJavaType;
+import de.uka.ilkd.key.java.abstraction.SetOfKeYJavaType;
 
 
 /**
@@ -35,16 +40,17 @@ public class ClassSelectionDialog extends JDialog {
     /**
      * Creates and displays a dialog box asking the user to make a choice from 
      * a set of classes.
-     * @param windowTitle Title for the dialog window.
+     * @param dialogTitle Title for the dialog window.
      * @param classesTitle Title for the list of available classes.
-     * @param modelClasses The available classes.
+     * @param kjts The available types.
+     * @param defaultClass Default selection.
      * @param allowMultipleSelection Whether multiple classes or a single class 
      * are to be selected
      */
     public ClassSelectionDialog(String dialogTitle,
                                 String classesTitle,
-                                ListOfModelClass modelClasses,
-                                ModelClass defaultClass,
+                                SetOfKeYJavaType kjts,
+                                KeYJavaType defaultClass,
                                 boolean allowMultipleSelection) {
         super(new JFrame(), dialogTitle, true);
         
@@ -56,27 +62,27 @@ public class ClassSelectionDialog extends JDialog {
         } else {
             classList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         }
-        ModelClass[] classesArray = modelClasses.toArray();
-        Arrays.sort(classesArray, new Comparator() {
+        IteratorOfKeYJavaType it = kjts.iterator();
+        Vector v = new Vector();
+        while(it.hasNext()) {
+            KeYJavaType kjt = (KeYJavaType) it.next();
+            if(kjt.getJavaType() instanceof ClassType) {
+        	v.add(new WrappedKJT(kjt));
+            }
+        }
+        Object[] listData = v.toArray();
+        Arrays.sort(listData, new Comparator() {
             public int compare(Object o1, Object o2) {
-                ModelClass mc1 = (ModelClass)o1;
-                ModelClass mc2 = (ModelClass)o2;
-                return mc1.getClassName().compareTo(mc2.getClassName());
+                KeYJavaType kjt1 = ((WrappedKJT)o1).kjt;
+                KeYJavaType kjt2 = ((WrappedKJT)o2).kjt;
+                return kjt1.getName().compareTo(kjt2.getName());
             }
         });
-        classList.setListData(classesArray);
-                
+        classList.setListData(listData);
+
         //select default class
         if(defaultClass != null) {
-            String defaultName = defaultClass.getFullClassName();
-            IteratorOfModelClass it = modelClasses.iterator();
-            while(it.hasNext()) {
-                ModelClass modelClass = it.next();
-                if(modelClass.getFullClassName().equals(defaultName)) {
-                    classList.setSelectedValue(modelClass, true);
-                    break;
-                }
-            }
+            classList.setSelectedValue(defaultClass, true);
         }
         
         //create type scroll pane
@@ -90,8 +96,8 @@ public class ClassSelectionDialog extends JDialog {
         //create button panel
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
+        Dimension buttonDim = new Dimension(100, 27);
         getContentPane().add(buttonPanel);
-        Dimension buttonDim = new Dimension(80, 25);
     
         //create "ok" button
         JButton okButton = new JButton("OK");
@@ -117,6 +123,7 @@ public class ClassSelectionDialog extends JDialog {
         });
         buttonPanel.add(cancelButton);
         
+        //show
         getContentPane().setLayout(new BoxLayout(getContentPane(), 
                                                  BoxLayout.Y_AXIS));
         pack();
@@ -127,11 +134,11 @@ public class ClassSelectionDialog extends JDialog {
     
     public ClassSelectionDialog(String dialogTitle,
                                 String classesTitle,
-                                ListOfModelClass modelClasses,
+                                SetOfKeYJavaType kjts,
                                 boolean allowMultipleSelection) {
         this(dialogTitle, 
              classesTitle, 
-             modelClasses, 
+             kjts, 
              null, 
              allowMultipleSelection);
     }
@@ -148,14 +155,28 @@ public class ClassSelectionDialog extends JDialog {
     /**
      * Returns the selected classes.
      */
-    public ListOfModelClass getSelection() {
-        Object[] selectedClasses = classList.getSelectedValues();
+    public SetOfKeYJavaType getSelection() {
+        Object[] selection = classList.getSelectedValues();
         
-        ListOfModelClass result = SLListOfModelClass.EMPTY_LIST;
-        for(int i = selectedClasses.length - 1; i >= 0; i--) {
-            result = result.prepend((UMLModelClass) selectedClasses[i]);
+        SetOfKeYJavaType result = SetAsListOfKeYJavaType.EMPTY_SET;
+        for(int i = selection.length - 1; i >= 0; i--) {
+            result = result.add(((WrappedKJT) selection[i]).kjt);
         }
         
         return result;
+    }
+    
+    
+    
+    private static class WrappedKJT {
+	public final KeYJavaType kjt;
+	
+	public WrappedKJT(KeYJavaType kjt) {
+	    this.kjt = kjt;
+	}
+	
+	public String toString() {
+	    return kjt.getFullName();
+	}
     }
 }

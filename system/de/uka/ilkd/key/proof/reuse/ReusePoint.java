@@ -126,16 +126,24 @@ public class ReusePoint implements Comparable {
       if (templateApp instanceof TacletApp) {
          TacletApp result = (TacletApp) tentativeApp;
 
-//if (result.tryToInstantiate(medi.getServices())!=null)
-//System.err.println(result);         
-//         result = result.tryToInstantiate(medi.getServices());
+         // 0th pass
+         SVInstantiations insts = ((TacletApp)templateApp).instantiations();
+	 IteratorOfSchemaVariable it = insts.svIterator();
+         while (it.hasNext()) {
+             SchemaVariable sv = it.next();
+             if (sv instanceof NameSV) {
+                 result = result.addInstantiation(
+                     new NameSV(sv.name()), (Name)insts.getInstantiation(sv));
+             } else continue;
+         }
+         
 
-//if (result.rule().name().toString().equals("int_induction")) return result;
+
+
 
          // 1st pass
-	 IteratorOfSchemaVariable it = result.uninstantiatedVars().iterator();
+	 it = result.uninstantiatedVars().iterator();
 	 while (it.hasNext()) {
-            SVInstantiations insts = ((TacletApp)templateApp).instantiations();
             SchemaVariable sv = it.next();
             SchemaVariable svTemplate;
             
@@ -172,7 +180,6 @@ public class ReusePoint implements Comparable {
 
          // 2nd pass
 	 it = result.uninstantiatedVars().iterator();
-         SVInstantiations insts = ((TacletApp)templateApp).instantiations();
 	 while (it.hasNext()) {
             SchemaVariable sv = it.next();
             SchemaVariable svTemplate;
@@ -182,7 +189,7 @@ public class ReusePoint implements Comparable {
                 svTemplate = sv;
             }
             
-            InstantiationEntry o = insts.interesting().get(svTemplate);
+            InstantiationEntry o = insts.getInstantiationEntry(svTemplate);
             
             if (result != null) {
                 reuseLogger.info(result.rule().name()+
@@ -191,14 +198,23 @@ public class ReusePoint implements Comparable {
                                
             String text = "";
             if (o instanceof TermInstantiation) {
-               text = ProofSaver.printTerm(
-                   ((TermInstantiation)o).getTerm(), 
+               Term t = ((TermInstantiation)o).getTerm();
+               text = ProofSaver.printTerm(t, 
 		   templateNode.proof().getServices()).toString();
+               if (t.op() instanceof Metavariable) {
+                   continue; // will be instantiated elsewhere
+                             // with the name proposal from the 0th pass
+               }
             } else
             if (o instanceof ProgramInstantiation) {
                text = ProofSaver.printProgramElement(
                    ((ProgramInstantiation)o).getProgramElement());
             } else 
+	    if (o instanceof ListInstantiation) {
+               text = ProofSaver.printListInstantiation(
+                   ((ListInstantiation)o).getList(), 
+		   templateNode.proof().getServices());
+            } else
 	    if (o instanceof ListInstantiation) {
                text = ProofSaver.printListInstantiation(
                    ((ListInstantiation)o).getList(), 

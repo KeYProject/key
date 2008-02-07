@@ -70,7 +70,7 @@ public class ApplyOnModality extends AbstractUpdateRule {
     public Term apply(Update update, Term target, Services services) {
 
         final ArrayOfAssignmentPair pairs = deletionEnabled ? new ArrayOfAssignmentPair(
-                remove(update, target))
+                remove(update, target, services))
         : update.getAllAssignmentPairs();
   
         return pairs.size() == 0   ? target : UpdateSimplifierTermFactory.DEFAULT
@@ -82,9 +82,10 @@ public class ApplyOnModality extends AbstractUpdateRule {
      * used in the tail of the formula
      * @author bubel         
      */
-    public AssignmentPair[] remove(Update up, Term target) {
+    public AssignmentPair[] remove(Update up, Term target, Services services) {
         final ArrayOfAssignmentPair pairs = up.getAllAssignmentPairs();        
-        final HashSet protectedProgVars = collectProgramVariables(target);
+        final HashSet protectedProgVars = collectProgramVariables(target, 
+                                                                  services);
         final List result = new ArrayList(pairs.size());
 
         for (int i = 0, size=pairs.size(); i<size; i++) {
@@ -111,7 +112,7 @@ public class ApplyOnModality extends AbstractUpdateRule {
               (protectedProgVars.contains(PROTECT_HEAP) && isHeapLocation(loc)) || 
               (isHeapLocation(loc) || protectedProgVars.contains(loc) ||
                       (loc instanceof ProgramVariable && ((ProgramVariable) loc).isFinal()) ||
-	    loc.name().equals(new ProgramElementName("<transactionCounter>")));                           
+	    loc.name().equals(new ProgramElementName("<transactionCounter>")));
     }
 
     
@@ -130,7 +131,7 @@ public class ApplyOnModality extends AbstractUpdateRule {
      * @param target
      * @return
      */
-    private HashSet collectProgramVariables(Term target) {
+    private HashSet collectProgramVariables(Term target, Services services) {
         if (protectedVarsCache.containsKey(target)) {           
             return (HashSet) protectedVarsCache.get(target); 
         }
@@ -151,13 +152,15 @@ public class ApplyOnModality extends AbstractUpdateRule {
         
         if (target.javaBlock() != JavaBlock.EMPTY_JAVABLOCK) {
             ProgramVariableCollector pvc = 
-                new ProgramVariableCollector(target.javaBlock().program(), true);
+                new ProgramVariableCollector(target.javaBlock().program(), 
+                                             services);
             pvc.start();
             foundProgVars.addAll(pvc.result());
         }
         
         for (int i = 0; i<target.arity(); i++) {
-            foundProgVars.addAll(collectProgramVariables(target.sub(i)));
+            foundProgVars.addAll(collectProgramVariables(target.sub(i), 
+                                                         services));
         }
         
         if (protectedVarsCache.size()>=1000) {

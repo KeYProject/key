@@ -1020,7 +1020,8 @@ public class PrettyPrinter {
     }
  
     public void printArrayDeclaration(ArrayDeclaration type) throws java.io.IOException {
-	Type baseType = type.getBaseType().getKeYJavaType().getJavaType();
+	Type baseType = type.getBaseType().getKeYJavaType().getJavaType();       
+        assert baseType != null;
 	if (baseType instanceof ArrayDeclaration) {
 	    printArrayDeclaration((ArrayDeclaration)baseType);
 	} else {
@@ -2008,6 +2009,36 @@ public class PrettyPrinter {
 	//	noLinefeed=false;
 	//write("\n");
         printFooter(x);	
+    }
+    
+    public void printSetAssignment(SetAssignment x) throws java.io.IOException {
+        printHeader(x);
+
+        markStart(0, x);
+        if (!noLinefeed) {
+            writeSymbol(1,0, "");
+        }
+        output();
+        
+        boolean wasNoSemicolons = noSemicolons;
+        boolean wasNoLinefeed = noLinefeed;
+        noSemicolons=true;
+        noLinefeed=true;
+        
+        write("#set ");
+        writeElement(0, x.getArguments().getExpression(0));
+        writeToken(0, " = ", x);
+        writeElement(0, x.getArguments().getExpression(1));
+        output();
+        
+        noSemicolons = wasNoSemicolons;
+        noLinefeed = wasNoLinefeed;
+        
+        write(";");
+        output();
+        markEnd(0, x);
+        
+        printFooter(x);
     }
 
     public void printDivideAssignment(DivideAssignment x) throws java.io.IOException {

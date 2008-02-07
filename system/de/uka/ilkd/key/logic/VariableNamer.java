@@ -10,7 +10,8 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import de.uka.ilkd.key.collection.IteratorOfString;
 import de.uka.ilkd.key.collection.ListOfString;
@@ -71,10 +72,10 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * pointer to services object
      */
-    private final Services services;
+    protected final Services services;
 
-    protected HashMap map = new HashMap();
-    protected HashMap renamingHistory = new HashMap();
+    protected final Map map = new LinkedHashMap();
+    protected Map renamingHistory = new LinkedHashMap();
 
     //-------------------------------------------------------------------------
     //constructors
@@ -122,7 +123,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     }
 
 
-    public HashMap getRenamingMap(){
+    public Map getRenamingMap(){
 	return renamingHistory;
     }
 
@@ -503,6 +504,10 @@ public abstract class VariableNamer implements InstantiationProposer {
 		    }
 		}
 	    }
+        }
+        
+        if(!(var instanceof SortedSchemaVariable)) {
+            return null;
         }
        
 	//get the proposal

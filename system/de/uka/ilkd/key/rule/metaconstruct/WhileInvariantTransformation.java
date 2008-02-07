@@ -16,7 +16,6 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.annotation.Annotation;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -32,7 +31,6 @@ import de.uka.ilkd.key.util.ExtList;
  */
 public class WhileInvariantTransformation extends WhileLoopTransformation {
 
-    private Services services = null;
     private JavaInfo javaInfo = null;    
 
     private ProgramVariable cont = null;
@@ -67,8 +65,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
 					LinkedList breakList,
 					Services services) {
 
-	super(root, outerLabel, innerLabel);
-	this.services = services;
+	super(root, outerLabel, innerLabel, services);
 	this.cont = cont;
 	this.exc = exc;
 	this.excParam = excParam;
@@ -86,8 +83,9 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
      * @param inst the SVInstantiations if available
      */
     public WhileInvariantTransformation(ProgramElement root, 
-					SVInstantiations inst) {
-	super(root, inst);
+					SVInstantiations inst,
+                                        Services services) {
+	super(root, inst, services);
 	this.breakList = new LinkedList();
     }
 
@@ -152,9 +150,6 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
 	    doDefaultAction(x);
     }
 
-    protected void performActionOnAnnotationArray(Annotation[] a){
-	//do nothing;
-    }
 
     public void performActionOnContinue(Continue x)   {
 	if (replaceJumpStatement(x) ||
@@ -264,8 +259,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
  		Statement body = (Statement) (changeList.isEmpty() ?
  					      null :
  					      changeList.removeFirst());
- 		addChild(new While(guard, body, x.getPositionInfo(), 
-				   x.getAnnotations()));
+ 		addChild(new While(guard, body, x.getPositionInfo()));
  		changed();
  	    } else {
  		doDefaultAction(x);

@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.HashMap;
+
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceData;
@@ -1446,7 +1448,7 @@ public abstract class Taclet implements Rule, Named {
 		    neededInstances = neededInstances.add ( cit.next () );
 	    }
 
-	    goal.addTaclet(tacletToAdd, neededInstances, matchCond.getConstraint ());
+	    goal.addTaclet(tacletToAdd, neededInstances, matchCond.getConstraint (), true);
 	}
     }
 
@@ -1465,7 +1467,7 @@ public abstract class Taclet implements Rule, Named {
 	    final VariableNamer vn = services.getVariableNamer();
 	    inst = vn.rename(inst, goal, posOfFind);
             final RenamingTable rt = 
-                RenamingTable.getRenamingTable(vn.getRenamingMap());
+                RenamingTable.getRenamingTable((HashMap)vn.getRenamingMap());
             if (rt != null) {
                 renamings = renamings.append(rt);
             }

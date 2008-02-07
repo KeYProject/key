@@ -29,6 +29,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PresentationFeatures;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.*;
 
@@ -163,12 +164,19 @@ public class ProofSaver {
       	tree.append("\"");        
         tree.append(posInOccurrence2Proof(node.sequent(), 
                                           appliedRuleApp.posInOccurrence()));
-        if (appliedRuleApp instanceof MethodContractRuleApp) {
+
+        if (appliedRuleApp.rule() instanceof UseOperationContractRule) {
+            RuleJustificationBySpec ruleJusti = (RuleJustificationBySpec) 
+                            proof.env().getJustifInfo()
+                                       .getJustification(appliedRuleApp, 
+                                                         proof.getServices());
+
             tree.append(" (contract \"");
-            tree.append(((MethodContractRuleApp)appliedRuleApp).getMethodContract().getName());
+            tree.append(ruleJusti.getSpec().toString());
             tree.append("\")");
         }
-      	tree.append(")\n");
+
+        tree.append(")\n");
       }
    }
        

@@ -398,7 +398,8 @@ public class Goal  {
      */
     public void addTaclet(Taclet           rule,
 			  SVInstantiations insts,
-			  Constraint       constraint ) {		
+			  Constraint       constraint,
+                          boolean          isAxiom) {		
 	NoPosTacletApp tacletApp =
 	    NoPosTacletApp.createFixedNoPosTacletApp(rule, insts, constraint);
 	if (tacletApp != null) {
@@ -406,7 +407,7 @@ public class Goal  {
  	    if (proof().env()!=null) { // do not break everything
                                        // because of ProofMgt
 		proof().env().registerRuleIntroducedAtNode(tacletApp, 
-		        node.parent());
+		        node.parent(), isAxiom);
 	    }
 	}
     }
@@ -633,12 +634,7 @@ public class Goal  {
 //System.err.println(Thread.currentThread());    
 
         final Proof proof = proof();
-        
-        // TODO: this is maybe not the right place for this check
-        assert proof.mgt ().ruleApplicable ( p_ruleApp, this ) :
-                 "Someone tried to apply the rule " + p_ruleApp +
-                 " that is not justified";
-        
+                
         final NodeChangeJournal journal = new NodeChangeJournal(proof, this);
         addGoalListener(journal);
         
@@ -700,9 +696,7 @@ public class Goal  {
 	            BuiltInRuleApp app = new BuiltInRuleApp ( rule,
 	                                                      pos,
 	                                                      userConstraint );
-	            if (proof().mgt().ruleApplicable(app, this)) {
-	                apply(app);
-                    }
+	            apply(app);
 	        }
 	    }
 	}

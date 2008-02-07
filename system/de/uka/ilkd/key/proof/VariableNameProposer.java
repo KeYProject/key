@@ -69,7 +69,8 @@ public class VariableNameProposer implements InstantiationProposer {
 	    					var,
 						services,
 						undoAnchor);
-	} else if(((SortedSchemaVariable)var).sort() == ProgramSVSort.LABEL) {
+	} else if(var instanceof SortedSchemaVariable 
+                 && ((SortedSchemaVariable)var).sort() == ProgramSVSort.LABEL) {
 	    return getNameProposalForLabel(app,
 	    				   var,
 					   services,
@@ -201,7 +202,7 @@ public class VariableNameProposer implements InstantiationProposer {
                 contextProgram = new StatementBlock();
         
         final LabelCollector lc = 
-            new LabelCollector(contextProgram, new HashSet(10));
+            new LabelCollector(contextProgram, new HashSet(10), services);
 
         lc.start();
         String proposal;         

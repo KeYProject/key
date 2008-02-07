@@ -84,5 +84,4 @@ public class ADT implements Named{
     public Vector getAxioms(){
 	return axioms;
     }
-
 }

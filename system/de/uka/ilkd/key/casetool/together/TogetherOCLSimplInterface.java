@@ -20,7 +20,6 @@ import java.util.LinkedList;
 
 import com.togethersoft.openapi.ide.IdeAccess;
 
-import de.uka.ilkd.key.casetool.FunctionalityOnModel;
 import de.uka.ilkd.key.casetool.HashMapOfClassifier;
 import de.uka.ilkd.key.casetool.UMLOCLClassifier;
 import de.uka.ilkd.key.gui.Main;
@@ -38,6 +37,7 @@ import de.uka.ilkd.key.pp.PresentationFeatures;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.util.pp.StringBackend;
 
 /** 
@@ -129,7 +129,10 @@ public class TogetherOCLSimplInterface {
      */
     private void simplifyInvariant(TogetherModelClass togetherClass,
 				   LinkedList newClasses) {
-	String res = FunctionalityOnModel.simplifyInvariant(togetherClass);
+	try {
+	    FunctionalityOnModel.simplifyInvariant(togetherClass);
+	} catch(ProofInputException e) {
+	}
 	main = Main.getInstance();
 
 	//Do not continue until the prover exits (different threads).	    

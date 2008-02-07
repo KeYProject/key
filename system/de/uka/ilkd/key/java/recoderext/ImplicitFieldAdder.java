@@ -6,13 +6,7 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
+// 
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.*;
@@ -207,11 +201,6 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	
 	addFieldsForFinalVars(td);
 
-//	int typeCount = td.getTypeDeclarationCount();
-	/*for (int j = 0; j<typeCount; j++) {
-	    makeExplicit(td.getTypeDeclarationAt(j));
-	}*/
-
 	if (!transformedObject && td == javaLangObject) {	   
 	    addGlobalImplicitRecoderFields(td);
 	    transformedObject = true;			    
@@ -223,6 +212,5 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 // 	    System.out.println(sw.toString());
 // 	    try { sw.close(); } catch (Exception e) {}	   
 // 	}
-
     }
 }

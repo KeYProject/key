@@ -6,136 +6,179 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.proof.mgt;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+package de.uka.ilkd.key.proof.mgt;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.RuleAppListener;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.init.EnsuresPostPO;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.PreservesInvPO;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.init.RespectsModifiesPO;
+import de.uka.ilkd.key.rule.IteratorOfRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.SetAsListOfRuleApp;
+import de.uka.ilkd.key.rule.SetOfRuleApp;
 
-public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt{
+public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
 
-    private Proof proof;
-    private Set cachedAppliedRules = new HashSet();
-    private KeYMediator mediator;
-    private DefaultMgtProofListener proofListener 
+    private final Proof proof;
+    private final SpecificationRepository specRepos;
+    private final DefaultMgtProofListener proofListener 
 	= new DefaultMgtProofListener();
-    private DefaultMgtProofTreeListener proofTreeListener
+    private final DefaultMgtProofTreeListener proofTreeListener
 	= new DefaultMgtProofTreeListener();
-
+    
+    private KeYMediator mediator;
+    private SetOfRuleApp cachedRuleApps = SetAsListOfRuleApp.EMPTY_SET;
     private ProofStatus proofStatus = null;
-
-    private DepAnalysis lastAnalysisInfo;
-
+    
+    
+    //-------------------------------------------------------------------------
+    //constructors
+    //-------------------------------------------------------------------------
+    
     public DefaultProofCorrectnessMgt(Proof p) {
-	this.proof=p;
+	this.proof = p;
+        this.specRepos = p.getServices().getSpecificationRepository();
 	proof.addProofTreeListener(proofTreeListener);
     }
+    
 
+    
+    //-------------------------------------------------------------------------
+    //internal methods
+    //-------------------------------------------------------------------------
+    
+    private boolean atLeastOneClosed(SetOfProof proofs) {
+        IteratorOfProof it = proofs.iterator();
+        while(it.hasNext()) {
+            Proof proof = it.next();
+            proof.mgt().updateProofStatus();
+            if(proof.mgt().getStatus().getProofClosed()) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    
+    
+    //-------------------------------------------------------------------------
+    //public interface
+    //-------------------------------------------------------------------------
+    
     public RuleJustification getJustification(RuleApp r) {
 	return proof.env().getJustifInfo().getJustification(r, proof.getServices());
     }
 
-    public boolean ruleApplicable(RuleApp r, Goal g) {
-	final RuleJustification just = getJustification(r);
-	if (just==null) {
-	    System.err.println("Warning: No justification for rule " + 
-			       r.rule().name()  +" found");
-	    return true;
-	}
-        lastAnalysisInfo = just.dependsOn(proof);
-	return !lastAnalysisInfo.depExists();
+    
+    /**
+     * Tells whether a contract for the passed operation may be applied 
+     * in the passed goal without creating circular dependencies.
+     */
+    public boolean contractApplicableFor(ProgramMethod pm, Goal g) {
+        //get the method which is being verified in the passed goal
+        ProgramMethod pmUnderVerification 
+            = specRepos.getOperationForProof(g.proof());
+        if(pmUnderVerification == null) {
+            return true;
+        }
+        
+        //collect all proofs on which the specification of the 
+        //passed operation may depend
+        SetOfProof proofs = specRepos.getProofs(pm);
+        SetOfProof newProofs = proofs;
+        while(newProofs.size() > 0) {
+            IteratorOfProof it = newProofs.iterator();
+            newProofs = SetAsListOfProof.EMPTY_SET;
+            
+            while(it.hasNext()) {
+                Proof proof = it.next();
+                IteratorOfRuleApp cachedRuleAppsIt 
+                    = proof.mgt().getNonAxiomApps().iterator();
+                while(cachedRuleAppsIt.hasNext()) {
+                    RuleApp ruleApp = cachedRuleAppsIt.next();
+                    RuleJustification ruleJusti = getJustification(ruleApp);
+                    if(ruleJusti instanceof RuleJustificationBySpec) {
+                        ContractWithInvs cwi 
+                            = ((RuleJustificationBySpec) ruleJusti).getSpec();
+                        SetOfProof proofsForPm 
+                            = specRepos.getProofs(cwi.contract
+                                                     .getProgramMethod());
+                        newProofs = newProofs.union(proofsForPm);
+                        proofs = proofs.union(proofsForPm);
+                    }   
+                }
+            }
+        }
+        
+        //is one of those proofs about the operation under verification? 
+        IteratorOfProof it = proofs.iterator();
+        while(it.hasNext()) {
+            ProgramMethod pm2 = specRepos.getOperationForProof(it.next());
+            if(pm2.equals(pmUnderVerification)) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 
-
-    public String getLastAnalysisInfo() {
-	return lastAnalysisInfo == null ? "" : lastAnalysisInfo.toString();
-    }
-
+    
     public void updateProofStatus() {
-	boolean closed = false;
-	boolean closedButLemmasLeft = false;
-	boolean open = false;
+        //proof open?
+        if(proof.openGoals().size() > 0) {
+            proofStatus = ProofStatus.OPEN;
+            return;
+        }
 	
-	if (proof.openGoals().size() == 0){
-	    // either closed or closedButLemmasLeft
-	    Iterator cachedAppliedRulesIt = cachedAppliedRules.iterator();
-	    
-	    RuleApp rule = null;
-	    RuleJustification ruleJusti = null;
-	    List list = null;
-	    Iterator listIterator = null;
-	    ProofAggregate pl = null;
-	    int size = 0;
-	    Proof p = null;
-	    
-	    boolean allRulesClosed = true;
-	    while (cachedAppliedRulesIt.hasNext()) {
-		// every rule must be proven correct
-		rule = (RuleApp) cachedAppliedRulesIt.next();
-		ruleJusti = getJustification(rule);
-		list = ruleJusti.getProofList();
-		listIterator = list.iterator();
-		boolean oneClosed = false;
-		while (listIterator.hasNext()) {
-		    // one of these must be closed
-		    pl = (ProofAggregate) listIterator.next();
-		    boolean allClosed = true;
-		    Proof[] proofs = pl.getProofs();
-		    size = proofs.length;
-		    for (int i = 0; i < size; i++) {
-			// all of these must be closed
-			p = proofs[i];
-			p.mgt().updateProofStatus();
-			if (p.mgt().getStatus().getProofClosed()) {
-			    // This proof is closed so it is possible
-			    // that all proofs are closed.
-			}
-			else {
-			    // There is a proof which is not closed,
-			    // so not all proofs can be closed!
-			    allClosed = false;
-			}
-		    }
-		    if (allClosed) {
-			// all proofs in the ProofList are closed, meaning
-			// that this proof is closed
-			oneClosed = true;
-		    }
-		    else {
-			// Nothing to do here because this proof wasn't closed.
-		    }
-		}
-		if (oneClosed) {
-		    // This rule is closed so it is still possible all rules are
-		    // closed and thus no need to change allRulesClosed here.
-		}
-		else {
-		    allRulesClosed = false;
-		}
-	    }
-	    if (allRulesClosed) {
-		closed = true;
-	    }
-	    else {
-		closedButLemmasLeft = true;
-	    }
-	}
-	else {
-	    open = true;
-	}
-	proofStatus = new ProofStatus(closed, closedButLemmasLeft, open);
+        //used, but yet unproven specifications?
+        IteratorOfRuleApp cachedRuleAppsIt = cachedRuleApps.iterator();
+        while(cachedRuleAppsIt.hasNext()) {
+            RuleApp ruleApp = cachedRuleAppsIt.next();
+            RuleJustification ruleJusti = getJustification(ruleApp);
+            if(ruleJusti instanceof RuleJustificationBySpec) {
+                ContractWithInvs cwi 
+                    = ((RuleJustificationBySpec) ruleJusti).getSpec();
+                InitConfig initConfig = proof.env().getInitConfig();
+                ProofOblInput ensuresPostPO 
+                    = new EnsuresPostPO(initConfig, 
+                                        cwi.contract, 
+                                        cwi.assumedInvs);
+                SetOfProof ensuresPostProofs 
+                    = specRepos.getProofs(ensuresPostPO);
+                ProofOblInput preservesInvPO
+                    = new PreservesInvPO(initConfig, 
+                                         cwi.contract.getProgramMethod(), 
+                                         cwi.assumedInvs, 
+                                         cwi.ensuredInvs);
+                SetOfProof preservesInvProofs 
+                    = specRepos.getProofs(preservesInvPO);
+                ProofOblInput respectsModifiesPO
+                    = new RespectsModifiesPO(initConfig, 
+                                             cwi.contract, 
+                                             cwi.assumedInvs);
+                SetOfProof respectsModifiesProofs
+                    = specRepos.getProofs(respectsModifiesPO);
+                
+                if(!(atLeastOneClosed(ensuresPostProofs)
+                     && atLeastOneClosed(preservesInvProofs)
+                     && atLeastOneClosed(respectsModifiesProofs))) {
+                    proofStatus = ProofStatus.CLOSED_BUT_LEMMAS_LEFT;
+                    return;
+                }
+            }
+        }
+        
+        //no -> proof is closed
+        proofStatus = ProofStatus.CLOSED;
     }
 
-    private void cacheAppliedRule(RuleApp r) {
-	cachedAppliedRules.add(r);
-    }
-
+    
     public void ruleApplied(RuleApp r) {
 	RuleJustification rj = getJustification(r);
 	if (rj==null) {
@@ -143,21 +186,25 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt{
 	    return;
 	}
 	if (!rj.isAxiomJustification()) {
-	    cacheAppliedRule(r);
+            cachedRuleApps = cachedRuleApps.add(r);
 	}
     }
 
+    
     public void ruleUnApplied(RuleApp r) {
-	boolean success = cachedAppliedRules.remove(r);
-	if (success) {
+        int oldSize = cachedRuleApps.size();
+        cachedRuleApps = cachedRuleApps.remove(r);
+	if(oldSize != cachedRuleApps.size()) {
 	    updateProofStatus();
 	}
     }
 
-    public Iterator getAppliedNonAxioms() {
-	return cachedAppliedRules.iterator();
+    
+    public SetOfRuleApp getNonAxiomApps() {
+	return cachedRuleApps;
     }
 
+    
     public void setMediator ( KeYMediator p_mediator ) {
 	if ( mediator != null )
 	    mediator.removeRuleAppListener ( proofListener );
@@ -168,22 +215,29 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt{
 	    mediator.addRuleAppListener ( proofListener );
     }
 
+    
     public Proof getProof() {
 	return proof;
     }
 
+    
     public boolean proofSimilarTo(Proof p) {
 	return p.name().equals(getProof().name()); //%%%
     }
 
+    
     public ProofStatus getStatus() {
 	if (proofStatus == null) updateProofStatus();
 	return proofStatus;
     }
     
-    class DefaultMgtProofListener implements RuleAppListener {
-
-	/** invoked when a rule has been applied */
+    
+    
+    //-------------------------------------------------------------------------
+    //inner classes
+    //-------------------------------------------------------------------------
+    
+    private class DefaultMgtProofListener implements RuleAppListener {
 	public void ruleApplied(ProofEvent e) {
 	    if (DefaultProofCorrectnessMgt.this.getProof()==e.getSource()) {
                 //%% actually I only want to listen to events of one proof
@@ -193,24 +247,11 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt{
 	}
     }
 
-    class DefaultMgtProofTreeListener extends ProofTreeAdapter {
+    
+    private class DefaultMgtProofTreeListener extends ProofTreeAdapter {
 	public void proofClosed(ProofTreeEvent e) {
 	    ProofEnvironment pEnv = proof.env();
 	    pEnv.updateProofStatus();
 	}
-
-	public void proofPruned(ProofTreeEvent e) {
-	
-	}
-
-	public void proofGoalsAdded(ProofTreeEvent e) {
-	    
-	}
-
-	public void proofStructureChanged(ProofTreeEvent e) {
-	   
-	}
     }
-    
-
 }

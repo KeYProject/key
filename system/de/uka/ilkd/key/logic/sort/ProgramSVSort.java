@@ -215,6 +215,8 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     public static final ProgramSVSort GUARD = new GuardSort();
 
     public static final ProgramSVSort FORUPDATES = new ForUpdatesSort();
+    
+    public static final ProgramSVSort FORLOOP = new ForLoopSort();
 
     public static final ProgramSVSort MULTIPLEVARDECL
 	= new MultipleVariableDeclarationSort();
@@ -787,9 +789,12 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	    
             final ProgramMethod pm = 
 		((MethodBodyStatement) pe).getProgramMethod(services);
+            if(pm == null) {
+                return false;
+            }
 	    final MethodDeclaration methodDeclaration = pm.getMethodDeclaration();
             
-            return !(pm.isModel() ||
+            return !(//pm.isModel() ||
                      methodDeclaration.getBody() == null) ||
                      (methodDeclaration instanceof ConstructorDeclaration);
 	}
@@ -1110,6 +1115,15 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	    return (check instanceof ForUpdates);
 
 	}
+    }
+    
+    private static class ForLoopSort extends ProgramSVSort {
+        public ForLoopSort() {
+            super(new Name("ForLoop"));
+        }
+        protected boolean canStandFor(ProgramElement check, Services services) {
+            return (check instanceof For);
+        }
     }
         
     private static class SwitchSVSort extends ProgramSVSort{

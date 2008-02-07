@@ -33,8 +33,8 @@ public abstract class AbstractMonomialSmallerThanFeature
     private Goal currentGoal = null;
 
     protected AbstractMonomialSmallerThanFeature(IntegerLDT numbers) {
-        this.add = numbers.getArithAddition ();
-        this.mul = numbers.getArithMultiplication ();
+        this.add = numbers.getAdd();
+        this.mul = numbers.getMul();
         this.Z = numbers.getNumberSymbol ();
     }
 

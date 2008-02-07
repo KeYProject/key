@@ -22,6 +22,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.ArrayOfProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
@@ -40,15 +41,22 @@ public class ProgVarReplacer {
     /**
      * map specifying the replacements to be done
      */
-    protected final Map map;
+    private final Map map;
+    
+    
+    /**
+     * The services object
+     */
+    private final Services services;
 
 
     /**
      * creates a ProgVarReplacer that replaces program variables as specified
      * by the map parameter
      */
-    public ProgVarReplacer(Map m) {
-        map = m;
+    public ProgVarReplacer(Map map, Services services) {
+        this.map = map;
+        this.services = services;
     }
 
 
@@ -398,7 +406,10 @@ public class ProgVarReplacer {
      * replaces in a statement
      */
     public ProgramElement replace(ProgramElement pe) {
-        ProgVarReplaceVisitor pvrv = new ProgVarReplaceVisitor(pe, map, false);
+        ProgVarReplaceVisitor pvrv = new ProgVarReplaceVisitor(pe, 
+                                                               map, 
+                                                               false, 
+                                                               services);
 	pvrv.start();
 	return pvrv.result();
     }

@@ -86,10 +86,10 @@ public abstract class LDT extends ADT {
      */
     public Function addFunction(Namespace funcNS, String funcName) {
         final Function f = (Function)funcNS.lookup(new Name(funcName));
-        functions.add(f);
         if (f==null) {
-            System.out.println("IntegerLDT: Function " + funcName + " not found");
-        } 
+            throw new RuntimeException("IntegerLDT: Function " + funcName + " not found");
+        }
+        addFunction(f);
         return f;
     }
 

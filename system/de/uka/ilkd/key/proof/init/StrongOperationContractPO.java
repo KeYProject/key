@@ -10,18 +10,16 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.casetool.ModelMethod;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ListOfProgramVariable;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.mgt.Contract;
-import de.uka.ilkd.key.proof.mgt.Contractable;
-import de.uka.ilkd.key.speclang.ListOfClassInvariant;
+import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.SLTranslationError;
+import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 
 
 /**
@@ -30,8 +28,8 @@ import de.uka.ilkd.key.speclang.SLTranslationError;
 public class StrongOperationContractPO extends AbstractPO {
     
     private final OperationContract contract;
-    private final ListOfClassInvariant assumedInvs;
-    private final ListOfClassInvariant ensuredInvs;
+    private final SetOfClassInvariant assumedInvs;
+    private final SetOfClassInvariant ensuredInvs;
 
     
     
@@ -39,11 +37,13 @@ public class StrongOperationContractPO extends AbstractPO {
     //constructors
     //-------------------------------------------------------------------------
     
-    public StrongOperationContractPO(OperationContract contract, 
-                                     ListOfClassInvariant assumedInvs,
-                                     ListOfClassInvariant ensuredInvs) {
-        super("StrongOperationContract of " + contract.getModelMethod(),
-              contract.getModelMethod().getContainingClass());
+    public StrongOperationContractPO(InitConfig initConfig,
+	    			     OperationContract contract, 
+                                     SetOfClassInvariant assumedInvs,
+                                     SetOfClassInvariant ensuredInvs) {
+        super(initConfig,
+              "StrongOperationContract of " + contract.getProgramMethod(),
+              contract.getProgramMethod().getContainerType());
         this.contract    = contract;
         this.assumedInvs = assumedInvs;
         this.ensuredInvs = ensuredInvs;
@@ -56,57 +56,46 @@ public class StrongOperationContractPO extends AbstractPO {
     //-------------------------------------------------------------------------     
     
     public void readProblem(ModStrategy mod) throws ProofInputException {
-        //make sure initConfig has been set
-        if(initConfig == null) {
-            throw new IllegalStateException("InitConfig not set.");
-        }
- 
         //prepare variables and container for @pre-functions
-        ModelMethod modelMethod         = contract.getModelMethod();
+        ProgramMethod programMethod     = contract.getProgramMethod();
         ProgramVariable selfVar         = buildSelfVarAsProgVar();
-        ListOfProgramVariable paramVars = buildParamVars(modelMethod);
-        ProgramVariable resultVar       = buildResultVar(modelMethod);
+        ListOfProgramVariable paramVars = buildParamVars(programMethod);
+        ProgramVariable resultVar       = buildResultVar(programMethod);
         ProgramVariable exceptionVar    = buildExcVar();
-        Map atPreFunctions              = new HashMap();
+        Map atPreFunctions              = new LinkedHashMap();
         
-        try {
-        	//translate precondition
-	        Term preTerm = translatePre(contract, selfVar, toPV(paramVars));
-	        
-	        //translate and conjoin assumed invariants
-	        Term assumedInvsTerm = translateInvs(assumedInvs);
-	        
-	        //translate postcondition
-	        Term postTerm = translatePost(contract, 
-	                                      selfVar, 
-	                                      toPV(paramVars), 
-	                                      resultVar, 
-	                                      exceptionVar);
-	        
-	        //translate and conjoin ensured invariants
-	        Term ensuredInvsTerm = translateInvs(ensuredInvs);
-	        
-	        //build post implication with updates
-	        Term postImpTerm = tb.imp(postTerm, ensuredInvsTerm);
-	        Term postUpdateTerm = translateModifies(contract, 
-	                                                postImpTerm,
-	                                                selfVar, 
-	                                                toPV(paramVars));
-	        
-	        //build definitions for @pre-functions
-	        Term atPreDefinitionsTerm = buildAtPreDefinitions(atPreFunctions);
-	   
-	        //put together @pre-definitions, precondition, and assumed invariants
-	        Term defAndPreAndAssumedInvsTerm = tb.and(atPreDefinitionsTerm, 
-	                                                  tb.and(preTerm, 
-	                                                         assumedInvsTerm));
-	        
-	        //build top level implication
-	        Term poTerm = tb.imp(defAndPreAndAssumedInvsTerm, postUpdateTerm);
-	        poTerms = new Term[]{poTerm};
-        } catch (SLTranslationError e) {
-        	throw new ProofInputException(e);
-        }
+        //translate precondition
+        Term preTerm = translatePre(contract, selfVar, toPV(paramVars));
+        
+        //translate and conjoin assumed invariants
+        Term assumedInvsTerm = translateInvs(assumedInvs);
+        
+        //translate postcondition
+        Term postTerm = translatePost(contract, 
+                                      selfVar, 
+                                      toPV(paramVars), 
+                                      resultVar, 
+                                      exceptionVar,
+                                      atPreFunctions);
+        
+        //translate and conjoin ensured invariants
+        Term ensuredInvsTerm = translateInvs(ensuredInvs);
+        
+        //build post implication with updates
+        Term postImpTerm = TB.imp(postTerm, ensuredInvsTerm);
+        Term postUpdateTerm = translateModifies(contract, 
+                                                postImpTerm,
+                                                selfVar, 
+                                                toPV(paramVars));
+        
+        //build definitions for @pre-functions
+        Update atPreDefinitions 
+            = APF.createAtPreDefinitions(atPreFunctions, services);
+   
+        //put everyhing together
+        Term poTerm = TB.imp(TB.and(preTerm, assumedInvsTerm), 
+                             uf.apply(atPreDefinitions, postUpdateTerm));
+        poTerms = new Term[]{poTerm};
         
         //register everything in namespaces
         registerInNamespaces(selfVar);
@@ -114,15 +103,5 @@ public class StrongOperationContractPO extends AbstractPO {
         registerInNamespaces(resultVar);
         registerInNamespaces(exceptionVar);
         registerInNamespaces(atPreFunctions);
-    }
-
-
-    public Contractable[] getObjectOfContract() {
-        return new Contractable[0];
-    }
-
-    
-    public boolean initContract(Contract ct) {
-        return false;
     }
 }

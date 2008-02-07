@@ -12,15 +12,64 @@
 
 package de.uka.ilkd.key.casetool.together.scripts.menuextension;
 
-import de.uka.ilkd.key.casetool.FunctionalityOnModel;
-import de.uka.ilkd.key.casetool.UMLModelClass;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
+import com.togethersoft.openapi.ide.project.IdeProjectManagerAccess;
+
+import de.uka.ilkd.key.casetool.together.TogetherModelClass;
+import de.uka.ilkd.key.ocl.OCLExport;
 
 public class ClassMenuPoint2 extends ClassMenu {
+
+    static File lastDirectory=null;
+    
+    private File directory;
+
     public String getMenuEntry(){
-	return "Parse Throughout";
+	return "Export OCL spec of class";
     }
 
-    protected String runCore(UMLModelClass modelClass){
-        return FunctionalityOnModel.parseOneThroughout(modelClass);
+    protected String runCore(TogetherModelClass modelClass) {
+	
+	if (lastDirectory==null) {
+	    String tprFile = IdeProjectManagerAccess
+		.getProjectManager().getActiveProject().getFileName();
+	    String projectRoot = tprFile.substring
+		(0, tprFile.lastIndexOf(File.separator));
+	    directory=new File(projectRoot);
+	}
+	else  
+	    directory=lastDirectory;
+	JFileChooser jFC = new JFileChooser(directory);
+	int saved = jFC.showSaveDialog(new JFrame());
+	if (saved == JFileChooser.APPROVE_OPTION) {
+	    String filename = jFC.getSelectedFile().getName();    
+	    filename = jFC.getCurrentDirectory()+File.separator+
+		(filename.endsWith(".ocl") ? filename : 
+		filename+".ocl");
+
+	    try{
+		File file = new File(filename);
+		FileWriter output = new FileWriter(file);
+		OCLExport oclExporter = 
+		    new OCLExport(modelClass, output);
+		oclExporter.export();
+		output.close();
+		lastDirectory = jFC.getCurrentDirectory();
+	    } catch (IOException ioe) {
+		String errorMsg = "Could not save \n"+filename+".\n";
+		errorMsg += ioe.toString();	    
+		JOptionPane.showMessageDialog(new JFrame(), errorMsg, "Oops...", 
+					      JOptionPane.ERROR_MESSAGE);
+	    }
+
+	}	
+	return "";
     }
 }

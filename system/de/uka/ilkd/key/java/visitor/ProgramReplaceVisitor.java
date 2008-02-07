@@ -32,7 +32,6 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
 
     private ProgramElement result = null;
 
-    private Services services;
     private SVInstantiations svinsts;
 
     private boolean allowPartialReplacement;
@@ -45,8 +44,7 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
 				 Services services, 
 				 SVInstantiations svi,
 				 boolean allowPartialReplacement) {
-	super(root, false);
-	this.services = services;
+	super(root, false, services);
 	svinsts = svi;
 	this.allowPartialReplacement=allowPartialReplacement;
     }

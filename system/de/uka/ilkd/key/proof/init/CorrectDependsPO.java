@@ -10,20 +10,16 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.AnonymousUpdate;
 import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.IteratorOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.proof.mgt.Contract;
-import de.uka.ilkd.key.proof.mgt.Contractable;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.SLTranslationError;
-import de.uka.ilkd.key.util.Debug;
 
 
 /**
@@ -39,10 +35,12 @@ public class CorrectDependsPO extends AbstractPO {
     //constructors
     //-------------------------------------------------------------------------
     
-    public CorrectDependsPO(SetOfLocationDescriptor dependsClause,
+    public CorrectDependsPO(InitConfig initConfig,
+	    		    SetOfLocationDescriptor dependsClause,
                             ClassInvariant inv) {
-        super("CorrectDepends of \"" + inv + "\"", 
-              inv.getModelClass());
+        super(initConfig,
+              "CorrectDepends of \"" + inv + "\"", 
+              inv.getKJT());
         this.dependsClause = dependsClause;
         this.inv           = inv;
     }
@@ -60,14 +58,18 @@ public class CorrectDependsPO extends AbstractPO {
         IteratorOfLocationDescriptor it = dependsClause.iterator();
         while(it.hasNext()) {
             LocationDescriptor loc = it.next();
-            Debug.assertTrue(loc instanceof BasicLocationDescriptor);
+            assert loc instanceof BasicLocationDescriptor;
             BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
             
             Term guardTerm = bloc.getFormula();
             Term locTerm = bloc.getLocTerm();
             
-            createAtPreFunctionsForTerm(guardTerm, atPreFunctions);
-            createAtPreFunctionsForTerm(locTerm, atPreFunctions);
+            APF.createAtPreFunctionsForTerm(guardTerm, 
+                                            atPreFunctions, 
+                                            services);
+            APF.createAtPreFunctionsForTerm(locTerm, 
+                                            atPreFunctions, 
+                                            services);
             
             Term[] subTermsAtPre = new Term[locTerm.arity()];
             ArrayOfQuantifiableVariable[] boundVars 
@@ -76,7 +78,7 @@ public class CorrectDependsPO extends AbstractPO {
                 subTermsAtPre[i] = replaceOps(atPreFunctions, locTerm.sub(i)); 
                 boundVars[i] = locTerm.varsBoundHere(i);
             }
-            Term locAtIntermediateTerm = tf.createTerm(locTerm.op(),
+            Term locAtIntermediateTerm = TF.createTerm(locTerm.op(),
                                                        subTermsAtPre,
                                                        boundVars,
                                                        null);
@@ -106,52 +108,30 @@ public class CorrectDependsPO extends AbstractPO {
     //-------------------------------------------------------------------------        
     
     public void readProblem(ModStrategy mod) throws ProofInputException {
-        //make sure initConfig has been set
-        if(initConfig == null) {
-            throw new IllegalStateException("InitConfig not set.");
-        }
- 
         //prepare container for @pre-functions
-        Map atPreFunctions = new HashMap();
+        Map atPreFunctions = new LinkedHashMap();
         
-        try {
-        	//translate invariant
-	        Term invTerm = translateInv(inv);
-	                                       
-	        //build post term
-	        UpdateFactory uf = new UpdateFactory(services, new UpdateSimplifier());
-	        Term updateTerm = uf.apply(createUpdate(uf, atPreFunctions), invTerm);
-	        AnonymousUpdate au = AnonymousUpdate.getNewAnonymousOperator();
-	        Term postTerm = tf.createAnonymousUpdateTerm(au, 
-	                                                     updateTerm);
-	        
-	        //build pre term
-	        Term atPreDefinitionsTerm = buildAtPreDefinitions(atPreFunctions);
-	        Term preTerm = tf.createJunctorTerm(Op.AND, 
-	                                            atPreDefinitionsTerm, 
-	                                            invTerm);
-	
-	        //build implication
-	        Term poTerm = tf.createJunctorTerm(Op.IMP, preTerm, postTerm);
-	        poTerms = new Term[]{poTerm};
-        } catch (SLTranslationError e) {
-        	throw new ProofInputException(e);
-        }
-	        
+        //translate invariant
+        Term invTerm = translateInv(inv);
+                                       
+        //build post term
+        UpdateFactory uf = new UpdateFactory(services, new UpdateSimplifier());
+        Term updateTerm = uf.apply(createUpdate(uf, atPreFunctions), invTerm);
+        AnonymousUpdate au = AnonymousUpdate.getNewAnonymousOperator();
+        Term postTerm = TF.createAnonymousUpdateTerm(au, updateTerm);
+        
+        //build definitions for @pre-functions
+        Update atPreDefinitions 
+            = APF.createAtPreDefinitions(atPreFunctions, services);
+
+        //put everyhing together
+        Term poTerm = TB.imp(invTerm, uf.apply(atPreDefinitions, postTerm));
+        poTerms = new Term[]{poTerm};
+
         //register everything in namespaces
         registerInNamespaces(atPreFunctions);
     }
 
-
-    public Contractable[] getObjectOfContract() {
-        return new Contractable[0];
-    }
-
-    
-    public boolean initContract(Contract ct) {
-        return false;
-    }
-    
     
     //-------------------------------------------------------------------------
     

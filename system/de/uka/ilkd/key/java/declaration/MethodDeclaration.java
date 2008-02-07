@@ -438,37 +438,4 @@ public class MethodDeclaration
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printMethodDeclaration(this);
     }
-
-    /**
-     * returns the comments belonging to this MethodDeclaration. 
-     * @return the comments.
-     */
-    public Comment[] getComments(){
-	final Comment[] c1 = super.getComments();
-        assert c1 != null;
-	LinkedList jmlComments = new LinkedList();
-	for(int i = 0, cc = getChildCount(); i<cc; i++){
-	    ProgramElement p = getChildAt(i);
-	    final Comment[] c2 = p.getComments();           
-	    if (c2 != null) {
-		for (int j=0; j<c2.length; j++){
-		    if(c2[j].containsJMLSpec() && 
-		       (c2[j].getJMLSpec().indexOf("pure") != -1 ||
-			c2[j].getJMLSpec().indexOf("helper") != -1)){
-			jmlComments.add(c2[j]);
-		    } 
-		}
-	    }
-	}
-	
-        final Comment[] c2 = new Comment[c1.length + jmlComments.size()];
-	
-        System.arraycopy(c1, 0, c2, 0, c1.length);
-        
-        for(int i=c1.length; i<c2.length; i++){
-	    c2[i] = (Comment)jmlComments.removeFirst();
-	}
-	return c2;
-    }
-      
 }

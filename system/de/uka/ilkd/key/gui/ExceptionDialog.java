@@ -27,6 +27,7 @@ import javax.swing.event.ListSelectionListener;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.SVInstantiationExceptionWithPosition;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.ExtList;
 
 public class ExceptionDialog extends JDialog {
@@ -47,13 +48,24 @@ public class ExceptionDialog extends JDialog {
 				    ((antlr.RecognitionException) exc).getColumn());
 	} else if (exc instanceof ParserException) {
 	       location = ((ParserException) exc).getLocation();
-	} else { 
-	    if (exc instanceof SVInstantiationExceptionWithPosition) {	      
+        } else if (exc instanceof SLTranslationException) {
+            SLTranslationException ste = (SLTranslationException) exc;
+            location = new Location(ste.getFileName(), 
+                                    ste.getLine(), 
+                                    ste.getColumn());
+        } else if (exc instanceof RuntimeException 
+                   && ((RuntimeException) exc).getCause() 
+                       instanceof SLTranslationException) {
+            SLTranslationException ste 
+                = (SLTranslationException) ((RuntimeException) exc).getCause();
+            location = new Location(ste.getFileName(),
+                                    ste.getLine(),
+                                    ste.getColumn());
+	} else if (exc instanceof SVInstantiationExceptionWithPosition) {	      
 		location = new Location(null, 
 			       ((SVInstantiationExceptionWithPosition)exc).getRow(),
 	         	       ((SVInstantiationExceptionWithPosition)exc).getColumn());
-	      }
-	  }
+	}
 	return location;
     }
 

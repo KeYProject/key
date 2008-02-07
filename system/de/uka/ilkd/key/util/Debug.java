@@ -11,6 +11,9 @@
 /** this class offers some methods for assertions, debug output and so
  * on */ 
 package de.uka.ilkd.key.util;
+
+import de.uka.ilkd.key.visualization.TraceElement;
+
 public final class Debug {
 
     private Debug() {}
@@ -236,6 +239,19 @@ public final class Debug {
 	    new java.io.ByteArrayOutputStream();
         t.printStackTrace(new java.io.PrintStream(baos));
         return(baos.toString());
+    }
+    
+    public static String getCassAndMethod() {
+    	try {
+    		throw new Exception();
+    	} catch(Exception e) {
+    		StackTraceElement[] trace = e.getStackTrace();
+    		if(trace.length > 1) {
+    			int line = trace[1].getLineNumber();
+    			return trace[1].getClass() + "." + trace[1].getMethodName() + (line > 0 ? " [line " + line +"]" : ""); 
+    		}
+    		return "";
+    	}        	
     }
 
 }

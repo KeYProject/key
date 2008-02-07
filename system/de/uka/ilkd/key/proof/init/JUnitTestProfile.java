@@ -6,7 +6,7 @@ import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.ListOfBuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UpdateSimplificationRule;
-import de.uka.ilkd.key.rule.UseMethodContractRule;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.strategy.FOLStrategy;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.SetOfStrategyFactory;
@@ -35,8 +35,8 @@ public class JUnitTestProfile extends AbstractProfile {
         return set;
     }
 
-    protected UseMethodContractRule getContractRule() {
-        return UseMethodContractRule.INSTANCE;
+    protected UseOperationContractRule getContractRule() {
+        return UseOperationContractRule.INSTANCE;
     }
     
     protected UpdateSimplificationRule getUpdateSimplificationRule() {

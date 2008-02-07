@@ -24,6 +24,7 @@ import javax.swing.text.JTextComponent;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.cspec.ComputeSpecification;
 import de.uka.ilkd.key.gui.assistant.*;
 import de.uka.ilkd.key.gui.configuration.*;
 import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
@@ -32,17 +33,29 @@ import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.*;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.java.*;
+
+import de.uka.ilkd.key.jmltest.JMLTestFileCreator;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.decproc.DecProcRunner;
 import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAuflia;
-import de.uka.ilkd.key.proof.init.*;
-import de.uka.ilkd.key.proof.mgt.*;
+import de.uka.ilkd.key.proof.init.DebuggerProfile;
+import de.uka.ilkd.key.proof.init.JavaTestGenerationProfile;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.PureFOLProfile;
+import de.uka.ilkd.key.proof.init.TacletSoundnessPOLoader;
+import de.uka.ilkd.key.proof.mgt.BasicTask;
+import de.uka.ilkd.key.proof.mgt.NonInterferenceCheck;
+import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
+import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.ExtList;
+import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
-import de.uka.ilkd.key.util.*;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 public class Main extends JFrame {
@@ -53,7 +66,8 @@ public class Main extends JFrame {
     private static final String VERSION = 
 	KeYResourceManager.getManager().getVersion() + 
 	"-beta (internal: "+INTERNAL_VERSION+")";
-    private static final String COPYRIGHT="(C) Copyright 2001-2007 "
+
+    private static final String COPYRIGHT="(C) Copyright 2001-2008 "
         +"Universit\u00e4t Karlsruhe, Universit\u00e4t Koblenz-Landau, "
         +"and Chalmers University of Technology";
     
@@ -170,8 +184,9 @@ public class Main extends JFrame {
 
     public static boolean testMode = false;
 
-    /** if false then JML specifications are not parsed (useful for .key input) */
-    public static boolean jmlSpecs = true;
+    /** if false then JML specifications are not parsed (useful for .key input) 
+     */
+    public static boolean enableSpecs = true;
     
     public JButton reuseButton = new JButton("Reuse",IconFactory.reuseLogo());
     
@@ -880,25 +895,27 @@ public class Main extends JFrame {
         }
     }
 
-    public void showSpecBrowser(){
+    public void showPOBrowser(){
 	if(mediator.getProof() == null){
 	    mediator.notify
 	    (new GeneralFailureEvent("Please load a proof first"));
 	}else{
-	    JMLSpecBrowser.getJMLSpecBrowser(mediator);
+	    POBrowser poBrowser 
+	    	= POBrowser.showInstance(mediator.getProof().env().getInitConfig());
+	    if(poBrowser.getPO() != null) {
+		ProblemInitializer pi = new ProblemInitializer(this);
+		try {
+		    pi.startProver(mediator.getProof().env(), 
+			    	   poBrowser.getPO());
+		} catch(ProofInputException e)  {
+		    ExtList list = new ExtList();
+		    list.add(e);
+		    new ExceptionDialog(this, list);
+		}
+	    }
 	}
     }
 
-    public void showDLSpecBrowser(){
-	if(mediator.getProof() == null){
-	    mediator.notify
-	    (new GeneralFailureEvent("Please load a proof first"));
-	}else{
-	    JDialog fr = UsedMethodContractsList.getInstance(mediator());
-	    fr.setVisible(true);
-	}
-    }
-    
     /**
      * for debugging - opens a window with the settings from current Proof and the default settings
      */
@@ -958,10 +975,6 @@ public class Main extends JFrame {
             userConstraintView.updateTableDisplay(); // %%% HACK
         }
         
-    }
-    
-    public JMLPOAndSpecProvider getJMLPOAndSpecProvider() {
-        return new JMLEclipseAdapter(mediator);
     }
     
     public void showLicense() {
@@ -1236,9 +1249,11 @@ public class Main extends JFrame {
         JMenuItem methodContractsItem = new JMenuItem("Show Used Specifications...");
         methodContractsItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-		JDialog fr = new UsedMethodContractsList
-		    (mediator.getSelectedProof().getBasicTask(), mediator);
-		fr.setVisible(true);
+                new UsedSpecificationsDialog(
+                             mediator.getServices(), 
+                             mediator.getSelectedProof()
+                                     .getBasicTask()
+                                     .getUsedSpecs());
             }});
         registerAtMenu(proof, methodContractsItem);
 
@@ -1283,6 +1298,8 @@ public class Main extends JFrame {
     protected JMenu createOptionsMenu() {
 	JMenu options = new JMenu("Options");
 	options.setMnemonic(KeyEvent.VK_O);
+	
+	// default taclet options
 	JMenuItem choiceItem = new JMenuItem("Default Taclet Options...");
 	choiceItem.setAccelerator(KeyStroke.getKeyStroke
 			    (KeyEvent.VK_T, ActionEvent.CTRL_MASK));
@@ -1293,6 +1310,7 @@ public class Main extends JFrame {
 		}});
 	registerAtMenu(options, choiceItem);	
 
+	// update simplifier
 	JMenuItem updateSimplifierItem = new JMenuItem("Update Simplifier...");
 	updateSimplifierItem.setAccelerator(KeyStroke.getKeyStroke
 			    (KeyEvent.VK_U, ActionEvent.CTRL_MASK));
@@ -1303,8 +1321,7 @@ public class Main extends JFrame {
 		}});
 	registerAtMenu(options, updateSimplifierItem);	
     
-	ButtonGroup decisionProcGroup = new ButtonGroup();
- 
+	// taclet libraries
         JMenuItem librariesItem = new JMenuItem("Taclet Libraries...");
         librariesItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -1313,16 +1330,22 @@ public class Main extends JFrame {
         });
         registerAtMenu(options, librariesItem);
         
+        // decision procedures
+        ButtonGroup decisionProcGroup = new ButtonGroup();
         setupDecisionProcedureGroup(decisionProcGroup);
-        
         registerAtMenu(options, decisionProcedureOption);
-        
-        
+                        
+        // specification extraction
         JMenuItem computeSpecificationOptions = 
             ComputeSpecificationView.createOptionMenuItems();
         registerAtMenu(options, computeSpecificationOptions);
+                
+        // specification languages
+        JMenuItem speclangItem = setupSpeclangMenu();
+        registerAtMenu(options, speclangItem);
         
-        // GENERAL SETTINGS
+        addSeparator(options);
+        
         // minimize interaction
         final boolean stupidMode = 
             ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().stupidMode();
@@ -1340,31 +1363,7 @@ public class Main extends JFrame {
         
         registerAtMenu(options, stupidModeOption);
         
-        
-        // suggestive var names
-        // currently removed to avoid confusion
-        /*        
-         final boolean suggestiveVarNames = 
-         ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().suggestiveVarNames();
-         final JMenuItem suggVarNamesOption = 
-         new JCheckBoxMenuItem("Suggestive names for aux vars", 
-         suggestiveVarNames);
-         VariableNamer.setSuggestiveEnabled(suggestiveVarNames);
-         
-         suggVarNamesOption.addActionListener(new ActionListener() {
-         public void actionPerformed(ActionEvent e) {
-         boolean b = ((JCheckBoxMenuItem)e.getSource()).isSelected();
-         VariableNamer.setSuggestiveEnabled(b);
-         ProofSettings.DEFAULT_SETTINGS.
-         getGeneralSettings().setSuggestiveVarNames(b);
-         }});
-         
-         registerAtMenu(options, suggVarNamesOption);
-         */
-               
-			
-	addSeparator(options);
-
+	// dnd direction sensitive		
         final boolean dndDirectionSensitivity = 
             ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().isDndDirectionSensitive();
         final JMenuItem dndDirectionSensitivityOption =
@@ -1397,7 +1396,6 @@ public class Main extends JFrame {
         }});
 	
 	registerAtMenu(options, soundNotificationOption);
-
 
 	// proof assistant
 	final JMenuItem assistantOption = new JCheckBoxMenuItem
@@ -1436,9 +1434,7 @@ public class Main extends JFrame {
         return options;
     }
 
-    /**
-     * @param decisionProcGroup
-     */
+
     private void setupDecisionProcedureGroup(ButtonGroup decisionProcGroup) {
         simplifyButton.setSelected(ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings()
                 .useSimplify());
@@ -1517,6 +1513,42 @@ public class Main extends JFrame {
     }    
     
     
+    private JMenuItem setupSpeclangMenu() {
+        JMenu result = new JMenu("Specification Languages");       
+        ButtonGroup group = new ButtonGroup();
+        boolean useJML 
+            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().useJML();
+        
+        JRadioButtonMenuItem jmlButton = new JRadioButtonMenuItem("JML", 
+                                                                  useJML);
+        result.add(jmlButton);
+        group.add(jmlButton);
+        jmlButton.setIcon(IconFactory.jmlLogo(15));
+        jmlButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                ProofSettings.DEFAULT_SETTINGS
+                             .getGeneralSettings()
+                             .setUseJML(true);
+            }
+        });
+        
+        JRadioButtonMenuItem oclButton = new JRadioButtonMenuItem("OCL", 
+                                                                  !useJML);
+        result.add(oclButton);
+        group.add(oclButton);
+        oclButton.setIcon(IconFactory.umlLogo(15));
+        oclButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                ProofSettings.DEFAULT_SETTINGS
+                             .getGeneralSettings()
+                             .setUseJML(false);
+            }
+        });        
+        
+        return result;
+    }
+    
+    
     public JMenu createHelpMenu() {
         JMenu help = new JMenu("About");
         help.setMnemonic(KeyEvent.VK_A);
@@ -1564,27 +1596,15 @@ public class Main extends JFrame {
 	tools.add(extractSpecification);
 
 	JMenuItem specificationBrowser = 
-	    new JMenuItem("JML Specification Browser...");
+	    new JMenuItem("Proof Obligation Browser...");
 	specificationBrowser.setAccelerator(KeyStroke.getKeyStroke
-					    (KeyEvent.VK_J, 
+					    (KeyEvent.VK_B, 
 					     ActionEvent.CTRL_MASK));
 	specificationBrowser.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    showSpecBrowser();
-		}});
+	    public void actionPerformed(ActionEvent e) {
+    	        showPOBrowser();
+    	    }});
 	registerAtMenu(tools, specificationBrowser);
-
-
-	JMenuItem dlSpecificationBrowser = 
-	    new JMenuItem("DL Specification Browser...");
-	dlSpecificationBrowser.setAccelerator(KeyStroke.getKeyStroke
-					    (KeyEvent.VK_L, 
-					     ActionEvent.CTRL_MASK));
-	dlSpecificationBrowser.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    showDLSpecBrowser();
-		}});
-	registerAtMenu(tools, dlSpecificationBrowser);
         
         JMenuItem nonInterference = new JMenuItem("Check Non-Interference");
         nonInterference.addActionListener(new ActionListener() {
@@ -1605,6 +1625,39 @@ public class Main extends JFrame {
         testItem.setAction(createUnitTestAction);
         
         tools.add(testItem);
+        
+     // implemented by mbender for jmltest
+        final JMenuItem createWrapper = new JMenuItem("Create JML-Wrapper");
+        
+        createWrapper.setAccelerator(KeyStroke.getKeyStroke
+                (KeyEvent.VK_J, 
+                 ActionEvent.CTRL_MASK));
+
+        createWrapper.setEnabled(mediator.getProof() != null);
+
+        mediator.addKeYSelectionListener(new KeYSelectionListener() {
+            /** focused node has changed */
+            public void selectedNodeChanged(KeYSelectionEvent e) {
+            }
+
+            /**
+             * the selected proof has changed. Enable or disable action
+             * depending whether a proof is available or not
+             */
+            public void selectedProofChanged(KeYSelectionEvent e) {
+                createWrapper
+                        .setEnabled(e.getSource().getSelectedProof() != null);
+            }
+        });
+
+        createWrapper.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                JMLTestFileCreator jmltfc = new JMLTestFileCreator();
+                jmltfc.createWrapper();
+            }
+        });
+        tools.add(createWrapper);
         
         return tools;
     }
@@ -2246,7 +2299,7 @@ public class Main extends JFrame {
 		} else if (opt[index].equals("ASSERTION")) {
 		    de.uka.ilkd.key.util.Debug.ENABLE_ASSERTION = true;
 		} else if (opt[index].equals("NO_JMLSPECS")) {
-		    jmlSpecs = false;
+		    enableSpecs = false;
 		} else if (opt[index].equals("AUTO")) {
 		    batchMode = true;
 		} else if (opt[index].equals("TESTING") || opt[index].equals("UNIT")) {
@@ -2873,15 +2926,16 @@ public class Main extends JFrame {
       
         protected JMenu createToolsMenu() {
             JMenu toolsMenu = new JMenu("Tools");
+            
             JMenuItem specificationBrowser = 
-                new JMenuItem("JML Specification Browser...");
+                new JMenuItem("Proof Obligation Browser...");
             specificationBrowser.setAccelerator(KeyStroke.getKeyStroke
-                                                (KeyEvent.VK_J, 
-                                                        ActionEvent.CTRL_MASK));
+                                                (KeyEvent.VK_B, 
+                                                ActionEvent.CTRL_MASK));
             specificationBrowser.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        main.showSpecBrowser();
-                    }});
+                public void actionPerformed(ActionEvent e) {
+                    main.showPOBrowser();
+                }});
             toolsMenu.add(specificationBrowser);
             
             final JMenuItem showProver = new JMenuItem("Show Prover",
