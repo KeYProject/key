@@ -17,7 +17,7 @@ options {
     // OPTIMIZE_TOKEN_MANAGER = true; // obsolete
     // DEBUG_PARSER = true;
     // FORCE_LA_CHECK = true;
-    DEBUG_LOOKAHEAD = true;
+    // DEBUG_LOOKAHEAD = true;
 }
 
 PARSER_BEGIN(ProofJavaParser)
@@ -1796,7 +1796,9 @@ ConstructorDeclaration ConstructorDeclaration() :
     ";" { body = null; }
   )
   {
-      setPostfixInfo(body); 
+  	  if(body != null)
+        setPostfixInfo(body);
+         
       result.setIdentifier(id);
       result.setParameters(pdl);
       if (!ml.isEmpty())
