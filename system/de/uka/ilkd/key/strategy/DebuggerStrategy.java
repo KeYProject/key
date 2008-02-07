@@ -86,6 +86,7 @@ public class DebuggerStrategy extends VBTStrategy {
                 inftyConst(), longConst(0)));
         bindRuleSet(d, "debugger", inftyConst());
         bindRuleSet(d, "statement_sep", longConst(-200));
+       // if not in initphase
         bindRuleSet(d, "statement_sep", ifZero(WatchPointFeature.create(watchpoints),
                 inftyConst(), longConst(0)));
 

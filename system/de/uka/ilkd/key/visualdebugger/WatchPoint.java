@@ -12,7 +12,7 @@ public class WatchPoint {
     private String expression;
     
     /** The file in which the expression was set. */
-    private String file;
+    private String typeOfSource;
     
     /** The method in which the expression was set. */
     private String method;
@@ -24,18 +24,18 @@ public class WatchPoint {
      * Instantiates a new watch point.
      * 
      * @param expression the expression
-     * @param file the file
+     * @param typeOfSource the type of the source where the watchpoint was set
      * @param method the method
      * @param statement_line the statement_line
      */
     public WatchPoint(String name, String expression, String method,
-            String statement_line, String file) {
+            String statement_line, String typeOfSource) {
         super();
         this.name = name;
         this.expression = expression;
         this.method = method;
         this.statement_line = statement_line;
-        this.file = file;
+        this.typeOfSource = typeOfSource;
     }
     
     
@@ -53,8 +53,8 @@ public class WatchPoint {
      * 
      * @return the file
      */
-    public String getFile() {
-        return file;
+    public String getTypeOfSource() {
+        return typeOfSource;
     }
 
     /**

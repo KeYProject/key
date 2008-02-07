@@ -1935,37 +1935,38 @@ public class VisualDebugger {
     public int translateWatchpoints() {
 
         LinkedList<WatchPoint> watchpoints = watchPointManager.getWatchPoints();
-        int count = watchpoints.size();
         listOfWatchpoints = SLListOfTerm.EMPTY_LIST;
-
-        if (watchpoints == null || count == 0) {
+        assert(watchpoints != null);
+     
+        if (watchpoints.isEmpty()) {
             System.out.println("No watches created so far");
             return 0;
         } else {
-            for (int i = 0; i < count; i++) {
+            
+            Namespace progVarNS = new Namespace();
+            JavaInfo ji = mediator.getServices().getJavaInfo();
 
+            for (int i = 0; i < watchpoints.size(); i++) {
+                //TODO lookup class name in eclipse ast
                 WatchPoint wp = watchpoints.get(i);
                 StringBuffer buffer = new StringBuffer();
-                String file = wp.getFile();
-                String self = file.substring(file.lastIndexOf("/") + 1);
-                self = self.substring(0, self.indexOf("."));
-                file = file.substring(0, file.indexOf("."));
-                file = file.replace("/", ".");
-                file = file.substring(4);
+                
+                String typeOfSource = wp.getTypeOfSource();
+                String typeOfSelf = typeOfSource.substring(typeOfSource.lastIndexOf("/") + 1);
+                typeOfSelf = typeOfSelf.substring(0, typeOfSelf.indexOf("."));
 
-                Namespace progVarNS = new Namespace();
-              
-                JavaInfo ji = mediator.getServices().getJavaInfo();
 
+                //TODO check namespace
+                ProgramElementName selfName = new ProgramElementName("self_XY");
                 ProgramVariable var_self = new LocationVariable(
-                        new ProgramElementName("self"), ji.getKeYJavaType(file));
+                        selfName, ji.getKeYJavaType(typeOfSource));
                 ProgramVariable var_dummy = new LocationVariable(
                         new ProgramElementName(wp.getName()), ji.getKeYJavaType("boolean"));
                 progVarNS.add(var_self);
                 progVarNS.add(var_dummy);
 
-                buffer.append("\\<{method-frame( source=" + file
-                        + ",this=self");
+                buffer.append("\\exists " + typeOfSource +" x; {"+ selfName +":= x } \\<{method-frame( source=" + typeOfSource
+                        + ",this="+selfName); 
                 buffer.append(" ) : { " + wp.getName() + " = "
                         + wp.getExpression());
                 buffer.append(";} }\\>" + wp.getName() + " = TRUE");
@@ -1985,7 +1986,7 @@ public class VisualDebugger {
 
                 listOfWatchpoints = listOfWatchpoints.append(term); 
             }
-            return count;
+            return watchpoints.size();
         }
     }
 
