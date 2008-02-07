@@ -600,6 +600,15 @@ public class Main extends JFrame {
      * *********************** UGLY INSPECTION CODE **********************
      */
     private void setupInternalInspection() {
+ /*MULBRICH       goalView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW ).put(
+                KeyStroke.getKeyStroke(KeyEvent.VK_U, ActionEvent.CTRL_MASK), 
+        "show_inspector");
+        goalView.getActionMap().put("show_inspector", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                new ObjectInspector("Term", sequentView.getMousePosInSequent().getPosInOccurrence().subTerm()).setVisible(true);
+            } });*/
+        
+        
         goalView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW ).put(
                 KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK), 
         "show_tree");

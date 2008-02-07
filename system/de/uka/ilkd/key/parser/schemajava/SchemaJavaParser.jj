@@ -4348,6 +4348,19 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
 		  return result;
 	      }
 	   )
+	   |
+	   (
+	    "#enhancedfor-elim" "("
+	      loopStat=ForStatement()
+	    ")" ";"
+	    	{
+	    	result = factory.createRKeYMetaConstruct();
+		  	setPrefixInfo(result);
+		 	result.setChild(loopStat);
+		 	result.setName("#enhancedfor-elim");
+		  	return result;
+	     	}
+	   )
 	  }
 
 

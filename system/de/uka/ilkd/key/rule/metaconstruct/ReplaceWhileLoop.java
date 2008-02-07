@@ -17,6 +17,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.statement.EnhancedFor;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
@@ -25,16 +27,20 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
- * Walks through a java AST in depth-left-fist-order. This walker is used to
- * transform a loop (not only while loops) according to the rules of the dynamic
- * logic.
+ * This visitor is used to identify and replace the while loop
+ * in invariant rule.
+ * 
+ * It can be applied to EnhancedFors also.
+ * 
+ * @see WhileInvRule
+ * @see WhileInvariantTransformation
  */
 public class ReplaceWhileLoop extends CreatingASTVisitor {
 
     private boolean firstWhileFound = false;
     private boolean replaced = false;
     private StatementBlock toInsert = null;
-    private While theLoop = null;
+    private LoopStatement theLoop = null;
     private int lastMethodFrameBeforeLoop = -1;
 
     private KeYJavaType returnType = null;
@@ -88,10 +94,10 @@ public class ReplaceWhileLoop extends CreatingASTVisitor {
     }
 
     protected void walk(ProgramElement node) {
-	if (node instanceof While && !firstWhileFound) {
+	if ((node instanceof While || node instanceof EnhancedFor)&& !firstWhileFound) {
 	    firstWhileFound = true;
 	    firstLoopPos = depth();
-	    theLoop = ((While) node);
+	    theLoop = (LoopStatement) node;
 	    lastMethodFrameBeforeLoop =
 		currentMethodFrame;
 	}
@@ -153,6 +159,23 @@ public class ReplaceWhileLoop extends CreatingASTVisitor {
 	    changed();
         } else {
             super.performActionOnWhile(x);
+        }
+    }
+    
+    /*
+     * spot the first the loop and remember it.
+     * This loop may be a while or also a foreach loop
+     */
+    public void performActionOnEnhancedFor(EnhancedFor x) {
+        if (firstLoopPos == depth() && ! replaced) {
+            replaced = true;
+            if (toInsert == null)
+                stack.pop();
+            else
+                addChild(toInsert);
+            changed();
+        } else {
+            super.performActionOnEnhancedFor(x);
         }
     }
 }

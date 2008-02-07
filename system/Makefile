@@ -288,7 +288,6 @@ GENERATED_MAPS=logic/HashMapFromNameToNamed \
 	logic/op/MapAsListFromQuantifiableVariableToTerm \
 	logic/op/MapAsListFromQuantifiableVariableToMetavariable 
 
-
 GENERATED_ARRAYS=java/ArrayOfProgramElementExtnullInnull \
 	java/ArrayOfStatementExtProgramElementInnull \
 	java/ArrayOfExpressionExtProgramElementInnull \

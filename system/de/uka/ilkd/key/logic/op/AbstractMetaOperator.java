@@ -53,6 +53,9 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
 
     public static final AbstractMetaOperator META_TRANSACTIONCOUNTER = 
 	new MetaTransactionCounter();
+    
+    /** general access to nonstatic fields in classes */
+    public static final AbstractMetaOperator META_FIELDREF = new MetaFieldReference(); 
 
     /** the shadow operator for transactions */
     public static final AbstractMetaOperator META_SHADOW = new MetaShadow();
@@ -101,6 +104,8 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     public static final AbstractMetaOperator META_LONG_UNSIGNEDSHIFTRIGHT = new MetaJavaLongUnsignedShiftRight();
 
     public static final AbstractMetaOperator WHILE_INV_RULE = new WhileInvRule();
+    
+    public static final AbstractMetaOperator ENHANCEDFOR_INV_RULE = new EnhancedForInvRule();
 
     public static final AbstractMetaOperator INTRODUCE_NEW_ANON_UPDATE = new IntroNewAnonUpdateOp();
 
@@ -113,6 +118,8 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     public static final AbstractMetaOperator RESOLVE_QUERY = new ResolveQuery();
 
     public static final AbstractMetaOperator CONSTANT_VALUE = new ConstantValue();
+    
+    public static final AbstractMetaOperator ENUM_CONSTANT_VALUE = new EnumConstantValue();
     
     public static final AbstractMetaOperator UNIVERSES = new Universes();
 
@@ -149,7 +156,7 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     }
 
     /**
-     * checks whether the top level structure of the given @link Term
+     * checks whether the top level structure of the given {@link Term}
      * is syntactically valid, given the assumption that the top level
      * operator of the term is the same as this Operator. The
      * assumption that the top level operator and the term are equal

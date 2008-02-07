@@ -207,3 +207,5 @@ org/jmlspecs/lang/JMLDataGroup.java
 junit/framework/Test.java
 junit/framework/TestCase.java
 junit/framework/TestSuite.java
+java5/Enum.java
+java5/Iterable.java

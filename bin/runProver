@@ -158,7 +158,7 @@ fi
 
 key_ext_jars="antlr.jar jargs.jar recoder.jar dresden-ocl-demo.jar xerces.jar log4j.jar"
 
-keyclasspath="$KEY_HOME/system/binary/"
+keyclasspath="$KEY_HOME/system/binary/:/home/mattze/eclipse/objinspector/classes/":
 
 for i in $key_ext_jars ; do
     current_jar="$KEY_LIB/$i"

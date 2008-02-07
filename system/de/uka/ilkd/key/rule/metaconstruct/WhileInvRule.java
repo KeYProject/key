@@ -30,12 +30,12 @@ public class WhileInvRule extends AbstractMetaOperator {
 
     /** the outer label that is used to leave the while loop ('l1') */
     private final SchemaVariable outerLabel = 
-	SchemaVariableFactory.createProgramSV(new ProgramElementName("outer_label"),
-				       ProgramSVSort.LABEL, false);
+        SchemaVariableFactory.createProgramSV(new ProgramElementName("outer_label"),
+                                       ProgramSVSort.LABEL, false);
     /** the inner label ('l2') */
     private final SchemaVariable innerLabel =
-	SchemaVariableFactory.createProgramSV(new ProgramElementName("inner_label"),
-				       ProgramSVSort.LABEL, false);
+        SchemaVariableFactory.createProgramSV(new ProgramElementName("inner_label"),
+                                       ProgramSVSort.LABEL, false);
     /** list of the labels */
     private ListOfSchemaVariable instantiations  = null;
 
@@ -61,7 +61,7 @@ public class WhileInvRule extends AbstractMetaOperator {
     private KeYJavaType returnType;
     
     public WhileInvRule() {
-	super(new Name("#whileInvRule"), 2);
+        super(new Name("#whileInvRule"), 2);
     }
 
 
@@ -69,7 +69,7 @@ public class WhileInvRule extends AbstractMetaOperator {
      * not a term.
      */
     public Sort sort(Term[] term) {
-	return Sort.FORMULA;
+        return Sort.FORMULA;
     }
 
 
@@ -83,8 +83,8 @@ public class WhileInvRule extends AbstractMetaOperator {
      * the @link Term is valid.
      */
     public boolean validTopLevel(Term term) {
-	// a meta operator accepts almost everything
-	return  term.arity()==arity();
+        // a meta operator accepts almost everything
+        return  term.arity()==arity();
     }
 
 
@@ -132,7 +132,7 @@ public class WhileInvRule extends AbstractMetaOperator {
         
         ProgramVariable contFlag   = getNewLocalvariable("cont", "boolean", services);
         ProgramVariable returnFlag = getNewLocalvariable("rtrn", "boolean", services);
-        ProgramVariable breakFlag  = getNewLocalvariable("brk", "boolean", services);               	
+        ProgramVariable breakFlag  = getNewLocalvariable("brk", "boolean", services);                   
         // xxx how to ensure that "exc" has not been used before??
         ProgramVariable excFlag    = getNewLocalvariable("exc", "boolean", services);        
         ProgramVariable excParam   = getNewLocalvariable("e", "java.lang.Throwable", services);          
@@ -255,7 +255,7 @@ public class WhileInvRule extends AbstractMetaOperator {
         Modality loopBodyModality = modality;
         
         // This here is crucial for transactions. If you wonder why the conversion
-	// is so "irregular", well, that's the way it is ;) /Wojtek
+        // is so "irregular", well, that's the way it is ;) /Wojtek
         if (modality == BOXTRC || modality == TOUTTRC)
             loopBodyModality = BOX;
         if (modality == DIATRC)
@@ -263,7 +263,7 @@ public class WhileInvRule extends AbstractMetaOperator {
         return tf.createProgramTerm
         (loopBodyModality, 
          JavaBlock.createJavaBlock
-         (new StatementBlock(resSta)), result);	
+         (new StatementBlock(resSta)), result); 
     }
 
 
@@ -307,23 +307,23 @@ public class WhileInvRule extends AbstractMetaOperator {
      * be given.
      */
     public ListOfSchemaVariable neededInstantiations(ProgramElement originalLoop,
-						     SVInstantiations svInst) {
-	WhileInvariantTransformation w = 
+                                                     SVInstantiations svInst) {
+        WhileInvariantTransformation w = 
 	    new WhileInvariantTransformation(originalLoop, 
                                              svInst, 
                                              javaInfo == null 
                                               ? null 
                                               : javaInfo.getServices());
-	w.start();
-	instantiations = SLListOfSchemaVariable.EMPTY_LIST;
-	if (w.innerLabelNeeded()) {
-	    instantiations = instantiations.prepend(innerLabel);
-	}
-	if (w.outerLabelNeeded()) {
-	    instantiations = instantiations.prepend(outerLabel);
-	}
-	breakList = w.breakList();
-	return instantiations;
+        w.start();
+        instantiations = SLListOfSchemaVariable.EMPTY_LIST;
+        if (w.innerLabelNeeded()) {
+            instantiations = instantiations.prepend(innerLabel);
+        }
+        if (w.outerLabelNeeded()) {
+            instantiations = instantiations.prepend(outerLabel);
+        }
+        breakList = w.breakList();
+        return instantiations;
     }
 
     //---------------------------------------------------------------
@@ -332,144 +332,143 @@ public class WhileInvRule extends AbstractMetaOperator {
 
 
     private Term createLongJunctorTerm(Junctor junctor, ArrayList terms) {
-	if (terms.size() == 1)
-	    return (Term)terms.get(0);
-	else if (terms.size() == 2)
-	    return tf.createJunctorTerm(junctor,
-					(Term)terms.get(0),
-					(Term)terms.get(1));
-	else {
-	    Term arg1 = (Term)terms.get(0);
-	    terms.remove(0);
-	    return 
-		tf.createJunctorTerm(junctor, 
-				     arg1, 
-				     createLongJunctorTerm(junctor, terms));
-	}
+        if (terms.size() == 1)
+            return (Term)terms.get(0);
+        else if (terms.size() == 2)
+            return tf.createJunctorTerm(junctor,
+                                        (Term)terms.get(0),
+                                        (Term)terms.get(1));
+        else {
+            Term arg1 = (Term)terms.get(0);
+            terms.remove(0);
+            return 
+                tf.createJunctorTerm(junctor, 
+                                     arg1, 
+                                     createLongJunctorTerm(junctor, terms));
+        }
     }
 
 
     private Statement returnFlagDecl(ProgramVariable returnFlag,
-				     SVInstantiations svInst) {
-	return KeYJavaASTFactory.
-	    declare(returnFlag, BooleanLiteral.FALSE,
-		    javaInfo.getKeYJavaType("boolean"));
+                                     SVInstantiations svInst) {
+        return KeYJavaASTFactory.
+            declare(returnFlag, BooleanLiteral.FALSE,
+                    javaInfo.getKeYJavaType("boolean"));
     }
 
     private Term returnCase(ProgramVariable returnFlag,
-			    KeYJavaType returnType,
-			    ProgramVariable returnExpression,
-			    Term post) {
-	Term executeReturn = tf.createProgramTerm
-	    (modality, 
-	     addContext(root, new StatementBlock
-			(KeYJavaASTFactory.returnClause(returnExpression))), 
-	     post);
-	
-	return tf.createJunctorTerm
-	    (Op.IMP, 
-	     tf.createEqualityTerm(Op.EQUALS, 
-				   typeConv.convertToLogicElement(returnFlag), 
-				   typeConv.getBooleanLDT().getTrueTerm()), 
-	     executeReturn);
-	
+                            KeYJavaType returnType,
+                            ProgramVariable returnExpression,
+                            Term post) {
+        Term executeReturn = tf.createProgramTerm
+            (modality, 
+             addContext(root, new StatementBlock
+                        (KeYJavaASTFactory.returnClause(returnExpression))), 
+             post);
+        
+        return tf.createJunctorTerm
+            (Op.IMP, 
+             tf.createEqualityTerm(Op.EQUALS, 
+                                   typeConv.convertToLogicElement(returnFlag), 
+                                   typeConv.getBooleanLDT().getTrueTerm()), 
+             executeReturn);
+        
     }
 
 
     private Statement breakFlagDecl(ProgramVariable breakFlag) {
-	return KeYJavaASTFactory.
-	    declare(breakFlag, BooleanLiteral.FALSE,
-		    javaInfo.getKeYJavaType("boolean"));
+        return KeYJavaASTFactory.
+            declare(breakFlag, BooleanLiteral.FALSE,
+                    javaInfo.getKeYJavaType("boolean"));
     }
 
     private Statement contFlagDecl(ProgramVariable contFlag) {
-	return KeYJavaASTFactory.
-	    declare(contFlag, BooleanLiteral.FALSE,
-		    javaInfo.getKeYJavaType("boolean"));
+        return KeYJavaASTFactory.
+            declare(contFlag, BooleanLiteral.FALSE,
+                    javaInfo.getKeYJavaType("boolean"));
     }
 
     private Term breakCase(ProgramVariable breakFlag,
-			   Term post,
-			   ArrayList breakIfCascade) {
-	Term executeBreak = 
-	    tf.createProgramTerm
-	    (modality,
-	     addContext(root, new StatementBlock
-			((Statement[])breakIfCascade.toArray(new Statement[0]))),
-	     post);
-	return tf.createJunctorTerm
-	    (Op.IMP, 
-	     tf.createEqualityTerm(Op.EQUALS, 
-				   typeConv.convertToLogicElement(breakFlag), 
-				   typeConv.getBooleanLDT().getTrueTerm()), 
-	     executeBreak); 
+                           Term post,
+                           ArrayList breakIfCascade) {
+        Term executeBreak = 
+            tf.createProgramTerm
+            (modality,
+             addContext(root, new StatementBlock
+                        ((Statement[])breakIfCascade.toArray(new Statement[0]))),
+             post);
+        return tf.createJunctorTerm
+            (Op.IMP, 
+             tf.createEqualityTerm(Op.EQUALS, 
+                                   typeConv.convertToLogicElement(breakFlag), 
+                                   typeConv.getBooleanLDT().getTrueTerm()), 
+             executeBreak); 
     }
 
 
     private Term  normalCaseAndContinue(Term contFlagTerm,
-					Term returnFlagTerm,
-					Term breakFlagTerm,
-					Term excFlagTerm,
-					Term inv) {
+                                        Term returnFlagTerm,
+                                        Term breakFlagTerm,
+                                        Term excFlagTerm,
+                                        Term inv) {
 
-	final Term TRUE_TERM = typeConv.getBooleanLDT().getTrueTerm();
+        final Term TRUE_TERM = typeConv.getBooleanLDT().getTrueTerm();
 
-	ArrayList al = new ArrayList();
+        ArrayList al = new ArrayList();
 
-	if (returnFlagTerm != null)
-	    al.add(tf.createEqualityTerm(Op.EQUALS, returnFlagTerm, TRUE_TERM));
-	if (breakFlagTerm != null)
-	    al.add(tf.createEqualityTerm(Op.EQUALS, breakFlagTerm, TRUE_TERM));
-	if (excFlagTerm != null)
-	    al.add(tf.createEqualityTerm(Op.EQUALS, excFlagTerm, TRUE_TERM));
+        if (returnFlagTerm != null)
+            al.add(tf.createEqualityTerm(Op.EQUALS, returnFlagTerm, TRUE_TERM));
+        if (breakFlagTerm != null)
+            al.add(tf.createEqualityTerm(Op.EQUALS, breakFlagTerm, TRUE_TERM));
+        if (excFlagTerm != null)
+            al.add(tf.createEqualityTerm(Op.EQUALS, excFlagTerm, TRUE_TERM));
 
-	if (al.size() == 0) {
-	    if (contFlagTerm == null)
-		return inv;
-	    else 
-		return tf.createJunctorTerm(Op.IMP, contFlagTerm, inv);
-	} else {
-	    Term premiss = tf.createJunctorTerm(Op.NOT, 
-						createLongJunctorTerm(Op.OR, al));
-	    if (contFlagTerm != null)
-		premiss = tf.createJunctorTerm(Op.OR, 
-					       contFlagTerm,
-					       premiss);	    
-	    
-	    return 
-		tf.createJunctorTerm(Op.IMP, premiss, inv);
-	}	
+        if (al.size() == 0) {
+            if (contFlagTerm == null)
+                return inv;
+            else 
+                return tf.createJunctorTerm(Op.IMP, contFlagTerm, inv);
+        } else {
+            Term premiss = tf.createJunctorTerm(Op.NOT, 
+                                                createLongJunctorTerm(Op.OR, al));
+            if (contFlagTerm != null)
+                premiss = tf.createJunctorTerm(Op.OR, 
+                                               contFlagTerm,
+                                               premiss);            
+            
+            return 
+                tf.createJunctorTerm(Op.IMP, premiss, inv);
+        }       
     }
     
 
     private Term throwCase(ProgramVariable excFlag,
-			   ProgramVariable thrownException,
-			   Term post) {
-	Term throwException = 
-	    tf.createProgramTerm
-	    (modality, addContext
-	     (root, new StatementBlock
-	      (KeYJavaASTFactory.throwClause(thrownException))), 
-	     post);
-	return tf.createJunctorTerm
-	    (Op.IMP, 
-	     tf.createEqualityTerm(Op.EQUALS, 
-				   typeConv.convertToLogicElement(excFlag), 
-				   typeConv.getBooleanLDT().getTrueTerm()), 
-	     throwException);
+                           ProgramVariable thrownException,
+                           Term post) {
+        Term throwException = 
+            tf.createProgramTerm
+            (modality, addContext
+             (root, new StatementBlock
+              (KeYJavaASTFactory.throwClause(thrownException))), 
+             post);
+        return tf.createJunctorTerm
+            (Op.IMP, 
+             tf.createEqualityTerm(Op.EQUALS, 
+                                   typeConv.convertToLogicElement(excFlag), 
+                                   typeConv.getBooleanLDT().getTrueTerm()), 
+             throwException);
     }
 
 
     protected JavaBlock addContext(JavaNonTerminalProgramElement root,
-				   StatementBlock block) {
-	ReplaceWhileLoop replaceWhile = 
+                                   StatementBlock block) {
+        ReplaceWhileLoop replaceWhile = 
   	    new ReplaceWhileLoop(root, block, javaInfo.getServices());
- 	replaceWhile.start();       
-	
-	return JavaBlock.createJavaBlock((StatementBlock)replaceWhile.result());
+        replaceWhile.start();       
+        
+        return JavaBlock.createJavaBlock((StatementBlock)replaceWhile.result());
 
     }
     
 
 }
-

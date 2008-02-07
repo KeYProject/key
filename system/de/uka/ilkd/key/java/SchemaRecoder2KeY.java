@@ -76,6 +76,11 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
                 schemaServConf.getProgramFactory().createClassDeclaration(null,
                         new ImplicitIdentifier("<KeYSpecialParsing>"), null,
                         null, null));
+	} else if ("#enhancedfor-elim".equals(mcName)){ 
+            EnhancedFor efor = (EnhancedFor)list.get(EnhancedFor.class);
+            if(efor == null)
+                throw new ConvertException("#enhancedfor-elim requires an enhanced for loop as argument");
+            return new EnhancedForElimination((EnhancedFor)list.get(EnhancedFor.class));
     }
 
     /**

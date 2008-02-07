@@ -70,4 +70,5 @@ public class TestProofJavaParser extends TestCase {
         factory.parseMemberDeclaration("private <Default> getDefault() { };");
         factory.parseMemberDeclaration("private <T> Type m() { };");
     }
+        
 }

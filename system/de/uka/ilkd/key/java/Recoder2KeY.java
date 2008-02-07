@@ -23,12 +23,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import recoder.java.declaration.EnumConstantDeclaration;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.service.ChangeHistory;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.declaration.EnumClassDeclaration;
 import de.uka.ilkd.key.java.recoderext.ClassInitializeMethodBuilder;
 import de.uka.ilkd.key.java.recoderext.ClassPreparationMethodBuilder;
 import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
@@ -549,8 +551,7 @@ public class Recoder2KeY implements JavaReader {
     private void transformModel(List<recoder.java.CompilationUnit> cUnits) {
 
         RecoderModelTransformer[] transformer = new RecoderModelTransformer[] {
-                // reinsert when java 5 is enabled
-                // new EnumClassBuilder(servConf, cUnits),
+                new EnumClassBuilder(servConf, cUnits),
                 new JMLTransformer(servConf, cUnits, parsingLibs),
                 new ImplicitFieldAdder(servConf, cUnits), new InstanceAllocationMethodBuilder(servConf, cUnits),
                 new ConstructorNormalformBuilder(servConf, cUnits), new ClassPreparationMethodBuilder(servConf, cUnits),
