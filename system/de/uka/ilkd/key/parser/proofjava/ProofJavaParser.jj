@@ -15,7 +15,9 @@ options {
     JAVA_UNICODE_ESCAPE = true; // costs approx. 7%
     STATIC = true; // if true, the parser may be initialized only once
     // OPTIMIZE_TOKEN_MANAGER = true; // obsolete
-//    DEBUG_PARSER = true;
+    // DEBUG_PARSER = true;
+    // FORCE_LA_CHECK = true;
+    DEBUG_LOOKAHEAD = true;
 }
 
 PARSER_BEGIN(ProofJavaParser)
@@ -70,7 +72,7 @@ public class ProofJavaParser {
     private static void setAllowSuper(boolean b) { superAllowed = b; }
 
 
-    static boolean jdk1_4 = false;
+    static boolean jdk1_4 = true;
     static boolean jdk1_5 = false;
 
     public static boolean isAwareOfAssert() {
@@ -925,6 +927,7 @@ EnumDeclaration EnumDeclaration() :
 	Implements im;
 	ASTList<UncollatedReferenceQualifier> nl;
 	EnumConstantDeclaration constant;
+	Identifier id;
 }
 {
 
@@ -949,11 +952,8 @@ EnumDeclaration EnumDeclaration() :
 			result.setDeclarationSpecifiers(declSpecs);
 	}
 	
-	<IDENTIFIER>
+	id = ShortName()
     {
-          Identifier id = factory.createIdentifier(token.image);
-          setPrefixInfo(id);
-          setPostfixInfo(id);
           result.setIdentifier(id);
     }
 
@@ -1088,32 +1088,25 @@ ClassDeclaration UnmodifiedClassDeclaration() :
   Extends ex;
   Implements im;
   ASTList<TypeParameterDeclaration> typeParams = null;
+  Identifier id;
 }
 {
   "class"  {
       result = factory.createClassDeclaration();
       setPrefixInfo(result);
   }
-  (<IDENTIFIER>
-      {
-          Identifier id = factory.createIdentifier(token.image);
-          setPrefixInfo(id);
-          setPostfixInfo(id);
-          result.setIdentifier(id);
-      }
-   [ typeParams = TypeParameters() 
+  
+  id = ShortName()
+  	{
+  		result.setIdentifier(id);
+  	}
+     
+  [ typeParams = TypeParameters() 
   	{
   		result.setTypeParameters(typeParams);
   	}
-   ]
-  |
-   id = ImplicitIdentifier() 
-      { 
-          setPrefixInfo(id);
-          setPostfixInfo(id);
-          result.setIdentifier(id);
-      }
-  )
+  ]
+  
   [ "extends"
       {
           ex = factory.createExtends();
@@ -1305,6 +1298,7 @@ InterfaceDeclaration UnmodifiedInterfaceDeclaration() :
     MemberDeclaration                md;
     Extends ex;
     ASTList<TypeParameterDeclaration> typeParams = null;
+    Identifier id;
 }
 {
   "interface"
@@ -1312,13 +1306,12 @@ InterfaceDeclaration UnmodifiedInterfaceDeclaration() :
       result = factory.createInterfaceDeclaration();
       setPrefixInfo(result);
   }      
-  <IDENTIFIER>
+  
+  id = ShortName() 
   {
-      Identifier id = factory.createIdentifier(token.image);
-      setPrefixInfo(id);
-      setPostfixInfo(id);
       result.setIdentifier(id);
   }
+  
   [ typeParams = TypeParameters() 
   	{
   		result.setTypeParameters(typeParams);
@@ -1388,6 +1381,7 @@ FieldDeclaration FieldDeclaration() :
     ASTList<DeclarationSpecifier> ml = new ASTArrayList<DeclarationSpecifier>();
     DeclarationSpecifier m = null;
     TypeReference tr;
+    UncollatedReferenceQualifier qn;
     ASTArrayList<FieldSpecification> vl = new ASTArrayList<FieldSpecification>();
     VariableSpecification var;
 }
@@ -1413,7 +1407,7 @@ FieldDeclaration FieldDeclaration() :
         ml.add(m);
     }
   )*
-  (tr = Type())
+  (tr = ResultType())  // grammar weakening, void is allowed, but DeclarationTypedName needed
   {
     result.setDeclarationSpecifiers(ml);
     result.setTypeReference(tr);
@@ -1469,10 +1463,8 @@ Identifier VariableDeclaratorId() :
     Identifier result;
 }
 {
-  <IDENTIFIER>
-  { result = factory.createIdentifier(token.image);
-    setPrefixInfo(result);
-    setPostfixInfo(result);
+  result = ShortName()
+  { 
     tmpDimension = 0;
   }
   ( "[" "]" { tmpDimension++; } )*
@@ -1528,6 +1520,23 @@ ArrayInitializer ArrayInitializer() :
   }
 }
 
+/*
+ * This production is needed to have a semantic lookahead to decide whether
+ * <x> is a type parameter or an implicit identifier
+ * consider:
+ *    public <E> <ImplicitClass> <init>( ...
+ *    public <ImplicitClass> <init>(
+ * The first < ist the decision point!
+ * If 2 identifiers follow the <...>, it is a type parameter
+ * otherwise a lookahead of >= 7 would have to be specified.
+ * Yet, this is not left recursive (I believe).
+ * @author MU
+ */
+void TypeParameterLookahead(): {}
+{
+	TypeParameters() ResultType() (<IDENTIFIER> | ImplicitIdentifier())
+}
+
 MethodDeclaration MethodDeclaration() :
 {
   ASTList<DeclarationSpecifier> ml = new ASTArrayList<DeclarationSpecifier>();
@@ -1561,7 +1570,7 @@ MethodDeclaration MethodDeclaration() :
     }
   )*
 
-  [	
+  [	LOOKAHEAD(TypeParameterLookahead())
   	"<"
   	{
 	    if (ml.size() == 0) { // '<' of MethodDeclaration is first element then. Need to store the result somewhere...
@@ -1610,7 +1619,8 @@ void MethodDeclarationLookahead() :
 {}
 {
   ( "public" | "protected" | "private" | "static" | "abstract" | "final" | "native" | "synchronized" | "strictfp" | AnnotationUse() )*
-  [TypeParameters()] ResultType() ( <IDENTIFIER> | ImplicitIdentifier() ) "("
+  [ LOOKAHEAD(TypeParameterLookahead()) TypeParameters()] ResultType() 
+            ( <IDENTIFIER> | ImplicitIdentifier() ) "("
 }
 
 MethodDeclaration MethodDeclarator(TypeReference tr) :
@@ -1620,12 +1630,7 @@ MethodDeclaration MethodDeclarator(TypeReference tr) :
     MethodDeclaration               result;
 }
 {
-  (<IDENTIFIER> 
-  { id = factory.createIdentifier(token.image); setPrefixInfo(id); setPostfixInfo(id);}
-  |
-   id = ImplicitIdentifier() 
-  { setPrefixInfo(id); setPostfixInfo(id);}
-  )        
+  id = ShortName()
   pdl = FormalParameters()
   
   ( "[" "]" // array dims are indeed allowed after parameter list (!)
@@ -1769,6 +1774,7 @@ ConstructorDeclaration ConstructorDeclaration() :
       setPostfixInfo(id);
   }
   pdl = FormalParameters()
+
   [ "throws" nl = TypedNameList() ]
   ( "{"
   {
@@ -1785,7 +1791,7 @@ ConstructorDeclaration ConstructorDeclaration() :
     ( stat = BlockStatement()
       { stats.add(stat); }
     )*
-    "}"
+  "}"
   |
     ";" { body = null; }
   )
@@ -1886,50 +1892,24 @@ TypeReference Type() :
   UncollatedReferenceQualifier qn;
   int dimension = 0;
 }
-{
-	(
-	LOOKAHEAD(TypedName()) // try to match typed name FIRST
- 	  qn = TypedName() 
- 	  {
-      	result = qn.toTypeReference();
-      }
+{	
+	  (
+	    result = PrimitiveType()
+	   |
+ 	    qn = TypedName() 
+ 	    {
+      	  result = qn.toTypeReference();
+        }
+      )
       ( "[" "]" { if (dimension == 0) setPrefixInfo(result); dimension++; } )*
       {
       	result.setDimensions(dimension);
       	setPostfixInfo(result);
- 	  }
- 	|
- 	  result = RawType() // raw types are also types
-  	)
+ 	  }  	
   {
       return result;
   }
 }
-
-TypeReference RawType() :
-{
-  TypeReference result;
-  UncollatedReferenceQualifier qn;
-  int dimension = 0;
-}
-{
-  ( result = PrimitiveType() // the 1st difference to Type()
-  | (qn = Name()  // the 2nd difference to Type()
-    {
-        result = qn.toTypeReference();
-    }
-    )
-
-  )
-  ( "[" "]" { if (dimension == 0) setPrefixInfo(result); dimension++; } )*
-  {
-      result.setDimensions(dimension);
-      checkConstruction(result);
-      setPostfixInfo(result);
-      return result;
-  }
-}
-
 
 TypeReference PrimitiveType() :
 {
@@ -1958,27 +1938,65 @@ TypeReference PrimitiveType() :
   }
 }
 
+/*
 TypeReference ResultType() :
 {
   TypeReference result;
 }
 {
 (
-  ( "void" { 
-    Identifier id = factory.createIdentifier(token.image);
-    setPrefixInfo(id);
-    setPostfixInfo(id);
-    result = factory.createTypeReference(id);
-    setPrefixInfo(result);
-} )
-  | result = Type()
+   "void" { 
+     Identifier id = factory.createIdentifier(token.image);
+     setPrefixInfo(id);
+     setPostfixInfo(id);
+     result = factory.createTypeReference(id);
+     setPrefixInfo(result);
+    } 
+  | 
+    result = Type()
 )
   {
     checkConstruction(result);
     setPostfixInfo(result);
     return result;
   }
+}*/
+
+
+// ResultType must be different to general Type because of the expanded
+// lookahead
+TypeReference ResultType() :
+{
+  int dimension = 0;
+  TypeReference result;
+  UncollatedReferenceQualifier qn;
 }
+{
+  (
+    "void" 
+      { 
+        Identifier id = factory.createIdentifier(token.image);
+        setPrefixInfo(id);
+	    setPostfixInfo(id);
+    	result = factory.createTypeReference(id);
+        setPrefixInfo(result);
+      }      
+  | 
+   ( 
+     result = PrimitiveType()
+    |
+     qn = DeclarationTypedName() { result = qn.toTypeReference(); }
+   )
+     ( "[" "]" { if (dimension == 0) setPrefixInfo(result); dimension++; } )*        
+  )    
+  {
+  	result.setDimensions(dimension);
+    checkConstruction(result);
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
 
 /*************************************
  * an implicit identifier is embraced by < and >
@@ -2006,6 +2024,28 @@ ImplicitIdentifier ImplicitIdentifier() :
   )
 }
 
+Identifier ShortName() :
+{
+	Identifier result;
+}
+{
+  (<IDENTIFIER>
+  {
+    result = factory.createIdentifier(token.image);    
+    setPrefixInfo(result);
+    setPostfixInfo(result);
+  }
+ | 
+  result = ImplicitIdentifier()
+  {
+    setPrefixInfo(result);
+    setPostfixInfo(result);
+  })
+  { 
+  	return result;
+  }
+}
+
 UncollatedReferenceQualifier Name() :
 /*
  * A lookahead of 2 is required below since "Name" can be followed
@@ -2016,34 +2056,17 @@ UncollatedReferenceQualifier Name() :
   Identifier id;
 }
 {
-  (<IDENTIFIER>
-  {
-    id = factory.createIdentifier(token.image);    
-    setPrefixInfo(id);
-    setPostfixInfo(id);
-    result = factory.createUncollatedReferenceQualifier(id);
-  } | 
-  id = ImplicitIdentifier()
-  {
-    setPrefixInfo(id);
-    setPostfixInfo(id);
-    result = factory.createUncollatedReferenceQualifier(id);
-  })
+  id = ShortName() 
+  {  
+	result = factory.createUncollatedReferenceQualifier(id);
+  } 
 
   (
     LOOKAHEAD(2) "." { setPrefixInfo(result); }
-    ( <IDENTIFIER>
+    id = ShortName()
       {
-        id = factory.createIdentifier(token.image);
+        result = factory.createUncollatedReferenceQualifier(result, id);
       }
-    |
-      id = ImplicitIdentifier()
-    )
-    {
-      setPrefixInfo(id);
-      setPostfixInfo(id);
-      result = factory.createUncollatedReferenceQualifier(result, id);
-    }
   )*
   {
     checkConstruction(result);
@@ -2052,32 +2075,61 @@ UncollatedReferenceQualifier Name() :
   }
 }
 
-UncollatedReferenceQualifier TypedName() :
-/* this is for generics.
+/*
+ * Identical copy of TypedName, but lookahead is different for
+ * TypeArgument --> if ImplicitIdentifier follows!
  */
+UncollatedReferenceQualifier DeclarationTypedName() :
 {
   UncollatedReferenceQualifier result;
   Identifier id;
   ASTList<TypeArgumentDeclaration> typeArguments = null;
 }
-{
-  <IDENTIFIER>
+{ 
+  id = ShortName()
+  
+  [LOOKAHEAD(TypeArguments() ("." | ShortName())) typeArguments = TypeArguments()]
   {
-    id = factory.createIdentifier(token.image);    
-    setPrefixInfo(id);
-    setPostfixInfo(id);
+    result = factory.createUncollatedReferenceQualifier(id);
+    result.setTypeArguments(typeArguments);
   }
+  (
+    LOOKAHEAD(2) "." { setPrefixInfo(result); setPostfixInfo(result); } 
+    id = ShortName()
+    {
+      typeArguments = null; // reset!
+    }
+    [LOOKAHEAD(TypeArguments() ("." | ShortName())) typeArguments = TypeArguments()]
+    {
+      result = factory.createUncollatedReferenceQualifier(result, id);
+      result.setTypeArguments(typeArguments);
+    }
+  )*
+  {
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+
+UncollatedReferenceQualifier TypedName() :
+{
+  UncollatedReferenceQualifier result;
+  Identifier id;
+  ASTList<TypeArgumentDeclaration> typeArguments = null;
+}
+{ 
+  id = ShortName()
+  
   [LOOKAHEAD(2) typeArguments = TypeArguments()]
   {
     result = factory.createUncollatedReferenceQualifier(id);
     result.setTypeArguments(typeArguments);
   }
   (
-    LOOKAHEAD(2) "." { setPrefixInfo(result); setPostfixInfo(result); } <IDENTIFIER>
+    LOOKAHEAD(2) "." { setPrefixInfo(result); setPostfixInfo(result); } 
+    id = ShortName()
     {
-      id = factory.createIdentifier(token.image);
-      setPrefixInfo(id);
-      setPostfixInfo(id);
       typeArguments = null; // reset!
     }
     [LOOKAHEAD(2) typeArguments = TypeArguments()]
@@ -2102,6 +2154,10 @@ ASTList<TypeArgumentDeclaration> TypeArguments() :
 	{ return args; }
 }
 
+/**
+ * bug: This grammar accepts for instance List<int>
+ * [mulbrich 2006-10-26]
+ */
 TypeArgumentDeclaration TypeArgument() :
 {
 	WildcardMode wm = WildcardMode.None;
@@ -2450,7 +2506,10 @@ Expression RelationalExpression() :
 }
 {
   result = ShiftExpression()
-  ( (   "<"  { cmp = factory.createLessThan(); setPrefixInfo(cmp); }
+  ( 
+    ( LOOKAHEAD({ getToken(1).kind == LT && 
+    	  ((Token.RealKindToken)getToken(1)).realKind != IMPLICITIDENTIFIER })
+        "<"  { cmp = factory.createLessThan(); setPrefixInfo(cmp); }
       | ">"  { cmp = factory.createGreaterThan(); setPrefixInfo(cmp); }
       | "<=" { cmp = factory.createLessOrEquals(); setPrefixInfo(cmp); }
       | ">=" { cmp = factory.createGreaterOrEquals(); setPrefixInfo(cmp); }
@@ -2671,7 +2730,7 @@ void CastLookahead() :
   LOOKAHEAD("(" TypedName() "[")
   "(" TypedName() "[" "]"
 |
-  "(" TypedName() ")" ( "~" | "!" | "(" | <IDENTIFIER> | "this" | "super" | "new" | Literal() )
+  "(" TypedName() ")" ( "~" | "!" | "(" | ShortName() | "this" | "super" | "new" | Literal() )
 }
 
 Expression PostfixExpression() :
@@ -2932,14 +2991,7 @@ PrimaryPrefixReturnValue PrimaryPrefix() :
       setPostfixInfo(supRef);
   }
   "."
-  (
-    <IDENTIFIER>
-    {
-      id   = factory.createIdentifier(token.image);
-    }
-  |
-    id = ImplicitIdentifier()
-  )
+    id = ShortName()
   {
     setPrefixInfo(id);
     setPostfixInfo(id);
@@ -3028,14 +3080,12 @@ PrimarySuffixReturnValue PrimarySuffix() :
       suffix.expr = expr;
   }
 |
-  LOOKAHEAD(3) // explicit Generic method invocation
+//  LOOKAHEAD(3) // explicit Generic method invocation
+  LOOKAHEAD(NonWildcardTypeArguments() ShortName()) // due to implicit indentifiers
   "." 
-  	  suffix.typeArgs = NonWildcardTypeArguments() <IDENTIFIER>
+  	  suffix.typeArgs = NonWildcardTypeArguments() suffix.id = ShortName()
   {
   	  suffix.type = suffix.IDENTIFIER;
-  	  suffix.id = factory.createIdentifier(token.image);
-  	  setPrefixInfo(suffix.id);
-  	  setPostfixInfo(suffix.id);
   }
 |  "[" expr = Expression() "]"
   {
@@ -3044,18 +3094,10 @@ PrimarySuffixReturnValue PrimarySuffix() :
   }
 |
   "."
-  (
-    <IDENTIFIER>
-    {
-      suffix.id   = factory.createIdentifier(token.image);
-    }
-  |
-    suffix.id = ImplicitIdentifier()
-  )
+  
+  suffix.id = ShortName()
   {
       suffix.type = PrimarySuffixReturnValue.IDENTIFIER;
-      setPrefixInfo(suffix.id);
-      setPostfixInfo(suffix.id);
   }
 |
   args = Arguments()

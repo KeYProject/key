@@ -74,7 +74,12 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
      * term factory to be used - from the services
      */
     private TermFactory tf;
-
+    
+    /**
+     * the services provided at init()
+     */
+    private Services services;
+    
     private TermBuilder tb = new TermBuilder();
 
     /**
@@ -130,6 +135,8 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
      */
     private VariableSpecification formalParam;
 
+    
+
     /**
      * create an instance of this rule.
      * 
@@ -159,11 +166,14 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
      *            the Services providing access to signature and type model
      */
     private void init(Term term, Services services) {
+        
+        this.services = services;
+        
         root =
                 (JavaNonTerminalProgramElement) term.sub(0).javaBlock().program();
         modality = (Modality) term.sub(0).op();
 
-        ReplaceWhileLoop removeWhile = new ReplaceWhileLoop(root, null);
+        ReplaceWhileLoop removeWhile = new ReplaceWhileLoop(root, null, services);
         removeWhile.start();
         loop = (EnhancedFor) removeWhile.getTheLoop();
 
@@ -244,7 +254,7 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
         ProgramElementName labelName = null;
 
         WhileInvariantTransformation w =
-                new WhileInvariantTransformation(loop, svInst);
+                new WhileInvariantTransformation(loop, svInst, services);
         w.start();
 
         if (w.innerLabelNeeded() || w.outerLabelNeeded()) {
@@ -639,7 +649,7 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
      */
     protected JavaBlock addContext(JavaNonTerminalProgramElement root,
             StatementBlock block) {
-        ReplaceWhileLoop replaceWhile = new ReplaceWhileLoop(root, block);
+        ReplaceWhileLoop replaceWhile = new ReplaceWhileLoop(root, block, services);
         replaceWhile.start();
 
         return JavaBlock.createJavaBlock((StatementBlock) replaceWhile.result());

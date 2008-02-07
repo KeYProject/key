@@ -199,7 +199,7 @@ public class Recoder2KeYTypeConverter {
 			} else {
 				s = createObjectSort(ct, directSuperSorts(ct));
 			}
-			List<Constructor> cl = t.getProgramModelInfo().getConstructors(
+			List<? extends Constructor> cl = t.getProgramModelInfo().getConstructors(
 					(recoder.abstraction.ClassType) t);
 			addKeYJavaType(t, s);
 			if (cl.size() == 1

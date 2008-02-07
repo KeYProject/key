@@ -91,7 +91,7 @@ public class ExpressionSVWrapper extends Literal implements Expression,
     public void accept(SourceVisitor v) {
     }
     
-    public Expression deepClone() {
+    public ExpressionSVWrapper deepClone() {
 	return new ExpressionSVWrapper(sv);
     }
 

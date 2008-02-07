@@ -36,6 +36,7 @@ import de.uka.ilkd.key.java.recoderext.ClassPreparationMethodBuilder;
 import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.recoderext.CreateBuilder;
 import de.uka.ilkd.key.java.recoderext.CreateObjectBuilder;
+import de.uka.ilkd.key.java.recoderext.EnumClassBuilder;
 import de.uka.ilkd.key.java.recoderext.ExtendedIdentifier;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;

@@ -505,7 +505,7 @@ public class JMLTransformer extends RecoderModelTransformer {
                     TypeDeclaration td = unit.getTypeDeclarationAt(j);
                     
                     //collect pre-existing operations
-                    List<Constructor> constructorList = td.getConstructors();
+                    List<? extends Constructor> constructorList = td.getConstructors();
                     List<Method> methodList = td.getMethods();
                     
                     transformClasslevelComments(td, unit.getName());

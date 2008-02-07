@@ -361,7 +361,7 @@ public class MethodBodyStatement extends JavaStatement implements
     }
 
     //don't think we need it
-    public SourceElement deepClone() {
+    public MethodBodyStatement deepClone() {
 	throw new IllegalStateException("Not implemented in "
 					+"MethodBodyStatement");
     }    

@@ -12,6 +12,7 @@ package de.uka.ilkd.key.java;
 import java.util.*;
 
 import recoder.abstraction.ClassType;
+import recoder.abstraction.Constructor;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.java.abstraction.*;
@@ -323,7 +324,7 @@ public class KeYProgModelInfo{
         return new ArrayList<recoder.abstraction.Method>();
     }
     
-    private List<recoder.abstraction.Constructor> getRecoderConstructors(KeYJavaType ct){
+    private List<? extends recoder.abstraction.Constructor> getRecoderConstructors(KeYJavaType ct){
         recoder.abstraction.ClassType rct
             = (recoder.abstraction.ClassType) rec2key().toRecoder(ct);
         return rct.getProgramModelInfo().getConstructors(rct);
@@ -437,7 +438,7 @@ public class KeYProgModelInfo{
 	 */
 
     public ListOfProgramMethod getConstructors(KeYJavaType ct){
-        List<recoder.abstraction.Constructor> rcl = getRecoderConstructors(ct);
+        List<? extends Constructor> rcl = getRecoderConstructors(ct);
         ListOfProgramMethod result = SLListOfProgramMethod.EMPTY_LIST;
         for (int i=rcl.size()-1; i>=0; i--) {
             recoder.abstraction.Method rm=rcl.get(i);

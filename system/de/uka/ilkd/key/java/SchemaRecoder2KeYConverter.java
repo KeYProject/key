@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.reference.SchematicFieldReference;
 import de.uka.ilkd.key.java.reference.SuperReference;
 import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.statement.EnhancedFor;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.IForUpdates;
 import de.uka.ilkd.key.java.statement.IGuard;
@@ -42,6 +43,7 @@ import de.uka.ilkd.key.rule.metaconstruct.ArrayPostDecl;
 import de.uka.ilkd.key.rule.metaconstruct.ConstructorCall;
 import de.uka.ilkd.key.rule.metaconstruct.CreateObject;
 import de.uka.ilkd.key.rule.metaconstruct.DoBreak;
+import de.uka.ilkd.key.rule.metaconstruct.EnhancedForElimination;
 import de.uka.ilkd.key.rule.metaconstruct.EvaluateArgs;
 import de.uka.ilkd.key.rule.metaconstruct.ExpandMethodBody;
 import de.uka.ilkd.key.rule.metaconstruct.ForToWhile;
@@ -117,6 +119,11 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             final ProgramSV[] labels = mc.getSV();
             return new ForToWhile(labels[0], labels[1], 
                     (Statement)list.get(Statement.class));      
+        }  else if ("#enhancedfor-elim".equals(mcName)){ 
+            EnhancedFor efor = (EnhancedFor)list.get(EnhancedFor.class);
+            if(efor == null)
+                throw new ConvertException("#enhancedfor-elim requires an enhanced for loop as argument");
+            return new EnhancedForElimination((EnhancedFor)list.get(EnhancedFor.class));
         } else if ("#do-break".equals(mcName)) {
             return new DoBreak((LabeledStatement) list
                     .get(LabeledStatement.class));
