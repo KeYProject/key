@@ -1515,6 +1515,7 @@ public class VisualDebugger {
      */
     public void setProofStrategy(final Proof proof, boolean splittingAllowed,
             boolean inUpdateAndAssumes, ListOfTerm watchpoints) {
+        
         StrategyProperties strategyProperties = DebuggerStrategy
                 .getDebuggerStrategyProperties(splittingAllowed,
                         inUpdateAndAssumes, isInitPhase(), watchpoints);

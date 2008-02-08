@@ -283,7 +283,7 @@ public class WatchpointView extends ViewPart {
 				} else {
 					WatchExpressionDialog dialog = new WatchExpressionDialog(
 							shell, java.lang.Integer.parseInt(information[1]),
-							information[3]);
+							information[3],information[0]);
 					
 					if (information != null) {
 						

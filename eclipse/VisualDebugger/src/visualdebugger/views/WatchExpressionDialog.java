@@ -45,18 +45,21 @@ public class WatchExpressionDialog {
 
 	private int offset;
 
+    private String fieldToObserve;
+
 	/**
 	 * Instantiates a new watch expression dialog.
 	 * 
 	 * @param parent
 	 *            the parent
 	 */
-	public WatchExpressionDialog(Shell parent, int offset, String source) {
+	public WatchExpressionDialog(Shell parent, int offset, String source, String fieldToObserve) {
 		shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
 		shell.setText("Enter watch expression");
 		shell.setLayout(new GridLayout());
 		this.source = source;
 		this.offset = offset;
+		this.fieldToObserve = fieldToObserve;
 	}
 
 	/**
@@ -204,6 +207,7 @@ public class WatchExpressionDialog {
 		GridData gridData = new GridData();
 		gridData.widthHint = 400;
 		text.setLayoutData(gridData);
+		text.setText(fieldToObserve);
 
 	}
 
