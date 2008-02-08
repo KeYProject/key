@@ -4,12 +4,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -135,7 +131,7 @@ public class WatchpointView extends ViewPart {
 				result = wp.getStatement_line();
 				break;
 			case 3:
-				result = wp.getFile();
+				result = wp.getTypeOfSource() ;
 				break;
 			default:
 				break;
@@ -204,7 +200,7 @@ public class WatchpointView extends ViewPart {
 
 		column = new TableColumn(table, SWT.NONE, 3);
 		column.setWidth(100);
-		column.setText("File");
+		column.setText("in Type");
 		return table;
 	}
 
@@ -355,10 +351,9 @@ public class WatchpointView extends ViewPart {
 	 * 
 	 * information[0]= The name of the JavaElement where the WatchPoint was set.
 	 * information[1]= The line offset where the text selection begins.
-	 * information[2]= The name of the file in which the WatchPoint was set.
+	 * information[2]= The type in which the WatchPoint was set (fully qualified name).
 	 * information[3]= The actual the source code for validating the WatchPoint.
-	 * information[4]= The unique name of the boolean variable that is used to
-	 * validate the watchpoint.
+	 * information[4]= The unique name of the boolean variable that is used to validate the watchpoint.
 	 */
 	private String[] getWatchPointInf() {
 
@@ -377,14 +372,10 @@ public class WatchpointView extends ViewPart {
 			information[1] = (1 + tsel.getEndLine()) + "";
 
 			IFile file = (IFile) tedit.getEditorInput().getAdapter(IFile.class);
-			String fileName = file.getProjectRelativePath().toString();
-			// set filename
-			information[2] = fileName;
 
 			ICompilationUnit unit = JavaCore.createCompilationUnitFrom(file);
-
 			String source = "";
-
+			information[2] = unit.findPrimaryType().getFullyQualifiedName();
 			try {
 				source = unit.getBuffer().getContents();
 

@@ -6,6 +6,9 @@ import org.eclipse.jdt.core.IProblemRequestor;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.WorkingCopyOwner;
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -143,7 +146,11 @@ public class WatchExpressionDialog {
 				.getAdapter(IFile.class);
 
 		ICompilationUnit icu = JavaCore.createCompilationUnitFrom(file);
-
+		
+//        ASTParser parser = ASTParser.newParser(AST.JLS3);
+//        parser.setSource(doc.toString().toCharArray());
+//        CompilationUnit cu = (CompilationUnit) parser.createAST(null);
+//        System.out.println("typeRoot : "+ cu.getTypeRoot());
 		final WatchPointProblemRequestor problemRequestor = new WatchPointProblemRequestor();
 
 		WorkingCopyOwner owner = new WorkingCopyOwner() {
