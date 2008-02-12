@@ -2,14 +2,7 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.logic.ConstrainedFormula;
-import de.uka.ilkd.key.logic.IteratorOfTerm;
-import de.uka.ilkd.key.logic.ListOfTerm;
-import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.UpdateFactory;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuanUpdateOperator;
 import de.uka.ilkd.key.proof.Goal;
@@ -18,15 +11,12 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
-import de.uka.ilkd.key.strategy.DebuggerStrategy;
-import de.uka.ilkd.key.strategy.StrategyFactory;
-import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.visualdebugger.ProofStarter;
 import de.uka.ilkd.key.visualdebugger.WatchpointPO;
 
 public class WatchPointFeature extends BinaryFeature {
 
-    private ListOfTerm watchpoints = null;
+    private final ListOfTerm watchpoints;
 
     public WatchPointFeature(ListOfTerm watchpoints) {
         super();
@@ -86,7 +76,7 @@ public class WatchPointFeature extends BinaryFeature {
                 watchpointPO.setIndices(initConfig.createTacletIndex(),
                         initConfig.createBuiltInRuleIndex());
                 watchpointPO.setProofSettings(proof.getSettings());
-                watchpointPO.setConfig(initConfig);
+                watchpointPO.setInitConfig(initConfig);
                 
                 ps.init(watchpointPO);
 // watchpoints ok until here - no return from ps.run!
