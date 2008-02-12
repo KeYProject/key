@@ -93,16 +93,19 @@ public class ContractConfigurator extends JDialog {
                     = new ClassInvariantSelectionPanel(services, 
                                                        false, 
                                                        pm.getContainerType(), 
-                                                       false);
+                                                       true);
             tabbedPane.addTab("Ensured Invariants", ensuredInvPanel);
         }
-        tabbedPane.setPreferredSize(new Dimension(800, 500));
+        tabbedPane.setMinimumSize(new Dimension(800, 500));
         getContentPane().add(tabbedPane);
         
         //create button panel
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
         Dimension buttonDim = new Dimension(100, 27);
+        buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 
+                                                 (int)buttonDim.getHeight() 
+                                                    + 10));
         getContentPane().add(buttonPanel);
         
         //create "ok" button
