@@ -26,10 +26,6 @@ public final class Debug {
 	public static boolean ENABLE_DEBUG = "on".equals(System
 			.getProperty("KeyDebugFlag"));
 
-	static {
-		System.out.println("Debug is enabeled: " + ENABLE_DEBUG);
-	}
-	
 	/**
 	 * prints given string if in debug mode
 	 * 

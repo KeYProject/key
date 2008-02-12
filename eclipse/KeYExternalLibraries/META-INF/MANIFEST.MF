@@ -9,7 +9,7 @@ Bundle-ClassPath: antlr.jar,
  javacc.jar,
  junit.jar,
  log4j.jar,
- recoder.jar,
+ recoderKey.jar,
  xerces.jar
 Bundle-Localization: plugin
 Export-Package: .,
