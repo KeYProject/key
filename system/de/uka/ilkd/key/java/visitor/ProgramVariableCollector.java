@@ -23,7 +23,6 @@ import de.uka.ilkd.key.logic.LocationDescriptor;
 import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
 import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -37,6 +36,7 @@ import de.uka.ilkd.key.speclang.LoopInvariant;
 public class ProgramVariableCollector extends JavaASTVisitor {
 
     private final HashSet result = new HashSet();
+    private final boolean collectFunctionLocations;
 
     /**
      * collects all program variables occuring in the AST <tt>root</tt>
@@ -44,9 +44,17 @@ public class ProgramVariableCollector extends JavaASTVisitor {
      * @param root the ProgramElement which is the root of the AST
      * @param services the Services object
      */
-    public ProgramVariableCollector(ProgramElement root, Services services) {
+    public ProgramVariableCollector(ProgramElement root, 
+                                    Services services, 
+                                    boolean collectFunctionLocations) {
 	super(root, services);
         assert services != null;
+        this.collectFunctionLocations = collectFunctionLocations;
+    }
+    
+    public ProgramVariableCollector(ProgramElement root, 
+                                    Services services) {
+        this(root, services, false);
     }
     
     /** starts the walker*/
@@ -79,7 +87,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     
     public void performActionOnLoopInvariant(LoopInvariant x) {
         TermProgramVariableCollector tpvc = 
-            new TermProgramVariableCollector(services);
+            new TermProgramVariableCollector(services, collectFunctionLocations);
         Term selfTerm = x.getInternalSelfTerm();
         Map atPreFunctions = x.getInternalAtPreFunctions();
         
