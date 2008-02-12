@@ -3,9 +3,11 @@ package de.uka.ilkd.key.speclang.translation;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
+import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 class SLMethodResolver extends SLExpressionResolver {
 
@@ -31,12 +33,28 @@ class SLMethodResolver extends SLExpressionResolver {
         
         ListOfKeYJavaType signature = parameters.getSignature(javaInfo.getServices());
         
-        ProgramMethod pm = javaInfo.getProgramMethod(
-                containingType,
-                methodName,
-                signature,
-                containingType);
-            
+        ProgramMethod pm = null;
+        Term recTerm = receiver.getTerm(); 
+        
+        
+        while(pm==null){
+            pm = javaInfo.getProgramMethod(
+                    containingType,
+                    methodName,
+                    signature,
+                    containingType);
+            ProgramVariable et = javaInfo.getAttribute(
+                    ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);
+            if(et!=null && pm==null){
+                containingType = et.getKeYJavaType();
+                if(recTerm!=null){
+                    recTerm = tb.dot(recTerm, et);
+                }
+            }else{
+                break;
+            }
+        }
+        
         if (pm == null)
         {
             return null;
@@ -52,7 +70,7 @@ class SLMethodResolver extends SLExpressionResolver {
                         " on Type " + receiver.getType());
             }
             subs = new Term[parameters.getParameters().size()+1];
-            subs[0] = receiver.getTerm();
+            subs[0] = recTerm;
             i = 1;
         } else {
             subs = new Term[parameters.getParameters().size()];

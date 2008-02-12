@@ -34,7 +34,6 @@ public abstract class SLExpressionResolver {
         if (!canHandleReceiver(receiver)) {
             return null;
         }
-        
         return doResolving(receiver, name, parameters);
         
     }

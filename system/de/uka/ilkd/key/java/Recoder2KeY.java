@@ -1453,7 +1453,7 @@ public class Recoder2KeY implements JavaReader{
 	ClassDeclaration keYClassDecl = new ClassDeclaration
 	    (classMembers,
 	     new ProgramElementName(makeAdmissibleName(td.getFullName())),
-	     parsingLibs, td.getContainingClassType()!=null,
+	     parsingLibs, td.getContainingClassType()!=null && !td.isStatic(),
 	     td.getName()==null, td.getStatementContainer() !=null
 	     );
 

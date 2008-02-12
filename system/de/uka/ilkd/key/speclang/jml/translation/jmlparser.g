@@ -1428,12 +1428,16 @@ primarysuffix[JMLExpression receiver, String fullyQualifiedName] returns [JMLExp
 	    } else {
 		lookupName = id.getText();
 	    }
-	    result = lookupIdentifier(lookupName, receiver, null, id);
+	    try{
+	    	result = lookupIdentifier(lookupName, receiver, null, id);
+	    }catch(SLTranslationException e){
+	    	result = lookupIdentifier(fullyQualifiedName + "." + lookupName, null, null, id);
+	    }
 	}
     |
     DOT THIS
     {
-    	result = new JMLExpression(services.getTypeConverter().findThisForSort(javaInfo.getKeYJavaType(fullyQualifiedName).getSort(),
+    	result = new JMLExpression(services.getTypeConverter().findThisForSort(receiver.getSort(),
     		tb.var(selfVar), javaInfo.getKeYJavaType(selfVar.sort())));
     }
     |

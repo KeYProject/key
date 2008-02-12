@@ -2,13 +2,9 @@ package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.NonRigidHeapDependentFunction;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 
 class SLAttributeResolver extends SLExpressionResolver {
 
@@ -25,25 +21,37 @@ class SLAttributeResolver extends SLExpressionResolver {
         if (parameters != null) {
             return null;
         }
-        
-        ProgramVariable attribute;
+        Term recTerm = receiver.getTerm();        
+        ProgramVariable attribute=null;
         try {
             //try as fully qualified name
             attribute = javaInfo.getAttribute(name);
         } catch(IllegalArgumentException e){
-            //try as short name
+            //try as short name and in enclosing classes
             KeYJavaType containingType = receiver.getKeYJavaType(javaInfo);
-            attribute = javaInfo.lookupVisibleAttribute(name, containingType);
+            while(attribute==null){
+                attribute = javaInfo.lookupVisibleAttribute(name, containingType);
+                ProgramVariable et = javaInfo.getAttribute(
+                        ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);
+                if(et!=null && attribute==null){
+                    containingType = et.getKeYJavaType();
+                    if(recTerm!=null){
+                        recTerm = tb.dot(recTerm, et);
+                    }
+                }else{
+                    break;
+                }
+            }
         }
         
         if(attribute != null) {
-            if(receiver.getTerm() == null && !attribute.isStatic()) {
+            if(recTerm == null && !attribute.isStatic()) {
                 throw manager.excManager.createException(
                         "Reference to non-static field without receiver: " +
                         attribute.name());
             }
             try {
-                Term attributeTerm = tb.dot(receiver.getTerm(), attribute);
+                Term attributeTerm = tb.dot(recTerm, attribute);
                 return manager.createSLExpression(attributeTerm);
             } catch (TermCreationException e) {
                 throw manager.excManager.createException(
