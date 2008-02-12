@@ -99,6 +99,10 @@ public class WatchpointPO implements ProofOblInput {
 
     }
 
+    /**
+     * the initial config containing for example the services which provide
+     * access to the Java model
+     */
     public void setInitConfig(InitConfig i) {
         this.initConfig = i;
 
