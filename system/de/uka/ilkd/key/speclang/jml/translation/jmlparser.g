@@ -549,6 +549,74 @@ options {
 	result = tb.or(result, t);
 
 	return result;
+    }
+    
+    
+    private SetOfLocationDescriptor getObjectCreationModSet(KeYJavaType kjt) {
+    	SetOfLocationDescriptor result = SetAsListOfLocationDescriptor.EMPTY_SET;
+    	
+    	//collect implicit attributes
+    	ProgramVariable nextToCreate 
+    		= javaInfo.getAttribute(
+    				ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE, 
+    				kjt);
+    	ProgramVariable createdAttribute
+		= javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, 
+					javaInfo.getJavaLangObject());
+	ProgramVariable initializedAttribute
+		= javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_INITIALIZED, 
+                                        javaInfo.getJavaLangObject());
+	ProgramVariable transientAttribute
+		= javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_TRANSIENT, 
+                                        javaInfo.getJavaLangObject());
+	ProgramVariable objectTimesFinalizedAttribute
+		= javaInfo.getAttribute("objectTimesFinalized", 
+                                        javaInfo.getJavaLangObject());
+        
+        //create logic variable, guard
+        Sort integerSort 
+        	= services.getTypeConverter().getIntegerLDT().targetSort();
+        LogicVariable lv 
+        	= new LogicVariable(new Name("x"), integerSort);
+	Term lvTerm = tb.var(lv);
+	Function repos
+		= (Function) ((SortDefiningSymbols) kjt.getSort())
+		             .lookupSymbol(AbstractSort.OBJECT_REPOSITORY_NAME);
+	Term objectTerm = tb.func(repos, lvTerm); 
+	Term guardFma = tb.leq(tb.dot(null, nextToCreate), lvTerm, services); 
+	
+	//<nextToCreate>
+	Term nextToCreateTerm = tb.dot(null, nextToCreate);
+	BasicLocationDescriptor nextToCreateLd
+		= new BasicLocationDescriptor(nextToCreateTerm);
+	result = result.add(nextToCreateLd);
+	
+	//<created>
+	Term createdTerm = tb.dot(objectTerm, createdAttribute);
+	BasicLocationDescriptor createdLd 
+		= new BasicLocationDescriptor(guardFma, createdTerm);
+	result = result.add(createdLd);
+		
+	//<initialized>
+	Term initializedTerm = tb.dot(objectTerm, initializedAttribute);
+	BasicLocationDescriptor initializedLd
+		= new BasicLocationDescriptor(guardFma, initializedTerm);
+	result = result.add(initializedLd); 
+	
+	//<transient>
+	Term transientTerm   = tb.dot(objectTerm, transientAttribute);
+	BasicLocationDescriptor transientLd
+		= new BasicLocationDescriptor(guardFma, transientTerm);
+	result = result.add(transientLd);
+	
+	//objectTimesFinalized 
+	Term objectTimesFinalizedTerm 
+			     = tb.dot(objectTerm, objectTimesFinalizedAttribute);
+	BasicLocationDescriptor objectTimesFinalizedLd
+		= new BasicLocationDescriptor(guardFma, objectTimesFinalizedTerm);
+	result = result.add(objectTimesFinalizedLd); 
+                                           
+    	return result;
     }    
 }
 
@@ -572,28 +640,25 @@ assignableclause returns [SetOfLocationDescriptor result=SetAsListOfLocationDesc
 
 storereflist returns [SetOfLocationDescriptor result=SetAsListOfLocationDescriptor.EMPTY_SET] throws SLTranslationException
 {
-    LocationDescriptor ld=null;
+    SetOfLocationDescriptor mod = null;
 }
 :
-    ld=storeref { if (ld != null) { result = result.add(ld); } }
-	("," ld=storeref { if (ld != null) { result = result.add(ld); } })*
+    mod=storeref { result = result.union(mod); } 
+	("," mod=storeref { result = result.union(mod); } )*
     ;
 
 
-storeref returns [LocationDescriptor ld=null] throws SLTranslationException
+storeref returns [SetOfLocationDescriptor result = SetAsListOfLocationDescriptor.EMPTY_SET] throws SLTranslationException
 :
-	ld=storerefexpression
-    |   { raiseError("informal descriptions not supported (for obvious reason)"); }
-//TODO: should be a warning!
-//    |   { raiseWarning("informal descriptions not supported (for obvious reason)\n Ignoring it"); }
-	LPAREN MULT
-	//informaldescription
-    |   ld=storerefkeyword
+	result=storerefexpression
+    |   LPAREN MULT { raiseError("informal descriptions not supported (for obvious reason)"); } //TODO: should be a warning!
+    |   result=storerefkeyword
     ;
 
-storerefexpression returns [BasicLocationDescriptor ld=null] throws SLTranslationException
+storerefexpression returns [SetOfLocationDescriptor result = SetAsListOfLocationDescriptor.EMPTY_SET] throws SLTranslationException
 {
     JMLExpression expr;
+    BasicLocationDescriptor ld = null;
 }
 :
     expr=storerefname 
@@ -608,6 +673,7 @@ storerefexpression returns [BasicLocationDescriptor ld=null] throws SLTranslatio
 		raiseError(e.getMessage());
 	    }
 	}
+	result = result.add(ld);
     }
     ;
 
@@ -705,11 +771,15 @@ specarrayrefexpr[JMLExpression receiver] returns [BasicLocationDescriptor result
     }
     ;
 
-storerefkeyword returns [LocationDescriptor ld=null] throws SLTranslationException
+storerefkeyword returns [SetOfLocationDescriptor result = SetAsListOfLocationDescriptor.EMPTY_SET] throws SLTranslationException
+{
+    KeYJavaType t = null;
+}
 :
     NOTHING
-    | EVERYTHING { ld = EverythingLocationDescriptor.INSTANCE; }
-    | NOT_SPECIFIED { ld = EverythingLocationDescriptor.INSTANCE; }
+    | EVERYTHING { result = EverythingLocationDescriptor.INSTANCE_AS_SET; }
+    | NOT_SPECIFIED { result = EverythingLocationDescriptor.INSTANCE_AS_SET; }
+    | OBJECT_CREATION LPAREN t=referencetype RPAREN  { result = getObjectCreationModSet(t); }
 ;
 
 
