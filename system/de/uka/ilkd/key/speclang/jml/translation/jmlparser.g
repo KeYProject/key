@@ -609,14 +609,16 @@ options {
 		= new BasicLocationDescriptor(guardFma, transientTerm);
 	result = result.add(transientLd);
 	
-	//objectTimesFinalized 
-	Term objectTimesFinalizedTerm 
+	//objectTimesFinalized (a ghost field in java.lang.Object)
+	if(objectTimesFinalizedAttribute != null) {
+	    Term objectTimesFinalizedTerm 
 			     = tb.dot(objectTerm, objectTimesFinalizedAttribute);
-	BasicLocationDescriptor objectTimesFinalizedLd
+	    BasicLocationDescriptor objectTimesFinalizedLd
 		= new BasicLocationDescriptor(guardFma, objectTimesFinalizedTerm);
-	result = result.add(objectTimesFinalizedLd); 
-                                           
-    	return result;
+	    result = result.add(objectTimesFinalizedLd); 
+    	}
+    	
+	return result;
     }    
     
     
