@@ -43,7 +43,7 @@ JAVA_OPTIONS=
 #JAVA_OPTIONS=-classic
 
 # Uncomment the following definition for remote debugging on port 1234
-JAVA_OPTIONS='-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1234'
+#JAVA_OPTIONS='-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1234'
 
 # Uncomment the following definition for profiling
 #JAVA_OPTIONS=-Xrunhprof:cpu=samples,format=a,thread=y,file=log.txt,depth=20
@@ -156,7 +156,7 @@ fi
 # KeY CLASSPATH
 #
 
-key_ext_jars="antlr.jar jargs.jar recoder.jar dresden-ocl-demo.jar xerces.jar log4j.jar"
+key_ext_jars="antlr.jar jargs.jar recoderKey.jar dresden-ocl-demo.jar xerces.jar log4j.jar"
 
 keyclasspath="$KEY_HOME/system/binary/:/home/mattze/eclipse/objinspector/classes/":
 

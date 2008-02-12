@@ -87,7 +87,7 @@
       <classpath>
         <pathelement location="${ext.dir}/antlr.jar" />
         <pathelement location="${ext.dir}/jargs.jar" />
-        <pathelement location="${ext.dir}/recoder.jar" />
+        <pathelement location="${ext.dir}/recoderKey.jar" />
         <pathelement location="${ext.dir}/log4j.jar" />
         <pathelement location="${ext.dir}/dresden-ocl-demo.jar" />
         <pathelement location="${ext.dir}/mgtp.jar" />
