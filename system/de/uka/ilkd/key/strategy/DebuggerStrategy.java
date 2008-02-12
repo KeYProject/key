@@ -78,6 +78,18 @@ public class DebuggerStrategy extends VBTStrategy {
 
         super(p_proof, props);
 
+        final boolean isSplittingAllowed = props.get(
+                VISUAL_DEBUGGER_SPLITTING_RULES_KEY).equals(
+                VISUAL_DEBUGGER_TRUE);
+
+        final boolean inUpdateAndAssumes = props.get(
+                VISUAL_DEBUGGER_IN_UPDATE_AND_ASSUMES_KEY).equals(
+                VISUAL_DEBUGGER_TRUE);
+
+        final boolean inInitPhase = props
+                .get(VISUAL_DEBUGGER_IN_INIT_PHASE_KEY).equals(
+                        VISUAL_DEBUGGER_TRUE);
+        
         RuleSetDispatchFeature d = getCostComputationDispatcher();
 
         bindRuleSet(d, "simplify_autoname", ifZero(BreakpointFeature.create(),
@@ -86,10 +98,13 @@ public class DebuggerStrategy extends VBTStrategy {
                 inftyConst(), longConst(0)));
         bindRuleSet(d, "debugger", inftyConst());
         bindRuleSet(d, "statement_sep", longConst(-200));
-       // if not in initphase
-        bindRuleSet(d, "statement_sep", ifZero(WatchPointFeature.create(watchpoints),
-                inftyConst(), longConst(0)));
 
+        // if not in initphase
+        if (!inInitPhase) {
+            bindRuleSet(d, "method_expand", ifZero(WatchPointFeature.create(watchpoints),
+                    inftyConst(), longConst(0)));
+        }
+        
         bindRuleSet(d, "test_gen_empty_modality_hide", inftyConst());
 
         bindRuleSet(d, "test_gen_quan", inftyConst());
@@ -109,18 +124,6 @@ public class DebuggerStrategy extends VBTStrategy {
         // FIXME: do not add it for each rule set add it as sum feature
 
         final ListOfNamed h = nss.ruleSets().allElements();
-
-        final boolean isSplittingAllowed = props.get(
-                VISUAL_DEBUGGER_SPLITTING_RULES_KEY).equals(
-                VISUAL_DEBUGGER_TRUE);
-
-        final boolean inUpdateAndAssumes = props.get(
-                VISUAL_DEBUGGER_IN_UPDATE_AND_ASSUMES_KEY).equals(
-                VISUAL_DEBUGGER_TRUE);
-
-        final boolean inInitPhase = props
-                .get(VISUAL_DEBUGGER_IN_INIT_PHASE_KEY).equals(
-                        VISUAL_DEBUGGER_TRUE);
 
         final Feature inUpdateFeature = InUpdateFeature.create(
                 isSplittingAllowed, inUpdateAndAssumes, inInitPhase);
@@ -147,7 +150,6 @@ public class DebuggerStrategy extends VBTStrategy {
 
             ListOfTerm watchpoints = (ListOfTerm) strategyProperties
                     .get(VISUAL_DEBUGGER_WATCHPOINTS_KEY);
-            if(watchpoints == null)System.out.println("watchpoints are null in create in DebuggerStrategy$Factory");
             injectDebuggerDefaultOptionsIfUnset(strategyProperties);
             
             return new DebuggerStrategy(p_proof, strategyProperties,

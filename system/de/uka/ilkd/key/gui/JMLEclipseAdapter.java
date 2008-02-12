@@ -101,8 +101,10 @@ public class JMLEclipseAdapter implements JMLPOAndSpecProvider{
 	}
 	ProblemInitializer pi = new ProblemInitializer(Main.getInstance(mainVisible));
 	try {
-	    mediator.getProof().setActiveStrategy(getStrategy());
 	    pi.startProver(mediator.getProof().env(), poi);
+            if (getStrategy() != null) {
+                mediator.getProof().setActiveStrategy(getStrategy());
+            }
 	} catch(ProofInputException e) {
 	    //too bad
 	}

@@ -15,10 +15,7 @@ import javax.swing.SwingUtilities;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.java.ArrayOfExpression;
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ArrayOfParameterDeclaration;
@@ -1952,7 +1949,8 @@ public class VisualDebugger {
         } else {
             
             Namespace progVarNS = new Namespace();
-            JavaInfo ji = mediator.getServices().getJavaInfo();
+            final Services services = mediator.getServices();
+            final JavaInfo ji = services.getJavaInfo();
 
             for (int i = 0; i < watchpoints.size(); i++) {
 
@@ -1960,18 +1958,20 @@ public class VisualDebugger {
                 StringBuffer buffer = new StringBuffer();
                 
                 String typeOfSource = wp.getTypeOfSource();
-                String typeOfSelf = typeOfSource.substring(typeOfSource.lastIndexOf("/") + 1);
-                typeOfSelf = typeOfSelf.substring(0, typeOfSelf.indexOf("."));
 
 
-                //TODO check namespace
+                //TODO check namespace: services.getNamespaces().lookup()               
+                
                 ProgramElementName selfName = new ProgramElementName("self_XY");
                 ProgramVariable var_self = new LocationVariable(
                         selfName, ji.getKeYJavaType(typeOfSource));
                 ProgramVariable var_dummy = new LocationVariable(
-                        new ProgramElementName(wp.getName()), ji.getKeYJavaType("boolean"));
+                        new ProgramElementName(wp.getName()), 
+                        services.getTypeConverter().getBooleanType());
                 progVarNS.add(var_self);
                 progVarNS.add(var_dummy);
+                
+                
 
                 buffer.append("\\exists " + typeOfSource +" x; {"+ selfName +":= x } \\<{method-frame( source=" + typeOfSource
                         + ",this="+selfName); 

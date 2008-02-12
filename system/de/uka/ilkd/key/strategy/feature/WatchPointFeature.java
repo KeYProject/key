@@ -32,7 +32,7 @@ public class WatchPointFeature extends BinaryFeature {
         System.out.println("entering watchpointfeature...");
 
         assert watchpoints != null : "Watchpoints are NULL!";
-        if (watchpoints == null || watchpoints.isEmpty()) {
+        if (watchpoints.isEmpty()) {
             System.out
                     .println("The list of watchpoints is empty./in WatchpointFeature");
             return false;
@@ -70,7 +70,7 @@ public class WatchPointFeature extends BinaryFeature {
                 }
 
                 ConstrainedFormula newCF = new ConstrainedFormula(watchpoint);
-                seq.changeFormula(newCF, pos);
+               seq = seq.changeFormula(newCF, pos).sequent();
 
                 // start side proof
                 ProofStarter ps = new ProofStarter();
@@ -88,11 +88,12 @@ public class WatchPointFeature extends BinaryFeature {
                                 SLListOfTerm.EMPTY_LIST);
                 final StrategyFactory factory = new DebuggerStrategy.Factory();
                 Strategy strategy = (factory.create(proof, strategyProperties));
-                proof.setActiveStrategy(strategy);
-                ps.setStrategy(strategy);
                 watchpointPO.setProofSettings(proof.getSettings());
                 watchpointPO.setInitConfig(initConfig);
                 ps.setStrategy(strategy);
+                
+                ps.setMaxSteps(2000);
+                
                 ps.init(watchpointPO);
                 // watchpoints ok until here - no return from ps.run!
                 ps.run(proofEnvironment);

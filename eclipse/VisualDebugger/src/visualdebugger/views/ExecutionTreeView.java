@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import de.uka.ilkd.key.util.ProgressMonitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.draw2d.*;
 import org.eclipse.draw2d.Label;
@@ -17,7 +16,6 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.ProgressIndicator;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.SWT;
@@ -26,7 +24,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
@@ -47,7 +44,11 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.decproc.DecProcRunner;
 import de.uka.ilkd.key.unittest.ModelGenerator;
-import de.uka.ilkd.key.visualdebugger.*;
+import de.uka.ilkd.key.util.ProgressMonitor;
+import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
+import de.uka.ilkd.key.visualdebugger.DebuggerListener;
+import de.uka.ilkd.key.visualdebugger.SourceElementId;
+import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 import de.uka.ilkd.key.visualdebugger.executiontree.*;
 
 // TODO: Auto-generated Javadoc
