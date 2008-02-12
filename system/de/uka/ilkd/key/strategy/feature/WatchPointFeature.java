@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.IteratorOfTerm;
 import de.uka.ilkd.key.logic.ListOfTerm;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.SLListOfTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.UpdateFactory;
@@ -19,6 +20,7 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
+import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.visualdebugger.ProofStarter;
@@ -26,7 +28,7 @@ import de.uka.ilkd.key.visualdebugger.WatchpointPO;
 
 public class WatchPointFeature extends BinaryFeature {
 
-    private ListOfTerm watchpoints = null;
+    private final ListOfTerm watchpoints;
 
     public WatchPointFeature(ListOfTerm watchpoints) {
         super();
@@ -36,17 +38,20 @@ public class WatchPointFeature extends BinaryFeature {
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
 
         System.out.println("entering watchpointfeature...");
-        Sequent seq = goal.sequent();
-        LinkedList<Update> updates = new LinkedList<Update>();
-        Proof proof = goal.proof();
-        UpdateFactory updateFactory = new UpdateFactory(proof.getServices(),
-                goal.simplifier());
 
         assert watchpoints != null : "Watchpoints are NULL!";
         if (watchpoints == null || watchpoints.isEmpty()) {
-            System.out.println("The list of watchpoints is empty./in WatchpointFeature");
+            System.out
+                    .println("The list of watchpoints is empty./in WatchpointFeature");
             return false;
         } else {
+
+            Sequent seq = goal.sequent();
+            LinkedList<Update> updates = new LinkedList<Update>();
+            Proof proof = goal.proof();
+            UpdateFactory updateFactory = new UpdateFactory(
+                    proof.getServices(), goal.simplifier());
+
             PIOPathIterator it = pos.iterator();
             while (it.hasNext()) {
                 it.next();
@@ -85,23 +90,32 @@ public class WatchPointFeature extends BinaryFeature {
                         seq);
                 watchpointPO.setIndices(initConfig.createTacletIndex(),
                         initConfig.createBuiltInRuleIndex());
+
+                StrategyProperties strategyProperties = DebuggerStrategy
+                        .getDebuggerStrategyProperties(true, false, false,
+                                SLListOfTerm.EMPTY_LIST);
+                final StrategyFactory factory = new DebuggerStrategy.Factory();
+                Strategy strategy = (factory.create(proof, strategyProperties));
+                proof.setActiveStrategy(strategy);
+                ps.setStrategy(strategy);
                 watchpointPO.setProofSettings(proof.getSettings());
-                watchpointPO.setConfig(initConfig);
-                
+                watchpointPO.setInitConfig(initConfig);
+                ps.setStrategy(strategy);
                 ps.init(watchpointPO);
-// watchpoints ok until here - no return from ps.run!
+                // watchpoints ok until here - no return from ps.run!
                 ps.run(proofEnvironment);
                 if (watchpoints == null) {
-                    System.out.println("wp's null, after after ps.run in WatchpointFeature"); }
-                else{
-                        System.out.println("wp's ok,  ps.run /in WatchpointFeature"); }
-               
-                if (ps.getProof().closed()) {
-                    return true;
+                    System.out
+                            .println("wp's null, after after ps.run in WatchpointFeature");
+                } else {
+                    System.out
+                            .println("wp's ok,  ps.run /in WatchpointFeature");
                 }
+                System.out.println("proof could be closed:" + ps.getProof().closed());
+                return ps.getProof().closed();
             }
-            return false;
         }
+        return false;
     }
 
     public static WatchPointFeature create(ListOfTerm wp) {

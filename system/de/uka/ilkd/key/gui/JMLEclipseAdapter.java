@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
 import de.uka.ilkd.key.jml.*;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.strategy.Strategy;
 
 public class JMLEclipseAdapter implements JMLPOAndSpecProvider{
 
@@ -31,7 +32,7 @@ public class JMLEclipseAdapter implements JMLPOAndSpecProvider{
     Implementation2SpecMap ism = null;
     JavaInfo ji;
     private boolean mainVisible=true;
-
+    private Strategy strategy = null;
 
     public JMLEclipseAdapter(KeYMediator mediator){
        	services = mediator.getServices();
@@ -100,6 +101,7 @@ public class JMLEclipseAdapter implements JMLPOAndSpecProvider{
 	}
 	ProblemInitializer pi = new ProblemInitializer(Main.getInstance(mainVisible));
 	try {
+	    mediator.getProof().setActiveStrategy(getStrategy());
 	    pi.startProver(mediator.getProof().env(), poi);
 	} catch(ProofInputException e) {
 	    //too bad
@@ -117,6 +119,15 @@ public class JMLEclipseAdapter implements JMLPOAndSpecProvider{
 
     public void setMainVisible(boolean mainVisible) {
         this.mainVisible = mainVisible;
+    }
+
+    public void setStrategy(Strategy strategy) {
+        this.strategy = strategy;
+        
+    }
+
+    public Strategy getStrategy() {
+        return strategy;
     }
 
 }

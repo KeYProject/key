@@ -14,6 +14,7 @@ import java.util.Vector;
 
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.jml.JMLSpec;
+import de.uka.ilkd.key.strategy.Strategy;
 
 public interface JMLPOAndSpecProvider{
 
@@ -32,5 +33,7 @@ public interface JMLPOAndSpecProvider{
      */
     void createPOandStartProver(JMLSpec spec, boolean allInv, boolean invPost,
 				boolean assignable);
+    
+    public void setStrategy(Strategy strategy);
 
 }

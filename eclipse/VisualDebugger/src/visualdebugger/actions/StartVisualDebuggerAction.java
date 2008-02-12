@@ -35,12 +35,16 @@ import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.jml.JMLMethodSpec;
 import de.uka.ilkd.key.jml.JMLSpec;
+import de.uka.ilkd.key.logic.SLListOfTerm;
 import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.strategy.DebuggerStrategy;
+import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.StrategyFactory;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
-
 
 /**
  * The Class StartVisualDebuggerAction.
@@ -494,16 +498,16 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 		// s = astRoot.toString();
 
 		String fn = unit.getPath().toOSString();
-		/** 
-		 * @author marcel 
+		/**
+		 * @author marcel
 		 * 
-		 * This was fixed to make the SymbolicExecutionDebugger work on windows os.
-		 *  not verified!
+		 * This was fixed to make the SymbolicExecutionDebugger work on windows
+		 * os. not verified!
 		 * 
-		 *  Creating the String d using substring(1,...) lead to an invalid path on windows,
-		 *  containing a colon. Hence fil could not be created.
-		 *  
-		 * */
+		 * Creating the String d using substring(1,...) lead to an invalid path
+		 * on windows, containing a colon. Hence fil could not be created.
+		 * 
+		 */
 		String d = VisualDebugger.tempDir
 				+ fn.substring(fn.indexOf(File.separator), fn
 						.lastIndexOf(File.separator));
@@ -813,57 +817,73 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 		VisualDebugger.getVisualDebugger().fireDebuggerEvent(
 				new DebuggerEvent(DebuggerEvent.PROJECT_LOADED_SUCCESSFUL,
 						debuggerEventMsg));
+		StrategyProperties strategyProperties = DebuggerStrategy
+				.getDebuggerStrategyProperties(true, false, false, SLListOfTerm.EMPTY_LIST);
+		
+		final StrategyFactory factory = new DebuggerStrategy.Factory();
+		Strategy strategy = (factory.create(VisualDebugger.getVisualDebugger().getMediator().getProof(), strategyProperties));
+		provider.setStrategy(strategy);
+
 		provider.createPOandStartProver(spec, allInvariants, invPost,
 				assignable);
 	}
 }
 
 /**
-	* The Nested Class ETProverTaskListener.
-	*
-	* Implements the ProverTaskListener Interface. Serves as wrapper for the
-	* ExcecutionTreeView's progressmonitor. The Instance of
-	* ETProverTaskListener is registered to the KeYMediator.
-	*/
-	 class ETProverTaskListener implements ProverTaskListener {
-	
+ * The Nested Class ETProverTaskListener.
+ * 
+ * Implements the ProverTaskListener Interface. Serves as wrapper for the
+ * ExcecutionTreeView's progressmonitor. The Instance of ETProverTaskListener is
+ * registered to the KeYMediator.
+ */
+class ETProverTaskListener implements ProverTaskListener {
+
 	/** The pm. */
 	private ProgressMonitor pm = null;
-	
+
 	/**
-	* Instantiates a new PM.
-	*
-	* @param pm the ProgressMonitor
-	*/
+	 * Instantiates a new PM.
+	 * 
+	 * @param pm
+	 *            the ProgressMonitor
+	 */
 	public ETProverTaskListener(ProgressMonitor pm) {
-	this.pm = pm;
+		this.pm = pm;
 	}
-	//reset progressbar when task is finished
-	/* (non-Javadoc)
-	* @see de.uka.ilkd.key.gui.ProverTaskListener#taskFinished()
-	*/
+
+	// reset progressbar when task is finished
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uka.ilkd.key.gui.ProverTaskListener#taskFinished()
+	 */
 	public void taskFinished() {
-	//System.out.println("task finished");
-	
+		// System.out.println("task finished");
+
 	}
-	
-	/* (non-Javadoc)
-	* @see de.uka.ilkd.key.gui.ProverTaskListener#taskProgress(int)
-	*/
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uka.ilkd.key.gui.ProverTaskListener#taskProgress(int)
+	 */
 	public void taskProgress(int position) {
-	
-	//System.out.println("taskProgress -position:" + position);
-	pm.setProgress(position);
-	
+
+		// System.out.println("taskProgress -position:" + position);
+		pm.setProgress(position);
+
 	}
-	
-   /* (non-Javadoc)
-	* @see de.uka.ilkd.key.gui.ProverTaskListener#taskStarted(java.lang.String, int)
-	*/
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uka.ilkd.key.gui.ProverTaskListener#taskStarted(java.lang.String,
+	 *      int)
+	 */
 	public void taskStarted(String message, int size) {
-	//System.out.println("taskStarted -size:" + size);
-	pm.setMaximum(size);
-	
+		// System.out.println("taskStarted -size:" + size);
+		pm.setMaximum(size);
+
 	}
-	
-	}
+
+}
