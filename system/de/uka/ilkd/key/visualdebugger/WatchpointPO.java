@@ -52,6 +52,11 @@ public class WatchpointPO implements ProofOblInput {
             if ( sequent == null || taclets == null
                     || builtInRules == null || initConfig == null
                     || settings == null) {
+                if(sequent == null) System.out.println("sequent == null");
+                if(taclets == null) System.out.println("taclets == null");
+                if(builtInRules == null) System.out.println("builtInRules == null");
+                if(initConfig == null) System.out.println("initConfig == null");
+                if(settings == null) System.out.println("settings == null");
                 
                 throw new IllegalStateException("watchpoint specification proof "
                         + "obligation is not initialized completely.");
@@ -76,7 +81,6 @@ public class WatchpointPO implements ProofOblInput {
     }
 
     public String name() {
-        // TODO Auto-generated method stub
         return name;
     }
 
@@ -96,7 +100,7 @@ public class WatchpointPO implements ProofOblInput {
     }
 
     public void setInitConfig(InitConfig i) {
-        // TODO Auto-generated method stub
+        this.initConfig = i;
 
     }
     /**

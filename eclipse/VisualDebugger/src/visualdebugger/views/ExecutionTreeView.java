@@ -70,7 +70,7 @@ import de.uka.ilkd.key.visualdebugger.executiontree.*;
 public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
 	/** The Constant debug. */
-	private static final boolean debug = false;
+	private static final boolean debug = true;
 
 	/** The bc labels. */
 	private boolean bcLabels = true;
@@ -519,7 +519,6 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 				currentETRootNode = null;
 				final ListOfGoal goals = getSubtreeGoalsForETNode(((SourceElementFigure) ExecutionTreeView.this.selected)
 						.getETNode());
-	            int i = vd.translateWatchpoints();
 				vd.run(goals);
 			}
 

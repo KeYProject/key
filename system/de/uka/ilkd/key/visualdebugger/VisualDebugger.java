@@ -1123,7 +1123,6 @@ public class VisualDebugger {
 
         postPredicate = (Function) proof.getNamespaces().functions().lookup(
                 POST_PREDICATE_NAME);
-
         setProofStrategy(proof, true, false, SLListOfTerm.EMPTY_LIST);
         run();
     }
@@ -1457,9 +1456,12 @@ public class VisualDebugger {
      * @return true, if successful
      */
     public boolean run(ListOfGoal goals) {
+        translateWatchpoints();
+        System.out.println("run(..) in VD");
         if (!mediator.autoMode()) {
             this.removeStepOver(goals);
             this.setSteps(goals, this.runLimit);
+            
             setProofStrategy(mediator.getProof(), true, false,
                     getListOfWatchpoints());
             runProver(goals);
@@ -1476,7 +1478,7 @@ public class VisualDebugger {
      *                the goals
      */
     private void runProver(final ListOfGoal goals) {
-
+        System.out.println("runProver(..) in VD");
         this.refreshRuleApps();
         mediator.startAutoMode(goals);
         // mediator.getInteractiveProver().removeProverTaskListener(proverTaskListener);
@@ -1515,7 +1517,9 @@ public class VisualDebugger {
      */
     public void setProofStrategy(final Proof proof, boolean splittingAllowed,
             boolean inUpdateAndAssumes, ListOfTerm watchpoints) {
-        
+        System.out.println("setProofStratgy in VD ");
+        if(watchpoints == null){System.out.println("watchpoints are null in setProofStrategy in VD");
+        }else{System.out.println("watchpoints seem to be ok. size: " + watchpoints.size());}
         StrategyProperties strategyProperties = DebuggerStrategy
                 .getDebuggerStrategyProperties(splittingAllowed,
                         inUpdateAndAssumes, isInitPhase(), watchpoints);
@@ -1706,10 +1710,12 @@ public class VisualDebugger {
      * @return true, if successful
      */
     public boolean stepInto(ListOfGoal goals, int steps) {
+        translateWatchpoints();
         if (!mediator.autoMode()) {
             final Proof proof = mediator.getProof();
             removeStepOver(proof.openGoals());
             this.setSteps(goals, steps);
+            translateWatchpoints();
             setProofStrategy(proof, true, false, getListOfWatchpoints());
             runProver(goals);
             return true;
@@ -1721,6 +1727,7 @@ public class VisualDebugger {
      * Step over.
      */
     public void stepOver() {
+       translateWatchpoints();
         this.stepOver(mediator.getProof().openGoals());
     }
 
@@ -1935,12 +1942,13 @@ public class VisualDebugger {
      */
     public int translateWatchpoints() {
 
+        System.out.println("translateWatchpoints()...");
         LinkedList<WatchPoint> watchpoints = watchPointManager.getWatchPoints();
         listOfWatchpoints = SLListOfTerm.EMPTY_LIST;
         assert(watchpoints != null);
      
         if (watchpoints.isEmpty()) {
-            System.out.println("No watches created so far");
+            System.out.println("translateWatchpoints: No watches created so far");
             return 0;
         } else {
             
@@ -1948,7 +1956,7 @@ public class VisualDebugger {
             JavaInfo ji = mediator.getServices().getJavaInfo();
 
             for (int i = 0; i < watchpoints.size(); i++) {
-                //TODO lookup class name in eclipse ast
+
                 WatchPoint wp = watchpoints.get(i);
                 StringBuffer buffer = new StringBuffer();
                 

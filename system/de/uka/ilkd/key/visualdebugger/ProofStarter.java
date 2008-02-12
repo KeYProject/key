@@ -191,7 +191,6 @@ public class ProofStarter {
         } else {
             proof.setActiveStrategy(strategy);
         }
-
         if (maxSteps == -1) {
             // take default settings
             setMaxSteps(proof.getSettings().getStrategySettings().getMaxSteps());

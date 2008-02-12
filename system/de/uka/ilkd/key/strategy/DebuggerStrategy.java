@@ -147,6 +147,7 @@ public class DebuggerStrategy extends VBTStrategy {
 
             ListOfTerm watchpoints = (ListOfTerm) strategyProperties
                     .get(VISUAL_DEBUGGER_WATCHPOINTS_KEY);
+            if(watchpoints == null)System.out.println("watchpoints are null in create in DebuggerStrategy$Factory");
             injectDebuggerDefaultOptionsIfUnset(strategyProperties);
             
             return new DebuggerStrategy(p_proof, strategyProperties,

@@ -43,8 +43,8 @@ public class WatchPointFeature extends BinaryFeature {
                 goal.simplifier());
 
         assert watchpoints != null : "Watchpoints are NULL!";
-        if (watchpoints==null || watchpoints.isEmpty()) {
-            System.out.println("The list of watchpoints is empty.");
+        if (watchpoints == null || watchpoints.isEmpty()) {
+            System.out.println("The list of watchpoints is empty./in WatchpointFeature");
             return false;
         } else {
             PIOPathIterator it = pos.iterator();
@@ -56,48 +56,50 @@ public class WatchPointFeature extends BinaryFeature {
 
                     Update update = Update.createUpdate(term);
                     System.out.println("update.toString: " + update.toString());
-                    updates.add(update);
+                    updates.addFirst(update);
 
                     System.out.println("counted updates: " + updates.size());
                 }
             }
-            
-            updates = reverseList(updates);
+
             IteratorOfTerm watchpointIterator = watchpoints.iterator();
             System.out.println(watchpoints.size() + " watchpoints found.");
-           
+
             while (watchpointIterator.hasNext()) {
                 Term watchpoint = watchpointIterator.next();
 
                 for (Update update : updates) {
                     watchpoint = updateFactory.prepend(update, watchpoint);
                 }
-                
+
                 ConstrainedFormula newCF = new ConstrainedFormula(watchpoint);
                 seq.changeFormula(newCF, pos);
-                
+
                 // start side proof
                 ProofStarter ps = new ProofStarter();
-               
-                StrategyProperties strategyProperties = DebuggerStrategy
-                .getDebuggerStrategyProperties(true,
-                        false, false, watchpoints);
 
-                final StrategyFactory factory = new DebuggerStrategy.Factory();
-                proof.setActiveStrategy((factory.create(proof, strategyProperties)));
-                
                 ProofEnvironment proofEnvironment = goal.proof().env();
                 InitConfig initConfig = proofEnvironment.getInitConfig();
-                
-                WatchpointPO watchpointPO = new WatchpointPO("WatchpointPO", seq);
+
+                WatchpointPO watchpointPO = new WatchpointPO("WatchpointPO",
+                        seq);
                 watchpointPO.setIndices(initConfig.createTacletIndex(),
                         initConfig.createBuiltInRuleIndex());
                 watchpointPO.setProofSettings(proof.getSettings());
                 watchpointPO.setConfig(initConfig);
+                
                 ps.init(watchpointPO);
+// watchpoints ok until here - no return from ps.run!
                 ps.run(proofEnvironment);
-            }// -> true
-            
+                if (watchpoints == null) {
+                    System.out.println("wp's null, after after ps.run in WatchpointFeature"); }
+                else{
+                        System.out.println("wp's ok,  ps.run /in WatchpointFeature"); }
+               
+                if (ps.getProof().closed()) {
+                    return true;
+                }
+            }
             return false;
         }
     }
@@ -105,20 +107,4 @@ public class WatchPointFeature extends BinaryFeature {
     public static WatchPointFeature create(ListOfTerm wp) {
         return new WatchPointFeature(wp);
     }
-
-    /**
-     * reverseList.
-     * 
-     * @param updates
-     *                the updates as linkedlist to reverse
-     */
-    private LinkedList<Update> reverseList(LinkedList<Update> updates) {
-
-        LinkedList<Update> reversedUpdates = new LinkedList<Update>();
-        for (int i = updates.size() - 1; i >= 0; i--) {
-            reversedUpdates.add(updates.get(i));
-        }
-        return reversedUpdates;
-    }
-   
 }
