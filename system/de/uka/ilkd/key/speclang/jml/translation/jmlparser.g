@@ -618,7 +618,19 @@ options {
                                            
     	return result;
     }    
+    
+    
+    private Term getObjectCreationFma(KeYJavaType kjt) {
+	ProgramVariable nextToCreate 
+    		= javaInfo.getAttribute(
+    				ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE, 
+    				kjt);
+	Term nextToCreateTerm = tb.dot(null, nextToCreate);
+	Term oldNextToCreateTerm = convertToOld(nextToCreateTerm);
+	return tb.leq(oldNextToCreateTerm, nextToCreateTerm, services);
+    }
 }
+
 
 top throws SLTranslationException
 {
@@ -1773,6 +1785,10 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	{
 	    result = new JMLExpression(t);
 	}
+    |   OBJECT_CREATION LPAREN typ=referencetype RPAREN
+    	{
+    	    result = new JMLExpression(getObjectCreationFma(typ));
+    	}
 ;
 
 specquantifiedexpression returns [Term result = null] throws SLTranslationException
