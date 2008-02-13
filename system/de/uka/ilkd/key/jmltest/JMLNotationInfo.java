@@ -65,9 +65,7 @@ public class JMLNotationInfo extends NotationInfo {
                             60, 60));
 
         tbl.put(Op.IF_THEN_ELSE, new Notation.IfThenElse(130, "("));
-        tbl.put(Op.IF_EX_THEN_ELSE, new Notation.IfThenElse(130, "\\ifEx"));
-
-        tbl.put(Op.COMPUTE_SPEC_OP, new Notation.Prefix("^", 60, 60));
+        tbl.put(Op.IF_EX_THEN_ELSE, new Notation.IfThenElse(130, "\\ifEx"));      
 
         // createNumLitNotation(IntegerLDT.getStaticNumberSymbol());
 

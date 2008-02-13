@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.speclang.jml.translation;
 
-import java.io.StringReader;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;

@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.jmltest;
 
+import de.uka.ilkd.key.cspec.ComputeSpecification;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.declaration.ArrayOfParameterDeclaration;
 import de.uka.ilkd.key.logic.IteratorOfConstrainedFormula;
@@ -388,14 +389,14 @@ public class WrapperConstructor extends Thread {
                     final IUpdateOperator update = (IUpdateOperator) suc
                             .formula().op();
                     if ((update.target(suc.formula())).op().equals(
-                            Op.COMPUTE_SPEC_OP)) {
+                            ComputeSpecification.ACCUMULATOR)) {
                         term = suc.formula();
                         isInCorrectForm = true;
                     }
                 } else {
 
                     // Checks that the current formula is not the STOPTOKEN
-                    if (!(suc.formula().op().equals(Op.COMPUTE_SPEC_OP))) {
+                    if (!(suc.formula().op().equals(ComputeSpecification.ACCUMULATOR))) {
 
                         // Checks that the current term is neither a Modality,
                         // nor the "InReachableState" nor

@@ -12,7 +12,6 @@
  * on */ 
 package de.uka.ilkd.key.util;
 
-import de.uka.ilkd.key.visualization.TraceElement;
 
 public final class Debug {
 

@@ -154,6 +154,11 @@ public class AnonymisingUpdateFactory {
                 baseName = new 
                     Name(((ProgramElementName)baseName).getProgramName());
             }
+            
+            String s = baseName.toString();
+            if (s.startsWith("<") && s.endsWith(">")) {
+                baseName = new Name(s.substring(1, s.length() - 1));
+            }
 
             result = new RigidFunction ( getNewName ( services, baseName,
                                          proposal ), locTerm.sort (),

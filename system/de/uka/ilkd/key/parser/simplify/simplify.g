@@ -83,8 +83,6 @@ term returns[Term t=null]
     Term sub;
     Function f;
 }: 
-        f=attr {t=new FunctionTerm(f);}
-    |
         f=func {t=new FunctionTerm(f);}
     |
         i=integer {t=new NumberTerm(i);} 

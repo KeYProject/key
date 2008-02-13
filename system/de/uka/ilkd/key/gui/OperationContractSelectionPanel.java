@@ -17,6 +17,7 @@ import java.awt.Font;
 import java.awt.event.MouseListener;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -55,6 +56,8 @@ class OperationContractSelectionPanel extends JPanel {
     public OperationContractSelectionPanel(Services services,
                                            SetOfOperationContract contracts,
                                            String title) {
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)); 
+        
         //create scroll pane
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setBorder(new TitledBorder(title));
