@@ -51,7 +51,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
     
     public static final String IMPLICIT_ENCLOSING_THIS = "<enclosingThis>";
     
-    public static final String FINAL_VAR_PREFIX = "_outer_final_";
+    public static final String FINAL_VAR_PREFIX = "";
  
     /** flag set if java.lang.Object has been already transformed */
     private boolean transformedObject = false;

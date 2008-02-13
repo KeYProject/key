@@ -175,7 +175,8 @@ public class ConstructorNormalformBuilder
 	     // collect constructors for transformation phase
              ConstructorMutableList constructors = new ConstructorArrayList(10);
              constructors.add(services.getSourceInfo().getConstructors(cd));
-             if(constructors.size()==0){
+             if(constructors.size()==0 && (cd.getContainingClassType()!=null && !cd.isStatic() ||
+                     cd.getName()==null || cd.getStatementContainer() !=null)){
                  constructors.add(new DefaultConstructor(cd));
              }
              class2constructors.put(cd, constructors);
@@ -427,7 +428,7 @@ public class ConstructorNormalformBuilder
 	    }
 	    ConstructorMutableList constructors = 
 		(ConstructorMutableList) class2constructors.get(td);
-	    constructors.add(anonConstr);
+	    if(anonConstr!=null) constructors.add(anonConstr);
 	    for (int i = 0; i < constructors.size(); i++) {
 		attach(normalform
 		       ((ClassDeclaration)td, 
