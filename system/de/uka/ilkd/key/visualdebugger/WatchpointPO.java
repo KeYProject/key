@@ -47,8 +47,6 @@ public class WatchpointPO implements ProofOblInput {
 
     public ProofAggregate getPO() {
         if (po == null) {
-            System.out.println("enterning getPO() in WatchpointPO...");
-
             if ( sequent == null || taclets == null
                     || builtInRules == null || initConfig == null
                     || settings == null) {

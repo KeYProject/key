@@ -117,7 +117,7 @@ public class VisualDebugger {
     public static boolean showMainWindow = false;
 
     /** The VisualDebugger implements the singleton pattern. */
-    private static VisualDebugger singleton;
+    private static VisualDebugger visualDebuggerInstance;
 
     /** The symbolic exec names. */
     private static List symbolicExecNames = new ArrayList(5);
@@ -126,9 +126,6 @@ public class VisualDebugger {
     private ProgressMonitor etProgressMonitor = null;
 
     private WatchPointManager watchPointManager = null;
-
-    // Key representation of watchpoints
-    private ListOfTerm listOfWatchpoints = null;
 
     /**
      * The Constant tempDir. A temporary directory in the users home:
@@ -199,12 +196,12 @@ public class VisualDebugger {
 
     /**
      * Gets the visual debugger.
-     * 
+     *  Uses the singleton pattern.
      * @return the visual debugger
      */
     public static VisualDebugger getVisualDebugger() {
-        if (singleton == null) {
-            singleton = new VisualDebugger();
+        if (visualDebuggerInstance == null) {
+            visualDebuggerInstance = new VisualDebugger();
             String[] args = new String[2];
 
             args[0] = "DEBUGGER";
@@ -214,10 +211,11 @@ public class VisualDebugger {
             Main key = Main.getInstance(false);
             key.loadCommandLineFile();
 
-            singleton.main = Main.getInstance(false);
-            singleton.mediator = singleton.main.mediator();
+            visualDebuggerInstance.main = Main.getInstance(false);
+            visualDebuggerInstance.mediator = visualDebuggerInstance.main.mediator();
+            
         }
-        return singleton;
+        return visualDebuggerInstance;
     }
 
     /**
@@ -328,7 +326,6 @@ public class VisualDebugger {
     protected VisualDebugger() {
         bpManager = new BreakpointManager(this);
         watchPointManager = new WatchPointManager();
-
         // main = Main.getInstance();
     }
 
@@ -1452,14 +1449,12 @@ public class VisualDebugger {
      * @return true, if successful
      */
     public boolean run(ListOfGoal goals) {
-        translateWatchpoints();
-        System.out.println("run(..) in VD");
         if (!mediator.autoMode()) {
             this.removeStepOver(goals);
             this.setSteps(goals, this.runLimit);
             
             setProofStrategy(mediator.getProof(), true, false,
-                    getListOfWatchpoints());
+                   watchPointManager.getListOfWatchpoints());
             runProver(goals);
 
             return true;
@@ -1474,7 +1469,6 @@ public class VisualDebugger {
      *                the goals
      */
     private void runProver(final ListOfGoal goals) {
-        System.out.println("runProver(..) in VD");
         this.refreshRuleApps();
         mediator.startAutoMode(goals);
         // mediator.getInteractiveProver().removeProverTaskListener(proverTaskListener);
@@ -1513,15 +1507,12 @@ public class VisualDebugger {
      */
     public void setProofStrategy(final Proof proof, boolean splittingAllowed,
             boolean inUpdateAndAssumes, ListOfTerm watchpoints) {
-        System.out.println("setProofStratgy in VD ");
-        if(watchpoints == null){System.out.println("watchpoints are null in setProofStrategy in VD");
-        }else{System.out.println("watchpoints seem to be ok. size: " + watchpoints.size());}
+
         StrategyProperties strategyProperties = DebuggerStrategy
                 .getDebuggerStrategyProperties(splittingAllowed,
                         inUpdateAndAssumes, isInitPhase(), watchpoints);
 
         final StrategyFactory factory = new DebuggerStrategy.Factory();
-
         proof.setActiveStrategy((factory.create(proof, strategyProperties)));
     }
 
@@ -1706,13 +1697,11 @@ public class VisualDebugger {
      * @return true, if successful
      */
     public boolean stepInto(ListOfGoal goals, int steps) {
-        translateWatchpoints();
         if (!mediator.autoMode()) {
             final Proof proof = mediator.getProof();
             removeStepOver(proof.openGoals());
             this.setSteps(goals, steps);
-            translateWatchpoints();
-            setProofStrategy(proof, true, false, getListOfWatchpoints());
+            setProofStrategy(proof, true, false, watchPointManager.getListOfWatchpoints());
             runProver(goals);
             return true;
         }
@@ -1723,7 +1712,6 @@ public class VisualDebugger {
      * Step over.
      */
     public void stepOver() {
-       translateWatchpoints();
         this.stepOver(mediator.getProof().openGoals());
     }
 
@@ -1737,7 +1725,7 @@ public class VisualDebugger {
         setStepOver(goals);
         this.setSteps(goals, runLimit);
         setProofStrategy(mediator.getProof(), true, false,
-                getListOfWatchpoints());
+                watchPointManager.getListOfWatchpoints());
         runProver(goals);
     }
 
@@ -1752,7 +1740,7 @@ public class VisualDebugger {
             final Proof proof = mediator.getProof();
             removeStepOver(proof.openGoals());
             setSteps(proof.openGoals(), 0);
-            setProofStrategy(proof, true, false, getListOfWatchpoints());
+            setProofStrategy(proof, true, false, watchPointManager.getListOfWatchpoints());
             runProver(proof.openGoals());
             return true;
         }
@@ -1933,81 +1921,5 @@ public class VisualDebugger {
         this.watchPointManager = watchPointManager;
     }
 
-    /**
-     * Translates the WatchPoints into KeY data structures.
-     */
-    public int translateWatchpoints() {
 
-        System.out.println("translateWatchpoints()...");
-        LinkedList<WatchPoint> watchpoints = watchPointManager.getWatchPoints();
-        listOfWatchpoints = SLListOfTerm.EMPTY_LIST;
-        assert(watchpoints != null);
-     
-        if (watchpoints.isEmpty()) {
-            System.out.println("translateWatchpoints: No watches created so far");
-            return 0;
-        } else {
-            
-            Namespace progVarNS = new Namespace();
-            final Services services = mediator.getServices();
-            final JavaInfo ji = services.getJavaInfo();
-
-            for (int i = 0; i < watchpoints.size(); i++) {
-
-                WatchPoint wp = watchpoints.get(i);
-                StringBuffer buffer = new StringBuffer();
-                
-                String typeOfSource = wp.getTypeOfSource();
-
-
-                //TODO check namespace: services.getNamespaces().lookup()               
-                
-                ProgramElementName selfName = new ProgramElementName("self_XY");
-                ProgramVariable var_self = new LocationVariable(
-                        selfName, ji.getKeYJavaType(typeOfSource));
-                ProgramVariable var_dummy = new LocationVariable(
-                        new ProgramElementName(wp.getName()), 
-                        services.getTypeConverter().getBooleanType());
-                progVarNS.add(var_self);
-                progVarNS.add(var_dummy);
-                
-                
-
-                buffer.append("\\exists " + typeOfSource +" x; {"+ selfName +":= x } \\<{method-frame( source=" + typeOfSource
-                        + ",this="+selfName); 
-                buffer.append(" ) : { " + wp.getName() + " = "
-                        + wp.getExpression());
-                buffer.append(";} }\\>" + wp.getName() + " = TRUE");
-                System.out.println(buffer.toString());
-
-                Term term = ProblemLoader.parseTerm(buffer.toString(), this
-                        .getMediator().getProof(), new Namespace(), progVarNS);
-
-                // MethodFrame mf = (MethodFrame)
-                // term.sub(0).javaBlock().program().getFirstElement();
-                // StatementBlock sb = (StatementBlock) mf.getChildAt(1);
-                // LocalVariableDeclaration lvd = (LocalVariableDeclaration)
-                // sb.getChildAt(0);
-                // VariableSpecification vs =
-                // lvd.getVariableSpecifications().getVariableSpecification(0);
-                // Expression watchpoint = vs.getInitializer();
-
-                listOfWatchpoints = listOfWatchpoints.append(term); 
-            }
-            return watchpoints.size();
-        }
-    }
-
-    /**
-     * Gets the listOfExpression containing the watchpoints.
-     * 
-     * @return the listOfExpression
-     */
-
-    public ListOfTerm getListOfWatchpoints() {
-        if (listOfWatchpoints == null) {
-            return SLListOfTerm.EMPTY_LIST;
-        }
-        return listOfWatchpoints;
-    }
 }

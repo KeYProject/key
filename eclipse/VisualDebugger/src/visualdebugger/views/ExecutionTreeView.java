@@ -59,7 +59,7 @@ import de.uka.ilkd.key.visualdebugger.executiontree.*;
 public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
 	/** The Constant debug. */
-	private static final boolean debug = true;
+	private static final boolean debug = false;
 
 	/** The bc labels. */
 	private boolean bcLabels = true;

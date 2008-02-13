@@ -20,6 +20,8 @@ public class WatchPoint {
     /** The statement. */
     private String statement_line;
     
+    private boolean enabled = true;
+    
     /**
      * Instantiates a new watch point.
      * 
@@ -79,6 +81,16 @@ public class WatchPoint {
 
     public String getName() {
         return name;
+    }
+
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+
+    public void setEnabled(boolean isEnabled) {
+        this.enabled = isEnabled;
     }
 
 

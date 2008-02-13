@@ -29,12 +29,8 @@ public class WatchPointFeature extends BinaryFeature {
 
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
 
-        System.out.println("entering watchpointfeature...");
-
         assert watchpoints != null : "Watchpoints are NULL!";
         if (watchpoints.isEmpty()) {
-            System.out
-                    .println("The list of watchpoints is empty./in WatchpointFeature");
             return false;
         } else {
 
@@ -70,7 +66,7 @@ public class WatchPointFeature extends BinaryFeature {
                 }
 
                 ConstrainedFormula newCF = new ConstrainedFormula(watchpoint);
-               seq = seq.changeFormula(newCF, pos).sequent();
+                seq = seq.changeFormula(newCF, pos).sequent();
 
                 // start side proof
                 ProofStarter ps = new ProofStarter();
@@ -91,20 +87,11 @@ public class WatchPointFeature extends BinaryFeature {
                 watchpointPO.setProofSettings(proof.getSettings());
                 watchpointPO.setInitConfig(initConfig);
                 ps.setStrategy(strategy);
-                
-                ps.setMaxSteps(2000);
-                
+                ps.setMaxSteps(500);
                 ps.init(watchpointPO);
-                // watchpoints ok until here - no return from ps.run!
                 ps.run(proofEnvironment);
-                if (watchpoints == null) {
-                    System.out
-                            .println("wp's null, after after ps.run in WatchpointFeature");
-                } else {
-                    System.out
-                            .println("wp's ok,  ps.run /in WatchpointFeature");
-                }
-                System.out.println("proof could be closed:" + ps.getProof().closed());
+                System.out.println("proof could be closed:"
+                        + ps.getProof().closed());
                 return ps.getProof().closed();
             }
         }
