@@ -10,24 +10,12 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
-import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.abstraction.ClassType;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.MethodDeclaration;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.expression.operator.Instanceof;
 import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.statement.Else;
-import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.Then;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
@@ -221,8 +209,10 @@ public class MethodCall extends ProgramMetaConstruct {
 	}
         newContext = methRef.getReferencePrefix();
 	if (newContext == null){
-	    newContext = (ReferencePrefix) services.getTypeConverter().convertToProgramElement(
-	            services.getTypeConverter().findThisForSort(pm.getContainerType().getSort(), execContext));
+	    Term self = services.getTypeConverter().findThisForSort(pm.getContainerType().getSort(), execContext);
+	    if(self!=null){
+	        newContext = (ReferencePrefix) services.getTypeConverter().convertToProgramElement(self);
+	    }
 	} else if(newContext instanceof ThisReference){
 	    newContext = (ReferencePrefix) services.getTypeConverter().convertToProgramElement(
                 services.getTypeConverter().convertToLogicElement((ThisReference) newContext, execContext));

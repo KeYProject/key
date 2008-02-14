@@ -111,7 +111,6 @@ public class ApplyOnModality extends AbstractUpdateRule {
         return protectedProgVars.contains(PROTECT_ALL) ||
               (protectedProgVars.contains(PROTECT_HEAP) && isHeapLocation(loc)) || 
               (isHeapLocation(loc) || protectedProgVars.contains(loc) ||
-                      (loc instanceof ProgramVariable && ((ProgramVariable) loc).isFinal()) ||
 	    loc.name().equals(new ProgramElementName("<transactionCounter>")));
     }
 
