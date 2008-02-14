@@ -15,9 +15,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.IteratorOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.AttributeOp;
 import de.uka.ilkd.key.logic.op.IUpdateOperator;
@@ -54,18 +57,18 @@ class TriggersSet {
      */
     private final Substitution replacementWithMVs;
 
-    private TriggersSet(Term allTerm) {
+    private TriggersSet(Term allTerm, Services services) {
         this.allTerm = allTerm;
         replacementWithMVs = ReplacerOfQuanVariablesWithMetavariables.createSubstitutionForVars(allTerm);
         uniQuantifiedVariables = getAllUQS(allTerm);
-        initTriggers();
+        initTriggers(services);
     }
 
-    static TriggersSet create(Term allTerm) {
+    static TriggersSet create(Term allTerm, Services services) {
         TriggersSet trs = (TriggersSet) cache.get(allTerm);
         if (trs == null) {
             // add check whether it is in PCNF
-            trs = new TriggersSet(allTerm);
+            trs = new TriggersSet(allTerm, services);
             cache.put(allTerm, trs);
         }
         return trs;
@@ -91,7 +94,7 @@ class TriggersSet {
     /**
      * initial all <code>Trigger</code>s by finding triggers in every clauses
      */
-    private void initTriggers() {
+    private void initTriggers(Services services) {
         final QuantifiableVariable var =
                 allTerm.varsBoundHere(0).getQuantifiableVariable(0);
         final IteratorOfTerm it =
@@ -102,7 +105,7 @@ class TriggersSet {
             // a trigger should contain the first variable of allTerm
             if (clause.freeVars().contains(var)) {
                 ClauseTrigger ct = new ClauseTrigger(clause);
-                ct.createTriggers();
+                ct.createTriggers(services);
             }
         }
     }
@@ -183,7 +186,7 @@ class TriggersSet {
          *to the goal trigger set. At last construct multi-triggers from
          * those elements. 
          */
-        public void createTriggers() {
+        public void createTriggers(Services services) {
             final IteratorOfTerm it =
                     TriggerUtils.iteratorByOperator(clause, Op.OR);
             while (it.hasNext()) {
@@ -194,7 +197,7 @@ class TriggersSet {
                     if (t.op() == Op.NOT) {
                         t = t.sub(0);
                     }
-                    recAddTriggers(t);
+                    recAddTriggers(t, services);
                 }
             }
             setMultiTriggers(elementsOfMultiTrigger.toArray(), 0);
@@ -205,7 +208,7 @@ class TriggersSet {
          * @param litQVS  all universal variables of <code>term</code>
          * @return true   if find any trigger from <code>term</code>
          */
-        private boolean recAddTriggers(Term term) {
+        private boolean recAddTriggers(Term term, Services services) {
             if (!mightContainTriggers(term)) {
                 return false;
             }
@@ -216,7 +219,7 @@ class TriggersSet {
             boolean foundSubtriggers = false;
             for (int i = 0; i < term.arity(); i++) {
                 final Term subTerm = term.sub(i);
-                final boolean found = recAddTriggers(subTerm);
+                final boolean found = recAddTriggers(subTerm, services);
 
                 if (found && uniVarsInTerm.subset(subTerm.freeVars())) {
                     foundSubtriggers = true;
@@ -224,7 +227,7 @@ class TriggersSet {
             }
 
             if (!foundSubtriggers) {
-                addUniTrigger(term);
+                addUniTrigger(term, services);
                 return true;
             }
 
@@ -314,20 +317,23 @@ class TriggersSet {
          * Further criteria for triggers. This is just a HACK, there should be
          * a more general framework for characterising acceptable triggers
          */
-        private boolean isAcceptableTrigger(Term term) {
+        private boolean isAcceptableTrigger(Term term, Services services) {
             final Operator op = term.op();
 
             // we do not want to match on expressions a.<created>
             if (op instanceof AttributeOp) {
-                final AttributeOp attrOp = (AttributeOp) op;
-                if (attrOp.attribute().name().toString().endsWith("<created>")) {
+                final AttributeOp attrOp = (AttributeOp) op;                
+                if (attrOp.attribute().name().toString().endsWith(ImplicitFieldAdder.IMPLICIT_CREATED)) {
                     return false;
                 }
             }
 
+            final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
             // matching on equations and inequalities does not seem to have any
             // positive effect for the time being
-            if (op == Op.EQUALS || "leq".equals(op.name().toString()) || "geq".equals(op.name().toString())) {
+            if (op == Op.EQUALS || 
+                    op == integerLDT.getLessOrEquals() || 
+                    op == integerLDT.getGreaterOrEquals()) {
                 return false;
             }
 
@@ -351,8 +357,8 @@ class TriggersSet {
          * multi-triggers for this clause
          * @return <code>true</code> if a uni-trigger was added
          */
-        private void addUniTrigger(Term term) {
-            if (!isAcceptableTrigger(term)) {
+        private void addUniTrigger(Term term, Services services) {
+            if (!isAcceptableTrigger(term, services)) {
                 return;
             }
             final boolean isUnify = !term.freeVars().subset(selfUQVS);
@@ -372,8 +378,8 @@ class TriggersSet {
          * multi-triggers for this clause
          * @return <code>true</code> if a uni-trigger was added
          */
-        private boolean addMultiTrigger(Term term) {
-            if (!isAcceptableTrigger(term)) {
+        private boolean addMultiTrigger(Term term, Services services) {
+            if (!isAcceptableTrigger(term, services)) {
                 return false;
             }
             final boolean isUnify = !term.freeVars().subset(selfUQVS);
