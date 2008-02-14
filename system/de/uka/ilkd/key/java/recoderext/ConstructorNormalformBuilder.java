@@ -171,7 +171,9 @@ public class ConstructorNormalformBuilder
 	 Iterator it = cds.iterator();
 	 while(it.hasNext()){
 	     ClassDeclaration cd = (ClassDeclaration) it.next();
-	     (new FinalOuterVarsCollector()).walk(cd);
+	     if(cd.getName()==null || cd.getStatementContainer() !=null){
+	         (new FinalOuterVarsCollector()).walk(cd);
+	     }
 	     // collect constructors for transformation phase
              ConstructorMutableList constructors = new ConstructorArrayList(10);
              constructors.add(services.getSourceInfo().getConstructors(cd));
@@ -185,14 +187,14 @@ public class ConstructorNormalformBuilder
              
              class2enclosingThis.put(cd, getImplicitEnclosingThis(cd));
              
-             LinkedList outerVars = (LinkedList) localClass2finalVar.get(cd);
+             LinkedList outerVars = (LinkedList) localClass2FinalVar.get(cd);
              for(int i=0; outerVars!=null && i<outerVars.size(); i++){
                  v2t.put(outerVars.get(i), ((Variable) outerVars.get(i)).getType());
              }
              
              if(cd.getName()==null || 
                      cd.getStatementContainer() !=null ||
-                     cd.getContainingClassType()!=null){
+                     cd.getContainingClassType()!=null && !cd.isStatic()){
                  class2enclosingClass.put(cd, containingClass(cd));
 //                 class2fieldsForFinalVars.put(cd, getFieldsForFinalVars(cd));
              }
@@ -272,7 +274,7 @@ public class ConstructorNormalformBuilder
 	StatementBlock body;
 	Field et = (Field) class2enclosingThis.get(cd);
 	TypeDeclaration td = (TypeDeclaration) class2enclosingClass.get(cd);
-	LinkedList outerVars = (LinkedList) localClass2finalVar.get(cd);
+	LinkedList outerVars = (LinkedList) localClass2FinalVar.get(cd);
 	int j = et==null? 0 : 1;
 	if(outerVars!=null) j+=outerVars.size();
 	ParameterDeclaration pd=null;

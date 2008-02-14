@@ -51,7 +51,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
     
     public static final String IMPLICIT_ENCLOSING_THIS = "<enclosingThis>";
     
-    public static final String FINAL_VAR_PREFIX = "";
+    public static final String FINAL_VAR_PREFIX = "_outer_final_";
  
     /** flag set if java.lang.Object has been already transformed */
     private boolean transformedObject = false;
@@ -169,7 +169,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
     }
     
     private void addFieldsForFinalVars(TypeDeclaration td){
-        LinkedList vars = (LinkedList) localClass2finalVar.get(td);
+        LinkedList vars = (LinkedList) localClass2FinalVar.get(td);
         if(vars!=null){
             Iterator it = vars.iterator();
             while(it.hasNext()){
@@ -189,7 +189,9 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	 Iterator it = cds.iterator();
 	 while(it.hasNext()){
 	     ClassDeclaration cd = (ClassDeclaration) it.next();
-	     (new FinalOuterVarsCollector()).walk(cd);
+	     if(cd.getName()==null || cd.getStatementContainer() !=null){
+	         (new FinalOuterVarsCollector()).walk(cd);
+	     }
 	 }     
 	 return super.analyze();
     }

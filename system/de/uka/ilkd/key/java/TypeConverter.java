@@ -257,6 +257,7 @@ public class TypeConverter extends TermBuilder {
     
     public Term findThisForSort(Sort s, ExecutionContext ec){
         ProgramVariable inst = (ProgramVariable) ec.getRuntimeInstance();
+        if(inst == null) return null;
         return findThisForSort(s, var(inst), ec.getTypeReference().getKeYJavaType());
     }
     

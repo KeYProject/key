@@ -29,13 +29,15 @@ public class LocalClassTransformation extends RecoderModelTransformer {
          Iterator it = cds.iterator();
          while(it.hasNext()){
              ClassDeclaration cd = (ClassDeclaration) it.next();
-             (new FinalOuterVarsCollector()).walk(cd);
+             if(cd.getName()==null || cd.getStatementContainer() !=null){
+                 (new FinalOuterVarsCollector()).walk(cd);
+             }
          }     
          return super.analyze();
     }
     
     protected void makeExplicit(TypeDeclaration td) {
-        LinkedList outerVars = (LinkedList) localClass2finalVar.get(td);
+        LinkedList outerVars = (LinkedList) localClass2FinalVar.get(td);
         CrossReferenceSourceInfo si = services.getCrossReferenceSourceInfo();
         if(outerVars!=null){
             for(int i=0; i<outerVars.size(); i++){

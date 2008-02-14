@@ -2771,6 +2771,7 @@ public class Recoder2KeY implements JavaReader{
         if (cHistory.needsUpdate()) {
             cHistory.updateModel();    
         }
+        RecoderModelTransformer.clear();
     }
 
     /**

@@ -31,6 +31,10 @@ class SLAttributeResolver extends SLExpressionResolver {
             KeYJavaType containingType = receiver.getKeYJavaType(javaInfo);
             while(attribute==null){
                 attribute = javaInfo.lookupVisibleAttribute(name, containingType);
+                if(attribute==null){
+                    attribute = javaInfo.lookupVisibleAttribute(
+                            ImplicitFieldAdder.FINAL_VAR_PREFIX+name, containingType);
+                }
                 ProgramVariable et = javaInfo.getAttribute(
                         ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);
                 if(et!=null && attribute==null){

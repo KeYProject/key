@@ -42,8 +42,8 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
 
     protected CrossReferenceServiceConfiguration services;
     protected CompilationUnitMutableList units;
-    protected HashSet classDeclarations=null;
-    protected HashMap localClass2finalVar=null;
+    protected static HashSet classDeclarations=null;
+    protected static HashMap localClass2FinalVar=null;
 
     /**
      * creates a transormder for the recoder model
@@ -58,11 +58,22 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
 	super(services);
 	this.services = services;
 	this.units = units;
-	localClass2finalVar=new HashMap();
+        getLocalClass2FinalVar();
     }
     
     public HashMap getLocalClass2FinalVar(){
-        return localClass2finalVar;
+        if(localClass2FinalVar==null){
+            localClass2FinalVar=new HashMap();
+        }
+        return localClass2FinalVar;
+    }
+   
+    /**
+     * Clears the information stored in static fields. 
+     */ 
+    public static void clear(){
+        classDeclarations=null;
+        localClass2FinalVar=null;      
     }
 
     /** 
@@ -220,8 +231,11 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
     
     class FinalOuterVarsCollector extends SourceVisitor{
         
+        HashMap lc2fv;
+        
         public FinalOuterVarsCollector(){
             super();
+            lc2fv = getLocalClass2FinalVar();
         }
         
         public void walk(SourceElement s){
@@ -239,14 +253,14 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
            Variable v = si.getVariable(vr.getName(), vr);
            if((v instanceof VariableSpecification) && !(v instanceof FieldSpecification) &&
                    si.getContainingClassType((ProgramElement) v) != si.getContainingClassType(vr)){
-               LinkedList vars = (LinkedList) localClass2finalVar.get(si.getContainingClassType(vr));
+               LinkedList vars = (LinkedList) lc2fv.get(si.getContainingClassType(vr));
                if(vars == null){
                    vars = new LinkedList();
                }
                if(!vars.contains(v)){
                    vars.add(v);
                }
-               localClass2finalVar.put(si.getContainingClassType(vr), vars);
+               lc2fv.put(si.getContainingClassType(vr), vars);
            }
        }
         
