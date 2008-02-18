@@ -26,7 +26,7 @@ import de.uka.ilkd.key.visualdebugger.VisualDebugger;
  */
 public class ETNode {
     
-    private LinkedList children = new LinkedList();
+    private LinkedList<ETNode> children = new LinkedList<ETNode>();
 
     private ETMethodInvocationNode lastMethodInvocation = null;
 
@@ -54,7 +54,7 @@ public class ETNode {
         this.setMethodInvocation();
     }
 
-    public ETNode(ListOfTerm bc, LinkedList itNodes, ETNode parent) {
+    public ETNode(ListOfTerm bc, LinkedList<ITNode> itNodes, ETNode parent) {
         this.bc = bc;
         this.itNodes = itNodes;
         this.parent = parent;
@@ -78,7 +78,7 @@ public class ETNode {
         children.add(n);
     }
 
-    public void setChildren(LinkedList n) {
+    public void setChildren(LinkedList<ETNode> n) {
         this.children = n;
     }
 
@@ -86,7 +86,7 @@ public class ETNode {
         return (ETNode[]) children.toArray(new ETNode[children.size()]);
     }
 
-    public LinkedList getChildrenList() {
+    public LinkedList<ETNode> getChildrenList() {
         return children;
     }
 
@@ -121,7 +121,7 @@ public class ETNode {
      * 
      * @param nodes
      */
-    public void addITNodes(LinkedList nodes) {
+    public void addITNodes(LinkedList<ITNode> nodes) {
         this.itNodes.addAll(nodes);
     }
 
@@ -130,7 +130,7 @@ public class ETNode {
      * 
      * @return
      */
-    public LinkedList getITNodes() {
+    public LinkedList<ITNode> getITNodes() {
         return itNodes;
     }
 
@@ -143,7 +143,7 @@ public class ETNode {
      * 
      */
     public ETNode copy(ETNode p) {
-        ETNode copy = new ETNode(bc, (LinkedList) itNodes.clone(), p);
+        ETNode copy = new ETNode(bc, (LinkedList<ITNode>) itNodes.clone(), p);
         copy.setChildren((LinkedList) children.clone());
         return copy;
     }
@@ -202,7 +202,7 @@ public class ETNode {
 
     public ListOfNode getProofTreeNodes() {
         ListOfNode result = SLListOfNode.EMPTY_LIST;
-        for (Iterator it = itNodes.iterator(); it.hasNext();) {
+        for (Iterator<ITNode> it = itNodes.iterator(); it.hasNext();) {
             result = result.append(((ITNode) it.next()).getNode());
 
         }
@@ -210,7 +210,7 @@ public class ETNode {
     }
 
     public boolean representsProofTreeNode(Node n) {
-        for (Iterator it = itNodes.iterator(); it.hasNext();) {
+        for (Iterator<ITNode> it = itNodes.iterator(); it.hasNext();) {
             if (((ITNode) it.next()).getNode().equals(n))
                 return true;
 
