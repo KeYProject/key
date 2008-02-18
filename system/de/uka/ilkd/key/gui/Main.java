@@ -2425,16 +2425,14 @@ public class Main extends JFrame implements IMain {
     
     class MainTaskListenerBatchMode implements ProverTaskListener { // XXX
         public void taskStarted(String message, int size) {
-            System.out.println(message + (size > 0 ? 
-                    " (expected dots: " + size + ")" : "" ));
+            System.out.println(message+"...");
         }
         
         public void taskProgress(int position) {
-            System.out.print(".");
         }
         
         public void taskFinished(TaskFinishedInfo info) {
-            System.out.println("DONE.");
+            System.out.println("[ DONE ]");
             if (info.getSource() instanceof ApplyStrategy) {
                 finishedBatchMode ( info.getResult(), 
                         info.getProof(), info.getTime(), 
