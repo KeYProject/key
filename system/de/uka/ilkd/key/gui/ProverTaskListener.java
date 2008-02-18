@@ -38,6 +38,7 @@ public interface ProverTaskListener {
     
     /**
      * Called when a task is finished.
+     * @param info a TaskFinishedInfo object with additional information
      */
-    void taskFinished ();
+    void taskFinished (TaskFinishedInfo info);
 }

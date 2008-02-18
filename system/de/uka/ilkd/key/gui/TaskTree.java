@@ -348,8 +348,11 @@ public class TaskTree extends JPanel {
 	        boolean loaded = localFileChooser.showOpenDialog(mainFrame);
 	        if (loaded) {
 		    File file = localFileChooser.getSelectedFile(); 
-		    (new ProblemLoader(file, mainFrame, 
-                            mediator.getProfile(), true)).run();
+		    final ProblemLoader pl = new ProblemLoader(file, mainFrame, 
+                                        mediator.getProfile(), true, 
+                                        Main.enableSpecs);
+                    pl.addTaskListener(mainFrame.getProverTaskListener());
+                    pl.run();
 	        }
             }
 	}

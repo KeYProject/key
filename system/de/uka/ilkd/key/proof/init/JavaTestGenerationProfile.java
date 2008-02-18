@@ -2,7 +2,7 @@ package de.uka.ilkd.key.proof.init;
 
 import java.util.HashMap;
 
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Name;
@@ -18,7 +18,7 @@ public class JavaTestGenerationProfile extends JavaProfile {
     private final static StrategyFactory DEFAULT = 
         new VBTStrategy.Factory();
     
-    public JavaTestGenerationProfile(Main main) {
+    public JavaTestGenerationProfile(IMain main) {
         super("standardRules-testGen.key", 
                 SetAsListOfGoalChooserBuilder.EMPTY_SET.
                 add(new DefaultGoalChooserBuilder()).

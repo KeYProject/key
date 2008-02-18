@@ -19,6 +19,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.util.Debug;
 
 
 public class QueueRuleApplicationManager implements AutomatedRuleApplicationManager {
@@ -102,10 +103,9 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             // then the heap has to be rebuilt completely anyway, and the new
             // rule app is not of interest for us
             return;
-        
-        push ( RuleAppContainer.createAppContainers
-	           ( rule, pos, getGoal (), getStrategy () ).iterator (),
-               PRIMARY_QUEUE );
+        final IteratorOfRuleAppContainer iterator = RuleAppContainer.createAppContainers
+        	           ( rule, pos, getGoal (), getStrategy () ).iterator ();
+        push ( iterator,  PRIMARY_QUEUE );
     }
 
 
@@ -113,8 +113,9 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * Add a number of new rule apps to the heap
      */
     private void push ( IteratorOfRuleAppContainer it, int target ) {
-        while ( it.hasNext () )
+        while ( it.hasNext () ) {
             push ( it.next (), target );
+        }
     }
 
 

@@ -18,7 +18,6 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
-import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.rule.IteratorOfNoPosTacletApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.SetOfNoPosTacletApp;
@@ -30,12 +29,9 @@ public class POSelectionDialog extends JDialog {
     private final SetOfNoPosTacletApp tacs;
     private boolean okPressed = false;
 
-
-
-    public POSelectionDialog (KeYMediator mediator,
+    public POSelectionDialog (Frame parent,
 			      SetOfNoPosTacletApp tacs) {  
-	super(mediator.mainFrame() == null ? new JFrame() : mediator.mainFrame(), 
-                "Load Taclets", true);
+	super(parent, "Load Taclets", true);
 
         this.tacs=tacs;
 
@@ -45,8 +41,6 @@ public class POSelectionDialog extends JDialog {
 	setLocation(70,70);
 	setVisible(true);
     }
-
-
 
     private Object[] createTacletListContents () {
     	Vector res = new Vector ();

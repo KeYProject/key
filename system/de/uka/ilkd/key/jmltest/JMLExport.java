@@ -11,14 +11,14 @@
 package de.uka.ilkd.key.jmltest;
 
 import java.io.IOException;
+
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PresentationFeatures;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.init.SpecExtPO;
 import de.uka.ilkd.key.rule.updatesimplifier.ArrayOfAssignmentPair;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.Main;
 
 /**
  * The class JMLExport is used to transform given JavaDL specification to an JML
@@ -28,22 +28,20 @@ import de.uka.ilkd.key.gui.Main;
  */
 public class JMLExport {
 
-    final private KeYMediator mediator;
-
     final private NotationInfo notaInfo;
 
     final private ProgramPrinter pgr;
 
     final private JMLLogicPrinter lp;
 
-    public JMLExport(SpecExtPO po) {
-        mediator = Main.getInstance().mediator();
+    public JMLExport(SpecExtPO po, Services services) {
         notaInfo = new JMLNotationInfo();
         pgr = new ProgramPrinter();
-        lp = new JMLLogicPrinter(pgr, notaInfo, mediator.getServices(), po);
+        lp = new JMLLogicPrinter(pgr, notaInfo, services, po);
         // Used to get infix notation of some Operators
         PresentationFeatures.ENABLED = true;
-        PresentationFeatures.initialize(mediator.func_ns(), notaInfo, null);
+        PresentationFeatures.initialize(services.getNamespaces().functions(), 
+                notaInfo, null);
 
     }
 

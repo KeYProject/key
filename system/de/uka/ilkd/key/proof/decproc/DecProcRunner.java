@@ -11,10 +11,7 @@
 package de.uka.ilkd.key.proof.decproc;
 
 
-import de.uka.ilkd.key.gui.ExceptionDialog;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.SwingWorker;
+import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.proof.IteratorOfGoal;
 import de.uka.ilkd.key.proof.Proof;
@@ -26,7 +23,7 @@ import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 public class DecProcRunner implements Runnable {
 
-    Main main;
+    IMain main;
     KeYMediator mediator;
     String currentDecProc;
         
@@ -36,7 +33,7 @@ public class DecProcRunner implements Runnable {
     
     private SwingWorker worker;
 
-    public DecProcRunner(Main main) {
+    public DecProcRunner(IMain main) {
         this.main = main;
         mediator = main.mediator();
         currentDecProc = mediator.getProof().getSettings().getDecisionProcedureSettings()
@@ -58,33 +55,32 @@ public class DecProcRunner implements Runnable {
 		return res;
 	    }
 	    public void finished() {
-		mediator.startInterface(true);
-		Main main = Main.getInstance();
-		String msg = (String) get();
-		if(!"".equals(msg)) {
-		    if(Main.batchMode){
-			System.exit(-1);
-		    } else {
-//                    mediator.notify(new GeneralFailureEvent(re.getMessage()));
-			new ExceptionDialog(main, 
-                                exceptionHandler.getExceptions());
-			exceptionHandler.clear();
-		    }
-		} else {
-		    int nrGoalsClosed = mediator.getNrGoalsClosedByAutoMode();
-		    main.setStatusLine( currentDecProc + ": " + totalGoals + 
-                (totalGoals != 1 ? " goals" : " goal" ) + " processed, " + nrGoalsClosed + 
-                (nrGoalsClosed != 1 ? " goals" : " goal" )+ " could be closed!" );
-		    if (nrGoalsClosed > 0 && !mediator.getProof().closed()) {
-		        final String informationMsg =
-		            nrGoalsClosed + ((nrGoalsClosed > 1) ? 
-                    " goals have been closed": 
-		            " goal has been closed");
-		        mediator.notify(
-		                new GeneralInformationEvent(informationMsg));			   
-		    }
+	        mediator.startInterface(true);		
+	        String msg = (String) get();
+	        if(!"".equals(msg)) {
+	            if(Main.batchMode){
+	                System.exit(-1);
+	            } else {
+//	                mediator.notify(new GeneralFailureEvent(re.getMessage()));
+	                new ExceptionDialog(Main.hasInstance() ? Main.getInstance() :
+	                    null, exceptionHandler.getExceptions());
+	                exceptionHandler.clear();
+	            }
+	        } else {
+	            int nrGoalsClosed = mediator.getNrGoalsClosedByAutoMode();
+	            main.setStatusLine( currentDecProc + ": " + totalGoals + 
+	                    (totalGoals != 1 ? " goals" : " goal" ) + " processed, " + nrGoalsClosed + 
+	                    (nrGoalsClosed != 1 ? " goals" : " goal" )+ " could be closed!" );
+	            if (nrGoalsClosed > 0 && !mediator.getProof().closed()) {
+	                final String informationMsg =
+	                    nrGoalsClosed + ((nrGoalsClosed > 1) ? 
+	                            " goals have been closed": 
+	                    " goal has been closed");
+	                mediator.notify(
+	                        new GeneralInformationEvent(informationMsg));			   
+	            }
 
-		}
+	        }
 	    }
         };
         mediator.stopInterface(true);

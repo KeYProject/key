@@ -11,11 +11,13 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
-import java.awt.Dimension;
 import java.awt.event.*;
 import java.io.*;
 import java.net.URL;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -24,16 +26,22 @@ import javax.swing.text.JTextComponent;
 
 import org.apache.log4j.Logger;
 
-import de.uka.ilkd.key.cspec.ComputeSpecification;
-import de.uka.ilkd.key.gui.assistant.*;
+import de.uka.ilkd.key.gui.assistant.ProofAssistant;
+import de.uka.ilkd.key.gui.assistant.ProofAssistantAI;
+import de.uka.ilkd.key.gui.assistant.ProofAssistantController;
 import de.uka.ilkd.key.gui.configuration.*;
 import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
-import de.uka.ilkd.key.gui.notification.events.*;
+import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
+import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
+import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
+import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
-import de.uka.ilkd.key.java.*;
-
+import de.uka.ilkd.key.java.NonTerminalProgramElement;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.jmltest.JMLTestFileCreator;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
@@ -41,24 +49,17 @@ import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.decproc.DecProcRunner;
 import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAuflia;
-import de.uka.ilkd.key.proof.init.DebuggerProfile;
-import de.uka.ilkd.key.proof.init.JavaTestGenerationProfile;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.PureFOLProfile;
-import de.uka.ilkd.key.proof.init.TacletSoundnessPOLoader;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.NonInterferenceCheck;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ExtList;
-import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
+import de.uka.ilkd.key.util.*;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-public class Main extends JFrame {
+public class Main extends JFrame implements IMain {
 
     public static final String INTERNAL_VERSION = 
 	KeYResourceManager.getManager().getSHA1();
@@ -188,7 +189,9 @@ public class Main extends JFrame {
      */
     public static boolean enableSpecs = true;
     
-    public JButton reuseButton = new JButton("Reuse",IconFactory.reuseLogo());
+    private JButton reuseButton = new JButton();
+    private ReuseAction reuseAction = new ReuseAction();
+    
     
     private JButton decisionProcedureButton;
     
@@ -256,7 +259,10 @@ public class Main extends JFrame {
         proofListener = new MainProofListener();
         guiListener = new MainGUIListener();
         constraintListener = new MainConstraintTableListener();
-        taskListener = new MainTaskListener();
+        
+        taskListener = (Main.batchMode ? (ProverTaskListener)
+                new MainTaskListenerBatchMode() : 
+            (ProverTaskListener) new MainTaskListener());
         
         setMediator(new KeYMediator(this));
         
@@ -279,10 +285,40 @@ public class Main extends JFrame {
         }
     }
     
+    
+    /**
+     * returns an instance of Main and creates one if necessary
+     * <strong>Do not use</strong> this method to access the mediator as long as
+     * you do not attempt create a GUI element. In particular be aware that the 
+     * pattern <tt>getInstance().mediator().getProof()</tt> breaks GUI and prover 
+     * separation and will not work if an alternative GUI is used (e.g. soon for 
+     * the visual debugger). 
+     * 
+     * Further the above pattern is very fragile as the mediator may have changed 
+     * the selected proof. Usually if you want to have access to a proof e.g. in
+     * the strategy hand the proof object over at the creation time of the component.
+     * 
+     * @return the instance of Main
+     */
     public static Main getInstance() {
         return getInstance(true);
     }
     
+    /**
+     * returns an instance of Main and creates one if necessary
+     * <strong>Do not use</strong> this method to access the mediator as long as
+     * you do not attempt create a GUI element. In particular be aware that the 
+     * pattern <tt>getInstance(boolean).mediator().getProof()</tt> breaks GUI and prover 
+     * separation and will not work if an alternative GUI is used (e.g. soon for 
+     * the visual debugger). 
+     * 
+     * Further the above pattern is very fragile as the mediator may have changed 
+     * the selected proof. Usually if you want to have access to a proof e.g. in
+     * the strategy hand the proof object over at the creation time of the component.
+     * 
+     * @param visible a boolean indicating if Main shall be made visible
+     * @return the instance of Main
+     */
     public static Main getInstance(boolean visible) {
         if (instance == null) {
             instance = new Main("KeY -- Prover");
@@ -468,14 +504,7 @@ public class Main extends JFrame {
         
         toolBar.add(goalBackButton);
         toolBar.addSeparator();
-        toolBar.add(reuseButton);
-
-	toolBar.addSeparator();
-        
-        if (mediator.getProfile() instanceof JavaTestGenerationProfile) {
-            toolBar.add(createUnitTestButton());
-        }
-        
+                
         reuseButton.setEnabled(false);
         reuseButton.setToolTipText("Start proof reuse (when template available)");
         JMenuItem singleStepReuse = new JCheckBoxMenuItem("Single step");
@@ -494,6 +523,15 @@ public class Main extends JFrame {
                 }
             }
         });
+        reuseButton.setAction(reuseAction);
+
+        toolBar.add(reuseButton);
+        
+        if (mediator.getProfile() instanceof JavaTestGenerationProfile) {
+            toolBar.addSeparator();
+            toolBar.add(createUnitTestButton());
+        }
+
         toolBar.addSeparator();
         
         JToolBar fileOperations = new JToolBar("File Operations");
@@ -1785,7 +1823,10 @@ public class Main extends JFrame {
         if(unitKeY!=null){
             unitKeY.recent.addRecentFile(file.getAbsolutePath());
         }
-        new ProblemLoader(file, this, mediator.getProfile()).run();
+        final ProblemLoader pl = 
+            new ProblemLoader(file, this, mediator.getProfile(), false, enableSpecs);
+        pl.addTaskListener(getProverTaskListener());
+        pl.run();
     }
     
     protected void closeTask() {
@@ -1800,7 +1841,7 @@ public class Main extends JFrame {
     }
     
     
-    public void closeTaskWithoutIntercation() {
+    public void closeTaskWithoutInteraction() {
         final Proof proof = mediator.getProof();
         if (proof != null) {
             final TaskTreeNode rootTask = 
@@ -2255,10 +2296,161 @@ public class Main extends JFrame {
                     decisionProcedureButton.setText("Run SMT Translation");
                 }
     }
+        
+    /**
+     * called when a ReusePoint has been found so that the GUI can offer reuse for
+     * the current point to the user
+     * @param bestReusePoint the ReusePoint found, precise the best found candidate for 
+     * 
+     */
+    public void indicateReuse(ReusePoint p) {
+        reuseAction.setReusePoint(p);
+    }
+    
+    /**
+     * invoked when currently no reuse is possible
+     */
+    public void indicateNoReuse() {
+        reuseAction.setReusePoint(null);
+    }
+
+    /** displays some status information */
+    private void displayResults ( long time, int appliedRules, int closedGoals ) {
+        String message;       
+        String timeString = "" + (time/1000)+"."+((time%1000)/100);        
+        
+        int closed = mediator().getNrGoalsClosedByAutoMode();
+        
+        // display message in the status bar
+        
+        if ( appliedRules != 0 ) {
+            message = "Strategy: Applied " + appliedRules + " rule";
+            if ( appliedRules != 1 ) message += "s";
+            message += " (" + timeString + " sec), ";
+            message += " closed " + closedGoals + " goal";
+            if ( closed != 1 ) message += "s";             
+            message += ", " + displayedOpenGoalNumber ();
+            message += " remaining"; 
+            setStatusLine ( message );
+        }
+                              
+    }
+    
+    /** 
+     * used when in batch mode to write out some statistic data
+     * @param file the String with the filename where to write the statistic data
+     * @param result the Object encapsulating informtation about the result, e.g.
+     * String "Error" if an error has occurred. 
+     * @param time the long giving the needed time in ms 
+     * @param appliedRules the int giving the number of applied rules
+     */
+    private void printStatistics(String file, Object result, 
+            long time, int appliedRules) {
+        try {
+            final FileWriter statistics = new FileWriter ( file, true );
+            final PrintWriter statPrinter = new PrintWriter ( statistics );
+            
+            String fileName = Main.fileNameOnStartUp;
+            final int slashIndex = fileName.lastIndexOf ( "examples/" );
+            if ( slashIndex >= 0 )
+                fileName = fileName.substring ( slashIndex );
+            
+            statPrinter.print ( fileName + ", " );
+            if ("Error".equals ( result ) )
+                statPrinter.println ( "-1, -1" );
+            else
+                statPrinter.println ( "" + appliedRules + ", " + time );                
+            statPrinter.close();
+        } catch ( IOException e ) {}
+    }
+    
+    /**
+     * called when the batch mode has been finished 
+     * @param result the Object encapsulating informtation about the result, e.g.
+     * String "Error" if an error has occurred. 
+     * @param proof the Proof to which <tt>appliedRules</tt> rules have been 
+     * applied requiring <tt>time</tt> ms
+     * @param time the long giving the needed time in ms 
+     * @param appliedRules the int giving the number of applied rules
+     */
+    private void finishedBatchMode (Object result, 
+            Proof proof, long time, int appliedRules) {
+
+        if ( Main.statisticsFile != null )
+            printStatistics ( Main.statisticsFile, result, time, appliedRules );
+
+        if ("Error".equals ( result ) ) {
+            // Error in batchMode. Terminate with status -1.
+            System.exit ( -1 );
+        }
+
+        // Save the proof before exit.
+
+        String baseName = Main.fileNameOnStartUp;
+        int idx = baseName.indexOf(".key");        
+        if (idx == -1) {
+            idx = baseName.indexOf(".proof");
+        }        
+        baseName = baseName.substring(0, idx==-1 ? baseName.length() : idx);
+
+        File f; 
+        int counter = 0;
+        do {           
+
+            f = new File(baseName + ".auto."+ counter +".proof");
+            counter++;
+        } while (f.exists());
+
+        Main.getInstance ().saveProof ( f.getAbsolutePath() );
+        if (proof.openGoals ().size () == 0) {
+            // Says that all Proofs have succeeded
+            if (proof.getBasicTask().getStatus().getProofClosedButLemmasLeft()) {
+                // Says that the proof is closed by depends on (unproved) lemmas                
+                System.exit ( 2 ); 
+            }
+            System.exit ( 0 ); 
+        } else {
+            // Says that there is at least one open Proof
+            System.exit ( 1 );
+        }
+    }
+
+
     
     class MainConstraintTableListener implements ConstraintTableListener {
         public void constraintChanged(ConstraintTableEvent e) {
             setProofNodeDisplay();
+        }
+    }
+    
+    class MainTaskListenerBatchMode implements ProverTaskListener { // XXX
+        public void taskStarted(String message, int size) {
+            System.out.println(message + (size > 0 ? 
+                    " (expected dots: " + size + ")" : "" ));
+        }
+        
+        public void taskProgress(int position) {
+            System.out.print(".");
+        }
+        
+        public void taskFinished(TaskFinishedInfo info) {
+            System.out.println("DONE.");
+            if (info.getSource() instanceof ApplyStrategy) {
+                finishedBatchMode ( info.getResult(), 
+                        info.getProof(), info.getTime(), 
+                        info.getAppliedRules());
+                Debug.fail ( "Control flow should not reach this point." );
+            } else if (info.getSource() instanceof ProblemLoader) {
+                if (!"".equals(info.getResult())) {
+                        System.exit(-1);
+                } 
+                if(info.getProof().openGoals().size()==0) {
+                    System.out.println("proof.openGoals.size=" + 
+                            info.getProof().openGoals().size());              
+                    System.exit(0);
+                }
+                mediator.startAutoMode();
+            }
         }
     }
     
@@ -2277,9 +2469,26 @@ public class Main extends JFrame {
             getProgressMonitor().setProgress(position);
         }
         
-        public void taskFinished() {
+        public void taskFinished(TaskFinishedInfo info) {
             final MainStatusLine sl = getStatusLine();
             sl.reset();
+            if (info.getSource() instanceof ApplyStrategy) {
+                displayResults(info.getTime(), info.getAppliedRules(), 
+                        info.getClosedGoals());                
+            } else if (info.getSource() instanceof ProblemLoader) {
+                if (!"".equals(info.getResult())) {
+                    final KeYExceptionHandler exceptionHandler = 
+                        ((ProblemLoader)info.getSource()).getExceptionHandler();
+                            new ExceptionDialog(Main.this,     
+                                    exceptionHandler.getExceptions());
+                            exceptionHandler.clear();
+                } else {
+                    PresentationFeatures.
+                    initialize(mediator.func_ns(), 
+                            mediator.getNotationInfo(),
+                            mediator.getSelectedProof());
+                }
+            }
         }
     }
     
@@ -2302,6 +2511,7 @@ public class Main extends JFrame {
 		    enableSpecs = false;
 		} else if (opt[index].equals("AUTO")) {
 		    batchMode = true;
+                    visible = false;
 		} else if (opt[index].equals("TESTING") || opt[index].equals("UNIT")) {
                     if(opt[index].equals("TESTING")){
                         testStandalone = true;
@@ -2544,6 +2754,36 @@ public class Main extends JFrame {
         
         public void actionPerformed(ActionEvent e) {
             MethodSelectionDialog.getInstance(mediator);
+        }
+    }
+    
+    private final class ReuseAction extends AbstractAction {        
+        public ReusePoint rP;
+        
+        public ReuseAction() {
+            setReusePoint(null);
+            putValue(SMALL_ICON, IconFactory.reuseLogo());
+            putValue(NAME, "Reuse");
+        }
+        
+        public void setReusePoint(ReusePoint reusePoint) {
+            this.rP = reusePoint;
+            setEnabled(rP != null);
+            if (rP == null) {
+                putValue(SHORT_DESCRIPTION, "Start proof reuse (when template available)");
+            } else {
+                putValue(SHORT_DESCRIPTION, rP.toString());
+            }
+        }
+                
+        public boolean isEnabled() {
+            return super.isEnabled() && rP != null;
+        }
+                
+        public void actionPerformed(ActionEvent e) {
+            final ReusePoint reusePoint = rP;
+            setReusePoint(null);
+            mediator.startReuse(reusePoint);                       
         }
     }
     
@@ -3244,6 +3484,10 @@ public class Main extends JFrame {
             }
             
         }
+    }
+
+    public static boolean hasInstance() {
+        return instance != null;
     }
 
    

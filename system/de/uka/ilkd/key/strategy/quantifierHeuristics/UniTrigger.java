@@ -12,6 +12,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.IteratorOfTerm;
 import de.uka.ilkd.key.logic.ListOfTerm;
 import de.uka.ilkd.key.logic.SLListOfTerm;
@@ -49,27 +50,28 @@ class UniTrigger extends Trigger {
         this.triggerSetThisBelongsTo = triggerSetThisBelongsTo;
     }
         
-    public SetOfSubstitution getSubstitutionsFromTerms(SetOfTerm targetTerm) {
+    public SetOfSubstitution getSubstitutionsFromTerms(SetOfTerm targetTerm, 
+            Services services) {
         SetOfSubstitution allsubs = SetAsListOfSubstitution.EMPTY_SET;
         final IteratorOfTerm it = targetTerm.iterator ();
         while ( it.hasNext () )
-            allsubs = allsubs.union ( getSubstitutionsFromTerm ( it.next () ) );
+            allsubs = allsubs.union ( getSubstitutionsFromTerm ( it.next (), services ) );
         return allsubs;
     }
 
-    private SetOfSubstitution getSubstitutionsFromTerm(Term t) {
+    private SetOfSubstitution getSubstitutionsFromTerm(Term t, Services services) {
         SetOfSubstitution res = (SetOfSubstitution)matchResults.get ( t );
         if ( res == null ) {
-            res = getSubstitutionsFromTermHelp ( t );
+            res = getSubstitutionsFromTermHelp ( t, services );
             matchResults.put ( t, res );
         }
         return res;
     }
 
-    private SetOfSubstitution getSubstitutionsFromTermHelp(Term t) {
+    private SetOfSubstitution getSubstitutionsFromTermHelp(Term t, Services services) {
         SetOfSubstitution newSubs = SetAsListOfSubstitution.EMPTY_SET;
         if ( t.freeVars ().size () > 0 || t.op () instanceof Quantifier )
-            newSubs = Matching.twoSidedMatching ( this, t );
+            newSubs = Matching.twoSidedMatching ( this, t, services );
         else if ( !onlyUnify )
             newSubs = Matching.basicMatching ( this, t );
         return newSubs;

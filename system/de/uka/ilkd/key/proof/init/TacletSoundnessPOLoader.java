@@ -14,10 +14,7 @@ import java.io.File;
 
 import javax.swing.JOptionPane;
 
-import de.uka.ilkd.key.gui.ExceptionDialog;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.SwingWorker;
+import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 
 /**
@@ -26,7 +23,7 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
  */
 public class TacletSoundnessPOLoader implements Runnable {
     final File file;
-    final Main main;
+    final IMain main;
     final KeYMediator mediator;
     
     private SwingWorker worker;
@@ -34,7 +31,7 @@ public class TacletSoundnessPOLoader implements Runnable {
     ProblemInitializer init;
 
     
-    public TacletSoundnessPOLoader(File file, Main main) {
+    public TacletSoundnessPOLoader(File file, IMain main) {
        this.main = main;
        mediator  = main.mediator();
        this.file = file;
@@ -57,7 +54,7 @@ public class TacletSoundnessPOLoader implements Runnable {
 
             public void finished () {
                 mediator.startInterface ( true );
-                Main main = Main.getInstance ();
+                Main main = Main.hasInstance() ? Main.getInstance () : null;
                 String msg = (String)get ();
                 if ( !"".equals ( msg ) ) {
                     JOptionPane.showMessageDialog

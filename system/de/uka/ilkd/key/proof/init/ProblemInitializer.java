@@ -23,7 +23,7 @@ import recoder.io.ProjectSettings;
 
 import org.apache.log4j.Logger;
 
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.CompilationUnit;
@@ -52,6 +52,7 @@ import de.uka.ilkd.key.proof.mgt.RuleConfig;
 import de.uka.ilkd.key.rule.IteratorOfBuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
+import de.uka.ilkd.key.util.ProgressMonitor;
 
 
 public class ProblemInitializer {
@@ -59,10 +60,12 @@ public class ProblemInitializer {
     private static JavaModel lastModel;
     private static InitConfig lastBaseConfig;
  
-    private final Main main;
+    private final IMain main;
     private final Profile profile;
     private final Services services;
     private final UpdateSimplifier simplifier;
+    
+    private final ProgressMonitor pm;
     
     private final HashSet alreadyParsed = new LinkedHashSet();
     
@@ -71,8 +74,9 @@ public class ProblemInitializer {
     //constructors
     //------------------------------------------------------------------------- 
     
-    public ProblemInitializer(Main main) {
+    public ProblemInitializer(IMain main) {
         this.main       = main;
+        this.pm         = main == null ? null : main.getProgressMonitor();
         this.profile    = main.mediator().getProfile();
         this.services   = new Services(main.mediator().getExceptionHandler());
         this.simplifier = ProofSettings.DEFAULT_SETTINGS
@@ -83,6 +87,7 @@ public class ProblemInitializer {
     public ProblemInitializer(Profile profile) {
 	assert profile != null;
 	this.main       = null;
+        this.pm         = null;
         this.profile    = profile;
         this.services   = new Services();
         this.simplifier = ProofSettings.DEFAULT_SETTINGS
@@ -179,10 +184,7 @@ public class ProblemInitializer {
 	    String name = (String) it.next();
 	    keyFile[i++] = new KeYFile(name, 
 				       in.get(name), 
-				       (main == null 
-                                        ? null 
-				        : main.getProgressMonitor()),
-                                        false);
+				       pm, false);
 	}
 	LDTInput ldtInp = new LDTInput(keyFile, main);
 	
@@ -212,9 +214,7 @@ public class ProblemInitializer {
 	    String fileName = (String) it.next();
 	    KeYFile keyFile = new KeYFile(fileName, 
 					  in.get(fileName),
-					  (main==null) ?
-					  null : main.getProgressMonitor(),
-                                          false);
+					  pm, false);
 	    readEnvInput(keyFile, initConfig, readLibraries);
 	}
     }
@@ -242,12 +242,7 @@ public class ProblemInitializer {
                 } else {
                     rs = RuleSource.initRuleFile(fileName);
                 }
-                KeYFile keyFile = new KeYFile(fileName, 
-					      rs, 
-                                              (main == null 
-                                               ? null 
-                                               : main.getProgressMonitor()),
-                                               false);
+                KeYFile keyFile = new KeYFile(fileName, rs, pm, false);
                 readEnvInput(keyFile, initConfig);
             }
         }
@@ -491,9 +486,9 @@ public class ProblemInitializer {
 	    populateNamespaces(proofs[i]);
 	}
 	initConfig.getProofEnv().registerProof(problem, pl);
-	if(main != null) {
-	    main.addProblem(pl);
-	}
+	if (main != null) {
+            main.addProblem(pl);
+        }
 	GlobalProofMgt.getInstance().tryReuse(pl);	
     }
     
@@ -519,10 +514,7 @@ public class ProblemInitializer {
     	    	KeYFile tacletBaseFile
     	    	    = new KeYFile("taclet base", 
     	    		          profile.getStandardRules().getTacletBase(),
-			          (main == null 
-                                   ? null 
-                                   : main.getProgressMonitor()),
-                                   false);
+			          pm, false);
     	    	readEnvInput(tacletBaseFile, lastBaseConfig, false);
 	    }
 	}

@@ -17,7 +17,6 @@ import java.util.Iterator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.mgt.*;
@@ -92,7 +91,7 @@ implements ProofOblInput{
         }
         
         final POSelectionDialog dialog = new POSelectionDialog 
-        ( Main.getInstance().mediator (),
+        ( Main.hasInstance() ? Main.getInstance().mediator ().mainFrame() : null,
                 newTacApps);
         
         app = dialog.getSelectedTaclets ();

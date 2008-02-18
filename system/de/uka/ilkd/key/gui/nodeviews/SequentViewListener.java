@@ -98,7 +98,7 @@ class SequentViewListener extends MouseInputAdapter
             if (showTermInfo) { 
                 final String info = getTermInfo();
                
-                final Main main = ((Main)mediator.mainFrame());
+                final IMain main = ((IMain)mediator.mainFrame());
                 if (info == null) {
                     main.setStandardStatusLine();
                 } else {                    
@@ -225,7 +225,7 @@ class SequentViewListener extends MouseInputAdapter
             }
             final String info = getTermInfo();
             
-            final Main main = ((Main)mediator.mainFrame());
+            final IMain main = ((IMain)mediator.mainFrame());
             if (info == null) {
                 main.setStandardStatusLine();
             } else {                    
@@ -243,7 +243,7 @@ class SequentViewListener extends MouseInputAdapter
             synchronized(this) {
                 showTermInfo = false;
             }
-            ((Main)mediator.mainFrame()).setStandardStatusLine();
+            ((IMain)mediator.mainFrame()).setStandardStatusLine();
         }
     }
 

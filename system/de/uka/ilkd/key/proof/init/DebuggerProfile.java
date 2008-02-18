@@ -2,7 +2,7 @@ package de.uka.ilkd.key.proof.init;
 
 import java.util.HashMap;
 
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Name;
@@ -18,7 +18,7 @@ public class  DebuggerProfile extends JavaProfile {
     private final static StrategyFactory DEFAULT = 
         new DebuggerStrategy.Factory();
     
-    public DebuggerProfile(Main main) {       
+    public DebuggerProfile(IMain main) {       
         super("standardRules-debugger.key",//TODO
                 SetAsListOfGoalChooserBuilder.EMPTY_SET.
                 add(new DefaultGoalChooserBuilder()).
