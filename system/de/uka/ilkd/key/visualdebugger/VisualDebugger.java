@@ -1454,7 +1454,7 @@ public class VisualDebugger {
             this.setSteps(goals, this.runLimit);
             
             setProofStrategy(mediator.getProof(), true, false,
-                   watchPointManager.getListOfWatchpoints());
+                   watchPointManager.getListOfWatchpoints(mediator));
             runProver(goals);
 
             return true;
@@ -1701,7 +1701,7 @@ public class VisualDebugger {
             final Proof proof = mediator.getProof();
             removeStepOver(proof.openGoals());
             this.setSteps(goals, steps);
-            setProofStrategy(proof, true, false, watchPointManager.getListOfWatchpoints());
+            setProofStrategy(proof, true, false, watchPointManager.getListOfWatchpoints(mediator));
             runProver(goals);
             return true;
         }
@@ -1725,7 +1725,7 @@ public class VisualDebugger {
         setStepOver(goals);
         this.setSteps(goals, runLimit);
         setProofStrategy(mediator.getProof(), true, false,
-                watchPointManager.getListOfWatchpoints());
+                watchPointManager.getListOfWatchpoints(mediator));
         runProver(goals);
     }
 
@@ -1740,7 +1740,7 @@ public class VisualDebugger {
             final Proof proof = mediator.getProof();
             removeStepOver(proof.openGoals());
             setSteps(proof.openGoals(), 0);
-            setProofStrategy(proof, true, false, watchPointManager.getListOfWatchpoints());
+            setProofStrategy(proof, true, false, watchPointManager.getListOfWatchpoints(mediator));
             runProver(proof.openGoals());
             return true;
         }

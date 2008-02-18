@@ -207,8 +207,8 @@ public class WatchpointView extends ViewPart {
         column.setText("Line");
 
         column = new TableColumn(table, SWT.NONE, 3);
-        column.setWidth(100);
-        column.setText("in Type");
+        column.setWidth(200);
+        column.setText("Type");
 
         column = new TableColumn(table, SWT.NONE, 4);
         column.setWidth(30);
@@ -426,7 +426,6 @@ public class WatchpointView extends ViewPart {
 
             ICompilationUnit unit = JavaCore.createCompilationUnitFrom(file);
             String source = "";
-            information[2] = unit.findPrimaryType().getFullyQualifiedName();
             try {
                 source = unit.getBuffer().getContents();
 
@@ -447,6 +446,7 @@ public class WatchpointView extends ViewPart {
 
                 if (je instanceof IField) {
 
+                    information[2]=((IField)je).getDeclaringType().getFullyQualifiedName();
                     information[0] = je.getElementName();
                 } else {
 

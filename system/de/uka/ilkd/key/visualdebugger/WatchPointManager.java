@@ -21,7 +21,7 @@ public class WatchPointManager {
 
     /** The watch points. */
     private LinkedList<WatchPoint> watchPoints = new LinkedList<WatchPoint>();
-
+    private LinkedList<Integer> statements = new LinkedList<Integer>(); 
     private ListOfTerm listOfWatchpoints;
 
     /**
@@ -70,7 +70,7 @@ public class WatchPointManager {
      * 
      * @return the number of translated WatchPoints
      */
-    private int translateWatchpoints() {
+    private int translateWatchpoints(Services services) {
 
         System.out.println("translateWatchpoints()...");
         LinkedList<WatchPoint> watchpoints = getWatchPoints();
@@ -84,10 +84,7 @@ public class WatchPointManager {
         } else {
 
             Namespace progVarNS = new Namespace();
-            KeYMediator mediator = VisualDebugger.getVisualDebugger()
-                    .getMediator();
 
-            final Services services = mediator.getServices();
             final JavaInfo ji = services.getJavaInfo();
 
             for (int i = 0; i < watchpoints.size(); i++) {
@@ -122,10 +119,9 @@ public class WatchPointManager {
                     buffer.append(" ) : { " + wp.getName() + " = "
                             + wp.getExpression());
                     buffer.append(";} }\\>" + wp.getName() + " = TRUE");
-                    System.out.println(buffer.toString());
-
+                    
                     Term term = ProblemLoader.parseTerm(buffer.toString(),
-                            mediator.getProof(), new Namespace(), progVarNS);
+                            services, new Namespace(), progVarNS);
 
                     listOfWatchpoints = listOfWatchpoints.append(term);
                 }
@@ -142,11 +138,11 @@ public class WatchPointManager {
      * @return the list of WatchPoints as ListOfTerm
      */
 
-    public ListOfTerm getListOfWatchpoints() {
+    public ListOfTerm getListOfWatchpoints(Services services) {
 
-        translateWatchpoints();
+        translateWatchpoints(services);
         assert listOfWatchpoints != null : "listOfWatchpoints is null";
         return listOfWatchpoints;
     }
-
+    
 }

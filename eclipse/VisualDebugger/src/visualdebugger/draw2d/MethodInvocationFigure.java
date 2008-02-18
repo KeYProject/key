@@ -56,6 +56,8 @@ public class MethodInvocationFigure extends Figure implements DrawableNode {
 
 	/** The Constant BORDER. */
 	static final Border BORDER = new LineBorder(ColorConstants.black, 1);
+	/** The Constant COLLAPSEDMODEBORDER. */
+    static final Border COLLAPSEDMODEBORDER = new LineBorder(ColorConstants.yellow, 2);
 
 	/** The label. */
 	private Label label = new Label();
@@ -129,6 +131,7 @@ public class MethodInvocationFigure extends Figure implements DrawableNode {
 		super.paintFigure(g);
 		if (isCollapsed) {
 			g.setForegroundColor(ColorConstants.darkGray);
+			setBorder(COLLAPSEDMODEBORDER);
 		} else {
 
 			if (selected) {

@@ -40,10 +40,11 @@ public class ETNode {
     private ListOfTerm bc = SLListOfTerm.EMPTY_LIST;
 
     // ListOfTerm pc= SLListOfTerm.EMPTY_LIST;
-    private LinkedList itNodes = new LinkedList();
+    private LinkedList<ITNode> itNodes = new LinkedList<ITNode>();
 
     private boolean nobc = false;
     private boolean isCollapsed = false;
+    private boolean isWatchpoint = false;
     
     private ListOfTerm simplifiedBC = null;
 
@@ -282,5 +283,13 @@ public class ETNode {
 
     public void setCollapsed(boolean isCollapsed) {
         this.isCollapsed = isCollapsed;
+    }
+
+    public boolean isWatchpoint() {
+        return isWatchpoint;
+    }
+
+    public void setWatchpoint(boolean isWatchpoint) {
+        this.isWatchpoint = isWatchpoint;
     }
 }

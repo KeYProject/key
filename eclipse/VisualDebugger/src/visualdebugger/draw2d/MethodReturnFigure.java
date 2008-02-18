@@ -26,6 +26,8 @@ public class MethodReturnFigure extends Figure implements DrawableNode {
 	final ETMethodReturnNode mrNode;
 
 	static final Border BORDER = new LineBorder(ColorConstants.black, 1);
+	/** The Constant COLLAPSEDMODEBORDER. */
+    static final Border COLLAPSEDMODEBORDER = new LineBorder(ColorConstants.yellow, 2);
 
 	private Label label = new Label();
 
@@ -66,6 +68,7 @@ public class MethodReturnFigure extends Figure implements DrawableNode {
 			// TODO colors for collapsed nodes
 			g.setForegroundColor(ColorConstants.menuBackgroundSelected);
 			g.setBackgroundColor(ColorConstants.titleGradient);
+			setBorder(COLLAPSEDMODEBORDER);
 		} else {
 			if (selected) {
 				g.setForegroundColor(ColorConstants.menuBackgroundSelected);

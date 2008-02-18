@@ -2,11 +2,24 @@ package visualdebugger.views;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.draw2d.*;
+import org.eclipse.draw2d.ChopboxAnchor;
+import org.eclipse.draw2d.ColorConstants;
+import org.eclipse.draw2d.Connection;
+import org.eclipse.draw2d.Ellipse;
+import org.eclipse.draw2d.Figure;
+import org.eclipse.draw2d.FigureCanvas;
+import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
+import org.eclipse.draw2d.LightweightSystem;
+import org.eclipse.draw2d.MidpointLocator;
+import org.eclipse.draw2d.MouseEvent;
+import org.eclipse.draw2d.MouseListener;
+import org.eclipse.draw2d.PolygonDecoration;
+import org.eclipse.draw2d.PolylineConnection;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.Expression;
@@ -28,8 +41,17 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.ProgressBar;
+import org.eclipse.swt.widgets.Scale;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PartInitException;
@@ -38,10 +60,25 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 import visualdebugger.VBTBuilder;
-import visualdebugger.draw2d.*;
+import visualdebugger.draw2d.BranchFilter;
+import visualdebugger.draw2d.CollapseFilter;
+import visualdebugger.draw2d.DrawableNode;
+import visualdebugger.draw2d.Filter;
+import visualdebugger.draw2d.LeafNode;
+import visualdebugger.draw2d.MethodInvocationFigure;
+import visualdebugger.draw2d.MethodReturnFigure;
+import visualdebugger.draw2d.SourceElementFigure;
+import visualdebugger.draw2d.TreeBranch;
+import visualdebugger.draw2d.TreeFilter;
+import visualdebugger.draw2d.TreeRoot;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.IteratorOfNode;
+import de.uka.ilkd.key.proof.ListOfGoal;
+import de.uka.ilkd.key.proof.ListOfNode;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.SLListOfGoal;
+import de.uka.ilkd.key.proof.SLListOfNode;
 import de.uka.ilkd.key.proof.decproc.DecProcRunner;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.util.ProgressMonitor;
@@ -49,7 +86,15 @@ import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
 import de.uka.ilkd.key.visualdebugger.DebuggerListener;
 import de.uka.ilkd.key.visualdebugger.SourceElementId;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
-import de.uka.ilkd.key.visualdebugger.executiontree.*;
+import de.uka.ilkd.key.visualdebugger.executiontree.ETLeafNode;
+import de.uka.ilkd.key.visualdebugger.executiontree.ETMethodInvocationNode;
+import de.uka.ilkd.key.visualdebugger.executiontree.ETMethodReturnNode;
+import de.uka.ilkd.key.visualdebugger.executiontree.ETNode;
+import de.uka.ilkd.key.visualdebugger.executiontree.ETPath;
+import de.uka.ilkd.key.visualdebugger.executiontree.ETStatementNode;
+import de.uka.ilkd.key.visualdebugger.executiontree.ExecutionTree;
+import de.uka.ilkd.key.visualdebugger.executiontree.ITNode;
+import de.uka.ilkd.key.util.WatchpointUtil;
 
 // TODO: Auto-generated Javadoc
 
@@ -152,6 +197,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	private CollapseFilter collapseFilter;
 
 	private MenuItem itemExpand;
+
+    private Action clearViewAction;
 			
 		
 	/**
@@ -192,7 +239,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	/**
 	 * Builds the tree branch.
 	 * 
-	 * This function builds the ExecutionTree in the View. Is draws the passed
+	 * This function builds the ExecutionTree in the View. It draws the passed
 	 * ETNode according to its type by calling createNode(ETNode). For every
 	 * child of this node the function is called recursively. On the return from
 	 * the calls the connections between the nodes are painted.
@@ -201,7 +248,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	 * TreeFilter which displays every node. BranchFilter are used to isolate a
 	 * certain path.
 	 * 
-	 * @param n
+	 * @param etn
 	 *            the ETNode
 	 * @param parent
 	 *            the parent
@@ -210,11 +257,13 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	 * 
 	 * @return the tree branch
 	 */
-	public synchronized TreeBranch buildTreeBranch(ETNode n, TreeBranch parent,
+	public synchronized TreeBranch buildTreeBranch(ETNode etn, TreeBranch parent,
 			Filter f) {
+	    
+	    identifyWatchpoints(etn);
 		try {
 			// draw node n
-			IFigure statementNode = createNode(n);
+			IFigure statementNode = createNode(etn);
 			// attach MouseListner
 			statementNode.addMouseListener(new MouseListener.Stub() {
 				public void mousePressed(MouseEvent event) {
@@ -227,7 +276,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 			createRighClickContextMenu();
 
 			TreeBranch branch = new TreeBranch(statementNode, parent);
-			ETNode[] children = n.getChildren();
+			ETNode[] children = etn.getChildren();
 
 			if (children != null && children.length > 0) {
 
@@ -261,7 +310,13 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 		return null;
 	}
 
-	/**
+	private void identifyWatchpoints(ETNode proofnodes) {
+	    
+        LinkedList<Node> leaves = WatchpointUtil.getAllLeaveNodes(proofnodes);
+    
+    }
+
+    /**
 	 * Contribute to action bars.
 	 */
 	private void contributeToActionBars() {
@@ -812,6 +867,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 		// manager.add(msletAction);
 		// //manager.
 		// manager.add(this.useBranchLabelsAction);
+	    manager.add(clearViewAction);
+	    manager.add(new Separator());
 		manager.add(decisionProcedureAction);
 		manager.add(new Separator());
 		manager.add(this.testCaseAction);
@@ -1159,6 +1216,16 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 		decisionProcedureAction
 				.setToolTipText("Runs an external decision procedure \nin order to find infeasible execution paths");
 		decisionProcedureAction.setText("Run Decision Procedure");
+	
+		clearViewAction = new Action() {
+            public void run() {
+                clearView();
+            }
+
+        };
+        clearViewAction
+                .setToolTipText("clears the view");
+        clearViewAction.setText("Clear View");
 	}
 
 	/**

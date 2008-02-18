@@ -6,9 +6,6 @@ import org.eclipse.jdt.core.IProblemRequestor;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.WorkingCopyOwner;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -116,7 +113,7 @@ public class WatchExpressionDialog {
 	 * @return true, if expression is valid
 	 * @throws JavaModelException
 	 */
-	protected boolean isValid(String expression) throws JavaModelException {
+    protected boolean isValid(String expression) throws JavaModelException {
 
 		//test name
 		String varName = "myDummy";

@@ -16,21 +16,13 @@ import de.uka.ilkd.key.visualdebugger.*;
 public class ExecutionTree implements AutoModeListener {
 
     private static ETNode etNodeRoot = null;
-
     private static ETNode etTreeBeforeMerge;
-
     private static boolean hideInf = true;
-
     private static ITNode itNodeRoot = null;
-
     public static final int RAWTREE = 1;
-
     public static final int SLET = 2;
-
     public static final int SLET2 = 3;
-
     public static final int SLET3 = 4;
-
     public static int treeStyle = SLET3;
 
     public static ETNode getETNode() {
