@@ -2778,12 +2778,37 @@ public class Main extends JFrame implements IMain {
                 public void selectedNodeChanged(KeYSelectionEvent e) {
                     final Proof proof = mediator.getSelectedProof();
                     if (proof == null) {
+                        // no proof loaded
                         setEnabled(false);
-                        return;
+                    } else {
+                        final Goal selGoal = mediator.getSelectedGoal();
+                        final Node selNode = mediator.getSelectedNode();
+                                                
+                        if (selGoal == null && selNode == null) {
+                                setEnabled(false);
+                        } else if (selGoal != null) {
+                            /* we undo the last rule application, if
+                             * the goal refers not to the proof's root */
+                            if (selNode == proof.root()) {
+                                setEnabled(false);
+                            } else {
+                                putValue(NAME, "Goal Back");
+                                putValue(SMALL_ICON, 
+                                        IconFactory.goalBackLogo(TOOLBAR_ICON_SIZE));
+                                setEnabled(true);
+                            }
+                        } else {/* pruning instead of goal back */
+                            // pruning a tree only if the selected node has children
+                            // and sub tree is not closed
+                            if (selNode.leaf() || selNode.isClosed()) {
+                                setEnabled(false);
+                            } else {
+                                putValue(NAME, "Prune Proof");
+                                putValue(SMALL_ICON, IconFactory.goalBackLogo(TOOLBAR_ICON_SIZE));
+                                setEnabled(true);
+                            }
+                        }
                     }
-                    final Goal selGoal = mediator.getSelectedGoal();
-                    setEnabled(proof != null && selGoal != null &&
-                            selGoal.node() != proof.root());                    
                 }
 
                 public void selectedProofChanged(KeYSelectionEvent e) {
@@ -2807,7 +2832,12 @@ public class Main extends JFrame implements IMain {
         }
         
         public void actionPerformed(ActionEvent e) {            
-            mediator.setBack();
+            final Goal selGoal = mediator.getSelectedGoal();
+            if (selGoal != null) {
+                mediator.setBack(selGoal);                
+            } else {
+                mediator.setBack(mediator.getSelectedNode());
+            }
         }        
     }
     
