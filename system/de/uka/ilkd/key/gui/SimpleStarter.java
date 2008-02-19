@@ -56,7 +56,7 @@ public class SimpleStarter implements IMain {
         System.out.println("Nodes:" + mediator.getSelectedProof().countNodes() );
     }
 
-    public String getPrcsVersion() {
+    public String getInternalVersion() {
         return "xyz";
     }
 

@@ -344,7 +344,7 @@ public class Main extends JFrame implements IMain {
         }
     }
     
-    public String getPrcsVersion() {
+    public String getInternalVersion() {
         return INTERNAL_VERSION;
     }
     

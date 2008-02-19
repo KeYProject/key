@@ -54,11 +54,10 @@ public class TacletSoundnessPOLoader implements Runnable {
 
             public void finished () {
                 mediator.startInterface ( true );
-                Main main = Main.hasInstance() ? Main.getInstance () : null;
                 String msg = (String)get ();
                 if ( !"".equals ( msg ) ) {
                     JOptionPane.showMessageDialog
-                        ( main,
+                        ( mediator.mainFrame(),
                           msg,
                           "Error occurred while creating proof obligation",
                           JOptionPane.ERROR_MESSAGE );

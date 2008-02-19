@@ -13,7 +13,7 @@ import de.uka.ilkd.key.util.ProgressMonitor;
  */
 public interface IMain {
 
-    public abstract String getPrcsVersion();
+    public abstract String getInternalVersion();
 
     /**
      * return the mediator

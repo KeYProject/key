@@ -64,7 +64,7 @@ public class ProofSaver {
     if(p.keyVersionLog==null)
         p.keyVersionLog = new Vector();
     p.userLog.add(System.getProperty("user.name"));
-    p.keyVersionLog.add(main.getPrcsVersion());
+    p.keyVersionLog.add(main.getInternalVersion());
     int s = p.userLog.size();
     for(int i=0; i<s; i++){
 	logstr.append("(keyLog \""+i+"\" (keyUser \""+
