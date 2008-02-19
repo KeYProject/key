@@ -749,7 +749,11 @@ public class Main extends JFrame implements IMain {
         decisionProcedureButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (!mediator.ensureProofLoaded()) return;
-                new DecProcRunner(Main.this).run();
+                final Proof proof = mediator.getProof();
+                new DecProcRunner(Main.this, proof, 
+                        mediator.getUserConstraint().getConstraint(),
+                        proof.getSettings().
+                        getDecisionProcedureSettings().getDecisionProcedure()).run();
             }
         });
         
