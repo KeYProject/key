@@ -59,6 +59,7 @@ import de.uka.ilkd.key.unittest.UnitTestBuilder;
 import de.uka.ilkd.key.util.*;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
+
 public class Main extends JFrame implements IMain {
 
     public static final String INTERNAL_VERSION = 
@@ -76,6 +77,9 @@ public class Main extends JFrame implements IMain {
      * The maximum number of recent files displayed.
      */
     private static final int MAX_RECENT_FILES = 8;
+    
+    /** size of the tool bar icons */
+    private static final int TOOLBAR_ICON_SIZE = 15;
     
     /** Name of the config file controlling logging with log4j */
     private static final String LOGGER_CONFIGURATION = PathConfig.KEY_CONFIG_DIR + File.separator + "logger.props";
@@ -165,8 +169,7 @@ public class Main extends JFrame implements IMain {
 
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
 
-    /** if true then automaticaly start startAutoMode after the key-file is loaded*/
-
+    /** if true then automatically start startAutoMode after the key-file is loaded*/
     public static boolean batchMode = false;
     
     /** A push-button test generation view of KeY*/
@@ -189,15 +192,19 @@ public class Main extends JFrame implements IMain {
      */
     public static boolean enableSpecs = true;
     
-    private JButton reuseButton = new JButton();
+    /** used to enable and initiate or to disable reuse */
     private ReuseAction reuseAction = new ReuseAction();
+    private JPopupMenu reusePopup = new JPopupMenu();
+
     
+    /** undo the last proof step on the currently selected branch */
+    private UndoLastStep undoAction = new UndoLastStep();
+
     
     private JButton decisionProcedureButton;
     
     private JButton testButton;
     
-    private JPopupMenu reusePopup = new JPopupMenu();
     
     protected static String fileNameOnStartUp = null;
     
@@ -236,14 +243,12 @@ public class Main extends JFrame implements IMain {
     JMenuItem smtBenchmarkArchivingOption;
     
     JMenuItem smtZipProblemDirOption;
-    
-    
-    /** size of the tool bar icons */
-    private int toolbarIconSize = 15;
-    
+        
     private ProverTaskListener taskListener;
     
     private NotificationManager notificationManager;
+
+    
     
     /**
      * creates prover -- private, use getInstance()
@@ -494,17 +499,14 @@ public class Main extends JFrame implements IMain {
         toolBar.add(createDecisionProcedureButton());
         toolBar.addSeparator();
         
-        JButton goalBackButton = new JButton("Goal Back");
-        goalBackButton.setIcon(IconFactory.goalBackLogo(toolbarIconSize));
-        goalBackButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setBack();
-            }
-        });
+        final JButton goalBackButton = new JButton();
+        undoAction.init();
+        goalBackButton.setAction(undoAction);
         
         toolBar.add(goalBackButton);
         toolBar.addSeparator();
-                
+               
+        final JButton reuseButton = new JButton();
         reuseButton.setEnabled(false);
         reuseButton.setToolTipText("Start proof reuse (when template available)");
         JMenuItem singleStepReuse = new JCheckBoxMenuItem("Single step");
@@ -734,16 +736,16 @@ public class Main extends JFrame implements IMain {
         
         // select icon
         if (ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().useSimplify()) {
-            decisionProcedureButton.setIcon(IconFactory.simplifyLogo(toolbarIconSize));
+            decisionProcedureButton.setIcon(IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));
         } else if (ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().useICS()) {
-            decisionProcedureButton.setIcon(IconFactory.icsLogo(toolbarIconSize));
+            decisionProcedureButton.setIcon(IconFactory.icsLogo(TOOLBAR_ICON_SIZE));
         } else if (ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().useCVCLite()
                 || ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().useCVC3()
                 || ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().useSVC()
                 || ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().useYices()
                 || ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().useSMT_Translation()) {
             // TODO: use different logos?!
-            decisionProcedureButton.setIcon(IconFactory.icsLogo(toolbarIconSize));
+            decisionProcedureButton.setIcon(IconFactory.icsLogo(TOOLBAR_ICON_SIZE));
         }
         
         decisionProcedureButton.addActionListener(new ActionListener() {
@@ -751,9 +753,7 @@ public class Main extends JFrame implements IMain {
                 if (!mediator.ensureProofLoaded()) return;
                 final Proof proof = mediator.getProof();
                 new DecProcRunner(Main.this, proof, 
-                        mediator.getUserConstraint().getConstraint(),
-                        proof.getSettings().
-                        getDecisionProcedureSettings().getDecisionProcedure()).run();
+                        proof.getUserConstraint().getConstraint()).run();
             }
         });
         
@@ -999,11 +999,6 @@ public class Main extends JFrame implements IMain {
              ProofSettings.DEFAULT_SETTINGS.getLibrariesSettings());
         config.setVisible(true);
     }
-    
-    protected void setBack() {
-        mediator.setBack();
-    }
-    
     
     protected void makePrettyView() {
         if (mediator().ensureProofLoadedSilent()) {
@@ -1929,7 +1924,7 @@ public class Main extends JFrame implements IMain {
     private final class OpenMostRecentFile extends AbstractAction {
         
         public OpenMostRecentFile() {
-            putValue(SMALL_ICON, IconFactory.openMostRecent(toolbarIconSize));
+            putValue(SMALL_ICON, IconFactory.openMostRecent(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, "Load last opened file.");
         }
         
@@ -1949,7 +1944,7 @@ public class Main extends JFrame implements IMain {
     private final class OpenFile extends AbstractAction {
         public OpenFile() {
             putValue(NAME, "Load ...");
-            putValue(SMALL_ICON, IconFactory.openKeYFile(toolbarIconSize));
+            putValue(SMALL_ICON, IconFactory.openKeYFile(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, "Browse and load problem or proof files.");
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
             
@@ -1974,7 +1969,7 @@ public class Main extends JFrame implements IMain {
         
         public SaveFile() {
             putValue(NAME, "Save ...");
-            putValue(SMALL_ICON, IconFactory.saveFile(toolbarIconSize));
+            putValue(SMALL_ICON, IconFactory.saveFile(TOOLBAR_ICON_SIZE));
             putValue(SHORT_DESCRIPTION, "Save current proof.");
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
             
@@ -2271,31 +2266,31 @@ public class Main extends JFrame implements IMain {
                 .getDecisionProcedureSettings()
                 : currentProof.getSettings().getDecisionProcedureSettings();
                 if (decSettings.useSimplify()) {
-                    decisionProcedureButton.setIcon(IconFactory.simplifyLogo(toolbarIconSize));
+                    decisionProcedureButton.setIcon(IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));
                     decisionProcedureButton.setToolTipText("Run Simplify");
                     decisionProcedureButton.setText("Run Simplify");
                 } else if (decSettings.useICS()) {
-                    decisionProcedureButton.setIcon(IconFactory.icsLogo(toolbarIconSize));
+                    decisionProcedureButton.setIcon(IconFactory.icsLogo(TOOLBAR_ICON_SIZE));
                     decisionProcedureButton.setToolTipText("Run ICS");
                     decisionProcedureButton.setText("Run ICS");
                 } else if (decSettings.useCVCLite()) {
-                    decisionProcedureButton.setIcon(IconFactory.icsLogo(toolbarIconSize));
+                    decisionProcedureButton.setIcon(IconFactory.icsLogo(TOOLBAR_ICON_SIZE));
                     decisionProcedureButton.setToolTipText("Run CVCLite");
                     decisionProcedureButton.setText("Run CVCLite");
                 } else if (decSettings.useCVC3()) {
-                    decisionProcedureButton.setIcon(IconFactory.icsLogo(toolbarIconSize));
+                    decisionProcedureButton.setIcon(IconFactory.icsLogo(TOOLBAR_ICON_SIZE));
                     decisionProcedureButton.setToolTipText("Run CVC3");
                     decisionProcedureButton.setText("Run CVC3");
                 } else if (decSettings.useSVC()) {
-                    decisionProcedureButton.setIcon(IconFactory.icsLogo(toolbarIconSize));
+                    decisionProcedureButton.setIcon(IconFactory.icsLogo(TOOLBAR_ICON_SIZE));
                     decisionProcedureButton.setToolTipText("Run SVC");
                     decisionProcedureButton.setText("Run SVC");
                 } else if (decSettings.useYices()) {
-                    decisionProcedureButton.setIcon(IconFactory.icsLogo(toolbarIconSize));
+                    decisionProcedureButton.setIcon(IconFactory.icsLogo(TOOLBAR_ICON_SIZE));
                     decisionProcedureButton.setToolTipText("Run Yices");
                     decisionProcedureButton.setText("Run Yices");
                 } else if (decSettings.useSMT_Translation()) {
-                    decisionProcedureButton.setIcon(IconFactory.icsLogo(toolbarIconSize));
+                    decisionProcedureButton.setIcon(IconFactory.icsLogo(TOOLBAR_ICON_SIZE));
                     decisionProcedureButton.setToolTipText("Run SMT Translation");
                     decisionProcedureButton.setText("Run SMT Translation");
                 }
@@ -2429,7 +2424,7 @@ public class Main extends JFrame implements IMain {
     
     class MainTaskListenerBatchMode implements ProverTaskListener { // XXX
         public void taskStarted(String message, int size) {
-            System.out.println(message+"...");
+            System.out.print(message+" ... ");
         }
         
         public void taskProgress(int position) {
@@ -2731,7 +2726,7 @@ public class Main extends JFrame implements IMain {
     }
     
     private final class CreateUnitTestAction extends AbstractAction {
-        final Icon icon = IconFactory.junitLogo(toolbarIconSize);
+        final Icon icon = IconFactory.junitLogo(TOOLBAR_ICON_SIZE);
         
         public CreateUnitTestAction() {            
             putValue(NAME, "Create Unittests");          
@@ -2759,6 +2754,71 @@ public class Main extends JFrame implements IMain {
         }
     }
     
+    /**
+     * This action undoes the last rule application on the currently selected
+     * branch (if not closed).
+     *
+     * The action is enabled if a goal is selected. 
+     */
+    private final class UndoLastStep extends AbstractAction {
+
+        public UndoLastStep() {            
+            putValue(NAME, "Goal Back");
+            putValue(SMALL_ICON, IconFactory.goalBackLogo(TOOLBAR_ICON_SIZE));            
+        }
+
+        /** 
+         * Registers the action at some listeners to update its status
+         * in a correct fashion. This method has to be invoked after the
+         * Main class has been initialised with the KeYMediator.
+         */
+        public void init() {
+            final KeYSelectionListener selListener = new KeYSelectionListener() {
+
+                public void selectedNodeChanged(KeYSelectionEvent e) {
+                    final Proof proof = mediator.getSelectedProof();
+                    if (proof == null) {
+                        setEnabled(false);
+                        return;
+                    }
+                    final Goal selGoal = mediator.getSelectedGoal();
+                    setEnabled(proof != null && selGoal != null &&
+                            selGoal.node() != proof.root());                    
+                }
+
+                public void selectedProofChanged(KeYSelectionEvent e) {
+                    selectedNodeChanged(e);
+                }                
+            };
+            
+            mediator.addKeYSelectionListener(selListener);
+            
+            mediator.addAutoModeListener(new AutoModeListener() {
+                public void autoModeStarted(ProofEvent e) {
+                    mediator.removeKeYSelectionListener(selListener);
+                    setEnabled(false);
+                }
+
+                public void autoModeStopped(ProofEvent e) {
+                    mediator.addKeYSelectionListener(selListener);
+                    selListener.selectedNodeChanged(null);
+                }                
+            });
+        }
+        
+        public void actionPerformed(ActionEvent e) {            
+            mediator.setBack();
+        }        
+    }
+    
+    
+    /**
+     * This action is enabled if in the current proof situation reuse has
+     * been requested and is possible, i.e. a reuse candidate has been found.
+     * 
+     * The actions {@link ReuseAction#actionPerformed(ActionEvent)} method
+     * starts the reuse when invoked. 
+     */
     private final class ReuseAction extends AbstractAction {        
         public ReusePoint rP;
         
@@ -2792,9 +2852,9 @@ public class Main extends JFrame implements IMain {
     private final class AutoModeAction extends AbstractAction {
         
         final Icon startLogo = 
-            IconFactory.autoModeStartLogo ( toolbarIconSize );
+            IconFactory.autoModeStartLogo ( TOOLBAR_ICON_SIZE );
         final Icon stopLogo = 
-            IconFactory.autoModeStopLogo ( toolbarIconSize );
+            IconFactory.autoModeStopLogo ( TOOLBAR_ICON_SIZE );
         
         private Proof associatedProof;
         

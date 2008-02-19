@@ -21,7 +21,10 @@ import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 
-
+/**
+ * Runs the currently active decision procedure on 
+ * each open goal of a given proof.
+ */
 public class DecProcRunner implements Runnable {
 
     private final IMain main;
@@ -30,21 +33,18 @@ public class DecProcRunner implements Runnable {
     private final Proof proof;
     private int totalGoals = 0;
     private final KeYExceptionHandler exceptionHandler;
-
-    private SwingWorker worker;
     
     private final Constraint userConstraint;
     private final BuiltInRule simpRule;
 
-    public DecProcRunner(IMain main, Proof proof, 
-            Constraint userConstraint, String decisionProcedure) {
+    public DecProcRunner(IMain main, Proof proof, Constraint userConstraint) {
         this.main = main;
         this.proof = proof;
         this.userConstraint = userConstraint;
         
         this.simpRule = getIntegerDecisionProcedure();
-        
-        currentDecProc = decisionProcedure;             
+        currentDecProc = proof.getSettings().
+            getDecisionProcedureSettings().getDecisionProcedure();          
         exceptionHandler = main.mediator().getExceptionHandler();
     }
 
@@ -55,7 +55,7 @@ public class DecProcRunner implements Runnable {
          * the worker is interrupted because we catch the
          * InterruptedException in doWork().
          */
-        worker = new SwingWorker() {
+        SwingWorker worker = new SwingWorker() {
             public Object construct() {
                 Object res = doWork();
                 return res;

@@ -6,7 +6,7 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 
 /** 
  * This interface extracts method signatures from the original main class
- * that need currently to be implemented by a class that wants to represent 
+ * that need (currently) to be implemented by a class that wants to represent 
  * an interface to the KeY prover. 
  * 
  * It is a first step to a better separation between GUI and prover.
