@@ -2763,8 +2763,7 @@ public class Main extends JFrame implements IMain {
     private final class UndoLastStep extends AbstractAction {
 
         public UndoLastStep() {            
-            putValue(NAME, "Goal Back");
-            putValue(SMALL_ICON, IconFactory.goalBackLogo(TOOLBAR_ICON_SIZE));            
+            setBackMode();         
         }
 
         /** 
@@ -2783,18 +2782,16 @@ public class Main extends JFrame implements IMain {
                     } else {
                         final Goal selGoal = mediator.getSelectedGoal();
                         final Node selNode = mediator.getSelectedNode();
-                                                
+
                         if (selGoal == null && selNode == null) {
-                                setEnabled(false);
+                            setEnabled(false);
                         } else if (selGoal != null) {
                             /* we undo the last rule application, if
                              * the goal refers not to the proof's root */
                             if (selNode == proof.root()) {
                                 setEnabled(false);
                             } else {
-                                putValue(NAME, "Goal Back");
-                                putValue(SMALL_ICON, 
-                                        IconFactory.goalBackLogo(TOOLBAR_ICON_SIZE));
+                                setBackMode();
                                 setEnabled(true);
                             }
                         } else {/* pruning instead of goal back */
@@ -2803,14 +2800,13 @@ public class Main extends JFrame implements IMain {
                             if (selNode.leaf() || selNode.isClosed()) {
                                 setEnabled(false);
                             } else {
-                                putValue(NAME, "Prune Proof");
-                                putValue(SMALL_ICON, IconFactory.goalBackLogo(TOOLBAR_ICON_SIZE));
+                                pruneMode();
                                 setEnabled(true);
                             }
                         }
                     }
                 }
-
+                
                 public void selectedProofChanged(KeYSelectionEvent e) {
                     selectedNodeChanged(e);
                 }                
@@ -2829,6 +2825,20 @@ public class Main extends JFrame implements IMain {
                     selListener.selectedNodeChanged(null);
                 }                
             });
+        }
+        
+        private void setBackMode() {
+            putValue(NAME, "Goal Back");
+            putValue(SMALL_ICON, 
+                    IconFactory.goalBackLogo(TOOLBAR_ICON_SIZE));
+            putValue(SHORT_DESCRIPTION, "Undo the last rule application.");
+        }
+
+        private void pruneMode() {
+            putValue(NAME, "Prune Proof");
+            putValue(SMALL_ICON, IconFactory.goalBackLogo(TOOLBAR_ICON_SIZE));
+            putValue(SHORT_DESCRIPTION, 
+                    "Prune the tree below the selected node.");
         }
         
         public void actionPerformed(ActionEvent e) {            
