@@ -2784,25 +2784,18 @@ public class Main extends JFrame implements IMain {
                         final Node selNode = mediator.getSelectedNode();
 
                         if (selGoal == null && selNode == null) {
+                            setBackMode();
                             setEnabled(false);
                         } else if (selGoal != null) {
                             /* we undo the last rule application, if
                              * the goal refers not to the proof's root */
-                            if (selNode == proof.root()) {
-                                setEnabled(false);
-                            } else {
-                                setBackMode();
-                                setEnabled(true);
-                            }
+                            setBackMode();
+                            setEnabled(selNode != proof.root());
                         } else {/* pruning instead of goal back */
                             // pruning a tree only if the selected node has children
                             // and sub tree is not closed
-                            if (selNode.leaf() || selNode.isClosed()) {
-                                setEnabled(false);
-                            } else {
-                                pruneMode();
-                                setEnabled(true);
-                            }
+                            pruneMode();
+                            setEnabled(!(selNode.leaf() || selNode.isClosed()));
                         }
                     }
                 }
