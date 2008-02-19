@@ -260,7 +260,6 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 	public synchronized TreeBranch buildTreeBranch(ETNode etn, TreeBranch parent,
 			Filter f) {
 	    
-	    identifyWatchpoints(etn);
 		try {
 			// draw node n
 			IFigure statementNode = createNode(etn);
@@ -312,8 +311,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
 	private void identifyWatchpoints(ETNode proofnodes) {
 	    
-        LinkedList<Node> leaves = WatchpointUtil.getAllLeaveNodes(proofnodes);
-    
+        LinkedList<ETNode> leaves = WatchpointUtil.getAllLeafETNodes(proofnodes);
+        WatchpointUtil.setActiveWatchpoint(leaves);
     }
 
     /**
@@ -1249,7 +1248,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 			 */
 			labels = new HashSet();
 			TreeBranch treebranch = null;
-			if (ExecutionTree.getETNode() == null) {
+			ETNode etn = ExecutionTree.getETNode();
+			if (etn == null) {
 				return;
 			}
 
@@ -1261,7 +1261,9 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 			} else
 
 			if (ExecutionTree.treeStyle == ExecutionTree.SLET3) {
-				treebranch = buildTreeBranch(ExecutionTree.getETNode(), null,
+				
+				identifyWatchpoints(etn);
+				treebranch = buildTreeBranch(etn, null,
 						new TreeFilter());
 				this.root.addBranch(treebranch);
 

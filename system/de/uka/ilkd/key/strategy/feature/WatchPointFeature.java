@@ -5,6 +5,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.WatchpointUtil;
+import de.uka.ilkd.key.logic.op.Op;
 
 
 public class WatchPointFeature extends BinaryFeature {
@@ -23,7 +24,7 @@ public class WatchPointFeature extends BinaryFeature {
             return false;
         } else {
            
-            return  WatchpointUtil.evalutateWatchpointsbyOR(watchpoints, pos, goal);
+            return  WatchpointUtil.evalutateWatchpoints(watchpoints, pos, goal, Op.OR, 250 );
         }
     }
 

@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.util;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -13,7 +14,10 @@ import de.uka.ilkd.key.logic.SLListOfTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.UpdateFactory;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuanUpdateOperator;
 import de.uka.ilkd.key.proof.Goal;
@@ -28,6 +32,7 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.visualdebugger.ProofStarter;
+import de.uka.ilkd.key.visualdebugger.WatchPoint;
 import de.uka.ilkd.key.visualdebugger.WatchpointPO;
 import de.uka.ilkd.key.visualdebugger.executiontree.ETNode;
 
@@ -62,7 +67,7 @@ public class WatchpointUtil {
                 leaves.addAll(getAllLeafETNodes(node));
             }
         }
-        System.out.println("size of leaves: " + leaves.size());
+        System.out.println("size of ETNode-leaves: " + leaves.size());
         return leaves;
 
     }
@@ -73,13 +78,36 @@ public class WatchpointUtil {
      * @param nodes -
      *                a list of (leaf-)ETNodes of the current ET
      */
-    public static void setActiveWatchpoint(List<ETNode> nodes) {
+    public static void setActiveWatchpoint(List<ETNode> nodes, ListOfTerm watchpoints) {
 
         for (ETNode node : nodes) {
-            getLeafNodesInETNode(node.getProofTreeNodes().toArray());
-
+            node.setWatchpoint(
+           satisfiesWatchpoint(getLeafNodesInETNode(node.getProofTreeNodes().toArray()), watchpoints));
         }
 
+    }
+    /**
+     * isWatchpoints
+     *  return true, if all leaf nodes in this ETNode satisfy 
+     *  at least one watchpoint from the list 
+     */
+    private static boolean satisfiesWatchpoint(HashSet<Node> leafNodesInETNode, ListOfTerm watchpoints) {
+      
+        Term[] watches = watchpoints.toArray();
+        for (Node node : leafNodesInETNode) {
+            //find pos
+            //goal ?
+            for (Term watchpoint : watches) {
+                WatchpointUtil.evalutateWatchpoint(watchpoint, findPos(node), null, 250);
+
+            }
+        }
+        return false;
+    }
+
+    private static PosInOccurrence findPos(Node node) {
+        // TODO Auto-generated method stub
+        return new PosInOccurrence(null, null, false);
     }
 
     /**
@@ -94,10 +122,8 @@ public class WatchpointUtil {
         // create a collection from the array -> type conversion
         // since getProofTreeNodes() only returns a ListOfNode which
         // does not implement the Collection interface
-        HashSet<Node> proofnodes = new HashSet<Node>();
-        for (Node node : nodes) {
-            proofnodes.add(node);
-        }
+        HashSet<Node> proofnodes = new HashSet<Node>(Arrays.asList(nodes));
+
         // not more than 4 children expected
         final int INITIALCAPACITY = 4;
         HashSet<Node> candidates = new HashSet<Node>(INITIALCAPACITY);
@@ -115,6 +141,7 @@ public class WatchpointUtil {
             }
             candidates.addAll(getLeavesInETNode(currentNode, proofnodes)); // correct ?
         }
+        System.out.println("candiates.size: " + candidates.size());
         return candidates;
     }
 
@@ -132,11 +159,8 @@ public class WatchpointUtil {
         }
         if (result.isEmpty()) {
             result.add(currentNode);
+        } 
             return result;
-        } else {
-            return result;
-        }
-
     }
 
     /**
@@ -147,7 +171,7 @@ public class WatchpointUtil {
      * @return true if the watchpoint is satisfied in the current state
      */
     public static boolean evalutateWatchpoint(Term watchpoint,
-            PosInOccurrence pos, Goal goal) {
+            PosInOccurrence pos, Goal goal, int maxsteps) {
 
         Sequent seq = goal.sequent();
         LinkedList<Update> updates = new LinkedList<Update>();
@@ -193,7 +217,7 @@ public class WatchpointUtil {
         watchpointPO.setProofSettings(proof.getSettings());
         watchpointPO.setInitConfig(initConfig);
         ps.setStrategy(strategy);
-        ps.setMaxSteps(500);
+        ps.setMaxSteps(maxsteps);
         ps.init(watchpointPO);
         ps.run(proofEnvironment);
 
@@ -269,8 +293,8 @@ public class WatchpointUtil {
      * Returns true, if all of the watchpoints (logical conjunction) contained
      * in the passed list can be evaluated to true in the current program state.
      */
-    public static boolean evalutateWatchpointsbyAND(ListOfTerm watchpoints,
-            PosInOccurrence pos, Goal goal) {
+    public static boolean evalutateWatchpoints(ListOfTerm watchpoints,
+            PosInOccurrence pos, Goal goal, Junctor junctor, int maxsteps) {
 
         Sequent seq = goal.sequent();
         LinkedList<Update> updates = new LinkedList<Update>();
@@ -291,9 +315,10 @@ public class WatchpointUtil {
             }
         }
 
-        TermBuilder termBuilder = new TermBuilder();
-
-        Term watchpoint = termBuilder.and(watchpoints);
+        //final TermFactory tf = TermFactory.DEFAULT;
+        //Term watchpoint = tf.createJunctorTerm(junctor, watchpoints.toArray());
+        TermBuilder tb = new TermBuilder();
+        Term watchpoint = tb.and(watchpoints);
         for (Update update : updates) {
             watchpoint = updateFactory.prepend(update, watchpoint);
         }
@@ -319,7 +344,7 @@ public class WatchpointUtil {
         watchpointPO.setProofSettings(proof.getSettings());
         watchpointPO.setInitConfig(initConfig);
         ps.setStrategy(strategy);
-        ps.setMaxSteps(500);
+        ps.setMaxSteps(maxsteps);
         ps.init(watchpointPO);
         ps.run(proofEnvironment);
 
