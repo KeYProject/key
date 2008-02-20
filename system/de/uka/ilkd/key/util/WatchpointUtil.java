@@ -1,18 +1,24 @@
 package de.uka.ilkd.key.util;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.IteratorOfConstrainedFormula;
 import de.uka.ilkd.key.logic.IteratorOfTerm;
 import de.uka.ilkd.key.logic.ListOfTerm;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SLListOfTerm;
+import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -112,7 +118,20 @@ public class WatchpointUtil {
 
     private static PosInOccurrence findPos(Node node) {
         // TODO Auto-generated method stub
-        Sequent seq = node.sequent();
+        Semisequent seq = node.sequent().succedent();
+        System.out.println("Succedent: "+ seq.size());
+
+        IteratorOfConstrainedFormula iter = seq.iterator();
+        ConstrainedFormula constrainedFormula;
+        Term t;
+        while(iter.hasNext()){
+            constrainedFormula = iter.next();
+            t = constrainedFormula.formula();
+            System.out.println("Operator: "+constrainedFormula.formula().op().getClass());
+            System.out.println("ConstrainedFormula: "+ constrainedFormula.toString());
+            System.out.println("term.sub(0).getclass : "+ t.sub(0).getClass());
+        }
+
         
         return new PosInOccurrence(null, null, false);
     }
@@ -124,20 +143,25 @@ public class WatchpointUtil {
      *                a list of (leaf-)ETNodes of the current ET
      * @return leaves - a LinkedList with all
      */
-    private static HashSet<Node> getLeafNodesInETNode(Node[] nodes) {
+    public static HashSet<Node> getLeafNodesInETNode(Node[] nodes) {
 
         // create a collection from the array -> type conversion
         // since getProofTreeNodes() only returns a ListOfNode which
         // does not implement the Collection interface
-        HashSet<Node> proofnodes = new HashSet<Node>(Arrays.asList(nodes));
-
+        
+        //HashSet<Node> proofnodes = new HashSet<Node>(Arrays.asList(nodes));
+        Set<Node> proofnodes = Collections.synchronizedSet(new HashSet<Node>(Arrays.asList(nodes)));
+        //Set<Node> proofnodes = new ConcurrentSkipListSet<Node>(Arrays.asList(nodes));
+       
         // not more than 4 children expected
         final int INITIALCAPACITY = 4;
         HashSet<Node> candidates = new HashSet<Node>(INITIALCAPACITY);
-        Iterator<Node> nodeIterator = proofnodes.iterator();
-
+        
+        synchronized(proofnodes){
         while (!proofnodes.isEmpty()) {
-
+            // cannot be instantiated outside of loop -> concurrentModifactionException
+            // if we try to change the collection we are iterating over
+            Iterator<Node> nodeIterator = proofnodes.iterator();
             Node currentNode = nodeIterator.next();
             proofnodes.remove(currentNode);
             Node parentNode = currentNode.parent();
@@ -149,12 +173,13 @@ public class WatchpointUtil {
             candidates.addAll(getLeavesInETNode(currentNode, proofnodes)); // correct
             // ?
         }
+    }
         System.out.println("candiates.size: " + candidates.size());
         return candidates;
     }
 
     private static HashSet<Node> getLeavesInETNode(Node currentNode,
-            HashSet<Node> proofnodes) {
+            Set<Node> proofnodes) {
 
         HashSet<Node> result = new HashSet<Node>(3);
         IteratorOfNode iter = currentNode.childrenIterator();
