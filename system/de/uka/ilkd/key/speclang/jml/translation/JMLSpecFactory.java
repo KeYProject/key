@@ -126,10 +126,7 @@ public class JMLSpecFactory {
         ListOfKeYJavaType subs = ji.getAllSubtypes(kjt);
         for(IteratorOfKeYJavaType it = subs.iterator(); it.hasNext(); ) {
             KeYJavaType sub = it.next();
-            
-            if(sub == null) {
-                continue; //HACK. Why does JavaInfo put null in here sometimes? 
-            }
+            assert sub != null;
             
             ListOfProgramMethod subPms 
                 = ji.getAllProgramMethodsLocallyDeclared(sub);
