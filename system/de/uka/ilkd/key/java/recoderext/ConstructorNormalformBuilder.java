@@ -248,7 +248,7 @@ public class ConstructorNormalformBuilder
                     body, i+1);
         }
         MethodDeclaration def =  new MethodDeclaration(mods,
-                new TypeReference((Identifier) class2identifier.get(cd)),
+                null, // return type is void
                 new ImplicitIdentifier(CONSTRUCTOR_NORMALFORM_IDENTIFIER),
                 parameters,
                 recThrows,
@@ -386,7 +386,7 @@ public class ConstructorNormalformBuilder
 	
 	MethodDeclaration nf =  new MethodDeclaration
 	    (mods,
-	     new TypeReference((Identifier) class2identifier.get(cd)),
+	     null, // return type is void
 	     new ImplicitIdentifier(CONSTRUCTOR_NORMALFORM_IDENTIFIER),
 	     parameters,
 	     recThrows,
