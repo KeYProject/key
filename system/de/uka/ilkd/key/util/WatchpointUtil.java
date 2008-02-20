@@ -6,7 +6,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.IteratorOfTerm;
 import de.uka.ilkd.key.logic.ListOfTerm;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -78,27 +80,30 @@ public class WatchpointUtil {
      * @param nodes -
      *                a list of (leaf-)ETNodes of the current ET
      */
-    public static void setActiveWatchpoint(List<ETNode> nodes, ListOfTerm watchpoints) {
+    public static void setActiveWatchpoint(List<ETNode> nodes,
+            ListOfTerm watchpoints) {
 
         for (ETNode node : nodes) {
-            node.setWatchpoint(
-           satisfiesWatchpoint(getLeafNodesInETNode(node.getProofTreeNodes().toArray()), watchpoints));
+            node.setWatchpoint(satisfiesWatchpoint(getLeafNodesInETNode(node
+                    .getProofTreeNodes().toArray()), watchpoints));
         }
 
     }
+
     /**
-     * isWatchpoints
-     *  return true, if all leaf nodes in this ETNode satisfy 
-     *  at least one watchpoint from the list 
+     * isWatchpoints return true, if all leaf nodes in this ETNode satisfy at
+     * least one watchpoint from the list
      */
-    private static boolean satisfiesWatchpoint(HashSet<Node> leafNodesInETNode, ListOfTerm watchpoints) {
-      
+    private static boolean satisfiesWatchpoint(HashSet<Node> leafNodesInETNode,
+            ListOfTerm watchpoints) {
+
         Term[] watches = watchpoints.toArray();
         for (Node node : leafNodesInETNode) {
-            //find pos
-            //goal ?
+            // find pos
+            // goal ?
             for (Term watchpoint : watches) {
-                WatchpointUtil.evalutateWatchpoint(watchpoint, findPos(node), null, 250);
+                WatchpointUtil.evalutateWatchpoint(watchpoint, node.sequent(), findPos(node),
+                        node.proof(), 250);
 
             }
         }
@@ -107,6 +112,8 @@ public class WatchpointUtil {
 
     private static PosInOccurrence findPos(Node node) {
         // TODO Auto-generated method stub
+        Sequent seq = node.sequent();
+        
         return new PosInOccurrence(null, null, false);
     }
 
@@ -139,7 +146,8 @@ public class WatchpointUtil {
                 parentNode = parentNode.parent();
 
             }
-            candidates.addAll(getLeavesInETNode(currentNode, proofnodes)); // correct ?
+            candidates.addAll(getLeavesInETNode(currentNode, proofnodes)); // correct
+            // ?
         }
         System.out.println("candiates.size: " + candidates.size());
         return candidates;
@@ -159,8 +167,8 @@ public class WatchpointUtil {
         }
         if (result.isEmpty()) {
             result.add(currentNode);
-        } 
-            return result;
+        }
+        return result;
     }
 
     /**
@@ -170,14 +178,12 @@ public class WatchpointUtil {
      * 
      * @return true if the watchpoint is satisfied in the current state
      */
-    public static boolean evalutateWatchpoint(Term watchpoint,
-            PosInOccurrence pos, Goal goal, int maxsteps) {
+    public static boolean evalutateWatchpoint(Term watchpoint, Sequent seq,
+            PosInOccurrence pos, Proof proof, int maxsteps) {
 
-        Sequent seq = goal.sequent();
         LinkedList<Update> updates = new LinkedList<Update>();
-        Proof proof = goal.proof();
         UpdateFactory updateFactory = new UpdateFactory(proof.getServices(),
-                goal.simplifier());
+                proof.simplifier());
         // collect all updates
         PIOPathIterator it = pos.iterator();
         while (it.hasNext()) {
@@ -202,7 +208,7 @@ public class WatchpointUtil {
         // start side proof
         ProofStarter ps = new ProofStarter();
 
-        ProofEnvironment proofEnvironment = goal.proof().env();
+        ProofEnvironment proofEnvironment = proof.env();
         InitConfig initConfig = proofEnvironment.getInitConfig();
 
         WatchpointPO watchpointPO = new WatchpointPO("WatchpointPO", seq);
@@ -293,61 +299,78 @@ public class WatchpointUtil {
      * Returns true, if all of the watchpoints (logical conjunction) contained
      * in the passed list can be evaluated to true in the current program state.
      */
-    public static boolean evalutateWatchpoints(ListOfTerm watchpoints,
-            PosInOccurrence pos, Goal goal, Junctor junctor, int maxsteps) {
+    public static boolean evalutateWatchpoints(ListOfTerm watchpoints, Sequent seq,
+            PosInOccurrence pos, Proof proof, Junctor junctor, int maxsteps) {
 
-        Sequent seq = goal.sequent();
-        LinkedList<Update> updates = new LinkedList<Update>();
-        Proof proof = goal.proof();
-        UpdateFactory updateFactory = new UpdateFactory(proof.getServices(),
-                goal.simplifier());
-        // collect all updates
-        PIOPathIterator it = pos.iterator();
-        while (it.hasNext()) {
-            it.next();
-            Term term = it.getSubTerm();
-            Operator operator = term.op();
-            if (operator instanceof QuanUpdateOperator) {
+        if (watchpoints.isEmpty()) {
+            return false;
+        } else {
+            if (watchpoints.size() == 1) {
 
-                Update update = Update.createUpdate(term);
-                System.out.println("update.toString: " + update.toString());
-                updates.addFirst(update);
+                return WatchpointUtil.evalutateWatchpoint(
+                        watchpoints.toArray()[0], seq, pos, proof, maxsteps);
             }
+            
+            LinkedList<Update> updates = new LinkedList<Update>();
+            
+            UpdateFactory updateFactory = new UpdateFactory(
+                    proof.getServices(), proof.simplifier());
+            // collect all updates
+            PIOPathIterator it = pos.iterator();
+            while (it.hasNext()) {
+                it.next();
+                Term term = it.getSubTerm();
+                Operator operator = term.op();
+                if (operator instanceof QuanUpdateOperator) {
+
+                    Update update = Update.createUpdate(term);
+                    System.out.println("update.toString: " + update.toString());
+                    updates.addFirst(update);
+                }
+            }
+
+            final TermFactory tf = TermFactory.DEFAULT;
+            IteratorOfTerm iter = watchpoints.iterator();
+
+            Term watchpoint = (Op.OR == junctor ? tf.createJunctorTerm(junctor,
+                    iter.next(), tf.createJunctorTerm(Op.FALSE)) : tf
+                    .createJunctorTerm(junctor, iter.next(), tf
+                            .createJunctorTerm(Op.TRUE)));
+
+            while (iter.hasNext()) {
+                watchpoint = tf.createJunctorTerm(junctor, iter.next(),
+                        watchpoint);
+            }
+
+            for (Update update : updates) {
+                watchpoint = updateFactory.prepend(update, watchpoint);
+            }
+
+            ConstrainedFormula newCF = new ConstrainedFormula(watchpoint);
+            seq = seq.changeFormula(newCF, pos).sequent();
+            // start side proof
+            ProofStarter ps = new ProofStarter();
+                                                //goal.proof().env()
+            ProofEnvironment proofEnvironment = proof.env();
+            InitConfig initConfig = proofEnvironment.getInitConfig();
+
+            WatchpointPO watchpointPO = new WatchpointPO("WatchpointPO", seq);
+            watchpointPO.setIndices(initConfig.createTacletIndex(), initConfig
+                    .createBuiltInRuleIndex());
+
+            StrategyProperties strategyProperties = DebuggerStrategy
+                    .getDebuggerStrategyProperties(true, false, false,
+                            SLListOfTerm.EMPTY_LIST);
+            final StrategyFactory factory = new DebuggerStrategy.Factory();
+            Strategy strategy = (factory.create(proof, strategyProperties));
+            watchpointPO.setProofSettings(proof.getSettings());
+            watchpointPO.setInitConfig(initConfig);
+            ps.setStrategy(strategy);
+            ps.setMaxSteps(maxsteps);
+            ps.init(watchpointPO);
+            ps.run(proofEnvironment);
+
+            return ps.getProof().closed();
         }
-
-        //final TermFactory tf = TermFactory.DEFAULT;
-        //Term watchpoint = tf.createJunctorTerm(junctor, watchpoints.toArray());
-        TermBuilder tb = new TermBuilder();
-        Term watchpoint = tb.and(watchpoints);
-        for (Update update : updates) {
-            watchpoint = updateFactory.prepend(update, watchpoint);
-        }
-
-        ConstrainedFormula newCF = new ConstrainedFormula(watchpoint);
-        seq = seq.changeFormula(newCF, pos).sequent();
-
-        // start side proof
-        ProofStarter ps = new ProofStarter();
-
-        ProofEnvironment proofEnvironment = goal.proof().env();
-        InitConfig initConfig = proofEnvironment.getInitConfig();
-
-        WatchpointPO watchpointPO = new WatchpointPO("WatchpointPO", seq);
-        watchpointPO.setIndices(initConfig.createTacletIndex(), initConfig
-                .createBuiltInRuleIndex());
-
-        StrategyProperties strategyProperties = DebuggerStrategy
-                .getDebuggerStrategyProperties(true, false, false,
-                        SLListOfTerm.EMPTY_LIST);
-        final StrategyFactory factory = new DebuggerStrategy.Factory();
-        Strategy strategy = (factory.create(proof, strategyProperties));
-        watchpointPO.setProofSettings(proof.getSettings());
-        watchpointPO.setInitConfig(initConfig);
-        ps.setStrategy(strategy);
-        ps.setMaxSteps(maxsteps);
-        ps.init(watchpointPO);
-        ps.run(proofEnvironment);
-
-        return ps.getProof().closed();
     }
 }
