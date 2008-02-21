@@ -2818,6 +2818,7 @@ public class Main extends JFrame implements IMain {
                     selListener.selectedNodeChanged(null);
                 }                
             });
+            selListener.selectedNodeChanged(new KeYSelectionEvent(mediator.getSelectionModel()));
         }
         
         private void setBackMode() {
