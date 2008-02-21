@@ -7,7 +7,6 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.WatchpointUtil;
 import de.uka.ilkd.key.logic.op.Op;
 
-
 public class WatchPointFeature extends BinaryFeature {
 
     private final ListOfTerm watchpoints;
@@ -23,8 +22,9 @@ public class WatchPointFeature extends BinaryFeature {
         if (watchpoints.isEmpty()) {
             return false;
         } else {
-           
-            return  WatchpointUtil.evalutateWatchpoints(watchpoints, goal.sequent(), pos, goal.proof(), Op.OR, 250 );
+
+            return WatchpointUtil.evalutateWatchpoints(watchpoints, goal
+                    .sequent(), pos, goal.proof(), Op.OR, 250);
         }
     }
 

@@ -2,7 +2,6 @@ package de.uka.ilkd.key.visualdebugger;
 
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ListOfTerm;
@@ -21,7 +20,6 @@ public class WatchPointManager {
 
     /** The watch points. */
     private LinkedList<WatchPoint> watchPoints = new LinkedList<WatchPoint>();
-    private LinkedList<Integer> statements = new LinkedList<Integer>(); 
     private ListOfTerm listOfWatchpoints;
 
     /**

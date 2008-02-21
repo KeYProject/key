@@ -8,11 +8,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.WatchpointUtil;
 import de.uka.ilkd.key.visualdebugger.executiontree.ETNode;
 import de.uka.ilkd.key.visualdebugger.executiontree.ITNode;
-/**
- * to make this work:
- *  change ITNode line 80 to: private Services serv = null; // VisualDebugger.getVisualDebugger().getMediator().getServices();
- *  and make getLeavesInETNode public in WatchpointUtil.java
- */
+
 public class WatchpointUtilTest {
 
     private static ETNode etNode = null;
@@ -36,7 +32,6 @@ public class WatchpointUtilTest {
             System.out.println("\nAn error occured!");
             System.exit(-1);
         }
-
     }
 
     private static ETNode init() {
@@ -69,6 +64,16 @@ public class WatchpointUtilTest {
         Node n10 = new Node(proof, null, null, n8, null);
         Node n11 = new Node(proof, null, null, n, null);
         
+        n.add(n1);
+        n.add(n2);
+        n1.add(n3);
+        n3.add(n4);
+        n3.add(n5);
+        n3.add(n6);
+        n4.add(n7);
+        n7.add(n8);
+        n7.add(n9);
+        n8.add(n10);
         
         ITNode itnode = new ITNode(n);
         ITNode itnode1 = new ITNode(n1);
@@ -93,8 +98,6 @@ public class WatchpointUtilTest {
         itnode7.addChild(itnode8);
         itnode7.addChild(itnode9);
         itnode8.addChild(itnode10);
-        
-        System.out.println(itnode10.getParent());
 
         LinkedList<ITNode> itNodes = new LinkedList<ITNode>();
         itNodes.add(itnode4);
@@ -112,17 +115,14 @@ public class WatchpointUtilTest {
         node5.addITNode(itnode5);
         
         setNode(node4);
-        return node2;
+        return root;
     }
 
     private static void setNode(ETNode etn) {
-        
         etNode = etn;
-
     }
 
     private static ETNode getNode() {
         return etNode;
-
     }
 }
