@@ -83,16 +83,12 @@ public class WatchPoint {
         return name;
     }
 
-
     public boolean isEnabled() {
         return enabled;
     }
 
-
     public void setEnabled(boolean isEnabled) {
         this.enabled = isEnabled;
     }
-
-
 
 }

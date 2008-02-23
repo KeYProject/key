@@ -211,7 +211,7 @@ public class WatchpointView extends ViewPart {
         column.setText("Type");
 
         column = new TableColumn(table, SWT.NONE, 4);
-        column.setWidth(30);
+        column.setWidth(80);
         column.setText("Enabled");
         return table;
     }

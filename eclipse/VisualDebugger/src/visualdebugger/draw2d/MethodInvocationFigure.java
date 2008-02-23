@@ -20,175 +20,187 @@ import de.uka.ilkd.key.visualdebugger.executiontree.ETNode;
  */
 public class MethodInvocationFigure extends Figure implements DrawableNode {
 
-	/** The selected. */
-	private boolean selected;
-	private boolean isCollapsed;
+    /** The selected. */
+    private boolean selected;
+    private boolean isCollapsed;
+    private boolean isWatchpoint;
 
-	/** some color definitions. */
-	static final Color gradient1 = new Color(null, 132, 132, 240);
+    /** some color definitions. */
+    static final Color gradient1 = new Color(null, 132, 132, 240);
 
-	/** The Constant gradient2. */
-	static final Color gradient2 = new Color(null, 76, 84, 216);
+    /** The Constant gradient2. */
+    static final Color gradient2 = new Color(null, 76, 84, 216);
 
-	/** The Constant gradient12. */
-	static final Color gradient12 = new Color(null, 202, 202, 210);
+    /** The Constant gradient12. */
+    static final Color gradient12 = new Color(null, 202, 202, 210);
 
-	/** The Constant gradient22. */
-	static final Color gradient22 = new Color(null, 146, 154, 186);
+    /** The Constant gradient22. */
+    static final Color gradient22 = new Color(null, 146, 154, 186);
 
-	/** The Constant corner1. */
-	static final Color corner1 = new Color(null, 200, 208, 223);
+    /** The Constant corner1. */
+    static final Color corner1 = new Color(null, 200, 208, 223);
 
-	/** The Constant corner2. */
-	static final Color corner2 = new Color(null, 160, 172, 200);
+    /** The Constant corner2. */
+    static final Color corner2 = new Color(null, 160, 172, 200);
 
-	/** The Constant blue. */
-	static final Color blue = new Color(null, 152, 168, 200);
+    /** The Constant blue. */
+    static final Color blue = new Color(null, 152, 168, 200);
 
-	/** The Constant shadow. */
-	static final Color shadow = new Color(null, 202, 202, 202);
+    /** The Constant shadow. */
+    static final Color shadow = new Color(null, 202, 202, 202);
 
-	/** The Constant CORNER_SIZE. */
-	static final int CORNER_SIZE = 00;
+    /** The Constant CORNER_SIZE. */
+    static final int CORNER_SIZE = 00;
 
-	/** The mi node. */
-	final ETMethodInvocationNode miNode;
+    /** The mi node. */
+    final ETMethodInvocationNode miNode;
 
-	/** The Constant BORDER. */
-	static final Border BORDER = new LineBorder(ColorConstants.black, 1);
-	/** The Constant COLLAPSEDMODEBORDER. */
-    static final Border COLLAPSEDMODEBORDER = new LineBorder(ColorConstants.yellow, 2);
+    /** The Constant BORDER. */
+    static final Border BORDER = new LineBorder(ColorConstants.black, 1);
+    /** The Constant COLLAPSEDMODEBORDER. */
+    static final Border COLLAPSEDMODEBORDER = new LineBorder(
+            ColorConstants.lightGreen, 2);
+    /** The Constant ACTIVEWATCHPOINTBORDER. */
+    static final Border ACTIVEWATCHPOINTBORDER = new LineBorder(
+            ColorConstants.orange, 2);
 
-	/** The label. */
-	private Label label = new Label();
+    /** The label. */
+    private Label label = new Label();
 
-	/**
-	 * Instantiates a new method invocation figure.
-	 * 
-	 * @param etNode
-	 *            the et node
-	 */
-	public MethodInvocationFigure(ETMethodInvocationNode etNode) {
+    /**
+     * Instantiates a new method invocation figure.
+     * 
+     * @param etNode
+     *            the et node
+     */
+    public MethodInvocationFigure(ETMethodInvocationNode etNode) {
 
-		super();
-		this.isCollapsed = etNode.isCollapsed();
-		setBorder(BORDER);
-		setLayoutManager(new StackLayout());
+        super();
+        this.isCollapsed = etNode.isCollapsed();
+        this.isWatchpoint = etNode.isWatchpoint();
+        setBorder(BORDER);
+        setLayoutManager(new StackLayout());
 
-		add(label);
-		String st = "";
-		if (etNode.getMethodReference() != null)
-			st = VisualDebugger.getVisualDebugger().prettyPrint(
-					etNode.getMethodReference())
-					+ ".";
+        add(label);
+        String st = "";
+        if (etNode.getMethodReference() != null)
+            st = VisualDebugger.getVisualDebugger().prettyPrint(
+                    etNode.getMethodReference())
+                    + ".";
 
-		// etNode.getMethod().get
-		st += etNode.getMethod().getProgramElementName().toString() + "(";
-		ListOfTerm param = etNode.getValues();
+        // etNode.getMethod().get
+        st += etNode.getMethod().getProgramElementName().toString() + "(";
+        ListOfTerm param = etNode.getValues();
 
-		for (IteratorOfTerm it = param.iterator(); it.hasNext();) {
-			st += VisualDebugger.getVisualDebugger().prettyPrint(it.next());
-			if (it.hasNext())
-				st += ", ";
+        for (IteratorOfTerm it = param.iterator(); it.hasNext();) {
+            st += VisualDebugger.getVisualDebugger().prettyPrint(it.next());
+            if (it.hasNext())
+                st += ", ";
 
-		}
+        }
 
-		st += ")";
+        st += ")";
 
-		label.setText(st);
-		miNode = etNode;
-		String toolTip = "";
+        label.setText(st);
+        miNode = etNode;
+        String toolTip = "";
 
-		toolTip += VisualDebugger.getMethodString(etNode.getMethod()
-				.getMethodDeclaration())
-				+ "\n";
-		toolTip += "@" + etNode.getMethod().getContainerType().getSort() + "\n";
-		if (etNode.getValues().size() > 0) {
-			toolTip += "Parameters: \n";
-			IteratorOfTerm termIt = etNode.getValues().iterator();
-			for (IteratorOfProgramVariable it = etNode.getParameters()
-					.iterator(); it.hasNext();) {
-				ProgramVariable p = it.next();
-				Term val = termIt.next();
-				toolTip += p.toString()
-						+ " := "
-						+ VisualDebugger.getVisualDebugger().prettyPrint(
-								SLListOfTerm.EMPTY_LIST.append(val)) + "\n";
-			}
-		}
-		this.setToolTip(new Label(toolTip));
-	}
+        toolTip += VisualDebugger.getMethodString(etNode.getMethod()
+                .getMethodDeclaration())
+                + "\n";
+        toolTip += "@" + etNode.getMethod().getContainerType().getSort() + "\n";
+        if (etNode.getValues().size() > 0) {
+            toolTip += "Parameters: \n";
+            IteratorOfTerm termIt = etNode.getValues().iterator();
+            for (IteratorOfProgramVariable it = etNode.getParameters()
+                    .iterator(); it.hasNext();) {
+                ProgramVariable p = it.next();
+                Term val = termIt.next();
+                toolTip += p.toString()
+                        + " := "
+                        + VisualDebugger.getVisualDebugger().prettyPrint(
+                                SLListOfTerm.EMPTY_LIST.append(val)) + "\n";
+            }
+        }
+        this.setToolTip(new Label(toolTip));
+    }
 
-	/**
-	 * Paint figure.
-	 * 
-	 * @param g
-	 *            the Graphics
-	 * 
-	 * @see org.eclipse.draw2d.Figure#paintFigure(org.eclipse.draw2d.Graphics)
-	 */
-	protected void paintFigure(Graphics g) {
-		super.paintFigure(g);
-		if (isCollapsed) {
-			g.setForegroundColor(ColorConstants.darkGray);
-			setBorder(COLLAPSEDMODEBORDER);
-		} else {
+    /**
+     * Paint figure.
+     * 
+     * @param g
+     *            the Graphics
+     * 
+     * @see org.eclipse.draw2d.Figure#paintFigure(org.eclipse.draw2d.Graphics)
+     */
+    protected void paintFigure(Graphics g) {
+        super.paintFigure(g);
 
-			if (selected) {
-				g.setForegroundColor(ColorConstants.menuBackgroundSelected);
-				g.setBackgroundColor(ColorConstants.titleGradient);
-			} else {
-				g.setForegroundColor(ColorConstants.white);
-				g.setBackgroundColor(ColorConstants.white);
+        if (isWatchpoint) {
+            g.setForegroundColor(blue);
+            g.setBackgroundColor(ColorConstants.titleGradient);
+            setBorder(ACTIVEWATCHPOINTBORDER);
+        } else {
+            if (isCollapsed) {
+                g.setForegroundColor(ColorConstants.darkGray);
+                setBorder(COLLAPSEDMODEBORDER);
+            } else {
 
-			}
-		}
-		g.fillGradient(getBounds().getResized(-1, -1), true);
-	}
+                if (selected) {
+                    g.setForegroundColor(ColorConstants.menuBackgroundSelected);
+                    g.setBackgroundColor(ColorConstants.titleGradient);
+                } else {
+                    g.setForegroundColor(ColorConstants.white);
+                    g.setBackgroundColor(ColorConstants.white);
+                }
+            }
+        }
+        g.fillGradient(getBounds().getResized(-1, -1), true);
+    }
 
-	/**
-	 * Sets the selected.
-	 * 
-	 * @param value
-	 *            the new selected
-	 */
-	public void setSelected(boolean value) {
-		this.selected = value;
-		if (selected)
-			label.setForegroundColor(ColorConstants.white);
-		else
-			label.setForegroundColor(null);
-		repaint();
-	}
+    /**
+     * Sets the selected.
+     * 
+     * @param value
+     *            the new selected
+     */
+    public void setSelected(boolean value) {
+        this.selected = value;
+        if (selected)
+            label.setForegroundColor(ColorConstants.white);
+        else
+            label.setForegroundColor(null);
+        repaint();
+    }
 
-	/**
-	 * To string.
-	 * 
-	 * @return the string
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString() {
-		return ((Label) getChildren().get(0)).getText();
-	}
+    /**
+     * To string.
+     * 
+     * @return the string
+     * 
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        return ((Label) getChildren().get(0)).getText();
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.draw2d.Figure#validate()
-	 */
-	public void validate() {
-		repaint();
-		super.validate();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.draw2d.Figure#validate()
+     */
+    public void validate() {
+        repaint();
+        super.validate();
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see visualdebugger.draw2d.DrawableNode#getETNode()
-	 */
-	public ETNode getETNode() {
-		return miNode;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see visualdebugger.draw2d.DrawableNode#getETNode()
+     */
+    public ETNode getETNode() {
+        return miNode;
+    }
 
 }

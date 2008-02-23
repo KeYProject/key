@@ -63,7 +63,7 @@ public class SourceElementFigure extends Figure implements DrawableNode {
     static final Border BREAKMODEBORDER = new LineBorder(ColorConstants.red, 2);
     /** The Constant COLLAPSEDMODEBORDER. */
     static final Border COLLAPSEDMODEBORDER = new LineBorder(
-            ColorConstants.yellow, 2);
+            ColorConstants.lightGreen, 2);
     /** The Constant ACTIVEWATCHPOINTBORDER. */
     static final Border ACTIVEWATCHPOINTBORDER = new LineBorder(
             ColorConstants.orange, 2);
@@ -103,8 +103,8 @@ public class SourceElementFigure extends Figure implements DrawableNode {
             tempRect.shrink(getWidth() / 2, getWidth() / 2);
             graphics.setLineWidth(getWidth());
             if (getColor() != null)
-                graphics.setForegroundColor(getColor());
             graphics.drawRoundRectangle(tempRect, 12, 12);
+            graphics.setForegroundColor(getColor());
         }
     }
 

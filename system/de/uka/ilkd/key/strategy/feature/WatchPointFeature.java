@@ -24,7 +24,7 @@ public class WatchPointFeature extends BinaryFeature {
         } else {
 
             return WatchpointUtil.evalutateWatchpoints(watchpoints, goal
-                    .sequent(), pos, goal.proof(), Op.OR, 250);
+                    .sequent(), pos, goal.proof(), Op.OR, false, 250);
         }
     }
 

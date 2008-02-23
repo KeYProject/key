@@ -72,6 +72,7 @@ import visualdebugger.draw2d.TreeBranch;
 import visualdebugger.draw2d.TreeFilter;
 import visualdebugger.draw2d.TreeRoot;
 import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.logic.ListOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.IteratorOfNode;
 import de.uka.ilkd.key.proof.ListOfGoal;
@@ -195,10 +196,18 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
     /** The collapse filter. */
     private CollapseFilter collapseFilter;
+    private BranchFilter branchFilter;
 
+    /** The item expand. */
     private MenuItem itemExpand;
 
+    /** The clear view action. */
     private Action clearViewAction;
+
+    /** The recompute watchpoints. */
+    private Action recomputeWatchpoints;
+
+    private List wpInfo;
 
     /**
      * Instantiates a new execution tree view.
@@ -302,18 +311,29 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                 }
             }
             return branch;
-        } catch (Throwable t) {
+        } 
+        catch (OutOfMemoryError oome) {
+            System.out.println("OUT OF MEMORY ERROR!!!");
+        }
+        catch (Throwable t) {
             t.printStackTrace();
         }
         return null;
     }
 
-    private void identifyWatchpoints(ETNode proofnodes) {
+    /**
+     * Identify watchpoints.
+     * 
+     * @param nodesToEvaluate
+     *            the ETNode
+     */
+    private void identifyWatchpoints(LinkedList<ETNode> nodesToEvaluate) {
 
-        LinkedList<ETNode> leaves = WatchpointUtil
-                .getAllLeafETNodes(proofnodes);
-        WatchpointUtil.setActiveWatchpoint(leaves, vd.getWatchPointManager()
-                .getListOfWatchpoints(vd.getMediator().getServices()));
+        ListOfTerm watchpoints = vd.getWatchPointManager()
+                .getListOfWatchpoints(vd.getMediator().getServices());
+        if (!watchpoints.isEmpty()) {
+            WatchpointUtil.setActiveWatchpoint(nodesToEvaluate, watchpoints);
+        }
     }
 
     /**
@@ -385,7 +405,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
      * @return the figure
      */
     private Figure createNode(ETNode etNode) {
-
+        
         if (etNode instanceof ETStatementNode) {
             final SourceElementFigure node = new SourceElementFigure(
                     (ETStatementNode) etNode);
@@ -396,6 +416,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                 }
 
                 public void mousePressed(MouseEvent me) {
+                    wpInfo.removeAll();
+                    wpInfo.add("Wp irgendwas");
                     setSelected(node);
                 }
             });
@@ -595,10 +617,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                 final ListOfGoal goals = getSubtreeGoalsForETNode(((SourceElementFigure) ExecutionTreeView.this.selected)
                         .getETNode());
                 vd.stepOver(goals);
-
             }
         });
-
         // create visualize button
         item = new MenuItem(classMenu, SWT.PUSH);
         item.setText("Visualize Node");
@@ -614,6 +634,28 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
             }
 
         });
+        // create Step into button
+        item = new MenuItem(classMenu, SWT.PUSH);
+        item.setText("Evaluate Watchpoints for Node");
+        item.addSelectionListener(new SelectionListener() {
+            public void widgetDefaultSelected(SelectionEvent event) {
+            }
+
+            public void widgetSelected(SelectionEvent event) {
+                ETNode etn = ((SourceElementFigure) ExecutionTreeView.this.selected)
+                        .getETNode();
+                LinkedList<ETNode> node = new LinkedList<ETNode>();
+                node.add(etn);
+                identifyWatchpoints(node);
+                // clear the View
+                clearView();
+                TreeBranch tb = buildTreeBranch(getCurrentETRootNode(), null,
+                        new TreeFilter());
+                // draw the new view of the tree
+                root.addBranch(tb);
+                sketchStartUpConnection(tb);
+            }
+        });
         item = new MenuItem(classMenu, SWT.SEPARATOR);
 
         // create Step Over button
@@ -627,6 +669,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
                 // clear the View
                 clearView();
+                branchFilter = null;
                 currentETRootNode = getSelectedNode();
 
                 // set the current node as root
@@ -649,18 +692,14 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
             public void widgetSelected(SelectionEvent event) {
 
                 // make sure that there is a root node
+                branchFilter = null;
                 currentETRootNode = getCurrentETRootNode();
-                if (currentETRootNode == null) {
-                    // if nothing was set take standard root
-                    currentETRootNode = getRootETNode(getSelectedNode());
-                }
                 // save the actual root
                 setCurrentETRootNode(currentETRootNode);
                 collapseFilter.addNodetoCollapse(getSelectedNode());
 
                 // clear the View
                 clearView();
-
                 TreeBranch tb = buildTreeBranch(currentETRootNode, null,
                         collapseFilter);
 
@@ -686,12 +725,9 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
             public void widgetSelected(SelectionEvent event) {
 
+                branchFilter = null;
                 // make sure that there is a root node
                 currentETRootNode = getCurrentETRootNode();
-                if (currentETRootNode == null) {
-                    // if nothing was set take standard root
-                    currentETRootNode = getRootETNode(getSelectedNode());
-                }
                 // save the actual root
                 setCurrentETRootNode(currentETRootNode);
                 collapseFilter.removeNodetoCollapse(getSelectedNode());
@@ -713,6 +749,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
         itemIsolated = new MenuItem(classMenu, SWT.PUSH);
         itemIsolated.setText("Isolate Path");
         itemIsolated.addSelectionListener(new SelectionListener() {
+
             public void widgetDefaultSelected(SelectionEvent event) {
             }
 
@@ -723,11 +760,13 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                     // clear the View
                     clearView();
 
+                    branchFilter = new BranchFilter(
+                            new ETPath(getRootETNode(getSelectedNode()),
+                                    getSelectedNode()));
+
                     TreeBranch tb = buildTreeBranch(
                             getRootETNode(getSelectedNode()), null,
-                            new BranchFilter(new ETPath(
-                                    getRootETNode(getSelectedNode()),
-                                    getSelectedNode())));
+                            branchFilter);
 
                     // add the isolated path
                     root.addBranch(tb);
@@ -738,11 +777,10 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                     itemIsolated.setEnabled(false);
 
                 } catch (RuntimeException e) {
-                    MessageDialog
-                            .openInformation(PlatformUI.getWorkbench()
-                                    .getActiveWorkbenchWindow().getShell(),
-                                    "Collapse Tree",
-                                    "Failed to collapse tree! Please select a leaf node.");
+                    MessageDialog.openInformation(PlatformUI.getWorkbench()
+                            .getActiveWorkbenchWindow().getShell(),
+                            "Collapse Tree",
+                            "Failed to collapse tree! Please select a node.");
                     e.printStackTrace();
                 }
 
@@ -763,6 +801,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                 setCurrentETRootNode(getRootETNode(getSelectedNode()));
 
                 // clean up
+                branchFilter = null;
                 collapseFilter.clearCollapseMarkers(currentETRootNode);
                 collapseFilter.clear();
 
@@ -869,6 +908,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
         // manager.add(this.useBranchLabelsAction);
         manager.add(clearViewAction);
         manager.add(new Separator());
+        manager.add(recomputeWatchpoints);
+        manager.add(new Separator());
         manager.add(decisionProcedureAction);
         manager.add(new Separator());
         manager.add(this.testCaseAction);
@@ -968,7 +1009,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
         rootGroup.setLayout(new GridLayout());
         GridData rootGroupLData = new GridData();
         rootGroupLData.widthHint = 237;
-        rootGroupLData.heightHint = 120;
+        rootGroupLData.heightHint = 134;
         rootGroup.setLayoutData(rootGroupLData);
         // for development purpose...disabled in normal runs
         if (debug) {
@@ -1048,7 +1089,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
         major.setLayoutData(new GridLayout());
         GridData majorLData = new GridData();
         majorLData.widthHint = 200;
-        majorLData.heightHint = 26;
+        majorLData.heightHint = 32;
         major.setLayoutData(majorLData);
 
         major.setMinimum(10);
@@ -1069,7 +1110,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
         minor.setLayoutData(new GridLayout());
         GridData minorLData = new GridData();
         minorLData.widthHint = 200;
-        minorLData.heightHint = 25;
+        minorLData.heightHint = 32;
         minor.setLayoutData(minorLData);
 
         minor.setMinimum(10);
@@ -1114,6 +1155,25 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
             }
         });
 
+        Group wpGroup = new Group(localShell, 0);
+        wpGroup.setText("Watchpoint Information");
+        
+        GridData wpGroupLData = new GridData();
+        wpGroupLData.verticalAlignment = GridData.FILL;
+        wpGroupLData.horizontalAlignment = GridData.FILL;
+        wpGroupLData.grabExcessHorizontalSpace = true;
+        wpGroupLData.grabExcessVerticalSpace = true;
+        wpGroup.setLayoutData(bcGroupLData);
+        wpGroup.setLayout(new GridLayout());
+        
+        wpInfo = new List(wpGroup, SWT.READ_ONLY | SWT.MULTI
+                | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
+        GridData wpInfoControlLData = new GridData();
+        wpInfoControlLData.verticalAlignment = GridData.FILL;
+        wpInfoControlLData.horizontalAlignment = GridData.FILL;
+        wpInfoControlLData.grabExcessHorizontalSpace = true;
+        wpInfoControlLData.grabExcessVerticalSpace = true;
+        wpInfo.setLayoutData(wpInfoControlLData);
     }
 
     /**
@@ -1225,6 +1285,66 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
         };
         clearViewAction.setToolTipText("clears the view");
         clearViewAction.setText("Clear View");
+
+        recomputeWatchpoints = new Action() {
+            public void run() {
+                try {
+                    LinkedList<ETNode> nodesToEvaluate;
+                    Filter f = new TreeFilter();
+                    currentETRootNode = getCurrentETRootNode();
+                    if (branchFilter != null) {
+                        f = branchFilter;
+                        nodesToEvaluate = branchFilter.getPath().getPath();
+                    } else {
+                        if (collapseFilter != null) {
+                            f = collapseFilter;
+                            nodesToEvaluate = getETasList(currentETRootNode);
+                            for (ETNode node : nodesToEvaluate) {
+                                if (!f.filter(node)) {
+                                    nodesToEvaluate.remove(node);
+                                }
+                            }
+                        } else {
+                            nodesToEvaluate = getETasList(currentETRootNode);
+                        }
+                    }
+                    identifyWatchpoints(nodesToEvaluate);
+                    // clear the View
+                    clearView();
+                    TreeBranch tb = buildTreeBranch(currentETRootNode, null, f);
+                    // draw the new view of the tree
+                    root.addBranch(tb);
+                    sketchStartUpConnection(tb);
+                } catch (OutOfMemoryError oome) {
+                    System.out.println("OUT OF MEMORY ERROR!!!");
+                }
+            }
+
+        };
+        recomputeWatchpoints
+                .setToolTipText("recomputes all watchpoints for the current execution tree");
+        recomputeWatchpoints.setText("Recompute Watchpoints");
+    }
+
+    /**
+     * Gets the executiontree, respectively subtree according to the given
+     * ETNode as list.
+     * 
+     * @param etn
+     *            the ETNode containing the current ET
+     * 
+     * @return the executiontree as list
+     */
+    private LinkedList<ETNode> getETasList(ETNode etn) {
+
+        LinkedList<ETNode> executionTree = new LinkedList<ETNode>();
+        executionTree.add(etn);
+        LinkedList<ETNode> children = etn.getChildrenList();
+        for (ETNode node : children) {
+            executionTree.addAll(getETasList(node));
+        }
+        System.out.println("This ET has " + executionTree.size() + " nodes.");
+        return executionTree;
     }
 
     /**
@@ -1238,9 +1358,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
             if (currentRoot == null) {
                 return;
             }
-
             clearView();
-
             /**
              * This distinction is only for debugging purposes and should be
              * removed in the final release. SLET3 is what the user normally
@@ -1263,7 +1381,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
             if (ExecutionTree.treeStyle == ExecutionTree.SLET3) {
 
-                identifyWatchpoints(etn);
+                identifyWatchpoints(WatchpointUtil.getAllLeafETNodes(etn));
                 treebranch = buildTreeBranch(etn, null, new TreeFilter());
                 this.root.addBranch(treebranch);
 
@@ -1607,8 +1725,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
      * @return the root et node
      */
     private ETNode getRootETNode(ETNode currentNode) {
-        while (currentNode.getParent().getParent() != null) {
 
+        while (currentNode.getParent().getParent() != null) {
             currentNode = currentNode.getParent();
         }
         return currentNode;
@@ -1664,7 +1782,6 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
             });
 
         }
-
     }
 
     /**
@@ -1679,14 +1796,15 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
     }
 
     /**
-     * Gets the current ETRootNode. The parameter can be an arbitrary node from
-     * the actual tree. This makes sure we can track all children.
+     * Gets the current ETRootNode. This makes sure we can track all children.
      * 
      * @return the currentETRootNode
      */
     private ETNode getCurrentETRootNode() {
 
+        if (currentETRootNode == null) {
+            return getRootETNode(ExecutionTree.getETNode());
+        }
         return currentETRootNode;
     }
-
 }

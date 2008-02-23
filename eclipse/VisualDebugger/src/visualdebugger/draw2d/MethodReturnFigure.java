@@ -10,106 +10,117 @@ import de.uka.ilkd.key.visualdebugger.executiontree.ETMethodReturnNode;
 
 public class MethodReturnFigure extends Figure implements DrawableNode {
 
-	private boolean selected;
-	private boolean isCollapsed;
+    private boolean selected;
+    private boolean isCollapsed;
+    private boolean isWatchpoint;
 
-	static final Color gradient1 = new Color(null, 132, 132, 240);
-	static final Color gradient2 = new Color(null, 76, 84, 216);
-	static final Color gradient12 = new Color(null, 202, 202, 210);
-	static final Color gradient22 = new Color(null, 146, 154, 186);
-	static final Color corner1 = new Color(null, 200, 208, 223);
-	static final Color corner2 = new Color(null, 160, 172, 200);
-	static final Color blue = new Color(null, 152, 168, 200);
-	static final Color shadow = new Color(null, 202, 202, 202);
-	static final int CORNER_SIZE = 00;
+    static final Color gradient1 = new Color(null, 132, 132, 240);
+    static final Color gradient2 = new Color(null, 76, 84, 216);
+    static final Color gradient12 = new Color(null, 202, 202, 210);
+    static final Color gradient22 = new Color(null, 146, 154, 186);
+    static final Color corner1 = new Color(null, 200, 208, 223);
+    static final Color corner2 = new Color(null, 160, 172, 200);
+    static final Color blue = new Color(null, 152, 168, 200);
+    static final Color shadow = new Color(null, 202, 202, 202);
+    static final int CORNER_SIZE = 00;
 
-	final ETMethodReturnNode mrNode;
+    final ETMethodReturnNode mrNode;
 
-	static final Border BORDER = new LineBorder(ColorConstants.black, 1);
-	/** The Constant COLLAPSEDMODEBORDER. */
-    static final Border COLLAPSEDMODEBORDER = new LineBorder(ColorConstants.yellow, 2);
+    static final Border BORDER = new LineBorder(ColorConstants.black, 1);
+    /** The Constant COLLAPSEDMODEBORDER. */
+    static final Border COLLAPSEDMODEBORDER = new LineBorder(
+            ColorConstants.lightGreen, 2);
+    /** The Constant ACTIVEWATCHPOINTBORDER. */
+    static final Border ACTIVEWATCHPOINTBORDER = new LineBorder(
+            ColorConstants.orange, 2);
 
-	private Label label = new Label();
+    private Label label = new Label();
 
-	public MethodReturnFigure(ETMethodReturnNode etNode) {
-		super();
-		this.isCollapsed = etNode.isCollapsed();
-		setBorder(BORDER);
-		setLayoutManager(new StackLayout());
+    public MethodReturnFigure(ETMethodReturnNode etNode) {
+        super();
+        this.isCollapsed = etNode.isCollapsed();
+        this.isWatchpoint = etNode.isWatchpoint();
+        setBorder(BORDER);
+        setLayoutManager(new StackLayout());
 
-		add(label);
+        add(label);
 
-		this.mrNode = etNode;
+        this.mrNode = etNode;
 
-		String st;
-		if (mrNode.getResult() != null)
-			st = "return "
-					+ VisualDebugger.getVisualDebugger().prettyPrint(
-							mrNode.getResult());
-		else
-			st = "return";
+        String st;
+        if (mrNode.getResult() != null)
+            st = "return "
+                    + VisualDebugger.getVisualDebugger().prettyPrint(
+                            mrNode.getResult());
+        else
+            st = "return";
 
-		label.setText(st);
+        label.setText(st);
 
-		String toolTip = "Returned from method:\n "
-				+ VisualDebugger.getMethodString(mrNode.getParent()
-						.getLastMethodInvocation().getMethod()
-						.getMethodDeclaration());
+        String toolTip = "Returned from method:\n "
+                + VisualDebugger.getMethodString(mrNode.getParent()
+                        .getLastMethodInvocation().getMethod()
+                        .getMethodDeclaration());
 
-		this.setToolTip(new Label(toolTip));
-	}
+        this.setToolTip(new Label(toolTip));
+    }
 
-	/**
-	 * @see org.eclipse.draw2d.Figure#paintFigure(org.eclipse.draw2d.Graphics)
-	 */
-	protected void paintFigure(Graphics g) {
-		super.paintFigure(g);
-		if (isCollapsed) {
-			// TODO colors for collapsed nodes
-			g.setForegroundColor(ColorConstants.menuBackgroundSelected);
-			g.setBackgroundColor(ColorConstants.titleGradient);
-			setBorder(COLLAPSEDMODEBORDER);
-		} else {
-			if (selected) {
-				g.setForegroundColor(ColorConstants.menuBackgroundSelected);
-				g.setBackgroundColor(ColorConstants.titleGradient);
-			} else {
+    /**
+     * @see org.eclipse.draw2d.Figure#paintFigure(org.eclipse.draw2d.Graphics)
+     */
+    protected void paintFigure(Graphics g) {
+        super.paintFigure(g);
+        if (isWatchpoint) {
+            g.setForegroundColor(blue);
+            g.setBackgroundColor(ColorConstants.titleGradient);
+            setBorder(ACTIVEWATCHPOINTBORDER);
+        } else {
+            if (isCollapsed) {
+                // TODO colors for collapsed nodes
+                g.setForegroundColor(ColorConstants.menuBackgroundSelected);
+                g.setBackgroundColor(ColorConstants.titleGradient);
+                setBorder(COLLAPSEDMODEBORDER);
+            } else {
+                if (selected) {
+                    g.setForegroundColor(ColorConstants.menuBackgroundSelected);
+                    g.setBackgroundColor(ColorConstants.titleGradient);
+                } else {
 
-				// g.setForegroundColor(gradient1);
-				// g.setBackgroundColor(gradient2);
+                    // g.setForegroundColor(gradient1);
+                    // g.setBackgroundColor(gradient2);
 
-				g.setForegroundColor(ColorConstants.white);
-				g.setBackgroundColor(ColorConstants.white);
+                    g.setForegroundColor(ColorConstants.white);
+                    g.setBackgroundColor(ColorConstants.white);
 
-			}
+                }
+            }
+        }
+        g.fillGradient(getBounds().getResized(-1, -1), true);
+    }
 
-		}
-		g.fillGradient(getBounds().getResized(-1, -1), true);
-	}
+    public void setSelected(boolean value) {
+        this.selected = value;
+        if (selected)
+            label.setForegroundColor(ColorConstants.white);
+        else
+            label.setForegroundColor(null);
+        repaint();
+    }
 
-	public void setSelected(boolean value) {
-		this.selected = value;
-		if (selected)
-			label.setForegroundColor(ColorConstants.white);
-		else
-			label.setForegroundColor(null);
-		repaint();
-	}
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        return ((Label) getChildren().get(0)).getText();
+    }
 
-	/**
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString() {
-		return ((Label) getChildren().get(0)).getText();
-	}
+    public void validate() {
+        repaint();
+        super.validate();
+    }
 
-	public void validate() {
-		repaint();
-		super.validate();
-	}
-
-	public ETMethodReturnNode getETNode() {
-		return mrNode;
-	}
+    public ETMethodReturnNode getETNode() {
+        return mrNode;
+    }
 
 }

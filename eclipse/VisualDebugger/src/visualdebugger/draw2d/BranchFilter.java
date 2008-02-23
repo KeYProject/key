@@ -30,4 +30,8 @@ public class BranchFilter implements Filter{
 	return path.contains(et);
 	}
 
+    public ETPath getPath() {
+        return path;
+    }
+
 }

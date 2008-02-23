@@ -29,14 +29,13 @@ public class CollapseFilter implements Filter {
 	 * (non-Javadoc)
 	 * 
 	 * @see visualdebugger.draw2d.Filter#filter(de.uka.ilkd.key.visualdebugger.executiontree.ETNode)
+	 * @return true, if the etnode is not in registered to this filter
 	 */
 	public boolean filter(ETNode etnode) {
 
 		// hide all nodes that are in the list of children
-		if (children.contains(etnode)) {
-			return false;
-		}
-		return true;
+			return !children.contains(etnode);
+
 	}
 
 	/**

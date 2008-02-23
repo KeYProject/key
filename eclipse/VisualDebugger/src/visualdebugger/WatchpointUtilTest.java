@@ -19,7 +19,7 @@ public class WatchpointUtilTest {
 
         try {
         ETNode etn = init();
-        System.out.println(etn.getChildrenList().size());
+        System.out.println("This ET has "+getETasList(etn).size() +" nodes.");
         WatchpointUtil.getAllLeafETNodes(etn);
         Node[] array = getNode().getProofTreeNodes().toArray();
 
@@ -124,5 +124,23 @@ public class WatchpointUtilTest {
 
     private static ETNode getNode() {
         return etNode;
+    }
+    /**
+     * Gets the executiontree as list.
+     * 
+     * @param etn the ETNode containing the current ET
+     * 
+     * @return the executiontree as list
+     */
+    public static LinkedList<ETNode> getETasList(ETNode etn) {
+        
+        LinkedList<ETNode> executionTree = new LinkedList<ETNode>();
+        executionTree.add(etn);
+        LinkedList<ETNode> children = etn.getChildrenList();
+
+            for (ETNode node : children) {
+                executionTree.addAll(getETasList(node));
+            }
+        return executionTree;
     }
 }

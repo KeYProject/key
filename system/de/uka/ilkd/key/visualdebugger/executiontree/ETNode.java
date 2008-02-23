@@ -2,10 +2,12 @@ package de.uka.ilkd.key.visualdebugger.executiontree;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.ListOfTerm;
 import de.uka.ilkd.key.logic.SLListOfTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.ListOfNode;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.SLListOfNode;
@@ -38,6 +40,7 @@ public class ETNode {
             .getMediator();
 
     private ListOfTerm bc = SLListOfTerm.EMPTY_LIST;
+    private List watchpointsSatisfied = null;
 
     // ListOfTerm pc= SLListOfTerm.EMPTY_LIST;
     private LinkedList<ITNode> itNodes = new LinkedList<ITNode>();
@@ -291,5 +294,13 @@ public class ETNode {
 
     public void setWatchpoint(boolean isWatchpoint) {
         this.isWatchpoint = isWatchpoint;
+    }
+
+    public List<Term> getWatchpointsSatisfied() {
+        return watchpointsSatisfied;
+    }
+
+    public void setWatchpointsSatisfied(List<Term> watchpointsSatisfied) {
+        this.watchpointsSatisfied = watchpointsSatisfied;
     }
 }
