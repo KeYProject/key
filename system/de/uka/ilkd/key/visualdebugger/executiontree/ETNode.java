@@ -40,7 +40,7 @@ public class ETNode {
             .getMediator();
 
     private ListOfTerm bc = SLListOfTerm.EMPTY_LIST;
-    private List watchpointsSatisfied = null;
+    private LinkedList<Term> watchpointsSatisfied = null;
 
     // ListOfTerm pc= SLListOfTerm.EMPTY_LIST;
     private LinkedList<ITNode> itNodes = new LinkedList<ITNode>();
@@ -296,11 +296,11 @@ public class ETNode {
         this.isWatchpoint = isWatchpoint;
     }
 
-    public List<Term> getWatchpointsSatisfied() {
+    public LinkedList<Term> getWatchpointsSatisfied() {
         return watchpointsSatisfied;
     }
 
-    public void setWatchpointsSatisfied(List<Term> watchpointsSatisfied) {
+    public void setWatchpointsSatisfied(LinkedList<Term> watchpointsSatisfied) {
         this.watchpointsSatisfied = watchpointsSatisfied;
     }
 }

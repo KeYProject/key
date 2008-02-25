@@ -1921,5 +1921,9 @@ public class VisualDebugger {
         this.watchPointManager = watchPointManager;
     }
 
+    public ProgressMonitor getEtProgressMonitor() {
+        return etProgressMonitor;
+    }
+
 
 }

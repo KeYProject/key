@@ -31,7 +31,7 @@ public class ProofStarter {
 
     private Strategy strategy;
 
-    private List progressMonitors = new LinkedList();
+    private List<ProgressMonitor> progressMonitors = new LinkedList<ProgressMonitor>();
 
     private boolean useDecisionProcedures;
     

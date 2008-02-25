@@ -72,8 +72,13 @@ import visualdebugger.draw2d.TreeBranch;
 import visualdebugger.draw2d.TreeFilter;
 import visualdebugger.draw2d.TreeRoot;
 import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.logic.ListOfTerm;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.IteratorOfNode;
 import de.uka.ilkd.key.proof.ListOfGoal;
 import de.uka.ilkd.key.proof.ListOfNode;
@@ -311,11 +316,10 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                 }
             }
             return branch;
-        } 
-        catch (OutOfMemoryError oome) {
+        } catch (OutOfMemoryError oome) {
             System.out.println("OUT OF MEMORY ERROR!!!");
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
+            System.out.println(t.toString());
             t.printStackTrace();
         }
         return null;
@@ -405,7 +409,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
      * @return the figure
      */
     private Figure createNode(ETNode etNode) {
-        
+
+        final LinkedList<Term> activeWPs = etNode.getWatchpointsSatisfied();
         if (etNode instanceof ETStatementNode) {
             final SourceElementFigure node = new SourceElementFigure(
                     (ETStatementNode) etNode);
@@ -416,9 +421,27 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                 }
 
                 public void mousePressed(MouseEvent me) {
-                    wpInfo.removeAll();
-                    wpInfo.add("Wp irgendwas");
+
                     setSelected(node);
+                    wpInfo.removeAll();
+                    try {
+                        if (activeWPs != null) {
+                            for (Term term : activeWPs) {
+
+                                SourceElement firstElement = term.sub(0).executableJavaBlock().program().getFirstElement();
+                                 StatementBlock sb = (StatementBlock) firstElement.getLastElement();
+                                                                
+                                System.out.println("1:"+firstElement.toString());
+                                System.out.println("2:"+firstElement.getClass());
+                                System.out.println("3:"+firstElement.getLastElement().toString());
+                                System.out.println("4:"+firstElement.getLastElement().getClass());
+  
+                                wpInfo.add(sb.toString().replaceFirst("myDummy=", ""));
+                            }
+                        }
+                    } catch (Throwable t) {
+                        System.out.println(t.toString());
+                    }
                 }
             });
             return node;
@@ -646,6 +669,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                         .getETNode();
                 LinkedList<ETNode> node = new LinkedList<ETNode>();
                 node.add(etn);
+                try {
                 identifyWatchpoints(node);
                 // clear the View
                 clearView();
@@ -653,7 +677,11 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                         new TreeFilter());
                 // draw the new view of the tree
                 root.addBranch(tb);
-                sketchStartUpConnection(tb);
+                sketchStartUpConnection(tb); }
+                catch (Throwable t){
+                    System.out.println(t.toString());
+                    
+                }
             }
         });
         item = new MenuItem(classMenu, SWT.SEPARATOR);
@@ -1157,7 +1185,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
         Group wpGroup = new Group(localShell, 0);
         wpGroup.setText("Watchpoint Information");
-        
+
         GridData wpGroupLData = new GridData();
         wpGroupLData.verticalAlignment = GridData.FILL;
         wpGroupLData.horizontalAlignment = GridData.FILL;
@@ -1165,9 +1193,9 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
         wpGroupLData.grabExcessVerticalSpace = true;
         wpGroup.setLayoutData(bcGroupLData);
         wpGroup.setLayout(new GridLayout());
-        
-        wpInfo = new List(wpGroup, SWT.READ_ONLY | SWT.MULTI
-                | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
+
+        wpInfo = new List(wpGroup, SWT.READ_ONLY | SWT.MULTI | SWT.BORDER
+                | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
         GridData wpInfoControlLData = new GridData();
         wpInfoControlLData.verticalAlignment = GridData.FILL;
         wpInfoControlLData.horizontalAlignment = GridData.FILL;
@@ -1317,6 +1345,9 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                     sketchStartUpConnection(tb);
                 } catch (OutOfMemoryError oome) {
                     System.out.println("OUT OF MEMORY ERROR!!!");
+                } catch (Throwable t) {
+                    System.out.println(t.toString());
+                    System.out.println("An Error occured!");
                 }
             }
 

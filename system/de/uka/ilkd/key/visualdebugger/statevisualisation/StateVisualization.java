@@ -384,6 +384,7 @@ public class StateVisualization {
 
     private void initProofStarter(ProofOblInput po) {
         ps = new ProofStarter();
+        ps.addProgressMonitor(VisualDebugger.getVisualDebugger().getEtProgressMonitor());
         ps.init(po);
         ps.setMaxSteps(maxProofSteps);
         ps.setUseDecisionProcedure(useDecisionProcedures);

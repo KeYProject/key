@@ -69,8 +69,7 @@ public class SourceElementFigure extends Figure implements DrawableNode {
             ColorConstants.orange, 2);
 
     /** The Constant ROUNDEDBORDER. */
-    static final Border ROUNDEDBORDER = new RoundedBorder(ColorConstants.black,
-            1);
+    static final Border ROUNDEDBORDER = new RoundedBorder(ColorConstants.black, 1);
     /**
      * The Class RoundedBorder.
      */
@@ -102,9 +101,10 @@ public class SourceElementFigure extends Figure implements DrawableNode {
             }
             tempRect.shrink(getWidth() / 2, getWidth() / 2);
             graphics.setLineWidth(getWidth());
-            if (getColor() != null)
-            graphics.drawRoundRectangle(tempRect, 12, 12);
-            graphics.setForegroundColor(getColor());
+            tempRect.crop(insets);
+            if (getColor() != null) graphics.setForegroundColor(getColor());
+            graphics.drawRoundRectangle(tempRect, 12 , 12 );
+            
         }
     }
 

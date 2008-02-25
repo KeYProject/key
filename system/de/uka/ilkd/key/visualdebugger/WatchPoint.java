@@ -90,5 +90,4 @@ public class WatchPoint {
     public void setEnabled(boolean isEnabled) {
         this.enabled = isEnabled;
     }
-
 }

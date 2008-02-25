@@ -20,6 +20,7 @@ public class WatchPointManager {
 
     /** The watch points. */
     private LinkedList<WatchPoint> watchPoints = new LinkedList<WatchPoint>();
+
     private ListOfTerm listOfWatchpoints;
 
     /**
@@ -73,58 +74,63 @@ public class WatchPointManager {
         System.out.println("translateWatchpoints()...");
         LinkedList<WatchPoint> watchpoints = getWatchPoints();
         listOfWatchpoints = SLListOfTerm.EMPTY_LIST;
-        assert (watchpoints != null);
+        try {
+            assert (watchpoints != null);
 
-        if (watchpoints.isEmpty()) {
-            System.out
-                    .println("translateWatchpoints: No watches created so far");
-            return 0;
-        } else {
+            if (watchpoints.isEmpty()) {
+                System.out
+                        .println("translateWatchpoints: No watches created so far");
+                return 0;
+            } else {
 
-            Namespace progVarNS = new Namespace();
+                Namespace progVarNS = new Namespace();
 
-            final JavaInfo ji = services.getJavaInfo();
+                final JavaInfo ji = services.getJavaInfo();
 
-            for (int i = 0; i < watchpoints.size(); i++) {
+                for (int i = 0; i < watchpoints.size(); i++) {
 
-                WatchPoint wp = watchpoints.get(i);
+                    WatchPoint wp = watchpoints.get(i);
 
-                if (wp.isEnabled()) {
-                    StringBuffer buffer = new StringBuffer();
-                    String typeOfSource = wp.getTypeOfSource();
+                    if (wp.isEnabled()) {
+                        StringBuffer buffer = new StringBuffer();
+                        String typeOfSource = wp.getTypeOfSource();
 
-                    String nameOfSelf = "self_XY";
-                    ProgramElementName selfName = new ProgramElementName(
-                            nameOfSelf);
+                        String nameOfSelf = "self_XY";
+                        ProgramElementName selfName = new ProgramElementName(
+                                nameOfSelf);
 
-                    // check namespace
-                    while (services.getNamespaces().lookup(selfName) != null) {
-                        nameOfSelf.concat("Z");
-                        selfName = new ProgramElementName(nameOfSelf);
+                        // check namespace
+                        while (services.getNamespaces().lookup(selfName) != null) {
+                            nameOfSelf.concat("Z");
+                            selfName = new ProgramElementName(nameOfSelf);
+                        }
+
+                        ProgramVariable var_self = new LocationVariable(
+                                selfName, ji.getKeYJavaType(typeOfSource));
+                        ProgramVariable var_dummy = new LocationVariable(
+                                new ProgramElementName(wp.getName()), services
+                                        .getTypeConverter().getBooleanType());
+                        progVarNS.add(var_self);
+                        progVarNS.add(var_dummy);
+
+                        buffer.append("\\exists " + typeOfSource + " x; {"
+                                + selfName + ":= x } \\<{method-frame( source="
+                                + typeOfSource + ",this=" + selfName);
+                        buffer.append(" ) : { " + wp.getName() + " = "
+                                + wp.getExpression());
+                        buffer.append(";} }\\>" + wp.getName() + " = TRUE");
+
+                        Term term = ProblemLoader.parseTerm(buffer.toString(),
+                                services, new Namespace(), progVarNS);
+
+                        listOfWatchpoints = listOfWatchpoints.append(term);
                     }
-
-                    ProgramVariable var_self = new LocationVariable(selfName,
-                            ji.getKeYJavaType(typeOfSource));
-                    ProgramVariable var_dummy = new LocationVariable(
-                            new ProgramElementName(wp.getName()), services
-                                    .getTypeConverter().getBooleanType());
-                    progVarNS.add(var_self);
-                    progVarNS.add(var_dummy);
-
-                    buffer.append("\\exists " + typeOfSource + " x; {"
-                            + selfName + ":= x } \\<{method-frame( source="
-                            + typeOfSource + ",this=" + selfName);
-                    buffer.append(" ) : { " + wp.getName() + " = "
-                            + wp.getExpression());
-                    buffer.append(";} }\\>" + wp.getName() + " = TRUE");
-                    
-                    Term term = ProblemLoader.parseTerm(buffer.toString(),
-                            services, new Namespace(), progVarNS);
-
-                    listOfWatchpoints = listOfWatchpoints.append(term);
                 }
+                return listOfWatchpoints.size();
             }
-            return listOfWatchpoints.size();
+        } catch (Throwable t) {
+            System.out.println(t.toString());
+            return -1;
         }
     }
 
@@ -142,5 +148,5 @@ public class WatchPointManager {
         assert listOfWatchpoints != null : "listOfWatchpoints is null";
         return listOfWatchpoints;
     }
-    
+
 }
