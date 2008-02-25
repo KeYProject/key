@@ -332,7 +332,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
      *            the ETNode
      */
     private void identifyWatchpoints(LinkedList<ETNode> nodesToEvaluate) {
-
+// FIXME: create getter/setter for watchpoints to avoid translation overhead
         ListOfTerm watchpoints = vd.getWatchPointManager()
                 .getListOfWatchpoints(vd.getMediator().getServices());
         if (!watchpoints.isEmpty()) {
@@ -1411,8 +1411,10 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
             } else
 
             if (ExecutionTree.treeStyle == ExecutionTree.SLET3) {
-
-                identifyWatchpoints(WatchpointUtil.getAllLeafETNodes(etn));
+            	
+                LinkedList<ETNode> allLeafETNodes = WatchpointUtil.getAllLeafETNodes(etn);
+				System.out.println("ETV identfy for : " + allLeafETNodes.size() + " ETNODE (LEAVES)");
+                identifyWatchpoints(allLeafETNodes);
                 treebranch = buildTreeBranch(etn, null, new TreeFilter());
                 this.root.addBranch(treebranch);
 

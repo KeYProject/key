@@ -96,6 +96,7 @@ public class WatchpointUtil {
                             + intersection.size());
         }
         etn.setWatchpointsSatisfied(intersection);
+        System.out.println("LEAVING satisfiesWP...");
         return !intersection.isEmpty();
     }
 
@@ -123,16 +124,16 @@ public class WatchpointUtil {
                 if (term.op() instanceof Modality) {
                     ProgramPrefix programPrefix = (ProgramPrefix) term
                             .javaBlock().program();
-                    System.out.println("ProgramPrefix : "
-                            + programPrefix.toString());
 
                     SourceElement firstStatement = PosInProgram.getProgramAt(
                             programPrefix.getFirstActiveChildPos(),
                             programPrefix).getFirstElement();
 
                     if (firstStatement.toString().startsWith("Debug.sep")) {
+                        System.out.println("LEAVING findPos WITH result...");
                         return pos;
                     } else {
+                        System.out.println("LEAVING findPos WITHOUT result...");
                         return null;
                     }
                 } else {
@@ -171,6 +172,12 @@ public class WatchpointUtil {
     public static boolean evalutateWatchpoint(Term watchpoint, Sequent seq,
             PosInOccurrence pos, Proof proof, int maxsteps) {
 
+        if(proof == null) throw new NullPointerException("proof was null");
+        if(pos == null) throw new NullPointerException("pos was null");
+        System.out.println("maxsteps : " + maxsteps);
+        if(watchpoint == null) throw new NullPointerException("watchpoint was null");
+        if(seq == null) throw new NullPointerException("seq was null");
+      
         LinkedList<Update> updates = new LinkedList<Update>();
         UpdateFactory updateFactory = new UpdateFactory(proof.getServices(),
                 proof.simplifier());
@@ -183,30 +190,33 @@ public class WatchpointUtil {
             if (operator instanceof QuanUpdateOperator) {
 
                 Update update = Update.createUpdate(term);
-                System.out.println("update.toString: " + update.toString());
+                System.out.println("evaluateWP.update.toString: " + update.toString());
                 updates.addFirst(update);
             }
         }
-
+        System.out.println("evaluateWP:collected updates...");
         for (Update update : updates) {
             watchpoint = updateFactory.prepend(update, watchpoint);
         }
-
+        System.out.println("evaluateWP:builded wp terms..." + watchpoint.toString());
         ConstrainedFormula newCF = new ConstrainedFormula(watchpoint);
+        System.out.println("1");
         seq = seq.changeFormula(newCF, pos).sequent();
-
+        System.out.println("2");
+        try{
         // start side proof
         ProofStarter ps = new ProofStarter();
         ProofEnvironment proofEnvironment = proof.env();
         InitConfig initConfig = proofEnvironment.getInitConfig();
-
         WatchpointPO watchpointPO = new WatchpointPO("WatchpointPO", seq);
+        System.out.println("6");
         watchpointPO.setIndices(initConfig.createTacletIndex(), initConfig
                 .createBuiltInRuleIndex());
-
+        System.out.println("7");
         StrategyProperties strategyProperties = DebuggerStrategy
                 .getDebuggerStrategyProperties(true, false, false,
                         SLListOfTerm.EMPTY_LIST);
+        System.out.println("8");
         final StrategyFactory factory = new DebuggerStrategy.Factory();
         Strategy strategy = (factory.create(proof, strategyProperties));
         watchpointPO.setProofSettings(proof.getSettings());
@@ -214,9 +224,18 @@ public class WatchpointUtil {
         ps.setStrategy(strategy);
         ps.setMaxSteps(maxsteps);
         ps.init(watchpointPO);
+        System.out.println("14");
+        if(strategy == null) throw new NullPointerException("strategy was null");
+        if(watchpointPO == null) throw new NullPointerException("watchpointPO was null");
+        if(proof.getSettings() == null) throw new NullPointerException("settings was null");
         ps.run(proofEnvironment);
-
-        return ps.getProof().closed();
+        System.out.println("LEAVING evaluateWP...");
+        return ps.getProof().closed();}
+        catch(Throwable t){
+            System.out.println(t.toString());
+            t.printStackTrace();
+        }
+        return false;
     }
 
     /**
@@ -346,7 +365,6 @@ public class WatchpointUtil {
                 leaves.addAll(getAllLeafETNodes(node));
             }
         }
-        System.out.println("size of ETNode-leaves: " + leaves.size());
         return leaves;
 
     }
@@ -396,10 +414,14 @@ public class WatchpointUtil {
         System.out.println("setting watchpoints active...");
         try {
             for (ETNode node : nodes) {
-                node
-                        .setWatchpoint(satisfiesWatchpoint(
-                                getLeafNodesInETNode(node.getProofTreeNodes()
-                                        .toArray()), watchpoints, node));
+                
+                HashSet<Node> leafNodesInETNode = getLeafNodesInETNode(node.getProofTreeNodes().toArray());
+                System.out.println("leafNodesINETNODE: "+ leafNodesInETNode.size());
+                boolean satisfiesWatchpoint = satisfiesWatchpoint(
+                        leafNodesInETNode,
+                        watchpoints, node);
+                node.setWatchpoint(satisfiesWatchpoint);
+                System.out.println("LEAVING setActiveWatchpoint...");
             }
         } catch (Throwable t) {
             System.out.println(t.toString());

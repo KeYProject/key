@@ -183,7 +183,7 @@ public class ProofStarter {
             throw new IllegalStateException(
                     "Proofstarter must be initialized before.");
         }
-
+        System.out.println("maxsteps 21: " + maxSteps);
         final Strategy oldStrategy = proof.getActiveStrategy();
         if (strategy == null) {
             // in this case take the strategy of the proof settings
@@ -192,42 +192,44 @@ public class ProofStarter {
             proof.setActiveStrategy(strategy);
         }
         if (maxSteps == -1) {
+            System.out.println("22-1");
             // take default settings
             setMaxSteps(proof.getSettings().getStrategySettings().getMaxSteps());
         }
-
+        System.out.println("23");
         final BuiltInRule decisionProcedureRule;
         if (useDecisionProcedures) {
             decisionProcedureRule = findSimplifyRule();
         } else {
             decisionProcedureRule = null;
         }
-
         env.registerProof(po, po.getPO());
-
         goalChooser.init(proof, proof.openGoals());
         final ProofListener pl = new ProofListener();
 
         Goal.addRuleAppListener(pl);
-        
+        System.out.println("27");
         try {
-
+            System.out.println("28");
             int countApplied = 0;
+            if(progressMonitors == null) throw new Throwable("progressmon was null");
             synchronized (progressMonitors) {
                 initProgressMonitors(maxSteps);
                 while (countApplied < maxSteps && applyAutomaticRule()) {
                     countApplied++;
+                    System.out.println("countApplied: "  +countApplied);
                     informProgressMonitors(countApplied);
                 }
-            }
+            }System.out.println("30");
             if (useDecisionProcedures && decisionProcedureRule != null) {
                 applySimplificationOnGoals(proof.openGoals(), decisionProcedureRule);
-            }            
+            }    System.out.println("31");        
         } catch (Throwable e) {
             System.err.println(e);
             e.printStackTrace();
             return false;
         } finally {
+            System.out.println("32");  
             Goal.removeRuleAppListener(pl);
             env.removeProofList(po.getPO());
             proof.setActiveStrategy(oldStrategy);
