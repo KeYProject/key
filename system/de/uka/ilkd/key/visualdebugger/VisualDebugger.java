@@ -2,19 +2,11 @@ package de.uka.ilkd.key.visualdebugger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.swing.SwingUtilities;
 
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.ProverTaskListener;
+import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -25,58 +17,19 @@ import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
-import de.uka.ilkd.key.logic.ArrayOfProgramPrefix;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
-import de.uka.ilkd.key.logic.IteratorOfConstrainedFormula;
-import de.uka.ilkd.key.logic.IteratorOfTerm;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.ListOfTerm;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.SLListOfTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SetAsListOfTerm;
-import de.uka.ilkd.key.logic.SetOfTerm;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.ArrayOp;
-import de.uka.ilkd.key.logic.op.AttributeOp;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IteratorOfProgramMethod;
-import de.uka.ilkd.key.logic.op.ListOfProgramMethod;
-import de.uka.ilkd.key.logic.op.ListOfProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuanUpdateOperator;
-import de.uka.ilkd.key.logic.op.SLListOfProgramVariable;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IteratorOfGoal;
-import de.uka.ilkd.key.proof.ListOfGoal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.ProblemLoader;
-import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.rule.ListOfRuleSet;
-import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -100,9 +53,6 @@ public class VisualDebugger {
 
     /** The Constant debugPackage. */
     public static final String debugPackage = "visualdebugger";
-
-    /** The key bugger mode. */
-    static boolean keyBuggerMode;
 
     /** The quan_splitting. */
     public static boolean quan_splitting = false;
@@ -280,8 +230,8 @@ public class VisualDebugger {
     /** The listeners. */
     private LinkedList listeners = new LinkedList();
 
-    /** The main. */
-    private Main main;
+    /** The Main. */
+    private IMain main;
 
     /** The max proof steps for state vis computation. */
     protected int maxProofStepsForStateVisComputation = 8000;
@@ -367,8 +317,8 @@ public class VisualDebugger {
     public ListOfProgramVariable arrayOfExpression2ListOfProgVar(
             ArrayOfExpression aoe, int start) {
         ListOfProgramVariable lopv = SLListOfProgramVariable.EMPTY_LIST;
-        for (int i = start; i < aoe.size(); i++) {
-            lopv = lopv.append((ProgramVariable) aoe.getExpression(i));
+        for (int i = aoe.size() - 1; i >= start ; i--) {
+            lopv = lopv.prepend((ProgramVariable) aoe.getExpression(i));
         }
         return lopv;
     }
@@ -382,15 +332,15 @@ public class VisualDebugger {
      * @return the list of term
      */
     private ListOfTerm collectResult(Sequent s) {
-        IteratorOfConstrainedFormula itc = s.antecedent().iterator();
+        final IteratorOfConstrainedFormula itAntec = s.antecedent().iterator();
         ListOfTerm result = SLListOfTerm.EMPTY_LIST;
-        while (itc.hasNext()) {
-            result = result.append(itc.next().formula());
+        while (itAntec.hasNext()) {
+            result = result.append(itAntec.next().formula());
         }
-        itc = s.succedent().iterator();
-        while (itc.hasNext()) {
+        final IteratorOfConstrainedFormula itSucc = s.succedent().iterator();
+        while (itSucc.hasNext()) {
             result = result.append(TermFactory.DEFAULT.createJunctorTerm(
-                    Op.NOT, itc.next().formula()));
+                    Op.NOT, itSucc.next().formula()));
         }
 
         return result;
@@ -455,27 +405,25 @@ public class VisualDebugger {
         JavaBlock jb = this.modalityTopLevel(pio);
         print("Extracting Symbolic Input Values-----------------------");
         ProgramVariable selfPV2 = null;
-        MethodBodyStatement mbs = (MethodBodyStatement) this
-                .getActStatement(modalityTopLevel(pio).program());
-        ReferencePrefix ref = mbs.getMethodReference().getReferencePrefix();
 
+        final MethodBodyStatement mbs = (MethodBodyStatement) 
+            getActStatement(modalityTopLevel(pio).program());
+        final ReferencePrefix ref = mbs.getMethodReference().getReferencePrefix();
+
+        final Services services = n.proof().getServices();
+        debuggingMethod = mbs.getProgramMethod(services);
+        
+        assert debuggingMethod != null : "Cannot determine method to debug.";
+
+        setStaticMethod(debuggingMethod.isStatic());
+        
         if (ref instanceof ProgramVariable) {
             setSelfPV((ProgramVariable) ref);
-            setStaticMethod(false);
             selfPV2 = (ProgramVariable) ref;
-
-            print("SelfPV " + ref);
-
         } else {
-
-            final KeYJavaType kjt = ((TypeRef) ref).getKeYJavaType();
-            setStaticMethod(true);
-            setType((ClassType) kjt.getJavaType());
-            print("Static Method of Type " + kjt.getJavaType());
-
+            setType((ClassType) mbs.getBodySource().getJavaType());
         }
 
-        debuggingMethod = mbs.getProgramMethod(mediator.getServices());
         // debuggingMethod.getVariableSpecification(index)
 
         ArrayOfExpression args = mbs.getArguments();
@@ -486,38 +434,29 @@ public class VisualDebugger {
             if (f.op() instanceof QuanUpdateOperator) {
                 final QuanUpdateOperator op = (QuanUpdateOperator) f.op();
                 for (int i = 0; i < op.locationCount(); i++) {
-                    if (op.location(f, i).op() instanceof ProgramVariable) {
-                        if (contains(args, (ProgramVariable) op.location(f, i)
-                                .op())
-                                || (selfPV2 != null && selfPV2.equals(op
-                                        .location(f, i).op()))) {
-                            map.put(op.value(f, i), op.location(f, i));
-                            map2.put(op.location(f, i), op.value(f, i));
+                    final Term location = op.location(f, i);
+                    if (location.op() instanceof ProgramVariable) {
+                        if (contains(args, (ProgramVariable) location.op())
+                                || (selfPV2 != null && selfPV2.equals(location.op()))) {
+                            map.put(op.value(f, i), location);
+                            map2.put(location, op.value(f, i));
                         }
                     }
                 }
-
             }
-
         }
 
         // set symb input values as list;
         this.symbolicInputValuesAsList = SLListOfTerm.EMPTY_LIST;
-        for (int i = 0; i < args.size(); i++) {
+        for (int i = args.size() - 1; i>=0 ; i--) {
             ProgramVariable next = (ProgramVariable) args.getExpression(i);
-            Term val = (Term) map2.get(TermFactory.DEFAULT
-                    .createVariableTerm(next));// TODO
-            this.symbolicInputValuesAsList = this.symbolicInputValuesAsList
-                    .append(val);
-
+            final Term val = (Term) 
+                map2.get(TermFactory.DEFAULT.createVariableTerm(next));// TODO
+            this.symbolicInputValuesAsList = 
+                this.symbolicInputValuesAsList.prepend(val);
         }
-
         setTerm2InputPV(map);
-        setInputPV2term(map2);
-        print("t2i " + map);
-        print("i2t " + map2);
-        print("Symbolic Input Values as list " + this.symbolicInputValuesAsList);
-
+        setInputPV2term(map2);        
     }
 
     /**
@@ -717,7 +656,7 @@ public class VisualDebugger {
                     .constrainedFormula().formula().op();
             Term f = pio.constrainedFormula().formula();
             for (int i = 0; i < op.locationCount(); i++) {
-                Term t = (op.location(f, i));
+                Term t = op.location(f, i);
                 if (t.op() instanceof AttributeOp /*
                                                      * && !((ProgramVariable)
                                                      * ((AttributeOp)
@@ -1097,7 +1036,7 @@ public class VisualDebugger {
 
                     if (m != null) {
                         ProgramVariableCollector pvc = new ProgramVariableCollector(
-                                m);
+                                m, mediator.getServices());
                         pvc.start();
                         pvs.addAll(pvc.result());
                     }
@@ -1611,6 +1550,7 @@ public class VisualDebugger {
         if (terms.size() == 0)
             return terms;
         final DebuggerPO po = new DebuggerPO("DebuggerPo");
+
         final ProofStarter ps = new ProofStarter();
         if (etProgressMonitor != null) {
             ps.addProgressMonitor(etProgressMonitor);
@@ -1633,12 +1573,16 @@ public class VisualDebugger {
         ps.setUseDecisionProcedure(useDecisionProcedures);
         ps.run(proofEnvironment);
 
-        setProofStrategy(proof, true, false, SLListOfTerm.EMPTY_LIST);
         if (etProgressMonitor != null) {
             ps.removeProgressMonitor(etProgressMonitor);
         }
-        return collectResult(proof.openGoals().iterator().next().node()
-                .sequent());
+
+        setProofStrategy(proof, true, false, SLListOfTerm.EMPTY_LIST);
+
+        final ListOfGoal openGoals = proof.openGoals();
+        assert openGoals.size() == 1;
+        
+        return collectResult(openGoals.head().sequent());
     }
 
     /**
@@ -1886,7 +1830,8 @@ public class VisualDebugger {
          * 
          * @see de.uka.ilkd.key.gui.ProverTaskListener#taskFinished()
          */
-        public void taskFinished() {
+        public void taskFinished(TaskFinishedInfo info) {
+            // TODO Auto-generated method stub
             pm.setProgress(300);
         }
 
@@ -1911,6 +1856,8 @@ public class VisualDebugger {
             pm.setMaximum(300);
 
         }
+
+        
     }
 
     public WatchPointManager getWatchPointManager() {

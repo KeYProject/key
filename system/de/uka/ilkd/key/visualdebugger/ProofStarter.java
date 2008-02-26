@@ -6,6 +6,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.proofevent.IteratorOfNodeReplacement;
@@ -39,7 +40,7 @@ public class ProofStarter {
     public ProofStarter() {
         this.goalChooser = new DefaultGoalChooser();
         // for the moment to maintain old default
-        useDecisionProcedures = true;
+        useDecisionProcedures = false;
     }    
         
     /**
@@ -78,8 +79,8 @@ public class ProofStarter {
             BuiltInRule decisionProcedureRule) {
         if (goals.isEmpty()) {
             return;
-        }
-            
+	}
+
         final Proof p = goals.head().node().proof();
 
         final IteratorOfGoal i = goals.iterator();                      
@@ -117,7 +118,12 @@ public class ProofStarter {
         }
 
         this.po = po;
-        this.proof = po.getPO().getFirstProof();
+        try {
+            this.proof = po.getPO().getFirstProof();
+        } catch(ProofInputException e) {
+            System.err.println(e);
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -203,13 +209,16 @@ public class ProofStarter {
         } else {
             decisionProcedureRule = null;
         }
-        env.registerProof(po, po.getPO());
+
+
         goalChooser.init(proof, proof.openGoals());
         final ProofListener pl = new ProofListener();
 
         Goal.addRuleAppListener(pl);
         System.out.println("27");
+        ProofAggregate proofList = null;
         try {
+            proofList = po.getPO();
             System.out.println("28");
             int countApplied = 0;
             if(progressMonitors == null) throw new Throwable("progressmon was null");
@@ -231,8 +240,8 @@ public class ProofStarter {
         } finally {
             System.out.println("32");  
             Goal.removeRuleAppListener(pl);
-            env.removeProofList(po.getPO());
             proof.setActiveStrategy(oldStrategy);
+            env.removeProofList(proofList);
         }
 
         return true;

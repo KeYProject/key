@@ -8,8 +8,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.init.*;
-import de.uka.ilkd.key.proof.mgt.Contract;
-import de.uka.ilkd.key.proof.mgt.Contractable;
 import de.uka.ilkd.key.visualdebugger.executiontree.ITNode;
 
 public class DebuggerPO implements ProofOblInput {
@@ -51,26 +49,15 @@ public class DebuggerPO implements ProofOblInput {
     private Term createConjunction(ListOfTerm list) {
         Term result = null;
         for (IteratorOfTerm it = list.iterator(); it.hasNext();) {
-            Term t = it.next();
-            if (result == null)
-                result = t;
-            else
-                result = TermFactory.DEFAULT.createJunctorTerm(Op.AND, result,
-                        t);
-
+            result = (result == null ? it.next() : 
+                TermFactory.DEFAULT.createJunctorTerm(Op.AND, result, it.next()));
         }
-        if (result == null)
-            result = TermFactory.DEFAULT.createJunctorTerm(Op.TRUE);
-        return result;
-
+        return result == null ? TermFactory.DEFAULT.createJunctorTerm(Op.TRUE) : 
+            result;
     }
 
     public String getJavaPath() throws ProofInputException {
         return null;
-    }
-
-    public Contractable[] getObjectOfContract() {
-        return new Contractable[0];
     }
 
     /**
@@ -109,10 +96,6 @@ public class DebuggerPO implements ProofOblInput {
         return result;
     }
 
-    public boolean initContract(Contract ct) {
-        // TODO Auto-generated method stub
-        return false;
-    }
 
     public void initJavaModelSettings(String classPath) {
 
@@ -141,24 +124,11 @@ public class DebuggerPO implements ProofOblInput {
     }
 
     // all below are not used for this proof obligation
-    public void read(ModStrategy mod) {
-    }
 
     public void readActivatedChoices() {
     }
 
-    public Includes readIncludes() throws ProofInputException {
-        return null;
-    }
-
-    public String readModel() throws ProofInputException {
-        return null;
-    }
-
     public void readProblem(ModStrategy mod) {
-    }
-
-    public void readSpecs() {
     }
 
     /**
@@ -182,10 +152,6 @@ public class DebuggerPO implements ProofOblInput {
         this.builtInRules = builtInRules;
     }
 
-    public void setInitConfig(InitConfig i) {
-        // TODO Auto-generated method stub
-
-    }
 
     public void setPCImpl(ListOfTerm l1, ListOfTerm l2) {
         Term t1 = list2term(l1);
@@ -245,9 +211,8 @@ public class DebuggerPO implements ProofOblInput {
     }
 
     public void setTerms(ListOfTerm terms) {
-        this.specFormula = this.createConjunction(terms);
         specFormula = TermFactory.DEFAULT
-                .createJunctorTerm(Op.NOT, specFormula);
+          .createJunctorTerm(Op.NOT, createConjunction(terms));
     }
 
     public void setUp(Sequent precondition, ITNode n) {
@@ -290,8 +255,4 @@ public class DebuggerPO implements ProofOblInput {
                 .sequent();
 
     }
-
-    public void startProtocol() {
-    }
-
 }

@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.IteratorOfTerm;
 import de.uka.ilkd.key.logic.SetAsListOfTerm;
 import de.uka.ilkd.key.logic.SetOfTerm;
@@ -38,18 +38,23 @@ class PredictCostProver {
 	/**clauses from <code>instance</code> of CNF*/
 	private Set clauses = new HashSet();
 
-	private PredictCostProver(Term instance, SetOfTerm assertList) {
+	private Services services;
+
+	private PredictCostProver(Term instance, SetOfTerm assertList, 
+                Services services) {
 		this.assertLiterals = this.assertLiterals.union(assertList);
-		initClauses(instance);
+		this.services = services;
+                initClauses(instance);
 	}
 
 	public static long computerInstanceCost(Substitution sub,
-                                            Term matrix,
-	                                        SetOfTerm assertList) {
+	        Term matrix,
+	        SetOfTerm assertList, Services services) {
         
         
 		final PredictCostProver prover = 
-			new PredictCostProver ( sub.applyWithoutCasts(matrix), assertList );
+			new PredictCostProver ( sub.applyWithoutCasts(matrix), 
+			        assertList, services );
 		return prover.cost();
 	}
 
@@ -156,8 +161,7 @@ class PredictCostProver {
 		}
 		if (op == Op.EQUALS && pro.sub(0).equals(pro.sub(1)))
 			return temp ? trueT : falseT;
-		Term arithRes = HandleArith.provedByArith(pro,
-                                 Main.getInstance().mediator().getServices());
+		Term arithRes = HandleArith.provedByArith(pro, services);
 		if(TriggerUtils.isTrueOrFalse(arithRes))
 			return temp ? arithRes : tb.not(arithRes);
 		else return problem;
@@ -195,8 +199,7 @@ class PredictCostProver {
 	private Term provedByAnother(Term problem, Term axiom) {
 		Term res = provedByequal(problem,axiom);
 		if(TriggerUtils.isTrueOrFalse(res))return res;
-		return HandleArith.provedByArith(problem, axiom,
-                                         Main.getInstance().mediator().getServices());
+		return HandleArith.provedByArith(problem, axiom, services);
 	}
 
     

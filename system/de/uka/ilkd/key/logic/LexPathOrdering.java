@@ -19,7 +19,6 @@ import java.util.WeakHashMap;
 import de.uka.ilkd.key.logic.ldt.AbstractIntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.IteratorOfSort;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 

@@ -17,10 +17,8 @@ import java.util.Iterator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.SingleProof;
 import de.uka.ilkd.key.proof.mgt.*;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.soundness.POBuilder;
@@ -41,8 +39,7 @@ implements ProofOblInput{
     
     public TacletSoundnessPO (String name, File file, 
             ProgressMonitor monitor) {
-        super ( name, file, monitor );
-	this.tacletFile = true;
+        super ( name, file, monitor, true );
     }
     
     /** returns the proof obligation term as result of the proof obligation
@@ -62,9 +59,10 @@ implements ProofOblInput{
      * strategy. 
      */
     public void readProblem(ModStrategy mod) throws ProofInputException {
-        
+        assert initConfig != null;
         final InitConfig old = initConfig;
         initConfig = old.copy ();
+        initConfig.getServices().setJavaInfo(old.getServices().getJavaInfo());
         
         // ensure that only the new taclets of the lemma file are presented to
         // the user
@@ -93,7 +91,7 @@ implements ProofOblInput{
         }
         
         final POSelectionDialog dialog = new POSelectionDialog 
-        ( Main.getInstance().mediator (),
+        ( Main.hasInstance() ? Main.getInstance().mediator ().mainFrame() : null,
                 newTacApps);
         
         app = dialog.getSelectedTaclets ();
@@ -106,6 +104,13 @@ implements ProofOblInput{
         for (int i=0; i<app.length; i++) {
             final POBuilder pob = new POBuilder ( app[i], initConfig.getServices() );
             pob.build ();
+            Main.getInstance()
+                .mediator()
+                .getSelectedGoal()
+                .addTaclet(app[i].taclet(), 
+                           app[i].instantiations(), 
+                           app[i].constraint(),
+                           false);
             
             updateNamespaces ( pob );
             String name = app.length==1 ? name() : app[i].taclet().name().toString();
@@ -122,13 +127,6 @@ implements ProofOblInput{
             proof = singleProofs[0];
         } else {
             proof = ProofAggregate.createProofAggregate(singleProofs, name());
-        }
-        for (int i=0; i<app.length; i++) {
-            LemmaSpec lemmaSpec = new LemmaSpec(app[i]);            
-            env.addContract(lemmaSpec);
-            env.registerRule(app[i], 
-                    new RuleJustificationBySpec(lemmaSpec));
-            env.addToAllProofs(app[i], file);
         }
         env.registerProof(this, proof);
     }
@@ -177,31 +175,7 @@ implements ProofOblInput{
     public String name() {
         if (app==null) return "Taclet proof obligation";
         return "Proof obligation(s) for "+file;
-    }
-    
-    public Contractable[] getObjectOfContract() {
-        return app;
-    }
-    
-    public boolean initContract(Contract ct) {
-        if (!(ct instanceof LemmaSpec)) {
-            return false;
-        }
-        LemmaSpec lct = (LemmaSpec)ct;
-        Contractable[] objs = getObjectOfContract();
-        boolean found = false;
-        for (int i=0; i<objs.length; i++) {
-            if (objs[i].equals(lct.getObjectOfContract())) {
-                if (getPO() instanceof SingleProof) {
-                    ct.addCompoundProof(getPO()); 
-                } else {
-                    ct.addCompoundProof(getPO().getChildren()[i]);
-                }
-                found = true;
-            }
-        }
-        return found;
-    }
+    }   
     
     
     /**

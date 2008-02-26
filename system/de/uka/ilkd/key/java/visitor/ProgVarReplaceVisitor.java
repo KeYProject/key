@@ -10,16 +10,19 @@
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.annotation.Annotation;
-import de.uka.ilkd.key.java.annotation.LoopInvariantAnnotation;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.declaration.ArrayOfVariableSpecification;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -28,43 +31,33 @@ import de.uka.ilkd.key.util.ExtList;
  * replaces a number of program variables by others or new ones.
  */
 public class ProgVarReplaceVisitor extends CreatingASTVisitor {
-
+    
     private ProgramElement result=null;
 
     // indicates if ALL program variables are to be replace by new
     // variables with the same name
     protected boolean replaceallbynew=true;
 
+    
     /**
      * stores the program variables to be replaced as keys and the new
      * program variables as values
      */
     protected Map replaceMap;
 
-    /**
-     * creates a visitor that replaces the program variables in the given
-     * statement by new ones with the same name
-     * @param st the statement where the prog vars are replaced
-     * @param oldPVs the program variables that are replaced
-     */
-    public ProgVarReplaceVisitor(ProgramElement st, ProgramVariable[] oldPVs) {
-	super(st, true);
-	replaceMap=new HashMap();
-	for (int i=0; i<oldPVs.length; i++) {
-	    replaceMap.put(oldPVs[i], copy(oldPVs[i]));		
-	}
-    }
-
+    
     /**
      * creates a visitor that replaces the program variables in the given
      * statement by new ones with the same name
      * @param st the statement where the prog vars are replaced
      * @param map the HashMap with the replacements
      */
-    public ProgVarReplaceVisitor(ProgramElement st, Map map) {
-	super(st, true);
-	replaceMap = map;
+    public ProgVarReplaceVisitor(ProgramElement st, Map map, Services services) {
+	super(st, true, services);
+	this.replaceMap = map;
+        assert services != null;
     }
+    
 
     /**
      * creates a visitor that replaces the program variables in the given
@@ -73,19 +66,14 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * @param map the HashMap with the replacements
      * @param replaceall decides if all variables are to be replaced
      */
-    public ProgVarReplaceVisitor(ProgramElement st, Map map, boolean replaceall) {
-        this(st, map);
-        replaceallbynew = replaceall;
+    public ProgVarReplaceVisitor(ProgramElement st, 
+                                 Map map, 
+                                 boolean replaceall, 
+                                 Services services) {
+        this(st, map, services);
+        this.replaceallbynew = replaceall;
     }
         
-    /**
-     * creates a visitor that replaces the program variables in the given
-     * statement by new ones with the same name
-     * @param st the statement where the prog vars are replaced
-     */
-    public ProgVarReplaceVisitor(ProgramElement st) {
-	this(st, new HashMap());
-    }
 
     //%%% HACK: there should be a central facility for introducing new program
     // variables; this method is also used in <code>MethodCall</code> to
@@ -94,15 +82,21 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 	return copy(pv, "");
     }
 
+    
     //%%% HACK: there should be a central facility for introducing new program
     // variables; this method is also used in <code>MethodCall</code> to
     // create copies of parameter variables
     public static ProgramVariable copy(ProgramVariable pv, String postFix) {
     	ProgramElementName name = pv.getProgramElementName();
+    	//%%% HACK: final local variables are not renamed since they can occur in an
+    	// anonymous class declared in their scope of visibility.
+/*    	if(pv.isFinal()){
+    	    return pv;
+    	}*/
 	return new LocationVariable
 	    (VariableNamer.parseName(name.toString() + postFix,
 	    			     name.getCreationInfo()),
-	     pv.getKeYJavaType());
+	     pv.getKeYJavaType(), pv.isFinal());
     }
 
 
@@ -122,12 +116,14 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 	super.walk(node);
     }
 
+    
     /** the action that is performed just before leaving the node the
      * last time 
      */
     protected void doAction(ProgramElement node) {
 	node.visit(this);
     }
+    
     
     /** starts the walker*/
     public void start() {	
@@ -141,9 +137,11 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 	result=(ProgramElement) stack.peek().get(i);
     }
 
+    
     public ProgramElement result() { 	
 	return result;
     }
+    
     
     public void performActionOnProgramVariable(ProgramVariable pv) {
 	ProgramElement newPV = (ProgramElement) replaceMap.get(pv);
@@ -155,42 +153,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 	}
     }
 
-    /**
-     * Performs action on the annotations <code>a</code>.
-     */
-    protected void performActionOnAnnotationArray(Annotation[] a){
-	for(int i = 0; i<a.length; i++){
-	    if(a[i] instanceof LoopInvariantAnnotation){
-		LoopInvariantAnnotation lia = (LoopInvariantAnnotation) a[i];	      
-                Term newInvariant   = lia.invariant() == null ? null : 
-		    replaceVariablesInTerm(lia.invariant());
-                SetOfLocationDescriptor newAssignable = lia.assignable() == null ? 
-		    null : replaceVariablesInLocs(lia.assignable());
-                ArrayOfTerm newOlds = lia.olds()    == null ? null : replaceVariablesInTerms(lia.olds());
-                Term newVariant     = lia.variant() == null ? null : replaceVariablesInTerm(lia.variant());
-                Term newPost        = lia.variant() == null ? null : replaceVariablesInTerm(lia.post());
-                ProgramVariable newSelfVar = (ProgramVariable)replaceMap.get(lia.getSelfVar());
-                if(newSelfVar == null) {
-                    newSelfVar = lia.getSelfVar();
-                }
-                LoopInvariantAnnotation newLia 
-                    = new LoopInvariantAnnotation(newInvariant, 
-                                                  newAssignable,
-                                                  newOlds, 
-                                                  newVariant,
-						  newPost,
-						  newSelfVar);
-                
-		addToTopOfStack(newLia);
-	    }else{
-		addToTopOfStack(a[i]);
-	    }
-	}
-	if(a.length>0){
-	    changed();
-	}
-    }
-
+    
     private Term replaceVariablesInTerm(Term t){  
      	if(t==null) return null;
 	if (t.op() instanceof ProgramVariable){ 
@@ -267,22 +230,97 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         return res;
     }
     
-    
-    private ArrayOfTerm replaceVariablesInTerms(ArrayOfTerm terms) {
-        Term[] res = new Term[terms.size()];
-
-        for(int i = 0; i < res.length; i++) {
-            res[i] = replaceVariablesInTerm(terms.getTerm(i));
+        
+    private SetOfTerm replaceVariablesInTerms(SetOfTerm terms) {
+        SetOfTerm res = SetAsListOfTerm.EMPTY_SET;
+        
+        IteratorOfTerm it = terms.iterator();
+        while(it.hasNext()) {
+            res = res.add(replaceVariablesInTerm(it.next()));
         }
         
-        return new ArrayOfTerm(res);
+        return res;
     }
-
+    
+    
+    private Map /*Operator -> Function*/ replaceVariablesInMap(
+                                        Map /*Operator -> Function*/ map) {
+        Map result = new LinkedHashMap();
+        Iterator it = map.entrySet().iterator();
+        while(it.hasNext()) {
+            Map.Entry entry = (Map.Entry) it.next();
+            Operator key = (Operator) entry.getKey();
+            Function value = (Function) entry.getValue();
+            
+            Operator newKey = (ProgramVariable) replaceMap.get(key);
+            if(newKey == null) {
+                newKey = key;
+            }
+            
+            result.put(newKey, value);
+        }
+        return result;
+    }
+    
+    
     public void performActionOnLocationVariable(LocationVariable x) {
        performActionOnProgramVariable(x);
     }
 
+    
     public void performActionOnProgramConstant(ProgramConstant x) {
         performActionOnProgramVariable(x);
+    }
+    
+    
+    public void performActionOnLoopInvariant(LoopStatement oldLoop, 
+                                             LoopStatement newLoop) {
+        LoopInvariant inv 
+            = services.getSpecificationRepository().getLoopInvariant(oldLoop);
+        if(inv == null) {
+            return;
+        }
+        Term selfTerm = inv.getInternalSelfTerm();
+        Map atPreFunctions = inv.getInternalAtPreFunctions();
+        
+        //invariant
+        Term newInvariant 
+            = replaceVariablesInTerm(inv.getInvariant(selfTerm, 
+                                                      atPreFunctions, 
+                                                      services));
+        
+        //predicates
+        SetOfTerm newPredicates 
+            = replaceVariablesInTerms(inv.getPredicates(selfTerm, 
+                                                        atPreFunctions, 
+                                                        services));
+        
+        //modifies
+        SetOfLocationDescriptor newModifies
+            = replaceVariablesInLocs(inv.getModifies(selfTerm, 
+                                                     atPreFunctions, 
+                                                     services));
+        
+        //variant
+        Term newVariant
+            = replaceVariablesInTerm(inv.getVariant(selfTerm, 
+                                                    atPreFunctions, 
+                                                    services));
+        
+        Term newSelfTerm = replaceVariablesInTerm(selfTerm); 
+        Map newAtPreFunctions = replaceVariablesInMap(atPreFunctions);
+        boolean newPredicateHeuristicsAllowed
+            = inv.getPredicateHeuristicsAllowed();
+
+        LoopInvariant newInv 
+            = new LoopInvariantImpl(newLoop, 
+                                    newInvariant, 
+                                    newPredicates,
+                                    newModifies, 
+                                    newVariant, 
+                                    newSelfTerm,
+                                    newAtPreFunctions,
+                                    newPredicateHeuristicsAllowed);
+        services.getSpecificationRepository().setLoopInvariant(newInv);
     }
 }

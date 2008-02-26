@@ -27,10 +27,10 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.proof.init.JavaInput;
-import de.uka.ilkd.key.proof.init.JavaInputWithJMLSpecBrowser;
+import de.uka.ilkd.key.proof.init.EnsuresPostPO;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 
 /**
  * @author Marius Hillenbrand
@@ -197,23 +197,24 @@ public class KeYPlugin extends AbstractUIPlugin implements
 
 			Main main = Main.getInstance(false);
 
-			JavaInput input;
+			EnsuresPostPO input = null;
 
 			if (jmlBrowserIntended) {
-
+/*
 				input = new JavaInputWithJMLSpecBrowser(inputName, location,
 						false, main.getProgressMonitor());
-
+*/
 			} else {
-				input = new JavaInput(inputName, location, main
+/*				input = new JavaInput(inputName, location, main
 						.getProgressMonitor());
+                        */
 			}
 
                         ProblemInitializer problemInit = new ProblemInitializer(main);
                         
                         String error = "Prover init for " + location + " failed.";
                         try {
-                            problemInit.startProver(input, input);
+                            problemInit.startProver(input.getPO().getFirstProof().env(), input);
                             error = "";
                         } catch (ProofInputException pie) {
                             error = pie.getMessage();
@@ -257,7 +258,7 @@ public class KeYPlugin extends AbstractUIPlugin implements
 		Main key = Main.getInstance(true);
                 Main.setStandalone(false);
 		key.toFront();
-		key.showSpecBrowser();
+		//key.showSpecBrowser();
 
 	}
 

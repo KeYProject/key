@@ -14,6 +14,9 @@ public class EverythingLocationDescriptor implements LocationDescriptor {
     public static final EverythingLocationDescriptor INSTANCE 
             = new EverythingLocationDescriptor();
     
+    public static final SetOfLocationDescriptor INSTANCE_AS_SET
+    	    = SetAsListOfLocationDescriptor.EMPTY_SET.add(INSTANCE);
+    
     private EverythingLocationDescriptor() {}
     
     public String toString() {

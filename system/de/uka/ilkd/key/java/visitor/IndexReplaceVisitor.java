@@ -14,6 +14,7 @@ import de.uka.ilkd.key.java.ArrayOfExpression;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -37,8 +38,9 @@ public class IndexReplaceVisitor extends CreatingASTVisitor{
 			       boolean singleTuple, 
 			       ProgramVariable partCounter, 
 //			       ProgramVariable[] lCounter, 
-			       ProgramVariable[] testArray){
-	super(pe, true);
+			       ProgramVariable[] testArray,
+                               Services services){
+	super(pe, true, services);
 	this.testLocation = testLocation;
 	this.singleTuple = singleTuple;
 	this.partCounter = partCounter;

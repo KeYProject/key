@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.rule.encapsulation;
 
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
@@ -23,13 +24,8 @@ class FreeProgramVariableDetector extends JavaASTVisitor {
     private SetOfProgramVariable declaredVars;
     
     
-    public FreeProgramVariableDetector(ProgramElement root) {
-        super(root);
-    }
-    
-    
-    protected void doAction(ProgramElement node) {
-        node.visit(this);
+    public FreeProgramVariableDetector(ProgramElement root, Services services) {
+        super(root, services);
     }
     
     

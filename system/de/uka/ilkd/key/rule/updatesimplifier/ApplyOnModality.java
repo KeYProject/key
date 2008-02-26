@@ -70,7 +70,7 @@ public class ApplyOnModality extends AbstractUpdateRule {
     public Term apply(Update update, Term target, Services services) {
 
         final ArrayOfAssignmentPair pairs = deletionEnabled ? new ArrayOfAssignmentPair(
-                remove(update, target))
+                remove(update, target, services))
         : update.getAllAssignmentPairs();
   
         return pairs.size() == 0   ? target : UpdateSimplifierTermFactory.DEFAULT
@@ -82,9 +82,10 @@ public class ApplyOnModality extends AbstractUpdateRule {
      * used in the tail of the formula
      * @author bubel         
      */
-    public AssignmentPair[] remove(Update up, Term target) {
+    public AssignmentPair[] remove(Update up, Term target, Services services) {
         final ArrayOfAssignmentPair pairs = up.getAllAssignmentPairs();        
-        final HashSet protectedProgVars = collectProgramVariables(target);
+        final HashSet protectedProgVars = collectProgramVariables(target, 
+                                                                  services);
         final List result = new ArrayList(pairs.size());
 
         for (int i = 0, size=pairs.size(); i<size; i++) {
@@ -110,7 +111,7 @@ public class ApplyOnModality extends AbstractUpdateRule {
         return protectedProgVars.contains(PROTECT_ALL) ||
               (protectedProgVars.contains(PROTECT_HEAP) && isHeapLocation(loc)) || 
               (isHeapLocation(loc) || protectedProgVars.contains(loc) ||
-	    loc.name().equals(new ProgramElementName("<transactionCounter>")));                           
+	    loc.name().equals(new ProgramElementName("<transactionCounter>")));
     }
 
     
@@ -121,7 +122,8 @@ public class ApplyOnModality extends AbstractUpdateRule {
      * @return true iff the location denotes a heap location
      */
     private boolean isHeapLocation(Location loc) {        
-        return !(loc instanceof ProgramVariable) || ((ProgramVariable)loc).isMember();
+        return (!(loc instanceof ProgramVariable) || ((ProgramVariable)loc).isMember())
+               && !(loc instanceof NonRigidFunctionLocation);
     }
 
     /**
@@ -129,7 +131,7 @@ public class ApplyOnModality extends AbstractUpdateRule {
      * @param target
      * @return
      */
-    private HashSet collectProgramVariables(Term target) {
+    private HashSet collectProgramVariables(Term target, Services services) {
         if (protectedVarsCache.containsKey(target)) {           
             return (HashSet) protectedVarsCache.get(target); 
         }
@@ -137,26 +139,29 @@ public class ApplyOnModality extends AbstractUpdateRule {
         
         final Operator targetOp = target.op();
         
-        if (targetOp instanceof ProgramVariable) {
+        if (targetOp instanceof ProgramVariable
+            || targetOp instanceof NonRigidFunctionLocation) {
             foundProgVars.add(targetOp);
         } else if (targetOp instanceof NonRigidHeapDependentFunction) {
             foundProgVars.add(PROTECT_HEAP);
-        } else if (targetOp == Op.COMPUTE_SPEC_OP ||         
-		   (targetOp instanceof NonRigidFunction && 
-                   !(targetOp instanceof ProgramMethod))) {
+        } else if (targetOp instanceof NonRigidFunction && 
+                   !(targetOp instanceof ProgramMethod)) {
             foundProgVars.add(PROTECT_ALL);
             return foundProgVars;
         }
         
         if (target.javaBlock() != JavaBlock.EMPTY_JAVABLOCK) {
             ProgramVariableCollector pvc = 
-                new ProgramVariableCollector(target.javaBlock().program(), true);
+                new ProgramVariableCollector(target.javaBlock().program(), 
+                                             services,
+                                             true);
             pvc.start();
             foundProgVars.addAll(pvc.result());
         }
         
         for (int i = 0; i<target.arity(); i++) {
-            foundProgVars.addAll(collectProgramVariables(target.sub(i)));
+            foundProgVars.addAll(collectProgramVariables(target.sub(i), 
+                                                         services));
         }
         
         if (protectedVarsCache.size()>=1000) {

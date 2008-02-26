@@ -15,10 +15,10 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.Stack;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.annotation.Annotation;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.expression.operator.SetAssignment;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
@@ -96,8 +96,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      */
     public WhileLoopTransformation(ProgramElement root, 
 				   ProgramElementName outerLabel,
-				   ProgramElementName innerLabel) {
-	super(root);
+				   ProgramElementName innerLabel,
+                                   Services services) {
+	super(root, services);
 	breakOuterLabel = (outerLabel == null ? null : new Break(outerLabel));
 	breakInnerLabel = (innerLabel == null ? null : new Break(innerLabel));
 	replaceBreakWithNoLabel = 0;
@@ -108,8 +109,10 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      * @param root the ProgramElement where to begin
      * @param inst the SVInstantiations if available
      */
-    public WhileLoopTransformation(ProgramElement root, SVInstantiations inst) {
-	super(root);
+    public WhileLoopTransformation(ProgramElement root, 
+                                   SVInstantiations inst, 
+                                   Services services) {
+	super(root, services);
 	instantiations = (inst == null ? 
 			  SVInstantiations.EMPTY_SVINSTANTIATIONS :
 			  inst);
@@ -273,6 +276,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	    if (runMode == CHECK) {
 		needOuterLabel = true;
 	    } else {
+	        needOuterLabel = true;	    	
 		addChild(breakOuterLabel);
 		changed();
 	    }
@@ -286,6 +290,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	    if (runMode == CHECK) {
 		needInnerLabel = true;
 	    } else {
+	        needInnerLabel = true;
 		addChild(breakInnerLabel);
 		changed();
 	    }
@@ -294,6 +299,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	    if (runMode == CHECK) {
 		needInnerLabel = true;
 	    } else if (runMode == TRANSFORMATION) {
+                needInnerLabel = true;
 		addChild(new Break(breakInnerLabel.getLabel()));
 		changed();
 	    }
@@ -484,7 +490,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	    For remainder = 
 		new For(null, x.getGuard(), unchangedUpdates, x.getBody());
 
-            if (breakInnerLabel != null) {
+            if (innerLabelNeeded() && breakInnerLabel != null) {
 	        body = new LabeledStatement(breakInnerLabel.getLabel(), body);
 	    }
 	    
@@ -513,7 +519,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 		       new Then(new StatementBlock(new ArrayOfStatement
 						   (innerBlockStatements))));
 	    
-	    if (breakOuterLabel!=null) {
+	    if (outerLabelNeeded() && breakOuterLabel!=null) {
 	        addChild(new LabeledStatement
 			 (breakOuterLabel.getLabel(), 
 			  new StatementBlock(new ArrayOfStatement
@@ -548,7 +554,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	    Statement body = (Statement) (changeList.isEmpty() ?
 					  null :
 					  changeList.removeFirst());
-	    if (breakInnerLabel != null) {
+	    if (innerLabelNeeded() && breakInnerLabel != null) {
 		// an unlabeled continue needs to be handled with (replaced)
 		body = new LabeledStatement(breakInnerLabel.getLabel(),
 					    body);
@@ -557,7 +563,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	    StatementBlock block = new StatementBlock
 		(new ArrayOfStatement(new Statement[]
 		    {body, (Statement) root()}));
-	    if (breakOuterLabel != null) {
+	    if (outerLabelNeeded() && breakOuterLabel != null) {
 		// an unlabeled break occurs in the
 		// while loop therefore we need a labeled statement
 		then = new Then(new LabeledStatement(breakOuterLabel.getLabel(),
@@ -576,8 +582,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 		Statement body = (Statement) (changeList.isEmpty() ?
 					      null :
 					      changeList.removeFirst());
-		addChild(new While(guard, body, x.getPositionInfo(), 
-				   x.getAnnotations()));
+		addChild(new While(guard, body, x.getPositionInfo()));
 		changed();
 	    } else {
 		doDefaultAction(x);
@@ -597,7 +602,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 					  changeList.removeFirst());
 	    Expression guard = ((Guard) changeList.removeFirst()).getExpression();
             Statement unwindedBody = null;
-            if (breakInnerLabel != null) {
+            if (innerLabelNeeded() && breakInnerLabel != null) {
 		// an unlabeled continue needs to be handled with (replaced)
                 unwindedBody = new LabeledStatement(breakInnerLabel.getLabel(),
 						    body);
@@ -610,10 +615,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 		    {unwindedBody, 
 		        new While(guard, 
 		                  x.getBody(), 
-                                  x.getPositionInfo(), 
-                                  x.getAnnotations())}));
+                                  x.getPositionInfo())}));
 
- 	    if (breakOuterLabel != null) {
+ 	    if (outerLabelNeeded() && breakOuterLabel != null) {
 		// an unlabeled break occurs in the
 		// body therefore we need a labeled statement
 		resultStatement = new LabeledStatement(breakOuterLabel.getLabel(),
@@ -630,8 +634,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 		Statement body = (Statement) (changeList.isEmpty() ?
 					      null :
 					      changeList.removeFirst());
-		addChild(new Do(guard, body, x.getPositionInfo(), 
-				x.getAnnotations()));
+		addChild(new Do(guard, body, x.getPositionInfo()));
 		changed();
 	    } else {
 		doDefaultAction(x);
@@ -639,9 +642,6 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	}
     }
 
-    protected void performActionOnAnnotationArray(Annotation[] a){
-	//do nothing;
-    }
 
     public void performActionOnIf(If x)     {
 	DefaultAction def=new DefaultAction() {		
@@ -730,6 +730,15 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 		}
 	    };
 	def.doAction(x);	
+    }
+    
+    public void performActionOnSetAssignment(SetAssignment x) {
+        DefaultAction def=new DefaultAction() {         
+            ProgramElement createNewElement(ExtList changeList) {
+                return new SetAssignment(changeList);
+            }
+        };
+        def.doAction(x);                
     }
 
     public void performActionOnThen(Then x)     {

@@ -109,6 +109,5 @@ public abstract class AbstractIntegerRule implements BuiltInRule {
         return name ().toString ();
     }
 
-  
 
 }

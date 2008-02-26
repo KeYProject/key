@@ -10,8 +10,6 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ModStrategy;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.mgt.Contract;
-import de.uka.ilkd.key.proof.mgt.Contractable;
 
 public class WatchpointPO implements ProofOblInput {
 
@@ -41,10 +39,6 @@ public class WatchpointPO implements ProofOblInput {
         return false;
     }
 
-    public Contractable[] getObjectOfContract() {
-        return new Contractable[0];
-    }
-
     public ProofAggregate getPO() {
         if (po == null) {
             if ( sequent == null || taclets == null
@@ -71,11 +65,6 @@ public class WatchpointPO implements ProofOblInput {
 
         }
         return po;
-    }
-
-    public boolean initContract(Contract ct) {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     public String name() {

@@ -20,7 +20,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
-import de.uka.ilkd.key.util.Debug;
 
 
 public class HeuristicInstantiation implements TermGenerator {
@@ -34,11 +33,11 @@ public class HeuristicInstantiation implements TermGenerator {
     public IteratorOfTerm generate(RuleApp app,
                                    PosInOccurrence pos,
                                    Goal goal) {
-        Debug.assertFalse ( pos == null,
-                            "Feature is only applicable to rules with find" );
+        assert pos != null : "Feature is only applicable to rules with find";
 
         final Term qf = pos.constrainedFormula ().formula ();
-        final Instantiation ia = Instantiation.create ( qf, goal.sequent() );
+        final Instantiation ia = Instantiation.create ( qf, goal.sequent(), 
+                goal.proof().getServices() );
         final QuantifiableVariable var =
             qf.varsBoundHere ( 0 ).lastQuantifiableVariable ();
         return new Iterator ( ia.getSubstitution ().iterator (), var );

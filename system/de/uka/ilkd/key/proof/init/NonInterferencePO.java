@@ -25,8 +25,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.mgt.Contract;
-import de.uka.ilkd.key.proof.mgt.Contractable;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.ExtList;
@@ -184,7 +182,9 @@ where p2' is the first assignment statement of p2.
 
 
         FirstStatementExtractionVisitor v = 
-            new FirstStatementExtractionVisitor(progB, b);
+            new FirstStatementExtractionVisitor(progB, 
+                                                b, 
+                                                initConfig.getServices());
         v.start();
         JavaBlock p2prime = JavaBlock.createJavaBlock(
             (StatementBlock)v.result());
@@ -435,14 +435,6 @@ if ((var!=null) && (s==null)) System.err.println("NULL SORT OF "+var+" "+var.get
         return "Non-Interference of ... and ...";
     }
 
-    public Contractable[] getObjectOfContract() {
-        return new Contractable[0];
-    }
-
-    public boolean initContract(Contract ct) {
-        return false;
-    }
-
     public void startProtocol() {
 	// do nothing
     }
@@ -454,8 +446,9 @@ if ((var!=null) && (s==null)) System.err.println("NULL SORT OF "+var+" "+var.get
         private Node node;
         
         public FirstStatementExtractionVisitor(ProgramElement root,
-                                               Node n) {
-	    super(root, true);
+                                               Node n,
+                                               Services services) {
+	    super(root, true, services);
             this.node = n;
         }
 

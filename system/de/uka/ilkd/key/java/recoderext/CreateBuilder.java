@@ -16,17 +16,12 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.CrossReferenceServiceConfiguration;
-import recoder.java.Identifier;
 import recoder.java.StatementBlock;
-import recoder.java.declaration.ClassDeclaration;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.TypeDeclaration;
-import recoder.java.declaration.modifier.Private;
+import recoder.java.declaration.*;
+import recoder.java.declaration.modifier.Public;
 import recoder.java.expression.literal.BooleanLiteral;
 import recoder.java.expression.literal.IntLiteral;
-import recoder.java.reference.MethodReference;
-import recoder.java.reference.ThisReference;
-import recoder.java.reference.TypeReference;
+import recoder.java.reference.*;
 import recoder.java.statement.Return;
 import recoder.list.*;
 
@@ -95,18 +90,17 @@ public class CreateBuilder extends RecoderModelTransformer {
      */
     public MethodDeclaration createMethod(ClassDeclaration type) {
 	ModifierMutableList modifiers = new ModifierArrayList(2);
-	modifiers.add(new Private());
+	modifiers.add(new Public());        
 	MethodDeclaration md =  new MethodDeclaration
 	    (modifiers, 
-	     new TypeReference
-	     ((Identifier)type.getIdentifier().deepClone()), 
+	     new TypeReference(getId(type)), 
 	     new ImplicitIdentifier(IMPLICIT_CREATE), 
 	     new ParameterDeclarationArrayList(0), 
 	     null,
 	     createBody(type));
 	md.makeAllParentRolesValid();
 	return md;
-    }    
+    }
 
 
     /**

@@ -41,7 +41,7 @@ public class InsertSystemInvariantTacletMenuItem extends InsertionTacletBrowserM
      */
     protected Sequent checkTaclet(Taclet t) {
         if (!(t instanceof NoFindTaclet) || 
-                !t.displayName().startsWith("Insert invariants of")) {
+                !t.displayName().startsWith("Insert implicit invariants of")) {
             return null;
         }
         

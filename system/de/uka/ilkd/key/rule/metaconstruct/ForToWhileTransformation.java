@@ -1,0 +1,122 @@
+package de.uka.ilkd.key.rule.metaconstruct;
+
+import de.uka.ilkd.key.java.ArrayOfStatement;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.expression.ExpressionStatement;
+import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.statement.For;
+import de.uka.ilkd.key.java.statement.Guard;
+import de.uka.ilkd.key.java.statement.IForUpdates;
+import de.uka.ilkd.key.java.statement.ILoopInit;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.util.ExtList;
+
+/**
+ * This transformation is used to transform a for-loop into a while-loop.
+ * 
+ * This is done because there are some rules (invariant, induction, ...) that
+ * are only available for while-loops, not for for-loops.
+ * 
+ * The transformation behaviour is very similar to the superclass' behaviour
+ * only the outermost for loop is treated silghtly differently.
+ * 
+ * @see ForToWhile Here is an example
+ * @author MU
+ * 
+ */
+
+public class ForToWhileTransformation extends WhileLoopTransformation {
+    
+    public ForToWhileTransformation(ProgramElement root,
+            ProgramElementName outerLabel, ProgramElementName innerLabel, 
+            Services services) {
+        super(root, outerLabel, innerLabel, services);
+    }
+
+    /**
+     * change the for-loop to a while loop with inits and updates.
+     */
+    public void performActionOnFor(For x) {
+        ExtList changeList = (ExtList) stack.peek();
+
+        if (replaceBreakWithNoLabel == 0) {
+            // most outer for loop
+
+            if (changeList.getFirst() == CHANGED)
+                changeList.removeFirst();
+
+            ILoopInit inits = null;
+            IForUpdates updates = null;
+            Guard guard = null;
+            Statement body = null;
+
+            if (changeList.get(0) instanceof ILoopInit) {
+                inits = (ILoopInit) changeList.removeFirst();
+            }
+
+            if (x.getGuard() != null) {
+                guard = (Guard) changeList.removeFirst();
+            } else {
+                guard = new Guard(BooleanLiteral.TRUE);
+            }
+
+            if (changeList.get(0) instanceof IForUpdates) {
+                updates = (IForUpdates) changeList.removeFirst();
+            }
+
+            body = (Statement) changeList.removeFirst();
+
+            if (innerLabelNeeded() && breakInnerLabel != null) {
+                body = new LabeledStatement(breakInnerLabel.getLabel(), body);
+            }
+
+            final int updateSize = (updates == null ? 0 : updates.size());
+            Statement innerBlockStatements[] = new Statement[updateSize + 1];
+            innerBlockStatements[0] = body;
+            for (int copyStatements = 0; copyStatements < updateSize; copyStatements++) {
+                innerBlockStatements[copyStatements + 1] = (ExpressionStatement) updates
+                        .getExpressionAt(copyStatements);
+            }
+
+            final int initSize = (inits == null ? 0 : inits.size());
+            Statement outerBlockStatements[] = new Statement[initSize + 1];
+
+            for (int copyStatements = 0; copyStatements < initSize; copyStatements++) {
+                outerBlockStatements[copyStatements] = inits.getInits()
+                        .getLoopInitializer(copyStatements);
+            }
+            
+            outerBlockStatements[initSize] = new While(guard.getExpression(),
+                    new StatementBlock(new ArrayOfStatement(
+                            innerBlockStatements)), null);
+
+            Statement outerBlock = new StatementBlock(new ArrayOfStatement(
+                    outerBlockStatements));
+
+            if (outerLabelNeeded() && breakOuterLabel != null) {
+                outerBlock = new LabeledStatement(breakOuterLabel.getLabel(),
+                        outerBlock);
+            }
+            
+            // copy loop invariant to the created while loop
+            LoopInvariant li 
+                = services.getSpecificationRepository().getLoopInvariant(x);
+            if(li != null) {
+                li = li.setLoop((While)outerBlockStatements[initSize]);
+                services.getSpecificationRepository().setLoopInvariant(li);
+            }
+
+            addChild(outerBlock);
+            changed();
+        } else {
+            super.performActionOnFor(x);
+        }
+    }
+
+}

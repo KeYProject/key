@@ -15,14 +15,14 @@ import de.uka.ilkd.key.java.ArrayOfExpression;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.declaration.modifier.Static;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.SLTranslationError;
+import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 import de.uka.ilkd.key.util.ExtList;
 
 
@@ -32,52 +32,54 @@ import de.uka.ilkd.key.util.ExtList;
 public class RespectsModifiesPO extends EnsuresPO {
     
     private final OperationContract contract;
+    
     private Term updateAnonMethodTerm = null;
     
     
-    public RespectsModifiesPO(OperationContract contract,
-                              InvariantSelectionStrategy invStrategy) {
-        super("RespectsModifies", 
-              contract.getModelMethod(), 
+    public RespectsModifiesPO(InitConfig initConfig,
+	    		      OperationContract contract,
+                              SetOfClassInvariant assumedInvs) {
+        super(initConfig,
+              "RespectsModifies", 
+              contract.getProgramMethod(), 
               Modality.BOX, 
-              invStrategy,
+              assumedInvs,
               true);
         this.contract = contract;
     }
     
     
     private void buildUpdateAnonMethodTerm(ProgramVariable selfVar, 
-                                           ListOfProgramVariable paramVars) throws SLTranslationError {
+                                           ListOfProgramVariable paramVars) 
+    		throws ProofInputException {
         if(updateAnonMethodTerm != null) {
             return;
         }
-        
+               
         //build method declaration
         ExtList extList = new ExtList();
-        ProgramElementName name = new ProgramElementName("anonMethod");
-        extList.addLast(name);
+        ProgramElementName methodName = new ProgramElementName("anonMethod");
+        extList.add(methodName);
+        extList.add(new Static());
         MethodDeclaration methodDecl = new MethodDeclaration(extList, false);
         
         //build program method
         ProgramMethod programMethod = new ProgramMethod(methodDecl, 
                                                         javaInfo.getJavaLangObject(), 
-                                                        javaInfo.getJavaLangObject(), 
+                                                        null, 
                                                         PositionInfo.UNDEFINED);
         
         //build java block
-        ProgramVariable pseudoSelfVar 
-                = new LocationVariable(new ProgramElementName("anonObject"), 
-                                      Sort.NULL);
         MethodBodyStatement call 
                 = new MethodBodyStatement(programMethod,
-                                          pseudoSelfVar,
+                                          javaInfo.createTypeReference(javaInfo.getJavaLangObject()),
                                           null,
-                                          new ArrayOfExpression());/*paramVars*/
+                                          new ArrayOfExpression());
         StatementBlock sb = new StatementBlock(call);
         JavaBlock jb = JavaBlock.createJavaBlock(sb);
         
         //build program term
-        Term programTerm = tb.dia(jb, tb.tt());
+        Term programTerm = TB.dia(jb, TB.tt());
         
         //add update
         updateAnonMethodTerm = translateModifies(contract, 
@@ -91,10 +93,10 @@ public class RespectsModifiesPO extends EnsuresPO {
                               ListOfProgramVariable paramVars, 
                               ProgramVariable resultVar,
                               ProgramVariable exceptionVar,
-                              Map atPreFunctions) throws SLTranslationError {
+                              Map atPreFunctions) throws ProofInputException {
         buildUpdateAnonMethodTerm(selfVar, paramVars);
         Term preTerm = translatePre(contract, selfVar, toPV(paramVars));
-        Term result = tb.and(preTerm, updateAnonMethodTerm);
+        Term result = TB.and(preTerm, updateAnonMethodTerm);
         return result;
     }
     
@@ -103,10 +105,29 @@ public class RespectsModifiesPO extends EnsuresPO {
                                ListOfProgramVariable paramVars, 
                                ProgramVariable resultVar,
                                ProgramVariable exceptionVar,
-                               Map atPreFunctions) throws SLTranslationError {
+                               Map atPreFunctions) 
+    		throws ProofInputException {
         buildUpdateAnonMethodTerm(selfVar, paramVars);
-        createAtPreFunctionsForTerm(updateAnonMethodTerm, atPreFunctions);
+        APF.createAtPreFunctionsForTerm(updateAnonMethodTerm, 
+                                        atPreFunctions, 
+                                        services);
         Term result = replaceOps(atPreFunctions, updateAnonMethodTerm);
         return result;
+    }
+    
+    
+    
+    public boolean equals(Object o) {
+        if(!(o instanceof RespectsModifiesPO)) {
+            return false;
+        }
+        RespectsModifiesPO po = (RespectsModifiesPO) o;
+        return super.equals(po)
+               && contract.equals(po.contract);
+    }
+    
+    
+    public int hashCode() {
+        return super.hashCode() + contract.hashCode();
     }
 }

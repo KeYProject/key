@@ -289,7 +289,7 @@ public class TestGenerator{
 		IndexReplaceVisitor irv = 
 		    new IndexReplaceVisitor(testLocation[i][k], testLocation, 
 					    singleTuple, partCounter, 
-					    testArray);
+					    testArray, serv);
 		irv.start();
 		irv.result();
 		testDataAssignments = testDataAssignments.append(	
@@ -369,7 +369,7 @@ public class TestGenerator{
 	    Expression cons = (Expression) loc2cons.get(loc);
 	    IndexReplaceVisitor irv = 
 		new IndexReplaceVisitor(loc, testLocation, 
-					singleTuple, partCounter, testArray);
+					singleTuple, partCounter, testArray, serv);
 	    irv.start();
 	    irv.result();
 	    assignments = 
@@ -475,7 +475,7 @@ public class TestGenerator{
 	
 	s = s.append(body);
 	StatementBlock mBody = new StatementBlock(s.toArray());
-	FieldReplaceVisitor frv = new FieldReplaceVisitor(mBody);
+	FieldReplaceVisitor frv = new FieldReplaceVisitor(mBody, serv);
 	frv.start();
 	l.add(frv.result());
 	l.add(new Comment("\n  Covered execution trace:\n"+
@@ -589,7 +589,7 @@ public class TestGenerator{
 	s[1] = new CopyAssignment(suite, cons);
 	s[2] = new Return(suite);
 	StatementBlock mBody = new StatementBlock(s);
-	FieldReplaceVisitor frv = new FieldReplaceVisitor(mBody);
+	FieldReplaceVisitor frv = new FieldReplaceVisitor(mBody, serv);
 	frv.start();
 	l.add(frv.result());
 	return new MethodDeclaration(l, false);
@@ -1021,7 +1021,7 @@ public class TestGenerator{
 	l.addAll(params);
 	l.add(type);
 	StatementBlock mBody = new StatementBlock(body);
-	FieldReplaceVisitor frv = new FieldReplaceVisitor(mBody);
+	FieldReplaceVisitor frv = new FieldReplaceVisitor(mBody, serv);
 	frv.start();
 	l.add(frv.result());
 	MethodDeclaration md = new MethodDeclaration(l, false);
@@ -1125,7 +1125,7 @@ public class TestGenerator{
 	SetOfProgramVariable programVars = 
 	    SetAsListOfProgramVariable.EMPTY_SET;
 	TermProgramVariableCollector pvColl = 
-	    new TermProgramVariableCollector();
+	    new TermProgramVariableCollector(serv);
 	t.execPreOrder(pvColl);
 	Iterator itp = pvColl.result().iterator();
 	while(itp.hasNext()){

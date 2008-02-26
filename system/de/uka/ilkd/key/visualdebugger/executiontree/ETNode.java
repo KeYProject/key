@@ -273,6 +273,7 @@ public class ETNode {
         
         final ProofStarter ps = new ProofStarter();
         ps.init(po);
+        ps.setUseDecisionProcedure(false);
         ps.getProof().setActiveStrategy(
                 (DebuggerStrategy.Factory.create(ps.getProof(),
                         "DebuggerStrategy", new StrategyProperties())));

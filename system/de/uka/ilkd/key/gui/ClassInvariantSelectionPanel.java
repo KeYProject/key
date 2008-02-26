@@ -11,12 +11,28 @@
 package de.uka.ilkd.key.gui;
 
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.util.Iterator;
+import java.util.Set;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTree;
+import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -24,61 +40,77 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
 
-import de.uka.ilkd.key.casetool.ModelClass;
-import de.uka.ilkd.key.speclang.*;
-import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.speclang.ClassInvariant;
+import de.uka.ilkd.key.speclang.IteratorOfClassInvariant;
+import de.uka.ilkd.key.speclang.SetAsListOfClassInvariant;
+import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 
 
 /**
- * A dialog for selecting class invariants.
+ * A panel for selecting class invariants.
  */
-public class ClassInvariantSelectionPanel extends JPanel {
+class ClassInvariantSelectionPanel extends JPanel {
+
+    private final Services services;
+    private final SpecificationRepository specRepos;
+    private final boolean useThroughoutInvs;
     
-    private Set modelClasses;
-    private boolean useThroughoutInvs;
-    
-    private ListOfClassInvariant selectedInvs 
-            = SLListOfClassInvariant.EMPTY_LIST;
-    private JTree classTree;
-    private JList invList;
-    private ModelClass selectedClass = null;
-    private JPanel rightButtonPanel;
-    private java.util.List selectionListeners = new LinkedList();
+    private final ClassTree classTree;
+    private final JList invList;
+    private final JPanel leftButtonPanel;
+    private final JPanel rightButtonPanel;
+
+    private SetOfClassInvariant selectedInvs 
+            = SetAsListOfClassInvariant.EMPTY_SET;
     
     
-    /**
-     * Creates and displays a dialog box asking the user to select a set of 
-     * invariants.
-     * @param modelClasses the classes to choose invariants from
-     */
-    public ClassInvariantSelectionPanel( Set modelClasses, 
-                                         boolean useThroughoutInvs,
-                                         ModelClass defaultClass,
-                                         boolean selectDefaultInvs) {
-        
-        this.modelClasses      = modelClasses;
+    //-------------------------------------------------------------------------
+    //constructors
+    //-------------------------------------------------------------------------    
+    
+    public ClassInvariantSelectionPanel(Services services,
+                                        boolean useThroughoutInvs,
+                                        KeYJavaType defaultClass,
+                                        boolean selectDefaultInvs) {
+        this.services          = services;
+        this.specRepos         = services.getSpecificationRepository();
         this.useThroughoutInvs = useThroughoutInvs;
+                        
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)); 
+        
+        //create list panel
+        JPanel listPanel = new JPanel();
+        listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.X_AXIS));
+        listPanel.setMinimumSize(new Dimension(660, 435));
+        add(listPanel);
+        
+        //create class scroll pane
+        JScrollPane classScrollPane = new JScrollPane();
+        classScrollPane.setBorder(new TitledBorder("Classes"));
+        Dimension classScrollPaneDim = new Dimension(220, 435);
+        classScrollPane.setMinimumSize(classScrollPaneDim);
+        listPanel.add(classScrollPane);
         
         //create class tree
-        classTree = buildClassTree(modelClasses);
+        classTree = new ClassTree(false, defaultClass, services);
+        setInvCounters(classTree.getRootNode());
         classTree.addTreeSelectionListener(new TreeSelectionListener() {
             public void valueChanged(TreeSelectionEvent e) {
-                DefaultMutableTreeNode selectedNode =
-                  (DefaultMutableTreeNode)(e.getPath().getLastPathComponent());
-                TreeEntry te = (TreeEntry)(selectedNode.getUserObject());
-                Debug.assertTrue(!selectedNode.isLeaf() 
-                                 || te.modelClass != null);
-                selectedClass = te.modelClass;
                 updateInvList();
             }
         });
         classTree.setCellRenderer(new DefaultTreeCellRenderer() {
             private final Color MEDIUMGREEN = new Color(80, 150, 0);
             private final Color DARKGREEN = new Color(0, 120, 90);
-            private final Font BOLDFONT = ClassInvariantSelectionPanel.this.getFont().deriveFont(Font.BOLD, 10);
+            private final Font BOLDFONT 
+            	= ClassInvariantSelectionPanel.this
+            				      .getFont()
+            				      .deriveFont(Font.BOLD, 10);
+
             public Component getTreeCellRendererComponent(JTree tree,
                                                           Object value,
                                                           boolean selected,
@@ -86,18 +118,21 @@ public class ClassInvariantSelectionPanel extends JPanel {
                                                           boolean leaf,
                                                           int row,
                                                           boolean hasFocus) {
+        	
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
-                TreeEntry te = (TreeEntry)(node.getUserObject());
-                if(te.numSelectedInvs == te.numInvs) {
+                ClassTree.Entry te = (ClassTree.Entry) node.getUserObject();
+                if(te.numSelectedMembers == te.numMembers 
+                	&& te.numMembers > 0) {
                     setTextNonSelectionColor(MEDIUMGREEN);
                     setTextSelectionColor(MEDIUMGREEN);
-                } else if(te.numSelectedInvs > 0) {
+                } else if(te.numSelectedMembers > 0) {
                     setTextNonSelectionColor(DARKGREEN);
                     setTextSelectionColor(DARKGREEN);
                 } else {
                     setTextNonSelectionColor(Color.BLACK);
                     setTextSelectionColor(Color.BLACK);
                 }
+                
                 setFont(BOLDFONT);
                 return super.getTreeCellRendererComponent(tree,
                                                           value,
@@ -108,11 +143,23 @@ public class ClassInvariantSelectionPanel extends JPanel {
                                                           hasFocus);
             }
         });
+        classScrollPane.setViewportView(classTree);
+        
+        //create invariant scroll pane
+        JScrollPane invScrollPane = new JScrollPane();
+        invScrollPane.setBorder(new TitledBorder((useThroughoutInvs 
+                                                  ? "Throughout invariants" 
+                                                  : "Invariants")));
+        Dimension invScrollPaneDim = new Dimension(440, 435);
+        invScrollPane.setPreferredSize(invScrollPaneDim);
+        invScrollPane.setMinimumSize(invScrollPaneDim);
+        listPanel.add(invScrollPane);
         
         //create inv list
         invList = new JList();
         invList.setSelectionMode(ListSelectionModel
                                  .MULTIPLE_INTERVAL_SELECTION);
+        final Services finalServices = services;
         invList.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 if(e.getValueIsAdjusting()) {
@@ -131,49 +178,65 @@ public class ClassInvariantSelectionPanel extends JPanel {
                         removeFromSelection(inv);
                     }
                 }
-                fireSelectionChanged(e);
             }
         });
-        
-        //create list panel
-        JPanel listPanel = new JPanel();
-        listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.X_AXIS));
-        add(listPanel);
-        
-        //create class scroll pane
-        JScrollPane classScrollPane = new JScrollPane(classTree);
-        classScrollPane.setBorder(new TitledBorder("Classes"));
-        Dimension classScrollPaneDim = new Dimension(220, 400);
-        classScrollPane.setPreferredSize(classScrollPaneDim);
-        classScrollPane.setMinimumSize(classScrollPaneDim);
-        listPanel.add(classScrollPane);
-        
-        //create invariant scroll pane
-        JScrollPane invScrollPane = new JScrollPane(invList);
-        invScrollPane.setBorder(new TitledBorder((useThroughoutInvs 
-                                                  ? "Throughout invariants" 
-                                                  : "Invariants")));
-        Dimension invScrollPaneDim = new Dimension(440, 400);
-        invScrollPane.setPreferredSize(invScrollPaneDim);
-        invScrollPane.setMinimumSize(invScrollPaneDim);
-        listPanel.add(invScrollPane);
+        invList.setCellRenderer(new DefaultListCellRenderer() {
+            private final Font PLAINFONT = getFont().deriveFont(Font.PLAIN);
+            
+	    public Component getListCellRendererComponent(
+                                		    JList list,
+                                		    Object value,
+                                		    int index,
+                                		    boolean isSelected,
+                                		    boolean cellHasFocus) {
+		ClassInvariant inv = (ClassInvariant) value;
+		Component supComp 
+		    	= super.getListCellRendererComponent(list, 
+		    					     value, 
+		    					     index, 
+		    					     isSelected, 
+		    					     cellHasFocus);		
+		
+		//create label and enclosing panel
+		JLabel label = new JLabel();
+		label.setText(inv.getHTMLText(finalServices));
+		label.setFont(PLAINFONT);
+		FlowLayout lay = new FlowLayout();
+		lay.setAlignment(FlowLayout.LEFT);
+		JPanel result = new JPanel(lay);
+		result.add(label);
+		label.setVerticalAlignment(SwingConstants.TOP);
+		
+		//set background color
+		result.setBackground(supComp.getBackground());
+
+		//set border
+		TitledBorder border = new TitledBorder(
+				BorderFactory.createEtchedBorder(),
+                                inv.getName());
+		border.setTitleFont(border.getTitleFont()
+					  .deriveFont(Font.BOLD));
+		result.setBorder(border);
+		
+		return result;
+	    }
+        });
+        invScrollPane.setViewportView(invList);
     
         //create button panel
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        Dimension buttonDim = new Dimension(110, 27);
+        buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 
+                                                 (int)buttonDim.getHeight() 
+                                                     + 10));
         add(buttonPanel);
-        Dimension buttonDim = new Dimension(95, 25);
         
         //create left button panel
-        JPanel leftButtonPanel = new JPanel();
+        leftButtonPanel = new JPanel();
         leftButtonPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
         buttonPanel.add(leftButtonPanel);
-        
-        //create right button panel
-        rightButtonPanel = new JPanel();
-        rightButtonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
-        buttonPanel.add(rightButtonPanel);
-        
+                
         //create "select all" button
         JButton selectButton = new JButton("Select all");
         selectButton.setPreferredSize(buttonDim);
@@ -197,173 +260,81 @@ public class ClassInvariantSelectionPanel extends JPanel {
             }
         });
         leftButtonPanel.add(unselectButton);
-    
         
+        //create right button panel
+        rightButtonPanel = new JPanel();
+        rightButtonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
+        buttonPanel.add(rightButtonPanel);
+    
         //set default selection
         if(selectDefaultInvs) {
             selectAllForClass(defaultClass);
         }
-        openClassInTree(defaultClass);
-        
-        //show dialog
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));                
+        updateInvList();
     }
     
-    public JPanel getButtonPanel() {
-        return rightButtonPanel;
-    }
+
     
-    public void addInvariantSelectionListener(ListSelectionListener listener) {
-        selectionListeners.add(listener);        
-    }
+    //-------------------------------------------------------------------------
+    //internal methods
+    //-------------------------------------------------------------------------    
     
-    private void fireSelectionChanged(ListSelectionEvent e) {
-        Iterator it = selectionListeners.iterator();
-        while (it.hasNext()) {
-            ((ListSelectionListener)it.next()).valueChanged(e);
-        }
-    }
-    
-    
-    private ListOfClassInvariant getRelevantInvs(ModelClass modelClass) {
+    private SetOfClassInvariant getRelevantInvs(KeYJavaType kjt) {
         if(useThroughoutInvs) {
-            return modelClass.getMyThroughoutClassInvariants();
+            return specRepos.getThroughoutClassInvariants(kjt);
         } else {
-            return modelClass.getMyClassInvariants();
+            return specRepos.getClassInvariants(kjt);
         }
-    }
-    
-    
-    private DefaultMutableTreeNode getChildByString(
-                                            DefaultMutableTreeNode parentNode, 
-                                            String childString) {
-        int numChildren = parentNode.getChildCount();
-        for(int i = 0; i < numChildren; i++) {
-            DefaultMutableTreeNode childNode 
-                    = (DefaultMutableTreeNode)(parentNode.getChildAt(i));
-          
-            TreeEntry te = (TreeEntry)(childNode.getUserObject());
-            if(childString.equals(te.string)) {
-                return childNode;
-            }
-        }
-        return null;
-    }
-    
-    
-    private void insertIntoClassTree(DefaultMutableTreeNode rootNode, 
-                                     ModelClass modelClass) {
-        String fullClassName = modelClass.getFullClassName();
-        int length = fullClassName.length();
-        int index = -1;
-        DefaultMutableTreeNode node = rootNode;
-        
-        do {
-            //get next part of the name
-            int lastIndex = index;
-            index = fullClassName.indexOf(".", ++index);
-            if(index == -1) {
-                index = length;
-            }
-            String namePart = fullClassName.substring(lastIndex + 1, index);
-            
-            //try to get child node; otherwise, create and insert it
-            DefaultMutableTreeNode childNode = 
-		getChildByString(node, namePart);
-            if(childNode == null) {
-                TreeEntry te = new TreeEntry(namePart);
-                childNode = new DefaultMutableTreeNode(te);
-                node.add(childNode);
-            }
-            
-            //go down to child node
-            node = childNode;
-        } while(index != length);
-        
-        //save model class in leaf
-        TreeEntry te = (TreeEntry)(node.getUserObject());
-        te.modelClass = modelClass;
     }
     
     
     private void setInvCounters(DefaultMutableTreeNode node) {
-        int numInvs = 0;
+        int numMembers = 0;
         
         int numChildren = node.getChildCount();
         for(int i = 0; i < numChildren; i++) {
             DefaultMutableTreeNode childNode 
-                    = (DefaultMutableTreeNode)(node.getChildAt(i));
+                    = (DefaultMutableTreeNode) node.getChildAt(i);
             setInvCounters(childNode);
-            TreeEntry te = (TreeEntry)(childNode.getUserObject());
-            numInvs += te.numInvs;
+            ClassTree.Entry te = (ClassTree.Entry)(childNode.getUserObject());
+            numMembers += te.numMembers;
+        }
+
+        ClassTree.Entry te = (ClassTree.Entry) node.getUserObject();
+        if(te.kjt != null) {
+            numMembers += getRelevantInvs(te.kjt).size();
         }
         
-        TreeEntry te = (TreeEntry)(node.getUserObject());
-        if(te.modelClass != null) {
-            numInvs += getRelevantInvs(te.modelClass).size();
-        }
-        
-        te.numInvs = numInvs;
+        te.numMembers = numMembers;
     }
     
     
     private void setSelectedInvCounters(DefaultMutableTreeNode node) {
-        int numSelectedInvs = 0;
+        int numSelectedMembers = 0;
         
         int numChildren = node.getChildCount();
         for(int i = 0; i < numChildren; i++) {
             DefaultMutableTreeNode childNode 
-                    = (DefaultMutableTreeNode)(node.getChildAt(i));
+                    = (DefaultMutableTreeNode) node.getChildAt(i);
             setSelectedInvCounters(childNode);
-            TreeEntry te = (TreeEntry)(childNode.getUserObject());
-            numSelectedInvs += te.numSelectedInvs;
+            ClassTree.Entry te = (ClassTree.Entry) childNode.getUserObject();
+            numSelectedMembers += te.numSelectedMembers;
         }
         
-        TreeEntry te = (TreeEntry)(node.getUserObject());
-        if(te.modelClass != null) {
-            ListOfClassInvariant invs = getRelevantInvs(te.modelClass);
+        ClassTree.Entry te = (ClassTree.Entry) node.getUserObject();
+        if(te.kjt != null) {
+            SetOfClassInvariant invs = getRelevantInvs(te.kjt);
             IteratorOfClassInvariant it = invs.iterator();
             while(it.hasNext()) {
                 if(selectedInvs.contains(it.next())) {
-                    numSelectedInvs++;
+                    numSelectedMembers++;
                 }
             }
         }
         
-        te.numSelectedInvs = numSelectedInvs;
+        te.numSelectedMembers = numSelectedMembers;
     }
-    
-    
-    private JTree buildClassTree(Set modelClasses) {
-        //sort classes alphabetically
-        Object[] mca = modelClasses.toArray();
-        Arrays.sort(mca, new Comparator() {
-            public int compare(Object o1, Object o2) {
-                ModelClass mc1 = (ModelClass)o1;
-                ModelClass mc2 = (ModelClass)o2;
-                return mc1.getFullClassName().compareTo(mc2.getFullClassName());
-            }
-        });
         
-        //build tree
-        TreeEntry rootEntry = new TreeEntry("");
-        DefaultMutableTreeNode rootNode = 
-	    new DefaultMutableTreeNode(rootEntry);
-        for(int i = 0; i < mca.length; i++) {
-            ModelClass modelClass = (ModelClass)(mca[i]);
-            if(getRelevantInvs(modelClass).size() > 0){
-                insertIntoClassTree(rootNode, modelClass);
-            }
-        }
-        
-        //set inv counters
-        setInvCounters(rootNode);
-        
-        JTree result = new JTree(new DefaultTreeModel(rootNode)); 
-        //result.setRootVisible(false);
-        return result;
-    }
-    
     
     private void addToSelection(ClassInvariant inv) {
         //make sure inv is not selected already
@@ -372,16 +343,16 @@ public class ClassInvariantSelectionPanel extends JPanel {
         }
         
         //add it to the selection
-        selectedInvs = selectedInvs.prepend(inv);
+        selectedInvs = selectedInvs.add(inv);
         
         //update selection counters in tree
         Object[] nodes = classTree.getSelectionPath().getPath();
         for(int i = 0; i < nodes.length; i++) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode)(nodes[i]);
-            TreeEntry te = (TreeEntry)(node.getUserObject());
-            te.numSelectedInvs++;
-            Debug.assertTrue(te.numSelectedInvs > 0 
-                             && te.numSelectedInvs <= te.numInvs);
+            ClassTree.Entry te = (ClassTree.Entry) node.getUserObject();
+            te.numSelectedMembers++;
+            assert te.numSelectedMembers > 0 
+                   && te.numSelectedMembers <= te.numMembers;
             
         }
         classTree.repaint();
@@ -395,28 +366,28 @@ public class ClassInvariantSelectionPanel extends JPanel {
         }
         
         //remove it from the selection
-        selectedInvs = selectedInvs.removeFirst(inv);
+        selectedInvs = selectedInvs.remove(inv);
         
         //update selection counters in tree
         Object[] nodes = classTree.getSelectionPath().getPath();
         for(int i = 0; i < nodes.length; i++) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode)(nodes[i]);
-            TreeEntry te = (TreeEntry)(node.getUserObject());
-            te.numSelectedInvs--;
-            Debug.assertTrue(te.numSelectedInvs >= 0 
-                             && te.numSelectedInvs < te.numInvs);
+            ClassTree.Entry te = (ClassTree.Entry) node.getUserObject();
+            te.numSelectedMembers--;
+            assert te.numSelectedMembers >= 0 
+                   && te.numSelectedMembers < te.numMembers;
         }
         classTree.repaint();
     }
     
     
-    private void selectAllForClass(ModelClass modelClass) {
+    private void selectAllForClass(KeYJavaType kjt) {
         //select invariants of this class
-        selectedInvs = getRelevantInvs(modelClass);
+        selectedInvs = getRelevantInvs(kjt);        
         
         //update selection counters in tree
         DefaultMutableTreeNode rootNode
-                = (DefaultMutableTreeNode)(classTree.getModel().getRoot());
+                = (DefaultMutableTreeNode) classTree.getModel().getRoot();
         setSelectedInvCounters(rootNode);
         classTree.repaint();
     }
@@ -424,16 +395,17 @@ public class ClassInvariantSelectionPanel extends JPanel {
     
     private void selectAll() {
         //select all
-        selectedInvs = SLListOfClassInvariant.EMPTY_LIST;
-        Iterator it = modelClasses.iterator();
+        selectedInvs = SetAsListOfClassInvariant.EMPTY_SET;
+	Set kjts = services.getJavaInfo().getAllKeYJavaTypes();
+	Iterator it = kjts.iterator();
         while(it.hasNext()) {
-            ModelClass modelClass = (ModelClass)(it.next());
-            selectedInvs = selectedInvs.append(getRelevantInvs(modelClass));
+            KeYJavaType kjt = (KeYJavaType)(it.next());            
+            selectedInvs = selectedInvs.union(getRelevantInvs(kjt));
         }
         
         //update selection counters in tree
         DefaultMutableTreeNode rootNode
-                = (DefaultMutableTreeNode)(classTree.getModel().getRoot());
+                = (DefaultMutableTreeNode) classTree.getModel().getRoot();
         setSelectedInvCounters(rootNode);
         classTree.repaint();
     }
@@ -441,11 +413,11 @@ public class ClassInvariantSelectionPanel extends JPanel {
     
     private void unselectAll() {
         //unselect all
-        selectedInvs = SLListOfClassInvariant.EMPTY_LIST;
+        selectedInvs = SetAsListOfClassInvariant.EMPTY_SET;
         
         //update selection counters in tree
         DefaultMutableTreeNode rootNode
-                = (DefaultMutableTreeNode)(classTree.getModel().getRoot());
+                = (DefaultMutableTreeNode) classTree.getModel().getRoot();
         setSelectedInvCounters(rootNode);
         classTree.repaint();
     }
@@ -454,15 +426,19 @@ public class ClassInvariantSelectionPanel extends JPanel {
     private void updateInvList() {     
         invList.setValueIsAdjusting(true);
         
-        if(selectedClass == null) {
+       	ClassTree.Entry selectedEntry = classTree.getSelectedEntry();
+
+        if(selectedEntry == null || selectedEntry.kjt == null) {
             invList.setListData(new Object[0]);
         } else {
-            ListOfClassInvariant invariants = getRelevantInvs(selectedClass);
-            invList.setListData(invariants.toArray());
+            SetOfClassInvariant invariants = getRelevantInvs(selectedEntry.kjt);
+            ClassInvariant[] listData = invariants.toArray();
+            invList.setListData(listData);
             
-            IteratorOfClassInvariant it = selectedInvs.iterator();
-            while(it.hasNext()) {
-                invList.setSelectedValue(it.next(), false);
+            for(int i = 0; i < listData.length; i++) {
+                if(selectedInvs.contains(listData[i])) {
+                    invList.addSelectionInterval(i, i);
+                }
             }
         }
         
@@ -470,69 +446,20 @@ public class ClassInvariantSelectionPanel extends JPanel {
     }
     
     
-    private boolean openClassInTree(ModelClass modelClass) {
-        //get tree path
-        Vector pathVector = new Vector();
-        
-        String fullClassName = modelClass.getFullClassName();
-        int length = fullClassName.length();
-        int index = -1;
-        DefaultMutableTreeNode node 
-                = (DefaultMutableTreeNode)(classTree.getModel().getRoot());
-        Debug.assertTrue(node!=null);        
-        do {
-            //save current node
-            pathVector.add(node);
-            
-            //get next part of the name
-            int lastIndex = index;
-            index = fullClassName.indexOf(".", ++index);
-            if(index == -1) {
-                index = length;
-            }
-            String namePart = fullClassName.substring(lastIndex + 1, index);
-            
-            //get child node, go down to it
-            DefaultMutableTreeNode childNode = 
-		getChildByString(node, namePart);
-	    if (childNode == null) {
-		return false;
-	    }
-            node = childNode;
-        } while(index != length);
-        TreePath incompletePath = new TreePath(pathVector.toArray());
-        
-        TreePath path = incompletePath.pathByAddingChild(node);
-        
-        classTree.expandPath(incompletePath);
-        classTree.setSelectionRow(classTree.getRowForPath(path));
-        return true;
+    
+    //-------------------------------------------------------------------------
+    //public interface
+    //-------------------------------------------------------------------------    
+
+    public JPanel getButtonPanel() {
+        return rightButtonPanel;
     }
+    
     
     /**
      * Returns the selected set of invariants.
      */
-    public ListOfClassInvariant getClassInvariants() {
+    public SetOfClassInvariant getClassInvariants() {
         return selectedInvs;
-    }
-    
-    public JList getInvList() {
-        return invList;
-    }
-    
-    
-    private static class TreeEntry {
-        public String string;
-        public ModelClass modelClass = null;        
-        public int numInvs = 0;
-        public int numSelectedInvs = 0;
-        
-        public TreeEntry(String string) {
-            this.string = string;
-        }
-        
-        public String toString() {
-            return string;
-        }
     }
 }

@@ -20,7 +20,6 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.jml.UsefulTools;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -230,36 +229,5 @@ public class InterfaceDeclaration extends TypeDeclaration {
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printInterfaceDeclaration(this);
-    }
-
-    /**
-     * returns the comments belonging to this InterfaceDeclaration + Comments 
-     * declared in the body of the class that contain jml invariant or 
-     * constraint statements. 
-     * @return the comments.
-     */
-    public Comment[] getComments(){	
-	Comment[] c1 = super.getComments();
-	LinkedList jmlComments = new LinkedList();
-	//HACK: RECODER interprets comments, that are intended to be refering
-	// to the interface, as comments belonging to fields or methods. 
-	for(int i=0; i<getChildCount(); i++){
-	    final ProgramElement p = getChildAt(i);
-	    final Comment[] c2 = p.getComments();
-	    if(c2!=null){
-		for(int j=0; j<c2.length; j++){
-		    if(UsefulTools.isClassSpec(c2[j]) || 
-		       (p instanceof Modifier)){
-			jmlComments.add(c2[j]);
-		    } 
-		}
-	    }
-	}
-	final Comment[] c2 = new Comment[c1.length + jmlComments.size()];
-	System.arraycopy(c1, 0, c2, 0, c1.length);
-	for(int i=c1.length; i<c2.length; i++){
-	    c2[i] = (Comment)jmlComments.removeFirst();
-	}
-	return c2;
     }
 }

@@ -10,13 +10,12 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.ListIterator;
+import java.util.*;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.*;
@@ -101,7 +100,7 @@ public class WhileInvRule extends AbstractMetaOperator {
         modality = (Modality)term.sub(0).op();
         
         ReplaceWhileLoop removeWhile = 
-            new ReplaceWhileLoop(root, null);
+            new ReplaceWhileLoop(root, null, services);
         removeWhile.start();       
         
         body = removeWhile.getTheLoop();
@@ -247,10 +246,11 @@ public class WhileInvRule extends AbstractMetaOperator {
         StatementBlock s = new StatementBlock
         ((Statement[])stmnt.toArray(new Statement[0]));
         Statement resSta;
-        if (svInst.getExecutionContext() != null)
+        if (svInst.getExecutionContext() != null){
             resSta = new MethodFrame(null, svInst.getExecutionContext(), s);
-        else
+        }else{
             resSta = s;
+        }
         
         Modality loopBodyModality = modality;
         
@@ -309,7 +309,11 @@ public class WhileInvRule extends AbstractMetaOperator {
     public ListOfSchemaVariable neededInstantiations(ProgramElement originalLoop,
 						     SVInstantiations svInst) {
 	WhileInvariantTransformation w = 
-	    new WhileInvariantTransformation(originalLoop, svInst);
+	    new WhileInvariantTransformation(originalLoop, 
+                                             svInst, 
+                                             javaInfo == null 
+                                              ? null 
+                                              : javaInfo.getServices());
 	w.start();
 	instantiations = SLListOfSchemaVariable.EMPTY_LIST;
 	if (w.innerLabelNeeded()) {
@@ -459,7 +463,7 @@ public class WhileInvRule extends AbstractMetaOperator {
     protected JavaBlock addContext(JavaNonTerminalProgramElement root,
 				   StatementBlock block) {
 	ReplaceWhileLoop replaceWhile = 
-  	    new ReplaceWhileLoop(root, block);
+  	    new ReplaceWhileLoop(root, block, javaInfo.getServices());
  	replaceWhile.start();       
 	
 	return JavaBlock.createJavaBlock((StatementBlock)replaceWhile.result());

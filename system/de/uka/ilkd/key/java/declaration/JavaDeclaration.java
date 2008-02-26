@@ -154,6 +154,14 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
     }
 
     /**
+     * Test whether the declaration is ghost (the jml modifier is meant).
+     */
+
+    protected boolean isGhost() {
+        return containsModifier(Ghost.class);
+    }
+
+    /**
      * Test whether the declaration is volatile.
      */
 

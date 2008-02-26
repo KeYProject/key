@@ -27,10 +27,7 @@ import org.eclipse.ui.PlatformUI;
 
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.collection.SLListOfString;
-import de.uka.ilkd.key.gui.JMLPOAndSpecProvider;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.jml.JMLSpec;
-import de.uka.ilkd.key.proof.init.AssignableCheckProofOblInput;
 
 /**
  * @author Marius Hillenbrand
@@ -122,7 +119,7 @@ public class MethodPOAction implements IObjectActionDelegate {
 	                    }
 	                        
 	    		        
-	    		        JMLPOAndSpecProvider provider = 
+/*	    		        JMLPOAndSpecProvider provider = 
 	    		            Main.getInstance().getJMLPOAndSpecProvider();
 						Main.getInstance().toBack();
                         
@@ -155,7 +152,7 @@ public class MethodPOAction implements IObjectActionDelegate {
 								// TODO handle error case
 							}
 						}
-						
+						*/
 	                } catch (JavaModelException e) {
 	                    // TODO Auto-generated catch block
 	                    e.printStackTrace();

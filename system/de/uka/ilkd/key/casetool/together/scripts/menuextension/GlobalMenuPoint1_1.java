@@ -15,7 +15,7 @@ package de.uka.ilkd.key.casetool.together.scripts.menuextension;
 import com.togethersoft.openapi.ide.window.IdeDialogType;
 import com.togethersoft.openapi.ide.window.IdeWindowManager;
 
-import de.uka.ilkd.key.casetool.FunctionalityOnModel;
+import de.uka.ilkd.key.casetool.together.FunctionalityOnModel;
 import de.uka.ilkd.key.casetool.together.TogetherReprModel;
 
 public class GlobalMenuPoint1_1 implements GlobalMenu {
@@ -23,9 +23,10 @@ public class GlobalMenuPoint1_1 implements GlobalMenu {
 	return "TransformXMI";
     }
     public void run(IdeWindowManager winMan){
-	String result = FunctionalityOnModel.transformXMIFile(new TogetherReprModel());
+	assert false;
+	/*String result = FunctionalityOnModel.transformXMIFile(new TogetherReprModel());
 	if (!result.equals("")){
 	    winMan.showMessageDialog("Results", IdeDialogType.INFORMATION, result);
-	}
+	}*/
     }
 }

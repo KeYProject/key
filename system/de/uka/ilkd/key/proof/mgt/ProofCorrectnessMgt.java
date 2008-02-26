@@ -6,27 +6,19 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.proof.mgt;
 
-import java.util.Iterator;
-
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.SetOfRuleApp;
 
 public interface ProofCorrectnessMgt {
 
-    boolean ruleApplicable(RuleApp r, Goal g);
-
-    String getLastAnalysisInfo();
+    boolean contractApplicableFor(ProgramMethod pm, Goal g);
 
     ProofStatus getStatus();
 
@@ -36,12 +28,11 @@ public interface ProofCorrectnessMgt {
 
     void ruleUnApplied(RuleApp r);
     
-    Iterator getAppliedNonAxioms();
+    SetOfRuleApp getNonAxiomApps();
 
     void setMediator ( KeYMediator p_mediator );
 
     boolean proofSimilarTo(Proof p);
 
     RuleJustification getJustification(RuleApp app);
-
 }

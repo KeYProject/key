@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.annotation.Annotation;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -38,17 +37,26 @@ public class While extends LoopStatement {
 		 ExtList comments){
         super(guard,body,comments,pos);
     }
-
+    
     /**
+     * create a new While statement with no position info and no comments but guard and body set
+     * @param guard an expression.
+     * @param body a statement.
+     */
+
+    public While(Expression guard, Statement body) {
+		super(guard, body, new ExtList());
+	}
+
+	/**
      *      While.
      *      @param guard an expression.
      *      @param body a statement.
      *	    @param pos a PositionInformation.
      */
 
-    public While(Expression guard, Statement body, PositionInfo pos, 
-		 Annotation[] a){
-        super(guard, body, a, pos);	
+    public While(Expression guard, Statement body, PositionInfo pos){
+        super(guard, body, pos);	
     }
 
     public SourceElement getLastElement() {

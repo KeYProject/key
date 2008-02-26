@@ -18,13 +18,12 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
-import de.uka.ilkd.key.jml.*;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.strategy.Strategy;
 
-public class JMLEclipseAdapter implements JMLPOAndSpecProvider{
-
+public class JMLEclipseAdapter {
+/*TODO
     KeYMediator mediator;
     Services services;
     String javaPath;
@@ -119,6 +118,7 @@ public class JMLEclipseAdapter implements JMLPOAndSpecProvider{
 	return result;
     }
 
+
     public void setMainVisible(boolean mainVisible) {
         this.mainVisible = mainVisible;
     }
@@ -131,5 +131,5 @@ public class JMLEclipseAdapter implements JMLPOAndSpecProvider{
     public Strategy getStrategy() {
         return strategy;
     }
-
+    */
 }

@@ -30,13 +30,12 @@ import de.uka.ilkd.key.casetool.eclipse.MethodPOSelectionDialog;
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.collection.SLListOfString;
 import de.uka.ilkd.key.gui.JMLEclipseAdapter;
-import de.uka.ilkd.key.gui.JMLPOAndSpecProvider;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.jml.JMLMethodSpec;
-import de.uka.ilkd.key.jml.JMLSpec;
+import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.logic.SLListOfTerm;
-import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -618,7 +617,7 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 
 		// remove old environments
 		while (VisualDebugger.getVisualDebugger().getMediator().getProof() != null) {
-			keyProver.closeTaskWithoutIntercation();
+			keyProver.closeTaskWithoutInteraction();
 		}
 
 		VisualDebugger.getVisualDebugger();// .prepareKeY();
@@ -716,44 +715,9 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 						startProver("Debugging "
 								+ selectedMethod.getElementName(), provider,
 								spec, allInvariants, false, false);
-					} else {
-						dialog = new MethodPOSelectionDialog(PlatformUI
-								.getWorkbench().getActiveWorkbenchWindow()
-								.getShell(), methodSpecs);
-						state = dialog.open();
-
-						boolean allInvariants = dialog
-								.isAllInvariantsSelected();
-						boolean addInvariantsToPostCondition = dialog
-								.isAddInvariantsToPostConditionSelected();
-
-						if (state == Window.OK) {
-							Object selectedPO = dialog.getSelectionOnOK()
-									.getFirstElement();
-
-							// TODO complete this step-by-step
-							// assignable: see JML Specification browser
-							// boolean assignablePO = (selectedPO instanceof
-							// AssignableCheckProofOblInput);
-							if (selectedPO instanceof AssignableCheckProofOblInput) {
-								AssignableCheckProofOblInput assignableCheckPO = (AssignableCheckProofOblInput) selectedPO;
-								startProver("Debugging "
-										+ selectedMethod.getElementName(),
-										provider, assignableCheckPO.getSpec(),
-										allInvariants,
-										addInvariantsToPostCondition, true);
-							} else if (selectedPO instanceof JMLSpec) {
-								startProver("Debugging "
-										+ selectedMethod.getElementName(),
-										provider, (JMLSpec) selectedPO,
-										allInvariants,
-										addInvariantsToPostCondition, false);
-							} else {
-								// TODO handle error case
-							}
-						}
-					}
-				} catch (JavaModelException e) {
+					}					
+				    // TODO implement what to do if spec == null
+                } catch (JavaModelException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -857,7 +821,7 @@ class ETProverTaskListener implements ProverTaskListener {
 	 * 
 	 * @see de.uka.ilkd.key.gui.ProverTaskListener#taskFinished()
 	 */
-	public void taskFinished() {
+	public void taskFinished(TaskFinishedInfo info) {
 		// System.out.println("task finished");
 
 	}

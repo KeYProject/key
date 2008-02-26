@@ -41,17 +41,14 @@ public class GlobalProofMgt {
     }
 
     public ProofEnvironment getProofEnvironment(JavaModel jmodel, 
-						RuleConfig ruleConfig,
-						boolean askUser) {
+						RuleConfig ruleConfig) {
 	if (jmodel==null) {
 	    return null;
 	}
         List setOfEnv 
-	    = (List) envKeyToEnv.get(new EnvKey(jmodel, ruleConfig));
+	    = (List) envKeyToEnv.get(new EnvKey(jmodel, ruleConfig));        
 	if (setOfEnv==null || setOfEnv.size()==0) {
 	    return null;
-	} else if (!askUser && setOfEnv.size()>0) {
-	    return (ProofEnvironment) setOfEnv.get(0);
 	} else {
 	    Object[] choice = new Object[setOfEnv.size()+1];
 	    System.arraycopy(setOfEnv.toArray(), 0, choice, 1, setOfEnv.size());
@@ -84,8 +81,10 @@ public class GlobalProofMgt {
 	    listOfEnv = new LinkedList();
 	    envKeyToEnv.put(envKey, listOfEnv);
 	}
-	listOfEnv.add(env);
-	env.setNumber(listOfEnv.size());
+	if(!listOfEnv.contains(env)) {
+	    listOfEnv.add(env);
+	    env.setNumber(listOfEnv.size());
+	}
     }
 
     public void tryReuse(ProofAggregate plist) {

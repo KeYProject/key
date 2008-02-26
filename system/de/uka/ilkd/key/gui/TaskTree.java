@@ -335,8 +335,9 @@ public class TaskTree extends JPanel {
 
 	public void actionPerformed(ActionEvent e) {
 	    if (e.getSource() == mcList) {
-		JDialog fr = new UsedMethodContractsList(invokedNode, mediator);
-		fr.setVisible(true);
+                new UsedSpecificationsDialog(
+                            mediator.getServices(), 
+                            invokedNode.getUsedSpecs());
 	    } else if (e.getSource() == removeTask) {
 	        removeTask(invokedNode);
             } else if (e.getSource() == loadProof) {
@@ -347,8 +348,11 @@ public class TaskTree extends JPanel {
 	        boolean loaded = localFileChooser.showOpenDialog(mainFrame);
 	        if (loaded) {
 		    File file = localFileChooser.getSelectedFile(); 
-		    (new ProblemLoader(file, mainFrame, 
-                            mediator.getProfile(), true)).run();
+		    final ProblemLoader pl = new ProblemLoader(file, mainFrame, 
+                                        mediator.getProfile(), true, 
+                                        Main.enableSpecs);
+                    pl.addTaskListener(mainFrame.getProverTaskListener());
+                    pl.run();
 	        }
             }
 	}

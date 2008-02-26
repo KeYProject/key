@@ -16,7 +16,6 @@ import java.io.IOException;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.annotation.Annotation;
 import de.uka.ilkd.key.java.statement.JumpStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -221,16 +220,4 @@ public abstract class ProgramSVSkolem
     public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
 	return this == se;
     }
-
-    /**
-     *@return the annotations.
-     */
-    public Annotation[] getAnnotations(){
-	return new Annotation[0];
-    }
-
-    public int getAnnotationCount(){
-	return 0;
-    }
-
 }

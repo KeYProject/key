@@ -2,7 +2,7 @@
 <!-- JNLP file for KeY -->
 <jnlp spec="1.0+" codebase="http://i12www.ira.uka.de/~bubel/nightly/webstart/" href="KeY.jnlp">
 <information> 
-<title>KeY</title>
+<title>KeY 1.3 (Nightly Build Version)</title>
 <vendor>KeY-Project, Universität Karlsruhe, Chalmers University, Universität Koblenz</vendor> 
 <homepage href="http://www.key-project.org"/> 
 <description>

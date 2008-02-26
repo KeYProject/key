@@ -25,8 +25,6 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 public abstract class HTMLFile extends HTMLContainer {
     
     private static final String PRCSVERSION = Main.INTERNAL_VERSION;
-
-
     
     static KeYResourceManager resManager = KeYResourceManager.getManager();
 

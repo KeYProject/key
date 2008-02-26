@@ -26,9 +26,7 @@ import recoder.java.SourceElement.Position;
 import recoder.java.declaration.*;
 import recoder.java.reference.MethodReference;
 import recoder.java.reference.TypeReference;
-import recoder.list.CommentArrayList;
-import recoder.list.CommentMutableList;
-import recoder.list.StatementMutableList;
+import recoder.list.*;
 import de.uka.ilkd.key.parser.proofjava.ParseException;
 import de.uka.ilkd.key.parser.proofjava.ProofJavaParser;
 
@@ -377,6 +375,22 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     }
     
     /**
+     * Create a comment.
+     * @param text comment text
+     */
+    public Comment createComment(String text) {
+        return new Comment(text);
+    }
+    
+    /**
+     * Create a comment.
+     * @param text comment text
+     */
+    public Comment createComment(String text, boolean prefixed) {
+        return new Comment(text, prefixed);
+    }
+    
+    /**
      * Create an {@link ImplicitIdentifier}.
      */
     public ImplicitIdentifier createImplicitIdentifier(String text) {
@@ -387,6 +401,8 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     public Identifier createIdentifier(String text) {
         return new ExtendedIdentifier(text);
     }
-
-
+    
+    public ObjectTypeIdentifier createObjectTypeIdentifier(String text) {
+        return new ObjectTypeIdentifier(text);
+    }
 }

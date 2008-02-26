@@ -3,8 +3,6 @@ package de.uka.ilkd.key.casetool;
 import java.util.Set;
 import java.util.Vector;
 
-import de.uka.ilkd.key.speclang.ListOfClassInvariant;
-
 
 public interface ModelClass {
 
@@ -38,15 +36,4 @@ public interface ModelClass {
     Vector getOps();
     
     public abstract Set getAllClasses();
-
-    /**
-     * Returns the invariants of the class.
-     */
-    public abstract ListOfClassInvariant getMyClassInvariants();
-
-    /**
-     * Returns the throughout invariants of the class.
-     */
-    public abstract ListOfClassInvariant getMyThroughoutClassInvariants();
-
 }

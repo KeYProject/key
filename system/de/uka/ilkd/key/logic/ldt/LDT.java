@@ -32,7 +32,10 @@ import de.uka.ilkd.key.util.ExtList;
  * class TypeConverter needs this class to convert java-program
  * constructs to logic terms.
  */
-public abstract class LDT extends ADT {
+public abstract class LDT {
+    
+    /** the ldts name */
+    private final Name name;
     
     /** the function namespace */
     private Namespace functions = new Namespace();
@@ -61,11 +64,9 @@ public abstract class LDT extends ADT {
      * of the java program
      */
     public LDT(Name name, Namespace sorts, Type type) {
-        super(name);
+        this.name = name;
         this.sort = (Sort) sorts.lookup(name);
         this.type = type;
-        assert sort != null;
-	addSort(sort);	
 	keyJavaType.put(type, new KeYJavaType(type, sort));	
     }
 
@@ -86,10 +87,10 @@ public abstract class LDT extends ADT {
      */
     public Function addFunction(Namespace funcNS, String funcName) {
         final Function f = (Function)funcNS.lookup(new Name(funcName));
-        functions.add(f);
         if (f==null) {
-            System.out.println("IntegerLDT: Function " + funcName + " not found");
-        } 
+            throw new RuntimeException("IntegerLDT: Function " + funcName + " not found");
+        }
+        addFunction(f);
         return f;
     }
 
@@ -131,6 +132,11 @@ public abstract class LDT extends ADT {
 	return rules;
     }
 
+    /** returns the name of the LDT */
+    public Name name() {
+        return name;
+    }
+    
     /** toString */
     public String toString() {
 	return "LDT "+name()+" ("+targetSort()+"<->"+javaType()+")";

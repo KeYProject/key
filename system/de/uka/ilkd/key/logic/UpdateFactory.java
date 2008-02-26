@@ -228,6 +228,16 @@ public class UpdateFactory {
         return res;
     }
     
+    
+    public Update quantify (QuantifiableVariable[] vars, Update update) {
+        Update res = update;
+        for (int i = 0; i < vars.length; i++) {
+            res = quantify (vars[i], res);
+        }
+        return res;
+    }
+    
+    
     /**
      * Quantify over <code>var</code>, i.e. carry out the update
      * <code>update</code> in parallel for all values of <code>var</code>

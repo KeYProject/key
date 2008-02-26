@@ -23,13 +23,13 @@ public class Position {
        The line number.
     */
 
-    private int line;
+    private final int line;
 
     /**
        The column number.
     */
 
-    private int column;
+    private final int column;
 
     /**
        The "undefined position" constant used to compare to undefined 

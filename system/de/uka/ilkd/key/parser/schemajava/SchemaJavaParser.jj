@@ -474,6 +474,7 @@ TOKEN :
 		    | < FINALLY: "finally" >
 		    | < FLOAT: "float" >
 		    | < FOR: "for" >
+		    | < GHOST: "ghost" >
 		    | < GOTO: "goto" >
 		    | < IF: "if" >
 		    | < IMPLEMENTS: "implements" >
@@ -513,6 +514,7 @@ TOKEN :
 		    | < TYPEOF: "#typeof" >
 		    | < SWITCHTOIF: "#switch-to-if" >
 		    | < UNPACK: "#unpack" >
+		    | < SET: "#set" >
 		    }
 
 /* LITERALS */
@@ -3061,7 +3063,7 @@ StatementBlock StartBlock() :
 	             ec = ExecutionContextSV() ))? 
             <CONTEXTSTART> 
             {
-              if (ec != null) {
+              if (tr == null) {
                  result = factory.createContextStatementBlock(ec);
 	      } else { 
                  result = factory.createContextStatementBlock(tr, sv);
@@ -3098,24 +3100,24 @@ Statement BlockStatement() :
 {    
     (LOOKAHEAD([ "final" ]<TYPEOF> "(" <SVIDENTIFIER> ")")
      result = SVLocalVariableDeclaration() ";"
-     |  LOOKAHEAD([ "final" ] <SVIDENTIFIER> <SVIDENTIFIER> ";" ,
+     |  LOOKAHEAD([ "final" | "ghost" ] <SVIDENTIFIER> <SVIDENTIFIER> ";" ,
 	 {
-	     isLocalVariable((getToken(1).kind == FINAL ? getToken(3) : getToken(2)).toString())
+	     isLocalVariable((getToken(1).kind == FINAL || getToken(1).kind == GHOST ? getToken(3) : getToken(2)).toString())
 	 })
      result = SVLocalVariableDeclaration() ";" 
-     |  LOOKAHEAD([ "final" ] <SVIDENTIFIER> <SVIDENTIFIER> "=" <SVIDENTIFIER> ,
+     |  LOOKAHEAD([ "final" | "ghost" ] <SVIDENTIFIER> <SVIDENTIFIER> "=" <SVIDENTIFIER> ,
 	 {
-	     isLocalVariable((getToken(1).kind == FINAL ? getToken(3) : getToken(2)).toString())
+	     isLocalVariable((getToken(1).kind == FINAL || getToken(1).kind == GHOST ? getToken(3) : getToken(2)).toString())
 	 })
      result = SVLocalVariableDeclaration() ";" 	
-     |  LOOKAHEAD([ "final" ] Type() <SVIDENTIFIER> ";" ,
+     |  LOOKAHEAD([ "final" | "ghost" ] Type() <SVIDENTIFIER> ";" ,
 	 {
-	     isLocalVariable((getToken(1).kind == FINAL ? getToken(3) : getToken(2)).toString())
+	     isLocalVariable((getToken(1).kind == FINAL || getToken(1).kind == GHOST ? getToken(3) : getToken(2)).toString())
 	 })
      result = SVLocalVariableDeclaration() ";" 
-     |  LOOKAHEAD([ "final" ] Type() <SVIDENTIFIER> "=" <SVIDENTIFIER> ,
+     |  LOOKAHEAD([ "final" | "ghost" ] Type() <SVIDENTIFIER> "=" <SVIDENTIFIER> ,
 	 {
-	     isLocalVariable((getToken(1).kind == FINAL ? getToken(3) : getToken(2)).toString())
+	     isLocalVariable((getToken(1).kind == FINAL || getToken(1).kind == GHOST ? getToken(3) : getToken(2)).toString())
 	 })
      result = SVLocalVariableDeclaration() ";" 
      |
@@ -3182,6 +3184,13 @@ LocalVariableDeclaration SVLocalVariableDeclaration() :
 	Final fi = factory.createFinal(); 
 	setPrefixInfo(fi);
 	result.setModifiers(new ModifierArrayList(fi));
+    }
+    |
+      "ghost"
+    {
+    	Ghost g = new Ghost();
+    	setPrefixInfo(g);
+    	result.setModifiers(new ModifierArrayList(g));
     } 
     ]
 	(tr = TypeMC() | tr = TypeSV() | tr = Type() ) 
@@ -3249,6 +3258,17 @@ Expression StatementExpression() :
 	     )
 	]
 	)
+     | (
+         "#set"
+         result = PrimaryExpression()
+         "="
+         expr = Expression()
+         {
+             op = new SetAssignment(result, expr);
+             testLeftHandSide(result);
+             result = op;             
+         }
+       )
      )
 	{
 	    checkConstruction(result);
@@ -3463,7 +3483,20 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
        return result;
    }
    )
-      |
+      | 
+(      "#for-to-while" "(" innerLabel = JumpLabelSV() "," outerLabel = JumpLabelSV() "," 
+      (   stat = Statement()
+      ) ")"
+  {
+      result = factory.createRKeYMetaConstruct();
+      setPrefixInfo(result);
+      result.setChild(stat);
+      result.addSV(innerLabel);
+      result.addSV(outerLabel);
+      result.setName("#for-to-while");
+      return result; 
+  }
+)      |
       <SWITCHTOIF> "(" stat = Statement() ")"
   {  
       result = factory.createRKeYMetaConstruct();

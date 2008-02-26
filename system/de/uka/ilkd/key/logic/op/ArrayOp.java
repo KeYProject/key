@@ -83,7 +83,11 @@ public class ArrayOp extends AccessOp implements SortDependingSymbol {
      * creates an ArrayOp
      */
     private ArrayOp(Sort arraySort){
-     this(new Name("arrayAccess(" + arraySort +")"), arraySort);
+     this(new Name("arrayAccess_" 
+                   + (arraySort instanceof ArraySort
+                      ? ((ArraySort)arraySort).elementSort().toString() 
+                      : arraySort.toString())), 
+          arraySort);
     }
     
     /**

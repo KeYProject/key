@@ -197,7 +197,7 @@ public class Polynomial {
     
     public Term toTerm (Services services) {
         final TermSymbol add = 
-            services.getTypeConverter().getIntegerLDT().getArithAddition();
+            services.getTypeConverter().getIntegerLDT().getAdd();
         Term res = null;
         
         final IteratorOfMonomial it = parts.iterator ();
@@ -241,7 +241,7 @@ public class Polynomial {
             this.tc = services.getTypeConverter ();
             final IntegerLDT intLDT = tc.getIntegerLDT ();
             numbers = intLDT.getNumberSymbol ();
-            add = intLDT.getArithAddition ();
+            add = intLDT.getAdd();
         }
         
         public void analyse(Term polynomial) {

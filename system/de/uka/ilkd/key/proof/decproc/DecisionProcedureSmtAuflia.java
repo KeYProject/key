@@ -10,25 +10,16 @@
 
 package de.uka.ilkd.key.proof.decproc;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.HashMap;
+import java.io.*;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Layout;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
+import org.apache.log4j.*;
 
 import de.uka.ilkd.key.gui.DecisionProcedureSettings;
+import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.proof.Goal;
@@ -102,18 +93,14 @@ public abstract class DecisionProcedureSmtAuflia extends AbstractDecisionProcedu
     private static String currentArchiveDir;
     
     /** */
-    private static Map fromProofToArchive = new HashMap();
-        
-    /* String constants for creation of the log file and benchmark archives */
-    private static final String pointKeyDir = 
-        System.getProperty( "user.home" ) + File.separator + ".key";
+    private static Map fromProofToArchive = new WeakHashMap();
         
     private static final String logPrefix = "smt_";
     private static final String logSuffix = "log";
-    private static final String logDir = pointKeyDir + File.separator + "SmtTrans_Logs";
+    private static final String logDir = PathConfig.KEY_CONFIG_DIR + File.separator + "SmtTrans_Logs";
     private static final String logFileCreateError = "SMT log file could not be created!\n";
     
-    private static final String archiveDir = pointKeyDir + File.separator + "SmtBench_Archive";
+    private static final String archiveDir = PathConfig.KEY_CONFIG_DIR + File.separator + "SmtBench_Archive";
     private static final String archiveFileExt = ".smt";
     private static final String zipFileExt = ".zip";
     private static final String 

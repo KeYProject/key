@@ -71,6 +71,7 @@ import visualdebugger.draw2d.SourceElementFigure;
 import visualdebugger.draw2d.TreeBranch;
 import visualdebugger.draw2d.TreeFilter;
 import visualdebugger.draw2d.TreeRoot;
+import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -1297,7 +1298,9 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                     return;
                 if (!vd.getMediator().ensureProofLoaded())
                     return;
-                new DecProcRunner(Main.getInstance(false)).run();
+                new DecProcRunner((IMain)vd.getMediator().mainFrame(),
+                        vd.getMediator().getProof(), 
+                        vd.getMediator().getUserConstraint().getConstraint()).run();
             }
 
         };

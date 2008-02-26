@@ -49,7 +49,6 @@ public class Config {
 
     /** the listeners to this Config */
     private List listenerList = new ArrayList(5);
-    
 
     private Config() {
     }

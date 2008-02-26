@@ -51,7 +51,7 @@ public class NewJumpLabelCondition implements VariableCondition {
             }                       
             final LinkedList programs = collect(matchCond.getInstantiations());
             programs.add(matchCond.getInstantiations().getContextInstantiation().contextProgram());
-            if (!isUnique((Label)instCandidate, programs)) {                                
+            if (!isUnique((Label)instCandidate, programs, services)) {                                
                 return null;
             }
         }    
@@ -73,11 +73,13 @@ public class NewJumpLabelCondition implements VariableCondition {
         return result;
     }
     
-    private boolean isUnique(Label label, LinkedList programs) {
+    private boolean isUnique(Label label, 
+                             LinkedList programs, 
+                             Services services) {
         final HashSet result = new HashSet(100);
         for (final Iterator it = programs.iterator(); it.hasNext();) {
             final LabelCollector lc = 
-                new LabelCollector((ProgramElement)it.next(), result); 
+                new LabelCollector((ProgramElement)it.next(), result, services); 
             lc.start();
         }                             
         return !result.contains(label);       

@@ -285,10 +285,12 @@ public class JavaInfo {
             return "[B";
         else if ("jint[]".equals(s) || "int[]".equals(s))
             return "[I";
-        else if ("jlong[]".equals(s) || "long[]".equals("s"))
+        else if ("jlong[]".equals(s) || "long[]".equals(s))
             return "[J";
         else if ("jshort[]".equals(s) || "short[]".equals(s))
             return "[S";
+        else if ("jchar[]".equals(s) || "char[]".equals(s))
+            return "[C";
 // Strangely, this one is not n
 //        else if ("boolean[]".equals(s))
 //            return "[Z";
@@ -647,6 +649,16 @@ public class JavaInfo {
 		result = keYType;
 	    }
 	}
+	
+	if(result == null && ((ClassDeclaration) javaType).isAnonymousClass()){
+	    IteratorOfSort sit = type.getSort().extendsSorts().iterator();
+	    while(sit.hasNext()){
+	        Sort s = sit.next();
+	        if(!((ClassType) getKeYJavaType(s).getJavaType()).isInterface()){
+	            return getKeYJavaType(s);
+	        }
+	    }
+	}
 
 	if (result == null) {
 	    result = getJavaLangObject();
@@ -924,7 +936,7 @@ public class JavaInfo {
 	    final ListOfField list   = kpmi.getAllFieldsLocallyDeclaredIn(classType);
 	    final IteratorOfField it = list.iterator();	   
             while (it.hasNext()) {
-		final Field f = it.next();              
+		final Field f = it.next();
 		if (f!=null && (f.getName().equals(name) || 
 		                f.getProgramName().equals(name))) {
 		    return (ProgramVariable)((VariableSpecification)f).
