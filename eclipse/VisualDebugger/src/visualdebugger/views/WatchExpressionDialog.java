@@ -204,6 +204,10 @@ public class WatchExpressionDialog {
 		GridData gridData = new GridData();
 		gridData.widthHint = 400;
 		text.setLayoutData(gridData);
+		
+		if(fieldToObserve.startsWith("Field ")){
+		    fieldToObserve = fieldToObserve.substring(6);
+		}
 		text.setText(fieldToObserve);
 
 	}

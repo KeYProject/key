@@ -212,14 +212,13 @@ public class ProofStarter {
         try {
             System.out.println("28");
             int countApplied = 0;
-            if(progressMonitors == null) throw new Throwable("progressmon was null");
-            synchronized (progressMonitors) {
+
                 initProgressMonitors(maxSteps);
                 while (countApplied < maxSteps && applyAutomaticRule()) {
                     countApplied++;
                     System.out.println("countApplied: "  +countApplied);
-                    informProgressMonitors(countApplied);
-                }
+                  //  informProgressMonitors(countApplied);
+             
             }System.out.println("30");
             if (useDecisionProcedures && decisionProcedureRule != null) {
                 applySimplificationOnGoals(proof.openGoals(), decisionProcedureRule);
