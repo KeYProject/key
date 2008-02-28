@@ -21,14 +21,20 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
+import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.AttributeOp;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.InstanceofSymbol;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
 import de.uka.ilkd.key.speclang.FormulaWithAxioms;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -52,6 +58,7 @@ public class TestJMLTranslator extends TestCase {
     private static JMLTranslator translator;
     private static KeYJavaType testClassType;
     
+    private static Term trueLitTerm;
     
 
     protected void setUp() {
@@ -63,6 +70,8 @@ public class TestJMLTranslator extends TestCase {
         services = javaInfo.getServices();
         translator = new JMLTranslator(services);
         testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
+        trueLitTerm = services.getTypeConverter().convertToLogicElement(
+                BooleanLiteral.TRUE);
     }
 
     
@@ -82,6 +91,41 @@ public class TestJMLTranslator extends TestCase {
                 .getTypeByClassName("java.lang.Exception");
         ProgramElementName excPEN = new ProgramElementName("exc");
         return new LocationVariable(excPEN, excType);
+    }
+
+    
+    protected ProgramVariable buildResultVar(ProgramMethod pm) {
+        ProgramElementName resPEN = new ProgramElementName("result");
+        ProgramVariable result = new LocationVariable(resPEN, pm.getKeYJavaType());
+        return result;
+    }
+    
+    
+    private boolean termContains(Term t, Term sub) {
+        
+        for(int i = 0; i < t.arity(); i++) {
+            if (t.sub(i).equals(sub) || termContains(t.sub(i), sub)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    
+    private boolean termContains(Term t, Operator op) {
+
+        if (t.op().arity() == op.arity() && t.op().name().equals(op.name())) {
+            return true;
+        }        
+        
+        for(int i = 0; i < t.arity(); i++) {
+            if (termContains(t.sub(i), op)) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     
@@ -119,6 +163,28 @@ public class TestJMLTranslator extends TestCase {
     }
 
     
+    public void testLogicalExpression() {
+        FormulaWithAxioms result = null;
+
+        ProgramVariable selfVar = buildSelfVarAsProgVar();
+
+        try {
+            result = translator.translateExpression(new PositionedString("(b <= s &&  i > 5) ==> this != instance"), testClassType,
+                    selfVar, null, null, null, new LinkedHashMap());
+        } catch (SLTranslationException e) {
+            e.printStackTrace();
+            assertTrue(false);
+        }
+
+        assertTrue(result != null);
+        assertTrue(result.getAxioms().isEmpty());
+        assertTrue(result.getFormula().op().equals(Op.IMP));
+        assertTrue(result.getFormula().sub(0).op().equals(Op.AND));
+        assertTrue(termContains(result.getFormula(), tb.zTerm(services, "5")));
+        assertTrue(termContains(result.getFormula(), selfVar));
+    }
+    
+    
     public void testPrimitiveField() {
         FormulaWithAxioms result = null;
 
@@ -133,8 +199,9 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-        assertTrue(result.getFormula().equals(tb.dot(tb.var(selfVar), i)));
         assertTrue(result.getAxioms().isEmpty());
+        assertTrue(termContains(result.getFormula(), AttributeOp.getAttributeOp(i) ));
+        assertTrue(termContains(result.getFormula(), selfVar ));
     }
 
     
@@ -142,8 +209,8 @@ public class TestJMLTranslator extends TestCase {
         FormulaWithAxioms result = null;
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
-        Term queryTerm = javaInfo.getProgramMethodTerm(tb.var(selfVar),
-                "getOne", new Term[] {}, "testPackage.TestClass");
+        ProgramMethod getOne = javaInfo.getProgramMethod(testClassType,
+                "getOne", SLListOfKeYJavaType.EMPTY_LIST, testClassType);
 
         try {
             result = translator.translateExpression(new PositionedString("this.getOne()"),
@@ -154,8 +221,9 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
-        assertTrue(result.getFormula().equals(queryTerm));
         assertTrue(result.getAxioms().isEmpty());
+        assertTrue(termContains(result.getFormula(), selfVar));
+        assertTrue(termContains(result.getFormula(), getOne));
     }
 
     
@@ -165,7 +233,7 @@ public class TestJMLTranslator extends TestCase {
         try {
             result = translator.translateExpression(
                     new PositionedString("(\\forall int i; (-2147483648 <= i && i <= 2147483647) )"),
-                    this.testClassType, null, null, null, null,
+                    testClassType, null, null, null, null,
                     new LinkedHashMap());
         } catch (SLTranslationException e) {
             assertTrue(false);
@@ -174,10 +242,8 @@ public class TestJMLTranslator extends TestCase {
         assertTrue(result != null);
         assertTrue(result.getAxioms().isEmpty());
         assertTrue(result.getFormula().op().equals(Op.ALL));
-        assertTrue(result.getFormula().sub(0).op().equals(Op.IMP));
-        assertTrue(result.getFormula().sub(0).sub(0).op() instanceof Function);
-        assertTrue(((Function) result.getFormula().sub(0).sub(1).sub(0).op()).name()
-                .toString().equals("leq"));
+        assertTrue(termContains(result.getFormula(), tb.zTerm(services, "2147483647")));
+        assertTrue(termContains(result.getFormula(), Op.AND));
     }
 
     
@@ -197,6 +263,7 @@ public class TestJMLTranslator extends TestCase {
         assertTrue(result.getAxioms().isEmpty());
         assertTrue(result.getFormula().op().equals(Op.EX));
         assertTrue(result.getFormula().sub(0).op().equals(Op.AND));
+        assertTrue(termContains(result.getFormula(), tb.NULL(services)));
     }
 
 
@@ -205,6 +272,7 @@ public class TestJMLTranslator extends TestCase {
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         ProgramVariable excVar = buildExcVar();
+        ProgramVariable i = javaInfo.getAttribute("testPackage.TestClass::i");
 
         Map atPreDefs = new LinkedHashMap();
 
@@ -219,9 +287,137 @@ public class TestJMLTranslator extends TestCase {
         assertTrue(result != null);
         assertTrue(result.getAxioms().isEmpty());
         assertTrue(atPreDefs.size() == 1); // for "i"
+        assertTrue(atPreDefs.containsKey(AttributeOp.getAttributeOp(i)));
         assertTrue(result.getFormula().op().equals(Op.EQUALS));
+        assertTrue(termContains(result.getFormula(), (Function) atPreDefs.get(atPreDefs.keySet().iterator().next())));
     }
 
+    
+    public void testResultVar() {
+        FormulaWithAxioms result = null;
+
+        ProgramVariable selfVar = buildSelfVarAsProgVar();
+        ProgramVariable excVar = buildExcVar();
+        
+        ListOfKeYJavaType signature = SLListOfKeYJavaType.EMPTY_LIST;
+
+        ProgramMethod pm = javaInfo.getProgramMethod(testClassType, "getOne",
+                signature, testClassType);
+        
+        ProgramVariable resultVar = buildResultVar(pm);
+        Map atPreDefs = new LinkedHashMap();
+
+        try {
+            result = translator.translateExpression(new PositionedString("\\result == 1"),
+                    testClassType, selfVar, null, resultVar, excVar, atPreDefs);
+        } catch (SLTranslationException e) {
+            assertTrue(false);
+        }
+
+        assertTrue(result != null);
+        assertTrue(result.getAxioms().isEmpty());
+        assertTrue(result.getFormula().op().equals(Op.EQUALS));
+        assertTrue(termContains(result.getFormula(), resultVar));
+        
+    }
+
+    
+    public void testCreated() {
+        FormulaWithAxioms result = null;
+
+        ProgramVariable selfVar = buildSelfVarAsProgVar();
+        ProgramVariable instance = javaInfo.getAttribute("testPackage.TestClass::instance");
+        Map atPreDefs = new LinkedHashMap();
+
+        try {
+            result = translator.translateExpression(new PositionedString("\\created(this.instance)"),
+                    testClassType, selfVar, null, null, null, atPreDefs);
+        } catch (SLTranslationException e) {
+            assertTrue(false);
+        }
+
+        assertTrue(result != null);
+        assertTrue(result.getAxioms().isEmpty());
+        assertTrue(termContains(result.getFormula(), instance));
+        assertTrue(termContains(result.getFormula(), AttributeOp
+                .getAttributeOp(javaInfo.getAttribute(
+                        ImplicitFieldAdder.IMPLICIT_CREATED, javaInfo
+                                .getJavaLangObject()))));
+    }
+
+    
+    public void testNonNullElements() {
+        FormulaWithAxioms result = null;
+        
+        ProgramVariable selfVar = buildSelfVarAsProgVar();
+        ProgramVariable array = javaInfo.getAttribute("testPackage.TestClass::array");
+        Map atPreDefs = new LinkedHashMap();
+        
+        try {
+            result = translator.translateExpression(new PositionedString("\\nonnullelements(this.array)"),
+                    testClassType,
+                    selfVar,
+                    null,
+                    null,
+                    null,
+                    atPreDefs);
+        } catch (SLTranslationException e) {
+            assertTrue(false);
+        }
+        
+        assertTrue(result != null);
+        assertTrue(result.getAxioms().isEmpty());
+        assertTrue(termContains(result.getFormula(), AttributeOp.getAttributeOp(array)));
+        assertTrue(termContains(result.getFormula(), tb.NULL(services)));
+    }
+
+    
+    public void testIsInitialized() {
+        
+        FormulaWithAxioms result = null;
+        
+        ProgramVariable selfVar = buildSelfVarAsProgVar();
+        Map atPreDefs = new LinkedHashMap();
+        
+        try {
+            result = translator.translateExpression(new PositionedString("\\is_initialized(testPackage.TestClass)"),
+                    testClassType,
+                    selfVar,
+                    null,
+                    null,
+                    null,
+                    atPreDefs);
+        } catch (SLTranslationException e) {
+            assertTrue(false);
+        }
+        
+        assertTrue(result != null);
+        assertTrue(result.getAxioms().isEmpty());
+        assertTrue(result.getFormula().op().equals(Op.EQUALS));
+        assertTrue(termContains(result.getFormula(), tb.var(javaInfo
+                .getAttribute(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED,
+                        testClassType))));
+    }
+
+  
+    public void testHexLiteral() {
+        FormulaWithAxioms result = null;
+        
+        ProgramVariable selfVar = buildSelfVarAsProgVar();
+        
+        try {
+            result = translator.translateExpression(
+                    new PositionedString(" i == 0x12 "),
+                    testClassType, selfVar, null, null, null, new LinkedHashMap());
+        } catch (SLTranslationException e) {
+            assertTrue(false);
+        }
+        
+        assertTrue(result != null);
+        assertTrue(result.getFormula().op().equals(Op.EQUALS));
+        assertTrue(termContains(result.getFormula(),tb.zTerm(services, "18")));
+    }
+    
     
     public void testComplexQueryResolving1() {
         FormulaWithAxioms result = null;
@@ -279,6 +475,34 @@ public class TestJMLTranslator extends TestCase {
     }
 
 
+    public void testComplexQueryResolving3() {
+        FormulaWithAxioms result = null;
+
+        ProgramVariable selfVar = buildSelfVarAsProgVar();
+
+        ListOfKeYJavaType signature = SLListOfKeYJavaType.EMPTY_LIST;
+        signature = signature.append(javaInfo
+                .getKeYJavaType(PrimitiveType.JAVA_INT));
+
+        ProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m",
+                signature, testClassType);
+
+        try {
+            result = translator.translateExpression(
+                    new PositionedString("this.m(s + 4) == this.m(+b)"), testClassType, selfVar,
+                    null, null, null, new LinkedHashMap());
+        } catch (SLTranslationException e) {
+            e.printStackTrace();
+            assertTrue(false);
+        }
+
+        assertTrue(result != null);
+        assertTrue(result.getAxioms().isEmpty());
+        assertTrue(result.getFormula().sub(0).op().equals(pm));
+        assertTrue(result.getFormula().sub(1).op().equals(pm));
+    }
+
+
     public void testStaticQueryResolving() {
         FormulaWithAxioms result = null;
 
@@ -298,10 +522,11 @@ public class TestJMLTranslator extends TestCase {
             assertTrue(false);
         }
 
-        assertTrue(result != null);;
+        assertTrue(result != null);
         assertTrue(result.getAxioms().isEmpty());
         assertTrue(result.getFormula().sub(0).op().equals(pm));
     }
+    
     
     public void testSubtypeExpression() {
         FormulaWithAxioms result = null;
@@ -318,5 +543,9 @@ public class TestJMLTranslator extends TestCase {
         }
 
         assertTrue(result != null);
+
+        SortDefiningSymbols sds = (SortDefiningSymbols) javaInfo.getJavaLangObjectAsSort();
+        Function ioFunc = (Function) sds.lookupSymbol(InstanceofSymbol.NAME);
+        assertTrue(termContains(result.getFormula(), ioFunc));
     }
 }

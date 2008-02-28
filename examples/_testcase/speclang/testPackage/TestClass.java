@@ -2,8 +2,14 @@ package testPackage;
 
 public class TestClass {
 
+    byte b;
+    short s;
     int i;
     long l;
+
+    TestClass[] array;
+
+    public static TestClass instance = new TestClass();
 
     public int getOne() {
         return 1;
