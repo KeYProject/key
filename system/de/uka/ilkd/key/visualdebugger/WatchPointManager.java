@@ -112,6 +112,17 @@ public class WatchPointManager {
                                         .getTypeConverter().getBooleanType());
                         progVarNS.add(var_self);
                         progVarNS.add(var_dummy);
+                        
+                        if(!wp.isGLOBAL_WATCHPOINT()){
+                            System.out.println("type of locVar: "+wp.getTypeOfLV());
+                            System.out.println("type of locVar: "+wp.getName());
+                            ProgramElementName nameOfLocalVariable = new ProgramElementName(
+                                    wp.getNameOfLV());
+                            ProgramVariable localVariable = new LocationVariable(
+                                    nameOfLocalVariable , ji.getKeYJavaType(wp.getTypeOfLV()));
+                            progVarNS.add(localVariable);
+                            
+                        }
 
                         buffer.append("\\exists " + typeOfSource + " x; {"
                                 + selfName + ":= x } \\<{method-frame( source="
