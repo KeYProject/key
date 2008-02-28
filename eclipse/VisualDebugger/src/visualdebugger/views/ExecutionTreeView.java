@@ -1414,7 +1414,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
             	
                 LinkedList<ETNode> allLeafETNodes = WatchpointUtil.getAllLeafETNodes(etn);
 				System.out.println("ETV identfy for : " + allLeafETNodes.size() + " ETNODE (LEAVES)");
-                identifyWatchpoints(allLeafETNodes);
+               //TODO make it work identifyWatchpoints(allLeafETNodes);
                 treebranch = buildTreeBranch(etn, null, new TreeFilter());
                 this.root.addBranch(treebranch);
 

@@ -2,6 +2,7 @@ package visualdebugger.views;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,6 +20,7 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SimpleName;
@@ -74,6 +76,10 @@ public class WatchpointView extends ViewPart {
     private Action disableAction;
 
     private Action enableAction;
+
+    private int offset;
+
+    private ICompilationUnit unit;
 
     /**
      * The Class WatchPointContentProvider.
@@ -310,27 +316,34 @@ public class WatchpointView extends ViewPart {
                             .openError(PlatformUI.getWorkbench()
                                     .getActiveWorkbenchWindow().getShell(),
                                     "Adding WatchPoint",
-                                    "Please select a constant, field or a local variable declaration to observe.");
+                                    "Please select a constant, field or a local variable to observe.");
                 } else {
+
                     WatchExpressionDialog dialog = new WatchExpressionDialog(
                             shell, java.lang.Integer.parseInt(information[1]),
                             information[3], information[0]);
+
                     if (information != null) {
 
                         String expression = dialog.open();
 
                         if (expression != null) {
                             // create global watchpoint
-                            if(information.length==5){
-                            watchPointManager.addWatchPoint(new WatchPoint(
-                                    information[4], expression, information[0],
-                                    information[1], information[2]));
-                            } // create watchpoint for local variable
-                            else{
-                                int offset = Integer.parseInt(information[7]); 
+                            if (information.length == 6) {
                                 watchPointManager.addWatchPoint(new WatchPoint(
-                                        information[4], expression, information[6],
-                                        information[1], information[2],information[5],information[6],offset));
+                                        information[4], expression,
+                                        information[0], information[1],
+                                        information[2]));
+                            } // create watchpoint for local variable
+                            else {
+                                //TODO
+                                LinkedList<String[]> locVars = getLocalVariables(expression);
+                                long offset = Long.parseLong(information[8]);
+                                watchPointManager.addWatchPoint(new WatchPoint(
+                                        information[4], expression,
+                                        information[0], information[1],
+                                        information[2], information[6],
+                                        information[0], 50));
                             }
                             vd.setWatchPointManager(watchPointManager);
                             viewer.refresh();
@@ -339,7 +352,6 @@ public class WatchpointView extends ViewPart {
                 }
 
             }
-
         };
         addAction.setText("Add");
         addAction.setToolTipText("Adds an expression that should be watched");
@@ -370,7 +382,6 @@ public class WatchpointView extends ViewPart {
 
                 Object element = sel.getFirstElement();
                 if (element instanceof WatchPoint) {
-                    // TODO
                     ((WatchPoint) element).setEnabled(true);
                     viewer.refresh();
 
@@ -388,7 +399,6 @@ public class WatchpointView extends ViewPart {
 
                 Object element = sel.getFirstElement();
                 if (element instanceof WatchPoint) {
-                    // TODO
                     ((WatchPoint) element).setEnabled(false);
                     viewer.refresh();
 
@@ -398,6 +408,40 @@ public class WatchpointView extends ViewPart {
         disableAction.setText("Disable");
         disableAction.setToolTipText("disable watchpoint");
 
+    }
+
+    private LinkedList<String[]> getLocalVariables(String expression) {
+        
+        try {
+            ICompilationUnit icu = getICompilationUnit();
+            IJavaElement je = icu.getElementAt(getOffset());
+            if (je instanceof IMethod) {
+
+                IMethod method = (IMethod) je;
+
+                CompilationUnit cu = Util
+                        .parse(icu, null /* IProgressMonitor */);
+
+                Set<IVariableBinding> allLocalVariables = Util
+                        .detectLocalVariables(cu);
+                LinkedList<IVariableBinding> localVariableBindings = Util
+                        .extractLocalVariablesForMethod(method,
+                                allLocalVariables);
+
+                Expression node = Util
+                        .parse(expression, null /* IProgressMonitor */);
+
+                Set<IVariableBinding> localVariables = Util
+                        .extractLocalVariablesForExpression(node,
+                                localVariableBindings);
+                
+                return Util.getLocVarInf(cu, localVariables);
+
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -415,7 +459,7 @@ public class WatchpointView extends ViewPart {
     public WatchPointManager getWatchPointManager() {
         return watchPointManager;
     }
-
+//TODO correct the doc
     /**
      * Gets the WatchPoint information.
      * 
@@ -425,10 +469,14 @@ public class WatchpointView extends ViewPart {
      * 
      * information[0]= The name of the JavaElement where the WatchPoint was set.<br>
      * information[1]= The line where the text selection ends. <br>
-     * information[2]= The type in which the WatchPoint was set (fully qualified name).<br> 
-     * information[3]= The actual the source code for validating the WatchPoint. <br>
-     * information[4]= The unique name of the boolean variable that is used to validate the watchpoint.<br>
-     ****** information[5] - [7] are only set for watchpoints on local variables.<br>
+     * information[2]= The type in which the WatchPoint was set (fully qualified
+     * name).<br>
+     * information[3]= The actual the source code for validating the WatchPoint.
+     * <br>
+     * information[4]= The unique name of the boolean variable that is used to
+     * validate the watchpoint.<br>
+     * ***** information[5] - [7] are only set for watchpoints on local
+     * variables.<br>
      * information[5] = The type of the local variable.<br>
      * information[6] = The name of the local variable.<br>
      * information[7] = The offset of the local variable.
@@ -446,8 +494,7 @@ public class WatchpointView extends ViewPart {
 
             ISelection sel = tedit.getSelectionProvider().getSelection();
             ITextSelection tsel = (ITextSelection) sel;
-            // set current line
-
+            
             int offset = tsel.getOffset();
             IFile file = (IFile) tedit.getEditorInput().getAdapter(IFile.class);
 
@@ -461,7 +508,6 @@ public class WatchpointView extends ViewPart {
                 }
 
             } catch (JavaModelException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
 
@@ -469,81 +515,62 @@ public class WatchpointView extends ViewPart {
                 IJavaElement je = unit.getElementAt(offset);
 
                 if (je instanceof IField) {
-                    information = new String[5];
+                    information = new String[6];
                     information[0] = "Field " + je.getElementName();
                     information[1] = (1 + tsel.getEndLine()) + "";
-                    information[2] = ((IField) je).getDeclaringType().getFullyQualifiedName();
+                    information[2] = ((IField) je).getDeclaringType()
+                            .getFullyQualifiedName();
                     information[3] = source;
                     information[4] = varName;
+                    information[5] = offset + "";
 
                     return information;
                 } else {
                     if (je instanceof IMethod) {
-
+                        
+                        information = new String[7];
                         IMethod method = (IMethod) je;
-
-                        final String methodName = method.getElementName();
-
-                        LocalVariableDetector localVariableDetector = new LocalVariableDetector();
-                        CompilationUnit cu = parse(unit);
-                        localVariableDetector.process(cu);
-                        Map<IVariableBinding, VariableBindingManager> localVariableManagers = localVariableDetector
-                                .getLocalVariableManagers();
-                        Set<IVariableBinding> s = localVariableManagers
-                                .keySet();
-
-                        for (Iterator<IVariableBinding> iterator = s.iterator(); iterator
-                                .hasNext();) {
-                            IVariableBinding variableBinding = (IVariableBinding) iterator
-                                    .next();
-
-                            if (methodName.equals(variableBinding
-                                    .getDeclaringMethod().getName())) {
-
-                                ASTNode astnode = cu
-                                        .findDeclaringNode(variableBinding);
-
-                                if (isSelected(astnode, offset)) {
-                                    information = new String[8];
-                                    
-                                    information[0] = variableBinding.getJavaElement().getElementName()+"";
-                                    information[1] = (1 + tsel.getEndLine()) + "";
-                                    information[2] = method.getDeclaringType().getFullyQualifiedName();
-                                    information[3] = source;
-                                    information[4] = varName;
-                                    information[5] = variableBinding.getType().getName()+"";
-                                 // alternative would be information[7] = methodName; -> returns only the name, no signature
-                                    information[6] = variableBinding.getDeclaringMethod()+"";
-                                    information[7] = astnode.getStartPosition()+"";
-
-                                    return information; 
-                                }
-                            }
-                        }
+                        
+                        information[0] = je.getElementName();
+                        information[1] = (1 + tsel.getEndLine()) + "";
+                        information[2] = method.getDeclaringType()
+                                .getFullyQualifiedName();
+                        information[3] = source;
+                        information[4] = varName;
+                        information[5] = offset + "";
+                        information[6] = "LOCAL";
+                        setOffset(offset);
+                        setICompilationUnit(unit);
+                        
                     } else {
                         return null;
                     }
                 }
 
             } catch (JavaModelException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
         return information;
     }
 
-    private boolean isSelected(ASTNode astnode, int offset) {
-        int startposition = astnode.getStartPosition();
-        int endposition = startposition + astnode.getLength();
-        return (startposition <= offset && offset <= endposition);
+    private void setICompilationUnit(ICompilationUnit unit) {
+        this.unit = unit;
+        
+    }
+    
+    private ICompilationUnit getICompilationUnit() {
+        return unit;
+        
     }
 
-    protected CompilationUnit parse(ICompilationUnit lwUnit) {
-        ASTParser parser = ASTParser.newParser(AST.JLS3);
-        parser.setKind(ASTParser.K_COMPILATION_UNIT);
-        parser.setSource(lwUnit); 
-        parser.setResolveBindings(true);
-        return (CompilationUnit) parser.createAST(null /* IProgressMonitor */);
+    private void setOffset(int offset) {
+        this.offset = offset;
+        
     }
+
+    public int getOffset() {
+        return offset;
+    }
+
 }
