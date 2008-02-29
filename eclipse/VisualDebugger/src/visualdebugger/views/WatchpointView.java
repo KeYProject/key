@@ -333,17 +333,20 @@ public class WatchpointView extends ViewPart {
                                 watchPointManager.addWatchPoint(new WatchPoint(
                                         information[4], expression,
                                         information[0], information[1],
-                                        information[2]));
+                                        information[2],null)); 
                             } // create watchpoint for local variable
                             else {
                                 //TODO
                                 LinkedList<String[]> locVars = getLocalVariables(expression);
-                                long offset = Long.parseLong(information[8]);
+                                information[0] = locVars.get(0)[3];
+                                for (String[] strings : locVars) {
+                                    System.out.println(strings[0] +" "+ strings[1] + " " +strings[2]);
+                                }
+                                
                                 watchPointManager.addWatchPoint(new WatchPoint(
                                         information[4], expression,
                                         information[0], information[1],
-                                        information[2], information[6],
-                                        information[0], 50));
+                                        information[2],locVars));
                             }
                             vd.setWatchPointManager(watchPointManager);
                             viewer.refresh();
@@ -541,6 +544,7 @@ public class WatchpointView extends ViewPart {
                         information[6] = "LOCAL";
                         setOffset(offset);
                         setICompilationUnit(unit);
+                        return information;
                         
                     } else {
                         return null;
@@ -549,6 +553,9 @@ public class WatchpointView extends ViewPart {
 
             } catch (JavaModelException e) {
                 e.printStackTrace();
+            }
+            catch (Throwable t) {
+                t.printStackTrace();
             }
         }
         return information;

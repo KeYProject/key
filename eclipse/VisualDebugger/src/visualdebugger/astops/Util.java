@@ -126,10 +126,11 @@ public final class Util {
         for (IVariableBinding variableBinding : localVariableBinding) {
             
             ASTNode astnode = cu.findDeclaringNode(variableBinding);
-            String[] information = new String[3];
+            String[] information = new String[4];
             information[0] = variableBinding.getType().getName() + ""; // type
             information[1] = variableBinding.getName() + ""; // name
             information[2] = astnode.getStartPosition() + ""; // offset
+            information[3] = variableBinding.getDeclaringMethod()+"";
             informations.add(information);
         }
         return informations;
