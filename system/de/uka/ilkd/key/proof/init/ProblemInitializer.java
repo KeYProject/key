@@ -343,7 +343,7 @@ public class ProblemInitializer {
                 searchPathList.add(javaPath);
             }
             Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(), initConfig.namespaces());
-            if (javaPath == "") {             
+            if (javaPath == "") {
                 r2k.parseSpecialClasses();
                 initConfig.getProofEnv().setJavaModel(JavaModel.NO_MODEL);
             } else {                 

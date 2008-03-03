@@ -20,9 +20,12 @@ import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
+import recoder.java.declaration.ClassDeclaration;
 import recoder.java.declaration.EnumConstantDeclaration;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
@@ -552,22 +555,24 @@ public class Recoder2KeY implements JavaReader {
      */
 
     private void transformModel(List<recoder.java.CompilationUnit> cUnits) {
+
+        RecoderModelTransformer.TransformerCache cache = new RecoderModelTransformer.TransformerCache(cUnits);
         
-        ConstructorNormalformBuilder cnb = new ConstructorNormalformBuilder(servConf, cUnits);
+        ConstructorNormalformBuilder cnb = new ConstructorNormalformBuilder(servConf, cache);
 
         RecoderModelTransformer[] transformer = new RecoderModelTransformer[] {
-                new EnumClassBuilder(servConf, cUnits),
-                new JMLTransformer(servConf, cUnits, parsingLibs),
-                new ImplicitFieldAdder(servConf, cUnits),
-                new InstanceAllocationMethodBuilder(servConf, cUnits),
+                new EnumClassBuilder(servConf, cache),
+                new JMLTransformer(servConf, cache, parsingLibs),
+                new ImplicitFieldAdder(servConf, cache),
+                new InstanceAllocationMethodBuilder(servConf, cache),
                 cnb,
-                new ClassPreparationMethodBuilder(servConf, cUnits),
-                new ClassInitializeMethodBuilder(servConf, cUnits), 
-                new PrepareObjectBuilder(servConf, cUnits), 
-                new CreateBuilder(servConf, cUnits),
-                new CreateObjectBuilder(servConf, cUnits),
-                new JVMIsTransientMethodBuilder(servConf, cUnits),
-                new LocalClassTransformation(servConf, cUnits)
+                new ClassPreparationMethodBuilder(servConf, cache),
+                new ClassInitializeMethodBuilder(servConf, cache), 
+                new PrepareObjectBuilder(servConf, cache), 
+                new CreateBuilder(servConf, cache),
+                new CreateObjectBuilder(servConf, cache),
+                new JVMIsTransientMethodBuilder(servConf, cache),
+                new LocalClassTransformation(servConf, cache)
         };
 
         final ChangeHistory cHistory = servConf.getChangeHistory();
@@ -583,9 +588,6 @@ public class Recoder2KeY implements JavaReader {
         if (cHistory.needsUpdate()) {
             cHistory.updateModel();
         }
-
-        // reset cached compilation units
-        RecoderModelTransformer.clear();
     }
 
     // ----- methods dealing with blocks.

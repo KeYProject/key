@@ -51,8 +51,8 @@ public class JVMIsTransientMethodBuilder extends RecoderModelTransformer {
 
     public JVMIsTransientMethodBuilder
 	(CrossReferenceServiceConfiguration services, 
-	 List<CompilationUnit> units) {	
-	super(services, units);
+	 TransformerCache cache) {	
+	super(services, cache);
     }
 
     private ReferencePrefix createJavaLangPrefix() {

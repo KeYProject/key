@@ -2,6 +2,8 @@ package de.uka.ilkd.key.java.recoderext;
 
 import java.util.*;
 
+import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer.TransformerCache;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.Variable;
 import recoder.java.CompilationUnit;
@@ -18,14 +20,13 @@ import recoder.service.CrossReferenceSourceInfo;
 public class LocalClassTransformation extends RecoderModelTransformer {
     
     
-    public LocalClassTransformation
-        (CrossReferenceServiceConfiguration services, 
-                List<CompilationUnit> units) {    
-        super(services, units);
+    public LocalClassTransformation(
+            CrossReferenceServiceConfiguration services, TransformerCache cache) {
+        super(services, cache);
     }
-    
+
     public ProblemReport analyze() {
-         HashSet cds = classDeclarations();
+         Set cds = classDeclarations();
          Iterator it = cds.iterator();
          while(it.hasNext()){
              ClassDeclaration cd = (ClassDeclaration) it.next();
@@ -37,7 +38,7 @@ public class LocalClassTransformation extends RecoderModelTransformer {
     }
     
     protected void makeExplicit(TypeDeclaration td) {
-        LinkedList outerVars = (LinkedList) localClass2FinalVar.get(td);
+        LinkedList outerVars = (LinkedList) getLocalClass2FinalVar().get(td);
         CrossReferenceSourceInfo si = services.getCrossReferenceSourceInfo();
         if(outerVars!=null){
             for(int i=0; i<outerVars.size(); i++){

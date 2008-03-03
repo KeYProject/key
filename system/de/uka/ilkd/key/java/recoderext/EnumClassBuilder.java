@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -59,13 +60,16 @@ public class EnumClassBuilder extends RecoderModelTransformer {
      * on the given list of compilation units
      * 
      * @param services
-     *            the cross referencing service configuration to be used
-     * @param units
-     *            the list of compilation units to be examined
+     *                the cross referencing service configuration to be used
+     * @param cache
+     *                a cache object that stores information which is needed by
+     *                and common to many transformations. it includes the
+     *                compilation units, the declared classes, and information
+     *                for local classes.
      */
     public EnumClassBuilder(CrossReferenceServiceConfiguration services,
-            List<CompilationUnit> units) {
-        super(services, units);
+            TransformerCache cache) {
+        super(services, cache);
     }
 
     /**
@@ -90,7 +94,7 @@ public class EnumClassBuilder extends RecoderModelTransformer {
     @Override
     public ProblemReport analyze() {
 
-        for (CompilationUnit unit : units) {
+        for (CompilationUnit unit : getUnits()) {
             for (TypeDeclaration td : unit.getDeclarations()) {
                 if (td instanceof EnumDeclaration) {
                     EnumDeclaration ed = (EnumDeclaration) td;

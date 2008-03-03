@@ -66,14 +66,17 @@ public class ClassPreparationMethodBuilder
      * which are declared in one of the given compilation units. 
      * @param services the CrossReferenceServiceConfiguration with the
      * information about the recoder model
-     * @param units the ASTList<CompilationUnit> with the classes to
-     * be transformed
+     * @param cache
+     *                a cache object that stores information which is needed by
+     *                and common to many transformations. it includes the
+     *                compilation units, the declared classes, and information
+     *                for local classes.
      */
     public ClassPreparationMethodBuilder
 	(CrossReferenceServiceConfiguration services, 
-	 List<CompilationUnit> units) {	
-	super(services, units);
-	class2staticFields = new HashMap(10*units.size());
+	 TransformerCache cache) {	
+	super(services, cache);
+	class2staticFields = new HashMap(10*getUnits().size());
     }
 
     /** 
@@ -146,8 +149,8 @@ public class ClassPreparationMethodBuilder
     }
     
     public ProblemReport analyze() {
-	for (int unit = 0; unit<units.size(); unit++) {
-	    CompilationUnit cu = units.get(unit);
+	for (int unit = 0; unit<getUnits().size(); unit++) {
+	    CompilationUnit cu = getUnits().get(unit);
 	    int typeCount = cu.getTypeDeclarationCount();
 	    
 	    for (int i = 0; i < typeCount; i++) {

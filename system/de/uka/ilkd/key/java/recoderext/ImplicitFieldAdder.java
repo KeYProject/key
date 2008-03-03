@@ -23,6 +23,7 @@ import recoder.java.reference.TypeReference;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
+import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer.TransformerCache;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -67,13 +68,13 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
      * <code>&lt;nextToCreate&gt;</code> etc. 
      * @param services the CrossReferenceServiceConfiguration to access 
      * model information
-     * @param units the array of CompilationUnits describing the model
-     * to be transformed
+     * @param  cache a cache object that stores information which is needed by
+     * and common to many transformations. it includes the compilation units,
+     * the declared classes, and information for local classes.
      */
-    public ImplicitFieldAdder
-	(CrossReferenceServiceConfiguration services, 
-	 List<CompilationUnit> units) {	
-	super(services, units);
+    public ImplicitFieldAdder(CrossReferenceServiceConfiguration services,
+            TransformerCache cache) {
+        super(services, cache);
     }
 
     /**
@@ -172,7 +173,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
     }
     
     private void addFieldsForFinalVars(TypeDeclaration td){
-        LinkedList vars = (LinkedList) localClass2FinalVar.get(td);
+        LinkedList vars = (LinkedList) getLocalClass2FinalVar().get(td);
         if(vars!=null){
             Iterator it = vars.iterator();
             while(it.hasNext()){
@@ -188,7 +189,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	 if (!(javaLangObject instanceof ClassDeclaration)) {
 	     Debug.fail("Could not find class java.lang.Object or only as bytecode");
 	 }
-	 HashSet cds = classDeclarations();
+	 Set cds = classDeclarations();
 	 Iterator it = cds.iterator();
 	 while(it.hasNext()){
 	     ClassDeclaration cd = (ClassDeclaration) it.next();
@@ -215,6 +216,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 // 	    java.io.StringWriter sw = new java.io.StringWriter();
 // 	    services.getProgramFactory().getPrettyPrinter(sw).visitClassDeclaration((ClassDeclaration)td);
 // 	    System.out.println(sw.toString());
+// 	    Debug.printStackTrace();
 // 	    try { sw.close(); } catch (Exception e) {}	   
 // 	}
     }

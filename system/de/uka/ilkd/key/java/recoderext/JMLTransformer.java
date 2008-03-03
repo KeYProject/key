@@ -17,6 +17,7 @@ import de.uka.ilkd.key.collection.IteratorOfString;
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.collection.SLListOfString;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer.TransformerCache;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.IteratorOfTextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
@@ -59,6 +60,9 @@ public class JMLTransformer extends RecoderModelTransformer {
     private final boolean parsingLibs;
 
     
+    
+
+
     /**
      * Creates a transformation that adds JML specific elements, for example
      * ghost fields and model method declarations.
@@ -66,14 +70,15 @@ public class JMLTransformer extends RecoderModelTransformer {
      * @param services
      *                the CrossReferenceServiceConfiguration to access model
      *                information
-     * @param units
-     *                the array of CompilationUnits describing the model to be
-     *                transformed
+     * @param cache
+     *                a cache object that stores information which is needed by
+     *                and common to many transformations. it includes the
+     *                compilation units, the declared classes, and information
+     *                for local classes.
      */
     public JMLTransformer(CrossReferenceServiceConfiguration services,
-                          List<CompilationUnit> units,
-                          boolean parsingLibs) {
-        super(services, units);
+            TransformerCache cache, boolean parsingLibs) {
+        super(services, cache);
         this.parsingLibs = parsingLibs;
     }
 
@@ -499,8 +504,8 @@ public class JMLTransformer extends RecoderModelTransformer {
 
         try {
             //iterate over all compilation units
-            for(int i = 0, m = units.size(); i < m; i++) {
-                CompilationUnit unit = units.get(i);
+            for(int i = 0, m = getUnits().size(); i < m; i++) {
+                CompilationUnit unit = getUnits().get(i);
                 
                 //iterate over all classes
                 for(int j = 0, n = unit.getTypeDeclarationCount(); j < n; j++) {

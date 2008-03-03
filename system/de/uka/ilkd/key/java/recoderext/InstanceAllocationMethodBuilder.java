@@ -2,6 +2,8 @@ package de.uka.ilkd.key.java.recoderext;
 
 import java.util.List;
 
+import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer.TransformerCache;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.CompilationUnit;
 import recoder.java.declaration.*;
@@ -17,13 +19,13 @@ public class InstanceAllocationMethodBuilder extends RecoderModelTransformer {
 
     public static final String IMPLICIT_INSTANCE_ALLOCATE = "<allocate>";
 
-
-    public InstanceAllocationMethodBuilder
-    (CrossReferenceServiceConfiguration services, 
-            List<CompilationUnit> units) {
-        super(services, units);      
+    public InstanceAllocationMethodBuilder(
+            CrossReferenceServiceConfiguration services, TransformerCache cache) {
+        super(services, cache);
+        /// @todo Auto-generated constructor stub
     }
-    
+
+
     /**
      * creates a method declaration with no implementation. The methods intention is
      * to allocate a new object of the type it is declared in and to return it.

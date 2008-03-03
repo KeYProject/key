@@ -54,8 +54,8 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
 
     public CreateObjectBuilder
 	(CrossReferenceServiceConfiguration services, 
-	 List<CompilationUnit> units) {	
-	super(services, units);
+	 TransformerCache cache) {	
+	super(services, cache);
 	class2identifier = new HashMap();
     }
 
@@ -121,7 +121,7 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
     }    
 
     public ProblemReport analyze() {
-        HashSet cds = classDeclarations();
+        Set cds = classDeclarations();
         Iterator it = cds.iterator();
         while(it.hasNext()){
             ClassDeclaration cd = (ClassDeclaration) it.next();

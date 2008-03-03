@@ -64,15 +64,18 @@ public class ClassInitializeMethodBuilder
      * which are declared in one of the given compilation units. 
      * @param services the CrossReferenceServiceConfiguration with the
      * information about the recoder model
-     * @param units the ASTList<CompilationUnit> with the classes to
-     * be transformed
+     * @param cache
+     *                a cache object that stores information which is needed by
+     *                and common to many transformations. it includes the
+     *                compilation units, the declared classes, and information
+     *                for local classes.
      */
     public ClassInitializeMethodBuilder
 	(CrossReferenceServiceConfiguration services, 
-	 List<CompilationUnit> units) {	
-	super(services, units);
-	class2initializers = new HashMap(10*units.size());
-	class2super = new HashMap(2*units.size());
+	        TransformerCache cache) {	
+	super(services, cache);
+	class2initializers = new HashMap(10*getUnits().size());
+	class2super = new HashMap(2*getUnits().size());
     }
 
     /** 
@@ -157,7 +160,7 @@ public class ClassInitializeMethodBuilder
         if (!(javaLangObject instanceof ClassDeclaration)) {
             Debug.fail("Could not find class java.lang.Object or only as bytecode");
         }
-        HashSet cds = classDeclarations();
+        Set cds = classDeclarations();
         Iterator it = cds.iterator();
         while(it.hasNext()){
             ClassDeclaration cd = (ClassDeclaration) it.next();
@@ -175,8 +178,8 @@ public class ClassInitializeMethodBuilder
                 class2super.put(cd, superType);
             }
         }
-        for (int unit = 0; unit<units.size(); unit++) {
-            CompilationUnit cu = units.get(unit);
+        for (int unit = 0; unit<getUnits().size(); unit++) {
+            CompilationUnit cu = getUnits().get(unit);
             int typeCount = cu.getTypeDeclarationCount();
             
             for (int i = 0; i < typeCount; i++) {		

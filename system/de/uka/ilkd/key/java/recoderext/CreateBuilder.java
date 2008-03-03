@@ -17,12 +17,13 @@ package de.uka.ilkd.key.java.recoderext;
 
 import java.util.List;
 
+import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer.TransformerCache;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.CompilationUnit;
 import recoder.java.Statement;
 import recoder.java.StatementBlock;
 import recoder.java.declaration.*;
-import recoder.java.declaration.DeclarationSpecifier;
 import recoder.java.declaration.modifier.Public;
 import recoder.java.declaration.ParameterDeclaration;
 import recoder.java.expression.literal.BooleanLiteral;
@@ -45,12 +46,11 @@ public class CreateBuilder extends RecoderModelTransformer {
 
     public static final String IMPLICIT_CREATE = "<create>";
 
-    public CreateBuilder
-	(CrossReferenceServiceConfiguration services, 
-	 List<CompilationUnit> units) {	
-	super(services, units);
+    public CreateBuilder(
+            CrossReferenceServiceConfiguration services,
+            TransformerCache cache) {
+        super(services, cache);
     }
-
 
     /** 
      * Creates the body of the static <code>&lt;createObject&gt;</code>

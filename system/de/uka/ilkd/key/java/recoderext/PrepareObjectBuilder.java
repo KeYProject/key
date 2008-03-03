@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
@@ -66,9 +67,9 @@ public class PrepareObjectBuilder
 
     public PrepareObjectBuilder
 	(CrossReferenceServiceConfiguration services, 
-	 List<CompilationUnit> units) {	
-	super(services, units);
-	class2fields = new HashMap<TypeDeclaration, ASTList<Statement>>(units.size());
+	 TransformerCache cache) {	
+	super(services, cache);
+	class2fields = new HashMap<TypeDeclaration, ASTList<Statement>>(getUnits().size());
     }
 
     /**
@@ -106,7 +107,7 @@ public class PrepareObjectBuilder
         if (!(javaLangObject instanceof ClassDeclaration)) {
             Debug.fail("Could not find class java.lang.Object or only as bytecode");
         }
-        HashSet cds = classDeclarations();
+        Set cds = classDeclarations();
         Iterator it = cds.iterator();
         while(it.hasNext()){
             ClassDeclaration cd = (ClassDeclaration) it.next();

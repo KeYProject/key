@@ -60,8 +60,9 @@ public class ConstructorNormalformBuilder
     /** creates the constructor normalform builder */
     public ConstructorNormalformBuilder
 	(CrossReferenceServiceConfiguration services, 
-	 List<CompilationUnit> units) {	
-	super(services, units);
+	 TransformerCache cache) {	
+	super(services, cache);
+	List<CompilationUnit> units = getUnits();
 	class2constructors = new HashMap(4*units.size());
 	class2initializers = new HashMap(10*units.size());
 	class2methodDeclaration = new HashMap(10*units.size());
@@ -168,7 +169,7 @@ public class ConstructorNormalformBuilder
 	 if (!(javaLangObject instanceof ClassDeclaration)) {
 	     Debug.fail("Could not find class java.lang.Object or only as bytecode");
 	 }
-	 HashSet cds = classDeclarations();
+	 Set cds = classDeclarations();
 	 Iterator it = cds.iterator();
 	 while(it.hasNext()){
 	     ClassDeclaration cd = (ClassDeclaration) it.next();
@@ -188,7 +189,7 @@ public class ConstructorNormalformBuilder
              
              class2enclosingThis.put(cd, getImplicitEnclosingThis(cd));
              
-             LinkedList outerVars = (LinkedList) localClass2FinalVar.get(cd);
+             LinkedList outerVars = (LinkedList) getLocalClass2FinalVar().get(cd);
              for(int i=0; outerVars!=null && i<outerVars.size(); i++){
                  v2t.put(outerVars.get(i), ((Variable) outerVars.get(i)).getType());
              }
@@ -275,7 +276,7 @@ public class ConstructorNormalformBuilder
 	StatementBlock body;
 	Field et = (Field) class2enclosingThis.get(cd);
 	TypeDeclaration td = (TypeDeclaration) class2enclosingClass.get(cd);
-	LinkedList outerVars = (LinkedList) localClass2FinalVar.get(cd);
+	LinkedList outerVars = (LinkedList) getLocalClass2FinalVar().get(cd);
 	int j = et==null? 0 : 1;
 	if(outerVars!=null) j+=outerVars.size();
 	ParameterDeclaration pd=null;
