@@ -153,7 +153,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	                (containingMethod(td)==null || !containingMethod(td).isStatic()) &&
 	                !td.isStatic()){
 	    ClassDeclaration container = containingClass(td);
-	    ModifierMutableList modifiers = new ModifierArrayList(1);
+	    ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(1);
 	    modifiers.add(new Private());
 	    Identifier id = getId(container);
         

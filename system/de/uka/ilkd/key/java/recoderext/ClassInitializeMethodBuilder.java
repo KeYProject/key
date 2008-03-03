@@ -15,12 +15,7 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.java.recoderext;
 
-<<<<<<< HEAD:system/de/uka/ilkd/key/java/recoderext/ClassInitializeMethodBuilder.java
-import java.util.HashMap;
-import java.util.List;
-=======
 import java.util.*;
->>>>>>> origin/master:system/de/uka/ilkd/key/java/recoderext/ClassInitializeMethodBuilder.java
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;

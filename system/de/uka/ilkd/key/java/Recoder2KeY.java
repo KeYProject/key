@@ -45,6 +45,8 @@ import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.java.recoderext.JVMIsTransientMethodBuilder;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceSourceInfo;
+import de.uka.ilkd.key.java.recoderext.LocalClassTransformation;
+import de.uka.ilkd.key.java.recoderext.ObjectTypeIdentifier;
 import de.uka.ilkd.key.java.recoderext.PrepareObjectBuilder;
 import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer;
 import de.uka.ilkd.key.java.recoderext.URLDataLocation;

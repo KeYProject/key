@@ -2046,6 +2046,8 @@ Identifier ShortName() :
   { 
   	return result;
   }
+}
+
 UncollatedReferenceQualifier Name() :
 /*
  * A lookahead of 2 is required below since "Name" can be followed
