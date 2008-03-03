@@ -216,8 +216,7 @@ public class ProofStarter {
                 initProgressMonitors(maxSteps);
                 while (countApplied < maxSteps && applyAutomaticRule()) {
                     countApplied++;
-                    System.out.println("countApplied: "  +countApplied);
-                  //  informProgressMonitors(countApplied);
+                    informProgressMonitors(countApplied);
              
             }System.out.println("30");
             if (useDecisionProcedures && decisionProcedureRule != null) {
