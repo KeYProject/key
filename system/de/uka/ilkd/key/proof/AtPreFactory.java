@@ -106,9 +106,14 @@ public class AtPreFactory {
                 return new ArrayOfSort(new Sort[]{objectSort});
             }
             
+            if(((ProgramVariable)aop.attribute()).isStatic()) {
+                return new ArrayOfSort();
+            }
+            
             Sort selfSort = aop.getContainerType().getSort();            
             assert selfSort != null;
             Sort[] argSorts = new Sort[] {selfSort};
+            
             return new ArrayOfSort(argSorts);
         } else if(op instanceof ArrayOp) {
             ArrayOp aop = (ArrayOp) op;
@@ -220,6 +225,25 @@ public class AtPreFactory {
                                         Services services) {
         assert normalOp != null;
         assert atPreFunc != null;
+        
+        //HACK. Special treatment for static attributes, necessary
+        //because they have arity 1, and because TermFactory.createTerm()
+        //indeed expects to get an argument for them 
+        //(although it's discarded later).
+        if(normalOp instanceof AttributeOp 
+           && ((ProgramVariable)((AttributeOp) normalOp).attribute())
+                                                        .isStatic()) {
+            assert normalOp.arity() == 1;
+            assert atPreFunc.arity() == 0;
+            Term atPreTerm = TB.func(atPreFunc);
+            Term normalTerm = TB.dot(null, 
+                                     (ProgramVariable)((AttributeOp) normalOp)
+                                          .attribute());
+            UpdateFactory uf = new UpdateFactory(services, new UpdateSimplifier());
+            Update result = uf.elementaryUpdate(atPreTerm, normalTerm);
+            return result;
+        }
+        
         
         int arity = normalOp.arity();
         assert arity == atPreFunc.arity();

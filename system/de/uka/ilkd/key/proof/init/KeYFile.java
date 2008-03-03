@@ -450,12 +450,12 @@ public class KeYFile implements EnvInput {
     
     
     public boolean equals(Object o){
-	if(!(o instanceof KeYFile)) {
+        if(!(o instanceof KeYFile)) {
             return false;
         }
-	KeYFile kf = (KeYFile) o;
-	 return kf.file.getExternalForm().equals(file.getExternalForm());
-	
+        KeYFile kf = (KeYFile) o;
+        return kf.file.getExternalForm().equals(file.getExternalForm());
+
     }
 
     

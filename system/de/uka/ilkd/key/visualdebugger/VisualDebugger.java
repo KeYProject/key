@@ -6,6 +6,7 @@ import java.util.*;
 
 import javax.swing.SwingUtilities;
 
+import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.*;
@@ -113,7 +114,7 @@ public class VisualDebugger {
             args[1] = "LOOP";
             
             Main.evaluateOptions(args);
-            Main key = Main.getInstance(false);
+            IMain key = Main.getInstance(false);
             key.loadCommandLineFile();
 
             singleton.main = Main.getInstance(false);
@@ -154,7 +155,7 @@ public class VisualDebugger {
 
     private LinkedList listeners = new LinkedList();
 
-    private Main main;
+    private IMain main;
 
     protected int maxProofStepsForStateVisComputation = 8000;
 

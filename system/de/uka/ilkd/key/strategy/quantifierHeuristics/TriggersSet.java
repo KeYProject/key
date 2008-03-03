@@ -383,7 +383,6 @@ class TriggersSet {
                 return false;
             }
             final boolean isUnify = !term.freeVars().subset(selfUQVS);
-            System.out.println(term);
             final boolean isElement = !selfUQVS.subset(term.freeVars());
             final SetOfQuantifiableVariable uniVarsInTerm =
                     TriggerUtils.intersect(term.freeVars(), selfUQVS);

@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.proof.SetOfGoalChooserBuilder;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -25,11 +25,11 @@ public class JavaProfile extends AbstractProfile {
 
     
     protected JavaProfile(String standardRules, SetOfGoalChooserBuilder gcb, 
-            Main main) {
+            IMain main) {
         super(standardRules, gcb, main);       
      }
 
-    protected JavaProfile(String standardRules, Main main) {
+    protected JavaProfile(String standardRules, IMain main) {
         super(standardRules, main);       
      }
 
@@ -37,7 +37,7 @@ public class JavaProfile extends AbstractProfile {
         this("standardRules.key", null);
     }
     
-    public JavaProfile(Main main) {
+    public JavaProfile(IMain main) {
         this("standardRules.key", main);
     }
     

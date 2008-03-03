@@ -68,7 +68,7 @@ public class ProofTreeView extends JPanel {
     private GUITreeSelectionListener treeSelectionListener;
     private GUIProofTreeGUIListener guiListener;
 
-    /** KeYStroke for the serach panel */
+    /** KeYStroke for the search panel */
     private final static KeyStroke searchKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0);
 
     

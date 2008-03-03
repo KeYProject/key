@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.IteratorOfConstrainedFormula;
 import de.uka.ilkd.key.logic.Sequent;
@@ -61,7 +60,7 @@ class Instantiation {
 	    matchedTerms = sequentToTerms ( seq );
 	    triggersSet = TriggersSet.create ( allterm, services );
 	    assumedLiterals = initAssertLiterals ( seq );
-	    addInstances ( matchedTerms );
+	    addInstances ( matchedTerms, services );
 	}
 
     
@@ -98,14 +97,14 @@ class Instantiation {
      *            instance (Term) and cost(Long) in
      *            <code>instancesCostCache</code>
      */
-    private void addInstances(SetOfTerm terms) {
+    private void addInstances(SetOfTerm terms, Services services) {
         final IteratorOfTrigger trs = triggersSet.getAllTriggers ().iterator ();
         while ( trs.hasNext () ) {
             final SetOfSubstitution subs =
-                trs.next ().getSubstitutionsFromTerms ( terms );
+                trs.next ().getSubstitutionsFromTerms ( terms, services );
             final IteratorOfSubstitution it = subs.iterator ();
             while ( it.hasNext () )
-                addInstance ( it.next () );
+                addInstance ( it.next (), services );
         }
         
 //        if ( instancesWithCosts.isEmpty () )
@@ -113,7 +112,7 @@ class Instantiation {
 //            addArbitraryInstance ();
     }
 
-    private void addArbitraryInstance() {
+    private void addArbitraryInstance(Services services) {
         MapFromQuantifiableVariableToTerm varMap =
             MapAsListFromQuantifiableVariableToTerm.EMPTY_MAP;
         
@@ -121,12 +120,11 @@ class Instantiation {
             triggersSet.getUniQuantifiedVariables().iterator();
         while ( it.hasNext () ) {
             final QuantifiableVariable v = it.next();
-            final Term inst = createArbitraryInstantiation
-                ( v, Main.getInstance ().mediator ().getServices () );
+            final Term inst = createArbitraryInstantiation ( v, services );
             varMap = varMap.put ( v, inst );
         }
         
-        addInstance ( new Substitution ( varMap ) );
+        addInstance ( new Substitution ( varMap ), services );
     }
 
     private Term createArbitraryInstantiation(QuantifiableVariable var,
@@ -135,10 +133,10 @@ class Instantiation {
                 tb.zero(services) );
     }
 
-    private void addInstance(Substitution sub) {
+    private void addInstance(Substitution sub, Services services) {
         final long cost =
             PredictCostProver.computerInstanceCost ( sub, getMatrix(),
-                                                     assumedLiterals );
+                                                     assumedLiterals, services );
         if ( cost != -1 ) addInstance ( sub, cost );
     }
 

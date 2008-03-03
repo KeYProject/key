@@ -15,7 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -25,7 +25,7 @@ import de.uka.ilkd.key.pp.ProgramPrinter;
 public class ProofSaverLatex extends ProofSaver {
 
 
-   public ProofSaverLatex(Main main, String filename) {
+   public ProofSaverLatex(IMain main, String filename) {
       super(main, filename);
    }
    

@@ -256,9 +256,10 @@ public class TypeConverter extends TermBuilder {
     }
     
     public Term findThisForSort(Sort s, ExecutionContext ec){
-        ProgramVariable inst = (ProgramVariable) ec.getRuntimeInstance();
-        if(inst == null) return null;
-        return findThisForSort(s, var(inst), ec.getTypeReference().getKeYJavaType());
+        ProgramElement pe = ec.getRuntimeInstance();
+        if(pe == null) return null;
+        Term inst = convertToLogicElement(pe, ec);
+        return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType());
     }
     
     public Term findThisForSort(Sort s, Term self, KeYJavaType context){

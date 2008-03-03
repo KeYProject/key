@@ -91,7 +91,7 @@ public class WrapperConstructor extends Thread {
         po = proof.getPO();
         pm = po.getProgramMethod();
         className = pm.getContainerType().getName();
-        jmlEx = new JMLExport(po);
+        jmlEx = new JMLExport(po, proof.getServices());
 
     }
 
