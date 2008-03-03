@@ -1636,8 +1636,11 @@ public class PrettyPrinter {
         noLinefeed = true;
         noSemicolons = true;
 
-        LoopInitializer loopInit = x.getInitializers().getLoopInitializer(0);
-        writeElement(1, loopInit);
+        ArrayOfLoopInitializer initializers = x.getInitializers();
+        if(initializers != null) {
+            LoopInitializer loopInit = initializers.getLoopInitializer(0);
+            writeElement(1, loopInit);
+        }
         
         write(" : ");
         

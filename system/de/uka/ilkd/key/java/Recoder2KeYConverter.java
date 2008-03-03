@@ -120,6 +120,7 @@ import de.uka.ilkd.key.java.statement.Case;
 import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.Do;
 import de.uka.ilkd.key.java.statement.Else;
+import de.uka.ilkd.key.java.statement.EnhancedFor;
 import de.uka.ilkd.key.java.statement.Finally;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.ForUpdates;
@@ -1466,12 +1467,12 @@ public class Recoder2KeYConverter {
      *            the EnhancedFor of recoder
      * @return the EnhancedFor of KeY
      */
-    /*
-     * include when Java 5 enabled private EnhancedFor
-     * convert(recoder.java.statement.EnhancedFor f) { return new
-     * EnhancedFor(convertLoopInitializers(f), convertGuard(f),
-     * convertBody(f),collectComments(f),positionInfo(f)); }
-     */
+    
+     private EnhancedFor convert(recoder.java.statement.EnhancedFor f) { 
+         return new EnhancedFor(convertLoopInitializers(f), convertGuard(f),
+                 convertBody(f),collectComments(f),positionInfo(f)); 
+     }
+     
 
     /**
      * converts a While.

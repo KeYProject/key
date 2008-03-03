@@ -583,6 +583,9 @@ public class Recoder2KeY implements JavaReader {
         if (cHistory.needsUpdate()) {
             cHistory.updateModel();
         }
+
+        // reset cached compilation units
+        RecoderModelTransformer.clear();
     }
 
     // ----- methods dealing with blocks.
