@@ -17,6 +17,8 @@ package de.uka.ilkd.key.java.recoderext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -27,10 +29,10 @@ import recoder.java.Identifier;
 import recoder.java.Statement;
 import recoder.java.StatementBlock;
 import recoder.java.declaration.ClassDeclaration;
+import recoder.java.declaration.DeclarationSpecifier;
 import recoder.java.declaration.FieldDeclaration;
 import recoder.java.declaration.FieldSpecification;
 import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.DeclarationSpecifier;
 import recoder.java.declaration.ParameterDeclaration;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.java.declaration.modifier.Private;
@@ -104,8 +106,14 @@ public class PrepareObjectBuilder
         if (!(javaLangObject instanceof ClassDeclaration)) {
             Debug.fail("Could not find class java.lang.Object or only as bytecode");
         }
-	for (int unit = 0; unit<units.size(); unit++) {
-	    CompilationUnit cu = units.get(unit);
+        HashSet cds = classDeclarations();
+        Iterator it = cds.iterator();
+        while(it.hasNext()){
+            ClassDeclaration cd = (ClassDeclaration) it.next();
+            class2fields.put(cd, defaultSettings(getFields(cd)));
+        }
+	/*for (int unit = 0; unit<units.size(); unit++) {
+        CompilationUnit cu = units.get(unit);
 	    int typeCount = cu.getTypeDeclarationCount();
 	
 	    for (int i = 0; i < typeCount; i++) {
@@ -127,7 +135,7 @@ public class PrepareObjectBuilder
 // 			class2fields.put(cd, defaultSettings(cd.getFields()));
 		    }
 	    }
-	}
+	}*/
 	setProblemReport(NO_PROBLEM);
 	return NO_PROBLEM;
     }

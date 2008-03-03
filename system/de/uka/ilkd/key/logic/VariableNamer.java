@@ -370,7 +370,7 @@ public abstract class VariableNamer implements InstantiationProposer {
  	} else {
             int lastDotIndex = name.lastIndexOf('.');
             if(lastDotIndex != -1) {
-                name = name.substring(lastDotIndex + 1);   
+                name = "v_"+name.substring(lastDotIndex + 1);   
             }
             result = name.substring(0, 1).toLowerCase() + name.substring(1);
         }

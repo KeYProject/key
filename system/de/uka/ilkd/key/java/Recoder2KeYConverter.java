@@ -227,6 +227,12 @@ public class Recoder2KeYConverter {
     private HashMap methodsDeclaring = new HashMap();
 
     /**
+     * locClass2finalVar stores the final variables that need to be passed
+     * to the constructor of an anonymous class. 
+     */
+    protected HashMap locClass2finalVar = null;
+    
+    /**
      * stores the class that is currently processed
      */
     private String currentClass;
@@ -411,10 +417,29 @@ public class Recoder2KeYConverter {
         children.add(positionInfo(pe));
         return children;
     }
+    
+    /**
+     * replace some numbers from anonymous class names.
+     * needed by the translation of anonymous classes. 
+     */
+    static String makeAdmissibleName(String s){
+        return s;
+        /*
+         int i = s.indexOf(".");
+         while(i!=-1){
+             if(s.charAt(i+1)<='9' && s.charAt(i+1)>='0') {
+                 s = s.substring(0, i)+"_"+s.substring(i+1);
+             }
+             i = s.indexOf(".", i+1);
+         }
+         return s;
+        */
+    }
+
 
     /**
      * collects comments and adds their converted KeY-counterpart to the list of
-     * childrem
+     * children
      * 
      * @param pe
      *            the ProgramElement that needs its comments before being
@@ -866,7 +891,7 @@ public class Recoder2KeYConverter {
     }
 
     // ------------------- declaration ---------------------
-
+    
     /** convert a recoder ClassDeclaration to a KeY ClassDeclaration */
     public ClassDeclaration convert(
             recoder.java.declaration.ClassDeclaration td) {
@@ -875,7 +900,10 @@ public class Recoder2KeYConverter {
         ExtList classMembers = collectChildren(td);
 
         ClassDeclaration keYClassDecl = new ClassDeclaration(classMembers,
-                new ProgramElementName(td.getFullName()), isParsingLibs());
+                new ProgramElementName(makeAdmissibleName(td.getFullName())),
+                isParsingLibs(), td.getContainingClassType() != null,
+                td.getName() == null, td.getStatementContainer() != null);
+                // new ProgramElementName(td.getFullName()), isParsingLibs());
 
         kjt.setJavaType(keYClassDecl);
         return keYClassDecl;
@@ -1050,9 +1078,9 @@ public class Recoder2KeYConverter {
                     .getSourceInfo()).getType(recoderVarSpec);
 
             final ProgramElementName name = VariableNamer
-            .parseName(recoderVarSpec.getName());
+                    .parseName(makeAdmissibleName(recoderVarSpec.getName()));
             final ProgramVariable pv = new LocationVariable(name,
-                    getKeYJavaType(recoderType));
+                    getKeYJavaType(recoderType), recoderVarSpec.isFinal());
             varSpec = new VariableSpecification(
                     collectChildren(recoderVarSpec), pv, recoderVarSpec
                     .getDimensions(), pv.getKeYJavaType());
@@ -1157,8 +1185,8 @@ public class Recoder2KeYConverter {
                 final ClassType recContainingClassType = recoderVarSpec
                 .getContainingClassType();
                 final ProgramElementName pen = new ProgramElementName(
-                        recoderVarSpec.getName(), recContainingClassType
-                        .getFullName());
+                        makeAdmissibleName(recoderVarSpec.getName()), 
+                        makeAdmissibleName(recContainingClassType.getFullName()));
 
                 final Literal compileTimeConstant = getCompileTimeConstantInitializer(recoderVarSpec);
 
@@ -1322,8 +1350,8 @@ public class Recoder2KeYConverter {
             .getByteCodeInfo().getType(recField);
             recoder.java.declaration.FieldSpecification fs = new recoder.java.declaration.FieldSpecification(
                     fr.getIdentifier());
-            pv = new LocationVariable(new ProgramElementName(fs.getName(),
-                    recField.getContainingClassType().getFullName()),
+            pv = new LocationVariable(new ProgramElementName(makeAdmissibleName(fs.getName()),
+                    makeAdmissibleName(recField.getContainingClassType().getFullName())),
                     getKeYJavaType(recoderType), getKeYJavaType(recField
                             .getContainingClassType()), recField.isStatic());
             insertToMap(fs, new FieldSpecification(pv));
@@ -1587,22 +1615,59 @@ public class Recoder2KeYConverter {
         final recoder.java.reference.ReferencePrefix rp = n
         .getReferencePrefix();
         final recoder.java.reference.TypeReference tr = n.getTypeReference();
-
-        Expression[] arguments = new Expression[args != null ? args.size() : 0];
-        for (int i = 0; i < arguments.length; i++) {
-            arguments[i] = (Expression) callConvert(args.get(i));
+        final recoder.java.declaration.ClassDeclaration cd = n.getClassDeclaration();
+        
+        LinkedList outerVars = null;
+        if(locClass2finalVar != null){
+            outerVars = (LinkedList) locClass2finalVar.get(cd);
         }
+        
+        int numVars = outerVars!=null? outerVars.size() : 0;
+        Expression[] arguments = new Expression[(args != null ? args.size() : 0)+numVars];
+        for (int i = 0; i < arguments.length-numVars; i++) {
+            arguments[i] = (Expression)callConvert(args.get(i));
+        }
+        
+        for (int i = arguments.length-numVars; i<arguments.length; i++) {
+            arguments[i] = (ProgramVariable) convert(
+                    (recoder.java.declaration.VariableSpecification)
+                        outerVars.get(i-arguments.length + numVars)).getProgramVariable();
+        }
+        
+        TypeReference maybeAnonClass = (TypeReference) callConvert(tr);
+        if(n.getClassDeclaration() != null){
+            callConvert(n.getClassDeclaration());
+            KeYJavaType kjt = getKeYJavaType(n.getClassDeclaration());
+            maybeAnonClass = new TypeRef(kjt);
+        }
+
         if (rp == null) {
-            return new New(arguments, (TypeReference) callConvert(tr),
+            return new New(arguments, maybeAnonClass,
                     (ReferencePrefix) null);
         } else {
-            return new New(arguments, (TypeReference) callConvert(tr),
+            return new New(arguments, maybeAnonClass,
                     (ReferencePrefix) callConvert(rp));
         }
     }
 
     public Import convert(recoder.java.Import im) {
         return new Import(collectChildren(im), im.isMultiImport());
+    }
+    
+    /**
+     * convert a statement block and remove all included anonymous classes.
+     * @param arg
+     * @return
+     */
+    public StatementBlock convert(recoder.java.StatementBlock block) {
+        ExtList children = collectChildrenAndComments(block);
+        
+        // remove local classes
+        while (children.removeFirstOccurrence(ClassDeclaration.class) != null) {
+            // do nothing
+        }
+        return new StatementBlock(children);
+
     }
 
     // ----- Default behaviour
@@ -1726,10 +1791,6 @@ public class Recoder2KeYConverter {
 
     public Else  convert(recoder.java.statement.Else  arg) {
         return new Else (collectChildrenAndComments(arg));
-    }
-
-    public StatementBlock convert(recoder.java.StatementBlock arg) {
-        return new StatementBlock(collectChildrenAndComments(arg));
     }
 
     public SynchronizedBlock convert(recoder.java.statement.SynchronizedBlock arg) {

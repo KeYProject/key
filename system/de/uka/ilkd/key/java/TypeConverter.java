@@ -18,14 +18,12 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
+import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ldt.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
+import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -243,13 +241,36 @@ public class TypeConverter extends TermBuilder {
 	}  else if (prefix instanceof ArrayReference) {	   
 	    return convertArrayReference((ArrayReference)prefix, ec);
 	} else if (prefix instanceof ThisReference) {	 
+	    if(prefix.getReferencePrefix()!=null && (prefix.getReferencePrefix() instanceof TypeReference)){
+	        TypeReference tr = (TypeReference) prefix.getReferencePrefix();
+	        KeYJavaType kjt = tr.getKeYJavaType();
+	        return findThisForSort(kjt.getSort(), ec);
+	    }
 	    return convertToLogicElement(ec.getRuntimeInstance());
 	} else {            
 	    Debug.out("typeconverter: WARNING: unknown reference prefix:", 
 		      prefix, prefix == null ? null : prefix.getClass());
 	    throw new IllegalArgumentException("TypeConverter failed to convert "
 					       + prefix);
-	}	
+	}
+    }
+    
+    public Term findThisForSort(Sort s, ExecutionContext ec){
+        ProgramVariable inst = (ProgramVariable) ec.getRuntimeInstance();
+        if(inst == null) return null;
+        return findThisForSort(s, var(inst), ec.getTypeReference().getKeYJavaType());
+    }
+    
+    public Term findThisForSort(Sort s, Term self, KeYJavaType context){
+        Term result = self;
+        ProgramVariable inst;
+        while(!context.getSort().extendsTrans(s)){
+            inst = services.getJavaInfo().getAttribute(
+                    ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, context);
+            result = dot(result, inst);
+            context = inst.getKeYJavaType();
+        }
+        return result;      
     }
 
     public Term convertVariableReference(VariableReference fr,
@@ -261,7 +282,8 @@ public class TypeConverter extends TermBuilder {
 	    return var(var);
 	} else if (prefix == null) {
 	    if (var.isMember()) {
-		return dot(convertReferencePrefix(thisReference, ec), var);
+		return dot(findThisForSort(var.getContainerType().getSort(), ec), 
+		        var);
 	    }
 	    return var(var); 
 	} else if (!(prefix instanceof PackageReference) ) {
@@ -310,7 +332,7 @@ public class TypeConverter extends TermBuilder {
     public Term convertToLogicElement(ProgramElement pe, 				    
 				      ExecutionContext ec) {
 	Debug.out("typeconverter: called for:", pe, pe.getClass());
-	if (pe instanceof ProgramVariable) {	    
+	if (pe instanceof ProgramVariable) {	  
 	    return var((ProgramVariable)pe);
 	} else if (pe instanceof FieldReference) {
 	    return convertVariableReference((FieldReference)pe, ec);

@@ -30,12 +30,8 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PresentationFeatures;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
-import de.uka.ilkd.key.speclang.SetAsListOfClassInvariant;
-import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 import de.uka.ilkd.key.util.Array;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
@@ -245,6 +241,7 @@ public class ProblemLoader implements Runnable {
 	       status =  ex.toString();
        }
        finally {
+           mediator.resetNrGoalsClosedByHeuristics();
            if (po != null && po instanceof KeYUserProblemFile){
                ((KeYUserProblemFile) po).close();
            }

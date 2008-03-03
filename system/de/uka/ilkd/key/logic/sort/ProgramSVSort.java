@@ -279,6 +279,10 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     public static final ProgramSVSort IMPLICITCREATED
         = new ImplicitFieldSort(new Name("ImplicitCreated"),
                                 ImplicitFieldAdder.IMPLICIT_CREATED, true);
+    
+    public static final ProgramSVSort IMPLICITENLOSINGTHIS
+    = new ImplicitFieldSort(new Name("ImplicitEnclosingThis"),
+                            ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, true);
 
     public static final ProgramSVSort IMPLICITTRAINITIALIZED
 	= new ImplicitFieldSort(new Name("ImplicitTraInitialized"),

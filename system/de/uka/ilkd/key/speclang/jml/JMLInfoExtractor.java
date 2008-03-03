@@ -139,6 +139,10 @@ class JMLInfoExtractor {
         if (md.getTypeReference() != null) {
             comments = comments.prepend(md.getTypeReference().getComments());
         }
+        Comment[] methodComments = md.getComments();
+        if(methodComments.length > 0) {
+            comments = comments.prepend(methodComments[methodComments.length - 1]);
+        }
 
         for(IteratorOfComment it = comments.iterator(); it.hasNext(); ) {
             Comment c = it.next();
@@ -164,10 +168,17 @@ class JMLInfoExtractor {
         ArrayOfModifier mods = method.getModifiers();
         for (int i=0; i < mods.size(); i++) {
             coms = coms.prepend(mods.getModifier(i).getComments());
-        }        
-        // .... or to the return type
+        }       
+        
+        // .... or to the return type ....
         if (method.getTypeReference() != null) {
             coms = coms.prepend(method.getTypeReference().getComments());
+        }
+        
+        // .... or to the method itself
+        Comment[] methodComments = method.getComments();
+        if(methodComments.length > 0) {
+            coms = coms.prepend(methodComments[methodComments.length - 1]);
         }
         
         for (IteratorOfComment it = coms.iterator(); it.hasNext(); ) {
@@ -199,7 +210,7 @@ class JMLInfoExtractor {
         // Collect all comments preceding the type declaration or the modifiers.
         ListOfComment coms = SLListOfComment.EMPTY_LIST;
         coms = coms.prepend(td.getComments());
-        coms = coms.prepend(td.getProgramElementName().getComments());
+        if(td.getProgramElementName()!=null) coms = coms.prepend(td.getProgramElementName().getComments());
         ArrayOfModifier mods = td.getModifiers();
         for (int i=0; i < mods.size(); i++) {
             coms = coms.prepend(mods.getModifier(i).getComments());

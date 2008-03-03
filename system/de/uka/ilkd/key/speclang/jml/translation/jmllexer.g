@@ -119,6 +119,7 @@ RESULT : "\\result";
 NOTHING : "\\nothing";
 EVERYTHING : "\\everything"; 
 PRIVATEDATA : "\\private_data";
+OBJECT_CREATION: "\\object_creation"; //KeY extension, not official JML
 INTO : "\\into";
 OLD : "\\old";
 PRE : "\\pre";

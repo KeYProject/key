@@ -2,18 +2,8 @@ package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.IteratorOfNamed;
-import de.uka.ilkd.key.logic.IteratorOfNamespace;
-import de.uka.ilkd.key.logic.ListOfNamed;
-import de.uka.ilkd.key.logic.ListOfNamespace;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.SLListOfNamespace;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.IteratorOfLogicVariable;
-import de.uka.ilkd.key.logic.op.ListOfLogicVariable;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.util.Debug;
 
@@ -103,7 +93,6 @@ public abstract class SLResolverManager {
                 }
             }
         }
-        
         // the class where the specification is written can be an implicit type receiver
         // (e.g. for static attributes or static methods)
         SLExpression result = resolveExplicit(createSLExpression(specInClass),

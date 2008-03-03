@@ -15,8 +15,12 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.java.recoderext;
 
+<<<<<<< HEAD:system/de/uka/ilkd/key/java/recoderext/ClassInitializeMethodBuilder.java
 import java.util.HashMap;
 import java.util.List;
+=======
+import java.util.*;
+>>>>>>> origin/master:system/de/uka/ilkd/key/java/recoderext/ClassInitializeMethodBuilder.java
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
@@ -158,30 +162,37 @@ public class ClassInitializeMethodBuilder
         if (!(javaLangObject instanceof ClassDeclaration)) {
             Debug.fail("Could not find class java.lang.Object or only as bytecode");
         }
+        HashSet cds = classDeclarations();
+        Iterator it = cds.iterator();
+        while(it.hasNext()){
+            ClassDeclaration cd = (ClassDeclaration) it.next();
+            class2initializers.put(cd, getInitializers(cd)) ;
+            if (cd!=javaLangObject) {
+                TypeReference superType;                    
+                if (cd.getExtendedTypes() != null) {
+                    superType = (TypeReference)cd.getExtendedTypes().
+                    getTypeReferenceAt(0).deepClone();
+                } else {
+                    superType = 
+                        new TypeReference(createJavaLangPackageReference(),
+                                          new Identifier("Object"));
+                }
+                class2super.put(cd, superType);
+            }
+        }
         for (int unit = 0; unit<units.size(); unit++) {
             CompilationUnit cu = units.get(unit);
             int typeCount = cu.getTypeDeclarationCount();
             
             for (int i = 0; i < typeCount; i++) {		
                 TypeDeclaration td = cu.getTypeDeclarationAt(i);
-                if (td.getTypeDeclarationCount()>0) {
+/*                if (td.getTypeDeclarationCount()>0) {
                     Debug.out
                     ("clInitializeBuilder: Inner Class detected. " + 
                     "Reject building class initialisation methods.");
-                }
-                class2initializers.put(td, getInitializers(td)) ;
-                if (td instanceof ClassDeclaration && td!=javaLangObject) {
-                    ClassDeclaration cd = (ClassDeclaration) td;
-                    TypeReference superType;			
-                    if (cd.getExtendedTypes() != null) {
-                        superType = (TypeReference)cd.getExtendedTypes().
-                        getTypeReferenceAt(0).deepClone();
-                    } else {
-                        superType = 
-                            new TypeReference(createJavaLangPackageReference(),
-                                              new Identifier("Object"));
-                    }
-                    class2super.put(cd, superType);
+                }*/
+                if (!(td instanceof ClassDeclaration)) {
+                    class2initializers.put(td, getInitializers(td)) ;
                 }
             }
             

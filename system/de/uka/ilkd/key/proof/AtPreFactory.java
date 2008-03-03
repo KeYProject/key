@@ -16,6 +16,7 @@ import java.util.Map;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -61,7 +62,7 @@ public class AtPreFactory {
      * Returns an available name constructed by affixing a counter to the passed 
      * base name.
      */
-    private String getNewName(String baseName, Services services) {
+    private String getNewName(Name baseName, Services services) {
         NamespaceSet namespaces = services.getNamespaces();
             
         int i = 0;
@@ -153,13 +154,27 @@ public class AtPreFactory {
      * symbol with the same signature.
      */
     public Function createAtPreFunction(Operator normalOp, Services services) {
-        String atPreName = normalOp.name().toString() + "AtPre";
-        if(atPreName.startsWith(".")) {
-            atPreName = atPreName.substring(1);
+        Name baseName = normalOp instanceof AttributeOp ? 
+                ((AttributeOp) normalOp).attribute().name()
+                : normalOp instanceof ArrayOp ? new Name("get")
+                        : normalOp.name();
+
+        if (baseName instanceof ProgramElementName) {
+            baseName = new 
+                Name(((ProgramElementName)baseName).getProgramName());
         }
         
+        String s = baseName.toString();
+        if (s.startsWith("<") && s.endsWith(">")) {
+            baseName = new Name(s.substring(1, s.length() - 1));
+        } else if(s.startsWith(".")) {
+            baseName = new Name(s.substring(1));
+        }
+        
+        baseName = new Name(baseName.toString() + "AtPre");        
+
         Function result 
-            = new NonRigidFunctionLocation(new Name(getNewName(atPreName, 
+            = new NonRigidFunctionLocation(new Name(getNewName(baseName, 
                                                                services)),
                                            getSort(normalOp),
                                            getArgSorts(normalOp, 

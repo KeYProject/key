@@ -489,7 +489,7 @@ options {
 	:	"==>"
 	;
 
-COMPUTE_SPEC_OP
+EXP
 options { 
   paraphrase = "'^'";
 }

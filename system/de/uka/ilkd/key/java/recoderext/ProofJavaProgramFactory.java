@@ -429,4 +429,8 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     public Identifier createIdentifier(String text) {
         return new ExtendedIdentifier(text);
     }
+    
+    public ObjectTypeIdentifier createObjectTypeIdentifier(String text) {
+        return new ObjectTypeIdentifier(text);
+    }
 }

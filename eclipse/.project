@@ -29,14 +29,14 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>key_lib</name>
-			<type>2</type>
-			<locationURI>key_lib</locationURI>
-		</link>
-		<link>
 			<name>tcc_modules</name>
 			<type>2</type>
 			<locationURI>tcc_modules</locationURI>
+		</link>
+		<link>
+			<name>key_lib</name>
+			<type>2</type>
+			<locationURI>key_lib</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

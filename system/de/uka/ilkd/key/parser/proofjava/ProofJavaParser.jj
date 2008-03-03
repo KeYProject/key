@@ -2046,8 +2046,6 @@ Identifier ShortName() :
   { 
   	return result;
   }
-}
-
 UncollatedReferenceQualifier Name() :
 /*
  * A lookahead of 2 is required below since "Name" can be followed
@@ -2063,7 +2061,7 @@ UncollatedReferenceQualifier Name() :
 	result = factory.createUncollatedReferenceQualifier(id);
   } 
 
-  (
+   (
     LOOKAHEAD(2) "." { setPrefixInfo(result); }
     id = ShortName()
       {
@@ -2231,7 +2229,6 @@ ASTList<UncollatedReferenceQualifier> TypedNameList() :
     return result;
   }
 }
-
 
 /*
  * Expression syntax follows.

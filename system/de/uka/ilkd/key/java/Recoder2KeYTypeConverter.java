@@ -309,8 +309,14 @@ public class Recoder2KeYTypeConverter {
 		List<ClassType> supers = classType.getSupertypes();
 		SetOfSort ss = SetAsListOfSort.EMPTY_SET;
 		for (int i = 0; i < supers.size(); i++) {
-			ss = ss.add(getKeYJavaType(supers.get(i)).getSort());
+		    ss = ss.add(getKeYJavaType(supers.get(i)).getSort());
+		}       
+
+		/* ??
+		if (classType.getName() == null) {
+
 		}
+		*/
 
 		if (ss == SetAsListOfSort.EMPTY_SET && !isObject(classType)) {
 			ss = ss.add(getJavaInfo().getJavaLangObjectAsSort());
@@ -342,8 +348,8 @@ public class Recoder2KeYTypeConverter {
 	 */
 	private Sort createObjectSort(ClassType ct, SetOfSort supers) {
 		final boolean abstractOrInterface = ct.isAbstract() || ct.isInterface();
-		return new ClassInstanceSortImpl(new Name(ct.getFullName()), supers,
-				abstractOrInterface);
+		return new ClassInstanceSortImpl(new Name(Recoder2KeYConverter.makeAdmissibleName(ct.getFullName())), 
+		        supers,	abstractOrInterface);
 	}
 
 	/**
@@ -358,8 +364,8 @@ public class Recoder2KeYTypeConverter {
 		KeYJavaType classType = getKeYJavaType(cf);
 
 		Modifier[] modifiers = getModifiers(cf);
-		ProgramElementName name = new ProgramElementName(cf.getName());
-		ProgramElementName fullname = new ProgramElementName(cf.getFullName());
+		ProgramElementName name = new ProgramElementName(Recoder2KeYConverter.makeAdmissibleName(cf.getName()));
+		ProgramElementName fullname = new ProgramElementName(Recoder2KeYConverter.makeAdmissibleName(cf.getFullName()));
 
 		List<ClassType> supertype = cf.getSupertypes();
 
@@ -593,8 +599,9 @@ public class Recoder2KeYTypeConverter {
 			TypeReference typeRef, boolean isStatic, KeYJavaType prefix) {
 
 		ImplicitFieldSpecification varSpec = new ImplicitFieldSpecification(
-				new LocationVariable(new ProgramElementName(name, prefix
-						.getSort().name().toString()),
+				new LocationVariable(
+				        new ProgramElementName(Recoder2KeYConverter.makeAdmissibleName(name),
+				                Recoder2KeYConverter.makeAdmissibleName(prefix.getSort().name().toString())),
 						typeRef.getKeYJavaType(), prefix, isStatic), typeRef
 						.getKeYJavaType());
 		// no recoder dependance

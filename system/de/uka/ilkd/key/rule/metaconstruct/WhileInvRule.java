@@ -10,13 +10,12 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.ListIterator;
+import java.util.*;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.*;
@@ -247,10 +246,11 @@ public class WhileInvRule extends AbstractMetaOperator {
         StatementBlock s = new StatementBlock
         ((Statement[])stmnt.toArray(new Statement[0]));
         Statement resSta;
-        if (svInst.getExecutionContext() != null)
+        if (svInst.getExecutionContext() != null){
             resSta = new MethodFrame(null, svInst.getExecutionContext(), s);
-        else
+        }else{
             resSta = s;
+        }
         
         Modality loopBodyModality = modality;
         

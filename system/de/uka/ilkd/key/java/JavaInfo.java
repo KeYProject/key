@@ -649,6 +649,16 @@ public class JavaInfo {
 		result = keYType;
 	    }
 	}
+	
+	if(result == null && ((ClassDeclaration) javaType).isAnonymousClass()){
+	    IteratorOfSort sit = type.getSort().extendsSorts().iterator();
+	    while(sit.hasNext()){
+	        Sort s = sit.next();
+	        if(!((ClassType) getKeYJavaType(s).getJavaType()).isInterface()){
+	            return getKeYJavaType(s);
+	        }
+	    }
+	}
 
 	if (result == null) {
 	    result = getJavaLangObject();
@@ -926,7 +936,7 @@ public class JavaInfo {
 	    final ListOfField list   = kpmi.getAllFieldsLocallyDeclaredIn(classType);
 	    final IteratorOfField it = list.iterator();	   
             while (it.hasNext()) {
-		final Field f = it.next();              
+		final Field f = it.next();
 		if (f!=null && (f.getName().equals(name) || 
 		                f.getProgramName().equals(name))) {
 		    return (ProgramVariable)((VariableSpecification)f).

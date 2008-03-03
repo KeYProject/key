@@ -36,7 +36,8 @@ public class HeuristicInstantiation implements TermGenerator {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final Term qf = pos.constrainedFormula ().formula ();
-        final Instantiation ia = Instantiation.create ( qf, goal.sequent() );
+        final Instantiation ia = Instantiation.create ( qf, goal.sequent(), 
+                goal.proof().getServices() );
         final QuantifiableVariable var =
             qf.varsBoundHere ( 0 ).lastQuantifiableVariable ();
         return new Iterator ( ia.getSubstitution ().iterator (), var );

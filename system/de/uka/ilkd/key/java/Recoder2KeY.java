@@ -550,14 +550,23 @@ public class Recoder2KeY implements JavaReader {
      */
 
     private void transformModel(List<recoder.java.CompilationUnit> cUnits) {
+        
+        ConstructorNormalformBuilder cnb = new ConstructorNormalformBuilder(servConf, cUnits);
 
         RecoderModelTransformer[] transformer = new RecoderModelTransformer[] {
                 new EnumClassBuilder(servConf, cUnits),
                 new JMLTransformer(servConf, cUnits, parsingLibs),
-                new ImplicitFieldAdder(servConf, cUnits), new InstanceAllocationMethodBuilder(servConf, cUnits),
-                new ConstructorNormalformBuilder(servConf, cUnits), new ClassPreparationMethodBuilder(servConf, cUnits),
-                new ClassInitializeMethodBuilder(servConf, cUnits), new PrepareObjectBuilder(servConf, cUnits), new CreateBuilder(servConf, cUnits),
-                new CreateObjectBuilder(servConf, cUnits), new JVMIsTransientMethodBuilder(servConf, cUnits) };
+                new ImplicitFieldAdder(servConf, cUnits),
+                new InstanceAllocationMethodBuilder(servConf, cUnits),
+                cnb,
+                new ClassPreparationMethodBuilder(servConf, cUnits),
+                new ClassInitializeMethodBuilder(servConf, cUnits), 
+                new PrepareObjectBuilder(servConf, cUnits), 
+                new CreateBuilder(servConf, cUnits),
+                new CreateObjectBuilder(servConf, cUnits),
+                new JVMIsTransientMethodBuilder(servConf, cUnits),
+                new LocalClassTransformation(servConf, cUnits)
+        };
 
         final ChangeHistory cHistory = servConf.getChangeHistory();
         for (int i = 0; i < transformer.length; i++) {
@@ -566,6 +575,9 @@ public class Recoder2KeY implements JavaReader {
             }
             transformer[i].execute();
         }
+        
+        converter.locClass2finalVar = cnb.getLocalClass2FinalVar();
+
         if (cHistory.needsUpdate()) {
             cHistory.updateModel();
         }
@@ -757,24 +769,28 @@ public class Recoder2KeY implements JavaReader {
      * @return a freshly created type reference to the given type.
      */
     private recoder.java.reference.TypeReference name2typeReference(String typeName) {
-
         recoder.java.reference.PackageReference pr = null;
         String baseType = TypeNameTranslator.getBaseType(typeName);
         int idx = baseType.indexOf('.');
         int lastIndex = 0;
-        while (idx != -1) {
-            pr = new recoder.java.reference.PackageReference(pr, new recoder.java.Identifier(baseType.substring(lastIndex, idx)));
+        String anonType="";
+        while (idx != -1 && baseType.charAt(lastIndex) >= 'a' 
+                && baseType.charAt(lastIndex) <= 'z') {
+            String s = baseType.substring(lastIndex, idx);
+            pr = new recoder.java.reference.PackageReference
+                    (pr, new recoder.java.Identifier(s));
             lastIndex = idx + 1;
             idx = baseType.indexOf('.', lastIndex);
         }
-
+        baseType = anonType+baseType;
         recoder.java.Identifier typeId;
         if (baseType.charAt(0) == '<') {
             typeId = new ImplicitIdentifier(baseType.substring(lastIndex));
         } else {
-            typeId = new recoder.java.Identifier(baseType.substring(lastIndex));
+            typeId = new ObjectTypeIdentifier(baseType.substring(lastIndex));
         }
-        recoder.java.reference.TypeReference result = new recoder.java.reference.TypeReference(pr, typeId);
+        recoder.java.reference.TypeReference result =
+            new recoder.java.reference.TypeReference(pr, typeId);
         result.setDimensions(TypeNameTranslator.getDimensions(typeName));
         return result;
     }

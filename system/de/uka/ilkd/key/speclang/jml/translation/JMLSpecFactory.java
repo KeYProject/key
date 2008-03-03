@@ -121,7 +121,7 @@ public class JMLSpecFactory {
         int numParams = pm.getParameterDeclarationCount();
         SetOfProgramMethod result = SetAsListOfProgramMethod.EMPTY_SET;
         
-        ListOfKeYJavaType subs = ji.getAllSubtypes(pm.getContainerType());        
+        ListOfKeYJavaType subs = ji.getAllSubtypes(pm.getContainerType());   
         for(IteratorOfKeYJavaType it = subs.iterator(); it.hasNext(); ) {
             KeYJavaType sub = it.next();
             ListOfProgramMethod subPms 

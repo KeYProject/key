@@ -235,7 +235,7 @@ else
 fi
 
 COMPLETEOPTIONS="$JAVA_OPTIONS $keysysprops  $hpfix \
--ea:de.uka.ilkd.key... -noverify -Djvm.dir=$JVM_DIR -Xms64m -Xmx512m \
+-ea:de.uka.ilkd.key... -noverify -Djvm.dir=$JVM_DIR -Xms64m -Xmx2048m \
 -Dkey.home=$KEY_HOME \
 -Dkey.pattern.path=$HOME/.key/keypatterns/ \
 -Djava5=false \

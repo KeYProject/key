@@ -55,32 +55,32 @@ class Instantiation {
 	/**Terms bound in every formula on <code>goal</code>*/
 	private final SetOfTerm matchedTerms;
 
-	private Instantiation(Term allterm, Sequent seq) {
-        firstVar = allterm.varsBoundHere ( 0 ).getQuantifiableVariable ( 0 );
-        matrix = TriggerUtils.discardQuantifiers ( allterm );
-        matchedTerms = sequentToTerms ( seq );
-        triggersSet = TriggersSet.create ( allterm );
-        assumedLiterals = initAssertLiterals ( seq );
-        addInstances ( matchedTerms );
-    }
+	private Instantiation(Term allterm, Sequent seq, Services services) {
+	    firstVar = allterm.varsBoundHere ( 0 ).getQuantifiableVariable ( 0 );
+	    matrix = TriggerUtils.discardQuantifiers ( allterm );
+	    matchedTerms = sequentToTerms ( seq );
+	    triggersSet = TriggersSet.create ( allterm, services );
+	    assumedLiterals = initAssertLiterals ( seq );
+	    addInstances ( matchedTerms );
+	}
 
     
     private static Term lastQuantifiedFormula = null;
     private static Sequent lastSequent = null;
     private static Instantiation lastResult = null;
-    
-	static Instantiation create(Term qf, Sequent seq) {
+
+    static Instantiation create(Term qf, Sequent seq, Services services) {
         if ( qf == lastQuantifiedFormula && seq == lastSequent )
             return lastResult;
-        
+
         lastQuantifiedFormula = qf;
         lastSequent = seq;
-        lastResult = new Instantiation ( qf, seq );
-        
+        lastResult = new Instantiation ( qf, seq, services );
+
         return lastResult;
     }
-
-	private static SetOfTerm sequentToTerms(Sequent seq) {
+    
+    private static SetOfTerm sequentToTerms(Sequent seq) {
         SetOfTerm res = SetAsListOfTerm.EMPTY_SET;
         IteratorOfConstrainedFormula it = seq.iterator ();
         while ( it.hasNext () )
@@ -89,16 +89,16 @@ class Instantiation {
     }
 
 	
-	/**
-	 * @param terms
-	 *            on which trigger are doning matching search every
-	 *            <code>Substitution</code> s by matching
-	 *            <code>triggers</code> from <code>triggersSet</code> to
-	 *            <code>terms</code> compute their cost and store the pair of
-	 *            instance (Term) and cost(Long) in
-	 *            <code>instancesCostCache</code>
-	 */
-	private void addInstances(SetOfTerm terms) {
+    /**
+     * @param terms
+     *            on which trigger are doning matching search every
+     *            <code>Substitution</code> s by matching
+     *            <code>triggers</code> from <code>triggersSet</code> to
+     *            <code>terms</code> compute their cost and store the pair of
+     *            instance (Term) and cost(Long) in
+     *            <code>instancesCostCache</code>
+     */
+    private void addInstances(SetOfTerm terms) {
         final IteratorOfTrigger trs = triggersSet.getAllTriggers ().iterator ();
         while ( trs.hasNext () ) {
             final SetOfSubstitution subs =
@@ -132,7 +132,7 @@ class Instantiation {
     private Term createArbitraryInstantiation(QuantifiableVariable var,
                                               Services services) {
         return tb.func ( ( (AbstractSort)var.sort () ).getCastSymbol (),
-                         tb.zTerm ( services, "0" ) );
+                tb.zero(services) );
     }
 
     private void addInstance(Substitution sub) {
@@ -150,19 +150,19 @@ class Instantiation {
      * @param sub
      * @param cost
      */
-	private void addInstance(Substitution sub, long cost) {
+    private void addInstance(Substitution sub, long cost) {
         final Term inst = sub.getSubstitutedTerm ( firstVar );
         final Long oldCost = (Long)instancesWithCosts.get ( inst );
         if ( oldCost == null || oldCost.longValue () >= cost )
             instancesWithCosts.put ( inst, new Long ( cost ) );
     }
 
-	/**
-	 * @param seq
-	 * @return all literals in antesequent, and all negation of literal in
-	 *         succedent
-	 */
-	private SetOfTerm initAssertLiterals(Sequent seq) {
+    /**
+     * @param seq
+     * @return all literals in antesequent, and all negation of literal in
+     *         succedent
+     */
+    private SetOfTerm initAssertLiterals(Sequent seq) {
         SetOfTerm assertLits = SetAsListOfTerm.EMPTY_SET;
         final IteratorOfConstrainedFormula anteIt = seq.antecedent ().iterator ();
         while ( anteIt.hasNext () ) {
@@ -184,12 +184,12 @@ class Instantiation {
     
     
     
-	/**
-	 * Try to find the cost of an instance(inst) according its quantified 
-	 * formula and current goal. 
-	 */
-	static RuleAppCost computeCost(Term inst, Term form, Sequent seq) {
-        return Instantiation.create ( form, seq ).computeCostHelp ( inst );
+    /**
+     * Try to find the cost of an instance(inst) according its quantified 
+     * formula and current goal. 
+     */
+    static RuleAppCost computeCost(Term inst, Term form, Sequent seq, Services services) {
+        return Instantiation.create ( form, seq, services ).computeCostHelp ( inst );
     }
 
     private RuleAppCost computeCostHelp(Term inst) {

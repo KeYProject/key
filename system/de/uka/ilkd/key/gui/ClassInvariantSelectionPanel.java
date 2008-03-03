@@ -85,14 +85,13 @@ class ClassInvariantSelectionPanel extends JPanel {
         //create list panel
         JPanel listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.X_AXIS));
-        listPanel.setPreferredSize(new Dimension(660, 435));
+        listPanel.setMinimumSize(new Dimension(660, 435));
         add(listPanel);
         
         //create class scroll pane
         JScrollPane classScrollPane = new JScrollPane();
         classScrollPane.setBorder(new TitledBorder("Classes"));
         Dimension classScrollPaneDim = new Dimension(220, 435);
-        classScrollPane.setPreferredSize(classScrollPaneDim);
         classScrollPane.setMinimumSize(classScrollPaneDim);
         listPanel.add(classScrollPane);
         
@@ -227,8 +226,10 @@ class ClassInvariantSelectionPanel extends JPanel {
         //create button panel
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-        buttonPanel.setPreferredSize(new Dimension(660, 27));
-        Dimension buttonDim = new Dimension(110, 27);        
+        Dimension buttonDim = new Dimension(110, 27);
+        buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 
+                                                 (int)buttonDim.getHeight() 
+                                                     + 10));
         add(buttonPanel);
         
         //create left button panel

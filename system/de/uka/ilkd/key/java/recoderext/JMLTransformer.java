@@ -431,6 +431,8 @@ public class JMLTransformer extends RecoderModelTransformer {
         for(int i = 0; i < children.length; i++) {
             transformMethodlevelCommentsHelper(children[i], fileName);
         }
+        
+        if(pe instanceof MethodDeclaration) return;
 
         //get comments
         Comment[] comments = getCommentsAndSetParent(pe);

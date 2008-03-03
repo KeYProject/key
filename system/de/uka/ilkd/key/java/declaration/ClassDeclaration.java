@@ -76,6 +76,12 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
      *      Implementing.
      */
     protected final Implements implementing;
+    
+    protected final boolean isInnerClass;
+    
+    protected final boolean isLocalClass;
+    
+    protected final boolean isAnonymousClass;
 
     /**
      *      Class declaration.     
@@ -98,7 +104,10 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
 	super(mods,name,fullName,members,
 	      parentIsInterfaceDeclaration, isLibrary);
 	this.extending    = extended;
-	this.implementing = implemented;	
+	this.implementing = implemented;
+	this.isInnerClass = false;
+	this.isAnonymousClass = false;
+	this.isLocalClass =false;
     }
 
     /**
@@ -116,10 +125,19 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
      * specifications)      
      */
     public ClassDeclaration(ExtList children, ProgramElementName fullName, 
-			    boolean isLibrary) { 
+			    boolean isLibrary, boolean innerClass, boolean anonymousClass,
+			    boolean localClass) { 
 	super(children, fullName, isLibrary);
 	extending=(Extends)children.get(Extends.class);
 	implementing=(Implements)children.get(Implements.class);
+	this.isInnerClass = innerClass;
+	this.isAnonymousClass = anonymousClass;
+	this.isLocalClass =localClass;
+    } 
+    
+    public ClassDeclaration(ExtList children, ProgramElementName fullName, 
+            boolean isLibrary) { 
+        this(children, fullName, isLibrary, false, false, false);
     } 
 
 
@@ -213,6 +231,18 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
 
     public boolean isTransient() {
         return false;
+    }
+    
+    public boolean isInnerClass(){
+        return isInnerClass;
+    }
+    
+    public boolean isAnonymousClass(){
+        return isAnonymousClass;
+    }
+    
+    public boolean isLocalClass(){
+        return isLocalClass;
     }
 
     /**

@@ -10,24 +10,12 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
-import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.abstraction.ClassType;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.MethodDeclaration;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.expression.operator.Instanceof;
 import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.statement.Else;
-import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.Then;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
@@ -112,9 +100,13 @@ public class MethodCall extends ProgramMetaConstruct {
 
 
     private KeYJavaType getStaticPrefixType(ReferencePrefix refPrefix) {
-	if (refPrefix==null || refPrefix instanceof ThisReference) {
+	if (refPrefix==null || refPrefix instanceof ThisReference && 
+	        ((ThisReference) refPrefix).getReferencePrefix()==null){ 
 	    return execContext.getTypeReference().getKeYJavaType();
-	} else if (refPrefix instanceof TypeRef) {
+	} else if(refPrefix instanceof ThisReference){
+	    return ((TypeReference) ((ThisReference) refPrefix).getReferencePrefix()).getKeYJavaType();
+	    //((ProgramVariable) services.getTypeConverter().convertToLogicElement(refPrefix).op()).getKeYJavaType();
+	}else if (refPrefix instanceof TypeRef) {
 	    KeYJavaType t = ((TypeRef)refPrefix).getKeYJavaType();
 	    if (t == null) { //%%%
 		Debug.fail();
@@ -126,8 +118,9 @@ public class MethodCall extends ProgramMetaConstruct {
 	    return ((FieldReference)refPrefix).getProgramVariable()
 		.getKeYJavaType();
 	} else if (refPrefix instanceof SuperReference) {
-	    return services.getJavaInfo().getSuperclass
-		(execContext.getTypeReference().getKeYJavaType()); 	
+	    KeYJavaType st = services.getJavaInfo().getSuperclass
+                (execContext.getTypeReference().getKeYJavaType());
+	    return st; 	
 	} else {
 	    throw new de.uka.ilkd.key.util.NotSupported
 		("Unsupported method invocation mode\n"+
@@ -215,8 +208,14 @@ public class MethodCall extends ProgramMetaConstruct {
 		 staticPrefixType);	    
 	}
         newContext = methRef.getReferencePrefix();
-	if (newContext == null || newContext instanceof ThisReference) {
-	    newContext = execContext.getRuntimeInstance();
+	if (newContext == null){
+	    Term self = services.getTypeConverter().findThisForSort(pm.getContainerType().getSort(), execContext);
+	    if(self!=null){
+	        newContext = (ReferencePrefix) services.getTypeConverter().convertToProgramElement(self);
+	    }
+	} else if(newContext instanceof ThisReference){
+	    newContext = (ReferencePrefix) services.getTypeConverter().convertToProgramElement(
+                services.getTypeConverter().convertToLogicElement((ThisReference) newContext, execContext));
 	} else if (newContext instanceof FieldReference) {
 	    final FieldReference fieldContext = (FieldReference) newContext;
             if (fieldContext.referencesOwnInstanceField())
@@ -258,7 +257,10 @@ public class MethodCall extends ProgramMetaConstruct {
 		ListOfKeYJavaType imps = 
 		    services.getJavaInfo().getKeYProgModelInfo().findImplementations
 		    (staticPrefixType, methRef.getName(), getTypes(arguments));
-
+		if (imps.isEmpty()) {
+		    imps = services.getJavaInfo().getKeYProgModelInfo().findImplementations
+	                    (pm.getContainerType(), methRef.getName(), getTypes(arguments));
+		}
 		if (imps.isEmpty()) {
 		    Type staticPrefix = staticPrefixType.getJavaType();
 		    if (staticPrefix instanceof ClassType &&

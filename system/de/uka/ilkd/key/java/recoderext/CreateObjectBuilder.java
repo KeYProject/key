@@ -15,7 +15,7 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.List;
+import java.util.*;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.CompilationUnit;
@@ -23,19 +23,15 @@ import recoder.java.Expression;
 import recoder.java.Identifier;
 import recoder.java.Statement;
 import recoder.java.StatementBlock;
-import recoder.java.declaration.ClassDeclaration;
+import recoder.java.declaration.*;
 import recoder.java.declaration.DeclarationSpecifier;
-import recoder.java.declaration.LocalVariableDeclaration;
-import recoder.java.declaration.MethodDeclaration;
 import recoder.java.declaration.Modifier;
 import recoder.java.declaration.ParameterDeclaration;
-import recoder.java.declaration.TypeDeclaration;
 import recoder.java.declaration.modifier.Public;
 import recoder.java.declaration.modifier.Static;
-import recoder.java.reference.MethodReference;
-import recoder.java.reference.TypeReference;
-import recoder.java.reference.VariableReference;
+import recoder.java.reference.*;
 import recoder.java.statement.Return;
+import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
@@ -53,12 +49,14 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
 
     public static final String IMPLICIT_OBJECT_CREATE = "<createObject>";
     public static final String NEW_OBJECT_VAR_NAME = "__NEW__";
+    private HashMap class2identifier;
 
 
     public CreateObjectBuilder
 	(CrossReferenceServiceConfiguration services, 
 	 List<CompilationUnit> units) {	
 	super(services, units);
+	class2identifier = new HashMap();
     }
 
    
@@ -69,7 +67,7 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
     private StatementBlock createBody(ClassDeclaration recoderClass) {
 		
 	ASTList<Statement> result = new ASTArrayList<Statement>(10);
-	LocalVariableDeclaration local = declare(NEW_OBJECT_VAR_NAME, recoderClass);
+	LocalVariableDeclaration local = declare(NEW_OBJECT_VAR_NAME, (Identifier) class2identifier.get(recoderClass));
 	
 
 	result.add(local);
@@ -80,7 +78,7 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
             (assign(new VariableReference
                     (new Identifier(NEW_OBJECT_VAR_NAME)),
                     new MethodReference(new TypeReference
-                         ((Identifier) recoderClass.getIdentifier().deepClone()), 
+                         ((Identifier) class2identifier.get(recoderClass)), 
                          new ImplicitIdentifier
                          (InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
                          arguments)));
@@ -110,10 +108,10 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
 	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(2);
 	modifiers.add(new Public());
 	modifiers.add(new Static());	
+
 	MethodDeclaration md =  new MethodDeclaration
 	    (modifiers, 
-	     new TypeReference
-	     ((Identifier)type.getIdentifier().deepClone()), 
+	     new TypeReference((Identifier) class2identifier.get(type)), 
 	     new ImplicitIdentifier(IMPLICIT_OBJECT_CREATE), 
 	     new ASTArrayList<ParameterDeclaration>(0), 
 	     null,
@@ -122,6 +120,16 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
 	return md;
     }    
 
+    public ProblemReport analyze() {
+        HashSet cds = classDeclarations();
+        Iterator it = cds.iterator();
+        while(it.hasNext()){
+            ClassDeclaration cd = (ClassDeclaration) it.next();
+            class2identifier.put(cd, getId(cd));
+        }
+        setProblemReport(NO_PROBLEM);
+        return NO_PROBLEM;
+    }
 
     /**
      * entry method for the constructor normalform builder

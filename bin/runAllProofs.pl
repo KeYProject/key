@@ -249,7 +249,13 @@ sub produceResultText {
       $result .= "$key \t :  $erroneous{$key}\n"
     }
   }
+
   $result;
+
+  if (%failures || %erroneous) {
+      exit -1;
+  }
+
 }
 
 sub runAuto {

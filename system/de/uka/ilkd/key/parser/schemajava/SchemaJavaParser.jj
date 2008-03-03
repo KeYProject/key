@@ -3684,7 +3684,7 @@ StatementBlock StartBlock() :
 	             ec = ExecutionContextSV() ))? 
             <CONTEXTSTART> 
             {
-              if (ec != null) {
+              if (tr == null) {
                  result = factory.createContextStatementBlock(ec);
 	      } else { 
                  result = factory.createContextStatementBlock(tr, sv);

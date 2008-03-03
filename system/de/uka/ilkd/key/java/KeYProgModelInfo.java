@@ -187,7 +187,7 @@ public class KeYProgModelInfo{
             = (recoder.abstraction.Type) rec2key().toRecoder(t);
         return rt.getFullName();
     }
-
+    
     public recoder.abstraction.Type getType(TypeReference tr) {
         recoder.abstraction.Type result;
         if (tr instanceof TypeRef) {            

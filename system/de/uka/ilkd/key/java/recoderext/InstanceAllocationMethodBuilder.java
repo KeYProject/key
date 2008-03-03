@@ -4,13 +4,10 @@ import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.CompilationUnit;
-import recoder.java.Identifier;
-import recoder.java.declaration.ClassDeclaration;
-import recoder.java.declaration.MethodDeclaration;
+import recoder.java.declaration.*;
+import recoder.java.declaration.modifier.Public;
 import recoder.java.declaration.DeclarationSpecifier;
 import recoder.java.declaration.ParameterDeclaration;
-import recoder.java.declaration.TypeDeclaration;
-import recoder.java.declaration.modifier.Private;
 import recoder.java.declaration.modifier.Static;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTArrayList;
@@ -28,21 +25,20 @@ public class InstanceAllocationMethodBuilder extends RecoderModelTransformer {
     }
     
     /**
-     * creates a method declaration whith no implementation. The methods intention is
+     * creates a method declaration with no implementation. The methods intention is
      * to allocate a new object of the type it is declared in and to return it.
      * The functionality will be described using taclets
      */
     private MethodDeclaration createAllocateMethod(ClassDeclaration type) {
         ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(2);
-        modifiers.add(new Private());
+        modifiers.add(new Public());
         modifiers.add(new Static());    
         
         ASTArrayList<ParameterDeclaration> pdal = new ASTArrayList<ParameterDeclaration>(0);
   
         MethodDeclaration md =  new MethodDeclaration
             (modifiers, 
-             new TypeReference
-             ((Identifier)type.getIdentifier().deepClone()), 
+             new TypeReference(getId(type)), 
              new ImplicitIdentifier(IMPLICIT_INSTANCE_ALLOCATE), 
              pdal, 
              null, null);
