@@ -51,6 +51,7 @@ public class ConstructorNormalformBuilder
     private HashMap class2initializers;
     private HashMap class2identifier;
     private HashMap class2methodDeclaration;
+    private HashMap class2superContainer;
     private HashMap v2t;
 //    private HashMap class2fieldsForFinalVars;
 
@@ -67,6 +68,7 @@ public class ConstructorNormalformBuilder
 	class2enclosingThis = new HashMap(units.size());
 	class2enclosingClass = new HashMap(units.size());
 	class2identifier = new HashMap(units.size());
+	class2superContainer = new HashMap(units.size());
 	v2t = new HashMap(units.size());
 //	class2fieldsForFinalVars = new HashMap(units.size());
     }
@@ -186,6 +188,10 @@ public class ConstructorNormalformBuilder
              class2identifier.put(cd, getId(cd));
              
              class2enclosingThis.put(cd, getImplicitEnclosingThis(cd));
+             
+             if(cd.getAllSupertypes().size()>1 && (cd.getStatementContainer()!=null || cd.getName()==null)){
+                 class2superContainer.put(cd, cd.getAllSupertypes().getClassType(1).getContainingClassType());
+             }
              
              LinkedList outerVars = (LinkedList) localClass2FinalVar.get(cd);
              for(int i=0; outerVars!=null && i<outerVars.size(); i++){
@@ -350,6 +356,9 @@ public class ConstructorNormalformBuilder
 		    if(referencePrefix!=null && referencePrefix instanceof Expression){
 		        if(args==null) args = new ExpressionArrayList(1);
 		        args.add((Expression) referencePrefix);
+		    }else if(class2superContainer.get(cd)!=null){
+		        if(args==null) args = new ExpressionArrayList(1);
+		        args.add(new VariableReference(new Identifier(etId)));        
 		    }
 		    attach(new MethodReference
 		            (new SuperReference(), new ImplicitIdentifier
