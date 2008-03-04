@@ -172,8 +172,11 @@ public class ProblemLoader implements Runnable {
         
         if (filename.endsWith(".java")){ 
             // java file, probably enriched by specifications
-            return new SLEnvInput(file.getParentFile().getAbsolutePath());
-            
+            if(file.getParentFile() == null) {
+                return new SLEnvInput(".");
+            } else {
+                return new SLEnvInput(file.getParentFile().getAbsolutePath());
+            }            
         } else if (filename.endsWith(".key") || 
                 filename.endsWith(".proof")) {
             // KeY problem specification or saved proof
