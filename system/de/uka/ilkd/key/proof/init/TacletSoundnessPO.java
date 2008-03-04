@@ -38,10 +38,13 @@ implements ProofOblInput{
     private ProofAggregate proof;
     
     private NoPosTacletApp[] app;
+
+    private final ListOfGoal goals;
     
     public TacletSoundnessPO (String name, File file, 
-            ProgressMonitor monitor) {
+            ProgressMonitor monitor, ListOfGoal goals) {
         super ( name, file, monitor );
+        this.goals = goals;
     }
     
     /** returns the proof obligation term as result of the proof obligation
@@ -106,8 +109,6 @@ implements ProofOblInput{
         for (int i=0; i<app.length; i++) {
             final POBuilder pob = new POBuilder ( app[i], initConfig.getServices() );
             pob.build ();
-            ListOfGoal goals = Main.getInstance().mediator().getSelectedProof()
-                                                            .openGoals();
             for(IteratorOfGoal it2 = goals.iterator(); it2.hasNext(); ) {
                 it2.next().addTaclet(app[i].taclet(), 
                                      app[i].instantiations(), 
