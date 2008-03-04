@@ -123,10 +123,11 @@ public class WatchPointManager {
 
                                 // String name = locVarInf[0];
                                 // String type = locVarInf[1];
-
+                                System.out.println("%%%%% "+locVarInf[0]);
+                                
                                 ProgramVariable locVar = new LocationVariable(
-                                        new ProgramElementName(locVarInf[0] + j),
-                                        ji.getKeYJavaType(locVarInf[1]));
+                                        new ProgramElementName(locVarInf[1]),
+                                        ji.getKeYJavaType(locVarInf[0]));
                                 progVarNS.add(locVar);
                             }
 
