@@ -677,7 +677,7 @@ public class Recoder2KeY implements JavaReader {
     }
 
     /**
-     * create a new Context with a temproray name and make a list of variables
+     * create a new Context with a temporary name and make a list of variables
      * visible from within.
      * 
      * @param vars

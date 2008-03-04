@@ -1644,7 +1644,8 @@ public class PrettyPrinter {
         
         write(" : ");
         
-        writeElement(1, x.getGuardExpression());
+        if(x.getGuard() != null)
+            writeElement(1, x.getGuardExpression());
         
         write(")");
         output();

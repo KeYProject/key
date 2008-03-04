@@ -1468,7 +1468,7 @@ public class Recoder2KeYConverter {
      * @return the EnhancedFor of KeY
      */
     
-     private EnhancedFor convert(recoder.java.statement.EnhancedFor f) { 
+     public EnhancedFor convert(recoder.java.statement.EnhancedFor f) { 
          return new EnhancedFor(convertLoopInitializers(f), convertGuard(f),
                  convertBody(f),collectComments(f),positionInfo(f)); 
      }
