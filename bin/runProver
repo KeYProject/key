@@ -158,7 +158,7 @@ fi
 
 key_ext_jars="antlr.jar jargs.jar recoderKey.jar dresden-ocl-demo.jar xerces.jar log4j.jar"
 
-keyclasspath="$KEY_HOME/system/binary/:/home/mattze/eclipse/objinspector/classes/":
+keyclasspath="$KEY_HOME/system/binary/"
 
 for i in $key_ext_jars ; do
     current_jar="$KEY_LIB/$i"
@@ -233,7 +233,6 @@ export PATH
 $JAVA $JAVA_OPTIONS $keysysprops $hpfix \
 -ea:de.uka.ilkd.key... -noverify -Djvm.dir=$JVM_DIR -Xms64m -Xmx1024m \
 -Dkey.home=$KEY_HOME \
--DKeyDebugFlag=on \
 -Dkey.pattern.path=$HOME/.key/keypatterns/ \
 -Dkey.simplify.logdir=$KEY_SIMPLIFY_LOG_DIR \
 -Dkey.ics.logdir=$KEY_ICS_LOG_DIR \

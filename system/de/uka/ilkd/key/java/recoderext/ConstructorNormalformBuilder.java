@@ -274,8 +274,8 @@ public class ConstructorNormalformBuilder
      * @return the constructor normalform
      */
     private MethodDeclaration normalform(ClassDeclaration cd, 
-					 Constructor cons) {	
-	
+					 Constructor cons) {
+
 	ASTList<DeclarationSpecifier> mods = new ASTArrayList<DeclarationSpecifier>(5);
 	ASTList<ParameterDeclaration> parameters;
 	Throws recThrows;
@@ -300,7 +300,7 @@ public class ConstructorNormalformBuilder
 	    mods.add(new Public());
 	    parameters = new ASTArrayList<ParameterDeclaration>(0+j);
 	    recThrows = null;
-	    body = null;    
+	    body =  new StatementBlock();    
 	} else {
 	    ConstructorDeclaration consDecl = (ConstructorDeclaration)cons;
 	    mods = (ASTList<DeclarationSpecifier>)
@@ -455,12 +455,11 @@ public class ConstructorNormalformBuilder
 	    for (int i = 0; i < mdl.size(); i++) {
 		attach(mdl.get(i), td, 0);
 	    }
-
-/*  	    java.io.StringWriter sw = new java.io.StringWriter();
-//  	    //services.getProgramFactory().getPrettyPrinter(sw).visitMethodDeclaration(nf);
+/*
+  	    java.io.StringWriter sw = new java.io.StringWriter();
   	    services.getProgramFactory().getPrettyPrinter(sw).visitClassDeclaration((ClassDeclaration)td);
   	    System.out.println(sw.toString());
-  	    try { sw.close(); } catch (Exception e) {}		*/
+  	    try { sw.close(); } catch (Exception e) {} */		
 	}
 
 
