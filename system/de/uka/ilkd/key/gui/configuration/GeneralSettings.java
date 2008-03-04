@@ -14,7 +14,6 @@ import java.util.LinkedList;
 import java.util.Properties;
 
 import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.gui.Main;
 
 
 /** This class encapsulates the information about the active
@@ -32,6 +31,11 @@ public class GeneralSettings implements Settings {
         "[General]DnDDirectionSensitive";
     private static final String USE_JML_KEY = "[General]UseJML";
     private static final String USE_OCL_KEY = "[General]UseOCL";
+    
+    /** if true then JML/OCL specifications are globally disabled 
+     * in this run of KeY, regardless of the regular settings 
+     */
+    public static boolean disableSpecs = false;
     
     /** minimize interaction is on by default */
     private boolean stupidMode = true;
@@ -84,12 +88,12 @@ public class GeneralSettings implements Settings {
     
     
     public boolean useJML() {
-        return useJML && !Main.disableSpecs;
+        return useJML && !disableSpecs;
     }
     
     
     public boolean useOCL() {
-        return useOCL && !Main.disableSpecs;
+        return useOCL && !disableSpecs;
     }
     
 

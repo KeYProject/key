@@ -270,7 +270,6 @@ $TGH/lib/guiBuilderBeanInfo.jar:\
 $keyclasspath:\
 $JDK_RT_JAR"
 
-echo $JAVA $COMPLETEOPTIONS junit.textui.TestRunner $testcase
 $JAVA $COMPLETEOPTIONS junit.textui.TestRunner $testcase
 
 if [ "$testcase" = "TestKey" ]; then

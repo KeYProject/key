@@ -187,11 +187,6 @@ public class Main extends JFrame implements IMain {
      * */ 
 
     public static boolean testMode = false;
-
-    /** if true then JML/OCL specifications are globally disabled 
-     * in this run of KeY, regardless of the regular settings 
-     */
-    public static boolean disableSpecs = false;
     
     /** used to enable and initiate or to disable reuse */
     private ReuseAction reuseAction = new ReuseAction();
@@ -2531,7 +2526,7 @@ public class Main extends JFrame implements IMain {
 		} else if (opt[index].equals("ASSERTION")) {
 		    de.uka.ilkd.key.util.Debug.ENABLE_ASSERTION = true;
 		} else if (opt[index].equals("NO_JMLSPECS")) {
-		    disableSpecs = true;
+		    GeneralSettings.disableSpecs = true;
 		} else if (opt[index].equals("AUTO")) {
 		    batchMode = true;
                     visible = false;
