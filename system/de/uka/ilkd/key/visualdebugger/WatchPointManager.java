@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.visualdebugger;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -75,7 +76,7 @@ public class WatchPointManager {
         LinkedList<WatchPoint> watchpoints = getWatchPoints();
         listOfWatchpoints = SLListOfTerm.EMPTY_LIST;
         try {
-            assert (watchpoints != null);
+            assert (watchpoints != null): "Watchpoints are NULL!";
 
             if (watchpoints.isEmpty()) {
                 System.out
@@ -113,6 +114,24 @@ public class WatchPointManager {
                         progVarNS.add(var_self);
                         progVarNS.add(var_dummy);
 
+                        if (wp.getLocalVariables() != null) {
+                            // TODO Locals
+                            List<String[]> locVars = wp.getLocalVariables();
+                            for (int j = 0; j < locVars.size(); j++) {
+
+                                String[] locVarInf = locVars.get(j);
+
+                                // String name = locVarInf[0];
+                                // String type = locVarInf[1];
+
+                                ProgramVariable locVar = new LocationVariable(
+                                        new ProgramElementName(locVarInf[0] + j),
+                                        ji.getKeYJavaType(locVarInf[1]));
+                                progVarNS.add(locVar);
+                            }
+
+                        }
+
                         buffer.append("\\exists " + typeOfSource + " x; {"
                                 + selfName + ":= x } \\<{method-frame( source="
                                 + typeOfSource + ",this=" + selfName);
@@ -130,6 +149,7 @@ public class WatchPointManager {
             }
         } catch (Throwable t) {
             System.out.println(t.toString());
+            t.printStackTrace();
             return -1;
         }
     }

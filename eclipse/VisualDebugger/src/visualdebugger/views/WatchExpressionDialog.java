@@ -1,11 +1,20 @@
 package visualdebugger.views;
 
+import java.util.LinkedList;
+import java.util.Set;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IProblemRequestor;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.WorkingCopyOwner;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -24,227 +33,233 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import visualdebugger.astops.Util;
+
 /**
  * The Class WatchExpressionDialog.
  */
 public class WatchExpressionDialog {
 
-	/** The shell. */
-	private Shell shell;
+    /** The shell. */
+    private Shell shell;
 
-	/** The expression. */
-	private String expression;
+    /** The expression. */
+    private String expression;
 
-	/** The expression. */
-	private String source;
-	/** The text. */
-	private Text text;
+    /** The expression. */
+    private String source;
+    /** The text. */
+    private Text text;
 
-	private int offset;
+    private int lineoffset;
 
     private String fieldToObserve;
 
-	/**
-	 * Instantiates a new watch expression dialog.
-	 * 
-	 * @param parent
-	 *            the parent
-	 */
-	public WatchExpressionDialog(Shell parent, int offset, String source, String fieldToObserve) {
-		shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
-		shell.setText("Enter watch expression");
-		shell.setLayout(new GridLayout());
-		this.source = source;
-		this.offset = offset;
-		this.fieldToObserve = fieldToObserve;
-	}
 
-	/**
-	 * Creates the control buttons.
-	 */
-	private void createControlButtons() {
-		Composite composite = new Composite(shell, SWT.NONE);
-		composite.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 2;
-		composite.setLayout(layout);
 
-		Button okButton = new Button(composite, SWT.PUSH);
-		okButton.setText("OK");
-		okButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
+    /**
+     * Instantiates a new watch expression dialog.
+     * 
+     * @param parent
+     *            the parent
+     */
+    public WatchExpressionDialog(Shell parent, int lineoffset, String source,
+            String fieldToObserve) {
+        shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
+        shell.setText("Enter watch expression");
+        shell.setLayout(new GridLayout());
+        this.source = source;
+        this.lineoffset = lineoffset;
+  
+        this.fieldToObserve = fieldToObserve;
+    }
 
-				try {
-					if (isValid(text.getText())) {
+    /**
+     * Creates the control buttons.
+     */
+    private void createControlButtons() {
+        Composite composite = new Composite(shell, SWT.NONE);
+        composite.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
+        GridLayout layout = new GridLayout();
+        layout.numColumns = 2;
+        composite.setLayout(layout);
 
-						expression = text.getText();
-						shell.close();
-					} else {
-						// if expression is not valid clear values
-						expression = null;
-						shell.close();
-					}
+        Button okButton = new Button(composite, SWT.PUSH);
+        okButton.setText("OK");
+        okButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {
 
-				} catch (JavaModelException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-		});
+                try {
+                    if (isValid(text.getText())) {
 
-		Button cancelButton = new Button(composite, SWT.PUSH);
-		cancelButton.setText("Cancel");
-		cancelButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				expression = null;
-				shell.close();
-			}
-		});
+                        expression = text.getText();
+                        shell.close();
+                    } else {
+                        // if expression is not valid clear values
+                        expression = null;
+                        shell.close();
+                    }
 
-		shell.setDefaultButton(okButton);
-	}
+                } catch (JavaModelException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
 
-	/**
-	 * Checks if the given expression is valid in this context.
-	 * 
-	 * @param expression
-	 *            the expression
-	 * 
-	 * @return true, if expression is valid
-	 * @throws JavaModelException
-	 */
+        Button cancelButton = new Button(composite, SWT.PUSH);
+        cancelButton.setText("Cancel");
+        cancelButton.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {
+                expression = null;
+                shell.close();
+            }
+        });
+
+        shell.setDefaultButton(okButton);
+    }
+
+    /**
+     * Checks if the given expression is valid in this context.
+     * 
+     * @param expression
+     *            the expression
+     * 
+     * @return true, if expression is valid
+     * @throws JavaModelException
+     */
     protected boolean isValid(String expression) throws JavaModelException {
 
-		//test name
-		String varName = "myDummy";
-		while(source.indexOf(varName) > (-1)){
-			varName  = varName.concat("x");
-		}
+        // test name
+        String varName = "myDummy";
+        while (source.indexOf(varName) > (-1)) {
+            varName = varName.concat("x");
+        }
 
-		// construct temporary source
-		String dummyVar = "\nboolean "+ varName + " = " + expression + ";\n"; 
-		Document doc = new Document(source);
-		
-		try {
+        // construct temporary source
+        String dummyVar = "\nboolean " + varName + " = " + expression + ";\n";
+        Document doc = new Document(source);
 
-			int pos = doc.getLineOffset(offset);
-			StringBuffer buffer = new StringBuffer();
-			buffer.append(source.substring(0, pos));
-			buffer.append(dummyVar);
-			buffer.append(source.substring(pos));
-			doc.set(buffer.toString());
+        try {
 
-		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            int pos = doc.getLineOffset(lineoffset);
+            StringBuffer buffer = new StringBuffer();
+            buffer.append(source.substring(0, pos));
+            buffer.append(dummyVar);
+            buffer.append(source.substring(pos));
+            doc.set(buffer.toString());
 
-		IEditorPart editor = PlatformUI.getWorkbench()
-				.getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+        } catch (BadLocationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-		IFile file = (IFile) ((ITextEditor) editor).getEditorInput()
-				.getAdapter(IFile.class);
+        IEditorPart editor = PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getActivePage().getActiveEditor();
 
-		ICompilationUnit icu = JavaCore.createCompilationUnitFrom(file);
-		
-//        ASTParser parser = ASTParser.newParser(AST.JLS3);
-//        parser.setSource(doc.toString().toCharArray());
-//        CompilationUnit cu = (CompilationUnit) parser.createAST(null);
-//        System.out.println("typeRoot : "+ cu.getTypeRoot());
-		final WatchPointProblemRequestor problemRequestor = new WatchPointProblemRequestor();
+        IFile file = (IFile) ((ITextEditor) editor).getEditorInput()
+                .getAdapter(IFile.class);
 
-		WorkingCopyOwner owner = new WorkingCopyOwner() {
-			public IProblemRequestor getProblemRequestor(ICompilationUnit unit) {
-				return (IProblemRequestor) problemRequestor;
-			}
-		};
-		ICompilationUnit workingCopy = null;
+        ICompilationUnit icu = JavaCore.createCompilationUnitFrom(file);
 
-		try {
-			workingCopy = icu.getWorkingCopy(owner, problemRequestor, null);
-			workingCopy.getBuffer().setContents(doc.get().toCharArray());
-			
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}
+        final WatchPointProblemRequestor problemRequestor = new WatchPointProblemRequestor();
 
-		// reconcile to inform problemRequestor about potential problems
-		workingCopy.reconcile(ICompilationUnit.NO_AST, true, null, null);
+        WorkingCopyOwner owner = new WorkingCopyOwner() {
+            public IProblemRequestor getProblemRequestor(ICompilationUnit unit) {
+                return (IProblemRequestor) problemRequestor;
+            }
+        };
+        ICompilationUnit workingCopy = null;
 
-		// clean up in the end
-		workingCopy.discardWorkingCopy();
+        try {
+            workingCopy = icu.getWorkingCopy(owner, problemRequestor, null);
+            workingCopy.getBuffer().setContents(doc.get().toCharArray());
 
-		// check for compilation errors and report the last detected problem
-		if (problemRequestor.hasErrors()) {
-			MessageDialog.openError(PlatformUI.getWorkbench()
-					.getActiveWorkbenchWindow().getShell(),
-					"Error creating WatchPoint", problemRequestor.getProblem()
-							.toString());
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
 
-			return false;
-		} else {
-			return true;
-		}
-	}
+        // reconcile to inform problemRequestor about potential problems
+        workingCopy.reconcile(ICompilationUnit.NO_AST, true, null, null);
 
-	/**
-	 * Creates the text widget.
-	 */
-	private void createTextWidget() {
+        // clean up in the end
+        workingCopy.discardWorkingCopy();
 
-		Composite composite = new Composite(shell, SWT.NONE);
-		composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 2;
-		composite.setLayout(layout);
+        // check for compilation errors and report the last detected problem
+        if (problemRequestor.hasErrors()) {
+            MessageDialog.openError(PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getShell(),
+                    "Error creating WatchPoint", problemRequestor.getProblem()
+                            .toString());
 
-		Label label = new Label(composite, SWT.RIGHT);
-		label.setText("Expression:");
-		text = new Text(composite, SWT.BORDER);
-		GridData gridData = new GridData();
-		gridData.widthHint = 400;
-		text.setLayoutData(gridData);
-		text.setText(fieldToObserve);
+            return false;
+        } else {
+            return true;
+        }
+    }
 
-	}
+    /**
+     * Creates the text widget.
+     */
+    private void createTextWidget() {
 
-	/**
-	 * Gets the title.
-	 * 
-	 * @return the title
-	 */
-	public String getTitle() {
-		return shell.getText();
-	}
+        Composite composite = new Composite(shell, SWT.NONE);
+        composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        GridLayout layout = new GridLayout();
+        layout.numColumns = 2;
+        composite.setLayout(layout);
 
-	/**
-	 * Returns the contents of the <code>Text</code> widgets in the dialog in
-	 * a <code>String</code> array.
-	 * 
-	 * @return String[] The contents of the text widgets of the dialog. May
-	 *         return null if all text widgets are empty.
-	 */
-	public String getExpression() {
-		return expression;
-	}
+        Label label = new Label(composite, SWT.RIGHT);
+        label.setText("Expression:");
+        text = new Text(composite, SWT.BORDER);
+        GridData gridData = new GridData();
+        gridData.widthHint = 400;
+        text.setLayoutData(gridData);
 
-	/**
-	 * Opens the dialog in the given state. Sets <code>Text</code> widget
-	 * contents and dialog behaviour accordingly.
-	 * 
-	 * @return the string
-	 */
-	public String open() {
-		createTextWidget();
-		createControlButtons();
-		shell.pack();
-		shell.open();
-		Display display = shell.getDisplay();
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch())
-				display.sleep();
-		}
+        if (fieldToObserve.startsWith("Field ")) {
+            fieldToObserve = fieldToObserve.substring(6);
+        }
+        text.setText(fieldToObserve);
 
-		return getExpression();
-	}
+    }
+
+    /**
+     * Gets the title.
+     * 
+     * @return the title
+     */
+    public String getTitle() {
+        return shell.getText();
+    }
+
+    /**
+     * Returns the contents of the <code>Text</code> widgets in the dialog in
+     * a <code>String</code> array.
+     * 
+     * @return String[] The contents of the text widgets of the dialog. May
+     *         return null if all text widgets are empty.
+     */
+    public String getExpression() {
+        return expression;
+    }
+
+    /**
+     * Opens the dialog in the given state. Sets <code>Text</code> widget
+     * contents and dialog behaviour accordingly.
+     * 
+     * @return the string
+     */
+    public String open() {
+        createTextWidget();
+        createControlButtons();
+        shell.pack();
+        shell.open();
+        Display display = shell.getDisplay();
+        while (!shell.isDisposed()) {
+            if (!display.readAndDispatch())
+                display.sleep();
+        }
+
+        return getExpression();
+    }
 }

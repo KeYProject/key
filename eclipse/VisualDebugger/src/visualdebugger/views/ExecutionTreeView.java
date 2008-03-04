@@ -424,20 +424,23 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                 public void mousePressed(MouseEvent me) {
 
                     setSelected(node);
+                    ListOfNode proofTreeNodes = node.getETNode().getProofTreeNodes();
+                    System.out.println("ProofNodes  :: "+proofTreeNodes.size());
+                   
+                    System.out.println("SerialNr  :: "+proofTreeNodes.iterator().next().serialNr());
                     wpInfo.removeAll();
                     try {
                         if (activeWPs != null) {
                             for (Term term : activeWPs) {
-
+                                try{
                                 SourceElement firstElement = term.sub(0).executableJavaBlock().program().getFirstElement();
-                                 StatementBlock sb = (StatementBlock) firstElement.getLastElement();
-                                                                
-                                System.out.println("1:"+firstElement.toString());
-                                System.out.println("2:"+firstElement.getClass());
-                                System.out.println("3:"+firstElement.getLastElement().toString());
-                                System.out.println("4:"+firstElement.getLastElement().getClass());
+                                StatementBlock sb = (StatementBlock) firstElement.getLastElement();
   
-                                wpInfo.add(sb.toString().replaceFirst("myDummy=", ""));
+                                String wp = sb.toString().replaceFirst("myDummy=", "");
+                                wpInfo.add(wp.replace(";",""));
+                                } catch (Throwable t){
+                                    t.printStackTrace();
+                                }
                             }
                         }
                     } catch (Throwable t) {
@@ -1417,7 +1420,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
             	
                 LinkedList<ETNode> allLeafETNodes = WatchpointUtil.getAllLeafETNodes(etn);
 				System.out.println("ETV identfy for : " + allLeafETNodes.size() + " ETNODE (LEAVES)");
-                identifyWatchpoints(allLeafETNodes);
+				identifyWatchpoints(allLeafETNodes);
                 treebranch = buildTreeBranch(etn, null, new TreeFilter());
                 this.root.addBranch(treebranch);
 

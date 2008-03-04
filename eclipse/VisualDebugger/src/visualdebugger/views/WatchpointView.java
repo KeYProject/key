@@ -1,11 +1,29 @@
 package visualdebugger.views;
 
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
+
+import visualdebugger.astops.*;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -58,6 +76,10 @@ public class WatchpointView extends ViewPart {
     private Action disableAction;
 
     private Action enableAction;
+
+    private int offset;
+
+    private ICompilationUnit unit;
 
     /**
      * The Class WatchPointContentProvider.
@@ -199,7 +221,7 @@ public class WatchpointView extends ViewPart {
         column.setText("Watch Expression");
 
         column = new TableColumn(table, SWT.NONE, 1);
-        column.setWidth(100);
+        column.setWidth(150);
         column.setText("Method");
 
         column = new TableColumn(table, SWT.NONE, 2);
@@ -294,20 +316,38 @@ public class WatchpointView extends ViewPart {
                             .openError(PlatformUI.getWorkbench()
                                     .getActiveWorkbenchWindow().getShell(),
                                     "Adding WatchPoint",
-                                    "Please select a global field or a constant in the Java Editor");
+                                    "Please select a constant, field or a local variable to observe.");
                 } else {
+
                     WatchExpressionDialog dialog = new WatchExpressionDialog(
                             shell, java.lang.Integer.parseInt(information[1]),
                             information[3], information[0]);
+
                     if (information != null) {
 
                         String expression = dialog.open();
 
                         if (expression != null) {
-
-                            watchPointManager.addWatchPoint(new WatchPoint(
-                                    information[4], expression, information[0],
-                                    information[1], information[2]));
+                            // create global watchpoint
+                            if (information.length == 6) {
+                                watchPointManager.addWatchPoint(new WatchPoint(
+                                        information[4], expression,
+                                        information[0], information[1],
+                                        information[2],null)); 
+                            } // create watchpoint for local variable
+                            else {
+                                //TODO
+                                LinkedList<String[]> locVars = getLocalVariables(expression);
+                                information[0] = locVars.get(0)[3];
+                                for (String[] strings : locVars) {
+                                    System.out.println(strings[0] +" "+ strings[1] + " " +strings[2]);
+                                }
+                                
+                                watchPointManager.addWatchPoint(new WatchPoint(
+                                        information[4], expression,
+                                        information[0], information[1],
+                                        information[2],locVars));
+                            }
                             vd.setWatchPointManager(watchPointManager);
                             viewer.refresh();
                         }
@@ -315,7 +355,6 @@ public class WatchpointView extends ViewPart {
                 }
 
             }
-
         };
         addAction.setText("Add");
         addAction.setToolTipText("Adds an expression that should be watched");
@@ -346,8 +385,7 @@ public class WatchpointView extends ViewPart {
 
                 Object element = sel.getFirstElement();
                 if (element instanceof WatchPoint) {
-                    // TODO
-                    ((WatchPoint)element).setEnabled(true);
+                    ((WatchPoint) element).setEnabled(true);
                     viewer.refresh();
 
                 }
@@ -364,8 +402,7 @@ public class WatchpointView extends ViewPart {
 
                 Object element = sel.getFirstElement();
                 if (element instanceof WatchPoint) {
-                    // TODO
-                    ((WatchPoint)element).setEnabled(false);
+                    ((WatchPoint) element).setEnabled(false);
                     viewer.refresh();
 
                 }
@@ -374,6 +411,40 @@ public class WatchpointView extends ViewPart {
         disableAction.setText("Disable");
         disableAction.setToolTipText("disable watchpoint");
 
+    }
+
+    private LinkedList<String[]> getLocalVariables(String expression) {
+        
+        try {
+            ICompilationUnit icu = getICompilationUnit();
+            IJavaElement je = icu.getElementAt(getOffset());
+            if (je instanceof IMethod) {
+
+                IMethod method = (IMethod) je;
+
+                CompilationUnit cu = Util
+                        .parse(icu, null /* IProgressMonitor */);
+
+                Set<IVariableBinding> allLocalVariables = Util
+                        .detectLocalVariables(cu);
+                LinkedList<IVariableBinding> localVariableBindings = Util
+                        .extractLocalVariablesForMethod(method,
+                                allLocalVariables);
+
+                Expression node = Util
+                        .parse(expression, null /* IProgressMonitor */);
+
+                Set<IVariableBinding> localVariables = Util
+                        .extractLocalVariablesForExpression(node,
+                                localVariableBindings);
+                
+                return Util.getLocVarInf(cu, localVariables);
+
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -391,24 +462,31 @@ public class WatchpointView extends ViewPart {
     public WatchPointManager getWatchPointManager() {
         return watchPointManager;
     }
-
+//TODO correct the doc
     /**
      * Gets the WatchPoint information.
      * 
      * Collects the necessary information to create a watchpoint.
      * 
-     * @return information where
+     * @return information where<br>
      * 
-     * information[0]= The name of the JavaElement where the WatchPoint was set.
-     * information[1]= The line offset where the text selection begins.
+     * information[0]= The name of the JavaElement where the WatchPoint was set.<br>
+     * information[1]= The line where the text selection ends. <br>
      * information[2]= The type in which the WatchPoint was set (fully qualified
-     * name). information[3]= The actual the source code for validating the
-     * WatchPoint. information[4]= The unique name of the boolean variable that
-     * is used to validate the watchpoint.
+     * name).<br>
+     * information[3]= The actual the source code for validating the WatchPoint.
+     * <br>
+     * information[4]= The unique name of the boolean variable that is used to
+     * validate the watchpoint.<br>
+     * ***** information[5] - [7] are only set for watchpoints on local
+     * variables.<br>
+     * information[5] = The type of the local variable.<br>
+     * information[6] = The name of the local variable.<br>
+     * information[7] = The offset of the local variable.
      */
     private String[] getWatchPointInf() {
 
-        String[] information = new String[5];
+        String[] information = null;
         String varName = "myDummy";
 
         IEditorPart editor = PlatformUI.getWorkbench()
@@ -419,45 +497,87 @@ public class WatchpointView extends ViewPart {
 
             ISelection sel = tedit.getSelectionProvider().getSelection();
             ITextSelection tsel = (ITextSelection) sel;
-            // set current line
-            information[1] = (1 + tsel.getEndLine()) + "";
-
+            
+            int offset = tsel.getOffset();
             IFile file = (IFile) tedit.getEditorInput().getAdapter(IFile.class);
 
             ICompilationUnit unit = JavaCore.createCompilationUnitFrom(file);
             String source = "";
+
             try {
                 source = unit.getBuffer().getContents();
-
                 while (source.indexOf(varName) > (-1)) {
                     varName = varName.concat("x");
                 }
 
             } catch (JavaModelException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
 
-            information[3] = source;
-            information[4] = varName;
-
             try {
-                IJavaElement je = unit.getElementAt(tsel.getOffset());
+                IJavaElement je = unit.getElementAt(offset);
 
                 if (je instanceof IField) {
+                    information = new String[6];
+                    information[0] = "Field " + je.getElementName();
+                    information[1] = (1 + tsel.getEndLine()) + "";
+                    information[2] = ((IField) je).getDeclaringType()
+                            .getFullyQualifiedName();
+                    information[3] = source;
+                    information[4] = varName;
+                    information[5] = offset + "";
 
-                    information[2]=((IField)je).getDeclaringType().getFullyQualifiedName();
-                    information[0] = je.getElementName();
+                    return information;
                 } else {
-
-                    return null;
+                    if (je instanceof IMethod) {
+                        
+                        information = new String[7];
+                        IMethod method = (IMethod) je;
+                        
+                        information[0] = je.getElementName();
+                        information[1] = (1 + tsel.getEndLine()) + "";
+                        information[2] = method.getDeclaringType()
+                                .getFullyQualifiedName();
+                        information[3] = source;
+                        information[4] = varName;
+                        information[5] = offset + "";
+                        information[6] = "LOCAL";
+                        setOffset(offset);
+                        setICompilationUnit(unit);
+                        return information;
+                        
+                    } else {
+                        return null;
+                    }
                 }
 
             } catch (JavaModelException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
+            }
+            catch (Throwable t) {
+                t.printStackTrace();
             }
         }
         return information;
     }
+
+    private void setICompilationUnit(ICompilationUnit unit) {
+        this.unit = unit;
+        
+    }
+    
+    private ICompilationUnit getICompilationUnit() {
+        return unit;
+        
+    }
+
+    private void setOffset(int offset) {
+        this.offset = offset;
+        
+    }
+
+    public int getOffset() {
+        return offset;
+    }
+
 }
