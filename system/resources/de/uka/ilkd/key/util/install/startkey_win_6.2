@@ -24,12 +24,12 @@ rem #############
 rem KeY CLASSPATH
 rem #############
 
-set key_ext_jars=antlr.jar recoder.jar dresden-ocl-demo.jar xerces.jar jargs.jar
+set key_ext_jars=antlr.jar recoderKey.jar dresden-ocl-demo.jar xerces.jar jargs.jar
 
 set keyclasspath=%KEY_HOME%\system\key.jar;%KEY_HOME%\keypatterns\
 
 if not exist "%KEY_LIB%\antlr.jar" (goto MISSING_LIBRARY ) else (set keyclasspath=%keyclasspath%;%KEY_LIB%\antlr.jar)
-if not exist "%KEY_LIB%\recoder.jar" (goto MISSING_LIBRARY ) else (set keyclasspath=%keyclasspath%;%KEY_LIB%\recoder.jar)
+if not exist "%KEY_LIB%\recoderKey.jar" (goto MISSING_LIBRARY ) else (set keyclasspath=%keyclasspath%;%KEY_LIB%\recoderKey.jar)
 if not exist "%KEY_LIB%\dresden-ocl-demo.jar" (goto MISSING_LIBRARY ) else (set keyclasspath=%keyclasspath%;%KEY_LIB%\dresden-ocl-demo.jar)
 if not exist "%KEY_LIB%\xerces.jar" (goto MISSING_LIBRARY ) else (set keyclasspath=%keyclasspath%;%KEY_LIB%\xerces.jar)
 if not exist "%KEY_LIB%\jargs.jar" (goto MISSING_LIBRARY ) else (set keyclasspath=%keyclasspath%;%KEY_LIB%\jargs.jar)
@@ -101,7 +101,7 @@ rem it is impossible to assign an environment variable value containing an equal
 
 :MISSING_LIBRARY
 echo Missing Library. Please copy all libraries to %KEY_LIB%.
-echo At least one of the following libraries has not been found: antlr.jar recoder.jar ocl-dresden-demo.jar xerces.jar
+echo At least one of the following libraries has not been found: antlr.jar recoderKey.jar ocl-dresden-demo.jar xerces.jar
 exit /b
 
 :MISSING_TOGETHER

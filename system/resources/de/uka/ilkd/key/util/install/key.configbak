@@ -1,0 +1,12 @@
+; some extensions for key-users
+pattern.root.4 = systemProperty("key.home")+"/keypatterns/de/uka/ilkd/key/casetool/together/patterns"
+scriptloader.root.6 = file(systemProperty("key.home")+"/keyscripts")
+scriptloader.root.6.name = "Key folder"
+
+; disable some extensions we[TM] do not need
+scriptloader.$com.togethersoft.modules.robustness.RobustnessDiagram$.Enabled = false
+scriptloader.$com.togethersoft.modules.ejb.EJBActivation$.Enabled = false
+scriptloader.$com.togethersoft.modules.guiBuilderModel.ModuleImpl$.Enabled = false
+scriptloader.$com.togethersoft.modules.dbmodeling.DBModeling$.Enabled = false
+
+

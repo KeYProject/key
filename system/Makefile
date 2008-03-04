@@ -37,7 +37,7 @@ JIKESPATH=$(CLASSPATH):$(GENERATED_SRC_PATH):$(JAVA_HOME)/jre/lib/rt.jar
 # enables optimization and removes debug info (such as line tables)
 #COMMON_OPTIONS=-O -g:none -d $(BINARYPATH)
 
-COMMON_OPTIONS=-g -d $(BINARYPATH) 
+COMMON_OPTIONS=-g -d $(BINARYPATH)
 OPTIONS=$(COMMON_OPTIONS)
 
 
@@ -80,13 +80,10 @@ ifeq "$(ANTLR)" ""
 ANTLR=$(JAVA) -cp $(GENERATED_SRC_PATH):$(CLASSPATH) antlr.Tool
 endif
 
-
-
-
 ifeq ($(JAVAC),jikes) 
 VERSION=$(shell jikes -version | grep "Version" )
 VERSION:=$(wordlist 5,5,$(VERSION))
-OPTIONS=$(COMMON_OPTIONS) +D +E +P -source 1.4 -classpath $(JIKESPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
+OPTIONS=$(COMMON_OPTIONS) +D +E +P -source 1.5 -classpath $(JIKESPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
 ifeq ($(VERSION), 1.19)
 else 
 OPTIONS:=+Peffective-java $(OPTIONS) 
@@ -96,9 +93,9 @@ else
     OPTIONS=$(COMMON_OPTIONS) -nowarn -classpath $(ASPECTJRTPATH):$(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
   else
     ifeq ($(JAVAC),ejc)      
-       OPTIONS=$(COMMON_OPTIONS) -warn:uselessTypeCheck,localHiding,fieldHiding,tasks\(TODO\|HACK\|%%%\)  -source 1.4 -classpath $(JAVA_HOME)/jre/lib/rt.jar:$(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
+       OPTIONS=$(COMMON_OPTIONS) -warn:uselessTypeCheck,localHiding,fieldHiding,tasks\(TODO\|HACK\|%%%\)  -source 1.5 -classpath $(JAVA_HOME)/jre/lib/rt.jar:$(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
     else 
-      OPTIONS=$(COMMON_OPTIONS) -J-Xmx512m -nowarn -source 1.4 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
+      OPTIONS=$(COMMON_OPTIONS) -J-Xmx512m -nowarn -source 1.5 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
     endif
   endif
 endif
@@ -291,7 +288,6 @@ GENERATED_MAPS=logic/HashMapFromNameToNamed \
 	logic/op/MapAsListFromQuantifiableVariableToTerm \
 	logic/op/MapAsListFromQuantifiableVariableToMetavariable 
 
-
 GENERATED_ARRAYS=java/ArrayOfProgramElementExtnullInnull \
 	java/ArrayOfStatementExtProgramElementInnull \
 	java/ArrayOfExpressionExtProgramElementInnull \
@@ -397,7 +393,7 @@ doc: argfile $(JAVAFILES)
 ## didn't want to use perl ;)
 	@find de/ -name '*.java' | xargs grep -h "^package\|^overview" |\
 	cut -d" " -f2 | cut -d";" -f1 | sort | uniq | grep "^de.uka" | \
-	xargs $(JAVADOC) $(JAVADOC_OPTIONS) -source 1.4 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH) \
+	xargs $(JAVADOC) $(JAVADOC_OPTIONS) -source 1.5 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH) \
 	-sourcepath $(GENERATED_SRC_PATH):. -d doc \
 	-link http://recoder.sourceforge.net/doc/api \
 	-link http://java.sun.com/j2se/1.3/docs/api \
@@ -573,6 +569,7 @@ $(JAVACC_PARSER) \
 	@echo [creating parser for schematic java in taclets]
 	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)parser/schemajava
 	@rm -f $(GENERATED_SRC_PATH)$(PFX)parser/schemajava/*.java $@
+	@cp $(PFX)parser/schemajava/Token.java.source $(GENERATED_SRC_PATH)$(PFX)parser/schemajava/Token.java	
 	@$(JAVA) -cp $(CLASSPATH) $(JAVACC_MAIN) -OUTPUT_DIRECTORY=$(GENERATED_SRC_PATH)$(PFX)parser/schemajava $< 
 
 $(PROOFJAVA_PARSER) \
@@ -580,6 +577,7 @@ $(PROOFJAVA_PARSER) \
 	@echo [create parser for extended java in proofs]
 	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)parser/proofjava
 	@rm -f $(GENERATED_SRC_PATH)$(PFX)parser/proofjava/*.java $@
+	@cp $(PFX)parser/proofjava/Token.java.source $(GENERATED_SRC_PATH)$(PFX)parser/proofjava/Token.java
 	@$(JAVA) -cp $(CLASSPATH) $(JAVACC_MAIN) -OUTPUT_DIRECTORY=$(GENERATED_SRC_PATH)$(PFX)parser/proofjava $< 
 
 $(DIFF_PARSER) \

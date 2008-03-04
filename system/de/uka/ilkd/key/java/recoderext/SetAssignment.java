@@ -42,7 +42,7 @@ public class SetAssignment extends Assignment {
      }
 
 
-     public Object deepClone() {
+     public SetAssignment deepClone() {
          return new SetAssignment(this);
      }
      

@@ -44,7 +44,7 @@ public abstract class KeYInstaller {
     /** array with names of required library files */
     private static final String[] libraries = new String[] {
 	"antlr.jar", "dresden-ocl-demo.jar", 
-	"recoder.jar", "xerces.jar", "jargs.jar", "log4j.jar"
+	"recoderKey.jar", "xerces.jar", "jargs.jar", "log4j.jar"
     };
 
     /** optional external binaries */

@@ -1036,8 +1036,7 @@ options {
                 colOffset=e.parseException().currentToken.next.beginColumn;
                 e.parseException().currentToken.next.beginLine=getLine()-1;
                 e.parseException().currentToken.next.beginColumn=getColumn();
-                throw new JavaParserException(e.parseException().getMessage(), t, 
-                    getFilename(), -1, -1);  // row/columns already in text
+                throw new JavaParserException(e, t, getFilename(), -1, -1);  // row/columns already in text
             }       
             if (e.proofJavaException()!=null
             &&  e.proofJavaException().currentToken != null
@@ -1046,11 +1045,10 @@ options {
                 colOffset=e.proofJavaException().currentToken.next.beginColumn;
                 e.proofJavaException().currentToken.next.beginLine=getLine();
                 e.proofJavaException().currentToken.next.beginColumn =getColumn();
-                 throw  new JavaParserException(e.proofJavaException().
-                    getMessage(), t, getFilename(), lineOffset, colOffset); 
+                 throw  new JavaParserException(e, t, getFilename(), lineOffset, colOffset); 
                             
             }   
-            throw new JavaParserException(e.getMessage(), t, getFilename());
+            throw new JavaParserException(e, t, getFilename());
         } 
         return sjb;
     }
@@ -3854,13 +3852,16 @@ varexp[TacletBuilder b]
     | varcond_free[b] | varcond_literal[b]
     | varcond_hassort[b] | varcond_query[b]
     | varcond_non_implicit[b] | varcond_non_implicit_query[b]
+    | varcond_enum_const[b]
     | varcond_inReachableState[b] 
   ) 
   | 
   ( (NOT {negated = true;} )? 
       ( varcond_reference[b, negated] 
+      | varcond_enumtype[b, negated]
       | varcond_staticmethod[b,negated]  
       | varcond_referencearray[b, negated]
+      | varcond_array[b, negated]
       | varcond_abstractOrInterface[b, negated]
       | varcond_static[b,negated] 
       | varcond_typecheck[b, negated]
@@ -4007,6 +4008,18 @@ varcond_hassort [TacletBuilder b]
    }
 ;
 
+varcond_enumtype [TacletBuilder b, boolean negated]
+{
+  TypeResolver tr = null;
+}
+:
+   ISENUMTYPE LPAREN tr = type_resolver RPAREN
+      {
+         b.addVariableCondition(new EnumTypeCondition(tr, negated));
+      }
+;
+ 
+
 varcond_reference [TacletBuilder b, boolean isPrimitive]
 {
   ParsableVariable x = null;
@@ -4108,6 +4121,18 @@ varcond_referencearray [TacletBuilder b, boolean primitiveElementType]
    }
 ;
 
+varcond_array [TacletBuilder b, boolean negated]
+{
+  ParsableVariable x = null;
+}
+:
+   ISARRAY LPAREN x=varId RPAREN {
+     b.addVariableCondition(new ArrayTypeCondition(
+       (SchemaVariable)x, negated));
+   }
+;
+
+
 varcond_abstractOrInterface [TacletBuilder b, boolean negated]
 {
   TypeResolver tr = null;
@@ -4115,6 +4140,17 @@ varcond_abstractOrInterface [TacletBuilder b, boolean negated]
 :
    IS_ABSTRACT_OR_INTERFACE LPAREN tr=type_resolver RPAREN {
      b.addVariableCondition(new AbstractOrInterfaceType(tr, negated));
+   }
+;
+
+varcond_enum_const [TacletBuilder b]
+{
+  ParsableVariable x = null;
+}
+:
+   ENUM_CONST LPAREN x=varId RPAREN {
+      b.addVariableCondition(new EnumConstantCondition(
+	(SchemaVariable) x));     
    }
 ;
 

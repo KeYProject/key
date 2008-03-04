@@ -248,6 +248,8 @@ public class ProblemInitializer {
     
         
     /**
+     * get a vector of Strings containing all .java file names 
+     * in the cfile directory.
      * Helper for readJava().
      */
     private Vector getClasses(String f) throws ProofInputException  {
@@ -334,7 +336,7 @@ public class ProblemInitializer {
             }
             Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(), 
                                               initConfig.namespaces());
-            if (javaPath == "") {             
+            if (javaPath == "") {
                 r2k.parseSpecialClasses();
                 initConfig.getProofEnv().setJavaModel(JavaModel.NO_MODEL);
             } else {                 

@@ -17,8 +17,8 @@ public class ObjectTypeIdentifier extends Identifier {
      * @return the object.
      */
     
-    public Object deepClone() {
-        return new ImplicitIdentifier(id);
+    public ObjectTypeIdentifier deepClone() {
+        return new ObjectTypeIdentifier(id);
     }
     
 }

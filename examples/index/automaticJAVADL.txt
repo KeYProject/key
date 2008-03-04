@@ -85,6 +85,7 @@
 ./java_dl/splittingWithQueries.key
 ./java_dl/symmArray.key
 ./java_dl/testcontext.key
+./java_dl/innerClasses/inner.key
 ./polySimp/simplify0.key
 ./polySimp/simplify1.key
 ./polySimp/simplify10.key

@@ -35,7 +35,7 @@ public class PassiveExpression
 	super(proto);
     }
 	   
-    public Object deepClone() {
+    public PassiveExpression deepClone() {
 	return new PassiveExpression(this);
     }
 }

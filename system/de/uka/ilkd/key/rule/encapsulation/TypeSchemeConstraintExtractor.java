@@ -758,7 +758,10 @@ class TypeSchemeConstraintExtractor implements Visitor {
     public void performActionOnFor(For x) {
         //nothing to do
     }
-
+    
+    public void performActionOnEnhancedFor(EnhancedFor x) {
+        // nothing to do
+    }
     
     public void performActionOnWhile(While x) {
         //nothing to do

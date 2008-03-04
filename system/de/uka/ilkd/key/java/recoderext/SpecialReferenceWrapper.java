@@ -78,7 +78,7 @@ public class SpecialReferenceWrapper extends ThisReference
     public void accept(SourceVisitor v) {
     }
     
-    public Object deepClone() {
+    public SpecialReferenceWrapper deepClone() {
 	return new SpecialReferenceWrapper(typeRef, myprefix);
     }
 

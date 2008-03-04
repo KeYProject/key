@@ -27,7 +27,8 @@ import recoder.java.expression.operator.CopyAssignment;
 import recoder.java.expression.operator.New;
 import recoder.java.reference.*;
 import recoder.kit.ProblemReport;
-import recoder.list.*;
+import recoder.list.generic.*;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -60,8 +61,9 @@ public class ConstructorNormalformBuilder
     /** creates the constructor normalform builder */
     public ConstructorNormalformBuilder
 	(CrossReferenceServiceConfiguration services, 
-	 CompilationUnitMutableList units) {	
-	super(services, units);
+	 TransformerCache cache) {	
+	super(services, cache);
+	List<CompilationUnit> units = getUnits();
 	class2constructors = new HashMap(4*units.size());
 	class2initializers = new HashMap(10*units.size());
 	class2methodDeclaration = new HashMap(10*units.size());
@@ -107,15 +109,15 @@ public class ConstructorNormalformBuilder
      * @return the list of copy assignments and method references
      * realising the initializers. 
      */
-    private StatementList collectInitializers(ClassDeclaration cd) {
-	StatementMutableList result = new StatementArrayList(20);
-	MethodDeclarationMutableList mdl = new MethodDeclarationArrayList(5);
+    private ASTList<Statement> collectInitializers(ClassDeclaration cd) {
+	ASTList<Statement> result = new ASTArrayList<Statement>(20);
+	ASTList<MethodDeclaration> mdl = new ASTArrayList<MethodDeclaration>(5);
 	int childCount = cd.getChildCount();
 	for (int i = 0; i<childCount; i++) {
 	    if (cd.getChildAt(i) instanceof ClassInitializer &&
 		!((ClassInitializer)cd.getChildAt(i)).isStatic()) {
 
-		ModifierMutableList mods = new ModifierArrayList(1);
+		ASTList<DeclarationSpecifier> mods = new ASTArrayList<DeclarationSpecifier>(1);
 		mods.add(new Private());
 		String name = OBJECT_INITIALIZER_IDENTIFIER + mdl.size();
 		MethodDeclaration initializerMethod = 
@@ -123,7 +125,7 @@ public class ConstructorNormalformBuilder
 		    (mods,
 		     null, //return type is void
 		     new ImplicitIdentifier(name),
-		     new ParameterDeclarationArrayList(0),
+		     new ASTArrayList<ParameterDeclaration>(0),
 		     null,
 		     (StatementBlock)
 		     ((ClassInitializer)cd.getChildAt(i)).getBody().deepClone());		
@@ -134,17 +136,17 @@ public class ConstructorNormalformBuilder
 			    new ImplicitIdentifier(name)));			   
 	    } else if (cd.getChildAt(i) instanceof FieldDeclaration &&
 		       !((FieldDeclaration)cd.getChildAt(i)).isStatic()) {
-		FieldSpecificationList specs =
+		ASTList<FieldSpecification> specs =
 		    ((FieldDeclaration)cd.getChildAt(i)).getFieldSpecifications();
 		for (int j = 0; j < specs.size(); j++) {
 		    Expression fieldInit = null;
-		    if ((fieldInit = specs.getFieldSpecification(j).			 
+		    if ((fieldInit = specs.get(j).			 
 			 getInitializer()) != null) {
 			CopyAssignment fieldCopy = 
 			    new CopyAssignment
 			    (new FieldReference
 			     (new ThisReference(), 
-			      specs.getFieldSpecification(j).getIdentifier()),
+			      specs.get(j).getIdentifier()),
                               (Expression)fieldInit.deepClone());
 			result.add(fieldCopy);
 		    }
@@ -169,7 +171,7 @@ public class ConstructorNormalformBuilder
 	 if (!(javaLangObject instanceof ClassDeclaration)) {
 	     Debug.fail("Could not find class java.lang.Object or only as bytecode");
 	 }
-	 HashSet cds = classDeclarations();
+	 Set cds = classDeclarations();
 	 Iterator it = cds.iterator();
 	 while(it.hasNext()){
 	     ClassDeclaration cd = (ClassDeclaration) it.next();
@@ -177,8 +179,8 @@ public class ConstructorNormalformBuilder
 	         (new FinalOuterVarsCollector()).walk(cd);
 	     }
 	     // collect constructors for transformation phase
-             ConstructorMutableList constructors = new ConstructorArrayList(10);
-             constructors.add(services.getSourceInfo().getConstructors(cd));
+             List<Constructor> constructors = new ArrayList<Constructor>(10);
+             constructors.addAll(services.getSourceInfo().getConstructors(cd));
              if(constructors.size()==0 && (cd.getContainingClassType()!=null && !cd.isStatic() ||
                      cd.getName()==null || cd.getStatementContainer() !=null)){
                  constructors.add(new DefaultConstructor(cd));
@@ -190,10 +192,10 @@ public class ConstructorNormalformBuilder
              class2enclosingThis.put(cd, getImplicitEnclosingThis(cd));
              
              if(cd.getAllSupertypes().size()>1 && (cd.getStatementContainer()!=null || cd.getName()==null)){
-                 class2superContainer.put(cd, cd.getAllSupertypes().getClassType(1).getContainingClassType());
+                 class2superContainer.put(cd, cd.getAllSupertypes().get(1).getContainingClassType());
              }
              
-             LinkedList outerVars = (LinkedList) localClass2FinalVar.get(cd);
+             LinkedList outerVars = (LinkedList) getLocalClass2FinalVar().get(cd);
              for(int i=0; outerVars!=null && i<outerVars.size(); i++){
                  v2t.put(outerVars.get(i), ((Variable) outerVars.get(i)).getType());
              }
@@ -225,32 +227,32 @@ public class ConstructorNormalformBuilder
     }*/
     
     protected Field getImplicitEnclosingThis(ClassDeclaration cd){
-        FieldList fl = cd.getAllFields();
+        List<Field> fl = cd.getAllFields();
         for(int i=0; i<fl.size(); i++){
-            if(fl.getField(i).getName().equals(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS)){
-                return fl.getField(i);
+            if(fl.get(i).getName().equals(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS)){
+                return fl.get(i);
             }
         }
         return null;
     }
 
     private void attachDefaultConstructor(ClassDeclaration cd){
-        ModifierMutableList mods = new ModifierArrayList(5);
-        ParameterDeclarationMutableList parameters;
+        ASTList<DeclarationSpecifier> mods = new ASTArrayList<DeclarationSpecifier>(5);
+        ASTList<ParameterDeclaration> parameters;
         Throws recThrows;
         StatementBlock body;
         mods.add(new Public());
-        parameters = new ParameterDeclarationArrayList(0);
+        parameters = new ASTArrayList<ParameterDeclaration>(0);
         recThrows = null;
         body = new StatementBlock();
-        body.setBody(new StatementArrayList());
+        body.setBody(new ASTArrayList<Statement>());
         attach(new MethodReference
                 (new SuperReference(), new ImplicitIdentifier
                     (CONSTRUCTOR_NORMALFORM_IDENTIFIER)), body, 0);
-        StatementMutableList initializers = (StatementMutableList) class2initializers.get(cd);
+        List<Statement> initializers = (List<Statement>) class2initializers.get(cd);
         for (int i = 0; i<initializers.size(); i++) {
             attach((Statement) 
-                    initializers.getStatement(i).deepClone(),
+                    initializers.get(i).deepClone(),
                     body, i+1);
         }
         MethodDeclaration def =  new MethodDeclaration(mods,
@@ -272,15 +274,15 @@ public class ConstructorNormalformBuilder
      * @return the constructor normalform
      */
     private MethodDeclaration normalform(ClassDeclaration cd, 
-					 Constructor cons) {	
-	
-	ModifierMutableList mods = new ModifierArrayList(5);
-	ParameterDeclarationMutableList parameters;
+					 Constructor cons) {
+
+	ASTList<DeclarationSpecifier> mods = new ASTArrayList<DeclarationSpecifier>(5);
+	ASTList<ParameterDeclaration> parameters;
 	Throws recThrows;
 	StatementBlock body;
 	Field et = (Field) class2enclosingThis.get(cd);
 	TypeDeclaration td = (TypeDeclaration) class2enclosingClass.get(cd);
-	LinkedList outerVars = (LinkedList) localClass2FinalVar.get(cd);
+	LinkedList outerVars = (LinkedList) getLocalClass2FinalVar().get(cd);
 	int j = et==null? 0 : 1;
 	if(outerVars!=null) j+=outerVars.size();
 	ParameterDeclaration pd=null;
@@ -296,18 +298,23 @@ public class ConstructorNormalformBuilder
 	
 	if (!(cons instanceof ConstructorDeclaration)) {
 	    mods.add(new Public());
-	    parameters = new ParameterDeclarationArrayList(0+j);
+	    parameters = new ASTArrayList<ParameterDeclaration>(0+j);
 	    recThrows = null;
-	    body = new StatementBlock();
+	    body =  new StatementBlock();    
 	} else {
 	    ConstructorDeclaration consDecl = (ConstructorDeclaration)cons;
-	    mods = (ModifierMutableList)
-		(consDecl.getModifiers()==null ? null : consDecl.getModifiers().deepClone());	    
+	    mods = (ASTList<DeclarationSpecifier>)
+		(consDecl.getDeclarationSpecifiers()==null ? null : consDecl.getDeclarationSpecifiers().deepClone());	    
 	    parameters = 
-		(ParameterDeclarationMutableList)consDecl.getParameters().deepClone();
+		(ASTList<ParameterDeclaration>)consDecl.getParameters().deepClone();
 	    recThrows = (Throws) (consDecl.getThrown() == null ? null : 
 				  consDecl.getThrown().deepClone());
-	    body = (StatementBlock) consDecl.getBody().deepClone();
+            
+	    StatementBlock origBody = consDecl.getBody();
+            if(origBody == null) // may happen if a stub is defined with an empty constructor
+                body = null;
+            else
+                body = (StatementBlock) origBody.deepClone();
 	}
 	
 	if(outerVars!=null && !outerVars.isEmpty()){     
@@ -330,7 +337,7 @@ public class ConstructorNormalformBuilder
 	    parameters.add(pd);
 	}
 	
-	if (cd != javaLangObject) {
+	if (cd != javaLangObject && body != null) {
 	    // remember original first statement
 	    Statement first = body.getStatementCount() > 0 ?
 		body.getStatementAt(0) : null;
@@ -338,7 +345,7 @@ public class ConstructorNormalformBuilder
 	    // first statement has to be a this or super constructor call	
 	    if (!(first instanceof SpecialConstructorReference)) {
 		if (body.getBody() == null) {
-		    body.setBody(new StatementArrayList());
+		    body.setBody(new ASTArrayList<Statement>());
 		}
 		attach(new MethodReference
 		    (new SuperReference(), new ImplicitIdentifier
@@ -352,12 +359,12 @@ public class ConstructorNormalformBuilder
 		                    ((SpecialConstructorReference)first).getArguments()), body, 0);
 		}else{
 		    ReferencePrefix referencePrefix = ((SuperConstructorReference) first).getReferencePrefix();
-		    ExpressionMutableList args = ((SpecialConstructorReference)first).getArguments();
+		    ASTList<Expression> args = ((SpecialConstructorReference)first).getArguments();
 		    if(referencePrefix!=null && referencePrefix instanceof Expression){
-		        if(args==null) args = new ExpressionArrayList(1);
+		        if(args==null) args = new ASTArrayList<Expression>(1);
 		        args.add((Expression) referencePrefix);
 		    }else if(class2superContainer.get(cd)!=null){
-		        if(args==null) args = new ExpressionArrayList(1);
+		        if(args==null) args = new ASTArrayList<Expression>(1);
 		        args.add(new VariableReference(new Identifier(etId)));        
 		    }
 		    attach(new MethodReference
@@ -371,8 +378,7 @@ public class ConstructorNormalformBuilder
 	    // the instance initializers have to be added in source code
 	    // order
 	    if (!(first instanceof ThisConstructorReference)) {
-		StatementMutableList initializers = (StatementMutableList)
-		    class2initializers.get(cd);
+		ASTList<Statement> initializers = (ASTList<Statement>) class2initializers.get(cd);
 		if(ca!=null){
 		    attach(ca, body, 0);
 		}
@@ -385,7 +391,7 @@ public class ConstructorNormalformBuilder
 		}      
 		for (int i = 0; i<initializers.size(); i++) {
 		    attach((Statement) 
-			   initializers.getStatement(i).deepClone(),
+			   initializers.get(i).deepClone(),
 			   body, i+1+j);
 		}
 
@@ -412,9 +418,9 @@ public class ConstructorNormalformBuilder
                     services.getCrossReferenceSourceInfo().getConstructor(n));
             constr = (ConstructorDeclaration) constr.deepClone();
             SuperConstructorReference sr = new SuperConstructorReference(
-                    n.getArguments()!=null ? (ExpressionMutableList) n.getArguments().deepClone() : 
-                        new ExpressionArrayList(0));
-            constr.setBody(new StatementBlock(new StatementArrayList(sr)));
+                    n.getArguments()!=null ? (ASTList<Expression>) n.getArguments().deepClone() : 
+                        new ASTArrayList<Expression>(0));
+            constr.setBody(new StatementBlock(new ASTArrayList<Statement>(sr)));
             constr.makeAllParentRolesValid();
             attach(constr, td, 0);
             return constr;
@@ -433,29 +439,27 @@ public class ConstructorNormalformBuilder
      */
     protected void makeExplicit(TypeDeclaration td) {
 	if (td instanceof ClassDeclaration) {
+	    List<Constructor> constructors = (List<Constructor>) class2constructors.get(td);
 	    ConstructorDeclaration anonConstr=null;
 	    if(td.getName()==null){
 	        anonConstr = attachConstructorDecl(td);
 	    }
-	    ConstructorMutableList constructors = 
-		(ConstructorMutableList) class2constructors.get(td);
 	    if(anonConstr!=null) constructors.add(anonConstr);
 	    for (int i = 0; i < constructors.size(); i++) {
 		attach(normalform
 		       ((ClassDeclaration)td, 
-			constructors.getConstructor(i)), td, 0);
+			constructors.get(i)), td, 0);
 	    }
 
-	    MethodDeclarationList mdl = (MethodDeclarationList)class2methodDeclaration.get(td);
+	    ASTList<MethodDeclaration> mdl = (ASTList<MethodDeclaration>) class2methodDeclaration.get(td);
 	    for (int i = 0; i < mdl.size(); i++) {
-		attach(mdl.getMethodDeclaration(i), td, 0);
+		attach(mdl.get(i), td, 0);
 	    }
-
-/*  	    java.io.StringWriter sw = new java.io.StringWriter();
-//  	    //services.getProgramFactory().getPrettyPrinter(sw).visitMethodDeclaration(nf);
+/*
+  	    java.io.StringWriter sw = new java.io.StringWriter();
   	    services.getProgramFactory().getPrettyPrinter(sw).visitClassDeclaration((ClassDeclaration)td);
   	    System.out.println(sw.toString());
-  	    try { sw.close(); } catch (Exception e) {}		*/
+  	    try { sw.close(); } catch (Exception e) {} */		
 	}
 
 

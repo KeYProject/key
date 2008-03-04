@@ -21,7 +21,7 @@
 
 <jar href="key.jar"/> 
 <jar href="lib/antlr.jar" /> 
-<jar href="lib/recoder.jar" /> 
+<jar href="lib/recoderKey.jar" /> 
 <jar href="lib/javacc.jar" /> 
 <jar href="lib/dresden-ocl-demo.jar" /> 
 <jar href="lib/jargs.jar" /> 

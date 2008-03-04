@@ -17,6 +17,7 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
+import recoder.ModelException;
 import recoder.convenience.TreeWalker;
 import recoder.java.*;
 import recoder.java.expression.Literal;
@@ -189,9 +190,20 @@ public class RKeYMetaConstructExpression extends Literal
     }
     
     //???
-    public Object deepClone() {
+    public Literal deepClone() {
 	return null;
     }
+
+	public void validateAll() throws ModelException {
+		// TODO Auto-generated method stub
+		throw new Error("mulbrich: Don't know what to do - yet");
+	}
+
+	@Override
+	public Object getEquivalentJavaType() {
+		// TODO Auto-generated method stub
+		throw new Error("mulbrich: Don't know what to do - yet");
+	}
 
 
 }

@@ -24,6 +24,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.util.ExtList;
 
 /**
  *  A shortcut-statement for a method body.
@@ -37,6 +38,12 @@ public class CatchAllStatement extends JavaNonTerminalProgramElement
     public CatchAllStatement(StatementBlock body, ParameterDeclaration paramdecl) {
 	this.body = body;
 	this.paramdecl = paramdecl;
+    }
+    
+    public CatchAllStatement(ExtList children) {
+    	super(children); // for comments
+    	this.body = (StatementBlock) children.get(StatementBlock.class);
+    	this.paramdecl = (ParameterDeclaration) children.get(ParameterDeclaration.class);
     }
     
     public Statement getBody() {

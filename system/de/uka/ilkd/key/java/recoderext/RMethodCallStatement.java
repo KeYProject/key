@@ -217,7 +217,7 @@ public class RMethodCallStatement extends JavaStatement
     }
     
     //???
-    public Object deepClone() {
+    public JavaStatement deepClone() {
 	return null;
     }
 
