@@ -2320,7 +2320,7 @@ public class Main extends JFrame implements IMain {
     /**
      * called when a ReusePoint has been found so that the GUI can offer reuse for
      * the current point to the user
-     * @param bestReusePoint the ReusePoint found, precise the best found candidate for 
+     * @param p the ReusePoint found, precise the best found candidate for 
      * 
      */
     public void indicateReuse(ReusePoint p) {

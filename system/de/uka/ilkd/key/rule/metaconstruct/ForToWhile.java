@@ -98,8 +98,6 @@ public class ForToWhile extends ProgramMetaConstruct implements
     /**
      * return a list of the SV that are relevant to this UnwindLoop
      * 
-     * @param originalLoop
-     *            the loop to work upon - ignored
      * @param svInst
      *            the instantiations so far - ignored
      * @return a list of 0 to 2 schema variables (outer/inner label)

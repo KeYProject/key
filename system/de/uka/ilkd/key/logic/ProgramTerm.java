@@ -22,9 +22,8 @@ import de.uka.ilkd.key.logic.op.Operator;
  */
 
 class ProgramTerm extends Term {
-    /** the program
-     * @link aggregation
-     * @supplierCardinality 0..1
+    /** 
+     * the program
      */
     private final JavaBlock javaBlock;
 

@@ -369,7 +369,6 @@ public class TermFactory {
       * collection operation as top operator that 
       * takes an OclExpression as argument (not "iterate")
       * @param op the OCL collection operation
-      * @param varBoundHere the iterator variable
       * @param subs subs[0] is the collection and subs[1] is the 
       *        expression in which the iterator variable is bound
       */
@@ -579,9 +578,9 @@ public class TermFactory {
 
     /**
      * creates a quantifier term 
-     * @param op Operator representing the
+     * @param quant Operator representing the
      * Quantifier (all, exist) of this term 
-     * @param varsBoundHere a QuantifiableVariable representing the only bound
+     * @param var a QuantifiableVariable representing the only bound
      * variable of this quantifier.
      */
     public Term createQuantifierTerm(Quantifier quant,
@@ -594,7 +593,7 @@ public class TermFactory {
 
     /**
      * creates a quantifier term 
-     * @param op Operator representing the
+     * @param quant Operator representing the
      * Quantifier (all, exist) of this term 
      * @param varsBoundHere an
      * array of QuantifiableVariable containing all variables bound by the
@@ -986,8 +985,8 @@ public class TermFactory {
     /**
      * creates an anonymous update applied to the given target term 
      * @param op the AnonymousUpdate operator 
-     * @param subs the array of Term containing the 
-     * @return
+     * @param sub the Term the anonymous update is applied to 
+     * @return the created term
      */
     public Term createAnonymousUpdateTerm(AnonymousUpdate op, 
             Term sub) {       
@@ -998,7 +997,7 @@ public class TermFactory {
      * creates an anonymous update applied to the given target term 
      * @param name 
      * @param target
-     * @return
+     * @return the created term
      */
     public Term createAnonymousUpdateTerm(Name name, Term target) {       
         return createAnonymousUpdateTerm

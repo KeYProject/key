@@ -36,7 +36,7 @@ public class SimplifyReplaceKnownCandidateFeature
     
     /**
      * Compute the cost of a RuleApp.
-     * @param app the RuleApp
+     * @param ruleApp the RuleApp
      * @param pos position where <code>app</code> is to be applied
      * @param goal the goal on which <code>app</code> is to be applied
      * @return the cost of <code>app</code>

@@ -405,7 +405,7 @@ public abstract class KeYInstaller {
     
     /**
      * Extracts files from the key/program jar-archive.
-     * @param entryname name of the file in the jar
+     * @param entrypath name of the file in the jar
      * @param filename name to be copied to.
      */
     public void extractFromJar( String  entrypath,

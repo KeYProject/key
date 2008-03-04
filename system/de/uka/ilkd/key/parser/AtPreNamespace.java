@@ -66,10 +66,6 @@ public class AtPreNamespace extends Namespace {
     }
 
     /**
-     * @param name
-     * @param atPost
-     * @param argsort
-     * @return
      */
     private Named createAtPreFunction(Name name, Sort sort, ArrayOfSort argsort) {
         return new RigidFunction(name, sort, argsort);

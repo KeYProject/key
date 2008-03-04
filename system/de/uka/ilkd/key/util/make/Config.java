@@ -11,7 +11,7 @@
 /** this class parses in a config file that has to use the following grammar:
  *  S -> (IDENTIFIER ':'  (alles ausser ';')* ';')* 
  *  then it creates files that can refer to the first IDENTIFIER by using
- *  @IDENTIFIER@ that will be replaced by the expression after the ':'
+ *  "@IDENTIFIER@" that will be replaced by the expression after the ':'
  *  and before ';'
  */ 
 

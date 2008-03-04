@@ -1256,8 +1256,6 @@ public abstract class Taclet implements Rule, Named {
      * @param semi the Semisequent with the the ConstrainedFormulae to be added
      * @param goal the Goal that knows the node the formulae have to be added
      * @param pos the PosInOccurrence describing the place in the sequent
-     * @param antec boolean true(false) if elements have to be added to the
-     * antecedent(succedent) (only looked at if pos == null)
      * @param services the Services encapsulating all java information
      * @param matchCond the MatchConditions containing in particular
      * the instantiations of the schemavariables

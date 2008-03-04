@@ -28,7 +28,6 @@ class BoundVarsTerm extends Term {
    /**
      * @supplierCardinality *
      * @supplierRole subterm
-     * @link aggregation
      */
     private final ArrayOfTerm subTerm;
 

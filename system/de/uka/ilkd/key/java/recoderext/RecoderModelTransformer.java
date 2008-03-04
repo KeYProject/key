@@ -52,8 +52,6 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
      * creates a transormder for the recoder model
      * @param services the CrossReferenceServiceConfiguration to access
      * model information 
-     * @param units the array of CompilationUnits describing the model 
-     * to be transformed 
      * @param cache a cache object that stores information which is needed by
      * and common to many transformations. it includes the compilation units,
      * the declared classes, and information for local classes.

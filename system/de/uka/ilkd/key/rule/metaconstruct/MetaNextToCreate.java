@@ -31,7 +31,8 @@ public class MetaNextToCreate extends MetaField implements Location {
     }
 
     /** calculates the resulting term. 
-     * @throws KeYSemanticException */
+     * @throws RuntimeException if <code>term.sub(0)</code> is not a sub term of Object
+     */
     public Term calculate(Term term, SVInstantiations svInst, 
 			  Services services) {	
   

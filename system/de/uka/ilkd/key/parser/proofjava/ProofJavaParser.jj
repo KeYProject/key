@@ -657,10 +657,10 @@ TOKEN :
 | < GT: ">" >
 }
 
-/* special attention is paid to "<".
+/* special attention is paid to "&lt;".
  * it will always be mapped to LT, but if an implicit identifier
- * is built, this is stored in the "<" token, so that later we
- * can distinguish "< a>" from "<a>".
+ * is built, this is stored in the "&lt;" token, so that later we
+ * can distinguish "&lt; a&gt;" from "&lt;a&gt".
  */
 
 TOKEN : 
@@ -2001,10 +2001,10 @@ TypeReference ResultType() :
 
 
 /*************************************
- * an implicit identifier is embraced by < and >
- * To make sure "<a>" is an implicit identifier and "< a>" is not
- * the first "<" token can be tested whether the token IMPLICITIDENTIFIER
- * had been found and reduced to "<".
+ * an implicit identifier is embraced by "&lt;" and "&gt;"
+ * To make sure "&lt;a&gt;" is an implicit identifier and "&lt; a&gt;" is not
+ * the first "&lt;" token can be tested whether the token IMPLICITIDENTIFIER
+ * had been found and reduced to "&lt;".
  */
  
 ImplicitIdentifier ImplicitIdentifier() :
@@ -2079,7 +2079,7 @@ UncollatedReferenceQualifier Name() :
 
 /*
  * Identical copy of TypedName, but lookahead is different for
- * TypeArgument --> if ImplicitIdentifier follows!
+ * TypeArgument, if ImplicitIdentifier follows!
  */
 UncollatedReferenceQualifier DeclarationTypedName() :
 {

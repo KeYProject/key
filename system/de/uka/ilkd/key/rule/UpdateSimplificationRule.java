@@ -74,7 +74,7 @@ public class UpdateSimplificationRule implements BuiltInRule {
      * @param goal the goal that the rule application should refer to.
      * @param services the Services with the necessary information
      * about the java programs 
-     * @param the rule application that is executed.
+     * @param ruleApp the rule application that is executed.
      */
     public ListOfGoal apply(Goal     goal, 
 			    Services services, 

@@ -164,7 +164,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
 
     /**
      * the given locations are the one to be updated by this operator  
-     * @param location
+     * @param signature the {@link QuanUpdateSignature} of the quantified update
      */
     private QuanUpdateOperator(QuanUpdateSignature signature) {
         this(new Name("quanUpdate("+signature.locations+")"), signature); 

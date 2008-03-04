@@ -1494,8 +1494,7 @@ public class LogicPrinter {
      * variable name with colon and sort.
      *
      * @param name the name of the quantifier
-     * @param var  the quantified variable (+colon and sort)
-     * @param sep  the separator (usually a dot)
+     * @param vars  the quantified variables (+colon and sort)
      * @param phi  the quantified formula
      * @param ass  associativity for phi
      */

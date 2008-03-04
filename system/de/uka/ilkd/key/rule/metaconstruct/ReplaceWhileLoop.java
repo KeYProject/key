@@ -63,10 +63,7 @@ public class ReplaceWhileLoop extends CreatingASTVisitor {
      * 
      * @param root
      *           the ProgramElement where to begin
-     * @param outerLabel
-     *           the ProgramElementName of the outer label
-     * @param innerLabel
-     *           the ProgramElementName of the inner label
+     * 
      */
     public ReplaceWhileLoop(ProgramElement root, 
                             StatementBlock toInsert, 

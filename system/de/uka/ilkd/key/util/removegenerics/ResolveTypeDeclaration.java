@@ -108,7 +108,7 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
      * 
      * @param name
      * @param signature
-     * @return
+     * @return a boolean true if the method with the given name and signature existed already
      */
     private boolean methodAlreadyPresent(String name, List<Type> signature) {
         

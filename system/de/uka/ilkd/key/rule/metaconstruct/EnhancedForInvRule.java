@@ -542,7 +542,6 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
      *            the flag used to indicate exceptions
      * @param inv
      *            the invariant that has to hold afterwards
-     * @return
      */
     private Term normalCaseAndContinue(Term contFlagTerm, Term returnFlagTerm,
             Term breakFlagTerm, Term excFlagTerm, Term inv) {

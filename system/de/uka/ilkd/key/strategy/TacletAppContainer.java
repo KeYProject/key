@@ -349,8 +349,6 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         /**
          * Find all possible instantiations of the if sequent formulas
          * within the sequent "p_seq".
-         * @return a list of tacletapps with the found if formula
-         * instantiations
          */
         public void findIfFormulaInstantiations () {
             final Sequent p_seq = goal.sequent();
@@ -521,11 +519,6 @@ public abstract class TacletAppContainer extends RuleAppContainer {
          * @param p_alreadyMatchedNewFor
          *            at least one new formula has already been matched, i.e. a
          *            formula that has been modified recently
-         * @param p_toMatch
-         *            list of the formulas to match the current if semisequent
-         *            formulas with
-         * @param p_toMatch2nd
-         *            list of the formulas of the antecedent
          */
         private void findIfFormulaInstantiationsHelp
             ( ListOfConstrainedFormula      p_ifSeqTail,

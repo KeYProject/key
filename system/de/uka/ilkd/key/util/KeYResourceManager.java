@@ -80,8 +80,8 @@ public class KeYResourceManager {
     }
 
     /**
-     * returns a readable customizable versin number    
-     * @return 
+     * returns a readable customizable version number    
+     * @return a readable version number  
      */
     public String getVersion() {      
 	if (version != null) {

@@ -592,7 +592,6 @@ public class TacletIndex  {
 
   /** get all Rewrite-Taclets.
     * @param filter Only return taclets the filter selects
-    * @param term the Term the Taclet is connected to
     * @param services the Services object encapsulating information
     * about the java datastructures like (static)types etc.
     * @return ListOfNoPosTacletApp containing all applicable rules

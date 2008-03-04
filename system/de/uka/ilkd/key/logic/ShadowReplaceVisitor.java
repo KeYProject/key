@@ -49,8 +49,7 @@ public class ShadowReplaceVisitor extends Visitor{
 			       "de.uka.ilkd.key.javacard.KeYJCSystem");
 
     /**
-     * @param forceSVInst iff true instantiate uninstantiated SVs by
-     * creating new metavariables or new bound logicvariables
+     * @param services the Services
      */
     public ShadowReplaceVisitor(Services services) { 
 	transactionCounter = 

@@ -14,7 +14,8 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 
 
 /** This class represents the director of the builder design pattern.
- It creates the datastucture, directs the KeYToHTMLBuilder and stores the {@link keydoc.BoxedFile BoxedFiles} it gets from the builder.
+ It creates the datastucture, directs the KeYToHTMLBuilder and stores the 
+ {@link de.uka.ilkd.key.util.keydoc.html.BoxedFile} it gets from the builder.
  */
 class Director {
     

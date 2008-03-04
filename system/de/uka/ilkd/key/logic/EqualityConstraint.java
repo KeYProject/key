@@ -359,7 +359,7 @@ public class EqualityConstraint implements Constraint {
      * @param t0
      * @param t1
      * @param services
-     * @return
+     * @return the constraint 
      */
     private Constraint introduceNewMV (Term t0,
                                        Term t1,

@@ -175,7 +175,8 @@ public class NamespaceSet {
     /**
      * @param name
      * @param spaces
-     * @return
+     * @return the element with the given name if found in the 
+     * given namespaces, otherwise <tt>null</tt>
      */
     private Named lookup(Name name, final Namespace[] spaces) {
         for (int i = 0; i<spaces.length; i++) {

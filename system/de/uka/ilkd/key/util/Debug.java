@@ -134,7 +134,7 @@ public final class Debug {
 	 *            the String to be printed
 	 * @param id1
 	 *            the int printed first after msg
-	 * @param id1
+	 * @param id2
 	 *            the int printed second after msg
 	 */
 	public static final void out(String msg, long id1, long id2) {

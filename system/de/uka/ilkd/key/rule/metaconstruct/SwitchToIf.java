@@ -43,7 +43,7 @@ public class SwitchToIf extends ProgramMetaConstruct {
 
 
      /** creates a switch-to-if ProgramMetaConstruct 
-     * @param switch the Statement contained by the meta construct 
+     * @param _switch the Statement contained by the meta construct 
      */
     public SwitchToIf(SchemaVariable _switch) {
 	super("switch-to-if", (ProgramSV)_switch); 

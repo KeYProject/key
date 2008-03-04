@@ -83,8 +83,8 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
      * 
      * @param classDecl
      *            the recoder.java.ClassDeclaration to wrap
-     * @param cUnit
-     *            the recoder.java.CompilationUnit where the class is wrapped
+     * @param context
+     *            the Context containing the recoder.java.CompilationUnit where the class is wrapped
      * @return the enclosing recoder.java.CompilationUnit
      */
     protected recoder.java.CompilationUnit embedClass(

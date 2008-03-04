@@ -852,7 +852,7 @@ thing. People were thinking it was a button.
     }
     
     /**
-     * @return
+     * @return the StrategyProperties
      */
     private StrategyProperties getProperties() {
         StrategyProperties p = new StrategyProperties();        

@@ -618,7 +618,7 @@ public class ExecutionTree implements AutoModeListener {
      * FIXME reuse method in VisualDebugger
      * 
      * @param pio
-     * @return
+     * @return true if pio describes a term with a modality as top operator
      */
     private boolean modalityTopLevel(PosInOccurrence pio) {
         Term cf = pio.constrainedFormula().formula();

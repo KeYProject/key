@@ -43,7 +43,7 @@ public class TermProgramVariableCollector extends Visitor {
     
 
     /** is called by the execPostOrder-method of a term 
-     * @param Term to checked if it is a program variable and if true the
+     * @param t the Term to checked if it is a program variable and if true the
      * variable is added to the list of found variables
      */  
     public void visit(Term t) {

@@ -81,8 +81,8 @@ public abstract class LDT {
     
     /**
      * looks up a function in the namespace and add it to the LDT 
-     * @param functions a Namespace with symbols
-     * @param String the String with the name of the function to look up
+     * @param funcNS a Namespace with symbols
+     * @param funcName the String with the name of the function to look up
      * @return the added function (for convenience reasons)
      */
     public Function addFunction(Namespace funcNS, String funcName) {

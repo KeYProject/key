@@ -25,11 +25,6 @@ import recoder.kit.TwoPassTransformation;
  * file.
  * 
  * It makes use of several sub-classes:
- * <ul>
- * <li>
- * <li>
- * </ul>
- * 
  * @author MU
  * 
  */

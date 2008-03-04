@@ -39,7 +39,7 @@ public abstract class TacletVisitor extends Visitor {
 
     /** collects all variables in a Taclet
      * @param taclet the Taclet where the variables have to be collected to
-     * @param visitAddRules a boolean that contols if the addrule sections are
+     * @param visitAddrules a boolean that contols if the addrule sections are
      * to be ignored (iff false) or if the visitor descends into them (iff true) 
      */
     public void visit(Taclet taclet, boolean visitAddrules) {

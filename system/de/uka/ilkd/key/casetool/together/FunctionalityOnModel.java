@@ -277,9 +277,8 @@ public class FunctionalityOnModel {
     /**
      * Asks the user to choose a supertype and then starts the prover with a 
      * corresponding "BehaviouralSubtypingInv" proof obligation.
-     * @param subtype the UMLModelClass with subtype for which behavioural 
+     * @param subType the UMLModelClass with subtype for which behavioural 
      * subtyping with respect to the invariant has to be shown
-     * @return error message to the user
      */
     public static void proveBehaviouralSubtypingInv(TogetherModelClass subType) 
     		throws ProofInputException {
@@ -310,9 +309,8 @@ public class FunctionalityOnModel {
     
     /**
      * Starts the prover with a "BehaviouralSubtypingOp" proof obligation.
-     * @param subtype the {@link UMLModelClass} with the subtype for whose method
+     * @param subType the {@link TogetherModelClass} with the subtype for whose method
      * behavioural subtyping has to be proven
-
      */
     public static void proveBehaviouralSubtypingOp(TogetherModelClass subType) 
     		throws ProofInputException {

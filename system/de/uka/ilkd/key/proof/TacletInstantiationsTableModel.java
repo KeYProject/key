@@ -179,7 +179,6 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
      * using the given variable namespace and the given namespace
      * for functions and default namespaces for the others
      * @param s the String to parse
-     * @param sort the expected sort
      * @param varNS the variable namespace
      * @param functNS the function namespace
      */

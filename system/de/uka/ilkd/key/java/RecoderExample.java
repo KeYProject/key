@@ -29,7 +29,7 @@ public class RecoderExample {
     }  
 
     /** transformates a "while(expr) {prg;}" to "if (exr) then {prg;}"
-     * @param While the while-loop to transform
+     * @param _while the while-loop to transform
      * @return the transformed AST
      */
     public ExtList transform(While _while) {

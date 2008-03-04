@@ -29,7 +29,6 @@ public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate{
      *@param addedSeq new Sequent to be added
      *@param addedRules ListOfTaclet contains the new allowed rules
      * at this branch 
-     *@param ruleVars ListOfRulevariable contains used rulevariables 
      *@param replacewith the Sequent that replaces another one
      */
     public AntecSuccTacletGoalTemplate(Sequent addedSeq,

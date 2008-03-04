@@ -363,7 +363,7 @@ public class Goal  {
     /** 
      * replaces a formula at the given position  
      * and informs the rule appliccation index about this change
-     * @param cf the ConstrainedFormula replacing the old one
+     * @param replacements the ConstrainedFormula replacing the old one
      * @param p PosInOccurrence encodes the position 
      */
     public void changeFormula(ListOfConstrainedFormula replacements, 

@@ -48,10 +48,10 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
      * 
      * <pre>
      * class B ...
-     * class G<E> { E m() {...} }
+     * class G&lt;E&gt; { E m() {...} }
      * 
      * ... 
-     * G<B> g = new G<B>(); 
+     * G&lt;B&gt; g = new G&lt;B&gt;(); 
      * B b = g.m();
      * ... 
      * </pre>
@@ -61,20 +61,20 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
      * <ul>
      * <li><code>declarationType</code> - the type of the member at its
      * declaration. Here the type of <code>G.m()</code> which is
-     * <code>E</code>.
+     * <code>E</code>.</li>
      * <li><code>genericFreeDeclaraionType</code> - the type of the
      * declaration in a non-generic situation, which is
-     * <code>java.lang.Object</code> here.
+     * <code>java.lang.Object</code> here.</li>
      * <li><code>kernelType</code> - if declarationType is an array,
-     * kernelType will be the component type (with all [] removed)
+     * kernelType will be the component type (with all [] removed)</li>
      * <li><code>actualType</code> - the type of the member in the
      * parameterized instance: here the type of <code>G&lt;B&gt;.m()</code>
-     * which is <code>B</code>.
+     * which is <code>B</code>.</li>
      * <li><code>genericFreeType</code> - if the actualType is a TV itsself,
      * this is the type that it will be replaced in a non-generic situation (<code>Object</code>
-     * or first boundary).
+     * or first boundary).</li>
      * <li><code>resolvedType</code> - if there are multiple bounds the
-     * reference might have to be cast to a different one than the first.
+     * reference might have to be cast to a different one than the first.</li>
      * </ul>
      * 
      * Also, if there are explicit type parameters, they will be removed.
@@ -155,7 +155,9 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
      * @todo
      * 
      * @param reference
-     * @return
+     * @return true iff the reference is a lhs of an assignment: Either an
+     * assignment operator or ???.
+     *  
      */
     private static boolean isLHS(Reference reference) {
         NonTerminalProgramElement parent = reference.getASTParent();
@@ -194,22 +196,22 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
     /**
      * Problem:
      * 
-     * <pre>
+     * <code>
      * interface B { void bb(); }
      * interface C {}
      * 
-     * class A<E extends C&B> {
+     * class A&lt;E extends C&amp;B&gt; {
      *   E e;
      *   
      *   void _d() {
      *     e.bb();
      *   }         
      * }
-     * </pre>
+     * </code>
      * 
      * would be resolved to
      * 
-     * <pre>
+     * <code>
      * intfcs s. above
      * 
      * class A {
@@ -219,25 +221,24 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
      *     ((B)e).bb();
      *   }
      * }
-     * </pre>
+     * </code>
      * 
      * because the element <code>e</code> cannot have a static types C and B
      * at the same time. Such casts have to be introduced in such situations.
      * 
      * The detection is handled for the following situations:
      * <ul>
-     * <li>FieldReference as suffix
-     * <li>MethodReference as suffix
-     * <li>CopyAssignments, reference as rhs.
+     * <li>FieldReference as suffix</li>
+     * <li>MethodReference as suffix</li>
+     * <li>CopyAssignments, reference as rhs.</li>
      * <li>VariableSpecifications (and field specs) (which are not
-     * assignments!)
-     * <li>MethodReference as parameter
+     * assignments!)</li>
+     * <li>MethodReference as parameter</li>
      * </ul>
      * 
      * @todo DAS IST JA WOHL NOCH NICHT
      * 
-     * @param actualType
-     * @return
+     * @return the resolved type
      */
     private Type resolveType() {
 

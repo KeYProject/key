@@ -37,7 +37,7 @@ class QuantifierTerm extends Term {
      * @param op a Quantifier (all, exist)
      * @param varsBoundHere  an array of Variable containing all variables
      * bound by the quantifier
-     * @param sort the Sort of this Term (is bool)
+     * @param subTerm the Term representing the formula below the quantifier
      */
      public QuantifierTerm(Quantifier op, 
 			   QuantifiableVariable[] varsBoundHere, 
@@ -51,7 +51,7 @@ class QuantifierTerm extends Term {
      * @param op Operator representing the Quantifier (all, exist) of this term
      * @param varsBoundHere  an array of Variable containing all variables
      * bound by the quantifier
-     * @param sort the Sort of this Term (is bool)
+     * @param subTerm the Term representing the formula below the quantifier
      */
      public QuantifierTerm(Quantifier op, 
 		 	   ArrayOfQuantifiableVariable varsBoundHere, 
