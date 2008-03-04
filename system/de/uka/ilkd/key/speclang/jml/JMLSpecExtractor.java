@@ -405,8 +405,8 @@ public class JMLSpecExtractor implements SpecExtractor {
             SetOfOperationContract contracts 
                 = jsf.createJMLOperationContractsAndInherit(pm, specCase);
             result = result.union(contracts);
-            if (i == startPos && isPure && pm.isModel()) {
-                i = getIndexOfMethodDecl(pm, constructsArray) - 1;
+            if (i == constructsArray.length - 1 && isPure && pm.isModel()) {
+                i = startPos;
             } else {
                 i--;
             }

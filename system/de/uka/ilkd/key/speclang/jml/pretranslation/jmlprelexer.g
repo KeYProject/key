@@ -300,15 +300,21 @@ options {
 }
 {
     int braceCounter = 0;
+    boolean ignoreAt = false;
 }
 :
     {!expressionMode}?
     '{'
     (
-	    '{'                      { braceCounter++; }
-    	|   {braceCounter > 0}? '}'  { braceCounter--; }
-    	|   '\n'                     { newline(); }
-    	|   ~'}'
+	   '{'                      { braceCounter++; ignoreAt = false; }
+    	|  {braceCounter > 0}? '}'  { braceCounter--; ignoreAt = false; }
+    	|  '\n'                     { newline(); ignoreAt = true; } 
+    	|  ' '
+    	|  '\t'
+    	|  '\r'
+    	|  {!ignoreAt}? '@'
+    	|  {ignoreAt}? '@'!	    { ignoreAt = false; }
+    	|  ~'}'			    { ignoreAt = false; }
     )* 
     {braceCounter == 0}? '}'
 ;

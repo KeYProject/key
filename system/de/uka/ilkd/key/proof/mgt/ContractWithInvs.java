@@ -109,7 +109,7 @@ public class ContractWithInvs {
                   ? "<br><u>Assumed invariants:</u>" + assumedSB.toString()
                   : "")
                + (ensuredInvs.size() > 0
-                  ? "<u>Ensured invariants:</u>" + ensuredSB.toString()
+                  ? "<br><u>Ensured invariants:</u>" + ensuredSB.toString()
                   : "")
                + "</html>";
     }

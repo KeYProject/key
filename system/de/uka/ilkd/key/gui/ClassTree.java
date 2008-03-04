@@ -160,8 +160,12 @@ class ClassTree extends JTree {
                         && pm.getMethodDeclaration().getBody() != null) {
                     StringBuffer sb = new StringBuffer(pm.getName());
                     sb.append("(");
-                    for(int i = 0; i < pm.getParameterDeclarationCount(); i++) {
-                        sb.append(pm.getParameterDeclarationAt(i));
+                    for(int i = 0, n = pm.getParameterDeclarationCount(); 
+                        i < n; i++) {
+                        sb.append(pm.getParameterDeclarationAt(i) + ", ");
+                    }
+                    if(pm.getParameterDeclarationCount() > 0) {
+                        sb.setLength(sb.length() - 2);
                     }
                     sb.append(")");
                     Entry te = new Entry(sb.toString());
