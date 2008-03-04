@@ -13,10 +13,9 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.proof.mgt;
 
-import java.util.LinkedList;
-import java.util.List;
 
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -32,6 +31,7 @@ public class RuleJustificationByAddRules implements RuleJustification{
     private final boolean isAxiom;
 
     public RuleJustificationByAddRules(Node node, boolean isAxiom) {
+        assert node != null;
 	this.node = node;
         this.isAxiom = isAxiom;
     }

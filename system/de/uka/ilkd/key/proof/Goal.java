@@ -406,8 +406,10 @@ public class Goal  {
 	    addNoPosTacletApp(tacletApp);
  	    if (proof().env()!=null) { // do not break everything
                                        // because of ProofMgt
-		proof().env().registerRuleIntroducedAtNode(tacletApp, 
-		        node.parent(), isAxiom);
+		proof().env().registerRuleIntroducedAtNode(
+		        tacletApp, 
+		        node.parent() != null ? node.parent() : node, 
+		        isAxiom);
 	    }
 	}
     }
