@@ -52,16 +52,16 @@ public class SimplifyReplaceKnownCandidateFeature
         final Sequent ifSeq = app.taclet ().ifSequent ();
         
         assert ifSeq.size () == 1 : "Wrong number of if-formulas.";
-        
-        final boolean ifForInAntec =
-            ifSeq.succedent () == Semisequent.EMPTY_SEMISEQUENT;
-        
+                
         final Boolean pol = polarity ( pos, new Boolean ( pos.isInAntec () ) );
 
+        final boolean ifForInAntec =
+            ifSeq.succedent () == Semisequent.EMPTY_SEMISEQUENT;        
+        
         final boolean approved =
                  pol == null
-                 || AbstractBetaFeature.alwaysReplace ( pos.subTerm () )
-                 || pol.booleanValue () != ifForInAntec;
+                 || pol.booleanValue () != ifForInAntec
+                 || AbstractBetaFeature.alwaysReplace ( pos.subTerm () );
         
         return approved ? BinaryFeature.ZERO_COST : BinaryFeature.TOP_COST;
     }

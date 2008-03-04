@@ -1877,7 +1877,8 @@ public class Main extends JFrame implements IMain {
         
         final File file = localFileChooser.getSelectedFile ();
         
-        new TacletSoundnessPOLoader(file, this).run();
+        new TacletSoundnessPOLoader(file, this, Main.getInstance().mediator().getSelectedProof()
+                .openGoals()).run();
     }
     
     /**

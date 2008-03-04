@@ -18,7 +18,6 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
