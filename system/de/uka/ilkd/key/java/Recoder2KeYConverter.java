@@ -71,6 +71,7 @@ import de.uka.ilkd.key.java.expression.operator.Divide;
 import de.uka.ilkd.key.java.expression.operator.DivideAssignment;
 import de.uka.ilkd.key.java.expression.operator.Equals;
 import de.uka.ilkd.key.java.expression.operator.GreaterOrEquals;
+import de.uka.ilkd.key.java.expression.operator.Instanceof;
 import de.uka.ilkd.key.java.expression.operator.GreaterThan;
 import de.uka.ilkd.key.java.expression.operator.LessOrEquals;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
@@ -719,13 +720,10 @@ public class Recoder2KeYConverter {
 
     // ------------------- operators ----------------------
 
-    // m.u. - Propably not necessary
-    // public Instanceof convert(recoder.java.expression.operator.Instanceof
-    // rio) {
-    // return new Instanceof((Expression) callConvert(rio.getExpressionAt(0)),
-    // (TypeReference) callConvert(rio.getTypeReference()));
-    //
-    // }
+     public Instanceof convert(recoder.java.expression.operator.Instanceof rio) {
+         return new Instanceof((Expression) callConvert(rio.getExpressionAt(0)),
+                 (TypeReference) callConvert(rio.getTypeReference()));
+     }
 
     /**
      * converts the recoder.java.expression.operator.NewArray node to the
