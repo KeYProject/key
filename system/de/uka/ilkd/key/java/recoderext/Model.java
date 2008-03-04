@@ -32,6 +32,5 @@ public class Model extends Modifier {
 
     
     public void accept(SourceVisitor v) {
-        assert false;
     }
  }
