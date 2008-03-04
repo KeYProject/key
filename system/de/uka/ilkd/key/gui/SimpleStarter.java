@@ -84,7 +84,7 @@ public class SimpleStarter implements IMain {
 
     protected void loadProblem(File file) {
         final ProblemLoader pl = 
-            new ProblemLoader(file, this, mediator.getProfile(), false, false);
+            new ProblemLoader(file, this, mediator.getProfile(), false);
         pl.addTaskListener(ptl);
         pl.run();
     }

@@ -71,17 +71,15 @@ public class ProblemLoader implements Runnable {
     private SwingWorker worker;
     private ProgressMonitor pm;
     private ProverTaskListener ptl;
-    private boolean enableSpecs;
     
     public ProblemLoader(File file, IMain main, Profile profile, 
-            boolean keepProblem, boolean enableSpecs) {
+            boolean keepProblem) {
         this.main = main;
         this.mediator  = main.mediator();        
         this.file = file;
         this.profile = profile;
         this.exceptionHandler = mediator.getExceptionHandler();
         this.keepProblem = keepProblem;
-        this.enableSpecs = enableSpecs;
 
         addProgressMonitor(main.getProgressMonitor());
     }    
@@ -179,7 +177,7 @@ public class ProblemLoader implements Runnable {
         } else if (filename.endsWith(".key") || 
                 filename.endsWith(".proof")) {
             // KeY problem specification or saved proof
-            return new KeYUserProblemFile(filename, file, pm, enableSpecs);
+            return new KeYUserProblemFile(filename, file, pm);
             
         } else if (file.isDirectory()){ 
             // directory containing java sources, probably enriched 

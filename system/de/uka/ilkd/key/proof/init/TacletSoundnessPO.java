@@ -39,7 +39,7 @@ implements ProofOblInput{
     
     public TacletSoundnessPO (String name, File file, 
             ProgressMonitor monitor) {
-        super ( name, file, monitor, true );
+        super ( name, file, monitor );
     }
     
     /** returns the proof obligation term as result of the proof obligation

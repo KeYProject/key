@@ -188,9 +188,10 @@ public class Main extends JFrame implements IMain {
 
     public static boolean testMode = false;
 
-    /** if false then JML specifications are not parsed (useful for .key input) 
+    /** if true then JML/OCL specifications are globally disabled 
+     * in this run of KeY, regardless of the regular settings 
      */
-    public static boolean enableSpecs = true;
+    public static boolean disableSpecs = false;
     
     /** used to enable and initiate or to disable reuse */
     private ReuseAction reuseAction = new ReuseAction();
@@ -1553,34 +1554,49 @@ public class Main extends JFrame implements IMain {
     private JMenuItem setupSpeclangMenu() {
         JMenu result = new JMenu("Specification Languages");       
         ButtonGroup group = new ButtonGroup();
-        boolean useJML 
-            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().useJML();
+        GeneralSettings gs 
+            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
         
-        JRadioButtonMenuItem jmlButton = new JRadioButtonMenuItem("JML", 
-                                                                  useJML);
+        JRadioButtonMenuItem noneButton 
+            = new JRadioButtonMenuItem("None", !gs.useJML() && !gs.useOCL());
+        result.add(noneButton);
+        group.add(noneButton);
+        noneButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                GeneralSettings gs 
+                    = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+                gs.setUseJML(false);
+                gs.setUseOCL(false);
+            }
+        });
+        
+        JRadioButtonMenuItem jmlButton 
+            = new JRadioButtonMenuItem("JML", gs.useJML());
         result.add(jmlButton);
         group.add(jmlButton);
         jmlButton.setIcon(IconFactory.jmlLogo(15));
         jmlButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ProofSettings.DEFAULT_SETTINGS
-                             .getGeneralSettings()
-                             .setUseJML(true);
+                GeneralSettings gs 
+                    = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+                gs.setUseJML(true);
+                gs.setUseOCL(false);
             }
         });
         
-        JRadioButtonMenuItem oclButton = new JRadioButtonMenuItem("OCL", 
-                                                                  !useJML);
+        JRadioButtonMenuItem oclButton 
+            = new JRadioButtonMenuItem("OCL", gs.useOCL());
         result.add(oclButton);
         group.add(oclButton);
         oclButton.setIcon(IconFactory.umlLogo(15));
         oclButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ProofSettings.DEFAULT_SETTINGS
-                             .getGeneralSettings()
-                             .setUseJML(false);
+                GeneralSettings gs 
+                    = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+                gs.setUseJML(false);
+                gs.setUseOCL(true);
             }
-        });        
+        });
         
         return result;
     }
@@ -1823,7 +1839,7 @@ public class Main extends JFrame implements IMain {
             unitKeY.recent.addRecentFile(file.getAbsolutePath());
         }
         final ProblemLoader pl = 
-            new ProblemLoader(file, this, mediator.getProfile(), false, enableSpecs);
+            new ProblemLoader(file, this, mediator.getProfile(), false);
         pl.addTaskListener(getProverTaskListener());
         pl.run();
     }
@@ -2505,7 +2521,7 @@ public class Main extends JFrame implements IMain {
 		} else if (opt[index].equals("ASSERTION")) {
 		    de.uka.ilkd.key.util.Debug.ENABLE_ASSERTION = true;
 		} else if (opt[index].equals("NO_JMLSPECS")) {
-		    enableSpecs = false;
+		    disableSpecs = true;
 		} else if (opt[index].equals("AUTO")) {
 		    batchMode = true;
                     visible = false;

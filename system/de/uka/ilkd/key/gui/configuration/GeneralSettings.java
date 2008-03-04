@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.Properties;
 
 import de.uka.ilkd.key.gui.GUIEvent;
+import de.uka.ilkd.key.gui.Main;
 
 
 /** This class encapsulates the information about the active
@@ -30,6 +31,7 @@ public class GeneralSettings implements Settings {
     private static final String DND_DIRECTION_SENSITIVE_KEY = 
         "[General]DnDDirectionSensitive";
     private static final String USE_JML_KEY = "[General]UseJML";
+    private static final String USE_OCL_KEY = "[General]UseOCL";
     
     /** minimize interaction is on by default */
     private boolean stupidMode = true;
@@ -46,9 +48,11 @@ public class GeneralSettings implements Settings {
     /** is drag and drop instantiation direction sensitive */
     private boolean dndDirectionSensitive = true;
     
-    /** JML is used by default (otherwise OCL is used) */
+    /** JML is active by default */
     private boolean useJML = true;
     
+    /** OCL is not active by default */
+    private boolean useOCL = false;
 
     private LinkedList listenerList = new LinkedList();
 
@@ -80,7 +84,12 @@ public class GeneralSettings implements Settings {
     
     
     public boolean useJML() {
-        return useJML;
+        return useJML && !Main.disableSpecs;
+    }
+    
+    
+    public boolean useOCL() {
+        return useOCL && !Main.disableSpecs;
     }
     
 
@@ -123,6 +132,14 @@ public class GeneralSettings implements Settings {
           fireSettingsChanged();
         }
     }
+    
+    
+    public void setUseOCL(boolean b) {
+        if (useOCL != b) {
+            useOCL = b;
+          fireSettingsChanged();
+        }
+    }
 
 
     
@@ -155,6 +172,11 @@ public class GeneralSettings implements Settings {
         if (val != null) {
             useJML = Boolean.valueOf(val).booleanValue();
         }         
+        
+        val = props.getProperty(USE_OCL_KEY);
+        if (val != null) {
+            useOCL = Boolean.valueOf(val).booleanValue();
+        }                 
     }
 
 
@@ -169,6 +191,7 @@ public class GeneralSettings implements Settings {
         props.setProperty(SOUND_NOTIFICATION_KEY, "" + soundNotification);
         props.setProperty(DND_DIRECTION_SENSITIVE_KEY, "" + dndDirectionSensitive);
         props.setProperty(USE_JML_KEY, "" + useJML);
+        props.setProperty(USE_OCL_KEY, "" + useOCL);
     }
 
     /** sends the message that the state of this setting has been
