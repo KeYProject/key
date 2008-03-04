@@ -18,11 +18,16 @@ header {
     import de.uka.ilkd.key.java.Position;
     import de.uka.ilkd.key.java.Services;
     import de.uka.ilkd.key.java.abstraction.ArrayType;
+    import de.uka.ilkd.key.java.abstraction.Field;
+    import de.uka.ilkd.key.java.abstraction.IteratorOfField;
     import de.uka.ilkd.key.java.abstraction.IteratorOfKeYJavaType;
     import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+    import de.uka.ilkd.key.java.abstraction.ListOfField;
     import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
     import de.uka.ilkd.key.java.abstraction.PrimitiveType;
     import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
+    import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
+    import de.uka.ilkd.key.java.declaration.ClassDeclaration;
     import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
     import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
     import de.uka.ilkd.key.logic.BasicLocationDescriptor;
@@ -590,7 +595,7 @@ options {
 	BasicLocationDescriptor nextToCreateLd
 		= new BasicLocationDescriptor(nextToCreateTerm);
 	result = result.add(nextToCreateLd);
-	
+		
 	//<created>
 	Term createdTerm = tb.dot(objectTerm, createdAttribute);
 	BasicLocationDescriptor createdLd 
@@ -617,6 +622,39 @@ options {
 		= new BasicLocationDescriptor(guardFma, objectTimesFinalizedTerm);
 	    result = result.add(objectTimesFinalizedLd); 
     	}
+
+	//local instance fields of created objects
+	if(kjt.getJavaType() instanceof ClassDeclaration) {
+	    ClassDeclaration cd = (ClassDeclaration)kjt.getJavaType();
+	    ListOfField fields = javaInfo.getAllFields(cd);
+	    for(IteratorOfField it = fields.iterator(); it.hasNext(); ) {
+	    	Field f = it.next();
+	    	ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
+	    	if(!pv.isStatic()) {
+	    	    Term fieldTerm = tb.dot(objectTerm, pv);
+	    	    BasicLocationDescriptor fieldLd 
+	    		    = new BasicLocationDescriptor(guardFma, fieldTerm);
+		    result = result.add(fieldLd);
+		}
+	    }
+	} else {
+	    assert kjt.getJavaType() instanceof ArrayDeclaration;
+	    
+	    //length
+	    Term lengthTerm = tb.dot(objectTerm, javaInfo.getArrayLength());
+	    BasicLocationDescriptor lengthLd
+		= new BasicLocationDescriptor(guardFma, lengthTerm);
+	    result = result.add(lengthLd);
+	    
+	    //slots
+	    LogicVariable idxLv 
+	    	= new LogicVariable(new Name("idx"), integerSort);
+	    Term arrTerm 
+	    	= tb.array(objectTerm, tb.var(idxLv));
+	    BasicLocationDescriptor arrLd
+	    	= new BasicLocationDescriptor(guardFma, arrTerm);
+	    result = result.add(arrLd);
+	}
     	
 	return result;
     }    
@@ -793,7 +831,7 @@ storerefkeyword returns [SetOfLocationDescriptor result = SetAsListOfLocationDes
     NOTHING
     | EVERYTHING { result = EverythingLocationDescriptor.INSTANCE_AS_SET; }
     | NOT_SPECIFIED { result = EverythingLocationDescriptor.INSTANCE_AS_SET; }
-    | OBJECT_CREATION LPAREN t=referencetype RPAREN  { result = getObjectCreationModSet(t); }
+    | OBJECT_CREATION LPAREN t=typespec RPAREN  { result = getObjectCreationModSet(t); }
 ;
 
 
