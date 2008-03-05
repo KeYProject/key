@@ -11,10 +11,7 @@ import org.eclipse.jdt.core.IProblemRequestor;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.WorkingCopyOwner;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.*;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -33,6 +30,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import visualdebugger.astops.LocalVariableDetector;
 import visualdebugger.astops.Util;
 
 /**
@@ -55,6 +53,8 @@ public class WatchExpressionDialog {
 
     private String fieldToObserve;
 
+    private WatchpointView wv;
+
 
 
     /**
@@ -63,14 +63,14 @@ public class WatchExpressionDialog {
      * @param parent
      *            the parent
      */
-    public WatchExpressionDialog(Shell parent, int lineoffset, String source,
+    public WatchExpressionDialog(Shell parent, WatchpointView wv,int lineoffset, String source,
             String fieldToObserve) {
         shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
         shell.setText("Enter watch expression");
         shell.setLayout(new GridLayout());
+        this.wv = wv;
         this.source = source;
         this.lineoffset = lineoffset;
-  
         this.fieldToObserve = fieldToObserve;
     }
 
@@ -128,6 +128,7 @@ public class WatchExpressionDialog {
      * @return true, if expression is valid
      * @throws JavaModelException
      */
+    
     protected boolean isValid(String expression) throws JavaModelException {
 
         // test name
@@ -153,7 +154,6 @@ public class WatchExpressionDialog {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
         IEditorPart editor = PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getActivePage().getActiveEditor();
 
@@ -161,7 +161,6 @@ public class WatchExpressionDialog {
                 .getAdapter(IFile.class);
 
         ICompilationUnit icu = JavaCore.createCompilationUnitFrom(file);
-
         final WatchPointProblemRequestor problemRequestor = new WatchPointProblemRequestor();
 
         WorkingCopyOwner owner = new WorkingCopyOwner() {
@@ -181,10 +180,12 @@ public class WatchExpressionDialog {
 
         // reconcile to inform problemRequestor about potential problems
         workingCopy.reconcile(ICompilationUnit.NO_AST, true, null, null);
-
+        
+        LocalVariableDetector lvd = new LocalVariableDetector(Util.parse(expression, null));
+        lvd.process(Util.parse(workingCopy, null));
+        
         // clean up in the end
         workingCopy.discardWorkingCopy();
-
         // check for compilation errors and report the last detected problem
         if (problemRequestor.hasErrors()) {
             MessageDialog.openError(PlatformUI.getWorkbench()
@@ -194,6 +195,7 @@ public class WatchExpressionDialog {
 
             return false;
         } else {
+            wv.setLocalVariables(lvd.getLocalVariables());
             return true;
         }
     }

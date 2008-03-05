@@ -49,94 +49,6 @@ public final class Util {
     }
 
     /**
-     * Extract local variables for method.
-     * 
-     * @param method
-     *            the method
-     * @param allLocalVariables
-     *            the all local variables
-     * 
-     * @return the linked list< i variable binding>
-     */
-    public static LinkedList<IVariableBinding> extractLocalVariablesForMethod(
-            IMethod method, Set<IVariableBinding> allLocalVariables) {
-
-        LinkedList<IVariableBinding> localVariableBindings = new LinkedList<IVariableBinding>();
-        for (IVariableBinding variableBinding : allLocalVariables) {
-            if (method.getElementName().equals(
-                    variableBinding.getDeclaringMethod().getName())) {
-                localVariableBindings.add(variableBinding);
-            }
-        }
-
-        return localVariableBindings;
-    }
-
-    /**
-     * Extract local variables for expression.
-     * 
-     * @param node
-     *            the node
-     * @param localVariableBindings
-     *            the local variable bindings
-     * 
-     * @return the set< i variable binding>
-     */
-    public static Set<IVariableBinding> extractLocalVariablesForExpression(
-            Expression node, LinkedList<IVariableBinding> localVariableBindings) {
-
-        Set<IVariableBinding> localVariables = new HashSet<IVariableBinding>();
-        if (node instanceof InfixExpression) {
-
-            InfixExpression ie = (InfixExpression) node;
-
-            Set<SimpleName> operands = getOperands(ie);
-            System.out.println("left " + ie.getLeftOperand());
-            System.out.println("class " + ie.getLeftOperand().getClass());
-            System.out.println("found " + operands.size() + " operands");
-
-            for (SimpleName candidate : operands) {
-
-                for (IVariableBinding localVariableBinding : localVariableBindings) {
-                    String a = localVariableBinding.getName();
-                    String b = candidate.toString();
-                    if (a.equals(b)) {
-                        localVariables.add(localVariableBinding);
-                    }
-                }
-            }
-        }
-        return localVariables;
-    }
-
-    /**
-     * Gets the loc var inf.
-     * 
-     * @param cu
-     *            the cu
-     * @param localVariableBinding
-     *            the local variable binding
-     * 
-     * @return the loc var inf
-     */
-    public static LinkedList<String[]> getLocVarInf(CompilationUnit cu,
-            Set<IVariableBinding> localVariableBinding) {
-        
-        LinkedList<String[]> informations = new LinkedList<String[]>();
-        for (IVariableBinding variableBinding : localVariableBinding) {
-            
-            ASTNode astnode = cu.findDeclaringNode(variableBinding);
-            String[] information = new String[4];
-            information[0] = variableBinding.getType().getName() + ""; // type
-            information[1] = variableBinding.getName() + ""; // name
-            information[2] = astnode.getStartPosition() + ""; // offset
-            information[3] = variableBinding.getDeclaringMethod()+"";
-            informations.add(information);
-        }
-        return informations;
-    }
-
-    /**
      * Parses the ICompilationUnit.
      * 
      * @param unit
@@ -181,21 +93,6 @@ public final class Util {
             t.printStackTrace();
             return null;
         }
-    }
-
-    /**
-     * Detect local variables.
-     * 
-     * @param cu
-     *            the cu
-     * 
-     * @return the set< i variable binding>
-     */
-    public static Set<IVariableBinding> detectLocalVariables(CompilationUnit cu) {
-
-        LocalVariableDetector localVariableDetector = new LocalVariableDetector();
-        localVariableDetector.process(cu);
-        return localVariableDetector.getLocalVariableManagers().keySet();
     }
 
 }

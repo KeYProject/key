@@ -6,20 +6,8 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.draw2d.ChopboxAnchor;
-import org.eclipse.draw2d.ColorConstants;
-import org.eclipse.draw2d.Connection;
-import org.eclipse.draw2d.Ellipse;
-import org.eclipse.draw2d.Figure;
-import org.eclipse.draw2d.FigureCanvas;
-import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.*;
 import org.eclipse.draw2d.Label;
-import org.eclipse.draw2d.LightweightSystem;
-import org.eclipse.draw2d.MidpointLocator;
-import org.eclipse.draw2d.MouseEvent;
-import org.eclipse.draw2d.MouseListener;
-import org.eclipse.draw2d.PolygonDecoration;
-import org.eclipse.draw2d.PolylineConnection;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.Expression;
@@ -41,17 +29,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.List;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.ProgressBar;
-import org.eclipse.swt.widgets.Scale;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PartInitException;
@@ -60,47 +39,21 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 import visualdebugger.VBTBuilder;
-import visualdebugger.draw2d.BranchFilter;
-import visualdebugger.draw2d.CollapseFilter;
-import visualdebugger.draw2d.DrawableNode;
-import visualdebugger.draw2d.Filter;
-import visualdebugger.draw2d.LeafNode;
-import visualdebugger.draw2d.MethodInvocationFigure;
-import visualdebugger.draw2d.MethodReturnFigure;
-import visualdebugger.draw2d.SourceElementFigure;
-import visualdebugger.draw2d.TreeBranch;
-import visualdebugger.draw2d.TreeFilter;
-import visualdebugger.draw2d.TreeRoot;
+import visualdebugger.draw2d.*;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.logic.ListOfTerm;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.proof.IteratorOfNode;
-import de.uka.ilkd.key.proof.ListOfGoal;
-import de.uka.ilkd.key.proof.ListOfNode;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.SLListOfGoal;
-import de.uka.ilkd.key.proof.SLListOfNode;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.decproc.DecProcRunner;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import de.uka.ilkd.key.util.WatchpointUtil;
 import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
 import de.uka.ilkd.key.visualdebugger.DebuggerListener;
 import de.uka.ilkd.key.visualdebugger.SourceElementId;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
-import de.uka.ilkd.key.visualdebugger.executiontree.ETLeafNode;
-import de.uka.ilkd.key.visualdebugger.executiontree.ETMethodInvocationNode;
-import de.uka.ilkd.key.visualdebugger.executiontree.ETMethodReturnNode;
-import de.uka.ilkd.key.visualdebugger.executiontree.ETNode;
-import de.uka.ilkd.key.visualdebugger.executiontree.ETPath;
-import de.uka.ilkd.key.visualdebugger.executiontree.ETStatementNode;
-import de.uka.ilkd.key.visualdebugger.executiontree.ExecutionTree;
-import de.uka.ilkd.key.visualdebugger.executiontree.ITNode;
-import de.uka.ilkd.key.util.WatchpointUtil;
+import de.uka.ilkd.key.visualdebugger.executiontree.*;
 
 // TODO: Auto-generated Javadoc
 
@@ -116,7 +69,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
     private boolean bcLabels = true;
 
     /** The bc list control. */
-    List bcListControl;
+    private List bcListControl;
 
     /** The class menu. */
     Menu classMenu;
@@ -421,12 +374,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                 }
 
                 public void mousePressed(MouseEvent me) {
-
                     setSelected(node);
-                    ListOfNode proofTreeNodes = node.getETNode().getProofTreeNodes();
-                    System.out.println("ProofNodes  :: "+proofTreeNodes.size());
-                   
-                    System.out.println("SerialNr  :: "+proofTreeNodes.iterator().next().serialNr());
+                    renameTest(node);
                     wpInfo.removeAll();
                     try {
                         if (activeWPs != null) {
@@ -444,6 +393,43 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                         }
                     } catch (Throwable t) {
                         System.out.println(t.toString());
+                    }
+                }
+
+                /**
+                 * @param node
+                 */
+                private void renameTest(final SourceElementFigure node) {
+                    ListOfNode proofTreeNodes = node.getETNode().getProofTreeNodes();
+                    System.out.println("ProofNodes  :: "+proofTreeNodes.size());
+                    Node head = proofTreeNodes.head();
+                    System.out.println("SerialNr  :: "+ head.serialNr());
+                    ListOfNode lon = SLListOfNode.EMPTY_LIST;
+                    while(head.parent() != null){
+                        lon = lon.append(head.parent());
+                        head = head.parent();
+                    }
+                    lon=lon.reverse();
+                    System.out.println("-------------");
+                    try {
+                        for (IteratorOfNode it = lon.iterator(); it.hasNext();) {
+                            Node anode = it.next();
+                            ListOfRenamingTable renamingTables = anode.getRenamingTable();
+                            
+                            if (renamingTables != null && renamingTables.size() > 0 ) {
+                               System.out.println("RT size: "+renamingTables.size()+"@node " + anode.serialNr());
+                                IteratorOfRenamingTable i = renamingTables
+                                        .iterator();
+                                while (i.hasNext()) {
+                                    System.out.println("++++++++");
+                                    System.out.println(i.next().toString());
+                                }
+                            } 
+                        }
+                      
+                    } catch (Throwable e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
                     }
                 }
             });
@@ -673,14 +659,13 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                 LinkedList<ETNode> node = new LinkedList<ETNode>();
                 node.add(etn);
                 try {
-                identifyWatchpoints(node);
-                // clear the View
-                clearView();
-                TreeBranch tb = buildTreeBranch(getCurrentETRootNode(), null,
-                        new TreeFilter());
-                // draw the new view of the tree
-                root.addBranch(tb);
-                sketchStartUpConnection(tb); }
+                    identifyWatchpoints(node);     
+                    refresh();  
+                    
+//                                vd.fireDebuggerEvent(new DebuggerEvent(
+//                                        DebuggerEvent.TREE_CHANGED, ExecutionTree
+//                                        .getITNode()));
+                }
                 catch (Throwable t){
                     System.out.println(t.toString());
                     
@@ -1024,7 +1009,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
         progressBar1LData.height = 12;
         progressBar1 = new ProgressBar(progressGroup, SWT.NONE);
         progressBar1.setLayoutData(progressBar1LData);
-        progressBar1.setMinimum(0);
+        progressBar1.setMinimum(-1);
 
         // Instaniate a new ProgressMonitor to provide feedback over long
         // running task
@@ -1660,6 +1645,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
         if (event.getType() == DebuggerEvent.TREE_CHANGED) {
             this.currentRoot = (ITNode) event.getSubject();
             startRefreshThread();
+            
         } else if (event.getType() == DebuggerEvent.TEST_RUN_FAILED) {
             final VisualDebugger.TestCaseIdentifier tci = (VisualDebugger.TestCaseIdentifier) event
                     .getSubject();

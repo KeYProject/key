@@ -20,10 +20,10 @@ public class WatchPoint {
     private final String method;
     
     /** The line where the watchpoint was set. */
-    private final String statement_line;
+    private final int statement_line;
     
     /** The local variables. */
-    private final List<String[]> localVariables;
+    private final List<LocalVariableDescriptor> localVariables;
     
     /** The enabled. */
     private boolean enabled = true;
@@ -50,7 +50,7 @@ public class WatchPoint {
      * @param name the name
      */
     public WatchPoint(String name, String expression, String method,
-            String statement_line, String declaringType, List<String[]> localVariables) {
+            int statement_line, String declaringType , List<LocalVariableDescriptor> localVariables) {
         super();
         this.name = name;
         this.expression = expression;
@@ -93,7 +93,7 @@ public class WatchPoint {
      * 
      * @return the statement_line
      */
-    public String getStatement_line() {
+    public int getStatement_line() {
         return statement_line;
     }
 
@@ -130,7 +130,7 @@ public class WatchPoint {
      * 
      * @return the local variables
      */
-    public List<String[]> getLocalVariables() {
+    public List<LocalVariableDescriptor> getLocalVariables() {
         return localVariables;
     }
 }
