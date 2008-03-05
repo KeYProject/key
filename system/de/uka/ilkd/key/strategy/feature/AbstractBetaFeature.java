@@ -70,7 +70,6 @@ public abstract class AbstractBetaFeature implements Feature {
             ti.candidate = candidateHelp ( p_t, ti );
 
             synchronized ( betaCandidates ) {
-                if ( betaCandidates.size () > 1000 ) betaCandidates.clear ();
                 betaCandidates.put ( p_t, ti );
             }
         }

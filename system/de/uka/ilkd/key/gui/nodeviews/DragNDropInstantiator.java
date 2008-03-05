@@ -432,13 +432,9 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      *            the ListOfPosTacletApp with all apps whose if sequent has to
      *            be matched against the formula specified by the pair
      *            <tt>seq</tt> and <tt>ifPIO</tt>
-     * @param seq
-     *            the Sequent to which the position information in <tt>ifPIO<tt>
      * is relative to
      * @param missingSVPIO the PosInOccurrence describing the position of the term an 
      * uninstantiated SV will be matched against 
-     * @param userConstraint the Constraint describing user instantiations of
-     * metavariables
      * @param services the Services 
      * @return the ListOfPosTacletApp that have been matched successfully
      */

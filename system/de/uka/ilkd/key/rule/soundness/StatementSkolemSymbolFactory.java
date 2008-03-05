@@ -40,7 +40,7 @@ public class StatementSkolemSymbolFactory extends SkolemSymbolTacletFactory {
      * @param p_influencingPVs program variable arguments the symbol is to
      * be given. A selector variable of type int is added as the last argument
      * implicitly
-     * @param jumpTable the jump table that symbol should have
+     * @param p_jumpTable the jump table that symbol should have
      */
     public ProgramSVProxy createStatementSymbol
         (ProgramElementName     p_name,
@@ -120,7 +120,7 @@ public class StatementSkolemSymbolFactory extends SkolemSymbolTacletFactory {
      * decomposition rule applies
      * @param p_rwProxy list to which the statement is added that replaces the
      * primary statement when applying the decomposition rule
-     * @param p_ifJumpTable list to which the if-cascade is added which is
+     * @param p_jumpCascade list to which the if-cascade is added which is
      * inserted by the decomposition rule
      */
     private void createSepSymbol ( ProgramSVProxy p,

@@ -47,9 +47,8 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
      */
     public KeYUserProblemFile(String name, 
                               File file, 
-                              ProgressMonitor monitor, 
-                              boolean parseJMLSpecs) {
-        super(name, file, monitor, parseJMLSpecs);
+                              ProgressMonitor monitor) {
+        super(name, file, monitor);
     }
     
     

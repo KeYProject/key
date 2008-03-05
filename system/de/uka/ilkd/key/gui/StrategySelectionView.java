@@ -18,7 +18,6 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -853,7 +852,7 @@ thing. People were thinking it was a button.
     }
     
     /**
-     * @return
+     * @return the StrategyProperties
      */
     private StrategyProperties getProperties() {
         StrategyProperties p = new StrategyProperties();        

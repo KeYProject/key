@@ -27,7 +27,6 @@ public class ResolveGenericClassTest extends TestCase {
      *            first comp unit as string
      * @param string2
      *            snd comp unit as string
-     * @return true iff the transformed first equals the snd
      * @throws Exception
      */
     public void equalCU(String string1, String string2) throws Exception {

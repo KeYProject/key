@@ -609,10 +609,6 @@ options {
     /** parses a problem but without reading the declarations of
      * sorts, functions and predicates. These have to be given
      * explicitly.
-     * @param functions() the Namespace with the function and predicate
-     * symbols to be used
-     * @param sorts() the Namespace with the sorts to be used
-     * @param heuristics() the Namespace with the heuristics to be used
      * the heuristics of the current problem file will be added 
      */ 
     public Term parseProblem() 
@@ -1079,6 +1075,7 @@ options {
     /** looks up a function, (program) variable or static query of the 
      * given name varfunc_id and the argument terms args in the namespaces 
      * and java info. 
+     * @param varfunc_name the String with the symbols name
      * @param args is null iff no argument list is given, for instance `f', 
      * and is an array of size zero, if an empty argument list was given,
      * for instance `f()'.
@@ -1328,10 +1325,6 @@ options {
     /** parses a problem but without reading the declarations of
      * sorts, functions and predicates. These have to be given
      * explicitly.
-     * @param functions() the Namespace with the function and predicate
-     * symbols to be used
-     * @param sorts() the Namespace with the sorts to be used
-     * @param ruleSets() the Namespace with the rule sets to be used
      * the rule sets of the current problem file will be added 
      */ 
     public Term parseTacletsAndProblem() 

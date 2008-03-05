@@ -70,7 +70,7 @@ public class Main {
 
     /**
      * @param args
-     * @throws
+     * @throws Exception if something goes wrong like opening a file etc.
      */
     public static void main(String[] args) throws Exception {
 

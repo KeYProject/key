@@ -17,7 +17,7 @@ public class CasetoolDLPO extends KeYUserProblemFile {
     private ModelClass aClRepr;
 
     public CasetoolDLPO(ModelClass reprModelCl, java.io.File file) {
-	super(file.getName(), file, null, true);
+	super(file.getName(), file, null);
 	this.aClRepr=reprModelCl;
     }
 

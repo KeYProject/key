@@ -13,6 +13,7 @@ package de.uka.ilkd.key.speclang;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.IteratorOfProgramElement;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -41,9 +42,17 @@ public class SLEnvInput extends AbstractEnvInput {
     //-------------------------------------------------------------------------
     
     private static String getLanguage() {
-        return ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().useJML()
-               ? "JML"
-               : "OCL";
+        GeneralSettings gs 
+            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+        if(gs.useJML() && gs.useOCL()) {
+            return "JML/OCL";
+        } else if(gs.useJML()) {
+            return "JML";
+        } else if(gs.useOCL()) {
+            return "OCL";
+        } else {
+            return "no";
+        }
     }
     
     
@@ -128,13 +137,13 @@ public class SLEnvInput extends AbstractEnvInput {
             throw new IllegalStateException("InitConfig not set.");
         }
         
-        String language = getLanguage();
-        if(language.equals("JML")) {
+        GeneralSettings gs 
+            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+        if(gs.useJML()) {
             createSpecs(new JMLSpecExtractor(initConfig.getServices()));
-        } else if(language.equals("OCL")) {
+        }
+        if(gs.useOCL()) {
             createSpecs(new OCLSpecExtractor(initConfig.getServices()));
-        } else {
-            assert false : "An unknown specification language is selected.";
         }
     }
 }

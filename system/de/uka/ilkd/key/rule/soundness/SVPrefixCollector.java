@@ -128,7 +128,7 @@ public class SVPrefixCollector extends TacletVisitor {
     }
 
     /** is called by the execPostOrder-method of a term 
-     * @param Term to checked if it is a Variable and if true the
+     * @param t the Term to checked if it is a Variable and if true the
      * Variable is added to the list of found Variables
      */  
     public void visit(Term t) {	

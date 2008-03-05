@@ -122,7 +122,7 @@ public class Node {
      * the node information object encapsulates non-logical information
      * of the node, e.g.  
      * 
-     * @return
+     * @return the NodeInfo containing non-logical information
      */
     public NodeInfo getNodeInfo() {
         return nodeInfo;

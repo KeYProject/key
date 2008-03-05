@@ -34,6 +34,7 @@ import de.uka.ilkd.key.speclang.IteratorOfClassInvariant;
 import de.uka.ilkd.key.speclang.IteratorOfOperationContract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.SetAsListOfClassInvariant;
+import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 import de.uka.ilkd.key.speclang.SetOfOperationContract;
 import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
 
@@ -170,10 +171,18 @@ public class UseOperationContractRule implements BuiltInRule {
         if(Main.getInstance().mediator().autoMode()) {
             SetOfOperationContract contracts
                 = getApplicableContracts(services, pm, modality, pio);
+            if(contracts.size() == 0) {
+                return null;
+            }
+            
+            SetOfClassInvariant ownInvs
+                = services.getSpecificationRepository()
+                          .getClassInvariants(pm.getContainerType());
+            
             //TODO: Apply *all* contracts here instead of a random one
             return new ContractWithInvs(contracts.iterator().next(), 
-                                        SetAsListOfClassInvariant.EMPTY_SET, 
-                                        SetAsListOfClassInvariant.EMPTY_SET);
+                                        ownInvs, 
+                                        ownInvs);
         } else {
             ContractConfigurator cc 
                     = new ContractConfigurator(Main.getInstance(),

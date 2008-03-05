@@ -48,7 +48,7 @@ public class AtPreEquations extends AbstractMetaOperator {
     }
     
     /**
-     * @deprecated: use updates for defining atPre-functions instead.
+     * @deprecated use updates for defining atPre-functions instead.
      */
     private static Term buildAtPreDefinitions(
                         /*in*/ Map /*Operator -> Function */atPreFunctions) {

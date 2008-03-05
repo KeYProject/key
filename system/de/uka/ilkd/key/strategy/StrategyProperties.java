@@ -105,7 +105,6 @@ public class StrategyProperties extends Properties {
 
     /**
      * @param p
-     * @return
      */
     private static Object readSingleOption(Properties p, String key) {
         Object o = (String) p.get("[StrategyProperty]"+key);

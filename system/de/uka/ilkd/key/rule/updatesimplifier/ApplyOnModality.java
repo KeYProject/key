@@ -100,9 +100,10 @@ public class ApplyOnModality extends AbstractUpdateRule {
     }
     
     /**
-     * @param loc
+     * looks up if the given location is protected, i.e. must not be deleted
+     * @param loc the Location to check
      * @param protectedProgVars
-     * @return
+     * @return true if the given location is protected
      */
     private boolean protectedLocation(Location loc, HashSet protectedProgVars) {
         // currently it would be safe to comment the PROTECTED_HEAP part out as 
@@ -129,7 +130,8 @@ public class ApplyOnModality extends AbstractUpdateRule {
     /**
      * collects all local program variables
      * @param target
-     * @return
+     * @return the HashSet containing all protected locations and the special protection markers
+     * {@link #PROTECT_ALL} and {@link #PROTECT_HEAP}
      */
     private HashSet collectProgramVariables(Term target, Services services) {
         if (protectedVarsCache.containsKey(target)) {           

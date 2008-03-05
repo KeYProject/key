@@ -42,7 +42,7 @@ public class ApplyOnNonRigidWithExplicitDependencies extends AbstractUpdateRule 
         }
 
         /**
-         * @return
+         * @return true if changed
          */
         public boolean hasChanged() {            
             return !assignmentPairs.isEmpty();
@@ -50,14 +50,14 @@ public class ApplyOnNonRigidWithExplicitDependencies extends AbstractUpdateRule 
 
         /**
          * returns a new {@link AssignmentPair} 
-         * @return
+         * @return list of assignmentPairs
          */
         public ListOfAssignmentPair getAssignmentPairs() {           
             return assignmentPairs;
         }
 
         /**
-         * @return
+         * @return the resulting term
          */
         public Term getTerm() {            
             return result;
@@ -151,7 +151,6 @@ public class ApplyOnNonRigidWithExplicitDependencies extends AbstractUpdateRule 
 
     /**
      * @param update
-     * @return
      */
     private Update[] sequentializeUpdate(Update update,
             NRFunctionWithExplicitDependencies nr) {
@@ -244,11 +243,8 @@ public class ApplyOnNonRigidWithExplicitDependencies extends AbstractUpdateRule 
         }
     }
 
-    /**
-     * @param s
-     * @return
-     */
     private static long COUNTER = 0;
+
     private Term getReplacement(Term s, ReplacementResult res) {
         // TODO register new variables at namespace; use variablenameproposer;
         // get KeYJavaType 

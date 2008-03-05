@@ -31,7 +31,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 public class EvaluateArgs extends ProgramMetaConstruct{
 
     /** creates a typeof ProgramMetaConstruct 
-     * @param expr the instance of expression contained by 
+     * @param pe the instance of expression contained by 
      * the meta construct 
      */
     public EvaluateArgs(ProgramElement pe) {

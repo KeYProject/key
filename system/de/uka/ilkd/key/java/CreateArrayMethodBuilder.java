@@ -266,8 +266,6 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      *            <code>length</length> of the array 
      * @param paramLength the ProgramVariable which is the parameter of
      *   the <code>&lt;createArray&gt;</code> method
-     * @param prepare the ProgramMethod <code>&lt;prepare&gt;()</code>
-     *   which will be called when executing
      * <code>&lt;createArray&gt;</code> 
      * @param fields the ListOfFields of the current array
      * @param createTransient a boolean indicating if a transient array has 

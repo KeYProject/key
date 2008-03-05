@@ -31,7 +31,7 @@ public class SVNameCorrespondenceCollector extends Visitor {
 
 
     /** is called by the execPostOrder-method of a term 
-     * @param Term if the toplevel operator of this term is a
+     * @param t the Term if the toplevel operator of this term is a
      * substitution of schema variables, then this pair is added to
      * the map "nameCorrespondences"
      */  
@@ -89,7 +89,7 @@ public class SVNameCorrespondenceCollector extends Visitor {
     /** collects all correspondences in a taclet
      * @param taclet the Taclet where the correspondences have to be
      * collected
-     * @param visitAddRules a boolean that contols if the addrule sections are
+     * @param visitAddrules a boolean that contols if the addrule sections are
      * to be ignored (iff false) or if the visitor descends into them (iff true) 
      */
     public void visit(Taclet taclet, boolean visitAddrules) {

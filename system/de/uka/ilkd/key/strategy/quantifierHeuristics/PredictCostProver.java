@@ -209,10 +209,8 @@ class PredictCostProver {
 	 * 
 	 * @param problem  a literal
 	 *            to be proved
-	 * @param assLits a set of term
+	 * @param assertLits a set of term
 	 *            assertLiterals in which all literals are true
-	 * @param cache a HashMap
-	 *            used to store proved literals
 	 * @return return <code>trueT</code> if if formu is proved to true,
 	 *         <code> falseT</code> if false, and <code>atom</code> if it
 	 *         cann't be proved.

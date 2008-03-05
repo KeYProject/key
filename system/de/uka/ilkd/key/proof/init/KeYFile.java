@@ -47,11 +47,6 @@ public class KeYFile implements EnvInput {
      */
     protected final ProgressMonitor monitor;
     
-    /**
-     * for disabling the parsing of specifications (e.g. when running tests)
-     */ 
-    private final boolean parseSpecs;
-    
     private String javaPath;
     private boolean javaPathAlreadyParsed=false;
 
@@ -74,14 +69,12 @@ public class KeYFile implements EnvInput {
      */
     public KeYFile(String name, 
                    RuleSource file, 
-                   ProgressMonitor monitor, 
-                   boolean parseSpecs) {
+                   ProgressMonitor monitor) {
         assert name != null;
         assert file != null;
         this.name = name;
         this.file = file;
         this.monitor = monitor;
-        this.parseSpecs = parseSpecs;        
     }
 
         
@@ -90,9 +83,8 @@ public class KeYFile implements EnvInput {
      */
     public KeYFile(String name, 
                    File file, 
-                   ProgressMonitor monitor, 
-                   boolean parseSpecs) {
-	this(name, RuleSource.initRuleFile(file), monitor, parseSpecs);
+                   ProgressMonitor monitor) {
+	this(name, RuleSource.initRuleFile(file), monitor);
     }
     
 
@@ -343,9 +335,9 @@ public class KeYFile implements EnvInput {
 	    throw new ProofInputException(fnfe);
         }
         
-        //read JML specs
+        //read in-code specifications
         readJavaPath();
-        if(parseSpecs && javaPath != null) {
+        if(javaPath != null) {
             SLEnvInput slEnvInput = new SLEnvInput(javaPath);
             slEnvInput.setInitConfig(initConfig);
             slEnvInput.read(mod);

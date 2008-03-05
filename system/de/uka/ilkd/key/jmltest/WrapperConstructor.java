@@ -323,7 +323,7 @@ public class WrapperConstructor extends Thread {
      * where every open goal leads to a new block of specification with its
      * generated requires- and ensures-clause
      * 
-     * @return
+     * @return a StringBuffer 
      */
     private final StringBuffer collectAllSpecs() {
         final StringBuffer result = new StringBuffer();
@@ -486,8 +486,8 @@ public class WrapperConstructor extends Thread {
      * Checks if the AssignementPairs of the given update are useful for our
      * task and returns an Update that just contains usefull Terms
      * 
-     * @see de.uka.ilka.key.jmltest.WrapperConstructor#checkTerm
-     * @see de.uka.ilka.key.jmltest.WrapperConstructor#isUsefulPair
+     * @see de.uka.ilkd.key.jmltest.WrapperConstructor#checkTerm(Term)
+     * @see de.uka.ilkd.key.jmltest.WrapperConstructor#isUsefulPair(AssignmentPair)
      * @param upTerm
      *                The Term thats needs to be cleaned up
      * @return An ArrayOfAssignmentPairs containing only good Terms
@@ -564,7 +564,7 @@ public class WrapperConstructor extends Thread {
     /**
      * This Method checks if both sides of an Assignment are useful
      * 
-     * @see de.uka.ilka.key.jmltest.WrapperConstructor#isUsefulPair
+     * @see de.uka.ilkd.key.jmltest.WrapperConstructor#isUsefulPair(AssignmentPair)
      * @param currPair
      * @return true if pair is usefull false else
      */
@@ -578,7 +578,7 @@ public class WrapperConstructor extends Thread {
      * target is the filtering of local Variables cause those are not known
      * outside and would lead to errors if they occur in specification
      * 
-     * @param The Term t to be checked
+     * @param t the Term to be checked
      * @return true if t is an Attribute, Parameter, \result, Constant; false else
      */
     private final boolean isUseful(Term t) {

@@ -115,7 +115,7 @@ class HandleArith {
      * Format literal to a form of "geq",linke a>=b;For example, a <=b to
      * b>=a;a>b to a>=b+1;!(a>=b) to b>=a+1..
      * 
-     * @param term
+     * @param problem
      * @return falseT if <code>term</code>'s operator is not >= or <=
      */
     private static Term formatArithTerm(Term problem, Services services) {

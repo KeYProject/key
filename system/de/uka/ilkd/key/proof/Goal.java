@@ -363,7 +363,7 @@ public class Goal  {
     /** 
      * replaces a formula at the given position  
      * and informs the rule appliccation index about this change
-     * @param cf the ConstrainedFormula replacing the old one
+     * @param replacements the ConstrainedFormula replacing the old one
      * @param p PosInOccurrence encodes the position 
      */
     public void changeFormula(ListOfConstrainedFormula replacements, 
@@ -406,8 +406,10 @@ public class Goal  {
 	    addNoPosTacletApp(tacletApp);
  	    if (proof().env()!=null) { // do not break everything
                                        // because of ProofMgt
-		proof().env().registerRuleIntroducedAtNode(tacletApp, 
-		        node.parent(), isAxiom);
+		proof().env().registerRuleIntroducedAtNode(
+		        tacletApp, 
+		        node.parent() != null ? node.parent() : node, 
+		        isAxiom);
 	    }
 	}
     }

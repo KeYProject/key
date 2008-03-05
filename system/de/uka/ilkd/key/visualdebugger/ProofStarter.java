@@ -271,8 +271,7 @@ public class ProofStarter {
      * @param maxSteps
      *                the int limiting the maximal amount of steps done in
      *                automatic proof mode
-     * @throws an
-     *                 IllegalArgumentException if <tt>maxSteps</tt> is lesser
+     * @throws IllegalArgumentException if <tt>maxSteps</tt> is lesser
      *                 than zero
      */
     public void setMaxSteps(int maxSteps) {

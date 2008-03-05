@@ -275,8 +275,8 @@ public class GenericParser {
     }
 
     
-    /** @param String str the String we want to replace %nr
-     *  @param Template tpl the corresponding template
+    /** @param str the String we want to replace %nr
+     *  @param tpl the Template 
      *	@return str replace took place
      */
     public static String replace(String str, Template tpl) {

@@ -335,8 +335,8 @@ public class InReachableStatePOBuilder extends TermBuilder {
      * </code>
      * ensuring that the static field is only updated to a living object or null
      * 
-     * @param the
-     *            update U to be checked
+     * @param update the
+     *            Update U to be checked
      * 
      * @return a formula that evaluates to true iff the update U does not update
      *         the static field loc to an "illegal" value
@@ -501,10 +501,7 @@ public class InReachableStatePOBuilder extends TermBuilder {
      * @param update
      *            the Update describing the new state to be checked for the
      *            <tt>inReachableState</tt> property
-     * @param erroneousField
-     *            the ProgramVariable representing the static field <erroneous>
-     *            of a certain class type
-     * @param implicitClassFields
+     * @param implicitFields
      *            the ProgramVariables for the field C.<erroneous>, C.<initialized>,
      *            C.<initInProgress> and C.<nextToCreate> (in this order)
      * @return a formula that evaluates to true if erroneous has been updated by
@@ -552,9 +549,7 @@ public class InReachableStatePOBuilder extends TermBuilder {
      * inReachableState
      * </tt>
      *   property
-     *   @param erroneousField the ProgramVariable representing the static field &lt;erroneous&gt; of
-     *   a certain class type
-     *   @param implicitClassFields the ProgramVariables for the field 
+     *   @param implicitFields the ProgramVariables for the field 
      *      C.&lt;erroneous&gt;, C.&lt;initialized&gt;, C.&lt;initInProgress&gt; and C.&lt;nextToCreate&gt;
      *      (in this order)
      *   @return a formula that evaluates to true if erroneous has been updated by U in an
@@ -607,9 +602,7 @@ public class InReachableStatePOBuilder extends TermBuilder {
      * inReachableState
      * </tt>
      *   property
-     *   @param erroneousField the ProgramVariable representing the static field &lt;erroneous&gt; of
-     *   a certain class type
-     *   @param implicitClassFields the ProgramVariables for the field 
+     *   @param implicitFields the ProgramVariables for the field 
      *      C.&lt;erroneous&gt;, C.&lt;initialized&gt;, C.&lt;initInProgress&gt;, C.&lt;prepared&gt; and C.&lt;nextToCreate&gt;
      *      (in this order)
      *   @return a formula that evaluates to true if erroneous has been updated by U in an
@@ -673,7 +666,6 @@ public class InReachableStatePOBuilder extends TermBuilder {
 
     /**
      * @param currentType
-     * @return
      */
     private ListOfKeYJavaType getDirectSubtypes(final KeYJavaType currentType) {
         ListOfKeYJavaType directSubTypes = SLListOfKeYJavaType.EMPTY_LIST;

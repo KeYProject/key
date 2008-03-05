@@ -32,6 +32,5 @@ public class Ghost extends Modifier {
 
     
     public void accept(SourceVisitor v) {
-        assert false;
     }
  }

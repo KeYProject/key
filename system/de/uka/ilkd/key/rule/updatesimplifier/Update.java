@@ -167,7 +167,7 @@ public abstract class Update {
         }
 
         /**
-         * @return
+         * @return the assignment pairs making up the update
          */
         public ArrayOfAssignmentPair getAllAssignmentPairs() {
             final AssignmentPair[] result = 
@@ -278,7 +278,7 @@ public abstract class Update {
     }
 
     /**
-     * @return
+     * @return all assignment pairs of the update
      */
     public abstract ArrayOfAssignmentPair getAllAssignmentPairs();
 
@@ -291,7 +291,7 @@ public abstract class Update {
     /**
      * returns true if the given location is updated by this update
      * 
-     * @param location
+     * @param loc
      *            the Operator specifying the location which is updated
      * @return true if location occurs on the left side of an assignment pair in
      *         this update

@@ -141,7 +141,7 @@ class TriggersSet {
      *            a <code>Term</code> of clause form
      * @param qvs
      *            all universal varaibles of all <code>clause</code>
-     * @return
+     * @return the MultTrigger for the given triggers
      */
     private Trigger createMultiTrigger(SetOfTrigger trs, Term clause,
             SetOfQuantifiableVariable qvs) {
@@ -205,7 +205,7 @@ class TriggersSet {
 
         /**
          * @param term    one atom at the begining
-         * @param litQVS  all universal variables of <code>term</code>
+         * @param services  the Services 
          * @return true   if find any trigger from <code>term</code>
          */
         private boolean recAddTriggers(Term term, Services services) {
@@ -355,7 +355,6 @@ class TriggersSet {
         /**
          * add a uni-trigger to triggers set or add an element of
          * multi-triggers for this clause
-         * @return <code>true</code> if a uni-trigger was added
          */
         private void addUniTrigger(Term term, Services services) {
             if (!isAcceptableTrigger(term, services)) {
@@ -403,7 +402,7 @@ class TriggersSet {
          * add to triggers set    
          * @param ts elements of multi-triggers at the begining
          * @param i
-         * @return
+         * @return a set of triggers
          */
         private Set setMultiTriggers(Trigger[] ts, int i) {
             Set res = new HashSet();

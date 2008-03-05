@@ -125,7 +125,7 @@ public abstract class AbstractUpdateRule implements IUpdateRule {
         }
 
         /**
-         * @return
+         * @return the simplified subterms
          */
         public Term[] getSimplifiedSubterms() {            
             return subs;
@@ -135,7 +135,7 @@ public abstract class AbstractUpdateRule implements IUpdateRule {
             return vars;
         }
         /**
-         * @return
+         * @return if one of the sub terms has been changed, true is returned
          */
         public boolean hasChanged() {           
             return changeFlag;

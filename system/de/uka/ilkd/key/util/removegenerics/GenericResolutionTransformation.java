@@ -67,7 +67,7 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
 
         /*
          * it might be necessary to do the following block more than once in a
-         * situation like: G<A, B extends A> where B would be replaced by A,
+         * situation like: G&lt;A, B extends A&gt; where B would be replaced by A,
          * which needs to be resolved to Object.
          */
         while (t instanceof TypeParameter) {

@@ -99,7 +99,7 @@ public class SymbolicArrayObject extends SymbolicObject {
     /**
      * return the index configuration
      * 
-     * @return
+     * @return the SetOfTerm representing the index config.
      */
     public SetOfTerm getIndexConfiguration() {
         return this.indexConfiguration;
@@ -121,7 +121,6 @@ public class SymbolicArrayObject extends SymbolicObject {
      * Finds a proper representantive for equivalence class cl.
      * 
      * @param cl
-     * @return
      */
     private Term getRepres(EquClass cl) {
         Term result = cl.getMembers().iterator().next();

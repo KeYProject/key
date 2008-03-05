@@ -26,8 +26,7 @@ class VariableSV extends SortedSchemaVariable {
      * @param sort the Sort of the SchemaVariable and the matched type     
      * @param listSV a boolean which is true iff the schemavariable is allowed
      * to match a list of quantified variables
-     * @param strictSV boolean indicating if the schemavariable is declared as strict
-     * forcing exact type match*/    
+     */
     VariableSV(Name name, Sort sort, boolean listSV) {
 	super(name, QuantifiableVariable.class, sort, listSV); 	
     }

@@ -20,7 +20,6 @@ import de.uka.ilkd.key.logic.op.Location;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.RigidFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.KeYSemanticException;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
@@ -49,7 +48,7 @@ public class MetaFieldReference extends AbstractMetaOperator implements
     /**
      * calculates the resulting term.
      * 
-     * @throws KeYSemanticException
+     * @throws RuntimeException if attribute could not be found
      */
     public Term calculate(Term term, SVInstantiations svInst, Services services) {
 

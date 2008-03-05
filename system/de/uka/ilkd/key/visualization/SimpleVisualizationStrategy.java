@@ -1004,8 +1004,8 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
     
 
     /**
-     * @param semisequent  semi
-     * @param formula toFind that should be found in semi
+     * @param semi  semi
+     * @param toFind toFind that should be found in semi
      * @return index of the formula toFind in the semisequent semi or -1 if it
      *         does not exist. Equality is checked modulu renamings
      */
@@ -1088,9 +1088,9 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
      * This method corresponds to the methods OccIn, codeTransformation
      * and formulaInvolved in the minor thesis.
      * 
-     * @param A node
+     * @param n a node
      * @param occ a Java block occurrence in the sequent of Node n
-     * @param newOcc the occurrence of occ in the sequent of the parent node, that
+     * @param result the occurrence of occ in the sequent of the parent node, that
      *        is computed by this method
      * @return a boolean that is true iff the java block was changed
      *         and the occurrence result of the Java block in the parent node 
@@ -1158,12 +1158,6 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
   }
 
     /**
-     * 
-     * @param n
-     * @param parent
-     * @param occ
-     * @param result
-     * @return
      */
     private boolean indexAfterBuiltInRuleApplication(Node n, Occ occ, Occ result) {
         final Node parent = n.parent();
@@ -1345,15 +1339,6 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
     }
             
     /**
-     * @param occOfFind
-     * @param occ
-     * @param result
-     * @param tgt
-     * @param n
-     * @param pta
-     * @param index2cfmAnt
-     * @param index2cfmSuc
-     * @return
      */
     private boolean indexAfterRewriteTacletApplication(Occ occ, Occ result, 
             TacletGoalTemplate tgt, Node n, 
@@ -1527,7 +1512,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
     /** renames a sequent 
      * 
      * @param semi
-     * @param renamings: a list of HashMaps, that contains the renamings
+     * @param renamings a list of HashMaps, that contains the renamings
      * @return a sequent that is the result of renaming variables in the order
      *          the renamings appear in the list;
      */

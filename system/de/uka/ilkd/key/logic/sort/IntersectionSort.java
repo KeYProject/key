@@ -149,7 +149,7 @@ public class IntersectionSort extends AbstractSort {
     /**
      * creates the sort name for the composites. 
      * 
-     * @param composites2 the array of Sort with the defining 
+     * @param composites the array of Sort with the defining 
      * composite sorts of this intersection sort
      * @return the name of the intersection sort to be created
      */

@@ -351,9 +351,8 @@ public class ProgVarReplacer {
     }
 
     /**
-     * @param t
-     * @param result
-     * @return
+     * @param t the Term where to perform the replacement
+     * @return the replaced term
      */
     protected Term standardReplace(Term t) {
         Term result = t;

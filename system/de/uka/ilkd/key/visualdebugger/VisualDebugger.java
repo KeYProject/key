@@ -419,7 +419,6 @@ public class VisualDebugger {
     /**
      * term 2 term
      * 
-     * @return
      */
     public HashMap getInputPV2term() {
         return inputPV2term;

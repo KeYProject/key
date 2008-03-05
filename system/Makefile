@@ -396,7 +396,7 @@ doc: argfile $(JAVAFILES)
 	xargs $(JAVADOC) $(JAVADOC_OPTIONS) -source 1.5 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH) \
 	-sourcepath $(GENERATED_SRC_PATH):. -d doc \
 	-link http://recoder.sourceforge.net/doc/api \
-	-link http://java.sun.com/j2se/1.3/docs/api \
+	-link http://java.sun.com/j2se/1.5.0/docs/api/ \
 	-link http://www.antlr.org \
 	-windowtitle "KeY API Documentation" \
 	-doctitle "KeY API Documentation ($(KEY_VERSION_LONG))" \

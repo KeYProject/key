@@ -22,9 +22,6 @@ public interface Sink {
     /**
      * Add a constraint for which something (a goal or a subtree of
      * the proof) can be closed
-     * @return the sink with least distance to the root whose buffer
-     * contains the bottom constraint, i.e. which is the root of a
-     * completely closed subtree; null if no such sink exists
      */
     void       put                ( Constraint   p_c );
 
