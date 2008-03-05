@@ -953,7 +953,8 @@ public class Recoder2KeYConverter {
             recoder.java.declaration.ParameterDeclaration pd) {
         return new ParameterDeclaration(
                 collectChildren(pd),
-                pd.getASTParent() instanceof recoder.java.declaration.InterfaceDeclaration);
+                pd.getASTParent() instanceof recoder.java.declaration.InterfaceDeclaration,
+                pd.isVarArg());
     }
 
     /**

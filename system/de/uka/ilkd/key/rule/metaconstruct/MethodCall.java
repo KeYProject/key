@@ -9,10 +9,15 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.operator.Instanceof;
+import de.uka.ilkd.key.java.expression.operator.NewArray;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.*;
@@ -328,15 +333,46 @@ public class MethodCall extends ProgramMetaConstruct {
 	    	= new LocationVariable(newName,
 	    			      originalParamVar.getKeYJavaType());
 
-	    varSpecs[i] =
-		new VariableSpecification
-		    (paramVar, 
-		     originalSpec.getDimensions(), 
-		     methRef.getArgumentAt(i),
-		     originalSpec.getType());
+	    if(i == params-1 && methDecl.isVarArgMethod() &&
+	            (   methRef.getArguments().size() != params 
+	             || notCompatible(methRef.getArgumentAt(i), originalSpec.getType()))) {
+	        // variable argument
+	        varSpecs[i] = new VariableSpecification(paramVar, 1, makeVariableArgument(originalSpec), originalSpec.getType());
+	    } else {
+	        // normal argument
+	        varSpecs[i] =
+	            new VariableSpecification
+	                    (paramVar, 
+	                    originalSpec.getDimensions(), 
+	                    methRef.getArgumentAt(i),
+	                    originalSpec.getType());
+	    }
 	} 
 	return varSpecs;
     }
+
+    
+    private Expression makeVariableArgument(VariableSpecification originalSpec) {
+        
+        int params = pm.getMethodDeclaration().getParameterDeclarationCount();
+        int args = methRef.getArguments().size();
+        Expression[] exps = new Expression[args - params + 1];
+                                           
+        for (int i = 0; i < exps.length; i++) {
+            exps[i] = methRef.getArgumentAt(params - 1 + i);
+        }
+        
+        Type type = originalSpec.getType();
+        KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(type);
+        TypeRef tyref = new TypeRef(kjt);
+        
+        ArrayInitializer arrayInit = new ArrayInitializer(exps);
+        Expression[] emptyArgs = new Expression[0];
+        NewArray newArray = new NewArray(emptyArgs, tyref, kjt, arrayInit, 1);
+        
+        return newArray;
+    }
+
 
     public Statement[] createParamAssignments(VariableSpecification[] specs) {
 	MethodDeclaration methDecl    = pm.getMethodDeclaration();
@@ -357,6 +393,22 @@ public class MethodCall extends ProgramMetaConstruct {
 	}
 	return new ArrayOfExpression(vars);
     }
+    
+    /**
+     * check whether an expression is assignment-compatible with a type.
+     * 
+     * In the absence of autoboxing this is the case if the type is a subtype.
+     * 
+     * @param exp expression to check
+     * @param type type to check for
+     * @return true iff exp is assign compatible with type 
+     */
+    private boolean notCompatible(Expression exp, Type type) {
+        KeYJavaType expKJT = exp.getKeYJavaType(services, execContext);
+        KeYJavaType typeKJT = services.getJavaInfo().getKeYJavaType(type); 
+        return services.getJavaInfo().isSubtype(expKJT, typeKJT);
+    }
+
 	
 
 }
