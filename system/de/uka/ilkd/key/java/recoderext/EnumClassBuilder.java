@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import de.uka.ilkd.key.util.Debug;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.CompilationUnit;
@@ -52,8 +52,6 @@ import recoder.kit.TypeKit;
  * @version 2006-11-21
  */
 public class EnumClassBuilder extends RecoderModelTransformer {
-
-    private static Logger logger = Logger.getLogger(EnumClassBuilder.class);
 
     /**
      * create a new instance that uses the given service configuration and works
@@ -89,6 +87,8 @@ public class EnumClassBuilder extends RecoderModelTransformer {
      * find all enum declarations and make their substitutes.
      * find all case usages of enum constants and make their substitutes.
      * 
+     * we may not the cache which buffers classes only not enums!
+     * 
      * @see recoder.kit.TwoPassTransformation#analyze()
      */
     @Override
@@ -101,9 +101,9 @@ public class EnumClassBuilder extends RecoderModelTransformer {
                     addCases(ed);
                     EnumClassDeclaration ecd = new EnumClassDeclaration(ed);
                     substitutes.put(ed, ecd);
-                    if (logger.isDebugEnabled()) {
+                    if (Debug.ENABLE_DEBUG) {
                         for (MemberDeclaration m : ecd.getMembers()) {
-                            logger.debug("Member of "
+                            Debug.out("Member of "
                                     + ecd.getIdentifier().getText() + ": "
                                     + m.toSource());
                         }
@@ -149,26 +149,10 @@ public class EnumClassBuilder extends RecoderModelTransformer {
      * substitute EnumDeclarations by EnumClassDeclarations.
      * 
      * @see de.uka.ilkd.key.java.recoderext.RecoderModelTransformer#makeExplicit(recoder.java.declaration.TypeDeclaration)
+     * @deprecated THIS DOES NOT WORK ANY MORE, SINCE THE CACHE ONLY CONSIDERS CLASSES!
      */
-    protected void makeExplicit(TypeDeclaration td) {
-        if (td instanceof EnumDeclaration) {
-            EnumDeclaration ed = (EnumDeclaration) td;
-            EnumClassDeclaration ecd = substitutes.get(ed);
-            // new ObjectInspector(ed).showAndWait();
-            if (ecd == null) {
-                logger.error("There is no enum->class substitute for "
-                        + td.getFullName());
-            } else {
-                replace(ed, ecd);
-                assert ecd.getASTParent() != null : "No parent for "
-                        + ecd.getIdentifier().getText();
-            }
-            
-            // new ObjectInspector(ecd).showAndWait();
-        }
-        
-    }
-
+    protected void makeExplicit(TypeDeclaration td) { }
+    
     /**
      * substitute all case statements that have been recorded earlier.
      * 
@@ -180,11 +164,40 @@ public class EnumClassBuilder extends RecoderModelTransformer {
         
         super.transform();
         
+        for (CompilationUnit unit : getUnits()) {
+            for (TypeDeclaration td : unit.getDeclarations()) {
+                if (td instanceof EnumDeclaration) {
+                    EnumDeclaration ed = (EnumDeclaration) td;
+                    EnumClassDeclaration ecd = substitutes.get(ed);
+                    if (ecd == null) {
+                        Debug.out("There is no enum->class substitute for "
+                                + td.getFullName());
+                    } else {
+                        replace(ed, ecd);
+                        assert ecd.getASTParent() != null : "No parent for "
+                                + ecd.getIdentifier().getText();
+                    }
+                }
+            }
+        }
+        
         for (Entry<FieldReference, UncollatedReferenceQualifier> entry : caseSubstitutes.entrySet()) {
             replace(entry.getKey(), entry.getValue());
         }
         
         getChangeHistory().updateModel();
+
+//
+//        // Debug output
+//        for (CompilationUnit cu : getUnits()) {
+//            for (int i = 0; i < cu.getTypeDeclarationCount(); i++) {
+//                System.out.println("Defined in " + cu.getName() + ": " + 
+//                        cu.getTypeDeclarationAt(i) + " - " + 
+//                        cu.getTypeDeclarationAt(i).getClass());
+//            }
+//        }
+        
+        cache.invalidateClasses();
     }
     
     

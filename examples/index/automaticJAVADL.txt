@@ -66,7 +66,9 @@
 ./java_dl/exchange.key
 ./java_dl/if.key
 ./java_dl/incrementcounter.key
+./java_dl/innerClasses/inner.key
 ./java_dl/iteratedAssignment.key
+./java_dl/java5/vararg.key
 ./java_dl/jml-information-flow.key
 ./java_dl/methodCall.key
 ./java_dl/methodCall1.key
@@ -85,7 +87,6 @@
 ./java_dl/splittingWithQueries.key
 ./java_dl/symmArray.key
 ./java_dl/testcontext.key
-./java_dl/innerClasses/inner.key
 ./polySimp/simplify0.key
 ./polySimp/simplify1.key
 ./polySimp/simplify10.key

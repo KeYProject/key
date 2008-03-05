@@ -558,14 +558,14 @@ public class Recoder2KeY implements JavaReader {
 
         RecoderModelTransformer.TransformerCache cache = new RecoderModelTransformer.TransformerCache(cUnits);
         
-        ConstructorNormalformBuilder cnb = new ConstructorNormalformBuilder(servConf, cache);
+        ConstructorNormalformBuilder cnb; 
 
         RecoderModelTransformer[] transformer = new RecoderModelTransformer[] {
                 new EnumClassBuilder(servConf, cache),
                 new JMLTransformer(servConf, cache, parsingLibs),
                 new ImplicitFieldAdder(servConf, cache),
                 new InstanceAllocationMethodBuilder(servConf, cache),
-                cnb,
+                cnb = new ConstructorNormalformBuilder(servConf, cache),
                 new ClassPreparationMethodBuilder(servConf, cache),
                 new ClassInitializeMethodBuilder(servConf, cache), 
                 new PrepareObjectBuilder(servConf, cache), 

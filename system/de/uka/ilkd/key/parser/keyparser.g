@@ -1026,7 +1026,7 @@ options {
         } catch (de.uka.ilkd.key.java.PosConvertException e) {
             lineOffset=e.getLine()-1;
             colOffset=e.getColumn()+1;
-            throw new JavaParserException(e.getMessage(), t, 
+            throw new JavaParserException(e, t, 
                 getFilename(), lineOffset, colOffset);
         } catch (de.uka.ilkd.key.java.ConvertException e) { 
             if (e.parseException()!=null

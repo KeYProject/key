@@ -236,6 +236,5 @@ $JAVA $JAVA_OPTIONS $keysysprops $hpfix \
 -Dkey.pattern.path=$HOME/.key/keypatterns/ \
 -Dkey.simplify.logdir=$KEY_SIMPLIFY_LOG_DIR \
 -Dkey.ics.logdir=$KEY_ICS_LOG_DIR \
--Djava5=false \
 -Dsun.awt.exception.handler=de.uka.ilkd.key.gui.ExceptionalHandler \
 -classpath $keyclasspath:$togetherclasspath:$JDK_RT_JAR de.uka.ilkd.key.gui.Main $keyarg

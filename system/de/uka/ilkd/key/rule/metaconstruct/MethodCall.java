@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -333,9 +334,12 @@ public class MethodCall extends ProgramMetaConstruct {
 	    	= new LocationVariable(newName,
 	    			      originalParamVar.getKeYJavaType());
 
+	    // this condition checks whether this is the last formal parameter and is used
+	    // in the context of a method with a variable number of args.
+	    // see makeVariableArgument below
 	    if(i == params-1 && methDecl.isVarArgMethod() &&
 	            (   methRef.getArguments().size() != params 
-	             || notCompatible(methRef.getArgumentAt(i), originalSpec.getType()))) {
+	             || !assignmentCompatible(methRef.getArgumentAt(i), originalSpec.getType()))) {
 	        // variable argument
 	        varSpecs[i] = new VariableSpecification(paramVar, 1, makeVariableArgument(originalSpec), originalSpec.getType());
 	    } else {
@@ -351,7 +355,40 @@ public class MethodCall extends ProgramMetaConstruct {
 	return varSpecs;
     }
 
-    
+    /**
+     * make an array out of a list of arguments to a method with variable
+     * arguments.
+     * 
+     * <pre>
+     * Quote JLS 15.12.4.2 Evaluate Arguments The process of evaluating of the
+     * argument list differs, depending on whether the method being invoked is a
+     * fixed arity method or a variable arity method (§8.4.1).
+     * 
+     * If the method being invoked is a variable arity method (§8.4.1) m, it
+     * necessarily has n>0 formal parameters. The final formal parameter of m
+     * necessarily has type T[] for some T, and m is necessarily being invoked
+     * with k0 actual argument expressions.
+     * 
+     * If m is being invoked with kn actual argument expressions, or, if m is
+     * being invoked with k=n actual argument expressions and the type of the
+     * kth argument expression is not assignment compatible with T[], then the
+     * argument list (e1, ... , en-1, en, ...ek) is evaluated as if it were
+     * written as (e1, ..., en-1, new T[]{en, ..., ek}).
+     * </pre>
+     * 
+     * Thus, when the last formal parameter is reached and circumstances enforce
+     * wrapping arguments in an array, this method creates the expected.
+     * 
+     * @author MU
+     * @since 2008-Mar
+     * 
+     * see examples/java_dl/java5/vararg.key for examples and tests.
+     * 
+     * @param originalSpec
+     *                the original sepcification of the formal paramater
+     * @return an Newarray expression conglomerating all remaining arguments may
+     *         be zero.
+     */
     private Expression makeVariableArgument(VariableSpecification originalSpec) {
         
         int params = pm.getMethodDeclaration().getParameterDeclarationCount();
@@ -363,12 +400,17 @@ public class MethodCall extends ProgramMetaConstruct {
         }
         
         Type type = originalSpec.getType();
-        KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(type);
-        TypeRef tyref = new TypeRef(kjt);
+        
+        // for some reason this does not work, but type itself is a KJT ???
+        // KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(type);
+        KeYJavaType kjt = (KeYJavaType)type;
+        ArrayType arrayTy = (ArrayType) kjt.getJavaType();
+        
+        TypeReference baseTyRef = arrayTy.getBaseType();
         
         ArrayInitializer arrayInit = new ArrayInitializer(exps);
         Expression[] emptyArgs = new Expression[0];
-        NewArray newArray = new NewArray(emptyArgs, tyref, kjt, arrayInit, 1);
+        NewArray newArray = new NewArray(emptyArgs, baseTyRef, kjt, arrayInit, 1);
         
         return newArray;
     }
@@ -395,7 +437,13 @@ public class MethodCall extends ProgramMetaConstruct {
     }
     
     /**
-     * check whether an expression is assignment-compatible with a type.
+     * check whether an expression is assignment-compatible with the array over a type.
+     * 
+     * Quoting JLS: 15.12.4.2 Evaluate Arguments
+     * 
+     * "if m is being invoked with k=n actual argument expressions and the type of the
+     * kth argument expression is not assignment compatible with T[], then the argument
+     * list"
      * 
      * In the absence of autoboxing this is the case if the type is a subtype.
      * 
@@ -403,10 +451,10 @@ public class MethodCall extends ProgramMetaConstruct {
      * @param type type to check for
      * @return true iff exp is assign compatible with type 
      */
-    private boolean notCompatible(Expression exp, Type type) {
-        KeYJavaType expKJT = exp.getKeYJavaType(services, execContext);
-        KeYJavaType typeKJT = services.getJavaInfo().getKeYJavaType(type); 
-        return services.getJavaInfo().isSubtype(expKJT, typeKJT);
+    private boolean assignmentCompatible(Expression exp, Type type) {
+        Sort expSort = exp.getKeYJavaType(services, execContext).getSort();
+        Sort typeSort = ((KeYJavaType) type).getSort(); // was: services.getJavaInfo().getKeYJavaType(type);
+        return expSort.extendsTrans(typeSort);
     }
 
 	
