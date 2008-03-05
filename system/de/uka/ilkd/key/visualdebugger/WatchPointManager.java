@@ -117,30 +117,16 @@ public class WatchPointManager {
 
                         if (wp.getLocalVariables() != null) {
                             // TODO Locals
-<<<<<<< HEAD:system/de/uka/ilkd/key/visualdebugger/WatchPointManager.java
                             List<LocalVariableDescriptor> locVars = wp.getLocalVariables();
+                            
                             for (LocalVariableDescriptor localVariableDescriptor : locVars) {
-                            System.out.println("type: " +localVariableDescriptor.getType());
-                            System.out.println("name: " +localVariableDescriptor.getName());
-                               ProgramVariable locVar = new LocationVariable(
+                            
+                                System.out.println("type: " +localVariableDescriptor.getType());
+                                System.out.println("name: " +localVariableDescriptor.getName());
+                                ProgramVariable locVar = new LocationVariable(
                                        new ProgramElementName(localVariableDescriptor.getName()),
                                        ji.getKeYJavaType(localVariableDescriptor.getType()));
-                               progVarNS.add(locVar);
-=======
-                            List<String[]> locVars = wp.getLocalVariables();
-                            for (int j = 0; j < locVars.size(); j++) {
-
-                                String[] locVarInf = locVars.get(j);
-
-                                // String name = locVarInf[0];
-                                // String type = locVarInf[1];
-                                System.out.println("%%%%% "+locVarInf[0]);
-                                
-                                ProgramVariable locVar = new LocationVariable(
-                                        new ProgramElementName(locVarInf[1]),
-                                        ji.getKeYJavaType(locVarInf[0]));
                                 progVarNS.add(locVar);
->>>>>>> 4625f67447e75402599af65deb9de642e439bbb5:system/de/uka/ilkd/key/visualdebugger/WatchPointManager.java
                             }
                         }
 
