@@ -105,16 +105,13 @@ public class WatchpointUtil {
                     ProgramPrefix programPrefix = (ProgramPrefix) term
                             .javaBlock().program();
 
+                    programPrefix = programPrefix.
+                      getPrefixElementAt(programPrefix.getPrefixLength()-1);
+                    
                     System.out.println("PrefixLength() : "+programPrefix.getPrefixLength());
-//                    SourceElement firstStatement = PosInProgram.getProgramAt(
-//                            programPrefix.
-//                            getPrefixElementAt(programPrefix.getPrefixLength()-1).
-//                            getFirstActiveChildPos(),
-//                            programPrefix).getFirstElement();
-                    SourceElement firstStatement = getFirstActiveStatement(programPrefix);
-                    while(firstStatement instanceof ProgramPrefix){
-                        firstStatement = getFirstActiveStatement((ProgramPrefix) firstStatement);
-                    }
+                    SourceElement firstStatement = PosInProgram.getProgramAt(
+                            programPrefix.getFirstActiveChildPos(),
+                            programPrefix).getFirstElement();
                     
                     System.out.println("firstStatement (after) "
                             + firstStatement.toString() + " class "
