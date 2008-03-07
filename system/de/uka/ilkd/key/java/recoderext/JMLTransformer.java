@@ -530,10 +530,12 @@ public class JMLTransformer extends RecoderModelTransformer {
                                         
                     //iterate over all pre-existing methods
                     for(int k = 0, o = methodList.size(); k < o; k++) {
-                        MethodDeclaration md 
-                            = (MethodDeclaration) 
-                               methodList.get(k);
-                        transformMethodlevelComments(md, unit.getName());
+                        if(methodList.get(k) instanceof MethodDeclaration) { // might be ImplicitEnumMethod
+                            MethodDeclaration md 
+                                = (MethodDeclaration) 
+                                   methodList.get(k);
+                            transformMethodlevelComments(md, unit.getName());
+                        }
                     }               
                     
                     td.makeAllParentRolesValid();

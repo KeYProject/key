@@ -18,8 +18,6 @@
 <j2se version="1.6+" initial-heap-size="128m" max-heap-size="1024m"/> 
 <j2se version="1.5+" initial-heap-size="128m" max-heap-size="1024m"/> 
 
-<property name="java5" value="false"/>
-
 <jar href="key.jar"/> 
 <jar href="lib/antlr.jar" /> 
 <jar href="lib/recoderKey.jar" /> 

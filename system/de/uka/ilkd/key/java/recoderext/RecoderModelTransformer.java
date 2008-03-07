@@ -264,6 +264,13 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
             }
             return localClass2FinalVar;
         }
+
+        /**
+         * if the class declaration set changes, the cash must be invalidated
+         */
+        public void invalidateClasses() {
+            classDeclarations = null;
+        }
     }
     
     protected class FinalOuterVarsCollector extends SourceVisitor{

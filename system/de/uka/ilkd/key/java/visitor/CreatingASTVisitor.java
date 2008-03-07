@@ -1086,7 +1086,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
         ProgramElement createNewElement(ExtList changeList) {
             return new ParameterDeclaration(changeList, x
-                    .parentIsInterfaceDeclaration());
+                    .parentIsInterfaceDeclaration(), x.isVarArg());
         }
     }
 

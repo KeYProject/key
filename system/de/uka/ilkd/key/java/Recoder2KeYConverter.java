@@ -846,7 +846,8 @@ public class Recoder2KeYConverter {
             recoder.java.declaration.ParameterDeclaration pd) {
         return new ParameterDeclaration(
                 collectChildren(pd),
-                pd.getASTParent() instanceof recoder.java.declaration.InterfaceDeclaration);
+                pd.getASTParent() instanceof recoder.java.declaration.InterfaceDeclaration,
+                pd.isVarArg());
     }
 
     /**
@@ -1135,8 +1136,7 @@ public class Recoder2KeYConverter {
      */
     public TypeReference convert(recoder.java.reference.TypeReference tr) {
 
-        recoder.abstraction.Type rType = getServiceConfiguration()
-        .getSourceInfo().getType(tr);
+        recoder.abstraction.Type rType = getServiceConfiguration().getSourceInfo().getType(tr);
 
         if (rType == null)
             return null; // because of 'void'

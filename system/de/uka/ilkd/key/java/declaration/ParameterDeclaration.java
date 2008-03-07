@@ -27,6 +27,13 @@ public class ParameterDeclaration extends VariableDeclaration {
      *   Var spec.
      */
     protected final ArrayOfVariableSpecification varSpec;
+    
+    /**
+     * flag to store whether this parameter is a the last arg in a method
+     * declaration with variable number of arguments. false if not otherwise
+     * set in the appropriate constructor.
+     */
+    private boolean varArgParameter = false;
 
     /**
  *      Parameter declaration.
@@ -53,6 +60,27 @@ public class ParameterDeclaration extends VariableDeclaration {
        super(mods,typeRef,parentIsInterfaceDeclaration);
        this.varSpec = new ArrayOfVariableSpecification(var);
     }
+    
+    /**
+     * Parameter declaration.
+     * @param mods a modifier array.
+     * @param typeRef a type reference.
+     * @param var the VariableSpecification belonging to this parameter declaration.
+     * @param parentIsInterfaceDeclaration a boolean set true iff
+     * the parent is an InterfaceDeclaration
+     * @param parameterIsVariable true iff this the last parameter of a method with variable number
+     * of arguments
+     */
+    public ParameterDeclaration(Modifier[] mods,
+                                TypeReference typeRef,
+                                VariableSpecification var,
+                                boolean parentIsInterfaceDeclaration,
+                                boolean parameterIsVarArg)
+    {   
+        this(mods, typeRef, var, parentIsInterfaceDeclaration);
+        this.varArgParameter = parameterIsVarArg;
+    }
+
 
     /**
      * Parameter declaration.
@@ -63,14 +91,18 @@ public class ParameterDeclaration extends VariableDeclaration {
      * 	a Comment
      * @param parentIsInterfaceDeclaration a boolean set true iff
      * the parent is an InterfaceDeclaration 
+     * @param parameterIsVariable true iff this the last parameter of a method with variable number
+     * of arguments
      */
 
     public ParameterDeclaration(ExtList children, 
-				boolean parentIsInterfaceDeclaration) {
+				boolean parentIsInterfaceDeclaration,
+				boolean parameterIsVarArg) {
         super(children,parentIsInterfaceDeclaration);
 	this.varSpec = new ArrayOfVariableSpecification(new
 	    VariableSpecification[]{(VariableSpecification)
-	        children.get(VariableSpecification.class)});        
+	        children.get(VariableSpecification.class)});      
+	this.varArgParameter = parameterIsVarArg;
     }
 
 
@@ -170,6 +202,15 @@ public class ParameterDeclaration extends VariableDeclaration {
      */
     public void visit(Visitor v) {
 	v.performActionOnParameterDeclaration(this);
+    }
+    
+    /**
+     * returns true iff this parameter is the last in a method with 
+     * a variable number of arguments.
+     * @return
+     */
+    public boolean isVarArg() {
+        return varArgParameter;
     }
 
 

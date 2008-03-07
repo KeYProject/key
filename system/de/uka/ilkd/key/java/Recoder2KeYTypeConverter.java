@@ -18,6 +18,7 @@ import recoder.ServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Constructor;
 import recoder.abstraction.DefaultConstructor;
+import recoder.abstraction.ParameterizedType;
 import recoder.abstraction.Type;
 import recoder.bytecode.ClassFile;
 import de.uka.ilkd.key.java.abstraction.*;
@@ -160,6 +161,9 @@ public class Recoder2KeYTypeConverter {
 		} else if (t instanceof recoder.abstraction.NullType) {
 			s = Sort.NULL;
 			addKeYJavaType(t, s);
+		} else if (t instanceof ParameterizedType) {
+		        ParameterizedType pt = (ParameterizedType) t;
+		        return getKeYJavaType(pt.getGenericType());
 		} else if (t instanceof ClassType) {
 			recoder.abstraction.ClassType ct = (recoder.abstraction.ClassType) t;
 			if (ct.isInterface()) {

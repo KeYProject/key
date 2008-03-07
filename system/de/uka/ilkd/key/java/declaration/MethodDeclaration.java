@@ -391,6 +391,16 @@ public class MethodDeclaration
     public boolean isModel() {
         return super.isModel();
     }
+    
+    /**
+     * test whether the declaration is a method with a variable number of arguments (i.e. the ellipsis ...)
+     * @return true iff so
+     */
+    public boolean isVarArgMethod() {
+        if (parameters == null || parameters.size() == 0)
+            return false;
+        return parameters.getParameterDeclaration(parameters.size() - 1).isVarArg();
+    }
 
     /**
      * Test whether the declaration is strictfp.
