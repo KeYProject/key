@@ -1,8 +1,6 @@
 package visualdebugger.draw2d;
 
 import org.eclipse.draw2d.*;
-import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.swt.graphics.Color;
 
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
@@ -11,8 +9,6 @@ import de.uka.ilkd.key.visualdebugger.executiontree.ETMethodReturnNode;
 public class MethodReturnFigure extends Figure implements DrawableNode {
 
     private boolean selected;
-    private boolean isCollapsed;
-    private boolean isWatchpoint;
 
     static final Color gradient1 = new Color(null, 132, 132, 240);
     static final Color gradient2 = new Color(null, 76, 84, 216);
@@ -38,8 +34,6 @@ public class MethodReturnFigure extends Figure implements DrawableNode {
 
     public MethodReturnFigure(ETMethodReturnNode etNode) {
         super();
-        this.isCollapsed = etNode.isCollapsed();
-        this.isWatchpoint = etNode.isWatchpoint();
         setBorder(BORDER);
         setLayoutManager(new StackLayout());
 
@@ -62,6 +56,13 @@ public class MethodReturnFigure extends Figure implements DrawableNode {
                         .getLastMethodInvocation().getMethod()
                         .getMethodDeclaration());
 
+        if (etNode.isWatchpoint()) {
+            setBorder(ACTIVEWATCHPOINTBORDER);
+        } else {
+            if (etNode.isCollapsed()) {
+                setBorder(COLLAPSEDMODEBORDER);
+            }
+        }
         this.setToolTip(new Label(toolTip));
     }
 
@@ -70,17 +71,7 @@ public class MethodReturnFigure extends Figure implements DrawableNode {
      */
     protected void paintFigure(Graphics g) {
         super.paintFigure(g);
-        if (isWatchpoint) {
-            g.setForegroundColor(blue);
-            g.setBackgroundColor(ColorConstants.titleGradient);
-            setBorder(ACTIVEWATCHPOINTBORDER);
-        } else {
-            if (isCollapsed) {
-                // TODO colors for collapsed nodes
-                g.setForegroundColor(ColorConstants.menuBackgroundSelected);
-                g.setBackgroundColor(ColorConstants.titleGradient);
-                setBorder(COLLAPSEDMODEBORDER);
-            } else {
+        
                 if (selected) {
                     g.setForegroundColor(ColorConstants.menuBackgroundSelected);
                     g.setBackgroundColor(ColorConstants.titleGradient);
@@ -91,9 +82,6 @@ public class MethodReturnFigure extends Figure implements DrawableNode {
 
                     g.setForegroundColor(ColorConstants.white);
                     g.setBackgroundColor(ColorConstants.white);
-
-                }
-            }
         }
         g.fillGradient(getBounds().getResized(-1, -1), true);
     }

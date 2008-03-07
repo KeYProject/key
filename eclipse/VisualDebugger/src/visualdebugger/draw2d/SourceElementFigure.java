@@ -1,7 +1,5 @@
 package visualdebugger.draw2d;
 
-import java.util.LinkedList;
-
 import org.eclipse.draw2d.*;
 import org.eclipse.draw2d.geometry.Insets;
 import org.eclipse.jdt.core.ICompilationUnit;

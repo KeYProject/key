@@ -155,6 +155,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
     /** The collapse filter. */
     private CollapseFilter collapseFilter;
     private BranchFilter branchFilter;
+    
+    private Filter activeFilter = new TreeFilter();
 
     /** The item expand. */
     private MenuItem itemExpand;
@@ -660,11 +662,12 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                 try {
                     currentETRootNode = null;
                     identifyWatchpoints(node);     
-                    refresh();  
-                    
-//                                vd.fireDebuggerEvent(new DebuggerEvent(
-//                                        DebuggerEvent.TREE_CHANGED, ExecutionTree
-//                                        .getITNode()));
+                    clearView();
+                    TreeBranch tb = buildTreeBranch(
+                            getCurrentETRootNode(), null,
+                            activeFilter);
+                    root.addBranch(tb);
+                    sketchStartUpConnection(tb);
                 }
                 catch (Throwable t){
                     System.out.println(t.toString());
@@ -685,7 +688,6 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
                 // clear the View
                 clearView();
-                branchFilter = null;
                 currentETRootNode = getSelectedNode();
 
                 // set the current node as root
@@ -708,21 +710,20 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
             public void widgetSelected(SelectionEvent event) {
 
                 // make sure that there is a root node
-                branchFilter = null;
-                currentETRootNode = getCurrentETRootNode();
                 // save the actual root
                 setCurrentETRootNode(currentETRootNode);
                 collapseFilter.addNodetoCollapse(getSelectedNode());
 
                 // clear the View
                 clearView();
-                TreeBranch tb = buildTreeBranch(currentETRootNode, null,
+                TreeBranch tb = buildTreeBranch(getCurrentETRootNode(), null,
                         collapseFilter);
 
                 // draw the new view of the tree
                 root.addBranch(tb);
                 // refresh();
                 sketchStartUpConnection(tb);
+                activeFilter=collapseFilter;
                 // handle menu status
                 itemAll.setEnabled(true);
                 itemExpand.setEnabled(true);
@@ -741,7 +742,6 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
             public void widgetSelected(SelectionEvent event) {
 
-                branchFilter = null;
                 // make sure that there is a root node
                 currentETRootNode = getCurrentETRootNode();
                 // save the actual root
@@ -786,7 +786,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
                     // add the isolated path
                     root.addBranch(tb);
-
+                    activeFilter = branchFilter;
                     sketchStartUpConnection(tb);
                     // handle menu status
                     itemAll.setEnabled(true);
