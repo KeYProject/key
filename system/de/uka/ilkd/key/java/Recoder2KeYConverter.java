@@ -22,6 +22,7 @@ import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
 import recoder.java.NonTerminalProgramElement;
 import recoder.list.generic.ASTList;
+import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.Ghost;
@@ -780,6 +781,13 @@ public class Recoder2KeYConverter {
                 keyArgs), methodName, invocationTarget);
 
         return new MethodBodyStatement(bodySource, resultVar, mr);
+    }
+    
+    public CatchAllStatement convert
+        (de.uka.ilkd.key.java.recoderext.CatchAllStatement cas) {
+        return new CatchAllStatement
+            ((StatementBlock)callConvert(cas.getStatementAt(0)),
+             (ParameterDeclaration) callConvert(cas.getParameterDeclarationAt(0)));
     }
 
     // ------------------- declaration ---------------------
