@@ -103,7 +103,7 @@ public class WatchPointManager {
 
                         // check namespace
                         while (services.getNamespaces().lookup(selfName) != null) {
-                            nameOfSelf.concat("Z");
+                            nameOfSelf = nameOfSelf.concat("Z");
                             selfName = new ProgramElementName(nameOfSelf);
                         }
 

@@ -362,7 +362,6 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
      * @return the figure
      */
     private Figure createNode(ETNode etNode) {
-
         final LinkedList<Term> activeWPs = etNode.getWatchpointsSatisfied();
         if (etNode instanceof ETStatementNode) {
             final SourceElementFigure node = new SourceElementFigure(
@@ -659,6 +658,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                 LinkedList<ETNode> node = new LinkedList<ETNode>();
                 node.add(etn);
                 try {
+                    currentETRootNode = null;
                     identifyWatchpoints(node);     
                     refresh();  
                     

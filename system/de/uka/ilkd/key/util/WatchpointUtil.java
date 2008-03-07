@@ -53,8 +53,10 @@ public class WatchpointUtil {
         for (Node node : leafNodesInETNode) {
 
             List<Term> temp = new LinkedList<Term>();
-            PosInOccurrence pos = findPos(node);
-
+            
+            PosInOccurrence pos = findPos(node.sequent().succedent());
+            if(pos == null)pos = findPos(node.sequent().antecedent()); 
+            
             if (pos != null) {
                 for (Term watchpoint : watches) {
 
@@ -78,24 +80,19 @@ public class WatchpointUtil {
         return !intersection.isEmpty();
     }
 
-    private static PosInOccurrence findPos(Node node) {
+    private static PosInOccurrence findPos(Semisequent seq) {
 
-        Sequent seq = node.sequent();
         IteratorOfConstrainedFormula iter = seq.iterator();
         ConstrainedFormula constrainedFormula;
         PosInOccurrence pos = null;
         Term term;
-        // debug statement - remove later on
-        int i = 0;
         // iterate over all constrained formulae
         while (iter.hasNext()) {
-            i++;
-            System.out.println("watchpointUtil - cfma nr.: " + i);
             constrainedFormula = iter.next();
             pos = new PosInOccurrence(constrainedFormula, PosInTerm.TOP_LEVEL,
                     false);
             term = constrainedFormula.formula();
-            // if we find a update
+
             if (term.op() instanceof QuanUpdateOperator) {
 
                 int targetPos = ((QuanUpdateOperator) term.op()).targetPos();
@@ -106,23 +103,17 @@ public class WatchpointUtil {
                             .javaBlock().program();
 
                     programPrefix = programPrefix.
-                      getPrefixElementAt(programPrefix.getPrefixLength()-1);
-                    
-                    System.out.println("PrefixLength() : "+programPrefix.getPrefixLength());
+                    getPrefixElementAt(programPrefix.getPrefixLength()-1);
+
                     SourceElement firstStatement = PosInProgram.getProgramAt(
-                            programPrefix.getFirstActiveChildPos(),
-                            programPrefix).getFirstElement();
-                    
-                    System.out.println("firstStatement (after) "
-                            + firstStatement.toString() + " class "
-                            + firstStatement.getClass());
+                             programPrefix.getFirstActiveChildPos(),
+                             programPrefix).getFirstElement();
 
                     if (firstStatement.toString().startsWith("Debug")) {
                         System.out.println("LEAVING findPos WITH result...");
                         return pos;
                     } else {
                         System.out.println("continue...");
-                        // return null;
                         continue;
                     }
                 }
