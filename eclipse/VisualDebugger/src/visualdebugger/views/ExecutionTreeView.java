@@ -1308,11 +1308,11 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                     LinkedList<ETNode> nodesToEvaluate;
                     Filter f = new TreeFilter();
                     currentETRootNode = getCurrentETRootNode();
-                    if (branchFilter != null) {
+                    if (activeFilter instanceof BranchFilter) {
                         f = branchFilter;
                         nodesToEvaluate = branchFilter.getPath().getPath();
                     } else {
-                        if (collapseFilter != null) {
+                        if (activeFilter instanceof CollapseFilter) {
                             f = collapseFilter;
                             nodesToEvaluate = getETasList(currentETRootNode);
                             for (ETNode node : nodesToEvaluate) {
@@ -1334,8 +1334,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                 } catch (OutOfMemoryError oome) {
                     System.out.println("OUT OF MEMORY ERROR!!!");
                 } catch (Throwable t) {
-                    System.out.println(t.toString());
-                    System.out.println("An Error occured!");
+                    System.out.println("An Error occured! \n\n" + t.toString());
+                    t.printStackTrace();
                 }
             }
 
@@ -1399,11 +1399,11 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
             } else
 
             if (ExecutionTree.treeStyle == ExecutionTree.SLET3) {
-            	
+            	activeFilter = new TreeFilter();
                 LinkedList<ETNode> allLeafETNodes = WatchpointUtil.getAllLeafETNodes(etn);
 				System.out.println("ETV identfy for : " + allLeafETNodes.size() + " ETNODE (LEAVES)");
 				identifyWatchpoints(allLeafETNodes);
-                treebranch = buildTreeBranch(etn, null, new TreeFilter());
+                treebranch = buildTreeBranch(etn, null, activeFilter);
                 this.root.addBranch(treebranch);
 
             } else if (ExecutionTree.treeStyle == ExecutionTree.RAWTREE) {

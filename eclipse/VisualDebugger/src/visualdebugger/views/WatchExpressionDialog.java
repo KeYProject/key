@@ -1,17 +1,8 @@
 package visualdebugger.views;
 
-import java.util.LinkedList;
-import java.util.Set;
-
 import org.eclipse.core.resources.IFile;
-import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.IProblemRequestor;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.WorkingCopyOwner;
-import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jdt.core.*;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -20,12 +11,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -182,8 +168,10 @@ public class WatchExpressionDialog {
         workingCopy.reconcile(ICompilationUnit.NO_AST, true, null, null);
         
         LocalVariableDetector lvd = new LocalVariableDetector(Util.parse(expression, null));
-        lvd.process(Util.parse(workingCopy, null));
-        
+       
+        CompilationUnit cu = Util.parse(workingCopy, null);
+        lvd.process(cu);
+        wv.setUnit(cu);
         // clean up in the end
         workingCopy.discardWorkingCopy();
         // check for compilation errors and report the last detected problem

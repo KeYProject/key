@@ -18,7 +18,10 @@ public class LocalVariableDetector extends ASTVisitor {
         Expression initializer = fragment.getInitializer();
         String e = initializer.toString();
         if(e.equals(expr.toString())){
-            localVariables.addAll(Util.getOperands(initializer));
+
+            Helper helper = new Helper();
+            initializer.accept(helper);
+
         }
         return false;
     }
@@ -36,5 +39,20 @@ public class LocalVariableDetector extends ASTVisitor {
      */
     public void process(CompilationUnit unit) {
         unit.accept(this);
+    }
+    
+    class Helper extends ASTVisitor{
+        
+        public boolean visit(SimpleName sn) {
+            IBinding binding =sn.resolveBinding();
+            if (binding instanceof IVariableBinding) {
+                IVariableBinding vb = (IVariableBinding) binding;
+                if (!vb.isField()) {
+                    localVariables.add(sn);
+                }
+            }
+            return false;
+        }
+        
     }
 }
