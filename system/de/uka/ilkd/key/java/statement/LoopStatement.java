@@ -114,7 +114,7 @@ public abstract class LoopStatement extends JavaStatement
 
     public LoopStatement(Expression guard, Statement body, 
                          PositionInfo pos) {
-	super(add(new ExtList(),pos));
+	super(pos);
         this.body    = body;
 	this.updates = null;
 	this.inits   = null;

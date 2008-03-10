@@ -171,16 +171,15 @@ public abstract class EnsuresPO extends AbstractPO {
         Term result = TB.func(javaInfo.getInReachableState());
         
         //assumed invariants
-        IteratorOfClassInvariant it = assumedInvs.iterator();
+        final IteratorOfClassInvariant it = assumedInvs.iterator();
         while(it.hasNext()) {
             result = TB.and(result, translateInv(it.next()));
         }
         
         //implicit invariants as taclets
-        Set allKJTs = javaInfo.getAllKeYJavaTypes();
-        Iterator it2 = allKJTs.iterator();
+        final Iterator<KeYJavaType> it2 = javaInfo.getAllKeYJavaTypes().iterator();
         while(it2.hasNext()) {
-            KeYJavaType kjt = (KeYJavaType) it2.next();
+            KeYJavaType kjt = it2.next();
             if(kjt.getJavaType() instanceof ClassType) {
                 buildInvariantTacletsForClass(kjt);
             }

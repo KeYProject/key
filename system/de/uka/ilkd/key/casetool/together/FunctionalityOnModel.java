@@ -742,9 +742,9 @@ public class FunctionalityOnModel {
         
         //let the user select the guard classes
 	SetOfKeYJavaType allKJTs = SetAsListOfKeYJavaType.EMPTY_SET;
-	Iterator it = javaInfo.getAllKeYJavaTypes().iterator();
+	final Iterator<KeYJavaType> it = javaInfo.getAllKeYJavaTypes().iterator();
 	while(it.hasNext()) {
-	    allKJTs = allKJTs.add((KeYJavaType)it.next());
+	    allKJTs = allKJTs.add(it.next());
 	}
         ClassSelectionDialog dlg2
                 = new ClassSelectionDialog("Please select the guard",

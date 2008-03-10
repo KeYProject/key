@@ -57,7 +57,7 @@ public class ArrayInitializer
     
     /**
      * create a new array initializer with the given expressions as elements.
-     * @param list of all contained elements
+     * @param expressions a list of all contained elements
      */
     public ArrayInitializer(Expression[] expressions) {
         super();

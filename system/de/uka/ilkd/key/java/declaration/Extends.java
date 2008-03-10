@@ -24,12 +24,6 @@ public class Extends extends InheritanceSpecification {
 
     /**
      *      Extends.
-     */
-
-    private Extends() {}
-
-    /**
-     *      Extends.
      *      @param supertype a type reference.
      */
     public Extends(TypeReference supertype) {

@@ -35,7 +35,7 @@ public class KeYProgModelInfo{
     private KeYCrossReferenceServiceConfiguration sc = null;
     private KeYRecoderMapping mapping;
     private TypeConverter typeConverter;
-    private HashMap implicits = new HashMap();
+    private HashMap<KeYJavaType, HashMap<String, ProgramMethod>> implicits = new HashMap<KeYJavaType, HashMap<String, ProgramMethod>>();
     private KeYExceptionHandler exceptionHandler = null;
     
     public KeYProgModelInfo(TypeConverter typeConverter, 
@@ -80,15 +80,17 @@ public class KeYProgModelInfo{
      * Returns all ObjectSorts mapped to java.Types in KeY.
      * @return a Collection containing the ObjectSorts.
      */
-    public Collection allObjectSorts(){
-	Set result=new HashSet();
+    public Collection<ObjectSort> allObjectSorts(){
+	Set<ObjectSort> result=new HashSet<ObjectSort>();
 	Iterator it=allElements().iterator();
 	while (it.hasNext()) {
 	    Object o=it.next();
-	    if (o instanceof KeYJavaType &&
-		(((KeYJavaType)o).getSort() instanceof ObjectSort)) {
-	        result.add(((KeYJavaType)o).getSort());
-            }
+	    if (o instanceof KeYJavaType) {	        	   
+		KeYJavaType oKJT = (KeYJavaType)o;
+		if (oKJT.getSort() instanceof ObjectSort) {
+		    result.add((ObjectSort)oKJT.getSort());
+		}
+	    }
 	}
         return result;
     }
@@ -482,7 +484,7 @@ public class KeYProgModelInfo{
      * retrieves implicit methods
      */
     private ProgramMethod getImplicitMethod(KeYJavaType ct, String name) {
-	HashMap m=(HashMap)implicits.get(ct);
+	HashMap m=implicits.get(ct);
 	if (m!=null) {
 	    ProgramMethod pm = (ProgramMethod)m.get(name);
 	    if (pm!=null) {
@@ -887,9 +889,9 @@ public class KeYProgModelInfo{
     }
 
     public void putImplicitMethod(ProgramMethod m, KeYJavaType t) {
-	HashMap map = (HashMap)implicits.get(t);
+	HashMap<String, ProgramMethod> map = implicits.get(t);
 	if (map==null) {
-	    map = new HashMap();
+	    map = new HashMap<String, ProgramMethod>();
 	    implicits.put(t, map);
 	}
 	map.put(m.name().toString(), m);

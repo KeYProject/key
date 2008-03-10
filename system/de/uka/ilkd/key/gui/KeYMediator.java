@@ -434,11 +434,10 @@ public class KeYMediator {
 		applyInteractive(firstApp, goal);
 	    }
 	} else if (applics.size() > 1) {
-            java.util.List appList = new java.util.LinkedList();
-            TacletApp rapp = null;
+            java.util.List<TacletApp> appList = new java.util.LinkedList<TacletApp>();
             
 	    for (int i = 0; i < applics.size(); i++) {
-		rapp = it.next();
+	        TacletApp rapp = it.next();
                 appList.add(rapp);
             }
             
@@ -863,7 +862,7 @@ public class KeYMediator {
 		throw new InternalError("only messages of type " + Component.class + " supported, yet");
 	    // JFrame dlg = new JDialog(mainFrame(),title, modal);
 	    JFrame dlg = new JFrame(title);
-	    dlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+	    dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	    dlg.getContentPane().add((Component)message);
 	    dlg.pack();
 	    setCenter(dlg, mainFrame());

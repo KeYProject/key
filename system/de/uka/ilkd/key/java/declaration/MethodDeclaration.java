@@ -11,8 +11,6 @@
 
 package de.uka.ilkd.key.java.declaration;
 
-import java.util.LinkedList;
-
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.Method;
 import de.uka.ilkd.key.java.reference.TypeReference;

@@ -682,10 +682,10 @@ public class TestGenerator{
      * each field.
      */
     public void exportCodeUnderTest(){
-	Set kjts = ji.getAllKeYJavaTypes();
-	Iterator it = kjts.iterator();
+	final Set<KeYJavaType> kjts = ji.getAllKeYJavaTypes();
+	final Iterator<KeYJavaType> it = kjts.iterator();
 	while(it.hasNext()){
-	    KeYJavaType kjt = (KeYJavaType) it.next();
+	    final KeYJavaType kjt = it.next();
 	    if((kjt.getJavaType() instanceof ClassDeclaration ||
 		kjt.getJavaType() instanceof InterfaceDeclaration) &&
 	       ((TypeDeclaration) kjt.getJavaType()).getPositionInfo().

@@ -12,6 +12,7 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Set;
 
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -67,12 +68,10 @@ public class SLEnvInput extends AbstractEnvInput {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private Object[] sortKJTs(Object[] kjts) {
-        Arrays.sort(kjts, new Comparator() {
-            public int compare(Object o1, Object o2) {
-                KeYJavaType kjt1 = (KeYJavaType)o1;
-                KeYJavaType kjt2 = (KeYJavaType)o2;
-                return kjt1.getFullName().compareTo(kjt2.getFullName());
+    private KeYJavaType[] sortKJTs(KeYJavaType[] kjts) {
+        Arrays.sort(kjts, new Comparator<KeYJavaType> () {
+            public int compare(KeYJavaType o1, KeYJavaType o2) {
+                return o1.getFullName().compareTo(o2.getFullName());
             }
         });
         
@@ -88,11 +87,13 @@ public class SLEnvInput extends AbstractEnvInput {
             = initConfig.getServices().getSpecificationRepository();
        
         //sort types alphabetically (necessary for deterministic names)
-        Object[] kjts = sortKJTs(javaInfo.getAllKeYJavaTypes().toArray());
+        final Set<KeYJavaType> allKeYJavaTypes = javaInfo.getAllKeYJavaTypes();
+        final KeYJavaType[] kjts = 
+            sortKJTs(allKeYJavaTypes.toArray(new KeYJavaType[allKeYJavaTypes.size()]));
         
         //create specifications for all types
         for(int i = 0; i < kjts.length; i++) {
-            KeYJavaType kjt = (KeYJavaType) kjts[i];
+            final KeYJavaType kjt = kjts[i];
             
             //class invariants
             specRepos.addClassInvariants(

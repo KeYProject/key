@@ -396,10 +396,10 @@ class ClassInvariantSelectionPanel extends JPanel {
     private void selectAll() {
         //select all
         selectedInvs = SetAsListOfClassInvariant.EMPTY_SET;
-	Set kjts = services.getJavaInfo().getAllKeYJavaTypes();
-	Iterator it = kjts.iterator();
-        while(it.hasNext()) {
-            KeYJavaType kjt = (KeYJavaType)(it.next());            
+	final Set<KeYJavaType> kjts = services.getJavaInfo().getAllKeYJavaTypes();
+	final Iterator<KeYJavaType> it = kjts.iterator();
+        while (it.hasNext()) {
+            final KeYJavaType kjt = it.next();            
             selectedInvs = selectedInvs.union(getRelevantInvs(kjt));
         }
         

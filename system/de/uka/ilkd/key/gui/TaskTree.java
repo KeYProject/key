@@ -15,6 +15,7 @@ import java.awt.Font;
 import java.awt.event.*;
 import java.io.File;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -126,16 +127,16 @@ public class TaskTree extends JPanel {
 
     /** returns all selected basic tasks */
     public BasicTask[] getAllSelectedBasicTasks() {
-	LinkedList result = new LinkedList();
 	TreePath[] paths 
 	    = delegateView.getSelectionModel().getSelectionPaths();
 	if (paths==null) return new BasicTask[0];
+        final List<BasicTask> result = new LinkedList<BasicTask>();
 	for (int i=0; i<paths.length; i++) {
 	    if (paths[i].getLastPathComponent() instanceof BasicTask) {
-		result.add(paths[i].getLastPathComponent());
+		result.add((BasicTask) paths[i].getLastPathComponent());
 	    }
 	}
-	return (BasicTask[]) result.toArray(new BasicTask[0]);
+	return result.toArray(new BasicTask[result.size()]);
     }
 
     /** called when the user has clicked on a problem */
