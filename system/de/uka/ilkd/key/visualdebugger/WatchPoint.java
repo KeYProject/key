@@ -27,6 +27,8 @@ public class WatchPoint {
     
     /** The enabled. */
     private boolean enabled = true;
+
+    private List<String> parameterTypes;
   
     /**
      * Gets the in type.
@@ -49,15 +51,16 @@ public class WatchPoint {
      * @param localVariables the local variables
      * @param name the name
      */
-    public WatchPoint(String name, String expression, String method,
-            int statement_line, String declaringType , List<LocalVariableDescriptor> localVariables) {
+    public WatchPoint(WatchpointDescriptor wpd) {
         super();
-        this.name = name;
-        this.expression = expression;
-        this.method = method;
-        this.statement_line = statement_line;
-        this.declaringType = declaringType;
-        this.localVariables = localVariables;
+        this.name = wpd.getVarName();
+        this.expression = wpd.getExpression();
+        this.method = wpd.getDeclaringMethod();
+        this.statement_line = wpd.getLine();
+        this.declaringType = wpd.getDeclaringType();
+        this.localVariables = wpd.getLocalVariables();
+        this.parameterTypes = wpd.getParameterTypes();
+        
     }
     
     /**
@@ -74,7 +77,7 @@ public class WatchPoint {
      * 
      * @return the file
      */
-    public String getTypeOfSource() {
+    public String getDeclaringType() {
         return declaringType;
     }
 
@@ -132,5 +135,13 @@ public class WatchPoint {
      */
     public List<LocalVariableDescriptor> getLocalVariables() {
         return localVariables;
+    }
+
+    public List<String> getParameterTypes() {
+        return parameterTypes;
+    }
+
+    public void setParameterTypes(List<String> parameterTypes) {
+        this.parameterTypes = parameterTypes;
     }
 }

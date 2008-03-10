@@ -1,13 +1,18 @@
 package de.uka.ilkd.key.visualdebugger;
 
+import java.util.List;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class WatchpointDescriptor.
  */
 public class WatchpointDescriptor {
-    
+
     /** The name. */
     private String name;
+
+    /** The watch expression. */
+    private String expression;
 
     /** The line. */
     private int line;
@@ -18,37 +23,59 @@ public class WatchpointDescriptor {
     /** The declaring method. */
     private String declaringType;
 
+    /** The declaring method. */
+    private String declaringMethod;
+
     /** The line. */
     private String varName;
 
     /** The column. */
     private String source;
-    
+
     /** The is local. */
-    private boolean isLocal= false;
+    private boolean isLocal = false;
+
+    /** The local variables. */
+    private List<LocalVariableDescriptor> localVariables;
+
+    private List<String> parameterTypes;
 
     /**
      * Instantiates a new watchpoint descriptor.
      * 
-     * @param name the name
-     * @param line the line
-     * @param column the column
-     * @param declaringType the declaring type
-     * @param varName the var name
-     * @param source the source
-     * @param isLocal the is local
+     * @param name
+     *                the name
+     * @param line
+     *                the line
+     * @param column
+     *                the column
+     * @param declaringType
+     *                the declaring type
+     * @param varName
+     *                the var name
+     * @param source
+     *                the source
+     * @param isLocal
+     *                the is local
      */
-    public WatchpointDescriptor(String name, int line, int column,
-            String declaringType, String varName, String source, boolean isLocal) {
+
+    public WatchpointDescriptor(String name, String expression, int line,
+            int column, String declaringType, String varName, String source,
+            boolean isLocal, List<LocalVariableDescriptor> localVariables,
+            List<String> parameterTypes) {
         super();
         this.name = name;
+        this.expression = expression;
         this.line = line;
         this.column = column;
         this.declaringType = declaringType;
         this.varName = varName;
         this.source = source;
+        this.localVariables = localVariables;
         this.isLocal = isLocal;
+        this.parameterTypes = parameterTypes;
     }
+
     public WatchpointDescriptor() {
 
     }
@@ -65,7 +92,8 @@ public class WatchpointDescriptor {
     /**
      * Sets the name.
      * 
-     * @param name the new name
+     * @param name
+     *                the new name
      */
     public void setName(String name) {
         this.name = name;
@@ -83,7 +111,8 @@ public class WatchpointDescriptor {
     /**
      * Sets the line.
      * 
-     * @param line the new line
+     * @param line
+     *                the new line
      */
     public void setLine(int line) {
         this.line = line;
@@ -101,7 +130,8 @@ public class WatchpointDescriptor {
     /**
      * Sets the column.
      * 
-     * @param column the new column
+     * @param column
+     *                the new column
      */
     public void setColumn(int column) {
         this.column = column;
@@ -119,7 +149,8 @@ public class WatchpointDescriptor {
     /**
      * Sets the declaring type.
      * 
-     * @param declaringType the new declaring type
+     * @param declaringType
+     *                the new declaring type
      */
     public void setDeclaringType(String declaringType) {
         this.declaringType = declaringType;
@@ -137,7 +168,8 @@ public class WatchpointDescriptor {
     /**
      * Sets the var name.
      * 
-     * @param varName the new var name
+     * @param varName
+     *                the new var name
      */
     public void setVarName(String varName) {
         this.varName = varName;
@@ -155,7 +187,8 @@ public class WatchpointDescriptor {
     /**
      * Sets the source.
      * 
-     * @param source the new source
+     * @param source
+     *                the new source
      */
     public void setSource(String source) {
         this.source = source;
@@ -173,10 +206,43 @@ public class WatchpointDescriptor {
     /**
      * Sets the local.
      * 
-     * @param isLocal the new local
+     * @param isLocal
+     *                the new local
      */
     public void setLocal(boolean isLocal) {
         this.isLocal = isLocal;
     }
 
+    public List<String> getParameterTypes() {
+        return parameterTypes;
+    }
+
+    public void setParameterTypes(List<String> parameterTypes) {
+        this.parameterTypes = parameterTypes;
+    }
+
+    public String getExpression() {
+        return expression;
+    }
+
+    public List<LocalVariableDescriptor> getLocalVariables() {
+        return localVariables;
+    }
+
+    public void setLocalVariables(
+            List<LocalVariableDescriptor> localVariables) {
+        this.localVariables = localVariables;
+    }
+
+    public String getDeclaringMethod() {
+        return declaringMethod;
+    }
+
+    public void setDeclaringMethod(String declaringMethod) {
+        this.declaringMethod = declaringMethod;
+    }
+
+    public void setExpression(String expression) {
+        this.expression = expression;
+    }
 }

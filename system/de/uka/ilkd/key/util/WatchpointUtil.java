@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.util;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -7,7 +8,9 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -96,37 +99,28 @@ public class WatchpointUtil {
                     false);
             term = constrainedFormula.formula();
             System.out.println("Operator-Class: "+term.op().getClass());
-            // handle most simple case <prg> phi
+            
+            // {U1}{U2}...{Un} <prg> phi
+            // proceed to update that is directly in front of the modality
+            while (term.op() instanceof QuanUpdateOperator) {
+                int targetPos = ((QuanUpdateOperator) term.op()).targetPos();
+                pos = pos.down(targetPos);
+                term = term.sub(targetPos);
+            }
+            
             if (term.op() instanceof Modality) {
+
                 SourceElement firstStatement = getFirstActiveStatement(term);
                 if (firstStatement.toString().startsWith("Debug")) {
                     System.out.println("LEAVING findPos WITH result...");
                     return pos;
-                }
-            }
-            // {U1}{U2}...{Un} <prg> phi
-            if (term.op() instanceof QuanUpdateOperator) {
-                // proceed to update that is directly in front of the modality
-                while (term.sub(0).op() instanceof QuanUpdateOperator) {
-                    term = term.sub(0);
-                }
-
-                int targetPos = ((QuanUpdateOperator) term.op()).targetPos();
-                pos = pos.down(targetPos);
-                term = term.sub(targetPos);
-                if (term.op() instanceof Modality) {
-
-                    SourceElement firstStatement = getFirstActiveStatement(term);
-                    if (firstStatement.toString().startsWith("Debug")) {
-                        System.out.println("LEAVING findPos WITH result...");
-                        return pos;
-                    } else {
-                        System.out.println("continue...");
-                        // continue;
-                    }
+                } else {
+                    System.out.println("continue...");
+                    continue;
                 }
             }
         }
+        
         System.out.println("LEAVING findPos WITHOUT result...");
         return null;
     }
@@ -149,7 +143,7 @@ public class WatchpointUtil {
                 .getFirstElement();
     }
 
-    private static HashSet<Node> getLeavesInETNode(Node currentNode,
+    private static HashSet<Node> findLeaves(Node currentNode,
             List<Node> proofnodes) {
 
         HashSet<Node> result = new HashSet<Node>(3);
@@ -158,7 +152,7 @@ public class WatchpointUtil {
             Node child = (Node) iter.next();
             if (proofnodes.contains(child)) {
                 proofnodes.remove(child);
-                result.addAll(getLeavesInETNode(child, proofnodes));
+                result.addAll(findLeaves(child, proofnodes));
             }
         }
         if (result.isEmpty()) {
@@ -180,6 +174,7 @@ public class WatchpointUtil {
         LinkedList<Update> updates = new LinkedList<Update>();
         UpdateFactory updateFactory = new UpdateFactory(proof.getServices(),
                 proof.simplifier());
+        trackRenaming(proof.getServices().getJavaInfo(), watchpoint);
         // collect all updates
         PIOPathIterator it = pos.iterator();
         while (it.hasNext()) {
@@ -230,8 +225,6 @@ public class WatchpointUtil {
                     }
                 });
             
-            
-            
             System.out.println("LEAVING evaluateWP...");
             return ps.getProof().closed();
         } catch (Throwable t) {
@@ -281,7 +274,7 @@ public class WatchpointUtil {
                 return WatchpointUtil.evalutateWatchpoint(
                         watchpoints.toArray()[0], seq, pos, proof, maxsteps);
             }
-
+            trackRenaming(proof.getServices().getJavaInfo(), null);
             LinkedList<Update> updates = new LinkedList<Update>();
 
             UpdateFactory updateFactory = new UpdateFactory(
@@ -322,8 +315,8 @@ public class WatchpointUtil {
             ConstrainedFormula newCF = new ConstrainedFormula(watchpoint);
             seq = seq.changeFormula(newCF, pos).sequent();
             // start side proof
-            ProofStarter ps = new ProofStarter();
-            ProofEnvironment proofEnvironment = proof.env();
+            final ProofStarter ps = new ProofStarter();
+            final ProofEnvironment proofEnvironment = proof.env();
             InitConfig initConfig = proofEnvironment.getInitConfig();
 
             WatchpointPO watchpointPO = new WatchpointPO("WatchpointPO", seq);
@@ -340,7 +333,20 @@ public class WatchpointUtil {
             ps.setStrategy(strategy);
             ps.setMaxSteps(maxsteps);
             ps.init(watchpointPO);
-            ps.run(proofEnvironment);
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    public void run() {
+                        ps.run(proofEnvironment);
+                    
+                    }
+                });
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
 
             return ps.getProof().closed();
         }
@@ -404,7 +410,7 @@ public class WatchpointUtil {
                 parentNode = parentNode.parent();
 
             }
-            candidates.addAll(getLeavesInETNode(currentNode, proofnodes));
+            candidates.addAll(findLeaves(currentNode, proofnodes));
         }
         System.out.println("candiates.size: " + candidates.size());
         return candidates;
@@ -457,5 +463,11 @@ public class WatchpointUtil {
             executionTree.addAll(getETasList(node));
         }
         return executionTree;
+    }
+    
+    private static void trackRenaming(JavaInfo javaInfo, Term watchpoint){
+        
+        
+       // MethodDeclaration md = javaInfo.getProgramMethod(classType, methodName, signature, context);
     }
 }
