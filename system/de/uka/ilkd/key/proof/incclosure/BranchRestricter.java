@@ -10,10 +10,11 @@
 
 package de.uka.ilkd.key.proof.incclosure;
 
+import java.util.Iterator;
+
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.ConstraintContainer;
 import de.uka.ilkd.key.logic.IntersectionConstraint;
-import de.uka.ilkd.key.proof.IteratorOfNode;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.util.Debug;
 
@@ -121,7 +122,7 @@ public class BranchRestricter extends Restricter {
 	pathConstraint = IntersectionConstraint.intersect
 	    ( getParent ().getResetConstraint (), p_c );
 
-	IteratorOfNode it   = nextNodesBelow ();
+	final Iterator<Node> it   = nextNodesBelow ();
 	Sink           sink;
 
 	while ( it.hasNext () ) {
@@ -142,7 +143,7 @@ public class BranchRestricter extends Restricter {
 							    p_c, cc );
 
 	if ( cc.val ().isSatisfiable () ) {
-	    IteratorOfNode it   = nextNodesBelow ();
+	    final Iterator<Node> it   = nextNodesBelow ();
 	    Sink           sink;
 
 	    while ( it.hasNext () ) {
@@ -166,7 +167,7 @@ public class BranchRestricter extends Restricter {
      * From "node" go downwards within the proof tree to the next node
      * with more than one child, return an iterator of the children
      */
-    private IteratorOfNode nextNodesBelow () {
+    private Iterator<Node> nextNodesBelow () {
 	Node n;
 
 	Debug.assertTrue ( node != null,

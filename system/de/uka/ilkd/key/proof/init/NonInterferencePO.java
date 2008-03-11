@@ -10,6 +10,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Vector;
 
@@ -151,7 +152,7 @@ public class NonInterferencePO implements ProofOblInput {
             v.add(n);
             }
         }
-        for(IteratorOfNode ni=n.childrenIterator();ni.hasNext();) {
+        for (Iterator<Node> ni=n.childrenIterator();ni.hasNext();) {
             getSymExecNodes (ni.next(), onlyUpdates, v);
         }
     }

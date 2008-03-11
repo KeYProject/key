@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.util.Iterator;
+
 
 /**
  * Helper class for managing a list of goals on which rules are applied.
@@ -254,7 +256,7 @@ public class DefaultGoalChooser implements IGoalChooser {
 	while ( node.childrenCount () == 1 )
 	    node = node.child ( 0 );
 
-	IteratorOfNode childrenIt = node.childrenIterator ();
+	Iterator<Node> childrenIt = node.childrenIterator ();
 
 	while ( childrenIt.hasNext () ) {
 	    final Node child = childrenIt.next ();

@@ -56,7 +56,7 @@ public class ShadowReplaceVisitor extends Visitor{
             tf.createVariableTerm(
                  services.getJavaInfo().getAttribute(transactionCounterName.getProgramName(),
 						transactionCounterName.getQualifier()));
-	Debug.assertTrue(transactionCounter != null);
+	assert transactionCounter != null;
 	subStack = new Stack(); // of Term
     }
 

@@ -70,5 +70,13 @@ public abstract class SequentFormulasGenerator implements TermGenerator {
         public Iterator(IteratorOfConstrainedFormula forIt) {
             this.forIt = forIt;
         }
+        
+        /** 
+         * throw an unsupported operation exception
+         */
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+        
     }
 }

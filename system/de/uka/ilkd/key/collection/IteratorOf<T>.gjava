@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.*;  //because the involved classes may be spread
 
 
 /** implemented by iterators of type <T> */
-public interface IteratorOf<T> {
+public interface IteratorOf<T> extends java.util.Iterator<<T>> {
 
     /** @return <T> the next element of collection */
     <T> next();

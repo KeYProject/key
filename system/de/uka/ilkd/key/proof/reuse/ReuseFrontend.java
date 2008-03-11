@@ -11,12 +11,12 @@
 package de.uka.ilkd.key.proof.reuse;
 
 import java.io.*;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.parser.diffparser.*;
-import de.uka.ilkd.key.proof.IteratorOfNode;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -79,8 +79,11 @@ public class ReuseFrontend {
             return;
          }
       }
-      IteratorOfNode ch = n.childrenIterator();
-      while (ch.hasNext()) recMark(ch.next(), hint);
+      
+      final Iterator<Node> ch = n.childrenIterator();
+      while (ch.hasNext()) { 
+          recMark(ch.next(), hint);
+      }
    }
    
    

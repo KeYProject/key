@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import de.uka.ilkd.key.collection.ListOfString;
@@ -234,9 +235,10 @@ public abstract class TacletApp implements RuleApp {
     protected static SVInstantiations resolveCollisionVarSV
 	(Taclet taclet, SVInstantiations insts) {
 
-	HashMapFromLogicVariableToSchemaVariable collMap =
-	    new HashMapFromLogicVariableToSchemaVariable();
-	IteratorOfEntryOfSchemaVariableAndInstantiationEntry it = 
+	HashMap<LogicVariable, SchemaVariable> collMap =
+	    new HashMap<LogicVariable, SchemaVariable>();
+	
+	final IteratorOfEntryOfSchemaVariableAndInstantiationEntry it = 
 	    insts.pairIterator();
 	while (it.hasNext()) {
 	    EntryOfSchemaVariableAndInstantiationEntry pair = it.next();
@@ -1650,7 +1652,7 @@ public abstract class TacletApp implements RuleApp {
 	    SchemaVariable sv=svIt.next();
 	    if (sv.isTermSV() || sv.isFormulaSV()) {
 		TacletPrefix prefix=taclet().getPrefix(sv);
-		HashSet names=new HashSet();	    
+		HashSet<Name> names=new HashSet<Name>();	    
 		if (prefix.context()) {
 		    IteratorOfQuantifiableVariable contextIt
 			= contextVars(sv).iterator();

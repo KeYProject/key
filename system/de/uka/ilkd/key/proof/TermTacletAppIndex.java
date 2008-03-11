@@ -15,7 +15,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IUpdateOperator;
 import de.uka.ilkd.key.logic.op.Metavariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.pp.ConstraintSequentPrintFilter;
 import de.uka.ilkd.key.rule.*;

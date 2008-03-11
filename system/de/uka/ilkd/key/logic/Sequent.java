@@ -428,6 +428,13 @@ public class Sequent {
 	    return succIt.next();
 	}
 
+	/** 
+         * throw an unsupported operation exception as sequents are immutable
+         */
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+	
     }
     
     

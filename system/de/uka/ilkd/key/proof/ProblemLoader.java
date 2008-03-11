@@ -44,7 +44,7 @@ public class ProblemLoader implements Runnable {
     KeYMediator mediator;
 
     Proof proof = null;
-    IteratorOfNode children = null;
+    Iterator<Node> children = null;
 
     Node currNode = null;
     KeYExceptionHandler exceptionHandler = null;
@@ -339,12 +339,12 @@ public class ProblemLoader implements Runnable {
             break;
         case 'u' : //UserLog
             if(proof.userLog==null)
-                proof.userLog = new Vector();
+                proof.userLog = new Vector<String>();
             proof.userLog.add(s);
             break;
         case 'v' : //Version log
             if(proof.keyVersionLog==null)
-                proof.keyVersionLog = new Vector();
+                proof.keyVersionLog = new Vector<String>();
             proof.keyVersionLog.add(s);
             break;
         case 's' : //ProofSettings
@@ -375,7 +375,7 @@ public class ProblemLoader implements Runnable {
         //System.out.println("end "+id);
         switch (id) {
         case 'b' :
-            children = (IteratorOfNode) stack.pop();
+            children = (Iterator<Node>) stack.pop();
             break;
         case 'a' :
             if (currNode != null) {

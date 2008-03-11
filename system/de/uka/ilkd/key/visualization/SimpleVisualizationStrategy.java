@@ -1555,7 +1555,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
         if (tacletWithLabel(ste.node(), LOOP_INVARIANT_PROPOSAL_RULESET)) {
             final TraceElement next = ste.getNextInProof();
             if (next != TraceElement.END) {
-		final IteratorOfNode it = ste.node().childrenIterator();
+		final Iterator<Node> it = ste.node().childrenIterator();
 		while (it.hasNext()) {
 		    final Node subTree = it.next();
 		    if (subTree.find(next.node())) {

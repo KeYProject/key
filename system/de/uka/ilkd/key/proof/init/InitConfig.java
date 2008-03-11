@@ -63,7 +63,8 @@ public class InitConfig {
      * GoalTemplates whose options are activated and those who don't belong
      * to any specific option.
      */
-    private HashMap taclet2Builder = new LinkedHashMap();
+    private HashMap<Taclet, TacletBuilder> taclet2Builder = 
+        new LinkedHashMap<Taclet, TacletBuilder>();
 
     /**
      * Set of the rule options activated for the current proof. The rule options
@@ -73,7 +74,7 @@ public class InitConfig {
     private SetOfChoice activatedChoices = SetAsListOfChoice.EMPTY_SET;
     
     /** HashMap for quick lookups taclet name->taclet */
-    private HashMapFromNameToNamed quickTacletMap;
+    private HashMap<Name, Named> quickTacletMap;
     
     private String originalKeYFileName;
     
@@ -173,7 +174,7 @@ public class InitConfig {
     }
     
     
-    public void setTaclet2Builder(HashMap taclet2Builder){
+    public void setTaclet2Builder(HashMap<Taclet, TacletBuilder> taclet2Builder){
         this.taclet2Builder = taclet2Builder;
     }
     
@@ -185,7 +186,7 @@ public class InitConfig {
      * creating all possible combinations in advance this is done by demand
      * @return the map from a taclet to its builder
      */
-    public HashMap getTaclet2Builder(){
+    public HashMap<Taclet, TacletBuilder> getTaclet2Builder(){
         return taclet2Builder;
     }
 
@@ -245,7 +246,7 @@ public class InitConfig {
     
     public Taclet lookupActiveTaclet(Name name) {
 	if (quickTacletMap == null) {
-            quickTacletMap = new HashMapFromNameToNamed();
+            quickTacletMap = new HashMap<Name, Named>();
             IteratorOfTaclet it = activatedTaclets().iterator();
             while (it.hasNext())  {
                 Taclet t = it.next();
@@ -271,7 +272,7 @@ public class InitConfig {
         TacletBuilder b;
         while(it.hasNext()){
             t = it.next();
-            b = (TacletBuilder) taclet2Builder.get(t);
+            b = taclet2Builder.get(t);
             if(t.getChoices().subset(activatedChoices)){
                 if(b!=null && b.getGoal2Choices()!=null){
                     t = b.getTacletWithoutInactiveGoalTemplates(
@@ -420,7 +421,7 @@ public class InitConfig {
         			       profile);
         ic.setActivatedChoices(activatedChoices);
         ic.category2DefaultChoice = ((HashMap) category2DefaultChoice.clone());
-        ic.setTaclet2Builder((HashMap) taclet2Builder.clone());
+        ic.setTaclet2Builder((HashMap<Taclet, TacletBuilder>) taclet2Builder.clone());
         ic.setTaclets(taclets);
         ic.originalKeYFileName = originalKeYFileName;
         return ic;

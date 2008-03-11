@@ -860,6 +860,10 @@ public abstract class VariableNamer implements InstantiationProposer {
 	public ProgramElementName next() {
 	    return (ProgramElementName)(it.next().name());
 	}
+	      
+        public void remove() {
+            it.remove();
+        }
     }
 
 
@@ -880,6 +884,10 @@ public abstract class VariableNamer implements InstantiationProposer {
 
 	public ProgramElementName next() {
 	    return it.next().getProgramElementName();
+	}
+	
+	public void remove() {
+	    it.remove();
 	}
     }
 

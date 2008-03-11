@@ -69,5 +69,9 @@ public class AllowedCutPositionsGenerator implements TermGenerator {
             
             return res;
         }
+
+        public void remove() {
+            throw new UnsupportedOperationException("Remove not supported");
+        }
     }
 }

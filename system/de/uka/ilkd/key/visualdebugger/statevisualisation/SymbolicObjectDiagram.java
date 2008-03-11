@@ -19,8 +19,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
 import de.uka.ilkd.key.unittest.ModelGenerator;
-import de.uka.ilkd.key.visualdebugger.HashMapFromPosInOccurrenceToLabel;
-import de.uka.ilkd.key.visualdebugger.IteratorOfPosInOccurrence;
+import de.uka.ilkd.key.visualdebugger.Label;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 import de.uka.ilkd.key.visualdebugger.executiontree.ITNode;
 
@@ -594,12 +593,10 @@ public class SymbolicObjectDiagram {
         return null;
     }
 
-    private ListOfTerm getPc(HashMapFromPosInOccurrenceToLabel labels) {
-        IteratorOfPosInOccurrence pioIt = labels.keyIterator();
+    private ListOfTerm getPc(HashMap<PosInOccurrence, Label> labels) {
         ListOfTerm pc2 = SLListOfTerm.EMPTY_LIST;
 
-        while (pioIt.hasNext()) {
-            PosInOccurrence pio = pioIt.next();
+        for (final PosInOccurrence pio : labels.keySet()) {
             // PCLabel pcLabel = ((PCLabel)labels.get(pio));
             if (!containsJavaBlock(pio.constrainedFormula().formula())) {
                 Term t = pio.constrainedFormula().formula();
@@ -837,7 +834,7 @@ public class SymbolicObjectDiagram {
         ref2ser = new HashMap();
         ITNode n = this.itNode;
         while (n.getParent() != null) {
-            HashMapFromPosInOccurrenceToLabel labels = n.getNode()
+            HashMap<PosInOccurrence, Label> labels = n.getNode()
                     .getNodeInfo().getVisualDebuggerState().getLabels();
             ListOfTerm pc2 = getPc(labels);
             SetOfTerm refs = getReferences(pc2);

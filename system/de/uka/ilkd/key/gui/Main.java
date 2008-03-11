@@ -1321,7 +1321,7 @@ public class Main extends JFrame implements IMain {
 
             private int computeInteractiveSteps(Node node) {
                 int steps = 0;
-                final IteratorOfNode it = node.childrenIterator();
+                final Iterator<Node> it = node.childrenIterator();
                 while (it.hasNext()) {
                   steps += computeInteractiveSteps(it.next());
                 }

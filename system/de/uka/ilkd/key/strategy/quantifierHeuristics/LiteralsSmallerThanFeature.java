@@ -197,6 +197,13 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
             findNextMonomial ();
             return res;
         }
+        
+        /** 
+         * throw an unsupported operation exception
+         */
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
     }
     
     private class LiteralCollector extends Collector {

@@ -19,7 +19,6 @@ import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -546,12 +545,10 @@ public class VisualDebugger {
     }
 
     public SourceElementId getProgramCounter(Node n) {
-        IteratorOfPosInOccurrence it = n.getNodeInfo().getVisualDebuggerState()
-                .getLabels().keyIterator();
         JavaBlock jb = null;
         SourceElement se = null;
-        while (it.hasNext()) {
-            PosInOccurrence pio = it.next();
+        for (final PosInOccurrence pio : n.getNodeInfo().getVisualDebuggerState()
+                .getLabels().keySet()) {
             jb = modalityTopLevel(pio); // TODO !!!!!!!!!!!!!!!!!!!!!!
             if (jb != null) {
                 se = getActStatement(jb.program());

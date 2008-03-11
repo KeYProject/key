@@ -897,9 +897,9 @@ public class LogicPrinter {
             formulaConstraint = null;
 
             EqualityConstraint eqc = (EqualityConstraint)p;
-            List vars = new ArrayList ();
+            List<Metavariable> vars = new ArrayList<Metavariable> ();
             {
-                IteratorOfMetavariable it =
+                Iterator<Metavariable>it =
                     eqc.restrictedMetavariables ();
 
                 while ( it.hasNext () )
@@ -909,11 +909,11 @@ public class LogicPrinter {
             startTerm ( vars.size () );
             layouter.print("[ ").beginI(0);
 
-            ListIterator it = vars.listIterator ();
+            ListIterator<Metavariable> it = vars.listIterator ();
             Metavariable mv;
             Term         inst;
             while ( it.hasNext () ) {
-                mv   = (Metavariable)it.next ();
+                mv   = it.next ();
                 inst = eqc.getDirectInstantiation ( mv );
                 if ( inst == null )
                     inst = TermFactory.DEFAULT.createFunctionTerm ( mv );
@@ -2265,7 +2265,7 @@ public class LogicPrinter {
 
         /** The stack of StackEntry representing the nodes above
          * the current subterm */
-        private Stack stack = new Stack();
+        private Stack<StackEntry> stack = new Stack<StackEntry>();
 
         /** If this is set, a ModalityPositionTable will
          * be built next.
@@ -2325,7 +2325,7 @@ public class LogicPrinter {
                 stack.push(new StackEntry(posTbl, pos));
                 pos=count();
             } else if ( o==MARK_END_SUB ) {
-                StackEntry se=(StackEntry)stack.peek();
+                StackEntry se=stack.peek();
                 stack.pop();
                 pos=se.pos();
                 se.posTbl().setEnd(count()-pos, posTbl);

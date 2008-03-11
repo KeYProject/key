@@ -160,7 +160,7 @@ public class TaskTree extends JPanel {
 	public void mouseClicked(MouseEvent e) {
 	    if (e.getClickCount() == 1 
 		&& e.getModifiers() != 
-                   (MouseEvent.CTRL_MASK+MouseEvent.BUTTON1_MASK)) {
+                   (InputEvent.CTRL_MASK+InputEvent.BUTTON1_MASK)) {
  		problemChosen();
  	    }
 	}

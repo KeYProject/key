@@ -266,25 +266,17 @@ GENERATED_SETS=logic/SetAsListOfTerm collection/SetAsListOfString \
 	strategy/SetAsListOfStrategyFactory \
 	logic/op/SetAsListOfLocation
 
-GENERATED_MAPS=logic/HashMapFromNameToNamed \
-	collection/MapAsListFromIntegerToString \
+GENERATED_MAPS=	collection/MapAsListFromIntegerToString \
 	logic/op/MapAsListFromQuantifiableVariableToInteger \
 	logic/op/MapAsListFromSchemaVariableToTerm \
 	logic/op/MapAsListFromSchemaVariableToInstantiationEntry \
 	logic/op/MapAsListFromLogicVariableToTerm \
 	logic/op/MapAsListFromSchemaVariableToTacletPrefix \
-	logic/HashMapFromStringToString \
-	java/abstraction/HashMapFromStringToListOfType \
-        rule/HashMapFromObjectToListOfNoPosTacletApp \
 	logic/sort/MapAsListFromGenericSortToSort \
 	logic/op/MapAsListFromNameToSortDependingSymbol \
 	logic/op/MapAsListFromSchemaVariableToSchemaVariable \
 	proof/MapAsListFromConstrainedFormulaToTermTacletAppIndex \
 	proof/proofevent/MapAsListFromNodeToNodeChangesHolder \
-        logic/HashMapFromNameToInteger \
-        logic/HashMapFromIntegerToName \
-        logic/op/HashMapFromLogicVariableToSchemaVariable \
-	visualdebugger/HashMapFromPosInOccurrenceToLabel \
 	logic/op/MapAsListFromQuantifiableVariableToTerm \
 	logic/op/MapAsListFromQuantifiableVariableToMetavariable 
 
@@ -315,8 +307,7 @@ GENERATED_ARRAYS=java/ArrayOfProgramElementExtnullInnull \
 GENERATED_HEAPS= logic/LeftistHeapOfInteger \
 	strategy/LeftistHeapOfRuleAppContainer
 
-GENERATED_VECTORS_STACKS= rule/VectorOfTaclet \
-	util/SimpleStackOfExtList 
+GENERATED_VECTORS_STACKS = util/SimpleStackOfExtList 
 
 GEN_FILES=$(GENERATED_MAPS) $(GENERATED_VECTORS_STACKS) $(GENERATED_ARRAYS) $(GENERATED_LISTS) $(GENERATED_SETS) \
 	$(GENERATED_ITERATORS) $(GENERATED_HEAPS)
