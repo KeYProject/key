@@ -23,7 +23,7 @@ package <Pck>;
 *    final variable called EMPTY_SET 
 */
 
-public interface SetOf<T> extends java.io.Serializable {
+public interface SetOf<T> extends Iterable<<T>>, java.io.Serializable {
 
     /** adds an element */
     SetOf<T> add(<T> element);

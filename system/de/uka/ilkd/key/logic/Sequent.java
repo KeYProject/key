@@ -26,7 +26,7 @@ import de.uka.ilkd.key.pp.SequentPrintFilter;
  * {@link Sequent#createSuccSequent} 
  * or by inserting formulas directly into {@link Sequent#EMPTY_SEQUENT}.
  */ 
-public class Sequent {
+public class Sequent implements Iterable<ConstrainedFormula> {
 
     public static final Sequent EMPTY_SEQUENT = new NILSequent();
 

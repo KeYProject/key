@@ -248,10 +248,9 @@ public abstract class Taclet implements Rule, Named {
         if (boundVariables == null) {        
             SetOfQuantifiableVariable result = 
                 SetAsListOfQuantifiableVariable.EMPTY_SET;
-            final IteratorOfTacletGoalTemplate it = goalTemplates().iterator();
-
-            while (it.hasNext()) {
-                result = result.union(it.next().getBoundVariables());
+                       
+            for (final TacletGoalTemplate tgt : goalTemplates()) {
+                result = result.union(tgt.getBoundVariables());
             }
 
             final BoundVarsVisitor bvv = new BoundVarsVisitor();
@@ -279,9 +278,8 @@ public abstract class Taclet implements Rule, Named {
      * @return true iff declared not free
      */
     private boolean varDeclaredNotFree(SchemaVariable var) {
-	final IteratorOfNotFreeIn it = varsNotFreeIn();
-	while (it.hasNext()) {
-	    if (it.next().first() == var) {
+	for (final NotFreeIn nfi : varsNotFreeIn) {
+	    if (nfi.first() == var) {
 		return true;
 	    }
 	}
@@ -305,9 +303,7 @@ public abstract class Taclet implements Rule, Named {
      * match-sort with
      */
     public NewVarcond varDeclaredNew(SchemaVariable var) {
-	final IteratorOfNewVarcond it = varsNew.iterator();
-	while (it.hasNext()) {
-	    final NewVarcond nv=it.next();
+	for (final NewVarcond nv : varsNew) {
 	    if (nv.getSchemaVariable()==var) {
 		return nv;
 	    }
@@ -423,9 +419,7 @@ public abstract class Taclet implements Rule, Named {
 	}
     
 	// check generic conditions
-	for (final IteratorOfVariableCondition it = 
-            variableConditions.iterator(); it.hasNext(); ) {
-	    final VariableCondition vc = it.next();
+	for (final VariableCondition vc : variableConditions) {
 	    matchCond = vc.check(var, instantiationCandidate, matchCond, services);	    
 	    if (matchCond == null) {	     
 		return null; // FAILED
@@ -1457,11 +1451,10 @@ public abstract class Taclet implements Rule, Named {
                                     PosInOccurrence posOfFind,
                                     Services services, 
                                     MatchConditions matchCond) {
-	final IteratorOfSchemaVariable it = pvs.iterator();
-        ListOfRenamingTable renamings= SLListOfRenamingTable.EMPTY_LIST;
-	while (it.hasNext()) {
+        ListOfRenamingTable renamings = SLListOfRenamingTable.EMPTY_LIST;
+	for (final SchemaVariable sv : pvs) {
 	    ProgramVariable inst
-		= (ProgramVariable)matchCond.getInstantiations ().getInstantiation(it.next());
+		= (ProgramVariable)matchCond.getInstantiations ().getInstantiation(sv);
 	    final VariableNamer vn = services.getVariableNamer();
 	    inst = vn.rename(inst, goal, posOfFind);
             final RenamingTable rt = 
@@ -1512,13 +1505,10 @@ public abstract class Taclet implements Rule, Named {
 	    p_numberOfNewGoals = 1;
 
 	if ( p_list != null ) {
-	    IteratorOfIfFormulaInstantiation it     = p_list.iterator ();
-	    IfFormulaInstantiation           inst;
 	    int                              i      = ifSequent ().antecedent ().size ();
 	    Term                             ifPart;
 
-	    while ( it.hasNext () ) {
-		inst = it.next ();
+	    for (final IfFormulaInstantiation inst : p_list) {
 		if ( !( inst instanceof IfFormulaInstSeq ) ) {
 		    // build the if obligation formula
 		    ifPart = inst.getConstrainedFormula ().formula ();
@@ -1578,10 +1568,9 @@ public abstract class Taclet implements Rule, Named {
      */
     protected void setRestrictedMetavariables ( Goal            p_goal,
 						MatchConditions p_matchCond ) {
-	IteratorOfMetavariable it =
-	    p_matchCond.getNewMetavariables ().iterator ();
-	while ( it.hasNext () )
-	    p_goal.addRestrictedMetavariable ( it.next () );
+	for (final Metavariable mv : p_matchCond.getNewMetavariables ()) {
+	    p_goal.addRestrictedMetavariable ( mv );
+	}
     }
 
     /**

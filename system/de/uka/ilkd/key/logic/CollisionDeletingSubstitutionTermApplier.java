@@ -38,12 +38,12 @@ public class CollisionDeletingSubstitutionTermApplier extends Visitor {
      * these subterms should build a new term instead of using the old one,
      * because one of its subterms has been built, too.
      */
-    private Stack subStack; //of Term (and Boolean)
+    private Stack<Object> subStack; //of Term (and Boolean)
     private TermFactory tf=TermFactory.DEFAULT;
     private Boolean newMarker = Boolean.TRUE;
 
     public CollisionDeletingSubstitutionTermApplier() {
-	subStack = new Stack(); // of Term	
+	subStack = new Stack<Object>(); // of Term	
     }
 
     private Term[] neededSubs(int n) {
@@ -121,7 +121,7 @@ public class CollisionDeletingSubstitutionTermApplier extends Visitor {
      */
     
     public void reset(){
-	subStack = new Stack(); // of Term
+	subStack = new Stack<Object>(); // of Term
     }
     
     /**

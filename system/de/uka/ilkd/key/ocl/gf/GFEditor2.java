@@ -2393,44 +2393,43 @@ public class GFEditor2 extends JFrame {
                 }
                 
                 public void actionPerformed(ActionEvent e) {
-                        if (saveFc.getChoosableFileFilters().length<2)
-                                saveFc.addChoosableFileFilter(new GrammarFilter()); 
-                        int returnVal = saveFc.showSaveDialog(GFEditor2.this);
-                        if (returnVal == JFileChooser.APPROVE_OPTION) {
-                                File file = saveFc.getSelectedFile();
-                                if (logger.isLoggable(Level.FINER)) logger.finer("saving as " + file);
-                                final String abstractLin = linearization.getLinearizations().get("Abstract").toString();
+                    if (saveFc.getChoosableFileFilters().length<2)
+                        saveFc.addChoosableFileFilter(new GrammarFilter()); 
+                    int returnVal = saveFc.showSaveDialog(GFEditor2.this);
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        File file = saveFc.getSelectedFile();
+                        if (logger.isLoggable(Level.FINER)) logger.finer("saving as " + file);
+                        final String abstractLin = linearization.getLinearizations().get("Abstract").toString();
 
-                                if (saveTypeGroup.getSelection().getActionCommand().equals("term")) {
-                                        // saving as a term                                        
-                                        writeOutput(removeMetavariableNumbers(abstractLin), file.getPath());
-                                } else {
-                                        // saving as a linearization:
-                                        /** collects the show linearizations */
-                                        StringBuffer text = new StringBuffer();
-                                        /** if sth. at all is shown already*/
-                                        boolean sthAtAll = false;
-                                        for (Iterator it = linearization.getLinearizations().keySet().iterator(); it.hasNext();) {
-                                                Object key = it.next();
-                                                if (!key.equals("Abstract")) {
-                                                        if (sthAtAll) {
-                                                                text.append("\n\n");
-                                                        }
-                                                        text.append(linearization.getLinearizations().get(key));
-                                                        sthAtAll = true;
-                                                }
-                                        }
-                                        if (sthAtAll) {
-                                                writeOutput(text.toString(), file.getPath());
-                                                if (logger.isLoggable(Level.FINER)) logger.finer(file + " saved.");
-                                        } else {
-                                                if (logger.isLoggable(Level.FINER)) logger.warning("no concrete language shown, saving abstract");
-                                                writeOutput(removeMetavariableNumbers(abstractLin), file.getPath());
-                                                if (logger.isLoggable(Level.FINER)) logger.finer(file + " saved.");
-                                        }
+                        if (saveTypeGroup.getSelection().getActionCommand().equals("term")) {
+                            // saving as a term                                        
+                            writeOutput(removeMetavariableNumbers(abstractLin), file.getPath());
+                        } else {
+                            // saving as a linearization:
+                            /** collects the show linearizations */
+                            StringBuffer text = new StringBuffer();
+                            /** if sth. at all is shown already*/
+                            boolean sthAtAll = false;
+                            for (final Object key : linearization.getLinearizations().keySet()) {
+                                if (!key.equals("Abstract")) {
+                                    if (sthAtAll) {
+                                        text.append("\n\n");
+                                    }
+                                    text.append(linearization.getLinearizations().get(key));
+                                    sthAtAll = true;
                                 }
-                        }           
-                        
+                            }
+                            if (sthAtAll) {
+                                writeOutput(text.toString(), file.getPath());
+                                if (logger.isLoggable(Level.FINER)) logger.finer(file + " saved.");
+                            } else {
+                                if (logger.isLoggable(Level.FINER)) logger.warning("no concrete language shown, saving abstract");
+                                writeOutput(removeMetavariableNumbers(abstractLin), file.getPath());
+                                if (logger.isLoggable(Level.FINER)) logger.finer(file + " saved.");
+                            }
+                        }
+                    }           
+
                 }
         }
 

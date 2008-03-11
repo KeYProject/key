@@ -168,9 +168,8 @@ public abstract class TacletApp implements RuleApp {
 
 	SetOfQuantifiableVariable instanceSet 
 	    = SetAsListOfQuantifiableVariable.EMPTY_SET;
-	IteratorOfSchemaVariable it = pre.prefix().iterator();
-	while (it.hasNext()) {
-	    SchemaVariable var = it.next();
+	
+	for (final SchemaVariable var : pre.prefix() ) {
 	    instanceSet = 
 		instanceSet.add((LogicVariable)
 				((Term)instantiations.getInstantiation(var)).op());
@@ -591,9 +590,7 @@ public abstract class TacletApp implements RuleApp {
         TacletApp app = this;
         ListOfString proposals = SLListOfString.EMPTY_LIST;
 
-        final IteratorOfSchemaVariable it = uninstantiatedVars().iterator();
-        while (it.hasNext()) {
-            SchemaVariable var = it.next();
+        for (final SchemaVariable var : uninstantiatedVars()) {
             
             if (LoopInvariantProposer.DEFAULT.inLoopInvariantRuleSet(taclet())){ 
                 Object inv = LoopInvariantProposer.DEFAULT.tryToInstantiate(this, var, services);              
@@ -712,21 +709,18 @@ public abstract class TacletApp implements RuleApp {
      * found cannot be instantiated (at least at the time)
      */
     private SVInstantiations forceGenericSortInstantiations (SVInstantiations insts) {
-        final IteratorOfSchemaVariable it  = uninstantiatedVars().iterator ();
-
-	    // force all generic sorts to be instantiated
-	    try {
-		while ( it.hasNext () ) {
-		    final SchemaVariable sv = it.next ();
-		    final GenericSortCondition c =
-		        GenericSortCondition.forceInstantiation
-		                ( ( (SortedSchemaVariable)sv ).sort (), true );
-		    if ( c != null ) 			                      
-		        insts = insts.add ( c );                                                                        
-		}
-	    } catch ( GenericSortException e ) {
-		Debug.fail ( "TacletApp cannot be made complete" );		
-	    }
+        // force all generic sorts to be instantiated
+        try {
+            for (final SchemaVariable sv : uninstantiatedVars()) {
+                final GenericSortCondition c =
+                    GenericSortCondition.forceInstantiation
+                    ( ( (SortedSchemaVariable)sv ).sort (), true );
+                if ( c != null ) 			                      
+                    insts = insts.add ( c );                                                                        
+            }
+        } catch ( GenericSortException e ) {
+            Debug.fail ( "TacletApp cannot be made complete" );		
+        }
         return insts;
     }
 
@@ -882,9 +876,7 @@ public abstract class TacletApp implements RuleApp {
                                                SetOfMetavariable newVars) {
         insts = forceGenericSortInstantiations ( insts );
 
-        final IteratorOfSchemaVariable it = uninstantiatedVars ().iterator ();
-        while ( it.hasNext () ) {
-            final SchemaVariable sv = it.next ();
+        for (final SchemaVariable sv : uninstantiatedVars()) {
             if (isDependingOnModifiesSV(sv))
                 continue;
             Debug.assertTrue ( canUseMVAPriori ( sv ),

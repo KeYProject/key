@@ -41,7 +41,7 @@ public class JavaTestGenerationProfile extends JavaProfile {
     
     public void updateSettings(ProofSettings settings) {        
         ChoiceSettings cs = settings.getChoiceSettings();
-        HashMap dcs = cs.getDefaultChoices();
+        HashMap<String, String> dcs = cs.getDefaultChoices();
         dcs.put("testGeneration", "testGeneration:testOn");
         cs.setDefaultChoices(dcs);
         settings.getStrategySettings().setStrategy(new Name("VBTStrategy"));        

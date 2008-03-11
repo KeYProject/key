@@ -100,7 +100,7 @@ options {
 
     private NamespaceSet nss;
     private Choice defaultChoice = null;
-    private HashMap category2Default = new HashMap();
+    private HashMap<String, String> category2Default = new HashMap<String, String>();
     private boolean onlyWith=false;
     private SetOfChoice activatedChoices = SetAsListOfChoice.EMPTY_SET;
     private SetOfChoice selectedChoices = SetAsListOfChoice.EMPTY_SET;
@@ -422,7 +422,7 @@ options {
         return contracts;
     }
     
-    public HashMap getCategory2Default(){
+    public HashMap<String, String> getCategory2Default(){
         return category2Default;
     }
 
