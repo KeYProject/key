@@ -179,7 +179,8 @@ public class BoundVariableTools {
         // at least one subterms belongs to the entry (value)
         ArrayOfQuantifiableVariable unifiedVariable = boundVarsPerSub[subtermsBegin];
 
-        final Map variableRenamings = new HashMap ();
+        final Map<QuantifiableVariable, QuantifiableVariable> variableRenamings = 
+            new HashMap<QuantifiableVariable, QuantifiableVariable> ();
         for ( int i = subtermsBegin + 1; i < subtermsEnd; ++i ) {
             // check that numbers and sorts of the quantified variables are
             // consistent
@@ -230,7 +231,8 @@ public class BoundVariableTools {
         if ( vars0.size () == 0 ) return term0.equalsModRenaming ( term1 );
         
         final ArrayOfQuantifiableVariable unifiedVars =
-            unifyVariableArrays ( vars0, vars1, new HashMap () );
+            unifyVariableArrays ( vars0, vars1, 
+                    new HashMap<QuantifiableVariable, QuantifiableVariable> () );
 
         final Term renamedTerm0 = renameVariables ( term0, vars0, unifiedVars );
         final Term renamedTerm1 = renameVariables ( term1, vars1, unifiedVars );
@@ -245,7 +247,7 @@ public class BoundVariableTools {
     private ArrayOfQuantifiableVariable
         unifyVariableArrays (ArrayOfQuantifiableVariable ar0,
                              ArrayOfQuantifiableVariable ar1,
-                             Map variableRenaming) {
+                             Map<QuantifiableVariable, QuantifiableVariable> variableRenaming) {
         final QuantifiableVariable[] res = new QuantifiableVariable [ar0.size()];
         for ( int i = 0; i != ar0.size (); ++i ) {
             QuantifiableVariable pv0 = ar0.getQuantifiableVariable ( i );            

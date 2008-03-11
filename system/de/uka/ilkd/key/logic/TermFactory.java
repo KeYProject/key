@@ -85,7 +85,8 @@ public class TermFactory {
         
     }
 
-    private static Map cache = Collections.synchronizedMap(new LRUCache(5000));
+    private static Map<Object, Term> cache = 
+        Collections.synchronizedMap(new LRUCache<Object, Term>(5000));
 
     
     /** An instance of TermFactory */
@@ -195,7 +196,7 @@ public class TermFactory {
        if (subs.length == 2) {
            // we cache only the most common case
            final CacheKey key = new CacheKey(arrayOp, subs[0], subs[1]);
-           arrayTerm = (Term) cache.get(key);
+           arrayTerm = cache.get(key);
            if (arrayTerm == null) {
                arrayTerm = OpTerm.createOpTerm(arrayOp, subs).checked();
                cache.put(key, arrayTerm);
@@ -248,7 +249,7 @@ public class TermFactory {
 	}        
         
         final CacheKey key = new CacheKey(var, term);
-        Term attrTerm = (Term) cache.get(key);
+        Term attrTerm = cache.get(key);
         if (attrTerm == null){
             attrTerm = OpTerm.createUnaryOpTerm(AttributeOp.getAttributeOp(var), term).checked();
             cache.put(key, attrTerm);
@@ -317,7 +318,7 @@ public class TermFactory {
     }
     
     public Term createFunctionTerm(TermSymbol op) {
-        Term result = (Term) cache.get(op);
+        Term result = cache.get(op);
         if (result == null) {
             result = createFunctionTerm(op, NO_SUBTERMS);
             cache.put(op, result);
@@ -327,7 +328,7 @@ public class TermFactory {
 
     public Term createFunctionTerm(TermSymbol op, Term s1) {
         final CacheKey key = new CacheKey(op, s1);
-        Term result = (Term) cache.get(key);
+        Term result = cache.get(key);
         if (result == null) {
             result = createFunctionTerm(op, new Term[]{s1});
             cache.put(key, result);
@@ -337,7 +338,7 @@ public class TermFactory {
 
     public Term createFunctionTerm(TermSymbol op, Term s1, Term s2) {	
         final CacheKey key = new CacheKey(op, s1, s2);
-        Term result = (Term) cache.get(key);
+        Term result = cache.get(key);
         if (result == null) {
             result = createFunctionTerm(op, new Term[]{s1,s2});
             cache.put(key, result);
@@ -945,7 +946,7 @@ public class TermFactory {
      * @param v the variable
      */
     public Term createVariableTerm(LogicVariable v) {
-        Term varTerm = (Term)cache.get(v);
+        Term varTerm = cache.get(v);
         if (varTerm == null) {
             varTerm = OpTerm.createConstantOpTerm(v).checked();
             cache.put(v, varTerm);
@@ -959,7 +960,7 @@ public class TermFactory {
      * @return variable <code>v</code> as term 
      */
     public Term createVariableTerm(ProgramVariable v) {
-        Term varTerm = (Term)cache.get(v);
+        Term varTerm = cache.get(v);
         if (varTerm == null) {
             varTerm = OpTerm.createConstantOpTerm(v).checked();
             cache.put(v, varTerm);
@@ -973,7 +974,7 @@ public class TermFactory {
      * @return the term <code>v</code>
      */
     public Term createVariableTerm(SchemaVariable v) {
-        Term varTerm = (Term)cache.get(v);
+        Term varTerm = cache.get(v);
         if (varTerm == null) {
             varTerm = OpTerm.createConstantOpTerm(v).checked();
             cache.put(v, varTerm);

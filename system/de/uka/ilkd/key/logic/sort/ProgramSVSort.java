@@ -38,7 +38,8 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     // Keeps the mapping of ProgramSVSort names to
     // ProgramSVSort instances (helpful in parsing
     // schema variable declarations)
-    private static HashMap name2sort = new HashMap(60);
+    private static HashMap<Name, ProgramSVSort> name2sort = 
+        new HashMap<Name, ProgramSVSort>(60);
 
     //----------- Types of Expression Program SVs ----------------------------
    
@@ -1586,7 +1587,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	return elemname.charAt(0)=='<';
     }
 
-    public static HashMap name2sort() {
+    public static HashMap<Name, ProgramSVSort> name2sort() {
         return name2sort;
     }
    

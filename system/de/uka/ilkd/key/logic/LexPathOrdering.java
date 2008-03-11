@@ -81,12 +81,13 @@ public class LexPathOrdering implements TermOrdering {
     }
     
     
-    private final HashMap cache = new HashMap ();
+    private final HashMap<CacheKey, CompRes> cache = 
+        new HashMap<CacheKey, CompRes> ();
     
     
     private CompRes compareHelp (Term p_a, Term p_b) {
         final CacheKey key = new CacheKey ( p_a, p_b );
-        CompRes res = (CompRes)cache.get ( key );
+        CompRes res = cache.get ( key );
         if ( res == null ) {
             res = compareHelp2 ( p_a, p_b );
             if ( cache.size () > 100000 ) cache.clear ();
@@ -201,7 +202,8 @@ public class LexPathOrdering implements TermOrdering {
      * lengths of maximal paths from a sort to the top element of the sort
      * lattice.
      */
-    private final WeakHashMap sortDepthCache = new WeakHashMap ();
+    private final WeakHashMap<Sort, Integer> sortDepthCache = 
+        new WeakHashMap<Sort, Integer> ();
     
     /**
      * @return the length of the longest path from <code>s</code> to the top
@@ -274,7 +276,7 @@ public class LexPathOrdering implements TermOrdering {
      */
     private static class LiteralWeighter extends Weighter {
 
-        private final Set intFunctionNames = new HashSet ();
+        private final Set<String> intFunctionNames = new HashSet<String> ();
         {
             intFunctionNames.add("#");
             intFunctionNames.add("0");

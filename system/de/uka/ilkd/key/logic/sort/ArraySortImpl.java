@@ -18,13 +18,14 @@ import java.util.WeakHashMap;
 
 public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
 
-    private static WeakHashMap aSH = new WeakHashMap();
+    private static WeakHashMap<SortKey, WeakReference<ArraySort>> aSH = 
+        new WeakHashMap<SortKey, WeakReference<ArraySort>>();
     
     private final ArrayOfSort commonJavaSorts;  
     
     private SetOfSort extendsSorts;
     
-    /** keeping this key is important to prevent for too early hasmap removal*/
+    /** keeping this key is important to prevent for too early hashmap removal*/
     private final SortKey sk;
     
 
@@ -91,7 +92,7 @@ public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
         final SortKey sortKey = new SortKey(elemSort, objectSort, 
                 cloneableSort, serializableSort);
         ArraySort as = aSH.containsKey(sortKey) ? 
-                (ArraySort) ((WeakReference)aSH.get(sortKey)).get() : null;          
+                (ArraySort) aSH.get(sortKey).get() : null;          
 	
         if (as == null){ 
         // HACK: this simple handling of sort creation does not treat
@@ -100,7 +101,7 @@ public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
 							     cloneableSort, 
                                                              serializableSort);
 	    as = new ArraySortImpl(localExtendsSorts, sortKey);
-	    aSH.put(sortKey, new WeakReference(as));
+	    aSH.put(sortKey, new WeakReference<ArraySort>(as));
 	    
 	} 
         return as;

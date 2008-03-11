@@ -36,7 +36,8 @@ import de.uka.ilkd.key.util.Debug;
  */
 public abstract class AbstractMetaOperator extends Op implements MetaOperator {
 
-    private static HashMap name2metaop = new HashMap(70);
+    private static HashMap<String, AbstractMetaOperator> name2metaop = 
+        new HashMap<String, AbstractMetaOperator>(70);
 
     public static final AbstractMetaOperator META_LENGTH = new MetaLength();
 
@@ -170,7 +171,7 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     }
 
     public static MetaOperator name2metaop(String s) {
-	return (MetaOperator)name2metaop.get(s);
+	return name2metaop.get(s);
     }
 
     /**
