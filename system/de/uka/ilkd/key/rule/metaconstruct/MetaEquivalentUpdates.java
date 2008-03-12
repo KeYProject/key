@@ -6,13 +6,8 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-// This file is part of KeY - Integrated Deductive Software Design 
-// Copyright (C) 2001-2003 Universitaet Karlsruhe, Germany
-//                         and Chalmers University of Technology, Sweden          
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
+
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
@@ -31,7 +26,6 @@ import de.uka.ilkd.key.logic.op.IUpdateOperator;
 import de.uka.ilkd.key.logic.op.IteratorOfLocation;
 import de.uka.ilkd.key.logic.op.Location;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.SetAsListOfLocation;
 import de.uka.ilkd.key.logic.op.SetOfLocation;
 import de.uka.ilkd.key.logic.sort.ArraySortImpl;
@@ -75,7 +69,7 @@ public class MetaEquivalentUpdates extends AbstractMetaOperator {
      */
     private Sort getArgumentSort(Location op, int argNum) {
         if ( op instanceof AttributeOp ) {
-            return getJavaLangObject ();
+            return ((AttributeOp) op).getContainerType().getSort();
         } else if ( op instanceof ArrayOp ) {
             switch ( argNum ) {
             case 0:
