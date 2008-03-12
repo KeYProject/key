@@ -41,21 +41,19 @@ public class WatchExpressionDialog {
 
     private WatchpointView wv;
 
-
-
     /**
      * Instantiates a new watch expression dialog.
      * 
      * @param parent
      *            the parent
      */
-    public WatchExpressionDialog(Shell parent, WatchpointView wv,int lineoffset, String source,
+    public WatchExpressionDialog(WatchpointView wv, Shell parent, int lineoffset, String source,
             String fieldToObserve) {
         shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
         shell.setText("Enter watch expression");
         shell.setLayout(new GridLayout());
-        this.wv = wv;
         this.source = source;
+        this.wv = wv;
         this.lineoffset = lineoffset;
         this.fieldToObserve = fieldToObserve;
     }
@@ -147,6 +145,7 @@ public class WatchExpressionDialog {
                 .getAdapter(IFile.class);
 
         ICompilationUnit icu = JavaCore.createCompilationUnitFrom(file);
+        wv.setICUnit(icu);
         final WatchPointProblemRequestor problemRequestor = new WatchPointProblemRequestor();
 
         WorkingCopyOwner owner = new WorkingCopyOwner() {
@@ -154,9 +153,10 @@ public class WatchExpressionDialog {
                 return (IProblemRequestor) problemRequestor;
             }
         };
-        ICompilationUnit workingCopy = null;
+        ICompilationUnit workingCopy = icu.getWorkingCopy(null);
 
         try {
+            //FIXME remove deprecated warning --> see eclipse help
             workingCopy = icu.getWorkingCopy(owner, problemRequestor, null);
             workingCopy.getBuffer().setContents(doc.get().toCharArray());
 
@@ -168,10 +168,11 @@ public class WatchExpressionDialog {
         workingCopy.reconcile(ICompilationUnit.NO_AST, true, null, null);
         
         LocalVariableDetector lvd = new LocalVariableDetector(Util.parse(expression, null));
-       
-        CompilationUnit cu = Util.parse(workingCopy, null);
-        lvd.process(cu);
-        wv.setUnit(cu);
+        CompilationUnit unit = Util.parse(workingCopy, null);
+        lvd.process(unit);
+        wv.setUnit(unit);
+        wv.setLocalVariables(lvd.getLocalVariables());
+        
         // clean up in the end
         workingCopy.discardWorkingCopy();
         // check for compilation errors and report the last detected problem
@@ -183,7 +184,6 @@ public class WatchExpressionDialog {
 
             return false;
         } else {
-            wv.setLocalVariables(lvd.getLocalVariables());
             return true;
         }
     }

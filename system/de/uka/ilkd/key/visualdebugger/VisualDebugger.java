@@ -129,7 +129,7 @@ public class VisualDebugger {
 
     /**
      * The Constant tempDir. A temporary directory in the users home:
-     * ~/tmp/visualdebugger.
+     * ~/tmp/visualdebugger/.
      */
     public static final String tempDir = System.getProperty("user.home")
             + File.separator + "tmp" + File.separator + "visualdebugger"
@@ -1766,7 +1766,7 @@ public class VisualDebugger {
         };
         startThread(interfaceSignaller);
     }
-
+    
     /**
      * The Class TestCaseIdentifier.
      */

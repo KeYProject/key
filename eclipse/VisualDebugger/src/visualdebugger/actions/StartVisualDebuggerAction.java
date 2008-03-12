@@ -647,7 +647,6 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 
 			// Inserts the separator statements
 			insertSeps(srcFile.getJavaProject());
-
 			// TODO generalize to consider packageFragmentRoots (needed to
 			// support
 			// special source locations like folders only linked into the

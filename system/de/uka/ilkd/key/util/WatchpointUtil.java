@@ -25,6 +25,7 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.visualdebugger.ProofStarter;
+import de.uka.ilkd.key.visualdebugger.WatchPointManager;
 import de.uka.ilkd.key.visualdebugger.WatchpointPO;
 import de.uka.ilkd.key.visualdebugger.executiontree.ETNode;
 
@@ -98,8 +99,7 @@ public class WatchpointUtil {
             pos = new PosInOccurrence(constrainedFormula, PosInTerm.TOP_LEVEL,
                     false);
             term = constrainedFormula.formula();
-            System.out.println("Operator-Class: "+term.op().getClass());
-            
+
             // {U1}{U2}...{Un} <prg> phi
             // proceed to update that is directly in front of the modality
             while (term.op() instanceof QuanUpdateOperator) {
@@ -107,7 +107,7 @@ public class WatchpointUtil {
                 pos = pos.down(targetPos);
                 term = term.sub(targetPos);
             }
-            
+
             if (term.op() instanceof Modality) {
 
                 SourceElement firstStatement = getFirstActiveStatement(term);
@@ -120,7 +120,7 @@ public class WatchpointUtil {
                 }
             }
         }
-        
+
         System.out.println("LEAVING findPos WITHOUT result...");
         return null;
     }
@@ -174,7 +174,7 @@ public class WatchpointUtil {
         LinkedList<Update> updates = new LinkedList<Update>();
         UpdateFactory updateFactory = new UpdateFactory(proof.getServices(),
                 proof.simplifier());
-        trackRenaming(proof.getServices().getJavaInfo(), watchpoint);
+        // trackRenaming(proof.getServices().getJavaInfo(), null);
         // collect all updates
         PIOPathIterator it = pos.iterator();
         while (it.hasNext()) {
@@ -219,12 +219,12 @@ public class WatchpointUtil {
                 throw new NullPointerException("settings was null");
 
             SwingUtilities.invokeAndWait(new Runnable() {
-                    public void run() {
-                        ps.run(proofEnvironment);
-                    
-                    }
-                });
-            
+                public void run() {
+                    ps.run(proofEnvironment);
+
+                }
+            });
+
             System.out.println("LEAVING evaluateWP...");
             return ps.getProof().closed();
         } catch (Throwable t) {
@@ -274,7 +274,7 @@ public class WatchpointUtil {
                 return WatchpointUtil.evalutateWatchpoint(
                         watchpoints.toArray()[0], seq, pos, proof, maxsteps);
             }
-            trackRenaming(proof.getServices().getJavaInfo(), null);
+            // trackRenaming(proof.getServices().getJavaInfo(), null);
             LinkedList<Update> updates = new LinkedList<Update>();
 
             UpdateFactory updateFactory = new UpdateFactory(
@@ -337,7 +337,7 @@ public class WatchpointUtil {
                 SwingUtilities.invokeAndWait(new Runnable() {
                     public void run() {
                         ps.run(proofEnvironment);
-                    
+
                     }
                 });
             } catch (InterruptedException e) {
@@ -464,10 +464,24 @@ public class WatchpointUtil {
         }
         return executionTree;
     }
-    
-    private static void trackRenaming(JavaInfo javaInfo, Term watchpoint){
-        
-        
-       // MethodDeclaration md = javaInfo.getProgramMethod(classType, methodName, signature, context);
+
+    public static void trackRenaming(JavaInfo javaInfo, ListOfRenamingTable rt) {
+
+        HashSet<ProgramVariable> localVariables = WatchPointManager
+        .getLocalVariables();
+
+       // for (ProgramVariable programVariable : localVariables) {
+            
+        IteratorOfRenamingTable i = rt.iterator();
+        while (i.hasNext()) {
+            System.out.println("++++++++");
+            RenamingTable renaming = i.next();
+//            if(renaming.getRenaming(programVariable) != null){
+//                System.out.println(" ###### detected renaming!!! #####");
+//            }
+            System.out.println(renaming.toString() +" "+ renaming.getClass());
+        }
+        //}
+
     }
 }

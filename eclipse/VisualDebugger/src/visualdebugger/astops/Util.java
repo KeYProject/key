@@ -1,5 +1,8 @@
 package visualdebugger.astops;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -7,14 +10,16 @@ import java.util.Set;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.IVariableBinding;
-import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.Document;
+import org.eclipse.text.edits.MalformedTreeException;
+import org.eclipse.text.edits.TextEdit;
+import org.eclipse.text.edits.UndoEdit;
+
+import visualdebugger.views.InsertSepVisitor;
+import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 
 /**
  * The Class Util.
@@ -71,6 +76,29 @@ public final class Util {
             return null;
         }
     }
+    /**
+     * Parses the ICompilationUnit.
+     * 
+     * @param unit
+     *            the unit
+     * @param pm
+     *            the progressmonitor
+     * 
+     * @return the compilation unit
+     */
+    public static CompilationUnit parseSource(String source,
+            IProgressMonitor pm) {
+        try {
+            ASTParser parser = ASTParser.newParser(AST.JLS3);
+            parser.setSource(source.toCharArray());
+            //FIXME not working
+            parser.setResolveBindings(true);
+            return (CompilationUnit) parser.createAST(pm);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return null;
+        }
+    }
 
     /**
      * Parses the Expression given as String.
@@ -95,4 +123,6 @@ public final class Util {
         }
     }
 
+    
+    
 }

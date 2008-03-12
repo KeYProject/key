@@ -13,7 +13,7 @@ public class LocalVariableDetector extends ASTVisitor {
     }    
     
     public boolean visit(VariableDeclarationStatement node) {
-        
+       
         VariableDeclarationFragment fragment = (VariableDeclarationFragment) node.fragments().get(0);
         Expression initializer = fragment.getInitializer();
         String e = initializer.toString();

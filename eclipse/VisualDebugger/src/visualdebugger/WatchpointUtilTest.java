@@ -17,6 +17,7 @@ public class WatchpointUtilTest {
      */
     public static void main(String[] args) {
 
+        
         try {
         ETNode etn = init();
         System.out.println("This ET has "+getETasList(etn).size() +" nodes.");

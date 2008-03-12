@@ -3,16 +3,12 @@ package de.uka.ilkd.key.visualdebugger;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-//import visualdebugger.astops.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.IteratorOfType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.ListOfType;
 import de.uka.ilkd.key.java.abstraction.SLListOfType;
-import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.logic.ListOfTerm;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -32,6 +28,8 @@ public class WatchPointManager {
     private LinkedList<WatchPoint> watchPoints = new LinkedList<WatchPoint>();
 
     private ListOfTerm listOfWatchpoints;
+
+    private static HashSet<ProgramVariable> localVariables = new HashSet<ProgramVariable>();
 
     /**
      * Gets the watch points.
@@ -121,38 +119,7 @@ public class WatchPointManager {
                         progVarNS.add(var_dummy);
 
                         if (wp.getLocalVariables() != null &&  wp.getLocalVariables().size() > 0) {
-                            // TODO Locals
-                            List<LocalVariableDescriptor> locVars = wp.getLocalVariables();
-                            //***
-                            List<String> parameterTypes = wp.getParameterTypes();
-                            ListOfType signature = SLListOfType.EMPTY_LIST;
-                            for (String string : parameterTypes) {
-                                signature = signature.append(ji.getKeYJavaType(string));
-                            }
-
-                            KeYJavaType classType = ji.getKeYJavaType(wp.getDeclaringType());
-                            ProgramMethod pm  = ji.getProgramMethod(classType, wp.getMethod(), signature, classType);
-                            System.out.println("programmethod "+pm.getFullName());
-                            MethodDeclaration md = pm.getMethodDeclaration();
-                            
-                            HashSet<ProgramElement> pvs = new HashSet<ProgramElement>();
-                            MethodVisitor pvc = new MethodVisitor(pm, locVars);
-                            pvc.start();
-                            pvs.addAll(pvc.result());
-                            for (ProgramElement programElement : pvs) {
-                                System.out.println("result of visting method: " + programElement.getClass() + " "+ programElement.toString());
-                            }
-                            //***
-                            
-                            for (LocalVariableDescriptor localVariableDescriptor : locVars) {
-                            
-                                System.out.println("type: " +localVariableDescriptor.getType());
-                                System.out.println("name: " +localVariableDescriptor.getName());
-                                ProgramVariable locVar = new LocationVariable(
-                                       new ProgramElementName(localVariableDescriptor.getName()),
-                                       ji.getKeYJavaType(localVariableDescriptor.getType()));
-                                progVarNS.add(locVar);
-                            }
+                            translateLocalVariables(progVarNS, ji, wp);
                         }
 
                         buffer.append("\\exists " + declaringType + " x; {"
@@ -179,6 +146,44 @@ public class WatchPointManager {
     }
 
     /**
+     * @param progVarNS
+     * @param ji
+     * @param wp
+     */
+    private void translateLocalVariables(Namespace progVarNS,
+            final JavaInfo ji, WatchPoint wp) {
+
+        List<LocalVariableDescriptor> locVars = wp.getLocalVariables();
+       
+        List<String> parameterTypes = wp.getParameterTypes();
+        ListOfType signature = SLListOfType.EMPTY_LIST;
+        
+        for (String string : parameterTypes) {
+            signature = signature.append(ji.getKeYJavaType(string));
+        }
+
+        KeYJavaType classType = ji.getKeYJavaType(wp.getDeclaringType());
+        ProgramMethod pm  = ji.getProgramMethod(classType, wp.getMethod(), signature, classType);
+        
+        MethodVisitor pvc = new MethodVisitor(pm.getMethodDeclaration(), locVars);
+        pvc.start();
+        localVariables.addAll(pvc.result());
+        
+        for (ProgramVariable variable : localVariables) {
+            System.out.println("tracking names for... "+ " "+ variable.toString());
+            System.out.println("***"+variable.getEndPosition().getLine() +" : " + variable.getEndPosition().getColumn());
+        }
+        
+        for (LocalVariableDescriptor localVariableDescriptor : locVars) {
+
+            LocationVariable locVar = new LocationVariable(
+                   new ProgramElementName(localVariableDescriptor.getName()),
+                   ji.getKeYJavaType(localVariableDescriptor.getType()));
+            progVarNS.add(locVar);
+        }
+    }
+
+    /**
      * Gets the listOfTerm containing the WatchPoints. This method never returns
      * null. In case that there are no WatchPoints an empty ListOfTerm is
      * returned.
@@ -192,4 +197,7 @@ public class WatchPointManager {
         return listOfWatchpoints;
     }
 
+    public static HashSet<ProgramVariable> getLocalVariables() {
+        return localVariables;
+    }
 }

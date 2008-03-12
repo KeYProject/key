@@ -419,12 +419,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                             
                             if (renamingTables != null && renamingTables.size() > 0 ) {
                                System.out.println("RT size: "+renamingTables.size()+"@node " + anode.serialNr());
-                                IteratorOfRenamingTable i = renamingTables
-                                        .iterator();
-                                while (i.hasNext()) {
-                                    System.out.println("++++++++");
-                                    System.out.println(i.next().toString());
-                                }
+                                
+                                WatchpointUtil.trackRenaming(vd.getMediator().getServices().getJavaInfo(), renamingTables);
                             } 
                         }
                       
