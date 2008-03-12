@@ -156,7 +156,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
                             q,
                             oclParameters.getDeclaredVars().toArray(),
                             subTerm);
-            
+
             return new OCLEntity(resTerm);
         }
         

@@ -121,7 +121,7 @@ options {
         formulaBoolConverter = new FormulaBoolConverter(services, nss);
         
         //initialise integer helper
-        intHelper = new JavaIntegerSemanticsHelper(services);
+        intHelper = new JavaIntegerSemanticsHelper(services, excManager);
         
         //initialise property manager
         propertyManager = new PropertyManager(services,

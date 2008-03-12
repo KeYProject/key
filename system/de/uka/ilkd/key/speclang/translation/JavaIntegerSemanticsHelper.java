@@ -26,14 +26,19 @@ public class JavaIntegerSemanticsHelper {
 
     private static final TermBuilder tb = TermBuilder.DF;
 
+    private final SLTranslationExceptionManager excManager;
+
     private final TypeConverter tc;
     private final Term trueLitTerm;
     private final Sort boolSort;
 
 
-    public JavaIntegerSemanticsHelper(Services services) {
+
+    public JavaIntegerSemanticsHelper(Services services,
+			SLTranslationExceptionManager excManager) {
 	assert services != null;
 
+	this.excManager = excManager;
 	this.tc = services.getTypeConverter();
 	trueLitTerm = services.getTypeConverter().convertToLogicElement(
 		BooleanLiteral.TRUE);
@@ -43,7 +48,7 @@ public class JavaIntegerSemanticsHelper {
 
 
     private void raiseError(String message) throws SLTranslationException {
-	throw new SLTranslationException(message);
+	throw excManager.createException(message);
     }
 
 
@@ -211,7 +216,7 @@ public class JavaIntegerSemanticsHelper {
 	}
 
 	assert resultType != null;
-
+	
         AbstractIntegerLDT ldt 
             = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
 	return castToLDTSort(tb.func(ldt.getSub(), a, b), ldt);
@@ -226,7 +231,7 @@ public class JavaIntegerSemanticsHelper {
 	    resultType = tc.getPromotedType(tc.getKeYJavaType(a), tc
 		    .getKeYJavaType(b));
 	} catch (RuntimeException e) {
-	    raiseError("Error in additive expression " + a.toString() + " * "
+	    raiseError("Error in multiplicative expression " + a.toString() + " * "
 		    + b.toString() + ".");
 	}
 
@@ -247,7 +252,7 @@ public class JavaIntegerSemanticsHelper {
 	    resultType = tc.getPromotedType(tc.getKeYJavaType(a), tc
 		    .getKeYJavaType(b));
 	} catch (RuntimeException e) {
-	    raiseError("Error in additive expression " + a.toString() + " / "
+	    raiseError("Error in division expression " + a.toString() + " / "
 		    + b.toString() + ".");
 	}
 

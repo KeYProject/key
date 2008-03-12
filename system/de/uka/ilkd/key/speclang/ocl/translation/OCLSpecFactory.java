@@ -102,8 +102,11 @@ public class OCLSpecFactory {
                                                                null,
                                                                null);
         //all-quantify
-        inv = inv.allClose(services);
-        
+        // dlohner: Not necessary (?), as ClassInvariantImpl.getClosedInv(..)
+        // provides a closed version, where the original selfVar is replaced.
+        // Also compare to JMLSpecFactory.createJMLClassInvariant(..).
+        //inv = inv.allClose(services);
+
         //create invariant
         String name = getInvName();
         return new ClassInvariantImpl(name, 
