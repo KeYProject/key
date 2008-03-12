@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
