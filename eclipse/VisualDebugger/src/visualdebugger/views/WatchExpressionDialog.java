@@ -153,11 +153,10 @@ public class WatchExpressionDialog {
                 return (IProblemRequestor) problemRequestor;
             }
         };
-        ICompilationUnit workingCopy = icu.getWorkingCopy(null);
-
+        
+        ICompilationUnit workingCopy = null;
         try {
-            //FIXME remove deprecated warning --> see eclipse help
-            workingCopy = icu.getWorkingCopy(owner, problemRequestor, null);
+            workingCopy = icu.getWorkingCopy(owner, null); 
             workingCopy.getBuffer().setContents(doc.get().toCharArray());
 
         } catch (Throwable t) {

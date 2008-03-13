@@ -291,7 +291,7 @@ public class WatchpointView extends ViewPart {
     private void makeActions() {
         final WatchpointView wv = this;
         addAction = new Action() {
-            
+
             private Shell shell = new Shell();
 
             public void run() {
@@ -305,8 +305,8 @@ public class WatchpointView extends ViewPart {
                                     "Please select a constant, field or a local variable to observe.");
                 } else {
 
-                    WatchExpressionDialog dialog = new WatchExpressionDialog(wv,
-                            shell, wpd.getLine(), wpd.getSource(), wpd
+                    WatchExpressionDialog dialog = new WatchExpressionDialog(
+                            wv, shell, wpd.getLine(), wpd.getSource(), wpd
                                     .getName());
 
                     if (wpd != null) {
@@ -323,9 +323,10 @@ public class WatchpointView extends ViewPart {
                             else {
                                 // TODO
                                 WatchpointDescriptor localVariables = getLocalVariables(wpd);
-                                if(localVariables != null)
-                                watchPointManager.addWatchPoint(new WatchPoint(
-                                        localVariables));
+                                if (localVariables != null)
+                                    watchPointManager
+                                            .addWatchPoint(new WatchPoint(
+                                                    localVariables));
                             }
                             vd.setWatchPointManager(watchPointManager);
                             viewer.refresh();
@@ -395,6 +396,11 @@ public class WatchpointView extends ViewPart {
     private WatchpointDescriptor getLocalVariables(WatchpointDescriptor wpd) {
 
         System.out.println("getting local vars..");
+
+        localVariables = getVars();
+        if (localVariables.size() == 0)
+            return wpd;
+
         File f = new File(getPathToDebugUnit());
         if (!f.exists()) {
             MessageDialog
@@ -404,16 +410,14 @@ public class WatchpointView extends ViewPart {
                             "Debug Unit not found.",
                             "Rewriting of the compilation unit is neccessary. "
                                     + "Please start the Visual Debugger first, before you try to set watchpoints.");
-        return null;
+            return null;
         }
         if (f.exists() && !f.canRead()) {
-            MessageDialog
-            .openInformation(
-                    PlatformUI.getWorkbench()
-                            .getActiveWorkbenchWindow().getShell(),
-                    "Cannot read file! "  ,
-                    "Cannot read file. Read permission required for "+
-                    f.getAbsolutePath()); 
+            MessageDialog.openInformation(PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getShell(),
+                    "Cannot read file! ",
+                    "Cannot read file. Read permission required for "
+                            + f.getAbsolutePath());
             return null;
         }
 
@@ -434,10 +438,22 @@ public class WatchpointView extends ViewPart {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
+
         CompilationUnit cu = getUnit();
-        localVariables = getVars();
+
+        //setting declaring method and signature for local variables
+        IVariableBinding vb = (IVariableBinding) localVariables.iterator()
+                .next().resolveBinding();
         
+        ITypeBinding[] itb = vb.getDeclaringMethod().getParameterTypes();
+        LinkedList<String> ll = new LinkedList<String>();
+        for (int i = 0; i < itb.length; i++) {
+            ll.add(itb[i].getName());
+        }
+        wpd.setDeclaringMethod(vb.getDeclaringMethod()+"");
+        wpd.setParameterTypes(ll);
+        
+        //determine final position of the variables
         PositionFinder pf = new PositionFinder(localVariables);
         try {
             ICompilationUnit workingcopy = getICUnit().getWorkingCopy(null);
@@ -451,20 +467,12 @@ public class WatchpointView extends ViewPart {
         ASTNode astnode;
 
         LinkedList<LocalVariableDescriptor> locVariables = new LinkedList<LocalVariableDescriptor>();
-        System.out.println("detected "+localVariables.size() +" local vars");
-       
+        System.out.println("detected " + localVariables.size() + " local vars");
+
         for (SimpleName simpleName : localVariables) {
             IVariableBinding varBinding = (IVariableBinding) simpleName
                     .resolveBinding();
-            // FIXME pull out of loop
-            // getting the method signature
-            ITypeBinding[] itb = varBinding.getDeclaringMethod()
-                    .getParameterTypes();
-            LinkedList<String> ll = new LinkedList<String>();
-            for (int i = 0; i < itb.length; i++) {
-                ll.add(itb[i].getName());
-            }
-            wpd.setParameterTypes(ll);
+
             astnode = cu.findDeclaringNode(varBinding);
             int startPosition = astnode.getStartPosition();
 
@@ -475,6 +483,7 @@ public class WatchpointView extends ViewPart {
                         + parent.getStartPosition() + " length "
                         + parent.getLength() + " parentClass "
                         + parent.getClass());
+
                 int col = parent.getStartPosition() + parent.getLength();
                 System.out.println("astnode parent " + parent.toString() + " "
                         + cu.getColumnNumber(col));
@@ -610,27 +619,31 @@ public class WatchpointView extends ViewPart {
         pathToDebugUnit = path;
 
     }
-    
-    public void setLocalVariables(Set<SimpleName> vars){
+
+    public void setLocalVariables(Set<SimpleName> vars) {
         localVariables = vars;
     }
-    private Set<SimpleName> getVars(){
+
+    private Set<SimpleName> getVars() {
         return localVariables;
     }
 
-    public void setUnit(CompilationUnit unit){
-        this.unit =unit;
+    public void setUnit(CompilationUnit unit) {
+        this.unit = unit;
     }
-    public CompilationUnit getUnit(){
+
+    public CompilationUnit getUnit() {
         return unit;
     }
-    
-    public void setICUnit(ICompilationUnit unit){
-        this.icunit =unit;
+
+    public void setICUnit(ICompilationUnit unit) {
+        this.icunit = unit;
     }
-    public ICompilationUnit getICUnit(){
+
+    public ICompilationUnit getICUnit() {
         return icunit;
     }
+
     private String getPathToDebugUnit() {
         return pathToDebugUnit;
     }
