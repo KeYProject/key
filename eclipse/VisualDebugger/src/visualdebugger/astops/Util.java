@@ -1,15 +1,10 @@
 package visualdebugger.astops;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.*;
 import org.eclipse.jface.text.BadLocationException;
@@ -122,7 +117,4 @@ public final class Util {
             return null;
         }
     }
-
-    
-    
 }

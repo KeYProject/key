@@ -470,18 +470,18 @@ public class WatchpointUtil {
         HashSet<ProgramVariable> localVariables = WatchPointManager
         .getLocalVariables();
 
-       // for (ProgramVariable programVariable : localVariables) {
+        for (ProgramVariable programVariable : localVariables) {
             
-        IteratorOfRenamingTable i = rt.iterator();
-        while (i.hasNext()) {
-            System.out.println("++++++++");
-            RenamingTable renaming = i.next();
-//            if(renaming.getRenaming(programVariable) != null){
-//                System.out.println(" ###### detected renaming!!! #####");
-//            }
-            System.out.println(renaming.toString() +" "+ renaming.getClass());
+            IteratorOfRenamingTable i = rt.iterator();
+            while (i.hasNext()) {
+                System.out.println("++++++++");
+                RenamingTable renaming = i.next();
+                if (renaming.getRenaming(programVariable) != null) {
+                    System.out.println(" ###### detected renaming!!! #####");
+                }
+                System.out.println(renaming.toString());
+            }
         }
-        //}
 
     }
 }

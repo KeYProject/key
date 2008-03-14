@@ -1,10 +1,15 @@
 package visualdebugger.views;
 
 import java.io.*;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.*;
 import org.eclipse.jdt.core.dom.*;
 import org.eclipse.jface.action.Action;
@@ -12,6 +17,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.*;
 import org.eclipse.swt.SWT;
@@ -27,7 +33,6 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.uka.ilkd.key.visualdebugger.*;
-import visualdebugger.astops.LocalVariableDetector;
 import visualdebugger.astops.PositionFinder;
 import visualdebugger.astops.Util;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
@@ -322,11 +327,11 @@ public class WatchpointView extends ViewPart {
                             } // create watchpoint for local variable
                             else {
                                 // TODO
-                                WatchpointDescriptor localVariables = getLocalVariables(wpd);
-                                if (localVariables != null)
+                                WatchpointDescriptor includingLocalVariables = getLocalVariables(wpd);
+                                if (includingLocalVariables != null)
                                     watchPointManager
                                             .addWatchPoint(new WatchPoint(
-                                                    localVariables));
+                                                    includingLocalVariables));
                             }
                             vd.setWatchPointManager(watchPointManager);
                             viewer.refresh();
@@ -441,6 +446,7 @@ public class WatchpointView extends ViewPart {
 
         CompilationUnit cu = getUnit();
 
+        assert(localVariables.size() > 0);
         //setting declaring method and signature for local variables
         IVariableBinding vb = (IVariableBinding) localVariables.iterator()
                 .next().resolveBinding();
@@ -450,64 +456,79 @@ public class WatchpointView extends ViewPart {
         for (int i = 0; i < itb.length; i++) {
             ll.add(itb[i].getName());
         }
-        wpd.setDeclaringMethod(vb.getDeclaringMethod()+"");
+       // wpd.setDeclaringMethod(vb.getDeclaringMethod()+"");
         wpd.setParameterTypes(ll);
         
         //determine final position of the variables
-        PositionFinder pf = new PositionFinder(localVariables);
+        PositionFinder pf = new PositionFinder(localVariables, vb.getDeclaringMethod()+"");
+        CompilationUnit newUnit = null;
+        
         try {
             ICompilationUnit workingcopy = getICUnit().getWorkingCopy(null);
             workingcopy.getBuffer().setContents(input.toString());
-            pf.process(Util.parse(workingcopy, null));
+            newUnit = Util.parse(workingcopy, null);
+            pf.process(newUnit);
         } catch (Throwable e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
         
-        ASTNode astnode;
+        try {
+            ASTNode astnode;
 
-        LinkedList<LocalVariableDescriptor> locVariables = new LinkedList<LocalVariableDescriptor>();
-        System.out.println("detected " + localVariables.size() + " local vars");
+            LinkedList<LocalVariableDescriptor> locVariables = new LinkedList<LocalVariableDescriptor>();
 
-        for (SimpleName simpleName : localVariables) {
-            IVariableBinding varBinding = (IVariableBinding) simpleName
-                    .resolveBinding();
+            Set<SimpleName> newLocalVariables = pf.getLocalVariables();
+            System.out.println("detected " + newLocalVariables.size() + " local vars");
+            
+            for (SimpleName simpleName : newLocalVariables) {
+                IVariableBinding varBinding = (IVariableBinding) simpleName
+                        .resolveBinding();
+                astnode = newUnit.findDeclaringNode(varBinding);
+                int position = determineFinalPosition(astnode.getParent() , newUnit);
 
-            astnode = cu.findDeclaringNode(varBinding);
-            int startPosition = astnode.getStartPosition();
+                System.out.println(newUnit.getLineNumber(position) + " : "
+                        + newUnit.getColumnNumber(astnode.getStartPosition() + 1 + astnode.getLength()) + " >> "
+                        + varBinding.getType().getName() + " "
+                        + varBinding.getName());
 
-            if (!varBinding.isParameter()) {
+                locVariables.add(new LocalVariableDescriptor(varBinding.getName(),
+                        varBinding.getType().getQualifiedName(), newUnit
+                                .getLineNumber(position), newUnit
+                                .getColumnNumber(position) + 1, null));
 
-                ASTNode parent = astnode.getParent();
-                System.out.println("astnode parent start "
-                        + parent.getStartPosition() + " length "
-                        + parent.getLength() + " parentClass "
-                        + parent.getClass());
-
-                int col = parent.getStartPosition() + parent.getLength();
-                System.out.println("astnode parent " + parent.toString() + " "
-                        + cu.getColumnNumber(col));
-                System.out.println("astnode start "
-                        + astnode.getStartPosition() + " length "
-                        + astnode.getLength());
-
-            } else {
-                System.out.println("var was parameter");
             }
-            System.out.println(cu.getLineNumber(startPosition) + " : "
-                    + cu.getColumnNumber(startPosition) + " >> "
-                    + varBinding.getType().getName() + " "
-                    + varBinding.getName());
-
-            locVariables.add(new LocalVariableDescriptor(varBinding.getName(),
-                    varBinding.getType().getQualifiedName(), cu
-                            .getLineNumber(startPosition), cu
-                            .getColumnNumber(startPosition), null));
-
+            wpd.setLocalVariables(locVariables);
+            System.out.println("sizeof locVars " + locVariables.size());
+            
+        } catch (Throwable e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        wpd.setLocalVariables(locVariables);
         return wpd;
+    }
 
+    private int determineFinalPosition(ASTNode varDeclarationStatment, CompilationUnit unit) {
+        
+        System.out.println("EXT " + unit.getExtendedStartPosition(varDeclarationStatment));
+        System.out.println("EXT " + unit.getExtendedLength(varDeclarationStatment));
+
+        if(!(varDeclarationStatment instanceof VariableDeclarationStatement))
+            return -1;
+        
+        VariableDeclarationStatement vds = (VariableDeclarationStatement) varDeclarationStatment;
+        Iterator<VariableDeclarationFragment> it = vds.fragments().iterator();
+        int pos = 0;
+        while (it.hasNext()) {
+            VariableDeclarationFragment vdf = (VariableDeclarationFragment) it.next();
+            pos = vdf.getStartPosition() + vdf.getLength();
+            System.out.println("determinePos start " + vdf.getStartPosition());
+            System.out.println("EXT " + unit.getExtendedStartPosition(vdf));
+            System.out.println("determinePos " + pos);
+            System.out.println("EXT " + unit.getExtendedStartPosition(vdf) +" lengthXXX "+ unit.getExtendedLength(vdf));
+            System.out.println("determinePos col " + unit.getColumnNumber(pos));
+        }
+        return pos+1;
     }
 
     /**

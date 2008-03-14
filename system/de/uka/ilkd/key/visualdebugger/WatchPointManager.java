@@ -154,7 +154,6 @@ public class WatchPointManager {
             final JavaInfo ji, WatchPoint wp) {
 
         List<LocalVariableDescriptor> locVars = wp.getLocalVariables();
-       
         List<String> parameterTypes = wp.getParameterTypes();
         ListOfType signature = SLListOfType.EMPTY_LIST;
         
@@ -164,7 +163,6 @@ public class WatchPointManager {
 
         KeYJavaType classType = ji.getKeYJavaType(wp.getDeclaringType());
         ProgramMethod pm  = ji.getProgramMethod(classType, wp.getMethod(), signature, classType);
-        
         MethodVisitor pvc = new MethodVisitor(pm.getMethodDeclaration(), locVars);
         pvc.start();
         localVariables.addAll(pvc.result());
