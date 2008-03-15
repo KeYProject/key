@@ -5,16 +5,7 @@ import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.*;
-import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.Document;
-import org.eclipse.text.edits.MalformedTreeException;
-import org.eclipse.text.edits.TextEdit;
-import org.eclipse.text.edits.UndoEdit;
-
-import visualdebugger.views.InsertSepVisitor;
-import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 
 /**
  * The Class Util.
@@ -117,13 +108,13 @@ public final class Util {
             return null;
         }
     }
-    public static HashMap<Integer,IVariableBinding> valueToKey(HashMap<IVariableBinding , Integer> hm ){
+    public static HashMap<Integer,IVariableBinding> valueToKey(Map<IVariableBinding , Integer> map ){
         
         HashMap<Integer,IVariableBinding> newHashMap = new HashMap<Integer, IVariableBinding>(); 
         
-        Iterator<Entry<IVariableBinding, Integer>> it = hm.entrySet().iterator();
+        Iterator<Entry<IVariableBinding, Integer>> it = map.entrySet().iterator();
         while (it.hasNext()) {
-            Map.Entry<org.eclipse.jdt.core.dom.IVariableBinding, java.lang.Integer> entry = (Map.Entry<org.eclipse.jdt.core.dom.IVariableBinding, java.lang.Integer>) it
+            Entry<IVariableBinding, java.lang.Integer> entry = (Entry<IVariableBinding, Integer>) it
                     .next();
             newHashMap.put(entry.getValue(), entry.getKey());
             

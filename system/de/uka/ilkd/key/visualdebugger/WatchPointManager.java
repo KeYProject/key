@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.visualdebugger;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,6 +10,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.ListOfType;
 import de.uka.ilkd.key.java.abstraction.SLListOfType;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.logic.ListOfTerm;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -18,6 +20,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.ProblemLoader;
+import de.uka.ilkd.key.util.WatchpointUtil;
 
 /**
  * The Class WatchPointManager keeps a list of all watchpoints.
@@ -29,7 +32,7 @@ public class WatchPointManager {
 
     private ListOfTerm listOfWatchpoints;
 
-    private static HashSet<ProgramVariable> localVariables = new HashSet<ProgramVariable>();
+    private static HashSet<VariableSpecification> localVariables = new HashSet<VariableSpecification>();
 
     /**
      * Gets the watch points.
@@ -163,17 +166,15 @@ public class WatchPointManager {
 
         KeYJavaType classType = ji.getKeYJavaType(wp.getDeclaringType());
         ProgramMethod pm  = ji.getProgramMethod(classType, wp.getMethod(), signature, classType);
-        MethodVisitor pvc = new MethodVisitor(pm.getMethodDeclaration(), locVars);
+        MethodVisitor pvc = new MethodVisitor(pm.getMethodDeclaration());
         pvc.start();
-        localVariables.addAll(pvc.result());
-        
-        for (ProgramVariable variable : localVariables) {
-            System.out.println("tracking names for... "+ " "+ variable.toString());
-            System.out.println("***"+variable.getEndPosition().getLine() +" : " + variable.getEndPosition().getColumn());
-        }
+        HashMap<Integer, VariableSpecification> keyPositions = WatchpointUtil.valueToKey(pvc.result());
+        System.out.println(keyPositions);
         
         for (LocalVariableDescriptor localVariableDescriptor : locVars) {
-
+            
+            localVariables.add(keyPositions.get(localVariableDescriptor.getPosition()));
+            // ProgramVariable???
             LocationVariable locVar = new LocationVariable(
                    new ProgramElementName(localVariableDescriptor.getName()),
                    ji.getKeYJavaType(localVariableDescriptor.getType()));
@@ -195,7 +196,7 @@ public class WatchPointManager {
         return listOfWatchpoints;
     }
 
-    public static HashSet<ProgramVariable> getLocalVariables() {
+    public static HashSet<VariableSpecification> getLocalVariables() {
         return localVariables;
     }
 }

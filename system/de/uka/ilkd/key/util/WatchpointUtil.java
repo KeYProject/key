@@ -1,16 +1,15 @@
 package de.uka.ilkd.key.util;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
 
 import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
 
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -465,23 +464,52 @@ public class WatchpointUtil {
         return executionTree;
     }
 
-    public static void trackRenaming(JavaInfo javaInfo, ListOfRenamingTable rt) {
+    public static Update trackRenaming(JavaInfo javaInfo, ListOfRenamingTable rt) {
 
-        HashSet<ProgramVariable> localVariables = WatchPointManager
+        HashSet<VariableSpecification> localVariables = WatchPointManager
         .getLocalVariables();
-
-        for (ProgramVariable programVariable : localVariables) {
+        if(localVariables.size() == 0) return null;
+        System.out.println(localVariables.size() + "loc var size in WPU");
             
             IteratorOfRenamingTable i = rt.iterator();
             while (i.hasNext()) {
                 System.out.println("++++++++");
                 RenamingTable renaming = i.next();
-                if (renaming.getRenaming(programVariable) != null) {
-                    System.out.println(" ###### detected renaming!!! #####");
+                for (Iterator iterator = localVariables.iterator(); iterator
+                        .hasNext();) {
+                    VariableSpecification variableSpecification = (VariableSpecification) iterator
+                            .next();
+                    if(variableSpecification.getProgramVariable() instanceof LocationVariable){
+                        LocationVariable lv = (LocationVariable) variableSpecification.getProgramVariable();
+                        System.out.println("variable ID: "+lv.id());
+                        SourceElement renamedVariable = renaming.getRenaming(lv);
+                       System.out.println("**************");
+                       if( renamedVariable!= null){
+                           System.out.println(" XXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+                           UpdateFactory uf = new UpdateFactory(null, null);
+                           Update elemtaryUpdate =  uf.elementaryUpdate(null, null);
+                           // -> add el.Updates to list/array
+                           // -> create & return parallel update
+                           uf.parallel(null);
+                           
+                       }
+                    }
                 }
                 System.out.println(renaming.toString());
             }
+            return null;
+    }
+    
+    public static HashMap<Integer, VariableSpecification> valueToKey(Map<VariableSpecification, Integer> map ){
+        
+        HashMap<Integer, VariableSpecification> newHashMap = new HashMap<Integer, VariableSpecification>(); 
+        Iterator<Entry<VariableSpecification, Integer>> it = map.entrySet().iterator();
+        while (it.hasNext()) {
+            Entry<VariableSpecification, Integer> entry = (Entry<VariableSpecification, Integer>) it
+                    .next();
+            newHashMap.put(entry.getValue(), entry.getKey());
+            
         }
-
+        return newHashMap;
     }
 }

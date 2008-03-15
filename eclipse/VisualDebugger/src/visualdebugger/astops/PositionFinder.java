@@ -14,8 +14,8 @@ public class PositionFinder extends ASTVisitor {
 
     /** The position info. */
     private HashMap<IVariableBinding, Integer> positionInfo = new HashMap<IVariableBinding, Integer>();
-    /** The count. */
-    int count = 0;
+    /** The position counter. */
+    private int count = 0;
 
     /**
      * Instantiates a new position finder.

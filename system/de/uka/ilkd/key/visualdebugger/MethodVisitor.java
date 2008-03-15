@@ -9,17 +9,15 @@
 //
 package de.uka.ilkd.key.visualdebugger;
 
-import java.util.HashSet;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
  * Walks through a java AST in depth-left-fist-order. This walker is used
@@ -27,9 +25,9 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  */
 public class MethodVisitor extends JavaASTVisitor {
 
-    private HashSet<ProgramVariable> result = new HashSet<ProgramVariable>();
+    private Map<VariableSpecification, Integer> keyPositions = new HashMap<VariableSpecification, Integer>();
 
-    private List<LocalVariableDescriptor> localVariables;
+    private int count = 0;
 
     /**
      * collects all program variables occuring in the AST <tt>root</tt> using
@@ -37,12 +35,10 @@ public class MethodVisitor extends JavaASTVisitor {
      * <tt>ProggramVariableCollector(root, false)</tt>
      * 
      * @param root
-     *                the ProgramElement which is the root of the AST
+     *                the method which is the root of the AST that is to be visited
      */
-    public MethodVisitor(ProgramElement root,
-            List<LocalVariableDescriptor> locVars) {
+    public MethodVisitor(ProgramElement root) {
         super(root);
-        this.localVariables = locVars;
     }
 
     /**
@@ -57,46 +53,19 @@ public class MethodVisitor extends JavaASTVisitor {
         walk(root());
     }
 
-    public HashSet<ProgramVariable> result() {
-        return result;
+    public Map<VariableSpecification, Integer> result() {
+        return keyPositions;
     }
 
     public String toString() {
-        return result.toString();
+        return keyPositions.toString();
     }
 
     protected void doDefaultAction(SourceElement x) {
     }
 
-    public void performActionOnProgramVariable(ProgramVariable pv) {
-        // TODO realize line/column based search
-        for (LocalVariableDescriptor lvd : localVariables) {
-            if (pv.getProgramElementName().toString().equals(lvd.getName())) {
-                // System.out.println("column myVar: " + lvd.getColumn());
-                result.add(pv);
-            }
-        }
-
-    }
-
     public void performActionOnVariableSpecification(VariableSpecification x) {
-       
-        System.out.println(x.getPositionInfo());
-        
-        System.out.println("###varSpec " + x.toSource() + ": "
-                + x.getEndPosition().getLine() + " : "
-                + x.getEndPosition().getColumn());
-
-    }
-
-    // use for catch blocks / method parameter
-    public void performActionOnLocalVariableDeclaration(
-            LocalVariableDeclaration x) {
-        System.out.println(x.getPositionInfo());
-
-        System.out.println("+++varDec " + x.toSource() + " col:"
-                + x.getEndPosition().getLine() + " : "
-                + x.getEndPosition().getColumn());
+        keyPositions.put(x, count++);
     }
 
     public void performActionOnLocationVariable(LocationVariable x) {

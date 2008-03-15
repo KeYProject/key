@@ -18,8 +18,8 @@ public class LocalVariableDescriptor {
     /** The line. */
     private int line;
     
-    /** The column. */
-    private int column;
+    /** The column. */ //TODO change to position
+    private int position;
     
     /**
      * Instantiates a new local variable descriptor.
@@ -27,15 +27,15 @@ public class LocalVariableDescriptor {
      * @param name the name
      * @param type the type
      * @param line the line
-     * @param column the column
+     * @param position the column
      */
     public LocalVariableDescriptor(String name, String type, int line,
-            int column, String declaringMethod) {
+            int position, String declaringMethod) {
         super();
         this.name = name;
         this.type = type;
         this.line = line;
-        this.column = column;
+        this.position = position;
         this.declaringMethod = declaringMethod;
     }
 
@@ -71,8 +71,8 @@ public class LocalVariableDescriptor {
      * 
      * @return the column
      */
-    public int getColumn() {
-        return column;
+    public int getPosition() {
+        return position;
     }
 
     public String getDeclaringMethod() {
