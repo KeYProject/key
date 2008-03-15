@@ -1,8 +1,15 @@
 package visualdebugger.views;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.*;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -17,7 +24,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import visualdebugger.astops.LocalVariableDetector;
+import visualdebugger.astops.PositionFinder;
 import visualdebugger.astops.Util;
+import de.uka.ilkd.key.visualdebugger.WatchpointDescriptor;
 
 /**
  * The Class WatchExpressionDialog.
@@ -28,9 +37,6 @@ public class WatchExpressionDialog {
     private Shell shell;
 
     /** The expression. */
-    private String expression;
-
-    /** The expression. */
     private String source;
     /** The text. */
     private Text text;
@@ -39,7 +45,9 @@ public class WatchExpressionDialog {
 
     private String fieldToObserve;
 
-    private WatchpointView wv;
+    private WatchpointDescriptor wpd;
+
+    private LinkedList<Integer> positions;
 
     /**
      * Instantiates a new watch expression dialog.
@@ -47,15 +55,14 @@ public class WatchExpressionDialog {
      * @param parent
      *            the parent
      */
-    public WatchExpressionDialog(WatchpointView wv, Shell parent, int lineoffset, String source,
-            String fieldToObserve) {
+    public WatchExpressionDialog(Shell parent, WatchpointDescriptor wpd) {
         shell = new Shell(parent, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
         shell.setText("Enter watch expression");
         shell.setLayout(new GridLayout());
-        this.source = source;
-        this.wv = wv;
-        this.lineoffset = lineoffset;
-        this.fieldToObserve = fieldToObserve;
+        this.wpd = wpd;
+        this.source = wpd.getSource();
+        this.lineoffset = wpd.getLine();
+        this.fieldToObserve = wpd.getName();
     }
 
     /**
@@ -76,11 +83,9 @@ public class WatchExpressionDialog {
                 try {
                     if (isValid(text.getText())) {
 
-                        expression = text.getText();
+                        wpd.setExpression(text.getText());
                         shell.close();
                     } else {
-                        // if expression is not valid clear values
-                        expression = null;
                         shell.close();
                     }
 
@@ -95,7 +100,6 @@ public class WatchExpressionDialog {
         cancelButton.setText("Cancel");
         cancelButton.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                expression = null;
                 shell.close();
             }
         });
@@ -112,7 +116,7 @@ public class WatchExpressionDialog {
      * @return true, if expression is valid
      * @throws JavaModelException
      */
-    
+
     protected boolean isValid(String expression) throws JavaModelException {
 
         // test name
@@ -145,7 +149,6 @@ public class WatchExpressionDialog {
                 .getAdapter(IFile.class);
 
         ICompilationUnit icu = JavaCore.createCompilationUnitFrom(file);
-        wv.setICUnit(icu);
         final WatchPointProblemRequestor problemRequestor = new WatchPointProblemRequestor();
 
         WorkingCopyOwner owner = new WorkingCopyOwner() {
@@ -153,27 +156,20 @@ public class WatchExpressionDialog {
                 return (IProblemRequestor) problemRequestor;
             }
         };
-        
+
         ICompilationUnit workingCopy = null;
         try {
-            workingCopy = icu.getWorkingCopy(owner, null); 
+            workingCopy = icu.getWorkingCopy(owner, null);
             workingCopy.getBuffer().setContents(doc.get().toCharArray());
 
+            // reconcile to inform problemRequestor about potential problems
+            workingCopy.reconcile(ICompilationUnit.NO_AST, true, null, null);
+
         } catch (Throwable t) {
+            // TODO Auto-generated catch block
             t.printStackTrace();
         }
 
-        // reconcile to inform problemRequestor about potential problems
-        workingCopy.reconcile(ICompilationUnit.NO_AST, true, null, null);
-        
-        LocalVariableDetector lvd = new LocalVariableDetector(Util.parse(expression, null));
-        CompilationUnit unit = Util.parse(workingCopy, null);
-        lvd.process(unit);
-        wv.setUnit(unit);
-        wv.setLocalVariables(lvd.getLocalVariables());
-        
-        // clean up in the end
-        workingCopy.discardWorkingCopy();
         // check for compilation errors and report the last detected problem
         if (problemRequestor.hasErrors()) {
             MessageDialog.openError(PlatformUI.getWorkbench()
@@ -183,8 +179,53 @@ public class WatchExpressionDialog {
 
             return false;
         } else {
-            return true;
+
+            // if no errors occurred keep track of positions
+            LocalVariableDetector lvd = new LocalVariableDetector(Util.parse(
+                    expression, null));
+            CompilationUnit unit = Util.parse(workingCopy, null);
+            lvd.process(unit);
+            // the local variables we really need
+            Set<IVariableBinding> requiredLocalVariables = lvd
+                    .getLocalVariables();
+            if (requiredLocalVariables.size() == 0)
+                return true;
+
+            IVariableBinding vb = requiredLocalVariables
+                    .iterator().next();
+            // set declaring method and signature
+            ITypeBinding[] itb = vb.getDeclaringMethod().getParameterTypes();
+            LinkedList<String> ll = new LinkedList<String>();
+            for (int i = 0; i < itb.length; i++) {
+                ll.add(itb[i].getName());
+            }
+            wpd.setParameterTypes(ll);
+            wpd.setDeclaringMethod(vb.getDeclaringMethod()+"");
+
+            // get enumeration of the local variables
+            PositionFinder pf = new PositionFinder(vb.getDeclaringMethod()
+                    + "");
+            pf.process(unit);
+            HashMap<IVariableBinding, Integer> positionInfo = pf
+                    .getPositionInfo();
+            LinkedList<Integer> positions = new LinkedList<Integer>();
+            Iterator<IVariableBinding> it = requiredLocalVariables.iterator();
+            // finally put all together
+             while (it.hasNext()) {
+             IVariableBinding variableBinding = it.next();
+             positions.add(positionInfo.get(variableBinding));
+                            
+             }
+             // clean up in the end
+             workingCopy.discardWorkingCopy();
+             System.out.println("WED " + positions);
+             setPositions(positions);
+             return true;
         }
+    }
+
+    private void setPositions(LinkedList<Integer> positions) {
+        this.positions = positions;
     }
 
     /**
@@ -222,23 +263,12 @@ public class WatchExpressionDialog {
     }
 
     /**
-     * Returns the contents of the <code>Text</code> widgets in the dialog in
-     * a <code>String</code> array.
-     * 
-     * @return String[] The contents of the text widgets of the dialog. May
-     *         return null if all text widgets are empty.
-     */
-    public String getExpression() {
-        return expression;
-    }
-
-    /**
      * Opens the dialog in the given state. Sets <code>Text</code> widget
      * contents and dialog behaviour accordingly.
      * 
      * @return the string
      */
-    public String open() {
+    public WatchpointDescriptor open() {
         createTextWidget();
         createControlButtons();
         shell.pack();
@@ -249,6 +279,18 @@ public class WatchExpressionDialog {
                 display.sleep();
         }
 
-        return getExpression();
+        return wpd;
     }
+
+    public LinkedList<Integer> getPositions() {
+        return positions;
+    }
+
+//    private void setLocalVariables(Set<IVariableBinding> vars) {
+//        localVariables = vars;
+//    }
+//
+//    public Set<IVariableBinding> getVars() {
+//        return localVariables;
+//    }
 }

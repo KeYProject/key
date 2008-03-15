@@ -5,7 +5,7 @@ import java.util.*;
 import org.eclipse.jdt.core.dom.*;
 
 public class LocalVariableDetector extends ASTVisitor {
-    Set<SimpleName> localVariables = new HashSet<SimpleName>();
+    Set<IVariableBinding> localVariables = new HashSet<IVariableBinding>();
     private Expression expr;
 
     public LocalVariableDetector(Expression e){
@@ -16,18 +16,19 @@ public class LocalVariableDetector extends ASTVisitor {
        
         VariableDeclarationFragment fragment = (VariableDeclarationFragment) node.fragments().get(0);
         Expression initializer = fragment.getInitializer();
+
+        if(initializer == null) return false;
+        
         String e = initializer.toString();
         if(e.equals(expr.toString())){
 
-            Helper helper = new Helper();
-            initializer.accept(helper);
+            initializer.accept(new Helper());
 
         }
         return false;
     }
 
-    
-    public Set<SimpleName> getLocalVariables() {
+    public Set<IVariableBinding> getLocalVariables() {
         return localVariables;
     }
 
@@ -48,7 +49,7 @@ public class LocalVariableDetector extends ASTVisitor {
             if (binding instanceof IVariableBinding) {
                 IVariableBinding vb = (IVariableBinding) binding;
                 if (!vb.isField()) {
-                    localVariables.add(sn);
+                    localVariables.add(vb);
                 }
             }
             return false;

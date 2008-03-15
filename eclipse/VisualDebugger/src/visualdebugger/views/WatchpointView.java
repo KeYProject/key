@@ -1,23 +1,18 @@
 package visualdebugger.views;
 
-import java.io.*;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.*;
-import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.*;
 import org.eclipse.swt.SWT;
@@ -27,25 +22,19 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IEditorPart; //import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import de.uka.ilkd.key.visualdebugger.*;
 import visualdebugger.astops.PositionFinder;
 import visualdebugger.astops.Util;
-import de.uka.ilkd.key.visualdebugger.VisualDebugger;
-import de.uka.ilkd.key.visualdebugger.WatchPoint;
-import de.uka.ilkd.key.visualdebugger.WatchPointManager;
-import de.uka.ilkd.key.visualdebugger.WatchpointDescriptor;
+import de.uka.ilkd.key.visualdebugger.*;
 
 /**
  * The Class WatchpointView.
  */
 public class WatchpointView extends ViewPart {
-
-    private CompilationUnit unit;
 
     /** The viewer. */
     private TableViewer viewer;
@@ -65,11 +54,9 @@ public class WatchpointView extends ViewPart {
 
     private Action enableAction;
 
-    private String pathToDebugUnit;
-
-    private Set<SimpleName> localVariables;
-
     private ICompilationUnit icunit;
+
+    private LinkedList<Integer> positions;
 
     /**
      * The Class WatchPointContentProvider.
@@ -294,7 +281,6 @@ public class WatchpointView extends ViewPart {
      * Make actions.
      */
     private void makeActions() {
-        final WatchpointView wv = this;
         addAction = new Action() {
 
             private Shell shell = new Shell();
@@ -310,24 +296,22 @@ public class WatchpointView extends ViewPart {
                                     "Please select a constant, field or a local variable to observe.");
                 } else {
 
-                    WatchExpressionDialog dialog = new WatchExpressionDialog(
-                            wv, shell, wpd.getLine(), wpd.getSource(), wpd
-                                    .getName());
+                    WatchExpressionDialog dialog = new WatchExpressionDialog(shell, wpd);
 
                     if (wpd != null) {
 
-                        String expression = dialog.open();
-
-                        if (expression != null) {
-                            wpd.setExpression(expression);
+                        WatchpointDescriptor result = dialog.open();
+                        setPositions(dialog.getPositions());
+                        
+                        if (result.getExpression() != null) {
                             // create global watchpoint
-                            if (!wpd.isLocal()) {
+                            if (!result.isLocal()) {
                                 watchPointManager.addWatchPoint(new WatchPoint(
-                                        wpd));
+                                        result));
                             } // create watchpoint for local variable
                             else {
                                 // TODO
-                                WatchpointDescriptor includingLocalVariables = getLocalVariables(wpd);
+                                WatchpointDescriptor includingLocalVariables = getLocalVariables(result);
                                 if (includingLocalVariables != null)
                                     watchPointManager
                                             .addWatchPoint(new WatchPoint(
@@ -397,138 +381,42 @@ public class WatchpointView extends ViewPart {
         disableAction.setToolTipText("disable watchpoint");
 
     }
-
+    //TODO move to Util class
     private WatchpointDescriptor getLocalVariables(WatchpointDescriptor wpd) {
 
-        System.out.println("getting local vars..");
+        LinkedList<Integer> postions = getPositions();
 
-        localVariables = getVars();
-        if (localVariables.size() == 0)
+        if (postions == null || postions.size() == 0)
             return wpd;
+        assert(postions.size() > 0);
+       
+        CompilationUnit cu = Util.parse(getICUnit(), null);
 
-        File f = new File(getPathToDebugUnit());
-        if (!f.exists()) {
-            MessageDialog
-                    .openInformation(
-                            PlatformUI.getWorkbench()
-                                    .getActiveWorkbenchWindow().getShell(),
-                            "Debug Unit not found.",
-                            "Rewriting of the compilation unit is neccessary. "
-                                    + "Please start the Visual Debugger first, before you try to set watchpoints.");
-            return null;
-        }
-        if (f.exists() && !f.canRead()) {
-            MessageDialog.openInformation(PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow().getShell(),
-                    "Cannot read file! ",
-                    "Cannot read file. Read permission required for "
-                            + f.getAbsolutePath());
-            return null;
-        }
-
-        StringBuffer input = new StringBuffer();
-        try {
-            FileInputStream fstream = new FileInputStream(f);
-            DataInputStream in = new DataInputStream(fstream);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-
-            String strLine;
-            while ((strLine = br.readLine()) != null) {
-                input.append(strLine + "\n");
-            }
-            fstream.close();
-            in.close();
-            br.close();
-        } catch (Throwable e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        CompilationUnit cu = getUnit();
-
-        assert(localVariables.size() > 0);
-        //setting declaring method and signature for local variables
-        IVariableBinding vb = (IVariableBinding) localVariables.iterator()
-                .next().resolveBinding();
+        // get enumeration of the local variables
+        PositionFinder pf  = new PositionFinder(wpd.getDeclaringMethod());
+        pf.process(cu);
         
-        ITypeBinding[] itb = vb.getDeclaringMethod().getParameterTypes();
-        LinkedList<String> ll = new LinkedList<String>();
-        for (int i = 0; i < itb.length; i++) {
-            ll.add(itb[i].getName());
-        }
-       // wpd.setDeclaringMethod(vb.getDeclaringMethod()+"");
-        wpd.setParameterTypes(ll);
+        HashMap<Integer, IVariableBinding> positionInfo = Util.valueToKey(pf.getPositionInfo());
+        System.out.println(positionInfo);
         
-        //determine final position of the variables
-        PositionFinder pf = new PositionFinder(localVariables, vb.getDeclaringMethod()+"");
-        CompilationUnit newUnit = null;
-        
-        try {
-            ICompilationUnit workingcopy = getICUnit().getWorkingCopy(null);
-            workingcopy.getBuffer().setContents(input.toString());
-            newUnit = Util.parse(workingcopy, null);
-            pf.process(newUnit);
-        } catch (Throwable e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        
-        try {
-            ASTNode astnode;
-
-            LinkedList<LocalVariableDescriptor> locVariables = new LinkedList<LocalVariableDescriptor>();
-
-            Set<SimpleName> newLocalVariables = pf.getLocalVariables();
-            System.out.println("detected " + newLocalVariables.size() + " local vars");
-            
-            for (SimpleName simpleName : newLocalVariables) {
-                IVariableBinding varBinding = (IVariableBinding) simpleName
-                        .resolveBinding();
-                astnode = newUnit.findDeclaringNode(varBinding);
-                int position = determineFinalPosition(astnode.getParent() , newUnit);
-
-                System.out.println(newUnit.getLineNumber(position) + " : "
-                        + newUnit.getColumnNumber(astnode.getStartPosition() + 1 + astnode.getLength()) + " >> "
-                        + varBinding.getType().getName() + " "
-                        + varBinding.getName());
-
-                locVariables.add(new LocalVariableDescriptor(varBinding.getName(),
-                        varBinding.getType().getQualifiedName(), newUnit
-                                .getLineNumber(position), newUnit
-                                .getColumnNumber(position) + 1, null));
-
-            }
-            wpd.setLocalVariables(locVariables);
-            System.out.println("sizeof locVars " + locVariables.size());
-            
-        } catch (Throwable e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return wpd;
-    }
-
-    private int determineFinalPosition(ASTNode varDeclarationStatment, CompilationUnit unit) {
-        
-        System.out.println("EXT " + unit.getExtendedStartPosition(varDeclarationStatment));
-        System.out.println("EXT " + unit.getExtendedLength(varDeclarationStatment));
-
-        if(!(varDeclarationStatment instanceof VariableDeclarationStatement))
-            return -1;
-        
-        VariableDeclarationStatement vds = (VariableDeclarationStatement) varDeclarationStatment;
-        Iterator<VariableDeclarationFragment> it = vds.fragments().iterator();
-        int pos = 0;
+        LinkedList<LocalVariableDescriptor> localVariables = new LinkedList<LocalVariableDescriptor>();
+        Iterator<Integer> it = postions.iterator();
         while (it.hasNext()) {
-            VariableDeclarationFragment vdf = (VariableDeclarationFragment) it.next();
-            pos = vdf.getStartPosition() + vdf.getLength();
-            System.out.println("determinePos start " + vdf.getStartPosition());
-            System.out.println("EXT " + unit.getExtendedStartPosition(vdf));
-            System.out.println("determinePos " + pos);
-            System.out.println("EXT " + unit.getExtendedStartPosition(vdf) +" lengthXXX "+ unit.getExtendedLength(vdf));
-            System.out.println("determinePos col " + unit.getColumnNumber(pos));
+            Integer pos = (Integer) it.next();
+            IVariableBinding varBinding =  positionInfo.get(pos);
+            localVariables.add(new LocalVariableDescriptor(varBinding.getName(),
+                  varBinding.getType().getQualifiedName(), 0, pos, null));
+        }   
+
+        // reset method name :: this is important, otherwise KeY will not be able to find the method later on
+        try {
+            IMethod m = (IMethod)getICUnit().getElementAt(wpd.getColumn());
+            wpd.setDeclaringMethod(m.getElementName());
+        } catch (JavaModelException e) {
+            e.printStackTrace();
         }
-        return pos+1;
+        wpd.setLocalVariables(localVariables);
+        return wpd;
     }
 
     /**
@@ -546,8 +434,6 @@ public class WatchpointView extends ViewPart {
     public WatchPointManager getWatchPointManager() {
         return watchPointManager;
     }
-
-    // TODO correct the doc
 
     /**
      * Gets the watch point descriptor.
@@ -568,8 +454,8 @@ public class WatchpointView extends ViewPart {
             int offset = tsel.getOffset();
             IFile file = (IFile) tedit.getEditorInput().getAdapter(IFile.class);
             ICompilationUnit unit = JavaCore.createCompilationUnitFrom(file);
-            setPathToDebugUnit(VisualDebugger.tempDir
-                    + unit.getPath().toOSString().substring(1));
+            setICUnit(unit);
+            
             String source = "";
 
             try {
@@ -597,7 +483,6 @@ public class WatchpointView extends ViewPart {
                     watchpointDescriptor.setDeclaringType(((IField) je)
                             .getDeclaringType().getFullyQualifiedName());
                     watchpointDescriptor.setSource(source);
-                    // **
                     watchpointDescriptor.setVarName(varName);
                     watchpointDescriptor.setLocal(false);
 
@@ -616,7 +501,6 @@ public class WatchpointView extends ViewPart {
                         watchpointDescriptor.setDeclaringType(method
                                 .getDeclaringType().getFullyQualifiedName());
                         watchpointDescriptor.setSource(source);
-                        // **
                         watchpointDescriptor.setVarName(varName);
                         watchpointDescriptor.setLocal(true);
 
@@ -636,37 +520,17 @@ public class WatchpointView extends ViewPart {
         return watchpointDescriptor;
     }
 
-    private void setPathToDebugUnit(String path) {
-        pathToDebugUnit = path;
-
-    }
-
-    public void setLocalVariables(Set<SimpleName> vars) {
-        localVariables = vars;
-    }
-
-    private Set<SimpleName> getVars() {
-        return localVariables;
-    }
-
-    public void setUnit(CompilationUnit unit) {
-        this.unit = unit;
-    }
-
-    public CompilationUnit getUnit() {
-        return unit;
-    }
-
-    public void setICUnit(ICompilationUnit unit) {
+    private void setICUnit(ICompilationUnit unit) {
         this.icunit = unit;
     }
 
-    public ICompilationUnit getICUnit() {
+    private ICompilationUnit getICUnit() {
         return icunit;
     }
-
-    private String getPathToDebugUnit() {
-        return pathToDebugUnit;
+    private void setPositions(LinkedList<Integer> positions) {
+        this.positions = positions;
     }
-
+    private LinkedList<Integer> getPositions() {
+        return this.positions;
+    }
 }

@@ -2,7 +2,6 @@ package de.uka.ilkd.key.visualdebugger;
 
 import java.util.List;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class WatchpointDescriptor.
  */

@@ -4,18 +4,35 @@ import java.util.*;
 
 import org.eclipse.jdt.core.dom.*;
 
+/**
+ * The Class PositionFinder.
+ */
 public class PositionFinder extends ASTVisitor {
-    private Set<SimpleName> oldLocalVariables = new HashSet<SimpleName>();
-    private Set<SimpleName> newLocalVariables = new HashSet<SimpleName>();
+
+    /** The method. */
     private String method;
 
-    public PositionFinder(Set<SimpleName> localVariables,
-            String methodOfInterest) {
+    /** The position info. */
+    private HashMap<IVariableBinding, Integer> positionInfo = new HashMap<IVariableBinding, Integer>();
+    /** The count. */
+    int count = 0;
+
+    /**
+     * Instantiates a new position finder.
+
+     * @param methodOfInterest
+     *            the method of interest
+     */
+    public PositionFinder(String methodOfInterest) {
         super();
-        this.oldLocalVariables = localVariables;
         this.method = methodOfInterest;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jdt.core.dom.ASTVisitor#visit(org.eclipse.jdt.core.dom.SimpleName)
+     */
     public boolean visit(SimpleName sn) {
 
         IBinding binding = sn.resolveBinding();
@@ -25,23 +42,33 @@ public class PositionFinder extends ASTVisitor {
 
             String thisMethod = vb.getDeclaringMethod() + "";
             if (thisMethod.equals(method) && !vb.isField()) {
-                for (SimpleName simpleName : oldLocalVariables) {
-//TODO eliminate duplicates
-                    if (simpleName.toString().equals(sn.toString())) {
-                        System.out
-                                .println("+++++  " + sn + " " + vb.hashCode());
-                            newLocalVariables.add(sn);
-                            
-                        }
-
-                    }
+                if (vb.isParameter()) {
+                    if (!(positionInfo.containsKey(vb)))
+                        positionInfo.put(vb, count++);
                 }
             }
+        }
         return false;
     }
 
-    public Set<SimpleName> getLocalVariables() {
-        return newLocalVariables;
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jdt.core.dom.ASTVisitor#visit(org.eclipse.jdt.core.dom.VariableDeclarationFragment)
+     */
+    public boolean visit(VariableDeclarationFragment vdf) {
+
+        IBinding binding = vdf.resolveBinding();
+
+        if (binding instanceof IVariableBinding) {
+            IVariableBinding vb = (IVariableBinding) binding;
+
+            String thisMethod = vb.getDeclaringMethod() + "";
+            if (thisMethod.equals(method) && !vb.isField()) {
+                vdf.accept(new Helper());
+            }
+        }
+        return false;
     }
 
     /**
@@ -52,5 +79,36 @@ public class PositionFinder extends ASTVisitor {
      */
     public void process(CompilationUnit unit) {
         unit.accept(this);
+    }
+
+    /**
+     * The Class Helper.
+     */
+    class Helper extends ASTVisitor {
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.eclipse.jdt.core.dom.ASTVisitor#visit(org.eclipse.jdt.core.dom.SimpleName)
+         */
+        public boolean visit(SimpleName sn) {
+            IBinding binding = sn.resolveBinding();
+
+            if (binding instanceof IVariableBinding) {
+                IVariableBinding vb = (IVariableBinding) binding;
+                if (!(positionInfo.containsKey(vb)))
+                    positionInfo.put(vb, count++);
+            }
+            return false;
+        }
+    }
+
+    /**
+     * Gets the position info.
+     * 
+     * @return the position info
+     */
+    public HashMap<IVariableBinding, Integer> getPositionInfo() {
+        return positionInfo;
     }
 }

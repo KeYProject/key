@@ -1,7 +1,7 @@
 package visualdebugger.astops;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -117,4 +117,18 @@ public final class Util {
             return null;
         }
     }
+    public static HashMap<Integer,IVariableBinding> valueToKey(HashMap<IVariableBinding , Integer> hm ){
+        
+        HashMap<Integer,IVariableBinding> newHashMap = new HashMap<Integer, IVariableBinding>(); 
+        
+        Iterator<Entry<IVariableBinding, Integer>> it = hm.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<org.eclipse.jdt.core.dom.IVariableBinding, java.lang.Integer> entry = (Map.Entry<org.eclipse.jdt.core.dom.IVariableBinding, java.lang.Integer>) it
+                    .next();
+            newHashMap.put(entry.getValue(), entry.getKey());
+            
+        }
+        return newHashMap;
+    }
+    
 }
