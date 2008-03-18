@@ -701,8 +701,7 @@ public class TermFactory {
 	    final ArrayOfQuantifiableVariable[] bv =
 	        new ArrayOfQuantifiableVariable [subTerms.length];
             final QuanUpdateOperator updOp = (QuanUpdateOperator)op;
-            Arrays.fill ( bv, new ArrayOfQuantifiableVariable () );
-            bv[0] = vars;
+            Arrays.fill ( bv, vars );
             return createQuanUpdateTerm ( updOp, subTerms, bv );
 	} else if (op instanceof IfExThenElse) {
 	    return createIfExThenElseTerm ( vars,
