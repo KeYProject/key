@@ -361,9 +361,7 @@ public class PreservesGuardPO extends EnsuresPO {
         
         //create and conjoin "ex x . Acc(x, p)" for all parameters p of an 
         //object sort
-        IteratorOfProgramVariable it = paramVars.iterator();
-        while(it.hasNext()) {
-            ProgramVariable paramVar = it.next();
+        for (final ProgramVariable paramVar : paramVars) {
             Term paramAccTerm = createAccessedTerm(paramVar,
                                                    javaLangObjectSort, 
                                                    accPred);
@@ -441,6 +439,7 @@ public class PreservesGuardPO extends EnsuresPO {
             dependsPO.readProblem(mod);
             poTerms[i] = dependsPO.getTerm();
             poNames[i] = dependsPO.name();
+            i++;
         }
     }
     

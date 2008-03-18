@@ -42,9 +42,6 @@ public class TypeConverter extends TermBuilder {
     private IntegerDomainLDT integerDomainLDT;
     private ListOfLDT models = SLListOfLDT.EMPTY_LIST;
 
-
-    /** required for this handling */
-    private final ThisReference thisReference = new ThisReference();
     
     public static StringConverter stringConverter =new StringConverter();
     

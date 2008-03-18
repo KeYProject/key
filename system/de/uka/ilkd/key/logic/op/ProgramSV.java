@@ -383,7 +383,8 @@ x     * @return the updated match conditions including mapping
         
         final ExecutionContext ec = instantiations.getExecutionContext();        
         
-        final java.util.ArrayList matchedElements = new java.util.ArrayList();        
+        final java.util.ArrayList<ProgramElement> matchedElements = 
+            new java.util.ArrayList<ProgramElement>();        
 
         while (src != null) {
             if (!check(src, ec, services)) {

@@ -31,7 +31,6 @@ import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;

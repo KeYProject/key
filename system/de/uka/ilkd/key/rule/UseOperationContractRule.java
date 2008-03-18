@@ -33,7 +33,6 @@ import de.uka.ilkd.key.speclang.FormulaWithAxioms;
 import de.uka.ilkd.key.speclang.IteratorOfClassInvariant;
 import de.uka.ilkd.key.speclang.IteratorOfOperationContract;
 import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.SetAsListOfClassInvariant;
 import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 import de.uka.ilkd.key.speclang.SetOfOperationContract;
 import de.uka.ilkd.key.speclang.SignatureVariablesFactory;

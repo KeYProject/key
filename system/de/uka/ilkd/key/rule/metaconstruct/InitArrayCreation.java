@@ -106,7 +106,7 @@ public class InitArrayCreation extends InitArray {
      * @param services the Services object
      */
     private ProgramVariable[] evaluateAndCheckDimensionExpressions
-	(LinkedList bodyStmnts, ArrayOfExpression dimExpr,
+	(LinkedList<Statement> bodyStmnts, ArrayOfExpression dimExpr,
 	 Services services) {
 
 	Expression checkDimensions = BooleanLiteral.FALSE;
@@ -148,7 +148,7 @@ public class InitArrayCreation extends InitArray {
     /**
      * creates an array of dimension <code>dimensions.length</code>
      */
-    private void createNDimensionalArray(LinkedList bodyStmnts,
+    private void createNDimensionalArray(LinkedList<Statement> bodyStmnts,
 					 Expression resultVar,
 					 KeYJavaType arrayType,
 					 ProgramVariable[] dimensions,
@@ -206,7 +206,7 @@ public class InitArrayCreation extends InitArray {
     }
 
 
-    private void createOneDimensionalArrayTransient(LinkedList bodyStmnts,
+    private void createOneDimensionalArrayTransient(LinkedList<Statement> bodyStmnts,
 					 Expression resultVar,
 					 KeYJavaType arrayType,
 					 ProgramVariable[] dimensions, 
@@ -227,7 +227,7 @@ public class InitArrayCreation extends InitArray {
     private ProgramElement arrayCreationWithoutInitializers
 	(Expression newObject, NewArray na, Services services) {
 	
-	final LinkedList bodyStmnts = new LinkedList();	
+	final LinkedList<Statement> bodyStmnts = new LinkedList<Statement>();	
 
 	final ProgramVariable[] dimensions = 
 	    evaluateAndCheckDimensionExpressions
@@ -238,7 +238,7 @@ public class InitArrayCreation extends InitArray {
 	createNDimensionalArray(bodyStmnts, newObject, arrayType, 
 				dimensions, services);
 
- 	return new StatementBlock((Statement[])bodyStmnts.toArray
+ 	return new StatementBlock(bodyStmnts.toArray
 				  (new Statement[bodyStmnts.size()]));
 	
     }
@@ -251,7 +251,7 @@ public class InitArrayCreation extends InitArray {
 	(Expression newObject, MethodReference mref,
 	 Services services, ExecutionContext ec) {
 	
-	LinkedList bodyStmnts = new LinkedList();	
+	LinkedList<Statement> bodyStmnts = new LinkedList<Statement>();	
 
 	ProgramVariable[] dimensions = 
 	    evaluateAndCheckDimensionExpressions
@@ -266,7 +266,7 @@ public class InitArrayCreation extends InitArray {
 				mref.getArgumentAt(1),
 				services);
 
- 	return new StatementBlock((Statement[])bodyStmnts.toArray
+ 	return new StatementBlock(bodyStmnts.toArray
 				  (new Statement[bodyStmnts.size()]));
 	
     }

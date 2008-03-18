@@ -14,7 +14,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 public class Metavariable extends TermSymbol
-    implements ParsableVariable, Comparable {
+    implements ParsableVariable, Comparable<Metavariable> {
 
     // Used to define an alternative order of all existing
     // metavariables
@@ -61,25 +61,22 @@ public class Metavariable extends TermSymbol
 	return 0;
     }
 
-    public int compareTo ( Object p ) {
-	if ( p == this )
+    public int compareTo ( Metavariable p_mr ) {
+	if ( p_mr == this )
 	    return 0;
-	if ( p == null )
+	if ( p_mr == null )
 	    throw new NullPointerException ();
-
-	// throws a ClassCastException on error
-	final Metavariable cmp = (Metavariable)p;
-
+	
 	// temporary variables are the greatest ones
 	if ( isTemporaryVariable () ) {
-            if ( !cmp.isTemporaryVariable () ) return 1;
+            if ( !p_mr.isTemporaryVariable () ) return 1;
         } else {
-            if ( cmp.isTemporaryVariable () ) return -1;
+            if ( p_mr.isTemporaryVariable () ) return -1;
         }
     
-	int t = name ().toString ().compareTo ( cmp.name ().toString () );
+	int t = name ().toString ().compareTo ( p_mr.name ().toString () );
 	if ( t == 0 )
-	    return serial < (cmp).serial ? -1 : 1;
+	    return serial < p_mr.serial ? -1 : 1;
 	return t;
     }
     

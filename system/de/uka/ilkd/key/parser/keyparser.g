@@ -3847,6 +3847,7 @@ varexp[TacletBuilder b]
     | varcond_non_implicit[b] | varcond_non_implicit_query[b]
     | varcond_enum_const[b]
     | varcond_inReachableState[b] 
+    | varcond_isupdated[b]    
   ) 
   | 
   ( (NOT {negated = true;} )? 
@@ -3859,7 +3860,6 @@ varexp[TacletBuilder b]
       | varcond_static[b,negated] 
       | varcond_typecheck[b, negated]
       | varcond_localvariable[b, negated]
-	  | varcond_isupdated[b, negated]
       | varcond_freeLabelIn[b,negated] )
   )
 ;
@@ -4169,14 +4169,14 @@ varcond_localvariable [TacletBuilder b, boolean negated]
         } 
 ;
 
-varcond_isupdated [TacletBuilder b, boolean negated]
+varcond_isupdated [TacletBuilder b]
 {
   ParsableVariable x = null;
 }
 :
    ISUPDATED 
 	LPAREN x=varId RPAREN {
-     	   b.addVariableCondition(new IsUpdatedVariableCondition((SchemaVariable) x, negated));
+     	   b.addVariableCondition(new IsUpdatedVariableCondition((SchemaVariable) x));
         } 
 ;
 

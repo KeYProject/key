@@ -9,9 +9,6 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
@@ -362,9 +359,9 @@ public class MethodCall extends ProgramMetaConstruct {
      * <pre>
      * Quote JLS 15.12.4.2 Evaluate Arguments The process of evaluating of the
      * argument list differs, depending on whether the method being invoked is a
-     * fixed arity method or a variable arity method (§8.4.1).
+     * fixed arity method or a variable arity method (ï¿½8.4.1).
      * 
-     * If the method being invoked is a variable arity method (§8.4.1) m, it
+     * If the method being invoked is a variable arity method (ï¿½8.4.1) m, it
      * necessarily has n>0 formal parameters. The final formal parameter of m
      * necessarily has type T[] for some T, and m is necessarily being invoked
      * with k0 actual argument expressions.
