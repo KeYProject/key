@@ -13,7 +13,6 @@ package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
@@ -42,8 +41,8 @@ public class RuleAppIndex  {
 
     private BuiltInRuleAppIndex builtInRuleAppIndex;
 
-    private List                listenerList =
-        Collections.synchronizedList ( new ArrayList ( 10 ) );
+    private List<NewRuleListener>                listenerList =
+        Collections.synchronizedList ( new ArrayList<NewRuleListener> ( 10 ) );
 
     /**
      * The current mode of the index: For <code>autoMode==true</code>, the index
@@ -435,9 +434,9 @@ public class RuleAppIndex  {
      */ 
     private void informNewRuleListener(RuleApp         p_app,
                                        PosInOccurrence p_pos) {
-	Iterator it = listenerList.iterator();
-	while (it.hasNext())
-	    ((NewRuleListener)it.next()).ruleAdded(p_app, p_pos);
+	for (final NewRuleListener listener : listenerList) {
+	    listener.ruleAdded(p_app, p_pos);
+	}
     }
 
     

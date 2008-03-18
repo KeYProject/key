@@ -46,10 +46,6 @@ public class ProofSaver {
    protected Proof proof;
    LogicPrinter printer;
    
-   
-   private ProofSaver() {
-   }
-
    public ProofSaver(IMain main, String filename) {
       this.main = main;
       this.mediator = main.mediator();

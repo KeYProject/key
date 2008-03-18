@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -202,7 +201,7 @@ public class VariableNameProposer implements InstantiationProposer {
                 contextProgram = new StatementBlock();
         
         final LabelCollector lc = 
-            new LabelCollector(contextProgram, new HashSet(10), services);
+            new LabelCollector(contextProgram, services);
 
         lc.start();
         String proposal;         
