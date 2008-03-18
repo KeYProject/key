@@ -439,6 +439,7 @@ public class PreservesGuardPO extends EnsuresPO {
             dependsPO.readProblem(mod);
             poTerms[i] = dependsPO.getTerm();
             poNames[i] = dependsPO.name();
+            i++;
         }
     }
     
