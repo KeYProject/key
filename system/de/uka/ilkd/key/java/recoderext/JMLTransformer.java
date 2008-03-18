@@ -17,7 +17,6 @@ import de.uka.ilkd.key.collection.IteratorOfString;
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.collection.SLListOfString;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer.TransformerCache;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.IteratorOfTextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;

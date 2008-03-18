@@ -160,7 +160,7 @@ class JMLInfoExtractor {
     /**
      * Returns true, if the given method is specified "pure".
      */
-    public static  boolean isPure(ProgramMethod pm) {
+    public static boolean isPure(ProgramMethod pm) {
         ListOfComment coms = SLListOfComment.EMPTY_LIST;
         MethodDeclaration method = pm.getMethodDeclaration();
         

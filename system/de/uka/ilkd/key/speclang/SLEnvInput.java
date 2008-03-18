@@ -16,12 +16,11 @@ import java.util.Set;
 
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.IteratorOfProgramElement;
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
-import de.uka.ilkd.key.logic.op.IteratorOfProgramMethod;
 import de.uka.ilkd.key.logic.op.ListOfProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.init.AbstractEnvInput;
@@ -102,10 +101,7 @@ public class SLEnvInput extends AbstractEnvInput {
             //contracts, loop invariants
             ListOfProgramMethod pms 
                 = javaInfo.getAllProgramMethodsLocallyDeclared(kjt);
-            IteratorOfProgramMethod it2 = pms.iterator();
-            while(it2.hasNext()) {
-                final ProgramMethod pm = it2.next();
-                
+            for(ProgramMethod pm : pms) {
                 //contracts
                 specRepos.addOperationContracts(
                             specExtractor.extractOperationContracts(pm));
@@ -114,11 +110,10 @@ public class SLEnvInput extends AbstractEnvInput {
                 JavaASTCollector collector 
                     = new JavaASTCollector(pm.getBody(), LoopStatement.class);
                 collector.start();
-                IteratorOfProgramElement it3 = collector.getNodes().iterator();
-                while(it3.hasNext()) {
-                    LoopStatement loop = (LoopStatement) it3.next();
-                    LoopInvariant inv
-                        = specExtractor.extractLoopInvariant(pm, loop);
+                for(ProgramElement loop : collector.getNodes()) {
+                    LoopInvariant inv = specExtractor.extractLoopInvariant(
+                	    			pm, 
+                        			(LoopStatement) loop);
                     if(inv != null) {
                         specRepos.setLoopInvariant(inv);
                     }

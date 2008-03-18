@@ -83,7 +83,8 @@ public class Services{
     /**
      * specification repository
      */
-    private SpecificationRepository specRepos = new SpecificationRepository();
+    private SpecificationRepository specRepos 
+    	= new SpecificationRepository(this);
 
     /**
      * creates a new Services object with a new TypeConverter and a new
@@ -221,7 +222,6 @@ public class Services{
 	       instanceof SchemaCrossReferenceServiceConfiguration),
 	     "services: tried to copy schema cross reference service config.");
 	Services s = new Services(getExceptionHandler());
-        s.specRepos = new SpecificationRepository();        
 	s.setTypeConverter(getTypeConverter().copy(s));
 	s.setNamespaces(namespaces.copy());
         s.setUMLInfo(umlinfo);
