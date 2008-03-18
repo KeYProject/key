@@ -17,12 +17,11 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementContainer;
-import de.uka.ilkd.key.java.abstraction.IteratorOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
 import de.uka.ilkd.key.java.declaration.ArrayOfVariableSpecification;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -34,8 +33,6 @@ import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
 import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.IteratorOfLogicVariable;
-import de.uka.ilkd.key.logic.op.IteratorOfProgramMethod;
 import de.uka.ilkd.key.logic.op.ListOfLogicVariable;
 import de.uka.ilkd.key.logic.op.ListOfParsableVariable;
 import de.uka.ilkd.key.logic.op.ListOfProgramMethod;
@@ -51,7 +48,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.ClassInvariantImpl;
 import de.uka.ilkd.key.speclang.FormulaWithAxioms;
-import de.uka.ilkd.key.speclang.IteratorOfPositionedString;
 import de.uka.ilkd.key.speclang.ListOfPositionedString;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
@@ -123,16 +119,12 @@ public class JMLSpecFactory {
         
         KeYJavaType kjt = pm.getContainerType();
         assert kjt != null;
-        ListOfKeYJavaType subs = ji.getAllSubtypes(kjt);
-        for(IteratorOfKeYJavaType it = subs.iterator(); it.hasNext(); ) {
-            KeYJavaType sub = it.next();
+        for(KeYJavaType sub : ji.getAllSubtypes(kjt)) {
             assert sub != null;
             
             ListOfProgramMethod subPms 
                 = ji.getAllProgramMethodsLocallyDeclared(sub);
-            for(IteratorOfProgramMethod it2 = subPms.iterator(); 
-                it2.hasNext(); ) {
-                ProgramMethod subPm = it2.next();
+            for(ProgramMethod subPm : subPms) {
                 if(subPm.getMethodDeclaration().getName().equals(name) 
                    && subPm.getParameterDeclarationCount() == numParams) {
                     boolean paramsEqual = true;
@@ -162,34 +154,26 @@ public class JMLSpecFactory {
     private ListOfParsableVariable collectLocalVariables(StatementContainer sc, 
                                                          LoopStatement loop){
         ListOfParsableVariable result = SLListOfParsableVariable.EMPTY_LIST;
-        for(int i = 0; i < sc.getStatementCount(); i++) {
+        for(int i = 0, m = sc.getStatementCount(); i < m; i++) {
             Statement s = sc.getStatementAt(i);
+            
+            if(s instanceof For) {
+        	ArrayOfVariableSpecification avs 
+        		= ((For)s).getVariablesInScope();
+        	for(int j = 0, n = avs.size(); j < n; j++) {
+        	    VariableSpecification vs = avs.getVariableSpecification(j);
+        	    ProgramVariable pv 
+        	    	= (ProgramVariable) vs.getProgramVariable();
+        	    result = result.prepend(pv);
+        	}
+            }
+
             if(s == loop) {
-                if(loop instanceof For) {
-                    for(int j = 0; loop.getInitializers() != null 
-                        && j < loop.getInitializers().size(); j++) {
-                        if(loop.getInitializers().getLoopInitializer(j) 
-                            instanceof LocalVariableDeclaration) {
-                            ArrayOfVariableSpecification vars = 
-                                ((LocalVariableDeclaration) 
-                                        loop.getInitializers()
-                                            .getLoopInitializer(j))
-                                            .getVariables();
-                            for(int k=0; k < vars.size(); k++) {
-                                ProgramVariable pv
-                                    = (ProgramVariable) 
-                                        vars.getVariableSpecification(k)
-                                            .getProgramVariable();
-                                result = result.prepend(pv);
-                            }
-                        }
-                    }
-                }
                 return result;
             } else if(s instanceof LocalVariableDeclaration) {
                 ArrayOfVariableSpecification vars = 
                     ((LocalVariableDeclaration) s).getVariables();
-                for(int j = 0; j < vars.size(); j++) {
+                for(int j = 0, n = vars.size(); j < n; j++) {
                     ProgramVariable pv 
                         = (ProgramVariable) vars.getVariableSpecification(j)
                                                 .getProgramVariable();
@@ -204,7 +188,7 @@ public class JMLSpecFactory {
                 }
             } else if(s instanceof BranchStatement) {
                 BranchStatement bs = (BranchStatement) s;
-                for(int j = 0; j < bs.getBranchCount(); j++) {
+                for(int j = 0, n = bs.getBranchCount(); j < n; j++) {
                     ListOfParsableVariable lpv 
                         = collectLocalVariables(bs.getBranchAt(j), loop);
                     if(lpv != null){ 
@@ -293,15 +277,13 @@ public class JMLSpecFactory {
                                                    programMethod, 
                                                    false);
         Map atPreFunctions = new LinkedHashMap();
-        IteratorOfPositionedString it;
         
         //translate requires
         FormulaWithAxioms requires = FormulaWithAxioms.TT;
-        it = originalRequires.iterator();
-        while(it.hasNext()) {
+        for(PositionedString expr : originalRequires) {
             FormulaWithAxioms translated 
                 = translator.translateExpression(
-                                    it.next(),
+                                    expr,
                                     programMethod.getContainerType(),
                                     selfVar, 
                                     paramVars, 
@@ -317,11 +299,10 @@ public class JMLSpecFactory {
             assignable = EverythingLocationDescriptor.INSTANCE_AS_SET;
         } else {
             assignable = SetAsListOfLocationDescriptor.EMPTY_SET;
-            it = originalAssignable.iterator();
-            while(it.hasNext()) {
+            for(PositionedString expr : originalAssignable) {
                 SetOfLocationDescriptor translated 
                     = translator.translateAssignableExpression(
-                                        it.next(), 
+                                        expr, 
                                         programMethod.getContainerType(),
                                         selfVar, 
                                         paramVars);
@@ -331,11 +312,10 @@ public class JMLSpecFactory {
         
         //translate ensures
         FormulaWithAxioms ensures = FormulaWithAxioms.TT;
-        it = originalEnsures.iterator();
-        while(it.hasNext()) {
+        for(PositionedString expr : originalEnsures) {
             FormulaWithAxioms translated 
                 = translator.translateExpression(
-                                    it.next(),
+                                    expr,
                                     programMethod.getContainerType(),
                                     selfVar, 
                                     paramVars, 
@@ -347,11 +327,10 @@ public class JMLSpecFactory {
         
         //translate signals
         FormulaWithAxioms signals = FormulaWithAxioms.TT;
-        it = originalSignals.iterator();
-        while(it.hasNext()) {
+        for(PositionedString expr : originalSignals) {
             FormulaWithAxioms translated 
                 = translator.translateSignalsExpression(
-                                    it.next(), 
+                                    expr, 
                                     programMethod.getContainerType(),
                                     selfVar, 
                                     paramVars, 
@@ -363,11 +342,10 @@ public class JMLSpecFactory {
         
         //translate signals_only
         FormulaWithAxioms signalsOnly = FormulaWithAxioms.TT;
-        it = originalSignalsOnly.iterator();
-        while(it.hasNext()) {
+        for(PositionedString expr : originalSignalsOnly) {
             FormulaWithAxioms translated 
                 = translator.translateSignalsOnlyExpression(
-                                    it.next(),
+                                    expr,
                                     programMethod.getContainerType(),
                                     excVar);
             signalsOnly = signalsOnly.conjoin(translated);        
@@ -375,11 +353,10 @@ public class JMLSpecFactory {
         
         //translate diverges
         FormulaWithAxioms diverges = FormulaWithAxioms.FF;
-        it = originalDiverges.iterator();
-        while(it.hasNext()) {
+        for(PositionedString expr : originalDiverges) {
             FormulaWithAxioms translated 
                 = translator.translateExpression(
-                                    it.next(), 
+                                    expr, 
                                     programMethod.getContainerType(),
                                     selfVar, 
                                     paramVars, 
@@ -507,11 +484,7 @@ public class JMLSpecFactory {
         SetOfOperationContract result 
             = createJMLOperationContracts(programMethod, textualSpecCase);
         
-        SetOfProgramMethod overridingMethods 
-            = getOverridingMethods(programMethod);
-        for(IteratorOfProgramMethod it = overridingMethods.iterator(); 
-            it.hasNext(); ) {
-            ProgramMethod subPm = it.next();       
+        for(ProgramMethod subPm : getOverridingMethods(programMethod)) {
             SetOfOperationContract subContracts 
                 = createJMLOperationContracts(subPm, textualSpecCase);
             result = result.union(subContracts);
@@ -553,10 +526,9 @@ public class JMLSpecFactory {
         }
 
         ListOfParsableVariable localVars 
-            = collectLocalVariables(programMethod.getBody(), loop);
+            = collectLocalVariables(programMethod.getBody(), loop);        
         paramVars = paramVars.append(localVars);
         Map atPreFunctions = new LinkedHashMap();
-        IteratorOfPositionedString it;
         
         //translate invariant
         Term invariant;
@@ -564,11 +536,10 @@ public class JMLSpecFactory {
             invariant = null;
         } else {
             invariant = TB.tt();
-            it = originalInvariant.iterator();
-            while(it.hasNext()) {
+            for(PositionedString expr : originalInvariant) {
                 FormulaWithAxioms translated 
                     = translator.translateExpression(
-                                            it.next(), 
+                                            expr, 
                                             programMethod.getContainerType(),
                                             selfVar, 
                                             paramVars, 
@@ -582,21 +553,17 @@ public class JMLSpecFactory {
         
         //translate skolem declarations
         ListOfParsableVariable freeVars = SLListOfParsableVariable.EMPTY_LIST;
-        it = originalSkolemDeclarations.iterator();
-        while(it.hasNext()) {
+        for(PositionedString expr : originalSkolemDeclarations) {
             ListOfLogicVariable translated 
-                = translator.translateVariableDeclaration(it.next());
-            IteratorOfLogicVariable it2 = translated.iterator();
-            while(it2.hasNext()) {
-                freeVars = freeVars.prepend(it2.next());
+                = translator.translateVariableDeclaration(expr);
+            for(LogicVariable lv : translated) {
+                freeVars = freeVars.prepend(lv);
             }
         }
         
         //translate predicates
         SetOfTerm predicates = SetAsListOfTerm.EMPTY_SET;
-        it = originalPredicates.iterator();
-        while(it.hasNext()) {
-            PositionedString ps = it.next();
+        for(PositionedString ps : originalPredicates) {
             String[] exprs = ps.text.split(",", 0);
             
             for(int i = 0; i < exprs.length; i++) {
@@ -620,11 +587,10 @@ public class JMLSpecFactory {
             assignable = EverythingLocationDescriptor.INSTANCE_AS_SET;
         } else {
             assignable = SetAsListOfLocationDescriptor.EMPTY_SET;
-            it = originalAssignable.iterator();
-            while(it.hasNext()) {
+            for(PositionedString expr : originalAssignable) {
                 SetOfLocationDescriptor translated 
                     = translator.translateAssignableExpression(
-                                        it.next(), 
+                                        expr, 
                                         programMethod.getContainerType(),
                                         selfVar, 
                                         paramVars);

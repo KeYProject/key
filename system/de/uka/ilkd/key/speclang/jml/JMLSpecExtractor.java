@@ -302,8 +302,17 @@ public class JMLSpecExtractor implements SpecExtractor {
             return result;
         }        
         
-        //determine purity 
+        //determine purity, add purity contract
         final boolean isPure = JMLInfoExtractor.isPure(pm);
+        if(isPure) {
+            TextualJMLSpecCase sc 
+            	= new TextualJMLSpecCase(SLListOfString.EMPTY_LIST, 
+                                     	 Behavior.NONE);
+            sc.addAssignable(new PositionedString("\\nothing"));
+            SetOfOperationContract contracts
+            	= jsf.createJMLOperationContractsAndInherit(pm, sc);
+            result = result.union(contracts);
+        }
 
         //get textual JML constructs
         Comment[] comments = pm.getComments();        
@@ -381,17 +390,6 @@ public class JMLSpecExtractor implements SpecExtractor {
             
             SetOfOperationContract contracts 
                 = jsf.createJMLOperationContractsAndInherit(pm, specCase);
-            result = result.union(contracts);
-        }
-        
-        //if pure, add purity contract
-        if(isPure) {
-            TextualJMLSpecCase sc 
-            	= new TextualJMLSpecCase(SLListOfString.EMPTY_LIST, 
-                                     	 Behavior.NONE);
-            sc.addAssignable(new PositionedString("\\nothing"));
-            SetOfOperationContract contracts
-            	= jsf.createJMLOperationContractsAndInherit(pm, sc);
             result = result.union(contracts);
         }
         
