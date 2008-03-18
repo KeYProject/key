@@ -13,7 +13,6 @@ package de.uka.ilkd.key.rule;
 import java.util.HashMap;
 
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.IteratorOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -38,15 +37,12 @@ public abstract class TacletBuilder {
     /** List of additional generic conditions on the instantiations of
      * schema variables. */
     protected ListOfVariableCondition variableConditions       = SLListOfVariableCondition.EMPTY_LIST; 
-    protected HashMap goal2Choices          = null;
+    protected HashMap<TacletGoalTemplate, SetOfChoice> goal2Choices          = null;
     protected SetOfChoice choices           = SetAsListOfChoice.EMPTY_SET;
 
 
     private static boolean containsFreeVarSV(Term t) {
-
-	IteratorOfQuantifiableVariable it = t.freeVars().iterator();
-	while (it.hasNext()) {
-	    QuantifiableVariable var = it.next();
+	for (final QuantifiableVariable var : t.freeVars()) {
 	    if (var instanceof SchemaVariable && 
 		((SchemaVariable)var).isVariableSV()) {
 		return true;
@@ -133,12 +129,12 @@ public abstract class TacletBuilder {
      */
     public void addGoal2ChoicesMapping(TacletGoalTemplate gt, SetOfChoice soc){
 	if(goal2Choices==null){
-	    goal2Choices = new HashMap();
+	    goal2Choices = new HashMap<TacletGoalTemplate, SetOfChoice>();
 	}
 	goal2Choices.put(gt, soc);
     }
 	
-    public HashMap getGoal2Choices(){
+    public HashMap<TacletGoalTemplate, SetOfChoice> getGoal2Choices(){
 	return goal2Choices;
     }
 
@@ -297,7 +293,7 @@ public abstract class TacletBuilder {
 	    while(it.hasNext()){
 		TacletGoalTemplate goal = it.next();
 		if(goal2Choices.get(goal) != null && 
-		   !((SetOfChoice) goal2Choices.get(goal)).subset(active)){
+		   !goal2Choices.get(goal).subset(active)){
 		    goals = goals.removeAll(goal);
 		}
 	    }

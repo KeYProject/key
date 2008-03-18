@@ -10,8 +10,6 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-
-import recoder.kit.TypeKit;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -19,9 +17,7 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
@@ -137,13 +133,9 @@ public class SwitchToIf extends ProgramMetaConstruct {
                         services.getJavaInfo().getKeYJavaType(
                                 "java.lang.NullPointerException")), null));
         
-        ExtList operands = new ExtList();
-        operands.add(var);
-        operands.add(NullLiteral.NULL);
-        Expression cnd = new Equals(operands);
+        final Expression cnd = new Equals(var, NullLiteral.NULL);
         
-        If ifst = new If(cnd, new Then(t));
-        return new Statement[] { ifst };
+        return new Statement[] { new If(cnd, new Then(t)) };
     }
 
 

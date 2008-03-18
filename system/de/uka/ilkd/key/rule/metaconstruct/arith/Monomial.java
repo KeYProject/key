@@ -35,13 +35,14 @@ public class Monomial {
         this.coefficient = coefficient;
     }
     
-    private static final LRUCache monomialCache = new LRUCache ( 2000 );
+    private static final LRUCache<Term, Monomial> monomialCache = 
+        new LRUCache<Term, Monomial> ( 2000 );
     
     public static final Monomial ONE = new Monomial ( SLListOfTerm.EMPTY_LIST,
                                                       BigInteger.ONE );
     
     public static Monomial create(Term monoTerm, Services services) {
-        Monomial res = (Monomial)monomialCache.get ( monoTerm );
+        Monomial res = monomialCache.get ( monoTerm );
         if ( res == null ) {
             res = createHelp ( monoTerm, services );
             monomialCache.put ( monoTerm, res );
