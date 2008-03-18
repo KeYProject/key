@@ -32,8 +32,6 @@ ifeq "$(JAVA)" ""
 JAVA=$(shell which java)
 endif
 
-JIKESPATH=$(CLASSPATH):$(GENERATED_SRC_PATH):$(JAVA_HOME)/jre/lib/rt.jar
-
 # enables optimization and removes debug info (such as line tables)
 #COMMON_OPTIONS=-O -g:none -d $(BINARYPATH)
 
@@ -74,31 +72,26 @@ export KEY_VERSION_SHORT
 
 ifeq "$(JAVAC)" ""
 JAVAC=javac
+else 
+ifeq ($(JAVAC),jikes) 
+JAVAC:=javac
+endif
 endif
 
 ifeq "$(ANTLR)" ""
 ANTLR=$(JAVA) -cp $(GENERATED_SRC_PATH):$(CLASSPATH) antlr.Tool
 endif
 
-ifeq ($(JAVAC),jikes) 
-VERSION=$(shell jikes -version | grep "Version" )
-VERSION:=$(wordlist 5,5,$(VERSION))
-OPTIONS=$(COMMON_OPTIONS) +D +E +P -source 1.5 -classpath $(JIKESPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
-ifeq ($(VERSION), 1.19)
-else 
-OPTIONS:=+Peffective-java $(OPTIONS) 
-endif 
+ifeq ($(JAVAC),ajc)
+  OPTIONS=$(COMMON_OPTIONS) -nowarn -classpath $(ASPECTJRTPATH):$(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
 else
-  ifeq ($(JAVAC),ajc)
-    OPTIONS=$(COMMON_OPTIONS) -nowarn -classpath $(ASPECTJRTPATH):$(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
-  else
-    ifeq ($(JAVAC),ejc)      
-       OPTIONS=$(COMMON_OPTIONS) -warn:uselessTypeCheck,localHiding,fieldHiding,tasks\(TODO\|HACK\|%%%\)  -source 1.5 -classpath $(JAVA_HOME)/jre/lib/rt.jar:$(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
-    else 
-      OPTIONS=$(COMMON_OPTIONS) -J-Xmx512m -nowarn -source 1.5 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
-    endif
+  ifeq ($(JAVAC),ejc)      
+    OPTIONS=$(COMMON_OPTIONS) -warn:uselessTypeCheck,localHiding,fieldHiding,tasks\(TODO\|HACK\|%%%\)  -source 1.5 -classpath $(JAVA_HOME)/jre/lib/rt.jar:$(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
+  else 
+    OPTIONS=$(COMMON_OPTIONS) -J-Xmx512m -nowarn -source 1.5 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
   endif
 endif
+
 
 #for JavaCC 3.0:
 JAVACC_MAIN=javacc

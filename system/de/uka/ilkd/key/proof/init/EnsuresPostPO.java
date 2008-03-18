@@ -12,12 +12,8 @@ package de.uka.ilkd.key.proof.init;
 import java.util.Map;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.ldt.AbstractIntegerLDT;
-import de.uka.ilkd.key.logic.ldt.LDT;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ListOfProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 

@@ -63,8 +63,9 @@ public class InnerVariableNamer extends VariableNamer {
                         globals,
                         getProgramFromPIO(posOfFind),
                         null);
+        final NamespaceSet namespaces = goal.proof().getServices().getNamespaces();
         while (!isUniqueInGlobals(newname.toString(), globals) ||
-                goal.proof().getServices().getNamespaces().lookupLogicSymbol(newname)!=null) {
+                namespaces.lookupLogicSymbol(newname)!=null) {
 	    newcounter += 1; 
 	    newname = createName(bai.basename, newcounter, nci);
 	}

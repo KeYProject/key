@@ -69,7 +69,7 @@ public class EqualityConstraint implements Constraint {
 	res.instantiationCache        =
 	    instantiationCache == null ?
 	    null :
-	    (HashMap<Metavariable, Term>)instantiationCache       .clone ();
+	    (HashMap<Metavariable, Term>)instantiationCache.clone ();
 	return res;
     }
     

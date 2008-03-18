@@ -13,7 +13,6 @@ package de.uka.ilkd.key.proof.init;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 import de.uka.ilkd.key.java.ArrayOfExpression;
 import de.uka.ilkd.key.java.Statement;
