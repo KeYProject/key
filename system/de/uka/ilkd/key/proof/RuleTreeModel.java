@@ -78,12 +78,11 @@ public class RuleTreeModel extends DefaultTreeModel {
 
 
     private void rulesForGoal(Goal g) {
-        IteratorOfBuiltInRule rit = getBuiltInIndex().rules().iterator();
-        while (rit.hasNext()) {
-            BuiltInRule br = rit.next();
+        for (final BuiltInRule br : getBuiltInIndex().rules()) {
             insertAsLast(new DefaultMutableTreeNode(br), builtInRoot);
         }
-        List<NoPosTacletApp> apps = sort(getTacletIndex().allNoPosTacletApps());
+        final List<NoPosTacletApp> apps = 
+            sort(getTacletIndex().allNoPosTacletApps());
         for (final NoPosTacletApp app : apps) {
             RuleJustification just = mgt().getJustification(app);
             if (just==null) continue; // do not break system because of this
@@ -98,7 +97,7 @@ public class RuleTreeModel extends DefaultTreeModel {
     }
     
     private List<NoPosTacletApp> sort(SetOfNoPosTacletApp apps) {
-        final List<NoPosTacletApp> l = 
+        final ArrayList<NoPosTacletApp> l = 
             new ArrayList<NoPosTacletApp>(apps.size());
         
         for (final NoPosTacletApp app : apps) {
