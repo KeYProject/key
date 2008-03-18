@@ -45,7 +45,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
     private boolean continueOccurred = false;
     private boolean returnOccurred = false;
 
-    private LinkedList breakList = null;
+    private LinkedList<BreakToBeReplaced> breakList = null;
 
     /**
      * creates the WhileLoopTransformation for the transformation mode
@@ -62,7 +62,8 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
             ProgramVariable cont, ProgramVariable exc,
             ProgramVariable excParam, ProgramVariable thrownException,
             ProgramVariable brk, ProgramVariable rtrn,
-            ProgramVariable returnExpr, LinkedList breakList, Services services) {
+            ProgramVariable returnExpr, 
+            LinkedList<BreakToBeReplaced> breakList, Services services) {
 
 	super(root, outerLabel, innerLabel, services);
         this.cont = cont;
@@ -88,7 +89,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
 					SVInstantiations inst,
                                         Services services) {
 	super(root, inst, services);
-        this.breakList = new LinkedList();
+        this.breakList = new LinkedList<BreakToBeReplaced>();
     }
 
     /**
@@ -111,7 +112,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
      * returns a list of breaks that lead to abrupt termination of the loop and
      * have to be replaced
      */
-    public LinkedList breakList() {
+    public LinkedList<BreakToBeReplaced> breakList() {
         return breakList;
     }
 
@@ -177,9 +178,9 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                 needInnerLabel = true;
                 breakList.add(new BreakToBeReplaced(x));
             } else {
-                ListIterator it = breakList.listIterator(0);
+                ListIterator<BreakToBeReplaced> it = breakList.listIterator(0);
                 while (it.hasNext()) {
-                    BreakToBeReplaced b = (BreakToBeReplaced) it.next();
+                    BreakToBeReplaced b = it.next();
                     if (x == b.getBreak()) {
                         Statement[] stmnts;
                         Statement assignFlag =

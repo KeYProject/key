@@ -10,12 +10,14 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.ListIterator;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.*;
@@ -43,7 +45,7 @@ public class WhileInvRule extends AbstractMetaOperator {
      * the method neededInstantiations that is invoked 
      * before calculate
      */
-    private LinkedList breakList;
+    private LinkedList<BreakToBeReplaced> breakList;
 
     /** The JavaInfo object which is handed over as
      * a parameter of calculate.
@@ -125,8 +127,8 @@ public class WhileInvRule extends AbstractMetaOperator {
         init(term, services);
         
         // local initialisation
-        ArrayList stmnt = new ArrayList();
-        ArrayList breakIfCascade = new ArrayList();
+        ArrayList<ProgramElement> stmnt = new ArrayList<ProgramElement>();
+        ArrayList<If> breakIfCascade = new ArrayList<If>();
         
         
         ProgramVariable contFlag   = getNewLocalvariable("cont", "boolean", services);
@@ -151,10 +153,10 @@ public class WhileInvRule extends AbstractMetaOperator {
         // end of initialisation............
         
         int breakCounter = 0;
-        final ListIterator it = breakList.listIterator(0);
+        final ListIterator<BreakToBeReplaced> it = breakList.listIterator(0);
         int numberOfBreaks = 0;
         while (it.hasNext()) {
-            BreakToBeReplaced b = (BreakToBeReplaced)it.next();
+            BreakToBeReplaced b = it.next();
             ProgramVariable newVar = getNewLocalvariable("break_"+breakCounter++, 
                                                          "boolean", services);
             b.setProgramVariable(newVar);
@@ -183,7 +185,7 @@ public class WhileInvRule extends AbstractMetaOperator {
                                              breakList, services);
         w.start();
         
-        ArrayList resultSubterms = new ArrayList();
+        ArrayList<Term> resultSubterms = new ArrayList<Term>();
         
         // normal case and continue
         if (w.continueOccurred()) {
@@ -244,7 +246,7 @@ public class WhileInvRule extends AbstractMetaOperator {
         
         stmnt.add(w.result());
         StatementBlock s = new StatementBlock
-        ((Statement[])stmnt.toArray(new Statement[0]));
+        (stmnt.toArray(new Statement[0]));
         Statement resSta;
         if (svInst.getExecutionContext() != null){
             resSta = new MethodFrame(null, svInst.getExecutionContext(), s);
@@ -331,15 +333,15 @@ public class WhileInvRule extends AbstractMetaOperator {
     //---------------------------------------------------------------
 
 
-    private Term createLongJunctorTerm(Junctor junctor, ArrayList terms) {
+    private Term createLongJunctorTerm(Junctor junctor, ArrayList<Term> terms) {
         if (terms.size() == 1)
-            return (Term)terms.get(0);
+            return terms.get(0);
         else if (terms.size() == 2)
             return tf.createJunctorTerm(junctor,
-                                        (Term)terms.get(0),
-                                        (Term)terms.get(1));
+                                        terms.get(0),
+                                        terms.get(1));
         else {
-            Term arg1 = (Term)terms.get(0);
+            Term arg1 = terms.get(0);
             terms.remove(0);
             return 
                 tf.createJunctorTerm(junctor, 
@@ -390,12 +392,12 @@ public class WhileInvRule extends AbstractMetaOperator {
 
     private Term breakCase(ProgramVariable breakFlag,
                            Term post,
-                           ArrayList breakIfCascade) {
+                           ArrayList<If> breakIfCascade) {
         Term executeBreak = 
             tf.createProgramTerm
             (modality,
              addContext(root, new StatementBlock
-                        ((Statement[])breakIfCascade.toArray(new Statement[0]))),
+                        (breakIfCascade.toArray(new Statement[0]))),
              post);
         return tf.createJunctorTerm
             (Op.IMP, 
@@ -414,7 +416,7 @@ public class WhileInvRule extends AbstractMetaOperator {
 
         final Term TRUE_TERM = typeConv.getBooleanLDT().getTrueTerm();
 
-        ArrayList al = new ArrayList();
+        ArrayList<Term> al = new ArrayList<Term>();
 
         if (returnFlagTerm != null)
             al.add(tf.createEqualityTerm(Op.EQUALS, returnFlagTerm, TRUE_TERM));

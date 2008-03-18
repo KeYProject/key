@@ -10,7 +10,6 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -58,7 +57,7 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
      * transformed. Is initialised by the method neededInstantiations that is
      * invoked before calculate
      */
-    private LinkedList breakList;
+    private LinkedList<BreakToBeReplaced> breakList;
 
     /**
      * The JavaInfo object which is handed over as a parameter of calculate.
@@ -266,11 +265,9 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
 
         //
         // create a variable for each label, to reproduce the break
-        Iterator it = breakList.iterator();
         int numberOfBreaks = breakList.size();
         int breakCounter = 0;
-        while (it.hasNext()) {
-            BreakToBeReplaced b = (BreakToBeReplaced) it.next();
+        for (BreakToBeReplaced b : breakList) {
             ProgramVariable newVar =
                     getNewLocalvariable("brk_" + breakCounter++, "boolean",
                             services);
@@ -365,7 +362,7 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
         stmnt.add((Statement) w.result());
         StatementBlock s =
                 new StatementBlock(
-                        (Statement[]) stmnt.toArray(new Statement[0]));
+                        stmnt.toArray(new Statement[0]));
         Statement resSta;
         if (svInst.getExecutionContext() != null)
             resSta = new MethodFrame(null, svInst.getExecutionContext(), s);
@@ -382,7 +379,7 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
         if (modality == DIATRC)
             loopBodyModality = DIA;
 
-        Term resultTerm =
+        final Term resultTerm =
                 tf.createProgramTerm(loopBodyModality,
                         JavaBlock.createJavaBlock(new StatementBlock(resSta)),
                         result);
@@ -444,14 +441,14 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
     // --- private helper methods to construct the result term
     // ---------------------------------------------------------------
 
-    private Term createLongJunctorTerm(Junctor junctor, ArrayList terms) {
+    private Term createLongJunctorTerm(Junctor junctor, ArrayList<Term> terms) {
         if (terms.size() == 1)
-            return (Term) terms.get(0);
+            return terms.get(0);
         else if (terms.size() == 2)
-            return tf.createJunctorTerm(junctor, (Term) terms.get(0),
-                    (Term) terms.get(1));
+            return tf.createJunctorTerm(junctor, terms.get(0),
+                    terms.get(1));
         else {
-            Term arg1 = (Term) terms.get(0);
+            Term arg1 = terms.get(0);
             terms.remove(0);
             return tf.createJunctorTerm(junctor, arg1, createLongJunctorTerm(
                     junctor, terms));
@@ -503,14 +500,14 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
      * @return the term that puts this together
      */
     private Term breakCase(ProgramVariable breakFlag, Term post,
-            ArrayList breakIfCascade) {
+            ArrayList<If> breakIfCascade) {
         Term executeBreak =
                 tf.createProgramTerm(
                         modality,
                         addContext(
                                 root,
                                 new StatementBlock(
-                                        (Statement[]) breakIfCascade.toArray(new Statement[0]))),
+                                        breakIfCascade.toArray(new Statement[0]))),
                         post);
         return tf.createJunctorTerm(Op.IMP, tf.createEqualityTerm(Op.EQUALS,
                 typeConv.convertToLogicElement(breakFlag),
