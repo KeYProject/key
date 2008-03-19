@@ -12,7 +12,6 @@ package de.uka.ilkd.key.proof.mgt;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.IteratorOfClassInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.SetAsListOfClassInvariant;
 import de.uka.ilkd.key.speclang.SetOfClassInvariant;
@@ -59,7 +58,7 @@ public class ContractWithInvs {
         
         SetOfClassInvariant tempAssumedInvs 
             = SetAsListOfClassInvariant.EMPTY_SET;
-        for(int i = 0; i < assumedInvNames.length; i++) {
+        for(int i = assumedInvNames.length - 1; i >=0; i--) {
             if(!assumedInvNames[i].equals("")) {
                 ClassInvariant inv 
                     = specRepos.getClassInvariantByName(assumedInvNames[i]);
@@ -71,7 +70,7 @@ public class ContractWithInvs {
         
         SetOfClassInvariant tempEnsuredInvs 
             = SetAsListOfClassInvariant.EMPTY_SET;
-        for(int i = 0; i < ensuredInvNames.length; i++) {
+        for(int i = ensuredInvNames.length - 1; i >= 0; i--) {
             if(!ensuredInvNames[i].equals("")) {
                 ClassInvariant inv 
                     = specRepos.getClassInvariantByName(ensuredInvNames[i]);
@@ -90,17 +89,15 @@ public class ContractWithInvs {
     
     public String getHTMLText(Services services) {
         StringBuffer assumedSB = new StringBuffer();
-        IteratorOfClassInvariant it = assumedInvs.iterator();
-        while(it.hasNext()) {
-            assumedSB.append("<br>" + it.next().getHTMLText(services)
-                                               .replaceAll("</?html>", ""));
+        for(ClassInvariant inv : assumedInvs) {
+            assumedSB.append("<br>" + inv.getHTMLText(services)
+                                         .replaceAll("</?html>", ""));
         }
         
         StringBuffer ensuredSB = new StringBuffer();
-        it = ensuredInvs.iterator();
-        while(it.hasNext()) {
-            ensuredSB.append("<br>" + it.next().getHTMLText(services)
-                                               .replaceAll("</?html>", ""));
+        for(ClassInvariant inv : ensuredInvs) {
+            ensuredSB.append("<br>" + inv.getHTMLText(services)
+                                         .replaceAll("</?html>", ""));
         }
         
         return "<html>"
@@ -118,15 +115,13 @@ public class ContractWithInvs {
     
     public String toString() {
         StringBuffer assumedSB = new StringBuffer();
-        IteratorOfClassInvariant it = assumedInvs.iterator();
-        while(it.hasNext()) {
-            assumedSB.append(it.next().getName() + ",");
+        for(ClassInvariant inv : assumedInvs) {
+            assumedSB.append(inv.getName() + ",");
         }
         
         StringBuffer ensuredSB = new StringBuffer();
-        it = ensuredInvs.iterator();
-        while(it.hasNext()) {
-            assumedSB.append(it.next().getName() + ",");
+        for(ClassInvariant inv : ensuredInvs) {
+            ensuredSB.append(inv.getName() + ",");
         }
         
         return contract.getName() + ";" 
