@@ -10,8 +10,8 @@
 
 package de.uka.ilkd.key.proof.decproc.smtlib;
 
-import java.util.Vector;
 import java.util.HashSet;
+import java.util.Vector;
 
 /**
  * Represents a term as defined in the SMT-Lib specification, and specialized in the

@@ -10,8 +10,9 @@
 
 package de.uka.ilkd.key.proof.decproc.smtlib;
 
-import de.uka.ilkd.key.logic.op.DecisionProcedureSmtAufliaOp;
 import java.util.Vector;
+
+import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAufliaOp;
 
 /** Represents an interpreted function as defined in the SMT-Lib specification, 
  * and specialized in the (QF_)AUFLIA sublogic. In (QF_)AUFLIA, only + , - , unary 

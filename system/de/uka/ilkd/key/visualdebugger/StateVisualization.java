@@ -16,15 +16,13 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ListOfSort;
 import de.uka.ilkd.key.logic.sort.SLListOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IteratorOfGoal;
-import de.uka.ilkd.key.proof.ListOfGoal;
-import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.updatesimplifier.*;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
-import de.uka.ilkd.key.strategy.feature.InUpdateFeature;
+import de.uka.ilkd.key.strategy.StrategyFactory;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 
 public class StateVisualization  {
  
@@ -168,14 +166,36 @@ public class StateVisualization  {
     
     private void simplifyUpdate() {
         this.setUpProof(SetAsListOfTerm.EMPTY_SET.add(TermFactory.DEFAULT.createJunctorTerm(Op.NOT,programPio.constrainedFormula().formula())));
+        
+        
         VisualDebugger.getVisualDebugger().setInitPhase(true);
         VisualDebugger.getVisualDebugger().getBpManager().setNoEx(true);
-        InUpdateFeature.inUpdateAndAssume=true;
-        ps.run(mediator.getProof().env());
-        VisualDebugger.getVisualDebugger().setInitPhase(false);
+
+       
+        final Proof proof = mediator.getProof();
+                        
+        StrategyProperties strategyProperties  = DebuggerStrategy.
+           getDebuggerStrategyProperties(true, true, 
+                   VisualDebugger.getVisualDebugger().isInitPhase());
+        
+        
+        StrategyFactory factory = new DebuggerStrategy.Factory();        
+        proof.setActiveStrategy(factory.create(proof, strategyProperties));
+        
+        ps.run(proof.env());
+        
+        
+        VisualDebugger.getVisualDebugger().setInitPhase(false);        
         VisualDebugger.getVisualDebugger().getBpManager().setNoEx(false);
-        InUpdateFeature.inUpdateAndAssume=false;
-       // System.out.println(ps.getProof().openGoals().iterator().next().sequent());
+
+        strategyProperties = DebuggerStrategy.
+            getDebuggerStrategyProperties(true, false, 
+                    VisualDebugger.getVisualDebugger().isInitPhase());
+
+        proof.setActiveStrategy(factory.create(proof, strategyProperties));
+
+        
+        // System.out.println(ps.getProof().openGoals().iterator().next().sequent());
         this.programPio =            
             VisualDebugger.getVisualDebugger().getProgramPIO(ps.getProof().openGoals().iterator().next().sequent());
         if (programPio==null){
@@ -300,8 +320,7 @@ public class StateVisualization  {
       po.setProofSettings(mediator.getProof().getSettings());
       po.setConfig(mediator.getProof().env().getInitConfig());
       ps.init(po);
-      ps.getProof().setActiveStrategy((DebuggerStrategy.Factory.create(ps.getProof(), "DebuggerStrategy", null)));
-      //ps.getProof().root().setLabels(itNode.getNode().getLabels());          
+      vd.setProofStrategy(ps.getProof(), true, false);
     }
     
     
@@ -315,8 +334,7 @@ public class StateVisualization  {
         po.setProofSettings(mediator.getProof().getSettings());
         po.setConfig(mediator.getProof().env().getInitConfig());
         ps.init(po);
-        ps.getProof().setActiveStrategy((DebuggerStrategy.Factory.create(ps.getProof(), "DebuggerStrategy", null)));
-      //  ps.getProof().root().setLabels(itNode.getNode().getLabels());          
+        vd.setProofStrategy(ps.getProof(), true, false);
       }
     
     
@@ -330,8 +348,7 @@ public class StateVisualization  {
         po.setProofSettings(mediator.getProof().getSettings());
         po.setConfig(mediator.getProof().env().getInitConfig());
         ps.init(po);
-        ps.getProof().setActiveStrategy((DebuggerStrategy.Factory.create(ps.getProof(), "DebuggerStrategy", null)));
-    //    ps.getProof().root().setLabels(itNode.getNode().getLabels());          
+        vd.setProofStrategy(ps.getProof(), true, false);
       }
 
     

@@ -22,9 +22,7 @@ import de.uka.ilkd.key.unittest.UnitTestBuilder;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 
 public class VBTBuilder {
-    
-    
-    
+   
     VisualDebugger vd = VisualDebugger.getVisualDebugger();
     ListOfNode nodes;
     private boolean error=false;
@@ -34,12 +32,6 @@ public class VBTBuilder {
     private String path;
     private boolean projectCreated=false;
     private int modelGenerator;
-    
-    
-
-    
-    
-    
     
     
     public VBTBuilder(ListOfNode nodes,int modelGenerator){

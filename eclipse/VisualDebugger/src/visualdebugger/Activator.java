@@ -22,11 +22,51 @@ import de.uka.ilkd.key.visualdebugger.SourceElementId;
  */
 public class Activator extends AbstractUIPlugin {
 
+    // The shared instance
+    private static Activator plugin;
+
     // The plug-in ID
     public static final String PLUGIN_ID = "VisualDebugger";
 
-    // The shared instance
-    private static Activator plugin;
+    /**
+     * Returns the shared instance
+     * 
+     * @return the shared instance
+     */
+    public static Activator getDefault() {
+        return plugin;
+    }
+
+    /**
+     * Returns an image descriptor for the image file at the given plug-in
+     * relative path
+     * 
+     * @param path
+     *                the path
+     * @return the image descriptor
+     */
+    public static ImageDescriptor getImageDescriptor(String path) {
+        return imageDescriptorFromPlugin(PLUGIN_ID, path);
+    }
+
+    /**
+     * Returns the string from the plugin's resource bundle, or 'key' if not
+     * found.
+     */
+    public static String getResourceString(String key) {
+        ResourceBundle bundle = getDefault().getResourceBundle();
+        try {
+            return (bundle != null) ? bundle.getString(key) : key;
+        } catch (MissingResourceException e) {
+            return key;
+        }
+    }
+
+    private IProject iProject = null;
+
+    private IJavaProject project = null;
+
+    private ResourceBundle resourceBundle;
 
     /**
      * The constructor
@@ -36,11 +76,91 @@ public class Activator extends AbstractUIPlugin {
         plugin = this;
     }
 
-    private IJavaProject project = null;
+    public ASTNode getASTNodeForStatementId(SourceElementId id) {
 
-    private IProject iProject = null;
+        assert id != null && id.isStatement();
 
-    private ResourceBundle resourceBundle;
+        final ICompilationUnit unit = getCompilationUnit(id);
+        if (unit == null) {
+            return null;
+        }
+
+        final FindStatementById visitor = new FindStatementById(id);
+
+        findSourceElement(unit, visitor);
+
+        return visitor.getStatement();
+    }
+
+    private void findSourceElement(final ICompilationUnit unit,
+            ASTVisitor visitor) {
+        final ASTParser parser = ASTParser.newParser(AST.JLS3);
+        parser.setResolveBindings(true);
+        parser.setSource(unit);
+        parser.createAST(null).accept(visitor);
+    }
+
+    public ICompilationUnit getCompilationUnit(SourceElementId id) {
+        assert id != null;
+        
+        IType result = null;
+        
+        try {
+            result = project.findType(id.getClassName());
+        } catch (JavaModelException e) {
+            result = null;
+        }
+        
+        if (result == null) {
+            return null;
+        }
+        
+        return result.getCompilationUnit();
+    }
+
+    public Expression getExpression(SourceElementId id) {
+        assert id != null;
+        
+        final ICompilationUnit unit = getCompilationUnit(id);
+        if (unit == null) {
+            return null;
+        }
+
+        final FindStatementById visitor = new FindStatementById(id);
+        findSourceElement(unit, visitor);
+
+        return visitor.getExpression();
+    }
+
+    public IProject getIProject() {
+        return iProject;
+    }
+
+    public IJavaProject getProject() {
+        return project;
+    }
+
+    /**
+     * Returns the plugin's resource bundle,
+     */
+    public ResourceBundle getResourceBundle() {
+        try {
+            if (resourceBundle == null)
+                resourceBundle = ResourceBundle
+                        .getBundle("visualdebugger.VisualDebuggerResources");
+        } catch (MissingResourceException x) {
+            resourceBundle = null;
+        }
+        return resourceBundle;
+    }
+
+    public void setIProject(IProject project) {
+        iProject = project;
+    }
+
+    public void setProject(IJavaProject project) {
+        this.project = project;
+    }
 
     /*
      * (non-Javadoc)
@@ -61,145 +181,6 @@ public class Activator extends AbstractUIPlugin {
         super.stop(context);
         plugin = null;
         resourceBundle = null;
-    }
-
-    /**
-     * Returns the shared instance
-     * 
-     * @return the shared instance
-     */
-    public static Activator getDefault() {
-        return plugin;
-    }
-
-    /**
-     * Returns the string from the plugin's resource bundle, or 'key' if not
-     * found.
-     */
-    public static String getResourceString(String key) {
-        ResourceBundle bundle = getDefault().getResourceBundle();
-        try {
-            return (bundle != null) ? bundle.getString(key) : key;
-        } catch (MissingResourceException e) {
-            return key;
-        }
-    }
-
-    /**
-     * Returns the plugin's resource bundle,
-     */
-    public ResourceBundle getResourceBundle() {
-        try {
-            if (resourceBundle == null)
-                resourceBundle = ResourceBundle
-                        .getBundle("visualdebugger.VisualDebuggerResources");
-        } catch (MissingResourceException x) {
-            resourceBundle = null;
-        }
-        return resourceBundle;
-    }
-
-    /**
-     * Returns an image descriptor for the image file at the given plug-in
-     * relative path
-     * 
-     * @param path
-     *            the path
-     * @return the image descriptor
-     */
-    public static ImageDescriptor getImageDescriptor(String path) {
-        return imageDescriptorFromPlugin(PLUGIN_ID, path);
-    }
-
-    public IJavaProject getProject() {
-        return project;
-    }
-
-    public void setProject(IJavaProject project) {
-        this.project = project;
-    }
-
-    public ASTNode getASTNodeForStatementId(SourceElementId id) {
-        // IJavaProject project =
-        // visualdebugger.Activator.getDefault().getProject();
-        IType result = null;
-        try {
-            result = project.findType(id.getClassName());
-        } catch (JavaModelException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        if (result == null) {
-            System.err.println("ITYPE NOT FOUND: " + id.getClassName());
-            return null;
-        }
-        ICompilationUnit unit = result.getCompilationUnit();
-        ASTParser parser = ASTParser.newParser(AST.JLS3);
-        parser.setResolveBindings(true);
-        parser.setSource(unit);
-        CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
-
-        FindStatementById visitor = new FindStatementById(id);
-        astRoot.accept(visitor);
-        if (id.isStatement())
-            return (visitor.getStatement());
-        else
-            return visitor.getExpression();
-
-    }
-
-    public Expression getExpression(SourceElementId id) {
-        // IJavaProject project =
-        // visualdebugger.Activator.getDefault().getProject();
-        IType result = null;
-        try {
-            result = project.findType(id.getClassName());
-        } catch (JavaModelException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        if (result == null) {
-            System.err.println("ITYPE NOT FOUND: " + id.getClassName());
-            return null;
-        }
-        ICompilationUnit unit = result.getCompilationUnit();
-        ASTParser parser = ASTParser.newParser(AST.JLS3);
-        parser.setResolveBindings(true);
-        parser.setSource(unit);
-        CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
-
-        FindStatementById visitor = new FindStatementById(id);
-        astRoot.accept(visitor);
-
-        return (visitor.getExpression());
-
-    }
-
-    public ICompilationUnit getCompilationUnit(SourceElementId id) {
-        // IJavaProject project =
-        // visualdebugger.Activator.getDefault().getProject();
-        IType result = null;
-        try {
-            result = project.findType(id.getClassName());
-        } catch (JavaModelException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        if (result == null) {
-            System.out.println("ITYPE NOT FOUND: " + id.getClassName());
-            return null;
-        }
-        ICompilationUnit unit = result.getCompilationUnit();
-        return unit;
-
-    }
-
-    public IProject getIProject() {
-        return iProject;
-    }
-
-    public void setIProject(IProject project) {
-        iProject = project;
     }
 
 }

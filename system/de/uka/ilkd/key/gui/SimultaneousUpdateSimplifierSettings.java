@@ -27,7 +27,7 @@ public class SimultaneousUpdateSimplifierSettings implements Settings {
 	"[SimultaneousUpdateSimplifier]EagerSimplification";
  
     private boolean delete_effectless_updates = true;
-    private boolean eagerMode = false;
+    private boolean eagerMode = true;
  
     private UpdateSimplifier sus;
 

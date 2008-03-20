@@ -817,48 +817,22 @@ public class Main extends JFrame {
         }
     }
     
-    /** saves settings */
-    private void saveSettings() {
-        ProofSettings.DEFAULT_SETTINGS.saveSettings();
-        recentFiles.store(RECENT_FILES_STORAGE);
-    }
-    
     /** exit */
     protected void exitMain() {
-        boolean quit = false;
-        if (ProofSettings.DEFAULT_SETTINGS.changed()) {
-            final int option = JOptionPane.showOptionDialog
-            (Main.this, "Settings have changed. "+
-                    "Should they be saved before quitting?", 
-                    "Exit", 
-                    JOptionPane.YES_NO_CANCEL_OPTION,
-                    JOptionPane.QUESTION_MESSAGE,
-                    null,
-                    new String[]{"Save and Quit", 
-                    "Just Quit", 
-            "Cancel"},
-            null);   
-            if (option == 0) {
-                saveSettings();
-                quit = true;
-            } else if (option == 1) {
-                // do not save but quit
-                quit = true;
-            }
-        } else {
-            final int option = JOptionPane.showConfirmDialog
-            (Main.this, "Really Quit?", "Exit", 
-                    JOptionPane.YES_NO_OPTION);		   	    
-            if (option == JOptionPane.YES_OPTION) {
-                quit = true;
-            } 
-        }
-        
+        boolean quit = false;       
+        final int option = JOptionPane.showConfirmDialog
+        (Main.this, "Really Quit?", "Exit", 
+                JOptionPane.YES_NO_OPTION);		   	    
+        if (option == JOptionPane.YES_OPTION) {
+            quit = true;
+        } 
+
+
         recentFiles.store(RECENT_FILES_STORAGE);
-        
+
         if (quit) {            
             mediator.fireShutDown(new GUIEvent(this));
-            
+
             if (standalone) {
                 // wait some seconds; give notification sound a bit time
                 try {
@@ -1442,12 +1416,17 @@ public class Main extends JFrame {
 
  	// listen to the state of the assistant in order to hold the
  	// item and state consistent
- 	assistant.addChangeListener(new ChangeListener() {
- 		public void stateChanged(ChangeEvent e) {
- 		    assistantOption.setSelected
- 			(((ProofAssistantController)e.getSource()).getState());
- 		}
- 	    });
+	assistant.addChangeListener(new ChangeListener() {
+	    public void stateChanged(ChangeEvent e) {
+	        final boolean assistentEnabled = 
+                    ((ProofAssistantController)e.getSource()).getState();
+	        assistantOption.setSelected(assistentEnabled);
+	        // setSelected does not trigger an action event so we have
+	        // to make the change explicitly permanent
+	        ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().
+	        setProofAssistantMode(assistentEnabled);
+	    }
+	});
 
 	assistantOption.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent e) {
@@ -1457,16 +1436,7 @@ public class Main extends JFrame {
 	    }});
 
 	registerAtMenu(options, assistantOption);
-	
-	addSeparator(options);
-
-	ProofSettings.DEFAULT_SETTINGS.item().addActionListener
-	    (new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-			ProofSettings.DEFAULT_SETTINGS.saveSettings();
-		    }});
-
-	registerAtMenu(options, ProofSettings.DEFAULT_SETTINGS.item());
+	        
         return options;
     }
 
@@ -3004,13 +2974,6 @@ public class Main extends JFrame {
                     "termination of the symbolic execution.</pre>");
             options.add(methodSelectionButton);
             
-            ProofSettings.DEFAULT_SETTINGS.item().addActionListener
-                (new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        ProofSettings.DEFAULT_SETTINGS.saveSettings();
-                    }});
-
-//            options.add(ProofSettings.DEFAULT_SETTINGS.item());
             return options;
         }
         

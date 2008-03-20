@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Visual Debugger
 Bundle-SymbolicName: VisualDebugger; singleton:=true
 PRCS-KEY: $Format: "Bundle-Version: 1.$ProjectVersion$"$
-Bundle-Version: 1.jseidelConstructorCollector.3
+Bundle-Version: 1.1.13
 Bundle-ClassPath: VisualDebugger.jar
 Bundle-Activator: visualdebugger.Activator
 Bundle-Vendor: KeY Project

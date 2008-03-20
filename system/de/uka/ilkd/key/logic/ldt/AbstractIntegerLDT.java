@@ -26,7 +26,6 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.TermSymbol;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -608,7 +607,7 @@ public abstract class AbstractIntegerLDT extends LDT {
     /**
      * returns the boolean function symbol to compare two integer values
      * <code>val1, val2</code> if <code>val1</code> is lesser or equal than
-     * <code>val2</val> 
+     * <code>val2</code> 
      * @return the boolean function symbol to compare two integer values
      */
     public Function getLessOrEquals() {
@@ -618,7 +617,7 @@ public abstract class AbstractIntegerLDT extends LDT {
     /**
      * returns the boolean function symbol to compare two integer values
      * <code>val1, val2</code> if <code>val1</code> is lesser than
-     * <code>val2</val> 
+     * <code>val2</code> 
      * @return the boolean function symbol to compare two integer values
      */
     public Function getLessThan() {
@@ -628,7 +627,7 @@ public abstract class AbstractIntegerLDT extends LDT {
     /**
      * returns the boolean function symbol to compare two integer values
      * <code>val1, val2</code> if <code>val1</code> is greater or equals
-     * <code>val2</val> 
+     * <code>val2</code> 
      * @return the boolean function symbol to compare two integer values
      */
     public Function getGreaterOrEquals() {
@@ -638,7 +637,7 @@ public abstract class AbstractIntegerLDT extends LDT {
     /**
      * returns the boolean function symbol to compare two integer values
      * <code>val1, val2</code> if <code>val1</code> is greater than
-     * <code>val2</val> 
+     * <code>val2</code> 
      * @return the boolean function symbol to compare two integer values
      */
     public Function getGreaterThan() {

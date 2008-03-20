@@ -3,6 +3,5 @@
    <description url="http://i12ww.ira.uka.de/~key/KeYDists/KeY_Feature/">
       KeY Nightly Builds
    </description>
-   <!-- $Format: "<feature url=\"features/KeY_Feature_1.$ProjectVersion$.jar\" id=\"KeY_Feature\" version=\"1.$ProjectVersion$\"/>"$ -->
-<feature url="features/KeY_Feature_1.jseidelConstructorCollector.3.jar" id="KeY_Feature" version="1.jseidelConstructorCollector.3"/>
+   <feature url="features/KeY_Feature.jar" id="KeY_Feature" version="1.1.16"/>
 </site>

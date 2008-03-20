@@ -18,8 +18,7 @@ import java.util.*;
 public class LibrariesSettings implements Settings {
 
    private static final String LIBRARIES_KEY = "[Libraries]Default";
-   private static final String LIBRARIES_PATH = "rules"+File.separator+
-                                                "libraries"+File.separator;
+   private static final String LIBRARIES_PATH = "libraries"+File.separator;
    private LinkedList listenerList = new LinkedList();
 
    /** keys:   the file names of the libraries,
