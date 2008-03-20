@@ -771,6 +771,8 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     /**
      * This sort represents a type of program schema variables that
      * match only on method body statements
+     * 
+     * TODO: Maybe further checks in canStandFor? (i.e. is the resultvariable available?)
      */    
     private static class StrictlyPureMethodBodySort extends ProgramSVSort{
 
