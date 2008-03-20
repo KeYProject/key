@@ -9,7 +9,6 @@
 //
 package de.uka.ilkd.key.java.visitor;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -171,16 +170,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 	    }
 	} else {
 	    Term subTerms[] = new Term[t.arity()];
-	    ArrayList<QuantifiableVariable> vars 
-	    	= new ArrayList<QuantifiableVariable>();
+	    final ArrayOfQuantifiableVariable[] vars = 
+	        new ArrayOfQuantifiableVariable[t.arity()]; 
 	    for ( int i = 0; i<t.arity(); i++ ) {
-		ArrayOfQuantifiableVariable vbh = t.varsBoundHere(i);
-		for( int j=0; j<vbh.size(); j++ ) {
-		    QuantifiableVariable var = vbh.getQuantifiableVariable(j);
-		    if(!vars.contains(var)) {
-			vars.add(var);
-		    }
-		}
+		vars[i] = t.varsBoundHere(i);
 		subTerms[i] = replaceVariablesInTerm(t.sub(i));
 	    }
 	    Operator op;
@@ -200,10 +193,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 	    }else{
 		op = t.op();
 	    }
-	    QuantifiableVariable v1[] = new QuantifiableVariable[0];
-	    v1 = vars.toArray(v1);
-	    JavaBlock jb = t.javaBlock();
-	    return TermFactory.DEFAULT.createTerm(op,subTerms,v1,jb);
+	    return TermFactory.DEFAULT.createTerm(op, subTerms, vars, t.javaBlock());
 	}
     }
 
@@ -212,10 +202,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                                 SetOfLocationDescriptor locs) {
         SetOfLocationDescriptor res 
             = SetAsListOfLocationDescriptor.EMPTY_SET;
-        
-        IteratorOfLocationDescriptor it = locs.iterator();
-        while(it.hasNext()) {
-            LocationDescriptor loc = it.next();
+        for (final LocationDescriptor loc : locs) {
             LocationDescriptor newLoc;
             
             if(loc instanceof BasicLocationDescriptor) {
@@ -236,13 +223,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     
         
     private SetOfTerm replaceVariablesInTerms(SetOfTerm terms) {
-        SetOfTerm res = SetAsListOfTerm.EMPTY_SET;
-        
-        IteratorOfTerm it = terms.iterator();
-        while(it.hasNext()) {
-            res = res.add(replaceVariablesInTerm(it.next()));
-        }
-        
+        SetOfTerm res = SetAsListOfTerm.EMPTY_SET;        
+        for (final Term term : terms) {
+            res = res.add(replaceVariablesInTerm(term));
+        }        
         return res;
     }
     

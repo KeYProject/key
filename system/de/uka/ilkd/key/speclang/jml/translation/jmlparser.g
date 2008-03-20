@@ -350,17 +350,20 @@ options {
 	    newOp = term.op();
 	}
 	
+	final ArrayOfQuantifiableVariable[] vars = 
+		new ArrayOfQuantifiableVariable[term.arity()];
+	
 	Term[] subTerms = getSubTerms(term);
 	Term[] newSubTerms = new Term[subTerms.length];
 	for(int i = 0; i < subTerms.length; i++) {
 	    newSubTerms[i] = convertToOld(subTerms[i]);
+	    vars[i] = term.varsBoundHere(i);
 	}
 	
-	Term result = tb.tf().createTerm(newOp, 
-					 newSubTerms, 
-					 term.varsBoundHere(0), 
-					 term.javaBlock());
-	return result;    
+	return tb.tf().createTerm(newOp, 
+		  		  newSubTerms, 
+				  vars, 
+				  term.javaBlock());
     }
 
 

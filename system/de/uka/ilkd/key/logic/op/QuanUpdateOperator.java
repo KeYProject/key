@@ -331,9 +331,14 @@ public class QuanUpdateOperator implements IUpdateOperator {
              ++i, ++j)
             sub[j] = t.sub(i);
         
+        
+        final ArrayOfQuantifiableVariable[] vars = 
+            new ArrayOfQuantifiableVariable[sub.length];
+        Arrays.fill(vars, Term.EMPTY_VAR_LIST);
+        
         return tf.createTerm ( location ( n ),
                                sub,
-                               new ArrayOfQuantifiableVariable (),
+                               vars,
                                JavaBlock.EMPTY_JAVABLOCK);
     }
 
@@ -877,9 +882,10 @@ public class QuanUpdateOperator implements IUpdateOperator {
             System.arraycopy ( subs, locationSubtermsBegin ( locNum ),
                                locSubs, 0,
                                loc.arity () );
+
             lhss[locNum] = tf.createTerm ( loc,
                                            locSubs,
-                                           new ArrayOfQuantifiableVariable (),
+                                           null,
                                            JavaBlock.EMPTY_JAVABLOCK);
             
             values[locNum] = subs[valuePos ( locNum )];

@@ -690,32 +690,7 @@ public class TermFactory {
 	}       	
     }
 
-    public Term createTerm(Operator op, Term[] subTerms, 
-			   ArrayOfQuantifiableVariable vars, 
-			   JavaBlock javaBlock) {
-	if (op==null) {
-	    throw new IllegalArgumentException("null-Operator at TermFactory");
-	} else if (op instanceof Quantifier) {
-	    return createQuantifierTerm((Quantifier)op, vars, subTerms[0]);
-	} else if ( op instanceof QuanUpdateOperator ) {
-	    final ArrayOfQuantifiableVariable[] bv =
-	        new ArrayOfQuantifiableVariable [subTerms.length];
-            final QuanUpdateOperator updOp = (QuanUpdateOperator)op;
-            Arrays.fill ( bv, vars );
-            return createQuanUpdateTerm ( updOp, subTerms, bv );
-	} else if (op instanceof IfExThenElse) {
-	    return createIfExThenElseTerm ( vars,
-                                            subTerms[0],
-                                            subTerms[1],
-                                            subTerms[2] );
-	} else if (op instanceof SubstOp) {
-	    return createSubstitutionTerm((SubstOp)op, 
-					  vars.getQuantifiableVariable(0),
-					  subTerms);
-	} else {
-	    return createTermWithNoBoundVariables(op, subTerms, javaBlock);
-	}
-    }
+  
 
 
    public Term createTerm(Operator op, Term[] subTerms, 
@@ -757,37 +732,6 @@ public class TermFactory {
     // CHANGE these two methods!  vars should be something like an 
     // array of arrays! 
     //
-
-
-    /**
-     * creates a term using the other methods of this class depending on the
-     * given operator. If the kind of term is known before (without using
-     * if-else cascades on the kind of operator) the other methods in this
-     * factory should be preferred. Depending on the needed parameters for
-     * the terms that should be created some of the parameters of this method
-     * might be ignored.
-     * @param op the top level operator for the new term.
-     * @param subTerms the subterms for the new term. The first n elements
-     * are taken if op is a Junctor or TermSymbol and n is the arity
-     * of op. Only the first entry is taken if op is a Quantifier or
-     * a Diamond. The first (representing the replacing term
-     * for a variable) and the second (representing the term behind the
-     * substitution operator) entries are taken if op is a SubstOp.
-     * @param vars the variables that are bound to a subterm. Not considered
-     * if op is a Junctor, TermSymbol or Diamond. If op is a
-     * SubstOp only the first element is taken and the variable is bound to
-     * the second subterm. In all other cases all variables are taken and
-     * bound to the first subterm.
-     * @param javaBlock representing a java code block. Only taken if op is a
-     * Diamond.
-     * @return the created Term
-     */
-    public Term createTerm(Operator op, Term[] subTerms, 
-			   QuantifiableVariable[] vars, 
-			   JavaBlock javaBlock) {
-	return createTerm(op, subTerms, new ArrayOfQuantifiableVariable(vars),
-			  javaBlock);
-    }
 
     /**
      * creates an update term like

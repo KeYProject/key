@@ -102,7 +102,7 @@ public class MetaEquivalentUpdates extends AbstractMetaOperator {
 		}
 
         final Term locWithVars = tf.createTerm ( op, varArray,
-                                                 new ArrayOfQuantifiableVariable (),
+                                                 null,
                                                  JavaBlock.EMPTY_JAVABLOCK );
 		// System.out.println("Term with free variables: " + locWithVars.toString());
 

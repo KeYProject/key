@@ -98,14 +98,10 @@ public class ShadowReplaceVisitor extends Visitor{
 	    subStack.push(newMarker);
 	}
 	
-	
-	ArrayOfQuantifiableVariable boundVars 
-	    = ((visited.varsBoundHere(0).size() == 0) ?
-	       visited.varsBoundHere(1) :
-	       visited.varsBoundHere(0)); 
-	
-	
+			
 	Term[] neededsubs = neededSubs(visited.arity());
+
+        final ArrayOfQuantifiableVariable[] boundVars;
 
 	if (changed || (!subStack.empty() && 
 			subStack.peek() == newMarker)) {
@@ -133,11 +129,19 @@ public class ShadowReplaceVisitor extends Visitor{
 		    System.arraycopy(neededsubs, 0, newsubs, 0, neededsubs.length);
 		    newsubs[neededsubs.length] = transactionCounter;
 		    neededsubs = newsubs;
+		    boundVars =  new ArrayOfQuantifiableVariable[neededsubs.length + 1];
+		    for (int i = 0; i<visited.arity(); i++) {
+		        boundVars[i] = visited.varsBoundHere(i);
+		    }
+		    boundVars[neededsubs.length] = Term.EMPTY_VAR_LIST;
+		} else {
+                    boundVars = extractBoundVars(visited, neededsubs);
 		}
-
 	    } else {
 		newOp = visited.op();
+                boundVars = extractBoundVars(visited, neededsubs);
 	    }
+	    
 	    pushNew(tf.createTerm(newOp, 
 				  neededsubs,
 				  boundVars,
@@ -146,6 +150,16 @@ public class ShadowReplaceVisitor extends Visitor{
 	    subStack.push(visited);
 	}		
 	
+    }
+
+    private ArrayOfQuantifiableVariable[] extractBoundVars(Term visited,
+            Term[] neededsubs) {
+        final ArrayOfQuantifiableVariable[] boundVars;
+        boundVars =  new ArrayOfQuantifiableVariable[neededsubs.length];
+        for (int i = 0; i<visited.arity(); i++) {
+            boundVars[i] = visited.varsBoundHere(i);
+        }
+        return boundVars;
     }
 
     private void pushNew(Object t) {

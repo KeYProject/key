@@ -68,11 +68,6 @@ public class CollisionDeletingSubstitutionTermApplier extends Visitor {
 	MapFromLogicVariableToTerm substToApply;
 	Term resultTerm;
 
-	// vars bound directly by operator of visited term ...
-	ArrayOfQuantifiableVariable vars 
-	    = (visited.varsBoundHere(0).size() == 0)
-	    ? visited.varsBoundHere(1) : visited.varsBoundHere(0);
-
 	if (visited.op()==Op.SUBST) {
 	    // get completely processed childs ...
 	    Term[] neededsubs=neededSubs(visited.arity());
@@ -100,11 +95,16 @@ public class CollisionDeletingSubstitutionTermApplier extends Visitor {
 	    }  
 	} else {	 
 	    Term[] neededsubs=neededSubs(visited.arity());
+	    final ArrayOfQuantifiableVariable[] boundVars = 
+	        new ArrayOfQuantifiableVariable[neededsubs.length];
+	    for (int i = 0; i<visited.arity(); i++) {
+	        boundVars[i] = visited.varsBoundHere(i);
+	    }
 	    if (!subStack.empty() && subStack.peek()==newMarker) {
-		subStack.pop(); // delete new marker ...
+		subStack.pop(); // delete new marker ...		
 		subStack.push(tf.createTerm(visited.op(), 
 					    neededsubs,
-					    vars,
+					    boundVars,
 					    visited.javaBlock()));
 		subStack.push(newMarker); // add new marker ...
 		
