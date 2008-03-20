@@ -12,7 +12,9 @@ package de.uka.ilkd.key.proof.init;
 import java.util.Map;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ListOfProgramVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.SetOfClassInvariant;
@@ -52,7 +54,7 @@ public class EnsuresPostPO extends EnsuresPO {
                               ListOfProgramVariable paramVars, 
                               ProgramVariable resultVar,
                               ProgramVariable exceptionVar,
-                              Map atPreFunctions) throws ProofInputException {
+                              Map<Operator, Function/*atPre*/> atPreFunctions) throws ProofInputException {
         Term result = translatePre(contract, selfVar, toPV(paramVars));
         return result;
     }
@@ -62,7 +64,7 @@ public class EnsuresPostPO extends EnsuresPO {
                                ListOfProgramVariable paramVars, 
                                ProgramVariable resultVar,
                                ProgramVariable exceptionVar,
-                               Map atPreFunctions) throws ProofInputException {        
+                               Map<Operator, Function/*atPre*/> atPreFunctions) throws ProofInputException {        
         Term result = translatePost(contract, 
                                     selfVar, 
                                     toPV(paramVars), 

@@ -34,18 +34,19 @@ public class BehaviouralSubtypingOpPO extends AbstractPO {
     public BehaviouralSubtypingOpPO(InitConfig initConfig,
 	    			    KeYJavaType subKJT, 
                                     KeYJavaType superKJT, 
-                                    Map contractPairs) {
+                                    Map<OperationContract, OperationContract> contractPairs) {
         super(initConfig,
               "BehaviouralSubtypingOp of " + subKJT.getName() + " and " 
                                            + superKJT.getName(),
               subKJT);
         pairPOs = SLListOfProofOblInput.EMPTY_LIST;
-        
-        Iterator it = contractPairs.entrySet().iterator();
+       
+        Iterator<Map.Entry<OperationContract, OperationContract>> it = 
+            contractPairs.entrySet().iterator();
         while(it.hasNext()) {
-            Map.Entry e = (Map.Entry)(it.next());
-            OperationContract subContract   = (OperationContract)(e.getKey());
-            OperationContract superContract = (OperationContract)(e.getValue());
+            Map.Entry<OperationContract, OperationContract> e = it.next();
+            OperationContract subContract   = e.getKey();
+            OperationContract superContract = e.getValue();
             ProofOblInput pairPO 
                     = new BehaviouralSubtypingOpPairPO(initConfig,
                 	    			       subContract, 

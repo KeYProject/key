@@ -121,8 +121,7 @@ public class OperationContractImpl implements OperationContract {
 	    				ListOfParsableVariable paramVars, 
 	    				ParsableVariable resultVar, 
 	    				ParsableVariable excVar,
-                                        /*inout*/ Map /*Operator (normal) 
-                                        -> Function (atPre)*/<Operator, Function> atPreFunctions,
+                                        /*inout*/ Map< Operator, Function> atPreFunctions,
                                         Services services) {
 	Map<Operator, Operator> result = new LinkedHashMap<Operator, Operator>();
 	

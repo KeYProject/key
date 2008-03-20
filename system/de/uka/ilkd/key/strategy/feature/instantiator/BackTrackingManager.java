@@ -41,13 +41,13 @@ public class BackTrackingManager {
      * <code>ChoicePoint</code>s that have not yet been taken, the branches
      * of later points being further up in the stack
      */
-    private final Stack choices = new Stack ();
+    private final Stack<IteratorOfCPBranch> choices = new Stack<IteratorOfCPBranch> ();
     
     /**
      * List of <code>CPBranch</code>: the branches that are taken in the
      * current evaluation run
      */
-    private final ArrayList chosenBranches = new ArrayList ();
+    private final ArrayList<CPBranch> chosenBranches = new ArrayList<CPBranch> ();
 
     /**
      * The position within <code>choices</code> during the current evaluation
@@ -186,7 +186,7 @@ public class BackTrackingManager {
      * a feature term is repeated. This is a simple runtime measure for ensuring
      * that the feature evaluation is deterministic
      */
-    private final ArrayList tickets = new ArrayList ();    
+    private final ArrayList<Object> tickets = new ArrayList<Object> ();    
 
     private void assertValidTicket(Object ticket) {
         if ( tickets.size () > position ) {
