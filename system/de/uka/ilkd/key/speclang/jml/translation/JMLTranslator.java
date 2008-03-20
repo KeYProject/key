@@ -16,10 +16,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.SetAsListOfLocationDescriptor;
 import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
-import de.uka.ilkd.key.logic.op.ListOfLogicVariable;
-import de.uka.ilkd.key.logic.op.ListOfParsableVariable;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.SLListOfLogicVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.FormulaWithAxioms;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.translation.AxiomCollector;
@@ -49,8 +46,7 @@ class JMLTranslator {
                                         ListOfParsableVariable paramVars,
                                         ParsableVariable resultVar,
                                         ParsableVariable excVar,
-                                        Map /*Operator (normal) 
-                                           -> Function (atPre)*/ atPreFunctions) 
+                                        Map<Operator,Function/*(atPre)*/> atPreFunctions) 
             throws SLTranslationException {
         assert expr != null;
         assert specInClass != null;
@@ -94,8 +90,7 @@ class JMLTranslator {
                                         ListOfParsableVariable paramVars, 
                                         ParsableVariable resultVar, 
                                         ParsableVariable excVar,
-                                        Map /*Operator (normal) 
-                                        -> Function (atPre)*/ atPreFunctions)
+                                        Map<Operator, Function/* atPre */> atPreFunctions)
             throws SLTranslationException {
         AxiomCollector axiomCollector = new AxiomCollector();
         

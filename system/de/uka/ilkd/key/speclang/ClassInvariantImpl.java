@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -72,10 +73,10 @@ public class ClassInvariantImpl implements ClassInvariant {
     //internal methods
     //------------------------------------------------------------------------- 
     
-    private Map /*Operator -> Operator*/ getReplaceMap(
+    private Map<Operator, Operator> getReplaceMap(
                 ParsableVariable selfVar, 
                 Services services) {
-        Map result = new LinkedHashMap();
+        Map<Operator, Operator> result = new LinkedHashMap<Operator, Operator>();
         
         if(selfVar != null) {
             assert selfVar.sort().extendsTrans(originalSelfVar.sort());
@@ -116,8 +117,8 @@ public class ClassInvariantImpl implements ClassInvariant {
     
     public FormulaWithAxioms getOpenInv(ParsableVariable selfVar, 
                                         Services services) {
-        Map replaceMap = getReplaceMap(selfVar, services);
-        OpReplacer or = new OpReplacer(replaceMap);
+        final Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, services);
+        final OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalInv);   
     }
 

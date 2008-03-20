@@ -29,13 +29,7 @@ import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
-import de.uka.ilkd.key.speclang.FormulaWithAxioms;
-import de.uka.ilkd.key.speclang.IteratorOfClassInvariant;
-import de.uka.ilkd.key.speclang.IteratorOfOperationContract;
-import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.SetOfClassInvariant;
-import de.uka.ilkd.key.speclang.SetOfOperationContract;
-import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
+import de.uka.ilkd.key.speclang.*;
 
 
 /**
@@ -205,7 +199,7 @@ public class UseOperationContractRule implements BuiltInRule {
      * replacement in the passed goal.
      */
     private void replaceInGoal(Term replacement, Goal goal, PosInOccurrence pio) {
-        Map replaceMap = new LinkedHashMap();
+        final Map<Term, Term> replaceMap = new LinkedHashMap<Term, Term>();
         replaceMap.put(pio.subTerm(), replacement);
         OpReplacer or = new OpReplacer(replaceMap);
         
@@ -364,8 +358,8 @@ public class UseOperationContractRule implements BuiltInRule {
             = SVF.createResultVar(services, pm, true);
         ProgramVariable excVar 
             = SVF.createExcVar(services, pm, true);
-        Map atPreFunctions               
-            = new LinkedHashMap();
+        Map<Operator, Function> atPreFunctions               
+            = new LinkedHashMap<Operator, Function>();
         
         //translate the contract and the invariants
         FormulaWithAxioms pre = cwi.contract.getPre(selfVar, 
@@ -380,13 +374,12 @@ public class UseOperationContractRule implements BuiltInRule {
         SetOfLocationDescriptor modifies = cwi.contract.getModifies(selfVar, 
                                                                     paramVars, 
                                                                     services);           
-        IteratorOfClassInvariant it = cwi.assumedInvs.iterator();
-        while(it.hasNext()) {
-            pre = pre.conjoin(it.next().getClosedInv(services));
+        for (final ClassInvariant inv : cwi.assumedInvs) {
+            pre = pre.conjoin(inv.getClosedInv(services));
         }
-        it = cwi.ensuredInvs.iterator();
-        while(it.hasNext()) {
-            post = post.conjoin(it.next().getClosedInv(services));
+
+        for (final ClassInvariant inv : cwi.ensuredInvs) {
+            post = post.conjoin(inv.getClosedInv(services));
         }
         
         //split goal into three branches
@@ -403,7 +396,7 @@ public class UseOperationContractRule implements BuiltInRule {
         AnonymisingUpdateFactory auf = new AnonymisingUpdateFactory(uf);
         SetOfMetavariable mvs = getAllMetavariables(pio.topLevel().subTerm());
         Term[] mvTerms = new Term[mvs.size()];
-        IteratorOfMetavariable it2 = mvs.iterator();
+        final IteratorOfMetavariable it2 = mvs.iterator();
         for(int i = 0; i < mvTerms.length; i++) {
             mvTerms[i] = TermBuilder.DF.func(it2.next());
         }            
@@ -416,13 +409,13 @@ public class UseOperationContractRule implements BuiltInRule {
                                    ? uf.skip()
                                    : uf.elementaryUpdate(TB.var(selfVar), 
                                                          actualSelf));
-        IteratorOfParsableVariable paramsIt = paramVars.iterator();
-        IteratorOfTerm actualParamsIt = actualParams.iterator();
-        while(paramsIt.hasNext()) {
+        
+        final IteratorOfTerm actualParamsIt = actualParams.iterator();
+        for (final ParsableVariable paramVar : paramVars) {
             assert actualParamsIt.hasNext();
             selfParamsUpdate 
                 = uf.parallel(selfParamsUpdate, 
-                              uf.elementaryUpdate(TB.var(paramsIt.next()), 
+                              uf.elementaryUpdate(TB.var(paramVar), 
                                                   actualParamsIt.next()));
         }
         Term excNullTerm = TB.equals(TB.var(excVar), TB.NULL(services));
