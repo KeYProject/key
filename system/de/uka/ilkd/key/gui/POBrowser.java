@@ -19,14 +19,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Iterator;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -179,7 +172,7 @@ public class POBrowser extends JDialog {
                             escapeListener,
                             "ESC",
                             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                            JButton.WHEN_IN_FOCUSED_WINDOW);
+                            JComponent.WHEN_IN_FOCUSED_WINDOW);
 
 	//show
         getContentPane().setLayout(new BoxLayout(getContentPane(), 

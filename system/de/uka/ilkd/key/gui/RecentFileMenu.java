@@ -52,7 +52,7 @@ public class RecentFileMenu {
     /** 
      * list of recent files
      */
-    private HashMap recentFiles;
+    private HashMap<JMenuItem, RecentFileEntry> recentFiles;
 
 
     private RecentFileEntry mostRecentFile;
@@ -76,7 +76,7 @@ public class RecentFileMenu {
         this.lissy = listener;
         this.maxNumberOfEntries = maxNumberOfEntries;
 
-	this.recentFiles = new HashMap();
+	this.recentFiles = new HashMap<JMenuItem, RecentFileEntry>();
 
         if (p != null) load(p);
 
@@ -110,7 +110,7 @@ public class RecentFileMenu {
      *
      */
     public String getAbsolutePath(JMenuItem item) {
-	return ((RecentFileEntry)recentFiles.get(item)).getAbsolutePath();
+	return recentFiles.get(item).getAbsolutePath();
     }
 
     /**
@@ -135,8 +135,8 @@ public class RecentFileMenu {
             Debug.out("", i);
             Debug.out("item is ", menu.getItem(i));
             Debug.out("name is ", menu.getItem(i).getText());
-            if (((RecentFileEntry)recentFiles.
-		 get(menu.getItem(i))).getAbsolutePath().equals(name)) {
+            if (recentFiles.
+		 get(menu.getItem(i)).getAbsolutePath().equals(name)) {
                 //this name has to be put at the first position
 		item = menu.getItem(i);
                 index = i;

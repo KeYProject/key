@@ -128,7 +128,7 @@ public abstract class ApplyTacletDialog extends JDialog {
         //logger.info(tacletSB);
         //System.out.println(tacletSB);
         
-        panel.setAlignmentY(JPanel.TOP_ALIGNMENT);
+        panel.setAlignmentY(Component.TOP_ALIGNMENT);
         // show taclet
         JScrollPane scroll = new JScrollPane();
         int nolines=countLines(model[0].taclet().toString())+1;
@@ -157,8 +157,8 @@ public abstract class ApplyTacletDialog extends JDialog {
 
         statusPanel.add(
 	    new JScrollPane(statusArea,
-	        JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), 
+	        ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED), 
 	    BorderLayout.CENTER);
         statusPanel.setBorder(new TitledBorder("Input validation result"));
         setStatus(model[current()].getStatusString());
@@ -177,7 +177,7 @@ public abstract class ApplyTacletDialog extends JDialog {
 
 	c.gridx = 1;
 	panel.add(applyButton, c);    
-	panel.setAlignmentY(JPanel.BOTTOM_ALIGNMENT);
+	panel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
 
 	return panel;
     }

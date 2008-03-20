@@ -48,7 +48,8 @@ public class Config {
 	new ConfigChangeEvent(this);
 
     /** the listeners to this Config */
-    private List listenerList = new ArrayList(5);
+    private List<ConfigChangeListener> listenerList = 
+        new ArrayList<ConfigChangeListener>(5);
 
     private Config() {
     }
@@ -107,9 +108,9 @@ public class Config {
 
     public synchronized void fireConfigChange() {
 	synchronized(listenerList) {
-	    Iterator it = listenerList.iterator();
+	    Iterator<ConfigChangeListener> it = listenerList.iterator();
 	    while (it.hasNext()) {
-		((ConfigChangeListener)it.next()).
+		it.next().
 		    configChanged(configChangeEvent);
 	    }
 	}

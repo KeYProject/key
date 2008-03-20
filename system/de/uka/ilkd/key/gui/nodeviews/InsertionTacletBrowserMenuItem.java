@@ -6,7 +6,6 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,9 +26,9 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
  implements TacletMenuItem {
 
     /** all taclet apps the user can choose from */
-    private Collection insertionTaclets;
+    private Collection<TacletAppListItem> insertionTaclets;
     /** the added action listeners */
-    private List listenerList = new LinkedList();
+    private List<ActionListener> listenerList = new LinkedList<ActionListener>();
     /** the notation info to pretty print the taclet apps */
     protected NotationInfo notInfo;
     /** the parent frame of the selection dialog to be displayed */
@@ -69,8 +68,8 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
      * (allows easy exchange for e.g. a sorted list)
      * default: is filo
      */
-    protected Collection createInsertionList() {
-        return new LinkedList();
+    protected Collection<TacletAppListItem> createInsertionList() {
+        return new LinkedList<TacletAppListItem>();
     }
     
     
@@ -130,8 +129,8 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
             final JList selectionList = new JList(insertionTaclets.toArray());
             
             final JScrollPane scrollPane = 
-                new JScrollPane(selectionList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
-                        JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                new JScrollPane(selectionList, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
+                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             scrollPane.setPreferredSize(new Dimension(300,100));
             scrollPane.setMinimumSize(new Dimension(150,50));
            
@@ -233,9 +232,8 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
         }
 
     protected void processTacletSelected(ActionEvent e) {
-        final Iterator it = listenerList.iterator();
-        while (it.hasNext()) {
-            ((ActionListener)it.next()).actionPerformed(e);
+        for (final ActionListener al : listenerList) {
+            al.actionPerformed(e);
         }
     }
 

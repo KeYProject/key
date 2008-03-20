@@ -58,7 +58,8 @@ public class GeneralSettings implements Settings {
     /** OCL is not active by default */
     private boolean useOCL = false;
 
-    private LinkedList listenerList = new LinkedList();
+    private LinkedList<SettingsListener> listenerList = 
+        new LinkedList<SettingsListener>();
 
 
     // getter
@@ -202,9 +203,9 @@ public class GeneralSettings implements Settings {
      * changed to its registered listeners (not thread-safe)
      */
     protected void fireSettingsChanged() {
-	Iterator it = listenerList.iterator();
+	Iterator<SettingsListener> it = listenerList.iterator();
 	while (it.hasNext()) {
-	    ((SettingsListener)it.next()).settingsChanged(new GUIEvent(this));
+	    it.next().settingsChanged(new GUIEvent(this));
 	}
     }
 
