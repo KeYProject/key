@@ -33,17 +33,7 @@ import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
 import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ListOfLogicVariable;
-import de.uka.ilkd.key.logic.op.ListOfParsableVariable;
-import de.uka.ilkd.key.logic.op.ListOfProgramMethod;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SLListOfParsableVariable;
-import de.uka.ilkd.key.logic.op.SetAsListOfProgramMethod;
-import de.uka.ilkd.key.logic.op.SetOfProgramMethod;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.ClassInvariantImpl;
@@ -276,7 +266,7 @@ public class JMLSpecFactory {
         ParsableVariable excVar = SVF.createExcVar(services,
                                                    programMethod, 
                                                    false);
-        Map atPreFunctions = new LinkedHashMap();
+        Map<Operator, Function> atPreFunctions = new LinkedHashMap<Operator, Function>();
         
         //translate requires
         FormulaWithAxioms requires = FormulaWithAxioms.TT;
@@ -528,7 +518,7 @@ public class JMLSpecFactory {
         ListOfParsableVariable localVars 
             = collectLocalVariables(programMethod.getBody(), loop);        
         paramVars = paramVars.append(localVars);
-        Map atPreFunctions = new LinkedHashMap();
+        Map<Operator, Function> atPreFunctions = new LinkedHashMap<Operator, Function>();
         
         //translate invariant
         Term invariant;

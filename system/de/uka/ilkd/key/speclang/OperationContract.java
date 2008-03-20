@@ -14,10 +14,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
-import de.uka.ilkd.key.logic.op.ListOfParsableVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.*;
 
 
 /**
@@ -59,14 +56,13 @@ public interface OperationContract {
      * @param atPreFunctions map containing functions to use as atPre-functions.
      *                       If the method needs an atPre-function which is not
      *                       in this map, it creates a fresh one and adds it to 
-     *                       the map.
+     *                       the map.˙
      */
     public FormulaWithAxioms getPost(ParsableVariable selfVar, 
                                      ListOfParsableVariable paramVars, 
                                      ParsableVariable resultVar, 
                                      ParsableVariable excVar,
-                                     /*inout*/ Map /*Operator (normal) 
-                                           -> Function (atPre)*/ atPreFunctions,
+                                     /*inout*/ Map<Operator, Function/* at pre */> atPreFunctions,
                                      Services services);
 
     /**

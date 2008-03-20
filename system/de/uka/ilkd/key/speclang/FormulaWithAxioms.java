@@ -17,10 +17,7 @@ import java.util.Map;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.IteratorOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
 
 
@@ -36,18 +33,18 @@ public class FormulaWithAxioms {
     public static final FormulaWithAxioms FF = new FormulaWithAxioms(TB.ff());
     
     private final Term formula;
-    private final Map /*Operator -> Term*/ axioms;
+    private final Map<Operator, Term> axioms;
   
   
-    public FormulaWithAxioms(Term formula, Map /*Operator -> Term*/ axioms) {
+    public FormulaWithAxioms(Term formula, Map<Operator, Term> axioms) {
         this.formula = formula;
-        this.axioms  = new LinkedHashMap();
+        this.axioms  = new LinkedHashMap<Operator, Term>();
         this.axioms.putAll(axioms);
     }
     
     
     public FormulaWithAxioms(Term formula) {
-	this(formula, new LinkedHashMap());
+	this(formula, new LinkedHashMap<Operator, Term>());
     }
 
   
@@ -56,8 +53,8 @@ public class FormulaWithAxioms {
     }
 
   
-    public Map /*Operator -> Term*/ getAxioms() {
-        Map result = new LinkedHashMap();
+    public Map<Operator, Term> getAxioms() {
+        Map<Operator, Term> result = new LinkedHashMap<Operator, Term>();
         result.putAll(axioms);
         return result;
     }
@@ -65,9 +62,9 @@ public class FormulaWithAxioms {
     
     public Term getAxiomsAsFormula() {
         Term result = TB.tt();
-        Iterator it = axioms.values().iterator();
+        Iterator<Term> it = axioms.values().iterator();
         while(it.hasNext()) {
-            result = TB.and(result, (Term)it.next());
+            result = TB.and(result, it.next());
         }
         return result;
     }
