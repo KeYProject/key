@@ -57,8 +57,9 @@ public class KeYFile implements EnvInput {
     protected InitConfig initConfig;
     
     private boolean chooseContract = false;
-    
-    
+
+    // when parsing the key file store the classPaths here
+    private ListOfString classPaths;
     
     //-------------------------------------------------------------------------
     //constructors
@@ -232,6 +233,12 @@ public class KeYFile implements EnvInput {
         return result;
     }
     
+    public ListOfString readClassPath() {
+        if(!javaPathAlreadyParsed)
+            throw new IllegalStateException("Can access this only after 'readJavaPath' has been called");
+        
+        return classPaths;
+    }
     
     public String readJavaPath() throws ProofInputException {
         if (javaPathAlreadyParsed) {
@@ -245,6 +252,7 @@ public class KeYFile implements EnvInput {
             
             problemParser.preferences(); // skip preferences
             
+            classPaths = problemParser.classPaths();
             ListOfString javaPaths = problemParser.javaSource(); 
             
             if (javaPaths == null) {
@@ -257,8 +265,6 @@ public class KeYFile implements EnvInput {
             
             if(javaPaths.size() > 1)
                 Debug.fail("Don't know what to do with multiple Java paths.");            
-                
-            javaPathAlreadyParsed=true;
             
             if (javaPath.length() != 0) { 
                 File cfile = new File(javaPath);
@@ -273,6 +279,9 @@ public class KeYFile implements EnvInput {
                             + javaPath + " not found.");
                 }                      
             }
+            
+            javaPathAlreadyParsed=true;
+            
             return javaPath;
         } catch (antlr.ANTLRException e) {
             throw new ProofInputException(e);

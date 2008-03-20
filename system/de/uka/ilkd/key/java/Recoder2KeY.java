@@ -15,11 +15,16 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
+import recoder.bytecode.ByteCodeParser;
+import recoder.bytecode.ClassFile;
+import recoder.io.DataLocation;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.service.ChangeHistory;
+import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
@@ -29,8 +34,12 @@ import de.uka.ilkd.key.logic.op.IteratorOfProgramVariable;
 import de.uka.ilkd.key.logic.op.ListOfProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SLListOfProgramVariable;
+import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.DirectoryFileCollection;
+import de.uka.ilkd.key.util.FileCollection;
 import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.key.util.ZipFileCollection;
 
 /**
  * This class is the bridge between recoder ast data structures and KeY data
@@ -62,7 +71,20 @@ public class Recoder2KeY implements JavaReader {
      * The location where the libraries to be parsed can be found. It will be
      * used as a resource path relative to the path of the package.
      */
-    private static String JAVA_SRC_DIR = "JavaRedux_1.4.2";
+    private static String JAVA_SRC_DIR = "defaultClasses.jar";
+    
+    /**
+     * This is a marker object to denote in the list of classPaths that the 
+     * default classpath must not be read. 
+     * (see also keyparser.g)
+     */
+    public static String NO_DEFAULT_CLASSES_STRING = new String("no default classes are to be read");
+    
+    /**
+     * the set of strings that describes the classpath to be searched
+     * for classes.
+     */
+    private ListOfString classPath;
 
     /**
      * this mapping stores the relation between recoder and KeY entities in a
@@ -99,6 +121,7 @@ public class Recoder2KeY implements JavaReader {
      * types
      */
     private Recoder2KeYTypeConverter typeConverter;
+
 
     /**
      * create a new Recoder2KeY transformation object.
@@ -405,66 +428,93 @@ public class Recoder2KeY implements JavaReader {
     }
 
     // ----- parsing libraries
+    
+    public void setClassPath(ListOfString classPath) {
+        this.classPath = classPath;
+    }
 
     /**
-     * adds a special compilation unit containing references to types that have
-     * to be available in Recoder and KeY form, e.g. Exceptions
+     * reads compilation units that will be treated as library classes.
      * 
-     * @todo
+     * Proceed as follows:
+     * 
+     * 1) If "classPath" is set and contains at least one entry
+     *     1.1) for each entry read every java file in its content
+     *     1.2) for each entry read every class file in its file tree
+     *     
+     * 2) else
+     *     2.1) read a special collection of classes that is stored
+     *          internally
+     *          
+     * @author mu
+     * @throws Exception during parsing
      */
-    private List<recoder.java.CompilationUnit> parseSpecial(boolean parseLibs) {
+    private List<recoder.java.CompilationUnit> parseLibs() {
+        
         recoder.ProgramFactory pf = servConf.getProgramFactory();
-        List<recoder.java.CompilationUnit> rcuList = new ArrayList<recoder.java.CompilationUnit>();
-        recoder.java.CompilationUnit rcu = null;
-        URL jlURL = KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class, JAVA_SRC_DIR + "/" + "JAVALANG.TXT");
-        if (jlURL == null) {
-            Debug.out(JAVA_SRC_DIR + "/" + "JAVALANG.TXT not found!");
+        List<recoder.java.CompilationUnit> rcuList = new LinkedList<recoder.java.CompilationUnit>();
+        List<FileCollection> sources = new ArrayList<FileCollection>();
+        
+        boolean parseDefault = true;
+        
+        if(classPath != null) {
+            for(String cp : classPath) {
+                // marker for no_default classes
+                if(cp == NO_DEFAULT_CLASSES_STRING) { 
+                   parseDefault = false; 
+                } else {
+                    File file = new File(cp);
+                    if(file.isDirectory())
+                        sources.add(new DirectoryFileCollection(file));
+                    else
+                        sources.add(new ZipFileCollection(file));
+                }
+            }
         }
-        if (jlURL != null && Debug.ENABLE_DEBUG) {
-            Debug.out(jlURL.toString());
+        if(parseDefault) {
+            URL jlURL = KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class, JAVA_SRC_DIR);
+            sources.add(0, new ZipFileCollection(jlURL));
         }
+
+        DataLocation currentDataLocation = null;
         try {
-            BufferedReader r = new BufferedReader(new InputStreamReader(jlURL.openStream()));
-            for (String jl = r.readLine(); (jl != null); jl = r.readLine()) {
-                if ((jl.charAt(0) == '#') || (jl.length() == 0)) {
-                    continue;
-                }
-                if ((jl.charAt(0) == '+')) {
-                    if (parseLibs) {
-                        jl = jl.substring(1);
-                    } else {
-                        continue;
-                    }
-                }
-                jl = jl.trim();
-                URL jlf = KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class, JAVA_SRC_DIR + "/" + jl);
-                InputStream is = jlf.openStream();
-                if (is == null)
-                    throw new IOException("Resource cannot be opened for reading: " + jlf);
-                Reader f = new BufferedReader(new InputStreamReader(is));
-                rcu = pf.parseCompilationUnit(f);
-                rcu.setDataLocation(new URLDataLocation(jlf));
-                rcu.makeAllParentRolesValid();
-                rcuList.add(rcu);
-                if (Debug.ENABLE_DEBUG) {
-                    Debug.out("parsed: " + jl);
+            // -- read java files --
+            for (FileCollection fc : sources) {
+                FileCollection.Walker walker = fc.createWalker(".java");
+                while(walker.step()) {
+                    currentDataLocation = walker.getCurrentDataLocation();
+                    InputStream is = walker.openCurrent();
+                    Reader f = new BufferedReader(new InputStreamReader(is));
+                    recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
+                    rcu.setDataLocation(currentDataLocation);
+                    rcu.makeAllParentRolesValid();
+                    rcuList.add(rcu);
                 }
             }
 
-            // parse a special default class
-            rcu = pf.parseCompilationUnit(new StringReader("public class " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS + " {}"));
-            rcu.makeAllParentRolesValid();
-            rcuList.add(rcu);
-        } catch (recoder.ParserException e) {
-            Debug.out("Error while parsing specials", e);
-            System.err.println("recoder2key: Error while parsing specials");
-            System.err.println("recoder2key: Try to continue...");
-        } catch (Exception e) {
-            Debug.out("Error while parsing specials, someone messed up with the resources", e);
-            System.err.println("recoder2key: Error while parsing specials");
-            System.err.println("recoder2key: someone messed up with the resources");
+            // -- read class files --
+            ByteCodeParser parser = new ByteCodeParser();
+            for (FileCollection fc : sources) {
+                FileCollection.Walker walker = fc.createWalker(".class");
+                while(walker.step()) {
+                    currentDataLocation = walker.getCurrentDataLocation();
+                    InputStream is = walker.openCurrent();
+                    ClassFile cf = parser.parseClassFile(is);
+                    ClassFileDeclarationBuilder builder = new ClassFileDeclarationBuilder(pf, cf);
+                    builder.setDataLocation(currentDataLocation);
+                    recoder.java.CompilationUnit rcu = builder.makeCompilationUnit();
+                    rcu.makeAllParentRolesValid();
+                    rcuList.add(rcu);
+                }
+            }
+            return rcuList;
+
+        } catch(Exception ex) {
+            reportError("Error while parsing lib: " + currentDataLocation, ex);
+            //  unreachable
+            return null;
         }
-        return rcuList;
+        
     }
 
     /**
@@ -481,11 +531,12 @@ public class Recoder2KeY implements JavaReader {
         // go to special mode -> used by the converter!
         setParsingLibs(true);
 
-        List<recoder.java.CompilationUnit> specialClasses = parseSpecial(false);
+        List<recoder.java.CompilationUnit> specialClasses = parseLibs();
 
         ChangeHistory changeHistory = servConf.getChangeHistory();
         for (int i = 0, sz = specialClasses.size(); i < sz; i++) {
             specialClasses.get(i).makeAllParentRolesValid();
+            // TODO if duplicated files, take first one only!
             changeHistory.attached(specialClasses.get(i));
         }
 

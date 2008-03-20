@@ -4436,6 +4436,9 @@ problem returns [ Term a = null ]
 	{ if (capturer != null) capturer.mark(); }
         (pref = preferences)
         { if ((pref!=null) && (capturer != null)) capturer.mark(); }
+        
+        stlist = classPaths 
+        // the result is not of importance here, so we use it twice
 
         stlist = javaSource {
           if(stlist != null && stlist.size() > 1)
@@ -4504,6 +4507,28 @@ problem returns [ Term a = null ]
 			setChoiceHelper(SetAsListOfChoice.EMPTY_SET, "");
         }
    ;
+   
+classPaths returns [ListOfString ids = SLListOfString.EMPTY_LIST]
+{
+  String s = null;
+}
+:
+  ( (
+    CLASSPATH 
+    s=string_literal {
+      ids = ids.append(s);
+    }
+    SEMI
+    )
+  | 
+    (
+    NODEFAULTCLASSES {
+      ids = ids.append(de.uka.ilkd.key.java.Recoder2KeY.NO_DEFAULT_CLASSES_STRING);
+    }
+    SEMI
+    )
+  )*
+  ;
 
 javaSource returns [ListOfString ids = SLListOfString.EMPTY_LIST]
 { 
