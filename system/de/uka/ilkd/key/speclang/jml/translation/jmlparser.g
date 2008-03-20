@@ -44,6 +44,7 @@ header {
     import de.uka.ilkd.key.logic.TermCreationException;
     import de.uka.ilkd.key.logic.ldt.LDT;
     import de.uka.ilkd.key.logic.ldt.AbstractIntegerLDT;
+    import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
     import de.uka.ilkd.key.logic.op.ExactInstanceSymbol;
     import de.uka.ilkd.key.logic.op.Function;
     import de.uka.ilkd.key.logic.op.InstanceofSymbol;
