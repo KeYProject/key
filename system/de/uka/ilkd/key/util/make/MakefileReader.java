@@ -16,7 +16,7 @@ import java.util.HashSet;
 public class MakefileReader {
 
     /** stores found rules */
-    private HashSet hset;
+    private HashSet<String> hset;
 
     /** the makefile */
     private File file;
@@ -61,8 +61,8 @@ public class MakefileReader {
 	}		
     }
     
-    public HashSet getRules() {
-	hset = new HashSet();
+    public HashSet<String> getRules() {
+	hset = new HashSet<String>();
 	try {
 	    FileReader fr = new FileReader(file);		
 	    if (hset.size()==0) read(fr);
@@ -75,7 +75,7 @@ public class MakefileReader {
     }
 
     public static void main(String[] args) {
-	HashSet set=new MakefileReader(new File(args[0])).getRules();
+	HashSet<String> set=new MakefileReader(new File(args[0])).getRules();
 	System.out.println("Read "+set.size()+" rules.");
     }
 

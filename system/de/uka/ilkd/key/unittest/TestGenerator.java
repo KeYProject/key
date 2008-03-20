@@ -1119,7 +1119,7 @@ public class TestGenerator{
     }
 
     /**
-     * Returns the program variables occuring in t that are no atributes.
+     * Returns the location variables occuring in t that are no attributes.
      */
     private ExtList getArguments(Term t){
 	SetOfProgramVariable programVars = 

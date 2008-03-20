@@ -160,7 +160,7 @@ public class ApplyOnNonRigidWithExplicitDependencies extends AbstractUpdateRule 
         final Location[] nrLocs = new Location[nr.dependencies().size()];
         nr.dependencies().arraycopy(0, nrLocs, 0, nrLocs.length);
 
-        HashSet nrDependencies = new HashSet();
+        HashSet<Location> nrDependencies = new HashSet<Location>();
         nrDependencies.addAll(Arrays.asList(nrLocs));
 
         ListOfAssignmentPair leftUpdate = SLListOfAssignmentPair.EMPTY_LIST;
@@ -209,7 +209,7 @@ public class ApplyOnNonRigidWithExplicitDependencies extends AbstractUpdateRule 
         return updates;
     }
 
-    private ReplacementResult replace(Term t, HashSet deps) {
+    private ReplacementResult replace(Term t, HashSet<Location> deps) {
         ReplacementResult result = new ReplacementResult();
         
         result.setReplacementResultTerm(replaceOccurences(t, deps, result));
@@ -221,7 +221,7 @@ public class ApplyOnNonRigidWithExplicitDependencies extends AbstractUpdateRule 
      * it is assumed that t contains no variable binding terms TODO: full
      * support of quantified variables
      */
-    private Term replaceOccurences(Term t, HashSet deps, 
+    private Term replaceOccurences(Term t, HashSet<Location> deps, 
             ReplacementResult res) {
         if (t.op() instanceof IUpdateOperator || deps.contains(t.op())) {
             return getReplacement(t, res);

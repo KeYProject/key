@@ -74,7 +74,7 @@ public class GenericParser {
     public static String generatedSrcPath;
 
     // Hashes rules that have been created
-    private static HashSet ruleSet=new HashSet();
+    private static HashSet<String> ruleSet=new HashSet<String>();
 
 
     // STATIC METHODS
