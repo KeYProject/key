@@ -18,7 +18,6 @@ import java.io.IOException;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.Constructor;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.annotation.Annotation;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
@@ -29,7 +28,6 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.mgt.Contractable;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
@@ -41,7 +39,7 @@ import de.uka.ilkd.key.util.ExtList;
  */
 public class ProgramMethod extends NonRigidFunction 
     implements SourceElement, ProgramElement, 
-    MemberDeclaration, ProgramInLogic, Contractable {
+    MemberDeclaration, ProgramInLogic {
 
     private final MethodDeclaration method; 
     private final KeYJavaType kjt;
@@ -146,17 +144,6 @@ public class ProgramMethod extends NonRigidFunction
 
     public Comment[] getComments() {
 	return method.getComments();
-    }
-
-    /**
-     *@return the annotations.
-     */
-    public Annotation[] getAnnotations(){
-	return new Annotation[0];
-    }
-
-    public int getAnnotationCount(){
-	return 0;
     }
 
     public void prettyPrint(PrettyPrinter w) throws IOException {
@@ -312,12 +299,6 @@ public class ProgramMethod extends NonRigidFunction
 
     public String getName() {
     	return getMethodDeclaration().getName();
-    }
-
-    public boolean equalContractable(Contractable c) {
-    	return equals(c) 
-	  && getContainerType().equals
-	       (((ProgramMethod)c).getContainerType());
     }
     
     public boolean isAbstract() {

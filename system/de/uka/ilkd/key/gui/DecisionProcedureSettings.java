@@ -13,6 +13,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Properties;
 
+import de.uka.ilkd.key.gui.configuration.Settings;
+import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 
 /** This class encapsulates the information which 

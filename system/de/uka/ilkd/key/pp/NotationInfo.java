@@ -111,16 +111,16 @@ public class NotationInfo {
      * a Notation registered.  Otherwise, we see if there is one for the
      * <em>class</em> of the operator.
      */
-    private HashMap tbl;
+    protected HashMap tbl;
 
     /**
      * Maps terms to abbreviations and reverse.
      */
-    private AbbrevMap scm;
+    protected AbbrevMap scm;
 
 
     /** Create a new NotationInfo. Do not call this constructor
-     * directly. Use the factory method {@link createInstance}
+     * directly. Use the factory method {@link #createInstance()}
      * instead. */
     public NotationInfo() {
     	createDefaultNotationTable();
@@ -135,7 +135,7 @@ public class NotationInfo {
      * abbreviations, and a set of Notations for the built-in operators
      * which corresponds to the parser syntax. 
      */
-    private void createDefaultNotationTable() {
+    protected void createDefaultNotationTable() {
 		tbl=new HashMap();
 		createDefaultOpNotation();
 		createDefaultTermSymbolNotation();
@@ -146,7 +146,7 @@ public class NotationInfo {
      * Registers notations for the built-in operators.  The priorities
      * and associativities correspond to the parser syntax.  
      */
-    private void createDefaultOpNotation() {
+   protected void createDefaultOpNotation() {
 	tbl.put(Op.TRUE ,new Notation.Constant("true", 130));
 	tbl.put(Op.FALSE,new Notation.Constant("false", 130));
 	tbl.put(Op.NOT,new Notation.Prefix("!" ,60,60));
@@ -170,8 +170,6 @@ public class NotationInfo {
 	tbl.put(Op.IF_THEN_ELSE, new Notation.IfThenElse(130, "\\if"));
 	tbl.put(Op.IF_EX_THEN_ELSE, new Notation.IfThenElse(130, "\\ifEx"));
 
-	tbl.put(Op.COMPUTE_SPEC_OP,new Notation.Prefix("^" ,60, 60));
-
 	//createNumLitNotation(IntegerLDT.getStaticNumberSymbol());
 
 	tbl.put(Op.SUBST,new Notation.Subst());
@@ -185,7 +183,7 @@ public class NotationInfo {
      * Register notations for standard classes of operators.  This
      * includes Function operators, all kinds of variables, etc.
      */
-    private void createDefaultTermSymbolNotation() {
+   protected void createDefaultTermSymbolNotation() {
 	tbl.put(Function.class, new Notation.Function());               
 	tbl.put(LogicVariable.class, new Notation.VariableNotation());
 	//tbl.put(SchemaVariable.class, new Notation.Variable());

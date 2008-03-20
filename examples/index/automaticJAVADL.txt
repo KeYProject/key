@@ -1,3 +1,4 @@
+./BookExamples/chap02FirstOrderLogic/Ex2.58.key
 ./arith/binomial1.key
 ./arith/binomial2.key
 ./arith/check_jdiv.key
@@ -11,6 +12,7 @@
 ./arith/divByZero.key
 ./arith/divisionAssoc.key
 ./arith/divisionBy2.key
+./arith/euclidean/gcdHelp-post.key
 ./arith/gemplusDecimal/add.key
 ./arith/jdivevenodd.key
 ./arith/median.key
@@ -19,6 +21,7 @@
 ./arith/mod7.key
 ./arith/overflow_hija.key
 ./arith/poly_division0.key
+./arith/poly_division1.key
 ./inEqSimp/division.key
 ./inEqSimp/inequations0.key
 ./inEqSimp/inequations1.key
@@ -63,7 +66,9 @@
 ./java_dl/exchange.key
 ./java_dl/if.key
 ./java_dl/incrementcounter.key
+./java_dl/innerClasses/inner.key
 ./java_dl/iteratedAssignment.key
+./java_dl/java5/vararg.key
 ./java_dl/jml-information-flow.key
 ./java_dl/methodCall.key
 ./java_dl/methodCall1.key
@@ -74,6 +79,7 @@
 ./java_dl/postConditionTaclets1.key
 ./java_dl/postConditionTaclets2.key
 ./java_dl/quantifiedQuery.key
+./java_dl/query_anon_updates.key
 ./java_dl/reverseArray.key
 ./java_dl/reverseArray2.key
 ./java_dl/simpleAssignment.key

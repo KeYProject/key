@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,13 +61,15 @@ public class VariableNameProposer implements InstantiationProposer {
 	    return getNameProposalForSkolemTermVariable(app,
 	    					       var,
 						       services,
-						       undoAnchor);
+						       undoAnchor,
+                                                       previousProposals);
 	} else if(var.isVariableSV()) {
 	    return getNameProposalForVariableSV(app,
 	    					var,
 						services,
 						undoAnchor);
-	} else if(((SortedSchemaVariable)var).sort() == ProgramSVSort.LABEL) {
+	} else if(var instanceof SortedSchemaVariable 
+                 && ((SortedSchemaVariable)var).sort() == ProgramSVSort.LABEL) {
 	    return getNameProposalForLabel(app,
 	    				   var,
 					   services,
@@ -87,11 +88,13 @@ public class VariableNameProposer implements InstantiationProposer {
     private String getNameProposalForSkolemTermVariable(TacletApp p_app,
     						       SchemaVariable p_var,
 						       Services services,
-						       Node undoAnchor) {
+						       Node undoAnchor,
+                                                       ListOfString previousProposals) {
 	return getNameProposalForSkolemTermVariable
 	    ( createBaseNameProposalBasedOnCorrespondence ( p_app, p_var ),
 	      services,
-	      undoAnchor );
+	      undoAnchor,
+              previousProposals);
     }
 
 
@@ -130,7 +133,8 @@ public class VariableNameProposer implements InstantiationProposer {
 
     private String getNameProposalForSkolemTermVariable(String name,
     						       Services services,
-						       Node undoAnchor) {
+						       Node undoAnchor,
+                                                       ListOfString previousProposals) {
 
 	final NamespaceSet nss = services.getNamespaces();
 	Name l_name;
@@ -139,8 +143,10 @@ public class VariableNameProposer implements InstantiationProposer {
 	    name = basename + services.getCounter(SKOLEMTERMVARCOUNTER_PREFIX + name)
 		.getCountPlusPlusWithParent(undoAnchor);	    
 	    l_name = new Name(name);
-	} while (nss.lookup(l_name) != null);
-	
+	} while (nss.lookup(l_name) != null &&
+                !previousProposals.contains(name));
+        
+        	
 	return name;
     }
 
@@ -195,7 +201,7 @@ public class VariableNameProposer implements InstantiationProposer {
                 contextProgram = new StatementBlock();
         
         final LabelCollector lc = 
-            new LabelCollector(contextProgram, new HashSet(10));
+            new LabelCollector(contextProgram, services);
 
         lc.start();
         String proposal;         

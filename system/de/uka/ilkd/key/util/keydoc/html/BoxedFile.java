@@ -13,8 +13,9 @@ class BoxedFile {
 
     /** Boxedfile Constructor.
      * Boxes a HTMLFile 
-     * @param fileName The name of the .key file
-     * @param shortDescription Short description of the purpose of the .key file
+     * @param file the File object repressenting the .key file
+     * @param firstLength
+     * @param firstOffset
      * @param htmlFile The processed .key file
      */
     public BoxedFile(File file, int firstLength, int firstOffset, HTMLFile htmlFile) {

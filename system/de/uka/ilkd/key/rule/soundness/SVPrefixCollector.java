@@ -109,7 +109,7 @@ public class SVPrefixCollector extends TacletVisitor {
     public void subtreeEntered(Term t) {
 	if ( t.op() instanceof Modality ) {
 	    ProgramCollector c = new ProgramCollector
-		( t.javaBlock ().program () );
+		( t.javaBlock ().program (), services );
 	    c.start ();
 	} else if ( t.op () instanceof SchemaVariable ) {
 	    SchemaVariable sv = (SchemaVariable)t.op ();
@@ -128,7 +128,7 @@ public class SVPrefixCollector extends TacletVisitor {
     }
 
     /** is called by the execPostOrder-method of a term 
-     * @param Term to checked if it is a Variable and if true the
+     * @param t the Term to checked if it is a Variable and if true the
      * Variable is added to the list of found Variables
      */  
     public void visit(Term t) {	
@@ -156,8 +156,8 @@ public class SVPrefixCollector extends TacletVisitor {
 	private int     startAtChild;
 	private boolean enter;
 
-	public ProgramCollector(ProgramElement root) {
-	    super(root);
+	public ProgramCollector(ProgramElement root, Services services) {
+	    super(root, services);
 	}
 
 	private void pushLevelMark () {
@@ -264,13 +264,6 @@ public class SVPrefixCollector extends TacletVisitor {
 	    doAction(node);
 
 	    popLevelMark ();
-	}
-
-	/** the action that is performed just before leaving the node the
-	 * last time 
-	 */
-	protected void doAction(ProgramElement node) {
-	    node.visit(this);
 	}
     
 	/** starts the walker*/

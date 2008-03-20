@@ -46,7 +46,7 @@ public class DivideMonomials extends AbstractMetaOperator {
         final Monomial m1 = Monomial.create ( arg1, services );
         final Monomial m2 = Monomial.create ( arg2, services );
 
-        final Monomial res = m2.divide ( m1 );
+        final Monomial res = m2.reduce ( m1 );
         return res.toTerm ( services );
     }
 

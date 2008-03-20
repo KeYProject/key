@@ -50,7 +50,7 @@ public abstract class AbstractFeatureStrategy implements Strategy {
     /**
      * @param heuristics
      * @param thenFeature
-     * @return
+     * @return the conditional feature return true when the rule belongs to one of the given heuristics
      */
     protected Feature ifHeuristics (String[] heuristics, Feature thenFeature) {
         return ConditionalFeature.createConditional (
@@ -62,7 +62,6 @@ public abstract class AbstractFeatureStrategy implements Strategy {
      * @param heuristics
      * @param thenFeature
      * @param elseFeature
-     * @return
      */
     protected Feature ifHeuristics (String[] heuristics,
                                     Feature thenFeature,
@@ -172,7 +171,6 @@ public abstract class AbstractFeatureStrategy implements Strategy {
     /**
      * @param names
      * @param priority
-     * @return
      */
     protected Feature ifHeuristics (String[] names, int priority) {
         return ConditionalFeature.createConditional ( getFilterFor ( names ),
@@ -181,7 +179,6 @@ public abstract class AbstractFeatureStrategy implements Strategy {
 
     /**
      * @param priority
-     * @return
      */
     protected Feature selectSimplifier (long priority) {
         return ConditionalFeature.createConditional(
@@ -324,6 +321,18 @@ public abstract class AbstractFeatureStrategy implements Strategy {
     protected Feature eq(ProjectionToTerm t1, ProjectionToTerm t2) {
         final TermBuffer buf = new TermBuffer ();
         return let ( buf, t1, applyTF ( t2, eq ( buf ) ) );
+    }
+
+    protected Feature contains(ProjectionToTerm bigTerm,
+                               ProjectionToTerm searchedTerm) {
+        final TermBuffer buf = new TermBuffer ();
+        return let ( buf, searchedTerm,
+                     applyTF ( bigTerm,
+                               not ( rec ( any (), not ( eq ( buf ) ) ) ) ) );
+    }
+    
+    protected Feature println(ProjectionToTerm t) {
+        return applyTF ( t, PrintTermFeature.INSTANCE );
     }
     
     protected TermFeature extendsTrans(Sort s) {

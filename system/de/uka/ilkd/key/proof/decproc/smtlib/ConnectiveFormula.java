@@ -79,7 +79,7 @@ public final class ConnectiveFormula extends Formula {
      * @throws IllegalArgumentException if <tt>op</tt> is no connective symbol or if the number
      *                                  of given arguments doesn't match the expected arity
      * 
-     * @see de.uka.ilkd.key.logic.op.DecisionProcedureSmtAufliaOp                                   
+     * @see de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAufliaOp                                   
      */
     public ConnectiveFormula( String op, Formula[] subForms ) {
         super( op, subForms, null );

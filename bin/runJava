@@ -189,7 +189,7 @@ JVM_DIR=`expr $JAVA : '\(.*\)/.*' \| $JAVA`
 # KeY CLASSPATH
 #
 
-key_ext_jars="antlr.jar recoder.jar dresden-ocl-demo.jar xerces.jar \
+key_ext_jars="antlr.jar recoderKey.jar dresden-ocl-demo.jar xerces.jar \
 junit.jar log4j.jar jargs.jar"
 
 keyclasspath="$KEY_HOME/system/binary/"

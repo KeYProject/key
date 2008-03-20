@@ -9,7 +9,7 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.casetool.ModelMethod;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 
 
 /**
@@ -17,11 +17,16 @@ import de.uka.ilkd.key.casetool.ModelMethod;
  */
 public class PreservesOwnInvPO extends PreservesInvPO {
     
-    public PreservesOwnInvPO(ModelMethod modelMethod, 
-                             InvariantSelectionStrategy invStrategy) {
-        super("PreservesOwnInv",
-              modelMethod, 
-              invStrategy,
-              modelMethod.getContainingClass().getMyClassInvariants());
+    public PreservesOwnInvPO(InitConfig initConfig,
+	    		     ProgramMethod programMethod) {
+        super(initConfig,
+              "PreservesOwnInv",
+              programMethod, 
+              initConfig.getServices()
+                        .getSpecificationRepository()
+                        .getClassInvariants(programMethod.getContainerType()),
+              initConfig.getServices()
+              	        .getSpecificationRepository()
+              	        .getClassInvariants(programMethod.getContainerType()));
     }
 }

@@ -9,11 +9,14 @@
 //
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.ListOfSchemaVariable;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public class WhileInvRuleWrapper extends While {
+public class WhileInvRuleWrapper extends While implements MetaConstructWithSV {
 
     private Term wrappedElement;
 
@@ -25,6 +28,14 @@ public class WhileInvRuleWrapper extends While {
 
     public Term unwrap() {
 	return wrappedElement;
+    }
+
+
+    public ListOfSchemaVariable neededInstantiations(SVInstantiations svInst) {
+        Term t = unwrap();
+        JavaProgramElement jpe = t.sub(0).javaBlock().program();
+        WhileInvRule wir = (WhileInvRule) t.op();
+        return wir.neededInstantiations(jpe, svInst);
     }
 
 }

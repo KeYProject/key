@@ -25,11 +25,9 @@ public class TestTerm extends TestCase {
 
     private TermFactory tf=TermFactory.DEFAULT;
 
-    private Term et1;
     private Sort sort1=new PrimitiveSort(new Name("S1"));
     private Sort sort2=new PrimitiveSort(new Name("S2"));
     private Sort sort3=new PrimitiveSort(new Name("S3"));
-    private String invalidTermMessage="Term not valid with given subterms";
     	
 
     Function p=new RigidFunction(new Name("p"),Sort.FORMULA,new Sort[]{sort1});  
@@ -54,16 +52,6 @@ public class TestTerm extends TestCase {
     public TestTerm(String name) {
 	super(name);
     }
-
-    public void setUp() {
-
-	Term et_x=new OpTerm(x,new Term[0]);
-	Term et_px=new OpTerm(p, new Term[]{et_x});
-	et1=et_px;
-
-    }
-
-
 
     private Term t1(){
 	Term t_x=tf.createFunctionTerm(x, new Term[0]);

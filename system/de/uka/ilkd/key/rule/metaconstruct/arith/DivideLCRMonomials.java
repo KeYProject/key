@@ -27,12 +27,11 @@ public class DivideLCRMonomials extends AbstractMetaOperator {
     /**
      * checks whether the top level structure of the given
      * 
-     * @link Term is syntactically valid, given the assumption that the top
+     * @param term the Term is syntactically valid, given the assumption that the top
      *       level operator of the term is the same as this Operator. The
      *       assumption that the top level operator and the term are equal is
      *       NOT checked.
-     * @return true iff the top level structure of the
-     * @link Term is valid.
+     * @return true iff the top level structure of the Term is valid.
      */
     public boolean validTopLevel(Term term) {
         // a meta operator accepts almost everything

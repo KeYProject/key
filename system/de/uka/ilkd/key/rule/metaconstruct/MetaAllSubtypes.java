@@ -15,8 +15,6 @@
 //
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.IteratorOfKeYJavaType;
@@ -60,9 +58,7 @@ public class MetaAllSubtypes extends AbstractMetaOperator {
 
     /** calculates the resulting term. */
     public Term calculate(Term term, SVInstantiations svInst, Services services) {
-	Main main = Main.getInstance();
-	KeYMediator mediator = main.mediator();
-	Namespace namespace = mediator.func_ns();
+	Namespace namespace = services.getNamespaces().functions();
 
 	TermSymbol nil = (TermSymbol)namespace.lookup(new Name("$empty_set"));
 	TermSymbol cons = (TermSymbol)namespace.lookup(new Name("$insert_set"));

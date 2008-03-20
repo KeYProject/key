@@ -42,7 +42,7 @@ public class ApplyOnNonRigidWithExplicitDependencies extends AbstractUpdateRule 
         }
 
         /**
-         * @return
+         * @return true if changed
          */
         public boolean hasChanged() {            
             return !assignmentPairs.isEmpty();
@@ -50,14 +50,14 @@ public class ApplyOnNonRigidWithExplicitDependencies extends AbstractUpdateRule 
 
         /**
          * returns a new {@link AssignmentPair} 
-         * @return
+         * @return list of assignmentPairs
          */
         public ListOfAssignmentPair getAssignmentPairs() {           
             return assignmentPairs;
         }
 
         /**
-         * @return
+         * @return the resulting term
          */
         public Term getTerm() {            
             return result;
@@ -151,7 +151,6 @@ public class ApplyOnNonRigidWithExplicitDependencies extends AbstractUpdateRule 
 
     /**
      * @param update
-     * @return
      */
     private Update[] sequentializeUpdate(Update update,
             NRFunctionWithExplicitDependencies nr) {
@@ -161,7 +160,7 @@ public class ApplyOnNonRigidWithExplicitDependencies extends AbstractUpdateRule 
         final Location[] nrLocs = new Location[nr.dependencies().size()];
         nr.dependencies().arraycopy(0, nrLocs, 0, nrLocs.length);
 
-        HashSet nrDependencies = new HashSet();
+        HashSet<Location> nrDependencies = new HashSet<Location>();
         nrDependencies.addAll(Arrays.asList(nrLocs));
 
         ListOfAssignmentPair leftUpdate = SLListOfAssignmentPair.EMPTY_LIST;
@@ -210,7 +209,7 @@ public class ApplyOnNonRigidWithExplicitDependencies extends AbstractUpdateRule 
         return updates;
     }
 
-    private ReplacementResult replace(Term t, HashSet deps) {
+    private ReplacementResult replace(Term t, HashSet<Location> deps) {
         ReplacementResult result = new ReplacementResult();
         
         result.setReplacementResultTerm(replaceOccurences(t, deps, result));
@@ -222,7 +221,7 @@ public class ApplyOnNonRigidWithExplicitDependencies extends AbstractUpdateRule 
      * it is assumed that t contains no variable binding terms TODO: full
      * support of quantified variables
      */
-    private Term replaceOccurences(Term t, HashSet deps, 
+    private Term replaceOccurences(Term t, HashSet<Location> deps, 
             ReplacementResult res) {
         if (t.op() instanceof IUpdateOperator || deps.contains(t.op())) {
             return getReplacement(t, res);
@@ -244,11 +243,8 @@ public class ApplyOnNonRigidWithExplicitDependencies extends AbstractUpdateRule 
         }
     }
 
-    /**
-     * @param s
-     * @return
-     */
     private static long COUNTER = 0;
+
     private Term getReplacement(Term s, ReplacementResult res) {
         // TODO register new variables at namespace; use variablenameproposer;
         // get KeYJavaType 

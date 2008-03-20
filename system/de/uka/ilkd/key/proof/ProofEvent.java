@@ -19,33 +19,18 @@ public class ProofEvent {
     private Proof source;
 
 
+    /** creates a new proof event the interactive prover where the
+     * event initially occured 
+     * @param source 
+     */
     public ProofEvent(Proof source) {
 	this.source=source;
     }
     
     
-    /** creates a new proof event the interactive prover where the
-     * event initially occured 
-     * @param source 
-     * @param message a String message
-    public ProofEvent(InteractiveProver source, String message) {
-	this.source = source;
-	this.message = message;
-    }
-     */
-
-
     public Proof getSource() {
 	return source;
     }
-
-
-/*
-    public String getMessage() {
-	return message;
-    }
-*/
-
 
     /**
      * This information should have its own event, but is currently

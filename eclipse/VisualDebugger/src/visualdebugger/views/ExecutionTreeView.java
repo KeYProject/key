@@ -43,6 +43,7 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.decproc.DecProcRunner;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.visualdebugger.*;
+import de.uka.ilkd.key.visualdebugger.executiontree.*;
 
 public class ExecutionTreeView extends ViewPart implements DebuggerListener {
     private static final boolean debug = false;
@@ -295,7 +296,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                     setSelected(node);
                 }
             });
-        // node.setToolTip(new Label("TEST"));
+
         if (!listener)
             node.setBackgroundColor(ColorConstants.white);
         return node;
@@ -399,8 +400,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
             }
 
             public void widgetSelected(SelectionEvent event) {
-                vd
-                        .visualize(((SourceElementFigure) ExecutionTreeView.this.selected)
+                vd.visualize(((SourceElementFigure) ExecutionTreeView.this.selected)
                                 .getETNode().getITNodesArray()[0]);
 
             }

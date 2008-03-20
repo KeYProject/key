@@ -209,7 +209,7 @@ public class RecentFileMenu {
 
     /** read the recent files from the given properties file */
     public void load(String filename) {
-	try {
+        try {
             Properties p = new Properties();
 	    p.load(new FileInputStream(filename));
               Enumeration e = p.propertyNames();
@@ -221,7 +221,7 @@ public class RecentFileMenu {
 	} catch (FileNotFoundException ex) {
             Debug.out("Could not read RecentFileList. Did not find file ",
 		      filename);
-	} catch (IOException ioe) {
+        } catch (IOException ioe) {
             Debug.out("Could not read RecentFileList. Some IO Error occured ",
 		      ioe);
 	}
@@ -244,14 +244,15 @@ public class RecentFileMenu {
 	try {
 	    // creates a new file if it does not exist yet
 	    localRecentFiles.createNewFile();
+            
 	    fin = new FileInputStream(localRecentFiles);
 	    fout = new FileOutputStream(localRecentFiles);
 	    p.load(fin);
             store(p);
             p.store(fout, "recent files");
-	} catch (IOException ex) {
-            Debug.out("Cound not write recentFileList due to ",
-		      ex.toString());
+	} catch (IOException ex) {            
+            System.err.println("Cound not write recentFileList due to "+
+		      ex.toString()+"::"+localRecentFiles);
         }
     }
 

@@ -34,6 +34,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
+import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.*;
@@ -97,15 +98,15 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         completeAndApplyApp(l, goal, medi);
     }
 
-    public static void completeAndApplyApp(java.util.List l, Goal goal,
+    public static void completeAndApplyApp(java.util.List<TacletApp> l, Goal goal,
             KeYMediator medi) {
         ApplyTacletDialogModel[] origInstModels = new ApplyTacletDialogModel[l
                 .size()];
         LinkedList recentInstModels = new LinkedList();
-        ListIterator tacletAppIt = l.listIterator();
+        ListIterator<TacletApp> tacletAppIt = l.listIterator();
 
         for (int i = 0; i < l.size(); i++) {
-            TacletApp tA = (TacletApp) tacletAppIt.next();
+            TacletApp tA =  tacletAppIt.next();
             origInstModels[i] = createModel(tA, goal, medi);
 
             if (InstantiationFileHandler.hasInstantiationListsFor(tA
@@ -568,9 +569,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 		editPanel = new JPanel();
 		editPanel.setLayout(new BoxLayout(editPanel, BoxLayout.X_AXIS));
 		editPanel.add(new JScrollPane(textarea,
-					      JScrollPane
+					      ScrollPaneConstants
 					      .VERTICAL_SCROLLBAR_AS_NEEDED,
-					      JScrollPane
+					      ScrollPaneConstants
 					      .HORIZONTAL_SCROLLBAR_AS_NEEDED));
 		JPanel buttonPanel=new JPanel(new BorderLayout());
 		Insets zeroIn=new Insets(0,0,0,0);
@@ -719,9 +720,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
     }
 
     private static class InstantiationFileHandler {
-        private static final String INSTANTIATION_DIR = System
-                .getProperty("user.home")
-                + File.separator + ".key" + File.separator + "instantiations";
+        private static final String INSTANTIATION_DIR = 
+            PathConfig.KEY_CONFIG_DIR + File.separator + "instantiations";
 
         private static final String SEPARATOR1 = "<<<<<<";
 

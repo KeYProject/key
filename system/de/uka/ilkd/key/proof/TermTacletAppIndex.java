@@ -15,7 +15,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IUpdateOperator;
 import de.uka.ilkd.key.logic.op.Metavariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.pp.ConstraintSequentPrintFilter;
 import de.uka.ilkd.key.rule.*;
@@ -401,7 +400,7 @@ public class TermTacletAppIndex {
      * a modification was performed
      * @param pathToModification an iterator that walks from the root of the
      * formula to the position of modification
-     * @return
+     * @return the updated TermTacletAppIndex
      */
     private TermTacletAppIndex updateHelp(PIOPathIterator pathToModification,
                                           Services services,
@@ -722,7 +721,6 @@ public class TermTacletAppIndex {
      * @param listener
      *            The listener to which the taclet apps found are supposed to be
      *            reported
-     * @return a list of all taclet apps
      */
     public void reportTacletApps ( PosInOccurrence pos,
                                    NewRuleListener listener ) {

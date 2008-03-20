@@ -74,7 +74,7 @@ public class GenericParser {
     public static String generatedSrcPath;
 
     // Hashes rules that have been created
-    private static HashSet ruleSet=new HashSet();
+    private static HashSet<String> ruleSet=new HashSet<String>();
 
 
     // STATIC METHODS
@@ -149,7 +149,9 @@ public class GenericParser {
 	    return "";
 	} 
 	// first get rule
- 	String makeStr=path+makeRule(t.toString(),dependencies(t,path));
+	String tmpPath = path+t.toString()+".java";
+ 	String makeStr=tmpPath+": "+generatedSrcPath+tmpPath+";\n";
+ 	makeStr+=generatedSrcPath+path+makeRule(t.toString(),dependencies(t,path));
 	if (!ruleSet.contains(path+t.toString()+".java")) {
 	    ruleSet.add(path+t.toString()+".java");
 	    // append make generic action
@@ -190,7 +192,7 @@ public class GenericParser {
     public static String makeRule(String pattern, String[] dep) {
 	String depStr="";
 	for (int i=0;i<dep.length;i++) {
-	    depStr+=dep[i]+" ";
+	    depStr+=(i==0 ? "" : generatedSrcPath)+dep[i]+" ";
 	}
 	
 	return pattern+".java"+": "+depStr;
@@ -273,8 +275,8 @@ public class GenericParser {
     }
 
     
-    /** @param String str the String we want to replace %nr
-     *  @param Template tpl the corresponding template
+    /** @param str the String we want to replace %nr
+     *  @param tpl the Template 
      *	@return str replace took place
      */
     public static String replace(String str, Template tpl) {

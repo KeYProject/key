@@ -12,7 +12,6 @@ package de.uka.ilkd.key.java.visitor;
 
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.annotation.Annotation;
 
 /** walks through a java AST in depth-left-fist-order at default.
  * Implementing method doAction specifies its behaviour at the
@@ -68,10 +67,9 @@ public abstract class JavaASTWalker {
 		    walk(nonTerminalNode.getChildAt(i));
 		}
 	    }
-	    performActionOnAnnotationArray(node.getAnnotations());
 	    depth--;
 	}
-	// otherwise the node is left, so perform the action
+	// otherwise the node is left, so perform the action	
 	doAction(node);	
     }
 
@@ -79,12 +77,4 @@ public abstract class JavaASTWalker {
      * last time 
      */
     protected abstract void doAction(ProgramElement node);
-
-    /**
-     * Performs action on the annotations <code>a</code>.
-     */
-    protected void performActionOnAnnotationArray(Annotation[] a){
-	// do nothing
-    }
-
 }

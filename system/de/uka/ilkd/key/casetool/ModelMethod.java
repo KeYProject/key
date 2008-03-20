@@ -12,10 +12,9 @@
 
 package de.uka.ilkd.key.casetool;
 
-import de.uka.ilkd.key.proof.mgt.Contractable;
 import de.uka.ilkd.key.speclang.ListOfOperationContract;
 
-public interface ModelMethod extends ReprModel, Contractable {
+public interface ModelMethod extends ReprModel {
 
 
     ModelClass getContainingClass();
@@ -75,6 +74,4 @@ public interface ModelMethod extends ReprModel, Contractable {
     void setMyGFAbs(String abs);
 
     boolean hasOrigParent();
-
-    ListOfOperationContract getMyOperationContracts();
 }

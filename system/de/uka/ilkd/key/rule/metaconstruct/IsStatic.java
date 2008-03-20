@@ -22,7 +22,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 public class IsStatic extends ProgramMetaConstruct{
 
     /** creates a typeof ProgramMetaConstruct 
-     * @param expr the instance of expression contained by 
+     * @param pe the instance of expression contained by 
      * the meta construct 
      */
     public IsStatic(ProgramElement pe) {

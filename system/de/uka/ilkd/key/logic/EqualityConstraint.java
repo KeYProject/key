@@ -10,9 +10,7 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
@@ -45,10 +43,10 @@ public class EqualityConstraint implements Constraint {
 
     /** stores constraint content as a mapping from Metavariable to
      * Term */
-    private HashMap map;
+    private HashMap<Metavariable, Term> map;
 
     /** cache for return values of getInstantiation */
-    private HashMap instantiationCache        = null;
+    private HashMap<Metavariable, Term> instantiationCache        = null;
 
     private Integer hashCode = null;
     
@@ -57,21 +55,21 @@ public class EqualityConstraint implements Constraint {
     
     /** Don't use this constructor, use Constraint.BOTTOM instead */
     public EqualityConstraint() {
-	this ( new HashMap () );
+	this ( new HashMap<Metavariable, Term> () );
     }
 
-    private EqualityConstraint( HashMap map ) {
+    private EqualityConstraint( HashMap<Metavariable, Term> map ) {
 	this.map = map;
     }
 
 
     protected synchronized Object clone () {
 	EqualityConstraint res        =
-	    new EqualityConstraint ( (HashMap)map.clone () );
+	    new EqualityConstraint ( (HashMap<Metavariable, Term>)map.clone () );
 	res.instantiationCache        =
 	    instantiationCache == null ?
 	    null :
-	    (HashMap)instantiationCache       .clone ();
+	    (HashMap<Metavariable, Term>)instantiationCache.clone ();
 	return res;
     }
     
@@ -97,26 +95,9 @@ public class EqualityConstraint implements Constraint {
      * @return list of metavariables, instantiations of which may
      * restricted by this constraint
      */
-    public IteratorOfMetavariable restrictedMetavariables () {
-	return new MVIterator ( map.keySet ().iterator () );
+    public Iterator<Metavariable> restrictedMetavariables () {
+	return Collections.unmodifiableSet(map.keySet ()).iterator ();
     }
-
-    private static class MVIterator implements IteratorOfMetavariable {
-	private Iterator it;
-
-	public MVIterator ( Iterator p_it ) {
-	    it = p_it;
-	}
-
-	public boolean hasNext () {
-	    return it.hasNext ();
-	}
-
-	public Metavariable next () {
-	    return (Metavariable)it.next ();
-	}
-    }
-
 
     /**      
      * @return The most general known term that is more defining than
@@ -125,7 +106,7 @@ public class EqualityConstraint implements Constraint {
      * instantiations of p_mv). This is just the entry of map.
      */
     public Term getDirectInstantiation ( Metavariable p_mv ) {
-	return (Term)map.get ( p_mv );
+	return map.get ( p_mv );
     }
 
 
@@ -136,12 +117,12 @@ public class EqualityConstraint implements Constraint {
     public synchronized Term getInstantiation (Metavariable p_mv) {
         Term t = null;
         if ( instantiationCache == null )
-            instantiationCache = new HashMap ();
+            instantiationCache = new HashMap<Metavariable, Term> ();
         else
-            t = (Term)instantiationCache.get ( p_mv );
+            t = instantiationCache.get ( p_mv );
 
         if ( t == null ) {
-            t = (Term)map.get ( p_mv );
+            t = map.get ( p_mv );
             if ( t == null )
                 t = TermFactory.DEFAULT.createFunctionTerm ( p_mv );
             else
@@ -156,7 +137,7 @@ public class EqualityConstraint implements Constraint {
     private synchronized Term getInstantiationIfExisting (Metavariable p_mv) {
         if ( instantiationCache == null )
             return null;
-        return (Term)instantiationCache.get ( p_mv );
+        return instantiationCache.get ( p_mv );
     }
 
     /**
@@ -359,7 +340,7 @@ public class EqualityConstraint implements Constraint {
      * @param t0
      * @param t1
      * @param services
-     * @return
+     * @return the constraint 
      */
     private Constraint introduceNewMV (Term t0,
                                        Term t1,
@@ -577,7 +558,7 @@ public class EqualityConstraint implements Constraint {
 
     private EqualityConstraint getMutableConstraint (boolean modifyThis) {
         if ( modifyThis ) return this;
-        return new EqualityConstraint ( (HashMap)map.clone () );
+        return new EqualityConstraint ( (HashMap<Metavariable, Term>)map.clone () );
     }
 
     /**
@@ -675,11 +656,11 @@ public class EqualityConstraint implements Constraint {
 
         lookup: synchronized ( joinCacheMonitor ) {
 	    ecPair0.set ( this, co );
-            Constraint res = (Constraint)joinCache.get ( ecPair0 );
+            Constraint res = joinCache.get ( ecPair0 );
 
             if ( res == null ) {
                 cacheKey = ecPair0.copy ();
-                res = (Constraint)joinCacheOld.get ( cacheKey );
+                res = joinCacheOld.get ( cacheKey );
                 if ( res == null ) break lookup;
                 joinCache.put ( cacheKey, res );
             }
@@ -695,7 +676,7 @@ public class EqualityConstraint implements Constraint {
         synchronized ( joinCacheMonitor ) {
             if ( joinCache.size () > 1000 ) {
                 joinCacheOld.clear ();
-                final HashMap t = joinCacheOld;
+                final HashMap<ECPair, Constraint> t = joinCacheOld;
                 joinCacheOld = joinCache;
                 joinCache = t;
             }
@@ -707,16 +688,11 @@ public class EqualityConstraint implements Constraint {
 
         
     private Constraint joinHelp (EqualityConstraint co, Services services) {
-        Iterator it = co.map.entrySet ().iterator ();
         Constraint newConstraint = this;
         boolean newCIsNew = false;
-        Map.Entry entry;
-
-        while ( it.hasNext () ) {
-            entry = (Map.Entry)it.next ();
+        for (Map.Entry<Metavariable, Term> entry : co.map.entrySet ()) {
             newConstraint = ( (EqualityConstraint)newConstraint )
-                .normalize ( (Metavariable)entry.getKey (),
-                             (Term)entry.getValue (),
+                .normalize ( entry.getKey (), entry.getValue (),
                              newCIsNew, services );
             if ( !newConstraint.isSatisfiable () )
                 return Constraint.TOP;
@@ -737,15 +713,12 @@ public class EqualityConstraint implements Constraint {
      */
     public Constraint removeVariables ( SetOfMetavariable mvs ) {
 	if ( mvs != SetAsListOfMetavariable.EMPTY_SET && !isBottom () ) {
-	    Iterator           it               = map.entrySet ().iterator ();
-	    Map.Entry          entry;
 	    EqualityConstraint removeConstraint = new EqualityConstraint ();
 	    EqualityConstraint newConstraint    = new EqualityConstraint ();
 
 	    // Find equalities with removed metavariable as left side
-	    while ( it.hasNext () ) {
-		entry = (Map.Entry)it.next ();
-		if ( mvs.contains ( (Metavariable)entry.getKey () ) )
+            for ( Map.Entry<Metavariable, Term>  entry : map.entrySet() ) {
+		if ( mvs.contains ( entry.getKey () ) )
 		    removeConstraint.map.put
 			( entry.getKey (), entry.getValue () );
 		else
@@ -754,20 +727,22 @@ public class EqualityConstraint implements Constraint {
 	    }
 
 	    // Find equalities with removed metavariable as right side
-	    it = newConstraint.map.entrySet ().iterator ();
+	    final Iterator<Map.Entry<Metavariable, Term>> it = 
+	        newConstraint.map.entrySet ().iterator ();
+	    
 	    while ( it.hasNext () ) {
-		entry = (Map.Entry)it.next ();
-		if ( ((Term)entry.getValue ()).op () instanceof Metavariable &&
-		     ( ((Metavariable)entry.getKey   ()).sort () ==
-		       ((Term)        entry.getValue ()).sort () ) &&
+	        Map.Entry<Metavariable, Term> entry = it.next ();
+		if ( (entry.getValue ()).op () instanceof Metavariable &&
+		     ( (entry.getKey   ()).sort () ==
+		       (        entry.getValue ()).sort () ) &&
 		     ( mvs.contains
-		       ( (Metavariable)((Term)entry.getValue ()).op () ) ) &&
+		       ( (Metavariable)(entry.getValue ()).op () ) ) &&
 		     !( removeConstraint.map.containsKey
-			( ((Term)entry.getValue ()).op () ) ) ) {
+			( (entry.getValue ()).op () ) ) ) {
 		    removeConstraint.map.put
-			( ((Term)entry.getValue ()).op (),
+			( (Metavariable)(entry.getValue ()).op (),
 			  TermFactory.DEFAULT.createFunctionTerm
-			  ( (Metavariable)entry.getKey () ) );
+			  ( entry.getKey () ) );
 		    it.remove ();
 		}
 	    }
@@ -783,14 +758,15 @@ public class EqualityConstraint implements Constraint {
 		if ( newConstraint.map.isEmpty () )
 		    return Constraint.BOTTOM;
 
-		it            = newConstraint.map.entrySet ().iterator ();
+		final Set<Map.Entry<Metavariable, Term>> entrySet = 
+		    newConstraint.map.entrySet ();
+		
 		newConstraint = new EqualityConstraint ();
 
-		while ( it.hasNext () ) {
-		    entry = (Map.Entry)it.next ();
+		for (final Map.Entry<Metavariable, Term> entry : entrySet) {		    
 		    newConstraint.map.put ( entry.getKey (),
 		                            removeConstraint.instantiate
-		                            ( (Term)entry.getValue () ) );
+		                            ( entry.getValue () ) );
 		}
 
 		return newConstraint;
@@ -824,7 +800,7 @@ public class EqualityConstraint implements Constraint {
                                 return true;
                     } else {
                         if ( map.containsKey ( termMV ) )
-                                fringe = fringe.prepend ( (Term)map.get ( termMV ) );
+                                fringe = fringe.prepend ( map.get ( termMV ) );
                     }
                     
                     if ( termMV == mv ) return true;
@@ -871,7 +847,7 @@ public class EqualityConstraint implements Constraint {
     /** ONLY FOR TESTS DONT USE THEM IN ANOTHER WAY 
      * @return mapping to mv */
     Term valueOf ( Metavariable mv ) {
-	return (Term)map.get ( mv );
+	return map.get ( mv );
     }
 
     /** @return String representation of the constraint */
@@ -918,15 +894,17 @@ public class EqualityConstraint implements Constraint {
     
     private static final Boolean joinCacheMonitor = Boolean.FALSE;
     
-    private static HashMap joinCache = new HashMap ();
-    private static HashMap joinCacheOld = new HashMap ();
+    private static HashMap<ECPair, Constraint> joinCache = 
+        new HashMap<ECPair, Constraint> ();
+    private static HashMap<ECPair, Constraint> joinCacheOld = 
+        new HashMap<ECPair, Constraint> ();
     
     private static final ECPair  ecPair0   = new ECPair ( null, null, 0 );
 
     public int hashCode () {
         if ( hashCode == null ) {
             int h = 0;
-            final IteratorOfMetavariable it = restrictedMetavariables ();
+            final Iterator<Metavariable> it = restrictedMetavariables ();
             while ( it.hasNext () ) {
                 final Metavariable mv = it.next ();
                 h += mv.hashCode ();

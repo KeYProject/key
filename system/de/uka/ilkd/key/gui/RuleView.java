@@ -26,7 +26,6 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 
 import de.uka.ilkd.key.proof.RuleTreeModel;
-import de.uka.ilkd.key.proof.mgt.OldOperationContract;
 import de.uka.ilkd.key.rule.Taclet;
 
 public class RuleView extends JPanel implements TreeSelectionListener, java.io.Serializable {
@@ -162,13 +161,6 @@ public class RuleView extends JPanel implements TreeSelectionListener, java.io.S
 
             DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
 
-	    if (node.getUserObject() instanceof OldOperationContract) {
-		OldOperationContract mc = (OldOperationContract) node.getUserObject();
-		comp = MethodContractList.makeMethodContractDisplay
-		    (mc, panel, text, statusPanel,
-		     sel ? super.backgroundSelectionColor : 
-		     super.backgroundNonSelectionColor);
-	    }
 	    if (node.getUserObject() instanceof Taclet) {
 		    
 		Taclet t = (Taclet) node.getUserObject();

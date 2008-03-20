@@ -18,14 +18,12 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
+import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ldt.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
+import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -41,12 +39,9 @@ public class TypeConverter extends TermBuilder {
     private CharLDT charLDT;
     private BooleanLDT booleanLDT;
     private IntegerLDT integerLDT;
-    private IntegerDomainLDT absIntegerLDT;
+    private IntegerDomainLDT integerDomainLDT;
     private ListOfLDT models = SLListOfLDT.EMPTY_LIST;
 
-
-    /** required for this handling */
-    private final ThisReference thisReference = new ThisReference();
     
     public static StringConverter stringConverter =new StringConverter();
     
@@ -76,7 +71,7 @@ public class TypeConverter extends TermBuilder {
         } else if (ldt instanceof IntegerLDT) {
             this.integerLDT = (IntegerLDT)ldt;
         } else if (ldt instanceof IntegerDomainLDT) {
-            this.absIntegerLDT = (IntegerDomainLDT)ldt;
+            this.integerDomainLDT = (IntegerDomainLDT)ldt;
         } 
         this.models = this.models.prepend(ldt);
         Debug.out("Initialize LDTs: ", ldt);
@@ -151,7 +146,7 @@ public class TypeConverter extends TermBuilder {
     }
     
     public IntegerDomainLDT getIntegerDomainLDT() {
-        return absIntegerLDT;
+        return integerDomainLDT;
     }
     
     public ByteLDT getByteLDT() {
@@ -243,13 +238,37 @@ public class TypeConverter extends TermBuilder {
 	}  else if (prefix instanceof ArrayReference) {	   
 	    return convertArrayReference((ArrayReference)prefix, ec);
 	} else if (prefix instanceof ThisReference) {	 
+	    if(prefix.getReferencePrefix()!=null && (prefix.getReferencePrefix() instanceof TypeReference)){
+	        TypeReference tr = (TypeReference) prefix.getReferencePrefix();
+	        KeYJavaType kjt = tr.getKeYJavaType();
+	        return findThisForSort(kjt.getSort(), ec);
+	    }
 	    return convertToLogicElement(ec.getRuntimeInstance());
 	} else {            
 	    Debug.out("typeconverter: WARNING: unknown reference prefix:", 
 		      prefix, prefix == null ? null : prefix.getClass());
 	    throw new IllegalArgumentException("TypeConverter failed to convert "
 					       + prefix);
-	}	
+	}
+    }
+    
+    public Term findThisForSort(Sort s, ExecutionContext ec){
+        ProgramElement pe = ec.getRuntimeInstance();
+        if(pe == null) return null;
+        Term inst = convertToLogicElement(pe, ec);
+        return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType());
+    }
+    
+    public Term findThisForSort(Sort s, Term self, KeYJavaType context){
+        Term result = self;
+        ProgramVariable inst;
+        while(!context.getSort().extendsTrans(s)){
+            inst = services.getJavaInfo().getAttribute(
+                    ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, context);
+            result = dot(result, inst);
+            context = inst.getKeYJavaType();
+        }
+        return result;      
     }
 
     public Term convertVariableReference(VariableReference fr,
@@ -261,7 +280,8 @@ public class TypeConverter extends TermBuilder {
 	    return var(var);
 	} else if (prefix == null) {
 	    if (var.isMember()) {
-		return dot(convertReferencePrefix(thisReference, ec), var);
+		return dot(findThisForSort(var.getContainerType().getSort(), ec), 
+		        var);
 	    }
 	    return var(var); 
 	} else if (!(prefix instanceof PackageReference) ) {
@@ -310,7 +330,7 @@ public class TypeConverter extends TermBuilder {
     public Term convertToLogicElement(ProgramElement pe, 				    
 				      ExecutionContext ec) {
 	Debug.out("typeconverter: called for:", pe, pe.getClass());
-	if (pe instanceof ProgramVariable) {	    
+	if (pe instanceof ProgramVariable) {	  
 	    return var((ProgramVariable)pe);
 	} else if (pe instanceof FieldReference) {
 	    return convertVariableReference((FieldReference)pe, ec);
@@ -324,10 +344,10 @@ public class TypeConverter extends TermBuilder {
 	        && ((Negative)pe).getChildAt(0) instanceof IntLiteral) {
 	    String val = ((IntLiteral)((Negative)pe).getChildAt(0)).getValue();
 	    if (val.charAt(0)=='-') {
-		return integerLDT.translateLiteral
+		return intLDT.translateLiteral
 		    (new IntLiteral(val.substring(1)));
 	    } else {
-		return integerLDT.translateLiteral
+		return intLDT.translateLiteral
 		    (new IntLiteral("-"+val));
 	    }
 	} else if (pe instanceof Negative 
@@ -335,10 +355,10 @@ public class TypeConverter extends TermBuilder {
 	    String val = ((LongLiteral)
 			  ((Negative)pe).getChildAt(0)).getValue();
 	    if (val.charAt(0)=='-') {
-		return integerLDT.translateLiteral
+		return intLDT.translateLiteral
 		    (new LongLiteral(val.substring(1)));
 	    } else {
-		return integerLDT.translateLiteral
+		return intLDT.translateLiteral
 		    (new LongLiteral("-"+val));
 	    }
 	} else if (pe instanceof ThisReference) {
@@ -351,7 +371,7 @@ public class TypeConverter extends TermBuilder {
 	} else if (pe instanceof de.uka.ilkd.key.java.expression.Operator) {
 	    return translateOperator
 		((de.uka.ilkd.key.java.expression.Operator)pe,
-		 integerLDT, booleanLDT, ec);
+		 intLDT, booleanLDT, ec);
 	} else if (pe instanceof PrimitiveType) {
 	    throw new IllegalArgumentException("TypeConverter could not handle"
 					       +" this primitive type");
@@ -374,13 +394,13 @@ public class TypeConverter extends TermBuilder {
         } else if (lit instanceof NullLiteral) {
             return services.getJavaInfo().getNullConst();
         } else if (lit instanceof IntLiteral) {
-            return integerLDT.translateLiteral(lit);
+            return intLDT.translateLiteral(lit);
         } else if (lit instanceof CharLiteral) {
-            return integerLDT.translateLiteral(lit);
+            return intLDT.translateLiteral(lit);
         } else if (lit instanceof LongLiteral) {
-            return integerLDT.translateLiteral(lit);
+            return intLDT.translateLiteral(lit);
         } else if (lit instanceof StringLiteral) {
-            return stringConverter.translateLiteral(lit,integerLDT,services);
+            return stringConverter.translateLiteral(lit,intLDT,services);
         } else {
             Debug.fail("Unknown literal type", lit);                 
             return null;
@@ -408,7 +428,8 @@ public class TypeConverter extends TermBuilder {
     public KeYJavaType getPromotedType(KeYJavaType type1, 
             KeYJavaType type2) {
         final Type t1 = type1.getJavaType();
-        final Type t2 = type1.getJavaType();
+        final Type t2 = type2.getJavaType();
+
         if ((t1 == PrimitiveType.JAVA_BOOLEAN &&
                 t2 == PrimitiveType.JAVA_BOOLEAN))
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
@@ -528,7 +549,7 @@ public class TypeConverter extends TermBuilder {
         final IteratorOfLDT it = models.iterator();
         while (it.hasNext() ) {
             final LDT model = it.next();
-            if (model.containsFunction((Function)term.op())) {
+            if (model.containsFunction((Function)term.op())) {             
                 return model.translateTerm(term, children);
             }  
 	    }
@@ -542,7 +563,7 @@ public class TypeConverter extends TermBuilder {
 	    return services.getJavaInfo().getKeYJavaType(t.sort());
 	}
         
-        KeYJavaType result = services.getJavaInfo().getKeYJavaType(t.sort());
+        KeYJavaType result = services.getJavaInfo().getKeYJavaType(t.sort());        
         if (result == null) {
            result = getKeYJavaType(convertToProgramElement(t));
         }

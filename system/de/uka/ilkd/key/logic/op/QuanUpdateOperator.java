@@ -114,7 +114,8 @@ public class QuanUpdateOperator implements IUpdateOperator {
      * Map from <code>QuanUpdateSignature</code> to
      * <code>QuanUpdateOperator</code>
      */
-    private static final HashMap updates = new HashMap();
+    private static final HashMap<QuanUpdateSignature, QuanUpdateOperator> updates = 
+        new HashMap<QuanUpdateSignature, QuanUpdateOperator>();
 
     /**
      * returns the update operator for the given location order
@@ -137,7 +138,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
     public static QuanUpdateOperator createUpdateOp(Location[] locs,
                                                     boolean[] guards) {
         final QuanUpdateSignature sig = new QuanUpdateSignature ( locs, guards );
-        QuanUpdateOperator result = (QuanUpdateOperator) updates.get(sig);
+        QuanUpdateOperator result = updates.get(sig);
         if (result == null) {
             result = new QuanUpdateOperator(sig);
             updates.put(sig, result);
@@ -164,7 +165,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
 
     /**
      * the given locations are the one to be updated by this operator  
-     * @param location
+     * @param signature the {@link QuanUpdateSignature} of the quantified update
      */
     private QuanUpdateOperator(QuanUpdateSignature signature) {
         this(new Name("quanUpdate("+signature.locations+")"), signature); 
@@ -330,9 +331,14 @@ public class QuanUpdateOperator implements IUpdateOperator {
              ++i, ++j)
             sub[j] = t.sub(i);
         
+        
+        final ArrayOfQuantifiableVariable[] vars = 
+            new ArrayOfQuantifiableVariable[sub.length];
+        Arrays.fill(vars, Term.EMPTY_VAR_LIST);
+        
         return tf.createTerm ( location ( n ),
                                sub,
-                               new ArrayOfQuantifiableVariable (),
+                               vars,
                                JavaBlock.EMPTY_JAVABLOCK);
     }
 
@@ -528,16 +534,15 @@ public class QuanUpdateOperator implements IUpdateOperator {
      * updates that potentially clash (here simply: have the same top-level
      * operator) are not permuted.
      */
-    private static class ElUpdateLocationComparator implements Comparator {
+    private static class ElUpdateLocationComparator 
+        implements Comparator<ElUpdateLocation> {
         private int primitiveLongCompare(long i, long j) {
             return (i < j ? -1 : (i == j ? 0 : 1));
         }
 
-        public int compare(Object o1, Object o2) {
+        public int compare(ElUpdateLocation elUpd1, ElUpdateLocation elUpd2) {
             // deliberately raise a ClassCastException for unsuitable o1, o2
-            final ElUpdateLocation elUpd1 = (ElUpdateLocation)o1;
             final Location pv1 = elUpd1.getLocation ();
-            final ElUpdateLocation elUpd2 = (ElUpdateLocation)o2;
             final Location pv2 = elUpd2.getLocation ();
             
             if ( elUpd1.locationNum == elUpd2.locationNum ) return 0;
@@ -584,7 +589,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
         }
     }
     
-    private final static Comparator elUpdateComparator =
+    private final static Comparator<ElUpdateLocation> elUpdateComparator =
         new ElUpdateLocationComparator (); 
     
     /**
@@ -877,9 +882,10 @@ public class QuanUpdateOperator implements IUpdateOperator {
             System.arraycopy ( subs, locationSubtermsBegin ( locNum ),
                                locSubs, 0,
                                loc.arity () );
+
             lhss[locNum] = tf.createTerm ( loc,
                                            locSubs,
-                                           new ArrayOfQuantifiableVariable (),
+                                           null,
                                            JavaBlock.EMPTY_JAVABLOCK);
             
             values[locNum] = subs[valuePos ( locNum )];
@@ -906,9 +912,10 @@ public class QuanUpdateOperator implements IUpdateOperator {
         // overwritten by later updates, and one to eliminate updates that are
         // subsumed by later quantified updates. The sets are filled
         // "from right to left"
-        final TreeSet orderedAssignments = new TreeSet ( elUpdateComparator );
-        final Set laterAssignments = new HashSet ();
-        final List laterQuanAssignments = new ArrayList ();
+        final TreeSet<ElUpdateLocation> orderedAssignments = 
+            new TreeSet<ElUpdateLocation> ( elUpdateComparator );
+        final Set<ElUpdateLocation> laterAssignments = new HashSet<ElUpdateLocation> ();
+        final List<ElUpdateLocation> laterQuanAssignments = new ArrayList<ElUpdateLocation> ();
         
         for (int locNum = locations.length - 1; locNum >= 0; locNum--) {
             final ElUpdateLocation elUpd =
@@ -935,10 +942,10 @@ public class QuanUpdateOperator implements IUpdateOperator {
             if ( elUpd.bindsVariables () ) laterQuanAssignments.add ( elUpd );
         }
 
-        final Set operators = new HashSet ();
-        final Iterator it = orderedAssignments.iterator ();
+        final Set<Location> operators = new HashSet<Location> ();
+        final Iterator<ElUpdateLocation> it = orderedAssignments.iterator ();
         while ( it.hasNext () ) {
-            final ElUpdateLocation elUpd = (ElUpdateLocation)it.next ();
+            final ElUpdateLocation elUpd = it.next ();
             final Location loc = elUpd.getLocation ();
 
             // delete trivial updates (left-hand and right-hand side are
@@ -952,7 +959,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
             operators.add ( loc );
         }
 
-        return (ElUpdateLocation[])orderedAssignments.toArray
+        return orderedAssignments.toArray
                      ( new ElUpdateLocation[orderedAssignments.size ()] );
     } 
 
@@ -965,10 +972,10 @@ public class QuanUpdateOperator implements IUpdateOperator {
      *         <code>a[0] := 4 || \for int i; a[i] := 2</code>
      */
     private static boolean isSubsumedAssignment(ElUpdateLocation elUpd,
-                                                List laterAssignments) {
-        final Iterator it = laterAssignments.iterator ();
+                                                List<ElUpdateLocation> laterAssignments) {
+        final Iterator<ElUpdateLocation> it = laterAssignments.iterator ();
         while ( it.hasNext () ) {
-            final ElUpdateLocation laterAss = (ElUpdateLocation)it.next ();
+            final ElUpdateLocation laterAss = it.next ();
             final Term subsumptionCond = laterAss.getSubsumptionCondition ( elUpd );
             final GuardSatisfiabilityFormulaBuilder satisfiabilityBuilder =
                 new GuardSatisfiabilityFormulaBuilder (subsumptionCond,

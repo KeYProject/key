@@ -20,7 +20,6 @@ public class SortComparisionFeature extends BinaryFeature {
 
     /**
      * creates a new comparision term feature
-     * @param s
      */
     private SortComparisionFeature(ProjectionToTerm s1, ProjectionToTerm s2, 
             int comparator) {
@@ -39,7 +38,6 @@ public class SortComparisionFeature extends BinaryFeature {
     /**
      * @param sort1
      * @param sort2
-     * @return
      */
     protected boolean compare(final Sort sort1, final Sort sort2) {
         switch (comparator) {

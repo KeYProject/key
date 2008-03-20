@@ -13,6 +13,8 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.ListOfSchemaVariable;
+import de.uka.ilkd.key.logic.op.SLListOfSchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -36,7 +38,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * }}  
  * </code> becomes          
  */
-public class UnwindLoop extends ProgramMetaConstruct {
+public class UnwindLoop extends ProgramMetaConstruct implements MetaConstructWithSV {
 
     /** the outer label that is used to leave the while loop ('l1') */
     private final SchemaVariable outerLabel;
@@ -74,16 +76,36 @@ public class UnwindLoop extends ProgramMetaConstruct {
 					(ProgramElementName)
 					svInst.getInstantiation(outerLabel),
 					(ProgramElementName)
-					svInst.getInstantiation(innerLabel));
+					svInst.getInstantiation(innerLabel),
+                                        services);
 	w.start();
 	return w.result();
     }
 
+    /** @deprecated */
     public SchemaVariable getInnerLabelSV() {        
         return innerLabel;
     }        
 
+    /** @deprecated */
     public SchemaVariable getOuterLabelSV() {        
         return outerLabel;
-    }        
+    }
+
+    /**
+     * return a list of the SV that are relevant to this UnwindLoop 
+     * @param svInst the instantiations so far - ignored
+     * @return a list of 0 to 2 schema variables (outer/inner label)
+     */
+    public ListOfSchemaVariable neededInstantiations(SVInstantiations svInst) {
+		ListOfSchemaVariable ret = SLListOfSchemaVariable.EMPTY_LIST;
+		
+		if(innerLabel != null)
+			ret = ret.prepend(innerLabel);
+		
+		if(outerLabel != null)
+			ret = ret.prepend(outerLabel);
+		
+		return ret;
+	}        
 }

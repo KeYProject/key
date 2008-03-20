@@ -10,7 +10,7 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import junit.framework.TestCase;
-import de.uka.ilkd.key.gui.ProofSettings;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.VarAndType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -215,7 +215,7 @@ public class TestTriggersSet extends TestCase {
 		String term1 = "\\forall s x;(ps(x))";
 		Term allterm = parseTerm(term1);
 		Term trigger1= allterm.sub(0);
-		TriggersSet ts = TriggersSet.create(allterm);
+		TriggersSet ts = TriggersSet.create(allterm, proof.getServices());
 		int triggerNum = ts.getAllTriggers().size();
 		assertEquals (1,triggerNum);
 		Term trigger2 = ts.getAllTriggers().iterator().next().getTriggerTerm();
@@ -226,7 +226,7 @@ public class TestTriggersSet extends TestCase {
 		String term1 = "\\forall r x;(frr(x)=frr(frr(x)))";
 		Term allterm = parseTerm(term1);
 		Term trigger1= allterm.sub(0).sub(1);
-		TriggersSet ts = TriggersSet.create(allterm);
+		TriggersSet ts = TriggersSet.create(allterm, proof.getServices());
 		int triggerNum = ts.getAllTriggers().size();
 		assertEquals (1,triggerNum);
 		Term trigger2 = ts.getAllTriggers().iterator().next().getTriggerTerm();

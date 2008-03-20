@@ -67,11 +67,11 @@ public class Goal  {
     private AutomatedRuleApplicationManager ruleAppManager;
 
     /** goal listeners  */
-    private List listeners = new ArrayList();
+    private List<GoalListener> listeners = new ArrayList<GoalListener>();
     
     /** list of rule app listeners */
-    private static List ruleAppListenerList = 
-        Collections.synchronizedList(new ArrayList(10));
+    private static List<RuleAppListener> ruleAppListenerList = 
+        Collections.synchronizedList(new ArrayList<RuleAppListener>(10));
 
     /** creates a new goal referencing the given node */
     private Goal( Node                    node, 
@@ -192,7 +192,7 @@ public class Goal  {
 	getFormulaTagManager().sequentChanged(this, sci);
 	ruleAppIndex()        .sequentChanged(this, sci); 
 	for (int i = 0, sz = listeners.size(); i<sz; i++) {
-	    ((GoalListener)listeners.get(i)).sequentChanged(this, sci);
+	    listeners.get(i).sequentChanged(this, sci);
 	}
     }
 
@@ -200,7 +200,7 @@ public class Goal  {
 				    Node       parent,
 				    ListOfGoal newGoals) {
 	for (int i = 0, sz = listeners.size(); i<sz; i++) {
-	    ((GoalListener)listeners.get(i)).goalReplaced(goal,
+	    listeners.get(i).goalReplaced(goal,
 							  parent,
 							  newGoals);
 	}
@@ -363,7 +363,7 @@ public class Goal  {
     /** 
      * replaces a formula at the given position  
      * and informs the rule appliccation index about this change
-     * @param cf the ConstrainedFormula replacing the old one
+     * @param replacements the ConstrainedFormula replacing the old one
      * @param p PosInOccurrence encodes the position 
      */
     public void changeFormula(ListOfConstrainedFormula replacements, 
@@ -398,15 +398,18 @@ public class Goal  {
      */
     public void addTaclet(Taclet           rule,
 			  SVInstantiations insts,
-			  Constraint       constraint ) {		
+			  Constraint       constraint,
+                          boolean          isAxiom) {		
 	NoPosTacletApp tacletApp =
 	    NoPosTacletApp.createFixedNoPosTacletApp(rule, insts, constraint);
 	if (tacletApp != null) {
 	    addNoPosTacletApp(tacletApp);
  	    if (proof().env()!=null) { // do not break everything
                                        // because of ProofMgt
-		proof().env().registerRuleIntroducedAtNode(tacletApp, 
-		        node.parent());
+		proof().env().registerRuleIntroducedAtNode(
+		        tacletApp, 
+		        node.parent() != null ? node.parent() : node, 
+		        isAxiom);
 	    }
 	}
     }
@@ -449,7 +452,8 @@ public class Goal  {
 	                        appliedRuleApps,
 	                        getFormulaTagManager ().copy (),
 				ruleAppManager.copy () );
-	clone.listeners = (List) ((ArrayList)listeners).clone();
+	clone.listeners = (List<GoalListener>)
+	    ((ArrayList<GoalListener>) listeners).clone();
 	return clone;
     }
 
@@ -544,7 +548,7 @@ public class Goal  {
      */
     public ListOfGoal setBack(ListOfGoal goalList) {
 	final Node parent = node.parent();
-	final IteratorOfNode leavesIt = parent.leavesIterator();
+	final Iterator<Node> leavesIt = parent.leavesIterator();
 	while (leavesIt.hasNext()) {
 	    Node n=leavesIt.next();
 	 
@@ -570,7 +574,7 @@ public class Goal  {
 	    node.proof().mgt().ruleUnApplied(parent.getAppliedRuleApp());
 	}
 
-	IteratorOfNode siblings=parent.childrenIterator();
+	Iterator<Node> siblings=parent.childrenIterator();
 	Node[] sibls=new Node[parent.childrenCount()];
 	int i=0;
 	while (siblings.hasNext()) {
@@ -621,9 +625,9 @@ public class Goal  {
     /** fires the event that a rule has been applied */
     protected void fireRuleApplied( ProofEvent p_e ) {
 	synchronized(ruleAppListenerList) {
-	    Iterator it = ruleAppListenerList.iterator();
+	    Iterator<RuleAppListener> it = ruleAppListenerList.iterator();
 	    while (it.hasNext()) {
-		((RuleAppListener)it.next()).ruleApplied(p_e);
+		it.next().ruleApplied(p_e);
 	    }
 	}
     }    
@@ -633,12 +637,7 @@ public class Goal  {
 //System.err.println(Thread.currentThread());    
 
         final Proof proof = proof();
-        
-        // TODO: this is maybe not the right place for this check
-        assert proof.mgt ().ruleApplicable ( p_ruleApp, this ) :
-                 "Someone tried to apply the rule " + p_ruleApp +
-                 " that is not justified";
-        
+                
         final NodeChangeJournal journal = new NodeChangeJournal(proof, this);
         addGoalListener(journal);
         
@@ -700,9 +699,7 @@ public class Goal  {
 	            BuiltInRuleApp app = new BuiltInRuleApp ( rule,
 	                                                      pos,
 	                                                      userConstraint );
-	            if (proof().mgt().ruleApplicable(app, this)) {
-	                apply(app);
-                    }
+	            apply(app);
 	        }
 	    }
 	}

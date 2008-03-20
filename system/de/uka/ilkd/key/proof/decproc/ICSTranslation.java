@@ -92,7 +92,7 @@ public class ICSTranslation extends DecProcTranslation{ //public since asmkey ne
 
     /** Translates the given sequent into "ICS" input syntax 
      *
-     * @param s the Sequent which should be written in ICS syntax
+     * @param sequent the Sequent which should be written in ICS syntax
      * @return the translated version of s
      */
     protected final StringBuffer translate(Sequent sequent) throws SimplifyException  {
@@ -489,7 +489,7 @@ public class ICSTranslation extends DecProcTranslation{ //public since asmkey ne
 	 *           true iff equality should be modulo renaming or not. This will
 	 *           result in the same names, if just the free variables are
 	 *           different, but the rest isn't.
-	 * @return
+	 * @return the StringBuffer with the translation of an uninterpreted term
 	 */
     protected final StringBuffer uninterpretedTerm(Term term, boolean modRenaming) {
 	if (cacheForUninterpretedSymbols.containsKey(term))

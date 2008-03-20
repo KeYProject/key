@@ -1,6 +1,6 @@
 		********************************
 		* KeY Byte Code Installation   * 
-		* Version 1.0.0                *
+		* Version 1.2.0                *
 		********************************
 
 
@@ -20,7 +20,7 @@ Needed additional Libraries:
 	antlr.jar Version >= 2.7.2: parser generator
 	dresden-ocl-demo.jar: ocl parser
 	xerces.jar version 1.4.4: used by tudresden.jar
-	recoder.jar version 0.75_KeY_TypeResolutionInMethodFrameFixed: 
+	recoder.jar version 0.75_KeY_TypeResolutionInMethodFrameFixed:
                  a transformation framework for java patched by the KeY group
 	jargs.jar
 	log4j.jar
@@ -29,7 +29,7 @@ Needed additional Libraries:
 Optionally, KeY can make use of the following binaries:
 	Grammatical Framework
 	ESC Java's decision procedure `Simplify´
-        SMT-LIB provers: bindings exist currently for Yices, CVSLite and SVC
+        SMT-LIB provers: bindings exist currently for Yices, CVCLite, CVC3 and SVC
               (export to SMT input file possible)        
 
 (2) Contents of the KeY-Distribution

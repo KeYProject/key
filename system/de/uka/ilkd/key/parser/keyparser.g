@@ -36,16 +36,17 @@ header {
 
   import de.uka.ilkd.key.proof.*;
   import de.uka.ilkd.key.proof.init.*;
-  import de.uka.ilkd.key.proof.mgt.*;
-
 
   import de.uka.ilkd.key.rule.*;
   import de.uka.ilkd.key.rule.conditions.*;
   import de.uka.ilkd.key.rule.metaconstruct.*;
+ 
+  import de.uka.ilkd.key.speclang.SetAsListOfOperationContract;
+  import de.uka.ilkd.key.speclang.SetOfOperationContract;
+  import de.uka.ilkd.key.speclang.dl.translation.DLSpecFactory;
 
   import de.uka.ilkd.key.util.*;
 
-  import de.uka.ilkd.key.jml.*;
   import de.uka.ilkd.key.java.JavaInfo;
   import de.uka.ilkd.key.java.Services;
   import de.uka.ilkd.key.java.JavaReader;
@@ -54,6 +55,8 @@ header {
   import de.uka.ilkd.key.java.visitor.*;
   import de.uka.ilkd.key.java.Recoder2KeY;
   import de.uka.ilkd.key.java.SchemaRecoder2KeY;
+  import de.uka.ilkd.key.java.StatementBlock;
+  import de.uka.ilkd.key.java.declaration.VariableDeclaration;
   import de.uka.ilkd.key.java.recoderext.*;
   import de.uka.ilkd.key.pp.AbbrevMap;
   import de.uka.ilkd.key.pp.LogicPrinter;
@@ -77,7 +80,7 @@ options {
     private final static int LOCATION_MODIFIER = 1;
     private final static int HEAP_DEPENDENT = 2;
 
-    static HashMap prooflabel2tag = new HashMap(15);
+    static HashMap<String, Character> prooflabel2tag = new HashMap<String, Character>(15);
     static {
       prooflabel2tag.put("branch", new Character('b'));
       prooflabel2tag.put("rule", new Character('r'));
@@ -97,7 +100,7 @@ options {
 
     private NamespaceSet nss;
     private Choice defaultChoice = null;
-    private HashMap category2Default = new HashMap();
+    private HashMap<String, String> category2Default = new HashMap<String, String>();
     private boolean onlyWith=false;
     private SetOfChoice activatedChoices = SetAsListOfChoice.EMPTY_SET;
     private SetOfChoice selectedChoices = SetAsListOfChoice.EMPTY_SET;
@@ -137,7 +140,7 @@ options {
     private ProgramMethod pm = null;
 
     private SetOfTaclet taclets = SetAsListOfTaclet.EMPTY_SET; 
-    private ContractSet contracts = new ContractSet();
+    private SetOfOperationContract contracts = SetAsListOfOperationContract.EMPTY_SET;
 
     private ParserConfig schemaConfig;
     private ParserConfig normalConfig;
@@ -415,11 +418,11 @@ options {
         return taclets;
     }
 
-    public ContractSet getContracts(){
+    public SetOfOperationContract getContracts(){
         return contracts;
     }
     
-    public HashMap getCategory2Default(){
+    public HashMap<String, String> getCategory2Default(){
         return category2Default;
     }
 
@@ -606,10 +609,6 @@ options {
     /** parses a problem but without reading the declarations of
      * sorts, functions and predicates. These have to be given
      * explicitly.
-     * @param functions() the Namespace with the function and predicate
-     * symbols to be used
-     * @param sorts() the Namespace with the sorts to be used
-     * @param heuristics() the Namespace with the heuristics to be used
      * the heuristics of the current problem file will be added 
      */ 
     public Term parseProblem() 
@@ -725,11 +724,6 @@ options {
                     semanticError("Could not find type '"+prefixSort+"'. Maybe mispelled or "+
                         "you use an array or object type in a .key-file with missing " + 
                         "\\javaSource section.");
-                }
-                result = getServices().getImplementation2SpecMap().
-                lookupModelField(prefixKJT, attributeName); 
-                if(result != null){
-                    return result;
                 }
                 // WATCHOUT why not in DECLARATION MODE	   
                 if(!isDeclParser()) {			      	
@@ -950,7 +944,7 @@ options {
     private HashSet progVars(JavaBlock jb) {
 	if(isGlobalDeclTermParser()) {
   	  ProgramVariableCollector pvc
-	      = new ProgramVariableCollector(jb.program());
+	      = new ProgramVariableCollector(jb.program(), getServices());
           pvc.start();
           return pvc.result();
         }else 
@@ -959,7 +953,7 @@ options {
               return new HashSet();
             }   
             DeclarationProgramVariableCollector pvc
-               = new DeclarationProgramVariableCollector(jb.program());
+               = new DeclarationProgramVariableCollector(jb.program(), getServices());
             pvc.start();
             return pvc.result();
           }
@@ -1028,7 +1022,7 @@ options {
         } catch (de.uka.ilkd.key.java.PosConvertException e) {
             lineOffset=e.getLine()-1;
             colOffset=e.getColumn()+1;
-            throw new JavaParserException(e.getMessage(), t, 
+            throw new JavaParserException(e, t, 
                 getFilename(), lineOffset, colOffset);
         } catch (de.uka.ilkd.key.java.ConvertException e) { 
             if (e.parseException()!=null
@@ -1038,8 +1032,7 @@ options {
                 colOffset=e.parseException().currentToken.next.beginColumn;
                 e.parseException().currentToken.next.beginLine=getLine()-1;
                 e.parseException().currentToken.next.beginColumn=getColumn();
-                throw new JavaParserException(e.parseException().getMessage(), t, 
-                    getFilename(), -1, -1);  // row/columns already in text
+                throw new JavaParserException(e, t, getFilename(), -1, -1);  // row/columns already in text
             }       
             if (e.proofJavaException()!=null
             &&  e.proofJavaException().currentToken != null
@@ -1048,11 +1041,10 @@ options {
                 colOffset=e.proofJavaException().currentToken.next.beginColumn;
                 e.proofJavaException().currentToken.next.beginLine=getLine();
                 e.proofJavaException().currentToken.next.beginColumn =getColumn();
-                 throw  new JavaParserException(e.proofJavaException().
-                    getMessage(), t, getFilename(), lineOffset, colOffset); 
+                 throw  new JavaParserException(e, t, getFilename(), lineOffset, colOffset); 
                             
             }   
-            throw new JavaParserException(e.getMessage(), t, getFilename());
+            throw new JavaParserException(e, t, getFilename());
         } 
         return sjb;
     }
@@ -1083,6 +1075,7 @@ options {
     /** looks up a function, (program) variable or static query of the 
      * given name varfunc_id and the argument terms args in the namespaces 
      * and java info. 
+     * @param varfunc_name the String with the symbols name
      * @param args is null iff no argument list is given, for instance `f', 
      * and is an array of size zero, if an empty argument list was given,
      * for instance `f()'.
@@ -1125,7 +1118,11 @@ options {
         try {
             int n = 1; 
             StringBuffer className = new StringBuffer(LT(n).getText());
-	    while (isPackage(className.toString())) {	   	   
+	    while (isPackage(className.toString()) || LA(n+2)==NUM_LITERAL || 
+	    		(LT(n+2)!=null && LT(n+2).getText()!=null && 
+	    		LT(n+2).getText().charAt(0)<='Z' && LT(n+2).getText().charAt(0)>='A' && 
+	    		(LT(n+2).getText().length()==1 || 
+	    		 LT(n+2).getText().charAt(1)<='z' && LT(n+2).getText().charAt(1)>='a'))){  	   
                 if (LA(n+1) != DOT && LA(n+1) != EMPTYBRACKETS) return false;
                 className.append(".");	       
                 className.append(LT(n+2).getText());
@@ -1192,21 +1189,8 @@ options {
 		   break;
 		 }
                }
-	       if(!result) {
-               JMLClassSpec cs = getServices().getImplementation2SpecMap().getSpecForClass(kjt);
-               if(cs != null){
-                  try {
-                    cs.lookupModelMethod(new Name(LT(n+2).getText()));
-		    result = true;
-                  }catch(AmbigiousModelElementException e){
-                    result = false;
-                  }
-               }
-	       }
            }   
-        }else{
-          result = false;
-	}
+        }
     } catch (antlr.TokenStreamException tse) {
         // System.out.println("an exception occured"+tse);
         result = false;
@@ -1341,10 +1325,6 @@ options {
     /** parses a problem but without reading the declarations of
      * sorts, functions and predicates. These have to be given
      * explicitly.
-     * @param functions() the Namespace with the function and predicate
-     * symbols to be used
-     * @param sorts() the Namespace with the sorts to be used
-     * @param ruleSets() the Namespace with the rule sets to be used
      * the rule sets of the current problem file will be added 
      */ 
     public Term parseTacletsAndProblem() 
@@ -1715,7 +1695,9 @@ simple_ident_dots returns [ String ident = ""; ]
 }
 :
   id = simple_ident { ident += id; }  
-    (DOT id = simple_ident {ident += "." + id;})* 
+    (DOT 
+ 	(id = simple_ident | num:NUM_LITERAL {id=num.getText();}) 
+ 	{ident += "." + id;})* 
  ;
 
 extends_sorts returns [Sort[] extendsSorts = null] 
@@ -1765,8 +1747,11 @@ keyjavatype returns [KeYJavaType kjt=null]
        kjt = getJavaInfo().getKeYJavaType(guess);       
        if (array) {
           try {
-            getJavaInfo().readJavaBlock("{" + type + " k;}");
-            kjt = getJavaInfo().getKeYJavaType(type);
+            JavaBlock jb = getJavaInfo().readJavaBlock("{" + type + " k;}");
+            kjt = ((VariableDeclaration) 
+                    ((StatementBlock) jb.program()).getChildAt(0)).
+                        getTypeReference().getKeYJavaType();
+//            kjt = getJavaInfo().getKeYJavaType(type);
           } catch (Exception e) {
              kjt = null;
           }          
@@ -2024,7 +2009,7 @@ pred_decl
                  	  case HEAP_DEPENDENT: p = new NonRigidHeapDependentFunction(predicate, Sort.FORMULA, argSorts);      
                  	      break;
                  	  default:
-                 	     semanticError("Unknwon modifier used in declaration of non-rigid predicate "+predicate);
+                 	     semanticError("Unknown modifier used in declaration of non-rigid predicate "+predicate);
                  	}
                     }
 
@@ -2384,7 +2369,7 @@ funcpred_name returns [String result = null]
     (sort_name DOUBLECOLON) => (prefix = sort_name 
         DOUBLECOLON name = simple_ident {result = prefix + "::" + name;})
   | 
-    (prefix = simple_ident {result = prefix;})
+    (prefix = simple_ident {result = prefix; })
 ;
 
 
@@ -2554,8 +2539,6 @@ unary_formula returns [Term a = null]
 { Term a1; }
     :  
         NOT a1  = term60 { a = tf.createJunctorTerm(Op.NOT,new Term[]{a1}); }
-    |   COMPUTE_SPEC_OP a1 = term60 
-                { a = tf.createJunctorTerm(Op.COMPUTE_SPEC_OP,new Term[]{a1}); }
     |	a = quantifierterm 
     |   a = modality_dl_term
 ; exception
@@ -2757,10 +2740,8 @@ classReference returns [String classReference = ""]
 
 transactionNumber returns [Term trans = null]
 :
-     // "^" is required which is called compute spec. As 
-     // the compute specification operator cannot be used here overloading is safe
-     COMPUTE_SPEC_OP LPAREN trans = term60 RPAREN
-    |
+     EXP LPAREN trans = term60 RPAREN
+     |
      p:PRIMES {
        int primes = p.getText().length();
        if(parsingContracts) {
@@ -2794,12 +2775,20 @@ transactionNumber returns [Term trans = null]
 staticAttributeOrQueryReference returns [String attrReference = ""]
 :
         
-        id:IDENT {
+      //  attrReference=simple_ident_dots 
+      id:IDENT
+        {
             attrReference = id.getText(); 
-            while (isPackage(attrReference)) {
+            while (isPackage(attrReference) || LA(2)==NUM_LITERAL || 
+                (LT(2).getText().charAt(0)<='Z' && LT(2).getText().charAt(0)>='A' && 
+	    		(LT(2).getText().length()==1 || LT(2).getText().charAt(1)<='z' && LT(2).getText().charAt(1)>='a'))) {
                 match(DOT);
                 attrReference += "." + LT(1).getText();
-                match(IDENT);
+                if(LA(1)==NUM_LITERAL){
+                	match(NUM_LITERAL);
+                }else{
+               	 	match(IDENT);
+                }
             }      
         }
         (EMPTYBRACKETS {attrReference += "[]";})*    
@@ -2831,9 +2820,15 @@ static_attribute_suffix returns [Term result = null]
     :   
         attributeName = staticAttributeOrQueryReference
         {   
-	       String className = 
-		   attributeName.substring(0, attributeName.indexOf(':')); 		
-	       v = getAttribute(getTypeByClassName(className).getSort(), attributeName); 
+         	String className;
+            if(attributeName.indexOf(':')!=-1){	
+	       		className = 
+		   			attributeName.substring(0, attributeName.indexOf(':'));
+            }else{
+          		className = 
+		   			attributeName.substring(0, attributeName.lastIndexOf("."));	
+            }	
+	       	v = getAttribute(getTypeByClassName(className).getSort(), attributeName); 
 	    }
         (shadowNumber = transactionNumber)?
         { result = createAttributeTerm(null, v, shadowNumber); }                   
@@ -2899,25 +2894,8 @@ query [Term prefix] returns [Term result = null]
        if (argsWithBoundVars != null) {
          args = argsWithBoundVars.getTerms();
        }
-       try{
-           result = getServices().getJavaInfo().getProgramMethodTerm
+       result = getServices().getJavaInfo().getProgramMethodTerm
                 (prefix, mid.getText(), args, classRef);
-       }catch(java.lang.IllegalArgumentException e){
-           ProgramMethod pm = 
-                getServices().getImplementation2SpecMap().
-                lookupModelMethod(
-                    getServices().getJavaInfo().getKeYJavaType(prefix.sort()), 
-                    new Name(mid.getText()));
-           if(pm == null){
-               throw e;
-           }
-           Term[] argTerms = new Term[args.length + 1];
-           argTerms[0] = prefix;
-           for(int i = 0; i<args.length; i++){
-               argTerms[i+1] = args[i];
-           }
-           result = tf.createFunctionTerm(pm, argTerms);
-       } 
     }        
  ; exception
         catch [TermCreationException ex] {
@@ -2955,18 +2933,7 @@ static_query returns [Term result = null]
 		semanticError("Found logic sort for " + className + 
 		 " but no corresponding java type (e.g. int is only " +
 		 " available as logic sort not as java type use (jint, jbyte, jshort etc. instead)");
-          }
-
-          
-          JMLClassSpec cs = getServices().getImplementation2SpecMap().getSpecForClass(kjt);
-          if (cs != null) {
-             try {
-               ts = (TermSymbol)cs.lookupModelMethod(new Name(qname));
-             }catch(AmbigiousModelElementException e){
-               e.printStackTrace();
-             }
-	     result = tf.createFunctionWithBoundVarsTerm(ts, argsWithBoundVars);
-          }
+          }          
        }
 	    
     }        
@@ -3616,7 +3583,7 @@ funcpredvarterm returns [Term a = null]
 	((LPAREN)=>argsWithBoundVars = argument_list)? 
         //argsWithBoundVars==null indicates no argument list
         //argsWithBoundVars.size()==0 indicates open-close-parens ()
-        {   
+        {  
             Operator op = lookupVarfuncId(varfuncid, argsWithBoundVars);            
             if (op instanceof ParsableVariable) {
                 a = termForParsedVariable((ParsableVariable)op);
@@ -3878,18 +3845,21 @@ varexp[TacletBuilder b]
     | varcond_free[b] | varcond_literal[b]
     | varcond_hassort[b] | varcond_query[b]
     | varcond_non_implicit[b] | varcond_non_implicit_query[b]
+    | varcond_enum_const[b]
     | varcond_inReachableState[b] 
+    | varcond_isupdated[b]    
   ) 
   | 
   ( (NOT {negated = true;} )? 
       ( varcond_reference[b, negated] 
+      | varcond_enumtype[b, negated]
       | varcond_staticmethod[b,negated]  
       | varcond_referencearray[b, negated]
+      | varcond_array[b, negated]
       | varcond_abstractOrInterface[b, negated]
       | varcond_static[b,negated] 
       | varcond_typecheck[b, negated]
       | varcond_localvariable[b, negated]
-	  | varcond_isupdated[b, negated]
       | varcond_freeLabelIn[b,negated] )
   )
 ;
@@ -4031,6 +4001,18 @@ varcond_hassort [TacletBuilder b]
    }
 ;
 
+varcond_enumtype [TacletBuilder b, boolean negated]
+{
+  TypeResolver tr = null;
+}
+:
+   ISENUMTYPE LPAREN tr = type_resolver RPAREN
+      {
+         b.addVariableCondition(new EnumTypeCondition(tr, negated));
+      }
+;
+ 
+
 varcond_reference [TacletBuilder b, boolean isPrimitive]
 {
   ParsableVariable x = null;
@@ -4132,6 +4114,18 @@ varcond_referencearray [TacletBuilder b, boolean primitiveElementType]
    }
 ;
 
+varcond_array [TacletBuilder b, boolean negated]
+{
+  ParsableVariable x = null;
+}
+:
+   ISARRAY LPAREN x=varId RPAREN {
+     b.addVariableCondition(new ArrayTypeCondition(
+       (SchemaVariable)x, negated));
+   }
+;
+
+
 varcond_abstractOrInterface [TacletBuilder b, boolean negated]
 {
   TypeResolver tr = null;
@@ -4139,6 +4133,17 @@ varcond_abstractOrInterface [TacletBuilder b, boolean negated]
 :
    IS_ABSTRACT_OR_INTERFACE LPAREN tr=type_resolver RPAREN {
      b.addVariableCondition(new AbstractOrInterfaceType(tr, negated));
+   }
+;
+
+varcond_enum_const [TacletBuilder b]
+{
+  ParsableVariable x = null;
+}
+:
+   ENUM_CONST LPAREN x=varId RPAREN {
+      b.addVariableCondition(new EnumConstantCondition(
+	(SchemaVariable) x));     
    }
 ;
 
@@ -4164,14 +4169,14 @@ varcond_localvariable [TacletBuilder b, boolean negated]
         } 
 ;
 
-varcond_isupdated [TacletBuilder b, boolean negated]
+varcond_isupdated [TacletBuilder b]
 {
   ParsableVariable x = null;
 }
 :
    ISUPDATED 
 	LPAREN x=varId RPAREN {
-     	   b.addVariableCondition(new IsUpdatedVariableCondition((SchemaVariable) x, negated));
+     	   b.addVariableCondition(new IsUpdatedVariableCondition((SchemaVariable) x));
         } 
 ;
 
@@ -4398,10 +4403,16 @@ one_contract
      fma = formula MODIFIES (modifiesClause = location_list)?
      (rs=rulesets)?   // for backward compatibility
      (DISPLAYNAME displayName = string_literal)?
-     { //Syntax check fma
-       contracts.add(new DLMethodContract(fma, 
-           modifiesClause,
-	   contractName, displayName, getServices(), namespaces()));
+     {
+       DLSpecFactory dsf = new DLSpecFactory(getServices());
+       try {
+         contracts = contracts.add(dsf.createDLOperationContract(contractName,
+	       					                 displayName,
+       					                         fma, 
+           				                         modifiesClause));
+       } catch(ProofInputException e) {
+         semanticError(e.getMessage());
+       }
      } RBRACE SEMI {
      // dump local program variable declarations and @pre functions
      namespaces().setProgramVariables(programVariables().parent());
@@ -4555,7 +4566,7 @@ expreid returns [ char eid = '0' ]
 { String id = null; } 
 :
    id = simple_ident {
-      Character c = (Character)prooflabel2tag.get(id);
+      Character c = prooflabel2tag.get(id);
       if(c != null)
          eid = c.charValue();
    }

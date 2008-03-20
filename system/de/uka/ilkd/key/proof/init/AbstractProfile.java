@@ -2,8 +2,8 @@ package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.SetAsListOfString;
 import de.uka.ilkd.key.collection.SetOfString;
-import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.ProofSettings;
+import de.uka.ilkd.key.gui.IMain;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.decproc.JavaDecisionProcedureTranslationFactory;
@@ -21,7 +21,7 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 
 public abstract class AbstractProfile implements Profile {
 
-    private Main                       main;
+    private IMain                       main;
 
     private AbstractExecDecproc[] execDecprocs;
     
@@ -37,7 +37,7 @@ public abstract class AbstractProfile implements Profile {
     
     
     protected AbstractProfile(String standardRuleFilename, 
-            SetOfGoalChooserBuilder supportedGCB, Main main) {
+            SetOfGoalChooserBuilder supportedGCB, IMain main) {
         
         // First initialise execDecproc, because it is used in initBuiltInRules()!
         int concreteDecprocs = ConcreteExecDecproc.getDecprocNumber();
@@ -76,7 +76,7 @@ public abstract class AbstractProfile implements Profile {
         this(standardRuleFilename, null);
     }
 
-    public AbstractProfile(String standardRuleFilename, Main main) {
+    public AbstractProfile(String standardRuleFilename, IMain main) {
         this(standardRuleFilename, 
                 SetAsListOfGoalChooserBuilder.EMPTY_SET.
                 add(new DefaultGoalChooserBuilder()), main);

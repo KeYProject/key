@@ -15,11 +15,13 @@ import java.awt.Font;
 import java.awt.event.*;
 import java.io.File;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 
+import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.notification.events.AbandonTaskEvent;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.mgt.*;
@@ -125,16 +127,16 @@ public class TaskTree extends JPanel {
 
     /** returns all selected basic tasks */
     public BasicTask[] getAllSelectedBasicTasks() {
-	LinkedList result = new LinkedList();
 	TreePath[] paths 
 	    = delegateView.getSelectionModel().getSelectionPaths();
 	if (paths==null) return new BasicTask[0];
+        final List<BasicTask> result = new LinkedList<BasicTask>();
 	for (int i=0; i<paths.length; i++) {
 	    if (paths[i].getLastPathComponent() instanceof BasicTask) {
-		result.add(paths[i].getLastPathComponent());
+		result.add((BasicTask) paths[i].getLastPathComponent());
 	    }
 	}
-	return (BasicTask[]) result.toArray(new BasicTask[0]);
+	return result.toArray(new BasicTask[result.size()]);
     }
 
     /** called when the user has clicked on a problem */
@@ -158,7 +160,7 @@ public class TaskTree extends JPanel {
 	public void mouseClicked(MouseEvent e) {
 	    if (e.getClickCount() == 1 
 		&& e.getModifiers() != 
-                   (MouseEvent.CTRL_MASK+MouseEvent.BUTTON1_MASK)) {
+                   (InputEvent.CTRL_MASK+InputEvent.BUTTON1_MASK)) {
  		problemChosen();
  	    }
 	}
@@ -182,6 +184,10 @@ public class TaskTree extends JPanel {
 		    
 	    }
 	}
+        
+        public void mouseReleased(MouseEvent e) {
+            mousePressed(e);
+        }
     }
 
 
@@ -330,8 +336,9 @@ public class TaskTree extends JPanel {
 
 	public void actionPerformed(ActionEvent e) {
 	    if (e.getSource() == mcList) {
-		JDialog fr = new UsedMethodContractsList(invokedNode, mediator);
-		fr.setVisible(true);
+                new UsedSpecificationsDialog(
+                            mediator.getServices(), 
+                            invokedNode.getUsedSpecs());
 	    } else if (e.getSource() == removeTask) {
 	        removeTask(invokedNode);
             } else if (e.getSource() == loadProof) {
@@ -342,8 +349,10 @@ public class TaskTree extends JPanel {
 	        boolean loaded = localFileChooser.showOpenDialog(mainFrame);
 	        if (loaded) {
 		    File file = localFileChooser.getSelectedFile(); 
-		    (new ProblemLoader(file, mainFrame, 
-                            mediator.getProfile(), true)).run();
+		    final ProblemLoader pl = new ProblemLoader(file, mainFrame, 
+                                        mediator.getProfile(), true);
+                    pl.addTaskListener(mainFrame.getProverTaskListener());
+                    pl.run();
 	        }
             }
 	}

@@ -31,8 +31,8 @@ public class ApplyTFFeature implements Feature {
     private final boolean          demandInst;
 
     /**
-     * @param schemaVar
-     *            the schema variable whose instantiation is supposed to be
+     * @param proj
+     *            the ProjectionToTerm to the instantiation is supposed to be
      *            inspected
      * @param termFeature
      *            the term feature to use

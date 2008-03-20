@@ -17,6 +17,7 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 import de.uka.ilkd.key.cspec.ComputeSpecification;
+import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -31,7 +32,7 @@ import de.uka.ilkd.key.util.Debug;
  *
  * @author Andr&eacute; Platzer
  * @version 1.1, 2003-02-01
- * @version-revision $Revision: 1.14.1.1.2.1.2.4.1.1 $, $Date: Tue, 26 Jun 2007 14:56:17 +0200 $
+ * @version-revision $Revision: 1.14.1.1.2.1.2.4.1.2 $, $Date: Fri, 20 Jul 2007 10:11:30 +0200 $
  * @see de.uka.ilkd.key.cspec.ComputeSpecification
  */
 public class ComputeSpecificationView {
@@ -101,7 +102,7 @@ public class ComputeSpecificationView {
      * A facade for the user-interface, displaying the computed
      * specification of a program.
      * @param mediator the KeY-mediator containing the specification construction proof.
-     * @see de.uka.ilkd.key.casetool.FunctionalityOnModel#computeSpecification(ReprModelMethod)
+     * @see de.uka.ilkd.key.casetool.together.FunctionalityOnModel#computeSpecification(de.uka.ilkd.key.casetool.ModelMethod)
      */
     public static final void show(KeYMediator mediator) {
 	try{

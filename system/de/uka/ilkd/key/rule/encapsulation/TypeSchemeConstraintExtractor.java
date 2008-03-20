@@ -40,6 +40,7 @@ import de.uka.ilkd.key.rule.metaconstruct.MethodCall;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramMetaConstruct;
 import de.uka.ilkd.key.rule.soundness.ProgramSVProxy;
 import de.uka.ilkd.key.rule.soundness.ProgramSVSkolem;
+import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -757,7 +758,10 @@ class TypeSchemeConstraintExtractor implements Visitor {
     public void performActionOnFor(For x) {
         //nothing to do
     }
-
+    
+    public void performActionOnEnhancedFor(EnhancedFor x) {
+        // nothing to do
+    }
     
     public void performActionOnWhile(While x) {
         //nothing to do
@@ -1047,6 +1051,11 @@ class TypeSchemeConstraintExtractor implements Visitor {
         
             push(assignmentTerm);
         }
+    }
+    
+    
+    public void performActionOnSetAssignment(SetAssignment x) {
+        assert false : "not implemented";
     }
 
     
@@ -1593,5 +1602,7 @@ class TypeSchemeConstraintExtractor implements Visitor {
     }
 
 
-  
+    public void performActionOnLoopInvariant(LoopInvariant x) {
+        //nothing to do
+    }    
 }

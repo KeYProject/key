@@ -4,6 +4,7 @@ import de.uka.ilkd.key.unittest.*;
 import de.uka.ilkd.key.unittest.simplify.*;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 
 import java.awt.event.ActionListener;

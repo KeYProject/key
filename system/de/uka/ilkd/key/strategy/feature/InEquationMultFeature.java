@@ -50,8 +50,8 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
                                            mult2Candidate,
                                            targetCandidate ) {
             protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {
-                return !mult2M.divide ( targetM ).variablesDisjoint ( mult1M )
-                       && !mult1M.divide ( targetM ).variablesDisjoint ( mult2M );
+                return !mult2M.reduce ( targetM ).variablesDisjoint ( mult1M )
+                       && !mult1M.reduce ( targetM ).variablesDisjoint ( mult2M );
             }            
         };
     }

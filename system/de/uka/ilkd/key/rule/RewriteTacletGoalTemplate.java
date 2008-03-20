@@ -19,7 +19,7 @@ import de.uka.ilkd.key.logic.op.SetOfSchemaVariable;
 
 /** this class inherits from TacletGoalTemplate. It is used if there is a
  * replacewith in the ruleGoals that replaces a term by another
- * term. For a sequent {@see de.uka.ilkd.key.proof.AnteSuccTacletGoalTemplate}
+ * term. For a sequent {@link AntecSuccTacletGoalTemplate}
  */
 public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
 
@@ -30,8 +30,8 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
      *@param addedSeq new Sequent to be added
      *@param addedRules ListOfTaclet contains the new allowed rules
      * at this branch 
-     *@param ruleVars ListOfRulevariable contains used rulevariables 
      *@param replacewith the Term that replaces another one
+     *@param pvs the set of schema variables
      */
     public RewriteTacletGoalTemplate(Sequent             addedSeq,
 				     ListOfTaclet        addedRules,				     

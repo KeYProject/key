@@ -149,7 +149,7 @@ public class IntersectionSort extends AbstractSort {
     /**
      * creates the sort name for the composites. 
      * 
-     * @param composites2 the array of Sort with the defining 
+     * @param composites the array of Sort with the defining 
      * composite sorts of this intersection sort
      * @return the name of the intersection sort to be created
      */
@@ -383,9 +383,6 @@ public class IntersectionSort extends AbstractSort {
                      
        for (int i = 0, sz = memberCount(); i<sz; i++) {
            final Sort s = getComponent(i);         
-           Debug.assertTrue(!(s instanceof GenSort), 
-                            "Cannot compute iff a domain is empty " +
-                            "in case of generic sorts.");
            if (s instanceof PrimitiveSort) {
                nonReferenceType = true;
            } else if (s instanceof IntersectionSort) {               

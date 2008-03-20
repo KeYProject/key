@@ -320,7 +320,7 @@ public abstract class Notation {
     /**
          * The standard concrete syntax for function and predicate terms.
          */
-    static class Function extends Notation {
+    public static class Function extends Notation {
 
 	public Function() {
 	    super(130);
@@ -339,7 +339,7 @@ public abstract class Notation {
          * The standard concrete syntax for a non rigid function with explicit
          * known dependencies.
          */
-    static class NRFunctionWithDependenciesNotation extends Notation {
+    public static class NRFunctionWithDependenciesNotation extends Notation {
 
 	public NRFunctionWithDependenciesNotation() {
 	    super(130);
@@ -436,11 +436,36 @@ public abstract class Notation {
 	    }
 	}
     }
+    
+    //implemented by mbender for jmltest
+    public static class JMLProgramMethod extends Notation {
+        private final int ass;
+
+        public JMLProgramMethod(int ass) {
+            super(130);
+            this.ass = ass;
+        }
+
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
+                sp.printTerm(t);
+            } else if (((de.uka.ilkd.key.logic.op.ProgramMethod) t.op())
+                    .isStatic()) {
+
+                sp.printFunctionTerm(t.op().name().toString().replaceAll("::",
+                        "."), t);
+            } else {
+                final ProgramElementName name = (ProgramElementName) t.op()
+                        .name();
+                sp.printQueryTerm(name.getProgramName(), t, ass);
+            }
+        }
+    }
 
     /**
          * The standard concrete syntax for attribute terms <code>o.a</code>.
          */
-    static class Attribute extends Notation {
+    public static class Attribute extends Notation {
 
 	private int associativity;
 
@@ -493,7 +518,7 @@ public abstract class Notation {
     /**
          * The standard concrete syntax for attribute terms <code>o.a</code>.
          */
-    static class ShadowAttribute extends Notation {
+    public static class ShadowAttribute extends Notation {
 
 	private int associativity;
 
@@ -517,7 +542,7 @@ public abstract class Notation {
          * The standard concrete syntax for conditional terms
          * <code>if (phi) (t1) (t2)</code>.
          */
-    static class IfThenElse extends Notation {
+    public static class IfThenElse extends Notation {
 
 	private final String keyword;
 
@@ -538,7 +563,7 @@ public abstract class Notation {
     /**
          * The standard concrete syntax for all kinds of variables.
          */
-    static class VariableNotation extends Notation {
+    public static class VariableNotation extends Notation {
 	public VariableNotation() {
 	    super(1000);
 	}
@@ -555,7 +580,7 @@ public abstract class Notation {
 	}
     }
 
-    static class SortedSchemaVariableNotation extends VariableNotation {
+    public static class SortedSchemaVariableNotation extends VariableNotation {
 	static Logger logger = Logger.getLogger(Notation.class.getName());
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
@@ -600,7 +625,7 @@ public abstract class Notation {
 	}
     }
 
-    static class MetavariableNotation extends Notation {
+    public static class MetavariableNotation extends Notation {
 	public MetavariableNotation() {
 	    super(1000);
 	}
@@ -905,7 +930,7 @@ public abstract class Notation {
          * @param sp
          * @param subTerm
          *                TODO
-         * @return
+         * @return the quantified variable
          */
     protected QuantifiableVariable instQV(Term t, LogicPrinter sp, int subTerm) {
 	QuantifiableVariable v = t.varsBoundHere(subTerm)

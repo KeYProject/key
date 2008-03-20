@@ -26,8 +26,6 @@ import de.uka.ilkd.key.collection.IteratorOfString;
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.collection.SLListOfString;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.speclang.*;
-import de.uka.ilkd.key.speclang.ocl.OCLClassInvariant;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -204,8 +202,8 @@ public class TogetherModelClass extends TogetherReprModel
 	this.inv = inv;
 	orig.setProperty("invariants", inv);
     }
-	
     
+        
     /** relies on a valid backing RWI model element, i.e. the together
      * project is still valid (opened)
      * @author Kristofer Johannisson
@@ -434,7 +432,7 @@ public class TogetherModelClass extends TogetherReprModel
      * project is still valid (opened)
      */
     public String[] getClassesInPackage() {	
-	HashSet v = new HashSet();	
+	HashSet v = new LinkedHashSet();	
 	RwiPackage rootPac=orig.getContainingPackage();	
 	while (rootPac.getContainingPackage()!=null) {
 	    rootPac=rootPac.getContainingPackage();
@@ -477,7 +475,7 @@ public class TogetherModelClass extends TogetherReprModel
 	       && rootPackage.getContainingPackage().nodes().hasMoreElements()){
 	    rootPackage=rootPackage.getContainingPackage();
 	}
-	Set result = new HashSet();
+	Set result = new LinkedHashSet();
 	rwiRecurse(rootPackage.nodes(), result);
 	return result;
     }
@@ -504,32 +502,7 @@ public class TogetherModelClass extends TogetherReprModel
 	}
     }
     
-    
-    public ListOfClassInvariant getMyClassInvariants() {
-        ListOfClassInvariant result = SLListOfClassInvariant.EMPTY_LIST;
         
-        String myInv = getMyInv();
-        if(!myInv.equals("")) {
-            ClassInvariant invariant = new OCLClassInvariant(this, myInv);
-            result = result.append(invariant);
-        }
-        
-        return result;
-    }
-    
-    
-    public ListOfClassInvariant getMyThroughoutClassInvariants() {
-        ListOfClassInvariant result = SLListOfClassInvariant.EMPTY_LIST;
-        
-        String myThroughout = getMyThroughout();
-        if(!myThroughout.equals("")) {
-            ClassInvariant invariant = new OCLClassInvariant(this, myThroughout);
-            result = result.append(invariant);
-        }
-        
-        return result;
-    }
-    
     
     public String toString() {
         return getClassName();

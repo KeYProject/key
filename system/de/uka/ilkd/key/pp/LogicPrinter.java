@@ -21,7 +21,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.op.oclop.OclOp;
 import de.uka.ilkd.key.logic.sort.ObjectSort;
@@ -62,19 +61,19 @@ public class LogicPrinter {
     public static final int DEFAULT_LINE_WIDTH = 55;
 
     /** The max. number of characters to put in one line */
-    private int lineWidth = DEFAULT_LINE_WIDTH;
+    protected int lineWidth = DEFAULT_LINE_WIDTH;
 
     /**
      * The ProgramPrinter used to pretty-print Java blocks in
      * formulae.
      */
-    private ProgramPrinter prgPrinter;
+    protected ProgramPrinter prgPrinter;
 
     /** Contains information on the concrete syntax of operators. */
     private final NotationInfo notationInfo;
 
     /** the services object */
-    private final Services services;
+    protected final Services services;
 
     /** The sequent we are pretty-printing */
     //private Sequent            seq;
@@ -84,7 +83,7 @@ public class LogicPrinter {
     protected Layouter layouter;
 
     /** The backend <code>layouter</code> will write to. */
-    private Backend backend;
+    protected Backend backend;
 
     /** The constraint used for metavariable instantiations of the
      * current formula */
@@ -100,14 +99,20 @@ public class LogicPrinter {
         are pretty-printed the right way. */
     private boolean oclPrettyPrinting = false;
 
-    static Logger logger = Logger.getLogger(LogicPrinter.class.getName());
+    protected static Logger logger = Logger.getLogger(LogicPrinter.class.getName());
 
 
     public static String quickPrintLocationDescriptors(
                                         SetOfLocationDescriptor locations,
                                         Services services) {
+        
+        final NotationInfo ni = NotationInfo.createInstance();
+        if (services != null) {
+            PresentationFeatures.modifyNotationInfo(ni,
+                    services.getNamespaces().functions());
+        }
         LogicPrinter p = new LogicPrinter(null, 
-        				  NotationInfo.createInstance(), 
+        				  ni, 
         				  services);
         try {
             p.printLocationDescriptors(locations);
@@ -116,6 +121,25 @@ public class LogicPrinter {
         }
         return p.result().toString();
     }
+    
+    
+    public static String quickPrintTerm(Term t, Services services) {
+        final NotationInfo ni = NotationInfo.createInstance();
+        if (services != null) {
+            PresentationFeatures.modifyNotationInfo(ni,
+                    services.getNamespaces().functions());
+        }
+        LogicPrinter p = new LogicPrinter(null, 
+                                          ni, 
+                                          services);
+        try {
+            p.printTerm(t);
+        } catch (IOException ioe) {
+            return t.toString();
+        }
+        return p.result().toString();
+    }
+    
 
     /**
      * Creates a LogicPrinter.  Sets the sequent to be printed, as
@@ -873,9 +897,9 @@ public class LogicPrinter {
             formulaConstraint = null;
 
             EqualityConstraint eqc = (EqualityConstraint)p;
-            List vars = new ArrayList ();
+            List<Metavariable> vars = new ArrayList<Metavariable> ();
             {
-                IteratorOfMetavariable it =
+                Iterator<Metavariable>it =
                     eqc.restrictedMetavariables ();
 
                 while ( it.hasNext () )
@@ -885,11 +909,11 @@ public class LogicPrinter {
             startTerm ( vars.size () );
             layouter.print("[ ").beginI(0);
 
-            ListIterator it = vars.listIterator ();
+            ListIterator<Metavariable> it = vars.listIterator ();
             Metavariable mv;
             Term         inst;
             while ( it.hasNext () ) {
-                mv   = (Metavariable)it.next ();
+                mv   = it.next ();
                 inst = eqc.getDirectInstantiation ( mv );
                 if ( inst == null )
                     inst = TermFactory.DEFAULT.createFunctionTerm ( mv );
@@ -933,10 +957,10 @@ public class LogicPrinter {
     }
 
     /**
-     * Pretty-prints a list of terms.
+     * Pretty-prints a set of terms.
      * @param terms the terms to be printed
      */
-    public void printTerm(ListOfTerm terms)
+    public void printTerm(SetOfTerm terms)
         throws IOException {
         getLayouter().print("{");
         IteratorOfTerm it = terms.iterator();
@@ -1298,7 +1322,7 @@ public class LogicPrinter {
         }
     }
 
-    private void printVariables (ArrayOfQuantifiableVariable vars)
+    protected void printVariables (ArrayOfQuantifiableVariable vars)
                                             throws IOException {
         int size = vars.size ();
         if(size != 1)
@@ -1351,8 +1375,22 @@ public class LogicPrinter {
         return result>0 ? result : -1;
 
     }
-
-    String[] setupUpdateSeparators (final Operator loc, final Term t)
+    
+    /**
+     * setup the separators to be printed between the sub-terms of an update
+     * location.
+     * 
+     * The top entity of the update loc is printed by this method.
+     * 
+     * @param loc
+     *            location to write to
+     * @param t
+     *            term to assign
+     * @return an array of separating strings (elements may be "[" "]" "," ")" )
+     * @throws IOException
+     *             if thrown by layouter
+     */
+    private String[] setupUpdateSeparators (final Operator loc, final Term t)
                                                 throws IOException {
         String[] separator = new String [loc.arity ()];
         if ( loc instanceof AttributeOp ) {
@@ -1365,6 +1403,7 @@ public class LogicPrinter {
             layouter.print( loc.name ().toString ().replaceAll ( "::", "." ) );
         } else {
             layouter.print ( loc.name().toString() + "(" );
+            // bugfix: was "m = 1;..." which made separator[0]==null
             for ( int m = 0; m < loc.arity () - 1; m++ ) {
                 separator[m] = ",";
             }
@@ -1455,8 +1494,7 @@ public class LogicPrinter {
      * variable name with colon and sort.
      *
      * @param name the name of the quantifier
-     * @param var  the quantified variable (+colon and sort)
-     * @param sep  the separator (usually a dot)
+     * @param vars  the quantified variables (+colon and sort)
      * @param phi  the quantified formula
      * @param ass  associativity for phi
      */
@@ -2109,6 +2147,62 @@ public class LogicPrinter {
     }
 
     /**
+     * escapes special characters by their HTML encoding 
+     * @param text the String to be displayed as part of an HTML side
+     * @return the text with special characters replaced
+     */
+    public static String escapeHTML(String text) {
+         StringBuffer sb = new StringBuffer();
+        
+         for (int i = 0, sz = text.length(); i < sz; i++) {
+             char c = text.charAt(i); 
+             switch (c) {
+             case  '<':
+                 sb.append("&lt;");
+                 break;
+             case '>': 
+                 sb.append("&gt;");
+                 break;
+             case '&': 
+                 sb.append("&amp;");
+                 break;
+             case '\"': 
+                 sb.append("&quot;");
+                 break;
+             case '\'': 
+                 sb.append("&#039;");
+                 break;
+             case '(': 
+                 sb.append("&#040;");
+                 break;
+             case ')': 
+                 sb.append("&#041;");
+                 break;
+             case '#': 
+                 sb.append("&#035;");
+                 break;
+             case '+': 
+                 sb.append("&#043;");
+                 break;
+             case '-': 
+                 sb.append("&#045;");
+                 break;
+             case '%': 
+                 sb.append("&#037;");
+                 break;
+             case ';': 
+                 sb.append("&#059;");
+                 break;
+             default:
+                 sb.append(c);
+             }
+             
+         }
+         return sb.toString();
+    }
+
+
+    /**
      * tests if the program name together with the prefix sort
      * determines the attribute in a unique way
      * @param programName the String denoting the program name of
@@ -2171,7 +2265,7 @@ public class LogicPrinter {
 
         /** The stack of StackEntry representing the nodes above
          * the current subterm */
-        private Stack stack = new Stack();
+        private Stack<StackEntry> stack = new Stack<StackEntry>();
 
         /** If this is set, a ModalityPositionTable will
          * be built next.
@@ -2231,7 +2325,7 @@ public class LogicPrinter {
                 stack.push(new StackEntry(posTbl, pos));
                 pos=count();
             } else if ( o==MARK_END_SUB ) {
-                StackEntry se=(StackEntry)stack.peek();
+                StackEntry se=stack.peek();
                 stack.pop();
                 pos=se.pos();
                 se.posTbl().setEnd(count()-pos, posTbl);

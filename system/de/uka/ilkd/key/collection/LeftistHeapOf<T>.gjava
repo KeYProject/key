@@ -377,6 +377,13 @@ public abstract class LeftistHeapOf<T> implements HeapOf<T> {
 	    
 	    return heap.data;
 	}
+	
+	/** 
+	 * throw an unsupported operation exception as leftiest heaps are immutable
+	 */
+	public void remove() {
+            throw new UnsupportedOperationException();
+        }
     }
 
 
@@ -405,6 +412,13 @@ public abstract class LeftistHeapOf<T> implements HeapOf<T> {
 
 	    return data;
 	}
+	
+	/** 
+	 * throw an unsupported operation exception as leftiest heaps are immutable
+	 */
+	public void remove() {
+            throw new UnsupportedOperationException();
+        }
     }
 
 }

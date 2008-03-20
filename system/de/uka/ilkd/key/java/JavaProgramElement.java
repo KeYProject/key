@@ -13,7 +13,6 @@ package de.uka.ilkd.key.java;
 
 import java.io.IOException;
 
-import de.uka.ilkd.key.java.annotation.Annotation;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
@@ -85,16 +84,6 @@ public abstract class JavaProgramElement extends JavaSourceElement
         return comments;
     }
 
-    /**
-     *@return the annotations.
-     */
-    public Annotation[] getAnnotations(){
-	return new Annotation[0];
-    }
-
-    public int getAnnotationCount(){
-	return 0;
-    }
 
     /**
      *      Template Method. Prints DocComments if existing, calls

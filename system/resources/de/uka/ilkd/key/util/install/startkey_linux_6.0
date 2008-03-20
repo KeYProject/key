@@ -185,7 +185,7 @@ fi
 # KeY CLASSPATH
 #
 
-key_ext_jars="antlr.jar recoder.jar dresden-ocl-demo.jar xerces.jar jargs.jar log4j.jar"
+key_ext_jars="antlr.jar recoderKey.jar dresden-ocl-demo.jar xerces.jar jargs.jar log4j.jar"
 
 keyclasspath="$KEY_HOME/system/key.jar:$KEY_HOME/keypatterns/"
 

@@ -15,7 +15,6 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.annotation.Annotation;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
@@ -38,7 +37,7 @@ public abstract class ProgramVariable extends TermSymbol
     private final boolean isStatic;
     private final boolean isModel;
     private final boolean isGhost;
-
+    private final boolean isFinal;
 
     // the type where this program variable is declared if and only if
     // the program variable denotes a field
@@ -50,16 +49,28 @@ public abstract class ProgramVariable extends TermSymbol
 			    KeYJavaType        containingType,
 			    boolean            isStatic,
 			    boolean            isModel,
-			    boolean            isGhost) {
+			    boolean            isGhost,
+			    boolean            isFinal) {
 	super(name, s);
 	this.type = t;
 	this.containingType = containingType;	
 	this.isStatic = isStatic;
 	this.isModel = isModel;
 	this.isGhost = isGhost;
+	this.isFinal = isFinal;
 	// remove this as soon as possible %%%
 	id = COUNTER;
 	COUNTER++;
+    }
+    
+    protected ProgramVariable(ProgramElementName name, 
+            Sort               s,
+            KeYJavaType        t, 
+            KeYJavaType        containingType,
+            boolean            isStatic,
+            boolean            isModel,
+            boolean            isGhost) {
+        this(name, s, t, containingType, isStatic, isModel, isGhost, false);
     }
  
     /** returns unique id %%%% HACK */
@@ -103,6 +114,13 @@ public abstract class ProgramVariable extends TermSymbol
      */
     public boolean isGhost() {
 	return isGhost;
+    }
+    
+    /**
+     * returns true if the program variable has been declared as final
+     */
+    public boolean isFinal() {
+        return isFinal;
     }
 
     /**
@@ -193,17 +211,6 @@ public abstract class ProgramVariable extends TermSymbol
     public KeYJavaType getKeYJavaType(Services javaServ, 
 				      ExecutionContext ec) {
 	return getKeYJavaType();
-    }
-
-    /**
-     *@return the annotations.
-     */
-    public Annotation[] getAnnotations(){
-	return new Annotation[0];
-    }
-
-    public int getAnnotationCount(){
-	return 0;
     }
 
     

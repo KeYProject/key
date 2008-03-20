@@ -102,7 +102,9 @@ public class TacletSchemaVariableCollector extends Visitor {
             varList = collectSVInQuanUpdateOperator(op, varList);
         } else if (op instanceof WhileInvRule) {
  	    varList = collectSVInProgram(t, varList);
- 	}
+ 	} else if (op instanceof SchemaVariableContainer) {
+ 	    varList = varList.prepend(((SchemaVariableContainer)op).collectSV(varList));
+        }
         
 	for (int j=0, ar = t.arity(); j<ar; j++) {
 	    for (int i=0, sz = t.varsBoundHere(j).size(); i<sz; i++) {

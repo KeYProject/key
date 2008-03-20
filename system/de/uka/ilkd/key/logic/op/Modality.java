@@ -25,7 +25,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 public class Modality extends Op implements NonRigid {
 
-    private static final HashMap nameMap = new HashMap(10);
+    private static final HashMap<String, Modality> nameMap = 
+        new HashMap<String, Modality>(10);
     
     private int arity=0;
 
@@ -48,7 +49,7 @@ public class Modality extends Op implements NonRigid {
 	nameMap.put(name.toString(), this);
     }
 
-    public static HashMap getNameMap() {
+    public static HashMap<String, Modality> getNameMap() {
 	return nameMap;
     }
 

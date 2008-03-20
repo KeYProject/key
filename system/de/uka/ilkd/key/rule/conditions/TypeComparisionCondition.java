@@ -47,8 +47,8 @@ public class TypeComparisionCondition extends VariableConditionAdapter {
     /**
      * creates a condition that checks if the declaration types of the
      * schemavariable's instantiations are unequal 
-     * @param fstType one of the SchemaVariable whose type is checked
-     * @param sndType one of the SchemaVariable whose type is checked
+     * @param fst one of the SchemaVariable whose type is checked
+     * @param snd one of the SchemaVariable whose type is checked
      * @param mode an int encoding if testing of not same or not compatible
      */
     public TypeComparisionCondition (TypeResolver fst, 

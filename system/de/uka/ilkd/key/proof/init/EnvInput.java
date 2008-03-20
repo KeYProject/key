@@ -9,10 +9,11 @@
 //
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.gui.LibrariesSettings;
+import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
 
 
-/** Represents an entity read to produce an environment to read a proof
+/** 
+ * Represents an entity read to produce an environment to read a proof
  * obligation. Environment means the initial configuration of a prover 
  * containing namespaces and Java model.
  */
@@ -22,7 +23,7 @@ public interface EnvInput {
      * Returns the name of this input.
      */
     String name();
-    
+
     /** 
      * Returns the total numbers of chars that can be read in this input.
      */
@@ -34,19 +35,23 @@ public interface EnvInput {
      */
     void setInitConfig(InitConfig initConfig);
     
-    /** reads the include section and returns an Includes object.  
+    /** 
+     * Reads the include section and returns an Includes object.  
      */
     Includes readIncludes() throws ProofInputException;
     
-    /** reads the libraries settings
+    /** 
+     * Reads the libraries settings.
      */
     LibrariesSettings readLibrariesSettings() throws ProofInputException;
     
-    /** reads the Java path.
+    /** 
+     * Reads the Java path.
      */
     String readJavaPath() throws ProofInputException;
     
-    /** reads the input using the given modification strategy, i.e.,
+    /** 
+     * Reads the input using the given modification strategy, i.e.,
      * parts of the input do not modify the initial configuration while
      * others do.
      */

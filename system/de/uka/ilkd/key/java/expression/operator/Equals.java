@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.java.expression.operator;
 
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.ExtList;
@@ -26,12 +27,19 @@ public class Equals extends ComparativeOperator {
      *      the first children in list will be the one on the left
      *      side, the second the one on the  right side.
      */
-
     public Equals(ExtList children) {
         super(children);
     }
 
-
+    /**
+     * Creates the equals expression <code>lhs==rhs</code>
+     * @param lhs the Expression on the left side of the comparison
+     * @param rhs the Expression on the right side of the comparison
+     */
+    public Equals(Expression lhs, Expression rhs) {
+        super (lhs, rhs);
+    }
+     
     /**
  *      Get precedence.
  *      @return the int value.

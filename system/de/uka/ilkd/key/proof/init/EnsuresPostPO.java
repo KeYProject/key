@@ -12,15 +12,12 @@ package de.uka.ilkd.key.proof.init;
 import java.util.Map;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.ldt.AbstractIntegerLDT;
-import de.uka.ilkd.key.logic.ldt.LDT;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ListOfProgramVariable;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.SLTranslationError;
+import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 
 
 /**
@@ -30,15 +27,26 @@ public class EnsuresPostPO extends EnsuresPO {
     
     private final OperationContract contract;
     
-    public EnsuresPostPO(OperationContract contract,
-                         Modality modality,
-                         InvariantSelectionStrategy invStrategy) {
-        super("EnsuresPost of " + contract.getModelMethod(), 
-              contract.getModelMethod(), 
-              modality,  
-              invStrategy,
+    public EnsuresPostPO(InitConfig initConfig, 
+                         String name,
+                         OperationContract contract, 
+                         SetOfClassInvariant assumedInvs) {
+        super(initConfig, 
+              name, 
+              contract.getProgramMethod(), 
+              contract.getModality(), 
+              assumedInvs, 
               true);
         this.contract = contract;
+    }
+
+
+    public EnsuresPostPO(InitConfig initConfig, OperationContract contract,
+            SetOfClassInvariant assumedInvs) {
+        this(initConfig, 
+             "EnsuresPost", 
+             contract, 
+             assumedInvs);
     }
     
     
@@ -46,8 +54,9 @@ public class EnsuresPostPO extends EnsuresPO {
                               ListOfProgramVariable paramVars, 
                               ProgramVariable resultVar,
                               ProgramVariable exceptionVar,
-                              Map atPreFunctions) throws SLTranslationError {      
-        return translatePre(contract, selfVar, toPV(paramVars));
+                              Map<Operator, Function/*atPre*/> atPreFunctions) throws ProofInputException {
+        Term result = translatePre(contract, selfVar, toPV(paramVars));
+        return result;
     }
     
     
@@ -55,20 +64,22 @@ public class EnsuresPostPO extends EnsuresPO {
                                ListOfProgramVariable paramVars, 
                                ProgramVariable resultVar,
                                ProgramVariable exceptionVar,
-                               Map atPreFunctions) throws SLTranslationError {        
+                               Map<Operator, Function/*atPre*/> atPreFunctions) throws ProofInputException {        
         Term result = translatePost(contract, 
                                     selfVar, 
                                     toPV(paramVars), 
                                     resultVar, 
-                                    exceptionVar);
+                                    exceptionVar,
+                                    atPreFunctions);
        
-        //add implicit postcondition
-        Term implicitPostTerm = tb.tt();
+        //add implicit postcondition (see discussion for Bug #789) 
+        /*
+        Term implicitPostTerm = TB.tt();
         if(resultVar != null) {
             if(resultVar.sort() instanceof ObjectSort) {       
                 implicitPostTerm 
                    = createdFactory.createCreatedOrNullTerm(services, 
-                                                            tb.var(resultVar));
+                                                            TB.var(resultVar));
             } else {
         	LDT ldt 
         	    = services.getTypeConverter().getModelFor(resultVar.sort());
@@ -76,17 +87,33 @@ public class EnsuresPostPO extends EnsuresPO {
         	    Function inBoundsPredicate 
         	    	= ((AbstractIntegerLDT)ldt).getInBoundsPredicate();
         	    if(inBoundsPredicate != null) {
-        		implicitPostTerm = tb.func(inBoundsPredicate, 
-        					   tb.var(resultVar));
+        		implicitPostTerm = TB.func(inBoundsPredicate, 
+        					   TB.var(resultVar));
         	    }
         	}
             }
         }
-	final Term excNotNullTerm = tb.not(tb.equals(tb.var(exceptionVar), 
-	        tb.NULL(services)));
-        implicitPostTerm = tb.or(implicitPostTerm, excNotNullTerm);
-        result = tb.and(result, implicitPostTerm);
+	Term excNotNullTerm = TB.not(TB.equals(TB.var(exceptionVar), 
+			                       TB.NULL(services)));
+        implicitPostTerm = TB.or(implicitPostTerm, excNotNullTerm);
+        result = TB.and(result, implicitPostTerm);
+        */
 
         return result;
+    }
+    
+    
+    public boolean equals(Object o) {
+        if(!(o instanceof EnsuresPostPO)) {
+            return false;
+        }
+        EnsuresPostPO po = (EnsuresPostPO) o;
+        return super.equals(po)
+               && contract.equals(po.contract);
+    }
+    
+    
+    public int hashCode() {
+        return super.hashCode() + contract.hashCode();
     }
 }

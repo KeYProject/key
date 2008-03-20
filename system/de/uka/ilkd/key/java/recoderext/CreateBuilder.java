@@ -15,20 +15,22 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.List;
+
+import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer.TransformerCache;
+
 import recoder.CrossReferenceServiceConfiguration;
-import recoder.java.Identifier;
+import recoder.java.CompilationUnit;
+import recoder.java.Statement;
 import recoder.java.StatementBlock;
-import recoder.java.declaration.ClassDeclaration;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.TypeDeclaration;
-import recoder.java.declaration.modifier.Private;
+import recoder.java.declaration.*;
+import recoder.java.declaration.modifier.Public;
+import recoder.java.declaration.ParameterDeclaration;
 import recoder.java.expression.literal.BooleanLiteral;
 import recoder.java.expression.literal.IntLiteral;
-import recoder.java.reference.MethodReference;
-import recoder.java.reference.ThisReference;
-import recoder.java.reference.TypeReference;
+import recoder.java.reference.*;
 import recoder.java.statement.Return;
-import recoder.list.*;
+import recoder.list.generic.*;
 
 /**
  * If an allocation expression <code>new Class(...)</code> occurs, a new object
@@ -44,12 +46,11 @@ public class CreateBuilder extends RecoderModelTransformer {
 
     public static final String IMPLICIT_CREATE = "<create>";
 
-    public CreateBuilder
-	(CrossReferenceServiceConfiguration services, 
-	 CompilationUnitMutableList units) {	
-	super(services, units);
+    public CreateBuilder(
+            CrossReferenceServiceConfiguration services,
+            TransformerCache cache) {
+        super(services, cache);
     }
-
 
     /** 
      * Creates the body of the static <code>&lt;createObject&gt;</code>
@@ -57,7 +58,7 @@ public class CreateBuilder extends RecoderModelTransformer {
      */
     private StatementBlock createBody(ClassDeclaration recoderClass) {
 		
-	StatementMutableList result = new StatementArrayList(10);
+	ASTList<Statement> result = new ASTArrayList<Statement>(10);
 
 	
 	result.add
@@ -94,19 +95,18 @@ public class CreateBuilder extends RecoderModelTransformer {
      * @return the implicit <code>&lt;prepare&gt;</code> method
      */
     public MethodDeclaration createMethod(ClassDeclaration type) {
-	ModifierMutableList modifiers = new ModifierArrayList(2);
-	modifiers.add(new Private());
+	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(2);
+	modifiers.add(new Public());        
 	MethodDeclaration md =  new MethodDeclaration
 	    (modifiers, 
-	     new TypeReference
-	     ((Identifier)type.getIdentifier().deepClone()), 
+	     new TypeReference(getId(type)), 
 	     new ImplicitIdentifier(IMPLICIT_CREATE), 
-	     new ParameterDeclarationArrayList(0), 
+	     new ASTArrayList<ParameterDeclaration>(0), 
 	     null,
 	     createBody(type));
 	md.makeAllParentRolesValid();
 	return md;
-    }    
+    }
 
 
     /**

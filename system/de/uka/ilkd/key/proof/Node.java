@@ -27,7 +27,7 @@ public class Node {
 
     private Sequent              seq                 = Sequent.EMPTY_SEQUENT;
 
-    private List                 children            = new LinkedList();
+    private List<Node>           children            = new LinkedList<Node>();
 
     private Node                 parent              = null;
 
@@ -95,7 +95,7 @@ public class Node {
      * of children (all elements must be of class Node) and the given
      * parent node.
      */
-    public Node(Proof proof, Sequent seq, List children,
+    public Node(Proof proof, Sequent seq, List<Node> children,
 		Node parent, Sink branchSink) {
 	this.proof = proof;
 	this.seq=seq;	
@@ -122,7 +122,7 @@ public class Node {
      * the node information object encapsulates non-logical information
      * of the node, e.g.  
      * 
-     * @return
+     * @return the NodeInfo containing non-logical information
      */
     public NodeInfo getNodeInfo() {
         return nodeInfo;
@@ -208,7 +208,7 @@ public class Node {
 	if ( p_node.root () )
 	    return p_node;
 
-	HashSet paths = new HashSet ();
+	HashSet<Node> paths = new HashSet<Node> ();
 	Node    n     = this;
 
 	while ( true ) {
@@ -333,9 +333,9 @@ public class Node {
 	if (children.remove(child)) {
 	    child.parent = null;
             
-            final ListIterator it = children.listIterator(child.siblingNr);
+            final ListIterator<Node> it = children.listIterator(child.siblingNr);
             while (it.hasNext()) {
-                ((Node)it.next()).siblingNr--;                
+                it.next().siblingNr--;                
             }
             child.siblingNr = -1;
 	    proof().fireProofPruned(this, child);
@@ -349,12 +349,12 @@ public class Node {
     /**
      * computes the leaves of the current subtree and returns them
      */
-    private List leaves() {
-	final List leaves = new LinkedList();       
-	final LinkedList nodesToCheck = new LinkedList();
+    private List<Node> leaves() {
+	final List<Node> leaves = new LinkedList<Node>();       
+	final LinkedList<Node> nodesToCheck = new LinkedList<Node>();
 	nodesToCheck.add(this);
 	while (!nodesToCheck.isEmpty()) {
-	    final Node n = (Node)nodesToCheck.removeFirst();
+	    final Node n = nodesToCheck.removeFirst();
 	    if (n.leaf()) {
 		leaves.add(n);
 	    } else {
@@ -369,13 +369,13 @@ public class Node {
      * returns an iterator for the leaves of the subtree below this
      * node. The computation is called at every call!
      */
-    public IteratorOfNode leavesIterator() {
+    public NodeIterator leavesIterator() {
 	return new NodeIterator(leaves().iterator());
     }
 
     /** returns an iterator for the direct children of this node.
      */
-    public IteratorOfNode childrenIterator() {
+    public NodeIterator childrenIterator() {
 	return new NodeIterator(children.iterator());
     }
 
@@ -396,7 +396,7 @@ public class Node {
      */
     public int getChildNr ( Node p_node ) {
 	int            res = 0;
-	IteratorOfNode it  = childrenIterator ();
+	final Iterator<Node> it  = childrenIterator ();
 	
 	while ( it.hasNext () ) {
 	    if ( it.next () == p_node )
@@ -425,7 +425,7 @@ public class Node {
 				  int maxNr,
 				  int ownNr
 				  ) {       
-	IteratorOfNode childrenIt = childrenIterator(); 	
+	Iterator<Node> childrenIt = childrenIterator(); 	
 	// Some constants
 	String frontIndent=(maxNr>1 ? " " : "");
 	String backFill="   "; // same length as connectNode without
@@ -513,9 +513,9 @@ public class Node {
         return text;
     }   
     
-    private static Vector reuseCandidates = new Vector(20);
+    private static Vector<Node> reuseCandidates = new Vector<Node>(20);
     
-    public static Iterator reuseCandidatesIterator() {
+    public static Iterator<Node> reuseCandidatesIterator() {
         return reuseCandidates.iterator();
     }
 
@@ -540,24 +540,19 @@ public class Node {
     }
     
     public static void clearReuseCandidates() {
-       Enumeration en = reuseCandidates.elements();
-       while (en.hasMoreElements()) {
-          Node n = (Node) en.nextElement();
-          n.reuseCandidate = 0;
-          n.persistentCandidate = false;
+       for (Node n : reuseCandidates) {
+           n.reuseCandidate = 0;
+           n.persistentCandidate = false;
        }
-       reuseCandidates = new Vector(20);
+       reuseCandidates = new Vector<Node>(20);
     }
     
     public static void clearReuseCandidates(Proof p) {
-       Enumeration en = reuseCandidates.elements();
-       while (en.hasMoreElements()) {
-          Node n = (Node) en.nextElement();
+       for (Node n : reuseCandidates) {
           if (n.proof() == p) reuseCandidates.remove(n);
        }
     }
     
-
     public boolean isReuseCandidate() {
        return reuseCandidate>0;
     }
@@ -587,7 +582,7 @@ public class Node {
 	    }
 	}
 	if (!leaf()) {
-	    IteratorOfNode it=childrenIterator();
+	    final Iterator<Node> it = childrenIterator();
 	    while (it.hasNext()) {
 		if (!it.next().sanityCheckDoubleLinks())
 		    return false;
@@ -634,11 +629,11 @@ public class Node {
 
     
     public void setClosed() {
-	final LinkedList subTreeNodes = new LinkedList();
+	final LinkedList<Node> subTreeNodes = new LinkedList<Node>();
 	subTreeNodes.add(this);	
 	while (!subTreeNodes.isEmpty()) {
 	    final Node n = (Node)subTreeNodes.removeFirst();
-	    n.closed = true;
+	    n.closed = true;	    
 	    subTreeNodes.addAll(n.children);
 	}
     }
@@ -652,10 +647,9 @@ public class Node {
      */
     public int countNodes() {
 	int nodes = 1 + children.size();
-	final LinkedList nodesToAdd = (LinkedList)
-	    ((LinkedList)children).clone();
+	final LinkedList<Node> nodesToAdd = new LinkedList<Node>(children);
 	while (!nodesToAdd.isEmpty()) {
-	    final Node n = (Node)nodesToAdd.removeFirst();
+	    final Node n = nodesToAdd.removeFirst();
 	    nodesToAdd.addAll(n.children);
 	    nodes += n.children.size();
 	}
@@ -685,10 +679,10 @@ public class Node {
    
 
     // inner iterator class 
-    private class NodeIterator implements IteratorOfNode {
-	private Iterator it;
+    public static class NodeIterator implements Iterator<Node>, IteratorOfNode {
+	private Iterator<Node> it;
 	
-	NodeIterator(Iterator it) {
+	NodeIterator(Iterator<Node> it) {
 	    this.it=it;
 	}
 
@@ -697,9 +691,27 @@ public class Node {
 	}
 
 	public Node next() {
-	    return (Node)it.next();
+	    return it.next();
+	}
+
+	public void remove() {
+	    throw new UnsupportedOperationException("Changing the proof tree " +
+	    		"structure this way is not allowed.");
 	}
     }
 
+    private int getIntroducedRulesCount() {
+        int c = 0;
+
+        if (parent != null) {
+            c = parent.getIntroducedRulesCount();
+        }
+
+        return c + localIntroducedRules.size();
+    }
+
+    public int getUniqueTacletNr() {
+        return getIntroducedRulesCount();
+    }
 
  }

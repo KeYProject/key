@@ -16,8 +16,6 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.util.HashMap;
-
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -55,17 +53,20 @@ public class InnerVariableNamer extends VariableNamer {
 	ProgramElementName name = var.getProgramElementName();
 	BasenameAndIndex bai = getBasenameAndIndex(name);
 	Globals globals = wrapGlobals(goal.getGlobalProgVars());
-	map = new HashMap();
+	map.clear();
 
 	//prepare renaming of inner var
 	final NameCreationInfo nci = getMethodStack(posOfFind);
 	ProgramElementName newname = createName(bai.basename, bai.index, nci);
-	if(!isUniqueInGlobals(newname.toString(), globals)) {
-	    int newcounter = getMaxCounterInGlobalsAndProgram(
-	    					bai.basename,
-					    	globals,
-					    	getProgramFromPIO(posOfFind),
-					    	null) + 1; 
+        int newcounter = getMaxCounterInGlobalsAndProgram(
+                        bai.basename,
+                        globals,
+                        getProgramFromPIO(posOfFind),
+                        null);
+        final NamespaceSet namespaces = goal.proof().getServices().getNamespaces();
+        while (!isUniqueInGlobals(newname.toString(), globals) ||
+                namespaces.lookupLogicSymbol(newname)!=null) {
+	    newcounter += 1; 
 	    newname = createName(bai.basename, newcounter, nci);
 	}
         
@@ -77,7 +78,7 @@ public class InnerVariableNamer extends VariableNamer {
             map.put(var, newvar);
             renamingHistory = map;
             //execute renaming
-            ProgVarReplacer pvr = new ProgVarReplacer(map);
+            ProgVarReplacer pvr = new ProgVarReplacer(map, services);
             pvr.replace(goal);
         }
         

@@ -33,6 +33,7 @@ import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.inst.RigidnessException;
 import de.uka.ilkd.key.rule.inst.SortException;
+import de.uka.ilkd.key.util.Array;
 
 
 public class TacletInstantiationsTableModel extends AbstractTableModel {
@@ -175,17 +176,18 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 
 
     /** parses the given string that represents the term (or formula)
-     * using the given variable namespace and the default namespaces
-     * for functions and sorts
+     * using the given variable namespace and the given namespace
+     * for functions and default namespaces for the others
      * @param s the String to parse
-     * @param sort the expected sort
      * @param varNS the variable namespace
+     * @param functNS the function namespace
      */
-    public Term parseTerm(String s, Namespace varNS)
+    public Term parseTerm(String s, Namespace varNS, Namespace functNS)
         throws ParserException
     {
         NamespaceSet copy = nss.copy();
         copy.setVariables(varNS);
+        copy.setFunctions(functNS);
         Term term = TermParserFactory.createInstance().parse(
            new StringReader(s), null, services, copy, scm);
         return term;
@@ -273,9 +275,11 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
      * entry in the row
      *
      * @param irow the row to be parsed
+     * @param varNS the variable namespace that will be passed to parseTerm
+     * @param functNS the function namespace that will be passed to parseTerm
      * @return the parsed term
      */
-    private Term parseRow(int irow, Namespace varNS)
+    private Term parseRow(int irow, Namespace varNS, Namespace functNS)
         throws SVInstantiationParserException,
                MissingInstantiationException {
 
@@ -286,7 +290,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
         }
 
         try {
-            return parseTerm(instantiation, varNS);
+            return parseTerm(instantiation, varNS, functNS);
         } catch (ParserException pe) {
             Location loc = pe.getLocation();
             if (loc != null) {
@@ -367,12 +371,13 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 					    getContextInstantiation().activeStatementContext());
 		    if(nvc.isDefinedByElementSort()){
 		        Sort s = kjt.getSort();
-			if(s instanceof ArraySort) s = ((ArraySort)s).elementSort();
+			if(s instanceof ArraySort) s = ((ArraySort)s).elementSort();              
 			kjt = javaInfo.getKeYJavaType(s);
 		    }
 		} else {
 		    kjt = javaInfo.getKeYJavaType((Sort)o);
 		}
+                assert kjt != null;
 		return new LocationVariable
 		    (VariableNamer.parseName(instantiation), kjt);
 	    }
@@ -483,7 +488,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 		    } else {
 		        // sv.isSkolemTermSV ()
                         
-                        Named n = services.getNamespaces().
+                        Named n = namespaces().
                             lookupLogicSymbol(new Name(idd.getName()));
                         if (n == null) { 
                             result = result.createSkolemConstant
@@ -528,7 +533,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
                 } else if (sv.isListSV()){
                     try{
                         SetOfLocationDescriptor s = parseLocationList(irow);
-                        result = result.addInstantiation(sv, s.toArray(), true);
+                        result = result.addInstantiation(sv, Array.reverse(s.toArray()), true);
                     }catch (ParserException pe) {
                         Location loc = pe.getLocation();
                         if (loc != null) {
@@ -553,7 +558,10 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
                         final Namespace extVarNS =
                             result.extendVarNamespaceForSV(nss.variables(), sv);
                         
-                        final Term instance = parseRow(irow, extVarNS);
+                        Namespace functNS =
+                            result.extendedFunctionNameSpace(nss.functions());
+                        
+                        final Term instance = parseRow(irow, extVarNS, functNS);
                         sort = instance.sort ();                    
                         
                         try {

@@ -54,6 +54,16 @@ public class ArrayInitializer
 	this.children = 
 	    new ArrayOfExpression((Expression[])list.collect(Expression.class));
     }
+    
+    /**
+     * create a new array initializer with the given expressions as elements.
+     * @param expressions a list of all contained elements
+     */
+    public ArrayInitializer(Expression[] expressions) {
+        super();
+        this.children = new ArrayOfExpression(expressions);
+    }
+    
 
 
     /**

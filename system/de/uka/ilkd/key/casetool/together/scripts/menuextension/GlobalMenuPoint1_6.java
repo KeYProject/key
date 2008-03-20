@@ -14,7 +14,7 @@ package de.uka.ilkd.key.casetool.together.scripts.menuextension;
 
 import com.togethersoft.openapi.ide.window.IdeWindowManager;
 
-import de.uka.ilkd.key.gui.ProofSettings;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 
 
 public class GlobalMenuPoint1_6 implements GlobalMenu{

@@ -26,7 +26,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.proof.mgt.Contract;
 import de.uka.ilkd.key.rule.Taclet;
 
 public class TacletView implements ActionListener{
@@ -57,8 +56,8 @@ public class TacletView implements ActionListener{
         content.setWrapStyleWord(true);
 
         scrollPane = new JScrollPane(content,
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         scrollPane.setWheelScrollingEnabled(true);
 
@@ -84,8 +83,6 @@ public class TacletView implements ActionListener{
         Taclet tac = null;
         if (node.getUserObject() instanceof Taclet) {
             tac = (Taclet) node.getUserObject();        
-        } else if (node.getUserObject() instanceof Contract) {
-            tac = null; //TODO ((Contract)node.getUserObject()).getLemmaAndRegister();
         } else return;
         scrollPane.setBorder(BorderFactory.createTitledBorder
                 (getDisplayName(tac)));

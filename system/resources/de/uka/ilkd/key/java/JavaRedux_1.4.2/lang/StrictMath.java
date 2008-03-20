@@ -3,7 +3,6 @@
 package java.lang;
 
 import java.util.Random;
-import gnu.classpath.Configuration;
 public final strictfp class StrictMath {
     private StrictMath() {}
     public static final double E = 2.718281828459045;

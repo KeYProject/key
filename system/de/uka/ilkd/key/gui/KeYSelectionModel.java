@@ -137,7 +137,7 @@ public class KeYSelectionModel {
 	private int            currentPos = POS_START;
 	private Goal           nextOne;
 	private IteratorOfGoal goalIt;
-	private IteratorOfNode nodeIt;
+	private Iterator<Node> nodeIt;
 
 	public  DefaultSelectionIterator () {
 	    findNext ();
@@ -184,6 +184,10 @@ public class KeYSelectionModel {
 
 	public  boolean hasNext          () {
 	    return nextOne != null;
+	}
+	
+	public void remove() {
+	    throw new UnsupportedOperationException();
 	}
     }
 
@@ -278,7 +282,7 @@ public class KeYSelectionModel {
      * <code>null</code> is returned if no such goal exists.
      */
     private Goal getFirstOpenGoalBelow(Node n) {
-        final IteratorOfNode it = n.leavesIterator();
+        final Iterator<Node> it = n.leavesIterator();
         while (it.hasNext()) {
             final Node node =it.next();
             if (!node.isClosed()) {
