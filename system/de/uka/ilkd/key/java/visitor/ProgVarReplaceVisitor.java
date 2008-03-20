@@ -171,11 +171,15 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 	    }
 	} else {
 	    Term subTerms[] = new Term[t.arity()];
-	    ArrayList vars = new ArrayList();
+	    ArrayList<QuantifiableVariable> vars 
+	    	= new ArrayList<QuantifiableVariable>();
 	    for ( int i = 0; i<t.arity(); i++ ) {
 		ArrayOfQuantifiableVariable vbh = t.varsBoundHere(i);
 		for( int j=0; j<vbh.size(); j++ ) {
-		    vars.add(vbh.getQuantifiableVariable(j));
+		    QuantifiableVariable var = vbh.getQuantifiableVariable(j);
+		    if(!vars.contains(var)) {
+			vars.add(var);
+		    }
 		}
 		subTerms[i] = replaceVariablesInTerm(t.sub(i));
 	    }
@@ -197,7 +201,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 		op = t.op();
 	    }
 	    QuantifiableVariable v1[] = new QuantifiableVariable[0];
-	    v1 = (QuantifiableVariable[])(vars.toArray(v1));
+	    v1 = vars.toArray(v1);
 	    JavaBlock jb = t.javaBlock();
 	    return TermFactory.DEFAULT.createTerm(op,subTerms,v1,jb);
 	}
