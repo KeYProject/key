@@ -154,15 +154,6 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
     }
 
     /**
-     * Test whether the declaration is strictly pure (the jml modifier is meant).
-     */
-
-    protected boolean isStrictlyPure() {
-        return true;
-        // TODO: return containsModifier(StrictlyPure.class);
-    }
-
-    /**
      * Test whether the declaration is volatile.
      */
 

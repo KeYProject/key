@@ -238,19 +238,6 @@ public class ProgramMethod extends NonRigidFunction
     }
 
     /**
-     * Tests for an annotation for methods that do not have any side effects
-     * 
-     * (i.e. \@pure + does not create any object, and thus does not modify
-     * implicit fields)
-     * 
-     * @param services
-     * @return true, iff the method is annotated as "strictly_pure"
-     */
-   public boolean isStrictlyPure(){
-        return method.isStrictlyPure();
-    }
-
-    /**
      * Test whether the declaration is a constructor.
      */
     public boolean isConstructor(){
