@@ -54,7 +54,6 @@ public class HoareLoopInvRuleMenuItem extends JMenuItem implements BuiltInRuleMe
      * using the given variable namespace and the default namespaces
      * for functions and sorts
      * @param s the String to parse
-     * @param sort the expected sort
      * @param varNS the variable namespace
      */
     private Term parseTerm(String s, Namespace varNS)

@@ -93,7 +93,7 @@ public class HoareLogicPrettyPrinter extends LogicPrinter {
 
     /** returns the index of the first formula containing a program or <tt>-1</tt>
      * if no such formula exists
-     * @param semi the Semisequent to search through
+     * @param it the IteratorOfConstrainedFormula to search through
      * @return the index of the formula containing a program or <tt>-1</tt>
      */
     private int findProgramFormula(IteratorOfConstrainedFormula it) {
@@ -111,7 +111,7 @@ public class HoareLogicPrettyPrinter extends LogicPrinter {
 
     /** returns the index of the first formula containing an update on top level 
      * or <tt>-1</tt> if no such formula exists
-     * @param semi the Semisequent to search through
+     * @param it the IteratorOfConstrainedFormula to search through
      * @return the index of the formula containing an update or <tt>-1</tt>
      */
     private int findUpdateFormula(IteratorOfConstrainedFormula it) {
@@ -131,7 +131,7 @@ public class HoareLogicPrettyPrinter extends LogicPrinter {
      * returns if a formula contains a program. Attention: the implementation 
      * makes heavy usage of the assumptions stated in the class comment
      * @param formula
-     * @return
+     * @return true if the formula contains a program
      */
     private boolean hasProgram(Term formula) {
         final Operator op = formula.op();
@@ -1068,8 +1068,7 @@ public class HoareLogicPrettyPrinter extends LogicPrinter {
             Term succPreserve) {
         Term et = tb.func((Function) services.getNamespaces().functions()
                 .lookup(HoareLoopInvariantRule.EXECTIME));
-        final Function addF = services.getTypeConverter().getIntegerLDT()
-                .getArithAddition();
+        final Function addF = services.getTypeConverter().getIntegerLDT().getAdd();
         final Update etPlusOne = uf.elementaryUpdate(et, tb.func(addF, et, tb
                 .one(services)));
         succPreserve = uf.prepend(etPlusOne, succPreserve);

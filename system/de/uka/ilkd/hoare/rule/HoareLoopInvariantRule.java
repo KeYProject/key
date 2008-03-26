@@ -212,7 +212,7 @@ public class HoareLoopInvariantRule implements BuiltInRule {
 
 
         final Function addF = 
-            services.getTypeConverter().getIntegerLDT().getArithAddition();
+            services.getTypeConverter().getIntegerLDT().getAdd();
 
         target = 
             uf.apply(uf.elementaryUpdate(execTime, 

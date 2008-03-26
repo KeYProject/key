@@ -15,53 +15,47 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 
 public class HoareUserProblemFile extends KeYUserProblemFile {
 
-    public HoareUserProblemFile(String name, File file, ProgressMonitor monitor, boolean parseJMLSpecs) {
-        super(name, file, monitor, parseJMLSpecs);
-    }
-
     public HoareUserProblemFile(String name, File file, ProgressMonitor monitor) {
         super(name, file, monitor);
     }
 
-    public void readHelp(ModStrategy mod, boolean problemOnly) 
+    public void readProblem(ModStrategy mod, boolean problemOnly) 
     throws ProofInputException {
         if(file == null) return;
         if (initConfig==null) {
-            throw new IllegalStateException("KeYFile: InitConfig not set.");
+            throw new IllegalStateException("KeYUserProblemFile: InitConfig not set.");
         }
+        
         try {
-            final CountingBufferedInputStream cinp = 
+            CountingBufferedInputStream cinp = 
                 new CountingBufferedInputStream
-                (getNewStream(),monitor,getNumberOfChars()/100);
-            final DeclPicker lexer = new DeclPicker(new KeYLexer(cinp,initConfig.getServices().getExceptionHandler()));
+                    (getNewStream(),monitor,getNumberOfChars()/100);
+            DeclPicker lexer = new DeclPicker(new KeYLexer(cinp,initConfig.getServices().getExceptionHandler()));
 
-            /*
-              two namespace sets which share all namespace except the
-              variable namespace                      
-             */
             final NamespaceSet normal = initConfig.namespaces().copy();
-            final NamespaceSet schema = setupSchemaNamespace(normal);           
+            final NamespaceSet schema = setupSchemaNamespace(normal);
+            
             final ParserConfig normalConfig 
-            = new ParserConfig(initConfig.getServices(), normal);
-
+                = new ParserConfig(initConfig.getServices(), normal);
             final ParserConfig schemaConfig 
-            = new ParserConfig(initConfig.getServices(), schema);
-            problemParser = new KeYParser(ParserMode.PROBLEM, lexer, 
-                    file.toString(), 
-                    schemaConfig, 
-                    normalConfig,
-                    initConfig.getTaclet2Builder(),
-                    initConfig.getTaclets(), 
-                    initConfig.getActivatedChoices()); 
-            if (problemOnly) {
-                problemTerm = problemParser.parseProblem();
-            } else {
-                problemTerm = problemParser.problem();
+                = new ParserConfig(initConfig.getServices(), schema);
+            
+            KeYParser problemParser 
+                    = new KeYParser(ParserMode.PROBLEM, 
+                                    lexer, 
+                                    file.toString(), 
+                                    schemaConfig, 
+                                    normalConfig,
+                                    initConfig.getTaclet2Builder(),
+                                    initConfig.getTaclets(), 
+                                    initConfig.getActivatedChoices()); 
+            problemTerm = problemParser.parseProblem();
+
+            if(problemTerm == null) {
+                throw new ProofInputException("No \\problem or \\chooseContract in the input file!");
             }
 
-            String[] searchS = {"\\problem", "\\hoare"};
-
-           
+            String[] searchS = {"\\problem", "\\hoare"};         
             
             setProblemHeader(lexer.getText());
             for (int i = 0; i<searchS.length; i++) {
@@ -73,13 +67,10 @@ public class HoareUserProblemFile extends KeYUserProblemFile {
                 }
 
             }
-            
             initConfig.setTaclets(problemParser.getTaclets());
             initConfig.add(normalConfig.namespaces(), mod);
-            if(!problemOnly) {
-                initConfig.getProofEnv().addMethodContracts(
-                        problemParser.getContracts(), getProblemHeader());
-            }
+
+            lastParser = problemParser;
         } catch (antlr.ANTLRException e) {
             throw new ProofInputException(e);
         } catch (FileNotFoundException fnfe) {

@@ -22,10 +22,7 @@ import java.util.Vector;
 import de.uka.ilkd.hoare.init.HoareProfile;
 import de.uka.ilkd.hoare.rule.HoareLoopInvRuleApp;
 import de.uka.ilkd.hoare.rule.HoareLoopInvariantRule;
-import de.uka.ilkd.key.gui.ExceptionDialog;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.SwingWorker;
+import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -33,6 +30,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.parser.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAuflia;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
 import de.uka.ilkd.key.rule.*;
@@ -40,9 +38,7 @@ import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.Array;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
-
 import de.uka.ilkd.key.util.ProgressMonitor;
-import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAuflia;
 
 public class ProblemLoader implements Runnable {
 
@@ -197,8 +193,6 @@ public class ProblemLoader implements Runnable {
                 // KeY problem specification or saved proof
                 return new KeYUserProblemFile(filename, file, pm);
             }            
-            // KeY problem specification or saved proof
-            return new KeYUserProblemFile(filename, file, pm);
         } else if (file.isDirectory()){ 
             // directory containing java sources, probably enriched 
             // by specifications

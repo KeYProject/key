@@ -482,19 +482,13 @@ public class KeYMediator {
 	}
     }
      
-    /** selected rule to apply
-     * @param rule the selected built-in rule
-     * @param pos the PosInSequent describes the position where to apply the
-     * rule 
+    /** 
+     * apply the Hoare Loop rule using the given application information
      */
     public boolean selectedHoareLoopInvRule(HoareLoopInvRuleApp app) {
         if (app == null) return false;
         Goal goal = keySelectionModel.getSelectedGoal();
-        Debug.assertTrue(goal != null);        
-        if (!getProof().mgt().ruleApplicable(app, goal)) {
-            barfRuleNotApplicable(app);
-            return false;
-        }
+        assert (goal != null);        
         applyInteractive(app, goal); 
         return true;
     }

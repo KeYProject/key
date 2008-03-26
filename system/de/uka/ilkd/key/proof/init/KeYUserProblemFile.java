@@ -32,7 +32,7 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
     protected Term problemTerm = null;
     private String problemHeader = "";
     
-    private KeYParser lastParser;
+    protected KeYParser lastParser;
     
     
     //-------------------------------------------------------------------------

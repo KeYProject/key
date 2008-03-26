@@ -50,7 +50,7 @@ public class KeYFile implements EnvInput {
     private String javaPath;
     private boolean javaPathAlreadyParsed=false;
 
-    private ProofSettings settings;
+    protected ProofSettings settings;
     
     private InputStream input;
     
