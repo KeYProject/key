@@ -209,6 +209,7 @@ public class TypeConverter extends TermBuilder {
 	}	
 	
 	LDT responsibleLDT = null;
+	
 	if (intLDT.isResponsible(op, subs, services, ec)) {
 	    responsibleLDT = intLDT;
 	} else if (booleanLDT.isResponsible(op, subs, services, ec)
@@ -246,7 +247,7 @@ public class TypeConverter extends TermBuilder {
 	    Debug.out("typeconverter: no data type model "+
 		      "available to convert:", op, op.getClass());		
 	    throw new IllegalArgumentException("TypeConverter could not handle"
-					       +" this");
+					       +" this " + op + op != null ? op.getClass()+"": "");
 	}
 	return func(responsibleLDT.getFunctionFor(op, services, ec), subs);
     }
@@ -426,9 +427,10 @@ public class TypeConverter extends TermBuilder {
         } else if (pe instanceof Instanceof) {
 	    return convertToInstanceofTerm((Instanceof)pe, ec);
 	} else if (pe instanceof de.uka.ilkd.key.java.expression.Operator) {
+	    // otherwise we get an exception when translating e.g. a + 1
 	    return translateOperator
 		((de.uka.ilkd.key.java.expression.Operator)pe,
-		 intLDT, booleanLDT, ec);
+		 integerLDT, booleanLDT, ec);
 	} else if (pe instanceof PrimitiveType) {
 	    throw new IllegalArgumentException("TypeConverter could not handle"
 					       +" this primitive type");

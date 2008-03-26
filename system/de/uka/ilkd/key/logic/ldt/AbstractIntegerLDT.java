@@ -408,6 +408,7 @@ public abstract class AbstractIntegerLDT extends LDT {
      */
     public boolean isResponsible(Operator op, Term left, Term right, 
             Services services, ExecutionContext ec) {
+        
         if (left!=null && left.sort().extendsTrans(targetSort()) 
                 && right!=null && right.sort().extendsTrans(targetSort())) {
             if (getFunctionFor(op, services, ec) != null) {
