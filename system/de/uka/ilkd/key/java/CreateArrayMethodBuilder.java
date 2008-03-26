@@ -10,6 +10,8 @@ package de.uka.ilkd.key.java;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
@@ -51,7 +53,8 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
     // as these methods are thought to be only preliminary(we cache some
     // information here)
-    private final HashMap cache = new HashMap(3);
+    private final Map<String, ProgramVariable> cache = 
+        new HashMap<String, ProgramVariable>(3);
 
     /**
      * keeps the currently used integer type
@@ -77,8 +80,8 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * @return the statements which take the next object out of the list of
      *         available objects
      */
-    protected LinkedList createArray(ListOfField fields) {
-        LinkedList result = new LinkedList();
+    protected List<Statement> createArray(ListOfField fields) {
+        LinkedList<Statement> result = new LinkedList<Statement>();
         ListOfField implicitFields = filterImplicitFields(fields);
 
         // declared only in Object so we have to look there
@@ -183,7 +186,7 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     }
 
     protected ProgramVariable findInObjectFields(String name) {
-        ProgramVariable var = (ProgramVariable) cache.get(name);
+        ProgramVariable var = cache.get(name);
         if (var == null && objectType.getJavaType() != null) {
             final ListOfField objectFields = filterImplicitFields(filterField(((ClassDeclaration) objectType
                     .getJavaType()).getMembers()));
@@ -230,7 +233,7 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         final ProgramVariable newObject = (ProgramVariable) local
                 .getVariables().getVariableSpecification(0)
                 .getProgramVariable();
-        final LinkedList body = new LinkedList();
+        final LinkedList<Statement> body = new LinkedList<Statement>();
 
         body.addLast(local);
         body.addLast(assign(
@@ -249,8 +252,7 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
         body.add(new Return(newObject));
 
-        return new StatementBlock((Statement[]) body.toArray(new Statement[body
-                .size()]));
+        return new StatementBlock(body.toArray(new Statement[body.size()]));
     }
 
     /**
@@ -266,8 +268,6 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      *            <code>length</length> of the array 
      * @param paramLength the ProgramVariable which is the parameter of
      *   the <code>&lt;createArray&gt;</code> method
-     * @param prepare the ProgramMethod <code>&lt;prepare&gt;()</code>
-     *   which will be called when executing
      * <code>&lt;createArray&gt;</code> 
      * @param fields the ListOfFields of the current array
      * @param createTransient a boolean indicating if a transient array has 
@@ -293,7 +293,7 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
         final ThisReference thisRef = new ThisReference();
 
-        final LinkedList body = createArray(fields);
+        final List<Statement> body = createArray(fields);
 
         body.add(assign(attribute(thisRef, length), paramLength));
 
@@ -313,8 +313,7 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
         body.add(new Return(thisRef));
 
-        return new StatementBlock((Statement[]) body.toArray(new Statement[body
-                .size()]));
+        return new StatementBlock(body.toArray(new Statement[body.size()]));
     }
 
     /**

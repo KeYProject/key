@@ -68,7 +68,6 @@ public class ConditionalFeature implements Feature {
      * @param cond the filter that decides which value is to be returned
      * @param thenFeature the feature that is evaluted, if <code>filter</code>
      * returns true
-     * @param elseValue the value of the feature, if <code>filter</code>
      * returns false
      */
     public static Feature createConditional (RuleFilter cond,

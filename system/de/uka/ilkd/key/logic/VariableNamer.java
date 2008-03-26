@@ -10,7 +10,8 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import de.uka.ilkd.key.collection.IteratorOfString;
 import de.uka.ilkd.key.collection.ListOfString;
@@ -71,10 +72,10 @@ public abstract class VariableNamer implements InstantiationProposer {
     /**
      * pointer to services object
      */
-    private final Services services;
+    protected final Services services;
 
-    protected HashMap map = new HashMap();
-    protected HashMap renamingHistory = new HashMap();
+    protected final Map map = new LinkedHashMap();
+    protected Map renamingHistory = new LinkedHashMap();
 
     //-------------------------------------------------------------------------
     //constructors
@@ -122,7 +123,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     }
 
 
-    public HashMap getRenamingMap(){
+    public Map getRenamingMap(){
 	return renamingHistory;
     }
 
@@ -348,7 +349,14 @@ public abstract class VariableNamer implements InstantiationProposer {
      */
     public abstract ProgramVariable rename(ProgramVariable var,
                                            Goal goal,
-                                           PosInOccurrence posOfFind);
+                                           PosInOccurrence posOfFind,
+                                           Name proposal);
+
+    public ProgramVariable rename(ProgramVariable var,
+                                           Goal goal,
+                                           PosInOccurrence posOfFind) {
+        return rename(var, goal, posOfFind, null);
+    }
 
     
     
@@ -369,7 +377,7 @@ public abstract class VariableNamer implements InstantiationProposer {
  	} else {
             int lastDotIndex = name.lastIndexOf('.');
             if(lastDotIndex != -1) {
-                name = name.substring(lastDotIndex + 1);   
+                name = "v_"+name.substring(lastDotIndex + 1);   
             }
             result = name.substring(0, 1).toLowerCase() + name.substring(1);
         }
@@ -503,6 +511,10 @@ public abstract class VariableNamer implements InstantiationProposer {
 		    }
 		}
 	    }
+        }
+        
+        if(!(var instanceof SortedSchemaVariable)) {
+            return null;
         }
        
 	//get the proposal
@@ -855,6 +867,10 @@ public abstract class VariableNamer implements InstantiationProposer {
 	public ProgramElementName next() {
 	    return (ProgramElementName)(it.next().name());
 	}
+	      
+        public void remove() {
+            it.remove();
+        }
     }
 
 
@@ -875,6 +891,10 @@ public abstract class VariableNamer implements InstantiationProposer {
 
 	public ProgramElementName next() {
 	    return it.next().getProgramElementName();
+	}
+	
+	public void remove() {
+	    it.remove();
 	}
     }
 

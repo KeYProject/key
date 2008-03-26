@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.logic;
 
+import java.util.Iterator;
+
 public class NamespaceSet {
 
     private Namespace varNS=new Namespace();
@@ -145,7 +147,7 @@ public class NamespaceSet {
       final Namespace[] myNames = asArray();
       final Namespace[] otherNames = nss.asArray();
       for (int i = 0; i<myNames.length; i++) {
-          final IteratorOfNamed it = otherNames[i].getProtocolled();
+          final Iterator<Named> it = otherNames[i].getProtocolled();
           while (it.hasNext()) {
               myNames[i].add(it.next());
           }
@@ -175,7 +177,8 @@ public class NamespaceSet {
     /**
      * @param name
      * @param spaces
-     * @return
+     * @return the element with the given name if found in the 
+     * given namespaces, otherwise <tt>null</tt>
      */
     private Named lookup(Name name, final Namespace[] spaces) {
         for (int i = 0; i<spaces.length; i++) {

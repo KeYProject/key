@@ -43,13 +43,14 @@ public class KeYRecoderMapping{
 
 
     /**
-    * creates a KeYRecoderMapping object
+    * creates a KeYRecoderMapping object.
+    * Used for cloning and testing.
     * @param map a HashMap mapping ProgramElements in Recoder to
     * ProgramElements in KeY
     * @param revMap the reverse map (KeY->Recoder)
     * @param parsedSpecial boolean indicating if the special classes have been parsed in
     */
-    public KeYRecoderMapping(HashMap map, HashMap revMap,
+    KeYRecoderMapping(HashMap map, HashMap revMap,
                              KeYJavaType superArrayType,
 			     boolean parsedSpecial){
         this.map      = map;

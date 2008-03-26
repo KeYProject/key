@@ -125,7 +125,7 @@ public class ETNode {
     /**
      * itnodes
      * 
-     * @return
+     * @return a LinkedList with the ITNodes associated to this ETNodes
      */
     public LinkedList getITNodes() {
         return itNodes;

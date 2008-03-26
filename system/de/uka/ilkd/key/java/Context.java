@@ -11,9 +11,8 @@ package de.uka.ilkd.key.java;
 
 import recoder.java.declaration.ClassDeclaration;
 import recoder.java.declaration.TypeDeclaration;
-import recoder.list.ImportArrayList;
-import recoder.list.TypeDeclarationArrayList;
-import recoder.list.TypeDeclarationMutableList;
+import recoder.list.generic.ASTArrayList;
+import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 
@@ -62,14 +61,14 @@ class Context {
     private static recoder.java.CompilationUnit createCompUnit
 	(ClassDeclaration classContext) {
 	recoder.java.CompilationUnit cu = new recoder.java.CompilationUnit
-	    (null, new ImportArrayList(0), inList(classContext));
+	    (null, new ASTArrayList<recoder.java.Import>(0), inList(classContext));
 	//	cu.setDataLocation(new ContextDataLocation("tmp"+counter++));
 	return cu;
     }
 
 
-    public static TypeDeclarationMutableList inList(TypeDeclaration td) {
-	TypeDeclarationMutableList tdml = new TypeDeclarationArrayList();
+    public static ASTList<TypeDeclaration> inList(TypeDeclaration td) {
+	ASTList<TypeDeclaration> tdml = new ASTArrayList<TypeDeclaration>();
 	tdml.add(td);
 	return tdml;
     }

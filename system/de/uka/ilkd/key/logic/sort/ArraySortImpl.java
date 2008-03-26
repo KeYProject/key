@@ -18,13 +18,14 @@ import java.util.WeakHashMap;
 
 public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
 
-    private static WeakHashMap aSH = new WeakHashMap();
+    private static WeakHashMap<SortKey, WeakReference<ArraySort>> aSH = 
+        new WeakHashMap<SortKey, WeakReference<ArraySort>>();
     
     private final ArrayOfSort commonJavaSorts;  
     
     private SetOfSort extendsSorts;
     
-    /** keeping this key is important to prevent for too early hasmap removal*/
+    /** keeping this key is important to prevent for too early hashmap removal*/
     private final SortKey sk;
     
 
@@ -88,10 +89,10 @@ public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
                                          Sort serializableSort){
         // this wrapper is required as some element sorts are shared among 
         // several environments (int, boolean)
-        final SortKey sk = new SortKey(elemSort, objectSort, 
+        final SortKey sortKey = new SortKey(elemSort, objectSort, 
                 cloneableSort, serializableSort);
-        ArraySort as = aSH.containsKey(sk) ? 
-                (ArraySort) ((WeakReference)aSH.get(sk)).get() : null;          
+        ArraySort as = aSH.containsKey(sortKey) ? 
+                (ArraySort) aSH.get(sortKey).get() : null;          
 	
         if (as == null){ 
         // HACK: this simple handling of sort creation does not treat
@@ -99,8 +100,8 @@ public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
 	    SetOfSort localExtendsSorts = getArraySuperSorts(elemSort, objectSort,
 							     cloneableSort, 
                                                              serializableSort);
-	    as = new ArraySortImpl(localExtendsSorts, sk);
-	    aSH.put(sk, new WeakReference(as));
+	    as = new ArraySortImpl(localExtendsSorts, sortKey);
+	    aSH.put(sortKey, new WeakReference<ArraySort>(as));
 	    
 	} 
         return as;

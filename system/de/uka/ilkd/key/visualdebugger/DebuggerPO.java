@@ -8,8 +8,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.init.*;
-import de.uka.ilkd.key.proof.mgt.Contract;
-import de.uka.ilkd.key.proof.mgt.Contractable;
 import de.uka.ilkd.key.visualdebugger.executiontree.ITNode;
 
 public class DebuggerPO implements ProofOblInput {
@@ -62,10 +60,6 @@ public class DebuggerPO implements ProofOblInput {
         return null;
     }
 
-    public Contractable[] getObjectOfContract() {
-        return new Contractable[0];
-    }
-
     /**
      * returns the proof to be loaded in the prover
      */
@@ -102,10 +96,6 @@ public class DebuggerPO implements ProofOblInput {
         return result;
     }
 
-    public boolean initContract(Contract ct) {
-        // TODO Auto-generated method stub
-        return false;
-    }
 
     public void initJavaModelSettings(String classPath) {
 
@@ -134,24 +124,11 @@ public class DebuggerPO implements ProofOblInput {
     }
 
     // all below are not used for this proof obligation
-    public void read(ModStrategy mod) {
-    }
 
     public void readActivatedChoices() {
     }
 
-    public Includes readIncludes() throws ProofInputException {
-        return null;
-    }
-
-    public String readModel() throws ProofInputException {
-        return null;
-    }
-
     public void readProblem(ModStrategy mod) {
-    }
-
-    public void readSpecs() {
     }
 
     /**
@@ -175,10 +152,6 @@ public class DebuggerPO implements ProofOblInput {
         this.builtInRules = builtInRules;
     }
 
-    public void setInitConfig(InitConfig i) {
-        // TODO Auto-generated method stub
-
-    }
 
     public void setPCImpl(ListOfTerm l1, ListOfTerm l2) {
         Term t1 = list2term(l1);
@@ -282,8 +255,4 @@ public class DebuggerPO implements ProofOblInput {
                 .sequent();
 
     }
-
-    public void startProtocol() {
-    }
-
 }

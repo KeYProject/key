@@ -18,21 +18,33 @@ package de.uka.ilkd.key.java.recoderext;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringWriter;
+import java.util.List;
 
 import recoder.ParserException;
+import recoder.ServiceConfiguration;
 import recoder.convenience.TreeWalker;
+import recoder.io.ProjectSettings;
+import recoder.io.PropertyNames;
 import recoder.java.*;
 import recoder.java.SourceElement.Position;
 import recoder.java.declaration.*;
 import recoder.java.reference.MethodReference;
 import recoder.java.reference.TypeReference;
-import recoder.list.CommentArrayList;
-import recoder.list.CommentMutableList;
-import recoder.list.StatementMutableList;
+import recoder.list.generic.ASTArrayList;
+import recoder.list.generic.ASTList;
+import recoder.util.StringUtils;
 import de.uka.ilkd.key.parser.proofjava.ParseException;
 import de.uka.ilkd.key.parser.proofjava.ProofJavaParser;
 
 public class ProofJavaProgramFactory extends JavaProgramFactory {
+    
+    /*
+     * by default allow java5 expressions such as the enum keyword
+     */
+    /*private static boolean ALLOW_JAVA5 =
+            System.getProperty("key.allowJava5", "true").equalsIgnoreCase(
+                    "true");*/
 
     /**
      Protected constructor - use {@link #getInstance} instead.
@@ -51,6 +63,21 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     public static JavaProgramFactory getInstance() {
         return theFactory;
     }
+    
+    public void initialize(ServiceConfiguration cfg) {
+
+      super.initialize(cfg);
+      ProjectSettings settings = cfg.getProjectSettings();
+      /*// that is the original recoder code:
+      ProofJavaParser.setAwareOfAssert(StringUtils.parseBooleanProperty(settings.getProperties().getProperty(
+              PropertyNames.JDK1_4)));
+      ProofJavaParser.setJava5(ALLOW_JAVA5); 
+      */
+      ProofJavaParser.setJava5(StringUtils.parseBooleanProperty(settings.getProperties().getProperty(
+              PropertyNames.JAVA_5)));
+      ProofJavaParser.setAwareOfAssert(true);
+      
+  }
 
 
     /** 
@@ -89,9 +116,9 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
                 dest.getFirstElement().setRelativePosition(p);
             }
         }
-        CommentMutableList cml = dest.getComments();
+        ASTList<Comment> cml = dest.getComments();
         if (cml == null) {
-            dest.setComments(cml = new CommentArrayList());
+            dest.setComments(cml = new ASTArrayList<Comment>());
         }
         cml.add(c);
     }
@@ -101,13 +128,13 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
        and assigns comments.
      */
     private static void postWork(ProgramElement pe) {
-        CommentMutableList comments = ProofJavaParser.getComments();
+        List<Comment> comments = ProofJavaParser.getComments();
         int commentIndex = 0;
         int commentCount = comments.size();
         Position cpos = ZERO_POSITION;
         Comment current = null;
         if (commentIndex < commentCount) {
-            current = comments.getComment(commentIndex);
+            current = comments.get(commentIndex);
             cpos = current.getFirstElement().getStartPosition();
         }
         TreeWalker tw = new TreeWalker(pe);
@@ -124,7 +151,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 		    attachComment(current, pe);
 		    commentIndex += 1;
 		    if (commentIndex < commentCount) {
-			current = comments.getComment(commentIndex);
+			current = comments.get(commentIndex);
 			cpos = current.getFirstElement().getStartPosition();
 		    }
 		}
@@ -134,12 +161,12 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
             while (pe.getASTParent() != null) {
                 pe = pe.getASTParent();
             }
-            CommentMutableList cml = pe.getComments();
+            ASTList<Comment> cml = pe.getComments();
             if (cml == null) {
-                pe.setComments(cml = new CommentArrayList());
+                pe.setComments(cml = new ASTArrayList<Comment>());
             }
             do {
-                current = comments.getComment(commentIndex);
+                current = comments.get(commentIndex);
                 current.setPrefixed(false);
                 cml.add(current);
                 commentIndex += 1;
@@ -302,13 +329,13 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     /**
      Parse some {@link Statement}s from the given reader.
      */
-    public StatementMutableList parseStatements(Reader in) throws IOException, ParserException {
+    public ASTList<Statement> parseStatements(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
 		ProofJavaParser.initialize(in);
-		StatementMutableList res = ProofJavaParser.GeneralizedStatements();
+		ASTList<Statement> res = ProofJavaParser.GeneralizedStatements();
 		for (int i = 0; i < res.size(); i += 1) {
-		    postWork(res.getStatement(i));
+		    postWork(res.get(i));
 		}
 		return res;
 	    } catch (ParseException e) {
@@ -377,6 +404,22 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     }
     
     /**
+     * Create a comment.
+     * @param text comment text
+     */
+    public Comment createComment(String text) {
+        return new Comment(text);
+    }
+    
+    /**
+     * Create a comment.
+     * @param text comment text
+     */
+    public Comment createComment(String text, boolean prefixed) {
+        return new Comment(text, prefixed);
+    }
+    
+    /**
      * Create an {@link ImplicitIdentifier}.
      */
     public ImplicitIdentifier createImplicitIdentifier(String text) {
@@ -387,6 +430,8 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     public Identifier createIdentifier(String text) {
         return new ExtendedIdentifier(text);
     }
-
-
+    
+    public ObjectTypeIdentifier createObjectTypeIdentifier(String text) {
+        return new ObjectTypeIdentifier(text);
+    }
 }

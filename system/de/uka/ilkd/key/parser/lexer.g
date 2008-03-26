@@ -74,10 +74,13 @@ tokens {
         NOTFREEIN = "\\notFreeIn";
         FREELABELIN = "\\freeLabelIn";
 	STATIC = "\\static";
+	ENUM_CONST = "\\enumConstant";
 	NOTSAMELITERAL="\\notSameLiteral";
 	ISREFERENCEARRAY="\\isReferenceArray";
+	ISARRAY="\\isArray";
 	ISREFERENCE="\\isReference";
 	ISNONIMPLICIT="\\isNonImplicit";
+        ISENUMTYPE="\\isEnumType";
         DEPENDINGON = "\\dependingOn";
         DEPENDINGONMOD = "\\dependingOnMod";
 	ISQUERY = "\\isQuery";
@@ -489,7 +492,7 @@ options {
 	:	"==>"
 	;
 
-COMPUTE_SPEC_OP
+EXP
 options { 
   paraphrase = "'^'";
 }
@@ -561,7 +564,7 @@ STRING_LITERAL
 options {
   paraphrase = "a string in double quotes";
 }
-    : '"' ( ESC | '\n' { newline(); } |~('\n' | '"' | '\\') )* '"' ;
+    : '"' ( ESC | '\n' { newline(); } |~('\n' | '"' | '\\' | '\uFFFF') )* '"' ;
 
 
 LESS_DISPATCH

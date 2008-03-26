@@ -35,7 +35,7 @@ public class ExpressionSkolemSymbolFactory extends SkolemSymbolTacletFactory {
      * be given. A result variable of type <code>p_type</code> and a 
      * selector variable of type int are added as the last two arguments
      * implicitly
-     * @param jumpTable the jump table that symbol should have
+     * @param p_jumpTable the jump table that symbol should have
      */
     public ProgramSVProxy createExpressionSymbol
 	( ProgramElementName     p_name,

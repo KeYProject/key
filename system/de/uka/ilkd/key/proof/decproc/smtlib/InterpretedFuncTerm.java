@@ -85,7 +85,7 @@ public final class InterpretedFuncTerm extends Term {
      *                                  QF_AULIA or if the number of function arguments doesn't
      *                                  match the function arity or if the sort of a function 
      *                                  argument doesn't match the expected sort
-     * @see de.uka.ilkd.key.logic.op.DecisionProcedureSmtAufliaOp                                 
+     * @see de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAufliaOp                                   
      */ 
     public InterpretedFuncTerm( String fName, Term[] fArgs ) {        
         super( fName , fArgs, null , null );

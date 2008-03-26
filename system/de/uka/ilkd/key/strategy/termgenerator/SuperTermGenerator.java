@@ -109,6 +109,13 @@ public abstract class SuperTermGenerator implements TermGenerator {
             if ( !generateFurther ( res ) ) currentPos = null;
             return res;
         }
+        
+        /** 
+         * throw an unsupported operation exception as generators do not remove
+         */
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
     }
 
 }

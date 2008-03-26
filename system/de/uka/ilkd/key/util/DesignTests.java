@@ -41,8 +41,6 @@ public class DesignTests {
     /**
      * Creates an instance used to test if design principles have been
      * hurt.
-     * @param binaryPath String with path to all
-     * <code>classname.class</code> files to test
      */
     public DesignTests() {
     }

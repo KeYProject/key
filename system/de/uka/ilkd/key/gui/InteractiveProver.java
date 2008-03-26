@@ -47,7 +47,8 @@ public class InteractiveProver {
         new FocussedAutoModeTaskListener ();
 
     /** list of proof listeners and interactive proof listeners */
-    private List listenerList = Collections.synchronizedList(new ArrayList(10));
+    private List<AutoModeListener> listenerList = 
+        Collections.synchronizedList(new ArrayList<AutoModeListener>(10));
 
 
     /** listens to the current selected proof and node */
@@ -100,9 +101,9 @@ public class InteractiveProver {
     /** fires the event that automatic execution has started */
     protected void fireAutoModeStarted(ProofEvent e) {
 	synchronized(listenerList) {
-	    Iterator it = listenerList.iterator();
+	    Iterator<AutoModeListener> it = listenerList.iterator();
 	    while (it.hasNext()) {
-		((AutoModeListener)it.next()).
+		it.next().
 		    autoModeStarted(e);
 	    }
 	}
@@ -111,9 +112,9 @@ public class InteractiveProver {
     /** fires the event that automatic execution has stopped */
     public void fireAutoModeStopped(ProofEvent e) {
 	synchronized(listenerList) {
-	    Iterator it = listenerList.iterator();
+	    Iterator<AutoModeListener> it = listenerList.iterator();
 	    while (it.hasNext()) {
-		((AutoModeListener)it.next()).
+		it.next().
 		    autoModeStopped(e);
 	    }
 	}
@@ -147,6 +148,7 @@ public class InteractiveProver {
         goal.node().getNodeInfo().setInteractiveRuleApplication(true);
 
         ListOfGoal goalList = goal.apply(app);
+        
         
         
         if (!getProof ().closed ()) {
@@ -220,7 +222,7 @@ public class InteractiveProver {
             interactive = false;
         }
         
-        applyStrategy.start ( goals, getMaxStepCount (), getTimeout() );
+        applyStrategy.start ( proof, goals, getMaxStepCount (), getTimeout() );
     }
     
     /** stops the execution of rules */
@@ -292,7 +294,7 @@ public class InteractiveProver {
     private final class FocussedAutoModeTaskListener implements ProverTaskListener {
         public void taskStarted ( String message, int size ) {}
         public void taskProgress ( int position ) {}
-        public void taskFinished () {
+        public void taskFinished (TaskFinishedInfo info) {
             SwingUtilities.invokeLater ( new Runnable () {
                 public void run () {
                     finishFocussedAutoMode ();
@@ -542,7 +544,7 @@ public class InteractiveProver {
      * the contained TacletApps
      */
     private ListOfTacletApp filterTaclet(ListOfNoPosTacletApp tacletInstances) {
-        java.util.HashSet applicableRules = new java.util.HashSet();
+        java.util.HashSet<Taclet> applicableRules = new java.util.HashSet<Taclet>();
         ListOfTacletApp result = SLListOfTacletApp.EMPTY_LIST;
         IteratorOfNoPosTacletApp it = tacletInstances.iterator();		
         while (it.hasNext()) {

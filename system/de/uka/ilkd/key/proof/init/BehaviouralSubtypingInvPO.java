@@ -10,13 +10,9 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.casetool.ModelClass;
-import de.uka.ilkd.key.casetool.UMLModelClass;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.proof.mgt.Contract;
-import de.uka.ilkd.key.proof.mgt.Contractable;
-import de.uka.ilkd.key.speclang.SLTranslationError;
 
 
 
@@ -26,21 +22,23 @@ import de.uka.ilkd.key.speclang.SLTranslationError;
  */
 public class BehaviouralSubtypingInvPO extends AbstractPO {
     
-    private UMLModelClass subType;
-    private ModelClass superType;
+    private KeYJavaType subKJT;
+    private KeYJavaType superKJT;
     
     
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
     
-    public BehaviouralSubtypingInvPO(UMLModelClass subType, 
-                                     ModelClass superType) {
-        super("BehaviouralSubtypingInv of " + subType.getClassName() + " and " 
-              + superType.getClassName(),
-              subType);
-        this.subType    = subType;
-        this.superType  = superType;
+    public BehaviouralSubtypingInvPO(InitConfig initConfig,
+	    			     KeYJavaType subKJT, 
+                                     KeYJavaType superKJT) {
+        super(initConfig,
+              "BehaviouralSubtypingInv of " + subKJT.getName() + " and " 
+              + superKJT.getName(),
+              subKJT);
+        this.subKJT   = subKJT;
+        this.superKJT = superKJT;
     }
     
     
@@ -50,41 +48,23 @@ public class BehaviouralSubtypingInvPO extends AbstractPO {
     //-------------------------------------------------------------------------    
         
     public void readProblem(ModStrategy mod) throws ProofInputException {
-        //make sure initConfig has been set
-        if(initConfig == null) {
-            throw new IllegalStateException("InitConfig not set.");
-        }
+        //prepare self variable
+        LogicVariable selfVar = buildSelfVarAsLogicVar();
+           
+    	//build conjunction of subtype invariants
+    	Term subConjTerm 
+    		= translateInvsOpen(specRepos.getClassInvariants(subKJT), 
+    			    	    selfVar);
         
-        try {
-        	//prepare self variable
-	        LogicVariable selfVar = buildSelfVarAsLogicVar();
-	               
-	        //build conjunction of subtype invariants
-	        Term subConjTerm = translateInvsOpen(subType.getMyClassInvariants(), 
-	        				     selfVar);
-	        
-	        //build conjunction of supertype invariants
-	        Term superConjTerm = translateInvsOpen(superType.getMyClassInvariants(),
-	        				       selfVar);
-	        
-	        //build implication
-	        Term impTerm = tb.imp(subConjTerm, superConjTerm);
-	        
-	        //build all-quantification
-	        Term poTerm = tb.all(selfVar, impTerm);
-	        poTerms = new Term[]{poTerm};
-        } catch(SLTranslationError e) {
-        	throw new ProofInputException(e);
-        }
-    }
-
-
-    public Contractable[] getObjectOfContract() {
-        return new Contractable[0];
-    }
-
-    
-    public boolean initContract(Contract ct) {
-        return false;
+        //build conjunction of supertype invariants
+        Term superConjTerm = translateInvsOpen(specRepos.getClassInvariants(superKJT),
+        				       selfVar);
+        
+        //build implication
+        Term impTerm = TB.imp(subConjTerm, superConjTerm);
+        
+        //build all-quantification
+        Term poTerm = TB.all(selfVar, impTerm);
+        poTerms = new Term[]{poTerm};
     }
 }

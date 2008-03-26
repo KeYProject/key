@@ -21,14 +21,14 @@ public class LibrariesSettings implements Settings {
 
    private static final String LIBRARIES_KEY = "[Libraries]Default";
    private static final String LIBRARIES_PATH = "libraries"+File.separator;
-   private LinkedList listenerList = new LinkedList();
+   private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
 
    /** keys:   the file names of the libraries,
     *          standard libraries are given by the library name
     *          and user libraries are given by the absolute path
     *  values: Booleans that indicate if a library is selected
     */
-   private HashMap libToSel = new HashMap();
+   private HashMap<String, Boolean> libToSel = new HashMap<String, Boolean>();
    
    /** this boolean indicates that there was no "Libraries" properties section,
     *  we need this because the there at least the standard libraries in
@@ -74,9 +74,9 @@ public class LibrariesSettings implements Settings {
      */
     public void writeSettings(Properties props) {
 	String s="";
-	Iterator keyIt = libToSel.keySet().iterator();
+	Iterator<String> keyIt = libToSel.keySet().iterator();
 	while (keyIt.hasNext()){
-           String fileName = (String) keyIt.next();
+           String fileName = keyIt.next();
            String sel =  libToSel.get(fileName).toString();           
            s+=fileName+"-"+sel;
            if (keyIt.hasNext())
@@ -89,9 +89,9 @@ public class LibrariesSettings implements Settings {
      * changed to its registered listeners (not thread-safe)
      */
     protected void fireSettingsChanged() {
-        Iterator it = listenerList.iterator();
+        Iterator<SettingsListener> it = listenerList.iterator();
 	while (it.hasNext()) {
-	    ((SettingsListener)it.next()).settingsChanged(new GUIEvent(this));
+	    it.next().settingsChanged(new GUIEvent(this));
 	}
     }
 
@@ -102,12 +102,12 @@ public class LibrariesSettings implements Settings {
 	listenerList.add(l);
     }
     
-    public HashMap getLibraries(){
-        return (HashMap)libToSel.clone();
+    public HashMap<String, Boolean> getLibraries(){
+        return (HashMap<String, Boolean>)libToSel.clone();
     }
     
-    public void setLibraries(HashMap libraries){
-        HashMap oldLibToSel = this.libToSel;
+    public void setLibraries(HashMap<String, Boolean> libraries){
+        HashMap<String, Boolean> oldLibToSel = this.libToSel;
         this.libToSel = libraries;
         if(oldLibToSel!=null && 
            !oldLibToSel.equals(libToSel)){

@@ -55,7 +55,7 @@ fi
 #echo "Using Together installation from: $TOGETHER_HOME"
 
 
-key_ext_jars="antlr.jar recoder.jar dresden-ocl-demo.jar xerces.jar log4j.jar jargs.jar"
+key_ext_jars="antlr.jar recoderKey.jar dresden-ocl-demo.jar xerces.jar log4j.jar jargs.jar"
 
 key_dev_jars="javacc.jar junit.jar"
 

@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.gui.notification;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Iterator;
 
 import javax.swing.SwingUtilities;
 
@@ -58,9 +57,8 @@ public class ExitKeYNotification extends NotificationTask {
      */
     protected void executeImpl(NotificationEvent event,
             NotificationManager manager) {
-        final Iterator actions = getActions();         
-        while (actions.hasNext()) {            
-            ((NotificationAction)actions.next()).execute(event);
+        for (final NotificationAction action : getNotificationActions()) {                    
+            action.execute(event);
         }
     }
 

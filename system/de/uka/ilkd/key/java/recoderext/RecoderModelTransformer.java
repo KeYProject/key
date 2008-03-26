@@ -6,40 +6,29 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.*;
+
 import recoder.CrossReferenceServiceConfiguration;
-import recoder.abstraction.ArrayType;
-import recoder.abstraction.ClassType;
-import recoder.abstraction.PrimitiveType;
-import recoder.abstraction.Type;
-import recoder.java.CompilationUnit;
-import recoder.java.Expression;
-import recoder.java.Identifier;
-import recoder.java.declaration.LocalVariableDeclaration;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.TypeDeclaration;
+import recoder.abstraction.*;
+import recoder.java.*;
+import recoder.java.declaration.*;
 import recoder.java.expression.literal.*;
 import recoder.java.expression.operator.CopyAssignment;
-import recoder.java.reference.FieldReference;
-import recoder.java.reference.ReferencePrefix;
-import recoder.java.reference.TypeReference;
+import recoder.java.reference.*;
 import recoder.kit.TwoPassTransformation;
-import recoder.list.CompilationUnitMutableList;
+import recoder.list.generic.*;
+import recoder.service.DefaultCrossReferenceSourceInfo;
 import de.uka.ilkd.key.util.Debug;
 
 /**
  * The Java DL requires some implicit fields, that are available in each
  * Java class. The name of the implicit fields is usually enclosed
  * between two angle brackets. 
- * Two access the fields in a uniform way, they are added as usual
+ * To access the fields in a uniform way, they are added as usual
  * fields to the classes, in particular this allows us to parse them in
  * more easier.
  *   For further information see also
@@ -48,27 +37,35 @@ import de.uka.ilkd.key.util.Debug;
  *     <li> {@link CreateObjectBuilder}  </li>
  *     <li> {@link PrepareObjectBuilder} </li>
  *   </ul>
+ *   
+ * Performance of these classes was low, so information that is shared between
+ * all instances of a transformation set has been outsourced to a transformation
+ * cache.
  */
 public abstract class RecoderModelTransformer extends TwoPassTransformation {
 
     protected CrossReferenceServiceConfiguration services;
-    protected CompilationUnitMutableList units;
+    // protected List<CompilationUnit> units;
+    protected TransformerCache cache;
 
     /**
      * creates a transormder for the recoder model
      * @param services the CrossReferenceServiceConfiguration to access
      * model information 
-     * @param units the array of CompilationUnits describing the model 
-     * to be transformed 
+     * @param cache a cache object that stores information which is needed by
+     * and common to many transformations. it includes the compilation units,
+     * the declared classes, and information for local classes.
      */
     public RecoderModelTransformer
 	(CrossReferenceServiceConfiguration services, 
-	 CompilationUnitMutableList units) {	
+	 TransformerCache cache) {	
 	super(services);
 	this.services = services;
-	this.units = units;
+	assert cache != null;
+	this.cache = cache;
+        getLocalClass2FinalVar();
     }
-
+    
     /** 
      * returns the default value of the given type 
      * according to JLS Sect. 4.5.5
@@ -114,7 +111,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
 
     /**
      * returns if changes have to be reported to the change history
-     * @return true, iff changes have to be reported to the change history
+     * @return true, if changes have to be reported to the change history
      */
     public boolean isVisible() {
 	return true;
@@ -123,7 +120,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
     /**
      * The method is called for each type declaration of the compilation
      * unit and initiates the syntactical transformation. If you want to
-     * descend in inner classes you have to implement the recusrsion by
+     * descend in inner classes you have to implement the recursion by
      * yourself.
      */
     protected abstract void makeExplicit(TypeDeclaration td);
@@ -148,27 +145,73 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
     }
 
     protected LocalVariableDeclaration declare
-	(String name, TypeDeclaration type) {
+	(String name, Identifier type) {
 	return new LocalVariableDeclaration
-	    (new TypeReference
-	     ((Identifier)type.getIdentifier().deepClone()), 
+	    (new TypeReference(type), 
 	     new Identifier(name));
     }
-
+    
+    protected Identifier getId(TypeDeclaration td){
+      /*  return td.getIdentifier()==null ? 
+            new Identifier(td.getFullName()) :
+                (Identifier)td.getIdentifier().deepClone();*/
+        return td.getIdentifier()==null ? 
+                (td.getAllSupertypes().get(1) instanceof TypeDeclaration ?
+                        getId((TypeDeclaration) td.getAllSupertypes().get(1)) : 
+                            new Identifier(td.getAllSupertypes().get(1).getName())) :
+                    (Identifier)td.getIdentifier().deepClone();
+    }
+    
+    protected ClassDeclaration containingClass(TypeDeclaration td){
+        NonTerminalProgramElement container = (ClassDeclaration) td.getContainingClassType();
+        if(container == null){
+            container = td.getASTParent();
+        }
+        while(!(container instanceof ClassDeclaration)){
+            container = container.getASTParent();
+        }
+        return (ClassDeclaration) container;
+    }
+    
+    protected MethodDeclaration containingMethod(TypeDeclaration td){
+        NonTerminalProgramElement container = td.getASTParent();
+        while(container!=null && !(container instanceof MethodDeclaration)){
+            container = container.getASTParent();
+        }
+        return (MethodDeclaration) container;
+    }
 
     /**
      * invokes model transformation for each top level type declaration
      * in any compilation unit. <emph>Not</emph> for inner classes.
      */
     public void makeExplicit() {
-	for (int i = 0; i<units.size(); i++) {
-	    CompilationUnit unit = units.getCompilationUnit(i);
-	    int typeCount = unit.getTypeDeclarationCount();
-	    for (int j = 0; j<typeCount; j++) {
-		makeExplicit(unit.getTypeDeclarationAt(j));
-	    }
-	}
+	Set s = classDeclarations();
+	Iterator it = s.iterator();
+	while(it.hasNext()) {
+	    ClassDeclaration cd = (ClassDeclaration) it.next();
+  //          System.out.println("RecoderModelTransformer: classdecl: "+cd.getFullName());
+            makeExplicit(cd);
+        }
     }
+    
+    // 3 methods to access the transformation cache.
+    
+    protected Set classDeclarations(){
+        return cache.getClassDeclarations();       
+    }
+    
+    public HashMap getLocalClass2FinalVar(){
+        return cache.getLocalClass2FinalVarMapping();
+     }
+    
+    public List<CompilationUnit> getUnits() {
+        return cache.getUnits();
+    }
+    
+ /*   protected String getNameForAnonClass(TypeDeclaration cd){
+        return cd.getAllSupertypes().getClassType(1).getFullName();
+    }*/
 
     /**
      * Starts the transformation. 
@@ -176,6 +219,124 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
     public void transform() {
 	super.transform();
 	makeExplicit();
+    }
+    
+    /**
+     * Cache of important data. This is done mainly for performance reasons.
+     * It contains the following info:
+     * - list of comp. units
+     * - their class declarations
+     * - a mapping from local classes to their needed final variables.
+     * 
+     * Objects are created upon the first request.
+     *  
+     * @author MU
+     */
+    public static class TransformerCache {
+        
+        private List<CompilationUnit> cUnits;
+        private Set classDeclarations;
+        private HashMap localClass2FinalVar;
+
+        public TransformerCache(List<CompilationUnit> cUnits) {
+            this.cUnits = cUnits;    
+        }
+        
+        public List<CompilationUnit> getUnits() {
+            return cUnits;
+        }
+        
+        public Set getClassDeclarations(){
+            if(classDeclarations==null){
+                ClassDeclarationCollector cdc = new ClassDeclarationCollector();
+                for (int i = 0; i < cUnits.size(); i++) {
+                CompilationUnit unit = cUnits.get(i);
+                    cdc.walk(unit);
+                }
+                classDeclarations = cdc.result();
+            }
+            return classDeclarations;       
+        }
+        
+        public HashMap getLocalClass2FinalVarMapping() {
+            if(localClass2FinalVar == null){
+                localClass2FinalVar = new HashMap();
+            }
+            return localClass2FinalVar;
+        }
+
+        /**
+         * if the class declaration set changes, the cash must be invalidated
+         */
+        public void invalidateClasses() {
+            classDeclarations = null;
+        }
+    }
+    
+    protected class FinalOuterVarsCollector extends SourceVisitor{
+        
+        HashMap lc2fv;
+        
+        public FinalOuterVarsCollector(){
+            super();
+            lc2fv = cache.getLocalClass2FinalVarMapping();
+        }
+        
+        public void walk(SourceElement s){
+            s.accept(this);
+            if(s instanceof NonTerminalProgramElement){
+                NonTerminalProgramElement pe = (NonTerminalProgramElement) s;
+                for(int i=0; i<pe.getChildCount(); i++){
+                    walk(pe.getChildAt(i));
+                }
+            }
+        }
+        
+       public void visitVariableReference(VariableReference vr){
+           DefaultCrossReferenceSourceInfo si = (DefaultCrossReferenceSourceInfo) services.getSourceInfo();
+           Variable v = si.getVariable(vr.getName(), vr);
+           if((v instanceof VariableSpecification) && !(v instanceof FieldSpecification) &&
+                   si.getContainingClassType((ProgramElement) v) != si.getContainingClassType(vr)){
+               LinkedList vars = (LinkedList) lc2fv.get(si.getContainingClassType(vr));
+               if(vars == null){
+                   vars = new LinkedList();
+               }
+               if(!vars.contains(v)){
+                   vars.add(v);
+               }
+               lc2fv.put(si.getContainingClassType(vr), vars);
+           }
+       }
+        
+    }
+    
+    private static class ClassDeclarationCollector extends SourceVisitor{
+        
+        HashSet result = new HashSet();
+        
+        public ClassDeclarationCollector(){
+            super();
+        }
+        
+        public void walk(SourceElement s){
+            s.accept(this);
+            if(s instanceof NonTerminalProgramElement){
+                NonTerminalProgramElement pe = (NonTerminalProgramElement) s;
+                for(int i=0; i<pe.getChildCount(); i++){
+                    walk(pe.getChildAt(i));
+                }
+            }
+        }
+        
+        public void visitClassDeclaration(ClassDeclaration cld){
+            result.add(cld);
+//            System.out.println("ClassDeclarationCollector: classdecl: "+cld.getName());
+            super.visitClassDeclaration(cld);
+        }
+               
+        public HashSet result(){
+            return result;
+        }
     }
 
 }

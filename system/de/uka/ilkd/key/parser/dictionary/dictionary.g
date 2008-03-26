@@ -31,9 +31,9 @@ options {
 }
 
 {
-	private Map map = new HashMap(20);
+	private Map<String,String> map = new HashMap<String,String>(20);
 
-	public Map getDictionary() {
+	public Map<String,String> getDictionary() {
 	   return map;
 	}
 

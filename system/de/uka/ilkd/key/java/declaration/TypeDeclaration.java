@@ -201,18 +201,37 @@ public abstract class TypeDeclaration extends JavaDeclaration
 	return null;
     }
 
-    /** TO BE IMPLEMENTED
+    /** 
+     * TO BE IMPLEMENTED
      */
     public ListOfField getFields(Services services) {
-	System.err.println("Method in class TypeDeclaration not implemented." );   
-	return null;
+        System.err.println("Method in class TypeDeclaration not implemented." );
+        return null;
     }
 
-    /** TO BE IMPLEMENTED
+    /**
+     * [dlohner] The given parameter is obsolete with this implementation.
      */
     public ListOfField getAllFields(Services services) {
-       	System.err.println("Method in class TypeDeclaration not implemented." );
-	return null;
+
+        if (members == null) {
+            return SLListOfField.EMPTY_LIST;
+        }
+
+        ListOfField result = SLListOfField.EMPTY_LIST;
+
+        for (int i = 0; i < members.size(); i++) {
+            if (members.getMemberDeclaration(i) instanceof FieldDeclaration) {
+                FieldDeclaration fds = (FieldDeclaration) members
+                        .getMemberDeclaration(i);
+                ArrayOfFieldSpecification aofs = fds.getFieldSpecifications();
+                for (int j = 0; j < aofs.size(); j++) {
+                    result = result.append(aofs.getFieldSpecification(j));
+                }
+            }
+        }
+
+        return result;
     }
 
     /** TO BE IMPLEMENTED

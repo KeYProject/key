@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.proof.SetOfGoalChooserBuilder;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -8,7 +8,7 @@ import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.ListOfBuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UpdateSimplificationRule;
-import de.uka.ilkd.key.rule.UseMethodContractRule;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.strategy.FOLStrategy;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.SetOfStrategyFactory;
@@ -25,11 +25,11 @@ public class JavaProfile extends AbstractProfile {
 
     
     protected JavaProfile(String standardRules, SetOfGoalChooserBuilder gcb, 
-            Main main) {
+            IMain main) {
         super(standardRules, gcb, main);       
      }
 
-    protected JavaProfile(String standardRules, Main main) {
+    protected JavaProfile(String standardRules, IMain main) {
         super(standardRules, main);       
      }
 
@@ -37,7 +37,7 @@ public class JavaProfile extends AbstractProfile {
         this("standardRules.key", null);
     }
     
-    public JavaProfile(Main main) {
+    public JavaProfile(IMain main) {
         this("standardRules.key", main);
     }
     
@@ -48,8 +48,8 @@ public class JavaProfile extends AbstractProfile {
         return set;
     }
 
-    protected UseMethodContractRule getContractRule() {
-        return UseMethodContractRule.INSTANCE;
+    protected UseOperationContractRule getContractRule() {
+        return UseOperationContractRule.INSTANCE;
     }
     
     protected UpdateSimplificationRule getUpdateSimplificationRule() {

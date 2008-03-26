@@ -11,6 +11,7 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 
 /**
@@ -34,9 +35,10 @@ class Matching {
     }
 
     public static SetOfSubstitution twoSidedMatching(UniTrigger trigger,
-                                                     Term targetTerm) {
+                                                     Term targetTerm, 
+                                                     Services services) {
         TwoSidedMatching tsm = new TwoSidedMatching ( trigger, targetTerm );
-        return tsm.getSubstitutions ();
+        return tsm.getSubstitutions (services);
     }      
     
 }

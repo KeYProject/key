@@ -11,18 +11,18 @@ package de.uka.ilkd.key.casetool;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import recoder.ServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Field;
 import recoder.abstraction.Method;
-
 import recoder.io.DefaultSourceFileRepository;
 import recoder.io.SourceFileRepository;
 import recoder.java.CompilationUnit;
 import recoder.java.declaration.TypeDeclaration;
-import recoder.list.*;
 import recoder.service.DefaultSourceInfo;
 import recoder.util.FileCollector;
 import tudresden.ocl.check.types.Type;
@@ -75,7 +75,7 @@ public class UMLOCLJavaModel implements UMLOCLModel {
     public HashMapOfClassifier getUMLOCLClassifiers() {
 	   
 
-	final CompilationUnitList cuList = sfr.getCompilationUnits();
+	final List<CompilationUnit> cuList = sfr.getCompilationUnits();
 	
 	// find classes
 	findAllClasses(cuList);	
@@ -86,7 +86,7 @@ public class UMLOCLJavaModel implements UMLOCLModel {
 	
 	// find attributes and methods	
 	for (int i=0, cuListSize = cuList.size(); i < cuListSize; i++) {
-	    final CompilationUnit unit = cuList.getCompilationUnit(i);	    
+	    final CompilationUnit unit = cuList.get(i);	    
 	    for (int j = 0, typeCount = unit.getTypeDeclarationCount(); 
 		 j < typeCount; j++) {
 
@@ -116,17 +116,17 @@ public class UMLOCLJavaModel implements UMLOCLModel {
     }
 
 
-    protected void findAllClasses(CompilationUnitList cuList) {	
+    protected void findAllClasses(List<CompilationUnit> cuList) {	
 	for (int i=0, cuListSize = cuList.size(); i < cuListSize; i++) {
-	    final CompilationUnit pa = cuList.getCompilationUnit(i);
+	    final CompilationUnit pa = cuList.get(i);
 	    
 	    for (int j = 0, tdCount = pa.getTypeDeclarationCount(); j < tdCount; j++) {
 		final TypeDeclaration td = pa.getTypeDeclarationAt(j);
 		final UMLOCLClassifier cls = ensureUMLOCLClassifier(td);
 		// now find all supertypes of this class
-		final ClassTypeList supertypes = td.getAllSupertypes();				
+		final List<ClassType> supertypes = td.getAllSupertypes();				
 		for (int k = 1, supSize = supertypes.size(); k < supSize; k++) {
-		    final ClassType st = supertypes.getClassType(k);
+		    final ClassType st = supertypes.get(k);
 		    cls.addSupertype(st.getName(), ensureUMLOCLClassifier(st));
 		}
 	    }	
@@ -138,9 +138,9 @@ public class UMLOCLJavaModel implements UMLOCLModel {
 	
 	final UMLOCLClassifier cls = 
 	    classifiers.getClassifierByFullName(td.getFullName());
-	final MethodList ml = td.getAllMethods();
+	final List<Method> ml = td.getAllMethods();
 	for (int l = 0, mlSize=ml.size(); l < mlSize; l++) {
-	    final Method meth = ml.getMethod(l);
+	    final Method meth = ml.get(l);
 	    recoder.abstraction.Type retType = meth.getReturnType();
 	    tudresden.ocl.check.types.Type ret2 = typeMap.getTypeFor(retType, classifiers);
 
@@ -150,13 +150,13 @@ public class UMLOCLJavaModel implements UMLOCLModel {
 	    }
 
 
-	    final TypeList ctl = meth.getSignature();
+	    final List<recoder.abstraction.Type> ctl = meth.getSignature();
 	    final Type[] paramsArray = new Type[ctl.size()];
 	    final StringBuffer methodSignatureStr = new StringBuffer(meth.getName());
 	    methodSignatureStr.append("(");
 	    
 	    for (int k = 0, ctlSize = ctl.size(); k < ctlSize; k++) {		
-		final recoder.abstraction.Type par = ctl.getType(k);
+		final recoder.abstraction.Type par = ctl.get(k);
 		final String parTypeFullName = par.getFullName();
 
 
@@ -185,14 +185,14 @@ public class UMLOCLJavaModel implements UMLOCLModel {
     
 	
     private void findAllAttributes(TypeDeclaration td) {
-	final FieldList fl = td.getAllFields();
+	final List<Field> fl = td.getAllFields();
 	final UMLOCLClassifier clf = classifiers.getClassifierByFullName(td.getFullName());
 	if (clf==null) {		
 	    throw new IllegalStateException("Classifier not found: "
 					    +td.getFullName());
 	}
 	for (int l = 0, flSize = fl.size(); l < flSize; l++) {
-	    final Field field = fl.getField(l);
+	    final Field field = fl.get(l);
 	    final recoder.abstraction.Type fieldType = field.getType();
 
 	    Type type = typeMap.getTypeFor(fieldType, classifiers);	    
@@ -220,9 +220,9 @@ public class UMLOCLJavaModel implements UMLOCLModel {
 	    services.getJavaInfo().getKeYProgModelInfo().getServConf();
 	sfr = crsc.getSourceFileRepository();
 	new DefaultSourceInfo(crsc);
-        StringArrayList files = collectJavaFiles(projectRoot);
+        ArrayList<String> files = collectJavaFiles(projectRoot);
         for (int i=0, sz = files.size(); i<sz; i++) {         
-            final String path = files.getString(i);
+            final String path = files.get(i);
             if (path != null) { 
                 try {      
                     sfr.getCompilationUnitFromFile(path); 
@@ -234,9 +234,9 @@ public class UMLOCLJavaModel implements UMLOCLModel {
         }
     }
 
-    private StringArrayList collectJavaFiles(String dir) {
+    private ArrayList<String> collectJavaFiles(String dir) {
  	final FileCollector col = new FileCollector(dir);
- 	final StringArrayList list = new StringArrayList();
+ 	final ArrayList<String> list = new ArrayList<String>();
  	while (col.next(DefaultSourceFileRepository.JAVA_FILENAME_FILTER)) {
  	    String path;
  	    try {

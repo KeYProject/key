@@ -11,9 +11,13 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import de.uka.ilkd.key.collection.ListOfString;
+import de.uka.ilkd.key.collection.PairOfListOfGoalAndTacletApp;
+import de.uka.ilkd.key.collection.PairOfTermAndListOfName;
+import de.uka.ilkd.key.collection.PairOfSVInstantiationsAndListOfName;
 import de.uka.ilkd.key.collection.SLListOfString;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -165,9 +169,8 @@ public abstract class TacletApp implements RuleApp {
 
 	SetOfQuantifiableVariable instanceSet 
 	    = SetAsListOfQuantifiableVariable.EMPTY_SET;
-	IteratorOfSchemaVariable it = pre.prefix().iterator();
-	while (it.hasNext()) {
-	    SchemaVariable var = it.next();
+	
+	for (final SchemaVariable var : pre.prefix() ) {
 	    instanceSet = 
 		instanceSet.add((LogicVariable)
 				((Term)instantiations.getInstantiation(var)).op());
@@ -232,9 +235,10 @@ public abstract class TacletApp implements RuleApp {
     protected static SVInstantiations resolveCollisionVarSV
 	(Taclet taclet, SVInstantiations insts) {
 
-	HashMapFromLogicVariableToSchemaVariable collMap =
-	    new HashMapFromLogicVariableToSchemaVariable();
-	IteratorOfEntryOfSchemaVariableAndInstantiationEntry it = 
+	HashMap<LogicVariable, SchemaVariable> collMap =
+	    new HashMap<LogicVariable, SchemaVariable>();
+	
+	final IteratorOfEntryOfSchemaVariableAndInstantiationEntry it = 
 	    insts.pairIterator();
 	while (it.hasNext()) {
 	    EntryOfSchemaVariableAndInstantiationEntry pair = it.next();
@@ -386,7 +390,11 @@ public abstract class TacletApp implements RuleApp {
 					    +"\nthat is not complete.");
 	}
         goal.addAppliedRuleApp(this);	
-	return taclet().apply(goal, services, this);
+        Node n = goal.node();
+        PairOfListOfGoalAndTacletApp p = taclet().applyHelp(
+                goal, services, this);
+        n.setAppliedRuleApp(p.getTacletApp());	
+	return p.getListOfGoal();
     }    
 
     /** applies the specified rule at the specified position 
@@ -587,11 +595,9 @@ public abstract class TacletApp implements RuleApp {
         TacletApp app = this;
         ListOfString proposals = SLListOfString.EMPTY_LIST;
 
-        final IteratorOfSchemaVariable it = uninstantiatedVars().iterator();
-        while (it.hasNext()) {
-            SchemaVariable var = it.next();
+        for (final SchemaVariable var : uninstantiatedVars()) {
             
-            if (LoopInvariantProposer.inLoopInvariantRuleSet(taclet().ruleSets())){ 
+            if (LoopInvariantProposer.DEFAULT.inLoopInvariantRuleSet(taclet())){ 
                 Object inv = LoopInvariantProposer.DEFAULT.tryToInstantiate(this, var, services);              
                 if (inv instanceof Term){
                     app = app.addCheckedInstantiation(var, (Term)inv, services, true);
@@ -708,21 +714,18 @@ public abstract class TacletApp implements RuleApp {
      * found cannot be instantiated (at least at the time)
      */
     private SVInstantiations forceGenericSortInstantiations (SVInstantiations insts) {
-        final IteratorOfSchemaVariable it  = uninstantiatedVars().iterator ();
-
-	    // force all generic sorts to be instantiated
-	    try {
-		while ( it.hasNext () ) {
-		    final SchemaVariable sv = it.next ();
-		    final GenericSortCondition c =
-		        GenericSortCondition.forceInstantiation
-		                ( ( (SortedSchemaVariable)sv ).sort (), true );
-		    if ( c != null ) 			                      
-		        insts = insts.add ( c );                                                                        
-		}
-	    } catch ( GenericSortException e ) {
-		Debug.fail ( "TacletApp cannot be made complete" );		
-	    }
+        // force all generic sorts to be instantiated
+        try {
+            for (final SchemaVariable sv : uninstantiatedVars()) {
+                final GenericSortCondition c =
+                    GenericSortCondition.forceInstantiation
+                    ( ( (SortedSchemaVariable)sv ).sort (), true );
+                if ( c != null ) 			                      
+                    insts = insts.add ( c );                                                                        
+            }
+        } catch ( GenericSortException e ) {
+            Debug.fail ( "TacletApp cannot be made complete" );		
+        }
         return insts;
     }
 
@@ -878,9 +881,7 @@ public abstract class TacletApp implements RuleApp {
                                                SetOfMetavariable newVars) {
         insts = forceGenericSortInstantiations ( insts );
 
-        final IteratorOfSchemaVariable it = uninstantiatedVars ().iterator ();
-        while ( it.hasNext () ) {
-            final SchemaVariable sv = it.next ();
+        for (final SchemaVariable sv : uninstantiatedVars()) {
             if (isDependingOnModifiesSV(sv))
                 continue;
             Debug.assertTrue ( canUseMVAPriori ( sv ),
@@ -983,6 +984,8 @@ public abstract class TacletApp implements RuleApp {
     }
     
 
+    private static final SchemaVariable ANON_SV = new NameSV(NameSV.NAME_PREFIX + "_ANON_UPDATES");
+
     /**
      * Create skolem functions (for variables declared via "\\new(c,
      * \\dependingOn(phi))" or via "\\new(upd, \\dependingOnMod(#modifiers))")
@@ -995,14 +998,60 @@ public abstract class TacletApp implements RuleApp {
         while ( svIt.hasNext () )
             insts = createTermSkolemFunctions ( svIt.next (), insts, p_func_ns );
         
+        Name[][] anon_proposals = null;
+        String anon_genNames = "";
+        Object o = insts.getInstantiation(ANON_SV);
+
+        if (o instanceof Name) {
+            String[] props = ((Name) o).toString().split(";");
+            anon_proposals = new Name[props.length][];
+
+            for (int i = 0; i < props.length; i++) {
+                String[] props2 = props[i].split(",");
+                anon_proposals[i] = new Name[props2.length];
+
+                for (int j = 0; j < props2.length; j++) {
+                    anon_proposals[i][j] = new Name(props2[j]);
+                }
+
+            }
+
+        }
+
         final IteratorOfVariableCondition vcIt = taclet.getVariableConditions ();
-        while ( vcIt.hasNext () ) {
+        for (int i = 0; vcIt.hasNext (); ) {
             final VariableCondition vc = vcIt.next();
-            if ( vc instanceof NewDepOnAnonUpdates )
-                insts = createModifiesSkolemFunctions((NewDepOnAnonUpdates)vc,
-                                                      insts, services);
+            if ( vc instanceof NewDepOnAnonUpdates ) {
+                Name[] proposals = null;
+
+                if (anon_proposals != null && i < anon_proposals.length) {
+                    proposals = anon_proposals[i];
+                }
+
+                i++;
+                PairOfSVInstantiationsAndListOfName result =
+                        createModifiesSkolemFunctions((NewDepOnAnonUpdates)vc,
+                        insts, services, proposals);
+                insts = result.getSVInstantiations();
+                IteratorOfName it = result.getListOfName().iterator();
+
+                for (int j = 0; it.hasNext(); j++) {
+
+                    if (j > 0) {
+                        anon_genNames += "," + it.next().toString();
+                    } else {
+                        anon_genNames += ";" + it.next().toString();
+                    }
+
+                }
+
+            }
         }
         
+        if (anon_genNames.length() > 0) {
+            insts = insts.addInteresting(ANON_SV, new Name(anon_genNames.substring(1)));
+        }
+
         if ( insts == instantiations () ) return this;
         return setInstantiation ( insts );
     }
@@ -1027,17 +1076,18 @@ public abstract class TacletApp implements RuleApp {
     /**
      * Instantiate a schemavariable for an anonymous update (FormulaSV)
      */
-    private SVInstantiations
+    private PairOfSVInstantiationsAndListOfName
         createModifiesSkolemFunctions(NewDepOnAnonUpdates cond,
                                       SVInstantiations insts,
-                                      Services services) {
+                                      Services services,
+                                      Name[] proposals) {
         final SchemaVariable modifies = cond.getModifiesSV ();
         final SchemaVariable updateSV = cond.getUpdateSV ();
         
         if (insts.isInstantiated ( updateSV )) {
             System.err.println(
                 "Modifies skolem functions already created - ignoring.");
-            return insts;
+            return new PairOfSVInstantiationsAndListOfName(insts, null);
         }
         
         final ListOfObject locationList =
@@ -1046,10 +1096,12 @@ public abstract class TacletApp implements RuleApp {
             new AnonymisingUpdateFactory
             ( new UpdateFactory ( services, new UpdateSimplifier () ) );
         final Term[] mvArgs = toTermArray ( determineArgMVs ( insts, updateSV ) );
-        return insts.add ( updateSV,
-                           auf.createAnonymisingUpdateAsFor
+        PairOfTermAndListOfName result =
+                                  auf.createAnonymisingUpdateAsFor
                                   ( toLocationDescriptorArray ( locationList ),
-                                    mvArgs, services ) );
+                                    mvArgs, services, proposals );
+        return new PairOfSVInstantiationsAndListOfName(insts.add ( updateSV,
+                                  result.getTerm()), result.getListOfName());
     }
     
     private static LocationDescriptor[]
@@ -1561,6 +1613,26 @@ public abstract class TacletApp implements RuleApp {
 	return ns;
     }
 
+    /**
+     * create a new function namespace by adding all newly instantiated 
+     * skolem symbols to a new namespace.
+     * 
+     * @author mulbrich
+     * @param func_ns the original function namespace
+     * @return the new function namespace that bases on the original one
+     */
+    public Namespace extendedFunctionNameSpace(Namespace func_ns) {
+        Namespace ns = new Namespace(func_ns);
+        IteratorOfSchemaVariable it = instantiations.svIterator();
+        while(it.hasNext()) {
+            SchemaVariable sv = it.next();
+            if(sv.isSkolemTermSV()) {            
+                Term inst = (Term) instantiations.getInstantiation(sv);
+                ns.addSafely(inst.op());
+            }
+        }
+        return ns;
+    }
 
     /**
      * returns the bound SchemaVariable that causes a name conflict (i.e. there are
@@ -1577,7 +1649,7 @@ public abstract class TacletApp implements RuleApp {
 	    SchemaVariable sv=svIt.next();
 	    if (sv.isTermSV() || sv.isFormulaSV()) {
 		TacletPrefix prefix=taclet().getPrefix(sv);
-		HashSet names=new HashSet();	    
+		HashSet<Name> names=new HashSet<Name>();	    
 		if (prefix.context()) {
 		    IteratorOfQuantifiableVariable contextIt
 			= contextVars(sv).iterator();

@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.visualdebugger;
 
+import java.util.HashMap;
+
+import de.uka.ilkd.key.logic.PosInOccurrence;
+
 
 /**
  * This class encapsulates some information which has been originally attached to 
@@ -13,7 +17,7 @@ package de.uka.ilkd.key.visualdebugger;
  */
 public class VisualDebuggerState {
 
-    private HashMapFromPosInOccurrenceToLabel labels = new HashMapFromPosInOccurrenceToLabel();
+    private HashMap<PosInOccurrence, Label> labels = new HashMap<PosInOccurrence, Label>();
 
     private boolean looking = false;
 
@@ -31,7 +35,7 @@ public class VisualDebuggerState {
     // ALL methods below are for the eclipse symbolic debugger plug-in
     // THEY HAVE TO BE MOVED OUT TO THE DEBUGGER package
     // where a separate mapping node <-> debugger status has to be maintained    
-    public HashMapFromPosInOccurrenceToLabel getLabels() {
+    public HashMap<PosInOccurrence, Label> getLabels() {
         return this.labels;
     }
 
@@ -51,7 +55,7 @@ public class VisualDebuggerState {
         return looking;
     }
 
-    public void setLabels(HashMapFromPosInOccurrenceToLabel labels) {
+    public void setLabels(HashMap<PosInOccurrence, Label> labels) {
         this.labels = labels;
     }
 

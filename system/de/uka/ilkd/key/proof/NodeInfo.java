@@ -50,7 +50,7 @@ public class NodeInfo {
     }
 
 
-    private static List symbolicExecNames = new ArrayList(5);
+    private static List<Name> symbolicExecNames = new ArrayList<Name>(5);
     static {
         symbolicExecNames.add(new Name("simplify_prog"));
         symbolicExecNames.add(new Name("simplify_autoname"));

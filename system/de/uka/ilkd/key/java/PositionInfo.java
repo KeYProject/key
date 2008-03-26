@@ -16,9 +16,9 @@ package de.uka.ilkd.key.java;
  */
 public class PositionInfo {
 
-    Position relPos;
-    Position startPos;
-    Position endPos;
+    final Position relPos;
+    final Position startPos;
+    final Position endPos;
 
     String fileName=null;
     protected String parentClass;

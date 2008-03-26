@@ -5,6 +5,7 @@ package java.lang;
 public final class Integer extends Number implements Comparable {
     public static final int MIN_VALUE = 0x80000000;
     public static final int MAX_VALUE = 0x7fffffff;
+    private int value;
     public Integer(int value) {}
     public Integer(String s) {}
     public static String toString(int num, int radix) {}

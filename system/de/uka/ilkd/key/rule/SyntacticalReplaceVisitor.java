@@ -446,8 +446,6 @@ public class SyntacticalReplaceVisitor extends Visitor {
     }
 
     /**
-     * @param dependencies
-     * @return
      */
     private Operator instantiateNRFunctionWithExplicitDependencies
     	(NRFunctionWithExplicitDependencies nrFunc) {
@@ -593,7 +591,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
     
     /**
      * @param boundSchemaVariable
-     * @return
+     * @return the temporary variable to use
      */
     private LogicVariable createTemporaryLV (SortedSchemaVariable boundSchemaVariable) {
         final Term t = newInstantiations.get ( boundSchemaVariable );

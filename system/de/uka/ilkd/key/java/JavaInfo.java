@@ -85,10 +85,14 @@ public class JavaInfo {
     private KeYJavaType[] commonTypes = new KeYJavaType[3];
 
     //some caches for the getKeYJavaType methods.
-    private HashMap sort2KJTCache = null;
-    private HashMap type2KJTCache = null;
-    private HashMap name2KJTCache = null;
-    private HashMap sName2KJTCache = null;
+    private HashMap<Sort, KeYJavaType> sort2KJTCache = null;
+    private HashMap<Type, KeYJavaType> type2KJTCache = null;
+    private HashMap<String, KeYJavaType> name2KJTCache = null;
+
+    // the simple name lookup is errorprone and should be removed soon
+    // where it is used, force to specify a context class for unique type 
+    // resolution
+    private HashMap<String, Object> sName2KJTCache = null;
     
     private LRUCache commonSubtypeCache = new LRUCache(200);
     
@@ -285,7 +289,7 @@ public class JavaInfo {
             return "[B";
         else if ("jint[]".equals(s) || "int[]".equals(s))
             return "[I";
-        else if ("jlong[]".equals(s) || "long[]".equals("s"))
+        else if ("jlong[]".equals(s) || "long[]".equals(s))
             return "[J";
         else if ("jshort[]".equals(s) || "short[]".equals(s))
             return "[S";
@@ -346,9 +350,9 @@ public class JavaInfo {
      * caches all known types according to their short name
      */
     private void buildShortNameCache() {
-        sName2KJTCache = new HashMap();
+        sName2KJTCache = new HashMap<String, Object>();
         sNameCachedSize = kpmi.rec2key().size();
-        final HashSet duplicates = new HashSet();
+        final HashSet<String> duplicates = new HashSet<String>();
         final Iterator it = kpmi.allElements().iterator();        
         while (it.hasNext()) {
             Object o = it.next();
@@ -384,13 +388,13 @@ public class JavaInfo {
      * @return all known KeYJavaTypes of the current
      * program type model
      */
-    public Set getAllKeYJavaTypes() {
-	final Set result  = new HashSet();
+    public Set<KeYJavaType> getAllKeYJavaTypes() {
+	final Set<KeYJavaType> result  = new HashSet<KeYJavaType>();
 	final Iterator it = kpmi.allElements().iterator();
         while (it.hasNext()) {
 	    final Object o = it.next();     
-	    if (o instanceof KeYJavaType) {
-		result.add(o);
+	    if (o instanceof KeYJavaType) {		
+	        result.add((KeYJavaType) o);
 	    }
 	}
 	return result;
@@ -448,12 +452,13 @@ public class JavaInfo {
      public KeYJavaType getKeYJavaType(Sort sort) {
 	 if(sort2KJTCache == null || kpmi.rec2key().size() > sortCachedSize){
 	     sortCachedSize = kpmi.rec2key().size();
-	     sort2KJTCache = new HashMap();
-	     Iterator it = (kpmi.allElements()).iterator();
+	     sort2KJTCache = new HashMap<Sort, KeYJavaType>();
+	     Iterator it = kpmi.allElements().iterator();
 	     while (it.hasNext()) {
 		 Object o = it.next();
-		 if (o != null && o instanceof KeYJavaType){
-                     sort2KJTCache.put(((KeYJavaType)o).getSort(), o);
+		 if (o instanceof KeYJavaType){
+                     final KeYJavaType oKJT = (KeYJavaType)o;
+                     sort2KJTCache.put((oKJT).getSort(), oKJT);
 		 }
 	     }
 	 }	
@@ -488,12 +493,13 @@ public class JavaInfo {
 	    return getTypeConverter().getKeYJavaType(t);
         } else {
 	    if(type2KJTCache == null){
-		type2KJTCache = new HashMap();
+		type2KJTCache = new HashMap<Type, KeYJavaType>();
 		final Iterator it = (kpmi.allElements()).iterator();
 		while (it.hasNext()) {
 		    Object o = it.next();
 		    if (o instanceof KeYJavaType) {
-			type2KJTCache.put(((KeYJavaType)o).getJavaType(), o);
+		        final KeYJavaType oKJT = (KeYJavaType)o;
+			type2KJTCache.put(oKJT.getJavaType(), oKJT);
 		    }
 		}
 	    }
@@ -647,6 +653,16 @@ public class JavaInfo {
 	    final KeYJavaType keYType = it.next();
 	    if (!((ClassType)keYType.getJavaType()).isInterface()) {
 		result = keYType;
+	    }
+	}
+	
+	if(result == null && ((ClassDeclaration) javaType).isAnonymousClass()){
+	    IteratorOfSort sit = type.getSort().extendsSorts().iterator();
+	    while(sit.hasNext()){
+	        Sort s = sit.next();
+	        if(!((ClassType) getKeYJavaType(s).getJavaType()).isInterface()){
+	            return getKeYJavaType(s);
+	        }
 	    }
 	}
 
@@ -926,7 +942,7 @@ public class JavaInfo {
 	    final ListOfField list   = kpmi.getAllFieldsLocallyDeclaredIn(classType);
 	    final IteratorOfField it = list.iterator();	   
             while (it.hasNext()) {
-		final Field f = it.next();              
+		final Field f = it.next();
 		if (f!=null && (f.getName().equals(name) || 
 		                f.getProgramName().equals(name))) {
 		    return (ProgramVariable)((VariableSpecification)f).

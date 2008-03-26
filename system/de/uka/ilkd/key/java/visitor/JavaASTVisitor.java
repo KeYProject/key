@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.java.visitor;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.annotation.Annotation;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
@@ -25,6 +24,7 @@ import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramMetaConstruct;
 import de.uka.ilkd.key.rule.soundness.ProgramSVProxy;
 import de.uka.ilkd.key.rule.soundness.ProgramSVSkolem;
+import de.uka.ilkd.key.speclang.LoopInvariant;
 
 /** 
  * Extends the JavaASTWalker to use the visitor mechanism. The
@@ -33,13 +33,39 @@ import de.uka.ilkd.key.rule.soundness.ProgramSVSkolem;
  */
 public abstract class JavaASTVisitor extends JavaASTWalker 
     implements Visitor {
+    
+    protected final Services services;
+    
 
     /** create the JavaASTVisitor
      * @param root the ProgramElement where to begin
+     * @param services the Services object
      */
-    public JavaASTVisitor(ProgramElement root) {
+    public JavaASTVisitor(ProgramElement root, Services services) {
 	super(root);
+        this.services = services;
     }
+    
+    
+    protected void walk(ProgramElement node) {
+        super.walk(node);
+        if(node instanceof LoopStatement && services != null) {
+            LoopInvariant li = services.getSpecificationRepository()
+                                       .getLoopInvariant((LoopStatement) node);
+            if(li != null) {
+                performActionOnLoopInvariant(li);
+            }
+        }
+    }
+    
+    
+    /**
+     * the action that is performed just before leaving the node the last time
+     */
+    protected void doAction(ProgramElement node) {
+        node.visit(this);
+    }
+    
 
     /** the action that is performed just before leaving the node the
      * last time 
@@ -48,12 +74,6 @@ public abstract class JavaASTVisitor extends JavaASTWalker
 
     public void performActionOnAbstractProgramElement(AbstractProgramElement x) {
 	doDefaultAction(x);
-    }
-
-    protected void performActionOnAnnotationArray(Annotation[] a){
-        for (int i = 0; i<a.length; i++){
-            doDefaultAction(a[i]);
-        }
     }
 
     public void performActionOnArrayDeclaration(ArrayDeclaration x) {
@@ -168,6 +188,10 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     public void performActionOnCopyAssignment(CopyAssignment x) {
 	doDefaultAction(x);	
     }
+    
+    public void performActionOnSetAssignment(SetAssignment x) {
+        doDefaultAction(x);
+    }
 
     public void performActionOnDefault(Default x) {
 	doDefaultAction(x);
@@ -211,6 +235,10 @@ public abstract class JavaASTVisitor extends JavaASTWalker
  
     public void performActionOnExtends(Extends x) {
 	doDefaultAction(x);
+    }
+    
+    public void performActionOnEnhancedFor(EnhancedFor x) {
+        doDefaultAction(x);
     }
 
     public void performActionOnFieldDeclaration(FieldDeclaration x) {
@@ -598,4 +626,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker
 	doDefaultAction(x);
     }
     
+    public void performActionOnLoopInvariant(LoopInvariant x) {
+        //do nothing
+    }
 }

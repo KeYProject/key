@@ -14,8 +14,6 @@
 package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.annotation.Annotation;
-import de.uka.ilkd.key.java.annotation.LoopInvariantAnnotation;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
@@ -48,8 +46,6 @@ public abstract class LoopStatement extends JavaStatement
      *      Body.
      */
     protected final Statement body;
-
-    protected Annotation[] annotations = new Annotation[0];
 
     /**
      *      Loop statement.
@@ -109,22 +105,20 @@ public abstract class LoopStatement extends JavaStatement
      *      Loop statement.
      *      @param body a statement.
      */
-    public LoopStatement(Expression guard,Statement body, Annotation[] a) {
+    public LoopStatement(Expression guard,Statement body) {
         this.body    = body;
 	this.updates = null;
 	this.inits   = null;
 	this.guard   = new Guard(guard);
-	this.annotations = a;
     }
 
     public LoopStatement(Expression guard, Statement body, 
-            Annotation[] a, PositionInfo pos) {
-	super(add(new ExtList(),pos));
+                         PositionInfo pos) {
+	super(pos);
         this.body    = body;
 	this.updates = null;
 	this.inits   = null;
 	this.guard   = new Guard(guard);
-	this.annotations = a;
     }
 
 
@@ -165,7 +159,6 @@ public abstract class LoopStatement extends JavaStatement
 	this.updates = updates;
 	this.inits   = inits;
 	this.guard   = guard;
-	this.annotations = (Annotation[]) comments.collect(Annotation.class);
     }
 
 
@@ -177,7 +170,6 @@ public abstract class LoopStatement extends JavaStatement
 	this.updates = updates;
 	this.inits   = inits;
 	this.guard   = guard;
-	this.annotations = (Annotation[]) comments.collect(Annotation.class);
     }
 
 
@@ -361,6 +353,7 @@ public abstract class LoopStatement extends JavaStatement
 	}
 	return null;
     }
+      
 
     /**
      *      Get updates.
@@ -380,33 +373,15 @@ public abstract class LoopStatement extends JavaStatement
     public IForUpdates getIForUpdates() {
         return updates;
     }
-
+    
     /**
-     *@return the annotations.
+     * get the loop initializer as ILoopInit
+     * @return the loop initializer
      */
-    public Annotation[] getAnnotations(){
-	return annotations;
+    public ILoopInit getILoopInit() {
+       return inits;
     }
 
-    public int getAnnotationCount(){
-	return annotations.length;
-    }
-
-    /**
-     * Don't use this method !!!
-     */
-    // HACK: loop invariants are parsed after this LoopStatement has already 
-    // been created, that's why they are set afterwards. 
-    // TODO: find a better solution which is compatible with the immutability 
-    // of ProgramElements.
-    public void addLoopInvariant(LoopInvariantAnnotation a){
-	Annotation[] result = new Annotation[annotations.length+1];
-	for(int i = 0; i<annotations.length; i++){
-	    result[i] = annotations[i];
-	}
-	result[annotations.length] = a;
-	annotations = result;
-    }
 
     /**
      *      Is exit condition.

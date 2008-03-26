@@ -153,6 +153,13 @@ public class SVInstantiations {
 
     public SVInstantiations addInteresting(SchemaVariable sv, 
 					   Name name) {
+        SchemaVariable existingSV = lookupVar(sv.name());
+        Name oldValue = (Name) getInstantiation(existingSV);
+        if (name.equals(oldValue)) return this; // already have it
+        if (oldValue!=null) throw new IllegalStateException(
+            "Trying to add a second name proposal for "+sv+
+            ": "+oldValue+"->"+name);
+        // otherwise (nothing here yet) add it    
         return addInteresting ( sv, new NameInstantiationEntry(sv, name) );
     }
     

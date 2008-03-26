@@ -3,7 +3,6 @@
 
 package java.lang;
 
-import gnu.classpath.Configuration;
 public class Object {  
 
     /** A data group for the state of this object.  This is used to

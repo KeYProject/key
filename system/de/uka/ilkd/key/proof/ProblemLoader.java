@@ -33,22 +33,25 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.parser.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.pp.PresentationFeatures;
-import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAuflia;
 import de.uka.ilkd.key.proof.init.*;
-import de.uka.ilkd.key.proof.mgt.OldOperationContract;
+import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.speclang.SLEnvInput;
+import de.uka.ilkd.key.util.Array;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
+
+import de.uka.ilkd.key.util.ProgressMonitor;
+import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAuflia;
 
 public class ProblemLoader implements Runnable {
 
     File file;
-    Main main;
+    private IMain main;    
     KeYMediator mediator;
 
     Proof proof = null;
-    IteratorOfNode children = null;
+    Iterator<Node> children = null;
 
     Node currNode = null;
     KeYExceptionHandler exceptionHandler = null;
@@ -60,7 +63,7 @@ public class ProblemLoader implements Runnable {
     private String hoareLoopInv;     
     
     PosInTerm currPosInTerm = PosInTerm.TOP_LEVEL;
-    OldOperationContract currContract = null;
+    ContractWithInvs currContract = null;
     Stack stack = new Stack();
     LinkedList loadedInsts = null;
     ListOfIfFormulaInstantiation ifSeqFormulaList =
@@ -77,18 +80,59 @@ public class ProblemLoader implements Runnable {
     private Profile profile;
     
     private SwingWorker worker;
-    
-    public ProblemLoader(File file, Main main, Profile profile) {
-        this(file, main, profile, false);
-    }
 
-    public ProblemLoader(File file, Main main, Profile profile, boolean keepProblem) {
+    private ProgressMonitor pm;
+    private ProverTaskListener ptl;
+
+    public ProblemLoader(File file, IMain main, Profile profile, 
+            boolean keepProblem) {
         this.main = main;
-        mediator  = main.mediator();
+        this.mediator  = main.mediator();        
         this.file = file;
         this.profile = profile;
         this.exceptionHandler = mediator.getExceptionHandler();
         this.keepProblem = keepProblem;
+
+        addProgressMonitor(main.getProgressMonitor());
+    }    
+      
+    public void addProgressMonitor(ProgressMonitor pm) {
+        this.pm = pm;
+    }
+
+    public void addTaskListener(ProverTaskListener ptl) {
+        this.ptl = ptl;
+    }
+    
+    /** 
+     * updates a possibly existing status line with the given information
+     * @param status the String to be printed in the status line
+     */
+    public void setStatusLine(String status) {
+        if (main != null) {
+            main.setStatusLine(status);
+        }
+    }
+
+    /**
+     * updates a possibly existing status line with the given status information
+     * and sets a maximum value for the progress bar
+     * @param status the String with the status information
+     * @param nr the int used a maximum value for a progress bar
+     */
+    public void setStatusLine(String status, int nr) {
+        if (main != null) {
+            main.setStatusLine(status, nr);
+        }
+    }
+    
+    /**
+     * resets a possibly existing statusline to its standard text
+     */
+    public void setStandardStatusLine() {
+        if (main != null) {
+            main.setStandardStatusLine();
+        }        
     }
 
 
@@ -100,40 +144,28 @@ public class ProblemLoader implements Runnable {
          * InterruptedException in doWork().
          */
         worker = new SwingWorker() {
+                private long time;
 		public Object construct() {
-		    Object res = doWork();
+                    time = System.currentTimeMillis();
+                    Object res = doWork();
+                    time = System.currentTimeMillis() - time;
 		    return res;
 		}
 		public void finished() {
 		    mediator.startInterface(true);
-		    String msg = (String) get();
-		    if(!"".equals(msg)) {
-		        if(Main.batchMode){
-			    System.exit(-1);
-			} else {
-			    new ExceptionDialog
-				(mediator.mainFrame(), 
-                                        exceptionHandler.getExceptions());
-			    exceptionHandler.clear();
-			}
-		    } else {
-			PresentationFeatures.
-			    initialize(mediator.func_ns(), 
-				       mediator.getNotationInfo(),
-				       mediator.getSelectedProof());
+		    final String msg = (String) get();
+		    if (ptl != null) {                        
+                        final TaskFinishedInfo tfi = new DefaultTaskFinishedInfo(ProblemLoader.this, 
+                                msg, proof, time, 
+                                (proof != null ? proof.countNodes() : 0),                                
+                                (proof != null ? proof.countBranches() -
+                                        proof.openGoals().size() : 0));
+                        ptl.taskFinished(tfi);
 		    }
-		    if (Main.batchMode) {
-			//System.out.println("Proof: " +proof.openGoals());
-			if(proof.openGoals().size()==0) {
-			    System.out.println("proof.openGoals.size=" + 
-                                    proof.openGoals().size());
-			    System.exit(0);
-			}
-		        mediator.startAutoMode();
-		    }		   
 		}
-	    };
+        };
         mediator.stopInterface(true);
+        if (ptl != null) ptl.taskStarted("Loading problem ...", 0);
         worker.start();
     }
 
@@ -145,33 +177,32 @@ public class ProblemLoader implements Runnable {
      * @throws IllegalArgumentException if the user has selected a file with an unsupported extension
      *                          an exception is thrown to indicate this
      */
-    protected KeYUserProblemFile createProblemFile(File file) 
+    protected EnvInput createEnvInput(File file) 
     throws FileNotFoundException {                
         
         final String filename = file.getName();
         
         if (filename.endsWith(".java")){ 
-            // java file, probably enriched by JML specifications
-            return new KeYJMLInput(filename, file, 
-                    profile instanceof JavaTestGenerationProfile,
-                    main.getProgressMonitor());
-            
+            // java file, probably enriched by specifications
+            if(file.getParentFile() == null) {
+                return new SLEnvInput(".");
+            } else {
+                return new SLEnvInput(file.getParentFile().getAbsolutePath());
+            }            
         } else if (filename.endsWith(".key") || 
                 filename.endsWith(".proof")) {
             if (profile instanceof HoareProfile) {
-                return new HoareUserProblemFile(filename, file,
-                        main.getProgressMonitor(), Main.jmlSpecs);
+                return new HoareUserProblemFile(filename, file, pm);
             } else {
                 // KeY problem specification or saved proof
-                return new KeYUserProblemFile(filename, file, 
-                        main.getProgressMonitor(), Main.jmlSpecs);
+                return new KeYUserProblemFile(filename, file, pm);
             }            
+            // KeY problem specification or saved proof
+            return new KeYUserProblemFile(filename, file, pm);
         } else if (file.isDirectory()){ 
-            // directory containing JML-enriched java sources
-            // prompt the 
-            return new JavaInputWithJMLSpecBrowser(file.getPath(), file, 
-                    profile instanceof JavaTestGenerationProfile, 
-                    main.getProgressMonitor());            
+            // directory containing java sources, probably enriched 
+            // by specifications
+            return new SLEnvInput(file.getPath());
         } else {
             if (filename.lastIndexOf('.') != -1) {
                 throw new IllegalArgumentException
@@ -189,29 +220,46 @@ public class ProblemLoader implements Runnable {
 
    private Object doWork() {
        String status = "";
-       KeYUserProblemFile problemFile = null;
+       ProofOblInput po = null;
        try{
            try{
                if (!keepProblem) {
-                   problemFile = createProblemFile(file);                  
-	           init = new ProblemInitializer(main);            
-                   init.startProver(problemFile, problemFile);
+        	   EnvInput envInput = createEnvInput(file);
+        	   init = new ProblemInitializer(main); 
+        	   InitConfig initConfig = init.prepare(envInput);
+        	   
+        	   if(envInput instanceof ProofOblInput
+                       && !(envInput instanceof KeYFile 
+                            && ((KeYFile) envInput).chooseContract())) {
+        	       po = (ProofOblInput) envInput;
+        	   } else {
+                       if(envInput instanceof KeYFile) {
+                           initConfig.setOriginalKeYFileName(envInput.name());
+                       }
+        	       POBrowser poBrowser = POBrowser.showInstance(initConfig);        	       
+        	       po = poBrowser.getPO();
+        	       if(po == null) {
+        		   return "Aborted.";
+        	       }
+        	   }
+        	   
+        	   init.startProver(initConfig, po);
                }
                proof = mediator.getSelectedProof();
                mediator.stopInterface(true); // first stop (above) is not enough
                // as there is no problem at that time
-               main.setStatusLine("Loading proof");
+               setStatusLine("Loading proof");
                currNode = proof.root(); // initialize loader
                children = currNode.childrenIterator(); // --"--
                iconfig = proof.env().getInitConfig();
                if (!keepProblem) {
-                   init.tryReadProof(this, problemFile);
+                   init.tryReadProof(this, po);
                } else {
-                   main.setStatusLine("Loading proof", (int)file.length());
+                   setStatusLine("Loading proof", (int)file.length());
                    CountingBufferedInputStream cinp =
                        new CountingBufferedInputStream(
                            new FileInputStream(file),
-                           main.getProgressMonitor(),
+                           pm,
                            (int)file.length()/100);
                    KeYLexer lexer = new KeYLexer(cinp,
                        proof.getServices().getExceptionHandler());
@@ -222,7 +270,7 @@ public class ProblemLoader implements Runnable {
                    } while (t.getType() != KeYLexer.PROOF);
                    parser.proofBody(this);
                }
-	       main.setStandardStatusLine();
+	       setStandardStatusLine();
            
            // Inform the decproc classes that a new problem has been loaded
            // This is done here because all benchmarks resulting from one loaded problem should be
@@ -236,12 +284,13 @@ public class ProblemLoader implements Runnable {
                status =  thr.getMessage();
 	   }
        } catch (ExceptionHandlerException ex){
-	       main.setStatusLine("Failed to load problem/proof");
+	       setStatusLine("Failed to load problem/proof");
 	       status =  ex.toString();
        }
        finally {
-           if (problemFile != null && problemFile instanceof KeYUserProblemFile){
-               ((KeYUserProblemFile) problemFile).close();
+           mediator.resetNrGoalsClosedByHeuristics();
+           if (po != null && po instanceof KeYUserProblemFile){
+               ((KeYUserProblemFile) po).close();
            }
        }
        return status;
@@ -291,19 +340,28 @@ public class ProblemLoader implements Runnable {
 	case 'h' :
 	    //             Debug.fail("Detected use of heuristics!");
 	    break;
-	case 'q' : // ifseqformula
-            Sequent seq = currGoal.sequent();
-            ifSeqFormulaList = ifSeqFormulaList.append(
-                new IfFormulaInstSeq(seq, Integer.parseInt(s)));
+	case 'q' : // ifseqformula      
+	    // mu 2008-jan-09
+            // bugfix: without this if-check,
+	    // proofs with meta variables cannot be loaded.
+            // when loading, rules are applied in an order different to the original one
+            // Thus the goal might already have been closed.
+            // Just ignore this ifseqforumla then
+            if(currGoal != null) {
+                Sequent seq = currGoal.sequent();
+                ifSeqFormulaList = ifSeqFormulaList.append(
+                        new IfFormulaInstSeq(seq, Integer.parseInt(s)));    
+            }
+            
             break;
         case 'u' : //UserLog
             if(proof.userLog==null)
-                proof.userLog = new Vector();
+                proof.userLog = new Vector<String>();
             proof.userLog.add(s);
             break;
         case 'v' : //Version log
             if(proof.keyVersionLog==null)
-                proof.keyVersionLog = new Vector();
+                proof.keyVersionLog = new Vector<String>();
             proof.keyVersionLog.add(s);
             break;
         case 's' : //ProofSettings
@@ -322,9 +380,10 @@ public class ProblemLoader implements Runnable {
             currPosInTerm = PosInTerm.TOP_LEVEL;
             break;
         case 'c' : //contract
-            currContract = (OldOperationContract) proof.getServices()
-                             .getSpecificationRepository().getContractByName(s);
-            break;             
+            currContract = new ContractWithInvs(s, proof.getServices());
+            if(currContract == null) {
+                throw new RuntimeException("Error loading proof: contract \"" + s + "\" not found.");
+            }
         case 'z': // old save mode only for compatibility
             hoareLoopInv = s;
             break;
@@ -336,7 +395,7 @@ public class ProblemLoader implements Runnable {
         //System.out.println("end "+id);
         switch (id) {
         case 'b' :
-            children = (IteratorOfNode) stack.pop();
+            children = (Iterator<Node>) stack.pop();
             break;
         case 'a' :
             if (currNode != null) {
@@ -344,6 +403,14 @@ public class ProblemLoader implements Runnable {
             }
             break;
         case 'r' :
+            // mu 2008-jan-09
+            // bugfix: without this, proofs with meta variables cannot be loaded.
+            // when loading, rules are applied in an order different to the original one
+            // Thus the goal might already have been closed.
+            // Just ignore this rule then
+            if(currGoal == null)
+                break;
+            
             try{
                currGoal.apply(constructApp());
                children = currNode.childrenIterator();
@@ -354,6 +421,14 @@ public class ProblemLoader implements Runnable {
             }
             break;
         case 'n' :
+            // mu 2008-jan-09
+            // bugfix: without this, proofs with meta variables cannot be loaded.
+            // when loading, rules are applied in an order different to the original one
+            // Thus the goal might already have been closed.
+            // Just ignore this rule then
+            if(currGoal == null)
+                break;
+
             try {
                 currGoal.apply(constructBuiltinApp());
                 children = currNode.childrenIterator();
@@ -390,8 +465,9 @@ public class ProblemLoader implements Runnable {
                         .getConstraint();
         
         if (currContract!=null) {
-            ourApp = new MethodContractRuleApp(UseMethodContractRule.INSTANCE,
-                    pos, userConstraint, currContract);
+            ourApp = new UseOperationContractRuleApp(pos, 
+                                                     userConstraint, 
+                                                     currContract);
             currContract=null;
             return ourApp;
         }
@@ -444,7 +520,7 @@ public class ProblemLoader implements Runnable {
                 throw new BuiltInConstructionException
                 (currTacletName +
                     " is missing. Most probably the binary "+
-                    "for this built-in rule ist not in your path or " +
+                    "for this built-in rule is not in your path or " +
                     "you do not have the permission to execute it.");
             } else {
                 throw new BuiltInConstructionException
@@ -534,7 +610,7 @@ public class ProblemLoader implements Runnable {
 	    result = app.createSkolemConstant ( value, sv, true, services );
         } else if (sv.isListSV()) {
             SetOfLocationDescriptor s = parseLocationList(value, targetGoal);
-            result = app.addInstantiation(sv, s.toArray(), true);
+            result = app.addInstantiation(sv, Array.reverse(s.toArray()), true);
         } else {
             Namespace varNS = p.getNamespaces().variables();
 	    varNS = app.extendVarNamespaceForSV(varNS, sv);
@@ -676,6 +752,10 @@ public class ProblemLoader implements Runnable {
         BuiltInConstructionException(String s) {
             super(s);
     }
+    }
+
+    public KeYExceptionHandler getExceptionHandler() {
+        return exceptionHandler;
     }
 
 }

@@ -24,8 +24,9 @@ public interface SortDefiningSymbols extends Sort {
     /**
      * Creates symbols defined by this sort and inserts them into the
      * namespace "functions".
-     * @param p_func_ns Namespace to which functions and predicates
+     * @param functions Namespace to which functions and predicates
      * should be added to
+     * @param sorts the Namespace containing all known sorts
      */
     void addDefinedSymbols(Namespace functions, Namespace sorts);
     

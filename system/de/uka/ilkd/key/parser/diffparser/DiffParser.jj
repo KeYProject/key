@@ -9,7 +9,7 @@
 //
 
 options {
-    OPTIMIZE_TOKEN_MANAGER = true;
+//    OPTIMIZE_TOKEN_MANAGER = true; // this is obsolete from Javacc 4 on
 //    DEBUG_PARSER = true;
 //    DEBUG_TOKEN_MANAGER = true;
     STATIC = false;

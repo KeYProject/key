@@ -13,12 +13,13 @@ package de.uka.ilkd.key.proof;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Iterator;
 import java.util.Vector;
 
 import de.uka.ilkd.hoare.init.HoareProfile;
 import de.uka.ilkd.hoare.rule.HoareLoopInvRuleApp;
+import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -31,6 +32,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PresentationFeatures;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.*;
 
@@ -40,194 +42,189 @@ import de.uka.ilkd.key.rule.inst.*;
  */
 public class ProofSaver {
 
-    protected Main main;
-    protected KeYMediator mediator;
-    protected String filename;
-    protected Proof proof;
-    LogicPrinter printer;
+   protected IMain main;
+   protected KeYMediator mediator;
+   protected String filename;
+   protected Proof proof;
+   LogicPrinter printer;
+   
+   public ProofSaver(IMain main, String filename) {
+      this.main = main;
+      this.mediator = main.mediator();
+      this.filename = filename;
+      this.proof = mediator.getSelectedProof();
+   }
+
+   public StringBuffer writeLog(Proof p){
+    StringBuffer logstr=new StringBuffer();
+    //Advance the Logentries
+    if(p.userLog==null)
+        p.userLog = new Vector<String>();
+    if(p.keyVersionLog==null)
+        p.keyVersionLog = new Vector<String>();
+    p.userLog.add(System.getProperty("user.name"));
+    p.keyVersionLog.add(main.getInternalVersion());
+    int s = p.userLog.size();
+    for(int i=0; i<s; i++){
+	logstr.append("(keyLog \""+i+"\" (keyUser \""+
+            p.userLog.elementAt(i)+"\" ) (keyVersion \""+
+            p.keyVersionLog.elementAt(i)+"\"))\n");
+       }
+    return logstr;
+   }
+
+   public String writeSettings(ProofSettings ps){
+    	return new String ("\\settings {\n\""+ps.settingsToString()+"\"\n}\n");
+   }
+   public String save() {
+      String errorMsg = null;
+      FileOutputStream fos = null;
+      PrintStream ps = null;
+
+      try {
+          fos = new FileOutputStream(filename);
+          ps = new PrintStream(fos);
 
 
-    private ProofSaver() {
-    }
+          Sequent problemSeq = proof.root().sequent();
+          printer = createLogicPrinter(proof.getServices(), false);
 
-    public ProofSaver(Main main, String filename) {
-        this.main = main;
-        this.mediator = main.mediator();
-        this.filename = filename;
-        this.proof = mediator.getSelectedProof();
-    }
+          ps.println(writeSettings(proof.getSettings()));
+          ps.print(proof.header());
+          ps.println("\\problem {");
+          if (mediator.getProfile() instanceof HoareProfile &&
+                  problemSeq.antecedent().size()>0) {
+              assert problemSeq.antecedent().size() == 1;
+              ps.println("(");            
+              printer.printSemisequent(problemSeq.antecedent());            
+              ps.println(printer.result());
+              ps.println(") ->");
 
-    public StringBuffer writeLog(Proof p){
-        StringBuffer logstr=new StringBuffer();
-        //Advance the Logentries
-        if(p.userLog==null)
-            p.userLog = new Vector();
-        if(p.keyVersionLog==null)
-            p.keyVersionLog = new Vector();
-        p.userLog.add(System.getProperty("user.name"));
-        p.keyVersionLog.add(Main.getInstance().getPrcsVersion());
-        int s = p.userLog.size();
-        for(int i=0; i<s; i++){
-            logstr.append("(keyLog \""+i+"\" (keyUser \""+
-                    p.userLog.elementAt(i)+"\" ) (keyVersion \""+
-                    p.keyVersionLog.elementAt(i)+"\"))\n");
-        }
-        return logstr;
-    }
+              printer.reset();            
+              ps.println("("); 
+          }
+          printer.printSemisequent(problemSeq.succedent());            
+          ps.println(printer.result());
+          if (mediator.getProfile() instanceof HoareProfile &&
+                  problemSeq.antecedent().size()>0) {
+              ps.println(")");
+          }
+          ps.println("}\n");
+   //                ps.println(mediator.sort_ns());
+          ps.println("\\proof {");
+          ps.println(writeLog(proof));
+          ps.println(node2Proof(proof.root()));
+          ps.println("}");
 
-    public String writeSettings(ProofSettings ps){
-        return new String ("\\settings {\n\""+ps.settingsToString()+"\"\n}\n");
-    }
-    public String save() {
-        String errorMsg = null;
-        FileOutputStream fos = null;
-        PrintStream ps = null;
-
-        try {
-            fos = new FileOutputStream(filename);
-            ps = new PrintStream(fos);
-
-
-            Sequent problemSeq = proof.root().sequent();
-            printer = createLogicPrinter(proof.getServices(), false);
-
-            ps.println(writeSettings(proof.getSettings()));
-            ps.print(proof.header());
-            ps.println("\\problem {");
-            
-            
-            if (mediator.getProfile() instanceof HoareProfile &&
-                    problemSeq.antecedent().size()>0) {
-                assert problemSeq.antecedent().size() == 1;
-                ps.println("(");            
-                printer.printSemisequent(problemSeq.antecedent());            
-                ps.println(printer.result());
-                ps.println(") ->");
-
-                printer.reset();            
-                ps.println("("); 
-            }
-            printer.printSemisequent(problemSeq.succedent());            
-            ps.println(printer.result());
-            if (mediator.getProfile() instanceof HoareProfile &&
-                    problemSeq.antecedent().size()>0) {
-                ps.println(")");
-            }
-            ps.println("}\n");
-            //                ps.println(mediator.sort_ns());
-            ps.println("\\proof {");
-            ps.println(writeLog(proof));
-            ps.println(node2Proof(proof.root()));
-            ps.println("}");
-
-        } catch (IOException ioe) {
-            errorMsg = "Could not save \n"+filename+".\n";
-            errorMsg += ioe.toString();	    
-        } catch (NullPointerException npe) {
-            errorMsg = "Could not save \n"+filename+"\n";
-            errorMsg += "No proof present?";
-            npe.printStackTrace();
-        } catch (Exception e) {
-            errorMsg = e.toString();
-            e.printStackTrace();
-        } finally {
-            try {
-                if (fos != null) fos.close();
-            } catch (IOException ioe) {
-                mediator.notify(new GeneralFailureEvent(ioe.toString()));
-            }          
-        }	  
-        return errorMsg; // null if success
-    }
+      } catch (IOException ioe) {
+          errorMsg = "Could not save \n"+filename+".\n";
+          errorMsg += ioe.toString();	    
+      } catch (NullPointerException npe) {
+          errorMsg = "Could not save \n"+filename+"\n";
+          errorMsg += "No proof present?";
+          npe.printStackTrace();
+      } catch (Exception e) {
+          errorMsg = e.toString();
+          e.printStackTrace();
+      } finally {
+          try {
+	      if (fos != null) fos.close();
+          } catch (IOException ioe) {
+	      mediator.notify(new GeneralFailureEvent(ioe.toString()));
+          }          
+      }	  
+      return errorMsg; // null if success
+   }
+   
 
 
+   private void printSingleNode(Node node, String prefix, StringBuffer tree) {
 
-    private void printSingleNode(Node node, String prefix, StringBuffer tree) {
+      RuleApp appliedRuleApp = node.getAppliedRuleApp();
+      if (appliedRuleApp == null && (proof.getGoal(node)!=null)) { // open goal
+         tree.append(prefix); 
+         tree.append("(opengoal \"");
+         LogicPrinter logicPrinter = 
+	     createLogicPrinter(proof.getServices(), false);
 
-        RuleApp appliedRuleApp = node.getAppliedRuleApp();
-        if (appliedRuleApp == null && (proof.getGoal(node)!=null)) { // open goal
-            tree.append(prefix); 
-            tree.append("(opengoal \"");
-            LogicPrinter logicPrinter = 
-                createLogicPrinter(proof.getServices(), false);
+         logicPrinter.printSequent(node.sequent());
+	 // WATCHOUT Woj: replaceAll... is necessary for the newly introduced backslash
+	 // notation in the parser
+         tree.append(printer.result().toString().replace('\n',' ').replaceAll("\\\\","\\\\\\\\"));
+         tree.append("\")\n");
+         return;
+      }
 
-            logicPrinter.printSequent(node.sequent());
-            // WATCHOUT Woj: replaceAll... is necessary for the newly introduced backslash
-            // notation in the parser
-            tree.append(printer.result().toString().replace('\n',' ').replaceAll("\\\\","\\\\\\\\"));
-            tree.append("\")\n");
-            return;
-        }
+      if (appliedRuleApp instanceof TacletApp) {
+         tree.append(prefix); 
+         tree.append("(rule \"");
+         tree.append(appliedRuleApp.rule().name());	
+         tree.append("\"");
+         tree.append(posInOccurrence2Proof(node.sequent(),
+                                           appliedRuleApp.posInOccurrence()));
+         tree.append(getInteresting(((TacletApp)appliedRuleApp).instantiations()));
+         ListOfIfFormulaInstantiation l =
+            ((TacletApp)appliedRuleApp).ifFormulaInstantiations();
+         if (l != null) tree.append(ifFormulaInsts(node, l));
+         tree.append("");
+         userInteraction2Proof(node, tree);
+         tree.append(")\n");
+      } else if (appliedRuleApp instanceof BuiltInRuleApp) {
+        tree.append(prefix); 
+      	tree.append("(builtin \"");
+      	tree.append(appliedRuleApp.rule().name().toString());
+      	tree.append("\"");        
+        tree.append(posInOccurrence2Proof(node.sequent(), 
+                                          appliedRuleApp.posInOccurrence()));
 
-        if (appliedRuleApp instanceof TacletApp) {
-            tree.append(prefix); 
-            tree.append("(rule \"");
-            tree.append(appliedRuleApp.rule().name());	
-            tree.append("\"");
-            tree.append(posInOccurrence2Proof(node.sequent(),
-                    appliedRuleApp.posInOccurrence()));
-            tree.append(getInteresting(((TacletApp)appliedRuleApp).instantiations()));
-            ListOfIfFormulaInstantiation l =
-                ((TacletApp)appliedRuleApp).ifFormulaInstantiations();
-            if (l != null) tree.append(ifFormulaInsts(node, l));
-            tree.append("");
-            userInteraction2Proof(node, tree);
-            tree.append(")\n");
-        }      
+        if (appliedRuleApp.rule() instanceof UseOperationContractRule) {
+            RuleJustificationBySpec ruleJusti = (RuleJustificationBySpec) 
+                            proof.env().getJustifInfo()
+                                       .getJustification(appliedRuleApp, 
+                                                         proof.getServices());
 
-        if (appliedRuleApp instanceof BuiltInRuleApp) {
-            tree.append(prefix); 
-            tree.append("(builtin \"");
-            tree.append(appliedRuleApp.rule().name().toString());
-            tree.append("\"");        
-            tree.append(posInOccurrence2Proof(node.sequent(), 
-                    appliedRuleApp.posInOccurrence()));
-            if (appliedRuleApp instanceof MethodContractRuleApp) {
-                tree.append(" (contract \"");
-                tree.append(((MethodContractRuleApp)appliedRuleApp).getMethodContract().getName());
-                tree.append("\")");
-            } else if (appliedRuleApp instanceof HoareLoopInvRuleApp) {
-                tree.append(" (inst \"");
-                HoareLoopInvRuleApp hoareLoopInvRuleApp = (HoareLoopInvRuleApp)appliedRuleApp;
-                String inv =
-                    printTerm(hoareLoopInvRuleApp.getInvariant(), 
+            tree.append(" (contract \"");
+            tree.append(ruleJusti.getSpec().toString());
+            tree.append("\")");
+        } else if (appliedRuleApp instanceof HoareLoopInvRuleApp) {
+            tree.append(" (inst \"");
+            HoareLoopInvRuleApp hoareLoopInvRuleApp = (HoareLoopInvRuleApp)appliedRuleApp;
+            String inv =
+                printTerm(hoareLoopInvRuleApp.getInvariant(), 
                         proof.getServices()).toString().trim();
-                inv = inv.replaceAll("\\\\","\\\\\\\\");
-                tree.append(inv);
-                tree.append("\")");                
-                if (hoareLoopInvRuleApp.getDecreases() != null) {
-                    tree.append("(inst \"");
-                    String dec =
-                        printTerm(hoareLoopInvRuleApp.getDecreases(), 
+            inv = inv.replaceAll("\\\\","\\\\\\\\");
+            tree.append(inv);
+            tree.append("\")");                
+            if (hoareLoopInvRuleApp.getDecreases() != null) {
+                tree.append("(inst \"");
+                String dec =
+                    printTerm(hoareLoopInvRuleApp.getDecreases(), 
                             proof.getServices()).toString().trim();
-                    dec = dec.replaceAll("\\\\","\\\\\\\\");
-                    tree.append(dec);
-                    tree.append("\")");
-                    tree.append(" (inst \"");
-                    tree.append(hoareLoopInvRuleApp.
-                            getDecreaseAtPreFuncName().toString().
-                            replaceAll("\\\\","\\\\\\\\"));                    
-                    tree.append("\")");
-                }
+                dec = dec.replaceAll("\\\\","\\\\\\\\");
+                tree.append(dec);
+                tree.append("\")");
+                tree.append(" (inst \"");
+                tree.append(hoareLoopInvRuleApp.
+                        getDecreaseAtPreFuncName().toString().
+                        replaceAll("\\\\","\\\\\\\\"));                    
+                tree.append("\")");
             }
-            tree.append(")\n");
         }
-    }
-
-
-
+        tree.append(")\n");
+      }
+   }
+        
     private StringBuffer collectProof(Node node, String prefix, 
             StringBuffer tree) {       
 
         printSingleNode(node, prefix, tree);
-        IteratorOfNode childrenIt = null;
+        Iterator<Node> childrenIt = null;
 
         while (node.childrenCount() == 1) {
             childrenIt = node.childrenIterator();
             node = childrenIt.next();
             printSingleNode(node, prefix, tree);
         }
-
 
         if (node.childrenCount() == 0) return tree;
 

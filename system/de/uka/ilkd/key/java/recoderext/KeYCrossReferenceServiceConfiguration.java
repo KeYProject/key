@@ -23,7 +23,8 @@ public class KeYCrossReferenceServiceConfiguration
 
     public KeYCrossReferenceServiceConfiguration(KeYExceptionHandler keh ) {
 	super(); // initialises servConf
-	getProjectSettings().ensureSystemClassesAreInPath();
+	// better not: it might add to the input path of recoder
+	// getProjectSettings().ensureSystemClassesAreInPath();
 	getProjectSettings().setErrorHandler( (recoder.service.ErrorHandler)(keh) );
     }
 

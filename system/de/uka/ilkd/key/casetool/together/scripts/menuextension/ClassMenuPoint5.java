@@ -8,50 +8,22 @@
 //
 //
 
-
-/** @author Kristofer Johannisson */ 
-
-
 package de.uka.ilkd.key.casetool.together.scripts.menuextension;
 
-import javax.swing.ProgressMonitor;
+import de.uka.ilkd.key.casetool.together.FunctionalityOnModel;
+import de.uka.ilkd.key.casetool.together.TogetherModelClass;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 
-import org.apache.log4j.Logger;
-
-import de.uka.ilkd.key.casetool.UMLModelClass;
-import de.uka.ilkd.key.casetool.together.TogetherGFInterface;
-import de.uka.ilkd.key.ocl.gf.CallbackClassInv;
-import de.uka.ilkd.key.ocl.gf.Utils;
 
 public class ClassMenuPoint5 extends ClassMenu {
-    protected static Logger timelogger = Logger.getLogger("de.uka.ilkd.key.ocl.gf.Timer");
-    protected static Logger logger = Logger.getLogger("key.ocl.gf");
-
     public String getMenuEntry(){
-	return "Edit Invariant [GF]";
+        return "BehaviouralSubtypingInv";
     }
 
-    protected String runCore(UMLModelClass modelClass) {
-	if (timelogger.isDebugEnabled()) {
-		timelogger.debug(System.currentTimeMillis() + "  ObMenuPoint6 runCore");
-	}
-	if (logger.isDebugEnabled()) {            
-		logger.debug("Class: " + modelClass.getFullClassName());
-	}
-	pm = new ProgressMonitor(null, "Loading the GF editor for OCL",
-			         "", 0, 9700);
-	Utils.tickProgress(pm, 1, "Initializing TogetherGFInterface");
-            
-        CallbackClassInv cci = new CallbackClassInv(modelClass);
-        String name = modelClass.getClassName();
-        String pack = modelClass.getContainingPackage();
-        String inv = modelClass.getMyInv();
-        String abs = modelClass.getMyInvGFAbs();
-        
-        // aReprModelClass.setMyInvGFAbs("just testing...");
-        
-    //    return (new GFinterface()).editClassInvariant(aReprModelClass.getClassName(),
-    //    	aReprModelClass.getMyInv());
-    	return (new TogetherGFInterface()).editClassInvariant(name, pack, inv, cci, pm, abs);
+
+    protected String runCore(TogetherModelClass modelClass)
+    		throws ProofInputException {
+        FunctionalityOnModel.proveBehaviouralSubtypingInv(modelClass);
+        return "";
     }
 }

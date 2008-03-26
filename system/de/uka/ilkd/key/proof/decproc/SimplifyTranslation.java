@@ -49,7 +49,6 @@ public class SimplifyTranslation extends DecProcTranslation {
 	 * Just a constructor which starts the conversion to Simplify syntax. The
 	 * result can be fetched with
 	 * 
-	 * @see getText-
 	 * @param sequent
 	 *           The sequent which shall be translated.
 	 * @param cs
@@ -129,7 +128,7 @@ public class SimplifyTranslation extends DecProcTranslation {
 	 * Translates the given sequent into "Simplify" input syntax and adds the
 	 * resulting string to the StringBuffer sb.
 	 * 
-	 * @param s
+	 * @param sequent
 	 *           the Sequent which should be written in Simplify syntax
 	 */
 	protected final StringBuffer translate(Sequent sequent, 
@@ -169,12 +168,10 @@ public class SimplifyTranslation extends DecProcTranslation {
 	 * Translates the given Semisequent into "Simplify" input syntax and adds
 	 * the resulting string to the StringBuffer sb.
 	 * 
-	 * @param ss
+	 * @param semi
 	 *           the SemiSequent which should be written in Simplify syntax
-	 * @param antesucc
-	 *           true for antecedent, false for succedent
 	 */
-	protected final StringBuffer translate(Semisequent ss, 
+	protected final StringBuffer translate(Semisequent semi, 
 					       int skolemization,
 					       boolean lightWeight)
 			throws SimplifyException {
@@ -185,9 +182,9 @@ public class SimplifyTranslation extends DecProcTranslation {
 		} else {
 			hb.append(DecisionProcedureSimplifyOp.OR);
 		}
-		for (int i = 0; i < ss.size(); ++i) {
+		for (int i = 0; i < semi.size(); ++i) {
 			hb.append(' ');
-			hb.append(translate(ss.get(i), lightWeight));
+			hb.append(translate(semi.get(i), lightWeight));
 		}
 // 		if (skolemization == ANTECEDENT) {
 // 			hb.append(' ');
@@ -663,7 +660,7 @@ public class SimplifyTranslation extends DecProcTranslation {
     
     /** 
      * Used just to be called from DecProcTranslation
-     * @see de.uka.ilkd.key.proof.decproc.DecProcTranslation#translate(de.uka.ilkd.key.logic.Term, int)
+     * @see de.uka.ilkd.key.proof.decproc.DecProcTranslation#translate(Semisequent, int)
      */
     protected final StringBuffer translate(Term term, int skolemization, Vector quantifiedVars) throws SimplifyException {
 	return translate(term, quantifiedVars);

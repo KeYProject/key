@@ -22,7 +22,7 @@ import de.uka.ilkd.key.util.Debug;
  * a given Strategy.
  * Instances of this class are immutable
  */
-public abstract class RuleAppContainer implements Comparable {
+public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
 
     /**
      * The stored rule app
@@ -40,10 +40,8 @@ public abstract class RuleAppContainer implements Comparable {
     	cost    = p_cost;
     }
 
-    public int compareTo(Object o) {
-	// deliberately raise a <code>ClassCastException</code> for unsuitable
-	// arguments
-	return cost.compareTo ( ((RuleAppContainer)o).cost );
+    public int compareTo(RuleAppContainer o) {
+	return cost.compareTo ( o.cost );
     }
 
     /**

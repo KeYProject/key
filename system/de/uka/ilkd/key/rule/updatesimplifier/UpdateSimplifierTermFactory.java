@@ -64,7 +64,8 @@ public class UpdateSimplifierTermFactory {
 		
     
     public Term createIfExCascade (IfExCascade cascade, Term defaultTerm) {
-        final List statements = new LinkedList ();
+        final List<IfExCascadeEntryBuilder> statements = 
+            new LinkedList<IfExCascadeEntryBuilder> ();
         
         while ( cascade.hasNext () ) {
             cascade.next ();
@@ -85,10 +86,10 @@ public class UpdateSimplifierTermFactory {
         
         Term res = defaultTerm;
         
-        final Iterator it = statements.iterator ();
+        final Iterator<IfExCascadeEntryBuilder> it = statements.iterator ();
         while ( it.hasNext () ) {
             final IfExCascadeEntryBuilder builder =
-                (IfExCascadeEntryBuilder)it.next ();
+                it.next ();
             res = builder.createTerm ( res );
         }
         
@@ -123,7 +124,7 @@ public class UpdateSimplifierTermFactory {
             values   [i] = assignmentPair.valueUnsafe();
             if (assignmentPair.location() == Update.StarLocation.ALL) {
                 Debug.assertTrue(
-                                assignmentPairs.size() == 1,
+                                i == assignmentPairs.size() - 1,
                                 "Special star operator tried to escape. "
                                         + "(not allowed as long as no generalized terms)");
                 return tf.createAnonymousUpdateTerm(

@@ -13,8 +13,6 @@ package de.uka.ilkd.key.gui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
@@ -44,7 +42,7 @@ import de.uka.ilkd.key.visualization.ProofVisualization;
 
 public class KeYMediator {
 
-    private Main mainFrame;
+    private IMain mainFrame;
 
 
     private InteractiveProver interactiveProver;
@@ -81,7 +79,7 @@ public class KeYMediator {
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
     */
-    public KeYMediator(Main mainFrame) {
+    public KeYMediator(IMain mainFrame) {
 	this.mainFrame = mainFrame;
 	notationInfo = NotationInfo.createInstance();
 	proofListener       = new KeYMediatorProofListener();
@@ -212,10 +210,7 @@ public class KeYMediator {
     }
 
     public boolean ensureProofLoadedSilent() {
-	if (proof == null) {
-	    return false;
-	}
-	return true;
+	return proof != null;
     }
 
     public boolean ensureProofLoaded() {
@@ -283,7 +278,7 @@ public class KeYMediator {
 	    }catch(Exception e){
 		ExtList l = new ExtList();
 		l.add(e);
-		new ExceptionDialog(Main.getInstance(), l);
+		new ExceptionDialog(mainFrame(), l);
 	    }
 	}
     }
@@ -407,7 +402,7 @@ public class KeYMediator {
 	SetOfTacletApp applics = 
            getTacletApplications(goal, taclet.name().toString(), pos);
         if (applics.size() == 0) {
-	   JOptionPane.showMessageDialog(mainFrame, "Taclet application failed." 
+	   JOptionPane.showMessageDialog(mainFrame(), "Taclet application failed." 
 					 + "\n" + taclet.name(), "Bummer!",
 					 JOptionPane.ERROR_MESSAGE);
            return false;
@@ -415,11 +410,6 @@ public class KeYMediator {
 	IteratorOfTacletApp it = applics.iterator();	
 	if (applics.size() == 1) {
 	    TacletApp firstApp = it.next();
-	    if (!getProof().mgt().ruleApplicable(firstApp, goal)) {
-                barfRuleNotApplicable(firstApp);
-                return false;
-            }
-
             boolean ifSeqInteraction = 
                firstApp.taclet().ifSequent() != Sequent.EMPTY_SEQUENT ;
             if (stupidMode && !firstApp.complete()) {                
@@ -445,18 +435,15 @@ public class KeYMediator {
 		applyInteractive(firstApp, goal);
 	    }
 	} else if (applics.size() > 1) {
-            java.util.List appList = new java.util.LinkedList();
-            TacletApp rapp = null;
+            java.util.List<TacletApp> appList = new java.util.LinkedList<TacletApp>();
             
 	    for (int i = 0; i < applics.size(); i++) {
-		rapp = it.next();
-                if (getProof().mgt().ruleApplicable(rapp, goal)) {
-                    appList.add(rapp);
-                }
+	        TacletApp rapp = it.next();
+                appList.add(rapp);
             }
             
             if (appList.size()==0) {
-                 barfRuleNotApplicable(rapp);
+                 assert false;
                  return false;
             }
 
@@ -467,15 +454,6 @@ public class KeYMediator {
         return true;
     }
     
-    private void barfRuleNotApplicable(RuleApp rapp) {
-        JOptionPane.showMessageDialog
-	    (mainFrame, 
-	     "Rule not applicable." + "\n" + rapp.rule().name()
-	     +"\n"+getProof().mgt().getLastAnalysisInfo(), 
-	     "Correctness Management",
-	     JOptionPane.ERROR_MESSAGE);
-    }
-
 
     /** selected rule to apply
      * @param rule the selected built-in rule
@@ -509,22 +487,6 @@ public class KeYMediator {
      * @param pos the PosInSequent describes the position where to apply the
      * rule 
      */
-    public boolean selectedUseMethodContractRule(MethodContractRuleApp app) {
-        Goal goal = keySelectionModel.getSelectedGoal();
-        Debug.assertTrue(goal != null);        
-        if (!getProof().mgt().ruleApplicable(app, goal)) {
-            barfRuleNotApplicable(app);
-            return false;
-        }
-        applyInteractive(app, goal); 
-        return true;
-    }
-    
-    /** selected rule to apply
-     * @param rule the selected built-in rule
-     * @param pos the PosInSequent describes the position where to apply the
-     * rule 
-     */
     public boolean selectedHoareLoopInvRule(HoareLoopInvRuleApp app) {
         if (app == null) return false;
         Goal goal = keySelectionModel.getSelectedGoal();
@@ -550,8 +512,81 @@ public class KeYMediator {
 // ****************** Re-Use Stuff *********************************
 
     private ReuseListener hook = new ReuseListenerDummy();
+   
     private boolean continuousReuse = true;
     private boolean reuseStarted = false;
+
+    private Node changeWish;
+
+    public void changeNode(Node n) {
+        Proof old = n.proof();
+        Proof p = new Proof(old);
+        mark(old.root());
+
+        p.setProofEnv(old.env());
+        mainFrame.addProblem(new SingleProof(p, "XXX"));
+        changeWish = n;
+    }
+
+    public void setContinuousReuse(boolean b) {
+        continuousReuse = b;
+    }
+
+    public boolean reuseInProgress() {
+        return continuousReuse && reuseStarted;
+    }
+    
+    public void indicateReuse(ReusePoint rp) {
+        mainFrame.indicateReuse(rp);
+    }
+
+    public void indicateNoReuse() {
+        mainFrame.indicateNoReuse();
+    }
+    
+    public void startReuse(ReusePoint reusePoint) {
+        reuseStarted = true;
+        getInteractiveProver().fireAutoModeStarted(
+                new ProofEvent(getProof()));
+        try {           
+            do {
+                final Goal currGoal = reusePoint.target(); // check proof!!!
+                assert currGoal != null : 
+                    "Cannot apply this here. Forgot to unregister listener?";
+                final ReuseListener hook = getReuseListener();
+                hook.removeRPConsumedMarker(reusePoint.source());
+                RuleApp app = reusePoint.getReuseApp();
+                if (reusePoint.source() != changeWish) {
+                    currGoal.node().setReuseSource(reusePoint);
+                    hook.removeRPConsumedGoal(currGoal);
+                    ListOfGoal goalList = currGoal.apply(app);
+                    hook.addRPOldMarkersNewGoals(goalList);
+                    hook.addRPNewMarkersAllGoals(reusePoint.source());
+                    reuseStarted = hook.reusePossible();
+                } else {
+                    // InteractiveProver will do the other 2 bookkeeping
+                    reuseStarted=false;
+                    changeWish=null;
+                    hook.addRPNewMarkersAllGoals(reusePoint.source());
+                }
+                hook.showState();
+                if (reuseStarted) {
+                    reusePoint = getReuseListener().getBestReusePoint();
+                    if (!continuousReuse) {
+                        indicateReuse(reusePoint);
+                    }
+                } else  {
+                    reuseStarted = false;
+                    indicateNoReuse();                    
+                }
+            } while (reuseInProgress());
+
+        } catch(RuntimeException re) {
+            getInteractiveProver().fireAutoModeStopped(new ProofEvent(getProof()));
+            throw re;
+        }
+        getInteractiveProver().fireAutoModeStopped(new ProofEvent(getProof()));
+    }    
     
     public void showReuseState() {
        hook.startShowingState();
@@ -560,7 +595,6 @@ public class KeYMediator {
     public void showPreImage() {
        hook.showPreImage();
     }
-
 
     public void mark(Node n) {
        if (hook instanceof ReuseListenerDummy) {
@@ -584,98 +618,11 @@ public class KeYMediator {
        n.markPersistentCandidate();
     }
     
-    public void setContinuousReuse(boolean b) {
-       continuousReuse = b;
-    }
+ 
     
-    public boolean reuseInProgress() {
-       return continuousReuse && reuseStarted;
-    }
+ 
     
-    private ActionListener reuseAction;
-
-    public void indicateNoReuse() {
-        final JButton b = mainFrame.reuseButton;
-        b.setEnabled(false);
-        b.removeActionListener(reuseAction);
-        reuseStarted = false;
-    }
-
-    
-    public void indicateReuse(ReusePoint p) {
-       final ReusePoint rp = p;
-       final JButton b = mainFrame.reuseButton;
-       b.removeActionListener(reuseAction);
-       b.setToolTipText(rp.toString());
-       b.setEnabled(true);
-       reuseAction = new ActionListener() {
-          ReusePoint reusePoint = rp;
-          public void actionPerformed(ActionEvent e) {
-             b.setEnabled(false);
-             b.removeActionListener(this);
-             b.setToolTipText(null);
-             reuseStarted = true;
-             getInteractiveProver().fireAutoModeStarted(
-                new ProofEvent(getProof()));
-             try {
-                 do {
-                     Goal currGoal = reusePoint.target(); // check proof!!!
-                     assert currGoal != null : 
-                        "Cannot apply this here. Forgot to unregister listener?";
-	             hook.removeRPConsumedMarker(reusePoint.source());
-                     RuleApp app = reusePoint.getReuseApp();
-//                     if (app.complete()) {
-//                     if (currGoal.node().serialNr()!=12) {
-//                     if (true) {
-                     if (reusePoint.source()!=changeWish) {
-                         currGoal.node().setReuseSource(reusePoint);
-                         hook.removeRPConsumedGoal(currGoal);
-                         ListOfGoal goalList = currGoal.apply(app);
-                         hook.addRPOldMarkersNewGoals(goalList);
-                         hook.addRPNewMarkersAllGoals(reusePoint.source());
-                         reuseStarted = hook.reusePossible();
-                     } else {
-                         // InteractiveProver will do the other 2 bookkeeping
-                         reuseStarted=false;
-//                         TacletMatchCompletionDialog.completeAndApplyApp(
-//                             (TacletApp)app, currGoal, KeYMediator.this);
-                         changeWish=null;
-                         hook.addRPNewMarkersAllGoals(reusePoint.source());
-                     }
-                     hook.showState();
-                     if (reuseStarted) {
-                         reusePoint = hook.getBestReusePoint();
-                         if (!continuousReuse) {
-                             b.setEnabled(true);
-                             b.addActionListener(this);
-                             b.setToolTipText(reusePoint.toString());
-                         }
-                     } else  indicateNoReuse();
-                 } while (reuseInProgress());
-             } catch(RuntimeException re) {
-                 getInteractiveProver().fireAutoModeStopped(new ProofEvent(getProof()));
-                 throw re;
-             }
-             getInteractiveProver().fireAutoModeStopped(new ProofEvent(getProof()));
-	  }
-       };
-       b.addActionListener(reuseAction);
-    }
-    
-    
-    private Node changeWish;
-    
-    public void changeNode(Node n) {
-        Proof old = n.proof();
-        Proof p = new Proof(old);
-        mark(old.root());
-        
-        p.setProofEnv(old.env());
-        mainFrame.addProblem(new SingleProof(p, "XXX"));
-        changeWish = n;
-    }
-    
-    
+ 
     
 // **********************************************************************
     
@@ -770,7 +717,7 @@ public class KeYMediator {
      * @return the main frame 
      */
     public JFrame mainFrame() {
-	return mainFrame;
+	return mainFrame instanceof JFrame ? (JFrame) mainFrame : null;
     }
 
     /** notifies that a node that is not a goal has been chosen
@@ -911,12 +858,12 @@ public class KeYMediator {
 
     public void popupInformationMessage(Object message, String title) {
         JOptionPane.showMessageDialog
-	    (mainFrame, message,
+	    (mainFrame(), message,
 	     title, JOptionPane.INFORMATION_MESSAGE);
     }
 
     public void popupWarning(Object message, String title) {
-        JOptionPane.showMessageDialog(mainFrame, message, title, 
+        JOptionPane.showMessageDialog(mainFrame(), message, title, 
                 JOptionPane.WARNING_MESSAGE);
     }
 
@@ -932,7 +879,7 @@ public class KeYMediator {
 		throw new InternalError("only messages of type " + Component.class + " supported, yet");
 	    // JFrame dlg = new JDialog(mainFrame(),title, modal);
 	    JFrame dlg = new JFrame(title);
-	    dlg.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+	    dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 	    dlg.getContentPane().add((Component)message);
 	    dlg.pack();
 	    setCenter(dlg, mainFrame());
@@ -998,7 +945,7 @@ public class KeYMediator {
       final boolean b = fullStop;
       Runnable interfaceSignaller = new Runnable() {
          public void run() {
-	     mainFrame.setCursor
+	     if (mainFrame() instanceof JFrame) mainFrame().setCursor
 		 (new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));
             if (b) {
                interactiveProver.fireAutoModeStarted(
@@ -1015,7 +962,7 @@ public class KeYMediator {
          public void run() {
             if ( b )
                interactiveProver.fireAutoModeStopped (new ProofEvent(getProof()));
-	    mainFrame.setCursor
+            if (mainFrame() instanceof JFrame) mainFrame().setCursor
 		(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
             if (getProof() != null)
                 keySelectionModel.fireSelectedProofChanged();
@@ -1159,7 +1106,7 @@ public class KeYMediator {
         if (profile == null) {               
             profile = ProofSettings.DEFAULT_SETTINGS.getProfile();   
             if (profile == null) {
-                profile = new JavaProfile((Main) this.mainFrame());
+                profile = new JavaProfile((IMain) this.mainFrame());
             }
         }
         return profile;

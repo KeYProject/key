@@ -70,7 +70,7 @@ public class QuantifierFormula extends Formula {
      *                                  <tt>formula</tt> or if duplicate <tt>TermVariable</tt>s
      *                                  are contained in <tt>quantVars</tt>
      *                                  
-     * @see de.uka.ilkd.key.logic.op.DecisionProcedureSmtAufliaOp                    
+     * @see de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAufliaOp                                   
      */
     public QuantifierFormula( String op, TermVariable[] quantVars, Formula formula ) {
         super( op, new Formula[]{ formula }, quantVars );

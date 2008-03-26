@@ -38,6 +38,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramMetaConstruct;
 import de.uka.ilkd.key.rule.soundness.ProgramSVProxy;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.java.recoderext.StatementSVWrapper;
 
 /**
    A configurable pretty printer for Java source elements originally from COMPOST.
@@ -1020,7 +1021,8 @@ public class PrettyPrinter {
     }
  
     public void printArrayDeclaration(ArrayDeclaration type) throws java.io.IOException {
-	Type baseType = type.getBaseType().getKeYJavaType().getJavaType();
+	Type baseType = type.getBaseType().getKeYJavaType().getJavaType();       
+        assert baseType != null;
 	if (baseType instanceof ArrayDeclaration) {
 	    printArrayDeclaration((ArrayDeclaration)baseType);
 	} else {
@@ -1622,51 +1624,110 @@ public class PrettyPrinter {
 	}
     }
 
-    public void printFor(For x) throws java.io.IOException {
+    public void printEnhancedFor(EnhancedFor x) throws IOException {
         printHeader(x);
         writeInternalIndentation(x);
-	output();
-	
-	// Mark statement start ...
-	markStart(0,x);
+        output();
 
-	write("for (");
-	noLinefeed=true;
-	noSemicolons=true;
-	write(" ");
-        if (x.getInitializers() != null) {
-            writeCommaList(x.getInitializers());
+        // Mark statement start ...
+        markStart(0, x);
+
+        write("for (");
+        noLinefeed = true;
+        noSemicolons = true;
+
+        ArrayOfLoopInitializer initializers = x.getInitializers();
+        if(initializers != null) {
+            LoopInitializer loopInit = initializers.getLoopInitializer(0);
+            writeElement(1, loopInit);
         }
-	noSemicolons=false;
-        write("; "); output();
-	noSemicolons=true;
-        if (x.getGuardExpression() != null) {
+        
+        write(" : ");
+        
+        if(x.getGuard() != null)
             writeElement(1, x.getGuardExpression());
-        }
-	noSemicolons=false;
-        write("; "); output();
-	noSemicolons=true;
-        if (x.getUpdates() != null) {
-            writeCommaList(0, 0, 1, x.getUpdates());
-        }
-	write(" ");
+        
         write(")");
-	output();
-	noLinefeed=false;
-	noSemicolons=false;
+        output();
+        noLinefeed = false;
+        noSemicolons = false;
+        
         if (x.getBody() == null || x.getBody() instanceof EmptyStatement) {
             write(";");
         } else {
-	    if (x.getBody() instanceof StatementBlock) {
-                    writeElement(1, 0, x.getBody());
-                } else {
-                    writeElement(1, +1, 0, x.getBody());
-                    changeLevel(-1);
-                }
+            if (x.getBody() instanceof StatementBlock) {
+                writeElement(1, 0, x.getBody());
+            } else {
+                writeElement(1, +1, 0, x.getBody());
+                changeLevel(-1);
+            }
         }
 
-	// Mark statement end ...
-	markEnd(0,x);
+        // Mark statement end ...
+        markEnd(0, x);
+
+        printFooter(x);
+    }
+
+    public void printFor(For x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        output();
+
+        // Mark statement start ...
+        markStart(0, x);
+
+        write("for (");
+        noLinefeed = true;
+        noSemicolons = true;
+        write(" ");
+
+        // there is no "getLoopInit" method
+        // so get the first child of the for loop
+        ILoopInit init = x.getILoopInit();
+        if(init != null) {
+            if(init instanceof ProgramSV)
+                writeElement(init);
+            else
+                writeCommaList(x.getInitializers());
+        } 
+        noSemicolons = false;
+        write("; ");
+        output();
+        noSemicolons = true;
+        if (x.getGuardExpression() != null) {
+            writeElement(1, x.getGuardExpression());
+        }
+        noSemicolons = false;
+        write("; ");
+        output();
+        noSemicolons = true;
+        
+        IForUpdates upd = x.getIForUpdates();
+        if(upd != null) {
+            if(upd instanceof ProgramSV)
+                writeElement(1, upd);
+            else
+                writeCommaList(0, 0, 1, x.getUpdates());
+        }
+        write(" ");
+        write(")");
+        output();
+        noLinefeed = false;
+        noSemicolons = false;
+        if (x.getBody() == null || x.getBody() instanceof EmptyStatement) {
+            write(";");
+        } else {
+            if (x.getBody() instanceof StatementBlock) {
+                writeElement(1, 0, x.getBody());
+            } else {
+                writeElement(1, +1, 0, x.getBody());
+                changeLevel(-1);
+            }
+        }
+
+        // Mark statement end ...
+        markEnd(0, x);
 
         printFooter(x);
     }
@@ -2010,6 +2071,36 @@ public class PrettyPrinter {
 	//	noLinefeed=false;
 	//write("\n");
         printFooter(x);	
+    }
+    
+    public void printSetAssignment(SetAssignment x) throws java.io.IOException {
+        printHeader(x);
+
+        markStart(0, x);
+        if (!noLinefeed) {
+            writeSymbol(1,0, "");
+        }
+        output();
+        
+        boolean wasNoSemicolons = noSemicolons;
+        boolean wasNoLinefeed = noLinefeed;
+        noSemicolons=true;
+        noLinefeed=true;
+        
+        write("#set ");
+        writeElement(0, x.getArguments().getExpression(0));
+        writeToken(0, " = ", x);
+        writeElement(0, x.getArguments().getExpression(1));
+        output();
+        
+        noSemicolons = wasNoSemicolons;
+        noLinefeed = wasNoLinefeed;
+        
+        write(";");
+        output();
+        markEnd(0, x);
+        
+        printFooter(x);
     }
 
     public void printDivideAssignment(DivideAssignment x) throws java.io.IOException {

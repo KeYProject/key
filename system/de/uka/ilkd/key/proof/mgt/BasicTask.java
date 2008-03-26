@@ -10,14 +10,14 @@
 
 package de.uka.ilkd.key.proof.mgt;
 
-import java.util.Iterator;
-
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.rule.IteratorOfRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
+
 
 /** Captures a node in the TaskTree which contains exactly one
  * proof. Such a node is the only one with a one to one mapping
@@ -68,43 +68,24 @@ public class BasicTask extends DefaultMutableTreeNode implements TaskTreeNode{
     public ProofStatus getStatus() {
 	return proof().mgt().getStatus();
     }
-
-    /** returns a list of method contracts that were used in the
-     * associated proof.
-     */ 
-    public ContractSet getAllMethodContracts() {
-	Iterator it = proof().mgt().getAppliedNonAxioms();
-	ContractSet contracts = new ContractSet();
-	while (it.hasNext()) {
-	    RuleApp r = (RuleApp) it.next();
-	    RuleJustification rj 
-		= ((DefaultProofCorrectnessMgt) 
-		   proof().mgt()).getJustification(r);
-	    if (rj instanceof RuleJustificationBySpec)
-		contracts.add
-		    (((RuleJustificationBySpec)rj).getContract());
+    
+    /** returns a list of operation contracts (with associated class invariants)
+     *  that were used in the associated proof.
+     */
+    public SetOfContractWithInvs getUsedSpecs() {
+        SetOfContractWithInvs result = SetAsListOfContractWithInvs.EMPTY_SET;       
+        IteratorOfRuleApp it = proof().mgt().getNonAxiomApps().iterator();
+        while(it.hasNext()) {
+            RuleApp r = (RuleApp) it.next();
+	    RuleJustification rj = proof().mgt().getJustification(r);            
+	    if(rj instanceof RuleJustificationBySpec) {
+                ContractWithInvs spec = ((RuleJustificationBySpec)rj).getSpec();
+                assert spec != null;
+                result = result.add(spec);
+            }
 	}
-	return contracts;
-    }
-
-    /** returns a list of method contracts that were used in the
-     * associated proof.
-     */ 
-    public ContractSet getAllDLMethodContracts() {
-	Iterator it = proof().env().getSpecificationRepository().getSpecs();
-	ContractSet contracts = new ContractSet();
-	while (it.hasNext()) {
-	    ContractSet c = (ContractSet)it.next();
-	      contracts.addAll(c);
-	}
-	ContractSet res = new ContractSet();
-	it = contracts.iterator();
-	while (it.hasNext()) {
-	    Contract c = (Contract)it.next();
-	    if(c instanceof DLMethodContract)
-	      res.add(c);
-	}	
-	return res;
+        
+        return result;
     }
 
     /** returns the upper most task this basic task belongs to.*/
@@ -120,5 +101,4 @@ public class BasicTask extends DefaultMutableTreeNode implements TaskTreeNode{
     public void decoupleFromEnv() {
 	getProofEnv().removeProofList(proof);
     }
-
 }

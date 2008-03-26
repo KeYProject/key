@@ -30,8 +30,7 @@ public class ExecutionContext
      * the reference to the active object
      */
     protected final ReferencePrefix runtimeInstance;
-
-
+   
     /**
      * creates an execution context reference
      * @param classContext the TypeReference refering to the next enclosing
@@ -45,7 +44,7 @@ public class ExecutionContext
 	this.classContext = classContext;
 	this.runtimeInstance = runtimeInstance;
     }
-
+    
     /**
      * creates an execution context reference
      * @param children an ExtList with the required children of the execution
@@ -108,8 +107,7 @@ public class ExecutionContext
     public ReferencePrefix getRuntimeInstance() {
 	return runtimeInstance;
     }
-
-
+    
     /** calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
      * @param v the Visitor

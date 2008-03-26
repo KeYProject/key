@@ -39,14 +39,11 @@ public class UninterpretedTermWrapper {
     }
 
     /**
-     * Returns true iff eps.equalsModRenaming(o).
-     * @returns true iff eps.equalsModRenaming(o)
-     * @param o The Object which eps should be compared with;
-     *        if o is not a Term, then normal .equals is used.
+     * Compares using eps.equalsModRenaming().
      */
     public boolean equals(Object o){
-	if (o instanceof Term)
-	    return ((Term) eps).equalsModRenaming(o);
+	if (o instanceof UninterpretedTermWrapper)
+	    return eps.equalsModRenaming(((UninterpretedTermWrapper)o).eps);
 	else
 	    return false;
     }

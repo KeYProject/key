@@ -136,7 +136,7 @@ public class PosInOccurrence {
      * Contrary to <code>eqEquals</code>, this method returns true only for pio
      * objects that point to the same (identical) formula
      * @param obj
-     * @return
+     * @return true if both objects are equal
      */
     public boolean equals (Object obj) {
 	if (!(obj instanceof PosInOccurrence)) {

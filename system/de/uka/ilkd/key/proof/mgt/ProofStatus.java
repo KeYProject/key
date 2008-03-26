@@ -60,7 +60,5 @@ public class ProofStatus {
 	}
 
 	return "Illegal status!";
-	
     }    
-
 }

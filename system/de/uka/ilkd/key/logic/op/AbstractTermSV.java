@@ -21,12 +21,10 @@ abstract class AbstractTermSV extends SortedSchemaVariable {
     /** creates a new SchemaVariable
      * @param name the Name of the SchemaVariable
      * @param sort the Sort of the SchemaVariable and the matched type     
-     * @param rigidness true iff this SV may only match rigid
-     * terms/formulas
      * @param listSV a boolean which is true iff the schemavariable is allowed
      * to match a list of terms
-     * @param strictSV boolean indicating if the schemavariable is declared as strict
-     * forcing exact type match
+     * @param rigidness true iff this SV may only match rigid
+     * terms/formulas
      */    
     AbstractTermSV(Name    name,
             Sort    sort,

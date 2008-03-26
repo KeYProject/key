@@ -44,7 +44,7 @@ public class DecisionProcedureSettings implements Settings {
     private boolean smt_zip_problem_dir = false;
     private boolean smt_use_quantifiers = true;
 
-    private LinkedList listenerList = new LinkedList();
+    private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
 
 
     // getter
@@ -222,9 +222,9 @@ public class DecisionProcedureSettings implements Settings {
      * changed to its registered listeners (not thread-safe)
      */
     protected void fireSettingsChanged() {
-        Iterator it = listenerList.iterator();
+        Iterator<SettingsListener> it = listenerList.iterator();
         while (it.hasNext()) {	    
-            ((SettingsListener)it.next()).settingsChanged(new GUIEvent(this));
+            it.next().settingsChanged(new GUIEvent(this));
         }
     }
 

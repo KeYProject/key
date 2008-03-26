@@ -80,8 +80,8 @@ public class KeYResourceManager {
     }
 
     /**
-     * returns a readable customizable versin number    
-     * @return 
+     * returns a readable customizable version number    
+     * @return a readable version number  
      */
     public String getVersion() {      
 	if (version != null) {
@@ -165,7 +165,7 @@ public class KeYResourceManager {
 	    System.out.println("No resource "+ resourcename + " found");
 	    return false;
 	} 
-
+        
 	// copying the resource to the target if targetfile 
 	// does not exist yet
 	boolean result = false;

@@ -5,6 +5,7 @@ package java.lang;
 
 import java.io.Serializable;
 public final class Boolean implements Serializable {
+    private boolean value;
     public static final Boolean TRUE = new Boolean(true);
     public static final Boolean FALSE = new Boolean(false);
     public Boolean(boolean value) {}

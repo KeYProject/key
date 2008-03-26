@@ -22,7 +22,7 @@ public class Counter {
     private String name;
     private int count;
     
-    private Stack undoAnchors = new Stack();
+    private Stack<NodeAnchor> undoAnchors = new Stack<NodeAnchor>();
 
     public Counter(String name) {
         this.name=name;

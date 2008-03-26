@@ -16,7 +16,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
@@ -31,7 +30,7 @@ public class TermConstructionProjection implements ProjectionToTerm {
 
     private final Operator               op;
     private final ProjectionToTerm[]     subTerms;
-    private final QuantifiableVariable[] boundVars = new QuantifiableVariable[0];
+    
 
     private TermConstructionProjection(Operator op, ProjectionToTerm[] subTerms) {
         this.op = op;
@@ -46,9 +45,10 @@ public class TermConstructionProjection implements ProjectionToTerm {
 
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
         final Term[] subs = new Term[subTerms.length];
-        for ( int i = 0; i != subTerms.length; ++i )
-            subs[i] = subTerms[i].toTerm ( app, pos, goal );
-        return TermFactory.DEFAULT.createTerm ( op, subs, boundVars,
+        for ( int i = 0; i != subTerms.length; ++i ) {
+            subs[i] = subTerms[i].toTerm ( app, pos, goal );           
+        }
+        return TermFactory.DEFAULT.createTerm ( op, subs, null,
                                                 JavaBlock.EMPTY_JAVABLOCK );
     }
     

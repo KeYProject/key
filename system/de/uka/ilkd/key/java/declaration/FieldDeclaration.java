@@ -172,6 +172,22 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
     public boolean isStrictFp() {
         return super.isStrictFp();
     }
+    
+    /**
+     * Test whether the declaration is model (the jml modifier is meant).
+     */
+
+    public boolean isModel() {
+        return super.isModel();
+    }
+
+    /**
+     * Test whether the declaration is ghost (the jml modifier is meant).
+     */
+
+    public boolean isGhost() {
+        return super.isGhost();
+    }
 
     /** calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element

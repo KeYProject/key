@@ -32,9 +32,6 @@ public class NoFindTacletAppContainer extends TacletAppContainer {
      * (if-formulas are not considered)
      */
     protected boolean isStillApplicable(Goal p_goal) {
-    	if (!p_goal.proof().mgt().ruleApplicable(getRuleApp(), p_goal)) {
-    		return false;
-    	}
     	return true;
     }
 
