@@ -30,9 +30,15 @@ public class ZipFileCollection implements FileCollection {
         this.file = file;
     }
 
-    public Walker createWalker(String extension) throws ZipException, IOException {
+    public Walker createWalker(String extension) throws IOException {
         if(zipFile == null)
-            zipFile = new ZipFile(file);
+            try {
+                zipFile = new ZipFile(file);
+            } catch(ZipException ex) {
+                IOException iox = new IOException("Error opening " + file);
+                iox.initCause(ex);
+                throw iox;
+            }
         return new Walker(extension.toLowerCase());
     }
     
@@ -66,7 +72,7 @@ public class ZipFileCollection implements FileCollection {
             currentEntry = null;
             while(enumeration.hasMoreElements() && currentEntry == null) {
                 currentEntry = enumeration.nextElement();
-                if(currentEntry.getName().toLowerCase().endsWith(extension))
+                if(!currentEntry.getName().toLowerCase().endsWith(extension))
                     currentEntry = null;
             }
             return currentEntry != null;
@@ -77,8 +83,13 @@ public class ZipFileCollection implements FileCollection {
         }
 
         public DataLocation getCurrentDataLocation() {
-            // dont use ArchiveDataLocation this opens the zip and keeps reference to it!
+            // dont use ArchiveDataLocation this keeps the zip open and keeps reference to it!
             return new SpecDataLocation("zip", file.getAbsolutePath() + "!" + currentEntry.getName());
         }
+    }
+    
+    @Override
+    public String toString() {
+        return "ZipFileCollection["+ file + "]";
     }
 }

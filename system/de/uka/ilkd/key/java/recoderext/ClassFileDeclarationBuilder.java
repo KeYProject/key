@@ -8,7 +8,10 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 
+import de.uka.ilkd.key.java.ConvertException;
+
 import recoder.CrossReferenceServiceConfiguration;
+import recoder.ParserException;
 import recoder.ProgramFactory;
 import recoder.bytecode.ByteCodeParser;
 import recoder.bytecode.ClassFile;
@@ -19,9 +22,12 @@ import recoder.io.DataLocation;
 import recoder.java.CompilationUnit;
 import recoder.java.Identifier;
 import recoder.java.PackageSpecification;
+import recoder.java.declaration.ClassDeclaration;
 import recoder.java.declaration.ConstructorDeclaration;
 import recoder.java.declaration.DeclarationSpecifier;
+import recoder.java.declaration.Extends;
 import recoder.java.declaration.FieldDeclaration;
+import recoder.java.declaration.InterfaceDeclaration;
 import recoder.java.declaration.MemberDeclaration;
 import recoder.java.declaration.MethodDeclaration;
 import recoder.java.declaration.ParameterDeclaration;
@@ -100,6 +106,7 @@ public class ClassFileDeclarationBuilder {
             setPackage();
             createTypeDeclaration();
             setNameAndMods();
+            setInheritance();
             memberDecls = new ASTArrayList<MemberDeclaration>();
             for (ConstructorInfo constr : classFile.getConstructorInfos()) {
                 addConstructor(constr);
@@ -116,7 +123,7 @@ public class ClassFileDeclarationBuilder {
         }
         return compilationUnit;
     }
-
+    
     /**
      * set the location to be stored in the compilation unit, mainly for
      * error reporting.
@@ -125,6 +132,26 @@ public class ClassFileDeclarationBuilder {
      */
     public void setDataLocation(DataLocation dataLocation) {
         this.dataLocation = dataLocation;
+    }
+    
+    public static CompilationUnit makeEmptyClassFile(
+            ProgramFactory programFactory, 
+            String fullClassName) 
+                throws ParserException {
+        String cuString = "";
+        int lastdot = fullClassName.lastIndexOf('.');
+        if(lastdot != -1) {
+            // there is a package
+            cuString = "package " + fullClassName.substring(0, lastdot) + ";\n";
+        }
+        cuString += "class " + fullClassName.substring(lastdot+1) + "{ }";
+        
+        return programFactory.parseCompilationUnit(cuString);
+    }
+    
+    
+    public boolean isInnerClass(ClassFile cf) {
+        return cf.getPhysicalName().contains("$");
     }
     
     // --------------------------------------- private stuff below this line (and main)
@@ -138,7 +165,7 @@ public class ClassFileDeclarationBuilder {
         } else if (classFile.isOrdinaryClass()) {
             typeDecl = factory.createClassDeclaration();
         } else {
-            throw new RuntimeException("Only Interfaces and classes are allowed as byte code files");
+            throw new ConvertException("Only Interfaces and classes are allowed as byte code files");
         }
         ASTArrayList<TypeDeclaration> dl = new ASTArrayList<TypeDeclaration>(1);
         dl.add(typeDecl);
@@ -166,6 +193,44 @@ public class ClassFileDeclarationBuilder {
             specs.add(factory.createStrictFp());
 
         typeDecl.setDeclarationSpecifiers(specs);
+    }
+
+    /*
+     * set super types, and implemented (or extended) interfaces
+     */    
+    private void setInheritance() {
+        
+        // do not inheret Object from itself!
+        if("java.lang.Object".equals(classFile.getPhysicalName()))
+            return;
+        
+        String superClassName = classFile.getSuperClassName();
+        String[] interfaceNames = classFile.getInterfaceNames();
+        
+        if (typeDecl instanceof ClassDeclaration) {
+            ClassDeclaration classDecl = (ClassDeclaration) typeDecl;
+            TypeReference tyRef = createTypeReference(superClassName);
+            Extends ext = factory.createExtends(tyRef);
+            classDecl.setExtendedTypes(ext);
+            
+            ASTList<TypeReference> implList = new ASTArrayList<TypeReference>();
+            for (String intf : interfaceNames) {
+                implList.add(createTypeReference(intf));
+            }
+            classDecl.setImplementedTypes(factory.createImplements(implList));
+        } else {
+            InterfaceDeclaration intfDecl = (InterfaceDeclaration) typeDecl;
+            ASTList<TypeReference> implList = new ASTArrayList<TypeReference>();
+            for (String intf : interfaceNames) {
+                implList.add(createTypeReference(intf));
+            }
+            intfDecl.setExtendedTypes(factory.createExtends(implList));
+        }
+        
+        if(superClassName != null) {
+            
+        }
+        
     }
 
     /*
@@ -258,7 +323,7 @@ public class ClassFileDeclarationBuilder {
         int index = 1;
         for (String tys : method.getParameterTypeNames()) {
             type = createTypeReference(tys);
-            String name = "arg" + index;
+            String name = "arg" + (index++);
             Identifier id = factory.createIdentifier(name);
             params.add(factory.createParameterDeclaration(type, id));
         }

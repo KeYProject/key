@@ -526,13 +526,18 @@ public class Recoder2KeY implements JavaReader {
             for (FileCollection fc : sources) {
                 FileCollection.Walker walker = fc.createWalker(".java");
                 while(walker.step()) {
-                    currentDataLocation = walker.getCurrentDataLocation();
-                    InputStream is = walker.openCurrent();
-                    Reader f = new BufferedReader(new InputStreamReader(is));
-                    recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
-                    rcu.setDataLocation(currentDataLocation);
-                    rcu.makeAllParentRolesValid();
-                    rcuList.add(rcu);
+                    try {
+                        currentDataLocation = walker.getCurrentDataLocation();
+                        InputStream is = walker.openCurrent();
+                        Reader f = new BufferedReader(new InputStreamReader(is));
+                        recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
+                        rcu.setDataLocation(currentDataLocation);
+                        rcu.makeAllParentRolesValid();
+                        rcuList.add(rcu);
+                    } catch(Exception ex) {
+                        System.err.println("Error while loading: " + walker.getCurrentDataLocation());
+                        ex.printStackTrace();
+                    }
                 }
             }
 
@@ -541,14 +546,19 @@ public class Recoder2KeY implements JavaReader {
             for (FileCollection fc : sources) {
                 FileCollection.Walker walker = fc.createWalker(".class");
                 while(walker.step()) {
-                    currentDataLocation = walker.getCurrentDataLocation();
-                    InputStream is = walker.openCurrent();
-                    ClassFile cf = parser.parseClassFile(is);
-                    ClassFileDeclarationBuilder builder = new ClassFileDeclarationBuilder(pf, cf);
-                    builder.setDataLocation(currentDataLocation);
-                    recoder.java.CompilationUnit rcu = builder.makeCompilationUnit();
-                    rcu.makeAllParentRolesValid();
-                    rcuList.add(rcu);
+                    try {
+                        currentDataLocation = walker.getCurrentDataLocation();
+                        InputStream is = walker.openCurrent();
+                        ClassFile cf = parser.parseClassFile(is);
+                        ClassFileDeclarationBuilder builder = new ClassFileDeclarationBuilder(pf, cf);
+                        builder.setDataLocation(currentDataLocation);
+                        recoder.java.CompilationUnit rcu = builder.makeCompilationUnit();
+                        rcu.makeAllParentRolesValid();
+                        rcuList.add(rcu);
+                    } catch(Exception ex) {
+                        System.err.println("Error while loading: " + walker.getCurrentDataLocation());
+                        ex.printStackTrace();
+                    }
                 }
             }
             
@@ -559,7 +569,7 @@ public class Recoder2KeY implements JavaReader {
             
             return rcuList;
         } catch(Exception ex) {
-            reportError("Error while parsing lib: " + currentDataLocation, ex);
+            reportError("Error while parsing lib", ex);
             //  unreachable
             return null;
         }
@@ -604,7 +614,6 @@ public class Recoder2KeY implements JavaReader {
         // make them available to the rec2key mapping
         for (int i = 0, sz = specialClasses.size(); i < sz; i++) {
             //TODO: use the real file name here
-            System.out.println(specialClasses.get(i).toSource());
             getConverter().processCompilationUnit(specialClasses.get(i), specialClasses.get(i).getName());
         }
 

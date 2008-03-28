@@ -85,5 +85,9 @@ public class DirectoryFileCollection implements FileCollection {
         }
     }
 
+    @Override
+    public String toString() {
+        return "DirectoryFileCollection[" + directory + "]";
+    }
 
 }

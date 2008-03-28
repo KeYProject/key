@@ -33,13 +33,13 @@ public class KeYCrossReferenceServiceConfiguration
 	this.kpmi = kpmi;
     }
 
+    // TODO  MU they only call super.samename. cant we delete these methods?
     protected void makeServices() { 
 	super.makeServices();
     }
 
     protected void initServices() { 
-	super.initServices();
-	
+	super.initServices();	
     }
 
     protected ProgramFactory makeProgramFactory() {
@@ -79,7 +79,7 @@ public class KeYCrossReferenceServiceConfiguration
     }
 
     protected NameInfo makeNameInfo() {
-	return new DefaultNameInfo(this);
+	return new KeYCrossReferenceNameInfo(this);
     }
 
     protected ConstantEvaluator makeConstantEvaluator() {
