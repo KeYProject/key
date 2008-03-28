@@ -24,29 +24,21 @@ public class DirectoryFileCollection implements FileCollection {
         this.directory = directory;
     }
 
-    private static void addAllFiles(File dir, String[] extensions,
+    private static void addAllFiles(File dir, String extension,
                                     List<File> files) {
         for (File file : dir.listFiles()) {
             if(file.isDirectory()) {
-                addAllFiles(file, extensions, files);
-            } else if(extMatch(file.getName(), extensions)) {
+                addAllFiles(file, extension, files);
+            } else if(file.getName().toLowerCase().endsWith(extension)) {
                 files.add(file);
             }
         }
     }
     
-    private static boolean extMatch(String s, String[] extensions) {
-        for(String ext : extensions) {
-            if(s.toLowerCase().endsWith(ext.toLowerCase()))
-                return true;
-        }
-        return false;
-    }
-    
-    public Walker createWalker(String... extensions) {
+    public Walker createWalker(String extension) {
         List<File> files = new ArrayList<File>();
-        addAllFiles(directory, extensions, files);
-        return new Walker(extensions);
+        addAllFiles(directory, extension, files);
+        return new Walker(files.iterator());
     }
 
 
@@ -55,8 +47,8 @@ public class DirectoryFileCollection implements FileCollection {
         private Iterator<File> iterator;
         private File currentFile;
 
-        public Walker(String[] extensions) {
-            
+        public Walker(Iterator<File> iterator) {
+            this.iterator = iterator;
         }
 
         public String getCurrentName() {

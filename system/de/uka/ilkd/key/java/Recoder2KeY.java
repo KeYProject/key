@@ -18,12 +18,17 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import recoder.ProgramFactory;
 import recoder.bytecode.ByteCodeParser;
 import recoder.bytecode.ClassFile;
 import recoder.io.DataLocation;
+import recoder.io.ProjectSettings;
+import recoder.java.declaration.TypeDeclaration;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
+import recoder.parser.ParseException;
 import recoder.service.ChangeHistory;
+import recoder.util.FileCollector;
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
@@ -71,7 +76,7 @@ public class Recoder2KeY implements JavaReader {
      * The location where the libraries to be parsed can be found. It will be
      * used as a resource path relative to the path of the package.
      */
-    private static String JAVA_SRC_DIR = "defaultClasses.jar";
+    private static String JAVA_SRC_DIR = "JavaRedux";
     
     /**
      * This is a marker object to denote in the list of classPaths that the 
@@ -201,18 +206,11 @@ public class Recoder2KeY implements JavaReader {
 
         // set up recoder:
         recoder.util.Debug.setLevel(500);
-
-       if (classPath != null) {
-            servConf.getProjectSettings().setProperty(recoder.io.PropertyNames.INPUT_PATH, classPath);
-        }
-
-        // make sure java.lang.Object as class file within reach.
-        // TODO is this really still desired?
-        // ClassFileRepository cfr = servConf.getClassFileRepository();
-        // if (cfr.findClassFile("java.lang.Object") == null) {
-        // Debug.out("System classes not found in path.");
-        // }
         
+        // do not look up classes anywhere but in the included classes!
+        servConf.getProjectSettings().setProperty(ProjectSettings.CLASS_SEARCH_MODE, "");
+
+        /*
         if (servConf.getProjectSettings().
 	    ensureSystemClassesAreInPath()) {
 	} else {
@@ -242,6 +240,8 @@ public class Recoder2KeY implements JavaReader {
 		System.err.println("System classes not found in path.");
 	    }
 	}
+	*/
+        
     }
     
     /**
@@ -432,7 +432,51 @@ public class Recoder2KeY implements JavaReader {
     public void setClassPath(ListOfString classPath) {
         this.classPath = classPath;
     }
+    
+    /*
+     * locate java classes that are stored internally within the jar-file or the binary directory.
+     * The JAVALANG.TXT file lists all files to be loaded
+     */
+    private void parseInternalClasses(ProgramFactory pf, List<recoder.java.CompilationUnit> rcuList) 
+                    throws IOException, recoder.ParserException {
+        URL jlURL = KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class, JAVA_SRC_DIR + "/" + "JAVALANG.TXT");
+        
+        if (jlURL == null) {
+            throw new FileNotFoundException("Resource " + JAVA_SRC_DIR + "/JAVALANG.TXT cannot be opened.");
+        }
+        
+        BufferedReader r = new BufferedReader(new InputStreamReader(jlURL.openStream()));
 
+        for (String jl = r.readLine(); (jl != null); jl = r.readLine()) {
+            // ignore comments and empty lines
+            if ((jl.length() == 0) || (jl.charAt(0) == '#')) {
+                continue;
+            }
+
+            jl = jl.trim();
+            URL jlf = KeYResourceManager.getManager().
+            getResourceFile(Recoder2KeY.class, JAVA_SRC_DIR + "/" + jl);
+            if(jlf == null) {
+                throw new FileNotFoundException("Resource " +  JAVA_SRC_DIR + "/" + jl + " not found");
+            }
+            InputStream is = jlf.openStream();
+            if (is == null)
+                throw new IOException("Resource cannot be opened for reading: " + jlf);
+            Reader f = new BufferedReader(new InputStreamReader(is));
+            try {
+                recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
+                rcu.setDataLocation(new URLDataLocation(jlf));
+                rcu.makeAllParentRolesValid();
+                rcuList.add(rcu);
+            } catch(ParseException ex) {
+                throw new RuntimeException("Error while parsing " + jlf.toString(), ex);
+            }
+            if (Debug.ENABLE_DEBUG) {
+                Debug.out("parsed: " + jl);
+            }
+        }
+    }
+    
     /**
      * reads compilation units that will be treated as library classes.
      * 
@@ -471,13 +515,13 @@ public class Recoder2KeY implements JavaReader {
                 }
             }
         }
-        if(parseDefault) {
-            URL jlURL = KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class, JAVA_SRC_DIR);
-            sources.add(0, new ZipFileCollection(jlURL));
-        }
-
+        
         DataLocation currentDataLocation = null;
         try {
+            if(parseDefault) {
+                parseInternalClasses(pf, rcuList);
+            }
+        
             // -- read java files --
             for (FileCollection fc : sources) {
                 FileCollection.Walker walker = fc.createWalker(".java");
@@ -507,8 +551,13 @@ public class Recoder2KeY implements JavaReader {
                     rcuList.add(rcu);
                 }
             }
+            
+            recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(
+                    new StringReader("public class " +
+                            JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS + " {}"));
+            rcuList.add(rcu);
+            
             return rcuList;
-
         } catch(Exception ex) {
             reportError("Error while parsing lib: " + currentDataLocation, ex);
             //  unreachable
@@ -539,6 +588,12 @@ public class Recoder2KeY implements JavaReader {
             // TODO if duplicated files, take first one only!
             changeHistory.attached(specialClasses.get(i));
         }
+        
+        /*for (recoder.java.CompilationUnit compilationUnit : specialClasses) {
+            for (TypeDeclaration decl : compilationUnit.getDeclarations()) {
+                System.out.println(decl.getName());
+            }
+        }*/
 
         if (changeHistory.needsUpdate()) {
             changeHistory.updateModel();
@@ -549,6 +604,7 @@ public class Recoder2KeY implements JavaReader {
         // make them available to the rec2key mapping
         for (int i = 0, sz = specialClasses.size(); i < sz; i++) {
             //TODO: use the real file name here
+            System.out.println(specialClasses.get(i).toSource());
             getConverter().processCompilationUnit(specialClasses.get(i), specialClasses.get(i).getName());
         }
 

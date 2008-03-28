@@ -17,7 +17,7 @@ import recoder.io.DataLocation;
 
 public interface FileCollection {
 
-    public Walker createWalker(String... extensions) throws IOException;
+    public Walker createWalker(String extension) throws IOException;
 
     public interface Walker {
 

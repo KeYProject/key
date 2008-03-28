@@ -3,8 +3,9 @@
  */
 package java.lang;
 
-public interface Iterable
+public class NoClassDefFoundError
 {
 
-   public java.util.Iterator iterator();
+   public NoClassDefFoundError();
+   public NoClassDefFoundError(java.lang.String arg0);
 }

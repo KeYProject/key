@@ -3,16 +3,12 @@ package de.uka.ilkd.key.util;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
-import recoder.io.ArchiveDataLocation;
 import recoder.io.DataLocation;
 
 
@@ -27,45 +23,36 @@ import recoder.io.DataLocation;
 
 public class ZipFileCollection implements FileCollection {
     
-    URL url;
+    File file;
+    ZipFile zipFile;
     
-    public ZipFileCollection(File file) {
-        this(mkURL(file));
+    public ZipFileCollection(File file)  {
+        this.file = file;
     }
 
-    public ZipFileCollection(URL url) {
-        this.url = url;
-    }
-
-    public Walker createWalker(String... extensions) throws IOException {
-        return new Walker(extensions);
+    public Walker createWalker(String extension) throws ZipException, IOException {
+        if(zipFile == null)
+            zipFile = new ZipFile(file);
+        return new Walker(extension.toLowerCase());
     }
     
-    private static URL mkURL(File f) {
-        try {
-            return f.toURL();
-        } catch (MalformedURLException e) {
-            // this may never happen!
-            throw new Error(e);
-        }
-    }
 
     class Walker implements FileCollection.Walker {
 
+        private Enumeration<? extends ZipEntry> enumeration;
         private ZipEntry currentEntry;
-        private String[] extensions;
-        private ZipInputStream zis;
+        private String extension;
 
-        public Walker(String[] extensions) throws IOException {
-            zis = new ZipInputStream(url.openStream()); 
-            this.extensions = extensions;
+        public Walker(String extension) {
+            this.enumeration = zipFile.entries();
+            this.extension = extension;
         }
 
         public String getCurrentName() {
             if(currentEntry == null)
                 throw new NoSuchElementException();
             else
-                return currentEntry.getName();
+                return file.getAbsolutePath() + File.separatorChar +  currentEntry.getName();
         }
 
         public InputStream openCurrent() throws IOException {
@@ -79,29 +66,19 @@ public class ZipFileCollection implements FileCollection {
             currentEntry = null;
             while(enumeration.hasMoreElements() && currentEntry == null) {
                 currentEntry = enumeration.nextElement();
-                if(extMatch(currentEntry.getName()))
+                if(currentEntry.getName().toLowerCase().endsWith(extension))
                     currentEntry = null;
             }
             return currentEntry != null;
         }
         
-        private boolean extMatch(String s) {
-            for(String ext : extensions) {
-                if(s.toLowerCase().endsWith(ext.toLowerCase()))
-                    return true;
-            }
-            return false;
-        }
-
         public String getType() {
             return "zip";
         }
 
         public DataLocation getCurrentDataLocation() {
             // dont use ArchiveDataLocation this opens the zip and keeps reference to it!
-            return new SpecDataLocation("zip", url.toString() + "!" + getCurrentName());
+            return new SpecDataLocation("zip", file.getAbsolutePath() + "!" + currentEntry.getName());
         }
-
-        
     }
 }
