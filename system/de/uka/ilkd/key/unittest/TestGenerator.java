@@ -690,8 +690,8 @@ public class TestGenerator{
 		kjt.getJavaType() instanceof InterfaceDeclaration) &&
 	       ((TypeDeclaration) kjt.getJavaType()).getPositionInfo().
 	       getFileName() != null &&
-	       ((TypeDeclaration) kjt.getJavaType()).getPositionInfo().
-	       getFileName().indexOf("resources")==-1){
+               ((TypeDeclaration) kjt.getJavaType()).getPositionInfo().
+               getFileName().indexOf(serv.getProof().getJavaModel().getModelDir())!=-1){
 
 		StringWriter sw = new StringWriter();
 		PrettyPrinter pp = new PrettyPrinter(sw, false, true);
