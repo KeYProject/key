@@ -33,7 +33,7 @@ public class KeYCrossReferenceServiceConfiguration
 	this.kpmi = kpmi;
     }
 
-    // TODO  MU they only call super.samename. cant we delete these methods?
+    // TODO  MU they only call super.samename. cant we delete all these methods?
     protected void makeServices() { 
 	super.makeServices();
     }

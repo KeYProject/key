@@ -329,7 +329,9 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 		postWork(res);
 		return res;
 	    } catch (ParseException e) {
-		throw new ParserException();
+	        ParserException pe = new ParserException();
+	        pe.initCause(e);
+		throw pe;
 	    }
         }
     }
@@ -345,7 +347,9 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 		postWork(res);
 		return res;
 	    } catch (ParseException e) {
-		throw new ParserException();
+	        ParserException pe = new ParserException();
+                pe.initCause(e);
+                throw pe;
 	    }
 
         }
@@ -362,7 +366,9 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 		postWork(res);
 		return res;
 	    } catch (ParseException e) {
-		throw new ParserException();
+	        ParserException pe = new ParserException();
+                pe.initCause(e);
+                throw pe;
 	    }
 
         }
@@ -379,7 +385,9 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 		postWork(res);
 		return res;
 	    } catch (ParseException e) {
-		throw new ParserException();
+	        ParserException pe = new ParserException();
+                pe.initCause(e);
+                throw pe;
 	    }
 
         }
@@ -396,7 +404,9 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 		postWork(res);
 		return res;
 	    } catch (ParseException e) {
-		throw new ParserException();
+	        ParserException pe = new ParserException();
+                pe.initCause(e);
+                throw pe;
 	    }
 
         }
@@ -413,7 +423,9 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 		postWork(res);
 		return res;
 	    } catch (ParseException e) {
-		throw new ParserException();
+	        ParserException pe = new ParserException();
+                pe.initCause(e);
+                throw pe;
 	    }
 
         }
@@ -430,7 +442,9 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 		postWork(res);
 		return res;
 	    } catch (ParseException e) {
-		throw new ParserException();
+	        ParserException pe = new ParserException();
+                pe.initCause(e);
+                throw pe;
 	    }
 
         }
@@ -447,7 +461,9 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 		postWork(res);
 		return res;
 	    } catch (ParseException e) {
-		throw new ParserException();
+	        ParserException pe = new ParserException();
+                pe.initCause(e);
+                throw pe;
 	    }
 
         }
@@ -464,7 +480,9 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 		postWork(res);
 		return res;
 	    } catch (ParseException e) {
-		throw new ParserException();
+	        ParserException pe = new ParserException();
+                pe.initCause(e);
+                throw pe;
 	    }
 
         }
@@ -483,7 +501,9 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 		}
 		return res;
 	    } catch (ParseException e) {
-		throw new ParserException();
+	        ParserException pe = new ParserException();
+                pe.initCause(e);
+                throw pe;
 	    }
 
         }
@@ -501,7 +521,9 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 		postWork(res);
 		return res;
 	    } catch (ParseException e) {
-		throw new ParserException(e.toString());
+	        ParserException pe = new ParserException(e.getMessage());
+                pe.initCause(e);
+                throw pe;
 	    }
 
         }

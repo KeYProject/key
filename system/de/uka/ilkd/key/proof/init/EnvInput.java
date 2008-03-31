@@ -9,6 +9,9 @@
 //
 package de.uka.ilkd.key.proof.init;
 
+import java.io.File;
+import java.util.List;
+
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
 
@@ -54,7 +57,7 @@ public interface EnvInput {
     /** 
      * gets the classpath elements to be considered here.
      */
-    ListOfString readClassPath() throws ProofInputException;
+    List<File> readClassPath() throws ProofInputException;
     
     /** 
      * Reads the input using the given modification strategy, i.e.,

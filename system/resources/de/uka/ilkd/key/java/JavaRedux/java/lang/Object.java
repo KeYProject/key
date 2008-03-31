@@ -3,7 +3,7 @@
  */
 package java.lang;
 
-public class Object extends java.lang.Object
+public class Object 
 {
 
    public Object();

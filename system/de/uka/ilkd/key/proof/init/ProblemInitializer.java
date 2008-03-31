@@ -325,7 +325,7 @@ public class ProblemInitializer {
     		throws ProofInputException {
 	envInput.setInitConfig(initConfig);
 	String javaPath = envInput.readJavaPath();
-	ListOfString classPath = envInput.readClassPath(); 
+	List<File> classPath = envInput.readClassPath(); 
 	
 	if(javaPath != null) {
     	    //read Java	
@@ -341,6 +341,7 @@ public class ProblemInitializer {
             Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(), 
                                               initConfig.namespaces());
             r2k.setClassPath(classPath);
+            //r2k.setKeYFile(envInput.)
             if (javaPath.length() == 0) {
                 r2k.parseSpecialClasses();
                 initConfig.getProofEnv().setJavaModel(JavaModel.NO_MODEL);

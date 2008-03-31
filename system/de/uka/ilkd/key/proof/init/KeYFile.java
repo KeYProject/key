@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.*;
 
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
@@ -233,11 +234,24 @@ public class KeYFile implements EnvInput {
         return result;
     }
     
-    public ListOfString readClassPath() {
+    public List<File> readClassPath() {
         if(!javaPathAlreadyParsed)
             throw new IllegalStateException("Can access this only after 'readJavaPath' has been called");
         
-        return classPaths;
+        String parentDirectory = file.file().getParent();
+        List<File> fileList = new ArrayList<File>();
+        for (String cp : classPaths) {
+            if (cp == null) {
+                fileList.add(null);
+            } else {
+                File f = new File(cp);
+                if (!f.isAbsolute()) {
+                    f = new File(parentDirectory, cp);
+                }
+                fileList.add(f);
+            }
+        }
+        return fileList;
     }
     
     public String readJavaPath() throws ProofInputException {

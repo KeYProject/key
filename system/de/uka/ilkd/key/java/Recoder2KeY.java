@@ -12,39 +12,22 @@ package de.uka.ilkd.key.java;
 
 import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import recoder.ProgramFactory;
-import recoder.bytecode.ByteCodeParser;
-import recoder.bytecode.ClassFile;
-import recoder.io.DataLocation;
-import recoder.io.ProjectSettings;
-import recoder.java.declaration.TypeDeclaration;
-import recoder.list.generic.ASTArrayList;
-import recoder.list.generic.ASTList;
+import recoder.abstraction.ClassType;
+import recoder.bytecode.*;
+import recoder.io.*;
+import recoder.list.generic.*;
 import recoder.parser.ParseException;
-import recoder.service.ChangeHistory;
-import recoder.util.FileCollector;
+import recoder.service.*;
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.recoderext.*;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.IteratorOfProgramVariable;
-import de.uka.ilkd.key.logic.op.ListOfProgramVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SLListOfProgramVariable;
-import de.uka.ilkd.key.parser.ParserException;
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.DirectoryFileCollection;
-import de.uka.ilkd.key.util.FileCollection;
-import de.uka.ilkd.key.util.KeYResourceManager;
-import de.uka.ilkd.key.util.ZipFileCollection;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.util.*;
 
 /**
  * This class is the bridge between recoder ast data structures and KeY data
@@ -83,13 +66,15 @@ public class Recoder2KeY implements JavaReader {
      * default classpath must not be read. 
      * (see also keyparser.g)
      */
-    public static String NO_DEFAULT_CLASSES_STRING = new String("no default classes are to be read");
+    // public static String NO_DEFAULT_CLASSES_STRING = new String("no default classes are to be read");
     
     /**
-     * the set of strings that describes the classpath to be searched
+     * the set of File objects that describes the classpath to be searched
      * for classes.
+     * it may contain a null file which indicates that the default classes are 
+     * not to be read.
      */
-    private ListOfString classPath;
+    private List<File> classPath;
 
     /**
      * this mapping stores the relation between recoder and KeY entities in a
@@ -429,7 +414,7 @@ public class Recoder2KeY implements JavaReader {
 
     // ----- parsing libraries
     
-    public void setClassPath(ListOfString classPath) {
+    public void setClassPath(List<File> classPath) {
         this.classPath = classPath;
     }
     
@@ -502,16 +487,15 @@ public class Recoder2KeY implements JavaReader {
         boolean parseDefault = true;
         
         if(classPath != null) {
-            for(String cp : classPath) {
+            for(File cp : classPath) {
                 // marker for no_default classes
-                if(cp == NO_DEFAULT_CLASSES_STRING) { 
+                if(cp == null) { 
                    parseDefault = false; 
                 } else {
-                    File file = new File(cp);
-                    if(file.isDirectory())
-                        sources.add(new DirectoryFileCollection(file));
+                    if(cp.isDirectory())
+                        sources.add(new DirectoryFileCollection(cp));
                     else
-                        sources.add(new ZipFileCollection(file));
+                        sources.add(new ZipFileCollection(cp));
                 }
             }
         }
@@ -607,6 +591,12 @@ public class Recoder2KeY implements JavaReader {
 
         if (changeHistory.needsUpdate()) {
             changeHistory.updateModel();
+        }
+        
+        NameInfo ni = servConf.getNameInfo();
+        System.out.println("Known types:");
+        for(ClassType ct : ni.getClassTypes()) {
+            System.out.println(ct.getFullName());
         }
 
         transformModel(specialClasses);

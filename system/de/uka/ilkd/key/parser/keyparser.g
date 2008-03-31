@@ -4523,7 +4523,7 @@ classPaths returns [ListOfString ids = SLListOfString.EMPTY_LIST]
   | 
     (
     NODEFAULTCLASSES {
-      ids = ids.append(de.uka.ilkd.key.java.Recoder2KeY.NO_DEFAULT_CLASSES_STRING);
+      ids = ids.append((String)null);
     }
     SEMI
     )

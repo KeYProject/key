@@ -9,6 +9,8 @@
 //
 package de.uka.ilkd.key.proof.init;
 
+import java.util.List;
+import java.io.File;
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -73,7 +75,7 @@ public abstract class AbstractEnvInput implements EnvInput {
     }
     
     // no class path elements here
-    public ListOfString readClassPath() throws ProofInputException {
+    public List<File> readClassPath() throws ProofInputException {
         return null;
     }
     

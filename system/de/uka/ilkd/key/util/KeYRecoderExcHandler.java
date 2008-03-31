@@ -11,7 +11,11 @@
 package de.uka.ilkd.key.util;
 
 
-import java.util.EventObject;
+import java.util.*;
+
+import recoder.java.ProgramElement;
+import recoder.java.reference.TypeReference;
+import recoder.service.UnresolvedReferenceException;
 
 
 public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl implements recoder.service.ErrorHandler{
@@ -19,13 +23,14 @@ public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl implements rec
     private ExtList recoderExceptions = new ExtList();
     private int recoderErrorCount = 0;
     private int recoderErrorThreshold;
-
-
+    
+    private List<String> unreferencedClasses = new ArrayList<String>();
+    
     public void reportException(Throwable e){
         super.reportException(e);
         if (getExceptions().size() != 0) {
             throw new ExceptionHandlerException(e);
-        }	
+        }    
     }
 
     public KeYRecoderExcHandler() {
@@ -42,6 +47,20 @@ public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl implements rec
 	super.clear();
 	recoderExceptions = new ExtList();
 	recoderErrorCount = 0;
+    }
+    
+    private boolean testUnreferencedClass(Throwable e) {
+        if (e instanceof UnresolvedReferenceException) {
+            UnresolvedReferenceException ur = (UnresolvedReferenceException) e;
+            ProgramElement ref = ur.getUnresolvedReference();
+            if (ref instanceof TypeReference) {
+                TypeReference tyref = (TypeReference) ref;
+                Debug.out("Unresolved type: " + ref.toSource());
+                // System.err.println("Unresolved type: " + ref.toSource());
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean error(){
@@ -81,11 +100,13 @@ public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl implements rec
     }
     
     public void reportError(Exception e) {
-	recoderErrorCount += 1;
-	recoderExceptions.add(e);
-	if (recoderErrorCount > recoderErrorThreshold) {
-            recoderExitAction();
-	}         
+        if(!testUnreferencedClass(e)) {
+            recoderErrorCount += 1;
+            recoderExceptions.add(e);
+            if (recoderErrorCount > recoderErrorThreshold) {
+                recoderExitAction();
+            }         
+        }
     }
     
     public void modelUpdating(EventObject event) {}

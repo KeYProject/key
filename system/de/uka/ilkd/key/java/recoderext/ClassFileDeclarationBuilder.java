@@ -217,14 +217,16 @@ public class ClassFileDeclarationBuilder {
             for (String intf : interfaceNames) {
                 implList.add(createTypeReference(intf));
             }
-            classDecl.setImplementedTypes(factory.createImplements(implList));
+            if(implList.size() > 0)
+                classDecl.setImplementedTypes(factory.createImplements(implList));
         } else {
             InterfaceDeclaration intfDecl = (InterfaceDeclaration) typeDecl;
             ASTList<TypeReference> implList = new ASTArrayList<TypeReference>();
             for (String intf : interfaceNames) {
                 implList.add(createTypeReference(intf));
             }
-            intfDecl.setExtendedTypes(factory.createExtends(implList));
+            if(implList.size() > 0)
+                intfDecl.setExtendedTypes(factory.createExtends(implList));
         }
         
         if(superClassName != null) {
