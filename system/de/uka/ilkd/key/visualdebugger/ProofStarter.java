@@ -202,7 +202,7 @@ public class ProofStarter {
             // take default settings
             setMaxSteps(proof.getSettings().getStrategySettings().getMaxSteps());
         }
-        System.out.println("23");
+        System.out.println("23 maxsteps..." + maxSteps);
         final BuiltInRule decisionProcedureRule;
         if (useDecisionProcedures) {
             decisionProcedureRule = findSimplifyRule();

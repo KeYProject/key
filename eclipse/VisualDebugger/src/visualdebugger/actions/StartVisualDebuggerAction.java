@@ -25,7 +25,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 
 import visualdebugger.views.InsertSepVisitor;
-import de.uka.ilkd.key.casetool.eclipse.EclipseSignaturesHelper;
+import de.uka.ilkd.key.casetool.eclipse.EclipseSignaturesHelper; 
 import de.uka.ilkd.key.casetool.eclipse.MethodPOSelectionDialog;
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.collection.SLListOfString;
@@ -646,7 +646,6 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 
 			// Inserts the separator statements
 			insertSeps(srcFile.getJavaProject());
-
 			// TODO generalize to consider packageFragmentRoots (needed to
 			// support
 			// special source locations like folders only linked into the

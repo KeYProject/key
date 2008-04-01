@@ -1,20 +1,11 @@
 package visualdebugger.astops;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.IVariableBinding;
-import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.dom.*;
 
 /**
  * The Class Util.
@@ -49,94 +40,6 @@ public final class Util {
     }
 
     /**
-     * Extract local variables for method.
-     * 
-     * @param method
-     *            the method
-     * @param allLocalVariables
-     *            the all local variables
-     * 
-     * @return the linked list< i variable binding>
-     */
-    public static LinkedList<IVariableBinding> extractLocalVariablesForMethod(
-            IMethod method, Set<IVariableBinding> allLocalVariables) {
-
-        LinkedList<IVariableBinding> localVariableBindings = new LinkedList<IVariableBinding>();
-        for (IVariableBinding variableBinding : allLocalVariables) {
-            if (method.getElementName().equals(
-                    variableBinding.getDeclaringMethod().getName())) {
-                localVariableBindings.add(variableBinding);
-            }
-        }
-
-        return localVariableBindings;
-    }
-
-    /**
-     * Extract local variables for expression.
-     * 
-     * @param node
-     *            the node
-     * @param localVariableBindings
-     *            the local variable bindings
-     * 
-     * @return the set< i variable binding>
-     */
-    public static Set<IVariableBinding> extractLocalVariablesForExpression(
-            Expression node, LinkedList<IVariableBinding> localVariableBindings) {
-
-        Set<IVariableBinding> localVariables = new HashSet<IVariableBinding>();
-        if (node instanceof InfixExpression) {
-
-            InfixExpression ie = (InfixExpression) node;
-
-            Set<SimpleName> operands = getOperands(ie);
-            System.out.println("left " + ie.getLeftOperand());
-            System.out.println("class " + ie.getLeftOperand().getClass());
-            System.out.println("found " + operands.size() + " operands");
-
-            for (SimpleName candidate : operands) {
-
-                for (IVariableBinding localVariableBinding : localVariableBindings) {
-                    String a = localVariableBinding.getName();
-                    String b = candidate.toString();
-                    if (a.equals(b)) {
-                        localVariables.add(localVariableBinding);
-                    }
-                }
-            }
-        }
-        return localVariables;
-    }
-
-    /**
-     * Gets the loc var inf.
-     * 
-     * @param cu
-     *            the cu
-     * @param localVariableBinding
-     *            the local variable binding
-     * 
-     * @return the loc var inf
-     */
-    public static LinkedList<String[]> getLocVarInf(CompilationUnit cu,
-            Set<IVariableBinding> localVariableBinding) {
-        
-        LinkedList<String[]> informations = new LinkedList<String[]>();
-        for (IVariableBinding variableBinding : localVariableBinding) {
-            
-            ASTNode astnode = cu.findDeclaringNode(variableBinding);
-            String[] information = new String[4];
-            information[0] = variableBinding.getType().getName() + ""; // type
-            information[1] = variableBinding.getName() + ""; // name
-            information[2] = astnode.getStartPosition() + ""; // offset
-            information[3] = variableBinding.getDeclaringMethod()+"";
-            informations.add(information);
-        }
-        return informations;
-    }
-
-    /**
      * Parses the ICompilationUnit.
      * 
      * @param unit
@@ -152,6 +55,29 @@ public final class Util {
             ASTParser parser = ASTParser.newParser(AST.JLS3);
             parser.setKind(ASTParser.K_COMPILATION_UNIT);
             parser.setSource(unit);
+            parser.setResolveBindings(true);
+            return (CompilationUnit) parser.createAST(pm);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return null;
+        }
+    }
+    /**
+     * Parses the ICompilationUnit.
+     * 
+     * @param unit
+     *            the unit
+     * @param pm
+     *            the progressmonitor
+     * 
+     * @return the compilation unit
+     */
+    public static CompilationUnit parseSource(String source,
+            IProgressMonitor pm) {
+        try {
+            ASTParser parser = ASTParser.newParser(AST.JLS3);
+            parser.setSource(source.toCharArray());
+            //FIXME not working
             parser.setResolveBindings(true);
             return (CompilationUnit) parser.createAST(pm);
         } catch (Throwable t) {
@@ -182,20 +108,18 @@ public final class Util {
             return null;
         }
     }
-
-    /**
-     * Detect local variables.
-     * 
-     * @param cu
-     *            the cu
-     * 
-     * @return the set< i variable binding>
-     */
-    public static Set<IVariableBinding> detectLocalVariables(CompilationUnit cu) {
-
-        LocalVariableDetector localVariableDetector = new LocalVariableDetector();
-        localVariableDetector.process(cu);
-        return localVariableDetector.getLocalVariableManagers().keySet();
+    public static HashMap<Integer,IVariableBinding> valueToKey(Map<IVariableBinding , Integer> map ){
+        
+        HashMap<Integer,IVariableBinding> newHashMap = new HashMap<Integer, IVariableBinding>(); 
+        
+        Iterator<Entry<IVariableBinding, Integer>> it = map.entrySet().iterator();
+        while (it.hasNext()) {
+            Entry<IVariableBinding, java.lang.Integer> entry = (Entry<IVariableBinding, Integer>) it
+                    .next();
+            newHashMap.put(entry.getValue(), entry.getKey());
+            
+        }
+        return newHashMap;
     }
-
+    
 }

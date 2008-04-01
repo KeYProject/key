@@ -1,11 +1,14 @@
 package de.uka.ilkd.key.util;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
+import java.util.Map.Entry;
 
+import javax.swing.SwingUtilities;
+
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.IteratorOfNode;
@@ -19,6 +22,7 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.visualdebugger.ProofStarter;
+import de.uka.ilkd.key.visualdebugger.WatchPointManager;
 import de.uka.ilkd.key.visualdebugger.WatchpointPO;
 import de.uka.ilkd.key.visualdebugger.executiontree.ETNode;
 
@@ -39,10 +43,10 @@ public class WatchpointUtil {
             ListOfTerm watchpoints, ETNode etn) {
 
         assert leafNodesInETNode != null;
-        assert leafNodesInETNode.size() != 0:"No node to process /in satisfiesWatchpoint /in WatchpointUtil";
-        assert watchpoints !=null;
-        assert watchpoints.size() != 0:"No watchpoint to evaluate /in satisfiesWatchpoint /in WatchpointUtil";
-        
+        assert leafNodesInETNode.size() != 0 : "No node to process /in satisfiesWatchpoint /in WatchpointUtil";
+        assert watchpoints != null;
+        assert watchpoints.size() != 0 : "No watchpoint to evaluate /in satisfiesWatchpoint /in WatchpointUtil";
+
         LinkedList<Term> intersection = new LinkedList<Term>(Arrays
                 .asList(watchpoints.toArray()));
 
@@ -52,7 +56,10 @@ public class WatchpointUtil {
         for (Node node : leafNodesInETNode) {
 
             List<Term> temp = new LinkedList<Term>();
-            PosInOccurrence pos = findPos(node);
+
+            PosInOccurrence pos = findPos(node.sequent().succedent());
+            if (pos == null)
+                pos = findPos(node.sequent().antecedent());
 
             if (pos != null) {
                 for (Term watchpoint : watches) {
@@ -63,7 +70,7 @@ public class WatchpointUtil {
                         System.out.println("wp evaluated to true");
                     }
                 }
-            }else {
+            } else {
                 System.out.println("POS was NULL!");
             }
             intersection.retainAll(temp);
@@ -72,13 +79,12 @@ public class WatchpointUtil {
                             + intersection.size());
         }
         etn.setWatchpointsSatisfied(intersection);
-        System.out.println("LEAVING satisfiesWP...with "+ !intersection.isEmpty());
+        System.out.println("LEAVING satisfiesWP...with "
+                + !intersection.isEmpty());
         return !intersection.isEmpty();
     }
 
-    private static PosInOccurrence findPos(Node node){
-
-        Sequent seq = node.sequent();
+    private static PosInOccurrence findPos(Semisequent seq) {
 
         IteratorOfConstrainedFormula iter = seq.iterator();
         ConstrainedFormula constrainedFormula;
@@ -90,35 +96,51 @@ public class WatchpointUtil {
             pos = new PosInOccurrence(constrainedFormula, PosInTerm.TOP_LEVEL,
                     false);
             term = constrainedFormula.formula();
-            // if we find a update
-            if (term.op() instanceof QuanUpdateOperator) {
 
+            // {U1}{U2}...{Un} <prg> phi
+            // proceed to update that is directly in front of the modality
+            while (term.op() instanceof QuanUpdateOperator) {
                 int targetPos = ((QuanUpdateOperator) term.op()).targetPos();
                 pos = pos.down(targetPos);
                 term = term.sub(targetPos);
-                if (term.op() instanceof Modality) {
-                    ProgramPrefix programPrefix = (ProgramPrefix) term
-                            .javaBlock().program();
-
-                    SourceElement firstStatement = PosInProgram.getProgramAt(
-                            programPrefix.getFirstActiveChildPos(),
-                            programPrefix).getFirstElement();
-
-                    if (firstStatement.toString().startsWith("Debug.sep")) {
-                        System.out.println("LEAVING findPos WITH result...");
-                        return pos;
-                    } else {
-                        System.out.println("continue...");
-                        //return null;
-                        continue;
-                    }
-                } 
             }
-        } System.out.println("LEAVING findPos WITHOUT result...");
+
+            if (term.op() instanceof Modality) {
+
+                SourceElement firstStatement = getFirstActiveStatement(term);
+                if (firstStatement.toString().startsWith("Debug")) {
+                    System.out.println("LEAVING findPos WITH result...");
+                    return pos;
+                } else {
+                    System.out.println("continue...");
+                    continue;
+                }
+            }
+        }
+
+        System.out.println("LEAVING findPos WITHOUT result...");
         return null;
     }
 
-    private static HashSet<Node> getLeavesInETNode(Node currentNode,
+    /**
+     * @param programPrefix
+     * @git commit -m 
+     */
+    private static SourceElement getFirstActiveStatement(Term term) {
+
+        assert term.op() instanceof Modality;
+        ProgramPrefix programPrefix = (ProgramPrefix) term.javaBlock()
+                .program();
+
+        programPrefix = programPrefix.getPrefixElementAt(programPrefix
+                .getPrefixLength() - 1);
+
+        return PosInProgram.getProgramAt(
+                programPrefix.getFirstActiveChildPos(), programPrefix)
+                .getFirstElement();
+    }
+
+    private static HashSet<Node> findLeaves(Node currentNode,
             List<Node> proofnodes) {
 
         HashSet<Node> result = new HashSet<Node>(3);
@@ -127,7 +149,7 @@ public class WatchpointUtil {
             Node child = (Node) iter.next();
             if (proofnodes.contains(child)) {
                 proofnodes.remove(child);
-                result.addAll(getLeavesInETNode(child, proofnodes));
+                result.addAll(findLeaves(child, proofnodes));
             }
         }
         if (result.isEmpty()) {
@@ -146,11 +168,10 @@ public class WatchpointUtil {
     public static boolean evalutateWatchpoint(Term watchpoint, Sequent seq,
             PosInOccurrence pos, Proof proof, int maxsteps) {
 
-        System.out.println("maxsteps : " + maxsteps);
-      
         LinkedList<Update> updates = new LinkedList<Update>();
         UpdateFactory updateFactory = new UpdateFactory(proof.getServices(),
                 proof.simplifier());
+        // trackRenaming(proof.getServices().getJavaInfo(), null);
         // collect all updates
         PIOPathIterator it = pos.iterator();
         while (it.hasNext()) {
@@ -168,33 +189,42 @@ public class WatchpointUtil {
         }
         ConstrainedFormula newCF = new ConstrainedFormula(watchpoint);
         seq = seq.changeFormula(newCF, pos).sequent();
-        try{
-        // start side proof
-        ProofStarter ps = new ProofStarter();
-        ProofEnvironment proofEnvironment = proof.env();
-        InitConfig initConfig = proofEnvironment.getInitConfig();
-        WatchpointPO watchpointPO = new WatchpointPO("WatchpointPO", seq);
-        watchpointPO.setIndices(initConfig.createTacletIndex(), initConfig
-                .createBuiltInRuleIndex());
-        StrategyProperties strategyProperties = DebuggerStrategy
-                .getDebuggerStrategyProperties(true, false, false,
-                        SLListOfTerm.EMPTY_LIST);
-        System.out.println("8");
-        final StrategyFactory factory = new DebuggerStrategy.Factory();
-        Strategy strategy = (factory.create(proof, strategyProperties));
-        watchpointPO.setProofSettings(proof.getSettings());
-        watchpointPO.setInitConfig(initConfig);
-        ps.setStrategy(strategy);
-        ps.setMaxSteps(maxsteps);
-        ps.init(watchpointPO);
-        System.out.println("14");
-        if(strategy == null) throw new NullPointerException("strategy was null");
-        if(watchpointPO == null) throw new NullPointerException("watchpointPO was null");
-        if(proof.getSettings() == null) throw new NullPointerException("settings was null");
-        ps.run(proofEnvironment);
-        System.out.println("LEAVING evaluateWP...");
-        return ps.getProof().closed();}
-        catch(Throwable t){
+        try {
+            // start side proof
+            final ProofStarter ps = new ProofStarter();
+            final ProofEnvironment proofEnvironment = proof.env();
+            InitConfig initConfig = proofEnvironment.getInitConfig();
+            WatchpointPO watchpointPO = new WatchpointPO("WatchpointPO", seq);
+            watchpointPO.setIndices(initConfig.createTacletIndex(), initConfig
+                    .createBuiltInRuleIndex());
+            StrategyProperties strategyProperties = DebuggerStrategy
+                    .getDebuggerStrategyProperties(true, false, false,
+                            SLListOfTerm.EMPTY_LIST);
+            final StrategyFactory factory = new DebuggerStrategy.Factory();
+            Strategy strategy = (factory.create(proof, strategyProperties));
+            watchpointPO.setProofSettings(proof.getSettings());
+            watchpointPO.setInitConfig(initConfig);
+            ps.setStrategy(strategy);
+            ps.setMaxSteps(maxsteps);
+            ps.init(watchpointPO);
+            System.out.println("14");
+            if (strategy == null)
+                throw new NullPointerException("strategy was null");
+            if (watchpointPO == null)
+                throw new NullPointerException("watchpointPO was null");
+            if (proof.getSettings() == null)
+                throw new NullPointerException("settings was null");
+
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    ps.run(proofEnvironment);
+
+                }
+            });
+
+            System.out.println("LEAVING evaluateWP...");
+            return ps.getProof().closed();
+        } catch (Throwable t) {
             System.out.println(t.toString());
             t.printStackTrace();
         }
@@ -241,7 +271,7 @@ public class WatchpointUtil {
                 return WatchpointUtil.evalutateWatchpoint(
                         watchpoints.toArray()[0], seq, pos, proof, maxsteps);
             }
-
+            // trackRenaming(proof.getServices().getJavaInfo(), null);
             LinkedList<Update> updates = new LinkedList<Update>();
 
             UpdateFactory updateFactory = new UpdateFactory(
@@ -282,8 +312,8 @@ public class WatchpointUtil {
             ConstrainedFormula newCF = new ConstrainedFormula(watchpoint);
             seq = seq.changeFormula(newCF, pos).sequent();
             // start side proof
-            ProofStarter ps = new ProofStarter();
-            ProofEnvironment proofEnvironment = proof.env();
+            final ProofStarter ps = new ProofStarter();
+            final ProofEnvironment proofEnvironment = proof.env();
             InitConfig initConfig = proofEnvironment.getInitConfig();
 
             WatchpointPO watchpointPO = new WatchpointPO("WatchpointPO", seq);
@@ -300,7 +330,20 @@ public class WatchpointUtil {
             ps.setStrategy(strategy);
             ps.setMaxSteps(maxsteps);
             ps.init(watchpointPO);
-            ps.run(proofEnvironment);
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    public void run() {
+                        ps.run(proofEnvironment);
+
+                    }
+                });
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
 
             return ps.getProof().closed();
         }
@@ -338,17 +381,17 @@ public class WatchpointUtil {
      */
     public static HashSet<Node> getLeafNodesInETNode(Node[] nodes) {
 
-        assert nodes!=null : "The parameter Node[] (proof)nodes was null / in getLeafNodesInETNode()/ in WatchpointUtil!";
+        assert nodes != null : "The parameter Node[] (proof)nodes was null / in getLeafNodesInETNode()/ in WatchpointUtil!";
         assert nodes.length != 0 : "No nodes contained in the passed Array /in getLeafNodesInETNode() / in WatchpointUtil!";
         // create a collection from the array -> type conversion
         // since getProofTreeNodes() only returns a ListOfNode which
         // does not implement the Collection interface
-      
+
         // handle simple case
-        if(nodes.length == 1){
-           final HashSet<Node> theNode = new HashSet<Node>(1);
-           theNode.add(nodes[0]);
-           return theNode;
+        if (nodes.length == 1) {
+            final HashSet<Node> theNode = new HashSet<Node>(1);
+            theNode.add(nodes[0]);
+            return theNode;
         }
         List<Node> proofnodes = new LinkedList<Node>(Arrays.asList(nodes));
         // not more than 4 children expected
@@ -364,7 +407,7 @@ public class WatchpointUtil {
                 parentNode = parentNode.parent();
 
             }
-            candidates.addAll(getLeavesInETNode(currentNode, proofnodes));
+            candidates.addAll(findLeaves(currentNode, proofnodes));
         }
         System.out.println("candiates.size: " + candidates.size());
         return candidates;
@@ -382,13 +425,15 @@ public class WatchpointUtil {
         System.out.println("setting watchpoints active...");
         try {
             for (ETNode node : nodes) {
-                
-                System.out.println("proofNodesInETNode: "+ node.getProofTreeNodes().size());
-                HashSet<Node> leafNodesInETNode = getLeafNodesInETNode(node.getProofTreeNodes().toArray());
-                System.out.println("leafNodesInProofNodes: "+ leafNodesInETNode.size());
+
+                System.out.println("proofNodesInETNode: "
+                        + node.getProofTreeNodes().size());
+                HashSet<Node> leafNodesInETNode = getLeafNodesInETNode(node
+                        .getProofTreeNodes().toArray());
+                System.out.println("leafNodesInProofNodes: "
+                        + leafNodesInETNode.size());
                 boolean satisfiesWatchpoint = satisfiesWatchpoint(
-                        leafNodesInETNode,
-                        watchpoints, node);
+                        leafNodesInETNode, watchpoints, node);
                 node.setWatchpoint(satisfiesWatchpoint);
                 System.out.println("LEAVING setActiveWatchpoint...");
             }
@@ -415,5 +460,54 @@ public class WatchpointUtil {
             executionTree.addAll(getETasList(node));
         }
         return executionTree;
+    }
+
+    public static Update trackRenaming(JavaInfo javaInfo, ListOfRenamingTable rt) {
+
+        HashSet<VariableSpecification> localVariables = WatchPointManager
+        .getLocalVariables();
+        if(localVariables.size() == 0) return null;
+        System.out.println(localVariables.size() + "loc var size in WPU");
+            
+            IteratorOfRenamingTable i = rt.iterator();
+            while (i.hasNext()) {
+                System.out.println("++++++++");
+                RenamingTable renaming = i.next();
+                for (Iterator iterator = localVariables.iterator(); iterator
+                        .hasNext();) {
+                    VariableSpecification variableSpecification = (VariableSpecification) iterator
+                            .next();
+                    if(variableSpecification.getProgramVariable() instanceof LocationVariable){
+                        LocationVariable lv = (LocationVariable) variableSpecification.getProgramVariable();
+                        System.out.println("variable ID: "+lv.id());
+                        SourceElement renamedVariable = renaming.getRenaming(lv);
+                       System.out.println("**************");
+                       if( renamedVariable!= null){
+                           System.out.println(" XXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+                           UpdateFactory uf = new UpdateFactory(null, null);
+                           Update elemtaryUpdate =  uf.elementaryUpdate(null, null);
+                           // -> add el.Updates to list/array
+                           // -> create & return parallel update
+                           uf.parallel(null);
+                           
+                       }
+                    }
+                }
+                System.out.println(renaming.toString());
+            }
+            return null;
+    }
+    
+    public static HashMap<Integer, VariableSpecification> valueToKey(Map<VariableSpecification, Integer> map ){
+        
+        HashMap<Integer, VariableSpecification> newHashMap = new HashMap<Integer, VariableSpecification>(); 
+        Iterator<Entry<VariableSpecification, Integer>> it = map.entrySet().iterator();
+        while (it.hasNext()) {
+            Entry<VariableSpecification, Integer> entry = (Entry<VariableSpecification, Integer>) it
+                    .next();
+            newHashMap.put(entry.getValue(), entry.getKey());
+            
+        }
+        return newHashMap;
     }
 }

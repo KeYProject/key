@@ -1,8 +1,6 @@
 package visualdebugger.draw2d;
 
 import org.eclipse.draw2d.*;
-import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.swt.graphics.Color;
 
 import de.uka.ilkd.key.logic.IteratorOfTerm;
@@ -22,8 +20,6 @@ public class MethodInvocationFigure extends Figure implements DrawableNode {
 
     /** The selected. */
     private boolean selected;
-    private boolean isCollapsed;
-    private boolean isWatchpoint;
 
     /** some color definitions. */
     static final Color gradient1 = new Color(null, 132, 132, 240);
@@ -76,8 +72,6 @@ public class MethodInvocationFigure extends Figure implements DrawableNode {
     public MethodInvocationFigure(ETMethodInvocationNode etNode) {
 
         super();
-        this.isCollapsed = etNode.isCollapsed();
-        this.isWatchpoint = etNode.isWatchpoint();
         setBorder(BORDER);
         setLayoutManager(new StackLayout());
 
@@ -100,7 +94,14 @@ public class MethodInvocationFigure extends Figure implements DrawableNode {
         }
 
         st += ")";
-
+        
+        if (etNode.isWatchpoint()) {
+            setBorder(ACTIVEWATCHPOINTBORDER);
+        } else {
+            if (etNode.isCollapsed()) {
+                setBorder(COLLAPSEDMODEBORDER);
+            }
+        }
         label.setText(st);
         miNode = etNode;
         String toolTip = "";
@@ -136,16 +137,6 @@ public class MethodInvocationFigure extends Figure implements DrawableNode {
     protected void paintFigure(Graphics g) {
         super.paintFigure(g);
 
-        if (isWatchpoint) {
-            g.setForegroundColor(blue);
-            g.setBackgroundColor(ColorConstants.titleGradient);
-            setBorder(ACTIVEWATCHPOINTBORDER);
-        } else {
-            if (isCollapsed) {
-                g.setForegroundColor(ColorConstants.darkGray);
-                setBorder(COLLAPSEDMODEBORDER);
-            } else {
-
                 if (selected) {
                     g.setForegroundColor(ColorConstants.menuBackgroundSelected);
                     g.setBackgroundColor(ColorConstants.titleGradient);
@@ -153,8 +144,6 @@ public class MethodInvocationFigure extends Figure implements DrawableNode {
                     g.setForegroundColor(ColorConstants.white);
                     g.setBackgroundColor(ColorConstants.white);
                 }
-            }
-        }
         g.fillGradient(getBounds().getResized(-1, -1), true);
     }
 

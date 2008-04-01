@@ -20,13 +20,15 @@ public class WatchPoint {
     private final String method;
     
     /** The line where the watchpoint was set. */
-    private final String statement_line;
+    private final int statement_line;
     
     /** The local variables. */
-    private final List<String[]> localVariables;
+    private final List<LocalVariableDescriptor> localVariables;
     
     /** The enabled. */
     private boolean enabled = true;
+
+    private List<String> parameterTypes;
   
     /**
      * Gets the in type.
@@ -49,15 +51,16 @@ public class WatchPoint {
      * @param localVariables the local variables
      * @param name the name
      */
-    public WatchPoint(String name, String expression, String method,
-            String statement_line, String declaringType, List<String[]> localVariables) {
+    public WatchPoint(WatchpointDescriptor wpd) {
         super();
-        this.name = name;
-        this.expression = expression;
-        this.method = method;
-        this.statement_line = statement_line;
-        this.declaringType = declaringType;
-        this.localVariables = localVariables;
+        this.name = wpd.getVarName();
+        this.expression = wpd.getExpression();
+        this.method = wpd.getDeclaringMethod();
+        this.statement_line = wpd.getLine();
+        this.declaringType = wpd.getDeclaringType();
+        this.localVariables = wpd.getLocalVariables();
+        this.parameterTypes = wpd.getParameterTypes();
+        
     }
     
     /**
@@ -74,7 +77,7 @@ public class WatchPoint {
      * 
      * @return the file
      */
-    public String getTypeOfSource() {
+    public String getDeclaringType() {
         return declaringType;
     }
 
@@ -93,7 +96,7 @@ public class WatchPoint {
      * 
      * @return the statement_line
      */
-    public String getStatement_line() {
+    public int getStatement_line() {
         return statement_line;
     }
 
@@ -130,7 +133,15 @@ public class WatchPoint {
      * 
      * @return the local variables
      */
-    public List<String[]> getLocalVariables() {
+    public List<LocalVariableDescriptor> getLocalVariables() {
         return localVariables;
+    }
+
+    public List<String> getParameterTypes() {
+        return parameterTypes;
+    }
+
+    public void setParameterTypes(List<String> parameterTypes) {
+        this.parameterTypes = parameterTypes;
     }
 }

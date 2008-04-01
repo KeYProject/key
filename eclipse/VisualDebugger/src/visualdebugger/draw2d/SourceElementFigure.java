@@ -1,7 +1,5 @@
 package visualdebugger.draw2d;
 
-import java.util.LinkedList;
-
 import org.eclipse.draw2d.*;
 import org.eclipse.draw2d.geometry.Insets;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -23,8 +21,6 @@ public class SourceElementFigure extends Figure implements DrawableNode {
 
     /** The selected. */
     private boolean selected;
-    private boolean isCollapsed;
-    private boolean isWatchpoint;
 
     /** some color definitions. */
     static final Color collapseGradient = new Color(null, 155, 122, 34);
@@ -69,7 +65,9 @@ public class SourceElementFigure extends Figure implements DrawableNode {
             ColorConstants.orange, 2);
 
     /** The Constant ROUNDEDBORDER. */
-    static final Border ROUNDEDBORDER = new RoundedBorder(ColorConstants.black, 1);
+    static final Border ROUNDEDBORDER = new RoundedBorder(ColorConstants.black,
+            1);
+
     /**
      * The Class RoundedBorder.
      */
@@ -102,9 +100,10 @@ public class SourceElementFigure extends Figure implements DrawableNode {
             tempRect.shrink(getWidth() / 2, getWidth() / 2);
             graphics.setLineWidth(getWidth());
             tempRect.crop(insets);
-            if (getColor() != null) graphics.setForegroundColor(getColor());
-            graphics.drawRoundRectangle(tempRect, 12 , 12 );
-            
+            if (getColor() != null)
+                graphics.setForegroundColor(getColor());
+            graphics.drawRoundRectangle(tempRect, 12, 12);
+
         }
     }
 
@@ -145,8 +144,6 @@ public class SourceElementFigure extends Figure implements DrawableNode {
      */
     public SourceElementFigure(ETStatementNode etNode) {
 
-        this.isCollapsed = etNode.isCollapsed();
-        this.isWatchpoint = etNode.isWatchpoint();
         setLayoutManager(new StackLayout());
         add(label);
         String labelText = "";
@@ -175,6 +172,13 @@ public class SourceElementFigure extends Figure implements DrawableNode {
                     etNode.getStatementId());
             st = expression.toString();
         }
+        if (etNode.isWatchpoint()) {
+            setBorder(ACTIVEWATCHPOINTBORDER);
+        } else {
+            if (etNode.isCollapsed()) {
+                setBorder(COLLAPSEDMODEBORDER);
+            }
+        }
 
         labelText = st;
         int i = st.indexOf("\n");
@@ -199,31 +203,18 @@ public class SourceElementFigure extends Figure implements DrawableNode {
      */
     protected void paintFigure(Graphics g) {
         super.paintFigure(g);
-        
-        if (isWatchpoint) {
-            g.setForegroundColor(blue);
+
+        if (selected) {
+            g.setForegroundColor(ColorConstants.menuBackgroundSelected);
             g.setBackgroundColor(ColorConstants.titleGradient);
-            setBorder(ACTIVEWATCHPOINTBORDER);
         } else {
-            if (isCollapsed) {
-                g.setForegroundColor(blue);
-                g.setBackgroundColor(ColorConstants.titleGradient);
-                setBorder(COLLAPSEDMODEBORDER);
+            if (statement != null || label.getText().equals("Start")) {
+                g.setForegroundColor(gradient1);
+                g.setBackgroundColor(gradient2);
             } else {
+                g.setForegroundColor(gradient12);
+                g.setBackgroundColor(gradient22);
 
-                if (selected) {
-                    g.setForegroundColor(ColorConstants.menuBackgroundSelected);
-                    g.setBackgroundColor(ColorConstants.titleGradient);
-                } else {
-                    if (statement != null || label.getText().equals("Start")) {
-                        g.setForegroundColor(gradient1);
-                        g.setBackgroundColor(gradient2);
-                    } else {
-                        g.setForegroundColor(gradient12);
-                        g.setBackgroundColor(gradient22);
-
-                    }
-                }
             }
         }
         g.fillGradient(getBounds().getResized(-1, -1), true);
