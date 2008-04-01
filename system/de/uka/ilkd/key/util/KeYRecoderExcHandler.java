@@ -24,7 +24,9 @@ public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl implements rec
     private int recoderErrorCount = 0;
     private int recoderErrorThreshold;
     
-    private List<String> unreferencedClasses = new ArrayList<String>();
+    private List<TypeReference> unresolvedClasses;
+    
+    private boolean ignoreUnresolvedClasses = false;
     
     public void reportException(Throwable e){
         super.reportException(e);
@@ -49,20 +51,6 @@ public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl implements rec
 	recoderErrorCount = 0;
     }
     
-    private boolean testUnreferencedClass(Throwable e) {
-        if (e instanceof UnresolvedReferenceException) {
-            UnresolvedReferenceException ur = (UnresolvedReferenceException) e;
-            ProgramElement ref = ur.getUnresolvedReference();
-            if (ref instanceof TypeReference) {
-                TypeReference tyref = (TypeReference) ref;
-                Debug.out("Unresolved type: " + ref.toSource());
-                // System.err.println("Unresolved type: " + ref.toSource());
-                return true;
-            }
-        }
-        return false;
-    }
-
     public boolean error(){
 	return ((super.error()) || (!recoderExceptions.isEmpty()));
     }
@@ -100,7 +88,7 @@ public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl implements rec
     }
     
     public void reportError(Exception e) {
-        if(!testUnreferencedClass(e)) {
+        if(!testUnresolvedClass(e)) {
             recoderErrorCount += 1;
             recoderExceptions.add(e);
             if (recoderErrorCount > recoderErrorThreshold) {
@@ -116,4 +104,42 @@ public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl implements rec
              recoderExitAction();
         }
     }
+
+    public boolean isIgnoreUnreferencedClasses() {
+        return ignoreUnresolvedClasses;
+    }
+
+    /**
+     * Check whether an exception is to be ignored.
+     * This is the case if:
+     * 1. the exception is an UnresolvedReferenceException
+     * 2. ignoreUnresolvedClasses is set to true
+     * 3. the unresolved reference is a type reference
+     */
+    private boolean testUnresolvedClass(Throwable e) {
+        if (ignoreUnresolvedClasses && e instanceof UnresolvedReferenceException) {
+            UnresolvedReferenceException ur = (UnresolvedReferenceException) e;
+            ProgramElement ref = ur.getUnresolvedReference();
+            if (ref instanceof TypeReference) {
+                TypeReference tyref = (TypeReference) ref;
+                unresolvedClasses.add(tyref);
+                Debug.out("Unresolved type: " + ref.toSource());
+                // System.err.println("Unresolved type: " + ref.toSource());
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public void setIgnoreUnresolvedClasses(boolean ignoreUnresolvedClasses) {
+        this.ignoreUnresolvedClasses = ignoreUnresolvedClasses;
+        if(ignoreUnresolvedClasses)
+            unresolvedClasses = new ArrayList<TypeReference>();
+    }
+
+    public List<TypeReference> getUnresolvedClasses() {
+        return unresolvedClasses;
+    }
+    
+    
 }

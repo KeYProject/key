@@ -79,7 +79,7 @@ public class KeYCrossReferenceServiceConfiguration
     }
 
     protected NameInfo makeNameInfo() {
-	return new KeYCrossReferenceNameInfo(this);
+	return super.makeNameInfo();
     }
 
     protected ConstantEvaluator makeConstantEvaluator() {

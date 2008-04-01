@@ -9,6 +9,7 @@ import java.io.Reader;
 import java.io.Writer;
 
 import de.uka.ilkd.key.java.ConvertException;
+import de.uka.ilkd.key.util.Debug;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
@@ -134,23 +135,44 @@ public class ClassFileDeclarationBuilder {
         this.dataLocation = dataLocation;
     }
     
+    /**
+     * make a stub class declaration for a fully qualified type reference.
+     * 
+     * If the type reference stands for an array, the trailing [] are
+     * discarded first.
+     * 
+     * @param programFactory
+     *                factory to use as parser
+     * @param fullClassName
+     *                the fully qualified type name
+     * @return a compilation unit that has not been added to a source repository
+     *         yet
+     * @throws ParserException
+     *                 thrown by the parser
+     */
     public static CompilationUnit makeEmptyClassFile(
             ProgramFactory programFactory, 
             String fullClassName) 
-                throws ParserException {
+                      throws ParserException {
+        
+        while(fullClassName.endsWith("[]"))
+            fullClassName = fullClassName.substring(0, fullClassName.length()-2);
+        
         String cuString = "";
         int lastdot = fullClassName.lastIndexOf('.');
         if(lastdot != -1) {
             // there is a package
-            cuString = "package " + fullClassName.substring(0, lastdot) + ";\n";
+            cuString = "package " + fullClassName.substring(0, lastdot) + "; ";
         }
-        cuString += "class " + fullClassName.substring(lastdot+1) + "{ }";
+        cuString += "class " + fullClassName.substring(lastdot+1) + " { }";
+
+        Debug.out("Parsing: " + cuString);
         
         return programFactory.parseCompilationUnit(cuString);
     }
     
     
-    public boolean isInnerClass(ClassFile cf) {
+    public static boolean isInnerClass(ClassFile cf) {
         return cf.getPhysicalName().contains("$");
     }
     

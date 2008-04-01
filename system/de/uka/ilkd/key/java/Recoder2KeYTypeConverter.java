@@ -250,8 +250,10 @@ public class Recoder2KeYTypeConverter {
 	            result = new KeYJavaType(s);
 	        } else if (t == recoder2key.getServiceConfiguration().
 	                        getNameInfo().getUnknownClassType()) {
-	            setUpSort(s);
-	            result = makeSimpleKeYType((ClassType)t,s);
+//	            setUpSort(s);
+//	            result = makeSimpleKeYType((ClassType)t,s);
+//	            //TEMP!
+//	            assert result.getJavaType() != null;
 	        }
 	        else {
 	            Debug.out("recoder2key: unknown type", t);
@@ -364,7 +366,9 @@ public class Recoder2KeYTypeConverter {
             
             TypeDeclaration td = new ClassDeclaration(modifiers, name, ext, fullname, impl,
                     members, parentIsInterface , true);
-            return new KeYJavaType(td, s);
+            KeYJavaType kjt = new KeYJavaType(s);
+            kjt.setJavaType(td);
+            return kjt;
 	}
 	
 	/**

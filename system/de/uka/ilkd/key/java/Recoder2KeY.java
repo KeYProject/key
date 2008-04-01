@@ -14,10 +14,12 @@ import java.io.*;
 import java.net.URL;
 import java.util.*;
 
-import recoder.ProgramFactory;
+import recoder.*;
 import recoder.abstraction.ClassType;
 import recoder.bytecode.*;
 import recoder.io.*;
+import recoder.java.NonTerminalProgramElement;
+import recoder.java.reference.TypeReference;
 import recoder.list.generic.*;
 import recoder.parser.ParseException;
 import recoder.service.*;
@@ -423,7 +425,7 @@ public class Recoder2KeY implements JavaReader {
      * The JAVALANG.TXT file lists all files to be loaded
      */
     private void parseInternalClasses(ProgramFactory pf, List<recoder.java.CompilationUnit> rcuList) 
-                    throws IOException, recoder.ParserException {
+                    throws IOException, ParseException, ParserException {
         URL jlURL = KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class, JAVA_SRC_DIR + "/" + "JAVALANG.TXT");
         
         if (jlURL == null) {
@@ -454,7 +456,9 @@ public class Recoder2KeY implements JavaReader {
                 rcu.makeAllParentRolesValid();
                 rcuList.add(rcu);
             } catch(ParseException ex) {
-                throw new RuntimeException("Error while parsing " + jlf.toString(), ex);
+                ParseException e2 = new ParseException("Error while parsing " + jlf.toString());
+                e2.initCause(ex);
+                throw e2;
             }
             if (Debug.ENABLE_DEBUG) {
                 Debug.out("parsed: " + jl);
@@ -476,21 +480,24 @@ public class Recoder2KeY implements JavaReader {
      *          internally
      *          
      * @author mu
+     * @throws ParserException 
+     * @throws IOException 
+     * @throws ParseException 
      * @throws Exception during parsing
      */
-    private List<recoder.java.CompilationUnit> parseLibs() {
+    private List<recoder.java.CompilationUnit> parseLibs() throws ParseException, IOException, ParserException {
         
         recoder.ProgramFactory pf = servConf.getProgramFactory();
         List<recoder.java.CompilationUnit> rcuList = new LinkedList<recoder.java.CompilationUnit>();
         List<FileCollection> sources = new ArrayList<FileCollection>();
-        
+
         boolean parseDefault = true;
-        
+
         if(classPath != null) {
             for(File cp : classPath) {
                 // marker for no_default classes
                 if(cp == null) { 
-                   parseDefault = false; 
+                    parseDefault = false; 
                 } else {
                     if(cp.isDirectory())
                         sources.add(new DirectoryFileCollection(cp));
@@ -499,64 +506,58 @@ public class Recoder2KeY implements JavaReader {
                 }
             }
         }
-        
-        DataLocation currentDataLocation = null;
-        try {
-            if(parseDefault) {
-                parseInternalClasses(pf, rcuList);
-            }
-        
-            // -- read java files --
-            for (FileCollection fc : sources) {
-                FileCollection.Walker walker = fc.createWalker(".java");
-                while(walker.step()) {
-                    try {
-                        currentDataLocation = walker.getCurrentDataLocation();
-                        InputStream is = walker.openCurrent();
-                        Reader f = new BufferedReader(new InputStreamReader(is));
-                        recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
-                        rcu.setDataLocation(currentDataLocation);
-                        rcu.makeAllParentRolesValid();
-                        rcuList.add(rcu);
-                    } catch(Exception ex) {
-                        System.err.println("Error while loading: " + walker.getCurrentDataLocation());
-                        ex.printStackTrace();
-                    }
-                }
-            }
 
-            // -- read class files --
-            ByteCodeParser parser = new ByteCodeParser();
-            for (FileCollection fc : sources) {
-                FileCollection.Walker walker = fc.createWalker(".class");
-                while(walker.step()) {
-                    try {
-                        currentDataLocation = walker.getCurrentDataLocation();
-                        InputStream is = walker.openCurrent();
-                        ClassFile cf = parser.parseClassFile(is);
-                        ClassFileDeclarationBuilder builder = new ClassFileDeclarationBuilder(pf, cf);
-                        builder.setDataLocation(currentDataLocation);
-                        recoder.java.CompilationUnit rcu = builder.makeCompilationUnit();
-                        rcu.makeAllParentRolesValid();
-                        rcuList.add(rcu);
-                    } catch(Exception ex) {
-                        System.err.println("Error while loading: " + walker.getCurrentDataLocation());
-                        ex.printStackTrace();
-                    }
+        DataLocation currentDataLocation = null;
+        if(parseDefault) {
+            parseInternalClasses(pf, rcuList);
+        }
+
+        // -- read java files --
+        for (FileCollection fc : sources) {
+            FileCollection.Walker walker = fc.createWalker(".java");
+            while(walker.step()) {
+                try {
+                    currentDataLocation = walker.getCurrentDataLocation();
+                    InputStream is = walker.openCurrent();
+                    Reader f = new BufferedReader(new InputStreamReader(is));
+                    recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
+                    rcu.setDataLocation(currentDataLocation);
+                    rcu.makeAllParentRolesValid();
+                    rcuList.add(rcu);
+                } catch(Exception ex) {
+                    System.err.println("Error while loading: " + walker.getCurrentDataLocation());
+                    ex.printStackTrace();
                 }
             }
-            
-            recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(
-                    new StringReader("public class " +
-                            JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS + " {}"));
-            rcuList.add(rcu);
-            
-            return rcuList;
-        } catch(Exception ex) {
-            reportError("Error while parsing lib", ex);
-            //  unreachable
-            return null;
         }
+
+        // -- read class files --
+        ByteCodeParser parser = new ByteCodeParser();
+        for (FileCollection fc : sources) {
+            FileCollection.Walker walker = fc.createWalker(".class");
+            while(walker.step()) {
+                try {
+                    currentDataLocation = walker.getCurrentDataLocation();
+                    InputStream is = walker.openCurrent();
+                    ClassFile cf = parser.parseClassFile(is);
+                    ClassFileDeclarationBuilder builder = new ClassFileDeclarationBuilder(pf, cf);
+                    builder.setDataLocation(currentDataLocation);
+                    recoder.java.CompilationUnit rcu = builder.makeCompilationUnit();
+                    rcu.makeAllParentRolesValid();
+                    rcuList.add(rcu);
+                } catch(Exception ex) {
+                    System.err.println("Error while loading: " + walker.getCurrentDataLocation());
+                    ex.printStackTrace();
+                }
+            }
+        }
+
+        recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(
+                new StringReader("public class " +
+                        JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS + " {}"));
+        rcuList.add(rcu);
+
+        return rcuList;
         
     }
 
@@ -565,8 +566,18 @@ public class Recoder2KeY implements JavaReader {
      * in.
      * 
      * If not parsed yet, the special classes are read in and converted.
+     * This method throws only runtime exceptions for historical reasons.
      */
     public void parseSpecialClasses() {
+        try {
+            parseLibraryClasses0();
+        } catch (Exception e) {
+            reportError("An error occured while parsing the libraries", e);
+        }
+    }
+    
+    
+    private void parseLibraryClasses0() throws ParseException, IOException, ParserException {
         if (mapping.parsedSpecial()) {
             return;
         }
@@ -588,18 +599,35 @@ public class Recoder2KeY implements JavaReader {
                 System.out.println(decl.getName());
             }
         }*/
+        
+        KeYRecoderExcHandler excHandler = 
+            (KeYRecoderExcHandler) servConf.getProjectSettings().getErrorHandler();
+        
+        excHandler.setIgnoreUnresolvedClasses(true);
 
         if (changeHistory.needsUpdate()) {
             changeHistory.updateModel();
         }
         
-        NameInfo ni = servConf.getNameInfo();
-        System.out.println("Known types:");
-        for(ClassType ct : ni.getClassTypes()) {
-            System.out.println(ct.getFullName());
+        List<TypeReference> tyrefs = excHandler.getUnresolvedClasses();
+        // this resets the list for unresolved refs
+        excHandler.setIgnoreUnresolvedClasses(true);
+        
+        for(TypeReference tyref : tyrefs) {
+            resolveUnresolvedTypeRef(tyref, specialClasses);
         }
+        
+        excHandler.setIgnoreUnresolvedClasses(false);
+        
+        changeHistory.updateModel();
 
         transformModel(specialClasses);
+        
+      NameInfo ni = servConf.getNameInfo();
+      System.out.println("Known types:");
+      for(ClassType ct : ni.getClassTypes()) {
+          System.out.println(ct.getFullName());
+      }
 
         // make them available to the rec2key mapping
         for (int i = 0, sz = specialClasses.size(); i < sz; i++) {
@@ -611,6 +639,27 @@ public class Recoder2KeY implements JavaReader {
         rec2key().parsedSpecial(true);
 
         setParsingLibs(false);
+    }
+
+    private void resolveUnresolvedTypeRef(TypeReference tyref, 
+            List<recoder.java.CompilationUnit> libClasses) throws ParserException {
+        NameInfo ni = servConf.getNameInfo();
+        String typeString = tyref.toSource();
+        recoder.abstraction.Type ty;
+        try {
+            ty = ni.getType(typeString);
+        } catch (UnresolvedReferenceException e) {
+            // this is still an unknown type, so set ty = null
+            ty = null;
+        }
+        if(ty == null) {
+            if(!typeString.contains("."))
+                throw new UnresolvedReferenceException("Type references to undefined classes may only appear if they are fully qualified", tyref);
+            recoder.java.CompilationUnit cu = ClassFileDeclarationBuilder.makeEmptyClassFile(servConf.getProgramFactory(), typeString);
+            ChangeHistory changeHistory = servConf.getChangeHistory();
+            changeHistory.attached(cu);
+            libClasses.add(cu);
+        }
     }
 
     /**
