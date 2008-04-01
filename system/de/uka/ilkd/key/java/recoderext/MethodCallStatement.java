@@ -310,7 +310,7 @@ public class MethodCallStatement extends JavaStatement implements
      * Deep clone.
      * @return the object
      */
-    public Object deepClone() {
+    public MethodCallStatement deepClone() {
 	return new MethodCallStatement(this);
     }
 

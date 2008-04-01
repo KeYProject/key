@@ -257,7 +257,7 @@ abstract class OpTerm extends Term {
         
         /** creates a unary term         
          * @param op the Operator on top
-         * @param sub the array of Term of length one with the one subterm (<em>must not</em> be null)
+         * @param subs the array of Term of length one with the one subterm (<em>must not</em> be null)
          */
         UnaryOpTerm(Operator op, Term[] subs) {
             super(op,op.sort(subs));

@@ -15,7 +15,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -32,7 +31,7 @@ public class LibrariesConfiguration extends JDialog {
     private JButton remove, add, ok, cancel;
     
     private LibrariesTableModel tableModel;
-    private HashMap libToSel;
+    private HashMap<String,Boolean> libToSel;
     private JTable table;
     
     /** creates a new Libraries selection dialog 
@@ -47,10 +46,9 @@ public class LibrariesConfiguration extends JDialog {
         String[] l = new String[size];
         boolean[] s = new boolean[size];
 
-        Iterator it = libToSel.keySet().iterator();
         int i=0;
-        while (it.hasNext()){
-            l[i]= (String)it.next();
+        for (final String lib : libToSel.keySet()) {
+            l[i] = lib;
             i++;
         }
   
@@ -76,7 +74,7 @@ public class LibrariesConfiguration extends JDialog {
     }
 
     private void pushSettings(String[] libraries,boolean[] selected) {
-        HashMap hm = new HashMap();
+        HashMap<String, Boolean> hm = new HashMap<String, Boolean>();
         for(int i=0;i<libraries.length;i++){
             hm.put(libraries[i],new Boolean(selected[i]));
         }
@@ -251,7 +249,7 @@ public class LibrariesConfiguration extends JDialog {
         }
 
      
-        public Class getColumnClass(int c) {
+        public Class<? extends Object> getColumnClass(int c) {
             return getValueAt(0, c).getClass();
         }
 

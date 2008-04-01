@@ -84,7 +84,7 @@ public class ConstructorCall extends ProgramMetaConstruct {
 	final ArrayOfExpression arguments = 
 	    constructorReference.getArguments();
 	
-	final ArrayList evaluatedArgs = new ArrayList();
+	final ArrayList<Statement> evaluatedArgs = new ArrayList<Statement>();
 	
 	int j=0;
 	if(services.getJavaInfo().getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, classType)!=null){

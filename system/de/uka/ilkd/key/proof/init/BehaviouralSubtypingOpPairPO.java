@@ -10,14 +10,11 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ListOfProgramVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.speclang.OperationContract;
 
@@ -62,7 +59,8 @@ public class BehaviouralSubtypingOpPairPO extends AbstractPO {
         ListOfProgramVariable paramVars = buildParamVars(programMethod);
         ProgramVariable resultVar       = buildResultVar(programMethod);
         ProgramVariable exceptionVar    = buildExcVar();
-        Map atPreFunctions              = new LinkedHashMap();
+        Map<Operator, Function/*atPre*/> atPreFunctions = 
+            new LinkedHashMap<Operator, Function>();
       
         //build precondition implication
         Term superPreTerm 

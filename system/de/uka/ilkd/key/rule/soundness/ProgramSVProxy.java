@@ -130,7 +130,6 @@ public class ProgramSVProxy
      *        Finds the source element that occurs first in the source. 
      *        @return the first source element in the syntactical representation of
      *        this element, may be equals to this element.
-     *        @see #toSource()
      *        @see #getStartPosition()
     */
     public SourceElement getFirstElement() {
@@ -142,7 +141,6 @@ public class ProgramSVProxy
  *        Finds the source element that occurs last in the source. 
  *        @return the last source element in the syntactical representation of
  *        this element, may be equals to this element.
- *        @see #toSource()
  *        @see #getEndPosition()
     */
     public SourceElement getLastElement() {

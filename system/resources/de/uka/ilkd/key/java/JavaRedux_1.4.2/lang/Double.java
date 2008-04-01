@@ -2,7 +2,6 @@
 
 package java.lang;
 
-import gnu.classpath.Configuration;
 public final class Double extends Number implements Comparable {
     public static final double MAX_VALUE = 1.7976931348623157e+308;
     public static final double MIN_VALUE = 5e-324;

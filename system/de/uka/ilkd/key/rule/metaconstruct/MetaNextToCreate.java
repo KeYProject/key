@@ -15,7 +15,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Location;
 import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.KeYSemanticException;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /** this class implements the interface for
@@ -31,7 +30,8 @@ public class MetaNextToCreate extends MetaField implements Location {
     }
 
     /** calculates the resulting term. 
-     * @throws KeYSemanticException */
+     * @throws RuntimeException if <code>term.sub(0)</code> is not a sub term of Object
+     */
     public Term calculate(Term term, SVInstantiations svInst, 
 			  Services services) {	
   

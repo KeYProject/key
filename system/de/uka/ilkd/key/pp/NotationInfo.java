@@ -120,7 +120,7 @@ public class NotationInfo {
 
 
     /** Create a new NotationInfo. Do not call this constructor
-     * directly. Use the factory method {@link createInstance}
+     * directly. Use the factory method {@link #createInstance()}
      * instead. */
     public NotationInfo() {
     	createDefaultNotationTable();

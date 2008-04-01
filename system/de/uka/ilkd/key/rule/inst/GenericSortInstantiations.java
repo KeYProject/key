@@ -482,8 +482,8 @@ public class GenericSortInstantiations {
 	    IteratorOfSort           it;
 	    Sort                     cur;
 	    MapFromGenericSortToSort res;
-	    HashSet                  todo   = new HashSet ();
-	    HashSet                  done   = new HashSet ();
+	    HashSet<Sort>                  todo   = new HashSet<Sort> ();
+	    HashSet<Sort>                  done   = new HashSet<Sort> ();
 	    Sort                     cand;
 
 	    // search for instantiated supersorts of gs (the method
@@ -497,7 +497,7 @@ public class GenericSortInstantiations {
 
 	    while ( !todo.isEmpty () ) {
 		it  = null;
-		cur = (Sort)todo.iterator ().next ();
+		cur = todo.iterator ().next ();
 		todo.remove ( cur );
 		done.add    ( cur );
 
@@ -584,9 +584,9 @@ public class GenericSortInstantiations {
         if ( p_sorts.size () == 1 ) return p_sorts;
             
         final IteratorOfSort p_itSorts = p_sorts.iterator();
-	HashSet        inside    = new HashSet ();
-	HashSet        outside   = new HashSet ();
-	HashSet        todo      = new HashSet ();
+	HashSet<Sort>        inside    = new HashSet<Sort> ();
+	HashSet<Sort>        outside   = new HashSet<Sort> ();
+	HashSet<Sort>        todo      = new HashSet<Sort> ();
 
 	// the null sort has to be handled separately, as it doesn't
 	// provide a list of direct supersorts
@@ -598,7 +598,7 @@ public class GenericSortInstantiations {
 	    final Sort condition = p_itSorts.next ();
 
 	    // At this point todo.isEmpty ()
-	    final HashSet t = todo;
+	    final HashSet<Sort> t = todo;
 	    todo            = inside;
 	    inside          = t;
 
@@ -631,16 +631,16 @@ public class GenericSortInstantiations {
     /**
      * Find all minimal elements of the given set <code>p_inside</code>
      */
-    private static ListOfSort findMinimalElements (Set p_inside) {
+    private static ListOfSort findMinimalElements (Set<Sort> p_inside) {
         if ( p_inside.size () == 1 )
             return SLListOfSort.EMPTY_LIST
-                        .prepend ( (Sort)p_inside.iterator ().next () );
+                        .prepend ( p_inside.iterator ().next () );
 
         ListOfSort res = SLListOfSort.EMPTY_LIST;
-        final Iterator it = p_inside.iterator ();
+        final Iterator<Sort> it = p_inside.iterator ();
         
         mainloop: while ( it.hasNext () ) {
-            final Sort sort = (Sort)it.next ();
+            final Sort sort = it.next ();
 
             ListOfSort res2 = SLListOfSort.EMPTY_LIST;
             final IteratorOfSort itSort = res.iterator ();
@@ -664,24 +664,24 @@ public class GenericSortInstantiations {
      * Remove all sorts that are not supersorts of the null sort, add the found
      * sorts to the set <code>p_emptySet</code>
      */
-    private static void treatNullSorts (HashSet p_inside, HashSet p_emptySet) {
-        final Iterator it = p_inside.iterator ();
+    private static void treatNullSorts (HashSet<Sort> p_inside, HashSet<Sort> p_emptySet) {
+        final Iterator<Sort> it = p_inside.iterator ();
 
         while ( it.hasNext () ) {
-            final Sort sort = (Sort)it.next ();
+            final Sort sort = it.next ();
             if ( Sort.NULL.extendsTrans ( sort ) ) p_emptySet.add ( sort );
         }
     }
 
 
-    private static Sort getOneOf (Set p_set) {
-        final Sort nextTodo = (Sort)p_set.iterator ().next ();
+    private static Sort getOneOf (Set<Sort> p_set) {
+        final Sort nextTodo = p_set.iterator ().next ();
         p_set.remove ( nextTodo );
         return nextTodo;
     }
 
 
-    private static void addSortsToSet (Set p_set, SetOfSort p_sorts) {
+    private static void addSortsToSet (Set<Sort> p_set, SetOfSort p_sorts) {
         final IteratorOfSort itSort = p_sorts.iterator ();
         while ( itSort.hasNext () )
             p_set.add ( itSort.next () );
@@ -695,7 +695,7 @@ public class GenericSortInstantiations {
      * deliver the sort NULL, add NULL to the set <code>inside</code>
      */
     private static boolean insertFirstSort (IteratorOfSort p_itSorts,
-                                            HashSet inside) {
+                                            HashSet<Sort> inside) {
         boolean checkNULL = false;
         Sort cand = p_itSorts.next ();
         while ( cand == Sort.NULL && p_itSorts.hasNext () ) {

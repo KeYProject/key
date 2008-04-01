@@ -93,7 +93,7 @@ public class RespectsModifiesPO extends EnsuresPO {
                               ListOfProgramVariable paramVars, 
                               ProgramVariable resultVar,
                               ProgramVariable exceptionVar,
-                              Map atPreFunctions) throws ProofInputException {
+                              Map<Operator, Function/*atPre*/> atPreFunctions) throws ProofInputException {
         buildUpdateAnonMethodTerm(selfVar, paramVars);
         Term preTerm = translatePre(contract, selfVar, toPV(paramVars));
         Term result = TB.and(preTerm, updateAnonMethodTerm);
@@ -105,7 +105,7 @@ public class RespectsModifiesPO extends EnsuresPO {
                                ListOfProgramVariable paramVars, 
                                ProgramVariable resultVar,
                                ProgramVariable exceptionVar,
-                               Map atPreFunctions) 
+                               Map<Operator, Function/*atPre*/> atPreFunctions) 
     		throws ProofInputException {
         buildUpdateAnonMethodTerm(selfVar, paramVars);
         APF.createAtPreFunctionsForTerm(updateAnonMethodTerm, 

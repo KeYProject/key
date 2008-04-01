@@ -50,7 +50,7 @@ public abstract class AbstractFeatureStrategy implements Strategy {
     /**
      * @param heuristics
      * @param thenFeature
-     * @return
+     * @return the conditional feature return true when the rule belongs to one of the given heuristics
      */
     protected Feature ifHeuristics (String[] heuristics, Feature thenFeature) {
         return ConditionalFeature.createConditional (
@@ -62,7 +62,6 @@ public abstract class AbstractFeatureStrategy implements Strategy {
      * @param heuristics
      * @param thenFeature
      * @param elseFeature
-     * @return
      */
     protected Feature ifHeuristics (String[] heuristics,
                                     Feature thenFeature,
@@ -172,7 +171,6 @@ public abstract class AbstractFeatureStrategy implements Strategy {
     /**
      * @param names
      * @param priority
-     * @return
      */
     protected Feature ifHeuristics (String[] names, int priority) {
         return ConditionalFeature.createConditional ( getFilterFor ( names ),
@@ -181,7 +179,6 @@ public abstract class AbstractFeatureStrategy implements Strategy {
 
     /**
      * @param priority
-     * @return
      */
     protected Feature selectSimplifier (long priority) {
         return ConditionalFeature.createConditional(

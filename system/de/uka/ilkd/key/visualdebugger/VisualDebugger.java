@@ -839,12 +839,10 @@ public class VisualDebugger {
      * @return the program counter
      */
     public SourceElementId getProgramCounter(Node n) {
-        IteratorOfPosInOccurrence it = n.getNodeInfo().getVisualDebuggerState()
-                .getLabels().keyIterator();
         JavaBlock jb = null;
         SourceElement se = null;
-        while (it.hasNext()) {
-            PosInOccurrence pio = it.next();
+        for (final PosInOccurrence pio : n.getNodeInfo().getVisualDebuggerState()
+                .getLabels().keySet()) {
             jb = modalityTopLevel(pio); // TODO !!!!!!!!!!!!!!!!!!!!!!
             if (jb != null) {
                 se = getActStatement(jb.program());

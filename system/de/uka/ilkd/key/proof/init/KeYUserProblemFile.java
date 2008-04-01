@@ -13,13 +13,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.abstraction.ListOfType;
-import de.uka.ilkd.key.java.abstraction.SLListOfType;
-import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.*;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.CountingBufferedInputStream;
+import de.uka.ilkd.key.proof.ProblemLoader;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -47,9 +47,8 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
      */
     public KeYUserProblemFile(String name, 
                               File file, 
-                              ProgressMonitor monitor, 
-                              boolean parseJMLSpecs) {
-        super(name, file, monitor, parseJMLSpecs);
+                              ProgressMonitor monitor) {
+        super(name, file, monitor);
     }
     
     

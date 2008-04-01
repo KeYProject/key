@@ -23,7 +23,7 @@ package <Pck>;
 *    final variable called EMPTY_SET 
 */
 
-public interface SetOf<T> extends java.io.Serializable {
+public interface SetOf<T> extends Iterable<<T>>, java.io.Serializable {
 
     /** adds an element */
     SetOf<T> add(<T> element);
@@ -52,7 +52,7 @@ public interface SetOf<T> extends java.io.Serializable {
 
     /** adds an element, barfs if the element is already present
     * @param element of type <T> that has to be added to this set
-    * @throws NotUniqueException if the element is already present
+    * @throws de.uka.ilkd.key.collection.NotUniqueException if the element is already present
     */
     SetOf<T> addUnique(<T> element) 
                     throws de.uka.ilkd.key.collection.NotUniqueException;

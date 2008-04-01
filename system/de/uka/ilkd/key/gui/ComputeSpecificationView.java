@@ -102,7 +102,7 @@ public class ComputeSpecificationView {
      * A facade for the user-interface, displaying the computed
      * specification of a program.
      * @param mediator the KeY-mediator containing the specification construction proof.
-     * @see de.uka.ilkd.key.casetool.together.FunctionalityOnModel#computeSpecification(ReprModelMethod)
+     * @see de.uka.ilkd.key.casetool.together.FunctionalityOnModel#computeSpecification(de.uka.ilkd.key.casetool.ModelMethod)
      */
     public static final void show(KeYMediator mediator) {
 	try{
@@ -122,8 +122,8 @@ public class ComputeSpecificationView {
 	    view.setCaretPosition(0); // at least until a better solution
 	    final JScrollPane pane =
 		new JScrollPane(view,
-				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED
 		    );
 	    
 	    pane.setPreferredSize(new Dimension(600, 400));

@@ -399,6 +399,15 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         };
         def.doAction(x);
     }
+    
+    public void performActionOnEnhancedFor(EnhancedFor x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new EnhancedFor(changeList);
+            }
+        };
+        def.doAction(x);
+    }
 
     // eee
     public void performActionOnLabeledStatement(LabeledStatement x) {
@@ -1077,7 +1086,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
         ProgramElement createNewElement(ExtList changeList) {
             return new ParameterDeclaration(changeList, x
-                    .parentIsInterfaceDeclaration());
+                    .parentIsInterfaceDeclaration(), x.isVarArg());
         }
     }
 

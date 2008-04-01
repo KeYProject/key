@@ -10,7 +10,8 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.IteratorOfOperator;
+import java.util.Iterator;
+
 import de.uka.ilkd.key.logic.op.Operator;
 
 
@@ -51,7 +52,7 @@ public class DepthTermOrdering implements TermOrdering {
      */
     protected int compareVars ( DepthCollector p_depthsA,
 				DepthCollector p_depthsB ) {
-	IteratorOfOperator it  = p_depthsA.getVariables ();
+	Iterator<Operator> it  = p_depthsA.getVariables ();
 	Operator           var;
 	int                depthB;
 

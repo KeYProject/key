@@ -17,11 +17,10 @@
 <resources> 
 <j2se version="1.6+" initial-heap-size="128m" max-heap-size="1024m"/> 
 <j2se version="1.5+" initial-heap-size="128m" max-heap-size="1024m"/> 
-<j2se version="1.4+" initial-heap-size="128m" max-heap-size="1024m"/> 
 
 <jar href="key.jar"/> 
 <jar href="lib/antlr.jar" /> 
-<jar href="lib/recoder.jar" /> 
+<jar href="lib/recoderKey.jar" /> 
 <jar href="lib/javacc.jar" /> 
 <jar href="lib/dresden-ocl-demo.jar" /> 
 <jar href="lib/jargs.jar" /> 

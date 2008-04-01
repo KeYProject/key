@@ -113,9 +113,9 @@ public class KeYJavaType implements Type {
 
     /** 
      * returns the default value of the given type 
-     * according to JLS ???4.5.5 
+     * according to JLS Sect. 4.5.5 
      * @return the default value of the given type 
-     * according to JLS ???4.5.5
+     * according to JLS Sect. 4.5.5
      */
     public Literal getDefaultValue() {
 	return javaType.getDefaultValue();
@@ -148,11 +148,10 @@ public class KeYJavaType implements Type {
 	return ref;
     }
 
-    public static final class LexicographicalKeYJavaTypeOrder implements Comparator {
-        public int compare(Object arg0, Object arg1) {
-            assert arg0 instanceof KeYJavaType && arg1 instanceof KeYJavaType;
-            return ((KeYJavaType)arg0).getFullName().
-                compareTo(((KeYJavaType)arg1).getFullName());
+    public static final class LexicographicalKeYJavaTypeOrder<T extends KeYJavaType> 
+    implements Comparator<T> {
+        public int compare(T arg0, T arg1) {
+            return arg0.getFullName().compareTo(arg1.getFullName());
         }
     }
 }

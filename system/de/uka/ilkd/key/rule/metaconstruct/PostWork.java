@@ -26,7 +26,7 @@ public class PostWork extends ProgramMetaConstruct {
     
     
      /** creates a typeof ProgramMetaConstruct 
-     * @param expr the instance of expression contained by 
+     * @param newObjectSV the instance of expression contained by 
      * the meta construct 
      */
     public PostWork(SchemaVariable newObjectSV) {

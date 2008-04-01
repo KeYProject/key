@@ -18,6 +18,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
 import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Operator;
 
 
 /**
@@ -35,34 +37,30 @@ public interface LoopInvariant {
      * Returns the invariant formula.
      */
     public Term getInvariant(Term selfTerm, 
-                             /*inout*/ Map /*Operator (normal) 
-                             -> Function (atPre)*/ atPreFunctions,
-                             Services services);
+            /*inout*/ Map<Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services);
     
     /**
      * Returns the set of loop predicates.
      */
     public SetOfTerm getPredicates(Term selfTerm, 
-                                   /*inout*/ Map /*Operator (normal) 
-                                   -> Function (atPre)*/ atPreFunctions,
-                                   Services services);
+            /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services);
     
     /**
      * Returns the modifier set.
      */
     public SetOfLocationDescriptor getModifies(
-                                    Term selfTerm, 
-                                    /*inout*/ Map /*Operator (normal) 
-                                    -> Function (atPre)*/ atPreFunctions,
-                                    Services services);
+            Term selfTerm, 
+            /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services);
     
     /**
      * Returns the variant term. 
      */
     public Term getVariant(Term selfTerm, 
-                           /*inout*/ Map /*Operator (normal) 
-                           -> Function (atPre)*/ atPreFunctions,
-                           Services services);
+            /*inout*/Map<Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services);
     
     /**
      * Tells whether using heuristics for generating additional loop predicates 
@@ -79,8 +77,7 @@ public interface LoopInvariant {
     /**
      * Returns a copy of the internal map of atPre-functions.
      */
-    public Map /*Operator (normal) -> Function (atPre)*/ 
-                                                getInternalAtPreFunctions();
+    public Map<Operator, Function> getInternalAtPreFunctions();
     
     /**
      * Returns a new loop invariant where the loop reference has been
@@ -94,20 +91,18 @@ public interface LoopInvariant {
      * the receiver, parameters, and local variables must stay the same!
      */
     public LoopInvariant setInvariant(Term invariant, 
-                                      Term selfTerm,
-                                      /*inout*/ Map /*Operator (normal) 
-                                      -> Function (atPre)*/ atPreFunctions,
-                                      Services services); 
+            Term selfTerm,
+            /*inout*/ Map<Operator, Function/*atPre*/> atPreFunctions,
+            Services services); 
     
     /**
      * Returns a new loop invariant where the loop predicates have been 
      * replaced with the passed ones.
      */
     public LoopInvariant setPredicates(SetOfTerm predicates, 
-                                       Term selfTerm,
-                                       /*inout*/ Map /*Operator (normal) 
-                                       -> Function (atPre)*/ atPreFunctions,
-                                       Services services);
+            Term selfTerm,
+            /*inout*/ Map<Operator, Function/*atPre*/> atPreFunctions,
+            Services services);
     
     /**
      * Returns a new loop invariant where the flag for predicate generation

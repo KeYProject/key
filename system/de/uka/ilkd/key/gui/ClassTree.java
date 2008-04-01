@@ -160,8 +160,12 @@ class ClassTree extends JTree {
                         && pm.getMethodDeclaration().getBody() != null) {
                     StringBuffer sb = new StringBuffer(pm.getName());
                     sb.append("(");
-                    for(int i = 0; i < pm.getParameterDeclarationCount(); i++) {
-                        sb.append(pm.getParameterDeclarationAt(i));
+                    for(int i = 0, n = pm.getParameterDeclarationCount(); 
+                        i < n; i++) {
+                        sb.append(pm.getParameterDeclarationAt(i) + ", ");
+                    }
+                    if(pm.getParameterDeclarationCount() > 0) {
+                        sb.setLength(sb.length() - 2);
                     }
                     sb.append(")");
                     Entry te = new Entry(sb.toString());
@@ -177,10 +181,10 @@ class ClassTree extends JTree {
     private static DefaultMutableTreeNode createTree(boolean addOperations,
 	    					     Services services) {
 	//get all classes
-	Set kjts = services.getJavaInfo().getAllKeYJavaTypes();
-	Iterator it = kjts.iterator();
+	final Set<KeYJavaType> kjts = services.getJavaInfo().getAllKeYJavaTypes();
+	final Iterator<KeYJavaType> it = kjts.iterator();
 	while(it.hasNext()) {
-	    KeYJavaType kjt = (KeYJavaType) it.next();
+	    KeYJavaType kjt = it.next();
 	    if(!(kjt.getJavaType() instanceof ClassDeclaration 
 		 || kjt.getJavaType() instanceof InterfaceDeclaration)) {
 		it.remove();
@@ -188,12 +192,10 @@ class ClassTree extends JTree {
 	}
 	
         //sort classes alphabetically
-        Object[] kjtsarr = kjts.toArray();
-        Arrays.sort(kjtsarr, new Comparator() {
-            public int compare(Object o1, Object o2) {
-                KeYJavaType kjt1 = (KeYJavaType)o1;
-                KeYJavaType kjt2 = (KeYJavaType)o2;
-                return kjt1.getFullName().compareTo(kjt2.getFullName());
+        final KeYJavaType[] kjtsarr = kjts.toArray(new KeYJavaType[kjts.size()]);
+        Arrays.sort(kjtsarr, new Comparator<KeYJavaType>() {
+            public int compare(KeYJavaType o1, KeYJavaType o2) {
+                return o1.getFullName().compareTo(o2.getFullName());
             }
         });
         
@@ -201,8 +203,7 @@ class ClassTree extends JTree {
         DefaultMutableTreeNode rootNode 
         	= new DefaultMutableTreeNode(new Entry(""));
         for(int i = 0; i < kjtsarr.length; i++) {
-            KeYJavaType kjt = (KeYJavaType)(kjtsarr[i]);
-            insertIntoTree(rootNode, kjt, addOperations, services);
+            insertIntoTree(rootNode, kjtsarr[i], addOperations, services);
         }
         
         return rootNode;
@@ -211,7 +212,7 @@ class ClassTree extends JTree {
     
     private void open(KeYJavaType kjt) {
         //get tree path
-        Vector pathVector = new Vector();
+        Vector<DefaultMutableTreeNode> pathVector = new Vector<DefaultMutableTreeNode>();
         
         String fullClassName = kjt.getFullName();
         int length = fullClassName.length();

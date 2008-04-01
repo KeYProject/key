@@ -930,7 +930,7 @@ public abstract class Notation {
          * @param sp
          * @param subTerm
          *                TODO
-         * @return
+         * @return the quantified variable
          */
     protected QuantifiableVariable instQV(Term t, LogicPrinter sp, int subTerm) {
 	QuantifiableVariable v = t.varsBoundHere(subTerm)

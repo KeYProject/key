@@ -24,16 +24,13 @@ import de.uka.ilkd.key.gui.ContractConfigurator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.*;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 import de.uka.ilkd.key.speclang.SetOfOperationContract;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
+
 
 
 public class FunctionalityOnModel {
@@ -277,9 +274,8 @@ public class FunctionalityOnModel {
     /**
      * Asks the user to choose a supertype and then starts the prover with a 
      * corresponding "BehaviouralSubtypingInv" proof obligation.
-     * @param subtype the UMLModelClass with subtype for which behavioural 
+     * @param subType the UMLModelClass with subtype for which behavioural 
      * subtyping with respect to the invariant has to be shown
-     * @return error message to the user
      */
     public static void proveBehaviouralSubtypingInv(TogetherModelClass subType) 
     		throws ProofInputException {
@@ -310,9 +306,8 @@ public class FunctionalityOnModel {
     
     /**
      * Starts the prover with a "BehaviouralSubtypingOp" proof obligation.
-     * @param subtype the {@link UMLModelClass} with the subtype for whose method
+     * @param subType the {@link TogetherModelClass} with the subtype for whose method
      * behavioural subtyping has to be proven
-
      */
     public static void proveBehaviouralSubtypingOp(TogetherModelClass subType) 
     		throws ProofInputException {
@@ -332,7 +327,8 @@ public class FunctionalityOnModel {
         //get all pairs of overriding and overridden operation contracts
         //(only works correctly if there cannot be more than one contract per 
 	// operation, as it is currently the case in Together)
-        Map contractPairs = new HashMap();
+        Map<OperationContract, OperationContract> contractPairs = 
+            new HashMap<OperationContract, OperationContract>();
         IteratorOfProgramMethod subIt 
         	= javaInfo.getAllProgramMethods(subKJT).iterator();
         while(subIt.hasNext()) {
@@ -744,9 +740,9 @@ public class FunctionalityOnModel {
         
         //let the user select the guard classes
 	SetOfKeYJavaType allKJTs = SetAsListOfKeYJavaType.EMPTY_SET;
-	Iterator it = javaInfo.getAllKeYJavaTypes().iterator();
+	final Iterator<KeYJavaType> it = javaInfo.getAllKeYJavaTypes().iterator();
 	while(it.hasNext()) {
-	    allKJTs = allKJTs.add((KeYJavaType)it.next());
+	    allKJTs = allKJTs.add(it.next());
 	}
         ClassSelectionDialog dlg2
                 = new ClassSelectionDialog("Please select the guard",

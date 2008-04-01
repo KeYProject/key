@@ -13,8 +13,6 @@ package de.uka.ilkd.key.java.declaration;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.declaration.modifier.Ghost;
-import de.uka.ilkd.key.java.declaration.modifier.Model;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.ExtList;

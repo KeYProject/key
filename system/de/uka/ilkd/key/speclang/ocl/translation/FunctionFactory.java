@@ -293,7 +293,7 @@ class FunctionFactory {
      * c->collect(e | b)
      * 
      * @param collectVar Translation of e
-     * @param selectTerm Translation of b 
+     * @param collectTerm Translation of b 
      * @throws SLTranslationException 
      */
     public Function createCollectFunction(LogicVariable collectVar,
@@ -413,7 +413,8 @@ class FunctionFactory {
 	}
 
 	private Term replaceVar(LogicVariable lv1, LogicVariable lv2, Term term) {
-        Map map = new LinkedHashMap();
+        Map<LogicVariable, LogicVariable> map = 
+            new LinkedHashMap<LogicVariable, LogicVariable>();
         map.put(lv1, lv2);
         OpReplacer or = new OpReplacer(map);
         return or.replace(term);
@@ -493,7 +494,7 @@ class FunctionFactory {
     /**
      * Returns the function-symbol representing emptyCollection of the given type and sort
      * 
-     * @param elementsort of the collection
+     * @param sort of the collection
      * @return function-symbol representing emptyCollection
      */
     public Function getEmptyCollection(Sort sort, int collectionType) {
@@ -905,7 +906,6 @@ class FunctionFactory {
     
     /**
      * returns the namespace which holds all the created functions
-     * @return
      */
     public Namespace getFunctions() {
         return this.functionNS;
@@ -914,7 +914,6 @@ class FunctionFactory {
 
     /**
      * returns the list of created variables which are used in the axioms
-     * @return
      */
     public SetOfLogicVariable getCreatedVars() {
         return this.createdVars;

@@ -22,7 +22,7 @@ public class QuanEliminationAnalyser {
     
     /**
      * 
-     * @param definitionPIO
+     * @param definition
      * @return the distance to the quantifier that can be eliminated;
      *         <code>Integer.MAX_VALUE</code> if the subformula is not an
      *         eliminable definition

@@ -897,9 +897,9 @@ public class LogicPrinter {
             formulaConstraint = null;
 
             EqualityConstraint eqc = (EqualityConstraint)p;
-            List vars = new ArrayList ();
+            List<Metavariable> vars = new ArrayList<Metavariable> ();
             {
-                IteratorOfMetavariable it =
+                Iterator<Metavariable>it =
                     eqc.restrictedMetavariables ();
 
                 while ( it.hasNext () )
@@ -909,11 +909,11 @@ public class LogicPrinter {
             startTerm ( vars.size () );
             layouter.print("[ ").beginI(0);
 
-            ListIterator it = vars.listIterator ();
+            ListIterator<Metavariable> it = vars.listIterator ();
             Metavariable mv;
             Term         inst;
             while ( it.hasNext () ) {
-                mv   = (Metavariable)it.next ();
+                mv   = it.next ();
                 inst = eqc.getDirectInstantiation ( mv );
                 if ( inst == null )
                     inst = TermFactory.DEFAULT.createFunctionTerm ( mv );
@@ -1375,8 +1375,22 @@ public class LogicPrinter {
         return result>0 ? result : -1;
 
     }
-
-    String[] setupUpdateSeparators (final Operator loc, final Term t)
+    
+    /**
+     * setup the separators to be printed between the sub-terms of an update
+     * location.
+     * 
+     * The top entity of the update loc is printed by this method.
+     * 
+     * @param loc
+     *            location to write to
+     * @param t
+     *            term to assign
+     * @return an array of separating strings (elements may be "[" "]" "," ")" )
+     * @throws IOException
+     *             if thrown by layouter
+     */
+    private String[] setupUpdateSeparators (final Operator loc, final Term t)
                                                 throws IOException {
         String[] separator = new String [loc.arity ()];
         if ( loc instanceof AttributeOp ) {
@@ -1389,6 +1403,7 @@ public class LogicPrinter {
             layouter.print( loc.name ().toString ().replaceAll ( "::", "." ) );
         } else {
             layouter.print ( loc.name().toString() + "(" );
+            // bugfix: was "m = 1;..." which made separator[0]==null
             for ( int m = 0; m < loc.arity () - 1; m++ ) {
                 separator[m] = ",";
             }
@@ -1479,8 +1494,7 @@ public class LogicPrinter {
      * variable name with colon and sort.
      *
      * @param name the name of the quantifier
-     * @param var  the quantified variable (+colon and sort)
-     * @param sep  the separator (usually a dot)
+     * @param vars  the quantified variables (+colon and sort)
      * @param phi  the quantified formula
      * @param ass  associativity for phi
      */
@@ -2251,7 +2265,7 @@ public class LogicPrinter {
 
         /** The stack of StackEntry representing the nodes above
          * the current subterm */
-        private Stack stack = new Stack();
+        private Stack<StackEntry> stack = new Stack<StackEntry>();
 
         /** If this is set, a ModalityPositionTable will
          * be built next.
@@ -2311,7 +2325,7 @@ public class LogicPrinter {
                 stack.push(new StackEntry(posTbl, pos));
                 pos=count();
             } else if ( o==MARK_END_SUB ) {
-                StackEntry se=(StackEntry)stack.peek();
+                StackEntry se=stack.peek();
                 stack.pop();
                 pos=se.pos();
                 se.posTbl().setEnd(count()-pos, posTbl);

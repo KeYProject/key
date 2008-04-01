@@ -102,7 +102,7 @@ public class TermTacletAppIndexCacheSet {
      * scope of binders. this is a mapping from
      * <code>ListOfQuantifiedVariable</code> to <code>TopLevelCache</code>
      */
-    private final LRUCache topLevelCaches = new LRUCache ( MAX_CACHE_ENTRIES );
+    private final LRUCache<ListOfQuantifiableVariable, ITermTacletAppIndexCache> topLevelCaches = new LRUCache<ListOfQuantifiableVariable, ITermTacletAppIndexCache> ( MAX_CACHE_ENTRIES );
     
     /**
      * cache for locations that are below updates, but not below programs or in
@@ -123,7 +123,7 @@ public class TermTacletAppIndexCacheSet {
      * binders. this is a mapping from <code>ListOfQuantifiedVariable</code>
      * to <code>BelowProgCache</code>
      */
-    private final LRUCache belowProgCaches = new LRUCache ( MAX_CACHE_ENTRIES );
+    private final LRUCache<ListOfQuantifiableVariable, ITermTacletAppIndexCache> belowProgCaches = new LRUCache<ListOfQuantifiableVariable, ITermTacletAppIndexCache> ( MAX_CACHE_ENTRIES );
 
     ////////////////////////////////////////////////////////////////////////////
     
@@ -168,7 +168,7 @@ public class TermTacletAppIndexCacheSet {
             getTopLevelCache(ListOfQuantifiableVariable prefix) {
         if ( prefix.isEmpty () ) return topLevelCacheEmptyPrefix;
         ITermTacletAppIndexCache res =
-            (ITermTacletAppIndexCache)topLevelCaches.get ( prefix );
+            topLevelCaches.get ( prefix );
         if ( res == null ) {
             res = new TopLevelCache ( prefix );
             topLevelCaches.put ( prefix, res );
@@ -184,7 +184,7 @@ public class TermTacletAppIndexCacheSet {
             getBelowProgCache(ListOfQuantifiableVariable prefix) {
         if ( prefix.isEmpty () ) return belowProgCacheEmptyPrefix;
         ITermTacletAppIndexCache res =
-            (ITermTacletAppIndexCache)belowProgCaches.get ( prefix );
+            belowProgCaches.get ( prefix );
         if ( res == null ) {
             res = new BelowProgCache ( prefix );
             belowProgCaches.put ( prefix, res );

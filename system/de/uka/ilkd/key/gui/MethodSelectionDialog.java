@@ -94,8 +94,8 @@ public class MethodSelectionDialog extends JDialog {
 	    testBuilder.getProgramMethods(mediator.getProof());
 	methodList.setListData(pms.toArray());
 	JScrollPane methodListScroll = new
-	    JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
-			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	    JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
+			ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	methodListScroll.getViewport().setView(methodList);
 	methodListScroll.setBorder(
 	    new TitledBorder("Methods occuring in Proof"));

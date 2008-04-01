@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Iterator;
 
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
@@ -94,7 +95,7 @@ public class ProofSaverLatex extends ProofSaver {
 
 
 
-   private StringBuffer collectProof(IteratorOfNode it, int siblings,
+   private StringBuffer collectProof(Iterator<Node> it, int siblings,
                                      String prefix, StringBuffer tree) {       
 
       Node node;

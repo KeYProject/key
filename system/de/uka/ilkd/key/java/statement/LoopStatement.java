@@ -114,7 +114,7 @@ public abstract class LoopStatement extends JavaStatement
 
     public LoopStatement(Expression guard, Statement body, 
                          PositionInfo pos) {
-	super(add(new ExtList(),pos));
+	super(pos);
         this.body    = body;
 	this.updates = null;
 	this.inits   = null;
@@ -353,6 +353,7 @@ public abstract class LoopStatement extends JavaStatement
 	}
 	return null;
     }
+      
 
     /**
      *      Get updates.
@@ -371,6 +372,14 @@ public abstract class LoopStatement extends JavaStatement
      */
     public IForUpdates getIForUpdates() {
         return updates;
+    }
+    
+    /**
+     * get the loop initializer as ILoopInit
+     * @return the loop initializer
+     */
+    public ILoopInit getILoopInit() {
+       return inits;
     }
 
 

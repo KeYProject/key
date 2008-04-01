@@ -191,7 +191,7 @@ public class Try extends BranchStatement
         return (branches != null) ? branches.size() : 0;
     }
 
-    /*
+    /**
       Return the branch at the specified index in this node's
       "virtual" branch array.
       @param index an index for a branch.
@@ -207,21 +207,11 @@ public class Try extends BranchStatement
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    /* Return the branch array wrapper
+    /** Return the branch array wrapper
      * @return the array wrapper of the branches
      */
     public ArrayOfBranch getBranchList() {
 	return branches;
-    }
-
-    public Branch containsAsBranch(Class cl) {
-	ArrayOfBranch br = getBranchList();
-	for (int i=0, brSize = br.size(); i<brSize; i++) {
-	    if (cl.isInstance(br.getBranch(i))) {
-		return branches.getBranch(i);
-	    }
-	}
-	return null;
     }
 
     /** calls the corresponding method of a visitor in order to
@@ -231,7 +221,6 @@ public class Try extends BranchStatement
     public void visit(Visitor v) {
 	v.performActionOnTry(this);
     }
-
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printTry(this);

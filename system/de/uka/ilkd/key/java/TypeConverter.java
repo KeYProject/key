@@ -42,9 +42,6 @@ public class TypeConverter extends TermBuilder {
     private IntegerDomainLDT integerDomainLDT;
     private ListOfLDT models = SLListOfLDT.EMPTY_LIST;
 
-
-    /** required for this handling */
-    private final ThisReference thisReference = new ThisReference();
     
     public static StringConverter stringConverter =new StringConverter();
     
@@ -431,7 +428,8 @@ public class TypeConverter extends TermBuilder {
     public KeYJavaType getPromotedType(KeYJavaType type1, 
             KeYJavaType type2) {
         final Type t1 = type1.getJavaType();
-        final Type t2 = type1.getJavaType();
+        final Type t2 = type2.getJavaType();
+
         if ((t1 == PrimitiveType.JAVA_BOOLEAN &&
                 t2 == PrimitiveType.JAVA_BOOLEAN))
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);

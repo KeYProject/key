@@ -25,8 +25,6 @@ class SkolemTermSV extends SortedSchemaVariable {
      * @param sort the Sort of the SchemaVariable and the matched type     
      * @param listSV a boolean which is true iff the schemavariable is
      * allowed to match a list of program constructs
-     * @param strictSV boolean indicating if the schemavariable is declared as strict
-     * forcing exact type match
      */    
     SkolemTermSV(Name name, Sort sort, boolean listSV) {
 	super(name, Term.class, sort, listSV);	

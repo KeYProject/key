@@ -27,7 +27,8 @@ public abstract class AbstractMonomialSmallerThanFeature
                                          extends SmallerThanFeature {
     
     private static final Name newSymRuleSetName = new Name ( "polySimp_newSmallSym" );
-    private static final LRUCache introductionTimeCache = new LRUCache ( 10000 );
+    private static final LRUCache<Operator, Integer> introductionTimeCache = 
+        new LRUCache<Operator, Integer> ( 10000 );
     private final Function add, mul, Z;
 
     private Goal currentGoal = null;

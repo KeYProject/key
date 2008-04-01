@@ -349,8 +349,6 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         /**
          * Find all possible instantiations of the if sequent formulas
          * within the sequent "p_seq".
-         * @return a list of tacletapps with the found if formula
-         * instantiations
          */
         public void findIfFormulaInstantiations () {
             final Sequent p_seq = goal.sequent();
@@ -475,8 +473,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                 if ( ifInstCache.cacheKey != goal.node () ) return null;
 
                 // the cache contains formula lists for the right semisequent
-                return (ListOfIfFormulaInstantiation)
-                            getCacheMap ( p_antec ).get ( getAgeObject () );
+                return getCacheMap ( p_antec ).get ( getAgeObject () );
             }
         }
 
@@ -494,7 +491,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         }
 
 
-        private HashMap getCacheMap (boolean p_antec) {
+        private HashMap<Long, ListOfIfFormulaInstantiation> getCacheMap (boolean p_antec) {
             return p_antec ? ifInstCache.antecCache : ifInstCache.succCache;
         }
 
@@ -521,11 +518,6 @@ public abstract class TacletAppContainer extends RuleAppContainer {
          * @param p_alreadyMatchedNewFor
          *            at least one new formula has already been matched, i.e. a
          *            formula that has been modified recently
-         * @param p_toMatch
-         *            list of the formulas to match the current if semisequent
-         *            formulas with
-         * @param p_toMatch2nd
-         *            list of the formulas of the antecedent
          */
         private void findIfFormulaInstantiationsHelp
             ( ListOfConstrainedFormula      p_ifSeqTail,
@@ -600,10 +592,9 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         private ListOfConstrainedFormula createSemisequentList ( Semisequent p_ss ) {
             ListOfConstrainedFormula res = SLListOfConstrainedFormula.EMPTY_LIST;
 
-            IteratorOfConstrainedFormula it  = p_ss.iterator ();
-            while ( it.hasNext () )
-                res = res.prepend ( it.next () );
-
+            for (final ConstrainedFormula cf : p_ss) {
+                res = res.prepend ( cf );
+            }
             return res; 
         }
 
@@ -630,8 +621,10 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     protected static final class IfInstCache {
         public Node cacheKey = null;
 
-        public final HashMap antecCache = new HashMap ();
-        public final HashMap succCache  = new HashMap ();               
+        public final HashMap<Long, ListOfIfFormulaInstantiation> 
+            antecCache = new HashMap<Long, ListOfIfFormulaInstantiation> ();
+        public final HashMap<Long, ListOfIfFormulaInstantiation>  succCache  = 
+            new HashMap<Long, ListOfIfFormulaInstantiation>  ();               
     }
 
     protected static final IfInstCache ifInstCache = new IfInstCache ();

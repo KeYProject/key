@@ -85,6 +85,10 @@ public class HeuristicInstantiation implements TermGenerator {
             findNextInst ();
             return res;
         }
+        
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
     }
 
 }

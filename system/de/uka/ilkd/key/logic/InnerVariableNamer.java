@@ -49,7 +49,8 @@ public class InnerVariableNamer extends VariableNamer {
 
     public ProgramVariable rename(ProgramVariable var,
                                   Goal goal,
-                                  PosInOccurrence posOfFind) {
+                                  PosInOccurrence posOfFind,
+                                  Name proposal) {
 	ProgramElementName name = var.getProgramElementName();
 	BasenameAndIndex bai = getBasenameAndIndex(name);
 	Globals globals = wrapGlobals(goal.getGlobalProgVars());
@@ -57,16 +58,25 @@ public class InnerVariableNamer extends VariableNamer {
 
 	//prepare renaming of inner var
 	final NameCreationInfo nci = getMethodStack(posOfFind);
-	ProgramElementName newname = createName(bai.basename, bai.index, nci);
-        int newcounter = getMaxCounterInGlobalsAndProgram(
-                        bai.basename,
-                        globals,
-                        getProgramFromPIO(posOfFind),
-                        null);
-        while (!isUniqueInGlobals(newname.toString(), globals) ||
-                goal.proof().getServices().getNamespaces().lookupLogicSymbol(newname)!=null) {
-	    newcounter += 1; 
-	    newname = createName(bai.basename, newcounter, nci);
+	ProgramElementName newname = null;
+	if (proposal != null) {
+	    newname = new ProgramElementName(proposal.toString(), nci);
+	}
+	if (newname == null || !isUniqueInGlobals(newname.toString(), globals)
+	        || goal.proof().getServices().getNamespaces()
+	        .lookupLogicSymbol(newname)!=null) {
+	    newname = createName(bai.basename, bai.index, nci);
+            int newcounter = getMaxCounterInGlobalsAndProgram(
+                            bai.basename,
+                            globals,
+                            getProgramFromPIO(posOfFind),
+                            null);
+            final NamespaceSet namespaces = goal.proof().getServices().getNamespaces();
+            while (!isUniqueInGlobals(newname.toString(), globals) ||
+                    namespaces.lookupLogicSymbol(newname)!=null) {
+	        newcounter += 1; 
+	        newname = createName(bai.basename, newcounter, nci);
+	    }
 	}
         
         ProgramVariable newvar = var;

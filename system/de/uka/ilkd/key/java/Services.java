@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.java;
 
 import java.util.HashMap;
-import java.util.Iterator;
 
 import de.uka.ilkd.key.casetool.UMLInfo;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
@@ -78,12 +77,13 @@ public class Services{
     /**
      * map of names to counters
      */
-    private HashMap counters = new HashMap();
+    private HashMap<String, Counter> counters = new HashMap<String, Counter>();
 
     /**
      * specification repository
      */
-    private SpecificationRepository specRepos = new SpecificationRepository();
+    private SpecificationRepository specRepos 
+    	= new SpecificationRepository(this);
 
     /**
      * creates a new Services object with a new TypeConverter and a new
@@ -221,7 +221,6 @@ public class Services{
 	       instanceof SchemaCrossReferenceServiceConfiguration),
 	     "services: tried to copy schema cross reference service config.");
 	Services s = new Services(getExceptionHandler());
-        s.specRepos = new SpecificationRepository();        
 	s.setTypeConverter(getTypeConverter().copy(s));
 	s.setNamespaces(namespaces.copy());
         s.setUMLInfo(umlinfo);
@@ -244,16 +243,17 @@ public class Services{
      * returns an existing named counter, creates a new one otherwise
      */
     public Counter getCounter(String name) {
-        Counter c = (Counter) counters.get(name);
+        Counter c = counters.get(name);
         if (c!=null) return c;
         c = new Counter(name);
         counters.put(name, c);
         return c;
     }
     
-    public void setBackCounters(Node n) {
-        Iterator it = counters.values().iterator();
-        while (it.hasNext()) ((Counter)it.next()).undo(n);
+    public void setBackCounters(Node n) {        
+        for (final Counter c : counters.values()) {
+            c.undo(n);
+        }
     }
     
     /**

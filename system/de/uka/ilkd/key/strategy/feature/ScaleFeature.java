@@ -145,7 +145,6 @@ public abstract class ScaleFeature implements Feature {
 
     /**
      * @param cost
-     * @return
      */
     private static long getValue (RuleAppCost cost) {
         if ( !( cost instanceof LongRuleAppCost ) ) illegalCostError ( cost );

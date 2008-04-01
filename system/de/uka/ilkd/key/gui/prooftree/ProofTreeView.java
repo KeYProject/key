@@ -55,7 +55,7 @@ public class ProofTreeView extends JPanel {
     /** the model that is displayed by the delegateView */
     private GUIProofTreeModel delegateModel;
     
-    private Hashtable models = new Hashtable(20);
+    private Hashtable<Proof, GUIProofTreeModel> models = new Hashtable<Proof, GUIProofTreeModel>(20);
 
     /** the proof this view shows */
     private Proof proof;
@@ -77,7 +77,7 @@ public class ProofTreeView extends JPanel {
      * applied; this is used when auto mode is active
      */
     private ListOfNode modifiedSubtrees      = null;
-    private HashSet    modifiedSubtreesCache = null;
+    private HashSet<Node>    modifiedSubtreesCache = null;
     
     /** the search dialog */
     private ProofTreeSearchPanel proofTreeSearchPanel;
@@ -261,7 +261,7 @@ public class ProofTreeView extends JPanel {
 	proof = p;
         
         if (proof !=null) {
-	    delegateModel = (GUIProofTreeModel) models.get(p);
+	    delegateModel = models.get(p);
             if (delegateModel == null) {
                delegateModel = new GUIProofTreeModel(p);
                models.put(p, delegateModel);
@@ -304,7 +304,7 @@ public class ProofTreeView extends JPanel {
         final GUIProofTreeNode node = delegateModel.getProofTreeNode(n);
         if (node==null) return;
  	
-        Object[] obs=node.getPath();
+        TreeNode[] obs=node.getPath();
  	TreePath tp = new TreePath(obs);
 	treeSelectionListener.ignoreChange = true;
  	delegateView.getSelectionModel().setSelectionPath(tp);
@@ -317,7 +317,7 @@ public class ProofTreeView extends JPanel {
     protected void makeNodeExpanded(Node n) {
 	GUIProofTreeNode node = delegateModel.getProofTreeNode(n);
  	if (node==null) return;
- 	Object[] obs=node.getPath();
+ 	TreeNode[] obs=node.getPath();
  	TreePath tp = new TreePath(obs);
  	delegateView.makeVisible(tp);
     }
@@ -490,7 +490,7 @@ public class ProofTreeView extends JPanel {
 	 */
 	public void autoModeStarted(ProofEvent e) {
 	    modifiedSubtrees      = SLListOfNode.EMPTY_LIST;
-	    modifiedSubtreesCache = new HashSet();
+	    modifiedSubtreesCache = new HashSet<Node>();
 	    if (delegateModel == null) {
                 Debug.out("delegateModel is null");
                 return;
@@ -827,13 +827,11 @@ public class ProofTreeView extends JPanel {
             } else if (e.getSource() == expandAllBelow) {
 		ExpansionState.expandAll(delegateView, branch);
             } else if (e.getSource() == expandGoals) {
-		IteratorOfGoal it = proof.openGoals ().iterator ();
-		Node n;
-		while ( it.hasNext () ) {
-		    n = it.next ().node ();
-		    if ( !mediator ().getUserConstraint ().displayClosed ( n ) )
-			makeNodeExpanded ( n );
-		}
+                for (final Goal g : proof.openGoals()) {
+                    final Node n = g.node ();
+                    if ( !mediator ().getUserConstraint ().displayClosed ( n ) )
+                        makeNodeExpanded ( n );
+                }
 		collapseClosedNodes ();
 		// do not show selected node if it is not on the path to an
 		// open goal, but do expand root
@@ -859,7 +857,7 @@ public class ProofTreeView extends JPanel {
 		    if ( !mediator ().getUserConstraint ().displayClosed ( n ) ) {
 			GUIProofTreeNode node = delegateModel.getProofTreeNode(n);
 			if (node==null) break;
-			Object[] obs=node.getPath();
+			TreeNode[] obs=node.getPath();
 			TreePath tp = new TreePath(obs);
 			if (branch.isDescendant(tp)) {
 				delegateView.makeVisible(tp);
@@ -1088,7 +1086,7 @@ public class ProofTreeView extends JPanel {
             GUIAbstractTreeNode node = null;
             TreePath tp = null;
             if (currentRow != -1) {
-                node = (GUIAbstractTreeNode)cache.get(currentRow);
+                node = cache.get(currentRow);
                 tp = new TreePath(node.getPath());
             }
             if (node != null && node instanceof GUIBranchNode) {
@@ -1127,14 +1125,14 @@ public class ProofTreeView extends JPanel {
             reset();
         }
 
-        private Vector cache;
+        private Vector<GUIAbstractTreeNode> cache;
 
         public synchronized void reset() {
             cache = null;
         }
 
         private void fillCache() {
-            cache = new Vector();
+            cache = new Vector<GUIAbstractTreeNode>();
             if (delegateModel.getRoot() != null) {
                 cache.add((GUIAbstractTreeNode)delegateModel.getRoot());
                 fillCacheHelp((GUIBranchNode)delegateModel.getRoot());

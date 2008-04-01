@@ -9,7 +9,7 @@
 package de.uka.ilkd.key.util;
 
 /** An interface to some progress reporting mechanism.  the {@link
- * setMaximum(int)} method must always be called first to determine
+ * #setMaximum(int)} method must always be called first to determine
  * the number of steps at which the task is finished.  After that,
  * {@link #setProgress} will be called repeatedly to indicate how
  * far one has got.  The progress monitor is assumed to have an

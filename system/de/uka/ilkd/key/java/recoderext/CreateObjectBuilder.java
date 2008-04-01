@@ -18,15 +18,22 @@ package de.uka.ilkd.key.java.recoderext;
 import java.util.*;
 
 import recoder.CrossReferenceServiceConfiguration;
+import recoder.java.CompilationUnit;
+import recoder.java.Expression;
 import recoder.java.Identifier;
+import recoder.java.Statement;
 import recoder.java.StatementBlock;
 import recoder.java.declaration.*;
+import recoder.java.declaration.DeclarationSpecifier;
+import recoder.java.declaration.Modifier;
+import recoder.java.declaration.ParameterDeclaration;
 import recoder.java.declaration.modifier.Public;
 import recoder.java.declaration.modifier.Static;
 import recoder.java.reference.*;
 import recoder.java.statement.Return;
 import recoder.kit.ProblemReport;
-import recoder.list.*;
+import recoder.list.generic.ASTArrayList;
+import recoder.list.generic.ASTList;
 
 /**
  * If an allocation expression <code>new Class(...)</code> occurs, a new object
@@ -47,8 +54,8 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
 
     public CreateObjectBuilder
 	(CrossReferenceServiceConfiguration services, 
-	 CompilationUnitMutableList units) {	
-	super(services, units);
+	 TransformerCache cache) {	
+	super(services, cache);
 	class2identifier = new HashMap();
     }
 
@@ -59,13 +66,13 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
      */
     private StatementBlock createBody(ClassDeclaration recoderClass) {
 		
-	StatementMutableList result = new StatementArrayList(10);
+	ASTList<Statement> result = new ASTArrayList<Statement>(10);
 	LocalVariableDeclaration local = declare(NEW_OBJECT_VAR_NAME, (Identifier) class2identifier.get(recoderClass));
 	
 
 	result.add(local);
 
-	final ExpressionMutableList arguments = new ExpressionArrayList(0);
+	final ASTList<Expression> arguments = new ASTArrayList<Expression>(0);
        
         result.add
             (assign(new VariableReference
@@ -98,7 +105,7 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
      * @return the implicit <code>&lt;prepare&gt;</code> method
      */
     public MethodDeclaration createMethod(ClassDeclaration type) {
-	ModifierMutableList modifiers = new ModifierArrayList(2);
+	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(2);
 	modifiers.add(new Public());
 	modifiers.add(new Static());	
 
@@ -106,7 +113,7 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
 	    (modifiers, 
 	     new TypeReference((Identifier) class2identifier.get(type)), 
 	     new ImplicitIdentifier(IMPLICIT_OBJECT_CREATE), 
-	     new ParameterDeclarationArrayList(0), 
+	     new ASTArrayList<ParameterDeclaration>(0), 
 	     null,
 	     createBody(type));
 	md.makeAllParentRolesValid();
@@ -114,7 +121,7 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
     }    
 
     public ProblemReport analyze() {
-        HashSet cds = classDeclarations();
+        Set cds = classDeclarations();
         Iterator it = cds.iterator();
         while(it.hasNext()){
             ClassDeclaration cd = (ClassDeclaration) it.next();

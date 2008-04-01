@@ -30,6 +30,8 @@ import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.UpdateFactory;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.AtPreFactory;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
@@ -86,7 +88,8 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
         }
 
         //collect atPre-functions, update loop invariants
-        Map atPreFunctions = new LinkedHashMap();
+        Map<Operator, Function /*atPre*/> atPreFunctions = 
+            new LinkedHashMap<Operator, Function>();
         for(IteratorOfLoopStatement it = loops.iterator(); it.hasNext(); ) {
             LoopStatement loop = it.next();
             LoopInvariant inv 

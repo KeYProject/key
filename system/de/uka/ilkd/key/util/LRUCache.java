@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Simple realisation of an LRU cache.
  */
-public class LRUCache extends LinkedHashMap {
+public class LRUCache<K,V> extends LinkedHashMap<K,V> {
 
     /** maximal cache size */
     private final int maxEntries;
@@ -22,7 +22,7 @@ public class LRUCache extends LinkedHashMap {
     /**
      * removes the eldest entry, i.e. the least recently used one
      */
-    protected boolean removeEldestEntry(Map.Entry eldest) {
+    protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
 	return size() > maxEntries;
     }
 }

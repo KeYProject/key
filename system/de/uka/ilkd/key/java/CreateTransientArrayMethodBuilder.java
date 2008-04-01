@@ -29,7 +29,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 /**
  * This class creates the <code>&lt;createArray&gt;</code> method for
  * array creation and in particular its helper method 
- * <code>&lt;createArrayHelper&gt;</code>. This class hould be replaced
+ * <code>&lt;createArrayHelper&gt;</code>. This class should be replaced
  * by a recoder transformation as soon as we port our array data
  * structures to RecodeR.
  */
@@ -38,7 +38,7 @@ public class CreateTransientArrayMethodBuilder extends CreateArrayMethodBuilder 
     /** current type for byte */
     private final KeYJavaType byteType;
 
-    /** create the method builder for transient array implict creation methods */
+    /** create the method builder for transient array implicit creation methods */
     public CreateTransientArrayMethodBuilder(KeYJavaType integerType, 
 					     KeYJavaType objectType,
 					     KeYJavaType byteType) {
@@ -101,7 +101,7 @@ public class CreateTransientArrayMethodBuilder extends CreateArrayMethodBuilder 
             declare(new ProgramElementName("newObject"), arrayRef);	
 	final ProgramVariable newObject      = (ProgramVariable) local.
 	    getVariables().getVariableSpecification(0).getProgramVariable();
-	final LinkedList body                = new LinkedList();
+	final LinkedList<Statement> body     = new LinkedList<Statement>();
 
 	body.addLast(local);
 	
@@ -122,7 +122,7 @@ public class CreateTransientArrayMethodBuilder extends CreateArrayMethodBuilder 
 	body.add(new Return(newObject));
 
 	return new StatementBlock
-	    ((Statement[])body.toArray(new Statement[body.size()]));
+	    (body.toArray(new Statement[body.size()]));
     }
 
 

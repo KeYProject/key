@@ -12,14 +12,15 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Set;
 
+import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.IteratorOfProgramElement;
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
-import de.uka.ilkd.key.logic.op.IteratorOfProgramMethod;
 import de.uka.ilkd.key.logic.op.ListOfProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.init.AbstractEnvInput;
@@ -41,9 +42,17 @@ public class SLEnvInput extends AbstractEnvInput {
     //-------------------------------------------------------------------------
     
     private static String getLanguage() {
-        return ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().useJML()
-               ? "JML"
-               : "OCL";
+        GeneralSettings gs 
+            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+        if(gs.useJML() && gs.useOCL()) {
+            return "JML/OCL";
+        } else if(gs.useJML()) {
+            return "JML";
+        } else if(gs.useOCL()) {
+            return "OCL";
+        } else {
+            return "no";
+        }
     }
     
     
@@ -58,12 +67,10 @@ public class SLEnvInput extends AbstractEnvInput {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private Object[] sortKJTs(Object[] kjts) {
-        Arrays.sort(kjts, new Comparator() {
-            public int compare(Object o1, Object o2) {
-                KeYJavaType kjt1 = (KeYJavaType)o1;
-                KeYJavaType kjt2 = (KeYJavaType)o2;
-                return kjt1.getFullName().compareTo(kjt2.getFullName());
+    private KeYJavaType[] sortKJTs(KeYJavaType[] kjts) {
+        Arrays.sort(kjts, new Comparator<KeYJavaType> () {
+            public int compare(KeYJavaType o1, KeYJavaType o2) {
+                return o1.getFullName().compareTo(o2.getFullName());
             }
         });
         
@@ -79,11 +86,13 @@ public class SLEnvInput extends AbstractEnvInput {
             = initConfig.getServices().getSpecificationRepository();
        
         //sort types alphabetically (necessary for deterministic names)
-        Object[] kjts = sortKJTs(javaInfo.getAllKeYJavaTypes().toArray());
+        final Set<KeYJavaType> allKeYJavaTypes = javaInfo.getAllKeYJavaTypes();
+        final KeYJavaType[] kjts = 
+            sortKJTs(allKeYJavaTypes.toArray(new KeYJavaType[allKeYJavaTypes.size()]));
         
         //create specifications for all types
         for(int i = 0; i < kjts.length; i++) {
-            KeYJavaType kjt = (KeYJavaType) kjts[i];
+            final KeYJavaType kjt = kjts[i];
             
             //class invariants
             specRepos.addClassInvariants(
@@ -92,10 +101,7 @@ public class SLEnvInput extends AbstractEnvInput {
             //contracts, loop invariants
             ListOfProgramMethod pms 
                 = javaInfo.getAllProgramMethodsLocallyDeclared(kjt);
-            IteratorOfProgramMethod it2 = pms.iterator();
-            while(it2.hasNext()) {
-                final ProgramMethod pm = it2.next();
-                
+            for(ProgramMethod pm : pms) {
                 //contracts
                 specRepos.addOperationContracts(
                             specExtractor.extractOperationContracts(pm));
@@ -104,11 +110,10 @@ public class SLEnvInput extends AbstractEnvInput {
                 JavaASTCollector collector 
                     = new JavaASTCollector(pm.getBody(), LoopStatement.class);
                 collector.start();
-                IteratorOfProgramElement it3 = collector.getNodes().iterator();
-                while(it3.hasNext()) {
-                    LoopStatement loop = (LoopStatement) it3.next();
-                    LoopInvariant inv
-                        = specExtractor.extractLoopInvariant(pm, loop);
+                for(ProgramElement loop : collector.getNodes()) {
+                    LoopInvariant inv = specExtractor.extractLoopInvariant(
+                	    			pm, 
+                        			(LoopStatement) loop);
                     if(inv != null) {
                         specRepos.setLoopInvariant(inv);
                     }
@@ -128,13 +133,13 @@ public class SLEnvInput extends AbstractEnvInput {
             throw new IllegalStateException("InitConfig not set.");
         }
         
-        String language = getLanguage();
-        if(language.equals("JML")) {
+        GeneralSettings gs 
+            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+        if(gs.useJML()) {
             createSpecs(new JMLSpecExtractor(initConfig.getServices()));
-        } else if(language.equals("OCL")) {
+        }
+        if(gs.useOCL()) {
             createSpecs(new OCLSpecExtractor(initConfig.getServices()));
-        } else {
-            assert false : "An unknown specification language is selected.";
         }
     }
 }

@@ -63,18 +63,18 @@ public class ClassSelectionDialog extends JDialog {
             classList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         }
         IteratorOfKeYJavaType it = kjts.iterator();
-        Vector v = new Vector();
+        Vector<WrappedKJT> v = new Vector<WrappedKJT>();
         while(it.hasNext()) {
             KeYJavaType kjt = (KeYJavaType) it.next();
             if(kjt.getJavaType() instanceof ClassType) {
         	v.add(new WrappedKJT(kjt));
             }
         }
-        Object[] listData = v.toArray();
-        Arrays.sort(listData, new Comparator() {
-            public int compare(Object o1, Object o2) {
-                KeYJavaType kjt1 = ((WrappedKJT)o1).kjt;
-                KeYJavaType kjt2 = ((WrappedKJT)o2).kjt;
+        WrappedKJT[] listData = v.toArray(new WrappedKJT[v.size()]);
+        Arrays.sort(listData, new Comparator<WrappedKJT>() {
+            public int compare(WrappedKJT o1, WrappedKJT o2) {
+                KeYJavaType kjt1 = o1.kjt;
+                KeYJavaType kjt2 = o2.kjt;
                 return kjt1.getName().compareTo(kjt2.getName());
             }
         });

@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.parser;
 
+import de.uka.ilkd.key.java.ConvertException;
 import antlr.Token;
 
 public class JavaParserException extends antlr.SemanticException {
@@ -27,6 +28,13 @@ public class JavaParserException extends antlr.SemanticException {
 	this.line = (lineOffset>=0) ? t.getLine()+lineOffset : 0;	
 	this.column = (colOffset>=0) ? t.getColumn()+colOffset : 0;
     }
+    
+    public JavaParserException(Throwable e, Token t, String filename, 
+               int lineOffset, int colOffset) {
+        this(e.getMessage(), t, filename, lineOffset, colOffset);
+        initCause(e);
+    }
+    
 
     public JavaParserException(String cat, Token t, String filename) {
 	super("JavaParser");
@@ -40,6 +48,11 @@ public class JavaParserException extends antlr.SemanticException {
 
     public JavaParserException(String message){
 	super(message);
+    }
+
+    public JavaParserException(Throwable e, Token t, String filename) {
+        this(e.getMessage(), t, filename);
+        initCause(e);
     }
 
     public String getFilename() {

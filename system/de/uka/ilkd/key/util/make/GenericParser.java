@@ -74,7 +74,7 @@ public class GenericParser {
     public static String generatedSrcPath;
 
     // Hashes rules that have been created
-    private static HashSet ruleSet=new HashSet();
+    private static HashSet<String> ruleSet=new HashSet<String>();
 
 
     // STATIC METHODS
@@ -275,8 +275,8 @@ public class GenericParser {
     }
 
     
-    /** @param String str the String we want to replace %nr
-     *  @param Template tpl the corresponding template
+    /** @param str the String we want to replace %nr
+     *  @param tpl the Template 
      *	@return str replace took place
      */
     public static String replace(String str, Template tpl) {

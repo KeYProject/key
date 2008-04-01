@@ -12,7 +12,6 @@
 package de.uka.ilkd.key.rule.updatesimplifier;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -24,7 +23,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.AbstractUpdateRule;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
-import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.LRUCache;
 
 /**
  * This simplification rule merges two updates and (optional) 
@@ -41,7 +40,8 @@ public class ApplyOnModality extends AbstractUpdateRule {
     
     private boolean deletionEnabled;
 
-    private static HashMap protectedVarsCache = new HashMap();
+    private static LRUCache<Term, HashSet<Object>> protectedVarsCache = 
+        new LRUCache<Term, HashSet<Object>>(1000);
     
     /**
      * @param updateSimplifier
@@ -84,9 +84,8 @@ public class ApplyOnModality extends AbstractUpdateRule {
      */
     public AssignmentPair[] remove(Update up, Term target, Services services) {
         final ArrayOfAssignmentPair pairs = up.getAllAssignmentPairs();        
-        final HashSet protectedProgVars = collectProgramVariables(target, 
-                                                                  services);
-        final List result = new ArrayList(pairs.size());
+        final HashSet<Object> protectedProgVars = collectProgramVariables(target, services);
+        final List<AssignmentPair> result = new ArrayList<AssignmentPair>(pairs.size());
 
         for (int i = 0, size=pairs.size(); i<size; i++) {
             final AssignmentPair pair =  pairs.getAssignmentPair(i);            
@@ -95,16 +94,17 @@ public class ApplyOnModality extends AbstractUpdateRule {
             if ( protectedLocation ( loc, protectedProgVars ) )
                 result.add ( pair );
         }    
-        return (AssignmentPair[]) 
-        	result.toArray(new AssignmentPair[result.size()]);
+        return result.toArray(new AssignmentPair[result.size()]);
     }
     
     /**
-     * @param loc
+     * looks up if the given location is protected, i.e. must not be deleted
+     * @param loc the Location to check
      * @param protectedProgVars
-     * @return
+     * @return true if the given location is protected
      */
-    private boolean protectedLocation(Location loc, HashSet protectedProgVars) {
+    private boolean protectedLocation(Location loc, 
+            HashSet<? extends Object> protectedProgVars) {
         // currently it would be safe to comment the PROTECTED_HEAP part out as 
         // heap locations are generally not thrown away. But in principle one can think
         // of a more finegrained control
@@ -129,13 +129,14 @@ public class ApplyOnModality extends AbstractUpdateRule {
     /**
      * collects all local program variables
      * @param target
-     * @return
+     * @return the HashSet containing all protected locations and the special protection markers
+     * {@link #PROTECT_ALL} and {@link #PROTECT_HEAP}
      */
-    private HashSet collectProgramVariables(Term target, Services services) {
+    private HashSet<Object> collectProgramVariables(Term target, Services services) {
         if (protectedVarsCache.containsKey(target)) {           
-            return (HashSet) protectedVarsCache.get(target); 
+            return protectedVarsCache.get(target); 
         }
-        HashSet foundProgVars = new HashSet();
+        HashSet<Object> foundProgVars = new HashSet<Object>();
         
         final Operator targetOp = target.op();
         
@@ -164,10 +165,6 @@ public class ApplyOnModality extends AbstractUpdateRule {
                                                          services));
         }
         
-        if (protectedVarsCache.size()>=1000) {
-            protectedVarsCache.clear();
-        }
-        
         protectedVarsCache.put(target, foundProgVars);
         return foundProgVars;
     }      
@@ -176,8 +173,7 @@ public class ApplyOnModality extends AbstractUpdateRule {
 	    		           Term target, 
 	    		           Services services) {
         // a modality is not a location
-        Debug.fail ( "matchingCondition(...) must not be called for target "
-                     + target );
+        assert false : "matchingCondition(...) must not be called for target " + target;
         return null; // unreachable
     }
 }

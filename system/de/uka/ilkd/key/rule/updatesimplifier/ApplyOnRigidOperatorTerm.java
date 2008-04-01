@@ -31,7 +31,7 @@ import de.uka.ilkd.key.util.Debug;
 public class ApplyOnRigidOperatorTerm extends AbstractUpdateRule {
 
     /**
-     * @param updateSimplifier
+     * @param us the UpdateSimplifier this rule is registered at
      */
     public ApplyOnRigidOperatorTerm(UpdateSimplifier us) {
         super(us);   

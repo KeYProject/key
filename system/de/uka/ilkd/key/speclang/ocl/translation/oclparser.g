@@ -121,7 +121,7 @@ options {
         formulaBoolConverter = new FormulaBoolConverter(services, nss);
         
         //initialise integer helper
-        intHelper = new JavaIntegerSemanticsHelper(services);
+        intHelper = new JavaIntegerSemanticsHelper(services, excManager);
         
         //initialise property manager
         propertyManager = new PropertyManager(services,
@@ -227,9 +227,18 @@ options {
             newOp = term.op();
         }
         
+        final ArrayOfQuantifiableVariable[] vars = 
+		new ArrayOfQuantifiableVariable[term.arity()];
+		
+	final Term[] subTerms = getSubTerms(term);
+	
+	for(int i = 0; i < subTerms.length; i++) {
+	    vars[i] = term.varsBoundHere(i);
+	}
+        
         Term result = tb.tf().createTerm(newOp, 
-                                         getSubTerms(term), 
-                                         term.varsBoundHere(0), 
+                                         subTerms, 
+                                         vars, 
                                          term.javaBlock());
         return result;
     }

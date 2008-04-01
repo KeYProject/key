@@ -17,7 +17,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
-import de.uka.ilkd.key.logic.IteratorOfConstrainedFormula;
 import de.uka.ilkd.key.logic.IteratorOfTerm;
 import de.uka.ilkd.key.logic.ListOfTerm;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -27,7 +26,6 @@ import de.uka.ilkd.key.logic.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.metaconstruct.arith.IteratorOfMonomial;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
@@ -75,7 +73,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         if ( targetM.divides ( sourceM ) )
             return toIterator ( targetM.reduce ( sourceM ).toTerm ( services ) );
 
-        final List cofactorPolys = extractPolys ( goal, services );
+        final List<CofactorPolynomial> cofactorPolys = extractPolys ( goal, services );
 
         if ( cofactorPolys.isEmpty () )
             return SLListOfTerm.EMPTY_LIST.iterator ();
@@ -97,21 +95,21 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
      * This method will change the object <code>cofactorPolys</code>.
      */
     private ListOfTerm computeMultiples(Monomial sourceM, Monomial targetM,
-                                        List cofactorPolys, Services services) {
+                                        List<CofactorPolynomial> cofactorPolys, Services services) {
         ListOfTerm res = SLListOfTerm.EMPTY_LIST;
         
-        final List cofactorMonos = new ArrayList ();
+        final List<CofactorItem> cofactorMonos = new ArrayList<CofactorItem> ();
         cofactorMonos.add ( new CofactorMonomial ( targetM, Polynomial.ONE ) );
 
         boolean changed = true;
         while ( changed ) {
             changed = false;
             
-            final Iterator polyIt = cofactorPolys.iterator ();
+            final Iterator<CofactorPolynomial> polyIt = cofactorPolys.iterator ();
             while ( polyIt.hasNext () ) {
-                CofactorPolynomial poly = (CofactorPolynomial)polyIt.next ();
+                CofactorPolynomial poly = polyIt.next ();
 
-                final Iterator monoIt = cofactorMonos.iterator ();
+                final Iterator<CofactorItem> monoIt = cofactorMonos.iterator ();
                 while ( monoIt.hasNext () ) {
                     final CofactorMonomial mono = (CofactorMonomial)monoIt.next ();
                     final CofactorItem reduced = poly.reduce ( mono );
@@ -157,16 +155,13 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
      *          <code>CofactorPolynomial</code>. The initial cofactor is set
      *          to zero.
      */
-    private List extractPolys(Goal goal, Services services) {
+    private List<CofactorPolynomial> extractPolys(Goal goal, Services services) {
         final IntegerLDT numbers =
             services.getTypeConverter ().getIntegerLDT ();
 
-        final List res = new ArrayList ();
-
-        final IteratorOfConstrainedFormula it =
-            goal.sequent ().antecedent ().iterator ();
-        while ( it.hasNext () ) {
-            final ConstrainedFormula cfm = it.next ();
+        final List<CofactorPolynomial> res = new ArrayList<CofactorPolynomial> ();
+     
+        for (final ConstrainedFormula cfm : goal.sequent ().antecedent ()) {
             if ( !cfm.constraint ().isBottom () ) continue;
 
             final Term t = cfm.formula();
@@ -232,9 +227,8 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
          */
         public CofactorItem reduce(CofactorMonomial mono) {
             CofactorPolynomial res = this;
-            final IteratorOfMonomial it = poly.getParts ().iterator ();
-            while ( it.hasNext () ) {
-                final Monomial part = it.next ();
+            
+            for (final Monomial part : poly.getParts()) {
                 if ( mono.mono.divides ( part ) ) {
                     final Monomial coeff = mono.mono.reduce ( part );
                     res = res.add ( mono,

@@ -100,6 +100,14 @@ public abstract class SubtermGenerator implements TermGenerator {
             
             return res;
         }
+
+        /** 
+         * throw an unsupported operation exception as generators do not remove
+         */
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+   
     }
 
     class RightIterator extends Iterator {
@@ -117,6 +125,13 @@ public abstract class SubtermGenerator implements TermGenerator {
             }
             
             return res;
+        }
+        
+        /** 
+         * throw an unsupported operation exception as generators do not remove
+         */
+        public void remove() {
+            throw new UnsupportedOperationException();
         }
     }
 }

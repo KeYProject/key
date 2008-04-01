@@ -44,6 +44,7 @@ header {
     import de.uka.ilkd.key.logic.TermCreationException;
     import de.uka.ilkd.key.logic.ldt.LDT;
     import de.uka.ilkd.key.logic.ldt.AbstractIntegerLDT;
+    import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
     import de.uka.ilkd.key.logic.op.ExactInstanceSymbol;
     import de.uka.ilkd.key.logic.op.Function;
     import de.uka.ilkd.key.logic.op.InstanceofSymbol;
@@ -157,7 +158,7 @@ options {
 	    resolverManager.putIntoTopLocalVariablesNamespace(resultVar);
 	}
 
-	this.intHelper = new JavaIntegerSemanticsHelper(services);
+	this.intHelper = new JavaIntegerSemanticsHelper(services, excManager);
 
 	trueLitTerm = services.getTypeConverter()
 	.convertToLogicElement(BooleanLiteral.TRUE);
@@ -350,17 +351,20 @@ options {
 	    newOp = term.op();
 	}
 	
+	final ArrayOfQuantifiableVariable[] vars = 
+		new ArrayOfQuantifiableVariable[term.arity()];
+	
 	Term[] subTerms = getSubTerms(term);
 	Term[] newSubTerms = new Term[subTerms.length];
 	for(int i = 0; i < subTerms.length; i++) {
 	    newSubTerms[i] = convertToOld(subTerms[i]);
+	    vars[i] = term.varsBoundHere(i);
 	}
 	
-	Term result = tb.tf().createTerm(newOp, 
-					 newSubTerms, 
-					 term.varsBoundHere(0), 
-					 term.javaBlock());
-	return result;    
+	return tb.tf().createTerm(newOp, 
+		  		  newSubTerms, 
+				  vars, 
+				  term.javaBlock());
     }
 
 
@@ -420,8 +424,9 @@ options {
     
 	// no identifier found, maybe it was just a package prefix.
 	// but package prefixes don't have a receiver!
+	// Let primarysuffix handle faulty method call.
 	
-	if (receiver != null) {
+	if (receiver != null & callingParameters == null) {
 	    raiseError("Identifier " + lookupName + " not found!", t);
 	}
 	
@@ -1500,6 +1505,11 @@ postfixexpr returns [JMLExpression result=null] throws SLTranslationException
 	    fullyQualifiedName = LT(0).getText();
 	}
 	(
+	    {
+		if (expr != null && expr.getKeYJavaType(javaInfo).getJavaType() instanceof PrimitiveType) {
+		    raiseError("Cannot build postfix expression from primitive type.");
+		}
+	    }
 	    expr=primarysuffix[expr, fullyQualifiedName]
 	    {
 		fullyQualifiedName += "." + LT(0).getText();

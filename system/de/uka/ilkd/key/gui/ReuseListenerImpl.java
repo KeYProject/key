@@ -33,7 +33,7 @@ public class ReuseListenerImpl implements ReuseListener, KeYSelectionListener {
    private KeYMediator medi;
    private Logger reuseLogger = Logger.getLogger("key.proof.reuse");
    
-   private List reusePoints;
+   private List<ReusePoint> reusePoints;
    private ReusePoint best;
    
    private ReuseFindTaclet findTacletLogic;
@@ -46,7 +46,7 @@ public class ReuseListenerImpl implements ReuseListener, KeYSelectionListener {
    }
 
    private void initLogicNewProof() {
-      reusePoints = new LinkedList();
+      reusePoints = new LinkedList<ReusePoint>();
       findTacletLogic = new ReuseFindTaclet(medi, reusePoints);
       updateSimpRuleLogic = new ReuseUpdateSimplificationRule(medi, reusePoints);
    }
@@ -112,9 +112,9 @@ public class ReuseListenerImpl implements ReuseListener, KeYSelectionListener {
    
    public void recomputeReuseTotal() {
       initLogicNewProof();
-      Iterator markerIt = Node.reuseCandidatesIterator();
+      Iterator<Node> markerIt = Node.reuseCandidatesIterator();
       while (markerIt.hasNext()) {
-         Node marker = (Node) markerIt.next();
+         Node marker = markerIt.next();
             IteratorOfGoal goalIt = medi.getProof().openGoals().iterator();
 //         reuseLogger.info("***********************************************");
             while (goalIt.hasNext()) {
@@ -128,9 +128,9 @@ public class ReuseListenerImpl implements ReuseListener, KeYSelectionListener {
    
 //remove RP with consumed goal
    public void removeRPConsumedGoal(Goal usedGoal) {
-      ListIterator it = reusePoints.listIterator();
+      ListIterator<ReusePoint> it = reusePoints.listIterator();
       while (it.hasNext()) {
-         ReusePoint rp = (ReusePoint) it.next();
+         final ReusePoint rp = it.next();
          if ((rp.target()==usedGoal)) {
             it.remove();
          }
@@ -141,9 +141,9 @@ public class ReuseListenerImpl implements ReuseListener, KeYSelectionListener {
 //add: old markers - new goals; call after removeRPConsumedMarker()
    public void addRPOldMarkersNewGoals(ListOfGoal newGoals) {
       if (newGoals==null) return; // dec. proc. return null as goal list
-      Iterator markerIt = Node.reuseCandidatesIterator();
+      Iterator<Node> markerIt = Node.reuseCandidatesIterator();
       while (markerIt.hasNext()) {
-         Node marker = (Node) markerIt.next();
+         Node marker = markerIt.next();
          IteratorOfGoal goalIt = newGoals.iterator();
          while (goalIt.hasNext()) {
             analyzeCandidate(marker, goalIt.next());
@@ -158,9 +158,9 @@ public class ReuseListenerImpl implements ReuseListener, KeYSelectionListener {
       usedMarker.unmarkReuseCandidate();
 
 //remove RP with consumed marker
-      ListIterator it = reusePoints.listIterator();
+      ListIterator<ReusePoint> it = reusePoints.listIterator();
       while (it.hasNext()) {
-         ReusePoint rp = (ReusePoint) it.next();
+         ReusePoint rp = it.next();
          if ((rp.source()==usedMarker)) {
             it.remove();
          }
@@ -170,7 +170,7 @@ public class ReuseListenerImpl implements ReuseListener, KeYSelectionListener {
 
 //add RP: new markers - all goals
    public void addRPNewMarkersAllGoals(Node usedMarker) {
-      IteratorOfNode newMarkerIt = usedMarker.childrenIterator();
+      Iterator<Node> newMarkerIt = usedMarker.childrenIterator();
       while (newMarkerIt.hasNext()) {
          Node n = newMarkerIt.next();
          if ("Closed goal".equals(n.name())) continue; // this is ugly
@@ -189,11 +189,11 @@ public class ReuseListenerImpl implements ReuseListener, KeYSelectionListener {
    }
    
    
-   private ReusePoint highestScored(List l) {
+   private ReusePoint highestScored(List<ReusePoint> l) {
       ReusePoint max = (ReusePoint) l.get(0);
-      ListIterator it = l.listIterator();
+      ListIterator<ReusePoint> it = l.listIterator();
       while (it.hasNext()) {
-         ReusePoint curr = (ReusePoint) it.next();
+         ReusePoint curr = it.next();
          if (curr.score()>max.score()) max=curr;
       }
       return max;
@@ -295,7 +295,7 @@ public class ReuseListenerImpl implements ReuseListener, KeYSelectionListener {
 
           getContentPane().add(p2, java.awt.BorderLayout.CENTER);
           getContentPane().add(p3, java.awt.BorderLayout.SOUTH);
-          setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+          setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 //          setBounds(300, 400, 400, 300);
           pack();
           setVisible(true);

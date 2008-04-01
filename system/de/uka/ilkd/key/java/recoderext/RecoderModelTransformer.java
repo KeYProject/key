@@ -20,7 +20,7 @@ import recoder.java.expression.literal.*;
 import recoder.java.expression.operator.CopyAssignment;
 import recoder.java.reference.*;
 import recoder.kit.TwoPassTransformation;
-import recoder.list.CompilationUnitMutableList;
+import recoder.list.generic.*;
 import recoder.service.DefaultCrossReferenceSourceInfo;
 import de.uka.ilkd.key.util.Debug;
 
@@ -37,45 +37,35 @@ import de.uka.ilkd.key.util.Debug;
  *     <li> {@link CreateObjectBuilder}  </li>
  *     <li> {@link PrepareObjectBuilder} </li>
  *   </ul>
+ *   
+ * Performance of these classes was low, so information that is shared between
+ * all instances of a transformation set has been outsourced to a transformation
+ * cache.
  */
 public abstract class RecoderModelTransformer extends TwoPassTransformation {
 
     protected CrossReferenceServiceConfiguration services;
-    protected CompilationUnitMutableList units;
-    protected static HashSet classDeclarations=null;
-    protected static HashMap localClass2FinalVar=null;
+    // protected List<CompilationUnit> units;
+    protected TransformerCache cache;
 
     /**
      * creates a transormder for the recoder model
      * @param services the CrossReferenceServiceConfiguration to access
      * model information 
-     * @param units the array of CompilationUnits describing the model 
-     * to be transformed 
+     * @param cache a cache object that stores information which is needed by
+     * and common to many transformations. it includes the compilation units,
+     * the declared classes, and information for local classes.
      */
     public RecoderModelTransformer
 	(CrossReferenceServiceConfiguration services, 
-	 CompilationUnitMutableList units) {	
+	 TransformerCache cache) {	
 	super(services);
 	this.services = services;
-	this.units = units;
+	assert cache != null;
+	this.cache = cache;
         getLocalClass2FinalVar();
     }
     
-    public HashMap getLocalClass2FinalVar(){
-        if(localClass2FinalVar==null){
-            localClass2FinalVar=new HashMap();
-        }
-        return localClass2FinalVar;
-    }
-   
-    /**
-     * Clears the information stored in static fields. 
-     */ 
-    public static void clear(){
-        classDeclarations=null;
-        localClass2FinalVar=null;      
-    }
-
     /** 
      * returns the default value of the given type 
      * according to JLS Sect. 4.5.5
@@ -166,9 +156,9 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
             new Identifier(td.getFullName()) :
                 (Identifier)td.getIdentifier().deepClone();*/
         return td.getIdentifier()==null ? 
-                (td.getAllSupertypes().getClassType(1) instanceof TypeDeclaration ?
-                        getId((TypeDeclaration) td.getAllSupertypes().getClassType(1)) : 
-                            new Identifier(td.getAllSupertypes().getClassType(1).getName())) :
+                (td.getAllSupertypes().get(1) instanceof TypeDeclaration ?
+                        getId((TypeDeclaration) td.getAllSupertypes().get(1)) : 
+                            new Identifier(td.getAllSupertypes().get(1).getName())) :
                     (Identifier)td.getIdentifier().deepClone();
     }
     
@@ -196,7 +186,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
      * in any compilation unit. <emph>Not</emph> for inner classes.
      */
     public void makeExplicit() {
-	HashSet s = classDeclarations();
+	Set s = classDeclarations();
 	Iterator it = s.iterator();
 	while(it.hasNext()) {
 	    ClassDeclaration cd = (ClassDeclaration) it.next();
@@ -205,16 +195,18 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
         }
     }
     
-    protected HashSet classDeclarations(){
-        if(classDeclarations==null){
-            ClassDeclarationCollector cdc = new ClassDeclarationCollector();
-            for (int i = 0; i<units.size(); i++) {
-                CompilationUnit unit = units.getCompilationUnit(i);
-                cdc.walk(unit);
-            }
-            classDeclarations = cdc.result();
-        }
-        return classDeclarations;       
+    // 3 methods to access the transformation cache.
+    
+    protected Set classDeclarations(){
+        return cache.getClassDeclarations();       
+    }
+    
+    public HashMap getLocalClass2FinalVar(){
+        return cache.getLocalClass2FinalVarMapping();
+     }
+    
+    public List<CompilationUnit> getUnits() {
+        return cache.getUnits();
     }
     
  /*   protected String getNameForAnonClass(TypeDeclaration cd){
@@ -229,13 +221,65 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
 	makeExplicit();
     }
     
-    class FinalOuterVarsCollector extends SourceVisitor{
+    /**
+     * Cache of important data. This is done mainly for performance reasons.
+     * It contains the following info:
+     * - list of comp. units
+     * - their class declarations
+     * - a mapping from local classes to their needed final variables.
+     * 
+     * Objects are created upon the first request.
+     *  
+     * @author MU
+     */
+    public static class TransformerCache {
+        
+        private List<CompilationUnit> cUnits;
+        private Set classDeclarations;
+        private HashMap localClass2FinalVar;
+
+        public TransformerCache(List<CompilationUnit> cUnits) {
+            this.cUnits = cUnits;    
+        }
+        
+        public List<CompilationUnit> getUnits() {
+            return cUnits;
+        }
+        
+        public Set getClassDeclarations(){
+            if(classDeclarations==null){
+                ClassDeclarationCollector cdc = new ClassDeclarationCollector();
+                for (int i = 0; i < cUnits.size(); i++) {
+                CompilationUnit unit = cUnits.get(i);
+                    cdc.walk(unit);
+                }
+                classDeclarations = cdc.result();
+            }
+            return classDeclarations;       
+        }
+        
+        public HashMap getLocalClass2FinalVarMapping() {
+            if(localClass2FinalVar == null){
+                localClass2FinalVar = new HashMap();
+            }
+            return localClass2FinalVar;
+        }
+
+        /**
+         * if the class declaration set changes, the cash must be invalidated
+         */
+        public void invalidateClasses() {
+            classDeclarations = null;
+        }
+    }
+    
+    protected class FinalOuterVarsCollector extends SourceVisitor{
         
         HashMap lc2fv;
         
         public FinalOuterVarsCollector(){
             super();
-            lc2fv = getLocalClass2FinalVar();
+            lc2fv = cache.getLocalClass2FinalVarMapping();
         }
         
         public void walk(SourceElement s){
@@ -266,7 +310,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
         
     }
     
-    class ClassDeclarationCollector extends SourceVisitor{
+    private static class ClassDeclarationCollector extends SourceVisitor{
         
         HashSet result = new HashSet();
         

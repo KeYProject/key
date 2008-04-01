@@ -13,6 +13,7 @@ package de.uka.ilkd.key.proof;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Iterator;
 import java.util.Vector;
 
 import de.uka.ilkd.key.gui.IMain;
@@ -45,10 +46,6 @@ public class ProofSaver {
    protected Proof proof;
    LogicPrinter printer;
    
-   
-   private ProofSaver() {
-   }
-
    public ProofSaver(IMain main, String filename) {
       this.main = main;
       this.mediator = main.mediator();
@@ -60,9 +57,9 @@ public class ProofSaver {
     StringBuffer logstr=new StringBuffer();
     //Advance the Logentries
     if(p.userLog==null)
-        p.userLog = new Vector();
+        p.userLog = new Vector<String>();
     if(p.keyVersionLog==null)
-        p.keyVersionLog = new Vector();
+        p.keyVersionLog = new Vector<String>();
     p.userLog.add(System.getProperty("user.name"));
     p.keyVersionLog.add(main.getInternalVersion());
     int s = p.userLog.size();
@@ -186,7 +183,7 @@ public class ProofSaver {
                                      StringBuffer tree) {       
 
       printSingleNode(node, prefix, tree);
-      IteratorOfNode childrenIt = null;
+      Iterator<Node> childrenIt = null;
       
       while (node.childrenCount() == 1) {
           childrenIt = node.childrenIterator();

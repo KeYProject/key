@@ -44,7 +44,7 @@ public class ProblemLoader implements Runnable {
     KeYMediator mediator;
 
     Proof proof = null;
-    IteratorOfNode children = null;
+    Iterator<Node> children = null;
 
     Node currNode = null;
     KeYExceptionHandler exceptionHandler = null;
@@ -71,17 +71,15 @@ public class ProblemLoader implements Runnable {
     private SwingWorker worker;
     private ProgressMonitor pm;
     private ProverTaskListener ptl;
-    private boolean enableSpecs;
     
     public ProblemLoader(File file, IMain main, Profile profile, 
-            boolean keepProblem, boolean enableSpecs) {
+            boolean keepProblem) {
         this.main = main;
         this.mediator  = main.mediator();        
         this.file = file;
         this.profile = profile;
         this.exceptionHandler = mediator.getExceptionHandler();
         this.keepProblem = keepProblem;
-        this.enableSpecs = enableSpecs;
 
         addProgressMonitor(main.getProgressMonitor());
     }    
@@ -174,12 +172,15 @@ public class ProblemLoader implements Runnable {
         
         if (filename.endsWith(".java")){ 
             // java file, probably enriched by specifications
-            return new SLEnvInput(file.getParentFile().getAbsolutePath());
-            
+            if(file.getParentFile() == null) {
+                return new SLEnvInput(".");
+            } else {
+                return new SLEnvInput(file.getParentFile().getAbsolutePath());
+            }            
         } else if (filename.endsWith(".key") || 
                 filename.endsWith(".proof")) {
             // KeY problem specification or saved proof
-            return new KeYUserProblemFile(filename, file, pm, enableSpecs);
+            return new KeYUserProblemFile(filename, file, pm);
             
         } else if (file.isDirectory()){ 
             // directory containing java sources, probably enriched 
@@ -338,12 +339,12 @@ public class ProblemLoader implements Runnable {
             break;
         case 'u' : //UserLog
             if(proof.userLog==null)
-                proof.userLog = new Vector();
+                proof.userLog = new Vector<String>();
             proof.userLog.add(s);
             break;
         case 'v' : //Version log
             if(proof.keyVersionLog==null)
-                proof.keyVersionLog = new Vector();
+                proof.keyVersionLog = new Vector<String>();
             proof.keyVersionLog.add(s);
             break;
         case 's' : //ProofSettings
@@ -374,7 +375,7 @@ public class ProblemLoader implements Runnable {
         //System.out.println("end "+id);
         switch (id) {
         case 'b' :
-            children = (IteratorOfNode) stack.pop();
+            children = (Iterator<Node>) stack.pop();
             break;
         case 'a' :
             if (currNode != null) {

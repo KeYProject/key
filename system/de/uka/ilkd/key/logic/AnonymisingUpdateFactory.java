@@ -140,7 +140,7 @@ public class AnonymisingUpdateFactory {
     private static RigidFunction getUninterpretedFunction(
                                 Term locTerm, 
                                 Sort[] commonArguments,
-                                Map /*Operator -> RigidFunction*/ functions,
+                                Map<Operator, RigidFunction> functions,
                                 Services services, Name proposal) {
         RigidFunction result = (RigidFunction) functions.get(locTerm.op());
         
@@ -182,7 +182,7 @@ public class AnonymisingUpdateFactory {
                                             Services services,
                                             Name[] proposals) {
         RigidFunction[] result = new RigidFunction[locations.length];
-        Map /*Operator -> RigidFunction*/ functions = new HashMap();
+        Map<Operator, RigidFunction> functions = new HashMap<Operator, RigidFunction>();
         
         for(int i = 0, c = 0; i < locations.length; i++) {
             if(locations[i] instanceof BasicLocationDescriptor) {

@@ -10,10 +10,7 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -61,7 +58,7 @@ public class Proof implements Named {
      * attention: firing events makes use of array list's random access
      * nature
      */
-    private List listenerList = new ArrayList(10);
+    private List<ProofTreeListener> listenerList = new ArrayList<ProofTreeListener>(10);
     
     /** list with the open goals of the proof */ 
     private ListOfGoal openGoals = SLListOfGoal.EMPTY_LIST;
@@ -101,13 +98,13 @@ public class Proof implements Named {
      * when different users load and save a proof this vector fills up with
      * Strings containing the user names.
      * */
-    public Vector userLog;
+    public Vector<String> userLog;
 
     /** 
      * when load and save a proof with different versions of key this vector
      * fills up with Strings containing the prcs versions.
      */
-    public Vector keyVersionLog;
+    public Vector<String> keyVersionLog;
    
     
     private Strategy activeStrategy;
@@ -271,7 +268,7 @@ public class Proof implements Named {
         getServices().setNamespaces(ns);
         if (openGoals().size() > 1)
             throw new IllegalStateException("Proof: ProgVars set too late");
-        openGoals().head().addProgramVariables(ns.programVariables());
+        openGoals().head().setProgramVariables(ns.programVariables());
     }
 
     public void setBasicTask(BasicTask t) {
@@ -469,7 +466,7 @@ public class Proof implements Named {
 	if ( !closed () && closedSubtree != null ) {
 
 	    boolean        b    = false;
-	    IteratorOfNode it   = closedSubtree.leavesIterator ();
+	    Iterator<Node> it   = closedSubtree.leavesIterator ();
 	    Goal           goal;
 
 	    while ( it.hasNext () ) {
@@ -585,7 +582,7 @@ public class Proof implements Named {
 		// direct ancestors (parents). Afterwards the remove
 		// list is the greatest subset of the subtree goals such
 		// that the parents of the goals are disjoint.
-		final HashSet parentSet = new HashSet();		
+		final HashSet<Node> parentSet = new HashSet<Node>();		
 		final IteratorOfGoal goalIt = goalList.iterator();
                 ListOfGoal removeList = SLListOfGoal.EMPTY_LIST;
 		while (goalIt.hasNext()) {
@@ -620,7 +617,7 @@ public class Proof implements Named {
     protected void fireProofExpanded(Node node) {
 	ProofTreeEvent e = new ProofTreeEvent(this, node);
 	for (int i = 0; i<listenerList.size(); i++) {
-	    ((ProofTreeListener)listenerList.get(i)).proofExpanded(e);
+	    listenerList.get(i).proofExpanded(e);
 	}
     }
 
@@ -628,7 +625,7 @@ public class Proof implements Named {
     protected void fireProofPruned(Node node, Node removedNode) {
 	ProofTreeEvent e = new ProofTreeRemovedNodeEvent(this, node, removedNode);
 	for (int i = 0; i<listenerList.size(); i++) {
-	    ((ProofTreeListener)listenerList.get(i)).proofPruned(e);
+	    listenerList.get(i).proofPruned(e);
 	}
     } 
 
@@ -636,7 +633,7 @@ public class Proof implements Named {
     protected void fireProofStructureChanged() {
 	ProofTreeEvent e = new ProofTreeEvent(this);
 	for (int i = 0; i<listenerList.size(); i++) {
-	    ((ProofTreeListener)listenerList.get(i)).proofStructureChanged(e);
+	    listenerList.get(i).proofStructureChanged(e);
 	}    
     }
 
@@ -644,7 +641,7 @@ public class Proof implements Named {
     protected void fireProofGoalRemoved(Goal goal) {
 	ProofTreeEvent e = new ProofTreeEvent(this, goal);
 	for (int i = 0; i<listenerList.size(); i++) {
-	    ((ProofTreeListener)listenerList.get(i)).proofGoalRemoved(e);
+	    listenerList.get(i).proofGoalRemoved(e);
 	}	
     }
 
@@ -654,7 +651,7 @@ public class Proof implements Named {
     protected void fireProofGoalsAdded(ListOfGoal goals) {
 	ProofTreeEvent e = new ProofTreeEvent(this, goals);
 	for (int i = 0; i<listenerList.size(); i++) {
-	    ((ProofTreeListener)listenerList.get(i)).proofGoalsAdded(e);
+	    listenerList.get(i).proofGoalsAdded(e);
 	}	
     }
 
@@ -669,7 +666,7 @@ public class Proof implements Named {
     protected void fireProofGoalsChanged() {
 	ProofTreeEvent e = new ProofTreeEvent(this, openGoals());
 	for (int i = 0; i<listenerList.size(); i++) {
-	    ((ProofTreeListener)listenerList.get(i)).proofGoalsChanged(e);
+	    listenerList.get(i).proofGoalsChanged(e);
 	}
     } 
 
@@ -680,7 +677,7 @@ public class Proof implements Named {
     protected void fireProofClosed() {
 	ProofTreeEvent e = new ProofTreeEvent(this);
 	for (int i = 0; i<listenerList.size(); i++) {
-	    ((ProofTreeListener)listenerList.get(i)).proofClosed(e);
+	    listenerList.get(i).proofClosed(e);
 	}
     }
 
@@ -745,7 +742,7 @@ public class Proof implements Named {
 	final IteratorOfGoal goalsIt  = openGoals.iterator();
 	while (goalsIt.hasNext()) {
 	    final Goal goal = goalsIt.next();
-	    final IteratorOfNode leavesIt = node.leavesIterator();
+	    final Iterator<Node> leavesIt = node.leavesIterator();
 	    while (leavesIt.hasNext()) {
 		if (leavesIt.next() == goal.node()) {
 		    result = result.prepend(goal);

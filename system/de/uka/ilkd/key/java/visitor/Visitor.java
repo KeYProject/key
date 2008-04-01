@@ -117,6 +117,8 @@ public interface Visitor {
      void performActionOnDo(Do x); 
 
      void performActionOnFor(For x);
+     
+     void performActionOnEnhancedFor(EnhancedFor x);
 
      void performActionOnWhile(While x); 
 

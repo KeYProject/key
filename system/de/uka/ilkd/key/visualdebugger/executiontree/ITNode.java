@@ -180,7 +180,7 @@ public class ITNode {
     /**
      * active statement of the form int b = sep(12,expr);
      * 
-     * @return
+     * @return the SourceElementId of the expression
      */
     private SourceElementId calcExprId() {
         if (parent != null && parent.getExprId() != null)

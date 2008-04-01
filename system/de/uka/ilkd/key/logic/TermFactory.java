@@ -85,7 +85,8 @@ public class TermFactory {
         
     }
 
-    private static Map cache = Collections.synchronizedMap(new LRUCache(5000));
+    private static Map<Object, Term> cache = 
+        Collections.synchronizedMap(new LRUCache<Object, Term>(5000));
 
     
     /** An instance of TermFactory */
@@ -195,7 +196,7 @@ public class TermFactory {
        if (subs.length == 2) {
            // we cache only the most common case
            final CacheKey key = new CacheKey(arrayOp, subs[0], subs[1]);
-           arrayTerm = (Term) cache.get(key);
+           arrayTerm = cache.get(key);
            if (arrayTerm == null) {
                arrayTerm = OpTerm.createOpTerm(arrayOp, subs).checked();
                cache.put(key, arrayTerm);
@@ -248,7 +249,7 @@ public class TermFactory {
 	}        
         
         final CacheKey key = new CacheKey(var, term);
-        Term attrTerm = (Term) cache.get(key);
+        Term attrTerm = cache.get(key);
         if (attrTerm == null){
             attrTerm = OpTerm.createUnaryOpTerm(AttributeOp.getAttributeOp(var), term).checked();
             cache.put(key, attrTerm);
@@ -317,7 +318,7 @@ public class TermFactory {
     }
     
     public Term createFunctionTerm(TermSymbol op) {
-        Term result = (Term) cache.get(op);
+        Term result = cache.get(op);
         if (result == null) {
             result = createFunctionTerm(op, NO_SUBTERMS);
             cache.put(op, result);
@@ -327,7 +328,7 @@ public class TermFactory {
 
     public Term createFunctionTerm(TermSymbol op, Term s1) {
         final CacheKey key = new CacheKey(op, s1);
-        Term result = (Term) cache.get(key);
+        Term result = cache.get(key);
         if (result == null) {
             result = createFunctionTerm(op, new Term[]{s1});
             cache.put(key, result);
@@ -337,7 +338,7 @@ public class TermFactory {
 
     public Term createFunctionTerm(TermSymbol op, Term s1, Term s2) {	
         final CacheKey key = new CacheKey(op, s1, s2);
-        Term result = (Term) cache.get(key);
+        Term result = cache.get(key);
         if (result == null) {
             result = createFunctionTerm(op, new Term[]{s1,s2});
             cache.put(key, result);
@@ -369,7 +370,6 @@ public class TermFactory {
       * collection operation as top operator that 
       * takes an OclExpression as argument (not "iterate")
       * @param op the OCL collection operation
-      * @param varBoundHere the iterator variable
       * @param subs subs[0] is the collection and subs[1] is the 
       *        expression in which the iterator variable is bound
       */
@@ -579,9 +579,9 @@ public class TermFactory {
 
     /**
      * creates a quantifier term 
-     * @param op Operator representing the
+     * @param quant Operator representing the
      * Quantifier (all, exist) of this term 
-     * @param varsBoundHere a QuantifiableVariable representing the only bound
+     * @param var a QuantifiableVariable representing the only bound
      * variable of this quantifier.
      */
     public Term createQuantifierTerm(Quantifier quant,
@@ -594,7 +594,7 @@ public class TermFactory {
 
     /**
      * creates a quantifier term 
-     * @param op Operator representing the
+     * @param quant Operator representing the
      * Quantifier (all, exist) of this term 
      * @param varsBoundHere an
      * array of QuantifiableVariable containing all variables bound by the
@@ -690,33 +690,7 @@ public class TermFactory {
 	}       	
     }
 
-    public Term createTerm(Operator op, Term[] subTerms, 
-			   ArrayOfQuantifiableVariable vars, 
-			   JavaBlock javaBlock) {
-	if (op==null) {
-	    throw new IllegalArgumentException("null-Operator at TermFactory");
-	} else if (op instanceof Quantifier) {
-	    return createQuantifierTerm((Quantifier)op, vars, subTerms[0]);
-	} else if ( op instanceof QuanUpdateOperator ) {
-	    final ArrayOfQuantifiableVariable[] bv =
-	        new ArrayOfQuantifiableVariable [subTerms.length];
-            final QuanUpdateOperator updOp = (QuanUpdateOperator)op;
-            Arrays.fill ( bv, new ArrayOfQuantifiableVariable () );
-            bv[0] = vars;
-            return createQuanUpdateTerm ( updOp, subTerms, bv );
-	} else if (op instanceof IfExThenElse) {
-	    return createIfExThenElseTerm ( vars,
-                                            subTerms[0],
-                                            subTerms[1],
-                                            subTerms[2] );
-	} else if (op instanceof SubstOp) {
-	    return createSubstitutionTerm((SubstOp)op, 
-					  vars.getQuantifiableVariable(0),
-					  subTerms);
-	} else {
-	    return createTermWithNoBoundVariables(op, subTerms, javaBlock);
-	}
-    }
+  
 
 
    public Term createTerm(Operator op, Term[] subTerms, 
@@ -758,37 +732,6 @@ public class TermFactory {
     // CHANGE these two methods!  vars should be something like an 
     // array of arrays! 
     //
-
-
-    /**
-     * creates a term using the other methods of this class depending on the
-     * given operator. If the kind of term is known before (without using
-     * if-else cascades on the kind of operator) the other methods in this
-     * factory should be preferred. Depending on the needed parameters for
-     * the terms that should be created some of the parameters of this method
-     * might be ignored.
-     * @param op the top level operator for the new term.
-     * @param subTerms the subterms for the new term. The first n elements
-     * are taken if op is a Junctor or TermSymbol and n is the arity
-     * of op. Only the first entry is taken if op is a Quantifier or
-     * a Diamond. The first (representing the replacing term
-     * for a variable) and the second (representing the term behind the
-     * substitution operator) entries are taken if op is a SubstOp.
-     * @param vars the variables that are bound to a subterm. Not considered
-     * if op is a Junctor, TermSymbol or Diamond. If op is a
-     * SubstOp only the first element is taken and the variable is bound to
-     * the second subterm. In all other cases all variables are taken and
-     * bound to the first subterm.
-     * @param javaBlock representing a java code block. Only taken if op is a
-     * Diamond.
-     * @return the created Term
-     */
-    public Term createTerm(Operator op, Term[] subTerms, 
-			   QuantifiableVariable[] vars, 
-			   JavaBlock javaBlock) {
-	return createTerm(op, subTerms, new ArrayOfQuantifiableVariable(vars),
-			  javaBlock);
-    }
 
     /**
      * creates an update term like
@@ -946,7 +889,7 @@ public class TermFactory {
      * @param v the variable
      */
     public Term createVariableTerm(LogicVariable v) {
-        Term varTerm = (Term)cache.get(v);
+        Term varTerm = cache.get(v);
         if (varTerm == null) {
             varTerm = OpTerm.createConstantOpTerm(v).checked();
             cache.put(v, varTerm);
@@ -960,7 +903,7 @@ public class TermFactory {
      * @return variable <code>v</code> as term 
      */
     public Term createVariableTerm(ProgramVariable v) {
-        Term varTerm = (Term)cache.get(v);
+        Term varTerm = cache.get(v);
         if (varTerm == null) {
             varTerm = OpTerm.createConstantOpTerm(v).checked();
             cache.put(v, varTerm);
@@ -974,7 +917,7 @@ public class TermFactory {
      * @return the term <code>v</code>
      */
     public Term createVariableTerm(SchemaVariable v) {
-        Term varTerm = (Term)cache.get(v);
+        Term varTerm = cache.get(v);
         if (varTerm == null) {
             varTerm = OpTerm.createConstantOpTerm(v).checked();
             cache.put(v, varTerm);
@@ -986,8 +929,8 @@ public class TermFactory {
     /**
      * creates an anonymous update applied to the given target term 
      * @param op the AnonymousUpdate operator 
-     * @param subs the array of Term containing the 
-     * @return
+     * @param sub the Term the anonymous update is applied to 
+     * @return the created term
      */
     public Term createAnonymousUpdateTerm(AnonymousUpdate op, 
             Term sub) {       
@@ -998,7 +941,7 @@ public class TermFactory {
      * creates an anonymous update applied to the given target term 
      * @param name 
      * @param target
-     * @return
+     * @return the created term
      */
     public Term createAnonymousUpdateTerm(Name name, Term target) {       
         return createAnonymousUpdateTerm

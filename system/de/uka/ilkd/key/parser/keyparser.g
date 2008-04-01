@@ -80,7 +80,7 @@ options {
     private final static int LOCATION_MODIFIER = 1;
     private final static int HEAP_DEPENDENT = 2;
 
-    static HashMap prooflabel2tag = new HashMap(15);
+    static HashMap<String, Character> prooflabel2tag = new HashMap<String, Character>(15);
     static {
       prooflabel2tag.put("branch", new Character('b'));
       prooflabel2tag.put("rule", new Character('r'));
@@ -100,7 +100,7 @@ options {
 
     private NamespaceSet nss;
     private Choice defaultChoice = null;
-    private HashMap category2Default = new HashMap();
+    private HashMap<String, String> category2Default = new HashMap<String, String>();
     private boolean onlyWith=false;
     private SetOfChoice activatedChoices = SetAsListOfChoice.EMPTY_SET;
     private SetOfChoice selectedChoices = SetAsListOfChoice.EMPTY_SET;
@@ -422,7 +422,7 @@ options {
         return contracts;
     }
     
-    public HashMap getCategory2Default(){
+    public HashMap<String, String> getCategory2Default(){
         return category2Default;
     }
 
@@ -609,10 +609,6 @@ options {
     /** parses a problem but without reading the declarations of
      * sorts, functions and predicates. These have to be given
      * explicitly.
-     * @param functions() the Namespace with the function and predicate
-     * symbols to be used
-     * @param sorts() the Namespace with the sorts to be used
-     * @param heuristics() the Namespace with the heuristics to be used
      * the heuristics of the current problem file will be added 
      */ 
     public Term parseProblem() 
@@ -1026,7 +1022,7 @@ options {
         } catch (de.uka.ilkd.key.java.PosConvertException e) {
             lineOffset=e.getLine()-1;
             colOffset=e.getColumn()+1;
-            throw new JavaParserException(e.getMessage(), t, 
+            throw new JavaParserException(e, t, 
                 getFilename(), lineOffset, colOffset);
         } catch (de.uka.ilkd.key.java.ConvertException e) { 
             if (e.parseException()!=null
@@ -1036,8 +1032,7 @@ options {
                 colOffset=e.parseException().currentToken.next.beginColumn;
                 e.parseException().currentToken.next.beginLine=getLine()-1;
                 e.parseException().currentToken.next.beginColumn=getColumn();
-                throw new JavaParserException(e.parseException().getMessage(), t, 
-                    getFilename(), -1, -1);  // row/columns already in text
+                throw new JavaParserException(e, t, getFilename(), -1, -1);  // row/columns already in text
             }       
             if (e.proofJavaException()!=null
             &&  e.proofJavaException().currentToken != null
@@ -1046,11 +1041,10 @@ options {
                 colOffset=e.proofJavaException().currentToken.next.beginColumn;
                 e.proofJavaException().currentToken.next.beginLine=getLine();
                 e.proofJavaException().currentToken.next.beginColumn =getColumn();
-                 throw  new JavaParserException(e.proofJavaException().
-                    getMessage(), t, getFilename(), lineOffset, colOffset); 
+                 throw  new JavaParserException(e, t, getFilename(), lineOffset, colOffset); 
                             
             }   
-            throw new JavaParserException(e.getMessage(), t, getFilename());
+            throw new JavaParserException(e, t, getFilename());
         } 
         return sjb;
     }
@@ -1081,6 +1075,7 @@ options {
     /** looks up a function, (program) variable or static query of the 
      * given name varfunc_id and the argument terms args in the namespaces 
      * and java info. 
+     * @param varfunc_name the String with the symbols name
      * @param args is null iff no argument list is given, for instance `f', 
      * and is an array of size zero, if an empty argument list was given,
      * for instance `f()'.
@@ -1330,10 +1325,6 @@ options {
     /** parses a problem but without reading the declarations of
      * sorts, functions and predicates. These have to be given
      * explicitly.
-     * @param functions() the Namespace with the function and predicate
-     * symbols to be used
-     * @param sorts() the Namespace with the sorts to be used
-     * @param ruleSets() the Namespace with the rule sets to be used
      * the rule sets of the current problem file will be added 
      */ 
     public Term parseTacletsAndProblem() 
@@ -3854,18 +3845,21 @@ varexp[TacletBuilder b]
     | varcond_free[b] | varcond_literal[b]
     | varcond_hassort[b] | varcond_query[b]
     | varcond_non_implicit[b] | varcond_non_implicit_query[b]
+    | varcond_enum_const[b]
     | varcond_inReachableState[b] 
+    | varcond_isupdated[b]    
   ) 
   | 
   ( (NOT {negated = true;} )? 
       ( varcond_reference[b, negated] 
+      | varcond_enumtype[b, negated]
       | varcond_staticmethod[b,negated]  
       | varcond_referencearray[b, negated]
+      | varcond_array[b, negated]
       | varcond_abstractOrInterface[b, negated]
       | varcond_static[b,negated] 
       | varcond_typecheck[b, negated]
       | varcond_localvariable[b, negated]
-	  | varcond_isupdated[b, negated]
       | varcond_freeLabelIn[b,negated] )
   )
 ;
@@ -4007,6 +4001,18 @@ varcond_hassort [TacletBuilder b]
    }
 ;
 
+varcond_enumtype [TacletBuilder b, boolean negated]
+{
+  TypeResolver tr = null;
+}
+:
+   ISENUMTYPE LPAREN tr = type_resolver RPAREN
+      {
+         b.addVariableCondition(new EnumTypeCondition(tr, negated));
+      }
+;
+ 
+
 varcond_reference [TacletBuilder b, boolean isPrimitive]
 {
   ParsableVariable x = null;
@@ -4108,6 +4114,18 @@ varcond_referencearray [TacletBuilder b, boolean primitiveElementType]
    }
 ;
 
+varcond_array [TacletBuilder b, boolean negated]
+{
+  ParsableVariable x = null;
+}
+:
+   ISARRAY LPAREN x=varId RPAREN {
+     b.addVariableCondition(new ArrayTypeCondition(
+       (SchemaVariable)x, negated));
+   }
+;
+
+
 varcond_abstractOrInterface [TacletBuilder b, boolean negated]
 {
   TypeResolver tr = null;
@@ -4115,6 +4133,17 @@ varcond_abstractOrInterface [TacletBuilder b, boolean negated]
 :
    IS_ABSTRACT_OR_INTERFACE LPAREN tr=type_resolver RPAREN {
      b.addVariableCondition(new AbstractOrInterfaceType(tr, negated));
+   }
+;
+
+varcond_enum_const [TacletBuilder b]
+{
+  ParsableVariable x = null;
+}
+:
+   ENUM_CONST LPAREN x=varId RPAREN {
+      b.addVariableCondition(new EnumConstantCondition(
+	(SchemaVariable) x));     
    }
 ;
 
@@ -4140,14 +4169,14 @@ varcond_localvariable [TacletBuilder b, boolean negated]
         } 
 ;
 
-varcond_isupdated [TacletBuilder b, boolean negated]
+varcond_isupdated [TacletBuilder b]
 {
   ParsableVariable x = null;
 }
 :
    ISUPDATED 
 	LPAREN x=varId RPAREN {
-     	   b.addVariableCondition(new IsUpdatedVariableCondition((SchemaVariable) x, negated));
+     	   b.addVariableCondition(new IsUpdatedVariableCondition((SchemaVariable) x));
         } 
 ;
 
@@ -4537,7 +4566,7 @@ expreid returns [ char eid = '0' ]
 { String id = null; } 
 :
    id = simple_ident {
-      Character c = (Character)prooflabel2tag.get(id);
+      Character c = prooflabel2tag.get(id);
       if(c != null)
          eid = c.charValue();
    }

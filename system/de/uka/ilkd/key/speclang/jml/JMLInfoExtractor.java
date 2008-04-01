@@ -160,7 +160,7 @@ class JMLInfoExtractor {
     /**
      * Returns true, if the given method is specified "pure".
      */
-    public static  boolean isPure(ProgramMethod pm) {
+    public static boolean isPure(ProgramMethod pm) {
         ListOfComment coms = SLListOfComment.EMPTY_LIST;
         MethodDeclaration method = pm.getMethodDeclaration();
         
@@ -180,6 +180,9 @@ class JMLInfoExtractor {
         if(methodComments.length > 0) {
             coms = coms.prepend(methodComments[methodComments.length - 1]);
         }
+        
+        // .... or to the method name
+        coms = coms.prepend(method.getProgramElementName().getComments());
         
         for (IteratorOfComment it = coms.iterator(); it.hasNext(); ) {
             if (checkFor("pure", it.next().getText()))

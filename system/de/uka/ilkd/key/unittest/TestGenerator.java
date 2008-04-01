@@ -682,16 +682,16 @@ public class TestGenerator{
      * each field.
      */
     public void exportCodeUnderTest(){
-	Set kjts = ji.getAllKeYJavaTypes();
-	Iterator it = kjts.iterator();
+	final Set<KeYJavaType> kjts = ji.getAllKeYJavaTypes();
+	final Iterator<KeYJavaType> it = kjts.iterator();
 	while(it.hasNext()){
-	    KeYJavaType kjt = (KeYJavaType) it.next();
+	    final KeYJavaType kjt = it.next();
 	    if((kjt.getJavaType() instanceof ClassDeclaration ||
 		kjt.getJavaType() instanceof InterfaceDeclaration) &&
 	       ((TypeDeclaration) kjt.getJavaType()).getPositionInfo().
 	       getFileName() != null &&
-	       ((TypeDeclaration) kjt.getJavaType()).getPositionInfo().
-	       getFileName().indexOf("resources")==-1){
+               ((TypeDeclaration) kjt.getJavaType()).getPositionInfo().
+               getFileName().indexOf(serv.getProof().getJavaModel().getModelDir())!=-1){
 
 		StringWriter sw = new StringWriter();
 		PrettyPrinter pp = new PrettyPrinter(sw, false, true);
@@ -1119,7 +1119,7 @@ public class TestGenerator{
     }
 
     /**
-     * Returns the program variables occuring in t that are no atributes.
+     * Returns the location variables occuring in t that are no attributes.
      */
     private ExtList getArguments(Term t){
 	SetOfProgramVariable programVars = 

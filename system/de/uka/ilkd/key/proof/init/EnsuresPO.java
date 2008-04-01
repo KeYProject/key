@@ -13,7 +13,6 @@ package de.uka.ilkd.key.proof.init;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 import de.uka.ilkd.key.java.ArrayOfExpression;
 import de.uka.ilkd.key.java.Statement;
@@ -88,7 +87,7 @@ public abstract class EnsuresPO extends AbstractPO {
                                        ListOfProgramVariable paramVars, 
                                        ProgramVariable resultVar,
                                        ProgramVariable exceptionVar,
-                                       Map atPreFunctions) 
+                                       Map<Operator, Function/*atPre*/> atPreFunctions) 
                                                     throws ProofInputException;
     
     
@@ -96,7 +95,7 @@ public abstract class EnsuresPO extends AbstractPO {
                                         ListOfProgramVariable paramVars, 
                                         ProgramVariable resultVar,
                                         ProgramVariable exceptionVar,
-                                        Map atPreFunctions)
+                                        Map<Operator, Function/*atPre*/> atPreFunctions)
                                                     throws ProofInputException;
     
 
@@ -171,16 +170,15 @@ public abstract class EnsuresPO extends AbstractPO {
         Term result = TB.func(javaInfo.getInReachableState());
         
         //assumed invariants
-        IteratorOfClassInvariant it = assumedInvs.iterator();
+        final IteratorOfClassInvariant it = assumedInvs.iterator();
         while(it.hasNext()) {
             result = TB.and(result, translateInv(it.next()));
         }
         
         //implicit invariants as taclets
-        Set allKJTs = javaInfo.getAllKeYJavaTypes();
-        Iterator it2 = allKJTs.iterator();
+        final Iterator<KeYJavaType> it2 = javaInfo.getAllKeYJavaTypes().iterator();
         while(it2.hasNext()) {
-            KeYJavaType kjt = (KeYJavaType) it2.next();
+            KeYJavaType kjt = it2.next();
             if(kjt.getJavaType() instanceof ClassType) {
                 buildInvariantTacletsForClass(kjt);
             }
@@ -357,7 +355,8 @@ public abstract class EnsuresPO extends AbstractPO {
         }
         ProgramVariable resultVar = buildResultVar(programMethod);
         ProgramVariable exceptionVar = buildExcVar();
-        Map atPreFunctions = new LinkedHashMap();
+        Map<Operator, Function/*atPre*/> atPreFunctions = 
+            new LinkedHashMap<Operator, Function/*atPre*/>();
         
         //build general assumption
         Term gaTerm = buildGeneralAssumption(selfVar, paramVars);

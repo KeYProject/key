@@ -19,11 +19,16 @@ import recoder.convenience.Format;
 import recoder.convenience.Naming;
 import recoder.java.*;
 import recoder.java.declaration.InheritanceSpecification;
+import recoder.java.declaration.EnumConstantSpecification;
+import recoder.java.declaration.EnumDeclaration;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.java.declaration.VariableDeclaration;
 import recoder.java.declaration.VariableSpecification;
-import recoder.list.ImportList;
+import recoder.list.generic.ASTList;
 import recoder.service.AmbiguousReferenceException;
+import recoder.java.reference.UncollatedReferenceQualifier;
+import recoder.java.reference.VariableReference;
+import recoder.java.statement.Case;
 import recoder.service.DefaultCrossReferenceSourceInfo;
 import recoder.service.NameInfo;
 
@@ -92,98 +97,147 @@ public class KeYCrossReferenceSourceInfo
 
 
     public Variable getVariable(String name, ProgramElement context) {
-	updateModel();
-	// look for the next variable scope equals to or parent of context
-	ProgramElement pe = context;
-	while (pe != null && !(pe instanceof VariableScope) &&
-	       !((pe instanceof MethodCallStatement) && !(context instanceof ExecutionContext) &&
-		 !(context.equals(((MethodCallStatement) pe).getResultVariable())))
-		   ) {
-	    context = pe;
-	    pe = pe.getASTParent();
-	    
-	}
-	if (pe == null) {
-	    // a null scope can happen if we try to find a variable
-	    // speculatively (for URQ resolution)
-	    return null;	    
-	}
-	if(pe instanceof MethodCallStatement && !(context instanceof ExecutionContext) &&
-	    !(context.equals(((MethodCallStatement) pe).getResultVariable()))){
-	    pe = getTypeDeclaration((ClassType) getType(((MethodCallStatement) pe).
-							   getExecutionContext()
-							   .getTypeReference()));
-	}
-	VariableScope scope = (VariableScope)pe;
-	Variable result;
-	do {
-	    result = scope.getVariableInScope(name);
-	    if (result != null) {
-		// must double check this result - rare cases of confusion
-		// involving field references before a local variable of the
-		// same name has been specified
-		if (scope instanceof StatementBlock) {
-		    StatementContainer cont = (StatementBlock)scope;	    
-		    // we need the topmost var-scope including context,
-		    // or context itself if the found scope is the topmost one
-		    VariableDeclaration def = 
-			((VariableSpecification)result).getParent();
-		    for (int i = 0; true; i += 1) {
-			Statement s = cont.getStatementAt(i);
-			if (s == def) {
-			    // Debug.log(">>> Not ignored: " +
-			    // Format.toString("%c \"%s\" @%p", result)
-			    // + " for context " +
-			    // Format.toString("@%p", context));
+        updateModel();
+        // look for the next variable scope equals to or parent of context
+        ProgramElement pe = context;
+        
+        // Enum constants:
+        // 2 cases:
+        //   1) its an original enum constant (see DefaultSourceInfo) 
+        //   or
+        //   2) its an already transformed enum class constant
+        //
+        // In the KeY gui, however, the references will always be qualified 
+        // like in "EnumName.ConstantName"
+        
+        // 1)
+        if ((context instanceof VariableReference || context instanceof UncollatedReferenceQualifier)
+                && context.getASTParent() instanceof Case 
+                && getType(((Case)context.getASTParent()).getParent().getExpression()) instanceof EnumDeclaration) {
+            /* is it an enum constant? Possible iff:
+             * 1) parent is "case" and
+             * 2) switch-selector is an enum type (that way, the selector specifies the scope!)
+             */
+            EnumConstantSpecification ecs = (EnumConstantSpecification)((EnumDeclaration)getType(((Case)context.getASTParent()).getParent().getExpression())).getVariableInScope(name);
+            if (ecs != null) {
+                return ecs;
+            } else {
+                // must not resolve! qualifying enum constant in case-statements is forbidden! 
+                return null;
+            }
+        }
+        
+        // 2)
+        if ((context instanceof VariableReference || context instanceof UncollatedReferenceQualifier)
+                && context.getASTParent() instanceof Case 
+                && getType(((Case)context.getASTParent()).getParent().getExpression()) instanceof EnumClassDeclaration) {
+            /* is it an enum class constant (after transformation)? Possible iff:
+             * 1) parent is "case" and
+             * 2) switch-selector is an enum type (that way, the selector specifies the scope!)
+             */
+            EnumClassDeclaration ecd = ((EnumClassDeclaration)getType(((Case)context.getASTParent()).getParent().getExpression()));
+            VariableSpecification vs = ecd.getVariableInScope(name);            
+            if (vs != null) {
+                return vs;
+            } else {
+                // must not resolve! qualifying enum constant in case-statements is forbidden! 
+                return null;
+            }
+        }
+        
+        while (pe != null
+                && !(pe instanceof VariableScope)
+                && !((pe instanceof MethodCallStatement)
+                        && !(context instanceof ExecutionContext) && !(context
+                        .equals(((MethodCallStatement) pe).getResultVariable())))) {
+            context = pe;
+            pe = pe.getASTParent();
 
-			    // stop if definition comes first
-			    break;
-			}
-			if (s == context) {
-			    // tricky: reference before definition - must
-			    // ignore the definition :(
+        }
+        if (pe == null) {
+            // a null scope can happen if we try to find a variable
+            // speculatively (for URQ resolution)
+            return null;
+        }
+        if (pe instanceof MethodCallStatement
+                && !(context instanceof ExecutionContext)
+                && !(context.equals(((MethodCallStatement) pe)
+                        .getResultVariable()))) {
+            pe = getTypeDeclaration((ClassType) getType(((MethodCallStatement) pe)
+                    .getExecutionContext().getTypeReference()));
+        }
+        VariableScope scope = (VariableScope) pe;
+        Variable result;
+        do {
+            result = scope.getVariableInScope(name);
+            if (result != null) {
+                // must double check this result - rare cases of confusion
+                // involving field references before a local variable of the
+                // same name has been specified
+                if (scope instanceof StatementBlock) {
+                    StatementContainer cont = (StatementBlock) scope;
+                    // we need the topmost var-scope including context,
+                    // or context itself if the found scope is the topmost one
+                    VariableDeclaration def = ((VariableSpecification) result)
+                            .getParent();
+                    for (int i = 0; true; i += 1) {
+                        Statement s = cont.getStatementAt(i);
+                        if (s == def) {
+                            // Debug.log(">>> Not ignored: " +
+                            // Format.toString("%c \"%s\" @%p", result)
+                            // + " for context " +
+                            // Format.toString("@%p", context));
 
-			    // Debug.log(">>> Ignored: " +
-			    // Format.toString("%c \"%s\" @%p", result)
-			    // + " for context " +
-			    // Format.toString("@%p", context));
+                            // stop if definition comes first
+                            break;
+                        }
+                        if (s == context) {
+                            // tricky: reference before definition - must
+                            // ignore the definition :(
 
-			    result = null;
-			    break;
-			}
-		    }
-		}
-		if (result != null) {
-		    // leave _now_
-		    break;
-		}
-	    }
-	    if (scope instanceof TypeDeclaration) { 
-		result = getInheritedField(name, (TypeDeclaration)scope);
-		if (result != null) {
-		    break;
-		}
-		// might want to check for ambiguity of outer class fields!!!
-	    }
-	    pe = scope.getASTParent();
-	    while (pe != null && !(pe instanceof VariableScope) && 
-		   !((pe instanceof MethodCallStatement) && !(context instanceof ExecutionContext))) {
-		context = pe;  // proceed the context
-		pe = pe.getASTParent();
-	    }
-	    if(pe instanceof MethodCallStatement && !(context instanceof ExecutionContext) && 
-		!(context.equals(((MethodCallStatement) pe).getResultVariable()))){
-		pe = getTypeDeclaration((ClassType) getType(((MethodCallStatement) pe).
-							    getExecutionContext()
-							   .getTypeReference()));
-	    }
-	    scope = (VariableScope)pe;
-	} while (scope != null);
-	// we were at the compilation unit scope, leave for good now
-	if(result == null && names2vars!=null){
-	    return (recoder.abstraction.Variable) names2vars.get(name);
-	}
-	return result;
+                            // Debug.log(">>> Ignored: " +
+                            // Format.toString("%c \"%s\" @%p", result)
+                            // + " for context " +
+                            // Format.toString("@%p", context));
+
+                            result = null;
+                            break;
+                        }
+                    }
+                }
+                if (result != null) {
+                    // leave _now_
+                    break;
+                }
+            }
+            if (scope instanceof TypeDeclaration) {
+                result = getInheritedField(name, (TypeDeclaration) scope);
+                if (result != null) {
+                    break;
+                }
+                // might want to check for ambiguity of outer class fields!!!
+            }
+            pe = scope.getASTParent();
+            while (pe != null
+                    && !(pe instanceof VariableScope)
+                    && !((pe instanceof MethodCallStatement) && !(context instanceof ExecutionContext))) {
+                context = pe; // proceed the context
+                pe = pe.getASTParent();
+            }
+            if (pe instanceof MethodCallStatement
+                    && !(context instanceof ExecutionContext)
+                    && !(context.equals(((MethodCallStatement) pe)
+                            .getResultVariable()))) {
+                pe = getTypeDeclaration((ClassType) getType(((MethodCallStatement) pe)
+                        .getExecutionContext().getTypeReference()));
+            }
+            scope = (VariableScope) pe;
+        } while (scope != null);
+        // we were at the compilation unit scope, leave for good now
+        if (result == null && names2vars != null) {
+            return (recoder.abstraction.Variable) names2vars.get(name);
+        }
+        return result;
     }
 
     /**
@@ -305,17 +359,17 @@ public class KeYCrossReferenceSourceInfo
         // now the outer scope is null, so we have arrived at the top
         CompilationUnit cu = (CompilationUnit) scope;
 
-        ImportList il = cu.getImports();
+        ASTList<Import> il = cu.getImports();
         if (il != null) {
             // first check type imports
-            result = getClassTypeFromTypeImports(name, il);
+            result = getFromTypeImports(name, il);
         }
         if (result == null) {
             // then check same package
-            result = getClassTypeFromUnitPackage(name, cu);
+            result = getFromUnitPackage(name, cu);
             if (result == null && il != null) {
                 // then check package imports
-                result = getClassTypeFromPackageImports(name, il);
+                result = getFromPackageImports(name, il, cu.getTypeDeclarationAt(0 /* doesn't matter which one to check, since this is important for static imports only */));
             }
         }
         if (result == null) {

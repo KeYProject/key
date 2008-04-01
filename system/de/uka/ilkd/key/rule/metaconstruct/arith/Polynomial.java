@@ -38,7 +38,8 @@ public class Polynomial {
         this.constantPart = constantPart;
     }
     
-    private static final LRUCache polynomialCache = new LRUCache ( 2000 );
+    private static final LRUCache<Term, Polynomial> polynomialCache = 
+        new LRUCache<Term, Polynomial> ( 2000 );
     private static final BigInteger MINUS_ONE = BigInteger.valueOf ( -1 );
 
     public final static Polynomial ZERO =
@@ -47,7 +48,7 @@ public class Polynomial {
         new Polynomial ( SLListOfMonomial.EMPTY_LIST, BigInteger.ONE );    
 
     public static Polynomial create(Term polyTerm, Services services) {
-        Polynomial res = (Polynomial)polynomialCache.get ( polyTerm );
+        Polynomial res = polynomialCache.get ( polyTerm );
         if ( res == null ) {
             res = createHelp ( polyTerm, services );
             polynomialCache.put ( polyTerm, res );

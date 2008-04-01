@@ -223,7 +223,7 @@ public class GoalList extends JList {
 	/** the proof the model belongs to */	
 	private Proof proof;
 	/** */
-	private List goals;
+	private List<Goal> goals;
 	/** is used to indicate if the model has to be updated */
 	private boolean attentive;
 	/** listens to the proof */
@@ -232,7 +232,7 @@ public class GoalList extends JList {
 
 
     	GoalListModel() {
-	    goals = new ArrayList(10);
+	    goals = new ArrayList<Goal>(10);
 	}
 
 	/** 
@@ -394,7 +394,7 @@ public class GoalList extends JList {
          * monotonic) mapping of the row indexes of this model to the rows of
          * the delegate model
          */
-        private final ArrayList entries = new ArrayList ( 10 );
+        private final ArrayList<Integer> entries = new ArrayList<Integer> ( 10 );
         private final DelegateListener delegateListener = new DelegateListener ();
         
         public SelectingGoalListModel (GoalListModel delegate) {
@@ -411,7 +411,7 @@ public class GoalList extends JList {
         }
         
         private int getDelegateIndex (int i) {
-            return ( (Integer)entries.get ( i ) ).intValue ();
+            return ( entries.get ( i ) ).intValue ();
         }
 
         /**
@@ -601,10 +601,10 @@ public class GoalList extends JList {
     private final static int MAX_DISPLAYED_SEQUENT_LENGTH = 100;
     
     // clear this cache whenever some display settings are changed?
-    private final WeakHashMap seqToString = new WeakHashMap ();
+    private final WeakHashMap<Sequent, String> seqToString = new WeakHashMap<Sequent, String> ();
     
     private String seqToString (Sequent seq) {
-        String res = (String)seqToString.get ( seq );
+        String res = seqToString.get ( seq );
         if ( res == null ) {
             LogicPrinter sp = new LogicPrinter ( new ProgramPrinter ( null ),
                                                  mediator ().getNotationInfo (),

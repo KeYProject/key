@@ -38,12 +38,12 @@ public class CollisionDeletingSubstitutionTermApplier extends Visitor {
      * these subterms should build a new term instead of using the old one,
      * because one of its subterms has been built, too.
      */
-    private Stack subStack; //of Term (and Boolean)
+    private Stack<Object> subStack; //of Term (and Boolean)
     private TermFactory tf=TermFactory.DEFAULT;
     private Boolean newMarker = Boolean.TRUE;
 
     public CollisionDeletingSubstitutionTermApplier() {
-	subStack = new Stack(); // of Term	
+	subStack = new Stack<Object>(); // of Term	
     }
 
     private Term[] neededSubs(int n) {
@@ -67,11 +67,6 @@ public class CollisionDeletingSubstitutionTermApplier extends Visitor {
 	// Sort equality has to be ensured before calling this method
 	MapFromLogicVariableToTerm substToApply;
 	Term resultTerm;
-
-	// vars bound directly by operator of visited term ...
-	ArrayOfQuantifiableVariable vars 
-	    = (visited.varsBoundHere(0).size() == 0)
-	    ? visited.varsBoundHere(1) : visited.varsBoundHere(0);
 
 	if (visited.op()==Op.SUBST) {
 	    // get completely processed childs ...
@@ -100,11 +95,16 @@ public class CollisionDeletingSubstitutionTermApplier extends Visitor {
 	    }  
 	} else {	 
 	    Term[] neededsubs=neededSubs(visited.arity());
+	    final ArrayOfQuantifiableVariable[] boundVars = 
+	        new ArrayOfQuantifiableVariable[neededsubs.length];
+	    for (int i = 0; i<visited.arity(); i++) {
+	        boundVars[i] = visited.varsBoundHere(i);
+	    }
 	    if (!subStack.empty() && subStack.peek()==newMarker) {
-		subStack.pop(); // delete new marker ...
+		subStack.pop(); // delete new marker ...		
 		subStack.push(tf.createTerm(visited.op(), 
 					    neededsubs,
-					    vars,
+					    boundVars,
 					    visited.javaBlock()));
 		subStack.push(newMarker); // add new marker ...
 		
@@ -121,7 +121,7 @@ public class CollisionDeletingSubstitutionTermApplier extends Visitor {
      */
     
     public void reset(){
-	subStack = new Stack(); // of Term
+	subStack = new Stack<Object>(); // of Term
     }
     
     /**

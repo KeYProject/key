@@ -11,8 +11,6 @@
 
 package de.uka.ilkd.key.java.declaration;
 
-import java.util.LinkedList;
-
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.Method;
 import de.uka.ilkd.key.java.reference.TypeReference;
@@ -390,6 +388,16 @@ public class MethodDeclaration
 
     public boolean isModel() {
         return super.isModel();
+    }
+    
+    /**
+     * test whether the declaration is a method with a variable number of arguments (i.e. the ellipsis ...)
+     * @return true iff so
+     */
+    public boolean isVarArgMethod() {
+        if (parameters == null || parameters.size() == 0)
+            return false;
+        return parameters.getParameterDeclaration(parameters.size() - 1).isVarArg();
     }
 
     /**

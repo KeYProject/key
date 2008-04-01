@@ -17,25 +17,21 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.BasicLocationDescriptor;
 import de.uka.ilkd.key.logic.EverythingLocationDescriptor;
-import de.uka.ilkd.key.logic.IteratorOfLocationDescriptor;
-import de.uka.ilkd.key.logic.IteratorOfTerm;
 import de.uka.ilkd.key.logic.LocationDescriptor;
 import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
 import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramConstant;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.soundness.TermProgramVariableCollector;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
 /** 
  * Walks through a java AST in depth-left-fist-order. 
- * This walker is used collect all ProgramVariables in a program.
+ * This walker is used collect all LocationVariables and optional function locations.
  */
 public class ProgramVariableCollector extends JavaASTVisitor {
 
-    private final HashSet result = new HashSet();
+    private final HashSet<Location> result = new HashSet<Location>();
     private final boolean collectFunctionLocations;
 
     /**
@@ -62,7 +58,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
 	walk(root());	
     }
 
-    public HashSet result() { 
+    public HashSet<Location> result() { 
 	return result;
     }    
 
@@ -73,38 +69,32 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     protected void doDefaultAction(SourceElement x) {
     }
 
-    public void performActionOnProgramVariable(ProgramVariable pv) {
-	result.add(pv);
-    }
-         
     public void performActionOnLocationVariable(LocationVariable x) {
-        performActionOnProgramVariable(x);        
-    }
-
-    public void performActionOnProgramConstant(ProgramConstant x) {       
-        performActionOnProgramVariable(x);
+        result.add(x);
     }
     
     public void performActionOnLoopInvariant(LoopInvariant x) {
         TermProgramVariableCollector tpvc = 
             new TermProgramVariableCollector(services, collectFunctionLocations);
         Term selfTerm = x.getInternalSelfTerm();
-        Map atPreFunctions = x.getInternalAtPreFunctions();
+        Map<Operator, Function> atPreFunctions = x.getInternalAtPreFunctions();
         
         //invariant
-        x.getInvariant(selfTerm, atPreFunctions, services).execPostOrder(tpvc);
+        Term inv = x.getInvariant(selfTerm, atPreFunctions, services);
+        if(inv != null) {
+            inv.execPostOrder(tpvc);
+        }
         
         //predicates
         SetOfTerm preds = x.getPredicates(selfTerm, atPreFunctions, services);
-        for(IteratorOfTerm it = preds.iterator(); it.hasNext(); ) {
-            it.next().execPostOrder(tpvc);
+        for(Term pred : preds) {
+            pred.execPostOrder(tpvc);
         }
         
         //modifies
         SetOfLocationDescriptor mod 
             = x.getModifies(selfTerm, atPreFunctions, services);
-        for(IteratorOfLocationDescriptor it = mod.iterator(); it.hasNext(); ) {
-            LocationDescriptor loc = it.next();
+        for(LocationDescriptor loc : mod) {
             if(loc instanceof BasicLocationDescriptor) {
                 BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
                 bloc.getFormula().execPostOrder(tpvc);

@@ -11,9 +11,6 @@
 
 package de.uka.ilkd.key.java.declaration;
 
-import java.util.LinkedList;
-
-import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;

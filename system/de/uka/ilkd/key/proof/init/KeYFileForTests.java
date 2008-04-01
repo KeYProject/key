@@ -29,7 +29,7 @@ public class KeYFileForTests extends KeYFile {
      * and a file representing the physical source of the .key file.
      */
     public KeYFileForTests(String name, File file) {
-	super(name, file, null, false);
+	super(name, file, null);
     }
 
     /** reads the whole .key file and modifies the initial configuration

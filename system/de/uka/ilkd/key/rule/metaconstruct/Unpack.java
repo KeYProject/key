@@ -23,7 +23,7 @@ public class Unpack extends ProgramMetaConstruct {
     
     
      /** creates a typeof ProgramMetaConstruct 
-     * @param expr the instance of expression contained by 
+     * @param loop the instance of expression contained by 
      * the meta construct 
      */
     public Unpack(For loop) {

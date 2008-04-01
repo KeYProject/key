@@ -17,6 +17,8 @@ import java.util.Iterator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.proof.IteratorOfGoal;
+import de.uka.ilkd.key.proof.ListOfGoal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.mgt.*;
@@ -36,10 +38,13 @@ implements ProofOblInput{
     private ProofAggregate proof;
     
     private NoPosTacletApp[] app;
+
+    private final ListOfGoal goals;
     
     public TacletSoundnessPO (String name, File file, 
-            ProgressMonitor monitor) {
-        super ( name, file, monitor, true );
+            ProgressMonitor monitor, ListOfGoal goals) {
+        super ( name, file, monitor );
+        this.goals = goals;
     }
     
     /** returns the proof obligation term as result of the proof obligation
@@ -104,13 +109,12 @@ implements ProofOblInput{
         for (int i=0; i<app.length; i++) {
             final POBuilder pob = new POBuilder ( app[i], initConfig.getServices() );
             pob.build ();
-            Main.getInstance()
-                .mediator()
-                .getSelectedGoal()
-                .addTaclet(app[i].taclet(), 
-                           app[i].instantiations(), 
-                           app[i].constraint(),
-                           false);
+            for(IteratorOfGoal it2 = goals.iterator(); it2.hasNext(); ) {
+                it2.next().addTaclet(app[i].taclet(), 
+                                     app[i].instantiations(), 
+                                     app[i].constraint(),
+                                     false);
+            }
             
             updateNamespaces ( pob );
             String name = app.length==1 ? name() : app[i].taclet().name().toString();

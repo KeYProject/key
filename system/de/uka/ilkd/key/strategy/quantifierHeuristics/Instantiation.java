@@ -10,16 +10,10 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.IteratorOfConstrainedFormula;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SetAsListOfTerm;
-import de.uka.ilkd.key.logic.SetOfTerm;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
 import de.uka.ilkd.key.logic.op.IteratorOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.MapAsListFromQuantifiableVariableToTerm;
@@ -46,7 +40,7 @@ class Instantiation {
 	private SetOfTerm assumedLiterals = SetAsListOfTerm.EMPTY_SET;
 
 	/** HashMap from instance(<code>Term</code>) to cost <code>Long</code> */
-	private final Map instancesWithCosts = new HashMap ();
+	private final Map<Term,Long> instancesWithCosts = new HashMap<Term,Long> ();
 
 	/**the <code>TriggersSet</code> of this <code>allTerm</code>*/
 	private final TriggersSet triggersSet;
@@ -81,9 +75,9 @@ class Instantiation {
     
     private static SetOfTerm sequentToTerms(Sequent seq) {
         SetOfTerm res = SetAsListOfTerm.EMPTY_SET;
-        IteratorOfConstrainedFormula it = seq.iterator ();
-        while ( it.hasNext () )
-            res = res.add ( it.next ().formula () );
+        for (final ConstrainedFormula cf : seq) {
+            res = res.add ( cf.formula () );
+        }
         return res;
     }
 
@@ -98,15 +92,12 @@ class Instantiation {
      *            <code>instancesCostCache</code>
      */
     private void addInstances(SetOfTerm terms, Services services) {
-        final IteratorOfTrigger trs = triggersSet.getAllTriggers ().iterator ();
-        while ( trs.hasNext () ) {
-            final SetOfSubstitution subs =
-                trs.next ().getSubstitutionsFromTerms ( terms, services );
-            final IteratorOfSubstitution it = subs.iterator ();
-            while ( it.hasNext () )
-                addInstance ( it.next (), services );
-        }
-        
+        for (final Trigger t : triggersSet.getAllTriggers ()) {
+            for (final Substitution sub : 
+                t.getSubstitutionsFromTerms ( terms, services )) {
+                addInstance ( sub, services );
+            }
+        }        
 //        if ( instancesWithCosts.isEmpty () )
             // ensure that there is always at least one instantiation
 //            addArbitraryInstance ();
@@ -150,7 +141,7 @@ class Instantiation {
      */
     private void addInstance(Substitution sub, long cost) {
         final Term inst = sub.getSubstitutedTerm ( firstVar );
-        final Long oldCost = (Long)instancesWithCosts.get ( inst );
+        final Long oldCost = instancesWithCosts.get ( inst );
         if ( oldCost == null || oldCost.longValue () >= cost )
             instancesWithCosts.put ( inst, new Long ( cost ) );
     }
@@ -162,25 +153,20 @@ class Instantiation {
      */
     private SetOfTerm initAssertLiterals(Sequent seq) {
         SetOfTerm assertLits = SetAsListOfTerm.EMPTY_SET;
-        final IteratorOfConstrainedFormula anteIt = seq.antecedent ().iterator ();
-        while ( anteIt.hasNext () ) {
-            final Term atom = anteIt.next ().formula ();
+        for (final ConstrainedFormula cf : seq.antecedent()) {
+            final Term atom = cf.formula ();
             final Operator op = atom.op ();
             if ( !( op == Op.ALL || op == Op.EX ) )
                 assertLits = assertLits.add ( atom );
         }
-        final IteratorOfConstrainedFormula succIt = seq.succedent ().iterator ();
-        while ( succIt.hasNext () ) {
-            final Term atom = succIt.next ().formula ();
+        for (final ConstrainedFormula cf : seq.succedent()) {
+            final Term atom = cf.formula ();
             final Operator op = atom.op ();
             if ( !( op == Op.ALL || op == Op.EX ) )
                 assertLits = assertLits.add ( tb.not ( atom ) );
         }
         return assertLits;
     }
-    
-    
-    
     
     /**
      * Try to find the cost of an instance(inst) according its quantified 
@@ -191,9 +177,9 @@ class Instantiation {
     }
 
     private RuleAppCost computeCostHelp(Term inst) {
-        Long cost = (Long)instancesWithCosts.get ( inst );
+        Long cost = instancesWithCosts.get ( inst );
         if ( cost == null && ( inst.op () instanceof CastFunctionSymbol ) )
-            cost = (Long)instancesWithCosts.get ( inst.sub ( 0 ) );
+            cost = instancesWithCosts.get ( inst.sub ( 0 ) );
 
         if ( cost == null ) {
 //            if (triggersSet)
@@ -204,12 +190,12 @@ class Instantiation {
         return LongRuleAppCost.create ( cost.longValue () );
     }
 
-	/**get all instances from instancesCostCache subsCache*/
-	SetOfTerm getSubstitution() {
+    /**get all instances from instancesCostCache subsCache*/
+    SetOfTerm getSubstitution() {
         SetOfTerm res = SetAsListOfTerm.EMPTY_SET;
-        final Iterator it = instancesWithCosts.keySet ().iterator ();
-        while ( it.hasNext () )
-            res = res.add ( (Term)it.next () );
+        for (final Term inst : instancesWithCosts.keySet ()) {
+            res = res.add ( inst );
+        }
         return res;
     }
 

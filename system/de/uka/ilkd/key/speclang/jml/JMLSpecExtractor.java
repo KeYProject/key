@@ -302,17 +302,21 @@ public class JMLSpecExtractor implements SpecExtractor {
             return result;
         }        
         
-        //determine purity 
+        //determine purity, add purity contract
         final boolean isPure = JMLInfoExtractor.isPure(pm);
-
-        //get comments
-        Comment[] comments = pm.getComments();
-        if(comments.length == 0 && !isPure) {
-            return result;
+        if(isPure) {
+            TextualJMLSpecCase sc 
+            	= new TextualJMLSpecCase(SLListOfString.EMPTY_LIST, 
+                                     	 Behavior.NONE);
+            sc.addAssignable(new PositionedString("\\nothing"));
+            SetOfOperationContract contracts
+            	= jsf.createJMLOperationContractsAndInherit(pm, sc);
+            result = result.union(contracts);
         }
-        
+
+        //get textual JML constructs
+        Comment[] comments = pm.getComments();        
         ListOfTextualJMLConstruct constructs;
-        
         if (comments.length != 0) {
             //concatenate comments, determine position
             String concatenatedComment = concatenate(comments);
@@ -322,21 +326,9 @@ public class JMLSpecExtractor implements SpecExtractor {
                 = new KeYJMLPreParser(concatenatedComment, fileName, pos);
             constructs = preParser.parseClasslevelComment();
         } else {
-            // method is declared pure and has no other comments
-            assert isPure;
             constructs = SLListOfTextualJMLConstruct.EMPTY_LIST;
         }
         
-        assert constructs != null;
-        
-        //if pure, add default contract
-        if(isPure) {
-            TextualJMLSpecCase sc 
-                = new TextualJMLSpecCase(SLListOfString.EMPTY_LIST, 
-                                         Behavior.NONE);
-            constructs = constructs.append(sc);
-        }
-
         //create JML contracts out of constructs, add them to result
         TextualJMLConstruct[] constructsArray = constructs.toArray();
         
@@ -347,13 +339,9 @@ public class JMLSpecExtractor implements SpecExtractor {
         } else {
             startPos = constructsArray.length - 1;
         }
-        int i;
-        if (isPure) {
-            i = constructsArray.length - 1;
-        } else {
-            i = startPos;
-        }
-        while (i >= 0 && constructsArray[i] instanceof TextualJMLSpecCase) {
+        for(int i = startPos; 
+            i >= 0 && constructsArray[i] instanceof TextualJMLSpecCase;
+            i--) {
             TextualJMLSpecCase specCase 
                 = (TextualJMLSpecCase) constructsArray[i];
             
@@ -371,10 +359,8 @@ public class JMLSpecExtractor implements SpecExtractor {
                 Type t = pm.getParameterDeclarationAt(j).
                             getTypeReference().
                             getKeYJavaType();
-                boolean isReferenceType = services.getTypeConverter().
-                                                 isReferenceType(t);
                 // no additional precondition for primitive types!
-                if (isReferenceType
+                if (services.getTypeConverter().isReferenceType(t)
                         && !JMLInfoExtractor.parameterIsNullable(pm, j)) {
                     String param_name = pm.
                             getParameterDeclarationAt(j).
@@ -405,11 +391,6 @@ public class JMLSpecExtractor implements SpecExtractor {
             SetOfOperationContract contracts 
                 = jsf.createJMLOperationContractsAndInherit(pm, specCase);
             result = result.union(contracts);
-            if (i == startPos && isPure && pm.isModel()) {
-                i = getIndexOfMethodDecl(pm, constructsArray) - 1;
-            } else {
-                i--;
-            }
         }
         
         return result;          

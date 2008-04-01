@@ -187,10 +187,6 @@ public class Main extends JFrame implements IMain {
      * */ 
 
     public static boolean testMode = false;
-
-    /** if false then JML specifications are not parsed (useful for .key input) 
-     */
-    public static boolean enableSpecs = true;
     
     /** used to enable and initiate or to disable reuse */
     private ReuseAction reuseAction = new ReuseAction();
@@ -640,6 +636,15 @@ public class Main extends JFrame implements IMain {
      * *********************** UGLY INSPECTION CODE **********************
      */
     private void setupInternalInspection() {
+ /*MULBRICH       goalView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW ).put(
+                KeyStroke.getKeyStroke(KeyEvent.VK_U, ActionEvent.CTRL_MASK), 
+        "show_inspector");
+        goalView.getActionMap().put("show_inspector", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                new ObjectInspector("Term", sequentView.getMousePosInSequent().getPosInOccurrence().subTerm()).setVisible(true);
+            } });*/
+        
+        
         goalView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW ).put(
                 KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK), 
         "show_tree");
@@ -924,11 +929,10 @@ public class Main extends JFrame implements IMain {
                     "If you wish to see Taclet Options "
                     + "for a proof you have to load one first"));
         } else {
-            Iterator it = currentProof.getSettings().getChoiceSettings().getDefaultChoices()
-            .values().iterator();
             String message = "Active Taclet Options:\n";
-            while (it.hasNext()) {
-                message += it.next().toString() + "\n";
+            for (final String choice : currentProof.getSettings().
+                    getChoiceSettings().getDefaultChoices().values()) {
+                message += choice + "\n";
             }
             final JTextComponent activeOptions = new JTextArea(message);
             activeOptions.setEditable(false);
@@ -1316,7 +1320,7 @@ public class Main extends JFrame implements IMain {
 
             private int computeInteractiveSteps(Node node) {
                 int steps = 0;
-                final IteratorOfNode it = node.childrenIterator();
+                final Iterator<Node> it = node.childrenIterator();
                 while (it.hasNext()) {
                   steps += computeInteractiveSteps(it.next());
                 }
@@ -1553,34 +1557,49 @@ public class Main extends JFrame implements IMain {
     private JMenuItem setupSpeclangMenu() {
         JMenu result = new JMenu("Specification Languages");       
         ButtonGroup group = new ButtonGroup();
-        boolean useJML 
-            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().useJML();
+        GeneralSettings gs 
+            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
         
-        JRadioButtonMenuItem jmlButton = new JRadioButtonMenuItem("JML", 
-                                                                  useJML);
+        JRadioButtonMenuItem noneButton 
+            = new JRadioButtonMenuItem("None", !gs.useJML() && !gs.useOCL());
+        result.add(noneButton);
+        group.add(noneButton);
+        noneButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                GeneralSettings gs 
+                    = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+                gs.setUseJML(false);
+                gs.setUseOCL(false);
+            }
+        });
+        
+        JRadioButtonMenuItem jmlButton 
+            = new JRadioButtonMenuItem("JML", gs.useJML());
         result.add(jmlButton);
         group.add(jmlButton);
         jmlButton.setIcon(IconFactory.jmlLogo(15));
         jmlButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ProofSettings.DEFAULT_SETTINGS
-                             .getGeneralSettings()
-                             .setUseJML(true);
+                GeneralSettings gs 
+                    = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+                gs.setUseJML(true);
+                gs.setUseOCL(false);
             }
         });
         
-        JRadioButtonMenuItem oclButton = new JRadioButtonMenuItem("OCL", 
-                                                                  !useJML);
+        JRadioButtonMenuItem oclButton 
+            = new JRadioButtonMenuItem("OCL", gs.useOCL());
         result.add(oclButton);
         group.add(oclButton);
         oclButton.setIcon(IconFactory.umlLogo(15));
         oclButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ProofSettings.DEFAULT_SETTINGS
-                             .getGeneralSettings()
-                             .setUseJML(false);
+                GeneralSettings gs 
+                    = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+                gs.setUseJML(false);
+                gs.setUseOCL(true);
             }
-        });        
+        });
         
         return result;
     }
@@ -1823,7 +1842,7 @@ public class Main extends JFrame implements IMain {
             unitKeY.recent.addRecentFile(file.getAbsolutePath());
         }
         final ProblemLoader pl = 
-            new ProblemLoader(file, this, mediator.getProfile(), false, enableSpecs);
+            new ProblemLoader(file, this, mediator.getProfile(), false);
         pl.addTaskListener(getProverTaskListener());
         pl.run();
     }
@@ -1861,7 +1880,8 @@ public class Main extends JFrame implements IMain {
         
         final File file = localFileChooser.getSelectedFile ();
         
-        new TacletSoundnessPOLoader(file, this).run();
+        new TacletSoundnessPOLoader(file, this, Main.getInstance().mediator().getSelectedProof()
+                .openGoals()).run();
     }
     
     /**
@@ -1896,10 +1916,10 @@ public class Main extends JFrame implements IMain {
         return proof;
     }
     
-    private java.util.Hashtable doNotEnable;
+    private java.util.Hashtable<Component, Component> doNotEnable;
     
     private void setToolBarDisabled() {
-        doNotEnable = new java.util.Hashtable(10);
+        doNotEnable = new java.util.Hashtable<Component, Component>(10);
         Component[] cs = toolBar.getComponents();
         int i = cs.length;
         while (i-- != 0) {
@@ -2299,7 +2319,7 @@ public class Main extends JFrame implements IMain {
     /**
      * called when a ReusePoint has been found so that the GUI can offer reuse for
      * the current point to the user
-     * @param bestReusePoint the ReusePoint found, precise the best found candidate for 
+     * @param p the ReusePoint found, precise the best found candidate for 
      * 
      */
     public void indicateReuse(ReusePoint p) {
@@ -2505,7 +2525,7 @@ public class Main extends JFrame implements IMain {
 		} else if (opt[index].equals("ASSERTION")) {
 		    de.uka.ilkd.key.util.Debug.ENABLE_ASSERTION = true;
 		} else if (opt[index].equals("NO_JMLSPECS")) {
-		    enableSpecs = false;
+		    GeneralSettings.disableSpecs = true;
 		} else if (opt[index].equals("AUTO")) {
 		    batchMode = true;
                     visible = false;
@@ -3044,7 +3064,7 @@ public class Main extends JFrame implements IMain {
         private RecentFileMenu recent=null;
         private JButton run;
         private JFrame proofList;
-        private HashMap test2model;
+        private HashMap<StringBuffer, String> test2model;
         private boolean autoMode = false;
         
         public static final String AUTO_MODE_TEXT = "Create Tests";
@@ -3053,7 +3073,7 @@ public class Main extends JFrame implements IMain {
             super("KeY Unit Test Generator");
             this.main = main;
             mediator = main.mediator();
-            test2model = new HashMap();
+            test2model = new HashMap<StringBuffer, String>();
             setIconImage(IconFactory.keyLogo());
             createProofList();
             layoutGui();
@@ -3134,8 +3154,8 @@ public class Main extends JFrame implements IMain {
             testList.setListData(bubbleSortTests(createTestArray()));
             
             JScrollPane testListScroll = new
-                JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
-                        JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
+                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             testListScroll.getViewport().setView(testList);
             testListScroll.setBorder(
                     new TitledBorder("Created Tests"));
@@ -3184,12 +3204,13 @@ public class Main extends JFrame implements IMain {
         }
         
         private Object[] createTestArray(){
-            Iterator it = test2model.entrySet().iterator();
-            Vector v = new Vector();
+            final Iterator<Map.Entry<StringBuffer, String>> it = 
+                test2model.entrySet().iterator();
+            Vector<TestAndModel> v = new Vector<TestAndModel>();
             while(it.hasNext()){
-                Map.Entry e = (Map.Entry) it.next();
-                String test = ((StringBuffer) e.getKey()).toString();
-                String model = (String) e.getValue();
+                final Map.Entry<StringBuffer, String> e = it.next();
+                String test = e.getKey().toString();
+                String model = e.getValue();
                 while(!"".equals(test.trim())){
                     v.add(new TestAndModel(test.substring(0, test.indexOf(" ")), model));
                     test = test.substring(test.indexOf(" ")+1);

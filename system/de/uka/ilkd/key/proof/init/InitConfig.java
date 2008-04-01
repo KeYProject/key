@@ -10,10 +10,9 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Map.Entry;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
@@ -54,7 +53,8 @@ public class InitConfig {
      * maps categories to their default choice (both represented as Strings),
      * which is used if no other choice is specified in the problemfile
      */
-    private HashMap category2DefaultChoice = new LinkedHashMap();
+    private HashMap<String,String> category2DefaultChoice = 
+        new LinkedHashMap<String,String>();
 
     /**
      * maps taclets to their TacletBuilders. This information is needed when
@@ -63,7 +63,8 @@ public class InitConfig {
      * GoalTemplates whose options are activated and those who don't belong
      * to any specific option.
      */
-    private HashMap taclet2Builder = new LinkedHashMap();
+    private HashMap<Taclet, TacletBuilder> taclet2Builder = 
+        new LinkedHashMap<Taclet, TacletBuilder>();
 
     /**
      * Set of the rule options activated for the current proof. The rule options
@@ -73,7 +74,7 @@ public class InitConfig {
     private SetOfChoice activatedChoices = SetAsListOfChoice.EMPTY_SET;
     
     /** HashMap for quick lookups taclet name->taclet */
-    private HashMapFromNameToNamed quickTacletMap;
+    private HashMap<Name, Named> quickTacletMap;
     
     private String originalKeYFileName;
     
@@ -156,11 +157,9 @@ public class InitConfig {
      * Only entries of <code>init</init> with keys not already contained in
      * category2DefaultChoice are added.
      */
-    public void addCategory2DefaultChoices(HashMap init){
-        Iterator it = init.entrySet().iterator();
+    public void addCategory2DefaultChoices(HashMap<String,String> init){
         boolean changed = false;
-        while(it.hasNext()){
-            Entry entry = (Entry) it.next();
+        for (final Map.Entry<String, String> entry : init.entrySet()) {
             if(!category2DefaultChoice.containsKey(entry.getKey())){
                 changed=true;
                 category2DefaultChoice.put(entry.getKey(), entry.getValue());
@@ -168,12 +167,12 @@ public class InitConfig {
         }
         if(changed){
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().
-                setDefaultChoices((HashMap)category2DefaultChoice.clone());
+                setDefaultChoices((HashMap<String, String>)category2DefaultChoice.clone());
         }
     }
     
     
-    public void setTaclet2Builder(HashMap taclet2Builder){
+    public void setTaclet2Builder(HashMap<Taclet, TacletBuilder> taclet2Builder){
         this.taclet2Builder = taclet2Builder;
     }
     
@@ -185,7 +184,7 @@ public class InitConfig {
      * creating all possible combinations in advance this is done by demand
      * @return the map from a taclet to its builder
      */
-    public HashMap getTaclet2Builder(){
+    public HashMap<Taclet, TacletBuilder> getTaclet2Builder(){
         return taclet2Builder;
     }
 
@@ -200,18 +199,13 @@ public class InitConfig {
 	    ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().
 	    getDefaultChoices();
 
-        final IteratorOfChoice it = activatedChoices.iterator();
-        HashMap c2DC = (HashMap)category2DefaultChoice.clone();
-        Choice c;
-        while(it.hasNext()){
-            c = it.next();
+        HashMap<String, String> c2DC = (HashMap<String,String>)category2DefaultChoice.clone();
+        for (final Choice c : activatedChoices) {
             c2DC.remove(c.category());
         }
         
-        final Iterator itDef = c2DC.values().iterator();
-        while(itDef.hasNext()){
-            String s = (String) itDef.next();
-            c = (Choice) choiceNS().lookup(new Name(s));
+        for (final String s : c2DC.values()) {
+            final Choice c = (Choice) choiceNS().lookup(new Name(s));
             if(c!=null){
                 activatedChoices = activatedChoices.add(c);
             }
@@ -245,7 +239,7 @@ public class InitConfig {
     
     public Taclet lookupActiveTaclet(Name name) {
 	if (quickTacletMap == null) {
-            quickTacletMap = new HashMapFromNameToNamed();
+            quickTacletMap = new HashMap<Name, Named>();
             IteratorOfTaclet it = activatedTaclets().iterator();
             while (it.hasNext())  {
                 Taclet t = it.next();
@@ -265,13 +259,11 @@ public class InitConfig {
      * returns the activated taclets of this initial configuration
      */
     public SetOfTaclet activatedTaclets() {
-        IteratorOfTaclet it = taclets.iterator();
         SetOfTaclet result = SetAsListOfTaclet.EMPTY_SET;
-        Taclet t;
         TacletBuilder b;
-        while(it.hasNext()){
-            t = it.next();
-            b = (TacletBuilder) taclet2Builder.get(t);
+        
+        for (Taclet t : taclets) {
+            b = taclet2Builder.get(t);
             if(t.getChoices().subset(activatedChoices)){
                 if(b!=null && b.getGoal2Choices()!=null){
                     t = b.getTacletWithoutInactiveGoalTemplates(
@@ -420,7 +412,7 @@ public class InitConfig {
         			       profile);
         ic.setActivatedChoices(activatedChoices);
         ic.category2DefaultChoice = ((HashMap) category2DefaultChoice.clone());
-        ic.setTaclet2Builder((HashMap) taclet2Builder.clone());
+        ic.setTaclet2Builder((HashMap<Taclet, TacletBuilder>) taclet2Builder.clone());
         ic.setTaclets(taclets);
         ic.originalKeYFileName = originalKeYFileName;
         return ic;

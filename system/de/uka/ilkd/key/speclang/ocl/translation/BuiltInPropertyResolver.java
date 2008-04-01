@@ -65,7 +65,8 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
 
     
     private Term replaceVar(LogicVariable lv1, LogicVariable lv2, Term term) {
-        Map map = new LinkedHashMap();
+        Map<LogicVariable, LogicVariable> map = 
+            new LinkedHashMap<LogicVariable, LogicVariable>();
         map.put(lv1, lv2);
         OpReplacer or = new OpReplacer(map);
         return or.replace(term);
@@ -156,7 +157,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
                             q,
                             oclParameters.getDeclaredVars().toArray(),
                             subTerm);
-            
+
             return new OCLEntity(resTerm);
         }
         

@@ -94,7 +94,7 @@ public class TacletLoader {
         }
         while(it.hasNext()){
             final String name = (String) it.next();
-            keyFile[i] = new KeYFile(name, in.get(name), null, false);
+            keyFile[i] = new KeYFile(name, in.get(name), null);
             keyFile[i].setInitConfig(initConfig);
             Includes includes = keyFile[i].readIncludes();
             loadIncludes(includes, level+1, name);
@@ -126,7 +126,7 @@ public class TacletLoader {
     private void loadFile(String filename, RuleSource ruleSource, int level)
         throws ProofInputException {
         if (alreadyParsed.add(filename)) {            
-            KeYFile file = new KeYFile(filename, ruleSource, null, false);
+            KeYFile file = new KeYFile(filename, ruleSource, null);
             file.setInitConfig(initConfig);
 
             

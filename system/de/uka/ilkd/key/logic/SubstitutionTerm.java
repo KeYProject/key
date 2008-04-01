@@ -43,9 +43,9 @@ class SubstitutionTerm extends Term {
     
 
     /** creates a substitution term
+     * @param op the Operator representing a substitution
      * @param substVar the Variable to be substituted
-     * @param substTerm the Term that replaces substVar
-     * @param origTerm the Term that is substituted
+     * @param subs the Term that replaces substVar
      */
     public SubstitutionTerm(Operator op, 
 			    QuantifiableVariable substVar, 

@@ -39,8 +39,7 @@ public class LoopInvariantImpl implements LoopInvariant {
     private final SetOfLocationDescriptor originalModifies;
     private final Term originalVariant;
     private final Term originalSelfTerm;
-    private final Map /*Operator (normal) -> Function (atPre)*/ 
-                                                        originalAtPreFunctions;
+    private final Map<Operator, Function /*(atPre)*/> originalAtPreFunctions;
     private final boolean predicateHeuristicsAllowed;
     
     
@@ -66,8 +65,7 @@ public class LoopInvariantImpl implements LoopInvariant {
                              SetOfLocationDescriptor modifies,  
                              Term variant, 
                              Term selfTerm,
-                             /*in*/ Map /*Operator (normal) 
-                             -> Function (atPre)*/ atPreFunctions,
+                             /*in*/ Map<Operator, Function /*(atPre)*/> atPreFunctions,
                              boolean predicateHeuristicsAllowed) {
         assert loop != null;
         assert predicates != null;
@@ -80,7 +78,7 @@ public class LoopInvariantImpl implements LoopInvariant {
         this.originalModifies           = modifies;
         this.originalSelfTerm           = selfTerm;   
         this.predicateHeuristicsAllowed = predicateHeuristicsAllowed;
-        this.originalAtPreFunctions     = new LinkedHashMap();
+        this.originalAtPreFunctions     = new LinkedHashMap<Operator, Function>();
         this.originalAtPreFunctions.putAll(atPreFunctions);
     }
     
@@ -95,7 +93,7 @@ public class LoopInvariantImpl implements LoopInvariant {
              SetAsListOfLocationDescriptor.EMPTY_SET, 
              null, 
              selfTerm,
-             new LinkedHashMap(),
+             new LinkedHashMap<Operator, Function>(),
              true);
     }
     
@@ -106,10 +104,9 @@ public class LoopInvariantImpl implements LoopInvariant {
     //-------------------------------------------------------------------------
     
     private Map /*Operator, Operator, Term -> Term*/ getReplaceMap(
-                                    Term selfTerm,
-                                    /*inout*/ Map /*Operator (normal) 
-                                    -> Function (atPre)*/ atPreFunctions,
-                                    Services services) {
+            Term selfTerm,
+            /*inout*/ Map<Operator, Function/*atpre*/> atPreFunctions,
+            Services services) {
         Map result = new LinkedHashMap();
         
         //self
@@ -123,16 +120,17 @@ public class LoopInvariantImpl implements LoopInvariant {
 
         //atPre-functions
         if(atPreFunctions != null) {
-            Iterator it = originalAtPreFunctions.entrySet().iterator();
+            Iterator<Map.Entry<Operator, Function>> it = 
+                originalAtPreFunctions.entrySet().iterator();
             while(it.hasNext()) {
-                Map.Entry entry = (Map.Entry) it.next();
-                Operator originalNormalOp = (Operator) entry.getKey();
-                Function originalAtPreFunc = (Function) entry.getValue();
+                Map.Entry<Operator, Function> entry = it.next();
+                Operator originalNormalOp = entry.getKey();
+                Function originalAtPreFunc = entry.getValue();
                 Operator normalOp = (Operator) result.get(originalNormalOp);
                 if(normalOp == null) {
                     normalOp = originalNormalOp;
                 }
-                Function atPreFunc = (Function) atPreFunctions.get(normalOp);
+                Function atPreFunc = atPreFunctions.get(normalOp);
                 if(atPreFunc == null) {
                     atPreFunc 
                         = AtPreFactory.INSTANCE.createAtPreFunction(normalOp, 
@@ -150,15 +148,14 @@ public class LoopInvariantImpl implements LoopInvariant {
     
     
     private Map /*Term -> Term*/ getInverseReplaceMap(
-                                        Term selfTerm,
-                                        /*inout*/ Map /*Operator (normal) 
-                                        -> Function (atPre)*/ atPreFunctions,
-                                        Services services) {
+            Term selfTerm,
+            /*inout*/ Map <Operator, Function/* atPre*/> atPreFunctions,
+            Services services) {
        Map result = new LinkedHashMap();
        Map replaceMap = getReplaceMap(selfTerm, atPreFunctions, services);
-       Iterator it = replaceMap.entrySet().iterator();
+       final Iterator<Map.Entry> it = replaceMap.entrySet().iterator();
        while(it.hasNext()) {
-           Map.Entry entry = (Map.Entry) it.next();
+           Map.Entry entry = it.next();
            result.put(entry.getValue(), entry.getKey());
        }
        return result;
@@ -176,9 +173,8 @@ public class LoopInvariantImpl implements LoopInvariant {
 
     
     public Term getInvariant(Term selfTerm,
-                            /*inout*/ Map /*Operator (normal) 
-                            -> Function (atPre)*/ atPreFunctions,
-                            Services services) {
+            /*inout*/Map <Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map replaceMap = getReplaceMap(selfTerm, atPreFunctions, services);
         OpReplacer or = new OpReplacer(replaceMap);
@@ -187,9 +183,8 @@ public class LoopInvariantImpl implements LoopInvariant {
     
     
     public SetOfTerm getPredicates(Term selfTerm,
-                                   /*inout*/ Map /*Operator (normal) 
-                                   -> Function (atPre)*/ atPreFunctions,
-                                   Services services) {
+            /*inout*/ Map<Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map replaceMap = getReplaceMap(selfTerm, atPreFunctions, services);
         OpReplacer or = new OpReplacer(replaceMap);
@@ -198,23 +193,23 @@ public class LoopInvariantImpl implements LoopInvariant {
 
     
     public SetOfLocationDescriptor getModifies(
-                                    Term selfTerm,
-                                    /*inout*/ Map /*Operator (normal) 
-                                    -> Function (atPre)*/ atPreFunctions,
-                                    Services services) {
+            Term selfTerm,
+            /*inout*/ Map<Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map replaceMap = getReplaceMap(selfTerm, atPreFunctions, services);
+        Map replaceMap = 
+            getReplaceMap(selfTerm, atPreFunctions, services);
         OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalModifies);
     }
     
 
     public Term getVariant(Term selfTerm, 
-                           /*inout*/ Map /*Operator (normal) 
-                           -> Function (atPre)*/ atPreFunctions,
-                           Services services) {
+            /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map replaceMap = getReplaceMap(selfTerm, atPreFunctions, services);
+        Map replaceMap = 
+            getReplaceMap(selfTerm, atPreFunctions, services);
         OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalVariant);
     }
@@ -230,9 +225,9 @@ public class LoopInvariantImpl implements LoopInvariant {
     }
     
     
-    public Map /*Operator (normal) -> Function (atPre)*/ 
+    public Map<Operator, Function> /*Operator (normal) -> Function (atPre)*/ 
                                                 getInternalAtPreFunctions() {
-        Map result = new LinkedHashMap();
+        Map<Operator, Function> result = new LinkedHashMap<Operator, Function>();
         result.putAll(originalAtPreFunctions);
         return result;
     }
@@ -251,10 +246,9 @@ public class LoopInvariantImpl implements LoopInvariant {
     
     
     public LoopInvariant setInvariant(Term invariant, 
-                                      Term selfTerm,
-                                      /*inout*/ Map /*Operator (normal) 
-                                      -> Function (atPre)*/ atPreFunctions,
-                                      Services services) {
+            Term selfTerm,
+            /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map inverseReplaceMap 
             = getInverseReplaceMap(selfTerm, atPreFunctions, services);
@@ -271,10 +265,9 @@ public class LoopInvariantImpl implements LoopInvariant {
     
 
     public LoopInvariant setPredicates(SetOfTerm predicates, 
-                                       Term selfTerm,
-                                       /*inout*/ Map /*Operator (normal) 
-                                       -> Function (atPre)*/ atPreFunctions,
-                                       Services services) {
+            Term selfTerm,
+            /*inout*/ Map <Operator, Function/* atPre */> atPreFunctions,
+            Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map inverseReplaceMap 
             = getInverseReplaceMap(selfTerm, atPreFunctions, services);

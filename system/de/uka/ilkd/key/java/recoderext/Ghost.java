@@ -26,12 +26,11 @@ public class Ghost extends Modifier {
     }
     
 
-    public Object deepClone() {
+    public Ghost deepClone() {
         return new Ghost(this);
     }
 
     
     public void accept(SourceVisitor v) {
-        assert false;
     }
  }

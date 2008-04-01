@@ -47,8 +47,7 @@ public class OperationContractImpl implements OperationContract {
     private final ListOfParsableVariable originalParamVars;
     private final ParsableVariable originalResultVar;
     private final ParsableVariable originalExcVar;
-    private final Map /*Operator (normal) -> Function (atPre)*/ 
-                                                    originalAtPreFunctions;
+    private final Map<Operator, Function/* at pre */> originalAtPreFunctions;
     
     
     //-------------------------------------------------------------------------
@@ -81,8 +80,7 @@ public class OperationContractImpl implements OperationContract {
             		         ListOfParsableVariable paramVars,
             		         ParsableVariable resultVar,
             		         ParsableVariable excVar,
-                                 /*in*/ Map /*Operator (normal) 
-                                 -> Function (atPre)*/ atPreFunctions) {
+                                 /*in*/ Map<Operator, Function> atPreFunctions) {
         assert name != null && !name.equals("");
         assert displayName != null && !displayName.equals("");
         assert programMethod != null;
@@ -108,7 +106,7 @@ public class OperationContractImpl implements OperationContract {
 	this.originalParamVars      = paramVars;
 	this.originalResultVar      = resultVar;
 	this.originalExcVar         = excVar;
-	this.originalAtPreFunctions = new LinkedHashMap();
+	this.originalAtPreFunctions = new LinkedHashMap<Operator, Function>();
         this.originalAtPreFunctions.putAll(atPreFunctions);
     }
     
@@ -118,15 +116,14 @@ public class OperationContractImpl implements OperationContract {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private Map /*Operator -> Operator*/ getReplaceMap(
+    private Map /*Operator -> Operator*/<Operator, Operator> getReplaceMap(
 	    				ParsableVariable selfVar, 
 	    				ListOfParsableVariable paramVars, 
 	    				ParsableVariable resultVar, 
 	    				ParsableVariable excVar,
-                                        /*inout*/ Map /*Operator (normal) 
-                                        -> Function (atPre)*/ atPreFunctions,
+                                        /*inout*/ Map< Operator, Function> atPreFunctions,
                                         Services services) {
-	Map result = new LinkedHashMap();
+	Map<Operator, Operator> result = new LinkedHashMap<Operator, Operator>();
 	
         //self
 	if(selfVar != null) {
@@ -161,16 +158,17 @@ public class OperationContractImpl implements OperationContract {
         
         //atPre-functions
         if(atPreFunctions != null) {
-            Iterator it = originalAtPreFunctions.entrySet().iterator();
+            Iterator<Map.Entry<Operator, Function>> it = 
+                originalAtPreFunctions.entrySet().iterator();
             while(it.hasNext()) {
-                Map.Entry entry = (Map.Entry) it.next();
-                Operator originalNormalOp = (Operator) entry.getKey();
-                Function originalAtPreFunc = (Function) entry.getValue();
-                Operator normalOp = (Operator) result.get(originalNormalOp);
+                Map.Entry<Operator,Function> entry = it.next();
+                Operator originalNormalOp = entry.getKey();
+                Function originalAtPreFunc = entry.getValue();
+                Operator normalOp = result.get(originalNormalOp);
                 if(normalOp == null) {
                     normalOp = originalNormalOp;
                 }
-                Function atPreFunc = (Function) atPreFunctions.get(normalOp);
+                Function atPreFunc = atPreFunctions.get(normalOp);
                 if(atPreFunc == null) {
                     atPreFunc 
                         = AtPreFactory.INSTANCE.createAtPreFunction(normalOp, 
@@ -219,7 +217,7 @@ public class OperationContractImpl implements OperationContract {
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-	Map replaceMap = getReplaceMap(selfVar, 
+	Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, 
                                        paramVars, 
                                        null, 
                                        null,
@@ -234,8 +232,7 @@ public class OperationContractImpl implements OperationContract {
                                      ListOfParsableVariable paramVars, 
                                      ParsableVariable resultVar, 
                                      ParsableVariable excVar,
-                                     /*inout*/ Map /*Operator (normal) 
-                                     -> Function (atPre)*/ atPreFunctions,
+                                     /*inout*/ Map<Operator, Function> atPreFunctions,
                                      Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
@@ -244,7 +241,7 @@ public class OperationContractImpl implements OperationContract {
         assert excVar != null;
         assert atPreFunctions != null;
         assert services != null;
-	Map replaceMap = getReplaceMap(selfVar, 
+	Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, 
                                        paramVars, 
                                        resultVar, 
                                        excVar, 
@@ -262,7 +259,7 @@ public class OperationContractImpl implements OperationContract {
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-	Map replaceMap = getReplaceMap(selfVar, 
+	Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, 
                                        paramVars, 
                                        null, 
                                        null, 

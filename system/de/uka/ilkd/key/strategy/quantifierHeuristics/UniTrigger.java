@@ -109,7 +109,6 @@ class UniTrigger extends Trigger {
      * 
      * @param candidate
      * @param searchTerm
-     * @return
      */
     public static boolean passedLoopTest(Term candidate, Term searchTerm) {
         final SetOfSubstitution substs =

@@ -56,8 +56,8 @@ public class TacletView implements ActionListener{
         content.setWrapStyleWord(true);
 
         scrollPane = new JScrollPane(content,
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         scrollPane.setWheelScrollingEnabled(true);
 

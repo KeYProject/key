@@ -26,12 +26,11 @@ public class Model extends Modifier {
     }
     
 
-    public Object deepClone() {
+    public Model deepClone() {
         return new Model(this);
     }
 
     
     public void accept(SourceVisitor v) {
-        assert false;
     }
  }

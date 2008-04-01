@@ -10,6 +10,9 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.Arrays;
+import java.util.List;
+
 import de.uka.ilkd.key.collection.IteratorOfString;
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.collection.SLListOfString;
@@ -24,26 +27,24 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSetStatement;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import recoder.CrossReferenceServiceConfiguration;
+import recoder.abstraction.Constructor;
+import recoder.abstraction.Method;
 import recoder.java.Comment;
 import recoder.java.CompilationUnit;
 import recoder.java.Declaration;
 import recoder.java.NonTerminalProgramElement;
 import recoder.java.ProgramElement;
+import recoder.java.Statement;
 import recoder.java.StatementBlock;
 import recoder.java.SourceElement.Position;
 import recoder.java.declaration.ConstructorDeclaration;
+import recoder.java.declaration.DeclarationSpecifier;
 import recoder.java.declaration.FieldDeclaration;
 import recoder.java.declaration.LocalVariableDeclaration;
 import recoder.java.declaration.MethodDeclaration;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.java.expression.operator.CopyAssignment;
-import recoder.list.CommentArrayList;
-import recoder.list.CompilationUnitMutableList;
-import recoder.list.MethodList;
-import recoder.list.ModifierArrayList;
-import recoder.list.ModifierMutableList;
-import recoder.list.StatementList;
-import recoder.list.StatementMutableList;
+import recoder.list.generic.*;
 
 
 public class JMLTransformer extends RecoderModelTransformer {
@@ -58,6 +59,9 @@ public class JMLTransformer extends RecoderModelTransformer {
     private final boolean parsingLibs;
 
     
+    
+
+
     /**
      * Creates a transformation that adds JML specific elements, for example
      * ghost fields and model method declarations.
@@ -65,14 +69,15 @@ public class JMLTransformer extends RecoderModelTransformer {
      * @param services
      *                the CrossReferenceServiceConfiguration to access model
      *                information
-     * @param units
-     *                the array of CompilationUnits describing the model to be
-     *                transformed
+     * @param cache
+     *                a cache object that stores information which is needed by
+     *                and common to many transformations. it includes the
+     *                compilation units, the declared classes, and information
+     *                for local classes.
      */
     public JMLTransformer(CrossReferenceServiceConfiguration services,
-                          CompilationUnitMutableList units,
-                          boolean parsingLibs) {
-        super(services, units);
+            TransformerCache cache, boolean parsingLibs) {
+        super(services, cache);
         this.parsingLibs = parsingLibs;
     }
 
@@ -206,7 +211,7 @@ public class JMLTransformer extends RecoderModelTransformer {
             return new Comment[0];
         }
         
-        Comment[] result = pe.getComments().toCommentArray();
+        Comment[] result = pe.getComments().toArray(new Comment[0]);
         for (int i = 0; i < result.length; i++) {
             result[i].setParent(pe);
         }
@@ -261,12 +266,11 @@ public class JMLTransformer extends RecoderModelTransformer {
                        childIndex);
             } else {
                 assert astParent instanceof StatementBlock;
-                StatementList declStatement 
-                    = services.getProgramFactory()
-                              .parseStatements(declWithMods.text);
+                List<Statement> declStatement = services.getProgramFactory()
+                          .parseStatements(declWithMods.text);
                 assert declStatement.size() == 1;
                 ghostDecl 
-                    = (LocalVariableDeclaration) declStatement.getStatement(0);
+                    = (LocalVariableDeclaration) declStatement.get(0);
                 updatePositionInformation(ghostDecl, declWithMods.pos);
                 attach((LocalVariableDeclaration)ghostDecl, 
                        (StatementBlock) astParent, 
@@ -283,13 +287,13 @@ public class JMLTransformer extends RecoderModelTransformer {
         }
 
         //add ghost modifier
-        ModifierMutableList mods = new ModifierArrayList();
+        ASTArrayList<DeclarationSpecifier> mods = new ASTArrayList<DeclarationSpecifier>();
         mods.add(new Ghost());
-        ghostDecl.setModifiers(mods);
+        ghostDecl.setDeclarationSpecifiers(mods);
             
         //set comments: the original list of comments with the declaration, 
         //and the JML modifiers
-        CommentArrayList newComments = new CommentArrayList(originalComments);
+        ASTList<Comment> newComments = new ASTArrayList<Comment>(Arrays.asList(originalComments));
         Comment jmlComment = new Comment(getJMLModString(decl.getMods()));
         jmlComment.setParent(ghostDecl);
         newComments.add(jmlComment);
@@ -338,13 +342,13 @@ public class JMLTransformer extends RecoderModelTransformer {
         }
         
         //add model modifier
-        ModifierMutableList mods = new ModifierArrayList();
+        ASTArrayList<DeclarationSpecifier> mods = new ASTArrayList<DeclarationSpecifier>();
         mods.add(new Model());
-        methodDecl.setModifiers(mods);
+        methodDecl.setDeclarationSpecifiers(mods);
         
         //set comments: the original list of comments with the declaration, 
         //and the JML modifiers
-        CommentArrayList newComments = new CommentArrayList(originalComments);
+        ASTList<Comment> newComments = new ASTArrayList<Comment>(Arrays.asList(originalComments));
         Comment jmlComment = new Comment(getJMLModString(decl.getMods()));
         jmlComment.setParent(methodDecl);
         newComments.add(jmlComment);
@@ -365,12 +369,11 @@ public class JMLTransformer extends RecoderModelTransformer {
         
         //parse statement, attach to AST
         try {
-            StatementMutableList stmtList 
-                = services.getProgramFactory()
-                          .parseStatements(stat.getAssignment().text);
+            List<Statement> stmtList = services.getProgramFactory()
+                      .parseStatements(stat.getAssignment().text);
             assert stmtList.size() == 1;
             CopyAssignment assignStmt 
-                = (CopyAssignment) stmtList.getStatement(0);
+                = (CopyAssignment) stmtList.get(0);
             SetAssignment setStmt = new SetAssignment(assignStmt);
             updatePositionInformation(setStmt, stat.getAssignment().pos);
             attach(setStmt, astParent, childIndex);
@@ -500,36 +503,38 @@ public class JMLTransformer extends RecoderModelTransformer {
 
         try {
             //iterate over all compilation units
-            for(int i = 0, m = units.size(); i < m; i++) {
-                CompilationUnit unit = units.getCompilationUnit(i);
+            for(int i = 0, m = getUnits().size(); i < m; i++) {
+                CompilationUnit unit = getUnits().get(i);
                 
                 //iterate over all classes
                 for(int j = 0, n = unit.getTypeDeclarationCount(); j < n; j++) {
                     TypeDeclaration td = unit.getTypeDeclarationAt(j);
                     
                     //collect pre-existing operations
-                    MethodList constructorList = td.getConstructors();
-                    MethodList methodList = td.getMethods();
+                    List<? extends Constructor> constructorList = td.getConstructors();
+                    List<Method> methodList = td.getMethods();
                     
                     transformClasslevelComments(td, unit.getName());
                     
                     //iterate over all pre-existing constructors
                     for(int k = 0, o = constructorList.size(); k < o; k++) {
-                        if(constructorList.getMember(k) 
+                        if(constructorList.get(k) 
                            instanceof ConstructorDeclaration) {
                             ConstructorDeclaration cd 
                                 = (ConstructorDeclaration) 
-                                   constructorList.getMethod(k);
+                                   constructorList.get(k);
                             transformMethodlevelComments(cd, unit.getName());
                         }
                     }               
                                         
                     //iterate over all pre-existing methods
                     for(int k = 0, o = methodList.size(); k < o; k++) {
-                        MethodDeclaration md 
-                            = (MethodDeclaration) 
-                               methodList.getMethod(k);
-                        transformMethodlevelComments(md, unit.getName());
+                        if(methodList.get(k) instanceof MethodDeclaration) { // might be ImplicitEnumMethod
+                            MethodDeclaration md 
+                                = (MethodDeclaration) 
+                                   methodList.get(k);
+                            transformMethodlevelComments(md, unit.getName());
+                        }
                     }               
                     
                     td.makeAllParentRolesValid();
