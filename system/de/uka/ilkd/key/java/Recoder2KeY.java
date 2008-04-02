@@ -17,8 +17,12 @@ import java.util.*;
 import recoder.*;
 import recoder.abstraction.ClassType;
 import recoder.bytecode.*;
+import recoder.convenience.TreeWalker;
 import recoder.io.*;
+import recoder.java.CompilationUnit;
 import recoder.java.NonTerminalProgramElement;
+import recoder.java.ProgramElement;
+import recoder.java.declaration.MethodDeclaration;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.*;
 import recoder.parser.ParseException;
@@ -194,41 +198,10 @@ public class Recoder2KeY implements JavaReader {
         // set up recoder:
         recoder.util.Debug.setLevel(500);
         
-        // do not look up classes anywhere but in the included classes!
+        // do not look up classes anywhere but in the included classes 
+        // or the specified classpaths
         servConf.getProjectSettings().setProperty(ProjectSettings.CLASS_SEARCH_MODE, "");
 
-        /*
-        if (servConf.getProjectSettings().
-	    ensureSystemClassesAreInPath()) {
-	} else {
-	    if (System.getProperty("os.name").toLowerCase().indexOf("mac") != -1) {
-		String inputPath = servConf.getProjectSettings().
-		    getProperty(recoder.io.PropertyNames.INPUT_PATH);
-		if (inputPath == null) {
-                    inputPath = ".";
-		}
-		 
-		final String javaHome = System.getProperty("java.home");
-		 
-		inputPath +=  File.pathSeparator + javaHome + File.separator +
-		    ".." + File.separator + "Classes"+ File.separator + "classes.jar";
-		inputPath +=  File.pathSeparator + javaHome + File.separator +
-		    ".."+ File.separator + "Classes"+ File.separator + "ui.jar";
-						   
-		servConf.getProjectSettings().
-		    setProperty(recoder.io.PropertyNames.INPUT_PATH, inputPath);
-						   
-		if (!servConf.getProjectSettings().
-		    ensureSystemClassesAreInPath()) {
-		    System.err.println("System classes not found on default Mac places.");
-		}
-	    
-	    } else {
-		System.err.println("System classes not found in path.");
-	    }
-	}
-	*/
-        
     }
     
     /**
@@ -309,9 +282,9 @@ public class Recoder2KeY implements JavaReader {
      *         to the given files.
      */
 
-    public CompilationUnit[] readCompilationUnitsAsFiles(String[] cUnitStrings) {
+    public de.uka.ilkd.key.java.CompilationUnit[] readCompilationUnitsAsFiles(String[] cUnitStrings) {
         List<recoder.java.CompilationUnit> cUnits = recoderCompilationUnitsAsFiles(cUnitStrings);
-        CompilationUnit[] result = new CompilationUnit[cUnits.size()];
+        de.uka.ilkd.key.java.CompilationUnit[] result = new de.uka.ilkd.key.java.CompilationUnit[cUnits.size()];
         for (int i = 0, sz = cUnits.size(); i < sz; i++) {
             Debug.out("converting now " + cUnitStrings[i]);
             result[i] = getConverter().processCompilationUnit(cUnits.get(i), cUnitStrings[i]);
@@ -362,9 +335,9 @@ public class Recoder2KeY implements JavaReader {
      *            a string represents a compilation unit
      * @return a KeY structured compilation unit.
      */
-    public CompilationUnit readCompilationUnit(String cUnitString) {
+    public de.uka.ilkd.key.java.CompilationUnit readCompilationUnit(String cUnitString) {
         final recoder.java.CompilationUnit cc = recoderCompilationUnits(new String[] { cUnitString }).get(0);
-        return (CompilationUnit) getConverter().process(cc);
+        return (de.uka.ilkd.key.java.CompilationUnit) getConverter().process(cc);
     }
 
     /**
@@ -453,7 +426,7 @@ public class Recoder2KeY implements JavaReader {
             try {
                 recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
                 rcu.setDataLocation(new URLDataLocation(jlf));
-                rcu.makeAllParentRolesValid();
+                // done by parser : rcu.makeAllParentRolesValid();
                 rcuList.add(rcu);
             } catch(ParseException ex) {
                 ParseException e2 = new ParseException("Error while parsing " + jlf.toString());
@@ -521,8 +494,8 @@ public class Recoder2KeY implements JavaReader {
                     InputStream is = walker.openCurrent();
                     Reader f = new BufferedReader(new InputStreamReader(is));
                     recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
+                    removeMethodBodies(rcu);
                     rcu.setDataLocation(currentDataLocation);
-                    rcu.makeAllParentRolesValid();
                     rcuList.add(rcu);
                 } catch(Exception ex) {
                     System.err.println("Error while loading: " + walker.getCurrentDataLocation());
@@ -532,6 +505,7 @@ public class Recoder2KeY implements JavaReader {
         }
 
         // -- read class files --
+        List<ClassFileDeclarationBuilder> innerClasses = new ArrayList<ClassFileDeclarationBuilder>(); 
         ByteCodeParser parser = new ByteCodeParser();
         for (FileCollection fc : sources) {
             FileCollection.Walker walker = fc.createWalker(".class");
@@ -542,14 +516,26 @@ public class Recoder2KeY implements JavaReader {
                     ClassFile cf = parser.parseClassFile(is);
                     ClassFileDeclarationBuilder builder = new ClassFileDeclarationBuilder(pf, cf);
                     builder.setDataLocation(currentDataLocation);
-                    recoder.java.CompilationUnit rcu = builder.makeCompilationUnit();
-                    rcu.makeAllParentRolesValid();
-                    rcuList.add(rcu);
+                    if(builder.isInnerClass()) {
+                        innerClasses.add(builder);
+                    } else {
+                        recoder.java.CompilationUnit rcu = builder.makeCompilationUnit();
+                        rcuList.add(rcu);
+                    }
                 } catch(Exception ex) {
                     System.err.println("Error while loading: " + walker.getCurrentDataLocation());
                     ex.printStackTrace();
                 }
             }
+        }
+        
+        for (ClassFileDeclarationBuilder innerClass : innerClasses) {
+            try {
+                innerClass.attachToEnclosingCompilationUnit(getServiceConfiguration());
+            } catch(Exception ex) {
+                System.err.println("Error while attaching: " + innerClass.getClassname());
+                ex.printStackTrace();
+            }   
         }
 
         recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(
@@ -559,6 +545,30 @@ public class Recoder2KeY implements JavaReader {
 
         return rcuList;
         
+    }
+
+    /*
+     * removes the method bodies of a parsed compilation unit. This is done for 
+     * classes that are read in a classpath-context. For these classes only
+     * contracts (if present) are to be considered.
+     * 
+     * No need to inform changeHistory since the class is not yet registered.
+     * Method bodies are set to null, i.e. all methods are stubs only 
+     * 
+     * TODO remove jml-model methods (or similar) also?
+     */
+    private void removeMethodBodies(CompilationUnit rcu) {
+        TreeWalker tw = new TreeWalker(rcu);
+        
+        while(tw.next()) {
+            ProgramElement pe = tw.getProgramElement();
+            if (pe instanceof MethodDeclaration) {
+                MethodDeclaration methDecl = (MethodDeclaration) pe;
+                NonTerminalProgramElement parent = pe.getASTParent();
+                int pos = parent.getChildPositionCode(methDecl);
+                parent.replaceChild(methDecl, null);
+            }
+        }
     }
 
     /**

@@ -1,43 +1,29 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+//
+//
+
 package de.uka.ilkd.key.java.recoderext;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 
+import recoder.*;
+import recoder.abstraction.ClassType;
+import recoder.bytecode.*;
+import recoder.io.DataLocation;
+import recoder.java.*;
+import recoder.java.declaration.*;
+import recoder.java.reference.*;
+import recoder.kit.TypeKit;
+import recoder.list.generic.*;
+import recoder.service.*;
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.util.Debug;
-
-import recoder.CrossReferenceServiceConfiguration;
-import recoder.ParserException;
-import recoder.ProgramFactory;
-import recoder.bytecode.ByteCodeParser;
-import recoder.bytecode.ClassFile;
-import recoder.bytecode.ConstructorInfo;
-import recoder.bytecode.FieldInfo;
-import recoder.bytecode.MethodInfo;
-import recoder.io.DataLocation;
-import recoder.java.CompilationUnit;
-import recoder.java.Identifier;
-import recoder.java.PackageSpecification;
-import recoder.java.declaration.ClassDeclaration;
-import recoder.java.declaration.ConstructorDeclaration;
-import recoder.java.declaration.DeclarationSpecifier;
-import recoder.java.declaration.Extends;
-import recoder.java.declaration.FieldDeclaration;
-import recoder.java.declaration.InterfaceDeclaration;
-import recoder.java.declaration.MemberDeclaration;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.ParameterDeclaration;
-import recoder.java.declaration.TypeDeclaration;
-import recoder.java.reference.PackageReference;
-import recoder.java.reference.TypeReference;
-import recoder.kit.TypeKit;
-import recoder.list.generic.ASTArrayList;
-import recoder.list.generic.ASTList;
 
 /**
  * Make a ClassDeclaration out of a class file.
@@ -55,7 +41,7 @@ import recoder.list.generic.ASTList;
  * 
  * The information is stored into a compilation unit within the appropriate package.
  * 
- * This builder *cannot* handle anonymous and inner classes yet.
+ * TODO This builder *cannot* handle anonymous and inner classes yet.
  * 
  * @author MU
  */
@@ -74,7 +60,7 @@ public class ClassFileDeclarationBuilder {
     // the class or interface declaration
     private TypeDeclaration typeDecl;
 
-    // this is the location for errormessages etc.
+    // this is the location for error messages etc.
     private DataLocation dataLocation;
 
     // the member to the declaration are collected here
@@ -85,7 +71,7 @@ public class ClassFileDeclarationBuilder {
      * ClassDeclaration for a single class file.
      * 
      * @param programFactory the factory to be used to create elements
-     * @param classFile classfile to be investigated
+     * @param classFile class file to be investigated
      */
     public ClassFileDeclarationBuilder(ProgramFactory programFactory, ClassFile classFile) {
         super();
@@ -93,18 +79,50 @@ public class ClassFileDeclarationBuilder {
         this.classFile = classFile;
     }
 
+    
     /**
-     * retrieve the compilation unit for the classfile under consideration.
+     * get the class name stored in the class file. May contain '$' for inner or
+     * anonymous classes
      * 
-     * The second and following calls will return the cached value of the 
-     * inital calculation.
+     * @return the physical name of the class in the class file
+     */
+    public String getClassname() {
+        return classFile.getPhysicalName();
+    }
+    
+    /**
+     * retrieve the compilation unit for the class file under consideration.
      * 
-     * @return a compilation unit correspoding to the class file.
+     * The second and following calls will return the cached value of the initial
+     * calculation.
+     * 
+     * This method calls {@link #makeTypeDeclaration()} and embeds this type
+     * into a compilation unit.
+     * 
+     * @return a compilation unit corresponding to the class file.
      */
     public CompilationUnit makeCompilationUnit() {
         if (compilationUnit == null) {
             compilationUnit = new CompilationUnit();
             setPackage();
+            makeTypeDeclaration();
+            addTypeDeclarationToCompUnit();
+            compilationUnit.makeAllParentRolesValid();
+            compilationUnit.setDataLocation(dataLocation);
+        }
+        return compilationUnit;
+    }
+
+    /**
+     * retrieve a TypeDeclaration for the class file under consideration
+     * 
+     * The second and following calls will return the cached value of the
+     * initial calculation.
+     * 
+     * @return a TypeDeclaration corresponding to the class file
+     */
+    public TypeDeclaration makeTypeDeclaration() {
+        if(typeDecl == null) {
             createTypeDeclaration();
             setNameAndMods();
             setInheritance();
@@ -119,10 +137,8 @@ public class ClassFileDeclarationBuilder {
                 addMethod(method);
             }
             typeDecl.setMembers(memberDecls);
-            compilationUnit.makeAllParentRolesValid();
-            compilationUnit.setDataLocation(dataLocation);
         }
-        return compilationUnit;
+        return typeDecl;
     }
     
     /**
@@ -135,6 +151,55 @@ public class ClassFileDeclarationBuilder {
         this.dataLocation = dataLocation;
     }
     
+    /**
+     * is the considered ClassFile the byte code of an inner class?
+     * 
+     * This is done checking the fully qualified class name. Does it contain a
+     * "$" and is this character not followed by a number
+     * 
+     * @return true iff the classFile under inspection is an inner class
+     */
+    public boolean isInnerClass() {
+        String physicalName = classFile.getPhysicalName();
+        if(physicalName.contains("$")) {
+            String trailing = physicalName.substring(physicalName.indexOf('$') + 1);
+            return !isNumber(trailing);
+        }
+        return false;
+    }
+    
+    
+   
+
+
+    /* TODO DOC*/
+    public void attachToEnclosingCompilationUnit(ServiceConfiguration sc) {
+        if(!isInnerClass())
+            throw new IllegalStateException("only inner classes can be attached to enclosing classes");
+        
+        NameInfo nameInfo = sc.getNameInfo();
+        String enclosingName = getEnclosingName();
+        ClassType ct = nameInfo.getClassType(enclosingName);
+        
+        if(!(ct instanceof TypeDeclaration)) {
+            throw new IllegalStateException(enclosingName + " is not present as source code; but:" + ct);
+        } else {
+            TypeDeclaration td = (TypeDeclaration) ct;
+            ASTList<MemberDeclaration> members = td.getMembers();
+            assert members != null : "ClassDeclaration with null members!";
+            TypeDeclaration childtd = makeTypeDeclaration();
+            members.add(childtd);
+            sc.getChangeHistory().attached(childtd);
+        }
+    }
+    
+    private String getEnclosingName() {
+        if(!isInnerClass())
+            throw new IllegalStateException("only inner classes have an enclosing class");
+        String physicalName = classFile.getPhysicalName();
+        return physicalName.substring(0, physicalName.indexOf('$'));
+    }
+
     /**
      * make a stub class declaration for a fully qualified type reference.
      * 
@@ -172,9 +237,7 @@ public class ClassFileDeclarationBuilder {
     }
     
     
-    public static boolean isInnerClass(ClassFile cf) {
-        return cf.getPhysicalName().contains("$");
-    }
+
     
     // --------------------------------------- private stuff below this line (and main)
     
@@ -189,6 +252,13 @@ public class ClassFileDeclarationBuilder {
         } else {
             throw new ConvertException("Only Interfaces and classes are allowed as byte code files");
         }
+    }
+    
+    /*
+     * add the type declaration to the compilation unit
+     */
+    
+    private void addTypeDeclarationToCompUnit() {
         ASTArrayList<TypeDeclaration> dl = new ASTArrayList<TypeDeclaration>(1);
         dl.add(typeDecl);
         compilationUnit.setDeclarations(dl);
@@ -222,7 +292,7 @@ public class ClassFileDeclarationBuilder {
      */    
     private void setInheritance() {
         
-        // do not inheret Object from itself!
+        // do not inherit Object from itself!
         if("java.lang.Object".equals(classFile.getPhysicalName()))
             return;
         
@@ -276,7 +346,7 @@ public class ClassFileDeclarationBuilder {
 
     /*
      * create the modifier list for a field declaration
-     * TODO are these all the possiblie mods?
+     * TODO are these all the possible modifiers?
      */
     private ASTList<DeclarationSpecifier> makeFieldSpecifiers(FieldInfo decl) {
         ASTList<DeclarationSpecifier> specs = new ASTArrayList<DeclarationSpecifier>();
@@ -439,6 +509,20 @@ public class ClassFileDeclarationBuilder {
         tyref.setDimensions(dimension);
         return tyref;
     }
+    
+    /**
+     * check if a string denotes a decimal number
+     * @param string
+     * @return true iff string denotes a decimal number
+     */
+    private boolean isNumber(String string) {
+        try {
+            Integer.parseInt(string);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 
     /**
      * Open a class file, transcribe it to a class Declaration and output the stub.
@@ -456,7 +540,5 @@ public class ClassFileDeclarationBuilder {
         CompilationUnit cu = b.makeCompilationUnit();
         System.out.println(cu.toSource());
     }
-
-
 
 }
