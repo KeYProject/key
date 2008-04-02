@@ -8,9 +8,8 @@ import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
-
+import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.IteratorOfNode;
@@ -18,11 +17,16 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.rule.IteratorOfRuleSet;
+import de.uka.ilkd.key.rule.ListOfRuleSet;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.visualdebugger.MethodVisitor;
 import de.uka.ilkd.key.visualdebugger.ProofStarter;
 import de.uka.ilkd.key.visualdebugger.WatchPointManager;
 import de.uka.ilkd.key.visualdebugger.WatchpointPO;
@@ -467,48 +471,112 @@ public class WatchpointUtil {
     public static Update trackRenaming(JavaInfo javaInfo, ListOfRenamingTable rt) {
 
         HashSet<VariableSpecification> localVariables = WatchPointManager
-        .getLocalVariables();
-        if(localVariables.size() == 0) return null;
+                .getLocalVariables();
+        if (localVariables.size() == 0)
+            return null;
         System.out.println(localVariables.size() + "loc var size in WPU");
-            
-            IteratorOfRenamingTable i = rt.iterator();
-            while (i.hasNext()) {
-                System.out.println("++++++++");
-                RenamingTable renaming = i.next();
-                for (Iterator iterator = localVariables.iterator(); iterator
-                        .hasNext();) {
-                    VariableSpecification variableSpecification = (VariableSpecification) iterator
-                            .next();
-                    if(variableSpecification.getProgramVariable() instanceof LocationVariable){
-                        LocationVariable lv = (LocationVariable) variableSpecification.getProgramVariable();
-                        System.out.println("variable ID: "+lv.id());
-                        SourceElement renamedVariable = renaming.getRenaming(lv);
-                       System.out.println("**************");
-                       if( renamedVariable!= null){
-                           System.out.println(" XXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-                           UpdateFactory uf = new UpdateFactory(null, null);
-                           Update elemtaryUpdate =  uf.elementaryUpdate(null, null);
-                           // -> add el.Updates to list/array
-                           // -> create & return parallel update
-                           uf.parallel(null);
-                           
-                       }
+
+        IteratorOfRenamingTable i = rt.iterator();
+        while (i.hasNext()) {
+            System.out.println("++++++++");
+            RenamingTable renaming = i.next();
+            for (Iterator iterator = localVariables.iterator(); iterator
+                    .hasNext();) {
+                VariableSpecification variableSpecification = (VariableSpecification) iterator
+                        .next();
+                if (variableSpecification.getProgramVariable() instanceof LocationVariable) {
+                    LocationVariable lv = (LocationVariable) variableSpecification
+                            .getProgramVariable();
+                    System.out.println("variable ID: " + lv.id());
+                    SourceElement renamedVariable = renaming.getRenaming(lv);
+                    System.out.println("**************");
+                    if (renamedVariable != null) {
+                        System.out.println(" XXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+                        UpdateFactory uf = new UpdateFactory(null, null);
+                        Update elemtaryUpdate = uf.elementaryUpdate(null, null);
+                        // -> add el.Updates to list/array
+                        // -> create & return parallel update
+                        uf.parallel(null);
+
                     }
                 }
-                System.out.println(renaming.toString());
             }
-            return null;
+            System.out.println(renaming.toString());
+        }
+        return null;
     }
-    
-    public static HashMap<Integer, VariableSpecification> valueToKey(Map<VariableSpecification, Integer> map ){
-        
-        HashMap<Integer, VariableSpecification> newHashMap = new HashMap<Integer, VariableSpecification>(); 
-        Iterator<Entry<VariableSpecification, Integer>> it = map.entrySet().iterator();
+
+    public static void getInitialRenamings(Node node) {
+
+        Node currentNode = node;
+        Node parent = currentNode.parent();
+
+        while (parent != null) {
+            if (parent.getAppliedRuleApp().rule() instanceof Taclet) {
+
+                ListOfRuleSet ruleSets = ((Taclet) parent.getAppliedRuleApp()
+                        .rule()).getRuleSets();
+                IteratorOfRuleSet iter = ruleSets.iterator();
+
+                while (iter.hasNext()) {
+                    RuleSet rs = iter.next();
+                    if (rs.name().toString().equals("method_expand"))
+                        System.out.println("METHOD_EXPAND");
+                                                            // currentNode?
+                    IteratorOfConstrainedFormula iterator = parent.sequent()
+                            .iterator();
+                    ConstrainedFormula constrainedFormula;
+                    Term term;
+                    while (iterator.hasNext()) {
+                        constrainedFormula = iterator.next();
+                        term = constrainedFormula.formula();
+
+                        while (term.op() instanceof QuanUpdateOperator) {
+                            int targetPos = ((QuanUpdateOperator) term.op())
+                                    .targetPos();
+                            term = term.sub(targetPos);
+                        }
+                        
+                            if (term.op() instanceof Modality) {
+                               
+                                ProgramPrefix programPrefix = (ProgramPrefix) term
+                                        .javaBlock().program();
+
+                                programPrefix = programPrefix
+                                        .getPrefixElementAt(programPrefix
+                                                .getPrefixLength() - 1);
+                                // TODO
+                                if(programPrefix instanceof MethodFrame) {
+                                    MethodFrame mf = (MethodFrame) programPrefix;
+                                    MethodVisitor mv = new MethodVisitor(mf);
+                                    mv.start();
+                                    System.out.println(mv.result());
+                                System.out.println(programPrefix.getClass());
+                                System.out.println(programPrefix.toString()); 
+                                }
+
+                            }
+
+                        
+                    }
+                }
+            }
+            currentNode = parent;
+            parent = currentNode.parent();
+        }
+    }
+
+    public static HashMap<Integer, VariableSpecification> valueToKey(
+            Map<VariableSpecification, Integer> map) {
+
+        HashMap<Integer, VariableSpecification> newHashMap = new HashMap<Integer, VariableSpecification>();
+        Iterator<Entry<VariableSpecification, Integer>> it = map.entrySet()
+                .iterator();
         while (it.hasNext()) {
             Entry<VariableSpecification, Integer> entry = (Entry<VariableSpecification, Integer>) it
                     .next();
             newHashMap.put(entry.getValue(), entry.getKey());
-            
+
         }
         return newHashMap;
     }
