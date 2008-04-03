@@ -218,7 +218,6 @@ public class WatchExpressionDialog {
              }
              // clean up in the end
              workingCopy.discardWorkingCopy();
-             System.out.println("WED " + positions);
              setPositions(positions);
              return true;
         }

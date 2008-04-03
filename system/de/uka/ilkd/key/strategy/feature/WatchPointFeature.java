@@ -23,7 +23,7 @@ public class WatchPointFeature extends BinaryFeature {
             return false;
         } else {
 
-            return WatchpointUtil.evalutateWatchpoints(watchpoints, goal
+            return WatchpointUtil.evalutateWatchpoints(goal.node(), watchpoints, goal
                     .sequent(), pos, goal.proof(), Op.OR, false, 250);
         }
     }

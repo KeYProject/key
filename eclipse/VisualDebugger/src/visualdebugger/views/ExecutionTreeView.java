@@ -41,6 +41,7 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
 import visualdebugger.VBTBuilder;
 import visualdebugger.draw2d.*;
 import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.*;
@@ -404,7 +405,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                     ListOfNode proofTreeNodes = node.getETNode().getProofTreeNodes();
                     System.out.println("ProofNodes  :: "+proofTreeNodes.size());
                     Node head = proofTreeNodes.head();
-                    WatchpointUtil.getInitialRenamings(head);
+                    try {
+                    WatchpointUtil.getInitialRenamings(vd.getMediator().getJavaInfo(),head);
                     System.out.println("SerialNr  :: "+ head.serialNr());
                     ListOfNode lon = SLListOfNode.EMPTY_LIST;
                     while(head.parent() != null){
@@ -413,7 +415,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                     }
                     lon=lon.reverse();
                     System.out.println("-------------");
-                    try {
+                    
                         for (IteratorOfNode it = lon.iterator(); it.hasNext();) {
                             Node anode = it.next();
                             ListOfRenamingTable renamingTables = anode.getRenamingTable();
@@ -421,7 +423,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                             if (renamingTables != null && renamingTables.size() > 0 ) {
                                System.out.println("RT size: "+renamingTables.size()+"@node " + anode.serialNr());
                                 
-                                WatchpointUtil.trackRenaming(vd.getMediator().getServices().getJavaInfo(), renamingTables);
+                                WatchpointUtil.trackRenaming(vd.getMediator().getServices().getJavaInfo(), head);
                             } 
                         }
                       
