@@ -122,7 +122,7 @@ public class WatchPointManager {
                         progVarNS.add(var_dummy);
 
                         if (wp.getLocalVariables() != null &&  wp.getLocalVariables().size() > 0) {
-                            translateLocalVariables(progVarNS, ji, wp);
+                            translateLocalVariables(progVarNS, services, wp);
                         }
 
                         buffer.append("\\exists " + declaringType + " x; {"
@@ -150,12 +150,14 @@ public class WatchPointManager {
 
     /**
      * @param progVarNS
-     * @param ji
+     * @param services
      * @param wp
      */
     private void translateLocalVariables(Namespace progVarNS,
-            final JavaInfo ji, WatchPoint wp) {
+            final Services services, WatchPoint wp) {
 
+        final JavaInfo ji = services.getJavaInfo();
+        
         List<LocalVariableDescriptor> locVars = wp.getLocalVariables();
         List<String> parameterTypes = wp.getParameterTypes();
         ListOfType signature = SLListOfType.EMPTY_LIST;
@@ -166,7 +168,7 @@ public class WatchPointManager {
 
         KeYJavaType classType = ji.getKeYJavaType(wp.getDeclaringType());
         ProgramMethod pm  = ji.getProgramMethod(classType, wp.getMethod(), signature, classType);
-        MethodVisitor pvc = new MethodVisitor(pm.getMethodDeclaration());
+        MethodVisitor pvc = new MethodVisitor(pm.getMethodDeclaration(), services);
         pvc.start();
         HashMap<Integer, VariableSpecification> keyPositions = WatchpointUtil.valueToKey(pvc.result());
         System.out.println(keyPositions);

@@ -571,11 +571,9 @@ public class InteractiveProver {
     }
 
     /**     
-     * adds a proverTaskListener to the mediator. 
+     * adds a proverTaskListener to apply strategy. 
      * 
-     * @param pm the ProverTaskListener to be added
-     * @param mediator TODO
-     * @param ptl TODO
+     * @param ptl the ProverTaskListener to be added
      */
     public void addProverTaskListener(ProverTaskListener ptl) {
         applyStrategy.addProverTaskObserver(ptl);

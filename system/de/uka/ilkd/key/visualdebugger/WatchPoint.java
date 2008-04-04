@@ -44,12 +44,7 @@ public class WatchPoint {
      * 
      * Use this constructor to instaniate a new watch point for a global field or a constant.
      * 
-     * @param expression the expression
-     * @param declaringType the type in which the watchpoint was set
-     * @param method the method
-     * @param statement_line the statement_line
-     * @param localVariables the local variables
-     * @param name the name
+     * @param wpd the WatchpointDescriptor encapsulating watchpoint related information
      */
     public WatchPoint(WatchpointDescriptor wpd) {
         super();

@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -129,8 +130,6 @@ public class WatchpointUtil {
     }
 
     /**
-     * @param programPrefix
-     * @git commit -m 
      */
     private static SourceElement getFirstActiveStatement(Term term) {
 
@@ -506,7 +505,7 @@ public class WatchpointUtil {
         return null;
     }
 
-    public static void getInitialRenamings(Node node) {
+    public static void getInitialRenamings(Node node, Services services) {
 
         Node currentNode = node;
         Node parent = currentNode.parent();
@@ -548,7 +547,7 @@ public class WatchpointUtil {
                                 // TODO
                                 if(programPrefix instanceof MethodFrame) {
                                     MethodFrame mf = (MethodFrame) programPrefix;
-                                    MethodVisitor mv = new MethodVisitor(mf);
+                                    MethodVisitor mv = new MethodVisitor(mf, services);
                                     mv.start();
                                     System.out.println(mv.result());
                                 System.out.println(programPrefix.getClass());
