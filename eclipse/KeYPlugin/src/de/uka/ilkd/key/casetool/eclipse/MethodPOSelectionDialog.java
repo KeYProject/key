@@ -26,10 +26,9 @@ import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
 
 
-
 /**
  * @author Marius Hillenbrand
- *
+ * NOT USED by KeYPlugin any more, but by VisualDebugger (TODO: Move there).
  */
 public class MethodPOSelectionDialog extends Dialog {
 
