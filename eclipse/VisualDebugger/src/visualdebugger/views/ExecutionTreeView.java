@@ -405,6 +405,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                     ListOfNode proofTreeNodes = node.getETNode().getProofTreeNodes();
                     System.out.println("ProofNodes  :: "+proofTreeNodes.size());
                     Node head = proofTreeNodes.head();
+                    WatchpointUtil.getInitialRenamings(head);
                     System.out.println("SerialNr  :: "+ head.serialNr());
                     ListOfNode lon = SLListOfNode.EMPTY_LIST;
                     while(head.parent() != null){

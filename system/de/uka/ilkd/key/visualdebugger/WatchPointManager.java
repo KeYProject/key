@@ -173,8 +173,10 @@ public class WatchPointManager {
         
         for (LocalVariableDescriptor localVariableDescriptor : locVars) {
             
-            localVariables.add(keyPositions.get(localVariableDescriptor.getPosition()));
-            // ProgramVariable???
+            VariableSpecification variableSpecification = keyPositions.get(localVariableDescriptor.getPosition());
+            System.out.println("ID in WPM "+((ProgramVariable)variableSpecification.getProgramVariable()).id());
+            localVariables.add(variableSpecification);
+   
             LocationVariable locVar = new LocationVariable(
                    new ProgramElementName(localVariableDescriptor.getName()),
                    ji.getKeYJavaType(localVariableDescriptor.getType()));
