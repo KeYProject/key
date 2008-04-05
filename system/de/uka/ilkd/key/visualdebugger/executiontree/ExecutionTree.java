@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.util.WatchpointUtil;
 import de.uka.ilkd.key.visualdebugger.*;
 
 public class ExecutionTree implements AutoModeListener {
@@ -311,6 +312,15 @@ public class ExecutionTree implements AutoModeListener {
         etNodeRoot = etrr2.getChildren()[0];
         simplifyBC(etNodeRoot);
 
+        // identify watchpoints
+        LinkedList<ETNode> allLeafETNodes = WatchpointUtil.getAllLeafETNodes(etNodeRoot);
+        ListOfTerm watchpoints = vd.getWatchPointManager()
+        .getListOfWatchpoints(vd.getMediator().getServices());
+        
+        if (!watchpoints.isEmpty()) {
+            WatchpointUtil.setActiveWatchpoint(allLeafETNodes, watchpoints);
+        }
+ 
         fireTreeChanged(root);
     }
 

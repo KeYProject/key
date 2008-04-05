@@ -379,6 +379,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                     setSelected(node);
                     renameTest(node);
                     wpInfo.removeAll();
+                    //TODO extract method
                     try {
                         if (activeWPs != null) {
                             for (Term term : activeWPs) {
@@ -423,7 +424,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                             if (renamingTables != null && renamingTables.size() > 0 ) {
                                System.out.println("RT size: "+renamingTables.size()+"@node " + anode.serialNr());
                                 
-                                WatchpointUtil.trackRenaming(vd.getMediator().getServices().getJavaInfo(), head);
+                                WatchpointUtil.trackRenaming(vd.getMediator().getServices().getJavaInfo(), anode);
                             } 
                         }
                       
@@ -1399,10 +1400,11 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
             if (ExecutionTree.treeStyle == ExecutionTree.SLET3) {
             	activeFilter = new TreeFilter();
-                LinkedList<ETNode> allLeafETNodes = WatchpointUtil.getAllLeafETNodes(etn);
-				System.out.println("ETV identfy for : " + allLeafETNodes.size() + " ETNODE (LEAVES)");
-				identifyWatchpoints(allLeafETNodes);
-                treebranch = buildTreeBranch(etn, null, activeFilter);
+                
+//            	LinkedList<ETNode> allLeafETNodes = WatchpointUtil.getAllLeafETNodes(etn);
+//				identifyWatchpoints(allLeafETNodes);
+                
+				treebranch = buildTreeBranch(etn, null, activeFilter);
                 this.root.addBranch(treebranch);
 
             } else if (ExecutionTree.treeStyle == ExecutionTree.RAWTREE) {

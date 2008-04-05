@@ -61,7 +61,7 @@ public abstract class ProgramVariable extends TermSymbol implements
         COUNTER++;
 
         if (name.toString().equals("marcelrothelovalvar")) {
-            System.out.println("PV ID## " + id());
+            System.out.println("PV ID## "+name+" " + id());
         }
     }
 

@@ -175,9 +175,7 @@ public class WatchpointUtil {
     public static boolean evalutateWatchpoint(Node node, Term watchpoint,
             Sequent seq, PosInOccurrence pos, Proof proof, int maxsteps) {
 
-        LinkedList<Update> updates = new LinkedList<Update>();
-        UpdateFactory updateFactory = new UpdateFactory(proof.getServices(),
-                proof.simplifier());
+        
         //start tracking names if necessary
         if(!WatchPointManager.getLocalVariables().isEmpty()){
             
@@ -185,6 +183,48 @@ public class WatchpointUtil {
             getInitialRenamings(javaInfo, node);
             trackRenaming(javaInfo, node);
             }
+        
+        UpdateFactory updateFactory = new UpdateFactory(proof.getServices(),
+                proof.simplifier());
+
+        LinkedList<Update> updates = collectUpdates(pos);
+        for (Update update : updates) {
+            watchpoint = updateFactory.prepend(update, watchpoint);
+        }
+        ConstrainedFormula newCF = new ConstrainedFormula(watchpoint);
+        seq = seq.changeFormula(newCF, pos).sequent();
+        try {
+            // start side proof
+            final ProofStarter ps = new ProofStarter();
+            final ProofEnvironment proofEnvironment = createProofEnvironment(seq,
+                    proof, maxsteps, ps);
+            System.out.println("14");
+
+            if (SwingUtilities.isEventDispatchThread())
+                ps.run(proofEnvironment);
+            else {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    ps.run(proofEnvironment);
+
+                }
+            });
+        }
+            System.out.println("LEAVING evaluateWP...");
+            return ps.getProof().closed();
+        } catch (Throwable t) {
+            System.out.println(t.toString());
+            t.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * @param pos
+     * @return
+     */
+    private static LinkedList<Update> collectUpdates(PosInOccurrence pos) {
+        LinkedList<Update> updates = new LinkedList<Update>();
         // collect all updates
         PIOPathIterator it = pos.iterator();
         while (it.hasNext()) {
@@ -197,51 +237,7 @@ public class WatchpointUtil {
                 updates.addFirst(update);
             }
         }
-        for (Update update : updates) {
-            watchpoint = updateFactory.prepend(update, watchpoint);
-        }
-        ConstrainedFormula newCF = new ConstrainedFormula(watchpoint);
-        seq = seq.changeFormula(newCF, pos).sequent();
-        try {
-            // start side proof
-            final ProofStarter ps = new ProofStarter();
-            final ProofEnvironment proofEnvironment = proof.env();
-            InitConfig initConfig = proofEnvironment.getInitConfig();
-            WatchpointPO watchpointPO = new WatchpointPO("WatchpointPO", seq);
-            watchpointPO.setIndices(initConfig.createTacletIndex(), initConfig
-                    .createBuiltInRuleIndex());
-            StrategyProperties strategyProperties = DebuggerStrategy
-                    .getDebuggerStrategyProperties(true, false, false,
-                            SLListOfTerm.EMPTY_LIST);
-            final StrategyFactory factory = new DebuggerStrategy.Factory();
-            Strategy strategy = (factory.create(proof, strategyProperties));
-            watchpointPO.setProofSettings(proof.getSettings());
-            watchpointPO.setInitConfig(initConfig);
-            ps.setStrategy(strategy);
-            ps.setMaxSteps(maxsteps);
-            ps.init(watchpointPO);
-            System.out.println("14");
-            if (strategy == null)
-                throw new NullPointerException("strategy was null");
-            if (watchpointPO == null)
-                throw new NullPointerException("watchpointPO was null");
-            if (proof.getSettings() == null)
-                throw new NullPointerException("settings was null");
-
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    ps.run(proofEnvironment);
-
-                }
-            });
-
-            System.out.println("LEAVING evaluateWP...");
-            return ps.getProof().closed();
-        } catch (Throwable t) {
-            System.out.println(t.toString());
-            t.printStackTrace();
-        }
-        return false;
+        return updates;
     }
 
     /**
@@ -250,9 +246,9 @@ public class WatchpointUtil {
      * Returns true, if the concatenation of all watchpoints by the junctor can
      * be evaluated to true, i.e. the proof can be closed
      * 
-     * Example: watchpoints: w1, w2, w3 junctor: /\ (AND - logical conjunction) ->
-     * evaluates w1 /\ w2 /\ w3 \/ (OR - logical disjunction) -> evalutaes w1 \/
-     * w2 \/ w3
+     * Example: watchpoints: w1, w2, w3 
+     *              junctor: /\ (AND - logical conjunction) -> evaluates w1 /\ w2 /\ w3 
+     *                       \/ (OR - logical disjunction) ->  evalutaes w1 \/ w2 \/ w3
      * 
      * @param watchpoints -
      *                a list of all watchpoints that have to be taken into
@@ -292,23 +288,10 @@ public class WatchpointUtil {
                 trackRenaming(proof.getServices().getJavaInfo(), node);
             }
             
-            LinkedList<Update> updates = new LinkedList<Update>();
-
             UpdateFactory updateFactory = new UpdateFactory(
                     proof.getServices(), proof.simplifier());
-            // collect all updates
-            PIOPathIterator it = pos.iterator();
-            while (it.hasNext()) {
-                it.next();
-                Term term = it.getSubTerm();
-                Operator operator = term.op();
-                if (operator instanceof QuanUpdateOperator) {
-
-                    Update update = Update.createUpdate(term);
-                    System.out.println("update.toString: " + update.toString());
-                    updates.addFirst(update);
-                }
-            }
+            
+            LinkedList<Update> updates = collectUpdates(pos);
 
             final TermFactory tf = TermFactory.DEFAULT;
             IteratorOfTerm iter = watchpoints.iterator();
@@ -333,23 +316,8 @@ public class WatchpointUtil {
             seq = seq.changeFormula(newCF, pos).sequent();
             // start side proof
             final ProofStarter ps = new ProofStarter();
-            final ProofEnvironment proofEnvironment = proof.env();
-            InitConfig initConfig = proofEnvironment.getInitConfig();
-
-            WatchpointPO watchpointPO = new WatchpointPO("WatchpointPO", seq);
-            watchpointPO.setIndices(initConfig.createTacletIndex(), initConfig
-                    .createBuiltInRuleIndex());
-
-            StrategyProperties strategyProperties = DebuggerStrategy
-                    .getDebuggerStrategyProperties(true, false, false,
-                            SLListOfTerm.EMPTY_LIST);
-            final StrategyFactory factory = new DebuggerStrategy.Factory();
-            Strategy strategy = (factory.create(proof, strategyProperties));
-            watchpointPO.setProofSettings(proof.getSettings());
-            watchpointPO.setInitConfig(initConfig);
-            ps.setStrategy(strategy);
-            ps.setMaxSteps(maxsteps);
-            ps.init(watchpointPO);
+            final ProofEnvironment proofEnvironment = createProofEnvironment(seq,
+                    proof, maxsteps, ps);
             try {
                 SwingUtilities.invokeAndWait(new Runnable() {
                     public void run() {
@@ -367,6 +335,37 @@ public class WatchpointUtil {
 
             return ps.getProof().closed();
         }
+    }
+
+    /**
+     * @param seq
+     * @param proof
+     * @param maxsteps
+     * @param ps
+     * @return
+     */
+    private static ProofEnvironment createProofEnvironment(Sequent seq,
+            Proof proof, int maxsteps, final ProofStarter ps) {
+        
+        final ProofEnvironment proofEnvironment = proof.env();
+        InitConfig initConfig = proofEnvironment.getInitConfig();
+
+        WatchpointPO watchpointPO = new WatchpointPO("WatchpointPO", seq);
+        watchpointPO.setIndices(initConfig.createTacletIndex(), initConfig
+                .createBuiltInRuleIndex());
+
+        StrategyProperties strategyProperties = DebuggerStrategy
+                .getDebuggerStrategyProperties(true, false, false,
+                        SLListOfTerm.EMPTY_LIST);
+        final StrategyFactory factory = new DebuggerStrategy.Factory();
+        Strategy strategy = (factory.create(proof, strategyProperties));
+        watchpointPO.setProofSettings(proof.getSettings());
+        watchpointPO.setInitConfig(initConfig);
+        ps.setStrategy(strategy);
+        ps.setMaxSteps(maxsteps);
+        ps.init(watchpointPO);
+        
+        return proofEnvironment;
     }
 
     /**
@@ -485,38 +484,36 @@ public class WatchpointUtil {
     public static Update trackRenaming(JavaInfo javaInfo, Node node) {
 
         HashSet<SourceElement> localVariables = WatchPointManager
-                .getLocalVariables();
+        .getLocalVariables();
+        
         if (localVariables.size() == 0)
             return null;
-        getInitialRenamings(javaInfo, node);
+       
         System.out.println(localVariables.size() + " loc var size in WPU");
-        
+        //TODO traverse tree upwards
         ListOfRenamingTable renamingTables = node.getRenamingTable();
         if (renamingTables != null && renamingTables.size() > 0 ) {
         IteratorOfRenamingTable i = renamingTables.iterator();
         while (i.hasNext()) {
             System.out.println("++++++++");
             RenamingTable renaming = i.next();
-            for (Iterator iterator = localVariables.iterator(); iterator
-                    .hasNext();) {
-                VariableSpecification variableSpecification = (VariableSpecification) iterator
-                        .next();
-                if (variableSpecification.getProgramVariable() instanceof LocationVariable) {
-                    LocationVariable lv = (LocationVariable) variableSpecification
-                            .getProgramVariable();
-                    System.out.println("variable ID: " + lv.id());
-                    SourceElement renamedVariable = renaming.getRenaming(lv);
+            for (SourceElement variable : localVariables) {
+                
+                VariableSpecification varSpec = (VariableSpecification) variable;
+                LocationVariable locationVariable = (LocationVariable) varSpec.getProgramVariable();
+                
+                    SourceElement renamedVariable = renaming.getRenaming(locationVariable);
+                    
                     System.out.println("**************");
                     if (renamedVariable != null) {
                         System.out.println(" XXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-                        UpdateFactory uf = new UpdateFactory(null, null);
-                        Update elemtaryUpdate = uf.elementaryUpdate(null, null);
-                        // -> add el.Updates to list/array
-                        // -> create & return parallel update
-                        uf.parallel(null);
+//                        UpdateFactory uf = new UpdateFactory(null, null);
+//                        Update elemtaryUpdate = uf.elementaryUpdate(null, null);
+//                        // -> add el.Updates to list/array
+//                        // -> create & return parallel update
+//                        uf.parallel(null);
 
                     }
-                }
             }
             System.out.println(renaming.toString());
         }
@@ -550,16 +547,17 @@ public class WatchpointUtil {
                         programMethod = mbs
                                 .getProgramMethod(javaInfo.getServices());
                         parameterCount = programMethod.getParameterDeclarationCount();
-                        System.out.println("parametercount "
-                                + parameterCount);
-                        System.out.println("parameters "
-                                + programMethod.getParameterDeclarationAt(0));
-                        IProgramVariable programVariable = programMethod
-                                .getParameterDeclarationAt(0)
-                                .getVariableSpecification()
-                                .getProgramVariable();
-                        System.out.println("id "
-                                + ((LocationVariable) programVariable).id());
+                        
+//                        System.out.println("parametercount "
+//                                + parameterCount);
+//                        System.out.println("parameters "
+//                                + programMethod.getParameterDeclarationAt(0));
+//                        IProgramVariable programVariable = programMethod
+//                                .getParameterDeclarationAt(0)
+//                                .getVariableSpecification()
+//                                .getProgramVariable();
+//                        System.out.println("id "
+//                                + ((LocationVariable) programVariable).id());
 
                         LinkedList<Integer> parameterIndices = getParameterIndicesOfMethod(programMethod);
                         
@@ -689,5 +687,4 @@ public class WatchpointUtil {
 
 
     }
-    
 }

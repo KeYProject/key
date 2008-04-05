@@ -1,8 +1,6 @@
 package de.uka.ilkd.key.visualdebugger;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.proof.*;
@@ -207,7 +205,12 @@ public class ProofStarter {
         goalChooser.init(proof, proof.openGoals());
         final ProofListener pl = new ProofListener();
 
+        ///%%% HACK !!!! Remove as soon as possible
+        List backup = Goal.getRuleAppListener();
+        Goal.setRuleAppListenerList((Collections.synchronizedList(new ArrayList(10))));
         Goal.addRuleAppListener(pl);
+       
+        
         System.out.println("27");
         try {
             System.out.println("28");
@@ -229,6 +232,7 @@ public class ProofStarter {
         } finally {
             System.out.println("32");  
             Goal.removeRuleAppListener(pl);
+            Goal.setRuleAppListenerList(backup);
             env.removeProofList(po.getPO());
             proof.setActiveStrategy(oldStrategy);
         }
