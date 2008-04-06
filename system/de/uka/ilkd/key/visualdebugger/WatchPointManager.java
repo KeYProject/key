@@ -39,6 +39,7 @@ public class WatchPointManager {
     private static HashSet<SourceElement> localVariables = new HashSet<SourceElement>();
 
     private static LinkedList<PositionWrapper> temporaryLocalVariables = new LinkedList<PositionWrapper>();
+    private static Namespace ns;
 
     /**
      * Gets the watch points.
@@ -91,6 +92,7 @@ public class WatchPointManager {
         LinkedList<WatchPoint> watchpoints = getWatchPoints();
         listOfWatchpoints = SLListOfTerm.EMPTY_LIST;
         temporaryLocalVariables = new LinkedList<PositionWrapper>();
+        ns = new Namespace();
 
         try {
             assert (watchpoints != null) : "Watchpoints are NULL!";
@@ -209,6 +211,7 @@ public class WatchPointManager {
                     new ProgramElementName(localVariableDescriptor.getName()),
                     ji.getKeYJavaType(localVariableDescriptor.getType()));
             progVarNS.add(locVar);
+            ns.add(locVar);
         }
     }
 
@@ -232,22 +235,14 @@ public class WatchPointManager {
 
     public static void setLocalVariables(HashSet<SourceElement> localVariables) {
         WatchPointManager.localVariables = localVariables;
-        try {
-            for (SourceElement sourceElement : localVariables) {
-                VariableSpecification varSpec = (VariableSpecification) sourceElement;
-                System.out
-                        .println("ID in WPM "
-                                + ((ProgramVariable) varSpec
-                                        .getProgramVariable()).id());
-            }
-        } catch (RuntimeException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
     public static LinkedList<PositionWrapper> getTemporaryLocalVariables() {
         return temporaryLocalVariables;
+    }
+
+    public static Namespace getNs() {
+        return ns;
     }
 
 }

@@ -60,9 +60,6 @@ public abstract class ProgramVariable extends TermSymbol implements
         id = COUNTER;
         COUNTER++;
 
-        if (name.toString().equals("marcelrothelovalvar")) {
-            System.out.println("PV ID## "+name+" " + id());
-        }
     }
 
     /** returns unique id %%%% HACK */

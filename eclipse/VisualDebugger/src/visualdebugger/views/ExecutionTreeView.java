@@ -404,30 +404,13 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                  */
                 private void renameTest(final SourceElementFigure node) {
                     ListOfNode proofTreeNodes = node.getETNode().getProofTreeNodes();
-                    System.out.println("ProofNodes  :: "+proofTreeNodes.size());
+
                     Node head = proofTreeNodes.head();
                     try {
-                    WatchpointUtil.getInitialRenamings(vd.getMediator().getJavaInfo(),head);
+                    WatchpointUtil.getInitialRenamings(head);
+                    WatchpointUtil.trackRenaming(head);
                     System.out.println("SerialNr  :: "+ head.serialNr());
-                    ListOfNode lon = SLListOfNode.EMPTY_LIST;
-                    while(head.parent() != null){
-                        lon = lon.append(head.parent());
-                        head = head.parent();
-                    }
-                    lon=lon.reverse();
-                    System.out.println("-------------");
-                    
-                        for (IteratorOfNode it = lon.iterator(); it.hasNext();) {
-                            Node anode = it.next();
-                            ListOfRenamingTable renamingTables = anode.getRenamingTable();
-                            
-                            if (renamingTables != null && renamingTables.size() > 0 ) {
-                               System.out.println("RT size: "+renamingTables.size()+"@node " + anode.serialNr());
-                                
-                                WatchpointUtil.trackRenaming(vd.getMediator().getServices().getJavaInfo(), anode);
-                            } 
-                        }
-                      
+
                     } catch (Throwable e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
