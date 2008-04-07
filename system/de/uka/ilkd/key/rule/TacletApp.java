@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import de.uka.ilkd.key.collection.ListOfString;
+import de.uka.ilkd.key.collection.PairOfListOfGoalAndTacletApp;
 import de.uka.ilkd.key.collection.PairOfTermAndListOfName;
 import de.uka.ilkd.key.collection.PairOfSVInstantiationsAndListOfName;
 import de.uka.ilkd.key.collection.SLListOfString;
@@ -389,7 +390,11 @@ public abstract class TacletApp implements RuleApp {
 					    +"\nthat is not complete.");
 	}
         goal.addAppliedRuleApp(this);	
-	return taclet().apply(goal, services, this);
+        Node n = goal.node();
+        PairOfListOfGoalAndTacletApp p = taclet().applyHelp(
+                goal, services, this);
+        n.setAppliedRuleApp(p.getTacletApp());	
+	return p.getListOfGoal();
     }    
 
     /** applies the specified rule at the specified position 

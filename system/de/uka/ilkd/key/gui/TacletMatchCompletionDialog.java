@@ -25,6 +25,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 
 import javax.swing.*;
@@ -93,64 +94,49 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
     public static void completeAndApplyApp(TacletApp app, Goal goal,
             KeYMediator medi) {
-        LinkedList l = new LinkedList();
+        LinkedList<TacletApp> l = new LinkedList<TacletApp>();
         l.add(app);
         completeAndApplyApp(l, goal, medi);
     }
 
-    public static void completeAndApplyApp(java.util.List<TacletApp> l, Goal goal,
+    public static void completeAndApplyApp(java.util.List<TacletApp> apps, Goal goal,
             KeYMediator medi) {
-        ApplyTacletDialogModel[] origInstModels = new ApplyTacletDialogModel[l
-                .size()];
-        LinkedList recentInstModels = new LinkedList();
-        ListIterator<TacletApp> tacletAppIt = l.listIterator();
+        ApplyTacletDialogModel[] origInstModels = new ApplyTacletDialogModel[apps.size()];
+        LinkedList<ApplyTacletDialogModel> recentInstModels = new LinkedList<ApplyTacletDialogModel>();
 
-        for (int i = 0; i < l.size(); i++) {
-            TacletApp tA =  tacletAppIt.next();
-            origInstModels[i] = createModel(tA, goal, medi);
+        int appCounter = 0;
+        for (final TacletApp tA : apps) {            
+            origInstModels[appCounter] = createModel(tA, goal, medi);
 
             if (InstantiationFileHandler.hasInstantiationListsFor(tA
                     .taclet())) {
-                ListIterator instListIt = InstantiationFileHandler
-                        .getInstantiationListsFor(tA.taclet()).listIterator();
-
-                while (instListIt.hasNext()) {
-                    java.util.List instantiations = (java.util.List) instListIt
-                        .next();
+                for (final List<String> instantiations : 
+                    InstantiationFileHandler.getInstantiationListsFor(tA.taclet())) {
                     int start = tA.instantiations().size();
 
-                    if (origInstModels[i].tableModel().getRowCount() - start ==
+                    if (origInstModels[appCounter].tableModel().getRowCount() - start ==
                             instantiations.size()) {
                         ApplyTacletDialogModel m = createModel(tA,
                                 goal, medi);
                         recentInstModels.add(m);
-                        ListIterator instIt = instantiations.listIterator();
-
-                        while (instIt.hasNext()) {
-                            m.tableModel().setValueAt(instIt.next(),
-                                    start++, 1);
+                        for (final String inst : instantiations) {
+                            m.tableModel().setValueAt(inst, start++, 1);
                         }
-
                     }
-
                 }
-
             }
-
+            appCounter++;
         }
 
         ApplyTacletDialogModel[] models = new ApplyTacletDialogModel[
                 origInstModels.length + recentInstModels.size()];
         int i;
-
         for (i = 0; i < origInstModels.length; i++) {
             models[i] = origInstModels[i];
         }
 
-        ListIterator recentInstModelIt = recentInstModels.listIterator();
-
-        while (recentInstModelIt.hasNext()) {
-            models[i++] = (ApplyTacletDialogModel) recentInstModelIt.next();
+        for (final ApplyTacletDialogModel model : recentInstModels) {
+            models[i++] = model;
         }
 
         new TacletMatchCompletionDialog(models, goal, medi);
@@ -732,7 +718,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
         private static final int SAVE_COUNT = 5;
 
-        private static HashMap hm;
+        private static HashMap<String, List<List<String>>> hm;
 
         private static boolean hasInstantiationListsFor(Taclet taclet) {
             if (hm == null) {
@@ -741,12 +727,12 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             return hm.containsKey(taclet.name().toString());
         }
 
-        private static java.util.List getInstantiationListsFor(Taclet taclet) {
+        private static java.util.List<List<String>> getInstantiationListsFor(Taclet taclet) {
             if (hasInstantiationListsFor(taclet)) {
                 if (hm.get(taclet.name().toString()) == null) {
                     createListFor(taclet);
                 }
-                return (java.util.List) hm.get(taclet.name().toString());
+                return hm.get(taclet.name().toString());
             }
             return null;
         }
@@ -758,10 +744,10 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             }
             String[] instFiles = dir.list();
             if (instFiles == null) {
-                hm = new HashMap(0);
+                hm = new HashMap<String, List<List<String>>>(0);
             } else {
                 // Avoid resizing of HashMap
-                hm = new HashMap(instFiles.length + 1, 1);
+                hm = new HashMap<String, List<List<String>>>(instFiles.length + 1, 1);
                 for (int i = 0; i < instFiles.length; i++) {
                     hm.put(instFiles[i], null);
                 }
@@ -769,8 +755,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         }
 
         private static void createListFor(Taclet taclet) {
-            java.util.List instList = new LinkedList();
-            java.util.List instantiations = new LinkedList();
+            java.util.List<List<String>> instList = new LinkedList<List<String>>();
+            java.util.List<String> instantiations = new LinkedList<String>();
             try {
                 BufferedReader br = new BufferedReader(new FileReader(
                         INSTANTIATION_DIR + File.separator
@@ -786,7 +772,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                         if (instantiations.size() > 0) {
                             instList.add(instantiations);
                         }
-                        instantiations = new LinkedList();
+                        instantiations = new LinkedList<String>();
                     } else if (line.equals(SEPARATOR2)) {
                         if (sb.length() > 0) {
                             instantiations.add(sb.toString());
@@ -816,7 +802,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             Taclet taclet = model.taclet();
             TacletInstantiationsTableModel tableModel = model.tableModel();
             int start = model.tacletApp().instantiations().size();
-            java.util.List instList = getInstantiationListsFor(taclet);
+            java.util.List<List<String>> instList = getInstantiationListsFor(taclet);
             try {
                 BufferedWriter bw = new BufferedWriter(new FileWriter(
                         INSTANTIATION_DIR + File.separator
@@ -831,11 +817,10 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                 String newInst = sb.toString();
                 bw.write(newInst);
                 if (instList != null) {
-                    ListIterator instListIt = instList.listIterator();
+                    final ListIterator<List<String>> instListIt = instList.listIterator();
                     int count = 1;
                     while (instListIt.hasNext() && count < SAVE_COUNT) {
-                        ListIterator instIt = ((java.util.List) instListIt
-                                .next()).listIterator();
+                        final ListIterator<String> instIt = instListIt.next().listIterator();
                         sb = new StringBuffer();
                         for (int i = 0; instIt.hasNext(); i++) {
                             if (i > 0) {

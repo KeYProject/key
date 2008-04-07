@@ -28,7 +28,8 @@ public class StrategySettings implements Settings {
     private static final String STEPS_KEY = "[Strategy]MaximumNumberOfAutomaticApplications";
     private static final String TIMEOUT_KEY = "[Strategy]Timeout";
     
-    private LinkedList listenerList = new LinkedList();
+    private LinkedList<SettingsListener> listenerList = 
+        new LinkedList<SettingsListener>();
     
     private Name activeStrategy;
 
@@ -147,9 +148,9 @@ public class StrategySettings implements Settings {
      * changed to its registered listeners (not thread-safe)
      */
     protected void fireSettingsChanged() {
-        Iterator it = listenerList.iterator();
+        Iterator<SettingsListener> it = listenerList.iterator();
         while (it.hasNext()) {
-            ((SettingsListener)it.next()).settingsChanged(new GUIEvent(this));
+            it.next().settingsChanged(new GUIEvent(this));
         }
     }
 

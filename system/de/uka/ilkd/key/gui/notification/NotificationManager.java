@@ -23,7 +23,7 @@ import de.uka.ilkd.key.proof.ProofEvent;
 public class NotificationManager {
 
     /** list of notification tasks */
-    private List notificationTasks = new ArrayList();
+    private List<NotificationTask> notificationTasks = new ArrayList<NotificationTask>();
     
     /** true if we are currently in automode */
     private boolean automode;
@@ -113,7 +113,7 @@ public class NotificationManager {
      * returns the registered notifications
      * @return the registered notifications
      */
-    public Iterator getNotificationTasks() {
+    public Iterator<NotificationTask> getNotificationTasks() {
         return notificationTasks.iterator();
     }
 
@@ -123,9 +123,9 @@ public class NotificationManager {
      * @return the notificatin task associated with the given event id
      */
     private NotificationTask getNotificationTask(int eventId) {
-        final Iterator it = getNotificationTasks();
+        final Iterator<NotificationTask> it = getNotificationTasks();
         while (it.hasNext()) {
-            final NotificationTask task = (NotificationTask)it.next();
+            final NotificationTask task = it.next();
             if (task.getEventID() == eventId) {
                 return task;
             }

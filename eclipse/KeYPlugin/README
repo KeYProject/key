@@ -7,16 +7,15 @@ which was introduced at the KeY Workshop 2005.
 Functionality
 =============
 
-- "Select proof obligation for method"
+- "Start Proof For Method"
 	in the context menu of methods in the java specific views (Outline /
-	Package Explorer)
-	lists the JML specifications of the selected method and allows the user
-	to invoke a proof on one of them
+	Package Explorer) 
+	allows the user to start a proof for the selected
+	method 
 	
-- "Open JML Specification Browser for java project"
+- "Start Proof For Project"
 	in the context menu of java projects in the Package Explorer
-	opens the JML Specification Browser for selection from all the classes
-	in the project
+	allows the user to start a proof for the selected project
 
 
 Requirements

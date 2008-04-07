@@ -3,8 +3,6 @@
  */
 package de.uka.ilkd.key.gui.notification;
 
-import java.util.Iterator;
-
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 
 /**
@@ -26,9 +24,8 @@ public class GeneralFailureNotification extends NotificationTask {
      */
     protected void executeImpl(NotificationEvent event,
             NotificationManager manager) {
-        final Iterator actions = getActions();         
-        while (actions.hasNext()) {            
-            ((NotificationAction)actions.next()).execute(event);
+        for (final NotificationAction action : getNotificationActions()) {         
+            action.execute(event);
         }
     }
 

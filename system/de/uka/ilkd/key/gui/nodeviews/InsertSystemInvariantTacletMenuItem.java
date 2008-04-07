@@ -53,8 +53,8 @@ public class InsertSystemInvariantTacletMenuItem extends InsertionTacletBrowserM
     /**
      * show the taclets sorted  
      */
-    protected Collection createInsertionList() {
-        return new TreeSet(new Lexicographical());
+    protected Collection<TacletAppListItem> createInsertionList() {
+        return new TreeSet<TacletAppListItem>(new Lexicographical());
     }
     
     
@@ -63,11 +63,10 @@ public class InsertSystemInvariantTacletMenuItem extends InsertionTacletBrowserM
                 notInfo, services);
     }
     
-    final static class Lexicographical implements Comparator {
-        public int compare(Object arg0, Object arg1) {
+    final static class Lexicographical implements Comparator<TacletAppListItem> {
+        public int compare(TacletAppListItem arg0, TacletAppListItem arg1) {
         
-            return ((TacletAppListItem)arg0).shortDescription().
-                compareTo(((TacletAppListItem)arg1).shortDescription());
+            return arg0.shortDescription().compareTo(arg1.shortDescription());
         }
     }
 
