@@ -38,6 +38,7 @@ import de.uka.ilkd.key.rule.metaconstruct.MethodCall;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramMetaConstruct;
 import de.uka.ilkd.key.rule.soundness.ProgramSVProxy;
 import de.uka.ilkd.key.rule.soundness.ProgramSVSkolem;
+import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -1230,6 +1231,24 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
     public void performActionOnProgramConstant(ProgramConstant x) {
         performActionOnProgramVariable(x);        
     }
+
+
+	public void performActionOnEnhancedFor(EnhancedFor x) {
+		// nothing to do
+		
+	}
+
+
+	public void performActionOnLoopInvariant(LoopInvariant x) {
+		// TODO resolve
+		
+	}
+
+
+	public void performActionOnSetAssignment(SetAssignment x) {
+		// TODO resolve
+		
+	}
 
 
   

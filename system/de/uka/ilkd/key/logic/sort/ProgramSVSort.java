@@ -789,7 +789,8 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 
         protected boolean canStandFor(ProgramElement check, Services services) {
             return ( (check instanceof MethodBodyStatement)
-            && ((MethodBodyStatement)check).isPure( services ) ) ;
+            && ((MethodBodyStatement)check).isPure( services )
+            && ((MethodBodyStatement)check).getResultVariable() != null ) ;
         }
     }
 
