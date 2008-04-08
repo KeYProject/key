@@ -42,7 +42,7 @@ public class CreateTacletForTests extends TestCase {
     public static SuccTaclet allright;
     public static AntecTaclet allleft;
     public static RewriteTaclet contradiction;
-    public static NoFindTaclet cut;
+    public static Taclet cut;
     public static RewriteTaclet predsuccelim;
     public static RewriteTaclet pluszeroelim;
     public static RewriteTaclet zeropluselim;
@@ -91,7 +91,7 @@ public class CreateTacletForTests extends TestCase {
 	    ("not_left{\\find(not b==>) \\replacewith(==>b)}");
 	notright = (SuccTaclet) parseTaclet
 	    ("not_right{\\find(==>not b) \\replacewith(b==>)}");
-	cut = (NoFindTaclet) parseTaclet
+	cut = (Taclet) parseTaclet
 	    ("cut{\\add(b==>); \\add(==>b)}");
 	imprightadd = (SuccTaclet) parseTaclet
 	    ("imp_right_add{\\find(==> b->b0) \\replacewith(b==>b0) \\addrules("

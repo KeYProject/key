@@ -10,21 +10,12 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.LinkedList;
+
 import de.uka.ilkd.key.collection.PairOfListOfGoalAndTacletApp;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Constraint;
-import de.uka.ilkd.key.logic.IteratorOfName;
-import de.uka.ilkd.key.logic.ListOfName;
-import de.uka.ilkd.key.logic.SLListOfName;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SetOfChoice;
-import de.uka.ilkd.key.logic.op.MapFromSchemaVariableToTacletPrefix;
-import de.uka.ilkd.key.logic.op.NameSV;
-import de.uka.ilkd.key.logic.op.SetAsListOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetOfSchemaVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IteratorOfGoal;
 import de.uka.ilkd.key.proof.ListOfGoal;
@@ -77,9 +68,6 @@ public class NoFindTaclet extends Taclet {
     }
     
 
-    private static final SchemaVariable PROGVAR_SV = new NameSV(
-            NameSV.NAME_PREFIX + "_PROG_VARS");
-
     /**
      * the rule is applied on the given goal using the
      * information of rule application. 
@@ -109,28 +97,16 @@ public class NoFindTaclet extends Taclet {
 	IteratorOfTacletGoalTemplate it               = goalTemplates().iterator();
 	IteratorOfGoal               goalIt           = newGoals.iterator();
 
-        ListOfName[] progvar_proposals = null;
+	
+	
         int count = 0;
-        String progvar_genNames = "";
-        Object o = tacletApp.instantiations().getInstantiation(PROGVAR_SV);
+        boolean newProgramVariablesAdded = false;
+        
+        final ListOfName[] nameProposalsForAddedProgVars = 
+            getNameProposalsForAddedProgramVariables(tacletApp);
 
-        if (o instanceof Name) {
-            String[] props = ((Name) o).toString().split(";");
-            progvar_proposals = new ListOfName[props.length];
-
-            for (int i = 0; i < props.length; i++) {
-                String[] props2 = props[i].split(",");
-                progvar_proposals[i] = SLListOfName.EMPTY_LIST;
-
-                for (int j = 0; j < props2.length; j++) {
-                    progvar_proposals[i] = progvar_proposals[i].append(
-                            new Name(props2[j]));
-                }
-
-            }
-
-        }
-
+        final LinkedList<ListOfName> newNames = new LinkedList<ListOfName>();
+        
 	while (it.hasNext()) {
 	    TacletGoalTemplate gt          = it    .next();
 	    Goal               currentGoal = goalIt.next();
@@ -146,39 +122,35 @@ public class NoFindTaclet extends Taclet {
 			      services,
 			      mc);
 
-	    ListOfName props = null;
-
-	    if (progvar_proposals != null && gt.addedProgVars().size() != 0) {
-	        props = progvar_proposals[count++];
+	    final ListOfName actualNamesOfAddedProgVars = 
+	        applyAddProgVars( gt.addedProgVars(),
+	                     currentGoal,
+	                     tacletApp.posInOccurrence(),
+	                     services,
+	                     mc, nameProposalsForAddedProgVars[count] );
+	    
+	    count++;
+	    
+	    if (!newProgramVariablesAdded && 
+	            !actualNamesOfAddedProgVars.isEmpty()) {
+	        newProgramVariablesAdded = true;
 	    }
-
-	    ListOfName newNames = applyAddProgVars( gt.addedProgVars(),
-			      currentGoal,
-                              tacletApp.posInOccurrence(),
-                              services,
-			      mc, props);
-	    IteratorOfName it2 = newNames.iterator();
-
-	    for (int j = 0; it2.hasNext(); j++) {
-
-	        if (j > 0) {
-	            progvar_genNames += "," + it2.next().toString();
-	        } else {
-	            progvar_genNames += ";" + it2.next().toString();
-	        }
-
-	    }
+	    
+	    newNames.add(actualNamesOfAddedProgVars);
                               
             currentGoal.setBranchLabel(gt.name());
 	}
 
-	PairOfListOfGoalAndTacletApp p;
+	final PairOfListOfGoalAndTacletApp p;
 
-	if (progvar_genNames.length() > 0) {
+	if (newProgramVariablesAdded) {
+	    final String actualUsedProgramVariableNames = 
+	        storeActualUsedProgramVariableNamesInString(newNames);
+	    
 	    p = new PairOfListOfGoalAndTacletApp(newGoals, tacletApp
 	            .setInstantiation(tacletApp.instantiations()
-	                    .addInteresting(PROGVAR_SV, new Name(
-	                            progvar_genNames.substring(1)))));
+	                    .addInteresting(PROGVAR_SV, 
+	                            new Name(actualUsedProgramVariableNames))));
 	} else {
 	    p = new PairOfListOfGoalAndTacletApp(newGoals, tacletApp);
 	}
