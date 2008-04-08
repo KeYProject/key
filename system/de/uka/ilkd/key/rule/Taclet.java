@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.PairOfListOfGoalAndTacletApp;
 import de.uka.ilkd.key.java.ContextStatementBlock;
@@ -73,11 +72,6 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class Taclet implements Rule, Named {
     
     private static final String AUTONAME = "_taclet";
-
-
-    protected static final SchemaVariable PROGVAR_SV = new NameSV(
-                NameSV.NAME_PREFIX + "_PROG_VARS");
-
 
     /** name of the taclet */
     private final Name name;
@@ -1777,60 +1771,6 @@ public abstract class Taclet implements Rule, Named {
     public ListOfSchemaVariable writeSet() {
 	return SLListOfSchemaVariable.EMPTY_LIST; 
     }
-
-    
-    /**
-     * returns a string with the actual names of the added program variables
-     * For example: The string <code>"v1,v2;;v3"</code> if three goals have been created where
-     * two program variables <code>v1,v2</code> have been added to the first one, none to the second goal
-     * and one variable <code>v3</code> to the third goal 
-     * @param newNames a LinkedList containing a list with names for added program variables 
-     * for each goal 
-     * @return the given list of list of names encoded as a String
-     */
-    protected String storeActualUsedProgramVariableNamesInString(final LinkedList<ListOfName> newNames) {
-        // we use Strings here as the lists contain usually only one element
-            // so that using StringBuffer does not pay off
-            String actualUsedProgramVariableNames = ""; 
-            for (ListOfName addedProgVarNames : newNames) {
-                String actualProgVarNamesPerGoal = "";
-                for (Name addedProgVarName : addedProgVarNames) {
-                    actualProgVarNamesPerGoal += "," + addedProgVarName;
-                }
-                actualUsedProgramVariableNames += actualProgVarNamesPerGoal.substring(1) + ";";
-            }
-            actualUsedProgramVariableNames = actualUsedProgramVariableNames.substring(0, 
-                    actualUsedProgramVariableNames.length()-1);
-        return actualUsedProgramVariableNames;
-    }
-
-    
-    /** 
-     * checks if name proposals for program variables to be added are available 
-     * and returns the proposals as list of names per goal
-     * @param tacletApp the TacletApp to look for name proposals
-     * @return an array with (a possible empty) list of names proposed to be used for 
-     * the respective goal 
-     */
-    protected ListOfName[] getNameProposalsForAddedProgramVariables(TacletApp tacletApp) {
-        final ListOfName[] progvar_proposals = new ListOfName[goalTemplates().size()];
-        Object o = tacletApp.instantiations().getInstantiation(PROGVAR_SV);
-    
-        if (o instanceof Name) {
-            String[] props = ((Name) o).toString().split(";");
-            assert props.length == progvar_proposals.length;
-            for (int i = 0; i < props.length; i++) {
-                String[] props2 = props[i].split(",");
-                progvar_proposals[i] = SLListOfName.EMPTY_LIST;
-    
-                for (int j = 0; j < props2.length; j++) {
-                    progvar_proposals[i] = progvar_proposals[i].append(
-                            new Name(props2[j]));
-                }
-    
-            }
-    
-        }
-        return progvar_proposals;
-    }         
+  
+         
 }

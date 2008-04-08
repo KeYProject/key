@@ -103,7 +103,7 @@ public class NoFindTaclet extends Taclet {
         boolean newProgramVariablesAdded = false;
         
         final ListOfName[] nameProposalsForAddedProgVars = 
-            getNameProposalsForAddedProgramVariables(tacletApp);
+            tacletApp.getNameProposalsForAddedProgramVariables();
 
         final LinkedList<ListOfName> newNames = new LinkedList<ListOfName>();
         
@@ -143,14 +143,9 @@ public class NoFindTaclet extends Taclet {
 
 	final PairOfListOfGoalAndTacletApp p;
 
-	if (newProgramVariablesAdded) {
-	    final String actualUsedProgramVariableNames = 
-	        storeActualUsedProgramVariableNamesInString(newNames);
-	    
-	    p = new PairOfListOfGoalAndTacletApp(newGoals, tacletApp
-	            .setInstantiation(tacletApp.instantiations()
-	                    .addInteresting(PROGVAR_SV, 
-	                            new Name(actualUsedProgramVariableNames))));
+	if (newProgramVariablesAdded) {	    
+	    p = new PairOfListOfGoalAndTacletApp(newGoals, 
+	            tacletApp.addNameProposal(newNames));	            	            
 	} else {
 	    p = new PairOfListOfGoalAndTacletApp(newGoals, tacletApp);
 	}
