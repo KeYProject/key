@@ -28,7 +28,7 @@ public class NoFindTacletBuilder extends TacletBuilder {
      * semisequences. No specification for the interactive or
      * recursive flags imply that the flags are not set. 
      */
-    public Taclet getNoFindTaclet(){
+    public NoFindTaclet getNoFindTaclet(){
 
 	TacletPrefixBuilder prefixBuilder=new TacletPrefixBuilder(this);
 	prefixBuilder.build();

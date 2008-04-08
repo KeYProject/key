@@ -206,7 +206,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     /**
      * Tests for "@pure" annotation
      *
-     * @see SpecificationRepository#isStrictlyPure(ProgramMethod)
+     * @see de.uka.ilkd.key.proof.mgt.SpecificationRepository#isStrictlyPure(ProgramMethod)
      * @param services
      * @return true, iff the method is annotated "@pure"
      */

@@ -53,7 +53,7 @@ import de.uka.ilkd.key.util.Debug;
  * TypeSchemeConstraintExtractor
  * 
  * @author jseidel
- * @see de.uka.ilkd.rule.UseMethodContractRule#apply(de.uka.ilkd.key.proof.Goal, de.uka.ilkd.key.java.Services, de.uka.ilkd.key.rule.RuleApp)
+ * @see de.uka.ilkd.key.rule.UseOperationContractRule#apply(de.uka.ilkd.key.proof.Goal, de.uka.ilkd.key.java.Services, de.uka.ilkd.key.rule.RuleApp)
  * @see TypeSchemeConstraintExtractor
  */
 

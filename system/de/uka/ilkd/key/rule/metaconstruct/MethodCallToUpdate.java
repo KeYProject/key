@@ -17,7 +17,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 /**
  * Transforms a method call into an update. Used for strictly pure methods.
  * 
- * @see ProgramSVSort#StrictlyPureMethodBodySort
+ * @see de.uka.ilkd.key.logic.sort.ProgramSVSort#PUREMETHODBODY
  * @author jseidel
  *
  */
