@@ -389,6 +389,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
   
                                 String wp = sb.toString().replaceFirst("myDummy=", "");
                                 wpInfo.add(wp.replace(";",""));
+                                
                                 } catch (Throwable t){
                                     t.printStackTrace();
                                 }

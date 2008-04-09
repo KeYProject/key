@@ -177,11 +177,35 @@ public class WatchpointUtil {
                 proof.simplifier());
         LinkedList<Update> updates = new LinkedList<Update>();
         // start tracking names if necessary
-        if (!WatchPointManager.getLocalVariables().isEmpty()) {
+        HashSet<SourceElement> localVariables = WatchPointManager.getLocalVariables();
+        
+        if (!localVariables.isEmpty()) {
 
             getInitialRenamings(node);
-            updates.add(buildNameUpdates(updateFactory, trackRenaming(node),
-                    WatchPointManager.getLocalVariables(), node.proof()));
+            
+            HashSet<SourceElement> initiallyRenamedLocalVariables = WatchPointManager.getInitiallyRenamedLocalVariables();
+            
+
+            for (SourceElement variable : initiallyRenamedLocalVariables) {
+                VariableSpecification spec = (VariableSpecification) variable;
+                
+                if(node.getGlobalProgVars().contains((ProgramVariable) spec.getProgramVariable() ) ){
+                    Iterator i = localVariables.iterator();
+                    Iterator it = initiallyRenamedLocalVariables.iterator();
+                    System.out.println("+++ detected relevant variable in namespace");
+                    while (i.hasNext()) {
+                        VariableSpecification varSpec = (VariableSpecification)i.next();
+                        VariableSpecification anotherVarSpec = (VariableSpecification) it.next();
+                        if(spec.equals(anotherVarSpec))
+                        updates.add(updateFactory.elementaryUpdate(
+                                TermFactory.DEFAULT.createVariableTerm((LocationVariable) varSpec.getProgramVariable()),
+                                TermFactory.DEFAULT.createVariableTerm((LocationVariable) anotherVarSpec.getProgramVariable())));
+                        
+                    }
+
+                }
+            }
+            updates.add(buildNameUpdates(updateFactory, trackRenaming(node), node));
         }
 
         updates.addAll(collectUpdates(pos));
@@ -195,7 +219,6 @@ public class WatchpointUtil {
             final ProofStarter ps = new ProofStarter();
             final ProofEnvironment proofEnvironment = createProofEnvironment(
                     seq, proof, maxsteps, ps);
-            System.out.println("14");
 
             if (SwingUtilities.isEventDispatchThread())
                 ps.run(proofEnvironment);
@@ -287,8 +310,7 @@ public class WatchpointUtil {
             if (!WatchPointManager.getLocalVariables().isEmpty()) {
 
                 getInitialRenamings(node);
-                updates.add(buildNameUpdates(updateFactory, trackRenaming(node),
-                        WatchPointManager.getLocalVariables(), node.proof()));
+                updates.add(buildNameUpdates(updateFactory, trackRenaming(node), node));
             }
 
             updates.addAll(collectUpdates(pos));
@@ -445,15 +467,11 @@ public class WatchpointUtil {
         try {
             for (ETNode node : nodes) {
 
-                System.out.println("proofNodesInETNode: "
-                        + node.getProofTreeNodes().size());
                 HashSet<Node> leafNodesInETNode = getLeafNodesInETNode(node
                         .getProofTreeNodes().toArray());
-                System.out.println("leafNodesInProofNodes: "
-                        + leafNodesInETNode.size());
-                boolean satisfiesWatchpoint = satisfiesWatchpoint(
-                        leafNodesInETNode, watchpoints, node);
-                node.setWatchpoint(satisfiesWatchpoint);
+
+                node.setWatchpoint(satisfiesWatchpoint(
+                        leafNodesInETNode, watchpoints, node));
                 System.out.println("LEAVING setActiveWatchpoint...");
             }
         } catch (Throwable t) {
@@ -488,15 +506,35 @@ public class WatchpointUtil {
         HashSet<SourceElement> localVariables = WatchPointManager
                 .getLocalVariables();
 
-        if (localVariables.size() == 0)
-            return null;
         // climb the tree
         ListOfNode lon = SLListOfNode.EMPTY_LIST;
         while (node.parent() != null) {
+            
+            for (SourceElement sourceElement : localVariables) {
+                Node thatParent = node.parent();
+                Node thatNode = node;
+                try {
+                    VariableSpecification varSpec = (VariableSpecification) sourceElement;
+                    LocationVariable locationVariable = (LocationVariable) varSpec
+                            .getProgramVariable();
+                    if(thatNode.getGlobalProgVars().contains(locationVariable)
+                            && !thatParent.getGlobalProgVars().contains(locationVariable)){
+//                        ListOfRenamingTable lort = SLListOfRenamingTable.EMPTY_LIST;
+//                        lort = lort.append(new SingleRenamingTable(locationVariable,locationVariable));
+//                        node.parent().setRenamings(lort);
+                        System.out.println("node contains local variable" + node.parent().serialNr());
+                        }
+                } catch (RuntimeException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            } 
+            
             lon = lon.append(node.parent());
             node = node.parent();
+           
         }
-
+        
         lon = lon.reverse();
         // walk back on the same branch
         IteratorOfNode it = lon.iterator();
@@ -504,7 +542,7 @@ public class WatchpointUtil {
             Node currentNode = it.next();
             ListOfRenamingTable renamingTables = currentNode.getRenamingTable();
             if (renamingTables != null && renamingTables.size() > 0) {
-
+                System.out.println("found renaming @node: " + currentNode.serialNr());
                 IteratorOfRenamingTable i = renamingTables.iterator();
 
                 while (i.hasNext()) {
@@ -531,8 +569,7 @@ public class WatchpointUtil {
                 if (isMethodExpandRule(((Taclet) parent.getAppliedRuleApp()
                         .rule()).getRuleSets())) {
 
-                    // treat parent, i.e. the method-body-statement to get
-                    // parameter information
+                    // treat parent, i.e. the method-body-statement to get parameter information
                     SourceElement parentElement = getStatement(parent);
                     if (parentElement instanceof StatementBlock) {
 
@@ -551,7 +588,6 @@ public class WatchpointUtil {
                             renamedLocalVariables.add(programMethod
                                     .getParameterDeclarationAt(index));
                         }
-
                     }
                     // treat currentnode, i.e. the method-frame
                     SourceElement element = getStatement(currentNode);
@@ -569,7 +605,7 @@ public class WatchpointUtil {
             currentNode = parent;
             parent = currentNode.parent();
         }
-        WatchPointManager.setLocalVariables(renamedLocalVariables);
+        WatchPointManager.setInitiallyRenamedLocalVariables(renamedLocalVariables);
         return renamedLocalVariables;
     }
 
@@ -622,8 +658,9 @@ public class WatchpointUtil {
     }
 
     private static boolean isMethodExpandRule(ListOfRuleSet listOfRuleSet) {
-        RuleSet expandRuleSet = new RuleSet(new Name("method_expand"));
-        return listOfRuleSet.contains(expandRuleSet);
+        return listOfRuleSet.contains(
+                new RuleSet(
+                        new Name("method_expand")));
     }
 
     /**
@@ -667,6 +704,7 @@ public class WatchpointUtil {
         HashSet<SourceElement> localVariables = new HashSet<SourceElement>();
         LinkedList<PositionWrapper> originalLocalVariables = WatchPointManager
                 .getTemporaryLocalVariables();
+        
         for (Entry<Integer, SourceElement> entry : entrySet) {
             for (PositionWrapper positionWrapper : originalLocalVariables) {
                 if (entry.getKey() + parameterCount == positionWrapper
@@ -682,37 +720,60 @@ public class WatchpointUtil {
     }
 
     private static Update buildNameUpdates(UpdateFactory uf,
-            ListOfRenamingTable renamings, HashSet<SourceElement> localVariables, Proof proof) {
+            ListOfRenamingTable renamings, Node node) {
 
         List<Update> nameUpdates = new LinkedList<Update>();
         IteratorOfRenamingTable i = renamings.iterator();
-        Namespace ns = WatchPointManager.getNs();
+        HashSet<SourceElement> localVariables = WatchPointManager.getLocalVariables();
+        HashSet<SourceElement> initiallyRenamedVars = WatchPointManager.getInitiallyRenamedLocalVariables();
+        assert localVariables.size() == initiallyRenamedVars.size();
+        Iterator localIter = localVariables.iterator();
+        Iterator initIter = initiallyRenamedVars.iterator();
+           
+        try {
+            while (i.hasNext()) {
+                RenamingTable renaming = i.next();
+                while (localIter.hasNext()) {
+                    
+                    SourceElement variable = (SourceElement) localIter.next();
+                    SourceElement initallyRenamedVariable = (SourceElement) initIter.next();
+                    
+                    VariableSpecification varSpec = (VariableSpecification) variable;
+                    VariableSpecification anotherVarSpec = (VariableSpecification) initallyRenamedVariable;
+                    
+                    LocationVariable originalVar = (LocationVariable) varSpec
+                            .getProgramVariable();
+                    
+                    LocationVariable initiallyRenamedVar = (LocationVariable) anotherVarSpec
+                    .getProgramVariable();
+                    System.out.println(originalVar.id() +" hashcode " + originalVar.hashCode());
+                    System.out.println(initiallyRenamedVar.id());
+//                    System.out.println("node"  + node.getGlobalProgVars().contains(locationVariable));
 
-        while (i.hasNext()) {
-            RenamingTable renaming = i.next();
+                    SourceElement renamedVariable = renaming
+                            .getRenaming(initiallyRenamedVar);
+                   
+                    if (renamedVariable != null) {
+                    
+                       System.out.println(renaming.toString());
+                        
+                      Update elemtaryUpdate = uf.elementaryUpdate(
+                      TermFactory.DEFAULT.createVariableTerm(originalVar),
+                      TermFactory.DEFAULT.createVariableTerm((LocationVariable) renamedVariable)); 
+                      System.out.println("update by tf"+elemtaryUpdate);
+                        
+                        nameUpdates.add(elemtaryUpdate);
+                        System.out.println("sizeof nameUpdates: " + nameUpdates.size());
 
-            for (SourceElement variable : localVariables) {
-
-                VariableSpecification varSpec = (VariableSpecification) variable;
-                LocationVariable locationVariable = (LocationVariable) varSpec
-                        .getProgramVariable();
-                SourceElement renamedVariable = renaming
-                        .getRenaming(locationVariable);
-
-                if (renamedVariable != null) {
-
-                    ns.add((LocationVariable)renamedVariable);
-                    Update elemtaryUpdate = uf.elementaryUpdate(
-                            ProblemLoader.parseTerm(
-                                    locationVariable.toString(), proof, new Namespace(), ns),
-                            ProblemLoader.parseTerm(
-                                    renamedVariable.toString(), proof, new Namespace(), ns));
-                    nameUpdates.add(elemtaryUpdate);
-
+                    }
                 }
             }
+            return uf.parallel(nameUpdates.toArray(new Update[nameUpdates.size()]));
+        } catch (RuntimeException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        return uf.parallel(nameUpdates.toArray(new Update[nameUpdates.size()]));
+        return null;
     }
 
 }

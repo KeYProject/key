@@ -37,9 +37,9 @@ public class WatchPointManager {
 
     /** Local variables contained in the watchpoints, if there are any. */
     private static HashSet<SourceElement> localVariables = new HashSet<SourceElement>();
+    private static HashSet<SourceElement> initiallyRenamedLocalVariables = new HashSet<SourceElement>();
 
     private static LinkedList<PositionWrapper> temporaryLocalVariables = new LinkedList<PositionWrapper>();
-    private static Namespace ns;
 
     /**
      * Gets the watch points.
@@ -92,7 +92,6 @@ public class WatchPointManager {
         LinkedList<WatchPoint> watchpoints = getWatchPoints();
         listOfWatchpoints = SLListOfTerm.EMPTY_LIST;
         temporaryLocalVariables = new LinkedList<PositionWrapper>();
-        ns = new Namespace();
 
         try {
             assert (watchpoints != null) : "Watchpoints are NULL!";
@@ -206,12 +205,13 @@ public class WatchPointManager {
             temporaryLocalVariables.add(new PositionWrapper(pm,
                     localVariableDescriptor.getPosition()));
             localVariables.add(variableSpecification);
-
-            LocationVariable locVar = new LocationVariable(
-                    new ProgramElementName(localVariableDescriptor.getName()),
-                    ji.getKeYJavaType(localVariableDescriptor.getType()));
+            VariableSpecification varspec = (VariableSpecification)variableSpecification;
+//            LocationVariable locVar = new LocationVariable(
+//                    new ProgramElementName(localVariableDescriptor.getName()),
+//                    ji.getKeYJavaType(localVariableDescriptor.getType()));
+            LocationVariable locVar = (LocationVariable) varspec.getProgramVariable();
             progVarNS.add(locVar);
-            ns.add(locVar);
+            System.out.println(locVar.hashCode() + " ID " + locVar.id() + " " + locVar);
         }
     }
 
@@ -241,8 +241,13 @@ public class WatchPointManager {
         return temporaryLocalVariables;
     }
 
-    public static Namespace getNs() {
-        return ns;
+    public static HashSet<SourceElement> getInitiallyRenamedLocalVariables() {
+        return initiallyRenamedLocalVariables;
     }
 
+    public static void setInitiallyRenamedLocalVariables(
+            HashSet<SourceElement> initiallyRenamedLocalVariables) {
+        WatchPointManager.initiallyRenamedLocalVariables = initiallyRenamedLocalVariables;
+    }
+    
 }

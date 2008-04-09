@@ -2,6 +2,9 @@ package de.uka.ilkd.key.visualdebugger;
 
 import java.util.List;
 
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.Term;
+
 /**
  * The Class WatchPoint.
  */
@@ -29,6 +32,11 @@ public class WatchPoint {
     private boolean enabled = true;
 
     private List<String> parameterTypes;
+    
+    private Term watchpointAsTerm;
+    private List<SourceElement> localVariablesAsSourceElements;
+    private List<SourceElement> inittiallyRenamedLocalVariables;
+    
   
     /**
      * Gets the in type.
