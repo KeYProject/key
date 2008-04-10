@@ -41,19 +41,15 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
 import visualdebugger.VBTBuilder;
 import visualdebugger.draw2d.*;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.decproc.DecProcRunner;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.util.WatchpointUtil;
-import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
-import de.uka.ilkd.key.visualdebugger.DebuggerListener;
-import de.uka.ilkd.key.visualdebugger.SourceElementId;
-import de.uka.ilkd.key.visualdebugger.VisualDebugger;
+import de.uka.ilkd.key.visualdebugger.*;
 import de.uka.ilkd.key.visualdebugger.executiontree.*;
 
 // TODO: Auto-generated Javadoc
@@ -289,7 +285,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
      */
     private void identifyWatchpoints(LinkedList<ETNode> nodesToEvaluate) {
 // FIXME: create getter/setter for watchpoints to avoid translation overhead
-        ListOfTerm watchpoints = vd.getWatchPointManager()
+        LinkedList<WatchPoint> watchpoints = vd.getWatchPointManager()
                 .getListOfWatchpoints(vd.getMediator().getServices());
         if (!watchpoints.isEmpty()) {
             WatchpointUtil.setActiveWatchpoint(nodesToEvaluate, watchpoints);
@@ -408,8 +404,9 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
                     Node head = proofTreeNodes.head();
                     try {
-                    WatchpointUtil.getInitialRenamings(head);
-                    WatchpointUtil.trackRenaming(head);
+                    LinkedList<WatchPoint> watchpoints = vd.getWatchPointManager().getListOfWatchpoints(vd.getMediator().getServices());
+                    WatchpointUtil.getInitialRenamings(head, watchpoints );
+                    WatchpointUtil.trackRenaming(head, watchpoints);
                     System.out.println("SerialNr  :: "+ head.serialNr());
 
                     } catch (Throwable e) {

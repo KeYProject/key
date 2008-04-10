@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.visualdebugger.executiontree;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.SwingUtilities;
 
@@ -314,7 +315,7 @@ public class ExecutionTree implements AutoModeListener {
 
         // identify watchpoints
         LinkedList<ETNode> allLeafETNodes = WatchpointUtil.getAllLeafETNodes(etNodeRoot);
-        ListOfTerm watchpoints = vd.getWatchPointManager()
+        List<WatchPoint> watchpoints = vd.getWatchPointManager()
         .getListOfWatchpoints(vd.getMediator().getServices());
         
         if (!watchpoints.isEmpty()) {

@@ -25,10 +25,7 @@ import de.uka.ilkd.key.strategy.DebuggerStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.visualdebugger.MethodVisitor;
-import de.uka.ilkd.key.visualdebugger.ProofStarter;
-import de.uka.ilkd.key.visualdebugger.WatchPointManager;
-import de.uka.ilkd.key.visualdebugger.WatchpointPO;
+import de.uka.ilkd.key.visualdebugger.*;
 import de.uka.ilkd.key.visualdebugger.executiontree.ETNode;
 
 /**
@@ -45,17 +42,19 @@ public class WatchpointUtil {
      * satisfy at least one watchpoint from the list
      */
     private static boolean satisfiesWatchpoint(HashSet<Node> leafNodesInETNode,
-            ListOfTerm watchpoints, ETNode etn) {
+            List<WatchPoint> watchpoints, ETNode etn) {
 
         assert leafNodesInETNode != null;
         assert leafNodesInETNode.size() != 0 : "No node to process /in satisfiesWatchpoint /in WatchpointUtil";
         assert watchpoints != null;
         assert watchpoints.size() != 0 : "No watchpoint to evaluate /in satisfiesWatchpoint /in WatchpointUtil";
 
-        LinkedList<Term> intersection = new LinkedList<Term>(Arrays
-                .asList(watchpoints.toArray()));
-
-        Term[] watches = watchpoints.toArray();
+        LinkedList<Term> watches = new LinkedList<Term>();
+        LinkedList<Term> intersection = new LinkedList<Term>();
+        for (WatchPoint watchPoint : watchpoints) {
+            watches.add(watchPoint.getWatchpointAsTerm());
+        }
+        intersection = watches;
         System.out.println("watches computed for " + leafNodesInETNode.size()
                 + " leafnodes..");
         for (Node node : leafNodesInETNode) {
@@ -70,7 +69,7 @@ public class WatchpointUtil {
                 for (Term watchpoint : watches) {
 
                     if (WatchpointUtil.evalutateWatchpoint(node, watchpoint,
-                            node.sequent(), pos, node.proof(), 250)) {
+                            node.sequent(), pos, node.proof(), 250, watchpoints)) {
                         temp.add(watchpoint);
                         System.out.println("wp evaluated to true");
                     }
@@ -80,8 +79,8 @@ public class WatchpointUtil {
             }
             intersection.retainAll(temp);
             System.out
-                    .println("wps evaluated to true (after intersection) for current node:"
-                            + intersection.size());
+            .println("wps evaluated to true (after intersection) for current node:"
+                    + intersection.size());
         }
         etn.setWatchpointsSatisfied(intersection);
         System.out.println("LEAVING satisfiesWP...with "
@@ -135,7 +134,7 @@ public class WatchpointUtil {
 
         assert term.op() instanceof Modality;
         ProgramPrefix programPrefix = (ProgramPrefix) term.javaBlock()
-                .program();
+        .program();
 
         programPrefix = programPrefix.getPrefixElementAt(programPrefix
                 .getPrefixLength() - 1);
@@ -171,41 +170,18 @@ public class WatchpointUtil {
      * @return true, if the watchpoint is satisfied in the current state
      */
     public static boolean evalutateWatchpoint(Node node, Term watchpoint,
-            Sequent seq, PosInOccurrence pos, Proof proof, int maxsteps) {
+            Sequent seq, PosInOccurrence pos, Proof proof, int maxsteps, List<WatchPoint> watchpoints) {
 
         UpdateFactory updateFactory = new UpdateFactory(proof.getServices(),
                 proof.simplifier());
         LinkedList<Update> updates = new LinkedList<Update>();
-        // start tracking names if necessary
-        HashSet<SourceElement> localVariables = WatchPointManager.getLocalVariables();
+        // start tracking names if necessary 
         
-        if (!localVariables.isEmpty()) {
+        if (WatchPointManager.existsWatchPointContainingLocals()) {
 
-            getInitialRenamings(node);
-            
-            HashSet<SourceElement> initiallyRenamedLocalVariables = WatchPointManager.getInitiallyRenamedLocalVariables();
-            
-
-            for (SourceElement variable : initiallyRenamedLocalVariables) {
-                VariableSpecification spec = (VariableSpecification) variable;
-                
-                if(node.getGlobalProgVars().contains((ProgramVariable) spec.getProgramVariable() ) ){
-                    Iterator i = localVariables.iterator();
-                    Iterator it = initiallyRenamedLocalVariables.iterator();
-                    System.out.println("+++ detected relevant variable in namespace");
-                    while (i.hasNext()) {
-                        VariableSpecification varSpec = (VariableSpecification)i.next();
-                        VariableSpecification anotherVarSpec = (VariableSpecification) it.next();
-                        if(spec.equals(anotherVarSpec))
-                        updates.add(updateFactory.elementaryUpdate(
-                                TermFactory.DEFAULT.createVariableTerm((LocationVariable) varSpec.getProgramVariable()),
-                                TermFactory.DEFAULT.createVariableTerm((LocationVariable) anotherVarSpec.getProgramVariable())));
-                        
-                    }
-
-                }
-            }
-            updates.add(buildNameUpdates(updateFactory, trackRenaming(node), node));
+            getInitialRenamings(node, watchpoints);
+            checkNamespace(node, watchpoints, updateFactory, updates);
+            updates.add(buildNameUpdates(updateFactory, trackRenaming(node, watchpoints), node, watchpoints));
         }
 
         updates.addAll(collectUpdates(pos));
@@ -237,6 +213,32 @@ public class WatchpointUtil {
             t.printStackTrace();
         }
         return false;
+    }
+
+    /**
+     * @param node
+     * @param watchpoints
+     * @param updateFactory
+     * @param updates
+     */
+    private static void checkNamespace(Node node, List<WatchPoint> watchpoints,
+            UpdateFactory updateFactory, LinkedList<Update> updates) {
+        
+        for(WatchPoint wp : watchpoints){
+            for(int i = 0;  i < wp.getOrginialLocalVariables().size(); i++){
+                LocationVariable orginialLocationVariable = wp.getOrginialLocalVariables().get(i);
+                LocationVariable renamedLocationVariable = wp.getInittiallyRenamedLocalVariables().get(i);
+
+                if(node.getGlobalProgVars().contains(renamedLocationVariable ) ){
+
+                    System.out.println("+++ detected relevant variable in namespace");
+
+                    updates.add(updateFactory.elementaryUpdate(
+                            TermFactory.DEFAULT.createVariableTerm(orginialLocationVariable),
+                            TermFactory.DEFAULT.createVariableTerm(renamedLocationVariable)));
+                }
+            }
+        }
     }
 
     /**
@@ -291,40 +293,42 @@ public class WatchpointUtil {
      *                the proof
      */
     public static boolean evalutateWatchpoints(Node node,
-            ListOfTerm watchpoints, Sequent seq, PosInOccurrence pos,
+            List<WatchPoint> watchpoints, Sequent seq, PosInOccurrence pos,
             Proof proof, Junctor junctor, boolean negateJunctor, int maxsteps) {
 
         UpdateFactory updateFactory = new UpdateFactory(
                 proof.getServices(), proof.simplifier());
         LinkedList<Update> updates = new LinkedList<Update>();
-        
+
         if (watchpoints.isEmpty()) {
             return false;
         } else {
             if (watchpoints.size() == 1) {
 
-                return WatchpointUtil.evalutateWatchpoint(node, watchpoints
-                        .toArray()[0], seq, pos, proof, maxsteps);
+                WatchPoint wp = (WatchPoint) watchpoints
+                .toArray()[0];
+                return WatchpointUtil.evalutateWatchpoint(node, wp.getWatchpointAsTerm(), seq, pos, proof, maxsteps, watchpoints);
             }
             // start tracking names if necessary
-            if (!WatchPointManager.getLocalVariables().isEmpty()) {
+            if (WatchPointManager.existsWatchPointContainingLocals()) {
 
-                getInitialRenamings(node);
-                updates.add(buildNameUpdates(updateFactory, trackRenaming(node), node));
+                getInitialRenamings(node, watchpoints);
+                updates.add(buildNameUpdates(updateFactory, trackRenaming(node,
+                        watchpoints), node, watchpoints));
             }
 
             updates.addAll(collectUpdates(pos));
 
             final TermFactory tf = TermFactory.DEFAULT;
-            IteratorOfTerm iter = watchpoints.iterator();
+            Iterator<WatchPoint> iter = watchpoints.iterator();
 
             Term watchpoint = (Op.OR == junctor ? tf.createJunctorTerm(junctor,
-                    iter.next(), tf.createJunctorTerm(Op.FALSE)) : tf
-                    .createJunctorTerm(junctor, iter.next(), tf
+                    ((WatchPoint)iter.next()).getWatchpointAsTerm(), tf.createJunctorTerm(Op.FALSE)) : tf
+                    .createJunctorTerm(junctor, ((WatchPoint)iter.next()).getWatchpointAsTerm(), tf
                             .createJunctorTerm(Op.TRUE)));
 
             while (iter.hasNext()) {
-                watchpoint = tf.createJunctorTerm(junctor, iter.next(),
+                watchpoint = tf.createJunctorTerm(junctor, ((WatchPoint)iter.next()).getWatchpointAsTerm(),
                         watchpoint);
             }
             if (negateJunctor) {
@@ -377,8 +381,8 @@ public class WatchpointUtil {
                 .createBuiltInRuleIndex());
 
         StrategyProperties strategyProperties = DebuggerStrategy
-                .getDebuggerStrategyProperties(true, false, false,
-                        SLListOfTerm.EMPTY_LIST);
+        .getDebuggerStrategyProperties(true, false, false,
+                new LinkedList<WatchPoint>());
         final StrategyFactory factory = new DebuggerStrategy.Factory();
         Strategy strategy = (factory.create(proof, strategyProperties));
         watchpointPO.setProofSettings(proof.getSettings());
@@ -462,7 +466,7 @@ public class WatchpointUtil {
      *                be evaluated for all these nodes.
      */
     public static void setActiveWatchpoint(List<ETNode> nodes,
-            ListOfTerm watchpoints) {
+            List<WatchPoint> watchpoints) {
         System.out.println("setting watchpoints active...");
         try {
             for (ETNode node : nodes) {
@@ -499,42 +503,37 @@ public class WatchpointUtil {
         return executionTree;
     }
 
-    public static ListOfRenamingTable trackRenaming(Node node) {
+    public static ListOfRenamingTable trackRenaming(Node node, List<WatchPoint> watchpoints) {
 
         ListOfRenamingTable allRenamings = SLListOfRenamingTable.EMPTY_LIST;
-
-        HashSet<SourceElement> localVariables = WatchPointManager
-                .getLocalVariables();
 
         // climb the tree
         ListOfNode lon = SLListOfNode.EMPTY_LIST;
         while (node.parent() != null) {
-            
-            for (SourceElement sourceElement : localVariables) {
-                Node thatParent = node.parent();
-                Node thatNode = node;
-                try {
-                    VariableSpecification varSpec = (VariableSpecification) sourceElement;
-                    LocationVariable locationVariable = (LocationVariable) varSpec
-                            .getProgramVariable();
-                    if(thatNode.getGlobalProgVars().contains(locationVariable)
-                            && !thatParent.getGlobalProgVars().contains(locationVariable)){
-//                        ListOfRenamingTable lort = SLListOfRenamingTable.EMPTY_LIST;
-//                        lort = lort.append(new SingleRenamingTable(locationVariable,locationVariable));
-//                        node.parent().setRenamings(lort);
-                        System.out.println("node contains local variable" + node.parent().serialNr());
+            for (WatchPoint watchPoint : watchpoints) {
+                List<LocationVariable> orginialLocalVariables = watchPoint.getOrginialLocalVariables();
+                for (LocationVariable locVar : orginialLocalVariables) {
+                    Node thatParent = node.parent();
+                    Node thatNode = node;
+                    try {
+
+                        if(thatNode.getGlobalProgVars().contains(locVar)
+                                && !thatParent.getGlobalProgVars().contains(locVar)){
+
+                            System.out.println("node contains local variable" + node.parent().serialNr());
                         }
-                } catch (RuntimeException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            } 
-            
+                    } catch (RuntimeException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                } 
+            }
+
             lon = lon.append(node.parent());
             node = node.parent();
-           
+
         }
-        
+
         lon = lon.reverse();
         // walk back on the same branch
         IteratorOfNode it = lon.iterator();
@@ -554,11 +553,18 @@ public class WatchpointUtil {
         return allRenamings;
     }
 
-    public static HashSet<SourceElement> getInitialRenamings(Node node) {
+    /**
+     * Gets the initial renamings.
+     * 
+     * @param node the node
+     * 
+     * @return the initial renamings
+     */
+    public static List<LocationVariable> getInitialRenamings(Node node,  List<WatchPoint> watchpoints) {
 
         Node currentNode = node;
         Node parent = currentNode.parent();
-        HashSet<SourceElement> renamedLocalVariables = new HashSet<SourceElement>();
+        List<LocationVariable> renamedLocalVariables = new LinkedList<LocationVariable>();
         ProgramMethod programMethod = null;
         int parameterCount = 0;
 
@@ -574,38 +580,44 @@ public class WatchpointUtil {
                     if (parentElement instanceof StatementBlock) {
 
                         MethodBodyStatement mbs = (MethodBodyStatement) parentElement
-                                .getFirstElement();
+                        .getFirstElement();
                         MethodVisitor mbsVisitor = new MethodVisitor(mbs);
                         mbsVisitor.start();
                         programMethod = mbs.getProgramMethod(node.proof()
                                 .getServices());
                         parameterCount = programMethod
-                                .getParameterDeclarationCount();
+                        .getParameterDeclarationCount();
 
-                        LinkedList<Integer> parameterIndices = getParameterIndicesOfMethod(programMethod);
+                        LinkedList<Integer> parameterIndices = getParameterIndicesOfMethod(programMethod, watchpoints);
 
                         for (Integer index : parameterIndices) {
-                            renamedLocalVariables.add(programMethod
-                                    .getParameterDeclarationAt(index));
+                            renamedLocalVariables.add((LocationVariable) programMethod
+                                    .getParameterDeclarationAt(index).getVariableSpecification().getProgramVariable());
                         }
                     }
                     // treat currentnode, i.e. the method-frame
                     SourceElement element = getStatement(currentNode);
-
+                    //  Before getting the finally renamed variables we have to get all variables that are declared
+                    //  in the method body. The resulting positions are not correct yet since the parameter count is missing.
                     if (element instanceof MethodFrame) {
                         MethodVisitor mv = new MethodVisitor(
                                 (MethodFrame) element);
                         mv.start();
-                        renamedLocalVariables.addAll(getRenamedLocalVariables(
+                        renamedLocalVariables.addAll(addParameterCount(
                                 programMethod, valueToKey(mv.result()),
-                                parameterCount));
+                                parameterCount, watchpoints));
+                    }
+
+                    for (WatchPoint wp : watchpoints) {
+                        if(wp.getProgramMethod().equals(programMethod)){
+                            wp.setInittiallyRenamedLocalVariables(renamedLocalVariables);
+                        }
                     }
                 }
             }
             currentNode = parent;
             parent = currentNode.parent();
         }
-        WatchPointManager.setInitiallyRenamedLocalVariables(renamedLocalVariables);
         return renamedLocalVariables;
     }
 
@@ -624,13 +636,13 @@ public class WatchpointUtil {
 
                 while (term.op() instanceof QuanUpdateOperator) {
                     int targetPos = ((QuanUpdateOperator) term.op())
-                            .targetPos();
+                    .targetPos();
                     term = term.sub(targetPos);
                 }
                 // proceed to most inner method-frame
                 if (term.op() instanceof Modality) {
                     ProgramPrefix programPrefix = (ProgramPrefix) term
-                            .javaBlock().program();
+                    .javaBlock().program();
                     return programPrefix.getPrefixElementAt(programPrefix
                             .getPrefixLength() - 1);
 
@@ -650,7 +662,7 @@ public class WatchpointUtil {
         Iterator<Entry<SourceElement, Integer>> it = map.entrySet().iterator();
         while (it.hasNext()) {
             Entry<SourceElement, Integer> entry = (Entry<SourceElement, Integer>) it
-                    .next();
+            .next();
             newHashMap.put(entry.getValue(), entry.getKey());
 
         }
@@ -674,44 +686,55 @@ public class WatchpointUtil {
      *         used
      */
     private static LinkedList<Integer> getParameterIndicesOfMethod(
-            ProgramMethod programMethod) {
+            ProgramMethod programMethod, List<WatchPoint> watchpoints) {
 
         int parameterCount = programMethod.getParameterDeclarationCount();
-        LinkedList<PositionWrapper> originalLocalVariables = WatchPointManager
-                .getTemporaryLocalVariables();
         LinkedList<Integer> parameterIndices = new LinkedList<Integer>();
-        if (originalLocalVariables.isEmpty() || originalLocalVariables == null) {
-            return parameterIndices;
-        } else {
 
-            for (PositionWrapper positionWrapper : originalLocalVariables) {
+        for (WatchPoint watchPoint : watchpoints) {
+            if(watchPoint.getProgramMethod().equals(programMethod)){
+                for (int position : watchPoint.getKeyPositions()) {
 
-                if (positionWrapper.getProgramMethod().equals(programMethod)
-                        && positionWrapper.getPosition() < parameterCount) {
-
-                    parameterIndices.add(positionWrapper.getPosition());
+                    if( position < parameterCount) {
+                        parameterIndices.add(position);
+                    }
                 }
             }
-            return parameterIndices;
         }
+        return parameterIndices;
     }
 
-    private static HashSet<SourceElement> getRenamedLocalVariables(
+    /**
+     * Gets the renamed local variables.
+     * 
+
+     *  In this method the we add the parametercount on the position of the variables from the method
+     *  body. After that the correct order of the variables is rebuild according to the original ones.
+     * 
+     * @param programMethod the program method
+     * @param variables the variables
+     * @param parameterCount the parameter count
+     * @param watchpoints the watchpoints
+     * 
+     * @return the renamed local variables
+     */
+    private static List<LocationVariable> addParameterCount(
             ProgramMethod programMethod, Map<Integer, SourceElement> variables,
-            int parameterCount) {
+            int parameterCount, List<WatchPoint> watchpoints) {
 
         Set<Entry<Integer, SourceElement>> entrySet = variables.entrySet();
-        HashSet<SourceElement> localVariables = new HashSet<SourceElement>();
-        LinkedList<PositionWrapper> originalLocalVariables = WatchPointManager
-                .getTemporaryLocalVariables();
-        
-        for (Entry<Integer, SourceElement> entry : entrySet) {
-            for (PositionWrapper positionWrapper : originalLocalVariables) {
-                if (entry.getKey() + parameterCount == positionWrapper
-                        .getPosition()
-                        && positionWrapper.getProgramMethod().equals(
-                                programMethod)) {
-                    localVariables.add(entry.getValue());
+        List<LocationVariable> localVariables = new LinkedList<LocationVariable>();
+
+        for (WatchPoint watchPoint : watchpoints) {
+            if(watchPoint.getProgramMethod().equals(programMethod)){
+                for (int position : watchPoint.getKeyPositions()) {
+                    for (Entry<Integer, SourceElement> entry : entrySet) {
+                        if (entry.getKey() + parameterCount == position) {
+
+                            VariableSpecification varspec = (VariableSpecification) entry.getValue();
+                            localVariables.add((LocationVariable) varspec.getProgramVariable());
+                        }
+                    }
                 }
             }
         }
@@ -720,54 +743,49 @@ public class WatchpointUtil {
     }
 
     private static Update buildNameUpdates(UpdateFactory uf,
-            ListOfRenamingTable renamings, Node node) {
+            ListOfRenamingTable renamings, Node node, List<WatchPoint> watchpoints) {
 
         List<Update> nameUpdates = new LinkedList<Update>();
         IteratorOfRenamingTable i = renamings.iterator();
-        HashSet<SourceElement> localVariables = WatchPointManager.getLocalVariables();
-        HashSet<SourceElement> initiallyRenamedVars = WatchPointManager.getInitiallyRenamedLocalVariables();
-        assert localVariables.size() == initiallyRenamedVars.size();
-        Iterator localIter = localVariables.iterator();
-        Iterator initIter = initiallyRenamedVars.iterator();
-           
-        try {
+
+        for (WatchPoint watchPoint : watchpoints) {
+            List<LocationVariable> orginialLocalVariables = watchPoint.getOrginialLocalVariables();
+            List<LocationVariable> inittiallyRenamedLocalVariables = watchPoint.getInittiallyRenamedLocalVariables();
+            assert orginialLocalVariables.size() == inittiallyRenamedLocalVariables.size();
+
             while (i.hasNext()) {
                 RenamingTable renaming = i.next();
-                while (localIter.hasNext()) {
-                    
-                    SourceElement variable = (SourceElement) localIter.next();
-                    SourceElement initallyRenamedVariable = (SourceElement) initIter.next();
-                    
-                    VariableSpecification varSpec = (VariableSpecification) variable;
-                    VariableSpecification anotherVarSpec = (VariableSpecification) initallyRenamedVariable;
-                    
-                    LocationVariable originalVar = (LocationVariable) varSpec
-                            .getProgramVariable();
-                    
-                    LocationVariable initiallyRenamedVar = (LocationVariable) anotherVarSpec
-                    .getProgramVariable();
+                for(int j = 0; j < orginialLocalVariables.size(); j++) {
+
+
+                    LocationVariable originalVar = orginialLocalVariables.get(j);
+                    LocationVariable initiallyRenamedVar = inittiallyRenamedLocalVariables.get(j);
+
                     System.out.println(originalVar.id() +" hashcode " + originalVar.hashCode());
                     System.out.println(initiallyRenamedVar.id());
-//                    System.out.println("node"  + node.getGlobalProgVars().contains(locationVariable));
 
                     SourceElement renamedVariable = renaming
-                            .getRenaming(initiallyRenamedVar);
-                   
+                    .getRenaming(initiallyRenamedVar);
                     if (renamedVariable != null) {
-                    
-                       System.out.println(renaming.toString());
-                        
-                      Update elemtaryUpdate = uf.elementaryUpdate(
-                      TermFactory.DEFAULT.createVariableTerm(originalVar),
-                      TermFactory.DEFAULT.createVariableTerm((LocationVariable) renamedVariable)); 
-                      System.out.println("update by tf"+elemtaryUpdate);
-                        
+
+                        System.out.println(renaming.toString());
+
+                        Update elemtaryUpdate = uf.elementaryUpdate(
+                                TermFactory.DEFAULT.createVariableTerm(originalVar),
+                                TermFactory.DEFAULT.createVariableTerm((LocationVariable) renamedVariable)); 
+                        System.out.println("update by tf"+elemtaryUpdate);
+
                         nameUpdates.add(elemtaryUpdate);
                         System.out.println("sizeof nameUpdates: " + nameUpdates.size());
 
                     }
                 }
             }
+        }
+
+
+        try {
+
             return uf.parallel(nameUpdates.toArray(new Update[nameUpdates.size()]));
         } catch (RuntimeException e) {
             // TODO Auto-generated catch block

@@ -45,6 +45,7 @@ import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
+import de.uka.ilkd.key.visualdebugger.WatchPoint;
 
 /**
  * The Class StartVisualDebuggerAction.
@@ -817,7 +818,7 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 				new DebuggerEvent(DebuggerEvent.PROJECT_LOADED_SUCCESSFUL,
 						debuggerEventMsg));
 		StrategyProperties strategyProperties = DebuggerStrategy
-				.getDebuggerStrategyProperties(true, false, false, SLListOfTerm.EMPTY_LIST);
+				.getDebuggerStrategyProperties(true, false, false, new LinkedList<WatchPoint>());
 		
 		final StrategyFactory factory = new DebuggerStrategy.Factory();
 		Strategy strategy = (factory.create(VisualDebugger.getVisualDebugger().getMediator().getProof(), strategyProperties));

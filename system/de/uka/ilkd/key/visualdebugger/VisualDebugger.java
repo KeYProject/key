@@ -1116,7 +1116,7 @@ public class VisualDebugger {
 
         postPredicate = (Function) proof.getNamespaces().functions().lookup(
                 POST_PREDICATE_NAME);
-        setProofStrategy(proof, true, false, SLListOfTerm.EMPTY_LIST);
+        setProofStrategy(proof, true, false, new LinkedList<WatchPoint>());
         run();
     }
 
@@ -1506,7 +1506,7 @@ public class VisualDebugger {
      *                the in update and assumes
      */
     public void setProofStrategy(final Proof proof, boolean splittingAllowed,
-            boolean inUpdateAndAssumes, ListOfTerm watchpoints) {
+            boolean inUpdateAndAssumes, List<WatchPoint> watchpoints) {
 
         StrategyProperties strategyProperties = DebuggerStrategy
                 .getDebuggerStrategyProperties(splittingAllowed,
@@ -1629,11 +1629,11 @@ public class VisualDebugger {
 
         final Proof proof = ps.getProof();
 
-        setProofStrategy(proof, false, false, SLListOfTerm.EMPTY_LIST);
+        setProofStrategy(proof, false, false, new LinkedList<WatchPoint>());
         ps.setUseDecisionProcedure(useDecisionProcedures);
         ps.run(proofEnvironment);
 
-        setProofStrategy(proof, true, false, SLListOfTerm.EMPTY_LIST);
+        setProofStrategy(proof, true, false, new LinkedList<WatchPoint>());
         if (etProgressMonitor != null) {
             ps.removeProgressMonitor(etProgressMonitor);
         }

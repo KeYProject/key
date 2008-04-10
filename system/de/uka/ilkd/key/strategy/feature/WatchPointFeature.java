@@ -1,17 +1,20 @@
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.ListOfTerm;
+import java.util.LinkedList;
+import java.util.List;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.WatchpointUtil;
+import de.uka.ilkd.key.visualdebugger.WatchPoint;
 import de.uka.ilkd.key.logic.op.Op;
 
 public class WatchPointFeature extends BinaryFeature {
 
-    private final ListOfTerm watchpoints;
+    private final List<WatchPoint> watchpoints;
 
-    public WatchPointFeature(ListOfTerm watchpoints) {
+    public WatchPointFeature(List<WatchPoint> watchpoints) {
         super();
         this.watchpoints = watchpoints;
     }
@@ -28,7 +31,7 @@ public class WatchPointFeature extends BinaryFeature {
         }
     }
 
-    public static WatchPointFeature create(ListOfTerm wp) {
+    public static WatchPointFeature create(List<WatchPoint> wp) {
         return new WatchPointFeature(wp);
     }
 }
