@@ -12,10 +12,7 @@ package de.uka.ilkd.key.proof.init;
 import java.util.Map;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ListOfProgramVariable;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 
 
@@ -43,7 +40,7 @@ public class PreservesThroughoutPO extends EnsuresPO {
                               ListOfProgramVariable paramVars, 
                               ProgramVariable resultVar,
                               ProgramVariable exceptionVar,
-                              Map atPreFunctions) throws ProofInputException {
+                              Map<Operator, Function/*atPre*/> atPreFunctions) throws ProofInputException {
         return TB.tt();
     }
     
@@ -52,7 +49,7 @@ public class PreservesThroughoutPO extends EnsuresPO {
                                ListOfProgramVariable paramVars, 
                                ProgramVariable resultVar,
                                ProgramVariable exceptionVar,
-                               Map atPreFunctions) throws ProofInputException {        
+                               Map<Operator, Function/*atPre*/> atPreFunctions) throws ProofInputException {        
         return translateInvs(invs);
     }
     

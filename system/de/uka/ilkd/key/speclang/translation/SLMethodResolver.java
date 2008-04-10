@@ -66,7 +66,7 @@ class SLMethodResolver extends SLExpressionResolver {
         if (!pm.isStatic()) {
             if (!receiver.isTerm()) {
                 throw manager.excManager.createException(
-                        "non-static method ( " + methodName + " ) invocation" +
+                        "non-static method (" + methodName + ") invocation" +
                         " on Type " + receiver.getType());
             }
             subs = new Term[parameters.getParameters().size()+1];
@@ -81,6 +81,12 @@ class SLMethodResolver extends SLExpressionResolver {
         while(it.hasNext()) {
             //Remember: parameters.isLisOfTerm() is true!
             subs[i++] = it.next().getTerm();
+        }
+        
+        if (pm.getKeYJavaType() == null) {
+            // return type is void
+            throw manager.excManager.createException("can not use void " +
+            		"method \"" + methodName + "\" in specification expression.");
         }
         
         return manager.createSLExpression(tb.func(pm,subs));

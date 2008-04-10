@@ -10,15 +10,12 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.LinkedList;
+
+import de.uka.ilkd.key.collection.PairOfListOfGoalAndTacletApp;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Constraint;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SetOfChoice;
-import de.uka.ilkd.key.logic.op.MapFromSchemaVariableToTacletPrefix;
-import de.uka.ilkd.key.logic.op.SetAsListOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetOfSchemaVariable;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IteratorOfGoal;
 import de.uka.ilkd.key.proof.ListOfGoal;
@@ -78,7 +75,7 @@ public class NoFindTaclet extends Taclet {
      * @param services the Services encapsulating all java information
      * @param ruleApp the taclet application that is executed
      */
-    public ListOfGoal apply(Goal     goal,
+    public PairOfListOfGoalAndTacletApp applyHelp(Goal     goal,
 			    Services services, 
 			    RuleApp  ruleApp) {
 
@@ -100,6 +97,16 @@ public class NoFindTaclet extends Taclet {
 	IteratorOfTacletGoalTemplate it               = goalTemplates().iterator();
 	IteratorOfGoal               goalIt           = newGoals.iterator();
 
+	
+	
+        int count = 0;
+        boolean newProgramVariablesAdded = false;
+        
+        final ListOfName[] nameProposalsForAddedProgVars = 
+            tacletApp.getNameProposalsForAddedProgramVariables();
+
+        final LinkedList<ListOfName> newNames = new LinkedList<ListOfName>();
+        
 	while (it.hasNext()) {
 	    TacletGoalTemplate gt          = it    .next();
 	    Goal               currentGoal = goalIt.next();
@@ -115,16 +122,35 @@ public class NoFindTaclet extends Taclet {
 			      services,
 			      mc);
 
-	    applyAddProgVars( gt.addedProgVars(),
-			      currentGoal,
-                              tacletApp.posInOccurrence(),
-                              services,
-			      mc);
+	    final ListOfName actualNamesOfAddedProgVars = 
+	        applyAddProgVars( gt.addedProgVars(),
+	                     currentGoal,
+	                     tacletApp.posInOccurrence(),
+	                     services,
+	                     mc, nameProposalsForAddedProgVars[count] );
+	    
+	    count++;
+	    
+	    if (!newProgramVariablesAdded && 
+	            !actualNamesOfAddedProgVars.isEmpty()) {
+	        newProgramVariablesAdded = true;
+	    }
+	    
+	    newNames.add(actualNamesOfAddedProgVars);
                               
             currentGoal.setBranchLabel(gt.name());
 	}
+
+	final PairOfListOfGoalAndTacletApp p;
+
+	if (newProgramVariablesAdded) {	    
+	    p = new PairOfListOfGoalAndTacletApp(newGoals, 
+	            tacletApp.addNameProposal(newNames));	            	            
+	} else {
+	    p = new PairOfListOfGoalAndTacletApp(newGoals, tacletApp);
+	}
        
-	return newGoals;
+	return p;
     }
 
     protected Taclet setName(String s) {

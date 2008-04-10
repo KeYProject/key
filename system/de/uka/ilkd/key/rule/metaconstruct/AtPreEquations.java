@@ -70,9 +70,8 @@ public class AtPreEquations extends AbstractMetaOperator {
             Term[] argTerms = getTerms(new ArrayOfQuantifiableVariable(args));
 
             TermFactory tf = TermBuilder.DF.tf();
-            Term f1Term = tf.createTerm(f1,
-                                        argTerms,
-                                        (ArrayOfQuantifiableVariable)null,
+            Term f1Term = tf.createTerm(f1,   argTerms,
+                                        null,
                                         null);
             Term f2Term = TermBuilder.DF.func(f2, argTerms);
             Term equalsTerm = tf.createJunctorTerm(Op.EQUALS, f1Term, f2Term);

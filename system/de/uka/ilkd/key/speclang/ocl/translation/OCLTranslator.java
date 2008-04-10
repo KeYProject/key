@@ -26,9 +26,7 @@ import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.IteratorOfParsableVariable;
-import de.uka.ilkd.key.logic.op.ListOfParsableVariable;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserMode;
@@ -60,8 +58,7 @@ class OCLTranslator {
 	    				ListOfParsableVariable paramVars,
 	    				ParsableVariable resultVar,
 	    				ParsableVariable excVar,
-                                        Map /*Operator (normal) 
-                                           -> Function (atPre)*/ atPreFunctions) 
+                                        Map<Operator, Function> /*(atPre)*/ atPreFunctions) 
     		throws SLTranslationException {
 	assert expr != null && !expr.equals("");
 	assert specInClass != null;
@@ -69,7 +66,7 @@ class OCLTranslator {
 	FunctionFactory.INSTANCE.resetFactory(services, ac);
 	
 	Term resultFormula = null;
-	Map resultAxioms = null;
+	Map<Operator, Term> resultAxioms = null;
 	
         //create lexer and parser
         StringReader stream = new StringReader(expr);

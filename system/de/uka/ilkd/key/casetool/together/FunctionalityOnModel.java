@@ -24,16 +24,13 @@ import de.uka.ilkd.key.gui.ContractConfigurator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.*;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 import de.uka.ilkd.key.speclang.SetOfOperationContract;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
+
 
 
 public class FunctionalityOnModel {
@@ -330,7 +327,8 @@ public class FunctionalityOnModel {
         //get all pairs of overriding and overridden operation contracts
         //(only works correctly if there cannot be more than one contract per 
 	// operation, as it is currently the case in Together)
-        Map contractPairs = new HashMap();
+        Map<OperationContract, OperationContract> contractPairs = 
+            new HashMap<OperationContract, OperationContract>();
         IteratorOfProgramMethod subIt 
         	= javaInfo.getAllProgramMethods(subKJT).iterator();
         while(subIt.hasNext()) {

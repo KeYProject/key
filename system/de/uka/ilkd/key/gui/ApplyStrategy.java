@@ -61,7 +61,7 @@ public class ApplyStrategy {
     
     private boolean startedAsInteractive;
     
-    private List proverTaskObservers = new ArrayList ();
+    private List<ProverTaskListener> proverTaskObservers = new ArrayList<ProverTaskListener> ();
 
     private ReusePoint reusePoint;
 
@@ -169,21 +169,21 @@ public class ApplyStrategy {
 
     private synchronized void fireTaskStarted () {
         for (int i = 0, sz = proverTaskObservers.size(); i<sz; i++) {
-            ((ProverTaskListener)proverTaskObservers.get(i))
+            proverTaskObservers.get(i)
                 .taskStarted(PROCESSING_STRATEGY, maxApplications);
         }
     }
 
     private synchronized void fireTaskProgress () {
         for (int i = 0, sz = proverTaskObservers.size(); i<sz; i++) {
-            ((ProverTaskListener)proverTaskObservers.get(i))
+            proverTaskObservers.get(i)
                 .taskProgress(countApplied);
         }
     }
 
     private synchronized void fireTaskFinished (TaskFinishedInfo info) {
         for (int i = 0, sz = proverTaskObservers.size(); i<sz; i++) {
-            ((ProverTaskListener)proverTaskObservers.get(i)).taskFinished(info);
+            proverTaskObservers.get(i).taskFinished(info);
         }
     }
 

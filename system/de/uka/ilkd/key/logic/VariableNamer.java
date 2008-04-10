@@ -349,7 +349,14 @@ public abstract class VariableNamer implements InstantiationProposer {
      */
     public abstract ProgramVariable rename(ProgramVariable var,
                                            Goal goal,
-                                           PosInOccurrence posOfFind);
+                                           PosInOccurrence posOfFind,
+                                           Name proposal);
+
+    public ProgramVariable rename(ProgramVariable var,
+                                           Goal goal,
+                                           PosInOccurrence posOfFind) {
+        return rename(var, goal, posOfFind, null);
+    }
 
     
     

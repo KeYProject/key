@@ -32,6 +32,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.Highlighter.HighlightPainter;
 
 import de.uka.ilkd.key.gui.ApplyTacletDialog;
@@ -71,10 +72,11 @@ public class SequentView extends JEditorPane implements Autoscroll {
     private Object additionalHighlight;
 
     // a vector of highlights to mark updates
-    private Vector updateHighlights;
+    private Vector<Object> updateHighlights;
 
     // all known highlights
-    private HashMap color2Highlight = new HashMap();
+    private HashMap<Color, DefaultHighlightPainter> color2Highlight = 
+        new HashMap<Color, DefaultHighlightPainter>();
     
     // the used sequentprinter
     private LogicPrinter printer;
@@ -136,7 +138,7 @@ public class SequentView extends JEditorPane implements Autoscroll {
 	defaultHighlight = getColorHighlight(DEFAULT_HIGHLIGHT_COLOR);
 	
 	currentHighlight = defaultHighlight;
-	updateHighlights = new Vector();
+	updateHighlights = new Vector<Object>();
 	
 	Config.DEFAULT.addConfigChangeListener(
 	        new ConfigChangeListener() {
@@ -260,7 +262,7 @@ public class SequentView extends JEditorPane implements Autoscroll {
     public void updateUpdateHighlights() {
         if (printer == null) return;
 
-        Iterator it = updateHighlights.iterator();
+        Iterator<Object> it = updateHighlights.iterator();
 
         while (it.hasNext()) {
             removeHighlight(it.next());
@@ -309,7 +311,7 @@ public class SequentView extends JEditorPane implements Autoscroll {
            color2Highlight.put(color, new DefaultHighlighter.
                    DefaultHighlightPainter(color));
         } 
-        return (HighlightPainter)color2Highlight.get(color);
+        return color2Highlight.get(color);
     }
     
     /**

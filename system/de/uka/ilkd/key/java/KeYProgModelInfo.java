@@ -13,8 +13,6 @@ import java.util.*;
 
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Constructor;
-import recoder.list.generic.ASTArrayList;
-import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
@@ -147,17 +145,13 @@ public class KeYProgModelInfo{
         return result;
     }
 
-
-
     private List<recoder.abstraction.Type> getRecoderTypes(ListOfType types) {
         if (types==null) {
             return null;
         }
-        IteratorOfType it=types.iterator();
-        ArrayList<recoder.abstraction.Type> tl
+        final ArrayList<recoder.abstraction.Type> tl
             = new ArrayList<recoder.abstraction.Type>(types.size());
-        while (it.hasNext()) {
-	    Type n = it.next();
+        for (final Type n : types) {
             tl.add( (recoder.abstraction.Type) rec2key().toRecoder(n));
         }
         return tl;
@@ -167,17 +161,13 @@ public class KeYProgModelInfo{
         if (types==null) {
             return null;
         }
-        IteratorOfKeYJavaType it=types.iterator();
         ArrayList<recoder.abstraction.Type> tl
             = new ArrayList<recoder.abstraction.Type>(types.size());
-        while (it.hasNext()) {
-            final KeYJavaType kjt = it.next();  
+        for (final KeYJavaType kjt : types) {
             tl.add( (recoder.abstraction.Type) rec2key().toRecoder(kjt));
         }
         return tl;
     }
-
-
 
     /**
      * Returns the full name of a KeYJavaType t.

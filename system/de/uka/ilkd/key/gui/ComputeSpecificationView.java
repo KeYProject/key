@@ -122,8 +122,8 @@ public class ComputeSpecificationView {
 	    view.setCaretPosition(0); // at least until a better solution
 	    final JScrollPane pane =
 		new JScrollPane(view,
-				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED
 		    );
 	    
 	    pane.setPreferredSize(new Dimension(600, 400));

@@ -18,7 +18,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.UpdateFactory;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.ArrayOp;
 import de.uka.ilkd.key.logic.op.AttributeOp;
 import de.uka.ilkd.key.logic.op.Function;
@@ -102,7 +101,7 @@ public class MetaEquivalentUpdates extends AbstractMetaOperator {
 		}
 
         final Term locWithVars = tf.createTerm ( op, varArray,
-                                                 new ArrayOfQuantifiableVariable (),
+                                                 null,
                                                  JavaBlock.EMPTY_JAVABLOCK );
 		// System.out.println("Term with free variables: " + locWithVars.toString());
 

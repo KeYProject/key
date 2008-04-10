@@ -18,11 +18,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.EverythingLocationDescriptor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
-import de.uka.ilkd.key.logic.op.ListOfParsableVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.ClassInvariantImpl;
@@ -139,7 +135,7 @@ public class OCLSpecFactory {
         ParsableVariable excVar = SVF.createExcVar(services,
                                                    programMethod, 
                                                    false);
-        Map atPreFunctions = new LinkedHashMap();
+        Map<Operator, Function> atPreFunctions = new LinkedHashMap<Operator, Function>();
         
         //translate pre
         FormulaWithAxioms pre;

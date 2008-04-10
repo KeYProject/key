@@ -35,7 +35,7 @@ public class TestTacletPopup {
     static AntecTaclet remove_and_left;
     static SuccTaclet remove_and_right;
     static RewriteTaclet contradiction;
-    static NoFindTaclet cut;
+    static Taclet cut;
     static RewriteTaclet predsuccelim;
     static RewriteTaclet pluszeroelim;
     static RewriteTaclet zeropluselim;

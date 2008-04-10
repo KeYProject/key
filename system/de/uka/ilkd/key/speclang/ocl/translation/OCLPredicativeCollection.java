@@ -26,7 +26,6 @@ import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
-import de.uka.ilkd.key.util.Debug;
 
 
 class OCLPredicativeCollection {
@@ -48,7 +47,7 @@ class OCLPredicativeCollection {
      */
     protected OCLPredicativeCollection(LogicVariable var, 
                          Term restriction) {
-        Debug.assertTrue(restriction.sort() == Sort.FORMULA);
+        assert restriction.sort() == Sort.FORMULA;
         this.var         = var;
         this.restriction = restriction;
     }
@@ -101,15 +100,15 @@ class OCLPredicativeCollection {
      */
     protected OCLPredicativeCollection(Term recTerm, 
                          Function assocFunc) {
-        Debug.assertTrue(assocFunc.sort() == Sort.FORMULA);
-        Debug.assertTrue(assocFunc.arity() == 2);
-        List createdVars = new LinkedList();
+        assert assocFunc.sort() == Sort.FORMULA;
+        assert assocFunc.arity() == 2;
+        List<LogicVariable> createdVars = new LinkedList<LogicVariable>();
         Term predicateTerm = createPredicateTerm(assocFunc, 
                                                  recTerm, 
                                                  createdVars);
-        Debug.assertTrue(createdVars.size() == 1);
+        assert createdVars.size() == 1;
         
-        this.var         = (LogicVariable) createdVars.get(0);
+        this.var         = createdVars.get(0);
         this.restriction = predicateTerm;
     }
     
@@ -122,8 +121,8 @@ class OCLPredicativeCollection {
     private static Term createPredicateTerm(
                                 Function predicate, 
                                 Term argTerm, 
-                                /*out*/ List /*LogicVariable*/ createdVars) {
-        Debug.assertTrue(predicate.sort() == Sort.FORMULA);
+                                /*out*/ List<LogicVariable> createdVars) {
+        assert predicate.sort() == Sort.FORMULA;
         
         //prepare arguments
         Term[] argTerms = new Term[predicate.arity()];
@@ -144,7 +143,8 @@ class OCLPredicativeCollection {
     
     
     private Term replaceVar(LogicVariable lv1, LogicVariable lv2, Term term) {
-        Map map = new LinkedHashMap();
+        Map<LogicVariable, LogicVariable> map = 
+            new LinkedHashMap<LogicVariable, LogicVariable>();
         map.put(lv1, lv2);
         OpReplacer or = new OpReplacer(map);
         return or.replace(term);
@@ -235,15 +235,15 @@ class OCLPredicativeCollection {
      * predicate).
      */
     protected OCLPredicativeCollection navigate(Services services, Function predicate) {
-        Debug.assertTrue(predicate.sort() == Sort.FORMULA);
-        Debug.assertTrue(predicate.arity() == 2);
+        assert predicate.sort() == Sort.FORMULA;
+        assert predicate.arity() == 2;
             
-        List createdVars = new LinkedList();
+        List<LogicVariable> createdVars = new LinkedList<LogicVariable>();
         Term predicateTerm = createPredicateTerm(predicate, 
                                                  getVarAsTerm(), 
                                                  createdVars);
-        Debug.assertTrue(createdVars.size() == 1);
-        LogicVariable newVar = (LogicVariable) createdVars.get(0);
+        assert createdVars.size() == 1;
+        LogicVariable newVar = createdVars.get(0);
         
         Term newRestriction = getConvertedRestriction(services, predicateTerm);
         return new OCLPredicativeCollection(newVar, newRestriction);

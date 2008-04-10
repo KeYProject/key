@@ -237,7 +237,7 @@ public class ProblemInitializer {
                 if (!fileName.startsWith(File.separator)) {
                     rs = RuleSource.initRuleFile(path+fileName);
                 } else {
-                    rs = RuleSource.initRuleFile(fileName);
+                    rs = RuleSource.initRuleFile(new File(fileName));
                 }
                 KeYFile keyFile = new KeYFile(fileName, rs, pm);
                 readEnvInput(keyFile, initConfig);

@@ -268,7 +268,7 @@ public class Proof implements Named {
         getServices().setNamespaces(ns);
         if (openGoals().size() > 1)
             throw new IllegalStateException("Proof: ProgVars set too late");
-        openGoals().head().addProgramVariables(ns.programVariables());
+        openGoals().head().setProgramVariables(ns.programVariables());
     }
 
     public void setBasicTask(BasicTask t) {

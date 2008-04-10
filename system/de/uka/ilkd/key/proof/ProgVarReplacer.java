@@ -30,8 +30,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.*;
-import de.uka.ilkd.key.util.Debug;
-
 
 /**
  * Replaces program variables.
@@ -71,18 +69,18 @@ public class ProgVarReplacer {
     private void mergeSemiCIs(SemisequentChangeInfo base,
                               SemisequentChangeInfo next,
                               int idx) {
-        Debug.assertTrue(next.modifiedFormulas().isEmpty());
+        assert next.modifiedFormulas().isEmpty();
 
         IteratorOfConstrainedFormula remIt = next.removedFormulas().iterator();
-        Debug.assertTrue(remIt.hasNext());
+        assert remIt.hasNext();
         ConstrainedFormula remCf = remIt.next();
-        Debug.assertFalse(remIt.hasNext());
+        assert !remIt.hasNext();
         base.removedFormula(idx, remCf);
 
         IteratorOfConstrainedFormula addIt = next.addedFormulas().iterator();
-        Debug.assertTrue(addIt.hasNext());
+        assert addIt.hasNext();
         ConstrainedFormula addCf = addIt.next();
-        Debug.assertFalse(addIt.hasNext());
+        assert !addIt.hasNext();
         base.addedFormula(idx, addCf);
 
         base.setFormulaList(next.getFormulaList());
@@ -113,9 +111,7 @@ public class ProgVarReplacer {
     public SetOfProgramVariable replace(SetOfProgramVariable vars) {
     	SetOfProgramVariable result = vars;
 
-    	IteratorOfProgramVariable it = vars.iterator();
-	while(it.hasNext()) {
-	    ProgramVariable var = it.next();
+    	for (final ProgramVariable var : vars) {
 	    ProgramVariable newVar = (ProgramVariable)map.get(var);
 	    if(newVar != null) {
 	    	result = result.remove(var);
@@ -219,7 +215,7 @@ public class ProgVarReplacer {
 		    result = result.replace(sv, newT);
 		}
 	    } else {
-		Debug.fail("unexpected subtype of InstantiationEntry");
+		assert false : "unexpected subtype of InstantiationEntry";
 	    }
 	}
 

@@ -261,7 +261,7 @@ public class AtPreFactory {
         Term normalTerm = TermFactory.DEFAULT.createTerm(
                                     normalOp,
                                     argTerms,
-                                    (ArrayOfQuantifiableVariable)null,
+                                    null,
                                     null);
         
         UpdateFactory uf = new UpdateFactory(services, new UpdateSimplifier());

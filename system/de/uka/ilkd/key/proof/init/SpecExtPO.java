@@ -15,10 +15,7 @@ import java.util.Map;
 import de.uka.ilkd.key.cspec.ComputeSpecification;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ListOfProgramVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.speclang.OperationContract;
@@ -55,7 +52,7 @@ public class SpecExtPO extends EnsuresPostPO {
 
     protected Term getPostTerm(ProgramVariable selfVar,
             ListOfProgramVariable paramVars, ProgramVariable resultVar,
-            ProgramVariable exceptionVar, Map atPreFunctions)
+            ProgramVariable exceptionVar, Map<Operator, Function/*atPre*/> atPreFunctions)
             throws ProofInputException {
         return TermBuilder.DF.func(ComputeSpecification.ACCUMULATOR);
     }

@@ -88,8 +88,8 @@ public class ProofVisTreeView extends JFrame implements java.io.Serializable {
         if (jScrollPane == null) {
 
             jScrollPane = new JScrollPane(getJTree(),
-                    JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                    ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             jScrollPane.setMinimumSize(new java.awt.Dimension(390, 400));
             jScrollPane.setPreferredSize(new java.awt.Dimension(390, 400));
         }
@@ -244,7 +244,7 @@ public class ProofVisTreeView extends JFrame implements java.io.Serializable {
 
         public PVTreeModel(ContextTraceElement ste) {
             root = new ParentContextTraceElement();
-            ArrayList childr = new ArrayList();
+            ArrayList<ContextTraceElement> childr = new ArrayList<ContextTraceElement>();
             ContextTraceElement cte = ste;
             while ((cte != TraceElement.END)
                     && (TraceElement.PARENTROOT == cte.getParent())) {
@@ -405,7 +405,7 @@ public class ProofVisTreeView extends JFrame implements java.io.Serializable {
                 return "" + traces[row].getLastNode().serialNr();
         }
 
-        public Class getColumnClass(int c) {
+        public Class<? extends Object> getColumnClass(int c) {
             return getValueAt(0, c).getClass();
         }
 

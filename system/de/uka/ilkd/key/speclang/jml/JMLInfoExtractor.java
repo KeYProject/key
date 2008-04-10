@@ -181,6 +181,9 @@ class JMLInfoExtractor {
             coms = coms.prepend(methodComments[methodComments.length - 1]);
         }
         
+        // .... or to the method name
+        coms = coms.prepend(method.getProgramElementName().getComments());
+        
         for (IteratorOfComment it = coms.iterator(); it.hasNext(); ) {
             if (checkFor("pure", it.next().getText()))
                 return true;

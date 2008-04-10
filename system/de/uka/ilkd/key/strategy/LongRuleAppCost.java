@@ -32,7 +32,7 @@ public class LongRuleAppCost implements RuleAppCost {
 	cost = p_cost;
     }
 
-    public int compareTo(Object o) {
+    public int compareTo(RuleAppCost o) {
 	if ( o instanceof TopRuleAppCost )
 	    return -1;
 	return compareTo((LongRuleAppCost)o);
@@ -43,7 +43,10 @@ public class LongRuleAppCost implements RuleAppCost {
     }
 
     public boolean equals(Object o) {
-        return compareTo ( o ) == 0;
+        if (o instanceof RuleAppCost) { 
+            return compareTo ( (RuleAppCost) o ) == 0;
+        }
+        return false;
     }
     
     public int hashCode() {

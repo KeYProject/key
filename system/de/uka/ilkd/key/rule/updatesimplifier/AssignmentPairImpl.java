@@ -76,9 +76,9 @@ public class AssignmentPairImpl implements AssignmentPair {
      * 
      * @see de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair#locationAsTerm()
      */
-    public Term locationAsTerm() {       
+    public Term locationAsTerm() {              
         return TermFactory.DEFAULT.createTerm(accessOp, locSubs,
-                new ArrayOfQuantifiableVariable(), JavaBlock.EMPTY_JAVABLOCK);
+                null, JavaBlock.EMPTY_JAVABLOCK);
     }
 
     /**

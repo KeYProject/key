@@ -929,11 +929,10 @@ public class Main extends JFrame implements IMain {
                     "If you wish to see Taclet Options "
                     + "for a proof you have to load one first"));
         } else {
-            Iterator it = currentProof.getSettings().getChoiceSettings().getDefaultChoices()
-            .values().iterator();
             String message = "Active Taclet Options:\n";
-            while (it.hasNext()) {
-                message += it.next().toString() + "\n";
+            for (final String choice : currentProof.getSettings().
+                    getChoiceSettings().getDefaultChoices().values()) {
+                message += choice + "\n";
             }
             final JTextComponent activeOptions = new JTextArea(message);
             activeOptions.setEditable(false);
@@ -1917,10 +1916,10 @@ public class Main extends JFrame implements IMain {
         return proof;
     }
     
-    private java.util.Hashtable doNotEnable;
+    private java.util.Hashtable<Component, Component> doNotEnable;
     
     private void setToolBarDisabled() {
-        doNotEnable = new java.util.Hashtable(10);
+        doNotEnable = new java.util.Hashtable<Component, Component>(10);
         Component[] cs = toolBar.getComponents();
         int i = cs.length;
         while (i-- != 0) {
@@ -3065,7 +3064,7 @@ public class Main extends JFrame implements IMain {
         private RecentFileMenu recent=null;
         private JButton run;
         private JFrame proofList;
-        private HashMap test2model;
+        private HashMap<StringBuffer, String> test2model;
         private boolean autoMode = false;
         
         public static final String AUTO_MODE_TEXT = "Create Tests";
@@ -3074,7 +3073,7 @@ public class Main extends JFrame implements IMain {
             super("KeY Unit Test Generator");
             this.main = main;
             mediator = main.mediator();
-            test2model = new HashMap();
+            test2model = new HashMap<StringBuffer, String>();
             setIconImage(IconFactory.keyLogo());
             createProofList();
             layoutGui();
@@ -3155,8 +3154,8 @@ public class Main extends JFrame implements IMain {
             testList.setListData(bubbleSortTests(createTestArray()));
             
             JScrollPane testListScroll = new
-                JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
-                        JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
+                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             testListScroll.getViewport().setView(testList);
             testListScroll.setBorder(
                     new TitledBorder("Created Tests"));
@@ -3205,12 +3204,13 @@ public class Main extends JFrame implements IMain {
         }
         
         private Object[] createTestArray(){
-            Iterator it = test2model.entrySet().iterator();
-            Vector v = new Vector();
+            final Iterator<Map.Entry<StringBuffer, String>> it = 
+                test2model.entrySet().iterator();
+            Vector<TestAndModel> v = new Vector<TestAndModel>();
             while(it.hasNext()){
-                Map.Entry e = (Map.Entry) it.next();
-                String test = ((StringBuffer) e.getKey()).toString();
-                String model = (String) e.getValue();
+                final Map.Entry<StringBuffer, String> e = it.next();
+                String test = e.getKey().toString();
+                String model = e.getValue();
                 while(!"".equals(test.trim())){
                     v.add(new TestAndModel(test.substring(0, test.indexOf(" ")), model));
                     test = test.substring(test.indexOf(" ")+1);

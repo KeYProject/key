@@ -80,7 +80,7 @@ options {
     private final static int LOCATION_MODIFIER = 1;
     private final static int HEAP_DEPENDENT = 2;
 
-    static HashMap prooflabel2tag = new HashMap(15);
+    static HashMap<String, Character> prooflabel2tag = new HashMap<String, Character>(15);
     static {
       prooflabel2tag.put("branch", new Character('b'));
       prooflabel2tag.put("rule", new Character('r'));
@@ -4566,7 +4566,7 @@ expreid returns [ char eid = '0' ]
 { String id = null; } 
 :
    id = simple_ident {
-      Character c = (Character)prooflabel2tag.get(id);
+      Character c = prooflabel2tag.get(id);
       if(c != null)
          eid = c.charValue();
    }

@@ -27,8 +27,8 @@ import javax.swing.event.ListSelectionListener;
 public class ChoiceSelector extends JDialog {
 
     private ChoiceSettings settings;
-    private HashMap category2DefaultChoice;
-    private HashMap category2Choices;
+    private HashMap<String, String> category2DefaultChoice;
+    private HashMap<String, Set<String>> category2Choices;
     private boolean changed=false;
 
 
@@ -76,8 +76,8 @@ public class ChoiceSelector extends JDialog {
 	    public void valueChanged(ListSelectionEvent e) {
 		setChoiceList();				
 	    }});
-	choiceList = new JList(((Set) category2Choices.
-				get(cats[0])).toArray());
+	choiceList = new JList(category2Choices.
+				get(cats[0]).toArray());
 	choiceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	choiceList.setSelectedValue(category2DefaultChoice.get(cats[0]),true);
 	choiceList.addListSelectionListener(new ListSelectionListener() {
@@ -86,14 +86,14 @@ public class ChoiceSelector extends JDialog {
 	    }});
 
 	JScrollPane catListScroll = new
-	    JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
-			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	    JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
+			ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	catListScroll.getViewport().setView(catList);
 	catListScroll.setBorder(new TitledBorder("Category"));
 
 	JScrollPane choiceScrollPane = new 	    
-	    JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
-			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	    JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
+			ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	choiceScrollPane.getViewport().setView(choiceList);
 	choiceScrollPane.setBorder(new TitledBorder("Default Option"));
 
@@ -164,8 +164,8 @@ public class ChoiceSelector extends JDialog {
      */
     private void setChoiceList() {
 	String selection = (String) catList.getSelectedValue();
-	choiceList.setListData(((Set)category2Choices.
-				get(selection)).toArray());
+	choiceList.setListData(category2Choices.
+				get(selection).toArray());
 	choiceList.setSelectedValue(category2DefaultChoice.
 				    get(selection),false);
     }

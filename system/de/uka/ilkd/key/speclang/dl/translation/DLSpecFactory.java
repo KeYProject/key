@@ -139,9 +139,9 @@ public class DLSpecFactory {
     }
     
     
-    private Map /*Operator (normal) -> Function (atPre)*/ 
+    private Map<Operator, Function>
         extractAtPreFunctions(Term term) {
-        Map result = new LinkedHashMap();
+        Map<Operator, Function> result = new LinkedHashMap<Operator, Function>();
         
         //is the operator of the passed term an atPre function?
         Operator op = term.op();
@@ -164,12 +164,12 @@ public class DLSpecFactory {
             assert normalOp != null;
             
             //add pair to map
-            result.put(normalOp, op);
+            result.put(normalOp, (Function)op);
         }
         
         //recurse to subterms
         for(int i = 0; i < term.arity(); i++) {
-            Map map = extractAtPreFunctions(term.sub(i));
+            Map<Operator, Function> map = extractAtPreFunctions(term.sub(i));
             result.putAll(map);
         }
         
@@ -209,10 +209,10 @@ public class DLSpecFactory {
         ListOfParsableVariable paramVars = extractParamVars(mbs);
         ParsableVariable resultVar       = extractResultVar(mbs);
         ParsableVariable excVar          = extractExcVar(fma);
-        Map atPreFunctions = extractAtPreFunctions(post.getFormula());
+        Map<Operator, Function> atPreFunctions = extractAtPreFunctions(post.getFormula());
         
         //atPre-functions may not occur in precondition
-        Map forbiddenAtPreFunctions = extractAtPreFunctions(pre.getFormula());
+        Map<Operator, Function> forbiddenAtPreFunctions = extractAtPreFunctions(pre.getFormula());
         if(!forbiddenAtPreFunctions.isEmpty()) {
             throw new ProofInputException(
                 "@pre-function not allowed in precondition: " 
@@ -227,7 +227,7 @@ public class DLSpecFactory {
                 BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
                 Term formula = bloc.getFormula();
                 Term locTerm = bloc.getLocTerm();
-                forbiddenAtPreFunctions = new LinkedHashMap(); 
+                forbiddenAtPreFunctions = new LinkedHashMap<Operator, Function>(); 
                 forbiddenAtPreFunctions.putAll(extractAtPreFunctions(formula));
                 forbiddenAtPreFunctions.putAll(extractAtPreFunctions(locTerm));
                 if(!forbiddenAtPreFunctions.isEmpty()) {
