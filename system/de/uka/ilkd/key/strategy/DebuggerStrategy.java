@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.strategy;
 
+import java.util.List;
+
 import de.uka.ilkd.key.logic.IteratorOfNamed;
 import de.uka.ilkd.key.logic.ListOfNamed;
 import de.uka.ilkd.key.logic.ListOfTerm;
@@ -18,6 +20,7 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
+import de.uka.ilkd.key.visualdebugger.WatchPoint;
 
 /**
  * Strategy tailored to VBT aimed symbolic execution.
@@ -37,7 +40,7 @@ public class DebuggerStrategy extends VBTStrategy {
 
     public static StrategyProperties getDebuggerStrategyProperties(
             boolean splittingRulesAllowed, boolean inUpdateAndAssumes,
-            boolean inInitPhase, ListOfTerm watchpoints) {
+            boolean inInitPhase, List<WatchPoint> watchpoints) {
         final StrategyProperties res = new StrategyProperties();
         res.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
                 StrategyProperties.LOOP_EXPAND);
@@ -74,7 +77,7 @@ public class DebuggerStrategy extends VBTStrategy {
     }
 
     protected DebuggerStrategy(Proof p_proof, StrategyProperties props,
-            ListOfTerm watchpoints) {
+            List<WatchPoint> watchpoints) {
 
         super(p_proof, props);
 
@@ -150,7 +153,7 @@ public class DebuggerStrategy extends VBTStrategy {
         public Strategy create(Proof p_proof,
                 StrategyProperties strategyProperties) {
 
-            ListOfTerm watchpoints = (ListOfTerm) strategyProperties
+            List<WatchPoint> watchpoints =  (List<WatchPoint>) strategyProperties
                     .get(VISUAL_DEBUGGER_WATCHPOINTS_KEY);
             injectDebuggerDefaultOptionsIfUnset(strategyProperties);
             

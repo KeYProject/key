@@ -1,6 +1,12 @@
 package de.uka.ilkd.key.visualdebugger;
 
+import java.util.LinkedList;
 import java.util.List;
+
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.util.PositionWrapper;
 
 /**
  * The Class WatchPoint.
@@ -29,6 +35,16 @@ public class WatchPoint {
     private boolean enabled = true;
 
     private List<String> parameterTypes;
+    
+    private Term watchpointAsTerm;
+    
+    //private List<PositionWrapper> variablePositions;
+    private ProgramMethod programMethod = null;
+    private List<Integer> keyPositions = new LinkedList<Integer>();
+    
+    private List<LocationVariable> orginialLocalVariables = new LinkedList<LocationVariable>();
+    private List<LocationVariable> inittiallyRenamedLocalVariables = new LinkedList<LocationVariable>();
+    
   
     /**
      * Gets the in type.
@@ -139,4 +155,56 @@ public class WatchPoint {
     public void setParameterTypes(List<String> parameterTypes) {
         this.parameterTypes = parameterTypes;
     }
+
+    public Term getWatchpointAsTerm() {
+        return watchpointAsTerm;
+    }
+
+    public void setWatchpointTerm(Term watchpointAsTerm) {
+        this.watchpointAsTerm = watchpointAsTerm;
+    }
+
+//    public List<PositionWrapper> getVariablePositions() {
+//        return variablePositions;
+//    }
+//
+//    public void setVariablePositions(LinkedList<PositionWrapper> variablePositions) {
+//        this.variablePositions = variablePositions;
+//    }
+
+    public List<LocationVariable> getOrginialLocalVariables() {
+        return orginialLocalVariables;
+    }
+
+    public void setOrginialLocalVariables(
+            List<LocationVariable> orginialLocalVariables) {
+        this.orginialLocalVariables = orginialLocalVariables;
+    }
+
+    public List<LocationVariable> getInittiallyRenamedLocalVariables() {
+        return inittiallyRenamedLocalVariables;
+    }
+
+    public void setInittiallyRenamedLocalVariables(
+            List<LocationVariable> inittiallyRenamedLocalVariables) {
+        this.inittiallyRenamedLocalVariables = inittiallyRenamedLocalVariables;
+    }
+
+    public ProgramMethod getProgramMethod() {
+        return programMethod;
+    }
+
+    public void setProgramMethod(ProgramMethod programMethod) {
+        this.programMethod = programMethod;
+    }
+
+    public List<Integer> getKeyPositions() {
+        return keyPositions;
+    }
+
+    public void setKeyPositions(List<Integer> keyPositions) {
+        this.keyPositions = keyPositions;
+    }
+
+
 }

@@ -3,7 +3,10 @@ package visualdebugger.actions;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+
+import javax.swing.SwingUtilities;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -15,7 +18,6 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.window.Window;
 import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
 import org.eclipse.text.edits.UndoEdit;
@@ -25,25 +27,23 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 
 import visualdebugger.views.InsertSepVisitor;
-import de.uka.ilkd.key.casetool.eclipse.EclipseSignaturesHelper; 
+import de.uka.ilkd.key.casetool.eclipse.KeYPlugin;
 import de.uka.ilkd.key.casetool.eclipse.MethodPOSelectionDialog;
-import de.uka.ilkd.key.collection.ListOfString;
-import de.uka.ilkd.key.collection.SLListOfString;
-import de.uka.ilkd.key.gui.JMLEclipseAdapter;
+import de.uka.ilkd.key.gui.ContractConfigurator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
-import de.uka.ilkd.key.logic.SLListOfTerm;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
+import de.uka.ilkd.key.visualdebugger.WatchPoint;
 
 /**
  * The Class StartVisualDebuggerAction.
@@ -122,69 +122,6 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 	}
 
 	/**
-	 * Assert project parsed.
-	 * 
-	 * @param project
-	 *            the project
-	 * @param jmlBrowserIntended
-	 *            the jml browser intended
-	 * 
-	 * @return the int
-	 */
-	protected synchronized int assertProjectParsed(IProject project,
-			boolean jmlBrowserIntended) {
-
-		// project's java model has not been loaded into KeY yet, do this
-		// now
-
-		final String inputName = "visualDebugger-project_" + project.getName();
-		final File location = new File(VisualDebugger.tempDir);
-
-		if (!location.exists()) {
-			location.mkdirs();
-		}
-
-		Main main = Main.getInstance(false);
-
-		JavaInput input;
-
-		if (jmlBrowserIntended) {
-
-			input = new JavaInputWithJMLSpecBrowser(inputName, location, false,
-					main.getProgressMonitor());
-
-		} else {
-			input = new JavaInput(inputName, location, main
-					.getProgressMonitor());
-		}
-
-		ProblemInitializer problemInit = new ProblemInitializer(main);
-
-		String error = "Prover init for " + location + " failed.";
-		try {
-			problemInit.startProver(input, input);
-			error = "";
-		} catch (ProofInputException pie) {
-			error = pie.getMessage();
-		} catch (ExceptionHandlerException ehe) {
-			error = ehe.getCause() == null ? ehe.getMessage() : ehe.getCause()
-					.getMessage();
-		}
-
-		if (error.length() == 0) {
-			return PROJECT_LOAD_SUCESSFUL;
-		} else {
-			MessageDialog.openError(PlatformUI.getWorkbench()
-					.getActiveWorkbenchWindow().getShell(),
-					"Error loading java model into KeY prover",
-					"While loading this project, the following error"
-							+ " occured:\n" + error);
-			return PROJECT_LOAD_FAILED;
-		}
-
-	}
-
-	/**
 	 * creates class <tt>Debug</tt> implementing the <tt>sep</tt> methods
 	 * representing breakpoints.
 	 * 
@@ -215,25 +152,6 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 		return unit;
 	}
 
-	/**
-	 * Gets the method spec.
-	 * 
-	 * @param methodSpecs
-	 *            the method specs
-	 * 
-	 * @return the method spec
-	 */
-	private JMLMethodSpec getMethodSpec(Vector methodSpecs) {
-		for (Iterator it = methodSpecs.iterator(); it.hasNext();) {
-			Object next = it.next();
-			if (next instanceof JMLMethodSpec) {
-				return (JMLMethodSpec) next;
-			}
-
-		}
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	/**
 	 * Gets the sep method declaration.
@@ -316,59 +234,6 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 		return methodDeclaration;
 	}
 
-	/**
-	 * Gets the sep method declaration deprecated.
-	 * 
-	 * @param ast
-	 *            the ast
-	 * @param type
-	 *            the type
-	 * 
-	 * @return the sep method declaration deprecated
-	 */
-	private MethodDeclaration getSepMethodDeclarationDEPRECATED(AST ast,
-			ITypeBinding type) {
-
-		MethodDeclaration methodDeclaration = ast.newMethodDeclaration();
-		methodDeclaration.setConstructor(false);
-		Modifier mf = ast.newModifier(Modifier.ModifierKeyword.STATIC_KEYWORD);
-		methodDeclaration.modifiers().add(mf);
-
-		mf = ast.newModifier(Modifier.ModifierKeyword.PUBLIC_KEYWORD);
-		methodDeclaration.modifiers().add(mf);
-
-		methodDeclaration.setName(ast.newSimpleName("sep"));
-
-		SimpleType loggerType = ast.newSimpleType(ast.newName(type
-				.getQualifiedName()));
-
-		methodDeclaration.setReturnType2(loggerType);
-
-		SingleVariableDeclaration variableDeclaration = ast
-				.newSingleVariableDeclaration();
-
-		variableDeclaration.setType(ast.newPrimitiveType(PrimitiveType.INT));
-		variableDeclaration.setName(ast.newSimpleName("id"));
-
-		SingleVariableDeclaration variableDeclaration2 = ast
-				.newSingleVariableDeclaration();
-
-		variableDeclaration2.setType((Type) ASTNode
-				.copySubtree(ast, loggerType));
-		variableDeclaration2.setName(ast.newSimpleName("expr"));
-
-		methodDeclaration.parameters().add(variableDeclaration);
-		methodDeclaration.parameters().add(variableDeclaration2);
-
-		org.eclipse.jdt.core.dom.Block block = ast.newBlock();
-		ReturnStatement ret = ast.newReturnStatement();
-		ret.setExpression(ast.newSimpleName("expr"));
-		block.statements().add(ret);
-
-		methodDeclaration.setBody(block);
-		// System.out.println(methodDeclaration);
-		return methodDeclaration;
-	}
 
 	/**
 	 * Gets the type.
@@ -621,107 +486,58 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 		}
 
 		VisualDebugger.getVisualDebugger();// .prepareKeY();
+		
 
-		if (selection != null && selection instanceof StructuredSelection) {
-			IMethod selectedMethod = (IMethod) ((StructuredSelection) selection)
-					.getFirstElement();
-			ICompilationUnit srcFile = selectedMethod.getCompilationUnit();
+	        if(selection == null || !(selection instanceof StructuredSelection)) {
+	            return;
+	        }
+	        
+	        try {
+	            //determine selected method and project
+	            IMethod method 
+	            = (IMethod) ((StructuredSelection)selection).getFirstElement();
+	            ICompilationUnit srcFile = method.getCompilationUnit();
+	            if(srcFile == null) {
+	                KeYPlugin.getInstance().showErrorMessage(
+	                        "Not source method", 
+	                        "The method you selected does not "
+	                        + "exist in source form. It cannot "
+	                        + "be used for a proof.");
+	                return;
+	            }   
 
-			if (srcFile == null) {
-				MessageDialog.openError(PlatformUI.getWorkbench()
-						.getActiveWorkbenchWindow().getShell(),
-						"No Source Found.",
-						"The method you selected does not exist in source form. "
-								+ "It cannot be used for a proof.");
-				return;
-			}
 
-			File location = new File(VisualDebugger.tempDir);
+	            File location = new File(VisualDebugger.tempDir);
 
-			if (location.exists()) {
-				delTemporaryDirectory();
-			} else {
-				location.mkdirs();
-			}
+	            if (location.exists()) {
+	                delTemporaryDirectory();
+	            } else {
+	                location.mkdirs();
+	            }
 
-			// Inserts the separator statements
-			insertSeps(srcFile.getJavaProject());
-			// TODO generalize to consider packageFragmentRoots (needed to
-			// support
-			// special source locations like folders only linked into the
-			// eclipse
-			// project
-			IProject project = srcFile.getJavaProject().getProject();
+	            // Inserts the separator statements
+	            insertSeps(srcFile.getJavaProject());
+	            // TODO generalize to consider packageFragmentRoots (needed to
+	            // support special source locations like folders only linked into the
+	            // eclipse project
+	            IProject project = srcFile.getJavaProject().getProject();
 
-			visualdebugger.Activator.getDefault().setProject(
-					srcFile.getJavaProject());
+	            visualdebugger.Activator.getDefault().setProject(
+	                    srcFile.getJavaProject());
 
-			visualdebugger.Activator.getDefault().setIProject(project);
-			// assure the sources are parsed
-			int status = assertProjectParsed(project, false);
+	            visualdebugger.Activator.getDefault().setIProject(project);
+	            
+	            //start proof	            
+	            startProver("DEBUGGER", project, method, allInvariants, true, true);
+	            
+	        } catch(Throwable e) {
+	            KeYPlugin.getInstance().showErrorMessage(e.getClass().getName(), 
+	                    e.getMessage());
+	            e.printStackTrace(System.out);
+	        }
 
-			if (status == PROJECT_ALREADY_OPEN
-					|| status == PROJECT_LOAD_SUCESSFUL) {
-				// determine the encapsulating class of the selected method
-				IType declaringType = selectedMethod.getDeclaringType();
 
-				// extract signature of method
-				// int paramCount = selectedMethod.getNumberOfParameters();
-				try {
-					// selectedMethod.get
-					String[] parameterNames = selectedMethod
-							.getParameterNames();
-					String[] parameterTypes = selectedMethod
-							.getParameterTypes();
-					ListOfString sigStrings = SLListOfString.EMPTY_LIST;
 
-					for (int i = 0; i < parameterNames.length; i++) {
-						String javaType = EclipseSignaturesHelper
-								.determineJavaType(parameterTypes[i],
-										declaringType);
-						if (javaType != null) {
-							sigStrings = sigStrings.append(javaType);
-						} else {
-							MessageDialog
-									.openError(
-											PlatformUI.getWorkbench()
-													.getActiveWorkbenchWindow()
-													.getShell(),
-											"Error determining signature types !",
-											"Could not resolve type "
-													+ parameterTypes[i]
-													+ " of the method's parameter "
-													+ parameterNames[i]
-													+ " !"
-													+ " This is probably a syntax problem, check your import statements.");
-							return;
-						}
-					}
-
-					keyProver.toBack();
-					Main.setStandalone(false);
-
-					final JMLPOAndSpecProvider provider = keyProver
-							.getJMLPOAndSpecProvider();
-
-					((JMLEclipseAdapter) provider).setMainVisible(false);
-
-					Vector methodSpecs = provider.getMethodSpecs(declaringType
-							.getFullyQualifiedName(), selectedMethod
-							.getElementName(), sigStrings);
-					final JMLMethodSpec spec = getMethodSpec(methodSpecs);
-					if (spec != null) {
-						startProver("Debugging "
-								+ selectedMethod.getElementName(), provider,
-								spec, allInvariants, false, false);
-					}					
-				    // TODO implement what to do if spec == null
-                } catch (JavaModelException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
 
 		VisualDebugger.getVisualDebugger().initialize();
 	}
@@ -762,10 +578,10 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 	 * 
 	 * @param debuggerEventMsg
 	 *            the debugger event msg
-	 * @param provider
-	 *            the provider
-	 * @param spec
-	 *            the spec
+	 * @param project
+	 *            the project
+	 * @param method
+	 *            the IMethod
 	 * @param allInvariants
 	 *            the all invariants
 	 * @param invPost
@@ -774,22 +590,158 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 	 *            the assignable
 	 */
 	private void startProver(String debuggerEventMsg,
-			final JMLPOAndSpecProvider provider, final JMLSpec spec,
+			final IProject project, final IMethod method,
 			final boolean allInvariants, final boolean invPost,
 			final boolean assignable) {
-		VisualDebugger.getVisualDebugger().fireDebuggerEvent(
-				new DebuggerEvent(DebuggerEvent.PROJECT_LOADED_SUCCESSFUL,
-						debuggerEventMsg));
-		StrategyProperties strategyProperties = DebuggerStrategy
-				.getDebuggerStrategyProperties(true, false, false, SLListOfTerm.EMPTY_LIST);
-		
-		final StrategyFactory factory = new DebuggerStrategy.Factory();
-		Strategy strategy = (factory.create(VisualDebugger.getVisualDebugger().getMediator().getProof(), strategyProperties));
-		provider.setStrategy(strategy);
 
-		provider.createPOandStartProver(spec, allInvariants, invPost,
-				assignable);
+	    VisualDebugger.getVisualDebugger().fireDebuggerEvent(
+	            new DebuggerEvent(DebuggerEvent.PROJECT_LOADED_SUCCESSFUL,
+	                    debuggerEventMsg));
+
+
+	    //TODO: use customised info allInvariants etc.
+
+//	    inlined: KeYPlugin.getInstance().startProof(project, method);
+
+
+//	    load project
+	    final InitConfig initConfig;
+	    try {
+	        initConfig = KeYPlugin.getInstance().loadProject(project);
+	    } catch(ProofInputException e) {
+                KeYPlugin.getInstance().showErrorMessage("Proof Input Exception",
+                        "The following problem occurred when "
+                        + "loading the project \"" 
+                        + project.getName() + "\" into the KeY prover:\n" 
+                        + e.getMessage());
+                return;
+	    }
+
+//	    determine method for which a proof should be started
+	    ProgramMethod pm = method == null 
+	    ? null : KeYPlugin.getInstance().getProgramMethod(method, 
+	            initConfig.getServices().getJavaInfo());
+
+//	    getPO
+	    final ProofOblInput po;
+	    try {
+	        po = proveEnsuresPost(initConfig, 
+	                initConfig.getServices().getJavaInfo(), pm);
+	    } catch (ProofInputException e1) {
+	        // TODO Auto-generated catch block
+                KeYPlugin.getInstance().showErrorMessage("Proof Obligation Generation Failed",
+                "A problem occurred when generating the PO: "+e1.getMessage());
+                return;
+	    }
+
+	    if (po == null) {
+                KeYPlugin.getInstance().showErrorMessage("Proof Obligation Generation Failed",
+                "A problem occurred when generating the PO");
+	        return;
+	    }
+	    
+//	    start proof
+	    final ProblemInitializer pi = new ProblemInitializer(Main.getInstance());
+	    try {
+	        StrategyProperties strategyProperties = DebuggerStrategy
+	        .getDebuggerStrategyProperties(true, false, false, new LinkedList<WatchPoint>());
+	        
+	        final StrategyFactory factory = new DebuggerStrategy.Factory();
+	        Strategy strategy = 
+	            factory.create(VisualDebugger.getVisualDebugger().getMediator().getProof(), strategyProperties);
+	        	       
+	        po.getPO().getFirstProof().setActiveStrategy(strategy);
+
+	        if (SwingUtilities.isEventDispatchThread()) {
+	            pi.startProver(initConfig, po);
+	        } else {
+	            Runnable runner = new Runnable() {
+	                public void run() { 
+	                    try {
+	                        pi.startProver(initConfig, po);
+	                    } catch (ProofInputException e) {
+	                        // TODO Auto-generated catch block
+	                        e.printStackTrace();
+	                    }
+	                }
+	            };
+	            try {
+	                SwingUtilities.invokeAndWait(runner);
+	            } catch (InterruptedException e) {
+	                // TODO Auto-generated catch block
+	                e.printStackTrace();
+	            } catch (InvocationTargetException e) {
+	                // TODO Auto-generated catch block
+	                e.printStackTrace();
+	            }
+	        }        
+
+	        
+	    } catch(ProofInputException e)  {
+	        MessageDialog.openError(PlatformUI.getWorkbench()
+	                .getActiveWorkbenchWindow().getShell(),
+	                "Proof Input Exception",
+	                "The following problem occurred when starting the proof:\n"
+	                + e.getMessage());
+	        return;
+	    }       
+
 	}
+
+	/**
+	 * Starts the prover with an "EnsuresPost" proof obligation.
+	 * @param modelMethod the ModelMethod to reason about
+	 */
+	private ProofOblInput proveEnsuresPost(final InitConfig initConfig, final JavaInfo javaInfo,
+	        final ProgramMethod pm) 
+	throws ProofInputException {
+	    //no contract?
+	    // TODO insert check
+
+	    //let the user select the contract and the assumed invariants
+	    final ContractConfigurator cc = new ContractConfigurator(Main.getInstance());
+
+	    if (SwingUtilities.isEventDispatchThread()) {
+	        cc.init(javaInfo.getServices(),
+	                pm,
+	                null,
+	                true,
+	                true,
+	                false);
+	    } else {
+	        Runnable runner = new Runnable() {
+	            public void run() { 
+	                cc.init(javaInfo.getServices(),
+	                        pm,
+	                        null,
+	                        true,
+	                        true,
+	                        false);
+	            }
+	        };
+	        try {
+	            SwingUtilities.invokeAndWait(runner);
+	        } catch (InterruptedException e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+	        } catch (InvocationTargetException e) {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+	        }
+	    }        
+
+	    if(!cc.wasSuccessful()) {
+	        return null;
+	    }     
+
+	    //create and start the PO
+	    return new EnsuresPostPO(initConfig, 
+	            cc.getContract(), 
+	            cc.getAssumedInvs());
+	}
+
+
+
 }
 
 /**

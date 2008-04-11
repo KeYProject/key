@@ -25,10 +25,7 @@ import de.uka.ilkd.key.rule.updatesimplifier.*;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
-import de.uka.ilkd.key.visualdebugger.DebuggerPO;
-import de.uka.ilkd.key.visualdebugger.ProofStarter;
-import de.uka.ilkd.key.visualdebugger.VisualDebugger;
+import de.uka.ilkd.key.visualdebugger.*;
 import de.uka.ilkd.key.visualdebugger.executiontree.ITNode;
 
 public class StateVisualization {
@@ -388,7 +385,7 @@ public class StateVisualization {
         ps.init(po);
         ps.setMaxSteps(maxProofSteps);
         ps.setUseDecisionProcedure(useDecisionProcedures);
-        vd.setProofStrategy(ps.getProof(), true, false, SLListOfTerm.EMPTY_LIST);
+        vd.setProofStrategy(ps.getProof(), true, false, new LinkedList<WatchPoint>());
     }
     
     private void setUpProof(SetOfTerm indexConf, Term forPostValues) {
@@ -425,7 +422,7 @@ public class StateVisualization {
         final Proof simplificationProof = ps.getProof();
         
         StrategyProperties strategyProperties = DebuggerStrategy
-                .getDebuggerStrategyProperties(true, true, vd.isInitPhase(),SLListOfTerm.EMPTY_LIST);
+                .getDebuggerStrategyProperties(true, true, vd.isInitPhase(),new LinkedList<WatchPoint>());
 
         StrategyFactory factory = new DebuggerStrategy.Factory();
         
@@ -438,7 +435,7 @@ public class StateVisualization {
         vd.getBpManager().setNoEx(false);
 
         strategyProperties = 
-            DebuggerStrategy.getDebuggerStrategyProperties(true, false, vd.isInitPhase(),SLListOfTerm.EMPTY_LIST);
+            DebuggerStrategy.getDebuggerStrategyProperties(true, false, vd.isInitPhase(),new LinkedList<WatchPoint>());
         
         mediator.getProof().
         setActiveStrategy(factory.create(mediator.getProof(), strategyProperties));

@@ -397,7 +397,6 @@ public class WatchpointView extends ViewPart {
         pf.process(cu);
         
         HashMap<Integer, IVariableBinding> positionInfo = Util.valueToKey(pf.getPositionInfo());
-        System.out.println(positionInfo);
         
         LinkedList<LocalVariableDescriptor> localVariables = new LinkedList<LocalVariableDescriptor>();
         Iterator<Integer> it = postions.iterator();

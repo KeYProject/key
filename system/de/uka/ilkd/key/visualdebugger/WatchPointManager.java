@@ -1,20 +1,18 @@
 package de.uka.ilkd.key.visualdebugger;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.ListOfType;
 import de.uka.ilkd.key.java.abstraction.SLListOfType;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.logic.ListOfTerm;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.SLListOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
@@ -27,12 +25,9 @@ import de.uka.ilkd.key.util.WatchpointUtil;
  */
 public class WatchPointManager {
 
-    /** The watch points. */
+    private static boolean watchPointsContainLocals;
+    /** The watch points in a raw format. */
     private LinkedList<WatchPoint> watchPoints = new LinkedList<WatchPoint>();
-
-    private ListOfTerm listOfWatchpoints;
-
-    private static HashSet<VariableSpecification> localVariables = new HashSet<VariableSpecification>();
 
     /**
      * Gets the watch points.
@@ -78,14 +73,15 @@ public class WatchPointManager {
     /**
      * Translates the WatchPoints into KeY data structures.
      * 
-     * @return the number of translated WatchPoints
+     * @return the count of translated WatchPoints
      */
     private int translateWatchpoints(Services services) {
 
         LinkedList<WatchPoint> watchpoints = getWatchPoints();
-        listOfWatchpoints = SLListOfTerm.EMPTY_LIST;
+        watchPointsContainLocals = false;
+
         try {
-            assert (watchpoints != null): "Watchpoints are NULL!";
+            assert (watchpoints != null) : "Watchpoints are NULL!";
 
             if (watchpoints.isEmpty()) {
                 return 0;
@@ -100,7 +96,7 @@ public class WatchPointManager {
                     WatchPoint wp = watchpoints.get(i);
 
                     if (wp.isEnabled()) {
-                        StringBuffer buffer = new StringBuffer();
+
                         String declaringType = wp.getDeclaringType();
 
                         String nameOfSelf = "self_XY";
@@ -121,31 +117,47 @@ public class WatchPointManager {
                         progVarNS.add(var_self);
                         progVarNS.add(var_dummy);
 
-                        if (wp.getLocalVariables() != null &&  wp.getLocalVariables().size() > 0) {
+                        if (wp.getLocalVariables() != null
+                                && wp.getLocalVariables().size() > 0) {
                             translateLocalVariables(progVarNS, services, wp);
+                            watchPointsContainLocals = true;
                         }
 
-                        buffer.append("\\exists " + declaringType + " x; {"
-                                + selfName + ":= x } \\<{method-frame( source="
-                                + declaringType + ",this=" + selfName);
-                        buffer.append(" ) : { " + wp.getName() + " = "
-                                + wp.getExpression());
-                        buffer.append(";} }\\>" + wp.getName() + " = TRUE");
+                        wp.setWatchpointTerm(createWatchpointTerm(services,
+                                progVarNS, wp, declaringType, selfName));
 
-                        Term term = ProblemLoader.parseTerm(buffer.toString(),
-                                services, new Namespace(), progVarNS);
-
-                        
-                        listOfWatchpoints = listOfWatchpoints.append(term);
                     }
                 }
-                return listOfWatchpoints.size();
+                return 1;
             }
         } catch (Throwable t) {
             System.out.println(t.toString());
             t.printStackTrace();
             return -1;
         }
+    }
+
+    /**
+     * @param services
+     * @param progVarNS
+     * @param wp
+     * @param declaringType
+     * @param selfName
+     * @return the watchpoint formula 
+     */
+    private Term createWatchpointTerm(Services services, Namespace progVarNS,
+            WatchPoint wp, String declaringType, ProgramElementName selfName) {
+        
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("\\exists " + declaringType + " x; {" + selfName
+                + ":= x } \\<{method-frame( source=" + declaringType + ",this="
+                + selfName);
+        buffer.append(" ) : { " + wp.getName() + " = " + wp.getExpression());
+        buffer.append(";} }\\>" + wp.getName() + " = TRUE");
+
+        Term term = ProblemLoader.parseTerm(buffer.toString(), services,
+                new Namespace(), progVarNS);
+        return term;
     }
 
     /**
@@ -161,46 +173,56 @@ public class WatchPointManager {
         List<LocalVariableDescriptor> locVars = wp.getLocalVariables();
         List<String> parameterTypes = wp.getParameterTypes();
         ListOfType signature = SLListOfType.EMPTY_LIST;
-        
-        for (String string : parameterTypes) {
-            signature = signature.append(ji.getKeYJavaType(string));
+    
+
+        for (String type : parameterTypes) {
+            signature = signature.append(ji.getKeYJavaType(type));
         }
 
         KeYJavaType classType = ji.getKeYJavaType(wp.getDeclaringType());
-        ProgramMethod pm  = ji.getProgramMethod(classType, wp.getMethod(), signature, classType);
+        ProgramMethod pm = ji.getProgramMethod(classType, wp.getMethod(),
+                signature, classType);
+        wp.setProgramMethod(pm);
         MethodVisitor pvc = new MethodVisitor(pm.getMethodDeclaration(), services);
         pvc.start();
-        HashMap<Integer, VariableSpecification> keyPositions = WatchpointUtil.valueToKey(pvc.result());
-        System.out.println(keyPositions);
+        HashMap<Integer, SourceElement> keyPositions = WatchpointUtil
+                .valueToKey(pvc.result());
+        
+        List<Integer> variablePositions = new LinkedList<Integer>();
+        List<LocationVariable> orginialLocalVariables = new LinkedList<LocationVariable>();
         
         for (LocalVariableDescriptor localVariableDescriptor : locVars) {
             
-            VariableSpecification variableSpecification = keyPositions.get(localVariableDescriptor.getPosition());
-            System.out.println("ID in WPM "+((ProgramVariable)variableSpecification.getProgramVariable()).id());
-            localVariables.add(variableSpecification);
-   
-            LocationVariable locVar = new LocationVariable(
-                   new ProgramElementName(localVariableDescriptor.getName()),
-                   ji.getKeYJavaType(localVariableDescriptor.getType()));
+            variablePositions.add(localVariableDescriptor.getPosition());
+            
+            SourceElement variableSpecification = keyPositions
+                    .get(localVariableDescriptor.getPosition());
+            
+            VariableSpecification varspec = (VariableSpecification)variableSpecification;
+            LocationVariable locVar = (LocationVariable) varspec.getProgramVariable();
+            orginialLocalVariables.add(locVar);
+            
             progVarNS.add(locVar);
+            System.out.println(locVar.hashCode() + " ID " + locVar.id() + " " + locVar);
         }
+        wp.setKeyPositions(variablePositions);
+        wp.setOrginialLocalVariables(orginialLocalVariables);
     }
 
     /**
-     * Gets the listOfTerm containing the WatchPoints. This method never returns
+     * Gets the list of WatchPoints. This method never returns
      * null. In case that there are no WatchPoints an empty ListOfTerm is
      * returned.
      * 
      * @return the list of WatchPoints as ListOfTerm
      */
-    public ListOfTerm getListOfWatchpoints(Services services) {
+    public LinkedList<WatchPoint> getListOfWatchpoints(Services services) {
 
         translateWatchpoints(services);
-        assert listOfWatchpoints != null : "listOfWatchpoints is null";
-        return listOfWatchpoints;
+        return watchPoints;
     }
 
-    public static HashSet<VariableSpecification> getLocalVariables() {
-        return localVariables;
+    public static boolean existsWatchPointContainingLocals() {
+        return watchPointsContainLocals;
     }
 }

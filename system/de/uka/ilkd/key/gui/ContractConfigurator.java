@@ -52,7 +52,7 @@ public class ContractConfigurator extends JDialog {
     /**
      * Helper for constructors.
      */
-    private void init(Services services, 
+    public void init(Services services, 
                       ProgramMethod pm,
                       Modality modality,
                       boolean allowContract,
@@ -154,15 +154,18 @@ public class ContractConfigurator extends JDialog {
         setVisible(true);
     }
     
+    public ContractConfigurator(Frame owner) {
+        super(owner, "Contract Configurator", true);
+    }
     
     public ContractConfigurator(JDialog owner,
-	    			Services services, 
-	    			ProgramMethod pm,
-	    			Modality modality,
-	    			boolean allowContract,
-	    			boolean allowAssumedInvs,
-	    			boolean allowEnsuredInvs) {
-	super(owner, "Contract Configurator", true);
+            Services services, 
+            ProgramMethod pm,
+            Modality modality,
+            boolean allowContract,
+            boolean allowAssumedInvs,
+            boolean allowEnsuredInvs) {
+        super(owner, "Contract Configurator", true);
 	init(services, 
              pm, 
              modality, 

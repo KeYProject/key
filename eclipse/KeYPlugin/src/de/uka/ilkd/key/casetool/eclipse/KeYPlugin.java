@@ -110,7 +110,7 @@ public class KeYPlugin extends AbstractUIPlugin
     /**
      * Returns the passed method in KeY representation.
      */
-    private ProgramMethod getProgramMethod(IMethod method, JavaInfo javaInfo) {
+    public ProgramMethod getProgramMethod(IMethod method, JavaInfo javaInfo) {
 	try {
 	    //determine container type
 	    IType containerType = method.getDeclaringType();
@@ -156,7 +156,7 @@ public class KeYPlugin extends AbstractUIPlugin
      * TODO: recursively parse source fragments linked from anywhere else -
      * sensefully integrateable in KeY ??
      */
-    private synchronized InitConfig loadProject(IProject project) 
+    public synchronized InitConfig loadProject(IProject project) 
     		throws ProofInputException {
 	assertTrue(project != null);
 	if(project.equals(lastLoadedProject)) {

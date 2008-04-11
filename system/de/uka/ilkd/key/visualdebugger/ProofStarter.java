@@ -1,8 +1,6 @@
 package de.uka.ilkd.key.visualdebugger;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.proof.*;
@@ -189,7 +187,6 @@ public class ProofStarter {
             throw new IllegalStateException(
                     "Proofstarter must be initialized before.");
         }
-        System.out.println("maxsteps 21: " + maxSteps);
         final Strategy oldStrategy = proof.getActiveStrategy();
         if (strategy == null) {
             // in this case take the strategy of the proof settings
@@ -198,11 +195,9 @@ public class ProofStarter {
             proof.setActiveStrategy(strategy);
         }
         if (maxSteps == -1) {
-            System.out.println("22-1");
             // take default settings
             setMaxSteps(proof.getSettings().getStrategySettings().getMaxSteps());
         }
-        System.out.println("23 maxsteps..." + maxSteps);
         final BuiltInRule decisionProcedureRule;
         if (useDecisionProcedures) {
             decisionProcedureRule = findSimplifyRule();
@@ -214,12 +209,14 @@ public class ProofStarter {
         goalChooser.init(proof, proof.openGoals());
         final ProofListener pl = new ProofListener();
 
+        //%%% HACK !!!! Remove as soon as possible
+        List backup = Goal.getRuleAppListener();
+        Goal.setRuleAppListenerList((Collections.synchronizedList(new ArrayList(10))));
+        //%%% END OF HACK 
+        
         Goal.addRuleAppListener(pl);
-        System.out.println("27");
-        ProofAggregate proofList = null;
+       
         try {
-            proofList = po.getPO();
-            System.out.println("28");
             int countApplied = 0;
 
                 initProgressMonitors(maxSteps);
@@ -227,19 +224,23 @@ public class ProofStarter {
                     countApplied++;
                     informProgressMonitors(countApplied);
              
-            }System.out.println("30");
+            }
             if (useDecisionProcedures && decisionProcedureRule != null) {
                 applySimplificationOnGoals(proof.openGoals(), decisionProcedureRule);
-            }    System.out.println("31");        
+            }      
         } catch (Throwable e) {
             System.err.println(e);
             e.printStackTrace();
             return false;
-        } finally {
-            System.out.println("32");  
+        } finally {            
             Goal.removeRuleAppListener(pl);
+            Goal.setRuleAppListenerList(backup);
+            try {
+                env.removeProofList(po.getPO());
+            } catch (ProofInputException e) {
+                e.printStackTrace();
+            }
             proof.setActiveStrategy(oldStrategy);
-            env.removeProofList(proofList);
         }
 
         return true;

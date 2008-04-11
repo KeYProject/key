@@ -26,7 +26,7 @@ import de.uka.ilkd.key.logic.op.ProgramConstant;
  */
 public class MethodVisitor extends JavaASTVisitor {
 
-    private Map<VariableSpecification, Integer> keyPositions = new HashMap<VariableSpecification, Integer>();
+    private Map<SourceElement, Integer> keyPositions = new HashMap<SourceElement, Integer>();
 
     private int count = 0;
 
@@ -56,7 +56,7 @@ public class MethodVisitor extends JavaASTVisitor {
         walk(root());
     }
 
-    public Map<VariableSpecification, Integer> result() {
+    public Map<SourceElement, Integer> result() {
         return keyPositions;
     }
 

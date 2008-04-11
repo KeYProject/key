@@ -44,16 +44,13 @@ import de.uka.ilkd.key.gui.IMain;
 import visualdebugger.draw2d.*;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.decproc.DecProcRunner;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.util.WatchpointUtil;
-import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
-import de.uka.ilkd.key.visualdebugger.DebuggerListener;
-import de.uka.ilkd.key.visualdebugger.SourceElementId;
-import de.uka.ilkd.key.visualdebugger.VisualDebugger;
+import de.uka.ilkd.key.visualdebugger.*;
 import de.uka.ilkd.key.visualdebugger.executiontree.*;
 
 // TODO: Auto-generated Javadoc
@@ -289,7 +286,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
      */
     private void identifyWatchpoints(LinkedList<ETNode> nodesToEvaluate) {
 // FIXME: create getter/setter for watchpoints to avoid translation overhead
-        ListOfTerm watchpoints = vd.getWatchPointManager()
+        LinkedList<WatchPoint> watchpoints = vd.getWatchPointManager()
                 .getListOfWatchpoints(vd.getMediator().getServices());
         if (!watchpoints.isEmpty()) {
             WatchpointUtil.setActiveWatchpoint(nodesToEvaluate, watchpoints);
@@ -379,6 +376,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                     setSelected(node);
                     renameTest(node);
                     wpInfo.removeAll();
+                    //TODO extract method
                     try {
                         if (activeWPs != null) {
                             for (Term term : activeWPs) {
@@ -388,6 +386,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
   
                                 String wp = sb.toString().replaceFirst("myDummy=", "");
                                 wpInfo.add(wp.replace(";",""));
+                                
                                 } catch (Throwable t){
                                     t.printStackTrace();
                                 }
@@ -403,29 +402,14 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                  */
                 private void renameTest(final SourceElementFigure node) {
                     ListOfNode proofTreeNodes = node.getETNode().getProofTreeNodes();
-                    System.out.println("ProofNodes  :: "+proofTreeNodes.size());
+
                     Node head = proofTreeNodes.head();
-                    WatchpointUtil.getInitialRenamings(head, vd.getMediator().getServices());
-                    System.out.println("SerialNr  :: "+ head.serialNr());
-                    ListOfNode lon = SLListOfNode.EMPTY_LIST;
-                    while(head.parent() != null){
-                        lon = lon.append(head.parent());
-                        head = head.parent();
-                    }
-                    lon=lon.reverse();
-                    System.out.println("-------------");
                     try {
-                        for (IteratorOfNode it = lon.iterator(); it.hasNext();) {
-                            Node anode = it.next();
-                            ListOfRenamingTable renamingTables = anode.getRenamingTable();
-                            
-                            if (renamingTables != null && renamingTables.size() > 0 ) {
-                               System.out.println("RT size: "+renamingTables.size()+"@node " + anode.serialNr());
-                                
-                                WatchpointUtil.trackRenaming(vd.getMediator().getServices().getJavaInfo(), renamingTables);
-                            } 
-                        }
-                      
+                    LinkedList<WatchPoint> watchpoints = vd.getWatchPointManager().getListOfWatchpoints(vd.getMediator().getServices());
+                    WatchpointUtil.getInitialRenamings(head, watchpoints );
+                    WatchpointUtil.trackRenaming(head, watchpoints);
+                    System.out.println("SerialNr  :: "+ head.serialNr());
+
                     } catch (Throwable e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
@@ -1400,10 +1384,11 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
             if (ExecutionTree.treeStyle == ExecutionTree.SLET3) {
             	activeFilter = new TreeFilter();
-                LinkedList<ETNode> allLeafETNodes = WatchpointUtil.getAllLeafETNodes(etn);
-				System.out.println("ETV identfy for : " + allLeafETNodes.size() + " ETNODE (LEAVES)");
-				identifyWatchpoints(allLeafETNodes);
-                treebranch = buildTreeBranch(etn, null, activeFilter);
+                
+//            	LinkedList<ETNode> allLeafETNodes = WatchpointUtil.getAllLeafETNodes(etn);
+//				identifyWatchpoints(allLeafETNodes);
+                
+				treebranch = buildTreeBranch(etn, null, activeFilter);
                 this.root.addBranch(treebranch);
 
             } else if (ExecutionTree.treeStyle == ExecutionTree.RAWTREE) {
