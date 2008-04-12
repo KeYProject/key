@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.visualdebugger;
+package de.uka.ilkd.key.visualdebugger.watchpoints;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -6,7 +6,6 @@ import java.util.List;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.util.PositionWrapper;
 
 /**
  * The Class WatchPoint.
@@ -35,13 +34,13 @@ public class WatchPoint {
     private boolean enabled = true;
 
     private List<String> parameterTypes;
-    
+    /** The watchpoint parsed as KeY data structure. */
     private Term watchpointAsTerm;
-    
-    //private List<PositionWrapper> variablePositions;
+    /** The method where the local variables belong to.*/
     private ProgramMethod programMethod = null;
+    /** The positions where the local variables occurred in the method.*/
     private List<Integer> keyPositions = new LinkedList<Integer>();
-    
+    /** A list of local variables used in this watchpoint. */
     private List<LocationVariable> orginialLocalVariables = new LinkedList<LocationVariable>();
     private List<LocationVariable> inittiallyRenamedLocalVariables = new LinkedList<LocationVariable>();
     

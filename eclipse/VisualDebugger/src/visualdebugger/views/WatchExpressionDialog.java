@@ -26,7 +26,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import visualdebugger.astops.LocalVariableDetector;
 import visualdebugger.astops.PositionFinder;
 import visualdebugger.astops.Util;
-import de.uka.ilkd.key.visualdebugger.WatchpointDescriptor;
+import de.uka.ilkd.key.visualdebugger.watchpoints.WatchpointDescriptor;
 
 /**
  * The Class WatchExpressionDialog.

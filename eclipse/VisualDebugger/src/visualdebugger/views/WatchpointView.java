@@ -30,7 +30,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import visualdebugger.astops.PositionFinder;
 import visualdebugger.astops.Util;
 import de.uka.ilkd.key.visualdebugger.*;
-
+import de.uka.ilkd.key.visualdebugger.watchpoints.*;
 /**
  * The Class WatchpointView.
  */

@@ -48,9 +48,12 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.decproc.DecProcRunner;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.util.ProgressMonitor;
-import de.uka.ilkd.key.util.WatchpointUtil;
-import de.uka.ilkd.key.visualdebugger.*;
+import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
+import de.uka.ilkd.key.visualdebugger.DebuggerListener;
+import de.uka.ilkd.key.visualdebugger.SourceElementId;
+import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 import de.uka.ilkd.key.visualdebugger.executiontree.*;
+import de.uka.ilkd.key.visualdebugger.watchpoints.*;
 
 // TODO: Auto-generated Javadoc
 
@@ -373,7 +376,6 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
                 public void mousePressed(MouseEvent me) {
                     setSelected(node);
-                    renameTest(node);
                     wpInfo.removeAll();
                     //TODO extract method
                     try {
@@ -393,25 +395,6 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                         }
                     } catch (Throwable t) {
                         System.out.println(t.toString());
-                    }
-                }
-
-                /**
-                 * @param node
-                 */
-                private void renameTest(final SourceElementFigure node) {
-                    ListOfNode proofTreeNodes = node.getETNode().getProofTreeNodes();
-
-                    Node head = proofTreeNodes.head();
-                    try {
-                    LinkedList<WatchPoint> watchpoints = vd.getWatchPointManager().getListOfWatchpoints(vd.getMediator().getServices());
-                    WatchpointUtil.getInitialRenamings(head, watchpoints );
-                    WatchpointUtil.trackRenaming(head, watchpoints);
-                    System.out.println("SerialNr  :: "+ head.serialNr());
-
-                    } catch (Throwable e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
                     }
                 }
             });

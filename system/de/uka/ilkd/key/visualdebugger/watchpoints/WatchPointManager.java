@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.visualdebugger;
+package de.uka.ilkd.key.visualdebugger.watchpoints;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -18,7 +18,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.ProblemLoader;
-import de.uka.ilkd.key.util.WatchpointUtil;
 
 /**
  * The Class WatchPointManager keeps a list of all watchpoints.
@@ -28,47 +27,15 @@ public class WatchPointManager {
     private static boolean watchPointsContainLocals;
     /** The watch points in a raw format. */
     private LinkedList<WatchPoint> watchPoints = new LinkedList<WatchPoint>();
-
     /**
      * Gets the watch points.
      * 
      * @return the watch points
      */
-    public LinkedList<WatchPoint> getWatchPoints() {
+    private LinkedList<WatchPoint> getWatchPoints() {
         return watchPoints;
     }
 
-    /**
-     * Gets the watch points as array.
-     * 
-     * @return the watch points as array
-     */
-    public Object[] getWatchPointsAsArray() {
-        return watchPoints.toArray();
-    }
-
-    /**
-     * Adds the watch point.
-     * 
-     * @param wp
-     *                the wp
-     */
-    public void addWatchPoint(WatchPoint wp) {
-        watchPoints.add(wp);
-    }
-
-    /**
-     * Removes the watch point.
-     * 
-     * @param wp
-     *                the wp
-     */
-    public void removeWatchPoint(WatchPoint wp) {
-
-        if (watchPoints.contains(wp)) {
-            watchPoints.remove(wp);
-        }
-    }
 
     /**
      * Translates the WatchPoints into KeY data structures.
@@ -76,39 +43,39 @@ public class WatchPointManager {
      * @return the count of translated WatchPoints
      */
     private int translateWatchpoints(Services services) {
-
+    
         LinkedList<WatchPoint> watchpoints = getWatchPoints();
         watchPointsContainLocals = false;
-
+    
         try {
             assert (watchpoints != null) : "Watchpoints are NULL!";
-
+    
             if (watchpoints.isEmpty()) {
                 return 0;
             } else {
-
+    
                 Namespace progVarNS = new Namespace();
-
+    
                 final JavaInfo ji = services.getJavaInfo();
-
+    
                 for (int i = 0; i < watchpoints.size(); i++) {
-
+    
                     WatchPoint wp = watchpoints.get(i);
-
+    
                     if (wp.isEnabled()) {
-
+    
                         String declaringType = wp.getDeclaringType();
-
+    
                         String nameOfSelf = "self_XY";
                         ProgramElementName selfName = new ProgramElementName(
                                 nameOfSelf);
-
+    
                         // check namespace
                         while (services.getNamespaces().lookup(selfName) != null) {
                             nameOfSelf = nameOfSelf.concat("Z");
                             selfName = new ProgramElementName(nameOfSelf);
                         }
-
+    
                         ProgramVariable var_self = new LocationVariable(
                                 selfName, ji.getKeYJavaType(declaringType));
                         ProgramVariable var_dummy = new LocationVariable(
@@ -116,16 +83,16 @@ public class WatchPointManager {
                                         .getTypeConverter().getBooleanType());
                         progVarNS.add(var_self);
                         progVarNS.add(var_dummy);
-
+    
                         if (wp.getLocalVariables() != null
                                 && wp.getLocalVariables().size() > 0) {
                             translateLocalVariables(progVarNS, ji, wp);
                             watchPointsContainLocals = true;
                         }
-
+    
                         wp.setWatchpointTerm(createWatchpointTerm(services,
                                 progVarNS, wp, declaringType, selfName));
-
+    
                     }
                 }
                 return 1;
@@ -136,6 +103,7 @@ public class WatchPointManager {
             return -1;
         }
     }
+
 
     /**
      * @param services
@@ -154,12 +122,11 @@ public class WatchPointManager {
                 + selfName);
         buffer.append(" ) : { " + wp.getName() + " = " + wp.getExpression());
         buffer.append(";} }\\>" + wp.getName() + " = TRUE");
-
+    
         Term term = ProblemLoader.parseTerm(buffer.toString(), services,
                 new Namespace(), progVarNS);
         return term;
     }
-
     /**
      * @param progVarNS
      * @param ji
@@ -207,6 +174,40 @@ public class WatchPointManager {
         wp.setOrginialLocalVariables(orginialLocalVariables);
     }
 
+
+    /**
+     * Gets the watch points as array.
+     * 
+     * @return the watch points as array
+     */
+    public Object[] getWatchPointsAsArray() {
+        return watchPoints.toArray();
+    }
+
+    /**
+     * Adds the watch point.
+     * 
+     * @param wp
+     *                the wp
+     */
+    public void addWatchPoint(WatchPoint wp) {
+        watchPoints.add(wp);
+    }
+
+    /**
+     * Removes the watch point.
+     * 
+     * @param wp
+     *                the wp
+     */
+    public void removeWatchPoint(WatchPoint wp) {
+
+        if (watchPoints.contains(wp)) {
+            watchPoints.remove(wp);
+        }
+    }
+
+    
     /**
      * Gets the list of WatchPoints. This method never returns
      * null. In case that there are no WatchPoints an empty ListOfTerm is

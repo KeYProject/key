@@ -85,6 +85,8 @@ import de.uka.ilkd.key.visualdebugger.executiontree.ExecutionTree;
 import de.uka.ilkd.key.visualdebugger.executiontree.ITNode;
 import de.uka.ilkd.key.visualdebugger.statevisualisation.StateVisualization;
 import de.uka.ilkd.key.visualdebugger.statevisualisation.SymbolicObject;
+import de.uka.ilkd.key.visualdebugger.watchpoints.WatchPoint;
+import de.uka.ilkd.key.visualdebugger.watchpoints.WatchPointManager;
 
 // TODO: Auto-generated Javadoc
 /**

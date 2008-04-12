@@ -27,6 +27,7 @@ import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.visualdebugger.*;
 import de.uka.ilkd.key.visualdebugger.executiontree.ITNode;
+import de.uka.ilkd.key.visualdebugger.watchpoints.WatchPoint;
 
 public class StateVisualization {
 

@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.visualdebugger;
+package de.uka.ilkd.key.visualdebugger.watchpoints;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Sequent;

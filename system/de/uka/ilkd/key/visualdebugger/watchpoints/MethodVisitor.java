@@ -7,7 +7,7 @@
 // See LICENSE.TXT for details.
 //
 //
-package de.uka.ilkd.key.visualdebugger;
+package de.uka.ilkd.key.visualdebugger.watchpoints;
 
 import java.util.HashMap;
 import java.util.Map;

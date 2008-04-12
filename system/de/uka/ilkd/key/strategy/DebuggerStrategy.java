@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
-import de.uka.ilkd.key.visualdebugger.WatchPoint;
+import de.uka.ilkd.key.visualdebugger.watchpoints.WatchPoint;
 
 /**
  * Strategy tailored to VBT aimed symbolic execution.

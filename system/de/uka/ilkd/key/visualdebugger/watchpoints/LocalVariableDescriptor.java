@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.visualdebugger;
+package de.uka.ilkd.key.visualdebugger.watchpoints;
 
 // TODO: Auto-generated Javadoc
 /**

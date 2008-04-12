@@ -25,7 +25,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 
 import visualdebugger.views.InsertSepVisitor;
-import de.uka.ilkd.key.casetool.eclipse.EclipseSignaturesHelper; 
+import de.uka.ilkd.key.casetool.eclipse.EclipseSignaturesHelper;
 import de.uka.ilkd.key.casetool.eclipse.MethodPOSelectionDialog;
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.collection.SLListOfString;
@@ -35,7 +35,6 @@ import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.jml.JMLMethodSpec;
 import de.uka.ilkd.key.jml.JMLSpec;
-import de.uka.ilkd.key.logic.SLListOfTerm;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -45,7 +44,7 @@ import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
-import de.uka.ilkd.key.visualdebugger.WatchPoint;
+import de.uka.ilkd.key.visualdebugger.watchpoints.WatchPoint;
 
 /**
  * The Class StartVisualDebuggerAction.
