@@ -42,8 +42,6 @@ public class WatchPoint {
     private List<Integer> keyPositions = new LinkedList<Integer>();
     /** A list of local variables used in this watchpoint. */
     private List<LocationVariable> orginialLocalVariables = new LinkedList<LocationVariable>();
-    private List<LocationVariable> inittiallyRenamedLocalVariables = new LinkedList<LocationVariable>();
-    
   
     /**
      * Gets the in type.
@@ -168,14 +166,6 @@ public class WatchPoint {
         this.watchpointAsTerm = watchpointAsTerm;
     }
 
-//    public List<PositionWrapper> getVariablePositions() {
-//        return variablePositions;
-//    }
-//
-//    public void setVariablePositions(LinkedList<PositionWrapper> variablePositions) {
-//        this.variablePositions = variablePositions;
-//    }
-
     public List<LocationVariable> getOrginialLocalVariables() {
         return orginialLocalVariables;
     }
@@ -183,15 +173,6 @@ public class WatchPoint {
     public void setOrginialLocalVariables(
             List<LocationVariable> orginialLocalVariables) {
         this.orginialLocalVariables = orginialLocalVariables;
-    }
-
-    public List<LocationVariable> getInittiallyRenamedLocalVariables() {
-        return inittiallyRenamedLocalVariables;
-    }
-
-    public void setInittiallyRenamedLocalVariables(
-            List<LocationVariable> inittiallyRenamedLocalVariables) {
-        this.inittiallyRenamedLocalVariables = inittiallyRenamedLocalVariables;
     }
 
     public ProgramMethod getProgramMethod() {

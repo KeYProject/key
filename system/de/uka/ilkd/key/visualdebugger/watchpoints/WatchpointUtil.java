@@ -180,11 +180,11 @@ public class WatchpointUtil {
         
         if (WatchPointManager.existsWatchPointContainingLocals()) {
 
-            VariableNameTracker vnt = new VariableNameTracker();
-            vnt.getInitialRenamings(node, watchpoints);
-            vnt.checkNamespace(node, watchpoints, updateFactory, updates);
+            VariableNameTracker vnt = new VariableNameTracker(node, watchpoints);
+            List<LocationVariable> initialRenamings = vnt.getInitialRenamings();
+            vnt.checkNamespace(updateFactory, updates, initialRenamings);
 
-            updates.add(buildNameUpdates(updateFactory, vnt.trackRenaming(node, watchpoints), node, watchpoints));
+            updates.add(buildNameUpdates(updateFactory, vnt.trackRenaming(), node, watchpoints,initialRenamings));
         }
 
         updates.addAll(collectUpdates(pos));
@@ -289,11 +289,10 @@ public class WatchpointUtil {
             // start tracking names if necessary
             if (WatchPointManager.existsWatchPointContainingLocals()) {
 
-                VariableNameTracker vnt = new VariableNameTracker();
-                vnt.getInitialRenamings(node, watchpoints);
-                vnt.checkNamespace(node, watchpoints, updateFactory, updates);
-                updates.add(buildNameUpdates(updateFactory, vnt.trackRenaming(node,
-                        watchpoints), node, watchpoints));
+                VariableNameTracker vnt = new VariableNameTracker(node, watchpoints);
+                List<LocationVariable> initialRenamings = vnt.getInitialRenamings();
+                vnt.checkNamespace(updateFactory, updates, initialRenamings);
+                updates.add(buildNameUpdates(updateFactory, vnt.trackRenaming(), node, watchpoints,initialRenamings));
             }
 
             updates.addAll(collectUpdates(pos));
@@ -482,40 +481,6 @@ public class WatchpointUtil {
         return executionTree;
     }
 
-    /**
-     * @param node
-     */
-    private static SourceElement getStatement(Node node) {
-        try {
-
-            IteratorOfConstrainedFormula iterator = node.sequent().iterator();
-            ConstrainedFormula constrainedFormula;
-            Term term;
-            while (iterator.hasNext()) {
-                constrainedFormula = iterator.next();
-                term = constrainedFormula.formula();
-
-                while (term.op() instanceof QuanUpdateOperator) {
-                    int targetPos = ((QuanUpdateOperator) term.op())
-                    .targetPos();
-                    term = term.sub(targetPos);
-                }
-                // proceed to most inner method-frame
-                if (term.op() instanceof Modality) {
-                    ProgramPrefix programPrefix = (ProgramPrefix) term
-                    .javaBlock().program();
-                    return programPrefix.getPrefixElementAt(programPrefix
-                            .getPrefixLength() - 1);
-
-                }
-            }
-        } catch (RuntimeException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     public static HashMap<Integer, SourceElement> valueToKey(
             Map<SourceElement, Integer> map) {
 
@@ -531,27 +496,22 @@ public class WatchpointUtil {
     }
 
     private static Update buildNameUpdates(UpdateFactory uf,
-            ListOfRenamingTable renamings, Node node, List<WatchPoint> watchpoints) {
+            ListOfRenamingTable renamings, Node node, List<WatchPoint> watchpoints, List<LocationVariable> initialRenamings) {
 
         List<Update> nameUpdates = new LinkedList<Update>();
         IteratorOfRenamingTable i = renamings.iterator();
 
         for (WatchPoint watchPoint : watchpoints) {
             List<LocationVariable> orginialLocalVariables = watchPoint.getOrginialLocalVariables();
-            List<LocationVariable> inittiallyRenamedLocalVariables = watchPoint.getInittiallyRenamedLocalVariables();
-            assert orginialLocalVariables.size() == inittiallyRenamedLocalVariables.size();
+            
+            assert orginialLocalVariables.size() == initialRenamings.size();
 
             while (i.hasNext()) {
                 RenamingTable renaming = i.next();
                 for(int j = 0; j < orginialLocalVariables.size(); j++) {
 
-
                     LocationVariable originalVar = orginialLocalVariables.get(j);
-                    LocationVariable initiallyRenamedVar = inittiallyRenamedLocalVariables.get(j);
-
-                    System.out.println(originalVar.id() +" hashcode " + originalVar.hashCode());
-                    System.out.println(initiallyRenamedVar.id());
-
+                    LocationVariable initiallyRenamedVar = initialRenamings.get(j);
                     SourceElement renamedVariable = renaming
                     .getRenaming(initiallyRenamedVar);
                     if (renamedVariable != null) {
@@ -561,7 +521,6 @@ public class WatchpointUtil {
                         Update elemtaryUpdate = uf.elementaryUpdate(
                                 TermFactory.DEFAULT.createVariableTerm(originalVar),
                                 TermFactory.DEFAULT.createVariableTerm((LocationVariable) renamedVariable)); 
-                        System.out.println("update by tf"+elemtaryUpdate);
 
                         nameUpdates.add(elemtaryUpdate);
                         System.out.println("sizeof nameUpdates: " + nameUpdates.size());

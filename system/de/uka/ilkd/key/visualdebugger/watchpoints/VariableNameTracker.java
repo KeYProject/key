@@ -27,11 +27,18 @@ import de.uka.ilkd.key.rule.updatesimplifier.Update;
 
 public class VariableNameTracker {
 
-    private boolean isMethodExpandRule(ListOfRuleSet listOfRuleSet) {
-        return listOfRuleSet.contains(
-                new RuleSet(
-                        new Name("method_expand")));
+    /** The current proof tree.*/
+    private Node node;
+    /** The watchpoints.*/
+    private List<WatchPoint> watchpoints;
+    
+    public VariableNameTracker(Node node, List<WatchPoint> watchpoints) {
+        super();
+        this.node = node;
+        this.watchpoints = watchpoints;
     }
+
+
     /**
      * @param node
      */
@@ -77,11 +84,11 @@ public class VariableNameTracker {
      * @return the parameter indices of method, null if no local variables are
      *         used
      */
-    private LinkedList<Integer> getParameterIndicesOfMethod(
-            ProgramMethod programMethod, List<WatchPoint> watchpoints) {
+    private List<Integer> getParameterIndicesOfMethod(
+            ProgramMethod programMethod) {
 
         int parameterCount = programMethod.getParameterDeclarationCount();
-        LinkedList<Integer> parameterIndices = new LinkedList<Integer>();
+        List<Integer> parameterIndices = new LinkedList<Integer>();
 
         for (WatchPoint watchPoint : watchpoints) {
             if(watchPoint.getProgramMethod().equals(programMethod)){
@@ -96,6 +103,15 @@ public class VariableNameTracker {
         return parameterIndices;
     }
  
+    /**
+     * Checks if the given listOfRuleSet contains the method-expand taclet.
+     * 
+     * */
+    private boolean isMethodExpandRule(ListOfRuleSet listOfRuleSet) {
+        return listOfRuleSet.contains(
+                new RuleSet(
+                        new Name("method_expand")));
+    }
     /**
      * Gets the renamed local variables.
      * 
@@ -133,38 +149,46 @@ public class VariableNameTracker {
         return localVariables;
     }
     /**
-     * @param node
-     * @param watchpoints
+     * This method checks for every watchpoints local variables if they are already in the global
+     * namespace of the node representing the current proof and thus cannot be located using the renaming tables. 
+     * It returns the proper updates for each variable that is contained in the namespace <br><br>
+     * {original_var:=initiallyRenamed_var}
+     *  
      * @param updateFactory
      * @param updates
      */
-    public void checkNamespace(Node node, List<WatchPoint> watchpoints,
-            UpdateFactory updateFactory, LinkedList<Update> updates) {
+    public void checkNamespace(UpdateFactory updateFactory, LinkedList<Update> updates, List<LocationVariable> inittiallyRenamedLocalVariables) {
         
         for(WatchPoint wp : watchpoints){
             for(int i = 0;  i < wp.getOrginialLocalVariables().size(); i++){
+                if(!inittiallyRenamedLocalVariables.isEmpty()){
                 LocationVariable orginialLocationVariable = wp.getOrginialLocalVariables().get(i);
-                LocationVariable renamedLocationVariable = wp.getInittiallyRenamedLocalVariables().get(i);
+                LocationVariable renamedLocationVariable = inittiallyRenamedLocalVariables.get(i);
 
                 if(node.getGlobalProgVars().contains(renamedLocationVariable ) ){
-
-                    System.out.println("+++ detected relevant variable in namespace");
 
                     updates.add(updateFactory.elementaryUpdate(
                             TermFactory.DEFAULT.createVariableTerm(orginialLocationVariable),
                             TermFactory.DEFAULT.createVariableTerm(renamedLocationVariable)));
                 }
-            }
+            }}
         }
     }
     /**
      * Gets the initial renamings.
      * 
+     * When the KeY Prover is started every variable is initially renamed by the ProgVarReplaceVisitor, i.e. it
+     * has still the same "name" but it is a new object. If we have used local variables in the watchpoints we have
+     * to keep track of these renamings. Therefore this method first looks up all applications of method-expand taclets.
+     * In those methods we check first if they contain parameters that are relevant for us and furthermore store the
+     * parameter count. Finally the following method-frame is investigated and the parameter count added to rebuild
+     * the original order.
+     * 
      * @param node the node
      * 
      * @return the initial renamings
      */
-    public /* List<LocationVariable>*/ void getInitialRenamings(Node node,  List<WatchPoint> watchpoints) {
+    public List<LocationVariable> getInitialRenamings() {
 
         Node currentNode = node;
         Node parent = currentNode.parent();
@@ -192,7 +216,7 @@ public class VariableNameTracker {
                         parameterCount = programMethod
                         .getParameterDeclarationCount();
 
-                        LinkedList<Integer> parameterIndices = getParameterIndicesOfMethod(programMethod, watchpoints);
+                        List<Integer> parameterIndices = getParameterIndicesOfMethod(programMethod);
 
                         for (Integer index : parameterIndices) {
                             renamedLocalVariables.add((LocationVariable) programMethod
@@ -212,36 +236,36 @@ public class VariableNameTracker {
                                 parameterCount, watchpoints));
                     }
 
-                    for (WatchPoint wp : watchpoints) {
-                        if(wp.getProgramMethod().equals(programMethod)){
-                            wp.setInittiallyRenamedLocalVariables(renamedLocalVariables);
-                        }
-                    }
+//                    for (WatchPoint wp : watchpoints) {
+//                        if(wp.getProgramMethod().equals(programMethod)){
+//                            wp.setInittiallyRenamedLocalVariables(renamedLocalVariables);
+//                        }
+//                    }
                 }
             }
             currentNode = parent;
             parent = currentNode.parent();
-        }
-        //return renamedLocalVariables;
+        }System.out.println("size of renamed variables: " + renamedLocalVariables.size());
+        return renamedLocalVariables;
     }
-    public ListOfRenamingTable trackRenaming(Node node, List<WatchPoint> watchpoints) {
     
+    public ListOfRenamingTable trackRenaming() {
+
         ListOfRenamingTable allRenamings = SLListOfRenamingTable.EMPTY_LIST;
-    
+        Node anode = node;
         // climb the tree
         ListOfNode lon = SLListOfNode.EMPTY_LIST;
-        while (node.parent() != null) {
+        while (anode.parent() != null) {
             for (WatchPoint watchPoint : watchpoints) {
                 List<LocationVariable> orginialLocalVariables = watchPoint.getOrginialLocalVariables();
                 for (LocationVariable locVar : orginialLocalVariables) {
-                    Node thatParent = node.parent();
-                    Node thatNode = node;
+                    Node thatParent = anode.parent();
+                    Node thatNode = anode;
                     try {
-    
                         if(thatNode.getGlobalProgVars().contains(locVar)
                                 && !thatParent.getGlobalProgVars().contains(locVar)){
-    
-                            System.out.println("node contains local variable" + node.parent().serialNr());
+
+                            System.out.println("node contains local variable" + anode.parent().serialNr());
                         }
                     } catch (RuntimeException e) {
                         // TODO Auto-generated catch block
@@ -249,12 +273,9 @@ public class VariableNameTracker {
                     }
                 } 
             }
-    
-            lon = lon.append(node.parent());
-            node = node.parent();
-    
+            lon = lon.append(anode.parent());
+            anode = anode.parent();
         }
-    
         lon = lon.reverse();
         // walk back on the same branch
         IteratorOfNode it = lon.iterator();
@@ -264,12 +285,12 @@ public class VariableNameTracker {
             if (renamingTables != null && renamingTables.size() > 0) {
                 System.out.println("found renaming @node: " + currentNode.serialNr());
                 IteratorOfRenamingTable i = renamingTables.iterator();
-    
+
                 while (i.hasNext()) {
                     allRenamings = allRenamings.append(i.next());
                 }
             }
-    
+
         }
         return allRenamings;
     }
