@@ -195,6 +195,9 @@ public class Recoder2KeY implements JavaReader {
 
         if (nss == null)
             throw new IllegalArgumentException("namespaces is null");
+        
+        if(!(servConf.getProjectSettings().getErrorHandler() instanceof KeYRecoderExcHandler))
+            throw new IllegalArgumentException("Recoder2KeY needs a KeyRecoderExcHandler as exception handler");
 
         this.servConf = servConf;
         this.mapping = rec2key;
@@ -599,9 +602,9 @@ public class Recoder2KeY implements JavaReader {
 
         List<recoder.java.CompilationUnit> specialClasses = parseLibs();
 
-        for (recoder.java.CompilationUnit compilationUnit : specialClasses) {
-            System.out.println(compilationUnit.toSource());
-        }
+//        for (recoder.java.CompilationUnit compilationUnit : specialClasses) {
+//            System.out.println(compilationUnit.toSource());
+//        }
         
         ChangeHistory changeHistory = servConf.getChangeHistory();
         for (int i = 0, sz = specialClasses.size(); i < sz; i++) {
@@ -610,10 +613,14 @@ public class Recoder2KeY implements JavaReader {
             changeHistory.attached(specialClasses.get(i));
         }
         
-        KeYRecoderExcHandler excHandler = 
-            (KeYRecoderExcHandler) servConf.getProjectSettings().getErrorHandler();
+        KeYRecoderExcHandler excHandler = null;
+        ErrorHandler errorHandler = servConf.getProjectSettings().getErrorHandler();
+        if (errorHandler instanceof KeYRecoderExcHandler) {
+             excHandler = (KeYRecoderExcHandler) errorHandler;
+        }
         
-        excHandler.setIgnoreUnresolvedClasses(true);
+        if(excHandler != null)
+            excHandler.setIgnoreUnresolvedClasses(true);
 
         if (changeHistory.needsUpdate()) {
             changeHistory.updateModel();
@@ -621,24 +628,26 @@ public class Recoder2KeY implements JavaReader {
         
         List<TypeReference> tyrefs = excHandler.getUnresolvedClasses();
         // this resets the list for unresolved refs
-        excHandler.setIgnoreUnresolvedClasses(true);
+        if(excHandler != null)
+            excHandler.setIgnoreUnresolvedClasses(true);
         
         for(TypeReference tyref : tyrefs) {
             resolveUnresolvedTypeRef(tyref, specialClasses);
         }
         
-        excHandler.setIgnoreUnresolvedClasses(false);
+        if(excHandler != null)
+            excHandler.setIgnoreUnresolvedClasses(false);
         
         changeHistory.updateModel();
 
         transformModel(specialClasses);
         
-      NameInfo ni = servConf.getNameInfo();
-      System.out.println("Known types:");
-      for(ClassType ct : ni.getClassTypes()) {
-          System.out.println(ct.getFullName());
-      }
-
+//        NameInfo ni = servConf.getNameInfo();
+//        System.out.println("Known types:");
+//        for(ClassType ct : ni.getClassTypes()) {
+//            System.out.println(ct.getFullName());
+//        }
+        
         // make them available to the rec2key mapping
         for (int i = 0, sz = specialClasses.size(); i < sz; i++) {
             //TODO: use the real file name here

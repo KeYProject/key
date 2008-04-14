@@ -25,6 +25,7 @@ public class KeYCrossReferenceServiceConfiguration
 	super(); // initialises servConf
 	// better not: it might add to the input path of recoder
 	// getProjectSettings().ensureSystemClassesAreInPath();
+	assert keh != null : "The exception handler must not be null";
 	getProjectSettings().setErrorHandler( (recoder.service.ErrorHandler)(keh) );
     }
 
