@@ -1,0 +1,161 @@
+
+Using the \classpath directives in KeY
+======================================
+
+The 'classpath' directive allows to include library code into a KeY
+project. These classes may be present either as
+ - a collection of class files
+ - a collection of normal java source files
+ - a collection of java stub source files
+or in a combination.
+
+Library classes may carry specifications (invariants, contracts) but
+do not contain a model of any contained code.
+
+1. Syntax
+---------
+
+The \classpath and \noDefaultClasses directive may be placed directly
+in front of the \javaSource directive or instead of it. There may be
+an arbitrary number of them.
+
+\classpath must be followed by a string describing either a directory
+or a zip file. Any jar file is a zip file. The path may either
+absolute or is considered relative to the location of the containing
+.key file.
+
+\noDefaultClasses may not be followed by any argument.
+
+Example: A .key-file might begin with
+
+\classpath "/tmp/classes.jar";
+\noDefaultClasses
+\classpath "../classDir/";
+\javaSource "../sources";
+...
+
+
+2. Meaning
+----------
+
+2.1. Default Classes
+
+If there is no "\noDefaultClasses" specified the classes listed in A.
+(which are internally stored) will be loaded. This class set is
+closed, i.e. there are no references to class types outside the
+set. These classes lack therefore any method or field whose
+declaration (w/o method body!) would require knowledge about an
+external class.
+
+The method "java.lang.Class Object.getClass()" is not included in
+class Object for instance since java.lang.Class is not in the set.
+
+If you miss fields or methods, you need to construct your own base
+set (see 2.x.).
+
+
+2.2. Java Sources
+
+After loading the default classes (if they are loaded), all classpath
+locations are iterated to recursivly read in all files within the
+directories and zip files that have the extension ".java".  All java
+sources are reduced to stubs, i.e. any method body is discarded as
+if it was not given.
+
+JML (and OCL??) specification given in the source code (outside a
+method body!) are considered, however!
+
+
+2.3. Class Files
+
+Thereafter, the locations are iterated once again to retrieve all
+contained files with the file name extension ".class".  The class
+files are used to construct java stubs containing the information
+stored in the class files.
+
+Inner classes are mapped as expected. Since there are no method
+bodies, anonymous classes cannot be included the usual way. Instead a
+normal class with an arbitrary name is created.
+
+2.4. Combining (TODO)
+
+It is possible to use both file types: Class files and java
+stubs. Since KeY does not YET support external .jml files, however,
+there may only be either a class file or a source specification for
+one class. This should change later.
+
+2.5. Open sets
+
+It is rather difficult to include all classes that are referenced from
+the stub into a collection of classes to create a set of stubs closed
+under reference. You would need to capture more than 120 classes to
+build a such closure around java.lang.Object. In order to cope with
+this problem, the following applies: 
+
+- All classes in the classpath are used as given.  
+
+- For all classes that are referenced in the classpath but are not
+defined anywhere in it, an empty stub is assumed. For a reference to
+"pack.Class" the stub would be:
+    package pack class Class { }
+
+- All references the javaSources must refer to a classpath class or to
+an empty stub created while reading the classpath. There must not be
+unresolved references.
+
+- Please note that the classpath classes cannot access the javaSource
+classes.
+
+3. No Default Classes
+---------------------
+
+If you want to replace the default classes, you have to specify
+"\noDefaultClasses" somewhere amongst the classpath specifications.
+However, you have to make sure that all classes in A that are not
+marked with a (*) are defined and have all needed methods and
+fields. You might want to look into the key sources to compare the
+current implementation of the default classes.
+
+
+4. Known issues
+---------------
+
+- Recoder does not recognise static inner classes. 
+  (A patch is on the way)
+
+
+A. List of internally stored classes:
+-------------------------------------
+
+java.lang.Object
+
+java.lang.ArithmeticException
+java.lang.ArrayIndexOutOfBoundsException
+java.lang.ArrayStoreException
+java.lang.CloneNotSupportedException
+java.lang.Cloneable
+java.lang.Comparable
+java.lang.Enum
+java.lang.Error
+java.lang.Exception
+java.lang.ExceptionInInitializerError
+java.lang.IndexOutOfBoundsException
+java.lang.InterruptedException
+java.lang.Iterable (*)
+java.lang.NoClassDefFoundError
+java.lang.NullPointerException
+java.lang.NumberFormatException (*)
+java.lang.RuntimeException
+java.lang.String
+java.lang.Throwable
+java.util.Collection (*)
+java.util.Iterator (*)
+java.util.List (*)
+java.util.ListIterator (*)
+java.util.Map (*)
+java.util.Set (*)
+java.io.IOException (*)
+java.io.Serializable
+
+(*) If you want to overwrite the internal classes, these may be
+omitted, all the others must be present

@@ -1,3 +1,13 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+//
+//
+
 package de.uka.ilkd.key.util;
 
 import java.io.File;
@@ -17,7 +27,6 @@ import recoder.io.DataLocation;
  * as InpuStreams.
  * 
  * @author MU
- *
  */
 
 
@@ -72,7 +81,7 @@ public class ZipFileCollection implements FileCollection {
             currentEntry = null;
             while(enumeration.hasMoreElements() && currentEntry == null) {
                 currentEntry = enumeration.nextElement();
-                if(!currentEntry.getName().toLowerCase().endsWith(extension))
+                if(extension != null && !currentEntry.getName().toLowerCase().endsWith(extension))
                     currentEntry = null;
             }
             return currentEntry != null;

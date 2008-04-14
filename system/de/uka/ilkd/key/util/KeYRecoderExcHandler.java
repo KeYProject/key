@@ -112,8 +112,8 @@ public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl implements rec
     /**
      * Check whether an exception is to be ignored.
      * This is the case if:
-     * 1. the exception is an UnresolvedReferenceException
-     * 2. ignoreUnresolvedClasses is set to true
+     * 1. the exception is an UnresolvedReferenceException, and
+     * 2. ignoreUnresolvedClasses is set to true, and
      * 3. the unresolved reference is a type reference
      */
     private boolean testUnresolvedClass(Throwable e) {

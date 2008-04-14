@@ -118,6 +118,12 @@ public class Recoder2KeY implements JavaReader {
      */
     private Recoder2KeYTypeConverter typeConverter;
 
+    /**
+     * the list of classnames that contain the classes that are referenced but not 
+     * defined. For those classe types a dummy stub is created at parse time.
+     */
+    private List<String> dynamicallyCreatedClasses;
+
 
     /**
      * create a new Recoder2KeY transformation object.
@@ -392,6 +398,21 @@ public class Recoder2KeY implements JavaReader {
     public void setClassPath(List<File> classPath) {
         this.classPath = classPath;
     }
+
+    /**
+     * get the list of classes that have been created dynamically due to lacking
+     * definitions.
+     * 
+     * For all classes that are referenced but not defined, an empty dummy stub
+     * is created. This method returns the list of their fully qualified class
+     * names.
+     * 
+     * @author mu, on rb's specification ;)
+     * @return an unmodifiable list of fully qualified class names
+     */
+    public List<String> getDynamicallyCreatedClasses() {
+        return Collections.unmodifiableList(dynamicallyCreatedClasses);
+    }
     
     /*
      * locate java classes that are stored internally within the jar-file or the binary directory.
@@ -498,14 +519,13 @@ public class Recoder2KeY implements JavaReader {
                     rcu.setDataLocation(currentDataLocation);
                     rcuList.add(rcu);
                 } catch(Exception ex) {
-                    System.err.println("Error while loading: " + walker.getCurrentDataLocation());
-                    ex.printStackTrace();
+                    throw new ConvertException("Error while loading: " + walker.getCurrentDataLocation(), ex);
                 }
             }
         }
 
         // -- read class files --
-        List<ClassFileDeclarationBuilder> innerClasses = new ArrayList<ClassFileDeclarationBuilder>(); 
+        ClassFileDeclarationManager manager = new ClassFileDeclarationManager(pf); 
         ByteCodeParser parser = new ByteCodeParser();
         for (FileCollection fc : sources) {
             FileCollection.Walker walker = fc.createWalker(".class");
@@ -514,30 +534,14 @@ public class Recoder2KeY implements JavaReader {
                     currentDataLocation = walker.getCurrentDataLocation();
                     InputStream is = walker.openCurrent();
                     ClassFile cf = parser.parseClassFile(is);
-                    ClassFileDeclarationBuilder builder = new ClassFileDeclarationBuilder(pf, cf);
-                    builder.setDataLocation(currentDataLocation);
-                    if(builder.isInnerClass()) {
-                        innerClasses.add(builder);
-                    } else {
-                        recoder.java.CompilationUnit rcu = builder.makeCompilationUnit();
-                        rcuList.add(rcu);
-                    }
+                    manager.addClassFile(cf, currentDataLocation);
                 } catch(Exception ex) {
-                    System.err.println("Error while loading: " + walker.getCurrentDataLocation());
-                    ex.printStackTrace();
+                    throw new ConvertException("Error while loading: " + walker.getCurrentDataLocation(), ex);
                 }
             }
         }
+        rcuList.addAll(manager.getCompilationUnits());
         
-        for (ClassFileDeclarationBuilder innerClass : innerClasses) {
-            try {
-                innerClass.attachToEnclosingCompilationUnit(getServiceConfiguration());
-            } catch(Exception ex) {
-                System.err.println("Error while attaching: " + innerClass.getClassname());
-                ex.printStackTrace();
-            }   
-        }
-
         recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(
                 new StringReader("public class " +
                         JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS + " {}"));
@@ -564,9 +568,7 @@ public class Recoder2KeY implements JavaReader {
             ProgramElement pe = tw.getProgramElement();
             if (pe instanceof MethodDeclaration) {
                 MethodDeclaration methDecl = (MethodDeclaration) pe;
-                NonTerminalProgramElement parent = pe.getASTParent();
-                int pos = parent.getChildPositionCode(methDecl);
-                parent.replaceChild(methDecl, null);
+                methDecl.setBody(null);
             }
         }
     }
@@ -597,18 +599,16 @@ public class Recoder2KeY implements JavaReader {
 
         List<recoder.java.CompilationUnit> specialClasses = parseLibs();
 
+        for (recoder.java.CompilationUnit compilationUnit : specialClasses) {
+            System.out.println(compilationUnit.toSource());
+        }
+        
         ChangeHistory changeHistory = servConf.getChangeHistory();
         for (int i = 0, sz = specialClasses.size(); i < sz; i++) {
             specialClasses.get(i).makeAllParentRolesValid();
             // TODO if duplicated files, take first one only!
             changeHistory.attached(specialClasses.get(i));
         }
-        
-        /*for (recoder.java.CompilationUnit compilationUnit : specialClasses) {
-            for (TypeDeclaration decl : compilationUnit.getDeclarations()) {
-                System.out.println(decl.getName());
-            }
-        }*/
         
         KeYRecoderExcHandler excHandler = 
             (KeYRecoderExcHandler) servConf.getProjectSettings().getErrorHandler();
@@ -651,6 +651,10 @@ public class Recoder2KeY implements JavaReader {
         setParsingLibs(false);
     }
 
+    /*
+     * make dummy classes for unresolved type references, store newly created classes to 
+     * libClasses and the qualified name of the class to dynamicallyCreatedClasses
+     */
     private void resolveUnresolvedTypeRef(TypeReference tyref, 
             List<recoder.java.CompilationUnit> libClasses) throws ParserException {
         NameInfo ni = servConf.getNameInfo();
@@ -666,6 +670,7 @@ public class Recoder2KeY implements JavaReader {
             if(!typeString.contains("."))
                 throw new UnresolvedReferenceException("Type references to undefined classes may only appear if they are fully qualified", tyref);
             recoder.java.CompilationUnit cu = ClassFileDeclarationBuilder.makeEmptyClassFile(servConf.getProgramFactory(), typeString);
+            dynamicallyCreatedClasses.add(typeString);
             ChangeHistory changeHistory = servConf.getChangeHistory();
             changeHistory.attached(cu);
             libClasses.add(cu);

@@ -41,7 +41,11 @@ import de.uka.ilkd.key.util.Debug;
  * 
  * The information is stored into a compilation unit within the appropriate package.
  * 
- * TODO This builder *cannot* handle anonymous and inner classes yet.
+ * TODO Recoder does not allow to detect if an inner class is static or not because 
+ * it discards the information about inner classes all to early. That is why all inner
+ * classes are non-static. Does this matter? 
+ * 
+ * TODO Possible improvement: Remove "synthetic" members (JVM spec chapter 4)
  * 
  * @author MU
  */
@@ -53,7 +57,10 @@ public class ClassFileDeclarationBuilder {
 
     // unit under investigation
     private ClassFile classFile;
-
+    
+    // the physical name stored in the class file
+    private String physicalName;
+    
     // the result
     private CompilationUnit compilationUnit;
 
@@ -77,6 +84,7 @@ public class ClassFileDeclarationBuilder {
         super();
         this.factory = programFactory;
         this.classFile = classFile;
+        this.physicalName = classFile.getPhysicalName();
     }
 
     
@@ -86,8 +94,23 @@ public class ClassFileDeclarationBuilder {
      * 
      * @return the physical name of the class in the class file
      */
-    public String getClassname() {
-        return classFile.getPhysicalName();
+    public String getFullClassname() {
+        return physicalName;
+    }
+    
+    
+    /**
+     * get the class name of this class. If it is an inner class, it is only the
+     * part after $, or the complete short name otherwise. Anonymous classes are
+     * therefore referenced by "EnclosingClass$11" for instance.
+     * 
+     * @return the name of the class
+     */
+    public String getClassName() {
+        if (isInnerClass())
+            return physicalName.substring(physicalName.indexOf('$') + 1);
+        else
+            return physicalName.substring(physicalName.indexOf('.') + 1);
     }
     
     /**
@@ -160,7 +183,6 @@ public class ClassFileDeclarationBuilder {
      * @return true iff the classFile under inspection is an inner class
      */
     public boolean isInnerClass() {
-        String physicalName = classFile.getPhysicalName();
         if(physicalName.contains("$")) {
             String trailing = physicalName.substring(physicalName.indexOf('$') + 1);
             return !isNumber(trailing);
@@ -168,35 +190,25 @@ public class ClassFileDeclarationBuilder {
         return false;
     }
     
-    
-   
-
-
-    /* TODO DOC*/
-    public void attachToEnclosingCompilationUnit(ServiceConfiguration sc) {
+    /* TODO DOC
+     * enclCU must contain exactly one type decl. the enclosing one 
+     */
+    public void attachToEnclosingCompilationUnit(CompilationUnit enclCU) {
         if(!isInnerClass())
             throw new IllegalStateException("only inner classes can be attached to enclosing classes");
-        
-        NameInfo nameInfo = sc.getNameInfo();
-        String enclosingName = getEnclosingName();
-        ClassType ct = nameInfo.getClassType(enclosingName);
-        
-        if(!(ct instanceof TypeDeclaration)) {
-            throw new IllegalStateException(enclosingName + " is not present as source code; but:" + ct);
-        } else {
-            TypeDeclaration td = (TypeDeclaration) ct;
-            ASTList<MemberDeclaration> members = td.getMembers();
-            assert members != null : "ClassDeclaration with null members!";
-            TypeDeclaration childtd = makeTypeDeclaration();
-            members.add(childtd);
-            sc.getChangeHistory().attached(childtd);
-        }
+
+        TypeDeclaration td = enclCU.getPrimaryTypeDeclaration();
+        assert td != null : "No type declaration in compilation unit";
+        ASTList<MemberDeclaration> members = td.getMembers();
+        assert members != null : "ClassDeclaration with null members!";
+        TypeDeclaration childtd = makeTypeDeclaration();
+        members.add(childtd);
     }
     
-    private String getEnclosingName() {
+    /* TODO DOC*/
+    public String getEnclosingName() {
         if(!isInnerClass())
             throw new IllegalStateException("only inner classes have an enclosing class");
-        String physicalName = classFile.getPhysicalName();
         return physicalName.substring(0, physicalName.indexOf('$'));
     }
 
@@ -268,10 +280,7 @@ public class ClassFileDeclarationBuilder {
      * set the name and modifiers of the class/intf declaration
      */
     private void setNameAndMods() {
-        String fullName = classFile.getFullName();
-        int lastDot = fullName.lastIndexOf('.');
-        String className = fullName.substring(lastDot + 1);
-        typeDecl.setIdentifier(factory.createIdentifier(className));
+        typeDecl.setIdentifier(factory.createIdentifier(getClassName()));
 
         ASTArrayList<DeclarationSpecifier> specs = new ASTArrayList<DeclarationSpecifier>();
 
@@ -283,6 +292,8 @@ public class ClassFileDeclarationBuilder {
             specs.add(factory.createFinal());
         if (classFile.isStrictFp())
             specs.add(factory.createStrictFp());
+        if (classFile.isStatic())
+            specs.add(factory.createStatic());
 
         typeDecl.setDeclarationSpecifiers(specs);
     }
@@ -293,7 +304,7 @@ public class ClassFileDeclarationBuilder {
     private void setInheritance() {
         
         // do not inherit Object from itself!
-        if("java.lang.Object".equals(classFile.getPhysicalName()))
+        if("java.lang.Object".equals(physicalName))
             return;
         
         String superClassName = classFile.getSuperClassName();
@@ -321,22 +332,17 @@ public class ClassFileDeclarationBuilder {
                 intfDecl.setExtendedTypes(factory.createExtends(implList));
         }
         
-        if(superClassName != null) {
-            
-        }
-        
     }
 
     /*
      * add a package specification if not in the default package.
      */
     private void setPackage() {
-        String fullName = classFile.getFullName();
-        int packIndex = fullName.lastIndexOf('.');
+        int packIndex = physicalName.lastIndexOf('.');
         // default package: job done
         if (packIndex < 0)
             return;
-        String packName = fullName.substring(0, packIndex);
+        String packName = physicalName.substring(0, packIndex);
         PackageReference ref = makePackageReference(packName);
         PackageSpecification p = factory.createPackageSpecification(ref);
         compilationUnit.setPackageSpecification(p);
@@ -359,7 +365,7 @@ public class ClassFileDeclarationBuilder {
         if (decl.isStatic())
             specs.add(factory.createStatic());
         if (decl.isFinal())
-            specs.add(factory.createAbstract());
+            specs.add(factory.createFinal());
         return specs;
     }
 
@@ -447,7 +453,7 @@ public class ClassFileDeclarationBuilder {
         ConstructorDeclaration decl = factory.createConstructorDeclaration();
         decl.setDeclarationSpecifiers(makeMethodSpecifiers(constr));
         
-        decl.setIdentifier(factory.createIdentifier(constr.getName()));
+        decl.setIdentifier(factory.createIdentifier(getClassName()));
         
         ASTList<ParameterDeclaration> params = new ASTArrayList<ParameterDeclaration>();
         int index = 1;
@@ -541,4 +547,10 @@ public class ClassFileDeclarationBuilder {
         System.out.println(cu.toSource());
     }
 
+    
+    @Override
+    public String toString() {
+        return "ClassFileDeclarationBuilder[" + getFullClassname() + "]";
+    }
+    
 }
