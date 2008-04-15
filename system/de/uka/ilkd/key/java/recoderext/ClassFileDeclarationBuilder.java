@@ -241,7 +241,7 @@ public class ClassFileDeclarationBuilder {
             // there is a package
             cuString = "package " + fullClassName.substring(0, lastdot) + "; ";
         }
-        cuString += "class " + fullClassName.substring(lastdot+1) + " { }";
+        cuString += "public class " + fullClassName.substring(lastdot+1) + " { }";
 
         Debug.out("Parsing: " + cuString);
         
@@ -403,6 +403,8 @@ public class ClassFileDeclarationBuilder {
             specs.add(factory.createPublic());
         if (decl.isFinal())
             specs.add(factory.createAbstract());
+        if (decl.isStatic())
+            specs.add(factory.createStatic());
         return specs;
     }
 

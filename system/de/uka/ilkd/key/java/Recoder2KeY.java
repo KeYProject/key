@@ -122,7 +122,7 @@ public class Recoder2KeY implements JavaReader {
      * the list of classnames that contain the classes that are referenced but not 
      * defined. For those classe types a dummy stub is created at parse time.
      */
-    private List<String> dynamicallyCreatedClasses;
+    private List<String> dynamicallyCreatedClasses = new ArrayList<String>();
 
 
     /**
@@ -602,9 +602,9 @@ public class Recoder2KeY implements JavaReader {
 
         List<recoder.java.CompilationUnit> specialClasses = parseLibs();
 
-//        for (recoder.java.CompilationUnit compilationUnit : specialClasses) {
+//         for (recoder.java.CompilationUnit compilationUnit : specialClasses) {
 //            System.out.println(compilationUnit.toSource());
-//        }
+//         }
         
         ChangeHistory changeHistory = servConf.getChangeHistory();
         for (int i = 0, sz = specialClasses.size(); i < sz; i++) {
@@ -613,14 +613,13 @@ public class Recoder2KeY implements JavaReader {
             changeHistory.attached(specialClasses.get(i));
         }
         
-        KeYRecoderExcHandler excHandler = null;
-        ErrorHandler errorHandler = servConf.getProjectSettings().getErrorHandler();
-        if (errorHandler instanceof KeYRecoderExcHandler) {
-             excHandler = (KeYRecoderExcHandler) errorHandler;
-        }
         
-        if(excHandler != null)
-            excHandler.setIgnoreUnresolvedClasses(true);
+        ErrorHandler errorHandler = servConf.getProjectSettings().getErrorHandler();
+        assert errorHandler instanceof KeYRecoderExcHandler :
+            "Errorhandler must be of type KeYRecoderExcHandler";
+        KeYRecoderExcHandler excHandler = (KeYRecoderExcHandler)errorHandler;
+        
+        excHandler.setIgnoreUnresolvedClasses(true);
 
         if (changeHistory.needsUpdate()) {
             changeHistory.updateModel();
@@ -628,8 +627,7 @@ public class Recoder2KeY implements JavaReader {
         
         List<TypeReference> tyrefs = excHandler.getUnresolvedClasses();
         // this resets the list for unresolved refs
-        if(excHandler != null)
-            excHandler.setIgnoreUnresolvedClasses(true);
+        excHandler.setIgnoreUnresolvedClasses(true);
         
         for(TypeReference tyref : tyrefs) {
             resolveUnresolvedTypeRef(tyref, specialClasses);
@@ -683,6 +681,7 @@ public class Recoder2KeY implements JavaReader {
             ChangeHistory changeHistory = servConf.getChangeHistory();
             changeHistory.attached(cu);
             libClasses.add(cu);
+            Debug.out("Dynamically created class: ", typeString);
         }
     }
 
