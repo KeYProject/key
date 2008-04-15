@@ -24,18 +24,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.UpdateFactory;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IteratorOfProgramVariable;
-import de.uka.ilkd.key.logic.op.ListOfParsableVariable;
-import de.uka.ilkd.key.logic.op.ListOfProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SLListOfParsableVariable;
-import de.uka.ilkd.key.logic.op.SLListOfProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.AtPreFactory;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
@@ -66,7 +55,7 @@ public abstract class AbstractPO implements ProofOblInput {
     protected final String name;
     protected final KeYJavaType selfKJT;
 
-    private final Map /*Operator -> Term*/ axioms = new LinkedHashMap();
+    private final Map<Operator, Term> axioms = new LinkedHashMap<Operator, Term>();
     private String header;
     private ProofAggregate proofAggregate;
     
@@ -94,18 +83,12 @@ public abstract class AbstractPO implements ProofOblInput {
     //-------------------------------------------------------------------------
 
     protected ProgramVariable buildSelfVarAsProgVar() {
-        ProgramElementName classPEN = new ProgramElementName("self");
-        ProgramVariable result = new LocationVariable(classPEN, selfKJT);
-        return result;
+        return new LocationVariable(new ProgramElementName("self"), selfKJT);
     }
-
 
     protected LogicVariable buildSelfVarAsLogicVar() {
-        ProgramElementName classPEN = new ProgramElementName("self");
-        LogicVariable result = new LogicVariable(classPEN, selfKJT.getSort());
-        return result;
+        return new LogicVariable(new ProgramElementName("self"), selfKJT.getSort());
     }
-
 
     protected ListOfProgramVariable buildParamVars(ProgramMethod programMethod) {
         int numPars = programMethod.getParameterDeclarationCount();
@@ -126,23 +109,19 @@ public abstract class AbstractPO implements ProofOblInput {
 
 
     protected ProgramVariable buildResultVar(ProgramMethod programMethod) {
-        ProgramVariable result = null;
-
-        KeYJavaType resultKJT = programMethod.getKeYJavaType();
+        final KeYJavaType resultKJT = programMethod.getKeYJavaType();
         if(resultKJT != null) {
-            ProgramElementName resultPEN = new ProgramElementName("result");
-            result = new LocationVariable(resultPEN, resultKJT);
+            final ProgramElementName resultPEN = new ProgramElementName("result");
+            return new LocationVariable(resultPEN, resultKJT);
         }
-
-        return result;
+        return null;
     }
 
 
     protected ProgramVariable buildExcVar() {
-        KeYJavaType excType
+        final KeYJavaType excType
         	= javaInfo.getTypeByClassName("java.lang.Exception");
-        ProgramElementName excPEN = new ProgramElementName("exc");
-        return new LocationVariable(excPEN, excType);      
+        return new LocationVariable(new ProgramElementName("exc"), excType);      
     }
     
 
@@ -167,8 +146,7 @@ public abstract class AbstractPO implements ProofOblInput {
                                  ListOfParsableVariable paramVars,
                                  ParsableVariable resultVar,
                                  ParsableVariable excVar,
-                                 /*inout*/ Map /*operator (normal) 
-                                 -> function (atPre)*/ atPreFunctions) 
+                                 /*inout*/ Map<Operator, Function/*(atPre)*/> atPreFunctions) 
     		throws ProofInputException {
         FormulaWithAxioms fwa = contract.getPost(selfVar, 
         					 paramVars, 
@@ -195,10 +173,9 @@ public abstract class AbstractPO implements ProofOblInput {
 
         UpdateFactory uf = new UpdateFactory(services, new UpdateSimplifier());
         AnonymisingUpdateFactory auf = new AnonymisingUpdateFactory(uf);
-        Term result = auf.createAnonymisingUpdateTerm(locations,
-                                                      targetTerm,
-                                                      services);
-        return result;
+        return auf.createAnonymisingUpdateTerm(locations,
+                targetTerm,
+                services);
     }
     
     
@@ -207,7 +184,7 @@ public abstract class AbstractPO implements ProofOblInput {
      */
     protected Term translateInv(ClassInvariant inv) 
     		throws ProofInputException {
-        FormulaWithAxioms fwa = inv.getClosedInv(services);
+        final FormulaWithAxioms fwa = inv.getClosedInv(services);
         axioms.putAll(fwa.getAxioms());
         return fwa.getFormula();
     }
@@ -219,9 +196,8 @@ public abstract class AbstractPO implements ProofOblInput {
     protected Term translateInvs(SetOfClassInvariant invs) 
     		throws ProofInputException {
 	Term result = TB.tt();
-	IteratorOfClassInvariant it = invs.iterator();
-	while(it.hasNext()) {
-	    result = TB.and(result, translateInv(it.next()));
+	for (final ClassInvariant inv : invs) {
+	    result = TB.and(result, translateInv(inv));
 	}
 	return result;
     }
@@ -243,9 +219,8 @@ public abstract class AbstractPO implements ProofOblInput {
 	    			     ParsableVariable selfVar) 
     		throws ProofInputException {
 	Term result = TB.tt();
-	IteratorOfClassInvariant it = invs.iterator();
-	while(it.hasNext()) {
-	    result = TB.and(result, translateInvOpen(it.next(), selfVar));
+	for (final ClassInvariant inv : invs) {
+	    result = TB.and(result, translateInvOpen(inv, selfVar));
 	}
 	return result;
     }
@@ -253,19 +228,17 @@ public abstract class AbstractPO implements ProofOblInput {
     
     protected ListOfParsableVariable toPV(ListOfProgramVariable vars) {
 	ListOfParsableVariable result = SLListOfParsableVariable.EMPTY_LIST;
-	final IteratorOfProgramVariable it = vars.iterator();
-	while(it.hasNext()) {
-	    result = result.append(it.next());
+	for (final ProgramVariable pv : vars) {
+	    result = result.append(pv);
 	}
 	return result;
     }
 
-
-
+    
     /**
      * Replaces operators in a term by other operators with the same signature.
      */
-    protected Term replaceOps(Map /*Operator -> Operator*/ map, Term term) {      
+    protected Term replaceOps(Map<? extends Operator, ? extends Operator> map, Term term) {      
         return new OpReplacer(map).replace(term);
     }
 
@@ -285,10 +258,9 @@ public abstract class AbstractPO implements ProofOblInput {
     }
 
 
-    protected void registerInNamespaces(/*in*/ Map atPreFunctions) {
-        final Iterator it = atPreFunctions.values().iterator();  
-        while(it.hasNext()) {            
-            initConfig.funcNS().add((Function) it.next()); 
+    protected void registerInNamespaces(/*in*/ Map<Operator, Function> atPreFunctions) {
+        for (final Function atPreF : atPreFunctions.values()) {
+            initConfig.funcNS().add(atPreF); 
         }
     }
     
@@ -388,11 +360,10 @@ public abstract class AbstractPO implements ProofOblInput {
     private Term getRequiredAxioms(Term t) {
         Term result = TB.tt();
 
-        Set axiomSet = getRequiredAxiomsAsSet(t);
+        final Set<Term> axiomSet = getRequiredAxiomsAsSet(t);
         
-        Iterator it = axiomSet.iterator();
-        while(it.hasNext()) {
-            result = TB.and(result,(Term)it.next());
+        for (final Term axiom : axiomSet) {
+            result = TB.and(result, axiom);
         }
 /*        
         if(axioms.containsKey(t.op())) {            
@@ -411,8 +382,8 @@ public abstract class AbstractPO implements ProofOblInput {
      * Returns those axioms from the SLDL-Translation which are required for
      * the passed term (helper for getRequiredAxioms(Term t)).
      */
-    private Set getRequiredAxiomsAsSet(Term t) {
-        Set result = new LinkedHashSet();
+    private Set<Term> getRequiredAxiomsAsSet(Term t) {
+        Set<Term> result = new LinkedHashSet<Term>();
         
         if (axioms.containsKey(t.op())) {
             result.add(axioms.get(t.op()));

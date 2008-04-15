@@ -25,7 +25,9 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IUpdateOperator;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -172,7 +174,7 @@ public class LoopInvariantProposer implements InstantiationProposer {
             
             //determine instantiation
             final Term selfTerm = getInnermostSelfTerm(pos.subTerm(), services);
-            final Map atPreFunctions = inv.getInternalAtPreFunctions();
+            final Map<Operator, Function> atPreFunctions = inv.getInternalAtPreFunctions();
             final String varName = var.name().toString();
             if (varName.equals("inv")) {
                 assert var.isFormulaSV();

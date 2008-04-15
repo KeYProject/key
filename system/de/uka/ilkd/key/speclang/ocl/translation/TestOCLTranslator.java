@@ -22,11 +22,7 @@ import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
 import de.uka.ilkd.key.speclang.FormulaWithAxioms;
 import de.uka.ilkd.key.speclang.ocl.translation.OCLTranslator;
@@ -239,7 +235,7 @@ public class TestOCLTranslator extends TestCase {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         ProgramVariable excVar = buildExcVar();
 
-        Map atPreDefs = new LinkedHashMap();
+        Map<Operator, Function> atPreDefs = new LinkedHashMap<Operator, Function>();
 
         try {
             result = translator.translateExpression("self.i = self.i@pre",

@@ -21,19 +21,17 @@ import de.uka.ilkd.key.logic.LocationDescriptor;
 import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
 import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramConstant;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.soundness.TermProgramVariableCollector;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
 /** 
  * Walks through a java AST in depth-left-fist-order. 
- * This walker is used collect all ProgramVariables in a program.
+ * This walker is used collect all LocationVariables and optional function locations.
  */
 public class ProgramVariableCollector extends JavaASTVisitor {
 
-    private final HashSet result = new HashSet();
+    private final HashSet<Location> result = new HashSet<Location>();
     private final boolean collectFunctionLocations;
 
     /**
@@ -60,7 +58,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
 	walk(root());	
     }
 
-    public HashSet result() { 
+    public HashSet<Location> result() { 
 	return result;
     }    
 
@@ -71,23 +69,15 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     protected void doDefaultAction(SourceElement x) {
     }
 
-    public void performActionOnProgramVariable(ProgramVariable pv) {
-	result.add(pv);
-    }
-         
     public void performActionOnLocationVariable(LocationVariable x) {
-        performActionOnProgramVariable(x);        
-    }
-
-    public void performActionOnProgramConstant(ProgramConstant x) {       
-        performActionOnProgramVariable(x);
+        result.add(x);
     }
     
     public void performActionOnLoopInvariant(LoopInvariant x) {
         TermProgramVariableCollector tpvc = 
             new TermProgramVariableCollector(services, collectFunctionLocations);
         Term selfTerm = x.getInternalSelfTerm();
-        Map atPreFunctions = x.getInternalAtPreFunctions();
+        Map<Operator, Function> atPreFunctions = x.getInternalAtPreFunctions();
         
         //invariant
         Term inv = x.getInvariant(selfTerm, atPreFunctions, services);

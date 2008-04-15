@@ -9,14 +9,11 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.AnonymousUpdate;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.IteratorOfQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.speclang.ClassInvariant;
@@ -52,7 +49,7 @@ public class CorrectDependsPO extends AbstractPO {
     //-------------------------------------------------------------------------
     
 
-    private Update createUpdate(UpdateFactory uf, Map atPreFunctions) {
+    private Update createUpdate(UpdateFactory uf, Map<Operator, Function> atPreFunctions) {
         Update result = uf.skip();
         
         IteratorOfLocationDescriptor it = dependsClause.iterator();
@@ -109,7 +106,7 @@ public class CorrectDependsPO extends AbstractPO {
     
     public void readProblem(ModStrategy mod) throws ProofInputException {
         //prepare container for @pre-functions
-        Map atPreFunctions = new LinkedHashMap();
+        Map<Operator, Function> atPreFunctions = new LinkedHashMap<Operator, Function>();
         
         //translate invariant
         Term invTerm = translateInv(inv);

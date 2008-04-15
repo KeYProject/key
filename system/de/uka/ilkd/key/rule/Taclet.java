@@ -12,6 +12,7 @@ package de.uka.ilkd.key.rule;
 
 import java.util.HashMap;
 
+import de.uka.ilkd.key.collection.PairOfListOfGoalAndTacletApp;
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceData;
@@ -71,7 +72,6 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class Taclet implements Rule, Named {
     
     private static final String AUTONAME = "_taclet";
-
 
     /** name of the taclet */
     private final Name name;
@@ -1447,16 +1447,29 @@ public abstract class Taclet implements Rule, Named {
 
 
 
-    protected void applyAddProgVars(SetOfSchemaVariable pvs, Goal goal,
+    protected ListOfName applyAddProgVars(SetOfSchemaVariable pvs, Goal goal,
                                     PosInOccurrence posOfFind,
                                     Services services, 
-                                    MatchConditions matchCond) {
+                                    MatchConditions matchCond,
+                                    ListOfName proposals) {
+	IteratorOfName propIt = SLListOfName.EMPTY_LIST.iterator();
+	if (proposals != null) {
+	    propIt = proposals.iterator();
+	}
+	Name proposal = null;
         ListOfRenamingTable renamings = SLListOfRenamingTable.EMPTY_LIST;
+        ListOfName newNames = SLListOfName.EMPTY_LIST;
 	for (final SchemaVariable sv : pvs) {
 	    ProgramVariable inst
 		= (ProgramVariable)matchCond.getInstantiations ().getInstantiation(sv);
 	    final VariableNamer vn = services.getVariableNamer();
-	    inst = vn.rename(inst, goal, posOfFind);
+	    if (propIt.hasNext()) {
+	        proposal = propIt.next();
+	    } else {
+	        proposal = null;
+	    }
+	    inst = vn.rename(inst, goal, posOfFind, proposal);
+	    newNames = newNames.append(inst.name());
             final RenamingTable rt = 
                 RenamingTable.getRenamingTable((HashMap)vn.getRenamingMap());
             if (rt != null) {
@@ -1465,6 +1478,7 @@ public abstract class Taclet implements Rule, Named {
 	    goal.addProgramVariable(inst);
 	}
 	goal.node().setRenamings(renamings);
+	return newNames;
     }
 
 
@@ -1479,8 +1493,13 @@ public abstract class Taclet implements Rule, Named {
      * the first goal of the return list is the goal that should be
      * closed (with the constraint this taclet is applied under).
      */
-    public abstract ListOfGoal apply(Goal goal, Services services, 
-				     RuleApp tacletApp);
+    public ListOfGoal apply(Goal goal, Services services, 
+				     RuleApp tacletApp) {
+        return applyHelp(goal, services, tacletApp).getListOfGoal();
+    }
+
+    public abstract PairOfListOfGoalAndTacletApp applyHelp(Goal goal,
+                                     Services services, RuleApp tacletApp);
 
 
     /**
@@ -1751,5 +1770,7 @@ public abstract class Taclet implements Rule, Named {
     */
     public ListOfSchemaVariable writeSet() {
 	return SLListOfSchemaVariable.EMPTY_LIST; 
-    }         
+    }
+  
+         
 }

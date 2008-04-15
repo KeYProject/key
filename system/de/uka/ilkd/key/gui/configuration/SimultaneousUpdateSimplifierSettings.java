@@ -32,7 +32,8 @@ public class SimultaneousUpdateSimplifierSettings implements Settings {
  
     private UpdateSimplifier sus;
 
-    private LinkedList listenerList = new LinkedList();
+    private LinkedList<SettingsListener> listenerList = 
+        new LinkedList<SettingsListener>();
 
     public SimultaneousUpdateSimplifierSettings() {
 	updateSimplifier();
@@ -110,9 +111,9 @@ public class SimultaneousUpdateSimplifierSettings implements Settings {
     protected void fireSettingsChanged() {
 	updateSimplifier();
 
-	Iterator it = listenerList.iterator();
+	Iterator<SettingsListener> it = listenerList.iterator();
 	while (it.hasNext()) {
-	    ((SettingsListener)it.next()).settingsChanged(new GUIEvent(this));
+	    it.next().settingsChanged(new GUIEvent(this));
 	}
     }
 

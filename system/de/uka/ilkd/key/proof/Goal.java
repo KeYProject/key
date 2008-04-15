@@ -21,6 +21,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IteratorOfProgramVariable;
 import de.uka.ilkd.key.logic.op.Metavariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SetAsListOfProgramVariable;
 import de.uka.ilkd.key.logic.op.SetOfProgramVariable;
 import de.uka.ilkd.key.proof.incclosure.BranchRestricter;
 import de.uka.ilkd.key.proof.incclosure.IteratorOfSink;
@@ -223,6 +224,15 @@ public class Goal  {
     }
 
     public void setGlobalProgVars(SetOfProgramVariable s) {
+        SetOfProgramVariable globalProgVars = getGlobalProgVars();
+        Namespace ns = proof().getNamespaces().programVariables();
+        IteratorOfProgramVariable it = s.iterator();
+        while (it.hasNext()) {
+            ProgramVariable pv = it.next();
+            if (!globalProgVars.contains(pv)) {
+                ns.addSafely(pv);
+            }
+        }
 	node.setGlobalProgVars(s);
     }
 
@@ -431,14 +441,19 @@ public class Goal  {
     }
 
     public void addProgramVariable(ProgramVariable pv) {
+        proof().getNamespaces().programVariables().addSafely(pv);
 	node.setGlobalProgVars(getGlobalProgVars().add(pv));
     }
 
-    public void addProgramVariables(Namespace ns) {
+    public void setProgramVariables(Namespace ns) {
 	final IteratorOfNamed it=ns.elements().iterator();
+	SetOfProgramVariable s = SetAsListOfProgramVariable.EMPTY_SET;
 	while (it.hasNext()) {
-	    addProgramVariable((ProgramVariable)it.next());
+	    s = s.add((ProgramVariable)it.next());
 	}
+        proof().getNamespaces().programVariables().reset();
+        node().setGlobalProgVars(SetAsListOfProgramVariable.EMPTY_SET);
+	setGlobalProgVars(s);
     }
 
 

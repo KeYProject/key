@@ -16,8 +16,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.logic.BasicLocationDescriptor;
 import de.uka.ilkd.key.logic.EverythingLocationDescriptor;
-import de.uka.ilkd.key.logic.IteratorOfLocationDescriptor;
-import de.uka.ilkd.key.logic.IteratorOfTerm;
 import de.uka.ilkd.key.logic.LocationDescriptor;
 import de.uka.ilkd.key.logic.SetAsListOfLocationDescriptor;
 import de.uka.ilkd.key.logic.SetAsListOfTerm;
@@ -88,6 +86,8 @@ public class OpReplacer {
         for(int i = 0; i < arity; i++) {
             Term subTerm = term.sub(i);
             newSubTerms[i] = replace(subTerm);
+            
+            // Is it guaranteed that no variables are renamed in the replaced term?
             boundVars[i] = term.varsBoundHere(i);
     
             if(newSubTerms[i] != subTerm) {
@@ -105,22 +105,18 @@ public class OpReplacer {
         }
     
         return result;
-    }
-    
+    }  
     
     /**
      * Replaces in a set of terms.
      */
     public SetOfTerm replace(SetOfTerm terms) {
         SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
-        IteratorOfTerm it = terms.iterator();
-        while(it.hasNext()) {
-            result = result.add(replace(it.next()));
+        for (final Term term : terms) {
+            result = result.add(replace(term));
         }
         return result;
     }
-
-    
 
     /**
      * Replaces in a location descriptor.
@@ -145,9 +141,8 @@ public class OpReplacer {
     public SetOfLocationDescriptor replace(SetOfLocationDescriptor locs) {
 	SetOfLocationDescriptor result 
 		= SetAsListOfLocationDescriptor.EMPTY_SET;
-	IteratorOfLocationDescriptor it = locs.iterator();
-	while(it.hasNext()) {
-	    result = result.add(replace(it.next()));
+	for (final LocationDescriptor loc : locs) {
+	    result = result.add(replace(loc));
 	}
 	return result;
     }
@@ -156,18 +151,15 @@ public class OpReplacer {
     /**
      * Replaces in a map from Operator to Term.
      */
-    public Map /*Operator -> Term*/ replace(
-                                    /*in*/ Map /*Operator -> Term */ map) {
-        Map result = new HashMap();
+    public Map<Operator, Term> replace(/*in*/ Map<Operator, Term> map) {
         
-        Iterator it = map.entrySet().iterator();
+        Map<Operator,Term> result = new HashMap<Operator, Term>();
+        
+        final Iterator<Map.Entry<Operator, Term>> it = map.entrySet().iterator();
         while(it.hasNext()) {
-            Map.Entry entry = (Map.Entry) it.next();
-            Operator op = (Operator) entry.getKey();
-            Term term  = (Term) entry.getValue();
-            result.put(replace(op), replace(term));
-        }
-        
+            final Map.Entry<Operator, Term> entry = it.next();
+            result.put(replace(entry.getKey()), replace(entry.getValue()));
+        }        
         return result;
     }
     

@@ -354,7 +354,7 @@ public class PreservesGuardPO extends EnsuresPO {
                               ListOfProgramVariable paramVars, 
                               ProgramVariable resultVar,
                               ProgramVariable exceptionVar,
-                              Map atPreFunctions) throws ProofInputException {
+                              Map<Operator, Function/*atPre*/> atPreFunctions) throws ProofInputException {
         Term result = TF.createJunctorTerm(Op.TRUE);
         Function accPred = getAccPred();
         Sort javaLangObjectSort = javaInfo.getJavaLangObjectAsSort();
@@ -394,7 +394,7 @@ public class PreservesGuardPO extends EnsuresPO {
                                ListOfProgramVariable paramVars, 
                                ProgramVariable resultVar,
                                ProgramVariable exceptionVar,
-                               Map atPreFunctions) throws ProofInputException {
+                               Map<Operator, Function/*atPre*/> atPreFunctions) throws ProofInputException {
         Term result = TF.createJunctorTerm(Op.TRUE);
         Function accPred = getAccPred();
         Sort javaLangObjectSort = javaInfo.getJavaLangObjectAsSort();

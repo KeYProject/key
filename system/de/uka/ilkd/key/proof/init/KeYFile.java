@@ -360,7 +360,7 @@ public class KeYFile implements EnvInput {
         
         //read in-code specifications
         readJavaPath();
-        if(javaPath != null) {
+        if(javaPath != null && !javaPath.equals("")) {            
             SLEnvInput slEnvInput = new SLEnvInput(javaPath);
             slEnvInput.setInitConfig(initConfig);
             slEnvInput.read(mod);

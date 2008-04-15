@@ -87,7 +87,7 @@ public abstract class EnsuresPO extends AbstractPO {
                                        ListOfProgramVariable paramVars, 
                                        ProgramVariable resultVar,
                                        ProgramVariable exceptionVar,
-                                       Map atPreFunctions) 
+                                       Map<Operator, Function/*atPre*/> atPreFunctions) 
                                                     throws ProofInputException;
     
     
@@ -95,7 +95,7 @@ public abstract class EnsuresPO extends AbstractPO {
                                         ListOfProgramVariable paramVars, 
                                         ProgramVariable resultVar,
                                         ProgramVariable exceptionVar,
-                                        Map atPreFunctions)
+                                        Map<Operator, Function/*atPre*/> atPreFunctions)
                                                     throws ProofInputException;
     
 
@@ -355,7 +355,8 @@ public abstract class EnsuresPO extends AbstractPO {
         }
         ProgramVariable resultVar = buildResultVar(programMethod);
         ProgramVariable exceptionVar = buildExcVar();
-        Map atPreFunctions = new LinkedHashMap();
+        Map<Operator, Function/*atPre*/> atPreFunctions = 
+            new LinkedHashMap<Operator, Function/*atPre*/>();
         
         //build general assumption
         Term gaTerm = buildGeneralAssumption(selfVar, paramVars);

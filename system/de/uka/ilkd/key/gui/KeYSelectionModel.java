@@ -31,7 +31,7 @@ public class KeYSelectionModel {
     /** the current displayed node */
     private Node selectedNode;
     /** the listeners to this model */
-    private List listenerList;
+    private List<KeYSelectionListener> listenerList;
     /** cached selected node event */
     private KeYSelectionEvent selectionEvent = 
 	new KeYSelectionEvent(this);
@@ -40,7 +40,7 @@ public class KeYSelectionModel {
 
     
     KeYSelectionModel() {
-	listenerList = Collections.synchronizedList(new ArrayList(5));
+	listenerList = Collections.synchronizedList(new ArrayList<KeYSelectionListener>(5));
 	goalIsValid = false;
     }
 
@@ -309,10 +309,8 @@ public class KeYSelectionModel {
 
     public synchronized void fireSelectedNodeChanged() {
 	synchronized(listenerList) {
-	    Iterator it = listenerList.iterator();
-	    while (it.hasNext()) {
-		((KeYSelectionListener)it.next()).
-		    selectedNodeChanged(selectionEvent);
+            for (final KeYSelectionListener listener : listenerList) {
+                listener.selectedNodeChanged(selectionEvent);
 	    }
 	}
     }
@@ -320,10 +318,8 @@ public class KeYSelectionModel {
     public synchronized void fireSelectedProofChanged() {
 	synchronized(listenerList) {
 	    threadLogger.info("Selected Proof changed, firing...");
-	    Iterator it = listenerList.iterator();
-	    while (it.hasNext()) {
-		((KeYSelectionListener)it.next()).
-		    selectedProofChanged(selectionEvent);
+            for (final KeYSelectionListener listener : listenerList) {
+	        listener.selectedProofChanged(selectionEvent);
 	    }
 	    threadLogger.info("Selected Proof changed, done firing.");
 	}
