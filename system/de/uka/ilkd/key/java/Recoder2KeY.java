@@ -17,7 +17,7 @@ import java.util.*;
 import recoder.*;
 import recoder.abstraction.ClassType;
 import recoder.bytecode.*;
-import recoder.convenience.TreeWalker;
+import recoder.convenience.*;
 import recoder.io.*;
 import recoder.java.CompilationUnit;
 import recoder.java.NonTerminalProgramElement;
@@ -665,7 +665,7 @@ public class Recoder2KeY implements JavaReader {
     private void resolveUnresolvedTypeRef(TypeReference tyref, 
             List<recoder.java.CompilationUnit> libClasses) throws ParserException {
         NameInfo ni = servConf.getNameInfo();
-        String typeString = tyref.toSource();
+        String typeString = Naming.toPathName(tyref);
         recoder.abstraction.Type ty;
         try {
             ty = ni.getType(typeString);
