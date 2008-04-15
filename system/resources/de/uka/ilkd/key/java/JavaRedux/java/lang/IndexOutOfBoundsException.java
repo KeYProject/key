@@ -6,6 +6,6 @@ package java.lang;
 public class IndexOutOfBoundsException extends java.lang.RuntimeException
 {
 
-   public IndexOutOfBoundsException();
-   public IndexOutOfBoundsException(java.lang.String arg0);
+   public IndexOutOfBoundsException() { super(); }
+   public IndexOutOfBoundsException(java.lang.String arg0) { super(arg0); }
 }

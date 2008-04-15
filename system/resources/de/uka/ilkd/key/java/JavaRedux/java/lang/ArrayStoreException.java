@@ -6,6 +6,6 @@ package java.lang;
 public class ArrayStoreException extends java.lang.RuntimeException
 {
 
-   public ArrayStoreException();
-   public ArrayStoreException(java.lang.String arg0);
+   public ArrayStoreException() { super(); }
+   public ArrayStoreException(java.lang.String arg0) { super(arg0); }
 }

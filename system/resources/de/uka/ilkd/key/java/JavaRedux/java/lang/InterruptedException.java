@@ -6,6 +6,6 @@ package java.lang;
 public class InterruptedException extends java.lang.Exception
 {
 
-   public InterruptedException();
-   public InterruptedException(java.lang.String arg0);
+   public InterruptedException() { super(); }
+   public InterruptedException(java.lang.String arg0) { super(arg0); }
 }

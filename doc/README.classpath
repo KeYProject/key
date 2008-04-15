@@ -116,6 +116,8 @@ marked with a (*) are defined and have all needed methods and
 fields. You might want to look into the key sources to compare the
 current implementation of the default classes.
 
+If you forget to include classes, it may to lead to unexpected and 
+mysterious errors at runtime of KeY.
 
 4. Known issues
 ---------------
@@ -142,6 +144,7 @@ java.lang.ExceptionInInitializerError
 java.lang.IndexOutOfBoundsException
 java.lang.InterruptedException
 java.lang.Iterable (*)
+java.lang.NegativeArraySizeException
 java.lang.NoClassDefFoundError
 java.lang.NullPointerException
 java.lang.NumberFormatException (*)

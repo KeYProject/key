@@ -6,6 +6,6 @@ package java.lang;
 public class ArithmeticException extends java.lang.RuntimeException
 {
 
-   public ArithmeticException();
-   public ArithmeticException(java.lang.String arg0);
+   public ArithmeticException() { super(); }
+   public ArithmeticException(java.lang.String arg0) { super(arg0); }
 }

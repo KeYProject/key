@@ -6,6 +6,18 @@ package java.lang;
 public class NullPointerException extends java.lang.RuntimeException
 {
 
-   public NullPointerException();
-   public NullPointerException(java.lang.String arg0);
+   /*@ public normal_behavior
+     @   ensures message == null && cause == null;
+     @   assignable message, cause;
+     @*/
+   public NullPointerException() { }
+   
+   
+   /*@ public normal_behavior
+     @   ensures message == arg0 && cause == null;
+     @   assignable message, cause;
+     @*/
+   public NullPointerException(java.lang.String arg0) {
+       super(arg0);
+   }
 }

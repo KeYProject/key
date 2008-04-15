@@ -17,6 +17,7 @@ java/lang/Object.java
 java/lang/ArithmeticException.java
 java/lang/ArrayIndexOutOfBoundsException.java
 java/lang/ArrayStoreException.java
+java/lang/ClassCastException.java
 java/lang/CloneNotSupportedException.java
 java/lang/Cloneable.java
 java/lang/Comparable.java
@@ -27,6 +28,7 @@ java/lang/ExceptionInInitializerError.java
 java/lang/IndexOutOfBoundsException.java
 java/lang/InterruptedException.java
 java/lang/Iterable.java
+java/lang/NegativeArraySizeException.java
 java/lang/NoClassDefFoundError.java
 java/lang/NullPointerException.java
 java/lang/NumberFormatException.java

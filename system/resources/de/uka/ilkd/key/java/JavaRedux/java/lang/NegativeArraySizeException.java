@@ -6,6 +6,6 @@ package java.lang;
 public class NegativeArraySizeException extends java.lang.RuntimeException
 {
 
-   public NegativeArraySizeException();
-   public NegativeArraySizeException(java.lang.String arg0);
+   public NegativeArraySizeException() { super(); }
+   public NegativeArraySizeException(java.lang.String arg0) { super(arg0); }
 }

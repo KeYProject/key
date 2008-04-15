@@ -6,8 +6,8 @@ package java.lang;
 public class RuntimeException extends java.lang.Exception
 {
 
-   public RuntimeException();
-   public RuntimeException(java.lang.String arg0);
-   public RuntimeException(java.lang.String arg0, java.lang.Throwable arg1);
-   public RuntimeException(java.lang.Throwable arg0);
+   public RuntimeException() { super(); }
+   public RuntimeException(java.lang.String arg0) { super(arg0); }
+   public RuntimeException(java.lang.String arg0, java.lang.Throwable arg1) { super(arg0, arg1); }
+   public RuntimeException(java.lang.Throwable arg0) { super(arg0); }
 }

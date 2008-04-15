@@ -3,9 +3,9 @@
  */
 package java.lang;
 
-public class NumberFormatException
+public class NumberFormatException extends java.lang.RuntimeException
 {
 
-   public NumberFormatException();
-   public NumberFormatException(java.lang.String arg0);
+   public NumberFormatException() { super(); }
+   public NumberFormatException(java.lang.String arg0) { super(arg0); }
 }

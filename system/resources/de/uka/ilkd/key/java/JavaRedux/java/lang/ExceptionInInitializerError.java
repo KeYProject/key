@@ -3,12 +3,12 @@
  */
 package java.lang;
 
-public class ExceptionInInitializerError
+public class ExceptionInInitializerError extends java.lang.Error
 {
 
-   public ExceptionInInitializerError();
-   public ExceptionInInitializerError(java.lang.Throwable arg0);
-   public ExceptionInInitializerError(java.lang.String arg0);
+   public ExceptionInInitializerError() { super(); }
+   public ExceptionInInitializerError(java.lang.Throwable arg0) { super(arg0); }
+   public ExceptionInInitializerError(java.lang.String arg0) { super(arg0); }
    public java.lang.Throwable getException();
    public java.lang.Throwable getCause();
 }

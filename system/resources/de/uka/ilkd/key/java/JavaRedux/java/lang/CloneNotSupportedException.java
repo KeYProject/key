@@ -6,6 +6,6 @@ package java.lang;
 public class CloneNotSupportedException extends java.lang.Exception
 {
 
-   public CloneNotSupportedException();
-   public CloneNotSupportedException(java.lang.String arg0);
+   public CloneNotSupportedException() { super(); } 
+   public CloneNotSupportedException(java.lang.String arg0) { super(arg0); }
 }

@@ -3,9 +3,9 @@
  */
 package java.lang;
 
-public class NoClassDefFoundError
+public class NoClassDefFoundError extends java.lang.Error
 {
 
-   public NoClassDefFoundError();
-   public NoClassDefFoundError(java.lang.String arg0);
+   public NoClassDefFoundError() { super(); }
+   public NoClassDefFoundError(java.lang.String arg0) { super(arg0); }
 }

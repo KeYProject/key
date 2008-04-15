@@ -6,8 +6,8 @@ package java.lang;
 public class Error extends java.lang.Throwable
 {
 
-   public Error();
-   public Error(java.lang.String arg0);
-   public Error(java.lang.String arg0, java.lang.Throwable arg1);
-   public Error(java.lang.Throwable arg0);
+   public Error() { super(); }
+   public Error(java.lang.String arg0) { super(arg0); }
+   public Error(java.lang.String arg0, java.lang.Throwable arg1) { super(arg0, arg1); }
+   public Error(java.lang.Throwable arg0) { super(arg0); }
 }

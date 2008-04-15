@@ -6,7 +6,7 @@ package java.lang;
 public class ArrayIndexOutOfBoundsException extends java.lang.IndexOutOfBoundsException
 {
 
-   public ArrayIndexOutOfBoundsException();
+   public ArrayIndexOutOfBoundsException() { super(); }
    public ArrayIndexOutOfBoundsException(int arg0);
-   public ArrayIndexOutOfBoundsException(java.lang.String arg0);
+   public ArrayIndexOutOfBoundsException(java.lang.String arg0) { super(arg0); }
 }
