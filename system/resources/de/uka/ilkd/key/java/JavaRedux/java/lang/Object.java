@@ -6,7 +6,7 @@ package java.lang;
 public class Object 
 {
 
-   public Object();
+   public Object() { };
 // public final java.lang.Class getClass();
    public int hashCode();
    public boolean equals(java.lang.Object arg0);
