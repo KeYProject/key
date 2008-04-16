@@ -9,6 +9,7 @@ package bank;
  */
 public abstract class Account {
 
+
     /**
      * Account number of the account represented by <code>this</code> object
      * 
@@ -122,14 +123,14 @@ public abstract class Account {
     ////////////////////////////////////////////////////////////////////////////
     // Storage of transactions
     ////////////////////////////////////////////////////////////////////////////
-    
+
     /**
      * A list of transactions in which the most recent transaction is the first
      * element
      */
     //@ private invariant transactions != null;    
-    private /*@ spec_public @*/ TransactionList transactions =
-        TransactionList.EMPTY_LIST;
+    public /*@ spec_public @*/ TransactionList transactions =
+        TransactionList.EMPTY_LIST;    
     
     /**
      * Add a transaction <code>trance</code> to the list of stored transaction
