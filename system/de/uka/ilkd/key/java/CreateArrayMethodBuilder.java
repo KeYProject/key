@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -190,6 +190,8 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         if (var == null && objectType.getJavaType() != null) {
             final ListOfField objectFields = filterImplicitFields(filterField(((ClassDeclaration) objectType
                     .getJavaType()).getMembers()));
+//            final ListOfField objectFields = filterField(((ClassDeclaration) objectType
+//                    .getJavaType()).getMembers());
             var = find(name, objectFields);
             if (var != null) { // may be null if object is currently created
                 cache.put(name, var);
@@ -310,7 +312,7 @@ public class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         body.add(assign(attribute(thisRef,
                 findInObjectFields(ImplicitFieldAdder.IMPLICIT_INITIALIZED)),
                 BooleanLiteral.TRUE));
-
+        
         body.add(new Return(thisRef));
 
         return new StatementBlock(body.toArray(new Statement[body.size()]));

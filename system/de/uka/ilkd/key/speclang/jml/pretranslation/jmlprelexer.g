@@ -111,7 +111,8 @@ tokens {
     WHEN 			= "when";
     WHEN_RED 			= "when_redundantly";
     WORKING_SPACE 		= "working_space";
-    WORKING_SPACE_RED 		= "working_space_redundantly";
+    WORKING_SPACE_RED 		= "working_space_redundantly";   
+    WORKING_SPACE_SINGLE_ITERATION	= "working_space_single_iteration";
     WRITABLE			= "writable";    
 }
 

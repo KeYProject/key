@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -14,7 +14,27 @@ import java.util.HashMap;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.AnonymousUpdate;
+import de.uka.ilkd.key.logic.op.ArrayOp;
+import de.uka.ilkd.key.logic.op.AttributeOp;
+import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Metavariable;
+import de.uka.ilkd.key.logic.op.ModalOperatorSV;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.NRFunctionWithExplicitDependencies;
+import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramConstant;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.QuanUpdateOperator;
+import de.uka.ilkd.key.logic.op.ShadowArrayOp;
+import de.uka.ilkd.key.logic.op.ShadowAttributeOp;
+import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
+import de.uka.ilkd.key.logic.op.WorkingSpaceRigidOp;
 import de.uka.ilkd.key.util.Service;
 
 
@@ -192,6 +212,7 @@ public class NotationInfo {
         tbl.put(ProgramConstant.class, new Notation.VariableNotation());
 	tbl.put(ProgramMethod.class, new Notation.ProgramMethod(121));
 	tbl.put(Equality.class, new Notation.Infix("=", 70, 80, 80)); 
+        tbl.put(WorkingSpaceRigidOp.class, new Notation.WorkingSpaceOp(121));
 	tbl.put(QuanUpdateOperator.class, new Notation.QuanUpdate());
 	tbl.put(AnonymousUpdate.class, new Notation.AnonymousUpdate());
 	tbl.put(ShadowAttributeOp.class, new Notation.ShadowAttribute(121,121));

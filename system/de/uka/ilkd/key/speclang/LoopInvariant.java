@@ -63,6 +63,13 @@ public interface LoopInvariant {
             Services services);
     
     /**
+     * Returns the working space term. 
+     */
+    public Term getWorkingSpace(Term selfTerm, 
+            /*inout*/Map<Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services);
+    
+    /**
      * Tells whether using heuristics for generating additional loop predicates 
      * is allowed or not.
      */

@@ -10,38 +10,18 @@
 
 package de.uka.ilkd.key.speclang.dl.translation;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
-import de.uka.ilkd.key.java.ArrayOfExpression;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.BasicLocationDescriptor;
-import de.uka.ilkd.key.logic.IteratorOfLocationDescriptor;
-import de.uka.ilkd.key.logic.LocationDescriptor;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.AttributeOp;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.ListOfParsableVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SLListOfParsableVariable;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.SymbolReplacer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.speclang.FormulaWithAxioms;
-import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.OperationContractImpl;
+import de.uka.ilkd.key.speclang.*;
 
 
 /**
@@ -263,6 +243,28 @@ public class DLSpecFactory {
             }
         }
         
+        TermBuilder tb = TermBuilder.DF;
+        TermFactory tf = tb.tf();
+        
+        
+        Term[] argTerms = new Term[pm.getParameterDeclarationCount()+(pm.isStatic() ? 0 : 1)];
+        int i=0;
+        if(!pm.isStatic()){
+                argTerms[0] = tb.var(selfVar);
+        }
+
+        for(; i<argTerms.length; i++){
+            argTerms[i] = tb.var((ProgramVariable) pm.getParameterDeclarationAt(i).
+                    getVariableSpecification().getProgramVariable());
+        }
+        
+        Term ws = tf.createWorkingSpaceNonRigidTerm(pm,
+            (Sort) services.getNamespaces().sorts().lookup(new Name("int")),
+            argTerms
+            );
+        
+        services.getNamespaces().functions().add(ws.op());
+        
         return new OperationContractImpl(name, 
                                          displayName, 
                                          pm,
@@ -270,6 +272,7 @@ public class DLSpecFactory {
                                          pre,
                                          post,
                                          modifies,
+                                         ws,
                                          selfVar,
                                          paramVars,
                                          resultVar,

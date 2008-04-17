@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -9,25 +9,16 @@
 //
 package de.uka.ilkd.key.java;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
+import java.util.*;
 
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ldt.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.IteratorOfSort;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LRUCache;
 
@@ -54,7 +45,7 @@ public class JavaInfo {
         
         public boolean equals(Object o) {
             if (o instanceof CacheKey) {
-                final CacheKey snd = (CacheKey)o;                
+                final CacheKey snd = (CacheKey)o;               
                 return snd.o1.equals(o1) && snd.o2.equals(o2);
             } 
             return false;
@@ -82,7 +73,7 @@ public class JavaInfo {
      *    java.lang.Object, java.lang.Clonable, java.io.Serializable
      * in </em>in this order</em>
      */
-    private KeYJavaType[] commonTypes = new KeYJavaType[3];
+    private KeYJavaType[] commonTypes = new KeYJavaType[4];
 
     //some caches for the getKeYJavaType methods.
     private HashMap<Sort, KeYJavaType> sort2KJTCache = null;
@@ -111,7 +102,9 @@ public class JavaInfo {
      */
     private ExecutionContext defaultExecutionContext;
                 
-
+    private LocationVariable defaultMemoryArea;    
+    private LocationVariable immortalMemoryArea;    
+    
     /**
      * a term with the constant 'null'
      */
@@ -134,7 +127,7 @@ public class JavaInfo {
      */
     JavaInfo(KeYProgModelInfo kpmi, Services s) {
 	this.kpmi 	= kpmi;
-	services	= s;	  	
+	services	= s;	 
     }
 
     private JavaInfo(JavaInfo proto, Services s) {
@@ -953,6 +946,49 @@ public class JavaInfo {
 	return null;
     }
 
+    public int getSizeInBytes(KeYJavaType classType){
+	int size = 8;
+	if(classType.toString().indexOf("[")!=-1) return 0;
+        size += getSizeInBytesRec(classType);
+        if(size % 8 == 0){
+            return size;
+        }else{
+            return (size/8+1)*8;
+        }
+    }
+    
+    private int getSizeInBytesRec(KeYJavaType classType){
+        if(classType == getJavaLangObject() || classType == null) return 0;
+        int size = 0;
+        ListOfField l = kpmi.getAllFieldsLocallyDeclaredIn(classType);
+        size += sizeInBytes(l);
+        size += getSizeInBytesRec(getSuperclass(classType));
+        return size;
+    }
+    
+    private int sizeInBytes(ListOfField l){
+        int size = 0;
+        while(!l.isEmpty()){
+            if(l.head() instanceof ImplicitFieldSpecification){
+                l = l.tail();
+                continue;
+            }
+            String fType = l.head().getProgramVariable().getKeYJavaType().
+                getSort().toString();
+            l = l.tail();
+            if(fType.equals("jbyte") || fType.equals("boolean")){
+                size += 1;
+            }else if(fType.equals("jshort") || fType.equals("jchar")){
+                size += 2;
+            }else if(fType.equals("jlong")){
+                size += 8;
+            }else{
+                size += 4;
+            }
+        }
+        return size;
+    }
+
     /**
      * returns an attribute named <tt>attributeName</tt> declared locally 
      * in object type <tt>s</tt>    
@@ -1024,7 +1060,8 @@ public class JavaInfo {
     private void fillCommonTypesCache() {
         if (commonTypesCacheValid) return;
         final String[] fullNames = {"java.lang.Object", 
-                "java.lang.Cloneable", "java.lang.Serializable"};
+                "java.lang.Cloneable", "java.io.Serializable",
+                "javax.realtime.ScopedMemory"};
         
         for (int i = 0; i<fullNames.length; i++) {
             commonTypes[i] = getKeYJavaTypeByClassName(fullNames[i]);            
@@ -1061,6 +1098,16 @@ public class JavaInfo {
             commonTypes[2] = getKeYJavaTypeByClassName("java.io.Serializable");
         }
         return commonTypes[2];
+    }
+    
+    /**
+     * returns the KeYJavaType for class <tt>java.realtime.ScopedMemory</tt>
+     */
+    public KeYJavaType getJavaxRealtimeScopedMemory() {
+        if (commonTypes[3] == null) {
+            commonTypes[3] = getKeYJavaTypeByClassName("javax.realtime.ScopedMemory");
+        }
+        return commonTypes[3];
     }
 
 
@@ -1129,9 +1176,48 @@ public class JavaInfo {
             final KeYJavaType kjt = 
                 getKeYJavaTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);                     
             defaultExecutionContext = 
-                new ExecutionContext(new TypeRef(kjt), null);
+                new ExecutionContext(new TypeRef(kjt), getDefaultMemoryArea(),
+                        null);
         }
         return defaultExecutionContext;
+    }
+    
+    public LocationVariable getDefaultMemoryArea(){
+        if(defaultMemoryArea==null){
+            // ensure that default classes are available
+            if (!kpmi.rec2key().parsedSpecial()) {
+                readJava("{}");                
+            }
+            defaultMemoryArea = (LocationVariable) services.getNamespaces().
+                programVariables().lookup(new Name("initialMemoryArea"));
+            KeYJavaType kjt = getTypeByClassName("javax.realtime.ScopedMemory");
+            if(defaultMemoryArea == null){
+                defaultMemoryArea = 
+                    new LocationVariable(new ProgramElementName("initialMemoryArea"),
+                            kjt);
+                services.getNamespaces().programVariables().add(defaultMemoryArea);
+            }
+        }
+        return defaultMemoryArea;
+    }
+    
+    public LocationVariable getImmortalMemoryArea(){
+        if(immortalMemoryArea==null){
+            // ensure that default classes are available
+            if (!kpmi.rec2key().parsedSpecial()) {
+                readJava("{}");                
+            }
+            immortalMemoryArea = (LocationVariable) services.getNamespaces().
+                programVariables().lookup(new Name("immortalMemoryArea"));
+            KeYJavaType kjt = getTypeByClassName("javax.realtime.ScopedMemory");
+            if(immortalMemoryArea == null){
+                immortalMemoryArea = 
+                    new LocationVariable(new ProgramElementName("immortalMemoryArea"),
+                            kjt);
+                services.getNamespaces().programVariables().add(immortalMemoryArea);
+            }
+        }
+        return immortalMemoryArea;
     }
     
     

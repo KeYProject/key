@@ -10,19 +10,11 @@
 
 package de.uka.ilkd.key.speclang;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IteratorOfParsableVariable;
-import de.uka.ilkd.key.logic.op.ListOfParsableVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.AtPreFactory;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -42,6 +34,7 @@ public class OperationContractImpl implements OperationContract {
     private final Modality modality;
     private final FormulaWithAxioms originalPre;
     private final FormulaWithAxioms originalPost;
+    private final Term originalWorkingSpace;
     private final SetOfLocationDescriptor originalModifies;
     private final ParsableVariable originalSelfVar;
     private final ListOfParsableVariable originalParamVars;
@@ -76,6 +69,7 @@ public class OperationContractImpl implements OperationContract {
             		         FormulaWithAxioms pre,
             		         FormulaWithAxioms post,
             		         SetOfLocationDescriptor modifies,
+                                 Term workingSpace,
             		         ParsableVariable selfVar,
             		         ListOfParsableVariable paramVars,
             		         ParsableVariable resultVar,
@@ -101,6 +95,7 @@ public class OperationContractImpl implements OperationContract {
         this.modality               = modality;
 	this.originalPre            = pre;
 	this.originalPost           = post;
+        this.originalWorkingSpace   = workingSpace;
 	this.originalModifies       = modifies;
 	this.originalSelfVar        = selfVar;
 	this.originalParamVars      = paramVars;
@@ -115,6 +110,34 @@ public class OperationContractImpl implements OperationContract {
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------
+    
+    private Map /*Operator -> Term*/<Operator, Term> getReplaceMap(
+                Term self, 
+                ListOfTerm params, 
+                Services services) {
+        Map<Operator, Term> result = new LinkedHashMap<Operator, Term>();
+
+        //self
+        if(self != null) {
+            assert self.sort().extendsTrans(originalSelfVar.sort());
+            result.put(originalSelfVar, self);
+        }
+
+        //parameters
+        if(params != null) {
+            assert originalParamVars.size() == params.size();
+            IteratorOfParsableVariable it1 = originalParamVars.iterator();
+            IteratorOfTerm it2 = params.iterator();
+            while(it1.hasNext()) {
+                ParsableVariable originalParamVar = it1.next();
+                Term paramVar           = it2.next();
+                assert paramVar.sort().extendsTrans(originalParamVar.sort());
+                result.put(originalParamVar, paramVar);
+            }
+        }
+        return result;
+    }
+    
     
     private Map /*Operator -> Operator*/<Operator, Operator> getReplaceMap(
 	    				ParsableVariable selfVar, 
@@ -226,8 +249,36 @@ public class OperationContractImpl implements OperationContract {
 	OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalPre);
     }
+    
+    public FormulaWithAxioms getPre(Term self, 
+                    ListOfTerm params,
+                    Services services) {
+        assert (self == null) == (originalSelfVar == null);
+        assert params != null;
+        assert params.size() == originalParamVars.size();
+        assert services != null;
+        Map<Operator, Term> replaceMap = getReplaceMap(self, 
+               params, 
+               services);
+        OpReplacer or = new OpReplacer(replaceMap);
+        return or.replace(originalPre);
+    }
+     
+    public Term getWorkingSpace(Term self, 
+            ListOfTerm params,
+            Services services){
+        assert (self == null) == (originalSelfVar == null);
+        assert params != null;
+        assert params.size() == originalParamVars.size();
+        assert services != null;
+        Map<Operator, Term> replaceMap = getReplaceMap(self, 
+                params, 
+                services);
+        OpReplacer or = new OpReplacer(replaceMap);
+        return or.replace(originalWorkingSpace);
+    }
 
-  
+    
     public FormulaWithAxioms getPost(ParsableVariable selfVar, 
                                      ListOfParsableVariable paramVars, 
                                      ParsableVariable resultVar, 

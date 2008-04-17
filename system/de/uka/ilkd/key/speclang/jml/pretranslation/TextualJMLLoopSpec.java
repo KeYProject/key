@@ -27,6 +27,7 @@ public class TextualJMLLoopSpec extends TextualJMLConstruct {
             = SLListOfPositionedString.EMPTY_LIST;
     private ListOfPositionedString assignable         
             = SLListOfPositionedString.EMPTY_LIST;
+    private PositionedString workingSpace = null;
     private PositionedString variant                  
             = null;
     
@@ -61,6 +62,11 @@ public class TextualJMLLoopSpec extends TextualJMLConstruct {
         variant = ps;
     }
     
+    public void setWorkingSpace(PositionedString ps) {
+        assert workingSpace == null;
+        workingSpace = ps;
+    }
+    
     
     public ListOfPositionedString getInvariant() {
         return invariant;
@@ -84,6 +90,10 @@ public class TextualJMLLoopSpec extends TextualJMLConstruct {
     
     public PositionedString getVariant() {
         return variant;
+    }
+    
+    public PositionedString getWorkingSpace() {
+        return workingSpace;
     }
     
     
@@ -111,6 +121,10 @@ public class TextualJMLLoopSpec extends TextualJMLConstruct {
             sb.append("decreases: " + variant);
         }
         
+        if(workingSpace != null){
+            sb.append("working_space_single_iteration: "+workingSpace);
+        }
+        
         return sb.toString();
     }
     
@@ -127,7 +141,9 @@ public class TextualJMLLoopSpec extends TextualJMLConstruct {
                && predicates.equals(ls.predicates)
                && assignable.equals(ls.assignable)
                && (variant == null && ls.variant == null
-                   || variant.equals(ls.variant));
+                   || variant.equals(ls.variant))
+               && (workingSpace == null && ls.workingSpace == null ||
+                       workingSpace.equals(ls.workingSpace));
     }
     
     

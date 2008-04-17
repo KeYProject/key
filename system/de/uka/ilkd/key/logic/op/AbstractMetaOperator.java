@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -42,11 +42,35 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     public static final AbstractMetaOperator META_LENGTH = new MetaLength();
 
     public static final AbstractMetaOperator META_ATTRIBUTE = new MetaAttribute();
+    
+    public static final AbstractMetaOperator META_INSTANCE = new MetaInstance();
 
     public static final AbstractMetaOperator META_CREATED = new MetaCreated();
     
     public static final AbstractMetaOperator META_NEXT_TO_CREATE = new MetaNextToCreate();
 
+    public static final AbstractMetaOperator META_ARRAY_SIZE = new ArraySize();
+    
+    public static final AbstractMetaOperator META_OBJECT_SIZE = new ObjectSize();
+    
+    public static final AbstractMetaOperator META_HEAP_SPACE = new HeapSpace();
+    
+    public static final AbstractMetaOperator META_UNIQUE_ANON_UPDATE = new UniqueAnonUpdate(); 
+    
+    public static final AbstractMetaOperator META_CALCULATE_ARRAY_SIZE = 
+        new CalculateArraySize();
+    
+    public static final AbstractMetaOperator META_WC_ARRAY_SIZE = 
+        new WorstCaseArraySize();
+    
+    public static final AbstractMetaOperator META_BC_ARRAY_SIZE = 
+        new BestCaseArraySize();
+    
+    public static final AbstractMetaOperator META_PRECONDITION_FOR_WS = 
+        new PreconditionForWS();
+    
+    public static final AbstractMetaOperator META_PRE_VALID_IN_STATE_OF_WS = 
+        new PreValidInStateOfWS();
 
     public static final AbstractMetaOperator META_TRAINITIALIZED = new MetaTraInitialized();
 

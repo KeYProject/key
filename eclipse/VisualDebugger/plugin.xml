@@ -4,11 +4,11 @@
      <extension
          point="org.eclipse.ui.views">
       <category
-            name="Symbolic Execution Debugger"
+            name="Symbolic Execution Debugger (alpha version)"
             id="VisualDebugger">
       </category>
       <view
-            name="Symbolic Execution Debugger"
+            name="Symbolic Execution Debugger (alpha)"
             icon="icons/key-small.png"
             category="VisualDebugger"
             class="visualdebugger.views.VisualDebuggerView"
@@ -23,7 +23,7 @@
             id="Breakpoints">
       </category>
       <view
-            name="Statement Breakpoints"
+            name="Statement Breakpoints (alpha)"
             icon="icons/key-small.png"
             category="VisualDebugger"
             class="visualdebugger.views.BreakpointView"
@@ -34,7 +34,7 @@
         <extension
          point="org.eclipse.ui.views">
       <view
-            name="Execution Tree View"
+            name="Execution Tree View (alpha)"
             icon="icons/key-small.png"
             category="VisualDebugger"
             class="visualdebugger.views.ExecutionTreeView"
@@ -45,7 +45,7 @@
           <extension
          point="org.eclipse.ui.views">
       <view
-            name="Symbolic State View"
+            name="Symbolic State View (alpha)"
             icon="icons/key-small.png"
             category="VisualDebugger"
             class="visualdebugger.views.SymbolicStateView"

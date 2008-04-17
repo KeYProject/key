@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -703,7 +703,10 @@ class TypeSchemeConstraintExtractor implements Visitor {
     public void performActionOnParameterDeclaration(ParameterDeclaration x) {
         //nothing to do
     }
-
+    
+/*    public void performActionOnCurrentMemoryAreaReference(CurrentMemoryAreaReference x){
+        //nothing to do
+    }*/
     
     public void performActionOnMethodDeclaration(MethodDeclaration x) {
         failUnexpected(x);
@@ -881,7 +884,7 @@ class TypeSchemeConstraintExtractor implements Visitor {
                 final ReferencePrefix runtimeInstance 
                                 = x.getDesignatedContext();
                 final ExecutionContext executionContext 
-                                = new ExecutionContext(classContext, 
+                                = new ExecutionContext(classContext, null,
                                                        runtimeInstance);
                                                        
                 //save context information

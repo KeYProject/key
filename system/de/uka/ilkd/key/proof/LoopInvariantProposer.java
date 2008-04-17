@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -14,28 +14,16 @@ import java.io.IOException;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ListOfString;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementContainer;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.rule.IteratorOfRuleSet;
-import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.pp.*;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
 
@@ -190,6 +178,13 @@ public class LoopInvariantProposer implements InstantiationProposer {
             } else if(varName.equals("variant")) {
                 assert var.isTermSV();
                 inst = inv.getVariant(selfTerm, atPreFunctions, services);
+	    } else if(varName.equals("wsOneIt")
+                    && inv.getWorkingSpace(selfTerm, atPreFunctions, services) != null) {
+                inst = inv.getWorkingSpace(selfTerm, atPreFunctions, services);
+            } else if(varName.equals("heapSpace")){
+                inst = TermBuilder.DF.var((ProgramVariable)
+                        services.getNamespaces().programVariables().
+                        lookup(new Name(ProblemInitializer.heapSpaceName)));
             }
         }
         

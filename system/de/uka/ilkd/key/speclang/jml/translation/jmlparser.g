@@ -18,6 +18,7 @@ header {
     import de.uka.ilkd.key.java.Position;
     import de.uka.ilkd.key.java.Services;
     import de.uka.ilkd.key.java.abstraction.ArrayType;
+    import de.uka.ilkd.key.java.abstraction.Constructor;
     import de.uka.ilkd.key.java.abstraction.Field;
     import de.uka.ilkd.key.java.abstraction.IteratorOfField;
     import de.uka.ilkd.key.java.abstraction.IteratorOfKeYJavaType;
@@ -28,7 +29,9 @@ header {
     import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
     import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
     import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+    import de.uka.ilkd.key.java.declaration.TypeDeclaration;
     import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
+    import de.uka.ilkd.key.java.expression.literal.IntLiteral;
     import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
     import de.uka.ilkd.key.logic.BasicLocationDescriptor;
     import de.uka.ilkd.key.logic.EverythingLocationDescriptor;
@@ -36,29 +39,17 @@ header {
     import de.uka.ilkd.key.logic.ListOfTerm;
     import de.uka.ilkd.key.logic.LocationDescriptor;
     import de.uka.ilkd.key.logic.Name;
+    import de.uka.ilkd.key.logic.ProgramElementName;
     import de.uka.ilkd.key.logic.SetAsListOfLocationDescriptor;
     import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
     import de.uka.ilkd.key.logic.SLListOfTerm;
     import de.uka.ilkd.key.logic.Term;
     import de.uka.ilkd.key.logic.TermBuilder;
     import de.uka.ilkd.key.logic.TermCreationException;
+    import de.uka.ilkd.key.logic.TermFactory;
     import de.uka.ilkd.key.logic.ldt.LDT;
     import de.uka.ilkd.key.logic.ldt.AbstractIntegerLDT;
-    import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
-    import de.uka.ilkd.key.logic.op.ExactInstanceSymbol;
-    import de.uka.ilkd.key.logic.op.Function;
-    import de.uka.ilkd.key.logic.op.InstanceofSymbol;
-    import de.uka.ilkd.key.logic.op.IteratorOfLogicVariable;
-    import de.uka.ilkd.key.logic.op.IteratorOfParsableVariable;
-    import de.uka.ilkd.key.logic.op.ListOfLogicVariable;
-    import de.uka.ilkd.key.logic.op.ListOfParsableVariable;
-    import de.uka.ilkd.key.logic.op.LogicVariable;
-    import de.uka.ilkd.key.logic.op.NonRigid;
-    import de.uka.ilkd.key.logic.op.Operator;
-    import de.uka.ilkd.key.logic.op.ParsableVariable;
-    import de.uka.ilkd.key.logic.op.ProgramVariable;
-    import de.uka.ilkd.key.logic.op.RigidFunction;
-    import de.uka.ilkd.key.logic.op.SLListOfLogicVariable;
+    import de.uka.ilkd.key.logic.op.*;
     import de.uka.ilkd.key.logic.sort.AbstractSort;
     import de.uka.ilkd.key.logic.sort.ArraySort;
     import de.uka.ilkd.key.logic.sort.ObjectSort;
@@ -66,16 +57,17 @@ header {
     import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
     import de.uka.ilkd.key.proof.AtPreFactory;
     import de.uka.ilkd.key.proof.OpReplacer;
+    import de.uka.ilkd.key.proof.SymbolReplacer;
     import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
     import de.uka.ilkd.key.speclang.FormulaWithAxioms;
     import de.uka.ilkd.key.speclang.PositionedString;
+    import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
     import de.uka.ilkd.key.speclang.translation.*;
     import de.uka.ilkd.key.util.Debug;
 
     import java.lang.RuntimeException;
     import java.math.BigInteger;
-    import java.util.Map;
-    import java.util.LinkedHashMap;
+    import java.util.*;
 }
 
 class KeYJMLParser extends Parser;
@@ -95,6 +87,8 @@ options {
 
     private static Sort boolSort;
     private static Term trueLitTerm;
+    
+    private KeYJavaType specInClass;
 
     private ParsableVariable selfVar;
     private ListOfParsableVariable paramVars;
@@ -142,6 +136,7 @@ options {
 	this.resolverManager = new JMLResolverManager(this.javaInfo,
 						      specInClass,
 						      this.excManager);
+	this.specInClass = specInClass;
 
 	// initialize namespaces
 	resolverManager.pushLocalVariablesNamespace();
@@ -319,7 +314,42 @@ options {
 	}
 	return result;
     }
-
+    
+    private int determineElementSize(KeYJavaType kjt, int dim){
+        if(dim>0){
+            return 4;
+        }
+        String baseType = kjt.getSort().toString();
+        if(baseType.equals("jbyte") || baseType.equals("boolean")){
+            return 1;
+        }else if(baseType.equals("jshort") || baseType.equals("jchar")){
+            return 2;
+        }else if(baseType.equals("jlong")){
+            return 8;
+        }else{
+            return 4;
+        }
+    }
+    
+    private Term createArraySizeTerm(int size, ListOfTerm l){
+        Term elSize = l.tail().isEmpty() ?
+        services.getTypeConverter().convertToLogicElement(
+            new IntLiteral(""+size)) :
+        services.getTypeConverter().convertToLogicElement(
+            new IntLiteral("4"));
+        Function arraySize = 
+            (Function) services.getNamespaces().functions().lookup(new Name("arraySize"));
+        Function mul = (Function) services.getNamespaces().functions().lookup(new Name("mul"));
+        Function add = (Function) services.getNamespaces().functions().lookup(new Name("add"));
+        Term headSize = tb.func(arraySize, elSize, l.head());
+        if(l.tail().isEmpty()){
+            return headSize;
+        }else{
+            return tb.func(add, headSize, 
+                tb.func(mul, l.head(), 
+                    createArraySizeTerm(size,l.tail())));
+        }
+    }
 
     /**
      * Extracts the sorts from an array of terms as an array.
@@ -336,7 +366,7 @@ options {
      * Converts a term so that all of its non-rigid operators refer to the pre-state.
      * Creates and saves new atPreFunctions when necessary.
      */
-    private Term convertToOld(Term term) {
+    public Term convertToOld(Term term) {
 	assert atPreFunctions != null;
 	Operator newOp;
 	if(term.op() instanceof NonRigid && term.op() != selfVar) {
@@ -1693,8 +1723,13 @@ decimalnumeral returns [Term result=null] throws SLTranslationException
 
 jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 {
-    Term t;
+    Term t=null, o1, o2, pre=null, dimTerm;
+    ListOfTerm dimTerms = SLListOfTerm.EMPTY_LIST;
     KeYJavaType typ;
+    ProgramMethod method;
+    LinkedList<LocationVariable> args=null;
+    TermFactory tf = tb.tf();
+    int d = 0;
 }
 :
 	RESULT
@@ -1776,20 +1811,126 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	{
 	    raiseNotSupported("\\duration");
 	} 
-	
-    |   SPACE "(" t=specexpression ")" 
-	{
-	    raiseNotSupported("\\space");
-	} 
-	
+    |   CURRENT_MEMORY_AREA
+    	{
+    		ProgramVariable v = javaInfo.getDefaultMemoryArea();
+    		t = tb.var(v);
+    		result = new JMLExpression(t);
+    	}
+    |   SPACE 
+    	"(" typ = type 
+            (LBRACKET 
+            	(RBRACKET) => RBRACKET {d++;}
+            |
+            	dimTerm=expression {dimTerms=dimTerms.append(t);} RBRACKET
+            )*
+    	")"
+        {
+        	if(d!=0 || !dimTerms.isEmpty()){
+	            int size = determineElementSize(typ, d);
+    	        t = createArraySizeTerm(size, dimTerms);
+        	}else{
+    	    	int size = services.getJavaInfo().getSizeInBytes(typ);
+	        	IntLiteral sizeLit = new IntLiteral(size+"");
+            	t = services.getTypeConverter().convertToLogicElement(sizeLit);
+        	}
+            result = new JMLExpression(t);
+        }
     |   WORKINGSPACE "(" t=expression ")"
-	{
-	    raiseNotSupported("\\working_space");
-	} 
-	
+        {
+            if(!(t.op() instanceof ProgramMethod)){
+            	raiseNotSupported("Only method calls are allowed in \\working_space");
+            }
+            ProgramMethod pm = (ProgramMethod) t.op();
+            Term[] argTerms = new Term[t.arity()];
+            for(int i=0; i<t.arity(); i++){
+            	argTerms[i] = t.sub(i);	
+            }
+            t = tb.tf().createWorkingSpaceNonRigidTerm(pm, 
+                (Sort) services.getNamespaces().sorts().lookup(new Name("int")), argTerms);
+            services.getNamespaces().functions().add(t.op());
+        }
+    |   WORKINGSPACERIGID {args=new LinkedList<LocationVariable>();}
+        "(" method = methodsignature[args] 
+        {
+            resolverManager.pushLocalVariablesNamespace();
+            Iterator it = args.iterator();
+            while(it.hasNext()){
+                resolverManager.putIntoTopLocalVariablesNamespace((ParsableVariable) it.next());
+            }
+            TypeDeclaration cld = 
+                (TypeDeclaration) method.getContainerType().getJavaType();
+        }
+        (COMMA pre = expression)?")"
+        {
+            if(pre==null){
+                pre = tb.tt();
+            }   
+            ProgramVariable local_self;    
+            Term t_self=null;
+            if(!method.isStatic()){
+                local_self = 
+                	SignatureVariablesFactory.INSTANCE.createSelfVar(services, method, false);
+                t_self = tb.var(local_self);
+                //adds self!=null && self.<created> == true or 
+                //self.<classInitialized> == true to the precondition
+                if(!(method.getMethodDeclaration() instanceof Constructor)){
+                    pre = tb.and(pre, tb.not(tb.equals(t_self, tb.NULL(services))));
+                    pre = tb.and(pre, tb.equals(tb.dot(t_self, javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, 
+					javaInfo.getJavaLangObject())), tb.TRUE(services)));
+                }
+            }
+            
+            Term[] argTerms = new Term[args.size()+(method.isStatic() ? 0 : 1)];
+            int i=0;
+            if(!method.isStatic()){
+            	argTerms[0] = t_self;
+            }
+            Iterator<LocationVariable> it = args.iterator();
+            while(it.hasNext()){
+          		argTerms[i++] = tb.var(it.next());
+            }
+            Term methodTerm = tb.tf().createFunctionTerm(method, argTerms);
+            
+            WorkingSpaceRigidOp op = (WorkingSpaceRigidOp) services.getNamespaces().functions().lookup(
+                new Name(WorkingSpaceRigidOp.makeName(methodTerm, pre, services)));
+            if(op==null){
+                t = tf.createWorkingSpaceTerm(methodTerm, pre, 
+                    (Sort) services.getNamespaces().sorts().lookup(new Name("int")), services);
+                services.getNamespaces().functions().add(t.op());
+            }else{
+                t = tf.createWorkingSpaceTerm(op);
+            }
+            resolverManager.popLocalVariablesNamespace();
+        } 
+	|  	IN_OUTER_SCOPE "("o1 = specexpression "," o2 = specexpression ")"
+        {
+            TermSymbol ios = (TermSymbol) services.getNamespaces().functions().lookup(new Name("outerScope"));
+            ProgramVariable ma = javaInfo.getAttribute("memoryArea", javaInfo.getJavaLangObject());
+      	  	ProgramVariable stack = javaInfo.getAttribute("stack", ma.getKeYJavaType());
+            t = tb.func(ios, tb.dot(tb.dot(o1, ma), stack), tb.dot(tb.dot(o2, ma), stack));
+            result = new JMLExpression(t);
+        }
+    |   OUTER_SCOPE "("o1 = specexpression "," o2 = specexpression ")"
+        {
+            TermSymbol ios = (TermSymbol) services.getNamespaces().functions().lookup(new Name("outerScope"));
+            ProgramVariable ma = javaInfo.getAttribute("memoryArea", javaInfo.getJavaLangObject());
+      	  	ProgramVariable stack = javaInfo.getAttribute("stack", ma.getKeYJavaType());
+            t = tb.func(ios, tb.dot(o1, stack), tb.dot(o2, stack));
+            result = new JMLExpression(t);
+        }
+    |   IN_IMMORTAL_MEMORY "(" t = expression ")" 
+    	{
+    		TermSymbol im = (TermSymbol) services.getNamespaces().functions().lookup(new Name("immortal"));
+    		ProgramVariable ma = javaInfo.getAttribute("memoryArea", javaInfo.getJavaLangObject());
+    		ProgramVariable stack = javaInfo.getAttribute("stack", ma.getKeYJavaType());
+    		t = tb.dot(tb.dot(t, ma), stack);
+    		t = tb.func(im, t);
+    		result = new JMLExpression(t);
+    	}
     |   TYPEOF "(" t=specexpression ")"
 	{
-	    result = new JMLExpression(services.getTypeConverter().getKeYJavaType(t),t);
+	    result = new JMLExpression(services.getTypeConverter().getKeYJavaType(t), t);
 	} 
 	
     |   ELEMTYPE "(" t=specexpression ")" 
@@ -1850,6 +1991,61 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
     	    result = new JMLExpression(getObjectCreationFma(typ));
     	}
 ;
+
+methodsignature[LinkedList args] returns [ProgramMethod pm=null] throws SLTranslationException
+{
+    String prefix=null;
+    String methodName=null;
+    KeYJavaType kjt, classType=null;
+    ListOfKeYJavaType sig = SLListOfKeYJavaType.EMPTY_LIST;
+    String argName=null;
+}:
+        prefix=name
+        {
+            int i = prefix.lastIndexOf(".");
+            if(i==-1){
+                classType = specInClass;
+                methodName = prefix;
+            }else{
+                classType = javaInfo.getKeYJavaType(prefix.substring(0,i));
+                methodName = prefix.substring(i);
+            }
+        }
+        "("
+        (
+            kjt=type (argName=name)?
+            {
+                sig = sig.append(kjt);
+                if(argName!=null){
+                    args.add(new LocationVariable(new ProgramElementName(
+                                argName),
+                            kjt));
+                    argName = null;
+                }
+            }
+            (
+                COMMA
+                kjt=type (argName=name)?
+                {
+                    sig = sig.append(kjt);
+                    if(argName!=null){
+                        args.add(new LocationVariable(new ProgramElementName(
+                                    argName),
+                                kjt));
+                        argName = null;
+                    }
+                }
+            )*
+        )?
+        ")"
+        {
+            pm = javaInfo.getProgramMethod(classType,
+                methodName, sig, classType);
+        }
+    ;
+
+
+
 
 specquantifiedexpression returns [Term result = null] throws SLTranslationException
 {

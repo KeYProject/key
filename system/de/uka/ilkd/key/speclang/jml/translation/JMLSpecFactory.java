@@ -25,14 +25,7 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.EverythingLocationDescriptor;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.SetAsListOfLocationDescriptor;
-import de.uka.ilkd.key.logic.SetAsListOfTerm;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
-import de.uka.ilkd.key.logic.SetOfTerm;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.ClassInvariant;
@@ -241,7 +234,8 @@ public class JMLSpecFactory {
                                 ListOfPositionedString originalEnsures,
                                 ListOfPositionedString originalSignals,
                                 ListOfPositionedString originalSignalsOnly,
-                                ListOfPositionedString originalDiverges) 
+                                ListOfPositionedString originalDiverges,
+                                PositionedString originalWorkingSpace) 
             throws SLTranslationException {
         assert programMethod != null;
         assert originalBehavior != null;
@@ -251,6 +245,7 @@ public class JMLSpecFactory {
         assert originalSignalsOnly != null;
         assert originalDiverges != null;
         assert originalAssignable != null;
+//        assert originalWorkingSpace != null;
         
         //create variables for self, parameters, result, exception,
         //and the map for atPre-Functions
@@ -283,9 +278,29 @@ public class JMLSpecFactory {
             requires = requires.conjoin(translated);        
         }
         
+        //translate working_space
+        Term workingSpace = null;
+        Term imCons=null;
+        if(originalWorkingSpace!=null){
+            workingSpace
+                = translator.translateExpression(
+                        originalWorkingSpace,
+                        programMethod.getContainerType(),
+                        selfVar, 
+                        paramVars, 
+                        resultVar, 
+                        excVar,
+                        atPreFunctions).getFormula();
+            ProgramVariable initialMemoryArea = services.getJavaInfo().
+                getDefaultMemoryArea();
+            Term imTerm = TB.var(initialMemoryArea);
+            imCons = TB.dot(imTerm, services.getJavaInfo().getAttribute(
+                "consumed", "javax.realtime.MemoryArea"));
+        }       
+        
         //translate assignable
         SetOfLocationDescriptor assignable;
-        if(originalAssignable.isEmpty()) {
+        if(originalAssignable.isEmpty() && imCons==null) {
             assignable = EverythingLocationDescriptor.INSTANCE_AS_SET;
         } else {
             assignable = SetAsListOfLocationDescriptor.EMPTY_SET;
@@ -298,6 +313,7 @@ public class JMLSpecFactory {
                                         paramVars);
                 assignable = assignable.union(translated);        
             }
+            assignable.add(new BasicLocationDescriptor(imCons));
         }
         
         //translate ensures
@@ -393,6 +409,7 @@ public class JMLSpecFactory {
                                             requires,
                                             post,
                                             assignable,
+                                            workingSpace,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -409,6 +426,7 @@ public class JMLSpecFactory {
                                             requires,
                                             post,
                                             assignable,
+                                            workingSpace,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -426,6 +444,7 @@ public class JMLSpecFactory {
                                             requires.conjoin(diverges.negate()),
                                             post,
                                             assignable,
+                                            workingSpace,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -439,6 +458,7 @@ public class JMLSpecFactory {
                                             requires,
                                             post,
                                             assignable,
+                                            workingSpace,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -463,7 +483,8 @@ public class JMLSpecFactory {
                                     textualSpecCase.getEnsures(),
                                     textualSpecCase.getSignals(),
                                     textualSpecCase.getSignalsOnly(),
-                                    textualSpecCase.getDiverges());
+                                    textualSpecCase.getDiverges(),
+                                    textualSpecCase.getWorkingSpace());
     }
     
     
@@ -491,7 +512,8 @@ public class JMLSpecFactory {
                             ListOfPositionedString originalSkolemDeclarations,
                             ListOfPositionedString originalPredicates,
                             ListOfPositionedString originalAssignable,
-                            PositionedString originalVariant) 
+                            PositionedString originalVariant,
+                            PositionedString originalWorkingSpace) 
             throws SLTranslationException {                
         assert programMethod != null;
         assert loop != null;
@@ -606,6 +628,21 @@ public class JMLSpecFactory {
             variant = translated.getFormula();
         }
         
+        Term workingSpace = null;
+        if(originalWorkingSpace!=null){
+            FormulaWithAxioms translated 
+                = translator.translateExpression(
+                        originalWorkingSpace,
+                        programMethod.getContainerType(),
+                        selfVar,
+                        paramVars,
+                        null,
+                        null,
+                        atPreFunctions);
+            assert translated.getAxioms().isEmpty();
+            workingSpace = translated.getFormula(); 
+        }
+        
         //create loop invariant annotation
         Term selfTerm = selfVar == null ? null : TB.var(selfVar);
         return new LoopInvariantImpl(loop,
@@ -613,6 +650,7 @@ public class JMLSpecFactory {
                                      predicates,
                                      assignable,
                                      variant,
+                                     workingSpace,
                                      selfTerm,
                                      atPreFunctions,
                                      true);
@@ -630,6 +668,7 @@ public class JMLSpecFactory {
                                       textualLoopSpec.getSkolemDeclarations(),
                                       textualLoopSpec.getPredicates(),
                                       textualLoopSpec.getAssignable(),
-                                      textualLoopSpec.getVariant());
+                                      textualLoopSpec.getVariant(),
+                                      textualLoopSpec.getWorkingSpace());
     }
 }

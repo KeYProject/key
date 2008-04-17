@@ -510,9 +510,9 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=signals_clause        { sc.addSignals(ps); }
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
+	|   ps=working_space_clause  { sc.setWorkingSpace(ps);}
 	|   captures_clause 
 	|   when_clause
-	|   working_space_clause
 	|   duration_clause
     )
     {
@@ -568,6 +568,12 @@ ensures_keyword
     |   ENSURES_RED
 ;
 
+
+working_space_clause returns [PositionedString result = null]
+	throws SLTranslationException
+:
+	working_space_keyword result=expression
+;
 
 signals_clause 
 	returns [PositionedString result = null] 
@@ -651,18 +657,6 @@ when_keyword
 :
     	WHEN 
     |   WHEN_RED
-;
-
-
-working_space_clause throws SLTranslationException
-{
-    PositionedString ps;
-}
-:
-    working_space_keyword ps=expression
-    {
-    	raiseNotSupported("working_space clauses");
-    }
 ;
 
 
@@ -937,6 +931,7 @@ loop_specification[ListOfString mods]
         |   ps=loop_predicates      { ls.addPredicates(ps); }
         |   ps=assignable_clause    { ls.addAssignable(ps); }
         |   ps=variant_function     { ls.setVariant(ps); } 
+        |   ps=working_space_single_iteration {ls.setWorkingSpace(ps);}
     )+
 ;
 
@@ -944,6 +939,11 @@ loop_specification[ListOfString mods]
 loop_invariant returns [PositionedString result = null]
 :
     maintaining_keyword result=expression
+;
+
+working_space_single_iteration returns [PositionedString result = null]
+:
+	WORKING_SPACE_SINGLE_ITERATION result=expression
 ;
 
 

@@ -267,6 +267,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     public ExecutionContext convert(
             de.uka.ilkd.key.java.recoderext.ExecutionContext ec) {
         return new ExecutionContext((TypeReference) callConvert(ec.getTypeReference()), 
+                                    ec.getMemoryArea()!=null? (ReferencePrefix)callConvert(ec.getMemoryArea()) : null,
 				    ec.getRuntimeInstance()!=null? (ReferencePrefix)callConvert(ec.getRuntimeInstance()) : null);
     }
 

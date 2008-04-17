@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.gui.IMain;
@@ -9,6 +16,7 @@ import de.uka.ilkd.key.rule.ListOfBuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UpdateSimplificationRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.UseWorkingSpaceContractRule;
 import de.uka.ilkd.key.strategy.FOLStrategy;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.SetOfStrategyFactory;
@@ -56,11 +64,17 @@ public class JavaProfile extends AbstractProfile {
         return UpdateSimplificationRule.INSTANCE;
     }
     
+    protected UseWorkingSpaceContractRule getWorkingSpaceRule(){
+        return UseWorkingSpaceContractRule.INSTANCE;
+    }
+    
     protected ListOfBuiltInRule initBuiltInRules() {       
        
         // update simplifier
         ListOfBuiltInRule builtInRules = super.initBuiltInRules().
             prepend(getUpdateSimplificationRule());
+        
+        builtInRules = builtInRules.prepend(getWorkingSpaceRule());
   
         //contract insertion rule, ATTENTION: ProofMgt relies on the fact 
         // that Contract insertion rule is the FIRST element of this list!

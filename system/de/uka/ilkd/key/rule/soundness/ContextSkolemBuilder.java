@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -268,7 +268,7 @@ public class ContextSkolemBuilder extends AbstractSkolemBuilder {
 	    ( refName, getJavaInfo ().getJavaLangObject () );
 	VariableReference  ref     = new VariableReference  ( refVar );
 	ExecutionContext  context = new ExecutionContext
-	    ( new TypeRef ( getJavaInfo ().getJavaLangObject () ), ref );
+	    ( new TypeRef ( getJavaInfo ().getJavaLangObject () ), null, ref );
 	return context;
     }
 

@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 //This file is part of KeY - Integrated Deductive Software Design
 //Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
 //                      Universitaet Koblenz-Landau, Germany
@@ -13,7 +20,7 @@ package de.uka.ilkd.key.speclang;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 
 
@@ -50,6 +57,13 @@ public interface OperationContract {
     public FormulaWithAxioms getPre(ParsableVariable selfVar, 
                                     ListOfParsableVariable paramVars,
                                     Services services);
+    
+    /**
+     * Returns the precondition of the contract.
+     */
+    public FormulaWithAxioms getPre(Term self, 
+                                    ListOfTerm params,
+                                    Services services);
 
     /**
      * Returns the postcondition of the contract.
@@ -64,6 +78,10 @@ public interface OperationContract {
                                      ParsableVariable excVar,
                                      /*inout*/ Map<Operator, Function/* at pre */> atPreFunctions,
                                      Services services);
+    
+    public Term getWorkingSpace(Term self, 
+                ListOfTerm params,
+                Services services);
 
     /**
      * Returns the modifier set of the contract.

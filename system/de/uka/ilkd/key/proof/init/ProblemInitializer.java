@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,47 +11,24 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Vector;
+import java.util.*;
 import java.util.Map.Entry;
-
-import recoder.io.PathList;
-import recoder.io.ProjectSettings;
 
 import org.apache.log4j.Logger;
 
+import recoder.io.PathList;
+import recoder.io.ProjectSettings;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.CompilationUnit;
-import de.uka.ilkd.key.java.Recoder2KeY;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
-import de.uka.ilkd.key.logic.IteratorOfConstrainedFormula;
-import de.uka.ilkd.key.logic.IteratorOfNamed;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
-import de.uka.ilkd.key.proof.JavaModel;
-import de.uka.ilkd.key.proof.ProblemLoader;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.RuleSource;
-import de.uka.ilkd.key.proof.mgt.AxiomJustification;
-import de.uka.ilkd.key.proof.mgt.CvsException;
-import de.uka.ilkd.key.proof.mgt.CvsRunner;
-import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.proof.mgt.RuleConfig;
-import de.uka.ilkd.key.rule.IteratorOfBuiltInRule;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.UpdateSimplifier;
+import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.mgt.*;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -68,8 +45,11 @@ public class ProblemInitializer {
     private final ProgressMonitor pm;
     
     private final HashSet alreadyParsed = new LinkedHashSet();
-    
-    
+    private ProgramVariable heapSpace;
+
+
+    public static final String heapSpaceName = "heapSpace";
+
     //-------------------------------------------------------------------------
     //constructors
     //------------------------------------------------------------------------- 
@@ -206,6 +186,11 @@ public class ProblemInitializer {
 	//read LDT includes
 	readLDTIncludes(in, initConfig, readLibraries);
 	
+/*	heapSpace = 
+	    new LocationVariable((new ProgramElementName(heapSpaceName)),
+				 initConfig.getServices().getJavaInfo().
+				 getKeYJavaType("int"));*/
+
 	//read normal includes
 	Iterator it = in.getIncludes().iterator();
 	while(it.hasNext()){
@@ -419,6 +404,13 @@ public class ProblemInitializer {
      */
     private void populateNamespaces(Proof proof) {
 	NamespaceSet namespaces = proof.getNamespaces();
+        heapSpace = 
+            new LocationVariable((new ProgramElementName(heapSpaceName)),
+                    lastBaseConfig.getServices().getJavaInfo().
+                    getKeYJavaType("int"));
+	namespaces.programVariables().add(heapSpace);
+//	namespaces.programVariables().add(proof.getServices().
+//	        getJavaInfo().getDefaultMemoryArea());
 	IteratorOfConstrainedFormula it = proof.root().sequent().iterator();
 	while(it.hasNext()) {
 	    ConstrainedFormula cf = it.next();
@@ -530,9 +522,24 @@ public class ProblemInitializer {
     	    initConfig.getProofEnv().registerRule(r, 
     		    				  profile.getJustification(r));
         }
-	
+
+        if(heapSpace==null){
+            heapSpace = 
+                    new LocationVariable((new ProgramElementName(heapSpaceName)),
+                            lastBaseConfig.getServices().getJavaInfo().
+                            getKeYJavaType("int"));
+        }
+        initConfig.namespaces().programVariables().add(heapSpace);  
+//        initConfig.namespaces().programVariables().add(initConfig.getServices().
+//                getJavaInfo().getDefaultMemoryArea());  
+        
 	//read envInput
 	readEnvInput(envInput, initConfig);
+	
+	initConfig.namespaces().programVariables().add(initConfig.getServices().
+	        getJavaInfo().getDefaultMemoryArea()); 
+	initConfig.namespaces().programVariables().add(initConfig.getServices().
+	        getJavaInfo().getImmortalMemoryArea()); 
 	
 	startInterface();	
 	return initConfig;

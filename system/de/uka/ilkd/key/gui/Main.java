@@ -1,4 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+// This file is part of KeY - Integrated Deductive Software Design
 // Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
 // Universitaet Koblenz-Landau, Germany
 // Chalmers University of Technology, Sweden
@@ -67,7 +74,7 @@ public class Main extends JFrame implements IMain {
 
     private static final String VERSION = 
 	KeYResourceManager.getManager().getVersion() + 
-	"-beta (internal: "+INTERNAL_VERSION+")";
+	"(internal: "+INTERNAL_VERSION+")";
 
     private static final String COPYRIGHT="(C) Copyright 2001-2008 "
         +"Universit\u00e4t Karlsruhe, Universit\u00e4t Koblenz-Landau, "

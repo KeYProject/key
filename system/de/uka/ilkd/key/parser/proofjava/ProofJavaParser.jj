@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -321,6 +321,7 @@ public class ProofJavaParser {
         static final int QUALIFIED_NAME   =  6;
         /** production was <pre>"@(" Expression ")"</pre> */
         static final int PASSIVE_EXPR =  7;    
+	static final int CURRENT_MEMORY_AREA = 8; 
     
         /** indicates the type of the result */
         int           type    = UNDEFINED;
@@ -478,6 +479,7 @@ TOKEN :
 | < WHILE: "while" >
 | < VARARGDENOTER: "..." >
 | < STRICTFP: "strictfp" >
+| < CURRENTMEMORYAREA: "<currentMemoryArea>" >
 }
 
 /* LITERALS */
@@ -2813,6 +2815,16 @@ Expression PrimaryExpression() :
           setPrefixInfo(tmpResult);
           setPostfixInfo(tmpResult);
           break;
+      case PrimaryPrefixReturnValue.CURRENT_MEMORY_AREA:
+    	  Identifier id = factory.createIdentifier("ScopedMemory");    
+    	  setPrefixInfo(id);
+    	  setPostfixInfo(id);
+          tmpResult = factory.createUncollatedReferenceQualifier(id);
+	  id = factory.createIdentifier("currentMemoryArea");	
+          tmpResult = factory.createUncollatedReferenceQualifier(tmpResult,id);
+          setPrefixInfo(tmpResult);
+	  setPostfixInfo(tmpResult);
+          break;
       case PrimaryPrefixReturnValue.SUPER_MEMBER:
           tmpResult = prefix.name;
           break;
@@ -2985,7 +2997,11 @@ PrimaryPrefixReturnValue PrimaryPrefix() :
       prefix.type = PrimaryPrefixReturnValue.THIS;
   }
 |
-  //[NonWildcardTypeArguments()]
+  "<currentMemoryArea>"
+  {
+      prefix.type = PrimaryPrefixReturnValue.CURRENT_MEMORY_AREA;   
+  }
+|
   "super" {
       supRef = factory.createSuperReference();
       setPrefixInfo(supRef);
@@ -3504,16 +3520,17 @@ MethodBodyStatement MethodBodyStatement() :
 ExecutionContext ExecutionContext() :
 {
   TypeReference classContext;
-  Expression runtimeInstance = null;
+  Expression runtimeInstance = null, memoryArea = null;
 } 
 {
 
   "source="
   classContext = Type() 
+  ",memoryArea=" memoryArea = Expression()
   [ ",this=" runtimeInstance = Expression() ]
 
   { return new ExecutionContext
-        (classContext, 
+	(classContext, (ReferencePrefix)memoryArea,
         (ReferencePrefix)runtimeInstance);
   }
 }

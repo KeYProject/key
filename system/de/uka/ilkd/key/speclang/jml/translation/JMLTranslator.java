@@ -14,8 +14,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.SetAsListOfLocationDescriptor;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.FormulaWithAxioms;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -74,7 +73,6 @@ class JMLTranslator {
     	
     	return result;
     }
-
     
     /**
      * Translates an expression as it occurs in JML signals-clauses, 

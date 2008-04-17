@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 //This file is part of KeY - Integrated Deductive Software Design
 //Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
 //Universitaet Koblenz-Landau, Germany
@@ -17,6 +24,7 @@ import java.util.Iterator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.IteratorOfGoal;
 import de.uka.ilkd.key.proof.ListOfGoal;
 import de.uka.ilkd.key.proof.Proof;

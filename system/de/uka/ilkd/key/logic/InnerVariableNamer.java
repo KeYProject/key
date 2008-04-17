@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -16,12 +16,14 @@
 
 package de.uka.ilkd.key.logic;
 
+import java.util.Iterator;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
+import de.uka.ilkd.key.rule.soundness.TermProgramVariableCollector;
 
 
 public class InnerVariableNamer extends VariableNamer {
@@ -84,4 +86,5 @@ public class InnerVariableNamer extends VariableNamer {
         
         return newvar;
     }
+
 }

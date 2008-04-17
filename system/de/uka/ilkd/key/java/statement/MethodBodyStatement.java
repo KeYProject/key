@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -62,7 +62,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     /** cache resolved method */
     private ProgramMethod method;
 
-    /** indicates whether this stands for the specifiction of 
+    /** indicates whether this stands for the specification of 
      * a method rather than the concrete body*/
     private boolean useSpecification;
     

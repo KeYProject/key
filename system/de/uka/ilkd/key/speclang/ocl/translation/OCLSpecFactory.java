@@ -10,24 +10,15 @@
 
 package de.uka.ilkd.key.speclang.ocl.translation;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.EverythingLocationDescriptor;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.ClassInvariantImpl;
-import de.uka.ilkd.key.speclang.FormulaWithAxioms;
-import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.OperationContractImpl;
-import de.uka.ilkd.key.speclang.SetAsListOfOperationContract;
-import de.uka.ilkd.key.speclang.SetOfOperationContract;
-import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
+import de.uka.ilkd.key.proof.SymbolReplacer;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 
@@ -175,6 +166,26 @@ public class OCLSpecFactory {
                                                               paramVars);
         }
         
+        TermBuilder tb = TermBuilder.DF;
+        TermFactory tf = tb.tf();
+        
+        Term[] argTerms = new Term[programMethod.getParameterDeclarationCount()+(programMethod.isStatic() ? 0 : 1)];
+        int i=0;
+        if(!programMethod.isStatic()){
+                argTerms[0] = tb.var(selfVar);
+        }
+
+        for(; i<argTerms.length; i++){
+            argTerms[i] = tb.var((ProgramVariable) programMethod.getParameterDeclarationAt(i).
+                    getVariableSpecification().getProgramVariable());
+        }
+        
+        Term ws = tf.createWorkingSpaceNonRigidTerm(programMethod,
+            (Sort) services.getNamespaces().sorts().lookup(new Name("int")),
+            argTerms
+            );
+        services.getNamespaces().functions().add(ws.op());
+        
         //create contracts
         SetOfOperationContract result = SetAsListOfOperationContract.EMPTY_SET;
         String name1 = getContractName();
@@ -187,6 +198,7 @@ public class OCLSpecFactory {
                                          pre,
                                          post,
                                          modifies,
+                                         ws,
                                          selfVar,
                                          paramVars,
                                          resultVar,
@@ -200,6 +212,7 @@ public class OCLSpecFactory {
                                          pre,
                                          post,
                                          modifies,
+                                         ws,
                                          selfVar,
                                          paramVars,
                                          resultVar,

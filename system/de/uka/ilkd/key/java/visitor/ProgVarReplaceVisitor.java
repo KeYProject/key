@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -151,7 +151,6 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 	    doDefaultAction(pv);
 	}
     }
-
     
     private Term replaceVariablesInTerm(Term t){  
      	if(t==null) return null;
@@ -295,6 +294,12 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                                     atPreFunctions, 
                                                     services));
         
+        //variant
+        Term newWorkingSpace
+            = replaceVariablesInTerm(inv.getWorkingSpace(selfTerm, 
+                                                    atPreFunctions, 
+                                                    services));
+        
         Term newSelfTerm = replaceVariablesInTerm(selfTerm); 
         Map newAtPreFunctions = replaceVariablesInMap(atPreFunctions);
         boolean newPredicateHeuristicsAllowed
@@ -306,6 +311,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                     newPredicates,
                                     newModifies, 
                                     newVariant, 
+                                    newWorkingSpace,
                                     newSelfTerm,
                                     newAtPreFunctions,
                                     newPredicateHeuristicsAllowed);

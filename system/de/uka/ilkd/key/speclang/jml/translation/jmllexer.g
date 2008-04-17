@@ -152,6 +152,7 @@ LBLNEG : "\\lblneg";
 LBLPOS : "\\lblpos";
 TYPE : "\\TYPE";
 NOWARN : "\\nowarn";
+CURRENT_MEMORY_AREA : "\\currentMemoryArea";
 
 
 LPAREN

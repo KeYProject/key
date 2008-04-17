@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -193,6 +193,10 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
                     || td.getTypeDeclarationAt(i) instanceof ClassDeclaration) {
                 result = result.append(td.getTypeDeclarationAt(i));
                 result = result.append(getInnerClasses(td.getTypeDeclarationAt(i)));
+            result = result.append(ji.getKeYJavaType("javax.realtime.MemoryStack")
+                    .getJavaType());    
+            result = result.append(ji.getKeYJavaType("javax.realtime.ScopedMemory")
+                    .getJavaType()); 
             }      
     }*/
 

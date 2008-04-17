@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -132,7 +132,7 @@ public class ResolveQuery extends AbstractMetaOperator {
             
             final ExecutionContext ec; 
             if (pm.getContainerType() != null) {
-                ec = new ExecutionContext(new TypeRef(pm.getContainerType()), null);
+                ec = new ExecutionContext(new TypeRef(pm.getContainerType()), null, null);
             } else {
                 ec = services.getJavaInfo().getDefaultExecutionContext();
             }

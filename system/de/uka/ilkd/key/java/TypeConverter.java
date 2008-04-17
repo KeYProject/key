@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -211,7 +211,7 @@ public class TypeConverter extends TermBuilder {
 	    Debug.out("typeconverter: no data type model "+
 		      "available to convert:", op, op.getClass());		
 	    throw new IllegalArgumentException("TypeConverter could not handle"
-					       +" this");
+					       +" this: "+op);
 	}
 	return func(responsibleLDT.getFunctionFor(op, services, ec), subs);
     }
@@ -244,7 +244,9 @@ public class TypeConverter extends TermBuilder {
 	        return findThisForSort(kjt.getSort(), ec);
 	    }
 	    return convertToLogicElement(ec.getRuntimeInstance());
-	} else {            
+	} /*else if (prefix instanceof CurrentMemoryAreaReference) {   
+            return convertToLogicElement(ec.getMemoryArea());
+        } */else {            
 	    Debug.out("typeconverter: WARNING: unknown reference prefix:", 
 		      prefix, prefix == null ? null : prefix.getClass());
 	    throw new IllegalArgumentException("TypeConverter failed to convert "
@@ -276,7 +278,10 @@ public class TypeConverter extends TermBuilder {
 	Debug.out("TypeConverter: FieldReference: ",fr);
 	final ReferencePrefix prefix = fr.getReferencePrefix();
 	final ProgramVariable var = fr.getProgramVariable();
-	if (var.isStatic()) {
+	if("javax.realtime.ScopedMemory::currentMemoryArea".
+	               equals(fr.getName().toString())){
+	    return convertToLogicElement(ec.getMemoryArea());
+	}else if (var.isStatic()) {
 	    return var(var);
 	} else if (prefix == null) {
 	    if (var.isMember()) {
@@ -363,7 +368,9 @@ public class TypeConverter extends TermBuilder {
 	    }
 	} else if (pe instanceof ThisReference) {
 	    return convertReferencePrefix((ThisReference)pe, ec);
-	} else if (pe instanceof ParenthesizedExpression) {
+	} /*else if (pe instanceof CurrentMemoryAreaReference) {   
+            return convertToLogicElement(ec.getMemoryArea());
+        } */else if (pe instanceof ParenthesizedExpression) {
             return convertToLogicElement
                 (((ParenthesizedExpression)pe).getChildAt(0), ec);
         } else if (pe instanceof Instanceof) {

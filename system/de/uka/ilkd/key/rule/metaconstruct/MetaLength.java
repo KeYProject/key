@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -28,7 +28,7 @@ public class MetaLength extends MetaField {
     }
 
     /** calculates the resulting term. */
-    public Term calculate(Term term, SVInstantiations svInst, Services services) {	
+    public Term calculate(Term term, SVInstantiations svInst, Services services) {
         return termFactory.createAttributeTerm
 	    (services.getJavaInfo().getAttribute
 	     ("length", services.getJavaInfo().getKeYJavaType(term.sub(0).sort())),

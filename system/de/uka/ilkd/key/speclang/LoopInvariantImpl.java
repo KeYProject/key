@@ -35,6 +35,7 @@ public class LoopInvariantImpl implements LoopInvariant {
     
     private final LoopStatement loop;
     private final Term originalInvariant;
+    private final Term originalWorkingSpace;
     private final SetOfTerm originalPredicates;
     private final SetOfLocationDescriptor originalModifies;
     private final Term originalVariant;
@@ -64,6 +65,7 @@ public class LoopInvariantImpl implements LoopInvariant {
                              SetOfTerm predicates,
                              SetOfLocationDescriptor modifies,  
                              Term variant, 
+                             Term workingSpace,
                              Term selfTerm,
                              /*in*/ Map<Operator, Function /*(atPre)*/> atPreFunctions,
                              boolean predicateHeuristicsAllowed) {
@@ -75,6 +77,7 @@ public class LoopInvariantImpl implements LoopInvariant {
 	this.originalInvariant          = invariant;
         this.originalPredicates         = predicates;
         this.originalVariant            = variant;
+        this.originalWorkingSpace       = workingSpace;
         this.originalModifies           = modifies;
         this.originalSelfTerm           = selfTerm;   
         this.predicateHeuristicsAllowed = predicateHeuristicsAllowed;
@@ -92,6 +95,7 @@ public class LoopInvariantImpl implements LoopInvariant {
              SetAsListOfTerm.EMPTY_SET, 
              SetAsListOfLocationDescriptor.EMPTY_SET, 
              null, 
+             null,
              selfTerm,
              new LinkedHashMap<Operator, Function>(),
              true);
@@ -214,6 +218,16 @@ public class LoopInvariantImpl implements LoopInvariant {
         return or.replace(originalVariant);
     }
     
+    public Term getWorkingSpace(Term selfTerm, 
+            /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services){
+        assert (selfTerm == null) == (originalSelfTerm == null);
+        Map replaceMap = 
+            getReplaceMap(selfTerm, atPreFunctions, services);
+        OpReplacer or = new OpReplacer(replaceMap);
+        return or.replace(originalWorkingSpace);   
+    }
+    
     
     public boolean getPredicateHeuristicsAllowed() {
         return predicateHeuristicsAllowed;
@@ -239,6 +253,7 @@ public class LoopInvariantImpl implements LoopInvariant {
                                      originalPredicates,
                                      originalModifies,
                                      originalVariant,
+                                     originalWorkingSpace,
                                      originalSelfTerm,
                                      originalAtPreFunctions,
                                      predicateHeuristicsAllowed);
@@ -257,7 +272,8 @@ public class LoopInvariantImpl implements LoopInvariant {
                                      or.replace(invariant), 
                                      originalPredicates,  
                                      originalModifies, 
-                                     originalVariant, 
+                                     originalVariant,
+                                     originalWorkingSpace, 
                                      originalSelfTerm,
                                      originalAtPreFunctions,
                                      predicateHeuristicsAllowed);
@@ -277,6 +293,7 @@ public class LoopInvariantImpl implements LoopInvariant {
                                      or.replace(predicates),
                                      originalModifies,
                                      originalVariant,
+                                     originalWorkingSpace,
                                      originalSelfTerm,
                                      originalAtPreFunctions,
                                      predicateHeuristicsAllowed);
@@ -290,6 +307,7 @@ public class LoopInvariantImpl implements LoopInvariant {
                                      originalPredicates,
                                      originalModifies,
                                      originalVariant,
+                                     originalWorkingSpace,
                                      originalSelfTerm,
                                      originalAtPreFunctions,
                                      predicateHeuristicsAllowed);

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -57,7 +57,8 @@ public class UpdateSimplifier {
      */
     public UpdateSimplifier(boolean deletionEnabled, boolean eager) {
 	this.eager = eager;
-        ListOfIUpdateRule usRules = SLListOfIUpdateRule.EMPTY_LIST.    
+        ListOfIUpdateRule usRules = SLListOfIUpdateRule.EMPTY_LIST.  
+        append(new ApplyOnWorkingSpaceNonRigid(this)).
         append(new ApplyOnAnonymousUpdate(this)).
         append(new ApplyAnonymousUpdateOnNonRigid(this)).
         append(new ApplyOnUpdate(this)).

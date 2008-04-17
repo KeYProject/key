@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2007 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -95,7 +95,7 @@ public class ProgramTypeCollector extends JavaASTVisitor {
 	    if (referencePre instanceof Expression) {
 		currentType = services.getTypeConverter().getKeYJavaType
 		    ((Expression) referencePre,
-		     new ExecutionContext(new TypeRef(type), self));
+		     new ExecutionContext(new TypeRef(type), null, self));
 		currentSelf = new LocationVariable
 		    (new ProgramElementName("x_" + 
 					    referencePre.toString()),
@@ -110,7 +110,7 @@ public class ProgramTypeCollector extends JavaASTVisitor {
 		 currentMR.getMethodSignature
 		 (services,
 		  new ExecutionContext(new TypeRef(currentType), 
-				       currentSelf)));
+		          null, currentSelf)));
 
 	    IteratorOfKeYJavaType impsIt = imps.iterator();
 	    while (impsIt.hasNext()) {
@@ -123,6 +123,7 @@ public class ProgramTypeCollector extends JavaASTVisitor {
 		     currentMR.getMethodSignature(services,
 						  new ExecutionContext
 						  (new TypeRef(currentType),
+						          null,
 						   currentSelf)),
 		     currentSelf.getKeYJavaType());
 		//System.out.println("pm: " + currentPM);
@@ -176,7 +177,7 @@ public class ProgramTypeCollector extends JavaASTVisitor {
 	    final KeYJavaType expressionType = 
 		services.getTypeConverter().getKeYJavaType
 		( (Expression)x, 
-		  new ExecutionContext(new TypeRef(type), self));
+		  new ExecutionContext(new TypeRef(type), null, self));
 	    Debug.assertTrue(expressionType != null, 
 			     "Could not determine type of " + x);
 	    result.add(expressionType);
