@@ -190,6 +190,26 @@ public class ClassFileDeclarationBuilder {
         return false;
     }
     
+    /**
+     * is the considered ClassFile the byte code of an anonyous inner class?
+     * 
+     * This is done checking the fully qualified class name. Does it contain a
+     * "$" or a '.' and is this character followed by a number
+     * 
+     * @return true iff the classFile under inspection is an inner class
+     */
+    public static boolean isAnonClassname(String name) {
+        if(name.contains("$")) {
+            String trailing = name.substring(name.indexOf('$') + 1);
+            return isNumber(trailing);
+        }
+        if(name.contains(".")) {
+            String trailing = name.substring(name.lastIndexOf('.') + 1);
+            return isNumber(trailing);
+        }
+        return false;
+    }
+    
     /* TODO DOC
      * enclCU must contain exactly one type decl. the enclosing one 
      */
@@ -218,6 +238,7 @@ public class ClassFileDeclarationBuilder {
      * If the type reference stands for an array, the trailing [] are
      * discarded first.
      * 
+     * 
      * @param programFactory
      *                factory to use as parser
      * @param fullClassName
@@ -241,6 +262,7 @@ public class ClassFileDeclarationBuilder {
             // there is a package
             cuString = "package " + fullClassName.substring(0, lastdot) + "; ";
         }
+        
         cuString += "public class " + fullClassName.substring(lastdot+1) + " { }";
 
         Debug.out("Parsing: " + cuString);
@@ -508,11 +530,20 @@ public class ClassFileDeclarationBuilder {
      * Helper: create a type reference to an arbitrary type.
      */
     private TypeReference createTypeReference(String typename) {
+       
         int dimension = 0;
         while(typename.endsWith("[]")) {
             dimension ++;
             typename = typename.substring(0, typename.length()-2);
         }
+        
+        // rare occasion where an anonymous class is used as a marker.
+        // happens only in methods not present in source code.
+        if(isAnonClassname(typename)) {
+            int lastdot = typename.lastIndexOf('.');
+            typename = typename.substring(0, lastdot) + '$' + typename.substring(lastdot+1);
+        }
+        
         TypeReference tyref = TypeKit.createTypeReference(factory, typename);
         tyref.setDimensions(dimension);
         return tyref;
@@ -523,7 +554,7 @@ public class ClassFileDeclarationBuilder {
      * @param string
      * @return true iff string denotes a decimal number
      */
-    private boolean isNumber(String string) {
+    private static boolean isNumber(String string) {
         try {
             Integer.parseInt(string);
             return true;

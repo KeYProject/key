@@ -35,20 +35,9 @@ public class KeYCrossReferenceServiceConfiguration
     }
 
     // TODO  MU they only call super.samename. cant we delete all these methods?
-    protected void makeServices() { 
-	super.makeServices();
-    }
-
-    protected void initServices() { 
-	super.initServices();	
-    }
 
     protected ProgramFactory makeProgramFactory() {
-	return ProofJavaProgramFactory.getInstance();
-    }
-
-    protected ChangeHistory makeChangeHistory() {
-	return new ChangeHistory(this);
+        return ProofJavaProgramFactory.getInstance();
     }
 
     /**
@@ -59,32 +48,8 @@ public class KeYCrossReferenceServiceConfiguration
  	return new KeYCrossReferenceSourceInfo(this);
     }  
 
-    protected ProjectSettings makeProjectSettings() {
-	return new ProjectSettings(this);
-    }
-
-    protected SourceFileRepository makeSourceFileRepository() {
-	return new DefaultSourceFileRepository(this);
-    }
-    
-    protected ClassFileRepository makeClassFileRepository() {
-	return new DefaultClassFileRepository(this);
-    }
-
-    protected ByteCodeInfo makeByteCodeInfo() {
-	return new DefaultByteCodeInfo(this);
-    }
-
-    protected ImplicitElementInfo makeImplicitElementInfo() {
-	return new DefaultImplicitElementInfo(this);
-    }
-
     protected NameInfo makeNameInfo() {
-	return super.makeNameInfo();
-    }
-
-    protected ConstantEvaluator makeConstantEvaluator() {
-	return new DefaultConstantEvaluator(this);
+	return new KeYCrossReferenceNameInfo(this);
     }
 
     public KeYProgModelInfo getKeYProgModelInfo(){

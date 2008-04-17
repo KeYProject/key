@@ -11,6 +11,8 @@ import recoder.io.DataLocation;
 
 public class SpecDataLocation implements DataLocation {
 
+    public static final DataLocation UNKNOWN_LOCATION = new SpecDataLocation("UNKNOWN", "");
+
     String type;
 
     String location;
