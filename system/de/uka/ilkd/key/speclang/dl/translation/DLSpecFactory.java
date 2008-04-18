@@ -19,7 +19,6 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.SymbolReplacer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.*;
 
@@ -262,6 +261,7 @@ public class DLSpecFactory {
             (Sort) services.getNamespaces().sorts().lookup(new Name("int")),
             argTerms
             );
+        FormulaWithAxioms wsPost = new FormulaWithAxioms(tb.tt(), new HashMap<Operator, Term>());
         
         services.getNamespaces().functions().add(ws.op());
         
@@ -271,6 +271,7 @@ public class DLSpecFactory {
                                          modality,
                                          pre,
                                          post,
+                                         wsPost,
                                          modifies,
                                          ws,
                                          selfVar,

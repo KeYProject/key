@@ -186,7 +186,15 @@ public abstract class EnsuresPO extends AbstractPO {
         
         return result;
     }
-    
+  
+    /**
+     * Builds the "general assumption" about the amount of available memory. 
+     */
+    protected Term buildGeneralMemoryAssumption(ProgramVariable selfVar,
+                                        ListOfProgramVariable paramVars) 
+                throws ProofInputException {
+        return TB.tt();
+    }
     
     /**
      * Builds the "general assumption" for a set of assumed invariants. 
@@ -360,6 +368,8 @@ public abstract class EnsuresPO extends AbstractPO {
         
         //build general assumption
         Term gaTerm = buildGeneralAssumption(selfVar, paramVars);
+        
+        Term gaMTerm = buildGeneralMemoryAssumption(selfVar, paramVars);
         
         //get precondition defined by subclass
         Term preTerm = getPreTerm(selfVar, 

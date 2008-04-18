@@ -38,7 +38,6 @@ public class MetaAttribute extends MetaField implements Location{
     /** calculates the resulting term. */
     public Term calculate(Term term, SVInstantiations svInst, Services services) {
         KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(term.sub(0).sort());
-        System.out.println("term.sub(0): "+term.sub(0));
         // This is still not really right, one would need something of the `@' notation thing
         return termFactory.createAttributeTerm
 	    (services.getJavaInfo().getAllAttributes

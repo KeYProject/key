@@ -82,6 +82,17 @@ public interface OperationContract {
     public Term getWorkingSpace(Term self, 
                 ListOfTerm params,
                 Services services);
+    
+    public Term getWorkingSpace(ParsableVariable selfVar, 
+                ListOfParsableVariable paramVars,
+                Services services);
+    
+    public FormulaWithAxioms getWorkingSpacePost(ParsableVariable selfVar, 
+            ListOfParsableVariable paramVars, 
+            ParsableVariable resultVar, 
+            ParsableVariable excVar,
+            /*inout*/ Map<Operator, Function/* at pre */> atPreFunctions,
+            Services services);
 
     /**
      * Returns the modifier set of the contract.

@@ -10,7 +10,7 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.ProofSaver;
 import de.uka.ilkd.key.speclang.FormulaWithAxioms;
 
-public class WorkingSpaceRigidOp extends Op implements IWorkingSpaceOp{
+public class WorkingSpaceRigidOp extends RigidFunction implements IWorkingSpaceOp{
     
     public static final Name name = new Name("workingSpace");
     private final Term methodTerm;
@@ -22,7 +22,7 @@ public class WorkingSpaceRigidOp extends Op implements IWorkingSpaceOp{
     }
     
     protected WorkingSpaceRigidOp(Term methodTerm, Sort sort, Term pre, Name name){
-        super(name);
+        super(name, sort, new Sort[0]);
         this.methodTerm = methodTerm;
         this.sort = sort;
         this.pre = pre;

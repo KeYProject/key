@@ -33,7 +33,8 @@ public class OperationContractImpl implements OperationContract {
     private final ProgramMethod programMethod;
     private final Modality modality;
     private final FormulaWithAxioms originalPre;
-    private final FormulaWithAxioms originalPost;
+    private final FormulaWithAxioms originalPost;    
+    private final FormulaWithAxioms originalWorkingSpacePost;
     private final Term originalWorkingSpace;
     private final SetOfLocationDescriptor originalModifies;
     private final ParsableVariable originalSelfVar;
@@ -68,6 +69,7 @@ public class OperationContractImpl implements OperationContract {
             		         Modality modality,
             		         FormulaWithAxioms pre,
             		         FormulaWithAxioms post,
+                                 FormulaWithAxioms workingSpacePost,
             		         SetOfLocationDescriptor modifies,
                                  Term workingSpace,
             		         ParsableVariable selfVar,
@@ -89,19 +91,20 @@ public class OperationContractImpl implements OperationContract {
         assert (resultVar == null) == (programMethod.sort() == null);
         assert excVar != null;
         assert atPreFunctions != null;
-        this.name                   = name;
-        this.displayName            = displayName;
-        this.programMethod          = programMethod;
-        this.modality               = modality;
-	this.originalPre            = pre;
-	this.originalPost           = post;
-        this.originalWorkingSpace   = workingSpace;
-	this.originalModifies       = modifies;
-	this.originalSelfVar        = selfVar;
-	this.originalParamVars      = paramVars;
-	this.originalResultVar      = resultVar;
-	this.originalExcVar         = excVar;
-	this.originalAtPreFunctions = new LinkedHashMap<Operator, Function>();
+        this.name                     = name;
+        this.displayName              = displayName;
+        this.programMethod            = programMethod;
+        this.modality                 = modality;
+	this.originalPre              = pre;
+	this.originalPost             = post;
+        this.originalWorkingSpace     = workingSpace;
+        this.originalWorkingSpacePost = workingSpacePost;
+	this.originalModifies         = modifies;
+	this.originalSelfVar          = selfVar;
+	this.originalParamVars        = paramVars;
+	this.originalResultVar        = resultVar;
+	this.originalExcVar           = excVar;
+	this.originalAtPreFunctions   = new LinkedHashMap<Operator, Function>();
         this.originalAtPreFunctions.putAll(atPreFunctions);
     }
     
@@ -277,6 +280,23 @@ public class OperationContractImpl implements OperationContract {
         OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalWorkingSpace);
     }
+    
+    public Term getWorkingSpace(ParsableVariable selfVar, 
+                    ListOfParsableVariable paramVars,
+                    Services services) {
+        assert (selfVar == null) == (originalSelfVar == null);
+        assert paramVars != null;
+        assert paramVars.size() == originalParamVars.size();
+        assert services != null;
+        Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, 
+                paramVars, 
+                null, 
+                null,
+                null, 
+                services);
+        OpReplacer or = new OpReplacer(replaceMap);
+        return or.replace(originalWorkingSpace);
+    }
 
     
     public FormulaWithAxioms getPost(ParsableVariable selfVar, 
@@ -300,6 +320,29 @@ public class OperationContractImpl implements OperationContract {
                                        services);
 	OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalPost);
+    }
+    
+    public FormulaWithAxioms getWorkingSpacePost(ParsableVariable selfVar, 
+            ListOfParsableVariable paramVars, 
+            ParsableVariable resultVar, 
+            ParsableVariable excVar,
+            /*inout*/ Map<Operator, Function> atPreFunctions,
+            Services services) {
+        assert (selfVar == null) == (originalSelfVar == null);
+        assert paramVars != null;
+        assert paramVars.size() == originalParamVars.size();
+        assert (resultVar == null) == (originalResultVar == null);
+        assert excVar != null;
+        assert atPreFunctions != null;
+        assert services != null;
+        Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, 
+                paramVars, 
+                resultVar, 
+                excVar, 
+                atPreFunctions, 
+                services);
+        OpReplacer or = new OpReplacer(replaceMap);
+        return or.replace(originalWorkingSpacePost);
     }
 
   

@@ -1819,10 +1819,13 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
     	}
     |   SPACE 
     	"(" typ = type 
-            (LBRACKET 
-            	(RBRACKET) => RBRACKET {d++;}
-            |
-            	dimTerm=expression {dimTerms=dimTerms.append(t);} RBRACKET
+            (
+            	LBRACKET
+            		( 
+            			RBRACKET {d++;}
+            		|
+            			dimTerm=expression {dimTerms=dimTerms.append(dimTerm);} RBRACKET
+          	  		)
             )*
     	")"
         {
@@ -1849,8 +1852,9 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
             t = tb.tf().createWorkingSpaceNonRigidTerm(pm, 
                 (Sort) services.getNamespaces().sorts().lookup(new Name("int")), argTerms);
             services.getNamespaces().functions().add(t.op());
+            result = new JMLExpression(t);
         }
-    |   WORKINGSPACERIGID {args=new LinkedList<LocationVariable>();}
+    |   RIGIDWORKINGSPACE {args=new LinkedList<LocationVariable>();}
         "(" method = methodsignature[args] 
         {
             resolverManager.pushLocalVariablesNamespace();
@@ -1861,7 +1865,8 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
             TypeDeclaration cld = 
                 (TypeDeclaration) method.getContainerType().getJavaType();
         }
-        (COMMA pre = expression)?")"
+        (COMMA pre = expression)?
+        ")"
         {
             if(pre==null){
                 pre = tb.tt();
@@ -1884,7 +1889,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
             Term[] argTerms = new Term[args.size()+(method.isStatic() ? 0 : 1)];
             int i=0;
             if(!method.isStatic()){
-            	argTerms[0] = t_self;
+            	argTerms[i++] = t_self;
             }
             Iterator<LocationVariable> it = args.iterator();
             while(it.hasNext()){
@@ -1902,6 +1907,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
                 t = tf.createWorkingSpaceTerm(op);
             }
             resolverManager.popLocalVariablesNamespace();
+            result = new JMLExpression(t);
         } 
 	|  	IN_OUTER_SCOPE "("o1 = specexpression "," o2 = specexpression ")"
         {

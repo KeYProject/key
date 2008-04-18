@@ -6,15 +6,14 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.ProofSaver;
 import de.uka.ilkd.key.proof.SymbolReplacer;
 
-public class WorkingSpaceNonRigidOp extends Op implements IWorkingSpaceOp{
+public class WorkingSpaceNonRigidOp extends NonRigidFunction implements IWorkingSpaceOp{
 
     public static final Name name = new Name("workingSpaceNonRigid");
-    private SymbolReplacer pvr;
     private final ProgramMethod pm;
     private final Sort sort;
     
     public WorkingSpaceNonRigidOp(ProgramMethod pm, Sort sort){
-        super(new Name(makeName(pm)));
+        super(new Name(makeName(pm)), sort, pm.argSort());
         this.pm = pm;
         this.sort = sort;
     }

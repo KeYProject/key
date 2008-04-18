@@ -13,37 +13,15 @@ package de.uka.ilkd.key.speclang.jml.translation;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ArrayOfVariableSpecification;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.statement.BranchStatement;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.ClassInvariantImpl;
-import de.uka.ilkd.key.speclang.FormulaWithAxioms;
-import de.uka.ilkd.key.speclang.ListOfPositionedString;
-import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.LoopInvariantImpl;
-import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.OperationContractImpl;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.SetAsListOfOperationContract;
-import de.uka.ilkd.key.speclang.SetOfOperationContract;
-import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
-import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassInv;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
+import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 
@@ -280,17 +258,33 @@ public class JMLSpecFactory {
         
         //translate working_space
         Term workingSpace = null;
+        FormulaWithAxioms wsPost = null;
         Term imCons=null;
         if(originalWorkingSpace!=null){
-            workingSpace
+            String ws = originalWorkingSpace.text.trim();
+            ws = "\\currentMemoryArea <= \\old("+ws.substring(0, ws.length()-1)+" + \\currentMemoryArea);";
+            System.out.println("ws: "+ws);
+            wsPost
                 = translator.translateExpression(
-                        originalWorkingSpace,
+                        new PositionedString(ws,
+                                originalWorkingSpace.fileName,
+                                new Position(originalWorkingSpace.pos.getLine(), 
+                                        originalWorkingSpace.pos.getColumn()-5)),
                         programMethod.getContainerType(),
                         selfVar, 
                         paramVars, 
                         resultVar, 
                         excVar,
-                        atPreFunctions).getFormula();
+                        atPreFunctions);
+            workingSpace
+                = translator.translateExpression(
+                    originalWorkingSpace,
+                    programMethod.getContainerType(),
+                    selfVar, 
+                    paramVars, 
+                    resultVar, 
+                    excVar,
+                    atPreFunctions).getFormula();
             ProgramVariable initialMemoryArea = services.getJavaInfo().
                 getDefaultMemoryArea();
             Term imTerm = TB.var(initialMemoryArea);
@@ -313,7 +307,7 @@ public class JMLSpecFactory {
                                         paramVars);
                 assignable = assignable.union(translated);        
             }
-            assignable.add(new BasicLocationDescriptor(imCons));
+            if(imCons!=null) assignable.add(new BasicLocationDescriptor(imCons));
         }
         
         //translate ensures
@@ -408,6 +402,7 @@ public class JMLSpecFactory {
                                             Modality.DIA,
                                             requires,
                                             post,
+                                            wsPost,
                                             assignable,
                                             workingSpace,
                                             selfVar,
@@ -425,6 +420,7 @@ public class JMLSpecFactory {
                                             Modality.BOX,
                                             requires,
                                             post,
+                                            wsPost,
                                             assignable,
                                             workingSpace,
                                             selfVar,
@@ -443,6 +439,7 @@ public class JMLSpecFactory {
                                             Modality.DIA,
                                             requires.conjoin(diverges.negate()),
                                             post,
+                                            wsPost,
                                             assignable,
                                             workingSpace,
                                             selfVar,
@@ -457,6 +454,7 @@ public class JMLSpecFactory {
                                             Modality.BOX,
                                             requires,
                                             post,
+                                            wsPost,
                                             assignable,
                                             workingSpace,
                                             selfVar,

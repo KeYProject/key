@@ -142,6 +142,7 @@ REAL : "\\real";
 DURATION : "\\duration";
 SPACE : "\\space";
 WORKINGSPACE : "\\working_space";
+RIGIDWORKINGSPACE : "\\rigid_working_space";
 TYPEOF : "\\typeof";
 ELEMTYPE : "\\elemtype";
 TYPE_SMALL : "\\type";
@@ -153,6 +154,9 @@ LBLPOS : "\\lblpos";
 TYPE : "\\TYPE";
 NOWARN : "\\nowarn";
 CURRENT_MEMORY_AREA : "\\currentMemoryArea";
+IN_IMMORTAL_MEMORY : "\\inImmortalMemory";
+OUTER_SCOPE : "\\outerScope";
+IN_OUTER_SCOPE : "\\inOuterScope";
 
 
 LPAREN

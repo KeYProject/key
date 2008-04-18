@@ -186,6 +186,8 @@ public class OCLSpecFactory {
             );
         services.getNamespaces().functions().add(ws.op());
         
+        FormulaWithAxioms wsPost = new FormulaWithAxioms(tb.tt(), new HashMap<Operator, Term>());
+        
         //create contracts
         SetOfOperationContract result = SetAsListOfOperationContract.EMPTY_SET;
         String name1 = getContractName();
@@ -197,6 +199,7 @@ public class OCLSpecFactory {
                                          Modality.DIA,
                                          pre,
                                          post,
+                                         wsPost,
                                          modifies,
                                          ws,
                                          selfVar,
@@ -211,6 +214,7 @@ public class OCLSpecFactory {
                                          Modality.BOX,
                                          pre,
                                          post,
+                                         wsPost,
                                          modifies,
                                          ws,
                                          selfVar,
