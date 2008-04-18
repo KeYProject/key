@@ -167,7 +167,7 @@ public class OCLSpecFactory {
         
         //translate modifies
         SetOfLocationDescriptor modifies;
-        if(originalModifies == null) {
+        if(originalModifies == null || originalModifies.equals("")) {
             modifies = EverythingLocationDescriptor.INSTANCE_AS_SET;
         } else {
             modifies = translator.translateModifiesExpression(originalModifies, 
