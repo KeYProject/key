@@ -139,7 +139,7 @@ public class OCLSpecFactory {
         
         //translate pre
         FormulaWithAxioms pre;
-        if(originalPre == null) {
+        if(originalPre == null || originalPre.equals("")) {
             pre = FormulaWithAxioms.TT;
         } else {
             pre = translator.translateExpression(originalPre,
@@ -153,7 +153,7 @@ public class OCLSpecFactory {
         
         //translate post
         FormulaWithAxioms post;
-        if(originalPost == null) {
+        if(originalPost == null || originalPost.equals("")) {
             post = FormulaWithAxioms.TT;
         } else {
             post = translator.translateExpression(originalPost, 
