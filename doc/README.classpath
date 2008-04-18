@@ -125,6 +125,8 @@ mysterious errors at runtime of KeY.
 - Recoder does not recognise static inner classes. 
   (A patch is on the way)
 
+- Private inner classes are difficult to map.
+
 
 A. List of internally stored classes:
 -------------------------------------
@@ -134,6 +136,7 @@ java.lang.Object
 java.lang.ArithmeticException
 java.lang.ArrayIndexOutOfBoundsException
 java.lang.ArrayStoreException
+java.lang.ClassCastException
 java.lang.CloneNotSupportedException
 java.lang.Cloneable
 java.lang.Comparable
@@ -144,6 +147,7 @@ java.lang.ExceptionInInitializerError
 java.lang.IndexOutOfBoundsException
 java.lang.InterruptedException
 java.lang.Iterable (*)
+java.lang.LinkageError
 java.lang.NegativeArraySizeException
 java.lang.NoClassDefFoundError
 java.lang.NullPointerException
