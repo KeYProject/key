@@ -735,7 +735,13 @@ ifExpression returns [Term result=null] throws SLTranslationException
 
 literal returns [Term result=null] throws SLTranslationException
 	:	STRING {raiseError("String literals are currently not supported.");}
-	| 	n:NUMBER { result=tb.zTerm(services, n.getText()); }
+	| 	n:NUMBER 
+		{ 
+		    Term intTerm = tb.zTerm(services, n.getText()); 
+		    result = intHelper.castToLDTSort(intTerm, 
+					 services.getTypeConverter()
+					     	 .getIntLDT());
+                }
 //  |	enumLiteral //this looks just like a property call with a long name -> not good
   	{
   		if (result == null) {
