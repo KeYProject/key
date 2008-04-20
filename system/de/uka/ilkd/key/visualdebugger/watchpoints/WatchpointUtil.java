@@ -6,28 +6,21 @@ import java.util.Map.Entry;
 
 import javax.swing.SwingUtilities;
 
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.IteratorOfNode;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.rule.ListOfRuleSet;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.visualdebugger.*;
+import de.uka.ilkd.key.visualdebugger.ProofStarter;
 import de.uka.ilkd.key.visualdebugger.executiontree.ETNode;
-import de.uka.ilkd.key.visualdebugger.watchpoints.*;
 
 /**
  * The Class WatchointUtil.
@@ -183,7 +176,7 @@ public class WatchpointUtil {
             VariableNameTracker vnt = new VariableNameTracker(node, watchpoints);
             List<LocationVariable> initialRenamings = vnt.getInitialRenamings();
             vnt.checkNamespace(updateFactory, updates, initialRenamings);
-
+            System.out.println("counted "+ updates.size() +" updates after namespacecheck");
             updates.add(buildNameUpdates(updateFactory, vnt.trackRenaming(), node, watchpoints,initialRenamings));
         }
 
@@ -503,33 +496,37 @@ public class WatchpointUtil {
 
         for (WatchPoint watchPoint : watchpoints) {
             List<LocationVariable> orginialLocalVariables = watchPoint.getOrginialLocalVariables();
-            
-            assert orginialLocalVariables.size() == initialRenamings.size();
+            System.out.println("org size "+orginialLocalVariables.size());
+            System.out.println("ren size "+initialRenamings.size());
+            for (LocationVariable v : initialRenamings) {
+                System.out.println("+++" + v.toString());
+            }
 
-            while (i.hasNext()) {
-                RenamingTable renaming = i.next();
-                for(int j = 0; j < orginialLocalVariables.size(); j++) {
+            for(LocationVariable originalVar : orginialLocalVariables) {
+                while (i.hasNext()) {
+                    RenamingTable renaming = i.next();
 
-                    LocationVariable originalVar = orginialLocalVariables.get(j);
-                    LocationVariable initiallyRenamedVar = initialRenamings.get(j);
-                    SourceElement renamedVariable = renaming
-                    .getRenaming(initiallyRenamedVar);
-                    if (renamedVariable != null) {
+                    for(LocationVariable initiallyRenamedVar : initialRenamings){
 
-                        System.out.println(renaming.toString());
+                        SourceElement renamedVariable = renaming
+                        .getRenaming(initiallyRenamedVar);
 
-                        Update elemtaryUpdate = uf.elementaryUpdate(
-                                TermFactory.DEFAULT.createVariableTerm(originalVar),
-                                TermFactory.DEFAULT.createVariableTerm((LocationVariable) renamedVariable)); 
+                        if (renamedVariable != null) {
 
-                        nameUpdates.add(elemtaryUpdate);
-                        System.out.println("sizeof nameUpdates: " + nameUpdates.size());
+                            System.out.println(renaming.toString());
 
+                            Update elemtaryUpdate = uf.elementaryUpdate(
+                                    TermFactory.DEFAULT.createVariableTerm(originalVar),
+                                    TermFactory.DEFAULT.createVariableTerm((LocationVariable) renamedVariable)); 
+
+                            System.out.println(elemtaryUpdate);
+                            nameUpdates.add(elemtaryUpdate);
+                            System.out.println("sizeof nameUpdates: " + nameUpdates.size());
+                        }
                     }
                 }
             }
         }
-
 
         try {
 

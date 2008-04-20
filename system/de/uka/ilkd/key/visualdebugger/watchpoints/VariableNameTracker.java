@@ -6,8 +6,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -95,6 +97,7 @@ public class VariableNameTracker {
                 for (int position : watchPoint.getKeyPositions()) {
 
                     if( position < parameterCount) {
+                        System.out.println("adding parameterposition" + position);
                         parameterIndices.add(position);
                     }
                 }
@@ -138,14 +141,14 @@ public class VariableNameTracker {
                 for (int position : watchPoint.getKeyPositions()) {
                     for (Entry<Integer, SourceElement> entry : entrySet) {
                         if (entry.getKey() + parameterCount == position) {
-
+                            System.out.println("added var");
                             VariableSpecification varspec = (VariableSpecification) entry.getValue();
                             localVariables.add((LocationVariable) varspec.getProgramVariable());
                         }
                     }
                 }
             }
-        }
+        }System.out.println("apc "+localVariables.size());
         return localVariables;
     }
     /**
@@ -158,19 +161,22 @@ public class VariableNameTracker {
      * @param updates
      */
     public void checkNamespace(UpdateFactory updateFactory, LinkedList<Update> updates, List<LocationVariable> inittiallyRenamedLocalVariables) {
-        
+
         for(WatchPoint wp : watchpoints){
             for(int i = 0;  i < wp.getOrginialLocalVariables().size(); i++){
+                System.out.println("checking var" + i);
                 if(!inittiallyRenamedLocalVariables.isEmpty()){
-                LocationVariable orginialLocationVariable = wp.getOrginialLocalVariables().get(i);
-                LocationVariable renamedLocationVariable = inittiallyRenamedLocalVariables.get(i);
-
-                if(node.getGlobalProgVars().contains(renamedLocationVariable ) ){
-
-                    updates.add(updateFactory.elementaryUpdate(
-                            TermFactory.DEFAULT.createVariableTerm(orginialLocationVariable),
-                            TermFactory.DEFAULT.createVariableTerm(renamedLocationVariable)));
+                LocationVariable orginialVariable = wp.getOrginialLocalVariables().get(i);
+                LocationVariable renamedVariable = inittiallyRenamedLocalVariables.get(i);
+                System.out.println("xx ren  var "+ renamedVariable +" " + renamedVariable.id());
+                    
+                    if(node.getGlobalProgVars().contains(renamedVariable ) ){
+                        System.out.println("var found in global namespace " + renamedVariable);
+                        updates.add(updateFactory.elementaryUpdate(
+                                TermFactory.DEFAULT.createVariableTerm(orginialVariable),
+                                TermFactory.DEFAULT.createVariableTerm(renamedVariable)));
                 }
+
             }}
         }
     }
@@ -202,32 +208,36 @@ public class VariableNameTracker {
 
                 if (isMethodExpandRule(((Taclet) parent.getAppliedRuleApp()
                         .rule()).getRuleSets())) {
-
+                    System.out.println("found method expand taclet " + parent.serialNr());
                     // treat parent, i.e. the method-body-statement to get parameter information
                     SourceElement parentElement = getStatement(parent);
-                    if (parentElement instanceof StatementBlock) {
+                    MethodBodyStatement mbs = null;
+                    if (parentElement instanceof StatementContainer) {
 
-                        MethodBodyStatement mbs = (MethodBodyStatement) parentElement
-                        .getFirstElement();
-                        MethodVisitor mbsVisitor = new MethodVisitor(mbs);
-                        mbsVisitor.start();
+                        mbs = (MethodBodyStatement) parentElement.getFirstElement();
+                        System.out.println(mbs.getMethodReference());
+                        System.out.println(mbs.getArguments());
                         programMethod = mbs.getProgramMethod(node.proof()
                                 .getServices());
-                        parameterCount = programMethod
-                        .getParameterDeclarationCount();
+                    }
+                    System.out.println("program method "+ programMethod);
+                    parameterCount = programMethod.getParameterDeclarationCount();
 
-                        List<Integer> parameterIndices = getParameterIndicesOfMethod(programMethod);
+                    List<Integer> parameterIndices = getParameterIndicesOfMethod(programMethod);
 
-                        for (Integer index : parameterIndices) {
-                            renamedLocalVariables.add((LocationVariable) programMethod
-                                    .getParameterDeclarationAt(index).getVariableSpecification().getProgramVariable());
-                        }
+                    for (Integer index : parameterIndices) {
+                        
+                        
+                        LocationVariable programVariable = (LocationVariable) mbs.getArguments().getExpression(index);
+                        System.out.println("adding a parameter to list. id " + programVariable.id());
+                        renamedLocalVariables.add(programVariable);
                     }
                     // treat currentnode, i.e. the method-frame
                     SourceElement element = getStatement(currentNode);
                     //  Before getting the finally renamed variables we have to get all variables that are declared
                     //  in the method body. The resulting positions are not correct yet since the parameter count is missing.
                     if (element instanceof MethodFrame) {
+                        System.out.println("found methodframe " + currentNode.serialNr());
                         MethodVisitor mv = new MethodVisitor(
                                 (MethodFrame) element);
                         mv.start();
@@ -235,12 +245,6 @@ public class VariableNameTracker {
                                 programMethod, WatchpointUtil.valueToKey(mv.result()),
                                 parameterCount, watchpoints));
                     }
-
-//                    for (WatchPoint wp : watchpoints) {
-//                        if(wp.getProgramMethod().equals(programMethod)){
-//                            wp.setInittiallyRenamedLocalVariables(renamedLocalVariables);
-//                        }
-//                    }
                 }
             }
             currentNode = parent;
@@ -256,23 +260,7 @@ public class VariableNameTracker {
         // climb the tree
         ListOfNode lon = SLListOfNode.EMPTY_LIST;
         while (anode.parent() != null) {
-            for (WatchPoint watchPoint : watchpoints) {
-                List<LocationVariable> orginialLocalVariables = watchPoint.getOrginialLocalVariables();
-                for (LocationVariable locVar : orginialLocalVariables) {
-                    Node thatParent = anode.parent();
-                    Node thatNode = anode;
-                    try {
-                        if(thatNode.getGlobalProgVars().contains(locVar)
-                                && !thatParent.getGlobalProgVars().contains(locVar)){
-
-                            System.out.println("node contains local variable" + anode.parent().serialNr());
-                        }
-                    } catch (RuntimeException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                } 
-            }
+            
             lon = lon.append(anode.parent());
             anode = anode.parent();
         }
@@ -287,7 +275,9 @@ public class VariableNameTracker {
                 IteratorOfRenamingTable i = renamingTables.iterator();
 
                 while (i.hasNext()) {
-                    allRenamings = allRenamings.append(i.next());
+                    RenamingTable next = i.next();
+                    System.out.println(next);
+                    allRenamings = allRenamings.append(next);
                 }
             }
 

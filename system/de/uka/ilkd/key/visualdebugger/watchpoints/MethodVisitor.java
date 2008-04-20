@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 
 /**
- * Walks through a java AST in depth-left-fist-order. This walker is used
+ * Walks through a java AST in depth-left-first-order. This walker is used
  * collect all ProgramVariables in a program.
  */
 public class MethodVisitor extends JavaASTVisitor {
