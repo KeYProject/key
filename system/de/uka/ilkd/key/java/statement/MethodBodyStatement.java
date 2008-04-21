@@ -203,6 +203,20 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         return method.isStatic();
     }
 
+    /**
+     * Tests for "@pure" annotation
+     *
+     * @see de.uka.ilkd.key.proof.mgt.SpecificationRepository#isStrictlyPure(ProgramMethod)
+     * @param services
+     * @return true, iff the method is annotated "@pure"
+     */
+    public boolean isPure(Services services) {
+        if (method == null) {
+            resolveMethod(services);
+        }
+        return services.getSpecificationRepository().isStrictlyPure(method);
+    }
+
     /** calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
      * @param v the Visitor

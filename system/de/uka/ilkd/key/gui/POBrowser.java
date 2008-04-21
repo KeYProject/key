@@ -68,7 +68,9 @@ public class POBrowser extends JDialog {
     //constructors
     //-------------------------------------------------------------------------
 
-    protected POBrowser(InitConfig initConfig, String title) {
+    private POBrowser(InitConfig initConfig, 
+	    	      String title, 
+	    	      ProgramMethod defaultPm) {
 	super(Main.getInstance(), title, true);
 	this.initConfig = initConfig;
 	this.services   = initConfig.getServices();
@@ -76,7 +78,7 @@ public class POBrowser extends JDialog {
 	this.specRepos  = initConfig.getServices().getSpecificationRepository();
 
 	//create class tree
-	classTree = new ClassTree(true, null, services);
+	classTree = new ClassTree(true, null, defaultPm, services);
 	classTree.addTreeSelectionListener(new TreeSelectionListener() {
 	    public void valueChanged(TreeSelectionEvent e) {
 		DefaultMutableTreeNode selectedNode 
@@ -173,6 +175,11 @@ public class POBrowser extends JDialog {
                             "ESC",
                             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                             JComponent.WHEN_IN_FOCUSED_WINDOW);
+        
+        //complete default selection
+        if(defaultPm != null) {
+            showPOsFor(defaultPm);
+        }
 
 	//show
         getContentPane().setLayout(new BoxLayout(getContentPane(), 
@@ -180,17 +187,32 @@ public class POBrowser extends JDialog {
 	pack();
 	setLocation(70, 70);
     }
-
     
-    public static POBrowser showInstance(InitConfig initConfig) {
-        if(instance == null
+    
+    /**
+     * Shows the PO browser and preselects the passed method.
+     */
+    public static POBrowser showInstance(InitConfig initConfig, 
+	    				 ProgramMethod defaultPm) {
+	if(instance == null
            || instance.initConfig != initConfig
-           || !instance.initConfig.equals(initConfig)) {
-            instance = new POBrowser(initConfig, "Proof Obligation Browser");
+           || !instance.initConfig.equals(initConfig)
+           || defaultPm != null) {
+            instance = new POBrowser(initConfig, 
+            			     "Proof Obligation Browser", 
+            			     defaultPm);
         }
         instance.po = null;
         instance.setVisible(true);
         return instance;
+    }
+    
+
+    /**
+     * Shows the PO browser.
+     */
+    public static POBrowser showInstance(InitConfig initConfig) {
+	return showInstance(initConfig, null);
     }
 
     

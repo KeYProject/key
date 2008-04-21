@@ -130,7 +130,7 @@ public class OCLSpecFactory {
         
         //translate pre
         FormulaWithAxioms pre;
-        if(originalPre == null) {
+        if(originalPre == null || originalPre.equals("")) {
             pre = FormulaWithAxioms.TT;
         } else {
             pre = translator.translateExpression(originalPre,
@@ -144,7 +144,7 @@ public class OCLSpecFactory {
         
         //translate post
         FormulaWithAxioms post;
-        if(originalPost == null) {
+        if(originalPost == null || originalPost.equals("")) {
             post = FormulaWithAxioms.TT;
         } else {
             post = translator.translateExpression(originalPost, 
@@ -158,7 +158,7 @@ public class OCLSpecFactory {
         
         //translate modifies
         SetOfLocationDescriptor modifies;
-        if(originalModifies == null) {
+        if(originalModifies == null || originalModifies.equals("")) {
             modifies = EverythingLocationDescriptor.INSTANCE_AS_SET;
         } else {
             modifies = translator.translateModifiesExpression(originalModifies, 

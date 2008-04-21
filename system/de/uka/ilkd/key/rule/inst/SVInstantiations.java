@@ -35,6 +35,14 @@ public class SVInstantiations {
     /** the empty instantiation */
     public static final SVInstantiations EMPTY_SVINSTANTIATIONS = new SVInstantiations();
     
+
+    /**
+     * this dummy schemavariable is used to retrieve and store name proposals
+     * for newly added program variables
+     */
+    private static final SchemaVariable PROGVAR_SV = new NameSV(
+            NameSV.NAME_PREFIX + "_PROG_VARS");
+    
     /**
      * the context itself is not realised as a schemavariable, therefore we need
      * here a dummy SV for a more unified handling (key in map)
@@ -149,20 +157,6 @@ public class SVInstantiations {
         return add(sv, new ProgramSkolemInstantiation(sv, pe, 
                 instantiationType));
     }
-
-
-    public SVInstantiations addInteresting(SchemaVariable sv, 
-					   Name name) {
-        SchemaVariable existingSV = lookupVar(sv.name());
-        Name oldValue = (Name) getInstantiation(existingSV);
-        if (name.equals(oldValue)) return this; // already have it
-        if (oldValue!=null) throw new IllegalStateException(
-            "Trying to add a second name proposal for "+sv+
-            ": "+oldValue+"->"+name);
-        // otherwise (nothing here yet) add it    
-        return addInteresting ( sv, new NameInstantiationEntry(sv, name) );
-    }
-    
 
     public SVInstantiations add(SchemaVariable sv, ProgramList pes) {
         return add(sv, new ProgramListInstantiation(sv, pes.getList()));
@@ -293,6 +287,40 @@ public class SVInstantiations {
                 getGenericSortConditions()).checkSorts(entry, false);
     }
 
+    
+    public SVInstantiations addInteresting(SchemaVariable sv, 
+            Name name) {
+        SchemaVariable existingSV = lookupVar(sv.name());
+        Name oldValue = (Name) getInstantiation(existingSV);
+        if (name.equals(oldValue)) return this; // already have it
+        if (oldValue!=null) throw new IllegalStateException(
+                "Trying to add a second name proposal for "+sv+
+                ": "+oldValue+"->"+name);
+//      otherwise (nothing here yet) add it    
+        return addInteresting ( sv, new NameInstantiationEntry(sv, name) );
+    }
+
+
+    /**
+     * adds name proposals for added program variables to the instantiation
+     * (encoding: comma separated list for variables added at one goal. Semicolon separates
+     * list of name proposals of different goals)
+     * @param listOfNames the Name containing the name proposals in a String 
+     *  encoding
+     * @return the SVInstantiations with the added name proposals
+     */
+    public SVInstantiations addNameProposals(Name listOfNames) {
+        try {
+            return addInteresting(PROGVAR_SV, listOfNames);
+        } catch (IllegalStateException e) {
+            System.out.println(e.getMessage());
+            System.out.println("Replacing instead");
+            e.printStackTrace();
+            return replace(PROGVAR_SV, new NameInstantiationEntry(
+                    PROGVAR_SV, listOfNames));
+        }
+    }
+    
     /**
      * replaces the given pair in the instantiations. If the given
      * SchemaVariable has been instantiated already, the new pair is taken
@@ -630,6 +658,14 @@ public class SVInstantiations {
         final EntryOfSchemaVariableAndInstantiationEntry e = 
             lookupEntryForSV(name);
         return e == null ? null : e.value().getInstantiation(); 
+    }
+
+    /**
+     * retrieves name proposals for program variables to be introduced (if available)
+     * @return name proposal for program variables to be introduced
+     */
+    public Object getNameProposalsForNewProgramVariables() {
+        return getInstantiation(PROGVAR_SV);
     }
     
 

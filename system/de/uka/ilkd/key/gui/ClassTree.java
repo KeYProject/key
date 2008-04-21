@@ -47,10 +47,14 @@ class ClassTree extends JTree {
 
     public ClassTree(boolean addOperations, 
 	    	     KeYJavaType defaultClass,
+	    	     ProgramMethod defaultPm,
 	    	     Services services) {
 	super(new DefaultTreeModel(createTree(addOperations, services)));
+	if(defaultPm != null) {
+	    defaultClass = defaultPm.getContainerType();
+	}
 	if(defaultClass != null) {
-	    open(defaultClass);
+	    open(defaultClass, defaultPm);
 	}
 	getSelectionModel().setSelectionMode(
 				TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -113,6 +117,23 @@ class ClassTree extends JTree {
             }
         }
         return null;
+    }
+    
+    
+    private static DefaultMutableTreeNode getChildByProgramMethod(
+	    				     DefaultMutableTreeNode parentNode,
+	    				     ProgramMethod pm) {
+        int numChildren = parentNode.getChildCount();
+        for(int i = 0; i < numChildren; i++) {
+            DefaultMutableTreeNode childNode 
+                    = (DefaultMutableTreeNode)(parentNode.getChildAt(i));
+          
+            Entry te = (Entry)(childNode.getUserObject());
+            if(pm.equals(te.pm)) {
+                return childNode;
+            }
+        }
+        return null;	
     }
     
     
@@ -210,10 +231,9 @@ class ClassTree extends JTree {
     }
     
     
-    private void open(KeYJavaType kjt) {
-        //get tree path
+    private void open(KeYJavaType kjt, ProgramMethod pm) {
+        //get tree path to class
         Vector<DefaultMutableTreeNode> pathVector = new Vector<DefaultMutableTreeNode>();
-        
         String fullClassName = kjt.getFullName();
         int length = fullClassName.length();
         int index = -1;
@@ -237,10 +257,20 @@ class ClassTree extends JTree {
 	    assert childNode != null;
             node = childNode;
         } while(index != length);
-        
         TreePath incompletePath = new TreePath(pathVector.toArray());
         TreePath path = incompletePath.pathByAddingChild(node);
         
+        //extend tree path to method
+        if(pm != null) {
+            DefaultMutableTreeNode methodNode 
+        	= getChildByProgramMethod(node, pm);
+            if(methodNode != null) {
+        	incompletePath = path;            
+        	path = path.pathByAddingChild(methodNode);
+            }
+        }
+        
+        //open and select
         expandPath(incompletePath);
         setSelectionRow(getRowForPath(path));
     }

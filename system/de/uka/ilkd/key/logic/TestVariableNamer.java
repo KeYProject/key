@@ -205,6 +205,8 @@ public class TestVariableNamer extends TestCase {
 	assertFalse(goal.sequent().equals(originalSequent));
 	assertTrue(inGlobals(goal, v));
 
+	// Reset progVar namespace which was altered due to addGlobal()
+	proof.getNamespaces().programVariables().reset();
 	testTemporaryNames(vn);
     }
 

@@ -69,7 +69,7 @@ public class Recoder2KeYConverter {
 
     public ProgramElement process(recoder.java.ProgramElement pe) {
         Object result = callConvert(pe);
-        assert pe instanceof recoder.java.ProgramElement : "result must be a ProgramElement";
+        assert result instanceof ProgramElement : "result must be a ProgramElement";
         return (ProgramElement) result;
     }
 
