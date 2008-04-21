@@ -30,7 +30,7 @@ public class RespectsWorkingSpacePO extends EnsuresPO {
             ListOfProgramVariable paramVars, ProgramVariable resultVar,
             ProgramVariable exceptionVar, Map<Operator, Function> atPreFunctions)
             throws ProofInputException {
-        Term result = translatePost(contract, 
+        Term result = translateWorkingSpacePost(contract, 
                 selfVar, 
                 toPV(paramVars), 
                 resultVar, 

@@ -164,6 +164,26 @@ public abstract class AbstractPO implements ProofOblInput {
         axioms.putAll(fwa.getAxioms());
         return fwa.getFormula();
     }
+    
+    /**
+     * Translates a postcondition out of an operation contract. 
+     */
+    protected Term translateWorkingSpacePost(OperationContract contract,
+                                 ParsableVariable selfVar,
+                                 ListOfParsableVariable paramVars,
+                                 ParsableVariable resultVar,
+                                 ParsableVariable excVar,
+                                 /*inout*/ Map<Operator, Function/*(atPre)*/> atPreFunctions) 
+                throws ProofInputException {
+        FormulaWithAxioms fwa = contract.getWorkingSpacePost(selfVar, 
+                                                 paramVars, 
+                                                 resultVar, 
+                                                 excVar, 
+                                                 atPreFunctions,
+                                                 services);
+        axioms.putAll(fwa.getAxioms());
+        return fwa.getFormula();
+    }
 
 
     /**

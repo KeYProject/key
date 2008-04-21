@@ -591,8 +591,29 @@ public class JMLSpecFactory {
             }
         }
         
+        Term workingSpace = null;
+        if(originalWorkingSpace!=null){
+            FormulaWithAxioms translated 
+                = translator.translateExpression(
+                        originalWorkingSpace,
+                        programMethod.getContainerType(),
+                        selfVar,
+                        paramVars,
+                        null,
+                        null,
+                        atPreFunctions);
+            assert translated.getAxioms().isEmpty();
+            workingSpace = translated.getFormula(); 
+        }
+        
         //translate assignable
+        Term imCons=null;
         SetOfLocationDescriptor assignable;
+        ProgramVariable initialMemoryArea = services.getJavaInfo().
+        getDefaultMemoryArea();
+        Term imTerm = TB.var(initialMemoryArea);
+        imCons = TB.dot(imTerm, services.getJavaInfo().getAttribute(
+                "consumed", "javax.realtime.MemoryArea"));
         if(originalAssignable.isEmpty()) {
             assignable = EverythingLocationDescriptor.INSTANCE_AS_SET;
         } else {
@@ -606,6 +627,7 @@ public class JMLSpecFactory {
                                         paramVars);
                 assignable = assignable.union(translated);        
             }
+            if(imCons!=null) assignable.add(new BasicLocationDescriptor(imCons));
         }
         
         //translate variant
@@ -624,21 +646,6 @@ public class JMLSpecFactory {
                                         atPreFunctions);
             assert translated.getAxioms().isEmpty();
             variant = translated.getFormula();
-        }
-        
-        Term workingSpace = null;
-        if(originalWorkingSpace!=null){
-            FormulaWithAxioms translated 
-                = translator.translateExpression(
-                        originalWorkingSpace,
-                        programMethod.getContainerType(),
-                        selfVar,
-                        paramVars,
-                        null,
-                        null,
-                        atPreFunctions);
-            assert translated.getAxioms().isEmpty();
-            workingSpace = translated.getFormula(); 
         }
         
         //create loop invariant annotation
