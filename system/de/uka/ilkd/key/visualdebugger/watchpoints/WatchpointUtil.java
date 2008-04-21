@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.IteratorOfNode;
@@ -22,18 +23,24 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.visualdebugger.ProofStarter;
 import de.uka.ilkd.key.visualdebugger.executiontree.ETNode;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class WatchointUtil.
  * 
  * This Class offers some tools to identify and mark Watchpoints in the current
  * program state, respectivly in the ExecutionTree ET.
- * 
  */
 public class WatchpointUtil {
 
     /**
      * satisfiesWatchpoint returns true, if all leaf nodes in this ETNode
-     * satisfy at least one watchpoint from the list
+     * satisfy at least one watchpoint from the list.
+     * 
+     * @param leafNodesInETNode the leaf nodes in et node
+     * @param watchpoints the watchpoints
+     * @param etn the etn
+     * 
+     * @return true, if satisfies watchpoint
      */
     private static boolean satisfiesWatchpoint(HashSet<Node> leafNodesInETNode,
             List<WatchPoint> watchpoints, ETNode etn) {
@@ -65,11 +72,8 @@ public class WatchpointUtil {
                     if (WatchpointUtil.evalutateWatchpoint(node, watchpoint,
                             node.sequent(), pos, node.proof(), 250, watchpoints)) {
                         temp.add(watchpoint);
-                        System.out.println("wp evaluated to true");
                     }
                 }
-            } else {
-                System.out.println("POS was NULL!");
             }
             intersection.retainAll(temp);
             System.out
@@ -77,11 +81,16 @@ public class WatchpointUtil {
                     + intersection.size());
         }
         etn.setWatchpointsSatisfied(intersection);
-        System.out.println("LEAVING satisfiesWP...with "
-                + !intersection.isEmpty());
         return !intersection.isEmpty();
     }
 
+    /**
+     * Find pos.
+     * 
+     * @param seq the seq
+     * 
+     * @return the pos in occurrence
+     */
     private static PosInOccurrence findPos(Semisequent seq) {
 
         IteratorOfConstrainedFormula iter = seq.iterator();
@@ -107,22 +116,22 @@ public class WatchpointUtil {
 
                 SourceElement firstStatement = getFirstActiveStatement(term);
                 if (firstStatement.toString().startsWith("Debug")) {
-                    System.out.println("LEAVING findPos WITH result...");
                     return pos;
                 } else {
-                    System.out.println("continue...");
                     continue;
                 }
             }
         }
-
         System.out.println("LEAVING findPos WITHOUT result...");
         return null;
     }
 
     /**
-     * @param programPrefix
-     * @return
+     * Gets the first active statement.
+     * 
+     * @param term the term
+     * 
+     * @return the first active statement
      */
     private static SourceElement getFirstActiveStatement(Term term) {
 
@@ -138,6 +147,14 @@ public class WatchpointUtil {
                 .getFirstElement();
     }
 
+    /**
+     * Find leaves.
+     * 
+     * @param currentNode the current node
+     * @param proofnodes the proofnodes
+     * 
+     * @return the hash set< node>
+     */
     private static HashSet<Node> findLeaves(Node currentNode,
             List<Node> proofnodes) {
 
@@ -161,6 +178,14 @@ public class WatchpointUtil {
      * 
      * Evaluates a single watchpoint.
      * 
+     * @param node the node
+     * @param watchpoint the watchpoint
+     * @param seq the seq
+     * @param pos the pos
+     * @param proof the proof
+     * @param maxsteps the maxsteps
+     * @param watchpoints the watchpoints
+     * 
      * @return true, if the watchpoint is satisfied in the current state
      */
     public static boolean evalutateWatchpoint(Node node, Term watchpoint,
@@ -169,15 +194,12 @@ public class WatchpointUtil {
         UpdateFactory updateFactory = new UpdateFactory(proof.getServices(),
                 proof.simplifier());
         LinkedList<Update> updates = new LinkedList<Update>();
-        // start tracking names if necessary 
-        
-        if (WatchPointManager.existsWatchPointContainingLocals()) {
 
+        // start tracking names if necessary 
+        if (WatchPointManager.existsWatchPointContainingLocals()) {
             VariableNameTracker vnt = new VariableNameTracker(node, watchpoints);
-            List<LocationVariable> initialRenamings = vnt.getInitialRenamings();
-            vnt.checkNamespace(updateFactory, updates, initialRenamings);
-            System.out.println("counted "+ updates.size() +" updates after namespacecheck");
-            updates.add(buildNameUpdates(updateFactory, vnt.trackRenaming(), node, watchpoints,initialRenamings));
+            vnt.start();
+            updates.add(buildNameUpdates(updateFactory, vnt.result()));
         }
 
         updates.addAll(collectUpdates(pos));
@@ -202,18 +224,19 @@ public class WatchpointUtil {
                     }
                 });
             }
-            System.out.println("LEAVING evaluateWP...");
             return ps.getProof().closed();
         } catch (Throwable t) {
-            System.out.println(t.toString());
             t.printStackTrace();
         }
         return false;
     }
 
     /**
-     * @param pos
-     * @return
+     * Collect updates.
+     * 
+     * @param pos the pos
+     * 
+     * @return the linked list< update>
      */
     private static LinkedList<Update> collectUpdates(PosInOccurrence pos) {
         LinkedList<Update> updates = new LinkedList<Update>();
@@ -239,28 +262,31 @@ public class WatchpointUtil {
      * Returns true, if the concatenation of all watchpoints by the junctor can
      * be evaluated to true, i.e. the proof can be closed
      * 
-     * Example: 
-     *  watchpoints: w1, w2, w3 
-     *      junctor: /\ (AND - logical conjunction) -> evaluates w1 /\ w2 /\ w3 
-     *               \/ (OR  - logical disjunction) -> evalutaes w1 \/ w2 \/ w3
+     * Example:
+     * watchpoints: w1, w2, w3
+     * junctor: /\ (AND - logical conjunction) -> evaluates w1 /\ w2 /\ w3
+     * \/ (OR  - logical disjunction) -> evalutaes w1 \/ w2 \/ w3
      * 
      * @param watchpoints -
-     *                a list of all watchpoints that have to be taken into
-     *                account
+     * a list of all watchpoints that have to be taken into
+     * account
      * @param seq -
-     *                the sequent
+     * the sequent
      * @param pos -
-     *                the PosInOcc
+     * the PosInOcc
      * @param proof -
-     *                the proof
+     * the proof
      * @param junctor -
-     *                the junctor to use
+     * the junctor to use
      * @param negateJunctor -
-     *                set this to true, if you want to realize NOR/NAND
-     *                concatenation
+     * set this to true, if you want to realize NOR/NAND
+     * concatenation
      * @param maxsteps -
-     *                the upper bound of steps that should be applied to close
-     *                the proof
+     * the upper bound of steps that should be applied to close
+     * the proof
+     * @param node the node
+     * 
+     * @return true, if evalutate watchpoints
      */
     public static boolean evalutateWatchpoints(Node node,
             List<WatchPoint> watchpoints, Sequent seq, PosInOccurrence pos,
@@ -283,9 +309,9 @@ public class WatchpointUtil {
             if (WatchPointManager.existsWatchPointContainingLocals()) {
 
                 VariableNameTracker vnt = new VariableNameTracker(node, watchpoints);
-                List<LocationVariable> initialRenamings = vnt.getInitialRenamings();
-                vnt.checkNamespace(updateFactory, updates, initialRenamings);
-                updates.add(buildNameUpdates(updateFactory, vnt.trackRenaming(), node, watchpoints,initialRenamings));
+                vnt.start();
+                updates.add(
+                        buildNameUpdates(updateFactory,vnt.result()));
             }
 
             updates.addAll(collectUpdates(pos));
@@ -335,11 +361,14 @@ public class WatchpointUtil {
     }
 
     /**
-     * @param seq
-     * @param proof
-     * @param maxsteps
-     * @param ps
-     * @return
+     * Creates the proof environment.
+     * 
+     * @param seq the seq
+     * @param proof the proof
+     * @param maxsteps the maxsteps
+     * @param ps the ps
+     * 
+     * @return the proof environment
      */
     private static ProofEnvironment createProofEnvironment(Sequent seq,
             Proof proof, int maxsteps, final ProofStarter ps) {
@@ -369,6 +398,7 @@ public class WatchpointUtil {
      * getAllLeaveNodes() returns all ETNodes that are leaves in the current
      * ExecutionTree, which is passed as ETNode as well.
      * 
+     * @param etn the etn
      * 
      * @return a LinkedList containing all leaves of the current ET
      */
@@ -389,10 +419,11 @@ public class WatchpointUtil {
     }
 
     /**
-     * getAllLeafNodes
+     * getAllLeafNodes.
      * 
      * @param nodes -
-     *                an array containing all (proof)nodes of an ETNode
+     * an array containing all (proof)nodes of an ETNode
+     * 
      * @return leaves - a LinkedList with all leaf proofnodes in the ETNode
      */
     public static HashSet<Node> getLeafNodesInETNode(Node[] nodes) {
@@ -430,11 +461,12 @@ public class WatchpointUtil {
     }
 
     /**
-     * setActiveWatchpoints
+     * setActiveWatchpoints.
      * 
      * @param nodes -
-     *                a list of ETNodes of the current ET. The watchpoints will
-     *                be evaluated for all these nodes.
+     * a list of ETNodes of the current ET. The watchpoints will
+     * be evaluated for all these nodes.
+     * @param watchpoints the watchpoints
      */
     public static void setActiveWatchpoint(List<ETNode> nodes,
             List<WatchPoint> watchpoints) {
@@ -457,8 +489,7 @@ public class WatchpointUtil {
     /**
      * Gets the executiontree as list.
      * 
-     * @param etn
-     *                the ETNode containing the current ET
+     * @param etn the ETNode containing the current ET
      * 
      * @return the executiontree as list
      */
@@ -474,6 +505,13 @@ public class WatchpointUtil {
         return executionTree;
     }
 
+    /**
+     * Value to key.
+     * 
+     * @param map the map
+     * 
+     * @return the hash map< integer, source element>
+     */
     public static HashMap<Integer, SourceElement> valueToKey(
             Map<SourceElement, Integer> map) {
 
@@ -488,54 +526,39 @@ public class WatchpointUtil {
         return newHashMap;
     }
 
+    /**
+     * Builds the name updates.
+     * 
+     * This method finally updates all names of local variables that were used in 
+     * watchpoints to their current name.
+     * 
+     * @param uf the uf
+     * @param nameMaps the name maps
+     * 
+     * @return the update
+     */
     private static Update buildNameUpdates(UpdateFactory uf,
-            ListOfRenamingTable renamings, Node node, List<WatchPoint> watchpoints, List<LocationVariable> initialRenamings) {
+            Map<MethodBodyStatement, ListOfRenamingTable> nameMaps) {
 
         List<Update> nameUpdates = new LinkedList<Update>();
-        IteratorOfRenamingTable i = renamings.iterator();
+        System.out.println(nameMaps);
+        for (ListOfRenamingTable lort : nameMaps.values()) {
+            //TODO currently always taking last entry in list
+            //   ->determine the proper method we are in at this point
+            if(!lort.isEmpty()){
+                RenamingTable lastRT = lort.head();
+                Iterator<LocationVariable> it = lastRT.getRenamingIterator();
 
-        for (WatchPoint watchPoint : watchpoints) {
-            List<LocationVariable> orginialLocalVariables = watchPoint.getOrginialLocalVariables();
-            System.out.println("org size "+orginialLocalVariables.size());
-            System.out.println("ren size "+initialRenamings.size());
-            for (LocationVariable v : initialRenamings) {
-                System.out.println("+++" + v.toString());
-            }
+                while(it.hasNext()){
+                    LocationVariable originalVar = (LocationVariable) it.next();
 
-            for(LocationVariable originalVar : orginialLocalVariables) {
-                while (i.hasNext()) {
-                    RenamingTable renaming = i.next();
-
-                    for(LocationVariable initiallyRenamedVar : initialRenamings){
-
-                        SourceElement renamedVariable = renaming
-                        .getRenaming(initiallyRenamedVar);
-
-                        if (renamedVariable != null) {
-
-                            System.out.println(renaming.toString());
-
-                            Update elemtaryUpdate = uf.elementaryUpdate(
-                                    TermFactory.DEFAULT.createVariableTerm(originalVar),
-                                    TermFactory.DEFAULT.createVariableTerm((LocationVariable) renamedVariable)); 
-
-                            System.out.println(elemtaryUpdate);
-                            nameUpdates.add(elemtaryUpdate);
-                            System.out.println("sizeof nameUpdates: " + nameUpdates.size());
-                        }
-                    }
-                }
+                    Update elemtaryUpdate = uf.elementaryUpdate(
+                            TermFactory.DEFAULT.createVariableTerm(originalVar),
+                            TermFactory.DEFAULT.createVariableTerm((LocationVariable) lastRT.getHashMap().get(originalVar))); 
+                    nameUpdates.add(elemtaryUpdate);}
             }
         }
-
-        try {
-
-            return uf.parallel(nameUpdates.toArray(new Update[nameUpdates.size()]));
-        } catch (RuntimeException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return null;
+        return uf.parallel(nameUpdates.toArray(new Update[nameUpdates.size()]));
     }
 
 }
