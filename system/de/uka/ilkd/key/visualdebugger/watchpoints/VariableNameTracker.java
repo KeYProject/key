@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
@@ -184,12 +185,13 @@ public class VariableNameTracker {
      * parameter count. Finally the following method-frame is investigated and the parameter count added to rebuild
      * the original order.
      * 
-     * @param node the node
      * 
      * @return the initial renamings
      */
     public List<LocationVariable> getInitialRenamings() {
 
+        final Services services = node.proof().getServices();
+        
         Node currentNode = node;
         Node parent = currentNode.parent();
         List<LocationVariable> renamedLocalVariables = new LinkedList<LocationVariable>();
@@ -209,7 +211,7 @@ public class VariableNameTracker {
 
                         MethodBodyStatement mbs = (MethodBodyStatement) parentElement
                         .getFirstElement();
-                        MethodVisitor mbsVisitor = new MethodVisitor(mbs);
+                        MethodVisitor mbsVisitor = new MethodVisitor(mbs, services);
                         mbsVisitor.start();
                         programMethod = mbs.getProgramMethod(node.proof()
                                 .getServices());
@@ -229,7 +231,7 @@ public class VariableNameTracker {
                     //  in the method body. The resulting positions are not correct yet since the parameter count is missing.
                     if (element instanceof MethodFrame) {
                         MethodVisitor mv = new MethodVisitor(
-                                (MethodFrame) element);
+                                (MethodFrame) element, services);
                         mv.start();
                         renamedLocalVariables.addAll(addParameterCount(
                                 programMethod, WatchpointUtil.valueToKey(mv.result()),
