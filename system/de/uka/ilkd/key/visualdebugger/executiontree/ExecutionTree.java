@@ -15,8 +15,9 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.util.WatchpointUtil;
 import de.uka.ilkd.key.visualdebugger.*;
+import de.uka.ilkd.key.visualdebugger.watchpoints.WatchPoint;
+import de.uka.ilkd.key.visualdebugger.watchpoints.WatchpointUtil;
 
 public class ExecutionTree implements AutoModeListener {
 

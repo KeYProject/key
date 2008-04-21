@@ -1,6 +1,7 @@
-package de.uka.ilkd.key.visualdebugger;
+package de.uka.ilkd.key.visualdebugger.watchpoints;
 
 import java.util.List;
+
 
 /**
  * The Class WatchpointDescriptor.

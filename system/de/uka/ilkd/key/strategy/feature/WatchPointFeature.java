@@ -1,14 +1,13 @@
 package de.uka.ilkd.key.strategy.feature;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.util.WatchpointUtil;
-import de.uka.ilkd.key.visualdebugger.WatchPoint;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.visualdebugger.watchpoints.WatchPoint;
+import de.uka.ilkd.key.visualdebugger.watchpoints.WatchpointUtil;
 
 public class WatchPointFeature extends BinaryFeature {
 

@@ -5,9 +5,9 @@ import java.util.LinkedList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.util.WatchpointUtil;
 import de.uka.ilkd.key.visualdebugger.executiontree.ETNode;
 import de.uka.ilkd.key.visualdebugger.executiontree.ITNode;
+import de.uka.ilkd.key.visualdebugger.watchpoints.WatchpointUtil;
 
 public class WatchpointUtilTest {
 

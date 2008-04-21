@@ -1,12 +1,4 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Core Plug-in
-Bundle-SymbolicName: org.key_project.core
-Bundle-Version: 1.1.13
-Bundle-ClassPath: key.jar
-Bundle-Vendor: KeY-Project, Universities of Chalmers, Koblenz and Karlsruhe
-Bundle-Localization: plugin
-Export-Package: .,
+Provide-Package: .,
  de.uka.ilkd.key,
  de.uka.ilkd.key.casetool,
  de.uka.ilkd.key.casetool.patternimplementor,
@@ -133,4 +125,3 @@ Export-Package: .,
  de.uka.ilkd.key.visualdebugger.executiontree,
  de.uka.ilkd.key.visualdebugger.statevisualisation,
  de.uka.ilkd.key.visualization
-Require-Bundle: KeYExternalLibraries
