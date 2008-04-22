@@ -62,6 +62,46 @@ public class CentralHost {
         return getAccount ( accountNumber ) != null;
     }
     
+    /** 
+     * Retrieves the accountnumber with the maximal balance.
+     * @return the accountnumber with maximal balance or <code>-1</code> if no accounts exists
+     */
+    /*@
+        public normal_behavior
+        requires (\exists int i; i>=0 && i<maxAccountNumber; accounts[i] != null);
+        ensures \result != -1 && (\forall int i; i>=0 && i<maxAccountNumber; 
+	      accounts[i]!=null ==> accounts[i].balance <= accounts[\result].balance);
+	also
+        public normal_behavior
+        requires (\forall int i; i>=0 && i<maxAccountNumber; accounts[i] == null);
+        ensures \result == -1;
+      @*/
+    public /*@ pure @*/ int getAccountWithMaxBalance() {
+
+	int account = -1;	
+	/*@ loop_invariant 
+	  @    0<=i && i <= maxAccountNumber && 
+	  @    account >=-1 && account < maxAccountNumber &&
+	  @    (account != -1 ==> (accounts[account] != null && 
+	  @     (\forall int j; (j>=0 && j<i && accounts[j] != null); 
+	  @             accounts[j].balance <= accounts[account].balance))) &&
+	  @    (account == -1 ==> (\forall int j; j>=0 && j<i; accounts[j] == null));
+	  @ assignable i,account;
+	  @ decreases maxAccountNumber - i; 
+	  @*/
+	 for (int i = 0; i<maxAccountNumber; i++) {	    
+	    if (accountExists(i)) {
+		if (account == -1) {
+		    account = i;
+		} else if (getAccount(i).accountBalance() > getAccount(account).accountBalance()) {
+		    account = i;		
+		}
+	    }	    
+	}
+
+	return account;
+    }
+
     
     /**
      * Create a new account with account number <code>accountNumber</code>

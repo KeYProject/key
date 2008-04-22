@@ -73,7 +73,6 @@ public abstract class Taclet implements Rule, Named {
     
     private static final String AUTONAME = "_taclet";
 
-
     /** name of the taclet */
     private final Name name;
     /** name displayed by the pretty printer */
@@ -1771,5 +1770,7 @@ public abstract class Taclet implements Rule, Named {
     */
     public ListOfSchemaVariable writeSet() {
 	return SLListOfSchemaVariable.EMPTY_LIST; 
-    }         
+    }
+  
+         
 }

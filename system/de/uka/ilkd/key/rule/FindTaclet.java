@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.LinkedList;
+
 import de.uka.ilkd.key.collection.PairOfListOfGoalAndTacletApp;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -133,9 +135,6 @@ public abstract class FindTaclet extends Taclet {
 				     MatchConditions matchCond);
 
 
-    private static final SchemaVariable PROGVAR_SV = new NameSV(
-            NameSV.NAME_PREFIX + "_PROG_VARS");
-
     /**  
      * the rule is applied on the given goal using the
      * information of rule application. 
@@ -165,28 +164,14 @@ public abstract class FindTaclet extends Taclet {
 	IteratorOfTacletGoalTemplate it               = goalTemplates().iterator();
 	IteratorOfGoal               goalIt           = newGoals.iterator();
 
-        ListOfName[] progvar_proposals = null;
-        int count = 0;
-        String progvar_genNames = "";
-        Object o = tacletApp.instantiations().getInstantiation(PROGVAR_SV);
+	int count = 0;
+        boolean newProgramVariablesAdded = false;
+        
+        final ListOfName[] nameProposalsForAddedProgVars = 
+            tacletApp.getNameProposalsForAddedProgramVariables();
 
-        if (o instanceof Name) {
-            String[] props = ((Name) o).toString().split(";");
-            progvar_proposals = new ListOfName[props.length];
-
-            for (int i = 0; i < props.length; i++) {
-                String[] props2 = props[i].split(",");
-                progvar_proposals[i] = SLListOfName.EMPTY_LIST;
-
-                for (int j = 0; j < props2.length; j++) {
-                    progvar_proposals[i] = progvar_proposals[i].append(
-                            new Name(props2[j]));
-                }
-
-            }
-
-        }
-
+        final LinkedList<ListOfName> newNames = new LinkedList<ListOfName>();
+        
 	while (it.hasNext()) {
 	    TacletGoalTemplate gt          = it    .next();
 	    Goal               currentGoal = goalIt.next();
@@ -209,39 +194,31 @@ public abstract class FindTaclet extends Taclet {
 			      services,
 			      mc );
 
-	    ListOfName props = null;
-
-	    if (progvar_proposals != null && gt.addedProgVars().size() != 0) {
-	        props = progvar_proposals[count++];
-	    }
-
-	    ListOfName newNames = applyAddProgVars( gt.addedProgVars(),
-			      currentGoal,
-                              tacletApp.posInOccurrence(),
-                              services,
-			      mc, props);
-	    IteratorOfName it2 = newNames.iterator();
-
-	    for (int j = 0; it2.hasNext(); j++) {
-
-	        if (j > 0) {
-	            progvar_genNames += "," + it2.next().toString();
-	        } else {
-	            progvar_genNames += ";" + it2.next().toString();
-	        }
-
-	    }
-                              
+	    
+            final ListOfName actualNamesOfAddedProgVars = 
+                applyAddProgVars( gt.addedProgVars(),
+                                  currentGoal,
+                                  tacletApp.posInOccurrence(),
+                                  services,
+                                  mc, nameProposalsForAddedProgVars[count]);
+            
+            count++;
+            
+            if (!newProgramVariablesAdded && 
+                    !actualNamesOfAddedProgVars.isEmpty()) {
+                newProgramVariablesAdded = true;
+            }
+            
+            newNames.add(actualNamesOfAddedProgVars);
+	                                  
             currentGoal.setBranchLabel(gt.name());
 	}
 
-	PairOfListOfGoalAndTacletApp p;
+	final PairOfListOfGoalAndTacletApp p;
 
-	if (progvar_genNames.length() > 0) {
-	    p = new PairOfListOfGoalAndTacletApp(newGoals, tacletApp
-	            .setInstantiation(tacletApp.instantiations()
-	                    .addInteresting(PROGVAR_SV, new Name(
-	                            progvar_genNames.substring(1)))));
+	if (newProgramVariablesAdded) {                     
+            p = new PairOfListOfGoalAndTacletApp(newGoals, 
+                    tacletApp.addNameProposal(newNames));	   
 	} else {
 	    p = new PairOfListOfGoalAndTacletApp(newGoals, tacletApp);
 	}
