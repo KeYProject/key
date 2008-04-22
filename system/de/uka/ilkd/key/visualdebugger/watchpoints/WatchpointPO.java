@@ -61,8 +61,7 @@ public class WatchpointPO implements ProofOblInput {
             }
             proof.setSimplifier(settings
                     .getSimultaneousUpdateSimplifierSettings().getSimplifier());
-            po = ProofAggregate.createProofAggregate(proof, name);
-
+            po = ProofAggregate.createProofAggregate(proof, name);                       
         }
         return po;
     }
@@ -86,14 +85,15 @@ public class WatchpointPO implements ProofOblInput {
 
     }
 
+    
     /**
      * the initial config containing for example the services which provide
      * access to the Java model
      */
     public void setInitConfig(InitConfig i) {
         this.initConfig = i;
-
     }
+    
     /**
      * the indices with the rules to be used for specification computation
      * 

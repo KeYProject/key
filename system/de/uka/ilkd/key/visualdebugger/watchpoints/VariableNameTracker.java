@@ -225,7 +225,7 @@ public class VariableNameTracker {
             }
             currentNode = parent;
             parent = currentNode.parent();
-        }System.out.println("size of renamed variables: " + renamedLocalVariables.size());
+        }
     }
     
     private ListOfRenamingTable collectAllRenamings() {

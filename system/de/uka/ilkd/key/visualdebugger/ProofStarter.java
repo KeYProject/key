@@ -187,6 +187,9 @@ public class ProofStarter {
             throw new IllegalStateException(
                     "Proofstarter must be initialized before.");
         }
+        
+        proof.setProofEnv(env);
+        
         final Strategy oldStrategy = proof.getActiveStrategy();
         if (strategy == null) {
             // in this case take the strategy of the proof settings
