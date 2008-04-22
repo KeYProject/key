@@ -34,8 +34,15 @@ import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.speclang.SetAsListOfClassInvariant;
+import de.uka.ilkd.key.speclang.SetOfClassInvariant;
+import de.uka.ilkd.key.speclang.SetOfOperationContract;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -591,7 +598,7 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 	 */
 	private void startProver(String debuggerEventMsg,
 			final IProject project, final IMethod method,
-			final boolean allInvariants, final boolean invPost,
+			boolean assumeClassInvariants, final boolean invPost,
 			final boolean assignable) {
 
 	    VisualDebugger.getVisualDebugger().fireDebuggerEvent(
@@ -625,8 +632,7 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 //	    getPO
 	    final ProofOblInput po;
 	    try {
-	        po = proveEnsuresPost(initConfig, 
-	                initConfig.getServices().getJavaInfo(), pm);
+	        po = proveEnsuresPost(initConfig, assumeClassInvariants, pm);
 	    } catch (ProofInputException e1) {
 	        // TODO Auto-generated catch block
                 KeYPlugin.getInstance().showErrorMessage("Proof Obligation Generation Failed",
@@ -642,15 +648,7 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 	    
 //	    start proof
 	    final ProblemInitializer pi = new ProblemInitializer(Main.getInstance());
-	    try {
-	        StrategyProperties strategyProperties = DebuggerStrategy
-	        .getDebuggerStrategyProperties(true, false, false, new LinkedList<WatchPoint>());
-	        
-	        final StrategyFactory factory = new DebuggerStrategy.Factory();
-	        Strategy strategy = 
-	            factory.create(VisualDebugger.getVisualDebugger().getMediator().getProof(), strategyProperties);
-	        	       
-	        po.getPO().getFirstProof().setActiveStrategy(strategy);
+	    try {	        
 
 	        if (SwingUtilities.isEventDispatchThread()) {
 	            pi.startProver(initConfig, po);
@@ -675,7 +673,14 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 	                e.printStackTrace();
 	            }
 	        }        
-
+	        StrategyProperties strategyProperties = DebuggerStrategy
+                .getDebuggerStrategyProperties(true, false, false, new LinkedList<WatchPoint>());
+                
+                final StrategyFactory factory = new DebuggerStrategy.Factory();
+                Strategy strategy = 
+                    factory.create(po.getPO().getFirstProof(), strategyProperties);
+                               
+                po.getPO().getFirstProof().setActiveStrategy(strategy);
 	        
 	    } catch(ProofInputException e)  {
 	        MessageDialog.openError(PlatformUI.getWorkbench()
@@ -690,54 +695,29 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 
 	/**
 	 * Starts the prover with an "EnsuresPost" proof obligation.
-	 * @param modelMethod the ModelMethod to reason about
 	 */
-	private ProofOblInput proveEnsuresPost(final InitConfig initConfig, final JavaInfo javaInfo,
-	        final ProgramMethod pm) 
-	throws ProofInputException {
-	    //no contract?
-	    // TODO insert check
+	private ProofOblInput proveEnsuresPost(InitConfig initConfig, 
+	        boolean assumeClassInvariants, ProgramMethod pm) 
+	throws ProofInputException {	   
+	    final Services services = initConfig.getServices();
+	    
+	    final SpecificationRepository specRepos = services.getSpecificationRepository();
+	    	    
+	    final SetOfClassInvariant assumedInvariants = 
+	        assumeClassInvariants ? specRepos.getClassInvariants(pm.getContainerType()) : 
+	            SetAsListOfClassInvariant.EMPTY_SET;	   	 
 
-	    //let the user select the contract and the assumed invariants
-	    final ContractConfigurator cc = new ContractConfigurator(Main.getInstance());
-
-	    if (SwingUtilities.isEventDispatchThread()) {
-	        cc.init(javaInfo.getServices(),
-	                pm,
-	                null,
-	                true,
-	                true,
-	                false);
-	    } else {
-	        Runnable runner = new Runnable() {
-	            public void run() { 
-	                cc.init(javaInfo.getServices(),
-	                        pm,
-	                        null,
-	                        true,
-	                        true,
-	                        false);
-	            }
-	        };
-	        try {
-	            SwingUtilities.invokeAndWait(runner);
-	        } catch (InterruptedException e) {
-	            // TODO Auto-generated catch block
-	            e.printStackTrace();
-	        } catch (InvocationTargetException e) {
-	            // TODO Auto-generated catch block
-	            e.printStackTrace();
-	        }
-	    }        
-
-	    if(!cc.wasSuccessful()) {
-	        return null;
-	    }     
-
+	    
+            final OperationContract contract = specRepos.getOperationContracts(pm).iterator().next();            	             
+            
+            if (contract == null) {
+                throw new ProofInputException("No contract found for "+pm.getFullName());
+            }          
+            
 	    //create and start the PO
 	    return new EnsuresPostPO(initConfig, 
-	            cc.getContract(), 
-	            cc.getAssumedInvs());
+	            contract, 
+	            assumedInvariants);
 	}
 
 
