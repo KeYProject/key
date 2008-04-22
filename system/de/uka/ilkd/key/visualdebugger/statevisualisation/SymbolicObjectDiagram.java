@@ -77,8 +77,9 @@ public class SymbolicObjectDiagram {
                 && op.name().toString().indexOf("undef(") == -1;
     }
 
-    private ListOfTerm ante = SLListOfTerm.EMPTY_LIST,
-            succ = SLListOfTerm.EMPTY_LIST;
+    private ListOfTerm ante = SLListOfTerm.EMPTY_LIST;
+            
+    private ListOfTerm succ = SLListOfTerm.EMPTY_LIST;
 
     private SetOfTerm arrayLocations;
 
@@ -777,49 +778,35 @@ public class SymbolicObjectDiagram {
 
         this.vd = VisualDebugger.getVisualDebugger();
         this.pc = pc;
-        // this.node = n;
         this.node = itNode.getNode();
         this.itNode = itNode;
-        // this.mediator=mediator;
-        // mediator = Main.getInstance().mediator();
         this.serv = serv;
-        // goals = mediator.getProof().getSubtreeGoals(node);
 
-        VisualDebugger.print("--------------------------");
-        VisualDebugger.print("Calculating Equ classes for " + node.serialNr());
-
-        IteratorOfConstrainedFormula itc = node.sequent().antecedent()
-                .iterator();
-        while (itc.hasNext()) {
-            ante = ante.append(itc.next().formula());
+        ante = SLListOfTerm.EMPTY_LIST;
+        for (final ConstrainedFormula cfma : node.sequent().antecedent()) {
+            ante = ante.append(cfma.formula());
         }
-        itc = node.sequent().succedent().iterator();
+        
+        
         succ = SLListOfTerm.EMPTY_LIST;
-        while (itc.hasNext()) {
-            succ = succ.append(itc.next().formula());
+        for (final ConstrainedFormula cfma : node.sequent().succedent()) {
+            succ = succ.append(cfma.formula());
         }
 
-        for (IteratorOfTerm it = this.instanceConfiguration.iterator(); it
-                .hasNext();) {
-            final Term t = it.next();
-            if (t.op() == Op.NOT)
-                succ = succ.append(t.sub(0));
+        for (final Term instanceTerm :  instanceConfiguration) {
+            if (instanceTerm.op() == Op.NOT)
+                succ = succ.append(instanceTerm.sub(0));
             else
-                ante = ante.append(t);
+                ante = ante.append(instanceTerm);
         }
 
         this.refInPC = refInPc;
 
         createEquivalenceClassesAndConstraints();
+        
         getEqvClass(nullTerm);
+        
         findDisjointClasses();
-
-        Collection<EquClass> cl = term2class.values();
-        HashSet<EquClass> s = new HashSet<EquClass>(cl);
-        Iterator<EquClass> it5 = s.iterator();
-        VisualDebugger.print("All Equi Classses: ");
-        while (it5.hasNext())
-            VisualDebugger.print(it5.next());
     }
 
     private boolean referenceSort(Sort s) {
