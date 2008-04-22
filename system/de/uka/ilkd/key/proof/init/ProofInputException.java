@@ -17,21 +17,20 @@ public class ProofInputException extends Exception {
     public static final ProofInputException USER_ABORT_EXCEPTION =
         new ProofInputException("User cancelled problem loading.");
 
-    String reason;
+    private final String message;
 
     public ProofInputException(Exception e) {
         super(e.getMessage());
-        reason = e.toString();
+        message = e.toString();
         initCause(e);
     }
 
-    public ProofInputException(String s) {
-        super(s);
-        reason = s;
+    public ProofInputException(String message) {
+        super(message);
+        this.message = message;
     }
 
     public String toString() {
-        return reason;
+        return message;
     }
-
 }

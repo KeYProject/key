@@ -36,7 +36,7 @@ class ProofAssistantDictionary {
     /** 
      * the dictionary  
      */
-    private Map dict = new HashMap(20);
+    private Map<String,String> dict = new HashMap<String,String>(20);
 
 
     public ProofAssistantDictionary() {
@@ -73,7 +73,7 @@ class ProofAssistantDictionary {
      * returns the stored text for the given key
      */
     public String get(String section, String key) {
-	return (String) dict.get(section+"."+key);
+	return dict.get(section+"."+key);
     }
 
 }

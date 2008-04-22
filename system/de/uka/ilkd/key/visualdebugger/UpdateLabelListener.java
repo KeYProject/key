@@ -1,9 +1,14 @@
 package de.uka.ilkd.key.visualdebugger;
 
+import java.util.HashMap;
+
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.OpCollector;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -16,7 +21,7 @@ public class UpdateLabelListener implements RuleAppListener {
     }
 
     private void analyseNodeChanges(NodeReplacement nr, int id,
-            boolean looking, HashMapFromPosInOccurrenceToLabel labels) {
+            boolean looking, HashMap<PosInOccurrence, Label> labels) {
         final IteratorOfNodeChange it = nr.getNodeChanges();
         while (it.hasNext()) {
             NodeChange nc = it.next();
@@ -105,10 +110,10 @@ public class UpdateLabelListener implements RuleAppListener {
         }
     }
 
-    private HashMapFromPosInOccurrenceToLabel setAssumeLabel(
-            HashMapFromPosInOccurrenceToLabel labels, Node n,
+    private HashMap<PosInOccurrence, Label> setAssumeLabel(
+            HashMap<PosInOccurrence, Label> labels, Node n,
             ListOfIfFormulaInstantiation inst) {
-        HashMapFromPosInOccurrenceToLabel l = labels;
+        HashMap<PosInOccurrence, Label> l = labels;
         if (inst == null) {
             return l;
         }
@@ -160,7 +165,7 @@ public class UpdateLabelListener implements RuleAppListener {
         int id = -1;
         boolean looking = false;
 
-        HashMapFromPosInOccurrenceToLabel labels = (HashMapFromPosInOccurrenceToLabel) parent
+        HashMap<PosInOccurrence, Label> labels = (HashMap<PosInOccurrence, Label>) parent
                 .getNodeInfo().getVisualDebuggerState().getLabels().clone();
 
         RuleApp app = parent.getAppliedRuleApp();
@@ -199,11 +204,10 @@ public class UpdateLabelListener implements RuleAppListener {
         n.getNodeInfo().getVisualDebuggerState().setLabels(labels);
     }
 
-    private void updateLooking(HashMapFromPosInOccurrenceToLabel labels) {
+    private void updateLooking(HashMap<PosInOccurrence, Label> labels) {
         boolean removelooking = true;
 
-        for (IteratorOfPosInOccurrence it = labels.keyIterator(); it.hasNext();) {
-            PosInOccurrence pio = it.next();
+        for (final PosInOccurrence pio : labels.keySet()) {
             PCLabel l = (PCLabel) labels.get(pio);
             if (l.isLooking()) {
                 if (!isLiteral(pio)) {
@@ -213,9 +217,7 @@ public class UpdateLabelListener implements RuleAppListener {
         }
 
         if (removelooking) {
-            for (IteratorOfPosInOccurrence it = labels.keyIterator(); it
-                    .hasNext();) {
-                PosInOccurrence pio = it.next();
+            for (final PosInOccurrence pio : labels.keySet()) {
                 PCLabel l = (PCLabel) labels.get(pio);
                 l.setLooking(false);
             }

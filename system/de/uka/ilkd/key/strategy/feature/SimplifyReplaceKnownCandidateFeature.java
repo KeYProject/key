@@ -36,7 +36,7 @@ public class SimplifyReplaceKnownCandidateFeature
     
     /**
      * Compute the cost of a RuleApp.
-     * @param app the RuleApp
+     * @param ruleApp the RuleApp
      * @param pos position where <code>app</code> is to be applied
      * @param goal the goal on which <code>app</code> is to be applied
      * @return the cost of <code>app</code>
@@ -52,16 +52,16 @@ public class SimplifyReplaceKnownCandidateFeature
         final Sequent ifSeq = app.taclet ().ifSequent ();
         
         assert ifSeq.size () == 1 : "Wrong number of if-formulas.";
-        
-        final boolean ifForInAntec =
-            ifSeq.succedent () == Semisequent.EMPTY_SEMISEQUENT;
-        
+                
         final Boolean pol = polarity ( pos, new Boolean ( pos.isInAntec () ) );
 
+        final boolean ifForInAntec =
+            ifSeq.succedent () == Semisequent.EMPTY_SEMISEQUENT;        
+        
         final boolean approved =
                  pol == null
-                 || AbstractBetaFeature.alwaysReplace ( pos.subTerm () )
-                 || pol.booleanValue () != ifForInAntec;
+                 || pol.booleanValue () != ifForInAntec
+                 || AbstractBetaFeature.alwaysReplace ( pos.subTerm () );
         
         return approved ? BinaryFeature.ZERO_COST : BinaryFeature.TOP_COST;
     }

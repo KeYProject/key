@@ -21,10 +21,6 @@ http://java.sun.com/products/jfc/tsc/articles/threads/threads2.html
 
 package de.uka.ilkd.key.gui;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,7 +61,7 @@ public class ApplyStrategy {
     
     private boolean startedAsInteractive;
     
-    private List proverTaskObservers = new ArrayList ();
+    private List<ProverTaskListener> proverTaskObservers = new ArrayList<ProverTaskListener> ();
 
     private ReusePoint reusePoint;
 
@@ -112,7 +108,8 @@ public class ApplyStrategy {
                 else
                     break;
             }
-            if (app == null) return false;            
+            if (app == null) return false;      
+            assert g != null;
             rl.removeRPConsumedGoal(g);                
             rl.addRPOldMarkersNewGoals(g.apply(app));
         }
@@ -172,27 +169,27 @@ public class ApplyStrategy {
 
     private synchronized void fireTaskStarted () {
         for (int i = 0, sz = proverTaskObservers.size(); i<sz; i++) {
-            ((ProverTaskListener)proverTaskObservers.get(i))
+            proverTaskObservers.get(i)
                 .taskStarted(PROCESSING_STRATEGY, maxApplications);
         }
     }
 
     private synchronized void fireTaskProgress () {
         for (int i = 0, sz = proverTaskObservers.size(); i<sz; i++) {
-            ((ProverTaskListener)proverTaskObservers.get(i))
+            proverTaskObservers.get(i)
                 .taskProgress(countApplied);
         }
     }
 
-    private synchronized void fireTaskFinished () {
+    private synchronized void fireTaskFinished (TaskFinishedInfo info) {
         for (int i = 0, sz = proverTaskObservers.size(); i<sz; i++) {
-            ((ProverTaskListener)proverTaskObservers.get(i)).taskFinished();
+            proverTaskObservers.get(i).taskFinished(info);
         }
     }
 
 
-    private void init(ListOfGoal goals, int maxSteps, long timeout) {
-        proof = medi.getProof();
+    private void init(Proof proof, ListOfGoal goals, int maxSteps, long timeout) {
+        this.proof = proof;
         maxApplications = maxSteps;
         this.timeout = timeout;
         countApplied = 0;
@@ -213,8 +210,9 @@ public class ApplyStrategy {
     
 
 
-    public void start(ListOfGoal goals, int maxSteps, long timeout) {
-        init(goals, maxSteps, timeout);
+    public void start(Proof proof, ListOfGoal goals, int maxSteps, long timeout) {
+        assert proof != null;
+        init(proof, goals, maxSteps, timeout);
 
         worker = new AutoModeWorker();
         worker.start();
@@ -229,88 +227,6 @@ public class ApplyStrategy {
         worker.interrupt();
     }
     
-    
-    private void displayResults ( Main main, String timeString ) {
-        String message;
-        int closed = mediator().getNrGoalsClosedByAutoMode();
-        
-        // display message in the status bar
-        
-        if ( countApplied != 0 ) {
-            message = "Strategy: Applied " + countApplied + " rule";
-            if ( countApplied != 1 ) message += "s";
-            message += " (" + timeString + " sec), ";
-            message += " closed " + closed + " goal";
-            if ( closed != 1 ) message += "s";             
-            message += ", "+main.displayedOpenGoalNumber ();
-            message += " remaining"; 
-            main.setStatusLine ( message );
-        }
-                       
-        mediator().resetNrGoalsClosedByHeuristics();
-    }
-
-    private void finishedBatchMode (Object result) {
-        
-        if ( Main.statisticsFile != null )
-            printStatistics ( Main.statisticsFile, result );
-        
-        if ("Error".equals ( result ) ) {
-            // Error in batchMode. Terminate with status -1.
-            System.exit ( -1 );
-        }
-        
-        // Save the proof before exit.
-        
-        String baseName = Main.fileNameOnStartUp;
-        int idx = baseName.indexOf(".key");        
-        if (idx == -1) {
-            idx = baseName.indexOf(".proof");
-        }        
-        baseName = baseName.substring(0, idx==-1 ? baseName.length() : idx);
-                
-        File f; 
-        int counter = 0;
-        do {           
-            
-            f = new File(baseName + ".auto."+ counter +".proof");
-            counter++;
-        } while (f.exists());
-                        
-        Main.getInstance ().saveProof ( f.getAbsolutePath() );
-        if (proof.openGoals ().size () == 0) {
-            // Says that all Proofs have succeeded
-            if (proof.getBasicTask().getStatus().getProofClosedButLemmasLeft()) {
-                // Says that the proof is closed by depends on (unproved) lemmas                
-                System.exit ( 2 ); 
-            }
-            System.exit ( 0 ); 
-        } else {
-            // Says that there is at least one open Proof
-            System.exit ( 1 );
-        }
-    }
-
-
-
-    private void printStatistics(String file, Object result) {
-        try {
-            final FileWriter statistics = new FileWriter ( file, true );
-            final PrintWriter statPrinter = new PrintWriter ( statistics );
-            
-            String fileName = Main.fileNameOnStartUp;
-            final int slashIndex = fileName.lastIndexOf ( "examples/" );
-            if ( slashIndex >= 0 )
-                fileName = fileName.substring ( slashIndex );
-            
-            statPrinter.print ( fileName + ", " );
-            if ("Error".equals ( result ) )
-                statPrinter.println ( "-1, -1" );
-            else
-                statPrinter.println ( "" + countApplied + ", " + time );                
-            statPrinter.close();
-        } catch ( IOException e ) {}
-    }
     
     public synchronized void addProverTaskObserver(ProverTaskListener observer) {
         proverTaskObservers.add(observer);
@@ -329,36 +245,33 @@ public class ApplyStrategy {
      * InterruptedException in doWork().
      */
     private class AutoModeWorker extends SwingWorker {
-    
+         
         public Object construct() {
             Object res = doWork();
 	    return res;
         }
 
         public void finished() {
-            setAutoModeActive(false);
-	    fireTaskFinished ();
-	    String timeString = "" + (time/1000)+"."+((time%1000)/100);
+            setAutoModeActive(false);	               
+            
+            final Object result = get ();
 
-	    final Object result = get ();
-        
-	    if (Main.batchMode) {
-                // This method does not return.
-                finishedBatchMode (result);
-                Debug.fail ( "Control flow should not reach this point." );
-	    }
-        
             if ("Error".equals ( result )) {
-                mediator ().startInterface ( true );
+                mediator ().startInterface ( true );                        
                 mediator ().notify
                 (new GeneralFailureEvent("An exception occurred during" 
-                        + " strategy execution."));               
+                        + " strategy execution."));  
             } else {
                 if (startedAsInteractive) mediator().startInterface(true);
             }
+
+            fireTaskFinished (new DefaultTaskFinishedInfo(ApplyStrategy.this, result, 
+                    proof, time, 
+                    countApplied, mediator().getNrGoalsClosedByAutoMode()));	  
             
-            mediator().setInteractive( true );
-            displayResults ( Main.getInstance (), timeString );
+            mediator().resetNrGoalsClosedByHeuristics();
+            
+            mediator().setInteractive( true );            
         }
     }
     

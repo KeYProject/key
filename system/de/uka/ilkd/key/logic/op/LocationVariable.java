@@ -33,6 +33,10 @@ public class LocationVariable extends ProgramVariable implements Location {
     public LocationVariable(ProgramElementName name, KeYJavaType t) {
         super(name, t.getSort(), t, null, false, false, false);
     }
+    
+    public LocationVariable(ProgramElementName name, KeYJavaType t, boolean isFinal) {
+        super(name, t.getSort(), t, null, false, false, false, isFinal);
+    }
 
     public LocationVariable(ProgramElementName name, Sort s) {
         super(name, s, null, null, false, false, false);

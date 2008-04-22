@@ -21,18 +21,13 @@ import de.uka.ilkd.key.util.Debug;
  * Applies an update on an array using rule ...
  */
 public class ApplyOnUpdate extends AbstractUpdateRule {
-       
-    private final UpdateFactory ufac;
-    
+          
     /**
      * creates an instance of this rule used by the given update
      * simplifier
      */
     public ApplyOnUpdate(UpdateSimplifier us) {
         super(us);
-        // The update factory does not need <code>Services</code> for what we
-        // are doing with it
-        ufac = new UpdateFactory (null, us);
     }
 
     /**
@@ -61,6 +56,8 @@ public class ApplyOnUpdate extends AbstractUpdateRule {
      * @return true if the rule can be applied on the update, target pair
      */
     public Term apply (Update update, Term target, Services services) {
+        final UpdateFactory ufac = new UpdateFactory(services, 
+                                                     updateSimplifier());
         final Update targetUpdate = Update.createUpdate ( target );
         final Update composedUpdate = ufac.sequential ( update, targetUpdate );
         final IUpdateOperator updateOp = (IUpdateOperator)target.op ();

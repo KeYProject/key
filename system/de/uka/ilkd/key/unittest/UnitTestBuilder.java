@@ -50,7 +50,7 @@ public class UnitTestBuilder{
      * implementation under test <code>p</code>.
      */
     public SetOfProgramMethod getProgramMethods(Proof p){
-	IteratorOfNode it = p.root().leavesIterator();
+	Iterator<Node> it = p.root().leavesIterator();
 	SetOfProgramMethod result = SetAsListOfProgramMethod.EMPTY_SET;
 	while(it.hasNext()){
 	    Node n = it.next();
@@ -98,7 +98,7 @@ public class UnitTestBuilder{
      * of the methods in pms. Only execution traces on branches that end with
      * one of the nodes iterated by <code>it</code> are considered.  
      */
-    private String createTestForNodes(IteratorOfNode it, 
+    private String createTestForNodes(Iterator<Node> it, 
 				      SetOfProgramMethod pms){
 	TestGenerator tg = null;
 	String methodName = null;
@@ -185,13 +185,13 @@ public class UnitTestBuilder{
      */
     public String createTestForNode(Node n){
 	ExecutionTraceModel[] tr = getTraces(n);
-	ListOfNode l = SLListOfNode.EMPTY_LIST.append(n);
-	return createTestForNodes(l.iterator(), getProgramMethods(tr));
+	return createTestForNodes(Arrays.asList(n).iterator(), getProgramMethods(tr));
     }
     
     
-    public String createTestForNodes(ListOfNode l){
-        return createTestForNodes(l.iterator(), getProgramMethods(l));
+    public String createTestForNodes(ListOfNode l){        
+        return createTestForNodes(Arrays.asList(l.toArray()).iterator(), 
+                getProgramMethods(l));
     }
 
 
@@ -241,8 +241,7 @@ public class UnitTestBuilder{
      * from the leaves of <code>p</code>'s proof tree.
      */
     public String createTestForProof(Proof p){
-	IteratorOfNode it = p.root().leavesIterator();
-	return createTestForNodes(it, getProgramMethods(p));
+	return createTestForNodes(p.root().leavesIterator(), getProgramMethods(p));
     }
 
     /**
@@ -252,8 +251,7 @@ public class UnitTestBuilder{
      * The testdata is derived from the leaves of <code>p</code>'s proof tree.
      */
     public String createTestForProof(Proof p, SetOfProgramMethod pms){
-	IteratorOfNode it = p.root().leavesIterator();
-	return createTestForNodes(it, pms);
+	return createTestForNodes(p.root().leavesIterator(), pms);
     }
 
     private ModelGenerator getModelGenerator(ExecutionTraceModel tr, Node n){

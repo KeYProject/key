@@ -131,7 +131,7 @@ public class ETNode {
     /**
      * itnodes
      * 
-     * @return
+     * @return a LinkedList with the ITNodes associated to this ETNodes
      */
     public LinkedList<ITNode> getITNodes() {
         return itNodes;
@@ -273,6 +273,7 @@ public class ETNode {
         
         final ProofStarter ps = new ProofStarter();
         ps.init(po);
+        ps.setUseDecisionProcedure(false);
         ps.getProof().setActiveStrategy(
                 (DebuggerStrategy.Factory.create(ps.getProof(),
                         "DebuggerStrategy", new StrategyProperties())));

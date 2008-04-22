@@ -28,7 +28,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
  */
 public class BoundUniquenessChecker {
 
-    private HashSet boundVars = new HashSet();
+    private HashSet<QuantifiableVariable> boundVars = new HashSet<QuantifiableVariable>();
     private ListOfTerm terms = SLListOfTerm.EMPTY_LIST;
 
     public BoundUniquenessChecker(Sequent seq) {
@@ -55,9 +55,8 @@ public class BoundUniquenessChecker {
      * @param seq the Sequent with the formulas to add
      */
     public void addAll(Sequent seq) {
-	final IteratorOfConstrainedFormula it=seq.iterator();
-	while (it.hasNext()) {
-	    terms = terms.prepend(it.next().formula());	
+	for (final ConstrainedFormula cf : seq) {
+	    terms = terms.prepend(cf.formula());	
 	}
     }
 
@@ -66,7 +65,7 @@ public class BoundUniquenessChecker {
 	/* Note that a term can bound a variable in several
 	 * subterms. 
          */
-        final HashSet localVars = new HashSet(10);
+        final HashSet<QuantifiableVariable> localVars = new HashSet<QuantifiableVariable>(10);
         
         for (int i = 0, ar = t.arity(); i<ar; i++) {
             for (int j=0, sz = t.varsBoundHere(i).size(); j<sz; j++) {
@@ -96,13 +95,12 @@ public class BoundUniquenessChecker {
      * given set of terms
      */
     public boolean correct() {
-	final IteratorOfTerm it = terms.iterator();
-	while (it.hasNext()) {	 
-	    if (!correct(it.next())) {
-		return false;
-	    }	    
-	}
-	return true;
+        for (final Term term : terms) {
+            if (!correct(term)) {       
+                return false;
+            }	        
+        }
+        return true;    
     }
 
 }

@@ -17,6 +17,7 @@ import java.util.Iterator;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -24,15 +25,15 @@ public class MaxRuleAppSlider extends JSlider {
     private static final int MAX_RULE_APPS_LOG10 = 5;
     private final static String TEXT = "Max. Rule Applications: ";
     private KeYMediator mediator;
-    private static LinkedList allInstances = new LinkedList();
+    private static LinkedList<MaxRuleAppSlider> allInstances = new LinkedList<MaxRuleAppSlider>();
 
     public MaxRuleAppSlider(KeYMediator mediator) {
-        super(JSlider.HORIZONTAL, 0, MAX_RULE_APPS_LOG10*9, 0);
+        super(SwingConstants.HORIZONTAL, 0, MAX_RULE_APPS_LOG10*9, 0);
 
         this.mediator = mediator;
         
         // set up slider labels
-        Hashtable labelTable = new Hashtable();
+        Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
 
         for ( int n = 0; n <= MAX_RULE_APPS_LOG10; n++ ) {
             int val = (int)Math.pow(10, n);
@@ -88,9 +89,9 @@ public class MaxRuleAppSlider extends JSlider {
     }
 
     private void updateAllSliders(){
-	Iterator it = allInstances.iterator();
+	Iterator<MaxRuleAppSlider> it = allInstances.iterator();
 	while(it.hasNext()){
-	    ((MaxRuleAppSlider) it.next()).refresh();
+	    it.next().refresh();
 	}
     }
 

@@ -219,7 +219,7 @@ public class Layouter {
      * Construts a newly allocated Layouter which will send output to
      * the given {@link Backend} and has the given default indentation.
      *
-     * @param backend the Backend
+     * @param back the Backend
      * @param indentation the default indentation
      *
      */

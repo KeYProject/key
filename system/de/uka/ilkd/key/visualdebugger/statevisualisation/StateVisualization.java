@@ -75,7 +75,6 @@ public class StateVisualization {
 
     public StateVisualization(ITNode itn, KeYMediator mediator, 
             int maxProofSteps, boolean useDecisionProcedures) {
-        
         this.itNode = itn;
         this.vd = VisualDebugger.getVisualDebugger();
         this.mediator = mediator;
@@ -132,7 +131,7 @@ public class StateVisualization {
                         .head().node().sequent());
             }
         }
-
+        
         vd.fireDebuggerEvent(new DebuggerEvent(DebuggerEvent.VIS_STATE, this));
     }
 
@@ -363,7 +362,6 @@ public class StateVisualization {
                 return s;
             }
         }
-
         return null;
     }
 

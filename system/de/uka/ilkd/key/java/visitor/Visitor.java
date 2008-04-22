@@ -25,6 +25,7 @@ import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramMetaConstruct;
 import de.uka.ilkd.key.rule.soundness.ProgramSVProxy;
 import de.uka.ilkd.key.rule.soundness.ProgramSVSkolem;
+import de.uka.ilkd.key.speclang.LoopInvariant;
 
 /**
  * This class is implemented by visitors/walkers.
@@ -116,6 +117,8 @@ public interface Visitor {
      void performActionOnDo(Do x); 
 
      void performActionOnFor(For x);
+     
+     void performActionOnEnhancedFor(EnhancedFor x);
 
      void performActionOnWhile(While x); 
 
@@ -155,7 +158,9 @@ public interface Visitor {
 
      void performActionOnBinaryXOrAssignment(BinaryXOrAssignment x); 
 
-     void performActionOnCopyAssignment(CopyAssignment x); 
+     void performActionOnCopyAssignment(CopyAssignment x);
+     
+     void performActionOnSetAssignment(SetAssignment x);
 
      void performActionOnDivideAssignment(DivideAssignment x);
 
@@ -303,5 +308,6 @@ public interface Visitor {
     void performActionOnProgramConstant(ProgramConstant constant);
 
     void performActionOnLocationVariable(LocationVariable variable); 
-
+    
+    void performActionOnLoopInvariant(LoopInvariant x);
 }

@@ -30,7 +30,7 @@ public class Equality extends Op {
      * generates a new equality symbol for the given target sort.
      * Don't call this, but {@link Sort#getEqualitySymbol()}. In case of
      * schemavariables without sort on both sides (e.g. two program SVs)
-     * @param targetSort - sort for which the equality symbol is generated.
+     * @param name the Name of the operator 
      */
     Equality(Name name) {
 	this(name, Sort.ANY);

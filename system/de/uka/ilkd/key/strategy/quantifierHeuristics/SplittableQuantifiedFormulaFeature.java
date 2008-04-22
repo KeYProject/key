@@ -21,7 +21,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.BinaryFeature;
 import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.util.Debug;
 
 public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
 
@@ -31,8 +30,7 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
         new SplittableQuantifiedFormulaFeature ();
     
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
-        Debug.assertFalse ( pos == null,
-                            "Feature is only applicable to rules with find" );
+        assert pos != null : "Feature is only applicable to rules with find";
 
         final Analyser analyser = new Analyser ();
         if ( !analyser.analyse ( pos.constrainedFormula ().formula () ) )

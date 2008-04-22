@@ -11,16 +11,12 @@
 
 package de.uka.ilkd.key.java.declaration;
 
-import java.util.LinkedList;
-
-import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.jml.UsefulTools;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -77,6 +73,12 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
      *      Implementing.
      */
     protected final Implements implementing;
+    
+    protected final boolean isInnerClass;
+    
+    protected final boolean isLocalClass;
+    
+    protected final boolean isAnonymousClass;
 
     /**
      *      Class declaration.     
@@ -99,7 +101,10 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
 	super(mods,name,fullName,members,
 	      parentIsInterfaceDeclaration, isLibrary);
 	this.extending    = extended;
-	this.implementing = implemented;	
+	this.implementing = implemented;
+	this.isInnerClass = false;
+	this.isAnonymousClass = false;
+	this.isLocalClass =false;
     }
 
     /**
@@ -117,10 +122,19 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
      * specifications)      
      */
     public ClassDeclaration(ExtList children, ProgramElementName fullName, 
-			    boolean isLibrary) { 
+			    boolean isLibrary, boolean innerClass, boolean anonymousClass,
+			    boolean localClass) { 
 	super(children, fullName, isLibrary);
 	extending=(Extends)children.get(Extends.class);
 	implementing=(Implements)children.get(Implements.class);
+	this.isInnerClass = innerClass;
+	this.isAnonymousClass = anonymousClass;
+	this.isLocalClass =localClass;
+    } 
+    
+    public ClassDeclaration(ExtList children, ProgramElementName fullName, 
+            boolean isLibrary) { 
+        this(children, fullName, isLibrary, false, false, false);
     } 
 
 
@@ -215,6 +229,18 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     public boolean isTransient() {
         return false;
     }
+    
+    public boolean isInnerClass(){
+        return isInnerClass;
+    }
+    
+    public boolean isAnonymousClass(){
+        return isAnonymousClass;
+    }
+    
+    public boolean isLocalClass(){
+        return isLocalClass;
+    }
 
     /**
      * Classes are never volatile.
@@ -245,43 +271,6 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
 	}
 	return types;
     }
-
-    /**
-     * returns the comments belonging to this ClassDeclaration + Comments 
-     * declared in the body of the class that contain jml invariant or 
-     * constraint statements.  
-     * @return the comments.
-     */
-    public Comment[] getComments(){
-	
-        final Comment[] c1 = super.getComments();
-        assert c1 != null;
-        
-	LinkedList jmlComments = new LinkedList();
-	//HACK: RECODER interprets comments, that are intended to be refering
-	// to the class, as comments belonging to fields or methods. 
-	for(int i=0, cc = getChildCount(); i<cc; i++){
-	    ProgramElement p = getChildAt(i);
-	    Comment[] c2 = p.getComments();
-	    if(c2!=null){
-		for(int j=0; j<c2.length; j++){
-		    if(UsefulTools.isClassSpec(c2[j]) || 
-		       (p instanceof Modifier)){
-			jmlComments.add(c2[j]);
-		    } 
-		}
-	    }
-	}
-	final Comment[] c2 = new Comment[c1.length + jmlComments.size()];
-        System.arraycopy(c1, 0, c2, 0, c1.length);
-       
-	for(int i=c1.length; i<c2.length; i++){
-	    c2[i] = (Comment)jmlComments.removeFirst();
-	}
-	return c2;
-    }
-
-
 
     /** calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element

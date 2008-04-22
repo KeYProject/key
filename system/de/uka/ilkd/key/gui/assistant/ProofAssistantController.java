@@ -18,7 +18,6 @@ package de.uka.ilkd.key.gui.assistant;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.*;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -329,7 +328,7 @@ public class ProofAssistantController {
      */
     private abstract class AIContainerListener implements ContainerListener {
 
-	private List components = new LinkedList();
+	private List<Component> components = new LinkedList<Component>();
 
 	public abstract void register(Component c);
 	public abstract void unregister(Component c);
@@ -373,9 +372,8 @@ public class ProofAssistantController {
 	 */
 	public void registerAll() {
 	    synchronized(components) {
- 		Iterator it = components.iterator();
-		while (it.hasNext()) {
-		    register((Component)it.next());
+                for (final Component c : components) {
+		    register(c);
 		}
 	    }
 	}
@@ -386,9 +384,8 @@ public class ProofAssistantController {
 	 */
 	public void unregisterAll() {
 	    synchronized(components) {
- 		Iterator it = components.iterator();
-		while (it.hasNext()) {
-		    unregister((Component)it.next());
+                for (final Component c : components) {
+		    unregister(c);
 		}
 	    }
 	}

@@ -10,7 +10,6 @@
 package de.uka.ilkd.key.gui.configuration;
 
 import java.util.*;
-import java.util.Map.Entry;
 
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.logic.*;
@@ -19,25 +18,25 @@ public class ChoiceSettings implements Settings {
 
     private static final String DEFAULTCHOICES_KEY = "[Choice]DefaultChoices";
     private static final String CHOICES_KEY = "[Choice]Choices";
-    private LinkedList listenerList = new LinkedList();
-    private HashMap category2Default;
+    private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
+    private HashMap<String,String> category2Default;
     /** maps categories to a set of Strings(representing the choices
      * which are options for this category).*/
-    private HashMap category2Choices=new HashMap();
+    private HashMap<String, Set<String>> category2Choices=new HashMap<String, Set<String>>();
 
 
     public ChoiceSettings() {
-	category2Default = new HashMap();
+	category2Default = new HashMap<String, String>();
     }
 
-    public ChoiceSettings(HashMap category2Default){
+    public ChoiceSettings(HashMap<String, String> category2Default){
 	this.category2Default = category2Default;
     }
 
-    public void setDefaultChoices(HashMap category2Default){
-	HashMap category2Defaultold = this.category2Default;
+    public void setDefaultChoices(HashMap<String, String> category2Default){
+	HashMap<String, String> category2Defaultold = this.category2Default;
 	this.category2Default = category2Default;
-	if(category2Defaultold!=null && 
+	if(category2Defaultold != null && 
 	   !category2Defaultold.equals(category2Default)){
 	    fireSettingsChanged();
 	}
@@ -45,15 +44,15 @@ public class ChoiceSettings implements Settings {
 
     /** returns a copy of the HashMap that maps categories to 
      * their choices. */ 
-    public HashMap getChoices(){
-        return (HashMap) category2Choices.clone();
+    public HashMap<String, Set<String>> getChoices(){
+        return (HashMap<String, Set<String>>) category2Choices.clone();
     }
 
     
     /** returns a copy of the HashMap that maps categories to 
      * their default choices. */ 
-    public HashMap getDefaultChoices(){
-	return (HashMap) category2Default.clone();
+    public HashMap<String,String> getDefaultChoices(){
+	return (HashMap<String,String>) category2Default.clone();
     }
     /** 
      * returns the current selected choices as set    
@@ -62,14 +61,11 @@ public class ChoiceSettings implements Settings {
         return choiceMap2choiceSet(category2Default);   
     }
 
-    private SetOfChoice choiceMap2choiceSet(HashMap ccc) {
-        final Iterator choiceIter = ccc.entrySet().iterator();
+    private SetOfChoice choiceMap2choiceSet(HashMap<String, String> ccc) {
         SetOfChoice choices = SetAsListOfChoice.EMPTY_SET;        
-        while (choiceIter.hasNext()) {
-            final Map.Entry entry = (Entry) choiceIter.next();
+        for (final Map.Entry<String,String> entry : ccc.entrySet()) {
             choices = choices.
-              add(new Choice(new Name(entry.getValue().toString()), 
-                    entry.getKey().toString()));
+              add(new Choice(new Name(entry.getValue()), entry.getKey()));
         }
         return choices;
     }
@@ -80,17 +76,17 @@ public class ChoiceSettings implements Settings {
      * @param remove remove entries not present in <code>choiceNS</code> */
     public void updateChoices(Namespace choiceNS, boolean remove){
 	IteratorOfNamed it = choiceNS.allElements().iterator();
-	HashMap c2C = new HashMap();
+	HashMap<String,Set<String>> c2C = new HashMap<String, Set<String>>();
 	Choice c;
-	Set soc;
+	Set<String> soc;
 	while(it.hasNext()){
 	    c=(Choice)it.next();
 	    if(c2C.containsKey(c.category())){
-		soc=(Set) c2C.get(c.category().toString());
+		soc=c2C.get(c.category().toString());
 		soc.add(c.name().toString());
 		c2C.put(c.category(),soc);
 	    }else{
-		soc = new HashSet();
+		soc = new HashSet<String>();
 		soc.add(c.name().toString());
 		c2C.put(c.category(),soc);
 	    }
@@ -104,13 +100,11 @@ public class ChoiceSettings implements Settings {
 		ProofSettings.DEFAULT_SETTINGS.saveSettings();
 	    }
 	}
-	Iterator catIt = getDefaultChoices().keySet().iterator();
-	while(catIt.hasNext()){
-	    String s = (String) catIt.next();
+	for (final String s : getDefaultChoices().keySet()) {
 	    if(category2Choices.containsKey(s)){
-		if(!((Set)category2Choices.get(s)).
+		if(!category2Choices.get(s).
 		   contains(category2Default.get(s))){
-		    category2Default.put(s,((Set)category2Choices.get(s)).
+		    category2Default.put(s,category2Choices.get(s).
 					 iterator().next());
 		    fireSettingsChanged();
 		}
@@ -126,10 +120,10 @@ public class ChoiceSettings implements Settings {
      * changed to its registered listeners (not thread-safe)
      */
     protected void fireSettingsChanged() {
-	Iterator it = listenerList.iterator();
+	Iterator<SettingsListener> it = listenerList.iterator();
 	ProofSettings.DEFAULT_SETTINGS.saveSettings();
 	while (it.hasNext()) {
-	    ((SettingsListener)it.next()).settingsChanged(new GUIEvent(this));
+	    it.next().settingsChanged(new GUIEvent(this));
 	}
     }
 
@@ -158,7 +152,7 @@ public class ChoiceSettings implements Settings {
 		StringTokenizer st2 = new StringTokenizer(
 				       st.nextToken().trim(), "-");
 		String category = st2.nextToken().trim();
-		Set soc = new HashSet();
+		Set<String> soc = new HashSet<String>();
 		while(st2.hasMoreTokens()){
 		    soc.add(st2.nextToken().trim());
 		}
@@ -174,39 +168,31 @@ public class ChoiceSettings implements Settings {
      * settings as (key, value) pair
      */
     public void writeSettings(Properties props) {
-	Map.Entry entry;
 	String choiceSequence = "";
-	Iterator it = category2Default.entrySet().iterator();
-	while(it.hasNext()) {
-	    entry = (Map.Entry)it.next();
+	for (final Map.Entry<String, String> entry : category2Default.entrySet()){
+	    if (choiceSequence.length() > 0) {
+	        choiceSequence += " , ";
+	    }
 	    choiceSequence += entry.getKey().toString()+"-"+
 		entry.getValue().toString();
-	    if(it.hasNext()){
-		choiceSequence += " , ";
-	    }
 	}
 	props.setProperty(DEFAULTCHOICES_KEY, choiceSequence);
 	choiceSequence = "";
-	it = category2Choices.keySet().iterator();
-	while(it.hasNext()){
-	    String cat = (String)it.next();
-	    Set soc = (Set)category2Choices.get(cat);
-	    choiceSequence += cat;
-	    Iterator it2 = soc.iterator();
-	    while(it2.hasNext()){
-		choiceSequence += "-"+it2.next().toString();
+	for (final String cat : category2Choices.keySet()) {
+	    if (choiceSequence.length() > 0) {
+	        choiceSequence += " , ";
 	    }
-	    if(it.hasNext()){
-		choiceSequence += " , ";
+	    Set<String> soc = category2Choices.get(cat);
+	    choiceSequence += cat;
+	    for (final String choice : soc) {
+		choiceSequence += "-"+choice.toString();
 	    }
 	}
 	props.setProperty(CHOICES_KEY, choiceSequence);	
     }
     
     public ChoiceSettings updateWith(SetOfChoice sc) {
-        IteratorOfChoice it = sc.iterator();
-        while (it.hasNext()) {
-            Choice c = it.next();
+        for (final Choice c : sc) {
             if (category2Default.containsKey(c.category())) {
                 category2Default.remove(c.category());
             }
@@ -214,8 +200,6 @@ public class ChoiceSettings implements Settings {
         }
         return this;
     }
-    
-
 
     /** adds a listener to the settings object 
      * @param l the listener

@@ -43,6 +43,7 @@ public class InstantiationCost implements Feature {
         final Term formula = pos.constrainedFormula ().formula ();
         final Term instance = varInst.toTerm ( app, pos, goal );
 
-        return Instantiation.computeCost ( instance, formula, goal.sequent () );
+        return Instantiation.computeCost ( instance, formula, goal.sequent (), 
+                goal.proof().getServices() );
 	}
 }

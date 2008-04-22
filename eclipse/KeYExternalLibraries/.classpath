@@ -6,7 +6,7 @@
 	<classpathentry exported="true" kind="lib" path="javacc.jar"/>
 	<classpathentry exported="true" kind="lib" path="junit.jar"/>
 	<classpathentry exported="true" kind="lib" path="log4j.jar"/>
-	<classpathentry exported="true" kind="lib" path="recoder.jar"/>
+	<classpathentry exported="true" kind="lib" path="recoderKey.jar"/>
 	<classpathentry exported="true" kind="lib" path="xerces.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>

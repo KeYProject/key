@@ -25,22 +25,23 @@ public class FormulaTagManager {
     /** Maps for the assignment of tags to formulas and vice versa */
     
     /** Key: FormulaTag        Value: FormulaInfo */
-    private final HashMap tagToFormulaInfo;
+    private final HashMap<FormulaTag, FormulaInfo> tagToFormulaInfo;
 
     /** Key: PosInOccurrence   Value: FormulaTag */
-    private final HashMap pioToTag;
+    private final HashMap<PosInOccurrence, FormulaTag> pioToTag;
 
     /**
      * Create a new manager that is initialised with the formulas of the given
      * sequent
      */
     FormulaTagManager ( Goal p_goal ) {
-	tagToFormulaInfo = new HashMap ();
-	pioToTag = new HashMap ();
+	tagToFormulaInfo = new HashMap<FormulaTag, FormulaInfo> ();
+	pioToTag = new HashMap<PosInOccurrence, FormulaTag> ();
 	createNewTags ( p_goal );
     }
 
-    private FormulaTagManager ( HashMap p_tagToPIO, HashMap p_pioToTag ) {
+    private FormulaTagManager ( HashMap<FormulaTag, FormulaInfo> p_tagToPIO, 
+            HashMap<PosInOccurrence, FormulaTag> p_pioToTag ) {
     	tagToFormulaInfo = p_tagToPIO;
     	pioToTag = p_pioToTag;
     }
@@ -49,7 +50,7 @@ public class FormulaTagManager {
      * @return the tag of the formula at the given position
      */
     public FormulaTag getTagForPos ( PosInOccurrence p_pio ) {
-	return (FormulaTag)pioToTag.get(p_pio);
+	return pioToTag.get(p_pio);
     }
 
     /**
@@ -125,9 +126,11 @@ public class FormulaTagManager {
     }
 
 
+    @SuppressWarnings("unchecked")
     public Object clone () {
     	return new FormulaTagManager
-    	    ( (HashMap)tagToFormulaInfo.clone(), (HashMap)pioToTag.clone() );
+    	    ( (HashMap<FormulaTag, FormulaInfo>)tagToFormulaInfo.clone(), 
+    	            (HashMap<PosInOccurrence, FormulaTag>)pioToTag.clone() );
     }
 
     public FormulaTagManager copy () {
@@ -217,7 +220,7 @@ public class FormulaTagManager {
     
     private FormulaInfo getFormulaInfo(FormulaTag p_tag) {
         if ( lastTagQueried != p_tag )
-            putInQueryCache ( p_tag, (FormulaInfo)tagToFormulaInfo.get ( p_tag ) );
+            putInQueryCache ( p_tag, tagToFormulaInfo.get ( p_tag ) );
         return lastQueryResult;
     }
 

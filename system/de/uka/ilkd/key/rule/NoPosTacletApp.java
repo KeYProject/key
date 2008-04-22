@@ -17,7 +17,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.proof.mgt.Contractable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -35,7 +34,7 @@ import de.uka.ilkd.key.util.Debug;
  * </li> </ul>
  * 
  */
-public class NoPosTacletApp extends TacletApp implements Contractable {
+public class NoPosTacletApp extends TacletApp {
 
     /** creates a NoPosTacletApp for the given taclet and no instantiation
      * information and CHECKS variable conditions as well as it resolves
@@ -473,9 +472,5 @@ public class NoPosTacletApp extends TacletApp implements Contractable {
     
     public int hashCode() {
     	return super.hashCode();
-    }
-    
-    public boolean equalContractable(Contractable c) {
-    	return equals(c);
-    }
+    }    
 }

@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 import javax.swing.ProgressMonitor;
 
 import de.uka.ilkd.key.casetool.UMLOCLModel;
-import de.uka.ilkd.key.proof.mgt.JavaModelMethod;
+import de.uka.ilkd.key.casetool.together.TogetherModelMethod;
 
 /** 
  * control object interfacing KeY with GF.
@@ -56,6 +56,7 @@ public abstract class GFinterface {
          * path to the Together project, get's written in subclass 
          */
         protected String projectRoot;
+        
         
         /**
          * Creates a new temporary directory and copies the grammars
@@ -318,9 +319,9 @@ public abstract class GFinterface {
                 String newName = colonNotation.replaceAll("Sequence \\((.*)\\)","Sequence_$1");
                 if (newName.indexOf("::") == -1) {
                         if (logger.isLoggable(Level.FINER)) {
-                                logger.finer("transformTypeJava2OCL :" + JavaModelMethod.transformTypeJava2OCL(colonNotation));
+                                logger.finer("transformTypeJava2OCL :" + TogetherModelMethod.transformTypeJava2OCL(colonNotation));
                         }
-                        if (colonNotation != JavaModelMethod.transformTypeJava2OCL(colonNotation)) {
+                        if (colonNotation != TogetherModelMethod.transformTypeJava2OCL(colonNotation)) {
                                 newName = "NOPACKAGEP_" + newName; 
                         }
                         newName =  newName + "C";

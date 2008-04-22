@@ -9,10 +9,12 @@
 //
 package de.uka.ilkd.key.proof.init;
 
+import java.util.Iterator;
+
 import de.uka.ilkd.key.casetool.ModelClass;
 import de.uka.ilkd.key.casetool.ModelManager;
 import de.uka.ilkd.key.java.Recoder2KeY;
-import de.uka.ilkd.key.logic.IteratorOfNamed;
+import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -78,7 +80,7 @@ public abstract class OCLProofOblInput implements ProofOblInput {
         String s;
         s = "\\javaSource \""+javaPath+"\";\n\n";
 
-        IteratorOfNamed it;
+        Iterator<Named> it;
 
 /* program sorts need not be declared and 
  * there are no user-defined sorts with this kind of PO (yes?)

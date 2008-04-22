@@ -20,8 +20,6 @@ import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.UseMethodContractRuleItem;
-import de.uka.ilkd.key.gui.nodeviews.*;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IteratorOfSchemaVariable;
@@ -156,14 +154,7 @@ class TacletMenu extends JMenu {
     private void addBuiltInRuleItem(BuiltInRule builtInRule,
 				    MenuControl control) {
         JMenuItem item;
-        if (builtInRule instanceof UseMethodContractRule) {
-            item = new UseMethodContractRuleItem(mediator.mainFrame(),
-                                                 (UseMethodContractRule)builtInRule,
-                                                 mediator.getSelectedProof(), 
-                                                 pos.getPosInOccurrence());           
-        } else {
-            item = new DefaultBuiltInRuleMenuItem(builtInRule);                       
-        }
+        item = new DefaultBuiltInRuleMenuItem(builtInRule);                       
         item.addActionListener(control);
         add(item);
     }
@@ -179,18 +170,17 @@ class TacletMenu extends JMenu {
 
     private ListOfTacletApp sort(ListOfTacletApp finds) {
 	ListOfTacletApp result = SLListOfTacletApp.EMPTY_LIST;
-	List list = new ArrayList(finds.size());
+	
+	List<TacletApp> list = new ArrayList<TacletApp>(finds.size());
 
-	IteratorOfTacletApp it = finds.iterator();
-	while (it.hasNext()) {
-	    list.add(it.next());
+	for (final TacletApp app : finds) {
+	    list.add(app);
 	}
 
 	Collections.sort(list, comp);
 
-	Iterator it2 = list.iterator();
-	while (it2.hasNext()) {
-	    result = result.prepend((TacletApp)it2.next());
+	for (final TacletApp app : list) {
+	    result = result.prepend(app);
 	}
 
 	return result;
@@ -283,7 +273,7 @@ class TacletMenu extends JMenu {
      */
     private TacletMenuItem[] createMenuItems(ListOfTacletApp taclets, 
 					     MenuControl  control) {
-	List items = new LinkedList();
+	List<TacletMenuItem> items = new LinkedList<TacletMenuItem>();
 	IteratorOfTacletApp it = taclets.iterator();
 	
         final InsertHiddenTacletMenuItem insHiddenItem = 
@@ -322,8 +312,7 @@ class TacletMenu extends JMenu {
             insSystemInvItem.addActionListener(control);
         }
         
-	return (TacletMenuItem[])
-            items.toArray(new TacletMenuItem[items.size()]);
+	return items.toArray(new TacletMenuItem[items.size()]);
     }
         
     /** makes submenus invisible */
@@ -353,9 +342,6 @@ class TacletMenu extends JMenu {
 		((SequentView)(getPopupMenu().getInvoker()))
 		    .selectedTaclet(((TacletMenuItem) e.getSource()).connectedTo(), 
 				    pos);
-            } else if (e.getSource() instanceof UseMethodContractRuleItem) {
-                mediator.selectedUseMethodContractRule
-                    (((UseMethodContractRuleItem) e.getSource()).getRuleApp());   
             } else if (e.getSource() instanceof BuiltInRuleMenuItem) {
                         mediator.selectedBuiltInRule
                     (((BuiltInRuleMenuItem) e.getSource()).connectedTo(), 
@@ -484,7 +470,7 @@ class TacletMenu extends JMenu {
     }
     
     
-    static class TacletAppComparator implements Comparator {
+    static class TacletAppComparator implements Comparator<TacletApp> {
 
 	private int countFormulaSV(TacletSchemaVariableCollector c) {
 	    int formulaSV = 0;
@@ -546,33 +532,48 @@ class TacletMenu extends JMenu {
 		}.getCounter();
 	}
 	
-	public int compare(Object o1, Object o2) {
-	    FindTaclet taclet1 = (FindTaclet)(((TacletApp)o1).taclet());
-	    FindTaclet taclet2 = (FindTaclet)(((TacletApp)o2).taclet());
-		    
-	    int findComplexity1 = taclet1.find().depth();
-	    int findComplexity2 = taclet2.find().depth();
-	    findComplexity1 += programComplexity(taclet1.find().javaBlock());
-	    findComplexity2 += programComplexity(taclet2.find().javaBlock());
-	
-	    if ( findComplexity1 < findComplexity2 ) {
-		return -1;
-	    } else if (findComplexity1 > findComplexity2) {
-		return 1;
-	    }		    		    		    
-	
-	    // depth are equal. Number of schemavariables decides
-	    TacletSchemaVariableCollector coll1 = new TacletSchemaVariableCollector();
-	    taclet1.find().execPostOrder(coll1);
-	    int formulaSV1 = countFormulaSV(coll1);
-		    
-	    TacletSchemaVariableCollector coll2  = new TacletSchemaVariableCollector();
-	    taclet2.find().execPostOrder(coll2);
-	    int formulaSV2 = countFormulaSV(coll2);
-	
-	    int cmpVar1 = -coll1.size()+taclet1.getRuleSets().size();
-	    int cmpVar2 = -coll2.size()+taclet2.getRuleSets().size();
-		    
+	public int compare(TacletApp o1, TacletApp o2) {
+	    final Taclet taclet1 = o1.taclet();
+	    final Taclet taclet2 = o2.taclet();
+		
+            int formulaSV1 = 0;
+            int formulaSV2 = 0;
+
+            int cmpVar1 = taclet1.getRuleSets().size();
+            int cmpVar2 = taclet2.getRuleSets().size();
+
+	    if (taclet1 instanceof FindTaclet && taclet2 instanceof FindTaclet) {
+	        final Term find1 = ((FindTaclet) taclet1).find();
+	        int findComplexity1 = find1.depth();
+	        final Term find2 = ((FindTaclet) taclet2).find();
+	        int findComplexity2 = find2.depth();
+	        findComplexity1 += programComplexity(find1.javaBlock());
+	        findComplexity2 += programComplexity(find2.javaBlock());
+
+	        if ( findComplexity1 < findComplexity2 ) {
+	            return -1;
+	        } else if (findComplexity1 > findComplexity2) {
+	            return 1;
+	        }		    		    		    
+	        // depth are equal. Number of schemavariables decides
+	        TacletSchemaVariableCollector coll1 = new TacletSchemaVariableCollector();
+	        find1.execPostOrder(coll1);
+	        formulaSV1 = countFormulaSV(coll1);
+
+	        TacletSchemaVariableCollector coll2  = new TacletSchemaVariableCollector();
+	        find2.execPostOrder(coll2);
+	        formulaSV2 = countFormulaSV(coll2);
+	        cmpVar1 += -coll1.size();
+	        cmpVar2 += -coll2.size();
+
+	    } else if (taclet1 instanceof FindTaclet != taclet2 instanceof FindTaclet) {
+	        if (taclet1 instanceof FindTaclet) {
+	            return -1;
+	        } else {
+	            return 1;
+	        }
+	    }
+
 	    if (cmpVar1 == cmpVar2) {
 		cmpVar1 = cmpVar1-formulaSV1;
 		cmpVar2 = cmpVar2-formulaSV2;
@@ -608,7 +609,5 @@ class TacletMenu extends JMenu {
 	
 	    return 0;
 	}
-	
     }
-    
 }

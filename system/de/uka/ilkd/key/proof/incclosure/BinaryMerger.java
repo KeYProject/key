@@ -90,7 +90,7 @@ public class BinaryMerger implements Merger {
 	/**
 	 * Add a constraint for which something (a goal or a subtree of
 	 * the proof) can be closed
-	 * @return a constraint representing the intersection of all
+	 * computes a constraint representing the intersection of all
 	 * constraints that have been pushed until now (including "p_c")
 	 */
 	public void       put                ( Constraint p_c ) {

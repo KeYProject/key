@@ -15,18 +15,27 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.List;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.CompilationUnit;
 import recoder.java.Identifier;
+import recoder.java.Statement;
 import recoder.java.StatementBlock;
 import recoder.java.declaration.ClassDeclaration;
 import recoder.java.declaration.MethodDeclaration;
+import recoder.java.declaration.DeclarationSpecifier;
 import recoder.java.declaration.ParameterDeclaration;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.java.declaration.modifier.Public;
-import recoder.java.reference.*;
+import recoder.java.reference.FieldReference;
+import recoder.java.reference.PackageReference;
+import recoder.java.reference.ReferencePrefix;
+import recoder.java.reference.TypeReference;
+import recoder.java.reference.VariableReference;
 import recoder.java.statement.Return;
-import recoder.list.*;
+import recoder.list.generic.ASTArrayList;
+import recoder.list.generic.ASTList;
 
 /**
  */
@@ -42,8 +51,8 @@ public class JVMIsTransientMethodBuilder extends RecoderModelTransformer {
 
     public JVMIsTransientMethodBuilder
 	(CrossReferenceServiceConfiguration services, 
-	 CompilationUnitMutableList units) {	
-	super(services, units);
+	 TransformerCache cache) {	
+	super(services, cache);
     }
 
     private ReferencePrefix createJavaLangPrefix() {
@@ -64,7 +73,7 @@ public class JVMIsTransientMethodBuilder extends RecoderModelTransformer {
 			       new Identifier("Object")), 
 	     new Identifier("obj"));
 
-	StatementMutableList body = new StatementArrayList(2);
+	ASTList<Statement> body = new ASTArrayList<Statement>(2);
 	
 	body.add(new Return
 		 (new FieldReference
@@ -72,11 +81,11 @@ public class JVMIsTransientMethodBuilder extends RecoderModelTransformer {
 		   new ImplicitIdentifier
 		   (ImplicitFieldAdder.IMPLICIT_TRANSIENT))));
 
-	ModifierMutableList modifiers = new ModifierArrayList(2);
+	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(2);
 	modifiers.add(new Public());
 
-	ParameterDeclarationMutableList params = 
-	    new ParameterDeclarationArrayList(1);
+	ASTList<ParameterDeclaration> params = 
+	    new ASTArrayList<ParameterDeclaration>(1);
 	params.add(paramDecl);
 
 	MethodDeclaration md = new MethodDeclaration

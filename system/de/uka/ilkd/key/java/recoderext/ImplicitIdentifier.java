@@ -37,7 +37,7 @@ public class ImplicitIdentifier extends Identifier {
      * @return the object.
      */
     
-    public Object deepClone() {
+    public ImplicitIdentifier deepClone() {
         return new ImplicitIdentifier(id);
     }
     

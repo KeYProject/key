@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.logic;
 
+import java.util.Iterator;
+
 import de.uka.ilkd.key.logic.ldt.AbstractIntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -173,7 +175,7 @@ public class NameTermOrdering implements TermOrdering {
      */
     private int compareVars ( DepthCollector p_depthsA,
 			      DepthCollector p_depthsB ) {
-	IteratorOfOperator it  = p_depthsA.getVariables ();
+	Iterator<Operator> it  = p_depthsA.getVariables ();
 
 	while ( it.hasNext () ) {
 	    if ( p_depthsB.getMaxDepth ( it.next () ) == -1 )

@@ -71,7 +71,7 @@ public final class PredicateFormula extends Formula {
      *                                  (QF_)AUFLIA or if the specified argument <tt>Term</tt>s
      *                                  don't match the predicate arity
      *
-     * @see de.uka.ilkd.key.logic.op.DecisionProcedureSmtAufliaOp                                 
+     * @see de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAufliaOp                                   
      */
     public PredicateFormula( String op, Term[] subTerms ) {
         super( op, null, subTerms );

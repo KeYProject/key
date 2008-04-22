@@ -55,7 +55,7 @@ public class TacletPORule implements BuiltInRule {
 	    goal.ruleAppIndex ().tacletIndex ();
 
 	POSelectionDialog dialog = new POSelectionDialog 
-	    (Main.getInstance().mediator(),
+	    (Main.hasInstance() ? Main.getInstance().mediator().mainFrame() : null,
 	     tacletIndex.allNoPosTacletApps());
 			    	
     	NoPosTacletApp app = dialog.getSelectedTaclets()[0]; 
@@ -105,7 +105,8 @@ public class TacletPORule implements BuiltInRule {
 		app = it.next ();
 		p_goal.addTaclet ( app.taclet         (),
 				   app.instantiations (),
-				   app.constraint     () );
+				   app.constraint     (),
+                                   false);
 	    }
 	}
     }

@@ -237,6 +237,7 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
     
 
     private void refreshPCStates() {
+
         prestateForTracesSlider.setMinimum(0);
         if (stateVis != null) {
             prestateForTracesSlider.setMaximum(stateVis.numberOfPCStates());
@@ -252,13 +253,20 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
             postButton.setEnabled(true);
             preState=true;
             possibleIndexTerms= stateVis.getPossibleIndexTermsForPcState(0);
-            if (possibleIndexTerms.length>0)
+           if (possibleIndexTerms.length>0) {
                 currentState = stateVis.getSymbolicState(0,possibleIndexTerms[0],true);
+           }
             else throw new RuntimeException("No States to visualize");
             arrayIndexSlider.setMaximum(possibleIndexTerms.length);            
             arrayIndexSlider.setSelection(0);
             arrayIndexSlider.setEnabled(true);
-            refreshVisualizedState();
+
+            try {
+                refreshVisualizedState();
+            } catch (RuntimeException re) {
+                re.printStackTrace();
+                System.out.println(re.getMessage());
+            }
         }else{
             prestateForTracesSlider.setEnabled(false);
             prestateForTracesSlider.setMaximum(1);
@@ -398,9 +406,7 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
     }
 
     static void buildNodeFigure(Figure contents, Node node, ObjectFigure of) {
-
-        contents
-                .add(of, new Rectangle(node.x, node.y, node.width, node.height));
+        contents.add(of, new Rectangle(node.x, node.y, node.width, node.height));
         new Dragger(of);
     }
 
@@ -674,6 +680,9 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
     static class Dragger extends MouseMotionListener.Stub implements
             MouseListener {
         public Dragger(IFigure figure) {
+            figure.removeMouseMotionListener(this);
+            figure.removeMouseListener(this);                
+            
             figure.addMouseMotionListener(this);
             figure.addMouseListener(this);
         }

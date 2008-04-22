@@ -19,11 +19,6 @@ import com.togethersoft.openapi.rwi.*;
 import de.uka.ilkd.key.casetool.ModelClass;
 import de.uka.ilkd.key.casetool.ModelMethod;
 import de.uka.ilkd.key.casetool.UMLModelClass;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.proof.mgt.Contractable;
-import de.uka.ilkd.key.proof.mgt.JavaModelMethod;
-import de.uka.ilkd.key.speclang.*;
-import de.uka.ilkd.key.speclang.ocl.OCLOperationContract;
 
 /** represents a method of the Together model. It is backed by the
  * corresponding Together RWI model element, but it is independent in
@@ -386,7 +381,23 @@ public class TogetherModelMethod extends TogetherReprModel
     }
 
     public static String transformTypeJava2OCL(String aJavaType){
-	return JavaModelMethod.transformTypeJava2OCL(aJavaType);
+        if ("int".equals(aJavaType) || 
+            "byte".equals(aJavaType) ||
+            "char".equals(aJavaType) ||
+            "short".equals(aJavaType) ||
+            "long".equals(aJavaType)){
+            return "Integer";
+        }
+        else if ("boolean".equals(aJavaType)) {return "Boolean";}
+        else if (aJavaType.endsWith("[]")) {
+            String base = transformTypeJava2OCL(aJavaType.substring
+                                                (0,aJavaType.length()-2));
+            return "KeYArrayOf"+base;
+
+        }
+        else {
+            return aJavaType;
+        }
     }
 
 
@@ -583,34 +594,5 @@ public class TogetherModelMethod extends TogetherReprModel
 
     public int hashCode() {
 	return hash==0 ? (hash=toString().hashCode()) : hash;
-    }
-
-    public ListOfOperationContract getMyOperationContracts() {
-        ListOfOperationContract result = SLListOfOperationContract.EMPTY_LIST;
-        
-        String myPre      = getMyPreCond();
-        String myPost     = getMyPostCond();
-        String myModifies = getMyModifClause();
-        if(!myPre.equals("") || !myPost.equals("") || !myModifies.equals("")) {
-            OperationContract contract = new OCLOperationContract(this,
-        	    						  true,
-                                                                  myPre, 
-                                                                  myPost,
-                                                                  myModifies);
-            result = result.append(contract);
-        } else {
-	    OperationContract defaultContract = new OCLOperationContract(this, 
-									 true, 
-									 "true", 
-									 "true", 
-									 "");
-	    result = result.append(defaultContract);
-        }
-        
-        return result;
-    }
-    
-    public boolean equalContractable(Contractable c) {
-    	return equals(c);
-    }
+    }    
 }

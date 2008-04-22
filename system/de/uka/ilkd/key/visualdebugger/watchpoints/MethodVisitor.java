@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
@@ -36,9 +37,11 @@ public class MethodVisitor extends JavaASTVisitor {
      * 
      * @param root
      *                the method which is the root of the AST that is to be visited
+     * @param services
+     *                the Services
      */
-    public MethodVisitor(ProgramElement root) {
-        super(root);
+    public MethodVisitor(ProgramElement root, Services services) {
+        super(root, services);
     }
 
     /**

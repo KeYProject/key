@@ -91,8 +91,8 @@ public class ExpressionSVWrapper extends Literal implements Expression,
     public void accept(SourceVisitor v) {
     }
     
-    public Object deepClone() {
-	return new StatementSVWrapper(sv);
+    public ExpressionSVWrapper deepClone() {
+	return new ExpressionSVWrapper(sv);
     }
 
     /**
@@ -123,4 +123,9 @@ public class ExpressionSVWrapper extends Literal implements Expression,
     public void setReferenceSuffix(ReferenceSuffix path) {
 	suff=path;
     }
+
+	@Override
+	public Object getEquivalentJavaType() {
+		throw new Error("mulbrich: what to do here?!");
+	}
 }

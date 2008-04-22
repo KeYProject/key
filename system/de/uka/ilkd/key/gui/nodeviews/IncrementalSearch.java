@@ -11,7 +11,7 @@ import java.util.regex.PatternSyntaxException;
 
 import javax.swing.JComponent;
 
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.pp.Range;
 
 /**
@@ -31,7 +31,7 @@ public class IncrementalSearch implements KeyListener, FocusListener {
 
     private SequentView seqView;
 
-    private Main        main;
+    private IMain        main;
 
     /**
      * create and initialize a new incremental search run
@@ -49,8 +49,8 @@ public class IncrementalSearch implements KeyListener, FocusListener {
 
         init();
 
-        if (seqView.mediator().mainFrame() instanceof Main) {
-            main = (Main) seqView.mediator().mainFrame();
+        if (seqView.mediator().mainFrame() instanceof IMain) {
+            main = (IMain) seqView.mediator().mainFrame();
         }
 
         printStatus("Search: " + searchStr);

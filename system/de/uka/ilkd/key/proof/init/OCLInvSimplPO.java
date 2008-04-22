@@ -39,8 +39,6 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.RuleSource;
-import de.uka.ilkd.key.proof.mgt.Contract;
-import de.uka.ilkd.key.proof.mgt.Contractable;
 
 /** 
  * Used for OCL Simplification.
@@ -92,13 +90,6 @@ public class OCLInvSimplPO extends OCLProofOblInput
 	proofObl = po;
     }
 
-    public boolean initContract(Contract contract) {
-        return false; // was true, but this seemed to be strange /AR
-    }
-
-    public Contractable[] getObjectOfContract() {
-	return new Contractable[0];
-    }
 
     public ModelClass getModelClass() {
 	return aClass;

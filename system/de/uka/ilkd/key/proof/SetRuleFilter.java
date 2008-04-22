@@ -30,7 +30,7 @@ import de.uka.ilkd.key.rule.Rule;
  */
 public class SetRuleFilter implements RuleFilter {
 
-    private HashSet set = new HashSet ();
+    private HashSet<Rule> set = new HashSet<Rule> ();
 
     public void addRuleToSet ( Rule rule ) {
     	set.add(rule);

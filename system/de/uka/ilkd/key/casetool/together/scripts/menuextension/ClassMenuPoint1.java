@@ -12,15 +12,18 @@
 
 package de.uka.ilkd.key.casetool.together.scripts.menuextension;
 
-import de.uka.ilkd.key.casetool.FunctionalityOnModel;
-import de.uka.ilkd.key.casetool.UMLModelClass;
+import de.uka.ilkd.key.casetool.together.FunctionalityOnModel;
+import de.uka.ilkd.key.casetool.together.TogetherModelClass;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 
 public class ClassMenuPoint1 extends ClassMenu {
     public String getMenuEntry(){
-	return "Parse Invariant";
+	return "Parse Class Spec";
     }
 
-    protected String runCore(UMLModelClass modelClass){
-        return FunctionalityOnModel.parseOneInvariant(modelClass);
+    protected String runCore(TogetherModelClass modelClass) 
+    		throws ProofInputException {
+        FunctionalityOnModel.parseClassSpec(modelClass);
+        return "No errors were found.";
     }
 }

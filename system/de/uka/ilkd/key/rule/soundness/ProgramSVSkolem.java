@@ -16,7 +16,6 @@ import java.io.IOException;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.annotation.Annotation;
 import de.uka.ilkd.key.java.statement.JumpStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -134,7 +133,6 @@ public abstract class ProgramSVSkolem
      *        Finds the source element that occurs first in the source. 
      *        @return the first source element in the syntactical representation of
      *        this element, may be equals to this element.
-     *        @see #toSource()
      *        @see #getStartPosition()
     */
     public SourceElement getFirstElement() {
@@ -146,7 +144,6 @@ public abstract class ProgramSVSkolem
  *        Finds the source element that occurs last in the source. 
  *        @return the last source element in the syntactical representation of
  *        this element, may be equals to this element.
- *        @see #toSource()
  *        @see #getEndPosition()
     */
     public SourceElement getLastElement() {
@@ -221,16 +218,4 @@ public abstract class ProgramSVSkolem
     public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
 	return this == se;
     }
-
-    /**
-     *@return the annotations.
-     */
-    public Annotation[] getAnnotations(){
-	return new Annotation[0];
-    }
-
-    public int getAnnotationCount(){
-	return 0;
-    }
-
 }

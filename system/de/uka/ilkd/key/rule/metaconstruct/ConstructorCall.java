@@ -21,12 +21,11 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.expression.operator.New;
+import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -81,28 +80,39 @@ public class ConstructorCall extends ProgramMetaConstruct {
 	    // no implementation available
 	    return pe;
 	}
-	    
 	
 	final ArrayOfExpression arguments = 
 	    constructorReference.getArguments();
 	
-	final ArrayList evaluatedArgs = new ArrayList();
-    
+	final ArrayList<Statement> evaluatedArgs = new ArrayList<Statement>();
+	
+	int j=0;
+	if(services.getJavaInfo().getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, classType)!=null){
+	    j=1;
+	}
 	final ProgramVariable[] argumentVariables =  
-	    new ProgramVariable[arguments.size()]; 	
+	    new ProgramVariable[arguments.size()+j]; 	
                
 	for (int i = 0, sz = arguments.size(); i<sz; i++) {
 	    argumentVariables[i] = 
 	        EvaluateArgs.evaluate(arguments.getExpression(i), evaluatedArgs, 
-	                services, svInst.getExecutionContext());	  
+	                services, ec);	  
 	}
         
-	final ProgramMethod method = services.getJavaInfo().
+	if(j==1){
+	    Expression enclosingThis = (Expression) (constructorReference.getReferencePrefix() instanceof Expression?
+	            constructorReference.getReferencePrefix() :
+	                ec.getRuntimeInstance());
+	    argumentVariables[argumentVariables.length-1] = 
+	        EvaluateArgs.evaluate(enclosingThis, evaluatedArgs, 
+	                        services, ec);    
+	}
+	ProgramMethod method = services.getJavaInfo().
 	  getProgramMethod(classType, NORMALFORM_IDENTIFIER, 
               (ProgramVariable[])argumentVariables, ec.
               getTypeReference().getKeYJavaType());
 	
-	Debug.assertTrue(method != null, "Call to non-existant constructor.");
+	Debug.assertTrue(method != null, "Call to non-existent constructor.");
     
 	final MethodBodyStatement mbs = new MethodBodyStatement(method, newObject, null, 
                new ArrayOfExpression(argumentVariables)); 

@@ -289,7 +289,7 @@ public class TestGenerator{
 		IndexReplaceVisitor irv = 
 		    new IndexReplaceVisitor(testLocation[i][k], testLocation, 
 					    singleTuple, partCounter, 
-					    testArray);
+					    testArray, serv);
 		irv.start();
 		irv.result();
 		testDataAssignments = testDataAssignments.append(	
@@ -369,7 +369,7 @@ public class TestGenerator{
 	    Expression cons = (Expression) loc2cons.get(loc);
 	    IndexReplaceVisitor irv = 
 		new IndexReplaceVisitor(loc, testLocation, 
-					singleTuple, partCounter, testArray);
+					singleTuple, partCounter, testArray, serv);
 	    irv.start();
 	    irv.result();
 	    assignments = 
@@ -475,7 +475,7 @@ public class TestGenerator{
 	
 	s = s.append(body);
 	StatementBlock mBody = new StatementBlock(s.toArray());
-	FieldReplaceVisitor frv = new FieldReplaceVisitor(mBody);
+	FieldReplaceVisitor frv = new FieldReplaceVisitor(mBody, serv);
 	frv.start();
 	l.add(frv.result());
 	l.add(new Comment("\n  Covered execution trace:\n"+
@@ -589,7 +589,7 @@ public class TestGenerator{
 	s[1] = new CopyAssignment(suite, cons);
 	s[2] = new Return(suite);
 	StatementBlock mBody = new StatementBlock(s);
-	FieldReplaceVisitor frv = new FieldReplaceVisitor(mBody);
+	FieldReplaceVisitor frv = new FieldReplaceVisitor(mBody, serv);
 	frv.start();
 	l.add(frv.result());
 	return new MethodDeclaration(l, false);
@@ -682,16 +682,16 @@ public class TestGenerator{
      * each field.
      */
     public void exportCodeUnderTest(){
-	Set kjts = ji.getAllKeYJavaTypes();
-	Iterator it = kjts.iterator();
+	final Set<KeYJavaType> kjts = ji.getAllKeYJavaTypes();
+	final Iterator<KeYJavaType> it = kjts.iterator();
 	while(it.hasNext()){
-	    KeYJavaType kjt = (KeYJavaType) it.next();
+	    final KeYJavaType kjt = it.next();
 	    if((kjt.getJavaType() instanceof ClassDeclaration ||
 		kjt.getJavaType() instanceof InterfaceDeclaration) &&
 	       ((TypeDeclaration) kjt.getJavaType()).getPositionInfo().
 	       getFileName() != null &&
-	       ((TypeDeclaration) kjt.getJavaType()).getPositionInfo().
-	       getFileName().indexOf("resources")==-1){
+               ((TypeDeclaration) kjt.getJavaType()).getPositionInfo().
+               getFileName().indexOf(serv.getProof().getJavaModel().getModelDir())!=-1){
 
 		StringWriter sw = new StringWriter();
 		PrettyPrinter pp = new PrettyPrinter(sw, false, true);
@@ -1021,7 +1021,7 @@ public class TestGenerator{
 	l.addAll(params);
 	l.add(type);
 	StatementBlock mBody = new StatementBlock(body);
-	FieldReplaceVisitor frv = new FieldReplaceVisitor(mBody);
+	FieldReplaceVisitor frv = new FieldReplaceVisitor(mBody, serv);
 	frv.start();
 	l.add(frv.result());
 	MethodDeclaration md = new MethodDeclaration(l, false);
@@ -1119,13 +1119,13 @@ public class TestGenerator{
     }
 
     /**
-     * Returns the program variables occuring in t that are no atributes.
+     * Returns the location variables occuring in t that are no attributes.
      */
     private ExtList getArguments(Term t){
 	SetOfProgramVariable programVars = 
 	    SetAsListOfProgramVariable.EMPTY_SET;
 	TermProgramVariableCollector pvColl = 
-	    new TermProgramVariableCollector();
+	    new TermProgramVariableCollector(serv);
 	t.execPreOrder(pvColl);
 	Iterator itp = pvColl.result().iterator();
 	while(itp.hasNext()){

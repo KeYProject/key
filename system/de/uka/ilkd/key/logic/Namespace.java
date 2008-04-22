@@ -9,6 +9,9 @@
 
 package de.uka.ilkd.key.logic;
 
+import java.util.HashMap;
+import java.util.Iterator;
+
 /**
  * A Namespace keeps track of already used {@link Name}s and the objects
  * carrying these names. These objects have to implement the interface
@@ -28,7 +31,7 @@ public class Namespace implements java.io.Serializable {
 
     /** The hashmap that maps a name to a symbols of that name if it 
      * is defined in this Namespace. */
-    protected HashMapFromNameToNamed symbols=null;
+    protected HashMap<Name, Named> symbols=null;
 
     /** One defined symbol.  Many Namespaces, e.g. those generated when 
      * a quantified formula is parsed, define only one new symbol,
@@ -44,7 +47,7 @@ public class Namespace implements java.io.Serializable {
     protected int numLocalSyms=0;
 
     /** Additions can be "recorded" here */
-    protected HashMapFromNameToNamed protocol = null;
+    protected HashMap<Name, Named> protocol = null;
 
 
     /** Construct an empty Namespace without a parent namespace. */
@@ -54,7 +57,7 @@ public class Namespace implements java.io.Serializable {
 
     /** Construct an empty Namespace with protocol <code>protocol</code> 
      * and without a parent namespace. */
-    public Namespace(HashMapFromNameToNamed protocol) {
+    public Namespace(HashMap<Name, Named> protocol) {
 	this.parent = null;
 	this.protocol = protocol;
     }
@@ -79,7 +82,7 @@ public class Namespace implements java.io.Serializable {
     public void add(Named sym) {
 	if (numLocalSyms>0) {
 	    if (symbols==null) {
-		symbols=new HashMapFromNameToNamed();
+		symbols=new HashMap<Name, Named>();
 		symbols.put(localSym.name(),localSym);
 		localSym=null;
 	    }
@@ -105,16 +108,16 @@ public class Namespace implements java.io.Serializable {
     
     /** "remember" all additions from now on */
     public void startProtocol() {
-        protocol = new HashMapFromNameToNamed();
+        protocol = new HashMap<Name, Named>();
     }
 
     /** gets symbols added since last <code>startProtocol()</code>;
      *  resets the protocol */
-    public IteratorOfNamed getProtocolled() {
+    public Iterator<Named> getProtocolled() {
         if (protocol == null) {
             return SLListOfNamed.EMPTY_LIST.iterator();
         }
-        IteratorOfNamed it = protocol.values();
+        final Iterator<Named> it = protocol.values().iterator();
         protocol = null;
         return it;
     }
@@ -173,7 +176,7 @@ public class Namespace implements java.io.Serializable {
 	if (numLocalSyms == 1) {
 	    list = list.prepend(localSym);
 	} else if (numLocalSyms > 1) {
-	    IteratorOfNamed it = symbols.values();
+	    Iterator<Named> it = symbols.values().iterator();
 	    while (it.hasNext()) {
 		list = list.prepend(it.next());
 	    }
@@ -221,9 +224,9 @@ public class Namespace implements java.io.Serializable {
     public Namespace copy() {
 	Namespace copy;
 	if(protocol != null){
-	    copy=new Namespace((HashMapFromNameToNamed)protocol.clone());
+	    copy = new Namespace((HashMap<Name, Named>)protocol.clone());
 	}else{
-	    copy=new Namespace();
+	    copy = new Namespace();
 	}
 	//%%%%make more efficient!!!
 	IteratorOfNamed it=allElements().iterator();

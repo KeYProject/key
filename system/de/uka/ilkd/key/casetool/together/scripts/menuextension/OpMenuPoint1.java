@@ -12,21 +12,24 @@
 
 package de.uka.ilkd.key.casetool.together.scripts.menuextension;
 
-import de.uka.ilkd.key.casetool.FunctionalityOnModel;
-import de.uka.ilkd.key.casetool.ModelMethod;
+import de.uka.ilkd.key.casetool.together.FunctionalityOnModel;
+import de.uka.ilkd.key.casetool.together.TogetherModelMethod;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 
 
 
 public class OpMenuPoint1 extends OpMenu {
     public String getMenuEntry(){
-	return "ParseMethodSpec";
+	return "Parse Method Spec";
     }
 
     public String getSubMenuName(){
 	return null;
     }
 
-    protected String runCore(ModelMethod modelMethod){
-        return FunctionalityOnModel.parseMethodSpec(modelMethod);
+    protected String runCore(TogetherModelMethod modelMethod) 
+    		throws ProofInputException {
+        FunctionalityOnModel.parseMethodSpec(modelMethod);
+        return "No errors were found.";
     }
 }

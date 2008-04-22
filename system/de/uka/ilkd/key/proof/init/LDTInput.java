@@ -9,11 +9,11 @@
 //
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
+import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.IteratorOfNamed;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ldt.BooleanLDT;
 import de.uka.ilkd.key.logic.ldt.ByteLDT;
@@ -37,7 +37,7 @@ public class LDTInput implements EnvInput {
     private static final String NAME = "language data types";
     
     private final KeYFile[] keyFiles;
-    private final Main main;
+    private final IMain main;
     
     private InitConfig initConfig = null;
 
@@ -47,7 +47,7 @@ public class LDTInput implements EnvInput {
      * @param keyFiles an array containing the LDT .key files
      * @param main the main class used to report the progress of reading
      */
-    public LDTInput(KeYFile[] keyFiles, Main main) {
+    public LDTInput(KeYFile[] keyFiles, IMain main) {
 	this.keyFiles = keyFiles;
 	this.main=main;
     }
@@ -55,6 +55,11 @@ public class LDTInput implements EnvInput {
     
     public String name() {
 	return NAME;
+    }
+    
+    
+    public RecoderModelTransformer getTransformer() {
+        return null;
     }
     
     

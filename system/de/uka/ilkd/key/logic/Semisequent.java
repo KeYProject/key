@@ -18,7 +18,7 @@ package de.uka.ilkd.key.logic;
  * versions it can be enhanced to do other simplifications. A sequent
  * and so a semisequent has to be immutable. 
  */
-public class Semisequent {
+public class Semisequent implements Iterable<ConstrainedFormula> {
 
     /** the empty semisequent (using singleton pattern) */
     public static final Semisequent EMPTY_SEMISEQUENT = new Empty();

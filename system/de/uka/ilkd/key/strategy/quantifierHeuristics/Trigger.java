@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
 
@@ -17,11 +18,13 @@ abstract class Trigger {
     
     /**
      * @param targetTerm
+     * @param services
      * @return all substitution that found from the targeTerm by matching 
      * this trigger to targeTerm.
      */
     public abstract SetOfSubstitution 
-                           getSubstitutionsFromTerms(SetOfTerm targetTerm);
+                           getSubstitutionsFromTerms(SetOfTerm targetTerm, 
+                                   Services services);
     
     public abstract Term getTriggerTerm();
 }

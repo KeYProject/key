@@ -39,8 +39,9 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 import visualdebugger.VBTBuilder;
+import de.uka.ilkd.key.gui.IMain;
+
 import visualdebugger.draw2d.*;
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.Term;
@@ -1249,7 +1250,9 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                     return;
                 if (!vd.getMediator().ensureProofLoaded())
                     return;
-                new DecProcRunner(Main.getInstance(false)).run();
+                new DecProcRunner((IMain)vd.getMediator().mainFrame(),
+                        vd.getMediator().getProof(), 
+                        vd.getMediator().getUserConstraint().getConstraint()).run();
             }
 
         };

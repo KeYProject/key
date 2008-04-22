@@ -44,7 +44,8 @@ public class PrimitiveType
 
     private ProgramElementName arrayElementName = null;
 
-    private static final HashMap typeMap = new HashMap(); 
+    private static final HashMap<String,PrimitiveType> typeMap = 
+        new HashMap<String, PrimitiveType>(); 
     static {
 	typeMap.put("byte", JAVA_BYTE);
 	typeMap.put("short", JAVA_SHORT);
@@ -57,7 +58,7 @@ public class PrimitiveType
     }
 
     public static PrimitiveType getPrimitiveType(String name) {
-	return (PrimitiveType)typeMap.get(name);
+	return typeMap.get(name);
     }
 
 

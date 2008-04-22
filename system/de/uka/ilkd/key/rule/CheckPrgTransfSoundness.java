@@ -10,13 +10,11 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.EnvInput;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.KeYFileForTests;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 
@@ -61,7 +59,7 @@ public class CheckPrgTransfSoundness {
     private static ListOfNewVarcond newvars = null;
 
     // This is a Map from SchemaVariables to Restrictions.
-    private static Map svToRestriction = new HashMap();
+    private static Map<SVSubstitute, Restriction> svToRestriction = new HashMap<SVSubstitute, Restriction>();
 
     // Constant representing the case with no restriction.
     private static Restriction RESTRICTNONE = new RestrictionNone();
@@ -156,7 +154,7 @@ public class CheckPrgTransfSoundness {
     // creates a "SetOfTaclet" set which includes the taclets.
     public static SetOfTaclet parseTaclets() {
 
-        Set checkTacsName = new HashSet();
+        Set<String> checkTacsName = new HashSet<String>();
 
         try {
             BufferedReader r = new BufferedReader
@@ -215,9 +213,9 @@ public class CheckPrgTransfSoundness {
             while (currentRulesIt.hasNext()) {
                 Taclet cT = (Taclet) currentRulesIt.next();
 
-                Iterator checkTacsNameIt = checkTacsName.iterator();
+                Iterator<String> checkTacsNameIt = checkTacsName.iterator();
                 while (checkTacsNameIt.hasNext()) {
-                    String tacName = (String) checkTacsNameIt.next();
+                    String tacName = checkTacsNameIt.next();
                     if (cT.name().toString().equals(tacName)) {
                         rules=rules.add(cT);
                     }
@@ -313,10 +311,10 @@ public class CheckPrgTransfSoundness {
 
         // Use method "createAllPossibilities" for the purpose of
         // creating *all* the possibilities.
-        Set allSVSet = svToRestriction.keySet();
+        Set<SVSubstitute> allSVSet = svToRestriction.keySet();
         int svarrsize = allSVSet.size();
         Object[] allSVs = allSVSet.toArray();
-        Map svToMaude = new HashMap();
+        Map<SchemaVariable, String> svToMaude = new HashMap<SchemaVariable, String>();
         createAllPossibilities(findTerm, replaceWithTerm, allSVs, 0,
                                svarrsize, new String(), svToMaude);
 
@@ -344,7 +342,7 @@ public class CheckPrgTransfSoundness {
 
         // Creates a map with all the schema variables mapped to the no
         // restriction class.
-        svToRestriction = new HashMap();
+        svToRestriction = new HashMap<SVSubstitute, Restriction>();
         IteratorOfSchemaVariable listIt = list.iterator();
         while (listIt.hasNext()) {
             svToRestriction.put(listIt.next(), RESTRICTNONE);
@@ -545,12 +543,12 @@ public class CheckPrgTransfSoundness {
     public static void
         createAllPossibilities(Term find, Term replaceWith,
                                Object[] allSVs, int svarrindex, int svarrsize,
-                               String addString, Map svToMaude) {
+                               String addString, Map<SchemaVariable, String> svToMaude) {
 
         if (svarrindex < svarrsize) {
             SchemaVariable sv = (SchemaVariable) allSVs[svarrindex];
             svarrindex = svarrindex + 1;
-            Restriction svRestri = (Restriction) svToRestriction.get(sv);
+            Restriction svRestri = svToRestriction.get(sv);
 
             Sort svSort = ((SortedSchemaVariable) sv).sort();
 
@@ -1118,7 +1116,7 @@ public class CheckPrgTransfSoundness {
     // In this method the new variables are assigned to their
     // maude-"values", the result of this is the side effect on
     // "addNewString"
-    public static void createNewVarsAddString(Map svToMaude) {
+    public static void createNewVarsAddString(Map<SchemaVariable, String> svToMaude) {
         addNewString = "";
         IteratorOfNewVarcond newvarsIt = newvars.iterator();
         while (newvarsIt.hasNext()) {
@@ -1126,7 +1124,7 @@ public class CheckPrgTransfSoundness {
             SchemaVariable sv = newVC.getSchemaVariable();
             SchemaVariable svPeer = newVC.getPeerSchemaVariable();
             Sort svPeerSort = ((SortedSchemaVariable) svPeer).sort();
-            String svMaudeCase = (String) svToMaude.get(svPeer);
+            String svMaudeCase = svToMaude.get(svPeer);
 
             // New SV's name.
             String svName = sv.name().toString()
@@ -1187,7 +1185,7 @@ public class CheckPrgTransfSoundness {
 
     // This method creates the code for the find part. It is stored in
     // the static findString attribute.
-    public static void createFindCode(Term find, Map svToMaude) {
+    public static void createFindCode(Term find, Map<SchemaVariable, String> svToMaude) {
         JavaBlock findJavaBlock = find.javaBlock();
 
         StatementBlock findStatementBlock =
@@ -1225,7 +1223,7 @@ public class CheckPrgTransfSoundness {
     // This works the same way as in the find part case,
     // i.e. "createFindCode" but writes into replaceWithString as
     // result.
-    public static void createReplaceWithCode(Term replaceWith, Map svToMaude) {
+    public static void createReplaceWithCode(Term replaceWith, Map<SchemaVariable, String> svToMaude) {
         JavaBlock replaceWithJavaBlock = replaceWith.javaBlock();
 
         StatementBlock replaceWithStatementBlock =
@@ -1261,7 +1259,7 @@ public class CheckPrgTransfSoundness {
     // This is the actual core of both "createFindCode" and
     // "createReplaceWithCode" methods. It puts the parts together by
     // recursing in the subparts of each operator.
-    public static String recurseFindRepl(ProgramElement pE, Map svToMaude) {
+    public static String recurseFindRepl(ProgramElement pE, Map<SchemaVariable, String> svToMaude) {
         String result1;
         String result2;
         if (pE instanceof NonTerminalProgramElement
@@ -1273,7 +1271,7 @@ public class CheckPrgTransfSoundness {
             String svName = sv.name().toString()
                 .substring(1,sv.name().toString().length());
 
-            String svMaudeCase = (String) svToMaude.get(sv);
+            String svMaudeCase = svToMaude.get(sv);
 
             // in case the current sv is one of the "new schema vars"
             // that sv is replaced in the code by
@@ -1356,7 +1354,7 @@ public class CheckPrgTransfSoundness {
                         .substring(1,svAtt.name().toString().length());
                     Restriction attRestri =
                         ((RestrictionIsAttrib)
-                         ((Restriction) svToRestriction.get(svAtt)))
+                         svToRestriction.get(svAtt))
                         .getAttribsRestriction();
                     String primitiveExpressionResultType = "";
                     if (attRestri instanceof RestrictionNone) {
@@ -1563,7 +1561,7 @@ public class CheckPrgTransfSoundness {
     // before. See the Maude interface to see why the string is built as
     // below.
     public static void putStringTogetherWriteToFile(String addString,
-                                                    Map svToMaude) {
+                                                    Map<SchemaVariable, String> svToMaude) {
         String resultString =
             "compareResultsModNewVars(\n"
             +"add(basicInitConfiguration, \n"
@@ -1585,11 +1583,11 @@ public class CheckPrgTransfSoundness {
             +"---- tacletname: " +currentTaclet.displayName() +" \n"
             +"---- case for each SV: \n";
 
-        Set allSVs = svToMaude.keySet();
-        Iterator allSVsIt = allSVs.iterator();
+        Set<SchemaVariable> allSVs = svToMaude.keySet();
+        Iterator<SchemaVariable> allSVsIt = allSVs.iterator();
         while (allSVsIt.hasNext()) {
-            SchemaVariable sv = (SchemaVariable) allSVsIt.next();
-            String svCase = (String) svToMaude.get(sv);
+            SchemaVariable sv = allSVsIt.next();
+            String svCase = svToMaude.get(sv);
             infoString = infoString + "---- SV: "+ sv +", Case:"
                 + svCase + " \n";
         }

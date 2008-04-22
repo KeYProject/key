@@ -3,6 +3,7 @@ package de.uka.ilkd.key.visualdebugger.watchpoints;
 import java.util.*;
 import java.util.Map.Entry;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
@@ -152,10 +153,11 @@ public class VariableNameTracker {
      * parameter count. Finally the following method-frame is investigated and the parameter count added to rebuild
      * the original order.
      * 
-     * @param node the node
      */
     public void start() {
 
+        final Services services = node.proof().getServices();
+        
         Node currentNode = node;
         Node parent = currentNode.parent();
         List<LocationVariable> renamedLocalVariables = null;
@@ -202,7 +204,7 @@ public class VariableNameTracker {
                     if (element instanceof MethodFrame) {
                        
                         MethodVisitor mv = new MethodVisitor(
-                                (MethodFrame) element);
+                                (MethodFrame) element, services);
                         mv.start();
                         
                         renamedLocalVariables.addAll(addParameterCount(
@@ -223,7 +225,7 @@ public class VariableNameTracker {
             }
             currentNode = parent;
             parent = currentNode.parent();
-        }System.out.println("size of renamed variables: " + renamedLocalVariables.size());
+        }
     }
     
     private ListOfRenamingTable collectAllRenamings() {

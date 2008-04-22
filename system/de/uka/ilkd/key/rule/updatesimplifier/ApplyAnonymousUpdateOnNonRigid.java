@@ -43,7 +43,9 @@ public class ApplyAnonymousUpdateOnNonRigid extends AbstractUpdateRule {
     /**
      * in case of a non-state changing non rigid top level operator, the anonymous update is also 
      * propagated to the subterm
-     * @param Term target the Term where to apply the anonymous update
+     * @param update the Update to be pushed
+     * @param target the Term where to apply the anonymous update
+     * @param services the Services
      * @return the term after pushing the update to the subterms
      */
     private Term pushToSubterms(Update update, Term target, Services services) {

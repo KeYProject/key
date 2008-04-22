@@ -17,31 +17,28 @@ import java.io.Writer;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-
 public class ProgramPrinter extends PrettyPrinter {
 
-	/** creates the program printer
-	 * @param writer the Writer to print in, may be <code>null</code>.
-	 */
-	public ProgramPrinter(Writer writer) {
-		super(writer);
-	}
+    /**
+     * creates the program printer
+     * 
+     * @param writer
+     *                the Writer to print in, may be <code>null</code>.
+     */
+    public ProgramPrinter(Writer writer) {
+        super(writer);
+    }
 
-	public ProgramPrinter(Writer writer, SVInstantiations svi) {
-		super(writer, svi);
-	}
-	
-	public ProgramPrinter() {
-		super(null);
-	}
+    public ProgramPrinter(Writer writer, SVInstantiations svi) {
+        super(writer, svi);
+    }
+
+    public ProgramPrinter() {
+        super(null);
+    }
+
+    public ProgramPrinter(Writer w, boolean b,
+            SVInstantiations instantiations) {
+        super(w,b,instantiations);
+    }
 }
-
-
-
-
-
-
-
-
-
-

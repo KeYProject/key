@@ -1,10 +1,11 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.ClassType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.sort.ArraySort;
+import de.uka.ilkd.key.logic.sort.ClassInstanceSort;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -25,14 +26,14 @@ public class AbstractOrInterfaceType extends VariableConditionAdapter {
     
     public boolean check(SchemaVariable var, SVSubstitute instCandidate,
             SVInstantiations instMap, Services services) {
-        final KeYJavaType type = 
-            resolver.resolveType(var, instCandidate, instMap, services);
+        final Sort sort = 
+            resolver.resolveSort(var, instCandidate, instMap, services);
         
-        final boolean isClassType  =  type.getJavaType() instanceof ClassType;
-        
-        final boolean isAbstractOrInterface = isClassType && 
-            ((ClassType)type.getJavaType()).isInterface() ||
-            ((ClassType)type.getJavaType()).isAbstract();
+        final boolean isClassType  =  sort instanceof ClassInstanceSort;
+                
+        final boolean isAbstractOrInterface = 
+            !(sort instanceof ArraySort) &&  
+              (isClassType && ((ClassInstanceSort)sort).representAbstractClassOrInterface());
         
         return negated ? !isAbstractOrInterface : isAbstractOrInterface;
     }

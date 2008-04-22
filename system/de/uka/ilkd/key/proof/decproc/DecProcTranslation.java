@@ -32,7 +32,6 @@ public abstract class DecProcTranslation {
 	 * Just a constructor which starts the conversion to Simplify syntax. The
 	 * result can be fetched with
 	 * 
-	 * @see getText-
 	 * @param sequent
 	 *           The sequent which shall be translated.
 	 * @param cs
@@ -65,8 +64,8 @@ public abstract class DecProcTranslation {
 	 * hash codes like the memory address of the object. It uses a 
 	 * hashMap and compares every new Object in O(n) (n number of 
 	 * Objects with the same .hashCode()) to all others.
+         * @param qv the Object the hashcode should be returned.
 	 * @returns a unique hashcode for the variable gv.
-	 * @param v the Object the hashcode should be returned.
 	 */
 	public int getUniqueHashCode(Object qv) {
 		Integer number = (Integer) this.variableMap.get(qv);
@@ -294,7 +293,7 @@ public abstract class DecProcTranslation {
 
 	/** Translates the given sequent into the decision procedure's input syntax 
     *
-    * @param s the Sequent which should be translated
+    * @param sequent the Sequent which should be translated
     * @return the translated version of s
     */
 	protected abstract StringBuffer translate(Sequent sequent) throws SimplifyException;

@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -74,7 +75,7 @@ public class UpdateSimplificationRule implements BuiltInRule {
      * @param goal the goal that the rule application should refer to.
      * @param services the Services with the necessary information
      * about the java programs 
-     * @param the rule application that is executed.
+     * @param ruleApp the rule application that is executed.
      */
     public ListOfGoal apply(Goal     goal, 
 			    Services services, 
@@ -97,8 +98,7 @@ public class UpdateSimplificationRule implements BuiltInRule {
 	if (applicationResult.length>0) { 
 	    result = goal.split(1);
 	    final Goal newGoal = result.head();	   
-	    for (int i = 0, nr = applicationResult.length; i<nr; i++) {
-		final ConstrainedFormulaContainer cfc = applicationResult[i];		
+	    for (final ConstrainedFormulaContainer cfc : applicationResult) {
 		final PosInOccurrence oldCFPIO = 
                     new PosInOccurrence(cfc.old(), PosInTerm.TOP_LEVEL,	
                             cfc.oldFormulaInAntecedent()); 	
@@ -108,30 +108,26 @@ public class UpdateSimplificationRule implements BuiltInRule {
 	return result;
     }
 
-
-
     private ConstrainedFormulaContainer[]
         applyOnSequent(Sequent seq, UpdateSimplifier sus,
                 Services services) {			
 
-	final LinkedList result = new LinkedList();
+	final List<ConstrainedFormulaContainer> result = 
+	    new LinkedList<ConstrainedFormulaContainer>();
 	
         applyOnSemisequent(seq.antecedent(), true, sus, services, result);
         applyOnSemisequent(seq.succedent(), false, sus, services, result);
 
-	return (ConstrainedFormulaContainer[]) 
-        result.toArray(new ConstrainedFormulaContainer[result.size()]);
+	return result.toArray(new ConstrainedFormulaContainer[result.size()]);
     }
 
     private void applyOnSemisequent(Semisequent semiSeq, 
             boolean semiSeqIsAntecedent,
             UpdateSimplifier sus, 
             Services services, 
-            final LinkedList result) {
-        final IteratorOfConstrainedFormula it = semiSeq.iterator();	
+            final List<ConstrainedFormulaContainer> result) {
 
-        while (it.hasNext()) {
-	    final ConstrainedFormula cf = it.next();
+        for (final ConstrainedFormula cf : semiSeq) {
             final Term simplified = sus.simplify(cf.formula(), services);
 	    if (simplified != cf.formula()) {
 		result.add
@@ -184,9 +180,7 @@ public class UpdateSimplificationRule implements BuiltInRule {
 		return true;
 	    }
 	} else { // this may be too slow; may be return true always
- 	    final IteratorOfConstrainedFormula it = goal.sequent().iterator(); 	    
- 	    while (it.hasNext()) {
- 		ConstrainedFormula cf = it.next();
+ 	    for (final ConstrainedFormula cf : goal.sequent()) {
                 final Term simplified = goal.simplifier().simplify(cf.formula(), services);
  		if (!simplified.equals(cf.formula())) {
  		    return true;

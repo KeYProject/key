@@ -14,10 +14,8 @@ import java.io.File;
 
 import javax.swing.JOptionPane;
 
-import de.uka.ilkd.key.gui.ExceptionDialog;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.SwingWorker;
+import de.uka.ilkd.key.gui.*;
+import de.uka.ilkd.key.proof.ListOfGoal;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 
 /**
@@ -25,19 +23,20 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
  * <code>ProblemLoader</code>
  */
 public class TacletSoundnessPOLoader implements Runnable {
-    final File file;
-    final Main main;
-    final KeYMediator mediator;
+    private final File file;
+    private final IMain main;
+    private final KeYMediator mediator;
     
     private SwingWorker worker;
 
-    ProblemInitializer init;
+    private final ListOfGoal openGoals;
 
     
-    public TacletSoundnessPOLoader(File file, Main main) {
+    public TacletSoundnessPOLoader(File file, IMain main, ListOfGoal openGoals) {
        this.main = main;
        mediator  = main.mediator();
        this.file = file;
+       this.openGoals = openGoals;
     }
 
     
@@ -57,11 +56,10 @@ public class TacletSoundnessPOLoader implements Runnable {
 
             public void finished () {
                 mediator.startInterface ( true );
-                Main main = Main.getInstance ();
                 String msg = (String)get ();
                 if ( !"".equals ( msg ) ) {
                     JOptionPane.showMessageDialog
-                        ( main,
+                        ( mediator.mainFrame(),
                           msg,
                           "Error occurred while creating proof obligation",
                           JOptionPane.ERROR_MESSAGE );
@@ -76,11 +74,13 @@ public class TacletSoundnessPOLoader implements Runnable {
     protected Object doWork () {
         final TacletSoundnessPO prob =
                 new TacletSoundnessPO (file.getName(), file, 
-				       main.getProgressMonitor());
+				       main.getProgressMonitor(),
+                                       openGoals);
     
         String status = "";
         try {
 	    ProofEnvironment env = mediator.getSelectedProof().env();
+            prob.setInitConfig(env.getInitConfig());
 	    ProblemInitializer pi = new ProblemInitializer(Main.getInstance());
 	    pi.startProver(env, prob);
         } catch ( Throwable e ) {

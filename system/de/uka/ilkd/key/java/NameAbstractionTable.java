@@ -49,8 +49,8 @@ public class NameAbstractionTable {
     /** 
      * tests if the given elements have been assigned to the same
      * abstract name. 
+     * @param pe0 SourceElement 
      * @param pe1 SourceElement 
-     * @param pe2 SourceElement 
      * @returns true if the pe1 and pe2 have been assigned to the same
      * name
      */

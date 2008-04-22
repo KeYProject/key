@@ -21,15 +21,14 @@ public class LocationDependentFunction extends AbstractMetaOperator {
     private static Term updTerm = null;
     private static Term heapDepFuncTerm = null;
     
-    public static Term getHeapDepFuncTermFor(Term term, Services services){
+    private static Term getHeapDepFuncTermFor(Term term, Services services){
         if(term.sub(0)==updTerm){
             return heapDepFuncTerm;
         }
         updTerm = term.sub(0);
-        ListOfProgramVariable pvs = collectRelevantPVs(term);
-        Term hdf = createHeapDependentFunctionTerm(pvs);
-        services.getNamespaces().functions().add(hdf.op());
-        Map map = AtPreEquations.getAtPreFunctions(updTerm);
+        ListOfProgramVariable pvs = collectRelevantPVs(term, services);
+        Term hdf = createHeapDependentFunctionTerm(pvs, services);
+        Map map = AtPreEquations.getAtPreFunctions(updTerm, services);
         OpReplacer or = new OpReplacer(map);
         Term preUpdTerm = or.replace(updTerm);
         if ( !( updTerm.op () instanceof IUpdateOperator ) ) return hdf;
@@ -51,7 +50,20 @@ public class LocationDependentFunction extends AbstractMetaOperator {
         return getHeapDepFuncTermFor(term, services);
     }
     
-    private static Term createHeapDependentFunctionTerm(ListOfProgramVariable l){
+    private static Name getNewName(Services services, Name baseName) {
+        NamespaceSet namespaces = services.getNamespaces();
+        
+        int i = 0;
+        Name name;
+        do {
+            name = new Name(baseName + "_" + i++);
+        } while(namespaces.lookup(name) != null);
+        
+        return name;
+    }
+    
+    private static Term createHeapDependentFunctionTerm(ListOfProgramVariable l,
+                                                        Services services){
         Term[] subs = new Term[l.size()];
         Sort[] subSorts = new Sort[l.size()];
         int i=0;
@@ -63,13 +75,16 @@ public class LocationDependentFunction extends AbstractMetaOperator {
             subSorts[i++] = pv.sort();
         }
         ArrayOfSort aos = new ArrayOfSort(subSorts);
-        Function anon = new NonRigidHeapDependentFunction(new Name("anon"), Sort.FORMULA, aos);
+        Name anonName = getNewName(services, new Name("anon"));
+        Function anon = new NonRigidHeapDependentFunction(anonName, Sort.FORMULA, aos);
+        services.getNamespaces().functions().add(anon);
         return tf.createFunctionTerm(anon, subs);
     }
     
-    private static ListOfProgramVariable collectRelevantPVs(Term t){
+    private static ListOfProgramVariable collectRelevantPVs(Term t, 
+                                                            Services services){
         LoopStatement loop = getLoop(t.sub(1).javaBlock().program());
-        FreePVCollector pc = new FreePVCollector(loop);
+        FreePVCollector pc = new FreePVCollector(loop, services);
         pc.start();
         return pc.result();
     }
@@ -128,11 +143,8 @@ public class LocationDependentFunction extends AbstractMetaOperator {
              = SLListOfProgramVariable.EMPTY_LIST;
          private ListOfProgramVariable freePVs
              = SLListOfProgramVariable.EMPTY_LIST;
-         public FreePVCollector(ProgramElement root) {
-             super(root);
-         }
-         protected void doAction(ProgramElement node) {
-             node.visit(this);
+         public FreePVCollector(ProgramElement root, Services services) {
+             super(root, services);
          }
          protected void doDefaultAction(SourceElement node) {
              if(node instanceof ProgramVariable) {

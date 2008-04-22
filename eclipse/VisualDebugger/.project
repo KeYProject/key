@@ -3,6 +3,7 @@
 	<name>VisualDebugger</name>
 	<comment></comment>
 	<projects>
+		<project>key-devel</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

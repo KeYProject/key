@@ -127,7 +127,7 @@ public class StatementSVWrapper extends JavaStatement
     public void accept(SourceVisitor v) {
     }
     
-    public Object deepClone() {
+    public StatementSVWrapper deepClone() {
 	return new StatementSVWrapper(sv);
     }
 
