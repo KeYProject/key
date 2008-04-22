@@ -271,6 +271,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "inReachableStateImplication",
                       add ( NonDuplicateAppModPositionFeature.INSTANCE,
                             longConst ( 100 ) ) );
+        
+        bindRuleSet ( d, "inReachableStateRTSJ",
+                add ( NonDuplicateAppModPositionFeature.INSTANCE,
+                      longConst ( -100 ) ) );
 
         bindRuleSet ( d, "inReachableStateExpandAntec", -200 );
 

@@ -3969,13 +3969,22 @@ termorseq returns [Object o]
 
 semisequent returns [Semisequent ss]
 { 
-    Term head = null;
-    ss = Semisequent.EMPTY_SEMISEQUENT; 
+    Term head = null, t=null;
+    ss = Semisequent.EMPTY_SEMISEQUENT;
+    ListOfConstrainedFormula terms = SLListOfConstrainedFormula.EMPTY_LIST;
 }
     :
         /* empty */ | 
-        head=term ( COMMA ss=semisequent ) ? 
-        { ss = ss.insertFirst(new ConstrainedFormula(head, Constraint.BOTTOM)).semisequent(); }
+        head=term 
+        {terms = terms.append(new ConstrainedFormula(head, Constraint.BOTTOM));} 
+        ( 
+        	COMMA t=term 
+        	{
+        		terms = terms.append(new ConstrainedFormula(t, Constraint.BOTTOM));
+        	}
+        )*
+        { ss = ss.insert(0, terms).semisequent(); }
+    //    { ss = ss.insertFirst(new ConstrainedFormula(head, Constraint.BOTTOM)).semisequent(); }
     ;
 
 varexplist[TacletBuilder b] : varexp[b] ( COMMA varexp[b] ) * ;

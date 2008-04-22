@@ -41,6 +41,7 @@ public class Test extends SuperTest{
     /*@ public normal_behavior
       @  requires \outerScope(\currentMemoryArea, oArr.memoryArea) &&
       @           \outerScope(o.memoryArea, \currentMemoryArea); 
+      @  assignable oArr, \object_creation(Object);
       @  ensures true;
       @*/
     public void createArrayWithInitializers(Object o){
