@@ -159,7 +159,7 @@ public class KeYPlugin extends AbstractUIPlugin
     public synchronized InitConfig loadProject(IProject project) 
     		throws ProofInputException {
 	assertTrue(project != null);
-	if(project.equals(lastLoadedProject)) {
+	if (project.equals(lastLoadedProject)) {
 	    assertTrue(lastInitConfig != null);
 	    return lastInitConfig;
 	}

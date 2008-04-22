@@ -29,20 +29,17 @@ import org.eclipse.ui.PlatformUI;
 import visualdebugger.views.InsertSepVisitor;
 import de.uka.ilkd.key.casetool.eclipse.KeYPlugin;
 import de.uka.ilkd.key.casetool.eclipse.MethodPOSelectionDialog;
-import de.uka.ilkd.key.gui.ContractConfigurator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.speclang.SetAsListOfClassInvariant;
 import de.uka.ilkd.key.speclang.SetOfClassInvariant;
-import de.uka.ilkd.key.speclang.SetOfOperationContract;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -409,6 +406,7 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 	 *            the project
 	 */
 	public void insertSeps(IJavaProject project) {
+    	       	    
 		ICompilationUnit[] units = getTypes(project);
 		types = new HashSet();
 		debugCU = createDebuggerClass(AST.newAST(AST.JLS3));
@@ -491,7 +489,8 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 		while (VisualDebugger.getVisualDebugger().getMediator().getProof() != null) {
 			keyProver.closeTaskWithoutInteraction();
 		}
-
+		
+		
 		VisualDebugger.getVisualDebugger();// .prepareKeY();
 		
 
@@ -513,22 +512,16 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 	                return;
 	            }   
 
-
-	            File location = new File(VisualDebugger.tempDir);
-
-	            if (location.exists()) {
-	                delTemporaryDirectory();
-	            } else {
-	                location.mkdirs();
-	            }
-
+	            setupTemporaryProjectDirectory(srcFile.getJavaProject().getProject());	            
+	            
 	            // Inserts the separator statements
 	            insertSeps(srcFile.getJavaProject());
 	            // TODO generalize to consider packageFragmentRoots (needed to
 	            // support special source locations like folders only linked into the
 	            // eclipse project
 	            IProject project = srcFile.getJavaProject().getProject();
-
+	            
+	            
 	            visualdebugger.Activator.getDefault().setProject(
 	                    srcFile.getJavaProject());
 
@@ -547,6 +540,22 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 
 
 		VisualDebugger.getVisualDebugger().initialize();
+	}
+
+	/**
+	 * creates the directory where to put the transformed source of the program 
+	 * that is prepared to be debugged, i.e. the program below this directory is
+	 * enriched with <code>Debug.sep</code> statements
+	 * @param project the IProject prepared to be debugged
+	 */
+	private void setupTemporaryProjectDirectory(IProject project) {
+	    File location = new File(VisualDebugger.tempDir + 
+	            File.separator + project.getName());
+	    if (location.exists()) {
+	        delTemporaryDirectory();
+	    } else {
+	        location.mkdirs();
+	    }
 	}
 
 	/**
@@ -578,6 +587,28 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 			action.setEnabled(false);
 		}
 		action.setEnabled(true);
+	}
+	
+
+	/**
+	 * Loads the transformed version of the given project into the KeYProver
+	 * 
+	 * @param project the IProject with the original project
+	 * @return the initial configuration of the KeY prover for
+	 * the transformed version of the given project
+	 */
+	public synchronized InitConfig loadProject(IProject project) 
+	throws ProofInputException {
+
+	    File location = new File(VisualDebugger.tempDir +  project.getName());
+
+	    //get java path, create EnvInput
+	    EnvInput envInput = new SLEnvInput(location.getAbsolutePath());
+
+	    //call ProblemInitializer
+	    ProblemInitializer pi = new ProblemInitializer(Main.getInstance());
+	    InitConfig result = pi.prepare(envInput);
+	    return result;
 	}
 
 	/**
@@ -611,10 +642,12 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 //	    inlined: KeYPlugin.getInstance().startProof(project, method);
 
 
+	    
+	    
 //	    load project
 	    final InitConfig initConfig;
 	    try {
-	        initConfig = KeYPlugin.getInstance().loadProject(project);
+	        initConfig = loadProject(project);
 	    } catch(ProofInputException e) {
                 KeYPlugin.getInstance().showErrorMessage("Proof Input Exception",
                         "The following problem occurred when "
@@ -673,12 +706,14 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 	                e.printStackTrace();
 	            }
 	        }        
+	        	        
 	        StrategyProperties strategyProperties = DebuggerStrategy
                 .getDebuggerStrategyProperties(true, false, false, new LinkedList<WatchPoint>());
                 
                 final StrategyFactory factory = new DebuggerStrategy.Factory();
                 Strategy strategy = 
-                    factory.create(po.getPO().getFirstProof(), strategyProperties);
+                    factory.create(VisualDebugger.getVisualDebugger().getMediator().getProof(), 
+                            strategyProperties);
                                
                 po.getPO().getFirstProof().setActiveStrategy(strategy);
 	        
