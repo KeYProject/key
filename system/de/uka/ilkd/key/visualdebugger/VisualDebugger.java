@@ -72,7 +72,7 @@ public class VisualDebugger {
     private static VisualDebugger visualDebuggerInstance;
 
     /** The symbolic exec names. */
-    private static List symbolicExecNames = new ArrayList(5);
+    private static List<Name> symbolicExecNames = new ArrayList<Name>(5);
 
     /** The ExecutionTreeView's progress monitor. */
     private ProgressMonitor etProgressMonitor = null;
@@ -227,10 +227,10 @@ public class VisualDebugger {
     private boolean initPhase = false;
 
     /** The input p v2term. */
-    private HashMap inputPV2term = new HashMap();
+    private HashMap<Term, Term> inputPV2term = new HashMap<Term, Term>();
 
     /** The listeners. */
-    private LinkedList listeners = new LinkedList();
+    private LinkedList<DebuggerListener> listeners = new LinkedList<DebuggerListener>();
 
     /** The Main. */
     private IMain main;
@@ -258,10 +258,10 @@ public class VisualDebugger {
     private ListOfTerm symbolicInputValuesAsList = SLListOfTerm.EMPTY_LIST;
 
     /** The tc2node. */
-    private HashMap tc2node = new HashMap();
+    private HashMap<TestCaseIdentifier, Node> tc2node = new HashMap<TestCaseIdentifier, Node>();
 
     /** The term2 input pv. */
-    private HashMap term2InputPV = new HashMap();
+    private HashMap<Term, Term> term2InputPV = new HashMap<Term, Term>();
 
     /** The type. */
     private ClassType type;
@@ -429,8 +429,8 @@ public class VisualDebugger {
         // debuggingMethod.getVariableSpecification(index)
 
         ArrayOfExpression args = mbs.getArguments();
-        HashMap map = new HashMap();
-        HashMap map2 = new HashMap();
+        HashMap<Term, Term> map = new HashMap<Term, Term>();
+        HashMap<Term, Term> map2 = new HashMap<Term, Term>();
         if (jb != null) {
             Term f = pio.constrainedFormula().formula();
             if (f.op() instanceof QuanUpdateOperator) {
@@ -452,8 +452,7 @@ public class VisualDebugger {
         this.symbolicInputValuesAsList = SLListOfTerm.EMPTY_LIST;
         for (int i = args.size() - 1; i>=0 ; i--) {
             ProgramVariable next = (ProgramVariable) args.getExpression(i);
-            final Term val = (Term) 
-                map2.get(TermFactory.DEFAULT.createVariableTerm(next));// TODO
+            final Term val = map2.get(TermFactory.DEFAULT.createVariableTerm(next));// TODO
             this.symbolicInputValuesAsList = 
                 this.symbolicInputValuesAsList.prepend(val);
         }
@@ -487,9 +486,9 @@ public class VisualDebugger {
                 currentState = (StateVisualization) event.getSubject();
             }
 
-            Iterator it = listeners.iterator();
+            Iterator<DebuggerListener> it = listeners.iterator();
             while (it.hasNext()) {
-                ((DebuggerListener) it.next()).update(event);
+                it.next().update(event);
             }
         }
     }
@@ -637,7 +636,7 @@ public class VisualDebugger {
      * 
      * @return the input p v2term
      */
-    public HashMap getInputPV2term() {
+    public HashMap<Term, Term> getInputPV2term() {
         return inputPV2term;
     }
 
@@ -777,8 +776,8 @@ public class VisualDebugger {
      * 
      * @return the param
      */
-    public HashSet getParam(MethodBodyStatement mbs) {
-        HashSet result = new HashSet();
+    public HashSet<Expression> getParam(MethodBodyStatement mbs) {
+        HashSet<Expression> result = new HashSet<Expression>();
         for (int i = 0; i < mbs.getArguments().size(); i++) {
             result.add(mbs.getArguments().getExpression(i));
         }
@@ -942,8 +941,8 @@ public class VisualDebugger {
      */
     public SetOfTerm getSymbolicInputValues() {
         SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
-        for (Iterator it = this.term2InputPV.keySet().iterator(); it.hasNext();) {
-            result = result.add((Term) it.next());
+        for (Iterator<Term> it = this.term2InputPV.keySet().iterator(); it.hasNext();) {
+            result = result.add(it.next());
         }
         return result;
 
@@ -963,7 +962,7 @@ public class VisualDebugger {
      * 
      * @return the term2 input pv
      */
-    public HashMap getTerm2InputPV() {
+    public HashMap<Term, Term> getTerm2InputPV() {
         return term2InputPV;
     }
 
@@ -986,8 +985,8 @@ public class VisualDebugger {
      * 
      * @return term2term
      */
-    public HashMap getValuesForLocation(HashSet locs, PosInOccurrence pio) {
-        HashMap result = new HashMap();
+    public HashMap<Term, Term> getValuesForLocation(HashSet locs, PosInOccurrence pio) {
+        HashMap<Term, Term> result = new HashMap<Term, Term>();
 
         Term f = pio.constrainedFormula().formula();
         if (f.op() instanceof QuanUpdateOperator) {
@@ -1430,7 +1429,7 @@ public class VisualDebugger {
      * @param inputPV2term
      *                the new input p v2term
      */
-    public void setInputPV2term(HashMap inputPV2term) {
+    public void setInputPV2term(HashMap<Term, Term> inputPV2term) {
         this.inputPV2term = inputPV2term;
     }
 
@@ -1524,7 +1523,7 @@ public class VisualDebugger {
      * @param inputValues
      *                the new term2 input pv
      */
-    public void setTerm2InputPV(HashMap inputValues) {
+    public void setTerm2InputPV(HashMap<Term, Term> inputValues) {
         this.term2InputPV = inputValues;
     }
 
