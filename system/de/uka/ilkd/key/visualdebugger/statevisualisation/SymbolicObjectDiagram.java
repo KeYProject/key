@@ -966,7 +966,7 @@ public class SymbolicObjectDiagram {
             ArrayOfParameterDeclaration paraDecl = mbs.getProgramMethod(serv)
                     .getParameters();
 
-            final HashMap values = vd.getValuesForLocation(set, vd
+            final HashMap<Term,Term> values = vd.getValuesForLocation(set, vd
                     .getProgramPIO(itNode.getNode().sequent()));
 
             ListOfProgramVariable paramDeclAsPVList = SLListOfProgramVariable.EMPTY_LIST;
@@ -989,18 +989,24 @@ public class SymbolicObjectDiagram {
 
     }
 
+    /**
+     * sort the given array in order of the symbolic objects ids
+     * @param a the SymbolicObject array to sort
+     */
     private void sort(SymbolicObject a[]) {
-
-        int n = a.length;
-        SymbolicObject temp;
-
-        for (int i = 0; i < n - 1; i = i + 1)
-            for (int j = n - 1; j > i; j = j - 1)
-                if (a[j - 1].getId() > a[j].getId()) {
-                    temp = a[j - 1];
-                    a[j - 1] = a[j];
-                    a[j] = temp;
+        final Comparator<SymbolicObject> comparator = new Comparator<SymbolicObject>() {
+            public int compare(SymbolicObject o1, SymbolicObject o2) {
+                if (o1.getId() < o2.getId()) {
+                    return -1;
+                } else if (o1.getId() > o2.getId()) {
+                    return 1;
+                } else {
+                    return 0;
                 }
+            }
+            
+        };        
+        Arrays.sort(a, comparator);                       
     }
 
     private class EquClass {
@@ -1059,10 +1065,10 @@ public class SymbolicObjectDiagram {
         }
 
         public KeYJavaType getKeYJavaType() {
-            IteratorOfTerm it = members.iterator();
+            final IteratorOfTerm it = members.iterator();
             Sort s = it.next().sort();
             while (it.hasNext()) {
-                Sort s1 = it.next().sort();
+                final Sort s1 = it.next().sort();
                 if (s1.extendsTrans(s)) {
                     s = s1;
                 }
