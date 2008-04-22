@@ -261,32 +261,23 @@ public class WatchpointUtil {
      * 
      * Returns true, if the concatenation of all watchpoints by the junctor can
      * be evaluated to true, i.e. the proof can be closed
-     * 
+     *  
      * Example:
      * watchpoints: w1, w2, w3
      * junctor: /\ (AND - logical conjunction) -> evaluates w1 /\ w2 /\ w3
-     * \/ (OR  - logical disjunction) -> evalutaes w1 \/ w2 \/ w3
+     *          \/ (OR  - logical disjunction) -> evalutaes w1 \/ w2 \/ w3
      * 
      * @param watchpoints -
-     * a list of all watchpoints that have to be taken into
-     * account
-     * @param seq -
-     * the sequent
-     * @param pos -
-     * the PosInOcc
-     * @param proof -
-     * the proof
-     * @param junctor -
-     * the junctor to use
-     * @param negateJunctor -
-     * set this to true, if you want to realize NOR/NAND
-     * concatenation
-     * @param maxsteps -
-     * the upper bound of steps that should be applied to close
-     * the proof
+     * a list of all watchpoints that have to be taken into account
+     * @param seq - the sequent
+     * @param pos - the PosInOcc
+     * @param proof - the proof
+     * @param junctor -the junctor to use
+     * @param negateJunctor - set this to true, if you want to realize NOR/NAND concatenation
+     * @param maxsteps - the upper bound of steps that should be applied to close the proof
      * @param node the node
      * 
-     * @return true, if evalutate watchpoints
+     * @return true, if the watchpoint formula evaluates to true (according to concatenation)
      */
     public static boolean evalutateWatchpoints(Node node,
             List<WatchPoint> watchpoints, Sequent seq, PosInOccurrence pos,
@@ -555,6 +546,7 @@ public class WatchpointUtil {
                     Update elemtaryUpdate = uf.elementaryUpdate(
                             TermFactory.DEFAULT.createVariableTerm(originalVar),
                             TermFactory.DEFAULT.createVariableTerm((LocationVariable) lastRT.getHashMap().get(originalVar))); 
+                    System.out.println(elemtaryUpdate);
                     nameUpdates.add(elemtaryUpdate);}
             }
         }
