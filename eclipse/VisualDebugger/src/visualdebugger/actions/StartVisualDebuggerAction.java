@@ -34,6 +34,7 @@ import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.OperationContract;
@@ -498,6 +499,7 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
             return;
         }
 
+        final Proof proof;
         try {
             //determine selected method and project
             IMethod method 
@@ -528,7 +530,9 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
             visualdebugger.Activator.getDefault().setIProject(project);
 
             //start proof	            
-            startProver("DEBUGGER", project, method, allInvariants, true, true);
+            proof = startProver("DEBUGGER", project, method, allInvariants, true, true);
+
+            VisualDebugger.getVisualDebugger().initialize(proof.getServices());
 
         } catch(Throwable e) {
             KeYPlugin.getInstance().showErrorMessage(e.getClass().getName(), 
@@ -536,10 +540,6 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
             e.printStackTrace(System.out);
         }
 
-
-
-
-        VisualDebugger.getVisualDebugger().initialize();
     }
 
     /**
@@ -626,8 +626,9 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
      *            the inv post
      * @param assignable
      *            the assignable
+     * @return the main proof or null in case of an error
      */
-    private void startProver(String debuggerEventMsg,
+    private Proof startProver(String debuggerEventMsg,
             final IProject project, final IMethod method,
             boolean assumeClassInvariants, final boolean invPost,
             final boolean assignable) {
@@ -651,7 +652,7 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
                     + "loading the project \"" 
                     + project.getName() + "\" into the KeY prover:\n" 
                     + e.getMessage());
-            return;
+            return null;
         }
 
 //      determine method for which a proof should be started
@@ -667,13 +668,13 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
             // TODO Auto-generated catch block
             KeYPlugin.getInstance().showErrorMessage("Proof Obligation Generation Failed",
                     "A problem occurred when generating the PO: "+e1.getMessage());
-            return;
+            return null;
         }
 
         if (po == null) {
             KeYPlugin.getInstance().showErrorMessage("Proof Obligation Generation Failed",
             "A problem occurred when generating the PO");
-            return;
+            return null;
         }
 
 //      start proof
@@ -708,11 +709,13 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
             .getDebuggerStrategyProperties(true, false, false, new LinkedList<WatchPoint>());
 
             final StrategyFactory factory = new DebuggerStrategy.Factory();
+            final Proof symbolicExecProof = po.getPO().getFirstProof();
             Strategy strategy = 
-                factory.create(VisualDebugger.getVisualDebugger().getMediator().getProof(), 
-                        strategyProperties);
+                factory.create(symbolicExecProof, strategyProperties);
 
-            po.getPO().getFirstProof().setActiveStrategy(strategy);
+            symbolicExecProof.setActiveStrategy(strategy);
+
+            return symbolicExecProof;
 
         } catch(ProofInputException e)  {
             MessageDialog.openError(PlatformUI.getWorkbench()
@@ -720,7 +723,7 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
                     "Proof Input Exception",
                     "The following problem occurred when starting the proof:\n"
                     + e.getMessage());
-            return;
+            return null;
         }       
 
     }

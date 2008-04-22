@@ -1012,7 +1012,7 @@ public class VisualDebugger {
     /**
      * Initialize.
      */
-    public void initialize() {
+    public void initialize(Services services) {
 
         UpdateLabelListener lListener = new UpdateLabelListener();
         // lListener.setListeners(listeners);
@@ -1021,25 +1021,18 @@ public class VisualDebugger {
 
         // Extract ProgramVariables of the context program
         JavaInfo info = mediator.getServices().getJavaInfo();
-        Set kjts = info.getAllKeYJavaTypes();
         // info.getKeYProgModelInfo().getMethods(ct)
-        HashSet pvs = new HashSet();
-        for (Iterator it = kjts.iterator(); it.hasNext();) {
-            KeYJavaType kjt = (KeYJavaType) it.next();
+        HashSet<Location> pvs = new HashSet<Location>();
+        for (final KeYJavaType kjt : info.getAllKeYJavaTypes()) {
             if (kjt.getJavaType() instanceof ClassDeclaration) {
-                final ListOfProgramMethod methods = info
-                        .getAllProgramMethods(kjt);
-                for (IteratorOfProgramMethod mit = methods.iterator(); mit
-                        .hasNext();) {
-                    ProgramMethod m = mit.next();
-
+                final ListOfProgramMethod methods = info.getAllProgramMethods(kjt);
+                for (final ProgramMethod m : methods) {
                     if (m != null) {
                         ProgramVariableCollector pvc = new ProgramVariableCollector(
-                                m, mediator.getServices());
+                                m, services);
                         pvc.start();
                         pvs.addAll(pvc.result());
                     }
-
                 }
             }
         }
