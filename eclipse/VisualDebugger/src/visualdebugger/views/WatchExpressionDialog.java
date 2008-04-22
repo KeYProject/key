@@ -29,7 +29,12 @@ import visualdebugger.astops.Util;
 import de.uka.ilkd.key.visualdebugger.watchpoints.WatchpointDescriptor;
 
 /**
- * The Class WatchExpressionDialog.
+ * The Class WatchExpressionDialog allows the user to enter a watch expression. After clicking
+ * OK or pressing the enter button the expression is validated immediately. If errors occur the last
+ * one found is displayed. If the expression is valid the expression is written to the WatchpointDescriptor.
+ * Furthermore if the expression contained any the local types there position in the corresponding method
+ * is determined and stored.* 
+ * 
  */
 public class WatchExpressionDialog {
 
@@ -216,7 +221,7 @@ public class WatchExpressionDialog {
              positions.add(positionInfo.get(variableBinding));
                             
              }
-             // clean up in the end
+             // and clean up in the end
              workingCopy.discardWorkingCopy();
              setPositions(positions);
              return true;
@@ -285,11 +290,4 @@ public class WatchExpressionDialog {
         return positions;
     }
 
-//    private void setLocalVariables(Set<IVariableBinding> vars) {
-//        localVariables = vars;
-//    }
-//
-//    public Set<IVariableBinding> getVars() {
-//        return localVariables;
-//    }
 }

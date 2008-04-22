@@ -6,6 +6,9 @@ import org.eclipse.jdt.core.dom.*;
 
 /**
  * The Class PositionFinder.
+ * 
+ * This Class enumerates every IVariableBinding of the given method that is either a parameter or
+ * a local variable.
  */
 public class PositionFinder extends ASTVisitor {
 
