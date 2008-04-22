@@ -1700,14 +1700,18 @@ public class VisualDebugger {
         mediator = main.mediator();
         final ITNode node = n;
 
-        final Runnable interfaceSignaller = new Runnable() {
+        new StateVisualization(node, mediator,
+                maxProofStepsForStateVisComputation,
+                useDecisionProcedures);
+        
+        /*final Runnable interfaceSignaller = new Runnable() {
             public void run() {
                 new StateVisualization(node, mediator,
                         maxProofStepsForStateVisComputation,
                         useDecisionProcedures);
             }
         };
-        startThread(interfaceSignaller);
+        startThread(interfaceSignaller);*/
     }
     
     /**

@@ -237,6 +237,7 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
     
 
     private void refreshPCStates() {
+
         prestateForTracesSlider.setMinimum(0);
         if (stateVis != null) {
             prestateForTracesSlider.setMaximum(stateVis.numberOfPCStates());
@@ -252,13 +253,20 @@ public class SymbolicStateView extends ViewPart implements DebuggerListener {
             postButton.setEnabled(true);
             preState=true;
             possibleIndexTerms= stateVis.getPossibleIndexTermsForPcState(0);
-            if (possibleIndexTerms.length>0)
+           if (possibleIndexTerms.length>0) {
                 currentState = stateVis.getSymbolicState(0,possibleIndexTerms[0],true);
+           }
             else throw new RuntimeException("No States to visualize");
             arrayIndexSlider.setMaximum(possibleIndexTerms.length);            
             arrayIndexSlider.setSelection(0);
             arrayIndexSlider.setEnabled(true);
-            refreshVisualizedState();
+
+            try {
+                refreshVisualizedState();
+            } catch (RuntimeException re) {
+                re.printStackTrace();
+                System.out.println(re.getMessage());
+            }
         }else{
             prestateForTracesSlider.setEnabled(false);
             prestateForTracesSlider.setMaximum(1);

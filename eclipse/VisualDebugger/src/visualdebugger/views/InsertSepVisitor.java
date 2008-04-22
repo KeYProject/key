@@ -33,7 +33,7 @@ public class InsertSepVisitor extends ASTVisitor {
 
         } else if (location.isChildListProperty()) {
 
-            List list = (List) parent.getStructuralProperty(location);
+            List<ASTNode> list = (List<ASTNode>) parent.getStructuralProperty(location);
             int index = list.indexOf(oldNode);
             list.set(index, newNode);
         }
@@ -43,8 +43,9 @@ public class InsertSepVisitor extends ASTVisitor {
     private int id = 0;
 
     /** The types. */
-    private final HashSet types = new HashSet();
+    private final HashSet<ITypeBinding> types = new HashSet<ITypeBinding>();
 
+    
     /* (non-Javadoc)
      * @see org.eclipse.jdt.core.dom.ASTVisitor#endVisit(org.eclipse.jdt.core.dom.ArrayAccess)
      */
@@ -186,7 +187,7 @@ public class InsertSepVisitor extends ASTVisitor {
      * 
      * @return the types
      */
-    public HashSet getTypes() {
+    public HashSet<ITypeBinding> getTypes() {
         return types;
     }
 

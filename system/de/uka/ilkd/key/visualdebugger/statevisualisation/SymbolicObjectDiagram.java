@@ -119,7 +119,9 @@ public class SymbolicObjectDiagram {
             SetOfTerm[] possibleIndexTerms, SetOfTerm indexTerms,
             SetOfTerm instanceConfiguration) {
         this.instanceConfiguration = instanceConfiguration;
+
         prepare(itNode, serv, pc, refInPC);
+
         this.postTerms = postTerms;
 
         this.arrayLocations = arrayLocations;
@@ -129,6 +131,7 @@ public class SymbolicObjectDiagram {
         this.indexTerms = indexTerms;
 
         createSymbolicObjects();
+
         if (!pre) {
             createSymbolicObjectsForNewInstances(preTerms);
             createPostState(preTerms, postTerms);
@@ -210,7 +213,7 @@ public class SymbolicObjectDiagram {
         Iterator it = objects.iterator();
         while (it.hasNext()) {
             SymbolicObject so = (SymbolicObject) it.next();
-            if (so.isStatic()
+            if (so.isStatic() 
                     && so.getType().equals(op.getContainerType().getJavaType()))
                 so.addAssociation(op, soReferenced);
 
@@ -432,7 +435,8 @@ public class SymbolicObjectDiagram {
                     if (refInPC.contains(t) || postTerms.contains(t)) // TODO??
                         addIndexReference(t.sub(0), t.sub(1), so, result);
 
-                } else if (t.op() instanceof ProgramVariable) {
+                } else if (t.op() instanceof ProgramVariable && 
+                        ((ProgramVariable)t.op()).isMember()) {
                     if (refInPC.contains(t) || postTerms.contains(t)) // TODO
                                                                         // ???//only
                                                                         // assoc
