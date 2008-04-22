@@ -12,11 +12,7 @@ package de.uka.ilkd.key.gui;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.Iterator;
 
 import javax.swing.*;
@@ -29,21 +25,9 @@ import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.collection.SLListOfString;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.IteratorOfKeYJavaType;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.SetAsListOfKeYJavaType;
-import de.uka.ilkd.key.java.abstraction.SetOfKeYJavaType;
+import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.proof.init.BehaviouralSubtypingInvPO;
-import de.uka.ilkd.key.proof.init.EnsuresPostPO;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.PreservesGuardPO;
-import de.uka.ilkd.key.proof.init.PreservesInvPO;
-import de.uka.ilkd.key.proof.init.PreservesOwnInvPO;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.init.RespectsModifiesPO;
-import de.uka.ilkd.key.proof.init.SpecExtPO;
-import de.uka.ilkd.key.proof.init.StrongOperationContractPO;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 
 
@@ -286,7 +270,12 @@ public class POBrowser extends JDialog {
 	if(specRepos.getOperationContracts(pm).size() > 0) {
 	    pos = pos.append("EnsuresPost");
 	}
-	
+
+        //RespectsModifies
+        if(specRepos.getOperationContracts(pm).size() > 0) {
+            pos = pos.append("RespectsWorkingSpace");           
+        }
+        
 	//RespectsModifies
 	if(specRepos.getOperationContracts(pm).size() > 0) {
 	    pos = pos.append("RespectsModifies");	    
@@ -378,6 +367,9 @@ public class POBrowser extends JDialog {
         } else if (poString.equals("EnsuresPost")) {
             assert selectedEntry.pm != null;
             return createEnsuresPostPO(selectedEntry.pm);
+        } else if (poString.equals("RespectsWorkingSpace")) {
+            assert selectedEntry.pm != null;
+            return createRespectsWorkingSpacePO(selectedEntry.pm);
         } else if (poString.equals("RespectsModifies")) {
             assert selectedEntry.pm != null;
             return createRespectsModifiesPO(selectedEntry.pm);
@@ -475,6 +467,23 @@ public class POBrowser extends JDialog {
 	} else {
 	    return null;
 	}
+    }
+    
+    private ProofOblInput createRespectsWorkingSpacePO(ProgramMethod pm) {
+        ContractConfigurator cc = new ContractConfigurator(this,
+                                                           services, 
+                                                           pm, 
+                                                           null, 
+                                                           true,
+                                                           true,
+                                                           false);
+        if(cc.wasSuccessful()) {
+            return new RespectsWorkingSpacePO(initConfig, 
+                                     cc.getContract(), 
+                                     cc.getAssumedInvs());
+        } else {
+            return null;
+        }
     }
     
     

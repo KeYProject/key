@@ -142,7 +142,7 @@ REAL : "\\real";
 DURATION : "\\duration";
 SPACE : "\\space";
 WORKINGSPACE : "\\working_space";
-RIGIDWORKINGSPACE : "\\rigid_working_space";
+RIGIDWORKINGSPACE : "\\rigid_working_space"; //KeY extension, not official JML
 TYPEOF : "\\typeof";
 ELEMTYPE : "\\elemtype";
 TYPE_SMALL : "\\type";
@@ -153,10 +153,10 @@ LBLNEG : "\\lblneg";
 LBLPOS : "\\lblpos";
 TYPE : "\\TYPE";
 NOWARN : "\\nowarn";
-CURRENT_MEMORY_AREA : "\\currentMemoryArea";
-IN_IMMORTAL_MEMORY : "\\inImmortalMemory";
-OUTER_SCOPE : "\\outerScope";
-IN_OUTER_SCOPE : "\\inOuterScope";
+CURRENT_MEMORY_AREA : "\\currentMemoryArea"; //KeY extension, not official JML
+IN_IMMORTAL_MEMORY : "\\inImmortalMemory"; //KeY extension, not official JML
+OUTER_SCOPE : "\\outerScope"; //KeY extension, not official JML
+IN_OUTER_SCOPE : "\\inOuterScope"; //KeY extension, not official JML
 
 
 LPAREN

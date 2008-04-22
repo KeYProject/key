@@ -29,9 +29,10 @@ public class WorkingSpaceContractDialog extends JDialog {
     final Services services;
     
     public WorkingSpaceContractDialog(String title, JFrame parent, 
-            Services services) {
+            Services services, Term wso) {
         super(parent, title, true);
         this.services = services;
+        this.wso = wso;
     }
     
     public void setSpecifications(SetOfOperationContract specSet){
@@ -141,6 +142,7 @@ public class WorkingSpaceContractDialog extends JDialog {
         JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                spec = null;
                 setVisible(false);
             }
         });

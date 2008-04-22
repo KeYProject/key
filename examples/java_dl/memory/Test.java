@@ -14,12 +14,12 @@ public class Test extends SuperTest{
 
     /*@ public normal_behavior
       @  requires oArr.memoryArea == \currentMemoryArea;
-      @  assignable oArr[0];
+      @  assignable oArr[0], \object_creation(Test);
       @  working_space \space(Test);
       @ also public normal_behavior
       @  requires oArr.memoryArea == \currentMemoryArea;
-      @  assignable oArr[0];
-      @  working_space 32;
+      @  assignable oArr[0], \object_creation(Test);
+      @  working_space 40;
       @  
       @*/
     public void createObj(){
@@ -31,7 +31,7 @@ public class Test extends SuperTest{
       @   {|
       @      working_space \space(Test);
       @     also
-      @      working_space 32;
+      @      working_space 40;
       @   |}
       @*/
     public void createObjectWithContract(){

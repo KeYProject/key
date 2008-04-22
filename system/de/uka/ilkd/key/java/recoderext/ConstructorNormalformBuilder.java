@@ -396,7 +396,14 @@ public class ConstructorNormalformBuilder
 		}
 
 	    }
-	}
+	}else if(cd == javaLangObject && body != null) {
+	    ASTList<Statement> initializers = (ASTList<Statement>) class2initializers.get(cd);
+	    for (int i = 0; i<initializers.size(); i++) {
+	        attach((Statement) 
+	                initializers.get(i).deepClone(),
+	                body, i);
+	    }
+        }
 
 	
 	MethodDeclaration nf =  new MethodDeclaration

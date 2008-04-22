@@ -184,8 +184,8 @@ public class PrepareObjectBuilder
 	    body.add((new MethodReference
 			 (new SuperReference(), 
 			  new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE))));
-	}
-	body.addAll(class2fields.get(classType));
+	    body.addAll(class2fields.get(classType));
+        }
 	return new StatementBlock(body);
     }
     

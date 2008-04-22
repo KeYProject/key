@@ -12,12 +12,11 @@ public class RespectsWorkingSpacePO extends EnsuresPO {
 
     private final OperationContract contract;
     
-    public RespectsWorkingSpacePO(InitConfig initConfig, 
-                         String name,
+    public RespectsWorkingSpacePO(InitConfig initConfig,
                          OperationContract contract, 
                          SetOfClassInvariant assumedInvs) {
         super(initConfig, 
-              name, 
+              "RespectsWorkingSpace", 
               contract.getProgramMethod(), 
               contract.getModality(), 
               assumedInvs, 

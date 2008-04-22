@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.WorkingSpaceContractDialog;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -83,16 +84,23 @@ public class UseWorkingSpaceContractRule implements BuiltInRule {
     }
 
     public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
-        OperationContract spec = getSelectedMethodSpec(ruleApp, goal.node().proof());
         
-        final ListOfGoal result = goal.split(2);            
-               
-        final IteratorOfGoal goalIt = result.iterator();
-
         Term ws = ruleApp.posInOccurrence().subTerm();
         Term wsNoUpd = goBelowUpdates(ruleApp.posInOccurrence()).subTerm();
         IWorkingSpaceOp wso = (IWorkingSpaceOp) wsNoUpd.op();
         TermFactory tf = TermFactory.DEFAULT;
+        
+        WorkingSpaceContractDialog dialog
+            = new WorkingSpaceContractDialog("Working Space Contract chooser", 
+                    Main.getInstance(), services, wsNoUpd);
+        OperationContract spec = selectSpec(services, ws, dialog);
+        int compare = dialog.compare();
+        
+        if(spec==null) return null;
+    
+        final ListOfGoal result = goal.split(2);            
+           
+        final IteratorOfGoal goalIt = result.iterator();
         
         if(!(ws.op() instanceof WorkingSpaceRigidOp) || !ws.op().isRigid(ws)) {
             Goal g = goalIt.next();
@@ -120,7 +128,7 @@ public class UseWorkingSpaceContractRule implements BuiltInRule {
                     wso.getParameters(wsNoUpd), services);
             Term specWS = spec.getWorkingSpace(wso.getSelf(wsNoUpd), 
                     wso.getParameters(wsNoUpd), services);
-            if(((WorkingSpaceContractRuleApp) ruleApp).compare() ==1){
+            if(compare == 1){
                 Goal g = goalIt.next();            
                 openBranch(anonymize(tf.createJunctorTerm(Op.AND,
                         tf.createJunctorTerm(Op.AND, tf.createEqualityTerm(     
@@ -139,7 +147,7 @@ public class UseWorkingSpaceContractRule implements BuiltInRule {
                         tf.createJunctorTerm(Op.IMP, preWS, 
                         tb.imp(pre.getAxiomsAsFormula(), pre.getFormula())), services, g, Op.IMP), 
                         g, "Pre", services, false);        
-            }else if(((WorkingSpaceContractRuleApp) ruleApp).compare() ==-1){
+            }else if(compare ==-1){
                 Goal g = goalIt.next();
                 openBranch(anonymize(tf.createJunctorTerm(Op.AND,
                         tf.createJunctorTerm(Op.AND, tf.createFunctionTerm(      
@@ -178,24 +186,9 @@ public class UseWorkingSpaceContractRule implements BuiltInRule {
         return tf.createAnonymousUpdateTerm(AnonymousUpdate.getNewAnonymousOperator(), t);       
     }
     
-    private OperationContract getSelectedMethodSpec(RuleApp ruleApp, Proof proof) {        
-        if (ruleApp instanceof WorkingSpaceContractRuleApp) {
-            return ((WorkingSpaceContractRuleApp) ruleApp).getOperationContract();    
-        }
-        return null;
-    }
-    
-    public OperationContract selectSpec(Proof proof, PosInOccurrence pos, 
-            WorkingSpaceContractDialog wscd) {
-        return selectSpec(proof.getServices(), proof, pos, wscd, true);
-    }       
-    
     private OperationContract selectSpec(Services services, 
-            Proof proof, 
-            PosInOccurrence pos, 
-            WorkingSpaceContractDialog wscd,
-            boolean allowConfiguration) {
-        Term t = pos.subTerm();
+            Term t, 
+            WorkingSpaceContractDialog wscd) {
         
         while(t.op() instanceof IUpdateOperator){
             t = ((IUpdateOperator) t.op()).target(t);
@@ -205,7 +198,7 @@ public class UseWorkingSpaceContractRule implements BuiltInRule {
         wscd.setSpecifications(getSpecs(pm ,services));
         
         if(t.op() instanceof WorkingSpaceRigidOp){
-            wscd.setCondition(((WorkingSpaceRigidOp) pos.subTerm().op()).getPre());
+            wscd.setCondition(((WorkingSpaceRigidOp) t.op()).getPre());
         }else{
             wscd.setCondition(null);
         }

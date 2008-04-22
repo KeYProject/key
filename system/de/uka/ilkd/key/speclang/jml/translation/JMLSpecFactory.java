@@ -258,24 +258,41 @@ public class JMLSpecFactory {
         
         //translate working_space
         Term workingSpace = null;
-        FormulaWithAxioms wsPost = null;
+        FormulaWithAxioms wsPost = new FormulaWithAxioms(TB.tt());
         Term imCons=null;
+        ProgramVariable initialMemoryArea = services.getJavaInfo().
+        getDefaultMemoryArea();
+        Term imTerm = TB.var(initialMemoryArea);
+        imCons = TB.dot(imTerm, services.getJavaInfo().getAttribute(
+        "consumed", "javax.realtime.MemoryArea"));
         if(originalWorkingSpace!=null){
             String ws = originalWorkingSpace.text.trim();
-            ws = "\\currentMemoryArea <= \\old("+ws.substring(0, ws.length()-1)+" + \\currentMemoryArea);";
-            System.out.println("ws: "+ws);
-            wsPost
-                = translator.translateExpression(
-                        new PositionedString(ws,
-                                originalWorkingSpace.fileName,
-                                new Position(originalWorkingSpace.pos.getLine(), 
-                                        originalWorkingSpace.pos.getColumn()-5)),
-                        programMethod.getContainerType(),
-                        selfVar, 
-                        paramVars, 
-                        resultVar, 
-                        excVar,
-                        atPreFunctions);
+            Term oldCons = translator.translateExpression(
+                    new PositionedString("\\old(\\currentMemoryArea.consumed)",
+                            originalWorkingSpace.fileName,
+                            new Position(originalWorkingSpace.pos.getLine(), 
+                                    originalWorkingSpace.pos.getColumn())),
+                    programMethod.getContainerType(),
+                    selfVar, 
+                    paramVars, 
+                    resultVar, 
+                    excVar,
+                    atPreFunctions).getFormula();
+            Term oldWS = translator.translateExpression(
+                    new PositionedString("\\old("+ws.substring(0, ws.length()-1)+")",
+                            originalWorkingSpace.fileName,
+                            new Position(originalWorkingSpace.pos.getLine(), 
+                                    originalWorkingSpace.pos.getColumn()-5)),
+                    programMethod.getContainerType(),
+                    selfVar, 
+                    paramVars, 
+                    resultVar, 
+                    excVar,
+                    atPreFunctions).getFormula();
+            Function add = (Function) services.getNamespaces().functions().lookup(new Name("add"));
+            Function leq = (Function) services.getNamespaces().functions().lookup(new Name("leq"));
+            wsPost = new FormulaWithAxioms(TB.func(leq, imCons, TB.func(add, oldCons, oldWS)));
+            
             workingSpace
                 = translator.translateExpression(
                     originalWorkingSpace,
@@ -285,16 +302,11 @@ public class JMLSpecFactory {
                     resultVar, 
                     excVar,
                     atPreFunctions).getFormula();
-            ProgramVariable initialMemoryArea = services.getJavaInfo().
-                getDefaultMemoryArea();
-            Term imTerm = TB.var(initialMemoryArea);
-            imCons = TB.dot(imTerm, services.getJavaInfo().getAttribute(
-                "consumed", "javax.realtime.MemoryArea"));
         }       
         
         //translate assignable
         SetOfLocationDescriptor assignable;
-        if(originalAssignable.isEmpty() && imCons==null) {
+        if(originalAssignable.isEmpty()) {
             assignable = EverythingLocationDescriptor.INSTANCE_AS_SET;
         } else {
             assignable = SetAsListOfLocationDescriptor.EMPTY_SET;
@@ -307,7 +319,7 @@ public class JMLSpecFactory {
                                         paramVars);
                 assignable = assignable.union(translated);        
             }
-            if(imCons!=null) assignable.add(new BasicLocationDescriptor(imCons));
+            assignable = assignable.add(new BasicLocationDescriptor(imCons));
         }
         
         //translate ensures

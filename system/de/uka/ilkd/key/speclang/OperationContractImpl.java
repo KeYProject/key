@@ -114,16 +114,16 @@ public class OperationContractImpl implements OperationContract {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private Map /*Operator -> Term*/<Operator, Term> getReplaceMap(
+    private Map /*Operator -> Term*/<Term, Term> getReplaceMap(
                 Term self, 
                 ListOfTerm params, 
                 Services services) {
-        Map<Operator, Term> result = new LinkedHashMap<Operator, Term>();
-
+        Map<Term, Term> result = new LinkedHashMap<Term, Term>();
+        TermBuilder tb = TermBuilder.DF;   
         //self
         if(self != null) {
             assert self.sort().extendsTrans(originalSelfVar.sort());
-            result.put(originalSelfVar, self);
+            result.put(tb.var(originalSelfVar), self);
         }
 
         //parameters
@@ -135,7 +135,7 @@ public class OperationContractImpl implements OperationContract {
                 ParsableVariable originalParamVar = it1.next();
                 Term paramVar           = it2.next();
                 assert paramVar.sort().extendsTrans(originalParamVar.sort());
-                result.put(originalParamVar, paramVar);
+                result.put(tb.var(originalParamVar), paramVar);
             }
         }
         return result;
@@ -260,7 +260,7 @@ public class OperationContractImpl implements OperationContract {
         assert params != null;
         assert params.size() == originalParamVars.size();
         assert services != null;
-        Map<Operator, Term> replaceMap = getReplaceMap(self, 
+        Map<Term, Term> replaceMap = getReplaceMap(self, 
                params, 
                services);
         OpReplacer or = new OpReplacer(replaceMap);
@@ -274,7 +274,7 @@ public class OperationContractImpl implements OperationContract {
         assert params != null;
         assert params.size() == originalParamVars.size();
         assert services != null;
-        Map<Operator, Term> replaceMap = getReplaceMap(self, 
+        Map<Term, Term> replaceMap = getReplaceMap(self, 
                 params, 
                 services);
         OpReplacer or = new OpReplacer(replaceMap);
@@ -368,6 +368,8 @@ public class OperationContractImpl implements OperationContract {
                 services);
         final String post = LogicPrinter.quickPrintTerm(originalPost.getFormula(), 
                 services);
+        final String ws = originalWorkingSpace!=null? LogicPrinter.quickPrintTerm(originalWorkingSpace, 
+                services) : "";
         final String locDesc = LogicPrinter.quickPrintLocationDescriptors(originalModifies, 
                 services);
                       
@@ -377,6 +379,8 @@ public class OperationContractImpl implements OperationContract {
                 + LogicPrinter.escapeHTML(post)
                 + "<br><b>modifies</b> "
                 + LogicPrinter.escapeHTML(locDesc)
+                + "<br><b>working space</b> "
+                + LogicPrinter.escapeHTML(ws)
                 + "<br><b>termination</b> "
                 + getModality()
                 + "</html>";
@@ -390,6 +394,8 @@ public class OperationContractImpl implements OperationContract {
 		+ originalPost 
 		+ "; modifies: " 
 		+ originalModifies
+                + "; working space: "
+                + (originalWorkingSpace!=null? originalWorkingSpace : "not specified")
 		+ "; termination: "
 		+ getModality();
     }
