@@ -18,36 +18,36 @@
 	<property name="javacTarget" value="1.5" />
 	<property name="compilerArg" value="" />
 	<path id="Plug-in Dependencies.libraryclasspath">
-		<pathelement path="../KeYExternalLibraries/jcoverage.jar" />
-		<pathelement path="../KeYExternalLibraries/antlr.jar" />
-		<pathelement path="../KeYExternalLibraries/dresden-ocl-demo.jar" />
-		<pathelement path="../KeYExternalLibraries/jargs.jar" />
-		<pathelement path="../KeYExternalLibraries/javacc.jar" />
-		<pathelement path="../KeYExternalLibraries/junit.jar" />
-		<pathelement path="../KeYExternalLibraries/log4j.jar" />
-		<pathelement path="../KeYExternalLibraries/recoderKey.jar" />
-		<pathelement path="../KeYExternalLibraries/xerces.jar" />
-		<pathelement path="../org.key-project.core/key.jar" />
-	        <pathelement location="${eclipse_home}/plugins/org.eclipse.core.runtime_3.3.100.v20070530.jar"/>
-		<pathelement location="${eclipse_home}/plugins/org.eclipse.osgi_3.3.2.R33x_v20080105.jar"/>
-		<pathelement location="${eclipse_home}/plugins/org.eclipse.equinox.common_3.3.0.v20070426.jar"/>
-		<pathelement location="${eclipse_home}/plugins/org.eclipse.core.jobs_3.3.1.R33x_v20070709.jar"/>
-		<pathelement location="${eclipse_home}/plugins/org.eclipse.core.runtime.compatibility.registry_3.2.100.v20070316/runtime_registry_compatibility.jar"/>
-		<pathelement location="${eclipse_home}/plugins/org.eclipse.equinox.registry_3.3.1.R33x_v20070802.jar"/>
-		<pathelement location="${eclipse_home}/plugins/org.eclipse.equinox.preferences_3.2.101.R33x_v20080117.jar"/>
-		<pathelement location="${eclipse_home}/plugins/org.eclipse.core.contenttype_3.2.100.v20070319.jar"/>
-		<pathelement location="${eclipse_home}/plugins/org.eclipse.equinox.app_1.0.1.R33x_v20070828.jar"/>
-		<pathelement location="${eclipse_home}/plugins/org.eclipse.ui_3.3.1.M20071128-0800.jar"/>
-		<pathelement location="${eclipse_home}/plugins/org.eclipse.swt_3.3.2.v3349d.jar"/>
-		<pathelement location="${eclipse_home}/plugins/org.eclipse.swt.gtk.linux.x86_3.3.2.v3349.jar"/>
-		<pathelement location="${eclipse_home}/plugins/org.eclipse.jface_3.3.2.M20080207-0800.jar"/>
-		<pathelement location="${eclipse_home}/plugins/org.eclipse.core.commands_3.3.0.I20070605-0010.jar"/>
-		<pathelement location="${eclipse_home}/plugins/org.eclipse.ui.workbench_3.3.2.M20080207-0800.jar"/>
-		<pathelement location="${eclipse_home}/plugins/org.eclipse.jdt.core_3.3.3.v_793_R33x.jar"/>
-		<pathelement location="${eclipse_home}/plugins/org.eclipse.jdt.compiler.apt_1.0.1.R33x_v20071002-2100.jar"/>
-		<pathelement location="${eclipse_home}/plugins/org.eclipse.jdt.compiler.tool_1.0.1.v_793_R33x.jar"/>
-		<pathelement location="${eclipse_home}/plugins/org.eclipse.core.resources_3.3.1.R33x_v20080205.jar"/>
-		<pathelement path="@dot" />
+	  <pathelement path="../KeYExternalLibraries/jcoverage.jar" />
+	  <pathelement path="../KeYExternalLibraries/antlr.jar" />
+	  <pathelement path="../KeYExternalLibraries/dresden-ocl-demo.jar" />
+	  <pathelement path="../KeYExternalLibraries/jargs.jar" />
+	  <pathelement path="../KeYExternalLibraries/javacc.jar" />
+	  <pathelement path="../KeYExternalLibraries/junit.jar" />
+	  <pathelement path="../KeYExternalLibraries/log4j.jar" />
+	  <pathelement path="../KeYExternalLibraries/recoderKey.jar" />
+	  <pathelement path="../KeYExternalLibraries/xerces.jar" />
+	  <pathelement path="../org.key-project.core/key.jar" />
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.core.resources_3.3.1.R33x_v20080205.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.core.runtime_3.3.100.v20070530.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.osgi_3.3.2.R33x_v20080105.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.equinox.common_3.3.0.v20070426.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.core.jobs_3.3.1.R33x_v20070709.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.core.runtime.compatibility.registry_3.2.100.v20070316/runtime_registry_compatibility.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.equinox.registry_3.3.1.R33x_v20070802.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.equinox.preferences_3.2.101.R33x_v20080117.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.core.contenttype_3.2.100.v20070319.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.equinox.app_1.0.1.R33x_v20070828.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.jdt.core_3.3.3.v_793_R33x.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.jdt.compiler.apt_1.0.1.R33x_v20071002-2100.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.jdt.compiler.tool_1.0.1.v_793_R33x.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.ui_3.3.1.M20071128-0800.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.swt_3.3.2.v3349d.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.swt.gtk.linux.x86_3.3.2.v3349.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.jface_3.3.2.M20080207-0800.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.core.commands_3.3.0.I20070605-0010.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.ui.workbench_3.3.2.M20080207-0800.jar"/>
+	  <pathelement path="@dot" />
 	</path>
 
 	<target name="init" depends="properties">
