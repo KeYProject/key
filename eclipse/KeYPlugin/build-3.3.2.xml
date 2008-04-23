@@ -9,7 +9,7 @@
 	<property environment="env" />
 
 	<!-- Compiler settings. -->
-	<property name="javacFailOnError" value="false" />
+	<property name="javacFailOnError" value="true" />
 	<property name="javacDebugInfo" value="on" />
 	<property name="javacVerbose" value="true" />
 	<property name="target" value="1.5"/>
@@ -134,15 +134,15 @@
 
 	<target name="gather.sources" depends="init" if="destination.temp.folder">
 		<mkdir dir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" />
-		<copy file="${build.result.folder}/KeYPluginsrc.zip" todir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" failonerror="false" overwrite="false" />
-		<copy todir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" failonerror="false" overwrite="false">
+		<copy file="${build.result.folder}/KeYPluginsrc.zip" todir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false" />
+		<copy todir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false">
 			<fileset dir="${basedir}" includes="src/,jars/antlr.jar,jars/dresden-ocl-demo.jar,jars/jargs.jar,jars/javacc.jar,jars/jcoverage.jar,jars/junit.jar,jars/log4j.jar,jars/recoderKey.jar,jars/xerces.jar,plugin.xml,README,META-INF/,key-small.png" />
 		</copy>
 	</target>
 
 	<target name="gather.logs" depends="init" if="destination.temp.folder">
 		<mkdir dir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" />
-		<copy file="${temp.folder}/KeYPlugin.jar.bin.log" todir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" failonerror="false" overwrite="false" />
+		<copy file="${temp.folder}/KeYPlugin.jar.bin.log" todir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false" />
 	</target>
 
 	<target name="clean" depends="init" description="Clean the plug-in: KeYPlugin of all the zips, jars and logs created.">
