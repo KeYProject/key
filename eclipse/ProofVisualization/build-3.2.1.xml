@@ -10,11 +10,11 @@
 
 
 	<!-- Compiler settings. -->
-	<property name="javacFailOnError" value="false"/>
+	<property name="javacFailOnError" value="true"/>
 	<property name="javacDebugInfo" value="on"/>
 	<property name="javacVerbose" value="true"/>
-	<property name="javacSource" value="1.4"/>
-	<property name="javacTarget" value="1.4"/>
+	<property name="javacSource" value="1.5"/>
+	<property name="javacTarget" value="1.5"/>
 	<property name="compilerArg" value=""/>
 
 
@@ -134,15 +134,15 @@
 
 	<target name="gather.sources" depends="init" if="destination.temp.folder">
 		<mkdir dir="${destination.temp.folder}/ProofVisualization_${env.KEY_VERSION_SHORT}"/>
-		<copy file="${build.result.folder}/ProofVisualizationsrc.zip" todir="${destination.temp.folder}/ProofVisualization_${env.KEY_VERSION_SHORT}" failonerror="false" overwrite="false"/>
-		<copy todir="${destination.temp.folder}/ProofVisualization_${env.KEY_VERSION_SHORT}" failonerror="false" overwrite="false">
+		<copy file="${build.result.folder}/ProofVisualizationsrc.zip" todir="${destination.temp.folder}/ProofVisualization_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false"/>
+		<copy todir="${destination.temp.folder}/ProofVisualization_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false">
 			<fileset dir="${basedir}" includes="src/,plugin.xml,icons/,ProofVisualization.jar"			/>
 		</copy>
 	</target>
 
 	<target name="gather.logs" depends="init" if="destination.temp.folder">
 		<mkdir dir="${destination.temp.folder}/ProofVisualization_${env.KEY_VERSION_SHORT}"/>
-		<copy file="${temp.folder}/ProofVisualization.jar.bin.log" todir="${destination.temp.folder}/ProofVisualization_${env.KEY_VERSION_SHORT}" failonerror="false" overwrite="false"/>
+		<copy file="${temp.folder}/ProofVisualization.jar.bin.log" todir="${destination.temp.folder}/ProofVisualization_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false"/>
 	</target>
 
 	<target name="clean" depends="init" description="Clean the plug-in: ProofVisualization of all the zips, jars and logs created.">
