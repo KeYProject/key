@@ -320,12 +320,22 @@ public class Main extends JFrame implements IMain {
      * @param visible a boolean indicating if Main shall be made visible
      * @return the instance of Main
      */
-    public static Main getInstance(boolean visible) {
+    public static Main getInstance(final boolean visible) {
         if (instance == null) {
             instance = new Main("KeY -- Prover");
         }
-        if (!instance.isVisible())
-            instance.setVisible(visible); // XXX: enough?
+        if (!instance.isVisible()) {
+            if (SwingUtilities.isEventDispatchThread()) {
+                instance.setVisible(visible); // XXX: enough?
+            } else {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {                            
+                        if (!instance.isVisible())
+                            instance.setVisible(visible);
+                    }
+                });
+            }
+        }
         return instance;
     }
     

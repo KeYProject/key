@@ -482,28 +482,19 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
             return;
         }
 
-        VisualDebugger.setDebuggingMode(true);
+        VisualDebugger.setDebuggingMode(true);     
 
-        final Main keyProver = Main.getInstance(false);
-
-        // remove old environments
-        while (VisualDebugger.getVisualDebugger().getMediator().getProof() != null) {
-            keyProver.closeTaskWithoutInteraction();
-        }
-
-
-        VisualDebugger.getVisualDebugger();// .prepareKeY();
+        VisualDebugger.getVisualDebugger();
 
 
         if(selection == null || !(selection instanceof StructuredSelection)) {
             return;
         }
 
-        final Proof proof;
+        Proof proof = null;
         try {
             //determine selected method and project
-            IMethod method 
-            = (IMethod) ((StructuredSelection)selection).getFirstElement();
+            final IMethod method = (IMethod) ((StructuredSelection)selection).getFirstElement();
             ICompilationUnit srcFile = method.getCompilationUnit();
             if(srcFile == null) {
                 KeYPlugin.getInstance().showErrorMessage(
@@ -521,8 +512,9 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
             // TODO generalize to consider packageFragmentRoots (needed to
             // support special source locations like folders only linked into the
             // eclipse project
-            IProject project = srcFile.getJavaProject().getProject();
+            final IProject project = srcFile.getJavaProject().getProject();
 
+            assert project != null;
 
             visualdebugger.Activator.getDefault().setProject(
                     srcFile.getJavaProject());
@@ -530,16 +522,33 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
             visualdebugger.Activator.getDefault().setIProject(project);
 
             //start proof	            
-            proof = startProver("DEBUGGER", project, method, allInvariants, true, true);
 
-            VisualDebugger.getVisualDebugger().initialize(proof.getServices());
+            startupProver();                
+            proof = startProver(project, method, allInvariants, true, true);
 
+            if (proof != null) {
+                VisualDebugger.getVisualDebugger().fireDebuggerEvent(
+                        new DebuggerEvent(DebuggerEvent.PROJECT_LOADED_SUCCESSFUL,
+                                "Project "+project.getName()+" loaded."));            
+                VisualDebugger.getVisualDebugger().initialize(proof.getServices());
+            } else {
+                throw new ProofInputException("Project "+project.getName()+" could not be loaded.");
+            }           
         } catch(Throwable e) {
             KeYPlugin.getInstance().showErrorMessage(e.getClass().getName(), 
                     e.getMessage());
             e.printStackTrace(System.out);
         }
 
+    }
+
+    private void startupProver() {        
+        final Main keyProver = Main.getInstance(false);
+
+        // remove old environments
+        while (VisualDebugger.getVisualDebugger().getMediator().getProof() != null) {
+            keyProver.closeTaskWithoutInteraction();
+        }
     }
 
     /**
@@ -606,7 +615,7 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
         EnvInput envInput = new SLEnvInput(location.getAbsolutePath());
 
         //call ProblemInitializer
-        ProblemInitializer pi = new ProblemInitializer(Main.getInstance());
+        ProblemInitializer pi = new ProblemInitializer(Main.getInstance(false));
         InitConfig result = pi.prepare(envInput);
         return result;
     }
@@ -628,15 +637,9 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
      *            the assignable
      * @return the main proof or null in case of an error
      */
-    private Proof startProver(String debuggerEventMsg,
-            final IProject project, final IMethod method,
+    private Proof startProver(final IProject project, final IMethod method,
             boolean assumeClassInvariants, final boolean invPost,
             final boolean assignable) {
-
-        VisualDebugger.getVisualDebugger().fireDebuggerEvent(
-                new DebuggerEvent(DebuggerEvent.PROJECT_LOADED_SUCCESSFUL,
-                        debuggerEventMsg));
-
 
         //TODO: use customised info allInvariants etc.
 
@@ -678,7 +681,7 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
         }
 
 //      start proof
-        final ProblemInitializer pi = new ProblemInitializer(Main.getInstance());
+        final ProblemInitializer pi = new ProblemInitializer(Main.getInstance(false));
         try {	        
 
             if (SwingUtilities.isEventDispatchThread()) {
@@ -714,7 +717,7 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
                 factory.create(symbolicExecProof, strategyProperties);
 
             symbolicExecProof.setActiveStrategy(strategy);
-
+            
             return symbolicExecProof;
 
         } catch(ProofInputException e)  {

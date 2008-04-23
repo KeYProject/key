@@ -278,7 +278,6 @@ public class VisualDebugger {
     protected VisualDebugger() {
         bpManager = new BreakpointManager(this);
         watchPointManager = new WatchPointManager();
-        // main = Main.getInstance();
     }
 
     /**
