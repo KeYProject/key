@@ -17,6 +17,7 @@ import java.util.ListIterator;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.*;
@@ -30,12 +31,12 @@ public class WhileInvRule extends AbstractMetaOperator {
 
     /** the outer label that is used to leave the while loop ('l1') */
     private final SchemaVariable outerLabel = 
-	SchemaVariableFactory.createProgramSV(new ProgramElementName("outer_label"),
-				       ProgramSVSort.LABEL, false);
+        SchemaVariableFactory.createProgramSV(new ProgramElementName("outer_label"),
+                                       ProgramSVSort.LABEL, false);
     /** the inner label ('l2') */
     private final SchemaVariable innerLabel =
-	SchemaVariableFactory.createProgramSV(new ProgramElementName("inner_label"),
-				       ProgramSVSort.LABEL, false);
+        SchemaVariableFactory.createProgramSV(new ProgramElementName("inner_label"),
+                                       ProgramSVSort.LABEL, false);
     /** list of the labels */
     private ListOfSchemaVariable instantiations  = null;
 
@@ -44,7 +45,7 @@ public class WhileInvRule extends AbstractMetaOperator {
      * the method neededInstantiations that is invoked 
      * before calculate
      */
-    private LinkedList breakList;
+    private LinkedList<BreakToBeReplaced> breakList;
 
     /** The JavaInfo object which is handed over as
      * a parameter of calculate.
@@ -61,7 +62,7 @@ public class WhileInvRule extends AbstractMetaOperator {
     private KeYJavaType returnType;
     
     public WhileInvRule() {
-	super(new Name("#whileInvRule"), 2);
+        super(new Name("#whileInvRule"), 2);
     }
 
 
@@ -69,7 +70,7 @@ public class WhileInvRule extends AbstractMetaOperator {
      * not a term.
      */
     public Sort sort(Term[] term) {
-	return Sort.FORMULA;
+        return Sort.FORMULA;
     }
 
 
@@ -83,8 +84,8 @@ public class WhileInvRule extends AbstractMetaOperator {
      * the @link Term is valid.
      */
     public boolean validTopLevel(Term term) {
-	// a meta operator accepts almost everything
-	return  term.arity()==arity();
+        // a meta operator accepts almost everything
+        return  term.arity()==arity();
     }
 
 
@@ -101,7 +102,7 @@ public class WhileInvRule extends AbstractMetaOperator {
         modality = (Modality)term.sub(0).op();
         
         ReplaceWhileLoop removeWhile = 
-            new ReplaceWhileLoop(root, null);
+            new ReplaceWhileLoop(root, null, services);
         removeWhile.start();       
         
         body = removeWhile.getTheLoop();
@@ -126,13 +127,13 @@ public class WhileInvRule extends AbstractMetaOperator {
         init(term, services);
         
         // local initialisation
-        ArrayList stmnt = new ArrayList();
-        ArrayList breakIfCascade = new ArrayList();
+        ArrayList<ProgramElement> stmnt = new ArrayList<ProgramElement>();
+        ArrayList<If> breakIfCascade = new ArrayList<If>();
         
         
         ProgramVariable contFlag   = getNewLocalvariable("cont", "boolean", services);
         ProgramVariable returnFlag = getNewLocalvariable("rtrn", "boolean", services);
-        ProgramVariable breakFlag  = getNewLocalvariable("brk", "boolean", services);               	
+        ProgramVariable breakFlag  = getNewLocalvariable("brk", "boolean", services);                   
         // xxx how to ensure that "exc" has not been used before??
         ProgramVariable excFlag    = getNewLocalvariable("exc", "boolean", services);        
         ProgramVariable excParam   = getNewLocalvariable("e", "java.lang.Throwable", services);          
@@ -152,10 +153,10 @@ public class WhileInvRule extends AbstractMetaOperator {
         // end of initialisation............
         
         int breakCounter = 0;
-        final ListIterator it = breakList.listIterator(0);
+        final ListIterator<BreakToBeReplaced> it = breakList.listIterator(0);
         int numberOfBreaks = 0;
         while (it.hasNext()) {
-            BreakToBeReplaced b = (BreakToBeReplaced)it.next();
+            BreakToBeReplaced b = it.next();
             ProgramVariable newVar = getNewLocalvariable("break_"+breakCounter++, 
                                                          "boolean", services);
             b.setProgramVariable(newVar);
@@ -184,7 +185,7 @@ public class WhileInvRule extends AbstractMetaOperator {
                                              breakList, services);
         w.start();
         
-        ArrayList resultSubterms = new ArrayList();
+        ArrayList<Term> resultSubterms = new ArrayList<Term>();
         
         // normal case and continue
         if (w.continueOccurred()) {
@@ -245,17 +246,18 @@ public class WhileInvRule extends AbstractMetaOperator {
         
         stmnt.add(w.result());
         StatementBlock s = new StatementBlock
-        ((Statement[])stmnt.toArray(new Statement[0]));
+        (stmnt.toArray(new Statement[0]));
         Statement resSta;
-        if (svInst.getExecutionContext() != null)
+        if (svInst.getExecutionContext() != null){
             resSta = new MethodFrame(null, svInst.getExecutionContext(), s);
-        else
+        }else{
             resSta = s;
+        }
         
         Modality loopBodyModality = modality;
         
         // This here is crucial for transactions. If you wonder why the conversion
-	// is so "irregular", well, that's the way it is ;) /Wojtek
+        // is so "irregular", well, that's the way it is ;) /Wojtek
         if (modality == BOXTRC || modality == TOUTTRC)
             loopBodyModality = BOX;
         if (modality == DIATRC)
@@ -263,7 +265,7 @@ public class WhileInvRule extends AbstractMetaOperator {
         return tf.createProgramTerm
         (loopBodyModality, 
          JavaBlock.createJavaBlock
-         (new StatementBlock(resSta)), result);	
+         (new StatementBlock(resSta)), result); 
     }
 
 
@@ -307,19 +309,23 @@ public class WhileInvRule extends AbstractMetaOperator {
      * be given.
      */
     public ListOfSchemaVariable neededInstantiations(ProgramElement originalLoop,
-						     SVInstantiations svInst) {
-	WhileInvariantTransformation w = 
-	    new WhileInvariantTransformation(originalLoop, svInst);
-	w.start();
-	instantiations = SLListOfSchemaVariable.EMPTY_LIST;
-	if (w.innerLabelNeeded()) {
-	    instantiations = instantiations.prepend(innerLabel);
-	}
-	if (w.outerLabelNeeded()) {
-	    instantiations = instantiations.prepend(outerLabel);
-	}
-	breakList = w.breakList();
-	return instantiations;
+                                                     SVInstantiations svInst) {
+        WhileInvariantTransformation w = 
+	    new WhileInvariantTransformation(originalLoop, 
+                                             svInst, 
+                                             javaInfo == null 
+                                              ? null 
+                                              : javaInfo.getServices());
+        w.start();
+        instantiations = SLListOfSchemaVariable.EMPTY_LIST;
+        if (w.innerLabelNeeded()) {
+            instantiations = instantiations.prepend(innerLabel);
+        }
+        if (w.outerLabelNeeded()) {
+            instantiations = instantiations.prepend(outerLabel);
+        }
+        breakList = w.breakList();
+        return instantiations;
     }
 
     //---------------------------------------------------------------
@@ -327,145 +333,144 @@ public class WhileInvRule extends AbstractMetaOperator {
     //---------------------------------------------------------------
 
 
-    private Term createLongJunctorTerm(Junctor junctor, ArrayList terms) {
-	if (terms.size() == 1)
-	    return (Term)terms.get(0);
-	else if (terms.size() == 2)
-	    return tf.createJunctorTerm(junctor,
-					(Term)terms.get(0),
-					(Term)terms.get(1));
-	else {
-	    Term arg1 = (Term)terms.get(0);
-	    terms.remove(0);
-	    return 
-		tf.createJunctorTerm(junctor, 
-				     arg1, 
-				     createLongJunctorTerm(junctor, terms));
-	}
+    private Term createLongJunctorTerm(Junctor junctor, ArrayList<Term> terms) {
+        if (terms.size() == 1)
+            return terms.get(0);
+        else if (terms.size() == 2)
+            return tf.createJunctorTerm(junctor,
+                                        terms.get(0),
+                                        terms.get(1));
+        else {
+            Term arg1 = terms.get(0);
+            terms.remove(0);
+            return 
+                tf.createJunctorTerm(junctor, 
+                                     arg1, 
+                                     createLongJunctorTerm(junctor, terms));
+        }
     }
 
 
     private Statement returnFlagDecl(ProgramVariable returnFlag,
-				     SVInstantiations svInst) {
-	return KeYJavaASTFactory.
-	    declare(returnFlag, BooleanLiteral.FALSE,
-		    javaInfo.getKeYJavaType("boolean"));
+                                     SVInstantiations svInst) {
+        return KeYJavaASTFactory.
+            declare(returnFlag, BooleanLiteral.FALSE,
+                    javaInfo.getKeYJavaType("boolean"));
     }
 
     private Term returnCase(ProgramVariable returnFlag,
-			    KeYJavaType returnType,
-			    ProgramVariable returnExpression,
-			    Term post) {
-	Term executeReturn = tf.createProgramTerm
-	    (modality, 
-	     addContext(root, new StatementBlock
-			(KeYJavaASTFactory.returnClause(returnExpression))), 
-	     post);
-	
-	return tf.createJunctorTerm
-	    (Op.IMP, 
-	     tf.createEqualityTerm(Op.EQUALS, 
-				   typeConv.convertToLogicElement(returnFlag), 
-				   typeConv.getBooleanLDT().getTrueTerm()), 
-	     executeReturn);
-	
+                            KeYJavaType returnType,
+                            ProgramVariable returnExpression,
+                            Term post) {
+        Term executeReturn = tf.createProgramTerm
+            (modality, 
+             addContext(root, new StatementBlock
+                        (KeYJavaASTFactory.returnClause(returnExpression))), 
+             post);
+        
+        return tf.createJunctorTerm
+            (Op.IMP, 
+             tf.createEqualityTerm(Op.EQUALS, 
+                                   typeConv.convertToLogicElement(returnFlag), 
+                                   typeConv.getBooleanLDT().getTrueTerm()), 
+             executeReturn);
+        
     }
 
 
     private Statement breakFlagDecl(ProgramVariable breakFlag) {
-	return KeYJavaASTFactory.
-	    declare(breakFlag, BooleanLiteral.FALSE,
-		    javaInfo.getKeYJavaType("boolean"));
+        return KeYJavaASTFactory.
+            declare(breakFlag, BooleanLiteral.FALSE,
+                    javaInfo.getKeYJavaType("boolean"));
     }
 
     private Statement contFlagDecl(ProgramVariable contFlag) {
-	return KeYJavaASTFactory.
-	    declare(contFlag, BooleanLiteral.FALSE,
-		    javaInfo.getKeYJavaType("boolean"));
+        return KeYJavaASTFactory.
+            declare(contFlag, BooleanLiteral.FALSE,
+                    javaInfo.getKeYJavaType("boolean"));
     }
 
     private Term breakCase(ProgramVariable breakFlag,
-			   Term post,
-			   ArrayList breakIfCascade) {
-	Term executeBreak = 
-	    tf.createProgramTerm
-	    (modality,
-	     addContext(root, new StatementBlock
-			((Statement[])breakIfCascade.toArray(new Statement[0]))),
-	     post);
-	return tf.createJunctorTerm
-	    (Op.IMP, 
-	     tf.createEqualityTerm(Op.EQUALS, 
-				   typeConv.convertToLogicElement(breakFlag), 
-				   typeConv.getBooleanLDT().getTrueTerm()), 
-	     executeBreak); 
+                           Term post,
+                           ArrayList<If> breakIfCascade) {
+        Term executeBreak = 
+            tf.createProgramTerm
+            (modality,
+             addContext(root, new StatementBlock
+                        (breakIfCascade.toArray(new Statement[0]))),
+             post);
+        return tf.createJunctorTerm
+            (Op.IMP, 
+             tf.createEqualityTerm(Op.EQUALS, 
+                                   typeConv.convertToLogicElement(breakFlag), 
+                                   typeConv.getBooleanLDT().getTrueTerm()), 
+             executeBreak); 
     }
 
 
     private Term  normalCaseAndContinue(Term contFlagTerm,
-					Term returnFlagTerm,
-					Term breakFlagTerm,
-					Term excFlagTerm,
-					Term inv) {
+                                        Term returnFlagTerm,
+                                        Term breakFlagTerm,
+                                        Term excFlagTerm,
+                                        Term inv) {
 
-	final Term TRUE_TERM = typeConv.getBooleanLDT().getTrueTerm();
+        final Term TRUE_TERM = typeConv.getBooleanLDT().getTrueTerm();
 
-	ArrayList al = new ArrayList();
+        ArrayList<Term> al = new ArrayList<Term>();
 
-	if (returnFlagTerm != null)
-	    al.add(tf.createEqualityTerm(Op.EQUALS, returnFlagTerm, TRUE_TERM));
-	if (breakFlagTerm != null)
-	    al.add(tf.createEqualityTerm(Op.EQUALS, breakFlagTerm, TRUE_TERM));
-	if (excFlagTerm != null)
-	    al.add(tf.createEqualityTerm(Op.EQUALS, excFlagTerm, TRUE_TERM));
+        if (returnFlagTerm != null)
+            al.add(tf.createEqualityTerm(Op.EQUALS, returnFlagTerm, TRUE_TERM));
+        if (breakFlagTerm != null)
+            al.add(tf.createEqualityTerm(Op.EQUALS, breakFlagTerm, TRUE_TERM));
+        if (excFlagTerm != null)
+            al.add(tf.createEqualityTerm(Op.EQUALS, excFlagTerm, TRUE_TERM));
 
-	if (al.size() == 0) {
-	    if (contFlagTerm == null)
-		return inv;
-	    else 
-		return tf.createJunctorTerm(Op.IMP, contFlagTerm, inv);
-	} else {
-	    Term premiss = tf.createJunctorTerm(Op.NOT, 
-						createLongJunctorTerm(Op.OR, al));
-	    if (contFlagTerm != null)
-		premiss = tf.createJunctorTerm(Op.OR, 
-					       contFlagTerm,
-					       premiss);	    
-	    
-	    return 
-		tf.createJunctorTerm(Op.IMP, premiss, inv);
-	}	
+        if (al.size() == 0) {
+            if (contFlagTerm == null)
+                return inv;
+            else 
+                return tf.createJunctorTerm(Op.IMP, contFlagTerm, inv);
+        } else {
+            Term premiss = tf.createJunctorTerm(Op.NOT, 
+                                                createLongJunctorTerm(Op.OR, al));
+            if (contFlagTerm != null)
+                premiss = tf.createJunctorTerm(Op.OR, 
+                                               contFlagTerm,
+                                               premiss);            
+            
+            return 
+                tf.createJunctorTerm(Op.IMP, premiss, inv);
+        }       
     }
     
 
     private Term throwCase(ProgramVariable excFlag,
-			   ProgramVariable thrownException,
-			   Term post) {
-	Term throwException = 
-	    tf.createProgramTerm
-	    (modality, addContext
-	     (root, new StatementBlock
-	      (KeYJavaASTFactory.throwClause(thrownException))), 
-	     post);
-	return tf.createJunctorTerm
-	    (Op.IMP, 
-	     tf.createEqualityTerm(Op.EQUALS, 
-				   typeConv.convertToLogicElement(excFlag), 
-				   typeConv.getBooleanLDT().getTrueTerm()), 
-	     throwException);
+                           ProgramVariable thrownException,
+                           Term post) {
+        Term throwException = 
+            tf.createProgramTerm
+            (modality, addContext
+             (root, new StatementBlock
+              (KeYJavaASTFactory.throwClause(thrownException))), 
+             post);
+        return tf.createJunctorTerm
+            (Op.IMP, 
+             tf.createEqualityTerm(Op.EQUALS, 
+                                   typeConv.convertToLogicElement(excFlag), 
+                                   typeConv.getBooleanLDT().getTrueTerm()), 
+             throwException);
     }
 
 
     protected JavaBlock addContext(JavaNonTerminalProgramElement root,
-				   StatementBlock block) {
-	ReplaceWhileLoop replaceWhile = 
-  	    new ReplaceWhileLoop(root, block);
- 	replaceWhile.start();       
-	
-	return JavaBlock.createJavaBlock((StatementBlock)replaceWhile.result());
+                                   StatementBlock block) {
+        ReplaceWhileLoop replaceWhile = 
+  	    new ReplaceWhileLoop(root, block, javaInfo.getServices());
+        replaceWhile.start();       
+        
+        return JavaBlock.createJavaBlock((StatementBlock)replaceWhile.result());
 
     }
     
 
 }
-

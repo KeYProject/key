@@ -9,7 +9,7 @@ import de.uka.ilkd.key.java.SourceElement;
 
 public class MultiRenamingTable extends RenamingTable{
 
-    HashMap hmap;
+    private final HashMap hmap;
 
     public MultiRenamingTable(HashMap hmap){
 	this.hmap = hmap;

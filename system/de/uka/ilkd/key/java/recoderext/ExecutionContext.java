@@ -33,8 +33,7 @@ public class ExecutionContext
      * the reference to the active object
      */
     private ReferencePrefix runtimeInstance;
-
-
+    
     protected ExecutionContext() {}
 
     /**
@@ -50,8 +49,7 @@ public class ExecutionContext
 	this.runtimeInstance  = runtimeInstance;
 	makeParentRoleValid();
     }
-
-
+    
     /**
      * Returns the number of children of this node.
      * @return an int giving the number of children of this node
@@ -101,7 +99,7 @@ public class ExecutionContext
     public void accept(SourceVisitor visitor) {       
     }
 
-    public Object deepClone() {
+    public ExecutionContext deepClone() {
 	return new ExecutionContext(classContext, runtimeInstance);
     }
 
@@ -173,7 +171,6 @@ public class ExecutionContext
 	return classContext;
     }
     
-
     /**
      * returns the runtime instance object
      * @return the runtime instance object

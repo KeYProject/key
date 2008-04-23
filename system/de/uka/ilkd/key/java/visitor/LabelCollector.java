@@ -4,6 +4,7 @@ import java.util.HashSet;
 
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 
 /**
@@ -11,11 +12,12 @@ import de.uka.ilkd.key.java.SourceElement;
  */
 public class LabelCollector extends JavaASTVisitor {
 
-    private HashSet labels;
+    private HashSet<Label> labels;
     
-    public LabelCollector(ProgramElement root, HashSet labels) {
-        super(root);        
-        this.labels = labels;
+    public LabelCollector(ProgramElement root,                           
+                          Services services) {
+        super(root, services);        
+        this.labels = new HashSet<Label>(20);
     }
     
     public boolean contains(Label l) {
@@ -24,13 +26,13 @@ public class LabelCollector extends JavaASTVisitor {
     
     protected void doDefaultAction(SourceElement node) {        
         if (node instanceof Label) {
-            labels.add(node);           
+            labels.add((Label) node);           
         }
     }
 
     protected void doAction(ProgramElement node) {  
         if (node instanceof Label) {
-            labels.add(node);
+            labels.add((Label) node);
         }
     }
 

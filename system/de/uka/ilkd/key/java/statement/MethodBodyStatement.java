@@ -62,7 +62,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     /** cache resolved method */
     private ProgramMethod method;
 
-    /** indicates whether this stands for the specifiction of 
+    /** indicates whether this stands for the specification of 
      * a method rather than the concrete body*/
     private boolean useSpecification;
     
@@ -201,6 +201,20 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
             resolveMethod(services);
         }
         return method.isStatic();
+    }
+
+    /**
+     * Tests for "@pure" annotation
+     *
+     * @see de.uka.ilkd.key.proof.mgt.SpecificationRepository#isStrictlyPure(ProgramMethod)
+     * @param services
+     * @return true, iff the method is annotated "@pure"
+     */
+    public boolean isPure(Services services) {
+        if (method == null) {
+            resolveMethod(services);
+        }
+        return services.getSpecificationRepository().isStrictlyPure(method);
     }
 
     /** calls the corresponding method of a visitor in order to

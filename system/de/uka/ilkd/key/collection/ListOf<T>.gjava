@@ -24,7 +24,7 @@ package <Pck>;
  * CONVENTION: All implementations of this interface MUST contain a
  * public static final class variable called EMPTY_LIST    
 */
-public interface ListOf<T> extends java.io.Serializable {
+public interface ListOf<T> extends Iterable<<T>>, java.io.Serializable {
 
     /** prepends element to the list (non-destructive)
      * @param element the head of the created list

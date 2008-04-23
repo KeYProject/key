@@ -14,6 +14,7 @@ import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ArrayLengthReference;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.MethodReference;
@@ -31,8 +32,8 @@ public class FieldReplaceVisitor extends CreatingASTVisitor{
     private ProgramElement result=null;
 //    private KeYJavaType containingKJT=null
 
-    public FieldReplaceVisitor(ProgramElement pe){
-	super(pe, true);
+    public FieldReplaceVisitor(ProgramElement pe, Services services){
+	super(pe, true, services);
     }
 
     /** starts the walker*/

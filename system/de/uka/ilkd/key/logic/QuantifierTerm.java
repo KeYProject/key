@@ -16,7 +16,6 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
@@ -35,16 +34,16 @@ class QuantifierTerm extends Term {
 
     /**
      * creates a quantifier term
-     * @param op Operator representing the Quantifier (all, exist) of this term
+     * @param op a Quantifier (all, exist)
      * @param varsBoundHere  an array of Variable containing all variables
      * bound by the quantifier
-     * @param sort the Sort of this Term (is bool)
+     * @param subTerm the Term representing the formula below the quantifier
      */
-    public QuantifierTerm(Operator op, 
-			  QuantifiableVariable[] varsBoundHere, 
-			  Term subTerm) {
+     public QuantifierTerm(Quantifier op, 
+			   QuantifiableVariable[] varsBoundHere, 
+			   Term subTerm) {
 	this(op, new ArrayOfQuantifiableVariable(varsBoundHere), subTerm);
-    }
+     }
 
 
     /**
@@ -52,12 +51,12 @@ class QuantifierTerm extends Term {
      * @param op Operator representing the Quantifier (all, exist) of this term
      * @param varsBoundHere  an array of Variable containing all variables
      * bound by the quantifier
-     * @param sort the Sort of this Term (is bool)
+     * @param subTerm the Term representing the formula below the quantifier
      */
-    public QuantifierTerm(Operator op, 
-			  ArrayOfQuantifiableVariable varsBoundHere, 
-			  Term subTerm) {
-	super(op, ((Quantifier)op).sort(subTerm));
+     public QuantifierTerm(Quantifier op, 
+		 	   ArrayOfQuantifiableVariable varsBoundHere, 
+		 	   Term subTerm) {
+	super(op, op.sort(subTerm));
 	this.subTerm = subTerm;
 	this.depth   = subTerm.depth() + 1;
 	this.varsBoundHere = varsBoundHere;

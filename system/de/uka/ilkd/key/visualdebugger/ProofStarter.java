@@ -6,6 +6,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.proofevent.IteratorOfNodeReplacement;
@@ -77,8 +78,8 @@ public class ProofStarter {
             BuiltInRule decisionProcedureRule) {
         if (goals.isEmpty()) {
             return;
-        }
-            
+	}
+
         final Proof p = goals.head().node().proof();
 
         final IteratorOfGoal i = goals.iterator();                      
@@ -116,7 +117,12 @@ public class ProofStarter {
         }
 
         this.po = po;
-        this.proof = po.getPO().getFirstProof();
+        try {
+            this.proof = po.getPO().getFirstProof();
+        } catch(ProofInputException e) {
+            System.err.println(e);
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -203,15 +209,17 @@ public class ProofStarter {
             decisionProcedureRule = null;
         }
 
-        env.registerProof(po, po.getPO());
 
         goalChooser.init(proof, proof.openGoals());
         final ProofListener pl = new ProofListener();
 
         Goal.addRuleAppListener(pl);
         
-        try {
+        ProofAggregate proofList = null;
 
+        try {
+            proofList = po.getPO();
+ 
             int countApplied = 0;
             synchronized (progressMonitors) {
                 initProgressMonitors(maxSteps);
@@ -229,8 +237,8 @@ public class ProofStarter {
             return false;
         } finally {
             Goal.removeRuleAppListener(pl);
-            env.removeProofList(po.getPO());
             proof.setActiveStrategy(oldStrategy);
+            env.removeProofList(proofList);
         }
 
         return true;
@@ -263,8 +271,7 @@ public class ProofStarter {
      * @param maxSteps
      *                the int limiting the maximal amount of steps done in
      *                automatic proof mode
-     * @throws an
-     *                 IllegalArgumentException if <tt>maxSteps</tt> is lesser
+     * @throws IllegalArgumentException if <tt>maxSteps</tt> is lesser
      *                 than zero
      */
     public void setMaxSteps(int maxSteps) {

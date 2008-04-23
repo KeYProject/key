@@ -11,6 +11,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.EntryOfQuantifiableVariableAndTerm;
@@ -34,10 +35,12 @@ class MultiTrigger extends Trigger {
         this.clause = clause;
     }
     
-    public SetOfSubstitution getSubstitutionsFromTerms(SetOfTerm targetTerms){
+    public SetOfSubstitution getSubstitutionsFromTerms(SetOfTerm targetTerms, 
+            Services services){
         SetOfSubstitution res = SetAsListOfSubstitution.EMPTY_SET;
         SetOfSubstitution mulsubs = 
-        	                setMultiSubstitution(triggers.toArray(),0,targetTerms);
+        	                setMultiSubstitution(triggers.toArray(),0,targetTerms, 
+                                        services);
         IteratorOfSubstitution it = mulsubs.iterator();
         while(it.hasNext()){
         	    Substitution sub = it.next();
@@ -49,11 +52,11 @@ class MultiTrigger extends Trigger {
     
     /**help function for getMultiSubstitution*/
     private SetOfSubstitution setMultiSubstitution(Trigger[] ts,int i,
-    		                                               SetOfTerm terms){
+            SetOfTerm terms, Services services){
     	    SetOfSubstitution res = SetAsListOfSubstitution.EMPTY_SET;
     	    if(i>=ts.length)return res;
-    	    SetOfSubstitution subi = ts[i].getSubstitutionsFromTerms(terms);
-            SetOfSubstitution nextSubs = setMultiSubstitution(ts,i+1,terms);
+    	    SetOfSubstitution subi = ts[i].getSubstitutionsFromTerms(terms, services);
+            SetOfSubstitution nextSubs = setMultiSubstitution(ts,i+1,terms, services);
             if(nextSubs.size()==0)return res.union(subi);
             IteratorOfSubstitution it = nextSubs.iterator();
             while(it.hasNext()){

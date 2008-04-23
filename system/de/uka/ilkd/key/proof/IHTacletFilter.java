@@ -31,7 +31,7 @@ public class IHTacletFilter extends TacletFilter {
     private final ListOfRuleSet heuristics;
 
     
-    private final HashMap filterCache = new HashMap(2000);
+    private final HashMap<Taclet, Boolean> filterCache = new HashMap<Taclet, Boolean>(2000);
     
     
     

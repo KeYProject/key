@@ -4,7 +4,6 @@
 package de.uka.ilkd.key.gui.notification;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.SwingUtilities;
@@ -22,13 +21,13 @@ public abstract class NotificationTask {
     /**
      *  the list of actions associated with this task
      */
-    private List notificationActions = new ArrayList(5);
+    private List<NotificationAction> notificationActions = new ArrayList<NotificationAction>(5);
             
     /**
      * @return returns the notification actions belonging to 
      * this task
      */
-    public List getNotificationActions() {
+    public List<NotificationAction> getNotificationActions() {
         return notificationActions;
     }
     
@@ -39,15 +38,7 @@ public abstract class NotificationTask {
     public void addNotificationAction(NotificationAction action) {
         this.notificationActions.add(action);
     }
-   
-
-    /**
-     * @return an iterator about the registered actions
-     */
-    public Iterator getActions() {   
-        return notificationActions.iterator();
-    }
-    
+       
     /**
      * 
      * called to execute the notification task, but this method
@@ -65,16 +56,16 @@ public abstract class NotificationTask {
         }
         // notify thread safe
         if (SwingUtilities.isEventDispatchThread()) {
-           executeImpl(event, manager);
-       } else {
-           final NotificationEvent eventObject = event;
-           final NotificationManager notManager = manager;
-           SwingUtilities.invokeLater(new Runnable() {                                    
-            public void run() {                
-                executeImpl(eventObject, notManager);
-            }               
-           });
-       }
+            executeImpl(event, manager);
+        } else {
+            final NotificationEvent eventObject = event;
+            final NotificationManager notManager = manager;
+            SwingUtilities.invokeLater(new Runnable() {                                    
+                public void run() {                
+                    executeImpl(eventObject, notManager);
+                }               
+            });
+        }
     }
 
 

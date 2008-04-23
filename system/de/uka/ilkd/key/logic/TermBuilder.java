@@ -46,29 +46,29 @@ public class TermBuilder {
         return ff;
     }
     
-    // To be more general: shouldn't lv be a QuantifiableVariable? Sure!
-    public Term all(QuantifiableVariable lv, Term t2) {
-        if ( !t2.freeVars.contains ( lv ) ) return t2;
-        return tf.createQuantifierTerm ( Op.ALL, lv, t2 );
+
+    public Term all(QuantifiableVariable qv, Term t2) {
+        if ( !t2.freeVars.contains ( qv ) ) return t2;
+        return tf.createQuantifierTerm ( Op.ALL, qv, t2 );
     }
     
-    public Term all(QuantifiableVariable[] lv, Term t2) {
+    public Term all(QuantifiableVariable[] qv, Term t2) {
         Term result = t2;
-        for (int i=lv.length-1; i>=0; i--) {
-            result = all(lv[i], result); 
+        for (int i=qv.length-1; i>=0; i--) {
+            result = all(qv[i], result); 
         }
         return result;
     }
     
-    public Term ex(QuantifiableVariable lv, Term t2) {
-        if ( !t2.freeVars.contains ( lv ) ) return t2;
-        return tf.createQuantifierTerm(Op.EX, lv, t2);
+    public Term ex(QuantifiableVariable qv, Term t2) {
+        if ( !t2.freeVars.contains ( qv ) ) return t2;
+        return tf.createQuantifierTerm(Op.EX, qv, t2);
     }
     
-    public Term ex(QuantifiableVariable[] lv, Term t2) {
+    public Term ex(QuantifiableVariable[] qv, Term t2) {
         Term result = t2;
-        for (int i=lv.length-1; i>=0; i--) {
-            result = ex(lv[i], result);
+        for (int i=qv.length-1; i>=0; i--) {
+            result = ex(qv[i], result);
         }
         return result;
     }
@@ -211,7 +211,8 @@ public class TermBuilder {
 	} else if(v instanceof LogicVariable) {
 	    return var((LogicVariable) v);
 	} else {
-	    throw new IllegalArgumentException("Wrong parsablevariable kind.");
+	    throw new IllegalArgumentException("Wrong parsablevariable kind: " 
+	                                        + v.getClass());
 	}
     }
 
@@ -237,6 +238,10 @@ public class TermBuilder {
     
     public Term dia(JavaBlock jb, Term t) {
         return tf.createDiamondTerm(jb, t);
+    }
+    
+    public Term prog(Modality mod, JavaBlock jb, Term t) {
+        return tf.createProgramTerm(mod, jb, t);
     }
 
     public Term ife(Term cond, Term _then, Term _else) {        

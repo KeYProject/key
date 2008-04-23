@@ -49,7 +49,7 @@ public interface HeapOf<T> extends java.io.Serializable {
 
     /**
      * Add multiple elements to this heap object
-     * @param element The elements to be added
+     * @param elements The elements to be added
      * @return a heap that contains all elements of this heap, and
      * additionally all objects from <code>elements</code>
      */

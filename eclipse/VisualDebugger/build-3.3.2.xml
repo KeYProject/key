@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="VisualDebugger" default="build.jars" basedir=".">
+
+	<property name="basews" value="${ws}" />
+	<property name="baseos" value="${os}" />
+	<property name="basearch" value="${arch}" />
+	<property name="basenl" value="${nl}" />
+
+	<property environment="env" />
+
+	<!-- Compiler settings. -->
+	<property name="javacFailOnError" value="true" />
+	<property name="javacDebugInfo" value="on" />
+	<property name="javacVerbose" value="true" />
+	<property name="target" value="1.5"/>
+        <property name="source" value="1.5"/>
+	<property name="javacSource" value="1.5" />
+	<property name="javacTarget" value="1.5" />
+	<property name="compilerArg" value="" />
+
+    <path id="Plug-in Dependencies.libraryclasspath">
+        <pathelement location="../org.key-project.core"/>
+        <pathelement location="../KeYPlugin"/>
+        <pathelement location="../KeYExternalLibraries"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.osgi_3.3.2.R33x_v20080105.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.ui.workbench.texteditor_3.3.2.r332_20080109-0800.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.ui.views.properties.tabbed_3.3.1.M20070831-0800.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.ui.forms_3.3.0.v20070511.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.ui.views_3.2.101.M20080207-0800.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.ui_3.3.1.M20071128-0800.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.swt_3.3.2.v3349d.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.swt.carbon.macosx_3.3.3.v3349.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.jface_3.3.2.M20080207-0800.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.core.commands_3.3.0.I20070605-0010.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.ui.workbench_3.3.2.M20080207-0800.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.ui.ide_3.3.2.M20080207-0800.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.ui.editors_3.3.2.r332_20080109-0800.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.core.filebuffers_3.3.1.r331_v20070829.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.jface.text_3.3.2.r332_20071017-0800.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.text_3.3.0.v20070606-0010.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.jdt.ui_3.3.2.r332_20080128.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.jdt.launching_3.3.2.v20080115_r332.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.jdt.junit_3.3.2.r332_20080109-0800.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.jdt.core_3.3.3.v_793_R33x.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.jdt.compiler.apt_1.0.1.R33x_v20071002-2100.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.jdt.compiler.tool_1.0.1.v_793_R33x.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.gef_3.2.102.v20080116.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.draw2d_3.2.100.v20070529.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.core.runtime.compatibility_3.1.200.v20070502.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.core.runtime_3.3.100.v20070530.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.equinox.common_3.3.0.v20070426.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.core.jobs_3.3.1.R33x_v20070709.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.core.runtime.compatibility.registry_3.2.100.v20070316/runtime_registry_compatibility.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.equinox.registry_3.3.1.R33x_v20070802.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.equinox.preferences_3.2.101.R33x_v20080117.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.core.contenttype_3.2.100.v20070319.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.equinox.app_1.0.1.R33x_v20070828.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.update.configurator_3.2.101.R33x_v20070810.jar"/>
+	<pathelement location="${eclipse_home}/plugins/org.eclipse.core.resources_3.3.1.R33x_v20080205.jar"/>    	
+	<pathelement path="../org.key-project.core/key.jar" />
+        <pathelement path="../KeYPlugin/KeYPlugin.jar "/>
+    </path>
+    <path id="VisualDebugger.classpath">
+        <pathelement location="bin"/>
+        <path refid="Plug-in Dependencies.libraryclasspath"/>
+    </path>
+
+    <target name="init" depends="properties">
+		<condition property="pluginTemp" value="${buildTempFolder}/plugins">
+			<isset property="buildTempFolder" />
+		</condition>
+		<property name="pluginTemp" value="${basedir}" />
+		<condition property="build.result.folder" value="${pluginTemp}/VisualDebugger">
+			<isset property="buildTempFolder" />
+		</condition>
+		<property name="build.result.folder" value="${basedir}" />
+		<property name="temp.folder" value="${basedir}/temp.folder" />
+		<property name="plugin.destination" value="${basedir}" />
+	</target>
+
+	<target name="properties" if="eclipse.running">
+		<property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter" />
+
+	</target>
+
+	<target name="build.update.jar" depends="init" description="Build the plug-in: VisualDebugger for an update site.">
+		<delete dir="${temp.folder}" />
+		<mkdir dir="${temp.folder}" />
+		<antcall target="build.jars" />
+		<antcall target="gather.bin.parts">
+			<param name="destination.temp.folder" value="${temp.folder}/" />
+		</antcall>
+		<zip destfile="${plugin.destination}/VisualDebugger_${env.KEY_VERSION_SHORT}.jar" basedir="${temp.folder}/VisualDebugger_${env.KEY_VERSION_SHORT}" filesonly="false" whenempty="skip" update="false" />
+		<delete dir="${temp.folder}" />
+	</target>
+
+	<target name="VisualDebugger.jar" depends="init" unless="VisualDebugger.jar" description="Create jar: VisualDebugger VisualDebugger.jar.">
+		<delete dir="${temp.folder}/VisualDebugger.jar.bin" />
+		<mkdir dir="${temp.folder}/VisualDebugger.jar.bin" />
+		<!-- compile the source code -->
+		<javac destdir="${temp.folder}/VisualDebugger.jar.bin" failonerror="${javacFailOnError}" verbose="${javacVerbose}" debug="${javacDebugInfo}" source="${javacSource}" target="${javacTarget}">
+			<compilerarg line="${compilerArg}" />
+			<src path="src/" />
+			<classpath refid="VisualDebugger.classpath" />
+		</javac>
+		<!-- Copy necessary resources -->
+		<copy todir="${temp.folder}/VisualDebugger.jar.bin" failonerror="true" overwrite="false">
+			<fileset dir="src/" excludes="**/*.java, **/package.htm*,null" />
+		</copy>
+		<mkdir dir="${build.result.folder}" />
+		<jar destfile="${build.result.folder}/VisualDebugger.jar" basedir="${temp.folder}/VisualDebugger.jar.bin" />
+		<delete dir="${temp.folder}/VisualDebugger.jar.bin" />
+	</target>
+
+	<target name="VisualDebuggersrc.zip" depends="init" unless="VisualDebuggersrc.zip">
+		<mkdir dir="${build.result.folder}" />
+		<zip destfile="${build.result.folder}/VisualDebuggersrc.zip" filesonly="false" whenempty="skip" update="false">
+			<fileset dir="src/, icons/, META-INF/, plugin.xml" includes="**/*.java" />
+		</zip>
+	</target>
+
+	<target name="build.jars" depends="init" description="Build all the jars for the plug-in: VisualDebugger.">
+		<available property="VisualDebugger.jar" file="${build.result.folder}/VisualDebugger.jar" />
+		<antcall target="VisualDebugger.jar" />
+	</target>
+
+	<target name="build.sources" depends="init">
+		<available property="VisualDebuggersrc.zip" file="${build.result.folder}/VisualDebuggersrc.zip" />
+		<antcall target="VisualDebuggersrc.zip" />
+	</target>
+
+	<target name="gather.bin.parts" depends="init" if="destination.temp.folder">
+		<mkdir dir="${destination.temp.folder}/VisualDebugger_${env.KEY_VERSION_SHORT}" />
+		<copy todir="${destination.temp.folder}/VisualDebugger_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false">
+			<fileset dir="${build.result.folder}" includes="VisualDebugger.jar" />
+		</copy>
+		<copy todir="${destination.temp.folder}/VisualDebugger_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false">
+			<fileset dir="${basedir}" includes="plugin.xml,README,VisualDebugger.jar,icons/,META-INF/" />
+		</copy>
+	</target>
+
+	<target name="build.zips" depends="init">
+	</target>
+
+	<target name="gather.sources" depends="init" if="destination.temp.folder">
+		<mkdir dir="${destination.temp.folder}/VisualDebugger_${env.KEY_VERSION_SHORT}" />
+		<copy file="${build.result.folder}/VisualDebuggersrc.zip" todir="${destination.temp.folder}/VisualDebugger_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false" />
+		<copy todir="${destination.temp.folder}/VisualDebugger_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false">
+  	        <fileset dir="${basedir}" includes="src/,plugin.xml" />
+		</copy>
+	</target>
+
+	<target name="gather.logs" depends="init" if="destination.temp.folder">
+		<mkdir dir="${destination.temp.folder}/VisualDebugger_${env.KEY_VERSION_SHORT}" />
+		<copy file="${temp.folder}/VisualDebugger.jar.bin.log" todir="${destination.temp.folder}/VisualDebugger_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false" />
+	</target>
+
+	<target name="clean" depends="init" description="Clean the plug-in: VisualDebugger of all the zips, jars and logs created.">
+		<delete file="${build.result.folder}/VisualDebugger.jar" />
+		<delete file="${build.result.folder}/VisualDebuggersrc.zip" />
+		<delete file="${plugin.destination}/VisualDebugger_${env.KEY_VERSION_SHORT}.jar" />
+		<delete file="${plugin.destination}/VisualDebugger_${env.KEY_VERSION_SHORT}.zip" />
+		<delete dir="${temp.folder}" />
+	</target>
+
+	<target name="refresh" depends="init" if="eclipse.running" description="Refresh this folder.">
+		<eclipse.convertPath fileSystemPath="${basedir}" property="resourcePath" />
+		<eclipse.refreshLocal resource="${resourcePath}" depth="infinite" />
+	</target>
+
+	<target name="zip.plugin" depends="init" description="Create a zip containing all the elements for the plug-in: VisualDebugger.">
+		<delete dir="${temp.folder}" />
+		<mkdir dir="${temp.folder}" />
+		<antcall target="build.jars" />
+		<antcall target="build.sources" />
+		<antcall target="gather.bin.parts">
+			<param name="destination.temp.folder" value="${temp.folder}/" />
+		</antcall>
+		<antcall target="gather.sources">
+			<param name="destination.temp.folder" value="${temp.folder}/" />
+		</antcall>
+		<delete>
+			<fileset dir="${temp.folder}" includes="**/*.bin.log" />
+		</delete>
+		<zip destfile="${plugin.destination}/VisualDebugger_${env.KEY_VERSION_SHORT}.zip" basedir="${temp.folder}" filesonly="true" whenempty="skip" update="false" />
+		<delete dir="${temp.folder}" />
+	</target>
+
+</project>

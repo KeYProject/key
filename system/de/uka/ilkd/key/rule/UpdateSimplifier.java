@@ -51,8 +51,9 @@ public class UpdateSimplifier {
     
     /**
      * creates an instance of the update simplifier 
-     * @param deletionEnable a boolean flag indicating if unused or 
+     * @param deletionEnabled a boolean flag indicating if unused or 
      * effectless assignment pairs should be removed
+     * @param eager boolean true if updates shall be applied eagerly
      */
     public UpdateSimplifier(boolean deletionEnabled, boolean eager) {
 	this.eager = eager;
@@ -154,8 +155,9 @@ public class UpdateSimplifier {
     }
 
     /**
-     * @param target
-     * @return
+     * @param target the Term with the update as top level operator whose application
+     * is performed
+     * @return the simplified term
      */
     public Term simplify(Term target, Services services) {
         if (target.op() instanceof IUpdateOperator) {            

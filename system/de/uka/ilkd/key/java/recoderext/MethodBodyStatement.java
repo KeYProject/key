@@ -14,7 +14,7 @@ package de.uka.ilkd.key.java.recoderext;
 import recoder.java.*;
 import recoder.java.reference.*;
 import recoder.java.statement.JavaStatement;
-import recoder.list.ExpressionMutableList;
+import recoder.list.generic.*;
 
 
 /**
@@ -33,7 +33,7 @@ public class MethodBodyStatement extends JavaStatement implements
 
     private Identifier methodName;
     private ReferencePrefix methodReferencePrefix;
-    private ExpressionMutableList arguments;
+    private ASTList<Expression> arguments;
     
     /**
      *      Construct a method body shortcut
@@ -173,7 +173,7 @@ public class MethodBodyStatement extends JavaStatement implements
             index--;
         }
         if (arguments != null) {
-            return arguments.getExpression(index);            
+            return arguments.get(index);            
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -234,7 +234,7 @@ public class MethodBodyStatement extends JavaStatement implements
             index--;
         }        
         if (arguments != null) {
-            return arguments.getExpression(index);
+            return arguments.get(index);
         }	              
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -280,7 +280,7 @@ public class MethodBodyStatement extends JavaStatement implements
             return true;
         } else {                               
             for (int i = 0; i < arguments.size(); i++) {
-                if (arguments.getProgramElement(i) == p) {
+                if (arguments.get(i) == p) {
                     if (q == null) {
                         arguments.remove(i);
                     } else {
@@ -321,7 +321,7 @@ public class MethodBodyStatement extends JavaStatement implements
         
         if (arguments != null) {
             for (int i = 0, sz = arguments.size(); i<sz; i++) {                
-                arguments.getExpression(i).setExpressionContainer(this);                
+                arguments.get(i).setExpressionContainer(this);                
             }
         }
     }
@@ -345,7 +345,7 @@ public class MethodBodyStatement extends JavaStatement implements
         }
         
         for (int i = 0, sz = arguments.size(); i<sz; i++) {                
-            final Expression e = arguments.getExpression(i);
+            final Expression e = arguments.get(i);
             if (e == child) {                
                 return i+4;
             }                
@@ -361,7 +361,7 @@ public class MethodBodyStatement extends JavaStatement implements
     }
 
     //don't think we need it
-    public Object deepClone() {
+    public MethodBodyStatement deepClone() {
 	throw new IllegalStateException("Not implemented in "
 					+"MethodBodyStatement");
     }    
@@ -371,7 +371,7 @@ public class MethodBodyStatement extends JavaStatement implements
         StringBuffer args = new StringBuffer();
         if (arguments != null) {
             for (int i=0; i<arguments.size(); i++) {
-                args.append(arguments.getExpression(i));            
+                args.append(arguments.get(i));            
                 if (i!=arguments.size()-1) {
                     args.append(", ");
                 }
@@ -383,12 +383,12 @@ public class MethodBodyStatement extends JavaStatement implements
     }
 
 
-    public ExpressionMutableList getArguments() {
+    public ASTList<Expression> getArguments() {
         return arguments;
     }
 
 
-    public void setArguments(ExpressionMutableList arguments) {
+    public void setArguments(ASTList<Expression> arguments) {
         this.arguments = arguments;
     }
 

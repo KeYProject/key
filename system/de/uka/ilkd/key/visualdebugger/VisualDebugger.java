@@ -6,6 +6,7 @@ import java.util.*;
 
 import javax.swing.SwingUtilities;
 
+import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.*;
@@ -18,7 +19,6 @@ import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -113,7 +113,7 @@ public class VisualDebugger {
             args[1] = "LOOP";
             
             Main.evaluateOptions(args);
-            Main key = Main.getInstance(false);
+            IMain key = Main.getInstance(false);
             key.loadCommandLineFile();
 
             singleton.main = Main.getInstance(false);
@@ -154,7 +154,7 @@ public class VisualDebugger {
 
     private LinkedList listeners = new LinkedList();
 
-    private Main main;
+    private IMain main;
 
     protected int maxProofStepsForStateVisComputation = 8000;
 
@@ -418,7 +418,6 @@ public class VisualDebugger {
     /**
      * term 2 term
      * 
-     * @return
      */
     public HashMap getInputPV2term() {
         return inputPV2term;
@@ -546,12 +545,10 @@ public class VisualDebugger {
     }
 
     public SourceElementId getProgramCounter(Node n) {
-        IteratorOfPosInOccurrence it = n.getNodeInfo().getVisualDebuggerState()
-                .getLabels().keyIterator();
         JavaBlock jb = null;
         SourceElement se = null;
-        while (it.hasNext()) {
-            PosInOccurrence pio = it.next();
+        for (final PosInOccurrence pio : n.getNodeInfo().getVisualDebuggerState()
+                .getLabels().keySet()) {
             jb = modalityTopLevel(pio); // TODO !!!!!!!!!!!!!!!!!!!!!!
             if (jb != null) {
                 se = getActStatement(jb.program());
@@ -684,7 +681,7 @@ public class VisualDebugger {
 
                     if (m != null) {
                         ProgramVariableCollector pvc = new ProgramVariableCollector(
-                                m);
+                                m, mediator.getServices());
                         pvc.start();
                         pvs.addAll(pvc.result());
                     }

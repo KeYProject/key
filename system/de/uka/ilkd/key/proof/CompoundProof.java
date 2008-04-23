@@ -16,7 +16,7 @@ public class CompoundProof extends ProofAggregate {
         this.proofs=proofs;
     }
 
-    private void addProofsToList(List l) {
+    private void addProofsToList(List<Proof> l) {
         for (int i=0; i<size(); i++) {
             if (proofs[i] instanceof SingleProof) {
                 l.add(proofs[i].getFirstProof());
@@ -27,9 +27,9 @@ public class CompoundProof extends ProofAggregate {
     }
     
     public Proof[] getProofs() {
-        List l = new LinkedList();
+        List<Proof> l = new LinkedList<Proof>();
         addProofsToList(l);
-        return (Proof[])l.toArray(new Proof[0]);
+        return l.toArray(new Proof[l.size()]);
     }
         
     public int size() {

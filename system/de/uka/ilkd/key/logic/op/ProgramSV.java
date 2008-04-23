@@ -14,7 +14,6 @@ import java.io.IOException;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.annotation.Annotation;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
@@ -71,17 +70,6 @@ public class ProgramSV extends SortedSchemaVariable
     
     public SourceElement getLastElement(){
 	return this;
-    }
-
-    /**
-     *@return the annotations.
-     */
-    public Annotation[] getAnnotations(){
-	return new Annotation[0];
-    }
-
-    public int getAnnotationCount(){
-	return 0;
     }
 
     /**
@@ -395,7 +383,8 @@ x     * @return the updated match conditions including mapping
         
         final ExecutionContext ec = instantiations.getExecutionContext();        
         
-        final java.util.ArrayList matchedElements = new java.util.ArrayList();        
+        final java.util.ArrayList<ProgramElement> matchedElements = 
+            new java.util.ArrayList<ProgramElement>();        
 
         while (src != null) {
             if (!check(src, ec, services)) {

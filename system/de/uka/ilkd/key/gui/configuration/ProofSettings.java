@@ -43,10 +43,9 @@ public class ProofSettings {
     public static final URL PROVER_CONFIG_FILE_TEMPLATE;
     public static final ProofSettings DEFAULT_SETTINGS;
 
-    static {
+    static {     
 	PROVER_CONFIG_FILE = new File
-	    (System.getProperty("user.home")+
-	     File.separator+".key"+File.separator+"proof-settings.props");
+	    (PathConfig.KEY_CONFIG_DIR+File.separator+"proof-settings.props");
 	PROVER_CONFIG_FILE_TEMPLATE =
 	    KeYResourceManager.getManager ().getResourceFile
 	    ( ProofSettings.class, "default-proof-settings.props" );
@@ -144,10 +143,10 @@ public class ProofSettings {
      */
     public void saveSettings() {
 	try {
-	    if (!PROVER_CONFIG_FILE.exists()) {
-		new File(System.getProperty("user.home")+File.separator
-			 +".key"+File.separator).mkdir();
-	    }
+	    if (!PROVER_CONFIG_FILE.exists()) {	                       
+                new File(PathConfig.KEY_CONFIG_DIR+File.separator).mkdirs();
+                PROVER_CONFIG_FILE.createNewFile();
+	    }            
 	    FileOutputStream out = 
 		new FileOutputStream(PROVER_CONFIG_FILE);
 	    settingsToStream(settings,out);
@@ -158,7 +157,7 @@ public class ProofSettings {
 	}
     }
 
-	public String settingsToString() {
+    public String settingsToString() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         settingsToStream(settings,out);
         return new String(out.toByteArray());

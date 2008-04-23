@@ -31,7 +31,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 public class EvaluateArgs extends ProgramMetaConstruct{
 
     /** creates a typeof ProgramMetaConstruct 
-     * @param expr the instance of expression contained by 
+     * @param pe the instance of expression contained by 
      * the meta construct 
      */
     public EvaluateArgs(ProgramElement pe) {
@@ -39,7 +39,7 @@ public class EvaluateArgs extends ProgramMetaConstruct{
     }
 
     public static ProgramVariable evaluate(Expression e, 
-                                           List l, 
+                                           List<? super LocalVariableDeclaration> l, 
                                            Services services, 
                                            ExecutionContext ec) {
 
@@ -76,7 +76,7 @@ public class EvaluateArgs extends ProgramMetaConstruct{
 	int lastNonSimple = -1;
 	boolean skip = false;
 
-	List evalstat = new LinkedList();
+	List<Statement> evalstat = new LinkedList<Statement>();
 
 	final ReferencePrefix newCalled;	
 	final ReferencePrefix invocationTarget = mr.getReferencePrefix();
@@ -104,11 +104,11 @@ public class EvaluateArgs extends ProgramMetaConstruct{
 	//Optimisation: If there is a tail of simple expressions they
 	//cannot be influenced by side effects and thus need not to be
 	//evaluated. Also, literals need not to be evaluated.
- 	Iterator statIt = evalstat.iterator();	
+ 	final Iterator<Statement> statIt = evalstat.iterator();	
 	if (skip) statIt.next(); //leave the first always
  	if (statIt.hasNext()) {
 	    for (int i=0; i<args.size(); i++) {
-		Object o = statIt.next();	
+		statIt.next();	
 		if ((args.getExpression(i) instanceof Literal)
 		    || (i > lastNonSimple)) {
 		    statIt.remove();
@@ -119,10 +119,10 @@ public class EvaluateArgs extends ProgramMetaConstruct{
 
 
 	Statement[] res = new Statement[1+evalstat.size()];
-	Iterator it = evalstat.iterator();
+	final Iterator<Statement> it = evalstat.iterator();
 
 	for (int i=0; i<evalstat.size(); i++) {
-	    res[i] = (Statement) it.next();
+	    res[i] = it.next();
 	}
 
 	final MethodReference resMR = new MethodReference

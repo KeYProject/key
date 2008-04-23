@@ -27,7 +27,7 @@ import de.uka.ilkd.key.logic.op.TermSymbol;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.UseMethodContractRuleFilter;
+import de.uka.ilkd.key.proof.UseOperationContractRuleFilter;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.*;
@@ -122,7 +122,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private Feature methodSpecFeature(Feature cost) {
         return ConditionalFeature.createConditional(
-            UseMethodContractRuleFilter.INSTANCE, cost );        
+            UseOperationContractRuleFilter.INSTANCE, cost );        
     }    
 
     
@@ -1272,7 +1272,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
              applyTF ( "tautRightBigger", tf.polynomial ),
              PolynomialValuesCmpFeature
              .leq ( instOf ( "tautRightSmaller" ),
-                    opTerm ( numbers.getArithAddition (),
+                    opTerm ( numbers.getAdd(),
                              one, instOf ( "tautRightBigger" ) ) ) } ) );
 
         bindRuleSet ( d, "inEqSimp_or_weaken",
@@ -1281,7 +1281,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
              applyTF ( "weakenRightSmaller", tf.polynomial ),
              applyTF ( "weakenRightBigger", tf.polynomial ),
              PolynomialValuesCmpFeature
-             .eq ( opTerm ( numbers.getArithAddition (),
+             .eq ( opTerm ( numbers.getAdd (),
                             one, instOf ( "weakenRightSmaller" ) ),
                    instOf ( "weakenRightBigger" ) ) } ) );
 
@@ -1291,7 +1291,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
              applyTF ( "antiSymmRightSmaller", tf.polynomial ),
              applyTF ( "antiSymmRightBigger", tf.polynomial ),
              PolynomialValuesCmpFeature
-             .eq ( opTerm ( numbers.getArithAddition (),
+             .eq ( opTerm ( numbers.getAdd (),
                             two, instOf ( "antiSymmRightSmaller" ) ),
                    instOf ( "antiSymmRightBigger" ) ) } ) );
 
@@ -1952,10 +1952,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         public ArithTermFeatures (IntegerLDT numbers){
             Z = numbers.getNumberSymbol ();
 
-            add = numbers.getArithAddition();
-            mul = numbers.getArithMultiplication ();
-            mod = numbers.getArithModulo ();
-            div = numbers.getArithDivision ();
+            add = numbers.getAdd();
+            mul = numbers.getMul();
+            mod = numbers.getMod();
+            div = numbers.getDiv ();
             jmod = numbers.getJModulo ();
             jdiv = numbers.getJDivision ();
             

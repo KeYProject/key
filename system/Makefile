@@ -32,32 +32,35 @@ ifeq "$(JAVA)" ""
 JAVA=$(shell which java)
 endif
 
-JIKESPATH=$(CLASSPATH):$(GENERATED_SRC_PATH):$(JAVA_HOME)/jre/lib/rt.jar
-
 # enables optimization and removes debug info (such as line tables)
 #COMMON_OPTIONS=-O -g:none -d $(BINARYPATH)
 
-COMMON_OPTIONS=-g -d $(BINARYPATH) 
+COMMON_OPTIONS=-g -d $(BINARYPATH)
 OPTIONS=$(COMMON_OPTIONS)
 
 
 
 GIT_AVAILABLE=$(shell which git)
- 
+
 ifneq ($(strip $(wordlist 1,1,$(GIT_AVAILABLE))),no) 
 GIT=$(shell which git)
 endif
 
+GIT_REPOS_AVAILABLE=$(wildcard ../.git/objects)
 
-ifneq "$(GIT)" ""
-SHA1=$(shell $(GIT) show | grep commit)
-SHA1:=$(wordlist 2,2,$(SHA1))
-KEY_VERSION_SHORT=$(shell $(GIT) log --pretty=one | wc -l)
-KEY_VERSION_SHORT:=$(wordlist 1,1,$(KEY_VERSION_SHORT))
-KEY_VERSION_SHORT:=1.1.$(KEY_VERSION_SHORT)
-else
 SHA1=ownVersion
 KEY_VERSION_SHORT=0.0.0
+
+ifneq "$(GIT)" "" 
+ ifneq "$(GIT_REPOS_AVAILABLE)" ""
+   SHA1:=$(shell $(GIT) show | grep commit)
+   SHA1:=$(wordlist 2,2,$(SHA1))
+   ifeq "$(KEY_VERSION_SHORT)" "0.0.0" 
+     KEY_VERSION_SHORT:=$(shell $(GIT) log --pretty=one | wc -l)
+     KEY_VERSION_SHORT:=$(wordlist 1,1,$(KEY_VERSION_SHORT))
+     KEY_VERSION_SHORT:=1.3.$(KEY_VERSION_SHORT)
+   endif
+ endif
 endif
 
 ifeq "$(KEY_VERSION_LONG)" ""
@@ -69,34 +72,26 @@ export KEY_VERSION_SHORT
 
 ifeq "$(JAVAC)" ""
 JAVAC=javac
+else 
+ifeq ($(JAVAC),jikes) 
+JAVAC:=javac
+endif
 endif
 
 ifeq "$(ANTLR)" ""
 ANTLR=$(JAVA) -cp $(GENERATED_SRC_PATH):$(CLASSPATH) antlr.Tool
 endif
 
-
-
-
-ifeq ($(JAVAC),jikes) 
-VERSION=$(shell jikes -version | grep "Version" )
-VERSION:=$(wordlist 5,5,$(VERSION))
-OPTIONS=$(COMMON_OPTIONS) +D +E +P -source 1.4 -classpath $(JIKESPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
-ifeq ($(VERSION), 1.19)
-else 
-OPTIONS:=+Peffective-java $(OPTIONS) 
-endif 
+ifeq ($(JAVAC),ajc)
+  OPTIONS=$(COMMON_OPTIONS) -nowarn -classpath $(ASPECTJRTPATH):$(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
 else
-  ifeq ($(JAVAC),ajc)
-    OPTIONS=$(COMMON_OPTIONS) -nowarn -classpath $(ASPECTJRTPATH):$(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
-  else
-    ifeq ($(JAVAC),ejc)      
-       OPTIONS=$(COMMON_OPTIONS) -warn:uselessTypeCheck,localHiding,fieldHiding,tasks\(TODO\|HACK\|%%%\)  -source 1.4 -classpath $(JAVA_HOME)/jre/lib/rt.jar:$(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
-    else 
-      OPTIONS=$(COMMON_OPTIONS) -J-Xmx512m -nowarn -source 1.4 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
-    endif
+  ifeq ($(JAVAC),ejc)      
+    OPTIONS=$(COMMON_OPTIONS) -warn:uselessTypeCheck,localHiding,fieldHiding,tasks\(TODO\|HACK\|%%%\)  -source 1.5 -classpath $(JAVA_HOME)/jre/lib/rt.jar:$(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
+  else 
+    OPTIONS=$(COMMON_OPTIONS) -J-Xmx512m -nowarn -source 1.5 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
   endif
 endif
+
 
 #for JavaCC 3.0:
 JAVACC_MAIN=javacc
@@ -215,13 +210,17 @@ GENERATED_LISTS=logic/SLListOfTerm \
 	logic/SLListOfNamespace \
 	casetool/SLListOfAssociation \
 	casetool/SLListOfAssociationEnd \
-	parser/ocl/SLListOfPropertyResolver \
-        parser/ocl/SLListOfOCLEntity \
+        speclang/ocl/translation/SLListOfOCLEntity \
+	speclang/translation/SLListOfSLExpression \
+	speclang/translation/SLListOfSLExpressionResolver \
+	speclang/SLListOfPositionedString \
+        speclang/jml/pretranslation/SLListOfTextualJMLConstruct \
         rule/encapsulation/SLListOfTypeSchemeTerm \
         rule/encapsulation/SLListOfTypeSchemeConstraint \
 	logic/ldt/SLListOfLDT \
         rule/metaconstruct/arith/SLListOfMonomial \
 	strategy/feature/instantiator/SLListOfCPBranch \
+	java/SLListOfComment \
 	strategy/SetAsListOfStrategyFactory \
 	visualdebugger/SLListOfLabel \
 	pp/SLListOfRange
@@ -234,8 +233,6 @@ GENERATED_SETS=logic/SetAsListOfTerm collection/SetAsListOfString \
 	rule/SetAsListOfTacletApp \
 	proof/SetAsListOfProof \
 	java/SetAsListOfExpression \
-	jml/SetAsListOfJMLMethodSpec \
-	jml/SetAsListOfSignals \
 	logic/op/SetAsListOfProgramVariable \
 	logic/op/SetAsListOfProgramMethod \
 	logic/sort/SetAsListOfSort \
@@ -248,34 +245,33 @@ GENERATED_SETS=logic/SetAsListOfTerm collection/SetAsListOfString \
         rule/encapsulation/SetAsListOfTypeSchemeVariable \
 	logic/SetAsListOfLocationDescriptor \
         logic/op/SetAsListOfLogicVariable \
+        proof/SetAsListOfGoalChooserBuilder \
+	speclang/SetAsListOfClassInvariant \
+        speclang/SetAsListOfOperationContract \
+        speclang/SetAsListOfLoopInvariant \
+	strategy/SetAsListOfStrategyFactory \
+	java/abstraction/SetAsListOfKeYJavaType \
+	proof/mgt/SetAsListOfContractWithInvs \
 	strategy/quantifierHeuristics/SetAsListOfTrigger\
 	strategy/quantifierHeuristics/SetAsListOfSubstitution \
+	java/statement/SetAsListOfLoopStatement \
         proof/SetAsListOfGoalChooserBuilder \
 	strategy/SetAsListOfStrategyFactory \
 	logic/op/SetAsListOfLocation
 
-GENERATED_MAPS=logic/HashMapFromNameToNamed \
-	collection/MapAsListFromIntegerToString \
+GENERATED_MAPS=	collection/MapAsListFromIntegerToString \
 	logic/op/MapAsListFromQuantifiableVariableToInteger \
 	logic/op/MapAsListFromSchemaVariableToTerm \
 	logic/op/MapAsListFromSchemaVariableToInstantiationEntry \
 	logic/op/MapAsListFromLogicVariableToTerm \
 	logic/op/MapAsListFromSchemaVariableToTacletPrefix \
-	logic/HashMapFromStringToString \
-	java/abstraction/HashMapFromStringToListOfType \
-        rule/HashMapFromObjectToListOfNoPosTacletApp \
 	logic/sort/MapAsListFromGenericSortToSort \
 	logic/op/MapAsListFromNameToSortDependingSymbol \
 	logic/op/MapAsListFromSchemaVariableToSchemaVariable \
 	proof/MapAsListFromConstrainedFormulaToTermTacletAppIndex \
 	proof/proofevent/MapAsListFromNodeToNodeChangesHolder \
-        logic/HashMapFromNameToInteger \
-        logic/HashMapFromIntegerToName \
-        logic/op/HashMapFromLogicVariableToSchemaVariable \
-	visualdebugger/HashMapFromPosInOccurrenceToLabel \
 	logic/op/MapAsListFromQuantifiableVariableToTerm \
 	logic/op/MapAsListFromQuantifiableVariableToMetavariable 
-
 
 GENERATED_ARRAYS=java/ArrayOfProgramElementExtnullInnull \
 	java/ArrayOfStatementExtProgramElementInnull \
@@ -297,7 +293,6 @@ GENERATED_ARRAYS=java/ArrayOfProgramElementExtnullInnull \
 	logic/op/ArrayOfIProgramVariableExtProgramElementInde.uka.ilkd.key.java \
 	logic/ArrayOfTermExtnullInnull \
 	logic/sort/ArrayOfSortExtnullInnull \
-	logic/sort/ArrayOfGenSortExtSortInnull \
 	java/abstraction/ArrayOfKeYJavaTypeExtnullInde.uka.ilkd.key.java.abstraction \
 	strategy/feature/ArrayOfFeatureExtnullInnull \
 	rule/updatesimplifier/ArrayOfAssignmentPairExtnullInnull
@@ -305,8 +300,7 @@ GENERATED_ARRAYS=java/ArrayOfProgramElementExtnullInnull \
 GENERATED_HEAPS= logic/LeftistHeapOfInteger \
 	strategy/LeftistHeapOfRuleAppContainer
 
-GENERATED_VECTORS_STACKS= rule/VectorOfTaclet \
-	util/SimpleStackOfExtList 
+GENERATED_VECTORS_STACKS = util/SimpleStackOfExtList 
 
 GEN_FILES=$(GENERATED_MAPS) $(GENERATED_VECTORS_STACKS) $(GENERATED_ARRAYS) $(GENERATED_LISTS) $(GENERATED_SETS) \
 	$(GENERATED_ITERATORS) $(GENERATED_HEAPS)
@@ -318,12 +312,14 @@ ANTLR_PARSER= \
 	$(GENERATED_SRC_PATH)$(PFX)parser/dictionary/DictionaryLexer.java \
 	$(GENERATED_SRC_PATH)$(PFX)parser/dictionary/DictionaryLexerTokenTypes.java \
 	$(GENERATED_SRC_PATH)$(PFX)parser/dictionary/DictionaryParser.java \
-	$(GENERATED_SRC_PATH)$(PFX)parser/jml/KeYJMLLexer.java \
-	$(GENERATED_SRC_PATH)$(PFX)parser/jml/KeYJMLParser.java \
+	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/KeYJMLPreLexer.java \
+	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/KeYJMLPreParser.java \
+	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation/KeYJMLLexer.java \
+	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation/KeYJMLParser.java \
 	$(GENERATED_SRC_PATH)$(PFX)parser/simplify/SimplifyLexer.java \
 	$(GENERATED_SRC_PATH)$(PFX)parser/simplify/SimplifyParser.java \
-	$(GENERATED_SRC_PATH)$(PFX)parser/ocl/KeYOclLexer.java \
-	$(GENERATED_SRC_PATH)$(PFX)parser/ocl/KeYOclParser.java \
+	$(GENERATED_SRC_PATH)$(PFX)speclang/ocl/translation/KeYOCLLexer.java \
+	$(GENERATED_SRC_PATH)$(PFX)speclang/ocl/translation/KeYOCLParser.java \
 	$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocLexer.java \
 	$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocParser.java \
 	$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocTreeWalker.java 
@@ -381,10 +377,10 @@ doc: argfile $(JAVAFILES)
 ## didn't want to use perl ;)
 	@find de/ -name '*.java' | xargs grep -h "^package\|^overview" |\
 	cut -d" " -f2 | cut -d";" -f1 | sort | uniq | grep "^de.uka" | \
-	xargs $(JAVADOC) $(JAVADOC_OPTIONS) -source 1.4 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH) \
+	xargs $(JAVADOC) $(JAVADOC_OPTIONS) -source 1.5 -classpath $(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH) \
 	-sourcepath $(GENERATED_SRC_PATH):. -d doc \
 	-link http://recoder.sourceforge.net/doc/api \
-	-link http://java.sun.com/j2se/1.3/docs/api \
+	-link http://java.sun.com/j2se/1.5.0/docs/api/ \
 	-link http://www.antlr.org \
 	-windowtitle "KeY API Documentation" \
 	-doctitle "KeY API Documentation ($(KEY_VERSION_LONG))" \
@@ -557,6 +553,7 @@ $(JAVACC_PARSER) \
 	@echo [creating parser for schematic java in taclets]
 	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)parser/schemajava
 	@rm -f $(GENERATED_SRC_PATH)$(PFX)parser/schemajava/*.java $@
+	@cp $(PFX)parser/schemajava/Token.java.source $(GENERATED_SRC_PATH)$(PFX)parser/schemajava/Token.java	
 	@$(JAVA) -cp $(CLASSPATH) $(JAVACC_MAIN) -OUTPUT_DIRECTORY=$(GENERATED_SRC_PATH)$(PFX)parser/schemajava $< 
 
 $(PROOFJAVA_PARSER) \
@@ -564,6 +561,7 @@ $(PROOFJAVA_PARSER) \
 	@echo [create parser for extended java in proofs]
 	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)parser/proofjava
 	@rm -f $(GENERATED_SRC_PATH)$(PFX)parser/proofjava/*.java $@
+	@cp $(PFX)parser/proofjava/Token.java.source $(GENERATED_SRC_PATH)$(PFX)parser/proofjava/Token.java
 	@$(JAVA) -cp $(CLASSPATH) $(JAVACC_MAIN) -OUTPUT_DIRECTORY=$(GENERATED_SRC_PATH)$(PFX)parser/proofjava $< 
 
 $(DIFF_PARSER) \
@@ -605,21 +603,6 @@ $(GENERATED_SRC_PATH)$(PFX)parser/KeYParser.java \
 	@$(ANTLR) -glib $(PFX)parser/lexer.g \
 			 -o $(GENERATED_SRC_PATH)$(PFX)parser $<
 
-$(GENERATED_SRC_PATH)$(PFX)parser/jml/KeYJMLLexer.java \
-$(GENERATED_SRC_PATH)$(PFX)parser/jml/KeYJMLLexerTokenTypes.txt \
-$(GENERATED_SRC_PATH)$(PFX)parser/jml/KeYJMLLexerTokenTypes.java \
-	: $(PFX)parser/jml/lexer.g
-	@echo [creating KeYJMLLexer]
-	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)parser/jml
-	@$(ANTLR)  -o $(GENERATED_SRC_PATH)$(PFX)parser/jml $<
-
-$(GENERATED_SRC_PATH)$(PFX)parser/jml/KeYJMLParser.java \
-	: $(PFX)parser/jml/jml.g \
-	  $(GENERATED_SRC_PATH)$(PFX)parser/jml/KeYJMLLexerTokenTypes.txt
-	@echo [creating jml parser]
-	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)parser/jml
-	@$(ANTLR)  -glib $(PFX)parser/jml/lexer.g \
-			 -o $(GENERATED_SRC_PATH)$(PFX)parser/jml $<
 
 $(GENERATED_SRC_PATH)$(PFX)parser/simplify/SimplifyLexer.java \
 $(GENERATED_SRC_PATH)$(PFX)parser/simplify/SimplifyLexerTokenTypes.txt \
@@ -637,21 +620,53 @@ $(GENERATED_SRC_PATH)$(PFX)parser/simplify/SimplifyParser.java \
 	@$(JAVA) -cp $(CLASSPATH) antlr.Tool  -glib $(PFX)parser/simplify/lexer.g \
 			 -o $(GENERATED_SRC_PATH)$(PFX)parser/simplify $<
 
-$(GENERATED_SRC_PATH)$(PFX)parser/ocl/KeYOclLexer.java \
-$(GENERATED_SRC_PATH)$(PFX)parser/ocl/KeYOclLexerTokenTypes.txt \
-$(GENERATED_SRC_PATH)$(PFX)parser/ocl/KeYOclLexerTokenTypes.java \
-	: $(PFX)parser/ocl/lexer.g
-	@echo [creating KeYOclLexer]
-	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)parser/ocl
-	@$(JAVA) -cp $(CLASSPATH) antlr.Tool  -o $(GENERATED_SRC_PATH)$(PFX)parser/ocl $<
+$(GENERATED_SRC_PATH)$(PFX)speclang/ocl/translation/KeYOCLLexer.java \
+$(GENERATED_SRC_PATH)$(PFX)speclang/ocl/translation/KeYOCLLexerTokenTypes.txt \
+$(GENERATED_SRC_PATH)$(PFX)speclang/ocl/translation/KeYOCLLexerTokenTypes.java \
+	: $(PFX)speclang/ocl/translation/ocllexer.g
+	@echo [creating OCL lexer]
+	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)speclang/ocl/translation
+	@$(JAVA) -cp $(CLASSPATH) antlr.Tool  -o $(GENERATED_SRC_PATH)$(PFX)speclang/ocl/translation $<
 
-$(GENERATED_SRC_PATH)$(PFX)parser/ocl/KeYOclParser.java \
-	: $(PFX)parser/ocl/ocl.g \
-	  $(GENERATED_SRC_PATH)$(PFX)parser/ocl/KeYOclLexerTokenTypes.txt
-	@echo [creating ocl parser]
-	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)parser/ocl
-	@$(JAVA) -cp $(CLASSPATH) antlr.Tool  -glib $(PFX)parser/ocl/lexer.g \
-			 -o $(GENERATED_SRC_PATH)$(PFX)parser/ocl $<
+$(GENERATED_SRC_PATH)$(PFX)speclang/ocl/translation/KeYOCLParser.java \
+	: $(PFX)speclang/ocl/translation/oclparser.g \
+	  $(GENERATED_SRC_PATH)$(PFX)speclang/ocl/translation/KeYOCLLexerTokenTypes.txt
+	@echo [creating OCL parser]
+	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)speclang/ocl/translation
+	@$(JAVA) -cp $(CLASSPATH) antlr.Tool  -glib $(PFX)speclang/ocl/translation/ocllexer.g \
+			 -o $(GENERATED_SRC_PATH)$(PFX)speclang/ocl/translation $<
+
+$(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/KeYJMLPreLexer.java \
+$(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/KeYJMLPreLexerTokenTypes.txt \
+$(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/KeYJMLPreLexerTokenTypes.java \
+	: $(PFX)speclang/jml/pretranslation/jmlprelexer.g
+	@echo [creating JML pre lexer]
+	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation
+	@$(JAVA) -cp $(CLASSPATH) antlr.Tool  -o $(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation $<
+
+$(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/KeYJMLPreParser.java \
+	: $(PFX)speclang/jml/pretranslation/jmlpreparser.g \
+	  $(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/KeYJMLPreLexerTokenTypes.txt
+	@echo [creating JML pre parser]
+	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation
+	@$(JAVA) -cp $(CLASSPATH) antlr.Tool  -glib $(PFX)speclang/jml/pretranslation/jmlprelexer.g \
+			 -o $(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation $<
+
+$(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation/KeYJMLLexer.java \
+$(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation/KeYJMLLexerTokenTypes.txt \
+$(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation/KeYJMLLexerTokenTypes.java \
+	: $(PFX)speclang/jml/translation/jmllexer.g
+	@echo [creating JML lexer]
+	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation
+	@$(JAVA) -cp $(CLASSPATH) antlr.Tool  -o $(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation $<
+
+$(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation/KeYJMLParser.java \
+	: $(PFX)speclang/jml/translation/jmlparser.g \
+	  $(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation/KeYJMLLexerTokenTypes.txt
+	@echo [creating JML parser]
+	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation
+	@$(JAVA) -cp $(CLASSPATH) antlr.Tool  -glib $(PFX)speclang/jml/translation/jmllexer.g \
+	                 -o $(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation $<
 
 $(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocLexer.java \
 $(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocLexerTokenTypes.txt \

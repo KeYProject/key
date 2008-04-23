@@ -27,7 +27,6 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.util.ExtList;
 
 
 /**
@@ -149,10 +148,10 @@ public class ContextSkolemBuilder extends AbstractSkolemBuilder {
     private Try createTryStatement() {
         final Catch          catchObj     = createCatchBlock();
         
-        final ExtList        tryBodyStmts = new ExtList ();
+        final Statement[] tryBodyStmts = new Statement[2];
         // an empty statement to mark the position of insertion
-        tryBodyStmts.add ( new EmptyStatement () );
-        tryBodyStmts.add ( getFrameStatementSV(0) );
+        tryBodyStmts[0] = new EmptyStatement ();
+        tryBodyStmts[1] = getFrameStatementSV(0);
 
         addTryVariable((SchemaVariable)getFrameStatementSV(0));
 
@@ -208,9 +207,9 @@ public class ContextSkolemBuilder extends AbstractSkolemBuilder {
 
         final MethodFrame mfObj = createMethodFrame(p_resultType);
 
-	final ExtList topLevelStmts = new ExtList ();
-	topLevelStmts.add ( mfObj );
-	topLevelStmts.add ( getFrameStatementSV(2) );
+	final Statement[] topLevelStmts = new Statement[2];
+	topLevelStmts[0] = mfObj;
+	topLevelStmts[1] = getFrameStatementSV(2);
 
         addResultVariable((SchemaVariable)getFrameStatementSV(2));
 

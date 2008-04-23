@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.visualdebugger.executiontree;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import javax.swing.SwingUtilities;
@@ -186,13 +189,10 @@ public class ExecutionTree implements AutoModeListener {
 
         boolean atomic = true;
         if (looking) {
-            HashMapFromPosInOccurrenceToLabel labels = n.getNodeInfo()
+            HashMap<PosInOccurrence, Label> labels = n.getNodeInfo()
                     .getVisualDebuggerState().getLabels();
-            IteratorOfPosInOccurrence pioIt = labels.keyIterator();
-
             // case: {u}post TODO
-            while (pioIt.hasNext()) {
-                PosInOccurrence pio = pioIt.next();
+            for (final PosInOccurrence pio : labels.keySet()) {
                 PCLabel pcLabel = ((PCLabel) labels.get(pio));
                 // if (!containsJavaBlock(pio.constrainedFormula().formula()))
                 // pc = pc.append(pio.constrainedFormula().formula());
@@ -249,7 +249,7 @@ public class ExecutionTree implements AutoModeListener {
             newTerms = null;
         }
 
-        final IteratorOfNode it = n.childrenIterator();
+        final Iterator<Node> it = n.childrenIterator();
         while (it.hasNext()) {
             buildITTree(it.next(), newId, looking, newParent, newTerms);
         }
@@ -386,12 +386,10 @@ public class ExecutionTree implements AutoModeListener {
         }
     }
 
-    private ListOfTerm getPc(HashMapFromPosInOccurrenceToLabel labels) {
-        IteratorOfPosInOccurrence pioIt = labels.keyIterator();
+    private ListOfTerm getPc(HashMap<PosInOccurrence, Label> labels) {
         ListOfTerm pc = SLListOfTerm.EMPTY_LIST;
 
-        while (pioIt.hasNext()) {
-            PosInOccurrence pio = pioIt.next();
+        for (final PosInOccurrence pio : labels.keySet()) {
             // PCLabel pcLabel = ((PCLabel)labels.get(pio));
             if (!containsJavaBlock(pio.constrainedFormula().formula())) {
                 Term t = pio.constrainedFormula().formula();
@@ -412,11 +410,12 @@ public class ExecutionTree implements AutoModeListener {
         return pc;
     }
 
-    private int greatestLabel(IteratorOfLabel it) {
+    private int greatestLabel(Collection<Label> collection) {
         int current = -1;
-        if (it != null)
-            while (it.hasNext()) {
-                PCLabel pc = (PCLabel) it.next();
+        if (collection != null)
+            for (final Label label : collection) {
+                assert label instanceof PCLabel;
+                final PCLabel pc = (PCLabel) label;
                 if (pc.getId() > current)
                     current = pc.getId();
             }
@@ -618,7 +617,7 @@ public class ExecutionTree implements AutoModeListener {
      * FIXME reuse method in VisualDebugger
      * 
      * @param pio
-     * @return
+     * @return true if pio describes a term with a modality as top operator
      */
     private boolean modalityTopLevel(PosInOccurrence pio) {
         Term cf = pio.constrainedFormula().formula();
@@ -638,7 +637,7 @@ public class ExecutionTree implements AutoModeListener {
     // TODO allow all rules that are not of the form assume(non pc) fing(pc)
     // TODO splitting rules in updates
     private boolean onlyBCInvolvedInTacletApp(Node n, int newId) {
-        HashMapFromPosInOccurrenceToLabel labels = n.getNodeInfo()
+        HashMap<PosInOccurrence, Label> labels = n.getNodeInfo()
                 .getVisualDebuggerState().getLabels();
 
         if (n.childrenCount() == 0) {

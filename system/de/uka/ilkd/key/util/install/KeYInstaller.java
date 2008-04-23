@@ -44,7 +44,7 @@ public abstract class KeYInstaller {
     /** array with names of required library files */
     private static final String[] libraries = new String[] {
 	"antlr.jar", "dresden-ocl-demo.jar", 
-	"recoder.jar", "xerces.jar", "jargs.jar", "log4j.jar"
+	"recoderKey.jar", "xerces.jar", "jargs.jar", "log4j.jar"
     };
 
     /** optional external binaries */
@@ -405,7 +405,7 @@ public abstract class KeYInstaller {
     
     /**
      * Extracts files from the key/program jar-archive.
-     * @param entryname name of the file in the jar
+     * @param entrypath name of the file in the jar
      * @param filename name to be copied to.
      */
     public void extractFromJar( String  entrypath,

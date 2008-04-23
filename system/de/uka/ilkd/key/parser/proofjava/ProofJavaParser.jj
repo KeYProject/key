@@ -14,8 +14,10 @@
 options {
     JAVA_UNICODE_ESCAPE = true; // costs approx. 7%
     STATIC = true; // if true, the parser may be initialized only once
-    OPTIMIZE_TOKEN_MANAGER = true;
-//    DEBUG_PARSER = true;
+    // OPTIMIZE_TOKEN_MANAGER = true; // obsolete
+    // DEBUG_PARSER = true;
+    // FORCE_LA_CHECK = true;
+    // DEBUG_LOOKAHEAD = true;
 }
 
 PARSER_BEGIN(ProofJavaParser)
@@ -26,7 +28,7 @@ import java.io.*;
 import java.util.*;
 
 import recoder.*;
-import recoder.list.*;
+import recoder.list.generic.*;
 import recoder.java.*;
 import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.*;
@@ -38,6 +40,8 @@ import recoder.java.statement.*;
 import recoder.io.*;
 
 import de.uka.ilkd.key.java.recoderext.*;
+import recoder.abstraction.TypeArgument.WildcardMode;
+
 
 /**
    JavaCC AST generation specification based on the original Java1.1   
@@ -52,17 +56,52 @@ import de.uka.ilkd.key.java.recoderext.*;
 public class ProofJavaParser {
 
     public static final void initialize(Reader r) {
-	current = null;
-	comments.clear();
-	ReInit(r);
+        current = null;
+        comments.clear();
+        ReInit(r);
     }
 
     /** the JavaProgramFactory instance that is used to create
-	parse results
+        parse results
     */
     private static ProofJavaProgramFactory factory
-	= (ProofJavaProgramFactory) ProofJavaProgramFactory.getInstance();
+        = (ProofJavaProgramFactory) ProofJavaProgramFactory.getInstance();
 
+    static boolean superAllowed = true;
+    private static boolean isSuperAllowed() { return superAllowed; }
+    private static void setAllowSuper(boolean b) { superAllowed = b; }
+
+
+    static boolean jdk1_4 = true;
+    static boolean jdk1_5 = false;
+
+    public static boolean isAwareOfAssert() {
+        return jdk1_4;        
+    }
+
+    public static void setAwareOfAssert(boolean yes) {
+        jdk1_4 = yes;
+        if (yes == false) jdk1_5 = false;
+    }
+    
+    public static boolean isJava5() {
+    	return jdk1_5;
+    }
+    
+    public static void setJava5(boolean yes) {
+	    jdk1_5 = yes;
+    	if (yes)
+	    	jdk1_4 = true;
+    }
+    
+    public static void setTabSize(int tabSize) {
+    	JavaCharStream.setTabSize(tabSize);
+    }
+    
+    public static int getTabSize() {
+    	return JavaCharStream.getTabSize(0); // whatever...
+    }
+    
     /** temporary valid variable that is used to return an additional
         argument from parser method VariableDeclaratorId, since such an
         id may have a dimension
@@ -73,17 +112,16 @@ public class ProofJavaParser {
     private static Token current;
 
     /** all comments in a global list. */
-    private static CommentMutableList comments = new CommentArrayList();
-
+    private static List<Comment> comments = new ArrayList<Comment>();
 
     /** reuseable position object. */
     private static SourceElement.Position position 
-	= new SourceElement.Position(0, 0);
+        = new SourceElement.Position(0, 0);
 
-    private static void	copyPrefixInfo(SourceElement oldResult,
-				       SourceElement newResult) {
-	newResult.setRelativePosition(oldResult.getRelativePosition());
-	newResult.setStartPosition(oldResult.getStartPosition());
+    private static void        copyPrefixInfo(SourceElement oldResult,
+                                       SourceElement newResult) {
+        newResult.setRelativePosition(oldResult.getRelativePosition());
+        newResult.setStartPosition(oldResult.getStartPosition());
         newResult.setEndPosition(oldResult.getEndPosition());
     }
 
@@ -92,28 +130,28 @@ public class ProofJavaParser {
      */
     private static void shiftToken() {
         if (current != token) {
-	    if (current != null) {
-		while (current.next != token) {
-		    current = current.next;
-		}
-	    }
+            if (current != null) {
+                while (current.next != token) {
+                    current = current.next;
+                }
+            }
             Token prev;
             if (token.specialToken != null) {
                 prev = token.specialToken;
             } else {
                 prev = current;
             }
-	    if (prev != null) {
-		int col = token.beginColumn - 1;
-		int lf = token.beginLine - prev.endLine;
-		if (lf <= 0) {
+            if (prev != null) {
+                int col = token.beginColumn - 1;
+                int lf = token.beginLine - prev.endLine;
+                if (lf <= 0) {
                     col -= prev.endColumn; // - 1;
-		    if (col < 0) {
-			col = 0;
-		    }
-		}		
-		position.setPosition(lf, col);
-	    }
+                    if (col < 0) {
+                        col = 0;
+                    }
+                }                
+                position.setPosition(lf, col);
+            }
         }
         current = token;
     }
@@ -121,11 +159,11 @@ public class ProofJavaParser {
         
         
     private static void setPrefixInfo(SourceElement constrResult) {
-	position.setPosition(0, 0);
+        position.setPosition(0, 0);
         shiftToken();
-	constrResult.setRelativePosition(position);
-	position.setPosition(current.beginLine, current.beginColumn);
-	constrResult.setStartPosition(position);
+        constrResult.setRelativePosition(position);
+        position.setPosition(current.beginLine, current.beginColumn);
+        constrResult.setStartPosition(position);
     }
 
     private static void setPostfixInfo(SourceElement constrResult) { 
@@ -144,17 +182,17 @@ public class ProofJavaParser {
                 prev = prev.next;
             }
         }
-	position.setPosition(0, 0);
+        position.setPosition(0, 0);
 
         int internalIndentation = 0;
         int internalLinefeeds = 0;
         if (prev.image != null) {
-	    int col = tok.beginColumn - 1;
-	    int lf = tok.beginLine - prev.endLine;
-	    if (lf <= 0) {
+            int col = tok.beginColumn - 1;
+            int lf = tok.beginLine - prev.endLine;
+            if (lf <= 0) {
                 col -= prev.endColumn; // - 1;
-	    }		
-	    position.setPosition(lf, col);
+            }                
+            position.setPosition(lf, col);
         }
         c.setRelativePosition(position);
         position.setPosition(tok.endLine, tok.endColumn);
@@ -162,12 +200,12 @@ public class ProofJavaParser {
         position.setPosition(tok.beginLine, tok.beginColumn);
         c.setStartPosition(position);
         if (!(c instanceof DocComment)) {
-	    boolean hasEmptyLine = c.getRelativePosition().getLine() > 1;
-	    c.setPrefixed(hasEmptyLine);
-	    if (tok.specialToken != null && !hasEmptyLine) {
-		c.setPrefixed(comments.getComment(comments.size() - 1).isPrefixed());
-	    }	    
-	}
+            boolean hasEmptyLine = c.getRelativePosition().getLine() > 1;
+            c.setPrefixed(hasEmptyLine);
+            if (tok.specialToken != null && !hasEmptyLine) {
+                c.setPrefixed(comments.get(comments.size() - 1).isPrefixed());
+            }            
+        }
         comments.add(c);
     }
     
@@ -183,121 +221,128 @@ public class ProofJavaParser {
         addComment(factory.createDocComment(tok.image), tok);
     }
     
-    public static CommentMutableList getComments() {
-	return comments;
+    public static List<Comment> getComments() {
+        return comments;
     }
    
  
     /** checks whether or not the tree construction result is valid.
-	Currently this only checks whether or not the result is <tt>null</tt>.
-	@param constrResult the result of a factory call
-	@exception ParseException if the result is not legal
+        Currently this only checks whether or not the result is <tt>null</tt>.
+        @param constrResult the result of a factory call
+        @exception ParseException if the result is not legal
     */
     private static void checkConstruction(SourceElement constrResult) 
     throws ParseException {
-	if (constrResult == null) {
-	    throw new ParseException
-	       ("An illegal null object was created during tree construction");	
-	}
+        if (constrResult == null) {
+            throw new ParseException
+               ("An illegal null object was created during tree construction");        
+        }
 
 
-	// insert check code here!!
+        // insert check code here!!
     }
 
-    private static void checkConstruction(ProgramElementList constrResult) 
+    private static void checkConstruction(ASTList<? extends ProgramElement> constrResult) 
     throws ParseException {
-	if (constrResult == null) {
-	    throw new ParseException
-		("An illegal null list was created during tree construction");
-	}
-	// insert check code here!!
+        if (constrResult == null) {
+            throw new ParseException
+                ("An illegal null list was created during tree construction");
+        }
+        // insert check code here!!
     }
 
 
     /** inner class that is only used to return results from
-	primary suffix syntax rule
-	@author RN
+        primary suffix syntax rule
+        @author RN
     */
     static class PrimarySuffixReturnValue {
-	
-	// the following constants represent the various sub rules
+        
+        // the following constants represent the various sub rules
 
-	/** indicates that the result is currently undefined */
-	static final int UNDEFINED       = -1;
-	/** production was <pre>"." "this"</pre> */
-	static final int THIS            =  0;	
-	/** production was <pre>"." AllocationExpression</pre> */
-	static final int ALLOCATION_EXPR =  1;	
-	/** production was <pre>"[" Expression "]"</pre> */
-	static final int INDEX_EXPR      =  2;	
-	/** production was <pre>"." <IDENTIFIER></pre> */
-	static final int IDENTIFIER      =  3;	
-	/** production was <pre>Arguments</pre> */
-	static final int ARGUMENTS       =  4;
+        /** indicates that the result is currently undefined */
+        static final int UNDEFINED       = -1;
+        /** production was <pre>"." "this"</pre> */
+        static final int THIS            =  0;        
+        /** production was <pre>"." AllocationExpression</pre> */
+        static final int ALLOCATION_EXPR =  1;        
+        /** production was <pre>"[" Expression "]"</pre> */
+        static final int INDEX_EXPR      =  2;        
+        /** production was <pre>"." <IDENTIFIER></pre> */
+        static final int IDENTIFIER      =  3;        
+        /** production was <pre>Arguments</pre> */
+        static final int ARGUMENTS       =  4;
+        /** production was <pre>super</pre> */
+        static final int SUPER 			 =  5;
 
-	/** indicates the type of the result */
-	int                   type = UNDEFINED;
-	
-	/** valid iff <tt>type</tt> is <tt>ALLOCATION_EXPR</tt> or 
-	    <tt>INDEX_EXPR</tt> */
-	Expression            expr = null;
-	
-	/** valid iff <tt>type</tt> is <tt>IDENTIFIER</tt> */
-	Identifier            id   = null;
+        /** indicates the type of the result */
+        int                   type = UNDEFINED;
+        
+        /** valid iff <tt>type</tt> is <tt>ALLOCATION_EXPR</tt> or 
+            <tt>INDEX_EXPR</tt> */
+        Expression            expr = null;
+        
+        /** valid iff <tt>type</tt> is <tt>IDENTIFIER</tt> */
+        Identifier            id   = null;
     
-	/** valid iff <tt>type</tt> is <tt>ARGUMENTS</tt> */
-	ExpressionMutableList args = null;
+        /** valid iff <tt>type</tt> is <tt>ARGUMENTS</tt> */
+        ASTList<Expression> args = null;
+        
+        /** valid iff <tt>type</tt> is <tt>IDENTIFIER</tt> and 
+         *  it is an explicit generic method invocation
+         */
+        ASTList<TypeArgumentDeclaration> typeArgs = null;
     }
 
 
     /** inner class that is only used to return results from
-	primary prefix syntax rule
-	@author RN
+        primary prefix syntax rule
+        @author RN
     */
     static class PrimaryPrefixReturnValue {
     
-	// the following constants represent the various sub rules
+        // the following constants represent the various sub rules
     
-	/** indicates that the result is currently undefined */
-	static final int UNDEFINED        = -1;	
-	/** production was <pre>Literal</pre> */
-	static final int LITERAL          =  0;    
-	/** production was <pre>"this"</pre> */
-	static final int THIS             =  1;	
-	/** production was <pre>"super" "." <IDENTIFIER></pre> */
-	static final int SUPER_MEMBER     =  2;	
-	/** production was <pre>"(" Expression ")"</pre> */
-	static final int PARENTHESIZED_EXPR =  3;    
-	/** production was <pre>AllocationExpression</pre> */
-	static final int ALLOCATION_EXPR  =  4;    
-	/** production was <pre>ResultType "." "class"</pre> */
-	static final int CLASS_REF        =  5;	
-	/** production was <pre>Name</pre> */
-	static final int QUALIFIED_NAME   =  6;
-	/** production was <pre>"@(" Expression ")"</pre> */
-	static final int PASSIVE_EXPR =  7;    
+        /** indicates that the result is currently undefined */
+        static final int UNDEFINED        = -1;        
+        /** production was <pre>Literal</pre> */
+        static final int LITERAL          =  0;    
+        /** production was <pre>"this"</pre> */
+        static final int THIS             =  1;        
+        /** production was <pre>"super" "." <IDENTIFIER></pre> */
+        static final int SUPER_MEMBER     =  2;        
+        /** production was <pre>"(" Expression ")"</pre> */
+        static final int PARENTHESIZED_EXPR =  3;    
+        /** production was <pre>AllocationExpression</pre> */
+        static final int ALLOCATION_EXPR  =  4;    
+        /** production was <pre>ResultType "." "class"</pre> */
+        static final int CLASS_REF        =  5;        
+        /** production was <pre>Name</pre> */
+        static final int QUALIFIED_NAME   =  6;
+        /** production was <pre>"@(" Expression ")"</pre> */
+        static final int PASSIVE_EXPR =  7;    
     
-	/** indicates the type of the result */
-	int           type    = UNDEFINED;
+        /** indicates the type of the result */
+        int           type    = UNDEFINED;
     
-	/** valid iff <tt>type</tt> is <tt>LITERAL</tt> */
-	Literal       literal = null;
+        /** valid iff <tt>type</tt> is <tt>LITERAL</tt> */
+        Literal       literal = null;
     
-	/** valid iff <tt>type</tt> is <tt>PARENTHESED_EXPR</tt>
-	    or <tt>ALLOCATION_EXPR</tt> */
-	Expression    expr    = null;
+        /** valid iff <tt>type</tt> is <tt>PARENTHESED_EXPR</tt>
+            or <tt>ALLOCATION_EXPR</tt> */
+        Expression    expr    = null;
     
-	/** valid iff <tt>type</tt> is <tt>CLASS_REF</tt> */
-	TypeReference typeref = null;
-	
-	/** valid iff <tt>type</tt> is <tt>QUALIFIED_NAME</tt> or
-	 <tt>SUPER_MEMBER</tt>*/
-	UncollatedReferenceQualifier name  = null;
+        /** valid iff <tt>type</tt> is <tt>CLASS_REF</tt> */
+        TypeReference typeref = null;
+        
+        /** valid iff <tt>type</tt> is <tt>QUALIFIED_NAME</tt> or
+         <tt>SUPER_MEMBER</tt>*/
+        UncollatedReferenceQualifier name = null;
 
     }
 
     /** return value containers for primary expression.
-	need only be allocated once per parser. */
+        need only be allocated once per parser. */
     static PrimarySuffixReturnValue suffix = new PrimarySuffixReturnValue();
     static PrimaryPrefixReturnValue prefix = new PrimaryPrefixReturnValue();
 
@@ -366,7 +411,16 @@ MORE :
 TOKEN :
 {
   < ABSTRACT: "abstract" >
-| < ASSERT: "assert" >
+| < ASSERT: "assert" >  {
+      if (!ProofJavaParser.jdk1_4) {
+          matchedToken.kind = IDENTIFIER;
+      }
+  }
+| < AT: "@" > {
+	  if (!ProofJavaParser.jdk1_5) {
+	  	  // TODO
+	  }
+  }
 | < BOOLEAN: "boolean" >
 | < BREAK: "break" >
 | < BYTE: "byte" >
@@ -380,6 +434,11 @@ TOKEN :
 | < DO: "do" >
 | < DOUBLE: "double" >
 | < ELSE: "else" >
+| < ENUM: "enum" > {
+	  if (!ProofJavaParser.jdk1_5) {
+	  	matchedToken.kind = IDENTIFIER;
+	  }
+}
 | < EXTENDS: "extends" >
 | < FALSE: "false" >
 | < FINAL: "final" >
@@ -417,6 +476,7 @@ TOKEN :
 | < VOID: "void" >
 | < VOLATILE: "volatile" >
 | < WHILE: "while" >
+| < VARARGDENOTER: "..." >
 | < STRICTFP: "strictfp" >
 }
 
@@ -449,7 +509,7 @@ TOKEN :
       "'"
       (   (~["'","\\","\n","\r"])
         | ("\\"
-	   ( ["n","t","b","r","f","\\","'","\""] 
+           ( ["n","t","b","r","f","\\","'","\""] 
             | ["0"-"7"] ( ["0"-"7"] )?
             | ["0"-"3"] ["0"-"7"] ["0"-"7"]
             )
@@ -477,8 +537,6 @@ TOKEN :
 TOKEN :
 {
   < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* ("#" (<DIGIT>)* )? >
-|
-  < IMPLICITIDENTIFIER: "<" <LETTER> (<LETTER>|<DIGIT>)* ">" >
 |
   < #LETTER:
       [
@@ -519,6 +577,8 @@ TOKEN :
   >
 }
 
+
+
 /* SEPARATORS */
 
 TOKEN :
@@ -539,8 +599,8 @@ TOKEN :
 TOKEN :
 {
   < ASSIGN: "=" >
-| < GT: ">" >
-| < LT: "<" >
+//| < GT: ">" >
+//| < LT: "<" >
 | < BANG: "!" >
 | < TILDE: "~" >
 | < HOOK: "?" >
@@ -563,8 +623,6 @@ TOKEN :
 | < XOR: "^" >
 | < REM: "%" >
 | < LSHIFT: "<<" >
-| < RSIGNEDSHIFT: ">>" >
-| < RUNSIGNEDSHIFT: ">>>" >
 | < PLUSASSIGN: "+=" >
 | < MINUSASSIGN: "-=" >
 | < STARASSIGN: "*=" >
@@ -577,6 +635,45 @@ TOKEN :
 | < RSIGNEDSHIFTASSIGN: ">>=" >
 | < RUNSIGNEDSHIFTASSIGN: ">>>=" >
 | < SHARP: "#">
+}
+
+/* >'s need special attention due to generics syntax. */
+TOKEN :
+{
+  < RUNSIGNEDSHIFT: ">>>" >
+  {
+     matchedToken.kind = GT;
+     ((Token.RealKindToken)matchedToken).realKind = RUNSIGNEDSHIFT;
+     input_stream.backup(2);
+     matchedToken.image = ">";
+  }
+| < RSIGNEDSHIFT: ">>" >
+  {
+     matchedToken.kind = GT;
+     ((Token.RealKindToken)matchedToken).realKind = RSIGNEDSHIFT;
+     input_stream.backup(1);
+     matchedToken.image = ">";
+  }
+| < GT: ">" >
+}
+
+/* special attention is paid to "&lt;".
+ * it will always be mapped to LT, but if an implicit identifier
+ * is built, this is stored in the "&lt;" token, so that later we
+ * can distinguish "&lt; a&gt;" from "&lt;a&gt".
+ */
+
+TOKEN : 
+{
+  < IMPLICITIDENTIFIER: "<" <LETTER> (<LETTER>|<DIGIT>)* ">" > {
+  		matchedToken.kind = LT;
+  		((Token.RealKindToken)matchedToken).realKind = IMPLICITIDENTIFIER;
+  		int len = matchedToken.image.length() - 1;
+  		input_stream.backup(len);
+  		matchedToken.image = "<";
+  }
+|
+  < LT: "<" >
 }
 
 
@@ -592,25 +689,40 @@ CompilationUnit CompilationUnit() :
 {
     CompilationUnit result;
     PackageSpecification        ps  = null;
-    ImportMutableList           il  = new ImportArrayList();
+    ASTList<Import>           il  = new ASTArrayList<Import>();
     Import                      imp;
-    TypeDeclarationMutableList  tdl = new TypeDeclarationArrayList();
+    ASTList<TypeDeclaration>  tdl = new ASTArrayList<TypeDeclaration>();
     TypeDeclaration             td;
 }
 {
-  [ ps = PackageDeclaration() ]
-  (
-    imp = ImportDeclaration()
-    {
-      if (imp != null) il.add(imp);
-    }
-  )*
-  (
-    td = TypeDeclaration()
-    {
-      if (td != null) tdl.add(td);
-    }
-  )*
+	// This is a quick "fix" - TypeDeclaration and PackageDeclaration unfortunately 
+	// can both start with an unlimited number of annotations. However, usually only one file
+	// per package contains package annotations, so this is not a performance issue.
+    (
+      LOOKAHEAD(PackageDeclaration())
+	  ps = PackageDeclaration()
+	  (
+	    imp = ImportDeclaration()
+	    { il.add(imp); }
+	  )*
+	  (
+	    td = TypeDeclaration()
+	    {
+	      if (td != null) tdl.add(td);
+	    }
+	  )*
+    |
+	  (
+	    imp = ImportDeclaration()
+	    { il.add(imp); }
+	  )*
+	  (
+	    td = TypeDeclaration()
+	    {
+	      if (td != null) tdl.add(td);
+	    }
+	  )*
+	)
   <EOF>
   {
     result = factory.createCompilationUnit(ps, il, tdl); 
@@ -625,12 +737,21 @@ PackageSpecification PackageDeclaration() :
 {
     PackageSpecification result;
     UncollatedReferenceQualifier qn;
+    ASTList<AnnotationUseSpecification> annotations = new ASTArrayList<AnnotationUseSpecification>();
+    AnnotationUseSpecification annot;
 }
 {
+  (annot = AnnotationUse() {
+  	annotations.add(annot);
+  } )*
+  { 
+  	annotations.trimToSize();
+  }
   "package" 
       {
-	  result = factory.createPackageSpecification();
-	  setPrefixInfo(result);
+          result = factory.createPackageSpecification();
+          setPrefixInfo(result);
+          result.setAnnotations(annotations);
       }
   qn = Name() ";"
   {
@@ -647,20 +768,34 @@ Import ImportDeclaration() :
     UncollatedReferenceQualifier qn;
     String hs = null;
     boolean wildcard = false;
+    boolean isStatic = false;
 }
 {
-  "import" {
+  "import"
+  {
       result = factory.createImport();
       setPrefixInfo(result);
   }
+  ["static" { isStatic = true; }] 
   ( qn = Name() ) [ "." "*" { wildcard = true; } ] ";"
   {
     // "*" will be thrown away immediately since the package name is sufficient
       result.setMultiImport(wildcard);
-      if (wildcard) {
-	  result.setReference(qn);
+      if (isStatic) {
+      	result.setStaticImport(true);
+     	if (wildcard) {
+	     	result.setReference(qn.toTypeReference());
+     	} else {
+     		result.setStaticIdentifier(qn.getIdentifier());
+     		UncollatedReferenceQualifier urq = (UncollatedReferenceQualifier)qn.getReferencePrefix();
+     		urq.setReferenceSuffix(null);
+     		result.setReference(urq.toTypeReference());
+     	}
+      }
+      else if (wildcard) {
+          result.setReference(qn);
       } else {
-	  result.setReference(qn.toTypeReference());
+          result.setReference(qn.toTypeReference());
       }
       checkConstruction(result);
       setPostfixInfo(result);
@@ -674,17 +809,24 @@ TypeDeclaration TypeDeclaration() :
 }
 {
   (
-  LOOKAHEAD( ( "abstract" | "final" | "public" | "strictfp" )* "class" )
-    result = ClassDeclaration()
-  |
-    result = InterfaceDeclaration()
-  |
-  ";" // ????????????????????????????????????????????????????
+      LOOKAHEAD( ( "abstract" | "final" | "public" | "strictfp" | AnnotationUse() )* "class" )
+      result = ClassDeclaration()
+    |
+      LOOKAHEAD( ( "abstract" | "public" | "strictfp" | AnnotationUse() )* "interface" )
+      result = InterfaceDeclaration()
+    |
+      LOOKAHEAD( ("public" | "strictfp" | "protected" | "private" | "static" | AnnotationUse() )* "enum")
+      result = EnumDeclaration()
+    |
+      LOOKAHEAD( ("strictfp" | "public" | "protected" | "private" | "static" | "abstract" | AnnotationUse() )* "@" "interface")
+      result = AnnotationTypeDeclaration()
+    |
+      ";"
   )
   {
-    if (result != null) {
-	checkConstruction(result);
-	setPostfixInfo(result);
+    if (result != null) { // may be removed as soon as Recoder fully understands Java5
+        checkConstruction(result);
+        setPostfixInfo(result);
     }
     return result;
   }
@@ -694,12 +836,225 @@ TypeDeclaration TypeDeclaration() :
 /*
  * Declaration syntax follows.
  */
+ 
+AnnotationDeclaration AnnotationTypeDeclaration() :
+{
+	ASTList<MemberDeclaration> members = new ASTArrayList<MemberDeclaration>();
+	MethodDeclaration md;
+	FieldDeclaration fd;
+	TypeDeclaration td;
+	ASTList<DeclarationSpecifier> declSpecs = new ASTArrayList<DeclarationSpecifier>(), methodDs;
+	DeclarationSpecifier ds;
+	Identifier name, methodName;
+	TypeReference methodRes;
+	Expression methodDefExpr;
+	AnnotationDeclaration result = new AnnotationDeclaration();
+}
+{
+	(LOOKAHEAD(2)(
+	    "strictfp" { ds = factory.createStrictFp(); }
+	  | "public" { ds = factory.createPublic(); }
+	  | "protected" { ds = factory.createProtected(); }
+	  | "private" { ds = factory.createPrivate(); }
+	  | "static" { ds = factory.createStatic(); }
+	  | "abstract" { ds = factory.createAbstract(); }
+	  | ds = AnnotationUse() 
+	 ) { declSpecs.add(ds); }
+	)*
+	"@" { setPrefixInfo(result); } 
+	"interface" <IDENTIFIER> { name = factory.createIdentifier(token.image); }
+	// here begins AnnotationTypeBody (JLS)
+	"{"
+		// AnnotationTypeElementDeclarations (JLS)
+		(
+			// this is a restricted method declaration:
+			LOOKAHEAD( (AnnotationUse() | "public" | "abstract")* Type() <IDENTIFIER>)
+			{ methodDs = new ASTArrayList<DeclarationSpecifier>(); }
+			  (( ds = AnnotationUse() 
+			    | "public" { ds = factory.createPublic(); }
+			    | "abstract" { ds = factory.createAbstract(); }
+			   ) { methodDs.add(ds); }
+			  )* 
+			  methodRes = Type() 
+			  <IDENTIFIER> { methodName = factory.createIdentifier(token.image); }
+			  "(" ")" 
+			  { methodDefExpr = null; }
+			  ["default" methodDefExpr = ElementValue()]
+			{ 
+				md = factory.createAnnotationPropertyDeclaration(methodDs, methodRes, methodName, methodDefExpr);
+				members.add(md);
+			}
+		  |
+		    // ConstantDeclaration
+		    /*LOOKAHEAD( (AnnotationUse() | "public" | "static" | "final")* Type() VariableDeclarator(true))
+		    (AnnotationUse() | "public" | "static" | "final")* Type() VariableDeclarator(true) ( "," VariableDeclarator(true))* ";"*/
+		    LOOKAHEAD(FieldDeclaration())
+		    fd = FieldDeclaration() { members.add(fd); }
+		  |
+		    LOOKAHEAD( NestedClassDeclaration() )
+		    td = NestedClassDeclaration() { members.add(td); }
+		  |
+		    LOOKAHEAD( EnumDeclaration())
+		    td = EnumDeclaration() { members.add(td); }
+		  |
+		    LOOKAHEAD( NestedInterfaceDeclaration() )
+		    td = NestedInterfaceDeclaration() { members.add(td); }
+		  | 
+		    LOOKAHEAD( AnnotationTypeDeclaration() )
+		    td = AnnotationTypeDeclaration() { members.add(td); }
+		  |
+		    ";"
+		)*
+	"}"
+	
+	{ 
+		result.setDeclarationSpecifiers(declSpecs);
+		result.setIdentifier(name);
+		result.setMembers(members);
+		setPostfixInfo(result);
+		return result;
+	}
+}
+
+ 
+EnumDeclaration EnumDeclaration() :
+{
+	DeclarationSpecifier ds;
+	ASTList<DeclarationSpecifier> declSpecs = new ASTArrayList<DeclarationSpecifier>();
+	EnumDeclaration result;
+	ASTList<MemberDeclaration> members = new ASTArrayList<MemberDeclaration>();
+	MemberDeclaration md;
+	Implements im;
+	ASTList<UncollatedReferenceQualifier> nl;
+	EnumConstantDeclaration constant;
+	Identifier id;
+}
+{
+
+	(LOOKAHEAD(2)(
+	    "strictfp" { ds = factory.createStrictFp(); }
+	  | "public" { ds = factory.createPublic(); }
+	  | "protected" { ds = factory.createProtected(); }
+	  | "private" { ds = factory.createPrivate(); }
+	  | "static" { ds = factory.createStatic(); }
+	  | ds = AnnotationUse() 
+	 )	{ 
+	 		setPrefixInfo(ds);
+	 		setPostfixInfo(ds);
+	 		declSpecs.add(ds); 
+		}
+	)*
+	"enum" 
+	{
+		result = new EnumDeclaration();
+		setPrefixInfo(result);
+		if (declSpecs.size() != 0)
+			result.setDeclarationSpecifiers(declSpecs);
+	}
+	
+	id = ShortName()
+    {
+          result.setIdentifier(id);
+    }
+
+	[ "implements"
+	  {
+          im = factory.createImplements();
+          setPrefixInfo(im);          
+      }
+      nl = TypedNameList()
+      {
+          ASTList<TypeReference> trl = new ASTArrayList<TypeReference>();
+          for (int i = 0, s = nl.size(); i < s; i++) {
+              TypeReference tr = 
+                  nl.get(i).toTypeReference();
+              trl.add(tr);
+          }
+          im.setSupertypes(trl);
+          result.setImplementedTypes(im);
+      }
+	] 
+	"{" // begin of "EnumBody"
+	  [ constant = EnumConstant() { 
+	 		members.add(constant);
+	  	}
+	  	( LOOKAHEAD(2) "," constant = EnumConstant() { members.add(constant); } )* 
+	  ] 
+	  [","] 
+	  [";" 
+	      (md = ClassBodyDeclaration()
+			 {
+		        members.add(md);
+			 }
+		   )*
+	  ] 
+	"}"
+	{ 
+	 	result.setMembers(members);
+	 	setPostfixInfo(result);
+		return result;
+	}
+}
+
+EnumConstantDeclaration EnumConstant() :
+{
+	AnnotationUseSpecification annot;
+	ASTArrayList<DeclarationSpecifier> annotations = null;
+	Identifier id;
+	ASTList<Expression> args = null;
+	ClassDeclaration cd = null;	
+	ASTList<MemberDeclaration> body = null;
+	EnumConstantSpecification spec;
+	EnumConstructorReference ref = null;
+	EnumConstantDeclaration result = new EnumConstantDeclaration();
+}
+{
+	{ setPrefixInfo(result); }
+	( 
+		{ if (annotations == null) annotations = new ASTArrayList<DeclarationSpecifier>(); }
+		annot = AnnotationUse() 
+		{ annotations.add(annot); }
+	)* 
+	
+	<IDENTIFIER> { 
+		id = factory.createIdentifier(token.image); 
+		setPrefixInfo(id);
+		setPostfixInfo(id);
+	}
+	[
+		args = Arguments() 
+	] 
+    [ 
+       {
+           cd = factory.createClassDeclaration();
+           setPrefixInfo(cd);
+       }
+       body = ClassBody()
+       {
+           cd.setMembers(body);
+           setPostfixInfo(cd);
+       }
+    ]	
+	{
+		ref = new EnumConstructorReference(args, cd);
+		setPrefixInfo(ref);  // TODO this maybe too late ?!
+		setPostfixInfo(ref);
+		spec = new EnumConstantSpecification(id, ref);
+		setPrefixInfo(spec); // TODO this maybe too late ?!
+		setPostfixInfo(spec);
+		setPostfixInfo(result);
+		result.setEnumConstantSpecification(spec);
+		result.setDeclarationSpecifiers(annotations);
+		return result;
+	}
+}
+
 
 ClassDeclaration ClassDeclaration() :
 {
   ClassDeclaration    result = null;
-  ModifierMutableList ml = new ModifierArrayList();
-  Modifier            m;
+  ASTList<DeclarationSpecifier> ml = new ASTArrayList<DeclarationSpecifier>();
+  DeclarationSpecifier m;
 }
 {
   ( (
@@ -707,16 +1062,17 @@ ClassDeclaration ClassDeclaration() :
     | ( "final"    { m = factory.createFinal();    } )
     | ( "public"   { m = factory.createPublic();   } )
     | ( "strictfp" { m = factory.createStrictFp(); } )
+    | ( m = AnnotationUse() 							  )
     )
     { 
-	setPrefixInfo(m);
-	setPostfixInfo(m);
-	ml.add(m); 
+        setPrefixInfo(m);
+        setPostfixInfo(m);
+        ml.add(m); 
     }
   )*
   result = UnmodifiedClassDeclaration()
   {
-    result.setModifiers(ml);
+    result.setDeclarationSpecifiers(ml);
     checkConstruction(result);
     setPostfixInfo(result);
     return result;
@@ -727,58 +1083,57 @@ ClassDeclaration UnmodifiedClassDeclaration() :
 {
   ClassDeclaration                 result;
   UncollatedReferenceQualifier     qn;
-  UncollatedReferenceQualifierList nl;
-  MemberDeclarationMutableList     mdl;
+  ASTList<UncollatedReferenceQualifier> nl;
+  ASTList<MemberDeclaration>     mdl;
   Extends ex;
   Implements im;
+  ASTList<TypeParameterDeclaration> typeParams = null;
+  Identifier id;
 }
 {
   "class"  {
       result = factory.createClassDeclaration();
       setPrefixInfo(result);
   }
-  (<IDENTIFIER>
-      {
-	  Identifier id = factory.createIdentifier(token.image);
-	  setPrefixInfo(id);
-	  setPostfixInfo(id);
-	  result.setIdentifier(id);
-      }
-  |
-   <IMPLICITIDENTIFIER> 
-      { 
-	  id = factory.createImplicitIdentifier(token.image);
-	  setPrefixInfo(id);
-	  setPostfixInfo(id);
-	  result.setIdentifier(id);
-      }
-  )
+  
+  id = ShortName()
+  	{
+  		result.setIdentifier(id);
+  	}
+     
+  [ typeParams = TypeParameters() 
+  	{
+  		result.setTypeParameters(typeParams);
+  	}
+  ]
+  
   [ "extends"
       {
-	  ex = factory.createExtends();
-	  setPrefixInfo(ex);
+          ex = factory.createExtends();
+          setPrefixInfo(ex);
       }
-      qn = Name()
+      qn = TypedName()
       {
-	  ex.setSupertypes(new TypeReferenceArrayList(qn.toTypeReference()));
-	  result.setExtendedTypes(ex);
+          ex.setSupertypes(new ASTArrayList<TypeReference>(1));
+          ex.getSupertypes().add(qn.toTypeReference());
+          result.setExtendedTypes(ex);
       }
   ]
   [ "implements"
       {
-	  im = factory.createImplements();
-	  setPrefixInfo(im);	  
+          im = factory.createImplements();
+          setPrefixInfo(im);          
       }
-      nl = NameList()
+      nl = TypedNameList()
       {
-	  TypeReferenceMutableList trl = new TypeReferenceArrayList();
-	  for (int i = 0, s = nl.size(); i < s; i++) {
-	      TypeReference tr = 
-		  nl.getUncollatedReferenceQualifier(i).toTypeReference();
-	      trl.add(tr);
-	  }
-	  im.setSupertypes(trl);
-	  result.setImplementedTypes(im);
+          ASTList<TypeReference> trl = new ASTArrayList<TypeReference>();
+          for (int i = 0, s = nl.size(); i < s; i++) {
+              TypeReference tr = 
+                  nl.get(i).toTypeReference();
+              trl.add(tr);
+          }
+          im.setSupertypes(trl);
+          result.setImplementedTypes(im);
       }
   ]
   mdl = ClassBody()
@@ -790,9 +1145,9 @@ ClassDeclaration UnmodifiedClassDeclaration() :
   }
 }
 
-MemberDeclarationMutableList ClassBody() :
+ASTList<MemberDeclaration> ClassBody() :
 {
-  MemberDeclarationMutableList result = new MemberDeclarationArrayList();
+  ASTList<MemberDeclaration> result = new ASTArrayList<MemberDeclaration>();
   MemberDeclaration md;
 }
 {
@@ -800,7 +1155,7 @@ MemberDeclarationMutableList ClassBody() :
   (
     md = ClassBodyDeclaration()
     {
-	result.add(md);
+        result.add(md);
     }
   )*
   "}"
@@ -813,8 +1168,8 @@ MemberDeclarationMutableList ClassBody() :
 ClassDeclaration NestedClassDeclaration() :
 {
   ClassDeclaration result;
-  ModifierMutableList ml = new ModifierArrayList();
-  Modifier m;
+  ASTList<DeclarationSpecifier> ml = new ASTArrayList<DeclarationSpecifier>();
+  DeclarationSpecifier m;
 }
 {
   (
@@ -826,16 +1181,17 @@ ClassDeclaration NestedClassDeclaration() :
     | ( "protected" { m = factory.createProtected(); } )
     | ( "private"   { m = factory.createPrivate(); }   )
     | ( "strictfp"  { m = factory.createStrictFp(); }  )
+    | ( m = AnnotationUse() 						   )
     )
     {
-	setPrefixInfo(m);
-	setPostfixInfo(m);
-	ml.add(m);
+        setPrefixInfo(m);
+        setPostfixInfo(m);
+        ml.add(m);
     }
   )*
   result = UnmodifiedClassDeclaration()
   {
-    result.setModifiers(ml);
+    result.setDeclarationSpecifiers(ml);
     checkConstruction(result);
     setPostfixInfo(result);
     return result;
@@ -849,15 +1205,19 @@ MemberDeclaration ClassBodyDeclaration() :
 {
 (
   LOOKAHEAD(2)
-  result = Initializer()
-| LOOKAHEAD( ( "static" | "abstract" | "final" | "public" | "protected" | "private" | "strictfp" )* "class" )
+  (result = Initializer() (";")*) // patch
+| LOOKAHEAD( ( "static" | "abstract" | "final" | "public" | "protected" | "private" | "strictfp" | AnnotationUse() )* "class" )
   (result = NestedClassDeclaration() (";")*) // patch
-| LOOKAHEAD( ( "static" | "abstract" | "final" | "public" | "protected" | "private" | "strictfp" )* "interface" )
+| LOOKAHEAD( ( "static" | "abstract" | "final" | "public" | "protected" | "private" | "strictfp" | AnnotationUse() )* "interface" )
   (result = NestedInterfaceDeclaration() (";")*) // patch
-| LOOKAHEAD( [ "public" | "protected" | "private" ] Name() "(" )
+| LOOKAHEAD( (AnnotationUse())* [ ("public" | "protected" | "private")  (AnnotationUse())*] [TypeParameters()] <IDENTIFIER> "(" )
   (result = ConstructorDeclaration()  (";")*) // patch
 | LOOKAHEAD( MethodDeclarationLookahead() )
   (result = MethodDeclaration() (";")*) // patch
+| LOOKAHEAD( EnumDeclaration() )
+  (result = EnumDeclaration() (";")*)
+| LOOKAHEAD( AnnotationTypeDeclaration() )
+  (result = AnnotationTypeDeclaration() (";")*)
 | (result = FieldDeclaration() (";")*) // patch
 )
   {
@@ -867,19 +1227,11 @@ MemberDeclaration ClassBodyDeclaration() :
   }
 }
 
-// This production is to determine lookahead only.
-void MethodDeclarationLookahead() :
-{}
-{
-  ( "public" | "protected" | "private" | "static" | "abstract" | "final" | "native" | "synchronized" | "strictfp" )*
-  ResultType() (<IDENTIFIER> | <IMPLICITIDENTIFIER>) "("
-}
-
 InterfaceDeclaration InterfaceDeclaration() :
 {
   InterfaceDeclaration result;
-  ModifierMutableList ml = new ModifierArrayList();
-  Modifier m;
+  ASTList<DeclarationSpecifier> ml = new ASTArrayList<DeclarationSpecifier>();
+  DeclarationSpecifier m;
 }
 {
   (
@@ -887,16 +1239,17 @@ InterfaceDeclaration InterfaceDeclaration() :
       ( "abstract"  { m = factory.createAbstract(); }  )
     | ( "public"    { m = factory.createPublic(); }    )
     | ( "strictfp"  { m = factory.createStrictFp(); }  )
+    | ( m = AnnotationUse()								   )
     )
     {
-	setPrefixInfo(m);
-	setPostfixInfo(m);
-	ml.add(m);
+        setPrefixInfo(m);
+        setPostfixInfo(m);
+        ml.add(m);
     }
   )*
   result = UnmodifiedInterfaceDeclaration()
   {
-    result.setModifiers(ml);
+    result.setDeclarationSpecifiers(ml);
     checkConstruction(result);
     setPostfixInfo(result);
     return result;
@@ -907,8 +1260,8 @@ InterfaceDeclaration InterfaceDeclaration() :
 InterfaceDeclaration NestedInterfaceDeclaration() :
 {
   InterfaceDeclaration result;
-  ModifierMutableList ml = new ModifierArrayList();
-  Modifier m;
+  ASTList<DeclarationSpecifier> ml = new ASTArrayList<DeclarationSpecifier>();
+  DeclarationSpecifier m;
 }
 {
   (
@@ -920,16 +1273,17 @@ InterfaceDeclaration NestedInterfaceDeclaration() :
     | ( "protected" { m = factory.createProtected(); } )
     | ( "private"   { m = factory.createPrivate(); }   )
     | ( "strictfp"  { m = factory.createStrictFp(); }  )
+    | ( m = AnnotationUse() 						   )
     )
     {
-	setPrefixInfo(m);
-	setPostfixInfo(m);
-	ml.add(m);
+        setPrefixInfo(m);
+        setPostfixInfo(m);
+        ml.add(m);
     }
   )*
   result = UnmodifiedInterfaceDeclaration()
   {
-    result.setModifiers(ml);
+    result.setDeclarationSpecifiers(ml);
     checkConstruction(result);
     setPostfixInfo(result);
     return result;
@@ -939,10 +1293,12 @@ InterfaceDeclaration NestedInterfaceDeclaration() :
 InterfaceDeclaration UnmodifiedInterfaceDeclaration() :
 {
     InterfaceDeclaration             result;
-    UncollatedReferenceQualifierList nl;
-    MemberDeclarationMutableList     mdl = new MemberDeclarationArrayList();
+    ASTList<UncollatedReferenceQualifier> nl;
+    ASTList<MemberDeclaration>     mdl = new ASTArrayList<MemberDeclaration>();
     MemberDeclaration                md;
     Extends ex;
+    ASTList<TypeParameterDeclaration> typeParams = null;
+    Identifier id;
 }
 {
   "interface"
@@ -950,35 +1306,39 @@ InterfaceDeclaration UnmodifiedInterfaceDeclaration() :
       result = factory.createInterfaceDeclaration();
       setPrefixInfo(result);
   }      
-  <IDENTIFIER>
+  
+  id = ShortName() 
   {
-      Identifier id = factory.createIdentifier(token.image);
-      setPrefixInfo(id);
-      setPostfixInfo(id);
       result.setIdentifier(id);
   }
+  
+  [ typeParams = TypeParameters() 
+  	{
+  		result.setTypeParameters(typeParams);
+  	}
+  ]
   [ "extends"
       {
-	  ex = factory.createExtends();
-	  setPrefixInfo(ex);
+          ex = factory.createExtends();
+          setPrefixInfo(ex);
       }
-      nl = NameList()
+      nl = TypedNameList()
       {
-	  TypeReferenceMutableList trl = new TypeReferenceArrayList();
-	  for (int i = 0, s = nl.size(); i < s; i++) {
-	      TypeReference tr = 
-		  nl.getUncollatedReferenceQualifier(i).toTypeReference();
-	      trl.add(tr);
-	  }
-	  ex.setSupertypes(trl);
-	  result.setExtendedTypes(ex);
+          ASTList<TypeReference> trl = new ASTArrayList<TypeReference>();
+          for (int i = 0, s = nl.size(); i < s; i++) {
+              TypeReference tr = 
+                  nl.get(i).toTypeReference();
+              trl.add(tr);
+          }
+          ex.setSupertypes(trl);
+          result.setExtendedTypes(ex);
       }
   ]
   "{"
   (
     md = InterfaceMemberDeclaration()
     {
-	mdl.add(md);
+        mdl.add(md);
     }
   )*
   "}"
@@ -996,12 +1356,16 @@ MemberDeclaration InterfaceMemberDeclaration() :
 }
 {
 (
-  LOOKAHEAD( ( "static" | "abstract" | "final" | "public" | "protected" | "private" | "strictfp" )* "class" )
+  LOOKAHEAD( ( "static" | "abstract" | "final" | "public" | "protected" | "private" | "strictfp" | AnnotationUse() )* "class" )
   (result = NestedClassDeclaration() (";")*) // patch
-| LOOKAHEAD( ( "static" | "abstract" | "final" | "public" | "protected" | "private" | "strictfp" )* "interface" )
+| LOOKAHEAD( ( "static" | "abstract" | "final" | "public" | "protected" | "private" | "strictfp" | AnnotationUse() )* "interface" )
   (result = NestedInterfaceDeclaration() (";")*) // patch
 | LOOKAHEAD( MethodDeclarationLookahead() )
   (result = MethodDeclaration() (";")*) // patch
+| LOOKAHEAD( EnumDeclaration() )
+  (result = EnumDeclaration() (";")*)
+| LOOKAHEAD( AnnotationTypeDeclaration() )
+  (result = AnnotationTypeDeclaration() (";")*)
 | (result = FieldDeclaration() (";")*) // patch
 )
   {
@@ -1014,13 +1378,18 @@ MemberDeclaration InterfaceMemberDeclaration() :
 FieldDeclaration FieldDeclaration() :
 {
     FieldDeclaration result;
-    ModifierMutableList ml = new ModifierArrayList();
-    Modifier m = null;
+    ASTList<DeclarationSpecifier> ml = new ASTArrayList<DeclarationSpecifier>();
+    DeclarationSpecifier m = null;
     TypeReference tr;
-    FieldSpecificationMutableList vl = new FieldSpecificationArrayList();
+    UncollatedReferenceQualifier qn;
+    ASTArrayList<FieldSpecification> vl = new ASTArrayList<FieldSpecification>();
     VariableSpecification var;
 }
 {
+   { 
+                result = factory.createFieldDeclaration();
+   }
+
    (
     (
       ( "public"    { m = factory.createPublic(); }    )
@@ -1030,28 +1399,28 @@ FieldDeclaration FieldDeclaration() :
     | ( "final"     { m = factory.createFinal(); }     )
     | ( "transient" { m = factory.createTransient(); } )
     | ( "volatile"  { m = factory.createVolatile(); }  )
+    | ( m = AnnotationUse() 						   )
     )
-    {	
-	setPrefixInfo(m);	
-	setPostfixInfo(m);
-	ml.add(m);
+    {        
+        setPrefixInfo(m);        
+        setPostfixInfo(m);
+        ml.add(m);
     }
   )*
-  (tr = Type())
+  (tr = ResultType())  // grammar weakening, void is allowed, but DeclarationTypedName needed
   {
-    result = factory.createFieldDeclaration();
-    result.setModifiers(ml);
+    result.setDeclarationSpecifiers(ml);
     result.setTypeReference(tr);
   }
   var = VariableDeclarator(true)
       {
-	  vl.add((FieldSpecification)var);
+          vl.add((FieldSpecification)var);
       }
   (
     ","
     var = VariableDeclarator(true)
     {
-	  vl.add((FieldSpecification)var);
+          vl.add((FieldSpecification)var);
     }
   )*
   ";"
@@ -1076,9 +1445,9 @@ VariableSpecification VariableDeclarator(boolean isForField) :
     [ "=" init = VariableInitializer() ]    
     {
     if (isForField) {
-	result = factory.createFieldSpecification(id, dim, init);
+        result = factory.createFieldSpecification(id, dim, init);
     } else {
-	result = factory.createVariableSpecification(id, dim, init);
+        result = factory.createVariableSpecification(id, dim, init);
     }
     //    setPrefixInfo(result); // only after "=" !!!!!!!!!!!!!!!
     checkConstruction(result);
@@ -1094,10 +1463,8 @@ Identifier VariableDeclaratorId() :
     Identifier result;
 }
 {
-  <IDENTIFIER>
-  { result = factory.createIdentifier(token.image);
-    setPrefixInfo(result);
-    setPostfixInfo(result);
+  result = ShortName()
+  { 
     tmpDimension = 0;
   }
   ( "[" "]" { tmpDimension++; } )*
@@ -1130,13 +1497,13 @@ Expression VariableInitializer() :
 ArrayInitializer ArrayInitializer() :
 {
     ArrayInitializer result;
-    ExpressionMutableList el = new ExpressionArrayList();
+    ASTList<Expression> el = new ASTArrayList<Expression>();
     Expression init;
 }
 {
     "{" {
-	result = factory.createArrayInitializer();
-	setPrefixInfo(result);
+        result = factory.createArrayInitializer();
+        setPrefixInfo(result);
     }
   [ init = VariableInitializer()
     { el.add(init); }
@@ -1153,15 +1520,34 @@ ArrayInitializer ArrayInitializer() :
   }
 }
 
+/*
+ * This production is needed to have a semantic lookahead to decide whether
+ * <x> is a type parameter or an implicit identifier
+ * consider:
+ *    public <E> <ImplicitClass> <init>( ...
+ *    public <ImplicitClass> <init>(
+ * The first < ist the decision point!
+ * If 2 identifiers follow the <...>, it is a type parameter
+ * otherwise a lookahead of >= 7 would have to be specified.
+ * Yet, this is not left recursive (I believe).
+ * @author MU
+ */
+void TypeParameterLookahead(): {}
+{
+	TypeParameters() ResultType() (<IDENTIFIER> | ImplicitIdentifier())
+}
+
 MethodDeclaration MethodDeclaration() :
 {
-  ModifierMutableList ml = new ModifierArrayList();
-  Modifier m = null;
+  ASTList<DeclarationSpecifier> ml = new ASTArrayList<DeclarationSpecifier>();
+  DeclarationSpecifier m = null;
   TypeReference tr;
-  UncollatedReferenceQualifierMutableList nl = null;
+  ASTList<UncollatedReferenceQualifier> nl = null;
   Throws th = null;
   StatementBlock body = null;
   MethodDeclaration result;
+  ASTList<TypeParameterDeclaration> typeParams = null;
+  SourceElement dummy = null;
 }
 {
   (
@@ -1175,32 +1561,51 @@ MethodDeclaration MethodDeclaration() :
     | ( "native"       { m = factory.createNative(); }        )
     | ( "synchronized" { m = factory.createSynchronized(); }  )
     | ( "strictfp"     { m = factory.createStrictFp(); }      )
+    | ( m = AnnotationUse()									  )
     )
     {
-	setPrefixInfo(m);
-	setPostfixInfo(m);
-	ml.add(m);
+        setPrefixInfo(m);
+        setPostfixInfo(m);
+        ml.add(m);
     }
   )*
+
+  [	LOOKAHEAD(TypeParameterLookahead())
+  	"<"
+  	{
+	    if (ml.size() == 0) { // '<' of MethodDeclaration is first element then. Need to store the result somewhere...
+	    	dummy = factory.createPublic();
+	    	setPrefixInfo(dummy); /* HACK */
+	    }
+    }
+  	typeParams = TypeParametersNoLE()
+  ]
   tr = ResultType()
   result = MethodDeclarator(tr)
+  {
+	  if (dummy != null) {
+	  	copyPrefixInfo(dummy, result);
+	  	dummy = null;
+	  }
+  }
   [ "throws" {
       th = factory.createThrows();
       setPrefixInfo(th);      
     }
-    nl = NameList() ]
+    nl = TypedNameList() ]
   ( body = Block() | ";" )
   {
       if (nl != null) {
-	  TypeReferenceMutableList trl = new TypeReferenceArrayList();
-	  for (int i = 0, s = nl.size(); i < s; i++) {
-              trl.add(nl.getUncollatedReferenceQualifier(i).toTypeReference());
-	  }
-	  th.setExceptions(trl);
-	  //  Throws th = factory.createThrows(trl);
-	  result.setThrown(th);
+          ASTList<TypeReference> trl = new ASTArrayList<TypeReference>();
+          for (int i = 0, s = nl.size(); i < s; i++) {
+              trl.add(nl.get(i).toTypeReference());
+          }
+          th.setExceptions(trl);
+          //  Throws th = factory.createThrows(trl);
+          result.setThrown(th);
       }
-      result.setModifiers(ml);
+      result.setTypeParameters(typeParams);
+      result.setDeclarationSpecifiers(ml);
       result.setBody(body);
       checkConstruction(result);
       setPostfixInfo(result);
@@ -1208,22 +1613,27 @@ MethodDeclaration MethodDeclaration() :
   }
 }
 
+
+// This production is to determine lookahead only.
+void MethodDeclarationLookahead() :
+{}
+{
+  ( "public" | "protected" | "private" | "static" | "abstract" | "final" | "native" | "synchronized" | "strictfp" | AnnotationUse() )*
+  [ LOOKAHEAD(TypeParameterLookahead()) TypeParameters()] ResultType() 
+            ( <IDENTIFIER> | ImplicitIdentifier() ) "("
+}
+
 MethodDeclaration MethodDeclarator(TypeReference tr) :
 {
     Identifier                      id;
-    ParameterDeclarationMutableList pdl;
+    ASTList<ParameterDeclaration> pdl;
     MethodDeclaration               result;
 }
 {
-  (<IDENTIFIER> 
-  { id = factory.createIdentifier(token.image); setPrefixInfo(id); setPostfixInfo(id);}
-  |
-   <IMPLICITIDENTIFIER> 
-  { id = factory.createImplicitIdentifier(token.image); setPrefixInfo(id); setPostfixInfo(id);}
-  )	
+  id = ShortName()
   pdl = FormalParameters()
   
-  ( "[" "]" 
+  ( "[" "]" // array dims are indeed allowed after parameter list (!)
     { if (tr != null) { tr.setDimensions(tr.getDimensions()+1); } }
   )*
 
@@ -1239,15 +1649,19 @@ MethodDeclaration MethodDeclarator(TypeReference tr) :
   }
 }
 
-ParameterDeclarationMutableList FormalParameters() :
+ASTList<ParameterDeclaration> FormalParameters() :
 {
     ParameterDeclaration pd;
-    ParameterDeclarationMutableList result = new ParameterDeclarationArrayList();
+    ASTList<ParameterDeclaration> result = new ASTArrayList<ParameterDeclaration>();
 }
 {
   "("
       [       pd = FormalParameter() { result.add(pd); }
-        ( "," pd = FormalParameter() { result.add(pd); } )* ]
+        ( "," pd = FormalParameter() { 
+        	// check if more params are admissible (no more after a vararg) occurs in FormalParameter()
+        	result.add(pd); 
+        } )* 
+      ]
   ")"
   {
       checkConstruction(result);
@@ -1257,29 +1671,66 @@ ParameterDeclarationMutableList FormalParameters() :
 
 ParameterDeclaration FormalParameter() :
 {
-    Identifier id;
-    int dim;
-    TypeReference tr;
-    Modifier mod = null;
-    VariableSpecification vspec;
     ParameterDeclaration result;
+    TypeReference tr;
+    DeclarationSpecifier mod = null;
+	Identifier id;
+	VariableSpecification vspec;
+	int dim;
+	ASTList<DeclarationSpecifier> ml = null;
+	boolean isVarArg = false;
 }
 {
-  [ "final" { mod = factory.createFinal(); setPrefixInfo(mod);  } ]
-  (tr = Type())
-  id = VariableDeclaratorId() { dim = tmpDimension; }
+  (
+  	mod = AnnotationUse()
+  	{
+       if (ml == null) {
+         ml = new ASTArrayList<DeclarationSpecifier>();
+       }
+       setPrefixInfo(mod);
+       setPostfixInfo(mod);
+       ml.add(mod);
+  	}
+  
+  )*
+  [  "final"  
+  	{  
+      mod = factory.createFinal(); 
+      setPrefixInfo(mod); 
+      setPostfixInfo(mod); 
+      if (ml == null) {
+         ml = new ASTArrayList<DeclarationSpecifier>();
+      }
+      ml.add(mod);
+    } 
+    (mod = AnnotationUse()
+       {
+       setPrefixInfo(mod);
+       setPostfixInfo(mod);
+       ml.add(mod);
+       }
+    )*
+	  
+  ]
+  
+  tr = Type()
+  [ "..." 
+  	{ 
+  		isVarArg = true;
+  	} 
+  ]
+  id = VariableDeclaratorId() { dim = tmpDimension; /*if (varArgSpec != null) dim++;*/ }
   {
       result = factory.createParameterDeclaration(tr, id);
-      if (mod != null) {
-	  ModifierMutableList ml = new ModifierArrayList();
-	  ml.add(mod);
-	  result.setModifiers(ml);
+      if (ml != null) {
+          result.setDeclarationSpecifiers(ml);
       }
-      vspec = result.getVariables().getVariableSpecification(0); 
+      vspec = result.getVariables().get(0); 
       vspec.setDimensions(dim);
       checkConstruction(result);
       setPostfixInfo(result);
       setPrefixInfo(result); 
+      result.setVarArg(isVarArg);
       return result;
   }
 }
@@ -1287,13 +1738,14 @@ ParameterDeclaration FormalParameter() :
 ConstructorDeclaration ConstructorDeclaration() :
 {
     ConstructorDeclaration          result;
-    Modifier                        m = null;
+    DeclarationSpecifier            m = null;
+    ASTList<DeclarationSpecifier> ml = new ASTArrayList<DeclarationSpecifier>();
     Identifier                      id;
-    ParameterDeclarationMutableList pdl;
-    UncollatedReferenceQualifierMutableList nl = null;
+    ASTList<ParameterDeclaration> pdl;
+    ASTList<UncollatedReferenceQualifier> nl = null;
     SpecialConstructorReference     scr = null;
     StatementBlock                  body;
-    StatementMutableList            stats = new StatementArrayList();
+    ASTList<Statement>            stats = new ASTArrayList<Statement>();
     Statement                       stat;
 }
 {
@@ -1301,6 +1753,7 @@ ConstructorDeclaration ConstructorDeclaration() :
      result = factory.createConstructorDeclaration();
      setPrefixInfo(result); 
   }
+  (m = AnnotationUse() { setPrefixInfo(m); setPostfixInfo(m); ml.add(m); })*
   [
    (
       ( "public"       { m = factory.createPublic(); }    )
@@ -1308,48 +1761,57 @@ ConstructorDeclaration ConstructorDeclaration() :
     | ( "private"      { m = factory.createPrivate(); }   )
    )
       {
-	  setPrefixInfo(m); 
-	  setPostfixInfo(m);
-      }
+          setPrefixInfo(m); 
+          setPostfixInfo(m);
+      ml.add(m);
+	}
+  (m = AnnotationUse() { setPrefixInfo(m); setPostfixInfo(m); ml.add(m); })*
   ]
+  [ TypeParameters() ]
   <IDENTIFIER> { 
       id = factory.createIdentifier(token.image);
       setPrefixInfo(id); 
       setPostfixInfo(id);
   }
   pdl = FormalParameters()
-  [ "throws" nl = NameList() ]
-  "{"
+
+  [ "throws" nl = TypedNameList() ]
+  ( "{"
   {
       body = factory.createStatementBlock();
       setPrefixInfo(body); 
       body.setBody(stats);
   }
+  { setAllowSuper(false); }
     [ LOOKAHEAD(ExplicitConstructorInvocation())
       scr = ExplicitConstructorInvocation()
       { stats.add(scr); }
     ]
+  { setAllowSuper(true); }
     ( stat = BlockStatement()
       { stats.add(stat); }
     )*
   "}"
+  |
+    ";" { body = null; }
+  )
   {
+  	  if(body != null)
+        setPostfixInfo(body);
+         
       result.setIdentifier(id);
       result.setParameters(pdl);
-      if (m != null) {
-	  ModifierMutableList ml = new ModifierArrayList(1);
-	  ml.add(m);
-	  result.setModifiers(ml);
-      }
+      if (!ml.isEmpty())
+          result.setDeclarationSpecifiers(ml);
       if (nl != null) {
-	  int s = nl.size();
-	  TypeReferenceMutableList trl = new TypeReferenceArrayList(s);
-	  for (int i = 0; i < s; i++) {
-              trl.add(nl.getUncollatedReferenceQualifier(i).toTypeReference());
-	  }
-	  Throws th = factory.createThrows(trl);
-	  setPrefixInfo(th);
-	  result.setThrown(th);
+          int s = nl.size();
+          ASTList<TypeReference> trl = new ASTArrayList<TypeReference>(s);
+          for (int i = 0; i < s; i++) {
+              trl.add(nl.get(i).toTypeReference());
+          }
+          Throws th = factory.createThrows(trl);
+          setPrefixInfo(th);
+          result.setThrown(th);
       }
       result.setBody(body);
       checkConstruction(result);
@@ -1361,7 +1823,7 @@ ConstructorDeclaration ConstructorDeclaration() :
 SpecialConstructorReference ExplicitConstructorInvocation() :
 {
     SpecialConstructorReference result;
-    ExpressionMutableList args;
+    ASTList<Expression> args;
     Expression expr = null;
 }
 {
@@ -1395,13 +1857,13 @@ SpecialConstructorReference ExplicitConstructorInvocation() :
 ClassInitializer Initializer() :
 {
   ClassInitializer result;
-  ModifierMutableList ml = null;
+  ASTList<DeclarationSpecifier> ml = null;
   StatementBlock block;
 }
 {
   [ "static"
     {
-      ml = new ModifierArrayList();
+      ml = new ASTArrayList<DeclarationSpecifier>();
       Static s = factory.createStatic();
       setPrefixInfo(s); 
       setPostfixInfo(s);
@@ -1413,7 +1875,7 @@ ClassInitializer Initializer() :
     result = factory.createClassInitializer(block);
     setPrefixInfo(result);
     if (ml != null) {
-      result.setModifiers(ml);
+      result.setDeclarationSpecifiers(ml);
     }
     checkConstruction(result);
     setPostfixInfo(result);
@@ -1432,27 +1894,29 @@ TypeReference Type() :
   UncollatedReferenceQualifier qn;
   int dimension = 0;
 }
-{
-(  result = PrimitiveType()
-  | (qn = Name() 
-    {
-	result = qn.toTypeReference();
-    }
-    )
-)  
-  ( "[" "]" { if (dimension == 0) setPrefixInfo(result); dimension++; } )*
+{	
+	  (
+	    result = PrimitiveType()
+	   |
+ 	    qn = TypedName() 
+ 	    {
+      	  result = qn.toTypeReference();
+        }
+      )
+      ( "[" "]" { if (dimension == 0) setPrefixInfo(result); dimension++; } )*
+      {
+      	result.setDimensions(dimension);
+      	setPostfixInfo(result);
+ 	  }  	
   {
-      result.setDimensions(dimension);
-      checkConstruction(result);
-      setPostfixInfo(result);
       return result;
   }
 }
 
-
 TypeReference PrimitiveType() :
 {
-    TypeReference result;}
+    TypeReference result;
+}
 {
   (
     "boolean"
@@ -1476,25 +1940,111 @@ TypeReference PrimitiveType() :
   }
 }
 
+/*
 TypeReference ResultType() :
 {
   TypeReference result;
 }
 {
 (
-  ( "void" { 
-    Identifier id = factory.createIdentifier(token.image);
-    setPrefixInfo(id);
-    setPostfixInfo(id);
-    result = factory.createTypeReference(id);
-    setPrefixInfo(result);
-} )
-  | result = Type()
+   "void" { 
+     Identifier id = factory.createIdentifier(token.image);
+     setPrefixInfo(id);
+     setPostfixInfo(id);
+     result = factory.createTypeReference(id);
+     setPrefixInfo(result);
+    } 
+  | 
+    result = Type()
 )
   {
     checkConstruction(result);
     setPostfixInfo(result);
     return result;
+  }
+}*/
+
+
+// ResultType must be different to general Type because of the expanded
+// lookahead
+TypeReference ResultType() :
+{
+  int dimension = 0;
+  TypeReference result;
+  UncollatedReferenceQualifier qn;
+}
+{
+  (
+    "void" 
+      { 
+        Identifier id = factory.createIdentifier(token.image);
+        setPrefixInfo(id);
+	    setPostfixInfo(id);
+    	result = factory.createTypeReference(id);
+        setPrefixInfo(result);
+      }      
+  | 
+   ( 
+     result = PrimitiveType()
+    |
+     qn = DeclarationTypedName() { result = qn.toTypeReference(); }
+   )
+     ( "[" "]" { if (dimension == 0) setPrefixInfo(result); dimension++; } )*        
+  )    
+  {
+  	result.setDimensions(dimension);
+    checkConstruction(result);
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+
+/*************************************
+ * an implicit identifier is embraced by "&lt;" and "&gt;"
+ * To make sure "&lt;a&gt;" is an implicit identifier and "&lt; a&gt;" is not
+ * the first "&lt;" token can be tested whether the token IMPLICITIDENTIFIER
+ * had been found and reduced to "&lt;".
+ */
+ 
+ImplicitIdentifier ImplicitIdentifier() :
+{ 	
+	ImplicitIdentifier result; 	
+} 
+{
+ ( LOOKAHEAD({ getToken(1).kind == LT &&
+                ((Token.RealKindToken)getToken(1)).realKind == IMPLICITIDENTIFIER} )
+  "<" 
+  <IDENTIFIER> 
+  {
+  	result = factory.createImplicitIdentifier("<" + token.image + ">"); 
+  } 
+  ">"
+  { 
+  	return result;
+  }
+  )
+}
+
+Identifier ShortName() :
+{
+	Identifier result;
+}
+{
+  (<IDENTIFIER>
+  {
+    result = factory.createIdentifier(token.image);    
+    setPrefixInfo(result);
+    setPostfixInfo(result);
+  }
+ | 
+  result = ImplicitIdentifier()
+  {
+    setPrefixInfo(result);
+    setPostfixInfo(result);
+  })
+  { 
+  	return result;
   }
 }
 
@@ -1508,38 +2058,17 @@ UncollatedReferenceQualifier Name() :
   Identifier id;
 }
 {
-  (<IDENTIFIER>
-  {
-    id = factory.createIdentifier(token.image);    
-    setPrefixInfo(id);
-    setPostfixInfo(id);
-    result = factory.createUncollatedReferenceQualifier(id);
-  } | 
-  <IMPLICITIDENTIFIER>
-  {
-    id = factory.createImplicitIdentifier(token.image);    
-    setPrefixInfo(id);
-    setPostfixInfo(id);
-    result = factory.createUncollatedReferenceQualifier(id);
-  })
+  id = ShortName() 
+  {  
+	result = factory.createUncollatedReferenceQualifier(id);
+  } 
 
-  (
+   (
     LOOKAHEAD(2) "." { setPrefixInfo(result); }
-    ( <IDENTIFIER>
+    id = ShortName()
       {
-        id = factory.createIdentifier(token.image);
+        result = factory.createUncollatedReferenceQualifier(result, id);
       }
-    |
-      <IMPLICITIDENTIFIER>
-      {
-        id = factory.createImplicitIdentifier(token.image);
-      }
-    )
-    {
-      setPrefixInfo(id);
-      setPostfixInfo(id);
-      result = factory.createUncollatedReferenceQualifier(result, id);
-    }
   )*
   {
     checkConstruction(result);
@@ -1548,10 +2077,120 @@ UncollatedReferenceQualifier Name() :
   }
 }
 
-UncollatedReferenceQualifierMutableList NameList() :
+/*
+ * Identical copy of TypedName, but lookahead is different for
+ * TypeArgument, if ImplicitIdentifier follows!
+ */
+UncollatedReferenceQualifier DeclarationTypedName() :
 {
-  UncollatedReferenceQualifierMutableList result = 
-      new UncollatedReferenceQualifierArrayList(2);
+  UncollatedReferenceQualifier result;
+  Identifier id;
+  ASTList<TypeArgumentDeclaration> typeArguments = null;
+}
+{ 
+  id = ShortName()
+  
+  [LOOKAHEAD(TypeArguments() ("." | ShortName())) typeArguments = TypeArguments()]
+  {
+    result = factory.createUncollatedReferenceQualifier(id);
+    result.setTypeArguments(typeArguments);
+  }
+  (
+    LOOKAHEAD(2) "." { setPrefixInfo(result); setPostfixInfo(result); } 
+    id = ShortName()
+    {
+      typeArguments = null; // reset!
+    }
+    [LOOKAHEAD(TypeArguments() ("." | ShortName())) typeArguments = TypeArguments()]
+    {
+      result = factory.createUncollatedReferenceQualifier(result, id);
+      result.setTypeArguments(typeArguments);
+    }
+  )*
+  {
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+
+UncollatedReferenceQualifier TypedName() :
+{
+  UncollatedReferenceQualifier result;
+  Identifier id;
+  ASTList<TypeArgumentDeclaration> typeArguments = null;
+}
+{ 
+  id = ShortName()
+  
+  [LOOKAHEAD(2) typeArguments = TypeArguments()]
+  {
+    result = factory.createUncollatedReferenceQualifier(id);
+    result.setTypeArguments(typeArguments);
+  }
+  (
+    LOOKAHEAD(2) "." { setPrefixInfo(result); setPostfixInfo(result); } 
+    id = ShortName()
+    {
+      typeArguments = null; // reset!
+    }
+    [LOOKAHEAD(2) typeArguments = TypeArguments()]
+    {
+      result = factory.createUncollatedReferenceQualifier(result, id);
+      result.setTypeArguments(typeArguments);
+    }
+  )*
+  {
+    setPostfixInfo(result);
+    return result;
+  }
+}
+	
+ASTList<TypeArgumentDeclaration> TypeArguments() :
+{
+	ASTList<TypeArgumentDeclaration> args = new ASTArrayList<TypeArgumentDeclaration>();
+	TypeArgumentDeclaration ta;
+}
+{
+	"<" ta = TypeArgument() { args.add(ta); } ("," ta = TypeArgument() { args.add(ta); })* ">"
+	{ return args; }
+}
+
+/**
+ * bug: This grammar accepts for instance List<int>
+ * [mulbrich 2006-10-26]
+ */
+TypeArgumentDeclaration TypeArgument() :
+{
+	WildcardMode wm = WildcardMode.None;
+	TypeReference t = null;
+	TypeArgumentDeclaration result = new TypeArgumentDeclaration();
+}
+{
+  (
+	t = Type() 
+   { setPrefixInfo(result); }
+  |
+	"?" { wm = WildcardMode.Any; setPrefixInfo(result); } 
+		[  ("extends" { wm = WildcardMode.Extends; } 
+		    | "super"  { wm = WildcardMode.Super; }
+		   ) 
+		 t = Type()
+		]
+  )
+  { 
+  	setPostfixInfo(result);
+  	result.setWildcardMode(wm);
+  	result.setTypeReference(t);
+  	return result;
+  }
+}
+
+/*
+ASTList<UncollatedReferenceQualifier> NameList() :
+{
+  ASTList<UncollatedReferenceQualifier> result = 
+      new ASTArrayList<UncollatedReferenceQualifier>();
   UncollatedReferenceQualifier qn;
 }
 {
@@ -1566,7 +2205,29 @@ UncollatedReferenceQualifierMutableList NameList() :
   )*
   {
     checkConstruction(result);
-/*    setPostfixInfo(result);*/
+//    setPostfixInfo(result);
+    return result;
+  }
+}
+*/
+
+ASTList<UncollatedReferenceQualifier> TypedNameList() :
+{
+  ASTList<UncollatedReferenceQualifier> result = 
+      new ASTArrayList<UncollatedReferenceQualifier>();
+  UncollatedReferenceQualifier qn;
+}
+{
+  qn = TypedName()
+  {
+    result.add(qn);
+  }
+  ( "," qn = TypedName()
+    {
+      result.add(qn);
+    }
+  )*
+  {
     return result;
   }
 }
@@ -1588,7 +2249,7 @@ Expression Expression() :
     Expression result;
     Expression expr;
     Assignment op;
-    ExpressionMutableList leftRight = new ExpressionArrayList(2);
+    ASTList<Expression> leftRight = new ASTArrayList<Expression>();
 }
 {
   (result = ConditionalExpression()
@@ -1596,10 +2257,10 @@ Expression Expression() :
     op   = AssignmentOperator()
     expr = Expression()
     {
-	leftRight.add(result);
-	leftRight.add(expr);
-	op.setArguments(leftRight);
-	result = op;
+        leftRight.add(result);
+        leftRight.add(expr);
+        op.setArguments(leftRight);
+        result = op;
     }
   ]
   {
@@ -1651,12 +2312,12 @@ Expression ConditionalExpression() :
     expr1 = Expression()
     ":" expr2 = ConditionalExpression()
     {
-	ExpressionMutableList args = new ExpressionArrayList(3);
-	args.add(result);
-	args.add(expr1);
-	args.add(expr2);
-	op.setArguments(args);
-	result = op;
+        ASTList<Expression> args = new ASTArrayList<Expression>(3);
+        args.add(result);
+        args.add(expr1);
+        args.add(expr2);
+        op.setArguments(args);
+        result = op;
     }
   ]
   {
@@ -1677,11 +2338,11 @@ Expression ConditionalOrExpression() :
   ( "||" { op = factory.createLogicalOr(); setPrefixInfo(op); }
     expr = ConditionalAndExpression()
     {
-	ExpressionMutableList args = new ExpressionArrayList(2);
-	args.add(result);
-	args.add(expr);
-	op.setArguments(args);
-	result = op;
+        ASTList<Expression> args = new ASTArrayList<Expression>(2);
+        args.add(result);
+        args.add(expr);
+        op.setArguments(args);
+        result = op;
     }
   )*
   {
@@ -1702,11 +2363,11 @@ Expression ConditionalAndExpression() :
   ( "&&" { op = factory.createLogicalAnd(); setPrefixInfo(op); }
     expr = InclusiveOrExpression()
     {
-	ExpressionMutableList args = new ExpressionArrayList(2);
-	args.add(result);
-	args.add(expr);
-	op.setArguments(args);
-	result = op;
+        ASTList<Expression> args = new ASTArrayList<Expression>(2);
+        args.add(result);
+        args.add(expr);
+        op.setArguments(args);
+        result = op;
     }
   )*
   { 
@@ -1727,11 +2388,11 @@ Expression InclusiveOrExpression() :
   ( "|" { op = factory.createBinaryOr(); setPrefixInfo(op); }
     expr = ExclusiveOrExpression()
     {
-	ExpressionMutableList args = new ExpressionArrayList(2);
-	args.add(result);
-	args.add(expr);
-	op.setArguments(args);
-	result = op;
+        ASTList<Expression> args = new ASTArrayList<Expression>(2);
+        args.add(result);
+        args.add(expr);
+        op.setArguments(args);
+        result = op;
     }
   )*
   { 
@@ -1752,11 +2413,11 @@ Expression ExclusiveOrExpression() :
   ( "^" { op = factory.createBinaryXOr(); setPrefixInfo(op); }
       expr = AndExpression()
       {
-	ExpressionMutableList args = new ExpressionArrayList(2);
-	args.add(result);
-	args.add(expr);
-	op.setArguments(args);
-	result = op;
+        ASTList<Expression> args = new ASTArrayList<Expression>(2);
+        args.add(result);
+        args.add(expr);
+        op.setArguments(args);
+        result = op;
       }
   )*
   { 
@@ -1777,11 +2438,11 @@ Expression AndExpression() :
   ( "&" { op = factory.createBinaryAnd(); setPrefixInfo(op); }
     expr = EqualityExpression()
     {
-	ExpressionMutableList args = new ExpressionArrayList(2);
-	args.add(result);
-	args.add(expr);
-	op.setArguments(args);
-	result = op;
+        ASTList<Expression> args = new ASTArrayList<Expression>(2);
+        args.add(result);
+        args.add(expr);
+        op.setArguments(args);
+        result = op;
     }
   )*
   { 
@@ -1804,11 +2465,11 @@ Expression EqualityExpression() :
     )
     expr = InstanceOfExpression()
     {
-	ExpressionMutableList args = new ExpressionArrayList(2);
-	args.add(result);
-	args.add(expr);
-	cmp.setArguments(args);
-	result = cmp;
+        ASTList<Expression> args = new ASTArrayList<Expression>(2);
+        args.add(result);
+        args.add(expr);
+        cmp.setArguments(args);
+        result = cmp;
     }
   )*
   { 
@@ -1827,8 +2488,8 @@ Expression InstanceOfExpression() :
   result = RelationalExpression()
   [ "instanceof" (tr = Type()) 
     {
-	result = factory.createInstanceof(result, tr);
-	setPrefixInfo(result);
+        result = factory.createInstanceof(result, tr);
+        setPrefixInfo(result);
     }
   ]
   { 
@@ -1846,18 +2507,21 @@ Expression RelationalExpression() :
 }
 {
   result = ShiftExpression()
-  ( (   "<"  { cmp = factory.createLessThan(); setPrefixInfo(cmp); }
+  ( 
+    ( LOOKAHEAD({ getToken(1).kind == LT && 
+    	  ((Token.RealKindToken)getToken(1)).realKind != IMPLICITIDENTIFIER })
+        "<"  { cmp = factory.createLessThan(); setPrefixInfo(cmp); }
       | ">"  { cmp = factory.createGreaterThan(); setPrefixInfo(cmp); }
       | "<=" { cmp = factory.createLessOrEquals(); setPrefixInfo(cmp); }
       | ">=" { cmp = factory.createGreaterOrEquals(); setPrefixInfo(cmp); }
     )
     expr = ShiftExpression()
     {
-	ExpressionMutableList args = new ExpressionArrayList(2);
-	args.add(result);
-	args.add(expr);
-	cmp.setArguments(args);
-	result = cmp;
+        ASTList<Expression> args = new ASTArrayList<Expression>(2);
+        args.add(result);
+        args.add(expr);
+        cmp.setArguments(args);
+        result = cmp;
     }
   )*
   { 
@@ -1877,16 +2541,18 @@ Expression ShiftExpression() :
 {
   result = AdditiveExpression()
   ( (   "<<"  { shift = factory.createShiftLeft(); setPrefixInfo(shift); }
-      | ">>"  { shift = factory.createShiftRight(); setPrefixInfo(shift); }
-      | ">>>" { shift = factory.createUnsignedShiftRight(); setPrefixInfo(shift); }
+//      | ">>"  { shift = factory.createShiftRight(); setPrefixInfo(shift); }
+      | RSIGNEDSHIFT()  { shift = factory.createShiftRight(); setPrefixInfo(shift); }
+//      | ">>>" { shift = factory.createUnsignedShiftRight(); setPrefixInfo(shift); }
+      | RUNSIGNEDSHIFT() { shift = factory.createUnsignedShiftRight(); setPrefixInfo(shift); }
     )
     expr = AdditiveExpression()
     {
-	ExpressionMutableList args = new ExpressionArrayList(2);
-	args.add(result);
-	args.add(expr);
-	shift.setArguments(args);
-	result = shift;
+        ASTList<Expression> args = new ASTArrayList<Expression>(2);
+        args.add(result);
+        args.add(expr);
+        shift.setArguments(args);
+        result = shift;
     }
   )*
   { 
@@ -1910,11 +2576,11 @@ Expression AdditiveExpression() :
     )
     expr = MultiplicativeExpression()
     {
-	ExpressionMutableList args = new ExpressionArrayList(2);
-	args.add(result);
-	args.add(expr);
-	add.setArguments(args);
-	result = add;
+        ASTList<Expression> args = new ASTArrayList<Expression>(2);
+        args.add(result);
+        args.add(expr);
+        add.setArguments(args);
+        result = add;
     }
   )*
   { 
@@ -1938,11 +2604,11 @@ Expression MultiplicativeExpression() :
     )
     expr = UnaryExpression()
     {
-	ExpressionMutableList args = new ExpressionArrayList(2);
-	args.add(result);
-	args.add(expr);
-	mult.setArguments(args);
-	result = mult;
+        ASTList<Expression> args = new ASTArrayList<Expression>(2);
+        args.add(result);
+        args.add(expr);
+        mult.setArguments(args);
+        result = mult;
     }
   )*
   { 
@@ -1965,7 +2631,7 @@ Expression UnaryExpression() :
   | "-" { result = factory.createNegative(); setPrefixInfo(result); } )
   expr = UnaryExpression()
   {
-      ((Operator)result).setArguments(new ExpressionArrayList(expr));
+      ((Operator)result).setArguments(new ASTArrayList<Expression>(expr));
   }
 |
   result = PreIncrementExpression()
@@ -1995,7 +2661,7 @@ PreIncrement PreIncrementExpression() :
   } 
   expr = PrimaryExpression()
   {
-      result.setArguments(new ExpressionArrayList(expr));
+      result.setArguments(new ASTArrayList<Expression>(expr));
       checkConstruction(result);
       setPostfixInfo(result);
       return result;
@@ -2015,7 +2681,7 @@ PreDecrement PreDecrementExpression() :
   }
   expr = PrimaryExpression()
   { 
-      result.setArguments(new ExpressionArrayList(expr));
+      result.setArguments(new ASTArrayList<Expression>(expr));
       checkConstruction(result);
       setPostfixInfo(result);
       return result;
@@ -2035,7 +2701,7 @@ Expression UnaryExpressionNotPlusMinus() :
   )
   expr = UnaryExpression()
   {
-      ((Operator)result).setArguments(new ExpressionArrayList(expr));
+      ((Operator)result).setArguments(new ASTArrayList<Expression>(expr));
   }
   
 |
@@ -2045,9 +2711,9 @@ Expression UnaryExpressionNotPlusMinus() :
   result = PostfixExpression()
 )
     { 
-	checkConstruction(result);
-	setPostfixInfo(result);
-	return result;
+        checkConstruction(result);
+        setPostfixInfo(result);
+        return result;
     }
 
 }
@@ -2062,10 +2728,10 @@ void CastLookahead() :
   //  LOOKAHEAD(2)
   //  "(" PrimitiveType()
 |
-  LOOKAHEAD("(" Name() "[")
-  "(" Name() "[" "]"
+  LOOKAHEAD("(" TypedName() "[")
+  "(" TypedName() "[" "]"
 |
-  "(" Name() ")" ( "~" | "!" | "(" | <IDENTIFIER> | "this" | "super" | "new" | Literal() )
+  "(" TypedName() ")" ( "~" | "!" | "(" | ShortName() | "this" | "super" | "new" | Literal() )
 }
 
 Expression PostfixExpression() :
@@ -2076,13 +2742,13 @@ Expression PostfixExpression() :
   result = PrimaryExpression()
   [   "++" 
     { 
-	result = factory.createPostIncrement(result); 
-	setPrefixInfo(result);
+        result = factory.createPostIncrement(result); 
+        setPrefixInfo(result);
     }
     | "--" 
     { 
-	result = factory.createPostDecrement(result); 
-	setPrefixInfo(result);
+        result = factory.createPostDecrement(result); 
+        setPrefixInfo(result);
     }
   ]
   { 
@@ -2111,7 +2777,7 @@ TypeCast CastExpression() :
 )
   {
       result.setTypeReference(tr);
-      result.setArguments(new ExpressionArrayList(expr));
+      result.setArguments(new ASTArrayList<Expression>(expr));
       checkConstruction(result);
       setPostfixInfo(result);
       return result;
@@ -2126,49 +2792,49 @@ Expression PrimaryExpression() :
 }
 {
     prefix = PrimaryPrefix()
-    {	
+    {        
       // create initial AST construct from prefix only
       switch (prefix.type) {
       case PrimaryPrefixReturnValue.LITERAL:
-	  if (prefix.literal instanceof StringLiteral) {
-	      tmpResult = (StringLiteral)prefix.literal;
-	  }
+          if (prefix.literal instanceof StringLiteral) {
+              tmpResult = (StringLiteral)prefix.literal;
+          }
           else 
           {
-	      result = prefix.literal;
-	      checkConstruction(result);
-	      setPostfixInfo(result);
-	      return result;
-	      //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	  }
-	  break;
+              result = prefix.literal;
+              checkConstruction(result);
+              setPostfixInfo(result);
+              return result;
+              //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          }
+          break;
       case PrimaryPrefixReturnValue.THIS:
-	  tmpResult = factory.createThisReference();
-	  setPrefixInfo(tmpResult);
-	  setPostfixInfo(tmpResult);
-	  break;
+          tmpResult = factory.createThisReference();
+          setPrefixInfo(tmpResult);
+          setPostfixInfo(tmpResult);
+          break;
       case PrimaryPrefixReturnValue.SUPER_MEMBER:
           tmpResult = prefix.name;
-	  break;
+          break;
       case PrimaryPrefixReturnValue.PARENTHESIZED_EXPR:
           tmpResult = (ParenthesizedExpression)prefix.expr;
-	  break;
+          break;
       case PrimaryPrefixReturnValue.ALLOCATION_EXPR:
-	  tmpResult = (ReferencePrefix)prefix.expr;
-	  break;
+          tmpResult = (ReferencePrefix)prefix.expr;
+          break;
       case PrimaryPrefixReturnValue.CLASS_REF:
-	  tmpResult = factory.createMetaClassReference(prefix.typeref);
+          tmpResult = factory.createMetaClassReference(prefix.typeref);
           setPrefixInfo(tmpResult);
-	  setPostfixInfo(tmpResult);
-	  break;
+          setPostfixInfo(tmpResult);
+          break;
       case PrimaryPrefixReturnValue.QUALIFIED_NAME:
-	  tmpResult = prefix.name;
-	  break;
+          tmpResult = prefix.name;
+          break;
       case PrimaryPrefixReturnValue.PASSIVE_EXPR:
-	  tmpResult = (PassiveExpression)prefix.expr;
-	  break;
+          tmpResult = (PassiveExpression)prefix.expr;
+          break;
       default:
-	  throw new ParseException("Unknown prefix");
+          throw new ParseException("Unknown prefix");
       }
     }
   ( LOOKAHEAD(2) suffix = PrimarySuffix()
@@ -2176,72 +2842,97 @@ Expression PrimaryExpression() :
       switch (suffix.type) {
       case PrimarySuffixReturnValue.THIS:
           // the prefix MUST be a type expression!!!!!
-	  // we currently only create UncollatedReferenceQualifiers
+          // we currently only create UncollatedReferenceQualifiers
           if (tmpResult instanceof TypeReference) {
-	      tmpResult = 
-	         factory.createThisReference((TypeReference)tmpResult);
-	      setPrefixInfo(tmpResult);
-	      setPostfixInfo(tmpResult);
-	  } else if (tmpResult instanceof UncollatedReferenceQualifier) {
-	      tmpResult =
-	         factory.createThisReference(((UncollatedReferenceQualifier)tmpResult).toTypeReference());
-	      setPrefixInfo(tmpResult);
-	      setPostfixInfo(tmpResult);
-	  } else {
-	      throw new ParseException("No type as prefix of `this'");
-	  }
-	  break;
+              tmpResult = 
+                 factory.createThisReference((TypeReference)tmpResult);
+              setPrefixInfo(tmpResult);
+              setPostfixInfo(tmpResult);
+          } else if (tmpResult instanceof UncollatedReferenceQualifier) {
+              tmpResult =
+                 factory.createThisReference(((UncollatedReferenceQualifier)tmpResult).toTypeReference());
+              setPrefixInfo(tmpResult);
+              setPostfixInfo(tmpResult);
+          } else {
+              throw new ParseException("No type as prefix of `this'");
+          }
+          break;
+      case PrimarySuffixReturnValue.SUPER:
+          // the prefix MUST be a type expression!!!!!
+          // we currently only create UncollatedReferenceQualifiers
+          if (tmpResult instanceof TypeReference) {
+              tmpResult = 
+                 factory.createSuperReference((TypeReference)tmpResult);
+              setPrefixInfo(tmpResult);
+              setPostfixInfo(tmpResult);
+          } else if (tmpResult instanceof UncollatedReferenceQualifier) {
+              tmpResult =
+                 factory.createSuperReference(((UncollatedReferenceQualifier)tmpResult).toTypeReference());
+              setPrefixInfo(tmpResult);
+              setPostfixInfo(tmpResult);
+          } else if (tmpResult instanceof ThisReference) {
+          	  tmpResult = 
+                 factory.createSuperReference((ThisReference)tmpResult);
+              setPrefixInfo(tmpResult);
+              setPostfixInfo(tmpResult);
+          } else {
+              throw new ParseException("No type as prefix of `super', was "  + tmpResult.getClass());
+          }
+          break;      
       case PrimarySuffixReturnValue.ALLOCATION_EXPR:
-	  if (suffix.expr instanceof New) {
-	      ((New)suffix.expr).setReferencePrefix(tmpResult);
-	      tmpResult = (New)suffix.expr;
-	  } else {
-	      throw new ParseException("Allocation without new?");
-	  }
-	  break;
+          if (suffix.expr instanceof New) {
+              ((New)suffix.expr).setReferencePrefix(tmpResult);
+              tmpResult = (New)suffix.expr;
+          } else {
+              throw new ParseException("Allocation without new?");
+          }
+          break;
       case PrimarySuffixReturnValue.INDEX_EXPR:
           if (tmpResult instanceof UncollatedReferenceQualifier ||
-	      tmpResult instanceof MethodReference ||
-	      tmpResult instanceof ParenthesizedExpression ||
-	      //tmpResult instanceof ThisReference || // this[i] in array initialization
-	      tmpResult instanceof VariableReference) {
-		  // Now we know that this is an array reference
-	      ExpressionMutableList indicees = new ExpressionArrayList(1);
-	      indicees.add(suffix.expr);
-	      tmpResult = 
-	          factory.createArrayReference(tmpResult, indicees);
-	      setPrefixInfo(tmpResult);
-	      setPostfixInfo(tmpResult);
-	  } else if (tmpResult instanceof ArrayReference) {
-	      // we need to add another access dimension
-	      ((ArrayReference)tmpResult).getDimensionExpressions().add(suffix.expr);
-	  } else {
-	      throw new ParseException("Bad index context - " +
-				       tmpResult.getClass().getName() + "?!");
-	      /*
-		e.g. StringLiteral, TypeReference, NewArray
-		(would have to be in parentheses), SuperReference, ...
-	      */
-	  }
+              tmpResult instanceof MethodReference ||
+              tmpResult instanceof ParenthesizedExpression ||
+              //tmpResult instanceof ThisReference || // this[i] in array initialization
+              tmpResult instanceof VariableReference) {
+                  // Now we know that this is an array reference
+              ASTList<Expression> indicees = new ASTArrayList<Expression>(1);
+              indicees.add(suffix.expr);
+              tmpResult = 
+                  factory.createArrayReference(tmpResult, indicees);
+              setPrefixInfo(tmpResult);
+              setPostfixInfo(tmpResult);
+          } else if (tmpResult instanceof ArrayReference) {
+              // we need to add another access dimension
+              ((ArrayReference)tmpResult).getDimensionExpressions().add(suffix.expr);
+          } else {
+              throw new ParseException("Bad index context - " +
+                                       tmpResult.getClass().getName() + "?!");
+              /*
+                e.g. StringLiteral, TypeReference, NewArray
+                (would have to be in parentheses), SuperReference, ...
+              */
+          }
           break;
       case PrimarySuffixReturnValue.IDENTIFIER:
           tmpResult = factory.createUncollatedReferenceQualifier(tmpResult, suffix.id);
+          ((UncollatedReferenceQualifier)tmpResult).setTypeArguments(suffix.typeArgs);
+          suffix.typeArgs = null;
           setPrefixInfo(tmpResult);
-	  setPostfixInfo(tmpResult);
+          setPostfixInfo(tmpResult);
           break;
       case PrimarySuffixReturnValue.ARGUMENTS:
           // method call -determine the kind of method
           if (tmpResult instanceof UncollatedReferenceQualifier) {
-	      // this is a normal method call
-	      tmpResult = factory.createMethodReference
-	      (((UncollatedReferenceQualifier)tmpResult).getReferencePrefix(),
-	       ((UncollatedReferenceQualifier)tmpResult).getIdentifier(),
-	       suffix.args);
+              // this is a normal method call
+              tmpResult = factory.createMethodReference
+              (((UncollatedReferenceQualifier)tmpResult).getReferencePrefix(),
+               ((UncollatedReferenceQualifier)tmpResult).getIdentifier(),
+               suffix.args, ((UncollatedReferenceQualifier)tmpResult).getTypeArguments());
+              
               setPrefixInfo(tmpResult);
-	      setPostfixInfo(tmpResult);
-	  } else {
-	      throw new ParseException("Arguments without method name?");
-	  }
+              setPostfixInfo(tmpResult);
+          } else {
+              throw new ParseException("Arguments without method name?");
+          }
           break;
       default:
           throw new ParseException("Unknown primary suffix type");
@@ -2250,15 +2941,17 @@ Expression PrimaryExpression() :
   )*
   {     
       if (tmpResult instanceof UncollatedReferenceQualifier) {
-	  result = (UncollatedReferenceQualifier)tmpResult;
+          result = (UncollatedReferenceQualifier)tmpResult;
+          // should be a FieldReference?
       } else {
-	  result = (Expression)tmpResult;
+          result = (Expression)tmpResult;
       }
       checkConstruction(result);
       setPostfixInfo(result);
       return result;
   }
 }
+
 
 PrimaryPrefixReturnValue PrimaryPrefix() :
 {
@@ -2274,6 +2967,13 @@ PrimaryPrefixReturnValue PrimaryPrefix() :
 }
 {
 (
+//  LOOKAHEAD(NonWildcardTypeArguments() "this" Arguments()) 
+//  	NonWildcardTypeArguments() "this" /* Arguments() is a mandatory suffix here!*/
+//      { 
+//        prefix.type = PrimaryPrefixReturnValue.THIS; 
+//        System.err.println("Ignoring NonWildcardTypeArguments!");
+//      }
+//|
   lit = Literal()
   {
       prefix.type    = PrimaryPrefixReturnValue.LITERAL;
@@ -2285,23 +2985,14 @@ PrimaryPrefixReturnValue PrimaryPrefix() :
       prefix.type = PrimaryPrefixReturnValue.THIS;
   }
 |
+  //[NonWildcardTypeArguments()]
   "super" {
       supRef = factory.createSuperReference();
       setPrefixInfo(supRef);
       setPostfixInfo(supRef);
   }
   "."
-  (
-    <IDENTIFIER>
-    {
-      id   = factory.createIdentifier(token.image);
-    }
-  |
-    <IMPLICITIDENTIFIER>
-    {
-      id   = factory.createImplicitIdentifier(token.image);
-    }
-  )
+    id = ShortName()
   {
     setPrefixInfo(id);
     setPostfixInfo(id);
@@ -2318,8 +3009,8 @@ PrimaryPrefixReturnValue PrimaryPrefix() :
   expr = Expression()
   ")"
   {
-  	setPostfixInfo(parExpr);
-      parExpr.setArguments(new ExpressionArrayList(expr));
+          setPostfixInfo(parExpr);
+      parExpr.setArguments(new ASTArrayList<Expression>(expr));
       prefix.expr = parExpr;
       prefix.type = PrimaryPrefixReturnValue.PARENTHESIZED_EXPR;
   }
@@ -2331,7 +3022,7 @@ PrimaryPrefixReturnValue PrimaryPrefix() :
   expr = Expression()
   ")"
   {
-       parExpr.setArguments(new ExpressionArrayList(expr));
+       parExpr.setArguments(new ASTArrayList<Expression>(expr));
        prefix.expr = parExpr;
        prefix.type = PrimaryPrefixReturnValue.PASSIVE_EXPR;
   }
@@ -2351,8 +3042,8 @@ PrimaryPrefixReturnValue PrimaryPrefix() :
 |
   qn = Name() 
   {
-	prefix.type = PrimaryPrefixReturnValue.QUALIFIED_NAME;
-	prefix.name = qn;
+        prefix.type = PrimaryPrefixReturnValue.QUALIFIED_NAME;
+        prefix.name = qn;
   }
 )
   {
@@ -2364,9 +3055,10 @@ PrimarySuffixReturnValue PrimarySuffix() :
 {
     // reuses global suffix field
     Expression               expr;
-    ExpressionMutableList    args;
+    ASTList<Expression>    args;
     Identifier               id;
     Literal                  lit;
+    ASTList<TypeArgumentDeclaration> typeArgs;
 }
 {
 (
@@ -2376,6 +3068,12 @@ PrimarySuffixReturnValue PrimarySuffix() :
       suffix.type = PrimarySuffixReturnValue.THIS;
   }
 |
+  LOOKAHEAD(2, {isSuperAllowed()})
+  "." "super"
+  {
+  	  suffix.type = PrimarySuffixReturnValue.SUPER;
+  }
+|
   LOOKAHEAD(2)
   "." expr = AllocationExpression()
   {
@@ -2383,28 +3081,24 @@ PrimarySuffixReturnValue PrimarySuffix() :
       suffix.expr = expr;
   }
 |
-  "[" expr = Expression() "]"
+//  LOOKAHEAD(3) // explicit Generic method invocation
+  LOOKAHEAD(NonWildcardTypeArguments() ShortName()) // due to implicit indentifiers
+  "." 
+  	  suffix.typeArgs = NonWildcardTypeArguments() suffix.id = ShortName()
+  {
+  	  suffix.type = suffix.IDENTIFIER;
+  }
+|  "[" expr = Expression() "]"
   {
       suffix.type = PrimarySuffixReturnValue.INDEX_EXPR;
       suffix.expr = expr;
   }
 |
   "."
-  (
-    <IDENTIFIER>
-    {
-      suffix.id   = factory.createIdentifier(token.image);
-    }
-  |
-    <IMPLICITIDENTIFIER>
-    {
-      suffix.id   = factory.createImplicitIdentifier(token.image);
-    }
-  )
+  
+  suffix.id = ShortName()
   {
       suffix.type = PrimarySuffixReturnValue.IDENTIFIER;
-      setPrefixInfo(suffix.id);
-      setPostfixInfo(suffix.id);
   }
 |
   args = Arguments()
@@ -2428,18 +3122,18 @@ Literal Literal() :
   <INTEGER_LITERAL>
   {
       if (token.image.endsWith("L") || token.image.endsWith("l")) {
-	  result = factory.createLongLiteral(token.image);
+          result = factory.createLongLiteral(token.image);
       } else {
-	  result = factory.createIntLiteral(token.image);
+          result = factory.createIntLiteral(token.image);
       }
       setPrefixInfo(result);
   }
 | <FLOATING_POINT_LITERAL>
   {
       if (token.image.endsWith("F") || token.image.endsWith("f")) {
-	  result = factory.createFloatLiteral(token.image);
+          result = factory.createFloatLiteral(token.image);
       } else {
-	  result = factory.createDoubleLiteral(token.image);
+          result = factory.createDoubleLiteral(token.image);
       }
       setPrefixInfo(result);
   }
@@ -2496,30 +3190,31 @@ NullLiteral NullLiteral() :
   }
 }
 
-ExpressionMutableList Arguments() :
+ASTList<Expression> Arguments() :
 {
-    ExpressionMutableList result = null;
+    ASTList<Expression> result = null;
 }
 {
   "(" [ result = ArgumentList() ] ")"
   {
+      // !!! should set end coordinates to parent, possibly
       if (result != null)
       {
-	  checkConstruction(result);
-	  
-	  }
+          checkConstruction(result);
+          
+          }
       return result;
   }
 }
 
-ExpressionMutableList ArgumentList() :
+ASTList<Expression> ArgumentList() :
 {
-    ExpressionMutableList result = new ExpressionArrayList();
+    ASTList<Expression> result = new ASTArrayList<Expression>();
     Expression expr;
 }
 {
         expr = Expression() { result.add(expr); }
-  ( "," expr = Expression() { result.add(expr); } )*
+  ( LOOKAHEAD("," Expression()) "," expr = Expression() { result.add(expr); } )*
   {
     checkConstruction(result);
     
@@ -2532,64 +3227,61 @@ TypeOperator AllocationExpression() :
     UncollatedReferenceQualifier qn;
     TypeOperator  result;
     TypeReference tr;
-    ExpressionMutableList args;
-    MemberDeclarationMutableList body = null;
+    ASTList<Expression> args;
+    ASTList<MemberDeclaration> body = null;
     ClassDeclaration cd = null;
     NewArray na;
+    ASTList<TypeArgumentDeclaration> typeArgs;
 }
 {
 (
   LOOKAHEAD(2)
-  ( "new"
+  "new" 
     {
-	na = factory.createNewArray();
-	setPrefixInfo(na);
+        na = factory.createNewArray();
+        setPrefixInfo(na);
     }
     tr = PrimitiveType()
     {
-	na.setTypeReference(tr);
+        na.setTypeReference(tr);
     }
     result = ArrayDimsAndInits(na)
-  )
-| (
-  "new" 
+|
+  "new"
   {
       result = factory.createNew();
       setPrefixInfo(result);
   }
-  qn = Name()
+  qn = TypedName()
+  [typeArgs = NonWildcardTypeArguments() { qn.setTypeArguments(typeArgs); } ]
   (
-   ( args = Arguments()
+   args = Arguments()
      [ 
        {
-	   cd = factory.createClassDeclaration();
-	   setPrefixInfo(cd);
+           cd = factory.createClassDeclaration();
+           setPrefixInfo(cd);
        }
        body = ClassBody()
        {
-	   cd.setMembers(body);
-	   setPostfixInfo(cd);
+           cd.setMembers(body);
+           setPostfixInfo(cd);
        }
      ]
      {
-	 result.setTypeReference(qn.toTypeReference());
-	 ((New)result).setArguments(args);
-	 if (cd != null) {
-	     ((New)result).setClassDeclaration(cd);
-	 }
+         result.setTypeReference(qn.toTypeReference());
+         ((New)result).setArguments(args);
+         if (cd != null) {
+             ((New)result).setClassDeclaration(cd);
+         }
      }
-   )
    |
-   (
-    {	
-	na = factory.createNewArray();
-	copyPrefixInfo(result, na);
-	na.setTypeReference(qn.toTypeReference());
-    }
-    result = ArrayDimsAndInits(na)
-   )
+     {        
+        na = factory.createNewArray();
+        copyPrefixInfo(result, na);
+        na.setTypeReference(qn.toTypeReference());
+     }
+     result = ArrayDimsAndInits(na)
   )
- )
 )
   {
     checkConstruction(result);
@@ -2606,37 +3298,35 @@ NewArray ArrayDimsAndInits(NewArray result) :
 {
     int dimensions = 0;
     Expression expr;
-    ExpressionMutableList sizes = null;
+    ASTList<Expression> sizes = null;
     ArrayInitializer init = null;
 }
 {
 (
   LOOKAHEAD(2)
-  ( ( LOOKAHEAD(2)
+  ( LOOKAHEAD(2)
       "[" expr = Expression() "]"
       {
-	  sizes = (sizes == null) ? new ExpressionArrayList() : sizes;
-	  sizes.add(expr);
-	  dimensions++;
+          sizes = (sizes == null) ? new ASTArrayList<Expression>() : sizes;
+          sizes.add(expr);
+          dimensions++;
       }
     )+
     ( LOOKAHEAD(2)
       "[" "]"
       { dimensions++; }
     )*
-  )
 |
-  ( ( "[" "]" 
+  ( "[" "]" 
       { dimensions++; }
-    )+
-    init = ArrayInitializer()
-  )
+  )+
+  init = ArrayInitializer()
 )
   {
       //      setPrefixInfo(result); 
       result.setDimensions(dimensions);
       if (sizes != null) {
-	  result.setArguments(sizes);
+          result.setArguments(sizes);
       }
       result.setArrayInitializer(init);
       checkConstruction(result);
@@ -2666,13 +3356,13 @@ Statement Statement() :
 | LOOKAHEAD(2) expr   = StatementExpression() ";"
   {
       try {
-	  result = (ExpressionStatement)expr;
+          result = (ExpressionStatement)expr;
       }
       catch (ClassCastException cce) {
-	  // this is a semantical error!!!
-	  throw new ParseException("Cannot parse "+current+
-	      "\nExpressionStatement expected"+
-	      "\n@" +current.beginLine+"/"+current.beginColumn+" in block");
+          // this is a semantical error!!!
+          throw new ParseException("Cannot parse "+current+
+              "\nExpressionStatement expected"+
+              "\n@" +current.beginLine+"/"+current.beginColumn+" in block");
       }
   }
 | result = SwitchStatement()
@@ -2717,11 +3407,11 @@ LabeledStatement LabeledStatement() :
 }
 {
   (<IDENTIFIER>
-  	{
-	      id = factory.createIdentifier(token.image);
-	      setPrefixInfo(id);
-	      setPostfixInfo(id);
-	}
+          {
+              id = factory.createIdentifier(token.image);
+              setPrefixInfo(id);
+              setPostfixInfo(id);
+        }
   )
   ":"
   {
@@ -2823,15 +3513,15 @@ ExecutionContext ExecutionContext() :
   [ ",this=" runtimeInstance = Expression() ]
 
   { return new ExecutionContext
-	(classContext, 
-	(ReferencePrefix)runtimeInstance);
+        (classContext, 
+        (ReferencePrefix)runtimeInstance);
   }
 }
 
 StatementBlock Block() :
 {
   StatementBlock result;
-  StatementMutableList sl = new StatementArrayList();
+  ASTList<Statement> sl = new ASTArrayList<Statement>();
   Statement stat;
 }
 {
@@ -2858,7 +3548,7 @@ StatementBlock Block() :
 StatementBlock StartBlock() :
 {
   StatementBlock result;
-  StatementMutableList sl = new StatementArrayList();
+  ASTList<Statement> sl = new ASTArrayList<Statement>();
   Statement stat;
 }
 {
@@ -2894,7 +3584,8 @@ Statement BlockStatement() :
   Statement result;
 }
 {
- (LOOKAHEAD([ "final" ] Type() <IDENTIFIER>)
+(
+  LOOKAHEAD((AnnotationUse())* [ "final" ] Type() <IDENTIFIER>)
   result = LocalVariableDeclaration() ";" 
 
 | result = Statement() 
@@ -2911,24 +3602,32 @@ Statement BlockStatement() :
 LocalVariableDeclaration LocalVariableDeclaration() :
 {
   LocalVariableDeclaration result;
-  VariableSpecificationMutableList vl = new VariableSpecificationArrayList(1);
+  ASTList<VariableSpecification> vl = new ASTArrayList<VariableSpecification>(1);
   TypeReference tr;
   VariableSpecification var;
+  ASTArrayList<DeclarationSpecifier> declSpecs = new ASTArrayList<DeclarationSpecifier>();
+  AnnotationUseSpecification annot;
 }
 {
   {
     result = factory.createLocalVariableDeclaration();
     setPrefixInfo(result);
   }
+  (annot = AnnotationUse() { declSpecs.add(annot); })*
   [ "final" 
     { 
       Final fi = factory.createFinal(); 
       setPrefixInfo(fi);
       setPostfixInfo(fi);
-      result.setModifiers(new ModifierArrayList(fi));
+      declSpecs.add(fi);
     } 
+   (annot = AnnotationUse() { declSpecs.add(annot); })*
   ]
-  (tr = Type())
+  {
+    if (declSpecs.size() != 0)
+    	result.setDeclarationSpecifiers(declSpecs); 
+  }
+  tr = Type()
   var = VariableDeclarator(false) { vl.add(var); }
   ( "," 
     var = VariableDeclarator(false)  { vl.add(var); }
@@ -2968,7 +3667,7 @@ Expression StatementExpression() :
     Expression result;
     Expression expr;
     Assignment op;
-    ExpressionMutableList leftRight;
+    ASTList<Expression> leftRight;
 }
 {
 (
@@ -2978,21 +3677,21 @@ Expression StatementExpression() :
     result = PrimaryExpression()
     [
       "++" { 
-	  result = factory.createPostIncrement(result); 
-	  setPrefixInfo(result);
+          result = factory.createPostIncrement(result); 
+          setPrefixInfo(result);
       }
     | "--" { 
-	result = factory.createPostDecrement(result);
-	setPrefixInfo(result);
+        result = factory.createPostDecrement(result);
+        setPrefixInfo(result);
       }
     | ( op = AssignmentOperator()
         expr = Expression()
         {
-	  leftRight = new ExpressionArrayList(2);
-	  leftRight.add(result);
-	  leftRight.add(expr);
-	  op.setArguments(leftRight);
-	  result = op;
+          leftRight = new ASTArrayList<Expression>(2);
+          leftRight.add(result);
+          leftRight.add(expr);
+          op.setArguments(leftRight);
+          result = op;
         }
       )
     ]
@@ -3009,9 +3708,9 @@ Switch SwitchStatement() :
 {
   Switch result;
   Expression expr;
-  BranchMutableList branches = new BranchArrayList(2);
+  ASTList<Branch> branches = new ASTArrayList<Branch>(2);
   Branch branch;
-  StatementMutableList stats;
+  ASTList<Statement> stats;
   Statement stat;
 }
 {
@@ -3024,21 +3723,21 @@ Switch SwitchStatement() :
 
     ( branch = SwitchLabel()
       {
-        stats = new StatementArrayList();
+        stats = new ASTArrayList<Statement>();
       }
       ( stat = BlockStatement()
         {
           stats.add(stat);
-	}
+        }
       )*
 
       {
         if (branch instanceof Case) {
-	  ((Case)branch).setBody(stats);
-	} else {
-	  ((Default)branch).setBody(stats);
-	}
-	branches.add(branch);
+          ((Case)branch).setBody(stats);
+        } else {
+          ((Default)branch).setBody(stats);
+        }
+        branches.add(branch);
       }
     )*
 
@@ -3065,20 +3764,20 @@ Branch SwitchLabel() :
 (
   ( "case"
     {
-	result = factory.createCase();
-	setPrefixInfo(result);
+        result = factory.createCase();
+        setPrefixInfo(result);
     }
     expr = Expression()
     ":"
     {
-	((Case)result).setExpression(expr);
+        ((Case)result).setExpression(expr);
     }
   )
   |
   ( "default"
     {
-	result = factory.createDefault();
-	setPrefixInfo(result);
+        result = factory.createDefault();
+        setPrefixInfo(result);
     }
     ":"
   )
@@ -3151,8 +3850,8 @@ If IfStatement() :
   }
   [ LOOKAHEAD(1) "else" 
     {
-	elseStat = factory.createElse();
-	setPrefixInfo(elseStat);
+        elseStat = factory.createElse();
+        setPrefixInfo(elseStat);
     }
     falseStat = Statement() 
     {
@@ -3163,7 +3862,7 @@ If IfStatement() :
       result.setExpression(cond);
       result.setThen(thenStat);
       if (elseStat != null) {
-	  result.setElse(elseStat);
+          result.setElse(elseStat);
       }
       checkConstruction(result);
       setPostfixInfo(result);
@@ -3216,40 +3915,63 @@ Do DoStatement() :
   }
 }
 
-For ForStatement() :
+LoopStatement ForStatement() :
 {
-    For result;
-    LoopInitializerMutableList init = null;
+    LoopStatement result;
+    ASTList<LoopInitializer> init = null;
     Expression guard = null;
-    ExpressionMutableList update = null;
+    ASTList<Expression> update = null;
     Statement body;
 }
 {
   "for"
-  {
-      result = factory.createFor();
-      setPrefixInfo(result);
-  }
-   "(" [ init = ForInit() ] ";"
-       [ guard = Expression() ] ";"
-        [ update = ForUpdate() ] ")"
-      body = Statement()
-  {
-      result.setInitializers(init);
-      result.setGuard(guard);
-      result.setUpdates(update);
-      result.setBody(body);
+//  {
+//      result = factory.createFor();
+//      setPrefixInfo(result);
+//  }
+	   //"(" 
+	   (
+  	// old for
+  	   LOOKAHEAD( "(" [ForInit()] ";")
+  	      { 
+  	      	result = factory.createFor();
+  	      	setPrefixInfo(result);
+  	      }
+  	      "("
+	   	  [ init = ForInit() ] ";"
+	      [ guard = Expression() ] ";"
+    	  [ update = ForUpdate() ] 
+    
+    | LOOKAHEAD( "(" ForInit() ":")
+    // enhanced for loop / "foreach"
+    	{
+    		result = factory.createEnhancedFor();
+    		setPrefixInfo(result);	
+    	}
+    	"("
+    	init = ForInit()
+    	":"
+    	guard = Expression()
+       )
+       // this is common again
+  	   ")"
+	      body = Statement()
+	  {
+    	  result.setInitializers(init);
+	      result.setGuard(guard);
+    	  result.setUpdates(update);
+	      result.setBody(body);
       checkConstruction(result);
-      setPostfixInfo(result);
-      return result;
-  }
+	      setPostfixInfo(result);
+	      return result;
+	  }
 }
 
-LoopInitializerMutableList ForInit() :
+ASTList<LoopInitializer> ForInit() :
 {
-    LoopInitializerMutableList result = new LoopInitializerArrayList();
+    ASTList<LoopInitializer> result = new ASTArrayList<LoopInitializer>();
     LocalVariableDeclaration varDecl = null;
-    ExpressionList exprs = null;
+    ASTList<Expression> exprs = null;
 }
 {
 (
@@ -3258,21 +3980,21 @@ LoopInitializerMutableList ForInit() :
 | exprs   = StatementExpressionList()
 )
     {
-	if (varDecl != null) {
-	    result.add(varDecl);
-	} else {
+        if (varDecl != null) {
+            result.add(varDecl);
+        } else {
             for (int i =  0, s = exprs.size(); i < s; i += 1)
-                result.add((LoopInitializer)exprs.getExpression(i));
-	}
-	checkConstruction(result);
-	
-	return result;
+                result.add((LoopInitializer)exprs.get(i));
+        }
+        checkConstruction(result);
+        
+        return result;
     }
 }
 
-ExpressionMutableList StatementExpressionList() :
+ASTList<Expression> StatementExpressionList() :
 {
-    ExpressionMutableList result = new ExpressionArrayList(2);
+    ASTList<Expression> result = new ASTArrayList<Expression>();
     Expression expr;
 }
 {
@@ -3285,9 +4007,9 @@ ExpressionMutableList StatementExpressionList() :
   }
 }
 
-ExpressionMutableList ForUpdate() :
+ASTList<Expression> ForUpdate() :
 {
-    ExpressionMutableList result;
+    ASTList<Expression> result;
 }
 {
   result = StatementExpressionList()
@@ -3337,10 +4059,10 @@ Continue ContinueStatement() :
   }
   [ <IDENTIFIER> 
      {
-	 id = factory.createIdentifier(token.image); 
-	 setPrefixInfo(id);
-	 setPostfixInfo(id);
-	 result.setIdentifier(id);
+         id = factory.createIdentifier(token.image); 
+         setPrefixInfo(id);
+         setPostfixInfo(id);
+         result.setIdentifier(id);
        }
   ] ";"
   {
@@ -3363,7 +4085,7 @@ Return ReturnStatement() :
   }
   [ expr = Expression() 
     { 
-	result.setExpression(expr); 
+        result.setExpression(expr); 
     } 
   ]   
   ";"
@@ -3427,7 +4149,7 @@ Try TryStatement() :
     Try result;
     StatementBlock block;
     ParameterDeclaration param;
-    BranchMutableList branches = new BranchArrayList(1);
+    ASTList<Branch> branches = new ASTArrayList<Branch>(1);
     Catch cat;
     Finally fin;
 }
@@ -3435,11 +4157,11 @@ Try TryStatement() :
   "try"
       {
         result = factory.createTry();
-	setPrefixInfo(result);
+        setPrefixInfo(result);
       }
   block = Block()
       {
-	  result.setBody(block);
+          result.setBody(block);
       }
   
   (
@@ -3451,20 +4173,20 @@ Try TryStatement() :
     "("  param = FormalParameter() ")"  
     block = Block()
     {
-	cat.setParameterDeclaration(param);
-	cat.setBody(block);
-	branches.add(cat);
+        cat.setParameterDeclaration(param);
+        cat.setBody(block);
+        branches.add(cat);
     }
   )*
   [ "finally" 
      {
-	 fin = factory.createFinally();
-	 setPrefixInfo(fin);
+         fin = factory.createFinally();
+         setPrefixInfo(fin);
      }
     block = Block()
       {
-	  fin.setBody(block);
-	  branches.add(fin);
+          fin.setBody(block);
+          branches.add(fin);
       }
   ])
   { 
@@ -3481,9 +4203,9 @@ Try TryStatement() :
    For partial parsing ONLY. Allows this()/super() calls, as in
    constructor bodies.
  */
-StatementMutableList GeneralizedStatements() :
+ASTList<Statement> GeneralizedStatements() :
 {
-    StatementMutableList            result = new StatementArrayList();
+    ASTList<Statement>            result = new ASTArrayList<Statement>();
     SpecialConstructorReference     scr = null;
     Statement                       stat = null;
 }
@@ -3500,4 +4222,188 @@ StatementMutableList GeneralizedStatements() :
       
       return result;
   }
+}
+
+// Java 5 specific 
+AnnotationUseSpecification AnnotationUse() :
+{
+	TypeReference tr;	
+	AnnotationUseSpecification result = factory.createAnnotationUseSpecification();
+	Expression ev = null;
+	ASTList<AnnotationElementValuePair> list = null;
+	AnnotationPropertyReference id;
+	AnnotationElementValuePair evp;
+}
+{
+	"@"
+	 { setPrefixInfo(result); }
+	tr = Type()
+	[ "(" { list = new ASTArrayList<AnnotationElementValuePair>(); }
+	    [
+			   LOOKAHEAD(<IDENTIFIER> "=")
+				<IDENTIFIER> { 
+					id = factory.createAnnotationPropertyReference(token.image); 
+					setPrefixInfo(id);
+					setPostfixInfo(id);
+				} "=" ev = ElementValue() 
+				{ 
+					 	evp = new AnnotationElementValuePair(id, ev);
+					 	setPrefixInfo(evp);
+					 	setPostfixInfo(evp);
+						list.add(evp); 				} 
+				(
+					"," <IDENTIFIER> { 
+						id = factory.createAnnotationPropertyReference(token.image); 
+						setPrefixInfo(id);
+						setPostfixInfo(id);
+					 } "=" ev = ElementValue() 
+					 { 
+					 	evp = new AnnotationElementValuePair(id, ev);
+					 	setPrefixInfo(evp);
+					 	setPostfixInfo(evp);
+						list.add(evp); 
+					} 
+				)*
+			| 
+			   LOOKAHEAD(ElementValue())
+			  	ev = ElementValue() { 
+			  			evp = new AnnotationElementValuePair(null, ev);
+					 	setPrefixInfo(evp);
+					 	setPostfixInfo(evp);
+						list.add(evp); 
+			  	} // Single Element Annotation
+		]
+	 ")"
+	]
+	{
+		result.setTypeReference(tr);
+		if (list != null) {
+			result.setElementValuePairs(list);
+		}
+		setPostfixInfo(result);
+		return result;
+	}
+}
+
+Expression ElementValue() :
+{
+	Expression res = null;
+	Expression tmp;
+	ASTList<Expression> elist;
+}
+{
+	(   res = Expression()
+	  | res = AnnotationUse()
+	  | "{" tmp = ElementValue() 
+	  		{ 
+	  			res = new ElementValueArrayInitializer();
+	  			setPrefixInfo(res);
+	  			elist = new ASTArrayList<Expression>();
+	  			elist.add(tmp);
+	  		}
+	  		(LOOKAHEAD(2) "," tmp = ElementValue()
+	  			{ elist.add(tmp); }
+	  		)* [","] "}"
+
+		{
+			((ElementValueArrayInitializer)res).setElementValues(elist);
+		}
+	  			
+	)
+	{ 
+		setPostfixInfo(res);
+		return res; 
+	}
+}
+
+ASTList<TypeArgumentDeclaration> NonWildcardTypeArguments() :
+{
+	ASTList<UncollatedReferenceQualifier> nl;
+	ASTList<TypeArgumentDeclaration> res = new ASTArrayList<TypeArgumentDeclaration>();
+	TypeArgumentDeclaration ta;
+}
+{
+	"<" nl = TypedNameList() ">"	
+	{
+		for (int i = 0; i < nl.size(); i++) {
+			ta = new TypeArgumentDeclaration(nl.get(i).toTypeReference());
+			res.add(ta);
+		}
+		return res;
+	}
+}
+
+// HACK for handling position of methodDeclarations correctly
+ASTList<TypeParameterDeclaration> TypeParametersNoLE() :
+{
+	ASTList<TypeParameterDeclaration> res = new ASTArrayList<TypeParameterDeclaration>();
+	TypeParameterDeclaration tp;
+}
+{
+  tp = TypeParameter() { res.add(tp); } ("," tp = TypeParameter() { res.add(tp);})* ">"
+  {
+  	return res;
+  }
+}
+
+ASTList<TypeParameterDeclaration> TypeParameters() :
+{
+	ASTList<TypeParameterDeclaration> res = new ASTArrayList<TypeParameterDeclaration>();
+}
+{
+  "<" res = TypeParametersNoLE()
+  { return res; }
+}
+
+TypeParameterDeclaration TypeParameter() :
+{
+	TypeParameterDeclaration res = new TypeParameterDeclaration();
+	Identifier id;
+	ASTList<TypeReference> bound = null;
+}
+{
+	<IDENTIFIER> { 
+		id = factory.createIdentifier(token.image); 
+		setPrefixInfo(id);
+		setPostfixInfo(id);
+	} ["extends" bound = Bound()]	
+	{
+		res.setIdentifier(id);
+		res.setBound(bound);
+		return res;
+	}
+}
+
+ASTList<TypeReference> Bound() :
+{
+	TypeReference tr;
+	ASTList<TypeReference> res = new ASTArrayList<TypeReference>();
+}
+{
+	tr = Type() {res.add(tr);} ("&" tr = Type() {res.add(tr);})*	
+	{ 
+		return res;
+	}
+}
+
+/* We use productions to match >>>, >> and > so that we can keep the
+ * type declaration syntax with generics clean
+ */
+
+void RUNSIGNEDSHIFT():
+{}
+{
+  ( LOOKAHEAD({ getToken(1).kind == GT &&
+                ((Token.RealKindToken)getToken(1)).realKind == RUNSIGNEDSHIFT} )
+   ">" ">" ">"
+  )
+}
+
+void RSIGNEDSHIFT():
+{}
+{
+  ( LOOKAHEAD({ getToken(1).kind == GT &&
+                ((Token.RealKindToken)getToken(1)).realKind == RSIGNEDSHIFT} )
+  ">" ">"
+  )
 }

@@ -64,7 +64,7 @@ public class SetAsListOf<T> implements SetOf<T> {
 
     /** adds an element, barfs if the element is already present
     * @param element of type <T> that has to be added to this set
-    * @throws NotUniqueException if the element is already present
+    * @throws de.uka.ilkd.key.collection.NotUniqueException if the element is already present
     */
     public SetOf<T> addUnique(<T> element) 
 	throws de.uka.ilkd.key.collection.NotUniqueException {

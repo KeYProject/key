@@ -40,9 +40,9 @@ public abstract class Update {
      */
     public static class UpdateInParts extends Update {
 
-        private final HashMap loc2assignmentPairs;
+        private final HashMap<Location, ArrayOfAssignmentPair> loc2assignmentPairs;
 
-        private final HashSet locationCache;
+        private final HashSet<Location> locationCache;
 
         private final ArrayOfAssignmentPair pairs;
 
@@ -53,8 +53,8 @@ public abstract class Update {
          */
         public UpdateInParts(final ArrayOfAssignmentPair pairs) {
             this.pairs = pairs;
-            loc2assignmentPairs = new HashMap();
-            this.locationCache = new HashSet();
+            loc2assignmentPairs = new HashMap<Location, ArrayOfAssignmentPair>();
+            this.locationCache = new HashSet<Location>();
 
             for (int i = 0; i < pairs.size(); i++) {
                 locationCache.add(pairs.getAssignmentPair(i).location());
@@ -90,7 +90,7 @@ public abstract class Update {
                 loc2assignmentPairs.put(loc, new ArrayOfAssignmentPair(result
                         .toArray()));
             }
-            return (ArrayOfAssignmentPair) loc2assignmentPairs.get(loc);
+            return loc2assignmentPairs.get(loc);
         }
 
         /*
@@ -143,9 +143,9 @@ public abstract class Update {
 
     private static class UpdateWithUpdateTerm extends Update {
 
-        private final HashMap loc2assignmentPairs;
+        private final HashMap<Location, ArrayOfAssignmentPair> loc2assignmentPairs;
 
-        private HashSet locationCache;
+        private HashSet<Location> locationCache;
 
         private final Term update;
 
@@ -156,7 +156,7 @@ public abstract class Update {
         public UpdateWithUpdateTerm(Term update) {
             this.update = update;	    
             this.updateOp = (IUpdateOperator) update.op();
-            this.loc2assignmentPairs = new HashMap();
+            this.loc2assignmentPairs = new HashMap<Location, ArrayOfAssignmentPair>();
             
             for ( int i = 0; i < updateOp.locationCount (); i++ ) {
                 if ( updateOp.location ( i ) == StarLocation.ALL )
@@ -167,7 +167,7 @@ public abstract class Update {
         }
 
         /**
-         * @return
+         * @return the assignment pairs making up the update
          */
         public ArrayOfAssignmentPair getAllAssignmentPairs() {
             final AssignmentPair[] result = 
@@ -203,12 +203,12 @@ public abstract class Update {
                 loc2assignmentPairs.put(loc, 
                         new ArrayOfAssignmentPair(result.toArray()));
             }
-            return (ArrayOfAssignmentPair) loc2assignmentPairs.get(loc);
+            return loc2assignmentPairs.get(loc);
         }
 
         public boolean hasLocation (Location loc) {
             if ( locationCache == null ) {
-                this.locationCache = new HashSet ();
+                this.locationCache = new HashSet<Location> ();
 
                 for ( int i = 0; i < updateOp.locationCount (); i++ ) {
                     locationCache.add ( updateOp.location ( i ) );
@@ -278,7 +278,7 @@ public abstract class Update {
     }
 
     /**
-     * @return
+     * @return all assignment pairs of the update
      */
     public abstract ArrayOfAssignmentPair getAllAssignmentPairs();
 
@@ -291,7 +291,7 @@ public abstract class Update {
     /**
      * returns true if the given location is updated by this update
      * 
-     * @param location
+     * @param loc
      *            the Operator specifying the location which is updated
      * @return true if location occurs on the left side of an assignment pair in
      *         this update

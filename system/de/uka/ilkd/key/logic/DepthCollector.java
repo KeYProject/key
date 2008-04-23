@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.logic;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -41,7 +42,7 @@ public class DepthCollector extends Visitor {
      *
      * Values: <code>Integer</code>
      */
-    private HashMap varDepths = new HashMap ();
+    private HashMap<Operator, Integer> varDepths = new HashMap<Operator, Integer> ();
 
     /**
      * Current maximum depth of the term
@@ -146,28 +147,7 @@ public class DepthCollector extends Visitor {
     /**
      * @return an iterator iterating the found variables
      */
-    public IteratorOfOperator getVariables () {
-	return new OperatorIterator ( varDepths.keySet ().iterator () );
+    public Iterator<Operator> getVariables () {
+	return Collections.unmodifiableSet(varDepths.keySet ()).iterator ();
     }
-
-
-    private static class OperatorIterator
-	implements IteratorOfOperator {
-	
-	private Iterator it;
-
-	private OperatorIterator(Iterator p_it) {
-	    it = p_it;
-	}
-
-	public boolean hasNext() {
-	    return it.hasNext();
-	}
-
-	public Operator next() {
-	    return (Operator)it.next();
-	}
-
-    }
-
 }

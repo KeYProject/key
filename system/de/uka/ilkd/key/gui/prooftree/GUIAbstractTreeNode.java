@@ -53,13 +53,13 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
 	return ! isLeaf();
     }
 
-    public Enumeration children() {
+    public Enumeration<TreeNode> children() {
 	return new ChildEnumeration();
     }
 
 
-    public Object[] getPath() {
-	LinkedList path = new LinkedList();
+    public TreeNode[] getPath() {
+	LinkedList<TreeNode> path = new LinkedList<TreeNode>();
 	TreeNode n = this;
 	//	System.out.println("1: "+n);
 	path.addFirst(n);
@@ -67,7 +67,7 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
 	    //	    System.out.println("2: "+n+ "    "+path);
 	    path.addFirst(n);
 	}
-	return path.toArray();
+	return path.toArray(new TreeNode[path.size()]);
     }
 
     protected TreeNode findBranch ( Node p_node ) {
@@ -88,14 +88,14 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
 	return getProofTreeModel ().getBranchNode(p_node, label);
     }
 
-    private class ChildEnumeration implements Enumeration {
+    private class ChildEnumeration implements Enumeration<TreeNode> {
 	int current = 0;
 
 	public boolean hasMoreElements() {
 	    return current < getChildCount();
 	}
 
-	public Object nextElement() {
+	public TreeNode nextElement() {
 	    return getChildAt(current++);
 	}
 	

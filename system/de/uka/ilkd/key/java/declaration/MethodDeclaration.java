@@ -11,8 +11,6 @@
 
 package de.uka.ilkd.key.java.declaration;
 
-import java.util.LinkedList;
-
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.Method;
 import de.uka.ilkd.key.java.reference.TypeReference;
@@ -391,6 +389,16 @@ public class MethodDeclaration
     public boolean isModel() {
         return super.isModel();
     }
+    
+    /**
+     * test whether the declaration is a method with a variable number of arguments (i.e. the ellipsis ...)
+     * @return true iff so
+     */
+    public boolean isVarArgMethod() {
+        if (parameters == null || parameters.size() == 0)
+            return false;
+        return parameters.getParameterDeclaration(parameters.size() - 1).isVarArg();
+    }
 
     /**
      * Test whether the declaration is strictfp.
@@ -438,37 +446,4 @@ public class MethodDeclaration
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printMethodDeclaration(this);
     }
-
-    /**
-     * returns the comments belonging to this MethodDeclaration. 
-     * @return the comments.
-     */
-    public Comment[] getComments(){
-	final Comment[] c1 = super.getComments();
-        assert c1 != null;
-	LinkedList jmlComments = new LinkedList();
-	for(int i = 0, cc = getChildCount(); i<cc; i++){
-	    ProgramElement p = getChildAt(i);
-	    final Comment[] c2 = p.getComments();           
-	    if (c2 != null) {
-		for (int j=0; j<c2.length; j++){
-		    if(c2[j].containsJMLSpec() && 
-		       (c2[j].getJMLSpec().indexOf("pure") != -1 ||
-			c2[j].getJMLSpec().indexOf("helper") != -1)){
-			jmlComments.add(c2[j]);
-		    } 
-		}
-	    }
-	}
-	
-        final Comment[] c2 = new Comment[c1.length + jmlComments.size()];
-	
-        System.arraycopy(c1, 0, c2, 0, c1.length);
-        
-        for(int i=c1.length; i<c2.length; i++){
-	    c2[i] = (Comment)jmlComments.removeFirst();
-	}
-	return c2;
-    }
-      
 }

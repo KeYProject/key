@@ -22,11 +22,11 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 public class TypeOf extends ProgramMetaConstruct {
     
      /** creates a typeof ProgramMetaConstruct 
-     * @param expr the instance of expression contained by 
+     * @param pe the instance of expression contained by 
      * the meta construct 
      */
-    public TypeOf(Expression expr) {
-	super("#typeof", expr); 
+    public TypeOf(ProgramElement pe) {
+	super("#typeof", pe); 
 	
     }
 
@@ -43,8 +43,12 @@ public class TypeOf extends ProgramMetaConstruct {
         if (insts.getContextInstantiation() != null) {
 	    ec = insts.getContextInstantiation().activeStatementContext();
 	}
-
-	final KeYJavaType kjt = services.getTypeConverter().getKeYJavaType((Expression)pe, ec);
+        KeYJavaType kjt=null;
+        if(pe instanceof Expression){
+            kjt = services.getTypeConverter().getKeYJavaType((Expression)pe, ec);
+        }else{
+            kjt = ((TypeRef) pe).getKeYJavaType();
+        }
         
         assert kjt != null;  
         

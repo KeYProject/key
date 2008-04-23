@@ -20,11 +20,11 @@ import java.util.HashSet;
 
 public class OpCollector extends Visitor{
     /** the found operators */
-    private HashSet ops;
+    private HashSet<Operator> ops;
 
     /** creates the Op collector */
     public OpCollector() {
-	ops = new HashSet();
+	ops = new HashSet<Operator>();
     }
 
     public void visit(Term t) {	

@@ -21,7 +21,7 @@ import de.uka.ilkd.key.util.Debug;
 /**
  * The default implementation of an assignment pair.
  * There exists a lazy one to which may spare resources
- * @see de.uka.ilkd.key.rule.updatesimplifier.AsssignmentPairLazy
+ * @see AssignmentPairLazy
  * @author bubel
  */
 public class AssignmentPairImpl implements AssignmentPair {
@@ -76,9 +76,9 @@ public class AssignmentPairImpl implements AssignmentPair {
      * 
      * @see de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair#locationAsTerm()
      */
-    public Term locationAsTerm() {       
+    public Term locationAsTerm() {              
         return TermFactory.DEFAULT.createTerm(accessOp, locSubs,
-                new ArrayOfQuantifiableVariable(), JavaBlock.EMPTY_JAVABLOCK);
+                null, JavaBlock.EMPTY_JAVABLOCK);
     }
 
     /**

@@ -38,7 +38,8 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     // Keeps the mapping of ProgramSVSort names to
     // ProgramSVSort instances (helpful in parsing
     // schema variable declarations)
-    private static HashMap name2sort = new HashMap(60);
+    private static HashMap<Name, ProgramSVSort> name2sort = 
+        new HashMap<Name, ProgramSVSort>(60);
 
     //----------- Types of Expression Program SVs ----------------------------
    
@@ -95,6 +96,9 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 
     public static final ProgramSVSort METHODBODY
 	= new MethodBodySort();
+
+    public static final ProgramSVSort PUREMETHODBODY
+        = new PureMethodBodySort();
 
     public static final ProgramSVSort NONMODELMETHODBODY
 	= new NonModelMethodBodySort();
@@ -215,6 +219,8 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     public static final ProgramSVSort GUARD = new GuardSort();
 
     public static final ProgramSVSort FORUPDATES = new ForUpdatesSort();
+    
+    public static final ProgramSVSort FORLOOP = new ForLoopSort();
 
     public static final ProgramSVSort MULTIPLEVARDECL
 	= new MultipleVariableDeclarationSort();
@@ -277,6 +283,10 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     public static final ProgramSVSort IMPLICITCREATED
         = new ImplicitFieldSort(new Name("ImplicitCreated"),
                                 ImplicitFieldAdder.IMPLICIT_CREATED, true);
+    
+    public static final ProgramSVSort IMPLICITENLOSINGTHIS
+    = new ImplicitFieldSort(new Name("ImplicitEnclosingThis"),
+                            ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, true);
 
     public static final ProgramSVSort IMPLICITTRAINITIALIZED
 	= new ImplicitFieldSort(new Name("ImplicitTraInitialized"),
@@ -767,6 +777,25 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 
     /**
      * This sort represents a type of program schema variables that
+     * match only on pure method body statements
+     * 
+     * TODO: Maybe further checks in canStandFor? (i.e. is the resultvariable available?)
+     */    
+    private static class PureMethodBodySort extends ProgramSVSort{
+
+        public PureMethodBodySort() {
+            super(new Name("PureMethodBody"));
+        }
+
+        protected boolean canStandFor(ProgramElement check, Services services) {
+            return ( (check instanceof MethodBodyStatement)
+            && ((MethodBodyStatement)check).isPure( services )
+            && ((MethodBodyStatement)check).getResultVariable() != null ) ;
+        }
+    }
+
+    /**
+     * This sort represents a type of program schema variables that
      * match only on method body statements for nonmodel methods for which
      * an implementation is present.
      */    
@@ -783,9 +812,12 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	    
             final ProgramMethod pm = 
 		((MethodBodyStatement) pe).getProgramMethod(services);
+            if(pm == null) {
+                return false;
+            }
 	    final MethodDeclaration methodDeclaration = pm.getMethodDeclaration();
             
-            return !(pm.isModel() ||
+            return !(//pm.isModel() ||
                      methodDeclaration.getBody() == null) ||
                      (methodDeclaration instanceof ConstructorDeclaration);
 	}
@@ -1106,6 +1138,15 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	    return (check instanceof ForUpdates);
 
 	}
+    }
+    
+    private static class ForLoopSort extends ProgramSVSort {
+        public ForLoopSort() {
+            super(new Name("ForLoop"));
+        }
+        protected boolean canStandFor(ProgramElement check, Services services) {
+            return (check instanceof For);
+        }
     }
         
     private static class SwitchSVSort extends ProgramSVSort{
@@ -1568,7 +1609,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	return elemname.charAt(0)=='<';
     }
 
-    public static HashMap name2sort() {
+    public static HashMap<Name, ProgramSVSort> name2sort() {
         return name2sort;
     }
    

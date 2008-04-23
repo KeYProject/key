@@ -22,6 +22,8 @@ public class VBTStrategy extends JavaCardDLStrategy {
 
     protected static StrategyProperties setupStrategyProperties() {
         final StrategyProperties res = new StrategyProperties ();
+        res.setProperty( StrategyProperties.SPLITTING_OPTIONS_KEY,
+                StrategyProperties.SPLITTING_NORMAL);  
         res.setProperty ( StrategyProperties.LOOP_OPTIONS_KEY,
                           StrategyProperties.LOOP_EXPAND );
         res.setProperty ( StrategyProperties.METHOD_OPTIONS_KEY,
@@ -74,11 +76,7 @@ public class VBTStrategy extends JavaCardDLStrategy {
 
     protected boolean arithDefOps() {
 	return true;
-    }
-
-    
-
-    
+    }   
     
     public Name name () {
         return new Name("VBTStrategy");

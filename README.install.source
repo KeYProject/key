@@ -19,7 +19,7 @@ Needed additional Libraries:
 	javacc.jar Version >= 3.0 : parser generator
 	dresden-ocl-demo.jar: ocl parser
 	xerces.jar version 1.4.4: used by tudresden.jar
-	recoder.jar version 0.75_KeY_TypeResolutionInMethodFrameFixed: 
+	recoderKey.jar 
                  a transformation framework for java patched by the KeY group
 	junit.jar version 3.8.1: test framework
 	jargs.jar
@@ -28,7 +28,7 @@ Needed additional Libraries:
 Optionally, KeY can make use of the following binaries:
 	Grammatical Framework
 	ESC Java's decision procedure `Simplify´
-        SMT-LIB provers: bindings exist currently for Yices, CVSLite and SVC
+        SMT-LIB provers: bindings exist currently for Yices, CVCLite, CVC3 and SVC
               (export to SMT input file possible)        
 
 (2) Contents of the KeY-Distribution

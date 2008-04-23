@@ -128,7 +128,13 @@ public class SimpleStackOf<T> {
 	    return stack.val;
 	}
 
-	
+	/** 
+	 * throws an unsupported operation exception a
+	 */
+	 public void remove() {
+	     throw new UnsupportedOperationException("Removing elements via an iterator" +
+	    	" is not supported for simple stacks.");
+	 } 
     }
 
 }

@@ -94,7 +94,7 @@ public class ShadowAttributeOp extends AttributeOp implements ShadowedOperator {
 
     /**
      * @param variable
-     * @return
+     * @return true if possibly aliased
      */
     private boolean attributesAliased(IProgramVariable variable) {
         boolean attributesAliased = 

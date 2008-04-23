@@ -19,6 +19,7 @@ import java.util.zip.ZipOutputStream;
 import org.apache.log4j.*;
 
 import de.uka.ilkd.key.gui.DecisionProcedureSettings;
+import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.proof.Goal;
@@ -94,16 +95,12 @@ public abstract class DecisionProcedureSmtAuflia extends AbstractDecisionProcedu
     /** */
     private static Map fromProofToArchive = new WeakHashMap();
         
-    /* String constants for creation of the log file and benchmark archives */
-    private static final String pointKeyDir = 
-        System.getProperty( "user.home" ) + File.separator + ".key";
-        
     private static final String logPrefix = "smt_";
     private static final String logSuffix = "log";
-    private static final String logDir = pointKeyDir + File.separator + "SmtTrans_Logs";
+    private static final String logDir = PathConfig.KEY_CONFIG_DIR + File.separator + "SmtTrans_Logs";
     private static final String logFileCreateError = "SMT log file could not be created!\n";
     
-    private static final String archiveDir = pointKeyDir + File.separator + "SmtBench_Archive";
+    private static final String archiveDir = PathConfig.KEY_CONFIG_DIR + File.separator + "SmtBench_Archive";
     private static final String archiveFileExt = ".smt";
     private static final String zipFileExt = ".zip";
     private static final String 

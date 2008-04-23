@@ -15,7 +15,6 @@ import java.io.IOException;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.annotation.Annotation;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.ArrayOfIProgramVariable;
@@ -131,7 +130,6 @@ public class ProgramSVProxy
      *        Finds the source element that occurs first in the source. 
      *        @return the first source element in the syntactical representation of
      *        this element, may be equals to this element.
-     *        @see #toSource()
      *        @see #getStartPosition()
     */
     public SourceElement getFirstElement() {
@@ -143,7 +141,6 @@ public class ProgramSVProxy
  *        Finds the source element that occurs last in the source. 
  *        @return the last source element in the syntactical representation of
  *        this element, may be equals to this element.
- *        @see #toSource()
  *        @see #getEndPosition()
     */
     public SourceElement getLastElement() {
@@ -247,18 +244,6 @@ public class ProgramSVProxy
     public PositionInfo getPositionInfo () {
         return PositionInfo.UNDEFINED;
     }
-
-    /**
-     *@return the annotations.
-     */
-    public Annotation[] getAnnotations(){
-	return new Annotation[0];
-    }
-
-    public int getAnnotationCount(){
-	return 0;
-    }
-
 
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         // TODO Auto-generated method stub

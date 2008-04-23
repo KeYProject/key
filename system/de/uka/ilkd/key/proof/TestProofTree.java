@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.util.Iterator;
+
 import junit.framework.TestCase;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -139,7 +141,7 @@ public class TestProofTree extends TestCase {
         assertTrue("n4 should have sibling nr 2", n4.siblingNr() == 2);
         assertTrue("n5 should have sibling nr 0", n5.siblingNr() == 0);
 
-	IteratorOfNode it=p.root().leavesIterator();
+	Iterator<Node> it=p.root().leavesIterator();
 	int i=0;
 	while (it.hasNext()) {
 	    assertEquals(it.next().toString(),

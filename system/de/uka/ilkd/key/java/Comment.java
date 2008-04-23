@@ -24,6 +24,11 @@ public class Comment extends JavaSourceElement {
 	this.text = text;
     }
 
+    public Comment(String text, PositionInfo pInfo) {
+        super(pInfo);
+        this.text = text;
+    }
+
     public boolean isPrefixed () {
 	return false;
     }
@@ -41,33 +46,12 @@ public class Comment extends JavaSourceElement {
     public String getText(){
 	return text;
     }
-
-    public boolean containsJMLSpec(){
-	if(text == null){
-	    return false;
-	}
-	return text.trim().startsWith("/*@") || text.trim().startsWith("//@")||
-	    text.trim().startsWith("/*+@") || text.trim().startsWith("/*-@")||
-	    text.indexOf("<jml>")!=-1 && text.indexOf("</jml>")!=-1;
+    
+    
+    public String toString() {
+        return getText();
     }
 
-    public String getJMLSpec(){
-	if(!containsJMLSpec()) return null;
-	if(text.trim().startsWith("/*@")){
-	    return text.trim().substring(3,text.length()-3);
-	}
-	if(text.trim().startsWith("/*+@")){
-	    return text.trim().substring(4,text.length()-3);
-	}
-	if(text.trim().startsWith("/*-@")){
-	    return text.trim().substring(4,text.length()-3);
-	}
-	if(text.trim().startsWith("//@")){
-	    return text.trim().substring(3);
-	}	    
-	int start = text.indexOf("<jml>")+5;
-	return text.substring(start, text.indexOf("</jml>", start));
-    }
 
     /** comments can be ignored
      */
@@ -90,6 +74,4 @@ public class Comment extends JavaSourceElement {
      	Comment cmp = (Comment)o;
      	return (getText().equals(cmp.getText()));
      }
-
-
 }

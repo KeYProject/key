@@ -50,6 +50,7 @@ public class NonRigidFunctionLocation extends Function implements NonRigid, Loca
 	return (this==loc);
     }
     
+    
     public String proofToString() {
         return "\\nonRigid[Location] " + super.proofToString();
     }

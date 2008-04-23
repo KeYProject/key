@@ -13,10 +13,11 @@ package de.uka.ilkd.key.proof;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Iterator;
 import java.util.Vector;
 
+import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -29,6 +30,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PresentationFeatures;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.*;
 
@@ -38,17 +40,13 @@ import de.uka.ilkd.key.rule.inst.*;
  */
 public class ProofSaver {
 
-   protected Main main;
+   protected IMain main;
    protected KeYMediator mediator;
    protected String filename;
    protected Proof proof;
    LogicPrinter printer;
    
-   
-   private ProofSaver() {
-   }
-
-   public ProofSaver(Main main, String filename) {
+   public ProofSaver(IMain main, String filename) {
       this.main = main;
       this.mediator = main.mediator();
       this.filename = filename;
@@ -59,11 +57,11 @@ public class ProofSaver {
     StringBuffer logstr=new StringBuffer();
     //Advance the Logentries
     if(p.userLog==null)
-        p.userLog = new Vector();
+        p.userLog = new Vector<String>();
     if(p.keyVersionLog==null)
-        p.keyVersionLog = new Vector();
+        p.keyVersionLog = new Vector<String>();
     p.userLog.add(System.getProperty("user.name"));
-    p.keyVersionLog.add(Main.getInstance().getPrcsVersion());
+    p.keyVersionLog.add(main.getInternalVersion());
     int s = p.userLog.size();
     for(int i=0; i<s; i++){
 	logstr.append("(keyLog \""+i+"\" (keyUser \""+
@@ -163,12 +161,19 @@ public class ProofSaver {
       	tree.append("\"");        
         tree.append(posInOccurrence2Proof(node.sequent(), 
                                           appliedRuleApp.posInOccurrence()));
-        if (appliedRuleApp instanceof MethodContractRuleApp) {
+
+        if (appliedRuleApp.rule() instanceof UseOperationContractRule) {
+            RuleJustificationBySpec ruleJusti = (RuleJustificationBySpec) 
+                            proof.env().getJustifInfo()
+                                       .getJustification(appliedRuleApp, 
+                                                         proof.getServices());
+
             tree.append(" (contract \"");
-            tree.append(((MethodContractRuleApp)appliedRuleApp).getMethodContract().getName());
+            tree.append(ruleJusti.getSpec().toString());
             tree.append("\")");
         }
-      	tree.append(")\n");
+
+        tree.append(")\n");
       }
    }
        
@@ -178,7 +183,7 @@ public class ProofSaver {
                                      StringBuffer tree) {       
 
       printSingleNode(node, prefix, tree);
-      IteratorOfNode childrenIt = null;
+      Iterator<Node> childrenIt = null;
       
       while (node.childrenCount() == 1) {
           childrenIt = node.childrenIterator();

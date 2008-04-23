@@ -21,7 +21,7 @@ public class ModelSourceSettings implements Settings{
 
     private static final String MODEL_SOURCE_KEY = "[Model]Source";
 
-    private LinkedList listenerList = new LinkedList();
+    private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
     private String modelSource="1";
     private String modelSourceNew;
     private boolean changed;
@@ -74,9 +74,9 @@ public class ModelSourceSettings implements Settings{
      * changed to its registered listeners (not thread-safe)
      */
     protected void fireSettingsChanged() {
-	Iterator it = listenerList.iterator();
+	Iterator<SettingsListener> it = listenerList.iterator();
 	while (it.hasNext()) {
-	    ((SettingsListener)it.next()).settingsChanged(new GUIEvent(this));
+	    it.next().settingsChanged(new GUIEvent(this));
 	}
     }
 

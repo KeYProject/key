@@ -91,7 +91,7 @@ public abstract class InitArray extends ProgramMetaConstruct {
 	KeYJavaType       arrayType    =
 	    ((NewArray)p_creationExpression).getKeYJavaType ();
 
-	ExtList           children     = new ExtList ();
+	ExtList children     = new ExtList ();
 	children.add ( new IntLiteral ( initializers.size () ) );
 	children.add ( ((NewArray)p_creationExpression).getTypeReference () );
 

@@ -10,22 +10,28 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import de.uka.ilkd.key.logic.BasicLocationDescriptor;
-import de.uka.ilkd.key.logic.IteratorOfLocationDescriptor;
+import de.uka.ilkd.key.logic.EverythingLocationDescriptor;
 import de.uka.ilkd.key.logic.LocationDescriptor;
 import de.uka.ilkd.key.logic.SetAsListOfLocationDescriptor;
+import de.uka.ilkd.key.logic.SetAsListOfTerm;
 import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
+import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.speclang.FormulaWithAxioms;
 
 
 /**
  * Replaces operators in a term by other operators with the same signature, 
- * or subterms of the term by other terms with the same sort.
+ * or subterms of the term by other terms with the same sort. Does not 
+ * replace in java blocks.
  */
 public class OpReplacer {
     private static final TermFactory TF = TermFactory.DEFAULT;
@@ -44,18 +50,32 @@ public class OpReplacer {
     
     
     /**
+     * Replaces in an operator.
+     */
+    public Operator replace(Operator op) {
+        Operator newOp = (Operator) map.get(op);
+        if(newOp != null) {
+            return newOp;
+        } else {
+            return op;
+        }
+    }
+    
+    
+    /**
      * Replaces in a term.
      */
     public Term replace(Term term) {
+        if(term == null) {
+            return null;
+        }
+        
         Term newTerm = (Term) map.get(term); 
         if(newTerm != null) {
             return newTerm;
         }
-        
-        Operator newOp = (Operator) map.get(term.op());
-        if(newOp == null) {
-            newOp = term.op();
-        }
+
+        Operator newOp = replace(term.op());
         
         int arity = term.arity();
         Term newSubTerms[] = new Term[arity];
@@ -66,6 +86,8 @@ public class OpReplacer {
         for(int i = 0; i < arity; i++) {
             Term subTerm = term.sub(i);
             newSubTerms[i] = replace(subTerm);
+            
+            // Is it guaranteed that no variables are renamed in the replaced term?
             boundVars[i] = term.varsBoundHere(i);
     
             if(newSubTerms[i] != subTerm) {
@@ -83,18 +105,31 @@ public class OpReplacer {
         }
     
         return result;
-    }
+    }  
     
+    /**
+     * Replaces in a set of terms.
+     */
+    public SetOfTerm replace(SetOfTerm terms) {
+        SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
+        for (final Term term : terms) {
+            result = result.add(replace(term));
+        }
+        return result;
+    }
 
     /**
      * Replaces in a location descriptor.
      */
     public LocationDescriptor replace(LocationDescriptor loc) {
-        if(loc instanceof BasicLocationDescriptor) {
+        if(loc == null) {
+            return null;
+        } else if(loc instanceof BasicLocationDescriptor) {
             BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
             return new BasicLocationDescriptor(replace(bloc.getFormula()), 
                                                replace(bloc.getLocTerm()));
         } else {
+            assert loc instanceof EverythingLocationDescriptor;
             return loc;
         }
     }
@@ -106,10 +141,34 @@ public class OpReplacer {
     public SetOfLocationDescriptor replace(SetOfLocationDescriptor locs) {
 	SetOfLocationDescriptor result 
 		= SetAsListOfLocationDescriptor.EMPTY_SET;
-	IteratorOfLocationDescriptor it = locs.iterator();
-	while(it.hasNext()) {
-	    result = result.add(replace(it.next()));
+	for (final LocationDescriptor loc : locs) {
+	    result = result.add(replace(loc));
 	}
 	return result;
+    }
+    
+    
+    /**
+     * Replaces in a map from Operator to Term.
+     */
+    public Map<Operator, Term> replace(/*in*/ Map<Operator, Term> map) {
+        
+        Map<Operator,Term> result = new HashMap<Operator, Term>();
+        
+        final Iterator<Map.Entry<Operator, Term>> it = map.entrySet().iterator();
+        while(it.hasNext()) {
+            final Map.Entry<Operator, Term> entry = it.next();
+            result.put(replace(entry.getKey()), replace(entry.getValue()));
+        }        
+        return result;
+    }
+    
+   
+    /**
+     * Replaces in a FormulaWithAxioms.
+     */
+    public FormulaWithAxioms replace(FormulaWithAxioms fwa) {
+        return new FormulaWithAxioms(replace(fwa.getFormula()), 
+                                     replace(fwa.getAxioms()));
     }
 }

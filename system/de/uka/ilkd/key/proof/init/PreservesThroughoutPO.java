@@ -11,13 +11,9 @@ package de.uka.ilkd.key.proof.init;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.casetool.ModelMethod;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ListOfProgramVariable;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.speclang.ListOfClassInvariant;
-import de.uka.ilkd.key.speclang.SLTranslationError;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 
 
 /**
@@ -25,15 +21,16 @@ import de.uka.ilkd.key.speclang.SLTranslationError;
  */
 public class PreservesThroughoutPO extends EnsuresPO {
     
-    private ListOfClassInvariant invs;
+    private SetOfClassInvariant invs;
     
-    public PreservesThroughoutPO(ModelMethod modelMethod, 
-                                 ListOfClassInvariant invs,
-                                 InvariantSelectionStrategy invStrategy) {
-        super("PreservesThroughout", 
-              modelMethod, 
+    public PreservesThroughoutPO(InitConfig initConfig,
+	    			 ProgramMethod programMethod, 
+                                 SetOfClassInvariant invs) {
+        super(initConfig,
+              "PreservesThroughout", 
+              programMethod, 
               Op.TOUT,
-              invStrategy,
+              invs,
               true);
         this.invs = invs;
     }
@@ -43,8 +40,8 @@ public class PreservesThroughoutPO extends EnsuresPO {
                               ListOfProgramVariable paramVars, 
                               ProgramVariable resultVar,
                               ProgramVariable exceptionVar,
-                              Map atPreFunctions) {
-        return tb.tt();
+                              Map<Operator, Function/*atPre*/> atPreFunctions) throws ProofInputException {
+        return TB.tt();
     }
     
     
@@ -52,7 +49,22 @@ public class PreservesThroughoutPO extends EnsuresPO {
                                ListOfProgramVariable paramVars, 
                                ProgramVariable resultVar,
                                ProgramVariable exceptionVar,
-                               Map atPreFunctions) throws SLTranslationError {        
+                               Map<Operator, Function/*atPre*/> atPreFunctions) throws ProofInputException {        
         return translateInvs(invs);
+    }
+    
+    
+    public boolean equals(Object o) {
+        if(!(o instanceof PreservesThroughoutPO)) {
+            return false;
+        }
+        PreservesThroughoutPO po = (PreservesThroughoutPO) o;
+        return super.equals(po)
+               && invs.equals(po.invs);
+    }
+    
+    
+    public int hashCode() {
+        return super.hashCode() + invs.hashCode();
     }
 }

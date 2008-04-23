@@ -26,7 +26,7 @@ public class ExtendedIdentifier extends recoder.java.Identifier {
         id=text.intern();
     }
     
-    public Object deepClone() {
+    public ExtendedIdentifier deepClone() {
         return new ExtendedIdentifier(id);
     }
 }

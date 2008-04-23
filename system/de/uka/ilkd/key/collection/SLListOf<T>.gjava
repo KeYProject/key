@@ -339,6 +339,16 @@ public abstract class SLListOf<T> implements ListOf<T> {
 	    public boolean hasNext() {
 		return list != EMPTY_LIST;
 	    }    
+
+	   /** 
+	    * throws an unsupported operation exception as removing elements
+	    * is not allowed on immutable lists
+	    */
+	    public void remove() {
+	    	throw new UnsupportedOperationException("Removing elements via an iterator" +
+	    	" is not supported for immutable datastructures.");
+	    } 
+	    
 	}
 
 
@@ -444,7 +454,16 @@ public abstract class SLListOf<T> implements ListOf<T> {
 	     */ 
 	    public boolean hasNext() {
 		return false;
-	    }    
+	    }
+	    
+	    /** 
+	     * throws an unsupported operation exception as removing elements
+	     * is not allowed on immutable lists
+	     */
+	    public void remove() {
+	    	throw new UnsupportedOperationException("Removing elements via an iterator" +
+	    	" is not supported for immutable datastructures.");
+	    }     
 	}
     }
 }

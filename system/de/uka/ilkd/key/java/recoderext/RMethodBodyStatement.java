@@ -23,7 +23,7 @@ import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.TypeReferenceContainer;
 import recoder.java.statement.JavaStatement;
-import recoder.list.ExpressionMutableList;
+import recoder.list.generic.ASTList;
 
 
 public class RMethodBodyStatement extends JavaStatement 
@@ -35,7 +35,7 @@ public class RMethodBodyStatement extends JavaStatement
     
     private ReferencePrefix methodReferencePrefix;
     private Identifier methodName;    
-    private ExpressionMutableList arguments;
+    private ASTList<Expression> arguments;
 
     public RMethodBodyStatement(TypeReference typeRef, 
                                 ProgramVariableSVWrapper resVar, 
@@ -49,7 +49,7 @@ public class RMethodBodyStatement extends JavaStatement
     public RMethodBodyStatement(TypeReference typeRef, 
             ProgramVariableSVWrapper resVar, 
             ReferencePrefix prefix, Identifier methodName, 
-            ExpressionMutableList arguments) {
+            ASTList<Expression> arguments) {
         this.bodySource = typeRef;
         this.resultVar = resVar;
         this.methodReferencePrefix = prefix;
@@ -63,13 +63,13 @@ public class RMethodBodyStatement extends JavaStatement
     public void accept(SourceVisitor visitor) {
     }
 
-    public Object deepClone() {
+    public RMethodBodyStatement deepClone() {
         return new RMethodBodyStatement
             ((TypeReference)bodySource.deepClone(), 
              (ProgramVariableSVWrapper)resultVar.deepClone(), 
              (ReferencePrefix)methodReferencePrefix.deepClone(),
              (Identifier)methodName.deepClone(),
-             (ExpressionMutableList)arguments.deepClone());
+             (ASTList<Expression>)arguments.deepClone());
     }
     
     /**
@@ -123,7 +123,7 @@ public class RMethodBodyStatement extends JavaStatement
             index--;
         }
         if (arguments != null) {
-            return arguments.getExpression(index);            
+            return arguments.get(index);            
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -147,7 +147,7 @@ public class RMethodBodyStatement extends JavaStatement
         }
         
         for (int i = 0, sz = arguments.size(); i<sz; i++) {                
-            final Expression e = arguments.getExpression(i);
+            final Expression e = arguments.get(i);
             if (e == child) {                
                 return i+4;
             }                
@@ -176,7 +176,7 @@ public class RMethodBodyStatement extends JavaStatement
         
         if (arguments != null) {
             for (int i = 0, sz = arguments.size(); i<sz; i++) {                
-                arguments.getExpression(i).setExpressionContainer(this);                
+                arguments.get(i).setExpressionContainer(this);                
             }
         }
     }
@@ -224,7 +224,7 @@ public class RMethodBodyStatement extends JavaStatement
             return true;
         } else {                    
             for (int i = 0, sz = arguments.size(); i<sz; i++) {                
-                final Expression e = arguments.getExpression(i);
+                final Expression e = arguments.get(i);
                 if (e == p) {
                     final Expression exp = e;
                     arguments.set(i, exp);
@@ -271,7 +271,7 @@ public class RMethodBodyStatement extends JavaStatement
 
     public Expression getExpressionAt(int index) {
         if (arguments != null) {
-            return arguments.getExpression(index);
+            return arguments.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }

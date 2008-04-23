@@ -64,6 +64,13 @@ public class OneOfCP implements Feature {
                     }
                 };
             }
+            
+            /** 
+             * throws an unsupported operation exception
+             */
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
         }
             
         public IteratorOfCPBranch getBranches(RuleApp oldApp) {

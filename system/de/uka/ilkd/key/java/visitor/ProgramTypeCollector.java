@@ -37,26 +37,17 @@ public class ProgramTypeCollector extends JavaASTVisitor {
     private HashSet result = new HashSet();
     private HashSet programMethods = new HashSet();
     private KeYJavaType type;
-    private Services services;
     private ProgramVariable self;
     private Set alreadyVisitedProgramMethods;
     
     public ProgramTypeCollector(ProgramElement root, ProgramVariable self, 
 				KeYJavaType type, Services services,
 				Set alreadyVisitedProgramMethods) {
-	super(root);
+	super(root, services);
 	this.type = type;
 	this.self=self;
-        this.services = services;
 	this.alreadyVisitedProgramMethods =
 	    alreadyVisitedProgramMethods;
-    }
-
-    /** the action that is performed just before leaving the node the
-     * last time 
-     */
-    protected void doAction(ProgramElement node) {
-	node.visit(this);
     }
 
     /** starts the walker*/

@@ -10,21 +10,24 @@
 
 package de.uka.ilkd.key.casetool.together.scripts.menuextension;
 
-import de.uka.ilkd.key.casetool.FunctionalityOnModel;
-import de.uka.ilkd.key.casetool.ModelMethod;
+import de.uka.ilkd.key.casetool.together.FunctionalityOnModel;
+import de.uka.ilkd.key.casetool.together.TogetherModelMethod;
 import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 
 
 public class OpMenuPoint9 extends OpMenu {
     public String getMenuEntry() {
-        return "EnsuresPost (partial)";
+        return "EnsuresPost";
     }
 
     public String getSubMenuName() {
         return "vertical";
     }
     
-    protected String runCore(ModelMethod modelMethod) {
-        return FunctionalityOnModel.proveEnsuresPost(modelMethod, Op.BOX);
+    protected String runCore(TogetherModelMethod modelMethod) 
+    		throws ProofInputException {
+        FunctionalityOnModel.proveEnsuresPost(modelMethod);
+        return "";
     }
 }

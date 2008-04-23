@@ -75,14 +75,11 @@ public class StaticProgramChecker
      */
     private final KeYJavaType LEVEL   = new KeYJavaType ();
 
-    private final Services services;
-
     private final Logger logger = Logger.getLogger ( "key.taclet_soundness" );
 
     public StaticProgramChecker ( ProgramElement p_root,
 				  Services       p_services ) {
-	super(p_root);
-	services = p_services;
+	super(p_root, p_services);
     }
 
     /**
@@ -157,13 +154,6 @@ public class StaticProgramChecker
 		p_array.getKeYJavaType ( p_pos ) == UNKNOWN ||
 		p_progEl.getChildAt ( p_pos ) instanceof ExpressionStatement ) )
 	    raiseTypeError ();	    
-    }
-
-    /** the action that is performed just before leaving the node the
-     * last time 
-     */
-    protected void doAction(ProgramElement node) {
-	node.visit(this);
     }
 
     public void doAssignment () {
@@ -624,6 +614,10 @@ public class StaticProgramChecker
     
     public void performActionOnCopyAssignment(CopyAssignment x) {
 	doAssignment ();
+    }
+    
+    public void performActionOnSetAssigment(SetAssignment x) {
+        doAssignment ();
     }
 
     public void performActionOnDivide(Divide x)     {

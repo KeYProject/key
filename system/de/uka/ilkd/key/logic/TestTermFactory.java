@@ -62,8 +62,8 @@ public class TestTermFactory extends TestCase {
     }
 
     public void setUp() {
-	Term et_x=new OpTerm(x,new Term[0]);
-	Term et_px=new OpTerm(p, new Term[]{et_x});
+	Term et_x=OpTerm.createOpTerm(x, new Term[0]);
+	Term et_px=OpTerm.createOpTerm(p, new Term[]{et_x});
 	et1=et_px;       
     }
 
@@ -123,8 +123,7 @@ public class TestTermFactory extends TestCase {
      * constructed anyway, as subformulae are not checked
      */
     public void testWithInvalidSubformulae() { 
-	Term invalidBuilt=new OpTerm(p, 
-				     new Term[]{ new OpTerm(y,new Term[0])});
+	Term invalidBuilt=OpTerm.createOpTerm(p, new Term[]{ OpTerm.createOpTerm(y, new Term[0])});
 	try {
 	    Term t_px_or_py=tf.createJunctorTerm(Op.OR,
 						 new Term[]{invalidBuilt, 
@@ -136,7 +135,7 @@ public class TestTermFactory extends TestCase {
 
     public void testConstantTrue() {
         Term t_true=tf.createJunctorTerm(Op.TRUE,new Term[0]);
-	Assert.assertEquals(t_true,new OpTerm(Op.TRUE,new Term[0]));
+	Assert.assertEquals(t_true,OpTerm.createOpTerm(Op.TRUE, new Term[0]));
     }
 
     public void testQuantifierTerm() {
@@ -148,13 +147,12 @@ public class TestTermFactory extends TestCase {
 
     public void testJunctorTerm() {
 	Term  t_px_imp_ryw= tf.createJunctorTerm(Op.IMP, t1(), t2());
-	Assert.assertEquals(t_px_imp_ryw, new OpTerm(Op.IMP,
-						     new Term[]{ t1(), t2()}));
+	Assert.assertEquals(t_px_imp_ryw, OpTerm.createOpTerm(Op.IMP, new Term[]{ t1(), t2()}));
     }
 
     public void testNegationTerm() {
 	Term t_not_ryw=tf.createJunctorTerm(Op.NOT, t2());
-	Assert.assertEquals(t_not_ryw, new OpTerm(Op.NOT,new Term[]{ t2()}));
+	Assert.assertEquals(t_not_ryw, OpTerm.createOpTerm(Op.NOT, new Term[]{ t2()}));
     }
 
     public void testDiamondTerm() {
@@ -226,8 +224,8 @@ public class TestTermFactory extends TestCase {
 	Term t_mv=tf.createFunctionTerm(xx, new Term[0]);
 	Term t_pxx=tf.createFunctionTerm(p, new Term[]{t_mv});	
 	Assert.assertEquals(t_pxx,
-			    new OpTerm(p, new Term[]{
-					       new OpTerm(xx,new Term[0])}));
+			    OpTerm.createOpTerm(p, new Term[]{
+					       OpTerm.createOpTerm(xx, new Term[0])}));
     }
 
 

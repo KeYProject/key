@@ -12,16 +12,12 @@
 package de.uka.ilkd.key.java.reference;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
-import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
+import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
+import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -263,10 +259,23 @@ public class MethodReference extends JavaNonTerminalProgramElement
     public ProgramMethod method(Services services, 
             			KeYJavaType refPrefixType, 
             			ExecutionContext ec) {	
-
-        return method(services, refPrefixType, 
+        ProgramVariable inst = services.getJavaInfo().getAttribute(
+                ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, ec.getTypeReference().getKeYJavaType());
+        ProgramMethod pm = method(services, refPrefixType, 
                 getMethodSignature(services, ec),
                 ec.getTypeReference().getKeYJavaType());
+        while(inst!=null && pm==null){
+            KeYJavaType classType = inst.getKeYJavaType();
+            pm = method(services, classType, 
+                    getMethodSignature(services, ec),
+                    classType);
+            if(pm!=null){
+                return pm;
+            }
+            inst = services.getJavaInfo().getAttribute(
+                    ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, classType);
+        }
+        return pm;
     }
     
     /**
@@ -286,10 +295,6 @@ public class MethodReference extends JavaNonTerminalProgramElement
         final String methodName = name.toString();
         ProgramMethod pm = services.getJavaInfo().getProgramMethod(classType, 
                 methodName, signature, context);
-	if(pm == null){
-	    pm = services.getImplementation2SpecMap().
-		lookupModelMethod(classType, new Name(methodName));
-	}
 	return pm;
     }
     

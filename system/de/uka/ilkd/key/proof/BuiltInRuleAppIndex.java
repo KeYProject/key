@@ -50,9 +50,7 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
 	    BuiltInRule bir = it.next();            
             if (bir.isApplicable(goal, pos, userConstraint)) {
                 RuleApp app = new BuiltInRuleApp(bir, pos, userConstraint);
-                if (goal.proof().mgt().ruleApplicable(app, goal)) {
-                    result = result.prepend(app);
-                }
+                result = result.prepend(app);
             }
 	}
 
@@ -147,10 +145,8 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
         final PosInOccurrence    pos = new PosInOccurrence 
 		( cfma, PosInTerm.TOP_LEVEL, antec );
         if (rule.isApplicable ( goal, pos, userConstraint ) ) {
-            BuiltInRuleApp app = new BuiltInRuleApp(rule, pos, userConstraint );
-            if (goal.proof().mgt().ruleApplicable(app, goal) ) {                            
-                listener.ruleAdded ( app, pos );
-            }
+            BuiltInRuleApp app = new BuiltInRuleApp(rule, pos, userConstraint );                            
+            listener.ruleAdded ( app, pos );
         }
     }
 

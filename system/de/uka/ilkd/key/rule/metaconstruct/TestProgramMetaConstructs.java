@@ -74,7 +74,8 @@ public class TestProgramMetaConstructs extends TestCase {
  	WhileLoopTransformation trans = 
  	    new WhileLoopTransformation(block2, 
 					new ProgramElementName("l1"), 
-					new ProgramElementName("l2"));
+					new ProgramElementName("l2"),
+                                        new Services());
  	trans.start();
  	System.out.println("Result:"+trans);	
     }

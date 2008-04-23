@@ -4,7 +4,6 @@
 package java.lang;
 
 import java.util.Random;
-import gnu.classpath.Configuration;
 public final class Math {
     private Math() {}
 

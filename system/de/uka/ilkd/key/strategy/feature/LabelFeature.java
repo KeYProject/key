@@ -1,11 +1,13 @@
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.HashMap;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.visualdebugger.HashMapFromPosInOccurrenceToLabel;
+import de.uka.ilkd.key.visualdebugger.Label;
 import de.uka.ilkd.key.visualdebugger.PCLabel;
 
 
@@ -29,7 +31,7 @@ public class LabelFeature extends BinaryFeature {
         final PosInOccurrence pio = previouslyAppliedRuleApp.posInOccurrence().topLevel();
         
         final NodeInfo nodeInfo = parent.getNodeInfo();
-        final HashMapFromPosInOccurrenceToLabel debugLabels = 
+        final HashMap<PosInOccurrence, Label> debugLabels = 
             nodeInfo.getVisualDebuggerState().getLabels();
         
         if( debugLabels.containsKey(pio)){

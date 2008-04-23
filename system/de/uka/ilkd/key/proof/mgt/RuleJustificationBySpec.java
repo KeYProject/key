@@ -9,25 +9,23 @@
 
 package de.uka.ilkd.key.proof.mgt;
 
-import java.util.List;
 
-public class RuleJustificationBySpec extends LemmaRuleJustification{
-
-    private Contract ct;
-
-    public RuleJustificationBySpec(Contract ms) {
-	this.ct = ms;
-    }
-
-    public Contract getContract() {
-	return ct;
+public class RuleJustificationBySpec implements RuleJustification {
+    
+    private final ContractWithInvs spec;
+    
+    
+    public RuleJustificationBySpec(ContractWithInvs spec) {
+        this.spec = spec;
     }
     
-    public List getProofList() {
-	return getContract().getProofs();
+    
+    public boolean isAxiomJustification() {
+        return false;
     }
-
-    public String toString() {
-	return "contract justification "+ct;
+    
+    
+    public ContractWithInvs getSpec() {
+        return spec;
     }
 }

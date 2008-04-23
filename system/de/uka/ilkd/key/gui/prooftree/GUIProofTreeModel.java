@@ -355,15 +355,15 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
      */
     private void updateTree(TreeNode trn) {
         if (trn == null || trn == getRoot()) { // bigger change, redraw whole tree
-	    proofTreeNodes = new HashMap();
-	    branchNodes    = new HashMap();
+	    proofTreeNodes = new HashMap<Node, GUIProofTreeNode>();
+	    branchNodes    = new HashMap<Node, GUIBranchNode>();
             fireTreeStructureChanged(new Object[]{getRoot()});
             return;
         }
         // otherwise redraw only a certain subtree
         // starting from the parent of trn
         flushCaches ( trn );
-        Object[] path = ((GUIAbstractTreeNode)trn.getParent()).getPath();
+        TreeNode[] path = ((GUIAbstractTreeNode)trn.getParent()).getPath();
         fireTreeStructureChanged(path);
     }
 
@@ -386,10 +386,10 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
     }
 
     private void flushCaches(Node n) {
-        final Stack workingList = new Stack ();
+        final Stack<Node> workingList = new Stack<Node> ();
         workingList.add ( n );
         while ( !workingList.empty () ) {
-            Node node = (Node)workingList.pop ();
+            Node node = workingList.pop ();
             final GUIBranchNode treeNode = findBranch ( node );
             if ( treeNode == null ) continue;
             treeNode.flushCache ();
@@ -431,14 +431,14 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
     // caches for the GUIProofTreeNode and GUIBranchNode objects
     // generated to represent the nodes resp. subtrees of the Proof.
     
-    private HashMap proofTreeNodes = new HashMap();
-    private HashMap branchNodes    = new HashMap();
+    private HashMap<Node, GUIProofTreeNode> proofTreeNodes = new HashMap<Node, GUIProofTreeNode>();
+    private HashMap<Node, GUIBranchNode> branchNodes    = new HashMap<Node, GUIBranchNode>();
     
     /** Return the GUIProofTreeNode corresponding to node n, if one
      * has already been generated, and null otherwise.
      */
     public GUIProofTreeNode find(Node n) {
-	return (GUIProofTreeNode)(proofTreeNodes.get(n));
+	return (proofTreeNodes.get(n));
     }
 
     /** Return the GUIProofTreeNode corresponding to node n.
@@ -458,7 +458,7 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
      * at n, if one has already been generated, and null otherwise.
      */
     public GUIBranchNode findBranch(Node n) {
-	return (GUIBranchNode) branchNodes.get(n);
+	return branchNodes.get(n);
     }
 
     /** 

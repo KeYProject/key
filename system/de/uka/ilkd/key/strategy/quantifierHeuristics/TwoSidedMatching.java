@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IUpdateOperator;
@@ -52,13 +53,13 @@ class TwoSidedMatching {
             triggerSubstWithMVs.apply ( trigger.getTriggerTerm () );
     }
     
-    SetOfSubstitution getSubstitutions() {
-        return getAllsubstitutions ( targetWithMVs );
+    SetOfSubstitution getSubstitutions(Services services) {
+        return getAllSubstitutions ( targetWithMVs, services );
     }
     
-    private SetOfSubstitution getAllsubstitutions(Term target) {
+    private SetOfSubstitution getAllSubstitutions(Term target, Services services) {
         SetOfSubstitution allsubs = SetAsListOfSubstitution.EMPTY_SET;
-        Substitution sub = match ( triggerWithMVs, target );
+        Substitution sub = match ( triggerWithMVs, target, services );
         if ( sub != null
              && ( trigger.isElementOfMultitrigger() || sub.isTotalOn ( trigger.getUniVariables() )
              // sub.containFreevar(trigger.ts.allTerm.
@@ -69,17 +70,18 @@ class TwoSidedMatching {
         final Operator op = target.op ();
         if ( !( op instanceof Modality || op instanceof IUpdateOperator ) ) {
             for ( int i = 0; i < target.arity (); i++ ) {
-                allsubs = allsubs.union ( getAllsubstitutions ( target.sub ( i ) ) );
+                allsubs = allsubs.union ( getAllSubstitutions ( target.sub ( i ), services ) );
             }
         }
         return allsubs;
     }
     
     /** find a substitution in a allterm by using unification */
-    private Substitution match(Term triggerTerm, Term targetTerm) {
+    private Substitution match(Term triggerTerm, Term targetTerm, 
+            Services services) {
         final Constraint c =
             Constraint.BOTTOM.unify ( targetTerm, triggerTerm,
-                                      Main.getInstance().mediator().getServices() );
+                                      services );
         if ( c.isSatisfiable () ) {
             MapFromQuantifiableVariableToTerm sub =
                 MapAsListFromQuantifiableVariableToTerm.EMPTY_MAP;
