@@ -1,6 +1,9 @@
 package visualdebugger.views;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+
+import javax.swing.SwingUtilities;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
@@ -281,21 +284,26 @@ public class VisualDebuggerView extends ViewPart implements DebuggerListener {
                 .setImageDescriptor(getImageDescriptor("stepover_co.gif"));
 
         showMainWindowAction = new Action("KeY-Prover Window",
-                Action.AS_CHECK_BOX) {
+                IAction.AS_CHECK_BOX) {
             public void run() {
-                if (this.isChecked()) {
-                    Main.getInstance().setVisible(true);
-                    // Main.getInstance().toFront();
-                } else
-                    Main.getInstance().setVisible(false);
+                final boolean isChecked = this.isChecked();
+                if (SwingUtilities.isEventDispatchThread()) {
+                    Main.getInstance(false).setVisible(isChecked);
+                } else {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {                            
+                            Main.getInstance(false).setVisible(isChecked);
+                        }
+                    });
+                }
+                // Main.getInstance().toFront();
                 VisualDebugger.showMainWindow = this.isChecked();
-
             }
         };
         showMainWindowAction.setChecked(false);
         // showMainWindowAction.setText("KeY-Prover");
         showMainWindowAction
-                .setToolTipText("Shows the KeY-Prover which runs in the background");
+        .setToolTipText("Shows the KeY-Prover which runs in the background");
 
         quanSplitAction = new Action(
                 "Quantifier Instantiation with Splitting ", Action.AS_CHECK_BOX) {
