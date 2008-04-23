@@ -74,7 +74,7 @@
 	      <pathelement location="../KeYPlugin"/>
 	      <pathelement location="${eclipse_home}/plugins/org.eclipse.ui_3.3.1.M20071128-0800.jar"/>
 	      <pathelement location="${eclipse_home}/plugins/org.eclipse.swt_3.3.2.v3349d.jar"/>
-	      <pathelement location="${eclipse_home}/plugins/org.eclipse.swt.carbon.macosx_3.3.3.v3349.jar"/>
+	      <pathelement location="${eclipse_home}/plugins/org.eclipse.swt.gtk.linux.x86_3.3.2.v3349.jar"/>
 	      <pathelement location="${eclipse_home}/plugins/org.eclipse.jface_3.3.2.M20080207-0800.jar"/>
 	      <pathelement location="${eclipse_home}/plugins/org.eclipse.core.commands_3.3.0.I20070605-0010.jar"/>
 	      <pathelement location="${eclipse_home}/plugins/org.eclipse.ui.workbench_3.3.2.M20080207-0800.jar"/>
