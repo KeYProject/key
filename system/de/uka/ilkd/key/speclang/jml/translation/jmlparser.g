@@ -30,12 +30,15 @@ header {
     import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
     import de.uka.ilkd.key.java.declaration.ClassDeclaration;
     import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+    import de.uka.ilkd.key.java.declaration.VariableDeclaration;
     import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
     import de.uka.ilkd.key.java.expression.literal.IntLiteral;
     import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+    import de.uka.ilkd.key.java.StatementBlock;
     import de.uka.ilkd.key.logic.BasicLocationDescriptor;
     import de.uka.ilkd.key.logic.EverythingLocationDescriptor;
     import de.uka.ilkd.key.logic.IteratorOfTerm;
+    import de.uka.ilkd.key.logic.JavaBlock; 
     import de.uka.ilkd.key.logic.ListOfTerm;
     import de.uka.ilkd.key.logic.LocationDescriptor;
     import de.uka.ilkd.key.logic.Name;
@@ -1730,7 +1733,7 @@ decimalnumeral returns [Term result=null] throws SLTranslationException
 
 jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 {
-    Term t=null, o1, o2, pre=null, dimTerm;
+    Term t=null, o1=null, o2=null, pre=null, dimTerm;
     ListOfTerm dimTerms = SLListOfTerm.EMPTY_LIST;
     KeYJavaType typ;
     ProgramMethod method;
@@ -2193,8 +2196,11 @@ typespec returns [KeYJavaType t = null] throws SLTranslationException
 	if(t == null && dim > 0) {
 	    //try to create missing array type
 	      try {
-	    javaInfo.readJavaBlock("{" + fullName + " k;}");
+	    JavaBlock jb=javaInfo.readJavaBlock("{" + fullName + " k;}");
 	    t = javaInfo.getKeYJavaType(fullName);
+	/*	t = ((VariableDeclaration) 
+                    ((StatementBlock) jb.program()).getChildAt(0)).
+                        getTypeReference().getKeYJavaType();*/
 	    } catch (Exception e) {
 	    t = null;
 		}

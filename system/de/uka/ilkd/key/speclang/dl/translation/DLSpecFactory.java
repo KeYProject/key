@@ -247,13 +247,13 @@ public class DLSpecFactory {
         
         
         Term[] argTerms = new Term[pm.getParameterDeclarationCount()+(pm.isStatic() ? 0 : 1)];
-        int i=0;
+        int j=0;
         if(!pm.isStatic()){
-                argTerms[0] = tb.var(selfVar);
+                argTerms[j++] = tb.var(selfVar);
         }
 
-        for(; i<argTerms.length; i++){
-            argTerms[i] = tb.var((ProgramVariable) pm.getParameterDeclarationAt(i).
+        for(int i=j; i<argTerms.length; i++){
+            argTerms[i] = tb.var((ProgramVariable) pm.getParameterDeclarationAt(i-j).
                     getVariableSpecification().getProgramVariable());
         }
         

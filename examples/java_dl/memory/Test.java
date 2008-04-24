@@ -113,12 +113,13 @@ public class Test extends SuperTest{
 	if(a>0){
 	    return oArr = new Object[a];
 	}
+	return null;
     }
 
     /*@ public normal_behavior
       @  requires true;
-      @//  working_space 2*\space(Test)+\space(TestRunnable)+
-      @  //       \space(LTMemory);
+      @  working_space \space(Test)+\space(TestRunnable)+
+      @         \space(LTMemory);
       @  ensures true;
       @*/
     public void enterScope(){
@@ -135,8 +136,8 @@ public class Test extends SuperTest{
       @        \outerScope(sm2.memoryArea, \currentMemoryArea);
       @ //       sm1.memoryArea == \currentMemoryArea.memoryArea &&
       @ //       sm2.memoryArea == \currentMemoryArea.memoryArea;
-      @ // working_space 2*\space(new Test())+\space(new TestRunnable(null, false))+
-      @   //    2*\space(new EnterScopeRunnable(null, null))+\space(new ScopedMemory(100));
+      @  working_space 2*\space(Test)+\space(TestRunnable)+
+      @     2*\space(EnterScopeRunnable)+\space(ScopedMemory);
       @  ensures true;
       @*/
     public void testScopeCycle(ScopedMemory sm1, ScopedMemory sm2){

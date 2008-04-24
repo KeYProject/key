@@ -69,7 +69,7 @@ public abstract class MemoryArea{
 	return size-consumed;
     }
 
-    /*@ public normal_behavior
+    /* public normal_behavior
       @  requires type==Byte.TYPE || type==Boolean.TYPE;
       @  working_space \space(new byte[number]);
       @ also public normal_behavior

@@ -219,7 +219,8 @@ public class JMLSpecExtractor implements SpecExtractor {
         String fileName = td.getPositionInfo().getFileName();
         
         //abort if library class (TODO: delete this)
-        if(td.isLibraryClass()) {
+        if(td.isLibraryClass() && td.getFullName().toString().indexOf("realtime")==-1 && 
+                td.getFullName().toString().indexOf("lang.Object")==-1) {
             return result;
         }
         
@@ -298,7 +299,8 @@ public class JMLSpecExtractor implements SpecExtractor {
         String fileName = td.getPositionInfo().getFileName();
 
         //abort if library class (TODO: delete this)
-        if(td.isLibraryClass()) {
+        if(td.isLibraryClass() && td.getFullName().toString().indexOf("realtime")==-1 && 
+                td.getFullName().toString().indexOf("lang.Object")==-1) {
             return result;
         }        
         

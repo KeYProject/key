@@ -33,7 +33,7 @@ import de.uka.ilkd.key.speclang.SetOfClassInvariant;
  */
 public class EnsuresPostPO extends EnsuresPO {
     
-    private final OperationContract contract;
+    protected final OperationContract contract;
     
     public EnsuresPostPO(InitConfig initConfig, 
                          String name,
@@ -73,6 +73,14 @@ public class EnsuresPostPO extends EnsuresPO {
             Function leq = (Function) services.getNamespaces().functions().lookup(new Name("leq")); 
             result = TB.and(result, TB.func(leq, TB.func(add, TB.dot(t_mem,consumed), 
                     workingSpace), TB.dot(t_mem, size)));
+            
+            final ProgramVariable stack = services.getJavaInfo().getAttribute(
+                    "stack", "javax.realtime.ScopedMemory");
+            result = TB.and(result, TB.not(TB.equals(TB.dot(t_mem,stack), TB.NULL(services))));
+            
+            Term initialMemCreatedAndNotNullTerm
+                = createdFactory.createCreatedAndNotNullTerm(services, t_mem);
+            result = TB.and(result, initialMemCreatedAndNotNullTerm);
         }
         return result;
     }

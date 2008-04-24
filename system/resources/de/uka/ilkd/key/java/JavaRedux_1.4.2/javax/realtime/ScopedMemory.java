@@ -17,25 +17,25 @@ public abstract class ScopedMemory extends MemoryArea{
       @*/
     private int referenceCount=0;
 
-    //@ public invariant stack!=null ==> (stack.top()==this && stack.stack.length>0);
-    public MemoryStack stack;
+    //@ public invariant stack!=null ==> (stack.top()==this && stack._stack.length>0);
+    public MemoryStack /*@nullable@*/ stack;
 
-    /*@ public invariant (\forall ScopedMemory m; (outerScope(m, this) <==>
-      @      (stack!=null && (\exists int i; i>=0 && i<stack.stack.length; 
-      @                       stack.stack[i]==m))));
+    /*@ public invariant (\forall ScopedMemory m; (\outerScope(m, this) <==>
+      @      (stack!=null && (\exists int i; i>=0 && i<stack._stack.length; 
+      @                       stack._stack[i]==m))));
       @*/
 
-    /*@ public invariant (\forall MemoryStack ms; (\exists int i; i>=0 && i<ms.stack.length;
-      @                                            ms.stack[i] == this) <==>
-      @                                           ms.stack[stack.stack.length-1]==this);
+    /*@ public invariant (\forall MemoryStack ms; (\exists int i; i>=0 && i<ms._stack.length;
+      @                                            ms._stack[i] == this) <==>
+      @                                           ms._stack[stack._stack.length-1]==this);
       @*/
 
     public MemoryStack stack(){
 	return stack;
     }
 
-    //@ public invariant parent!=null ==> outerScope(parent, this);
-    public ScopedMemory parent=null;
+    //@ public invariant parent!=null ==> \outerScope(parent, this);
+    public /*@nullable@*/ ScopedMemory parent=null;
 
     public ScopedMemory(long size){
 	super(size);
@@ -119,7 +119,7 @@ public abstract class ScopedMemory extends MemoryArea{
 
     /*@ public normal_behavior
       @  working_space 0;
-      @  ensures \result==outerScope(a,b);
+      @  ensures \result==\outerScope(a,b);
       @*/
     public static /*@pure@*/ boolean outerScopeM(MemoryArea a, MemoryArea b);
 

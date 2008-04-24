@@ -533,6 +533,7 @@ public class Recoder2KeY implements JavaReader {
                 new InstanceAllocationMethodBuilder(servConf, cache),
                 cnb = new ConstructorNormalformBuilder(servConf, cache),
                 new ClassPreparationMethodBuilder(servConf, cache),
+                new AreaAllocationMethodBuilder(servConf, cache),
                 new ClassInitializeMethodBuilder(servConf, cache), 
                 new PrepareObjectBuilder(servConf, cache), 
                 new CreateBuilder(servConf, cache),

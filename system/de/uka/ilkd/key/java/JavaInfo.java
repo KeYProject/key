@@ -333,6 +333,12 @@ public class JavaInfo {
 		sName2KJTCache = null;
 		return getTypeByClassName(className);
 	    }
+            // maybe a not yet known array type
+            if(className.endsWith("]")){
+                readJavaBlock("{" + className + " k;}");
+                result = getKeYJavaType(className);
+                if(result!=null) return result;
+            }
 	    Debug.out("javaInfo: type not found. Looked for:", className);
 	    throw new RuntimeException("TYPE NOT FOUND: " + className);
 	}
@@ -418,7 +424,7 @@ public class JavaInfo {
     public KeYJavaType getKeYJavaType(String fullName) {
         KeYJavaType result = getPrimitiveKeYJavaType(fullName);
         return (result == null ?
-            (KeYJavaType)getTypeByName(fullName) :
+            (KeYJavaType)getTypeByClassName(fullName) :
             result);
     }
 
@@ -455,7 +461,11 @@ public class JavaInfo {
 		 }
 	     }
 	 }	
-	 return (KeYJavaType) sort2KJTCache.get(sort);
+	 KeYJavaType result = (KeYJavaType) sort2KJTCache.get(sort);
+         if(result==null && sort instanceof ArraySort){
+             result = getKeYJavaType(sort.name().toString());
+         }
+         return result;
      }
 
     /** returns the KeYJavaType of the expression if it can be
@@ -910,6 +920,15 @@ public class JavaInfo {
             String qualifiedClassName) {
 	if (qualifiedClassName == null || qualifiedClassName.length() == 0) {
             throw new IllegalArgumentException("Missing qualified classname");
+        }
+        KeYJavaType kjt=null;
+        try{
+            kjt = getKeYJavaTypeByClassName(qualifiedClassName);
+        }catch(Exception e){
+            if(qualifiedClassName.endsWith("]")){
+                readJavaBlock("{" + qualifiedClassName + " k;}");
+                kjt = getKeYJavaType(qualifiedClassName);
+            }
         }
         return getAttribute(programName, 
 			    getKeYJavaTypeByClassName(qualifiedClassName));
