@@ -184,9 +184,13 @@ public class Test extends SuperTest{
     }
 
     /*@ public normal_behavior
+      @  requires \outerScope(\currentMemoryArea, oArr.memoryArea);
       @  assignable arr;
-      @  working_space \rigid_working_space(createArray(int arg), arg==7);
+      @  working_space \rigid_working_space(createArray(int arg), self, 
+      @        arg==7 &&
+      @    \outerScope(\currentMemoryArea, self.oArr.memoryArea));
       @ also public normal_behavior
+      @  requires \outerScope(\currentMemoryArea, oArr.memoryArea);
       @  assignable arr;
       @  working_space \working_space(createArray(7));
       @*/

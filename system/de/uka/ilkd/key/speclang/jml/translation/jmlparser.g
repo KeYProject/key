@@ -1875,6 +1875,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
             TypeDeclaration cld = 
                 (TypeDeclaration) method.getContainerType().getJavaType();
         }
+        (COMMA o1 = expression)
         (COMMA pre = expression)?
         ")"
         {
@@ -1884,9 +1885,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
             ProgramVariable local_self;    
             Term t_self=null;
             if(!method.isStatic()){
-                local_self = 
-                	SignatureVariablesFactory.INSTANCE.createSelfVar(services, method, false);
-                t_self = tb.var(local_self);
+                t_self = o1;
                 //adds self!=null && self.<created> == true or 
                 //self.<classInitialized> == true to the precondition
                 if(!(method.getMethodDeclaration() instanceof Constructor)){
