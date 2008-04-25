@@ -58,6 +58,9 @@ tokens {
         // Keywords used in program variable declarations
 	PROGRAMVARIABLES = "\\programVariables";
 
+        // Keywords used in KeY Hoare to declare arrays
+        ARRAYS = "\\arrays";
+
         // Keywords for varcond and related stuff
 	VARCOND = "\\varcond";
 	TYPEOF = "\\typeof";

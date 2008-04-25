@@ -360,6 +360,13 @@ public class TypeConverter extends TermBuilder {
             index[i] = 
                 convertToLogicElement(ar.getDimensionExpressions().getExpression(i), ec);
         }
+        
+        if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof HoareProfile) {
+            ProgramVariable arrayRef = (ProgramVariable) ar.getReferencePrefix();
+            return tf.createFunctionTerm((Function)services.getNamespaces().
+                    functions().lookup(arrayRef.name()), index);
+        }
+
         return tf.createArrayTerm(ArrayOp.getArrayOp(t.sort()), t, index);
     }
 

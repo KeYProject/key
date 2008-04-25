@@ -25,13 +25,15 @@ class KeYHoareParser extends Parser;
 options {
     importVocab=KeYHoareLexer;
     k = 1;
-    defaultErrorHandler=false;
+    defaultErrorHandler=true;
 }
 
 {
     private final static int NONE = -1; 
     private final static int BOOLEAN = 0; 
     private final static int INT = 1; 
+    private final static int INT_ARRAY = 2; 
+    private final static int BOOLEAN_ARRAY = 3; 
     
     private Namespace pvs;
     
@@ -41,20 +43,25 @@ options {
     public KeYHoareParser(KeYHoareLexer khl, Namespace pvs, int lineOffset) {
         this(khl);       
         this.pvs = pvs;
-        this.lineOffset = lineOffset;   	
-        
+        this.lineOffset = lineOffset;        
     }
     
     public int resolveLocationType(String id) {
         int type = NONE;
         ProgramVariable pv = (ProgramVariable)pvs.lookup(new Name(id));
+        
+        
         if (pv == null) {
-            reportError("Programvariable " + pv + " not declared.");
+            reportError("Programvariable " + id + " not declared.");
         } 
         if (pv.sort().name().toString().equals("boolean")) {
             type = BOOLEAN;
         } else if (pv.sort().name().toString().equals("jint")) {
             type = INT;
+        } else if (pv.sort().name().toString().equals("jint[]")) {             
+            type = INT_ARRAY;
+        } else  if (pv.sort().name().toString().equals("boolean[]")) {
+            type = BOOLEAN_ARRAY;        
         } else {
             reportError("Programvariable " + pv + " of unknown type " + pv.sort());
         }
@@ -68,7 +75,7 @@ options {
         } catch (TokenStreamException e) {
             System.err.println("No further token in stream");
         }        
-        return line + lineOffset;
+        return line;
     }   
 
     private int getColumn() {
@@ -116,11 +123,11 @@ statement
 
 assignmentStatement 
 {
-    String l = null;
+    int locationType = NONE;
     int type = NONE;
 } :
-        l=location ASSIGN type=expression SEMI
-        { if (resolveLocationType(l) != type) {
+        locationType=location ASSIGN type=expression SEMI
+        { if (locationType != type) {
        	      reportError("Incompatible types in assignment.", getLine(), getColumn());
           }
         }
@@ -277,14 +284,13 @@ strongIntExpression returns [int type = NONE]
 ;
 
 
+
 atomicExpression returns [int type = NONE]
 {
     String id = null;
     int rightType = NONE;
 } :
-        NUM_LITERAL {type = INT;} | id=location {
-            type = resolveLocationType(id);
-        } |
+        NUM_LITERAL {type = INT;} | type=location | 
         LPAREN type=expression RPAREN | TRUE {type = BOOLEAN;} | FALSE {type = BOOLEAN;} 
     ;
 
@@ -298,7 +304,42 @@ strongOp returns [Token t = null]
         mul:MULT {t=mul;} | div:DIV {t=div;} | mod:MOD {t=mod;}
     ;
 
-location returns [String t = null]
+location returns [int type = NONE]
 {} :
-        id:IDENT {t=id.getText();}
+        (IDENT LBRACKET) => type = arrayAccessExpression        
+        | type = simpleLocation
     ;
+   
+simpleLocation returns [int type = NONE]
+{} :
+   id:IDENT {type = resolveLocationType(id.getText());} 
+;
+
+    
+arrayAccessExpression returns [int type = NONE] 
+{
+  int arrayType = NONE;
+  int indexType = NONE;
+} :
+    arrayType = simpleLocation LBRACKET indexType = atomicExpression {
+    	    if (arrayType == INT_ARRAY || arrayType == BOOLEAN_ARRAY) {
+    	    	if (indexType != INT) {
+    	    	   reportError("Index of an array access expression must be of type 'int'.");
+    	    	} else {
+    	    	   type = (arrayType == INT_ARRAY ? INT : BOOLEAN);
+    	    	}
+    	    } else {
+    	    	reportError("Array access on non-array element.", getLine(), getColumn());
+    	    }    	    
+       } 
+       RBRACKET
+       {
+       	   if (type != INT && type != BOOLEAN) {
+       	   	reportError("Could not resolve type.",getLine(),getColumn());
+       	   }
+       }
+
+;
+
+
+    

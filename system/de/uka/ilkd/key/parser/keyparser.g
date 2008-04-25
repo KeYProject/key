@@ -103,6 +103,8 @@ options {
       prooflabel2tag.put("hoareLoopInvariant", new Character('z'));	
    }
 
+    private Namespace arrays = new Namespace();
+
     private NamespaceSet nss;
     private Choice defaultChoice = null;
     private HashMap<String, String> category2Default = new HashMap<String, String>();
@@ -1022,7 +1024,10 @@ options {
             if (inSchemaMode() || isGlobalDeclTermParser()) {
                 sjb.javaBlock = jr.readBlockWithEmptyContext(s);
             }else{
-                sjb.javaBlock = jr.readBlockWithProgramVariables(programVariables(), s);
+                Namespace programVariableAndArrays = arrays.copy();
+		programVariableAndArrays.add(programVariables());
+            
+                sjb.javaBlock = jr.readBlockWithProgramVariables(programVariableAndArrays, s);
             }
         } catch (de.uka.ilkd.key.java.PosConvertException e) {
             lineOffset=e.getLine()-1;
@@ -1477,7 +1482,9 @@ decls :
         |
             func_decls
         |
-            ruleset_decls
+            ruleset_decls 
+        |   
+            array_decls        
 
         ) *
     ;
@@ -2129,6 +2136,68 @@ func_decl
         }
         SEMI
     ;
+
+array_decls 
+{
+    final int dim = 1;
+    String elementSortName;
+    Sort elementSort = null;
+    String func_name;
+} :
+   {switchToNormalMode();}
+   ARRAYS LBRACE (
+      elementSortName=simple_ident EMPTYBRACKETS func_name=simple_ident SEMI
+   
+   { 
+      ProgramElementName arrayName = new ProgramElementName(func_name);
+      KeYJavaType elType = getJavaInfo().getKeYJavaType(elementSortName);
+      if (elType == null) {
+      	throw new KeYSemanticException
+		("Unknown type " + elementSortName, 
+			getFilename(), getLine(), getColumn());
+      }
+      elementSort = elType.getSort();
+      if (arrays.lookup(arrayName) != null) {
+		throw new KeYSemanticException
+			("The name " + func_name + " is already in use.", 
+			getFilename(), getLine(), getColumn());
+      }
+      final Sort intSort = (Sort) sorts().lookup(new Name("int"));
+      assert intSort != null;
+      
+      if (!skip_functions) {
+	 if (namespaces().lookup(arrayName) != null) {
+		throw new KeYSemanticException
+			("The name " + func_name + " is already in use.", 
+			getFilename(), getLine(), getColumn());
+	 }	      	      
+	assert elementSort != null;
+	Sort[] argSorts = new Sort[dim];
+	for (int i = 0; i<dim;i++) {      	
+           argSorts[i] = intSort;
+	}   
+	Function f = new de.uka.ilkd.hoare.logic.op.ArrayFunction(arrayName, elementSort, argSorts);
+	addFunction(f);
+      }
+      
+      Named arrayFunction = namespaces().lookup(arrayName);
+            
+      if (arrayFunction instanceof de.uka.ilkd.hoare.logic.op.ArrayFunction) {        
+        
+        KeYJavaType kjt = new KeYJavaType(de.uka.ilkd.key.java.abstraction.PrimitiveType.JAVA_DOUBLE,
+	    new PrimitiveSort(new Name(elementSort.name()+"[]")));      
+      	arrays.add(new LocationVariable(arrayName, kjt));     
+      } else {
+      	throw new KeYSemanticException
+			("The name " + func_name + " is already in use.", 
+			getFilename(), getLine(), getColumn());
+      }
+            
+   } )* RBRACE
+;
+
+
+
 
 func_decls 
 {
@@ -2968,28 +3037,76 @@ accessterm returns [Term result = null]
       |
       (LPAREN any_sortId_check[false] RPAREN term110)=> 
         LPAREN s = any_sortId_check[true] RPAREN result=term110 {
-         if(s==null) {
-           semanticError("Tried to cast to unknown type.");
-         } else if ((s instanceof PrimitiveSort) && 
+          if(s==null) {
+            semanticError("Tried to cast to unknown type.");
+          } else if ((s instanceof PrimitiveSort) && 
              (result.sort() instanceof ObjectSort)) {
                 semanticError("Illegal cast from " + result.sort() + 
                     " to sort " + s +
                     ". Casts between primitive and reference types are not allowed. ");
-         }
-         result = tf.createFunctionTerm(((AbstractSort)s).getCastSymbol(), result);
-	  } |
-      ( {isStaticQuery()}? // look for package1.package2.Class.query(
-        result = static_query
-      | 
-        {isStaticAttribute()}?            // look for package1.package2.Class.attr
-        result = static_attribute_suffix
-      | 	
-        result = term130
-      )   
-         ( result = array_access_suffix[result] | result = attribute_or_query_suffix[result] )*
+          }
+          result = tf.createFunctionTerm(((AbstractSort)s).getCastSymbol(), result);
+       } |
+       ( {de.uka.ilkd.key.gui.configuration.ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof 
+           de.uka.ilkd.hoare.init.HoareProfile}?
+       	     ( (funcpred_name LBRACKET) => result = hoareArrayAccess | result = term130)
+         
+        | (( {isStaticQuery()}? // look for package1.package2.Class.query(
+          result = static_query
+         | 
+          {isStaticAttribute()}?            // look for package1.package2.Class.attr
+            result = static_attribute_suffix
+         | 	
+           result = term130 )   
+         ( result = array_access_suffix[result] | result = attribute_or_query_suffix[result] )*)
+       )
  ; exception
         catch [TermCreationException ex] {
               semanticError(ex.getMessage());
+        }
+
+hoare_array_argument_list returns [PairOfTermArrayAndBoundVarsArray ts = null]
+{
+    List args = new LinkedList();
+    TermWithBoundVars p1, p2;
+}
+    :
+       
+        p1 = argument { args.add(p1);  }
+
+
+        {
+            ts = new PairOfTermArrayAndBoundVarsArray(args);
+        }
+
+    ;
+
+
+hoareArrayAccess returns [Term result = null] 
+{
+    PairOfTermArrayAndBoundVarsArray argsWithBoundVars = null;
+    String varfuncid;
+}:
+   varfuncid = funcpred_name        
+	LBRACKET argsWithBoundVars = hoare_array_argument_list RBRACKET 
+        {  
+            Operator op = lookupVarfuncId(varfuncid, argsWithBoundVars);            
+            if (op instanceof ParsableVariable) {
+                result = termForParsedVariable((ParsableVariable)op);
+            } else  if (op instanceof TermSymbol) {
+                if (argsWithBoundVars==null) {
+                    argsWithBoundVars = new PairOfTermArrayAndBoundVarsArray(new LinkedList());
+                }
+
+                result = tf.createFunctionWithBoundVarsTerm((TermSymbol)op, argsWithBoundVars);
+            }
+	    
+        }
+; exception
+        catch [TermCreationException ex] {
+              keh.reportException
+		(new KeYSemanticException
+			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
 
@@ -4534,7 +4651,9 @@ problem returns [ Term a = null ]
 	
 		KeYHoareLexer khl = new KeYHoareLexer(new StringReader(text));	
 		khl.setFilename(getFilename());	
-		KeYHoareParser khp = new KeYHoareParser(khl, programVariables(), getLine()-1);
+		Namespace programVariableAndArrays = arrays.copy();
+		programVariableAndArrays.add(programVariables());
+		KeYHoareParser khp = new KeYHoareParser(khl, programVariableAndArrays, getLine()-1);
 		khp.setFilename(getFilename());
 		try {
 		   khp.program();

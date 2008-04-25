@@ -2,6 +2,7 @@ package de.uka.ilkd.hoare.pp;
 
 import java.io.IOException;
 
+import de.uka.ilkd.hoare.logic.op.ArrayFunction;
 import de.uka.ilkd.hoare.rule.HoareLoopInvRuleApp;
 import de.uka.ilkd.hoare.rule.HoareLoopInvariantRule;
 import de.uka.ilkd.key.java.*;
@@ -59,6 +60,28 @@ public class HoareLogicPrettyPrinter extends LogicPrinter {
             }
         }
     }
+    
+    /**
+     * The standard concrete syntax for terms with updates.
+     */
+    public static class ArrayFunctionNot extends Notation {
+
+        final String[] arraySep = new String[]{"[","]"};
+        final int[] ass = new int[]{121, 0, 0};
+        
+        public ArrayFunctionNot() {
+            super(130);
+        }
+
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
+                sp.printTerm(t);
+            } else {
+                sp.printArray(arraySep, t, ass); 
+            }
+        }
+    }
+
 
     private static final String SEMI_SEQ_SEP_ANTEC = " & ";
 
@@ -1117,6 +1140,7 @@ public class HoareLogicPrettyPrinter extends LogicPrinter {
                 .functions(), "javaMod", "%", 100, 100, 101);
 
         notInfo.put(QuanUpdateOperator.class, new QuanUpdate());
+        notInfo.put(ArrayFunction.class, new ArrayFunctionNot());
     }
 
 }
