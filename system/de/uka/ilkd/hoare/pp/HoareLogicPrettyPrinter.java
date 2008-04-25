@@ -493,7 +493,7 @@ public class HoareLogicPrettyPrinter extends LogicPrinter {
         if ( loc instanceof AttributeOp ) {
             separator[0] = Notation.
                Attribute.printName(((AttributeOp)loc), t.sub(0), this);
-        } else if ( loc instanceof ArrayOp  ) {
+        } else if ( loc instanceof ArrayOp ) {
             separator[0] = "[";
             separator[1] = "]";
         } else if ( loc.arity () == 0 ) {

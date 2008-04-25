@@ -19,7 +19,7 @@ public class HoareUserProblemFile extends KeYUserProblemFile {
         super(name, file, monitor);
     }
 
-    public void readProblem(ModStrategy mod, boolean problemOnly) 
+    public void readProblem(ModStrategy mod) 
     throws ProofInputException {
         if(file == null) return;
         if (initConfig==null) {

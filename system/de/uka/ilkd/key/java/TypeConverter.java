@@ -16,6 +16,7 @@ import recoder.service.ConstantEvaluator;
 import de.uka.ilkd.hoare.init.HoareProfile;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;

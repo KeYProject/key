@@ -9,8 +9,12 @@
 //
 package de.uka.ilkd.key.logic.ldt;
 
+import de.uka.ilkd.hoare.init.HoareProfile;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
@@ -335,8 +339,83 @@ public abstract class AbstractIntegerLDT extends LDT {
     public Function getFunctionFor
         (de.uka.ilkd.key.java.expression.Operator op, 
                 Services serv, ExecutionContext ec) {
-        //final KeYJavaType opReturnType = op.getKeYJavaType(serv, ec);
+        final KeYJavaType opReturnType;
+        if (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof HoareProfile) {
+            opReturnType = serv.getJavaInfo().getPrimitiveKeYJavaType("int");
+        } else {
+            opReturnType = op.getKeYJavaType(serv, ec);
+        }
 
+        if (op instanceof GreaterThan) {
+            return greaterThan;
+        } else if (op instanceof GreaterOrEquals) {
+            return greaterOrEquals;
+        } else if (op instanceof LessThan) {
+            return lessThan;
+        } else if (op instanceof LessOrEquals) {
+            return lessOrEquals;
+        } else if (op instanceof Divide) {                      
+            return 
+                opReturnType.getJavaType() == PrimitiveType.JAVA_LONG 
+                ? getJavaDivLong() : getJavaDivInt();
+        } else if (op instanceof Times) {
+            return 
+            opReturnType.getJavaType() == PrimitiveType.JAVA_LONG 
+            ? getJavaMulLong() : getJavaMulInt();
+        } else if (op instanceof Plus) {
+            return 
+            opReturnType.getJavaType() == PrimitiveType.JAVA_LONG 
+            ? getJavaAddLong() : getJavaAddInt();
+        } else if (op instanceof Minus) {
+            return 
+            opReturnType.getJavaType() == PrimitiveType.JAVA_LONG 
+            ? getJavaSubLong() : getJavaSubInt();
+        } else if (op instanceof Modulo) {
+            return getJavaMod();
+        } else if (op instanceof ShiftLeft) {
+            return 
+                opReturnType.getJavaType() == PrimitiveType.JAVA_LONG 
+                ? getJavaShiftLeftLong() : getJavaShiftLeftInt();
+        } else if (op instanceof ShiftRight) {
+            return opReturnType.getJavaType() == PrimitiveType.JAVA_LONG 
+            ? getJavaShiftRightLong() : getJavaShiftRightInt();
+        }  else if (op instanceof UnsignedShiftRight) {
+            return opReturnType.getJavaType() == PrimitiveType.JAVA_LONG 
+            ? getJavaUnsignedShiftRightLong() : getJavaUnsignedShiftRightInt();
+        } else if (op instanceof BinaryAnd) {
+            assert opReturnType.getJavaType() != PrimitiveType.JAVA_BOOLEAN;
+            return opReturnType.getJavaType() == PrimitiveType.JAVA_LONG 
+            ? getJavaBitwiseAndLong() : getJavaBitwiseAndInt();
+        } else if (op instanceof BinaryNot) {
+            assert opReturnType.getJavaType() != PrimitiveType.JAVA_BOOLEAN;
+            return getJavaBitwiseNegation();
+        } else if (op instanceof BinaryOr) {
+            assert opReturnType.getJavaType() != PrimitiveType.JAVA_BOOLEAN;
+            return opReturnType.getJavaType() == PrimitiveType.JAVA_LONG 
+            ? getJavaBitwiseOrLong() : getJavaBitwiseOrInt();
+        } else if (op instanceof BinaryXOr) {
+            assert opReturnType.getJavaType() != PrimitiveType.JAVA_BOOLEAN;
+            return opReturnType.getJavaType() == PrimitiveType.JAVA_LONG 
+            ? getJavaBitwiseOrLong() : getJavaBitwiseOrInt();
+        } else if (op instanceof Negative) {
+            return opReturnType.getJavaType() == PrimitiveType.JAVA_LONG 
+            ? getJavaUnaryMinusLong() : getJavaUnaryMinusLong();
+        } else if (op instanceof TypeCast) {
+            if (opReturnType.getJavaType() == PrimitiveType.JAVA_CHAR) {
+                return getJavaCastChar();
+            } else if (opReturnType.getJavaType() == PrimitiveType.JAVA_BYTE) {
+                return getJavaCastByte();
+            } else if (opReturnType.getJavaType() == PrimitiveType.JAVA_SHORT) {
+                return getJavaCastShort();
+            } else if (opReturnType.getJavaType() == PrimitiveType.JAVA_INT) {
+                return getJavaCastInt();
+            } else if (opReturnType.getJavaType() == PrimitiveType.JAVA_LONG) {
+                return getJavaCastLong();
+            }  
+        }
+        return null;
+//final KeYJavaType opReturnType = op.getKeYJavaType(serv, ec);
+/*
         if (op instanceof GreaterThan) {
             return getGreaterThan();
         } else if (op instanceof GreaterOrEquals) {
@@ -375,7 +454,7 @@ public abstract class AbstractIntegerLDT extends LDT {
             return getCast();
         } else {
             return null;
-        }
+        }*/
     }
     
     

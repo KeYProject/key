@@ -12,6 +12,7 @@ package de.uka.ilkd.key.logic.sort;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import de.uka.ilkd.hoare.logic.op.ArrayFunction;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
@@ -351,9 +352,12 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 
     
 
-    //---------------UNNECESSARY ONES------------------------
+    //--------------- UNNECESSARY ONES ------------------------
 
-
+    
+    //--------------- HOARE ------------------------
+    
+    public static final ProgramSVSort HOARELOCATION = new HoareLocationSort();
 
     //--------------------------------------------------------------------------
     
@@ -1530,6 +1534,25 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	}
     } 
 
+    // HOARE 
+    private static class HoareLocationSort extends LeftHandSideSort {
+
+    public HoareLocationSort() {
+        super(new Name("HoareLocation"));
+    }
+
+    public boolean canStandFor(Term t) {
+        
+        return super.canStandFor(t) || 
+            t.op() instanceof ArrayFunction;
+    }
+
+    protected boolean canStandFor(ProgramElement pe,
+                                  Services services) {
+        return super.canStandFor(pe, services) || 
+           pe instanceof ArrayReference;
+    }
+}
  
     //-------------------helper methods ------------------------------------
     

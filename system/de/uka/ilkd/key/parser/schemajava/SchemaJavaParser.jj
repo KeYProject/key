@@ -180,6 +180,7 @@ public class SchemaJavaParser {
 	    s == ProgramSVSort.IMPLICITVARIABLE ||
 	    s == ProgramSVSort.EXPLICITVARIABLE ||
 	    s == ProgramSVSort.LEFTHANDSIDE  ||
+	    s == ProgramSVSort.HOARELOCATION  ||
 	    s == ProgramSVSort.SIMPLEEXPRESSION  ||
 	    s == ProgramSVSort.NONSIMPLEEXPRESSION;
     }

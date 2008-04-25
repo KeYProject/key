@@ -2182,8 +2182,7 @@ array_decls
       
       Named arrayFunction = namespaces().lookup(arrayName);
             
-      if (arrayFunction instanceof de.uka.ilkd.hoare.logic.op.ArrayFunction) {        
-        
+      if (arrayFunction instanceof de.uka.ilkd.hoare.logic.op.ArrayFunction) {                
         KeYJavaType kjt = new KeYJavaType(de.uka.ilkd.key.java.abstraction.PrimitiveType.JAVA_DOUBLE,
 	    new PrimitiveSort(new Name(elementSort.name()+"[]")));      
       	arrays.add(new LocationVariable(arrayName, kjt));     
