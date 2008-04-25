@@ -2,7 +2,7 @@ package javax.realtime;
 
 public abstract class ScopedMemory extends MemoryArea{
 
-    private Object portal;
+    private /*@nullable@*/ Object portal;
 
     public static ScopedMemory currentMemoryArea;
 
@@ -17,17 +17,17 @@ public abstract class ScopedMemory extends MemoryArea{
       @*/
     private int referenceCount=0;
 
-    //@ public invariant stack!=null ==> (stack.top()==this && stack._stack.length>0);
+    // public invariant stack!=null ==> (stack.top()==this && stack._stack.length>0);
     public MemoryStack /*@nullable@*/ stack;
 
-    /*@ public invariant (\forall ScopedMemory m; (\outerScope(m, this) <==>
+    /* public invariant (\forall ScopedMemory m; (\outerScope(m, this) <==>
       @      (stack!=null && (\exists int i; i>=0 && i<stack._stack.length; 
       @                       stack._stack[i]==m))));
       @*/
 
-    /*@ public invariant (\forall MemoryStack ms; (\exists int i; i>=0 && i<ms._stack.length;
-      @                                            ms._stack[i] == this) <==>
-      @                                           ms._stack[stack._stack.length-1]==this);
+    /* public invariant (\forall ScopedMemory s; (\exists int i; i>=0 && i<s.stack._stack.length;
+      @                                            s.stack._stack[i] == this) <==>
+      @                                           s.stack._stack[stack._stack.length-1]==this);
       @*/
 
     public MemoryStack stack(){

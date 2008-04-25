@@ -144,7 +144,8 @@ public class Test extends SuperTest{
 	TestRunnable t = new TestRunnable(new Test(), false);
 	EnterScopeRunnable esr = new EnterScopeRunnable(sm2,t);
 	EnterScopeRunnable esr1 = new EnterScopeRunnable(sm1, esr);
-	sm2.enter(esr1);
+	//	sm2.enter(esr1);
+	sm1.enter(esr);
     }
 
     /*@ public normal_behavior
