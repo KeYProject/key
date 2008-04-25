@@ -77,7 +77,11 @@ public class HoareLogicPrettyPrinter extends LogicPrinter {
             if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
                 sp.printTerm(t);
             } else {
-                sp.printArray(arraySep, t, ass); 
+                if (sp instanceof HoareLogicPrettyPrinter) {
+                    ((HoareLogicPrettyPrinter)sp).printArray(arraySep, t); 
+                } else {
+                    sp.printFunctionTerm(t.op().name().toString(), t);
+                }
             }
         }
     }
@@ -172,6 +176,23 @@ public class HoareLogicPrettyPrinter extends LogicPrinter {
         return false;
     }
 
+    /**
+     * Pretty-prints a (shadowed) array expression
+     *
+     * @param arraySep usually a <code>[ </code> and a <code>] </code>
+     * @param t the array expression as a whole
+     */
+    public void printArray(String[] arraySep, Term t)
+        throws java.io.IOException {
+        startTerm(t.arity());
+        layouter.print(t.op().name().toString());       
+        layouter.print(arraySep[0]).beginC(0);
+        markStartSub();
+        printTerm(t.sub(0));
+        markEndSub();
+        layouter.print(arraySep[1]).end();        
+    }
+    
     public void printCast(String pre, String post, Term t, int ass)
             throws IOException {
         startTerm(t.arity());
@@ -452,6 +473,49 @@ public class HoareLogicPrettyPrinter extends LogicPrinter {
         layouter.end();
     }
 
+    /**
+     * setup the separators to be printed between the sub-terms of an update
+     * location.
+     * 
+     * The top entity of the update loc is printed by this method.
+     * 
+     * @param loc
+     *            location to write to
+     * @param t
+     *            term to assign
+     * @return an array of separating strings (elements may be "[" "]" "," ")" )
+     * @throws IOException
+     *             if thrown by layouter
+     */
+    protected String[] setupUpdateSeparators (final Operator loc, final Term t)
+                                                throws IOException {
+        String[] separator = new String [loc.arity ()];
+        if ( loc instanceof AttributeOp ) {
+            separator[0] = Notation.
+               Attribute.printName(((AttributeOp)loc), t.sub(0), this);
+        } else if ( loc instanceof ArrayOp  ) {
+            separator[0] = "[";
+            separator[1] = "]";
+        } else if ( loc.arity () == 0 ) {
+            layouter.print( loc.name ().toString ().replaceAll ( "::", "." ) );
+        } else if ( loc instanceof ArrayFunction ) {
+            layouter.print ( loc.name().toString() + "[" );
+            // bugfix: was "m = 1;..." which made separator[0]==null
+            for ( int m = 0; m < loc.arity () - 1; m++ ) {
+                separator[m] = ",";
+            }
+            separator[loc.arity () - 1] = "]";
+        } else {
+            layouter.print ( loc.name().toString() + "(" );
+            // bugfix: was "m = 1;..." which made separator[0]==null
+            for ( int m = 0; m < loc.arity () - 1; m++ ) {
+                separator[m] = ",";
+            }
+            separator[loc.arity () - 1] = ")";
+        }
+        return separator;
+    }
+    
     /**
      * Print a term with an (quantified) update.  This looks like
      * <code>{loc1 := val1 || ... || locn := valn} t</code>.  If line breaks are necessary, the
