@@ -1875,7 +1875,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
             TypeDeclaration cld = 
                 (TypeDeclaration) method.getContainerType().getJavaType();
         }
-        (COMMA o1 = expression)
+        (COMMA (o1 = expression)?)
         (COMMA pre = expression)?
         ")"
         {
