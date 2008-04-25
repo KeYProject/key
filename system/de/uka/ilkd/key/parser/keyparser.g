@@ -1787,7 +1787,14 @@ prog_var_decls
         PROGRAMVARIABLES
         LBRACE 
         (
-            kjt = keyjavatype
+            kjt = keyjavatype {
+              if (kjt.getJavaType() instanceof ArrayType &&
+                 de.uka.ilkd.key.gui.configuration.ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof 
+                  de.uka.ilkd.hoare.init.HoareProfile) {
+              	 throw new KeYSemanticException("Array must be declared in the separate \\arrays section.",
+              	   getFilename(), getLine(), getColumn());
+              }               
+            }
             var_names = simple_ident_comma_list
             {
 	        IteratorOfString it = var_names.iterator();
