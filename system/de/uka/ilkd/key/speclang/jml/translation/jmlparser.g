@@ -1882,6 +1882,9 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	{
 	    resolverManager.popLocalVariablesNamespace();
 	    
+	    p = convertToFormula(p);
+	    t = convertToFormula(t);
+	    
 	    //add implicit "non-null" guards for reference types, 
 	    //"in-bounds" guards for integer types
 	    Term nullTerm = tb.NULL(services);
@@ -1901,9 +1904,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	    	    }
 	    	}
 	    }	    
-	    
-	    t = convertToFormula(t);
-	    
+	    	    
 	    if (q.getText().equals("\\forall")) {
 		if (p != null) {
 		    t = tb.imp(p, t);
