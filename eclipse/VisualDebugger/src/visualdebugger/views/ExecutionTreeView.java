@@ -365,7 +365,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
      * @return the figure
      */
     private Figure createNode(ETNode etNode) {
-        final LinkedList<Term> activeWPs = etNode.getWatchpointsSatisfied();
+        final java.util.List<WatchPoint> activeWPs = etNode.getWatchpointsSatisfied();
         if (etNode instanceof ETStatementNode) {
             final SourceElementFigure node = new SourceElementFigure(
                     (ETStatementNode) etNode);
@@ -380,18 +380,10 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                     wpInfo.removeAll();
                     //TODO extract method
                     try {
-                        if (activeWPs != null) {
-                            for (Term term : activeWPs) {
-                                try{
-                                SourceElement firstElement = term.sub(0).executableJavaBlock().program().getFirstElement();
-                                StatementBlock sb = (StatementBlock) firstElement.getLastElement();
-  
-                                String wp = sb.toString().replaceFirst("myDummy=", "");
-                                wpInfo.add(wp.replace(";",""));
-                                
-                                } catch (Throwable t){
-                                    t.printStackTrace();
-                                }
+                        if (activeWPs != null && activeWPs.size()>0) {
+                            for (WatchPoint watchpoint : activeWPs) {
+                                wpInfo.add(watchpoint.getExpression() +"@" + watchpoint.getMethod());
+
                             }
                         }
                     } catch (Throwable t) {

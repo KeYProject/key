@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.IteratorOfNode;
@@ -23,15 +22,15 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.visualdebugger.ProofStarter;
 import de.uka.ilkd.key.visualdebugger.executiontree.ETNode;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class WatchointUtil.
+ * The Class WatchpointUtil.
  * 
  * This Class offers some tools to identify and mark Watchpoints in the current
  * program state, respectivly in the ExecutionTree ET.
  */
 public class WatchpointUtil {
 
+    private static final int ALL = 1;
     /**
      * satisfiesWatchpoint returns true, if all leaf nodes in this ETNode
      * satisfy at least one watchpoint from the list.
@@ -50,24 +49,19 @@ public class WatchpointUtil {
         assert watchpoints != null;
         assert watchpoints.size() != 0 : "No watchpoint to evaluate /in satisfiesWatchpoint /in WatchpointUtil";
 
-        LinkedList<Term> watches = new LinkedList<Term>();
-        LinkedList<Term> intersection = new LinkedList<Term>();
-        for (WatchPoint watchPoint : watchpoints) {
-            watches.add(watchPoint.getWatchpointAsTerm());
-        }
-        intersection = watches;
+        List<WatchPoint> intersection = watchpoints;
         System.out.println("watches computed for " + leafNodesInETNode.size()
                 + " leafnodes..");
         for (Node node : leafNodesInETNode) {
 
-            List<Term> temp = new LinkedList<Term>();
+            List<WatchPoint> temp = new LinkedList<WatchPoint>();
 
             PosInOccurrence pos = findPos(node.sequent().succedent());
             if (pos == null)
                 pos = findPos(node.sequent().antecedent());
 
             if (pos != null) {
-                for (Term watchpoint : watches) {
+                for (WatchPoint watchpoint : watchpoints) {
 
                     if (WatchpointUtil.evalutateWatchpoint(node, watchpoint,
                             node.sequent(), pos, node.proof(), 250, watchpoints)) {
@@ -85,7 +79,12 @@ public class WatchpointUtil {
     }
 
     /**
-     * Find pos.
+     * Finds the PosInOccurrence.
+     * 
+     * This method looks for the PosInOccurrence in the given semisequent,
+     * which should be obtained from a proof node.
+     * That allows us to check if a watchpoint is true at an arbitrary node in 
+     * the proof tree, even if we proceeded with symbolic execution. 
      * 
      * @param seq the seq
      * 
@@ -128,6 +127,8 @@ public class WatchpointUtil {
 
     /**
      * Gets the first active statement.
+     * The method returns the first active statement within the modality.
+     * It simply steps over the program prefix.
      * 
      * @param term the term
      * 
@@ -188,25 +189,50 @@ public class WatchpointUtil {
      * 
      * @return true, if the watchpoint is satisfied in the current state
      */
-    public static boolean evalutateWatchpoint(Node node, Term watchpoint,
+    public static boolean evalutateWatchpoint(Node node, WatchPoint watchpoint,
             Sequent seq, PosInOccurrence pos, Proof proof, int maxsteps, List<WatchPoint> watchpoints) {
 
+        Term wp = watchpoint.getWatchpointAsTerm();
+        
+        TermBuilder tb = TermBuilder.DF;
         UpdateFactory updateFactory = new UpdateFactory(proof.getServices(),
                 proof.simplifier());
+        
         LinkedList<Update> updates = new LinkedList<Update>();
 
         // start tracking names if necessary 
-        if (WatchPointManager.existsWatchPointContainingLocals()) {
+        if (watchpoint.getLocalVariables() != null
+                && watchpoint.getLocalVariables().size() > 0) {
             VariableNameTracker vnt = new VariableNameTracker(node, watchpoints);
             vnt.start();
             updates.add(buildNameUpdates(updateFactory, vnt.result()));
+            updates.add(updateSelfVar(updateFactory, watchpoint, vnt
+                    .getSelfVar()));
+            System.out.println(updates.toString());
+        } else {
+            LogicVariable lv = new LogicVariable(new Name (watchpoint.getSelf().name() + "_lv"),
+                    watchpoint.getSelf().getKeYJavaType().getSort());
+            
+            Update elementaryUpdate = updateFactory.elementaryUpdate(
+                    TermFactory.DEFAULT.createVariableTerm(watchpoint.getSelf()),
+                    TermFactory.DEFAULT.createVariableTerm(lv));
+            updates.add(elementaryUpdate);
+            System.out.println(elementaryUpdate);
+            System.out.println(lv);
+            if (watchpoint.getFlavor() == ALL) {
+                watchpoint.setWatchpointTerm(tb.all(lv, wp));
+            } else {
+                watchpoint.setWatchpointTerm(tb.ex(lv, wp));
+                System.out.println(watchpoint.getWatchpointAsTerm());
+            }
         }
 
         updates.addAll(collectUpdates(pos));
         for (Update update : updates) {
-            watchpoint = updateFactory.prepend(update, watchpoint);
+            wp = updateFactory.prepend(update, wp);
         }
-        ConstrainedFormula newCF = new ConstrainedFormula(watchpoint);
+        
+        ConstrainedFormula newCF = new ConstrainedFormula(wp);
         seq = seq.changeFormula(newCF, pos).sequent();
         try {
             // start side proof
@@ -232,7 +258,25 @@ public class WatchpointUtil {
     }
 
     /**
+     * updateSelfVar updates the self variable of a local watchpoint 
+     * 
+     * @param uf
+     * @param watchpoint
+     * @param selfVar
+     * @return Update
+     */
+    private static Update updateSelfVar(UpdateFactory uf, WatchPoint watchpoint,
+            SourceElement selfVar) {
+        
+        return uf.elementaryUpdate(
+                TermFactory.DEFAULT.createVariableTerm(watchpoint.getSelf()),
+                TermFactory.DEFAULT.createVariableTerm((LocationVariable) selfVar)); 
+    }
+
+    /**
      * Collect updates.
+     * The method collects all updated that can be found in front of the modality
+     * to preserve the current state.
      * 
      * @param pos the pos
      * 
@@ -255,7 +299,6 @@ public class WatchpointUtil {
         return updates;
     }
 
-    // TODO
     /**
      * EvaluateWatchpoints.
      * 
@@ -294,7 +337,7 @@ public class WatchpointUtil {
 
                 WatchPoint wp = (WatchPoint) watchpoints
                 .toArray()[0];
-                return WatchpointUtil.evalutateWatchpoint(node, wp.getWatchpointAsTerm(), seq, pos, proof, maxsteps, watchpoints);
+                return WatchpointUtil.evalutateWatchpoint(node, wp, seq, pos, proof, maxsteps, watchpoints);
             }
             // start tracking names if necessary
             if (WatchPointManager.existsWatchPointContainingLocals()) {
@@ -529,13 +572,12 @@ public class WatchpointUtil {
      * @return the update
      */
     private static Update buildNameUpdates(UpdateFactory uf,
-            Map<MethodBodyStatement, ListOfRenamingTable> nameMaps) {
+            Map<ProgramMethod, ListOfRenamingTable> nameMaps) {
 
         List<Update> nameUpdates = new LinkedList<Update>();
         System.out.println(nameMaps);
         for (ListOfRenamingTable lort : nameMaps.values()) {
-            //TODO currently always taking last entry in list
-            //   ->determine the proper method we are in at this point
+
             if(!lort.isEmpty()){
                 RenamingTable lastRT = lort.head();
                 Iterator<LocationVariable> it = lastRT.getRenamingIterator();
@@ -543,9 +585,11 @@ public class WatchpointUtil {
                 while(it.hasNext()){
                     LocationVariable originalVar = (LocationVariable) it.next();
 
+                    LocationVariable locationVariable = (LocationVariable) lastRT.getHashMap().get(originalVar);
                     Update elemtaryUpdate = uf.elementaryUpdate(
                             TermFactory.DEFAULT.createVariableTerm(originalVar),
-                            TermFactory.DEFAULT.createVariableTerm((LocationVariable) lastRT.getHashMap().get(originalVar))); 
+                            TermFactory.DEFAULT.createVariableTerm(locationVariable)); 
+                    System.out.println(originalVar.id() +" -> " + locationVariable.id());
                     System.out.println(elemtaryUpdate);
                     nameUpdates.add(elemtaryUpdate);}
             }

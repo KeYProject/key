@@ -16,6 +16,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.visualdebugger.DebuggerPO;
 import de.uka.ilkd.key.visualdebugger.ProofStarter;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
+import de.uka.ilkd.key.visualdebugger.watchpoints.WatchPoint;
 
 /**
  * A node of an execution tree representing the control flow of a program.
@@ -40,7 +41,7 @@ public class ETNode {
             .getMediator();
 
     private ListOfTerm bc = SLListOfTerm.EMPTY_LIST;
-    private LinkedList<Term> watchpointsSatisfied = null;
+    private List<WatchPoint> watchpointsSatisfied = null;
 
     // ListOfTerm pc= SLListOfTerm.EMPTY_LIST;
     private LinkedList<ITNode> itNodes = new LinkedList<ITNode>();
@@ -297,11 +298,11 @@ public class ETNode {
         this.isWatchpoint = isWatchpoint;
     }
 
-    public LinkedList<Term> getWatchpointsSatisfied() {
+    public List<WatchPoint> getWatchpointsSatisfied() {
         return watchpointsSatisfied;
     }
 
-    public void setWatchpointsSatisfied(LinkedList<Term> watchpointsSatisfied) {
+    public void setWatchpointsSatisfied(List<WatchPoint> watchpointsSatisfied) {
         this.watchpointsSatisfied = watchpointsSatisfied;
     }
 }

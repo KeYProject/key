@@ -11,8 +11,12 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.ListOfType;
 import de.uka.ilkd.key.java.abstraction.SLListOfType;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
@@ -78,11 +82,13 @@ public class WatchPointManager {
     
                         ProgramVariable var_self = new LocationVariable(
                                 selfName, ji.getKeYJavaType(declaringType));
+                        System.out.println(var_self.id());
+                        wp.setSelf(var_self);
                         ProgramVariable var_dummy = new LocationVariable(
                                 new ProgramElementName(wp.getName()), services
                                         .getTypeConverter().getBooleanType());
-                        progVarNS.add(var_self);
-                        progVarNS.add(var_dummy);
+                        progVarNS.addSafely(var_self);
+                        progVarNS.addSafely(var_dummy);
     
                         if (wp.getLocalVariables() != null
                                 && wp.getLocalVariables().size() > 0) {
@@ -117,15 +123,24 @@ public class WatchPointManager {
             WatchPoint wp, String declaringType, ProgramElementName selfName) {
         
         StringBuffer buffer = new StringBuffer();
-        buffer.append("\\exists " + declaringType + " x; {" + selfName
-                + ":= x } \\<{method-frame( source=" + declaringType + ",this="
+        buffer.append("\\<{method-frame( source=" + declaringType + ",this="
                 + selfName);
         buffer.append(" ) : { " + wp.getName() + " = " + wp.getExpression());
         buffer.append(";} }\\>" + wp.getName() + " = TRUE");
     
-        Term term = ProblemLoader.parseTerm(buffer.toString(), services,
+//        System.out.println(term.op().getClass());
+//        ProgramPrefix programPrefix = (ProgramPrefix) term
+//        .javaBlock().program();
+//        MethodFrame mf= (MethodFrame) programPrefix.getPrefixElementAt(programPrefix
+//                .getPrefixLength() - 1);
+//        ExecutionContext executionContext = (ExecutionContext) mf.getExecutionContext();
+//        ProgramVariable runtimeInstance = (ProgramVariable) executionContext.getRuntimeInstance();
+//        System.out.println(runtimeInstance.id());
+//        wp.setSelf(runtimeInstance);
+        
+        return ProblemLoader.parseTerm(buffer.toString(), services,
                 new Namespace(), progVarNS);
-        return term;
+
     }
     /**
      * @param progVarNS

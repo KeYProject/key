@@ -139,6 +139,9 @@ public class WatchpointView extends ViewPart {
             case 4:
                 result = "" + wp.isEnabled();
                 break;
+            case 5:
+                result = "false";
+                break;
             default:
                 break;
             }
@@ -190,11 +193,11 @@ public class WatchpointView extends ViewPart {
      */
     private Table createTable() {
         Table table = viewer.getTable();
-
+        
         TableColumn column;
 
         column = new TableColumn(table, SWT.NONE, 0);
-        column.setWidth(150);
+        column.setWidth(200);
         column.setText("Watch Expression");
 
         column = new TableColumn(table, SWT.NONE, 1);
@@ -212,6 +215,10 @@ public class WatchpointView extends ViewPart {
         column = new TableColumn(table, SWT.NONE, 4);
         column.setWidth(80);
         column.setText("Enabled");
+        
+        column = new TableColumn(table, SWT.CHECK, 5);
+        column.setWidth(30);
+        column.setText("Possibility");
         return table;
     }
 

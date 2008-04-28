@@ -6,6 +6,7 @@ import java.util.List;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
  * The Class WatchPoint.
@@ -32,7 +33,10 @@ public class WatchPoint {
     
     /** The enabled. */
     private boolean enabled = true;
-
+    
+    private ProgramVariable self = null;
+    private int flavor = 0;
+   
     private List<String> parameterTypes;
     /** The watchpoint parsed as KeY data structure. */
     private Term watchpointAsTerm;
@@ -184,6 +188,22 @@ public class WatchPoint {
 
     public void setKeyPositions(List<Integer> keyPositions) {
         this.keyPositions = keyPositions;
+    }
+
+    public int getFlavor() {
+        return flavor;
+    }
+
+    public void setFlavor(int flavor) {
+        this.flavor = flavor;
+    }
+
+    public ProgramVariable getSelf() {
+        return self;
+    }
+
+    public void setSelf(ProgramVariable self) {
+        this.self = self;
     }
 
 

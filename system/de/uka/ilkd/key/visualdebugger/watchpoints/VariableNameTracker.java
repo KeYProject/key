@@ -7,6 +7,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.IExecutionContext;
+import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.*;
@@ -21,6 +24,7 @@ import de.uka.ilkd.key.proof.SLListOfNode;
 import de.uka.ilkd.key.rule.ListOfRuleSet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 
 public class VariableNameTracker {
 
@@ -28,13 +32,17 @@ public class VariableNameTracker {
     private Node node;
     /** The watchpoints.*/
     private List<WatchPoint> watchpoints;
-    
-    private Map<MethodBodyStatement, ListOfRenamingTable> nameMaps = new HashMap<MethodBodyStatement, ListOfRenamingTable>();
+    private ListOfNode branch = null;
+    private Map<ProgramMethod, ListOfRenamingTable> nameMaps = new HashMap<ProgramMethod, ListOfRenamingTable>();
+    private Stack<ProgramMethod> methodStack = new Stack<ProgramMethod>();
+    private Stack<ReferencePrefix> selfVarStack = new Stack<ReferencePrefix>();
+    private ReferencePrefix selfVar = null;
     
     public VariableNameTracker(Node node, List<WatchPoint> watchpoints) {
         super();
         this.node = node;
         this.watchpoints = watchpoints;
+        branch = buildBranch(node);
     }
 
 
@@ -144,104 +152,83 @@ public class VariableNameTracker {
     }
 
     /**
-     * Gets the initial renamings.
+     * builds a branch from the root to the given node
      * 
-     * When the KeY Prover is started every variable is initially renamed by the ProgVarReplaceVisitor, i.e. it
-     * has still the same "name" but it is a new object. If we have used local variables in the watchpoints we have
-     * to keep track of these renamings. Therefore this method first looks up all applications of method-expand taclets.
-     * In those methods we check first if they contain parameters that are relevant for us and furthermore store the
-     * parameter count. Finally the following method-frame is investigated and the parameter count added to rebuild
-     * the original order.
-     * 
+     * @param n - an arbitrary node
+     * @return a list of nodes from the root the passed node
      */
-    public void start() {
-
-        final Services services = node.proof().getServices();
-        
-        Node currentNode = node;
-        Node parent = currentNode.parent();
-        List<LocationVariable> renamedLocalVariables = null;
-        List<LocationVariable> initialRenamings = new LinkedList<LocationVariable>();
-        ProgramMethod programMethod = null;
-        int parameterCount = 0;
-
-        while (parent != null) {
-
-            if (parent.getAppliedRuleApp().rule() instanceof Taclet) {
-
-                if (isMethodExpandRule(((Taclet) parent.getAppliedRuleApp()
-                        .rule()).getRuleSets())) {
-                    
-                    renamedLocalVariables = new LinkedList<LocationVariable>();
-                    // treat parent, i.e. the method-body-statement to get parameter information
-                    SourceElement parentElement = getStatement(parent);
-                    MethodBodyStatement mbs = null;
-                    if (parentElement instanceof StatementContainer) {
-
-                        mbs = (MethodBodyStatement) parentElement.getFirstElement();
-                        if(!nameMaps.containsKey(mbs)){
-                            System.out.println("added mbs to name map");
-                            nameMaps.put(mbs, SLListOfRenamingTable.EMPTY_LIST);
-                        }
-                         programMethod = mbs.getProgramMethod(node.proof()
-                                .getServices());
+    private ListOfNode buildBranch(Node n) {
+        ListOfNode lon = SLListOfNode.EMPTY_LIST;
+        while(n.parent() != null){
+            lon = lon.append(n);
+            n=n.parent();
+        }
+        return lon.reverse();
+    }
+    /**
+     * updates the MethodStack.
+     * checks for a given node pair if methods returned and if
+     * so, it removes the corresponding entry from the name map
+     * 
+     * @param current
+     * @param child
+     * @param nameMap
+     */
+    private void updateMethodStack(Node current, Node child, Map<ProgramMethod, ListOfRenamingTable> nameMap) {
+        try {
+            
+            int current_stacksize = VisualDebugger.getVisualDebugger()
+                    .getMethodStackSize(current);
+            int next_stacksize = VisualDebugger.getVisualDebugger()
+                    .getMethodStackSize(child);
+            
+            if (current_stacksize == -1 || next_stacksize == -1)    return;
+            
+            if (current_stacksize > next_stacksize) {
+                int diff = current_stacksize - next_stacksize;
+                for (int k = 0; k < diff; k++) {
+                    if (!methodStack.isEmpty()) {
+                       selfVarStack.pop();
+                       ProgramMethod key =  methodStack.pop();
+                       if(nameMap.containsKey(key)){
+                       ListOfRenamingTable lort = nameMap.get(key);
+                       lort = lort.removeFirst(lort.head());
+                       nameMap.put(key, lort);
+                       }
+                       selfVar.toString();
+                       methodStack.toString();
                     }
-
-                    parameterCount = programMethod.getParameterDeclarationCount();
-                    Set<Integer> parameterIndices = getParameterIndicesOfMethod(programMethod);
-
-                    for (Integer index : parameterIndices) {
-                        
-                        LocationVariable programVariable = (LocationVariable) mbs.getArguments().getExpression(index);
-                        renamedLocalVariables.add(programVariable);
-                        initialRenamings.add(programVariable);
-                    }
-                    
-                    // treat currentnode, i.e. the method-frame
-                    SourceElement element = getStatement(currentNode);
-                    //  Before getting the finally renamed variables we have to get all variables that are declared
-                    //  in the method body. The resulting positions are not correct yet since the parameter count is missing.
-                    if (element instanceof MethodFrame) {
-                       
-                        MethodVisitor mv = new MethodVisitor(
-                                (MethodFrame) element, services);
-                        mv.start();
-                        
-                        renamedLocalVariables.addAll(addParameterCount(
-                                programMethod, WatchpointUtil.valueToKey(mv.result()),
-                                parameterCount, watchpoints));
-                        initialRenamings.addAll(addParameterCount(
-                                programMethod, WatchpointUtil.valueToKey(mv.result()),
-                                parameterCount, watchpoints));
-
-                    }System.out.println("size of renamed variables: " + renamedLocalVariables.size());
-                    if(renamedLocalVariables.isEmpty()){
-                        nameMaps.remove(mbs);
-                        System.out.println("removed mbs");
-                    }else {
-                    addRenamingTable(mbs, nameMaps, trackVariableNames(programMethod, renamedLocalVariables));
                 }
-                    }
             }
-            currentNode = parent;
-            parent = currentNode.parent();
+        } catch (EmptyStackException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
-    
+
+    /**
+     * Update self variable for local watchpoints. TODO
+     * 
+     * @param mf the MethodFrame
+     */
+    private void updateSelfVar(MethodFrame mf) {
+        ExecutionContext executionContext = (ExecutionContext) mf.getExecutionContext();
+        selfVar = executionContext.getRuntimeInstance();
+        selfVarStack.push(selfVar);
+        System.out.println(selfVar);
+    }
+
+
+    /**
+     * Collect all renamings from the current proof tree.
+     * 
+     * @return the list of renaming table
+     */
     private ListOfRenamingTable collectAllRenamings() {
 
         ListOfRenamingTable allRenamings = SLListOfRenamingTable.EMPTY_LIST;
-        Node anode = node;
-        // climb the tree
-        ListOfNode lon = SLListOfNode.EMPTY_LIST;
-        while (anode.parent() != null) {
-            
-            lon = lon.append(anode.parent());
-            anode = anode.parent();
-        }
-        lon = lon.reverse();
-        // walk back on the same branch
-        IteratorOfNode it = lon.iterator();
+
+        IteratorOfNode it = branch.iterator();
         while (it.hasNext()) {
             Node currentNode = it.next();
             ListOfRenamingTable renamingTables = currentNode.getRenamingTable();
@@ -251,15 +238,22 @@ public class VariableNameTracker {
 
                 while (i.hasNext()) {
                     RenamingTable next = i.next();
-                    System.out.println(next);
+                    System.out.println(next); //TODO remove
                     allRenamings = allRenamings.append(next);
                 }
             }
-
         }
         return allRenamings;
     }
     
+    /**
+     * Track variable names.
+     * 
+     * @param pm the pm
+     * @param initialRenamings the initial renamings
+     * 
+     * @return the renaming table
+     */
     private RenamingTable trackVariableNames(ProgramMethod pm, List<LocationVariable> initialRenamings) {
 
         List<LocationVariable> orginialLocalVariables = getLocalsForMethod(pm);
@@ -285,17 +279,16 @@ public class VariableNameTracker {
                     // replace entry with the most actual one
                     nameMap.put(originalVar, renamedVariable);
                     System.out.println("created name update");
-
                 }
-                //TODO track history
-              //  trackHistory(nameMap);
+                //trackHistory(nameMap);
             }
         }
         return new MultiRenamingTable(nameMap);
     }
-    //TODO
+    //TODO the method is buggy and causes a stack overflow
+    // it does not terminate because the values are not "disappearing" from the namemap
     private void trackHistory(HashMap<LocationVariable, SourceElement> nameMap) {
-       
+        
         IteratorOfRenamingTable i = collectAllRenamings().iterator();
         boolean allNamesUpToDate = true;
         while (i.hasNext()) {
@@ -308,6 +301,7 @@ public class VariableNameTracker {
                 if (renamedVariable != null) {
                     // replace entry with the most actual one
                     allNamesUpToDate = false;
+                    System.out.println("traced name...");
                     nameMap.put((LocationVariable) name, renamedVariable);
                 }
             }
@@ -317,7 +311,7 @@ public class VariableNameTracker {
  * some helper methods 
  */
 
-    private void addRenamingTable(MethodBodyStatement key, Map<MethodBodyStatement, ListOfRenamingTable> nameMap, RenamingTable newElement){
+    private void addRenamingTable(ProgramMethod key, Map<ProgramMethod, ListOfRenamingTable> nameMap, RenamingTable newElement){
         ListOfRenamingTable lort = nameMap.get(key);
         lort = nameMap.get(key).prepend(newElement);
         nameMap.put(key, lort);
@@ -341,14 +335,124 @@ public class VariableNameTracker {
     private List<WatchPoint> getWatchpointsForMethod(ProgramMethod pm){
         List<WatchPoint> wps = new LinkedList<WatchPoint>();
         for (WatchPoint watchPoint : watchpoints) {
-            if(watchPoint.getProgramMethod().equals(pm))
+            
+            ProgramMethod programMethod = watchPoint.getProgramMethod();
+            if(programMethod!= null && programMethod.equals(pm))
             wps.add(watchPoint);
             }
         return wps;
     }
     
- public Map<MethodBodyStatement, ListOfRenamingTable> result (){
+    /**
+     * Starts the name tracker.
+     * 
+     * When the KeY Prover is started every variable is initially renamed by the ProgVarReplaceVisitor, i.e. it
+     * is a new object. If we have used local variables in the watchpoints we have
+     * to keep track of these renamings. Therefore this method first looks up all applications of method-expand taclets.
+     * In those methods we check first if they contain parameters that are relevant for us and furthermore store the
+     * parameter count. Finally the following method-frame is investigated and the parameter count added to rebuild
+     * the original order.
+     * 
+     */
+    public void start() {
+
+        try {
+            final Services services = node.proof().getServices();
+
+            List<LocationVariable> renamedLocalVariables = null;
+            ProgramMethod programMethod = null;
+            int parameterCount = 0;
+
+            Iterator<Node> i = branch.iterator();
+            assert branch.size() >= 2;
+            Node current = i.next();
+            while (i.hasNext()) {
+
+                Node child = i.next();
+                updateMethodStack(current, child, nameMaps);
+
+                if (current.getAppliedRuleApp().rule() instanceof Taclet) {
+
+                    if (isMethodExpandRule(((Taclet) current
+                            .getAppliedRuleApp().rule()).getRuleSets())) {
+
+                        renamedLocalVariables = new LinkedList<LocationVariable>();
+                        // treat parent, i.e. the method-body-statement to get
+                        // parameter information
+                        SourceElement parentElement = getStatement(current);
+                        MethodBodyStatement mbs = null;
+                        if (parentElement instanceof StatementContainer) {
+
+                            mbs = (MethodBodyStatement) parentElement
+                                    .getFirstElement();
+                            programMethod = mbs.getProgramMethod(node.proof()
+                                    .getServices());
+                            methodStack.push(programMethod);
+                            System.out.println(methodStack.size()
+                                    + "elements on stack after push");
+                            if (!nameMaps.containsKey(programMethod)) {
+                                System.out.println("added mbs to name map");
+                                nameMaps.put(programMethod,
+                                        SLListOfRenamingTable.EMPTY_LIST);
+                            }
+                        }
+
+                        parameterCount = programMethod
+                                .getParameterDeclarationCount();
+                        Set<Integer> parameterIndices = getParameterIndicesOfMethod(programMethod);
+
+                        for (Integer index : parameterIndices) {
+
+                            LocationVariable programVariable = (LocationVariable) mbs
+                                    .getArguments().getExpression(index);
+                            renamedLocalVariables.add(programVariable);
+                        }
+
+                        // treat currentnode, i.e. the method-frame
+                        SourceElement element = getStatement(child);
+                        // Before getting the finally renamed variables we have
+                        // to get all variables that are declared
+                        // in the method body. The resulting positions are not
+                        // correct yet since the parameter count is missing.
+                        if (element instanceof MethodFrame) {
+
+                            MethodFrame mf = (MethodFrame) element;
+                            MethodVisitor mv = new MethodVisitor(mf, services);
+                            mv.start();
+                            System.out.println(mf.getExecutionContext());
+                            updateSelfVar(mf);
+                            renamedLocalVariables.addAll(addParameterCount(
+                                    programMethod, WatchpointUtil.valueToKey(mv
+                                            .result()), parameterCount,
+                                    watchpoints));
+                        }
+                        System.out.println("size of renamed variables: "
+                                + renamedLocalVariables.size());
+                        if (renamedLocalVariables.isEmpty()) {
+                            nameMaps.remove(programMethod);
+                            System.out.println("removed mbs");
+                        } else {
+
+                            addRenamingTable(programMethod, nameMaps,
+                                    trackVariableNames(programMethod,
+                                            renamedLocalVariables));
+                        }
+                    }
+                }
+                current = child;
+            }
+        } catch (RuntimeException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+    
+ public Map<ProgramMethod, ListOfRenamingTable> result (){
      return nameMaps;
- }  
+ }
+
+public ReferencePrefix getSelfVar() {
+    return selfVarStack.peek();
+}  
  
 }
