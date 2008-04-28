@@ -7,7 +7,11 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.proof.init;
 
+import java.util.HashMap;
+
 import de.uka.ilkd.key.gui.IMain;
+import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.SetOfGoalChooserBuilder;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -107,6 +111,13 @@ public class JavaProfile extends AbstractProfile {
      */
     public StrategyFactory getDefaultStrategyFactory() {        
         return DEFAULT;
+    }
+    
+    public void updateSettings(ProofSettings settings) {        
+        ChoiceSettings cs = settings.getChoiceSettings();
+        HashMap<String, String> dcs = cs.getDefaultChoices();
+        dcs.put("rtsj", "rtsj:off");
+        cs.setDefaultChoices(dcs);
     }
 
  

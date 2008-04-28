@@ -16,14 +16,8 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.decproc.JavaDecisionProcedureTranslationFactory;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
-import de.uka.ilkd.key.rule.AbstractIntegerRule;
-import de.uka.ilkd.key.rule.ListOfBuiltInRule;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.SLListOfBuiltInRule;
-import de.uka.ilkd.key.strategy.IteratorOfStrategyFactory;
-import de.uka.ilkd.key.strategy.SetAsListOfStrategyFactory;
-import de.uka.ilkd.key.strategy.SetOfStrategyFactory;
-import de.uka.ilkd.key.strategy.StrategyFactory;
+import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.strategy.*;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 public abstract class AbstractProfile implements Profile {

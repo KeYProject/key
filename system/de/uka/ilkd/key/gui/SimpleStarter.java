@@ -171,4 +171,9 @@ public class SimpleStarter implements IMain {
         }
     }
     
+    public ProofSettings getSettings(){
+        if(mediator.getProof() == null) return ProofSettings.DEFAULT_SETTINGS;
+        return mediator.getProof().getSettings();
+    }
+    
 }

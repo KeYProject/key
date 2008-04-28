@@ -111,6 +111,7 @@ public class ProofSettings {
     
     public void setProfile(Profile profile) {
         ensureInitialized();
+        profile.updateSettings(this);
         this.profile = profile;
     }
 

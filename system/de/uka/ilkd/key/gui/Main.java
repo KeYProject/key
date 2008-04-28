@@ -2516,6 +2516,11 @@ public class Main extends JFrame implements IMain {
         }
     }
     
+    public ProofSettings getSettings(){
+        if(mediator.getProof() == null) return ProofSettings.DEFAULT_SETTINGS;
+        return mediator.getProof().getSettings();
+    }
+    
     public static void evaluateOptions(String[] opt) {
 	int index = 0;
 	while (opt.length > index) {	    
@@ -2536,7 +2541,9 @@ public class Main extends JFrame implements IMain {
 		} else if (opt[index].equals("AUTO")) {
 		    batchMode = true;
                     visible = false;
-		} else if (opt[index].equals("TESTING") || opt[index].equals("UNIT")) {
+		} else if (opt[index].equals("RTSJ")) {
+                    ProofSettings.DEFAULT_SETTINGS.setProfile(new RTSJProfile());
+                } else if (opt[index].equals("TESTING") || opt[index].equals("UNIT")) {
                     if(opt[index].equals("TESTING")){
                         testStandalone = true;
                         visible = false;
@@ -2552,7 +2559,6 @@ public class Main extends JFrame implements IMain {
                         index ++;
                     }
                     ProofSettings.DEFAULT_SETTINGS.setProfile(p);
-                    p.updateSettings(ProofSettings.DEFAULT_SETTINGS);
                     testMode = true;
 		} else if (opt[index].equals("DEBUGGER")) {                                     
                     System.out.println("Symbolic Execution Debugger Mode enabled ...");                                        
@@ -2564,7 +2570,6 @@ public class Main extends JFrame implements IMain {
                         index ++;
                     }
                     ProofSettings.DEFAULT_SETTINGS.setProfile(p);
-                    p.updateSettings(ProofSettings.DEFAULT_SETTINGS);
                     testMode = true;
                 } 
                 
@@ -2606,6 +2611,7 @@ public class Main extends JFrame implements IMain {
 	} else {
 	    System.out.println("Not using assertions ...");	   
 	}       
+        ProofSettings.DEFAULT_SETTINGS.getProfile().updateSettings(ProofSettings.DEFAULT_SETTINGS);
     }
 
     private static void printUsageAndExit() {

@@ -4,7 +4,7 @@ public abstract class MemoryArea{
 
     protected final long size;
     protected long consumed;
-    protected final Runnable logic;
+    protected final /*@ nullable @*/ Runnable logic;
 
     protected final PhysicalMemoryArea memory;
 
