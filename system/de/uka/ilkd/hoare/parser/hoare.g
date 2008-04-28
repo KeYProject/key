@@ -25,7 +25,7 @@ class KeYHoareParser extends Parser;
 options {
     importVocab=KeYHoareLexer;
     k = 1;
-    defaultErrorHandler=true;
+    defaultErrorHandler=false;
 }
 
 {
