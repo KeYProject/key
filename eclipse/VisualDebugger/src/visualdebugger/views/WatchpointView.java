@@ -1,8 +1,7 @@
 package visualdebugger.views;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.lang.reflect.Array;
+import java.util.*;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.*;
@@ -16,11 +15,11 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.*;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.TableEditor;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
@@ -92,7 +91,6 @@ public class WatchpointView extends ViewPart {
          */
         public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
             // TODO Auto-generated method stub
-
         }
 
     }
@@ -140,7 +138,10 @@ public class WatchpointView extends ViewPart {
                 result = "" + wp.isEnabled();
                 break;
             case 5:
-                result = "false";
+                result = "";
+                break;
+            case 6:
+                result = "";
                 break;
             default:
                 break;
@@ -193,13 +194,17 @@ public class WatchpointView extends ViewPart {
      */
     private Table createTable() {
         Table table = viewer.getTable();
-        
         TableColumn column;
-
+        // Create the cell editors
+//        CellEditor[] editors = new CellEditor[4];
+//        editors[0] = new TextCellEditor(table);
+//        editors[1] = new CheckboxCellEditor(table);
+//        viewer.setCellEditors(editors);
+        
         column = new TableColumn(table, SWT.NONE, 0);
         column.setWidth(200);
         column.setText("Watch Expression");
-
+        
         column = new TableColumn(table, SWT.NONE, 1);
         column.setWidth(150);
         column.setText("Method");
@@ -216,9 +221,13 @@ public class WatchpointView extends ViewPart {
         column.setWidth(80);
         column.setText("Enabled");
         
-        column = new TableColumn(table, SWT.CHECK, 5);
-        column.setWidth(30);
+        column = new TableColumn(table, SWT.NONE, 5);
+        column.setWidth(80);
         column.setText("Possibility");
+        
+        column = new TableColumn(table, SWT.NONE, 6);
+        column.setWidth(40);
+        column.setText("All Quantification");
         return table;
     }
 
@@ -326,10 +335,50 @@ public class WatchpointView extends ViewPart {
                             }
                             vd.setWatchPointManager(watchPointManager);
                             viewer.refresh();
+                            addCheckBoxes(viewer,result.isLocal());
+                            
                         }
                     }
                 }
 
+            }
+
+            private void addCheckBoxes(final TableViewer viewer, final boolean isLocal) {
+                final Table table = viewer.getTable();
+                final Object[] wps =  watchPointManager.getWatchPointsAsArray();
+                TableItem [] items = table.getItems ();
+
+                  final  TableItem ti = items[items.length-1];
+                                      
+                    Button possibility = new Button(table,SWT.CHECK);
+                    possibility.setData(items.length-1);
+                    final int line = (Integer)possibility.getData();
+                    possibility.addSelectionListener(new SelectionAdapter(){
+                      public void widgetSelected(SelectionEvent e){
+                          WatchPoint wp = (WatchPoint) wps[line];
+                          wp.setPossible(((Button) e.widget).getSelection());
+                      }
+                    });
+                    TableEditor tbl_editor = new TableEditor(table);
+                    tbl_editor.grabHorizontal=true;
+                    tbl_editor.minimumHeight=possibility.getSize().x;
+                    tbl_editor.minimumWidth=possibility.getSize().y;
+                    tbl_editor.setEditor(possibility,ti,5);
+                    
+                    Button all_quant = new Button(table,SWT.CHECK);
+                    all_quant.setData(items.length-1);
+                    all_quant.addSelectionListener(new SelectionAdapter(){
+                      public void widgetSelected(SelectionEvent e){
+                          WatchPoint wp = (WatchPoint) wps[line];
+                          //TODO
+                      }
+                    });
+                    tbl_editor = new TableEditor(table);
+                    all_quant.setEnabled(!isLocal);
+                    tbl_editor.grabHorizontal=true;
+                    tbl_editor.minimumHeight=all_quant.getSize().x;
+                    tbl_editor.minimumWidth=all_quant.getSize().y;
+                    tbl_editor.setEditor(all_quant,ti,6);
             }
         };
         addAction.setText("Add");
@@ -339,15 +388,30 @@ public class WatchpointView extends ViewPart {
             public void run() {
 
                 IStructuredSelection sel = (IStructuredSelection) viewer
-                        .getSelection();
-
-                Object element = sel.getFirstElement();
-                if (element instanceof WatchPoint) {
-
-                    watchPointManager.removeWatchPoint((WatchPoint) element);
-                    viewer.refresh();
-
+                .getSelection();
+                Iterator<WatchPoint> i = sel.iterator();
+                
+                while(i.hasNext()){
+                    WatchPoint wp = i.next();
+                    watchPointManager.removeWatchPoint(wp);
                 }
+                removeCheckboxes(viewer);
+                viewer.refresh();
+
+            }
+
+            private void removeCheckboxes(TableViewer viewer) {
+                Table table = viewer.getTable();
+                int[] items = table.getSelectionIndices();
+                for (int j : items) {
+                    TableItem ti = table.getItem(j);
+                    TableEditor tbl_editor = new TableEditor(table);
+                   // ti.dispose();
+                    tbl_editor.setEditor(new Text(table, SWT.NONE),ti,5);
+                    tbl_editor.setEditor(null,ti,6);
+                }
+                
+                
             }
         };
         removeAction.setText("Remove");
@@ -357,14 +421,13 @@ public class WatchpointView extends ViewPart {
             public void run() {
 
                 IStructuredSelection sel = (IStructuredSelection) viewer
-                        .getSelection();
-
-                Object element = sel.getFirstElement();
-                if (element instanceof WatchPoint) {
-                    ((WatchPoint) element).setEnabled(true);
-                    viewer.refresh();
-
+                .getSelection();
+                Iterator<WatchPoint> i = sel.iterator();
+                while(i.hasNext()){
+                    WatchPoint element = i.next();
+                        ((WatchPoint) element).setEnabled(true);
                 }
+                viewer.refresh();
             }
         };
         enableAction.setText("Enable");
@@ -374,14 +437,13 @@ public class WatchpointView extends ViewPart {
             public void run() {
 
                 IStructuredSelection sel = (IStructuredSelection) viewer
-                        .getSelection();
-
-                Object element = sel.getFirstElement();
-                if (element instanceof WatchPoint) {
-                    ((WatchPoint) element).setEnabled(false);
-                    viewer.refresh();
-
+                .getSelection();
+                Iterator<WatchPoint> i = sel.iterator();
+                while(i.hasNext()){
+                    WatchPoint element = i.next();
+                        ((WatchPoint) element).setEnabled(false);
                 }
+                viewer.refresh();
             }
         };
         disableAction.setText("Disable");

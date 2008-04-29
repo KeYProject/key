@@ -33,6 +33,7 @@ public class WatchPoint {
     
     /** The enabled. */
     private boolean enabled = true;
+    private boolean isPossible = false;
     
     private ProgramVariable self = null;
     private int flavor = 0;
@@ -204,6 +205,14 @@ public class WatchPoint {
 
     public void setSelf(ProgramVariable self) {
         this.self = self;
+    }
+
+    public boolean isPossible() {
+        return isPossible;
+    }
+
+    public void setPossible(boolean isPossible) {
+        this.isPossible = isPossible;
     }
 
 

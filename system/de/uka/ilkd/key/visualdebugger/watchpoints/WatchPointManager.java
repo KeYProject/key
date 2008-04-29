@@ -57,15 +57,15 @@ public class WatchPointManager {
             if (watchpoints.isEmpty()) {
                 return 0;
             } else {
-    
+                
                 Namespace progVarNS = new Namespace();
-    
                 final JavaInfo ji = services.getJavaInfo();
     
                 for (int i = 0; i < watchpoints.size(); i++) {
-    
+                    
+
                     WatchPoint wp = watchpoints.get(i);
-    
+                    System.out.println("possibility flag: " + wp.isPossible());
                     if (wp.isEnabled()) {
     
                         String declaringType = wp.getDeclaringType();
@@ -75,7 +75,7 @@ public class WatchPointManager {
                                 nameOfSelf);
     
                         // check namespace
-                        while (services.getNamespaces().lookup(selfName) != null) {
+                        while (progVarNS.lookup(selfName) != null) {
                             nameOfSelf = nameOfSelf.concat("Z");
                             selfName = new ProgramElementName(nameOfSelf);
                         }
@@ -223,7 +223,6 @@ public class WatchPointManager {
             watchPoints.remove(wp);
         }
     }
-
     
     /**
      * Gets the list of WatchPoints. This method never returns
