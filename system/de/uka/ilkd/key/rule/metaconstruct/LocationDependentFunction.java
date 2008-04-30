@@ -17,26 +17,26 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
 
 public class LocationDependentFunction extends AbstractMetaOperator {
-
+    
     private static Term updTerm = null;
     private static Term heapDepFuncTerm = null;
     
-    private static Term getHeapDepFuncTermFor(Term term, Services services){
-        if(term.sub(0)==updTerm){
+    private Term getHeapDepFuncTermFor(Term term, Services services){        
+        if (term.sub(0) == updTerm) {
             return heapDepFuncTerm;
         }
         updTerm = term.sub(0);
-        ListOfProgramVariable pvs = collectRelevantPVs(term, services);
-        Term hdf = createHeapDependentFunctionTerm(pvs, services);
+
+        final ListOfProgramVariable pvs = collectRelevantPVs(term, services);
+        heapDepFuncTerm = createHeapDependentFunctionTerm(pvs, services);        
         Map map = AtPreEquations.getAtPreFunctions(updTerm, services);
         OpReplacer or = new OpReplacer(map);
         Term preUpdTerm = or.replace(updTerm);
-        if ( !( updTerm.op () instanceof IUpdateOperator ) ) return hdf;
+        if ( !( updTerm.op () instanceof IUpdateOperator ) ) return heapDepFuncTerm;
         final Update upd = Update.createUpdate ( preUpdTerm );
         final UpdateFactory uf =
             new UpdateFactory ( services, new UpdateSimplifier () );
-        heapDepFuncTerm = uf.prepend(upd, hdf);
-        return heapDepFuncTerm;
+        return heapDepFuncTerm = uf.prepend(upd, heapDepFuncTerm);
     }
     
     public LocationDependentFunction() {
