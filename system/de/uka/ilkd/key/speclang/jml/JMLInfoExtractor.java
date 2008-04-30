@@ -247,7 +247,7 @@ class JMLInfoExtractor {
         // Collect all comments preceding the type declaration or the modifiers.
         ListOfComment coms = SLListOfComment.EMPTY_LIST;
         coms = coms.prepend(td.getComments());
-        coms = coms.prepend(td.getProgramElementName().getComments());
+        if(td.getProgramElementName()!=null) coms = coms.prepend(td.getProgramElementName().getComments());
         ArrayOfModifier mods = td.getModifiers();
         for (int i=0; i < mods.size(); i++) {
             coms = coms.prepend(mods.getModifier(i).getComments());

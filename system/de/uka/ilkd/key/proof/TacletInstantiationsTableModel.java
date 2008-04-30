@@ -26,20 +26,16 @@ import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.collection.SLListOfString;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.parser.*;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.NewVarcond;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
-import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
-import de.uka.ilkd.key.rule.inst.RigidnessException;
-import de.uka.ilkd.key.rule.inst.SortException;
+import de.uka.ilkd.key.rule.inst.*;
 import de.uka.ilkd.key.util.Array;
 
 
@@ -368,14 +364,18 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 	            final TypeConverter tc = services.getTypeConverter();
 		    final SchemaVariable peerSV=(SchemaVariable)o;
 		    final Object peerInst = app.instantiations().getInstantiation(peerSV);
-		    Expression peerInstExpr;
-		    if (peerInst instanceof Term) {
-			peerInstExpr=tc.convertToProgramElement((Term)peerInst);
-		    } else {
-			peerInstExpr=(Expression)peerInst;
-		    }
-		    kjt = tc.getKeYJavaType(peerInstExpr, app.instantiations().
-					    getContextInstantiation().activeStatementContext());
+                    if(peerInst instanceof TypeReference){
+                        kjt = ((TypeReference) peerInst).getKeYJavaType();
+                    }else{
+                        Expression peerInstExpr;
+                        if (peerInst instanceof Term) {
+                            peerInstExpr=tc.convertToProgramElement((Term)peerInst);
+                        } else{
+                            peerInstExpr=(Expression)peerInst;
+                        }
+                        kjt = tc.getKeYJavaType(peerInstExpr, app.instantiations().
+                                getContextInstantiation().activeStatementContext());
+                    }
 		    if(nvc.isDefinedByElementSort()){
 		        Sort s = kjt.getSort();
 			if(s instanceof ArraySort) s = ((ArraySort)s).elementSort();              

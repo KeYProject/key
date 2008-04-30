@@ -117,15 +117,20 @@ public class Test extends SuperTest{
     }
 
     /*@ public normal_behavior
-      @  requires true;
-      @  working_space \space(Test)+\space(TestRunnable)+
-      @         \space(LTMemory);
+      @  requires \outerScope(this.memoryArea, \currentMemoryArea);
+      @  working_space \space(Test)+\space(Runnable)+
+      @         \space(LTMemory)+24;
       @  ensures true;
       @*/
     public void enterScope(){
-	TestRunnable t = new TestRunnable(new Test(), false);
+	final Test t = new Test();
 	ScopedMemory sm = new LTMemory(48);
-	sm.enter(t);
+	sm.enter(new Runnable(){
+		public void run(){
+		    Test nt = new Test();
+		    nt.next = t;
+		}
+	    });
     }
 
     /*@ public normal_behavior
@@ -141,8 +146,12 @@ public class Test extends SuperTest{
       @  ensures true;
       @*/
     public void testScopeCycle(ScopedMemory sm1, ScopedMemory sm2){
-	TestRunnable t = new TestRunnable(new Test(), false);
-	EnterScopeRunnable esr = new EnterScopeRunnable(sm2,t);
+	EnterScopeRunnable esr = new EnterScopeRunnable(sm2,new Runnable(){
+		public void run(){
+		    Test nt = new Test();
+		    nt.next = t;
+		}
+	    });
 	EnterScopeRunnable esr1 = new EnterScopeRunnable(sm1, esr);
 	//	sm2.enter(esr1);
 	sm1.enter(esr);

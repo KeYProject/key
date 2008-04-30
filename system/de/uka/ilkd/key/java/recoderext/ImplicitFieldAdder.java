@@ -13,17 +13,14 @@ import java.util.*;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
-import recoder.java.CompilationUnit;
 import recoder.abstraction.Variable;
-import recoder.java.Identifier;
+import recoder.java.*;
 import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.*;
-import recoder.java.declaration.DeclarationSpecifier;
 import recoder.java.reference.TypeReference;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer.TransformerCache;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -60,6 +57,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
     /** flag set if java.lang.Object has been already transformed */
     private boolean transformedObject = false;
     private ClassType javaLangObject;
+    private Set interfaceDecl;
 
     /**
      * creates a transformation that adds all implicit fields,
@@ -165,7 +163,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	    attach(fd, td, 0);
 	}
 	  
-        
+
 	if (!td.isInterface() && !td.isAbstract()) {	  
 	    attach(createImplicitRecoderField("int", 
 					      IMPLICIT_NEXT_TO_CREATE, true, true), td, 0);
@@ -192,14 +190,14 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	 Set cds = classDeclarations();
 	 Iterator it = cds.iterator();
 	 while(it.hasNext()){
-	     ClassDeclaration cd = (ClassDeclaration) it.next();
-	     if(cd.getName()==null || cd.getStatementContainer() !=null){
+	     TypeDeclaration cd = (TypeDeclaration) it.next();
+	     if(cd instanceof ClassDeclaration && 
+                     (cd.getName()==null || ((ClassDeclaration) cd).getStatementContainer()!=null)){
 	         (new FinalOuterVarsCollector()).walk(cd);
 	     }
 	 }     
 	 return super.analyze();
     }
-    
     
     protected void makeExplicit(TypeDeclaration td) {
 
@@ -220,4 +218,5 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 // 	    try { sw.close(); } catch (Exception e) {}	   
 // 	}
     }
+    
 }
