@@ -263,6 +263,7 @@ sub runAuto {
   #  system $bin_path . "/runProver $_[0] auto";
   my $dk = &getcwd . "/$_[0]";
   #  print "$dk .-. ";
+  sleep(1);
   my $result = system $absolute_bin_path . "/runProver $dk auto print_statistics " . $absolute_bin_path . "/../examples/statistics.csv";
   #chdir "/home/daniels/programme/kruscht/";
   #my $result = system 'java RetVal';

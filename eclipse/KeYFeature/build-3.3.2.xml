@@ -9,15 +9,15 @@
 	</target>
 
 	<target name="all.plugins" depends="init">
-		<ant antfile="build-3.2.1.xml" dir="../KeYPlugin" target="${target}">
+		<ant antfile="build-3.3.2.xml" dir="../KeYPlugin" target="${target}">
 		</ant>
-		<ant antfile="build-3.2.1.xml" dir="../ProofVisualization" target="${target}">
+		<ant antfile="build-3.3.2.xml" dir="../ProofVisualization" target="${target}">
 		</ant>
 		<ant antfile="build-all.xml" dir="../KeYExternalLibraries/" target="${target}">
 		</ant>
-		<ant antfile="build-3.2.1.xml" dir="../KeYPlugin" target="${target}">
+		<ant antfile="build-3.3.2.xml" dir="../KeYPlugin" target="${target}">
 		</ant>
-<!-- commented out until release of rothe vis debug <ant antfile="build-3.2.1.xml" dir="../VisualDebugger" target="${target}"> 	</ant> -->
+		<!-- commented out until rothe vis debug is on master <ant antfile="build-3.3.2.xml" dir="../VisualDebugger" target="${target}"> </ant> -->
 	</target>
 	<target name="all.features" depends="init">
 	</target>
