@@ -146,6 +146,7 @@ public class Test extends SuperTest{
       @  ensures true;
       @*/
     public void testScopeCycle(ScopedMemory sm1, ScopedMemory sm2){
+	final Test t = new Test();
 	EnterScopeRunnable esr = new EnterScopeRunnable(sm2,new Runnable(){
 		public void run(){
 		    Test nt = new Test();

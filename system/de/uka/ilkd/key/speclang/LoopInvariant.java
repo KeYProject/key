@@ -51,7 +51,7 @@ public interface LoopInvariant {
      * Returns the modifier set.
      */
     public SetOfLocationDescriptor getModifies(
-            Term selfTerm, 
+            Term selfTerm,
             /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
             Services services);
     

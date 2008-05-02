@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.init.RTSJProfile;
 import de.uka.ilkd.key.proof.mgt.*;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
@@ -495,16 +496,23 @@ public class UseOperationContractRule implements BuiltInRule {
         Term excNullTerm = TB.equals(TB.var(excVar), TB.NULL(services));
        
         //create "Pre" branch
+        Term preF = pre.getFormula();
+        if(services.getProof().getSettings().getProfile() instanceof RTSJProfile){
+            Term wsPre = cwi.contract.getWorkingSpace(selfVar, paramVars, services);
+            Function leq = (Function) nss.functions().lookup(new Name("leq"));
+            wsPre = TB.tf().createFunctionTerm(leq, TB.tf().createFunctionTerm(add, mCons, wsPre),
+                    TB.dot(mTerm, services.getJavaInfo().getAttribute(
+                            "size", "javax.realtime.MemoryArea")));
+            preF = TB.and(wsPre, preF);
+        }
         Term preTerm = uf.apply(selfParamsUpdate, 
                                 TB.imp(pre.getAxiomsAsFormula(), 
-                                       pre.getFormula()));
+                                       preF));
         replaceInGoal(preTerm, preGoal, pio);
         
         //create "Post" branch
         StatementBlock postSB = replaceStatement(jb, new StatementBlock());
-        Term wsEq = TB.equals(ws, cwi.contract.getWorkingSpace(selfVar, paramVars, services));
-        wsEq = uf.apply(uf.sequential(new Update[]{selfParamsUpdate,
-                atPreUpdate}),wsEq);
+
         Term postTermWithoutUpdate 
             = TB.imp(TB.and(new Term[]{excNullTerm,
                                        post.getAxiomsAsFormula(),
@@ -534,7 +542,14 @@ public class UseOperationContractRule implements BuiltInRule {
                                                            resultUpdate}),
                                 postTermWithoutUpdate);
         }
-        postTerm = TB.imp(wsEq, postTerm);
+    
+        Term wsEq = TB.tt();
+        if(services.getProof().getSettings().getProfile() instanceof RTSJProfile){    
+            wsEq = TB.equals(ws, cwi.contract.getWorkingSpace(selfVar, paramVars, services));
+            wsEq = uf.apply(uf.sequential(new Update[]{selfParamsUpdate,
+                    atPreUpdate}),wsEq);
+            postTerm = TB.imp(wsEq, postTerm);
+        }
                                                         
         replaceInGoal(postTerm, postGoal, pio);
         
@@ -544,8 +559,7 @@ public class UseOperationContractRule implements BuiltInRule {
         Term excPostTermWithoutUpdate
             = TB.imp(TB.and(new Term[]{TB.not(excNullTerm),
                                        post.getAxiomsAsFormula(),
-                                       post.getFormula(),
-                                       wsEq}),
+                                       post.getFormula()}),
                      TB.prog(modality,
                              JavaBlock.createJavaBlock(excPostSB), 
                              pio.subTerm().sub(0)));

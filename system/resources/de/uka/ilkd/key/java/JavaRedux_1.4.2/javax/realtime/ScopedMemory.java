@@ -6,10 +6,10 @@ public abstract class ScopedMemory extends MemoryArea{
 
     public static ScopedMemory currentMemoryArea;
 
-    //@ public static invariant counter>=1;
+    // public static invariant counter>=1;
     private static long counter=1;
 
-    //@ public invariant (\forall ScopedMemory m; m!=null && m.id==id; m==this);
+    // public invariant (\forall ScopedMemory m; m!=null && m.id==id; m==this);
     private long id = counter++;
 
     /*@ public invariant referenceCount>=0 && (referenceCount>0 <==>

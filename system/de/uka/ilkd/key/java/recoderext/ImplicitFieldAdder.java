@@ -57,7 +57,6 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
     /** flag set if java.lang.Object has been already transformed */
     private boolean transformedObject = false;
     private ClassType javaLangObject;
-    private Set interfaceDecl;
 
     /**
      * creates a transformation that adds all implicit fields,
@@ -99,11 +98,14 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	    modifiers.add(new Public());
 	}
 	
+        String baseType = typeName.substring(0, typeName.indexOf("[")==-1 ? 
+                typeName.length() : typeName.indexOf("["));
+        
 	Identifier id = typeName.charAt(0) == '<' ? 
-	    new ImplicitIdentifier(typeName) : new Identifier(typeName);
+	    new ImplicitIdentifier(baseType) : new Identifier(baseType);
 	
 	FieldDeclaration fd = new FieldDeclaration
-	    (modifiers, new TypeReference(id), 
+	    (modifiers, new TypeReference(id, (typeName.length()-baseType.length())/2), 
 	     new ImplicitIdentifier(fieldName), null);
 	
 	fd.makeAllParentRolesValid();

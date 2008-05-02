@@ -115,7 +115,8 @@ public class LoopInvariantImpl implements LoopInvariant {
         
         //self
         if(selfTerm != null) {
-            assert selfTerm.sort().extendsTrans(originalSelfTerm.sort());
+            assert (selfTerm.sort().extendsTrans(originalSelfTerm.sort()) || 
+                originalSelfTerm.sort().extendsTrans(selfTerm.sort()));
             result.put(originalSelfTerm, selfTerm);
         }
         

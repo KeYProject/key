@@ -324,8 +324,11 @@ public class ConstructorNormalformBuilder
 	    Iterator it = outerVars.iterator();
 	    while(it.hasNext()){
 	        Variable v = (Variable) it.next();
+                String typeName = ((Type) v2t.get(v)).getName();
+                String baseType = typeName.substring(0, typeName.indexOf("[")==-1 ? 
+                        typeName.length() : typeName.indexOf("["));
 	        parameters.add(new ParameterDeclaration(
-	                new TypeReference(new Identifier(((Type) v2t.get(v)).getName())), 
+	                new TypeReference(new Identifier(baseType), (typeName.length()-baseType.length())/2), 
 	                new Identifier(v.getName())));
 	    }
 	}

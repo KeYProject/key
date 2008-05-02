@@ -95,6 +95,8 @@ public class MetaEquivalentUpdates extends AbstractMetaOperator {
 		for (int j = 0; j < op.arity(); j++) {
 			LogicVariable lv = new LogicVariable(new Name("x" + j),
                                                  getArgumentSort(op, j));
+                        System.out.println("lv: "+lv);
+                        System.out.println("getArgumentSort("+op+","+ j+"): "+getArgumentSort(op, j));
 			Term vt = tf.createVariableTerm(lv);
 			//System.out.print(" " + vt.toString());
 			varArray[j] = vt;
