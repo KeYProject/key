@@ -63,7 +63,7 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
             private MethodFrame frame = null;
             private SetOfLoopStatement loops = SetAsListOfLoopStatement.EMPTY_SET;
             protected void doDefaultAction(SourceElement node) {
-                if(node instanceof MethodFrame) {
+                if(node instanceof MethodFrame && frame == null) {
                     frame = (MethodFrame) node;
                 } else if(frame == null && node instanceof LoopStatement) {
                     loops = loops.add((LoopStatement) node);
