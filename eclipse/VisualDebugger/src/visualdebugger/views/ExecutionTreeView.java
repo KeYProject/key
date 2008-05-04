@@ -382,6 +382,9 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                     try {
                         if (activeWPs != null && activeWPs.size()>0) {
                             for (WatchPoint watchpoint : activeWPs) {
+                                if(watchpoint.testPossible()){
+                                    wpInfo.add(watchpoint.getExpression() +" is possible@" + watchpoint.getMethod());
+                                }else
                                 wpInfo.add(watchpoint.getExpression() +"@" + watchpoint.getMethod());
 
                             }

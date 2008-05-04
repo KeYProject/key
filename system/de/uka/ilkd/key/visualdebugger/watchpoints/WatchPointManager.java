@@ -63,9 +63,7 @@ public class WatchPointManager {
     
                 for (int i = 0; i < watchpoints.size(); i++) {
                     
-
                     WatchPoint wp = watchpoints.get(i);
-                    System.out.println("possibility flag: " + wp.isPossible());
                     if (wp.isEnabled()) {
     
                         String declaringType = wp.getDeclaringType();
@@ -98,7 +96,6 @@ public class WatchPointManager {
     
                         wp.setWatchpointTerm(createWatchpointTerm(services,
                                 progVarNS, wp, declaringType, selfName));
-    
                     }
                 }
                 return 1;
@@ -109,7 +106,6 @@ public class WatchPointManager {
             return -1;
         }
     }
-
 
     /**
      * @param services
@@ -127,16 +123,6 @@ public class WatchPointManager {
                 + selfName);
         buffer.append(" ) : { " + wp.getName() + " = " + wp.getExpression());
         buffer.append(";} }\\>" + wp.getName() + " = TRUE");
-    
-//        System.out.println(term.op().getClass());
-//        ProgramPrefix programPrefix = (ProgramPrefix) term
-//        .javaBlock().program();
-//        MethodFrame mf= (MethodFrame) programPrefix.getPrefixElementAt(programPrefix
-//                .getPrefixLength() - 1);
-//        ExecutionContext executionContext = (ExecutionContext) mf.getExecutionContext();
-//        ProgramVariable runtimeInstance = (ProgramVariable) executionContext.getRuntimeInstance();
-//        System.out.println(runtimeInstance.id());
-//        wp.setSelf(runtimeInstance);
         
         return ProblemLoader.parseTerm(buffer.toString(), services,
                 new Namespace(), progVarNS);

@@ -4,6 +4,7 @@ import java.lang.reflect.Array;
 import java.util.*;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.gef.editparts.GridLayer;
 import org.eclipse.jdt.core.*;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.IVariableBinding;
@@ -16,9 +17,13 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableEditor;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
@@ -34,9 +39,6 @@ import de.uka.ilkd.key.visualdebugger.watchpoints.*;
  * The Class WatchpointView.
  */
 public class WatchpointView extends ViewPart {
-
-    /** The viewer. */
-    private TableViewer viewer;
 
     /** The delete action. */
     private Action removeAction;
@@ -56,6 +58,10 @@ public class WatchpointView extends ViewPart {
     private ICompilationUnit icunit;
 
     private LinkedList<Integer> positions;
+    private Table table;
+    private final int ALL_QUAN = 1;
+    private final int EX_QUAN = 1;
+    private TableViewer tableViewer;
 
     /**
      * The Class WatchPointContentProvider.
@@ -68,9 +74,7 @@ public class WatchpointView extends ViewPart {
          * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
          */
         public Object[] getElements(Object inputElement) {
-
-            WatchPointManager wpm = (WatchPointManager) inputElement;
-            return wpm.getWatchPointsAsArray();
+            return watchPointManager.getWatchPointsAsArray();
         }
 
         /*
@@ -92,6 +96,22 @@ public class WatchpointView extends ViewPart {
         public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
             // TODO Auto-generated method stub
         }
+//        public void addWatchpoint(WatchPoint wp) {
+//            watchPointManager.addWatchPoint(wp);
+//        }
+//
+//        /* (non-Javadoc)
+//         * @see TODO
+//         */
+//        public void removeWatchpoint(WatchPoint wp) {
+//            watchPointManager.removeWatchPoint(wp);
+//        }
+//
+//        /* (non-Javadoc)
+//         * @see TODO
+//         */
+//        public void updateWatchpoint(WatchPoint wp) {
+//        }
 
     }
 
@@ -137,22 +157,22 @@ public class WatchpointView extends ViewPart {
             case 4:
                 result = "" + wp.isEnabled();
                 break;
-            case 5:
-                result = "";
-                break;
-            case 6:
-                result = "";
-                break;
+//            case 5:
+//               // result = "";
+//                break;
+//            case 6:
+//              //  result = "";
+//                break;
             default:
                 break;
             }
             return result;
         }
 
-    }
+    }    
 
     /**
-     * Instantiates a new breakpoint view.
+     * Instantiates a new watchpoint view.
      */
     public WatchpointView() {
         vd = VisualDebugger.getVisualDebugger();
@@ -169,17 +189,12 @@ public class WatchpointView extends ViewPart {
     public void createPartControl(Composite parent) {
 
         watchPointManager = vd.getWatchPointManager();
-        viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL
-                | SWT.V_SCROLL | SWT.SEPARATOR);
-
-        Table table = createTable();
+        table = createTable(parent);
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
-
-        viewer.setContentProvider(new WatchPointContentProvider());
-        viewer.setLabelProvider(new WatchPointLabelProvider());
-
-        viewer.setInput(watchPointManager);
+       
+        createTableViewer();
+        tableViewer.setInput(watchPointManager);
 
         makeActions();
         // hookContextMenu();
@@ -192,14 +207,10 @@ public class WatchpointView extends ViewPart {
      * 
      * @return the table
      */
-    private Table createTable() {
-        Table table = viewer.getTable();
+    private Table createTable(Composite parent) {
+        Table table = new Table(parent, SWT.MULTI | SWT.H_SCROLL
+                | SWT.V_SCROLL | SWT.SEPARATOR /*| SWT.CHECK*/);
         TableColumn column;
-        // Create the cell editors
-//        CellEditor[] editors = new CellEditor[4];
-//        editors[0] = new TextCellEditor(table);
-//        editors[1] = new CheckboxCellEditor(table);
-//        viewer.setCellEditors(editors);
         
         column = new TableColumn(table, SWT.NONE, 0);
         column.setWidth(200);
@@ -244,6 +255,18 @@ public class WatchpointView extends ViewPart {
      * viewer.getControl().setMenu(menu); getSite().registerContextMenu(menuMgr,
      * viewer); }
      */
+
+    /**
+     * Create the TableViewer 
+     */
+        private TableViewer createTableViewer() {
+    
+            tableViewer = new TableViewer(table);
+            tableViewer.setUseHashlookup(true);
+            tableViewer.setContentProvider(new WatchPointContentProvider());
+            tableViewer.setLabelProvider(new WatchPointLabelProvider());
+            return tableViewer;
+        }
 
     /**
      * Contribute to action bars.
@@ -334,8 +357,8 @@ public class WatchpointView extends ViewPart {
                                                     includingLocalVariables));
                             }
                             vd.setWatchPointManager(watchPointManager);
-                            viewer.refresh();
-                            addCheckBoxes(viewer,result.isLocal());
+                            tableViewer.refresh();
+                            addCheckBoxes(result.isLocal());
                             
                         }
                     }
@@ -343,42 +366,55 @@ public class WatchpointView extends ViewPart {
 
             }
 
-            private void addCheckBoxes(final TableViewer viewer, final boolean isLocal) {
-                final Table table = viewer.getTable();
+            private void addCheckBoxes(final boolean isLocal) {
+                final Table table = tableViewer.getTable();
                 final Object[] wps =  watchPointManager.getWatchPointsAsArray();
                 TableItem [] items = table.getItems ();
+                final  TableItem ti = items[items.length-1];
+                final TableEditor tableEditor = new TableEditor(table);
+                Button possibility = new Button(table, SWT.CHECK);
+                possibility.setData(items.length - 1);
+                possibility.setBackground(ti.getBackground());
+                final int line = (Integer) possibility.getData();
+                possibility.addSelectionListener(new SelectionAdapter() {
+                    public void widgetSelected(SelectionEvent e) {
+                        WatchPoint wp = (WatchPoint) wps[line];
+                        wp.setTestForPossibility(((Button) e.widget).getSelection());
+                    }
+                });
 
-                  final  TableItem ti = items[items.length-1];
-                                      
-                    Button possibility = new Button(table,SWT.CHECK);
-                    possibility.setData(items.length-1);
-                    final int line = (Integer)possibility.getData();
-                    possibility.addSelectionListener(new SelectionAdapter(){
-                      public void widgetSelected(SelectionEvent e){
-                          WatchPoint wp = (WatchPoint) wps[line];
-                          wp.setPossible(((Button) e.widget).getSelection());
-                      }
-                    });
-                    TableEditor tbl_editor = new TableEditor(table);
-                    tbl_editor.grabHorizontal=true;
-                    tbl_editor.minimumHeight=possibility.getSize().x;
-                    tbl_editor.minimumWidth=possibility.getSize().y;
-                    tbl_editor.setEditor(possibility,ti,5);
-                    
-                    Button all_quant = new Button(table,SWT.CHECK);
-                    all_quant.setData(items.length-1);
-                    all_quant.addSelectionListener(new SelectionAdapter(){
-                      public void widgetSelected(SelectionEvent e){
-                          WatchPoint wp = (WatchPoint) wps[line];
-                          //TODO
-                      }
-                    });
-                    tbl_editor = new TableEditor(table);
-                    all_quant.setEnabled(!isLocal);
-                    tbl_editor.grabHorizontal=true;
-                    tbl_editor.minimumHeight=all_quant.getSize().x;
-                    tbl_editor.minimumWidth=all_quant.getSize().y;
-                    tbl_editor.setEditor(all_quant,ti,6);
+                tableEditor.grabHorizontal = true;
+                tableEditor.grabVertical = true;
+        //        tableEditor.minimumHeight = possibility.getSize().x;
+          //      tableEditor.minimumWidth = possibility.getSize().y;
+                tableEditor.setEditor(possibility, ti, 5);
+
+                final TableEditor editor = new TableEditor(table);
+                Button quan = new Button(table, SWT.CHECK);
+                quan.pack();
+                quan.setData(items.length - 1);
+                quan.setBackground(ti.getBackground());
+                quan.addSelectionListener(new SelectionAdapter() {
+                    public void widgetSelected(SelectionEvent e) {
+                        WatchPoint wp = (WatchPoint) wps[line];
+
+                        if(((Button) e.widget).getSelection())   wp.setFlavor(ALL_QUAN);
+                        wp.setFlavor(EX_QUAN);
+                    }
+                });
+
+                quan.setEnabled(!isLocal);
+                editor.grabHorizontal = true;
+                editor.grabVertical = true;
+//                editor.minimumHeight = quan.getSize().x;
+//                editor.minimumWidth = quan.getSize().y;
+                editor.setEditor(quan, ti, 6);
+                ti.addDisposeListener(new DisposeListener() {
+                    public void widgetDisposed(DisposeEvent event) {
+                        editor.getEditor().dispose();
+                        tableEditor.getEditor().dispose();
+                    }
+                });
             }
         };
         addAction.setText("Add");
@@ -387,7 +423,7 @@ public class WatchpointView extends ViewPart {
         removeAction = new Action() {
             public void run() {
 
-                IStructuredSelection sel = (IStructuredSelection) viewer
+                IStructuredSelection sel = (IStructuredSelection) tableViewer
                 .getSelection();
                 Iterator<WatchPoint> i = sel.iterator();
                 
@@ -395,23 +431,17 @@ public class WatchpointView extends ViewPart {
                     WatchPoint wp = i.next();
                     watchPointManager.removeWatchPoint(wp);
                 }
-                removeCheckboxes(viewer);
-                viewer.refresh();
-
+                removeCheckboxes();
             }
 
-            private void removeCheckboxes(TableViewer viewer) {
-                Table table = viewer.getTable();
+            private void removeCheckboxes() {
+                Table table = tableViewer.getTable();
                 int[] items = table.getSelectionIndices();
                 for (int j : items) {
                     TableItem ti = table.getItem(j);
-                    TableEditor tbl_editor = new TableEditor(table);
-                   // ti.dispose();
-                    tbl_editor.setEditor(new Text(table, SWT.NONE),ti,5);
-                    tbl_editor.setEditor(null,ti,6);
+                    ti.notifyListeners(SWT.Dispose, null);
+                    ti.dispose();
                 }
-                
-                
             }
         };
         removeAction.setText("Remove");
@@ -420,14 +450,14 @@ public class WatchpointView extends ViewPart {
         enableAction = new Action() {
             public void run() {
 
-                IStructuredSelection sel = (IStructuredSelection) viewer
+                IStructuredSelection sel = (IStructuredSelection) tableViewer
                 .getSelection();
                 Iterator<WatchPoint> i = sel.iterator();
                 while(i.hasNext()){
                     WatchPoint element = i.next();
                         ((WatchPoint) element).setEnabled(true);
                 }
-                viewer.refresh();
+                tableViewer.refresh();
             }
         };
         enableAction.setText("Enable");
@@ -436,14 +466,15 @@ public class WatchpointView extends ViewPart {
         disableAction = new Action() {
             public void run() {
 
-                IStructuredSelection sel = (IStructuredSelection) viewer
+                IStructuredSelection sel = (IStructuredSelection) tableViewer
                 .getSelection();
                 Iterator<WatchPoint> i = sel.iterator();
                 while(i.hasNext()){
                     WatchPoint element = i.next();
                         ((WatchPoint) element).setEnabled(false);
                 }
-                viewer.refresh();
+                tableViewer.refresh();
+                setFocus();
             }
         };
         disableAction.setText("Disable");
@@ -491,7 +522,7 @@ public class WatchpointView extends ViewPart {
      * Passing the focus request to the viewer's control.
      */
     public void setFocus() {
-        viewer.getControl().setFocus();
+        tableViewer.getControl().setFocus();
     }
 
     /**

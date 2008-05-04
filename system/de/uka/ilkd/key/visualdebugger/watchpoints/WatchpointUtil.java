@@ -190,17 +190,18 @@ public class WatchpointUtil {
      * @return true, if the watchpoint is satisfied in the current state
      */
     public static boolean evalutateWatchpoint(Node node, WatchPoint watchpoint,
-            Sequent seq, PosInOccurrence pos, Proof proof, int maxsteps, List<WatchPoint> watchpoints) {
+            Sequent seq, PosInOccurrence pos, Proof proof, int maxsteps,
+            List<WatchPoint> watchpoints) {
 
         Term wp = watchpoint.getWatchpointAsTerm();
-        
+
         TermBuilder tb = TermBuilder.DF;
         UpdateFactory updateFactory = new UpdateFactory(proof.getServices(),
                 proof.simplifier());
-        
+
         LinkedList<Update> updates = new LinkedList<Update>();
 
-        // start tracking names if necessary 
+        // start tracking names if necessary
         if (watchpoint.getLocalVariables() != null
                 && watchpoint.getLocalVariables().size() > 0) {
             VariableNameTracker vnt = new VariableNameTracker(node, watchpoints);
@@ -208,30 +209,51 @@ public class WatchpointUtil {
             updates.add(buildNameUpdates(updateFactory, vnt.result()));
             updates.add(updateSelfVar(updateFactory, watchpoint, vnt
                     .getSelfVar()));
-            System.out.println(updates.toString());
         } else {
-            LogicVariable lv = new LogicVariable(new Name (watchpoint.getSelf().name() + "_lv"),
-                    watchpoint.getSelf().getKeYJavaType().getSort());
+            LogicVariable lv = new LogicVariable(new Name(watchpoint.getSelf()
+                    .name()
+                    + "_lv"), watchpoint.getSelf().getKeYJavaType().getSort());
+
+            watchpoint.setWatchpointTerm(updateFactory.prepend(updateFactory
+                    .elementaryUpdate(TermFactory.DEFAULT
+                            .createVariableTerm(watchpoint.getSelf()),
+                            TermFactory.DEFAULT.createVariableTerm(lv)),
+                    watchpoint.getWatchpointAsTerm()));
             
-            Update elementaryUpdate = updateFactory.elementaryUpdate(
-                    TermFactory.DEFAULT.createVariableTerm(watchpoint.getSelf()),
-                    TermFactory.DEFAULT.createVariableTerm(lv));
-            updates.add(elementaryUpdate);
-            System.out.println(elementaryUpdate);
-            System.out.println(lv);
+            wp = watchpoint.getWatchpointAsTerm();
             if (watchpoint.getFlavor() == ALL) {
+
                 watchpoint.setWatchpointTerm(tb.all(lv, wp));
             } else {
                 watchpoint.setWatchpointTerm(tb.ex(lv, wp));
-                System.out.println(watchpoint.getWatchpointAsTerm());
             }
         }
-
+        wp = watchpoint.getWatchpointAsTerm();
         updates.addAll(collectUpdates(pos));
         for (Update update : updates) {
             wp = updateFactory.prepend(update, wp);
         }
-        
+        boolean result = startSideProof(seq, pos, proof, maxsteps, wp);
+        if (!watchpoint.testPossible()) {
+            return result;
+        } else {
+            //if already true, do not bother
+            if(result) return result;
+            wp = tb.not(wp);
+            return !startSideProof(seq, pos, proof, maxsteps, wp);
+        }
+
+    }
+
+    /**
+     * @param seq
+     * @param pos
+     * @param proof
+     * @param maxsteps
+     * @param wp
+     */
+    private static boolean startSideProof(Sequent seq, PosInOccurrence pos,
+            Proof proof, int maxsteps, Term wp) {
         ConstrainedFormula newCF = new ConstrainedFormula(wp);
         seq = seq.changeFormula(newCF, pos).sequent();
         try {
@@ -251,6 +273,7 @@ public class WatchpointUtil {
                 });
             }
             return ps.getProof().closed();
+            
         } catch (Throwable t) {
             t.printStackTrace();
         }

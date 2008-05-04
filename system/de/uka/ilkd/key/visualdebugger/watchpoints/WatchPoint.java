@@ -33,7 +33,8 @@ public class WatchPoint {
     
     /** The enabled. */
     private boolean enabled = true;
-    private boolean isPossible = false;
+    /** Set this to true, if you want to test if the expression might be true.*/
+    private boolean testPossible = false;
     
     private ProgramVariable self = null;
     private int flavor = 0;
@@ -207,12 +208,12 @@ public class WatchPoint {
         this.self = self;
     }
 
-    public boolean isPossible() {
-        return isPossible;
+    public boolean testPossible() {
+        return testPossible;
     }
 
-    public void setPossible(boolean isPossible) {
-        this.isPossible = isPossible;
+    public void setTestForPossibility(boolean testPossible) {
+        this.testPossible = testPossible;
     }
 
 
