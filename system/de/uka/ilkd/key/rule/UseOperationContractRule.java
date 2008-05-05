@@ -417,6 +417,10 @@ public class UseOperationContractRule implements BuiltInRule {
         Map<Operator, Function> atPreFunctions               
             = new LinkedHashMap<Operator, Function>();
         
+        ExecutionContext ec = getExecutionContext(pio);
+        Term mTerm = services.getTypeConverter().convertToLogicElement(
+                ec.getMemoryArea(), ec);
+        
         //translate the contract and the invariants
         FormulaWithAxioms pre = cwi.contract.getPre(selfVar, 
                                                     paramVars, 
@@ -427,7 +431,8 @@ public class UseOperationContractRule implements BuiltInRule {
                                                       excVar, 
                                                       atPreFunctions,
                                                       services);
-        SetOfLocationDescriptor modifies = cwi.contract.getModifies(selfVar, 
+        SetOfLocationDescriptor modifies = cwi.contract.getModifies(selfVar,
+                                                                    mTerm,
                                                                     paramVars, 
                                                                     services);           
         for (final ClassInvariant inv : cwi.assumedInvs) {
@@ -480,9 +485,7 @@ public class UseOperationContractRule implements BuiltInRule {
                                                   actualParamsIt.next()));
             argTerms[i++] = TB.var(paramVar);
         }
-        ExecutionContext ec = getExecutionContext(pio);
-        Term mTerm = services.getTypeConverter().convertToLogicElement(
-                ec.getMemoryArea(), ec);
+
         Term mCons = TB.dot(mTerm, services.getJavaInfo().getAttribute(
             "consumed", "javax.realtime.MemoryArea"));
         NamespaceSet nss = services.getNamespaces();

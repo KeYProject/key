@@ -141,6 +141,39 @@ public class OperationContractImpl implements OperationContract {
         return result;
     }
     
+    private Map /*Operator -> Term*/<Term, Term> getReplaceMap(
+            ParsableVariable self, 
+            Term memoryArea,
+            ListOfParsableVariable paramVars,
+            Services services) {
+        Map<Term, Term> result = new LinkedHashMap<Term, Term>();
+        TermBuilder tb = TermBuilder.DF;   
+        //self
+        if(self != null) {
+            assert self.sort().extendsTrans(originalSelfVar.sort());
+            result.put(tb.var(originalSelfVar), tb.var(self));
+        }
+        
+        //memory area
+        if(memoryArea != null) {
+            assert memoryArea.sort().extendsTrans(services.getJavaInfo().getDefaultMemoryArea().sort());
+            result.put(tb.var(services.getJavaInfo().getDefaultMemoryArea()), memoryArea);
+        }
+    
+        //parameters
+        if(paramVars != null) {
+            assert originalParamVars.size() == paramVars.size();
+            IteratorOfParsableVariable it1 = originalParamVars.iterator();
+            IteratorOfParsableVariable it2 = paramVars.iterator();
+            while(it1.hasNext()) {
+                ParsableVariable originalParamVar = it1.next();
+                ParsableVariable paramVar           = it2.next();
+                assert paramVar.sort().extendsTrans(originalParamVar.sort());
+                result.put(tb.var(originalParamVar), tb.var(paramVar));
+            }
+        }
+        return result;
+    }    
     
     private Map /*Operator -> Operator*/<Operator, Operator> getReplaceMap(
 	    				ParsableVariable selfVar, 
@@ -360,6 +393,22 @@ public class OperationContractImpl implements OperationContract {
                                        null, 
                                        services);
 	OpReplacer or = new OpReplacer(replaceMap);
+        return or.replace(originalModifies);
+    }
+    
+    public SetOfLocationDescriptor getModifies(ParsableVariable self, 
+            Term memoryArea,
+            ListOfParsableVariable params,
+            Services services) {
+        assert (self == null) == (originalSelfVar == null);
+        assert params != null;
+        assert params.size() == originalParamVars.size();
+        assert services != null;
+        Map<Term, Term> replaceMap = getReplaceMap(self, 
+                memoryArea,
+                params, 
+                services);
+        OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalModifies);
     }
 

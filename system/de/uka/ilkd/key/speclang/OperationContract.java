@@ -102,6 +102,14 @@ public interface OperationContract {
                                                Services services);
     
     /**
+     * Returns the modifier set of the contract.
+     */
+    public SetOfLocationDescriptor getModifies(ParsableVariable selfVar, 
+                                               Term memoryArea, 
+                                               ListOfParsableVariable paramVars,
+                                               Services services);
+    
+    /**
      * Returns the contract in pretty HTML format.
      */
     public String getHTMLText(Services services);

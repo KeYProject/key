@@ -319,7 +319,9 @@ public class JMLSpecFactory {
                                         paramVars);
                 assignable = assignable.union(translated);        
             }
-            assignable = assignable.add(new BasicLocationDescriptor(imCons));
+            if(assignable.size()!=0){
+                assignable = assignable.add(new BasicLocationDescriptor(imCons));
+            }
         }
         
         //translate ensures
@@ -619,13 +621,13 @@ public class JMLSpecFactory {
         }
         
         //translate assignable
-        Term imCons=null;
         SetOfLocationDescriptor assignable;
+        /*        Term imCons=null;
         ProgramVariable initialMemoryArea = services.getJavaInfo().
         getDefaultMemoryArea();
         Term imTerm = TB.var(initialMemoryArea);
         imCons = TB.dot(imTerm, services.getJavaInfo().getAttribute(
-                "consumed", "javax.realtime.MemoryArea"));
+                "consumed", "javax.realtime.MemoryArea"));*/
         if(originalAssignable.isEmpty()) {
             assignable = EverythingLocationDescriptor.INSTANCE_AS_SET;
         } else {
@@ -639,7 +641,7 @@ public class JMLSpecFactory {
                                         paramVars);
                 assignable = assignable.union(translated);        
             }
-            if(imCons!=null) assignable.add(new BasicLocationDescriptor(imCons));
+//            if(imCons!=null) assignable = assignable.add(new BasicLocationDescriptor(imCons));
         }
         
         //translate variant
