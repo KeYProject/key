@@ -102,7 +102,7 @@ org/jmlspecs/lang/JMLDataGroup.java
 javax/realtime/SizeEstimator.java
 javax/realtime/MemoryArea.java
 javax/realtime/ImmortalMemory.java
-javax/realtime/InaccessableAreaException.java
+javax/realtime/InaccessibleAreaException.java
 javax/realtime/IllegalAssignmentError.java
 javax/realtime/ScopedMemory.java
 javax/realtime/ScopedCycleException.java

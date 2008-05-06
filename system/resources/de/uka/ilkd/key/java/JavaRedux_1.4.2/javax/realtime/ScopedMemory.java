@@ -112,7 +112,7 @@ public abstract class ScopedMemory extends MemoryArea{
     public void	executeInArea(java.lang.Runnable logic){
 	//	if(!<currentMemoryArea>.stack.contains(this)){
 	if(!outerScopeM(this, <currentMemoryArea>)){
-	    throw new InaccessableAreaException();
+	    throw new InaccessibleAreaException();
 	}
 	super.executeInArea(logic);
     }
