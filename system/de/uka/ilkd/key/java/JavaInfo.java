@@ -1080,7 +1080,7 @@ public class JavaInfo {
         if (commonTypesCacheValid) return;
         final String[] fullNames = {"java.lang.Object", 
                 "java.lang.Cloneable", "java.io.Serializable",
-                "javax.realtime.ScopedMemory"};
+                "javax.realtime.MemoryArea"};
         
         for (int i = 0; i<fullNames.length; i++) {
             commonTypes[i] = getKeYJavaTypeByClassName(fullNames[i]);            
@@ -1120,11 +1120,11 @@ public class JavaInfo {
     }
     
     /**
-     * returns the KeYJavaType for class <tt>java.realtime.ScopedMemory</tt>
+     * returns the KeYJavaType for class <tt>java.realtime.MemoryArea</tt>
      */
-    public KeYJavaType getJavaxRealtimeScopedMemory() {
+    public KeYJavaType getJavaxRealtimeMemoryArea() {
         if (commonTypes[3] == null) {
-            commonTypes[3] = getKeYJavaTypeByClassName("javax.realtime.ScopedMemory");
+            commonTypes[3] = getKeYJavaTypeByClassName("javax.realtime.MemoryArea");
         }
         return commonTypes[3];
     }
@@ -1209,7 +1209,7 @@ public class JavaInfo {
             }
             defaultMemoryArea = (LocationVariable) services.getNamespaces().
                 programVariables().lookup(new Name("initialMemoryArea"));
-            KeYJavaType kjt = getTypeByClassName("javax.realtime.ScopedMemory");
+            KeYJavaType kjt = getTypeByClassName("javax.realtime.MemoryArea");
             if(defaultMemoryArea == null){
                 defaultMemoryArea = 
                     new LocationVariable(new ProgramElementName("initialMemoryArea"),
@@ -1228,7 +1228,7 @@ public class JavaInfo {
             }
             immortalMemoryArea = (LocationVariable) services.getNamespaces().
                 programVariables().lookup(new Name("immortalMemoryArea"));
-            KeYJavaType kjt = getTypeByClassName("javax.realtime.ScopedMemory");
+            KeYJavaType kjt = getTypeByClassName("javax.realtime.MemoryArea");
             if(immortalMemoryArea == null){
                 immortalMemoryArea = 
                     new LocationVariable(new ProgramElementName("immortalMemoryArea"),

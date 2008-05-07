@@ -4,21 +4,12 @@ public abstract class ScopedMemory extends MemoryArea{
 
     private /*@nullable@*/ Object portal;
 
-    public static ScopedMemory currentMemoryArea;
-
     // public static invariant counter>=1;
     private static long counter=1;
 
     // public invariant (\forall ScopedMemory m; m!=null && m.id==id; m==this);
     private long id = counter++;
 
-    /*@ public invariant referenceCount>=0 && (referenceCount>0 <==>
-      @      stack!=null) && (referenceCount>0 <==> parent!=null);
-      @*/
-    private int referenceCount=0;
-
-    // public invariant stack!=null ==> (stack.top()==this && stack._stack.length>0);
-    public MemoryStack /*@nullable@*/ stack;
 
     /* public invariant (\forall ScopedMemory m; (\outerScope(m, this) <==>
       @      (stack!=null && (\exists int i; i>=0 && i<stack._stack.length; 
@@ -29,13 +20,6 @@ public abstract class ScopedMemory extends MemoryArea{
       @                                            s.stack._stack[i] == this) <==>
       @                                           s.stack._stack[stack._stack.length-1]==this);
       @*/
-
-    public MemoryStack stack(){
-	return stack;
-    }
-
-    //@ public invariant parent!=null ==> \outerScope(parent, this);
-    public /*@nullable@*/ ScopedMemory parent=null;
 
     public ScopedMemory(long size){
 	super(size);

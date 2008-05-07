@@ -1066,7 +1066,7 @@ public class PrettyPrinter {
     public void printFieldReference(FieldReference x) throws java.io.IOException {
         printHeader(x);
         if (x.getName()!=null && 
-                "javax.realtime.ScopedMemory::currentMemoryArea".
+                "javax.realtime.MemoryArea::currentMemoryArea".
                 equals(x.getName().toString())){
             write("<currentMemoryArea>");
         }else{

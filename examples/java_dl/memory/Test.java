@@ -42,6 +42,7 @@ public class Test extends SuperTest{
       @  requires \outerScope(\currentMemoryArea, oArr.memoryArea) &&
       @           \outerScope(o.memoryArea, \currentMemoryArea); 
       @  assignable oArr, \object_creation(Object);
+      @  working_space \space(Object[1]);
       @  ensures true;
       @*/
     public void createArrayWithInitializers(Object o){
@@ -137,6 +138,7 @@ public class Test extends SuperTest{
       @  requires sm1!=null && sm2!=null && sm1!=sm2 &&
       @        sm1.memoryRemaining()>1000 && sm2.memoryRemaining()>1000 && 
       @        sm1.parent==null && sm2.parent==null && 
+      @        \outerScope(this.memoryArea, \currentMemoryArea) &&
       @        \outerScope(sm1.memoryArea, \currentMemoryArea) &&
       @        \outerScope(sm2.memoryArea, \currentMemoryArea);
       @ //       sm1.memoryArea == \currentMemoryArea.memoryArea &&

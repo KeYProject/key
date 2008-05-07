@@ -2,7 +2,7 @@ package javax.realtime;
 
 public class MemoryStack{
 
-    private ScopedMemory[] _stack;
+    private MemoryArea[] _stack;
 
     // public static invariant EMPTY_STACK.size()==0;
     private static MemoryStack EMPTY_STACK;
@@ -23,14 +23,14 @@ public class MemoryStack{
       @          \result._stack[_stack.length]==m && (\forall int i; i>=0 &&
       @            i<_stack.length; \result._stack[i]==_stack[i]);
       @*/
-    public MemoryStack push(ScopedMemory m);
+    public MemoryStack push(MemoryArea m);
 
     /*@ public normal_behavior
       @  ensures \result==(\exists int i; i>=0 && i<_stack.length; _stack[i]==m);
       @ also public normal_behavior
       @  ensures \result == \outerScope(m, _stack[_stack.length-1]);
       @*/
-    public /*@pure@*/ boolean contains(ScopedMemory m);
+    public /*@pure@*/ boolean contains(MemoryArea m);
 
     /*@ public normal_behavior
       @  ensures \result==((o instanceof MemoryStack) && 
@@ -43,7 +43,7 @@ public class MemoryStack{
     /*@ public normal_behavior
       @  ensures \result==_stack[i];
       @*/
-    public /*@pure@*/ ScopedMemory get(int i);
+    public /*@pure@*/ MemoryArea get(int i);
 
     /*@ public normal_behavior
       @  ensures \result==_stack.length;
@@ -53,5 +53,5 @@ public class MemoryStack{
     /*@ public normal_behavior
       @  ensures \result==_stack[_stack.length-1];
       @*/
-    public /*@pure@*/ ScopedMemory top();
+    public /*@pure@*/ MemoryArea top();
 }

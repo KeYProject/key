@@ -278,7 +278,7 @@ public class TypeConverter extends TermBuilder {
 	Debug.out("TypeConverter: FieldReference: ",fr);
 	final ReferencePrefix prefix = fr.getReferencePrefix();
 	final ProgramVariable var = fr.getProgramVariable();
-	if("javax.realtime.ScopedMemory::currentMemoryArea".
+	if("javax.realtime.MemoryArea::currentMemoryArea".
 	               equals(fr.getName().toString())){
 	    return convertToLogicElement(ec.getMemoryArea());
 	}else if (var.isStatic()) {

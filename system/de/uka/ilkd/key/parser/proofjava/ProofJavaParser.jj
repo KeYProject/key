@@ -2816,7 +2816,7 @@ Expression PrimaryExpression() :
           setPostfixInfo(tmpResult);
           break;
       case PrimaryPrefixReturnValue.CURRENT_MEMORY_AREA:
-    	  Identifier id = factory.createIdentifier("ScopedMemory");    
+    	  Identifier id = factory.createIdentifier("MemoryArea");    
     	  setPrefixInfo(id);
     	  setPostfixInfo(id);
           tmpResult = factory.createUncollatedReferenceQualifier(id);

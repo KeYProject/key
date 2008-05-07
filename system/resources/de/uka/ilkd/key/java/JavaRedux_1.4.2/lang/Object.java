@@ -9,7 +9,7 @@ public class Object {
 
     //@ public invariant memoryArea!=null && memoryArea.stack!=null; 
 
-    public final javax.realtime.ScopedMemory memoryArea = <currentMemoryArea>;
+    public final javax.realtime.MemoryArea memoryArea = <currentMemoryArea>;
 	//	javax.realtime.ScopedMemory.currentMemoryArea;
 
     /*    public javax.realtime.ScopedMemory memoryArea(){

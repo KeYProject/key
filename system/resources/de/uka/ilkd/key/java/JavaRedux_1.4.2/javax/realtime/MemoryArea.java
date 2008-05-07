@@ -2,6 +2,24 @@ package javax.realtime;
 
 public abstract class MemoryArea{
 
+    public static MemoryArea currentMemoryArea;
+
+    // public invariant stack!=null ==> (stack.top()==this && stack._stack.length>0);
+    public MemoryStack /*@nullable@*/ stack;
+
+    public MemoryStack stack(){
+	return stack;
+    }
+
+    //@ public invariant parent!=null ==> \outerScope(parent, this);
+    public /*@nullable@*/ MemoryArea parent=null;
+
+    /*@ public invariant referenceCount>=0 && (referenceCount>0 <==>
+      @      stack!=null) && 
+      @     (referenceCount>0 <==> parent!=null);
+      @*/
+    protected int referenceCount=0;
+
     protected final long size;
     protected long consumed;
     protected final /*@ nullable @*/ Runnable logic;

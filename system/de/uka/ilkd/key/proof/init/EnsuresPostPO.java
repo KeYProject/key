@@ -75,7 +75,7 @@ public class EnsuresPostPO extends EnsuresPO {
                     workingSpace), TB.dot(t_mem, size)));
             
             final ProgramVariable stack = services.getJavaInfo().getAttribute(
-                    "stack", "javax.realtime.ScopedMemory");
+                    "stack", "javax.realtime.MemoryArea");
             result = TB.and(result, TB.not(TB.equals(TB.dot(t_mem,stack), TB.NULL(services))));
             
             Term initialMemCreatedAndNotNullTerm
