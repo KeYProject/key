@@ -233,7 +233,6 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
     
     
     public void finalize() {
-        System.out.println("FINALIZING");
         if (mediator != null) {
             mediator.removeRuleAppListener(proofListener);
         }
