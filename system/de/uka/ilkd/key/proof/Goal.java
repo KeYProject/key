@@ -32,7 +32,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.util.Debug;
 
 /**
  *  A proof is represented as a tree of nodes containing sequents. The initial
