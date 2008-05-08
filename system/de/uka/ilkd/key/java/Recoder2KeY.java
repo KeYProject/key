@@ -602,9 +602,9 @@ public class Recoder2KeY implements JavaReader {
 
         List<recoder.java.CompilationUnit> specialClasses = parseLibs();
 
-//         for (recoder.java.CompilationUnit compilationUnit : specialClasses) {
+//        for (recoder.java.CompilationUnit compilationUnit : specialClasses) {
 //            System.out.println(compilationUnit.toSource());
-//         }
+//        }
         
         ChangeHistory changeHistory = servConf.getChangeHistory();
         for (int i = 0, sz = specialClasses.size(); i < sz; i++) {
@@ -647,11 +647,12 @@ public class Recoder2KeY implements JavaReader {
 //        }
         
         // make them available to the rec2key mapping
-        for (int i = 0, sz = specialClasses.size(); i < sz; i++) {
-            //TODO: use the real file name here
-            getConverter().processCompilationUnit(specialClasses.get(i), specialClasses.get(i).getName());
+        for(CompilationUnit cu : specialClasses) {
+            DataLocation dl = cu.getOriginalDataLocation();
+            assert dl != null : "DataLocation not set on " + cu.toSource();
+            getConverter().processCompilationUnit(cu, dl.toString());
         }
-
+        
         // tell the mapping that we have parsed the special classes
         rec2key().parsedSpecial(true);
 
@@ -732,6 +733,13 @@ public class Recoder2KeY implements JavaReader {
         if (cHistory.needsUpdate()) {
             cHistory.updateModel();
         }
+        
+        // recoder changes the data location to some imaginary files
+        // undo this by setting the original locations
+        for (CompilationUnit cu : cUnits) {
+            cu.setDataLocation(cu.getOriginalDataLocation());
+        }
+        
     }
 
     // ----- methods dealing with blocks.
@@ -772,7 +780,7 @@ public class Recoder2KeY implements JavaReader {
 
         recoder.java.declaration.ClassDeclaration classContext = context.getClassContext();
 
-        // add method to memberdeclaration list
+        // add method to member declaration list
         ASTList<recoder.java.declaration.MemberDeclaration> memberList = classContext.getMembers();
 
         if (memberList == null) {

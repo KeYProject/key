@@ -18,6 +18,7 @@ import recoder.bytecode.*;
 import recoder.io.DataLocation;
 import recoder.java.*;
 import recoder.java.declaration.*;
+import recoder.java.declaration.modifier.Private;
 import recoder.java.reference.*;
 import recoder.kit.TypeKit;
 import recoder.list.generic.*;
@@ -43,7 +44,10 @@ import de.uka.ilkd.key.util.Debug;
  * 
  * TODO Recoder does not allow to detect if an inner class is static or not because 
  * it discards the information about inner classes all to early. That is why all inner
- * classes are non-static. Does this matter? 
+ * classes are non-static. Does this matter?  Patch is on the way
+ * 
+ * TODO inner classes are not detected to be "private". A combination of private and 
+ * static seems impossible with recoder
  * 
  * TODO Possible improvement: Remove "synthetic" members (JVM spec chapter 4)
  * 
@@ -150,11 +154,21 @@ public class ClassFileDeclarationBuilder {
             setNameAndMods();
             setInheritance();
             memberDecls = new ASTArrayList<MemberDeclaration>();
+            if (typeDecl instanceof EnumDeclaration) {
+                EnumDeclaration enumDecl = (EnumDeclaration) typeDecl;
+                for (FieldInfo field : classFile.getFieldInfos()) {
+                    if(isEnumConstant(field))
+                        addEnumConstant(field);
+                }
+                // create a default constructor for the enum constants
+                addDefaultConstructor();
+            }
             for (ConstructorInfo constr : classFile.getConstructorInfos()) {
                 addConstructor(constr);
             }
             for (FieldInfo field : classFile.getFieldInfos()) {
-                addField(field);
+                if(!isEnumConstant(field))
+                    addField(field);        
             }
             for (MethodInfo method : classFile.getMethodInfos()) {
                 addMethod(method);
@@ -225,7 +239,10 @@ public class ClassFileDeclarationBuilder {
         members.add(childtd);
     }
     
-    /* TODO DOC*/
+    /**
+     * get the fully qualified name of the enclosing class of an inner class
+     * @return class name, not null
+     */
     public String getEnclosingName() {
         if(!isInnerClass())
             throw new IllegalStateException("only inner classes have an enclosing class");
@@ -283,8 +300,11 @@ public class ClassFileDeclarationBuilder {
             typeDecl = factory.createInterfaceDeclaration();
         } else if (classFile.isOrdinaryClass()) {
             typeDecl = factory.createClassDeclaration();
+        } else if (classFile.isEnumType()){
+            // there is no factory.createEnumDeclaration()
+            typeDecl = new EnumDeclaration(); 
         } else {
-            throw new ConvertException("Only Interfaces and classes are allowed as byte code files");
+            throw new ConvertException("Only Interfaces, enums and classes are allowed as byte code files");
         }
     }
     
@@ -344,7 +364,15 @@ public class ClassFileDeclarationBuilder {
             }
             if(implList.size() > 0)
                 classDecl.setImplementedTypes(factory.createImplements(implList));
-        } else {
+        } else if(typeDecl instanceof EnumDeclaration) { 
+            EnumDeclaration enDecl = (EnumDeclaration) typeDecl;
+            ASTList<TypeReference> implList = new ASTArrayList<TypeReference>();
+            for (String intf : interfaceNames) {
+                implList.add(createTypeReference(intf));
+            }
+            if(implList.size() > 0)
+                enDecl.setImplementedTypes(factory.createImplements(implList));
+        } else if(typeDecl instanceof InterfaceDeclaration){
             InterfaceDeclaration intfDecl = (InterfaceDeclaration) typeDecl;
             ASTList<TypeReference> implList = new ASTArrayList<TypeReference>();
             for (String intf : interfaceNames) {
@@ -352,7 +380,8 @@ public class ClassFileDeclarationBuilder {
             }
             if(implList.size() > 0)
                 intfDecl.setExtendedTypes(factory.createExtends(implList));
-        }
+        } else
+           throw new Error("unknown declaration type: " + typeDecl.getClass().getName());
         
     }
 
@@ -392,11 +421,20 @@ public class ClassFileDeclarationBuilder {
     }
 
     /*
+     * This uses an undocumented(!) feature which is provided by the java
+     * compiler: Enum constants have set the bit 0x4000 in their access flags.
+     * TODO find a documented and transferable mean to express this 
+     */
+    private boolean isEnumConstant(FieldInfo field) {
+        return ((field.getAccessFlags() & 0x4000) == 0x4000);
+    }
+
+    /*
      * Add a field to the member list
      * TODO compile time constants.
      */
     private void addField(FieldInfo field) {
-
+        
         String typename = field.getTypeName();
         TypeReference type = createTypeReference(typename);
         Identifier id = factory.createIdentifier(field.getName());
@@ -405,9 +443,22 @@ public class ClassFileDeclarationBuilder {
         decl.setDeclarationSpecifiers(makeFieldSpecifiers(field));
         
         memberDecls.add(decl);
-
     }
 
+    /*
+     * Add an enum constant to the member list.
+     * There is no factory.createEnum... () method
+     * 
+     * TODO This maps all constants w/o arguments, i.e. 
+     * such a constructor must be present. :( 
+     */
+    private void addEnumConstant(FieldInfo field) {
+        Identifier id = factory.createIdentifier(field.getName());
+        EnumConstructorReference ecr = new EnumConstructorReference();
+        EnumConstantSpecification ecs = new EnumConstantSpecification(id, ecr);
+        EnumConstantDeclaration ecd = new EnumConstantDeclaration(ecs, new ASTArrayList<DeclarationSpecifier>());
+        memberDecls.add(ecd);
+    }
   
     /*
      * create the modifier list for a method declaration
@@ -467,6 +518,18 @@ public class ClassFileDeclarationBuilder {
         // Body is deliberately set to null in all cases!
         decl.setBody(null);
 
+        memberDecls.add(decl);
+    }
+    
+    /*
+     * add a default constructor
+     * this is used for enums, it is therefore made private
+     */
+    private void addDefaultConstructor() {
+        Identifier id = factory.createIdentifier(getClassName());
+        Private priv = factory.createPrivate();
+        ASTList<ParameterDeclaration> params = new ASTArrayList<ParameterDeclaration>();
+        ConstructorDeclaration decl = factory.createConstructorDeclaration(priv, id, params, null, null);
         memberDecls.add(decl);
     }
     

@@ -37,6 +37,7 @@ import recoder.java.reference.UncollatedReferenceQualifier;
 import recoder.java.statement.Case;
 import recoder.kit.ProblemReport;
 import recoder.kit.TypeKit;
+import recoder.service.*;
 
 /**
  * 
@@ -149,7 +150,7 @@ public class EnumClassBuilder extends RecoderModelTransformer {
      * substitute EnumDeclarations by EnumClassDeclarations.
      * 
      * @see de.uka.ilkd.key.java.recoderext.RecoderModelTransformer#makeExplicit(recoder.java.declaration.TypeDeclaration)
-     * @deprecated THIS DOES NOT WORK ANY MORE, SINCE THE CACHE ONLY CONSIDERS CLASSES!
+     * @deprecated THIS DOES NOT WORK ANY MORE, SINCE THE CACHE ONLY CONSIDERS CLASSE TYPES, NOT ENUMS!
      */
     protected void makeExplicit(TypeDeclaration td) { }
     

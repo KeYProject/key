@@ -53,12 +53,12 @@ public class KeYCrossReferenceNameInfo extends DefaultNameInfo {
         if(old != null && ct != old) {
             String d1, d2;
             if (ct instanceof TypeDeclaration) {
-                d1 = UnitKit.getCompilationUnit((TypeDeclaration) ct).getDataLocation().toString();
+                d1 = UnitKit.getCompilationUnit((TypeDeclaration) ct).getOriginalDataLocation().toString();
             } else {
                 d1 = ct.toString();
             }
             if (old instanceof TypeDeclaration) {
-                d2 = UnitKit.getCompilationUnit((TypeDeclaration) old).getDataLocation().toString();
+                d2 = UnitKit.getCompilationUnit((TypeDeclaration) old).getOriginalDataLocation().toString();
             } else {
                 d2 = old.toString();
             }
@@ -68,6 +68,19 @@ public class KeYCrossReferenceNameInfo extends DefaultNameInfo {
         super.register(ct);
         
         classtypes.put(name, ct);
+    }
+
+    /**
+     * unregister a class type. This happes for instance when removing an
+     * EnumDeclaration and inserting an EnumClassDeclaration instead
+     * 
+     * @param fullname
+     *                name of the type to be unregistered
+     */
+    @Override
+    public void unregisterClassType(String fullname) {
+        super.unregisterClassType(fullname);
+        classtypes.remove(fullname);
     }
 
     /*

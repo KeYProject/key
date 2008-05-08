@@ -46,7 +46,12 @@ public class DirectoryFileCollection implements FileCollection {
      */
     private static void addAllFiles(File dir, String extension,
                                     List<File> files) {
-        for (File file : dir.listFiles()) {
+        File[] listFiles = dir.listFiles();
+        
+        if(listFiles == null)
+            throw new IllegalArgumentException(dir+" is not a directory or cannot be read!");
+        
+        for (File file : listFiles) {
             if(file.isDirectory()) {
                 addAllFiles(file, extension, files);
             } else if(extension == null || file.getName().toLowerCase().endsWith(extension)) {
