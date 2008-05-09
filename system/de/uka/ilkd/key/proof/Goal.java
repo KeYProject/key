@@ -696,7 +696,7 @@ public class Goal  {
     }
 
 
-    public void applyUpdateSimplifier (boolean antec) {
+    private void applyUpdateSimplifier (boolean antec) {
 	    final Constraint userConstraint =
 	        proof().getUserConstraint ().getConstraint ();
 	    final BuiltInRule rule = UpdateSimplificationRule.INSTANCE;

@@ -195,9 +195,7 @@ public class ConstructorNormalformBuilder
              final List<Variable> finalVars = getLocalClass2FinalVar().get(cd);
              if (finalVars != null) {
                  for (final Variable v : finalVars) {
-                     if (v != null) {
-                         v2t.put(v, v.getType());
-                     }
+                     v2t.put(v, v.getType());
                  }
              }
              
