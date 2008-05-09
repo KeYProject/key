@@ -349,15 +349,27 @@ public class UseOperationContractRule implements BuiltInRule {
         assert cwi.contract.getProgramMethod().equals(pm);
 
         //create variables for self, parameters, result, exception, and a map 
-        //for atPre-functions 
+        //for atPre-functions
+        //register the newly created program variables
+        Namespace progVarNS = services.getNamespaces().programVariables();
         ProgramVariable selfVar          
             = SVF.createSelfVar(services, pm, true);
+        progVarNS.addSafely(selfVar);
+        
         ListOfParsableVariable paramVars 
             = SVF.createParamVars(services, pm, true);
+        for (ParsableVariable pvar : paramVars) {
+            progVarNS.add(pvar);
+        }
+        
         ProgramVariable resultVar 
             = SVF.createResultVar(services, pm, true);
+        progVarNS.addSafely(resultVar);
+        
         ProgramVariable excVar 
             = SVF.createExcVar(services, pm, true);
+        progVarNS.addSafely(excVar);
+        
         Map<Operator, Function> atPreFunctions               
             = new LinkedHashMap<Operator, Function>();
         
