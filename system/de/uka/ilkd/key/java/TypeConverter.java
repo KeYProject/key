@@ -174,14 +174,14 @@ public class TypeConverter extends TermBuilder {
 	return booleanLDT;
     }
     
-    HashMap mcrMap = new HashMap(10);
+    private final HashMap<String, Term> mcrMap = new HashMap<String, Term>(10);
     
     private Term translateMetaClassReference(MetaClassReference mcr) {
 //	    throw new IllegalArgumentException("Convert MCR to a constant");
 //            return intLDT.translateLiteral( new CharLiteral('X'));
         String name = mcr.getTypeReference().getName().intern();
         
-        if (mcrMap.containsKey(name)) return (Term) mcrMap.get(name);
+        if (mcrMap.containsKey(name)) return mcrMap.get(name);
 
         final Sort dummySort = services.getJavaInfo().getJavaLangObjectAsSort();       
         final Term tMCR = func(new RigidFunction(new Name(name), 

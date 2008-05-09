@@ -33,7 +33,8 @@ public class KeYProgModelInfo{
     private KeYCrossReferenceServiceConfiguration sc = null;
     private KeYRecoderMapping mapping;
     private TypeConverter typeConverter;
-    private HashMap<KeYJavaType, HashMap<String, ProgramMethod>> implicits = new HashMap<KeYJavaType, HashMap<String, ProgramMethod>>();
+    private HashMap<KeYJavaType, HashMap<String, ProgramMethod>> implicits = 
+        new HashMap<KeYJavaType, HashMap<String, ProgramMethod>>();
     private KeYExceptionHandler exceptionHandler = null;
     
     public KeYProgModelInfo(TypeConverter typeConverter, 
@@ -80,9 +81,7 @@ public class KeYProgModelInfo{
      */
     public Collection<ObjectSort> allObjectSorts(){
 	Set<ObjectSort> result=new HashSet<ObjectSort>();
-	Iterator it=allElements().iterator();
-	while (it.hasNext()) {
-	    Object o=it.next();
+	for (final Object o : allElements()) {
 	    if (o instanceof KeYJavaType) {	        	   
 		KeYJavaType oKJT = (KeYJavaType)o;
 		if (oKJT.getSort() instanceof ObjectSort) {
@@ -474,9 +473,9 @@ public class KeYProgModelInfo{
      * retrieves implicit methods
      */
     private ProgramMethod getImplicitMethod(KeYJavaType ct, String name) {
-	HashMap m=implicits.get(ct);
+	final HashMap<String, ProgramMethod> m = implicits.get(ct);
 	if (m!=null) {
-	    ProgramMethod pm = (ProgramMethod)m.get(name);
+	    final ProgramMethod pm = m.get(name);
 	    if (pm!=null) {
 		return pm;
 	    }
@@ -484,7 +483,7 @@ public class KeYProgModelInfo{
  	TypeDeclaration cd = (TypeDeclaration)ct.getJavaType();
  	ArrayOfMemberDeclaration members = cd.getMembers();
  	for (int i = 0; i<members.size(); i++) {
- 	    MemberDeclaration member = members.getMemberDeclaration(i);
+ 	    final MemberDeclaration member = members.getMemberDeclaration(i);
  	    if (member instanceof ProgramMethod &&
  		((ProgramMethod)member).getMethodDeclaration().getName().equals(name)) {
  		return (ProgramMethod)member;

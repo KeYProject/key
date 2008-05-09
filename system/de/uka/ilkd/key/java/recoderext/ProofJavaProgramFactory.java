@@ -18,7 +18,6 @@ package de.uka.ilkd.key.java.recoderext;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.util.List;
 
 import recoder.ParserException;

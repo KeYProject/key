@@ -10,19 +10,25 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
 
-import recoder.*;
-import recoder.abstraction.ClassType;
+import recoder.CrossReferenceServiceConfiguration;
+import recoder.ParserException;
+import recoder.ProgramFactory;
 import recoder.bytecode.*;
 import recoder.io.DataLocation;
-import recoder.java.*;
+import recoder.java.CompilationUnit;
+import recoder.java.Identifier;
+import recoder.java.PackageSpecification;
 import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Private;
-import recoder.java.reference.*;
+import recoder.java.reference.EnumConstructorReference;
+import recoder.java.reference.PackageReference;
+import recoder.java.reference.TypeReference;
 import recoder.kit.TypeKit;
-import recoder.list.generic.*;
-import recoder.service.*;
+import recoder.list.generic.ASTArrayList;
+import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.util.Debug;
 
@@ -155,7 +161,6 @@ public class ClassFileDeclarationBuilder {
             setInheritance();
             memberDecls = new ASTArrayList<MemberDeclaration>();
             if (typeDecl instanceof EnumDeclaration) {
-                EnumDeclaration enumDecl = (EnumDeclaration) typeDecl;
                 for (FieldInfo field : classFile.getFieldInfos()) {
                     if(isEnumConstant(field))
                         addEnumConstant(field);
@@ -182,7 +187,7 @@ public class ClassFileDeclarationBuilder {
      * set the location to be stored in the compilation unit, mainly for
      * error reporting.
      * 
-     * @param dataLocation, location to be set or null 
+     * @param dataLocation the DataLocation to be set or null 
      */
     public void setDataLocation(DataLocation dataLocation) {
         this.dataLocation = dataLocation;

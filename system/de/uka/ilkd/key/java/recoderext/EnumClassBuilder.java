@@ -17,18 +17,14 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.util.Debug;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.CompilationUnit;
-import recoder.java.Expression;
-import recoder.java.Identifier;
 import recoder.java.JavaProgramFactory;
 import recoder.java.declaration.*;
 import recoder.java.reference.FieldReference;
@@ -37,7 +33,6 @@ import recoder.java.reference.UncollatedReferenceQualifier;
 import recoder.java.statement.Case;
 import recoder.kit.ProblemReport;
 import recoder.kit.TypeKit;
-import recoder.service.*;
 
 /**
  * 

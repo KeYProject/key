@@ -15,19 +15,16 @@ import java.net.URL;
 import java.util.*;
 
 import recoder.*;
-import recoder.abstraction.ClassType;
 import recoder.bytecode.*;
 import recoder.convenience.*;
 import recoder.io.*;
 import recoder.java.CompilationUnit;
-import recoder.java.NonTerminalProgramElement;
 import recoder.java.ProgramElement;
 import recoder.java.declaration.MethodDeclaration;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.*;
 import recoder.parser.ParseException;
 import recoder.service.*;
-import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.recoderext.*;
@@ -209,7 +206,7 @@ public class Recoder2KeY implements JavaReader {
         
         // do not look up classes anywhere but in the included classes 
         // or the specified classpaths
-        servConf.getProjectSettings().setProperty(ProjectSettings.CLASS_SEARCH_MODE, "");
+        servConf.getProjectSettings().setProperty(PropertyNames.CLASS_SEARCH_MODE, "");
 
     }
     
@@ -480,7 +477,6 @@ public class Recoder2KeY implements JavaReader {
      * @throws ParserException 
      * @throws IOException 
      * @throws ParseException 
-     * @throws Exception during parsing
      */
     private List<recoder.java.CompilationUnit> parseLibs() throws ParseException, IOException, ParserException {
         
@@ -856,9 +852,10 @@ public class Recoder2KeY implements JavaReader {
     private void addProgramVariablesToClassContext(recoder.java.declaration.ClassDeclaration classContext, ListOfProgramVariable vars,
             recoder.service.CrossReferenceSourceInfo csi) {
 
-        HashMap names2var = new HashMap();
+        HashMap<String, recoder.java.declaration.VariableSpecification> names2var = 
+            new HashMap<String, recoder.java.declaration.VariableSpecification>();
         IteratorOfProgramVariable it = vars.iterator();
-        java.util.HashSet names = new java.util.HashSet();
+        java.util.HashSet<String> names = new java.util.HashSet<String>();
         ASTList<recoder.java.declaration.MemberDeclaration> list = classContext.getMembers();
 
         // perhaps install a new list for the members of the class context
@@ -909,11 +906,8 @@ public class Recoder2KeY implements JavaReader {
      * used by addProgramVariablesToClassContext
      */
     private VariableSpecification lookupVarSpec(ProgramVariable pv) {
-        Iterator it = mapping.elemsKeY().iterator();
-        while (it.hasNext()) {
-            Object o = it.next();
+        for (final Object o : mapping.elemsKeY()) {
             if ((o instanceof VariableSpecification) && ((VariableSpecification) o).getProgramVariable() == pv) {
-
                 return (VariableSpecification) o;
             }
         }
