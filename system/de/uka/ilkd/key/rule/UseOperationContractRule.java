@@ -354,7 +354,8 @@ public class UseOperationContractRule implements BuiltInRule {
         Namespace progVarNS = services.getNamespaces().programVariables();
         ProgramVariable selfVar          
             = SVF.createSelfVar(services, pm, true);
-        progVarNS.addSafely(selfVar);
+        if(selfVar != null)
+            progVarNS.addSafely(selfVar);
         
         ListOfParsableVariable paramVars 
             = SVF.createParamVars(services, pm, true);
@@ -364,11 +365,13 @@ public class UseOperationContractRule implements BuiltInRule {
         
         ProgramVariable resultVar 
             = SVF.createResultVar(services, pm, true);
-        progVarNS.addSafely(resultVar);
+        if(resultVar != null)
+            progVarNS.addSafely(resultVar);
         
         ProgramVariable excVar 
             = SVF.createExcVar(services, pm, true);
-        progVarNS.addSafely(excVar);
+        if(excVar != null)
+            progVarNS.addSafely(excVar);
         
         Map<Operator, Function> atPreFunctions               
             = new LinkedHashMap<Operator, Function>();
