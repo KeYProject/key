@@ -837,7 +837,5 @@ public class Proof implements Named {
      */
     public SpecExtPO getPO() {
         return specExtPO;
-    }
-
-  
+    }    
 }

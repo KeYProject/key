@@ -198,6 +198,7 @@ public class POBrowser extends JDialog {
            || instance.initConfig != initConfig
            || !instance.initConfig.equals(initConfig)
            || defaultPm != null) {
+            if(instance!=null) instance.dispose();
             instance = new POBrowser(initConfig, 
             			     "Proof Obligation Browser", 
             			     defaultPm);
@@ -554,5 +555,12 @@ public class POBrowser extends JDialog {
     
     public ProofOblInput getPO() {	
 	return po;
+    }
+    
+    // to prevent memory leaks
+    public ProofOblInput getAndClearPO(){
+        ProofOblInput result = po;
+        po = null;
+        return result;
     }
 }
