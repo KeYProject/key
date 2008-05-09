@@ -68,6 +68,7 @@ public class SLEnvInput extends AbstractEnvInput {
     //-------------------------------------------------------------------------
     
     private KeYJavaType[] sortKJTs(KeYJavaType[] kjts) {
+        
         Arrays.sort(kjts, new Comparator<KeYJavaType> () {
             public int compare(KeYJavaType o1, KeYJavaType o2) {
                 return o1.getFullName().compareTo(o2.getFullName());
@@ -87,6 +88,11 @@ public class SLEnvInput extends AbstractEnvInput {
        
         //sort types alphabetically (necessary for deterministic names)
         final Set<KeYJavaType> allKeYJavaTypes = javaInfo.getAllKeYJavaTypes();
+        for (KeYJavaType keYJavaType : allKeYJavaTypes) {
+            if(keYJavaType.getJavaType() == null) {
+                System.out.println(keYJavaType);
+            }
+        }
         final KeYJavaType[] kjts = 
             sortKJTs(allKeYJavaTypes.toArray(new KeYJavaType[allKeYJavaTypes.size()]));
         

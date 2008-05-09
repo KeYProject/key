@@ -42,12 +42,14 @@ public class KeYCrossReferenceSourceInfo
        Strict checking. Does not allow "broken links" during reference
        resolution.
      */
-    public int STRICT = 0;
+    // never used
+    //public static final int STRICT = 0;
     
     /**
        Sloppy checking. Allows "broken links" during reference resolution.
      */
-    public int SLOPPY = 1;
+    // never used
+    //public static final int SLOPPY = 1;
 
 
     public KeYCrossReferenceSourceInfo(ServiceConfiguration config) {
@@ -412,4 +414,12 @@ public class KeYCrossReferenceSourceInfo
         
         return scope.getASTParent();
     }
+    
+    /**
+     * clears the cache for the TypeReference to Type resolution.
+     * This is necessary if types are added after model evalutation.
+     *
+    public void clearTypeRefCache() {
+        shit: reference2element.clear();
+    }*/
 }
