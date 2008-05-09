@@ -565,15 +565,14 @@ public class Goal  {
 	final Node parent = node.parent();
 	final Iterator<Node> leavesIt = parent.leavesIterator();
 	while (leavesIt.hasNext()) {
-	    Node n=leavesIt.next();
+	    Node n = leavesIt.next();
 	 
 	    final IteratorOfGoal goalIt = goalList.iterator();
 	    while (goalIt.hasNext()) {
 		final Goal g = goalIt.next();
 	
 		if (g.node()==n && g!=this) {
-		    goalList=goalList.removeFirst(g);
-		   
+		    goalList=goalList.removeFirst(g);		   
 		}
 	    }
 	}
