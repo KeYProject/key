@@ -521,7 +521,9 @@ public class ProofTreeView extends JPanel {
         
        	/** invoked when a rule has been applied */
 	public void ruleApplied(ProofEvent e) {
-	    addModifiedNode(e.getRuleAppInfo().getOriginalNode());
+	    if (proof == e.getSource()) {
+	        addModifiedNode(e.getRuleAppInfo().getOriginalNode());
+	    }
 	}
         
         

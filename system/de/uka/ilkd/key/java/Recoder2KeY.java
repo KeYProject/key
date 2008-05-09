@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import recoder.io.DataLocation;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.service.ChangeHistory;
@@ -496,11 +497,12 @@ public class Recoder2KeY implements JavaReader {
         transformModel(specialClasses);
 
         // make them available to the rec2key mapping
-        for (int i = 0, sz = specialClasses.size(); i < sz; i++) {
-            //TODO: use the real file name here
-            getConverter().processCompilationUnit(specialClasses.get(i), specialClasses.get(i).getName());
+        for(recoder.java.CompilationUnit cu : specialClasses) {
+            DataLocation dl = cu.getOriginalDataLocation();
+            assert dl != null : "DataLocation not set on " + cu.toSource();
+            getConverter().processCompilationUnit(cu, dl.toString());
         }
-
+        
         // tell the mapping that we have parsed the special classes
         rec2key().parsedSpecial(true);
 
@@ -554,6 +556,13 @@ public class Recoder2KeY implements JavaReader {
         if (cHistory.needsUpdate()) {
             cHistory.updateModel();
         }
+        
+        // recoder changes the data location to some imaginary files
+        // undo this by setting the original locations
+        for (recoder.java.CompilationUnit cu : cUnits) {
+            cu.setDataLocation(cu.getOriginalDataLocation());
+        }
+        
     }
 
     // ----- methods dealing with blocks.
