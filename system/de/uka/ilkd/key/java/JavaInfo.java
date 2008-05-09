@@ -94,7 +94,7 @@ public class JavaInfo {
     // resolution
     private HashMap<String, Object> sName2KJTCache = null;
     
-    private LRUCache commonSubtypeCache = new LRUCache(200);
+    private LRUCache<CacheKey, ListOfKeYJavaType> commonSubtypeCache = new LRUCache<CacheKey, ListOfKeYJavaType>(200);
     
     private int nameCachedSize = 0;
     private int sNameCachedSize = 0;
@@ -246,7 +246,7 @@ public class JavaInfo {
         if(name2KJTCache == null || kpmi.rec2key().size() > nameCachedSize){
             buildNameCache();
         }
-        return (KeYJavaType) name2KJTCache.get(fullName);
+        return name2KJTCache.get(fullName);
     }
 
     /**
@@ -254,7 +254,7 @@ public class JavaInfo {
      */
     private void buildNameCache() {
         nameCachedSize = kpmi.rec2key().size();
-        name2KJTCache = new HashMap();
+        name2KJTCache = new HashMap<String, KeYJavaType>();
         Iterator it = (kpmi.allElements()).iterator();
         while (it.hasNext()) {
             Object o = it.next();
@@ -462,7 +462,7 @@ public class JavaInfo {
 		 }
 	     }
 	 }	
-	 return (KeYJavaType) sort2KJTCache.get(sort);
+	 return sort2KJTCache.get(sort);
      }
 
     /** returns the KeYJavaType of the expression if it can be
@@ -503,7 +503,7 @@ public class JavaInfo {
 		    }
 		}
 	    }
-	    return (KeYJavaType) type2KJTCache.get(t);
+	    return type2KJTCache.get(t);
 	}
     }
 
@@ -1210,7 +1210,7 @@ public class JavaInfo {
      */
     public ListOfKeYJavaType getCommonSubtypes(KeYJavaType k1, KeYJavaType k2) {        
         final CacheKey ck = new CacheKey(k1, k2);
-        ListOfKeYJavaType result = (ListOfKeYJavaType)commonSubtypeCache.get(ck);
+        ListOfKeYJavaType result = commonSubtypeCache.get(ck);
         
         if (result != null) {
             return result;

@@ -729,8 +729,8 @@ public class Goal  {
 	return result;
     }
 
-    /** make Taclet instantions complete with regard to metavariables and
-     * skolem functions
+    /** make Taclet instantiations complete with regard to metavariables and
+     * Skolemfunctions
      */ 
     private RuleApp completeRuleApp ( RuleApp ruleApp ) {
         final Proof proof = proof();
