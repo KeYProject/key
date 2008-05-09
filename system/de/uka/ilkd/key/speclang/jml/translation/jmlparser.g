@@ -630,18 +630,25 @@ options {
 
 	//local instance fields of created objects
 	if(kjt.getJavaType() instanceof ClassDeclaration) {
-	    ClassDeclaration cd = (ClassDeclaration)kjt.getJavaType();
-	    ListOfField fields = javaInfo.getAllFields(cd);
-	    for(IteratorOfField it = fields.iterator(); it.hasNext(); ) {
-	    	Field f = it.next();
-	    	ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
-	    	if(!pv.isStatic()) {
-	    	    Term fieldTerm = tb.dot(objectTerm, pv);
-	    	    BasicLocationDescriptor fieldLd 
-	    		    = new BasicLocationDescriptor(guardFma, fieldTerm);
-		    result = result.add(fieldLd);
-		}
-	    }
+		ListOfKeYJavaType kjts = javaInfo.getAllSupertypes(kjt).append(kjt);
+        IteratorOfKeYJavaType kit = kjts.iterator();
+        while(kit.hasNext()){
+            KeYJavaType skjt = kit.next();
+            if(skjt.getJavaType() instanceof ClassDeclaration){
+                ClassDeclaration cd = (ClassDeclaration)skjt.getJavaType();
+	            ListOfField fields = javaInfo.getAllFields(cd);
+	            for(IteratorOfField it = fields.iterator(); it.hasNext(); ) {
+                    Field f = it.next();
+                    ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
+                    if(!pv.isStatic()) {
+                        Term fieldTerm = tb.dot(objectTerm, pv);
+                        BasicLocationDescriptor fieldLd 
+                            = new BasicLocationDescriptor(guardFma, fieldTerm);
+                        result = result.add(fieldLd);
+                    }
+                }
+            }
+        }
 	} else {
 	    assert kjt.getJavaType() instanceof ArrayDeclaration;
 	    
@@ -1875,6 +1882,9 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	{
 	    resolverManager.popLocalVariablesNamespace();
 	    
+	    p = convertToFormula(p);
+	    t = convertToFormula(t);
+	    
 	    //add implicit "non-null" guards for reference types, 
 	    //"in-bounds" guards for integer types
 	    Term nullTerm = tb.NULL(services);
@@ -1894,9 +1904,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	    	    }
 	    	}
 	    }	    
-	    
-	    t = convertToFormula(t);
-	    
+	    	    
 	    if (q.getText().equals("\\forall")) {
 		if (p != null) {
 		    t = tb.imp(p, t);

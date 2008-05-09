@@ -63,7 +63,7 @@ public class OCLSpecExtractor implements SpecExtractor {
             if(restString.startsWith("@") | restString.startsWith("/")) {
                 return startString;
             } else {
-                return startString.concat(shorten(restString));
+                return startString.concat(" " + shorten(restString));
             }
         } else {
             int commentEndIndex = s.indexOf("*/");

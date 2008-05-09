@@ -310,7 +310,15 @@ public class SVInstantiations {
      * @return the SVInstantiations with the added name proposals
      */
     public SVInstantiations addNameProposals(Name listOfNames) {
-        return addInteresting(PROGVAR_SV, listOfNames);
+        try {
+            return addInteresting(PROGVAR_SV, listOfNames);
+        } catch (IllegalStateException e) {
+            System.out.println(e.getMessage());
+            System.out.println("Replacing instead");
+            e.printStackTrace();
+            return replace(PROGVAR_SV, new NameInstantiationEntry(
+                    PROGVAR_SV, listOfNames));
+        }
     }
     
     /**

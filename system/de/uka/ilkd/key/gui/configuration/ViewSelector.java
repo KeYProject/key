@@ -83,6 +83,7 @@ public class ViewSelector extends JDialog {
 			    ProofSettings.DEFAULT_SETTINGS.getViewSettings().setShowWholeTaclet(ifind);
 			    
 			    setVisible(false);
+                            dispose();
 	 		}
 		    });
 	 	JButton saveButton = new JButton("Save as Default");
@@ -98,6 +99,7 @@ public class ViewSelector extends JDialog {
 			    //temporary solution, stores more than wanted %%%% 
 			    dflt.saveSettings();
 			    setVisible(false);
+                            dispose();
 	 		}
 		    });
 	 	JButton cancelButton = new JButton("Cancel");

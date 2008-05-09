@@ -154,6 +154,7 @@ public class UsedSpecificationsDialog extends JDialog {
                                                      cwi.assumedInvs);
                 findOrStartProof(initConfig, po);
                 setVisible(false);
+                dispose();
             }
         });
         buttonPanel.add(ensuresPostButton);
@@ -177,6 +178,7 @@ public class UsedSpecificationsDialog extends JDialog {
                                          cwi.ensuredInvs);
                 findOrStartProof(initConfig, po);
                 setVisible(false);
+                dispose();
             }
         });
         buttonPanel.add(preservesInvButton);

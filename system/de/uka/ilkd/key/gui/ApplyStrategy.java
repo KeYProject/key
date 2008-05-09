@@ -279,7 +279,7 @@ public class ApplyStrategy {
     
 	/** invoked when a rule has been applied */
 	public void ruleApplied(ProofEvent e) {
-            if (!isAutoModeActive()) return;
+            if (!isAutoModeActive() || e.getSource() != proof) return;            
 	    RuleAppInfo rai = e.getRuleAppInfo ();
 	    if ( rai == null )
 		return;
