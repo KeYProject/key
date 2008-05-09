@@ -223,7 +223,12 @@ public class SpecificationRepository {
 	for(Map.Entry<EnsuresPO,SetOfProof> entry : proofs.entrySet()) {
             SetOfProof sop = (SetOfProof) entry.getValue();
             if(sop.contains(proof)) {
-                proofs.put(entry.getKey(), sop.remove(proof));
+                sop = sop.remove(proof);
+                if(sop.size()==0){
+                    proofs.remove(entry.getKey());
+                }else{
+                    proofs.put(entry.getKey(), sop);
+                }
                 return;
             }
         }

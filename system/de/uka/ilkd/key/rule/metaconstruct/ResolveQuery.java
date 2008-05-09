@@ -33,7 +33,6 @@ public class ResolveQuery extends AbstractMetaOperator {
     private Term addUpdatesTarget;
     private JavaBlock addJavaBlock = null;
     private JavaBlock addDecls = null;
-    private Services services;
     private TermFactory tf = TermFactory.DEFAULT;
 //    private boolean stop = false;    
 
@@ -57,7 +56,7 @@ public class ResolveQuery extends AbstractMetaOperator {
 	return  term.arity()==arity();
     }
 
-    private ArrayOfExpression createArgumentPVs(Term t) {
+    private ArrayOfExpression createArgumentPVs(Term t, Services services) {
 	final ProgramMethod pm = ((ProgramMethod)t.op());
 	boolean staticMethod = pm.isStatic() || pm.isConstructor();
 	Expression[] result = new Expression[t.arity()-(staticMethod ? 0 : 1)];
@@ -65,7 +64,7 @@ public class ResolveQuery extends AbstractMetaOperator {
 	    final IProgramVariable parameter = 
                 pm.getVariableSpecification(i).getProgramVariable();
             final KeYJavaType argumentType = pm.getParameterType(i);
-            result[i] = createPV(parameter.name().toString(), argumentType);
+            result[i] = createPV(parameter.name().toString(), argumentType, services);
 	}
 	return new ArrayOfExpression(result);
     }
@@ -80,11 +79,11 @@ public class ResolveQuery extends AbstractMetaOperator {
 	return new ArrayOfQuantifiableVariable(qva);
     }
 
-    private ProgramVariable createPV(String name, Sort s) {       
-        return createPV(name, services.getJavaInfo().getKeYJavaType(s));
+    private ProgramVariable createPV(String name, Sort s, Services services) {       
+        return createPV(name, services.getJavaInfo().getKeYJavaType(s), services);
     }
 
-    private ProgramVariable createPV(String name, KeYJavaType kjt) {
+    private ProgramVariable createPV(String name, KeYJavaType kjt, Services services) {
        
         final ProgramElementName pvname 
             = services.getVariableNamer().getTemporaryNameProposal(name);
@@ -92,7 +91,7 @@ public class ResolveQuery extends AbstractMetaOperator {
         return new LocationVariable(pvname, kjt);
     }
     
-    private Term createProgramMethodSubstitute(Term t, Term rigidResTerm) {
+    private Term createProgramMethodSubstitute(Term t, Term rigidResTerm, Services services) {
 	ProgramMethod pm = (ProgramMethod) t.op();
 	if(t.arity() > 0 && !pm.isStatic() && !pm.isConstructor() && 
 	   t.sub(0).sort() instanceof NullSort){
@@ -102,11 +101,11 @@ public class ResolveQuery extends AbstractMetaOperator {
 	addUpdatesVal = new Term[t.arity()];
 	// the last slot is for the subterm of the update term (to
 	// be set on a higher recursion level)
-	ArrayOfExpression argPVs = createArgumentPVs(t);
+	ArrayOfExpression argPVs = createArgumentPVs(t, services);
 	
         final ProgramVariable callerPV = 
 	    (pm.isStatic() || pm.isConstructor()) ? null : 
-                createPV("queryReceiver", t.sub(0).sort());
+                createPV("queryReceiver", t.sub(0).sort(), services);
 	// create updates
 	for (int i = 0; i<argPVs.size(); i++) {
 	    addUpdatesLoc[i] = tf.createVariableTerm
@@ -119,7 +118,7 @@ public class ResolveQuery extends AbstractMetaOperator {
 	    addUpdatesVal[addUpdatesVal.length-1] = t.sub(0);
 	}	
 	// create java block
-        final ProgramVariable res = createPV(suggestResultVariableName(pm), t.sort());
+        final ProgramVariable res = createPV(suggestResultVariableName(pm), t.sort(), services);
 	Statement mbs = null;
 	//    = new MethodBodyStatement(pm, callerPV, res, argPVs); 
         //    (for always binding dynamically)
@@ -202,8 +201,7 @@ public class ResolveQuery extends AbstractMetaOperator {
     /** calculates the resulting term. */
     public Term calculate(Term term, SVInstantiations svInst, 
 			  Services services) {
-	this.services = services;
-	return createProgramMethodSubstitute(term.sub(0), term.sub(1));	
+	return createProgramMethodSubstitute(term.sub(0), term.sub(1), services);	
     }
 
     public Sort sort(Term[] term) {

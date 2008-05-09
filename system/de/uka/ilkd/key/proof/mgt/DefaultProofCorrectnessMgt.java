@@ -214,6 +214,10 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
 	if ( mediator != null )
 	    mediator.addRuleAppListener ( proofListener );
     }
+    
+    public void removeProofListener(){
+        mediator.removeRuleAppListener(proofListener);
+    }
 
     
     public Proof getProof() {

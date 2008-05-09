@@ -220,7 +220,7 @@ public class ProblemLoader implements Runnable {
                            initConfig.setOriginalKeYFileName(envInput.name());
                        }
         	       POBrowser poBrowser = POBrowser.showInstance(initConfig);        	       
-        	       po = poBrowser.getPO();
+        	       po = poBrowser.getAndClearPO();
         	       if(po == null) {
         		   return "Aborted.";
         	       }
