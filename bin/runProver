@@ -39,7 +39,7 @@ echo "Using JDK installation from:      $JAVA_HOME"
 
 # For debugging reasons disable JIT (otherwise strace doesn't work)
 #JAVA_OPTIONS="-Djava.library.path=/home/vladimir/lib -Xrunjprofiler:port=8887 -Xbootclasspath/a:/home/vladimir/jprofiler3/bin/agent.jar"
-JAVA_OPTIONS=-XX:+HeapDumpOnOutOfMemoryError
+JAVA_OPTIONS=
 #JAVA_OPTIONS=-classic
 
 # Uncomment the following definition for remote debugging on port 1234

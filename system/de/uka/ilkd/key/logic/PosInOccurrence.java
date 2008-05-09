@@ -32,7 +32,10 @@ public class PosInOccurrence {
      */
     private final ConstrainedFormula cfma;
 
-    private final int hashCode;
+    // saves 8 bytes (due to allignment issues) per instance if we use a 
+    // short here instead of an int
+    private final short hashCode;
+    
     /**
      * is true iff the position is in the antecedent of a sequent. 
      */
@@ -67,7 +70,7 @@ public class PosInOccurrence {
 	this.posInTerm=posInTerm;
 	this.metaTerm=metaTerm;
 	this.metaPosInTerm=metaPosInTerm;
-	this.hashCode = computeHash ();
+	this.hashCode = (short) computeHash ();
     }
        
     
@@ -180,7 +183,7 @@ public class PosInOccurrence {
     }
 
     public int hashCode () {
-    	return hashCode;
+    	return (int) hashCode;
     }  
 
     /**

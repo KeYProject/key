@@ -44,7 +44,7 @@ public class ProofTreeView extends JPanel {
     /** the model that is displayed by the delegateView */
     private GUIProofTreeModel delegateModel;
     
-    private WeakHashMap<Proof, GUIProofTreeModel> models = new WeakHashMap<Proof, GUIProofTreeModel>(20);
+    private HashMap<Proof, GUIProofTreeModel> models = new HashMap<Proof, GUIProofTreeModel>(20);
 
     /** the proof this view shows */
     private Proof proof;

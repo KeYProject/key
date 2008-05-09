@@ -27,12 +27,16 @@ public class PosInTerm {
      */
     private final int pos;
 
+    // saves 8 bytes (due to allignment issues) per instance if we use a 
+    // short here instead of an int
     /** 
      * the depth
      */
-    private final int depth;
-
-    private final int hashCode;
+    private final short depth;
+    
+    // saves 8 bytes (due to allignment issues) per instance if we use a 
+    // short here instead of an int
+    private final short hashCode;
 
     /**
      * iterator cache
@@ -42,8 +46,8 @@ public class PosInTerm {
     private PosInTerm(PosInTerm pit, int posNr) {
 	prev = pit;
 	pos = posNr;
-	depth = pit.depth + 1;
-	hashCode = prev.hashCode * 715 + pos;
+	depth = (short) (pit.depth + 1);
+	hashCode = (short) (prev.hashCode * 715 + pos);
     }   
 
     /**
