@@ -38,7 +38,7 @@ public class WatchPoint {
     
     private ProgramVariable self = null;
     private int flavor = 0;
-   
+    /**A list of all parameters from the corresponding program method.*/
     private List<String> parameterTypes;
     /** The watchpoint parsed as KeY data structure. */
     private Term watchpointAsTerm;

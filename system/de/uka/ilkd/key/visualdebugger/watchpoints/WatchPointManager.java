@@ -36,7 +36,7 @@ public class WatchPointManager {
      * 
      * @return the watch points
      */
-    private LinkedList<WatchPoint> getWatchPoints() {
+    private List<WatchPoint> getWatchPoints() {
         return watchPoints;
     }
 
@@ -48,7 +48,7 @@ public class WatchPointManager {
      */
     private int translateWatchpoints(Services services) {
     
-        LinkedList<WatchPoint> watchpoints = getWatchPoints();
+        List<WatchPoint> watchpoints = getWatchPoints();
         watchPointsContainLocals = false;
     
         try {
@@ -80,7 +80,6 @@ public class WatchPointManager {
     
                         ProgramVariable var_self = new LocationVariable(
                                 selfName, ji.getKeYJavaType(declaringType));
-                        System.out.println(var_self.id());
                         wp.setSelf(var_self);
                         ProgramVariable var_dummy = new LocationVariable(
                                 new ProgramElementName(wp.getName()), services
@@ -101,7 +100,6 @@ public class WatchPointManager {
                 return 1;
             }
         } catch (Throwable t) {
-            System.out.println(t.toString());
             t.printStackTrace();
             return -1;
         }
@@ -129,6 +127,10 @@ public class WatchPointManager {
 
     }
     /**
+     * For each local variable used in the given watchpoint the proper KeY data structured
+     * is looked up. 
+     * Note, that these are the "original" local variables. See also VariableNameTracker.
+     * 
      * @param progVarNS
      * @param services
      * @param wp
@@ -139,14 +141,13 @@ public class WatchPointManager {
         final JavaInfo ji = services.getJavaInfo();
         
         List<LocalVariableDescriptor> locVars = wp.getLocalVariables();
+        //reconstruct signature
         List<String> parameterTypes = wp.getParameterTypes();
         ListOfType signature = SLListOfType.EMPTY_LIST;
-    
-
         for (String type : parameterTypes) {
             signature = signature.append(ji.getKeYJavaType(type));
         }
-
+        
         KeYJavaType classType = ji.getKeYJavaType(wp.getDeclaringType());
         ProgramMethod pm = ji.getProgramMethod(classType, wp.getMethod(),
                 signature, classType);

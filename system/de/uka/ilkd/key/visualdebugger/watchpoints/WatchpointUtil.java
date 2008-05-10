@@ -193,6 +193,7 @@ public class WatchpointUtil {
             Sequent seq, PosInOccurrence pos, Proof proof, int maxsteps,
             List<WatchPoint> watchpoints) {
 
+        if(!watchpoint.isEnabled()) return false;
         Term wp = watchpoint.getWatchpointAsTerm();
 
         TermBuilder tb = TermBuilder.DF;
@@ -211,18 +212,16 @@ public class WatchpointUtil {
                     .getSelfVar()));
         } else {
             LogicVariable lv = new LogicVariable(new Name(watchpoint.getSelf()
-                    .name()
-                    + "_lv"), watchpoint.getSelf().getKeYJavaType().getSort());
+                    .name()+ "_lv"), watchpoint.getSelf().getKeYJavaType().getSort());
 
             watchpoint.setWatchpointTerm(updateFactory.prepend(updateFactory
-                    .elementaryUpdate(TermFactory.DEFAULT
-                            .createVariableTerm(watchpoint.getSelf()),
-                            TermFactory.DEFAULT.createVariableTerm(lv)),
-                    watchpoint.getWatchpointAsTerm()));
+                    .elementaryUpdate(
+                            TermFactory.DEFAULT.createVariableTerm(watchpoint.getSelf()),
+                            TermFactory.DEFAULT.createVariableTerm(lv)),watchpoint.getWatchpointAsTerm()));
             
             wp = watchpoint.getWatchpointAsTerm();
+            // quantify according to users decision
             if (watchpoint.getFlavor() == ALL) {
-
                 watchpoint.setWatchpointTerm(tb.all(lv, wp));
             } else {
                 watchpoint.setWatchpointTerm(tb.ex(lv, wp));
@@ -290,7 +289,10 @@ public class WatchpointUtil {
      */
     private static Update updateSelfVar(UpdateFactory uf, WatchPoint watchpoint,
             SourceElement selfVar) {
-        
+        // handle static methods
+        if (selfVar == null) {
+            return uf.skip();
+        }
         return uf.elementaryUpdate(
                 TermFactory.DEFAULT.createVariableTerm(watchpoint.getSelf()),
                 TermFactory.DEFAULT.createVariableTerm((LocationVariable) selfVar)); 
@@ -323,7 +325,7 @@ public class WatchpointUtil {
     }
 
     /**
-     * EvaluateWatchpoints.
+     * EvaluateWatchpoints. TODO out of order - currently not working
      * 
      * Returns true, if the concatenation of all watchpoints by the junctor can
      * be evaluated to true, i.e. the proof can be closed
@@ -527,7 +529,6 @@ public class WatchpointUtil {
      */
     public static void setActiveWatchpoint(List<ETNode> nodes,
             List<WatchPoint> watchpoints) {
-        System.out.println("setting watchpoints active...");
         try {
             for (ETNode node : nodes) {
 
@@ -536,10 +537,9 @@ public class WatchpointUtil {
 
                 node.setWatchpoint(satisfiesWatchpoint(
                         leafNodesInETNode, watchpoints, node));
-                System.out.println("LEAVING setActiveWatchpoint...");
             }
         } catch (Throwable t) {
-            System.out.println(t.toString());
+            t.printStackTrace();
         }
     }
 

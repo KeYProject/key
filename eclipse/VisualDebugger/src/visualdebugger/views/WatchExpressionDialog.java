@@ -135,7 +135,7 @@ public class WatchExpressionDialog {
         Document doc = new Document(source);
 
         try {
-
+            // TODO do not use a string buffer -> insert dummy var directly into the AST
             int pos = doc.getLineOffset(lineoffset);
             StringBuffer buffer = new StringBuffer();
             buffer.append(source.substring(0, pos));
@@ -202,7 +202,7 @@ public class WatchExpressionDialog {
             ITypeBinding[] itb = vb.getDeclaringMethod().getParameterTypes();
             LinkedList<String> ll = new LinkedList<String>();
             for (int i = 0; i < itb.length; i++) {
-                ll.add(itb[i].getName());
+                ll.add(itb[i].getQualifiedName());
             }
             wpd.setParameterTypes(ll);
             wpd.setDeclaringMethod(vb.getDeclaringMethod()+"");

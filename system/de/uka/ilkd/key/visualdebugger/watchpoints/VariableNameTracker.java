@@ -8,7 +8,6 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -25,7 +24,15 @@ import de.uka.ilkd.key.rule.ListOfRuleSet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
-
+/**
+ * This Class offers several tools to keep track of (local) variable names, 
+ * since they are renamed during a proof. Renamed variables are new objects.
+ * After an instances of this class was started the method result() returns
+ * a map, where each entry holds the current names for variables for a specific
+ * program method. Note that this class is tailored for usage in context with
+ * watchpoints.
+ * 
+ */
 public class VariableNameTracker {
 
     /** The current proof tree.*/
@@ -37,7 +44,12 @@ public class VariableNameTracker {
     private Stack<ProgramMethod> methodStack = new Stack<ProgramMethod>();
     private Stack<ReferencePrefix> selfVarStack = new Stack<ReferencePrefix>();
     private ReferencePrefix selfVar = null;
-    
+    /**
+     * Instantiates a new VariableNameTracker.
+     * 
+     * @param node - the current proof tree
+     * @param watchpoints - a list of watchpoints
+     */
     public VariableNameTracker(Node node, List<WatchPoint> watchpoints) {
         super();
         this.node = node;
@@ -70,7 +82,6 @@ public class VariableNameTracker {
                     .javaBlock().program();
                     return programPrefix.getPrefixElementAt(programPrefix
                             .getPrefixLength() - 1);
-
                 }
             }
         } catch (RuntimeException e) {
@@ -82,7 +93,7 @@ public class VariableNameTracker {
    
     
     /**
-     * Gets the indices of all parameters that are used in (all)watchpoints for the
+     * Gets the indices of all parameters that are used in (all) watchpoints for the
      * given method.
      * 
      * @param programMethod
@@ -207,15 +218,21 @@ public class VariableNameTracker {
     }
 
     /**
-     * Update self variable for local watchpoints. TODO
+     * Update self variable for local watchpoints. 
+     * The method keeps track of the this pointer.
+     * Note that a null element is pushed on the stack, if
+     * the method-frame belongs to a static method.
+     * @see #getSelfVar()
      * 
      * @param mf the MethodFrame
      */
     private void updateSelfVar(MethodFrame mf) {
         ExecutionContext executionContext = (ExecutionContext) mf.getExecutionContext();
+        // the execution context might be null for static methods
         selfVar = executionContext.getRuntimeInstance();
+        // if the execution context was null, we push a null element and create 
+        // skip update later on
         selfVarStack.push(selfVar);
-        System.out.println(selfVar);
     }
 
 
@@ -350,8 +367,8 @@ public class VariableNameTracker {
      * is a new object. If we have used local variables in the watchpoints we have
      * to keep track of these renamings. Therefore this method first looks up all applications of method-expand taclets.
      * In those methods we check first if they contain parameters that are relevant for us and furthermore store the
-     * parameter count. Finally the following method-frame is investigated and the parameter count added to rebuild
-     * the original order.
+     * parameter count. Finally the following method-frame is investigated and the parameter count added to each variable found
+     * in the method-frame to rebuild the original order.
      * 
      */
     public void start() {
@@ -364,6 +381,7 @@ public class VariableNameTracker {
             int parameterCount = 0;
 
             Iterator<Node> i = branch.iterator();
+            // 2 nodes needed to compare something at all
             assert branch.size() >= 2;
             Node current = i.next();
             while (i.hasNext()) {
@@ -387,11 +405,11 @@ public class VariableNameTracker {
                                     .getFirstElement();
                             programMethod = mbs.getProgramMethod(node.proof()
                                     .getServices());
+                            // keep method stack up to date
                             methodStack.push(programMethod);
                             System.out.println(methodStack.size()
-                                    + "elements on stack after push");
+                                    + " elements on stack after push");
                             if (!nameMaps.containsKey(programMethod)) {
-                                System.out.println("added mbs to name map");
                                 nameMaps.put(programMethod,
                                         SLListOfRenamingTable.EMPTY_LIST);
                             }
@@ -420,6 +438,7 @@ public class VariableNameTracker {
                             MethodVisitor mv = new MethodVisitor(mf, services);
                             mv.start();
                             System.out.println(mf.getExecutionContext());
+                            
                             updateSelfVar(mf);
                             renamedLocalVariables.addAll(addParameterCount(
                                     programMethod, WatchpointUtil.valueToKey(mv
@@ -451,6 +470,15 @@ public class VariableNameTracker {
      return nameMaps;
  }
 
+/**
+ * Gets the self variable.
+ * Returns the peek element from the selfVarStack.
+ * Note that the returned element might be null in
+ * case a static method has been called
+ * 
+ * @see #updateSelfVar(MethodFrame)
+ * @return the self var
+ */
 public ReferencePrefix getSelfVar() {
     return selfVarStack.peek();
 }  
