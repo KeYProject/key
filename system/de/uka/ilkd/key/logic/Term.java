@@ -62,16 +62,15 @@ public abstract class Term implements SVSubstitute {
     
     /** true iff this term is rigid */
     private boolean rigid;
+    private boolean rigidComputed = false; 
 
     /** 
      * caches the free variables of this term  
      */
-    protected SetOfQuantifiableVariable freeVars =
-	SetAsListOfQuantifiableVariable.EMPTY_SET; 
+    private SetOfQuantifiableVariable freeVars = null; 
 
     /** caches the meta variables of this term */
-    protected SetOfMetavariable metaVars = SetAsListOfMetavariable.EMPTY_SET; 
-
+    private SetOfMetavariable metaVars = null;
 
     /** 
      * creates a Term with top operator op
@@ -131,33 +130,29 @@ public abstract class Term implements SVSubstitute {
      * arity of the term. The method then can determine the free vars of the
      * term and put them in a cache.
      */
-    private void determineFreeVars() {
-	for (int i = 0, ar = arity(); i<ar; i++) {
+    private void determineFreeVarsAndMetaVars() {
+	freeVars = SetAsListOfQuantifiableVariable.EMPTY_SET;
+        metaVars = SetAsListOfMetavariable.EMPTY_SET;
+        if (op instanceof QuantifiableVariable) {
+            freeVars = freeVars.add((QuantifiableVariable) op);
+        } else if ( op instanceof Metavariable ) {
+            metaVars = metaVars.add ( (Metavariable)op );
+        }
+        for (int i = 0, ar = arity(); i<ar; i++) {
 	    if (sub(i) == null) {
                 Debug.fail("FREE "+op+" "+i);
-	    }
-	    SetOfQuantifiableVariable subFreeVars = sub(i).freeVars;
+	    }	        
+	    SetOfQuantifiableVariable subFreeVars = sub(i).freeVars();
 	    for (int j=0, sz = varsBoundHere(i).size(); j<sz; j++) {
 		subFreeVars = subFreeVars.
 		    remove(varsBoundHere(i)
 			   .getQuantifiableVariable(j));
 	    }
 	    freeVars = freeVars.union(subFreeVars);
+	    metaVars = metaVars.union(sub(i).metaVars());
 	}
     }
 
-
-    /**
-     * computes the metavariables that are part of this term     
-     */
-    private void determineMetaVars () {
-        for ( int i = 0, ar = arity(); i < ar; i++ ) {
-            if ( sub ( i ) == null ) {
-               Debug.fail ( "FREE " + op + " " + i );
-            }
-            metaVars = metaVars.union ( sub ( i ).metaVars );
-        }
-    }
 
     /**
      * this method has to be called by subclasses after they have
@@ -171,6 +166,7 @@ public abstract class Term implements SVSubstitute {
      */
     private void determineRigidness () {
 	this.rigid = op ().isRigid ( this ) ;
+	this.rigidComputed = true;
     }
 
     /**
@@ -180,17 +176,14 @@ public abstract class Term implements SVSubstitute {
      * operator, sort, arity, varsBoundHere and javaBlock as this object.
      */
     public boolean equals(Object o) {
-	if (o == null) return false;
 	if (o == this) return true;
 	if (!(o instanceof Term)) return false;	
 
 	final Term t = (Term) o;	
 
-	if (!(t.hashCode() == hashCode() && 
-	      sort() == t.sort() &&
+	if (!(sort() == t.sort() &&
 	      arity() == t.arity() && 
-	      op().equals(t.op()) && 
-	      javaBlock().equals(t.javaBlock()))) {
+	      op().equals(t.op()))) {
 	    return false;
 	}
 
@@ -209,8 +202,7 @@ public abstract class Term implements SVSubstitute {
 		return false;
 	    }
 	}
-
-	return true;
+	return javaBlock().equals(t.javaBlock());
     }
 
     /**
@@ -220,14 +212,13 @@ public abstract class Term implements SVSubstitute {
      * modulo bound renaming
      */  
     public boolean equalsModRenaming(Object o) {
-        if (o == null || !(o instanceof Term)) {
+        if (o == this) {
+            return true;
+        }       
+        if (!(o instanceof Term)) {
 	    return false;
 	}
-	if (o == this){
-	    return true;
-	}	
-	Term cmp = (Term) o;	
-	final Constraint result = Constraint.BOTTOM.unify(this, cmp, null);
+	final Constraint result = Constraint.BOTTOM.unify(this, (Term) o, null);
 
 	return result == Constraint.BOTTOM;	
     }
@@ -270,22 +261,14 @@ public abstract class Term implements SVSubstitute {
         return javaBlock();
     }
 
-    /**
-     * fills the cache variables
-     * must be called in the constructors 
-     */
-    protected void fillCaches() {
-        determineFreeVars();
-        determineMetaVars();
-        determineRigidness();
-        hashcode = calculateHash();	
-    }
-
     /** 
      * returns the set of free quantifiable variables occuring in this term
      * @return the SetOfFree 
      */
-    public SetOfQuantifiableVariable freeVars(){
+    public SetOfQuantifiableVariable freeVars() {
+        if (freeVars == null) {
+            determineFreeVarsAndMetaVars();
+        }
         return freeVars;
     }
 
@@ -327,7 +310,11 @@ public abstract class Term implements SVSubstitute {
      * modalities (otherwise, however, the result may also be false)
      */
     public final boolean isRigid () {
-        return rigid;
+        if (!rigidComputed ) {
+            determineRigidness();
+        }
+            
+       return rigid;
     }
 
     /** @return JavaBlock if term has diamond at the top level */
@@ -342,6 +329,9 @@ public abstract class Term implements SVSubstitute {
      * @return the set of metavariables
      */
     public SetOfMetavariable metaVars () {
+        if (metaVars == null) {
+            determineFreeVarsAndMetaVars();
+        }
         return metaVars;
     }
 
