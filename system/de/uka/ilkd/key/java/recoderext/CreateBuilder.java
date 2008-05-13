@@ -15,12 +15,7 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.List;
-
-import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer.TransformerCache;
-
 import recoder.CrossReferenceServiceConfiguration;
-import recoder.java.CompilationUnit;
 import recoder.java.Statement;
 import recoder.java.StatementBlock;
 import recoder.java.declaration.*;

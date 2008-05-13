@@ -15,8 +15,6 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.List;
-
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.CompilationUnit;
 import recoder.java.Identifier;

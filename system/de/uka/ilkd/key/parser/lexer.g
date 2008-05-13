@@ -107,6 +107,8 @@ tokens {
 	// of the file
 	INCLUDE="\\include";
 	INCLUDELDTS="\\includeLDTs";
+	CLASSPATH="\\classpath";
+	NODEFAULTCLASSES="\\noDefaultClasses";
 	JAVASOURCE="\\javaSource";
         NOJAVAMODEL ="\\noJavaModel";
         WITHOPTIONS="\\withOptions";

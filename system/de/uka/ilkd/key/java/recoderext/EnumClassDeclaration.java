@@ -5,17 +5,12 @@ import java.util.List;
 import recoder.ProgramFactory;
 import recoder.java.Expression;
 import recoder.java.Identifier;
-import recoder.java.Statement;
-import recoder.java.StatementBlock;
 import recoder.java.declaration.*;
 import recoder.java.expression.operator.New;
-import recoder.java.reference.SuperConstructorReference;
-import recoder.java.reference.ThisConstructorReference;
 import recoder.java.reference.TypeReference;
 import recoder.kit.TypeKit;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-import de.uka.ilkd.key.rule.Rule;
 
 /**
  * This class is used to describe an enum type by its equivalent class

@@ -11,9 +11,7 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Metavariable;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 /** 
  * Used for OCL Simplification.
@@ -58,13 +56,7 @@ class BoundVarsTerm extends Term {
 	    }
 	}
 	depth = max_depth + 1;
-	if (op instanceof QuantifiableVariable) {
-	    freeVars = freeVars.add((QuantifiableVariable) op);
-	} else if ( op instanceof Metavariable ) {
-            metaVars = metaVars.add ( (Metavariable)op );
-        }
-	
-	fillCaches();	
+
     }  
 
     /** @return arity of the term */

@@ -17,18 +17,14 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.util.Debug;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.CompilationUnit;
-import recoder.java.Expression;
-import recoder.java.Identifier;
 import recoder.java.JavaProgramFactory;
 import recoder.java.declaration.*;
 import recoder.java.reference.FieldReference;
@@ -149,7 +145,7 @@ public class EnumClassBuilder extends RecoderModelTransformer {
      * substitute EnumDeclarations by EnumClassDeclarations.
      * 
      * @see de.uka.ilkd.key.java.recoderext.RecoderModelTransformer#makeExplicit(recoder.java.declaration.TypeDeclaration)
-     * @deprecated THIS DOES NOT WORK ANY MORE, SINCE THE CACHE ONLY CONSIDERS CLASSES!
+     * @deprecated THIS DOES NOT WORK ANY MORE, SINCE THE CACHE ONLY CONSIDERS CLASSE TYPES, NOT ENUMS!
      */
     protected void makeExplicit(TypeDeclaration td) { }
     
