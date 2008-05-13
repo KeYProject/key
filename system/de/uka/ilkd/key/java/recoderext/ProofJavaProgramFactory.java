@@ -18,7 +18,6 @@ package de.uka.ilkd.key.java.recoderext;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.util.List;
 
 import recoder.ParserException;
@@ -185,7 +184,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 		postWork(res);
 		return res;
 	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException()).initCause(e);
+		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
 	    }
         }
     }
@@ -201,7 +200,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 		postWork(res);
 		return res;
 	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException()).initCause(e);
+		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
 	    }
 
         }
@@ -218,7 +217,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 		postWork(res);
 		return res;
 	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException()).initCause(e);
+		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
 	    }
 
         }
@@ -235,7 +234,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 		postWork(res);
 		return res;
 	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException()).initCause(e);
+		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
 	    }
 
         }
@@ -252,7 +251,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 		postWork(res);
 		return res;
 	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException()).initCause(e);
+		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
 	    }
 
         }
@@ -269,7 +268,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 		postWork(res);
 		return res;
 	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException()).initCause(e);
+		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
 	    }
 
         }
@@ -286,7 +285,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 		postWork(res);
 		return res;
 	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException()).initCause(e);
+		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
 	    }
 
         }
@@ -303,7 +302,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 		postWork(res);
 		return res;
 	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException()).initCause(e);
+		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
 	    }
 
         }
@@ -320,7 +319,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 		postWork(res);
 		return res;
 	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException()).initCause(e);
+		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
 	    }
 
         }
@@ -339,7 +338,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 		}
 		return res;
 	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException()).initCause(e);
+		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
 	    }
 
         }
@@ -357,7 +356,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 		postWork(res);
 		return res;
 	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException()).initCause(e);
+		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
 	    }
 
         }

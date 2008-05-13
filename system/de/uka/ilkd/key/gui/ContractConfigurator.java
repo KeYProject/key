@@ -116,6 +116,7 @@ public class ContractConfigurator extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 successful = true;
                 setVisible(false);
+                dispose();
             }
         });
         buttonPanel.add(okButton);
@@ -129,6 +130,7 @@ public class ContractConfigurator extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 successful = false;
                 setVisible(false);
+                dispose();
             }
         });
         buttonPanel.add(cancelButton);

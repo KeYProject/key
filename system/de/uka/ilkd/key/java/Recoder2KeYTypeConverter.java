@@ -21,11 +21,12 @@ import recoder.abstraction.DefaultConstructor;
 import recoder.abstraction.ParameterizedType;
 import recoder.abstraction.Type;
 import recoder.bytecode.ClassFile;
+import recoder.service.*;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.*;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.recoderext.*;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.Name;
@@ -125,6 +126,28 @@ public class Recoder2KeYTypeConverter {
 	private Recoder2KeYConverter getRecoder2KeYConverter() {
 		return recoder2key.getConverter();
 	}
+	
+	/**
+	 * return the corresponding KeY JavaType for a recoder type.
+         * 
+         * Return the cached value if present - otherwise create a new type.
+         * Store this in the cache.
+         * 
+         * This method retrieves the recoder nameinfo and queries it for the
+         * type for typeName and passes this result to {@link #getKeYJavaType(Type)}
+         * 
+         * @param typeName
+         *            name of a type to be converted
+         * @return the KJT for the string representation.
+         * @see #getKeYJavaType(Type)
+         * @author mu
+	 */
+
+	public KeYJavaType getKeYJavaType(String typeName) {
+	    NameInfo ni = recoder2key.getServiceConfiguration().getNameInfo();
+	    Type ty = ni.getType(typeName);
+	    return getKeYJavaType(ty);
+	}
 
 	/**
 	 * return the corresponding KeY JavaType for a recoder type.
@@ -168,17 +191,22 @@ public class Recoder2KeYTypeConverter {
 			recoder.abstraction.ClassType ct = (recoder.abstraction.ClassType) t;
 			if (ct.isInterface()) {
 				s = createObjectSort(ct, directSuperSorts(ct).add(
-						getJavaInfo().getJavaLangObjectAsSort()));
+						getKeYJavaType("java.lang.Object").getSort()));
 			} else {
 				s = createObjectSort(ct, directSuperSorts(ct));
 			}
-			List<? extends Constructor> cl = t.getProgramModelInfo().getConstructors(
-					(recoder.abstraction.ClassType) t);
+			
 			addKeYJavaType(t, s);
-			if (cl.size() == 1
-					&& (cl.get(0) instanceof recoder.abstraction.DefaultConstructor)) {
-				getRecoder2KeYConverter().processDefaultConstructor(
-						(DefaultConstructor) cl.get(0));
+			
+			// the unknown classtype has no modelinfo so surround with null check
+			if(t.getProgramModelInfo() != null) {
+			    List<? extends Constructor> cl = t.getProgramModelInfo().getConstructors(
+			            (recoder.abstraction.ClassType) t);
+			    if (cl.size() == 1
+			            && (cl.get(0) instanceof recoder.abstraction.DefaultConstructor)) {
+			        getRecoder2KeYConverter().processDefaultConstructor(
+			                (DefaultConstructor) cl.get(0));
+			    }
 			}
 		} else if (t instanceof recoder.abstraction.ArrayType) {
 			recoder.abstraction.Type bt = ((recoder.abstraction.ArrayType) t)
@@ -186,10 +214,11 @@ public class Recoder2KeYTypeConverter {
 
 			kjt = getKeYJavaType(bt);
 
-			s = ArraySortImpl.getArraySort(kjt.getSort(), getJavaInfo()
-					.getJavaLangObjectAsSort(), getJavaInfo()
-					.getJavaLangCloneableAsSort(), getJavaInfo()
-					.getJavaIoSerializableAsSort());
+			// I may not use JavaInfo here because the classes may not yet be cached!
+			s = ArraySortImpl.getArraySort(kjt.getSort(), 
+			                getKeYJavaType("java.lang.Object").getSort(),
+			                getKeYJavaType("java.lang.Cloneable").getSort(),
+			                getKeYJavaType("java.io.Serializable").getSort());
 			addKeYJavaType(t, s);
 		}
 
@@ -198,58 +227,59 @@ public class Recoder2KeYTypeConverter {
 		return kjt;
 	}
 
-	private KeYJavaType addKeYJavaType(Type t, Sort s) {
-		KeYJavaType result = null;
-		if (!(t instanceof recoder.java.declaration.TypeDeclaration)) {
-			de.uka.ilkd.key.java.abstraction.Type type = null;
-			if (t instanceof recoder.abstraction.PrimitiveType) {
-				type = PrimitiveType.getPrimitiveType(t.getFullName());
-				result = typeConverter.getKeYJavaType(type);
-				if (result == null) {
-					Debug.out("create new KeYJavaType for primitive type "
-							+ t + ". This should not happen");
-					result = new KeYJavaType(type, s);
-				}
-			} else if (t instanceof recoder.abstraction.NullType) {
-				type = NullType.JAVA_NULL;
-				if (namespaces.sorts().lookup(s.name()) == null) {
-					setUpSort(s);
-				}
-				result = new KeYJavaType(type, s);
-			} else if (t instanceof ClassFile) {
-				setUpSort(s);
-				result = new KeYJavaType(s);
-				storeInCache(t, result);
-				createTypeDeclaration((ClassFile) t);
+	private void addKeYJavaType(Type t, Sort s) {
+	    KeYJavaType result = null;
+	    if (!(t instanceof recoder.java.declaration.TypeDeclaration)) {
+	        de.uka.ilkd.key.java.abstraction.Type type = null;
+	        if (t instanceof recoder.abstraction.PrimitiveType) {
+	            type = PrimitiveType.getPrimitiveType(t.getFullName());
+	            result = typeConverter.getKeYJavaType(type);
+	            if (result == null) {
+	                Debug.out("create new KeYJavaType for primitive type "
+	                        + t + ". This should not happen");
+	                result = new KeYJavaType(type, s);
+	            }
+	        } else if (t instanceof recoder.abstraction.NullType) {
+	            type = NullType.JAVA_NULL;
+	            if (namespaces.sorts().lookup(s.name()) == null) {
+	                setUpSort(s);
+	            }
+	            result = new KeYJavaType(type, s);
+	        } else if (t instanceof recoder.abstraction.ArrayType) {
+	            setUpSort(s);
+	            result = new KeYJavaType(s);
+	        } else if (t == recoder2key.getServiceConfiguration().
+	                        getNameInfo().getUnknownClassType()) {
+//	            setUpSort(s);
+//	            result = makeSimpleKeYType((ClassType)t,s);
+//	            //TEMP!
+//	            assert result.getJavaType() != null;
+	        }
+	        else {
+	            Debug.out("recoder2key: unknown type", t);
+	            Debug.out("Unknown type: " + t.getClass() + " "
+	                    + t.getFullName());
+	            Debug.fail();
+	            result = new KeYJavaType();
+	        }
+	    } else {
+	        setUpSort(s);
+	        result = new KeYJavaType(s);
+	    }
+	    storeInCache(t, result);
 
-				return (KeYJavaType) lookupInCache(t);
-			} else if (t instanceof recoder.abstraction.ArrayType) {
-				setUpSort(s);
-				result = new KeYJavaType(s);
-			} else {
-				Debug.out("recoder2key: unknown type", t);
-				Debug.out("Unknown type: " + t.getClass() + " "
-						+ t.getFullName());
-				Debug.fail();
-				result = new KeYJavaType();
-			}
-		} else {
-			setUpSort(s);
-			result = new KeYJavaType(s);
-		}
-		storeInCache(t, result);
+	    // delayed creation of virtual array declarations
+	    // to avoid cycles
+	    if (t instanceof recoder.abstraction.ArrayType) {
+	        result.setJavaType(createArrayType(
+	                getKeYJavaType(((recoder.abstraction.ArrayType) t)
+	                        .getBaseType()), (KeYJavaType) lookupInCache(t)));
+	    }
 
-		// delayed creation of virtual array declarations
-		// to avoid cycles
-		if (t instanceof recoder.abstraction.ArrayType) {
-			result.setJavaType(createArrayType(
-					getKeYJavaType(((recoder.abstraction.ArrayType) t)
-							.getBaseType()), (KeYJavaType) lookupInCache(t)));
-		}
-
-		return (KeYJavaType) lookupInCache(t); // usually this equals result,
-		// sometimes however, there is a 'legacy' type in the mapping,
-		// which has priority
+	    // return was never used, so it is removed and method changed to void (mu)
+	    // return (KeYJavaType) lookupInCache(t); // usually this equals result,
+	    // sometimes however, there is a 'legacy' type in the mapping,
+	    // which has priority
 	}
 
 	/**
@@ -325,12 +355,30 @@ public class Recoder2KeYTypeConverter {
 		        supers,	abstractOrInterface);
 	}
 
+	private KeYJavaType makeSimpleKeYType(ClassType ct, Sort s) {
+	    ProgramElementName name = new ProgramElementName(Recoder2KeYConverter.makeAdmissibleName(ct.getName()));
+            ProgramElementName fullname = new ProgramElementName(Recoder2KeYConverter.makeAdmissibleName(ct.getFullName()));
+            MemberDeclaration[] members = new MemberDeclaration[0];
+            Modifier[] modifiers = new Modifier[0];
+            Extends ext = null;
+            Implements impl = null;
+            boolean parentIsInterface = false;
+            
+            TypeDeclaration td = new ClassDeclaration(modifiers, name, ext, fullname, impl,
+                    members, parentIsInterface , true);
+            KeYJavaType kjt = new KeYJavaType(s);
+            kjt.setJavaType(td);
+            return kjt;
+	}
+	
 	/**
 	 * retrieve information from a bytecode class file and store it into the
 	 * type repository.
 	 * 
 	 * @param cf
 	 *            class file to model
+	 *            
+	 * @deprecated now supported in {@link ClassFileDeclarationBuilder}
 	 */
 	private void createTypeDeclaration(ClassFile cf) {
 

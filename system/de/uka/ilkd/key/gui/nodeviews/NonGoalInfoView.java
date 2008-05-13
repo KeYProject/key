@@ -42,6 +42,7 @@ public class NonGoalInfoView extends JTextArea {
     	 
     private LogicPrinter printer;	 
     private SequentPrintFilter filter;
+    private InitialPositionTable posTable;
     
     public NonGoalInfoView (Node node, KeYMediator mediator) {
 	filter = new ConstraintSequentPrintFilter 
@@ -53,6 +54,8 @@ public class NonGoalInfoView extends JTextArea {
 	     mediator.getServices());
 	printer.printSequent (null, filter);
 	String s = printer.toString();
+        posTable = printer.getPositionTable();
+        printer=null;
 	RuleApp app = node.getAppliedRuleApp();
         s += "\nNode Nr "+node.serialNr()+"\n";
         
@@ -225,7 +228,6 @@ public class NonGoalInfoView extends JTextArea {
     private Range highlightPos (PosInOccurrence pos,	 
 				HighlightPainter light)	 
 	throws BadLocationException {	 
-	InitialPositionTable posTable = printer.getPositionTable ();	 
 	ListOfInteger path = posTable.pathForPosition (pos, filter);	 
 	Range r = posTable.rangeForPath(path);	 
 	getHighlighter().addHighlight(r.start(), r.end(), light);	 

@@ -9,11 +9,7 @@
 //
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
@@ -21,15 +17,7 @@ import de.uka.ilkd.key.logic.IteratorOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.AttributeOp;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetAsListOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.LRUCache;
 
 /**
@@ -40,7 +28,7 @@ class TriggersSet {
 
     /**a <code>HashMap</code> from <code>Term</code> to 
      * <code>TriggersSet</code> uses to cache all created TriggersSets*/
-    private final static Map cache = new LRUCache(1000);
+    private final static Map<Term, TriggersSet> cache = new LRUCache<Term, TriggersSet>(1000);
     /** Quantified formula of PCNF*/
     private final Term allTerm;
     /**all <code>Trigger</code>s  for <code>allTerm</code>*/
@@ -48,7 +36,7 @@ class TriggersSet {
     /**a <code>HashMap</code> from <code>Term</code> to <code>Trigger</code> 
      * which stores different subterms of <code>allTerm</code> 
      * with its according trigger */
-    private final Map termToTrigger = new HashMap();
+    private final Map<Term, Trigger> termToTrigger = new HashMap<Term, Trigger>();
     /**all universal variables of <code>allTerm</code>*/
     private final SetOfQuantifiableVariable uniQuantifiedVariables;
     /**
@@ -65,7 +53,7 @@ class TriggersSet {
     }
 
     static TriggersSet create(Term allTerm, Services services) {
-        TriggersSet trs = (TriggersSet) cache.get(allTerm);
+        TriggersSet trs = cache.get(allTerm);
         if (trs == null) {
             // add check whether it is in PCNF
             trs = new TriggersSet(allTerm, services);
@@ -126,7 +114,7 @@ class TriggersSet {
     private Trigger createUniTrigger(Term trigger,
             SetOfQuantifiableVariable qvs,
             boolean isUnify, boolean isElement) {
-        Trigger t = (Trigger) termToTrigger.get(trigger);
+        Trigger t = termToTrigger.get(trigger);
         if (t == null) {
             t = new UniTrigger(trigger, qvs, isUnify, isElement, this);
             termToTrigger.put(trigger, t);
@@ -191,9 +179,9 @@ class TriggersSet {
                     TriggerUtils.iteratorByOperator(clause, Op.OR);
             while (it.hasNext()) {
                 final Term oriTerm = it.next();
-                final Iterator it2 = expandIfThenElse(oriTerm).iterator();
+                final Iterator<Term> it2 = expandIfThenElse(oriTerm).iterator();
                 while (it2.hasNext()) {
-                    Term t = (Term)it2.next();
+                    Term t = it2.next();
                     if (t.op() == Op.NOT) {
                         t = t.sub(0);
                     }
@@ -234,8 +222,8 @@ class TriggersSet {
             return foundSubtriggers;
         }
 
-        private Set expandIfThenElse(Term t) {
-            final Set[] possibleSubs = new Set[t.arity()];
+        private Set<Term> expandIfThenElse(Term t) {
+            final Set<Term>[] possibleSubs = new Set[t.arity()];
             boolean changed = false;
             for (int i = 0; i != t.arity(); ++i) {
                 final Term oriSub = t.sub(i);
@@ -243,7 +231,7 @@ class TriggersSet {
                 changed = changed || possibleSubs[i].size() != 1 || possibleSubs[i].iterator().next() != oriSub;
             }
 
-            final Set res = new HashSet();
+            final Set<Term> res = new HashSet<Term>();
             if (t.op() == Op.IF_THEN_ELSE) {
                 res.addAll(possibleSubs[1]);
                 res.addAll(possibleSubs[2]);
@@ -266,12 +254,12 @@ class TriggersSet {
             return res;
         }
 
-        private Set combineSubterms(Term oriTerm,
-                Set/*of Term*/[] possibleSubs,
+        private Set<Term> combineSubterms(Term oriTerm,
+                Set<Term>[] possibleSubs,
                 Term[] chosenSubs,
                 ArrayOfQuantifiableVariable[] boundVars,
                 int i) {
-            final HashSet set = new HashSet();
+            final HashSet<Term> set = new HashSet<Term>();
             if (i >= possibleSubs.length) {
                 final Term res =
                         TermFactory.DEFAULT.createTerm(oriTerm.op(),
@@ -285,9 +273,9 @@ class TriggersSet {
             }
 
 
-            final Iterator it = possibleSubs[i].iterator();
+            final Iterator<Term> it = possibleSubs[i].iterator();
             while (it.hasNext()) {
-                chosenSubs[i] = (Term)it.next();
+                chosenSubs[i] = it.next();
                 set.addAll(combineSubterms(oriTerm, possibleSubs,
                         chosenSubs, boundVars,
                         i + 1));
@@ -404,18 +392,18 @@ class TriggersSet {
          * @param i
          * @return a set of triggers
          */
-        private Set setMultiTriggers(Trigger[] ts, int i) {
-            Set res = new HashSet();
+        private Set<SetOfTrigger> setMultiTriggers(Trigger[] ts, int i) {
+            Set<SetOfTrigger> res = new HashSet<SetOfTrigger>();
             if (i >= ts.length) {
                 return res;
             }
             SetOfTrigger tsi = SetAsListOfTrigger.EMPTY_SET.add(ts[i]);
             res.add(tsi);
-            Set nextTriggers = setMultiTriggers(ts, i + 1);
+            Set<SetOfTrigger> nextTriggers = setMultiTriggers(ts, i + 1);
             res.addAll(nextTriggers);
-            Iterator it = nextTriggers.iterator();
+            Iterator<SetOfTrigger> it = nextTriggers.iterator();
             while (it.hasNext()) {
-                SetOfTrigger next = (SetOfTrigger) it.next();
+                SetOfTrigger next = it.next();
                 next = next.add(ts[i]);
                 if (addMultiTrigger(next)) {
                     continue;

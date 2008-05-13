@@ -107,6 +107,7 @@ public class ClassSelectionDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 successful = true;
                 setVisible(false);
+                dispose();
             }
         });
         buttonPanel.add(okButton);
@@ -119,6 +120,7 @@ public class ClassSelectionDialog extends JDialog {
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
+                dispose();
             }
         });
         buttonPanel.add(cancelButton);

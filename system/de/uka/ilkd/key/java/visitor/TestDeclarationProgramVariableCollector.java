@@ -12,6 +12,7 @@ package de.uka.ilkd.key.java.visitor;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.java.Recoder2KeY;
@@ -62,7 +63,7 @@ public class TestDeclarationProgramVariableCollector  extends TestCase {
         test_block = null;    
     }
     
-    private HashSet toNames(HashSet programVariables) {
+    private HashSet toNames(Set programVariables) {
 	HashSet result = new HashSet();
 	Iterator it = programVariables.iterator(); 
 	while (it.hasNext()) {

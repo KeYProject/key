@@ -29,7 +29,7 @@ public class NameAbstractionTable {
      * are compared. The latest declaration of a symbol will be the first
      * matching entry in the list
      */
-    private List declarations0 = null, declarations1 = null;
+    private List<SourceElement> declarations0 = null, declarations1 = null;
     
     /** 
      * adds the given two elements to the table
@@ -38,8 +38,8 @@ public class NameAbstractionTable {
      */
     public void add(SourceElement pe1, SourceElement pe2) {
         if ( declarations0 == null ) {
-            declarations0 = new LinkedList ();
-            declarations1 = new LinkedList ();
+            declarations0 = new LinkedList<SourceElement> ();
+            declarations1 = new LinkedList<SourceElement> ();
         }
 
         declarations0.add ( 0, pe1 );
@@ -56,8 +56,8 @@ public class NameAbstractionTable {
      */
     public boolean sameAbstractName(SourceElement pe0, SourceElement pe1) {
         if ( declarations0 != null ) {
-            final Iterator it0 = declarations0.iterator ();
-            final Iterator it1 = declarations1.iterator ();
+            final Iterator<SourceElement> it0 = declarations0.iterator ();
+            final Iterator<SourceElement> it1 = declarations1.iterator ();
 
             while ( it0.hasNext () ) {
                 // both lists are assumed to hold the same number of elements

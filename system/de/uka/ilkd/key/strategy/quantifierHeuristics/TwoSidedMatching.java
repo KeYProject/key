@@ -10,18 +10,10 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
-import de.uka.ilkd.key.logic.op.IteratorOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.MapAsListFromQuantifiableVariableToTerm;
-import de.uka.ilkd.key.logic.op.MapFromQuantifiableVariableToTerm;
-import de.uka.ilkd.key.logic.op.Metavariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.*;
 
 /**
  * Matching triggers within another quantifier expression. Problems with the

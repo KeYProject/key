@@ -65,6 +65,7 @@ public class ClassInvariantSelectionDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 successful = true;
                 setVisible(false);
+                dispose();
             }
         });
         panel.getButtonPanel().add(okButton);
@@ -77,6 +78,7 @@ public class ClassInvariantSelectionDialog extends JDialog {
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
+                dispose();
             }
         });
         panel.getButtonPanel().add(cancelButton);

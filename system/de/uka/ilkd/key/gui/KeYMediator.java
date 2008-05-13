@@ -1024,7 +1024,9 @@ public class KeYMediator {
         
 	/** invoked when a rule has been applied */
 	public void ruleApplied(ProofEvent e) {
-	    keySelectionModel.defaultSelection();	   
+	    if (e.getSource() == getProof()) {
+	        keySelectionModel.defaultSelection();
+	    }
 	}
 
 
