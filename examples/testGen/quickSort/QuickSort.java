@@ -1,12 +1,12 @@
 public class QuickSort{
 
     /*@ public normal_behavior
-      @  requires a!=null && a.length<4;
+      @  requires a!=null && a.length<5;
       @  requires lo<hi && 0<=lo && hi<a.length;
-      @  ensures a!=null ==> (\forall int i; 0<=i && i<a.length-1; 
+      @  ensures a!=null ==> (\forall int i; lo<=i && i<hi; 
       @                        a[i]<=a[i+1]) &&
-      @                      (\forall int i; 0<=i && i<a.length; 
-      @                        (\exists int j; 0<=j && j<a.length; 
+      @                      (\forall int i;lo<=i && i<=hi; 
+      @                        (\exists int j; lo<=j && j<=hi; 
       @                          \old(a[i]) == a[j]));
       @*/
     public static void sort(int[] a, int lo, int hi){
