@@ -144,3 +144,4 @@
 ./staticInitialisation/localDeclaredMethod.key
 ./staticInitialisation/objectOfErroneousClass.key
 ./staticInitialisation/staticInitialisersAreNonSimple.key
+./_testcase/classpath/classpath.key

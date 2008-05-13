@@ -48,7 +48,7 @@ public class TermBuilder {
     
 
     public Term all(QuantifiableVariable qv, Term t2) {
-        if ( !t2.freeVars.contains ( qv ) ) return t2;
+        if ( !t2.freeVars().contains ( qv ) ) return t2;
         return tf.createQuantifierTerm ( Op.ALL, qv, t2 );
     }
     
@@ -61,7 +61,7 @@ public class TermBuilder {
     }
     
     public Term ex(QuantifiableVariable qv, Term t2) {
-        if ( !t2.freeVars.contains ( qv ) ) return t2;
+        if ( !t2.freeVars().contains ( qv ) ) return t2;
         return tf.createQuantifierTerm(Op.EX, qv, t2);
     }
     

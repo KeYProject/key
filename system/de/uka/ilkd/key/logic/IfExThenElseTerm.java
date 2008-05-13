@@ -41,8 +41,6 @@ class IfExThenElseTerm extends Term {
             }
         }
         depth = max_depth + 1;
-        
-        fillCaches ();
     }
  
     /* (non-Javadoc)

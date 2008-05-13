@@ -13,7 +13,6 @@ package de.uka.ilkd.key.java.recoderext;
 
 import recoder.java.Identifier;
 import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
 import recoder.java.SourceVisitor;
 import recoder.java.statement.Catch;
 import de.uka.ilkd.key.logic.op.SchemaVariable;

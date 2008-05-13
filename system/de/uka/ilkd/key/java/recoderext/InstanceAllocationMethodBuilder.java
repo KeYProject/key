@@ -1,15 +1,8 @@
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.List;
-
-import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer.TransformerCache;
-
 import recoder.CrossReferenceServiceConfiguration;
-import recoder.java.CompilationUnit;
 import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Public;
-import recoder.java.declaration.DeclarationSpecifier;
-import recoder.java.declaration.ParameterDeclaration;
 import recoder.java.declaration.modifier.Static;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTArrayList;

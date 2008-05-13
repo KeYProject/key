@@ -9,21 +9,24 @@
 // 
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
-import recoder.java.CompilationUnit;
 import recoder.abstraction.Variable;
 import recoder.java.Identifier;
-import recoder.java.declaration.*;
-import recoder.java.declaration.modifier.*;
+import recoder.java.declaration.ClassDeclaration;
 import recoder.java.declaration.DeclarationSpecifier;
+import recoder.java.declaration.FieldDeclaration;
+import recoder.java.declaration.TypeDeclaration;
+import recoder.java.declaration.modifier.Private;
+import recoder.java.declaration.modifier.Public;
+import recoder.java.declaration.modifier.Static;
 import recoder.java.reference.TypeReference;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer.TransformerCache;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -173,11 +176,11 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
     }
     
     private void addFieldsForFinalVars(TypeDeclaration td){
-        LinkedList vars = (LinkedList) getLocalClass2FinalVar().get(td);
+        List<Variable> vars = getLocalClass2FinalVar().get(td);
         if(vars!=null){
-            Iterator it = vars.iterator();
+            Iterator<Variable> it = vars.iterator();
             while(it.hasNext()){
-                Variable v = (Variable) it.next();
+                Variable v = it.next();
                 attach(createImplicitRecoderField(v.getType().getName(), FINAL_VAR_PREFIX+v.getName(), false, true), td, 0);
             }
         }
@@ -189,10 +192,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	 if (!(javaLangObject instanceof ClassDeclaration)) {
 	     Debug.fail("Could not find class java.lang.Object or only as bytecode");
 	 }
-	 Set cds = classDeclarations();
-	 Iterator it = cds.iterator();
-	 while(it.hasNext()){
-	     ClassDeclaration cd = (ClassDeclaration) it.next();
+	 for (final ClassDeclaration cd : classDeclarations()) {
 	     if(cd.getName()==null || cd.getStatementContainer() !=null){
 	         (new FinalOuterVarsCollector()).walk(cd);
 	     }

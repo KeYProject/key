@@ -11,7 +11,6 @@ package de.uka.ilkd.key.java;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 
@@ -94,7 +93,7 @@ public class JavaInfo {
     // resolution
     private HashMap<String, Object> sName2KJTCache = null;
     
-    private LRUCache commonSubtypeCache = new LRUCache(200);
+    private LRUCache<CacheKey, ListOfKeYJavaType> commonSubtypeCache = new LRUCache<CacheKey, ListOfKeYJavaType>(200);
     
     private int nameCachedSize = 0;
     private int sNameCachedSize = 0;
@@ -246,7 +245,7 @@ public class JavaInfo {
         if(name2KJTCache == null || kpmi.rec2key().size() > nameCachedSize){
             buildNameCache();
         }
-        return (KeYJavaType) name2KJTCache.get(fullName);
+        return name2KJTCache.get(fullName);
     }
 
     /**
@@ -254,10 +253,8 @@ public class JavaInfo {
      */
     private void buildNameCache() {
         nameCachedSize = kpmi.rec2key().size();
-        name2KJTCache = new HashMap();
-        Iterator it = (kpmi.allElements()).iterator();
-        while (it.hasNext()) {
-            Object o = it.next();
+        name2KJTCache = new HashMap<String, KeYJavaType>();
+        for (final Object o : kpmi.allElements()) {
             if (o != null && o instanceof KeYJavaType){                 
                 final KeYJavaType oKJT = (KeYJavaType)o;
                 if (oKJT.getJavaType() instanceof ArrayType) {
@@ -353,10 +350,8 @@ public class JavaInfo {
         sName2KJTCache = new HashMap<String, Object>();
         sNameCachedSize = kpmi.rec2key().size();
         final HashSet<String> duplicates = new HashSet<String>();
-        final Iterator it = kpmi.allElements().iterator();        
-        while (it.hasNext()) {
-            Object o = it.next();
-            if (o != null && o instanceof KeYJavaType){
+        for (Object o : kpmi.allElements()) {
+            if (o instanceof KeYJavaType){
                 KeYJavaType t = (KeYJavaType)o;                
                 String name = getFullName(t);
                 //TODO array types [[I vs. int[]
@@ -390,9 +385,7 @@ public class JavaInfo {
      */
     public Set<KeYJavaType> getAllKeYJavaTypes() {
 	final Set<KeYJavaType> result  = new HashSet<KeYJavaType>();
-	final Iterator it = kpmi.allElements().iterator();
-        while (it.hasNext()) {
-	    final Object o = it.next();     
+        for (final Object o : kpmi.allElements()) {     
 	    if (o instanceof KeYJavaType) {		
 	        result.add((KeYJavaType) o);
 	    }
@@ -405,10 +398,7 @@ public class JavaInfo {
      * of the LDTs of the current type converter in the services.
      */
     public KeYJavaType getPrimitiveKeYJavaType(String typename) {
-        ListOfLDT models = getTypeConverter().getModels();
-        final IteratorOfLDT ldtIterator = models.iterator();
-        while (ldtIterator.hasNext()) {
-            final LDT model = ldtIterator.next();           
+        for (final LDT model : getTypeConverter().getModels()) {           
             if (model.javaType() != null && 
                     model.javaType().getFullName().equals(typename)) {
                 return model.getKeYJavaType(model.javaType());
@@ -453,16 +443,14 @@ public class JavaInfo {
 	 if(sort2KJTCache == null || kpmi.rec2key().size() > sortCachedSize){
 	     sortCachedSize = kpmi.rec2key().size();
 	     sort2KJTCache = new HashMap<Sort, KeYJavaType>();
-	     Iterator it = kpmi.allElements().iterator();
-	     while (it.hasNext()) {
-		 Object o = it.next();
+	     for (final Object o : kpmi.allElements()) {
 		 if (o instanceof KeYJavaType){
                      final KeYJavaType oKJT = (KeYJavaType)o;
                      sort2KJTCache.put((oKJT).getSort(), oKJT);
 		 }
 	     }
 	 }	
-	 return (KeYJavaType) sort2KJTCache.get(sort);
+	 return sort2KJTCache.get(sort);
      }
 
     /** returns the KeYJavaType of the expression if it can be
@@ -477,10 +465,9 @@ public class JavaInfo {
      * @return a namespace containing the object sorts
      */
     public Namespace getObjectSorts() {
-        Iterator it = kpmi.allObjectSorts().iterator();
-        Namespace ns = new Namespace();
-        while (it.hasNext()) {       
-            ns.add((Named)it.next());            
+        final Namespace ns = new Namespace();
+        for (final ObjectSort os : kpmi.allObjectSorts()) {
+            ns.add(os);            
         }
         return ns;
     }    
@@ -494,16 +481,14 @@ public class JavaInfo {
         } else {
 	    if(type2KJTCache == null){
 		type2KJTCache = new HashMap<Type, KeYJavaType>();
-		final Iterator it = (kpmi.allElements()).iterator();
-		while (it.hasNext()) {
-		    Object o = it.next();
+		for (final Object o : kpmi.allElements()) {
 		    if (o instanceof KeYJavaType) {
 		        final KeYJavaType oKJT = (KeYJavaType)o;
 			type2KJTCache.put(oKJT.getJavaType(), oKJT);
 		    }
 		}
 	    }
-	    return (KeYJavaType) type2KJTCache.get(t);
+	    return type2KJTCache.get(t);
 	}
     }
 
@@ -1210,7 +1195,7 @@ public class JavaInfo {
      */
     public ListOfKeYJavaType getCommonSubtypes(KeYJavaType k1, KeYJavaType k2) {        
         final CacheKey ck = new CacheKey(k1, k2);
-        ListOfKeYJavaType result = (ListOfKeYJavaType)commonSubtypeCache.get(ck);
+        ListOfKeYJavaType result = commonSubtypeCache.get(ck);
         
         if (result != null) {
             return result;

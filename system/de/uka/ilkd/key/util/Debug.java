@@ -25,6 +25,22 @@ public final class Debug {
 	/** has to be set in order to enable debugging */
 	public static boolean ENABLE_DEBUG = "on".equals(System
 			.getProperty("KeyDebugFlag"));
+	
+	/**
+	 * Using the command line switch "-Dkey.debug.prefix" one can choose
+	 * of which classes the debug output is to be send to the standard
+	 * output.
+	 * 
+	 * For example:
+	 *    runProver -Dkey.debug.prefix=de.uka.ilkd.key.java:de.uka.ilkd.key.proof.ProblemLoader
+	 *    
+	 * will display all debug outputs either coming from package de...java
+	 * (or any subpackage) or from the class ProblemLoader.
+	 * 
+	 * Stacktraces will always be printed.
+	 */
+	public static final String[] showOnlyPrefixes = 
+	    System.getProperty("key.debug.prefix", "").split(":");
 
 	/**
 	 * prints given string if in debug mode
@@ -51,7 +67,7 @@ public final class Debug {
 		if (ENABLE_DEBUG) {
 			dbgPrint(msg);
 			if(exc != null)
-				exc.printStackTrace();
+				exc.printStackTrace(System.out);
 		}
 	}
 
@@ -288,12 +304,21 @@ public final class Debug {
 	 * print a string to stdout, prefixed by the execution context of the caller
 	 * of the calling function.
 	 * 
+	 * If {@link #showOnlyPrefixes} is defined, the output is only written, if
+	 * the caller prefix begins with one of the specified strings
+	 * 
 	 * @author MU
 	 * @param string
 	 *            string to be printed out
 	 */
 	private static final void dbgPrint(String string) {
-		System.out.println("DEBUG in " + getClassAndMethod(3) + ":: " + string);
+	    String prefix = getClassAndMethod(3);
+	    for (String so : showOnlyPrefixes) {
+                if(prefix.startsWith(so)) {
+                    System.out.println("DEBUG in " + prefix + ":: " + string);
+                    return;
+                }
+            }
 	}
 
 	/**

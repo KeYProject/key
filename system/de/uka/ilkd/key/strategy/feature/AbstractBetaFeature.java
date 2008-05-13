@@ -33,7 +33,7 @@ public abstract class AbstractBetaFeature implements Feature {
      *
      *    keys: Term              values: TermInfo
      */
-    private static LRUCache betaCandidates = new LRUCache (1000);
+    private static LRUCache<Term, TermInfo> betaCandidates = new LRUCache<Term, TermInfo> (1000);
 
     /** helper for computing maxPosPath_* in TermInfo */
     private static MaxPosPathHelper maxPosPathHelper = new MaxPosPathHelper();
@@ -47,7 +47,7 @@ public abstract class AbstractBetaFeature implements Feature {
     private static TermInfo termInfo (Term p_t) {
         TermInfo ti;
         synchronized ( betaCandidates ) {
-            ti = (TermInfo)betaCandidates.get ( p_t );
+            ti = betaCandidates.get ( p_t );
         }
 
         if ( ti == null ) {

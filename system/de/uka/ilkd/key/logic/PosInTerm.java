@@ -46,8 +46,13 @@ public class PosInTerm {
     private PosInTerm(PosInTerm pit, int posNr) {
 	prev = pit;
 	pos = posNr;
+
+        if (pit.depth == Short.MAX_VALUE) {
+	    throw new IllegalStateException("Overflow detected for field depth in PosInTerm.");
+	}
 	depth = (short) (pit.depth + 1);
-	hashCode = (short) (prev.hashCode * 715 + pos);
+	
+	hashCode = (short) (prev.hashCode * 13 + pos);
     }   
 
     /**
