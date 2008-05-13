@@ -16,7 +16,9 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.util.ExtList;
 
 
@@ -83,6 +85,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
          assert methodReference.getReferencePrefix() != null : 
              "Method reference of a method body statement needs an " +
              "explicit reference prefix.";
+         checkOnlyProgramVarsAsArguments(methodReference.getArguments());
      }
     
     public MethodBodyStatement(ExtList list) {        
@@ -95,6 +98,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         assert methodReference.getReferencePrefix() != null : 
             "Method reference of a method body statement needs an " +
             "explicit reference prefix.";
+        checkOnlyProgramVarsAsArguments(methodReference.getArguments());
     }    
 
 
@@ -119,12 +123,24 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
             }
         }
         
+        checkOnlyProgramVarsAsArguments(args);
         this.methodReference = new MethodReference(args, 
                                                    method.getProgramElementName(), 
                                                    newContext);
+
     }
 
 
+
+    private void checkOnlyProgramVarsAsArguments(ArrayOfExpression arguments) {
+        for (int i = 0, sz = arguments.size(); i<sz; i++) {
+            final Expression argument = arguments.getExpression(i);
+            if (!(argument instanceof LocationVariable || argument instanceof SchemaVariable)) {
+                throw new IllegalArgumentException("Only local variables or schemavariables " +
+                		"allowed as arguments of a method body statement.");
+            }
+        }
+    }
 
     public MethodBodyStatement(ProgramMethod method, 
             ReferencePrefix newContext, 
