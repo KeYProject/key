@@ -135,7 +135,8 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     private void checkOnlyProgramVarsAsArguments(ArrayOfExpression arguments) {
         for (int i = 0, sz = arguments.size(); i<sz; i++) {
             final Expression argument = arguments.getExpression(i);
-            if (!(argument instanceof LocationVariable || argument instanceof SchemaVariable)) {
+            if (!((argument instanceof LocationVariable && !((LocationVariable)argument).isMember()) || 
+                    argument instanceof SchemaVariable)) {
                 throw new IllegalArgumentException("Only local variables or schemavariables " +
                 		"allowed as arguments of a method body statement.");
             }
