@@ -1,17 +1,20 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.unittest.*;
-import de.uka.ilkd.key.unittest.simplify.*;
-import de.uka.ilkd.key.util.ExtList;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.declaration.MethodDeclaration;
-
-import java.awt.event.ActionListener;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.awt.*;
+import java.awt.event.ActionListener;
+
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.java.declaration.MethodDeclaration;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.SetAsListOfProgramMethod;
+import de.uka.ilkd.key.logic.op.SetOfProgramMethod;
+import de.uka.ilkd.key.unittest.ModelGenerator;
+import de.uka.ilkd.key.unittest.UnitTestBuilder;
+import de.uka.ilkd.key.unittest.simplify.SimplifyModelGenerator;
 
 public class MethodSelectionDialog extends JDialog {
 
@@ -234,9 +237,7 @@ public class MethodSelectionDialog extends JDialog {
 		mediator.testCaseConfirmation(test);
 	    }
 	}catch(Exception e){
-	    ExtList l = new ExtList();
-	    l.add(e);
-	    new ExceptionDialog(Main.getInstance(), l);
+	    new ExceptionDialog(Main.getInstance(), e);
 	}
     }
 

@@ -56,7 +56,9 @@ import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
-import de.uka.ilkd.key.util.*;
+import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.KeYExceptionHandler;
+import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -964,9 +966,7 @@ public class Main extends JFrame implements IMain {
 		    pi.startProver(mediator.getProof().env(), 
 			    	   poBrowser.getAndClearPO());
 		} catch(ProofInputException e)  {
-		    ExtList list = new ExtList();
-		    list.add(e);
-		    new ExceptionDialog(this, list);
+		    new ExceptionDialog(this, e);
 		}
 	    }
 	}
@@ -3188,9 +3188,7 @@ public class Main extends JFrame implements IMain {
                         try{
                             runTest(tam.test, tam.model);
                         }catch(Exception exc){
-                            ExtList l = new ExtList();
-                            l.add(exc);
-                            new ExceptionDialog(testGui, l);    
+                            new ExceptionDialog(testGui, exc);    
                         }
                     }
                 }
@@ -3583,9 +3581,7 @@ public class Main extends JFrame implements IMain {
                                         }
                                         main.setStatusLine("Test Generation Completed");
                                     }catch(Exception exc){
-                                        ExtList l = new ExtList();
-                                        l.add(exc);
-                                        new ExceptionDialog(testGui, l);
+                                        new ExceptionDialog(testGui, exc);
                                     }
                                     creatingTests = false;
                                     enable();
