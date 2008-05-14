@@ -44,7 +44,7 @@ public class KeYMediator {
     private IMain mainFrame;
 
 
-    InteractiveProver interactiveProver;
+    private InteractiveProver interactiveProver;
 
     /** the update simplifier (may be moved to nodes)*/
     private UpdateSimplifier upd_simplifier;

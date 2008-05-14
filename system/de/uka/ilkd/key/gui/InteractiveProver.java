@@ -70,7 +70,6 @@ public class InteractiveProver {
 	this.mediator = mediator;
 	mediator.addKeYSelectionListener(selListener);
 	applyStrategy = new ApplyStrategy(mediator);
-
     }
 
     /** returns the KeYMediator */
