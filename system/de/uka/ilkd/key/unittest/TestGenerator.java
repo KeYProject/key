@@ -711,7 +711,7 @@ public class TestGenerator{
 		    String header = getHeader(fn);
 
 		    File dir = new File(directory+
-					fn.substring(0, fn.lastIndexOf(
+					fn.substring(fn.indexOf(File.separator), fn.lastIndexOf(
 							 File.separator)));
 		    fn = fn.substring(fn.lastIndexOf(File.separator)+1);
 		    if(!dir.exists()){

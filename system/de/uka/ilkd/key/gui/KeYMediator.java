@@ -44,7 +44,7 @@ public class KeYMediator {
     private IMain mainFrame;
 
 
-    private InteractiveProver interactiveProver;
+    InteractiveProver interactiveProver;
 
     /** the update simplifier (may be moved to nodes)*/
     private UpdateSimplifier upd_simplifier;
@@ -74,7 +74,7 @@ public class KeYMediator {
     private boolean stupidMode; // minimize user interaction
 
     private boolean autoMode; // autoModeStarted has been fired
-
+    
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
     */
@@ -377,11 +377,6 @@ public class KeYMediator {
     {
     	return interactiveProver.getBuiltInRuleAppsForName(name, pos);
     }
-    
-    public ProverTaskListener getProverTaskListener() {
-        return mainFrame.getProverTaskListener();
-    }
-
 
     /**
      * selected rule to apply; opens a dialog 
