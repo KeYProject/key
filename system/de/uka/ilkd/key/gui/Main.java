@@ -1925,8 +1925,7 @@ public class Main extends JFrame implements IMain {
     }
     
     protected Proof setUpNewProof(Proof proof) {
-        KeYMediator localMediator = mediator();
-        localMediator.setProof(proof);
+        mediator().setProof(proof);
         return proof;
     }
     

@@ -16,7 +16,6 @@ import de.uka.ilkd.key.rule.UpdateSimplifier;
 import de.uka.ilkd.key.rule.updatesimplifier.ArrayOfAssignmentPair;
 import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
-import de.uka.ilkd.key.rule.updatesimplifier.UpdateSimplifierTermFactory;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -709,11 +708,6 @@ public class InReachableStatePOBuilder extends TermBuilder {
             result = and(result, it.next());
         }
         return result;
-    }
-
-    private Term updateNoSimplification(Update update, Term target) {
-        return UpdateSimplifierTermFactory.DEFAULT.createUpdateTerm(
-                update.getAllAssignmentPairs(), target);
     }
 
     private Term update(Update update, Term target) {          
