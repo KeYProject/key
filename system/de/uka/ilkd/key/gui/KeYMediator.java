@@ -1115,4 +1115,12 @@ public class KeYMediator {
        }
        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
     }
+
+    /** 
+     * returns the prover task listener of the main frame
+     */
+    public ProverTaskListener getProverTaskListener() {
+        return mainFrame.getProverTaskListener();
+    }
+
 }
