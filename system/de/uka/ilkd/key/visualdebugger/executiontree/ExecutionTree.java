@@ -165,7 +165,7 @@ public class ExecutionTree implements AutoModeListener {
         }
 
     }
-
+    
     private void buildITTree(Node n, int currentId, boolean lookingForBC,
             ITNode parent, ListOfTerm terms) {
         int newId = currentId;

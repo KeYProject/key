@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 
@@ -22,7 +23,7 @@ public class InsertSepVisitor extends ASTVisitor {
      * @param oldNode the old node
      * @param newNode the new node
      */
-    public static void replaceNode(ASTNode oldNode, ASTNode newNode) {
+    private void replaceNode(ASTNode oldNode, ASTNode newNode) {
 
         ASTNode parent = oldNode.getParent();
         StructuralPropertyDescriptor location = oldNode.getLocationInParent();
@@ -46,13 +47,14 @@ public class InsertSepVisitor extends ASTVisitor {
     private final HashSet<ITypeBinding> types = new HashSet<ITypeBinding>();
 
     
-    /* (non-Javadoc)
-     * @see org.eclipse.jdt.core.dom.ASTVisitor#endVisit(org.eclipse.jdt.core.dom.ArrayAccess)
+    /**
+     * An array access might cause a NullPointer- or ArrayIndexOutOfBoundException therefore
+     * we set a breakpoint around the access, i.e. <code>a[Debug.sep(id1, i)]</code>
      */
-    public void endVisit(ArrayAccess node) {
+    public void endVisit(ArrayAccess node) {        
         Expression index = node.getIndex();
-        MethodInvocation inv = getSepStatement(index.getAST(), ++id, index);
-        replaceNode(index, inv);
+        MethodInvocation indexSep = getSepStatement(index.getAST(), ++id, index);
+        replaceNode(index, indexSep);
     }
 
     /* (non-Javadoc)
@@ -70,6 +72,13 @@ public class InsertSepVisitor extends ASTVisitor {
         }
     }
 
+    public void endVisit(InfixExpression node) {
+        if (node.getOperator() == Operator.DIVIDE) {
+            replaceNode(node.getRightOperand(), 
+                    getSepStatement(node.getAST(), ++id, node.getRightOperand()));
+        }        
+    }
+    
     /* (non-Javadoc)
      * @see org.eclipse.jdt.core.dom.ASTVisitor#endVisit(org.eclipse.jdt.core.dom.ForStatement)
      */

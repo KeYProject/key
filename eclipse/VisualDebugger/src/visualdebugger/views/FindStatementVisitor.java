@@ -1,6 +1,7 @@
 package visualdebugger.views;
 
 import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jface.text.TextSelection;
 
 public class FindStatementVisitor extends ASTVisitor {
@@ -96,39 +97,26 @@ public class FindStatementVisitor extends ASTVisitor {
         if (node.getQualifier().resolveTypeBinding().isArray())
             return;
         currentId++;
-    //    System.out.println(node+" "+currentId);
-//        if(currentId==idToFind){
-//            expr=node;
-//        }
-
     }
     
     
     
     public void endVisit(ArrayAccess node){
         currentId++;
-        //    System.out.println(node+" "+currentId);
-//            if(currentId==idToFind){
-//                expr=node;
-//            }
-
     }
     
-    
-//    public void endVisit(IfStatement node){
-//        final Expression index = node.getExpression();
-//        currentId++;
-//    }
-    
+    public void endVisit(InfixExpression node) {
+        if (node.getOperator() == Operator.DIVIDE) {
+            currentId++;
+        }
+    }
     
     public void endVisit(ForStatement node){
-        final Expression guard = node.getExpression();
         currentId++;
     }
     
     
     public void endVisit(WhileStatement node){
-        final Expression guard = node.getExpression();
         currentId++;
     }
     
