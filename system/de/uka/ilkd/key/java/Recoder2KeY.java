@@ -313,7 +313,11 @@ public class Recoder2KeY implements JavaReader {
         List<recoder.java.CompilationUnit> cUnits = new ArrayList<recoder.java.CompilationUnit>();
         parseSpecialClasses();
         try {
-            cUnits = servConf.getProgramFactory().parseCompilationUnits(cUnitStrings);
+            for (String filename : cUnitStrings) {
+                CompilationUnit cu = servConf.getProgramFactory().parseCompilationUnit(new FileReader(filename));
+                cu.setDataLocation(new DataFileLocation(filename));
+                cUnits.add(cu);
+            }
             final ChangeHistory changeHistory = servConf.getChangeHistory();
             for (int i = 0, sz = cUnits.size(); i < sz; i++) {
                 cUnits.get(i).makeAllParentRolesValid();
@@ -330,10 +334,12 @@ public class Recoder2KeY implements JavaReader {
             reportError(ade.getMessage(), ade);
         } catch (recoder.ParserException pe) {
             reportError(pe.getMessage(), pe);
+        } catch (IOException e) {
+            reportError(e.getMessage(), e);
         }
         return cUnits;
     }
-
+    
     /**
      * read a compilation unit, given as a string.
      * 
@@ -663,7 +669,13 @@ public class Recoder2KeY implements JavaReader {
             List<recoder.java.CompilationUnit> libClasses) throws ParserException {
         NameInfo ni = servConf.getNameInfo();
         String typeString = Naming.toPathName(tyref);
+        
+        // bugfix: The reference might be to an array. Remove the array reference then.
+        while(typeString.endsWith("[]"))
+            typeString = typeString.substring(0, typeString.length() - 2);
+
         recoder.abstraction.Type ty;
+        
         try {
             ty = ni.getType(typeString);
         } catch (UnresolvedReferenceException e) {
@@ -673,10 +685,13 @@ public class Recoder2KeY implements JavaReader {
         if(ty == null) {
             if(!typeString.contains("."))
                 throw new UnresolvedReferenceException("Type references to undefined classes may only appear if they are fully qualified", tyref);
+            
             recoder.java.CompilationUnit cu = ClassFileDeclarationBuilder.makeEmptyClassFile(servConf.getProgramFactory(), typeString);
             dynamicallyCreatedClasses.add(typeString);
+            
             ChangeHistory changeHistory = servConf.getChangeHistory();
             changeHistory.attached(cu);
+            
             libClasses.add(cu);
             Debug.out("Dynamically created class: ", typeString);
         }

@@ -1,6 +1,7 @@
 package visualdebugger.views;
 
 import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 
 import de.uka.ilkd.key.visualdebugger.SourceElementId;
 
@@ -76,6 +77,16 @@ public class FindStatementById extends ASTVisitor {
 
     }
 
+    public void endVisit(InfixExpression node) {
+        if (node.getOperator() == Operator.DIVIDE) {
+            currentId++;
+            if (currentId == idToFind) {
+                expr = node.getRightOperand();
+            }
+        }        
+    }
+
+    
     public void endVisit(ForStatement node) {
         final Expression guard = node.getExpression();
         currentId++;

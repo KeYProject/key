@@ -19,6 +19,9 @@ import de.uka.ilkd.key.visualdebugger.VisualDebuggerState;
  * carry something of logical value.
  */
 public class NodeInfo {
+    
+    // for optimizing memory consumption of large proofs
+    public static boolean largeProofMode = false;
 
     /** firstStatement stripped of method frames */
     private SourceElement activeStatement                 = null;
@@ -42,7 +45,7 @@ public class NodeInfo {
     // ALL fields below are for the eclipse symbolic debugger plug-in
     // THEY HAVE TO BE MOVED OUT TO THE DEBUGGER package
     // where a separate mapping node <-> debugger status has to be maintained
-    private final VisualDebuggerState visualDebuggerState = new VisualDebuggerState();
+    private final VisualDebuggerState visualDebuggerState = largeProofMode ? null : new VisualDebuggerState();
    
     
     public NodeInfo(Node node) {

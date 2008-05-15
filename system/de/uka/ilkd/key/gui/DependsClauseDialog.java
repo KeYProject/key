@@ -31,7 +31,6 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ExtList;
 
 
 /**
@@ -147,9 +146,7 @@ public class DependsClauseDialog extends JDialog {
             
             currentClause = locations;
         } catch(Exception e) {
-            ExtList list = new ExtList();
-            list.add(e);
-            new ExceptionDialog(this, list);
+            new ExceptionDialog(this, e);
             return false;
         }
 

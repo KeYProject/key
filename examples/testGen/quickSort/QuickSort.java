@@ -1,7 +1,7 @@
 public class QuickSort{
 
     /*@ public normal_behavior
-      @  requires a!=null && a.length<5;
+      @  requires a!=null && a.length<4;
       @  requires lo<hi && 0<=lo && hi<a.length;
       @  ensures a!=null ==> (\forall int i; lo<=i && i<hi; 
       @                        a[i]<=a[i+1]) &&
