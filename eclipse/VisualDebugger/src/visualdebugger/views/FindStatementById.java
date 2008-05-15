@@ -78,12 +78,27 @@ public class FindStatementById extends ASTVisitor {
     }
 
     public void endVisit(InfixExpression node) {
-        if (node.getOperator() == Operator.DIVIDE) {
+        if (node.getOperator() == Operator.DIVIDE || 
+                node.getOperator() == Operator.REMAINDER) {
             currentId++;
             if (currentId == idToFind) {
                 expr = node.getRightOperand();
             }
         }        
+    }
+
+    /**
+     * Division-by-zero ArithmeticExceptions can occur when evaluating
+     * the division or remainder composite assignment operator. 
+     */
+    public void endVisit(Assignment node) {
+        if (node.getOperator() == Assignment.Operator.DIVIDE_ASSIGN || 
+                node.getOperator() == Assignment.Operator.REMAINDER_ASSIGN) {
+            currentId++;
+            if (currentId == idToFind) {
+                expr = node.getRightHandSide();
+            }
+        }   
     }
 
     
