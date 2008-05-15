@@ -18,6 +18,9 @@ public class B{
 	    a.super();
 	}
 
+	/*@ public normal_behavior
+	  @  ensures \result==B.this.i;
+	  @*/
 	public int n(){
 	    return i;
 	}
