@@ -106,10 +106,23 @@ public class FindStatementVisitor extends ASTVisitor {
     }
     
     public void endVisit(InfixExpression node) {
-        if (node.getOperator() == Operator.DIVIDE) {
+        if (node.getOperator() == Operator.DIVIDE || 
+                node.getOperator() == Operator.REMAINDER) {
             currentId++;
         }
     }
+    
+    /**
+     * Division-by-zero ArithmeticExceptions can occur when evaluating
+     * the division or remainder composite assignment operator. 
+     */
+    public void endVisit(Assignment node) {
+        if (node.getOperator() == Assignment.Operator.DIVIDE_ASSIGN || 
+                node.getOperator() == Assignment.Operator.REMAINDER_ASSIGN) {
+            currentId++;
+        }   
+    }
+
     
     public void endVisit(ForStatement node){
         currentId++;

@@ -72,12 +72,30 @@ public class InsertSepVisitor extends ASTVisitor {
         }
     }
 
+    /**
+     * Division-by-zero ArithmeticExceptions can occur when evaluating
+     * the division or remainder infix operator. We take care of them here.     
+     */
     public void endVisit(InfixExpression node) {
-        if (node.getOperator() == Operator.DIVIDE) {
+        if (node.getOperator() == Operator.DIVIDE || 
+                node.getOperator() == Operator.REMAINDER) {
             replaceNode(node.getRightOperand(), 
                     getSepStatement(node.getAST(), ++id, node.getRightOperand()));
         }        
     }
+
+    /**
+     * Division-by-zero ArithmeticExceptions can occur when evaluating
+     * the division or remainder composite assignment operator. 
+     */
+    public void endVisit(Assignment node) {
+        if (node.getOperator() == Assignment.Operator.DIVIDE_ASSIGN || 
+                node.getOperator() == Assignment.Operator.REMAINDER_ASSIGN) {
+            replaceNode(node.getRightHandSide(), 
+                    getSepStatement(node.getRightHandSide().getAST(), ++id, node.getRightHandSide()));
+        }   
+    }
+
     
     /* (non-Javadoc)
      * @see org.eclipse.jdt.core.dom.ASTVisitor#endVisit(org.eclipse.jdt.core.dom.ForStatement)
