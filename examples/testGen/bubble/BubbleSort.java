@@ -2,7 +2,7 @@ public class BubbleSort{
  
     /*@ public normal_behavior
       @  forall int[] b;
-      @  requires a!=null && a.length>1 && a.length<3;
+      @  requires a!=null && a.length>1 && a.length<5;
       @  requires a.length == b.length && 
       @           (\forall int i; 0<=i && i<a.length; b[i]==a[i]);
       @  ensures a!=null ==> (\forall int i; 0<=i && i<a.length-1; 
