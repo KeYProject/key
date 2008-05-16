@@ -1,10 +1,20 @@
 package visualdebugger.views;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashSet;
-import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.dom.*;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
+import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
+import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.text.edits.MalformedTreeException;
+import org.eclipse.text.edits.TextEdit;
 
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 
@@ -21,8 +31,23 @@ public class InsertSepVisitor extends ASTVisitor {
     private int id = 0;
 
     /** The types. */
-    private final HashSet<ITypeBinding> types = new HashSet<ITypeBinding>();
+    private final HashSet<ITypeBinding> types;
 
+    /** the CompilationUnit to be rewritten */
+    private final CompilationUnit astRoot;
+
+    private ASTRewrite rewrite;
+
+    /**
+     * Creates an instance of this visitor used to add breakpoints between each statement
+     * and around expression that may implicitly trigger an unchecked exception.
+     * @param astRoot the CompilationUnit to be rewritten
+     */
+    public InsertSepVisitor(CompilationUnit astRoot) {
+        this.id = 0;
+        this.types = new HashSet<ITypeBinding>();
+        this.astRoot = astRoot;
+    }
     
     /**
      * Replace node.
@@ -31,19 +56,10 @@ public class InsertSepVisitor extends ASTVisitor {
      * @param newNode the new node
      */
     private void replaceNode(ASTNode oldNode, ASTNode newNode) {
-
-        ASTNode parent = oldNode.getParent();
-        StructuralPropertyDescriptor location = oldNode.getLocationInParent();
-
-        if (location.isChildProperty()) {
-            parent.setStructuralProperty(location, newNode);
-        } else if (location.isChildListProperty()) {
-            List<ASTNode> list = (List<ASTNode>) parent.getStructuralProperty(location);
-            int index = list.indexOf(oldNode);
-            list.set(index, newNode);
-        }
+        rewrite.replace(oldNode, newNode, null);        
     }
 
+    
     /**
      * An array access might cause a NullPointer- or ArrayIndexOutOfBoundException therefore
      * we set a breakpoint around the access, i.e. <code>a[Debug.sep(id1, i)]</code>
@@ -93,14 +109,64 @@ public class InsertSepVisitor extends ASTVisitor {
                     getSepStatement(node.getRightHandSide().getAST(), ++id, node.getRightHandSide()));
         }   
     }
+    
+    /**
+     * The guard of a "do-while" statement is enclosed by a <code>Debug.sep</code>
+     * statement. 
+     * 
+     * If the body of the loop is only a single statement and not a block, we have to enclose it
+     * in a block and to add a <code>Debug.sep</code> statement as first statement of the body. 
+     */
+    public void endVisit(DoStatement node) {
+        final Expression guard = node.getExpression();
+        replaceNode(guard, getSepStatement(guard.getAST(), ++id, guard));
+        final Statement body = node.getBody();
+        useBlocksInControlStatement(body);
+
+    }
+
+    /**
+     * Ensures that existing then and else statements use blocks and their first statement 
+     * is a breakpoint 
+     */
+    public void endVisit(IfStatement node) {
+        final Statement thenStmnt = node.getThenStatement();
+        useBlocksInControlStatement(thenStmnt);
+        final Statement elseStmnt = node.getElseStatement();
+        if (elseStmnt != null) {
+            useBlocksInControlStatement(elseStmnt);
+        }
+    }
 
     
-    /* (non-Javadoc)
-     * @see org.eclipse.jdt.core.dom.ASTVisitor#endVisit(org.eclipse.jdt.core.dom.ForStatement)
+    /**
+     * If the given Statement is not a Block then a block statement is created with the first 
+     * statement being a <code>Debug.sep</code> statement and a copy of body as second statement.
+     * @param body the Statement to be wrapped
+     */
+    private void useBlocksInControlStatement(final Statement body) {
+        if (!(body instanceof Block)) {    
+            final Block block = body.getAST().newBlock();
+            id++;
+            block.statements().add(getSepStatement(block.getAST(), id));
+            block.statements().add(ASTNode.copySubtree(block.getAST(), body));
+            rewrite.replace(body, block, null);            
+        }
+    }
+
+    
+    /**
+     * The guard of a for statement is enclosed by a <code>Debug.sep</code>
+     * statement. 
+     * 
+     * If the body of the loop is only a single statement and not a block, we have to enclose it
+     * in a block and to add a <code>Debug.sep</code> statement as first statement of the body. 
      */
     public void endVisit(ForStatement node) {
         final Expression guard = node.getExpression();
         replaceNode(guard, getSepStatement(guard.getAST(), ++id, guard));
+        final Statement body = node.getBody();
+        useBlocksInControlStatement(body);
     }
 
     /**
@@ -147,12 +213,18 @@ public class InsertSepVisitor extends ASTVisitor {
     }
 
     /**
-     *
+     * The guard of a while statement is enclosed by a <code>Debug.sep</code>
+     * statement. 
+     * 
+     * If the body of the loop is only a single statement and not a block, we have to enclose it
+     * in a block and to add a <code>Debug.sep</code> statement as first statement of the body. 
      */
     public void endVisit(WhileStatement node) {
         final Expression guard = node.getExpression();
         MethodInvocation inv = getSepStatement(guard.getAST(), ++id, guard);
         replaceNode(guard, inv);
+        final Statement body = node.getBody();
+        useBlocksInControlStatement(body);
     }
 
     /**
@@ -166,12 +238,12 @@ public class InsertSepVisitor extends ASTVisitor {
     private ExpressionStatement getSepStatement(AST ast, int id) {
         MethodInvocation methodInvocation = ast.newMethodInvocation();
 
-        methodInvocation.setExpression(ast
-                .newSimpleName(VisualDebugger.debugClass));
+        methodInvocation.setExpression(ast.newSimpleName(VisualDebugger.debugClass));
         methodInvocation.setName(ast.newSimpleName(VisualDebugger.sepName));
 
         NumberLiteral literal = ast.newNumberLiteral("" + id);
         methodInvocation.arguments().add(literal);
+        
         ExpressionStatement expressionStatement = ast
                 .newExpressionStatement(methodInvocation);
         return expressionStatement;
@@ -193,18 +265,10 @@ public class InsertSepVisitor extends ASTVisitor {
         // methodInvocation.setExpression(null);
         methodInvocation.setName(ast.newSimpleName(VisualDebugger.sepName));
         NumberLiteral literal = ast.newNumberLiteral("" + id);
-        ASTNode ex2 = ASTNode.copySubtree(ast, ex);
-
-        ASTParser parser = ASTParser.newParser(AST.JLS3);
-        parser.setKind(ASTParser.K_EXPRESSION);
-        parser.setSource(ex.toString().toCharArray()); // set source
-        // parser.setResolveBindings(true); // we need bindings later on
-        ex2 = (ASTNode.copySubtree(ast, (Expression) parser
-                .createAST(null /* IProgressMonitor */)));
-        // TODO !!!!!!!!!!!!!!!!!!!!!!!!
-
+       
+        
         methodInvocation.arguments().add(literal);
-        methodInvocation.arguments().add((Expression) ex2);
+        methodInvocation.arguments().add(rewrite.createCopyTarget(ex));
 
         return methodInvocation;
     }
@@ -232,16 +296,73 @@ public class InsertSepVisitor extends ASTVisitor {
     /* (non-Javadoc)
      * @see org.eclipse.jdt.core.dom.ASTVisitor#visit(org.eclipse.jdt.core.dom.Block)
      */
-    public boolean visit(Block node) {
-        AST ast = node.getAST();
-        for (int i = 0; i < node.statements().size(); i++) {
-            id++;
-            if (!(node.statements().get(i) instanceof SuperMethodInvocation)
-                    && !(node.statements().get(i) instanceof ConstructorInvocation))
-                node.statements().add(i, getSepStatement(ast, id));
-            i++;
+    public boolean visit(Block node) {      
+        //AST ast = node.getAST();
+        final ListRewrite listRewrite = rewrite.getListRewrite(node, Block.STATEMENTS_PROPERTY);
+        // the index where to insert a statement breakpoint has to take care of the previously 
+        // inserted sep statements
+        int offset = 0;
+        for (int i = 0, sz = node.statements().size(); i < sz; i++) {
+            if (!(node.statements().get(i) instanceof SuperConstructorInvocation)
+                    && !(node.statements().get(i) instanceof ConstructorInvocation)) {                
+                id++;
+                listRewrite.insertAt(getSepStatement(node.getAST(), id), i + offset, null);    
+                offset++;
+            }
+                //node.statements().add(i, getSepStatement(ast, id));
+            //i++;
         }
         return true;
+    }
+
+
+    /**
+     * starts the insertion of breakpoint, i.e. <code>Debug.sep</code> statements.
+     */
+    public void start() {
+        rewrite = ASTRewrite.create(astRoot.getAST());
+        addImports();
+        astRoot.accept(this);
+    }
+    
+    
+    public void finish(String prefix, IDocument document) throws MalformedTreeException, 
+                                                                    BadLocationException, 
+                                                                    IOException {
+        IPath path = Path.fromOSString(prefix).append(astRoot.getJavaElement().getPath());
+        File dirs = path.removeLastSegments(1).toFile();
+        dirs.mkdirs();
+        
+        File compUnitFile = path.toFile();
+        
+        TextEdit edits = rewrite.rewriteAST(document, null);        
+
+        edits.apply(document);
+
+        compUnitFile.createNewFile();
+        
+        FileWriter fw = new FileWriter(compUnitFile);        
+        try {
+            fw.append(document.get());
+        } finally {
+            fw.close();
+        }
+    }
+
+    /**
+     * After the rewrite the source code contains references to the <code>Debug</code> 
+     * class, therefore we need to import this class in the namespace of the CompilationUnit 
+     * to be rewritten.
+     */
+    private void addImports() {       
+        ListRewrite imports = rewrite.getListRewrite(astRoot, CompilationUnit.IMPORTS_PROPERTY);
+
+        ImportDeclaration importDeclaration = astRoot.getAST().newImportDeclaration();
+
+        importDeclaration.setName(astRoot.getAST().newSimpleName(VisualDebugger.debugPackage));
+        importDeclaration.setOnDemand(true);
+
+        imports.insertFirst(importDeclaration, null);                
     }
 
 }

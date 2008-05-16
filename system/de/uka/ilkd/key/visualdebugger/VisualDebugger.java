@@ -2,6 +2,7 @@ package de.uka.ilkd.key.visualdebugger;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 import javax.swing.SwingUtilities;
@@ -28,6 +29,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
@@ -1398,9 +1400,8 @@ public class VisualDebugger {
      */
     private void runProver(final ListOfGoal goals) {
         this.refreshRuleApps();
-        mediator.startAutoMode(goals);
+        mediator.startAutoMode(goals);        
         // mediator.getInteractiveProver().removeProverTaskListener(proverTaskListener);
-
     }
 
     /**
