@@ -39,11 +39,8 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 import visualdebugger.VBTBuilder;
-import de.uka.ilkd.key.gui.IMain;
-
 import visualdebugger.draw2d.*;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.decproc.DecProcRunner;
@@ -54,7 +51,8 @@ import de.uka.ilkd.key.visualdebugger.DebuggerListener;
 import de.uka.ilkd.key.visualdebugger.SourceElementId;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 import de.uka.ilkd.key.visualdebugger.executiontree.*;
-import de.uka.ilkd.key.visualdebugger.watchpoints.*;
+import de.uka.ilkd.key.visualdebugger.watchpoints.WatchPoint;
+import de.uka.ilkd.key.visualdebugger.watchpoints.WatchpointUtil;
 
 // TODO: Auto-generated Javadoc
 

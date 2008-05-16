@@ -23,37 +23,20 @@ public class FindStatementVisitor extends ASTVisitor {
         this.toFind = toFind;
     }
 
-/*    public void preVisit(ASTNode node) {
-        
-       
-        if (node instanceof Statement) {
-            currentId++;
-            System.out.println("st "+id+""+node);
-            Statement st = (Statement) node;
-            if (st.getStartPosition() < toFind
-                    && st.getStartPosition() > offset) {
-                offset = st.getStartPosition();
-                length = st.getLength();
-                id=currentId;
-            }
-        }
-    
-    
-
-    }*/
-    
     public boolean visit(Block node){
         for(int i=0; i < node.statements().size();i++){
-            currentId++;
             Statement st = (Statement)node.statements().get(i);
-            if (st.getStartPosition() <= toFind
-                    && st.getStartPosition() >= offset) {
-                offset = st.getStartPosition();
-                length = st.getLength();
-                statement = st;
-                id=currentId;
-               
-            }            
+            if (!(st instanceof SuperConstructorInvocation)
+                    && !(st instanceof ConstructorInvocation)) {                
+                currentId++;
+                if (st.getStartPosition() <= toFind
+                        && st.getStartPosition() >= offset) {
+                    offset = st.getStartPosition();
+                    length = st.getLength();
+                    statement = st;
+                    id=currentId;             
+                }            
+            }
         }
         return true;
     }
@@ -76,17 +59,10 @@ public class FindStatementVisitor extends ASTVisitor {
     
     public void endVisit(FieldAccess node) {
         currentId++;
-    //    System.out.println(node+" "+currentId);
-//        if(currentId==idToFind){
-//            expr=node;
-//        }
     }
     
     
     public void endVisit(QualifiedName node) {
-
-        
-        
         if (node.getParent() instanceof QualifiedName)
             return;
         
@@ -99,8 +75,7 @@ public class FindStatementVisitor extends ASTVisitor {
         currentId++;
     }
     
-    
-    
+   
     public void endVisit(ArrayAccess node){
         currentId++;
     }
@@ -123,19 +98,42 @@ public class FindStatementVisitor extends ASTVisitor {
         }   
     }
 
-    
-    public void endVisit(ForStatement node){
-        currentId++;
+    /**
+     * find also ids for single line bodies of control statements
+     * @param st
+     */
+    private void checkBody(Statement st) {
+        if (!(st instanceof Block)) {
+            currentId++;
+            if (st.getStartPosition() <= toFind
+                    && st.getStartPosition() >= offset) {
+                offset = st.getStartPosition();
+                length = st.getLength();
+                statement = st;
+                id=currentId;               
+            }            
+        }        
+    }
+   
+    public void endVisit(IfStatement node) {
+        checkBody(node.getThenStatement());
+        if (node.getElseStatement() != null) {
+            checkBody(node.getElseStatement());
+        }
     }
     
-    
-    public void endVisit(WhileStatement node){
+    public void endVisit(DoStatement node) {
         currentId++;
+        checkBody(node.getBody());
     }
-    
-    
-    
-    
-    
 
+    public void endVisit(ForStatement node) {
+        currentId++;
+        checkBody(node.getBody());
+    }
+    
+    public void endVisit(WhileStatement node) {
+        currentId++;
+        checkBody(node.getBody());
+    }
 }
