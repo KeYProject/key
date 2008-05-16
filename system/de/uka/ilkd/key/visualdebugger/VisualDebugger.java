@@ -1176,7 +1176,7 @@ public class VisualDebugger {
      * 
      * @return the string
      */
-    public String prettyPrint(ListOfTerm l, LinkedList objects,
+    public String prettyPrint(ListOfTerm l, List<SymbolicObject> objects,
             SymbolicObject thisObject) {
         // KeYMediator mediator=
         // VisualDebugger.getVisualDebugger().getMediator();
@@ -1258,17 +1258,17 @@ public class VisualDebugger {
      * 
      * @param l
      *                the l
-     * @param sos
-     *                the sos
+     * @param symbolicObjects
+     *                the SymbolicObjects
      * @param so
      *                the so
      * 
      * @return the string
      */
-    public String prettyPrint(Term l, LinkedList sos, SymbolicObject so) {
+    public String prettyPrint(Term l, List<SymbolicObject> symbolicObjects, SymbolicObject so) {
         final LogicPrinter lp = new DebuggerLP(new ProgramPrinter(null),
                 mediator.getNotationInfo(), mediator.getServices(),
-                term2InputPV, sos, so);
+                term2InputPV, symbolicObjects, so);
 
         String result = "";
 
@@ -1297,9 +1297,7 @@ public class VisualDebugger {
     private void refreshRuleApps() {
         ListOfGoal goals = mediator.getProof().openGoals();
         // g.getRuleAppManager().clearCache();
-        IteratorOfGoal it = goals.iterator();
-        while (it.hasNext()) {
-            Goal g = it.next();
+        for (final Goal g : goals) {
             g.ruleAppIndex().clearIndexes();
             g.ruleAppIndex().fillCache();
         }

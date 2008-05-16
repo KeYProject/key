@@ -222,11 +222,11 @@ public class ProofStarter {
         try {
             int countApplied = 0;
 
-                initProgressMonitors(maxSteps);
-                while (countApplied < maxSteps && applyAutomaticRule()) {
-                    countApplied++;
-                    informProgressMonitors(countApplied);
-             
+            initProgressMonitors(maxSteps);
+            while (countApplied < maxSteps && applyAutomaticRule()) {
+                countApplied++;
+                informProgressMonitors(countApplied);
+
             }
             if (useDecisionProcedures && decisionProcedureRule != null) {
                 applySimplificationOnGoals(proof.openGoals(), decisionProcedureRule);

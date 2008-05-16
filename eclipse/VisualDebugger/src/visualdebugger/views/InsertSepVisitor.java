@@ -17,6 +17,13 @@ import de.uka.ilkd.key.visualdebugger.VisualDebugger;
  */
 public class InsertSepVisitor extends ASTVisitor {
 
+    /** The id. */
+    private int id = 0;
+
+    /** The types. */
+    private final HashSet<ITypeBinding> types = new HashSet<ITypeBinding>();
+
+    
     /**
      * Replace node.
      * 
@@ -29,24 +36,14 @@ public class InsertSepVisitor extends ASTVisitor {
         StructuralPropertyDescriptor location = oldNode.getLocationInParent();
 
         if (location.isChildProperty()) {
-
             parent.setStructuralProperty(location, newNode);
-
         } else if (location.isChildListProperty()) {
-
             List<ASTNode> list = (List<ASTNode>) parent.getStructuralProperty(location);
             int index = list.indexOf(oldNode);
             list.set(index, newNode);
         }
     }
 
-    /** The id. */
-    private int id = 0;
-
-    /** The types. */
-    private final HashSet<ITypeBinding> types = new HashSet<ITypeBinding>();
-
-    
     /**
      * An array access might cause a NullPointer- or ArrayIndexOutOfBoundException therefore
      * we set a breakpoint around the access, i.e. <code>a[Debug.sep(id1, i)]</code>
@@ -57,8 +54,9 @@ public class InsertSepVisitor extends ASTVisitor {
         replaceNode(index, indexSep);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jdt.core.dom.ASTVisitor#endVisit(org.eclipse.jdt.core.dom.FieldAccess)
+    /**
+     * Fields access may cause NullPointerException and need to be surrounded 
+     * by a <code>Debug.sep(id, o).a</code>
      */
     public void endVisit(FieldAccess node) {
         final ITypeBinding expressionTypeBinding = node.getExpression()
@@ -105,8 +103,10 @@ public class InsertSepVisitor extends ASTVisitor {
         replaceNode(guard, getSepStatement(guard.getAST(), ++id, guard));
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jdt.core.dom.ASTVisitor#endVisit(org.eclipse.jdt.core.dom.QualifiedName)
+    /**
+     * At the processing stage when we access the AST a field access may be either represented
+     * by a <code>FieldAccess</code> node or a <code>QualifiedName</code> node. The latter case 
+     * is what we take care here.  
      */
     public void endVisit(QualifiedName node) {
 
@@ -146,8 +146,8 @@ public class InsertSepVisitor extends ASTVisitor {
         replaceNode(node, fa);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jdt.core.dom.ASTVisitor#endVisit(org.eclipse.jdt.core.dom.WhileStatement)
+    /**
+     *
      */
     public void endVisit(WhileStatement node) {
         final Expression guard = node.getExpression();
