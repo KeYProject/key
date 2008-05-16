@@ -81,19 +81,7 @@ public class DebuggerLP extends LogicPrinter {
 
     public void printCast(String pre, String post, Term t, int ass)
             throws IOException {
-        final CastFunctionSymbol cast = (CastFunctionSymbol) t.op();
         printTerm(t.sub(0));
-    }
-
-    public void printFunctionTerm(String name, Term t) throws IOException {
-        String s = null;// = this.getName(t);
-        // System.out.println("PF "+ t);
-        if (s != null) {
-            startTerm(0);
-            layouter.print(s);
-        } else
-            super.printFunctionTerm(name, t);
-
     }
 
     public void printTerm(Term t) throws IOException {
