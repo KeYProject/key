@@ -17,12 +17,32 @@ import org.eclipse.text.edits.TextEdit;
 
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class InsertSepVisitor
  * 
- * This Class inserts Debug._sep(intlit) methods into the original sourcecode
+ * Inserts breakpoints into a given compilation unit and writes the altered unit out at
+ * a specified place. Breakpoints are represented by <code>Debug.sep</code> method calls
+ * and inserted before each statement (except this- and super constructor invocations). 
+ * In the following we use breakpoint and sep-statement to denote the same concept. 
  * 
+ * Each breakpoint has an associated unique id modelled as an integer literal.
+ * 
+ * The <code>Debug</code> class contains several kinds of <code>sep</code> method declarations, 
+ * as sometimes it is necessary to put an expression breakpoint around guards, field- or array 
+ * accesses as those may cause runtime exceptions. 
+ * 
+ * The following <code>sep</code> methods are used:
+ * <ul>
+ * <li><code>void sep(int id)</code> for statement breakpoints</li>
+ * <li><code>(long|int|short|byte|char) sep(int id, (long|int|short|byte|char) expr)</code> in case
+ * an expression breakpoint needs to be set at a primitive typed expression <code>expr</code> e.g.
+ * <code>Debug.sep(id,expr)</code> the <code>sep</code> methods implementation simply returns <code>expr</code></li> 
+ * <li><code>java.lang.Object sep(int id, java.lang.Object)</code> in case of expression breakpoints for reference
+ * typed expressions, those are wrapped as in <code>((T)Debug.sep(id,expr))</code> where <code>T</code> is the static 
+ * type of <code>expr</code></li>
+ * </ul>
+ *  
+ *  The visitor processes the given AST when invoking method {@link #start()}. The rewrite is performed by a 
+ *  succeeding call to {@link #finish(String, IDocument)}.
  */
 public class InsertSepVisitor extends ASTVisitor {
 
@@ -306,7 +326,7 @@ public class InsertSepVisitor extends ASTVisitor {
      * starts the insertion of breakpoint, i.e. <code>Debug.sep</code> statements.
      */
     public void start() {
-        rewrite = ASTRewrite.create(cunit.getAST());
+        rewrite = ASTRewrite.create(ast);
         addImports();
         cunit.accept(this);
     }
@@ -351,9 +371,9 @@ public class InsertSepVisitor extends ASTVisitor {
     private void addImports() {       
         ListRewrite imports = rewrite.getListRewrite(cunit, CompilationUnit.IMPORTS_PROPERTY);
 
-        ImportDeclaration importDeclaration = cunit.getAST().newImportDeclaration();
+        ImportDeclaration importDeclaration = ast.newImportDeclaration();
 
-        importDeclaration.setName(cunit.getAST().newSimpleName(VisualDebugger.debugPackage));
+        importDeclaration.setName(ast.newSimpleName(VisualDebugger.debugPackage));
         importDeclaration.setOnDemand(true);
 
         imports.insertFirst(importDeclaration, null);                
