@@ -3,7 +3,6 @@ package visualdebugger.views;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashSet;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -31,8 +30,11 @@ public class InsertSepVisitor extends ASTVisitor {
     private int id = 0;
 
     /** the CompilationUnit to be rewritten */
-    private final CompilationUnit astRoot;
+    private final CompilationUnit cunit;
 
+    /** the AST associated with the root */
+    private final AST ast;
+    
     private ASTRewrite rewrite;
 
     /**
@@ -42,19 +44,9 @@ public class InsertSepVisitor extends ASTVisitor {
      */
     public InsertSepVisitor(CompilationUnit astRoot) {
         this.id = 0;
-        this.astRoot = astRoot;
+        this.cunit = astRoot;
+        this.ast = astRoot.getAST();
     }
-    
-    /**
-     * Replace node.
-     * 
-     * @param oldNode the old node
-     * @param newNode the new node
-     */
-    private void replaceNode(ASTNode oldNode, ASTNode newNode) {
-        rewrite.replace(oldNode, newNode, null);        
-    }
-
     
     /**
      * An array access might cause a NullPointer- or ArrayIndexOutOfBoundException therefore
@@ -62,7 +54,7 @@ public class InsertSepVisitor extends ASTVisitor {
      */
     public void endVisit(ArrayAccess node) {        
         Expression index = node.getIndex();
-        replaceNode(index, getSepStatement(index.getAST(), ++id, index));
+        rewrite.replace(index, getSepStatement(++id, index), null);
     }
     
 
@@ -74,8 +66,8 @@ public class InsertSepVisitor extends ASTVisitor {
         final ITypeBinding expressionTypeBinding = node.getExpression()
                 .resolveTypeBinding();
         if (expressionTypeBinding != null) {
-            replaceNode(node.getExpression(), getSepStatement(node.getAST(),
-                    ++id, node.getExpression()));
+            rewrite.replace(node.getExpression(), getSepStatement(++id,
+            node.getExpression()), null);
         } 
     }
 
@@ -86,8 +78,7 @@ public class InsertSepVisitor extends ASTVisitor {
     public void endVisit(InfixExpression node) {
         if (node.getOperator() == Operator.DIVIDE || 
                 node.getOperator() == Operator.REMAINDER) {
-            replaceNode(node.getRightOperand(), 
-                    getSepStatement(node.getAST(), ++id, node.getRightOperand()));
+            rewrite.replace(node.getRightOperand(), getSepStatement(++id, node.getRightOperand()), null);
         }        
     }
 
@@ -98,8 +89,7 @@ public class InsertSepVisitor extends ASTVisitor {
     public void endVisit(Assignment node) {
         if (node.getOperator() == Assignment.Operator.DIVIDE_ASSIGN || 
                 node.getOperator() == Assignment.Operator.REMAINDER_ASSIGN) {
-            replaceNode(node.getRightHandSide(), 
-                    getSepStatement(node.getRightHandSide().getAST(), ++id, node.getRightHandSide()));
+            rewrite.replace(node.getRightHandSide(), getSepStatement(++id, node.getRightHandSide()), null);
         }   
     }
     
@@ -112,7 +102,7 @@ public class InsertSepVisitor extends ASTVisitor {
      */
     public void endVisit(DoStatement node) {
         final Expression guard = node.getExpression();
-        replaceNode(guard, getSepStatement(guard.getAST(), ++id, guard));
+        rewrite.replace(guard, getSepStatement(++id, guard), null);
         final Statement body = node.getBody();
         useBlocksInControlStatement(body);
 
@@ -141,7 +131,7 @@ public class InsertSepVisitor extends ASTVisitor {
         if (!(body instanceof Block)) {    
             final Block block = body.getAST().newBlock();
             id++;
-            block.statements().add(getSepStatement(block.getAST(), id));
+            block.statements().add(getSepStatement(id));
             block.statements().add(ASTNode.copySubtree(block.getAST(), body));
             rewrite.replace(body, block, null);            
         }
@@ -157,7 +147,7 @@ public class InsertSepVisitor extends ASTVisitor {
      */
     public void endVisit(ForStatement node) {
         final Expression guard = node.getExpression();
-        replaceNode(guard, getSepStatement(guard.getAST(), ++id, guard));
+        rewrite.replace(guard, getSepStatement(++id, guard), null);
         final Statement body = node.getBody();
         useBlocksInControlStatement(body);
     }
@@ -191,15 +181,14 @@ public class InsertSepVisitor extends ASTVisitor {
             return;
         }
 
-        Expression sep = getSepStatement(qualifier.getAST(), ++id,
-                qualifier);
+        Expression sep = getSepStatement(++id, qualifier);
 
         FieldAccess fa = node.getAST().newFieldAccess();
 
         fa.setName(node.getAST().newSimpleName(node.getName().toString()));
         fa.setExpression(sep);
 
-        replaceNode(node, fa);
+        rewrite.replace(node, fa, null);
     }
 
     /**
@@ -211,21 +200,19 @@ public class InsertSepVisitor extends ASTVisitor {
      */
     public void endVisit(WhileStatement node) {
         final Expression guard = node.getExpression();
-        Expression sep = getSepStatement(guard.getAST(), ++id, guard);
-        replaceNode(guard, sep);
+        Expression sep = getSepStatement(++id, guard);
+        rewrite.replace(guard, sep, null);
         final Statement body = node.getBody();
         useBlocksInControlStatement(body);
     }
 
     /**
      * Gets the sep statement.
-     * 
-     * @param ast the ast
      * @param id the id
      * 
      * @return the sep statement
      */
-    private ExpressionStatement getSepStatement(AST ast, int id) {
+    private ExpressionStatement getSepStatement(int id) {
         MethodInvocation methodInvocation = ast.newMethodInvocation();
 
         methodInvocation.setExpression(ast.newSimpleName(VisualDebugger.debugClass));
@@ -241,14 +228,12 @@ public class InsertSepVisitor extends ASTVisitor {
 
     /**
      * Gets the sep statement.
-     * 
-     * @param ast the ast
      * @param id the id
      * @param ex the ex
      * 
      * @return the sep statement
      */
-    private Expression getSepStatement(AST ast, int id, Expression ex) {        
+    private Expression getSepStatement(int id, Expression ex) {        
         MethodInvocation methodInvocation = ast.newMethodInvocation();
         methodInvocation.setExpression(ast
                 .newSimpleName(VisualDebugger.debugClass));
@@ -272,7 +257,7 @@ public class InsertSepVisitor extends ASTVisitor {
 
             final CastExpression ce = ast.newCastExpression();
             ce.setExpression(methodInvocation);            
-            final Type newType = getType(ast, binding);
+            final Type newType = getType(binding);
             ce.setType(newType);            
             ParenthesizedExpression pe = ast.newParenthesizedExpression();
             pe.setExpression(ce);
@@ -283,11 +268,16 @@ public class InsertSepVisitor extends ASTVisitor {
         return methodInvocation;
     }
 
-    private Type getType(AST ast, ITypeBinding bind) {
+    /**
+     * determines the Type object for the given type binding
+     * @param bind
+     * @return
+     */
+    private Type getType(ITypeBinding bind) {
         if (bind.isPrimitive()) {
             return ast.newPrimitiveType(PrimitiveType.toCode(bind.getName()));
         } else if (bind.isArray()) {
-            return ast.newArrayType(getType(ast, bind.getComponentType()));
+            return ast.newArrayType(getType(bind.getComponentType()));
         }        
         return ast.newSimpleType(ast.newName(bind.getQualifiedName()));
     }
@@ -305,7 +295,7 @@ public class InsertSepVisitor extends ASTVisitor {
             if (!(node.statements().get(i) instanceof SuperConstructorInvocation)
                     && !(node.statements().get(i) instanceof ConstructorInvocation)) {                
                 id++;
-                listRewrite.insertAt(getSepStatement(node.getAST(), id), i + offset, null);    
+                listRewrite.insertAt(getSepStatement(id), i + offset, null);    
                 offset++;
             }
         }
@@ -316,15 +306,24 @@ public class InsertSepVisitor extends ASTVisitor {
      * starts the insertion of breakpoint, i.e. <code>Debug.sep</code> statements.
      */
     public void start() {
-        rewrite = ASTRewrite.create(astRoot.getAST());
+        rewrite = ASTRewrite.create(cunit.getAST());
         addImports();
-        astRoot.accept(this);
+        cunit.accept(this);
     }
         
+    /**
+     * applies the changes to the given document and writes the result to 
+     * <code>prefix + unit.getJavaElement().getPath()</code>
+     * @param prefix String describing root directory where to start writing the document
+     * @param document the IDocument where to apply the edits
+     * @throws MalformedTreeException thrown if edits constructed an invalid AST 
+     * @throws BadLocationException if some location information is wrong
+     * @throws IOException if the file where to write could not be created/opened for some reasons.
+     */
     public void finish(String prefix, IDocument document) throws MalformedTreeException, 
                                                                     BadLocationException, 
                                                                     IOException {
-        IPath path = Path.fromOSString(prefix).append(astRoot.getJavaElement().getPath());
+        IPath path = Path.fromOSString(prefix).append(cunit.getJavaElement().getPath());
         File dirs = path.removeLastSegments(1).toFile();
         dirs.mkdirs();
         
@@ -350,11 +349,11 @@ public class InsertSepVisitor extends ASTVisitor {
      * to be rewritten.
      */
     private void addImports() {       
-        ListRewrite imports = rewrite.getListRewrite(astRoot, CompilationUnit.IMPORTS_PROPERTY);
+        ListRewrite imports = rewrite.getListRewrite(cunit, CompilationUnit.IMPORTS_PROPERTY);
 
-        ImportDeclaration importDeclaration = astRoot.getAST().newImportDeclaration();
+        ImportDeclaration importDeclaration = cunit.getAST().newImportDeclaration();
 
-        importDeclaration.setName(astRoot.getAST().newSimpleName(VisualDebugger.debugPackage));
+        importDeclaration.setName(cunit.getAST().newSimpleName(VisualDebugger.debugPackage));
         importDeclaration.setOnDemand(true);
 
         imports.insertFirst(importDeclaration, null);                
