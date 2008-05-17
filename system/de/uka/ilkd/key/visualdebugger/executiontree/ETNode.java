@@ -1,8 +1,6 @@
 package de.uka.ilkd.key.visualdebugger.executiontree;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.ListOfTerm;
@@ -42,6 +40,8 @@ public class ETNode {
 
     private ListOfTerm bc = SLListOfTerm.EMPTY_LIST;
     private List<WatchPoint> watchpointsSatisfied = null;
+    /** Indicates that the watchpoint has been true for a subset of nodes of the proof tree nodes.*/
+    private Set<WatchPoint> watchpointsTrueInSubset = new HashSet<WatchPoint>();
 
     // ListOfTerm pc= SLListOfTerm.EMPTY_LIST;
     private LinkedList<ITNode> itNodes = new LinkedList<ITNode>();
@@ -304,5 +304,13 @@ public class ETNode {
 
     public void setWatchpointsSatisfied(List<WatchPoint> watchpointsSatisfied) {
         this.watchpointsSatisfied = watchpointsSatisfied;
+    }
+
+    public Set<WatchPoint> getWatchpointsTrueInSubset() {
+        return watchpointsTrueInSubset;
+    }
+
+    public void addWatchpointTrueInSubset(WatchPoint watchpoint) {
+        watchpointsTrueInSubset.add(watchpoint);
     }
 }

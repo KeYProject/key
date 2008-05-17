@@ -366,6 +366,7 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
      */
     private Figure createNode(ETNode etNode) {
         final java.util.List<WatchPoint> activeWPs = etNode.getWatchpointsSatisfied();
+        final java.util.List<WatchPoint> watchpointsTrueInSubset =etNode.getWatchpointsSatisfied();
         if (etNode instanceof ETStatementNode) {
             final SourceElementFigure node = new SourceElementFigure(
                     (ETStatementNode) etNode);
@@ -387,6 +388,13 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
                                 }else
                                 wpInfo.add(watchpoint.getExpression() +"@" + watchpoint.getMethod());
 
+                            }
+                        } else {
+                            if(watchpointsTrueInSubset != null && watchpointsTrueInSubset.size()>0){
+                                for (WatchPoint wp : watchpointsTrueInSubset) {
+                                    wpInfo.add("true in subset: " +wp.getExpression() +"@" + wp.getMethod());
+                                }
+                               
                             }
                         }
                     } catch (Throwable t) {

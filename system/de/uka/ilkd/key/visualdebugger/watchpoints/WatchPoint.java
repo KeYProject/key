@@ -215,6 +215,4 @@ public class WatchPoint {
     public void setTestForPossibility(boolean testPossible) {
         this.testPossible = testPossible;
     }
-
-
 }

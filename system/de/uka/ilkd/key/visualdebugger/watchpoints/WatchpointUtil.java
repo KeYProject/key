@@ -66,6 +66,8 @@ public class WatchpointUtil {
                     if (WatchpointUtil.evalutateWatchpoint(node, watchpoint,
                             node.sequent(), pos, node.proof(), 250, watchpoints)) {
                         temp.add(watchpoint);
+                        System.out.println("wp true in subset");
+                        etn.addWatchpointTrueInSubset(watchpoint);
                     }
                 }
             }
@@ -280,7 +282,7 @@ public class WatchpointUtil {
     }
 
     /**
-     * updateSelfVar updates the self variable of a local watchpoint 
+     * updateSelfVar updates the self variable of a local watchpoint.
      * 
      * @param uf
      * @param watchpoint
