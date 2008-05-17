@@ -12,6 +12,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.*;
 import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jdt.core.formatter.CodeFormatterApplication;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
@@ -52,8 +53,6 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 
     /** The all invariants. */
     public static boolean allInvariants = false;
-
-    // public static boolean allInvariants=false;
 
     /** The Constant PROJECT_ALREADY_OPEN. */
     protected static final int PROJECT_ALREADY_OPEN = 1;
@@ -327,30 +326,20 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
         td.bodyDeclarations().add(
                 getSepMethodDeclaration(ast, ast
                         .newSimpleType(ast.newName("java.lang.Object"))));        
-        td.bodyDeclarations().add(
-                getSepMethodDeclaration(ast, ast
-                        .newPrimitiveType(PrimitiveType.DOUBLE)));
-        td.bodyDeclarations().add(
-                getSepMethodDeclaration(ast, ast
-                        .newPrimitiveType(PrimitiveType.FLOAT)));
-        td.bodyDeclarations().add(
-                getSepMethodDeclaration(ast, ast
-                        .newPrimitiveType(PrimitiveType.LONG)));
-        td.bodyDeclarations().add(
-                getSepMethodDeclaration(ast, ast
-                        .newPrimitiveType(PrimitiveType.INT)));
-        td.bodyDeclarations().add(
-                getSepMethodDeclaration(ast, ast
-                        .newPrimitiveType(PrimitiveType.SHORT)));
-        td.bodyDeclarations().add(
-                getSepMethodDeclaration(ast, ast
-                        .newPrimitiveType(PrimitiveType.BYTE)));
-        td.bodyDeclarations().add(
-                getSepMethodDeclaration(ast, ast
-                        .newPrimitiveType(PrimitiveType.CHAR)));
-        td.bodyDeclarations().add(
-                getSepMethodDeclaration(ast, ast
-                        .newPrimitiveType(PrimitiveType.BOOLEAN)));
+
+        final PrimitiveType.Code[] primCodes = new PrimitiveType.Code[]{
+                PrimitiveType.DOUBLE, PrimitiveType.FLOAT,
+                PrimitiveType.LONG, PrimitiveType.INT,
+                PrimitiveType.SHORT, PrimitiveType.BYTE,
+                PrimitiveType.CHAR, PrimitiveType.BOOLEAN
+        };
+        
+        for (final PrimitiveType.Code code : primCodes) {        
+            td.bodyDeclarations().add(
+                    getSepMethodDeclaration(ast, ast
+                            .newPrimitiveType(code)));
+        }
+
         
         td.bodyDeclarations().add(getSepMethodDeclaration(ast));
 
@@ -375,7 +364,7 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
             final FileWriter fw = new FileWriter(pcFile);
             // FIXME: toString is only for debugging purpose, no warranty that
             // it will
-            // always generate a compilable output
+            // always generate a compilable output            
             fw.write(debugCU.toString());
             fw.flush();
             fw.close();
