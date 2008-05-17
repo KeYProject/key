@@ -30,9 +30,6 @@ public class InsertSepVisitor extends ASTVisitor {
     /** The id. */
     private int id = 0;
 
-    /** The types. */
-    private final HashSet<ITypeBinding> types;
-
     /** the CompilationUnit to be rewritten */
     private final CompilationUnit astRoot;
 
@@ -45,7 +42,6 @@ public class InsertSepVisitor extends ASTVisitor {
      */
     public InsertSepVisitor(CompilationUnit astRoot) {
         this.id = 0;
-        this.types = new HashSet<ITypeBinding>();
         this.astRoot = astRoot;
     }
     
@@ -66,9 +62,9 @@ public class InsertSepVisitor extends ASTVisitor {
      */
     public void endVisit(ArrayAccess node) {        
         Expression index = node.getIndex();
-        MethodInvocation indexSep = getSepStatement(index.getAST(), ++id, index);
-        replaceNode(index, indexSep);
+        replaceNode(index, getSepStatement(index.getAST(), ++id, index));
     }
+    
 
     /**
      * Fields access may cause NullPointerException and need to be surrounded 
@@ -78,12 +74,9 @@ public class InsertSepVisitor extends ASTVisitor {
         final ITypeBinding expressionTypeBinding = node.getExpression()
                 .resolveTypeBinding();
         if (expressionTypeBinding != null) {
-
-            types.add(expressionTypeBinding);
-
             replaceNode(node.getExpression(), getSepStatement(node.getAST(),
                     ++id, node.getExpression()));
-        }
+        } 
     }
 
     /**
@@ -194,20 +187,17 @@ public class InsertSepVisitor extends ASTVisitor {
             return;
         }
 
-        if (qualifier.resolveTypeBinding() == null
-                || qualifier.resolveTypeBinding().isArray()) {
+        if (qualifier.resolveTypeBinding() == null) {
             return;
         }
 
-        types.add(qualifier.resolveTypeBinding());
-
-        MethodInvocation inv = getSepStatement(qualifier.getAST(), ++id,
+        Expression sep = getSepStatement(qualifier.getAST(), ++id,
                 qualifier);
 
         FieldAccess fa = node.getAST().newFieldAccess();
 
         fa.setName(node.getAST().newSimpleName(node.getName().toString()));
-        fa.setExpression(inv);
+        fa.setExpression(sep);
 
         replaceNode(node, fa);
     }
@@ -221,8 +211,8 @@ public class InsertSepVisitor extends ASTVisitor {
      */
     public void endVisit(WhileStatement node) {
         final Expression guard = node.getExpression();
-        MethodInvocation inv = getSepStatement(guard.getAST(), ++id, guard);
-        replaceNode(guard, inv);
+        Expression sep = getSepStatement(guard.getAST(), ++id, guard);
+        replaceNode(guard, sep);
         final Statement body = node.getBody();
         useBlocksInControlStatement(body);
     }
@@ -258,7 +248,7 @@ public class InsertSepVisitor extends ASTVisitor {
      * 
      * @return the sep statement
      */
-    private MethodInvocation getSepStatement(AST ast, int id, Expression ex) {
+    private Expression getSepStatement(AST ast, int id, Expression ex) {        
         MethodInvocation methodInvocation = ast.newMethodInvocation();
         methodInvocation.setExpression(ast
                 .newSimpleName(VisualDebugger.debugClass));
@@ -268,36 +258,45 @@ public class InsertSepVisitor extends ASTVisitor {
        
         
         methodInvocation.arguments().add(literal);
-        methodInvocation.arguments().add(rewrite.createCopyTarget(ex));
+        methodInvocation.arguments().add(ASTNode.copySubtree(methodInvocation.getAST(), ex));
 
+
+        ITypeBinding binding = ex.resolveTypeBinding();
+        
+        if (binding != null && !binding.isPrimitive()) {
+            // The sep statement has to be cast to the according reference type
+            // Attention we derive here from Marcus master thesis where he created a method 
+            // for each type in class Debug. But that approach does not work with visibility issues and breaks
+            // as soon as non-public classes are involved. Instead the Debug class has only methods for
+            // primitive types and one for java.lang.Object. 
+
+            final CastExpression ce = ast.newCastExpression();
+            ce.setExpression(methodInvocation);            
+            final Type newType = getType(ast, binding);
+            ce.setType(newType);            
+            ParenthesizedExpression pe = ast.newParenthesizedExpression();
+            pe.setExpression(ce);
+            return pe;
+        } else if (binding == null) {
+            System.out.println("Warning: Could not resolve type of "+ex+" trying safe fallback.");            
+        }        
         return methodInvocation;
     }
 
-    /**
-     * Gets the types.
-     * 
-     * @return the types
-     */
-    public HashSet<ITypeBinding> getTypes() {
-        return types;
+    private Type getType(AST ast, ITypeBinding bind) {
+        if (bind.isPrimitive()) {
+            return ast.newPrimitiveType(PrimitiveType.toCode(bind.getName()));
+        } else if (bind.isArray()) {
+            return ast.newArrayType(getType(ast, bind.getComponentType()));
+        }        
+        return ast.newSimpleType(ast.newName(bind.getQualifiedName()));
     }
 
     /**
-     * Visit.
-     * 
-     * @param node the node
-     * 
-     * @return true, if successful
-     */
-    public boolean visit(ASTNode node) {
-        return true;
-    }
-
-    /* (non-Javadoc)
+     *  (non-Javadoc)
      * @see org.eclipse.jdt.core.dom.ASTVisitor#visit(org.eclipse.jdt.core.dom.Block)
      */
     public boolean visit(Block node) {      
-        //AST ast = node.getAST();
         final ListRewrite listRewrite = rewrite.getListRewrite(node, Block.STATEMENTS_PROPERTY);
         // the index where to insert a statement breakpoint has to take care of the previously 
         // inserted sep statements
@@ -309,12 +308,9 @@ public class InsertSepVisitor extends ASTVisitor {
                 listRewrite.insertAt(getSepStatement(node.getAST(), id), i + offset, null);    
                 offset++;
             }
-                //node.statements().add(i, getSepStatement(ast, id));
-            //i++;
         }
         return true;
     }
-
 
     /**
      * starts the insertion of breakpoint, i.e. <code>Debug.sep</code> statements.
@@ -324,8 +320,7 @@ public class InsertSepVisitor extends ASTVisitor {
         addImports();
         astRoot.accept(this);
     }
-    
-    
+        
     public void finish(String prefix, IDocument document) throws MalformedTreeException, 
                                                                     BadLocationException, 
                                                                     IOException {

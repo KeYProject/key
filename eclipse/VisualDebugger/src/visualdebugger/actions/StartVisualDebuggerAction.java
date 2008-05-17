@@ -111,9 +111,6 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
     /** The state. */
     int state;
 
-    /** The types. */
-    HashSet<ITypeBinding> types = new HashSet<ITypeBinding>();
-
     /**
      * Constructor for Action1.
      */
@@ -234,21 +231,6 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
         return methodDeclaration;
     }
 
-
-    /**
-     * Gets the type.
-     * 
-     * @param ast
-     *            the ast
-     * @param bind
-     *            the bind
-     * 
-     * @return the type
-     */
-    private Type getType(AST ast, ITypeBinding bind) {// TODO !!!!!!!!!
-        return ast.newSimpleType(ast.newName(bind.getQualifiedName()));
-    }
-
     /**
      * Gets the types.
      * 
@@ -318,7 +300,6 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
             new InsertSepVisitor((CompilationUnit) parser.createAST(null));        
         visitor.start();
         visitor.finish(VisualDebugger.tempDir, document);
-        types.addAll(visitor.getTypes());        
     }
 
     /**
@@ -333,33 +314,45 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
     public void insertSeps(IJavaProject project) throws MalformedTreeException, BadLocationException, IOException {
 
         ICompilationUnit[] units = getTypes(project);
-        types = new HashSet();
         debugCU = createDebuggerClass(AST.newAST(AST.JLS3));
 
         for (int i = 0; i < units.length; i++) {
             insertSeps(units[i]);
         }
 
-        TypeDeclaration td = (TypeDeclaration) debugCU.types().get(0);
-
-        for (Iterator it = types.iterator(); it.hasNext();) {
-            ITypeBinding next = (ITypeBinding) it.next();
-            td.bodyDeclarations().add(
-                    getSepMethodDeclaration(debugCU.getAST(), this.getType(
-                            debugCU.getAST(), next)));
-
-        }
+        TypeDeclaration td = (TypeDeclaration) debugCU.types().get(0);        
+        
+        final AST ast = debugCU.getAST();
 
         td.bodyDeclarations().add(
-                getSepMethodDeclaration(debugCU.getAST(), debugCU.getAST()
+                getSepMethodDeclaration(ast, ast
+                        .newSimpleType(ast.newName("java.lang.Object"))));        
+        td.bodyDeclarations().add(
+                getSepMethodDeclaration(ast, ast
+                        .newPrimitiveType(PrimitiveType.DOUBLE)));
+        td.bodyDeclarations().add(
+                getSepMethodDeclaration(ast, ast
+                        .newPrimitiveType(PrimitiveType.FLOAT)));
+        td.bodyDeclarations().add(
+                getSepMethodDeclaration(ast, ast
+                        .newPrimitiveType(PrimitiveType.LONG)));
+        td.bodyDeclarations().add(
+                getSepMethodDeclaration(ast, ast
                         .newPrimitiveType(PrimitiveType.INT)));
         td.bodyDeclarations().add(
-                getSepMethodDeclaration(debugCU.getAST(), debugCU.getAST()
+                getSepMethodDeclaration(ast, ast
+                        .newPrimitiveType(PrimitiveType.SHORT)));
+        td.bodyDeclarations().add(
+                getSepMethodDeclaration(ast, ast
                         .newPrimitiveType(PrimitiveType.BYTE)));
         td.bodyDeclarations().add(
-                getSepMethodDeclaration(debugCU.getAST(), debugCU.getAST()
+                getSepMethodDeclaration(ast, ast
+                        .newPrimitiveType(PrimitiveType.CHAR)));
+        td.bodyDeclarations().add(
+                getSepMethodDeclaration(ast, ast
                         .newPrimitiveType(PrimitiveType.BOOLEAN)));
-        td.bodyDeclarations().add(getSepMethodDeclaration(debugCU.getAST()));
+        
+        td.bodyDeclarations().add(getSepMethodDeclaration(ast));
 
         String projectPath = project.getPath().toOSString().substring(1);
 
