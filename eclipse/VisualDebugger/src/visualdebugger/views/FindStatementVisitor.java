@@ -63,15 +63,18 @@ public class FindStatementVisitor extends ASTVisitor {
     
     
     public void endVisit(QualifiedName node) {
-        if (node.getParent() instanceof QualifiedName)
+        if (node.getParent() instanceof QualifiedName) {
             return;
+        }
         
-        if ((node.getQualifier().resolveBinding().getKind()==IBinding.PACKAGE))
+        if ((node.getQualifier().resolveBinding().getKind()==IBinding.PACKAGE)) {
             return;
+        }
 
-        
-        if (node.getQualifier().resolveTypeBinding().isArray())
+        if (node.getQualifier().resolveTypeBinding() == null) {
             return;
+        }
+
         currentId++;
     }
     

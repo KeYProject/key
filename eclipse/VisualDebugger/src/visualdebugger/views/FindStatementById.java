@@ -61,10 +61,10 @@ public class FindStatementById extends ASTVisitor {
         }
     
         
-        if (node.getQualifier().resolveTypeBinding().isArray())
+        if (node.getQualifier().resolveTypeBinding() == null) {
             return;
+        }
         currentId++;
-        // System.out.println(node+" "+currentId);
         if (currentId == idToFind) {
             expr = node;
         }
