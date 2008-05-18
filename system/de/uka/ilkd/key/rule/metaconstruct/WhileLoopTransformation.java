@@ -12,6 +12,7 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.HashMap;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
@@ -24,6 +25,7 @@ import de.uka.ilkd.key.java.expression.operator.SetAssignment;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -585,6 +587,15 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	    Statement body = (Statement) (changeList.isEmpty() ?
 					  null :
 					  changeList.removeFirst());
+	    
+	    /* 
+	     * rename all occ. variables in the body (same name but different object)
+	     */
+	    ProgVarReplaceVisitor replacer = new ProgVarReplaceVisitor(body, 
+	            new HashMap(), true, services);
+	    replacer.start();
+	    body = (Statement) replacer.result();
+	    
 	    if (innerLabelNeeded() && breakInnerLabel != null) {
 		// an unlabeled continue needs to be handled with (replaced)
 		body = new LabeledStatement(breakInnerLabel.getLabel(),
