@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
+import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.SetAssignment;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
@@ -477,15 +478,22 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	    //remainding 'for' statement
 	    IForUpdates unchangedUpdates = x.getIForUpdates();
 
-	    Guard guard = null;
+	    Guard guard;
 	    Statement body = null;
 
 	    if (changeList.get(0) instanceof ILoopInit) {
 		inits = (ILoopInit) changeList.removeFirst();
 	    } 
-            if (x.getGuard()!=null) {
+            
+            if (x.getGuard() != null) {            
                 guard = (Guard) changeList.removeFirst();
+                if (guard.getExpression() == null) {
+                    guard = new Guard(BooleanLiteral.TRUE); 
+                }
+            } else {
+                guard = new Guard(BooleanLiteral.TRUE);
             }
+            
 	    if (changeList.get(0) instanceof IForUpdates) {
 		updates = (IForUpdates) changeList.removeFirst();
 	    } 
