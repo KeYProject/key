@@ -53,15 +53,18 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
 
             ILoopInit inits = null;
             IForUpdates updates = null;
-            Guard guard = null;
             Statement body = null;
 
             if (changeList.get(0) instanceof ILoopInit) {
                 inits = (ILoopInit) changeList.removeFirst();
             }
 
-            if (x.getGuard() != null) {
+            Guard guard;            
+            if (x.getGuard() != null) {            
                 guard = (Guard) changeList.removeFirst();
+                if (guard.getExpression() == null) {
+                    guard  = new Guard(BooleanLiteral.TRUE); 
+                }
             } else {
                 guard = new Guard(BooleanLiteral.TRUE);
             }
