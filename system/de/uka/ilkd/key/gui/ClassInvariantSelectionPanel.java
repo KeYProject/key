@@ -396,12 +396,13 @@ class ClassInvariantSelectionPanel extends JPanel {
     }
     
     private void addAllRealtimeInvs() {
-        //select all invariants in javax.realtime.*
+        //select all invariants in javax.realtime and for java.lang.Object.*
         final Set<KeYJavaType> kjts = services.getJavaInfo().getAllKeYJavaTypes();
         final Iterator<KeYJavaType> it = kjts.iterator();
         while (it.hasNext()) {
             final KeYJavaType kjt = it.next();     
-            if(kjt.getFullName().indexOf("javax.realtime")!=-1){
+            if(kjt.getFullName().indexOf("javax.realtime")!=-1 || 
+                    kjt.getFullName().indexOf("java.lang.Object")!=-1){
                 selectedInvs = selectedInvs.union(getRelevantInvs(kjt));
             }
         }

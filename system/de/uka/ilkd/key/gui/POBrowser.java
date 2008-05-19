@@ -564,4 +564,5 @@ public class POBrowser extends JDialog {
     public ProofOblInput getPO() {	
 	return po;
     }
+    
 }
