@@ -2,6 +2,7 @@ package de.uka.ilkd.key.visualdebugger;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 import javax.swing.SwingUtilities;
@@ -28,6 +29,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
@@ -1176,7 +1178,7 @@ public class VisualDebugger {
      * 
      * @return the string
      */
-    public String prettyPrint(ListOfTerm l, LinkedList objects,
+    public String prettyPrint(ListOfTerm l, List<SymbolicObject> objects,
             SymbolicObject thisObject) {
         // KeYMediator mediator=
         // VisualDebugger.getVisualDebugger().getMediator();
@@ -1258,17 +1260,17 @@ public class VisualDebugger {
      * 
      * @param l
      *                the l
-     * @param sos
-     *                the sos
+     * @param symbolicObjects
+     *                the SymbolicObjects
      * @param so
      *                the so
      * 
      * @return the string
      */
-    public String prettyPrint(Term l, LinkedList sos, SymbolicObject so) {
+    public String prettyPrint(Term l, List<SymbolicObject> symbolicObjects, SymbolicObject so) {
         final LogicPrinter lp = new DebuggerLP(new ProgramPrinter(null),
                 mediator.getNotationInfo(), mediator.getServices(),
-                term2InputPV, sos, so);
+                term2InputPV, symbolicObjects, so);
 
         String result = "";
 
@@ -1297,9 +1299,7 @@ public class VisualDebugger {
     private void refreshRuleApps() {
         ListOfGoal goals = mediator.getProof().openGoals();
         // g.getRuleAppManager().clearCache();
-        IteratorOfGoal it = goals.iterator();
-        while (it.hasNext()) {
-            Goal g = it.next();
+        for (final Goal g : goals) {
             g.ruleAppIndex().clearIndexes();
             g.ruleAppIndex().fillCache();
         }
@@ -1400,9 +1400,8 @@ public class VisualDebugger {
      */
     private void runProver(final ListOfGoal goals) {
         this.refreshRuleApps();
-        mediator.startAutoMode(goals);
+        mediator.startAutoMode(goals);        
         // mediator.getInteractiveProver().removeProverTaskListener(proverTaskListener);
-
     }
 
     /**

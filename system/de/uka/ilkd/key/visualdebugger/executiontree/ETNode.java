@@ -5,7 +5,6 @@ import java.util.*;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.ListOfTerm;
 import de.uka.ilkd.key.logic.SLListOfTerm;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.ListOfNode;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.SLListOfNode;
@@ -146,8 +145,9 @@ public class ETNode {
      * would destroy the old tree
      * 
      */
-    public ETNode copy(ETNode p) {
-        ETNode copy = new ETNode(bc, (LinkedList<ITNode>) itNodes.clone(), p);
+    public ETNode copy(ETNode p) {        
+        final ETNode copy = 
+            new ETNode(bc, (LinkedList<ITNode>) itNodes.clone(), p);
         copy.setChildren((LinkedList) children.clone());
         return copy;
     }

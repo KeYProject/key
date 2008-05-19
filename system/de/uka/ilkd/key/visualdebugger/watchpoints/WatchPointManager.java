@@ -85,7 +85,7 @@ public class WatchPointManager {
                                 new ProgramElementName(wp.getName()), services
                                         .getTypeConverter().getBooleanType());
                         progVarNS.addSafely(var_self);
-                        progVarNS.addSafely(var_dummy);
+                        progVarNS.add(var_dummy);
     
                         if (wp.getLocalVariables() != null
                                 && wp.getLocalVariables().size() > 0) {
@@ -93,7 +93,7 @@ public class WatchPointManager {
                             watchPointsContainLocals = true;
                         }
     
-                        wp.setWatchpointTerm(createWatchpointTerm(services,
+                        wp.setRawTerm(createWatchpointTerm(services,
                                 progVarNS, wp, declaringType, selfName));
                     }
                 }

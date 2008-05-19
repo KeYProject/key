@@ -14,7 +14,10 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 import javax.swing.event.EventListenerList;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -33,7 +36,6 @@ import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.visualization.ProofVisualization;
@@ -44,7 +46,7 @@ public class KeYMediator {
     private IMain mainFrame;
 
 
-    InteractiveProver interactiveProver;
+    private InteractiveProver interactiveProver;
 
     /** the update simplifier (may be moved to nodes)*/
     private UpdateSimplifier upd_simplifier;
@@ -271,13 +273,11 @@ public class KeYMediator {
 	if (ensureProofLoaded()) {
 	    UnitTestBuilder testBuilder = new UnitTestBuilder(getServices(), 
 							      getProof());
-	    try{
+	    try {
 		testCaseConfirmation(
 		    testBuilder.createTestForNode(getSelectedNode()));
-	    }catch(Exception e){
-		ExtList l = new ExtList();
-		l.add(e);
-		new ExceptionDialog(mainFrame(), l);
+	    } catch(Exception e){
+		new ExceptionDialog(mainFrame(), e);
 	    }
 	}
     }
@@ -1115,4 +1115,12 @@ public class KeYMediator {
        }
        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
     }
+
+    /** 
+     * returns the prover task listener of the main frame
+     */
+    public ProverTaskListener getProverTaskListener() {
+        return mainFrame.getProverTaskListener();
+    }
+
 }

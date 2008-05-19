@@ -1,6 +1,7 @@
 package visualdebugger.views;
 
 import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jface.text.TextSelection;
 
 public class FindStatementVisitor extends ASTVisitor {
@@ -22,37 +23,20 @@ public class FindStatementVisitor extends ASTVisitor {
         this.toFind = toFind;
     }
 
-/*    public void preVisit(ASTNode node) {
-        
-       
-        if (node instanceof Statement) {
-            currentId++;
-            System.out.println("st "+id+""+node);
-            Statement st = (Statement) node;
-            if (st.getStartPosition() < toFind
-                    && st.getStartPosition() > offset) {
-                offset = st.getStartPosition();
-                length = st.getLength();
-                id=currentId;
-            }
-        }
-    
-    
-
-    }*/
-    
     public boolean visit(Block node){
         for(int i=0; i < node.statements().size();i++){
-            currentId++;
             Statement st = (Statement)node.statements().get(i);
-            if (st.getStartPosition() <= toFind
-                    && st.getStartPosition() >= offset) {
-                offset = st.getStartPosition();
-                length = st.getLength();
-                statement = st;
-                id=currentId;
-               
-            }            
+            if (!(st instanceof SuperConstructorInvocation)
+                    && !(st instanceof ConstructorInvocation)) {                
+                currentId++;
+                if (st.getStartPosition() <= toFind
+                        && st.getStartPosition() >= offset) {
+                    offset = st.getStartPosition();
+                    length = st.getLength();
+                    statement = st;
+                    id=currentId;             
+                }            
+            }
         }
         return true;
     }
@@ -75,66 +59,84 @@ public class FindStatementVisitor extends ASTVisitor {
     
     public void endVisit(FieldAccess node) {
         currentId++;
-    //    System.out.println(node+" "+currentId);
-//        if(currentId==idToFind){
-//            expr=node;
-//        }
     }
     
     
     public void endVisit(QualifiedName node) {
+        if (node.getParent() instanceof QualifiedName) {
+            return;
+        }
+        
+        if ((node.getQualifier().resolveBinding().getKind()==IBinding.PACKAGE)) {
+            return;
+        }
 
-        
-        
-        if (node.getParent() instanceof QualifiedName)
+        if (node.getQualifier().resolveTypeBinding() == null) {
             return;
-        
-        if ((node.getQualifier().resolveBinding().getKind()==IBinding.PACKAGE))
-            return;
+        }
 
-        
-        if (node.getQualifier().resolveTypeBinding().isArray())
-            return;
         currentId++;
-    //    System.out.println(node+" "+currentId);
-//        if(currentId==idToFind){
-//            expr=node;
-//        }
-
     }
     
-    
-    
+   
     public void endVisit(ArrayAccess node){
         currentId++;
-        //    System.out.println(node+" "+currentId);
-//            if(currentId==idToFind){
-//                expr=node;
-//            }
+    }
+    
+    public void endVisit(InfixExpression node) {
+        if (node.getOperator() == Operator.DIVIDE || 
+                node.getOperator() == Operator.REMAINDER) {
+            currentId++;
+        }
+    }
+    
+    /**
+     * Division-by-zero ArithmeticExceptions can occur when evaluating
+     * the division or remainder composite assignment operator. 
+     */
+    public void endVisit(Assignment node) {
+        if (node.getOperator() == Assignment.Operator.DIVIDE_ASSIGN || 
+                node.getOperator() == Assignment.Operator.REMAINDER_ASSIGN) {
+            currentId++;
+        }   
+    }
 
+    /**
+     * find also ids for single line bodies of control statements
+     * @param st
+     */
+    private void checkBody(Statement st) {
+        if (!(st instanceof Block)) {
+            currentId++;
+            if (st.getStartPosition() <= toFind
+                    && st.getStartPosition() >= offset) {
+                offset = st.getStartPosition();
+                length = st.getLength();
+                statement = st;
+                id=currentId;               
+            }            
+        }        
+    }
+   
+    public void endVisit(IfStatement node) {
+        checkBody(node.getThenStatement());
+        if (node.getElseStatement() != null) {
+            checkBody(node.getElseStatement());
+        }
     }
     
-    
-//    public void endVisit(IfStatement node){
-//        final Expression index = node.getExpression();
-//        currentId++;
-//    }
-    
-    
-    public void endVisit(ForStatement node){
-        final Expression guard = node.getExpression();
+    public void endVisit(DoStatement node) {
         currentId++;
+        checkBody(node.getBody());
     }
-    
-    
-    public void endVisit(WhileStatement node){
-        final Expression guard = node.getExpression();
-        currentId++;
-    }
-    
-    
-    
-    
-    
 
+    public void endVisit(ForStatement node) {
+        currentId++;
+        checkBody(node.getBody());
+    }
+    
+    public void endVisit(WhileStatement node) {
+        currentId++;
+        checkBody(node.getBody());
+    }
 }

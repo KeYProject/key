@@ -273,14 +273,17 @@ public class VariableNameTracker {
      */
     private RenamingTable trackVariableNames(ProgramMethod pm, List<LocationVariable> initialRenamings) {
 
-        List<LocationVariable> orginialLocalVariables = getLocalsForMethod(pm);
+        Set<LocationVariable> olv = getLocalsForMethod(pm);
         HashMap<LocationVariable, SourceElement> nameMap = new HashMap<LocationVariable, SourceElement>();
+      
+        List<LocationVariable> originalLocalVariables = Arrays.asList(olv
+                .toArray(new LocationVariable[olv.size()]));
+        // every local variable needs a corresponding renamed counterpart
+        assert originalLocalVariables.size() == initialRenamings.size();
 
-        assert orginialLocalVariables.size() == initialRenamings.size();
-
-        for(int k = 0; k<orginialLocalVariables.size(); k++) {
+        for(int k = 0; k<originalLocalVariables.size(); k++) {
             // create standard mapping from original var -> initially renamed var
-            LocationVariable originalVar = orginialLocalVariables.get(k);
+            LocationVariable originalVar = originalLocalVariables.get(k);
             LocationVariable initiallyRenamedVar = initialRenamings.get(k);
             nameMap.put(originalVar, initiallyRenamedVar);
             System.out.println("created initial mapping");
@@ -341,8 +344,8 @@ public class VariableNameTracker {
             }
         return locals;
     }
-    private List<LocationVariable> getLocalsForMethod(ProgramMethod pm){
-        List<LocationVariable> locals = new LinkedList<LocationVariable>();
+    private Set<LocationVariable> getLocalsForMethod(ProgramMethod pm){
+        Set<LocationVariable> locals = new HashSet<LocationVariable>();
         for (WatchPoint watchPoint : watchpoints) {
             if(watchPoint.getProgramMethod().equals(pm))
             locals.addAll(watchPoint.getOrginialLocalVariables());

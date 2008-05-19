@@ -41,7 +41,9 @@ public class WatchPoint {
     /**A list of all parameters from the corresponding program method.*/
     private List<String> parameterTypes;
     /** The watchpoint parsed as KeY data structure. */
-    private Term watchpointAsTerm;
+    private Term composedTerm;
+    /** The watchpoint parsed as KeY data structure. */
+    private Term rawTerm;
     /** The method where the local variables belong to.*/
     private ProgramMethod programMethod = null;
     /** The positions where the local variables occurred in the method.*/
@@ -158,15 +160,6 @@ public class WatchPoint {
     public void setParameterTypes(List<String> parameterTypes) {
         this.parameterTypes = parameterTypes;
     }
-
-    public Term getWatchpointAsTerm() {
-        return watchpointAsTerm;
-    }
-
-    public void setWatchpointTerm(Term watchpointAsTerm) {
-        this.watchpointAsTerm = watchpointAsTerm;
-    }
-
     public List<LocationVariable> getOrginialLocalVariables() {
         return orginialLocalVariables;
     }
@@ -214,5 +207,21 @@ public class WatchPoint {
 
     public void setTestForPossibility(boolean testPossible) {
         this.testPossible = testPossible;
+    }
+
+    public Term getComposedTerm() {
+        return composedTerm;
+    }
+
+    public void setComposedTerm(Term composedTerm) {
+        this.composedTerm = composedTerm;
+    }
+
+    public Term getRawTerm() {
+        return rawTerm;
+    }
+
+    public void setRawTerm(Term rawTerm) {
+        this.rawTerm = rawTerm;
     }
 }

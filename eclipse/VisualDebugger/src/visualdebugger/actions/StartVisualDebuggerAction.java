@@ -12,6 +12,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.*;
 import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jdt.core.formatter.CodeFormatterApplication;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
@@ -19,8 +20,6 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.text.edits.MalformedTreeException;
-import org.eclipse.text.edits.TextEdit;
-import org.eclipse.text.edits.UndoEdit;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
@@ -37,10 +36,7 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.SLEnvInput;
-import de.uka.ilkd.key.speclang.SetAsListOfClassInvariant;
-import de.uka.ilkd.key.speclang.SetOfClassInvariant;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -57,8 +53,6 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 
     /** The all invariants. */
     public static boolean allInvariants = false;
-
-    // public static boolean allInvariants=false;
 
     /** The Constant PROJECT_ALREADY_OPEN. */
     protected static final int PROJECT_ALREADY_OPEN = 1;
@@ -115,9 +109,6 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
 
     /** The state. */
     int state;
-
-    /** The types. */
-    HashSet<ITypeBinding> types = new HashSet<ITypeBinding>();
 
     /**
      * Constructor for Action1.
@@ -239,21 +230,6 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
         return methodDeclaration;
     }
 
-
-    /**
-     * Gets the type.
-     * 
-     * @param ast
-     *            the ast
-     * @param bind
-     *            the bind
-     * 
-     * @return the type
-     */
-    private Type getType(AST ast, ITypeBinding bind) {// TODO !!!!!!!!!
-        return ast.newSimpleType(ast.newName(bind.getQualifiedName()));
-    }
-
     /**
      * Gets the types.
      * 
@@ -299,8 +275,11 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
      * 
      * @param unit
      *            the ICompilationUnit
+     * @throws IOException 
+     * @throws BadLocationException 
+     * @throws MalformedTreeException 
      */
-    public void insertSeps(ICompilationUnit unit) {
+    public void insertSeps(ICompilationUnit unit) throws MalformedTreeException, BadLocationException, IOException {
         String source = "";
 
         try {
@@ -314,90 +293,12 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
         // creation of DOM/AST from a ICompilationUnit
         ASTParser parser = ASTParser.newParser(AST.JLS3);
         parser.setResolveBindings(true);
-
         parser.setSource(unit);
-
-        CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
-
-        InsertSepVisitor visitor = new InsertSepVisitor();
-        astRoot.recordModifications();
-
-        TypeDeclaration td = (TypeDeclaration) astRoot.types().get(0);
-
-        ImportDeclaration importDeclaration = astRoot.getAST()
-        .newImportDeclaration();
-
-        importDeclaration.setName(astRoot.getAST().newSimpleName(
-                VisualDebugger.debugPackage));
-        importDeclaration.setOnDemand(true);
-        astRoot.imports().add(importDeclaration);
-
-        astRoot.accept(visitor);
-        // creation of ASTRewrite
-        types.addAll(visitor.getTypes());
-
-        TextEdit edits = astRoot.rewrite(document, null);
-        try {
-            UndoEdit undo = edits.apply(document);
-        } catch (MalformedTreeException e) {
-            e.printStackTrace();
-        } catch (BadLocationException e) {
-            if (VisualDebugger.vdInDebugMode)
-                e.printStackTrace();
-        }
-
-        // computation of the new source code
-        try {
-            edits.apply(document);
-        } catch (MalformedTreeException e) {
-
-            e.printStackTrace();
-        } catch (BadLocationException e) {
-            if (VisualDebugger.vdInDebugMode) {
-                System.out.println(e.getLocalizedMessage());
-                System.out.println(e.getMessage());
-                e.printStackTrace();
-            }
-        }
-        String newSource = document.get();
-
-        String s = null;
-
-        s = newSource;
-        // s = astRoot.toString();
-
-        String fn = unit.getPath().toOSString();
-        /**
-         * @author marcel
-         * 
-         * This was fixed to make the SymbolicExecutionDebugger work on windows
-         * os. not verified!
-         * 
-         * Creating the String d using substring(1,...) lead to an invalid path
-         * on windows, containing a colon. Hence fil could not be created.
-         * 
-         */
-        String d = VisualDebugger.tempDir
-        + fn.substring(fn.indexOf(File.separator), fn
-                .lastIndexOf(File.separator));
-
-        File fil = new File(d);
-        if (!fil.exists())
-            fil.mkdirs();
-
-        fn = fn.substring(fn.lastIndexOf(File.separator) + 1);
-
-        File pcFile = new File(fil, fn);
-
-        try {
-            FileWriter fw = new FileWriter(pcFile);
-            fw.write(s);
-            fw.flush();
-            fw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        
+        final InsertSepVisitor visitor = 
+            new InsertSepVisitor((CompilationUnit) parser.createAST(null));        
+        visitor.start();
+        visitor.finish(VisualDebugger.tempDir, document);
     }
 
     /**
@@ -405,37 +306,42 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
      * 
      * @param project
      *            the project
+     * @throws IOException 
+     * @throws BadLocationException 
+     * @throws MalformedTreeException 
      */
-    public void insertSeps(IJavaProject project) {
+    public void insertSeps(IJavaProject project) throws MalformedTreeException, BadLocationException, IOException {
 
         ICompilationUnit[] units = getTypes(project);
-        types = new HashSet();
         debugCU = createDebuggerClass(AST.newAST(AST.JLS3));
 
         for (int i = 0; i < units.length; i++) {
             insertSeps(units[i]);
         }
 
-        TypeDeclaration td = (TypeDeclaration) debugCU.types().get(0);
+        TypeDeclaration td = (TypeDeclaration) debugCU.types().get(0);        
+        
+        final AST ast = debugCU.getAST();
 
-        for (Iterator it = types.iterator(); it.hasNext();) {
-            ITypeBinding next = (ITypeBinding) it.next();
+        td.bodyDeclarations().add(
+                getSepMethodDeclaration(ast, ast
+                        .newSimpleType(ast.newName("java.lang.Object"))));        
+
+        final PrimitiveType.Code[] primCodes = new PrimitiveType.Code[]{
+                PrimitiveType.DOUBLE, PrimitiveType.FLOAT,
+                PrimitiveType.LONG, PrimitiveType.INT,
+                PrimitiveType.SHORT, PrimitiveType.BYTE,
+                PrimitiveType.CHAR, PrimitiveType.BOOLEAN
+        };
+        
+        for (final PrimitiveType.Code code : primCodes) {        
             td.bodyDeclarations().add(
-                    getSepMethodDeclaration(debugCU.getAST(), this.getType(
-                            debugCU.getAST(), next)));
-
+                    getSepMethodDeclaration(ast, ast
+                            .newPrimitiveType(code)));
         }
 
-        td.bodyDeclarations().add(
-                getSepMethodDeclaration(debugCU.getAST(), debugCU.getAST()
-                        .newPrimitiveType(PrimitiveType.INT)));
-        td.bodyDeclarations().add(
-                getSepMethodDeclaration(debugCU.getAST(), debugCU.getAST()
-                        .newPrimitiveType(PrimitiveType.BYTE)));
-        td.bodyDeclarations().add(
-                getSepMethodDeclaration(debugCU.getAST(), debugCU.getAST()
-                        .newPrimitiveType(PrimitiveType.BOOLEAN)));
-        td.bodyDeclarations().add(getSepMethodDeclaration(debugCU.getAST()));
+        
+        td.bodyDeclarations().add(getSepMethodDeclaration(ast));
 
         String projectPath = project.getPath().toOSString().substring(1);
 
@@ -458,7 +364,7 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
             final FileWriter fw = new FileWriter(pcFile);
             // FIXME: toString is only for debugging purpose, no warranty that
             // it will
-            // always generate a compilable output
+            // always generate a compilable output            
             fw.write(debugCU.toString());
             fw.flush();
             fw.close();
@@ -663,6 +569,7 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
         ? null : KeYPlugin.getInstance().getProgramMethod(method, 
                 initConfig.getServices().getJavaInfo());
 
+        
 //      getPO
         final ProofOblInput po;
         try {
@@ -746,11 +653,13 @@ public class StartVisualDebuggerAction implements IObjectActionDelegate {
                 SetAsListOfClassInvariant.EMPTY_SET;	   	 
 
 
-            final OperationContract contract = specRepos.getOperationContracts(pm).iterator().next();            	             
-
-            if (contract == null) {
+            final SetOfOperationContract operationContracts = specRepos.getOperationContracts(pm);
+            
+            if (operationContracts.size() == 0) {
                 throw new ProofInputException("No contract found for "+pm.getFullName());
-            }          
+            } 
+            
+            final OperationContract contract = operationContracts.iterator().next();            	             
 
             //create and start the PO
             return new EnsuresPostPO(initConfig, 

@@ -196,40 +196,18 @@ public class WatchpointUtil {
             List<WatchPoint> watchpoints) {
 
         if(!watchpoint.isEnabled()) return false;
-        Term wp = watchpoint.getWatchpointAsTerm();
-
+       
         TermBuilder tb = TermBuilder.DF;
         UpdateFactory updateFactory = new UpdateFactory(proof.getServices(),
                 proof.simplifier());
 
         LinkedList<Update> updates = new LinkedList<Update>();
 
-        // start tracking names if necessary
-        if (watchpoint.getLocalVariables() != null
-                && watchpoint.getLocalVariables().size() > 0) {
-            VariableNameTracker vnt = new VariableNameTracker(node, watchpoints);
-            vnt.start();
-            updates.add(buildNameUpdates(updateFactory, vnt.result()));
-            updates.add(updateSelfVar(updateFactory, watchpoint, vnt
-                    .getSelfVar()));
-        } else {
-            LogicVariable lv = new LogicVariable(new Name(watchpoint.getSelf()
-                    .name()+ "_lv"), watchpoint.getSelf().getKeYJavaType().getSort());
-
-            watchpoint.setWatchpointTerm(updateFactory.prepend(updateFactory
-                    .elementaryUpdate(
-                            TermFactory.DEFAULT.createVariableTerm(watchpoint.getSelf()),
-                            TermFactory.DEFAULT.createVariableTerm(lv)),watchpoint.getWatchpointAsTerm()));
-            
-            wp = watchpoint.getWatchpointAsTerm();
-            // quantify according to users decision
-            if (watchpoint.getFlavor() == ALL) {
-                watchpoint.setWatchpointTerm(tb.all(lv, wp));
-            } else {
-                watchpoint.setWatchpointTerm(tb.ex(lv, wp));
-            }
-        }
-        wp = watchpoint.getWatchpointAsTerm();
+        composeWatchpointTerm(node, watchpoint, new VariableNameTracker(node,
+                watchpoints), tb, updateFactory, updates);
+        
+        Term wp = watchpoint.getComposedTerm();
+        System.out.println(wp);
         updates.addAll(collectUpdates(pos));
         for (Update update : updates) {
             wp = updateFactory.prepend(update, wp);
@@ -243,7 +221,46 @@ public class WatchpointUtil {
             wp = tb.not(wp);
             return !startSideProof(seq, pos, proof, maxsteps, wp);
         }
+    }
 
+    /**
+     * @param node
+     * @param watchpoint
+     * @param tb
+     * @param updateFactory
+     * @param updates
+     */
+    private static void composeWatchpointTerm(Node node, WatchPoint watchpoint,
+            VariableNameTracker vnt, TermBuilder tb,
+            UpdateFactory updateFactory, LinkedList<Update> updates) {
+        
+        Term wp;
+        vnt.start();
+        // start tracking names if necessary (local watchpoints)
+        if (watchpoint.getLocalVariables() != null
+                && watchpoint.getLocalVariables().size() > 0) {
+
+            updates.add(buildNameUpdates(updateFactory, vnt.result()));
+            updates.add(updateSelfVar(updateFactory, watchpoint, vnt
+                    .getSelfVar()));
+            watchpoint.setComposedTerm(watchpoint.getRawTerm());
+        } else {
+            LogicVariable lv = new LogicVariable(new Name(watchpoint.getSelf()
+                    .name()+ "_lv"), watchpoint.getSelf().getKeYJavaType().getSort());
+            //update self variable
+            watchpoint.setComposedTerm(updateFactory.prepend(updateFactory
+                    .elementaryUpdate(
+                            TermFactory.DEFAULT.createVariableTerm(watchpoint.getSelf()),
+                            TermFactory.DEFAULT.createVariableTerm(lv)),watchpoint.getRawTerm()));
+            
+            wp = watchpoint.getComposedTerm();
+            // quantify term
+            if (watchpoint.getFlavor() == ALL) {
+                watchpoint.setComposedTerm(tb.all(lv, wp));
+            } else {
+                watchpoint.setComposedTerm(tb.ex(lv, wp));
+            }
+        }
     }
 
     /**
@@ -366,27 +383,26 @@ public class WatchpointUtil {
                 .toArray()[0];
                 return WatchpointUtil.evalutateWatchpoint(node, wp, seq, pos, proof, maxsteps, watchpoints);
             }
-            // start tracking names if necessary
-            if (WatchPointManager.existsWatchPointContainingLocals()) {
 
-                VariableNameTracker vnt = new VariableNameTracker(node, watchpoints);
-                vnt.start();
-                updates.add(
-                        buildNameUpdates(updateFactory,vnt.result()));
+            VariableNameTracker vnt = new VariableNameTracker(node,
+                    watchpoints);           
+            for (WatchPoint wp : watchpoints) {
+                if(wp.isEnabled()) {
+                    composeWatchpointTerm(node, wp, vnt, TermBuilder.DF, updateFactory, updates);
+                }
             }
-
             updates.addAll(collectUpdates(pos));
 
             final TermFactory tf = TermFactory.DEFAULT;
             Iterator<WatchPoint> iter = watchpoints.iterator();
 
             Term watchpoint = (Op.OR == junctor ? tf.createJunctorTerm(junctor,
-                    ((WatchPoint)iter.next()).getWatchpointAsTerm(), tf.createJunctorTerm(Op.FALSE)) : tf
-                    .createJunctorTerm(junctor, ((WatchPoint)iter.next()).getWatchpointAsTerm(), tf
+                    ((WatchPoint)iter.next()).getComposedTerm(), tf.createJunctorTerm(Op.FALSE)) : tf
+                    .createJunctorTerm(junctor, ((WatchPoint)iter.next()).getComposedTerm(), tf
                             .createJunctorTerm(Op.TRUE)));
 
             while (iter.hasNext()) {
-                watchpoint = tf.createJunctorTerm(junctor, ((WatchPoint)iter.next()).getWatchpointAsTerm(),
+                watchpoint = tf.createJunctorTerm(junctor, ((WatchPoint)iter.next()).getComposedTerm(),
                         watchpoint);
             }
             if (negateJunctor) {

@@ -397,6 +397,13 @@ public class UseOperationContractRule implements BuiltInRule {
             post = post.conjoin(inv.getClosedInv(services));
         }
         
+        //add "actual parameters" (which in fact already are
+        //program variables in a method body statement) to modifier set
+        for(Term t : actualParams) {
+            ProgramVariable pv = (ProgramVariable) t.op();
+            modifies = modifies.add(new BasicLocationDescriptor(TB.var(pv)));
+        }
+        
         //split goal into three branches
         ListOfGoal result = goal.split(3);
         Goal preGoal = result.tail().tail().head();

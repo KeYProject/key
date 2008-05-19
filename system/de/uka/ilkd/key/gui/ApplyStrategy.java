@@ -75,7 +75,7 @@ public class ApplyStrategy {
     public ApplyStrategy(KeYMediator medi) {
 	this.medi = medi;
         medi.addRuleAppListener( proofListener );
-        this.goalChooser = medi.getProfile().getSelectedGoalChooserBuilder().create();
+        this.goalChooser = medi.getProfile().getSelectedGoalChooserBuilder().create();        
     }
     
     
