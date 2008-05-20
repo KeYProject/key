@@ -1610,7 +1610,7 @@ primarysuffix[JMLExpression receiver, String fullyQualifiedName] returns [JMLExp
     DOT THIS
     {
     	result = new JMLExpression(services.getTypeConverter().findThisForSort(receiver.getSort(),
-    		tb.var(selfVar), javaInfo.getKeYJavaType(selfVar.sort())));
+    		tb.var(selfVar), javaInfo.getKeYJavaType(selfVar.sort()), true));
     }
     |
 	l:LPAREN (callingParameters=expressionlist)? RPAREN
