@@ -2,7 +2,11 @@ package javax.realtime;
 
 public class ImmortalMemory extends MemoryArea{
 
-    //@ public static invariant instance!=null;
+    /*@ public static invariant instance!=null && 
+      @          instance.memoryArea==instance && 
+      @          instance.parent==instance &&
+      @          \inImmortalMemory(instance); 
+      @*/
     private static ImmortalMemory instance;
 
     public void	executeInArea(java.lang.Runnable logic){
@@ -15,7 +19,7 @@ public class ImmortalMemory extends MemoryArea{
       @  assignable \nothing;
       @  ensures \result == instance;
       @*/
-    public static ImmortalMemory instance(){
+    public static /*@pure@*/ ImmortalMemory instance(){
 	return instance;
     }
 

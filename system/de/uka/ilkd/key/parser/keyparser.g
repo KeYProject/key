@@ -4013,6 +4013,7 @@ varexp[TacletBuilder b]
       | varcond_referencearray[b, negated]
       | varcond_array[b, negated]
       | varcond_abstractOrInterface[b, negated]
+      | varcond_interface[b, negated]
       | varcond_static[b,negated] 
       | varcond_typecheck[b, negated]
       | varcond_localvariable[b, negated]
@@ -4320,6 +4321,16 @@ varcond_abstractOrInterface [TacletBuilder b, boolean negated]
 :
    IS_ABSTRACT_OR_INTERFACE LPAREN tr=type_resolver RPAREN {
      b.addVariableCondition(new AbstractOrInterfaceType(tr, negated));
+   }
+;
+
+varcond_interface [TacletBuilder b, boolean negated]
+{
+  TypeResolver tr = null;
+}
+:
+   IS_INTERFACE LPAREN tr=type_resolver RPAREN {
+     b.addVariableCondition(new InterfaceType(tr, negated));
    }
 ;
 

@@ -165,6 +165,7 @@ tokens {
 	IN_TYPE = "\\inType";
 	ISINREACHABLESTATE = "\\isInReachableState";
         IS_ABSTRACT_OR_INTERFACE = "\\isAbstractOrInterface";
+        IS_INTERFACE = "\\isInterface";
         CONTAINERTYPE = "\\containerType";
 }
 
