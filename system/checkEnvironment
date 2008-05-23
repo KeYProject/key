@@ -22,6 +22,7 @@ resolve_symlink  ()
 }
 
 
+UNAME=`uname -s 2>/dev/null | tr '[:upper:]' '[:lower:]'`
 
 if [ "D""$JAVA_HOME" = "D" ]; then 
     echo "Please set the \$JAVA_HOME environment for compiling KeY" 
