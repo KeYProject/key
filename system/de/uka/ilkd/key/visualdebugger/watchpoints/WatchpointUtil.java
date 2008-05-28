@@ -195,7 +195,11 @@ public class WatchpointUtil {
             Sequent seq, PosInOccurrence pos, Proof proof, int maxsteps,
             List<WatchPoint> watchpoints) {
 
+        System.out.println(watchpoint.getRawTerm());
         if(!watchpoint.isEnabled()) return false;
+        VariableNameTracker vnt = new VariableNameTracker(node, watchpoints);
+        vnt.start();
+        if(watchpoint.isLocal() && !vnt.getActiveMethod().equals(watchpoint.getProgramMethod())) return false;
        
         TermBuilder tb = TermBuilder.DF;
         UpdateFactory updateFactory = new UpdateFactory(proof.getServices(),
@@ -203,15 +207,14 @@ public class WatchpointUtil {
 
         LinkedList<Update> updates = new LinkedList<Update>();
 
-        composeWatchpointTerm(node, watchpoint, new VariableNameTracker(node,
-                watchpoints), tb, updateFactory, updates);
+        composeWatchpointTerm(node, watchpoint, vnt, tb, updateFactory, updates);
         
         Term wp = watchpoint.getComposedTerm();
-        System.out.println(wp);
         updates.addAll(collectUpdates(pos));
         for (Update update : updates) {
             wp = updateFactory.prepend(update, wp);
         }
+        System.out.println("++++++ starting side proof with watchpoint: "+wp);
         boolean result = startSideProof(seq, pos, proof, maxsteps, wp);
         if (!watchpoint.testPossible()) {
             return result;
@@ -235,10 +238,8 @@ public class WatchpointUtil {
             UpdateFactory updateFactory, LinkedList<Update> updates) {
         
         Term wp;
-        vnt.start();
         // start tracking names if necessary (local watchpoints)
-        if (watchpoint.getLocalVariables() != null
-                && watchpoint.getLocalVariables().size() > 0) {
+        if (watchpoint.isLocal()) {
 
             updates.add(buildNameUpdates(updateFactory, vnt.result()));
             updates.add(updateSelfVar(updateFactory, watchpoint, vnt

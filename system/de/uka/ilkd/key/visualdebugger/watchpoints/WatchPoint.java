@@ -134,7 +134,16 @@ public class WatchPoint {
     public boolean isEnabled() {
         return enabled;
     }
-
+    /**
+     * Checks if is enabled.
+     * 
+     * @return true, if is enabled
+     */
+    public boolean isLocal() {
+        if(getLocalVariables() == null) return false;
+        else if(getLocalVariables().size() > 0 ) return true;
+        return false;
+    }
     /**
      * Sets the Watchpoint enabled.
      * 
