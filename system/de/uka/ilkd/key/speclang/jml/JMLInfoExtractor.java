@@ -161,10 +161,21 @@ class JMLInfoExtractor {
      * Returns true, if the given method is specified "pure".
      */
     public static boolean isPure(ProgramMethod pm) {
+        return hasJMLModifier(pm, "pure") || isPureByDefault(pm.getContainerType());
+    }
+    
+    /**
+     * Returns true, if the given method is specified "scopeSafe".
+     */
+    public static boolean isScopeSafe(ProgramMethod pm) {
+        return hasJMLModifier(pm, "scopeSafe");
+    }
+    
+    private static boolean hasJMLModifier(ProgramMethod pm, String mod){
         ListOfComment coms = SLListOfComment.EMPTY_LIST;
         MethodDeclaration method = pm.getMethodDeclaration();
         
-        // Either "pure" is attached to a modifier ....
+        // Either mod is attached to a modifier ....
         ArrayOfModifier mods = method.getModifiers();
         for (int i=0; i < mods.size(); i++) {
             coms = coms.prepend(mods.getModifier(i).getComments());
@@ -185,11 +196,10 @@ class JMLInfoExtractor {
         coms = coms.prepend(method.getProgramElementName().getComments());
         
         for (IteratorOfComment it = coms.iterator(); it.hasNext(); ) {
-            if (checkFor("pure", it.next().getText()))
+            if (checkFor(mod, it.next().getText()))
                 return true;
         }
-        
-        return isPureByDefault(pm.getContainerType());
+        return false;
     }
     
     

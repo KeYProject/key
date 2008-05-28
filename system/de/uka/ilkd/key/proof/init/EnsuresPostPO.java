@@ -61,10 +61,19 @@ public class EnsuresPostPO extends EnsuresPO {
             ListOfProgramVariable paramVars) 
         throws ProofInputException {
         Term result = TB.tt();
+        
+        final ProgramVariable stack = services.getJavaInfo().getAttribute(
+                "stack", "javax.realtime.MemoryArea");
+        ProgramVariable initialMemoryArea = services.getJavaInfo().getDefaultMemoryArea();
+        Term t_mem = TB.var(initialMemoryArea);
+        result = TB.and(result, TB.not(TB.equals(TB.dot(t_mem,stack), TB.NULL(services))));
+        
+        Term initialMemCreatedAndNotNullTerm
+            = createdFactory.createCreatedAndNotNullTerm(services, t_mem);
+        result = TB.and(result, initialMemCreatedAndNotNullTerm);
+        
         Term workingSpace = contract.getWorkingSpace(selfVar, toPV(paramVars), services);
         if(contract.getWorkingSpace(selfVar, toPV(paramVars), services)!=null){
-            ProgramVariable initialMemoryArea = services.getJavaInfo().getDefaultMemoryArea();
-            Term t_mem = TB.var(initialMemoryArea);
             final ProgramVariable size = services.getJavaInfo().getAttribute(
                     "size", "javax.realtime.MemoryArea");
             final ProgramVariable consumed = services.getJavaInfo().getAttribute(
@@ -73,14 +82,6 @@ public class EnsuresPostPO extends EnsuresPO {
             Function leq = (Function) services.getNamespaces().functions().lookup(new Name("leq")); 
             result = TB.and(result, TB.func(leq, TB.func(add, TB.dot(t_mem,consumed), 
                     workingSpace), TB.dot(t_mem, size)));
-            
-            final ProgramVariable stack = services.getJavaInfo().getAttribute(
-                    "stack", "javax.realtime.MemoryArea");
-            result = TB.and(result, TB.not(TB.equals(TB.dot(t_mem,stack), TB.NULL(services))));
-            
-            Term initialMemCreatedAndNotNullTerm
-                = createdFactory.createCreatedAndNotNullTerm(services, t_mem);
-            result = TB.and(result, initialMemCreatedAndNotNullTerm);
         }
         return result;
     }

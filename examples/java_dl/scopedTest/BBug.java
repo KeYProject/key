@@ -6,7 +6,7 @@ public abstract class BBug{
       @  requires x>=0 && y>=0;
       @  working_space \space(LTMemory)+\space(PhysicalMemoryArea)+\space(Runnable)+8;
       @*/
-    public final void foo(final int x, final int y){
+    public final void /*@scopeSafe@*/ foo(final int x, final int y){
 	ScopedMemory m = new LTMemory(24*x+16);
 	Runnable r = new Runnable(){
 		public void run(){

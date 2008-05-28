@@ -11,15 +11,8 @@
 package de.uka.ilkd.key.speclang.jml;
 
 import de.uka.ilkd.key.collection.SLListOfString;
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Field;
-import de.uka.ilkd.key.java.abstraction.IteratorOfField;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfField;
-import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.FieldDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.reference.ArrayOfTypeReference;
@@ -27,27 +20,9 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.NonRigidHeapDependentFunction;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.SetAsListOfClassInvariant;
-import de.uka.ilkd.key.speclang.SetAsListOfOperationContract;
-import de.uka.ilkd.key.speclang.SetOfClassInvariant;
-import de.uka.ilkd.key.speclang.SetOfOperationContract;
-import de.uka.ilkd.key.speclang.SpecExtractor;
-import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
-import de.uka.ilkd.key.speclang.jml.pretranslation.IteratorOfTextualJMLConstruct;
-import de.uka.ilkd.key.speclang.jml.pretranslation.SLListOfTextualJMLConstruct;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassInv;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLFieldDecl;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
-import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
-import de.uka.ilkd.key.speclang.jml.pretranslation.ListOfTextualJMLConstruct;
+import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
@@ -313,6 +288,25 @@ public class JMLSpecExtractor implements SpecExtractor {
             sc.addAssignable(new PositionedString("\\nothing"));
             SetOfOperationContract contracts
             	= jsf.createJMLOperationContractsAndInherit(pm, sc);
+            result = result.union(contracts);
+        }
+        
+        //determine scope safety, add scope safety contract
+        final boolean isScopeSafe = JMLInfoExtractor.isScopeSafe(pm);
+        if(isScopeSafe) {
+            TextualJMLSpecCase sc 
+                = new TextualJMLSpecCase(SLListOfString.EMPTY_LIST, 
+                                         Behavior.BEHAVIOR);
+            if(pm.getKeYJavaType()!=null && 
+                    !(pm.getKeYJavaType().getSort() instanceof PrimitiveSort)){
+                sc.addEnsures(new PositionedString("\\result!=null ==> \\inImmortalMemory(\\result)"));
+            }
+            sc.addSignals(new PositionedString("(Throwable e) !(e instanceof javax.realtime.IllegalAssignmentError || "+
+                    "e instanceof javax.realtime.ScopedCycleException || "+
+                    "e instanceof javax.realtime.InaccessibleAreaException ||"+
+                    "e instanceof javax.realtime.ThrowBoundaryError)"));
+            SetOfOperationContract contracts
+                = jsf.createJMLOperationContractsAndInherit(pm, sc);
             result = result.union(contracts);
         }
 

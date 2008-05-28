@@ -91,6 +91,7 @@ tokens {
     REPRESENTS_RED		= "represents_redundantly";
     REQUIRES 			= "requires";
     REQUIRES_RED 		= "requires_redundantly";
+    SCOPE_SAFE 			= "scopeSafe";
     SET 			= "set";
     SIGNALS 			= "signals";
     SIGNALS_ONLY 		= "signals_only";
