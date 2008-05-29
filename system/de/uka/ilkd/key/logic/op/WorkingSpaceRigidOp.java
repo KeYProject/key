@@ -8,7 +8,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.ProofSaver;
-import de.uka.ilkd.key.speclang.FormulaWithAxioms;
 
 public class WorkingSpaceRigidOp extends RigidFunction implements IWorkingSpaceOp{
     

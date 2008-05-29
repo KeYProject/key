@@ -60,7 +60,6 @@ header {
     import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
     import de.uka.ilkd.key.proof.AtPreFactory;
     import de.uka.ilkd.key.proof.OpReplacer;
-    import de.uka.ilkd.key.proof.SymbolReplacer;
     import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
     import de.uka.ilkd.key.speclang.FormulaWithAxioms;
     import de.uka.ilkd.key.speclang.PositionedString;

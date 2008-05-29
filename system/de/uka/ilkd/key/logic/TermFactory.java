@@ -17,7 +17,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.SymbolReplacer;
 import de.uka.ilkd.key.rule.ListOfUpdatePair;
 import de.uka.ilkd.key.rule.UpdatePair;
 import de.uka.ilkd.key.util.Debug;

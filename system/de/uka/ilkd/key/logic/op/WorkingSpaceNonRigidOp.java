@@ -1,10 +1,7 @@
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.ProofSaver;
-import de.uka.ilkd.key.proof.SymbolReplacer;
 
 public class WorkingSpaceNonRigidOp extends NonRigidFunction implements IWorkingSpaceOp{
 
