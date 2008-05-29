@@ -301,6 +301,7 @@ public class JMLSpecExtractor implements SpecExtractor {
                     !(pm.getKeYJavaType().getSort() instanceof PrimitiveSort)){
                 sc.addEnsures(new PositionedString("\\result!=null ==> \\inImmortalMemory(\\result)"));
             }
+            sc.addDiverges(new PositionedString("true"));
             sc.addSignals(new PositionedString("(Throwable e) !(e instanceof javax.realtime.IllegalAssignmentError || "+
                     "e instanceof javax.realtime.ScopedCycleException || "+
                     "e instanceof javax.realtime.InaccessibleAreaException ||"+

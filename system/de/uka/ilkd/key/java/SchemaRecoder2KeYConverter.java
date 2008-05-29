@@ -395,14 +395,23 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         recoder.java.reference.PackageReference result = null;
         while (rp != null) {
             if (prefix == null) {
-                result = new recoder.java.reference.PackageReference(
-                        ((recoder.java.reference.UncollatedReferenceQualifier) rp)
-                        .getIdentifier());
+                if(rp instanceof recoder.java.reference.PackageReference){
+                    result = (recoder.java.reference.PackageReference) rp;
+                }else{
+                    result = new recoder.java.reference.PackageReference(
+                            ((recoder.java.reference.UncollatedReferenceQualifier) rp)
+                            .getIdentifier());
+                }
                 prefix = result;
             } else {
-                recoder.java.reference.PackageReference prefix2 = new recoder.java.reference.PackageReference(
-                        ((recoder.java.reference.UncollatedReferenceQualifier) rp)
-                        .getIdentifier());
+                recoder.java.reference.PackageReference prefix2;
+                if(rp instanceof recoder.java.reference.PackageReference){
+                    prefix2 = (recoder.java.reference.PackageReference) rp;
+                }else{
+                    prefix2 = new recoder.java.reference.PackageReference(
+                            ((recoder.java.reference.UncollatedReferenceQualifier) rp)
+                            .getIdentifier());
+                }
                 prefix.setReferencePrefix(prefix2);
                 prefix = prefix2;
             }
