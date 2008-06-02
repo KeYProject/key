@@ -168,6 +168,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
 
     private List wpInfo;
 
+    private Action clearWatchpoints;
+
     /**
      * Instantiates a new execution tree view.
      */
@@ -890,6 +892,8 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
         // manager.add(this.useBranchLabelsAction);
         manager.add(clearViewAction);
         manager.add(new Separator());
+        manager.add(clearWatchpoints);
+        manager.add(new Separator());
         manager.add(recomputeWatchpoints);
         manager.add(new Separator());
         manager.add(decisionProcedureAction);
@@ -1269,6 +1273,15 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
         };
         clearViewAction.setToolTipText("clears the view");
         clearViewAction.setText("Clear View");
+        
+        clearWatchpoints = new Action() {
+            public void run() {
+                clearWatchpoints();
+            }
+
+        };
+        clearWatchpoints.setToolTipText("removes all watchpoint markers (yellow borders)");
+        clearWatchpoints.setText("Clear Watchpoints");
 
         recomputeWatchpoints = new Action() {
             public void run() {
@@ -1670,6 +1683,16 @@ public class ExecutionTreeView extends ViewPart implements DebuggerListener {
             ((Figure) contents).removeAll();
             root.removeLabels();
         }
+    }
+    /**
+     * Removes the watchpoint markers(yellow borders) from the view.
+     */ 
+    private void clearWatchpoints() {
+       LinkedList<ETNode> executionTree = WatchpointUtil.getETasList(getCurrentETRootNode());
+       for (ETNode node : executionTree) {
+        node.setWatchpoint(false);
+    }
+        refresh();
     }
 
     /**

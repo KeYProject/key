@@ -563,7 +563,8 @@ public class WatchpointUtil {
     }
 
     /**
-     * Gets the executiontree as list.
+     * Gets the executiontree as list. The method works top-down, 
+     * so pass the root node of the (sub) tree you need as list.
      * 
      * @param etn the ETNode containing the current ET
      * 
@@ -583,6 +584,7 @@ public class WatchpointUtil {
 
     /**
      * Value to key.
+     * Swaps the values of the given map to its keys.
      * 
      * @param map the map
      * 

@@ -5,6 +5,7 @@ import java.util.*;
 import org.eclipse.jdt.core.dom.*;
 
 public class LocalVariableDetector extends ASTVisitor {
+    
     Set<IVariableBinding> localVariables = new HashSet<IVariableBinding>();
     private Expression expr;
 
@@ -48,9 +49,8 @@ public class LocalVariableDetector extends ASTVisitor {
             IBinding binding =sn.resolveBinding();
             if (binding instanceof IVariableBinding) {
                 IVariableBinding vb = (IVariableBinding) binding;
-                if (!vb.isField()) {
+                if (!vb.isField()) 
                     localVariables.add(vb);
-                }
             }
             return false;
         }
