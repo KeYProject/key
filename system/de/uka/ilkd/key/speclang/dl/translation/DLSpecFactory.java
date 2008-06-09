@@ -199,8 +199,14 @@ public class DLSpecFactory {
         }
         assert fma != null;
         assert modifies != null;
-        
+       
+        //extract parts
         MethodBodyStatement mbs          = extractMBS(fma);
+        if(mbs.getProgramMethod(services) == null) {
+            throw new ProofInputException("method \"" 
+        	                          + mbs.getMethodReference() 
+        	                          + "\" not found");
+        }
         ProgramMethod pm                 = extractProgramMethod(mbs);
         Modality modality                = extractModality(fma);
         FormulaWithAxioms pre            = extractPre(fma);
