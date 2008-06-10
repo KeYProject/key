@@ -638,7 +638,7 @@ public class Main extends JFrame implements IMain {
         
         statusLine = new MainStatusLine("<html>" + PARA + COPYRIGHT + PARA
                 + "KeY is free software and comes with ABSOLUTELY NO WARRANTY."
-                + " See Help | License.", getFont());
+                + " See About | License.", getFont());
         getContentPane().add(statusLine, BorderLayout.SOUTH);
         setupInternalInspection();
     }
