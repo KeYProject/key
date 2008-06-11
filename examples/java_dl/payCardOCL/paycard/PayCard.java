@@ -1,3 +1,5 @@
+package paycard;
+
 public class PayCard {
     int limit=1000;
     int unsuccessfulOperations;

@@ -15,12 +15,12 @@ import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Field;
-import de.uka.ilkd.key.java.abstraction.IteratorOfField;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.ListOfField;
 import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.declaration.ArrayOfFieldSpecification;
+import de.uka.ilkd.key.java.declaration.ArrayOfMemberDeclaration;
 import de.uka.ilkd.key.java.declaration.FieldDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.reference.ArrayOfTypeReference;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -163,7 +163,7 @@ public class JMLSpecExtractor implements SpecExtractor {
     }
     
     
-    private String getDefautlSignalsOnly(ProgramMethod pm) {
+    private String getDefaultSignalsOnly(ProgramMethod pm) {
 
         if (pm.getThrown() == null) {
             return "\\nothing;";
@@ -218,22 +218,30 @@ public class JMLSpecExtractor implements SpecExtractor {
         TypeDeclaration td = (TypeDeclaration) kjt.getJavaType();
         String fileName = td.getPositionInfo().getFileName();
                 
-        //add invariants for non_null fields.
-        ListOfField fields = td.getAllFields(services);
-        for (IteratorOfField it = fields.iterator(); it.hasNext(); ) {
-            Field field = it.next();
-            String fieldName = field.getProgramName();
-            // add invariant only for fields of reference types
-            // and not for implicit fields.
-            // [TODO] is there a better way to check this?
-            if (services.getTypeConverter().isReferenceType(field.getType())
-                    && !fieldName.startsWith("<")) {
-                if (!JMLInfoExtractor.isNullable(fieldName, kjt)) {
-                    PositionedString ps 
-                        = new PositionedString(fieldName + " != null", 
-                                               fileName);
-                    result = result.add(jsf.createJMLClassInvariant(kjt, ps));
-                }
+        //add invariants for non_null fields
+        ArrayOfMemberDeclaration fds = td.getMembers();
+        for(int i = 0, m = fds.size(); i < m; i++) {            
+            if(fds.getMemberDeclaration(i) instanceof FieldDeclaration) {
+        	FieldDeclaration fd 
+        		= (FieldDeclaration) fds.getMemberDeclaration(i);
+        	ArrayOfFieldSpecification fields = fd.getFieldSpecifications();
+        	for(int j = 0, n = fields.size(); j < n; j++) {
+        	    FieldSpecification field = fields.getFieldSpecification(j);
+                    String fieldName = field.getProgramName();
+                    // add invariant only for fields of reference types
+                    // and not for implicit fields.
+                    // [TODO] is there a better way to check this?
+                    if(services.getTypeConverter().isReferenceType(field.getType())
+                            && !fieldName.startsWith("<")) {
+                        if(!JMLInfoExtractor.isNullable(fieldName, kjt)) {
+                            PositionedString ps 
+                                = new PositionedString(fieldName + " != null", 
+                                                       fileName,
+                                                       fd.getEndPosition());
+                            result = result.add(jsf.createJMLClassInvariant(kjt, ps));
+                        }
+                    }        	    
+        	}
             }
         }
         
@@ -357,7 +365,10 @@ public class JMLSpecExtractor implements SpecExtractor {
                             getVariableSpecification().
                             getName();
                     String nonNull = param_name + " != null";
-                    specCase.addRequires(new PositionedString(nonNull));
+                    specCase.addRequires(new PositionedString(
+                	    			nonNull, 
+                	    			fileName, 
+                	    			pm.getStartPosition()));
                 }
             }
             
@@ -368,14 +379,17 @@ public class JMLSpecExtractor implements SpecExtractor {
                && !JMLInfoExtractor.resultIsNullable(pm)
                && specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
                 String nonNull = "\\result " + " != null";
-                specCase.addEnsures(new PositionedString(nonNull));
+                specCase.addEnsures(new PositionedString(
+                				nonNull, 
+                				fileName, 
+                				pm.getStartPosition()));
             }
             
             // add implicit signals-only if omitted
             if (specCase.getSignalsOnly().isEmpty()
                     && specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR) {
                 specCase.addSignalsOnly(new PositionedString(
-                        getDefautlSignalsOnly(pm)));
+                        getDefaultSignalsOnly(pm)));
             }
             
             SetOfOperationContract contracts 

@@ -24,7 +24,7 @@ public abstract class AbstractButton extends javax.swing.JComponent implements j
    public final static java.lang.String ROLLOVER_SELECTED_ICON_CHANGED_PROPERTY = "rolloverSelectedIcon";
    public final static java.lang.String DISABLED_ICON_CHANGED_PROPERTY = "disabledIcon";
    public final static java.lang.String DISABLED_SELECTED_ICON_CHANGED_PROPERTY = "disabledSelectedIcon";
-   protected javax.swing.ButtonModel model;
+   //protected javax.swing.ButtonModel model;
    protected javax.swing.event.ChangeListener changeListener;
    protected java.awt.event.ActionListener actionListener;
    protected java.awt.event.ItemListener itemListener;
