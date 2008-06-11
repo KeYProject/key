@@ -960,11 +960,11 @@ public class Main extends JFrame implements IMain {
 	}else{
 	    POBrowser poBrowser 
 	    	= POBrowser.showInstance(mediator.getProof().env().getInitConfig());
-	    if(poBrowser.getPO() != null) {
+	    ProofOblInput po = poBrowser.getAndClearPO();
+	    if(po != null) {
 		ProblemInitializer pi = new ProblemInitializer(this);
 		try {
-		    pi.startProver(mediator.getProof().env(), 
-			    	   poBrowser.getAndClearPO());
+		    pi.startProver(mediator.getProof().env(), po);
 		} catch(ProofInputException e)  {
 		    new ExceptionDialog(this, e);
 		}
