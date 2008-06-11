@@ -217,12 +217,7 @@ public class JMLSpecExtractor implements SpecExtractor {
         //get type declaration, file name
         TypeDeclaration td = (TypeDeclaration) kjt.getJavaType();
         String fileName = td.getPositionInfo().getFileName();
-        
-        //abort if library class (TODO: delete this)
-        if(td.isLibraryClass()) {
-            return result;
-        }
-        
+                
         //add invariants for non_null fields.
         ListOfField fields = td.getAllFields(services);
         for (IteratorOfField it = fields.iterator(); it.hasNext(); ) {
@@ -297,11 +292,6 @@ public class JMLSpecExtractor implements SpecExtractor {
             = (TypeDeclaration) pm.getContainerType().getJavaType();
         String fileName = td.getPositionInfo().getFileName();
 
-        //abort if library class (TODO: delete this)
-        if(td.isLibraryClass()) {
-            return result;
-        }        
-        
         //determine purity, add purity contract
         final boolean isPure = JMLInfoExtractor.isPure(pm);
         if(isPure) {

@@ -78,7 +78,7 @@ public class POBrowser extends JDialog {
 	this.specRepos  = initConfig.getServices().getSpecificationRepository();
 
 	//create class tree
-	classTree = new ClassTree(true, null, defaultPm, services);
+	classTree = new ClassTree(true, true, null, defaultPm, services);
 	classTree.addTreeSelectionListener(new TreeSelectionListener() {
 	    public void valueChanged(TreeSelectionEvent e) {
 		DefaultMutableTreeNode selectedNode 

@@ -37,6 +37,7 @@ public class Throwable extends java.lang.Object implements java.io.Serializable
    public Throwable(java.lang.String arg0, java.lang.Throwable arg1) {
        //@ set message = arg0;
        //@ set cause = arg1;
+       ; //workaround: set statement currently must not be the last statement
    }
    
    /*@ public normal_behavior
@@ -67,6 +68,7 @@ public class Throwable extends java.lang.Object implements java.io.Serializable
      @*/
    public java.lang.Throwable initCause(java.lang.Throwable arg0) {
        //@ set cause = arg0;
+       ; //workaround: set statement currently must not be the last statement
    }
    
    public java.lang.String toString();

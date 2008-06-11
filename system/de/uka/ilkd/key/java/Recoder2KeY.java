@@ -589,7 +589,7 @@ public class Recoder2KeY implements JavaReader {
         try {
             parseLibraryClasses0();
         } catch (Exception e) {
-            reportError("An error occured while parsing the libraries", e);
+            reportError("An error occurred while parsing the libraries", e);
         }
     }
     
@@ -718,7 +718,7 @@ public class Recoder2KeY implements JavaReader {
 
         RecoderModelTransformer[] transformer = new RecoderModelTransformer[] {
                 new EnumClassBuilder(servConf, cache),
-                new JMLTransformer(servConf, cache, parsingLibs),
+                new JMLTransformer(servConf, cache),
                 new ImplicitFieldAdder(servConf, cache),
                 new InstanceAllocationMethodBuilder(servConf, cache),
                 cnb = new ConstructorNormalformBuilder(servConf, cache),

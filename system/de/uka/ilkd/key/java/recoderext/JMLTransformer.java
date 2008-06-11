@@ -57,11 +57,6 @@ public class JMLTransformer extends RecoderModelTransformer {
                                                          "public", 
                                                          "static"});    
     
-    private final boolean parsingLibs;
-
-    
-    
-
 
     /**
      * Creates a transformation that adds JML specific elements, for example
@@ -77,9 +72,8 @@ public class JMLTransformer extends RecoderModelTransformer {
      *                for local classes.
      */
     public JMLTransformer(CrossReferenceServiceConfiguration services,
-            TransformerCache cache, boolean parsingLibs) {
+            TransformerCache cache) {
         super(services, cache);
-        this.parsingLibs = parsingLibs;
     }
 
    
@@ -492,11 +486,6 @@ public class JMLTransformer extends RecoderModelTransformer {
     
     
     public void makeExplicit() {
-        //abort if library class (TODO: remove this)
-        if(parsingLibs) {
-            return;
-        }
-        
         //abort if JML is disabled
         if(!ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().useJML()) {
             return;
@@ -547,7 +536,11 @@ public class JMLTransformer extends RecoderModelTransformer {
                 }
             }
         } catch(SLTranslationException e) {
-            RuntimeException runtimeE = new RuntimeException(e);
+            RuntimeException runtimeE 
+            	= new RuntimeException(e.getMessage() 
+            		               + "\n" + e.getFileName() 
+            		               + ", line " + e.getLine()
+            		               + ", column " + e.getColumn());
             runtimeE.setStackTrace(e.getStackTrace());
             throw runtimeE;
         }

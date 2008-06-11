@@ -63,6 +63,5 @@ public class SetAssignment extends Assignment {
 
 
      public void accept(SourceVisitor v) {
-         assert false; //uh oh
      }
  }
