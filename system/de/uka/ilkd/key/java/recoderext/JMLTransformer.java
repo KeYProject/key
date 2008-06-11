@@ -245,8 +245,8 @@ public class JMLTransformer extends RecoderModelTransformer {
         //determine parent, child index
         NonTerminalProgramElement astParent
             = originalComments[0].getParent().getASTParent();
-        int childIndex = 0;
-            //= astParent.getIndexOfChild(originalComments[0].getParent());
+        int childIndex
+            = astParent.getIndexOfChild(originalComments[0].getParent());
 
         //parse declaration, attach to AST
         Declaration ghostDecl;
@@ -256,6 +256,15 @@ public class JMLTransformer extends RecoderModelTransformer {
                     = services.getProgramFactory()
                               .parseFieldDeclaration(declWithMods.text);
                 updatePositionInformation(ghostDecl, declWithMods.pos);
+                
+                //set comments: the original list of comments with the declaration, 
+                //and the JML modifiers
+                ASTList<Comment> newComments = new ASTArrayList<Comment>(Arrays.asList(originalComments));
+                Comment jmlComment = new Comment(getJMLModString(decl.getMods()));
+                jmlComment.setParent(ghostDecl);
+                newComments.add(jmlComment);
+                ghostDecl.setComments(newComments);
+                
                 attach((FieldDeclaration)ghostDecl, 
                        (TypeDeclaration) astParent, 
                        childIndex);
@@ -282,17 +291,9 @@ public class JMLTransformer extends RecoderModelTransformer {
         }
 
         //add ghost modifier
-        ASTArrayList<DeclarationSpecifier> mods = new ASTArrayList<DeclarationSpecifier>();
+        ASTList<DeclarationSpecifier> mods = ghostDecl.getDeclarationSpecifiers();
         mods.add(new Ghost());
         ghostDecl.setDeclarationSpecifiers(mods);
-            
-        //set comments: the original list of comments with the declaration, 
-        //and the JML modifiers
-        ASTList<Comment> newComments = new ASTArrayList<Comment>(Arrays.asList(originalComments));
-        Comment jmlComment = new Comment(getJMLModString(decl.getMods()));
-        jmlComment.setParent(ghostDecl);
-        newComments.add(jmlComment);
-        ghostDecl.setComments(newComments);
     }
     
 
@@ -337,7 +338,7 @@ public class JMLTransformer extends RecoderModelTransformer {
         }
         
         //add model modifier
-        ASTArrayList<DeclarationSpecifier> mods = new ASTArrayList<DeclarationSpecifier>();
+        ASTList<DeclarationSpecifier> mods = methodDecl.getDeclarationSpecifiers();
         mods.add(new Model());
         methodDecl.setDeclarationSpecifiers(mods);
         
