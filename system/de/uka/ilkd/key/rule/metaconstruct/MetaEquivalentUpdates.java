@@ -96,7 +96,7 @@ public class MetaEquivalentUpdates extends AbstractMetaOperator {
 	 * */
 	private Term eqUpdWithRespectToTerm(Update upd1, Update upd2, Term t) {
 		final Term[] varArray = new Term[t.arity()];
-		System.out.println("Location as term(" + t.arity() + "):" + t.toString());
+		//System.out.println("Location as term(" + t.arity() + "):" + t.toString());
 		for (int j = 0; j < t.arity(); j++) {
             Sort argSort = getArgumentSort((Location)t.op(), j);
             if(argSort==null){
