@@ -53,7 +53,7 @@ public abstract class ScopedMemory extends MemoryArea{
 	    super.enter();
 	}catch(Exception e){
 	    if(this==e.memoryArea){
-		throw new ThrowBoundaryError();
+		throw RealtimeSystem.tbe();
 	    }
 	}finally{
 	    referenceCount--;
@@ -81,7 +81,7 @@ public abstract class ScopedMemory extends MemoryArea{
 	    super.enter(logic);
 	}catch(Exception e){
 	    if(this==e.memoryArea){
-		throw new ThrowBoundaryError();
+		throw RealtimeSystem.tbe();
 	    }
 	}finally{
 	    referenceCount--;
