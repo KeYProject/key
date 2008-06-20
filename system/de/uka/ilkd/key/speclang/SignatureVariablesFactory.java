@@ -136,7 +136,7 @@ public class SignatureVariablesFactory {
                                         boolean makeNameUnique) {
         return new LocationVariable(getNewName(services, "exc", makeNameUnique),
                                     services.getJavaInfo().getTypeByClassName(
-                                                   "java.lang.Exception"));
+                                                   "java.lang.Throwable"));
         
     }
 }
