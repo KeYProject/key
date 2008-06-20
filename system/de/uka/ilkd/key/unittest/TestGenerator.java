@@ -46,6 +46,7 @@ public class TestGenerator{
     private TypeRef testTypeRef;
     private String fileName;
     private String path=null;
+    private String resultName = "_oracleResult";
 
     private Random rand;
 
@@ -402,7 +403,7 @@ public class TestGenerator{
 	ib[code.length+2] = new CopyAssignment(buffer, cons);
 
 	ProgramVariable result = 
-	    new LocationVariable(new ProgramElementName("result"), b);
+	    new LocationVariable(new ProgramElementName(resultName), b);
 	ib[code.length+3] = new LocalVariableDeclaration(new TypeRef(b), 
 					    new VariableSpecification(result));
 	MethodReference oracle = getOracle(post, buffer, children);
@@ -863,7 +864,7 @@ public class TestGenerator{
 						   ExtList children){
 	Statement[] s = new Statement[4];
 	ProgramVariable result = 
-	    new LocationVariable(new ProgramElementName("result"), b);
+	    new LocationVariable(new ProgramElementName(resultName), b);
 	s[0] = new LocalVariableDeclaration(new TypeRef(b), 
 					    new VariableSpecification(result));
 	Expression f = translateFormula(post, buffer, children);
