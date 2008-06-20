@@ -35,4 +35,6 @@ public interface ProofCorrectnessMgt {
     boolean proofSimilarTo(Proof p);
 
     RuleJustification getJustification(RuleApp app);
+    
+    void removeProofListener();
 }

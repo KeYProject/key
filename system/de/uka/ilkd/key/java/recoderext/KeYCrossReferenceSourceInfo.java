@@ -36,25 +36,27 @@ import recoder.service.NameInfo;
 public class KeYCrossReferenceSourceInfo 
     extends DefaultCrossReferenceSourceInfo {
 
-    private HashMap names2vars = null;
+    private HashMap<String, recoder.java.declaration.VariableSpecification>  names2vars = null;
 
     /**
        Strict checking. Does not allow "broken links" during reference
        resolution.
      */
-    public int STRICT = 0;
+    // never used
+    //public static final int STRICT = 0;
     
     /**
        Sloppy checking. Allows "broken links" during reference resolution.
      */
-    public int SLOPPY = 1;
+    // never used
+    //public static final int SLOPPY = 1;
 
 
     public KeYCrossReferenceSourceInfo(ServiceConfiguration config) {
 	super(config);	
     }
 
-    public void setNames2Vars(HashMap names2vars){
+    public void setNames2Vars(HashMap<String, recoder.java.declaration.VariableSpecification> names2vars){
 	this.names2vars = names2vars;
     }
     
@@ -235,7 +237,7 @@ public class KeYCrossReferenceSourceInfo
         } while (scope != null);
         // we were at the compilation unit scope, leave for good now
         if (result == null && names2vars != null) {
-            return (recoder.abstraction.Variable) names2vars.get(name);
+            return names2vars.get(name);
         }
         return result;
     }
@@ -412,4 +414,12 @@ public class KeYCrossReferenceSourceInfo
         
         return scope.getASTParent();
     }
+    
+    /**
+     * clears the cache for the TypeReference to Type resolution.
+     * This is necessary if types are added after model evalutation.
+     *
+    public void clearTypeRefCache() {
+        shit: reference2element.clear();
+    }*/
 }

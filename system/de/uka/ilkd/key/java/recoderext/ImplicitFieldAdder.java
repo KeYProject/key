@@ -9,12 +9,13 @@
 // 
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Variable;
-import recoder.java.*;
+import recoder.java.Identifier;
 import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.*;
 import recoder.java.reference.TypeReference;
@@ -173,11 +174,11 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
     }
     
     private void addFieldsForFinalVars(TypeDeclaration td){
-        LinkedList vars = (LinkedList) getLocalClass2FinalVar().get(td);
+        List<Variable> vars = getLocalClass2FinalVar().get(td);
         if(vars!=null){
-            Iterator it = vars.iterator();
+            Iterator<Variable> it = vars.iterator();
             while(it.hasNext()){
-                Variable v = (Variable) it.next();
+                Variable v = it.next();
                 attach(createImplicitRecoderField(v.getType().getName(), FINAL_VAR_PREFIX+v.getName(), false, true), td, 0);
             }
         }
@@ -189,10 +190,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	 if (!(javaLangObject instanceof ClassDeclaration)) {
 	     Debug.fail("Could not find class java.lang.Object or only as bytecode");
 	 }
-	 Set cds = classDeclarations();
-	 Iterator it = cds.iterator();
-	 while(it.hasNext()){
-	     TypeDeclaration cd = (TypeDeclaration) it.next();
+	 for (final TypeDeclaration cd : classDeclarations()) {
 	     if(cd instanceof ClassDeclaration && 
                      (cd.getName()==null || ((ClassDeclaration) cd).getStatementContainer()!=null)){
 	         (new FinalOuterVarsCollector()).walk(cd);

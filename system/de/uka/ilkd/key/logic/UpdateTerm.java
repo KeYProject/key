@@ -25,7 +25,6 @@ class UpdateTerm extends OpTerm.UnaryOpTerm {
      */
     UpdateTerm(AnonymousUpdate op, Term[] subs) {	
 	super(op, subs);
-        fillCaches();
     }
  
     public JavaBlock executableJavaBlock() {

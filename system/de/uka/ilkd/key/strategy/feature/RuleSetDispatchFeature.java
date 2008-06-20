@@ -34,7 +34,7 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
  */
 public class RuleSetDispatchFeature implements Feature {
 
-    private final Map rulesetToFeature = new HashMap ();
+    private final Map<RuleSet, Feature> rulesetToFeature = new HashMap<RuleSet, Feature> ();
     
     private RuleSetDispatchFeature() {}
     
@@ -48,7 +48,7 @@ public class RuleSetDispatchFeature implements Feature {
         RuleAppCost res = LongRuleAppCost.ZERO_COST;
         final IteratorOfRuleSet it = ( (TacletApp)app ).taclet ().ruleSets ();
         while ( !( res instanceof TopRuleAppCost ) && it.hasNext () ) {
-            final Feature partialF = (Feature)rulesetToFeature.get ( it.next () );
+            final Feature partialF = rulesetToFeature.get ( it.next () );
             if ( partialF != null )
                     res = res.add ( partialF.compute ( app, pos, goal ) );
         }
@@ -62,7 +62,7 @@ public class RuleSetDispatchFeature implements Feature {
      * features are added to each other.
      */
     public void add(RuleSet ruleSet, Feature f) {
-        Feature combinedF = (Feature)rulesetToFeature.get ( ruleSet );
+        Feature combinedF = rulesetToFeature.get ( ruleSet );
         if ( combinedF == null )
             combinedF = f;
         else

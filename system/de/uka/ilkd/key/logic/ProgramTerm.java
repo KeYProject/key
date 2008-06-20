@@ -49,7 +49,6 @@ class ProgramTerm extends Term {
 	super(op, op.sort(subTerm));
 	this.subTerm=new ArrayOfTerm(subTerm);
 	this.javaBlock=javaBlock;
-	fillCaches();
     }
 
     /** @return n-th subterm (always the only one)*/    

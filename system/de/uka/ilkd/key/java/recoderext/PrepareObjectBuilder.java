@@ -17,15 +17,11 @@ package de.uka.ilkd.key.java.recoderext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Field;
-import recoder.java.CompilationUnit;
 import recoder.java.Identifier;
 import recoder.java.Statement;
 import recoder.java.StatementBlock;
@@ -107,10 +103,7 @@ public class PrepareObjectBuilder
         if (!(javaLangObject instanceof ClassDeclaration)) {
             Debug.fail("Could not find class java.lang.Object or only as bytecode");
         }
-        Set cds = classDeclarations();
-        Iterator it = cds.iterator();
-        while(it.hasNext()){
-            ClassDeclaration cd = (ClassDeclaration) it.next();
+        for (final ClassDeclaration cd : classDeclarations()) {
             class2fields.put(cd, defaultSettings(getFields(cd)));
         }
 	/*for (int unit = 0; unit<units.size(); unit++) {

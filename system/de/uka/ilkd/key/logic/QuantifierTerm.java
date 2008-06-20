@@ -60,7 +60,6 @@ class QuantifierTerm extends Term {
 	this.subTerm = subTerm;
 	this.depth   = subTerm.depth() + 1;
 	this.varsBoundHere = varsBoundHere;
-	fillCaches();	
     }
 
     /**@return depth of the term */

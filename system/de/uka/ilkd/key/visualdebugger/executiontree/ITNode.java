@@ -46,7 +46,7 @@ public class ITNode {
 
     ListOfTerm bc = SLListOfTerm.EMPTY_LIST;
 
-    private LinkedList children = new LinkedList();
+    private LinkedList<ITNode> children = new LinkedList<ITNode>();
 
     private boolean exprEnd;
 
@@ -84,8 +84,7 @@ public class ITNode {
 
     private ProgramMethod programMethod;
 
-    private Services serv = VisualDebugger.getVisualDebugger().getMediator()
-            .getServices();
+    private Services serv = null;
 
     private SourceElementId statementId = null;
 
@@ -96,7 +95,7 @@ public class ITNode {
     public ITNode(ListOfTerm bc, ListOfTerm pc, Node n, ITNode parent) {
         this.bc = bc;
         this.parent = parent;
-
+        this.serv = n.proof().getServices();
         this.id = n.serialNr();
         this.pc = pc;
         this.node = n;
@@ -113,6 +112,8 @@ public class ITNode {
     }
 
     public ITNode(Node n) {
+        
+        this.serv = n.proof().getServices();
         this.parent = null;
         this.id = n.serialNr();
         this.node = n;

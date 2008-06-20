@@ -12,12 +12,14 @@ package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
 import java.util.*;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
 import recoder.io.PathList;
 import recoder.io.ProjectSettings;
+import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -308,6 +310,8 @@ public class ProblemInitializer {
     		throws ProofInputException {
 	envInput.setInitConfig(initConfig);
 	String javaPath = envInput.readJavaPath();
+	List<File> classPath = envInput.readClassPath(); 
+	
 	if(javaPath != null) {
     	    //read Java	
             reportStatus("Reading Java model");
@@ -321,7 +325,9 @@ public class ProblemInitializer {
             }
             Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(), 
                                               initConfig.namespaces());
-            if (javaPath == "") {
+            r2k.setClassPath(classPath);
+            //r2k.setKeYFile(envInput.)
+            if (javaPath.length() == 0) {
                 r2k.parseSpecialClasses();
                 initConfig.getProofEnv().setJavaModel(JavaModel.NO_MODEL);
             } else {                 

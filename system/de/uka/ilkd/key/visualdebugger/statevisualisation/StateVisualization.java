@@ -13,6 +13,7 @@ import java.util.LinkedList;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.SLListOfExpression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -31,11 +32,9 @@ import de.uka.ilkd.key.rule.updatesimplifier.*;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
-import de.uka.ilkd.key.visualdebugger.DebuggerPO;
-import de.uka.ilkd.key.visualdebugger.ProofStarter;
-import de.uka.ilkd.key.visualdebugger.VisualDebugger;
+import de.uka.ilkd.key.visualdebugger.*;
 import de.uka.ilkd.key.visualdebugger.executiontree.ITNode;
+import de.uka.ilkd.key.visualdebugger.watchpoints.WatchPoint;
 
 public class StateVisualization {
 
@@ -83,7 +82,6 @@ public class StateVisualization {
 
     public StateVisualization(ITNode itn, KeYMediator mediator, 
             int maxProofSteps, boolean useDecisionProcedures) {
-        
         this.itNode = itn;
         this.vd = VisualDebugger.getVisualDebugger();
         this.mediator = mediator;
@@ -140,7 +138,7 @@ public class StateVisualization {
                         .head().node().sequent());
             }
         }
-
+        
         vd.fireDebuggerEvent(new DebuggerEvent(DebuggerEvent.VIS_STATE, this));
     }
 
@@ -371,7 +369,6 @@ public class StateVisualization {
                 return s;
             }
         }
-
         return null;
     }
 
@@ -390,10 +387,11 @@ public class StateVisualization {
 
     private void initProofStarter(ProofOblInput po) {
         ps = new ProofStarter();
+        ps.addProgressMonitor(VisualDebugger.getVisualDebugger().getEtProgressMonitor());
         ps.init(po);
         ps.setMaxSteps(maxProofSteps);
         ps.setUseDecisionProcedure(useDecisionProcedures);
-        vd.setProofStrategy(ps.getProof(), true, false);
+        vd.setProofStrategy(ps.getProof(), true, false, new LinkedList<WatchPoint>());
     }
     
     private void setUpProof(SetOfTerm indexConf, Term forPostValues) {
@@ -430,7 +428,7 @@ public class StateVisualization {
         final Proof simplificationProof = ps.getProof();
         
         StrategyProperties strategyProperties = DebuggerStrategy
-                .getDebuggerStrategyProperties(true, true, vd.isInitPhase());
+                .getDebuggerStrategyProperties(true, true, vd.isInitPhase(),new LinkedList<WatchPoint>());
 
         StrategyFactory factory = new DebuggerStrategy.Factory();
         
@@ -443,7 +441,7 @@ public class StateVisualization {
         vd.getBpManager().setNoEx(false);
 
         strategyProperties = 
-            DebuggerStrategy.getDebuggerStrategyProperties(true, false, vd.isInitPhase());
+            DebuggerStrategy.getDebuggerStrategyProperties(true, false, vd.isInitPhase(),new LinkedList<WatchPoint>());
         
         mediator.getProof().
         setActiveStrategy(factory.create(mediator.getProof(), strategyProperties));

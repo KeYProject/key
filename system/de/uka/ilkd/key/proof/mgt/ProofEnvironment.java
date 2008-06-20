@@ -33,9 +33,8 @@ public class ProofEnvironment {
     private RuleConfig ruleConfig;
     private RuleJustificationInfo justifInfo = new RuleJustificationInfo();
     private final InitConfig initConfig; 
-    private Set proofs = new HashSet(); //of ProofList
+    private Set<ProofAggregate> proofs = new HashSet<ProofAggregate>(); //of ProofList
     private int number=0;
-    private Set extraRuleSources = new HashSet(10);
 
     private Logger mgtLogger = Logger.getLogger("key.proof.mgt");
 
@@ -145,7 +144,7 @@ public class ProofEnvironment {
 
     /** retrieves all proofs registered at this environment 
      */
-    public Set getProofs() {
+    public Set<ProofAggregate> getProofs() {
 	return proofs;
     }
 
@@ -186,11 +185,11 @@ public class ProofEnvironment {
     }
 
     public void updateProofStatus() {
-	Set allProofs = getProofs();
-	Iterator allProofsIt = allProofs.iterator();
+	Set<ProofAggregate> allProofs = getProofs();
+	Iterator<ProofAggregate> allProofsIt = allProofs.iterator();
 	ProofAggregate  pl = null;
 	while (allProofsIt.hasNext()) {
-	    pl = (ProofAggregate) allProofsIt.next();
+	    pl = allProofsIt.next();
 	    pl.updateProofStatus();
 	}
     }

@@ -16,7 +16,7 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
-
+import de.uka.ilkd.key.logic.sort.*;
 
 /**
  * 
@@ -72,9 +72,19 @@ public class TermCreationException extends RuntimeException {
             StringBuffer sb = new StringBuffer();
             for (int i = 0; i<subs.length; i++) {
                 sb.append((i+1) + ".) ");
-                sb.append(subs[i]);
-                sb.append("(sort: " + subs[i].sort()+
-                          ", sort hash: "+ subs[i].sort().hashCode()+")\n");
+                Term subi = subs[i];
+                if(subi!=null){
+                    sb.append(subi);
+                    Sort subiSort = subi.sort();
+                    if(subiSort!=null){
+                        sb.append("(sort: " + subi.sort()+
+                                  ", sort hash: "+ subi.sort().hashCode()+")\n");
+                    }else{
+                        sb.append("(Unknown sort, \"null pointer\")");
+                    }
+                }else{
+                    sb.append(" !null! ");
+                }
         
             }
             return sb.toString();

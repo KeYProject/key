@@ -35,15 +35,15 @@ public class POBrowser extends JDialog {
     
     private static POBrowser instance;
 
-    private final InitConfig initConfig;
-    private final Services services;
-    private final JavaInfo javaInfo;
-    private final SpecificationRepository specRepos;
+    private InitConfig initConfig;
+    private Services services;
+    private JavaInfo javaInfo;
+    private SpecificationRepository specRepos;
 
-    private final ClassTree classTree;
-    private final JList poList;
-    private final JButton startButton;
-    private final JButton cancelButton;
+    private ClassTree classTree;
+    private JList poList;
+    private JButton startButton;
+    private JButton cancelButton;
     
     private ProofOblInput po;
     
@@ -62,7 +62,7 @@ public class POBrowser extends JDialog {
 	this.specRepos  = initConfig.getServices().getSpecificationRepository();
 
 	//create class tree
-	classTree = new ClassTree(true, null, defaultPm, services);
+	classTree = new ClassTree(true, true, null, defaultPm, services);
 	classTree.addTreeSelectionListener(new TreeSelectionListener() {
 	    public void valueChanged(TreeSelectionEvent e) {
 		DefaultMutableTreeNode selectedNode 
@@ -182,6 +182,25 @@ public class POBrowser extends JDialog {
            || instance.initConfig != initConfig
            || !instance.initConfig.equals(initConfig)
            || defaultPm != null) {
+            
+            if(instance != null){
+                instance.dispose();
+                
+                //============================================
+                // cumbersome but necessary code providing a workaround for a memory leak 
+                // in Java, see: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6497929
+                instance.initConfig = null;
+                instance.services = null;
+                instance.javaInfo = null;
+                instance.specRepos = null;
+                instance.classTree = null;
+                instance.poList = null;
+                instance.startButton = null;
+                instance.cancelButton = null;
+                instance.po = null;
+                //============================================
+            }
+            
             instance = new POBrowser(initConfig, 
             			     "Proof Obligation Browser", 
             			     defaultPm);
@@ -561,8 +580,10 @@ public class POBrowser extends JDialog {
     //public interface
     //-------------------------------------------------------------------------
     
-    public ProofOblInput getPO() {	
-	return po;
+    public ProofOblInput getAndClearPO(){
+        ProofOblInput result = po;
+        po = null; //to prevent memory leaks
+        return result;
     }
     
 }

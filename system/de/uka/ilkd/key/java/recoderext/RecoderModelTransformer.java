@@ -20,7 +20,6 @@ import recoder.java.expression.literal.*;
 import recoder.java.expression.operator.CopyAssignment;
 import recoder.java.reference.*;
 import recoder.kit.TwoPassTransformation;
-import recoder.list.generic.*;
 import recoder.service.DefaultCrossReferenceSourceInfo;
 import de.uka.ilkd.key.util.Debug;
 
@@ -186,8 +185,8 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
      * in any compilation unit. <emph>Not</emph> for inner classes.
      */
     public void makeExplicit() {
-	Set s = classDeclarations();
-	Iterator it = s.iterator();
+	Set<ClassDeclaration> s = classDeclarations();
+	Iterator<ClassDeclaration> it = s.iterator();
 	while(it.hasNext()) {
 	    TypeDeclaration cd = (TypeDeclaration) it.next();
   //          System.out.println("RecoderModelTransformer: classdecl: "+cd.getFullName());
@@ -197,11 +196,11 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
     
     // 3 methods to access the transformation cache.
     
-    protected Set classDeclarations(){
+    protected Set<ClassDeclaration> classDeclarations(){
         return cache.getClassDeclarations();       
     }
     
-    public HashMap getLocalClass2FinalVar(){
+    public HashMap<ClassType, List<Variable>> getLocalClass2FinalVar(){
         return cache.getLocalClass2FinalVarMapping();
      }
     
@@ -235,8 +234,8 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
     public static class TransformerCache {
         
         private List<CompilationUnit> cUnits;
-        private Set classDeclarations;
-        private HashMap localClass2FinalVar;
+        private Set<ClassDeclaration> classDeclarations;
+        private HashMap<ClassType, List<Variable>> localClass2FinalVar;
 
         public TransformerCache(List<CompilationUnit> cUnits) {
             this.cUnits = cUnits;    
@@ -246,7 +245,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
             return cUnits;
         }
         
-        public Set getClassDeclarations(){
+        public Set<ClassDeclaration> getClassDeclarations(){
             if(classDeclarations==null){
                 ClassDeclarationCollector cdc = new ClassDeclarationCollector();
                 for (int i = 0; i < cUnits.size(); i++) {
@@ -258,9 +257,9 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
             return classDeclarations;       
         }
         
-        public HashMap getLocalClass2FinalVarMapping() {
+        public HashMap<ClassType, List<Variable>> getLocalClass2FinalVarMapping() {
             if(localClass2FinalVar == null){
-                localClass2FinalVar = new HashMap();
+                localClass2FinalVar = new HashMap<ClassType, List<Variable>>();
             }
             return localClass2FinalVar;
         }
@@ -275,7 +274,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
     
     protected class FinalOuterVarsCollector extends SourceVisitor{
         
-        HashMap lc2fv;
+        HashMap<ClassType, List<Variable>> lc2fv;
         
         public FinalOuterVarsCollector(){
             super();
@@ -297,9 +296,9 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
            Variable v = si.getVariable(vr.getName(), vr);
            if((v instanceof VariableSpecification) && !(v instanceof FieldSpecification) &&
                    si.getContainingClassType((ProgramElement) v) != si.getContainingClassType(vr)){
-               LinkedList vars = (LinkedList) lc2fv.get(si.getContainingClassType(vr));
+               List<Variable> vars = lc2fv.get(si.getContainingClassType(vr));
                if(vars == null){
-                   vars = new LinkedList();
+                   vars = new LinkedList<Variable>();
                }
                if(!vars.contains(v)){
                    vars.add(v);
@@ -312,7 +311,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
     
     private static class ClassDeclarationCollector extends SourceVisitor{
         
-        HashSet result = new HashSet();
+        HashSet<ClassDeclaration> result = new HashSet<ClassDeclaration>();
         
         public ClassDeclarationCollector(){
             super();
@@ -334,7 +333,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
             super.visitClassDeclaration(cld);
         }
                
-        public HashSet result(){
+        public HashSet<ClassDeclaration> result(){
             return result;
         }
     }

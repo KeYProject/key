@@ -1397,7 +1397,7 @@ public abstract class Taclet implements Rule, Named {
 */
             if ("".equals(uniqueTail)) { // otherwise just number it
                de.uka.ilkd.key.proof.Node n = goal.node();
-               uniqueTail = AUTONAME+n.getUniqueTacletNr()+"_"+n.siblingNr();
+               uniqueTail = AUTONAME+n.getUniqueTacletNr()+"_"+n.parent().siblingNr();
             }
 
             tacletToAdd=tacletToAdd.setName(tacletToAdd.name()+uniqueTail);

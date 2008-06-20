@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ArrayOfParameterDeclaration;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeRef;
@@ -83,8 +84,9 @@ public class SymbolicObjectDiagram {
                 && op.name().toString().indexOf("undef(") == -1;
     }
 
-    private ListOfTerm ante = SLListOfTerm.EMPTY_LIST,
-            succ = SLListOfTerm.EMPTY_LIST;
+    private ListOfTerm ante = SLListOfTerm.EMPTY_LIST;
+            
+    private ListOfTerm succ = SLListOfTerm.EMPTY_LIST;
 
     private SetOfTerm arrayLocations;
 
@@ -106,15 +108,15 @@ public class SymbolicObjectDiagram {
 
     private ListOfTerm postTerms;
 
-    private HashMap ref2ser;
+    private HashMap<Term, Integer> ref2ser;
 
     private SetOfTerm refInPC = SetAsListOfTerm.EMPTY_SET;
 
     private Services serv;
 
-    private LinkedList symbolicObjects;
+    private LinkedList<SymbolicObject> symbolicObjects;
 
-    private HashMap term2class;
+    private HashMap<Term, EquClass> term2class;
 
     LinkedList terms = new LinkedList();
 
@@ -126,7 +128,9 @@ public class SymbolicObjectDiagram {
             SetOfTerm[] possibleIndexTerms, SetOfTerm indexTerms,
             SetOfTerm instanceConfiguration) {
         this.instanceConfiguration = instanceConfiguration;
+
         prepare(itNode, serv, pc, refInPC);
+
         this.postTerms = postTerms;
 
         this.arrayLocations = arrayLocations;
@@ -136,6 +140,7 @@ public class SymbolicObjectDiagram {
         this.indexTerms = indexTerms;
 
         createSymbolicObjects();
+
         if (!pre) {
             createSymbolicObjectsForNewInstances(preTerms);
             createPostState(preTerms, postTerms);
@@ -145,11 +150,11 @@ public class SymbolicObjectDiagram {
         setInstanceNames(symbolicObjects);
     }
 
-    private void addArrayEntry(LinkedList objects, Term ref, Term index,
+    private void addArrayEntry(LinkedList<SymbolicObject> objects, Term ref, Term index,
             Term con) {
-        final Iterator it = objects.iterator();
+        final Iterator<SymbolicObject> it = objects.iterator();
         while (it.hasNext()) {
-            SymbolicObject so = (SymbolicObject) it.next();
+            SymbolicObject so = it.next();
             if (so.getTerms().contains(ref)) {
                 ((SymbolicArrayObject) so).addIndexConstraint(index, con);
             }
@@ -157,11 +162,11 @@ public class SymbolicObjectDiagram {
 
     }
 
-    private void addAttribute(LinkedList objects, AttributeOp op, Term sub,
+    private void addAttribute(LinkedList<SymbolicObject> objects, AttributeOp op, Term sub,
             Term cTerm) {
-        Iterator it = objects.iterator();
+        Iterator<SymbolicObject> it = objects.iterator();
         while (it.hasNext()) {
-            SymbolicObject so = (SymbolicObject) it.next();
+            SymbolicObject so = it.next();
             if (so.getTerms().contains(sub)) {
                 if (!((ProgramVariable) op.attribute()).isImplicit()
                         || VisualDebugger.showImpliciteAttr)
@@ -173,10 +178,10 @@ public class SymbolicObjectDiagram {
     }
 
     private void addIndexReference(Term sub, Term index,
-            SymbolicObject soReferenced, LinkedList objects) {
-        Iterator it = objects.iterator();
+            SymbolicObject soReferenced, LinkedList<SymbolicObject> objects) {
+        Iterator<SymbolicObject> it = objects.iterator();
         while (it.hasNext()) {
-            SymbolicObject so = (SymbolicObject) it.next();
+            SymbolicObject so = it.next();
             if (so.getTerms().contains(sub)) {
                 ((SymbolicArrayObject) so).addAssociationFromIndex(index,
                         soReferenced);
@@ -185,10 +190,10 @@ public class SymbolicObjectDiagram {
     }
 
     private void addReference(AttributeOp op, Term sub,
-            SymbolicObject soReferenced, LinkedList objects) {
-        Iterator it = objects.iterator();
+            SymbolicObject soReferenced, LinkedList<SymbolicObject> objects) {
+        Iterator<SymbolicObject> it = objects.iterator();
         while (it.hasNext()) {
-            SymbolicObject so = (SymbolicObject) it.next();
+            SymbolicObject so = it.next();
             if (so.getTerms().contains(sub)) {
                 if (op.attribute() instanceof ProgramVariable)
                     so.addAssociation(op.attribute(), soReferenced);
@@ -199,11 +204,11 @@ public class SymbolicObjectDiagram {
         }
     }
 
-    private void addStaticAttribute(LinkedList objects, ProgramVariable pv,
+    private void addStaticAttribute(LinkedList<SymbolicObject> objects, ProgramVariable pv,
             ClassType ct, Term cTerm) {
-        Iterator it = objects.iterator();
+        Iterator<SymbolicObject> it = objects.iterator();
         while (it.hasNext()) {
-            SymbolicObject so = (SymbolicObject) it.next();
+            SymbolicObject so = it.next();
             if (so.isStatic() && so.getType().equals(ct)) {
                 if (!pv.isImplicit() || VisualDebugger.showImpliciteAttr)
                     so.addAttributeConstraint(pv, cTerm);
@@ -213,11 +218,11 @@ public class SymbolicObjectDiagram {
     }
 
     private void addStaticReference(ProgramVariable op,
-            SymbolicObject soReferenced, LinkedList objects) {
-        Iterator it = objects.iterator();
+            SymbolicObject soReferenced, LinkedList<SymbolicObject> objects) {
+        Iterator<SymbolicObject> it = objects.iterator();
         while (it.hasNext()) {
-            SymbolicObject so = (SymbolicObject) it.next();
-            if (so.isStatic()
+            SymbolicObject so = it.next();
+            if (so.isStatic() 
                     && so.getType().equals(op.getContainerType().getJavaType()))
                 so.addAssociation(op, soReferenced);
 
@@ -269,7 +274,7 @@ public class SymbolicObjectDiagram {
     }
 
     private void createEquivalenceClassesAndConstraints() {
-        term2class = new HashMap();
+        term2class = new HashMap<Term, EquClass>();
         IteratorOfTerm it = ante.iterator();
         while (it.hasNext()) {
             EquClass ec = null;
@@ -277,14 +282,14 @@ public class SymbolicObjectDiagram {
             collectLocations(t);
             if (t.op() instanceof Equality /* && !containsImplicitAttr(t) */) {
                 if (term2class.containsKey(t.sub(0))) {
-                    ec = (EquClass) term2class.get(t.sub(0));
+                    ec = term2class.get(t.sub(0));
                     if (term2class.containsKey(t.sub(1))) {
-                        ec.add((EquClass) term2class.get(t.sub(1)));
+                        ec.add(term2class.get(t.sub(1)));
                     } else {
                         ec.add(t.sub(1));
                     }
                 } else if (term2class.containsKey(t.sub(1))) {
-                    ec = (EquClass) term2class.get(t.sub(1));
+                    ec = term2class.get(t.sub(1));
                     ec.add(t.sub(0));
                 } else {
                     ec = new EquClass(t.sub(0), t.sub(1));
@@ -354,7 +359,7 @@ public class SymbolicObjectDiagram {
     }
 
     private void createSymbolicObjects() {
-        LinkedList result = new LinkedList();
+        LinkedList<SymbolicObject> result = new LinkedList<SymbolicObject>();
         EquClass[] npClasses = getNonPrimitiveLocationEqvClasses();
         for (int i = 0; i < npClasses.length; i++) {
             KeYJavaType t = npClasses[i].getKeYJavaType();
@@ -378,7 +383,7 @@ public class SymbolicObjectDiagram {
 
         // create static objects
         // System.out.println("Static Type "+);
-        for (Iterator it = this.getStaticClasses().iterator(); it.hasNext();) {
+        for (Iterator<Type> it = this.getStaticClasses().iterator(); it.hasNext();) {
             result.add(new SymbolicObject((ClassType) (it.next()), serv));
         }
 
@@ -412,9 +417,9 @@ public class SymbolicObjectDiagram {
         }
 
         // Compute Associations...
-        Iterator it = result.iterator();
+        Iterator<SymbolicObject> it = result.iterator();
         while (it.hasNext()) {
-            SymbolicObject so = (SymbolicObject) it.next();
+            SymbolicObject so = it.next();
             IteratorOfTerm it2 = so.getTerms().iterator();
             // SetOfTerm result;
             // System.out.println("adding assos");
@@ -439,7 +444,8 @@ public class SymbolicObjectDiagram {
                     if (refInPC.contains(t) || postTerms.contains(t)) // TODO??
                         addIndexReference(t.sub(0), t.sub(1), so, result);
 
-                } else if (t.op() instanceof ProgramVariable) {
+                } else if (t.op() instanceof ProgramVariable && 
+                        ((ProgramVariable)t.op()).isMember()) {
                     if (refInPC.contains(t) || postTerms.contains(t)) // TODO
                                                                         // ???//only
                                                                         // assoc
@@ -516,11 +522,11 @@ public class SymbolicObjectDiagram {
         return true;
     }
 
-    private LinkedList filterStaticObjects(LinkedList objects) {
-        LinkedList result = new LinkedList();
-        Iterator it = objects.iterator();
+    private LinkedList<SymbolicObject> filterStaticObjects(LinkedList<SymbolicObject> objects) {
+        LinkedList<SymbolicObject> result = new LinkedList<SymbolicObject>();
+        Iterator<SymbolicObject> it = objects.iterator();
         while (it.hasNext()) {
-            final SymbolicObject so = (SymbolicObject) it.next();
+            final SymbolicObject so = it.next();
             if (!so.isStatic())
                 result.add(so);
         }
@@ -564,7 +570,7 @@ public class SymbolicObjectDiagram {
         if (!term2class.containsKey(t)) {
             term2class.put(t, new EquClass(t));
         }
-        return (EquClass) term2class.get(t);
+        return term2class.get(t);
     }
 
     public SetOfTerm getIndexTerms() {
@@ -572,7 +578,7 @@ public class SymbolicObjectDiagram {
     }
 
     public EquClass[] getNonPrimitiveLocationEqvClasses() {
-        Object[] oa = (new HashSet(term2class.values())).toArray();
+        Object[] oa = (new HashSet<EquClass>(term2class.values())).toArray();
         EquClass[] temp = new EquClass[oa.length];
         int l = 0;
         for (int i = 0; i < oa.length; i++) {
@@ -589,10 +595,10 @@ public class SymbolicObjectDiagram {
         return result;
     }
 
-    private SymbolicObject getObject(Term sub, LinkedList objects) {
-        Iterator it = objects.iterator();
+    private SymbolicObject getObject(Term sub, LinkedList<SymbolicObject> objects) {
+        Iterator<SymbolicObject> it = objects.iterator();
         while (it.hasNext()) {
-            final SymbolicObject so = (SymbolicObject) it.next();
+            final SymbolicObject so = it.next();
             if (so.getTerms().contains(sub)) {
                 return so;
             }
@@ -624,8 +630,8 @@ public class SymbolicObjectDiagram {
         return pc2;
     }
 
-    private LinkedList getPossibleIndexTerms(SetOfTerm members) {
-        LinkedList result = new LinkedList();
+    private LinkedList<SetOfTerm> getPossibleIndexTerms(SetOfTerm members) {
+        LinkedList<SetOfTerm> result = new LinkedList<SetOfTerm>();
         if (possibleIndexTerms != null)
             for (int i = 0; i < possibleIndexTerms.length; i++) {
                 SetOfTerm currentIndexTerms = possibleIndexTerms[i];
@@ -720,17 +726,17 @@ public class SymbolicObjectDiagram {
         for (IteratorOfTerm it = refs.iterator(); it.hasNext();) {
             final Term t = it.next();
             if (ref2ser.containsKey(t)
-                    && ((current == -1) || ((Integer) ref2ser.get(t))
+                    && ((current == -1) || ref2ser.get(t)
                             .intValue() < current)) {
-                current = ((Integer) ref2ser.get(t)).intValue();
+                current = ref2ser.get(t).intValue();
             }
         }
 
         return current;
     }
 
-    private Set getStaticClasses() {
-        HashSet res = new HashSet();
+    private Set<Type> getStaticClasses() {
+        HashSet<Type> res = new HashSet<Type>();
         for (IteratorOfTerm it = this.pc.iterator(); it.hasNext();) {
             Term t = it.next();
             res.addAll(this.getStaticClasses(t));
@@ -740,8 +746,8 @@ public class SymbolicObjectDiagram {
         return res;
     }
 
-    private Set getStaticClasses(Term t) {
-        Set result = new HashSet();
+    private Set<Type> getStaticClasses(Term t) {
+        Set<Type> result = new HashSet<Type>();
         if (t.op() instanceof ProgramVariable) {
             if (((ProgramVariable) t.op()).getContainerType() != null)
                 if (!((ProgramVariable) t.op()).isImplicit()
@@ -758,17 +764,17 @@ public class SymbolicObjectDiagram {
 
     }
 
-    private SymbolicObject getStaticObject(ClassType ct, LinkedList objects) {
-        final Iterator it = objects.iterator();
+    private SymbolicObject getStaticObject(ClassType ct, LinkedList<SymbolicObject> objects) {
+        final Iterator<SymbolicObject> it = objects.iterator();
         while (it.hasNext()) {
-            final SymbolicObject so = (SymbolicObject) it.next();
+            final SymbolicObject so = it.next();
             if (so.isStatic() && so.getType().equals(ct))
                 return so;
         }
         return null;
     }
 
-    public LinkedList getSymbolicObjects() {
+    public LinkedList<SymbolicObject> getSymbolicObjects() {
         return symbolicObjects;
     }
 
@@ -779,49 +785,35 @@ public class SymbolicObjectDiagram {
 
         this.vd = VisualDebugger.getVisualDebugger();
         this.pc = pc;
-        // this.node = n;
         this.node = itNode.getNode();
         this.itNode = itNode;
-        // this.mediator=mediator;
-        // mediator = Main.getInstance().mediator();
         this.serv = serv;
-        // goals = mediator.getProof().getSubtreeGoals(node);
 
-        VisualDebugger.print("--------------------------");
-        VisualDebugger.print("Calculating Equ classes for " + node.serialNr());
-
-        IteratorOfConstrainedFormula itc = node.sequent().antecedent()
-                .iterator();
-        while (itc.hasNext()) {
-            ante = ante.append(itc.next().formula());
+        ante = SLListOfTerm.EMPTY_LIST;
+        for (final ConstrainedFormula cfma : node.sequent().antecedent()) {
+            ante = ante.append(cfma.formula());
         }
-        itc = node.sequent().succedent().iterator();
+        
+        
         succ = SLListOfTerm.EMPTY_LIST;
-        while (itc.hasNext()) {
-            succ = succ.append(itc.next().formula());
+        for (final ConstrainedFormula cfma : node.sequent().succedent()) {
+            succ = succ.append(cfma.formula());
         }
 
-        for (IteratorOfTerm it = this.instanceConfiguration.iterator(); it
-                .hasNext();) {
-            final Term t = it.next();
-            if (t.op() == Op.NOT)
-                succ = succ.append(t.sub(0));
+        for (final Term instanceTerm :  instanceConfiguration) {
+            if (instanceTerm.op() == Op.NOT)
+                succ = succ.append(instanceTerm.sub(0));
             else
-                ante = ante.append(t);
+                ante = ante.append(instanceTerm);
         }
 
         this.refInPC = refInPc;
 
         createEquivalenceClassesAndConstraints();
+        
         getEqvClass(nullTerm);
+        
         findDisjointClasses();
-
-        Collection cl = term2class.values();
-        HashSet s = new HashSet(cl);
-        Iterator it5 = s.iterator();
-        VisualDebugger.print("All Equi Classses: ");
-        while (it5.hasNext())
-            VisualDebugger.print(it5.next());
     }
 
     private boolean referenceSort(Sort s) {
@@ -836,9 +828,9 @@ public class SymbolicObjectDiagram {
         return false;
     }
 
-    private void setInstanceNames(LinkedList objects) {
+    private void setInstanceNames(LinkedList<SymbolicObject> objects) {
         objects = filterStaticObjects(objects);
-        ref2ser = new HashMap();
+        ref2ser = new HashMap<Term, Integer>();
         ITNode n = this.itNode;
         while (n.getParent() != null) {
             HashMap<PosInOccurrence, Label> labels = n.getNode()
@@ -881,19 +873,19 @@ public class SymbolicObjectDiagram {
 
         // System.out.println("INPUT VALUES"+inputVal);
 
-        Iterator it2 = objects.iterator();
+        Iterator<SymbolicObject> it2 = objects.iterator();
         while (it2.hasNext()) {
-            SymbolicObject so = (SymbolicObject) it2.next();
+            SymbolicObject so = it2.next();
             so.setId(getSerialNumber(so.getTerms()));
         }
 
-        SymbolicObject[] sos = (SymbolicObject[]) objects
+        SymbolicObject[] sos = objects
                 .toArray(new SymbolicObject[objects.size()]);
 
         // sort symbolic objects according to their ids
         sort(sos);
 
-        HashMap counters = new HashMap();
+        HashMap<ClassType, Integer> counters = new HashMap<ClassType, Integer>();
 
         for (int i = 0; i < sos.length; i++) {
             SymbolicObject so = sos[i];
@@ -903,7 +895,7 @@ public class SymbolicObjectDiagram {
 
             Integer newValue;
             if (counters.containsKey(so.getType())) {
-                Integer value = (Integer) counters.get(so.getType());
+                Integer value = counters.get(so.getType());
                 newValue = new Integer(value.intValue() + 1);
                 counters.remove(so.getType());
                 counters.put(so.getType(), newValue);
@@ -925,7 +917,7 @@ public class SymbolicObjectDiagram {
 
     private void setMethodStack(boolean pre) {
         try {
-            ITNode it = itNode.getMethodNode();
+            final ITNode it = itNode.getMethodNode();
             if (it == null) {
                 return;
             }
@@ -957,8 +949,7 @@ public class SymbolicObjectDiagram {
                         refPre);
                 methodReferences = new Term[1];
                 methodReferences[0] = t;
-                // System.out.println("AAAAAAAAAAAAAAAAAAAAAA "+t);
-                HashMap map = new HashMap();
+                HashMap<Operator, Term> map = new HashMap<Operator, Term>();
                 Term self = vd.getSelfTerm();
                 // vd.getSelfTerm() //TODO
                 // ProgramVariable val =
@@ -982,7 +973,7 @@ public class SymbolicObjectDiagram {
             ArrayOfParameterDeclaration paraDecl = mbs.getProgramMethod(serv)
                     .getParameters();
 
-            final HashMap values = vd.getValuesForLocation(set, vd
+            final HashMap<Term,Term> values = vd.getValuesForLocation(set, vd
                     .getProgramPIO(itNode.getNode().sequent()));
 
             ListOfProgramVariable paramDeclAsPVList = SLListOfProgramVariable.EMPTY_LIST;
@@ -1005,18 +996,24 @@ public class SymbolicObjectDiagram {
 
     }
 
+    /**
+     * sort the given array in order of the symbolic objects ids
+     * @param a the SymbolicObject array to sort
+     */
     private void sort(SymbolicObject a[]) {
-
-        int n = a.length;
-        SymbolicObject temp;
-
-        for (int i = 0; i < n - 1; i = i + 1)
-            for (int j = n - 1; j > i; j = j - 1)
-                if (a[j - 1].getId() > a[j].getId()) {
-                    temp = a[j - 1];
-                    a[j - 1] = a[j];
-                    a[j] = temp;
+        final Comparator<SymbolicObject> comparator = new Comparator<SymbolicObject>() {
+            public int compare(SymbolicObject o1, SymbolicObject o2) {
+                if (o1.getId() < o2.getId()) {
+                    return -1;
+                } else if (o1.getId() > o2.getId()) {
+                    return 1;
+                } else {
+                    return 0;
                 }
+            }
+            
+        };        
+        Arrays.sort(a, comparator);                       
     }
 
     private class EquClass {
@@ -1075,10 +1072,10 @@ public class SymbolicObjectDiagram {
         }
 
         public KeYJavaType getKeYJavaType() {
-            IteratorOfTerm it = members.iterator();
+            final IteratorOfTerm it = members.iterator();
             Sort s = it.next().sort();
             while (it.hasNext()) {
-                Sort s1 = it.next().sort();
+                final Sort s1 = it.next().sort();
                 if (s1.extendsTrans(s)) {
                     s = s1;
                 }

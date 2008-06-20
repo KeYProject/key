@@ -63,7 +63,7 @@ public class TestRecoder2KeY extends TestCase {
 	+"if (j>42) return;"
 	+"synchronized(null) { j=7; }"
 	+"}",
-	"{ int x = 1; {Boolean b;} }",
+	"{ int x = 1; {java.util.List l;} }",
 	"{"
 	+"int[] a; a=new int[3]; a=new int[]{2,3,4}; int j=a[2]; j=a.length;"
 	+"}"
@@ -75,12 +75,12 @@ public class TestRecoder2KeY extends TestCase {
 	"class A1 { public A1() { }} ",
 	"package qwe.rty; import qwe.rty.A; import dfg.hjk.*; import java.util.*;"	
 	+"public abstract class A implements Z{"
-	+"static {d=3; Vector v = new Vector();}"
+	+"static {d=3; Object v = new Object();}"
 	+"public static int d;"
 	+"A (int j) { d=5; }"
 	+"public A (int j, float k) {this(j); d=5; }"
 	+"private static final A[] b=new A[]{null}; "
-	+"float f; Boolean s;"
+	+"float f; java.util.List s;"
 	+"public void abc() {"
 	+"Object z=new A(4, 5) { public int d=7; };"
 	+"abc(); A a=(A)null; a=def(a); a=def(a).ghi(a).ghi(a);}"	
@@ -89,14 +89,14 @@ public class TestRecoder2KeY extends TestCase {
 	+"private synchronized A ghi(A a) { a=ghi(a); ghi(a); A a1=null; "
 	+" a1=ghi(a1); a=def(a); return null;}"
 	+"protected abstract int[] jkl(A a, int i);"
-	+"protected Object o() {if (s instanceof Class) return A.class;}"
+	+"protected Object o() {if (s instanceof Cloneable) return A.class;}"
 	+"}"
 	+"interface Z { public int d=0; }"
 	+"interface Z0 extends Z {}"
 	+"class A1 extends A { public static A a=new A(4); "
 	+"A1 (int j) {super(j);} }",
 	"public class B extends Object {"
-	+"class E  { public E(Class s) {super();} }"
+	+"class E  { public E(Object s) {super();} }"
 	+"}",
 	" class circ_A {   static int a = circ_B.b;   } "
 	+"class circ_B {   static int b = circ_A.a;   }",

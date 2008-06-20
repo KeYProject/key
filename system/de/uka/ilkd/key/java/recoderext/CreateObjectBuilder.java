@@ -18,15 +18,11 @@ package de.uka.ilkd.key.java.recoderext;
 import java.util.*;
 
 import recoder.CrossReferenceServiceConfiguration;
-import recoder.java.CompilationUnit;
 import recoder.java.Expression;
 import recoder.java.Identifier;
 import recoder.java.Statement;
 import recoder.java.StatementBlock;
 import recoder.java.declaration.*;
-import recoder.java.declaration.DeclarationSpecifier;
-import recoder.java.declaration.Modifier;
-import recoder.java.declaration.ParameterDeclaration;
 import recoder.java.declaration.modifier.Public;
 import recoder.java.declaration.modifier.Static;
 import recoder.java.reference.*;
@@ -49,14 +45,14 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
 
     public static final String IMPLICIT_OBJECT_CREATE = "<createObject>";
     public static final String NEW_OBJECT_VAR_NAME = "__NEW__";
-    private HashMap class2identifier;
+    private HashMap<ClassDeclaration, Identifier> class2identifier;
 
 
     public CreateObjectBuilder
 	(CrossReferenceServiceConfiguration services, 
 	 TransformerCache cache) {	
 	super(services, cache);
-	class2identifier = new HashMap();
+	class2identifier = new HashMap<ClassDeclaration, Identifier>();
     }
 
    
@@ -67,7 +63,7 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
     private StatementBlock createBody(ClassDeclaration recoderClass) {
 		
 	ASTList<Statement> result = new ASTArrayList<Statement>(10);
-	LocalVariableDeclaration local = declare(NEW_OBJECT_VAR_NAME, (Identifier) class2identifier.get(recoderClass));
+	LocalVariableDeclaration local = declare(NEW_OBJECT_VAR_NAME, class2identifier.get(recoderClass));
 	
 
 	result.add(local);
@@ -78,7 +74,7 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
             (assign(new VariableReference
                     (new Identifier(NEW_OBJECT_VAR_NAME)),
                     new MethodReference(new TypeReference
-                         ((Identifier) class2identifier.get(recoderClass)), 
+                         (class2identifier.get(recoderClass)), 
                          new ImplicitIdentifier
                          (InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
                          arguments)));
@@ -111,7 +107,7 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
 
 	MethodDeclaration md =  new MethodDeclaration
 	    (modifiers, 
-	     new TypeReference((Identifier) class2identifier.get(type)), 
+	     new TypeReference(class2identifier.get(type)), 
 	     new ImplicitIdentifier(IMPLICIT_OBJECT_CREATE), 
 	     new ASTArrayList<ParameterDeclaration>(0), 
 	     null,
@@ -121,10 +117,7 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
     }    
 
     public ProblemReport analyze() {
-        Set cds = classDeclarations();
-        Iterator it = cds.iterator();
-        while(it.hasNext()){
-            ClassDeclaration cd = (ClassDeclaration) it.next();
+        for (final ClassDeclaration cd : classDeclarations()) {
             class2identifier.put(cd, getId(cd));
         }
         setProblemReport(NO_PROBLEM);

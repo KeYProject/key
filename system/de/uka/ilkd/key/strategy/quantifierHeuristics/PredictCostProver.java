@@ -43,7 +43,7 @@ class PredictCostProver {
 	private SetOfTerm assertLiterals = SetAsListOfTerm.EMPTY_SET;
 
 	/**clauses from <code>instance</code> of CNF*/
-	private Set clauses = new HashSet();
+	private Set<Clause> clauses = new HashSet<Clause>();
 
 	private Services services;
 
@@ -71,20 +71,20 @@ class PredictCostProver {
 		while (it.hasNext()) {
 			SetOfTerm literals = TriggerUtils.setByOperator(it.next(),Op.OR);
 			//clauses.add(new Clause(literals));
-			Iterator lit = createClause(literals.toArray(), 0).iterator();
+			Iterator<SetOfTerm> lit = createClause(literals.toArray(), 0).iterator();
 			while (lit.hasNext()) {
-			  clauses.add(new Clause((SetOfTerm) lit.next()));
+			  clauses.add(new Clause(lit.next()));
 			}
 		}
 	}
 
-	private Set createClause(Term[] terms, int i) {
-		Set res = new HashSet();
+	private Set<SetOfTerm> createClause(Term[] terms, int i) {
+		Set<SetOfTerm> res = new HashSet<SetOfTerm>();
 		if (i >= terms.length)
 			return res;
 		Term self = terms[i];
 		boolean ifthen = terms[i].op() == Op.IF_EX_THEN_ELSE;
-		Set next = createClause(terms, i+1);
+		Set<SetOfTerm> next = createClause(terms, i+1);
 		if(next.size()==0){
 		     if(ifthen){res.add(SetAsListOfTerm.EMPTY_SET
 				.add(tb.not(self.sub(0))).add(self.sub(1)));
@@ -94,9 +94,9 @@ class PredictCostProver {
 		     else res.add(SetAsListOfTerm.EMPTY_SET.add(self));
 		}
 		else {
-			Iterator  it = next.iterator();
+			Iterator<SetOfTerm>  it = next.iterator();
 			while (it.hasNext()) {
-				SetOfTerm ts = (SetOfTerm) it.next();
+				SetOfTerm ts = it.next();
 				if (ifthen) {
 					res.add(ts.add(tb.not(self.sub(0)))
 							    .add(self.sub(1)));
@@ -139,7 +139,7 @@ class PredictCostProver {
 	 * add the problem with its result(res) to cache. if the problem is 
 	 * not an atom, add its subterm with according changed res to cache.
 	 */
-	private void addToCache(Term problem, Term res, Map cache){
+	private void addToCache(Term problem, Term res, Map<Term, Term> cache){
 		boolean temp =true;
 		Term pro = problem;
 		Operator op = pro.op();
@@ -264,10 +264,10 @@ class PredictCostProver {
 	private long firstRefine() {
 		long cost = 1;
 		boolean assertChanged = false;
-		Set res = new HashSet();
-		Iterator it = clauses.iterator();
+		Set<Clause> res = new HashSet<Clause>();
+		Iterator<Clause> it = clauses.iterator();
 		while (it.hasNext()) {
-			Clause c = (Clause) (it.next());
+			Clause c = (it.next());
 			c.firstRefine();
 			long cCost = c.cost();
 			if (cCost == 0) {cost = 0;res.clear();break;}

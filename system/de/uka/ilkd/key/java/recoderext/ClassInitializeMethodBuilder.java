@@ -47,10 +47,10 @@ public class ClassInitializeMethodBuilder
 	CLASS_INITIALIZE_IDENTIFIER = "<clinit>";
 
     /** maps a class to its static NON CONSTANT fields */
-    private HashMap class2initializers;
+    private HashMap<TypeDeclaration, ASTList<Statement>> class2initializers;
 
     /** maps a class to its superclass */
-    private HashMap class2super;
+    private HashMap<ClassDeclaration, TypeReference> class2super;
 
     private ClassType javaLangObject;
 
@@ -74,8 +74,8 @@ public class ClassInitializeMethodBuilder
 	(CrossReferenceServiceConfiguration services, 
 	        TransformerCache cache) {	
 	super(services, cache);
-	class2initializers = new HashMap(10*getUnits().size());
-	class2super = new HashMap(2*getUnits().size());
+	class2initializers = new HashMap<TypeDeclaration, ASTList<Statement>>(10*getUnits().size());
+	class2super = new HashMap<ClassDeclaration, TypeReference>(2*getUnits().size());
     }
 
     /** 
@@ -160,16 +160,12 @@ public class ClassInitializeMethodBuilder
         if (!(javaLangObject instanceof ClassDeclaration)) {
             Debug.fail("Could not find class java.lang.Object or only as bytecode");
         }
-        Set cds = classDeclarations();
-        Iterator it = cds.iterator();
-        while(it.hasNext()){
-            ClassDeclaration cd = (ClassDeclaration) it.next();
+        for (final ClassDeclaration cd : classDeclarations()) {
             class2initializers.put(cd, getInitializers(cd)) ;
             if (cd!=javaLangObject) {
                 TypeReference superType;                    
                 if (cd.getExtendedTypes() != null) {
-                    superType = (TypeReference)cd.getExtendedTypes().
-                    getTypeReferenceAt(0).deepClone();
+                    superType = cd.getExtendedTypes().getTypeReferenceAt(0).deepClone();
                 } else {
                     superType = 
                         new TypeReference(createJavaLangPackageReference(),
@@ -269,7 +265,7 @@ public class ClassInitializeMethodBuilder
 	// try block
 	ASTList<Statement> initializerExecutionBody;
 
-	initializerExecutionBody = (ASTList<Statement>) class2initializers.get(td);
+	initializerExecutionBody = class2initializers.get(td);
 	if (initializerExecutionBody == null) {
 	    initializerExecutionBody = new ASTArrayList<Statement>(20);
 	}
@@ -280,7 +276,7 @@ public class ClassInitializeMethodBuilder
 		(0, new PassiveExpression
 		 (new MethodReference
 		  ((TypeReference)
-		   ((TypeReference)class2super.get(cd)).deepClone(),
+		   class2super.get(cd).deepClone(),
 		   new ImplicitIdentifier
 		   (ClassInitializeMethodBuilder.CLASS_INITIALIZE_IDENTIFIER))));
 	}

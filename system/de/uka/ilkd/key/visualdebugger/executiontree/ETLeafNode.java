@@ -24,29 +24,20 @@ public class ETLeafNode extends ETNode {
 
     // surround with try catch
 
-    public static int TERMINATED = 1;
+    public final static int TERMINATED = 1;
 
-    public static int INFEASIBLE = 2;
-
-    public static int SUSPENDED = 3;// depr
-
-    // public ETLeafNode(ListOfTerm bc, int st){
-    // super(bc);
-    // this.state = st;
-    // assert(st==TERMINATED || st==INFEASIBLE|| st== SUSPENDED) ;
-    // }
+    public final static int INFEASIBLE = 2;
 
     public ETLeafNode(ListOfTerm bc, int st, ETNode parent) {
         super(bc, parent);
         this.state = st;
-        assert (st == TERMINATED || st == INFEASIBLE || st == SUSPENDED);
+        assert (st == TERMINATED || st == INFEASIBLE);
     }
 
     public ETLeafNode(ListOfTerm bc, int st, LinkedList nodes, ETNode parent) {
         super(bc, nodes, parent);
         this.state = st;
-        assert (st == TERMINATED || st == INFEASIBLE || st == SUSPENDED);
-
+        assert (st == TERMINATED || st == INFEASIBLE);
     }
 
     public ETLeafNode(int st, ETLeafNode parent) {

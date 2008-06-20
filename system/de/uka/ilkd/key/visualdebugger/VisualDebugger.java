@@ -9,13 +9,12 @@ package de.uka.ilkd.key.visualdebugger;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 import javax.swing.SwingUtilities;
 
-import de.uka.ilkd.key.gui.IMain;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -37,41 +36,70 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.DebuggerStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.visualdebugger.executiontree.ExecutionTree;
 import de.uka.ilkd.key.visualdebugger.executiontree.ITNode;
 import de.uka.ilkd.key.visualdebugger.statevisualisation.StateVisualization;
 import de.uka.ilkd.key.visualdebugger.statevisualisation.SymbolicObject;
+import de.uka.ilkd.key.visualdebugger.watchpoints.WatchPoint;
+import de.uka.ilkd.key.visualdebugger.watchpoints.WatchPointManager;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class VisualDebugger.
+ */
 public class VisualDebugger {
+
+    /** The Constant debugClass. */
     public static final String debugClass = "Debug";
 
+    /** The debugging mode. */
     private static boolean debuggingMode = false;
 
+    /** The Constant debugPackage. */
     public static final String debugPackage = "visualdebugger";
 
+    /** The quan_splitting. */
     public static boolean quan_splitting = false;
 
+    /** The Constant sepName. */
     public static final String sepName = "sep";
 
+    /** The show implicite attr. */
     public static boolean showImpliciteAttr = false;
 
+    /** The show main window. */
     public static boolean showMainWindow = false;
 
-    private static VisualDebugger singleton;
+    /** The VisualDebugger implements the singleton pattern. */
+    private static VisualDebugger visualDebuggerInstance;
 
-    private static List symbolicExecNames = new ArrayList(5);
+    /** The symbolic exec names. */
+    private static List<Name> symbolicExecNames = new ArrayList<Name>(5);
 
+    /** The ExecutionTreeView's progress monitor. */
+    private ProgressMonitor etProgressMonitor = null;
+
+    private WatchPointManager watchPointManager = null;
+
+    /**
+     * The Constant tempDir. A temporary directory in the users home:
+     * ~/tmp/visualdebugger/.
+     */
     public static final String tempDir = System.getProperty("user.home")
             + File.separator + "tmp" + File.separator + "visualdebugger"
             + File.separator;
 
+    /** The Constant vdInDebugMode. */
     public static final boolean vdInDebugMode = false;
 
+    /** The Constant POST_PREDICATE_NAME. */
     private static final Name POST_PREDICATE_NAME = new Name("POST");
 
     static {
@@ -82,6 +110,14 @@ public class VisualDebugger {
         symbolicExecNames.add(new Name("method_expand"));
     }
 
+    /**
+     * Contains implicit attr.
+     * 
+     * @param t
+     *                the t
+     * 
+     * @return true, if successful
+     */
     public static boolean containsImplicitAttr(Term t) {
         if (t.op() instanceof AttributeOp
                 && ((ProgramVariable) ((AttributeOp) t.op()).attribute())
@@ -97,6 +133,14 @@ public class VisualDebugger {
         return false;
     }
 
+    /**
+     * Gets the method string.
+     * 
+     * @param md
+     *                the md
+     * 
+     * @return the method string
+     */
     public static String getMethodString(MethodDeclaration md) {
         String result = md.getProgramElementName().toString() + "( ";
         final ArrayOfParameterDeclaration paraDecl = md.getParameters();
@@ -111,98 +155,175 @@ public class VisualDebugger {
 
     }
 
+    /**
+     * Gets the visual debugger.
+     *  Uses the singleton pattern.
+     * @return the visual debugger
+     */
     public static VisualDebugger getVisualDebugger() {
-        if (singleton == null) {
-            singleton = new VisualDebugger();
+        if (visualDebuggerInstance == null) {
+            visualDebuggerInstance = new VisualDebugger();
             String[] args = new String[2];
 
             args[0] = "DEBUGGER";
             args[1] = "LOOP";
-            
+
             Main.evaluateOptions(args);
-            IMain key = Main.getInstance(false);
+            Main key = Main.getInstance(false);
             key.loadCommandLineFile();
 
-            singleton.main = Main.getInstance(false);
-            singleton.mediator = singleton.main.mediator();
+            visualDebuggerInstance.main = Main.getInstance(false);
+            visualDebuggerInstance.mediator = visualDebuggerInstance.main.mediator();
+            
         }
-        return singleton;
+        return visualDebuggerInstance;
     }
 
+    /**
+     * Checks if is debugging mode.
+     * 
+     * @return true, if is debugging mode
+     */
     public static boolean isDebuggingMode() {
         return debuggingMode;
     }
 
+    /**
+     * Prints the.
+     * 
+     * @param o
+     *                the o
+     */
     public static void print(Object o) {
         if (vdInDebugMode)
             System.out.println(o.toString());
     }
 
+    /**
+     * Prints the.
+     * 
+     * @param s
+     *                the s
+     */
     public static void print(String s) {
         if (vdInDebugMode)
             System.out.println(s);
     }
 
+    /**
+     * Sets the debugging mode.
+     * 
+     * @param mode
+     *                the new debugging mode
+     */
     public static void setDebuggingMode(boolean mode) {
         debuggingMode = mode;
     }
 
+    /** The bp manager. */
     private BreakpointManager bpManager;
 
+    /** The current state. */
     private StateVisualization currentState;
 
+    /** The current tree. */
     private ITNode currentTree;
 
+    /** The debugging method. */
     private ProgramMethod debuggingMethod;
 
+    /** The init phase. */
     private boolean initPhase = false;
 
-    private HashMap inputPV2term = new HashMap();
+    /** The input p v2term. */
+    private HashMap<Term, Term> inputPV2term = new HashMap<Term, Term>();
 
-    private LinkedList listeners = new LinkedList();
+    /** The listeners. */
+    private LinkedList<DebuggerListener> listeners = new LinkedList<DebuggerListener>();
 
+    /** The Main. */
     private IMain main;
 
+    /** The max proof steps for state vis computation. */
     protected int maxProofStepsForStateVisComputation = 8000;
 
     // InteractiveProver ip;
+    /** The mediator. */
     private KeYMediator mediator;
 
+    /** The precondition. */
     private Sequent precondition;
 
+    /** The run limit. */
     private int runLimit = 5;
 
+    /** The self pv. */
     private ProgramVariable selfPV;
 
+    /** The static method. */
     private boolean staticMethod;
 
+    /** The symbolic input values as list. */
     private ListOfTerm symbolicInputValuesAsList = SLListOfTerm.EMPTY_LIST;
 
-    private HashMap tc2node = new HashMap();
+    /** The tc2node. */
+    private HashMap<TestCaseIdentifier, Node> tc2node = new HashMap<TestCaseIdentifier, Node>();
 
-    private HashMap term2InputPV = new HashMap();
+    /** The term2 input pv. */
+    private HashMap<Term, Term> term2InputPV = new HashMap<Term, Term>();
 
+    /** The type. */
     private ClassType type;
 
+    /** The use decision procedures. */
     private boolean useDecisionProcedures = false;
 
+    /** The post predicate. */
     private Function postPredicate;
 
+    /**
+     * Instantiates a new visual debugger.
+     */
     protected VisualDebugger() {
         bpManager = new BreakpointManager(this);
-        
-        // main = Main.getInstance();
+        watchPointManager = new WatchPointManager();
     }
 
+    /**
+     * Adds the listener.
+     * 
+     * @param listener
+     *                the listener
+     */
     public void addListener(DebuggerListener listener) {
         listeners.add(listener);
     }
 
+    /**
+     * Adds the test case.
+     * 
+     * @param file
+     *                the file
+     * @param method
+     *                the method
+     * @param n
+     *                the n
+     */
     public void addTestCase(String file, String method, Node n) {
         tc2node.put(new TestCaseIdentifier(file, method), n);
 
     }
 
+    /**
+     * Array of expression2 list of prog var.
+     * 
+     * @param aoe
+     *                the aoe
+     * @param start
+     *                the start
+     * 
+     * @return the list of program variable
+     */
     public ListOfProgramVariable arrayOfExpression2ListOfProgVar(
             ArrayOfExpression aoe, int start) {
         ListOfProgramVariable lopv = SLListOfProgramVariable.EMPTY_LIST;
@@ -212,6 +333,14 @@ public class VisualDebugger {
         return lopv;
     }
 
+    /**
+     * Collect result.
+     * 
+     * @param s
+     *                the s
+     * 
+     * @return the list of term
+     */
     private ListOfTerm collectResult(Sequent s) {
         final IteratorOfConstrainedFormula itAntec = s.antecedent().iterator();
         ListOfTerm result = SLListOfTerm.EMPTY_LIST;
@@ -227,6 +356,16 @@ public class VisualDebugger {
         return result;
     }
 
+    /**
+     * Contains.
+     * 
+     * @param aoe
+     *                the aoe
+     * @param pv
+     *                the pv
+     * 
+     * @return true, if successful
+     */
     private boolean contains(ArrayOfExpression aoe, ProgramVariable pv) {
         for (int i = 0; i < aoe.size(); i++) {
             if (aoe.getExpression(i) == pv) {
@@ -241,6 +380,11 @@ public class VisualDebugger {
      * determines and returns the first and active statement if the applied
      * taclet worked on a modality. If the applied taclet performs no symbolic
      * execution <tt>null</tt> is returned
+     * 
+     * @param node
+     *                the node
+     * 
+     * @return the source element
      */
     public SourceElement determineFirstAndActiveStatement(Node node) {
         final RuleApp ruleApp = node.getAppliedRuleApp();
@@ -259,6 +403,14 @@ public class VisualDebugger {
         return activeStatement;
     }
 
+    /**
+     * Extract input.
+     * 
+     * @param n
+     *                the n
+     * @param pio
+     *                the pio
+     */
     public void extractInput(Node n, PosInOccurrence pio) {
         JavaBlock jb = this.modalityTopLevel(pio);
         print("Extracting Symbolic Input Values-----------------------");
@@ -285,8 +437,8 @@ public class VisualDebugger {
         // debuggingMethod.getVariableSpecification(index)
 
         ArrayOfExpression args = mbs.getArguments();
-        HashMap map = new HashMap();
-        HashMap map2 = new HashMap();
+        HashMap<Term, Term> map = new HashMap<Term, Term>();
+        HashMap<Term, Term> map2 = new HashMap<Term, Term>();
         if (jb != null) {
             Term f = pio.constrainedFormula().formula();
             if (f.op() instanceof QuanUpdateOperator) {
@@ -308,8 +460,7 @@ public class VisualDebugger {
         this.symbolicInputValuesAsList = SLListOfTerm.EMPTY_LIST;
         for (int i = args.size() - 1; i>=0 ; i--) {
             ProgramVariable next = (ProgramVariable) args.getExpression(i);
-            final Term val = (Term) 
-                map2.get(TermFactory.DEFAULT.createVariableTerm(next));// TODO
+            final Term val = map2.get(TermFactory.DEFAULT.createVariableTerm(next));// TODO
             this.symbolicInputValuesAsList = 
                 this.symbolicInputValuesAsList.prepend(val);
         }
@@ -317,10 +468,24 @@ public class VisualDebugger {
         setInputPV2term(map2);        
     }
 
+    /**
+     * Extract precondition.
+     * 
+     * @param node
+     *                the node
+     * @param pio
+     *                the pio
+     */
     public void extractPrecondition(Node node, PosInOccurrence pio) {
         this.precondition = node.sequent().removeFormula(pio).sequent();
     }
 
+    /**
+     * Fire debugger event.
+     * 
+     * @param event
+     *                the event
+     */
     public void fireDebuggerEvent(DebuggerEvent event) {
         synchronized (listeners) {
             if (event.getType() == DebuggerEvent.TREE_CHANGED) {
@@ -329,13 +494,21 @@ public class VisualDebugger {
                 currentState = (StateVisualization) event.getSubject();
             }
 
-            Iterator it = listeners.iterator();
+            Iterator<DebuggerListener> it = listeners.iterator();
             while (it.hasNext()) {
-                ((DebuggerListener) it.next()).update(event);
+                it.next().update(event);
             }
         }
     }
 
+    /**
+     * Gets the act statement.
+     * 
+     * @param statement
+     *                the statement
+     * 
+     * @return the act statement
+     */
     private SourceElement getActStatement(SourceElement statement) {
         while ((statement instanceof ProgramPrefix)
                 || statement instanceof ProgramElementName) {
@@ -350,6 +523,14 @@ public class VisualDebugger {
         return statement;
     }
 
+    /**
+     * Gets the array index.
+     * 
+     * @param pio2
+     *                the pio2
+     * 
+     * @return the array index
+     */
     public SetOfTerm getArrayIndex(PosInOccurrence pio2) {
         SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
         PosInOccurrence pio = pio2;
@@ -370,6 +551,14 @@ public class VisualDebugger {
         return result;
     }
 
+    /**
+     * Gets the array locations.
+     * 
+     * @param pio2
+     *                the pio2
+     * 
+     * @return the array locations
+     */
     public SetOfTerm getArrayLocations(PosInOccurrence pio2) {
         SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
         PosInOccurrence pio = pio2;
@@ -390,22 +579,50 @@ public class VisualDebugger {
         return result;
     }
 
+    /**
+     * Gets the bp manager.
+     * 
+     * @return the bp manager
+     */
     public BreakpointManager getBpManager() {
         return bpManager;
     }
 
+    /**
+     * Gets the current state.
+     * 
+     * @return the current state
+     */
     public StateVisualization getCurrentState() {
         return currentState;
     }
 
+    /**
+     * Gets the current tree.
+     * 
+     * @return the current tree
+     */
     public ITNode getCurrentTree() {
         return ExecutionTree.getITNode();
     }
 
+    /**
+     * Gets the debugging method.
+     * 
+     * @return the debugging method
+     */
     public ProgramMethod getDebuggingMethod() {
         return debuggingMethod;
     }
 
+    /**
+     * Gets the execution terminated normal.
+     * 
+     * @param n
+     *                the n
+     * 
+     * @return the execution terminated normal
+     */
     public PosInOccurrence getExecutionTerminatedNormal(Node n) {
         final Sequent s = n.sequent();
         for (IteratorOfConstrainedFormula it = s.succedent().iterator(); it
@@ -423,13 +640,22 @@ public class VisualDebugger {
     }
 
     /**
-     * term 2 term
+     * term 2 term.
      * 
+     * @return the input p v2term
      */
-    public HashMap getInputPV2term() {
+    public HashMap<Term, Term> getInputPV2term() {
         return inputPV2term;
     }
 
+    /**
+     * Gets the locations.
+     * 
+     * @param pio2
+     *                the pio2
+     * 
+     * @return the locations
+     */
     public ListOfTerm getLocations(PosInOccurrence pio2) {
         ListOfTerm result = SLListOfTerm.EMPTY_LIST;
         PosInOccurrence pio = pio2;
@@ -463,10 +689,23 @@ public class VisualDebugger {
         return result;
     }
 
+    /**
+     * Gets the mediator.
+     * 
+     * @return the mediator
+     */
     public KeYMediator getMediator() {
         return mediator;
     }
 
+    /**
+     * Gets the method frame.
+     * 
+     * @param context
+     *                the context
+     * 
+     * @return the method frame
+     */
     public MethodFrame getMethodFrame(SourceElement context) {
         MethodFrame frame = null;
         if (context instanceof ProgramPrefix) {
@@ -481,6 +720,14 @@ public class VisualDebugger {
         return frame;
     }
 
+    /**
+     * Gets the method stack size.
+     * 
+     * @param n
+     *                the n
+     * 
+     * @return the method stack size
+     */
     public int getMethodStackSize(Node n) {
         final PosInOccurrence pio = this.getProgramPIO(n.sequent());
         if (pio == null) {
@@ -491,7 +738,12 @@ public class VisualDebugger {
 
     /**
      * computes the depth of the method frame stack up to the first active
-     * statement
+     * statement.
+     * 
+     * @param context
+     *                the context
+     * 
+     * @return the method stack size
      */
     private int getMethodStackSize(SourceElement context) {
         int size = 0;
@@ -506,6 +758,16 @@ public class VisualDebugger {
         return size;
     }
 
+    /**
+     * Gets the node for tc.
+     * 
+     * @param file
+     *                the file
+     * @param method
+     *                the method
+     * 
+     * @return the node for tc
+     */
     public Node getNodeForTC(String file, String method) {
         Object result = tc2node.get(new TestCaseIdentifier(file, method));
         if (result instanceof Node) {
@@ -514,22 +776,48 @@ public class VisualDebugger {
         return null;
     }
 
-    public HashSet getParam(MethodBodyStatement mbs) {
-        HashSet result = new HashSet();
+    /**
+     * Gets the param.
+     * 
+     * @param mbs
+     *                the mbs
+     * 
+     * @return the param
+     */
+    public HashSet<Expression> getParam(MethodBodyStatement mbs) {
+        HashSet<Expression> result = new HashSet<Expression>();
         for (int i = 0; i < mbs.getArguments().size(); i++) {
             result.add(mbs.getArguments().getExpression(i));
         }
         return result;
     }
 
+    /**
+     * Gets the post predicate.
+     * 
+     * @return the post predicate
+     */
     public Function getPostPredicate() {
         return postPredicate;
     }
 
+    /**
+     * Gets the precondition.
+     * 
+     * @return the precondition
+     */
     public Sequent getPrecondition() {
         return precondition;
     }
 
+    /**
+     * Gets the program counter.
+     * 
+     * @param jb
+     *                the jb
+     * 
+     * @return the program counter
+     */
     public SourceElementId getProgramCounter(JavaBlock jb) {
         SourceElement se = getActStatement(jb.program());
         if (se != null && se instanceof MethodReference) {
@@ -551,6 +839,14 @@ public class VisualDebugger {
 
     }
 
+    /**
+     * Gets the program counter.
+     * 
+     * @param n
+     *                the n
+     * 
+     * @return the program counter
+     */
     public SourceElementId getProgramCounter(Node n) {
         JavaBlock jb = null;
         SourceElement se = null;
@@ -580,6 +876,14 @@ public class VisualDebugger {
         return null;
     }
 
+    /**
+     * Gets the program counter.
+     * 
+     * @param pio
+     *                the pio
+     * 
+     * @return the program counter
+     */
     public SourceElementId getProgramCounter(PosInOccurrence pio) {
         final JavaBlock jb = modalityTopLevel(pio);
         if (jb != null) {
@@ -589,6 +893,14 @@ public class VisualDebugger {
 
     }
 
+    /**
+     * Gets the program pio.
+     * 
+     * @param s
+     *                the s
+     * 
+     * @return the program pio
+     */
     public PosInOccurrence getProgramPIO(Sequent s) {
         IteratorOfConstrainedFormula it = s.succedent().iterator();
         while (it.hasNext()) {
@@ -603,46 +915,86 @@ public class VisualDebugger {
 
     }
 
+    /**
+     * Gets the run limit.
+     * 
+     * @return the run limit
+     */
     public int getRunLimit() {
         return runLimit;
     }
 
+    /**
+     * Gets the self pv.
+     * 
+     * @return the self pv
+     */
     public ProgramVariable getSelfPV() {
         return selfPV;
     }
 
+    /**
+     * Gets the self term.
+     * 
+     * @return the self term
+     */
     public Term getSelfTerm() {
         return TermFactory.DEFAULT.createVariableTerm(selfPV);
     }
 
+    /**
+     * Gets the symbolic input values.
+     * 
+     * @return the symbolic input values
+     */
     public SetOfTerm getSymbolicInputValues() {
         SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
-        for (Iterator it = this.term2InputPV.keySet().iterator(); it.hasNext();) {
-            result = result.add((Term) it.next());
+        for (Iterator<Term> it = this.term2InputPV.keySet().iterator(); it.hasNext();) {
+            result = result.add(it.next());
         }
         return result;
 
     }
 
+    /**
+     * Gets the symbolic input values as list.
+     * 
+     * @return the symbolic input values as list
+     */
     public ListOfTerm getSymbolicInputValuesAsList() {
         return this.symbolicInputValuesAsList;
     }
 
-    public HashMap getTerm2InputPV() {
+    /**
+     * Gets the term2 input pv.
+     * 
+     * @return the term2 input pv
+     */
+    public HashMap<Term, Term> getTerm2InputPV() {
         return term2InputPV;
     }
 
+    /**
+     * Gets the type.
+     * 
+     * @return the type
+     */
     public ClassType getType() {
         return type;
     }
 
     /**
+     * Gets the values for location.
+     * 
      * @param locs
      *                set of Terms (ops)
+     * @param pio
+     *                the pio
+     * 
      * @return term2term
      */
-    public HashMap getValuesForLocation(HashSet locs, PosInOccurrence pio) {
-        HashMap result = new HashMap();
+    public HashMap<Term, Term> getValuesForLocation(HashSet locs, PosInOccurrence pio) {
+        HashMap<Term, Term> result = new HashMap<Term, Term>();
 
         Term f = pio.constrainedFormula().formula();
         if (f.op() instanceof QuanUpdateOperator) {
@@ -665,7 +1017,10 @@ public class VisualDebugger {
         return result;
     }
 
-    public void initialize() {
+    /**
+     * Initialize.
+     */
+    public void initialize(Services services) {
 
         UpdateLabelListener lListener = new UpdateLabelListener();
         // lListener.setListeners(listeners);
@@ -674,49 +1029,53 @@ public class VisualDebugger {
 
         // Extract ProgramVariables of the context program
         JavaInfo info = mediator.getServices().getJavaInfo();
-        Set kjts = info.getAllKeYJavaTypes();
         // info.getKeYProgModelInfo().getMethods(ct)
-        HashSet pvs = new HashSet();
-        for (Iterator it = kjts.iterator(); it.hasNext();) {
-            KeYJavaType kjt = (KeYJavaType) it.next();
+        HashSet<Location> pvs = new HashSet<Location>();
+        for (final KeYJavaType kjt : info.getAllKeYJavaTypes()) {
             if (kjt.getJavaType() instanceof ClassDeclaration) {
-                final ListOfProgramMethod methods = info
-                        .getAllProgramMethods(kjt);
-                for (IteratorOfProgramMethod mit = methods.iterator(); mit
-                        .hasNext();) {
-                    ProgramMethod m = mit.next();
-
+                final ListOfProgramMethod methods = info.getAllProgramMethods(kjt);
+                for (final ProgramMethod m : methods) {
                     if (m != null) {
                         ProgramVariableCollector pvc = new ProgramVariableCollector(
-                                m, mediator.getServices());
+                                m, services);
                         pvc.start();
                         pvs.addAll(pvc.result());
                     }
-
                 }
             }
         }
 
         final Proof proof = mediator.getProof();
-        ExecutionTree pl = new ExecutionTree(proof, mediator,
-                true);
+        ExecutionTree pl = new ExecutionTree(proof, mediator, true);
         pl.setListeners(listeners);
         mediator.addAutoModeListener(pl);
 
         this.initPhase = true;
         bpManager.setNoEx(true);
 
-        postPredicate = (Function) 
-            proof.getNamespaces().functions().lookup(POST_PREDICATE_NAME);  
-        
-        setProofStrategy(proof, true, false);
+        postPredicate = (Function) proof.getNamespaces().functions().lookup(
+                POST_PREDICATE_NAME);
+        setProofStrategy(proof, true, false, new LinkedList<WatchPoint>());
         run();
     }
 
+    /**
+     * Checks if is inits the phase.
+     * 
+     * @return true, if is inits the phase
+     */
     public boolean isInitPhase() {
         return initPhase;
     }
 
+    /**
+     * Checks if is sep statement.
+     * 
+     * @param pe
+     *                the pe
+     * 
+     * @return true, if is sep statement
+     */
     public boolean isSepStatement(ProgramElement pe) {
         if (pe instanceof MethodReference) {
             MethodReference mr = (MethodReference) pe;
@@ -728,10 +1087,23 @@ public class VisualDebugger {
 
     }
 
+    /**
+     * Checks if is static method.
+     * 
+     * @return true, if is static method
+     */
     public boolean isStaticMethod() {
         return staticMethod;
     }
 
+    /**
+     * Checks if is symbolic execution.
+     * 
+     * @param t
+     *                the t
+     * 
+     * @return true, if is symbolic execution
+     */
     private boolean isSymbolicExecution(Taclet t) {
         ListOfRuleSet list = t.getRuleSets();
         RuleSet rs;
@@ -745,6 +1117,14 @@ public class VisualDebugger {
         return false;
     }
 
+    /**
+     * Modality top level.
+     * 
+     * @param pio
+     *                the pio
+     * 
+     * @return the java block
+     */
     public JavaBlock modalityTopLevel(PosInOccurrence pio) {
         Term cf = pio.constrainedFormula().formula();
         if (cf.arity() > 0) {
@@ -759,6 +1139,14 @@ public class VisualDebugger {
         return null;
     }
 
+    /**
+     * Pretty print.
+     * 
+     * @param l
+     *                the l
+     * 
+     * @return the string
+     */
     public String prettyPrint(ListOfTerm l) {
         // KeYMediator mediator=
         // VisualDebugger.getVisualDebugger().getMediator();
@@ -785,7 +1173,19 @@ public class VisualDebugger {
         return removeLineBreaks(result);
     }
 
-    public String prettyPrint(ListOfTerm l, LinkedList objects,
+    /**
+     * Pretty print.
+     * 
+     * @param l
+     *                the l
+     * @param objects
+     *                the objects
+     * @param thisObject
+     *                the this object
+     * 
+     * @return the string
+     */
+    public String prettyPrint(ListOfTerm l, List<SymbolicObject> objects,
             SymbolicObject thisObject) {
         // KeYMediator mediator=
         // VisualDebugger.getVisualDebugger().getMediator();
@@ -812,12 +1212,32 @@ public class VisualDebugger {
         return removeLineBreaks(result);
     }
 
+    /**
+     * Pretty print.
+     * 
+     * @param l
+     *                the l
+     * @param objects
+     *                the objects
+     * @param thisObject
+     *                the this object
+     * 
+     * @return the string
+     */
     public String prettyPrint(SetOfTerm l, LinkedList objects,
             SymbolicObject thisObject) {
         return prettyPrint(SLListOfTerm.EMPTY_LIST.append(l.toArray()),
                 objects, thisObject);
     }
 
+    /**
+     * Pretty print.
+     * 
+     * @param l
+     *                the l
+     * 
+     * @return the string
+     */
     public String prettyPrint(Term l) {
         // KeYMediator mediator=
         // VisualDebugger.getVisualDebugger().getMediator();
@@ -842,10 +1262,22 @@ public class VisualDebugger {
     // TODO {u}POST, execution is finished...
     // alternative: { } <sep(-1);>\phi
 
-    public String prettyPrint(Term l, LinkedList sos, SymbolicObject so) {
+    /**
+     * Pretty print.
+     * 
+     * @param l
+     *                the l
+     * @param symbolicObjects
+     *                the SymbolicObjects
+     * @param so
+     *                the so
+     * 
+     * @return the string
+     */
+    public String prettyPrint(Term l, List<SymbolicObject> symbolicObjects, SymbolicObject so) {
         final LogicPrinter lp = new DebuggerLP(new ProgramPrinter(null),
                 mediator.getNotationInfo(), mediator.getServices(),
-                term2InputPV, sos, so);
+                term2InputPV, symbolicObjects, so);
 
         String result = "";
 
@@ -861,22 +1293,34 @@ public class VisualDebugger {
         return removeLineBreaks(result);
     }
 
+    /**
+     * Prints the test cases.
+     */
     public void printTestCases() {
         print(this.tc2node.toString());
     }
 
+    /**
+     * Refresh rule apps.
+     */
     private void refreshRuleApps() {
         ListOfGoal goals = mediator.getProof().openGoals();
         // g.getRuleAppManager().clearCache();
-        IteratorOfGoal it = goals.iterator();
-        while (it.hasNext()) {
-            Goal g = it.next();
+        for (final Goal g : goals) {
             g.ruleAppIndex().clearIndexes();
             g.ruleAppIndex().fillCache();
         }
 
     }
 
+    /**
+     * Removes the implicite.
+     * 
+     * @param list
+     *                the list
+     * 
+     * @return the list of term
+     */
     public ListOfTerm removeImplicite(ListOfTerm list) {
         ListOfTerm result = SLListOfTerm.EMPTY_LIST;
 
@@ -889,10 +1333,24 @@ public class VisualDebugger {
         return result;
     }
 
+    /**
+     * Removes the line breaks.
+     * 
+     * @param s
+     *                the s
+     * 
+     * @return the string
+     */
     private String removeLineBreaks(String s) {
         return s.replace('\n', ' ');
     }
 
+    /**
+     * Removes the step over.
+     * 
+     * @param goals
+     *                the goals
+     */
     private void removeStepOver(ListOfGoal goals) {
         IteratorOfGoal it = goals.iterator();
         while (it.hasNext()) {
@@ -904,6 +1362,11 @@ public class VisualDebugger {
 
     }
 
+    /**
+     * Run.
+     * 
+     * @return true, if successful
+     */
     public boolean run() {
         // this.refreshRuleApps();
         if (!mediator.autoMode()) {
@@ -914,49 +1377,107 @@ public class VisualDebugger {
         }
     }
 
+    /**
+     * Run.
+     * 
+     * @param goals
+     *                the goals
+     * 
+     * @return true, if successful
+     */
     public boolean run(ListOfGoal goals) {
         if (!mediator.autoMode()) {
             this.removeStepOver(goals);
             this.setSteps(goals, this.runLimit);
-            setProofStrategy(mediator.getProof(), true, false);
+            
+            setProofStrategy(mediator.getProof(), true, false,
+                   watchPointManager.getListOfWatchpoints(mediator.getServices()));
             runProver(goals);
+
             return true;
         }
         return false;
     }
 
+    /**
+     * Run prover.
+     * 
+     * @param goals
+     *                the goals
+     */
     private void runProver(final ListOfGoal goals) {
         this.refreshRuleApps();
-        mediator.startAutoMode(goals);
+        mediator.startAutoMode(goals);        
+        // mediator.getInteractiveProver().removeProverTaskListener(proverTaskListener);
     }
 
+    /**
+     * Sets the inits the phase.
+     * 
+     * @param initPhase
+     *                the new inits the phase
+     */
     public void setInitPhase(boolean initPhase) {
         this.initPhase = initPhase;
     }
 
-    public void setInputPV2term(HashMap inputPV2term) {
+    /**
+     * Sets the input p v2term.
+     * 
+     * @param inputPV2term
+     *                the new input p v2term
+     */
+    public void setInputPV2term(HashMap<Term, Term> inputPV2term) {
         this.inputPV2term = inputPV2term;
     }
 
+    /**
+     * Sets the proof strategy.
+     * 
+     * @param proof
+     *                the proof
+     * @param splittingAllowed
+     *                the splitting allowed
+     * @param inUpdateAndAssumes
+     *                the in update and assumes
+     */
     public void setProofStrategy(final Proof proof, boolean splittingAllowed,
-            boolean inUpdateAndAssumes) {
+            boolean inUpdateAndAssumes, List<WatchPoint> watchpoints) {
+
         StrategyProperties strategyProperties = DebuggerStrategy
                 .getDebuggerStrategyProperties(splittingAllowed,
-                        inUpdateAndAssumes, isInitPhase());
+                        inUpdateAndAssumes, isInitPhase(), watchpoints);
 
         final StrategyFactory factory = new DebuggerStrategy.Factory();
-
         proof.setActiveStrategy((factory.create(proof, strategyProperties)));
     }
 
+    /**
+     * Sets the self pv.
+     * 
+     * @param selfPV
+     *                the new self pv
+     */
     public void setSelfPV(ProgramVariable selfPV) {
         this.selfPV = selfPV;
     }
 
+    /**
+     * Sets the static method.
+     * 
+     * @param staticMethod
+     *                the new static method
+     */
     public void setStaticMethod(boolean staticMethod) {
         this.staticMethod = staticMethod;
     }
 
+    /**
+     * Sets the step over.
+     * 
+     * @param goals
+     *                the new step over
+     */
     private void setStepOver(ListOfGoal goals) {
         IteratorOfGoal it = goals.iterator();
         while (it.hasNext()) {
@@ -971,6 +1492,14 @@ public class VisualDebugger {
 
     }
 
+    /**
+     * Sets the steps.
+     * 
+     * @param goals
+     *                the goals
+     * @param steps
+     *                the steps
+     */
     private void setSteps(ListOfGoal goals, int steps) {
         IteratorOfGoal it = goals.iterator();
         while (it.hasNext()) {
@@ -986,26 +1515,50 @@ public class VisualDebugger {
 
     }
 
-    public void setTerm2InputPV(HashMap inputValues) {
+    /**
+     * Sets the term2 input pv.
+     * 
+     * @param inputValues
+     *                the new term2 input pv
+     */
+    public void setTerm2InputPV(HashMap<Term, Term> inputValues) {
         this.term2InputPV = inputValues;
     }
 
+    /**
+     * Sets the type.
+     * 
+     * @param type
+     *                the new type
+     */
     public void setType(ClassType type) {
         this.type = type;
     }
 
+    /**
+     * Simplify.
+     * 
+     * @param terms
+     *                the terms
+     * 
+     * @return the list of term
+     */
     public ListOfTerm simplify(ListOfTerm terms) {
         if (terms.size() == 0)
             return terms;
         final DebuggerPO po = new DebuggerPO("DebuggerPo");
+
         final ProofStarter ps = new ProofStarter();
+        if (etProgressMonitor != null) {
+            ps.addProgressMonitor(etProgressMonitor);
+        }
         po.setTerms(terms);
 
         final ProofEnvironment proofEnvironment = mediator.getProof().env();
         final InitConfig initConfig = proofEnvironment.getInitConfig();
-        
-        po.setIndices(initConfig.createTacletIndex(),
-                initConfig.createBuiltInRuleIndex());
+
+        po.setIndices(initConfig.createTacletIndex(), initConfig
+                .createBuiltInRuleIndex());
         po.setProofSettings(mediator.getProof().getSettings());
         po.setConfig(initConfig);
         po.setTerms(terms);
@@ -1013,12 +1566,14 @@ public class VisualDebugger {
 
         final Proof proof = ps.getProof();
 
-        setProofStrategy(proof, false, false);
-
+        setProofStrategy(proof, false, false, new LinkedList<WatchPoint>());
         ps.setUseDecisionProcedure(useDecisionProcedures);
         ps.run(proofEnvironment);
 
-        setProofStrategy(proof, true, false);
+        setProofStrategy(proof, true, false, new LinkedList<WatchPoint>());
+        if (etProgressMonitor != null) {
+            ps.removeProgressMonitor(etProgressMonitor);
+        }
 
         final ListOfGoal openGoals = proof.openGoals();
         assert openGoals.size() == 1;
@@ -1026,6 +1581,12 @@ public class VisualDebugger {
         return collectResult(openGoals.head().sequent());
     }
 
+    /**
+     * Start thread.
+     * 
+     * @param r
+     *                the r
+     */
     private void startThread(final Runnable r) {
         mediator.stopInterface(false);
         Thread appThread = new Thread() {
@@ -1044,75 +1605,141 @@ public class VisualDebugger {
         appThread.start();
     }
 
+    /**
+     * Step into.
+     * 
+     * @return true, if successful
+     */
     public boolean stepInto() {
         return stepInto(mediator.getProof().openGoals());
     }
 
+    /**
+     * Step into.
+     * 
+     * @param goals
+     *                the goals
+     * 
+     * @return true, if successful
+     */
     public boolean stepInto(ListOfGoal goals) {
         return this.stepInto(goals, 1);
     }
 
+    /**
+     * Step into.
+     * 
+     * @param goals
+     *                the goals
+     * @param steps
+     *                the steps
+     * 
+     * @return true, if successful
+     */
     public boolean stepInto(ListOfGoal goals, int steps) {
         if (!mediator.autoMode()) {
             final Proof proof = mediator.getProof();
             removeStepOver(proof.openGoals());
             this.setSteps(goals, steps);
-            setProofStrategy(proof, true, false);
+            setProofStrategy(proof, true, false, watchPointManager.getListOfWatchpoints(mediator.getServices()));
             runProver(goals);
             return true;
         }
         return false;
     }
 
+    /**
+     * Step over.
+     */
     public void stepOver() {
         this.stepOver(mediator.getProof().openGoals());
     }
 
+    /**
+     * Step over.
+     * 
+     * @param goals
+     *                the goals
+     */
     public void stepOver(ListOfGoal goals) {
         setStepOver(goals);
         this.setSteps(goals, runLimit);
-        setProofStrategy(mediator.getProof(), true, false);
+        setProofStrategy(mediator.getProof(), true, false,
+                watchPointManager.getListOfWatchpoints(mediator.getServices()));
         runProver(goals);
     }
 
+    /**
+     * Step to first sep.
+     * 
+     * @return true, if successful
+     */
     public boolean stepToFirstSep() {
         if (!mediator.autoMode()) {
 
             final Proof proof = mediator.getProof();
             removeStepOver(proof.openGoals());
             setSteps(proof.openGoals(), 0);
-            setProofStrategy(proof, true, false);
+            setProofStrategy(proof, true, false, watchPointManager.getListOfWatchpoints(mediator.getServices()));
             runProver(proof.openGoals());
             return true;
         }
         return false;
     }
 
+    /**
+     * Visualize.
+     * 
+     * @param n
+     *                the n
+     */
     public synchronized void visualize(ITNode n) {
         mediator = main.mediator();
         final ITNode node = n;
 
-        final Runnable interfaceSignaller = new Runnable() {
+        new StateVisualization(node, mediator,
+                maxProofStepsForStateVisComputation,
+                useDecisionProcedures);
+        
+        /*final Runnable interfaceSignaller = new Runnable() {
             public void run() {
-                new StateVisualization(node, mediator, 
+                new StateVisualization(node, mediator,
                         maxProofStepsForStateVisComputation,
                         useDecisionProcedures);
             }
         };
-        startThread(interfaceSignaller);
+        startThread(interfaceSignaller);*/
     }
-
+    
+    /**
+     * The Class TestCaseIdentifier.
+     */
     public class TestCaseIdentifier {
 
+        /** The file. */
         private final String file;
 
+        /** The method. */
         private final String method;
 
+        /**
+         * Instantiates a new test case identifier.
+         * 
+         * @param file
+         *                the file
+         * @param method
+         *                the method
+         */
         public TestCaseIdentifier(String file, String method) {
             this.file = file;
             this.method = method;
         }
 
+        /*
+         * (non-Javadoc)
+         * 
+         * @see java.lang.Object#equals(java.lang.Object)
+         */
         public boolean equals(Object o) {
             if (o instanceof TestCaseIdentifier) {
                 TestCaseIdentifier tci = (TestCaseIdentifier) o;
@@ -1123,20 +1750,127 @@ public class VisualDebugger {
             return false;
         }
 
+        /**
+         * Gets the file.
+         * 
+         * @return the file
+         */
         public String getFile() {
             return file;
         }
 
+        /**
+         * Gets the method.
+         * 
+         * @return the method
+         */
         public String getMethod() {
             return method;
         }
 
+        /*
+         * (non-Javadoc)
+         * 
+         * @see java.lang.Object#hashCode()
+         */
         public int hashCode() {
             return (method.concat(file)).hashCode();
         }
 
+        /*
+         * (non-Javadoc)
+         * 
+         * @see java.lang.Object#toString()
+         */
         public String toString() {
             return "File: " + file + " Method: " + method;
         }
     }
+
+    /**
+     * Adds the pm to proof starter.
+     * 
+     * @param pm
+     *                the pm
+     */
+    public void addPMtoProofStarter(ProgressMonitor pm) {
+        this.etProgressMonitor = pm;
+        ETProverTaskListener proverTaskListener = new ETProverTaskListener(
+                etProgressMonitor);
+        mediator.getInteractiveProver().addProverTaskListener(
+                proverTaskListener);
+
+    }
+
+    /**
+     * The Nested Class ETProverTaskListener.
+     * 
+     * Implements the ProverTaskListener Interface. Serves as wrapper for the
+     * ExcecutionTreeView's progressmonitor. The Instance of
+     * ETProverTaskListener is registered to the KeYMediator.
+     */
+    static class ETProverTaskListener implements ProverTaskListener {
+
+        /** The pm. */
+        private ProgressMonitor pm = null;
+
+        /**
+         * Instantiates a new PM.
+         * 
+         * @param pm
+         *                the ProgressMonitor
+         */
+        public ETProverTaskListener(ProgressMonitor pm) {
+            this.pm = pm;
+        }
+
+        // reset progressbar when task is finished
+        /*
+         * (non-Javadoc)
+         * 
+         * @see de.uka.ilkd.key.gui.ProverTaskListener#taskFinished()
+         */
+        public void taskFinished(TaskFinishedInfo info) {
+            // TODO Auto-generated method stub
+            pm.setProgress(300);
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see de.uka.ilkd.key.gui.ProverTaskListener#taskProgress(int)
+         */
+        public void taskProgress(int position) {
+
+            pm.setProgress(position);
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see de.uka.ilkd.key.gui.ProverTaskListener#taskStarted(java.lang.String,
+         *      int)
+         */
+        public void taskStarted(String message, int size) {
+            // System.out.println("taskStarted -size:" + size);
+            pm.setMaximum(300);
+
+        }
+
+        
+    }
+
+    public WatchPointManager getWatchPointManager() {
+        return watchPointManager;
+    }
+
+    public void setWatchPointManager(WatchPointManager watchPointManager) {
+        this.watchPointManager = watchPointManager;
+    }
+
+    public ProgressMonitor getEtProgressMonitor() {
+        return etProgressMonitor;
+    }
+
+
 }

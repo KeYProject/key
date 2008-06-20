@@ -57,8 +57,6 @@ class SubstitutionTerm extends Term {
 	    (new QuantifiableVariable[] {substVar});
 	this.depth = 1+(subs[0].depth() > subs[1].depth() ? 
 			subs[0].depth() : subs[1].depth());
-
-	fillCaches();
     }
 
     /**

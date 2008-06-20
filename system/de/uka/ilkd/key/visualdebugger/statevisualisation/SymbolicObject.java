@@ -21,11 +21,11 @@ import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 
 public class SymbolicObject {
 
-    private final HashMap associations = new HashMap();
+    private final HashMap<IProgramVariable, SymbolicObject> associations = new HashMap<IProgramVariable, SymbolicObject>();
 
-    private final HashMap attr2Constraint = new HashMap();
+    private final HashMap<ProgramVariable, ListOfTerm> attr2Constraint = new HashMap<ProgramVariable, ListOfTerm>();
 
-    private HashMap attr2ValueTerm = new HashMap();
+    private HashMap<ProgramVariable, Term> attr2ValueTerm = new HashMap<ProgramVariable, Term>();
 
     private int id;
 
@@ -35,9 +35,9 @@ public class SymbolicObject {
 
     private ProgramMethod method = null;
 
-    private HashMap par2constraint = new HashMap();
+    private HashMap<ProgramVariable, ListOfTerm> par2constraint = new HashMap<ProgramVariable, ListOfTerm>();
 
-    private HashMap par2value = new HashMap();
+    private HashMap<ProgramVariable, Object> par2value = new HashMap<ProgramVariable, Object>();
 
     private ListOfProgramVariable parameter;
 
@@ -79,7 +79,7 @@ public class SymbolicObject {
 
     public void addAttributeConstraint(ProgramVariable f, Term o) {
         if (attr2Constraint.containsKey(f)) {
-            ListOfTerm t = (ListOfTerm) attr2Constraint.get(f);
+            ListOfTerm t = attr2Constraint.get(f);
             t = t.append(o);
             attr2Constraint.remove(f);
             attr2Constraint.put(f, t);
@@ -104,7 +104,7 @@ public class SymbolicObject {
 
     public void addParameterConstraint(ProgramVariable f, ListOfTerm o) {
         if (this.par2constraint.containsKey(f)) {
-            ListOfTerm t = (ListOfTerm) par2constraint.get(f);
+            ListOfTerm t = par2constraint.get(f);
             t = t.append(o);
             par2constraint.remove(f);
             par2constraint.put(f, t);
@@ -116,7 +116,7 @@ public class SymbolicObject {
 
     public void addParameterConstraint(ProgramVariable f, Term o) {
         if (this.par2constraint.containsKey(f)) {
-            ListOfTerm t = (ListOfTerm) par2constraint.get(f);
+            ListOfTerm t = par2constraint.get(f);
             t = t.append(o);
             par2constraint.remove(f);
             par2constraint.put(f, t);
@@ -151,33 +151,33 @@ public class SymbolicObject {
         }
     }
 
-    public Collection getAllAssociationEnds() {
+    public Collection<SymbolicObject> getAllAssociationEnds() {
         return this.associations.values();
 
     }
 
     public SetOfProgramVariable getAllModifiedPrimitiveAttributes() {
         SetOfProgramVariable result = SetAsListOfProgramVariable.EMPTY_SET;
-        Set s = attr2ValueTerm.keySet();
-        for (Iterator it = s.iterator(); it.hasNext();) {
-            result = result.add((ProgramVariable) it.next());
+        Set<ProgramVariable> s = attr2ValueTerm.keySet();
+        for (Iterator<ProgramVariable> it = s.iterator(); it.hasNext();) {
+            result = result.add(it.next());
         }
         return result;
     }
 
     public SymbolicObject getAssociationEnd(ProgramVariable f) {
-        return (SymbolicObject) associations.get(f);
+        return associations.get(f);
     }
 
     public ListOfTerm getAttrConstraints(ProgramVariable f) {
-        return (ListOfTerm) attr2Constraint.get(f);
+        return attr2Constraint.get(f);
     }
 
     public SetOfProgramVariable getAttributes() {
         SetOfProgramVariable result = SetAsListOfProgramVariable.EMPTY_SET;
-        Set s = attr2Constraint.keySet();
-        for (Iterator it = s.iterator(); it.hasNext();) {
-            result = result.add((ProgramVariable) it.next());
+        Set<ProgramVariable> s = attr2Constraint.keySet();
+        for (Iterator<ProgramVariable> it = s.iterator(); it.hasNext();) {
+            result = result.add(it.next());
         }
         return result;
     }
@@ -196,15 +196,15 @@ public class SymbolicObject {
 
     public SetOfProgramVariable getNonPrimAttributes() {
         SetOfProgramVariable result = SetAsListOfProgramVariable.EMPTY_SET;
-        Set s = associations.keySet();
-        for (Iterator it = s.iterator(); it.hasNext();) {
+        Set<IProgramVariable> s = associations.keySet();
+        for (Iterator<IProgramVariable> it = s.iterator(); it.hasNext();) {
             result = result.add((ProgramVariable) it.next());
         }
         return result;
     }
 
     public ListOfTerm getParaConstraints(ProgramVariable f) {
-        return (ListOfTerm) this.par2constraint.get(f);
+        return this.par2constraint.get(f);
     }
 
     public ListOfProgramVariable getParameter() {
@@ -233,7 +233,7 @@ public class SymbolicObject {
     }
 
     public Term getValueTerm(ProgramVariable pv) {
-        return (Term) this.attr2ValueTerm.get(pv);
+        return this.attr2ValueTerm.get(pv);
     }
 
     public boolean isNull() {

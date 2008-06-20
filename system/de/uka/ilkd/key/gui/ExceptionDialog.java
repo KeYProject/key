@@ -198,15 +198,30 @@ public class ExceptionDialog extends JDialog {
 
 
     public ExceptionDialog(Dialog parent, ExtList excList) {
-	 super(parent, "Parser Messages", true); 
-	 init(excList);
-    }
+        super(parent, "Parser Messages", true); 
+        init(excList);
+   }
+
+    public ExceptionDialog(Dialog parent, Exception exc) {
+        super(parent, "Parser Messages", true); 
+        ExtList msgList = new ExtList();
+        msgList.add(exc);
+        init(msgList);
+   }
 
     public ExceptionDialog(JFrame parent, ExtList excList) {
         super(parent, "Parser Messages", true);   
         init(excList);
     }
     
+    public ExceptionDialog(JFrame parent, Exception exc) {
+        super(parent, "Parser Messages", true);   
+        ExtList msgList = new ExtList();
+        msgList.add(exc);
+        init(msgList);
+    }
+
+
     private void init(ExtList excList) {
         buttonPanel = createButtonPanel();
         if (excList.size()!=0) {

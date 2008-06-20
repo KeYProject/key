@@ -7,9 +7,7 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.visualdebugger;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.proof.*;
@@ -21,6 +19,7 @@ import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.ProgressMonitor;
+
 
 /**
  * Starts and runs a proof attempt mostly separated from the rest of the KeY
@@ -38,7 +37,7 @@ public class ProofStarter {
 
     private Strategy strategy;
 
-    private List progressMonitors = new LinkedList();
+    private List<ProgressMonitor> progressMonitors = new LinkedList<ProgressMonitor>();
 
     private boolean useDecisionProcedures;
     
@@ -195,7 +194,9 @@ public class ProofStarter {
             throw new IllegalStateException(
                     "Proofstarter must be initialized before.");
         }
-
+        
+        proof.setProofEnv(env);
+        
         final Strategy oldStrategy = proof.getActiveStrategy();
         if (strategy == null) {
             // in this case take the strategy of the proof settings
@@ -203,12 +204,10 @@ public class ProofStarter {
         } else {
             proof.setActiveStrategy(strategy);
         }
-
         if (maxSteps == -1) {
             // take default settings
             setMaxSteps(proof.getSettings().getStrategySettings().getMaxSteps());
         }
-
         final BuiltInRule decisionProcedureRule;
         if (useDecisionProcedures) {
             decisionProcedureRule = findSimplifyRule();
@@ -220,32 +219,38 @@ public class ProofStarter {
         goalChooser.init(proof, proof.openGoals());
         final ProofListener pl = new ProofListener();
 
-        Goal.addRuleAppListener(pl);
+        //%%% HACK !!!! Remove as soon as possible
+        List backup = Goal.getRuleAppListener();
+        Goal.setRuleAppListenerList((Collections.synchronizedList(new ArrayList(10))));
+        //%%% END OF HACK 
         
-        ProofAggregate proofList = null;
-
+        Goal.addRuleAppListener(pl);
+       
         try {
-            proofList = po.getPO();
- 
             int countApplied = 0;
-            synchronized (progressMonitors) {
-                initProgressMonitors(maxSteps);
-                while (countApplied < maxSteps && applyAutomaticRule()) {
-                    countApplied++;
-                    informProgressMonitors(countApplied);
-                }
+
+            initProgressMonitors(maxSteps);
+            while (countApplied < maxSteps && applyAutomaticRule()) {
+                countApplied++;
+                informProgressMonitors(countApplied);
+
             }
             if (useDecisionProcedures && decisionProcedureRule != null) {
                 applySimplificationOnGoals(proof.openGoals(), decisionProcedureRule);
-            }            
+            }      
         } catch (Throwable e) {
             System.err.println(e);
             e.printStackTrace();
             return false;
-        } finally {
+        } finally {            
             Goal.removeRuleAppListener(pl);
+            Goal.setRuleAppListenerList(backup);
+            try {
+                env.removeProofList(po.getPO());
+            } catch (ProofInputException e) {
+                e.printStackTrace();
+            }
             proof.setActiveStrategy(oldStrategy);
-            env.removeProofList(proofList);
         }
 
         return true;

@@ -100,9 +100,9 @@ public class DefaultGoalChooser implements IGoalChooser {
                 nextGoals = nextGoals.tail ();
             }
         } else {
-            ++nextGoalCounter;
+	    ++nextGoalCounter;
             if ( nextGoalCounter % 100 == 0 )
-                selectedList = rotateList ( selectedList );
+	       selectedList = rotateList ( selectedList );
 
             result = selectedList.isEmpty () ? null : selectedList.head ();
         }

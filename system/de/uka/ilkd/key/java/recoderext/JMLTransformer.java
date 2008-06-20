@@ -29,6 +29,7 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.Constructor;
 import recoder.abstraction.Method;
+import recoder.io.DataLocation;
 import recoder.java.Comment;
 import recoder.java.CompilationUnit;
 import recoder.java.Declaration;
@@ -56,11 +57,6 @@ public class JMLTransformer extends RecoderModelTransformer {
                                                          "public", 
                                                          "static"});    
     
-    private final boolean parsingLibs;
-
-    
-    
-
 
     /**
      * Creates a transformation that adds JML specific elements, for example
@@ -76,9 +72,8 @@ public class JMLTransformer extends RecoderModelTransformer {
      *                for local classes.
      */
     public JMLTransformer(CrossReferenceServiceConfiguration services,
-            TransformerCache cache, boolean parsingLibs) {
+            TransformerCache cache) {
         super(services, cache);
-        this.parsingLibs = parsingLibs;
     }
 
    
@@ -250,8 +245,8 @@ public class JMLTransformer extends RecoderModelTransformer {
         //determine parent, child index
         NonTerminalProgramElement astParent
             = originalComments[0].getParent().getASTParent();
-        int childIndex = 0;
-            //= astParent.getIndexOfChild(originalComments[0].getParent());
+        int childIndex
+            = astParent.getIndexOfChild(originalComments[0].getParent());
 
         //parse declaration, attach to AST
         Declaration ghostDecl;
@@ -261,6 +256,15 @@ public class JMLTransformer extends RecoderModelTransformer {
                     = services.getProgramFactory()
                               .parseFieldDeclaration(declWithMods.text);
                 updatePositionInformation(ghostDecl, declWithMods.pos);
+                
+                //set comments: the original list of comments with the declaration, 
+                //and the JML modifiers
+                ASTList<Comment> newComments = new ASTArrayList<Comment>(Arrays.asList(originalComments));
+                Comment jmlComment = new Comment(getJMLModString(decl.getMods()));
+                jmlComment.setParent(ghostDecl);
+                newComments.add(jmlComment);
+                ghostDecl.setComments(newComments);
+                
                 attach((FieldDeclaration)ghostDecl, 
                        (TypeDeclaration) astParent, 
                        childIndex);
@@ -287,17 +291,9 @@ public class JMLTransformer extends RecoderModelTransformer {
         }
 
         //add ghost modifier
-        ASTArrayList<DeclarationSpecifier> mods = new ASTArrayList<DeclarationSpecifier>();
+        ASTList<DeclarationSpecifier> mods = ghostDecl.getDeclarationSpecifiers();
         mods.add(new Ghost());
         ghostDecl.setDeclarationSpecifiers(mods);
-            
-        //set comments: the original list of comments with the declaration, 
-        //and the JML modifiers
-        ASTList<Comment> newComments = new ASTArrayList<Comment>(Arrays.asList(originalComments));
-        Comment jmlComment = new Comment(getJMLModString(decl.getMods()));
-        jmlComment.setParent(ghostDecl);
-        newComments.add(jmlComment);
-        ghostDecl.setComments(newComments);
     }
     
 
@@ -342,7 +338,7 @@ public class JMLTransformer extends RecoderModelTransformer {
         }
         
         //add model modifier
-        ASTArrayList<DeclarationSpecifier> mods = new ASTArrayList<DeclarationSpecifier>();
+        ASTList<DeclarationSpecifier> mods = methodDecl.getDeclarationSpecifiers();
         mods.add(new Model());
         methodDecl.setDeclarationSpecifiers(mods);
         
@@ -491,11 +487,6 @@ public class JMLTransformer extends RecoderModelTransformer {
     
     
     public void makeExplicit() {
-        //abort if library class (TODO: remove this)
-        if(parsingLibs) {
-            return;
-        }
-        
         //abort if JML is disabled
         if(!ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().useJML()) {
             return;
@@ -514,7 +505,12 @@ public class JMLTransformer extends RecoderModelTransformer {
                     List<? extends Constructor> constructorList = td.getConstructors();
                     List<Method> methodList = td.getMethods();
                     
-                    transformClasslevelComments(td, unit.getName());
+                    // fix mu: units carry an artificial file name.
+                    // use getOriginalDataLocation instead
+                    DataLocation dl = unit.getOriginalDataLocation();
+                    String fileName = dl == null ? "" : dl.toString();
+                    
+                    transformClasslevelComments(td, fileName);
                     
                     //iterate over all pre-existing constructors
                     for(int k = 0, o = constructorList.size(); k < o; k++) {
@@ -541,7 +537,11 @@ public class JMLTransformer extends RecoderModelTransformer {
                 }
             }
         } catch(SLTranslationException e) {
-            RuntimeException runtimeE = new RuntimeException(e);
+            RuntimeException runtimeE 
+            	= new RuntimeException(e.getMessage() 
+            		               + "\n" + e.getFileName() 
+            		               + ", line " + e.getLine()
+            		               + ", column " + e.getColumn());
             runtimeE.setStackTrace(e.getStackTrace());
             throw runtimeE;
         }

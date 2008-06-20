@@ -75,7 +75,7 @@ public class ApplyStrategy {
     public ApplyStrategy(KeYMediator medi) {
 	this.medi = medi;
         medi.addRuleAppListener( proofListener );
-        this.goalChooser = medi.getProfile().getSelectedGoalChooserBuilder().create();
+        this.goalChooser = medi.getProfile().getSelectedGoalChooserBuilder().create();        
     }
     
     
@@ -279,7 +279,7 @@ public class ApplyStrategy {
     
 	/** invoked when a rule has been applied */
 	public void ruleApplied(ProofEvent e) {
-            if (!isAutoModeActive()) return;
+            if (!isAutoModeActive() || e.getSource() != proof) return;            
 	    RuleAppInfo rai = e.getRuleAppInfo ();
 	    if ( rai == null )
 		return;

@@ -25,6 +25,7 @@ public class KeYCrossReferenceServiceConfiguration
 	super(); // initialises servConf
 	// better not: it might add to the input path of recoder
 	// getProjectSettings().ensureSystemClassesAreInPath();
+	assert keh != null : "The exception handler must not be null";
 	getProjectSettings().setErrorHandler( (recoder.service.ErrorHandler)(keh) );
     }
 
@@ -33,21 +34,8 @@ public class KeYCrossReferenceServiceConfiguration
 	this.kpmi = kpmi;
     }
 
-    protected void makeServices() { 
-	super.makeServices();
-    }
-
-    protected void initServices() { 
-	super.initServices();
-	
-    }
-
     protected ProgramFactory makeProgramFactory() {
-	return ProofJavaProgramFactory.getInstance();
-    }
-
-    protected ChangeHistory makeChangeHistory() {
-	return new ChangeHistory(this);
+        return ProofJavaProgramFactory.getInstance();
     }
 
     /**
@@ -56,34 +44,14 @@ public class KeYCrossReferenceServiceConfiguration
      */
     protected SourceInfo makeSourceInfo() {
  	return new KeYCrossReferenceSourceInfo(this);
-    }  
-
-    protected ProjectSettings makeProjectSettings() {
-	return new ProjectSettings(this);
-    }
-
-    protected SourceFileRepository makeSourceFileRepository() {
-	return new DefaultSourceFileRepository(this);
     }
     
-    protected ClassFileRepository makeClassFileRepository() {
-	return new DefaultClassFileRepository(this);
-    }
-
-    protected ByteCodeInfo makeByteCodeInfo() {
-	return new DefaultByteCodeInfo(this);
-    }
-
-    protected ImplicitElementInfo makeImplicitElementInfo() {
-	return new DefaultImplicitElementInfo(this);
+    protected SourceFileRepository makeSourceFileRepository() {
+        return new KeYCrossReferenceSourceFileRepository(this);
     }
 
     protected NameInfo makeNameInfo() {
-	return new DefaultNameInfo(this);
-    }
-
-    protected ConstantEvaluator makeConstantEvaluator() {
-	return new DefaultConstantEvaluator(this);
+	return new KeYCrossReferenceNameInfo(this);
     }
 
     public KeYProgModelInfo getKeYProgModelInfo(){

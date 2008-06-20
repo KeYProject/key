@@ -17,13 +17,7 @@ header {
   import antlr.*;
 
   import java.io.*;
-  import java.util.List;
-  import java.util.Iterator;
-  import java.util.ArrayList;
-  import java.util.LinkedList;
-  import java.util.HashMap;
-  import java.util.HashSet;
-  import java.util.Vector;
+  import java.util.*;
   import java.math.BigInteger;
 
   import de.uka.ilkd.key.collection.ListOfString;
@@ -925,7 +919,7 @@ options {
         namespaces().setVariables(variables().parent());
     }
 
-    private void bindProgVars(HashSet progVars) {
+    private void bindProgVars(Set progVars) {
 	namespaces().setProgramVariables(new Namespace(programVariables()));
 	Iterator it=progVars.iterator();
 	while (it.hasNext()) {
@@ -942,7 +936,7 @@ options {
         }
     }
 
-    private HashSet progVars(JavaBlock jb) {
+    private Set progVars(JavaBlock jb) {
 	if(isGlobalDeclTermParser()) {
   	  ProgramVariableCollector pvc
 	      = new ProgramVariableCollector(jb.program(), getServices());
@@ -4634,6 +4628,9 @@ problem returns [ Term a = null ]
 	{ if (capturer != null) capturer.mark(); }
         (pref = preferences)
         { if ((pref!=null) && (capturer != null)) capturer.mark(); }
+        
+        stlist = classPaths 
+        // the result is not of importance here, so we use it twice
 
         stlist = javaSource {
           if(stlist != null && stlist.size() > 1)
@@ -4702,6 +4699,28 @@ problem returns [ Term a = null ]
 			setChoiceHelper(SetAsListOfChoice.EMPTY_SET, "");
         }
    ;
+   
+classPaths returns [ListOfString ids = SLListOfString.EMPTY_LIST]
+{
+  String s = null;
+}
+:
+  ( (
+    CLASSPATH 
+    s=string_literal {
+      ids = ids.append(s);
+    }
+    SEMI
+    )
+  | 
+    (
+    NODEFAULTCLASSES {
+      ids = ids.append((String)null);
+    }
+    SEMI
+    )
+  )*
+  ;
 
 javaSource returns [ListOfString ids = SLListOfString.EMPTY_LIST]
 { 

@@ -19,13 +19,11 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class EvaluateArgs extends ProgramMetaConstruct{
@@ -73,9 +71,6 @@ public class EvaluateArgs extends ProgramMetaConstruct{
 	    (MethodReference) (pe instanceof CopyAssignment ? 
 			       ((CopyAssignment)pe).getChildAt(1) : pe);
 	
-	int lastNonSimple = -1;
-	boolean skip = false;
-
 	List<Statement> evalstat = new LinkedList<Statement>();
 
 	final ReferencePrefix newCalled;	
@@ -85,7 +80,6 @@ public class EvaluateArgs extends ProgramMetaConstruct{
 	    !(invocationTarget instanceof ThisReference)) {
 	    newCalled = evaluate
 		((Expression)invocationTarget, evalstat, services, ec);
-	    skip = true;
 	} else {
 	    newCalled = mr.getReferencePrefix();
 	}
@@ -94,29 +88,7 @@ public class EvaluateArgs extends ProgramMetaConstruct{
 	Expression[] newArgs = new Expression[args.size()];
 	for (int i=0; i<args.size(); i++) { 
 	    newArgs[i]=evaluate(args.getExpression(i), evalstat, services, ec);
-
-	    if (ProgramSVSort.NONSIMPLEEXPRESSION.canStandFor
-		(args.getExpression(i), ec, services)) {
-		lastNonSimple = i;
-	    }
 	}
-
-	//Optimisation: If there is a tail of simple expressions they
-	//cannot be influenced by side effects and thus need not to be
-	//evaluated. Also, literals need not to be evaluated.
- 	final Iterator<Statement> statIt = evalstat.iterator();	
-	if (skip) statIt.next(); //leave the first always
- 	if (statIt.hasNext()) {
-	    for (int i=0; i<args.size(); i++) {
-		statIt.next();	
-		if ((args.getExpression(i) instanceof Literal)
-		    || (i > lastNonSimple)) {
-		    statIt.remove();
-		    newArgs[i]=args.getExpression(i);
-		}
-	    }
-	} // end of optimisation
-
 
 	Statement[] res = new Statement[1+evalstat.size()];
 	final Iterator<Statement> it = evalstat.iterator();

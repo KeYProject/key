@@ -37,6 +37,7 @@ import de.uka.ilkd.key.proof.init.EnvInput;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 
 
@@ -110,7 +111,7 @@ public class KeYPlugin extends AbstractUIPlugin
     /**
      * Returns the passed method in KeY representation.
      */
-    private ProgramMethod getProgramMethod(IMethod method, JavaInfo javaInfo) {
+    public ProgramMethod getProgramMethod(IMethod method, JavaInfo javaInfo) {
 	try {
 	    //determine container type
 	    IType containerType = method.getDeclaringType();
@@ -156,10 +157,10 @@ public class KeYPlugin extends AbstractUIPlugin
      * TODO: recursively parse source fragments linked from anywhere else -
      * sensefully integrateable in KeY ??
      */
-    private synchronized InitConfig loadProject(IProject project) 
+    public synchronized InitConfig loadProject(IProject project) 
     		throws ProofInputException {
 	assertTrue(project != null);
-	if(project.equals(lastLoadedProject)) {
+	if (project.equals(lastLoadedProject)) {
 	    assertTrue(lastInitConfig != null);
 	    return lastInitConfig;
 	}
@@ -286,14 +287,15 @@ public class KeYPlugin extends AbstractUIPlugin
 	
 	//show PO browser
 	POBrowser poBrowser = POBrowser.showInstance(initConfig, pm);
-	if(poBrowser.getPO() == null) {
+	ProofOblInput po = poBrowser.getAndClearPO();
+	if(po == null) {
 	    return;
 	}
 	
 	//start proof
 	ProblemInitializer pi = new ProblemInitializer(Main.getInstance());
 	try {
-	    pi.startProver(initConfig, poBrowser.getPO());
+	    pi.startProver(initConfig, po);
 	} catch(ProofInputException e)  {
 	    MessageDialog.openError(PlatformUI.getWorkbench()
 		    .getActiveWorkbenchWindow().getShell(),

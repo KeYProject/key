@@ -56,7 +56,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
      * these subterms should build a new term instead of using the old one,
      * because one of its subterms has been built, too.
      */
-    private final Stack subStack; //of Term (and Boolean)
+    private final Stack<Object> subStack; //of Term (and Boolean)
     private final TermFactory tf = TermFactory.DEFAULT;
     private final Boolean newMarker = new Boolean(true);
     
@@ -87,7 +87,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
 	this.svInstBasename   = svInstBasename;
 	this.allowPartialReplacement = allowPartialReplacement;
 	this.resolveSubsts    = resolveSubsts;
-	subStack = new Stack(); // of Term
+	subStack = new Stack<Object>(); // of Term
     }
 
     public SyntacticalReplaceVisitor(Services              services, 
@@ -207,7 +207,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
      * <code>store</code>. The top element of the stack will be the last
      * element of list <code>store</code>
      */
-    private void popN (int n, LinkedList store) {
+    private void popN (int n, LinkedList<Object> store) {
         for ( int i = 0; i < n; i++ ) {
             store.addFirst ( subStack.pop () );
             if ( subStack.peek () == newMarker ) {
@@ -220,8 +220,8 @@ public class SyntacticalReplaceVisitor extends Visitor {
      * Push the given objects on the subterm stack, in the order in which they
      * are returned by the method <code>iterator</code>
      */
-    private void push (Collection store) {
-        final Iterator it = store.iterator ();
+    private void push (Collection<Object> store) {
+        final Iterator<Object> it = store.iterator ();
         while ( it.hasNext () )
             subStack.push ( it.next () );
     }
@@ -236,7 +236,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
     
     private void pushNewAt(Object[] t, int posFromTop) {
 
-	final LinkedList store = new LinkedList();
+	final LinkedList<Object> store = new LinkedList<Object>();
 	popN ( posFromTop, store );
 
 	for (int i = 0; i<t.length; i++) {
@@ -249,11 +249,11 @@ public class SyntacticalReplaceVisitor extends Visitor {
 
     private void replaceAt (Object[] t, int posFromTop, int length) {
 
-	final LinkedList store = new LinkedList();
+	final LinkedList<Object> store = new LinkedList<Object>();
 	popN ( posFromTop, store );
 
 	// remove 
-	popN ( length, new LinkedList () );
+	popN ( length, new LinkedList<Object> () );
 
 	// add new 
 	for (int i = 0; i<t.length; i++) {	    
@@ -268,10 +268,10 @@ public class SyntacticalReplaceVisitor extends Visitor {
 
 	final Term[] result = new Term[length];
 
-	final LinkedList store = new LinkedList();
+	final LinkedList<Object> store = new LinkedList<Object>();
 	popN ( pos + length, store );
 
-	final Iterator it = store.iterator ();
+	final Iterator<Object> it = store.iterator ();
         for ( int i = 0; i < length; i++ ) {
             Object o = it.next ();
             if ( o == newMarker ) o = it.next ();

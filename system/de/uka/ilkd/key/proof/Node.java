@@ -10,11 +10,10 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.lang.ref.WeakReference;
 import java.util.*;
 
-import de.uka.ilkd.key.logic.Constraint;
-import de.uka.ilkd.key.logic.ListOfRenamingTable;
-import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.incclosure.*;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
@@ -23,7 +22,7 @@ import de.uka.ilkd.key.util.Debug;
 
 public class Node {
     /** the proof the node belongs to */
-    private Proof                proof;
+    private Proof               proof;
 
     private Sequent              seq                 = Sequent.EMPTY_SEQUENT;
 
@@ -252,7 +251,7 @@ public class Node {
 
 	    if ( forkMerger == null )
 		forkMerger = new MultiMerger ( branchSink, p_count, 
-                proof.getServices() );
+                proof().getServices() );
 	    else {
 		i = forkMerger.getArity ();
 		forkMerger.expand ( i + p_count );
@@ -311,7 +310,7 @@ public class Node {
         child.siblingNr = children.size();
 	children.add(child);
 	child.parent = this;
-	proof.fireProofExpanded(this);
+	proof().fireProofExpanded(this);
     }
 
     /** removes child/parent relationship between this node and its
@@ -493,7 +492,7 @@ public class Node {
 
 	RuleApp rap = getAppliedRuleApp();
         if (rap == null) {
-	    Goal goal = proof.getGoal(this);
+	    Goal goal = proof().getGoal(this);
 	    if ( goal == null
                  || proof ().getUserConstraint ().displayClosed ( this ) )
                 return "Closed goal";

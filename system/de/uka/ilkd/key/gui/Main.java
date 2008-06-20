@@ -63,7 +63,9 @@ import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
-import de.uka.ilkd.key.util.*;
+import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.KeYExceptionHandler;
+import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -327,12 +329,22 @@ public class Main extends JFrame implements IMain {
      * @param visible a boolean indicating if Main shall be made visible
      * @return the instance of Main
      */
-    public static Main getInstance(boolean visible) {
+    public static Main getInstance(final boolean visible) {
         if (instance == null) {
             instance = new Main("KeY -- Prover");
         }
-        if (!instance.isVisible())
-            instance.setVisible(visible); // XXX: enough?
+        if (!instance.isVisible()) {
+            if (SwingUtilities.isEventDispatchThread()) {
+                instance.setVisible(visible); // XXX: enough?
+            } else {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {                            
+                        if (!instance.isVisible())
+                            instance.setVisible(visible);
+                    }
+                });
+            }
+        }
         return instance;
     }
     
@@ -633,7 +645,7 @@ public class Main extends JFrame implements IMain {
         
         statusLine = new MainStatusLine("<html>" + PARA + COPYRIGHT + PARA
                 + "KeY is free software and comes with ABSOLUTELY NO WARRANTY."
-                + " See Help | License.", getFont());
+                + " See About | License.", getFont());
         getContentPane().add(statusLine, BorderLayout.SOUTH);
         setupInternalInspection();
     }
@@ -955,15 +967,13 @@ public class Main extends JFrame implements IMain {
 	}else{
 	    POBrowser poBrowser 
 	    	= POBrowser.showInstance(mediator.getProof().env().getInitConfig());
-	    if(poBrowser.getPO() != null) {
+	    ProofOblInput po = poBrowser.getAndClearPO();
+	    if(po != null) {
 		ProblemInitializer pi = new ProblemInitializer(this);
 		try {
-		    pi.startProver(mediator.getProof().env(), 
-			    	   poBrowser.getPO());
+		    pi.startProver(mediator.getProof().env(), po);
 		} catch(ProofInputException e)  {
-		    ExtList list = new ExtList();
-		    list.add(e);
-		    new ExceptionDialog(this, list);
+		    new ExceptionDialog(this, e);
 		}
 	    }
 	}
@@ -1611,6 +1621,9 @@ public class Main extends JFrame implements IMain {
         return result;
     }
     
+    public JPanel getProofView(){
+        return proofView;
+    }
     
     public JMenu createHelpMenu() {
         JMenu help = new JMenu("About");
@@ -1860,7 +1873,7 @@ public class Main extends JFrame implements IMain {
 	    final TaskTreeNode rootTask = 
 		proof.getBasicTask().getRootTask();	
 	    proofList.removeTask(rootTask);   
-	    
+	    proof.getServices().getSpecificationRepository().removeProof(proof);
             ((ProofTreeView)proofView.getComponent(0)).removeProofs(rootTask.allProofs());
 	}
     }
@@ -1872,7 +1885,8 @@ public class Main extends JFrame implements IMain {
             final TaskTreeNode rootTask = 
                 proof.getBasicTask().getRootTask();     
             proofList.removeTaskWithoutInteraction(rootTask);   
-            
+            proof.getServices().getSpecificationRepository().removeProof(proof);
+            proof.mgt().removeProofListener();
             ((ProofTreeView)proofView.getComponent(0)).removeProofs(rootTask.allProofs());
         }
     }
@@ -1918,8 +1932,7 @@ public class Main extends JFrame implements IMain {
     }
     
     protected Proof setUpNewProof(Proof proof) {
-        KeYMediator localMediator = mediator();
-        localMediator.setProof(proof);
+        mediator().setProof(proof);
         return proof;
     }
     
@@ -3188,9 +3201,7 @@ public class Main extends JFrame implements IMain {
                         try{
                             runTest(tam.test, tam.model);
                         }catch(Exception exc){
-                            ExtList l = new ExtList();
-                            l.add(exc);
-                            new ExceptionDialog(testGui, l);    
+                            new ExceptionDialog(testGui, exc);    
                         }
                     }
                 }
@@ -3583,9 +3594,7 @@ public class Main extends JFrame implements IMain {
                                         }
                                         main.setStatusLine("Test Generation Completed");
                                     }catch(Exception exc){
-                                        ExtList l = new ExtList();
-                                        l.add(exc);
-                                        new ExceptionDialog(testGui, l);
+                                        new ExceptionDialog(testGui, exc);
                                     }
                                     creatingTests = false;
                                     enable();

@@ -29,6 +29,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.logic.op.IteratorOfProgramMethod;
 import de.uka.ilkd.key.logic.op.ListOfProgramMethod;
@@ -46,10 +47,13 @@ class ClassTree extends JTree {
     //-------------------------------------------------------------------------    
 
     public ClassTree(boolean addOperations, 
+	             boolean skipLibraryClasses,
 	    	     KeYJavaType defaultClass,
 	    	     ProgramMethod defaultPm,
 	    	     Services services) {
-	super(new DefaultTreeModel(createTree(addOperations, services)));
+	super(new DefaultTreeModel(createTree(addOperations, 
+					      skipLibraryClasses, 
+					      services)));
 	if(defaultPm != null) {
 	    defaultClass = defaultPm.getContainerType();
 	}
@@ -190,7 +194,8 @@ class ClassTree extends JTree {
                     }
                     sb.append(")");
                     Entry te = new Entry(sb.toString());
-                    DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(te);
+                    DefaultMutableTreeNode childNode 
+                    	= new DefaultMutableTreeNode(te);
                     te.pm = pm;
                     node.add(childNode);
                 }
@@ -200,20 +205,25 @@ class ClassTree extends JTree {
 
     
     private static DefaultMutableTreeNode createTree(boolean addOperations,
+	    					     boolean skipLibraryClasses,
 	    					     Services services) {
 	//get all classes
-	final Set<KeYJavaType> kjts = services.getJavaInfo().getAllKeYJavaTypes();
+	final Set<KeYJavaType> kjts 
+		= services.getJavaInfo().getAllKeYJavaTypes();
 	final Iterator<KeYJavaType> it = kjts.iterator();
 	while(it.hasNext()) {
 	    KeYJavaType kjt = it.next();
 	    if(!(kjt.getJavaType() instanceof ClassDeclaration 
-		 || kjt.getJavaType() instanceof InterfaceDeclaration)) {
+		 || kjt.getJavaType() instanceof InterfaceDeclaration) 
+		 || (((TypeDeclaration) kjt.getJavaType()).isLibraryClass() 
+		       && skipLibraryClasses)) {
 		it.remove();
 	    }
 	}
 	
         //sort classes alphabetically
-        final KeYJavaType[] kjtsarr = kjts.toArray(new KeYJavaType[kjts.size()]);
+        final KeYJavaType[] kjtsarr 
+        	= kjts.toArray(new KeYJavaType[kjts.size()]);
         Arrays.sort(kjtsarr, new Comparator<KeYJavaType>() {
             public int compare(KeYJavaType o1, KeYJavaType o2) {
                 return o1.getFullName().compareTo(o2.getFullName());
@@ -233,7 +243,8 @@ class ClassTree extends JTree {
     
     private void open(KeYJavaType kjt, ProgramMethod pm) {
         //get tree path to class
-        Vector<DefaultMutableTreeNode> pathVector = new Vector<DefaultMutableTreeNode>();
+        Vector<DefaultMutableTreeNode> pathVector 
+        	= new Vector<DefaultMutableTreeNode>();
         String fullClassName = kjt.getFullName();
         int length = fullClassName.length();
         int index = -1;

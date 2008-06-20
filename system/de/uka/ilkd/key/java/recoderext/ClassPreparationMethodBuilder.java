@@ -56,7 +56,7 @@ public class ClassPreparationMethodBuilder
 	CLASS_PREPARE_IDENTIFIER = "<clprepare>";
 
     /** maps a class to its static NON CONSTANT fields */
-    private HashMap class2staticFields;
+    private HashMap<ClassDeclaration, ASTList<Statement>> class2staticFields;
 
     /**  
      * Creates an instance of the class preparation method model
@@ -76,7 +76,7 @@ public class ClassPreparationMethodBuilder
 	(CrossReferenceServiceConfiguration services, 
 	 TransformerCache cache) {	
 	super(services, cache);
-	class2staticFields = new HashMap(10*getUnits().size());
+	class2staticFields = new HashMap<ClassDeclaration, ASTList<Statement>>(10*getUnits().size());
     }
 
     /** 
@@ -125,14 +125,12 @@ public class ClassPreparationMethodBuilder
 		if (ident instanceof ImplicitIdentifier) {	    
 		    result.add(new CopyAssignment
 		            (new PassiveExpression
-		                    (new FieldReference
-		                            ((ImplicitIdentifier)ident.deepClone())), 
+		                    (new FieldReference(ident.deepClone())), 
 		                            getDefaultValue(spec.getType())));		    
 		} else {
 		   result.add(new CopyAssignment
 			(new PassiveExpression
-			 (new FieldReference
-			  ((Identifier)ident.deepClone())), 
+			 (new FieldReference(ident.deepClone())), 
 			 getDefaultValue(spec.getType())));
 		}
 	    }
@@ -149,15 +147,12 @@ public class ClassPreparationMethodBuilder
     }
     
     public ProblemReport analyze() {
-	for (int unit = 0; unit<getUnits().size(); unit++) {
-	    CompilationUnit cu = getUnits().get(unit);
-	    int typeCount = cu.getTypeDeclarationCount();
-	    
+	for (final CompilationUnit cu : getUnits()) {
+	    final int typeCount = cu.getTypeDeclarationCount();	    
 	    for (int i = 0; i < typeCount; i++) {
 		if (cu.getTypeDeclarationAt(i) instanceof ClassDeclaration)
 		    { 
-			ClassDeclaration cd = (ClassDeclaration)
-			    cu.getTypeDeclarationAt(i);
+			ClassDeclaration cd = (ClassDeclaration) cu.getTypeDeclarationAt(i);
 			if (cd.getTypeDeclarationCount()>0) {
 			    Debug.out
 				("clPrepBuilder: Inner Class detected. " + 
@@ -186,13 +181,10 @@ public class ClassPreparationMethodBuilder
 	modifiers.add(new Private());
 	return new MethodDeclaration(modifiers, 
 				     null,  // return type is void
-				     new ImplicitIdentifier
-				     (CLASS_PREPARE_IDENTIFIER),
+				     new ImplicitIdentifier(CLASS_PREPARE_IDENTIFIER),
 				     new ASTArrayList<ParameterDeclaration>(0), 
 				     null, // no throws
-				     new StatementBlock
-				     ((ASTList<Statement>)
-				      class2staticFields.get(td)));
+				     new StatementBlock(class2staticFields.get(td)));
     }
 
 

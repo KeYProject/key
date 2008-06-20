@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.SwingUtilities;
 
@@ -22,25 +23,19 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.visualdebugger.*;
+import de.uka.ilkd.key.visualdebugger.watchpoints.WatchPoint;
+import de.uka.ilkd.key.visualdebugger.watchpoints.WatchpointUtil;
 
 public class ExecutionTree implements AutoModeListener {
 
     private static ETNode etNodeRoot = null;
-
     private static ETNode etTreeBeforeMerge;
-
     private static boolean hideInf = true;
-
     private static ITNode itNodeRoot = null;
-
     public static final int RAWTREE = 1;
-
     public static final int SLET = 2;
-
     public static final int SLET2 = 3;
-
     public static final int SLET3 = 4;
-
     public static int treeStyle = SLET3;
 
     public static ETNode getETNode() {
@@ -177,7 +172,7 @@ public class ExecutionTree implements AutoModeListener {
         }
 
     }
-
+    
     private void buildITTree(Node n, int currentId, boolean lookingForBC,
             ITNode parent, ListOfTerm terms) {
         int newId = currentId;
@@ -326,6 +321,15 @@ public class ExecutionTree implements AutoModeListener {
         etNodeRoot = etrr2.getChildren()[0];
         simplifyBC(etNodeRoot);
 
+        // identify watchpoints
+        LinkedList<ETNode> allLeafETNodes = WatchpointUtil.getAllLeafETNodes(etNodeRoot);
+        List<WatchPoint> watchpoints = vd.getWatchPointManager()
+        .getListOfWatchpoints(vd.getMediator().getServices());
+        
+        if (!watchpoints.isEmpty()) {
+            WatchpointUtil.setActiveWatchpoint(allLeafETNodes, watchpoints);
+        }
+ 
         fireTreeChanged(root);
     }
 

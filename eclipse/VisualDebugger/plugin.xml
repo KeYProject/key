@@ -52,6 +52,20 @@
             id="visualdebugger.views.SymbolicStateView">
       </view>
    </extension>
+          <extension
+                point="org.eclipse.ui.views">
+             <category
+                   id="VisualDebugger.category1"
+                   name="watchpoints">
+             </category>
+             <view
+                   category="VisualDebugger"
+                   class="visualdebugger.views.WatchpointView"
+                   icon="icons/key-small.png"
+                   id="VisualDebugger.views.Watchpoints"
+                   name="Watchpoints">
+             </view>
+          </extension>
    
    
    <extension

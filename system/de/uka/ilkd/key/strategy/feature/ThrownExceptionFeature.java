@@ -46,7 +46,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
      */
     private ThrownExceptionFeature(String[] p_filteredExceptions,
             Services services) {
-        final List filtered = new ArrayList();
+        final List<Sort> filtered = new ArrayList<Sort>();
 
         final JavaInfo javaInfo = services.getJavaInfo();
 
@@ -57,7 +57,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
                 filtered.add(nullPointer.getSort());
             }
         }
-        filteredExceptions = (Sort[]) filtered.toArray(new Sort[filtered.size()]);
+        filteredExceptions = filtered.toArray(new Sort[filtered.size()]);
     }
 
     private boolean blockedExceptions(Sort excType) {

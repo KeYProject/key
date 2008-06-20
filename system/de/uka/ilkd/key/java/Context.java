@@ -15,6 +15,7 @@ import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
+import de.uka.ilkd.key.util.SpecDataLocation;
 
 /** this class stores recoder related contextinformation used to parse
  * in program parts in which non-declared variables are used
@@ -62,7 +63,7 @@ class Context {
 	(ClassDeclaration classContext) {
 	recoder.java.CompilationUnit cu = new recoder.java.CompilationUnit
 	    (null, new ASTArrayList<recoder.java.Import>(0), inList(classContext));
-	//	cu.setDataLocation(new ContextDataLocation("tmp"+counter++));
+	cu.setDataLocation(new SpecDataLocation("INTERNAL", classContext.getFullName()));
 	return cu;
     }
 

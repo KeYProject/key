@@ -23,10 +23,13 @@ import de.uka.ilkd.key.logic.op.AttributeOp;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IUpdateOperator;
 import de.uka.ilkd.key.logic.op.IteratorOfLocation;
+import de.uka.ilkd.key.logic.IteratorOfTerm;
 import de.uka.ilkd.key.logic.op.Location;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.SetAsListOfLocation;
 import de.uka.ilkd.key.logic.op.SetOfLocation;
+import de.uka.ilkd.key.logic.SetAsListOfTerm;
+import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.sort.ArraySortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
@@ -34,6 +37,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.updatesimplifier.ArrayOfAssignmentPair;
 import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
+import de.uka.ilkd.key.util.Debug;
 
 /* @author Christoph Gladisch
  * This class is necessary for the following rule :
@@ -87,30 +91,40 @@ public class MetaEquivalentUpdates extends AbstractMetaOperator {
     
 	/**	 
 	 *   obl_fi  :=   \forall x1, x2, ... ; ({u1} fi(x1, x2, ...)) = ({u2} fi(x1, x2, ...))
+     *   This method requires as argument the "location term" t and not just the "location operator" of t
+     *   because some operators, e.g. ".length", may have unknown sorts. This caused BUG 0898 resp. 0910.
 	 * */
-	private Term eqUpdWithRespectToTerm(Update upd1, Update upd2, Location op) {
-		final Term[] varArray = new Term[op.arity()];
-		//System.out.println("Location as term(" + t.arity() + "):"
-		//		+ t.toString());
-		for (int j = 0; j < op.arity(); j++) {
-			LogicVariable lv = new LogicVariable(new Name("x" + j),
-                                                 getArgumentSort(op, j));
-                        System.out.println("lv: "+lv);
-                        System.out.println("getArgumentSort("+op+","+ j+"): "+getArgumentSort(op, j));
+	private Term eqUpdWithRespectToTerm(Update upd1, Update upd2, Term t) {
+		final Term[] varArray = new Term[t.arity()];
+		//System.out.println("Location as term(" + t.arity() + "):" + t.toString());
+		for (int j = 0; j < t.arity(); j++) {
+            Sort argSort = getArgumentSort((Location)t.op(), j);
+            if(argSort==null){
+                //If the sort cannot be determined from the operator, then try to derive
+                //the sort from the term arguments
+                Term subj = t.sub(j);
+                argSort = subj.sort();
+                Debug.assertFalse(argSort==null, "Cannot determine sort of argument "+j+
+                            " (it is null) of the following term that stemms " +
+                            "from left-hand side of an update:"+
+                            t.toString());
+                    //System.out.println("getArgumentSort(op, "+j+"):null");
+            }
+			LogicVariable lv = new LogicVariable(new Name("x" + j),argSort);
 			Term vt = tf.createVariableTerm(lv);
 			//System.out.print(" " + vt.toString());
 			varArray[j] = vt;
 		}
 
-        final Term locWithVars = tf.createTerm ( op, varArray,
-                                                 null,
-                                                 JavaBlock.EMPTY_JAVABLOCK );
-		// System.out.println("Term with free variables: " + locWithVars.toString());
-
-		final Term u1t = uf.apply ( upd1, locWithVars );
-        final Term u2t = uf.apply ( upd2, locWithVars );
-
-        return tb.all ( locWithVars.freeVars ().toArray (), tb.equals ( u1t, u2t ) );
+                final Term locWithVars = tf.createTerm ( t.op(), varArray,
+                                                         null,
+                                                         JavaBlock.EMPTY_JAVABLOCK );
+        		// System.out.println("Term with free variables: " + locWithVars.toString());
+        
+        	final Term u1t = uf.apply ( upd1, locWithVars );
+                final Term u2t = uf.apply ( upd2, locWithVars );
+        
+                return tb.all ( locWithVars.freeVars ().toArray (), tb.equals ( u1t, u2t ) );
 	}
 
     private Location getUpdatedOp(AssignmentPair ap) {
@@ -123,6 +137,7 @@ public class MetaEquivalentUpdates extends AbstractMetaOperator {
                 serv.getJavaInfo ().getJavaLangCloneableAsSort ();
             final Sort javaIoSerializable =
                 serv.getJavaInfo ().getJavaIoSerializableAsSort ();
+            
             return ArrayOp.getArrayOp ( ArraySortImpl.getArraySort (
                              getJavaLangObject (), getJavaLangObject (),
                              javaLangCloneable, javaIoSerializable ) );
@@ -134,13 +149,14 @@ public class MetaEquivalentUpdates extends AbstractMetaOperator {
         return serv.getJavaInfo ().getJavaLangObjectAsSort ();
     }
 
-    private SetOfLocation addOperatorsToSet(Update upd,
-                                            SetOfLocation updatedLocs) {
+    private SetOfTerm addLocTermsToSet(Update upd,
+                                            SetOfTerm updatedLocTerms) {
         final ArrayOfAssignmentPair pairs = upd.getAllAssignmentPairs ();
         for ( int i = 0; i < pairs.size (); i++ ) {
-            updatedLocs = updatedLocs.add ( getUpdatedOp ( pairs.getAssignmentPair ( i ) ) );
+            updatedLocTerms = updatedLocTerms.add( pairs.getAssignmentPair ( i ).locationAsTerm());
+            /* updatedLocs = updatedLocs.add ( getUpdatedOp ( pairs.getAssignmentPair ( i ) ) ); BUG 0898*/
         }
-        return updatedLocs;
+        return updatedLocTerms;
     }
 
 	/** 
@@ -149,20 +165,20 @@ public class MetaEquivalentUpdates extends AbstractMetaOperator {
 	 *  obl_fi  :=   \forall x1, x2, ... ; ({u1} fi(x1, x2, ...)) = ({u2} fi(x1, x2, ...))
 	 */
 	private Term eqivalentUpdates(Update upd1, Update upd2) {
-        SetOfLocation updatedLocs = SetAsListOfLocation.EMPTY_SET;
+        	SetOfTerm updatedLocTerms = SetAsListOfTerm.EMPTY_SET;
+                
+                updatedLocTerms = addLocTermsToSet ( upd1, updatedLocTerms );
+                updatedLocTerms = addLocTermsToSet ( upd2, updatedLocTerms );
         
-        updatedLocs = addOperatorsToSet ( upd1, updatedLocs );
-        updatedLocs = addOperatorsToSet ( upd2, updatedLocs );
-
-		// System.out.println("Locations:" + updatedLocs);
-
-        Term res = tb.tt ();
+        		// System.out.println("Locations:" + updatedLocs);
         
-        final IteratorOfLocation locIt = updatedLocs.iterator ();
-        while ( locIt.hasNext () ) {
-            res = tb.and ( res, eqUpdWithRespectToTerm ( upd1, upd2,
-                                                         locIt.next () ) );
-        }
+                Term res = tb.tt ();
+                
+                final IteratorOfTerm termIt = updatedLocTerms.iterator ();
+                while ( termIt.hasNext () ) {
+                    res = tb.and ( res, eqUpdWithRespectToTerm ( upd1, upd2,
+                                                                 termIt.next () ) );
+                }
         
 		return res;
 	}

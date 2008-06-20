@@ -22,17 +22,17 @@ public class AbbrevMap{
      * and Term to Enabled. Enabled is set true if a abbreviation should be used when 
      * printing the term.
      */ 
-    protected HashMap termstring, stringterm, termenabled;
-	protected Boolean TRUE=new Boolean(true);
-	protected Boolean FALSE=new Boolean(false);
+    protected HashMap<AbbrevWrapper, String> termstring;
+    protected HashMap<String, AbbrevWrapper> stringterm;
+    protected HashMap<AbbrevWrapper, Boolean> termenabled;
 
     /**
      * Creates a  AbbrevMap.
      */
     public AbbrevMap(){
-	termstring = new HashMap();
-	stringterm = new HashMap();
-	termenabled = new HashMap();
+	termstring = new HashMap<AbbrevWrapper, String>();
+	stringterm = new HashMap<String, AbbrevWrapper>();
+	termenabled = new HashMap<AbbrevWrapper, Boolean>();
     }
        
     /**
@@ -56,7 +56,7 @@ public class AbbrevMap{
 	scw = new AbbrevWrapper(t); 
 	termstring.put(scw, abbreviation);
 	stringterm.put(abbreviation, scw);
-	termenabled.put(scw, enabled? TRUE : FALSE);
+	termenabled.put(scw, enabled? Boolean.TRUE : Boolean.FALSE);
     }
 
     /**
@@ -97,7 +97,7 @@ public class AbbrevMap{
      * is mapped to the abbreviation.
      */
     public Term getTerm(String s){
-	return ((AbbrevWrapper)stringterm.get(s)).getTerm();
+	return stringterm.get(s).getTerm();
     }
 
     /**
@@ -105,7 +105,7 @@ public class AbbrevMap{
      * is mapped to t.
      */ 
     public String getAbbrev(Term t){
-	return "@"+(String)termstring.get(new AbbrevWrapper(t));
+	return "@"+termstring.get(new AbbrevWrapper(t));
     }
     
     /**
@@ -113,7 +113,7 @@ public class AbbrevMap{
      * be used.
      */
     public boolean isEnabled(Term t){
-	Boolean b=(Boolean) termenabled.get(new AbbrevWrapper(t));
+	Boolean b=termenabled.get(new AbbrevWrapper(t));
 	if(b!=null) return b.booleanValue();
 	return false;
     }
@@ -124,32 +124,33 @@ public class AbbrevMap{
      * @param enabled true if the abbreviation of t may be used.
      */
     public void setEnabled(Term t, boolean enabled){
-	termenabled.put(new AbbrevWrapper(t), enabled? TRUE : FALSE);
+	termenabled.put(new AbbrevWrapper(t), enabled? Boolean.TRUE : Boolean.FALSE);
     }
 
-}
+    public class AbbrevWrapper{
 
-  
-class AbbrevWrapper{
+        private Term t;
 
-    private Term t;
-    
-    public AbbrevWrapper(Term t){
-	this.t =t;
-    }
+        public AbbrevWrapper(Term t){
+            this.t =t;
+        }
 
-    public int hashCode(){
-	return t.hashCode();
-    }
+        public int hashCode(){
+            return t.hashCode();
+        }
 
-    public boolean equals(Object o){
-	if(!(o instanceof AbbrevWrapper)) return false;
-	AbbrevWrapper scw = (AbbrevWrapper) o;
-	if(scw.getTerm()==t) return true;
-	return t.equals(scw.getTerm());
-    } 
+        public boolean equals(Object o){
+            if(!(o instanceof AbbrevWrapper)) return false;
+            AbbrevWrapper scw = (AbbrevWrapper) o;
+            if(scw.getTerm()==t) return true;
+            return t.equals(scw.getTerm());
+        } 
 
-    public Term getTerm(){
-	return t;
+        public Term getTerm(){
+            return t;
+        }
     }
 }
+
+
+

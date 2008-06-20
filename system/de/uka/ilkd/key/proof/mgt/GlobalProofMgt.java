@@ -26,7 +26,8 @@ public class GlobalProofMgt {
 
     private static final GlobalProofMgt INSTANCE = new GlobalProofMgt();
 
-    private Map envKeyToEnv = new HashMap();
+    private Map<EnvKey, List<ProofEnvironment>> envKeyToEnv = 
+        new HashMap<EnvKey, List<ProofEnvironment>>();
 
     private KeYMediator mediator;
 
@@ -45,8 +46,8 @@ public class GlobalProofMgt {
 	if (jmodel==null) {
 	    return null;
 	}
-        List setOfEnv 
-	    = (List) envKeyToEnv.get(new EnvKey(jmodel, ruleConfig));        
+        List<ProofEnvironment> setOfEnv 
+	    = envKeyToEnv.get(new EnvKey(jmodel, ruleConfig));        
 	if (setOfEnv==null || setOfEnv.size()==0) {
 	    return null;
 	} else {
@@ -76,12 +77,12 @@ public class GlobalProofMgt {
     public void registerProofEnvironment(ProofEnvironment env) {
 	EnvKey envKey = new EnvKey(env.getJavaModel(), 
 				   env.getRuleConfig());
-	List listOfEnv = (List) envKeyToEnv.get(envKey);
+	List<ProofEnvironment> listOfEnv = envKeyToEnv.get(envKey);
 	if (listOfEnv==null) {
-	    listOfEnv = new LinkedList();
+	    listOfEnv = new LinkedList<ProofEnvironment>();
 	    envKeyToEnv.put(envKey, listOfEnv);
 	}
-	if(!listOfEnv.contains(env)) {
+	if (!listOfEnv.contains(env)) {
 	    listOfEnv.add(env);
 	    env.setNumber(listOfEnv.size());
 	}
@@ -139,16 +140,16 @@ public class GlobalProofMgt {
     
 
     private Proof[] lookupPrevious(Proof p) {
-	List result = new LinkedList();
-	Iterator it = envKeyToEnv.values().iterator();
+	List<Proof> result = new LinkedList<Proof>();
+	Iterator<List<ProofEnvironment>> it = envKeyToEnv.values().iterator();
 	while (it.hasNext()) {
-	    List envList = (List) it.next();
-	    Iterator envIt = envList.iterator();
+	    List<ProofEnvironment> envList = it.next();
+	    Iterator<ProofEnvironment> envIt = envList.iterator();
 	    while (envIt.hasNext()) {
-		ProofEnvironment env = (ProofEnvironment) envIt.next();
-		Iterator proofListIt = env.getProofs().iterator();
+		ProofEnvironment env = envIt.next();
+		Iterator<ProofAggregate> proofListIt = env.getProofs().iterator();
 		while (proofListIt.hasNext()) {
-		    ProofAggregate pl = (ProofAggregate) proofListIt.next();
+		    ProofAggregate pl = proofListIt.next();
                     Proof[] proofs = pl.getProofs();
 		    for (int i=0; i<proofs.length; i++) {
 			if (p != proofs[i] 
@@ -159,17 +160,17 @@ public class GlobalProofMgt {
 		}
 	    }
 	}
-	return (Proof[]) result.toArray(new Proof[0]);
+	return result.toArray(new Proof[0]);
     }
     
     
     public void removeEnv(ProofEnvironment env) {
-        Set entries = envKeyToEnv.entrySet();
-        Iterator it = entries.iterator();
+        Set<Map.Entry<EnvKey,List<ProofEnvironment>>> entries = envKeyToEnv.entrySet();
+        Iterator<Map.Entry<EnvKey,List<ProofEnvironment>>> it = entries.iterator();
         while (it.hasNext()) {
-            Map.Entry entry = (Map.Entry) it.next();
-            List l = (List)entry.getValue();
-            Iterator listIt = l.iterator();
+            Map.Entry<EnvKey,List<ProofEnvironment>> entry = it.next();
+            List<ProofEnvironment> l = entry.getValue();
+            Iterator<ProofEnvironment> listIt = l.iterator();
             while (listIt.hasNext()) {
                 if (listIt.next().equals(env)) listIt.remove();
             }

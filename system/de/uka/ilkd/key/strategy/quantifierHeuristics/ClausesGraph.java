@@ -40,19 +40,19 @@ class ClausesGraph {
     /**
      * Map from  <code>Term</code>(allTerm) to <code>ClausesGraph</code> 
      */
-    private final static Map graphCache = new LRUCache (1000);
+    private final static Map<Term, ClausesGraph> graphCache = new LRUCache<Term, ClausesGraph> (1000);
 
     private final SetOfQuantifiableVariable exVars;
     
     /**
      * Map from <code>Term</code> to <code>SetOfTerm</code>
      */
-    private final Map connections = new HashMap();
+    private final Map<Term, SetOfTerm> connections = new HashMap<Term, SetOfTerm>();
     
     private final SetOfTerm clauses;
     
     static ClausesGraph create(Term quantifiedFormula) {
-        ClausesGraph graph = (ClausesGraph)graphCache.get ( quantifiedFormula );
+        ClausesGraph graph = graphCache.get ( quantifiedFormula );
         if ( graph == null ) {
             graph = new ClausesGraph ( quantifiedFormula );
             graphCache.put ( quantifiedFormula, graph );
@@ -128,7 +128,7 @@ class ClausesGraph {
      * @return set of terms that connect to the formula.
      */
     private SetOfTerm getConnections(Term formula) {
-        return (SetOfTerm)connections.get ( formula );
+        return connections.get ( formula );
     }
 
     /**

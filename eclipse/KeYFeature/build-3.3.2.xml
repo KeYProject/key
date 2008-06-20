@@ -17,7 +17,8 @@
 		</ant>
 		<ant antfile="build-3.3.2.xml" dir="../KeYPlugin" target="${target}">
 		</ant>
-		<!-- commented out until rothe vis debug is on master <ant antfile="build-3.3.2.xml" dir="../VisualDebugger" target="${target}"> </ant> -->
+		<ant antfile="build-3.3.2.xml" dir="../VisualDebugger" target="${target}">
+		</ant>
 	</target>
 	<target name="all.features" depends="init">
 	</target>

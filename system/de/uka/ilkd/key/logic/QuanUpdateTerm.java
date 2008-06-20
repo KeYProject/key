@@ -57,7 +57,6 @@ class QuanUpdateTerm extends Term {
         }
         depth = max_depth + 1;
         
-        fillCaches ();
     }
  
     public JavaBlock executableJavaBlock () {

@@ -9,9 +9,7 @@
 //
 package de.uka.ilkd.key.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.util.LinkedList;
@@ -23,6 +21,7 @@ import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.notification.events.AbandonTaskEvent;
+import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.mgt.*;
 import de.uka.ilkd.key.util.Debug;
@@ -91,7 +90,10 @@ public class TaskTree extends JPanel {
 	    mediator.notify(new AbandonTaskEvent());
 	    for (int i=0; i<tn.allProofs().length; i++) {
 		tn.allProofs()[i].removeProofTreeListener(proofTreeListener);
+                tn.allProofs()[i].mgt().removeProofListener();
 	    }
+            ((ProofTreeView) Main.getInstance().getProofView().getComponent(0)).
+                removeProofs(tn.allProofs());
 	    //go to some other node, take the last leaf.
 	    TreePath path 
 		= delegateView.getPathForRow(delegateView.getRowCount()-1);

@@ -405,15 +405,31 @@ public class UseOperationContractRule implements BuiltInRule {
         assert cwi.contract.getProgramMethod().equals(pm);
 
         //create variables for self, parameters, result, exception, and a map 
-        //for atPre-functions 
+        //for atPre-functions
+        //register the newly created program variables
+        Namespace progVarNS = services.getNamespaces().programVariables();
         ProgramVariable selfVar          
             = SVF.createSelfVar(services, pm, true);
+        if(selfVar != null)
+            goal.addProgramVariable(selfVar);
+        
         ListOfParsableVariable paramVars 
             = SVF.createParamVars(services, pm, true);
+        for (ParsableVariable pvar : paramVars) {
+            assert pvar instanceof ProgramVariable : pvar + " is not a ProgramVariable";
+            goal.addProgramVariable((ProgramVariable)pvar);
+        }
+        
         ProgramVariable resultVar 
             = SVF.createResultVar(services, pm, true);
+        if(resultVar != null)
+            goal.addProgramVariable(resultVar);
+        
         ProgramVariable excVar 
             = SVF.createExcVar(services, pm, true);
+        if(excVar != null)
+            progVarNS.addSafely(excVar);
+        
         Map<Operator, Function> atPreFunctions               
             = new LinkedHashMap<Operator, Function>();
         
@@ -441,6 +457,13 @@ public class UseOperationContractRule implements BuiltInRule {
 
         for (final ClassInvariant inv : cwi.ensuredInvs) {
             post = post.conjoin(inv.getClosedInv(services));
+        }
+        
+        //add "actual parameters" (which in fact already are
+        //program variables in a method body statement) to modifier set
+        for(Term t : actualParams) {
+            ProgramVariable pv = (ProgramVariable) t.op();
+            modifies = modifies.add(new BasicLocationDescriptor(TB.var(pv)));
         }
         
         //split goal into three branches
