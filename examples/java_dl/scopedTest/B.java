@@ -13,7 +13,7 @@ public abstract class B{
 		    int j=0;
 		    final A[] a = new A[x];
 		    /*@ loop_invariant j>=0 && (\forall int k; k>=0 && k<j; a[k]!=null);
-		      @ assignable j, a[*];
+		      @ assignable j, a[*], \object_creation(A);
 		      @ decreasing x-j;
 		      @ working_space_single_iteration \space(A);
 		      @*/

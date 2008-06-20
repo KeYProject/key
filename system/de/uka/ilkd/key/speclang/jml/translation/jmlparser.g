@@ -614,8 +614,13 @@ options {
 	ProgramVariable objectTimesFinalizedAttribute
 		= javaInfo.getAttribute("objectTimesFinalized", 
                                         javaInfo.getJavaLangObject());
-        
-        //create logic variable, guard
+                                        
+    LocationVariable dma = javaInfo.getDefaultMemoryArea();
+    
+    ProgramVariable consumed
+		= javaInfo.getAttribute("consumed", dma.getKeYJavaType());
+		
+	//create logic variable, guard
         Sort integerSort 
         	= services.getTypeConverter().getIntegerLDT().targetSort();
         LogicVariable lv 
@@ -650,6 +655,12 @@ options {
 	BasicLocationDescriptor transientLd
 		= new BasicLocationDescriptor(guardFma, transientTerm);
 	result = result.add(transientLd);
+	
+	//initialMemoryArea.consumed
+	Term cons = tb.dot(tb.var(dma), consumed);
+	BasicLocationDescriptor cld
+		= new BasicLocationDescriptor(cons);
+	result = result.add(cld);
 	
 	//objectTimesFinalized (a ghost field in java.lang.Object)
 	if(objectTimesFinalizedAttribute != null) {
