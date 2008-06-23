@@ -2011,7 +2011,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	{
 	    result = new JMLExpression(t);
 	}
-    |   OBJECT_CREATION LPAREN typ=referencetype RPAREN
+    |   OBJECT_CREATION LPAREN typ=typespec RPAREN
     	{
     	    result = new JMLExpression(getObjectCreationFma(typ));
     	}

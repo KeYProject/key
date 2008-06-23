@@ -5,10 +5,10 @@ public abstract class ScopedMemory extends MemoryArea{
     private /*@nullable@*/ Object portal;
 
     // public static invariant counter>=1;
-    private static long counter=1;
+    //    private static long counter=1;
 
     // public invariant (\forall ScopedMemory m; m!=null && m.id==id; m==this);
-    private long id = counter++;
+    //    private long id = counter++;
 
 
     /* public invariant (\forall ScopedMemory m; (\outerScope(m, this) <==>
@@ -149,8 +149,8 @@ public abstract class ScopedMemory extends MemoryArea{
 	}
     }
 
-    public java.lang.String toString(){
+    /*    public java.lang.String toString(){
 	return "ScopedMemory#"+id;
-    }
+	}*/
 
 }

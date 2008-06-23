@@ -17,11 +17,7 @@ import java.util.Map;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.SetAsListOfLocationDescriptor;
-import de.uka.ilkd.key.logic.SetAsListOfTerm;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
-import de.uka.ilkd.key.logic.SetOfTerm;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.AtPreFactory;
@@ -109,15 +105,23 @@ public class LoopInvariantImpl implements LoopInvariant {
     
     private Map /*Operator, Operator, Term -> Term*/ getReplaceMap(
             Term selfTerm,
+            Term memoryArea,
             /*inout*/ Map<Operator, Function/*atpre*/> atPreFunctions,
             Services services) {
         Map result = new LinkedHashMap();
+        TermBuilder tb = TermBuilder.DF;   
         
         //self
         if(selfTerm != null) {
             assert (selfTerm.sort().extendsTrans(originalSelfTerm.sort()) || 
                 originalSelfTerm.sort().extendsTrans(selfTerm.sort()));
             result.put(originalSelfTerm, selfTerm);
+        }
+        
+        //memory area
+        if(memoryArea != null) {
+            assert memoryArea.sort().extendsTrans(services.getJavaInfo().getDefaultMemoryArea().sort());
+            result.put(tb.var(services.getJavaInfo().getDefaultMemoryArea()), memoryArea);
         }
         
         //-parameters and other local variables are always kept up to
@@ -157,7 +161,7 @@ public class LoopInvariantImpl implements LoopInvariant {
             /*inout*/ Map <Operator, Function/* atPre*/> atPreFunctions,
             Services services) {
        Map result = new LinkedHashMap();
-       Map replaceMap = getReplaceMap(selfTerm, atPreFunctions, services);
+       Map replaceMap = getReplaceMap(selfTerm, null, atPreFunctions, services);
        final Iterator<Map.Entry> it = replaceMap.entrySet().iterator();
        while(it.hasNext()) {
            Map.Entry entry = it.next();
@@ -178,10 +182,20 @@ public class LoopInvariantImpl implements LoopInvariant {
 
     
     public Term getInvariant(Term selfTerm,
+            Term memoryArea,
             /*inout*/Map <Operator, Function/* (atPre)*/> atPreFunctions,
             Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map replaceMap = getReplaceMap(selfTerm, atPreFunctions, services);
+        Map replaceMap = getReplaceMap(selfTerm, memoryArea, atPreFunctions, services);
+        OpReplacer or = new OpReplacer(replaceMap);
+        return or.replace(originalInvariant);
+    }
+    
+    public Term getInvariant(Term selfTerm,
+            /*inout*/Map <Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services) {
+        assert (selfTerm == null) == (originalSelfTerm == null);
+        Map replaceMap = getReplaceMap(selfTerm, null, atPreFunctions, services);
         OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalInvariant);
     }
@@ -191,7 +205,7 @@ public class LoopInvariantImpl implements LoopInvariant {
             /*inout*/ Map<Operator, Function/* (atPre)*/> atPreFunctions,
             Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map replaceMap = getReplaceMap(selfTerm, atPreFunctions, services);
+        Map replaceMap = getReplaceMap(selfTerm, null, atPreFunctions, services);
         OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalPredicates);
     }
@@ -203,18 +217,29 @@ public class LoopInvariantImpl implements LoopInvariant {
             Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map replaceMap = 
-            getReplaceMap(selfTerm, atPreFunctions, services);
+            getReplaceMap(selfTerm, null, atPreFunctions, services);
         OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalModifies);
     }
     
-
+    public SetOfLocationDescriptor getModifies(
+            Term selfTerm,
+            Term memoryArea,
+            /*inout*/ Map<Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services) {
+        assert (selfTerm == null) == (originalSelfTerm == null);
+        Map replaceMap = 
+            getReplaceMap(selfTerm, memoryArea, atPreFunctions, services);
+        OpReplacer or = new OpReplacer(replaceMap);
+        return or.replace(originalModifies);
+    }
+    
     public Term getVariant(Term selfTerm, 
             /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
             Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map replaceMap = 
-            getReplaceMap(selfTerm, atPreFunctions, services);
+            getReplaceMap(selfTerm, null, atPreFunctions, services);
         OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalVariant);
     }
@@ -224,7 +249,7 @@ public class LoopInvariantImpl implements LoopInvariant {
             Services services){
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map replaceMap = 
-            getReplaceMap(selfTerm, atPreFunctions, services);
+            getReplaceMap(selfTerm, null, atPreFunctions, services);
         OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalWorkingSpace);   
     }

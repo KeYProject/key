@@ -86,6 +86,8 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
         } else {
             selfTerm = services.getTypeConverter().convertToLogicElement(rp);
         }
+        
+        Term memoryArea = services.getTypeConverter().convertToLogicElement(ec.getMemoryArea());
 
         //collect atPre-functions, update loop invariants
         Map<Operator, Function /*atPre*/> atPreFunctions = 
@@ -100,11 +102,11 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
                     selfTerm = null;
                 }
                 Term newInvariant 
-                    = inv.getInvariant(selfTerm, atPreFunctions, services);
+                    = inv.getInvariant(selfTerm, memoryArea, atPreFunctions, services);
                 SetOfTerm newPredicates
                     = inv.getPredicates(selfTerm, atPreFunctions, services);
                 SetOfLocationDescriptor newModifies
-                    = inv.getModifies(selfTerm, atPreFunctions, services);
+                    = inv.getModifies(selfTerm, memoryArea, atPreFunctions, services);
                 Term newVariant
                     = inv.getVariant(selfTerm, atPreFunctions, services);
                 Term newWorkingSpace

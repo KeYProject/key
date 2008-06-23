@@ -23,6 +23,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.collection.SLListOfString;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.*;
@@ -290,8 +291,9 @@ public class POBrowser extends JDialog {
 	    pos = pos.append("EnsuresPost");
 	}
 
-        //RespectsModifies
-        if(specRepos.getOperationContracts(pm).size() > 0) {
+        //RespectsWorkingSpace
+        if(specRepos.getOperationContracts(pm).size() > 0 && 
+                ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile) {
             pos = pos.append("RespectsWorkingSpace");           
         }
         

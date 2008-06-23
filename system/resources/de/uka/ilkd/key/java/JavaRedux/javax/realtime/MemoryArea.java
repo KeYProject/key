@@ -34,6 +34,7 @@ public abstract class MemoryArea{
 	if(size<0) throw new java.lang.IllegalArgumentException();
 	this.size = size;
 	this.logic = logic;
+	<currentMemoryArea>.consumed -= 8;
 	memory = new PhysicalMemoryArea(size);
     }
 

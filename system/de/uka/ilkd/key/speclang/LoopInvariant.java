@@ -37,6 +37,14 @@ public interface LoopInvariant {
      * Returns the invariant formula.
      */
     public Term getInvariant(Term selfTerm, 
+            Term memoryArea,
+            /*inout*/ Map<Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services);
+    
+    /**
+     * Returns the invariant formula.
+     */
+    public Term getInvariant(Term selfTerm, 
             /*inout*/ Map<Operator, Function/* (atPre)*/> atPreFunctions,
             Services services);
     
@@ -47,6 +55,14 @@ public interface LoopInvariant {
             /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
             Services services);
     
+    /**
+     * Returns the modifier set.
+     */
+    public SetOfLocationDescriptor getModifies(
+            Term selfTerm,
+            Term memoryArea,
+            /*inout*/ Map <Operator, Function/* (atPre)*/> atPreFunctions,
+            Services services);
     /**
      * Returns the modifier set.
      */
