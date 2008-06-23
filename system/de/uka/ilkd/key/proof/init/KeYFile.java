@@ -364,7 +364,7 @@ public class KeYFile implements EnvInput {
             SLEnvInput slEnvInput = new SLEnvInput(javaPath);
             slEnvInput.setInitConfig(initConfig);
             slEnvInput.read(mod);
-        }
+        }               
     }
 
     
