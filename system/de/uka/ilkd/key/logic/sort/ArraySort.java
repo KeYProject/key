@@ -13,5 +13,9 @@ package de.uka.ilkd.key.logic.sort;
 
 public interface ArraySort extends CollectionSort, ObjectSort, SortDefiningSymbols {
 
+    /**
+     * returns the element sort of the array
+     */
+    Sort elementSort();
 
 }
