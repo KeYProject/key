@@ -1543,7 +1543,13 @@ primaryexpr returns [JMLExpression result=null] throws SLTranslationException
     |   "false"      { result = new JMLExpression(tb.ff()); }
     |   "null"       { result = new JMLExpression(tb.NULL(services)); }
     |   result=jmlprimary 
-    |   "this"       { result = new JMLExpression(tb.var(selfVar)); }
+    |   "this"       
+        { 
+            if(selfVar == null) {
+            	raiseError("Cannot access \"this\" in a static context!"); 
+            }
+            result = new JMLExpression(tb.var(selfVar));
+        }
     |   new_expr
 ;   
 
