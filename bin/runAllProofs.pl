@@ -26,7 +26,7 @@ print "$absolute_bin_path\n";
 chdir $path_to_pe;
 
 if ($option{h}) {
-  print "runs all proofs listed in the files: $automaticfol_txt, $automaticjavadl_txt, $interactive_txt, $not_provablefol_txt, $not_provablejavadl and $quit_with_error_txt .\n";
+  print "runs all proofs listed in the files: $automaticfol_txt, $automaticjavadl_txt, $interactive_txt, $not_provablefol_txt, $not_provablejavadl_txt and $quit_with_error_txt .\n";
   print "They can be found in " .  $bin_path . "/" . $path_to_pe .  "\n\n";
   print "Use '-m email\@address.com' to send the report as an email to the specified address.\n";
   print "Use '-h' to get this text (very necessary this line).\n";
