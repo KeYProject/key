@@ -638,7 +638,7 @@ public class Main extends JFrame implements IMain {
         
         statusLine = new MainStatusLine("<html>" + PARA + COPYRIGHT + PARA
                 + "KeY is free software and comes with ABSOLUTELY NO WARRANTY."
-                + " See Help | License.", getFont());
+                + " See About | License.", getFont());
         getContentPane().add(statusLine, BorderLayout.SOUTH);
         setupInternalInspection();
     }
@@ -998,11 +998,12 @@ public class Main extends JFrame implements IMain {
 	}else{
 	    POBrowser poBrowser 
 	    	= POBrowser.showInstance(mediator.getProof().env().getInitConfig());
+	    ProofOblInput po = poBrowser.getAndClearPO();
+	    if(po != null) {
 	    if(poBrowser.getPO() != null) {
 		ProblemInitializer pi = new ProblemInitializer(this);
 		try {
-		    pi.startProver(mediator.getProof().env(), 
-			    	   poBrowser.getAndClearPO());
+		    pi.startProver(mediator.getProof().env(), po);
 		} catch(ProofInputException e)  {
 		    new ExceptionDialog(this, e);
 		}
