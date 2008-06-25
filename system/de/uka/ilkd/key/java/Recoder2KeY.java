@@ -330,12 +330,13 @@ public class Recoder2KeY implements JavaReader {
 
             // transform program
             transformModel(cUnits);
-        } catch (recoder.service.AmbiguousDeclarationException ade) {
-            reportError(ade.getMessage(), ade);
-        } catch (recoder.ParserException pe) {
-            reportError(pe.getMessage(), pe);
-        } catch (IOException e) {
-            reportError(e.getMessage(), e);
+        } catch (Exception ex) {
+            if(ex.getCause() instanceof UnresolvedReferenceException) {
+                String extraMsg = "Consider using a classpath if this is a classtype that cannot be resolved\n";
+                reportError(extraMsg + ex.getCause().getMessage(), ex);
+            } else {
+                reportError(ex.getMessage(), ex);
+            }
         }
         return cUnits;
     }
