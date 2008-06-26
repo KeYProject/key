@@ -65,8 +65,10 @@ public class VisualizationStrategyForTesting extends
 
             Occ result = new Occ(false, -1, -1);
             /**Usually this variable tells whether to include an occurence of a modal operator
-             * in the trace or not. In this overwritten method also an occurence is added
-             * to the trace if inTrace is falls but te is null. */
+             * in the trace or not. This overwritten method also includes an occurence 
+             * to the trace if the variable inTrace is falls and the variable te is null.
+             * Note that even if inTrace is false the object reference by result is and
+             * must be updated by occInParent. */
             boolean inTrace = occInParent(currentNode, currentJB, result);
 
             currentJB = result;
@@ -128,7 +130,7 @@ public class VisualizationStrategyForTesting extends
                 if (te instanceof ContextTraceElement) {
                     lastExecuted = (ContextTraceElement) te;
                 }
-            }else if(te==null){
+            }else if(te==null){//&& false
                 /** @author Christoph Gladisch chrisg 
                  * The purpose of this branch is to include
                  * the last occurence of a "modal operator" in a proof
@@ -161,9 +163,10 @@ public class VisualizationStrategyForTesting extends
                              }
                          }
                          rating = rating<1?1:rating;//This has influence, e.g., on UnitTestBuilder.createTestForNodes()
+                        
                      te = new UnexecutedTraceElement(actSt,contextProgram, occ.ant, node,
                                                  lastTraceElement, lastExecuted, ec);
-                     if (firstTraceElement == null) {
+                      if (firstTraceElement == null) {
                          firstTraceElement = te;
                       }
 
@@ -177,10 +180,13 @@ public class VisualizationStrategyForTesting extends
                            */
                           lastExecuted = (ContextTraceElement) te;
                       }
-                }else if(!warningOccured){
+                }else if(!warningOccured){//occ==null || occ.jbt==null
                     warningOccured = true; //this prevents from generating multiple warnings by the loop.
                     Main.getInstance().notify(new GeneralFailureEvent(
-                            "Warning: There are problems in extracting an execution trace. See VisualizationStrategyForTesting.java"));
+                            "Warning: There are problems in extracting an execution trace from node "+node.serialNr() +".\n" +
+                            (occ==null?"No JavaBlock occurrence selected (occ==null)":
+                                (occ.jbt==null?"JavaBlock of JavaBlock occurrence cannot be determined (occ.jbt==null).":""))+
+                            "\nSee VisualizationStrategyForTesting.java"));
                 }
 
             }

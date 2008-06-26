@@ -195,7 +195,6 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
                 }
             }
         }
-
         // traces of modalities that ended "on the way" to Node node
         while (!currentNode.root() && !ignoreNodes.contains(currentNode)) {
             final LinkedList types = new LinkedList();
@@ -331,7 +330,6 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
      */
     protected LinkedList findJavaBlocks(boolean ant, int cfm, Term t, int pos) {
         LinkedList ll = new LinkedList();
-
         int p = pos;
         if (t.javaBlock() != JavaBlock.EMPTY_JAVABLOCK) {
             ll.add(new Occ(ant,cfm,p));
@@ -952,7 +950,8 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
                             
                             for (int i = 0; i < jbCount; i++) {
                                 Occ newOcc = new Occ(occOfFind.ant, 
-                                        occOfFind.cfm, occOfFind.jb + occOfSV + i);                                
+                                        occOfFind.cfm, occOfFind.jb + occOfSV + i,
+                                        (Term) inst.getInstantiation(sv));  //chrisg                              
                                 result.add(newOcc);
                                 types.add(type);
                             }
@@ -1749,9 +1748,20 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
         public Occ(boolean ant, int cfm, int jb){
             set(ant, cfm, jb);
         }
+       
+        /**This is an extended constructor that is used by 
+         * VisualizationStrategyForTesting. 
+         * @author gladisch*/
+        public Occ(boolean ant, int cfm, int jb, Term jbt){
+            this(ant,cfm,jb);
+            if(jbt==null){
+                throw new RuntimeException("Term with JavaBlock is not specified.");
+            }
+            this.jbt = jbt;
+        }
         
         public void copy(Occ occ) {
-            set(occ.ant, occ.cfm, occ.jb);            
+            set(occ.ant, occ.cfm, occ.jb, occ.jbt);            
         }
 
         public void set(boolean p_ant, int p_cfm, int p_jb) {
@@ -1760,15 +1770,20 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
             this.jb  = p_jb;
         }
 
-        /**@author gladisch
-         * This is an extended constructor that is used by 
-         * VisualizationStrategyForTesting. */
-        public Occ(boolean ant, int cfm, int jb, Term jbt){
-            this(ant,cfm,jb);
-            this.jbt = jbt;
+        public void set(boolean p_ant, int p_cfm, int p_jb, Term p_jbt) {
+            set(p_ant,p_cfm,p_jb);
+            this.jbt  = p_jbt;
         }
+
         public Occ copy() {
-            return new Occ(ant, cfm, jb);
+            if(jbt==null){
+                //it is allowed to not instantiate jbt in the new occ if this original occ didn't have jbt instantiated.
+                return new Occ(ant, cfm, jb);
+            }else{
+                //If this occ has jbt instantiated then its copy has to have jbt instantiated as well.
+                //Otherwise the constructor throws an exception.
+                return new Occ(ant, cfm, jb, jbt);
+            }
         }
         
         public String toString(){

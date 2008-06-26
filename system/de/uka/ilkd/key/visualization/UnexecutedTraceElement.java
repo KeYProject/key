@@ -21,16 +21,14 @@ public class UnexecutedTraceElement extends TraceElement {
      * @author gladisch*/
     public UnexecutedTraceElement(SourceElement prElement, ProgramElement program, Boolean inAntec, Node n,  TraceElement nip, ContextTraceElement ne, IExecutionContext exCont){
         node = n;
-        try{
-            /*if no symbolic execution took place yet, getAppliedRuleApp() may be null. 
-             Maybe posOfModality can always be null, but I'm not sure.*/
-            posOfModality = n.getAppliedRuleApp().posInOccurrence();
-        }catch(NullPointerException npe){
-            posOfModality = null;
-            //alternative way to determine the position of the modality.
-            assert inAntec!=null;
-            this.inAntec = inAntec;
-        }
+        /*To set posOfModality = n.getAppliedRuleApp().posInOccurrence(); is wrong, because
+          UnexecutedTraceElement is usually created from a modal operator that is not
+          symbolically executed. Thus n.getAppliedRuleApp().posInOccurrence() must refere to a different
+          modal operator or formula with a modal operator than the modal operator represented
+          by this UnexecutedTraceElement. */
+        posOfModality = null;
+        //assert inAntec!=null; This is required by UnitTestBuilder
+        this.inAntec = inAntec;
         nextInProof = nip;
         stepInto = ne;
         programElement = prElement;
@@ -38,12 +36,15 @@ public class UnexecutedTraceElement extends TraceElement {
         this.program = program;
     }
 
+/**To determine the position of the modality from n.getAppliedRuleApp().posInOccurrence() is wrong
+  because UnexecutedTraceElement is usually created from a modal operator that is not
+  symbolically executed. Thus n.getAppliedRuleApp().posInOccurrence() must refere to a different
+  modal operator or formula with a modal operator than the modal operator represented
+  by this UnexecutedTraceElement. Therefore 
+   n.getAppliedRuleApp().posInOccurrence().isInAntec may differ from inAntec
+   */
     public Boolean isInAntec(){
-        if(getPosOfModality()!=null){
-            return getPosOfModality().isInAntec();
-        }else{
             return inAntec;
-        }
     }
 
 }

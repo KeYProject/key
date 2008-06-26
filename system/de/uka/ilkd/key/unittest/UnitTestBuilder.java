@@ -88,7 +88,7 @@ public class UnitTestBuilder{
 	if(tr == null){
 	    ProofVisualization pv = 
 		new ProofVisualization(n, 
-                new VisualizationStrategyForTesting(serv),
+                new VisualizationStrategyForTesting(serv), //new SimpleVisualizationStrategy(serv),
                 serv, traceEndNodes, true);
 	    tr = pv.getVisualizationModel().getExecutionTraces();
 	    node2trace.put(n, tr);
