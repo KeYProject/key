@@ -88,7 +88,7 @@ public class TestJMLTranslator extends TestCase {
     
     protected ProgramVariable buildExcVar() {
         KeYJavaType excType = javaInfo
-                .getTypeByClassName("java.lang.Exception");
+                .getTypeByClassName("java.lang.Throwable");
         ProgramElementName excPEN = new ProgramElementName("exc");
         return new LocationVariable(excPEN, excType);
     }

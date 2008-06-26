@@ -2289,9 +2289,16 @@ array_set_decls[Sort p] returns [Sort s = null]
             if (n != 0){
                 final JavaInfo ji = getJavaInfo();
                 s = ArraySortImpl.getArraySortForDim(
-                    p, n, ji.getJavaLangObjectAsSort(),
-                    ji.getJavaLangCloneableAsSort(), 
-                    ji.getJavaIoSerializableAsSort());
+                                                     p, n, ji.getJavaLangObjectAsSort(),
+                                                     ji.getJavaLangCloneableAsSort(), 
+                                                     ji.getJavaIoSerializableAsSort());
+
+                Sort last = s;
+                do {
+                    final ArraySort as = (ArraySort) last;
+                    addSort(as);                        
+                    last = as.elementSort();
+                } while (last instanceof ArraySort && sorts().lookup(last.name()) == null);
             } else {
                 s = p;
             }

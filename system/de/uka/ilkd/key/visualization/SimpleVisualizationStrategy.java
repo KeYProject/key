@@ -195,7 +195,6 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
                 }
             }
         }
-
         // traces of modalities that ended "on the way" to Node node
         while (!currentNode.root() && !ignoreNodes.contains(currentNode)) {
             final LinkedList types = new LinkedList();
@@ -214,11 +213,9 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
 	    ignoreNodes.add(currentNode);
             currentNode = currentNode.parent();
        }
-
         final ExecutionTraceModel[] exTraceModels = 
             removeRedundandTraces((ExecutionTraceModel[])executionTraceModelsList.
                     toArray(new ExecutionTraceModel[executionTraceModelsList.size()]));
-        
         printTraces(exTraceModels);
         
         return new VisualizationModel(node, exTraceModels);
@@ -229,7 +226,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
      * sequent of Node n
      */
 
-    private ExecutionTraceModel extractExecutionTrace(Node node, Occ occ,
+    protected ExecutionTraceModel extractExecutionTrace(Node node, Occ occ,
             Integer type) {              
         TraceElement firstTraceElement = null;
         TraceElement lastTraceElement = TraceElement.END;        
@@ -331,9 +328,8 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
      *            offset that is added to the occurrences, needed for recursion
      * @return a list containing the occurrences of the java blocks in the term   
      */
-    private LinkedList findJavaBlocks(boolean ant, int cfm, Term t, int pos) {
+    protected LinkedList findJavaBlocks(boolean ant, int cfm, Term t, int pos) {
         LinkedList ll = new LinkedList();
-
         int p = pos;
         if (t.javaBlock() != JavaBlock.EMPTY_JAVABLOCK) {
             ll.add(new Occ(ant,cfm,p));
@@ -359,7 +355,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
     }
 
 
-    private SourceElement getActStatement(Node n) {
+    protected SourceElement getActStatement(Node n) {
         SourceElement statement = n.getNodeInfo().getActiveStatement();
         while ((statement instanceof ProgramPrefix)||
                 statement instanceof ProgramElementName) {
@@ -371,7 +367,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
         return statement;
     }
       
-    private IExecutionContext getExecutionContext(SourceElement cp) {
+    protected IExecutionContext getExecutionContext(SourceElement cp) {
         MethodFrame frame = getMethodFrame(cp);
         if (frame != null) {
             return frame.getExecutionContext();
@@ -516,7 +512,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
      * <tt>context</tt> 
      * @param context the SourceElement 
      */
-    private MethodFrame getMethodFrame(SourceElement context) {
+    protected MethodFrame getMethodFrame(SourceElement context) {
         SourceElement se = context;
         MethodFrame frame = null;
        
@@ -954,7 +950,8 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
                             
                             for (int i = 0; i < jbCount; i++) {
                                 Occ newOcc = new Occ(occOfFind.ant, 
-                                        occOfFind.cfm, occOfFind.jb + occOfSV + i);                                
+                                        occOfFind.cfm, occOfFind.jb + occOfSV + i,
+                                        (Term) inst.getInstantiation(sv));  //chrisg                              
                                 result.add(newOcc);
                                 types.add(type);
                             }
@@ -1063,7 +1060,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
      * @return true iff se is associated with a ParentContextTraceElment.
      *         This means that se contains statements or a method invokation
      */    
-    private boolean isParentContextTE(SourceElement se) {
+    protected boolean isParentContextTE(SourceElement se) {
         if (se instanceof MethodReference 
                 || se instanceof LoopStatement
                 || se instanceof BranchStatement) {
@@ -1096,7 +1093,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
      *         and the occurrence result of the Java block in the parent node 
      */
     
-    private boolean occInParent(Node n, Occ occ, Occ result){
+    protected boolean occInParent(Node n, Occ occ, Occ result){
       
         print("Node "+n.serialNr()+ "  Occ: ", occ);
         final Node parent = n.parent();          
@@ -1413,19 +1410,19 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
         }
     }
     
-    private void  print(Object o, Object o2){
+    protected void  print(Object o, Object o2){
         if (DEBUG) {
             System.out.println(o+""+o2);
         }
     }   
     
-    private void  print(Object o, int i){
+    protected void  print(Object o, int i){
         if (DEBUG) {
             System.out.println(o+""+i);
         }
     }  
 
-    private void  print(Object o){
+    protected void  print(Object o){
         if (DEBUG) {
             System.out.println(o);
         }
@@ -1737,20 +1734,34 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
 
         public boolean ant;
         public int cfm, jb;
-
+        /** The term containing the JavaBlock that is described by this occurence object. 
+         * This term should have the runtime type ProgramTerm, but ProgramTerm is not
+         * visible in this package (There is maybe a reason for it). */
+        public Term jbt; 
+        
         /** @param ant determines if the Java block occures in 
          *         the antecedent or succedent of the sequent
          *  @param cfm the index of the formula in the semisequent
          *  @param jb determines the occurrence of the Java block
          *         in the formula
-         */
-        
+         */  
         public Occ(boolean ant, int cfm, int jb){
             set(ant, cfm, jb);
         }
+       
+        /**This is an extended constructor that is used by 
+         * VisualizationStrategyForTesting. 
+         * @author gladisch*/
+        public Occ(boolean ant, int cfm, int jb, Term jbt){
+            this(ant,cfm,jb);
+            if(jbt==null){
+                throw new RuntimeException("Term with JavaBlock is not specified.");
+            }
+            this.jbt = jbt;
+        }
         
         public void copy(Occ occ) {
-            set(occ.ant, occ.cfm, occ.jb);            
+            set(occ.ant, occ.cfm, occ.jb, occ.jbt);            
         }
 
         public void set(boolean p_ant, int p_cfm, int p_jb) {
@@ -1759,8 +1770,20 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
             this.jb  = p_jb;
         }
 
+        public void set(boolean p_ant, int p_cfm, int p_jb, Term p_jbt) {
+            set(p_ant,p_cfm,p_jb);
+            this.jbt  = p_jbt;
+        }
+
         public Occ copy() {
-            return new Occ(ant, cfm, jb);
+            if(jbt==null){
+                //it is allowed to not instantiate jbt in the new occ if this original occ didn't have jbt instantiated.
+                return new Occ(ant, cfm, jb);
+            }else{
+                //If this occ has jbt instantiated then its copy has to have jbt instantiated as well.
+                //Otherwise the constructor throws an exception.
+                return new Occ(ant, cfm, jb, jbt);
+            }
         }
         
         public String toString(){

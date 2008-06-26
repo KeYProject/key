@@ -47,6 +47,10 @@ public class TraceElement {
         return posOfModality;
     }
     
+    public Boolean isInAntec(){
+        return getPosOfModality().isInAntec();
+    }
+    
     public ProgramElement getProgram(){
         return program;
     }
@@ -96,13 +100,15 @@ public class TraceElement {
     }
 
     public String toString(){
-	String s ="TraceElement:\n";
-	if  (this == END) return "END";
-	if  (this == PARENTROOT) return "PARENTROOT";
-	if (node!=null) s = s+(serialNr()+"\n");
-	if (programElement!=null) s=s+programElement;
-	if (stepInto!=null) s= s+ "\nNext executed: "+stepInto.serialNr();
-	return s;
+    	String s ="TraceElement:";
+    	if  (this == END) return "END ";
+    	if  (this == PARENTROOT) return "PARENTROOT ";
+    	if (node!=null) s = s+(serialNr());
+        s+="\n";
+    	if (programElement!=null) s=s+programElement;
+    	if (stepInto!=null) s= s+ "\nNext executed: "+stepInto.serialNr();
+        s+="\n";
+    	return s;
     }
 
 }
