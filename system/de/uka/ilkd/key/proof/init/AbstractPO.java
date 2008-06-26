@@ -120,7 +120,7 @@ public abstract class AbstractPO implements ProofOblInput {
 
     protected ProgramVariable buildExcVar() {
         final KeYJavaType excType
-        	= javaInfo.getTypeByClassName("java.lang.Exception");
+        	= javaInfo.getTypeByClassName("java.lang.Throwable");
         return new LocationVariable(new ProgramElementName("exc"), excType);      
     }
     

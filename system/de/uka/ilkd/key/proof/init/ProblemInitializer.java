@@ -154,7 +154,7 @@ public class ProblemInitializer {
      * collection sorts). This may not have been done for previously
      * defined sorts, as the integer sort was not available.
      */
-    public void setUpSorts(InitConfig initConfig) {
+    private void setUpSorts(InitConfig initConfig) {
 	IteratorOfNamed it = initConfig.sortNS().allElements().iterator();
         while(it.hasNext()) {
             Sort sort = (Sort)it.next ();
@@ -242,7 +242,7 @@ public class ProblemInitializer {
                     rs = RuleSource.initRuleFile(new File(fileName));
                 }
                 KeYFile keyFile = new KeYFile(fileName, rs, pm);
-                readEnvInput(keyFile, initConfig);
+                readEnvInput(keyFile, initConfig, true);
             }
         }
         reportReady();
@@ -397,12 +397,6 @@ public class ProblemInitializer {
     }
 
 
-    private void readEnvInput(EnvInput envInput, InitConfig initConfig) 
-		throws ProofInputException {
-	readEnvInput(envInput, initConfig, true);
-    }
-    
-    
     private void populateNamespaces(Term term, NamespaceSet namespaces) {
 	for(int i = 0; i < term.arity(); i++) {
 	    populateNamespaces(term.sub(i), namespaces);
@@ -538,7 +532,7 @@ public class ProblemInitializer {
         }
 	
 	//read envInput
-	readEnvInput(envInput, initConfig);
+	readEnvInput(envInput, initConfig, true);
 	
 	startInterface();	
 	return initConfig;

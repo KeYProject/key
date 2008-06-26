@@ -152,7 +152,9 @@ public class OperationContractImpl implements OperationContract {
 	
         //exception
 	if(excVar != null) {
-	    assert originalExcVar.sort().equals(excVar.sort());
+	    assert originalExcVar.sort().equals(excVar.sort())
+		    || originalExcVar.sort().name().toString() //for backward compatibility with old DL contracts
+		                     .equals("java.lang.Exception");
 	    result.put(originalExcVar, excVar);
 	}
         
