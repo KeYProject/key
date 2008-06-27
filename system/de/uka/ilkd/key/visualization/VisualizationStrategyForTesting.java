@@ -146,20 +146,29 @@ public class VisualizationStrategyForTesting extends
                 SourceElement actSt = null;
                 if(occ!=null && occ.jbt!=null){
                     print("VisStrategyForTesting: occ.jbt = "+occ.jbt);
-                     JavaBlock jb = occ.jbt.javaBlock();
-                     JavaProgramElement contextProgram = jb.program();
-                     actSt = determineFirstAndActiveStatement(jb);
+                    /*According to my understanding the expression occ.jbt.javaBlock().program() 
+                     * should be sufficient to determine the program element in focus of the 
+                     * occurrence occ, but it isn't. occ.jbt.javaBlock().program() may be null.
+                     * Therefore findFirstJavaProgramElement tries to find the first best javablock
+                     * with a program element. 'Hope this is correct.
+                    */
+                     JavaProgramElement contextProgram = findFirstJavaProgramElement(occ.jbt);
+                     actSt = determineFirstAndActiveStatement(contextProgram);
                          if(actSt==null){
                              warningOccured = true; //this prevents from generating multiple warnings by the loop.
                              if(contextProgram!=null){
                                  actSt = contextProgram;
+                                 String cpStr = contextProgram.toString();
+                                 cpStr = cpStr.length()>200?cpStr.substring(0, 170)+" ...":cpStr;
                                  Main.getInstance().notify(new GeneralFailureEvent(
-                                     "Warning: ExecutionTrace extraction (See VisualizationStrategyForTesting.java)." +
-                                     "\n Could not determine the active statement in:\n"+contextProgram));
+                                     "Warning: ExecutionTrace extraction from node "+node.serialNr()+" and JavaBlock "+occ+" (See VisualizationStrategyForTesting.java)." +
+                                     "\n Could not determine the active statement in:\n"+cpStr));
                              }else{
+                                 String jbtStr = occ.jbt.toString();
+                                 jbtStr = jbtStr.length()>200?jbtStr.substring(0,170)+" ...":jbtStr;
                                  Main.getInstance().notify(new GeneralFailureEvent(
-                                         "Warning: ExecutionTrace extraction (See VisualizationStrategyForTesting.java)." +
-                                         "\n Unexpected: term has no JavaBlock:"+occ.jbt));
+                                         "Warning: ExecutionTrace extraction from node "+node.serialNr()+" and JavaBlock "+occ+" (See VisualizationStrategyForTesting.java)." +
+                                         "\n Term has no JavaBlock:\n"+jbtStr));
                              }
                          }
                          rating = rating<1?1:rating;//This has influence, e.g., on UnitTestBuilder.createTestForNodes()
@@ -202,7 +211,31 @@ public class VisualizationStrategyForTesting extends
         return null;
     }
 
-    /**Computes the first active statement in the given JavaBlock. 
+    /**Recursive extension of Term.javaBlock().program(). This method
+     * performs depth first order search on the syntax tree of the term t
+     * until it finds a JavaBlock that is not "empty". Some terms may have
+     * a JavaBlock but with no root JavaProgramElement. In this
+     * case the search continues. 
+     * */
+    private JavaProgramElement findFirstJavaProgramElement(Term t){
+        if(t!=null){
+            JavaBlock jb=t.javaBlock();
+            if(jb==null)return null;
+            JavaProgramElement jpe = jb.program();
+            if(jpe!=null){
+                return jpe;
+            }else{
+                for(int i=0;i<t.arity();i++){
+                    JavaProgramElement jpe2=findFirstJavaProgramElement(t.sub(i));
+                    if(jpe2!=null)
+                        return jpe2;
+                }
+            }
+        }
+        return null;
+    }
+    
+    /**Computes the first active statement in the given ProgramElement. 
      * In contrast to SimpleVisualisationStrategy.getActStatement() which
      * makes indirectly use of NodeInfo.determineFirstAndActiveStatement(), this
      * method (that has been derived from NodeInfo.determineFirstAndActiveStatement())
@@ -210,13 +243,12 @@ public class VisualizationStrategyForTesting extends
      * by a symbolic execution rule. Instead, this method computes the 
      * *potential* active statement for the given JavaBlock.
      * @author gladisch */
-    private SourceElement determineFirstAndActiveStatement(JavaBlock jb) {
+    private SourceElement determineFirstAndActiveStatement(ProgramElement pe) {
         SourceElement activeStatement=null;
-        if(jb==null){
+        if(pe==null){
             return null;
         }
 
-        final ProgramElement pe = jb.program();
         if (pe != null) {
             activeStatement = pe.getFirstElement();
             while ((activeStatement instanceof ProgramPrefix)
