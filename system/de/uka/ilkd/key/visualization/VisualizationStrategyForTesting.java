@@ -139,7 +139,11 @@ public class VisualizationStrategyForTesting extends
                  * if no symbolic execution takes place. 
                  * This is desired for test case generation. 
                  * At this point no TraceElement has been created yet and
-                 * inTrace is and must be false at this point
+                 * inTrace is and must be false at this point.
+                 * 
+                 * An alternative way could be to overwrite
+                 * indexAfterAntecSuccTacletapplication. See the comments
+                 * in this method.
                  */
                 print("VisStrategyForTesting: Trying to add first node:"+node.serialNr());
                 IExecutionContext ec = null;
@@ -194,7 +198,7 @@ public class VisualizationStrategyForTesting extends
                     Main.getInstance().notify(new GeneralFailureEvent(
                             "Warning: There are problems in extracting an execution trace from node "+node.serialNr() +".\n" +
                             (occ==null?"No JavaBlock occurrence selected (occ==null)":
-                                (occ.jbt==null?"JavaBlock of JavaBlock occurrence cannot be determined (occ.jbt==null).":""))+
+                                (occ.jbt==null?"JavaBlock of JavaBlock occurrence cannot be determined (occ.jbt==null) for "+occ:""))+
                             "\nSee VisualizationStrategyForTesting.java"));
                 }
 
@@ -219,9 +223,11 @@ public class VisualizationStrategyForTesting extends
      * */
     private JavaProgramElement findFirstJavaProgramElement(Term t){
         if(t!=null){
+            JavaProgramElement jpe=null;
             JavaBlock jb=t.javaBlock();
-            if(jb==null)return null;
-            JavaProgramElement jpe = jb.program();
+            if(jb!=null){
+                jpe = jb.program();
+            }
             if(jpe!=null){
                 return jpe;
             }else{
@@ -259,40 +265,5 @@ public class VisualizationStrategyForTesting extends
         return activeStatement;
     }
 
-    /**
-     * The difference to the overwritten method from the parent class is that
-     * the created Occ objects additionaly store the term with the javablock
-     * that shall be traced. This information is important for the
-     * implementation of extractExecutionTrace in this class.
-     * 
-     * @param ant
-     *            determines if t occures in the antecedent or succedent in a
-     *            formula
-     * @param cfm
-     *            position of <tt>t</tt>'s enclosing constrained formula
-     * 
-     * @param t
-     *            the term
-     * @param pos
-     *            offset that is added to the occurrences, needed for recursion
-     * @return a list containing the occurrences of the java blocks in the term
-     */
-    protected LinkedList findJavaBlocks(boolean ant, int cfm, Term t, int pos) {
-        LinkedList ll = new LinkedList();
-
-        int p = pos;
-        if (t.javaBlock() != JavaBlock.EMPTY_JAVABLOCK) {
-            ll.add(new Occ(ant,cfm,p,t)); //This is the only modified line wrt. the overwritten method of the parent class
-            p++;        
-        }
-        
-        for (int i = 0; i < t.arity(); i++) {
-            final LinkedList ll2 = findJavaBlocks(ant, cfm, t.sub(i), p);            
-            p += ll2.size();            
-            ll.addAll(ll2);
-        }
-        
-        return ll;
-    }
-
+   
 }

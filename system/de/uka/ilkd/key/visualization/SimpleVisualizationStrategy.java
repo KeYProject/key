@@ -2,6 +2,8 @@ package de.uka.ilkd.key.visualization;
 
 import java.util.*;
 
+import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodReference;
@@ -26,6 +28,10 @@ import de.uka.ilkd.key.util.ExtList;
 public class SimpleVisualizationStrategy implements VisualizationStrategy {
 
     static boolean DEBUG = false;
+    /**Set this to true if you want to show a warning to the user. If this field
+     * is true already, then don't show a warning to the user. In this way we
+     * can reduce number of warning popups shown to the user. */
+    private boolean warningOccured = false;
 
     /** used to extract branch labels
      */
@@ -332,7 +338,12 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
         LinkedList ll = new LinkedList();
         int p = pos;
         if (t.javaBlock() != JavaBlock.EMPTY_JAVABLOCK) {
-            ll.add(new Occ(ant,cfm,p));
+            /*Occ objects additionally store the term with the javablock
+             * that shall be traced. This information is important for the
+             * implementation of extractExecutionTrace in class
+             * VisualizationStrategyForTesting.
+             */
+            ll.add(new Occ(ant,cfm,p, t));
             p++;        
         }
         
@@ -609,17 +620,17 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
         final int jb = getSubformulaOccurrence(pio.constrainedFormula().formula(),
 					       pio.posInTerm().iterator());
 
-        return new Occ(pio.isInAntec(), formulaIndex, jb);
+        return new Occ(pio.isInAntec(), formulaIndex, jb, pio.subTerm());
     }
     
 
 
-    /**
-     * 
-     * @param t
+    /**@param t
      * @param inst
      * @return the occurrence of the first Java block in the instantiation of 
      *          term t
+     * @note gladisch: It is unclear if an occurrence according to Def 4.
+     * or according to Def. 5 is returned (see Minor Thesis of Markus Baum).
      */
     private int getOccurrenceOfJavaBlock(Term t, SVInstantiations inst){       
         int p = 0;
@@ -642,6 +653,45 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
         return -1;
     }
 
+    /**This method is a variant of method {@code getOccurrenceOfJavaBlock}.
+     * The purpose of this method in the class is to compute the field{@code jbt}
+     * of {@code Occ}.
+     * @param t term with Schema Variables
+     * @param inst Instantiation of the Schema Variables
+     * @return Should return the first term with a JavaBlock because
+     * it is analogously implemented to {@code getOccurrenceOfJavaBlock}.
+     * @author gladisch
+     */
+    private Term getTermWithJavaBlock(Term t, SVInstantiations inst){
+        int p = 0;
+        final Iterator it = getList(t).iterator();        
+        while (it.hasNext()) {
+            final Object next = it.next();            
+            int jbs = 0;
+            if (next instanceof SchemaVariable) {             
+                Object instantiation = 
+                    inst.getInstantiation((SchemaVariable) next);
+                if (instantiation instanceof Term) {
+                    jbs = countJavaBlocks((Term) instantiation);
+                }
+            } else {
+                Term subt = (Term)t;
+                if(subt.javaBlock()==null && !warningOccured){
+                    warningOccured=true;
+                    String tStr = t.toString();
+                    tStr = tStr.length()>160?tStr.substring(0, 160)+" ...":tStr;
+                    String subtStr = subt.toString();
+                    subtStr = subtStr.length()>160?subtStr.substring(0, 160)+" ...":subtStr;
+                    Main.getInstance().notify(new GeneralFailureEvent("Warning: SimpleVisualizationStrategy.getTermWithJavaBlock " +
+                    		"returns a term without a JavaBlock.\n Variable p="+p+"\n Given term="+subtStr));
+                }
+                return (Term)next;
+            }
+            p += jbs;
+        }
+        
+        return null;
+    }
   
     
     /**
@@ -1132,7 +1182,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
             }
             // otherwise occ occurres in parent
             result.set(occ.ant, 
-                    getIndexOfUnchangedFormula(n, occ.ant, occ.cfm), occ.jb);           
+                    getIndexOfUnchangedFormula(n, occ.ant, occ.cfm), occ.jb, occ.jbt);           
             print("Occ was not changed or added");
             return false;
         }
@@ -1150,7 +1200,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
                     pta, index2cfmAnt, index2cfmSuc);
         }
         
-        result.set(occ.ant, occ.cfm, occ.jb);       
+        result.set(occ.ant, occ.cfm, occ.jb, occ.jbt);       
         return false;
   }
 
@@ -1178,7 +1228,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
         if (newCfm == -1) {
             newCfm = indexOfUpSimpl;
         }
-        result.set(occ.ant, newCfm, occ.jb);
+        result.set(occ.ant, newCfm, occ.jb, occ.jbt);
         return false;
     }
 
@@ -1242,7 +1292,8 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
                         + "   occ ", occInSV.occ);
                 if (occInSV.isJavaBlock) {
                     result.set(occOfFind.ant, occOfFind.cfm, 
-                            getOccurrenceOfJavaBlock(findTerm, inst));                   
+                            getOccurrenceOfJavaBlock(findTerm, inst),
+                            getTermWithJavaBlock(findTerm, inst));                   
                     return true;
                 } else {
                     occOfSV = getOccurrenceOfSV(findTerm, occInSV.sv, inst);
@@ -1259,7 +1310,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
             }
             
             print("Occurrence of sv in find ", occOfSV);
-            result.set(occOfFind.ant, occOfFind.cfm, occOfSV + occInSV.occ);            
+            result.set(occOfFind.ant, occOfFind.cfm, occOfSV + occInSV.occ, occOfFind.jbt);            
             return false;
         } else {
             // Case 1
@@ -1271,7 +1322,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
                 newCfm = occ.cfm;
             }
 
-            result.set(occ.ant, newCfm, occ.jb);            
+            result.set(occ.ant, newCfm, occ.jb, occ.jbt);            
             return false;
         }
     }
@@ -1382,7 +1433,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
                     if (occ.jb >= occOfFind.jb+javaBlocksInRepl) {
                         print("occ after replace");
                         result.set(occOfFind.ant, occOfFind.cfm, 
-                                occ.jb+(javaBlocksInFind-javaBlocksInRepl));                       
+                                occ.jb+(javaBlocksInFind-javaBlocksInRepl),occOfFind.jbt);                       
                         return false;
                     }
                     
@@ -1402,7 +1453,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
             } else {
                 // Case 1
                 result.set(occ.ant, 
-                        getIndexOfUnchangedFormula(n, occ.ant, occ.cfm), occ.jb);
+                        getIndexOfUnchangedFormula(n, occ.ant, occ.cfm), occ.jb, occ.jbt);
                 print("Occ was not changed or added");
                 return false;
             }
@@ -1733,7 +1784,15 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
     public class Occ{
 
         public boolean ant;
-        public int cfm, jb;
+        /**Occurrence of the formula in the subsequent*/
+        public int cfm;
+        /**This is unclear. Is this the "Subformula Occurence" of the term
+         * with the JavaBlock (according to Def. 4) or is it rather a 
+         * "Java Block Occurence in a Formula" (according to Def. 5). 
+         * getSubformulaOccurrence seems to give a "Java Block Occurence in a formula"
+         * but getOccurrenceOfJavaBlock seems to give a "Subformula Occurrence".
+         * See Minor Thesis of Markus Baum.*/
+        public int jb;
         /** The term containing the JavaBlock that is described by this occurence object. 
          * This term should have the runtime type ProgramTerm, but ProgramTerm is not
          * visible in this package (There is maybe a reason for it). */
