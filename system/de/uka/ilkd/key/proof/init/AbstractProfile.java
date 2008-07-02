@@ -79,7 +79,8 @@ public abstract class AbstractProfile implements Profile {
     public AbstractProfile(String standardRuleFilename, IMain main) {
         this(standardRuleFilename, 
                 SetAsListOfGoalChooserBuilder.EMPTY_SET.
-                add(new DefaultGoalChooserBuilder()), main);
+                add(new DefaultGoalChooserBuilder()).
+                add(new DepthFirstGoalChooserBuilder()), main);
     }
 
     public RuleCollection getStandardRules() {

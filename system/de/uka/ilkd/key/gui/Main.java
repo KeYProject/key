@@ -2587,6 +2587,11 @@ public class Main extends JFrame implements IMain {
 		} else if (opt[index].equals("AUTO")) {
 		    batchMode = true;
                     visible = false;
+		} else if (opt[index].equals("DEPTHFIRST")) {		
+            System.out.println("DepthFirst GoalChooser ...");
+			Profile p = ProofSettings.DEFAULT_SETTINGS.getProfile();
+			p.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);           
+            
 		} else if (opt[index].equals("TESTING") || opt[index].equals("UNIT")) {
                     if(opt[index].equals("TESTING")){
                         testStandalone = true;
@@ -2602,6 +2607,7 @@ public class Main extends JFrame implements IMain {
                         System.out.println("Balanced loop unwinding ...");
                         index ++;
                     }
+                    
                     ProofSettings.DEFAULT_SETTINGS.setProfile(p);
                     p.updateSettings(ProofSettings.DEFAULT_SETTINGS);
                     testMode = true;
