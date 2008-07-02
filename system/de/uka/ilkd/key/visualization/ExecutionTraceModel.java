@@ -23,8 +23,8 @@ public class ExecutionTraceModel {
     public final static Integer TYPE3 = new Integer(3);
     
     
-    private TraceElement start=null;
-    private TraceElement end= null;
+    protected TraceElement start=null;
+    protected TraceElement end= null;
     private ContextTraceElement she=null;
     private Node startNode, endNode;
     private long rating=0;
