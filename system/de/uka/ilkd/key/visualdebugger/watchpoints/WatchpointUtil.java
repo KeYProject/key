@@ -158,22 +158,17 @@ public class WatchpointUtil {
      * 
      * @return the hash set< node>
      */
-    private static HashSet<Node> findLeaves(Node currentNode,
+    private static boolean hasChildrenInSet(Node currentNode,
             List<Node> proofnodes) {
 
-        HashSet<Node> result = new HashSet<Node>(3);
         IteratorOfNode iter = currentNode.childrenIterator();
         while (iter.hasNext()) {
             Node child = (Node) iter.next();
             if (proofnodes.contains(child)) {
-                proofnodes.remove(child);
-                result.addAll(findLeaves(child, proofnodes));
+               return true;
             }
         }
-        if (result.isEmpty()) {
-            result.add(currentNode);
-        }
-        return result;
+        return false;
     }
 
     /**
@@ -518,24 +513,29 @@ public class WatchpointUtil {
             theNode.add(nodes[0]);
             return theNode;
         }
+
         List<Node> proofnodes = new LinkedList<Node>(Arrays.asList(nodes));
         // not more than 4 children expected
         final int INITIALCAPACITY = 4;
-        HashSet<Node> candidates = new HashSet<Node>(INITIALCAPACITY);
+        HashSet<Node> result = new HashSet<Node>(INITIALCAPACITY);
+        
         while (!proofnodes.isEmpty()) {
 
             Node currentNode = proofnodes.get(0);
             proofnodes.remove(currentNode);
+            
+            if(!hasChildrenInSet(currentNode, proofnodes)){
+                result.add(currentNode);
+            }
             Node parentNode = currentNode.parent();
             while (parentNode != null && proofnodes.contains(parentNode)) {
                 proofnodes.remove(parentNode);
                 parentNode = parentNode.parent();
 
             }
-            candidates.addAll(findLeaves(currentNode, proofnodes));
         }
-        System.out.println("candiates.size: " + candidates.size());
-        return candidates;
+        System.out.println("result.size: " + result.size());
+        return result;
     }
 
     /**

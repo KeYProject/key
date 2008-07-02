@@ -238,7 +238,7 @@ public class WatchpointView extends ViewPart {
         
         column = new TableColumn(table, SWT.NONE, 6);
         column.setWidth(40);
-        column.setText("All Quantification");
+        column.setText("Universal Quantification");
         return table;
     }
 
