@@ -37,7 +37,6 @@ java/lang/NullPointerException.java
 java/lang/NumberFormatException.java
 java/lang/RuntimeException.java
 java/lang/String.java
-java/lang/StringBuffer.java
 java/lang/Throwable.java
 java/util/Collection.java
 java/util/Iterator.java
@@ -47,6 +46,3 @@ java/util/Map.java
 java/util/Set.java
 java/io/IOException.java
 java/io/Serializable.java
-junit/framework/Test.java
-junit/framework/TestCase.java
-junit/framework/TestSuite.java
