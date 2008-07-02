@@ -593,7 +593,9 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
         //nothing to do
     }
     
-    
+    public void performActionOnIProgramVariable(IProgramVariable x) {
+        //nothing to do
+    }
 
     
     public void performActionOnSchemaVariable(SchemaVariable x) {
