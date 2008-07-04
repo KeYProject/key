@@ -2675,6 +2675,7 @@ public class Main extends JFrame implements IMain {
         System.out.println("  no_jmlspecs     : disables parsing JML specifications");
         System.out.println("  unit [loop]     : unit test generation mode (optional argument loop to " +
                             "enable balanced loop unwinding)");
+	System.out.println("  depthfirst      : constructs the proof tree in a depth first manner. Recommended for large proofs");
         System.out.println("  auto	          : start prove procedure after initialisation");
         System.out.println("  testing         : starts the prover with a simple test generation oriented user interface");
         System.out.println("  print_statistics <filename>" );
