@@ -391,10 +391,10 @@ public abstract class TacletApp implements RuleApp {
 					    +"\nthat is not complete.");
 	}
         goal.addAppliedRuleApp(this);	
-        Node n = goal.node();
         PairOfListOfGoalAndTacletApp p = taclet().applyHelp(
                 goal, services, this);
-        n.setAppliedRuleApp(p.getTacletApp());	
+        goal.removeAppliedRuleApp();
+        goal.addAppliedRuleApp(p.getTacletApp());
 	return p.getListOfGoal();
     }    
 
