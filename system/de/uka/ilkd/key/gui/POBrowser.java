@@ -78,7 +78,7 @@ public class POBrowser extends JDialog {
 	this.specRepos  = initConfig.getServices().getSpecificationRepository();
 
 	//create class tree
-	classTree = new ClassTree(true, null, defaultPm, services);
+	classTree = new ClassTree(true, true, null, defaultPm, services);
 	classTree.addTreeSelectionListener(new TreeSelectionListener() {
 	    public void valueChanged(TreeSelectionEvent e) {
 		DefaultMutableTreeNode selectedNode 
@@ -199,7 +199,7 @@ public class POBrowser extends JDialog {
            || !instance.initConfig.equals(initConfig)
            || defaultPm != null) {
             
-            if(instance!=null){
+            if(instance != null){
                 instance.dispose();
                 
                 //============================================
@@ -214,7 +214,7 @@ public class POBrowser extends JDialog {
                 instance.startButton = null;
                 instance.cancelButton = null;
                 instance.po = null;
-//              ============================================
+                //============================================
             }
             
             instance = new POBrowser(initConfig, 
@@ -297,7 +297,7 @@ public class POBrowser extends JDialog {
 	pos = pos.append("PreservesInv");
 	
 	//PreservesOwnInv
-	if(specRepos.getClassInvariants(pm.getKeYJavaType()).size() > 0) {
+	if(specRepos.getClassInvariants(pm.getContainerType()).size() > 0) {
 	    pos = pos.append("PreservesOwnInv");
 	}
 	
@@ -571,14 +571,9 @@ public class POBrowser extends JDialog {
     //public interface
     //-------------------------------------------------------------------------
     
-    public ProofOblInput getPO() {	
-	return po;
-    }
-    
-    // to prevent memory leaks
     public ProofOblInput getAndClearPO(){
         ProofOblInput result = po;
-        po = null;
+        po = null; //to prevent memory leaks
         return result;
     }
 }

@@ -355,18 +355,19 @@ public class UseOperationContractRule implements BuiltInRule {
         ProgramVariable selfVar          
             = SVF.createSelfVar(services, pm, true);
         if(selfVar != null)
-            progVarNS.addSafely(selfVar);
+            goal.addProgramVariable(selfVar);
         
         ListOfParsableVariable paramVars 
             = SVF.createParamVars(services, pm, true);
         for (ParsableVariable pvar : paramVars) {
-            progVarNS.add(pvar);
+            assert pvar instanceof ProgramVariable : pvar + " is not a ProgramVariable";
+            goal.addProgramVariable((ProgramVariable)pvar);
         }
         
         ProgramVariable resultVar 
             = SVF.createResultVar(services, pm, true);
         if(resultVar != null)
-            progVarNS.addSafely(resultVar);
+            goal.addProgramVariable(resultVar);
         
         ProgramVariable excVar 
             = SVF.createExcVar(services, pm, true);

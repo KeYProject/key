@@ -57,6 +57,7 @@ public class ProblemLoader implements Runnable {
     LinkedList loadedInsts = null;
     ListOfIfFormulaInstantiation ifSeqFormulaList =
         SLListOfIfFormulaInstantiation.EMPTY_LIST;
+    Constraint matchConstraint = null;
 
 
     ProblemInitializer init;
@@ -235,23 +236,51 @@ public class ProblemLoader implements Runnable {
                currNode = proof.root(); // initialize loader
                children = currNode.childrenIterator(); // --"--
                iconfig = proof.env().getInitConfig();
-               if (!keepProblem) {
-                   init.tryReadProof(this, po);
-               } else {
-                   setStatusLine("Loading proof", (int)file.length());
-                   CountingBufferedInputStream cinp =
-                       new CountingBufferedInputStream(
-                           new FileInputStream(file),
-                           pm,
-                           (int)file.length()/100);
-                   KeYLexer lexer = new KeYLexer(cinp,
-                       proof.getServices().getExceptionHandler());
-                   KeYParser parser = new KeYParser(ParserMode.PROBLEM, lexer, 
-                                                    proof.getServices());
-                   antlr.Token t;
-                   do { t = lexer.getSelector().nextToken();
-                   } while (t.getType() != KeYLexer.PROOF);
-                   parser.proofBody(this);
+               try {
+                   if (!keepProblem) {
+                       init.tryReadProof(this, po);
+                   } else {
+                       setStatusLine("Loading proof", (int)file.length());
+                       CountingBufferedInputStream cinp =
+                           new CountingBufferedInputStream(
+                                   new FileInputStream(file),
+                                   pm,
+                                   (int)file.length()/100);
+                       KeYLexer lexer = new KeYLexer(cinp,
+                               proof.getServices().getExceptionHandler());
+                       KeYParser parser = new KeYParser(ParserMode.PROBLEM, lexer, 
+                               proof.getServices());
+                       antlr.Token t;
+                       do { t = lexer.getSelector().nextToken();
+                       } while (t.getType() != KeYLexer.PROOF);
+                       parser.proofBody(this);
+                   }
+               } finally {
+                    if (constraints.size() > 0) {
+                        Term left, right;
+                        for (Iterator<PairOfString> it = constraints.iterator(); it
+                                .hasNext();) {
+                            PairOfString p = it.next();
+                            left = parseTerm(p.left, proof);
+                            right = parseTerm(p.right, proof);
+
+                            if (left == null || right == null) {
+                                continue;
+                            }
+
+                            if (!(left.sort().extendsTrans(right.sort()) || right
+                                    .sort().extendsTrans(left.sort()))) {
+                                continue;
+                            }
+
+                            if (!Constraint.BOTTOM.unify(left, right, null)
+                                    .isSatisfiable()) {
+                                continue;
+                            }
+
+                            proof.getUserConstraint().addEquality(left, right);
+                        }
+                    }
                }
 	       setStandardStatusLine();
            
@@ -286,6 +315,8 @@ public class ProblemLoader implements Runnable {
         proofSettings.loadSettingsFromString(preferences);
     }
 
+    private Vector<PairOfString> constraints = new Vector<PairOfString>();
+
     // note: Expressions without parameters only emit the endExpr signal
     public void beginExpr(char id, String s) {
         //System.out.println("start "+id+"="+s);
@@ -305,6 +336,7 @@ public class ProblemLoader implements Runnable {
             currPosInTerm = PosInTerm.TOP_LEVEL;
             loadedInsts   = null;
             ifSeqFormulaList = SLListOfIfFormulaInstantiation.EMPTY_LIST;
+            matchConstraint = Constraint.BOTTOM;
             break;
 
         case 'f' :
@@ -366,6 +398,33 @@ public class ProblemLoader implements Runnable {
             if(currContract == null) {
                 throw new RuntimeException("Error loading proof: contract \"" + s + "\" not found.");
             }
+            break;
+        case 'o' : //userconstraint
+            final int i = s.indexOf('=');
+
+            if (i < 0) {
+                break;
+            }
+
+            constraints.add(new PairOfString(s.substring(0, i),
+                    s.substring(i + 1)));
+            break;
+        case 'm' : //matchconstraint
+            final int index = s.indexOf('=');
+
+            if (index < 0) {
+                break;
+            }
+
+            final Term left = parseTerm(s.substring(0, index), proof);
+            final Term right = parseTerm(s.substring(index + 1), proof);
+
+            if (!(left.sort().extendsTrans(right.sort()) || right.sort()
+                    .extendsTrans(left.sort()))) {
+                break;
+            }
+
+            matchConstraint = matchConstraint.unify(left, right, null);
             break;
         }
     }
@@ -483,6 +542,12 @@ public class ProblemLoader implements Runnable {
             ourApp = currGoal.indexOfTaclets().lookup(currTacletName);
         } else {
             ourApp = NoPosTacletApp.createNoPosTacletApp(t);
+        }
+
+        if (matchConstraint != Constraint.BOTTOM) {
+            ourApp = ourApp.setMatchConditions(new MatchConditions(ourApp
+                    .instantiations(), matchConstraint, ourApp
+                    .newMetavariables(), RenameTable.EMPTY_TABLE));
         }
 
         Constraint userC = mediator.getUserConstraint().getConstraint();
@@ -711,6 +776,17 @@ public class ProblemLoader implements Runnable {
 
     public KeYExceptionHandler getExceptionHandler() {
         return exceptionHandler;
+    }
+
+    private static class PairOfString {
+        public String left;
+        public String right;
+
+        public PairOfString ( String p_left, String p_right ) {
+            left  = p_left;
+            right = p_right;
+        }
+
     }
 
 }

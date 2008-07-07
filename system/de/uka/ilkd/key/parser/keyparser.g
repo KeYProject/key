@@ -90,6 +90,8 @@ options {
       prooflabel2tag.put("keySettings", new Character('s'));
       prooflabel2tag.put("contract", new Character('c'));	
       prooflabel2tag.put("userinteraction", new Character('a'));
+      prooflabel2tag.put("userconstraint", new Character('o'));
+      prooflabel2tag.put("matchconstraint", new Character('m'));
    }
 
     private NamespaceSet nss;
@@ -2289,9 +2291,16 @@ array_set_decls[Sort p] returns [Sort s = null]
             if (n != 0){
                 final JavaInfo ji = getJavaInfo();
                 s = ArraySortImpl.getArraySortForDim(
-                    p, n, ji.getJavaLangObjectAsSort(),
-                    ji.getJavaLangCloneableAsSort(), 
-                    ji.getJavaIoSerializableAsSort());
+                                                     p, n, ji.getJavaLangObjectAsSort(),
+                                                     ji.getJavaLangCloneableAsSort(), 
+                                                     ji.getJavaIoSerializableAsSort());
+
+                Sort last = s;
+                do {
+                    final ArraySort as = (ArraySort) last;
+                    addSort(as);                        
+                    last = as.elementSort();
+                } while (last instanceof ArraySort && sorts().lookup(last.name()) == null);
             } else {
                 s = p;
             }

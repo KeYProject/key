@@ -37,6 +37,7 @@ import de.uka.ilkd.key.proof.init.EnvInput;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 
 
@@ -286,14 +287,15 @@ public class KeYPlugin extends AbstractUIPlugin
 	
 	//show PO browser
 	POBrowser poBrowser = POBrowser.showInstance(initConfig, pm);
-	if(poBrowser.getPO() == null) {
+	ProofOblInput po = poBrowser.getAndClearPO();
+	if(po == null) {
 	    return;
 	}
 	
 	//start proof
 	ProblemInitializer pi = new ProblemInitializer(Main.getInstance());
 	try {
-	    pi.startProver(initConfig, poBrowser.getPO());
+	    pi.startProver(initConfig, po);
 	} catch(ProofInputException e)  {
 	    MessageDialog.openError(PlatformUI.getWorkbench()
 		    .getActiveWorkbenchWindow().getShell(),

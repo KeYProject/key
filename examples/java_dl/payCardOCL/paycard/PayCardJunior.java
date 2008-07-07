@@ -1,3 +1,5 @@
+package paycard;
+
 public class PayCardJunior extends PayCard {
 
    /* @invariants (self.balance >= 0) 

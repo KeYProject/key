@@ -16,7 +16,6 @@ import java.util.Map;
 import de.uka.ilkd.key.java.ArrayOfExpression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.BasicLocationDescriptor;
@@ -42,6 +41,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.FormulaWithAxioms;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.OperationContractImpl;
+import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
 
 
 /**
@@ -51,6 +51,8 @@ import de.uka.ilkd.key.speclang.OperationContractImpl;
 public class DLSpecFactory {
     
     private static final TermBuilder TB = TermBuilder.DF;
+    private static final SignatureVariablesFactory SVF 
+    	= SignatureVariablesFactory.INSTANCE;
     private final Services services;
     
 
@@ -199,8 +201,14 @@ public class DLSpecFactory {
         }
         assert fma != null;
         assert modifies != null;
-        
+       
+        //extract parts
         MethodBodyStatement mbs          = extractMBS(fma);
+        if(mbs.getProgramMethod(services) == null) {
+            throw new ProofInputException("method \"" 
+        	                          + mbs.getMethodReference() 
+        	                          + "\" not found");
+        }
         ProgramMethod pm                 = extractProgramMethod(mbs);
         Modality modality                = extractModality(fma);
         FormulaWithAxioms pre            = extractPre(fma);
@@ -246,11 +254,7 @@ public class DLSpecFactory {
 
         //exception variable may be omitted
 	if(excVar == null) {
-	    KeYJavaType excType
-                    = services.getJavaInfo()
-                              .getTypeByClassName("java.lang.Exception");
-            ProgramElementName excPEN = new ProgramElementName("exc");
-            excVar = new LocationVariable(excPEN, excType);
+            excVar = SVF.createExcVar(services, pm, false);
 	    Term excNullTerm = TB.equals(TB.var(excVar), TB.NULL(services));
             if(modality == Op.DIA) {
                 post = post.conjoin(new FormulaWithAxioms(excNullTerm));
