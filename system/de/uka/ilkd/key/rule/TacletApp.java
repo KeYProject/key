@@ -1328,7 +1328,7 @@ public abstract class TacletApp implements RuleApp {
      * instantiations, constraints and new metavariables given 
      * by the mc object and forget the old ones
      */
-    protected abstract TacletApp setMatchConditions ( MatchConditions mc );
+    public abstract TacletApp setMatchConditions ( MatchConditions mc );
 
 
     /**
