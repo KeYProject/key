@@ -297,7 +297,7 @@ public class POBrowser extends JDialog {
 	pos = pos.append("PreservesInv");
 	
 	//PreservesOwnInv
-	if(specRepos.getClassInvariants(pm.getKeYJavaType()).size() > 0) {
+	if(specRepos.getClassInvariants(pm.getContainerType()).size() > 0) {
 	    pos = pos.append("PreservesOwnInv");
 	}
 	
