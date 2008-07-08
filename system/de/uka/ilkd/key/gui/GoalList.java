@@ -59,8 +59,7 @@ public class GoalList extends JList {
         public void valueChanged(ListSelectionEvent e) {
             final int firstIndex = e.getFirstIndex();
             if (firstIndex>=0 && firstIndex<GoalList.this.getModel().getSize()) {
-                if (mediator().getSelectedGoal() != null && 
-                        mediator.getSelectedGoal() != GoalList.this.getSelectedValue()) {
+                if (mediator.getSelectedGoal() != GoalList.this.getSelectedValue()) {
                     goalChosen();
                 }
             }
@@ -186,7 +185,7 @@ public class GoalList extends JList {
             selectSelectedGoal();
         }
 
-        /** focused node has changed */
+        /** focused goal has changed */
         public void selectedGoalChanged(KeYSelectionEvent e) {
             selectSelectedGoal();
         }
