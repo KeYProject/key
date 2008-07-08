@@ -13,9 +13,7 @@ package de.uka.ilkd.key.gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
@@ -62,6 +60,26 @@ public class GoalList extends JList {
 	}
     }
     
+    
+    /** 
+     * KeyListener for the goal view. We overwrite only method {@link KeyAdapter#keyReleased(KeyEvent)}
+     * so that the sequent view is first updated after the end of an action and e.g. if not for 
+     * intermediate steps when scrolling over larger lists.
+     */
+    private class GoalListKeyListener extends KeyAdapter {
+                
+        public void keyReleased(KeyEvent ke) {
+            final int keyCode = ke.getKeyCode();
+            if (keyCode == KeyEvent.VK_UP ||
+                    keyCode == KeyEvent.VK_KP_UP ||
+                    keyCode == KeyEvent.VK_DOWN ||      
+                    keyCode == KeyEvent.VK_KP_DOWN ) {
+                goalChosen();
+            }                
+        }
+        
+    }
+    
 
     public GoalList(KeYMediator mediator){
 	interactiveListener = new GoalListInteractiveListener();
@@ -76,6 +94,7 @@ public class GoalList extends JList {
 	setModel(selectingListModel);
 	setCellRenderer(new IconCellRenderer());
 	addMouseListener(mouseListener);		
+	addKeyListener(new GoalListKeyListener());
 	updateUI();
     }
 
