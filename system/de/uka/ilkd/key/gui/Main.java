@@ -1908,14 +1908,21 @@ public class Main extends JFrame implements IMain {
     protected void closeTask() {
 	final Proof proof = mediator.getProof();
 	if (proof != null) {
-	    final TaskTreeNode rootTask = 
-		proof.getBasicTask().getRootTask();	
-	    proofList.removeTask(rootTask);   
-	    proof.getServices().getSpecificationRepository().removeProof(proof);
-            ((ProofTreeView)proofView.getComponent(0)).removeProofs(rootTask.allProofs());
+	    final TaskTreeNode rootTask = proof.getBasicTask().getRootTask();
+	    closeTask(rootTask); 
 	}
     }
-    
+
+    protected void closeTask(TaskTreeNode rootTask) {
+            proofList.removeTask(rootTask);
+            for(Proof proof:rootTask.allProofs()){
+                //In a previous revision the following statement was performed only
+                //on one proof object, namely on: mediator.getProof()
+                proof.getServices().getSpecificationRepository().removeProof(proof);
+            }
+            ((ProofTreeView)proofView.getComponent(0)).removeProofs(rootTask.allProofs());
+    }
+
     
     public void closeTaskWithoutInteraction() {
         final Proof proof = mediator.getProof();

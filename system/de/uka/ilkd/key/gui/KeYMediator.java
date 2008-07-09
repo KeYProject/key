@@ -13,6 +13,7 @@ package de.uka.ilkd.key.gui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.lang.ref.WeakReference;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -1020,7 +1021,7 @@ public class KeYMediator {
     class KeYMediatorProofListener implements RuleAppListener, 
                                               AutoModeListener {
 
-        private Node selectedBeforeAutoMode;
+        private WeakReference<Node> selectedBeforeAutoMode;
         
 	/** invoked when a rule has been applied */
 	public void ruleApplied(ProofEvent e) {
@@ -1034,7 +1035,8 @@ public class KeYMediator {
 	 */
 	public void autoModeStarted(ProofEvent e) {
               autoMode = true;
-              selectedBeforeAutoMode = getSelectedNode();
+              Node n = getSelectedNode();
+              selectedBeforeAutoMode = (n!=null)? new WeakReference<Node>(n) : null; 
 //            if (proof == null) return; // there is no selection or anything
 	}
 	
@@ -1043,10 +1045,10 @@ public class KeYMediator {
 	public void autoModeStopped(ProofEvent e) {
             autoMode = false;
             if (proof == null) return; // there is no selection or anything
-	    if (selectedBeforeAutoMode != null) {
+	    if (selectedBeforeAutoMode!=null && selectedBeforeAutoMode.get() != null) {
 //XXX%%%%% This is way too slow for big proofs! 
                 // XXX Could you please check if it is still to slow?
-	        keySelectionModel.nearestOpenGoalSelection(selectedBeforeAutoMode);
+	        keySelectionModel.nearestOpenGoalSelection(selectedBeforeAutoMode.get());
             } else {
                 keySelectionModel.defaultSelection();
             }
