@@ -7,9 +7,10 @@ public class RussianMultiplication{
       @*/
     public int russianMultiplication(int a, int b){
         int z = 0;
-	/*@ maintaining \old(a)*\old(b)==z+a*b;
-	  @ post \old(a)*\old(b) == z;
-	  @ assignable a,b;
+	//This is not valid JML
+	/*@ //maintaining \old(a)*\old(b)==z+a*b;
+	  @ //post \old(a)*\old(b) == z;
+	  @ //assignable a,b;
 	  @*/
         while(a != 0){
             if(a%2 != 0){
