@@ -1021,7 +1021,7 @@ public class KeYMediator {
     class KeYMediatorProofListener implements RuleAppListener, 
                                               AutoModeListener {
 
-        private WeakReference<Node> selectedBeforeAutoMode;
+        private Node selectedBeforeAutoMode;
         
 	/** invoked when a rule has been applied */
 	public void ruleApplied(ProofEvent e) {
@@ -1035,8 +1035,7 @@ public class KeYMediator {
 	 */
 	public void autoModeStarted(ProofEvent e) {
               autoMode = true;
-              Node n = getSelectedNode();
-              selectedBeforeAutoMode = (n!=null)? new WeakReference<Node>(n) : null; 
+              selectedBeforeAutoMode = getSelectedNode(); 
 //            if (proof == null) return; // there is no selection or anything
 	}
 	
@@ -1044,11 +1043,14 @@ public class KeYMediator {
 	 */
 	public void autoModeStopped(ProofEvent e) {
             autoMode = false;
-            if (proof == null) return; // there is no selection or anything
-	    if (selectedBeforeAutoMode!=null && selectedBeforeAutoMode.get() != null) {
+            if (proof == null){
+                selectedBeforeAutoMode = null; //Important to prevent memory leaking
+                return; // there is no selection or anything
+            }
+	    if (selectedBeforeAutoMode!=null) {
 //XXX%%%%% This is way too slow for big proofs! 
                 // XXX Could you please check if it is still to slow?
-	        keySelectionModel.nearestOpenGoalSelection(selectedBeforeAutoMode.get());
+	        keySelectionModel.nearestOpenGoalSelection(selectedBeforeAutoMode);
             } else {
                 keySelectionModel.defaultSelection();
             }
