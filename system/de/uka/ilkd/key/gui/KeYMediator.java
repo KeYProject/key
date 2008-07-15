@@ -13,7 +13,6 @@ package de.uka.ilkd.key.gui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.lang.ref.WeakReference;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -1043,17 +1042,16 @@ public class KeYMediator {
 	 */
 	public void autoModeStopped(ProofEvent e) {
             autoMode = false;
-            if (proof == null){
-                selectedBeforeAutoMode = null; //Important to prevent memory leaking
-                return; // there is no selection or anything
-            }
-	    if (selectedBeforeAutoMode!=null) {
+            if (proof != null) {
+                if (selectedBeforeAutoMode!=null) {
 //XXX%%%%% This is way too slow for big proofs! 
                 // XXX Could you please check if it is still to slow?
-	        keySelectionModel.nearestOpenGoalSelection(selectedBeforeAutoMode);
-            } else {
-                keySelectionModel.defaultSelection();
+                    keySelectionModel.nearestOpenGoalSelection(selectedBeforeAutoMode);
+                } else {
+                    keySelectionModel.defaultSelection();
+                }
             }
+            selectedBeforeAutoMode = null; //Important to prevent memory leaking	    
 	}
     }
 
