@@ -342,7 +342,7 @@ public class TaskTree extends JPanel {
                             mediator.getServices(), 
                             invokedNode.getUsedSpecs());
 	    } else if (e.getSource() == removeTask) {
-	        removeTask(invokedNode);
+	        Main.getInstance().closeTask(invokedNode);
             } else if (e.getSource() == loadProof) {
                 Main mainFrame = Main.getInstance();
                 KeYFileChooser localFileChooser = Main.getFileChooser(
