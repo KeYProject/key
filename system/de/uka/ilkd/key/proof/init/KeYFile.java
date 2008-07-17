@@ -27,6 +27,7 @@ import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.CountingBufferedInputStream;
 import de.uka.ilkd.key.proof.RuleSource;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.SetOfTaclet;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.Debug;
@@ -347,9 +348,10 @@ public class KeYFile implements EnvInput {
 	    initConfig.setTaclets(st);
 	    initConfig.add(normalConfig.namespaces(), mod);
             
-	    initConfig.getServices()
-                      .getSpecificationRepository()
-                      .addOperationContracts(problemParser.getContracts());
+	    SpecificationRepository specRepos 
+	        = initConfig.getServices().getSpecificationRepository();
+	    specRepos.addOperationContracts(problemParser.getContracts());
+	    specRepos.addClassInvariants(problemParser.getInvariants());
             chooseContract = problemParser.getChooseContract();
             Debug.out("Read KeY file   ", file);
 	} catch (antlr.ANTLRException e) {

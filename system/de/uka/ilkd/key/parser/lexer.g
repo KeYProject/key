@@ -157,6 +157,7 @@ tokens {
         CHOOSECONTRACT = "\\chooseContract";
         PROOF = "\\proof";
         CONTRACTS = "\\contracts";
+        INVARIANTS = "\\invariants";
 
         // The first two guys are not really meta operators, treated separately
 	IN_TYPE = "\\inType";
