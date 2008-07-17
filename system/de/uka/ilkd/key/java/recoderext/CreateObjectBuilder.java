@@ -27,7 +27,7 @@ import recoder.java.declaration.modifier.Public;
 import recoder.java.declaration.modifier.Static;
 import recoder.java.reference.*;
 import recoder.java.statement.Return;
-import recoder.kit.ProblemReport;
+import recoder.kit.*;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
@@ -79,12 +79,23 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
                          (InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
                          arguments)));
 
-	result.add
+	MethodReference createRef = 
 	    (new MethodReference(new VariableReference
 				 (new Identifier(NEW_OBJECT_VAR_NAME)), 
 				 new ImplicitIdentifier
 				 (CreateBuilder.IMPLICIT_CREATE)));
-
+	
+	// July 08: mulbrich wraps createRef into a method body statement to
+	// avoid unnecessary dynamic dispatch.
+	TypeReference tyref;
+	Identifier id = class2identifier.get(recoderClass);
+	// handle implicit identifiers differently
+	if(id instanceof ImplicitIdentifier) 
+	    tyref = new TypeReference(id);
+	else 
+	    tyref = TypeKit.createTypeReference(getProgramFactory(), recoderClass); 
+	result.add(new MethodBodyStatement(tyref, null, createRef));
+	
 	result.add(new Return
 		 (new VariableReference(new Identifier(NEW_OBJECT_VAR_NAME))));
 
