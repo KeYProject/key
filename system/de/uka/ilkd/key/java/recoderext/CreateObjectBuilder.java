@@ -85,22 +85,42 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
 				 new ImplicitIdentifier
 				 (CreateBuilder.IMPLICIT_CREATE)));
 	
-	// July 08: mulbrich wraps createRef into a method body statement to
+	// July 08 - mulbrich: wraps createRef into a method body statement to
 	// avoid unnecessary dynamic dispatch.
-	TypeReference tyref;
-	Identifier id = class2identifier.get(recoderClass);
-	// handle implicit identifiers differently
-	if(id instanceof ImplicitIdentifier) 
-	    tyref = new TypeReference(id);
-	else 
-	    tyref = TypeKit.createTypeReference(getProgramFactory(), recoderClass); 
-	result.add(new MethodBodyStatement(tyref, null, createRef));
+	// Method body statement are not possible for anonymous classes, however.
+	// Use a method call there
+	if(recoderClass.getIdentifier() == null) {
+	    // anonymous
+	    result.add
+        (new MethodReference(new VariableReference
+                             (new Identifier(NEW_OBJECT_VAR_NAME)),
+                             new ImplicitIdentifier
+                             (CreateBuilder.IMPLICIT_CREATE)));
+	} else {
+	    TypeReference tyref;
+	    tyref = makeTyRef(recoderClass); 
+	    result.add(new MethodBodyStatement(tyref, null, createRef));
+	}
 	
+	// TODO why does the method return a value? Is the result ever used??
 	result.add(new Return
 		 (new VariableReference(new Identifier(NEW_OBJECT_VAR_NAME))));
 
 	return new StatementBlock(result);
 	
+    }
+
+    /* 
+     * make a type reference. There are special classes which need to be handled 
+     * differently. (<Default> for instance) 
+     */
+    private TypeReference makeTyRef(ClassDeclaration recoderClass) {
+        TypeReference tyref;
+        Identifier id = recoderClass.getIdentifier();
+        if(id instanceof ImplicitIdentifier) 
+            return new TypeReference(id);
+        else 
+            return TypeKit.createTypeReference(getProgramFactory(), recoderClass);
     }
     
 
