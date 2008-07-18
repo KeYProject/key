@@ -12,6 +12,7 @@ public abstract class MemoryArea{
     }
 
     //@ public invariant parent!=null ==> \outerScope(parent, this);
+    //@ public invariant parent==null <==> stack==null;
     public /*@nullable@*/ MemoryArea parent=null;
 
     /*@ public invariant referenceCount>=0 && (referenceCount>0 <==>

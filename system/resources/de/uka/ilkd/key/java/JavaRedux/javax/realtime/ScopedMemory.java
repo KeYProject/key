@@ -47,7 +47,9 @@ public abstract class ScopedMemory extends MemoryArea{
 	    throw new ScopedCycleException();
 	}
 	parent = <currentMemoryArea>;
-	stack = <currentMemoryArea>.stack.push(this);
+	if(stack==null){
+	    stack = <currentMemoryArea>.stack.push(this);
+	}
 	referenceCount++;
 	try{
 	    super.enter();
@@ -75,7 +77,9 @@ public abstract class ScopedMemory extends MemoryArea{
 	    throw new ScopedCycleException();
 	}
 	parent = <currentMemoryArea>;
-	stack = <currentMemoryArea>.stack.push(this);
+	if(stack==null){
+	    stack = <currentMemoryArea>.stack.push(this);
+	}
 	referenceCount++;
 	try{
 	    super.enter(logic);

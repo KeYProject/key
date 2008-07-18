@@ -48,6 +48,8 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
     public static final String IMPLICIT_NEXT_TO_CREATE = "<nextToCreate>";
     public static final String IMPLICIT_CREATED = "<created>";
     
+    public static final String IMPLICIT_SIZE = "<size>";
+    
     public static final String IMPLICIT_INITIALIZED = "<initialized>";
     public static final String IMPLICIT_TRANSIENT = "<transient>";
     
@@ -84,8 +86,14 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
      * @return the new created field declaration
      */
     public static FieldDeclaration createImplicitRecoderField
+        (String typeName, String fieldName, 
+         boolean isStatic, boolean isPrivate) {
+        return createImplicitRecoderField(typeName, fieldName, isStatic, isPrivate, false);
+    }
+    
+    public static FieldDeclaration createImplicitRecoderField
 	(String typeName, String fieldName, 
-	 boolean isStatic, boolean isPrivate) {
+	 boolean isStatic, boolean isPrivate, boolean isFinal) {
 	
 	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>
 	    (1 + (isStatic ? 1 : 0));
@@ -98,6 +106,10 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	} else {
 	    modifiers.add(new Public());
 	}
+        
+        if(isFinal){
+            modifiers.add(new Final());
+        }
 	
         String baseType = typeName.substring(0, typeName.indexOf("[")==-1 ? 
                 typeName.length() : typeName.indexOf("["));
@@ -147,6 +159,8 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_ERRONEOUS, true, true), td, 0);
 	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INITIALIZED, true, true), td, 0);
 	attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_PREPARED, true, true), td, 0);
+        
+        attach(createImplicitRecoderField("long", IMPLICIT_SIZE, true, true, true), td, 0);
 	
 	if(td instanceof ClassDeclaration && 
 	        (td.getName()==null || 

@@ -1837,28 +1837,57 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
     		t = tb.var(v);
     		result = new JMLExpression(t);
     	}
-    |   SPACE 
-    	"(" typ = type 
-            (
-            	LBRACKET
-            		( 
-            			RBRACKET {d++;}
-            		|
-            			dimTerm=expression {dimTerms=dimTerms.append(dimTerm);} RBRACKET
-          	  		)
-            )*
+    |   SPACE // \\space(t): the space an object of exact type t consumes
+    	"(" (
+    		(type) => 
+    		(	typ = type 
+            	(
+            		LBRACKET
+            			( 
+            				RBRACKET {d++;}
+            			|
+            				dimTerm=expression {dimTerms=dimTerms.append(dimTerm);} RBRACKET
+          	  			)
+            	)*
+         	    {
+        			if(d!=0 || !dimTerms.isEmpty()){
+	            		int size = determineElementSize(typ, d);
+    	    	    	t = createArraySizeTerm(size, dimTerms);
+        			}else{
+    	    			int size = services.getJavaInfo().getSizeInBytes(typ);
+	        			IntLiteral sizeLit = new IntLiteral(size+"");
+            			t = services.getTypeConverter().convertToLogicElement(sizeLit);
+        			}
+            		result = new JMLExpression(t);
+        		}
+            )
+            |
+       			t=expression
+				{
+					Function f = (Function) services.getNamespaces().functions().lookup(new Name("maxSpace"));
+					result = new JMLExpression(tb.func(f, t));
+				}
+            )
     	")"
-        {
-        	if(d!=0 || !dimTerms.isEmpty()){
-	            int size = determineElementSize(typ, d);
-    	        t = createArraySizeTerm(size, dimTerms);
-        	}else{
-    	    	int size = services.getJavaInfo().getSizeInBytes(typ);
-	        	IntLiteral sizeLit = new IntLiteral(size+"");
-            	t = services.getTypeConverter().convertToLogicElement(sizeLit);
-        	}
-            result = new JMLExpression(t);
-        }
+
+    |   MAX_SPACE 
+    	// \\max_space(t): the space an object of static type t consumes at most
+        // \\max_space(o): the space an object o consumes
+    	"("
+    		(
+				(type) => typ = type 
+    			{
+    				ProgramVariable s = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_SIZE,	typ);
+    				result = new JMLExpression(tb.var(s));
+				}
+			|				
+				t=expression
+				{
+					Function f = (Function) services.getNamespaces().functions().lookup(new Name("maxSpace"));
+					result = new JMLExpression(tb.func(f, t));
+				}
+			)
+    	")"
     |   WORKINGSPACE "(" t=expression ")"
         {
             if(!(t.op() instanceof ProgramMethod)){
