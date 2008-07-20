@@ -535,6 +535,22 @@ public class InteractiveProver {
 	}
 
     }
+    
+    /**The purpose is to reset the interactiveProver to prevent memory leaking. This 
+     * method is used, e.g., by {@code TaskTree.removeTaskWithoutInteraction}. 
+     * An alternative would be to reset the InteractiveProver in 
+     * {@code InteractiveProverKeYSelectionListener.selectedProofChanged} but 
+     * there we don't know whether the proof has been abandoned or not. 
+     * @author gladisch */
+    public void clear(){
+        if(applyStrategy!=null){
+            applyStrategy.clear();
+        }
+        proof.clearAndDetachRuleAppIndexes();
+        proof = null;
+        focusedGoal = null;
+        //probably more clean up has to be done here.
+    }
 
     /**
      * takes NoPosTacletApps as arguments and returns a duplicate free list of

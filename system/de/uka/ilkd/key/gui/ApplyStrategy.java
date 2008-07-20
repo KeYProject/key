@@ -307,10 +307,16 @@ public class ApplyStrategy {
         return autoModeActive;
     }
 
-
-
     public void setAutoModeActive(boolean autoModeActive) {
         this.autoModeActive = autoModeActive;
     }    
 
+    /**Used by, e.g., {@code InteractiveProver.clear()} in order to prevent memory leaking. 
+     * When a proof obligation is abandoned all references to the proof must be reset.
+     * @author gladisch */
+    public void clear(){
+        stop();
+        proof = null;
+        goalChooser = null;
+    }
 }

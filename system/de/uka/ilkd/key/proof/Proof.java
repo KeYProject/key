@@ -349,7 +349,7 @@ public class Proof implements Named {
             });
     }
 
-    private void clearAndDetachRuleAppIndexes () {
+    public void clearAndDetachRuleAppIndexes () {
         // Taclet indices of the particular goals have to
         // be rebuilt
         final IteratorOfGoal it = openGoals ().iterator ();

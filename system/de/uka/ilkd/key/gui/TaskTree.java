@@ -97,6 +97,9 @@ public class TaskTree extends JPanel {
 	    //go to some other node, take the last leaf.
 	    TreePath path 
 		= delegateView.getPathForRow(delegateView.getRowCount()-1);
+	    if(mediator.getInteractiveProver()!=null){
+	        mediator.getInteractiveProver().clear();
+	    }
 	    if (path!=null) {
 		TaskTreeNode tn0 = (TaskTreeNode) path.getLastPathComponent();
 		mediator.setProof(tn0.proof());
