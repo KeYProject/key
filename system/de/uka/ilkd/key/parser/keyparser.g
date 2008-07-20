@@ -35,7 +35,9 @@ header {
   import de.uka.ilkd.key.rule.conditions.*;
   import de.uka.ilkd.key.rule.metaconstruct.*;
  
+  import de.uka.ilkd.key.speclang.SetAsListOfClassInvariant;
   import de.uka.ilkd.key.speclang.SetAsListOfOperationContract;
+  import de.uka.ilkd.key.speclang.SetOfClassInvariant;
   import de.uka.ilkd.key.speclang.SetOfOperationContract;
   import de.uka.ilkd.key.speclang.dl.translation.DLSpecFactory;
 
@@ -137,6 +139,7 @@ options {
 
     private SetOfTaclet taclets = SetAsListOfTaclet.EMPTY_SET; 
     private SetOfOperationContract contracts = SetAsListOfOperationContract.EMPTY_SET;
+    private SetOfClassInvariant invs = SetAsListOfClassInvariant.EMPTY_SET;
 
     private ParserConfig schemaConfig;
     private ParserConfig normalConfig;
@@ -416,6 +419,10 @@ options {
 
     public SetOfOperationContract getContracts(){
         return contracts;
+    }
+    
+    public SetOfClassInvariant getInvariants(){
+    	return invs;
     }
     
     public HashMap<String, String> getCategory2Default(){
@@ -4383,6 +4390,31 @@ contracts[SetOfChoice choices, Namespace funcNSForSelectedChoices]
        }
 ;
 
+invariants[SetOfChoice choices, Namespace funcNSForSelectedChoices]
+{
+  Choice c = null;
+  QuantifiableVariable selfVar;
+}
+:
+   INVARIANTS LPAREN selfVar=one_logic_bound_variable RPAREN
+       LBRACE {
+	    switchToNormalMode();
+	    IteratorOfChoice it = choices.iterator();
+	    Namespace funcNSForRules = funcNSForSelectedChoices;
+	    while(it.hasNext()){
+		c=it.next();
+		funcNSForRules = 
+		    funcNSForRules.extended(c.funcNS().allElements());
+	    }
+	    namespaces().setFunctions(funcNSForRules); 
+       }
+       ( one_invariant[(ParsableVariable)selfVar] )*
+       RBRACE  {
+           unbindVars();
+       }
+;
+
+
 one_contract 
 {
   Term fma = null;
@@ -4422,6 +4454,29 @@ one_contract
      namespaces().setFunctions(functions().parent());
      getServices().setNamespaces(oldServicesNamespaces);
    }
+;
+
+one_invariant[ParsableVariable selfVar]
+{
+  Term fma = null;
+  String displayName = null;
+  String invName = null;
+}
+:
+     invName = simple_ident LBRACE 
+     fma = formula
+     (DISPLAYNAME displayName = string_literal)?
+     {
+       DLSpecFactory dsf = new DLSpecFactory(getServices());
+       try {
+         invs = invs.add(dsf.createDLClassInvariant(invName,
+                                                    displayName,
+                                                    selfVar,
+                                                    fma));
+       } catch(ProofInputException e) {
+         semanticError(e.getMessage());
+       }
+     } RBRACE SEMI
 ;
 
 problem returns [ Term a = null ]
@@ -4467,6 +4522,7 @@ problem returns [ Term a = null ]
         // WATCHOUT: choices is always going to be an empty set here,
 	// isn't it?
 	( contracts[choices, funcNSForSelectedChoices] )*
+	( invariants[choices, funcNSForSelectedChoices] )*
         (  RULES (choices = option_list[choices])?
 	    LBRACE
             { 
