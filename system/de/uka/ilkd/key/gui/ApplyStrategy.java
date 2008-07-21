@@ -224,7 +224,9 @@ public class ApplyStrategy {
      * method handles InterruptedExceptions cleanly.
      */
     public void stop () {
-        worker.interrupt();
+        if(worker!=null){
+            worker.interrupt();
+        }
     }
     
     
@@ -317,6 +319,8 @@ public class ApplyStrategy {
     public void clear(){
         stop();
         proof = null;
-        goalChooser = null;
+        if(goalChooser!=null){
+            goalChooser.init(null, SLListOfGoal.EMPTY_LIST);
+        }
     }
 }
