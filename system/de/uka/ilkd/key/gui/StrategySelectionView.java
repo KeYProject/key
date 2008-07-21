@@ -22,6 +22,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
+import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.*;
 
@@ -72,6 +74,8 @@ public class StrategySelectionView extends JPanel {
     private JRadioButtonHashMap quantifierNonSplitting;
     private JRadioButtonHashMap quantifierNonSplittingWithProgs;
     private JRadioButtonHashMap quantifierInstantiate;
+    private JRadioButton rdButDefaultGC;
+    private JRadioButton rdButDepthGC;
     
     private KeYMediator mediator;
     
@@ -281,6 +285,42 @@ public class StrategySelectionView extends JPanel {
         ++yCoord;
         addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
 
+        
+        ////////////////////////////////////////////////////////////////////////
+
+        ++yCoord;
+        
+        addJavaDLOption ( new JLabel ( "Goul Chooser" ),
+                    javaDLOptionsLayout, 1, yCoord, 7 );
+        
+        ++yCoord;
+          
+        rdButDefaultGC = new JRadioButton("Default",true);
+        rdButDepthGC = new JRadioButton("Depth",false);
+        ButtonGroup rdgGoalChooser = new ButtonGroup();        
+        ActionListener al = new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				if(e.getSource().equals(rdButDefaultGC)){					
+						mediator.getProfile().setSelectedGoalChooserBuilder(DefaultGoalChooserBuilder.NAME);
+				}else if(e.getSource().equals(rdButDepthGC)){{
+						mediator.getProfile().setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);
+					}
+				}				
+			}        	
+        };
+        
+        rdButDefaultGC.addActionListener(al);
+        rdButDepthGC.addActionListener(al);
+        
+        rdgGoalChooser.add(rdButDefaultGC);
+        rdgGoalChooser.add(rdButDepthGC);
+        
+        addJavaDLOption ( rdButDefaultGC, javaDLOptionsLayout, 2, yCoord, 2 );
+        addJavaDLOption ( rdButDepthGC, javaDLOptionsLayout, 4, yCoord, 2); 
+        
+        
+        ++yCoord;
+        addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
         ////////////////////////////////////////////////////////////////////////
 
         ++yCoord;
