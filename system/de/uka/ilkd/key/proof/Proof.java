@@ -622,6 +622,14 @@ public class Proof implements Named {
     }
 
     /** fires the event that the proof has been pruned at the given node */
+    protected void fireProofIsBeingPruned(Node node, Node removedNode) {
+        ProofTreeEvent e = new ProofTreeRemovedNodeEvent(this, node, removedNode);
+        for (int i = 0; i<listenerList.size(); i++) {
+            listenerList.get(i).proofIsBeingPruned(e);
+        }
+    } 
+
+    /** fires the event that the proof has been pruned at the given node */
     protected void fireProofPruned(Node node, Node removedNode) {
 	ProofTreeEvent e = new ProofTreeRemovedNodeEvent(this, node, removedNode);
 	for (int i = 0; i<listenerList.size(); i++) {

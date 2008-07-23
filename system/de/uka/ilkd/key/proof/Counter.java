@@ -22,7 +22,10 @@ public class Counter {
     private String name;
     private int count;
     
-    private Stack<NodeAnchor> undoAnchors = new Stack<NodeAnchor>();
+    /* This field seems to be useless. It introduces a memory leak because
+     * sometimes there remains an NodeAnchor with a reference to a deleted Node (by prune proof)
+     private Stack<NodeAnchor> undoAnchors = new Stack<NodeAnchor>();
+     */
 
     public Counter(String name) {
         this.name=name;
@@ -33,17 +36,17 @@ public class Counter {
     }
 
     public int getCountPlusPlus(Node undoAnchor) {
-        undoAnchors.push(new NodeAnchor(undoAnchor));
+//        undoAnchors.push(new NodeAnchor(undoAnchor));
         return count++;
     }
     
     public int getCountPlusPlusWithParent(Node undoAnchor) {
-        undoAnchors.push(new NodeAnchor(undoAnchor, true));
+//        undoAnchors.push(new NodeAnchor(undoAnchor, true));
         return count++;
     }
     
     public void undo(Node node) {
-        if (undoAnchors.size()==0) {
+/*        if (undoAnchors.size()==0) {
             de.uka.ilkd.key.util.Debug.assertTrue(count==0,
                                         "No undoAnchor, count should be 0");
             return;
@@ -51,16 +54,23 @@ public class Counter {
         NodeAnchor anchor = (NodeAnchor)undoAnchors.peek();
         if ((!anchor.anchorIsParent() && anchor.node() == node) ||
                 (anchor.anchorIsParent() && anchor.node() == node.parent())) {
+            System.out.println("Counter\""+name+"\".undo node.serialNr:"+anchor.node.serialNr);
             undoAnchors.pop();
             count--;
+        }else{
+            System.out.println("Counter\""+name+"\".undo FAILED: anchor.anchorIsParent()="+anchor.anchorIsParent()+
+                    " anchor.node()==node="+(anchor.node()==node)+
+                    " anchor.node()==node.parent()="+(anchor.node() == node.parent()));
         }
-    }
+*/    }
     
     public String toString() {
         return "Counter "+ name + ": " + count;
     }
     
-    private static class NodeAnchor {
+/*   
+  See comment of the field "undoAnchors" above
+   private static class NodeAnchor {
         Node node;
         boolean anchorIsParent = false;
         NodeAnchor(Node n) {
@@ -77,5 +87,5 @@ public class Counter {
             return anchorIsParent;
         }
     }
-
+*/
 }
