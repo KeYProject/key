@@ -51,7 +51,8 @@ import recoder.list.generic.*;
 public class JMLTransformer extends RecoderModelTransformer {
     
     private static final ListOfString javaMods
-        = SLListOfString.EMPTY_LIST.prepend(new String[]{"final", 
+        = SLListOfString.EMPTY_LIST.prepend(new String[]{"abstract",
+                                                         "final", 
                                                          "private", 
                                                          "protected", 
                                                          "public", 
