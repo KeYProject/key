@@ -67,6 +67,8 @@ public class ApplyStrategy {
 
     /** time in ms after which rule application shall be aborted, -1 disables timeout */
     private long timeout = -1;
+    
+    private String usedCoalChooserBuilderName;
 
     
     // Please create this object beforehand and re-use it.
@@ -75,7 +77,8 @@ public class ApplyStrategy {
     public ApplyStrategy(KeYMediator medi) {
 	this.medi = medi;
         medi.addRuleAppListener( proofListener );
-        this.goalChooser = medi.getProfile().getSelectedGoalChooserBuilder().create();        
+        this.goalChooser = medi.getProfile().getSelectedGoalChooserBuilder().create(); 
+        usedCoalChooserBuilderName = medi.getProfile().getSelectedGoalChooserBuilder().name();
     }
     
     
@@ -193,6 +196,8 @@ public class ApplyStrategy {
         maxApplications = maxSteps;
         this.timeout = timeout;
         countApplied = 0;
+        if(usedCoalChooserBuilderName.compareTo(medi.getProfile().getSelectedGoalChooserBuilder().name())!=0)
+        	this.goalChooser = medi.getProfile().getSelectedGoalChooserBuilder().create();
         goalChooser.init ( proof, goals );
         setAutoModeActive(true);
         startedAsInteractive = !mediator().autoMode();
