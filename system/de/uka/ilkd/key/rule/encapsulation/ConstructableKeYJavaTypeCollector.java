@@ -430,8 +430,7 @@ public class ConstructableKeYJavaTypeCollector implements Visitor {
                 final ReferencePrefix runtimeInstance 
                                 = x.getDesignatedContext();
                 final ExecutionContext executionContext 
-                                = new ExecutionContext(classContext, 
-                                                       runtimeInstance);
+		    = new ExecutionContext(classContext, null,runtimeInstance);
                                                        
                 //save context information
                 final SVInstantiations oldSvInst 

@@ -951,14 +951,18 @@ public class JavaInfo {
 	return null;
     }
 
-    public int getSizeInBytes(KeYJavaType classType){
-	int size = 8;
-	if(classType.toString().indexOf("[")!=-1) return 0;
-        size += getSizeInBytesRec(classType);
-        if(size % 8 == 0){
-            return size;
+    public int getSizeInBytes(KeYJavaType type){
+        if(type.getSort() instanceof ObjectSort){
+            int size = 8;
+            if(type.toString().indexOf("[")!=-1) return 0;
+            size += getSizeInBytesRec(type);
+            if(size % 8 == 0){
+                return size;
+            }else{
+                return (size/8+1)*8;
+            }
         }else{
-            return (size/8+1)*8;
+            return getSizeInBytesForPrimitiveType(type);
         }
     }
     
@@ -971,6 +975,19 @@ public class JavaInfo {
         return size;
     }
     
+    private int getSizeInBytesForPrimitiveType(KeYJavaType pType){
+        String name = pType.getSort().toString();
+        if(name.equals("jbyte") || name.equals("boolean")){
+            return 1;
+        }else if(name.equals("jshort") || name.equals("jchar")){
+            return 2;
+        }else if(name.equals("jlong")){
+            return 8;
+        }else{
+            return 4;
+        }
+    }
+    
     private int sizeInBytes(ListOfField l){
         int size = 0;
         while(!l.isEmpty()){
@@ -978,17 +995,12 @@ public class JavaInfo {
                 l = l.tail();
                 continue;
             }
-            String fType = l.head().getProgramVariable().getKeYJavaType().
-                getSort().toString();
+            KeYJavaType fType = l.head().getProgramVariable().getKeYJavaType();
             l = l.tail();
-            if(fType.equals("jbyte") || fType.equals("boolean")){
-                size += 1;
-            }else if(fType.equals("jshort") || fType.equals("jchar")){
-                size += 2;
-            }else if(fType.equals("jlong")){
-                size += 8;
-            }else{
+            if(fType.getSort() instanceof ObjectSort){
                 size += 4;
+            }else{
+                size += getSizeInBytesForPrimitiveType(fType);
             }
         }
         return size;
