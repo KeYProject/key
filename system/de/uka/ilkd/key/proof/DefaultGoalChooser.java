@@ -48,8 +48,24 @@ public class DefaultGoalChooser implements IGoalChooser {
      * @see de.uka.ilkd.key.proof.IGoalChooser#init(de.uka.ilkd.key.proof.Proof, de.uka.ilkd.key.proof.ListOfGoal)
      */
     public void init ( Proof p_proof, ListOfGoal p_goals ) {
-        allGoalsSatisfiable = false;
+        if(p_proof==null && !(p_goals==null || p_goals==SLListOfGoal.EMPTY_LIST)){
+            throw new RuntimeException("A not existing proof has goals. This makes no sense.");
+        }
+        if(p_goals==null||p_goals==SLListOfGoal.EMPTY_LIST){
+            //the idea of this case is to reset the object if a proof is abandoned. (To prevent memory leaks)
+            allGoalsSatisfiable = true;
+        }else{//this is the normal branch
+            allGoalsSatisfiable = false;
+        }
         currentSubtreeRoot  = null;
+        if(p_proof!=proof){
+            if(proof!=null){
+                proof.removeProofTreeListener(proofTreeListener);
+            }
+            if(p_proof!=null){
+                p_proof.addProofTreeListener(proofTreeListener);
+            }
+        }
         proof               = p_proof;
         setupGoals ( p_goals );
     }
@@ -61,7 +77,9 @@ public class DefaultGoalChooser implements IGoalChooser {
 
 	if ( allGoalsSatisfiable ) {
 	    goalList = p_goals;
-	    findMinimalSubtree ( currentSubtreeRoot );
+	    if(currentSubtreeRoot!=null){
+	        findMinimalSubtree ( currentSubtreeRoot );
+	    }
 	} else {
 	    final IteratorOfGoal it = p_goals.iterator ();
 
@@ -81,6 +99,22 @@ public class DefaultGoalChooser implements IGoalChooser {
 	}
     }
 
+    private ProofTreeObserver proofTreeListener = new ProofTreeObserver();
+    
+    /**Important when a proof is pruned */
+    class ProofTreeObserver extends ProofTreeAdapter{
+        /** The proof tree has been pruned under the node mentioned in the
+         * ProofTreeEvent.  In other words, that node should no longer
+         * have any children now.  Any nodes that were not descendants of
+         * that node are unaffected.*/
+        public void proofPruned(ProofTreeEvent e) {
+            ProofTreeRemovedNodeEvent removeEvent = (ProofTreeRemovedNodeEvent)e;
+            currentSubtreeRoot = removeEvent.getNode();
+            setupGoals ( proof.getSubtreeGoals(proof.root()) );
+        }
+    }
+
+    
     protected int nextGoalCounter = 0;
     
     /* (non-Javadoc)

@@ -116,9 +116,14 @@ public class RuleView extends JPanel implements TreeSelectionListener, java.io.S
 	public void selectedProofChanged(KeYSelectionEvent e) {
             Runnable action = new Runnable () {
 		public void run () {
-		    if ( mediator != null && mediator.getSelectedProof()!=null)
-			setRuleTreeModel(new RuleTreeModel
-					 (mediator.getSelectedGoal()));
+		    if ( mediator != null){
+		        if( mediator.getSelectedProof()!=null){
+		            setRuleTreeModel(new RuleTreeModel
+                                    (mediator.getSelectedGoal()));
+		        }else{
+		            ruleViewModel.setSelectedGoal(null);
+		        }
+		    }
 		}
 	    };
         

@@ -349,7 +349,7 @@ public class Proof implements Named {
             });
     }
 
-    private void clearAndDetachRuleAppIndexes () {
+    public void clearAndDetachRuleAppIndexes () {
         // Taclet indices of the particular goals have to
         // be rebuilt
         final IteratorOfGoal it = openGoals ().iterator ();
@@ -620,6 +620,14 @@ public class Proof implements Named {
 	    listenerList.get(i).proofExpanded(e);
 	}
     }
+
+    /** fires the event that the proof has been pruned at the given node */
+    protected void fireProofIsBeingPruned(Node node, Node removedNode) {
+        ProofTreeEvent e = new ProofTreeRemovedNodeEvent(this, node, removedNode);
+        for (int i = 0; i<listenerList.size(); i++) {
+            listenerList.get(i).proofIsBeingPruned(e);
+        }
+    } 
 
     /** fires the event that the proof has been pruned at the given node */
     protected void fireProofPruned(Node node, Node removedNode) {

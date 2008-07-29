@@ -78,7 +78,7 @@ public class ClassInvariantImpl implements ClassInvariant {
                 Services services) {
         Map<Operator, Operator> result = new LinkedHashMap<Operator, Operator>();
         
-        if(selfVar != null) {
+        if(selfVar != null && originalSelfVar != null) {
             assert selfVar.sort().extendsTrans(originalSelfVar.sort());
             result.put(originalSelfVar, selfVar);
         }

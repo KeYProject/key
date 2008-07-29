@@ -213,7 +213,7 @@ class ClassInvariantSelectionPanel extends JPanel {
 		//set border
 		TitledBorder border = new TitledBorder(
 				BorderFactory.createEtchedBorder(),
-                                inv.getName());
+                                inv.getDisplayName());
 		border.setTitleFont(border.getTitleFont()
 					  .deriveFont(Font.BOLD));
 		result.setBorder(border);

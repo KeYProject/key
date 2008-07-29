@@ -1914,13 +1914,15 @@ public class Main extends JFrame implements IMain {
     }
 
     protected void closeTask(TaskTreeNode rootTask) {
-            proofList.removeTask(rootTask);
+       if(proofList.removeTask(rootTask)){
             for(Proof proof:rootTask.allProofs()){
                 //In a previous revision the following statement was performed only
                 //on one proof object, namely on: mediator.getProof()
                 proof.getServices().getSpecificationRepository().removeProof(proof);
+                proof.mgt().removeProofListener();
             }
             ((ProofTreeView)proofView.getComponent(0)).removeProofs(rootTask.allProofs());
+       }
     }
 
     
@@ -2179,9 +2181,12 @@ public class Main extends JFrame implements IMain {
     private synchronized void setProofNodeDisplay() {
         if (!disableCurrentGoalView) {
             Goal goal;
-            try {
+            if(mediator()!=null && mediator().getSelectedProof()!=null){
                 goal = mediator().getSelectedGoal();
-            } catch(IllegalStateException e) { // there is no proof (yet)
+            } else{//There is no proof. Either not loaded yet or it is abandoned 
+                final LogicPrinter printer = new LogicPrinter
+                (new ProgramPrinter(null), null,null);
+                sequentView.setPrinter(printer, null);
                 return;
             }
             if ( goal != null &&

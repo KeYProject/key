@@ -54,9 +54,6 @@ public class KeYMediator {
     /** the notation info used to print sequents */
     private final NotationInfo notationInfo;
 
-    /** the proof the mediator handles with */
-    private Proof proof;
-
     /** listenerList with to gui listeners */
     private EventListenerList listenerList = new EventListenerList();
 
@@ -211,7 +208,7 @@ public class KeYMediator {
     }
 
     public boolean ensureProofLoadedSilent() {
-	return proof != null;
+	return getProof() != null;
     }
 
     public boolean ensureProofLoaded() {
@@ -233,7 +230,7 @@ public class KeYMediator {
 
     public void setBack(Node node) {
 	if (ensureProofLoaded()) {
-	    if (!proof.setBack(node)) {
+	    if (!getProof().setBack(node)) {
 		popupWarning("Setting back at the chosen node is not possible.",
 			     "Oops...");	    
 	    }
@@ -242,7 +239,7 @@ public class KeYMediator {
     
     public void setBack(Goal goal) {
 	if (ensureProofLoaded()) {
-	    if (proof == null || !proof.setBack(goal))
+	    if (getProof() == null || !getProof().setBack(goal))
 		popupWarning("Setting back the current goal is not possible.", 
 			     "Oops...");
 	}
@@ -299,11 +296,11 @@ public class KeYMediator {
 
 
     private void setProofHelper(Proof p) {
-	if (proof != null) {
-	    proof.removeProofTreeListener(proofTreeListener);
+	if (getProof() != null) {
+	    getProof().removeProofTreeListener(proofTreeListener);
 	}
 	if (p!=null) notationInfo.setAbbrevMap(p.abbreviations());
-	proof = p;
+	Proof proof = p;
 	if (proof != null) {
 	    proof.addProofTreeListener(proofTreeListener);
 	    proof.mgt().setMediator(this);
@@ -321,8 +318,9 @@ public class KeYMediator {
     }
 
 
+    /** the proof the mediator handles with */
     public Proof getProof() {
-	return proof;
+	return keySelectionModel.getSelectedProof();
     }
     
 
@@ -331,8 +329,8 @@ public class KeYMediator {
      * @param steps an int setting the limit
      */
     public void setMaxAutomaticSteps(int steps) {
-       if (proof != null) {
-           proof.getSettings().getStrategySettings().setMaxSteps(steps);
+       if (getProof() != null) {
+           getProof().getSettings().getStrategySettings().setMaxSteps(steps);
        }
        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(steps);
     }
@@ -343,8 +341,8 @@ public class KeYMediator {
      * automatic mode
      */
     public int getMaxAutomaticSteps() {
-        if (proof != null) {
-            return proof.getSettings().getStrategySettings().getMaxSteps();
+        if (getProof() != null) {
+            return getProof().getSettings().getStrategySettings().getMaxSteps();
         } else {
             return ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getMaxSteps();
         }
@@ -759,7 +757,7 @@ public class KeYMediator {
     /** sets the simultaneous update simplifier */
     public void setSimplifier(UpdateSimplifier s) {
 	upd_simplifier = s;
-	if (proof != null) proof.setSimplifier(s);
+	if (getProof() != null) getProof().setSimplifier(s);
     }
    
   
@@ -796,7 +794,7 @@ public class KeYMediator {
      */
     public void startAutoMode() {
 	if (ensureProofLoaded()) {
-	    startAutoMode(proof.openGoals());
+	    startAutoMode(getProof().openGoals());
 	}
     }
 
@@ -825,11 +823,11 @@ public class KeYMediator {
      */
     public void setInteractive ( boolean b ) {
         interactiveProver.setInteractive ( b );
-        if (proof != null) {
+        if (getProof() != null) {
             if ( b  ) {
-                proof.setRuleAppIndexToInteractiveMode ();
+                getProof().setRuleAppIndexToInteractiveMode ();
             } else {
-                proof.setRuleAppIndexToAutoMode ();
+                getProof().setRuleAppIndexToAutoMode ();
             }
         }
     }
@@ -1042,7 +1040,7 @@ public class KeYMediator {
 	 */
 	public void autoModeStopped(ProofEvent e) {
             autoMode = false;
-            if (proof != null) {
+            if (getProof() != null) {
                 if (selectedBeforeAutoMode!=null) {
 //XXX%%%%% This is way too slow for big proofs! 
                 // XXX Could you please check if it is still to slow?
@@ -1100,7 +1098,7 @@ public class KeYMediator {
      * @return the time in ms after which automatic rule application stops
      */
     public long getAutomaticApplicationTimeout() {      
-        if (proof != null) {
+        if (getProof() != null) {
             return getProof().getSettings().getStrategySettings().getTimeout();
         } else {
             return ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getTimeout();
@@ -1112,8 +1110,8 @@ public class KeYMediator {
      * @param timeout a long specifying the timeout time in ms
      */
     public void setAutomaticApplicationTimeout(long timeout) {
-       if (proof != null) {
-           proof.getSettings().getStrategySettings().setTimeout(timeout);
+       if (getProof() != null) {
+           getProof().getSettings().getStrategySettings().setTimeout(timeout);
        }
        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
     }

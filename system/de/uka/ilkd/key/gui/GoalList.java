@@ -343,6 +343,9 @@ public class GoalList extends JList {
 		clear();
 	    }
 
+	    public void proofIsBeingPruned(ProofTreeEvent e) {
+	    }
+
 	    /** The proof tree has been pruned under the node mentioned in the
 	     * ProofTreeEvent.  In other words, that node should no longer
 	     * have any children now.  Any nodes that were not descendants of
@@ -375,6 +378,7 @@ public class GoalList extends JList {
 	        clear ();
                 add ( e.getSource ().openGoals () );
             }
+
 	}
     }
 
