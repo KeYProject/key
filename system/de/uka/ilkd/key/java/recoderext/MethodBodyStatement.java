@@ -11,6 +11,8 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
+import java.io.IOException;
+
 import recoder.java.*;
 import recoder.java.reference.*;
 import recoder.java.statement.JavaStatement;
@@ -355,9 +357,9 @@ public class MethodBodyStatement extends JavaStatement implements
     }
 
     //don't think we need it
+    // we would actually - for "toSource" for instance ...
     public void accept(SourceVisitor v) {
-	throw new IllegalStateException("Not implemented in "
-					+"MethodBodyStatement");
+        // throw new IllegalStateException("Not implemented in MethodBodyStatement, visited by " + v.getClass());
     }
 
     //don't think we need it
