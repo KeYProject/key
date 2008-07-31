@@ -329,6 +329,7 @@ public class Node {
      * nothing has been done.
      */
     public boolean remove(Node child) {
+        proof().fireProofIsBeingPruned(child.parent, child);
 	if (children.remove(child)) {
 	    child.parent = null;
             

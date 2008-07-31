@@ -58,6 +58,14 @@ public class DefaultGoalChooser implements IGoalChooser {
             allGoalsSatisfiable = false;
         }
         currentSubtreeRoot  = null;
+        if(p_proof!=proof){
+            if(proof!=null){
+                proof.removeProofTreeListener(proofTreeListener);
+            }
+            if(p_proof!=null){
+                p_proof.addProofTreeListener(proofTreeListener);
+            }
+        }
         proof               = p_proof;
         setupGoals ( p_goals );
     }
@@ -91,6 +99,22 @@ public class DefaultGoalChooser implements IGoalChooser {
 	}
     }
 
+    private ProofTreeObserver proofTreeListener = new ProofTreeObserver();
+    
+    /**Important when a proof is pruned */
+    class ProofTreeObserver extends ProofTreeAdapter{
+        /** The proof tree has been pruned under the node mentioned in the
+         * ProofTreeEvent.  In other words, that node should no longer
+         * have any children now.  Any nodes that were not descendants of
+         * that node are unaffected.*/
+        public void proofPruned(ProofTreeEvent e) {
+            ProofTreeRemovedNodeEvent removeEvent = (ProofTreeRemovedNodeEvent)e;
+            currentSubtreeRoot = removeEvent.getNode();
+            setupGoals ( proof.getSubtreeGoals(proof.root()) );
+        }
+    }
+
+    
     protected int nextGoalCounter = 0;
     
     /* (non-Javadoc)

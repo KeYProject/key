@@ -393,6 +393,9 @@ public class ProofTreeView extends JPanel {
         delegateView.scrollPathToVisible(tp);
         delegateView.validate();
         treeSelectionListener.ignoreChange = false;
+
+        delegateModel.storeSelection(delegateView.getSelectionPath());
+
     }
 
     /**
@@ -546,6 +549,11 @@ public class ProofTreeView extends JPanel {
 		 getLastPathComponent() instanceof GUIAbstractTreeNode)) {
 		return;
 	    }
+	    
+	    TreePath newTP = e.getNewLeadSelectionPath();
+	    delegateModel.storeSelection(newTP);
+
+	    
 	    GUIAbstractTreeNode treeNode = 
 		((GUIAbstractTreeNode)e.getNewLeadSelectionPath().
 		 getLastPathComponent());

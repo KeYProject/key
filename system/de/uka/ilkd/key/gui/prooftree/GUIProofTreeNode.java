@@ -12,6 +12,8 @@ package de.uka.ilkd.key.gui.prooftree;
 /** this class implements a TreeModel that can be displayed using the
  * JTree class framework 
  */
+import java.lang.ref.WeakReference;
+
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.proof.Node;
@@ -19,11 +21,11 @@ import de.uka.ilkd.key.proof.Node;
 class GUIProofTreeNode extends GUIAbstractTreeNode 
                        implements TreeNode {
 
-    private Node node;
+    private WeakReference<Node> noderef;//made weak otherwise there are leaks in ExpansionState.map and ProofTreeView.delegateView.lastPathComponent 
     
     public GUIProofTreeNode(GUIProofTreeModel tree, Node node) {
 	super ( tree );
-	this.node = node;
+	this.noderef = new WeakReference<Node>(node);
     }
 
 
@@ -36,7 +38,8 @@ class GUIProofTreeNode extends GUIAbstractTreeNode
     }
 
     public TreeNode getParent() {
-	Node n = node;
+	Node n = noderef.get();
+	if(n==null)return null;
 	while (n.parent()!=null
 	       && findChild ( n.parent() ) != null ) {
 	    n = n.parent();
@@ -49,13 +52,18 @@ class GUIProofTreeNode extends GUIAbstractTreeNode
     }
 
     public Node getNode() {
-	return node;
+	return noderef.get();
     }
 
     public String toString() {
 	// changed to serial:name for searching
 	// the proof tree in ProofTreeView.java
-	return node.serialNr()+":"+node.name();
+        Node n =noderef.get();
+        if(n!=null){
+	return n.serialNr()+":"+n.name();
+        }else{
+            return "Invalid WeakReference";
+        }
     }
     
 }
