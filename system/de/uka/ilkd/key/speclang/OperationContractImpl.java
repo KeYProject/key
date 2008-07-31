@@ -317,7 +317,6 @@ public class OperationContractImpl implements OperationContract {
         assert others != null;        
         for(OperationContract contract : others) {
             assert contract.getProgramMethod().equals(programMethod);
-            assert contract.getModality().equals(modality);
         }
         
         //copy atPre map
