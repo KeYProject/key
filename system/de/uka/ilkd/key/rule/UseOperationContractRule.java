@@ -167,13 +167,17 @@ public class UseOperationContractRule implements BuiltInRule {
             if(contracts.size() == 0) {
                 return null;
             }
+            OperationContract combinedContract 
+                = services.getSpecificationRepository()
+                          .combineContracts(contracts);
             
             SetOfClassInvariant ownInvs
                 = services.getSpecificationRepository()
                           .getClassInvariants(pm.getContainerType());
             
-            //TODO: Apply *all* contracts here instead of a random one
-            return new ContractWithInvs(contracts.iterator().next(), 
+            //TODO: Allow user control over the used invariants, instead of 
+            //always using ownInvs (see bug #913)
+            return new ContractWithInvs(combinedContract,
                                         ownInvs, 
                                         ownInvs);
         } else {

@@ -72,6 +72,15 @@ public interface OperationContract {
                                                ListOfParsableVariable paramVars,
                                                Services services);
     
+
+    /**
+     * Returns the union of this contract and those in the passed array.
+     */
+    public OperationContract union(OperationContract[] others, 
+                                   String name, 
+                                   String displayName, 
+                                   Services services);
+        
     /**
      * Returns the contract in pretty HTML format.
      */
