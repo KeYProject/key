@@ -74,7 +74,10 @@ public interface OperationContract {
     
 
     /**
-     * Returns the union of this contract and those in the passed array.
+     * Returns the union of this contract and those in the passed array. 
+     * Probably you want to use SpecificationRepository.combineContracts()
+     * instead, which additionally takes care that the combined contract can be 
+     * loaded later.
      */
     public OperationContract union(OperationContract[] others, 
                                    String name, 

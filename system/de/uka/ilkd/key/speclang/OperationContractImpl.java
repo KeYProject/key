@@ -314,9 +314,12 @@ public class OperationContractImpl implements OperationContract {
                                    String name, 
                                    String displayName, 
                                    Services services) {
-        assert others != null;        
+        assert others != null;
         for(OperationContract contract : others) {
             assert contract.getProgramMethod().equals(programMethod);
+        }
+        if(others.length == 0) {
+            return this;
         }
         
         //copy atPre map
