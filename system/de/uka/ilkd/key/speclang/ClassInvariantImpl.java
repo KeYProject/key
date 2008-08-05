@@ -16,6 +16,7 @@ import java.util.Map;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
@@ -85,6 +86,23 @@ public class ClassInvariantImpl implements ClassInvariant {
 
         return result;
     }
+    
+    
+    /**
+     * Returns an available name constructed by affixing a counter to the passed 
+     * base name.
+     */
+    private String getNewName(String baseName, Services services) {
+        NamespaceSet namespaces = services.getNamespaces();
+            
+        int i = 0;
+        String result;
+        do {
+            result = baseName + "_" + i++;
+        } while(namespaces.lookup(new Name(result)) != null);
+        
+        return result;
+    }
 
     
     
@@ -109,7 +127,8 @@ public class ClassInvariantImpl implements ClassInvariant {
 
     public FormulaWithAxioms getClosedInv(Services services) {
         Sort sort = getKJT().getSort();
-        String name = sort.name().toString().substring(0, 1).toLowerCase();
+        String baseName = sort.name().toString().substring(0, 1).toLowerCase();
+        String name = getNewName(baseName, services);
         LogicVariable selfVar = new LogicVariable(new Name(name), sort);
         return getOpenInv(selfVar, services).allClose(services);
     }

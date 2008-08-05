@@ -403,7 +403,7 @@ public class SpecificationRepository {
     
     /**
      * Tells whether the passed operation is "strictly pure", i.e., whether
-     * its specification says that it may have absolutely side effects
+     * its specification says that it may have absolutely no side effects
      * (except for abrupt termination, which is not considered a side effect).
      */
     public boolean isStrictlyPure(ProgramMethod pm) {
