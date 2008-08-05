@@ -39,7 +39,7 @@ public class PreservesInvPO extends EnsuresPO {
                           SetOfClassInvariant assumedInvs,
                           SetOfClassInvariant ensuredInvs) {
         this(initConfig, 
-             "PreservesInv", 
+             "PreservesInv (" + programMethod + ")", 
              programMethod, 
              assumedInvs, 
              ensuredInvs);
@@ -61,6 +61,16 @@ public class PreservesInvPO extends EnsuresPO {
                                ProgramVariable exceptionVar,
                                Map<Operator, Function/*atPre*/> atPreFunctions) throws ProofInputException {        
         return translateInvs(ensuredInvs);
+    }
+    
+    
+    public boolean implies(ProofOblInput po) {
+        if(!(po instanceof PreservesInvPO)) {
+            return false;
+        }
+        PreservesInvPO piPO = (PreservesInvPO) po;
+        return piPO.ensuredInvs.subset(ensuredInvs) 
+               && assumedInvs.subset(piPO.assumedInvs);
     }
     
     

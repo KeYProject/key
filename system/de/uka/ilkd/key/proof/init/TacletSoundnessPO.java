@@ -55,6 +55,12 @@ implements ProofOblInput{
         return proof;
     }
     
+    
+    public boolean implies(ProofOblInput po) {
+        return equals(po);
+    }
+    
+    
     public NoPosTacletApp[] getTaclets () {
         return app;
     }

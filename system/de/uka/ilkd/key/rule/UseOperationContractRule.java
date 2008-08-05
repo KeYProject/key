@@ -188,6 +188,7 @@ public class UseOperationContractRule implements BuiltInRule {
                                                modality,
                                                true,
                                                true,
+                                               true,
                                                true);
             if(cc.wasSuccessful()) {
                 return cc.getContractWithInvs();

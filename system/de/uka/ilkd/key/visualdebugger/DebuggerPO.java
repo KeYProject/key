@@ -130,6 +130,11 @@ public class DebuggerPO implements ProofOblInput {
 
     public void readProblem(ModStrategy mod) {
     }
+    
+    public boolean implies(ProofOblInput po) {
+        return equals(po);
+    }
+    
 
     /**
      * the initial config containing for example the services which provide

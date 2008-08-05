@@ -27,7 +27,7 @@ public class PreservesThroughoutPO extends EnsuresPO {
 	    			 ProgramMethod programMethod, 
                                  SetOfClassInvariant invs) {
         super(initConfig,
-              "PreservesThroughout", 
+              "PreservesThroughout (" + programMethod + ")", 
               programMethod, 
               Op.TOUT,
               invs,

@@ -59,8 +59,8 @@ public class SpecificationRepository {
     		= new LinkedHashMap<KeYJavaType, SetOfClassInvariant>();
     private final Map<String,ClassInvariant> throughoutInvsByName
                 = new LinkedHashMap<String,ClassInvariant>();
-    private final Map<EnsuresPO,SetOfProof> proofs
-                = new LinkedHashMap<EnsuresPO,SetOfProof>();
+    private final Map<ProofOblInput,SetOfProof> proofs
+                = new LinkedHashMap<ProofOblInput,SetOfProof>();
     private final Map<LoopStatement,LoopInvariant> loopInvs
                 = new LinkedHashMap<LoopStatement,LoopInvariant>();
     private final Map<ProgramMethod,Boolean> strictPurityCache
@@ -78,16 +78,24 @@ public class SpecificationRepository {
     }
     
     
+    
     //-------------------------------------------------------------------------
     //public interface
     //------------------------------------------------------------------------- 
     
+    /**
+     * Returns all registered (atomic) contracts for the passed operation.
+     */
     public SetOfOperationContract getOperationContracts(ProgramMethod pm) {
 	SetOfOperationContract result = contracts.get(pm);
         return result == null ? SetAsListOfOperationContract.EMPTY_SET : result;
     }
     
     
+    /**
+     * Returns all registered (atomic) contracts for the passed operation which 
+     * refer to the passed modality.
+     */
     public SetOfOperationContract getOperationContracts(ProgramMethod pm, 
 	    						Modality modality) {
 	SetOfOperationContract result = getOperationContracts(pm);
@@ -100,6 +108,10 @@ public class SpecificationRepository {
     }
     
 
+    /**
+     * Returns the registered (atomic or combined) contract corresponding to the 
+     * passed name, or null.
+     */
     public OperationContract getOperationContractByName(String name) {
         if(name == null || name.length() == 0) {
             return null;
@@ -119,66 +131,13 @@ public class SpecificationRepository {
         return combineContracts(baseContracts);
     }
     
-        
-    public SetOfClassInvariant getClassInvariants(KeYJavaType kjt) {
-	SetOfClassInvariant result = invs.get(kjt);
-	return result == null ? SetAsListOfClassInvariant.EMPTY_SET : result;
-    }
     
-
-    public ClassInvariant getClassInvariantByName(String name) {
-        return invsByName.get(name);
-    }
-    
-    
-    public SetOfClassInvariant getThroughoutClassInvariants(KeYJavaType kjt) {
-	SetOfClassInvariant result = throughoutInvs.get(kjt);
-        return result == null ? SetAsListOfClassInvariant.EMPTY_SET : result;
-    }
-    
-    public ClassInvariant getThroughoutClassInvariantByName(String name) {
-        return throughoutInvsByName.get(name);
-    }
-    
-    
-    public SetOfProof getProofs(ProofOblInput po) {
-        SetOfProof result = proofs.get(po);
-        return result == null ? SetAsListOfProof.EMPTY_SET : result; 
-    }
-    
-    
-    public SetOfProof getProofs(ProgramMethod pm) {
-        SetOfProof result = SetAsListOfProof.EMPTY_SET;
-        for(Map.Entry<EnsuresPO,SetOfProof> entry : proofs.entrySet()) {
-            EnsuresPO po   = entry.getKey();
-            SetOfProof sop = entry.getValue();
-            if(po.getProgramMethod().equals(pm)) {
-                result = result.union(sop);
-            }
-        }
-        return result;
-    }
-    
-    
-    public ProgramMethod getOperationForProof(Proof proof) {
-	for(Map.Entry<EnsuresPO,SetOfProof> entry : proofs.entrySet()) {
-            EnsuresPO po = entry.getKey();
-            SetOfProof sop = entry.getValue();
-            if(sop.contains(proof)) {
-                return po.getProgramMethod();
-            }
-        }
-        return null;
-    }
-    
-    
-    public LoopInvariant getLoopInvariant(LoopStatement loop) {
-        return loopInvs.get(loop);
-    }
-
-        
+    /**
+     * Registers the passed (atomic) operation contract, whose name must
+     * be different from all previously registered contracts.
+     */
     public void addOperationContract(OperationContract contract) {
-	ProgramMethod pm = contract.getProgramMethod();
+        ProgramMethod pm = contract.getProgramMethod();
         String name = contract.getName();
         assert contractsByName.get(name) == null 
                : "Tried to add a contract with a non-unique name!";
@@ -190,19 +149,25 @@ public class SpecificationRepository {
     }
     
     
+    /**
+     * Registers the passed contracts.
+     */
     public void addOperationContracts(SetOfOperationContract contracts) {
-	for(OperationContract contract : contracts) {
+        for(OperationContract contract : contracts) {
             addOperationContract(contract);
         }
     }
     
     
+    /**
+     * Creates a combined contract out of the passed atomic contracts.
+     */
     public OperationContract combineContracts(
                                         SetOfOperationContract contracts) {
         assert contracts != null && contracts.size() > 0;
         for(OperationContract contract : contracts) {            
             assert !contract.getName().contains(CONTRACT_COMBINATION_MARKER)
-                   : "Please combine only base contracts!";
+                   : "Please combine only atomic contracts!";
         }
 
         //sort contracts alphabetically (for determinism)
@@ -239,51 +204,171 @@ public class SpecificationRepository {
     }
     
     
+    /**
+     * Splits the passed contract into its atomic components. 
+     */
+    public SetOfOperationContract splitContract(OperationContract contract) {
+        SetOfOperationContract result = SetAsListOfOperationContract.EMPTY_SET;
+        String[] atomicNames 
+            = contract.getName().split(CONTRACT_COMBINATION_MARKER);
+        for(String atomicName : atomicNames) {
+            OperationContract atomicContract = contractsByName.get(atomicName);
+            if(atomicContract == null) {
+                return null;
+            }
+            assert atomicContract.getProgramMethod()
+                                 .equals(contract.getProgramMethod());
+            result = result.add(atomicContract);
+        }
+        return result;
+    }
+    
+        
+    /**
+     * Returns all known class invariants for the passed type.
+     */
+    public SetOfClassInvariant getClassInvariants(KeYJavaType kjt) {
+	SetOfClassInvariant result = invs.get(kjt);
+	return result == null ? SetAsListOfClassInvariant.EMPTY_SET : result;
+    }
+    
+
+    /**
+     * Returns the known class invariant corresponding to the passed name, 
+     * or null.
+     */
+    public ClassInvariant getClassInvariantByName(String name) {
+        return invsByName.get(name);
+    }
+    
+
+    /**
+     * Registers the passed class invariant, whose name must be different from 
+     * all previously registered class invariants.
+     */
     public void addClassInvariant(ClassInvariant inv) {
-	KeYJavaType kjt = inv.getKJT();
+        KeYJavaType kjt = inv.getKJT();
         String name = inv.getName();
         assert invsByName.get(name) == null
                : "Tried to add an invariant with a non-unique name!";
-	invs.put(kjt, getClassInvariants(kjt).add(inv));
+        invs.put(kjt, getClassInvariants(kjt).add(inv));
         invsByName.put(name, inv);
     }
     
     
+    /**
+     * Registers the passed class invariants.
+     */
     public void addClassInvariants(SetOfClassInvariant invs) {
-	for(ClassInvariant inv : invs) {
+        for(ClassInvariant inv : invs) {
             addClassInvariant(inv);
         }
     }
     
     
+    /**
+     * Returns all known throughout invariants for the passed type.
+     */
+    public SetOfClassInvariant getThroughoutClassInvariants(KeYJavaType kjt) {
+	SetOfClassInvariant result = throughoutInvs.get(kjt);
+        return result == null ? SetAsListOfClassInvariant.EMPTY_SET : result;
+    }
+    
+    
+    /**
+     * Returns the known throughout invariant corresponding to the passed name, 
+     * or null.
+     */
+    public ClassInvariant getThroughoutClassInvariantByName(String name) {
+        return throughoutInvsByName.get(name);
+    }
+    
+
+    /**
+     * Registers the passed throughout invariant, whose name must be different 
+     * from all previously registered throughout invariants.
+     */
     public void addThroughoutClassInvariant(ClassInvariant inv) {
-	KeYJavaType kjt = inv.getKJT();
+        KeYJavaType kjt = inv.getKJT();
         String name = inv.getName();
         assert throughoutInvsByName.get(name) == null
                : "Tried to add an invariant with a non-unique name!";
-	throughoutInvs.put(kjt, getThroughoutClassInvariants(kjt).add(inv));
+        throughoutInvs.put(kjt, getThroughoutClassInvariants(kjt).add(inv));
         throughoutInvsByName.put(name, inv);
     }
     
     
+    /**
+     * Registers the passed throughout invariants.
+     */
     public void addThroughoutClassInvariants(SetOfClassInvariant invs) {
-	for(ClassInvariant inv : invs) {
+        for(ClassInvariant inv : invs) {
             addThroughoutClassInvariant(inv);
         }
     }
     
     
-    public void registerProof(ProofOblInput po, Proof proof) {
-        if(po instanceof EnsuresPostPO 
-           || po instanceof PreservesInvPO 
-           || po instanceof RespectsModifiesPO) {
-            proofs.put((EnsuresPO) po, getProofs(po).add(proof));
+    /**
+     * Returns all proofs registered for the passed PO (or stronger POs).
+     */
+    public SetOfProof getProofs(ProofOblInput po) {
+        SetOfProof result = SetAsListOfProof.EMPTY_SET;
+        for(Map.Entry<ProofOblInput,SetOfProof> entry : proofs.entrySet()) {
+            ProofOblInput mapPO = entry.getKey();
+            SetOfProof sop = entry.getValue();
+            if(mapPO.implies(po)) {
+                result = result.union(sop);
+            }
         }
+        return result;
+    }
+    
+    
+    /**
+     * Returns all proofs registered for the passed operation.
+     */
+    public SetOfProof getProofs(ProgramMethod pm) {
+        SetOfProof result = SetAsListOfProof.EMPTY_SET;
+        for(Map.Entry<ProofOblInput,SetOfProof> entry : proofs.entrySet()) {
+            ProofOblInput po = entry.getKey();
+            SetOfProof sop = entry.getValue();
+            if(po instanceof EnsuresPO 
+               && ((EnsuresPO) po).getProgramMethod().equals(pm)) {
+                result = result.union(sop);
+            }
+        }
+        return result;
+    }
+    
+    
+    /**
+     * Returns the operation that the passed proof is about, or null.
+     */
+    public ProgramMethod getOperationForProof(Proof proof) {
+	for(Map.Entry<ProofOblInput,SetOfProof> entry : proofs.entrySet()) {
+	    ProofOblInput po = entry.getKey();
+            SetOfProof sop = entry.getValue();
+            if(sop.contains(proof) && po instanceof EnsuresPO) {
+                return ((EnsuresPO)po).getProgramMethod();
+            }
+        }
+        return null;
+    }
+    
+
+    /**
+     * Registers the passed proof. 
+     */
+    public void registerProof(ProofOblInput po, Proof proof) {
+        proofs.put(po, getProofs(po).add(proof));
     }    
     
     
+    /**
+     * Unregisters the passed proof.
+     */
     public void removeProof(Proof proof) {
-	for(Map.Entry<EnsuresPO,SetOfProof> entry : proofs.entrySet()) {
+        for(Map.Entry<ProofOblInput,SetOfProof> entry : proofs.entrySet()) {
             SetOfProof sop = (SetOfProof) entry.getValue();
             if(sop.contains(proof)) {
                 sop = sop.remove(proof);
@@ -296,15 +381,31 @@ public class SpecificationRepository {
             }
         }
     }
+        
     
-    
+    /**
+     * Returns the registered loop invariant for the passed loop, or null.
+     */
+    public LoopInvariant getLoopInvariant(LoopStatement loop) {
+        return loopInvs.get(loop);
+    }
+
+
+    /**
+     * Registers the passed loop invariant, possibly overwriting an older
+     * registration for the same loop.
+     */
     public void setLoopInvariant(LoopInvariant inv) {
         LoopStatement loop = inv.getLoop();
         loopInvs.put(loop, inv);
     }
     
     
-    
+    /**
+     * Tells whether the passed operation is "strictly pure", i.e., whether
+     * its specification says that it may have absolutely side effects
+     * (except for abrupt termination, which is not considered a side effect).
+     */
     public boolean isStrictlyPure(ProgramMethod pm) {
 	Boolean result = strictPurityCache.get(pm);
 	if(result != null) {

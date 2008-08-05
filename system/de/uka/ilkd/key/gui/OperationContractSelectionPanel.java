@@ -59,7 +59,8 @@ class OperationContractSelectionPanel extends JPanel {
      */
     public OperationContractSelectionPanel(Services services,
                                            SetOfOperationContract contracts,
-                                           String title) {
+                                           String title,
+                                           boolean multipleSelection) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.services = services;
         
@@ -81,7 +82,10 @@ class OperationContractSelectionPanel extends JPanel {
         
         //create contract list
         contractList = new JList();
-        contractList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        contractList.setSelectionMode(
+                multipleSelection 
+                ? ListSelectionModel.MULTIPLE_INTERVAL_SELECTION 
+                : ListSelectionModel.SINGLE_SELECTION);
         contractList.setListData(contractsArray);
         contractList.setSelectedIndex(0);
         contractList.addListSelectionListener(new ListSelectionListener() {
@@ -165,13 +169,15 @@ class OperationContractSelectionPanel extends JPanel {
      */
     public OperationContractSelectionPanel(Services services,
                                            ProgramMethod pm,
-                                           Modality modality) {
+                                           Modality modality,
+                                           boolean multipleSelection) {
         this(services, 
              collectContracts(services, pm, modality),  
              "Contracts for \"" 
                 + pm.getFullName()
                 + "\""
-                + (modality != null ? " (" + modality + ")" : ""));
+                + (modality != null ? " (" + modality + ")" : ""),
+             multipleSelection);
     }
     
     
