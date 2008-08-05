@@ -167,13 +167,17 @@ public class UseOperationContractRule implements BuiltInRule {
             if(contracts.size() == 0) {
                 return null;
             }
+            OperationContract combinedContract 
+                = services.getSpecificationRepository()
+                          .combineContracts(contracts);
             
             SetOfClassInvariant ownInvs
                 = services.getSpecificationRepository()
                           .getClassInvariants(pm.getContainerType());
             
-            //TODO: Apply *all* contracts here instead of a random one
-            return new ContractWithInvs(contracts.iterator().next(), 
+            //TODO: Allow user control over the used invariants, instead of 
+            //always using ownInvs (see bug #913)
+            return new ContractWithInvs(combinedContract,
                                         ownInvs, 
                                         ownInvs);
         } else {
@@ -444,7 +448,7 @@ public class UseOperationContractRule implements BuiltInRule {
         Term excNullTerm = TB.equals(TB.var(excVar), TB.NULL(services));
        
         //create "Pre" branch
-        Term preTerm = uf.apply(selfParamsUpdate, 
+        Term preTerm = uf.prepend(selfParamsUpdate, 
                                 TB.imp(pre.getAxiomsAsFormula(), 
                                        pre.getFormula()));
         replaceInGoal(preTerm, preGoal, pio);
@@ -469,12 +473,12 @@ public class UseOperationContractRule implements BuiltInRule {
         //anonym*ous* updates; replace by "else" case once this is fixed
         Term postTerm;
         if(anonUpdate.isAnonymousUpdate()) {
-            postTerm = uf.apply(resultUpdate, postTermWithoutUpdate);
+            postTerm = uf.prepend(resultUpdate, postTermWithoutUpdate);
             postTerm = TB.tf().createAnonymousUpdateTerm(
                                     AnonymousUpdate.getNewAnonymousOperator(), 
                                     postTerm);
         } else {
-            postTerm = uf.apply(uf.sequential(new Update[]{selfParamsUpdate,
+            postTerm = uf.prepend(uf.sequential(new Update[]{selfParamsUpdate,
                                                            atPreUpdate,
                                                            anonUpdate,
                                                            resultUpdate}),
@@ -493,7 +497,7 @@ public class UseOperationContractRule implements BuiltInRule {
                      TB.prog(modality,
                              JavaBlock.createJavaBlock(excPostSB), 
                              pio.subTerm().sub(0)));
-        Term excPostTerm = uf.apply(uf.sequential(new Update[]{selfParamsUpdate,
+        Term excPostTerm = uf.prepend(uf.sequential(new Update[]{selfParamsUpdate,
                                                                atPreUpdate,
                                                                anonUpdate}),
                                     excPostTermWithoutUpdate);

@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.proof.mgt;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -43,6 +45,8 @@ import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
 
 public class SpecificationRepository {
     
+    private static final String CONTRACT_COMBINATION_MARKER = "#";
+    
     private final Map<ProgramMethod, SetOfOperationContract> contracts 
     		= new LinkedHashMap<ProgramMethod,SetOfOperationContract>();
     private final Map<String, OperationContract> contractsByName
@@ -66,13 +70,12 @@ public class SpecificationRepository {
     
     
     //-------------------------------------------------------------------------
-    //public interface
+    //constructors
     //------------------------------------------------------------------------- 
 
     public SpecificationRepository(Services services) {
 	this.services = services;
     }
-    
     
     
     //-------------------------------------------------------------------------
@@ -98,7 +101,22 @@ public class SpecificationRepository {
     
 
     public OperationContract getOperationContractByName(String name) {
-        return contractsByName.get(name);
+        if(name == null || name.length() == 0) {
+            return null;
+        }
+        
+        String[] baseNames = name.split(CONTRACT_COMBINATION_MARKER);        
+        SetOfOperationContract baseContracts 
+            = SetAsListOfOperationContract.EMPTY_SET;
+        for(String baseName : baseNames) {
+            OperationContract baseContract = contractsByName.get(baseName);
+            if(baseContract == null) {
+                return null;
+            }
+            baseContracts = baseContracts.add(baseContract);
+        }
+        
+        return combineContracts(baseContracts);
     }
     
         
@@ -164,6 +182,9 @@ public class SpecificationRepository {
         String name = contract.getName();
         assert contractsByName.get(name) == null 
                : "Tried to add a contract with a non-unique name!";
+        assert !name.contains(CONTRACT_COMBINATION_MARKER)
+               : "Tried to add a contract with a name containing the reserved" 
+                  + " character " + CONTRACT_COMBINATION_MARKER + "!";
         contracts.put(pm, getOperationContracts(pm).add(contract));
         contractsByName.put(name, contract);
     }
@@ -173,6 +194,48 @@ public class SpecificationRepository {
 	for(OperationContract contract : contracts) {
             addOperationContract(contract);
         }
+    }
+    
+    
+    public OperationContract combineContracts(
+                                        SetOfOperationContract contracts) {
+        assert contracts != null && contracts.size() > 0;
+        for(OperationContract contract : contracts) {            
+            assert !contract.getName().contains(CONTRACT_COMBINATION_MARKER)
+                   : "Please combine only base contracts!";
+        }
+
+        //sort contracts alphabetically (for determinism)
+        OperationContract[] contractsArray = contracts.toArray();
+        Arrays.sort(contractsArray, new Comparator<OperationContract> () {
+            public int compare(OperationContract c1, OperationContract c2) {
+                return c1.getName().compareTo(c2.getName());
+            }
+        });
+        
+        //split
+        OperationContract contract = contractsArray[0];
+        OperationContract[] others 
+            = new OperationContract[contractsArray.length - 1];
+        System.arraycopy(contractsArray, 
+                         1, 
+                         others, 
+                         0, 
+                         contractsArray.length - 1);
+        
+        //determine names
+        StringBuffer nameSB = new StringBuffer(contract.getName());
+        StringBuffer displayNameSB = new StringBuffer(contract.getDisplayName());
+        for(OperationContract other : others) {
+            nameSB.append(CONTRACT_COMBINATION_MARKER + other.getName());
+            displayNameSB.append(", ").append(other.getDisplayName());
+        }
+        
+        return contract.union(
+                others, 
+                nameSB.toString(), 
+                (others.length > 0 ? "Combined Contract: " : "") + displayNameSB, 
+                services);
     }
     
     
