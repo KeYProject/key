@@ -18,4 +18,6 @@ public interface ConfigChangeListener {
     /** focused node has changed */
     void configChanged(ConfigChangeEvent e);
 
+    void clear();
+
 } 

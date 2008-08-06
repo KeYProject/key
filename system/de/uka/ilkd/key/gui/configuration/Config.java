@@ -17,6 +17,8 @@ import java.util.List;
 
 import javax.swing.UIManager;
 
+import de.uka.ilkd.key.gui.MethodCallInfo;
+
 
 
 
@@ -96,6 +98,10 @@ public class Config {
 
     public void addConfigChangeListener(ConfigChangeListener listener) {
 	synchronized(listenerList) {
+	    if(MethodCallInfo.MethodCallCounterOn){
+                MethodCallInfo.Global.incForClass(this.getClass().toString(), MethodCallInfo.addOrPut);
+                MethodCallInfo.Local.incForClass(this.getClass().toString(), MethodCallInfo.addOrPut);
+	    }
 	    listenerList.add(listener);	    
 	}
     }
@@ -103,6 +109,10 @@ public class Config {
     public void removeConfigChangeListener(ConfigChangeListener listener) {
 	synchronized(listenerList) {
 	    listenerList.remove(listener);	    
+            if(MethodCallInfo.MethodCallCounterOn){
+                MethodCallInfo.Global.incForClass(this.getClass().toString(), MethodCallInfo.remove);
+                MethodCallInfo.Local.incForClass(this.getClass().toString(), MethodCallInfo.remove);
+            }
 	}
     }		
 

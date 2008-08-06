@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import java.lang.ref.WeakReference;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
@@ -114,8 +115,8 @@ public class QuanUpdateOperator implements IUpdateOperator {
      * Map from <code>QuanUpdateSignature</code> to
      * <code>QuanUpdateOperator</code>
      */
-    private static final HashMap<QuanUpdateSignature, QuanUpdateOperator> updates = 
-        new HashMap<QuanUpdateSignature, QuanUpdateOperator>();
+    private static final WeakHashMap<QuanUpdateSignature, WeakReference<QuanUpdateOperator>> updates = 
+        new WeakHashMap<QuanUpdateSignature, WeakReference<QuanUpdateOperator>>();
 
     /**
      * returns the update operator for the given location order
@@ -138,10 +139,11 @@ public class QuanUpdateOperator implements IUpdateOperator {
     public static QuanUpdateOperator createUpdateOp(Location[] locs,
                                                     boolean[] guards) {
         final QuanUpdateSignature sig = new QuanUpdateSignature ( locs, guards );
-        QuanUpdateOperator result = updates.get(sig);
+        WeakReference<QuanUpdateOperator> qUpOp = updates.get(sig);
+        QuanUpdateOperator result = qUpOp!=null?qUpOp.get():null;
         if (result == null) {
             result = new QuanUpdateOperator(sig);
-            updates.put(sig, result);
+            updates.put(sig, new WeakReference<QuanUpdateOperator>(result));
         }
         return result;
     }

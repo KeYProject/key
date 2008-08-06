@@ -1270,6 +1270,9 @@ public class Main extends JFrame implements IMain {
                 smaller.setEnabled(!Config.DEFAULT.isMinimumSize());
                 larger.setEnabled(!Config.DEFAULT.isMaximumSize());
             }
+            public void clear(){
+                Config.DEFAULT.removeConfigChangeListener(this);
+            };
         });
         
         fontSize.add(smaller);
@@ -1815,6 +1818,10 @@ public class Main extends JFrame implements IMain {
      * {@link #updateGoalView(String, JComponent)} instead (thread safe)
      */
     private void paintGoalView(String borderTitle, JComponent goalViewPane) {
+        JViewport vp = goalView.getViewport();
+        if(vp!=null){
+            vp.removeAll();
+        }
         goalView.setViewportView(goalViewPane);
         goalView.setBorder(new TitledBorder(borderTitle));
         goalView.validate();

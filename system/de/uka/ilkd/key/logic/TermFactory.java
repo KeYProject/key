@@ -85,7 +85,7 @@ public class TermFactory {
         
     }
 
-    private static Map<Object, Term> cache = 
+    private  static Map<Object, Term> cache = 
         Collections.synchronizedMap(new LRUCache<Object, Term>(5000));
 
     
@@ -954,4 +954,8 @@ public class TermFactory {
         return createFunctionTerm(sort.getCastSymbol(), with);
     }
     
+    
+    public static void clearCache(){
+        cache.clear();
+    }
 }
