@@ -1871,8 +1871,10 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
     	")"
 
     |   MAX_SPACE 
-    	// \\max_space(t): the space an object of static type t consumes at most
-        // \\max_space(o): the space an object o consumes
+    	// \max_space(t): the space an object of static type t consumes at most
+        // \max_space(o): the space an object o consumes
+        // o instanceof t ==> \max_space(o) <= \max_space(t)
+        // t2<:t1 ==> \max_space(t2)<=\max_space(t1)
     	"("
     		(
 				(type) => typ = type 
