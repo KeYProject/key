@@ -570,7 +570,7 @@ public class ProblemInitializer {
         /*After creating the proof environment and loading of the problem we use
          * weak references to store newly created names as they become obsolete when
          * parts of a proof become pruned. */
-        Namespace.storeAsWeak = true;
+        Namespace.storeAsWeak = false;//true
         if(MethodCallInfo.MethodCallCounterOn){
             MethodCallInfo.Local.reset();
         }
