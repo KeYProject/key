@@ -131,7 +131,8 @@ public class ResolveQuery extends AbstractMetaOperator {
             
             final ExecutionContext ec; 
             if (pm.getContainerType() != null) {
-                ec = new ExecutionContext(new TypeRef(pm.getContainerType()), null, null);
+                ec = new ExecutionContext(new TypeRef(pm.getContainerType()), 
+                        services.getJavaInfo().getDefaultMemoryArea(), null);
             } else {
                 ec = services.getJavaInfo().getDefaultExecutionContext();
             }

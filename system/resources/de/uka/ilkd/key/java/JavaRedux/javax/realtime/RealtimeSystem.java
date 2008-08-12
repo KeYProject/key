@@ -24,7 +24,7 @@ public class RealtimeSystem{
     //	return IAE;
     //    }
 
-    public static IllegalAssignmentError tbe(){
+    public static ThrowBoundaryError tbe(){
 	return TBE;
     }
 

@@ -11,7 +11,7 @@ public abstract class B{
 	Runnable r = new Runnable(){
 		public void run(){
 		    int j=0;
-		    final A[] a = new A[x];
+		    A[] a = new A[x];
 		    /*@ loop_invariant j>=0 && (\forall int k; k>=0 && k<j; a[k]!=null) && \object_creation(A);
 		      @ assignable j, a[*], \object_creation(A);
 		      @ decreasing x-j;
@@ -25,9 +25,8 @@ public abstract class B{
 		}
 	    };
 	int i=0;
-	/*@ loop_invariant i>=0 && \object_creation(A) && \object_creation(A[]) && \object_creation(MemoryStack) && 
-	  @                m.stack == null;
-	  @ assignable i, \object_creation(A), \object_creation(A[]), \object_creation(MemoryStack), m.stack;
+	/*@ loop_invariant i>=0 && \object_creation(A) && \object_creation(A[]) && \object_creation(MemoryStack);
+	  @ assignable i, \object_creation(A), \object_creation(A[]), \object_creation(MemoryStack);
 	  @ decreasing y-i;
 	  @ working_space_single_iteration 0;
 	  @*/
@@ -38,7 +37,7 @@ public abstract class B{
     }
 
     /*@ public normal_behavior
-      @  assignable a[*], a[*].c;
+      @  assignable \nothing; //a[*], a[*].c;
       @  working_space 0;
       @*/
     public void bar(A[] a);

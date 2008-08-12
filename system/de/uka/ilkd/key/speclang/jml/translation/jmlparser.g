@@ -701,6 +701,21 @@ options {
 		= new BasicLocationDescriptor(guardFma, lengthTerm);
 	    result = result.add(lengthLd);
 	    
+	    //fields of java.lang.Object
+	    
+	    ClassDeclaration cd = (ClassDeclaration) javaInfo.getJavaLangObject().getJavaType();
+	    ListOfField fields = javaInfo.getAllFields(cd);
+	    for(IteratorOfField it = fields.iterator(); it.hasNext(); ) {
+        	Field f = it.next();
+            ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
+            if(!pv.isStatic()) {
+            	Term fieldTerm = tb.dot(objectTerm, pv);
+                BasicLocationDescriptor fieldLd 
+                            = new BasicLocationDescriptor(guardFma, fieldTerm);
+                result = result.add(fieldLd);
+            }
+        }
+    	    
 	    //slots
 	    LogicVariable idxLv 
 	    	= new LogicVariable(new Name("idx"), integerSort);

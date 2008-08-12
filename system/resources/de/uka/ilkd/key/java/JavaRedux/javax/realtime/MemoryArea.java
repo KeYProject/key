@@ -11,8 +11,9 @@ public abstract class MemoryArea{
 	return stack;
     }
 
-    //@ public invariant parent!=null ==> \outerScope(parent, this);
+    // public invariant parent!=null ==> \outerScope(parent, this);
     //@ public invariant parent==null <==> stack==null;
+    //@ public invariant parent==null <==> consumed==0;
     public /*@nullable@*/ MemoryArea parent=null;
 
     /*@ public invariant referenceCount>=0 && (referenceCount>0 <==>
@@ -84,6 +85,7 @@ public abstract class MemoryArea{
 
     /*@ normal_behavior
       @  working_space 0;
+      @  ensures \result==size-consumed;
       @*/
     public /*@pure@*/ long memoryRemaining(){
 	return size-consumed;

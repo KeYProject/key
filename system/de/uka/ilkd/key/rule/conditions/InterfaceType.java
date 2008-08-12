@@ -26,10 +26,10 @@ public class InterfaceType extends VariableConditionAdapter {
             SVInstantiations instMap, Services services) {
         final Sort sort = 
             resolver.resolveSort(var, instCandidate, instMap, services);
-        
         final boolean isClassType  =  sort instanceof ClassInstanceSort;
         
         KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(sort);
+        if(kjt==null) kjt = services.getJavaInfo().getKeYJavaType(sort.toString());
         boolean b = true;
         if(kjt.getJavaType() instanceof TypeDeclaration){
             b = ((TypeDeclaration) kjt.getJavaType()).isInterface();
