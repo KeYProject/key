@@ -452,7 +452,6 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	}
     }
 
-
     /**
      * This sort represents a type of program schema variables that match
      * only on <ul> <li>program variables or <li>static field references with

@@ -4,6 +4,8 @@ public class MemoryStack{
 
     private MemoryArea[] _stack;
 
+    //@ public invariant \inImmortalMemory(this);
+
     // public static invariant EMPTY_STACK.size()==0;
     private static MemoryStack EMPTY_STACK;
 

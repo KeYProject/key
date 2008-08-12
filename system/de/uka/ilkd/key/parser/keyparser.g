@@ -3998,6 +3998,7 @@ varexp[TacletBuilder b]
     | varcond_ws_non_rigid_op[b]
     | varcond_ws_op[b]
     | varcond_isupdated[b]    
+    | varcond_no_memory_area[b]
   ) 
   | 
   ( (NOT {negated = true;} )? 
@@ -4372,6 +4373,16 @@ varcond_isupdated [TacletBuilder b]
         } 
 ;
 
+varcond_no_memory_area [TacletBuilder b]
+{
+  ParsableVariable x = null;
+}
+:
+   NOMEMORYAREA 
+	LPAREN x=varId RPAREN {
+     	   b.addVariableCondition(new NoMemoryAreaCondition((SchemaVariable) x));
+        } 
+;
 
 varcond_freeLabelIn [TacletBuilder b, boolean negated]
 {
