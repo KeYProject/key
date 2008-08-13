@@ -54,7 +54,7 @@ public abstract class ScopedMemory extends MemoryArea{
 	try{
 	    super.enter();
 	}catch(Exception e){
-	    if(this==e.memoryArea){
+	    if(this==getMemoryArea(e)){
 		throw RealtimeSystem.tbe();
 	    }
 	}finally{
@@ -84,7 +84,7 @@ public abstract class ScopedMemory extends MemoryArea{
 	try{
 	    super.enter(logic);
 	}catch(Exception e){
-	    if(this==e.memoryArea){
+	    if(this==getMemoryArea(e)){
 		throw RealtimeSystem.tbe();
 	    }
 	}finally{
@@ -146,7 +146,7 @@ public abstract class ScopedMemory extends MemoryArea{
     //	java.lang.Object[] args){}
 
     public void setPortal(java.lang.Object object){
-	if(this==object.memoryArea){
+	if(this==getMemoryArea(object)){
 	    portal = object;
 	}else{
 	    throw new IllegalAssignmentError();

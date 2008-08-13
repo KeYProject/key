@@ -3998,7 +3998,6 @@ varexp[TacletBuilder b]
     | varcond_ws_non_rigid_op[b]
     | varcond_ws_op[b]
     | varcond_isupdated[b]    
-    | varcond_no_memory_area[b]
   ) 
   | 
   ( (NOT {negated = true;} )? 
@@ -4007,6 +4006,7 @@ varexp[TacletBuilder b]
       | varcond_staticmethod[b,negated]  
       | varcond_referencearray[b, negated]
       | varcond_array[b, negated]
+      | varcond_memory_area[b, negated]
       | varcond_abstractOrInterface[b, negated]
       | varcond_interface[b, negated]
       | varcond_static[b,negated] 
@@ -4373,14 +4373,14 @@ varcond_isupdated [TacletBuilder b]
         } 
 ;
 
-varcond_no_memory_area [TacletBuilder b]
+varcond_memory_area [TacletBuilder b, boolean negated]
 {
   ParsableVariable x = null;
 }
 :
-   NOMEMORYAREA 
+   MEMORYAREA 
 	LPAREN x=varId RPAREN {
-     	   b.addVariableCondition(new NoMemoryAreaCondition((SchemaVariable) x));
+     	   b.addVariableCondition(new MemoryAreaCondition((SchemaVariable) x, negated));
         } 
 ;
 

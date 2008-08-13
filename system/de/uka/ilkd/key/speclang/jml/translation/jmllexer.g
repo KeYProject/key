@@ -156,6 +156,7 @@ TYPE : "\\TYPE";
 NOWARN : "\\nowarn";
 CURRENT_MEMORY_AREA : "\\currentMemoryArea"; //KeY extension, not official JML
 IN_IMMORTAL_MEMORY : "\\inImmortalMemory"; //KeY extension, not official JML
+MEMORY_AREA : "\\memoryArea"; //KeY extension, not official JML
 OUTER_SCOPE : "\\outerScope"; //KeY extension, not official JML
 IN_OUTER_SCOPE : "\\inOuterScope"; //KeY extension, not official JML
 

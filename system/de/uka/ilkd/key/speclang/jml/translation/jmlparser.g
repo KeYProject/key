@@ -1977,7 +1977,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	|  	IN_OUTER_SCOPE "("o1 = specexpression "," o2 = specexpression ")"
         {
             TermSymbol ios = (TermSymbol) services.getNamespaces().functions().lookup(new Name("outerScope"));
-            ProgramVariable ma = javaInfo.getAttribute("memoryArea", javaInfo.getJavaLangObject());
+            ProgramVariable ma = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_MEMORY_AREA, javaInfo.getJavaLangObject());
       	  	ProgramVariable stack = javaInfo.getAttribute("stack", ma.getKeYJavaType());
             t = tb.func(ios, tb.dot(tb.dot(o1, ma), stack), tb.dot(tb.dot(o2, ma), stack));
             result = new JMLExpression(t);
@@ -1985,7 +1985,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
     |   OUTER_SCOPE "("o1 = specexpression "," o2 = specexpression ")"
         {
             TermSymbol ios = (TermSymbol) services.getNamespaces().functions().lookup(new Name("outerScope"));
-            ProgramVariable ma = javaInfo.getAttribute("memoryArea", javaInfo.getJavaLangObject());
+            ProgramVariable ma = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_MEMORY_AREA, javaInfo.getJavaLangObject());
       	  	ProgramVariable stack = javaInfo.getAttribute("stack", ma.getKeYJavaType());
             t = tb.func(ios, tb.dot(o1, stack), tb.dot(o2, stack));
             result = new JMLExpression(t);
@@ -1993,10 +1993,15 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
     |   IN_IMMORTAL_MEMORY "(" t = expression ")" 
     	{
     		TermSymbol im = (TermSymbol) services.getNamespaces().functions().lookup(new Name("immortal"));
-    		ProgramVariable ma = javaInfo.getAttribute("memoryArea", javaInfo.getJavaLangObject());
+    		ProgramVariable ma = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_MEMORY_AREA, javaInfo.getJavaLangObject());
     		ProgramVariable stack = javaInfo.getAttribute("stack", ma.getKeYJavaType());
     		t = tb.dot(tb.dot(t, ma), stack);
     		t = tb.func(im, t);
+    		result = new JMLExpression(t);
+    	}
+    |   MEMORY_AREA "(" t = expression ")"
+    	{
+    		t = tb.dot(t, javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_MEMORY_AREA, javaInfo.getJavaLangObject()));
     		result = new JMLExpression(t);
     	}
     |   TYPEOF "(" t=specexpression ")"

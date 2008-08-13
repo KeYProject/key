@@ -36,7 +36,7 @@ public abstract class MemoryArea{
 	if(size<0) throw new java.lang.IllegalArgumentException();
 	this.size = size;
 	this.logic = logic;
-	<currentMemoryArea>.consumed -= 8;
+	//	<currentMemoryArea>.consumed -= 8;
 	memory = new PhysicalMemoryArea(size);
     }
 
@@ -72,9 +72,11 @@ public abstract class MemoryArea{
 	<runRunnable>(logic);
     }
 
-    public static MemoryArea getMemoryArea(java.lang.Object object){
-	return object.memoryArea;
-    }
+    /*@ public normal_behavior
+      @  ensures \result == \memoryArea(object);
+      @  working_space 0;
+      @*/
+    public static MemoryArea getMemoryArea(java.lang.Object object);
 
     /*@ normal_behavior
       @  working_space 0;

@@ -7,10 +7,10 @@ import javax.realtime.*;
 
 public class Object {  
 
-    /*@ public invariant memoryArea!=null && memoryArea.stack!=null; 
+    /*@ public invariant \memoryArea(this)!=null && \memoryArea(this).stack!=null; 
       @*/
 
-    public final javax.realtime.MemoryArea memoryArea = <currentMemoryArea>;
+    //    public final javax.realtime.MemoryArea memoryArea = <currentMemoryArea>;
 	//	javax.realtime.ScopedMemory.currentMemoryArea;
 
     /*    public javax.realtime.ScopedMemory memoryArea(){

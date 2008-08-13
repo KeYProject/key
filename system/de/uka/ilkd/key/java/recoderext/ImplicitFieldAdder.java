@@ -18,6 +18,7 @@ import recoder.abstraction.Variable;
 import recoder.java.Identifier;
 import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.*;
+import recoder.java.reference.PackageReference;
 import recoder.java.reference.TypeReference;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
@@ -47,7 +48,9 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 
     public static final String IMPLICIT_NEXT_TO_CREATE = "<nextToCreate>";
     public static final String IMPLICIT_CREATED = "<created>";
-    
+   
+    public static final String IMPLICIT_MEMORY_AREA = "<memoryArea>";
+       
     public static final String IMPLICIT_SIZE = "<size>";
     
     public static final String IMPLICIT_INITIALIZED = "<initialized>";
@@ -137,6 +140,14 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
         attach(createImplicitRecoderField("byte", IMPLICIT_TRANSIENT, false, false), td, 0);
 	attach(createImplicitRecoderField("boolean", IMPLICIT_INITIALIZED, false, false), td, 0);
         attach(createImplicitRecoderField("boolean", IMPLICIT_CREATED, false, false), td, 0);
+        ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(1);
+        modifiers.add(new Public());
+        FieldDeclaration fd = new FieldDeclaration
+        (modifiers, new TypeReference(
+                new PackageReference(new PackageReference(new Identifier("javax")), new Identifier("realtime")),
+                new Identifier("MemoryArea")), new ImplicitIdentifier(IMPLICIT_MEMORY_AREA), null);
+        fd.makeAllParentRolesValid();
+        attach(fd, td, 0);
     }
     
 

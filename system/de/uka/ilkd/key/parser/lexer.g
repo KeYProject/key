@@ -94,7 +94,7 @@ tokens {
     WORKINGSPACE = "\\workingSpace";
     WORKINGSPACENONRIGID = "\\workingSpaceNonRigid";
 	ISUPDATED = "\\isUpdated";
-	NOMEMORYAREA = "\\noMemoryArea";
+	MEMORYAREA = "\\memoryArea";
 
 
 	// Quantifiers, binding, substitution

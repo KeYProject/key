@@ -13,11 +13,11 @@ public class Test extends SuperTest{
     public static Test st;
 
     /*@ public normal_behavior
-      @  requires oArr.memoryArea == \currentMemoryArea;
+      @  requires \memoryArea(oArr) == \currentMemoryArea;
       @  assignable oArr[0], \object_creation(Test);
       @  working_space \space(Test);
       @ also public normal_behavior
-      @  requires oArr.memoryArea == \currentMemoryArea;
+      @  requires \memoryArea(oArr) == \currentMemoryArea;
       @  assignable oArr[0], \object_creation(Test);
       @  working_space 40;
       @  
@@ -27,7 +27,7 @@ public class Test extends SuperTest{
     }
 
     /*@ public normal_behavior
-      @  requires oArr.memoryArea == \currentMemoryArea;
+      @  requires \memoryArea(oArr) == \currentMemoryArea;
       @   {|
       @      working_space \space(Test);
       @     also
@@ -39,8 +39,8 @@ public class Test extends SuperTest{
     }
 
     /*@ public normal_behavior
-      @  requires \outerScope(\currentMemoryArea, oArr.memoryArea) &&
-      @           \outerScope(o.memoryArea, \currentMemoryArea); 
+      @  requires \outerScope(\currentMemoryArea, \memoryArea(oArr)) &&
+      @           \outerScope(\memoryArea(o), \currentMemoryArea); 
       @  assignable oArr, \object_creation(Object);
       @  working_space \space(Object[1]);
       @  ensures true;
@@ -89,6 +89,87 @@ public class Test extends SuperTest{
     }
 
     /*@ public normal_behavior
+      @  requires \outerScope(\memoryArea(this), \currentMemoryArea);
+      @  working_space 10000;
+      @  ensures true;
+      @*/
+    private void testOrder(){
+	final LTMemory ltm1 = new LTMemory(3000000);
+	final Runnable r = new Runnable(){
+		public void run(){
+		    final LTMemory ltm3 = new LTMemory(3000000);
+		    enterArea(ltm1, ltm3);
+		    /*		    ltm1.executeInArea( new Runnable(){
+			    public void run(){
+				ltm3.enter(hello);
+			    }
+			    });*/
+		}
+	    };
+	ltm1.enter(new Runnable(){
+		public void run(){
+		    final LTMemory ltm2 = new LTMemory(3000000);
+		    ltm2.enter(r);
+		}
+	    });
+    }
+
+    /*@ public normal_behavior
+      @  ensures \outerScope(\memoryArea(\memoryArea(this)), \memoryArea(this));
+      @*/
+    public void testMemoryAreaOuter(){}
+
+    public void enterArea(final ScopedMemory sm1, final ScopedMemory sm2){
+	final Runnable hello = new Runnable(){
+		public void run(){
+		    int i=0;
+		    i++;
+		}
+	    };
+	sm1.executeInArea( new Runnable(){
+			    public void run(){
+				sm2.enter(hello);
+			    }
+			});
+    }
+
+    /*@ public normal_behavior
+      @  requires \outerScope(\memoryArea(this), \currentMemoryArea);
+      @  working_space 10000;
+      @  ensures true;
+      @*/
+    private void testOrderWithAssignment(){
+	final LTMemory ltm1 = new LTMemory(3000000);
+	final Runnable r = new Runnable(){
+		public void run(){
+		    final LTMemory ltm3 = new LTMemory(3000000);
+		    RefCont rc = new RefCont();
+		    enterAreaWithAssignment(ltm1, ltm3, rc);
+		    /*		    ltm1.executeInArea( new Runnable(){
+			    public void run(){
+				ltm3.enter(hello);
+			    }
+			    });*/
+		}
+	    };
+	ltm1.enter(new Runnable(){
+		public void run(){
+		    final LTMemory ltm2 = new LTMemory(3000000);
+		    ltm2.enter(r);
+		}
+	    });
+    }
+
+    public void enterAreaWithAssignment(final ScopedMemory sm1, final ScopedMemory sm2, final RefCont rc){
+	sm1.executeInArea( new Runnable(){
+		Runnable r = new AssignmentRunnable(rc);
+			    public void run(){
+				sm2.enter(r);
+			    }
+			});
+    }
+
+    /*@ public normal_behavior
       @  ensures true;
       @*/
     public void assignToInstanceFieldNull2(){
@@ -96,11 +177,11 @@ public class Test extends SuperTest{
     }
 
     /*@ public normal_behavior
-      @  requires a>0 && \outerScope(\currentMemoryArea, oArr.memoryArea);
+      @  requires a>0 && \outerScope(\currentMemoryArea, \memoryArea(oArr));
       @  assignable \nothing;
       @  working_space 16+a*4;
       @ also public normal_behavior
-      @  requires a<=0 && \outerScope(\currentMemoryArea, oArr.memoryArea);
+      @  requires a<=0 && \outerScope(\currentMemoryArea, \memoryArea(oArr));
       @  assignable \nothing;
       @  working_space 0;
       @*/
@@ -118,7 +199,7 @@ public class Test extends SuperTest{
     }
 
     /*@ public normal_behavior
-      @  requires \outerScope(this.memoryArea, \currentMemoryArea);
+      @  requires \outerScope(\memoryArea(this), \currentMemoryArea);
       @  working_space \space(Test)+\space(Runnable)+
       @         \space(LTMemory)+24;
       @  ensures true;
@@ -138,9 +219,9 @@ public class Test extends SuperTest{
       @  requires sm1!=null && sm2!=null && sm1!=sm2 &&
       @        sm1.memoryRemaining()>1000 && sm2.memoryRemaining()>1000 && 
       @        sm1.parent==null && sm2.parent==null && 
-      @        \outerScope(this.memoryArea, \currentMemoryArea) &&
-      @        \outerScope(sm1.memoryArea, \currentMemoryArea) &&
-      @        \outerScope(sm2.memoryArea, \currentMemoryArea);
+      @        \outerScope(\memoryArea(this), \currentMemoryArea) &&
+      @        \outerScope(\memoryArea(sm1), \currentMemoryArea) &&
+      @        \outerScope(\memoryArea(sm2), \currentMemoryArea);
       @ //       sm1.memoryArea == \currentMemoryArea.memoryArea &&
       @ //       sm2.memoryArea == \currentMemoryArea.memoryArea;
       @  working_space 2*\space(Test)+\space(TestRunnable)+
@@ -196,13 +277,13 @@ public class Test extends SuperTest{
     }
 
     /*@ public normal_behavior
-      @  requires \outerScope(\currentMemoryArea, oArr.memoryArea);
+      @  requires \outerScope(\currentMemoryArea, \memoryArea(oArr));
       @  assignable arr;
       @  working_space \rigid_working_space(createArray(int arg), self, 
       @        arg==7 &&
-      @    \outerScope(\currentMemoryArea, self.oArr.memoryArea));
+      @    \outerScope(\currentMemoryArea, \memoryArea(self.oArr)));
       @ also public normal_behavior
-      @  requires \outerScope(\currentMemoryArea, oArr.memoryArea);
+      @  requires \outerScope(\currentMemoryArea, \memoryArea(oArr));
       @  assignable arr;
       @  working_space \working_space(createArray(7));
       @*/
@@ -211,7 +292,7 @@ public class Test extends SuperTest{
     }
 
     /*@ public normal_behavior
-      @  requires \outerScope(\currentMemoryArea,this.memoryArea);
+      @  requires \outerScope(\currentMemoryArea,\memoryArea(this));
       @  assignable \nothing;
       @  working_space 50;
       @*/

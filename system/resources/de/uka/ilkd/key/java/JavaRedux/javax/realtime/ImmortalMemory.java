@@ -3,7 +3,7 @@ package javax.realtime;
 public class ImmortalMemory extends MemoryArea{
 
     /*@ public static invariant instance!=null && 
-      @          instance.memoryArea==instance && 
+      @          \memoryArea(instance)==instance && 
       @          instance.parent==instance &&
       @          \inImmortalMemory(instance); 
       @*/
