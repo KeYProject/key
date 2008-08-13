@@ -65,6 +65,12 @@ public class WatchpointPO implements ProofOblInput {
         }
         return po;
     }
+    
+    
+    public boolean implies(ProofOblInput po) {
+        return equals(po);
+    }
+    
 
     public String name() {
         return name;

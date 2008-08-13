@@ -40,7 +40,9 @@ public class RespectsModifiesPO extends EnsuresPO {
 	    		      OperationContract contract,
                               SetOfClassInvariant assumedInvs) {
         super(initConfig,
-              "RespectsModifies", 
+              "RespectsModifies (" 
+                + contract.getProgramMethod() + ", " 
+                + contract.getDisplayName() + ")", 
               contract.getProgramMethod(), 
               Modality.BOX, 
               assumedInvs,
@@ -117,6 +119,15 @@ public class RespectsModifiesPO extends EnsuresPO {
         return result;
     }
     
+    
+    public boolean implies(ProofOblInput po) {
+        if(!(po instanceof RespectsModifiesPO)) {
+            return false;
+        }
+        RespectsModifiesPO rmPO = (RespectsModifiesPO) po;
+        return contract.equals(rmPO.contract)
+               && assumedInvs.subset(rmPO.assumedInvs);
+    }
     
     
     public boolean equals(Object o) {

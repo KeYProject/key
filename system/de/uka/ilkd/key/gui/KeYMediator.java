@@ -34,6 +34,9 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.updatesimplifier.ApplyOnModality;
+import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature;
+import de.uka.ilkd.key.strategy.feature.IfThenElseMalusFeature;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
@@ -230,19 +233,38 @@ public class KeYMediator {
 
     public void setBack(Node node) {
 	if (ensureProofLoaded()) {
-	    if (!getProof().setBack(node)) {
-		popupWarning("Setting back at the chosen node is not possible.",
-			     "Oops...");	    
+	    if (getProof().setBack(node)) {
+                finishSetBack();
+	    }else{
+                popupWarning("Setting back at the chosen node is not possible.",
+                "Oops...");            
 	    }
 	}
     }    
     
     public void setBack(Goal goal) {
 	if (ensureProofLoaded()) {
-	    if (getProof() == null || !getProof().setBack(goal))
-		popupWarning("Setting back the current goal is not possible.", 
-			     "Oops...");
+	    if (getProof() != null && getProof().setBack(goal)){
+                finishSetBack();
+	    }else{
+                popupWarning("Setting back the current goal is not possible.", 
+                "Oops...");
+	    }
 	}
+    }
+    private void finishSetBack(){
+        TermTacletAppIndexCacheSet.clearCache();
+        ApplyOnModality.clearCache();
+        TermFactory.clearCache();
+        AbstractBetaFeature.clearCache();
+        IfThenElseMalusFeature.clearCache();
+        
+        System.gc();//Runs Garbagecolletor
+        System.runFinalization();
+        if(MethodCallInfo.MethodCallCounterOn){
+            System.out.println(MethodCallInfo.Local.toString());
+            MethodCallInfo.Local.reset();
+        }
     }
 
     

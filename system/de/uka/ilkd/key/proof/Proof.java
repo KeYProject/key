@@ -27,9 +27,11 @@ import de.uka.ilkd.key.proof.mgt.DefaultProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
+import de.uka.ilkd.key.rule.updatesimplifier.ApplyOnModality;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature;
 
 
 /**

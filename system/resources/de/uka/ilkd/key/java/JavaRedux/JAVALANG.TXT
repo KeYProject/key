@@ -17,6 +17,7 @@ java/lang/Object.java
 java/lang/ArithmeticException.java
 java/lang/ArrayIndexOutOfBoundsException.java
 java/lang/ArrayStoreException.java
+java/lang/AssertionError.java
 java/lang/Class.java
 java/lang/ClassCastException.java
 java/lang/CloneNotSupportedException.java

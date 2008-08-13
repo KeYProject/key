@@ -60,7 +60,14 @@ public class ProofTreeView extends JPanel {
     /** KeYStroke for the search panel */
     private final static KeyStroke searchKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0);
 
-    
+    private ConfigChangeListener configChangeListener =  new ConfigChangeListener() {
+                                            public void configChanged(ConfigChangeEvent e) {
+                                                setProofTreeFont();
+                                            }
+                                            public void clear(){
+                                                Config.DEFAULT.removeConfigChangeListener(this);
+                                            }
+                                        };
     /**
      * Roots of subtrees containing all nodes to which rules have been
      * applied; this is used when auto mode is active
@@ -142,12 +149,7 @@ public class ProofTreeView extends JPanel {
 // 		    }
 // 		});
 
-	Config.DEFAULT.addConfigChangeListener(
-	        new ConfigChangeListener() {
-	            public void configChanged(ConfigChangeEvent e) {
-                        setProofTreeFont();
-	            }
-	        });
+	Config.DEFAULT.addConfigChangeListener( configChangeListener);
 
 	setProofTreeFont();
 	delegateView.setLargeModel(true);
@@ -219,6 +221,7 @@ public class ProofTreeView extends JPanel {
 	mediator.addAutoModeListener(proofListener);
 	mediator.addRuleAppListener(proofListener);
 	mediator.addGUIListener(guiListener);
+        Config.DEFAULT.addConfigChangeListener( configChangeListener);
     }
 
     private void unregister() {
@@ -226,6 +229,7 @@ public class ProofTreeView extends JPanel {
 	mediator.removeAutoModeListener(proofListener);
 	mediator.removeRuleAppListener(proofListener);
 	mediator.removeGUIListener(guiListener);
+	configChangeListener.clear();
     }
 
     public void removeNotify () {

@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.gui.IMain;
+import de.uka.ilkd.key.gui.MethodCallInfo;
 import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.CompilationUnit;
@@ -34,6 +35,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.IteratorOfConstrainedFormula;
 import de.uka.ilkd.key.logic.IteratorOfNamed;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
@@ -543,6 +545,10 @@ public class ProblemInitializer {
     		throws ProofInputException {
 	assert initConfig != null;
 	stopInterface();
+	/*Setting this flag to false tells KeY to store Names in namespaces using strong references.
+	 * So they are not garbage collected, while the namespace exists. If you have
+	 * a better place for this statement without introducing memory leaks then refactor this code. */
+	Namespace.storeAsWeak = false;
         
         try {
             //determine environment
@@ -560,6 +566,13 @@ public class ProblemInitializer {
             throw e;            
         } finally {
             startInterface();
+        }
+        /*After creating the proof environment and loading of the problem we use
+         * weak references to store newly created names as they become obsolete when
+         * parts of a proof become pruned. */
+        Namespace.storeAsWeak = true;
+        if(MethodCallInfo.MethodCallCounterOn){
+            MethodCallInfo.Local.reset();
         }
     }
     

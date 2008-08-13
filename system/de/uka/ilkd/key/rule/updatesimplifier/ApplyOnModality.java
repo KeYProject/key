@@ -176,4 +176,8 @@ public class ApplyOnModality extends AbstractUpdateRule {
         assert false : "matchingCondition(...) must not be called for target " + target;
         return null; // unreachable
     }
+
+    public static void clearCache(){
+        protectedVarsCache.clear();
+    }
 }

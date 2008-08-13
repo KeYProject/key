@@ -44,7 +44,9 @@ public class EnsuresPostPO extends EnsuresPO {
     public EnsuresPostPO(InitConfig initConfig, OperationContract contract,
             SetOfClassInvariant assumedInvs) {
         this(initConfig, 
-             "EnsuresPost", 
+             "EnsuresPost (" 
+                 + contract.getProgramMethod() + ", " 
+                 + contract.getDisplayName() + ")", 
              contract, 
              assumedInvs);
     }
@@ -54,7 +56,8 @@ public class EnsuresPostPO extends EnsuresPO {
                               ListOfProgramVariable paramVars, 
                               ProgramVariable resultVar,
                               ProgramVariable exceptionVar,
-                              Map<Operator, Function/*atPre*/> atPreFunctions) throws ProofInputException {
+                              Map<Operator, Function/*atPre*/> atPreFunctions) 
+            throws ProofInputException {
         Term result = translatePre(contract, selfVar, toPV(paramVars));
         return result;
     }
@@ -64,7 +67,8 @@ public class EnsuresPostPO extends EnsuresPO {
                                ListOfProgramVariable paramVars, 
                                ProgramVariable resultVar,
                                ProgramVariable exceptionVar,
-                               Map<Operator, Function/*atPre*/> atPreFunctions) throws ProofInputException {        
+                               Map<Operator, Function/*atPre*/> atPreFunctions) 
+            throws ProofInputException {        
         Term result = translatePost(contract, 
                                     selfVar, 
                                     toPV(paramVars), 
@@ -100,6 +104,17 @@ public class EnsuresPostPO extends EnsuresPO {
         */
 
         return result;
+    }
+    
+    
+    public boolean implies(ProofOblInput po) {
+        if(!(po instanceof EnsuresPostPO)) {
+            return false;
+        }
+        EnsuresPostPO epPO = (EnsuresPostPO) po;
+        return specRepos.splitContract(epPO.contract)
+                        .subset(specRepos.splitContract(contract))
+               && assumedInvs.subset(epPO.assumedInvs);
     }
     
     

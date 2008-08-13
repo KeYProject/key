@@ -48,9 +48,9 @@ import de.uka.ilkd.key.speclang.*;
  */
 public abstract class EnsuresPO extends AbstractPO {
     
-    private final ProgramMethod programMethod;
-    private final Modality modality;
-    private final SetOfClassInvariant assumedInvs;
+    protected final ProgramMethod programMethod;
+    protected final Modality modality;
+    protected final SetOfClassInvariant assumedInvs;
     
     private final boolean skipPreconditions;
     
@@ -69,7 +69,7 @@ public abstract class EnsuresPO extends AbstractPO {
                      SetOfClassInvariant assumedInvs,
                      boolean skipPreconditions) {
     	super(initConfig, 
-    	      name + " of " + programMethod, 
+    	      name, 
     	      programMethod.getContainerType());
     	this.programMethod     = programMethod;
     	this.modality          = modality; 
