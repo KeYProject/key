@@ -13,10 +13,8 @@ package de.uka.ilkd.key.rule;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ListOfString;
-import de.uka.ilkd.key.collection.PairOfListOfGoalAndTacletApp;
 import de.uka.ilkd.key.collection.SLListOfString;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -389,11 +387,7 @@ public abstract class TacletApp implements RuleApp {
 					    +"\nthat is not complete.");
 	}
         goal.addAppliedRuleApp(this);	
-        Node n = goal.node();
-        PairOfListOfGoalAndTacletApp p = taclet().applyHelp(
-                goal, services, this);
-        n.setAppliedRuleApp(p.getTacletApp());	
-	return p.getListOfGoal();
+	return taclet().apply(goal, services, this);
     }    
 
     /** applies the specified rule at the specified position 
@@ -1673,76 +1667,6 @@ public abstract class TacletApp implements RuleApp {
 	return taclet ().admissible (interactive, ruleSets);
     }
 
-    /**
-     * returns a name encoding a list of list of names. The list contains actual names of the 
-     * added program variables after applying {@link TacletApp#taclet()} 
-     * For example: The string <code>"v1,v2;;v3"</code> if three goals have been created where
-     * two program variables <code>v1,v2</code> have been added to the first one, none to the second goal
-     * and one variable <code>v3</code> to the third goal 
-     * @param newNames a LinkedList containing a list with names for added program variables 
-     * for each goal 
-     * @return the given list of list of names encoded as a String
-     */
-    private Name storeActualUsedProgramVariableNamesInString(final LinkedList<ListOfName> newNames) {
-        // we use Strings here as the lists contain usually only one element
-            // so that using StringBuffer does not pay off
-            String actualUsedProgramVariableNames = ""; 
-            for (ListOfName addedProgVarNames : newNames) {
-                String actualProgVarNamesPerGoal = "";
-                for (Name addedProgVarName : addedProgVarNames) {
-                    actualProgVarNamesPerGoal += "," + addedProgVarName;
-                }
-                
-                actualUsedProgramVariableNames += 
-                    (actualProgVarNamesPerGoal.length() == 0 ? "" : 
-                        actualProgVarNamesPerGoal.substring(1)) + ";";
-            }
-            actualUsedProgramVariableNames = actualUsedProgramVariableNames.substring(0, 
-                    actualUsedProgramVariableNames.length()-1);
-        return new Name(actualUsedProgramVariableNames);
-    }
-    
-    /** 
-     * checks if name proposals for program variables to be added are available 
-     * and returns the proposals as list of names per goal
-     * @return an array with (a possible empty) list of names proposed to be used for 
-     * the respective goal 
-     */
-    protected ListOfName[] getNameProposalsForAddedProgramVariables() {
-        final ListOfName[] progvar_proposals = new ListOfName[taclet().goalTemplates().size()];
-        
-        Object o = instantiations().getNameProposalsForNewProgramVariables();
-    
-        if (o instanceof Name) {            
-            final String ostr = o.toString();
-            
-            final String[] props;            
-            // split ignores empty trailing spaces
-            // take care of the case when last created goal adds no progvars            
-            if (ostr.trim().endsWith(";")) {
-                props = (ostr+"x").split(";");
-                props[props.length-1] = "";
-            } else {
-                props = ostr.split(";");                
-            }
-            
-            for (int i = 0; i < progvar_proposals.length; i++) {
-                progvar_proposals[i] = SLListOfName.EMPTY_LIST;
-                
-                if (props[i].length() != 0) {
-                    String[] props2 = props[i].split(",");
-                    for (int j = 0; j < props2.length; j++) {
-                        progvar_proposals[i] = progvar_proposals[i].append(
-                                new Name(props2[j]));
-                    }
-                }
-                    
-            }
-    
-        }
-        return progvar_proposals;
-    }
-
     /** checks if the variable conditions of type 'x not free in y' are
      * hold by the found instantiations. The variable conditions is used
      * implicit in the prefix. (Used to calculate the prefix)
@@ -1793,11 +1717,5 @@ public abstract class TacletApp implements RuleApp {
 	}
     
 	return result;
-    }
-
-    
-    public TacletApp addNameProposal(LinkedList<ListOfName> newNames) {
-        return setInstantiation(instantiations()
-                .addNameProposals(storeActualUsedProgramVariableNamesInString(newNames)));
     }
 }

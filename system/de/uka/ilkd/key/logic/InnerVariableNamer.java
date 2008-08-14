@@ -49,8 +49,7 @@ public class InnerVariableNamer extends VariableNamer {
 
     public ProgramVariable rename(ProgramVariable var,
                                   Goal goal,
-                                  PosInOccurrence posOfFind,
-                                  Name proposal) {
+                                  PosInOccurrence posOfFind) {
 	ProgramElementName name = var.getProgramElementName();
 	BasenameAndIndex bai = getBasenameAndIndex(name);
 	Globals globals = wrapGlobals(goal.getGlobalProgVars());
@@ -59,6 +58,7 @@ public class InnerVariableNamer extends VariableNamer {
 	//prepare renaming of inner var
 	final NameCreationInfo nci = getMethodStack(posOfFind);
 	ProgramElementName newname = null;
+	Name proposal = services.getProof().getNameRecorder().getProposal();
 	if (proposal != null) {
 	    newname = new ProgramElementName(proposal.toString(), nci);
 	}
