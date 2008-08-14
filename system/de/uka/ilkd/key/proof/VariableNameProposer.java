@@ -80,6 +80,22 @@ public class VariableNameProposer implements InstantiationProposer {
 	}
     }
 
+    public Name getNewName(Services services, Name baseName) {
+        NamespaceSet namespaces = services.getNamespaces();
+        NameRecorder rec = services.getProof().getNameRecorder();
+        Name name = rec.getProposal();
+
+        if (name == null || namespaces.lookup(name) != null) {
+            int i = 0;
+
+            do {
+                name = new Name(baseName + "_" + i++);
+            } while(namespaces.lookup(name) != null);
+
+        }
+
+        return name;
+    }
 
     /**
      * Generates a proposal for the instantiation of the given term

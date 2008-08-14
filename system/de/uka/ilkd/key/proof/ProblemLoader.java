@@ -426,6 +426,14 @@ public class ProblemLoader implements Runnable {
 
             matchConstraint = matchConstraint.unify(left, right, null);
             break;
+        case 'w' : //newnames
+            final String[] newNames = s.split(",");
+            ListOfName l = SLListOfName.EMPTY_LIST;
+            for (int in = 0; in < newNames.length; in++) {
+                l = l.append(new Name(newNames[in]));
+            }
+            proof.getNameRecorder().setProposals(l);
+            break;
         }
     }
 

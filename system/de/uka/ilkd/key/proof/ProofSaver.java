@@ -140,6 +140,22 @@ public class ProofSaver {
         return "";
     }
 
+    private String newNames2Proof(Node n) {
+        String s = "";
+        NameRecorder rec = n.getNameRecorder();
+        if (rec == null) {
+            return s;
+        }
+        ListOfName proposals = rec.getProposals();
+        if (proposals.isEmpty()) {
+            return s;
+        }
+        for (IteratorOfName it = proposals.iterator(); it.hasNext();) {
+            s += "," + it.next();
+        }
+        return " (newnames \"" + s.substring(1) + "\")";
+    }
+
     private void printUserConstraints(PrintStream ps) {
         ConstraintTableModel uCons = proof.getUserConstraint();
         Services s = mediator.getServices();
@@ -182,6 +198,7 @@ public class ProofSaver {
          tree.append(posInOccurrence2Proof(node.sequent(),
                                            appliedRuleApp.posInOccurrence()));
          tree.append(mc2Proof(((TacletApp)appliedRuleApp).matchConditions()));
+         tree.append(newNames2Proof(node));
          tree.append(getInteresting(((TacletApp)appliedRuleApp).instantiations()));
          ListOfIfFormulaInstantiation l =
             ((TacletApp)appliedRuleApp).ifFormulaInstantiations();
@@ -198,6 +215,7 @@ public class ProofSaver {
       	tree.append("\"");        
         tree.append(posInOccurrence2Proof(node.sequent(), 
                                           appliedRuleApp.posInOccurrence()));
+        tree.append(newNames2Proof(node));
 
         if (appliedRuleApp.rule() instanceof UseOperationContractRule) {
             RuleJustificationBySpec ruleJusti = (RuleJustificationBySpec) 

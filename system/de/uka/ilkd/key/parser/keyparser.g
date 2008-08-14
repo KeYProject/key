@@ -94,6 +94,7 @@ options {
       prooflabel2tag.put("userinteraction", new Character('a'));
       prooflabel2tag.put("userconstraint", new Character('o'));
       prooflabel2tag.put("matchconstraint", new Character('m'));
+      prooflabel2tag.put("newnames", new Character('w'));
    }
 
     private NamespaceSet nss;
