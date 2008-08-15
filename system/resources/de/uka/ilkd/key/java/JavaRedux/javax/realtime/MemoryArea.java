@@ -13,7 +13,7 @@ public abstract class MemoryArea{
 
     // public invariant parent!=null ==> \outerScope(parent, this);
     //@ public invariant parent==null <==> stack==null;
-    //@ public invariant parent==null <==> consumed==0;
+    //@ public invariant parent==null ==> consumed==0;
     public /*@nullable@*/ MemoryArea parent=null;
 
     /*@ public invariant referenceCount>=0 && (referenceCount>0 <==>
@@ -36,7 +36,7 @@ public abstract class MemoryArea{
 	if(size<0) throw new java.lang.IllegalArgumentException();
 	this.size = size;
 	this.logic = logic;
-	//	<currentMemoryArea>.consumed -= 8;
+	<currentMemoryArea>.consumed -= 8;
 	memory = new PhysicalMemoryArea(size);
     }
 
@@ -57,20 +57,73 @@ public abstract class MemoryArea{
 	logic.run();
     }
 
-    public void enter(){
+    public void	enter(){
 	if(logic==null) throw new IllegalArgumentException();
+	if(stack!=null && outerScopeM(this, <currentMemoryArea>) ||
+	   parent!=null && parent!=<currentMemoryArea>){
+	    throw new ScopedCycleException();
+	}
+	parent = <currentMemoryArea>;
+	if(stack==null){
+	    stack = <currentMemoryArea>.stack.push(this);
+	}
+	referenceCount++;
+	try{
+	    <runRunnable>(logic);
+	}catch(Exception e){
+	    if(this==getMemoryArea(e)){
+		throw RealtimeSystem.tbe();
+	    }
+	}finally{
+	    referenceCount--;
+	    if(referenceCount==0){
+		consumed=0;
+		parent=null;
+		stack=null;
+	    }
+	}
+    }
+
+    public void	enter(java.lang.Runnable logic){
+	if(logic==null) throw new IllegalArgumentException();
+	if(stack!=null && outerScopeM(this, <currentMemoryArea>) ||
+	   parent!=null && parent!=<currentMemoryArea>){
+	    throw new ScopedCycleException();
+	}
+	parent = <currentMemoryArea>;
+	if(stack==null){
+	    stack = <currentMemoryArea>.stack.push(this);
+	}
+	referenceCount++;
+	try{
+	    <runRunnable>(logic);
+	}catch(Exception e){
+	    if(this==getMemoryArea(e)){
+		throw RealtimeSystem.tbe();
+	    }
+	}finally{
+	    referenceCount--;
+	    if(referenceCount==0){
+		consumed=0;
+		parent=null;
+		stack=null;
+	    }
+	}
+    }
+
+    public void	executeInArea(java.lang.Runnable logic){
+	if(logic==null) throw new IllegalArgumentException();
+	if(!outerScopeM(this, <currentMemoryArea>)){
+	    throw new InaccessibleAreaException();
+	}
 	<runRunnable>(logic);
     }
 
-    public void enter(java.lang.Runnable logic){
-	if(logic==null) throw new java.lang.IllegalArgumentException();
-	<runRunnable>(logic);
-    }
-
-    public void executeInArea(java.lang.Runnable logic){
-	if(logic==null) throw new java.lang.IllegalArgumentException();
-	<runRunnable>(logic);
-    }
+    /*@ public normal_behavior
+      @  working_space 0;
+      @  ensures \result==\outerScope(a,b);
+      @*/
+    public static /*@pure@*/ boolean outerScopeM(MemoryArea a, MemoryArea b);
 
     /*@ public normal_behavior
       @  ensures \result == \memoryArea(object);

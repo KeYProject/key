@@ -3,7 +3,7 @@ import javax.realtime.*;
 public abstract class B{
 
     /*@ public normal_behavior
-      @  requires x>=0 && y>=0 && \outerScope(this.memoryArea, \currentMemoryArea);
+      @  requires x>=0 && y>=0 && \outerScope(\memoryArea(this), \currentMemoryArea);
       @  working_space \space(LTMemory)+\space(Runnable)+8;
       @*/
     public final void foo(final int x, final int y){

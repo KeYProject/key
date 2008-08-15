@@ -485,10 +485,11 @@ public class SyntacticalReplaceVisitor extends Visitor {
         boolean containsBoundVars = false;
         ArrayOfQuantifiableVariable[] boundVars = 
             new ArrayOfQuantifiableVariable[visited.arity()];
-
+        
         for (int i = 0, arity = visited.arity(); i < arity; i++) {
             final ArrayOfQuantifiableVariable vBoundVars =
                 visited.varsBoundHere(i);
+            
         
             final QuantifiableVariable[] newVars = (vBoundVars.size() > 0)? 
                     new QuantifiableVariable[vBoundVars.size()]

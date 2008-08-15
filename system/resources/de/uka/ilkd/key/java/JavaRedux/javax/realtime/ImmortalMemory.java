@@ -9,12 +9,6 @@ public class ImmortalMemory extends MemoryArea{
       @*/
     private static ImmortalMemory instance;
 
-    public void	executeInArea(java.lang.Runnable logic){
-	super.executeInArea(logic);
-	/*	if(logic==null) throw new IllegalArgumentException();
-		logic.run();*/
-    }
-
     /*@ public normal_behavior
       @  assignable \nothing;
       @  ensures \result == instance;

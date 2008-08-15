@@ -2,7 +2,7 @@ package javax.realtime;
 
 public class MemoryStack{
 
-    private MemoryArea[] _stack;
+    private /*@nullable@*/  MemoryArea[] _stack;
 
     //@ public invariant \inImmortalMemory(this);
 
@@ -11,8 +11,7 @@ public class MemoryStack{
 
 
     /* public invariant (\forall int i,j; 0<=i && i<_stack.length && 
-      @    i<j && j<_stack.length; _stack[i]!=null && _stack[i]!=_stack[j] &&
-      @    \outerScope(_stack[i], _stack[j]));
+      @    i<j && j<_stack.length; _stack[i]!=null && _stack[i]!=_stack[j]);
       @*/
 
     /* public invariant (\forall int i; 1<=i && i<_stack.length; 
@@ -29,8 +28,6 @@ public class MemoryStack{
 
     /*@ public normal_behavior
       @  ensures \result==(\exists int i; i>=0 && i<_stack.length; _stack[i]==m);
-      @ also public normal_behavior
-      @  ensures \result == \outerScope(m, _stack[_stack.length-1]);
       @*/
     public /*@pure@*/ boolean contains(MemoryArea m);
 
