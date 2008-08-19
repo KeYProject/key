@@ -34,7 +34,11 @@ public class MemoryAreaCondition extends VariableConditionAdapter {
         }else if(candidate instanceof ProgramVariable){
             return neg^(((ProgramVariable) candidate).name().toString().indexOf((ImplicitFieldAdder.IMPLICIT_MEMORY_AREA))!=-1);
         }
-        return false;        
+        return true;        
+    }
+    
+    public String toString () {
+        return (neg ? "\\not " : "") + "\\memoryArea(" + var + ")";
     }
     
 }

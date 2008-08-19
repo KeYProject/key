@@ -1,0 +1,50 @@
+package de.uka.ilkd.key.rule.conditions;
+
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.reference.FieldReference;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.rule.VariableConditionAdapter;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+public class ParentScopeCondition extends VariableConditionAdapter {
+
+    private SchemaVariable var;
+    private boolean neg;
+
+    /**
+     * creates an instance of this condition checking if var has reference type
+     * @param var the SchemaVariable to be checked
+     */
+    public ParentScopeCondition(SchemaVariable var, boolean neg) {
+        this.var = var; 
+        this.neg = neg;
+    }
+    
+    public boolean check(SchemaVariable var, 
+                 SVSubstitute candidate, 
+                 SVInstantiations svInst,
+                 Services services) {
+        if(var!=this.var) return true;
+        ProgramVariable pv;
+        if (candidate instanceof FieldReference) {
+            pv = ((FieldReference)candidate).getProgramVariable();
+        }else if(candidate instanceof ProgramVariable){
+            pv = (ProgramVariable) candidate;
+        }else{
+            return true;
+        }
+        boolean result = (pv.name().toString().indexOf(("parent"))!=-1);
+        if(pv.getContainerType()!=null){
+            result &= pv.getContainerType().getSort().extendsTrans(
+                    services.getJavaInfo().getJavaxRealtimeMemoryArea().getSort());
+        }else{
+            return true;
+        }
+        return neg^result;
+    }
+    
+    public String toString () {
+        return (neg ? "\\not " : "") + "\\parentScope(" + var + ")";
+    }
+    
+}

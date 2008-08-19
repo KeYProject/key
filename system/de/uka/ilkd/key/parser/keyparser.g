@@ -4007,6 +4007,7 @@ varexp[TacletBuilder b]
       | varcond_referencearray[b, negated]
       | varcond_array[b, negated]
       | varcond_memory_area[b, negated]
+      | varcond_parent_scope[b, negated]
       | varcond_abstractOrInterface[b, negated]
       | varcond_interface[b, negated]
       | varcond_static[b,negated] 
@@ -4381,6 +4382,17 @@ varcond_memory_area [TacletBuilder b, boolean negated]
    MEMORYAREA 
 	LPAREN x=varId RPAREN {
      	   b.addVariableCondition(new MemoryAreaCondition((SchemaVariable) x, negated));
+        } 
+;
+
+varcond_parent_scope [TacletBuilder b, boolean negated]
+{
+  ParsableVariable x = null;
+}
+:
+   PARENTSCOPE
+	LPAREN x=varId RPAREN {
+     	   b.addVariableCondition(new ParentScopeCondition((SchemaVariable) x, negated));
         } 
 ;
 

@@ -26,7 +26,7 @@ public abstract class MemoryArea{
     protected long consumed;
     protected final /*@ nullable @*/ java.lang.Runnable logic;
 
-    protected final PhysicalMemoryArea memory;
+    //    protected final PhysicalMemoryArea memory;
 
     protected MemoryArea(long size){
 	this(size, null);
@@ -36,8 +36,8 @@ public abstract class MemoryArea{
 	if(size<0) throw new java.lang.IllegalArgumentException();
 	this.size = size;
 	this.logic = logic;
-	<currentMemoryArea>.consumed -= 8;
-	memory = new PhysicalMemoryArea(size);
+	//	<currentMemoryArea>.consumed -= 8;
+	//	memory = new PhysicalMemoryArea(size);
     }
 
     protected MemoryArea(SizeEstimator size){
@@ -50,7 +50,7 @@ public abstract class MemoryArea{
 	}
 	this.size = size.getEstimate();
 	this.logic = logic;
-	memory = new PhysicalMemoryArea(this.size);
+	//	memory = new PhysicalMemoryArea(this.size);
     }
 
     private void <runRunnable>(java.lang.Runnable logic){
