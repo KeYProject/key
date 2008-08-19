@@ -648,11 +648,6 @@ public class ProblemLoader implements Runnable {
             int eq = s.indexOf('=');
             String varname = s.substring(0, eq);
             String value = s.substring(eq+1, s.length());
-            if (varname.startsWith(NameSV.NAME_PREFIX)) {
-                app = app.addInstantiation(new NameSV(varname), new Name(value));
-                continue;
-            }
-
             SchemaVariable sv = lookupName(uninsts, varname);
             if (sv==null) {
 //                throw new IllegalStateException(
