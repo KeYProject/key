@@ -886,8 +886,6 @@ public abstract class TacletApp implements RuleApp {
             newVars = newVars.add ( mv );
             final Term t = TermFactory.DEFAULT.createFunctionTerm ( mv );
             insts = insts.add ( sv, t );
-            NameSV nameSV = new NameSV(new Name(NameSV.MV_NAME_PREFIX+sv.name()));
-            insts = insts.addInteresting (nameSV, mv.name());
         }
 
         return setMatchConditions ( new MatchConditions ( insts,
@@ -908,32 +906,11 @@ public abstract class TacletApp implements RuleApp {
                                    SVInstantiations insts) {
         final Sort realSort = insts.getGenericSortInstantiations().
             getRealSort(sv, proof.getServices());
-        SchemaVariable nameSV = insts.lookupVar(
-            new Name(NameSV.MV_NAME_PREFIX+sv.name()));
-        Name proposal = (Name) insts.getInstantiation(nameSV);
-        String s = (proposal==null) ? "" : proposal.toString();
-        return getMVFor ( sv, realSort, proof, goal, s );
+        String nameProposal = TacletInstantiationsTableModel
+                .getBaseNameProposalForMetavariable(goal, this, sv);
+        return proof.getMetavariableDeliverer().createNewVariable(nameProposal,
+                realSort);
     }
-
-    /**
-     * Create a Metavariable the given SchemaVariable can be
-     * instantiated with
-     * @return an appropriate mv, or null if for some reason the
-     * creation failed
-     */
-    private Metavariable getMVFor ( SchemaVariable p_sv,
-				    Sort           p_sort,
-				    Proof          p_proof,
-                                    Goal goal,
-                                    String nameProposal ) {
-        if ("".equals(nameProposal)) {
-            nameProposal = TacletInstantiationsTableModel
-	      .getNameProposalForMetavariable ( goal, this, p_sv );
-        }
-	return p_proof.getMetavariableDeliverer().
-            createNewVariable(nameProposal, p_sort);
-    }
-
 
     /**
      * @param services the Services class allowing access to the type model
