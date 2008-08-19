@@ -136,9 +136,6 @@ public abstract class Taclet implements Rule, Named {
      */
     protected final MapFromSchemaVariableToTacletPrefix prefixMap;
     
-    /** cache */
-    protected SetOfSchemaVariable addedRuleNameVars = null;
-
     /** cache; contains set of all bound variables */
     private SetOfQuantifiableVariable boundVariables = null;
     
@@ -162,28 +159,6 @@ public abstract class Taclet implements Rule, Named {
     /** Integer to cache the hashcode */
     private int hashcode = 0;    
     
- 
-    /** 
-     * creates an empty Taclet 
-     */
-    private Taclet() {
-	name               = new Name("");
-	ifSequent          = Sequent.EMPTY_SEQUENT;
-	varsNew            = SLListOfNewVarcond.EMPTY_LIST;
-	varsNotFreeIn      = SLListOfNotFreeIn.EMPTY_LIST;
-	varsNewDependingOn = SLListOfNewDependingOn.EMPTY_LIST;
-	variableConditions = SLListOfVariableCondition.EMPTY_LIST;
-	goalTemplates      = SLListOfTacletGoalTemplate.EMPTY_LIST;
-	ruleSets           = SLListOfRuleSet.EMPTY_LIST;
-	noninteractive     = false;	
-	constraint         = Constraint.BOTTOM;
-	choices            = SetAsListOfChoice.EMPTY_SET;
-	prefixMap          =
-	    MapAsListFromSchemaVariableToTacletPrefix.EMPTY_MAP;
-	this.displayName   = "";
-        this.oldNames      = SLListOfName.EMPTY_LIST;
-    }
-
     /**
      * creates a Schematic Theory Specific Rule (Taclet) with the given
      * parameters.  
@@ -1047,24 +1022,6 @@ public abstract class Taclet implements Rule, Named {
 	return hasReplaceWith;
     }
     
-    public SetOfSchemaVariable addedRuleNameVars() {
-        if (addedRuleNameVars == null) {
-            int i=0;
-            addedRuleNameVars = SetAsListOfSchemaVariable.EMPTY_SET;
-            IteratorOfTacletGoalTemplate itgt = goalTemplates().iterator();
-            while (itgt.hasNext()) {
-                TacletGoalTemplate tgt = itgt.next();
-                IteratorOfTaclet itt = tgt.rules().iterator();
-                while (itt.hasNext()) {
-                    addedRuleNameVars = addedRuleNameVars.add(
-                        SchemaVariableFactory.createNameSV(new Name("T"+i++)));
-                    itt.next();
-                }
-            }
-        }
-        return addedRuleNameVars;
-   }
-
     /**
      * returns the computed prefix for the given schemavariable. The
      * prefix of a schemavariable is used to determine if an
