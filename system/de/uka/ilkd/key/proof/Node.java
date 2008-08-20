@@ -32,6 +32,8 @@ public class Node {
 
     private RuleApp              appliedRuleApp;
 
+    private NameRecorder         nameRecorder;
+
     private SetOfProgramVariable globalProgVars      = SetAsListOfProgramVariable.EMPTY_SET;
 
     private boolean              closed              = false;
@@ -136,6 +138,13 @@ public class Node {
         this.appliedRuleApp = ruleApp;        
     }
 
+    public NameRecorder getNameRecorder() {
+        return nameRecorder;
+    }
+
+    public void setNameRecorder(NameRecorder rec) {
+        nameRecorder = rec;
+    }
 
     public void setRenamings(ListOfRenamingTable list){
         renamings = list;

@@ -104,11 +104,6 @@ public class SchemaVariableFactory {
 	return new ListSV(name, matchType);
     }
 
-    public static SchemaVariable createNameSV(Name name){
-	return new NameSV(name);
-    }
-
-
     /** creates a SchemaVariable representing a program construct
      * @param name the ProgramElementName of the SchemaVariable
      * @param listSV a boolean which is true iff the schemavariable is allowed

@@ -113,6 +113,8 @@ public class Proof implements Named {
 //    implemented by mbender for jmltest
     private SpecExtPO specExtPO;
     
+    private NameRecorder nameRecorder;
+
     /** constructs a new empty proof with name */
     private Proof(Name name, Services services, ProofSettings settings) {
         this.name = name;
@@ -124,6 +126,7 @@ public class Proof implements Named {
         addConstraintListener ();
 
         addStrategyListener ();
+        nameRecorder = new NameRecorder();
     }
 
     /**
@@ -263,6 +266,19 @@ public class Proof implements Named {
     /** returns the Services with the java service classes */
     public Services getServices() {
        return services;
+    }
+
+    public NameRecorder getNameRecorder() {
+        return nameRecorder;
+    }
+
+    public void saveNameRecorder(Node n) {
+        n.setNameRecorder(nameRecorder);
+        nameRecorder = new NameRecorder();
+    }
+
+    public void addNameProposal(Name proposal) {
+        nameRecorder.addProposal(proposal);
     }
 
     /** sets the variable, function, sort, heuristics namespaces */

@@ -426,6 +426,14 @@ public class ProblemLoader implements Runnable {
 
             matchConstraint = matchConstraint.unify(left, right, null);
             break;
+        case 'w' : //newnames
+            final String[] newNames = s.split(",");
+            ListOfName l = SLListOfName.EMPTY_LIST;
+            for (int in = 0; in < newNames.length; in++) {
+                l = l.append(new Name(newNames[in]));
+            }
+            proof.getNameRecorder().setProposals(l);
+            break;
         }
     }
 
@@ -640,11 +648,6 @@ public class ProblemLoader implements Runnable {
             int eq = s.indexOf('=');
             String varname = s.substring(0, eq);
             String value = s.substring(eq+1, s.length());
-            if (varname.startsWith(NameSV.NAME_PREFIX)) {
-                app = app.addInstantiation(new NameSV(varname), new Name(value));
-                continue;
-            }
-
             SchemaVariable sv = lookupName(uninsts, varname);
             if (sv==null) {
 //                throw new IllegalStateException(
