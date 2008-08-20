@@ -324,6 +324,9 @@ INITIALISER
 options {
     paraphrase = "an initialiser";
 }
+{
+    assert inputState.guessing == 0;
+}
 :
     {!expressionMode}?
     (
@@ -358,7 +361,4 @@ EXPRESSION
         |    ~';'
     )* 
     {parenthesesCounter == 0}? ';'
-    {
-    	setExpressionMode(false);
-    }
 ;

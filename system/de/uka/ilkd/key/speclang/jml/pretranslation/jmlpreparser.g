@@ -992,11 +992,12 @@ decreasing_keyword
 expression returns [PositionedString result = null]
 {
     lexer.setExpressionMode(true);
+    LT(1);
+    lexer.setExpressionMode(false);
 }
 :
     t:EXPRESSION
     { 
-    	lexer.setExpressionMode(false);
     	result = createPositionedString(t.getText(), t);
     }
 ;
