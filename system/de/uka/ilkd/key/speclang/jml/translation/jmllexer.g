@@ -141,7 +141,7 @@ REACH : "\\reach";
 REAL : "\\real";
 DURATION : "\\duration";
 SPACE : "\\space";
-MAX_SPACE : "\\max_space";
+MAX_SPACE : "\\max_space"; //KeY extension, not official JML
 WORKINGSPACE : "\\working_space";
 RIGIDWORKINGSPACE : "\\rigid_working_space"; //KeY extension, not official JML
 TYPEOF : "\\typeof";

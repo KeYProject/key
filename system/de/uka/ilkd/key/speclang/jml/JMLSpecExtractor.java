@@ -291,16 +291,17 @@ public class JMLSpecExtractor implements SpecExtractor {
         }
         
         //determine scope safety, add scope safety contract
-        final boolean isScopeSafe = JMLInfoExtractor.isScopeSafe(pm);
+        final boolean isScopeSafe = JMLInfoExtractor.isScopeSafe(pm) || 
+            JMLInfoExtractor.isScopeSafe(pm.getContainerType());
         if(isScopeSafe) {
             TextualJMLSpecCase sc 
                 = new TextualJMLSpecCase(SLListOfString.EMPTY_LIST, 
                                          Behavior.BEHAVIOR);
-            if(pm.getKeYJavaType()!=null && 
+/*            if(pm.getKeYJavaType()!=null && 
                     !(pm.getKeYJavaType().getSort() instanceof PrimitiveSort)){
                 sc.addEnsures(new PositionedString("\\result!=null ==> \\inImmortalMemory(\\result)"));
-            }
-            sc.addDiverges(new PositionedString("true"));
+            }*/
+	    //            sc.addDiverges(new PositionedString("true"));
             sc.addSignals(new PositionedString("(Throwable e) !(e instanceof javax.realtime.IllegalAssignmentError || "+
                     "e instanceof javax.realtime.ScopedCycleException || "+
                     "e instanceof javax.realtime.InaccessibleAreaException ||"+

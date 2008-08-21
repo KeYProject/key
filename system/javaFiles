@@ -1162,9 +1162,11 @@ de/uka/ilkd/key/rule/conditions/InterfaceType.java
 de/uka/ilkd/key/rule/conditions/IsUpdatedVariableCondition.java
 de/uka/ilkd/key/rule/conditions/JavaTypeToSortCondition.java
 de/uka/ilkd/key/rule/conditions/LocalVariableCondition.java
+de/uka/ilkd/key/rule/conditions/MemoryAreaCondition.java
 de/uka/ilkd/key/rule/conditions/NewDepOnAnonUpdates.java
 de/uka/ilkd/key/rule/conditions/NewJumpLabelCondition.java
 de/uka/ilkd/key/rule/conditions/NonImplicitTypeCondition.java
+de/uka/ilkd/key/rule/conditions/ParentScopeCondition.java
 de/uka/ilkd/key/rule/conditions/StaticMethodCondition.java
 de/uka/ilkd/key/rule/conditions/StaticReferenceCondition.java
 de/uka/ilkd/key/rule/conditions/TestEqualWorkingSpaceOp.java
@@ -1325,6 +1327,7 @@ de/uka/ilkd/key/rule/metaconstruct/MetaField.java
 de/uka/ilkd/key/rule/metaconstruct/MetaFieldReference.java
 de/uka/ilkd/key/rule/metaconstruct/MetaInstance.java
 de/uka/ilkd/key/rule/metaconstruct/MetaLength.java
+de/uka/ilkd/key/rule/metaconstruct/MetaMemoryArea.java
 de/uka/ilkd/key/rule/metaconstruct/MetaNextToCreate.java
 de/uka/ilkd/key/rule/metaconstruct/MetaShadow.java
 de/uka/ilkd/key/rule/metaconstruct/MetaTraInitialized.java

@@ -4,7 +4,7 @@ public abstract class B{
 
     /*@ public normal_behavior
       @  requires x>=0 && y>=0 && \outerScope(\memoryArea(this), \currentMemoryArea);
-      @  working_space \space(LTMemory)+\space(Runnable)+8;
+      @  working_space \space(LTMemory)+\space(Runnable);
       @*/
     public final void foo(final int x, final int y){
 	ScopedMemory m = new LTMemory(24*x+16);
@@ -37,7 +37,7 @@ public abstract class B{
     }
 
     /*@ public normal_behavior
-      @  assignable \nothing; //a[*], a[*].c;
+      @  assignable \nothing; 
       @  working_space 0;
       @*/
     public void bar(A[] a);

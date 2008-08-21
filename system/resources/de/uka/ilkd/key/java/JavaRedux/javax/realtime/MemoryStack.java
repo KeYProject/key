@@ -7,7 +7,7 @@ public class MemoryStack{
     //@ public invariant \inImmortalMemory(this);
 
     // public static invariant EMPTY_STACK.size()==0;
-    private static MemoryStack EMPTY_STACK;
+    //    private static MemoryStack EMPTY_STACK;
 
 
     /* public invariant (\forall int i,j; 0<=i && i<_stack.length && 

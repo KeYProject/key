@@ -10,18 +10,9 @@
 
 package de.uka.ilkd.key.speclang.jml;
 
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.IteratorOfComment;
-import de.uka.ilkd.key.java.ListOfComment;
-import de.uka.ilkd.key.java.SLListOfComment;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ArrayOfFieldSpecification;
-import de.uka.ilkd.key.java.declaration.ArrayOfMemberDeclaration;
-import de.uka.ilkd.key.java.declaration.ArrayOfModifier;
-import de.uka.ilkd.key.java.declaration.FieldDeclaration;
-import de.uka.ilkd.key.java.declaration.MethodDeclaration;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 
 class JMLInfoExtractor {
@@ -169,6 +160,29 @@ class JMLInfoExtractor {
      */
     public static boolean isScopeSafe(ProgramMethod pm) {
         return hasJMLModifier(pm, "scopeSafe");
+    }
+    
+    /**
+     * Returns true, if the given KeYJavaType is specified "scopeSafe".
+     */
+    public static boolean isScopeSafe(KeYJavaType kjt) {
+        if(!(kjt.getJavaType() instanceof ClassDeclaration)){
+            return false;
+        }
+        return hasJMLModifier((ClassDeclaration) kjt.getJavaType(), "scopeSafe");
+    }
+    
+    private static boolean hasJMLModifier(ClassDeclaration cd, String mod){
+        ListOfComment coms = SLListOfComment.EMPTY_LIST;
+        ArrayOfModifier mods = cd.getModifiers();
+        for (int i=0; i < mods.size(); i++) {
+            coms = coms.prepend(mods.getModifier(i).getComments());
+        }  
+        for (IteratorOfComment it = coms.iterator(); it.hasNext(); ) {
+            if (checkFor(mod, it.next().getText()))
+                return true;
+        }
+        return false;
     }
     
     private static boolean hasJMLModifier(ProgramMethod pm, String mod){
