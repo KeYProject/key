@@ -80,10 +80,69 @@ public class VariableNameProposer implements InstantiationProposer {
 	}
     }
 
+    // reklov
+    // START TEMPORARY DOWNWARD COMPATIBILITY
+    private Name oldMVProposal;
+
+    public void setOldMVProposal(Name proposal) {
+        oldMVProposal = proposal;
+    }
+
+    private de.uka.ilkd.key.logic.ListOfName oldAnonUpdateProposals =
+            de.uka.ilkd.key.logic.SLListOfName.EMPTY_LIST;
+
+    public void setOldAnonUpdateProposals(Name proposals) {
+        if (proposals == null) return;
+        String[] props = proposals.toString().split(",|;");
+
+        for (int i = 0; i < props.length; i++) {
+            oldAnonUpdateProposals = oldAnonUpdateProposals.append(new Name(props[i]));
+        }
+
+    }
+
+    public Name getNewNameOldAnonUpdateCompatibility(Services services, Name baseName) {
+        NamespaceSet namespaces = services.getNamespaces();
+        Name name = null;
+
+        if (oldAnonUpdateProposals !=
+                de.uka.ilkd.key.logic.SLListOfName.EMPTY_LIST) {
+            name = oldAnonUpdateProposals.head();
+            oldAnonUpdateProposals = oldAnonUpdateProposals.tail();
+        } else {
+            name = services.getProof().getNameRecorder().getProposal();
+        }
+
+        if (name == null || namespaces.lookup(name) != null) {
+            int i = 0;
+
+            do {
+                name = new Name(baseName + "_" + i++);
+            } while(namespaces.lookup(name) != null);
+
+        }
+
+        return name;
+    }
+
+    // END TEMPORARY DOWNWARD COMPATIBILITY
+
     public Name getNewName(Services services, Name baseName) {
         NamespaceSet namespaces = services.getNamespaces();
-        NameRecorder rec = services.getProof().getNameRecorder();
-        Name name = rec.getProposal();
+
+        // reklov
+        // START TEMPORARY DOWNWARD COMPATIBILITY
+        // Name name = services.getProof().getNameRecorder().getProposal();
+        Name name = null;
+
+        if (oldMVProposal != null) {
+            name = oldMVProposal;
+            oldMVProposal = null;
+        } else {
+            name = services.getProof().getNameRecorder().getProposal();
+        }
+
+        // END TEMPORARY DOWNWARD COMPATIBILITY
 
         if (name == null || namespaces.lookup(name) != null) {
             int i = 0;

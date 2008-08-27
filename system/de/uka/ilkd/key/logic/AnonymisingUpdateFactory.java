@@ -143,9 +143,17 @@ public class AnonymisingUpdateFactory {
                 baseName = new Name(s.substring(1, s.length() - 1));
             }
 
-            result = new RigidFunction(VariableNameProposer.DEFAULT.getNewName(
-                    services, baseName), locTerm.sort(), getArgumentSorts(
-                    locTerm.op(), commonArguments, services));
+            // reklov
+            // START TEMPORARY DOWNWARD COMPATIBILITY
+            // result = new RigidFunction(VariableNameProposer.DEFAULT.getNewName(
+            //         services, baseName), locTerm.sort(), getArgumentSorts(
+            //         locTerm.op(), commonArguments, services));
+            Name newName = VariableNameProposer.DEFAULT.
+                    getNewNameOldAnonUpdateCompatibility(services, baseName);
+            result = new RigidFunction(newName, locTerm.sort(),
+                    getArgumentSorts(locTerm.op(), commonArguments, services));
+            // END TEMPORARY DOWNWARD COMPATIBILITY
+
             services.getNamespaces().functions().add(result);
             services.getProof().addNameProposal(result.name());
             functions.put(locTerm.op(), result);

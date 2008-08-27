@@ -46,6 +46,21 @@ public class InnerVariableNamer extends VariableNamer {
 	return (maxInGlobals > maxInProgram ? maxInGlobals : maxInProgram);
     }
 
+    // reklov
+    // START TEMPORARY DOWNWARD COMPATIBILITY
+    private ListOfName oldProgVarProposals = SLListOfName.EMPTY_LIST;
+
+    public void setOldProgVarProposals(Name proposals) {
+        if (proposals == null) return;
+        String[] props = proposals.toString().split(",|;");
+
+        for (int i = 0; i < props.length; i++) {
+            oldProgVarProposals = oldProgVarProposals.append(new Name(props[i]));
+        }
+
+    }
+
+    // END TEMPORARY DOWNWARD COMPATIBILITY
 
     public ProgramVariable rename(ProgramVariable var,
                                   Goal goal,
@@ -58,7 +73,21 @@ public class InnerVariableNamer extends VariableNamer {
 	//prepare renaming of inner var
 	final NameCreationInfo nci = getMethodStack(posOfFind);
 	ProgramElementName newname = null;
-	Name proposal = services.getProof().getNameRecorder().getProposal();
+
+	// reklov
+	// START TEMPORARY DOWNWARD COMPATIBILITY
+	// Name proposal = services.getProof().getNameRecorder().getProposal();
+	Name proposal = null;
+
+	if (oldProgVarProposals != SLListOfName.EMPTY_LIST) {
+	    proposal = oldProgVarProposals.head();
+	    oldProgVarProposals = oldProgVarProposals.tail();
+	} else {
+	    proposal = services.getProof().getNameRecorder().getProposal();
+	}
+
+	// END TEMPORARY DOWNWARD COMPATIBILITY
+
 	if (proposal != null) {
 	    newname = new ProgramElementName(proposal.toString(), nci);
 	}

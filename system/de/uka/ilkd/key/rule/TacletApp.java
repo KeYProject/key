@@ -906,6 +906,15 @@ public abstract class TacletApp implements RuleApp {
                                    SVInstantiations insts) {
         final Sort realSort = insts.getGenericSortInstantiations().
             getRealSort(sv, proof.getServices());
+
+        // reklov
+        // START TEMPORARY DOWNWARD COMPATIBILITY
+        SchemaVariable nameSV = insts.lookupVar(
+            new Name("_NAME_MV_"+sv.name()));
+        Name proposal = (Name) insts.getInstantiation(nameSV);
+        VariableNameProposer.DEFAULT.setOldMVProposal(proposal);
+        // END TEMPORARY DOWNWARD COMPATIBILITY
+
         String nameProposal = TacletInstantiationsTableModel
                 .getBaseNameProposalForMetavariable(goal, this, sv);
         return proof.getMetavariableDeliverer().createNewVariable(nameProposal,
@@ -966,6 +975,12 @@ public abstract class TacletApp implements RuleApp {
         while ( svIt.hasNext () )
             insts = createTermSkolemFunctions ( svIt.next (), insts, p_func_ns );
         
+        // reklov
+        // START TEMPORARY DOWNWARD COMPATIBILITY
+        VariableNameProposer.DEFAULT.setOldAnonUpdateProposals((Name)
+                insts.getInstantiation(new NameSV("_NAME_ANON_UPDATES")));
+        // END TEMPORARY DOWNWARD COMPATIBILITY
+
         final IteratorOfVariableCondition vcIt = taclet.getVariableConditions ();
         while ( vcIt.hasNext () ) {
             final VariableCondition vc = vcIt.next();

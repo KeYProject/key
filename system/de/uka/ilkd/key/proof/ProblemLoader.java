@@ -648,6 +648,19 @@ public class ProblemLoader implements Runnable {
             int eq = s.indexOf('=');
             String varname = s.substring(0, eq);
             String value = s.substring(eq+1, s.length());
+
+            // reklov
+            // START TEMPORARY DOWNWARD COMPATIBILITY
+
+            if (varname.startsWith("_NAME")) {
+                app = app.addInstantiation(de.uka.ilkd.key.rule.inst.
+                        SVInstantiations.EMPTY_SVINSTANTIATIONS.add(
+                        new NameSV(varname), new Name(value)));
+                continue;
+            }
+
+            // END TEMPORARY DOWNWARD COMPATIBILITY
+
             SchemaVariable sv = lookupName(uninsts, varname);
             if (sv==null) {
 //                throw new IllegalStateException(

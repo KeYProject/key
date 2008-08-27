@@ -94,6 +94,13 @@ public class NoFindTaclet extends Taclet {
 	IteratorOfTacletGoalTemplate it               = goalTemplates().iterator();
 	IteratorOfGoal               goalIt           = newGoals.iterator();
 
+        // reklov
+        // START TEMPORARY DOWNWARD COMPATIBILITY
+        ((InnerVariableNamer) services.getVariableNamer()).
+                setOldProgVarProposals((Name) tacletApp.instantiations().
+                getInstantiation(new NameSV("_NAME_PROG_VARS")));
+        // END TEMPORARY DOWNWARD COMPATIBILITY
+
 	while (it.hasNext()) {
 	    TacletGoalTemplate gt          = it    .next();
 	    Goal               currentGoal = goalIt.next();
