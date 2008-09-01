@@ -292,7 +292,7 @@ public class StrategySelectionView extends JPanel {
         ////////////////////////////////////////////////////////////////////////
         ++yCoord;
         
-        addJavaDLOption ( new JLabel ( "Goul Chooser" ),
+        addJavaDLOption ( new JLabel ( "Goal Chooser" ),
                     javaDLOptionsLayout, 1, yCoord, 7 );
         
         ++yCoord;
