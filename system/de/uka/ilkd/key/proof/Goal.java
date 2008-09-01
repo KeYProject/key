@@ -656,9 +656,13 @@ public class Goal  {
         addGoalListener(journal);
         
         final RuleApp ruleApp = completeRuleApp( p_ruleApp ); 
+
+        final Node n = node;
         
         final ListOfGoal goalList = ruleApp.execute(this,  
                 proof.getServices());
+
+        proof.saveNameRecorder(n);
         
         if ( goalList == null ) {
             // this happens for the simplify decision procedure

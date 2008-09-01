@@ -1270,6 +1270,9 @@ public class Main extends JFrame implements IMain {
                 smaller.setEnabled(!Config.DEFAULT.isMinimumSize());
                 larger.setEnabled(!Config.DEFAULT.isMaximumSize());
             }
+            public void clear(){
+                Config.DEFAULT.removeConfigChangeListener(this);
+            };
         });
         
         fontSize.add(smaller);
@@ -1815,6 +1818,10 @@ public class Main extends JFrame implements IMain {
      * {@link #updateGoalView(String, JComponent)} instead (thread safe)
      */
     private void paintGoalView(String borderTitle, JComponent goalViewPane) {
+        JViewport vp = goalView.getViewport();
+        if(vp!=null){
+            vp.removeAll();
+        }
         goalView.setViewportView(goalViewPane);
         goalView.setBorder(new TitledBorder(borderTitle));
         goalView.validate();
@@ -1908,14 +1915,23 @@ public class Main extends JFrame implements IMain {
     protected void closeTask() {
 	final Proof proof = mediator.getProof();
 	if (proof != null) {
-	    final TaskTreeNode rootTask = 
-		proof.getBasicTask().getRootTask();	
-	    proofList.removeTask(rootTask);   
-	    proof.getServices().getSpecificationRepository().removeProof(proof);
-            ((ProofTreeView)proofView.getComponent(0)).removeProofs(rootTask.allProofs());
+	    final TaskTreeNode rootTask = proof.getBasicTask().getRootTask();
+	    closeTask(rootTask); 
 	}
     }
-    
+
+    protected void closeTask(TaskTreeNode rootTask) {
+       if(proofList.removeTask(rootTask)){
+            for(Proof proof:rootTask.allProofs()){
+                //In a previous revision the following statement was performed only
+                //on one proof object, namely on: mediator.getProof()
+                proof.getServices().getSpecificationRepository().removeProof(proof);
+                proof.mgt().removeProofListener();
+            }
+            ((ProofTreeView)proofView.getComponent(0)).removeProofs(rootTask.allProofs());
+       }
+    }
+
     
     public void closeTaskWithoutInteraction() {
         final Proof proof = mediator.getProof();
@@ -2172,9 +2188,12 @@ public class Main extends JFrame implements IMain {
     private synchronized void setProofNodeDisplay() {
         if (!disableCurrentGoalView) {
             Goal goal;
-            try {
+            if(mediator()!=null && mediator().getSelectedProof()!=null){
                 goal = mediator().getSelectedGoal();
-            } catch(IllegalStateException e) { // there is no proof (yet)
+            } else{//There is no proof. Either not loaded yet or it is abandoned 
+                final LogicPrinter printer = new LogicPrinter
+                (new ProgramPrinter(null), null,null);
+                sequentView.setPrinter(printer, null);
                 return;
             }
             if ( goal != null &&
@@ -2675,6 +2694,7 @@ public class Main extends JFrame implements IMain {
         System.out.println("  no_jmlspecs     : disables parsing JML specifications");
         System.out.println("  unit [loop]     : unit test generation mode (optional argument loop to " +
                             "enable balanced loop unwinding)");
+	System.out.println("  depthfirst      : constructs the proof tree in a depth first manner. Recommended for large proofs");
         System.out.println("  auto	          : start prove procedure after initialisation");
         System.out.println("  testing         : starts the prover with a simple test generation oriented user interface");
         System.out.println("  print_statistics <filename>" );

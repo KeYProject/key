@@ -20,7 +20,7 @@ public class PreservesOwnInvPO extends PreservesInvPO {
     public PreservesOwnInvPO(InitConfig initConfig,
 	    		     ProgramMethod programMethod) {
         super(initConfig,
-              "PreservesOwnInv",
+              "PreservesOwnInv (" + programMethod + ")",
               programMethod, 
               initConfig.getServices()
                         .getSpecificationRepository()

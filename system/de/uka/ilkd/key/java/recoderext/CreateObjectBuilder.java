@@ -27,7 +27,7 @@ import recoder.java.declaration.modifier.Public;
 import recoder.java.declaration.modifier.Static;
 import recoder.java.reference.*;
 import recoder.java.statement.Return;
-import recoder.kit.ProblemReport;
+import recoder.kit.*;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
@@ -79,17 +79,48 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
                          (InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
                          arguments)));
 
-	result.add
+	MethodReference createRef = 
 	    (new MethodReference(new VariableReference
 				 (new Identifier(NEW_OBJECT_VAR_NAME)), 
 				 new ImplicitIdentifier
 				 (CreateBuilder.IMPLICIT_CREATE)));
-
+	
+	// July 08 - mulbrich: wraps createRef into a method body statement to
+	// avoid unnecessary dynamic dispatch.
+	// Method body statement are not possible for anonymous classes, however.
+	// Use a method call there
+	if(recoderClass.getIdentifier() == null) {
+	    // anonymous
+	    result.add
+        (new MethodReference(new VariableReference
+                             (new Identifier(NEW_OBJECT_VAR_NAME)),
+                             new ImplicitIdentifier
+                             (CreateBuilder.IMPLICIT_CREATE)));
+	} else {
+	    TypeReference tyref;
+	    tyref = makeTyRef(recoderClass); 
+	    result.add(new MethodBodyStatement(tyref, null, createRef));
+	}
+	
+	// TODO why does the method return a value? Is the result ever used??
 	result.add(new Return
 		 (new VariableReference(new Identifier(NEW_OBJECT_VAR_NAME))));
 
 	return new StatementBlock(result);
 	
+    }
+
+    /* 
+     * make a type reference. There are special classes which need to be handled 
+     * differently. (<Default> for instance) 
+     */
+    private TypeReference makeTyRef(ClassDeclaration recoderClass) {
+        TypeReference tyref;
+        Identifier id = recoderClass.getIdentifier();
+        if(id instanceof ImplicitIdentifier) 
+            return new TypeReference(id);
+        else 
+            return TypeKit.createTypeReference(getProgramFactory(), recoderClass);
     }
     
 

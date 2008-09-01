@@ -74,15 +74,17 @@ public class TaskTree extends JPanel {
         setVisible(true);
     }
 
-    public void removeTask(TaskTreeNode tn) {
+    public boolean removeTask(TaskTreeNode tn) {
 
         int option = JOptionPane.showConfirmDialog(
                 mediator.mainFrame(),"Are you sure?\n",
                 "Abandon Proof", JOptionPane.YES_NO_OPTION);
 
         if (option == JOptionPane.YES_OPTION) {
-	    removeTaskWithoutInteraction(tn);	    
+	    removeTaskWithoutInteraction(tn);
+	    return true;
         }
+        return false;
     }
 
     public void removeTaskWithoutInteraction(TaskTreeNode tn) {
@@ -97,6 +99,9 @@ public class TaskTree extends JPanel {
 	    //go to some other node, take the last leaf.
 	    TreePath path 
 		= delegateView.getPathForRow(delegateView.getRowCount()-1);
+	    if(mediator.getInteractiveProver()!=null){
+	        mediator.getInteractiveProver().clear();
+	    }
 	    if (path!=null) {
 		TaskTreeNode tn0 = (TaskTreeNode) path.getLastPathComponent();
 		mediator.setProof(tn0.proof());
@@ -342,7 +347,7 @@ public class TaskTree extends JPanel {
                             mediator.getServices(), 
                             invokedNode.getUsedSpecs());
 	    } else if (e.getSource() == removeTask) {
-	        removeTask(invokedNode);
+	        Main.getInstance().closeTask(invokedNode);
             } else if (e.getSource() == loadProof) {
                 Main mainFrame = Main.getInstance();
                 KeYFileChooser localFileChooser = Main.getFileChooser(

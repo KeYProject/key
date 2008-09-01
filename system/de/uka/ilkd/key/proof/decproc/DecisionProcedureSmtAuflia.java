@@ -176,6 +176,7 @@ public abstract class DecisionProcedureSmtAuflia extends AbstractDecisionProcedu
      * @param proof the <tt>Proof</tt> that is currently selected in the prover 
      */
     public static void fireSelectedProofChanged( Proof proof ) {
+        currentProof = proof;//currentProof must be settable to null if a proof is abandoned; otherwise we get a memroy leak
         if ( currentProof != proof  &&  proof != null ) {
             // Save current settings:
             // If archive dir hasn't been created yet, put problem file into map
@@ -184,7 +185,6 @@ public abstract class DecisionProcedureSmtAuflia extends AbstractDecisionProcedu
             else fromProofToArchive.put( currentProof, currentArchiveDir );
             
             // Load new settings
-            currentProof = proof;
             Object widget = fromProofToArchive.get( proof );
             // If the widget is a File, then the archive dir hasn't been created yet 
             if ( widget instanceof File ) {

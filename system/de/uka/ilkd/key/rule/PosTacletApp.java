@@ -326,7 +326,7 @@ public class PosTacletApp extends TacletApp {
      * instantiations, constraints and new metavariables given 
      * by the mc object and forget the old ones
      */
-    protected TacletApp setMatchConditions ( MatchConditions mc ) {
+    public TacletApp setMatchConditions ( MatchConditions mc ) {
 	return createPosTacletApp( (FindTaclet)taclet(),
 				   mc.getInstantiations   (),
 				   mc.getConstraint       (),

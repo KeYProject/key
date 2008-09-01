@@ -34,8 +34,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class TestVariableNamer extends TestCase {
 
-    private final Services services = new Services();
-    private final Proof proof = new Proof(services);
+    private final Proof proof = new Proof(new Services());
+    private final Services services = proof.getServices();
     private final ProgramVariable x     = constructProgramVariable("x");
     private final ProgramVariable xx    = constructProgramVariable("x");
     private final ProgramVariable y     = constructProgramVariable("y");

@@ -793,7 +793,7 @@ thing. People were thinking it was a button.
                     getActiveStrategyProperties();
             String activeSplittingOptions = p.getProperty(StrategyProperties.SPLITTING_OPTIONS_KEY);
             JRadioButton bSplittingActive = getStrategyOptionButton(activeSplittingOptions,
-		    StrategyProperties.LOOP_OPTIONS_KEY);
+		    StrategyProperties.SPLITTING_OPTIONS_KEY);
             bSplittingActive.setSelected(true);
             String activeLoopOptions = p.getProperty(StrategyProperties.LOOP_OPTIONS_KEY);
             JRadioButton bLoopActive = getStrategyOptionButton(activeLoopOptions, 
