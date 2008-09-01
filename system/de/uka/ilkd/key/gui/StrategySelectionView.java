@@ -22,6 +22,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
+import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.*;
 
@@ -48,6 +50,7 @@ public class StrategySelectionView extends JPanel {
     ButtonGroup queryGroup = new ButtonGroup();
     ButtonGroup nonLinArithGroup = new ButtonGroup();
     ButtonGroup quantifierGroup = new ButtonGroup();
+    ButtonGroup goalChooserGroup = new ButtonGroup();
     ButtonGroup[] userTacletsGroup = new ButtonGroup[StrategyProperties.USER_TACLETS_NUM];
     {
         for (int i = 0; i < StrategyProperties.USER_TACLETS_NUM; ++i)
@@ -59,6 +62,8 @@ public class StrategySelectionView extends JPanel {
     JRadioButtonHashMap rdBut12;
     JRadioButtonHashMap rdBut13;
     JRadioButtonHashMap rdBut14;
+    JRadioButtonHashMap rdBut15;
+    JRadioButtonHashMap rdBut16;
     private JRadioButtonHashMap splittingNormal;
     private JRadioButtonHashMap splittingOff;
     private JRadioButtonHashMap splittingDelayed;
@@ -72,6 +77,8 @@ public class StrategySelectionView extends JPanel {
     private JRadioButtonHashMap quantifierNonSplitting;
     private JRadioButtonHashMap quantifierNonSplittingWithProgs;
     private JRadioButtonHashMap quantifierInstantiate;
+    private JRadioButton rdButDefaultGC;
+    private JRadioButton rdButDepthGC;
     
     private KeYMediator mediator;
     
@@ -281,6 +288,27 @@ public class StrategySelectionView extends JPanel {
         ++yCoord;
         addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
 
+        
+        ////////////////////////////////////////////////////////////////////////
+        ++yCoord;
+        
+        addJavaDLOption ( new JLabel ( "Goul Chooser" ),
+                    javaDLOptionsLayout, 1, yCoord, 7 );
+        
+        ++yCoord;
+
+        rdBut15 = new JRadioButtonHashMap("Default", StrategyProperties.GOALCHOOSER_DEFAULT, true, false);
+        goalChooserGroup.add(rdBut15);
+        addJavaDLOption ( rdBut15, javaDLOptionsLayout, 2, yCoord, 2 );        
+
+        rdBut16 = new JRadioButtonHashMap(
+                "Depth", StrategyProperties.GOALCHOOSER_DEPTH, false, false);
+        goalChooserGroup.add(rdBut16);
+        addJavaDLOption ( rdBut16, javaDLOptionsLayout, 4, yCoord, 2 );        
+       
+        
+        ++yCoord;
+        addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
         ////////////////////////////////////////////////////////////////////////
 
         ++yCoord;
@@ -526,6 +554,8 @@ public class StrategySelectionView extends JPanel {
         rdBut12.addActionListener(optListener);       
         rdBut13.addActionListener(optListener);     
         rdBut14.addActionListener(optListener);
+        rdBut15.addActionListener(optListener);
+        rdBut16.addActionListener(optListener);
         queryExpand.addActionListener(optListener);
         queryProgramsToRight.addActionListener(optListener);
         queryNone.addActionListener(optListener);
@@ -761,7 +791,6 @@ thing. People were thinking it was a button.
             StrategyProperties p = proof.
                 getSettings().getStrategySettings().
                     getActiveStrategyProperties();
-            
             String activeSplittingOptions = p.getProperty(StrategyProperties.SPLITTING_OPTIONS_KEY);
             JRadioButton bSplittingActive = getStrategyOptionButton(activeSplittingOptions,
 		    StrategyProperties.LOOP_OPTIONS_KEY);
@@ -786,6 +815,10 @@ thing. People were thinking it was a button.
             JRadioButton bQuantifierActive = getStrategyOptionButton(quantifierOptions, 
                     StrategyProperties.QUANTIFIERS_OPTIONS_KEY);
             bQuantifierActive.setSelected(true);   
+            String goalChooserOptions = p.getProperty(StrategyProperties.GOALCHOOSER_OPTIONS_KEY);
+            JRadioButton bCoalChooserActive = getStrategyOptionButton(goalChooserOptions, 
+                    StrategyProperties.GOALCHOOSER_OPTIONS_KEY);
+            bCoalChooserActive.setSelected(true); 
             for (int i = 1; i <= StrategyProperties.USER_TACLETS_NUM; ++i) {
                 String userTacletsOptions =
                     p.getProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(i));
@@ -868,6 +901,8 @@ thing. People were thinking it was a button.
                        nonLinArithGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.QUANTIFIERS_OPTIONS_KEY, 
                        quantifierGroup.getSelection().getActionCommand());
+        p.setProperty( StrategyProperties.GOALCHOOSER_OPTIONS_KEY, 
+                	   goalChooserGroup.getSelection().getActionCommand());
         
         for (int i = 1; i <= StrategyProperties.USER_TACLETS_NUM; ++i) {
             p.setProperty( StrategyProperties.USER_TACLETS_OPTIONS_KEY(i), 
@@ -906,10 +941,10 @@ thing. People were thinking it was a button.
     }
 
     public class OptListener implements ActionListener { 
-        public void actionPerformed(ActionEvent e) {   
+        public void actionPerformed(ActionEvent e) { 	
+        	
             updateStrategySettings(mediator.getProof().
                     getActiveStrategy().name().toString());
         }
     }
-
 }
