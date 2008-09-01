@@ -30,6 +30,7 @@ import de.uka.ilkd.key.proof.proofevent.IteratorOfNodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -68,7 +69,7 @@ public class ApplyStrategy {
     /** time in ms after which rule application shall be aborted, -1 disables timeout */
     private long timeout = -1;
     
-    private String usedCoalChooserBuilderName;
+    private String usedCoalChooserOptionsKey="";
 
     
     // Please create this object beforehand and re-use it.
@@ -76,9 +77,7 @@ public class ApplyStrategy {
     // can cause a ConcurrentModificationException during ongoing operation
     public ApplyStrategy(KeYMediator medi) {
 	this.medi = medi;
-        medi.addRuleAppListener( proofListener );
-        this.goalChooser = medi.getProfile().getSelectedGoalChooserBuilder().create(); 
-        usedCoalChooserBuilderName = medi.getProfile().getSelectedGoalChooserBuilder().name();
+        medi.addRuleAppListener( proofListener );        
     }
     
     
@@ -195,9 +194,17 @@ public class ApplyStrategy {
         this.proof = proof;
         maxApplications = maxSteps;
         this.timeout = timeout;
-        countApplied = 0;
-        if(usedCoalChooserBuilderName.compareTo(medi.getProfile().getSelectedGoalChooserBuilder().name())!=0)
+        countApplied = 0; 
+        
+        if(usedCoalChooserOptionsKey.compareTo(medi.getProof().getSettings().getStrategySettings().getActiveStrategyProperties().getProperty(StrategyProperties.GOALCHOOSER_OPTIONS_KEY))!=0){
+        	usedCoalChooserOptionsKey = medi.getProof().getSettings().getStrategySettings().getActiveStrategyProperties().getProperty(StrategyProperties.GOALCHOOSER_OPTIONS_KEY);
+        	if(usedCoalChooserOptionsKey.equals(StrategyProperties.GOALCHOOSER_DEFAULT)){
+        		medi.getProfile().setSelectedGoalChooserBuilder(DefaultGoalChooserBuilder.NAME);
+        	}else if(usedCoalChooserOptionsKey.equals(StrategyProperties.GOALCHOOSER_DEPTH)){
+        		medi.getProfile().setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);
+        	}
         	this.goalChooser = medi.getProfile().getSelectedGoalChooserBuilder().create();
+    	}        
         goalChooser.init ( proof, goals );
         setAutoModeActive(true);
         startedAsInteractive = !mediator().autoMode();
