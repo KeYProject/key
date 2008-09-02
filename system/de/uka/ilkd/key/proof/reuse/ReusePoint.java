@@ -118,6 +118,10 @@ public class ReusePoint implements Comparable {
       return reuseApp;
    }
    
+   public ListOfName getNameProposals() {
+       return templateNode.getNameRecorder().getProposals();
+   }
+
    public void setGoalLocal(boolean b) {
        goalLocalRule = b;
    }

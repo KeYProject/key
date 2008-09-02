@@ -557,6 +557,8 @@ public class KeYMediator {
                 if (reusePoint.source() != changeWish) {
                     currGoal.node().setReuseSource(reusePoint);
                     hook.removeRPConsumedGoal(currGoal);
+                    getProof().getNameRecorder().setProposals(
+                            reusePoint.getNameProposals());
                     ListOfGoal goalList = currGoal.apply(app);
                     hook.addRPOldMarkersNewGoals(goalList);
                     hook.addRPNewMarkersAllGoals(reusePoint.source());
