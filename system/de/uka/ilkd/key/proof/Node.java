@@ -557,9 +557,10 @@ public class Node {
     }
     
     public static void clearReuseCandidates(Proof p) {
-       for (Node n : reuseCandidates) {
-          if (n.proof() == p) reuseCandidates.remove(n);
-       }
+        for (Iterator<Node> it = reuseCandidates.iterator(); it.hasNext();) {
+            Node n = it.next();
+            if (n.proof() == p) it.remove();
+        }
     }
     
     public boolean isReuseCandidate() {
