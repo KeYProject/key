@@ -302,7 +302,7 @@ public class StrategySelectionView extends JPanel {
         addJavaDLOption ( rdBut15, javaDLOptionsLayout, 2, yCoord, 2 );        
 
         rdBut16 = new JRadioButtonHashMap(
-                "Depth", StrategyProperties.GOALCHOOSER_DEPTH, false, false);
+                "Depth First", StrategyProperties.GOALCHOOSER_DEPTH, false, false);
         goalChooserGroup.add(rdBut16);
         addJavaDLOption ( rdBut16, javaDLOptionsLayout, 4, yCoord, 2 );        
        
