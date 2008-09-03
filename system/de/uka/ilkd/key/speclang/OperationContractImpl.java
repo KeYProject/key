@@ -15,7 +15,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.BasicLocationDescriptor;
+import de.uka.ilkd.key.logic.EverythingLocationDescriptor;
+import de.uka.ilkd.key.logic.LocationDescriptor;
+import de.uka.ilkd.key.logic.SetAsListOfLocationDescriptor;
 import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IteratorOfParsableVariable;
 import de.uka.ilkd.key.logic.op.ListOfParsableVariable;
@@ -33,9 +39,11 @@ import de.uka.ilkd.key.proof.OpReplacer;
  */
 public class OperationContractImpl implements OperationContract {
     
+    protected static final TermBuilder TB = TermBuilder.DF;
     protected static final SignatureVariablesFactory SVN 
         = SignatureVariablesFactory.INSTANCE;
-    
+    protected static final AtPreFactory APF = AtPreFactory.INSTANCE;
+
     private final String name;
     private final String displayName;
     private final ProgramMethod programMethod;
@@ -47,7 +55,7 @@ public class OperationContractImpl implements OperationContract {
     private final ListOfParsableVariable originalParamVars;
     private final ParsableVariable originalResultVar;
     private final ParsableVariable originalExcVar;
-    private final Map<Operator, Function/* at pre */> originalAtPreFunctions;
+    private final Map<Operator, Function/* atPre */> originalAtPreFunctions;
     
     
     //-------------------------------------------------------------------------
@@ -80,7 +88,7 @@ public class OperationContractImpl implements OperationContract {
             		         ListOfParsableVariable paramVars,
             		         ParsableVariable resultVar,
             		         ParsableVariable excVar,
-                                 /*in*/ Map<Operator, Function> atPreFunctions) {
+                                 /*in*/ Map<Operator, Function /*atPre*/> atPreFunctions) {
         assert name != null && !name.equals("");
         assert displayName != null && !displayName.equals("");
         assert programMethod != null;
@@ -116,12 +124,12 @@ public class OperationContractImpl implements OperationContract {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private Map /*Operator -> Operator*/<Operator, Operator> getReplaceMap(
+    private Map <Operator, Operator> getReplaceMap(
 	    				ParsableVariable selfVar, 
 	    				ListOfParsableVariable paramVars, 
 	    				ParsableVariable resultVar, 
 	    				ParsableVariable excVar,
-                                        /*inout*/ Map< Operator, Function> atPreFunctions,
+                                        /*inout*/ Map< Operator, Function/*atPre*/> atPreFunctions,
                                         Services services) {
 	Map<Operator, Operator> result = new LinkedHashMap<Operator, Operator>();
 	
@@ -185,7 +193,37 @@ public class OperationContractImpl implements OperationContract {
 	
 	return result;
     }
-  
+    
+    
+    private SetOfLocationDescriptor addGuard(SetOfLocationDescriptor modifies, 
+                                             Term formula) {
+        SetOfLocationDescriptor result 
+            = SetAsListOfLocationDescriptor.EMPTY_SET;
+        for(LocationDescriptor loc : modifies) {
+            if(loc instanceof EverythingLocationDescriptor) {
+                return EverythingLocationDescriptor.INSTANCE_AS_SET;
+            } else {
+                BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
+                Term newGuard = TB.and(bloc.getFormula(), formula);
+                result = result.add(new BasicLocationDescriptor(
+                        newGuard, 
+                        bloc.getLocTerm()));
+            }
+        }
+        return result;
+    }
+    
+    
+    private FormulaWithAxioms atPreify(
+                FormulaWithAxioms fwa, 
+                /*inout*/Map<Operator, Function/*atPre*/> atPreFunctions,
+                Services services) {
+        APF.createAtPreFunctionsForTerm(fwa.getFormula(), 
+                                        atPreFunctions, 
+                                        services);
+        return new OpReplacer(atPreFunctions).replace(fwa);
+    }
+    
     
     
     //-------------------------------------------------------------------------
@@ -270,7 +308,70 @@ public class OperationContractImpl implements OperationContract {
 	OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalModifies);
     }
+    
+    
+    public OperationContract union(OperationContract[] others, 
+                                   String name, 
+                                   String displayName, 
+                                   Services services) {
+        assert others != null;
+        for(OperationContract contract : others) {
+            assert contract.getProgramMethod().equals(programMethod);
+        }
+        if(others.length == 0) {
+            return this;
+        }
+        
+        //copy atPre map
+        Map<Operator, Function> newAtPreFunctions 
+            = new LinkedHashMap<Operator, Function>();
+        newAtPreFunctions.putAll(originalAtPreFunctions);
 
+        //collect information
+        FormulaWithAxioms pre = originalPre;
+        FormulaWithAxioms post = atPreify(originalPre, 
+                                          newAtPreFunctions, 
+                                          services).imply(originalPost);
+        SetOfLocationDescriptor modifies = addGuard(originalModifies, 
+                                                    originalPre.getFormula());
+        for(OperationContract other : others) {
+            FormulaWithAxioms otherPre = other.getPre(originalSelfVar, 
+                                                      originalParamVars, 
+                                                      services);
+            FormulaWithAxioms otherPost = other.getPost(originalSelfVar, 
+                                                        originalParamVars, 
+                                                        originalResultVar, 
+                                                        originalExcVar, 
+                                                        newAtPreFunctions, 
+                                                        services);
+            SetOfLocationDescriptor otherModifies 
+                    = other.getModifies(originalSelfVar, 
+                                        originalParamVars, 
+                                        services);
+
+            pre = pre.disjoin(otherPre);
+            post = post.conjoin(atPreify(otherPre, 
+                                         newAtPreFunctions, 
+                                         services).imply(otherPost));
+            modifies = modifies.union(addGuard(otherModifies, 
+                                      otherPre.getFormula()));
+        }
+
+        return new OperationContractImpl(name,
+                                         displayName,
+                                         programMethod,
+                                         modality,
+                                         pre,
+                                         post,
+                                         modifies,
+                                         originalSelfVar,
+                                         originalParamVars,
+                                         originalResultVar,
+                                         originalExcVar,
+                                         newAtPreFunctions);
+    }
+
+    
     public String getHTMLText(Services services) {
         final String pre = LogicPrinter.quickPrintTerm(originalPre.getFormula(), 
                 services);

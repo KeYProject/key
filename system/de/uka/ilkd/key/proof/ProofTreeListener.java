@@ -19,6 +19,15 @@ public interface ProofTreeListener {
      */
     void proofExpanded(ProofTreeEvent e);
 
+    /** The proof tree under the node mentioned in the ProofTreeEvent
+     * is in pruning phase. The subtree of node will be removed after this
+     * call but at this point the subtree can still be
+     * traversed (e.g. in order to free the nodes in caches).
+     * The method proofPruned is called, when the nodes are disconnect from
+     * node.
+     */
+    void proofIsBeingPruned(ProofTreeEvent e);
+    
     /** 
      * The proof tree has been pruned under the node mentioned in the
      * ProofTreeEvent.  In other words, that node should no longer

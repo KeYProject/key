@@ -75,7 +75,11 @@ public class NonInterferencePO implements ProofOblInput {
     public ProofAggregate getPO() {
         return po;
     }
-
+    
+    
+    public boolean implies(ProofOblInput po) {
+        return equals(po);
+    }
 
 
     public void readProblem(ModStrategy mod) throws ProofInputException {

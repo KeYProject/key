@@ -27,9 +27,11 @@ import de.uka.ilkd.key.proof.mgt.DefaultProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
+import de.uka.ilkd.key.rule.updatesimplifier.ApplyOnModality;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature;
 
 
 /**
@@ -111,6 +113,8 @@ public class Proof implements Named {
 //    implemented by mbender for jmltest
     private SpecExtPO specExtPO;
     
+    private NameRecorder nameRecorder;
+
     /** constructs a new empty proof with name */
     private Proof(Name name, Services services, ProofSettings settings) {
         this.name = name;
@@ -122,6 +126,7 @@ public class Proof implements Named {
         addConstraintListener ();
 
         addStrategyListener ();
+        nameRecorder = new NameRecorder();
     }
 
     /**
@@ -263,6 +268,19 @@ public class Proof implements Named {
        return services;
     }
 
+    public NameRecorder getNameRecorder() {
+        return nameRecorder;
+    }
+
+    public void saveNameRecorder(Node n) {
+        n.setNameRecorder(nameRecorder);
+        nameRecorder = new NameRecorder();
+    }
+
+    public void addNameProposal(Name proposal) {
+        nameRecorder.addProposal(proposal);
+    }
+
     /** sets the variable, function, sort, heuristics namespaces */
     public void setNamespaces(NamespaceSet ns) {
         getServices().setNamespaces(ns);
@@ -349,7 +367,7 @@ public class Proof implements Named {
             });
     }
 
-    private void clearAndDetachRuleAppIndexes () {
+    public void clearAndDetachRuleAppIndexes () {
         // Taclet indices of the particular goals have to
         // be rebuilt
         final IteratorOfGoal it = openGoals ().iterator ();
@@ -620,6 +638,14 @@ public class Proof implements Named {
 	    listenerList.get(i).proofExpanded(e);
 	}
     }
+
+    /** fires the event that the proof has been pruned at the given node */
+    protected void fireProofIsBeingPruned(Node node, Node removedNode) {
+        ProofTreeEvent e = new ProofTreeRemovedNodeEvent(this, node, removedNode);
+        for (int i = 0; i<listenerList.size(); i++) {
+            listenerList.get(i).proofIsBeingPruned(e);
+        }
+    } 
 
     /** fires the event that the proof has been pruned at the given node */
     protected void fireProofPruned(Node node, Node removedNode) {

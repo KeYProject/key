@@ -38,4 +38,9 @@ public interface ProofOblInput {
      * been read yet null is returned.
      */
     ProofAggregate getPO() throws ProofInputException;
+    
+    /**
+     * If true, then this PO implies the passed one.
+     */
+    boolean implies(ProofOblInput po);
  }

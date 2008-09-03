@@ -54,6 +54,7 @@ public class ContractConfigurator extends JDialog {
             ProgramMethod pm,
             Modality modality,
             boolean allowContract,
+            boolean allowMultipleContracts,
             boolean allowAssumedInvs,
             boolean allowEnsuredInvs) {
         super(owner, "Contract Configurator", true);
@@ -61,6 +62,7 @@ public class ContractConfigurator extends JDialog {
              pm, 
              modality, 
              allowContract, 
+             allowMultipleContracts,
              allowAssumedInvs, 
              allowEnsuredInvs);
     }
@@ -71,6 +73,7 @@ public class ContractConfigurator extends JDialog {
                                 ProgramMethod pm,
                                 Modality modality,
                                 boolean allowContract,
+                                boolean allowMultipleContracts,
                                 boolean allowAssumedInvs,
                                 boolean allowEnsuredInvs) {
         super(owner, "Contract Configurator", true);
@@ -78,6 +81,7 @@ public class ContractConfigurator extends JDialog {
              pm, 
              modality, 
              allowContract, 
+             allowMultipleContracts,
              allowAssumedInvs, 
              allowEnsuredInvs);
     }
@@ -89,6 +93,7 @@ public class ContractConfigurator extends JDialog {
                       ProgramMethod pm,
                       Modality modality,
                       boolean allowContract,
+                      boolean allowMultipleContracts,
                       boolean allowAssumedInvs,
                       boolean allowEnsuredInvs) {
         assert allowContract || allowAssumedInvs || allowEnsuredInvs;
@@ -97,9 +102,11 @@ public class ContractConfigurator extends JDialog {
         
         //create contract panel
         if(allowContract) {
-            contractPanel = new OperationContractSelectionPanel(services, 
-                                                                pm, 
-                                                                modality);
+            contractPanel 
+                = new OperationContractSelectionPanel(services, 
+                                                      pm, 
+                                                      modality,
+                                                      allowMultipleContracts);
             contractPanel.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent e){                
                     if(e.getClickCount() == 2){

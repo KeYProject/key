@@ -13,13 +13,25 @@ package de.uka.ilkd.key.gui;
 import java.io.File;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 public class KeYFileChooser {
 
     JFileChooser fileChooser;
 
+    private boolean saveDialog;
+
     public KeYFileChooser() {
-	fileChooser = new JFileChooser(new File(System.getProperty("user.dir")));
+	fileChooser = new JFileChooser(new File(System.getProperty("user.dir"))) {
+                public void approveSelection() {
+                    File file = getSelectedFile();
+                    if (saveDialog && file.exists() &&
+                            showOverwriteDialog(file) != JOptionPane.YES_OPTION) {
+                        return;
+                    }
+                    super.approveSelection();
+                }
+            };
 	fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 	fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
 		public boolean accept(File f) {
@@ -53,12 +65,18 @@ public class KeYFileChooser {
 	}
     }
 
+    private void setSaveDialog(boolean b) {
+        saveDialog = b;
+    }
+
     public boolean showSaveDialog(Main main) {
+        setSaveDialog(true);
 	int result = fileChooser.showSaveDialog(main);
 	return (result == JFileChooser.APPROVE_OPTION);
     }
 
     public boolean showOpenDialog(Main main) {
+        setSaveDialog(false);
 	int result = fileChooser.showOpenDialog(main);
 	return (result == JFileChooser.APPROVE_OPTION);
     }
@@ -71,5 +89,11 @@ public class KeYFileChooser {
 	fileChooser.setSelectedFile(f);
     }
 
+    private int showOverwriteDialog(File file) {
+        return JOptionPane.showOptionDialog(fileChooser, "File " +
+                file.getAbsolutePath() + " already exists. Overwrite?",
+                "Save warning", JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE, null, null, null);
+    }
 
 }

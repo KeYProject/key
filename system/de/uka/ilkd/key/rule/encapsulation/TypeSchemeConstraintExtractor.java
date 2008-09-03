@@ -563,7 +563,13 @@ class TypeSchemeConstraintExtractor implements Visitor {
         }
     }
     
-    
+    public void performActionOnIProgramVariable(IProgramVariable x) {
+        if(x instanceof ProgramVariable){
+            performActionOnProgramVariable(( ProgramVariable)x);
+        }else{
+            failUnexpected((IProgramVariable) x);
+        }
+    }
 
     
     public void performActionOnSchemaVariable(SchemaVariable x) {

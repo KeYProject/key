@@ -194,7 +194,8 @@ modifiers
 
 
 modifier returns [String result = null]:
-    fin:FINAL                   { result = fin.getText(); }
+        abs:ABSTRACT            { result = abs.getText(); }
+    |   fin:FINAL               { result = fin.getText(); }
     |   gho:GHOST               { result = gho.getText(); } 
     |   hel:HELPER              { result = hel.getText(); }
     |   ins:INSTANCE            { result = ins.getText(); }

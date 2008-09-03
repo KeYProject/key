@@ -357,4 +357,7 @@ public abstract class AbstractBetaFeature implements Feature {
     protected abstract RuleAppCost doComputation (PosInOccurrence pos,
                                                   Term findTerm);
 
+    public static void clearCache(){
+        betaCandidates.clear();
+    }
 }

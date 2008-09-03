@@ -41,7 +41,7 @@ public class PreservesGuardPO extends EnsuresPO {
                             SetOfClassInvariant guardedInvs,
                             SetOfKeYJavaType guard) {
         super(initConfig,
-              "PreservesGuard", 
+              "PreservesGuard (" + programMethod + ")", 
               programMethod, 
               Op.BOX, 
               SetAsListOfClassInvariant.EMPTY_SET,

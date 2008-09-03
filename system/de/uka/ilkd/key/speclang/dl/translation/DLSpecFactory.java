@@ -38,6 +38,8 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SLListOfParsableVariable;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.speclang.ClassInvariant;
+import de.uka.ilkd.key.speclang.ClassInvariantImpl;
 import de.uka.ilkd.key.speclang.FormulaWithAxioms;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.OperationContractImpl;
@@ -183,7 +185,33 @@ public class DLSpecFactory {
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
+    
+    /**
+     * Creates a class invariant from a formula and a designated "self".
+     */
+    public ClassInvariant createDLClassInvariant(String name, 
+                                                 String displayName,
+                                                 ParsableVariable selfVar,
+                                                 Term inv) 
+            throws ProofInputException {
+        assert name != null;
+        if(displayName == null) {
+            displayName = name;
+        }
+        assert selfVar != null;
+        assert inv != null;
+        
+        KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(selfVar.sort());
+        assert kjt != null;
+        
+        return new ClassInvariantImpl(name, 
+                                      displayName, 
+                                      kjt, 
+                                      new FormulaWithAxioms(inv), 
+                                      selfVar);
+    }
   
+    
     /**
      * Creates an operation contract from an implication formula of the form
      * <code>pre -> \<p\> post</code> and a modifies clause (which is how

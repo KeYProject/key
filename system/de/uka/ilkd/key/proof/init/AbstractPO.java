@@ -423,4 +423,9 @@ public abstract class AbstractPO implements ProofOblInput {
         
         return proofAggregate = ProofAggregate.createProofAggregate(proofs, name);
     }
+    
+    
+    public boolean implies(ProofOblInput po) {
+        return equals(po);
+    }
 }
