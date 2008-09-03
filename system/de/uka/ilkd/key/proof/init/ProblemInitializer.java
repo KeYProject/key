@@ -544,12 +544,7 @@ public class ProblemInitializer {
     public void startProver(InitConfig initConfig, ProofOblInput po) 
     		throws ProofInputException {
 	assert initConfig != null;
-	stopInterface();
-	/*Setting this flag to false tells KeY to store Names in namespaces using strong references.
-	 * So they are not garbage collected, while the namespace exists. If you have
-	 * a better place for this statement without introducing memory leaks then refactor this code. */
-	Namespace.storeAsWeak = false;
-        
+	stopInterface();	
         try {
             //determine environment
             initConfig = determineEnvironment(po, initConfig);
@@ -567,10 +562,7 @@ public class ProblemInitializer {
         } finally {
             startInterface();
         }
-        /*After creating the proof environment and loading of the problem we use
-         * weak references to store newly created names as they become obsolete when
-         * parts of a proof become pruned. */
-        Namespace.storeAsWeak = false;//true
+    
         if(MethodCallInfo.MethodCallCounterOn){
             MethodCallInfo.Local.reset();
         }
