@@ -84,6 +84,7 @@ options {
       prooflabel2tag.put("formula", new Character('f'));
       prooflabel2tag.put("inst", new Character('i'));
       prooflabel2tag.put("ifseqformula", new Character('q'));
+      prooflabel2tag.put("ifdirectformula", new Character('d'));
       prooflabel2tag.put("heur", new Character('h'));
       prooflabel2tag.put("builtin", new Character('n'));
       prooflabel2tag.put("keyLog", new Character('l'));

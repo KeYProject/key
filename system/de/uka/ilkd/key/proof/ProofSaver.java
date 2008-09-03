@@ -371,7 +371,8 @@ public class ProofSaver {
             }
             else
                 if (iff instanceof IfFormulaInstDirect) {
-                    throw new RuntimeException("IfFormulaInstDirect not yet supported");
+                    s += " (ifdirectformula \"" + iff.getConstrainedFormula()
+                        + "\")";
                 }
                 else throw new RuntimeException("Unknown If-Seq-Formula type");
         }
