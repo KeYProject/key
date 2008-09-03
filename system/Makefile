@@ -49,7 +49,10 @@ endif
 GIT_REPOS_AVAILABLE=$(wildcard ../.git/objects)
 
 SHA1=ownVersion
-KEY_VERSION_SHORT=0.0.0
+
+ifeq "$(KEY_VERSION_SHORT)" "" 
+  KEY_VERSION_SHORT=0.0.0
+endif
 
 ifneq "$(GIT)" "" 
  ifneq "$(GIT_REPOS_AVAILABLE)" ""
@@ -64,7 +67,7 @@ ifneq "$(GIT)" ""
 endif
 
 ifeq "$(KEY_VERSION_LONG)" ""
-KEY_VERSION_LONG=$(KEY_VERSION_SHORT)_$(SHA1)_Technological_Preview
+KEY_VERSION_LONG=$(KEY_VERSION_SHORT)_$(SHA1)
 endif
 
 export KEY_VERSION_LONG
