@@ -64,7 +64,7 @@ POSSIBILITY OF SUCH DAMAGES.
 
 
    <url>
-     <update label="KeY 1.4 Technological Preview Update Site" url="http://www.key-project.org/download/releases/tp14/eclipse/"/>
+     <update label="KeY 1.4 Technology Preview Update Site" url="http://www.key-project.org/download/releases/tp14/eclipse/"/>
      <discovery label="KeY Project" url="http://www.key-project.org/"/>
    </url>
   <requires>
