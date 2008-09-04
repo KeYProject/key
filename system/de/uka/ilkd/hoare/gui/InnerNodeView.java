@@ -70,6 +70,7 @@ public class InnerNodeView extends NonGoalInfoView {
                     public void configChanged(ConfigChangeEvent e) {
                         updateUI();
                     }
+		public void clear() {}
                 });
 
         updateUI();

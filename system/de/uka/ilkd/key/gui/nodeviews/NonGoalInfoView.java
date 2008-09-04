@@ -55,7 +55,7 @@ public class NonGoalInfoView extends JTextArea {
     }
 
     protected void printInnerNode(Node node, KeYMediator mediator) {
-        if(MethodCallInfo.MethodCallCounterOn){
+        if(MethodCallInfo.MethodCallCounterOn) {
             MethodCallInfo.Global.incForClass(this.getClass().toString(), MethodCallInfo.constructor);
             MethodCallInfo.Local.incForClass(this.getClass().toString(), MethodCallInfo.constructor);
         }
@@ -72,9 +72,19 @@ public class NonGoalInfoView extends JTextArea {
         posTable = printer.getPositionTable();
         printer=null;
 	RuleApp app = node.getAppliedRuleApp();
-                s += tacPrinter;
+
+	if ( app != null ) {
+	    s = s + "\n \nUpcoming rule application: \n";
+	    if (app.rule() instanceof Taclet) {
+               LogicPrinter tacPrinter = new LogicPrinter 
+                   (new ProgramPrinter(null),                       
+                    mediator.getNotationInfo(),
+                    mediator.getServices(),
+                    true);      
+               tacPrinter.printTaclet((Taclet)(app.rule()));    
+               s += tacPrinter;
             } else {
-                s = s + app.rule();
+	      s = s + app.rule();
             }
 
             if ( app instanceof TacletApp ) {
