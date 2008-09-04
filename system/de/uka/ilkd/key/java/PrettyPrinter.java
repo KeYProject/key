@@ -67,7 +67,8 @@ public class PrettyPrinter {
     protected StringBuffer outBuf;
     protected boolean noLinefeed=false;
     protected boolean noSemicolons=false;
-    protected boolean fileWriterMode=false; //enfoces the output of real Java syntax that can be compiled.
+    /**Enforces the output of real Java syntax that can be compiled. See also {@link de.uka.ilkd.key.unittest.ppAndJavaASTExtension.CompilableJavaPP}*/
+    protected boolean fileWriterMode=false; 
     protected Type classToPrint = null;
 
     protected int firstStatementStart = -1;

@@ -16,13 +16,7 @@ header {
   import antlr.*;
 
   import java.io.*;
-  import java.util.List;
-  import java.util.Iterator;
-  import java.util.ArrayList;
-  import java.util.LinkedList;
-  import java.util.HashMap;
-  import java.util.HashSet;
-  import java.util.Vector;
+  import java.util.*;
   import java.math.BigInteger;
 
   import de.uka.ilkd.key.collection.ListOfString;
@@ -43,7 +37,9 @@ header {
 
   import de.uka.ilkd.key.rule.updatesimplifier.Update;
  
+  import de.uka.ilkd.key.speclang.SetAsListOfClassInvariant;
   import de.uka.ilkd.key.speclang.SetAsListOfOperationContract;
+  import de.uka.ilkd.key.speclang.SetOfClassInvariant;
   import de.uka.ilkd.key.speclang.SetOfOperationContract;
   import de.uka.ilkd.key.speclang.dl.translation.DLSpecFactory;
 
@@ -101,6 +97,9 @@ options {
       prooflabel2tag.put("contract", new Character('c'));	
       prooflabel2tag.put("userinteraction", new Character('a'));
       prooflabel2tag.put("hoareLoopInvariant", new Character('z'));	
+      prooflabel2tag.put("userconstraint", new Character('o'));
+      prooflabel2tag.put("matchconstraint", new Character('m'));
+      prooflabel2tag.put("newnames", new Character('w'));
    }
 
     private Namespace arrays = new Namespace();
@@ -148,6 +147,7 @@ options {
 
     private SetOfTaclet taclets = SetAsListOfTaclet.EMPTY_SET; 
     private SetOfOperationContract contracts = SetAsListOfOperationContract.EMPTY_SET;
+    private SetOfClassInvariant invs = SetAsListOfClassInvariant.EMPTY_SET;
 
     private ParserConfig schemaConfig;
     private ParserConfig normalConfig;
@@ -427,6 +427,10 @@ options {
 
     public SetOfOperationContract getContracts(){
         return contracts;
+    }
+    
+    public SetOfClassInvariant getInvariants(){
+    	return invs;
     }
     
     public HashMap<String, String> getCategory2Default(){
@@ -931,7 +935,7 @@ options {
         namespaces().setVariables(variables().parent());
     }
 
-    private void bindProgVars(HashSet progVars) {
+    private void bindProgVars(Set progVars) {
 	namespaces().setProgramVariables(new Namespace(programVariables()));
 	Iterator it=progVars.iterator();
 	while (it.hasNext()) {
@@ -948,7 +952,7 @@ options {
         }
     }
 
-    private HashSet progVars(JavaBlock jb) {
+    private Set progVars(JavaBlock jb) {
 	if(isGlobalDeclTermParser()) {
   	  ProgramVariableCollector pvc
 	      = new ProgramVariableCollector(jb.program(), getServices());
@@ -2375,9 +2379,16 @@ array_set_decls[Sort p] returns [Sort s = null]
             if (n != 0){
                 final JavaInfo ji = getJavaInfo();
                 s = ArraySortImpl.getArraySortForDim(
-                    p, n, ji.getJavaLangObjectAsSort(),
-                    ji.getJavaLangCloneableAsSort(), 
-                    ji.getJavaIoSerializableAsSort());
+                                                     p, n, ji.getJavaLangObjectAsSort(),
+                                                     ji.getJavaLangCloneableAsSort(), 
+                                                     ji.getJavaIoSerializableAsSort());
+
+                Sort last = s;
+                do {
+                    final ArraySort as = (ArraySort) last;
+                    addSort(as);                        
+                    last = as.elementSort();
+                } while (last instanceof ArraySort && sorts().lookup(last.name()) == null);
             } else {
                 s = p;
             }
@@ -4508,6 +4519,31 @@ contracts[SetOfChoice choices, Namespace funcNSForSelectedChoices]
        }
 ;
 
+invariants[SetOfChoice choices, Namespace funcNSForSelectedChoices]
+{
+  Choice c = null;
+  QuantifiableVariable selfVar;
+}
+:
+   INVARIANTS LPAREN selfVar=one_logic_bound_variable RPAREN
+       LBRACE {
+	    switchToNormalMode();
+	    IteratorOfChoice it = choices.iterator();
+	    Namespace funcNSForRules = funcNSForSelectedChoices;
+	    while(it.hasNext()){
+		c=it.next();
+		funcNSForRules = 
+		    funcNSForRules.extended(c.funcNS().allElements());
+	    }
+	    namespaces().setFunctions(funcNSForRules); 
+       }
+       ( one_invariant[(ParsableVariable)selfVar] )*
+       RBRACE  {
+           unbindVars();
+       }
+;
+
+
 one_contract 
 {
   Term fma = null;
@@ -4549,6 +4585,29 @@ one_contract
    }
 ;
 
+one_invariant[ParsableVariable selfVar]
+{
+  Term fma = null;
+  String displayName = null;
+  String invName = null;
+}
+:
+     invName = simple_ident LBRACE 
+     fma = formula
+     (DISPLAYNAME displayName = string_literal)?
+     {
+       DLSpecFactory dsf = new DLSpecFactory(getServices());
+       try {
+         invs = invs.add(dsf.createDLClassInvariant(invName,
+                                                    displayName,
+                                                    selfVar,
+                                                    fma));
+       } catch(ProofInputException e) {
+         semanticError(e.getMessage());
+       }
+     } RBRACE SEMI
+;
+
 problem returns [ Term a = null ]
 {
     Term a2 = null;
@@ -4568,6 +4627,9 @@ problem returns [ Term a = null ]
 	{ if (capturer != null) capturer.mark(); }
         (pref = preferences)
         { if ((pref!=null) && (capturer != null)) capturer.mark(); }
+        
+        stlist = classPaths 
+        // the result is not of importance here, so we use it twice
 
         stlist = javaSource {
           if(stlist != null && stlist.size() > 1)
@@ -4593,6 +4655,7 @@ problem returns [ Term a = null ]
         // WATCHOUT: choices is always going to be an empty set here,
 	// isn't it?
 	( contracts[choices, funcNSForSelectedChoices] )*
+	( invariants[choices, funcNSForSelectedChoices] )*
         (  RULES (choices = option_list[choices])?
 	    LBRACE
             { 
@@ -4725,6 +4788,28 @@ updates returns [Update result = null]
 		(new KeYSemanticException
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
+   
+classPaths returns [ListOfString ids = SLListOfString.EMPTY_LIST]
+{
+  String s = null;
+}
+:
+  ( (
+    CLASSPATH 
+    s=string_literal {
+      ids = ids.append(s);
+    }
+    SEMI
+    )
+  | 
+    (
+    NODEFAULTCLASSES {
+      ids = ids.append((String)null);
+    }
+    SEMI
+    )
+  )*
+  ;
 
 javaSource returns [ListOfString ids = SLListOfString.EMPTY_LIST]
 { 

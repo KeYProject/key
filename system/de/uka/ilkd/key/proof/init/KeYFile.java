@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.*;
 
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
@@ -26,6 +27,7 @@ import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.CountingBufferedInputStream;
 import de.uka.ilkd.key.proof.RuleSource;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.SetOfTaclet;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.Debug;
@@ -57,8 +59,9 @@ public class KeYFile implements EnvInput {
     protected InitConfig initConfig;
     
     private boolean chooseContract = false;
-    
-    
+
+    // when parsing the key file store the classPaths here
+    private ListOfString classPaths;
     
     //-------------------------------------------------------------------------
     //constructors
@@ -232,6 +235,25 @@ public class KeYFile implements EnvInput {
         return result;
     }
     
+    public List<File> readClassPath() {
+        if(!javaPathAlreadyParsed)
+            throw new IllegalStateException("Can access this only after 'readJavaPath' has been called");
+        
+        String parentDirectory = file.file().getParent();
+        List<File> fileList = new ArrayList<File>();
+        for (String cp : classPaths) {
+            if (cp == null) {
+                fileList.add(null);
+            } else {
+                File f = new File(cp);
+                if (!f.isAbsolute()) {
+                    f = new File(parentDirectory, cp);
+                }
+                fileList.add(f);
+            }
+        }
+        return fileList;
+    }
     
     public String readJavaPath() throws ProofInputException {
         if (javaPathAlreadyParsed) {
@@ -245,6 +267,7 @@ public class KeYFile implements EnvInput {
             
             problemParser.preferences(); // skip preferences
             
+            classPaths = problemParser.classPaths();
             ListOfString javaPaths = problemParser.javaSource(); 
             
             if (javaPaths == null) {
@@ -257,8 +280,6 @@ public class KeYFile implements EnvInput {
             
             if(javaPaths.size() > 1)
                 Debug.fail("Don't know what to do with multiple Java paths.");            
-                
-            javaPathAlreadyParsed=true;
             
             if (javaPath.length() != 0) { 
                 File cfile = new File(javaPath);
@@ -273,6 +294,9 @@ public class KeYFile implements EnvInput {
                             + javaPath + " not found.");
                 }                      
             }
+            
+            javaPathAlreadyParsed=true;
+            
             return javaPath;
         } catch (antlr.ANTLRException e) {
             throw new ProofInputException(e);
@@ -324,9 +348,10 @@ public class KeYFile implements EnvInput {
 	    initConfig.setTaclets(st);
 	    initConfig.add(normalConfig.namespaces(), mod);
             
-	    initConfig.getServices()
-                      .getSpecificationRepository()
-                      .addOperationContracts(problemParser.getContracts());
+	    SpecificationRepository specRepos 
+	        = initConfig.getServices().getSpecificationRepository();
+	    specRepos.addOperationContracts(problemParser.getContracts());
+	    specRepos.addClassInvariants(problemParser.getInvariants());
             chooseContract = problemParser.getChooseContract();
             Debug.out("Read KeY file   ", file);
 	} catch (antlr.ANTLRException e) {
@@ -337,11 +362,11 @@ public class KeYFile implements EnvInput {
         
         //read in-code specifications
         readJavaPath();
-        if(javaPath != null) {
+        if(javaPath != null && !javaPath.equals("")) {            
             SLEnvInput slEnvInput = new SLEnvInput(javaPath);
             slEnvInput.setInitConfig(initConfig);
             slEnvInput.read(mod);
-        }
+        }               
     }
 
     

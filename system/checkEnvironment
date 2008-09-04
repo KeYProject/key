@@ -22,11 +22,16 @@ resolve_symlink  ()
 }
 
 
+UNAME=`uname -s 2>/dev/null | tr '[:upper:]' '[:lower:]'`
 
 if [ "D""$JAVA_HOME" = "D" ]; then 
-echo "Please set the \$JAVA_HOME environment for compiling KeY" 
-echo "to the directory where you have installed Java." 
-exit 1
+    echo "Please set the \$JAVA_HOME environment for compiling KeY" 
+    echo "to the directory where you have installed Java." 
+    if [ "$UNAME" = "darwin" ] ; then
+	echo "... try to continue, but without warranty"
+    else
+	exit 1
+    fi
 fi
 #echo "Using JDK installation from:      $JAVA_HOME"
 
@@ -59,7 +64,7 @@ key_ext_jars="antlr.jar recoderKey.jar dresden-ocl-demo.jar xerces.jar log4j.jar
 
 key_dev_jars="javacc.jar junit.jar"
 
-together_jars="lib/openapi.jar lib/jgl.zip lib/together.jar modules/"
+together_jars="lib/openapi.jar lib/together.jar modules/"
 
 
 CLASSPATH=./binary/

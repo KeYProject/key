@@ -36,7 +36,6 @@ public class MethodCall extends ProgramMetaConstruct {
     protected MethodReference methRef;
     private ProgramMethod pm;
     protected ReferencePrefix newContext;
-    private Services services;
     protected ProgramVariable pvar;
     private IExecutionContext execContextSV;
     private ExecutionContext execContext;
@@ -82,7 +81,7 @@ public class MethodCall extends ProgramMetaConstruct {
     
 
     /** gets an array of expression and returns a list of types */
-    private ListOfKeYJavaType getTypes(ArrayOfExpression args) {        
+    private ListOfKeYJavaType getTypes(ArrayOfExpression args, Services services) {        
         ListOfKeYJavaType result = SLListOfKeYJavaType.EMPTY_LIST; 
 	for (int i = args.size()-1; i >= 0 ; i--) {
 	    Expression argument = args.getExpression(i);
@@ -102,7 +101,7 @@ public class MethodCall extends ProgramMetaConstruct {
     }
 
 
-    private KeYJavaType getStaticPrefixType(ReferencePrefix refPrefix) {
+    private KeYJavaType getStaticPrefixType(ReferencePrefix refPrefix, Services services) {
 	if (refPrefix==null || refPrefix instanceof ThisReference && 
 	        ((ThisReference) refPrefix).getReferencePrefix()==null){ 
 	    return execContext.getTypeReference().getKeYJavaType();
@@ -131,7 +130,7 @@ public class MethodCall extends ProgramMetaConstruct {
 	}			    
     }
 
-    protected ProgramMethod getMethod(KeYJavaType prefixType, MethodReference mr) {
+    protected ProgramMethod getMethod(KeYJavaType prefixType, MethodReference mr, Services services) {
 	ProgramMethod result;
  	if (execContext != null){
 	    result = mr.method(services, prefixType, execContext);
@@ -151,11 +150,12 @@ public class MethodCall extends ProgramMetaConstruct {
 
 
     private ProgramMethod getSuperMethod(ExecutionContext ex,
-					 MethodReference mr) {
-	return mr.method(services, getSuperType(ex), ex);
+					 MethodReference mr,
+                                         Services services) {
+	return mr.method(services, getSuperType(ex, services), ex);
     }
 
-    private KeYJavaType getSuperType(ExecutionContext ex) {
+    private KeYJavaType getSuperType(ExecutionContext ex, Services services) {
 	return services.getJavaInfo().getSuperclass
 	    (ex.getTypeReference().getKeYJavaType());
     }
@@ -173,7 +173,6 @@ public class MethodCall extends ProgramMetaConstruct {
 					    SVInstantiations svInst) {
 
 	Debug.out("method-call: called for ", pe);
-	this.services=services;
 
 	if (resultVar != null) {
 	    pvar = (ProgramVariable) svInst.getInstantiation(resultVar);
@@ -198,7 +197,7 @@ public class MethodCall extends ProgramMetaConstruct {
 	    }
 	}
 	
-	staticPrefixType = getStaticPrefixType(methRef.getReferencePrefix());
+	staticPrefixType = getStaticPrefixType(methRef.getReferencePrefix(), services);
 	if(execContext != null){
 	    pm = assertImplementationPresent
 		(methRef.method(services, staticPrefixType, execContext),
@@ -226,7 +225,7 @@ public class MethodCall extends ProgramMetaConstruct {
 		    (execContext.getRuntimeInstance());
 	}
 	
-	VariableSpecification[] paramSpecs = createParamSpecs();
+	VariableSpecification[] paramSpecs = createParamSpecs(services);
 	Statement[] paramDecl = createParamAssignments(paramSpecs);
 
 
@@ -237,14 +236,14 @@ public class MethodCall extends ProgramMetaConstruct {
 	if (pm.isStatic()) {	// Static invocation mode
 	    Debug.out("method-call: invocation of static method detected");
             newContext = null;
-	    ProgramMethod staticMethod = getMethod(staticPrefixType, methRef);	                
+	    ProgramMethod staticMethod = getMethod(staticPrefixType, methRef, services);	                
             result = new MethodBodyStatement(staticMethod, newContext,
 					     pvar, arguments); 
 	} else if (refPrefix instanceof SuperReference) {
 	    Debug.out("method-call: super invocation of method detected." + 
 		      "Requires static resolving.");
 	    ProgramMethod superMethod = getSuperMethod(execContext,
-						       methRef);
+						       methRef, services);
 	    result = new MethodBodyStatement
 		(superMethod, execContext.getRuntimeInstance(), pvar,
 		 arguments);
@@ -252,17 +251,17 @@ public class MethodCall extends ProgramMetaConstruct {
 	    if (pm.isPrivate()) { // private methods are bound statically
 		Debug.out("method-call: invocation of private method detected." + 
 			  "Requires static resolving.");
-                result = makeMbs(staticPrefixType);
+                result = makeMbs(staticPrefixType, services);
 	    } else {
 		Debug.out("method-call: invocation of non-private"
 			  +" instance method detected." 
 			  +"Requires dynamic resolving.");
 		ListOfKeYJavaType imps = 
 		    services.getJavaInfo().getKeYProgModelInfo().findImplementations
-		    (staticPrefixType, methRef.getName(), getTypes(arguments));
+		    (staticPrefixType, methRef.getName(), getTypes(arguments, services));
 		if (imps.isEmpty()) {
 		    imps = services.getJavaInfo().getKeYProgModelInfo().findImplementations
-	                    (pm.getContainerType(), methRef.getName(), getTypes(arguments));
+	                    (pm.getContainerType(), methRef.getName(), getTypes(arguments, services));
 		}
 		if (imps.isEmpty()) {
 		    Type staticPrefix = staticPrefixType.getJavaType();
@@ -271,10 +270,10 @@ public class MethodCall extends ProgramMetaConstruct {
 		        ((ClassType)staticPrefix).isAbstract()) ) {
 			// no implementing sub type found
                         // insert mbs with interface type so that contracts are applicable
-			result = makeMbs(staticPrefixType);
+			result = makeMbs(staticPrefixType, services);
 		    }
 		} else {
-		    result = makeIfCascade(imps);
+		    result = makeIfCascade(imps, services);
 		}
 	    }
 	}
@@ -286,8 +285,8 @@ public class MethodCall extends ProgramMetaConstruct {
     //***************** Dynamic Binding Construction Utilities ***************
 
 
-    private Statement makeMbs(KeYJavaType t) {
-	ProgramMethod meth = getMethod(t, methRef);
+    private Statement makeMbs(KeYJavaType t, Services services) {
+	ProgramMethod meth = getMethod(t, methRef, services);
 	return new MethodBodyStatement(meth, newContext,
 				       pvar, arguments);
     }
@@ -299,17 +298,17 @@ public class MethodCall extends ProgramMetaConstruct {
     }
 
 
-    protected Statement makeIfCascade(ListOfKeYJavaType imps) {
+    protected Statement makeIfCascade(ListOfKeYJavaType imps, Services services) {
         KeYJavaType currType = imps.head();
         if (imps.size()==1) 
-           return makeMbs(currType);
+           return makeMbs(currType, services);
         else return new If(makeIOf(currType),
-                           new Then(makeMbs(currType)),
-                           new Else(makeIfCascade(imps.tail())));
+                           new Then(makeMbs(currType, services)),
+                           new Else(makeIfCascade(imps.tail(), services)));
     }
 
 
-    public VariableSpecification[] createParamSpecs(){
+    public VariableSpecification[] createParamSpecs(Services services){
 	
 	MethodDeclaration methDecl    = pm.getMethodDeclaration();
 	int params                    = methDecl.getParameterDeclarationCount();
@@ -336,7 +335,7 @@ public class MethodCall extends ProgramMetaConstruct {
 	    // see makeVariableArgument below
 	    if(i == params-1 && methDecl.isVarArgMethod() &&
 	            (   methRef.getArguments().size() != params 
-	             || !assignmentCompatible(methRef.getArgumentAt(i), originalSpec.getType()))) {
+	             || !assignmentCompatible(methRef.getArgumentAt(i), originalSpec.getType(), services))) {
 	        // variable argument
 	        varSpecs[i] = new VariableSpecification(paramVar, 1, makeVariableArgument(originalSpec), originalSpec.getType());
 	    } else {
@@ -448,7 +447,7 @@ public class MethodCall extends ProgramMetaConstruct {
      * @param type type to check for
      * @return true iff exp is assign compatible with type 
      */
-    private boolean assignmentCompatible(Expression exp, Type type) {
+    private boolean assignmentCompatible(Expression exp, Type type, Services services) {
         Sort expSort = exp.getKeYJavaType(services, execContext).getSort();
         Sort typeSort = ((KeYJavaType) type).getSort(); // was: services.getJavaInfo().getKeYJavaType(type);
         return expSort.extendsTrans(typeSort);

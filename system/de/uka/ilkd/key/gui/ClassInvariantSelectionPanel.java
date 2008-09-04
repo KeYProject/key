@@ -96,7 +96,7 @@ class ClassInvariantSelectionPanel extends JPanel {
         listPanel.add(classScrollPane);
         
         //create class tree
-        classTree = new ClassTree(false, defaultClass, services);
+        classTree = new ClassTree(false, false, defaultClass, null, services);
         setInvCounters(classTree.getRootNode());
         classTree.addTreeSelectionListener(new TreeSelectionListener() {
             public void valueChanged(TreeSelectionEvent e) {
@@ -213,7 +213,7 @@ class ClassInvariantSelectionPanel extends JPanel {
 		//set border
 		TitledBorder border = new TitledBorder(
 				BorderFactory.createEtchedBorder(),
-                                inv.getName());
+                                inv.getDisplayName());
 		border.setTitleFont(border.getTitleFont()
 					  .deriveFont(Font.BOLD));
 		result.setBorder(border);

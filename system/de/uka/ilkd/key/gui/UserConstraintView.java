@@ -43,6 +43,8 @@ import de.uka.ilkd.key.util.Debug;
 
 
 public class UserConstraintView extends JPanel {
+    private static final ConstraintTableModel NULL_TABLE_MODEL
+            = new ConstraintTableModel();
 
     /** Text fields for new equalities */
     private JTextField  newEqLeftText, newEqRightText;
@@ -101,6 +103,8 @@ public class UserConstraintView extends JPanel {
 	if ( constraintTableModel != null ) {
 	    constraintTable.setModel ( constraintTableModel );
 	    registerAtModel ();
+	} else {
+	    constraintTable.setModel(NULL_TABLE_MODEL);
 	}
 
         setControlsActive ( constraintTableModel != null );

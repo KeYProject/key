@@ -1,3 +1,5 @@
+package paycard;
+
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 

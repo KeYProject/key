@@ -38,7 +38,7 @@ class UniTrigger extends Trigger {
     private final boolean onlyUnify;
     private final boolean isElementOfMultitrigger;
    
-    private final LRUCache matchResults = new LRUCache ( 1000 );
+    private final LRUCache<Term, SetOfSubstitution> matchResults = new LRUCache<Term, SetOfSubstitution> ( 1000 );
     
     UniTrigger(Term trigger,SetOfQuantifiableVariable uqvs,
                boolean isUnify,boolean isElementOfMultitrigger,
@@ -60,7 +60,7 @@ class UniTrigger extends Trigger {
     }
 
     private SetOfSubstitution getSubstitutionsFromTerm(Term t, Services services) {
-        SetOfSubstitution res = (SetOfSubstitution)matchResults.get ( t );
+        SetOfSubstitution res = matchResults.get ( t );
         if ( res == null ) {
             res = getSubstitutionsFromTermHelp ( t, services );
             matchResults.put ( t, res );

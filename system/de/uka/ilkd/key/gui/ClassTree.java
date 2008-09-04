@@ -29,6 +29,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.logic.op.IteratorOfProgramMethod;
 import de.uka.ilkd.key.logic.op.ListOfProgramMethod;
@@ -46,11 +47,18 @@ class ClassTree extends JTree {
     //-------------------------------------------------------------------------    
 
     public ClassTree(boolean addOperations, 
+	             boolean skipLibraryClasses,
 	    	     KeYJavaType defaultClass,
+	    	     ProgramMethod defaultPm,
 	    	     Services services) {
-	super(new DefaultTreeModel(createTree(addOperations, services)));
+	super(new DefaultTreeModel(createTree(addOperations, 
+					      skipLibraryClasses, 
+					      services)));
+	if(defaultPm != null) {
+	    defaultClass = defaultPm.getContainerType();
+	}
 	if(defaultClass != null) {
-	    open(defaultClass);
+	    open(defaultClass, defaultPm);
 	}
 	getSelectionModel().setSelectionMode(
 				TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -116,6 +124,23 @@ class ClassTree extends JTree {
     }
     
     
+    private static DefaultMutableTreeNode getChildByProgramMethod(
+	    				     DefaultMutableTreeNode parentNode,
+	    				     ProgramMethod pm) {
+        int numChildren = parentNode.getChildCount();
+        for(int i = 0; i < numChildren; i++) {
+            DefaultMutableTreeNode childNode 
+                    = (DefaultMutableTreeNode)(parentNode.getChildAt(i));
+          
+            Entry te = (Entry)(childNode.getUserObject());
+            if(pm.equals(te.pm)) {
+                return childNode;
+            }
+        }
+        return null;	
+    }
+    
+    
     private static void insertIntoTree(DefaultMutableTreeNode rootNode, 
 	    			       KeYJavaType kjt,
 	    			       boolean addOperations,
@@ -169,7 +194,8 @@ class ClassTree extends JTree {
                     }
                     sb.append(")");
                     Entry te = new Entry(sb.toString());
-                    DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(te);
+                    DefaultMutableTreeNode childNode 
+                    	= new DefaultMutableTreeNode(te);
                     te.pm = pm;
                     node.add(childNode);
                 }
@@ -179,20 +205,25 @@ class ClassTree extends JTree {
 
     
     private static DefaultMutableTreeNode createTree(boolean addOperations,
+	    					     boolean skipLibraryClasses,
 	    					     Services services) {
 	//get all classes
-	final Set<KeYJavaType> kjts = services.getJavaInfo().getAllKeYJavaTypes();
+	final Set<KeYJavaType> kjts 
+		= services.getJavaInfo().getAllKeYJavaTypes();
 	final Iterator<KeYJavaType> it = kjts.iterator();
 	while(it.hasNext()) {
 	    KeYJavaType kjt = it.next();
 	    if(!(kjt.getJavaType() instanceof ClassDeclaration 
-		 || kjt.getJavaType() instanceof InterfaceDeclaration)) {
+		 || kjt.getJavaType() instanceof InterfaceDeclaration) 
+		 || (((TypeDeclaration) kjt.getJavaType()).isLibraryClass() 
+		       && skipLibraryClasses)) {
 		it.remove();
 	    }
 	}
 	
         //sort classes alphabetically
-        final KeYJavaType[] kjtsarr = kjts.toArray(new KeYJavaType[kjts.size()]);
+        final KeYJavaType[] kjtsarr 
+        	= kjts.toArray(new KeYJavaType[kjts.size()]);
         Arrays.sort(kjtsarr, new Comparator<KeYJavaType>() {
             public int compare(KeYJavaType o1, KeYJavaType o2) {
                 return o1.getFullName().compareTo(o2.getFullName());
@@ -210,10 +241,10 @@ class ClassTree extends JTree {
     }
     
     
-    private void open(KeYJavaType kjt) {
-        //get tree path
-        Vector<DefaultMutableTreeNode> pathVector = new Vector<DefaultMutableTreeNode>();
-        
+    private void open(KeYJavaType kjt, ProgramMethod pm) {
+        //get tree path to class
+        Vector<DefaultMutableTreeNode> pathVector 
+        	= new Vector<DefaultMutableTreeNode>();
         String fullClassName = kjt.getFullName();
         int length = fullClassName.length();
         int index = -1;
@@ -237,10 +268,20 @@ class ClassTree extends JTree {
 	    assert childNode != null;
             node = childNode;
         } while(index != length);
-        
         TreePath incompletePath = new TreePath(pathVector.toArray());
         TreePath path = incompletePath.pathByAddingChild(node);
         
+        //extend tree path to method
+        if(pm != null) {
+            DefaultMutableTreeNode methodNode 
+        	= getChildByProgramMethod(node, pm);
+            if(methodNode != null) {
+        	incompletePath = path;            
+        	path = path.pathByAddingChild(methodNode);
+            }
+        }
+        
+        //open and select
         expandPath(incompletePath);
         setSelectionRow(getRowForPath(path));
     }

@@ -59,7 +59,9 @@ import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
-import de.uka.ilkd.key.util.*;
+import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.KeYExceptionHandler;
+import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -323,12 +325,22 @@ public class Main extends JFrame implements IMain {
      * @param visible a boolean indicating if Main shall be made visible
      * @return the instance of Main
      */
-    public static Main getInstance(boolean visible) {
+    public static Main getInstance(final boolean visible) {
         if (instance == null) {
             instance = new Main("KeY -- Prover");
         }
-        if (!instance.isVisible())
-            instance.setVisible(visible); // XXX: enough?
+        if (!instance.isVisible()) {
+            if (SwingUtilities.isEventDispatchThread()) {
+                instance.setVisible(visible); // XXX: enough?
+            } else {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {                            
+                        if (!instance.isVisible())
+                            instance.setVisible(visible);
+                    }
+                });
+            }
+        }
         return instance;
     }
     
@@ -629,7 +641,7 @@ public class Main extends JFrame implements IMain {
         
         statusLine = new MainStatusLine("<html>" + PARA + COPYRIGHT + PARA
                 + "KeY is free software and comes with ABSOLUTELY NO WARRANTY."
-                + " See Help | License.", getFont());
+                + " See About | License.", getFont());
         getContentPane().add(statusLine, BorderLayout.SOUTH);
         setupInternalInspection();
     }
@@ -943,6 +955,44 @@ public class Main extends JFrame implements IMain {
                     JOptionPane.INFORMATION_MESSAGE);
         }
     }
+    
+    protected void showTypeHierarchy() {
+        Proof currentProof = mediator.getProof();
+        if(currentProof == null) {
+            mediator.notify(new GeneralInformationEvent("No Type Hierarchy available.",
+                    "If you wish to see the types "
+                    + "for a proof you have to load one first"));
+        } else {
+            final JDialog dialog = new JDialog(this, "Known types for this proof", true);
+            dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            Container pane = dialog.getContentPane();
+            pane.setLayout(new BorderLayout());
+            {   
+                JScrollPane scrollpane = new JScrollPane();
+                ClassTree classTree = new ClassTree(false, false, null, null, currentProof.getServices());
+                classTree.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+                scrollpane.setViewportView(classTree);
+                pane.add(scrollpane, BorderLayout.CENTER);
+            }
+            {
+                JButton button = new JButton("OK");
+                button.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        dialog.setVisible(false);
+                        dialog.dispose();
+                    }
+                });
+                {
+                    JPanel panel = new JPanel();
+                    panel.add(button);
+                    pane.add(panel, BorderLayout.SOUTH);
+                }
+            }
+            dialog.setSize(300, 400);
+            dialog.setLocationRelativeTo(this);
+            dialog.setVisible(true);
+        }
+    }
 
     public void showPOBrowser(){
 	if(mediator.getProof() == null){
@@ -951,15 +1001,13 @@ public class Main extends JFrame implements IMain {
 	}else{
 	    POBrowser poBrowser 
 	    	= POBrowser.showInstance(mediator.getProof().env().getInitConfig());
-	    if(poBrowser.getPO() != null) {
+	    ProofOblInput po = poBrowser.getAndClearPO();
+	    if(po != null) {
 		ProblemInitializer pi = new ProblemInitializer(this);
 		try {
-		    pi.startProver(mediator.getProof().env(), 
-			    	   poBrowser.getPO());
+		    pi.startProver(mediator.getProof().env(), po);
 		} catch(ProofInputException e)  {
-		    ExtList list = new ExtList();
-		    list.add(e);
-		    new ExceptionDialog(this, list);
+		    new ExceptionDialog(this, e);
 		}
 	    }
 	}
@@ -1225,6 +1273,9 @@ public class Main extends JFrame implements IMain {
                 smaller.setEnabled(!Config.DEFAULT.isMinimumSize());
                 larger.setEnabled(!Config.DEFAULT.isMaximumSize());
             }
+            public void clear(){
+                Config.DEFAULT.removeConfigChangeListener(this);
+            };
         });
         
         fontSize.add(smaller);
@@ -1335,7 +1386,14 @@ public class Main extends JFrame implements IMain {
             }
         });
         registerAtMenu(proof, statisticsInfo);
-
+        
+        final JMenuItem typeHierInfo = new JMenuItem("Show Known Types");
+        typeHierInfo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                showTypeHierarchy();
+            }});
+        registerAtMenu(proof, typeHierInfo);
+        
         return proof;
     }
 
@@ -1607,6 +1665,9 @@ public class Main extends JFrame implements IMain {
         return result;
     }
     
+    public JPanel getProofView(){
+        return proofView;
+    }
     
     public JMenu createHelpMenu() {
         JMenu help = new JMenu("About");
@@ -1760,6 +1821,10 @@ public class Main extends JFrame implements IMain {
      * {@link #updateGoalView(String, JComponent)} instead (thread safe)
      */
     private void paintGoalView(String borderTitle, JComponent goalViewPane) {
+        JViewport vp = goalView.getViewport();
+        if(vp!=null){
+            vp.removeAll();
+        }
         goalView.setViewportView(goalViewPane);
         goalView.setBorder(new TitledBorder(borderTitle));
         goalView.validate();
@@ -1861,14 +1926,23 @@ public class Main extends JFrame implements IMain {
     protected void closeTask() {
 	final Proof proof = mediator.getProof();
 	if (proof != null) {
-	    final TaskTreeNode rootTask = 
-		proof.getBasicTask().getRootTask();	
-	    proofList.removeTask(rootTask);   
-	    
-            ((ProofTreeView)proofView.getComponent(0)).removeProofs(rootTask.allProofs());
+	    final TaskTreeNode rootTask = proof.getBasicTask().getRootTask();
+	    closeTask(rootTask); 
 	}
     }
-    
+
+    protected void closeTask(TaskTreeNode rootTask) {
+       if(proofList.removeTask(rootTask)){
+            for(Proof proof:rootTask.allProofs()){
+                //In a previous revision the following statement was performed only
+                //on one proof object, namely on: mediator.getProof()
+                proof.getServices().getSpecificationRepository().removeProof(proof);
+                proof.mgt().removeProofListener();
+            }
+            ((ProofTreeView)proofView.getComponent(0)).removeProofs(rootTask.allProofs());
+       }
+    }
+
     
     public void closeTaskWithoutInteraction() {
         final Proof proof = mediator.getProof();
@@ -1876,7 +1950,8 @@ public class Main extends JFrame implements IMain {
             final TaskTreeNode rootTask = 
                 proof.getBasicTask().getRootTask();     
             proofList.removeTaskWithoutInteraction(rootTask);   
-            
+            proof.getServices().getSpecificationRepository().removeProof(proof);
+            proof.mgt().removeProofListener();
             ((ProofTreeView)proofView.getComponent(0)).removeProofs(rootTask.allProofs());
         }
     }
@@ -1922,8 +1997,7 @@ public class Main extends JFrame implements IMain {
     }
     
     protected Proof setUpNewProof(Proof proof) {
-        KeYMediator localMediator = mediator();
-        localMediator.setProof(proof);
+        mediator().setProof(proof);
         return proof;
     }
     
@@ -2125,9 +2199,12 @@ public class Main extends JFrame implements IMain {
     private synchronized void setProofNodeDisplay() {
         if (!disableCurrentGoalView) {
             Goal goal;
-            try {
+            if(mediator()!=null && mediator().getSelectedProof()!=null){
                 goal = mediator().getSelectedGoal();
-            } catch(IllegalStateException e) { // there is no proof (yet)
+            } else{//There is no proof. Either not loaded yet or it is abandoned 
+                final LogicPrinter printer = new LogicPrinter
+                (new ProgramPrinter(null), null,null);
+                sequentView.setPrinter(printer, null);
                 return;
             }
             if ( goal != null &&
@@ -2547,6 +2624,11 @@ public class Main extends JFrame implements IMain {
 		} else if (opt[index].equals("AUTO")) {
 		    batchMode = true;
                     visible = false;
+		} else if (opt[index].equals("DEPTHFIRST")) {		
+            System.out.println("DepthFirst GoalChooser ...");
+			Profile p = ProofSettings.DEFAULT_SETTINGS.getProfile();
+			p.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);           
+            
 		} else if (opt[index].equals("TESTING") || opt[index].equals("UNIT")) {
                     if(opt[index].equals("TESTING")){
                         testStandalone = true;
@@ -2562,6 +2644,7 @@ public class Main extends JFrame implements IMain {
                         System.out.println("Balanced loop unwinding ...");
                         index ++;
                     }
+                    
                     ProofSettings.DEFAULT_SETTINGS.setProfile(p);
                     p.updateSettings(ProofSettings.DEFAULT_SETTINGS);
                     testMode = true;
@@ -2631,6 +2714,7 @@ public class Main extends JFrame implements IMain {
         System.out.println("  no_jmlspecs     : disables parsing JML specifications");
         System.out.println("  unit [loop]     : unit test generation mode (optional argument loop to " +
                             "enable balanced loop unwinding)");
+	System.out.println("  depthfirst      : constructs the proof tree in a depth first manner. Recommended for large proofs");
         System.out.println("  auto	          : start prove procedure after initialisation");
         System.out.println("  testing         : starts the prover with a simple test generation oriented user interface");
         System.out.println("  print_statistics <filename>" );
@@ -3195,9 +3279,7 @@ public class Main extends JFrame implements IMain {
                         try{
                             runTest(tam.test, tam.model);
                         }catch(Exception exc){
-                            ExtList l = new ExtList();
-                            l.add(exc);
-                            new ExceptionDialog(testGui, l);    
+                            new ExceptionDialog(testGui, exc);    
                         }
                     }
                 }
@@ -3590,9 +3672,7 @@ public class Main extends JFrame implements IMain {
                                         }
                                         main.setStatusLine("Test Generation Completed");
                                     }catch(Exception exc){
-                                        ExtList l = new ExtList();
-                                        l.add(exc);
-                                        new ExceptionDialog(testGui, l);
+                                        new ExceptionDialog(testGui, exc);
                                     }
                                     creatingTests = false;
                                     enable();

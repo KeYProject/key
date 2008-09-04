@@ -24,9 +24,13 @@ import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.MethodCallInfo;
 import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
+import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.logic.ListOfInteger;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -42,33 +46,32 @@ public class NonGoalInfoView extends JTextArea {
     	 
     protected LogicPrinter printer;	 
     protected SequentPrintFilter filter;
+    private InitialPositionTable posTable;
+    private ConfigChangeListener configChangeListener = new ConfigChangeAdapter(this);//keeps only a weak reference to objects of this class
+    
     
     public NonGoalInfoView (Node node, KeYMediator mediator) {
         printInnerNode(node, mediator);
     }
 
     protected void printInnerNode(Node node, KeYMediator mediator) {
-        filter = new ConstraintSequentPrintFilter 
-        ( node.sequent (), mediator.getUserConstraint ().getConstraint () );        
-        printer = new LogicPrinter                 
-        (new ProgramPrinter(null), 
-                mediator.getNotationInfo(),
-                mediator.getServices());
+        if(MethodCallInfo.MethodCallCounterOn){
+            MethodCallInfo.Global.incForClass(this.getClass().toString(), MethodCallInfo.constructor);
+            MethodCallInfo.Local.incForClass(this.getClass().toString(), MethodCallInfo.constructor);
+        }
 
-        printer.printSequent (null, filter);
-        String s = printer.toString();
-        RuleApp app = node.getAppliedRuleApp();
-        s += "\nNode Nr "+node.serialNr()+"\n";
-
-        if ( app != null ) {
-            s = s + "\n \nUpcoming rule application: \n";
-            if (app.rule() instanceof Taclet) {
-                LogicPrinter tacPrinter = new LogicPrinter                 
-                (new ProgramPrinter(null),	                     
-                        mediator.getNotationInfo(),
-                        mediator.getServices(),
-                        true);	 
-                tacPrinter.printTaclet((Taclet)(app.rule()));                    
+	filter = new ConstraintSequentPrintFilter 
+	    ( node.sequent (), 
+	      mediator.getUserConstraint ().getConstraint () );
+	printer = new LogicPrinter
+	    (new ProgramPrinter(null), 
+	     mediator.getNotationInfo(),
+	     mediator.getServices());
+	printer.printSequent (null, filter);
+	String s = printer.toString();
+        posTable = printer.getPositionTable();
+        printer=null;
+	RuleApp app = node.getAppliedRuleApp();
                 s += tacPrinter;
             } else {
                 s = s + app.rule();
@@ -105,12 +108,7 @@ public class NonGoalInfoView extends JTextArea {
             s += "\n"+node.getReuseSource().scoringInfo();
         }
 
-	Config.DEFAULT.addConfigChangeListener(
-	    new ConfigChangeListener() {
-		    public void configChanged(ConfigChangeEvent e) {
-			updateUI();
-		    }
-		});
+	Config.DEFAULT.addConfigChangeListener(configChangeListener);
 
 	updateUI();
 	setText(s);
@@ -124,7 +122,40 @@ public class NonGoalInfoView extends JTextArea {
 	
 	setEditable(false);
     }
+    
+    public void removeNotify(){
+        unregisterListener();
+        if(MethodCallInfo.MethodCallCounterOn){
+            MethodCallInfo.Local.incForClass(this.getClass().toString(), "removeNotify()");
+        }
+        super.removeNotify();
+    }
 
+    public void unregisterListener(){
+        if(configChangeListener!=null){
+            Config.DEFAULT.removeConfigChangeListener(configChangeListener);
+            configChangeListener.clear();
+            configChangeListener=null;
+        }
+    }
+    
+    protected void finalize(){
+        try{
+            unregisterListener();
+            if(MethodCallInfo.MethodCallCounterOn){
+                MethodCallInfo.Global.incForClass(this.getClass().toString(), MethodCallInfo.finalize);
+                MethodCallInfo.Local.incForClass(this.getClass().toString(), MethodCallInfo.finalize);
+            }
+        } catch (Throwable e) {
+            Main.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
+        }finally{
+                try {
+                    super.finalize();
+                } catch (Throwable e) {
+                    Main.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
+                }
+        }
+    }
 
     static final Highlighter.HighlightPainter RULEAPP_HIGHLIGHTER =	 
 	new DefaultHighlighter	 
@@ -229,7 +260,6 @@ public class NonGoalInfoView extends JTextArea {
     private Range highlightPos (PosInOccurrence pos,	 
 				HighlightPainter light)	 
 	throws BadLocationException {	 
-	InitialPositionTable posTable = printer.getPositionTable ();	 
 	ListOfInteger path = posTable.pathForPosition (pos, filter);	 
 	Range r = posTable.rangeForPath(path);	 
 	getHighlighter().addHighlight(r.start(), r.end(), light);	 

@@ -30,7 +30,7 @@ import de.uka.ilkd.key.util.LRUCache;
  */
 public class IfThenElseMalusFeature implements Feature {
 
-    private static LRUCache cache = new LRUCache(1000); 
+    private  static LRUCache<PosInOccurrence, RuleAppCost> cache = new LRUCache<PosInOccurrence, RuleAppCost>(1000); 
 
     public static final Feature INSTANCE = new IfThenElseMalusFeature ();
     
@@ -39,7 +39,7 @@ public class IfThenElseMalusFeature implements Feature {
     public RuleAppCost compute(RuleApp app, PosInOccurrence pos, Goal goal) {
         if ( pos == null ) return LongRuleAppCost.ZERO_COST;
 
-        RuleAppCost resInt = (RuleAppCost)cache.get ( pos );
+        RuleAppCost resInt = cache.get ( pos );
         if ( resInt != null ) {
             return resInt;
         }
@@ -60,4 +60,7 @@ public class IfThenElseMalusFeature implements Feature {
         return resInt;
     }
 
+    public static void clearCache(){
+        cache.clear();
+    }
 }

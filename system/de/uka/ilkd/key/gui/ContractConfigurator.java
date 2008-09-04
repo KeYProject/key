@@ -49,6 +49,43 @@ public class ContractConfigurator extends JDialog {
     //constructors
     //-------------------------------------------------------------------------
     
+    public ContractConfigurator(JDialog owner,
+            Services services, 
+            ProgramMethod pm,
+            Modality modality,
+            boolean allowContract,
+            boolean allowMultipleContracts,
+            boolean allowAssumedInvs,
+            boolean allowEnsuredInvs) {
+        super(owner, "Contract Configurator", true);
+        init(services, 
+             pm, 
+             modality, 
+             allowContract, 
+             allowMultipleContracts,
+             allowAssumedInvs, 
+             allowEnsuredInvs);
+    }
+    
+    
+    public ContractConfigurator(Frame owner,
+                                Services services,
+                                ProgramMethod pm,
+                                Modality modality,
+                                boolean allowContract,
+                                boolean allowMultipleContracts,
+                                boolean allowAssumedInvs,
+                                boolean allowEnsuredInvs) {
+        super(owner, "Contract Configurator", true);
+        init(services, 
+             pm, 
+             modality, 
+             allowContract, 
+             allowMultipleContracts,
+             allowAssumedInvs, 
+             allowEnsuredInvs);
+    }
+    
     /**
      * Helper for constructors.
      */
@@ -56,6 +93,7 @@ public class ContractConfigurator extends JDialog {
                       ProgramMethod pm,
                       Modality modality,
                       boolean allowContract,
+                      boolean allowMultipleContracts,
                       boolean allowAssumedInvs,
                       boolean allowEnsuredInvs) {
         assert allowContract || allowAssumedInvs || allowEnsuredInvs;
@@ -64,9 +102,11 @@ public class ContractConfigurator extends JDialog {
         
         //create contract panel
         if(allowContract) {
-            contractPanel = new OperationContractSelectionPanel(services, 
-                                                                pm, 
-                                                                modality);
+            contractPanel 
+                = new OperationContractSelectionPanel(services, 
+                                                      pm, 
+                                                      modality,
+                                                      allowMultipleContracts);
             contractPanel.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent e){                
                     if(e.getClickCount() == 2){
@@ -116,6 +156,7 @@ public class ContractConfigurator extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 successful = true;
                 setVisible(false);
+                dispose();
             }
         });
         buttonPanel.add(okButton);
@@ -129,6 +170,7 @@ public class ContractConfigurator extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 successful = false;
                 setVisible(false);
+                dispose();
             }
         });
         buttonPanel.add(cancelButton);
@@ -153,43 +195,9 @@ public class ContractConfigurator extends JDialog {
         setLocation(70, 70);        
         setVisible(true);
     }
+      
     
-    
-    public ContractConfigurator(JDialog owner,
-	    			Services services, 
-	    			ProgramMethod pm,
-	    			Modality modality,
-	    			boolean allowContract,
-	    			boolean allowAssumedInvs,
-	    			boolean allowEnsuredInvs) {
-	super(owner, "Contract Configurator", true);
-	init(services, 
-             pm, 
-             modality, 
-             allowContract, 
-             allowAssumedInvs, 
-             allowEnsuredInvs);
-    }
-    
-    
-    public ContractConfigurator(Frame owner,
-                                Services services,
-                                ProgramMethod pm,
-                                Modality modality,
-                                boolean allowContract,
-                                boolean allowAssumedInvs,
-                                boolean allowEnsuredInvs) {
-        super(owner, "Contract Configurator", true);
-        init(services, 
-             pm, 
-             modality, 
-             allowContract, 
-             allowAssumedInvs, 
-             allowEnsuredInvs);
-    }
-    
-    
-    
+   
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------

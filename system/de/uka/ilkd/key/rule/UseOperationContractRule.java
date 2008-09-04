@@ -167,13 +167,17 @@ public class UseOperationContractRule implements BuiltInRule {
             if(contracts.size() == 0) {
                 return null;
             }
+            OperationContract combinedContract 
+                = services.getSpecificationRepository()
+                          .combineContracts(contracts);
             
             SetOfClassInvariant ownInvs
                 = services.getSpecificationRepository()
                           .getClassInvariants(pm.getContainerType());
             
-            //TODO: Apply *all* contracts here instead of a random one
-            return new ContractWithInvs(contracts.iterator().next(), 
+            //TODO: Allow user control over the used invariants, instead of 
+            //always using ownInvs (see bug #913)
+            return new ContractWithInvs(combinedContract,
                                         ownInvs, 
                                         ownInvs);
         } else {
@@ -182,6 +186,7 @@ public class UseOperationContractRule implements BuiltInRule {
                                                services,
                                                pm,
                                                modality,
+                                               true,
                                                true,
                                                true,
                                                true);
@@ -349,15 +354,31 @@ public class UseOperationContractRule implements BuiltInRule {
         assert cwi.contract.getProgramMethod().equals(pm);
 
         //create variables for self, parameters, result, exception, and a map 
-        //for atPre-functions 
+        //for atPre-functions
+        //register the newly created program variables
+        Namespace progVarNS = services.getNamespaces().programVariables();
         ProgramVariable selfVar          
             = SVF.createSelfVar(services, pm, true);
+        if(selfVar != null)
+            goal.addProgramVariable(selfVar);
+        
         ListOfParsableVariable paramVars 
             = SVF.createParamVars(services, pm, true);
+        for (ParsableVariable pvar : paramVars) {
+            assert pvar instanceof ProgramVariable : pvar + " is not a ProgramVariable";
+            goal.addProgramVariable((ProgramVariable)pvar);
+        }
+        
         ProgramVariable resultVar 
             = SVF.createResultVar(services, pm, true);
+        if(resultVar != null)
+            goal.addProgramVariable(resultVar);
+        
         ProgramVariable excVar 
             = SVF.createExcVar(services, pm, true);
+        if(excVar != null)
+            progVarNS.addSafely(excVar);
+        
         Map<Operator, Function> atPreFunctions               
             = new LinkedHashMap<Operator, Function>();
         
@@ -380,6 +401,13 @@ public class UseOperationContractRule implements BuiltInRule {
 
         for (final ClassInvariant inv : cwi.ensuredInvs) {
             post = post.conjoin(inv.getClosedInv(services));
+        }
+        
+        //add "actual parameters" (which in fact already are
+        //program variables in a method body statement) to modifier set
+        for(Term t : actualParams) {
+            ProgramVariable pv = (ProgramVariable) t.op();
+            modifies = modifies.add(new BasicLocationDescriptor(TB.var(pv)));
         }
         
         //split goal into three branches
@@ -421,7 +449,7 @@ public class UseOperationContractRule implements BuiltInRule {
         Term excNullTerm = TB.equals(TB.var(excVar), TB.NULL(services));
        
         //create "Pre" branch
-        Term preTerm = uf.apply(selfParamsUpdate, 
+        Term preTerm = uf.prepend(selfParamsUpdate, 
                                 TB.imp(pre.getAxiomsAsFormula(), 
                                        pre.getFormula()));
         replaceInGoal(preTerm, preGoal, pio);
@@ -446,12 +474,12 @@ public class UseOperationContractRule implements BuiltInRule {
         //anonym*ous* updates; replace by "else" case once this is fixed
         Term postTerm;
         if(anonUpdate.isAnonymousUpdate()) {
-            postTerm = uf.apply(resultUpdate, postTermWithoutUpdate);
+            postTerm = uf.prepend(resultUpdate, postTermWithoutUpdate);
             postTerm = TB.tf().createAnonymousUpdateTerm(
                                     AnonymousUpdate.getNewAnonymousOperator(), 
                                     postTerm);
         } else {
-            postTerm = uf.apply(uf.sequential(new Update[]{selfParamsUpdate,
+            postTerm = uf.prepend(uf.sequential(new Update[]{selfParamsUpdate,
                                                            atPreUpdate,
                                                            anonUpdate,
                                                            resultUpdate}),
@@ -470,7 +498,7 @@ public class UseOperationContractRule implements BuiltInRule {
                      TB.prog(modality,
                              JavaBlock.createJavaBlock(excPostSB), 
                              pio.subTerm().sub(0)));
-        Term excPostTerm = uf.apply(uf.sequential(new Update[]{selfParamsUpdate,
+        Term excPostTerm = uf.prepend(uf.sequential(new Update[]{selfParamsUpdate,
                                                                atPreUpdate,
                                                                anonUpdate}),
                                     excPostTermWithoutUpdate);

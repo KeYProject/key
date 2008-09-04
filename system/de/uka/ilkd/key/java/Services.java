@@ -98,7 +98,7 @@ public class Services{
 	    this.exceptionHandler = exceptionHandler;
 	}
         javainfo = new JavaInfo
-        (new KeYProgModelInfo(typeconverter, exceptionHandler), this);
+        (new KeYProgModelInfo(typeconverter, this.exceptionHandler), this);
     }
 
     public Services(){

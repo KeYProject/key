@@ -17,8 +17,7 @@
 		</ant>
 		<ant antfile="build-3.2.1.xml" dir="../KeYPlugin" target="${target}">
 		</ant>
-		<ant antfile="build-3.2.1.xml" dir="../VisualDebugger" target="${target}">
-		</ant>
+<!-- commented out until release of rothe vis debug <ant antfile="build-3.2.1.xml" dir="../VisualDebugger" target="${target}"> 	</ant> -->
 	</target>
 	<target name="all.features" depends="init">
 	</target>

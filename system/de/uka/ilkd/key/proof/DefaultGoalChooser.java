@@ -21,16 +21,16 @@ import java.util.Iterator;
 public class DefaultGoalChooser implements IGoalChooser {
     
     /** the proof that is worked with */
-    private Proof      proof;
+    protected Proof      proof;
 
     /** list of goals on which the strategy should be applied */
-    private ListOfGoal goalList;
+    protected ListOfGoal goalList;
 
     /** part of goalList that should be worked on next */
-    private ListOfGoal nextGoals;
+    protected ListOfGoal nextGoals;
 
     /** true iff all goals have satisfiable constraints */
-    private boolean    allGoalsSatisfiable = false;
+    protected boolean    allGoalsSatisfiable = false;
 
     /**
      * Subset of the goals to which currently taclets are applied. First this
@@ -39,7 +39,7 @@ public class DefaultGoalChooser implements IGoalChooser {
      */
     protected ListOfGoal selectedList;
 
-    private Node       currentSubtreeRoot  = null;
+    protected Node       currentSubtreeRoot  = null;
 
     public DefaultGoalChooser () {
     }
@@ -48,20 +48,38 @@ public class DefaultGoalChooser implements IGoalChooser {
      * @see de.uka.ilkd.key.proof.IGoalChooser#init(de.uka.ilkd.key.proof.Proof, de.uka.ilkd.key.proof.ListOfGoal)
      */
     public void init ( Proof p_proof, ListOfGoal p_goals ) {
-        allGoalsSatisfiable = false;
+        if(p_proof==null && !(p_goals==null || p_goals==SLListOfGoal.EMPTY_LIST)){
+            throw new RuntimeException("A not existing proof has goals. This makes no sense.");
+        }
+        if(p_goals==null||p_goals==SLListOfGoal.EMPTY_LIST){
+            //the idea of this case is to reset the object if a proof is abandoned. (To prevent memory leaks)
+            allGoalsSatisfiable = true;
+        }else{//this is the normal branch
+            allGoalsSatisfiable = false;
+        }
         currentSubtreeRoot  = null;
+        if(p_proof!=proof){
+            if(proof!=null){
+                proof.removeProofTreeListener(proofTreeListener);
+            }
+            if(p_proof!=null){
+                p_proof.addProofTreeListener(proofTreeListener);
+            }
+        }
         proof               = p_proof;
         setupGoals ( p_goals );
     }
 
-    private void setupGoals ( ListOfGoal p_goals ) {
+    protected void setupGoals ( ListOfGoal p_goals ) {
 	goalList     = SLListOfGoal.EMPTY_LIST;
 	selectedList = SLListOfGoal.EMPTY_LIST;
 	nextGoals    = SLListOfGoal.EMPTY_LIST;
 
 	if ( allGoalsSatisfiable ) {
 	    goalList = p_goals;
-	    findMinimalSubtree ( currentSubtreeRoot );
+	    if(currentSubtreeRoot!=null){
+	        findMinimalSubtree ( currentSubtreeRoot );
+	    }
 	} else {
 	    final IteratorOfGoal it = p_goals.iterator ();
 
@@ -81,7 +99,23 @@ public class DefaultGoalChooser implements IGoalChooser {
 	}
     }
 
-    private int nextGoalCounter = 0;
+    private ProofTreeObserver proofTreeListener = new ProofTreeObserver();
+    
+    /**Important when a proof is pruned */
+    class ProofTreeObserver extends ProofTreeAdapter{
+        /** The proof tree has been pruned under the node mentioned in the
+         * ProofTreeEvent.  In other words, that node should no longer
+         * have any children now.  Any nodes that were not descendants of
+         * that node are unaffected.*/
+        public void proofPruned(ProofTreeEvent e) {
+            ProofTreeRemovedNodeEvent removeEvent = (ProofTreeRemovedNodeEvent)e;
+            currentSubtreeRoot = removeEvent.getNode();
+            setupGoals ( proof.getSubtreeGoals(proof.root()) );
+        }
+    }
+
+    
+    protected int nextGoalCounter = 0;
     
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.proof.IGoalChooser#getNextGoal()
@@ -100,9 +134,9 @@ public class DefaultGoalChooser implements IGoalChooser {
                 nextGoals = nextGoals.tail ();
             }
         } else {
-            ++nextGoalCounter;
+	    ++nextGoalCounter;
             if ( nextGoalCounter % 100 == 0 )
-                selectedList = rotateList ( selectedList );
+	       selectedList = rotateList ( selectedList );
 
             result = selectedList.isEmpty () ? null : selectedList.head ();
         }
@@ -145,7 +179,7 @@ public class DefaultGoalChooser implements IGoalChooser {
         }
     }
 
-    private void updateGoalListHelp ( Node node, ListOfGoal newGoals ) {
+    protected void updateGoalListHelp ( Node node, ListOfGoal newGoals ) {
         ListOfGoal prevGoalList     = SLListOfGoal.EMPTY_LIST;
         boolean    newGoalsInserted = false;
         
@@ -170,12 +204,12 @@ public class DefaultGoalChooser implements IGoalChooser {
         }
 
         while ( !prevGoalList.isEmpty() ) {
-            selectedList = selectedList.prepend ( prevGoalList.head () );
+            selectedList = selectedList.prepend( prevGoalList.head () );
             prevGoalList = prevGoalList.tail ();
         }
     }
 
-    private ListOfGoal insertNewGoals (ListOfGoal newGoals, ListOfGoal prevGoalList) {
+    protected ListOfGoal insertNewGoals (ListOfGoal newGoals, ListOfGoal prevGoalList) {
         final IteratorOfGoal it = newGoals.iterator ();
         
         while ( it.hasNext () ) {
@@ -201,7 +235,7 @@ public class DefaultGoalChooser implements IGoalChooser {
         return p_list.tail ().append ( p_list.head () );
     }
     
-    private void removeClosedGoals () {
+    protected void removeClosedGoals () {
         boolean        changed = false;
         IteratorOfGoal it      = goalList.iterator ();
         goalList               = SLListOfGoal.EMPTY_LIST;
@@ -250,7 +284,7 @@ public class DefaultGoalChooser implements IGoalChooser {
      *
      * @return true iff a non-empty subtree was found
      */
-    private boolean findMinimalSubtreeBelow ( Node p_startNode ) {
+    protected boolean findMinimalSubtreeBelow ( Node p_startNode ) {
 	Node node = p_startNode;
 	
 	while ( node.childrenCount () == 1 )
@@ -291,7 +325,7 @@ public class DefaultGoalChooser implements IGoalChooser {
      *
      * PRECONDITION: all goals have satisfiable constraints
      */
-    private void findMinimalSubtree ( Node p_startNode ) {
+    protected void findMinimalSubtree ( Node p_startNode ) {
 	while ( isSatisfiableSubtree ( p_startNode ) )
 	    p_startNode = p_startNode.parent ();
 
@@ -300,7 +334,7 @@ public class DefaultGoalChooser implements IGoalChooser {
     }
 
 
-    private boolean isSatisfiableSubtree ( Node p_root ) {
+    protected boolean isSatisfiableSubtree ( Node p_root ) {
 	return p_root.getBranchSink ().getResetConstraint ().isSatisfiable ();
     }
 

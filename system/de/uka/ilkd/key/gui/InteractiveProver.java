@@ -71,7 +71,7 @@ public class InteractiveProver {
 	this.mediator = mediator;
 	mediator.addKeYSelectionListener(selListener);
 	applyStrategy = new ApplyStrategy(mediator);
-	applyStrategy.addProverTaskObserver(mediator().getProverTaskListener());
+        applyStrategy.addProverTaskObserver(mediator().getProverTaskListener());
     }
 
     /** returns the KeYMediator */
@@ -538,6 +538,22 @@ public class InteractiveProver {
 	}
 
     }
+    
+    /**The purpose is to reset the interactiveProver to prevent memory leaking. This 
+     * method is used, e.g., by {@code TaskTree.removeTaskWithoutInteraction}. 
+     * An alternative would be to reset the InteractiveProver in 
+     * {@code InteractiveProverKeYSelectionListener.selectedProofChanged} but 
+     * there we don't know whether the proof has been abandoned or not. 
+     * @author gladisch */
+    public void clear(){
+        if(applyStrategy!=null){
+            applyStrategy.clear();
+        }
+        proof.clearAndDetachRuleAppIndexes();
+        proof = null;
+        focusedGoal = null;
+        //probably more clean up has to be done here.
+    }
 
     /**
      * takes NoPosTacletApps as arguments and returns a duplicate free list of
@@ -571,6 +587,24 @@ public class InteractiveProver {
             }
         }
        	return result;
+    }
+
+    /**     
+     * adds a proverTaskListener to apply strategy. 
+     * 
+     * @param ptl the ProverTaskListener to be added
+     */
+    public void addProverTaskListener(ProverTaskListener ptl) {
+        applyStrategy.addProverTaskObserver(ptl);
+    }
+
+    /**
+     * removes <code>ptl</code> from the list of proverTaskListeners
+     *  
+     * @param ptl the proverTaskListener to be removed
+     */
+    public void removeProverTaskListener(ProverTaskListener ptl) {      
+        applyStrategy.removeProverTaskObserver(ptl);        
     }
     
 }

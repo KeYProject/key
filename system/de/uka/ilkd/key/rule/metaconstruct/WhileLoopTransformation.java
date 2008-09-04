@@ -12,6 +12,7 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.HashMap;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
@@ -19,11 +20,13 @@ import org.apache.log4j.Logger;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
+import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.SetAssignment;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -475,15 +478,22 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	    //remainding 'for' statement
 	    IForUpdates unchangedUpdates = x.getIForUpdates();
 
-	    Guard guard = null;
+	    Guard guard;
 	    Statement body = null;
 
 	    if (changeList.get(0) instanceof ILoopInit) {
 		inits = (ILoopInit) changeList.removeFirst();
 	    } 
-            if (x.getGuard()!=null) {
+            
+            if (x.getGuard() != null) {            
                 guard = (Guard) changeList.removeFirst();
+                if (guard.getExpression() == null) {
+                    guard = new Guard(BooleanLiteral.TRUE); 
+                }
+            } else {
+                guard = new Guard(BooleanLiteral.TRUE);
             }
+            
 	    if (changeList.get(0) instanceof IForUpdates) {
 		updates = (IForUpdates) changeList.removeFirst();
 	    } 
@@ -585,6 +595,15 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	    Statement body = (Statement) (changeList.isEmpty() ?
 					  null :
 					  changeList.removeFirst());
+	    
+	    /* 
+	     * rename all occ. variables in the body (same name but different object)
+	     */
+	    ProgVarReplaceVisitor replacer = new ProgVarReplaceVisitor(body, 
+	            new HashMap(), true, services);
+	    replacer.start();
+	    body = (Statement) replacer.result();
+	    
 	    if (innerLabelNeeded() && breakInnerLabel != null) {
 		// an unlabeled continue needs to be handled with (replaced)
 		body = new LabeledStatement(breakInnerLabel.getLabel(),

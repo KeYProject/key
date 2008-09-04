@@ -2,11 +2,10 @@ package de.uka.ilkd.key.visualdebugger;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.IteratorOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -14,17 +13,18 @@ import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.visualdebugger.statevisualisation.SymbolicObject;
 
 public class DebuggerLP extends LogicPrinter {
-    Abb abb = new Abb();
+    
+    private Abb abb = new Abb();
 
-    NotationInfo info;
+    private NotationInfo info;
 
-    HashMap inputValues;
+    private HashMap inputValues;
 
-    LinkedList objects = new LinkedList();
+    private List<SymbolicObject> objects;
 
-    Services services;
+    private Services services;
 
-    SymbolicObject thisObject;
+    private SymbolicObject thisObject;
 
     final VisualDebugger vd = VisualDebugger.getVisualDebugger();
 
@@ -34,13 +34,14 @@ public class DebuggerLP extends LogicPrinter {
         // TODO Auto-generated constructor stub
         notationInfo.setAbbrevMap(new AbbrevMap());
         info = notationInfo;
+        this.objects = new LinkedList<SymbolicObject>();
         this.inputValues = inputValues;
         this.services = services;
 
     }
 
     public DebuggerLP(ProgramPrinter prgPrinter, NotationInfo notationInfo,
-            Services services, HashMap inputValues, LinkedList objects,
+            Services services, HashMap inputValues, List<SymbolicObject> objects,
             SymbolicObject thisObject) {
         super(prgPrinter, notationInfo, services);
         info = notationInfo;
@@ -52,17 +53,9 @@ public class DebuggerLP extends LogicPrinter {
     }
 
     private void createAb() {
-        Iterator it = objects.iterator();
-        // info.set
-        // System.out.println(t);
-        while (it.hasNext()) {
-
-            SymbolicObject so = (SymbolicObject) it.next();
-            // System.out.println(so.getName());
-            // if (so.getTerms().contains(t))
-            for (IteratorOfTerm tit = so.getTerms().iterator(); tit.hasNext();)
+        for (final SymbolicObject so : objects) {
+            for (final Term t : so.getTerms()) {
                 try {
-                    Term t = tit.next();
                     if (so != thisObject) {
                         if (!abb.containsTerm(t))
                             abb.put(t, so.getInstanceName(), true);
@@ -71,50 +64,24 @@ public class DebuggerLP extends LogicPrinter {
                 } catch (AbbrevException e) {
                     e.printStackTrace();
                 }
+            }
 
         }
-        // abb.put(thisObject., abbreviation, enabled)
         info.setAbbrevMap(abb);
     }
 
     private String getName(Term t) {
-        Iterator it = objects.iterator();
-
-        while (it.hasNext()) {
-
-            SymbolicObject so = (SymbolicObject) it.next();
-
-            if (so.getTerms().contains(t))
+        for (final SymbolicObject so : objects) {
+            if (so.getTerms().contains(t)) {
                 return so.getInstanceName();
+            }
         }
-
         return null;
     }
 
     public void printCast(String pre, String post, Term t, int ass)
             throws IOException {
-        final CastFunctionSymbol cast = (CastFunctionSymbol) t.op();
-        // startTerm(t.arity());
-        // layouter.print(pre);
-        // System.out.println("PRE: "+pre);
-        // System.out.println("Post: "+post);
-        //        
-        // System.out.println("csat "+cast.getSortDependingOn().toString());
-        // layouter.print(cast.getSortDependingOn().toString());
-        // layouter.print(post);
-        // maybeParens(t.sub(0), ass);
         printTerm(t.sub(0));
-    }
-
-    public void printFunctionTerm(String name, Term t) throws IOException {
-        String s = null;// = this.getName(t);
-        // System.out.println("PF "+ t);
-        if (s != null) {
-            startTerm(0);
-            layouter.print(s);
-        } else
-            super.printFunctionTerm(name, t);
-
     }
 
     public void printTerm(Term t) throws IOException {
@@ -201,7 +168,7 @@ public class DebuggerLP extends LogicPrinter {
          * abbreviation is mapped to t.
          */
         public String getAbbrev(Term t) {
-            return (String) termstring.get(new AbbrevWrapper(t));
+            return termstring.get(new AbbrevWrapper(t));
         }
 
         /**
@@ -209,7 +176,7 @@ public class DebuggerLP extends LogicPrinter {
          * term is mapped to the abbreviation.
          */
         public Term getTerm(String s) {
-            return ((AbbrevWrapper) stringterm.get(s)).getTerm();
+            return stringterm.get(s).getTerm();
         }
 
         /**
@@ -217,7 +184,7 @@ public class DebuggerLP extends LogicPrinter {
          * abbreviation may be used.
          */
         public boolean isEnabled(Term t) {
-            Boolean b = (Boolean) termenabled.get(new AbbrevWrapper(t));
+            Boolean b = termenabled.get(new AbbrevWrapper(t));
             if (b != null)
                 return b.booleanValue();
             return false;
@@ -249,7 +216,7 @@ public class DebuggerLP extends LogicPrinter {
             scw = new AbbrevWrapper(t);
             termstring.put(scw, abbreviation);
             stringterm.put(abbreviation, scw);
-            termenabled.put(scw, enabled ? TRUE : FALSE);
+            termenabled.put(scw, enabled ? Boolean.TRUE : Boolean.FALSE);
         }
 
         /**
@@ -262,7 +229,7 @@ public class DebuggerLP extends LogicPrinter {
          *                true if the abbreviation of t may be used.
          */
         public void setEnabled(Term t, boolean enabled) {
-            termenabled.put(new AbbrevWrapper(t), enabled ? TRUE : FALSE);
+            termenabled.put(new AbbrevWrapper(t), enabled ? Boolean.TRUE : Boolean.FALSE);
         }
 
     }

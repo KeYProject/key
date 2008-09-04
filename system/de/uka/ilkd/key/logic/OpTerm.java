@@ -12,9 +12,7 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Metavariable;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /** 
@@ -86,20 +84,12 @@ abstract class OpTerm extends Term {
     /** 
      * initialises the term with the given operator and sort.
      * It updates the set of free variables and meta variables by 
-     * adding the operator if necessary. 
-     * <em>Attention:</em> The constructor of the subclasses have to invoke 
-     * {@link #fillCaches()} at the end.
+     * adding the operator if necessary.      
      * @param op the Operator on top
      * @param sort the Sort of the term
      */
     protected OpTerm(Operator op, Sort sort) {
         super(op, sort);       
-        
-        if (op instanceof QuantifiableVariable) {
-            freeVars = freeVars.add((QuantifiableVariable) op);
-        } else if ( op instanceof Metavariable ) {
-            metaVars = metaVars.add ( (Metavariable)op );
-        }
     }
     
     /**
@@ -131,7 +121,7 @@ abstract class OpTerm extends Term {
          */
         ArbitraryOpTerm(Operator op, Term[] subTerm) {
             super(op, op.sort(subTerm));
-
+            
             this.subTerm   = new ArrayOfTerm(subTerm);
                         
             fillCaches();	
@@ -151,8 +141,6 @@ abstract class OpTerm extends Term {
             }
 
             depth = max_depth + 1;
-
-            super.fillCaches();
         }
           
         /** @return arity of the term */
@@ -200,10 +188,9 @@ abstract class OpTerm extends Term {
             super(op,op.sort(subs));
             assert subs.length == 2 : "Tried to create a binary term with more or less" +
             " than two sub terms";
+            assert subs[0] != null && subs[1] != null : "Tried to create a term with 'null' as subterm.";
             this.left  = subs[0];
             this.right = subs[1];        
-            
-            fillCaches();
         }
            
         /** 
@@ -220,7 +207,7 @@ abstract class OpTerm extends Term {
             if (depth == -1) {
                 final int leftDepth = left.depth();
                 final int rightDepth = right.depth();
-                depth = leftDepth > rightDepth ? leftDepth : rightDepth; 
+                depth = (leftDepth > rightDepth ? leftDepth : rightDepth) + 1; 
             }
             return depth;
         }
@@ -252,7 +239,7 @@ abstract class OpTerm extends Term {
          * @param sub the Term used as the one subterm (<em>must not</em> be null)
          */
         UnaryOpTerm(Operator op, Term sub) {
-            this(op, new Term[]{sub});
+            this(op, new Term[]{sub});            
         }
         
         /** creates a unary term         
@@ -263,8 +250,8 @@ abstract class OpTerm extends Term {
             super(op,op.sort(subs));
             assert subs.length == 1 : "Tried to create a unary term with more or less" +
                         " than one sub term";
+            assert subs[0] != null : "Tried to create a term with 'null' as subterm.";
             this.sub  = subs[0];
-            fillCaches();
         }
            
         /**
@@ -309,7 +296,6 @@ abstract class OpTerm extends Term {
          */
         ConstantOpTerm(Operator op) {
             super(op,op.sort(NOSUBS));
-            fillCaches();
         }
            
         public int arity() {

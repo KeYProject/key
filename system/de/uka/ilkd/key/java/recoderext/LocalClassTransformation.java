@@ -1,12 +1,25 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+//
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.*;
 
-import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer.TransformerCache;
-
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.Variable;
-import recoder.java.CompilationUnit;
 import recoder.java.ProgramElement;
 import recoder.java.declaration.ClassDeclaration;
 import recoder.java.declaration.TypeDeclaration;
@@ -16,9 +29,19 @@ import recoder.java.reference.VariableReference;
 import recoder.kit.ProblemReport;
 import recoder.service.CrossReferenceSourceInfo;
 
-
+/**
+ * Local (i.e. anonymous) classes may access variables from the creating context
+ * if they are declared final and initialised.
+ * 
+ * This transformation searches for such final variables and replaces them by 
+ * an implicit variable.
+ * 
+ * Additionally a pseudo name is assigned to anonymous classes to allow to
+ * access them despite all.
+ * 
+ * @author engelc
+ */
 public class LocalClassTransformation extends RecoderModelTransformer {
-    
     
     public LocalClassTransformation(
             CrossReferenceServiceConfiguration services, TransformerCache cache) {
@@ -26,11 +49,8 @@ public class LocalClassTransformation extends RecoderModelTransformer {
     }
 
     public ProblemReport analyze() {
-         Set cds = classDeclarations();
-         Iterator it = cds.iterator();
-         while(it.hasNext()){
-             ClassDeclaration cd = (ClassDeclaration) it.next();
-             if(cd.getName()==null || cd.getStatementContainer() !=null){
+         for (final ClassDeclaration cd : classDeclarations()) {
+             if(cd.getName() == null || cd.getStatementContainer() !=null){
                  (new FinalOuterVarsCollector()).walk(cd);
              }
          }     
@@ -38,17 +58,16 @@ public class LocalClassTransformation extends RecoderModelTransformer {
     }
     
     protected void makeExplicit(TypeDeclaration td) {
-        LinkedList outerVars = (LinkedList) getLocalClass2FinalVar().get(td);
+        List<Variable> outerVars = getLocalClass2FinalVar().get(td);
         CrossReferenceSourceInfo si = services.getCrossReferenceSourceInfo();
+        
         if(outerVars!=null){
-            for(int i=0; i<outerVars.size(); i++){
-                Variable v = (Variable) outerVars.get(i);
-                List<VariableReference> refs = si.getReferences(v);
-                for(int j=0; j<refs.size(); j++){
-                    if(si.getContainingClassType(refs.get(j)) !=
+            for (final Variable v : outerVars) {
+                for (final VariableReference vr : si.getReferences(v)){
+                    if (si.getContainingClassType(vr) !=
                         si.getContainingClassType((ProgramElement) v)){
-                        refs.get(j).getASTParent().replaceChild(
-                                refs.get(j), new FieldReference(new ThisReference(), 
+                        vr.getASTParent().replaceChild(
+                                vr, new FieldReference(new ThisReference(), 
                                         new ImplicitIdentifier(ImplicitFieldAdder.FINAL_VAR_PREFIX+
                                                 v.getName())));
                         td.makeAllParentRolesValid();
@@ -57,4 +76,5 @@ public class LocalClassTransformation extends RecoderModelTransformer {
             }
         }
     }
+
 }

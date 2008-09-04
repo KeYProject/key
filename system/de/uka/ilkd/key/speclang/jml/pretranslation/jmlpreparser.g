@@ -194,7 +194,8 @@ modifiers
 
 
 modifier returns [String result = null]:
-    fin:FINAL                   { result = fin.getText(); }
+        abs:ABSTRACT            { result = abs.getText(); }
+    |   fin:FINAL               { result = fin.getText(); }
     |   gho:GHOST               { result = gho.getText(); } 
     |   hel:HELPER              { result = hel.getText(); }
     |   ins:INSTANCE            { result = ins.getText(); }
@@ -992,11 +993,12 @@ decreasing_keyword
 expression returns [PositionedString result = null]
 {
     lexer.setExpressionMode(true);
+    LT(1);
+    lexer.setExpressionMode(false);
 }
 :
     t:EXPRESSION
     { 
-    	lexer.setExpressionMode(false);
     	result = createPositionedString(t.getText(), t);
     }
 ;

@@ -51,15 +51,15 @@ public class POBrowser extends JDialog {
     
     private static POBrowser instance;
 
-    private final InitConfig initConfig;
-    private final Services services;
-    private final JavaInfo javaInfo;
-    private final SpecificationRepository specRepos;
+    private InitConfig initConfig;
+    private Services services;
+    private JavaInfo javaInfo;
+    private SpecificationRepository specRepos;
 
-    private final ClassTree classTree;
-    private final JList poList;
-    private final JButton startButton;
-    private final JButton cancelButton;
+    private ClassTree classTree;
+    private JList poList;
+    private JButton startButton;
+    private JButton cancelButton;
     
     private ProofOblInput po;
     
@@ -68,7 +68,9 @@ public class POBrowser extends JDialog {
     //constructors
     //-------------------------------------------------------------------------
 
-    protected POBrowser(InitConfig initConfig, String title) {
+    private POBrowser(InitConfig initConfig, 
+	    	      String title, 
+	    	      ProgramMethod defaultPm) {
 	super(Main.getInstance(), title, true);
 	this.initConfig = initConfig;
 	this.services   = initConfig.getServices();
@@ -76,7 +78,7 @@ public class POBrowser extends JDialog {
 	this.specRepos  = initConfig.getServices().getSpecificationRepository();
 
 	//create class tree
-	classTree = new ClassTree(true, null, services);
+	classTree = new ClassTree(true, true, null, defaultPm, services);
 	classTree.addTreeSelectionListener(new TreeSelectionListener() {
 	    public void valueChanged(TreeSelectionEvent e) {
 		DefaultMutableTreeNode selectedNode 
@@ -173,6 +175,11 @@ public class POBrowser extends JDialog {
                             "ESC",
                             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                             JComponent.WHEN_IN_FOCUSED_WINDOW);
+        
+        //complete default selection
+        if(defaultPm != null) {
+            showPOsFor(defaultPm);
+        }
 
 	//show
         getContentPane().setLayout(new BoxLayout(getContentPane(), 
@@ -180,17 +187,51 @@ public class POBrowser extends JDialog {
 	pack();
 	setLocation(70, 70);
     }
-
     
-    public static POBrowser showInstance(InitConfig initConfig) {
-        if(instance == null
+    
+    /**
+     * Shows the PO browser and preselects the passed method.
+     */
+    public static POBrowser showInstance(InitConfig initConfig, 
+	    				 ProgramMethod defaultPm) {
+	if(instance == null
            || instance.initConfig != initConfig
-           || !instance.initConfig.equals(initConfig)) {
-            instance = new POBrowser(initConfig, "Proof Obligation Browser");
+           || !instance.initConfig.equals(initConfig)
+           || defaultPm != null) {
+            
+            if(instance != null){
+                instance.dispose();
+                
+                //============================================
+                // cumbersome but necessary code providing a workaround for a memory leak 
+                // in Java, see: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6497929
+                instance.initConfig = null;
+                instance.services = null;
+                instance.javaInfo = null;
+                instance.specRepos = null;
+                instance.classTree = null;
+                instance.poList = null;
+                instance.startButton = null;
+                instance.cancelButton = null;
+                instance.po = null;
+                //============================================
+            }
+            
+            instance = new POBrowser(initConfig, 
+            			     "Proof Obligation Browser", 
+            			     defaultPm);
         }
         instance.po = null;
         instance.setVisible(true);
         return instance;
+    }
+    
+
+    /**
+     * Shows the PO browser.
+     */
+    public static POBrowser showInstance(InitConfig initConfig) {
+	return showInstance(initConfig, null);
     }
 
     
@@ -256,7 +297,7 @@ public class POBrowser extends JDialog {
 	pos = pos.append("PreservesInv");
 	
 	//PreservesOwnInv
-	if(specRepos.getClassInvariants(pm.getKeYJavaType()).size() > 0) {
+	if(specRepos.getClassInvariants(pm.getContainerType()).size() > 0) {
 	    pos = pos.append("PreservesOwnInv");
 	}
 	
@@ -401,6 +442,7 @@ public class POBrowser extends JDialog {
 						           pm,
 						           null,
 						           true,
+						           false,
 						           true,
 						           true);
 	if(cc.wasSuccessful()) {
@@ -419,7 +461,8 @@ public class POBrowser extends JDialog {
 						           services, 
 						           pm, 
 						           null, 
-						           false, 
+						           false,
+						           false,
 						           true, 
 						           true);
 	if(cc.wasSuccessful()) {
@@ -445,6 +488,7 @@ public class POBrowser extends JDialog {
 						           null, 
 						           true,
 						           true,
+						           true,
 						           false);
 	if(cc.wasSuccessful()) {
 	    return new EnsuresPostPO(initConfig, 
@@ -462,6 +506,7 @@ public class POBrowser extends JDialog {
 						           pm,
 						           null,
 						           true,
+						           false,
 						           true,
 						           false);
 	if(cc.wasSuccessful()) {
@@ -515,6 +560,7 @@ public class POBrowser extends JDialog {
                                                            null, 
                                                            true,
                                                            true,
+                                                           true,
                                                            false);
         if(cc.wasSuccessful()) {
             return new SpecExtPO(initConfig, 
@@ -530,7 +576,9 @@ public class POBrowser extends JDialog {
     //public interface
     //-------------------------------------------------------------------------
     
-    public ProofOblInput getPO() {	
-	return po;
+    public ProofOblInput getAndClearPO(){
+        ProofOblInput result = po;
+        po = null; //to prevent memory leaks
+        return result;
     }
 }

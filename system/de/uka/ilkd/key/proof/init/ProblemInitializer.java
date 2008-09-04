@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Vector;
 import java.util.Map.Entry;
 
@@ -23,7 +24,9 @@ import recoder.io.ProjectSettings;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.gui.IMain;
+import de.uka.ilkd.key.gui.MethodCallInfo;
 import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.CompilationUnit;
@@ -32,6 +35,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.IteratorOfConstrainedFormula;
 import de.uka.ilkd.key.logic.IteratorOfNamed;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
@@ -152,7 +156,7 @@ public class ProblemInitializer {
      * collection sorts). This may not have been done for previously
      * defined sorts, as the integer sort was not available.
      */
-    public void setUpSorts(InitConfig initConfig) {
+    private void setUpSorts(InitConfig initConfig) {
 	IteratorOfNamed it = initConfig.sortNS().allElements().iterator();
         while(it.hasNext()) {
             Sort sort = (Sort)it.next ();
@@ -240,7 +244,7 @@ public class ProblemInitializer {
                     rs = RuleSource.initRuleFile(new File(fileName));
                 }
                 KeYFile keyFile = new KeYFile(fileName, rs, pm);
-                readEnvInput(keyFile, initConfig);
+                readEnvInput(keyFile, initConfig, true);
             }
         }
         reportReady();
@@ -323,6 +327,8 @@ public class ProblemInitializer {
     		throws ProofInputException {
 	envInput.setInitConfig(initConfig);
 	String javaPath = envInput.readJavaPath();
+	List<File> classPath = envInput.readClassPath(); 
+	
 	if(javaPath != null) {
     	    //read Java	
             reportStatus("Reading Java model");
@@ -336,7 +342,9 @@ public class ProblemInitializer {
             }
             Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(), 
                                               initConfig.namespaces());
-            if (javaPath == "") {
+            r2k.setClassPath(classPath);
+            //r2k.setKeYFile(envInput.)
+            if (javaPath.length() == 0) {
                 r2k.parseSpecialClasses();
                 initConfig.getProofEnv().setJavaModel(JavaModel.NO_MODEL);
             } else {                 
@@ -391,12 +399,6 @@ public class ProblemInitializer {
     }
 
 
-    private void readEnvInput(EnvInput envInput, InitConfig initConfig) 
-		throws ProofInputException {
-	readEnvInput(envInput, initConfig, true);
-    }
-    
-    
     private void populateNamespaces(Term term, NamespaceSet namespaces) {
 	for(int i = 0; i < term.arity(); i++) {
 	    populateNamespaces(term.sub(i), namespaces);
@@ -532,7 +534,7 @@ public class ProblemInitializer {
         }
 	
 	//read envInput
-	readEnvInput(envInput, initConfig);
+	readEnvInput(envInput, initConfig, true);
 	
 	startInterface();	
 	return initConfig;
@@ -543,6 +545,10 @@ public class ProblemInitializer {
     		throws ProofInputException {
 	assert initConfig != null;
 	stopInterface();
+	/*Setting this flag to false tells KeY to store Names in namespaces using strong references.
+	 * So they are not garbage collected, while the namespace exists. If you have
+	 * a better place for this statement without introducing memory leaks then refactor this code. */
+	Namespace.storeAsWeak = false;
         
         try {
             //determine environment
@@ -560,6 +566,13 @@ public class ProblemInitializer {
             throw e;            
         } finally {
             startInterface();
+        }
+        /*After creating the proof environment and loading of the problem we use
+         * weak references to store newly created names as they become obsolete when
+         * parts of a proof become pruned. */
+        Namespace.storeAsWeak = false;//true
+        if(MethodCallInfo.MethodCallCounterOn){
+            MethodCallInfo.Local.reset();
         }
     }
     

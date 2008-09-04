@@ -630,18 +630,25 @@ options {
 
 	//local instance fields of created objects
 	if(kjt.getJavaType() instanceof ClassDeclaration) {
-	    ClassDeclaration cd = (ClassDeclaration)kjt.getJavaType();
-	    ListOfField fields = javaInfo.getAllFields(cd);
-	    for(IteratorOfField it = fields.iterator(); it.hasNext(); ) {
-	    	Field f = it.next();
-	    	ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
-	    	if(!pv.isStatic()) {
-	    	    Term fieldTerm = tb.dot(objectTerm, pv);
-	    	    BasicLocationDescriptor fieldLd 
-	    		    = new BasicLocationDescriptor(guardFma, fieldTerm);
-		    result = result.add(fieldLd);
-		}
-	    }
+		ListOfKeYJavaType kjts = javaInfo.getAllSupertypes(kjt).append(kjt);
+        IteratorOfKeYJavaType kit = kjts.iterator();
+        while(kit.hasNext()){
+            KeYJavaType skjt = kit.next();
+            if(skjt.getJavaType() instanceof ClassDeclaration){
+                ClassDeclaration cd = (ClassDeclaration)skjt.getJavaType();
+	            ListOfField fields = javaInfo.getAllFields(cd);
+	            for(IteratorOfField it = fields.iterator(); it.hasNext(); ) {
+                    Field f = it.next();
+                    ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
+                    if(!pv.isStatic()) {
+                        Term fieldTerm = tb.dot(objectTerm, pv);
+                        BasicLocationDescriptor fieldLd 
+                            = new BasicLocationDescriptor(guardFma, fieldTerm);
+                        result = result.add(fieldLd);
+                    }
+                }
+            }
+        }
 	} else {
 	    assert kjt.getJavaType() instanceof ArrayDeclaration;
 	    
@@ -1536,7 +1543,13 @@ primaryexpr returns [JMLExpression result=null] throws SLTranslationException
     |   "false"      { result = new JMLExpression(tb.ff()); }
     |   "null"       { result = new JMLExpression(tb.NULL(services)); }
     |   result=jmlprimary 
-    |   "this"       { result = new JMLExpression(tb.var(selfVar)); }
+    |   "this"       
+        { 
+            if(selfVar == null) {
+            	raiseError("Cannot access \"this\" in a static context!"); 
+            }
+            result = new JMLExpression(tb.var(selfVar));
+        }
     |   new_expr
 ;   
 
@@ -1570,7 +1583,7 @@ primarysuffix[JMLExpression receiver, String fullyQualifiedName] returns [JMLExp
     DOT THIS
     {
     	result = new JMLExpression(services.getTypeConverter().findThisForSort(receiver.getSort(),
-    		tb.var(selfVar), javaInfo.getKeYJavaType(selfVar.sort())));
+    		tb.var(selfVar), javaInfo.getKeYJavaType(selfVar.sort()), true));
     }
     |
 	l:LPAREN (callingParameters=expressionlist)? RPAREN
@@ -1875,6 +1888,9 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	{
 	    resolverManager.popLocalVariablesNamespace();
 	    
+	    p = convertToFormula(p);
+	    t = convertToFormula(t);
+	    
 	    //add implicit "non-null" guards for reference types, 
 	    //"in-bounds" guards for integer types
 	    Term nullTerm = tb.NULL(services);
@@ -1894,9 +1910,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	    	    }
 	    	}
 	    }	    
-	    
-	    t = convertToFormula(t);
-	    
+	    	    
 	    if (q.getText().equals("\\forall")) {
 		if (p != null) {
 		    t = tb.imp(p, t);

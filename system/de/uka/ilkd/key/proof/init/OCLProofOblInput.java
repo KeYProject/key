@@ -56,6 +56,12 @@ public abstract class OCLProofOblInput implements ProofOblInput {
      */
     public abstract ProofAggregate getPO();
     
+    
+    public boolean implies(ProofOblInput po) {
+        return equals(po);
+    }
+    
+    
     public void readActivatedChoices() throws ProofInputException{
 	//nothing to do
     }

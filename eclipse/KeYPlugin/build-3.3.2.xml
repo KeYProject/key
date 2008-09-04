@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="KeYPlugin" default="build.jars" basedir=".">
+
+	<property name="basews" value="${ws}" />
+	<property name="baseos" value="${os}" />
+	<property name="basearch" value="${arch}" />
+	<property name="basenl" value="${nl}" />
+
+	<property environment="env" />
+
+	<!-- Compiler settings. -->
+	<property name="javacFailOnError" value="true" />
+	<property name="javacDebugInfo" value="on" />
+	<property name="javacVerbose" value="true" />
+	<property name="target" value="1.5"/>
+	<property name="source" value="1.5"/>
+	<property name="javacSource" value="1.5" />
+	<property name="javacTarget" value="1.5" />
+	<property name="compilerArg" value="" />
+	<path id="Plug-in Dependencies.libraryclasspath">
+	  <pathelement path="../KeYExternalLibraries/jcoverage.jar" />
+	  <pathelement path="../KeYExternalLibraries/antlr.jar" />
+	  <pathelement path="../KeYExternalLibraries/dresden-ocl-demo.jar" />
+	  <pathelement path="../KeYExternalLibraries/jargs.jar" />
+	  <pathelement path="../KeYExternalLibraries/javacc.jar" />
+	  <pathelement path="../KeYExternalLibraries/junit.jar" />
+	  <pathelement path="../KeYExternalLibraries/log4j.jar" />
+	  <pathelement path="../KeYExternalLibraries/recoderKey.jar" />
+	  <pathelement path="../KeYExternalLibraries/xerces.jar" />
+	  <pathelement path="../org.key-project.core/key.jar" />
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.core.resources_3.3.1.R33x_v20080205.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.core.runtime_3.3.100.v20070530.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.osgi_3.3.2.R33x_v20080105.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.equinox.common_3.3.0.v20070426.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.core.jobs_3.3.1.R33x_v20070709.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.core.runtime.compatibility.registry_3.2.100.v20070316/runtime_registry_compatibility.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.equinox.registry_3.3.1.R33x_v20070802.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.equinox.preferences_3.2.101.R33x_v20080117.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.core.contenttype_3.2.100.v20070319.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.equinox.app_1.0.1.R33x_v20070828.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.jdt.core_3.3.3.v_793_R33x.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.jdt.compiler.apt_1.0.1.R33x_v20071002-2100.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.jdt.compiler.tool_1.0.1.v_793_R33x.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.ui_3.3.1.M20071128-0800.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.swt_3.3.2.v3349d.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.swt.gtk.linux.x86_3.3.2.v3349.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.jface_3.3.2.M20080207-0800.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.core.commands_3.3.0.I20070605-0010.jar"/>
+	  <pathelement location="${eclipse_home}/plugins/org.eclipse.ui.workbench_3.3.2.M20080207-0800.jar"/>
+	  <pathelement path="@dot" />
+	</path>
+
+	<target name="init" depends="properties">
+		<condition property="pluginTemp" value="${buildTempFolder}/plugins">
+			<isset property="buildTempFolder" />
+		</condition>
+		<property name="pluginTemp" value="${basedir}" />
+		<condition property="build.result.folder" value="${pluginTemp}/KeYPlugin">
+			<isset property="buildTempFolder" />
+		</condition>
+		<property name="build.result.folder" value="${basedir}" />
+		<property name="temp.folder" value="${basedir}/temp.folder" />
+		<property name="plugin.destination" value="${basedir}" />
+	</target>
+
+	<path id="KeYPlugin.classpath">
+		<pathelement location="${temp.folder}/KeYPlugin.jar.bin" />
+		<path refid="Plug-in Dependencies.libraryclasspath" />
+	</path>
+
+	<target name="properties" if="eclipse.running">
+		<property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter" />
+
+	</target>
+
+	<target name="build.update.jar" depends="init" description="Build the plug-in: KeYPlugin for an update site.">
+		<delete dir="${temp.folder}" />
+		<mkdir dir="${temp.folder}" />
+		<antcall target="build.jars" />
+		<antcall target="gather.bin.parts">
+			<param name="destination.temp.folder" value="${temp.folder}/" />
+		</antcall>
+		<zip destfile="${plugin.destination}/KeYPlugin_${env.KEY_VERSION_SHORT}.jar" basedir="${temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" filesonly="false" whenempty="skip" update="false" />
+		<delete dir="${temp.folder}" />
+	</target>
+
+	<target name="KeYPlugin.jar" depends="init" unless="KeYPlugin.jar" description="Create jar: KeYPlugin KeYPlugin.jar.">
+		<delete dir="${temp.folder}/KeYPlugin.jar.bin" />
+		<mkdir dir="${temp.folder}/KeYPlugin.jar.bin" />
+		<!-- compile the source code -->
+		<javac destdir="${temp.folder}/KeYPlugin.jar.bin" failonerror="${javacFailOnError}" verbose="${javacVerbose}" debug="${javacDebugInfo}" source="${javacSource}" target="${javacTarget}">
+			<compilerarg line="${compilerArg}" />
+			<src path="src/" />
+			<classpath refid="KeYPlugin.classpath" />
+		</javac>
+		<!-- Copy necessary resources -->
+		<copy todir="${temp.folder}/KeYPlugin.jar.bin" failonerror="true" overwrite="false">
+			<fileset dir="src/" excludes="**/*.java, **/package.htm*,null" />
+		</copy>
+		<mkdir dir="${build.result.folder}" />
+		<jar destfile="${build.result.folder}/KeYPlugin.jar" basedir="${temp.folder}/KeYPlugin.jar.bin" />
+		<delete dir="${temp.folder}/KeYPlugin.jar.bin" />
+	</target>
+
+	<target name="KeYPluginsrc.zip" depends="init" unless="KeYPluginsrc.zip">
+		<mkdir dir="${build.result.folder}" />
+		<zip destfile="${build.result.folder}/KeYPluginsrc.zip" filesonly="false" whenempty="skip" update="false">
+			<fileset dir="src/" includes="**/*.java" />
+		</zip>
+	</target>
+
+	<target name="build.jars" depends="init" description="Build all the jars for the plug-in: KeYPlugin.">
+		<available property="KeYPlugin.jar" file="${build.result.folder}/KeYPlugin.jar" />
+		<antcall target="KeYPlugin.jar" />
+	</target>
+
+	<target name="build.sources" depends="init">
+		<available property="KeYPluginsrc.zip" file="${build.result.folder}/KeYPluginsrc.zip" />
+		<antcall target="KeYPluginsrc.zip" />
+	</target>
+
+	<target name="gather.bin.parts" depends="init" if="destination.temp.folder">
+		<mkdir dir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" />
+		<copy todir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false">
+			<fileset dir="${build.result.folder}" includes="KeYPlugin.jar" />
+		</copy>
+		<copy todir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false">
+			<fileset dir="${basedir}" includes="plugin.xml,README,META-INF/, key-small.png,KeYPlugin.jar,jars/" />
+		</copy>
+	</target>
+
+	<target name="build.zips" depends="init">
+	</target>
+
+	<target name="gather.sources" depends="init" if="destination.temp.folder">
+		<mkdir dir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" />
+		<copy file="${build.result.folder}/KeYPluginsrc.zip" todir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false" />
+		<copy todir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false">
+			<fileset dir="${basedir}" includes="src/,jars/antlr.jar,jars/dresden-ocl-demo.jar,jars/jargs.jar,jars/javacc.jar,jars/jcoverage.jar,jars/junit.jar,jars/log4j.jar,jars/recoderKey.jar,jars/xerces.jar,plugin.xml,README,META-INF/,key-small.png" />
+		</copy>
+	</target>
+
+	<target name="gather.logs" depends="init" if="destination.temp.folder">
+		<mkdir dir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" />
+		<copy file="${temp.folder}/KeYPlugin.jar.bin.log" todir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false" />
+	</target>
+
+	<target name="clean" depends="init" description="Clean the plug-in: KeYPlugin of all the zips, jars and logs created.">
+		<delete file="${build.result.folder}/KeYPlugin.jar" />
+		<delete file="${build.result.folder}/KeYPluginsrc.zip" />
+		<delete file="${plugin.destination}/KeYPlugin_${env.KEY_VERSION_SHORT}.jar" />
+		<delete file="${plugin.destination}/KeYPlugin_${env.KEY_VERSION_SHORT}.zip" />
+		<delete dir="${temp.folder}" />
+	</target>
+
+	<target name="refresh" depends="init" if="eclipse.running" description="Refresh this folder.">
+		<eclipse.convertPath fileSystemPath="${basedir}" property="resourcePath" />
+		<eclipse.refreshLocal resource="${resourcePath}" depth="infinite" />
+	</target>
+
+	<target name="zip.plugin" depends="init" description="Create a zip containing all the elements for the plug-in: KeYPlugin.">
+		<delete dir="${temp.folder}" />
+		<mkdir dir="${temp.folder}" />
+		<antcall target="build.jars" />
+		<antcall target="build.sources" />
+		<antcall target="gather.bin.parts">
+			<param name="destination.temp.folder" value="${temp.folder}/" />
+		</antcall>
+		<antcall target="gather.sources">
+			<param name="destination.temp.folder" value="${temp.folder}/" />
+		</antcall>
+		<delete>
+			<fileset dir="${temp.folder}" includes="**/*.bin.log" />
+		</delete>
+		<zip destfile="${plugin.destination}/KeYPlugin_${env.KEY_VERSION_SHORT}.zip" basedir="${temp.folder}" filesonly="true" whenempty="skip" update="false" />
+		<delete dir="${temp.folder}" />
+	</target>
+
+</project>

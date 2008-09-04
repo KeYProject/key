@@ -59,6 +59,8 @@
 ./java_dl/continue1.key
 ./java_dl/continue2.key
 ./java_dl/complexAssignment.key
+./java_dl/danglingElseSolution1.key
+./java_dl/danglingElseSolution2.key
 ./java_dl/exceptions.key   
 ./java_dl/exceptions1.key
 ./java_dl/exceptions2.key
@@ -144,3 +146,4 @@
 ./staticInitialisation/localDeclaredMethod.key
 ./staticInitialisation/objectOfErroneousClass.key
 ./staticInitialisation/staticInitialisersAreNonSimple.key
+./_testcase/classpath/classpath.key

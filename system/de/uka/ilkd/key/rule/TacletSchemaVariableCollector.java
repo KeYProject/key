@@ -228,7 +228,6 @@ public class TacletSchemaVariableCollector extends Visitor {
      */
     public void visitWithoutAddrule(Taclet taclet) {
 	visit(taclet, false);
-//        varList = varList.prepend(taclet.addedRuleNameVars());
     }
     
 }

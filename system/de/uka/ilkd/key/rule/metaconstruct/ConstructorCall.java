@@ -26,6 +26,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -100,9 +101,11 @@ public class ConstructorCall extends ProgramMetaConstruct {
 	}
         
 	if(j==1){
+            Sort s = services.getJavaInfo().getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, classType).sort();
 	    Expression enclosingThis = (Expression) (constructorReference.getReferencePrefix() instanceof Expression?
 	            constructorReference.getReferencePrefix() :
-	                ec.getRuntimeInstance());
+                        services.getTypeConverter().convertToProgramElement(
+                                services.getTypeConverter().findThisForSort(s, ec)));
 	    argumentVariables[argumentVariables.length-1] = 
 	        EvaluateArgs.evaluate(enclosingThis, evaluatedArgs, 
 	                        services, ec);    

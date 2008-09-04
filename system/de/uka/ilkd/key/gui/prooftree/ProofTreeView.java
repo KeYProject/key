@@ -10,31 +10,20 @@
 
 package de.uka.ilkd.key.gui.prooftree;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.*;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
+import javax.swing.event.*;
 import javax.swing.plaf.TreeUI;
 import javax.swing.plaf.basic.BasicTreeUI;
+import javax.swing.plaf.metal.MetalTreeUI;
 import javax.swing.text.Position;
 import javax.swing.tree.*;
 
 import de.uka.ilkd.key.gui.*;
-import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
-import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
+import de.uka.ilkd.key.gui.configuration.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.util.Debug;
 
@@ -55,7 +44,7 @@ public class ProofTreeView extends JPanel {
     /** the model that is displayed by the delegateView */
     private GUIProofTreeModel delegateModel;
     
-    private Hashtable<Proof, GUIProofTreeModel> models = new Hashtable<Proof, GUIProofTreeModel>(20);
+    private HashMap<Proof, GUIProofTreeModel> models = new HashMap<Proof, GUIProofTreeModel>(20);
 
     /** the proof this view shows */
     private Proof proof;
@@ -71,7 +60,14 @@ public class ProofTreeView extends JPanel {
     /** KeYStroke for the search panel */
     private final static KeyStroke searchKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0);
 
-    
+    private ConfigChangeListener configChangeListener =  new ConfigChangeListener() {
+                                            public void configChanged(ConfigChangeEvent e) {
+                                                setProofTreeFont();
+                                            }
+                                            public void clear(){
+                                                Config.DEFAULT.removeConfigChangeListener(this);
+                                            }
+                                        };
     /**
      * Roots of subtrees containing all nodes to which rules have been
      * applied; this is used when auto mode is active
@@ -98,8 +94,13 @@ public class ProofTreeView extends JPanel {
 			treeUI.setExpandedIcon(IconFactory.expandedIcon());
 			treeUI.setCollapsedIcon(IconFactory.collapsedIcon());
 		    }
+                    if(ui instanceof CacheLessMetalTreeUI){
+                        ((CacheLessMetalTreeUI) ui).clearDrawingCache();
+                    }
 		}
 	    };
+            
+        delegateView.setUI(new CacheLessMetalTreeUI());
 
         delegateView.getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, ActionEvent.CTRL_MASK));
         delegateView.getInputMap(JComponent.WHEN_FOCUSED).getParent().remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, ActionEvent.CTRL_MASK));
@@ -148,12 +149,7 @@ public class ProofTreeView extends JPanel {
 // 		    }
 // 		});
 
-	Config.DEFAULT.addConfigChangeListener(
-	        new ConfigChangeListener() {
-	            public void configChanged(ConfigChangeEvent e) {
-                        setProofTreeFont();
-	            }
-	        });
+	Config.DEFAULT.addConfigChangeListener( configChangeListener);
 
 	setProofTreeFont();
 	delegateView.setLargeModel(true);
@@ -225,6 +221,7 @@ public class ProofTreeView extends JPanel {
 	mediator.addAutoModeListener(proofListener);
 	mediator.addRuleAppListener(proofListener);
 	mediator.addGUIListener(guiListener);
+        Config.DEFAULT.addConfigChangeListener( configChangeListener);
     }
 
     private void unregister() {
@@ -232,6 +229,7 @@ public class ProofTreeView extends JPanel {
 	mediator.removeAutoModeListener(proofListener);
 	mediator.removeRuleAppListener(proofListener);
 	mediator.removeGUIListener(guiListener);
+	configChangeListener.clear();
     }
 
     public void removeNotify () {
@@ -399,6 +397,9 @@ public class ProofTreeView extends JPanel {
         delegateView.scrollPathToVisible(tp);
         delegateView.validate();
         treeSelectionListener.ignoreChange = false;
+
+        delegateModel.storeSelection(delegateView.getSelectionPath());
+
     }
 
     /**
@@ -527,7 +528,9 @@ public class ProofTreeView extends JPanel {
         
        	/** invoked when a rule has been applied */
 	public void ruleApplied(ProofEvent e) {
-	    addModifiedNode(e.getRuleAppInfo().getOriginalNode());
+	    if (proof == e.getSource()) {
+	        addModifiedNode(e.getRuleAppInfo().getOriginalNode());
+	    }
 	}
         
         
@@ -550,6 +553,11 @@ public class ProofTreeView extends JPanel {
 		 getLastPathComponent() instanceof GUIAbstractTreeNode)) {
 		return;
 	    }
+	    
+	    TreePath newTP = e.getNewLeadSelectionPath();
+	    delegateModel.storeSelection(newTP);
+
+	    
 	    GUIAbstractTreeNode treeNode = 
 		((GUIAbstractTreeNode)e.getNewLeadSelectionPath().
 		 getLastPathComponent());
@@ -1190,7 +1198,16 @@ public class ProofTreeView extends JPanel {
             assert string != null && searchString != null;
             return string.indexOf(searchString) != -1;
         }
-
+        
+    }
+    
+    // to prevent memory leaks
+    private class CacheLessMetalTreeUI extends MetalTreeUI{
+        
+        public void clearDrawingCache(){
+            drawingCache.clear();
+        }
+        
     }
 
-     }
+}

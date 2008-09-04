@@ -150,20 +150,6 @@ public class SVInstantiations {
                 instantiationType));
     }
 
-
-    public SVInstantiations addInteresting(SchemaVariable sv, 
-					   Name name) {
-        SchemaVariable existingSV = lookupVar(sv.name());
-        Name oldValue = (Name) getInstantiation(existingSV);
-        if (name.equals(oldValue)) return this; // already have it
-        if (oldValue!=null) throw new IllegalStateException(
-            "Trying to add a second name proposal for "+sv+
-            ": "+oldValue+"->"+name);
-        // otherwise (nothing here yet) add it    
-        return addInteresting ( sv, new NameInstantiationEntry(sv, name) );
-    }
-    
-
     public SVInstantiations add(SchemaVariable sv, ProgramList pes) {
         return add(sv, new ProgramListInstantiation(sv, pes.getList()));
     }
@@ -292,6 +278,36 @@ public class SVInstantiations {
                 entry), getUpdateContext(), getGenericSortInstantiations(),
                 getGenericSortConditions()).checkSorts(entry, false);
     }
+
+    
+    public SVInstantiations addInteresting(SchemaVariable sv, 
+            Name name) {
+        SchemaVariable existingSV = lookupVar(sv.name());
+        Name oldValue = (Name) getInstantiation(existingSV);
+        if (name.equals(oldValue)) return this; // already have it
+        if (oldValue!=null) throw new IllegalStateException(
+                "Trying to add a second name proposal for "+sv+
+                ": "+oldValue+"->"+name);
+//      otherwise (nothing here yet) add it    
+        return addInteresting ( sv, new NameInstantiationEntry(sv, name) );
+    }
+
+    // reklov
+    // START TEMPORARY DOWNWARD COMPATIBILITY
+
+    public SVInstantiations add(SchemaVariable sv, 
+            Name name) {
+        SchemaVariable existingSV = lookupVar(sv.name());
+        Name oldValue = (Name) getInstantiation(existingSV);
+        if (name.equals(oldValue)) return this; // already have it
+        if (oldValue!=null) throw new IllegalStateException(
+                "Trying to add a second name proposal for "+sv+
+                ": "+oldValue+"->"+name);
+//      otherwise (nothing here yet) add it    
+        return add ( sv, new NameInstantiationEntry(sv, name) );
+    }
+
+    // END TEMPORARY DOWNWARD COMPATIBILITY
 
     /**
      * replaces the given pair in the instantiations. If the given

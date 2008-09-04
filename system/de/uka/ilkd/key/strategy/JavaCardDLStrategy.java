@@ -341,12 +341,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // attention: usually this application is against the term order but
         // does not interfere as only applied below updates
         bindRuleSet ( d, "query_normalize", 
-               ifZero ( add ( DirectlyBelowOpClassFeature.create
-                              ( ProgramMethod.class ),
-                              applyTF (FocusProjection.create(2), ff.update),
-                              applyTF("t", IsNonRigidTermFeature.INSTANCE) ),
-                        longConst (-10),
-                        inftyConst () ) );
+	    SumFeature.createSum ( new Feature [] {
+                DirectlyBelowOpClassFeature.create ( ProgramMethod.class ),
+                applyTF(FocusProjection.create(2), ff.update),
+                applyTF("t", IsNonRigidTermFeature.INSTANCE),
+		// we actually have to be in the scope of an update,
+		// not only within an update
+		not(NotInScopeOfModalityFeature.INSTANCE),
+                longConst (-10) } ));
 
         if ( expandQueries () )
             bindRuleSet ( d, "queries",

@@ -15,11 +15,6 @@ import de.uka.ilkd.key.rule.Rule;
 
 public class NameSV extends SchemaVariableAdapter {
 
-    public static final String NAME_PREFIX = "_NAME";
-    public static final String MV_NAME_PREFIX = NAME_PREFIX+"_MV_";
-    public static final String TACLET_NAME_PREFIX = NAME_PREFIX+"_T_";
-
-
     public NameSV(Name name) {
         super(name, Rule.class);
     }

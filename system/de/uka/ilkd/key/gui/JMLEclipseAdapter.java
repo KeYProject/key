@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.strategy.Strategy;
 
 public class JMLEclipseAdapter {
 /*TODO
@@ -30,7 +31,7 @@ public class JMLEclipseAdapter {
     Implementation2SpecMap ism = null;
     JavaInfo ji;
     private boolean mainVisible=true;
-
+    private Strategy strategy = null;
 
     public JMLEclipseAdapter(KeYMediator mediator){
        	services = mediator.getServices();
@@ -100,6 +101,9 @@ public class JMLEclipseAdapter {
 	ProblemInitializer pi = new ProblemInitializer(Main.getInstance(mainVisible));
 	try {
 	    pi.startProver(mediator.getProof().env(), poi);
+            if (getStrategy() != null) {
+                mediator.getProof().setActiveStrategy(getStrategy());
+            }
 	} catch(ProofInputException e) {
 	    //too bad
 	}
@@ -117,6 +121,15 @@ public class JMLEclipseAdapter {
 
     public void setMainVisible(boolean mainVisible) {
         this.mainVisible = mainVisible;
+    }
+
+    public void setStrategy(Strategy strategy) {
+        this.strategy = strategy;
+        
+    }
+
+    public Strategy getStrategy() {
+        return strategy;
     }
     */
 }

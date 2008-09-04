@@ -120,7 +120,7 @@ public abstract class AbstractPO implements ProofOblInput {
 
     protected ProgramVariable buildExcVar() {
         final KeYJavaType excType
-        	= javaInfo.getTypeByClassName("java.lang.Exception");
+        	= javaInfo.getTypeByClassName("java.lang.Throwable");
         return new LocationVariable(new ProgramElementName("exc"), excType);      
     }
     
@@ -422,5 +422,10 @@ public abstract class AbstractPO implements ProofOblInput {
         }
         
         return proofAggregate = ProofAggregate.createProofAggregate(proofs, name);
+    }
+    
+    
+    public boolean implies(ProofOblInput po) {
+        return equals(po);
     }
 }

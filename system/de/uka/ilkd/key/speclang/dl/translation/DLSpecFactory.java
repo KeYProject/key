@@ -39,9 +39,12 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SLListOfParsableVariable;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.speclang.ClassInvariant;
+import de.uka.ilkd.key.speclang.ClassInvariantImpl;
 import de.uka.ilkd.key.speclang.FormulaWithAxioms;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.OperationContractImpl;
+import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
 
 
 /**
@@ -51,6 +54,8 @@ import de.uka.ilkd.key.speclang.OperationContractImpl;
 public class DLSpecFactory {
     
     private static final TermBuilder TB = TermBuilder.DF;
+    private static final SignatureVariablesFactory SVF 
+    	= SignatureVariablesFactory.INSTANCE;
     private final Services services;
     
 
@@ -181,7 +186,33 @@ public class DLSpecFactory {
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
+    
+    /**
+     * Creates a class invariant from a formula and a designated "self".
+     */
+    public ClassInvariant createDLClassInvariant(String name, 
+                                                 String displayName,
+                                                 ParsableVariable selfVar,
+                                                 Term inv) 
+            throws ProofInputException {
+        assert name != null;
+        if(displayName == null) {
+            displayName = name;
+        }
+        assert selfVar != null;
+        assert inv != null;
+        
+        KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(selfVar.sort());
+        assert kjt != null;
+        
+        return new ClassInvariantImpl(name, 
+                                      displayName, 
+                                      kjt, 
+                                      new FormulaWithAxioms(inv), 
+                                      selfVar);
+    }
   
+    
     /**
      * Creates an operation contract from an implication formula of the form
      * <code>pre -> \<p\> post</code> and a modifies clause (which is how
@@ -199,8 +230,14 @@ public class DLSpecFactory {
         }
         assert fma != null;
         assert modifies != null;
-        
+       
+        //extract parts
         MethodBodyStatement mbs          = extractMBS(fma);
+        if(mbs.getProgramMethod(services) == null) {
+            throw new ProofInputException("method \"" 
+        	                          + mbs.getMethodReference() 
+        	                          + "\" not found");
+        }
         ProgramMethod pm                 = extractProgramMethod(mbs);
         Modality modality                = extractModality(fma);
         FormulaWithAxioms pre            = extractPre(fma);
@@ -246,11 +283,7 @@ public class DLSpecFactory {
 
         //exception variable may be omitted
 	if(excVar == null) {
-	    KeYJavaType excType
-                    = services.getJavaInfo()
-                              .getTypeByClassName("java.lang.Exception");
-            ProgramElementName excPEN = new ProgramElementName("exc");
-            excVar = new LocationVariable(excPEN, excType);
+            excVar = SVF.createExcVar(services, pm, false);
 	    Term excNullTerm = TB.equals(TB.var(excVar), TB.NULL(services));
             if(modality == Op.DIA) {
                 post = post.conjoin(new FormulaWithAxioms(excNullTerm));

@@ -35,7 +35,10 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.RespectsModifiesPO;
 import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
+import de.uka.ilkd.key.proof.mgt.SetAsListOfContractWithInvs;
 import de.uka.ilkd.key.proof.mgt.SetOfContractWithInvs;
+import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.speclang.SetOfOperationContract;
 
 
 public class UsedSpecificationsDialog extends JDialog {
@@ -64,6 +67,21 @@ public class UsedSpecificationsDialog extends JDialog {
                                     SetOfContractWithInvs contractApps) {
         super(Main.getInstance(), "Used Specifications", true);
         this.services = services;
+        
+        //break contract apps down to atomic contracts
+        SetOfContractWithInvs atomicContractApps 
+            = SetAsListOfContractWithInvs.EMPTY_SET;
+        for(ContractWithInvs cwi : contractApps) {
+            for(OperationContract atomicContract 
+                : services.getSpecificationRepository()
+                          .splitContract(cwi.contract)) {
+                ContractWithInvs atomicCwi 
+                    = new ContractWithInvs(atomicContract, 
+                                           cwi.assumedInvs, 
+                                           cwi.ensuredInvs);
+                atomicContractApps = atomicContractApps.add(atomicCwi);
+            }
+        }
                 
         //create scroll pane
         JScrollPane scrollPane = new JScrollPane();
@@ -75,7 +93,7 @@ public class UsedSpecificationsDialog extends JDialog {
         //create contract app list
         contractAppList = new JList();
         contractAppList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        contractAppList.setListData(contractApps.toArray());
+        contractAppList.setListData(atomicContractApps.toArray());
         contractAppList.setSelectedIndex(0);
         contractAppList.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {                
@@ -154,6 +172,7 @@ public class UsedSpecificationsDialog extends JDialog {
                                                      cwi.assumedInvs);
                 findOrStartProof(initConfig, po);
                 setVisible(false);
+                dispose();
             }
         });
         buttonPanel.add(ensuresPostButton);
@@ -177,6 +196,7 @@ public class UsedSpecificationsDialog extends JDialog {
                                          cwi.ensuredInvs);
                 findOrStartProof(initConfig, po);
                 setVisible(false);
+                dispose();
             }
         });
         buttonPanel.add(preservesInvButton);
@@ -228,7 +248,7 @@ public class UsedSpecificationsDialog extends JDialog {
                             JComponent.WHEN_IN_FOCUSED_WINDOW);
         
         //disable PO buttons if no specifications
-        if(contractApps.size() == 0) {
+        if(atomicContractApps.size() == 0) {
             ensuresPostButton.setEnabled(false);
             preservesInvButton.setEnabled(false);
             respectsModifiesButton.setEnabled(false);

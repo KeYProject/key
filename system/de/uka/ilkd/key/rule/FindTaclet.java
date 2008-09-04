@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.collection.PairOfListOfGoalAndTacletApp;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -133,9 +132,6 @@ public abstract class FindTaclet extends Taclet {
 				     MatchConditions matchCond);
 
 
-    private static final SchemaVariable PROGVAR_SV = new NameSV(
-            NameSV.NAME_PREFIX + "_PROG_VARS");
-
     /**  
      * the rule is applied on the given goal using the
      * information of rule application. 
@@ -143,7 +139,7 @@ public abstract class FindTaclet extends Taclet {
      * @param services the Services encapsulating all java information
      * @param ruleApp the taclet application that is executed.
      */
-    public PairOfListOfGoalAndTacletApp applyHelp(Goal     goal,
+    public ListOfGoal apply(Goal     goal,
 			    Services services,
 			    RuleApp  ruleApp) {
 
@@ -165,27 +161,12 @@ public abstract class FindTaclet extends Taclet {
 	IteratorOfTacletGoalTemplate it               = goalTemplates().iterator();
 	IteratorOfGoal               goalIt           = newGoals.iterator();
 
-        ListOfName[] progvar_proposals = null;
-        int count = 0;
-        String progvar_genNames = "";
-        Object o = tacletApp.instantiations().getInstantiation(PROGVAR_SV);
-
-        if (o instanceof Name) {
-            String[] props = ((Name) o).toString().split(";");
-            progvar_proposals = new ListOfName[props.length];
-
-            for (int i = 0; i < props.length; i++) {
-                String[] props2 = props[i].split(",");
-                progvar_proposals[i] = SLListOfName.EMPTY_LIST;
-
-                for (int j = 0; j < props2.length; j++) {
-                    progvar_proposals[i] = progvar_proposals[i].append(
-                            new Name(props2[j]));
-                }
-
-            }
-
-        }
+        // reklov
+        // START TEMPORARY DOWNWARD COMPATIBILITY
+        ((InnerVariableNamer) services.getVariableNamer()).
+                setOldProgVarProposals((Name) tacletApp.instantiations().
+                getInstantiation(new NameSV("_NAME_PROG_VARS")));
+        // END TEMPORARY DOWNWARD COMPATIBILITY
 
 	while (it.hasNext()) {
 	    TacletGoalTemplate gt          = it    .next();
@@ -209,44 +190,17 @@ public abstract class FindTaclet extends Taclet {
 			      services,
 			      mc );
 
-	    ListOfName props = null;
-
-	    if (progvar_proposals != null && gt.addedProgVars().size() != 0) {
-	        props = progvar_proposals[count++];
-	    }
-
-	    ListOfName newNames = applyAddProgVars( gt.addedProgVars(),
+	    
+	    applyAddProgVars( gt.addedProgVars(),
 			      currentGoal,
                               tacletApp.posInOccurrence(),
                               services,
-			      mc, props);
-	    IteratorOfName it2 = newNames.iterator();
-
-	    for (int j = 0; it2.hasNext(); j++) {
-
-	        if (j > 0) {
-	            progvar_genNames += "," + it2.next().toString();
-	        } else {
-	            progvar_genNames += ";" + it2.next().toString();
-	        }
-
-	    }
-                              
+			      mc);
+                               
             currentGoal.setBranchLabel(gt.name());
 	}
 
-	PairOfListOfGoalAndTacletApp p;
-
-	if (progvar_genNames.length() > 0) {
-	    p = new PairOfListOfGoalAndTacletApp(newGoals, tacletApp
-	            .setInstantiation(tacletApp.instantiations()
-	                    .addInteresting(PROGVAR_SV, new Name(
-	                            progvar_genNames.substring(1)))));
-	} else {
-	    p = new PairOfListOfGoalAndTacletApp(newGoals, tacletApp);
-	}
-
-	return p;
+	return newGoals;
     }
 
     StringBuffer toStringFind(StringBuffer sb) {

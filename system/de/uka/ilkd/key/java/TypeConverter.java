@@ -181,14 +181,14 @@ public class TypeConverter extends TermBuilder {
 	return booleanLDT;
     }
     
-    HashMap mcrMap = new HashMap(10);
+    private final HashMap<String, Term> mcrMap = new HashMap<String, Term>(10);
     
     private Term translateMetaClassReference(MetaClassReference mcr) {
 //	    throw new IllegalArgumentException("Convert MCR to a constant");
 //            return intLDT.translateLiteral( new CharLiteral('X'));
         String name = mcr.getTypeReference().getName().intern();
         
-        if (mcrMap.containsKey(name)) return (Term) mcrMap.get(name);
+        if (mcrMap.containsKey(name)) return mcrMap.get(name);
 
         final Sort dummySort = services.getJavaInfo().getJavaLangObjectAsSort();       
         final Term tMCR = func(new RigidFunction(new Name(name), 
@@ -300,7 +300,7 @@ public class TypeConverter extends TermBuilder {
 	    if(prefix.getReferencePrefix()!=null && (prefix.getReferencePrefix() instanceof TypeReference)){
 	        TypeReference tr = (TypeReference) prefix.getReferencePrefix();
 	        KeYJavaType kjt = tr.getKeYJavaType();
-	        return findThisForSort(kjt.getSort(), ec);
+	        return findThisForSortExact(kjt.getSort(), ec);
 	    }
 	    return convertToLogicElement(ec.getRuntimeInstance());
 	} else {            
@@ -311,17 +311,25 @@ public class TypeConverter extends TermBuilder {
 	}
     }
     
+    public Term findThisForSortExact(Sort s, ExecutionContext ec){
+        ProgramElement pe = ec.getRuntimeInstance();
+        if(pe == null) return null;
+        Term inst = convertToLogicElement(pe, ec);
+        return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType(), true);
+    }
+    
     public Term findThisForSort(Sort s, ExecutionContext ec){
         ProgramElement pe = ec.getRuntimeInstance();
         if(pe == null) return null;
         Term inst = convertToLogicElement(pe, ec);
-        return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType());
+        return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType(), false);
     }
     
-    public Term findThisForSort(Sort s, Term self, KeYJavaType context){
+    public Term findThisForSort(Sort s, Term self, KeYJavaType context, boolean exact){
         Term result = self;
         ProgramVariable inst;
-        while(!context.getSort().extendsTrans(s)){
+        while(!exact && !context.getSort().extendsTrans(s) ||
+                 exact && !context.getSort().equals(s)){
             inst = services.getJavaInfo().getAttribute(
                     ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, context);
             result = dot(result, inst);

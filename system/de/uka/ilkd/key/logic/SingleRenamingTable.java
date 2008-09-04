@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 
 
 
@@ -29,7 +30,9 @@ public class SingleRenamingTable extends RenamingTable{
     }
     
     public String toString(){
-	return ("SingleRenamingTable: "+oldVar+" -> "+newVar);
+        LocationVariable ov = (LocationVariable) oldVar;
+        LocationVariable nv = (LocationVariable) newVar;
+	return ("SingleRenamingTable: "+oldVar+" id: "+ ov.id() +" -> "+newVar + " id: " + nv.id());
     }
     
     public HashMap getHashMap(){

@@ -63,6 +63,13 @@ public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
 	return extendsSorts;
     }
 
+    /**
+     * returns the element sort of the array
+     */
+    public Sort elementSort() {
+	return sk.elemSort;
+    }
+
     
     /** 
      * returns elemSort([])^n.

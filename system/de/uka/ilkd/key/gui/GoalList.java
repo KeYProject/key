@@ -13,9 +13,6 @@ package de.uka.ilkd.key.gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
@@ -23,6 +20,8 @@ import java.util.WeakHashMap;
 import javax.swing.*;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.logic.Sequent;
@@ -50,16 +49,21 @@ public class GoalList extends JList {
     /** listens to gui events */
     private GoalListGUIListener guiListener; 
 
-    private MouseListener mouseListener = new GoalListMouseListener();
+    /**
+     * 
+     * choose goal as soon as selected
+     *
+     */
+    public class GoalListSelectionListern implements ListSelectionListener {
 
-
-    private class GoalListMouseListener extends MouseAdapter 
-	implements java.io.Serializable {
-	public void mouseClicked(MouseEvent e) {
-	    if (e.getClickCount() == 1) {
-		goalChosen();
-	    }
-	}
+        public void valueChanged(ListSelectionEvent e) {
+            final int firstIndex = e.getFirstIndex();
+            if (firstIndex>=0 && firstIndex<GoalList.this.getModel().getSize()) {
+                if (mediator.getSelectedGoal() != GoalList.this.getSelectedValue()) {
+                    goalChosen();
+                }
+            }
+        }
     }
     
 
@@ -75,7 +79,7 @@ public class GoalList extends JList {
         selectingListModel.setProof ( mediator.getSelectedProof () );
 	setModel(selectingListModel);
 	setCellRenderer(new IconCellRenderer());
-	addMouseListener(mouseListener);		
+	addListSelectionListener(new GoalListSelectionListern());
 	updateUI();
     }
 
@@ -154,7 +158,7 @@ public class GoalList extends JList {
 
         validate ();
     }
-    
+
     
     private class GoalListGUIListener implements GUIListener,
                                          java.io.Serializable {
@@ -176,10 +180,15 @@ public class GoalList extends JList {
 
     private class GoalListSelectionListener implements KeYSelectionListener {
 
-	/** focused node has changed */
-	public void selectedNodeChanged(KeYSelectionEvent e) {
-	    selectSelectedGoal();
-	}
+        /** focused node has changed */
+        public void selectedNodeChanged(KeYSelectionEvent e) {
+            selectSelectedGoal();
+        }
+
+        /** focused goal has changed */
+        public void selectedGoalChanged(KeYSelectionEvent e) {
+            selectSelectedGoal();
+        }
 
 	/** the selected proof has changed (e.g. a new proof has been
 	 * loaded) */ 
@@ -334,6 +343,9 @@ public class GoalList extends JList {
 		clear();
 	    }
 
+	    public void proofIsBeingPruned(ProofTreeEvent e) {
+	    }
+
 	    /** The proof tree has been pruned under the node mentioned in the
 	     * ProofTreeEvent.  In other words, that node should no longer
 	     * have any children now.  Any nodes that were not descendants of
@@ -366,6 +378,7 @@ public class GoalList extends JList {
 	        clear ();
                 add ( e.getSource ().openGoals () );
             }
+
 	}
     }
 
@@ -548,8 +561,7 @@ public class GoalList extends JList {
                 final int changeBegin = begin;
                 final int changeEnd = end - 1;
                 if ( changeEnd >= changeBegin )
-                    fireContentsChanged ( this, changeBegin, changeEnd );
-                selectSelectedGoal(); // this should rather be done by modifying the SelectionModel
+                    fireContentsChanged ( this, changeBegin, changeEnd );  
             }
 
             public void intervalAdded (ListDataEvent e) {
@@ -564,8 +576,6 @@ public class GoalList extends JList {
                 final int addEnd = end - 1;
                 if ( addEnd >= addBegin )
                     fireIntervalAdded ( this, addBegin, addEnd );               
-                selectSelectedGoal(); // this should rather be done by modifying
-                                      // the SelectionModel
             }
 
             public void intervalRemoved (ListDataEvent e) {
@@ -580,8 +590,6 @@ public class GoalList extends JList {
                 final int remEnd = begin + ( oldSize - entries.size () ) - 1;
                 if ( remEnd >= remBegin )
                     fireIntervalRemoved ( this, remBegin, remEnd );                
-                selectSelectedGoal(); // this should rather be done by modifying
-                                      // the SelectionModel
             }
         }
 

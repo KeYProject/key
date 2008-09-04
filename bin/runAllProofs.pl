@@ -16,7 +16,8 @@ my $path_to_pe = "../system/proofExamples/";
 my $path_to_automated = "index/";
 my $automaticfol_txt = "automaticFOL.txt";
 my $automaticjavadl_txt = "automaticJAVADL.txt";
-my $not_provable_txt = "notProvable.txt";
+my $not_provablefol_txt = "notProvableFOL.txt";
+my $not_provablejavadl_txt = "notProvableJavaDL.txt";
 my $interactive_txt = "interactive.txt";
 my $quit_with_error_txt = "quitWithError.txt";
 chdir $bin_path;
@@ -25,7 +26,7 @@ print "$absolute_bin_path\n";
 chdir $path_to_pe;
 
 if ($option{h}) {
-  print "runs all proofs listed in the files: $automaticfol_txt, $automaticjavadl_txt, $interactive_txt, $not_provable_txt and $quit_with_error_txt .\n";
+  print "runs all proofs listed in the files: $automaticfol_txt, $automaticjavadl_txt, $interactive_txt, $not_provablefol_txt, $not_provablejavadl_txt and $quit_with_error_txt .\n";
   print "They can be found in " .  $bin_path . "/" . $path_to_pe .  "\n\n";
   print "Use '-m email\@address.com' to send the report as an email to the specified address.\n";
   print "Use '-h' to get this text (very necessary this line).\n";
@@ -56,10 +57,16 @@ open (AUTOMATIC, $path_to_automated . $automaticjavadl_txt) or
 my @automatic_JAVADL = <AUTOMATIC>;
 close AUTOMATIC;
 
-open (NOT_PROVABLE, $path_to_automated . $not_provable_txt) or
-  die  $bin_path . "/" . $path_to_pe . $not_provable_txt . " couldn't be opened.";
-my @not_provable = <NOT_PROVABLE>;
+open (NOT_PROVABLE, $path_to_automated . $not_provablefol_txt) or
+  die  $bin_path . "/" . $path_to_pe . $not_provablefol_txt . " couldn't be opened.";
+my @not_provableFOL = <NOT_PROVABLE>;
 close NOT_PROVABLE;
+
+open (NOT_PROVABLE, $path_to_automated . $not_provablejavadl_txt) or
+  die  $bin_path . "/" . $path_to_pe . $not_provablejavadl_txt . " couldn't be opened.";
+my @not_provableJavaDL = <NOT_PROVABLE>;
+close NOT_PROVABLE;
+
 
 open (INTERACTIVE, $path_to_automated . $interactive_txt) or
   die  $bin_path . "/" . $path_to_pe . $interactive_txt . " couldn't be opened.";
@@ -152,7 +159,7 @@ my %erroneous;
 
 
 
-  foreach my $dotkey (@not_provable) {
+  foreach my $dotkey (@not_provableFOL) {
     $dotkey = &fileline($dotkey);
 
    open (HANDLE, $dotkey) or die  $dotkey. " couldn't be opened.";
@@ -166,6 +173,41 @@ my %erroneous;
    open (HANDLE, ">".$dotkey);
    if (!$cnt) {
        foreach my $line (@headerFOL) {
+	   print HANDLE $line;
+       }
+   }
+   foreach my $line (@old) {
+     print HANDLE $line;
+   }
+   close HANDLE;
+
+    if ($dotkey) {
+      my $success = runAuto ($dotkey);
+      if ( $success == 0) {
+        &processReturn (1, "should not be provable", $dotkey);
+      } elsif ($success == 1) {
+        &processReturn (0, "indeed not provable", $dotkey);
+      } else {
+        &processReturn (2, "error in proof", $dotkey);
+      }
+    }
+  }
+
+
+  foreach my $dotkey (@not_provableJavaDL) {
+    $dotkey = &fileline($dotkey);
+
+   open (HANDLE, $dotkey) or die  $dotkey. " couldn't be opened.";
+   my $cnt=grep /\\settings/, <HANDLE>;
+   close HANDLE;
+
+   #the following should be put in a sub routine
+   open (HANDLE, $dotkey) or die  $dotkey. " couldn't be opened.";
+   my @old = <HANDLE>;
+   close HANDLE;
+   open (HANDLE, ">".$dotkey);
+   if (!$cnt) {
+       foreach my $line (@headerJavaDL) {
 	   print HANDLE $line;
        }
    }
@@ -263,6 +305,7 @@ sub runAuto {
   #  system $bin_path . "/runProver $_[0] auto";
   my $dk = &getcwd . "/$_[0]";
   #  print "$dk .-. ";
+  sleep(1);
   my $result = system $absolute_bin_path . "/runProver $dk auto print_statistics " . $absolute_bin_path . "/../examples/statistics.csv";
   #chdir "/home/daniels/programme/kruscht/";
   #my $result = system 'java RetVal';

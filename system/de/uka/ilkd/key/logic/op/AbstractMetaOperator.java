@@ -146,6 +146,9 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     public static final AbstractMetaOperator METABOOL2LOGIC = new MetaBool2Logic();
 
     
+    /** metaconstruct for strictly pure method calls */
+    public static final AbstractMetaOperator META_METHOD_CALL_TO_UPDATE= new MethodCallToUpdate();
+
     public static final Sort METASORT = new PrimitiveSort(new Name("Meta"));
 
     

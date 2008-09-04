@@ -2,6 +2,7 @@ package de.uka.ilkd.key.visualdebugger.executiontree;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.ListOfTerm;
@@ -14,6 +15,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.visualdebugger.DebuggerPO;
 import de.uka.ilkd.key.visualdebugger.ProofStarter;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
+import de.uka.ilkd.key.visualdebugger.watchpoints.WatchPoint;
 
 /**
  * A node of an execution tree representing the control flow of a program.
@@ -25,7 +27,8 @@ import de.uka.ilkd.key.visualdebugger.VisualDebugger;
  * been wanted. This bug applies to all subclasses as well.
  */
 public class ETNode {
-    private LinkedList children = new LinkedList();
+    
+    private LinkedList<ETNode> children = new LinkedList<ETNode>();
 
     private ETMethodInvocationNode lastMethodInvocation = null;
 
@@ -37,12 +40,15 @@ public class ETNode {
             .getMediator();
 
     private ListOfTerm bc = SLListOfTerm.EMPTY_LIST;
+    private List<WatchPoint> watchpointsSatisfied = null;
 
     // ListOfTerm pc= SLListOfTerm.EMPTY_LIST;
-    private LinkedList itNodes = new LinkedList();
+    private LinkedList<ITNode> itNodes = new LinkedList<ITNode>();
 
     private boolean nobc = false;
-
+    private boolean isCollapsed = false;
+    private boolean isWatchpoint = false;
+    
     private ListOfTerm simplifiedBC = null;
 
     public ETNode(ListOfTerm bc, ETNode parent) {
@@ -51,7 +57,7 @@ public class ETNode {
         this.setMethodInvocation();
     }
 
-    public ETNode(ListOfTerm bc, LinkedList itNodes, ETNode parent) {
+    public ETNode(ListOfTerm bc, LinkedList<ITNode> itNodes, ETNode parent) {
         this.bc = bc;
         this.itNodes = itNodes;
         this.parent = parent;
@@ -75,7 +81,7 @@ public class ETNode {
         children.add(n);
     }
 
-    public void setChildren(LinkedList n) {
+    public void setChildren(LinkedList<ETNode> n) {
         this.children = n;
     }
 
@@ -83,7 +89,7 @@ public class ETNode {
         return (ETNode[]) children.toArray(new ETNode[children.size()]);
     }
 
-    public LinkedList getChildrenList() {
+    public LinkedList<ETNode> getChildrenList() {
         return children;
     }
 
@@ -118,7 +124,7 @@ public class ETNode {
      * 
      * @param nodes
      */
-    public void addITNodes(LinkedList nodes) {
+    public void addITNodes(LinkedList<ITNode> nodes) {
         this.itNodes.addAll(nodes);
     }
 
@@ -127,7 +133,7 @@ public class ETNode {
      * 
      * @return a LinkedList with the ITNodes associated to this ETNodes
      */
-    public LinkedList getITNodes() {
+    public LinkedList<ITNode> getITNodes() {
         return itNodes;
     }
 
@@ -139,8 +145,9 @@ public class ETNode {
      * would destroy the old tree
      * 
      */
-    public ETNode copy(ETNode p) {
-        ETNode copy = new ETNode(bc, (LinkedList) itNodes.clone(), p);
+    public ETNode copy(ETNode p) {        
+        final ETNode copy = 
+            new ETNode(bc, (LinkedList<ITNode>) itNodes.clone(), p);
         copy.setChildren((LinkedList) children.clone());
         return copy;
     }
@@ -199,7 +206,7 @@ public class ETNode {
 
     public ListOfNode getProofTreeNodes() {
         ListOfNode result = SLListOfNode.EMPTY_LIST;
-        for (Iterator it = itNodes.iterator(); it.hasNext();) {
+        for (Iterator<ITNode> it = itNodes.iterator(); it.hasNext();) {
             result = result.append(((ITNode) it.next()).getNode());
 
         }
@@ -207,7 +214,7 @@ public class ETNode {
     }
 
     public boolean representsProofTreeNode(Node n) {
-        for (Iterator it = itNodes.iterator(); it.hasNext();) {
+        for (Iterator<ITNode> it = itNodes.iterator(); it.hasNext();) {
             if (((ITNode) it.next()).getNode().equals(n))
                 return true;
 
@@ -273,5 +280,29 @@ public class ETNode {
                         "DebuggerStrategy", new StrategyProperties())));
         ps.run(mediator.getProof().env());
         return ps.getProof().closed();
+    }
+
+    public boolean isCollapsed() {
+        return isCollapsed;
+    }
+
+    public void setCollapsed(boolean isCollapsed) {
+        this.isCollapsed = isCollapsed;
+    }
+
+    public boolean isWatchpoint() {
+        return isWatchpoint;
+    }
+
+    public void setWatchpoint(boolean isWatchpoint) {
+        this.isWatchpoint = isWatchpoint;
+    }
+
+    public List<WatchPoint> getWatchpointsSatisfied() {
+        return watchpointsSatisfied;
+    }
+
+    public void setWatchpointsSatisfied(List<WatchPoint> watchpointsSatisfied) {
+        this.watchpointsSatisfied = watchpointsSatisfied;
     }
 }

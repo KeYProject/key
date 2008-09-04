@@ -64,6 +64,7 @@ public class ProblemLoader implements Runnable {
     LinkedList loadedInsts = null;
     ListOfIfFormulaInstantiation ifSeqFormulaList =
         SLListOfIfFormulaInstantiation.EMPTY_LIST;
+    Constraint matchConstraint = null;
 
 
     ProblemInitializer init;
@@ -231,7 +232,7 @@ public class ProblemLoader implements Runnable {
                            initConfig.setOriginalKeYFileName(envInput.name());
                        }
         	       POBrowser poBrowser = POBrowser.showInstance(initConfig);        	       
-        	       po = poBrowser.getPO();
+        	       po = poBrowser.getAndClearPO();
         	       if(po == null) {
         		   return "Aborted.";
         	       }
@@ -246,23 +247,51 @@ public class ProblemLoader implements Runnable {
                currNode = proof.root(); // initialize loader
                children = currNode.childrenIterator(); // --"--
                iconfig = proof.env().getInitConfig();
-               if (!keepProblem) {
-                   init.tryReadProof(this, po);
-               } else {
-                   setStatusLine("Loading proof", (int)file.length());
-                   CountingBufferedInputStream cinp =
-                       new CountingBufferedInputStream(
-                           new FileInputStream(file),
-                           pm,
-                           (int)file.length()/100);
-                   KeYLexer lexer = new KeYLexer(cinp,
-                       proof.getServices().getExceptionHandler());
-                   KeYParser parser = new KeYParser(ParserMode.PROBLEM, lexer, 
-                                                    proof.getServices());
-                   antlr.Token t;
-                   do { t = lexer.getSelector().nextToken();
-                   } while (t.getType() != KeYLexer.PROOF);
-                   parser.proofBody(this);
+               try {
+                   if (!keepProblem) {
+                       init.tryReadProof(this, po);
+                   } else {
+                       setStatusLine("Loading proof", (int)file.length());
+                       CountingBufferedInputStream cinp =
+                           new CountingBufferedInputStream(
+                                   new FileInputStream(file),
+                                   pm,
+                                   (int)file.length()/100);
+                       KeYLexer lexer = new KeYLexer(cinp,
+                               proof.getServices().getExceptionHandler());
+                       KeYParser parser = new KeYParser(ParserMode.PROBLEM, lexer, 
+                               proof.getServices());
+                       antlr.Token t;
+                       do { t = lexer.getSelector().nextToken();
+                       } while (t.getType() != KeYLexer.PROOF);
+                       parser.proofBody(this);
+                   }
+               } finally {
+                    if (constraints.size() > 0) {
+                        Term left, right;
+                        for (Iterator<PairOfString> it = constraints.iterator(); it
+                                .hasNext();) {
+                            PairOfString p = it.next();
+                            left = parseTerm(p.left, proof);
+                            right = parseTerm(p.right, proof);
+
+                            if (left == null || right == null) {
+                                continue;
+                            }
+
+                            if (!(left.sort().extendsTrans(right.sort()) || right
+                                    .sort().extendsTrans(left.sort()))) {
+                                continue;
+                            }
+
+                            if (!Constraint.BOTTOM.unify(left, right, null)
+                                    .isSatisfiable()) {
+                                continue;
+                            }
+
+                            proof.getUserConstraint().addEquality(left, right);
+                        }
+                    }
                }
 	       setStandardStatusLine();
            
@@ -297,6 +326,8 @@ public class ProblemLoader implements Runnable {
         proofSettings.loadSettingsFromString(preferences);
     }
 
+    private Vector<PairOfString> constraints = new Vector<PairOfString>();
+
     // note: Expressions without parameters only emit the endExpr signal
     public void beginExpr(char id, String s) {
         //System.out.println("start "+id+"="+s);
@@ -316,6 +347,7 @@ public class ProblemLoader implements Runnable {
             currPosInTerm = PosInTerm.TOP_LEVEL;
             loadedInsts   = null;
             ifSeqFormulaList = SLListOfIfFormulaInstantiation.EMPTY_LIST;
+            matchConstraint = Constraint.BOTTOM;
             break;
 
         case 'f' :
@@ -380,6 +412,41 @@ public class ProblemLoader implements Runnable {
             }
         case 'z': // old save mode only for compatibility
             hoareLoopInv = s;
+            break;
+        case 'o' : //userconstraint
+            final int i = s.indexOf('=');
+
+            if (i < 0) {
+                break;
+            }
+
+            constraints.add(new PairOfString(s.substring(0, i),
+                    s.substring(i + 1)));
+            break;
+        case 'm' : //matchconstraint
+            final int index = s.indexOf('=');
+
+            if (index < 0) {
+                break;
+            }
+
+            final Term left = parseTerm(s.substring(0, index), proof);
+            final Term right = parseTerm(s.substring(index + 1), proof);
+
+            if (!(left.sort().extendsTrans(right.sort()) || right.sort()
+                    .extendsTrans(left.sort()))) {
+                break;
+            }
+
+            matchConstraint = matchConstraint.unify(left, right, null);
+            break;
+        case 'w' : //newnames
+            final String[] newNames = s.split(",");
+            ListOfName l = SLListOfName.EMPTY_LIST;
+            for (int in = 0; in < newNames.length; in++) {
+                l = l.append(new Name(newNames[in]));
+            }
+            proof.getNameRecorder().setProposals(l);
             break;
         }
     }
@@ -539,6 +606,12 @@ public class ProblemLoader implements Runnable {
             ourApp = NoPosTacletApp.createNoPosTacletApp(t);
         }
 
+        if (matchConstraint != Constraint.BOTTOM) {
+            ourApp = ourApp.setMatchConditions(new MatchConditions(ourApp
+                    .instantiations(), matchConstraint, ourApp
+                    .newMetavariables(), RenameTable.EMPTY_TABLE));
+        }
+
         Constraint userC = mediator.getUserConstraint().getConstraint();
         Services services = mediator.getServices();
 
@@ -629,10 +702,18 @@ public class ProblemLoader implements Runnable {
             int eq = s.indexOf('=');
             String varname = s.substring(0, eq);
             String value = s.substring(eq+1, s.length());
-            if (varname.startsWith(NameSV.NAME_PREFIX)) {
-                app = app.addInstantiation(new NameSV(varname), new Name(value));
+
+            // reklov
+            // START TEMPORARY DOWNWARD COMPATIBILITY
+
+            if (varname.startsWith("_NAME")) {
+                app = app.addInstantiation(de.uka.ilkd.key.rule.inst.
+                        SVInstantiations.EMPTY_SVINSTANTIATIONS.add(
+                        new NameSV(varname), new Name(value)));
                 continue;
             }
+
+            // END TEMPORARY DOWNWARD COMPATIBILITY
 
             SchemaVariable sv = lookupName(uninsts, varname);
             if (sv==null) {
@@ -680,7 +761,22 @@ public class ProblemLoader implements Runnable {
                                        "\nVar namespace is: "+varNS+"\n", e);
         }
     }
-
+    public static Term parseTerm(String value, Services services,
+            Namespace varNS, Namespace progVar_ns) {
+        try { 
+            return TermParserFactory.createInstance().
+                parse(new StringReader(value), null,
+                      services,
+                      varNS,
+                      services.getNamespaces().functions(),
+                      services.getNamespaces().sorts(),
+                      progVar_ns,
+                      new AbbrevMap());
+        } catch(ParserException e) {
+            throw new RuntimeException("Error while parsing value "+value+
+                                       "\nVar namespace is: "+varNS+"\n", e);
+        }
+    }
 
     public static SetOfLocationDescriptor parseLocationList(String value, Goal targetGoal) {
         SetOfLocationDescriptor result = null;
@@ -750,6 +846,17 @@ public class ProblemLoader implements Runnable {
 
     public KeYExceptionHandler getExceptionHandler() {
         return exceptionHandler;
+    }
+
+    private static class PairOfString {
+        public String left;
+        public String right;
+
+        public PairOfString ( String p_left, String p_right ) {
+            left  = p_left;
+            right = p_right;
+        }
+
     }
 
 }

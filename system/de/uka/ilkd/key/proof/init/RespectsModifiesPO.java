@@ -40,7 +40,9 @@ public class RespectsModifiesPO extends EnsuresPO {
 	    		      OperationContract contract,
                               SetOfClassInvariant assumedInvs) {
         super(initConfig,
-              "RespectsModifies", 
+              "RespectsModifies (" 
+                + contract.getProgramMethod() + ", " 
+                + contract.getDisplayName() + ")", 
               contract.getProgramMethod(), 
               Modality.BOX, 
               assumedInvs,
@@ -72,7 +74,8 @@ public class RespectsModifiesPO extends EnsuresPO {
         //build java block
         MethodBodyStatement call 
                 = new MethodBodyStatement(programMethod,
-                                          javaInfo.createTypeReference(javaInfo.getJavaLangObject()),
+                                          javaInfo.createTypeReference(
+                                                 javaInfo.getJavaLangObject()),
                                           null,
                                           new ArrayOfExpression());
         StatementBlock sb = new StatementBlock(call);
@@ -93,7 +96,8 @@ public class RespectsModifiesPO extends EnsuresPO {
                               ListOfProgramVariable paramVars, 
                               ProgramVariable resultVar,
                               ProgramVariable exceptionVar,
-                              Map<Operator, Function/*atPre*/> atPreFunctions) throws ProofInputException {
+                              Map<Operator, Function/*atPre*/> atPreFunctions) 
+                                                throws ProofInputException {
         buildUpdateAnonMethodTerm(selfVar, paramVars);
         Term preTerm = translatePre(contract, selfVar, toPV(paramVars));
         Term result = TB.and(preTerm, updateAnonMethodTerm);
@@ -115,6 +119,15 @@ public class RespectsModifiesPO extends EnsuresPO {
         return result;
     }
     
+    
+    public boolean implies(ProofOblInput po) {
+        if(!(po instanceof RespectsModifiesPO)) {
+            return false;
+        }
+        RespectsModifiesPO rmPO = (RespectsModifiesPO) po;
+        return contract.equals(rmPO.contract)
+               && assumedInvs.subset(rmPO.assumedInvs);
+    }
     
     
     public boolean equals(Object o) {

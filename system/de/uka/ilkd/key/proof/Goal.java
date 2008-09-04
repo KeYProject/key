@@ -565,15 +565,14 @@ public class Goal  {
 	final Node parent = node.parent();
 	final Iterator<Node> leavesIt = parent.leavesIterator();
 	while (leavesIt.hasNext()) {
-	    Node n=leavesIt.next();
+	    Node n = leavesIt.next();
 	 
 	    final IteratorOfGoal goalIt = goalList.iterator();
 	    while (goalIt.hasNext()) {
 		final Goal g = goalIt.next();
 	
 		if (g.node()==n && g!=this) {
-		    goalList=goalList.removeFirst(g);
-		   
+		    goalList=goalList.removeFirst(g);		   
 		}
 	    }
 	}
@@ -657,9 +656,13 @@ public class Goal  {
         addGoalListener(journal);
         
         final RuleApp ruleApp = completeRuleApp( p_ruleApp ); 
+
+        final Node n = node;
         
         final ListOfGoal goalList = ruleApp.execute(this,  
                 proof.getServices());
+
+        proof.saveNameRecorder(n);
         
         if ( goalList == null ) {
             // this happens for the simplify decision procedure
@@ -697,7 +700,7 @@ public class Goal  {
     }
 
 
-    public void applyUpdateSimplifier (boolean antec) {
+    private void applyUpdateSimplifier (boolean antec) {
 	    final Constraint userConstraint =
 	        proof().getUserConstraint ().getConstraint ();
 	    final BuiltInRule rule = UpdateSimplificationRule.INSTANCE;
@@ -729,8 +732,8 @@ public class Goal  {
 	return result;
     }
 
-    /** make Taclet instantions complete with regard to metavariables and
-     * skolem functions
+    /** make Taclet instantiations complete with regard to metavariables and
+     * Skolemfunctions
      */ 
     private RuleApp completeRuleApp ( RuleApp ruleApp ) {
         final Proof proof = proof();
@@ -758,5 +761,12 @@ public class Goal  {
 	    ruleAppListenerList.remove(p);
 	}
     }
-
+    // %%%%%%%% HACK !!! REMOVE AS SOON AS POSSIBLE %%%%%%
+    public static List getRuleAppListener(){
+        return ruleAppListenerList;
+    }
+    public static void setRuleAppListenerList(List ruleAppListenerList){
+        Goal.ruleAppListenerList = ruleAppListenerList;
+    }
+    // %%%%%%%%%%%%%%%%
 }

@@ -40,7 +40,7 @@ public class RKeYMetaConstruct extends JavaStatement
     protected String name="";
 
     /** schemavariable needed by meta construct */
-    private List sv = new Vector(); //of ProgramVariableSVWrapper
+    private List<SVWrapper> sv = new Vector<SVWrapper>(); //of ProgramVariableSVWrapper
 
     /**
      Loop statement.
@@ -181,15 +181,15 @@ public class RKeYMetaConstruct extends JavaStatement
      * @return first schemavariable needed by the metaconstruct
      */
     public SVWrapper getFirstSV() {
-        return (SVWrapper)sv.get(0);
+        return sv.get(0);
     }
 
     public ProgramSV[] getSV() {
 	ProgramSV[] res = new ProgramSV[sv.size()];
-	Iterator it = sv.iterator();
+	Iterator<SVWrapper> it = sv.iterator();
 	int i=0;
 	while (it.hasNext()) {
-	    res[i++]=(ProgramSV)((SVWrapper)it.next()).getSV();
+	    res[i++]=(ProgramSV)it.next().getSV();
 	}
 	return res;
     }

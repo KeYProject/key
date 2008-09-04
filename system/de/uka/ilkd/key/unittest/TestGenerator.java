@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.*;
+import de.uka.ilkd.key.unittest.ppAndJavaASTExtension.*;
 import de.uka.ilkd.key.util.*;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 import de.uka.ilkd.key.logic.*;
@@ -29,16 +30,17 @@ public class TestGenerator{
 
     private StringWriter w;
     private Services serv;
-    private JavaInfo ji;
+    private JavaInfo ji;//It should be possible to get rid of JavaInfo entirely if all KeYJavaTypes are "replaced" by SyntacticalTypeRefs. This would make the class more independent from the type system known by in JavaInfo.
 
-    private KeYJavaType testCase;
-    private KeYJavaType testSuite;
+    private SyntacticalTypeRef testCase;
+    private SyntacticalTypeRef testSuite;
+    private SyntacticalTypeRef testTypeRef;
+    private SyntacticalTypeRef stringBufferType;
     private KeYJavaType b;
     private KeYJavaType intType;
-    private Type suiteType;
-    private TypeRef testTypeRef;
     private String fileName;
     private String path=null;
+    private String resultName = "_oracleResult";
 
     private Random rand;
 
@@ -69,16 +71,25 @@ public class TestGenerator{
 	this.serv = serv;
 	ExtList l = new  ExtList();
 	l.add(new ProgramElementName(fileName));
-	suiteType = new ClassDeclaration(l, new ProgramElementName(fileName),
-					 false);
-	KeYJavaType testType = new KeYJavaType(suiteType,
-					       new ClassInstanceSortImpl(
-						   new Name(fileName), false));
-	testTypeRef = new TypeRef(testType);
-	testCase = ji.getKeYJavaTypeByClassName("junit.framework.TestCase");
-	testSuite = ji.getKeYJavaTypeByClassName("junit.framework.TestSuite");
-	b = ji.getTypeByName("boolean");
-	intType = ji.getTypeByName("int");
+    
+	Type suiteType = new ClassDeclaration(l, new ProgramElementName(fileName), false);
+        testTypeRef = new SyntacticalTypeRef(suiteType);
+        
+	testCase    = new SyntacticalTypeRef(
+	                new ClassDeclaration(
+	                        new ProgramElementName("TestCase"), 
+	                        new ProgramElementName("junit.framework.TestCase")));
+        testSuite   = new SyntacticalTypeRef(
+                        new ClassDeclaration(
+                                new ProgramElementName("TestSuite"), 
+                                new ProgramElementName("junit.framework.TestSuite")));
+        stringBufferType = new SyntacticalTypeRef(
+                            new ClassDeclaration(
+                                new ProgramElementName("StringBuffer"),
+                                new ProgramElementName("java.lang.StringBuffer")));
+
+	b = ji.getTypeByName("boolean"); //You can create a SyntacticalTypeRef for BooleanType as well if JavaInfo doesn't provide it (as it should be in a clean typesystem for JavaCard).
+	intType = ji.getTypeByName("int"); //You can create a SyntacticalTypeRef for Integer type as well if JavaInfo doesn't provide it (as it should be in a clean typesystem for JavaCard).
 	suiteMethod = createSuiteMethod();
 	rand = new Random();
     }
@@ -96,7 +107,7 @@ public class TestGenerator{
      */
     private ClassDeclaration createSuiteClass(ExtList l){
 	l.add(new Public());
-	l.add(new Extends(new TypeRef(testCase)));
+	l.add(new Extends(testCase));
 	l.add(new ProgramElementName(fileName));
 	ClassDeclaration result = 
 	    new ClassDeclaration(l, new ProgramElementName(fileName), false);
@@ -385,28 +396,29 @@ public class TestGenerator{
 	    ib[i+1] = code[i];
 	}
 	
-	KeYJavaType sb = 
-	    ji.getKeYJavaTypeByClassName("java.lang.StringBuffer");
-	New cons = new New(new Expression[0], new TypeRef(sb), null);
-	ProgramVariable buffer = 
-	    new LocationVariable(new ProgramElementName("buffer"), sb);
-	ib[code.length+1] = new LocalVariableDeclaration(new TypeRef(sb), 
-					    new VariableSpecification(buffer));
+	New cons = new New(new Expression[0], stringBufferType, null);
+	SyntacticalProgramVariable buffer = 
+	    new SyntacticalProgramVariable(new ProgramElementName("buffer"), 
+	                                    stringBufferType.type);
+	ib[code.length+1] = new LocalVariableDeclaration(
+	                            stringBufferType, 
+	                            new VariableSpecification(buffer, buffer.type));
 	ib[code.length+2] = new CopyAssignment(buffer, cons);
 
 	ProgramVariable result = 
-	    new LocationVariable(new ProgramElementName("result"), b);
+	    new LocationVariable(new ProgramElementName(resultName), b);
 	ib[code.length+3] = new LocalVariableDeclaration(new TypeRef(b), 
 					    new VariableSpecification(result));
 	MethodReference oracle = getOracle(post, buffer, children);
 	ib[code.length+4] = new CopyAssignment(result, oracle);
-	ProgramMethod assertTrue = 
+/* This variable seems to be unused. JavaInfo methods cannot be applied on SyntacticalTypeReferences. This is on purpose.
+ 	ProgramMethod assertTrue = 
 	    ji.getProgramMethod(testCase, "assertTrue", 
 				SLListOfKeYJavaType.EMPTY_LIST.
 				append(ji.getKeYJavaTypeByClassName(
 					   "java.lang.String")).append(b),
 				testCase);
-	Expression failure = 
+*/	Expression failure = 
 	    new StringLiteral("\\nPost evaluated to false.\\n"+
 			      "Variable/Location Assignments:\\n");
 	for(int i=0; i<testLocation.length; i++){
@@ -570,25 +582,31 @@ public class TestGenerator{
      * which is needed for junit test suites.
      */
     private MethodDeclaration createSuiteMethod(){
-	TypeRef testSuiteRef = new TypeRef(testSuite);
 	ExtList l = new  ExtList();
 	l.add(new ProgramElementName("suite"));
 	l.add(new Public());
 	l.add(new Static());
-	l.add(testSuiteRef);
+	l.add(testSuite);
 	Statement[] s = new Statement[3];
 
-	ProgramVariable suite = 
-	    new LocationVariable(new ProgramElementName("suite"),
-				testSuite);
-	s[0] = new LocalVariableDeclaration(testSuiteRef,
-					    new VariableSpecification(suite));
+	SyntacticalProgramVariable suite = 
+	    new SyntacticalProgramVariable(new ProgramElementName("suiteVar"),
+				testSuite.type);
+	s[0] = new LocalVariableDeclaration(testSuite,
+					    new VariableSpecification(suite, suite.type));
 	Expression[] arg = new Expression[1];
 	arg[0] = new MetaClassReference(testTypeRef);
-	New cons = new New(arg, testSuiteRef, null);
+	New cons = new New(arg, testSuite, null);
 	s[1] = new CopyAssignment(suite, cons);
 	s[2] = new Return(suite);
 	StatementBlock mBody = new StatementBlock(s);
+	/*The visitor is applied on SyntacticalProgramVariable
+	* and the visitor must be implemented such that effectively
+	* CreatingASTVisitor.doDefaultAction(x) is invoked where x is
+	* the SyntacticalProgramVariable. For this the Visitor interface
+	* was be extended, to support actions on IProgramVariable from which
+	* SyntacticalProgramVariable is derived.
+	*/
 	FieldReplaceVisitor frv = new FieldReplaceVisitor(mBody, serv);
 	frv.start();
 	l.add(frv.result());
@@ -658,7 +676,7 @@ public class TestGenerator{
 	}
 
         ClassDeclaration suite = createSuiteClass(l);
-	PrettyPrinter pp = new PrettyPrinter(w, false, true);
+	PrettyPrinter pp = new CompilableJavaPP(w, false);
 	try{
 	    // write the file to disk
 	    pp.printClassDeclaration(suite);
@@ -690,8 +708,8 @@ public class TestGenerator{
 		kjt.getJavaType() instanceof InterfaceDeclaration) &&
 	       ((TypeDeclaration) kjt.getJavaType()).getPositionInfo().
 	       getFileName() != null &&
-	       ((TypeDeclaration) kjt.getJavaType()).getPositionInfo().
-	       getFileName().indexOf("resources")==-1){
+               ((TypeDeclaration) kjt.getJavaType()).getPositionInfo().
+               getFileName().indexOf(serv.getProof().getJavaModel().getModelDir())!=-1){
 
 		StringWriter sw = new StringWriter();
 		PrettyPrinter pp = new PrettyPrinter(sw, false, true);
@@ -711,7 +729,7 @@ public class TestGenerator{
 		    String header = getHeader(fn);
 
 		    File dir = new File(directory+
-					fn.substring(0, fn.lastIndexOf(
+					fn.substring(fn.indexOf(File.separator), fn.lastIndexOf(
 							 File.separator)));
 		    fn = fn.substring(fn.lastIndexOf(File.separator)+1);
 		    if(!dir.exists()){
@@ -811,7 +829,7 @@ public class TestGenerator{
      *       created by this method are added to <code>children</code>.
      */
     public MethodReference getOracle(Term post, 
-				     ProgramVariable buffer,
+				     SyntacticalProgramVariable buffer,
 				     ExtList children){
 	if(oracle==null){
 	    post = replaceConstants(post, serv, null);
@@ -826,8 +844,8 @@ public class TestGenerator{
      * also the corresponding method declaration.
      */
     private Expression getMethodReferenceForFormula(Term post, 
-						    ProgramVariable buffer,
-						    ExtList children){
+                                    SyntacticalProgramVariable buffer,
+                                    ExtList children){
 	if(post.sort() != Sort.FORMULA){
 	    return translateTerm(post, buffer, children);
 	}
@@ -852,11 +870,11 @@ public class TestGenerator{
      * Creates the method body for the method the term post is translated to.
      */
     private Statement[] buildMethodBodyFromFormula(Term post, 
-						   ProgramVariable buffer,
-						   ExtList children){
+                                                   SyntacticalProgramVariable buffer,
+                                                   ExtList children){
 	Statement[] s = new Statement[4];
 	ProgramVariable result = 
-	    new LocationVariable(new ProgramElementName("result"), b);
+	    new LocationVariable(new ProgramElementName(resultName), b);
 	s[0] = new LocalVariableDeclaration(new TypeRef(b), 
 					    new VariableSpecification(result));
 	Expression f = translateFormula(post, buffer, children);
@@ -873,8 +891,8 @@ public class TestGenerator{
      * Translates a term to a java expression. 
      */
     private Expression translateTerm(Term t, 
-				     ProgramVariable buffer,
-				     ExtList children){
+                                     SyntacticalProgramVariable buffer,
+                                     ExtList children){
 	Expression result = null;
 	if (t.op() instanceof ProgramInLogic) {
 	    final ExtList tchildren = new ExtList();
@@ -945,7 +963,7 @@ public class TestGenerator{
      *         children</code>.
      */
     private Expression translateFormula(Term post, 
-					ProgramVariable buffer,
+					SyntacticalProgramVariable buffer,
 					ExtList children){
 	ExtList l = new ExtList();
 	if(post.sort() != Sort.FORMULA){
@@ -1035,7 +1053,7 @@ public class TestGenerator{
      */
     private Expression translateQuantifiedTerm(boolean all,
 					       Term t, 
-					       ProgramVariable buffer,
+					       SyntacticalProgramVariable buffer,
 					       ExtList children){
 	de.uka.ilkd.key.logic.op.Operator junctor;
 	Expression resInit;
@@ -1147,12 +1165,28 @@ public class TestGenerator{
 	LinkedList params = new LinkedList();
 	Iterator it = l.iterator();
 	while(it.hasNext()){
-	    ProgramVariable arg = (ProgramVariable) it.next();
-	    params.add(new ParameterDeclaration(
-			   new Modifier[0],
-			   new TypeRef(arg.getKeYJavaType()),
-			   new VariableSpecification(arg), 
-			   false));
+	            IProgramVariable arg = (IProgramVariable) it.next();
+            // Depending wether it's a ProgramVariable or
+            // SyntacticalProgramVariable
+            // the type has to be obtained in two different ways.
+            if (arg instanceof ProgramVariable) {// chris
+                KeYJavaType kjt = arg.getKeYJavaType();
+                params.add(new ParameterDeclaration(
+                        new Modifier[0],
+                        new TypeRef(kjt),
+                        new VariableSpecification(arg), 
+                        false));
+            } else if (arg instanceof SyntacticalProgramVariable) {
+                SyntacticalProgramVariable syntArg = (SyntacticalProgramVariable) arg;
+                params.add(new ParameterDeclaration(
+                        new Modifier[0],
+                        new SyntacticalTypeRef(syntArg.type),
+                        new VariableSpecification(arg, syntArg.type), 
+                        false));
+            } else {
+                throw new RuntimeException(
+                        "Unexpected case: arg is instance of:"+arg);
+            }
 	}
 	return params;
     }
@@ -1161,7 +1195,7 @@ public class TestGenerator{
      * Trys to extract bounds for the quantified integer variable.
      */
     private void getBound(Term t, Expression[] bounds, ProgramVariable pv, 
-			  ProgramVariable buffer, ExtList children){
+			  SyntacticalProgramVariable buffer, ExtList children){
 	int ex=0, less=1;
 	if((t.op().name().toString().equals("!") || 
 	    t.op().name().toString().equals("not")) && 

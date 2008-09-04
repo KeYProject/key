@@ -75,7 +75,7 @@ public class ApplyStrategy {
     public ApplyStrategy(KeYMediator medi) {
 	this.medi = medi;
         medi.addRuleAppListener( proofListener );
-        this.goalChooser = medi.getProfile().getSelectedGoalChooserBuilder().create();
+        this.goalChooser = medi.getProfile().getSelectedGoalChooserBuilder().create();        
     }
     
     
@@ -224,7 +224,9 @@ public class ApplyStrategy {
      * method handles InterruptedExceptions cleanly.
      */
     public void stop () {
-        worker.interrupt();
+        if(worker!=null){
+            worker.interrupt();
+        }
     }
     
     
@@ -279,7 +281,7 @@ public class ApplyStrategy {
     
 	/** invoked when a rule has been applied */
 	public void ruleApplied(ProofEvent e) {
-            if (!isAutoModeActive()) return;
+            if (!isAutoModeActive() || e.getSource() != proof) return;            
 	    RuleAppInfo rai = e.getRuleAppInfo ();
 	    if ( rai == null )
 		return;
@@ -307,10 +309,18 @@ public class ApplyStrategy {
         return autoModeActive;
     }
 
-
-
     public void setAutoModeActive(boolean autoModeActive) {
         this.autoModeActive = autoModeActive;
     }    
 
+    /**Used by, e.g., {@code InteractiveProver.clear()} in order to prevent memory leaking. 
+     * When a proof obligation is abandoned all references to the proof must be reset.
+     * @author gladisch */
+    public void clear(){
+        stop();
+        proof = null;
+        if(goalChooser!=null){
+            goalChooser.init(null, SLListOfGoal.EMPTY_LIST);
+        }
+    }
 }
