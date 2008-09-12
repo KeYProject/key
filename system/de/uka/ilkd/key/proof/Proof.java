@@ -108,6 +108,7 @@ public class Proof implements Named {
      */
     public Vector<String> keyVersionLog;
    
+    private long autoModeTime = 0;
     
     private Strategy activeStrategy;
 //    implemented by mbender for jmltest
@@ -279,6 +280,14 @@ public class Proof implements Named {
 
     public void addNameProposal(Name proposal) {
         nameRecorder.addProposal(proposal);
+    }
+
+    public long getAutoModeTime() {
+        return autoModeTime;
+    }
+
+    public void addAutoModeTime(long time) {
+        autoModeTime += time;
     }
 
     /** sets the variable, function, sort, heuristics namespaces */

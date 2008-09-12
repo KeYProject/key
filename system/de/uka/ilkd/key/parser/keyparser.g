@@ -96,6 +96,7 @@ options {
       prooflabel2tag.put("userconstraint", new Character('o'));
       prooflabel2tag.put("matchconstraint", new Character('m'));
       prooflabel2tag.put("newnames", new Character('w'));
+      prooflabel2tag.put("autoModeTime", new Character('e'));
    }
 
     private NamespaceSet nss;

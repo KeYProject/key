@@ -97,6 +97,7 @@ public class ProofSaver {
    //                ps.println(mediator.sort_ns());
           ps.println("\\proof {");
           ps.println(writeLog(proof));
+          ps.println("(autoModeTime \"" + proof.getAutoModeTime() + "\")\n");
           printUserConstraints(ps);
           ps.println(node2Proof(proof.root()));
           ps.println("}");

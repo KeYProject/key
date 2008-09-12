@@ -269,6 +269,7 @@ public class ApplyStrategy {
                 if (startedAsInteractive) mediator().startInterface(true);
             }
 
+            proof.addAutoModeTime(time);
             fireTaskFinished (new DefaultTaskFinishedInfo(ApplyStrategy.this, result, 
                     proof, time, 
                     countApplied, mediator().getNrGoalsClosedByAutoMode()));	  

@@ -447,6 +447,13 @@ public class ProblemLoader implements Runnable {
             }
             proof.getNameRecorder().setProposals(l);
             break;
+        case 'e': //autoModeTime
+            try {
+                proof.addAutoModeTime(Long.parseLong(s));
+            } catch (NumberFormatException e) {
+                // ignore
+            }
+            break;
         }
     }
 
