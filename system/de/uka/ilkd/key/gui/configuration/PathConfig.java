@@ -10,7 +10,7 @@ public interface PathConfig {
 
     /** directory where to find the KeY configuration files */ 
     public static final String KEY_CONFIG_DIR = System.getProperty("user.home")
-        + File.separator + ".key-1.2";
+        + File.separator + ".key";
     /**
      * In which file to store the recent files.
      */
