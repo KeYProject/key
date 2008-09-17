@@ -50,9 +50,9 @@ public class SemisequentChangeInfo implements java.io.Serializable {
      * returns true if the semisequent has changed
      */
     public boolean hasChanged() {
-	return added != SLListOfConstrainedFormula.EMPTY_LIST || 
-	       removed != SLListOfConstrainedFormula.EMPTY_LIST ||
-	       modified != SLListOfFormulaChangeInfo.EMPTY_LIST;
+	return !added.isEmpty() || 
+	       !removed.isEmpty() ||
+	       !modified.isEmpty();
     }
 
     /**

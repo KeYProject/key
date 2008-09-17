@@ -425,7 +425,7 @@ public class KeYMediator {
 	if (applics.size() == 1) {
 	    TacletApp firstApp = it.next();
             boolean ifSeqInteraction = 
-               firstApp.taclet().ifSequent() != Sequent.EMPTY_SEQUENT ;
+               !firstApp.taclet().ifSequent().isEmpty() ;
             if (stupidMode && !firstApp.complete()) {                
                 ListOfTacletApp ifSeqCandidates =
                     firstApp.findIfFormulaInstantiations(goal.sequent(),

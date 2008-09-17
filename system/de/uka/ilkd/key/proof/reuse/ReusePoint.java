@@ -417,7 +417,7 @@ public class ReusePoint implements Comparable {
       int localScore;
       JavaBlock jx = x.executableJavaBlock();
       JavaBlock jy = y.executableJavaBlock();
-      if (jx == JavaBlock.EMPTY_JAVABLOCK || jy == JavaBlock.EMPTY_JAVABLOCK) {
+      if (jx.isEmpty() || jy.isEmpty()) {
          
          // not a symbolic execution rule
          localScore = scoreLogicalFindEqualsMod(x,y);

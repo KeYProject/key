@@ -48,10 +48,10 @@ public class DefaultGoalChooser implements IGoalChooser {
      * @see de.uka.ilkd.key.proof.IGoalChooser#init(de.uka.ilkd.key.proof.Proof, de.uka.ilkd.key.proof.ListOfGoal)
      */
     public void init ( Proof p_proof, ListOfGoal p_goals ) {
-        if(p_proof==null && !(p_goals==null || p_goals==SLListOfGoal.EMPTY_LIST)){
+        if(p_proof==null && !(p_goals==null || p_goals.isEmpty())){
             throw new RuntimeException("A not existing proof has goals. This makes no sense.");
         }
-        if(p_goals==null||p_goals==SLListOfGoal.EMPTY_LIST){
+        if(p_goals==null||p_goals.isEmpty()){
             //the idea of this case is to reset the object if a proof is abandoned. (To prevent memory leaks)
             allGoalsSatisfiable = true;
         }else{//this is the normal branch

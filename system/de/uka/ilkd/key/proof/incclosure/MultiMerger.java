@@ -88,9 +88,9 @@ public class MultiMerger implements Merger {
 	arity      = p_arity;
 
 	while ( i-- != 0 ) {
-	    if ( sinkList == SLListOfSink.EMPTY_LIST ) {
+	    if ( sinkList.isEmpty() ) {
 		/** Increase the depth of the tree by one */
-		while ( newList != SLListOfSink.EMPTY_LIST ) {
+		while ( !newList.isEmpty() ) {
 		    sinkList = sinkList.prepend ( newList.head () );
 		    newList  = newList.tail ();
 		}
@@ -101,12 +101,12 @@ public class MultiMerger implements Merger {
 	    sinkList = sinkList.tail ();
 	}
 
-	while ( newList != SLListOfSink.EMPTY_LIST ) {
+	while ( !newList.isEmpty() ) {
 	    sinkList = sinkList.prepend ( newList.head () );
 	    newList  = newList.tail ();
 	}
 	
-	while ( sinkList != SLListOfSink.EMPTY_LIST ) {
+	while ( !sinkList.isEmpty() ) {
 	    leafSinks = leafSinks.append ( sinkList.head () );
 	    sinkList  = sinkList.tail ();
 	}

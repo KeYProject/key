@@ -31,7 +31,7 @@ public class InUpdateFeature extends BinaryFeature {
                 return true;                
             }
                 
-            if (taclet.ifSequent()==Sequent.EMPTY_SEQUENT) {
+            if (taclet.ifSequent().isEmpty()) {
                 return false;
             }
         }

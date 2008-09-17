@@ -330,7 +330,7 @@ public class NoPosTacletApp extends TacletApp {
      * that the Taclet can be applied.
      */
     public boolean complete() {
-	return ( uninstantiatedVars() == SetAsListOfSchemaVariable.EMPTY_SET
+	return ( uninstantiatedVars().isEmpty()
 		 && taclet() instanceof NoFindTaclet
 		 && ifInstsComplete () );
 

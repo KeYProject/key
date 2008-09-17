@@ -282,7 +282,7 @@ public class GoalList extends JList {
 	}
 
 	public void add(ListOfGoal g) {
-	    if (g != SLListOfGoal.EMPTY_LIST) {
+	    if (!g.isEmpty()) {
 		final IteratorOfGoal it = g.iterator();
 		while (it.hasNext()) {
 		    goals.add(it.next());

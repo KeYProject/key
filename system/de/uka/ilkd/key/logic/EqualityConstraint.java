@@ -390,8 +390,8 @@ public class EqualityConstraint implements Constraint {
                                                     NameAbstractionTable nat) {
 
 
-        if ( t0.javaBlock () != JavaBlock.EMPTY_JAVABLOCK
-                || t1.javaBlock () != JavaBlock.EMPTY_JAVABLOCK ) {
+        if ( !t0.javaBlock ().isEmpty()
+                || !t1.javaBlock ().isEmpty() ) {
             nat = checkNat ( nat );
             if ( ! t0.javaBlock ().equalsModRenaming ( t1.javaBlock (), nat ) ) {
                 return FAILED; 
@@ -712,7 +712,7 @@ public class EqualityConstraint implements Constraint {
      * other variables are not modified)
      */
     public Constraint removeVariables ( SetOfMetavariable mvs ) {
-	if ( mvs != SetAsListOfMetavariable.EMPTY_SET && !isBottom () ) {
+	if ( !mvs.isEmpty() && !isBottom () ) {
 	    EqualityConstraint removeConstraint = new EqualityConstraint ();
 	    EqualityConstraint newConstraint    = new EqualityConstraint ();
 
@@ -809,7 +809,7 @@ public class EqualityConstraint implements Constraint {
                 }
             }
 
-            if ( fringe == SLListOfTerm.EMPTY_LIST ) return false;
+            if ( fringe.isEmpty() ) return false;
 
             checkForCycle = fringe.head ();
             fringe        = fringe.tail ();

@@ -132,7 +132,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * (helper for getProgramFromPIO())
      */
     private Term findProgramInTerm(Term term) {
-        if(term.javaBlock() != JavaBlock.EMPTY_JAVABLOCK) {
+        if(!term.javaBlock().isEmpty()) {
     	    return term;
     	}
     	for(int i = 0; i < term.arity(); i++) {

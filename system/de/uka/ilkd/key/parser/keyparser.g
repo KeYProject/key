@@ -954,7 +954,7 @@ options {
           return pvc.result();
         }else 
   	  if(!isDeclParser()) {
-            if ((isTermParser() || isProblemParser()) && jb==JavaBlock.EMPTY_JAVABLOCK) {
+            if ((isTermParser() || isProblemParser()) && jb.isEmpty()) {
               return new HashSet();
             }   
             DeclarationProgramVariableCollector pvc
@@ -1243,7 +1243,7 @@ options {
                 .setStateRestriction(stateRestriction);
         } else if ( find instanceof Sequent ) {
             Sequent findSeq = (Sequent) find;
-            if ( findSeq == Sequent.EMPTY_SEQUENT ) {
+            if ( findSeq.isEmpty() ) {
                 return new NoFindTacletBuilder();
             } else if (   findSeq.antecedent().size() == 1
                           && findSeq.succedent().size() == 0 ) {

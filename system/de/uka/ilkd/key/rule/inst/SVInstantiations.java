@@ -518,6 +518,13 @@ public class SVInstantiations {
     }
 
     /**
+     * returns true iff no instantiation of SchemaVariables are known
+     */
+    public boolean isEmpty() {
+        return map.isEmpty();
+    }
+
+    /**
      * returns the update context
      * 
      * @return the update context
@@ -584,9 +591,9 @@ public class SVInstantiations {
         
         ListOfUpdatePair updates = SLListOfUpdatePair.EMPTY_LIST;
         
-        if (other.getUpdateContext() == SLListOfUpdatePair.EMPTY_LIST) {
+        if (other.getUpdateContext().isEmpty()) {
             updates = getUpdateContext();
-        } else if (getUpdateContext() == SLListOfUpdatePair.EMPTY_LIST) {
+        } else if (getUpdateContext().isEmpty()) {
             updates = other.getUpdateContext();
         } else if (!getUpdateContext().equals(other.getUpdateContext())) {
             Debug.fail("The update context of one of"

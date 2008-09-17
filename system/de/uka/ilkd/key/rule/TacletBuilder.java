@@ -284,7 +284,7 @@ public abstract class TacletBuilder {
     public abstract Taclet getTaclet();
 
     public Taclet getTacletWithoutInactiveGoalTemplates(SetOfChoice active){
-	if(goal2Choices==null || goals == SLListOfTacletGoalTemplate.EMPTY_LIST){
+	if(goal2Choices==null || goals.isEmpty()){
 	    return getTaclet();
 	}else{
 	    ListOfTacletGoalTemplate oldGoals = goals;
@@ -297,7 +297,7 @@ public abstract class TacletBuilder {
 		    goals = goals.removeAll(goal);
 		}
 	    }
-	    if(goals == SLListOfTacletGoalTemplate.EMPTY_LIST){
+	    if(goals.isEmpty()){
 		result = null;
 	    }else{
 		result = getTaclet();

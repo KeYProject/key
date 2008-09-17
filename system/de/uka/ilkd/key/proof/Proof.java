@@ -553,7 +553,7 @@ public class Proof implements Named {
     public boolean closed () {
 	if ( root ().getRootSink ().isSatisfiable () ) {
 	    Goal goal;
-	    while ( openGoals != SLListOfGoal.EMPTY_LIST ) {
+	    while ( !openGoals.isEmpty() ) {
 		goal      = openGoals.head ();
 		openGoals = openGoals.tail ();
 		fireProofGoalRemoved ( goal );

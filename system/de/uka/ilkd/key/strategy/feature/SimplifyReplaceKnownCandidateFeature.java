@@ -56,7 +56,7 @@ public class SimplifyReplaceKnownCandidateFeature
         final Boolean pol = polarity ( pos, new Boolean ( pos.isInAntec () ) );
 
         final boolean ifForInAntec =
-            ifSeq.succedent () == Semisequent.EMPTY_SEMISEQUENT;        
+            ifSeq.succedent ().isEmpty();        
         
         final boolean approved =
                  pol == null
