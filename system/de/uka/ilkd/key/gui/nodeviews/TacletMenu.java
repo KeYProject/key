@@ -588,8 +588,8 @@ class TacletMenu extends JMenu {
 	    if (taclet1.ifSequent() == Sequent.EMPTY_SEQUENT && 
 		taclet2.ifSequent() != Sequent.EMPTY_SEQUENT) {
 		return 1;
-	    } else if (taclet1.ifSequent() == Sequent.EMPTY_SEQUENT && 
-		       taclet2.ifSequent() != Sequent.EMPTY_SEQUENT) {
+	    } else if (taclet1.ifSequent() != Sequent.EMPTY_SEQUENT && 
+		       taclet2.ifSequent() == Sequent.EMPTY_SEQUENT) {
 		return -1;
 	    }
 		    
