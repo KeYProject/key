@@ -181,13 +181,13 @@ public class ProblemInitializer {
 	
 	//collect all ldt includes into a single LDTInput
 	KeYFile[] keyFile = new KeYFile[in.getLDTIncludes().size()];
-	Iterator it = in.getLDTIncludes().iterator();
+	
 	int i = 0;
-	while(it.hasNext()){
-	    String name = (String) it.next();
+        for (String name : in.getLDTIncludes()) {
 	    keyFile[i++] = new KeYFile(name, in.get(name), pm);
 	}
-	LDTInput ldtInp = new LDTInput(keyFile, main);
+
+        LDTInput ldtInp = new LDTInput(keyFile, main);
 	
 	//read the LDTInput
 	readEnvInput(ldtInp, initConfig, readLibraries);
@@ -210,9 +210,7 @@ public class ProblemInitializer {
 	readLDTIncludes(in, initConfig, readLibraries);
 	
 	//read normal includes
-	Iterator it = in.getIncludes().iterator();
-	while(it.hasNext()){
-	    String fileName = (String) it.next();
+	for (String fileName : in.getIncludes()) {
 	    KeYFile keyFile = new KeYFile(fileName, in.get(fileName), pm);
 	    readEnvInput(keyFile, initConfig, readLibraries);
 	}
