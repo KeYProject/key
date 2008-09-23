@@ -27,19 +27,19 @@ import de.uka.ilkd.key.proof.RuleSource;
 public class Includes{
     
     /** a list containing the "normal" includes, represented as Strings */
-    private final List includes;
+    private final List<String> includes;
     /** a list containing the LDT includes, represented as Strings */
-    private final List ldtIncludes;
+    private final List<String> ldtIncludes;
     /** contains mappings from filenames to RuleSources */
-    private final HashMap name2Source;
+    private final HashMap<String, RuleSource> name2Source;
 
     public Includes(){
-	includes = new LinkedList();
-	ldtIncludes = new LinkedList();
-	name2Source = new LinkedHashMap();
+	includes = new LinkedList<String>();
+	ldtIncludes = new LinkedList<String>();
+	name2Source = new LinkedHashMap<String, RuleSource>();
     }
     
-    private void put(String name, RuleSource source, List list){
+    private void put(String name, RuleSource source, List<String> list){
 	if(!list.contains(name)){
 	    list.add(name);
 	    name2Source.put(name, source);
@@ -60,7 +60,7 @@ public class Includes{
      * <code>name</name>
      */
     public RuleSource get(String name){
-	return (RuleSource) name2Source.get(name);
+	return name2Source.get(name);
     }
 
     /** removes the filename <code>name</code> and its mapping. */
@@ -71,12 +71,12 @@ public class Includes{
     }
 
     /** return the list of non-LDT includes*/ 
-    public List getIncludes(){
+    public List<String> getIncludes(){
 	return includes;
     }
 
     /** return the list of LDT includes*/ 
-    public List getLDTIncludes(){
+    public List<String> getLDTIncludes(){
 	return ldtIncludes;
     }
 
