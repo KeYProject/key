@@ -49,10 +49,11 @@ public class ConstraintTableModel extends AbstractTableModel {
 	if ( p_node.isClosed () )
 	    return true;
 	
+	
 	Sink sink = p_node.getBranchSink ();
 	return
 	    ( sink instanceof BranchRestricter ) &&
-	    getConstraint ().isSatisfiable () &&
+            getConstraint ().isSatisfiable () &&
 	    ( ((BranchRestricter)sink).getPathConstraint ().isAsWeakAs
 	      ( getConstraint () ) );
     }

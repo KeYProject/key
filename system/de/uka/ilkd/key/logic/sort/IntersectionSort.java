@@ -19,6 +19,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.util.Debug;
 
@@ -59,7 +60,7 @@ public class IntersectionSort extends AbstractSort {
      * @param sorts the SetOfSort whose intersection sort has to be determined
      * @param services the Namespace with all known sorts to which if necessary 
      * the intersection sort of the given sorts is added
-     * @return the intersection sort of the given sorts.
+     * @return the intersection sort of the given sorts or null if this sort would have an empty domain 
      */
     public static Sort getIntersectionSort(SetOfSort sorts, Services services) {        
         return rightAssoc(sort(flatten(minimize(sorts.toArray()))), services);                     
@@ -75,7 +76,7 @@ public class IntersectionSort extends AbstractSort {
      * @param sorts the Namespace with all known sorts to which if necessary 
      * the intersection sort of the given sorts is added
      * @param functions the Namespace where to add the sort depending functions 
-     * @return the intersection sort of the given sorts.
+     * @return the intersection sort of the given sorts or null if this sort would have an empty domain 
      */
     public static Sort getIntersectionSort(SetOfSort components, 
                                            Namespace sorts, Namespace functions) {        
@@ -94,7 +95,7 @@ public class IntersectionSort extends AbstractSort {
      * the intersection sort of the given sorts is added
      * @param functions the Namespace where to add sort depending functions like 
      * instance, casts etc.
-     * @return the intersection sort of the given sorts.     
+     * @return the intersection sort of the given sorts or null if this sort would have an empty domain    
      */ 
     public static Sort getIntersectionSort(Sort s1, Sort s2, 
                                            Namespace sorts, 
@@ -113,6 +114,9 @@ public class IntersectionSort extends AbstractSort {
         if (result == null) {
             result = new IntersectionSort(sortName, 
                     composites[0], composites[1]);            
+            if (((IntersectionSort)result).hasEmptyDomain(sorts)) {
+                return null;
+            }
             sorts.add(result);
             ((IntersectionSort)result).addDefinedSymbols(functions, sorts);
         }
@@ -375,41 +379,43 @@ public class IntersectionSort extends AbstractSort {
      * @return true if other than reference types, which are siblings in the type hierarchy, 
      * intersect    
      */
-    public boolean hasEmptyDomain() {       
+    public boolean hasEmptyDomain(Namespace sorts) {       
        if (emptyDomainComputed) return emptyDomain;                     
-       
-       boolean nonReferenceType = false; 
-       emptyDomain = false;
-                     
-       for (int i = 0, sz = memberCount(); i<sz; i++) {
-           final Sort s = getComponent(i);    
-           
-           if (s instanceof PrimitiveSort) {
-               nonReferenceType = true;
-           } else if (s instanceof IntersectionSort) {               
-               // due to normalform and JavaCardDL type system we know
-               // intersection of 
-               // * primitive sorts have an empty domain iff
-               //   they do not subclass each other but intersection of 
-               //   sorts in a vertical line are never an IntersectionSort 
-               // * intersection of primitive and object have empty domain
-               // thus we can derive from a non-empty domain that the 
-               // composites are of type ObjectSort 
-               final IntersectionSort s_intersect = (IntersectionSort)s;
-               if (s_intersect.hasEmptyDomain()) {
-                   emptyDomainComputed = true;
-                   emptyDomain = true;
-                   return emptyDomain;
-               }               
-           }                  
+
+       emptyDomain = true;
+
+       for (final Named n : sorts.allElements()) {
+           final Sort s = (Sort) n;
+                  
+           if (s != this) {
+               if (s instanceof IntersectionSort && 
+                       ((IntersectionSort)s).hasEmptyDomain(sorts)) {
+                   continue;
+               } else if (extendsTransAll(s)) {               
+                   emptyDomain = false;
+                   break;
+               }           
+           }    
        }
+
        emptyDomainComputed = true;
-       if (nonReferenceType) {
-           emptyDomain = true;
-       }
        return emptyDomain;
     }
     
+    /**
+     * checks if s extends all composite sorts
+     * @param s Sort to be checked
+     * @return true iff s extends all composites of this intersection sort
+     */
+    private boolean extendsTransAll(Sort s) {
+        for (int i = 0; i<memberCount(); i++) {
+            if (!s.extendsTrans(getComponent(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /** 
      * toString 
      */

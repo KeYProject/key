@@ -1388,9 +1388,15 @@ options {
         }
         final Sort s = IntersectionSort.getIntersectionSort(compositeSorts, sorts(), functions());
         if (!(s instanceof IntersectionSort)) {
-            semanticError("Failed to create an intersection sort of " + composites + 
-                ". Usually intersection is not required in these cases as \n" + 
-                "it is equal to one composite. In this case " + s);            
+            String err = "Failed to create an intersection sort of " + composites;
+            if (s == null) {
+                err += " as the resulting intersection sort would be empty.";
+            } else {
+                err += ". Usually intersection is not required in these cases as \n" + 
+                "it is equal to one composite. In this case " + s;
+            }
+            semanticError(err);
+                            
         }        
         return s;
     }
