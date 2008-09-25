@@ -382,7 +382,8 @@ public class IntersectionSort extends AbstractSort {
        emptyDomain = false;
                      
        for (int i = 0, sz = memberCount(); i<sz; i++) {
-           final Sort s = getComponent(i);         
+           final Sort s = getComponent(i);    
+           
            if (s instanceof PrimitiveSort) {
                nonReferenceType = true;
            } else if (s instanceof IntersectionSort) {               
@@ -398,17 +399,14 @@ public class IntersectionSort extends AbstractSort {
                if (s_intersect.hasEmptyDomain()) {
                    emptyDomainComputed = true;
                    emptyDomain = true;
-                   break;
-               } else {
-                   if (nonReferenceType) {
-                       emptyDomainComputed = true;
-                       emptyDomain = true;
-                       break;
-                   }
+                   return emptyDomain;
                }               
            }                  
        }
-       emptyDomainComputed = true;       
+       emptyDomainComputed = true;
+       if (nonReferenceType) {
+           emptyDomain = true;
+       }
        return emptyDomain;
     }
     
