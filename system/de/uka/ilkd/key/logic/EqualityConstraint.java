@@ -354,7 +354,6 @@ public class EqualityConstraint implements Constraint {
         final Sort intersectionSort = 
             IntersectionSort.getIntersectionSort(set, services);
                       
-        
         if (intersectionSort instanceof IntersectionSort &&
                 ((IntersectionSort)intersectionSort).hasEmptyDomain()) {
             return Constraint.TOP;
