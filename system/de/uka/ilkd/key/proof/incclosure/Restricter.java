@@ -55,6 +55,10 @@ public class Restricter implements Sink {
      */
     public void       addRestriction     ( Metavariable p_mv ) {
 	removedVariables = removedVariables.add ( p_mv );
+        // also pass the restriction upwards, because the removed variables
+        // might still occur as right-hand side (and might reoccur later for
+        // this reason)
+        parent.addRestriction(p_mv);
     }
 
     public SetOfMetavariable getRestrictions () {
