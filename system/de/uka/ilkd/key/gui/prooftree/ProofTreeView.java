@@ -634,10 +634,9 @@ public class ProofTreeView extends JPanel {
 	    DefaultTreeCellRenderer tree_cell =  
 		(DefaultTreeCellRenderer) super.getTreeCellRendererComponent
 		(tree, nodeText, sel, expanded, leaf, row, hasFocus);
-		
-	    tree_cell.setFont(tree.getFont());	    	    
-	    tree_cell.setText(nodeText);            
                                 
+	    
+	    
 	    if (node.leaf()) {
 		Goal goal = proof.getGoal(node);
 		if ( goal == null ||
@@ -647,17 +646,25 @@ public class ProofTreeView extends JPanel {
 		    ProofTreeView.this.setToolTipText("Closed Goal");
 		    tree_cell.setToolTipText("A closed goal");
 		} else {
-		    if ( goal.getClosureConstraint ().isSatisfiable () ) {
+		    if ( goal.isDisabled() ) {
+		        tree_cell.setForeground(Color.orange);
+		        tree_cell.setIcon(IconFactory.keyHoleDisabled(20, 20));
+		        ProofTreeView.this.setToolTipText("Disabled Goal");
+		        tree_cell.setToolTipText("Disabled goal - no automatic rule application");
+		        nodeText = node.serialNr()+": DISABLED";
+		        tree_cell.setText(nodeText);
+		        delegateView.setFont(tree.getFont());
+		    } else if ( goal.getClosureConstraint ().isSatisfiable () ) {
 			tree_cell.setForeground(Color.blue);
 			tree_cell.setIcon(IconFactory.keyHole(20, 20));
 			ProofTreeView.this.setToolTipText("Closable Goal");
 			tree_cell.setToolTipText("A goal that can be closed");
 		    } else {
 			tree_cell.setForeground(Color.red);
+			tree_cell.setIcon(IconFactory.keyHole(20, 20));
 			ProofTreeView.this.setToolTipText("Open Goal");
 			tree_cell.setToolTipText("An open goal");
 		    }                                                            
-		    tree_cell.setIcon(IconFactory.keyHole(20, 20));
 		}
 	    } else {
 		/*
@@ -685,7 +692,7 @@ public class ProofTreeView extends JPanel {
                 }
 		tree_cell.setToolTipText(tooltipText);
 	    }
-
+	    
             if (node.getReuseSource() != null) {
 		tree_cell.setBackgroundNonSelectionColor(PASTEL_COLOR);
                 if (!node.getReuseSource().isConnect()) { 
@@ -698,6 +705,9 @@ public class ProofTreeView extends JPanel {
                 tree_cell.setBackgroundNonSelectionColor(Color.white);
             }
 	    if (sel) tree_cell.setBackground(Color.blue);
+	    
+	    tree_cell.setFont(tree.getFont());
+	    tree_cell.setText(nodeText);
 	    
 	    return tree_cell;
 	}
@@ -722,6 +732,8 @@ public class ProofTreeView extends JPanel {
 	private JCheckBoxMenuItem hideClosedSubtrees = 
 		new JCheckBoxMenuItem("Hide Closed Subtrees");
 	private JMenuItem search = new JMenuItem("Search");
+	private JMenuItem disableGoals = new JMenuItem("Disable Goals Below");
+	private JMenuItem enableGoals = new JMenuItem("Enable Goals Below");
 	private JMenuItem goalBack    = new JMenuItem("Prune Proof");
 	private JMenuItem runStrategy = new JMenuItem("Apply Strategy",
 	    IconFactory.autoModeStartLogo(10));
@@ -783,6 +795,11 @@ public class ProofTreeView extends JPanel {
 	    hideClosedSubtrees.addItemListener(this);
 	    this.add(search);
 	    search.addActionListener(this);
+	    this.add(new JSeparator());
+	    disableGoals.addActionListener(this);
+	    this.add(disableGoals);
+	    enableGoals.addActionListener(this);
+	    this.add(enableGoals);
 	    this.add(new JSeparator());
 	    this.add(goalBack);
 	    if (branch != path) {
@@ -934,13 +951,43 @@ public class ProofTreeView extends JPanel {
 		}
             } else if (e.getSource() == search) {
 		proofTreeSearchPanel.setVisible(true);
-            }  else if (e.getSource() == visualize) {
+            } else if (e.getSource() == disableGoals) {
+                setDisabledGoalsBelow(true);
+            } else if (e.getSource() == enableGoals) {
+                setDisabledGoalsBelow(false);
+            } else if (e.getSource() == visualize) {
                 new ProofVisTreeView(mediator.visualizeProof().getVisualizationModel());                
             }else if (e.getSource() == test) {
 		mediator.generateTestCaseForSelectedNode();
             } else if (e.getSource() == change) {
                 mediator.changeNode(invokedNode);
             }
+	}
+
+	/**
+         * set the enabled/disabled state of all goals below "node" to state.
+         * 
+         * Iterate all goals and check if they are a below node.
+         * 
+         * @param state
+         *                disable-state (true for disabled)
+         * @author mulbrich
+         */
+	private void setDisabledGoalsBelow(boolean state) {
+	    IteratorOfGoal it = proof.openGoals ().iterator();
+	    while (it.hasNext ()) {
+	        Goal g = it.next();
+	        Node n = g.node();
+	        GUIProofTreeNode node = delegateModel.getProofTreeNode(n);
+	        if (node != null) {
+	            TreeNode[] obs = node.getPath();
+	            TreePath tp = new TreePath(obs);
+	            if (branch.isDescendant(tp)) {
+	                g.setDisabled(state);
+	            }
+	        }
+	    }
+	    delegateView.repaint();
 	}
 
         public void itemStateChanged(ItemEvent e) {
