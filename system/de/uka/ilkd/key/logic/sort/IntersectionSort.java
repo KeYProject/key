@@ -20,6 +20,7 @@ import java.util.List;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.IteratorOfNamed;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.util.Debug;
 
@@ -384,8 +385,10 @@ public class IntersectionSort extends AbstractSort {
 
        emptyDomain = true;
 
-       for (final Named n : sorts.allElements()) {
-           final Sort s = (Sort) n;
+       IteratorOfNamed it = sorts.allElements().iterator();
+       while (it.hasNext()) {
+
+           final Sort s = (Sort) it.next();
                   
            if (s != this) {
                if (s instanceof IntersectionSort && 
