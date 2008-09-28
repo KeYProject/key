@@ -205,7 +205,16 @@ public class GenericSortInstantiations {
             for (int i = 0, sz = inter.memberCount(); i < sz; i++) {
                 sos = sos.add(getRealSort(inter.getComponent(i), services));
             }
-            return IntersectionSort.getIntersectionSort(sos, services);
+            
+            final Sort res = IntersectionSort.getIntersectionSort(sos, services);
+            
+            if (res == null) {
+                throw new GenericSortException
+                ( "Generic sort is instantiated with an intersection sort" +
+                  " that has an empty domain." );
+            }
+            
+            return res;
         } else if ( p_s instanceof CollectionSort ) {
 	    Sort s = getRealSort ( ((CollectionSort)p_s).elementSort (), services );
 
