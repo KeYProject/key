@@ -144,7 +144,7 @@ public class SimplifyTranslation extends DecProcTranslation {
 				    lightWeight));
 		hb.append(')');
 
-		if (sortAxioms!=SLListOfString.EMPTY_LIST && quantifiersOccur) {
+		if (!sortAxioms.isEmpty() && quantifiersOccur) {
 		    String sar[] = sortAxioms.toArray();
 		    String axioms=sar[0];
 		    for (int i=1; i<sar.length; i++) {

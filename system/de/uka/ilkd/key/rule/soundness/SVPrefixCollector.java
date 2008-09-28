@@ -447,7 +447,7 @@ public class SVPrefixCollector extends TacletVisitor {
 	private boolean containsModRenaming ( ListOfStatement      p_list,
 					      Statement            p_st,
 					      NameAbstractionTable p_nat ) {
-	    if ( p_list == SLListOfStatement.EMPTY_LIST )
+	    if ( p_list.isEmpty() )
 		return false;
 	    else
 		return

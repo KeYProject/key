@@ -46,6 +46,9 @@ public interface MapFrom<S>To<T> extends java.io.Serializable {
     /** @return number of entries as int */
     int size();
 
+    /** @return true iff the map is empty */
+    boolean isEmpty();
+
     /** @return true iff the map includes key */
     boolean containsKey(<S> key);
 

@@ -150,7 +150,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
    
     private int countJavaBlocks(Term t) {
         int p = 0;
-        if (t.javaBlock() != JavaBlock.EMPTY_JAVABLOCK){
+        if (!t.javaBlock().isEmpty()){
             p++;
         }
         for (int i = 0; i < t.arity(); i++) {
@@ -337,7 +337,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
     protected LinkedList findJavaBlocks(boolean ant, int cfm, Term t, int pos) {
         LinkedList ll = new LinkedList();
         int p = pos;
-        if (t.javaBlock() != JavaBlock.EMPTY_JAVABLOCK) {
+        if (!t.javaBlock().isEmpty()) {
             /*Occ objects additionally store the term with the javablock
              * that shall be traced. This information is important for the
              * implementation of extractExecutionTrace in class
@@ -852,7 +852,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
     private int getSubformulaOccurrence(Term t, IntIterator it){
         int result = 0;
         if (it.hasNext()) {
-            if (t.javaBlock() != JavaBlock.EMPTY_JAVABLOCK){
+            if (!t.javaBlock().isEmpty()){
                 result++;
             }
             

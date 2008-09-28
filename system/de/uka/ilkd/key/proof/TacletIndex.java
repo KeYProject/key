@@ -162,7 +162,7 @@ public class TacletIndex  {
 	ListOfNoPosTacletApp opList = map.get(op);	
 	if (opList != null) {
 	    opList = opList.removeAll(tacletApp);
-	    if (opList == SLListOfNoPosTacletApp.EMPTY_LIST) {
+	    if (opList.isEmpty()) {
 		map.remove(op);
 	    } else {
 		map.put(op, opList);

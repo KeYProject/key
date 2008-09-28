@@ -118,7 +118,7 @@ public class GenericSort extends AbstractNonCollectionSort
     public boolean isPossibleInstantiation ( Sort p_s ) {
 	return
 	    p_s != Sort.FORMULA &&
-	    ( oneOf == EMPTY_SORT_SET || oneOf.contains ( p_s ) ) &&
+	    ( oneOf.isEmpty() || oneOf.contains ( p_s ) ) &&
 	    checkNonGenericSupersorts ( p_s );
     }
 

@@ -64,14 +64,14 @@ public class MeaningFormulaBuilder {
     private boolean isRewriteTacletWithRWorAdd () {
         if ( !isRewriteTaclet () ) return false;
         
-        if ( ( (RewriteTaclet)getTaclet () ).ifSequent () != Sequent.EMPTY_SEQUENT )
+        if ( !( (RewriteTaclet)getTaclet () ).ifSequent ().isEmpty() )
             return true;
 
         final IteratorOfTacletGoalTemplate it =
             getTaclet ().goalTemplates ().iterator ();
             
         while ( it.hasNext () ) {
-            if ( it.next().sequent () != Sequent.EMPTY_SEQUENT ) return true;
+            if ( !it.next().sequent ().isEmpty() ) return true;
         }
 
         return false;

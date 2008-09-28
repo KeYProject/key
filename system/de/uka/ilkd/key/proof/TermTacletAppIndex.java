@@ -783,7 +783,7 @@ public class TermTacletAppIndex {
                                                ListOfNoPosTacletApp taclets) {
         ListOfNoPosTacletApp result = SLListOfNoPosTacletApp.EMPTY_LIST;
 
-        while ( taclets != SLListOfNoPosTacletApp.EMPTY_LIST ) {
+        while ( !taclets.isEmpty() ) {
             final NoPosTacletApp app = taclets.head ();
             taclets = taclets.tail ();
             if ( p_filter.filter ( app.taclet () ) )

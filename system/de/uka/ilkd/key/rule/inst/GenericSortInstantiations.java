@@ -157,6 +157,9 @@ public class GenericSortInstantiations {
 	return insts.get ( p_gs );
     }
 
+    public boolean isEmpty() {
+        return insts.isEmpty();
+    }
 
     /**
      * Create a list of conditions establishing the instantiations
@@ -205,7 +208,16 @@ public class GenericSortInstantiations {
             for (int i = 0, sz = inter.memberCount(); i < sz; i++) {
                 sos = sos.add(getRealSort(inter.getComponent(i), services));
             }
-            return IntersectionSort.getIntersectionSort(sos, services);
+            
+            final Sort res = IntersectionSort.getIntersectionSort(sos, services);
+            
+            if (res == null) {
+                throw new GenericSortException
+                ( "Generic sort is instantiated with an intersection sort" +
+                  " that has an empty domain." );
+            }
+            
+            return res;
         } else if ( p_s instanceof CollectionSort ) {
 	    Sort s = getRealSort ( ((CollectionSort)p_s).elementSort (), services );
 
@@ -278,7 +290,7 @@ public class GenericSortInstantiations {
 	  ListOfGenericSortCondition p_conditions,
 	  ListOfGenericSort          p_pushedBack ) {
 
-	if ( p_remainingSorts == SLListOfGenericSort.EMPTY_LIST )
+	if ( p_remainingSorts.isEmpty() )
 	    return solveForcedInst ( p_pushedBack, p_curRes, p_conditions );
 
 	// next generic sort to seek an instantiation for
@@ -328,7 +340,7 @@ public class GenericSortInstantiations {
                               gs,
                               subsorts,
                               chosenList );
-        } else if ( subsorts != SLListOfSort.EMPTY_LIST ) {
+        } else if ( !subsorts.isEmpty() ) {
             // if anything else has failed, construct minimal
             // supersorts of the found subsorts and try them
             final ListOfSort superSorts = minimalSupersorts ( subsorts );
@@ -379,7 +391,7 @@ public class GenericSortInstantiations {
     private static ListOfSort chooseResults (GenericSort p_gs,
                                              ListOfGenericSortCondition p_idConditions)
                                                         throws FailException {
-        if ( p_idConditions != SLListOfGenericSortCondition.EMPTY_LIST ) {
+        if ( !p_idConditions.isEmpty() ) {
             // then the instantiation is completely determined by
             // an identity condition
             final IteratorOfGenericSortCondition itC = p_idConditions.iterator ();
@@ -443,7 +455,7 @@ public class GenericSortInstantiations {
 	  MapFromGenericSortToSort   p_curRes,
 	  ListOfGenericSortCondition p_conditions ) {
 
-	if ( p_remainingSorts == SLListOfGenericSort.EMPTY_LIST )
+	if ( p_remainingSorts.isEmpty() )
 	    return p_curRes; // nothing further to be done
 
 	IteratorOfGenericSort it = topology ( p_remainingSorts ).iterator ();
@@ -471,7 +483,7 @@ public class GenericSortInstantiations {
     private static MapFromGenericSortToSort solveForcedInstHelp
 	( ListOfGenericSort        p_remainingSorts,
 	  MapFromGenericSortToSort p_curRes ) {
-	if ( p_remainingSorts == SLListOfGenericSort.EMPTY_LIST ) {
+	if ( p_remainingSorts.isEmpty() ) {
 	    // we're done
 	    return p_curRes;
 	} else {
@@ -544,7 +556,7 @@ public class GenericSortInstantiations {
 	GenericSort           tMax;
 	ListOfGenericSort     tList;
 
-	while ( p_sorts != SLListOfGenericSort.EMPTY_LIST ) {
+	while ( !p_sorts.isEmpty() ) {
 	    // search for a maximal element
 	    it      = p_sorts.iterator ();
 	    curMax  = it.next ();

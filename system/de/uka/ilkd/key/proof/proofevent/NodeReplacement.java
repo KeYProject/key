@@ -41,7 +41,7 @@ public class NodeReplacement {
     }
 
     private void addNodeChanges () {
-	if ( rawChanges != SLListOfSequentChangeInfo.EMPTY_LIST ) {
+	if ( !rawChanges.isEmpty() ) {
 	    SequentChangeInfo sci = rawChanges.head ();
 	    rawChanges            = rawChanges.tail ();
 

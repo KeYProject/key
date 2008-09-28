@@ -157,7 +157,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
     }
 
     private JavaBlock replacePrg(SVInstantiations svInst, JavaBlock jb) {
-	if ( svInst == SVInstantiations.EMPTY_SVINSTANTIATIONS ) {
+        if ( svInst.isEmpty() ) {
 	    return jb;
 	}
 	ProgramReplaceVisitor trans;

@@ -262,7 +262,7 @@ public class TestApplyTaclet extends TestCase{
 	ListOfTacletApp appList = 
 	    rApp.findIfFormulaInstantiations ( goal.sequent (), 
 	                                       services, Constraint.BOTTOM );
-	assertTrue("Match Failed.", appList!=SLListOfTacletApp.EMPTY_LIST);
+	assertTrue("Match Failed.", !appList.isEmpty());
 	assertTrue("Too many matches.", appList.size()==1);
 	assertTrue("Wrong match found.", appList.head().instantiations()==rApp.instantiations());
 	assertTrue("Rule App should be complete", appList.head().complete());
@@ -273,7 +273,7 @@ public class TestApplyTaclet extends TestCase{
 	/*
  	ListOfSVInstantiations svilist=rApp.taclet().matchIf(goal.sequent(),
 					   rApp.instantiations(), null);
-	assertTrue("Match Failed.", svilist!=SLListOfSVInstantiations.EMPTY_LIST);
+	assertTrue("Match Failed.", !svilist.isEmpty());
 	assertTrue("Too many matches.", svilist.size()==1);
 	assertTrue("Wrong match found.", svilist.head()==rApp.instantiations());
 	assertTrue("Rule App should be complete", rApp.complete());
@@ -302,7 +302,7 @@ public class TestApplyTaclet extends TestCase{
  	ListOfGoal goals=rApp.execute(goal, TacletForTests.services());
  	assertTrue("Too many or zero goals for imp-left.",goals.size()==2);	
 	Sequent seq=goals.head().sequent();
-	if (seq.succedent()!=Semisequent.EMPTY_SEMISEQUENT) {
+	if (!seq.succedent().isEmpty()) {
 	    assertEquals("Wrong succedent after imp-left",
 			 seq.succedent().getFirst().formula(),
 			 fma.sub(0));  
@@ -372,7 +372,7 @@ public class TestApplyTaclet extends TestCase{
  	Sequent seq1=goals.head().sequent();
  	goals=goals.tail();
  	Sequent seq2=goals.head().sequent();
-	if (seq1.antecedent()!=Semisequent.EMPTY_SEMISEQUENT 
+	if (!seq1.antecedent().isEmpty() 
 	    && seq1.antecedent().getFirst().formula().equals(t_c)) {
 	    assertTrue("D is in antecedent of 1st goal but not in succedent of 2nd",
 		       seq2.succedent().getFirst().formula().equals(t_c)
@@ -415,7 +415,7 @@ public class TestApplyTaclet extends TestCase{
 			PosInOccurrence(userCfma, PosInTerm.TOP_LEVEL,
 					goal.node().sequent())));
 	    }
-       	    if (rapplist==SLListOfTacletApp.EMPTY_LIST) {
+       	    if (rapplist.isEmpty()) {
 		it=goal.node().sequent().succedent().iterator();
 		while (it.hasNext()) {		
 		    userCfma=it.next();	
@@ -430,12 +430,12 @@ public class TestApplyTaclet extends TestCase{
 	    out="\n"+out+("Choose for if-test: "+rapplist.head()+"\n");
 	    goals=goals.tail();
 	    boolean executed=false;
-	    while (!executed && rapplist!=SLListOfTacletApp.EMPTY_LIST) {
+	    while (!executed && !rapplist.isEmpty()) {
 		ListOfMapFromSchemaVariableToTerm
 		    mrlist=((Taclet)(rapplist.head().rule())).matchIf(goal.node().sequent(), 
 								    rapplist.head().instantiations());
 		out="\n"+out+("List of if-seq matches:"+mrlist);
-		if (mrlist!=SLListOfMapFromSchemaVariableToTerm.EMPTY_LIST) {		
+		if (!mrlist.isEmpty()) {		
 		    out+="Execute: "+rapplist.head()+"\n";
 		    goals=goals.prepend(rapplist.head().execute(goal));	
 		    executed=true;
@@ -607,7 +607,7 @@ public class TestApplyTaclet extends TestCase{
 	assertTrue("Expected one goal", goals.size()==1);
 	assertTrue("Expected '==>', but is "+
 		   goals.head().sequent(), 
-		   goals.head().sequent() == Sequent.EMPTY_SEQUENT);
+		   goals.head().sequent().isEmpty());
 
     }
 

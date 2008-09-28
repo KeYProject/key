@@ -84,6 +84,7 @@ options {
       prooflabel2tag.put("formula", new Character('f'));
       prooflabel2tag.put("inst", new Character('i'));
       prooflabel2tag.put("ifseqformula", new Character('q'));
+      prooflabel2tag.put("ifdirectformula", new Character('d'));
       prooflabel2tag.put("heur", new Character('h'));
       prooflabel2tag.put("builtin", new Character('n'));
       prooflabel2tag.put("keyLog", new Character('l'));
@@ -95,6 +96,7 @@ options {
       prooflabel2tag.put("userconstraint", new Character('o'));
       prooflabel2tag.put("matchconstraint", new Character('m'));
       prooflabel2tag.put("newnames", new Character('w'));
+      prooflabel2tag.put("autoModeTime", new Character('e'));
    }
 
     private NamespaceSet nss;
@@ -953,7 +955,7 @@ options {
           return pvc.result();
         }else 
   	  if(!isDeclParser()) {
-            if ((isTermParser() || isProblemParser()) && jb==JavaBlock.EMPTY_JAVABLOCK) {
+            if ((isTermParser() || isProblemParser()) && jb.isEmpty()) {
               return new HashSet();
             }   
             DeclarationProgramVariableCollector pvc
@@ -1242,7 +1244,7 @@ options {
                 .setStateRestriction(stateRestriction);
         } else if ( find instanceof Sequent ) {
             Sequent findSeq = (Sequent) find;
-            if ( findSeq == Sequent.EMPTY_SEQUENT ) {
+            if ( findSeq.isEmpty() ) {
                 return new NoFindTacletBuilder();
             } else if (   findSeq.antecedent().size() == 1
                           && findSeq.succedent().size() == 0 ) {
@@ -1386,9 +1388,15 @@ options {
         }
         final Sort s = IntersectionSort.getIntersectionSort(compositeSorts, sorts(), functions());
         if (!(s instanceof IntersectionSort)) {
-            semanticError("Failed to create an intersection sort of " + composites + 
-                ". Usually intersection is not required in these cases as \n" + 
-                "it is equal to one composite. In this case " + s);            
+            String err = "Failed to create an intersection sort of " + composites;
+            if (s == null) {
+                err += " as the resulting intersection sort would be empty.";
+            } else {
+                err += ". Usually intersection is not required in these cases as \n" + 
+                "it is equal to one composite. In this case " + s;
+            }
+            semanticError(err);
+                            
         }        
         return s;
     }

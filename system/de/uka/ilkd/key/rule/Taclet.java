@@ -851,8 +851,7 @@ public abstract class Taclet implements Rule, Named {
 	    SLListOfMatchConditions       .EMPTY_LIST;
 
 	Term                             updateFormula;
-	if ( p_matchCond.getInstantiations ().getUpdateContext() == 
-	     SLListOfUpdatePair.EMPTY_LIST )
+	if ( p_matchCond.getInstantiations ().getUpdateContext().isEmpty() )
 	    updateFormula = p_template;
 	else
 	    updateFormula = TermFactory.DEFAULT
@@ -914,7 +913,7 @@ public abstract class Taclet implements Rule, Named {
 			      p_services,
 			      p_userConstraint ).getMatchConditions ();
 
-	    if ( newMC == SLListOfMatchConditions.EMPTY_LIST )
+	    if ( newMC.isEmpty() )
 		return null;
 
 	    p_matchCond = newMC.head ();

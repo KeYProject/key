@@ -77,7 +77,7 @@ public class SetAsListOf<T> implements SetOf<T> {
 
     /** @return union of this set with set */
     public SetOf<T> union(SetOf<T> set) {
-	if (set==EMPTY_SET) {
+	if (set.isEmpty()) {
 	    return this;
 	}
 	SetOf<T> unified=set;       
@@ -118,9 +118,14 @@ public class SetAsListOf<T> implements SetOf<T> {
 	return elementList.size();
     }    
 
+    /** @return true iff the set is empty */
+    public boolean isEmpty() {
+	return false;
+    }
+
     public SetOf<T> remove(<T> element) {
 	ListOf<T> list = elementList.removeFirst(element);
-	return (list.size()==0) ? EMPTY_SET : new SetAsListOf<T>(list);
+	return (list.isEmpty()) ? EMPTY_SET : new SetAsListOf<T>(list);
     }
 
 
@@ -220,6 +225,11 @@ public class SetAsListOf<T> implements SetOf<T> {
 	public int size() {
 	    return 0;
 	}       
+
+	/** @return true iff the set is empty */
+	public boolean isEmpty() {
+	    return true;
+	}
 
 	/** @return true iff the this set is subset of o and vice versa.
 	 */

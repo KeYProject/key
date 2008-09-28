@@ -24,7 +24,6 @@ import recoder.io.ProjectSettings;
 
 import org.apache.log4j.Logger;
 
-import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.MethodCallInfo;
 import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
@@ -71,7 +70,7 @@ public class ProblemInitializer {
     
     private final ProgressMonitor pm;
     
-    private final HashSet alreadyParsed = new LinkedHashSet();
+    private final HashSet<EnvInput> alreadyParsed = new LinkedHashSet<EnvInput>();
     
     
     //-------------------------------------------------------------------------
@@ -182,13 +181,13 @@ public class ProblemInitializer {
 	
 	//collect all ldt includes into a single LDTInput
 	KeYFile[] keyFile = new KeYFile[in.getLDTIncludes().size()];
-	Iterator it = in.getLDTIncludes().iterator();
+	
 	int i = 0;
-	while(it.hasNext()){
-	    String name = (String) it.next();
+        for (String name : in.getLDTIncludes()) {
 	    keyFile[i++] = new KeYFile(name, in.get(name), pm);
 	}
-	LDTInput ldtInp = new LDTInput(keyFile, main);
+
+        LDTInput ldtInp = new LDTInput(keyFile, main);
 	
 	//read the LDTInput
 	readEnvInput(ldtInp, initConfig, readLibraries);
@@ -211,9 +210,7 @@ public class ProblemInitializer {
 	readLDTIncludes(in, initConfig, readLibraries);
 	
 	//read normal includes
-	Iterator it = in.getIncludes().iterator();
-	while(it.hasNext()){
-	    String fileName = (String) it.next();
+	for (String fileName : in.getIncludes()) {
 	    KeYFile keyFile = new KeYFile(fileName, in.get(fileName), pm);
 	    readEnvInput(keyFile, initConfig, readLibraries);
 	}
@@ -256,9 +253,9 @@ public class ProblemInitializer {
      * in the cfile directory.
      * Helper for readJava().
      */
-    private Vector getClasses(String f) throws ProofInputException  {
+    private Vector<String> getClasses(String f) throws ProofInputException  {
 	File cfile = new File(f);
-	Vector v=new Vector();
+	Vector<String> v=new Vector<String>();
 	if (cfile.isDirectory()) {
 	    String[] list=cfile.list();
 	    // mu(2008-jan-28): if the directory is not readable for the current user
@@ -348,7 +345,7 @@ public class ProblemInitializer {
                 r2k.parseSpecialClasses();
                 initConfig.getProofEnv().setJavaModel(JavaModel.NO_MODEL);
             } else {                 
-                String[] cus = (String[]) getClasses(javaPath).toArray(new String[]{});
+                String[] cus = getClasses(javaPath).toArray(new String[]{});
                 CompilationUnit[] compUnits = r2k.readCompilationUnitsAsFiles(cus);
                 initConfig.getServices().getJavaInfo().setJavaSourcePath(javaPath);               
 

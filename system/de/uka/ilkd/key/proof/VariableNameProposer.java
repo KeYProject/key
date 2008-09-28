@@ -105,8 +105,7 @@ public class VariableNameProposer implements InstantiationProposer {
         NamespaceSet namespaces = services.getNamespaces();
         Name name = null;
 
-        if (oldAnonUpdateProposals !=
-                de.uka.ilkd.key.logic.SLListOfName.EMPTY_LIST) {
+        if (!oldAnonUpdateProposals.isEmpty()) {
             name = oldAnonUpdateProposals.head();
             oldAnonUpdateProposals = oldAnonUpdateProposals.tail();
         } else {

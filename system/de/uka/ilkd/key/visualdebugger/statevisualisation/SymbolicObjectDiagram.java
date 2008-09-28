@@ -255,7 +255,7 @@ public class SymbolicObjectDiagram {
         if (t.op() == vd.getPostPredicate()) {
             return true; // TODO
         }
-        if (t.javaBlock() != JavaBlock.EMPTY_JAVABLOCK) {
+        if (!t.javaBlock().isEmpty()) {
             return true;
         }
         for (int i = 0; i < t.arity(); i++) {

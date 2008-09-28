@@ -121,7 +121,7 @@ public class IntersectionConstraint implements Constraint {
 
 	p_diff.setVal ( diff.intersectSimplify () );
 
-	if ( diff.subConstraints == SLListOfConstraint.EMPTY_LIST )
+	if ( diff.subConstraints.isEmpty() )
 	    return intersectSimplify ();
 
 	res.subConstraints = res.subConstraints.prepend ( diff.subConstraints );
@@ -176,10 +176,10 @@ public class IntersectionConstraint implements Constraint {
      * Make an "IntersectionConstraint" well-formed
      */
     protected Constraint intersectSimplify () {
-	if ( subConstraints == SLListOfConstraint.EMPTY_LIST )
+	if ( subConstraints.isEmpty() )
 	    return Constraint.TOP;
 
-	if ( subConstraints.tail () == SLListOfConstraint.EMPTY_LIST )
+	if ( subConstraints.tail ().isEmpty() )
 	    return subConstraints.head ();
 
 	return this;

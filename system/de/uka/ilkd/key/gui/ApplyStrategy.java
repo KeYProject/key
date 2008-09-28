@@ -95,6 +95,8 @@ public class ApplyStrategy {
             g.node().setReuseSource(reusePoint);
             rl.removeRPConsumedMarker(reusePoint.source());
             rl.removeRPConsumedGoal(g);
+            proof.getNameRecorder().setProposals(
+                    reusePoint.getNameProposals());
             ListOfGoal goalList = g.apply(app);
             rl.addRPOldMarkersNewGoals(goalList);
             rl.addRPNewMarkersAllGoals(reusePoint.source());
@@ -267,6 +269,7 @@ public class ApplyStrategy {
                 if (startedAsInteractive) mediator().startInterface(true);
             }
 
+            proof.addAutoModeTime(time);
             fireTaskFinished (new DefaultTaskFinishedInfo(ApplyStrategy.this, result, 
                     proof, time, 
                     countApplied, mediator().getNrGoalsClosedByAutoMode()));	  
