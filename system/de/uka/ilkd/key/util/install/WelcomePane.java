@@ -33,7 +33,7 @@ public class WelcomePane extends InstallationPane {
 	text.setText 
 	    ( "Dear User,\n"+
 	      "   thank you for choosing KeY. In case of any questions, problems " +
-	      "or suggestions please contact us: key@ira.uka.de\n" +  
+	      "or suggestions please contact us: suppor@key-project.org\n" +  
 	      "We would also be interested to know for which purpose you " + 
 	      "will use KeY, e.g. research, industry or teaching.\n" + 
 	      "\t Best regards,\n" +
