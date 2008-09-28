@@ -29,7 +29,6 @@ import de.uka.ilkd.key.util.Debug;
 
 public class ProofTreeView extends JPanel {
 
-
     private static final Color PASTEL_COLOR = new Color(255,255,204);
     private static final Color BISQUE_COLOR = new Color(240,228,196);
     private static final Color PALE_RED_COLOR = new Color(255,153,153);
@@ -114,40 +113,30 @@ public class ProofTreeView extends JPanel {
 	delegateView.setScrollsOnExpand(true);
         ToolTipManager.sharedInstance().registerComponent(delegateView);
 	
-	MouseListener ml = new MouseAdapter() {
-		public void mousePressed(MouseEvent e) {
-		    if (e.isPopupTrigger()) {
-			TreePath selPath = delegateView.getPathForLocation
-			    (e.getX(), e.getY());
-			if (selPath!=null && (selPath.getLastPathComponent() 
-				instanceof GUIProofTreeNode || 
-				selPath.getLastPathComponent() instanceof 
-				GUIBranchNode)) {
-			    JPopupMenu popup = new ProofTreePopupMenu(selPath);
-			    popup.show(e.getComponent(),
-					e.getX(), e.getY());
-			}
-		    }
-		}
-                
-                public void mouseReleased(MouseEvent e) {
-                    mousePressed(e);
+        MouseListener ml = new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    TreePath selPath = delegateView.getPathForLocation
+                        (e.getX(), e.getY());
+                    if (selPath!=null && (selPath.getLastPathComponent() 
+                            instanceof GUIProofTreeNode || 
+                            selPath.getLastPathComponent() instanceof 
+                            GUIBranchNode)) {
+                        JPopupMenu popup = new ProofTreePopupMenu(selPath);
+                        popup.show(e.getComponent(),
+                                    e.getX(), e.getY());
+                    }
                 }
-	    };	    	
+            }
+            
+            public void mouseReleased(MouseEvent e) {
+                mousePressed(e);
+            }
+        };          
 	
 	delegateView.addMouseListener(ml);
 
 	setMediator(mediator);
-
-// 	UIManager.addPropertyChangeListener(
-// 	    new PropertyChangeListener() {
-// 		    public void propertyChange(PropertyChangeEvent e) {
-// 			if (Config.KEY_FONT_PROOF_TREE.
-// 			    equals(e.getPropertyName())) {
-// 			    setProofTreeFont();
-// 			}
-// 		    }
-// 		});
 
 	Config.DEFAULT.addConfigChangeListener( configChangeListener);
 
