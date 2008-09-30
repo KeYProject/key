@@ -199,9 +199,9 @@ public class MethodCall extends ProgramMetaConstruct {
 	
 	staticPrefixType = getStaticPrefixType(methRef.getReferencePrefix(), services);
 	if(execContext != null){
-	    pm = assertImplementationPresent
-		(methRef.method(services, staticPrefixType, execContext),
-		 staticPrefixType);
+            pm = assertImplementationPresent
+                (methRef.method(services, staticPrefixType, execContext), 
+                 staticPrefixType);
 	}else{
 	    pm = assertImplementationPresent
 		(methRef.method(services, staticPrefixType, 

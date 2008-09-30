@@ -578,7 +578,11 @@ public class TypeConverter extends TermBuilder {
 	    return services.getJavaInfo().getKeYJavaType(t.sort());
 	}
         
-        KeYJavaType result = services.getJavaInfo().getKeYJavaType(t.sort());        
+        KeYJavaType result = services.getJavaInfo().getKeYJavaType(t.sort());  
+        if (result == null) {
+            //HACK
+            result = services.getJavaInfo().getKeYJavaType(t.sort().toString()); 
+        }
         if (result == null) {
            result = getKeYJavaType(convertToProgramElement(t));
         }

@@ -6,7 +6,7 @@ public abstract class BBug{
       @  requires x>=0 && y>=0;
       @  working_space \space(LTMemory)+\space(Runnable);
       @*/
-    public final void /*@scopeSafe@*/ foo(final int x, final int y){
+    public static final void /*@scopeSafe@*/ foo(final int x, final int y){
 	ScopedMemory m = new LTMemory(24*x+16);
 	Runnable r = new Runnable(){
 		public void run(){
@@ -21,7 +21,7 @@ public abstract class BBug{
 			a[j] = new A();
 			j++;
 		    }
-		    bar(a);
+		    BBug.bar(a);
 		}
 	    };
 	int i=0;
@@ -40,6 +40,6 @@ public abstract class BBug{
       @  assignable \nothing; 
       @  working_space 0;
       @*/
-    public void bar(A[] a);
+    public static void bar(A[] a);
 
 }

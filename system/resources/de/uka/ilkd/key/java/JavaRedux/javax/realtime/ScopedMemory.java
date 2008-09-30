@@ -72,10 +72,15 @@ public abstract class ScopedMemory extends MemoryArea{
     //	java.lang.Object[] args){}
 
     public void setPortal(java.lang.Object object){
-	if(this==getMemoryArea(object)){
-	    portal = object;
-	}else{
-	    throw new IllegalAssignmentError();
+	if(!outerScopeM(this, <currentMemoryArea>)){
+	    throw new InaccessibleAreaException();
+	}
+	if(object!=null){
+	    if(this==getMemoryArea(object)){
+		portal = object;
+	    }else{
+		throw new IllegalAssignmentError();
+	    }
 	}
     }
 

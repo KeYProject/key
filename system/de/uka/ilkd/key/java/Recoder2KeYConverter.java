@@ -1323,7 +1323,7 @@ public class Recoder2KeYConverter {
             prefix = (ReferencePrefix) children.get(prefixPos);
             children.remove(prefixPos);
         }
-
+        
         return new MethodReference(children,
                 pm == null ? new ProgramElementName(mr.getName()) : pm
                         .getProgramElementName(), prefix, positionInfo(mr));

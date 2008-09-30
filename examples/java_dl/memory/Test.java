@@ -145,11 +145,6 @@ public class Test extends SuperTest{
 		    final LTMemory ltm3 = new LTMemory(3000000);
 		    RefCont rc = new RefCont();
 		    enterAreaWithAssignment(ltm1, ltm3, rc);
-		    /*		    ltm1.executeInArea( new Runnable(){
-			    public void run(){
-				ltm3.enter(hello);
-			    }
-			    });*/
 		}
 	    };
 	ltm1.enter(new Runnable(){

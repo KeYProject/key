@@ -39,7 +39,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
      *      Name.
      */
     protected final MethodName name;
-
+    
     /**
      *      Arguments.
      */
@@ -65,10 +65,11 @@ public class MethodReference extends JavaNonTerminalProgramElement
    public MethodReference(ExtList children, MethodName n, ReferencePrefix p) {
 	this(new ArrayOfExpression((Expression[]) 
 				   children.collect(Expression.class)),
-	     n, p, (PositionInfo) children.get(PositionInfo.class) );
+	     n, p, (PositionInfo) children.get(PositionInfo.class));
     }
 
-     public MethodReference(ExtList children, MethodName n, ReferencePrefix p,PositionInfo pos) {
+     public MethodReference(ExtList children, MethodName n, ReferencePrefix p,
+             PositionInfo pos) {
 	this(new ArrayOfExpression((Expression[]) 
 				   children.collect(Expression.class)),
 	     n, p, pos);
@@ -100,7 +101,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
         if (arguments  != null) result += arguments.size();
         return result;
     }
-
+    
     /**
      *      Returns the child at the specified index in this node's "virtual"
      *      child array
