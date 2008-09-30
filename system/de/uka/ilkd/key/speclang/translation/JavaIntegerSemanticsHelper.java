@@ -191,7 +191,6 @@ public class JavaIntegerSemanticsHelper {
 	    resultType = tc.getPromotedType(tc.getKeYJavaType(a), tc
 		    .getKeYJavaType(b));
 	} catch (RuntimeException e) {
-            e.printStackTrace();
             raiseError("Error in additive expression " + a.toString() + " + "
 		    + b.toString() + ":\n"+e);
 	}

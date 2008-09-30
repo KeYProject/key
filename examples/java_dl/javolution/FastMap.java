@@ -1,9 +1,15 @@
+import javax.realtime.*;
+
 public class FastMap{
 
     /**
      * Holds table higher index rotation. 
      */
     static final int R0 = 5;
+
+    /*@ public invariant \memoryArea(_head)==\memoryArea(_tail) && 
+      @    \memoryArea(this)==\memoryArea(_tail);
+      @*/
 
     /**
      * Holds the table lower index mask. 
@@ -27,6 +33,10 @@ public class FastMap{
      * The tail entry changes as entries are added/removed.
      */
     transient Entry _tail;
+
+    public FastMap(int capacity) {
+        setup(capacity);
+    }
 
    /*@ public normal_behavior
      @  requires capacity <= (1 << R0) && capacity>=0 && 
@@ -80,6 +90,45 @@ public class FastMap{
             previous._next = newEntry;
             previous = newEntry;
         }
+    }
+
+    public final Object/*{V}*/put(MyObject/*{K}*/key, MyObject/*{V}*/value) {
+        addEntry(key.hashCode(), key, value);
+    }
+
+    private void addEntry(int hash, Object/*{K}*/key, Object/*{V}*/value) {
+        if (_tail._next == null) {
+            increaseCapacity();
+        }
+        final Entry newTail = _tail._next;
+        // Setups entry parameters.
+        _tail._key = key;
+        _tail._value = value;
+        _tail._keyHash = hash;
+        _tail._table = _entries;
+	// Connects to bucket ...
+    }
+
+    private void increaseCapacity() {
+        MemoryArea.getMemoryArea(this).executeInArea(new Runnable() {
+            public void run() {
+                Entry newEntry0 = new Entry();
+                _tail._next = newEntry0;
+                newEntry0._previous = _tail;
+
+                Entry newEntry1 = new Entry();
+                newEntry0._next = newEntry1;
+                newEntry1._previous = newEntry0;
+
+                Entry newEntry2 = new Entry();
+                newEntry1._next = newEntry2;
+                newEntry2._previous = newEntry1;
+
+                Entry newEntry3 = new Entry();
+                newEntry2._next = newEntry3;
+                newEntry3._previous = newEntry2;
+            }
+        });
     }
 
 }

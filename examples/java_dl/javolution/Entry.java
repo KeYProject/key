@@ -3,7 +3,7 @@ public class Entry {
     /**
      * Holds the next node.
      */
-    Entry _next;
+    Entry /*@nullable@*/ _next;
 
     /**
      * Holds the previous node.

@@ -129,7 +129,7 @@ public abstract class MemoryArea{
       @  ensures \result == \memoryArea(object);
       @  working_space 0;
       @*/
-    public static MemoryArea getMemoryArea(java.lang.Object object);
+    public static /*@pure@*/ MemoryArea getMemoryArea(java.lang.Object object);
 
     /*@ normal_behavior
       @  working_space 0;
