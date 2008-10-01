@@ -163,6 +163,46 @@ class JMLInfoExtractor {
     }
     
     /**
+     * Returns true, if the receiver object of the given method is specified arbitraryScopeThis.
+     */
+    public static boolean arbitraryScopeThis(ProgramMethod pm) {
+        return hasJMLModifier(pm, "arbitraryScopeThis");
+    }
+    
+    /**
+     * Returns true, if the result of the given method is specified arbitraryScope.
+     */
+    public static boolean resultArbitraryScope(ProgramMethod pm) {
+        return hasJMLModifier(pm, "arbitraryScope");
+    }
+    
+    /**
+     * Returns true, iff the <code>pos</code>-th parameter of the given method
+     * is declared "arbitraryScope". 
+     */
+    public static boolean parameterInArbitraryScope(ProgramMethod pm, int pos) {
+
+        MethodDeclaration md = pm.getMethodDeclaration();
+        ParameterDeclaration pd = md.getParameterDeclarationAt(pos);
+
+        ListOfComment comments = SLListOfComment.EMPTY_LIST;
+        comments = comments.prepend(pd.getComments());
+        comments = comments.prepend(pd.getTypeReference().getComments());
+        comments = comments.prepend(pd.getVariableSpecification().getComments());
+        for (int j=0; j < pd.getModifiers().size(); j++) {
+            comments = comments.prepend(pd.getModifiers().getModifier(j).getComments());
+        }
+        for (IteratorOfComment it = comments.iterator(); it.hasNext(); ) {
+            Comment c = it.next();
+            if (checkFor("arbitraryScope",c.getText())){
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
      * Returns true, if the given KeYJavaType is specified "scopeSafe".
      */
     public static boolean isScopeSafe(KeYJavaType kjt) {

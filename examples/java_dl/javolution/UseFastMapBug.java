@@ -3,8 +3,6 @@ import javax.realtime.*;
 public class UseFastMapBug{
 
     /*@ public normal_behavior
-      @  requires \outerScope(\memoryArea(a), \currentMemoryArea) && \outerScope(\memoryArea(b), \currentMemoryArea) &&
-      @     \outerScope(\memoryArea(fm), \currentMemoryArea);
       @  requires \memoryArea(fm).memoryRemaining() >=
       @      (\currentMemoryArea==\memoryArea(fm) ? \space(LTMemory)+\space(Runnable) : 0) + 4*\space(Entry);
       @  working_space (\currentMemoryArea==\memoryArea(fm) ? 4*\space(Entry) : 0)+\space(LTMemory)+\space(Runnable); 
@@ -20,8 +18,7 @@ public class UseFastMapBug{
     }
 
     /*@ public normal_behavior
-      @  requires \outerScope(\memoryArea(a), \currentMemoryArea) && \outerScope(\memoryArea(b), \currentMemoryArea) &&
-      @     \outerScope(\memoryArea(fm), \currentMemoryArea) && \outerScope(\memoryArea(a), \memoryArea(fm)) && 
+      @  requires \outerScope(\memoryArea(a), \memoryArea(fm)) && 
       @     \outerScope(\memoryArea(b), \memoryArea(fm));
       @  working_space (\currentMemoryArea==\memoryArea(fm) ? 4*\space(Entry) : 0)+\space(LTMemory)+\space(Runnable); 
       @*/

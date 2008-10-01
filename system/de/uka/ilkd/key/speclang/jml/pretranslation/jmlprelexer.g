@@ -92,6 +92,8 @@ tokens {
     REQUIRES 			= "requires";
     REQUIRES_RED 		= "requires_redundantly";
     SCOPE_SAFE 			= "scopeSafe";
+    ARBITRARY_SCOPE 	= "arbitraryScope";
+    ARBITRARY_SCOPE_THIS = "arbitraryScopeThis";
     SET 			= "set";
     SIGNALS 			= "signals";
     SIGNALS_ONLY 		= "signals_only";

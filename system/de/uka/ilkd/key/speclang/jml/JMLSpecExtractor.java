@@ -351,37 +351,60 @@ public class JMLSpecExtractor implements SpecExtractor {
                 }
             }
             
-            //add non-null preconditions
+            if(JMLInfoExtractor.arbitraryScopeThis(pm)){
+                specCase.addRequires(new PositionedString("\\outerScope(\\memoryArea(this),\\currentMemoryArea)", 
+                        fileName, 
+                        pm.getStartPosition()));
+            }
+            
+            //add non-null and outer scope preconditions
             for (int j = 0, n = pm.getParameterDeclarationCount(); j < n; j++) {
                 Type t = pm.getParameterDeclarationAt(j).
                             getTypeReference().
                             getKeYJavaType();
                 // no additional precondition for primitive types!
-                if (services.getTypeConverter().isReferenceType(t)
-                        && !JMLInfoExtractor.parameterIsNullable(pm, j)) {
+                if (services.getTypeConverter().isReferenceType(t)){
                     String param_name = pm.
-                            getParameterDeclarationAt(j).
-                            getVariableSpecification().
-                            getName();
-                    String nonNull = param_name + " != null";
-                    specCase.addRequires(new PositionedString(
-                	    			nonNull, 
-                	    			fileName, 
-                	    			pm.getStartPosition()));
+                        getParameterDeclarationAt(j).
+                        getVariableSpecification().
+                        getName();
+                    if(!JMLInfoExtractor.parameterIsNullable(pm, j)) {
+                        String nonNull = param_name + " != null";
+                        specCase.addRequires(new PositionedString(
+                               nonNull, 
+                               fileName, 
+                               pm.getStartPosition()));
+                   }
+                   if(!JMLInfoExtractor.parameterInArbitraryScope(pm, j)){
+                       String outerScope = "\\outerScope(\\memoryArea("+param_name+"),\\currentMemoryArea)";
+                       specCase.addRequires(new PositionedString(
+                               outerScope, 
+                               fileName, 
+                               pm.getStartPosition()));
+                   }
                 }
+                 
             }
             
             //add non-null postcondition
             KeYJavaType resultType = pm.getKeYJavaType();
             if(resultType != null
                && services.getTypeConverter().isReferenceType(resultType)
-               && !JMLInfoExtractor.resultIsNullable(pm)
                && specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
-                String nonNull = "\\result " + " != null";
-                specCase.addEnsures(new PositionedString(
-                				nonNull, 
-                				fileName, 
-                				pm.getStartPosition()));
+                if(!JMLInfoExtractor.resultIsNullable(pm)){
+                    String nonNull = "\\result " + " != null";
+                    specCase.addEnsures(new PositionedString(
+                            nonNull, 
+                            fileName, 
+                            pm.getStartPosition()));
+                }
+                if(!JMLInfoExtractor.resultArbitraryScope(pm)){
+                    String outerScope = "\\outerScope(\\memoryArea(\\result),\\currentMemoryArea)";
+                    specCase.addEnsures(new PositionedString(
+                            outerScope, 
+                            fileName, 
+                            pm.getStartPosition()));            
+                }
             }
             
             // add implicit signals-only if omitted
