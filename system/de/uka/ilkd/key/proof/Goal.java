@@ -480,6 +480,7 @@ public class Goal  {
 				ruleAppManager.copy () );
 	clone.listeners = (List<GoalListener>)
 	    ((ArrayList<GoalListener>) listeners).clone();
+	clone.disabled = this.disabled;
 	return clone;
     }
 

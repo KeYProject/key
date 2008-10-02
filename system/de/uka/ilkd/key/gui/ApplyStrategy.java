@@ -103,8 +103,6 @@ public class ApplyStrategy {
         } else {
             while ( ( g = goalChooser.getNextGoal () ) != null ) {
                 
-                assert !g.isDisabled() : "A disabled goal has been chosen:"+g;
-
                 app = g.getRuleAppManager().next();
 
                 if ( app == null )

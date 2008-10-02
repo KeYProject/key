@@ -439,6 +439,17 @@ public class Proof implements Named {
     public ListOfGoal openGoals() {
 	return openGoals;
     }
+    
+    public ListOfGoal openEnabledGoals() {
+        ListOfGoal enabledGoals = SLListOfGoal.EMPTY_LIST;
+        for(Goal g : openGoals) {
+            if(!g.isDisabled()) {
+                enabledGoals = enabledGoals.prepend(g);
+            }
+        }
+        return enabledGoals;
+    }    
+
 
     /** 
      * removes the given goal and adds the new goals in list 
@@ -872,5 +883,6 @@ public class Proof implements Named {
      */
     public SpecExtPO getPO() {
         return specExtPO;
-    }    
+    }
+
 }

@@ -818,7 +818,7 @@ public class KeYMediator {
      */
     public void startAutoMode() {
 	if (ensureProofLoaded()) {
-	    startAutoMode(getProof().openGoals());
+	    startAutoMode(getProof().openEnabledGoals());
 	}
     }
 

@@ -86,10 +86,6 @@ public class DefaultGoalChooser implements IGoalChooser {
             while ( it.hasNext () ) {
                 final Goal goal = it.next ();
                 
-                if(goal.isDisabled()) {
-                    continue;
-                }
-
                 if ( goal.getClosureConstraint ().isSatisfiable () )
                     goalList     = goalList    .prepend ( goal );
                 else
