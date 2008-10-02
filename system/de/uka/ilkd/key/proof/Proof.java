@@ -443,7 +443,7 @@ public class Proof implements Named {
     public ListOfGoal openEnabledGoals() {
         ListOfGoal enabledGoals = SLListOfGoal.EMPTY_LIST;
         for(Goal g : openGoals) {
-            if(!g.isDisabled()) {
+            if(g.isEnabled()) {
                 enabledGoals = enabledGoals.prepend(g);
             }
         }

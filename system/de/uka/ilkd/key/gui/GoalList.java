@@ -70,13 +70,13 @@ public class GoalList extends JList {
         DisableSingleGoal() {
             if (getSelectedValue() instanceof Goal) {                
                 final Goal g = (Goal) getSelectedValue();
-                putValue(NAME, !g.isDisabled() ? "Disable Goal" : "Enable Goal");
-                putValue(SHORT_DESCRIPTION,  !g.isDisabled() ? "No automatic rules " +
+                putValue(NAME, g.isEnabled() ? "Disable Goal" : "Enable Goal");
+                putValue(SHORT_DESCRIPTION,  g.isEnabled() ? "No automatic rules " +
                 		"will be applied when goal is disabled." : 
                 		    "Re-enable automatic rule application for this goal.");
-                putValue(SMALL_ICON, !g.isDisabled() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU : 
+                putValue(SMALL_ICON, g.isEnabled() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU : 
                     KEY_HOLE_PULL_DOWN_MENU);
-                disableGoals = !g.isDisabled();
+                enableGoals = !g.isEnabled();
                 setEnabled(true);
             } else {
                 setEnabled(false);
@@ -116,13 +116,13 @@ public class GoalList extends JList {
         DisableOtherGoals() {
             if (getSelectedValue() instanceof Goal) {                
                 final Goal g = (Goal) getSelectedValue();
-                putValue(NAME, !g.isDisabled() ? "Disable Other Goals" : "Enable Other Goals");
-                putValue(SHORT_DESCRIPTION,  !g.isDisabled() ? "No automatic rules " +
+                putValue(NAME, g.isEnabled() ? "Disable Other Goals" : "Enable Other Goals");
+                putValue(SHORT_DESCRIPTION,  g.isEnabled() ? "No automatic rules " +
                                 "will be applied on all other goals." : 
                                     "Re-enable automatic rule application for other goals.");
-                putValue(SMALL_ICON, !g.isDisabled() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU : 
+                putValue(SMALL_ICON, g.isEnabled() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU : 
                     KEY_HOLE_PULL_DOWN_MENU);
-                disableGoals = !g.isDisabled();
+                enableGoals = !g.isEnabled();
                 
                 setEnabled(getModel().getSize() > 1);
             } else {
@@ -789,7 +789,7 @@ public class GoalList extends JList {
 
 		if ( ((Goal)value).getClosureConstraint ().isSatisfiable () )
 		    col = Color.blue;		
-		statusIcon = ((Goal)value).isDisabled() ? disabledGoalIcon : keyIcon;
+		statusIcon = ((Goal)value).isEnabled() ? keyIcon : disabledGoalIcon;
 	    } else {
 		valueStr   = ""+value;
                 statusIcon = keyIcon;

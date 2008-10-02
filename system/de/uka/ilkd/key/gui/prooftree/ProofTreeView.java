@@ -636,7 +636,7 @@ public class ProofTreeView extends JPanel {
 		    ProofTreeView.this.setToolTipText("Closed Goal");
 		    tree_cell.setToolTipText("A closed goal");
 		} else {
-		    if ( goal.isDisabled() ) {
+		    if ( !goal.isEnabled() ) {
 		        tree_cell.setForeground(Color.orange);
 		        tree_cell.setIcon(IconFactory.keyHoleDisabled(20, 20));
 		        ProofTreeView.this.setToolTipText("Disabled Goal");
@@ -785,9 +785,9 @@ public class ProofTreeView extends JPanel {
 	    search.addActionListener(this);
 	    this.add(new JSeparator());
 	    // disable goals
-	    this.add(new SetGoalsBelowDisableStatus(true));
+	    this.add(new SetGoalsBelowEnableStatus(false));
 	    // enable goals
-	    this.add(new SetGoalsBelowDisableStatus(false));
+	    this.add(new SetGoalsBelowEnableStatus(true));
 	    this.add(new JSeparator());
 	    this.add(goalBack);
 	    if (branch != path) {
@@ -953,17 +953,17 @@ public class ProofTreeView extends JPanel {
          * 
          * @author mulbrich
          */
-	private final class SetGoalsBelowDisableStatus extends DisableGoal {
+	private final class SetGoalsBelowEnableStatus extends DisableGoal {
 
-	    public SetGoalsBelowDisableStatus(boolean disableGoals) {
-	        this.disableGoals = disableGoals;
+	    public SetGoalsBelowEnableStatus(boolean enableGoals) {
+	        this.enableGoals = enableGoals;
 	        
-	        String action = disableGoals ? "Disable" : "Enable";
+	        String action = enableGoals ? "Disable" : "Enable";
 	        putValue(NAME, action + " All Goals Below");
-	        if(disableGoals)
-	            putValue(SHORT_DESCRIPTION, "Exclude this node and all goals in the subtree from automatic rule application");
-	        else
+	        if(enableGoals)
 	            putValue(SHORT_DESCRIPTION, "Include this node and all goals in the subtree in automatic rule application");
+	        else
+	            putValue(SHORT_DESCRIPTION, "Exclude this node and all goals in the subtree from automatic rule application");
             }
 	    
 	    /*

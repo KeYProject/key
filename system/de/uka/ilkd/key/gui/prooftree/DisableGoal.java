@@ -23,7 +23,7 @@ public abstract class DisableGoal extends AbstractAction {
     /**
      * indicates whether this action enables or disables goals
      */
-    protected boolean disableGoals = false;
+    protected boolean enableGoals = false;
     
     /**
      * enables or disables all given goals
@@ -31,14 +31,14 @@ public abstract class DisableGoal extends AbstractAction {
      */
     private void setGoalStatus(Iterable<Goal> goals) {
         for (final Goal g : goals) {
-            g.setDisabled(disableGoals);
+            g.setEnabled(enableGoals);
         }
     }
     
     /**
      * an implementation should return an iterable collection over those
      * goals that are to be disabled or enabled according to the setting of 
-     * {@link #disableGoals}.
+     * {@link #enableGoals}.
      * 
      * @return an iterator of Goals to set the enable state for, not null
      */

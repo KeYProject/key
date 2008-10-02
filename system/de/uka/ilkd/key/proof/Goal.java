@@ -70,8 +70,8 @@ public class Goal  {
     /** goal listeners  */
     private List<GoalListener> listeners = new ArrayList<GoalListener>();
 
-    /** a goal has been excluded from automatic rule application iff disabled == true */
-    private boolean disabled = false;
+    /** a goal has been excluded from automatic rule application iff enabled == false */
+    private boolean enabled = true;
     
     /** list of rule app listeners */
     private static List<RuleAppListener> ruleAppListenerList = 
@@ -350,12 +350,12 @@ public class Goal  {
 	return node().sequent();
     }
     
-    public boolean isDisabled() {
-        return disabled;
+    public boolean isEnabled() {
+        return enabled;
     }
     
-    public void setDisabled(boolean t) {
-        disabled = t;
+    public void setEnabled(boolean t) {
+        enabled = t;
     }
 
     
@@ -480,7 +480,7 @@ public class Goal  {
 				ruleAppManager.copy () );
 	clone.listeners = (List<GoalListener>)
 	    ((ArrayList<GoalListener>) listeners).clone();
-	clone.disabled = this.disabled;
+	clone.enabled = this.enabled;
 	return clone;
     }
 
