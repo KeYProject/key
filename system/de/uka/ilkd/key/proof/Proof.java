@@ -440,9 +440,26 @@ public class Proof implements Named {
 	return openGoals;
     }
     
+    /**
+     * return the list of open and enabled goals
+     * @return list of open and enabled goals, never null
+     * @author mulbrich
+     */
     public ListOfGoal openEnabledGoals() {
+        return filterEnabledGoals(openGoals);
+    }
+
+    /**
+     * filter those goals from a list which are enabled
+     * 
+     * @param goals non-null list of goals
+     * @return sublist such that every goal in the list is enabled
+     * @see Goal#isEnabled()
+     * @author mulbrich
+     */
+    private ListOfGoal filterEnabledGoals(ListOfGoal goals) {
         ListOfGoal enabledGoals = SLListOfGoal.EMPTY_LIST;
-        for(Goal g : openGoals) {
+        for(Goal g : goals) {
             if(g.isEnabled()) {
                 enabledGoals = enabledGoals.prepend(g);
             }
@@ -780,6 +797,7 @@ public class Proof implements Named {
     }
 
     /** returns the list of goals of the subtree starting with node 
+     * 
      * @param node the Node where to start from
      * @return the list of goals of the subtree starting with node 
      */
@@ -796,6 +814,15 @@ public class Proof implements Named {
 	    }
 	}
 	return result;
+    }
+    
+    /**
+     * get the list of goals of the subtree starting with node which are enabled.
+     * @param node the Node where to start from
+     * @return the list of enabled goals of the subtree starting with node 
+     */
+    public ListOfGoal getSubtreeEnabledGoals(Node node) {
+        return filterEnabledGoals(getSubtreeGoals(node));
     }
 
     /** returns true iff the given node is found in the proof tree 

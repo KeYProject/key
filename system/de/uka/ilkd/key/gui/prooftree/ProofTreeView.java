@@ -830,8 +830,7 @@ public class ProofTreeView extends JPanel {
 		delegateModel.setAttentive(true);
 		makeNodeVisible(mediator.getSelectedNode());
 	    } else if (e.getSource() == runStrategy) {
-		mediator().startAutoMode
-		    (proof.getSubtreeGoals(invokedNode));
+		runStrategyOnNode();
 	    } else if (e.getSource() == mark) {
 		mediator().mark(invokedNode);
                 delegateView.treeDidChange(); // redraw with mark
@@ -947,6 +946,25 @@ public class ProofTreeView extends JPanel {
                 mediator.changeNode(invokedNode);
             }
 	}
+
+	/**
+	 * run automatic on the currently selected node.
+	 * All enabled goals below the current node are taken into consideration. 
+	 * 
+	 * CAUTION: If the node itself is a goal then allow applying rules
+	 *   to it even if it were disabled. Desired behaviour? 
+	 * 
+	 */
+	private void runStrategyOnNode() {
+	    Goal invokedGoal = proof.getGoal(invokedNode);
+	    // is the node a goal?
+            if(invokedGoal == null) {
+                ListOfGoal enabledGoals = proof.getSubtreeEnabledGoals(invokedNode);
+                mediator().startAutoMode(enabledGoals);
+            } else {
+                mediator().startAutoMode(SLListOfGoal.EMPTY_LIST.prepend(invokedGoal));
+            }
+	}
 	
 	/**
 	 * Action for enabling/disabling all goals below "node".
@@ -958,7 +976,7 @@ public class ProofTreeView extends JPanel {
 	    public SetGoalsBelowEnableStatus(boolean enableGoals) {
 	        this.enableGoals = enableGoals;
 	        
-	        String action = enableGoals ? "Disable" : "Enable";
+	        String action = enableGoals ? "Enable" : "Disable";
 	        putValue(NAME, action + " All Goals Below");
 	        if(enableGoals)
 	            putValue(SHORT_DESCRIPTION, "Include this node and all goals in the subtree in automatic rule application");
@@ -971,26 +989,10 @@ public class ProofTreeView extends JPanel {
 	     */
             @Override
             public Iterable<Goal> getGoalList() {
-                List<Goal> goalsToChange = new ArrayList<Goal>();
-                IteratorOfGoal it = proof.openGoals ().iterator();
-                while (it.hasNext ()) {
-                    Goal g = it.next();
-                    Node n = g.node();
-                    GUIProofTreeNode node = delegateModel.getProofTreeNode(n);
-                    if (node != null) {
-                        TreeNode[] obs = node.getPath();
-                        TreePath tp = new TreePath(obs);
-                        if (branch.isDescendant(tp)) {
-                            goalsToChange.add(g);
-                        }
-                    }
-                }
-                
                 // trigger repainting the tree after the completion of this event.
                 delegateView.repaint();
-                return goalsToChange;
+                return proof.getSubtreeGoals(invokedNode);
             }
-	    
 	}
 	
         public void itemStateChanged(ItemEvent e) {
