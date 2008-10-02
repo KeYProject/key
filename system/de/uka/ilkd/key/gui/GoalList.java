@@ -40,9 +40,6 @@ public class GoalList extends JList {
     private final static ImageIcon keyIcon = IconFactory.keyHole(20,20);
     private final static Icon disabledGoalIcon = IconFactory.keyHoleDisabled(20, 20);
 
-    private static final Icon KEY_HOLE_DISABLED_PULL_DOWN_MENU = IconFactory.keyHoleDisabled(16, 16);
-    private static final ImageIcon KEY_HOLE_PULL_DOWN_MENU = IconFactory.keyHole(16, 16);
-    
     private KeYMediator mediator;   
 
     /** the model used by this view */

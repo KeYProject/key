@@ -13,7 +13,6 @@ package de.uka.ilkd.key.gui.prooftree;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-import java.util.List;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -978,10 +977,13 @@ public class ProofTreeView extends JPanel {
 	        
 	        String action = enableGoals ? "Enable" : "Disable";
 	        putValue(NAME, action + " All Goals Below");
-	        if(enableGoals)
+	        if(enableGoals) {
 	            putValue(SHORT_DESCRIPTION, "Include this node and all goals in the subtree in automatic rule application");
-	        else
+	            putValue(SMALL_ICON, KEY_HOLE_PULL_DOWN_MENU);
+	        } else {
 	            putValue(SHORT_DESCRIPTION, "Exclude this node and all goals in the subtree from automatic rule application");
+                    putValue(SMALL_ICON, KEY_HOLE_DISABLED_PULL_DOWN_MENU);
+	        }	       
             }
 	    
 	    /*

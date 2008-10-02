@@ -3,8 +3,11 @@ package de.uka.ilkd.key.gui.prooftree;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.ListSelectionModel;
 
+import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.proof.Goal;
 
 /**
@@ -14,6 +17,9 @@ import de.uka.ilkd.key.proof.Goal;
  *
  */
 public abstract class DisableGoal extends AbstractAction {
+    
+    public static final Icon KEY_HOLE_DISABLED_PULL_DOWN_MENU = IconFactory.keyHoleDisabled(16, 16);
+    public static final ImageIcon KEY_HOLE_PULL_DOWN_MENU = IconFactory.keyHole(16, 16);
     
     /**
      * 
