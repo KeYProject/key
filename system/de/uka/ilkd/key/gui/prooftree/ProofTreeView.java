@@ -13,6 +13,7 @@ package de.uka.ilkd.key.gui.prooftree;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -721,8 +722,6 @@ public class ProofTreeView extends JPanel {
 	private JCheckBoxMenuItem hideClosedSubtrees = 
 		new JCheckBoxMenuItem("Hide Closed Subtrees");
 	private JMenuItem search = new JMenuItem("Search");
-	private JMenuItem disableGoals = new JMenuItem("Disable Goals Below");
-	private JMenuItem enableGoals = new JMenuItem("Enable Goals Below");
 	private JMenuItem goalBack    = new JMenuItem("Prune Proof");
 	private JMenuItem runStrategy = new JMenuItem("Apply Strategy",
 	    IconFactory.autoModeStartLogo(10));
@@ -785,10 +784,10 @@ public class ProofTreeView extends JPanel {
 	    this.add(search);
 	    search.addActionListener(this);
 	    this.add(new JSeparator());
-	    disableGoals.addActionListener(this);
-	    this.add(disableGoals);
-	    enableGoals.addActionListener(this);
-	    this.add(enableGoals);
+	    // disable goals
+	    this.add(new SetGoalsBelowDisableStatus(true));
+	    // enable goals
+	    this.add(new SetGoalsBelowDisableStatus(false));
 	    this.add(new JSeparator());
 	    this.add(goalBack);
 	    if (branch != path) {
@@ -807,7 +806,7 @@ public class ProofTreeView extends JPanel {
 		this.add(visualize);
 		visualize.addActionListener(this);
 		visualize.setEnabled(true);
-		((ProofTreePopupMenu)this).add(test);
+		this.add(test);
 		test.addActionListener(this);
 		test.setEnabled(true);
 		if (proof != null) {
@@ -940,10 +939,6 @@ public class ProofTreeView extends JPanel {
 		}
             } else if (e.getSource() == search) {
 		proofTreeSearchPanel.setVisible(true);
-            } else if (e.getSource() == disableGoals) {
-                setDisabledGoalsBelow(true);
-            } else if (e.getSource() == enableGoals) {
-                setDisabledGoalsBelow(false);
             } else if (e.getSource() == visualize) {
                 new ProofVisTreeView(mediator.visualizeProof().getVisualizationModel());                
             }else if (e.getSource() == test) {
@@ -952,33 +947,52 @@ public class ProofTreeView extends JPanel {
                 mediator.changeNode(invokedNode);
             }
 	}
-
+	
 	/**
-         * set the enabled/disabled state of all goals below "node" to state.
+	 * Action for enabling/disabling all goals below "node".
          * 
-         * Iterate all goals and check if they are a below node.
-         * 
-         * @param state
-         *                disable-state (true for disabled)
          * @author mulbrich
          */
-	private void setDisabledGoalsBelow(boolean state) {
-	    IteratorOfGoal it = proof.openGoals ().iterator();
-	    while (it.hasNext ()) {
-	        Goal g = it.next();
-	        Node n = g.node();
-	        GUIProofTreeNode node = delegateModel.getProofTreeNode(n);
-	        if (node != null) {
-	            TreeNode[] obs = node.getPath();
-	            TreePath tp = new TreePath(obs);
-	            if (branch.isDescendant(tp)) {
-	                g.setDisabled(state);
-	            }
-	        }
-	    }
-	    delegateView.repaint();
-	}
+	private final class SetGoalsBelowDisableStatus extends DisableGoal {
 
+	    public SetGoalsBelowDisableStatus(boolean disableGoals) {
+	        this.disableGoals = disableGoals;
+	        
+	        String action = disableGoals ? "Disable" : "Enable";
+	        putValue(NAME, action + " All Goals Below");
+	        if(disableGoals)
+	            putValue(SHORT_DESCRIPTION, "Exclude this node and all goals in the subtree from automatic rule application");
+	        else
+	            putValue(SHORT_DESCRIPTION, "Include this node and all goals in the subtree in automatic rule application");
+            }
+	    
+	    /*
+	     * return all subgoals of the current node. 
+	     */
+            @Override
+            public Iterable<Goal> getGoalList() {
+                List<Goal> goalsToChange = new ArrayList<Goal>();
+                IteratorOfGoal it = proof.openGoals ().iterator();
+                while (it.hasNext ()) {
+                    Goal g = it.next();
+                    Node n = g.node();
+                    GUIProofTreeNode node = delegateModel.getProofTreeNode(n);
+                    if (node != null) {
+                        TreeNode[] obs = node.getPath();
+                        TreePath tp = new TreePath(obs);
+                        if (branch.isDescendant(tp)) {
+                            goalsToChange.add(g);
+                        }
+                    }
+                }
+                
+                // trigger repainting the tree after the completion of this event.
+                delegateView.repaint();
+                return goalsToChange;
+            }
+	    
+	}
+	
         public void itemStateChanged(ItemEvent e) {
             if (e.getSource() == hideIntermediate) {
                 delegateModel.hideIntermediateProofsteps(e.getStateChange()

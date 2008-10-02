@@ -70,8 +70,7 @@ public class Goal  {
     /** goal listeners  */
     private List<GoalListener> listeners = new ArrayList<GoalListener>();
 
-    /** a goal has been excluded from automatic rule application from the UI
-     * iff disabled == true */
+    /** a goal has been excluded from automatic rule application iff disabled == true */
     private boolean disabled = false;
     
     /** list of rule app listeners */

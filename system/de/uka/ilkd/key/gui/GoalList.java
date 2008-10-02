@@ -67,7 +67,7 @@ public class GoalList extends JList {
      */
     private final class DisableSingleGoal extends DisableGoal {
 
-        public boolean isEnabled() {
+        DisableSingleGoal() {
             if (getSelectedValue() instanceof Goal) {                
                 final Goal g = (Goal) getSelectedValue();
                 putValue(NAME, !g.isDisabled() ? "Disable Goal" : "Enable Goal");
@@ -76,12 +76,16 @@ public class GoalList extends JList {
                 		    "Re-enable automatic rule application for this goal.");
                 putValue(SMALL_ICON, !g.isDisabled() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU : 
                     KEY_HOLE_PULL_DOWN_MENU);
-                disable = !g.isDisabled();
-                return true;
+                disableGoals = !g.isDisabled();
+                setEnabled(true);
+            } else {
+                setEnabled(false);
             }
-            return false;
         }
 
+        /*
+         * return singleton list if selectedObject is a goal, en empty list otherwise.
+         */
         @Override
         public Iterable<Goal> getGoalList() {     
             final Object selectedObject = getSelectedValue();
@@ -104,14 +108,12 @@ public class GoalList extends JList {
     
     /**
      * This action dis-/enables all goals except the chosen one.
+     * 
+     * @author Richard Bubel
      */
-    class DisableOtherGoals extends DisableGoal {
-
+    private final class DisableOtherGoals extends DisableGoal {
 
         DisableOtherGoals() {
-        }
-
-        public boolean isEnabled() {
             if (getSelectedValue() instanceof Goal) {                
                 final Goal g = (Goal) getSelectedValue();
                 putValue(NAME, !g.isDisabled() ? "Disable Other Goals" : "Enable Other Goals");
@@ -120,13 +122,17 @@ public class GoalList extends JList {
                                     "Re-enable automatic rule application for other goals.");
                 putValue(SMALL_ICON, !g.isDisabled() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU : 
                     KEY_HOLE_PULL_DOWN_MENU);
-                disable = !g.isDisabled();
+                disableGoals = !g.isDisabled();
                 
-                return getModel().getSize() > 1;
+                setEnabled(getModel().getSize() > 1);
+            } else {
+                setEnabled(false);
             }
-            return false;
         }
 
+        /*
+         * return all goals that are not the current goal (=selected value)
+         */
         @Override
         public Iterable<Goal> getGoalList() {     
             final Object selectedObject = getSelectedValue();
@@ -183,6 +189,7 @@ public class GoalList extends JList {
 	
 	MouseListener ml = new MouseAdapter() {
 	    public void mousePressed(MouseEvent e) {
+	        setSelectedIndex(locationToIndex(e.getPoint()));
 	        if (e.isPopupTrigger()) {
 	            popupMenu().show(e.getComponent(),
 	                    e.getX(), e.getY());
