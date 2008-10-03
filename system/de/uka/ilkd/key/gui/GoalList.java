@@ -86,7 +86,7 @@ public class GoalList extends JList {
         @Override
         public Iterable<Goal> getGoalList() {     
             final Object selectedObject = getSelectedValue();
-            final ArrayList<Goal> selectedGoals = new ArrayList();
+            final ArrayList<Goal> selectedGoals = new ArrayList<Goal>();
             
             if (selectedObject instanceof Goal) {
                 selectedGoals.add((Goal)selectedObject);
