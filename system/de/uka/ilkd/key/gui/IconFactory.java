@@ -94,7 +94,7 @@ public class IconFactory {
 	return scaleIcon(keyHoleAlmostClosed,x,y);
     }
     
-    public static Icon keyHoleDisabled(int x, int y) {
+    public static ImageIcon keyHoleDisabled(int x, int y) {
         return scaleIcon(keyHoleDisabled,x,y);
     }
     
