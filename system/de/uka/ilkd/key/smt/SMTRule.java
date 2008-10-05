@@ -47,25 +47,34 @@ public class SMTRule implements BuiltInRule {
         public boolean isApplicable(Goal goal, PosInOccurrence pio, Constraint userConstraint) {
                 boolean hasModality = false;
                 
-                IteratorOfConstrainedFormula ante = goal.sequent().antecedent().iterator();
-                IteratorOfConstrainedFormula succ = goal.sequent().succedent().iterator();
+//                IteratorOfConstrainedFormula ante = goal.sequent().antecedent().iterator();
+//                IteratorOfConstrainedFormula succ = goal.sequent().succedent().iterator();
                 
+                ModalityChecker mc = new ModalityChecker();
+                
+                for (final ConstrainedFormula currentForm : goal.sequent()) {
+                        currentForm.formula().execPreOrder(mc);   
+                        if (mc.hasModality()) {
+                                hasModality = true;
+                        }
+                        mc.reset();
+                }
+                
+                /*
                 while (ante.hasNext()) {
                         ConstrainedFormula currentForm = ante.next();
                         Term t = currentForm.formula();
-                        ModalityChecker v = new ModalityChecker();
-                        t.execPreOrder(v);
-                        hasModality = hasModality || v.hasModality();
+                        t.execPreOrder(mc);
+                        hasModality = hasModality || mc.hasModality();
                 }
-                
+                mc.reset();
                 while (succ.hasNext()) {
                         ConstrainedFormula currentForm = succ.next();
                         Term t = currentForm.formula();
-                        ModalityChecker v = new ModalityChecker();
-                        t.execPreOrder(v);
-                        hasModality = hasModality || v.hasModality();
+                        t.execPreOrder(mc);
+                        hasModality = hasModality || mc.hasModality();
                 }
-                
+                */
                 /*
                 while (!modalityFound && pioiter.hasNext()) {
                         Term t = pioiter.getSubTerm();
@@ -104,7 +113,7 @@ public class SMTRule implements BuiltInRule {
               //  SetAsListOfMetavariable setofmv = new SetAsListOfMetavariable();
                 try {
                         SMTTranslator trans = new SMTTranslator(goal.sequent(), new ConstraintSet(goal, null), SetAsListOfMetavariable.EMPTY_SET, services);
-                        StringBuffer s = trans.translate(goal.sequent());
+                        StringBuffer s = trans.translate(goal.sequent(), services);
                         System.out.println("Final Formular: " + s);
                 } catch (SimplifyException e) {
                         System.out.println("!!!    Simplify Exception thrown");

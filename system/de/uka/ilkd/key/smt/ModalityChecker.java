@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.smt;
 
-import java.beans.Visibility;
-
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -28,6 +26,10 @@ public class ModalityChecker extends Visitor{
         
         public boolean hasModality() {
                 return this.hasModality;
+        }
+        
+        public void reset() {
+                this.hasModality = false;
         }
                 
 }

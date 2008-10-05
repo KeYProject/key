@@ -137,7 +137,7 @@ public class SMTTranslator {
                 jcharSort = services.getTypeConverter().getCharLDT().targetSort();
                 integerSort = services.getTypeConverter().getIntegerLDT().targetSort();
                 cacheForUninterpretedSymbols = new HashMap();
-                StringBuffer hb = translate(sequent, lightWeight);
+                StringBuffer hb = translate(sequent, lightWeight, services);
                 text = predicate.toString() + produceClosure(hb);
                 logger.info("SimplifyTranslation:\n" + text);
                 if (notes.length() > 0) {
@@ -186,9 +186,9 @@ public class SMTTranslator {
                 return tmp.toString();
         }
 
-        protected final StringBuffer translate(Sequent sequent)
+        protected final StringBuffer translate(Sequent sequent, Services services)
                 throws SimplifyException {
-                return translate(sequent, false);
+                return translate(sequent, false, services);
         }
 
         private StringBuffer buildDeclarations() {
@@ -199,9 +199,8 @@ public class SMTTranslator {
                         Iterator<Sort> i = sortSet.iterator();
                         while (i.hasNext()) {
                                 Sort curr = i.next();
-                                System.out.println("+++++++++++++++++" + curr.toString() + " | " + curr.getClass().toString());
                                 sorts.append(" ");
-                                sorts.append(curr.name());
+                                sorts.append(getSortName(curr));
                         }
                         sorts.append(" )");
                 }
@@ -248,25 +247,22 @@ public class SMTTranslator {
          *           the Sequent which should be written in Simplify syntax
          */
         protected final StringBuffer translate(Sequent sequent, 
-                                               boolean lightWeight)
+                                               boolean lightWeight,
+                                               Services services)
                         throws SimplifyException {
-            //          computeModuloConstraints(sequent);
-System.out.println("translate called");                
+            //          computeModuloConstraints(sequent);             
                 StringBuffer hb = new StringBuffer();
                 StringBuffer temp;
                 hb.append('(').append(IMPLYSTRING).append(' ');
                 temp = translate(sequent.antecedent(), ANTECEDENT,
-                                lightWeight);
-System.out.println("Produced antecedent: " + temp);                
+                                lightWeight, services);               
                 hb.append(temp);
                 hb.append("\n");
                 temp = translate(sequent.succedent(), SUCCEDENT,
-                                lightWeight);
-System.out.println("Produced succedent: " + temp);                 
+                                lightWeight, services);                
                 hb.append(temp);
                 hb.append(')');
-                
-System.out.println("The declaration used: " + this.buildDeclarations());  
+                 
 
                 //build the final StringBuffer
                 StringBuffer complete = new StringBuffer("(benchmark KeY\n");
@@ -297,9 +293,10 @@ System.out.println("The declaration used: " + this.buildDeclarations());
         }
 
         protected final StringBuffer translate(Semisequent ss, 
-                                               int skolemization)
+                                               int skolemization,
+                                               Services services)
                 throws SimplifyException {
-                return translate(ss, skolemization, false);
+                return translate(ss, skolemization, false, services);
         }
 
         /**
@@ -311,7 +308,8 @@ System.out.println("The declaration used: " + this.buildDeclarations());
          */
         protected final StringBuffer translate(Semisequent semi, 
                                                int skolemization,
-                                               boolean lightWeight)
+                                               boolean lightWeight,
+                                               Services services)
                         throws SimplifyException {
                 StringBuffer hb = new StringBuffer();
                 
@@ -337,7 +335,7 @@ System.out.println("The declaration used: " + this.buildDeclarations());
                 }
                 for (int i = 0; i < semi.size(); ++i) {
                         hb.append(' ');
-                        hb.append(translate(semi.get(i), lightWeight));
+                        hb.append(translate(semi.get(i), lightWeight, services));
                 }
 //              if (skolemization == ANTECEDENT) {
 //                      hb.append(' ');
@@ -360,15 +358,12 @@ System.out.println("The declaration used: " + this.buildDeclarations());
          * TODO now: translation out of constraintSet context          
          */
         protected final StringBuffer translate(ConstrainedFormula cf, 
-                                               boolean lightWeight)
-                throws SimplifyException {
-System.out.println("translate ConstrainedFormular");   
-System.out.println("current constraint set: " + constraintSet.toString());  
+                                               boolean lightWeight, Services services)
+                throws SimplifyException { 
                 StringBuffer hb = new StringBuffer();
                 Term t;
                 //if the cnstraintSet contains cf, make a syntactical replacement
                 if (constraintSet.used(cf)) {
-System.out.println("translate ConstrainedFormular 2"); 
                         SyntacticalReplaceVisitor srVisitor = 
                                 new SyntacticalReplaceVisitor(
                                                 constraintSet.chosenConstraint());
@@ -382,9 +377,8 @@ System.out.println("translate ConstrainedFormular 2");
                                 && !(op instanceof IUpdateOperator)
                                  && !(op instanceof IfThenElse)
                                  && op != Op.ALL
-                                 && op != Op.EX){    
-System.out.println("translate ConstrainedFormular 3");                                 
-                        hb.append(translate(t, new Vector()));
+                                 && op != Op.EX){                                     
+                        hb.append(translate(t, new Vector(), services));
                 }
                 return hb;
         }
@@ -400,23 +394,21 @@ System.out.println("translate ConstrainedFormular 3");
          *           super-terms. It is only used for the translation of modulo
          *           terms, but must be looped through until we get there.
          */
-        public final StringBuffer translate(Term term, Vector quantifiedVars) throws SimplifyException {
+        public final StringBuffer translate(Term term, Vector quantifiedVars, Services services) throws SimplifyException {
                 Operator op = term.op();
-System.out.println("translate called with " + op.toString() + " (Term: "+ term.toString() + " )");
-System.out.println("translate of class " + op.getClass().getName());
                 if (op == Op.NOT) {
-                        return (translateSimpleTerm(term, NOTSTRING, quantifiedVars));
+                        return (translateSimpleTerm(term, NOTSTRING, quantifiedVars, services));
                 } else if (op == Op.AND) {
-                        return (translateSimpleTerm(term, ANDSTRING, quantifiedVars));
+                        return (translateSimpleTerm(term, ANDSTRING, quantifiedVars, services));
                 } else if (op == Op.OR) {
-                        return (translateSimpleTerm(term, ORSTRING, quantifiedVars));
+                        return (translateSimpleTerm(term, ORSTRING, quantifiedVars, services));
                 } else if (op == Op.IMP) {
-                        return (translateSimpleTerm(term, IMPLYSTRING, quantifiedVars));
+                        return (translateSimpleTerm(term, IMPLYSTRING, quantifiedVars, services));
                 } else if (op == Op.EQV) {
-                        return (translateEquiv(term, quantifiedVars));
+                        return (translateEquiv(term, quantifiedVars, services));
                 } else if (op == Op.EQUALS) {               
                         return (translateSimpleTerm(term,
-                                                    EQSTRING, quantifiedVars));
+                                                    EQSTRING, quantifiedVars, services));
                 } else if (op == Op.ALL || op == Op.EX) {
                         quantifiersOccur = true;
                         StringBuffer hb = new StringBuffer();
@@ -431,7 +423,7 @@ System.out.println("translate of class " + op.getClass().getName());
                         //append the quantified variable including sort
                         String v = translateVariable(vars.getQuantifiableVariable(0)).toString();
                         hb.append(v);
-                        hb.append(" " + vars.getQuantifiableVariable(0).sort().name());
+                        hb.append(" " + getSortName(vars.getQuantifiableVariable(0).sort()));
                         this.addSort(vars.getQuantifiableVariable(0).sort());
                         Vector cloneVars = (Vector)quantifiedVars.clone(); 
                         collectQuantifiedVars(cloneVars, term);
@@ -452,7 +444,7 @@ System.out.println("translate of class " + op.getClass().getName());
                         addPredicate(getUniqueVariableName(sort).toString(),1);
                         */
                         //append the term
-                        hb.append(translate(term.sub(0), cloneVars));                     
+                        hb.append(translate(term.sub(0), cloneVars, services));                     
                         hb.append(")");
                         
                         return hb;
@@ -461,46 +453,55 @@ System.out.println("translate of class " + op.getClass().getName());
                 } else if (op == Op.FALSE) {
                         return (new StringBuffer(FALSESTRING));
                 } else if (op instanceof AttributeOp) {
-                        return (translateAttributeOpTerm(term, quantifiedVars));
+                        return (translateAttributeOpTerm(term, quantifiedVars, services));
                 } else if (op instanceof ProgramMethod) {
                         return (translateSimpleTerm(term, getUniqueVariableName(op)
-                                        .toString(), quantifiedVars));
+                                        .toString(), quantifiedVars, services));
                 } else if (op instanceof LogicVariable || op instanceof ProgramVariable) {
-                        return (translateVariable(op));
-                } else if (op instanceof Metavariable) {
-System.out.println("translate Metavariable " + op.toString());                        
+                        if (quantifiedVars.contains(op)) {
+                                return (translateVariable(op));
+                        } else {
+                                addPredicate(term, getUniqueVariableName(op));
+                                return getUniqueVariableName(op);
+                        }
+                } else if (op instanceof Metavariable) {                       
                         if (localMetavariables.contains((Metavariable) op)) {
                                 usedLocalMv.add(op);
-                                System.out.println("Found local mv: " + op.toString());
                         } else {
                                 usedGlobalMv.add(op);
-                                System.out.println("Found global mv: " + op.toString());
                         }
                         return (translateVariable(op));
                 } else if (op instanceof ArrayOp) {
-                        return (translateSimpleTerm(term, "ArrayOp", quantifiedVars));
+                        String funcName = "ArrayOp_" + term.sort().name().toString();
+                        this.addFunction(term, new StringBuffer(funcName));
+                        return (translateSimpleTerm(term, funcName, quantifiedVars, services));
                 } else if (op instanceof Function) {
                         String name = op.name().toString().intern();
-                        if (name.equals("add")) {
+//                        if (name.equals("add")) {
+                        if (op == services.getTypeConverter().getIntegerLDT().getAdd()) {
                                 return (translateSimpleTerm(term,
-                                                PLUSSTRING, quantifiedVars));
-                        } else if (name.equals("sub")) {
+                                                PLUSSTRING, quantifiedVars, services));
+                        //} else if (name.equals("sub")) {
+                        } else if (op == services.getTypeConverter().getIntegerLDT().getSub() ) {        
                                 return (translateSimpleTerm(term,
-                                                MINUSSTRING, quantifiedVars));
-                        } else if (name.equals("neg")) {
+                                                MINUSSTRING, quantifiedVars, services));
+                        //} else if (name.equals("neg")) {
+                        } else if (op == services.getTypeConverter().getIntegerLDT().getNeg() ) {        
                                 //%%: This is not really hygienic
                                 return (translateUnaryMinus(term,
-                                                MINUSSTRING, quantifiedVars));
-                        } else if (name.equals("mul")) {
+                                                MINUSSTRING, quantifiedVars, services));
+                        //} else if (name.equals("mul")) {
+                        } else if (op == services.getTypeConverter().getIntegerLDT().getMul() ) {        
                                 return (translateSimpleTerm(term,
-                                                MULTSTRING, quantifiedVars));
-                        } else if (name.equals("div")) {
+                                                MULTSTRING, quantifiedVars, services));
+                        //} else if (name.equals("div")) {
+                        } else if (op == services.getTypeConverter().getIntegerLDT().getDiv() ) {
                                 notes.append(
                                                 "Division encountered which is not "
                                                                 + "supported by Simplify.").append(
                                                 "It is treated as an uninterpreted function.\n");
                                 return (translateSimpleTerm(term, getUniqueVariableName(op)
-                                                .toString(), quantifiedVars));
+                                                .toString(), quantifiedVars, services));
                                 //                      } 
                                 // else if (name.equals("mod")) {
                                 //                              Term tt = translateModulo(term, quantifiedVars);
@@ -509,19 +510,24 @@ System.out.println("translate Metavariable " + op.toString());
                                 //                              } else {
                                 //                                      return translate(tt, quantifiedVars);
                                 //                              }
-                        } else if (name.equals("lt")) {
+                        //} else if (name.equals("lt")) {
+                        } else if (op == services.getTypeConverter().getIntegerLDT().getLessThan() ) {        
                                 return (translateSimpleTerm(term,
-                                                LTSTRING, quantifiedVars));
-                        } else if (name.equals("gt")) {
+                                                LTSTRING, quantifiedVars, services));
+                        //} else if (name.equals("gt")) {
+                        } else if (op == services.getTypeConverter().getIntegerLDT().getGreaterThan() ) {        
                                 return (translateSimpleTerm(term,
-                                                GTSTRING, quantifiedVars));
-                        } else if (name.equals("leq")) {
+                                                GTSTRING, quantifiedVars, services));
+                        //} else if (name.equals("leq")) {
+                        } else if (op == services.getTypeConverter().getIntegerLDT().getLessOrEquals() ) {        
                                 return (translateSimpleTerm(term,
-                                                LEQSTRING, quantifiedVars));
-                        } else if (name.equals("geq")) {
+                                                LEQSTRING, quantifiedVars, services));
+                        //} else if (name.equals("geq")) {
+                        } else if (op == services.getTypeConverter().getIntegerLDT().getGreaterOrEquals() ) {        
                                 return (translateSimpleTerm(term,
-                                                GEQSTRING, quantifiedVars));
-                        } else if (name.equals("Z") || name.equals("C")) {
+                                                GEQSTRING, quantifiedVars, services));
+                        //} else if (name.equals("Z") || name.equals("C")) {
+                        } else if (op == services.getTypeConverter().getIntegerLDT().getNumberSymbol() ) {        
                                 Debug.assertTrue(term.arity() == 1);
 
                                 String res = NumberTranslation.translate(term.sub(0)).toString();
@@ -549,6 +555,7 @@ System.out.println("translate Metavariable " + op.toString());
                         } else if (name.equals("int_MAX")) {
                             return new StringBuffer("500000");
 */
+                        //TODO remove strings here
                         } else if (name.equals("byte_MIN") | name.equals("byte_MAX")
                                         | name.equals("byte_RANGE") | name.equals("byte_HALFRANGE")
                                         | name.equals("short_MIN") | name.equals("short_MAX")
@@ -558,7 +565,7 @@ System.out.println("translate Metavariable " + op.toString());
                                         | name.equals("int_HALFRANGE") | name.equals("long_MIN")
                                         | name.equals("long_MAX") | name.equals("long_RANGE")
                                         | name.equals("long_HALFRANGE")) {
-                                return (translateSimpleTerm(term, name, quantifiedVars));
+                                return (translateSimpleTerm(term, name, quantifiedVars, services));
                         } else {
                                 if (term.sort() == Sort.FORMULA) {
                                         //addPredicate(getUniqueVariableName(op).toString(), op
@@ -571,7 +578,7 @@ System.out.println("translate Metavariable " + op.toString());
                                 
                                 
                                 return (translateSimpleTerm(term, getUniqueVariableName(op)
-                                                .toString(), quantifiedVars));
+                                                .toString(), quantifiedVars, services));
                         }
                 } else if ((op instanceof Modality)
                                 || (op instanceof IUpdateOperator)
@@ -628,7 +635,6 @@ System.out.println("translate Metavariable " + op.toString());
          *           The variable to be translated/renamed.
          */
         protected final StringBuffer translateVariable(Operator op) {
-System.out.println("translateVariable " + op.toString()); 
 //Exception e = new Exception();
 //e.printStackTrace();
                 StringBuffer res = new StringBuffer("?");
@@ -652,7 +658,7 @@ System.out.println("translateVariable " + op.toString());
         
         
         /**
-         * produces a unique name for the given Variable, enclosed in '|' and with a
+         * produces a unique name for the given Variable, starting with "KeY_" and with a
          * unique hashcode.
          * 
          * @param op
@@ -669,9 +675,9 @@ System.out.println("translateVariable " + op.toString());
                 return new StringBuffer(name).
                     append("_").append(getUniqueHashCode(op));
             }
-            return new StringBuffer("|").
+            return new StringBuffer("KeY_").
                 append(name).
-                append("_").append(getUniqueHashCode(op)).append("|");
+                append("_").append(getUniqueHashCode(op));
         }
         
         protected final StringBuffer uninterpretedTerm(Term term,
@@ -736,7 +742,7 @@ System.out.println("translateVariable " + op.toString());
      *           super-terms. It is only used for the translation of modulo
      *           terms, but must be looped through until we get there.
      */
-    protected final StringBuffer translateSimpleTerm(Term term, String name, Vector quantifiedVars)
+    protected final StringBuffer translateSimpleTerm(Term term, String name, Vector quantifiedVars, Services services)
         throws SimplifyException {
         StringBuffer hb = new StringBuffer();
         //don't add brackets, if a constant is delivered
@@ -748,7 +754,7 @@ System.out.println("translateVariable " + op.toString());
         for (int i = 0; i < term.arity(); ++i) {
             Debug.assertTrue(term.varsBoundHere(i).size() == 0);
             hb.append(' ');
-            res = translate(term.sub(i), quantifiedVars);
+            res = translate(term.sub(i), quantifiedVars, services);
             if (res!=null && term.sub(i).sort()!=Sort.FORMULA) {
                 final Sort sort;
                 if (isSomeIntegerSort(term.sub(i).sort())) 
@@ -785,14 +791,14 @@ System.out.println("translateVariable " + op.toString());
      *           super-terms. It is only used for the translation of modulo
      *           terms, but must be looped through until we get there.
      */
-    protected final StringBuffer translateEquiv(Term term, Vector quantifiedVars)
+    protected final StringBuffer translateEquiv(Term term, Vector quantifiedVars, Services services)
         throws SimplifyException {
         
         //the first argument
         StringBuffer left = null;
         Debug.assertTrue(term.varsBoundHere(0).size() == 0);
             
-        left = translate(term.sub(0), quantifiedVars);
+        left = translate(term.sub(0), quantifiedVars, services);
         if (left!=null && term.sub(0).sort()!=Sort.FORMULA) {
                 final Sort sort;
                 if (isSomeIntegerSort(term.sub(0).sort())) 
@@ -813,7 +819,7 @@ System.out.println("translateVariable " + op.toString());
         StringBuffer right = null;
         Debug.assertTrue(term.varsBoundHere(1).size() == 0);
             
-        right = translate(term.sub(1), quantifiedVars);
+        right = translate(term.sub(1), quantifiedVars, services);
         if (right!=null && term.sub(1).sort()!=Sort.FORMULA) {
                 final Sort sort;
                 if (isSomeIntegerSort(term.sub(1).sort())) 
@@ -868,9 +874,8 @@ System.out.println("translateVariable " + op.toString());
      *           super-terms. It is only used for the translation of modulo
      *           terms, but must be looped through until we get there.
      */
-    protected final StringBuffer translateAttributeOpTerm(Term term, Vector quantifiedVars)
-        throws SimplifyException {
-System.out.println("translateAttributeTerm " + term.op().toString());            
+    protected final StringBuffer translateAttributeOpTerm(Term term, Vector quantifiedVars, Services services)
+        throws SimplifyException {          
         StringBuffer hb = new StringBuffer();
         if (logger.isDebugEnabled()) {
             logger.debug("opClass=" + term.op().getClass().getName()
@@ -878,10 +883,12 @@ System.out.println("translateAttributeTerm " + term.op().toString());
                          + term.sort().name());
         }
 
+        this.addFunction(term, getUniqueVariableName(term.op()));
+        
         hb.append(getUniqueVariableName(term.op()));
         Debug.assertTrue(term.varsBoundHere(0).size() == 0);
         hb.append(' ');
-        hb.append(translate(term.sub(0), quantifiedVars));
+        hb.append(translate(term.sub(0), quantifiedVars, services));
         hb.insert(0,'(');
         hb.append(')'); 
 
@@ -891,13 +898,13 @@ System.out.println("translateAttributeTerm " + term.op().toString());
         else
                 sort = term.sort();
         addSort(sort);
-        String ax = "("+getUniqueVariableName(sort).toString()+" "+hb+")";
+/*        String ax = "("+getUniqueVariableName(sort).toString()+" "+hb+")";
         if (!sortAxioms.contains(ax)) {
             sortAxioms = sortAxioms.prepend(new String[]{ax});                                                
             //addPredicate(getUniqueVariableName(sort).toString(),1);
             addPredicate(term, getUniqueVariableName(sort));
         }
-
+*/
         return hb;
     }
     /**
@@ -914,11 +921,11 @@ System.out.println("translateAttributeTerm " + term.op().toString());
      *           super-terms. It is only used for the translation of modulo
      *           terms, but must be looped through until we get there.
      */
-    protected final StringBuffer translateUnaryMinus(Term term, String name, Vector quantifiedVars)
+    protected final StringBuffer translateUnaryMinus(Term term, String name, Vector quantifiedVars, Services services)
         throws SimplifyException {
         StringBuffer hb = new StringBuffer();
         hb.append('(').append(name).append(" 0 ");
-        hb.append(translate(term.sub(0), quantifiedVars));
+        hb.append(translate(term.sub(0), quantifiedVars, services));
         hb.append(')');
         return hb;
     }
@@ -947,12 +954,10 @@ System.out.println("translateAttributeTerm " + term.op().toString());
     }*/
     protected final void addPredicate(Term term, StringBuffer name) {
             if (!predicateSet.contains(term.op())) {
-                    Exception e = new Exception();
-                    e.printStackTrace();
                 predicateSet.add(term.op());
                 StringBuffer temp = new StringBuffer(name).append(" ");
                 for (int i = 0; i < term.arity(); i++) {
-                        temp.append(term.sub(i).sort().name());
+                        temp.append(getSortName(term.sub(i).sort()));
                         temp.append(" ");
                 }
                 predicatedecls.add(temp.toString());
@@ -973,10 +978,10 @@ System.out.println("translateAttributeTerm " + term.op().toString());
                 if (!functionSet.contains(term.op())) {
                         functionSet.add(term.op());
                         StringBuffer temp = new StringBuffer(name).append(" "); 
-                        temp.append(term.sort().name());
+                        temp.append(getSortName(term.sort()));
                         for (int i = 0; i < term.arity(); i++) {
                                 temp.append(" ");
-                                temp.append(term.sub(i).sort().name());
+                                temp.append(getSortName(term.sub(i).sort()));
                         }
                         functiondecls.add(temp.toString());
                 }
@@ -1024,8 +1029,9 @@ System.out.println("translateAttributeTerm " + term.op().toString());
      * Used just to be called from DecProcTranslation
      * @see de.uka.ilkd.key.proof.decproc.DecProcTranslation#translate(Semisequent, int)
      */
-    protected final StringBuffer translate(Term term, int skolemization, Vector quantifiedVars) throws SimplifyException {
-        return translate(term, quantifiedVars);
+    protected final StringBuffer translate(Term term, int skolemization, Vector quantifiedVars, Services services)
+            throws SimplifyException {
+        return translate(term, quantifiedVars, services);
     }
     
     private boolean isSomeIntegerSort(Sort s) {
@@ -1077,5 +1083,20 @@ System.out.println("translateAttributeTerm " + term.op().toString());
                         this.variableMap.put(new UninterpretedTermWrapper(term), number);
                 }
                 return number.intValue();
+        }
+        
+        public String getSortName(Sort s) {
+                if (s.name().toString().indexOf("[") == s.name().toString().length()-2 &&
+                                s.name().toString().indexOf("]") == s.name().toString().length()-1 ) {
+                        //an Array is used
+                        String res = s.name().toString().substring(0, s.name().toString().length() - 2);
+                        res = "Array_" + res;
+                        return res;
+                } else if (isSomeIntegerSort(s)) {
+                        return integerSort.name().toString();
+                
+                } else {
+                        return s.name().toString();
+                }
         }
 }
