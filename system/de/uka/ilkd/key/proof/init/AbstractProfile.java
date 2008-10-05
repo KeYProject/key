@@ -13,6 +13,7 @@ import de.uka.ilkd.key.rule.AbstractIntegerRule;
 import de.uka.ilkd.key.rule.ListOfBuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.SLListOfBuiltInRule;
+import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.strategy.IteratorOfStrategyFactory;
 import de.uka.ilkd.key.strategy.SetAsListOfStrategyFactory;
 import de.uka.ilkd.key.strategy.SetOfStrategyFactory;
@@ -124,6 +125,9 @@ public abstract class AbstractProfile implements Profile {
         if (main != null) {
             main.setStandardStatusLine();
         }
+        
+        builtInRules = builtInRules.prepend(new SMTRule());
+        
         return builtInRules;
     }
     
