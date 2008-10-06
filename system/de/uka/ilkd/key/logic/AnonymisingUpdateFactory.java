@@ -156,9 +156,7 @@ public class AnonymisingUpdateFactory {
 
             services.getNamespaces().functions().add(result);
             
-            if (services.getProof() != null) {
-                services.getProof().addNameProposal(result.name());
-            }
+            services.addNameProposal(result.name());
             
             functions.put(locTerm.op(), result);
         }

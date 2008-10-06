@@ -43,4 +43,11 @@ public class NameRecorder {
         return proposal;
     }
 
+    public NameRecorder copy() {
+        final NameRecorder result = new NameRecorder();
+        result.pre = pre;
+        result.post = post;
+        return result;
+    }
+
 }
