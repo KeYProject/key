@@ -2,7 +2,7 @@
 <!-- JNLP file for KeY -->
 <jnlp spec="1.0+" codebase="http://www.key-project.org/download/releases/tp14/webstart/" href="KeY.jnlp">
 <information> 
-<title>KeY 1.4 Technology Preview 3</title>
+<title>KeY 1.4 Technology Preview 3a</title>
 <vendor>KeY-Project, Universität Karlsruhe, Chalmers University, Universität Koblenz</vendor> 
 <homepage href="http://www.key-project.org"/> 
 <description>
