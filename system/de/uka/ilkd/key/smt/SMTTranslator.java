@@ -47,7 +47,7 @@ import org.apache.log4j.Logger;
 
 /**
  * 
- * @author daniels
+ * @author Simon Greiner
  *
  * The class responsible for converting a sequent into the Simplify input language.
  * It is public because ASM-KeY inherits form it to provide a version suppporting
@@ -461,7 +461,7 @@ public class SMTTranslator {
                         if (quantifiedVars.contains(op)) {
                                 return (translateVariable(op));
                         } else {
-                                addPredicate(term, getUniqueVariableName(op));
+                                addFunction(term, getUniqueVariableName(op));
                                 return getUniqueVariableName(op);
                         }
                 } else if (op instanceof Metavariable) {                       
@@ -978,11 +978,13 @@ public class SMTTranslator {
                 if (!functionSet.contains(term.op())) {
                         functionSet.add(term.op());
                         StringBuffer temp = new StringBuffer(name).append(" "); 
-                        temp.append(getSortName(term.sort()));
+//                        temp.append(getSortName(term.sort()));
                         for (int i = 0; i < term.arity(); i++) {
                                 temp.append(" ");
                                 temp.append(getSortName(term.sub(i).sort()));
                         }
+                        temp.append(" ").append(getSortName(term.sort()));
+                        
                         functiondecls.add(temp.toString());
                 }
         }
