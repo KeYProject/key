@@ -662,7 +662,7 @@ public class Goal  {
         final ListOfGoal goalList = ruleApp.execute(this,  
                 proof.getServices());
 
-        proof.saveNameRecorder(n);
+        proof.getServices().saveNameRecorder(n);
         
         if ( goalList == null ) {
             // this happens for the simplify decision procedure

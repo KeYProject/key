@@ -379,7 +379,7 @@ public class IntersectionSort extends AbstractSort {
      * @return true if other than reference types, which are siblings in the type hierarchy, 
      * intersect    
      */
-    public boolean hasEmptyDomain(Namespace sorts) {       
+    private boolean hasEmptyDomain(Namespace sorts) {       
        if (emptyDomainComputed) return emptyDomain;                     
 
        emptyDomain = true;

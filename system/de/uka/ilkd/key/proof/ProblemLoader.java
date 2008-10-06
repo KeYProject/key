@@ -445,7 +445,7 @@ public class ProblemLoader implements Runnable {
             for (int in = 0; in < newNames.length; in++) {
                 l = l.append(new Name(newNames[in]));
             }
-            proof.getNameRecorder().setProposals(l);
+            proof.getServices().getNameRecorder().setProposals(l);
             break;
         case 'e': //autoModeTime
             try {

@@ -325,10 +325,13 @@ public abstract class AbstractPO implements ProofOblInput {
         
         header += "}\n\n\\functions {\n";
         it = initConfig.funcNS().allElements().iterator();
+        System.out.println(services.getNameRecorder().getProposals());
         while(it.hasNext()) {
             Function f = (Function)it.next();
-            // only declare @pre-functions, others will be generated automat. (hack)
-            if(f.name().toString().indexOf("AtPre")!=-1) {
+            // only declare @pre-functions or anonymising functions, others will be generated automat. (hack)
+            System.out.println(f);
+            if(f.name().toString().indexOf("AtPre")!=-1 || services.getNameRecorder().
+                    getProposals().contains(f.name())) {
                 header += f.proofToString();
             }
         }

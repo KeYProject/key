@@ -286,14 +286,15 @@ public class ProofTreeView extends JPanel {
         models.remove(p);
     }
 
-    public void removeProofs(Proof[] p) {
-	for (int i=0; i<p.length; i++) {
-	    models.remove(p[i]);
+    public void removeProofs(Proof[] ps) {
+        for (final Proof p : ps) {        
+	    models.remove(p);
 	}
     }
 
 
-    /** moves the scope of the tree view to the given node so that it
+    /**
+     *  moves the scope of the tree view to the given node so that it
      *	is visible  
      */
     public void makeNodeVisible(Node n) {
@@ -506,13 +507,13 @@ public class ProofTreeView extends JPanel {
 	 */
 	public void autoModeStopped(ProofEvent e) {
             if (mediator.getSelectedProof() == null) return; // no proof (yet)
-	    delegateView.removeTreeSelectionListener(treeSelectionListener);
+            delegateView.removeTreeSelectionListener(treeSelectionListener);
 	    if (delegateModel == null) {
 		setProof(mediator.getSelectedProof());
 	    } else if (modifiedSubtrees != null) {
-		IteratorOfNode it = modifiedSubtrees.iterator ();
-		while ( it.hasNext () )
-		    delegateModel.updateTree ( it.next () );
+		for (final Node n : modifiedSubtrees) {
+		    delegateModel.updateTree (n);
+		}
 	    }
 	    if (!delegateModel.isAttentive()) {
 		delegateModel.setAttentive(true);	    

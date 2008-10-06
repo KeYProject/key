@@ -68,7 +68,7 @@ public class LocationDependentFunction extends AbstractMetaOperator {
                 new Name("anon"));
         Function anon = new NonRigidHeapDependentFunction(anonName, Sort.FORMULA, aos);
         services.getNamespaces().functions().add(anon);
-        services.getProof().addNameProposal(anonName);
+        services.addNameProposal(anonName);
         return tf.createFunctionTerm(anon, subs);
     }
     
