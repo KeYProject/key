@@ -108,8 +108,8 @@ public class VariableNameProposer implements InstantiationProposer {
         if (!oldAnonUpdateProposals.isEmpty()) {
             name = oldAnonUpdateProposals.head();
             oldAnonUpdateProposals = oldAnonUpdateProposals.tail();
-        } else {
-            name = services.getProof().getNameRecorder().getProposal();
+        } else if (services.getProof() != null) {  
+            name = services.getProof().getNameRecorder().getProposal();            
         }
 
         if (name == null || namespaces.lookup(name) != null) {
@@ -137,8 +137,8 @@ public class VariableNameProposer implements InstantiationProposer {
         if (oldMVProposal != null) {
             name = oldMVProposal;
             oldMVProposal = null;
-        } else {
-            name = services.getProof().getNameRecorder().getProposal();
+        } else if (services.getProof() != null) {
+            name = services.getProof().getNameRecorder().getProposal();            
         }
 
         // END TEMPORARY DOWNWARD COMPATIBILITY
