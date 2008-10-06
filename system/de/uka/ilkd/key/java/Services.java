@@ -122,6 +122,7 @@ public class Services{
 	//	exceptionHandler = new KeYRecoderExcHandler();
 	javainfo = new JavaInfo
 	    (new KeYProgModelInfo(crsc, rec2key, typeconverter), this);
+        nameRecorder = new NameRecorder();
     }
 
 
