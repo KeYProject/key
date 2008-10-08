@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
    <description url="http://www.key-project.org/download/releases/tp14/eclipse/">
-      KeY 1.4.0 Technology Preview
+      KeY 1.4.0 Technology Preview 4
    </description>
    <feature url="features/KeY_Feature.jar" id="KeY_Feature" version="1.1.16"/>
 </site>
