@@ -5,7 +5,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
-class SLTypeResolver extends SLExpressionResolver {
+public class SLTypeResolver extends SLExpressionResolver {
 
     public SLTypeResolver(JavaInfo javaInfo, SLResolverManager manager) {
         super(javaInfo, manager);

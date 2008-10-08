@@ -23,18 +23,13 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.AttributeOp;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.InstanceofSymbol;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
+import de.uka.ilkd.key.proof.ProofSaver;
 import de.uka.ilkd.key.speclang.FormulaWithAxioms;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -256,7 +251,7 @@ public class TestJMLTranslator extends TestCase {
                     this.testClassType, null, null, null, null,
                     new LinkedHashMap());
         } catch (SLTranslationException e) {
-            assertTrue(false);
+            assertTrue("Error Message: "+e,false);
         }
 
         assertTrue(result != null);
@@ -548,4 +543,38 @@ public class TestJMLTranslator extends TestCase {
         Function ioFunc = (Function) sds.lookupSymbol(InstanceofSymbol.NAME);
         assertTrue(termContains(result.getFormula(), ioFunc));
     }
+    
+    
+    public void testCorrectImplicitThisResolution() {
+        FormulaWithAxioms result = null;
+
+        ProgramVariable selfVar = buildSelfVarAsProgVar();
+        ProgramVariable array = javaInfo.getAttribute("testPackage.TestClass::array");
+        Map atPreDefs = new LinkedHashMap();
+
+        try {
+            result = translator.translateExpression
+                (new PositionedString("(\\forall TestClass a;a.array == array; a == this)"),
+                    testClassType,
+                    selfVar,
+                    null,
+                    null,
+                    null,
+                    atPreDefs);
+        } catch (SLTranslationException e) {
+            assertTrue("Parsing Error: "+e,false);
+        }
+
+        assertTrue(result != null);
+        final LogicVariable qv = new LogicVariable(new Name("a"),selfVar.sort());
+        Term expected = tb.all(qv,
+                tb.imp(tb.and(
+                        tb.equals(tb.dot(tb.var(qv),array),tb.dot(tb.var(selfVar),array)),
+                        tb.not(tb.equals(tb.var(qv), tb.NULL(services))) // implicit non null
+                        ),
+                        tb.equals(tb.var(qv), tb.var(selfVar))));
+        assertTrue("Expected:"+ProofSaver.printTerm(expected,services)+"\n Was:"+
+                ProofSaver.printTerm(result.getFormula(),services),
+                result.getFormula().equalsModRenaming(expected));
+    } 
 }

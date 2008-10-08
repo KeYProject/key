@@ -213,7 +213,7 @@ GENERATED_LISTS=logic/SLListOfTerm \
 	logic/SLListOfNamespace \
 	casetool/SLListOfAssociation \
 	casetool/SLListOfAssociationEnd \
-        speclang/ocl/translation/SLListOfOCLEntity \
+        speclang/ocl/translation/SLListOfOCLExpression \
 	speclang/translation/SLListOfSLExpression \
 	speclang/translation/SLListOfSLExpressionResolver \
 	speclang/SLListOfPositionedString \

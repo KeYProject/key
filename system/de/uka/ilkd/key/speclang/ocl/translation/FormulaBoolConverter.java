@@ -155,10 +155,10 @@ class FormulaBoolConverter {
      * Converts those terms in a list of OCLEntities which are formulas 
      * to boolean terms, and leaves the others unchanged.
      */
-    public ListOfTerm convertFormulasToBool(ListOfOCLEntity list) {
+    public ListOfTerm convertFormulasToBool(ListOfOCLExpression list) {
         ListOfTerm result = SLListOfTerm.EMPTY_LIST;
         
-        IteratorOfOCLEntity it = list.iterator();
+        IteratorOfOCLExpression it = list.iterator();
         while(it.hasNext()) {
             result = result.append(it.next().getTerm());
         }

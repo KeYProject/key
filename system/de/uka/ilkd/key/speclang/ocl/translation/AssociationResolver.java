@@ -93,18 +93,18 @@ class AssociationResolver extends SLExpressionResolver {
                 if (assocFunc.sort() instanceof AbstractCollectionSort) {
                     // we have a binary association with multiplicity greater than 1
                     OCLCollection collection = new OCLCollection(recTerm,assoc,name);
-                    return new OCLEntity(collection);
+                    return new OCLExpression(collection);
                 } else {
                     // either the association-end has multiplicity 1 or it is no binary association
                     Term functionTerm = tf.createFunctionTerm(assocFunc,recTerm);
-                    return new OCLEntity(functionTerm);
+                    return new OCLExpression(functionTerm);
                 }
             } else if(recCollection != null) {
                 OCLCollection newCollection
                         = recCollection.collect(services,
                                                 assoc,
                                                 name);
-                return new OCLEntity(newCollection);
+                return new OCLExpression(newCollection);
             }
         } 
         
