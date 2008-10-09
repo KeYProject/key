@@ -14,6 +14,7 @@ package de.uka.ilkd.key.util;
 import java.util.*;
 
 import recoder.java.ProgramElement;
+import recoder.java.expression.operator.New;
 import recoder.java.reference.TypeReference;
 import recoder.service.UnresolvedReferenceException;
 
@@ -83,8 +84,11 @@ public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl implements rec
     protected void recoderExitAction() {       
         String msg = "Recoder: " + recoderErrorCount + " errors have occured - aborting.";
 	recoderErrorCount = 0;
-        throw (ExceptionHandlerException) 
-	    new ExceptionHandlerException(msg).initCause((Throwable)recoderExceptions.getFirst());
+        ExceptionHandlerException ex = new ExceptionHandlerException(msg);
+        ex.initCause((Throwable)recoderExceptions.getFirst());
+        recoderExceptions.clear();
+        
+        throw ex;
     }
     
     public void reportError(Exception e) {
@@ -125,6 +129,17 @@ public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl implements rec
                 unresolvedClasses.add(tyref);
                 Debug.out("Unresolved type: " + ref.toSource());
                 // System.err.println("Unresolved type: " + ref.toSource());
+                return true;
+            }
+            // bugfix (mu oct-08): 
+            // Recoder may also report "new" to be unresolved instead of the
+            // contained type reference. Is this a bug in recoder?
+            if(ref instanceof New) {
+                New newref = (New)ref;
+                TypeReference tyref = newref.getTypeReference();
+                unresolvedClasses.add(tyref);
+                Debug.out("Unresolved type: " + ref.toSource());
+                // System.err.println("Unresolved type: " + ref.toSource());                
                 return true;
             }
         }

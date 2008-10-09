@@ -20,6 +20,7 @@ import recoder.convenience.*;
 import recoder.io.*;
 import recoder.java.CompilationUnit;
 import recoder.java.ProgramElement;
+import recoder.java.declaration.ClassInitializer;
 import recoder.java.declaration.MethodDeclaration;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.*;
@@ -521,7 +522,7 @@ public class Recoder2KeY implements JavaReader {
                     InputStream is = walker.openCurrent();
                     Reader f = new BufferedReader(new InputStreamReader(is));
                     recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
-                    removeMethodBodies(rcu);
+                    removeCodeFromClasses(rcu);
                     rcu.setDataLocation(currentDataLocation);
                     rcuList.add(rcu);
                 } catch(Exception ex) {
@@ -558,16 +559,18 @@ public class Recoder2KeY implements JavaReader {
     }
 
     /*
-     * removes the method bodies of a parsed compilation unit. This is done for 
-     * classes that are read in a classpath-context. For these classes only
-     * contracts (if present) are to be considered.
+     * removes code from a parsed compilation unit. This includes method bodies,
+     * inital assignments, compile-time constants, static blocks.
+     * 
+     * This is done for classes that are read in a classpath-context. For these
+     * classes only contracts (if present) are to be considered.
      * 
      * No need to inform changeHistory since the class is not yet registered.
-     * Method bodies are set to null, i.e. all methods are stubs only 
+     * Method bodies are set to null, i.e. all methods are stubs only
      * 
      * TODO remove jml-model methods (or similar) also?
      */
-    private void removeMethodBodies(CompilationUnit rcu) {
+    private void removeCodeFromClasses(CompilationUnit rcu) {
         TreeWalker tw = new TreeWalker(rcu);
         
         while(tw.next()) {
@@ -575,6 +578,15 @@ public class Recoder2KeY implements JavaReader {
             if (pe instanceof MethodDeclaration) {
                 MethodDeclaration methDecl = (MethodDeclaration) pe;
                 methDecl.setBody(null);
+            }
+            if (pe instanceof recoder.java.declaration.FieldSpecification) {
+                recoder.java.declaration.FieldSpecification fieldSpec = 
+                    (recoder.java.declaration.FieldSpecification) pe;
+                fieldSpec.setInitializer(null);
+            }
+            if (pe instanceof ClassInitializer) {
+                ClassInitializer classInit = (ClassInitializer) pe;
+                classInit.setBody(null);
             }
         }
     }
@@ -617,27 +629,20 @@ public class Recoder2KeY implements JavaReader {
         }
         
         
-        ErrorHandler errorHandler = servConf.getProjectSettings().getErrorHandler();
-        assert errorHandler instanceof KeYRecoderExcHandler :
-            "Errorhandler must be of type KeYRecoderExcHandler";
-        KeYRecoderExcHandler excHandler = (KeYRecoderExcHandler)errorHandler;
+        CrossReferenceSourceInfo sourceInfo = servConf.getCrossReferenceSourceInfo();
+        assert sourceInfo instanceof KeYCrossReferenceSourceInfo :
+            "...";
+        KeYCrossReferenceSourceInfo keySourceInfo = 
+            (KeYCrossReferenceSourceInfo)sourceInfo;
         
-        excHandler.setIgnoreUnresolvedClasses(true);
+        keySourceInfo.setIgnoreUnresolvedClasses(true);
 
         if (changeHistory.needsUpdate()) {
             changeHistory.updateModel();
         }
         
-        List<TypeReference> tyrefs = excHandler.getUnresolvedClasses();
-        // this resets the list for unresolved refs
-        excHandler.setIgnoreUnresolvedClasses(true);
-        
-        for(TypeReference tyref : tyrefs) {
-            resolveUnresolvedTypeRef(tyref, specialClasses);
-        }
-        
-        if(excHandler != null)
-            excHandler.setIgnoreUnresolvedClasses(false);
+        specialClasses.addAll(keySourceInfo.getCreatedStubClasses());
+        keySourceInfo.setIgnoreUnresolvedClasses(false);
         
         changeHistory.updateModel();
 
@@ -660,42 +665,6 @@ public class Recoder2KeY implements JavaReader {
         rec2key().parsedSpecial(true);
 
         setParsingLibs(false);
-    }
-
-    /*
-     * make dummy classes for unresolved type references, store newly created classes to 
-     * libClasses and the qualified name of the class to dynamicallyCreatedClasses
-     */
-    private void resolveUnresolvedTypeRef(TypeReference tyref, 
-            List<recoder.java.CompilationUnit> libClasses) throws ParserException {
-        NameInfo ni = servConf.getNameInfo();
-        String typeString = Naming.toPathName(tyref);
-        
-        // bugfix: The reference might be to an array. Remove the array reference then.
-        while(typeString.endsWith("[]"))
-            typeString = typeString.substring(0, typeString.length() - 2);
-
-        recoder.abstraction.Type ty;
-        
-        try {
-            ty = ni.getType(typeString);
-        } catch (UnresolvedReferenceException e) {
-            // this is still an unknown type, so set ty = null
-            ty = null;
-        }
-        if(ty == null) {
-            if(!typeString.contains("."))
-                throw new UnresolvedReferenceException("Type references to undefined classes may only appear if they are fully qualified", tyref);
-            
-            recoder.java.CompilationUnit cu = ClassFileDeclarationBuilder.makeEmptyClassFile(servConf.getProgramFactory(), typeString);
-            dynamicallyCreatedClasses.add(typeString);
-            
-            ChangeHistory changeHistory = servConf.getChangeHistory();
-            changeHistory.attached(cu);
-            
-            libClasses.add(cu);
-            Debug.out("Dynamically created class: ", typeString);
-        }
     }
 
     /**
@@ -1122,11 +1091,11 @@ public class Recoder2KeY implements JavaReader {
         if (errorMessage == null || errorMessage.indexOf('@') == -1) {
             return new int[0];
         }
-        String pos = errorMessage.substring(errorMessage.indexOf("@") + 1);
-        pos = pos.substring(0, pos.indexOf(" "));
         int line = -1;
         int column = -1;
         try {
+            String pos = errorMessage.substring(errorMessage.indexOf("@") + 1);
+            pos = pos.substring(0, pos.indexOf(" "));
             line = Integer.parseInt(pos.substring(0, pos.indexOf('/')));
             column = Integer.parseInt(pos.substring(pos.indexOf('/') + 1));
         } catch (NumberFormatException nfe) {

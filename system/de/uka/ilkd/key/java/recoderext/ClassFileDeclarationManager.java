@@ -10,14 +10,19 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.*;
-
-import de.uka.ilkd.key.java.ConvertException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import recoder.ProgramFactory;
-import recoder.bytecode.*;
+import recoder.bytecode.ClassFile;
 import recoder.io.DataLocation;
 import recoder.java.CompilationUnit;
+import recoder.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.ConvertException;
 
 /**
  * This class provides an infrastructure to read in multiple class files and to
@@ -35,11 +40,13 @@ import recoder.java.CompilationUnit;
  */
 public class ClassFileDeclarationManager {
 
-    private Map<String, CompilationUnit> compUnits = new HashMap<String, CompilationUnit>();
+    private List<CompilationUnit> compUnits = new ArrayList<CompilationUnit>();
 
     private List<ClassFileDeclarationBuilder> innerClassBuilders = new ArrayList<ClassFileDeclarationBuilder>();
 
     private ProgramFactory programFactory;
+
+    private Map<String, TypeDeclaration> typeDeclarations = new HashMap<String, TypeDeclaration>();
 
     /**
      * create a new ClassFileDeclarationManager
@@ -63,24 +70,30 @@ public class ClassFileDeclarationManager {
      */
     public Collection<? extends CompilationUnit> getCompilationUnits() throws ConvertException {
         attachInnerClasses();
-        return compUnits.values();
+        return compUnits;
     }
 
     /*
-     * iterate the inner classes and add them to the according enclosing classes.
+     * iterate the inner classes and add them to the according enclosing classes.,
+     * 
+     * The list of inner classes is sorted lexicographically so that any inner
+     * classes has been added before their (even more) inner classes appear.  
      */
     private void attachInnerClasses() throws ConvertException {
 
+        Collections.sort(innerClassBuilders);
+        
         for (ClassFileDeclarationBuilder innerClass : innerClassBuilders) {
             try {
                 String enclName = innerClass.getEnclosingName();
-                
-                CompilationUnit enclCU = compUnits.get(enclName);
-                if(enclCU == null)
+
+                TypeDeclaration enclTD = typeDeclarations.get(enclName);
+                if(enclTD == null)
                     throw new ConvertException("The enclosing class '" + enclName +
                             "' for class '" + innerClass.getFullClassname() + "' is not present");
                 
-                innerClass.attachToEnclosingCompilationUnit(enclCU);
+                innerClass.attachToEnclosingDeclaration(enclTD);
+                typeDeclarations.put(innerClass.getFullClassname(), innerClass.makeTypeDeclaration());
             } catch (Exception ex) {
                 throw new ConvertException("Error while attaching: " + 
                         innerClass.getFullClassname(), ex);
@@ -108,7 +121,8 @@ public class ClassFileDeclarationManager {
             innerClassBuilders.add(builder);
         } else {
             CompilationUnit cu = builder.makeCompilationUnit();
-            compUnits.put(builder.getFullClassname(), cu);
+            compUnits.add(cu);
+            typeDeclarations.put(builder.getFullClassname(), cu.getPrimaryTypeDeclaration());
         }
     }
 
