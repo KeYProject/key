@@ -94,10 +94,12 @@ public class JMLSpecFactory {
     }
     
     
-    private String getContractName(Behavior behavior) {
+    private String getContractName(Behavior behavior, PositionedString name) {
         return "JML " 
                + behavior 
-               + "operation contract (id: " + contractCounter++ + ")";
+	    + "operation contract (" + 
+	    (name.toString().length() > 0 ? "name: " + name + ", " : "") +
+	    "id: " + contractCounter++ + ")";
     }
     
     
@@ -235,7 +237,8 @@ public class JMLSpecFactory {
     
     public SetOfOperationContract createJMLOperationContracts(
                                 ProgramMethod programMethod,
-                                Behavior originalBehavior,
+                                Behavior originalBehavior,				
+				PositionedString customName,
                                 ListOfPositionedString originalRequires,
                                 ListOfPositionedString originalAssignable,
                                 ListOfPositionedString originalEnsures,
@@ -384,7 +387,8 @@ public class JMLSpecFactory {
         FormulaWithAxioms post 
             = post1.conjoin(post2);
         if(diverges.equals(FormulaWithAxioms.FF)) {
-            String name = getContractName(originalBehavior);
+            String name = getContractName(originalBehavior, customName);
+	    
             OperationContract contract
                 = new OperationContractImpl(name,
                                             name,
@@ -400,7 +404,7 @@ public class JMLSpecFactory {
                                             atPreFunctions); 
             result = result.add(contract);
 	} else if(diverges.equals(FormulaWithAxioms.TT)) {
-	    String name = getContractName(originalBehavior);
+	    String name = getContractName(originalBehavior, customName);
             OperationContract contract
                 = new OperationContractImpl(name,
                                             name,
@@ -416,8 +420,8 @@ public class JMLSpecFactory {
                                             atPreFunctions); 
             result = result.add(contract);
         } else {
-            String name1 = getContractName(originalBehavior);
-            String name2 = getContractName(originalBehavior);
+            String name1 = getContractName(originalBehavior, customName);
+            String name2 = getContractName(originalBehavior, customName);
             OperationContract contract1
                 = new OperationContractImpl(name1,
                                             name1,
@@ -458,6 +462,7 @@ public class JMLSpecFactory {
         return createJMLOperationContracts(
                                     programMethod,
                                     textualSpecCase.getBehavior(),
+				    textualSpecCase.getName(),
                                     textualSpecCase.getRequires(),
                                     textualSpecCase.getAssignable(),
                                     textualSpecCase.getEnsures(),

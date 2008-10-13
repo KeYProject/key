@@ -511,6 +511,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=signals_clause        { sc.addSignals(ps); }
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
+    |   ps=name_clause           { sc.addName(ps);}
 	|   captures_clause 
 	|   when_clause
 	|   working_space_clause
@@ -633,6 +634,17 @@ captures_keyword
 :
     	CAPTURES 
     |   CAPTURES_RED
+;
+
+
+name_clause 
+	returns [PositionedString result = null]
+	throws SLTranslationException
+:
+    spec:SPEC_NAME name:STRING_LITERAL SEMICOLON 
+        {
+            result=createPositionedString(name.getText(), spec);
+        }    
 ;
 
 
