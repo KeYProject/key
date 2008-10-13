@@ -94,12 +94,10 @@ public class JMLSpecFactory {
     }
     
     
-    private String getContractName(Behavior behavior, PositionedString name) {
+    private String getContractName(Behavior behavior) {
         return "JML " 
-               + behavior 
-	    + "operation contract (" + 
-	    (name.toString().length() > 0 ? "name: " + name + ", " : "") +
-	    "id: " + contractCounter++ + ")";
+	    + behavior 
+	    + "operation contract (id: " + contractCounter++ + ")";
     }
     
     
@@ -387,11 +385,12 @@ public class JMLSpecFactory {
         FormulaWithAxioms post 
             = post1.conjoin(post2);
         if(diverges.equals(FormulaWithAxioms.FF)) {
-            String name = getContractName(originalBehavior, customName);
-	    
+            String name = getContractName(originalBehavior);	    
+	    String customStr = (customName.toString().length() > 0) ? 
+		customName + "[" + name + "]" : name; 
             OperationContract contract
                 = new OperationContractImpl(name,
-                                            name,
+                                            customStr,
                                             programMethod,
                                             Modality.DIA,
                                             requires,
@@ -404,10 +403,12 @@ public class JMLSpecFactory {
                                             atPreFunctions); 
             result = result.add(contract);
 	} else if(diverges.equals(FormulaWithAxioms.TT)) {
-	    String name = getContractName(originalBehavior, customName);
+	    String name = getContractName(originalBehavior);
+	    String customStr = (customName.toString().length() > 0) ? 
+		customName + "[" + name + "]" : name; 
             OperationContract contract
                 = new OperationContractImpl(name,
-                                            name,
+                                            customStr,
                                             programMethod,
                                             Modality.BOX,
                                             requires,
@@ -420,11 +421,16 @@ public class JMLSpecFactory {
                                             atPreFunctions); 
             result = result.add(contract);
         } else {
-            String name1 = getContractName(originalBehavior, customName);
-            String name2 = getContractName(originalBehavior, customName);
+            String name1 = getContractName(originalBehavior);
+	    String customStr1 = (customName.toString().length() > 0) ? 
+		customName + "[" + name1 + "]" : name1; 
+
+            String name2 = getContractName(originalBehavior);
+	    String customStr2 = (customName.toString().length() > 0) ? 
+		customName + "[" + name2 + "]" : name2; 
             OperationContract contract1
                 = new OperationContractImpl(name1,
-                                            name1,
+                                            customStr1,
                                             programMethod,
                                             Modality.DIA,
                                             requires.conjoin(diverges.negate()),
@@ -437,7 +443,7 @@ public class JMLSpecFactory {
                                             atPreFunctions);
             OperationContract contract2
                 = new OperationContractImpl(name2,
-                                            name2,
+                                            customStr2,
                                             programMethod,
                                             Modality.BOX,
                                             requires,
