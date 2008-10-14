@@ -38,7 +38,7 @@ import de.uka.ilkd.key.util.Debug;
 public class GoalList extends JList {
     
     private final static ImageIcon keyIcon = IconFactory.keyHole(20,20);
-    private final static Icon disabledGoalIcon = IconFactory.keyHoleDisabled(20, 20);
+    private final static Icon disabledGoalIcon = IconFactory.keyHoleInteractive(20, 20);
 
     private KeYMediator mediator;   
 
@@ -67,13 +67,13 @@ public class GoalList extends JList {
         DisableSingleGoal() {
             if (getSelectedValue() instanceof Goal) {                
                 final Goal g = (Goal) getSelectedValue();
-                putValue(NAME, g.isEnabled() ? "Disable Goal" : "Enable Goal");
-                putValue(SHORT_DESCRIPTION,  g.isEnabled() ? "No automatic rules " +
-                		"will be applied when goal is disabled." : 
+                putValue(NAME, g.isAutomatic() ? "Interactive Goal" : "Automatic Goal");
+                putValue(SHORT_DESCRIPTION,  g.isAutomatic() ? "No automatic rules " +
+                		"will be applied when goal is set to interactive." : 
                 		    "Re-enable automatic rule application for this goal.");
-                putValue(SMALL_ICON, g.isEnabled() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU : 
+                putValue(SMALL_ICON, g.isAutomatic() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU : 
                     KEY_HOLE_PULL_DOWN_MENU);
-                enableGoals = !g.isEnabled();
+                enableGoals = !g.isAutomatic();
                 setEnabled(true);
             } else {
                 setEnabled(false);
@@ -113,13 +113,13 @@ public class GoalList extends JList {
         DisableOtherGoals() {
             if (getSelectedValue() instanceof Goal) {                
                 final Goal g = (Goal) getSelectedValue();
-                putValue(NAME, g.isEnabled() ? "Disable Other Goals" : "Enable Other Goals");
-                putValue(SHORT_DESCRIPTION,  g.isEnabled() ? "No automatic rules " +
+                putValue(NAME, g.isAutomatic() ? "Set Other Goals Interactive" : "Set Other Goals Automatic");
+                putValue(SHORT_DESCRIPTION,  g.isAutomatic() ? "No automatic rules " +
                                 "will be applied on all other goals." : 
                                     "Re-enable automatic rule application for other goals.");
-                putValue(SMALL_ICON, g.isEnabled() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU : 
+                putValue(SMALL_ICON, g.isAutomatic() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU : 
                     KEY_HOLE_PULL_DOWN_MENU);
-                enableGoals = !g.isEnabled();
+                enableGoals = !g.isAutomatic();
                 
                 setEnabled(getModel().getSize() > 1);
             } else {
@@ -786,7 +786,7 @@ public class GoalList extends JList {
 
 		if ( ((Goal)value).getClosureConstraint ().isSatisfiable () )
 		    col = Color.blue;		
-		statusIcon = ((Goal)value).isEnabled() ? keyIcon : disabledGoalIcon;
+		statusIcon = ((Goal)value).isAutomatic() ? keyIcon : disabledGoalIcon;
 	    } else {
 		valueStr   = ""+value;
                 statusIcon = keyIcon;

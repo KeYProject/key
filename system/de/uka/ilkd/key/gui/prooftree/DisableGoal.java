@@ -18,7 +18,7 @@ import de.uka.ilkd.key.proof.Goal;
  */
 public abstract class DisableGoal extends AbstractAction {
     
-    public static final Icon KEY_HOLE_DISABLED_PULL_DOWN_MENU = IconFactory.keyHoleDisabled(16, 16);
+    public static final Icon KEY_HOLE_DISABLED_PULL_DOWN_MENU = IconFactory.keyHoleInteractive(16, 16);
     public static final ImageIcon KEY_HOLE_PULL_DOWN_MENU = IconFactory.keyHole(16, 16);
     
     /**

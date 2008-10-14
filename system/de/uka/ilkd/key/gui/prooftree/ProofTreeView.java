@@ -635,14 +635,11 @@ public class ProofTreeView extends JPanel {
 		    ProofTreeView.this.setToolTipText("Closed Goal");
 		    tree_cell.setToolTipText("A closed goal");
 		} else {
-		    if ( !goal.isEnabled() ) {
+		    if ( !goal.isAutomatic() ) {
 		        tree_cell.setForeground(Color.orange);
-		        tree_cell.setIcon(IconFactory.keyHoleDisabled(20, 20));
+		        tree_cell.setIcon(IconFactory.keyHoleInteractive(20, 20));
 		        ProofTreeView.this.setToolTipText("Disabled Goal");
-		        tree_cell.setToolTipText("Disabled goal - no automatic rule application");
-		        nodeText = node.serialNr()+": DISABLED";
-		        tree_cell.setText(nodeText);
-		        delegateView.setFont(tree.getFont());
+		        tree_cell.setToolTipText("Interactive goal - no automatic rule application");
 		    } else if ( goal.getClosureConstraint ().isSatisfiable () ) {
 			tree_cell.setForeground(Color.blue);
 			tree_cell.setIcon(IconFactory.keyHole(20, 20));
@@ -975,8 +972,8 @@ public class ProofTreeView extends JPanel {
 	    public SetGoalsBelowEnableStatus(boolean enableGoals) {
 	        this.enableGoals = enableGoals;
 	        
-	        String action = enableGoals ? "Enable" : "Disable";
-	        putValue(NAME, action + " All Goals Below");
+	        String action = enableGoals ? "Automatic" : "Interactive";
+	        putValue(NAME, "Set All Goals Below to " + action);
 	        if(enableGoals) {
 	            putValue(SHORT_DESCRIPTION, "Include this node and all goals in the subtree in automatic rule application");
 	            putValue(SMALL_ICON, KEY_HOLE_PULL_DOWN_MENU);
@@ -991,10 +988,25 @@ public class ProofTreeView extends JPanel {
 	     */
             @Override
             public Iterable<Goal> getGoalList() {
+                ListOfGoal goals = proof.getSubtreeGoals(invokedNode);
+                return goals;
+            }
+
+            /* 
+             * In addition to marking setting goals, update the tree model
+             * so that the label sizes are recalculated
+             */
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                super.actionPerformed(e);
+                for (Goal goal : getGoalList()) {
+                    delegateModel.updateTree(goal.node());
+                }
                 // trigger repainting the tree after the completion of this event.
                 delegateView.repaint();
-                return proof.getSubtreeGoals(invokedNode);
             }
+            
+            
 	}
 	
         public void itemStateChanged(ItemEvent e) {

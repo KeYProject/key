@@ -460,7 +460,7 @@ public class Proof implements Named {
     private ListOfGoal filterEnabledGoals(ListOfGoal goals) {
         ListOfGoal enabledGoals = SLListOfGoal.EMPTY_LIST;
         for(Goal g : goals) {
-            if(g.isEnabled()) {
+            if(g.isAutomatic()) {
                 enabledGoals = enabledGoals.prepend(g);
             }
         }

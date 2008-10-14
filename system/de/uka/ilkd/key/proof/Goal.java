@@ -70,8 +70,8 @@ public class Goal  {
     /** goal listeners  */
     private List<GoalListener> listeners = new ArrayList<GoalListener>();
 
-    /** a goal has been excluded from automatic rule application iff enabled == false */
-    private boolean enabled = true;
+    /** a goal has been excluded from automatic rule application iff automatic == false */
+    private boolean automatic = true;
     
     /** list of rule app listeners */
     private static List<RuleAppListener> ruleAppListenerList = 
@@ -350,12 +350,23 @@ public class Goal  {
 	return node().sequent();
     }
     
-    public boolean isEnabled() {
-        return enabled;
+    /**
+     * Checks if is an automatic goal.
+     * 
+     * @return true, if is automatic
+     */
+    public boolean isAutomatic() {
+        return automatic;
     }
     
+    /**
+     * Sets the automatic status of this goal.
+     * 
+     * @param t
+     *                the new status: true for automatic, false for interactive
+     */
     public void setEnabled(boolean t) {
-        enabled = t;
+        automatic = t;
     }
 
     
@@ -480,7 +491,7 @@ public class Goal  {
 				ruleAppManager.copy () );
 	clone.listeners = (List<GoalListener>)
 	    ((ArrayList<GoalListener>) listeners).clone();
-	clone.enabled = this.enabled;
+	clone.automatic = this.automatic;
 	return clone;
     }
 
