@@ -25,10 +25,6 @@ public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl implements rec
     private int recoderErrorCount = 0;
     private int recoderErrorThreshold;
     
-    private List<TypeReference> unresolvedClasses;
-    
-    private boolean ignoreUnresolvedClasses = false;
-    
     public void reportException(Throwable e){
         super.reportException(e);
         if (getExceptions().size() != 0) {
@@ -92,13 +88,11 @@ public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl implements rec
     }
     
     public void reportError(Exception e) {
-        if(!testUnresolvedClass(e)) {
-            recoderErrorCount += 1;
-            recoderExceptions.add(e);
-            if (recoderErrorCount > recoderErrorThreshold) {
-                recoderExitAction();
-            }         
-        }
+        recoderErrorCount += 1;
+        recoderExceptions.add(e);
+        if (recoderErrorCount > recoderErrorThreshold) {
+            recoderExitAction();
+        }         
     }
     
     public void modelUpdating(EventObject event) {}
@@ -109,52 +103,4 @@ public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl implements rec
         }
     }
 
-    public boolean isIgnoreUnreferencedClasses() {
-        return ignoreUnresolvedClasses;
-    }
-
-    /**
-     * Check whether an exception is to be ignored.
-     * This is the case if:
-     * 1. the exception is an UnresolvedReferenceException, and
-     * 2. ignoreUnresolvedClasses is set to true, and
-     * 3. the unresolved reference is a type reference
-     */
-    private boolean testUnresolvedClass(Throwable e) {
-        if (ignoreUnresolvedClasses && e instanceof UnresolvedReferenceException) {
-            UnresolvedReferenceException ur = (UnresolvedReferenceException) e;
-            ProgramElement ref = ur.getUnresolvedReference();
-            if (ref instanceof TypeReference) {
-                TypeReference tyref = (TypeReference) ref;
-                unresolvedClasses.add(tyref);
-                Debug.out("Unresolved type: " + ref.toSource());
-                // System.err.println("Unresolved type: " + ref.toSource());
-                return true;
-            }
-            // bugfix (mu oct-08): 
-            // Recoder may also report "new" to be unresolved instead of the
-            // contained type reference. Is this a bug in recoder?
-            if(ref instanceof New) {
-                New newref = (New)ref;
-                TypeReference tyref = newref.getTypeReference();
-                unresolvedClasses.add(tyref);
-                Debug.out("Unresolved type: " + ref.toSource());
-                // System.err.println("Unresolved type: " + ref.toSource());                
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    public void setIgnoreUnresolvedClasses(boolean ignoreUnresolvedClasses) {
-        this.ignoreUnresolvedClasses = ignoreUnresolvedClasses;
-        if(ignoreUnresolvedClasses)
-            unresolvedClasses = new ArrayList<TypeReference>();
-    }
-
-    public List<TypeReference> getUnresolvedClasses() {
-        return unresolvedClasses;
-    }
-    
-    
 }

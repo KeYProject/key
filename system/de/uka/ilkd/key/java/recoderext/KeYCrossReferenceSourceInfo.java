@@ -48,6 +48,10 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 
 
+/**
+ * @author mattias
+ *
+ */
 public class KeYCrossReferenceSourceInfo 
     extends DefaultCrossReferenceSourceInfo {
 
@@ -435,10 +439,27 @@ public class KeYCrossReferenceSourceInfo
         return scope.getASTParent();
     }
     
+    /// -------------- Handling of stub class generation
+    
+    /** 
+     * The mapping from class names to stub compilation units.
+     */
     protected Map<String, CompilationUnit> stubClasses = new HashMap<String, CompilationUnit>();
     
+    /**
+     *  The flag which decides on the behaviour on undefined classes
+     */
     private boolean ignoreUnresolvedClasses = false;
     
+    /**
+     * Sets if unresolved classes result in an exception or lead to stubs.
+     * 
+     * If unresolved classes are ignored, we use 
+     * {@link #registerUnresolvedTypeRef(TypeReference)} to create dummy stubs.
+     * 
+     * @param ignoreUnresolvedClasses
+     *                ignore unresolved classes iff true
+     */
     public void setIgnoreUnresolvedClasses(boolean ignoreUnresolvedClasses) {
         this.ignoreUnresolvedClasses = ignoreUnresolvedClasses;
         if(ignoreUnresolvedClasses) {
@@ -446,23 +467,32 @@ public class KeYCrossReferenceSourceInfo
         }
     }
     
+    /*
+     * overwrite the default behaviour:
+     * if the normal lookup fails, generate a stub class, register it
+     * and try to look up again. This might fail again, should never.
+     * 
+     * @see recoder.service.DefaultSourceInfo#getType(recoder.java.reference.TypeReference)
+     */
     @Override
     public Type getType(TypeReference tr) {
         try {
             return super.getType(tr);
         } catch (ExceptionHandlerException e) {
-            if(ignoreUnresolvedClasses && e.getCause() instanceof UnresolvedReferenceException)
-                return resolveUnresolvedTypeRef(tr);
-            else
+            if(ignoreUnresolvedClasses && e.getCause() instanceof UnresolvedReferenceException) {
+                registerUnresolvedTypeRef(tr);
+                return super.getType(tr);
+            } else {
                 throw e;
+            }
         }
     }
     
     /*
      * make dummy classes for unresolved type references, store newly created classes to 
-     * libClasses and the qualified name of the class to dynamicallyCreatedClasses
+     * stubClasses and register the compilation unit.
      */
-    private Type resolveUnresolvedTypeRef(TypeReference tyref) {
+    private void registerUnresolvedTypeRef(TypeReference tyref) {
         NameInfo ni = serviceConfiguration.getNameInfo();
         String typeString = Naming.toPathName(tyref);
         
@@ -472,9 +502,8 @@ public class KeYCrossReferenceSourceInfo
         
         // look in the already created classes:
         CompilationUnit stub = stubClasses.get(typeString);
-        
         if(stub != null)
-            return stub.getPrimaryTypeDeclaration();
+            throw new IllegalStateException("try to resolve an unknown type twice");
 
         recoder.abstraction.Type ty;
         
@@ -504,18 +533,18 @@ public class KeYCrossReferenceSourceInfo
             
             register(cu);
             
-            return cu.getPrimaryTypeDeclaration();
-        } else {
-            return ty;
-        }
+        } 
     }
 
+    /**
+     * Gets the collection of created stub classes ion their compilation units
+     * 
+     * @return the unmodifiable collection of created compilation units
+     */
     public Collection<? extends CompilationUnit> getCreatedStubClasses() {
         return stubClasses.values();
     }
 
-    
-    
     /**
      * clears the cache for the TypeReference to Type resolution.
      * This is necessary if types are added after model evalutation.

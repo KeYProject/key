@@ -120,7 +120,7 @@ public class Recoder2KeY implements JavaReader {
      * the list of classnames that contain the classes that are referenced but not 
      * defined. For those classe types a dummy stub is created at parse time.
      */
-    private List<String> dynamicallyCreatedClasses = new ArrayList<String>();
+    private Collection<? extends CompilationUnit> dynamicallyCreatedCompilationUnits;
 
 
     /**
@@ -408,8 +408,8 @@ public class Recoder2KeY implements JavaReader {
     }
 
     /**
-     * get the list of classes that have been created dynamically due to lacking
-     * definitions.
+     * get the list of names of classes that have been created dynamically due
+     * to lacking definitions.
      * 
      * For all classes that are referenced but not defined, an empty dummy stub
      * is created. This method returns the list of their fully qualified class
@@ -419,7 +419,13 @@ public class Recoder2KeY implements JavaReader {
      * @return an unmodifiable list of fully qualified class names
      */
     public List<String> getDynamicallyCreatedClasses() {
-        return Collections.unmodifiableList(dynamicallyCreatedClasses);
+        List<String> ret = new ArrayList<String>();
+        if(dynamicallyCreatedCompilationUnits != null) {
+            for (CompilationUnit cu : dynamicallyCreatedCompilationUnits) {
+                ret.add(cu.getPrimaryTypeDeclaration().getFullName());
+            }
+        }
+        return ret;
     }
     
     /*
@@ -631,7 +637,7 @@ public class Recoder2KeY implements JavaReader {
         
         CrossReferenceSourceInfo sourceInfo = servConf.getCrossReferenceSourceInfo();
         assert sourceInfo instanceof KeYCrossReferenceSourceInfo :
-            "...";
+            "SourceInfo is not of type KeYCrossReferenceSourceInfo";
         KeYCrossReferenceSourceInfo keySourceInfo = 
             (KeYCrossReferenceSourceInfo)sourceInfo;
         
@@ -641,7 +647,8 @@ public class Recoder2KeY implements JavaReader {
             changeHistory.updateModel();
         }
         
-        specialClasses.addAll(keySourceInfo.getCreatedStubClasses());
+        dynamicallyCreatedCompilationUnits = keySourceInfo.getCreatedStubClasses();
+        specialClasses.addAll(dynamicallyCreatedCompilationUnits);
         keySourceInfo.setIgnoreUnresolvedClasses(false);
         
         changeHistory.updateModel();
