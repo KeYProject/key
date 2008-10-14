@@ -95,7 +95,7 @@ public class ApplyStrategy {
             g.node().setReuseSource(reusePoint);
             rl.removeRPConsumedMarker(reusePoint.source());
             rl.removeRPConsumedGoal(g);
-            proof.getNameRecorder().setProposals(
+            proof.getServices().getNameRecorder().setProposals(
                     reusePoint.getNameProposals());
             ListOfGoal goalList = g.apply(app);
             rl.addRPOldMarkersNewGoals(goalList);

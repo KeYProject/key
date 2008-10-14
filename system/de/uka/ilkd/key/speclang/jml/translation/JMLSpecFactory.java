@@ -96,8 +96,8 @@ public class JMLSpecFactory {
     
     private String getContractName(Behavior behavior) {
         return "JML " 
-               + behavior 
-               + "operation contract (id: " + contractCounter++ + ")";
+	    + behavior 
+	    + "operation contract (id: " + contractCounter++ + ")";
     }
     
     
@@ -235,7 +235,8 @@ public class JMLSpecFactory {
     
     public SetOfOperationContract createJMLOperationContracts(
                                 ProgramMethod programMethod,
-                                Behavior originalBehavior,
+                                Behavior originalBehavior,				
+				PositionedString customName,
                                 ListOfPositionedString originalRequires,
                                 ListOfPositionedString originalAssignable,
                                 ListOfPositionedString originalEnsures,
@@ -384,10 +385,12 @@ public class JMLSpecFactory {
         FormulaWithAxioms post 
             = post1.conjoin(post2);
         if(diverges.equals(FormulaWithAxioms.FF)) {
-            String name = getContractName(originalBehavior);
+            String name = getContractName(originalBehavior);	    
+	    String customStr = (customName.toString().length() > 0) ? 
+		customName + "[" + name + "]" : name; 
             OperationContract contract
                 = new OperationContractImpl(name,
-                                            name,
+                                            customStr,
                                             programMethod,
                                             Modality.DIA,
                                             requires,
@@ -401,9 +404,11 @@ public class JMLSpecFactory {
             result = result.add(contract);
 	} else if(diverges.equals(FormulaWithAxioms.TT)) {
 	    String name = getContractName(originalBehavior);
+	    String customStr = (customName.toString().length() > 0) ? 
+		customName + "[" + name + "]" : name; 
             OperationContract contract
                 = new OperationContractImpl(name,
-                                            name,
+                                            customStr,
                                             programMethod,
                                             Modality.BOX,
                                             requires,
@@ -417,10 +422,15 @@ public class JMLSpecFactory {
             result = result.add(contract);
         } else {
             String name1 = getContractName(originalBehavior);
+	    String customStr1 = (customName.toString().length() > 0) ? 
+		customName + "[" + name1 + "]" : name1; 
+
             String name2 = getContractName(originalBehavior);
+	    String customStr2 = (customName.toString().length() > 0) ? 
+		customName + "[" + name2 + "]" : name2; 
             OperationContract contract1
                 = new OperationContractImpl(name1,
-                                            name1,
+                                            customStr1,
                                             programMethod,
                                             Modality.DIA,
                                             requires.conjoin(diverges.negate()),
@@ -433,7 +443,7 @@ public class JMLSpecFactory {
                                             atPreFunctions);
             OperationContract contract2
                 = new OperationContractImpl(name2,
-                                            name2,
+                                            customStr2,
                                             programMethod,
                                             Modality.BOX,
                                             requires,
@@ -458,6 +468,7 @@ public class JMLSpecFactory {
         return createJMLOperationContracts(
                                     programMethod,
                                     textualSpecCase.getBehavior(),
+				    textualSpecCase.getName(),
                                     textualSpecCase.getRequires(),
                                     textualSpecCase.getAssignable(),
                                     textualSpecCase.getEnsures(),

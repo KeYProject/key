@@ -67,7 +67,7 @@ options {
         
     //helper objects
     private FormulaBoolConverter formulaBoolConverter;
-    private PropertyManager propertyManager;
+    private OCLResolverManager OCLResolverManager;
     private AxiomCollector axiomCollector;
     private JavaIntegerSemanticsHelper intHelper;
     private SLTranslationExceptionManager excManager;
@@ -105,13 +105,13 @@ options {
         
         String fileName = "no file";
         if (specInClass.getJavaType() instanceof TypeDeclaration) {
-        	fileName = ((TypeDeclaration)specInClass.getJavaType())
+		fileName = ((TypeDeclaration)specInClass.getJavaType())
                                 .getPositionInfo().getFileName();
         }
         
         this.excManager = new SLTranslationExceptionManager(this,
-                                fileName, 
-                                offsetPos);
+                                			    fileName, 
+                                	                    offsetPos);
                                 
                 
         //set axiomCollector
@@ -124,23 +124,24 @@ options {
         intHelper = new JavaIntegerSemanticsHelper(services, excManager);
         
         //initialise property manager
-        propertyManager = new PropertyManager(services,
-                                              specInClass,
-                                              formulaBoolConverter,
-                                              excVar,
-                                              excManager);
-        propertyManager.pushLocalVariablesNamespace();
+        OCLResolverManager = new OCLResolverManager(services,
+                                              	    specInClass,
+                                              	    selfVar,
+                                              	    formulaBoolConverter,
+                                              	    excVar,
+                                              	    excManager);
+        OCLResolverManager.pushLocalVariablesNamespace();
         if(selfVar != null) {
-	        propertyManager.putIntoTopLocalVariablesNamespace(selfVar);
+	        OCLResolverManager.putIntoTopLocalVariablesNamespace(selfVar);
         }
         if(paramVars != null) {
 			IteratorOfParsableVariable it = paramVars.iterator(); 
 			while(it.hasNext()) {
-				propertyManager.putIntoTopLocalVariablesNamespace(it.next());
+				OCLResolverManager.putIntoTopLocalVariablesNamespace(it.next());
 			}
         }
         if(resultVar != null) {
-		 	propertyManager.putIntoTopLocalVariablesNamespace(resultVar);
+		 	OCLResolverManager.putIntoTopLocalVariablesNamespace(resultVar);
 		}
 		
 		if(excVar == null) {
@@ -249,7 +250,7 @@ options {
      * depending on their type. If the types are not compatible,
      * null is returned.
      */
-    private Term buildEqualityTermByEntity(OCLEntity a, OCLEntity b)
+    private Term buildEqualityTermByEntity(OCLExpression a, OCLExpression b)
     {
     	Term result = null;
         Sort boolSort = services.getJavaInfo()
@@ -327,7 +328,7 @@ options {
      */
     public Term parseExpression() throws SLTranslationException {
         
-    	OCLEntity expr = null;
+    	OCLExpression expr = null;
     	try {
             expr = expression();
 		} catch (antlr.ANTLRException e) {
@@ -371,7 +372,7 @@ options {
 
 top throws SLTranslationException
 {
-	OCLEntity t;
+	OCLExpression t;
 }
 	: 
 		t = oclExpression 
@@ -401,7 +402,7 @@ oclExpressions throws SLTranslationException
 
 constraint throws SLTranslationException
 {
-	OCLEntity t;
+	OCLExpression t;
 }
 	: 
 		contextDeclaration 
@@ -465,14 +466,14 @@ operationName throws SLTranslationException
     ;
 
 
-oclExpression returns [OCLEntity result=null] throws SLTranslationException
+oclExpression returns [OCLExpression result=null] throws SLTranslationException
   	:	( (letExpression)* "in" )?  result=expression
   	;
   	
 
 letExpression throws SLTranslationException
 {
-	OCLEntity t;
+	OCLExpression t;
 }
   	: 
   		"let" NAME 
@@ -497,30 +498,30 @@ formalParameterList throws SLTranslationException
 //Rules for expressions and below
 //-----------------------------------------------------------------------------
 
-expression returns [OCLEntity result=null] throws SLTranslationException
+expression returns [OCLExpression result=null] throws SLTranslationException
   	: result=implicationExpression
   	;
 
 
-implicationExpression returns [OCLEntity result=null] throws SLTranslationException
+implicationExpression returns [OCLExpression result=null] throws SLTranslationException
 {
-	OCLEntity a=null;
+	OCLExpression a=null;
 }
   	: 
   		result=logicalExpression
         ( 
            	IMPLIES a=logicalExpression
             {
-                result = new OCLEntity(
+                result = new OCLExpression(
                     tb.imp(result.getTerm(),a.getTerm()));
             }
         )* 
 	;
 
 
-logicalExpression returns [OCLEntity result=null] throws SLTranslationException
+logicalExpression returns [OCLExpression result=null] throws SLTranslationException
 {
-	OCLEntity a=null;
+	OCLExpression a=null;
 	Junctor j=null;
 }
   	: 
@@ -528,7 +529,7 @@ logicalExpression returns [OCLEntity result=null] throws SLTranslationException
         ( 
             (XOR relationalExpression) => XOR a=relationalExpression
             {
-                result = new OCLEntity(
+                result = new OCLExpression(
                     tb.not(
                         tb.equals(
                             result.getTerm(),
@@ -537,7 +538,7 @@ logicalExpression returns [OCLEntity result=null] throws SLTranslationException
             |
            	j=logicalOperator a=relationalExpression
             {
-                result = new OCLEntity(
+                result = new OCLExpression(
                     tb.tf().createJunctorTermAndSimplify(
                         j,
                         result.getTerm(),
@@ -547,9 +548,9 @@ logicalExpression returns [OCLEntity result=null] throws SLTranslationException
 	;
 
 
-relationalExpression returns [OCLEntity result=null] throws SLTranslationException
+relationalExpression returns [OCLExpression result=null] throws SLTranslationException
 {
-	OCLEntity a=null;
+	OCLExpression a=null;
 	Function f=null;
 }
 	: 
@@ -557,13 +558,13 @@ relationalExpression returns [OCLEntity result=null] throws SLTranslationExcepti
 	    ( 
             (EQUAL additiveExpression) => EQUAL a=additiveExpression 
 	        {
-    			result = new OCLEntity(
+    			result = new OCLExpression(
     			    buildEqualityTermByEntity(result,a));
 	        }
             | 
             (NEQUAL additiveExpression) => NEQUAL a=additiveExpression
             {
-    			result = new OCLEntity(
+    			result = new OCLExpression(
     			    tb.not(
     			        buildEqualityTermByEntity(result,a)));
 
@@ -571,7 +572,7 @@ relationalExpression returns [OCLEntity result=null] throws SLTranslationExcepti
             | 
             f=relationalOperator a=additiveExpression 
             {
-            	result = new OCLEntity(
+            	result = new OCLExpression(
             	    tb.func(
             	        (Function) f,
             	        result.getTerm(),
@@ -585,9 +586,9 @@ relationalExpression returns [OCLEntity result=null] throws SLTranslationExcepti
 	;
 
 
-additiveExpression returns [OCLEntity result=null] throws SLTranslationException
+additiveExpression returns [OCLExpression result=null] throws SLTranslationException
 {
-	OCLEntity a=null;
+	OCLExpression a=null;
 	Operator op=null; 
 }
   	: 
@@ -599,7 +600,7 @@ additiveExpression returns [OCLEntity result=null] throws SLTranslationException
 	       			raiseError("Wrong expression in additive expression. One of the summands is not a term.");
 	       		}
 	        		
-       	        result = new OCLEntity(
+       	        result = new OCLExpression(
        	                intHelper.buildAddExpression(result.getTerm(),a.getTerm()));
 	        }
 
@@ -611,16 +612,16 @@ additiveExpression returns [OCLEntity result=null] throws SLTranslationException
         			raiseError("Wrong expression in subtractive expression. One of the summands is not a term.");
         		}
 	        		
-       	        result = new OCLEntity(
+       	        result = new OCLExpression(
        	                intHelper.buildSubExpression(result.getTerm(),a.getTerm()));
 	        }
     	)*
 	;
 
 
-multiplicativeExpression returns [OCLEntity result=null] throws SLTranslationException
+multiplicativeExpression returns [OCLExpression result=null] throws SLTranslationException
 {
-	OCLEntity a=null;
+	OCLExpression a=null;
     Operator op=null; 
 }
   	: 
@@ -632,7 +633,7 @@ multiplicativeExpression returns [OCLEntity result=null] throws SLTranslationExc
         			raiseError("Wrong expression in multiplicative expression. One of the factors is not a term.");
         		}
         		
-       	        result = new OCLEntity(
+       	        result = new OCLExpression(
        	                intHelper.buildMulExpression(result.getTerm(),a.getTerm()));
 	        }
 	        
@@ -646,18 +647,18 @@ multiplicativeExpression returns [OCLEntity result=null] throws SLTranslationExc
   	;
 
 
-unaryExpression returns [OCLEntity result=null] throws SLTranslationException
+unaryExpression returns [OCLExpression result=null] throws SLTranslationException
 	: 
 		(NOT postfixExpression) => NOT result=postfixExpression
 	    {
-    		result = new OCLEntity(
+    		result = new OCLExpression(
     		    tb.not(result.getTerm()));
 	    }
 		| 
 		(MINUS postfixExpression) => MINUS result=postfixExpression
     	{
     		Function neg = (Function) funcNS.lookup(new Name("neg"));
-    		result = new OCLEntity(
+    		result = new OCLExpression(
     		    tb.func(neg,result.getTerm()));
     	}
   		| 
@@ -665,9 +666,9 @@ unaryExpression returns [OCLEntity result=null] throws SLTranslationException
   	;
 
 
-postfixExpression returns [OCLEntity result=null] throws SLTranslationException
+postfixExpression returns [OCLExpression result=null] throws SLTranslationException
 {
-	OCLEntity entity=null;
+	OCLExpression entity=null;
 }
   	: 
 		entity=primaryExpression
@@ -684,19 +685,19 @@ postfixExpression returns [OCLEntity result=null] throws SLTranslationException
 	;
   
   
-primaryExpression returns [OCLEntity result=null] throws SLTranslationException
+primaryExpression returns [OCLExpression result=null] throws SLTranslationException
 {
 	Term t;
 	OCLCollection c;
 }
-  	:   c=literalCollection { result = new OCLEntity(c); }
-  	| 	(literal) => t=literal {result = new OCLEntity(t);}
+  	:   c=literalCollection { result = new OCLExpression(c); }
+  	| 	(literal) => t=literal {result = new OCLExpression(t);}
   	|   result = propertyCall[null]
     | 	LPAREN result=expression RPAREN 
-    | 	t=ifExpression { result = new OCLEntity(t);}
-    | 	TRUE { result=new OCLEntity(tb.tt()); }
-    | 	FALSE { result=new OCLEntity(tb.ff()); }
-    | 	NULL { result=new OCLEntity(tb.func(Op.NULL)); }
+    | 	t=ifExpression { result = new OCLExpression(t);}
+    | 	TRUE { result=new OCLExpression(tb.tt()); }
+    | 	FALSE { result=new OCLExpression(tb.ff()); }
+    | 	NULL { result=new OCLExpression(tb.func(Op.NULL)); }
     {
     	if (result == null) {
     	    raiseError("Error in primary expression");
@@ -707,9 +708,9 @@ primaryExpression returns [OCLEntity result=null] throws SLTranslationException
   	
 ifExpression returns [Term result=null] throws SLTranslationException
 {
-	OCLEntity condition;
-	OCLEntity branchA;
-	OCLEntity branchB;
+	OCLExpression condition;
+	OCLExpression branchA;
+	OCLExpression branchB;
 }
   	: 
   		IF condition = expression
@@ -779,8 +780,8 @@ literalCollection returns [OCLCollection resCollection=new OCLCollection()] thro
 
 collectionItem[int colType] returns [OCLCollection result=null] throws SLTranslationException
 {
-	OCLEntity t=null;
-	OCLEntity a=null;
+	OCLExpression t=null;
+	OCLExpression a=null;
 }
 	:
 		t=expression (DOTDOT a=expression)?
@@ -800,24 +801,24 @@ collectionItem[int colType] returns [OCLCollection result=null] throws SLTransla
   	;
 
 
-propertyCall[OCLEntity receiver] returns [OCLEntity result = null] throws SLTranslationException
+propertyCall[OCLExpression receiver] returns [OCLExpression result = null] throws SLTranslationException
 {
 	String propertyName = null;
 	boolean atPre = false;
 	boolean needVarDeclaration = false;
 	OCLParameters parameters = null;
-	ListOfOCLEntity qualifier;
+	ListOfOCLExpression qualifier;
 }
 	: 
        	propertyName=pathName
         (timeExpression {atPre = true;})?
         (qualifier=qualifiers {raiseError("qualifiers are not yet supported");})?
         {
-        	needVarDeclaration = propertyManager.needVarDeclaration(propertyName);
+        	needVarDeclaration = OCLResolverManager.needVarDeclaration(propertyName);
 		}
         (parameters=propertyCallParameters[receiver, needVarDeclaration])?
         {
-       	    result = (OCLEntity) propertyManager.resolve(receiver, 
+       	    result = (OCLExpression) OCLResolverManager.resolve(receiver, 
    								    		 propertyName, 
    									    	 parameters);
  
@@ -839,29 +840,29 @@ propertyCall[OCLEntity receiver] returns [OCLEntity result = null] throws SLTran
         		}
         		
     			Term t = convertToAtPre(result.getTerm());
-        		result = new OCLEntity(t);
+        		result = new OCLExpression(t);
         	}
 
         	if(result.isTerm()) {
         		Term t = formulaBoolConverter.convertBoolToFormula(
 	        												result.getTerm());
-        		result = new OCLEntity(t);
+        		result = new OCLExpression(t);
         	}
         }
 	;
 
 
-propertyCallParameters[OCLEntity receiver, boolean needVarDeclaration]
+propertyCallParameters[OCLExpression receiver, boolean needVarDeclaration]
 		returns [OCLParameters result = null] throws SLTranslationException
 {
 	ListOfLogicVariable resultVars = SLListOfLogicVariable.EMPTY_LIST;
-	ListOfOCLEntity resultEntities = SLListOfOCLEntity.EMPTY_LIST;
+	ListOfOCLExpression resultEntities = SLListOfOCLExpression.EMPTY_LIST;
 	
 	Sort declaredVarsSort = (receiver == null ? null : receiver.getSort());
 }
 	:
 		{
-      		propertyManager.pushLocalVariablesNamespace();
+      		OCLResolverManager.pushLocalVariablesNamespace();
 	    }
       	LPAREN 
       	(
@@ -870,7 +871,7 @@ propertyCallParameters[OCLEntity receiver, boolean needVarDeclaration]
           		resultVars=declarator[declaredVarsSort] 
           		BAR
           		{
-          			propertyManager.putIntoTopLocalVariablesNamespace(resultVars);
+          			OCLResolverManager.putIntoTopLocalVariablesNamespace(resultVars);
           		}
           		resultEntities=actualParameterList
            	)
@@ -880,7 +881,7 @@ propertyCallParameters[OCLEntity receiver, boolean needVarDeclaration]
             	  	if(needVarDeclaration) {
             	  		LogicVariable collectionVar 
             	  				= ((OCLCollection) receiver.getCollection()).getPredVar();
-        	  			propertyManager.putIntoTopLocalVariablesNamespace(collectionVar);
+        	  			OCLResolverManager.putIntoTopLocalVariablesNamespace(collectionVar);
         	  		    resultVars = resultVars.append(collectionVar);
     	      		}
           	  	}
@@ -889,7 +890,7 @@ propertyCallParameters[OCLEntity receiver, boolean needVarDeclaration]
       	)
       	RPAREN	       	
   		{ 
-    		propertyManager.popLocalVariablesNamespace();
+    		OCLResolverManager.popLocalVariablesNamespace();
   			result = new OCLParameters(resultVars, resultEntities);
   		}
 	;
@@ -899,7 +900,7 @@ declarator[Sort expectedSort] returns [ListOfLogicVariable result = null] throws
 {	
     ListOfString varNames=SLListOfString.EMPTY_LIST;
     KeYJavaType kjt=null;
-    OCLEntity t;
+    OCLExpression t;
 }
 	:
 	  	{
@@ -950,9 +951,9 @@ collectionType throws SLTranslationException
   	;
   	
   	
-actualParameterList returns [ListOfOCLEntity result=SLListOfOCLEntity.EMPTY_LIST] throws SLTranslationException
+actualParameterList returns [ListOfOCLExpression result=SLListOfOCLExpression.EMPTY_LIST] throws SLTranslationException
 {
-	OCLEntity t=null;
+	OCLExpression t=null;
 }
 	: 
 		t=expression { result=result.append(t); }
@@ -960,7 +961,7 @@ actualParameterList returns [ListOfOCLEntity result=SLListOfOCLEntity.EMPTY_LIST
 	;
 
 
-qualifiers returns [ListOfOCLEntity result=null] throws SLTranslationException
+qualifiers returns [ListOfOCLExpression result=null] throws SLTranslationException
   	:	LBRACK result=actualParameterList RBRACK
   	;
   	

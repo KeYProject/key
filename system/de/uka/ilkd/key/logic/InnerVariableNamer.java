@@ -83,7 +83,7 @@ public class InnerVariableNamer extends VariableNamer {
 	    proposal = oldProgVarProposals.head();
 	    oldProgVarProposals = oldProgVarProposals.tail();
 	} else {
-	    proposal = services.getProof().getNameRecorder().getProposal();
+	    proposal = services.getNameRecorder().getProposal();
 	}
 
 	// END TEMPORARY DOWNWARD COMPATIBILITY

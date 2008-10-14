@@ -1418,7 +1418,7 @@ public abstract class Taclet implements Rule, Named {
                 renamings = renamings.append(rt);
             }
 	    goal.addProgramVariable(inst);
-	    goal.proof().addNameProposal(inst.name());
+	    goal.proof().getServices().addNameProposal(inst.name());
 	}
 	goal.node().setRenamings(renamings);
     }

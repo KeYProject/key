@@ -16,9 +16,11 @@ import de.uka.ilkd.key.casetool.UMLInfo;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.InnerVariableNamer;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.proof.Counter;
+import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -84,7 +86,13 @@ public class Services{
      */
     private SpecificationRepository specRepos 
     	= new SpecificationRepository(this);
+    
+    /**
+     * 
+     */
+    private NameRecorder nameRecorder;
 
+    
     /**
      * creates a new Services object with a new TypeConverter and a new
      * JavaInfo object with no information stored at none of these.
@@ -99,6 +107,8 @@ public class Services{
 	}
         javainfo = new JavaInfo
         (new KeYProgModelInfo(typeconverter, this.exceptionHandler), this);
+
+        nameRecorder = new NameRecorder();
     }
 
     public Services(){
@@ -112,6 +122,7 @@ public class Services{
 	//	exceptionHandler = new KeYRecoderExcHandler();
 	javainfo = new JavaInfo
 	    (new KeYProgModelInfo(crsc, rec2key, typeconverter), this);
+        nameRecorder = new NameRecorder();
     }
 
 
@@ -163,6 +174,18 @@ public class Services{
         javainfo = ji;
     }
     
+    public NameRecorder getNameRecorder() {
+        return nameRecorder;
+    }
+
+    public void saveNameRecorder(Node n) {
+        n.setNameRecorder(nameRecorder);
+        nameRecorder = new NameRecorder();
+    }
+
+    public void addNameProposal(Name proposal) {
+        nameRecorder.addProposal(proposal);
+    }
     
     /**
      * Returns the UMLInfo associated with this Services object.
@@ -208,6 +231,7 @@ public class Services{
 	s.setExceptionHandler(getExceptionHandler());
 	s.setNamespaces(namespaces.copy());
         s.setUMLInfo(umlinfo);
+        nameRecorder = nameRecorder.copy();
 	return s;
     }
 
@@ -224,6 +248,7 @@ public class Services{
 	s.setTypeConverter(getTypeConverter().copy(s));
 	s.setNamespaces(namespaces.copy());
         s.setUMLInfo(umlinfo);
+        nameRecorder = nameRecorder.copy();
 	return s;
     }
     
@@ -236,6 +261,7 @@ public class Services{
         s.setExceptionHandler(getExceptionHandler());
         s.setNamespaces(namespaces.copy());
         s.setUMLInfo(umlinfo);
+        nameRecorder = nameRecorder.copy();
         return s;
     }
 

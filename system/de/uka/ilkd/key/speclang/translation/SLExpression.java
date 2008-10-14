@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 
+
 /**
  *  This class represents an expression of an arbitrary specification language.
  *  We assume that every expression is either a Term, Type or a Collection.
