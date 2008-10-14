@@ -506,8 +506,10 @@ public class Node {
 	    if ( goal == null
                  || proof ().getUserConstraint ().displayClosed ( this ) )
                 return "Closed goal";
-            else
+            else if(goal.isAutomatic())
                 return "OPEN GOAL";
+            else
+                return "INTERACTIVE GOAL";
         }
         if (rap.rule() == null) return "rule application without rule";
 

@@ -102,7 +102,7 @@ public class ApplyStrategy {
             rl.addRPNewMarkersAllGoals(reusePoint.source());
         } else {
             while ( ( g = goalChooser.getNextGoal () ) != null ) {
-
+                
                 app = g.getRuleAppManager().next();
 
                 if ( app == null )
