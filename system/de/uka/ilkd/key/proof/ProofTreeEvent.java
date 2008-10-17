@@ -71,7 +71,7 @@ public class ProofTreeEvent {
         return "ProofTreeEvent: "+
             ( (node!=null) ? "node " : "" ) +
             ( (goal!=null) ? "goal " : "" ) +
-            ( (goals!=SLListOfGoal.EMPTY_LIST) ? "goals " : "" );
+            ( (!goals.isEmpty()) ? "goals " : "" );
     }
 }
 

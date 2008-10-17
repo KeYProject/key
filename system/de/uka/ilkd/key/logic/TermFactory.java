@@ -47,11 +47,15 @@ public class TermFactory {
         
         /**
          * the first key composite is compared by identity
-         * the second key composite is compared via equals
+         * the second key composite is compared via equals.
+         * It must not be null.
          * @param o1 the first key composite
          * @param o2 the second key composite (non null)
          */
         public CacheKey(Object o1, Object o2) {
+            assert o2 != null :
+                "CacheKey composites must not be null";
+            
             this.o1 = o1;
             this.o2 = o2;
             this.o3 = DUMMY_KEY_COMPOSITE;
@@ -59,12 +63,16 @@ public class TermFactory {
         
         /**
          * the first key composite is compared by identity
-         * the second and third key composite is compared via equals
+         * the second and third key composite is compared via equals.
+         * They must not be null.
          * @param o1 the first key composite
          * @param o2 the second key composite (non null)
          * @param o3 the third key composite (non null)
          */
         public CacheKey(Object o1, Object o2, Object o3) {
+            assert o2 != null && o3 != null :
+                "CacheKey composites must not be null";
+            
             this.o1 = o1;
             this.o2 = o2;
             this.o3 = o3;
@@ -72,7 +80,12 @@ public class TermFactory {
         
 
         public int hashCode() {
-            return o1.hashCode() + 17*o2.hashCode() + 7*o3.hashCode(); 
+            // fixed: o1.hashCode may only be called if o1 is not null.
+            int o1Hash = 0;
+            if(o1 != null) { 
+                o1Hash = o1.hashCode();
+            }
+            return o1Hash + 17*o2.hashCode() + 7*o3.hashCode(); 
         }
         
         public boolean equals(Object o) {
@@ -85,7 +98,7 @@ public class TermFactory {
         
     }
 
-    private static Map<Object, Term> cache = 
+    private  static Map<Object, Term> cache = 
         Collections.synchronizedMap(new LRUCache<Object, Term>(5000));
 
     
@@ -954,4 +967,8 @@ public class TermFactory {
         return createFunctionTerm(sort.getCastSymbol(), with);
     }
     
+    
+    public static void clearCache(){
+        cache.clear();
+    }
 }

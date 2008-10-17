@@ -55,7 +55,7 @@ public class ProblemLoader implements Runnable {
     ContractWithInvs currContract = null;
     Stack stack = new Stack();
     LinkedList loadedInsts = null;
-    ListOfIfFormulaInstantiation ifSeqFormulaList =
+    ListOfIfFormulaInstantiation ifFormulaList =
         SLListOfIfFormulaInstantiation.EMPTY_LIST;
     Constraint matchConstraint = null;
 
@@ -335,7 +335,7 @@ public class ProblemLoader implements Runnable {
             currFormula   = 0;
             currPosInTerm = PosInTerm.TOP_LEVEL;
             loadedInsts   = null;
-            ifSeqFormulaList = SLListOfIfFormulaInstantiation.EMPTY_LIST;
+            ifFormulaList = SLListOfIfFormulaInstantiation.EMPTY_LIST;
             matchConstraint = Constraint.BOTTOM;
             break;
 
@@ -361,13 +361,26 @@ public class ProblemLoader implements Runnable {
 	    // proofs with meta variables cannot be loaded.
             // when loading, rules are applied in an order different to the original one
             // Thus the goal might already have been closed.
-            // Just ignore this ifseqforumla then
+            // Just ignore this ifseqformula then
             if(currGoal != null) {
                 Sequent seq = currGoal.sequent();
-                ifSeqFormulaList = ifSeqFormulaList.append(
+                ifFormulaList = ifFormulaList.append(
                         new IfFormulaInstSeq(seq, Integer.parseInt(s)));    
             }
             
+            break;
+        case 'd' : // ifdirectformula      
+            // mu 2008-jan-09
+            // bugfix: without this if-check,
+            // proofs with meta variables cannot be loaded.
+            // when loading, rules are applied in an order different to the original one
+            // Thus the goal might already have been closed.
+            // Just ignore this ifdirectformula then
+            if(currGoal != null) {
+                ifFormulaList = ifFormulaList.append(
+                        new IfFormulaInstDirect(new ConstrainedFormula(parseTerm(s, proof))));
+            }
+
             break;
         case 'u' : //UserLog
             if(proof.userLog==null)
@@ -425,6 +438,21 @@ public class ProblemLoader implements Runnable {
             }
 
             matchConstraint = matchConstraint.unify(left, right, null);
+            break;
+        case 'w' : //newnames
+            final String[] newNames = s.split(",");
+            ListOfName l = SLListOfName.EMPTY_LIST;
+            for (int in = 0; in < newNames.length; in++) {
+                l = l.append(new Name(newNames[in]));
+            }
+            proof.getServices().getNameRecorder().setProposals(l);
+            break;
+        case 'e': //autoModeTime
+            try {
+                proof.addAutoModeTime(Long.parseLong(s));
+            } catch (NumberFormatException e) {
+                // ignore
+            }
             break;
         }
     }
@@ -574,7 +602,7 @@ public class ProblemLoader implements Runnable {
 
         ourApp = constructInsts(ourApp, services);
 
-        ourApp = ourApp.setIfFormulaInstantiations(ifSeqFormulaList,
+        ourApp = ourApp.setIfFormulaInstantiations(ifFormulaList,
                                                    services, userC);
 
         if (!ourApp.sufficientlyComplete()) {
@@ -640,10 +668,18 @@ public class ProblemLoader implements Runnable {
             int eq = s.indexOf('=');
             String varname = s.substring(0, eq);
             String value = s.substring(eq+1, s.length());
-            if (varname.startsWith(NameSV.NAME_PREFIX)) {
-                app = app.addInstantiation(new NameSV(varname), new Name(value));
+
+            // reklov
+            // START TEMPORARY DOWNWARD COMPATIBILITY
+
+            if (varname.startsWith("_NAME")) {
+                app = app.addInstantiation(de.uka.ilkd.key.rule.inst.
+                        SVInstantiations.EMPTY_SVINSTANTIATIONS.add(
+                        new NameSV(varname), new Name(value)));
                 continue;
             }
+
+            // END TEMPORARY DOWNWARD COMPATIBILITY
 
             SchemaVariable sv = lookupName(uninsts, varname);
             if (sv==null) {

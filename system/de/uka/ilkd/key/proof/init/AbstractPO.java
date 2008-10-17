@@ -327,8 +327,9 @@ public abstract class AbstractPO implements ProofOblInput {
         it = initConfig.funcNS().allElements().iterator();
         while(it.hasNext()) {
             Function f = (Function)it.next();
-            // only declare @pre-functions, others will be generated automat. (hack)
-            if(f.name().toString().indexOf("AtPre")!=-1) {
+            // only declare @pre-functions or anonymising functions, others will be generated automat. (hack)
+            if(f.name().toString().indexOf("AtPre")!=-1 || services.getNameRecorder().
+                    getProposals().contains(f.name())) {
                 header += f.proofToString();
             }
         }
@@ -422,5 +423,10 @@ public abstract class AbstractPO implements ProofOblInput {
         }
         
         return proofAggregate = ProofAggregate.createProofAggregate(proofs, name);
+    }
+    
+    
+    public boolean implies(ProofOblInput po) {
+        return equals(po);
     }
 }

@@ -12,7 +12,6 @@ package de.uka.ilkd.key.rule;
 
 import java.util.HashMap;
 
-import de.uka.ilkd.key.collection.PairOfListOfGoalAndTacletApp;
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceData;
@@ -137,9 +136,6 @@ public abstract class Taclet implements Rule, Named {
      */
     protected final MapFromSchemaVariableToTacletPrefix prefixMap;
     
-    /** cache */
-    protected SetOfSchemaVariable addedRuleNameVars = null;
-
     /** cache; contains set of all bound variables */
     private SetOfQuantifiableVariable boundVariables = null;
     
@@ -163,28 +159,6 @@ public abstract class Taclet implements Rule, Named {
     /** Integer to cache the hashcode */
     private int hashcode = 0;    
     
- 
-    /** 
-     * creates an empty Taclet 
-     */
-    private Taclet() {
-	name               = new Name("");
-	ifSequent          = Sequent.EMPTY_SEQUENT;
-	varsNew            = SLListOfNewVarcond.EMPTY_LIST;
-	varsNotFreeIn      = SLListOfNotFreeIn.EMPTY_LIST;
-	varsNewDependingOn = SLListOfNewDependingOn.EMPTY_LIST;
-	variableConditions = SLListOfVariableCondition.EMPTY_LIST;
-	goalTemplates      = SLListOfTacletGoalTemplate.EMPTY_LIST;
-	ruleSets           = SLListOfRuleSet.EMPTY_LIST;
-	noninteractive     = false;	
-	constraint         = Constraint.BOTTOM;
-	choices            = SetAsListOfChoice.EMPTY_SET;
-	prefixMap          =
-	    MapAsListFromSchemaVariableToTacletPrefix.EMPTY_MAP;
-	this.displayName   = "";
-        this.oldNames      = SLListOfName.EMPTY_LIST;
-    }
-
     /**
      * creates a Schematic Theory Specific Rule (Taclet) with the given
      * parameters.  
@@ -877,8 +851,7 @@ public abstract class Taclet implements Rule, Named {
 	    SLListOfMatchConditions       .EMPTY_LIST;
 
 	Term                             updateFormula;
-	if ( p_matchCond.getInstantiations ().getUpdateContext() == 
-	     SLListOfUpdatePair.EMPTY_LIST )
+	if ( p_matchCond.getInstantiations ().getUpdateContext().isEmpty() )
 	    updateFormula = p_template;
 	else
 	    updateFormula = TermFactory.DEFAULT
@@ -940,7 +913,7 @@ public abstract class Taclet implements Rule, Named {
 			      p_services,
 			      p_userConstraint ).getMatchConditions ();
 
-	    if ( newMC == SLListOfMatchConditions.EMPTY_LIST )
+	    if ( newMC.isEmpty() )
 		return null;
 
 	    p_matchCond = newMC.head ();
@@ -1048,24 +1021,6 @@ public abstract class Taclet implements Rule, Named {
 	return hasReplaceWith;
     }
     
-    public SetOfSchemaVariable addedRuleNameVars() {
-        if (addedRuleNameVars == null) {
-            int i=0;
-            addedRuleNameVars = SetAsListOfSchemaVariable.EMPTY_SET;
-            IteratorOfTacletGoalTemplate itgt = goalTemplates().iterator();
-            while (itgt.hasNext()) {
-                TacletGoalTemplate tgt = itgt.next();
-                IteratorOfTaclet itt = tgt.rules().iterator();
-                while (itt.hasNext()) {
-                    addedRuleNameVars = addedRuleNameVars.add(
-                        SchemaVariableFactory.createNameSV(new Name("T"+i++)));
-                    itt.next();
-                }
-            }
-        }
-        return addedRuleNameVars;
-   }
-
     /**
      * returns the computed prefix for the given schemavariable. The
      * prefix of a schemavariable is used to determine if an
@@ -1447,38 +1402,25 @@ public abstract class Taclet implements Rule, Named {
 
 
 
-    protected ListOfName applyAddProgVars(SetOfSchemaVariable pvs, Goal goal,
+    protected void applyAddProgVars(SetOfSchemaVariable pvs, Goal goal,
                                     PosInOccurrence posOfFind,
                                     Services services, 
-                                    MatchConditions matchCond,
-                                    ListOfName proposals) {
-	IteratorOfName propIt = SLListOfName.EMPTY_LIST.iterator();
-	if (proposals != null) {
-	    propIt = proposals.iterator();
-	}
-	Name proposal = null;
+                                    MatchConditions matchCond) {
         ListOfRenamingTable renamings = SLListOfRenamingTable.EMPTY_LIST;
-        ListOfName newNames = SLListOfName.EMPTY_LIST;
 	for (final SchemaVariable sv : pvs) {
 	    ProgramVariable inst
 		= (ProgramVariable)matchCond.getInstantiations ().getInstantiation(sv);
 	    final VariableNamer vn = services.getVariableNamer();
-	    if (propIt.hasNext()) {
-	        proposal = propIt.next();
-	    } else {
-	        proposal = null;
-	    }
-	    inst = vn.rename(inst, goal, posOfFind, proposal);
-	    newNames = newNames.append(inst.name());
+	    inst = vn.rename(inst, goal, posOfFind);
             final RenamingTable rt = 
                 RenamingTable.getRenamingTable((HashMap)vn.getRenamingMap());
             if (rt != null) {
                 renamings = renamings.append(rt);
             }
 	    goal.addProgramVariable(inst);
+	    goal.proof().getServices().addNameProposal(inst.name());
 	}
 	goal.node().setRenamings(renamings);
-	return newNames;
     }
 
 
@@ -1493,13 +1435,8 @@ public abstract class Taclet implements Rule, Named {
      * the first goal of the return list is the goal that should be
      * closed (with the constraint this taclet is applied under).
      */
-    public ListOfGoal apply(Goal goal, Services services, 
-				     RuleApp tacletApp) {
-        return applyHelp(goal, services, tacletApp).getListOfGoal();
-    }
-
-    public abstract PairOfListOfGoalAndTacletApp applyHelp(Goal goal,
-                                     Services services, RuleApp tacletApp);
+    public abstract ListOfGoal apply(Goal goal, Services services, 
+				     RuleApp tacletApp);
 
 
     /**

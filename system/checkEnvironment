@@ -64,7 +64,7 @@ key_ext_jars="antlr.jar recoderKey.jar dresden-ocl-demo.jar xerces.jar log4j.jar
 
 key_dev_jars="javacc.jar junit.jar"
 
-together_jars="lib/openapi.jar lib/jgl.zip lib/together.jar modules/"
+together_jars="lib/openapi.jar lib/together.jar modules/"
 
 
 CLASSPATH=./binary/

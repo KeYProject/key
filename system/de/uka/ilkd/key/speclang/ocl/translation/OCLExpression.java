@@ -20,17 +20,17 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 /**
  * A Term, a KeYJavaType, or an OCLCollection.
  */
-class OCLEntity extends SLExpression {
+class OCLExpression extends SLExpression {
     
-    public OCLEntity(Term term) {
+    public OCLExpression(Term term) {
         super(term);
     }
 
-    public OCLEntity(KeYJavaType type) {
+    public OCLExpression(KeYJavaType type) {
         super(type);
     }
 
-    public OCLEntity(OCLCollection collection) {
+    public OCLExpression(OCLCollection collection) {
         super(collection);
     }
 
@@ -39,8 +39,8 @@ class OCLEntity extends SLExpression {
      * by the Term of this entity
      * @throws SLTranslationException 
      */
-    public OCLEntity asCollection() throws SLTranslationException {
-        return this.getTerm() != null ? new OCLEntity(new OCLCollection(this.getTerm())) : null;
+    public OCLExpression asCollection() throws SLTranslationException {
+        return this.getTerm() != null ? new OCLExpression(new OCLCollection(this.getTerm())) : null;
     }
     
     /**

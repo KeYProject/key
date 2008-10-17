@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -50,18 +51,6 @@ public class LocationDependentFunction extends AbstractMetaOperator {
         return getHeapDepFuncTermFor(term, services);
     }
     
-    private static Name getNewName(Services services, Name baseName) {
-        NamespaceSet namespaces = services.getNamespaces();
-        
-        int i = 0;
-        Name name;
-        do {
-            name = new Name(baseName + "_" + i++);
-        } while(namespaces.lookup(name) != null);
-        
-        return name;
-    }
-    
     private static Term createHeapDependentFunctionTerm(ListOfProgramVariable l,
                                                         Services services){
         Term[] subs = new Term[l.size()];
@@ -75,9 +64,11 @@ public class LocationDependentFunction extends AbstractMetaOperator {
             subSorts[i++] = pv.sort();
         }
         ArrayOfSort aos = new ArrayOfSort(subSorts);
-        Name anonName = getNewName(services, new Name("anon"));
+        Name anonName = VariableNameProposer.DEFAULT.getNewName(services,
+                new Name("anon"));
         Function anon = new NonRigidHeapDependentFunction(anonName, Sort.FORMULA, aos);
         services.getNamespaces().functions().add(anon);
+        services.addNameProposal(anonName);
         return tf.createFunctionTerm(anon, subs);
     }
     

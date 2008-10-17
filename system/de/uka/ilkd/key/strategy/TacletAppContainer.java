@@ -356,7 +356,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             Debug.assertTrue ( getTacletApp().ifFormulaInstantiations() == null,
                    "The if formulas have already been instantiated" );
 
-            if ( getTaclet ().ifSequent () == Sequent.EMPTY_SEQUENT )
+            if ( getTaclet ().ifSequent ().isEmpty() )
                 addResult ( getTacletApp () );
             else {
                 allAntecFormulas = IfFormulaInstSeq.createList(
@@ -481,9 +481,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                                                    boolean p_antec) {
             synchronized ( ifInstCache ) {
                 if ( ifInstCache.cacheKey != goal.node () ) {
-                    ifInstCache.cacheKey = goal.node ();
-                    ifInstCache.antecCache.clear ();
-                    ifInstCache.succCache.clear ();
+                    ifInstCache.reset(goal.node());
                 }
 
                 getCacheMap ( p_antec ).put ( getAgeObject (), p_list );
@@ -624,8 +622,19 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         public final HashMap<Long, ListOfIfFormulaInstantiation> 
             antecCache = new HashMap<Long, ListOfIfFormulaInstantiation> ();
         public final HashMap<Long, ListOfIfFormulaInstantiation>  succCache  = 
-            new HashMap<Long, ListOfIfFormulaInstantiation>  ();               
+            new HashMap<Long, ListOfIfFormulaInstantiation>  ();  
+        
+        public void reset(Node n){
+            cacheKey = n;
+            antecCache.clear ();
+            succCache.clear ();
+        }
     }
 
-    protected static final IfInstCache ifInstCache = new IfInstCache ();
+    /**This field causes a memory leak (that is ad-hoc-ly fixed in 
+     * QueueRuleApplicationManager.clearCache()) because it is static and it 
+     * has a reference to node which has again a reference to proof. 
+     * Can this field be made non-static by putting it in some other class?
+     * This field was private before the fix*/
+    public static final IfInstCache ifInstCache = new IfInstCache ();
 }

@@ -9,30 +9,49 @@
 //
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
+import recoder.ParserException;
 import recoder.ServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
 import recoder.abstraction.Variable;
 import recoder.convenience.Format;
 import recoder.convenience.Naming;
-import recoder.java.*;
-import recoder.java.declaration.InheritanceSpecification;
+import recoder.java.CompilationUnit;
+import recoder.java.Import;
+import recoder.java.ProgramElement;
+import recoder.java.Statement;
+import recoder.java.StatementBlock;
+import recoder.java.StatementContainer;
+import recoder.java.TypeScope;
+import recoder.java.VariableScope;
 import recoder.java.declaration.EnumConstantSpecification;
 import recoder.java.declaration.EnumDeclaration;
+import recoder.java.declaration.InheritanceSpecification;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.java.declaration.VariableDeclaration;
 import recoder.java.declaration.VariableSpecification;
-import recoder.list.generic.ASTList;
-import recoder.service.AmbiguousReferenceException;
+import recoder.java.reference.TypeReference;
 import recoder.java.reference.UncollatedReferenceQualifier;
 import recoder.java.reference.VariableReference;
 import recoder.java.statement.Case;
+import recoder.list.generic.ASTList;
+import recoder.service.AmbiguousReferenceException;
+import recoder.service.ChangeHistory;
 import recoder.service.DefaultCrossReferenceSourceInfo;
 import recoder.service.NameInfo;
+import recoder.service.UnresolvedReferenceException;
+import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.ExceptionHandlerException;
 
 
+/**
+ * @author mattias
+ *
+ */
 public class KeYCrossReferenceSourceInfo 
     extends DefaultCrossReferenceSourceInfo {
 
@@ -247,11 +266,16 @@ public class KeYCrossReferenceSourceInfo
      * as context. Useful to check for name clashes when introducing a new
      * identifier. Neither name nor context may be <CODE>null</CODE>.
      * 
+     * This method is identical to
+     * {@link DefaultCrossReferenceSourceInfo#getType(String, ProgramElement)}
+     * but it uses <code>pe = redirectScopeNesting(pe);</code> instead of
+     * <code>s.getASTParent();</code> in Recoder 0.84.
+     * 
      * @param name
-     *            the name for the type to be looked up; may or may not be
-     *            qualified.
+     *                the name for the type to be looked up; may or may not be
+     *                qualified.
      * @param context
-     *            a program element defining the lookup context (scope).
+     *                a program element defining the lookup context (scope).
      * @return the corresponding type (may be <CODE>null</CODE>).
      */
     public Type getType(String name, ProgramElement context) {           
@@ -415,6 +439,112 @@ public class KeYCrossReferenceSourceInfo
         return scope.getASTParent();
     }
     
+    /// -------------- Handling of stub class generation
+    
+    /** 
+     * The mapping from class names to stub compilation units.
+     */
+    protected Map<String, CompilationUnit> stubClasses = new HashMap<String, CompilationUnit>();
+    
+    /**
+     *  The flag which decides on the behaviour on undefined classes
+     */
+    private boolean ignoreUnresolvedClasses = false;
+    
+    /**
+     * Sets if unresolved classes result in an exception or lead to stubs.
+     * 
+     * If unresolved classes are ignored, we use 
+     * {@link #registerUnresolvedTypeRef(TypeReference)} to create dummy stubs.
+     * 
+     * @param ignoreUnresolvedClasses
+     *                ignore unresolved classes iff true
+     */
+    public void setIgnoreUnresolvedClasses(boolean ignoreUnresolvedClasses) {
+        this.ignoreUnresolvedClasses = ignoreUnresolvedClasses;
+        if(ignoreUnresolvedClasses) {
+            stubClasses.clear();
+        }
+    }
+    
+    /*
+     * overwrite the default behaviour:
+     * if the normal lookup fails, generate a stub class, register it
+     * and try to look up again. This might fail again, should never.
+     * 
+     * @see recoder.service.DefaultSourceInfo#getType(recoder.java.reference.TypeReference)
+     */
+    @Override
+    public Type getType(TypeReference tr) {
+        try {
+            return super.getType(tr);
+        } catch (ExceptionHandlerException e) {
+            if(ignoreUnresolvedClasses && e.getCause() instanceof UnresolvedReferenceException) {
+                registerUnresolvedTypeRef(tr);
+                return super.getType(tr);
+            } else {
+                throw e;
+            }
+        }
+    }
+    
+    /*
+     * make dummy classes for unresolved type references, store newly created classes to 
+     * stubClasses and register the compilation unit.
+     */
+    private void registerUnresolvedTypeRef(TypeReference tyref) {
+        NameInfo ni = serviceConfiguration.getNameInfo();
+        String typeString = Naming.toPathName(tyref);
+        
+        // bugfix: The reference might be to an array. Remove the array reference then.
+        while(typeString.endsWith("[]"))
+            typeString = typeString.substring(0, typeString.length() - 2);
+        
+        // look in the already created classes:
+        CompilationUnit stub = stubClasses.get(typeString);
+        if(stub != null)
+            throw new IllegalStateException("try to resolve an unknown type twice");
+
+        recoder.abstraction.Type ty;
+        
+        try {
+            ty = ni.getType(typeString);
+        } catch (UnresolvedReferenceException e) {
+            // this is still an unknown type, so set ty = null
+            ty = null;
+        }
+        if(ty == null) {
+            if(!typeString.contains("."))
+                throw new UnresolvedReferenceException("Type references to undefined classes may only appear if they are fully qualified: " + tyref.toSource(), tyref);
+            
+            recoder.java.CompilationUnit cu;
+            try {
+                cu = ClassFileDeclarationBuilder.makeEmptyClassFile(serviceConfiguration.getProgramFactory(), typeString);
+            } catch (ParserException e) {
+                throw new RuntimeException(e);
+            }
+            
+            ChangeHistory changeHistory = serviceConfiguration.getChangeHistory();
+            changeHistory.attached(cu);
+            changeHistory.updateModel();
+            
+            stubClasses.put(typeString, cu);
+            Debug.out("Dynamically created class: ", typeString);
+            
+            register(cu);
+            
+        } 
+    }
+
+    /**
+     * Gets the collection of created stub classes ion their compilation units
+     * 
+     * @return the unmodifiable collection of created compilation units
+     */
+    public Collection<? extends CompilationUnit> getCreatedStubClasses() {
+        return stubClasses.values();
+    }
+
     /**
      * clears the cache for the TypeReference to Type resolution.
      * This is necessary if types are added after model evalutation.

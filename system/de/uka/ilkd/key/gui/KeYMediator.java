@@ -34,6 +34,9 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.updatesimplifier.ApplyOnModality;
+import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature;
+import de.uka.ilkd.key.strategy.feature.IfThenElseMalusFeature;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
@@ -53,9 +56,6 @@ public class KeYMediator {
 
     /** the notation info used to print sequents */
     private final NotationInfo notationInfo;
-
-    /** the proof the mediator handles with */
-    private Proof proof;
 
     /** listenerList with to gui listeners */
     private EventListenerList listenerList = new EventListenerList();
@@ -211,7 +211,7 @@ public class KeYMediator {
     }
 
     public boolean ensureProofLoadedSilent() {
-	return proof != null;
+	return getProof() != null;
     }
 
     public boolean ensureProofLoaded() {
@@ -233,19 +233,38 @@ public class KeYMediator {
 
     public void setBack(Node node) {
 	if (ensureProofLoaded()) {
-	    if (!proof.setBack(node)) {
-		popupWarning("Setting back at the chosen node is not possible.",
-			     "Oops...");	    
+	    if (getProof().setBack(node)) {
+                finishSetBack();
+	    }else{
+                popupWarning("Setting back at the chosen node is not possible.",
+                "Oops...");            
 	    }
 	}
     }    
     
     public void setBack(Goal goal) {
 	if (ensureProofLoaded()) {
-	    if (proof == null || !proof.setBack(goal))
-		popupWarning("Setting back the current goal is not possible.", 
-			     "Oops...");
+	    if (getProof() != null && getProof().setBack(goal)){
+                finishSetBack();
+	    }else{
+                popupWarning("Setting back the current goal is not possible.", 
+                "Oops...");
+	    }
 	}
+    }
+    private void finishSetBack(){
+        TermTacletAppIndexCacheSet.clearCache();
+        ApplyOnModality.clearCache();
+        TermFactory.clearCache();
+        AbstractBetaFeature.clearCache();
+        IfThenElseMalusFeature.clearCache();
+        
+        System.gc();//Runs Garbagecolletor
+        System.runFinalization();
+        if(MethodCallInfo.MethodCallCounterOn){
+            System.out.println(MethodCallInfo.Local.toString());
+            MethodCallInfo.Local.reset();
+        }
     }
 
     
@@ -299,11 +318,11 @@ public class KeYMediator {
 
 
     private void setProofHelper(Proof p) {
-	if (proof != null) {
-	    proof.removeProofTreeListener(proofTreeListener);
+	if (getProof() != null) {
+	    getProof().removeProofTreeListener(proofTreeListener);
 	}
 	if (p!=null) notationInfo.setAbbrevMap(p.abbreviations());
-	proof = p;
+	Proof proof = p;
 	if (proof != null) {
 	    proof.addProofTreeListener(proofTreeListener);
 	    proof.mgt().setMediator(this);
@@ -321,8 +340,9 @@ public class KeYMediator {
     }
 
 
+    /** the proof the mediator handles with */
     public Proof getProof() {
-	return proof;
+	return keySelectionModel.getSelectedProof();
     }
     
 
@@ -331,8 +351,8 @@ public class KeYMediator {
      * @param steps an int setting the limit
      */
     public void setMaxAutomaticSteps(int steps) {
-       if (proof != null) {
-           proof.getSettings().getStrategySettings().setMaxSteps(steps);
+       if (getProof() != null) {
+           getProof().getSettings().getStrategySettings().setMaxSteps(steps);
        }
        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(steps);
     }
@@ -343,8 +363,8 @@ public class KeYMediator {
      * automatic mode
      */
     public int getMaxAutomaticSteps() {
-        if (proof != null) {
-            return proof.getSettings().getStrategySettings().getMaxSteps();
+        if (getProof() != null) {
+            return getProof().getSettings().getStrategySettings().getMaxSteps();
         } else {
             return ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getMaxSteps();
         }
@@ -405,7 +425,7 @@ public class KeYMediator {
 	if (applics.size() == 1) {
 	    TacletApp firstApp = it.next();
             boolean ifSeqInteraction = 
-               firstApp.taclet().ifSequent() != Sequent.EMPTY_SEQUENT ;
+               !firstApp.taclet().ifSequent().isEmpty() ;
             if (stupidMode && !firstApp.complete()) {                
                 ListOfTacletApp ifSeqCandidates =
                     firstApp.findIfFormulaInstantiations(goal.sequent(),
@@ -537,6 +557,8 @@ public class KeYMediator {
                 if (reusePoint.source() != changeWish) {
                     currGoal.node().setReuseSource(reusePoint);
                     hook.removeRPConsumedGoal(currGoal);
+                    getProof().getServices().getNameRecorder().setProposals(
+                            reusePoint.getNameProposals());
                     ListOfGoal goalList = currGoal.apply(app);
                     hook.addRPOldMarkersNewGoals(goalList);
                     hook.addRPNewMarkersAllGoals(reusePoint.source());
@@ -759,7 +781,7 @@ public class KeYMediator {
     /** sets the simultaneous update simplifier */
     public void setSimplifier(UpdateSimplifier s) {
 	upd_simplifier = s;
-	if (proof != null) proof.setSimplifier(s);
+	if (getProof() != null) getProof().setSimplifier(s);
     }
    
   
@@ -796,7 +818,7 @@ public class KeYMediator {
      */
     public void startAutoMode() {
 	if (ensureProofLoaded()) {
-	    startAutoMode(proof.openGoals());
+	    startAutoMode(getProof().openEnabledGoals());
 	}
     }
 
@@ -825,11 +847,11 @@ public class KeYMediator {
      */
     public void setInteractive ( boolean b ) {
         interactiveProver.setInteractive ( b );
-        if (proof != null) {
+        if (getProof() != null) {
             if ( b  ) {
-                proof.setRuleAppIndexToInteractiveMode ();
+                getProof().setRuleAppIndexToInteractiveMode ();
             } else {
-                proof.setRuleAppIndexToAutoMode ();
+                getProof().setRuleAppIndexToAutoMode ();
             }
         }
     }
@@ -1034,7 +1056,7 @@ public class KeYMediator {
 	 */
 	public void autoModeStarted(ProofEvent e) {
               autoMode = true;
-              selectedBeforeAutoMode = getSelectedNode();
+              selectedBeforeAutoMode = getSelectedNode(); 
 //            if (proof == null) return; // there is no selection or anything
 	}
 	
@@ -1042,14 +1064,16 @@ public class KeYMediator {
 	 */
 	public void autoModeStopped(ProofEvent e) {
             autoMode = false;
-            if (proof == null) return; // there is no selection or anything
-	    if (selectedBeforeAutoMode != null) {
+            if (getProof() != null) {
+                if (selectedBeforeAutoMode!=null) {
 //XXX%%%%% This is way too slow for big proofs! 
                 // XXX Could you please check if it is still to slow?
-	        keySelectionModel.nearestOpenGoalSelection(selectedBeforeAutoMode);
-            } else {
-                keySelectionModel.defaultSelection();
+                    keySelectionModel.nearestOpenGoalSelection(selectedBeforeAutoMode);
+                } else {
+                    keySelectionModel.defaultSelection();
+                }
             }
+            selectedBeforeAutoMode = null; //Important to prevent memory leaking	    
 	}
     }
 
@@ -1098,7 +1122,7 @@ public class KeYMediator {
      * @return the time in ms after which automatic rule application stops
      */
     public long getAutomaticApplicationTimeout() {      
-        if (proof != null) {
+        if (getProof() != null) {
             return getProof().getSettings().getStrategySettings().getTimeout();
         } else {
             return ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getTimeout();
@@ -1110,8 +1134,8 @@ public class KeYMediator {
      * @param timeout a long specifying the timeout time in ms
      */
     public void setAutomaticApplicationTimeout(long timeout) {
-       if (proof != null) {
-           proof.getSettings().getStrategySettings().setTimeout(timeout);
+       if (getProof() != null) {
+           getProof().getSettings().getStrategySettings().setTimeout(timeout);
        }
        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
     }

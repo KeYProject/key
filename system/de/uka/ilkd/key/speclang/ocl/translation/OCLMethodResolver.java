@@ -99,7 +99,7 @@ class OCLMethodResolver extends SLExpressionResolver {
                             containingName);
             OCLCollection newCollection 
                     = recCollection.collect(services, methodTerm);
-            return new OCLEntity(newCollection);
+            return new OCLExpression(newCollection);
         } catch (IllegalArgumentException e) {
             return null;
         }

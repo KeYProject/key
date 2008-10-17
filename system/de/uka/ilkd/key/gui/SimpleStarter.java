@@ -152,17 +152,18 @@ public class SimpleStarter implements IMain {
         public void taskFinished(TaskFinishedInfo info) {
             System.out.println("DONE.");
             if (info.getSource() instanceof ApplyStrategy) {
-                finishedBatchMode ( info.getResult(), 
+                finishedBatchMode(info.getResult(), 
                         info.getProof(), info.getTime(), 
                         info.getAppliedRules());
                 Debug.fail ( "Control flow should not reach this point." );
             } else if (info.getSource() instanceof ProblemLoader) {
                 if (!"".equals(info.getResult())) {
-                        System.exit(-1);
-                } 
-                if(info.getProof().openGoals().size()==0) {
+                    System.out.println(info.getResult());    
+                    System.exit(-1);
+                }
+                if (info.getProof().openGoals().size()==0) {
                     System.out.println("proof.openGoals.size=" + 
-                            info.getProof().openGoals().size());              
+                            info.getProof().openGoals().size());
                     System.exit(0);
                 }
                 mediator.getProof().getActiveStrategy();         

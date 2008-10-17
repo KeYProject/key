@@ -53,7 +53,7 @@ public class TermProgramVariableCollector extends Visitor {
 	    result.add( (Location) t.op() );
 	}
 	
-	if ( t.javaBlock () != JavaBlock.EMPTY_JAVABLOCK ) {
+	if ( !t.javaBlock ().isEmpty() ) {
 	    ProgramVariableCollector pvc
 		= new ProgramVariableCollector ( t.javaBlock ().program (), services, collectFunctionLocations );
 	    pvc.start();

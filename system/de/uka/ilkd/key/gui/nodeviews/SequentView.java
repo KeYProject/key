@@ -27,26 +27,24 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 
-import javax.swing.JEditorPane;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.Highlighter.HighlightPainter;
 
-import de.uka.ilkd.key.gui.ApplyTacletDialog;
-import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.gui.GUIListener;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
+import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 
@@ -103,6 +101,8 @@ public class SequentView extends JEditorPane implements Autoscroll {
     // an object that detects opening and closing of an Taclet instantiation dialog
     private GUIListener guiListener;
 
+    private ConfigChangeListener configChangeListener = new ConfigChangeAdapter(this);
+    
     // enables this component to be a Drag Source
     DragSource dragSource = null;
 
@@ -140,12 +140,8 @@ public class SequentView extends JEditorPane implements Autoscroll {
 	currentHighlight = defaultHighlight;
 	updateHighlights = new Vector<Object>();
 	
-	Config.DEFAULT.addConfigChangeListener(
-	        new ConfigChangeListener() {
-	            public void configChanged(ConfigChangeEvent e) {
-	                updateUI();
-	            }
-	        });
+	Config.DEFAULT.addConfigChangeListener(configChangeListener);
+	//Must be removed uopn finalize() invocation to prevent memory leaks
 	
         setSequentViewFont();
 
@@ -226,6 +222,41 @@ public class SequentView extends JEditorPane implements Autoscroll {
 	addHierarchyBoundsListener(changeListener);
     
     }
+    
+    public void removeNotify(){
+        unregisterListener();
+        if(MethodCallInfo.MethodCallCounterOn){
+            MethodCallInfo.Local.incForClass(this.getClass().toString(), "removeNotify()");
+        }
+        super.removeNotify();
+    }
+
+    public void unregisterListener(){
+        if(configChangeListener!=null){
+            Config.DEFAULT.removeConfigChangeListener(configChangeListener);
+            configChangeListener.clear();
+            configChangeListener=null;
+        }
+    }
+
+   protected void finalize(){
+        try{
+            unregisterListener();
+            if(MethodCallInfo.MethodCallCounterOn){
+                MethodCallInfo.Global.incForClass(this.getClass().toString(), MethodCallInfo.finalize);
+                MethodCallInfo.Local.incForClass(this.getClass().toString(), MethodCallInfo.finalize);
+            }
+        } catch (Throwable e) {
+            Main.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
+        }finally{
+                try {
+                    super.finalize();
+                } catch (Throwable e) {
+                    Main.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
+                }
+        }
+    }
+    
     
     protected DragSource getDragSource() {
 	return dragSource;

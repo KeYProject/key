@@ -15,6 +15,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.MouseListener;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -35,6 +37,7 @@ import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.speclang.SetAsListOfOperationContract;
 import de.uka.ilkd.key.speclang.SetOfOperationContract;
 
 
@@ -43,6 +46,7 @@ import de.uka.ilkd.key.speclang.SetOfOperationContract;
  */
 class OperationContractSelectionPanel extends JPanel {
     
+    private final Services services;
     private final JList contractList;
     
     
@@ -55,8 +59,10 @@ class OperationContractSelectionPanel extends JPanel {
      */
     public OperationContractSelectionPanel(Services services,
                                            SetOfOperationContract contracts,
-                                           String title) {
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)); 
+                                           String title,
+                                           boolean multipleSelection) {
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        this.services = services;
         
         //create scroll pane
         JScrollPane scrollPane = new JScrollPane();
@@ -66,10 +72,21 @@ class OperationContractSelectionPanel extends JPanel {
         scrollPane.setMinimumSize(scrollPaneDim);
         add(scrollPane);
         
+        //sort contracts alphabetically (for the user's convenience)
+        OperationContract[] contractsArray = contracts.toArray();
+        Arrays.sort(contractsArray, new Comparator<OperationContract> () {
+            public int compare(OperationContract c1, OperationContract c2) {
+                return c1.getName().compareTo(c2.getName());
+            }
+        });
+        
         //create contract list
         contractList = new JList();
-        contractList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        contractList.setListData(contracts.toArray());
+        contractList.setSelectionMode(
+                multipleSelection 
+                ? ListSelectionModel.MULTIPLE_INTERVAL_SELECTION 
+                : ListSelectionModel.SINGLE_SELECTION);
+        contractList.setListData(contractsArray);
         contractList.setSelectedIndex(0);
         contractList.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
@@ -152,13 +169,15 @@ class OperationContractSelectionPanel extends JPanel {
      */
     public OperationContractSelectionPanel(Services services,
                                            ProgramMethod pm,
-                                           Modality modality) {
+                                           Modality modality,
+                                           boolean multipleSelection) {
         this(services, 
              collectContracts(services, pm, modality),  
              "Contracts for \"" 
                 + pm.getFullName()
                 + "\""
-                + (modality != null ? " (" + modality + ")" : ""));
+                + (modality != null ? " (" + modality + ")" : ""),
+             multipleSelection);
     }
     
     
@@ -173,6 +192,13 @@ class OperationContractSelectionPanel extends JPanel {
     
     
     public OperationContract getOperationContract() {
-	return (OperationContract) contractList.getSelectedValue();
+        Object[] selection = contractList.getSelectedValues();
+        SetOfOperationContract contracts 
+            = SetAsListOfOperationContract.EMPTY_SET;
+        for(Object contract : selection) {
+            contracts = contracts.add((OperationContract) contract);
+        }        
+        return services.getSpecificationRepository()
+                       .combineContracts(contracts);
     }
 }

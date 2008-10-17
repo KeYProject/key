@@ -194,7 +194,8 @@ modifiers
 
 
 modifier returns [String result = null]:
-    fin:FINAL                   { result = fin.getText(); }
+        abs:ABSTRACT            { result = abs.getText(); }
+    |   fin:FINAL               { result = fin.getText(); }
     |   gho:GHOST               { result = gho.getText(); } 
     |   hel:HELPER              { result = hel.getText(); }
     |   ins:INSTANCE            { result = ins.getText(); }
@@ -510,6 +511,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=signals_clause        { sc.addSignals(ps); }
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
+    |   ps=name_clause           { sc.addName(ps);}
 	|   captures_clause 
 	|   when_clause
 	|   working_space_clause
@@ -632,6 +634,17 @@ captures_keyword
 :
     	CAPTURES 
     |   CAPTURES_RED
+;
+
+
+name_clause 
+	returns [PositionedString result = null]
+	throws SLTranslationException
+:
+    spec:SPEC_NAME name:STRING_LITERAL SEMICOLON 
+        {
+            result=createPositionedString(name.getText(), spec);
+        }    
 ;
 
 
@@ -992,11 +1005,12 @@ decreasing_keyword
 expression returns [PositionedString result = null]
 {
     lexer.setExpressionMode(true);
+    LT(1);
+    lexer.setExpressionMode(false);
 }
 :
     t:EXPRESSION
     { 
-    	lexer.setExpressionMode(false);
     	result = createPositionedString(t.getText(), t);
     }
 ;

@@ -22,6 +22,7 @@ import de.uka.ilkd.key.rule.IteratorOfRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SetAsListOfRuleApp;
 import de.uka.ilkd.key.rule.SetOfRuleApp;
+import de.uka.ilkd.key.speclang.OperationContract;
 
 public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
 
@@ -144,32 +145,37 @@ public class DefaultProofCorrectnessMgt implements ProofCorrectnessMgt {
             if(ruleJusti instanceof RuleJustificationBySpec) {
                 ContractWithInvs cwi 
                     = ((RuleJustificationBySpec) ruleJusti).getSpec();
-                InitConfig initConfig = proof.env().getInitConfig();
-                ProofOblInput ensuresPostPO 
-                    = new EnsuresPostPO(initConfig, 
-                                        cwi.contract, 
-                                        cwi.assumedInvs);
-                SetOfProof ensuresPostProofs 
-                    = specRepos.getProofs(ensuresPostPO);
-                ProofOblInput preservesInvPO
-                    = new PreservesInvPO(initConfig, 
-                                         cwi.contract.getProgramMethod(), 
-                                         cwi.assumedInvs, 
-                                         cwi.ensuredInvs);
-                SetOfProof preservesInvProofs 
-                    = specRepos.getProofs(preservesInvPO);
-                ProofOblInput respectsModifiesPO
-                    = new RespectsModifiesPO(initConfig, 
-                                             cwi.contract, 
-                                             cwi.assumedInvs);
-                SetOfProof respectsModifiesProofs
-                    = specRepos.getProofs(respectsModifiesPO);
+                for(OperationContract atomicContract 
+                    : proof.getServices().getSpecificationRepository()
+                                         .splitContract(cwi.contract)) {
                 
-                if(!(atLeastOneClosed(ensuresPostProofs)
-                     && atLeastOneClosed(preservesInvProofs)
-                     && atLeastOneClosed(respectsModifiesProofs))) {
-                    proofStatus = ProofStatus.CLOSED_BUT_LEMMAS_LEFT;
-                    return;
+                    InitConfig initConfig = proof.env().getInitConfig();
+                    ProofOblInput ensuresPostPO 
+                        = new EnsuresPostPO(initConfig, 
+                                            atomicContract, 
+                                            cwi.assumedInvs);
+                    SetOfProof ensuresPostProofs 
+                        = specRepos.getProofs(ensuresPostPO);
+                    ProofOblInput preservesInvPO
+                        = new PreservesInvPO(initConfig, 
+                                             atomicContract.getProgramMethod(), 
+                                             cwi.assumedInvs, 
+                                             cwi.ensuredInvs);
+                    SetOfProof preservesInvProofs 
+                        = specRepos.getProofs(preservesInvPO);
+                    ProofOblInput respectsModifiesPO
+                        = new RespectsModifiesPO(initConfig, 
+                                                 atomicContract, 
+                                                 cwi.assumedInvs);
+                    SetOfProof respectsModifiesProofs
+                        = specRepos.getProofs(respectsModifiesPO);
+                    
+                    if(!(atLeastOneClosed(ensuresPostProofs)
+                         && atLeastOneClosed(preservesInvProofs)
+                         && atLeastOneClosed(respectsModifiesProofs))) {
+                        proofStatus = ProofStatus.CLOSED_BUT_LEMMAS_LEFT;
+                        return;
+                    }
                 }
             }
         }

@@ -24,8 +24,10 @@ import java.util.Map.Entry;
 import de.uka.ilkd.key.util.Debug;
 
 import recoder.CrossReferenceServiceConfiguration;
+import recoder.convenience.TreeWalker;
 import recoder.java.CompilationUnit;
 import recoder.java.JavaProgramFactory;
+import recoder.java.ProgramElement;
 import recoder.java.declaration.*;
 import recoder.java.reference.FieldReference;
 import recoder.java.reference.TypeReference;
@@ -38,10 +40,6 @@ import recoder.kit.TypeKit;
  * 
  * This transformation is made to transform any found {@link EnumDeclaration}
  * into a corresponding {@link EnumClassDeclaration}.
- * 
- * <p>
- * Enums defined within another class are NOT converted as not supported yet by
- * KeY
  * 
  * @author mulbrich
  * @since 2006-11-20
@@ -91,9 +89,11 @@ public class EnumClassBuilder extends RecoderModelTransformer {
     public ProblemReport analyze() {
 
         for (CompilationUnit unit : getUnits()) {
-            for (TypeDeclaration td : unit.getDeclarations()) {
-                if (td instanceof EnumDeclaration) {
-                    EnumDeclaration ed = (EnumDeclaration) td;
+            TreeWalker tw = new TreeWalker(unit);
+            while (tw.next()) {
+                ProgramElement pe = tw.getProgramElement();
+                if (pe instanceof EnumDeclaration) {
+                    EnumDeclaration ed = (EnumDeclaration) pe;
                     addCases(ed);
                     EnumClassDeclaration ecd = new EnumClassDeclaration(ed);
                     substitutes.put(ed, ecd);
@@ -160,20 +160,15 @@ public class EnumClassBuilder extends RecoderModelTransformer {
         
         super.transform();
         
-        for (CompilationUnit unit : getUnits()) {
-            for (TypeDeclaration td : unit.getDeclarations()) {
-                if (td instanceof EnumDeclaration) {
-                    EnumDeclaration ed = (EnumDeclaration) td;
-                    EnumClassDeclaration ecd = substitutes.get(ed);
-                    if (ecd == null) {
-                        Debug.out("There is no enum->class substitute for "
-                                + td.getFullName());
-                    } else {
-                        replace(ed, ecd);
-                        assert ecd.getASTParent() != null : "No parent for "
-                                + ecd.getIdentifier().getText();
-                    }
-                }
+        for (EnumDeclaration ed : substitutes.keySet()) {
+            EnumClassDeclaration ecd = substitutes.get(ed);
+            if (ecd == null) {
+                Debug.out("There is no enum->class substitute for "
+                        + ed.getFullName());
+            } else {
+                replace(ed, ecd);
+                assert ecd.getASTParent() != null : "No parent for "
+                    + ecd.getIdentifier().getText();
             }
         }
         

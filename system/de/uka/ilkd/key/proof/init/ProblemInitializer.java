@@ -24,8 +24,8 @@ import recoder.io.ProjectSettings;
 
 import org.apache.log4j.Logger;
 
-import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.gui.IMain;
+import de.uka.ilkd.key.gui.MethodCallInfo;
 import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.CompilationUnit;
@@ -34,6 +34,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.IteratorOfConstrainedFormula;
 import de.uka.ilkd.key.logic.IteratorOfNamed;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
@@ -69,7 +70,7 @@ public class ProblemInitializer {
     
     private final ProgressMonitor pm;
     
-    private final HashSet alreadyParsed = new LinkedHashSet();
+    private final HashSet<EnvInput> alreadyParsed = new LinkedHashSet<EnvInput>();
     
     
     //-------------------------------------------------------------------------
@@ -180,13 +181,13 @@ public class ProblemInitializer {
 	
 	//collect all ldt includes into a single LDTInput
 	KeYFile[] keyFile = new KeYFile[in.getLDTIncludes().size()];
-	Iterator it = in.getLDTIncludes().iterator();
+	
 	int i = 0;
-	while(it.hasNext()){
-	    String name = (String) it.next();
+        for (String name : in.getLDTIncludes()) {
 	    keyFile[i++] = new KeYFile(name, in.get(name), pm);
 	}
-	LDTInput ldtInp = new LDTInput(keyFile, main);
+
+        LDTInput ldtInp = new LDTInput(keyFile, main);
 	
 	//read the LDTInput
 	readEnvInput(ldtInp, initConfig, readLibraries);
@@ -209,9 +210,7 @@ public class ProblemInitializer {
 	readLDTIncludes(in, initConfig, readLibraries);
 	
 	//read normal includes
-	Iterator it = in.getIncludes().iterator();
-	while(it.hasNext()){
-	    String fileName = (String) it.next();
+	for (String fileName : in.getIncludes()) {
 	    KeYFile keyFile = new KeYFile(fileName, in.get(fileName), pm);
 	    readEnvInput(keyFile, initConfig, readLibraries);
 	}
@@ -254,9 +253,9 @@ public class ProblemInitializer {
      * in the cfile directory.
      * Helper for readJava().
      */
-    private Vector getClasses(String f) throws ProofInputException  {
+    private Vector<String> getClasses(String f) throws ProofInputException  {
 	File cfile = new File(f);
-	Vector v=new Vector();
+	Vector<String> v=new Vector<String>();
 	if (cfile.isDirectory()) {
 	    String[] list=cfile.list();
 	    // mu(2008-jan-28): if the directory is not readable for the current user
@@ -346,7 +345,7 @@ public class ProblemInitializer {
                 r2k.parseSpecialClasses();
                 initConfig.getProofEnv().setJavaModel(JavaModel.NO_MODEL);
             } else {                 
-                String[] cus = (String[]) getClasses(javaPath).toArray(new String[]{});
+                String[] cus = getClasses(javaPath).toArray(new String[]{});
                 CompilationUnit[] compUnits = r2k.readCompilationUnitsAsFiles(cus);
                 initConfig.getServices().getJavaInfo().setJavaSourcePath(javaPath);               
 
@@ -543,6 +542,10 @@ public class ProblemInitializer {
     		throws ProofInputException {
 	assert initConfig != null;
 	stopInterface();
+	/*Setting this flag to false tells KeY to store Names in namespaces using strong references.
+	 * So they are not garbage collected, while the namespace exists. If you have
+	 * a better place for this statement without introducing memory leaks then refactor this code. */
+	Namespace.storeAsWeak = false;
         
         try {
             //determine environment
@@ -560,6 +563,13 @@ public class ProblemInitializer {
             throw e;            
         } finally {
             startInterface();
+        }
+        /*After creating the proof environment and loading of the problem we use
+         * weak references to store newly created names as they become obsolete when
+         * parts of a proof become pruned. */
+        Namespace.storeAsWeak = false;//true
+        if(MethodCallInfo.MethodCallCounterOn){
+            MethodCallInfo.Local.reset();
         }
     }
     

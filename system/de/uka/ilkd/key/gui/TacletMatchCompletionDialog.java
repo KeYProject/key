@@ -213,8 +213,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 	    instPanel.setBorder(indents);
 	    tabContent.add(instPanel);
 
-	    if (model[i].application().taclet().
-		ifSequent() != Sequent.EMPTY_SEQUENT) {
+	    if (!model[i].application().taclet().
+		ifSequent().isEmpty()) {
 
 		TacletIfSelectionDialog ifSelection = 
 		    new TacletIfSelectionDialog(model[i], this);		
@@ -359,9 +359,10 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 		}  catch (ExceptionHandlerException ex) { 
 		    Exception exc = (Exception) ((mediator().getExceptionHandler()).getExceptions()).get(0);
 		    if (exc instanceof SVInstantiationExceptionWithPosition) {
-			 errorPositionKnown(((SVInstantiationExceptionWithPosition)exc).getMessage(), 
-					    ((SVInstantiationExceptionWithPosition)exc).getRow(), 1, 
-					    ((SVInstantiationExceptionWithPosition) exc).inIfSequent());
+                        errorPositionKnown(((SVInstantiationExceptionWithPosition) exc).getMessage(),
+                                ((SVInstantiationExceptionWithPosition) exc).getRow(),
+                                ((SVInstantiationExceptionWithPosition) exc).getColumn(),
+                                ((SVInstantiationExceptionWithPosition) exc).inIfSequent());
 		    }
 		    new ExceptionDialog(TacletMatchCompletionDialog.this, 
 		            mediator().getExceptionHandler().getExceptions());

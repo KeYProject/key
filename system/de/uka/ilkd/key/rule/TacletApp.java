@@ -13,12 +13,8 @@ package de.uka.ilkd.key.rule;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 
 import de.uka.ilkd.key.collection.ListOfString;
-import de.uka.ilkd.key.collection.PairOfListOfGoalAndTacletApp;
-import de.uka.ilkd.key.collection.PairOfTermAndListOfName;
-import de.uka.ilkd.key.collection.PairOfSVInstantiationsAndListOfName;
 import de.uka.ilkd.key.collection.SLListOfString;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -391,11 +387,7 @@ public abstract class TacletApp implements RuleApp {
 					    +"\nthat is not complete.");
 	}
         goal.addAppliedRuleApp(this);	
-        Node n = goal.node();
-        PairOfListOfGoalAndTacletApp p = taclet().applyHelp(
-                goal, services, this);
-        n.setAppliedRuleApp(p.getTacletApp());	
-	return p.getListOfGoal();
+	return taclet().apply(goal, services, this);
     }    
 
     /** applies the specified rule at the specified position 
@@ -748,7 +740,7 @@ public abstract class TacletApp implements RuleApp {
 	SetOfMetavariable newVars = newMetavariables ();
 	Constraint        constr = constraint ();
 
-	if ( newVars != SetAsListOfMetavariable.EMPTY_SET ) {
+	if ( !newVars.isEmpty() ) {
             // Replace temporary metavariables that were introduced
             // when matching the taclet with real MVs
             final IteratorOfMetavariable mvIt = newVars.iterator ();
@@ -894,8 +886,6 @@ public abstract class TacletApp implements RuleApp {
             newVars = newVars.add ( mv );
             final Term t = TermFactory.DEFAULT.createFunctionTerm ( mv );
             insts = insts.add ( sv, t );
-            NameSV nameSV = new NameSV(new Name(NameSV.MV_NAME_PREFIX+sv.name()));
-            insts = insts.addInteresting (nameSV, mv.name());
         }
 
         return setMatchConditions ( new MatchConditions ( insts,
@@ -916,32 +906,20 @@ public abstract class TacletApp implements RuleApp {
                                    SVInstantiations insts) {
         final Sort realSort = insts.getGenericSortInstantiations().
             getRealSort(sv, proof.getServices());
+
+        // reklov
+        // START TEMPORARY DOWNWARD COMPATIBILITY
         SchemaVariable nameSV = insts.lookupVar(
-            new Name(NameSV.MV_NAME_PREFIX+sv.name()));
+            new Name("_NAME_MV_"+sv.name()));
         Name proposal = (Name) insts.getInstantiation(nameSV);
-        String s = (proposal==null) ? "" : proposal.toString();
-        return getMVFor ( sv, realSort, proof, goal, s );
-    }
+        VariableNameProposer.DEFAULT.setOldMVProposal(proposal);
+        // END TEMPORARY DOWNWARD COMPATIBILITY
 
-    /**
-     * Create a Metavariable the given SchemaVariable can be
-     * instantiated with
-     * @return an appropriate mv, or null if for some reason the
-     * creation failed
-     */
-    private Metavariable getMVFor ( SchemaVariable p_sv,
-				    Sort           p_sort,
-				    Proof          p_proof,
-                                    Goal goal,
-                                    String nameProposal ) {
-        if ("".equals(nameProposal)) {
-            nameProposal = TacletInstantiationsTableModel
-	      .getNameProposalForMetavariable ( goal, this, p_sv );
-        }
-	return p_proof.getMetavariableDeliverer().
-            createNewVariable(nameProposal, p_sort);
+        String nameProposal = TacletInstantiationsTableModel
+                .getBaseNameProposalForMetavariable(goal, this, sv);
+        return proof.getMetavariableDeliverer().createNewVariable(nameProposal,
+                realSort);
     }
-
 
     /**
      * @param services the Services class allowing access to the type model
@@ -985,8 +963,6 @@ public abstract class TacletApp implements RuleApp {
     }
     
 
-    private static final SchemaVariable ANON_SV = new NameSV(NameSV.NAME_PREFIX + "_ANON_UPDATES");
-
     /**
      * Create skolem functions (for variables declared via "\\new(c,
      * \\dependingOn(phi))" or via "\\new(upd, \\dependingOnMod(#modifiers))")
@@ -999,60 +975,20 @@ public abstract class TacletApp implements RuleApp {
         while ( svIt.hasNext () )
             insts = createTermSkolemFunctions ( svIt.next (), insts, p_func_ns );
         
-        Name[][] anon_proposals = null;
-        String anon_genNames = "";
-        Object o = insts.getInstantiation(ANON_SV);
-
-        if (o instanceof Name) {
-            String[] props = ((Name) o).toString().split(";");
-            anon_proposals = new Name[props.length][];
-
-            for (int i = 0; i < props.length; i++) {
-                String[] props2 = props[i].split(",");
-                anon_proposals[i] = new Name[props2.length];
-
-                for (int j = 0; j < props2.length; j++) {
-                    anon_proposals[i][j] = new Name(props2[j]);
-                }
-
-            }
-
-        }
+        // reklov
+        // START TEMPORARY DOWNWARD COMPATIBILITY
+        VariableNameProposer.DEFAULT.setOldAnonUpdateProposals((Name)
+                insts.getInstantiation(new NameSV("_NAME_ANON_UPDATES")));
+        // END TEMPORARY DOWNWARD COMPATIBILITY
 
         final IteratorOfVariableCondition vcIt = taclet.getVariableConditions ();
-        for (int i = 0; vcIt.hasNext (); ) {
+        while ( vcIt.hasNext () ) {
             final VariableCondition vc = vcIt.next();
-            if ( vc instanceof NewDepOnAnonUpdates ) {
-                Name[] proposals = null;
-
-                if (anon_proposals != null && i < anon_proposals.length) {
-                    proposals = anon_proposals[i];
-                }
-
-                i++;
-                PairOfSVInstantiationsAndListOfName result =
-                        createModifiesSkolemFunctions((NewDepOnAnonUpdates)vc,
-                        insts, services, proposals);
-                insts = result.getSVInstantiations();
-                IteratorOfName it = result.getListOfName().iterator();
-
-                for (int j = 0; it.hasNext(); j++) {
-
-                    if (j > 0) {
-                        anon_genNames += "," + it.next().toString();
-                    } else {
-                        anon_genNames += ";" + it.next().toString();
-                    }
-
-                }
-
-            }
+            if ( vc instanceof NewDepOnAnonUpdates )
+                insts = createModifiesSkolemFunctions((NewDepOnAnonUpdates)vc,
+                                                      insts, services);
         }
         
-        if (anon_genNames.length() > 0) {
-            insts = insts.addInteresting(ANON_SV, new Name(anon_genNames.substring(1)));
-        }
-
         if ( insts == instantiations () ) return this;
         return setInstantiation ( insts );
     }
@@ -1077,18 +1013,17 @@ public abstract class TacletApp implements RuleApp {
     /**
      * Instantiate a schemavariable for an anonymous update (FormulaSV)
      */
-    private PairOfSVInstantiationsAndListOfName
+    private SVInstantiations
         createModifiesSkolemFunctions(NewDepOnAnonUpdates cond,
                                       SVInstantiations insts,
-                                      Services services,
-                                      Name[] proposals) {
+                                      Services services) {
         final SchemaVariable modifies = cond.getModifiesSV ();
         final SchemaVariable updateSV = cond.getUpdateSV ();
         
         if (insts.isInstantiated ( updateSV )) {
             System.err.println(
                 "Modifies skolem functions already created - ignoring.");
-            return new PairOfSVInstantiationsAndListOfName(insts, null);
+            return insts;
         }
         
         final ListOfObject locationList =
@@ -1097,12 +1032,10 @@ public abstract class TacletApp implements RuleApp {
             new AnonymisingUpdateFactory
             ( new UpdateFactory ( services, new UpdateSimplifier () ) );
         final Term[] mvArgs = toTermArray ( determineArgMVs ( insts, updateSV ) );
-        PairOfTermAndListOfName result =
-                                  auf.createAnonymisingUpdateAsFor
+        return insts.add ( updateSV,
+                           auf.createAnonymisingUpdateAsFor
                                   ( toLocationDescriptorArray ( locationList ),
-                                    mvArgs, services, proposals );
-        return new PairOfSVInstantiationsAndListOfName(insts.add ( updateSV,
-                                  result.getTerm()), result.getListOfName());
+                                    mvArgs, services ) );
     }
     
     private static LocationDescriptor[]
@@ -1167,7 +1100,7 @@ public abstract class TacletApp implements RuleApp {
                                                    SchemaVariable depSV,
                                                    Term tempDepVar,
                                                    SetOfMetavariable mvs) {
-        if ( mvs == SetAsListOfMetavariable.EMPTY_SET ) {
+        if ( mvs.isEmpty() ) {
             // if the term contains no metavariables, we just use the
             // (nullary) constant <code>tempDepVar</code> as skolem symbol
             p_func_ns.add ( tempDepVar.op () );
@@ -1379,7 +1312,7 @@ public abstract class TacletApp implements RuleApp {
 	Debug.assertTrue ( ifInstantiations == null,
 			   "The if formulas have already been instantiated" );
 
-	if ( taclet ().ifSequent () == Sequent.EMPTY_SEQUENT )
+	if ( taclet ().ifSequent ().isEmpty() )
 	    return SLListOfTacletApp.EMPTY_LIST.prepend ( this );        
         
 	return
@@ -1419,7 +1352,7 @@ public abstract class TacletApp implements RuleApp {
 	  Services                      p_services,
 	  Constraint                    p_userConstraint ) {
 
-	while ( p_ifSeqTail == SLListOfConstrainedFormula.EMPTY_LIST ) {
+	while ( p_ifSeqTail.isEmpty() ) {
 	    if ( p_ifSeqTail2nd == null ) {
 		// All formulas have been matched, collect the results
 		TacletApp res = setAllInstantiations ( p_matchCond,
@@ -1515,7 +1448,7 @@ public abstract class TacletApp implements RuleApp {
      * using metavariables
      */
     public boolean instsSufficientlyComplete() {
-	return neededUninstantiatedVars () == SetAsListOfSchemaVariable.EMPTY_SET;
+	return neededUninstantiatedVars ().isEmpty();
     }
 
 
@@ -1525,7 +1458,7 @@ public abstract class TacletApp implements RuleApp {
      */
     public boolean ifInstsComplete() {
 	return ifInstantiations != null ||
-	    ( taclet ().ifSequent () == Sequent.EMPTY_SEQUENT );
+	    ( taclet ().ifSequent ().isEmpty() );
     }
 
 
@@ -1726,76 +1659,6 @@ public abstract class TacletApp implements RuleApp {
 	return taclet ().admissible (interactive, ruleSets);
     }
 
-    /**
-     * returns a name encoding a list of list of names. The list contains actual names of the 
-     * added program variables after applying {@link TacletApp#taclet()} 
-     * For example: The string <code>"v1,v2;;v3"</code> if three goals have been created where
-     * two program variables <code>v1,v2</code> have been added to the first one, none to the second goal
-     * and one variable <code>v3</code> to the third goal 
-     * @param newNames a LinkedList containing a list with names for added program variables 
-     * for each goal 
-     * @return the given list of list of names encoded as a String
-     */
-    private Name storeActualUsedProgramVariableNamesInString(final LinkedList<ListOfName> newNames) {
-        // we use Strings here as the lists contain usually only one element
-            // so that using StringBuffer does not pay off
-            String actualUsedProgramVariableNames = ""; 
-            for (ListOfName addedProgVarNames : newNames) {
-                String actualProgVarNamesPerGoal = "";
-                for (Name addedProgVarName : addedProgVarNames) {
-                    actualProgVarNamesPerGoal += "," + addedProgVarName;
-                }
-                
-                actualUsedProgramVariableNames += 
-                    (actualProgVarNamesPerGoal.length() == 0 ? "" : 
-                        actualProgVarNamesPerGoal.substring(1)) + ";";
-            }
-            actualUsedProgramVariableNames = actualUsedProgramVariableNames.substring(0, 
-                    actualUsedProgramVariableNames.length()-1);
-        return new Name(actualUsedProgramVariableNames);
-    }
-    
-    /** 
-     * checks if name proposals for program variables to be added are available 
-     * and returns the proposals as list of names per goal
-     * @return an array with (a possible empty) list of names proposed to be used for 
-     * the respective goal 
-     */
-    protected ListOfName[] getNameProposalsForAddedProgramVariables() {
-        final ListOfName[] progvar_proposals = new ListOfName[taclet().goalTemplates().size()];
-        
-        Object o = instantiations().getNameProposalsForNewProgramVariables();
-    
-        if (o instanceof Name) {            
-            final String ostr = o.toString();
-            
-            final String[] props;            
-            // split ignores empty trailing spaces
-            // take care of the case when last created goal adds no progvars            
-            if (ostr.trim().endsWith(";")) {
-                props = (ostr+"x").split(";");
-                props[props.length-1] = "";
-            } else {
-                props = ostr.split(";");                
-            }
-            
-            for (int i = 0; i < progvar_proposals.length; i++) {
-                progvar_proposals[i] = SLListOfName.EMPTY_LIST;
-                
-                if (props[i].length() != 0) {
-                    String[] props2 = props[i].split(",");
-                    for (int j = 0; j < props2.length; j++) {
-                        progvar_proposals[i] = progvar_proposals[i].append(
-                                new Name(props2[j]));
-                    }
-                }
-                    
-            }
-    
-        }
-        return progvar_proposals;
-    }
-
     /** checks if the variable conditions of type 'x not free in y' are
      * hold by the found instantiations. The variable conditions is used
      * implicit in the prefix. (Used to calculate the prefix)
@@ -1846,11 +1709,5 @@ public abstract class TacletApp implements RuleApp {
 	}
     
 	return result;
-    }
-
-    
-    public TacletApp addNameProposal(LinkedList<ListOfName> newNames) {
-        return setInstantiation(instantiations()
-                .addNameProposals(storeActualUsedProgramVariableNamesInString(newNames)));
     }
 }

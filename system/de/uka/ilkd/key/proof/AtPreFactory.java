@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
@@ -99,6 +98,7 @@ public class AtPreFactory {
             //This hack works to a point, but it can lead to unparseable 
             //formulas, since the length attribute is not actually defined on 
             //java.lang.Object. We need a SuperArray sort! /BW
+            //(see also bug #875)
             if(aop.attribute().equals(services.getJavaInfo()
                                               .getArrayLength())) {
                 Sort objectSort 
@@ -192,10 +192,9 @@ public class AtPreFactory {
      * Creates atPre-functions for all relevant operators in the passed term.
      */
     public void createAtPreFunctionsForTerm(
-                            Term term,
-                            /*inout*/ Map /*Operator (normal) 
-                            -> Function (atPre)*/ atPreFunctions,
-                            Services services) {
+            Term term,
+            /*inout*/ Map<Operator,Function/*atPre*/> atPreFunctions,
+            Services services) {
         int arity = term.arity();
         Sort[] subSorts = new Sort[arity];
         for(int i = 0; i < arity; i++) {
@@ -207,7 +206,7 @@ public class AtPreFactory {
         if(term.op() instanceof AccessOp
            || term.op() instanceof ProgramVariable
            || term.op() instanceof ProgramMethod) {
-            Function atPreFunc = (Function)(atPreFunctions.get(term.op()));
+            Function atPreFunc = atPreFunctions.get(term.op());
             if(atPreFunc == null) {
                 atPreFunc = AtPreFactory.INSTANCE.createAtPreFunction(term.op(), 
                                                                       services);
@@ -276,18 +275,16 @@ public class AtPreFactory {
      * Creates definitions for a set of atPre functions.
      */
     public Update createAtPreDefinitions(
-         /*in*/ Map /*Operator (normal) -> Function (atPre)*/ atPreFunctions, 
+         /*in*/ Map<Operator,Function/*atPre*/> atPreFunctions, 
          Services services) {
         assert atPreFunctions != null;
         
         UpdateFactory uf = new UpdateFactory(services, new UpdateSimplifier());
         Update result = uf.skip();
         
-        Iterator it = atPreFunctions.entrySet().iterator();
-        while(it.hasNext()) {
-            Map.Entry entry = (Map.Entry) it.next();
-            Operator normalOp = (Operator) entry.getKey();
-            Function atPreFunc = (Function) entry.getValue();
+        for(Map.Entry<Operator,Function> entry : atPreFunctions.entrySet()) {
+            Operator normalOp = entry.getKey();
+            Function atPreFunc = entry.getValue();
             Update def = createAtPreDefinition(normalOp, atPreFunc, services);
             result = uf.parallel(result, def);
         }

@@ -27,7 +27,7 @@ public class AnyRuleSetTacletFilter extends TacletFilter {
      * result
      */
     public boolean filter ( Taclet taclet ) {
-	return taclet.getRuleSets () != SLListOfRuleSet.EMPTY_LIST;
+	return !taclet.getRuleSets ().isEmpty();
     }
 
     public final static TacletFilter INSTANCE = new AnyRuleSetTacletFilter ();

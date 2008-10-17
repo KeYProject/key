@@ -132,7 +132,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * (helper for getProgramFromPIO())
      */
     private Term findProgramInTerm(Term term) {
-        if(term.javaBlock() != JavaBlock.EMPTY_JAVABLOCK) {
+        if(!term.javaBlock().isEmpty()) {
     	    return term;
     	}
     	for(int i = 0; i < term.arity(); i++) {
@@ -349,14 +349,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      */
     public abstract ProgramVariable rename(ProgramVariable var,
                                            Goal goal,
-                                           PosInOccurrence posOfFind,
-                                           Name proposal);
-
-    public ProgramVariable rename(ProgramVariable var,
-                                           Goal goal,
-                                           PosInOccurrence posOfFind) {
-        return rename(var, goal, posOfFind, null);
-    }
+                                           PosInOccurrence posOfFind);
 
     
     

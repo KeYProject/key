@@ -6,7 +6,7 @@ import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 
-class SLAttributeResolver extends SLExpressionResolver {
+public class SLAttributeResolver extends SLExpressionResolver {
 
     private static TermBuilder tb = TermBuilder.DF;
 

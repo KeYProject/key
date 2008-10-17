@@ -95,12 +95,14 @@ public class ApplyStrategy {
             g.node().setReuseSource(reusePoint);
             rl.removeRPConsumedMarker(reusePoint.source());
             rl.removeRPConsumedGoal(g);
+            proof.getServices().getNameRecorder().setProposals(
+                    reusePoint.getNameProposals());
             ListOfGoal goalList = g.apply(app);
             rl.addRPOldMarkersNewGoals(goalList);
             rl.addRPNewMarkersAllGoals(reusePoint.source());
         } else {
             while ( ( g = goalChooser.getNextGoal () ) != null ) {
-
+                
                 app = g.getRuleAppManager().next();
 
                 if ( app == null )
@@ -224,7 +226,9 @@ public class ApplyStrategy {
      * method handles InterruptedExceptions cleanly.
      */
     public void stop () {
-        worker.interrupt();
+        if(worker!=null){
+            worker.interrupt();
+        }
     }
     
     
@@ -265,6 +269,7 @@ public class ApplyStrategy {
                 if (startedAsInteractive) mediator().startInterface(true);
             }
 
+            proof.addAutoModeTime(time);
             fireTaskFinished (new DefaultTaskFinishedInfo(ApplyStrategy.this, result, 
                     proof, time, 
                     countApplied, mediator().getNrGoalsClosedByAutoMode()));	  
@@ -307,10 +312,18 @@ public class ApplyStrategy {
         return autoModeActive;
     }
 
-
-
     public void setAutoModeActive(boolean autoModeActive) {
         this.autoModeActive = autoModeActive;
     }    
 
+    /**Used by, e.g., {@code InteractiveProver.clear()} in order to prevent memory leaking. 
+     * When a proof obligation is abandoned all references to the proof must be reset.
+     * @author gladisch */
+    public void clear(){
+        stop();
+        proof = null;
+        if(goalChooser!=null){
+            goalChooser.init(null, SLListOfGoal.EMPTY_LIST);
+        }
+    }
 }

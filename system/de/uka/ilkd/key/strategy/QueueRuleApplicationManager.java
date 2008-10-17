@@ -57,6 +57,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         queue       = null;
         secQueue    = null;
         workingList = null;
+        TacletAppContainer.ifInstCache.reset(null);
         clearNextRuleApp ();
     }
     

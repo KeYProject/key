@@ -48,39 +48,73 @@ public class DefaultGoalChooser implements IGoalChooser {
      * @see de.uka.ilkd.key.proof.IGoalChooser#init(de.uka.ilkd.key.proof.Proof, de.uka.ilkd.key.proof.ListOfGoal)
      */
     public void init ( Proof p_proof, ListOfGoal p_goals ) {
-        allGoalsSatisfiable = false;
+        if(p_proof==null && !(p_goals==null || p_goals.isEmpty())){
+            throw new RuntimeException("A not existing proof has goals. This makes no sense.");
+        }
+        if(p_goals==null||p_goals.isEmpty()){
+            //the idea of this case is to reset the object if a proof is abandoned. (To prevent memory leaks)
+            allGoalsSatisfiable = true;
+        }else{//this is the normal branch
+            allGoalsSatisfiable = false;
+        }
         currentSubtreeRoot  = null;
+        if(p_proof!=proof){
+            if(proof!=null){
+                proof.removeProofTreeListener(proofTreeListener);
+            }
+            if(p_proof!=null){
+                p_proof.addProofTreeListener(proofTreeListener);
+            }
+        }
         proof               = p_proof;
         setupGoals ( p_goals );
     }
 
     protected void setupGoals ( ListOfGoal p_goals ) {
-	goalList     = SLListOfGoal.EMPTY_LIST;
-	selectedList = SLListOfGoal.EMPTY_LIST;
-	nextGoals    = SLListOfGoal.EMPTY_LIST;
+        goalList     = SLListOfGoal.EMPTY_LIST;
+        selectedList = SLListOfGoal.EMPTY_LIST;
+        nextGoals    = SLListOfGoal.EMPTY_LIST;
 
-	if ( allGoalsSatisfiable ) {
-	    goalList = p_goals;
-	    findMinimalSubtree ( currentSubtreeRoot );
-	} else {
-	    final IteratorOfGoal it = p_goals.iterator ();
+        if ( allGoalsSatisfiable ) {
+            goalList = p_goals;
+            if(currentSubtreeRoot!=null) {
+                findMinimalSubtree ( currentSubtreeRoot );
+            }
+        } else {
+            final IteratorOfGoal it = p_goals.iterator ();
 
-	    while ( it.hasNext () ) {
-		final Goal goal = it.next ();
-		
-		if ( goal.getClosureConstraint ().isSatisfiable () )
-		    goalList     = goalList    .prepend ( goal );
-		else
-		    selectedList = selectedList.prepend ( goal );
-	    }
+            while ( it.hasNext () ) {
+                final Goal goal = it.next ();
+                
+                if ( goal.getClosureConstraint ().isSatisfiable () )
+                    goalList     = goalList    .prepend ( goal );
+                else
+                    selectedList = selectedList.prepend ( goal );
+            }
 
-	    allGoalsSatisfiable = selectedList.isEmpty ();
+            allGoalsSatisfiable = selectedList.isEmpty ();
 
-	    if ( allGoalsSatisfiable )
-		findMinimalSubtreeBelow ( proof.root () );
-	}
+            if ( allGoalsSatisfiable )
+                findMinimalSubtreeBelow ( proof.root () );
+        }
     }
 
+    private ProofTreeObserver proofTreeListener = new ProofTreeObserver();
+    
+    /**Important when a proof is pruned */
+    class ProofTreeObserver extends ProofTreeAdapter{
+        /** The proof tree has been pruned under the node mentioned in the
+         * ProofTreeEvent.  In other words, that node should no longer
+         * have any children now.  Any nodes that were not descendants of
+         * that node are unaffected.*/
+        public void proofPruned(ProofTreeEvent e) {
+            ProofTreeRemovedNodeEvent removeEvent = (ProofTreeRemovedNodeEvent)e;
+            currentSubtreeRoot = removeEvent.getNode();
+            setupGoals ( proof.getSubtreeGoals(proof.root()) );
+        }
+    }
+
+    
     protected int nextGoalCounter = 0;
     
     /* (non-Javadoc)
@@ -251,35 +285,35 @@ public class DefaultGoalChooser implements IGoalChooser {
      * @return true iff a non-empty subtree was found
      */
     protected boolean findMinimalSubtreeBelow ( Node p_startNode ) {
-	Node node = p_startNode;
-	
-	while ( node.childrenCount () == 1 )
-	    node = node.child ( 0 );
+        Node node = p_startNode;
 
-	Iterator<Node> childrenIt = node.childrenIterator ();
+        while ( node.childrenCount () == 1 )
+            node = node.child ( 0 );
 
-	while ( childrenIt.hasNext () ) {
-	    final Node child = childrenIt.next ();
-	    
+        Iterator<Node> childrenIt = node.childrenIterator ();
+
+        while ( childrenIt.hasNext () ) {
+            final Node child = childrenIt.next ();
+
             if (!isSatisfiableSubtree ( child )
                     && findMinimalSubtreeBelow ( child ))
                 return true;
-	}
+        }
 
-	currentSubtreeRoot = p_startNode;
-	childrenIt         = node.leavesIterator ();
-	
-	while ( childrenIt.hasNext () ) {
-	    final Node child = childrenIt.next ();
-	    final Goal goal  = proof.getGoal ( child );
-	    
-	    if ( goalList.contains ( goal ) ) {
-		selectedList = selectedList.prepend   ( goal );
-		goalList     = goalList    .removeAll ( goal );
-	    }
-	}
+        currentSubtreeRoot = p_startNode;
+        childrenIt         = node.leavesIterator ();
 
-	return !selectedList.isEmpty();
+        while ( childrenIt.hasNext () ) {
+            final Node child = childrenIt.next ();
+            final Goal goal  = proof.getGoal ( child );
+
+            if ( goalList.contains ( goal ) ) {
+                selectedList = selectedList.prepend   ( goal );
+                goalList     = goalList    .removeAll ( goal );
+            }
+        }
+
+        return !selectedList.isEmpty();
 
     }
 

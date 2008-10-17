@@ -56,7 +56,7 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
-    
+        
     public boolean askUserForEnvironment() {
         return true;
     }
@@ -165,6 +165,11 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
     }
     
     
+    public boolean implies(ProofOblInput po) {
+        return equals(po);
+    }
+    
+    
     /** 
      * Reads a saved proof of a .key file.
      */
@@ -175,7 +180,7 @@ public class KeYUserProblemFile extends KeYFile implements ProofOblInput{
             throw new ProofInputException(e);
         }
     }
-    
+        
     
     public boolean equals(Object o){
         if(!(o instanceof KeYUserProblemFile)) {

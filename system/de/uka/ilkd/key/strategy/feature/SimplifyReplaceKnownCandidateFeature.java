@@ -12,7 +12,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.IUpdateOperator;
 import de.uka.ilkd.key.proof.Goal;
@@ -56,7 +55,7 @@ public class SimplifyReplaceKnownCandidateFeature
         final Boolean pol = polarity ( pos, new Boolean ( pos.isInAntec () ) );
 
         final boolean ifForInAntec =
-            ifSeq.succedent () == Semisequent.EMPTY_SEMISEQUENT;        
+            ifSeq.succedent ().isEmpty();        
         
         final boolean approved =
                  pol == null

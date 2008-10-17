@@ -9,7 +9,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
-class SLMethodResolver extends SLExpressionResolver {
+public class SLMethodResolver extends SLExpressionResolver {
 
     private TermBuilder tb = TermBuilder.DF;
     
