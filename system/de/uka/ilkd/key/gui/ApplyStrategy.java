@@ -24,6 +24,9 @@ package de.uka.ilkd.key.gui;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.proofevent.IteratorOfNodeReplacement;
@@ -105,9 +108,26 @@ public class ApplyStrategy {
 
                 app = g.getRuleAppManager().next();
 
-                if ( app == null )
-                    goalChooser.removeGoal ( g );
-                else
+                if (app == null) {
+                    if (medi.getProof().getSettings().getStrategySettings()
+                            .getActiveStrategyProperties().getProperty(
+                                    StrategyProperties.STOPMODE_OPTIONS_KEY)
+                            .equals(StrategyProperties.STOPMODE_NONCLOSE)) {
+                        // iff Stop on non-closeable Goal is selected a little
+                        // popup is generated and proof is stopped
+                        JOptionPane pane = new JOptionPane(
+                                "Couldn't close Goal Nr. "
+                                        + g.node().serialNr()
+                                        + " automatically",
+                                JOptionPane.INFORMATION_MESSAGE,
+                                JOptionPane.DEFAULT_OPTION);
+                        JDialog dialog = pane.createDialog(medi.mainFrame(),
+                                "The KeY Project");
+                        dialog.setVisible(true);
+                        this.stop();
+                    }
+                    goalChooser.removeGoal(g);
+                }else
                     break;
             }
             if (app == null) return false;      

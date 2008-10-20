@@ -49,6 +49,10 @@ public class StrategyProperties extends Properties {
     public final static String GOALCHOOSER_OPTIONS_KEY = "GOALCHOOSER_OPTIONS_KEY";
     public final static String GOALCHOOSER_DEFAULT = "GOALCHOOSER_DEFAULT";
     public final static String GOALCHOOSER_DEPTH = "GOALCHOOSER_DEPTH";
+    
+    public final static String STOPMODE_OPTIONS_KEY = "STOPMODE_OPTIONS_KEY";
+    public final static String STOPMODE_DEFAULT = "STOPMODE_DEFAULT";
+    public final static String STOPMODE_NONCLOSE = "STOPMODE_NONCLOSE";
 
 
     public final static int USER_TACLETS_NUM = 3;
@@ -71,6 +75,7 @@ public class StrategyProperties extends Properties {
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)
             defaultMap.setProperty(USER_TACLETS_OPTIONS_KEY(i), USER_TACLETS_OFF);
         defaultMap.setProperty(GOALCHOOSER_OPTIONS_KEY, GOALCHOOSER_DEFAULT);
+        defaultMap.setProperty(STOPMODE_OPTIONS_KEY, STOPMODE_DEFAULT);
     }
     
     public StrategyProperties() {
@@ -83,6 +88,7 @@ public class StrategyProperties extends Properties {
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)
             put(USER_TACLETS_OPTIONS_KEY(i), defaultMap.get(USER_TACLETS_OPTIONS_KEY(i)));
         put(GOALCHOOSER_OPTIONS_KEY, defaultMap.get(GOALCHOOSER_OPTIONS_KEY));
+        put(STOPMODE_OPTIONS_KEY, defaultMap.get(STOPMODE_OPTIONS_KEY));
     }
 
     public static String getDefaultProperty(String key) {
@@ -107,7 +113,7 @@ public class StrategyProperties extends Properties {
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)
             sp.put(USER_TACLETS_OPTIONS_KEY(i), readSingleOption(p,USER_TACLETS_OPTIONS_KEY(i)));
         sp.put(GOALCHOOSER_OPTIONS_KEY, readSingleOption(p,GOALCHOOSER_OPTIONS_KEY));
-        
+        sp.put(STOPMODE_OPTIONS_KEY, readSingleOption(p,STOPMODE_OPTIONS_KEY));
         return sp;
     }
 
@@ -130,6 +136,7 @@ public class StrategyProperties extends Properties {
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)
             p.put("[StrategyProperty]"+USER_TACLETS_OPTIONS_KEY(i), get(USER_TACLETS_OPTIONS_KEY(i)));
         p.put("[StrategyProperty]"+GOALCHOOSER_OPTIONS_KEY, get(GOALCHOOSER_OPTIONS_KEY));
+        p.put("[StrategyProperty]"+STOPMODE_OPTIONS_KEY, get(STOPMODE_OPTIONS_KEY));
     }
 
     

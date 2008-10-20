@@ -51,6 +51,7 @@ public class StrategySelectionView extends JPanel {
     ButtonGroup nonLinArithGroup = new ButtonGroup();
     ButtonGroup quantifierGroup = new ButtonGroup();
     ButtonGroup goalChooserGroup = new ButtonGroup();
+    ButtonGroup stopModeGroup = new ButtonGroup();    
     ButtonGroup[] userTacletsGroup = new ButtonGroup[StrategyProperties.USER_TACLETS_NUM];
     {
         for (int i = 0; i < StrategyProperties.USER_TACLETS_NUM; ++i)
@@ -64,6 +65,8 @@ public class StrategySelectionView extends JPanel {
     JRadioButtonHashMap rdBut14;
     JRadioButtonHashMap rdBut15;
     JRadioButtonHashMap rdBut16;
+    JRadioButtonHashMap rdBut17;
+    JRadioButtonHashMap rdBut18;
     private JRadioButtonHashMap splittingNormal;
     private JRadioButtonHashMap splittingOff;
     private JRadioButtonHashMap splittingDelayed;
@@ -305,6 +308,26 @@ public class StrategySelectionView extends JPanel {
                 "Depth First", StrategyProperties.GOALCHOOSER_DEPTH, false, false);
         goalChooserGroup.add(rdBut16);
         addJavaDLOption ( rdBut16, javaDLOptionsLayout, 4, yCoord, 2 );        
+       
+        
+        ++yCoord;
+        addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
+        ////////////////////////////////////////////////////////////////////////
+        ++yCoord;
+        
+        addJavaDLOption ( new JLabel ( "Stop at" ),
+                    javaDLOptionsLayout, 1, yCoord, 7 );
+        
+        ++yCoord;
+
+        rdBut17 = new JRadioButtonHashMap("Default", StrategyProperties.STOPMODE_DEFAULT, true, false);
+        stopModeGroup.add(rdBut17);
+        addJavaDLOption ( rdBut17, javaDLOptionsLayout, 2, yCoord, 2 );        
+
+        rdBut18 = new JRadioButtonHashMap(
+                "Non-Closable Goal", StrategyProperties.STOPMODE_NONCLOSE, false, false);
+        stopModeGroup.add(rdBut18);
+        addJavaDLOption ( rdBut18, javaDLOptionsLayout, 4, yCoord, 2 );        
        
         
         ++yCoord;
@@ -556,6 +579,8 @@ public class StrategySelectionView extends JPanel {
         rdBut14.addActionListener(optListener);
         rdBut15.addActionListener(optListener);
         rdBut16.addActionListener(optListener);
+        rdBut17.addActionListener(optListener);
+        rdBut18.addActionListener(optListener);
         queryExpand.addActionListener(optListener);
         queryProgramsToRight.addActionListener(optListener);
         queryNone.addActionListener(optListener);
@@ -819,6 +844,11 @@ thing. People were thinking it was a button.
             JRadioButton bCoalChooserActive = getStrategyOptionButton(goalChooserOptions, 
                     StrategyProperties.GOALCHOOSER_OPTIONS_KEY);
             bCoalChooserActive.setSelected(true); 
+            String stopmodeOptions = p.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY);
+            JRadioButton bStopModeActive = getStrategyOptionButton(stopmodeOptions, 
+                    StrategyProperties.STOPMODE_OPTIONS_KEY);
+            bStopModeActive.setSelected(true);        
+         
             for (int i = 1; i <= StrategyProperties.USER_TACLETS_NUM; ++i) {
                 String userTacletsOptions =
                     p.getProperty(StrategyProperties.USER_TACLETS_OPTIONS_KEY(i));
@@ -902,7 +932,9 @@ thing. People were thinking it was a button.
         p.setProperty( StrategyProperties.QUANTIFIERS_OPTIONS_KEY, 
                        quantifierGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.GOALCHOOSER_OPTIONS_KEY, 
-                	   goalChooserGroup.getSelection().getActionCommand());
+                       goalChooserGroup.getSelection().getActionCommand());
+        p.setProperty( StrategyProperties.STOPMODE_OPTIONS_KEY, 
+                       stopModeGroup.getSelection().getActionCommand());
         
         for (int i = 1; i <= StrategyProperties.USER_TACLETS_NUM; ++i) {
             p.setProperty( StrategyProperties.USER_TACLETS_OPTIONS_KEY(i), 
