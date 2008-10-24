@@ -42,7 +42,7 @@ public class SemisequentTacletAppIndex {
                                   Constraint               userConstraint,
                                   TacletIndex              tacletIndex,
                                   NewRuleListener          listener ) {
-        while ( cfmas != SLListOfConstrainedFormula.EMPTY_LIST ) {
+        while ( !cfmas.isEmpty() ) {
             final ConstrainedFormula cfma = cfmas.head ();
             cfmas = cfmas.tail ();
             addTermIndex ( cfma, s, services, userConstraint, tacletIndex,

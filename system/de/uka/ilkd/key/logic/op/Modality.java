@@ -87,7 +87,7 @@ public class Modality extends Op implements NonRigid {
     public boolean isRigid (Term term) {
 	return
 	    super.isRigid ( term ) &&
-	    term.javaBlock () == JavaBlock.EMPTY_JAVABLOCK;
+	    term.javaBlock ().isEmpty();
     }
 
 }

@@ -111,7 +111,9 @@ public class BinaryMerger implements Merger {
 	 *
 	 * Restrictions should not leave its branches
 	 */
-	public void       addRestriction     ( Metavariable p_mv ) {}
+	public void       addRestriction     ( Metavariable p_mv ) {
+	    parent.addRestriction(p_mv);
+        }
 
 	/**
 	 * @return a constraint that restores the current state of this

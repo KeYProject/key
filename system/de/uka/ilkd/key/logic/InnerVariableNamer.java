@@ -79,11 +79,11 @@ public class InnerVariableNamer extends VariableNamer {
 	// Name proposal = services.getProof().getNameRecorder().getProposal();
 	Name proposal = null;
 
-	if (oldProgVarProposals != SLListOfName.EMPTY_LIST) {
+	if (!oldProgVarProposals.isEmpty()) {
 	    proposal = oldProgVarProposals.head();
 	    oldProgVarProposals = oldProgVarProposals.tail();
 	} else {
-	    proposal = services.getProof().getNameRecorder().getProposal();
+	    proposal = services.getNameRecorder().getProposal();
 	}
 
 	// END TEMPORARY DOWNWARD COMPATIBILITY

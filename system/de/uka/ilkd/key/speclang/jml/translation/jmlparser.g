@@ -135,12 +135,13 @@ options {
 	this.selfVar	    = self;
 	this.paramVars      = paramVars;
 	this.resultVar      = result;
-	this.excVar	     = exc;
+	this.excVar	    = exc;
 	this.atPreFunctions = atPreFunctions;
 
 	// initialize helper objects
 	this.resolverManager = new JMLResolverManager(this.javaInfo,
 						      specInClass,
+						      selfVar,
 						      this.excManager);
 
 	// initialize namespaces

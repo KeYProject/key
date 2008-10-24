@@ -157,7 +157,7 @@ public class KeYSelectionModel {
 		case POS_LEAVES:
 		    if ( nodeIt == null || !nodeIt.hasNext () ) {
 			currentPos = POS_GOAL_LIST;
-			if ( proof.openGoals() != SLListOfGoal.EMPTY_LIST )
+			if ( !proof.openGoals().isEmpty() )
 			    goalIt = proof.openGoals().iterator();
 			else
 			    goalIt = null;
@@ -232,7 +232,7 @@ public class KeYSelectionModel {
 		}
 	    }
 	}
-	if (g == null && proof.openGoals() != SLListOfGoal.EMPTY_LIST ) {	       	    
+	if (g == null && !proof.openGoals().isEmpty() ) {	       	    
 	    g = proof.openGoals().iterator().next();
 	}
 	if (g != null) {

@@ -506,8 +506,10 @@ public class Node {
 	    if ( goal == null
                  || proof ().getUserConstraint ().displayClosed ( this ) )
                 return "Closed goal";
-            else
+            else if(goal.isAutomatic())
                 return "OPEN GOAL";
+            else
+                return "INTERACTIVE GOAL";
         }
         if (rap.rule() == null) return "rule application without rule";
 
@@ -557,9 +559,10 @@ public class Node {
     }
     
     public static void clearReuseCandidates(Proof p) {
-       for (Node n : reuseCandidates) {
-          if (n.proof() == p) reuseCandidates.remove(n);
-       }
+        for (Iterator<Node> it = reuseCandidates.iterator(); it.hasNext();) {
+            Node n = it.next();
+            if (n.proof() == p) it.remove();
+        }
     }
     
     public boolean isReuseCandidate() {

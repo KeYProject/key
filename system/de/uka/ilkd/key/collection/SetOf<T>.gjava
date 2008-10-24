@@ -43,6 +43,9 @@ public interface SetOf<T> extends Iterable<<T>>, java.io.Serializable {
     /** @return int the cardinality of the set */
     int size();
 
+    /** @return true iff the set is empty */
+    boolean isEmpty();
+
     /** @return set without element */
     SetOf<T> remove(<T> element);
 

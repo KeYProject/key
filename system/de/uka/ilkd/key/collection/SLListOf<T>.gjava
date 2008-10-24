@@ -46,7 +46,7 @@ public abstract class SLListOf<T> implements ListOf<T> {
 
 	ListOf<T> rest = this;
 	ListOf<T> rev  = EMPTY_LIST;
-	while (rest != EMPTY_LIST) {
+	while (!rest.isEmpty()) {
 	    rev = rev.prepend(rest.head());
 	    rest = rest.tail();
 	}
@@ -61,7 +61,7 @@ public abstract class SLListOf<T> implements ListOf<T> {
 	<T>[]     res  = new <T> [ size () ];
 	int       i    = 0;
 	ListOf<T> rest = this;
-	while ( rest != EMPTY_LIST ) {
+	while ( !rest.isEmpty() ) {
 	    res[i++] = rest.head ();
 	    rest     = rest.tail ();
 	}
@@ -218,7 +218,7 @@ public abstract class SLListOf<T> implements ListOf<T> {
 	public boolean contains(<T> obj) {
 	    ListOf<T> list = this;
 	    <T>       t;
-	    while (list != EMPTY_LIST) {
+	    while (!list.isEmpty()) {
 		t = list.head ();
 		if ( t == null ? obj == null : t.equals ( obj ) )
 		    return true;
@@ -242,7 +242,7 @@ public abstract class SLListOf<T> implements ListOf<T> {
 	    SLListOf<T> rest           = this;
 	    SLListOf<T> unmodifiedTail = this;
 	    <T>         t;
-	    while (rest != EMPTY_LIST) {
+	    while (!rest.isEmpty()) {
 		t    = rest.head ();
 		rest = (SLListOf<T>)rest.tail();
 		if ( !( t == null ? obj == null : t.equals ( obj ) ) )
@@ -268,7 +268,7 @@ public abstract class SLListOf<T> implements ListOf<T> {
 	    SLListOf<T> unmodifiedTail = this;
 	    <T>         t;
 
-	    while (rest != EMPTY_LIST) {
+	    while (!rest.isEmpty()) {
 		t    = rest.head ();
 		rest = (SLListOf<T>)rest.tail();
 		if ( !( t == null ? obj == null : t.equals ( obj ) ) )
@@ -337,7 +337,7 @@ public abstract class SLListOf<T> implements ListOf<T> {
 	    /** @return true iff there are unseen elements in the list
 	     */ 
 	    public boolean hasNext() {
-		return list != EMPTY_LIST;
+		return !list.isEmpty();
 	    }    
 
 	   /** 

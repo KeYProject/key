@@ -113,7 +113,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
                 return null;
             }
 
-            return new OCLEntity(new OCLCollection(receiver.getKeYJavaType(javaInfo).getSort(), services));
+            return new OCLExpression(new OCLCollection(receiver.getKeYJavaType(javaInfo).getSort(), services));
         }
         
         
@@ -158,7 +158,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
                             oclParameters.getDeclaredVars().toArray(),
                             subTerm);
 
-            return new OCLEntity(resTerm);
+            return new OCLExpression(resTerm);
         }
         
         
@@ -187,7 +187,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
             OCLCollection resCollection;
             resCollection = ((OCLCollection) receiver.getCollection()).select(selectVar, selectTerm);
             
-            return new OCLEntity(resCollection);            
+            return new OCLExpression(resCollection);            
         }
         
         
@@ -222,7 +222,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
             OCLCollection result
                 = ((OCLCollection) receiver.getCollection()).collect(services, collectTerm);
             
-            return new OCLEntity(result);
+            return new OCLExpression(result);
         } 
         
         
@@ -262,7 +262,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
                             vars,
                             opTerm);
             
-            return new OCLEntity(resTerm);
+            return new OCLExpression(resTerm);
         }
         
         
@@ -300,7 +300,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
                             vars,
                             opTerm);
             
-            return new OCLEntity(resTerm);
+            return new OCLExpression(resTerm);
         }
         
 
@@ -355,7 +355,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
                             new LogicVariable[]{lv1,lv2},
                             subTerm);
             
-            return new OCLEntity(resTerm);
+            return new OCLExpression(resTerm);
 
         }
 
@@ -381,7 +381,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
             Function f = (Function) services.getNamespaces().functions().lookup(
                     new Name(ssort.name().toString()+"::"+name));  
             
-            return new OCLEntity(
+            return new OCLExpression(
                     tf.createFunctionTerm(
                             f,
                             ((OCLCollection) receiver.getCollection()).getFunctionalRestriction()));
@@ -403,7 +403,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
             
             Term result = tf.createFunctionTerm(instance,receiver.getTerm());
             
-            return new OCLEntity(result);
+            return new OCLExpression(result);
         }
 
         
@@ -422,7 +422,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
             
             Term result = tf.createFunctionTerm(instance,receiver.getTerm());
             
-            return new OCLEntity(result);
+            return new OCLExpression(result);
         }
 
         
@@ -440,7 +440,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
                     (AbstractSort)oclParameters.getEntities().head().getSort(),
                     receiver.getTerm());
             
-            return new OCLEntity(result);
+            return new OCLExpression(result);
         }
 
         
@@ -461,7 +461,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
                     receiver.getTerm(),
                     oclParameters.getEntities().head().getTerm());
             
-            return new OCLEntity(res);
+            return new OCLExpression(res);
         }
         
         //signals (exception-handling)--------------------------------------------------
@@ -482,7 +482,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
                         tb.not(tb.equals(tb.var(excVar),tb.NULL(services))),
                         tb.equals(tb.func(instance,tb.var(excVar)),tb.TRUE(services)));
             
-            return new OCLEntity(res);
+            return new OCLExpression(res);
             
         }
         
@@ -498,7 +498,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
                    || !(oclParameters.getEntities().head().getSort().extendsTrans(integerSort))) {                            
                 return null;
             }
-            return new OCLEntity(tb.func(integerLDT.getMod(), 
+            return new OCLExpression(tb.func(integerLDT.getMod(), 
                     receiver.getTerm(), 
                     oclParameters.getEntities().head().getTerm()));
         }
@@ -515,7 +515,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
                    || !(oclParameters.getEntities().head().getSort().extendsTrans(integerSort))) {                            
                 return null;
             }
-            return new OCLEntity(tb.func(integerLDT.getDiv(), 
+            return new OCLExpression(tb.func(integerLDT.getDiv(), 
                     receiver.getTerm(), 
                     oclParameters.getEntities().head().getTerm()));
         }

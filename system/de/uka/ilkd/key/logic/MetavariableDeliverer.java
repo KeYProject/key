@@ -73,7 +73,7 @@ public class MetavariableDeliverer {
                 .getServices(), new Name(name));
         Metavariable var = new Metavariable(newName, p_sort);
 	proof.getNamespaces ().variables ().add ( var );
-	proof.addNameProposal(var.name());
+	proof.getServices().addNameProposal(var.name());
 	return var;
     }
 

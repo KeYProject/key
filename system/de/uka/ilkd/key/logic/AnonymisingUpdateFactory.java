@@ -155,7 +155,9 @@ public class AnonymisingUpdateFactory {
             // END TEMPORARY DOWNWARD COMPATIBILITY
 
             services.getNamespaces().functions().add(result);
-            services.getProof().addNameProposal(result.name());
+            
+            services.addNameProposal(result.name());
+            
             functions.put(locTerm.op(), result);
         }
         

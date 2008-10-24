@@ -152,7 +152,7 @@ public class Semisequent implements Iterable<ConstrainedFormula> {
 	Constraint               c;
 	int                      pos        = -1;
 
-	while ( searchList != SLListOfConstrainedFormula.EMPTY_LIST ) {
+	while ( !searchList.isEmpty() ) {
 	    ++pos;
 	    cf         = searchList.head ();
 	    searchList = searchList.tail();	    
@@ -192,7 +192,7 @@ public class Semisequent implements Iterable<ConstrainedFormula> {
 	    searchList = searchList.prepend ( conForm );
 	}
 
-	while ( newSeqList != SLListOfConstrainedFormula.EMPTY_LIST ) {
+	while ( !newSeqList.isEmpty() ) {
 	    searchList = searchList.prepend ( newSeqList.head () );
 	    newSeqList = newSeqList.tail ();
 	    if ( idx == pos ) {
@@ -396,7 +396,7 @@ public class Semisequent implements Iterable<ConstrainedFormula> {
     public int indexOf(ConstrainedFormula conForm) {
 	ListOfConstrainedFormula searchList = seqList;  
 	int index=0;
-	while (searchList!=SLListOfConstrainedFormula.EMPTY_LIST)
+	while (!searchList.isEmpty())
 	    { 
 		if (searchList.head()==conForm) {
 		    return index;
