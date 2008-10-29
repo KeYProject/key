@@ -126,7 +126,6 @@ public class ApplyStrategy {
                         JDialog dialog = pane.createDialog(medi.mainFrame(),
                                 "The KeY Project");
                         dialog.setVisible(true);
-			//                        this.stop();
 			medi.goalChosen(g);
 			return false;
                     }
