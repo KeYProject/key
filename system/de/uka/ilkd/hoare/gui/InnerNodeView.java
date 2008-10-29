@@ -26,13 +26,15 @@ public class InnerNodeView extends NonGoalInfoView {
     protected void printInnerNode(Node node, KeYMediator mediator) {
         filter = new ConstraintSequentPrintFilter 
         ( node.sequent (), mediator.getUserConstraint ().getConstraint () );  
-        printer = new HoareLogicPrettyPrinter
+        LogicPrinter printer = new HoareLogicPrettyPrinter
         (new ProgramPrinter(null),
                 mediator.getNotationInfo(),
                 mediator.getServices());
 
         printer.printSequent (null, filter);
         String s = printer.toString();
+        posTable = printer.getPositionTable();
+        
         RuleApp app = node.getAppliedRuleApp();
         s += "\nNode Nr "+node.serialNr()+"\n";
 
@@ -80,7 +82,7 @@ public class InnerNodeView extends NonGoalInfoView {
             highlightRuleAppPosition(app);       
         } else {         
             // no rule app       
-                 setCaretPosition(0);    
+            setCaretPosition(0);    
         }
         
         setEditable(false);

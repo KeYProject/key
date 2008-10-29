@@ -28,7 +28,6 @@ import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.MethodCallInfo;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
-import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.logic.ListOfInteger;
@@ -44,9 +43,9 @@ import de.uka.ilkd.key.util.Debug;
 
 public class NonGoalInfoView extends JTextArea {
     	 
-    protected LogicPrinter printer;	 
+    //protected LogicPrinter printer;	 
     protected SequentPrintFilter filter;
-    private InitialPositionTable posTable;
+    protected InitialPositionTable posTable;
     private ConfigChangeListener configChangeListener = new ConfigChangeAdapter(this);//keeps only a weak reference to objects of this class
     
     
@@ -63,15 +62,15 @@ public class NonGoalInfoView extends JTextArea {
 	filter = new ConstraintSequentPrintFilter 
 	    ( node.sequent (), 
 	      mediator.getUserConstraint ().getConstraint () );
-	printer = new LogicPrinter
+	LogicPrinter printer = new LogicPrinter
 	    (new ProgramPrinter(null), 
 	     mediator.getNotationInfo(),
 	     mediator.getServices());
 	printer.printSequent (null, filter);
 	String s = printer.toString();
         posTable = printer.getPositionTable();
-        printer=null;
-	RuleApp app = node.getAppliedRuleApp();
+
+        RuleApp app = node.getAppliedRuleApp();
 
 	if ( app != null ) {
 	    s = s + "\n \nUpcoming rule application: \n";
