@@ -126,7 +126,9 @@ public class ApplyStrategy {
                         JDialog dialog = pane.createDialog(medi.mainFrame(),
                                 "The KeY Project");
                         dialog.setVisible(true);
-                        this.stop();
+			//                        this.stop();
+			medi.goalChosen(g);
+			return false;
                     }
                     goalChooser.removeGoal(g);
                 }else
@@ -298,17 +300,27 @@ public class ApplyStrategy {
                 (new GeneralFailureEvent("An exception occurred during" 
                         + " strategy execution."));  
             } else {
-                if (startedAsInteractive) mediator().startInterface(true);
+                if (startedAsInteractive){
+                    if (medi.getProof().getSettings().getStrategySettings()
+			.getActiveStrategyProperties().getProperty(
+			       StrategyProperties.STOPMODE_OPTIONS_KEY)
+			.equals(StrategyProperties.STOPMODE_NONCLOSE)){
+			Goal g = mediator().getSelectedGoal();
+			mediator().startInterface(true);
+			mediator().goalChosen(g);
+		    }else{
+			mediator().startInterface(true);
+		    }
+		}
             }
-
             proof.addAutoModeTime(time);
             fireTaskFinished (new DefaultTaskFinishedInfo(ApplyStrategy.this, result, 
                     proof, time, 
                     countApplied, mediator().getNrGoalsClosedByAutoMode()));	  
-            
+
             mediator().resetNrGoalsClosedByHeuristics();
             
-            mediator().setInteractive( true );            
+            mediator().setInteractive( true );  
         }
     }
     
