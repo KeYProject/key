@@ -10,18 +10,34 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.List;
 
-import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
 import recoder.ProgramFactory;
-import recoder.bytecode.*;
+import recoder.abstraction.TypeParameter;
+import recoder.bytecode.ClassFile;
+import recoder.bytecode.ConstructorInfo;
+import recoder.bytecode.FieldInfo;
+import recoder.bytecode.MethodInfo;
+import recoder.bytecode.TypeParameterInfo;
 import recoder.io.DataLocation;
 import recoder.java.CompilationUnit;
 import recoder.java.Identifier;
 import recoder.java.PackageSpecification;
-import recoder.java.declaration.*;
+import recoder.java.declaration.ClassDeclaration;
+import recoder.java.declaration.ConstructorDeclaration;
+import recoder.java.declaration.DeclarationSpecifier;
+import recoder.java.declaration.EnumConstantDeclaration;
+import recoder.java.declaration.EnumConstantSpecification;
+import recoder.java.declaration.EnumDeclaration;
+import recoder.java.declaration.Extends;
+import recoder.java.declaration.FieldDeclaration;
+import recoder.java.declaration.InterfaceDeclaration;
+import recoder.java.declaration.MemberDeclaration;
+import recoder.java.declaration.MethodDeclaration;
+import recoder.java.declaration.ParameterDeclaration;
+import recoder.java.declaration.TypeDeclaration;
 import recoder.java.declaration.modifier.Private;
 import recoder.java.reference.EnumConstructorReference;
 import recoder.java.reference.PackageReference;
@@ -57,10 +73,11 @@ import de.uka.ilkd.key.util.Debug;
  * 
  * TODO Possible improvement: Remove "synthetic" members (JVM spec chapter 4)
  * 
+ * @see ClassFileDeclarationManager
  * @author MU
  */
 
-public class ClassFileDeclarationBuilder {
+public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarationBuilder> {
 
     // used to create elements
     private ProgramFactory factory;
@@ -83,16 +100,23 @@ public class ClassFileDeclarationBuilder {
     // the member to the declaration are collected here
     private ASTList<MemberDeclaration> memberDecls;
 
+    // the manager to which this builder belongs
+    private ClassFileDeclarationManager manager;
+    
+    // store all type parameters of this class and potentially 
+    // all enclosing classes
+    private List<TypeParameterInfo> typeParameters;
+
     /**
      * create a new ClassDeclaration builder. The builder can be used to create a
      * ClassDeclaration for a single class file.
      * 
-     * @param programFactory the factory to be used to create elements
      * @param classFile class file to be investigated
+     * @param manager the manager to which this builder belongs 
      */
-    public ClassFileDeclarationBuilder(ProgramFactory programFactory, ClassFile classFile) {
-        super();
-        this.factory = programFactory;
+    public ClassFileDeclarationBuilder(ClassFileDeclarationManager manager, ClassFile classFile) {
+        this.factory = manager.getProgramFactory();
+        this.manager = manager;
         this.classFile = classFile;
         this.physicalName = classFile.getPhysicalName();
     }
@@ -118,9 +142,9 @@ public class ClassFileDeclarationBuilder {
      */
     public String getClassName() {
         if (isInnerClass())
-            return physicalName.substring(physicalName.indexOf('$') + 1);
+            return physicalName.substring(physicalName.lastIndexOf('$') + 1);
         else
-            return physicalName.substring(physicalName.indexOf('.') + 1);
+            return physicalName.substring(physicalName.lastIndexOf('.') + 1);
     }
     
     /**
@@ -155,6 +179,7 @@ public class ClassFileDeclarationBuilder {
      * @return a TypeDeclaration corresponding to the class file
      */
     public TypeDeclaration makeTypeDeclaration() {
+        
         if(typeDecl == null) {
             createTypeDeclaration();
             setNameAndMods();
@@ -179,6 +204,7 @@ public class ClassFileDeclarationBuilder {
                 addMethod(method);
             }
             typeDecl.setMembers(memberDecls);
+            typeDecl.makeAllParentRolesValid();
         }
         return typeDecl;
     }
@@ -203,45 +229,50 @@ public class ClassFileDeclarationBuilder {
      */
     public boolean isInnerClass() {
         if(physicalName.contains("$")) {
-            String trailing = physicalName.substring(physicalName.indexOf('$') + 1);
-            return !isNumber(trailing);
+            String trailing = physicalName.substring(physicalName.lastIndexOf('$') + 1);
+            return !startsWithADigit(trailing);
         }
         return false;
     }
     
     /**
-     * is the considered ClassFile the byte code of an anonyous inner class?
+     * is the considered ClassFile the representation of an anymous class or a class
+     * declared within a program?
      * 
-     * This is done checking the fully qualified class name. Does it contain a
-     * "$" or a '.' and is this character followed by a number
+     * This is the case if the last $ is followed by a digit.
      * 
-     * @return true iff the classFile under inspection is an inner class
+     * @return true iff the classFile under inspection is an anon. or in-code-class
      */
-    public static boolean isAnonClassname(String name) {
-        if(name.contains("$")) {
-            String trailing = name.substring(name.indexOf('$') + 1);
-            return isNumber(trailing);
-        }
-        if(name.contains(".")) {
-            String trailing = name.substring(name.lastIndexOf('.') + 1);
-            return isNumber(trailing);
+    public boolean isAnonymousClass() {
+        if(physicalName.contains("$")) {
+            String trailing = physicalName.substring(physicalName.lastIndexOf('$') + 1);
+            return startsWithADigit(trailing);
         }
         return false;
     }
     
-    /* TODO DOC
-     * enclCU must contain exactly one type decl. the enclosing one 
+    /**
+     * If this is a builder for an inner class, the declaration has to be
+     * attached to the enclosing class. This method adds the resulting
+     * declaration to an existing type declaration. A reference to the
+     * enclosing builder is stored to retrieve the type parameter
+     * information, e.g.
+     * 
      */
-    public void attachToEnclosingCompilationUnit(CompilationUnit enclCU) {
+    public void attachToEnclosingDeclaration() {
         if(!isInnerClass())
             throw new IllegalStateException("only inner classes can be attached to enclosing classes");
 
-        TypeDeclaration td = enclCU.getPrimaryTypeDeclaration();
-        assert td != null : "No type declaration in compilation unit";
-        ASTList<MemberDeclaration> members = td.getMembers();
+        // this builder must not yet have built:
+        assert typeDecl == null;
+
+        ClassFileDeclarationBuilder enclBuilder = manager.getBuilder(getEnclosingName());
+        TypeDeclaration enclTD = enclBuilder.makeTypeDeclaration();
+        ASTList<MemberDeclaration> members = enclTD.getMembers();
         assert members != null : "ClassDeclaration with null members!";
         TypeDeclaration childtd = makeTypeDeclaration();
         members.add(childtd);
+        enclTD.makeParentRoleValid();
     }
     
     /**
@@ -249,9 +280,9 @@ public class ClassFileDeclarationBuilder {
      * @return class name, not null
      */
     public String getEnclosingName() {
-        if(!isInnerClass())
+        if(!isInnerClass() && !isAnonymousClass())
             throw new IllegalStateException("only inner classes have an enclosing class");
-        return physicalName.substring(0, physicalName.indexOf('$'));
+        return physicalName.substring(0, physicalName.lastIndexOf('$'));
     }
 
     /**
@@ -296,11 +327,13 @@ public class ClassFileDeclarationBuilder {
 
     
     // --------------------------------------- private stuff below this line (and main)
-    
+
+      
     /*
      * create the target declaration and register it in the comp. unit
      */
     private void createTypeDeclaration() {
+        
         if (classFile.isInterface()) {
             typeDecl = factory.createInterfaceDeclaration();
         } else if (classFile.isOrdinaryClass()) {
@@ -440,9 +473,15 @@ public class ClassFileDeclarationBuilder {
      */
     private void addField(FieldInfo field) {
         
+        // ignore internal fields.
+        String name = field.getName();
+        if(isInternal(name))
+            return;
+        
         String typename = field.getTypeName();
+        typename = resolveTypeVariable(typename, null);
         TypeReference type = createTypeReference(typename);
-        Identifier id = factory.createIdentifier(field.getName());
+        Identifier id = factory.createIdentifier(name);
         FieldDeclaration decl = factory.createFieldDeclaration(type, id);
 
         decl.setDeclarationSpecifiers(makeFieldSpecifiers(field));
@@ -490,18 +529,27 @@ public class ClassFileDeclarationBuilder {
      * add a method to the member set
      */
     private void addMethod(MethodInfo method) {
+
         MethodDeclaration decl = factory.createMethodDeclaration();
         decl.setDeclarationSpecifiers(makeMethodSpecifiers(method));
 
+        // feature: ignore access functions which should not ne visible on
+        // source code level
+        String methodName = method.getName();
+        if(isInternal(methodName)) 
+            return;
+        
         String returntype = method.getTypeName();
+        returntype = resolveTypeVariable(returntype, method.getTypeParameters());
         TypeReference type = createTypeReference(returntype);
         decl.setTypeReference(type);
-
-        decl.setIdentifier(factory.createIdentifier(method.getName()));
+        
+        decl.setIdentifier(factory.createIdentifier(methodName));
 
         ASTList<ParameterDeclaration> params = new ASTArrayList<ParameterDeclaration>();
         int index = 1;
         for (String tys : method.getParameterTypeNames()) {
+            tys = resolveTypeVariable(tys, method.getTypeParameters());
             type = createTypeReference(tys);
             String name = "arg" + (index++);
             Identifier id = factory.createIdentifier(name);
@@ -514,6 +562,7 @@ public class ClassFileDeclarationBuilder {
             ASTList<TypeReference> _throws = new ASTArrayList<TypeReference>();
 
             for (String tys : exceptionsInfo) {
+                tys = resolveTypeVariable(tys, method.getTypeParameters());
                 type = createTypeReference(tys);
                 _throws.add(type);
             }
@@ -552,6 +601,11 @@ public class ClassFileDeclarationBuilder {
         TypeReference type;
         
         for (String tys : constr.getParameterTypeNames()) {
+            tys = resolveTypeVariable(tys, constr.getTypeParameters());
+            // filter out those constructors with a Classname$1 argument
+            // that are only introduced for technical reasons
+            if(ClassFileDeclarationBuilder.isAnononymous(tys))
+                return;
             type = createTypeReference(tys);
             String name = "arg" + (index++);
             Identifier id = factory.createIdentifier(name);
@@ -577,7 +631,6 @@ public class ClassFileDeclarationBuilder {
     }
 
     
-    
     /*
      * Helper:
      * see also recoder.kit,PackageKit
@@ -595,7 +648,68 @@ public class ClassFileDeclarationBuilder {
     }
     
     /*
+     * in the presence of (generic) type parameters
+     * replace every type parameter by its first boundary.
+     * There are three sources for type parameters:
+     * <ol>
+     * <li> type parameters in the classfile
+     * <li> type parameters from the enclosing classfiles (gathered in getAllTypeParameters)
+     * <li> additional parameters (from constr/methdo decl)
+     * </ol>
+     */
+    private String resolveTypeVariable(String typename, List<? extends TypeParameter> additionalTypeParameters) {
+        
+        int dim = 0;
+        while(typename.endsWith("[]")) {
+            typename = typename.substring(0, typename.length() - 2);
+            dim++;
+        }
+        
+        for (TypeParameter tp : getAllTypeParameters()) {
+            if (typename.equals(tp.getName())) {
+                return tp.getBoundName(0);
+            }
+        }
+        if(additionalTypeParameters != null) {
+            for (TypeParameter tp : additionalTypeParameters) {
+                if (typename.equals(tp.getName())) {
+                    return tp.getBoundName(0);
+                }
+            }   
+        }
+        for (int i = 0; i < dim; i++) {
+            typename += "[]";
+        }
+        
+        return typename;
+    }
+    
+    /*
+     * gather all type parameters. The ones of this class and potentially 
+     * the ones of an enclosing class. Store the result for later calls
+     *  
+     * @return a possibly cached list of all type parameters used in
+     * this class, not null.
+     */
+    private List<TypeParameterInfo> getAllTypeParameters() {
+        if(typeParameters == null) {
+            typeParameters = new ArrayList<TypeParameterInfo>(0);
+            typeParameters.addAll(classFile.getTypeParameters());
+            if(isInnerClass() || isAnonymousClass()) {
+                ClassFileDeclarationBuilder encl = manager.getBuilder(getEnclosingName());
+                typeParameters.addAll(encl.getAllTypeParameters());
+            }
+        }
+        return typeParameters;
+    }
+
+
+    /*
      * Helper: create a type reference to an arbitrary type.
+     * $ are introduced instead of . if identifier are numbers or
+     * start with digits.
+     * This is not used at the moment - but might be interesting if 
+     * anonymous classes are mapped, too.
      */
     private TypeReference createTypeReference(String typename) {
        
@@ -607,9 +721,17 @@ public class ClassFileDeclarationBuilder {
         
         // rare occasion where an anonymous class is used as a marker.
         // happens only in methods not present in source code.
-        if(isAnonClassname(typename)) {
-            int lastdot = typename.lastIndexOf('.');
-            typename = typename.substring(0, lastdot) + '$' + typename.substring(lastdot+1);
+        // bugfix: treatment to the situations:
+        //    CN.1.1  -->  CN$1$1
+        //    CN.1.D  -->  CD$1.D  etc.
+        String[] parts = typename.split("(\\.|\\$)");
+        typename = parts[0];
+        for (int i = 1; i < parts.length; i++) {
+            if(startsWithADigit(parts[i])) {
+                typename += "$" + parts[i];
+            } else {
+                typename += "." + parts[i];
+            }
         }
         
         TypeReference tyref = TypeKit.createTypeReference(factory, typename);
@@ -617,41 +739,43 @@ public class ClassFileDeclarationBuilder {
         return tyref;
     }
     
-    /**
-     * check if a string denotes a decimal number
-     * @param string
+    
+    /*
+     * is this a reference to an anonymous class?
+     * The argument must contain "." not "$"
+     */
+    private static boolean isAnononymous(String tys) {
+        return startsWithADigit(tys.substring(tys.lastIndexOf('.')+1));
+    }
+    
+    /*
+     * check if a string starts with a decimal digit.
+     * @param string to check
      * @return true iff string denotes a decimal number
      */
-    private static boolean isNumber(String string) {
-        try {
-            Integer.parseInt(string);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
+    private static boolean startsWithADigit(String string) {
+        char c0 = string.charAt(0);
+        return c0 >= '0' && c0 <= '9';
     }
-
-    /**
-     * Open a class file, transcribe it to a class Declaration and output the stub.
-     * 
-     * @param args the first element is taken as a file name to a class file
-     * @throws Exception if I/O fails
-     */
-    public static void main(String args[]) throws Exception {
-        CrossReferenceServiceConfiguration sc = new CrossReferenceServiceConfiguration();
-        ByteCodeParser bcp = new ByteCodeParser();
-        ClassFile cf = bcp.parseClassFile(new FileInputStream(args[0]));
-
-        ClassFileDeclarationBuilder b = new ClassFileDeclarationBuilder(sc.getProgramFactory(), cf);
-        b.setDataLocation(new URLDataLocation(new File(args[0]).toURL()));
-        CompilationUnit cu = b.makeCompilationUnit();
-        System.out.println(cu.toSource());
-    }
-
     
+    /*
+     * an internal name contains an '$'
+     */
+    private static boolean isInternal(String name) {
+        return name.contains("$");
+    }
+
     @Override
     public String toString() {
         return "ClassFileDeclarationBuilder[" + getFullClassname() + "]";
+    }
+
+    /**
+     * compare to class file declaration builders.
+     * comparison is performed upon the full classnames
+     */
+    public int compareTo(ClassFileDeclarationBuilder o) {
+        return getFullClassname().compareTo(o.getFullClassname());
     }
     
 }

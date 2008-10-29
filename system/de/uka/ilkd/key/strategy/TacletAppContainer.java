@@ -356,7 +356,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             Debug.assertTrue ( getTacletApp().ifFormulaInstantiations() == null,
                    "The if formulas have already been instantiated" );
 
-            if ( getTaclet ().ifSequent () == Sequent.EMPTY_SEQUENT )
+            if ( getTaclet ().ifSequent ().isEmpty() )
                 addResult ( getTacletApp () );
             else {
                 allAntecFormulas = IfFormulaInstSeq.createList(

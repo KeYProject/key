@@ -359,7 +359,7 @@ public class PosTacletApp extends TacletApp {
      */
     public boolean complete() {
 	return posInOccurrence() != null && 
-	    uninstantiatedVars() == SetAsListOfSchemaVariable.EMPTY_SET &&
+	    uninstantiatedVars().isEmpty() &&
 	    ifInstsComplete ();
     }
 

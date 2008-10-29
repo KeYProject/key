@@ -58,7 +58,7 @@ public class JMLEclipseAdapter {
 		specs = ism.
 		    getInheritedMethodSpecs(m, classType);
 	    }
-	    if(specs != SetAsListOfJMLMethodSpec.EMPTY_SET || cSpec != null){
+	    if(!specs.isEmpty() || cSpec != null){
 		Vector specVector = new Vector();
 		if(specs != null){
 		    IteratorOfJMLMethodSpec it = specs.iterator();

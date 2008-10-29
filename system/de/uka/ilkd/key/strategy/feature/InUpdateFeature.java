@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuanUpdateOperator;
 import de.uka.ilkd.key.proof.Goal;
@@ -31,7 +30,7 @@ public class InUpdateFeature extends BinaryFeature {
                 return true;                
             }
                 
-            if (taclet.ifSequent()==Sequent.EMPTY_SEQUENT) {
+            if (taclet.ifSequent().isEmpty()) {
                 return false;
             }
         }

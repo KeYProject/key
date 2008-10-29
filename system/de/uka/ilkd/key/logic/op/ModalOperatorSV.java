@@ -56,7 +56,7 @@ public class ModalOperatorSV extends OperatorSV  {
      * changed by modalities
      */
     public boolean isRigid (Term term) {
-	return (term.javaBlock () == JavaBlock.EMPTY_JAVABLOCK);
+	return (term.javaBlock ().isEmpty());
     }    
     
     /**

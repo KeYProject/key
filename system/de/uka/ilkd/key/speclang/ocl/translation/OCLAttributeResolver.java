@@ -77,7 +77,7 @@ class OCLAttributeResolver extends SLExpressionResolver {
                                                         recVarTerm);                
             OCLCollection newCollection 
                     = recCollection.collect(services, attributeTerm);
-            return new OCLEntity(newCollection);
+            return new OCLExpression(newCollection);
         }   
     
         return null;

@@ -165,7 +165,7 @@ class UniTrigger extends Trigger {
                 }
             }
 
-            if ( fringe == SLListOfTerm.EMPTY_LIST ) return false;
+            if ( fringe.isEmpty() ) return false;
 
             checkForCycle = fringe.head ();
             fringe        = fringe.tail ();

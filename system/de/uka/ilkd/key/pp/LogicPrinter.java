@@ -521,7 +521,7 @@ public class LogicPrinter {
 	if (!(tgt.sequent().isEmpty())) {
 	    printTextSequent(tgt.sequent(), "\\add", true);
 	} 
-	if (tgt.rules()!=SLListOfTaclet.EMPTY_LIST) {
+	if (!tgt.rules().isEmpty()) {
 	    printRules(tgt.rules());
 	}
 	if (tgt.addedProgVars().size()>0) {

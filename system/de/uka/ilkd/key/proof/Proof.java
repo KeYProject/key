@@ -108,12 +108,12 @@ public class Proof implements Named {
      */
     public Vector<String> keyVersionLog;
    
+    private long autoModeTime = 0;
     
     private Strategy activeStrategy;
 //    implemented by mbender for jmltest
     private SpecExtPO specExtPO;
     
-    private NameRecorder nameRecorder;
 
     /** constructs a new empty proof with name */
     private Proof(Name name, Services services, ProofSettings settings) {
@@ -126,7 +126,6 @@ public class Proof implements Named {
         addConstraintListener ();
 
         addStrategyListener ();
-        nameRecorder = new NameRecorder();
     }
 
     /**
@@ -268,17 +267,12 @@ public class Proof implements Named {
        return services;
     }
 
-    public NameRecorder getNameRecorder() {
-        return nameRecorder;
+    public long getAutoModeTime() {
+        return autoModeTime;
     }
 
-    public void saveNameRecorder(Node n) {
-        n.setNameRecorder(nameRecorder);
-        nameRecorder = new NameRecorder();
-    }
-
-    public void addNameProposal(Name proposal) {
-        nameRecorder.addProposal(proposal);
+    public void addAutoModeTime(long time) {
+        autoModeTime += time;
     }
 
     /** sets the variable, function, sort, heuristics namespaces */
@@ -430,6 +424,34 @@ public class Proof implements Named {
     public ListOfGoal openGoals() {
 	return openGoals;
     }
+    
+    /**
+     * return the list of open and enabled goals
+     * @return list of open and enabled goals, never null
+     * @author mulbrich
+     */
+    public ListOfGoal openEnabledGoals() {
+        return filterEnabledGoals(openGoals);
+    }
+
+    /**
+     * filter those goals from a list which are enabled
+     * 
+     * @param goals non-null list of goals
+     * @return sublist such that every goal in the list is enabled
+     * @see Goal#isAutomatic()
+     * @author mulbrich
+     */
+    private ListOfGoal filterEnabledGoals(ListOfGoal goals) {
+        ListOfGoal enabledGoals = SLListOfGoal.EMPTY_LIST;
+        for(Goal g : goals) {
+            if(g.isAutomatic()) {
+                enabledGoals = enabledGoals.prepend(g);
+            }
+        }
+        return enabledGoals;
+    }    
+
 
     /** 
      * removes the given goal and adds the new goals in list 
@@ -553,7 +575,7 @@ public class Proof implements Named {
     public boolean closed () {
 	if ( root ().getRootSink ().isSatisfiable () ) {
 	    Goal goal;
-	    while ( openGoals != SLListOfGoal.EMPTY_LIST ) {
+	    while ( !openGoals.isEmpty() ) {
 		goal      = openGoals.head ();
 		openGoals = openGoals.tail ();
 		fireProofGoalRemoved ( goal );
@@ -760,6 +782,7 @@ public class Proof implements Named {
     }
 
     /** returns the list of goals of the subtree starting with node 
+     * 
      * @param node the Node where to start from
      * @return the list of goals of the subtree starting with node 
      */
@@ -776,6 +799,15 @@ public class Proof implements Named {
 	    }
 	}
 	return result;
+    }
+    
+    /**
+     * get the list of goals of the subtree starting with node which are enabled.
+     * @param node the Node where to start from
+     * @return the list of enabled goals of the subtree starting with node 
+     */
+    public ListOfGoal getSubtreeEnabledGoals(Node node) {
+        return filterEnabledGoals(getSubtreeGoals(node));
     }
 
     /** returns true iff the given node is found in the proof tree 
@@ -863,5 +895,6 @@ public class Proof implements Named {
      */
     public SpecExtPO getPO() {
         return specExtPO;
-    }    
+    }
+
 }

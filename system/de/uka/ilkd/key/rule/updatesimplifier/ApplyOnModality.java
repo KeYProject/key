@@ -151,7 +151,7 @@ public class ApplyOnModality extends AbstractUpdateRule {
             return foundProgVars;
         }
         
-        if (target.javaBlock() != JavaBlock.EMPTY_JAVABLOCK) {
+        if (!target.javaBlock().isEmpty()) {
             ProgramVariableCollector pvc = 
                 new ProgramVariableCollector(target.javaBlock().program(), 
                                              services,

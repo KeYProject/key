@@ -321,7 +321,7 @@ public class Recoder2KeYTypeConverter {
 		}
 		*/
 
-		if (ss == SetAsListOfSort.EMPTY_SET && !isObject(classType)) {
+		if (ss.isEmpty() && !isObject(classType)) {
 			ss = ss.add(getJavaInfo().getJavaLangObjectAsSort());
 		}
 		return ss;

@@ -141,7 +141,7 @@ class TacletMenu extends JMenu {
     private void createBuiltInRuleMenu(ListOfBuiltInRule builtInList,
 				       MenuControl            control) {
 
-	if (builtInList != SLListOfBuiltInRule.EMPTY_LIST) {
+	if (!builtInList.isEmpty()) {
 	    addSeparator();	
 	    IteratorOfBuiltInRule it = builtInList.iterator();
 	    while (it.hasNext()) {                
@@ -512,7 +512,7 @@ class TacletMenu extends JMenu {
 			result += ((RewriteTacletGoalTemplate)gt).replaceWith().depth();
 		    }
 		} 
-		if (gt.sequent() != Sequent.EMPTY_SEQUENT) {
+		if (!gt.sequent().isEmpty()) {
 		    result += 10;
 		}
 	    }
@@ -524,7 +524,7 @@ class TacletMenu extends JMenu {
 	 * rough approximation of the program complexity
 	 */
 	public int programComplexity(JavaBlock b) {
-	    if (b == JavaBlock.EMPTY_JAVABLOCK) {
+	    if (b.isEmpty()) {
 		return 0;
 	    }
 	    return new de.uka.ilkd.key.java.visitor.JavaASTWalker(b.program()) { 
@@ -595,11 +595,11 @@ class TacletMenu extends JMenu {
 		return 1;
 	    }
 	
-	    if (taclet1.ifSequent() == Sequent.EMPTY_SEQUENT && 
-		taclet2.ifSequent() != Sequent.EMPTY_SEQUENT) {
+	    if (taclet1.ifSequent().isEmpty() && 
+		!taclet2.ifSequent().isEmpty()) {
 		return 1;
-	    } else if (taclet1.ifSequent() == Sequent.EMPTY_SEQUENT && 
-		       taclet2.ifSequent() != Sequent.EMPTY_SEQUENT) {
+	    } else if (!taclet1.ifSequent().isEmpty() && 
+		       taclet2.ifSequent().isEmpty()) {
 		return -1;
 	    }
 		    

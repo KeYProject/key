@@ -426,7 +426,7 @@ public class KeYMediator {
 	if (applics.size() == 1) {
 	    TacletApp firstApp = it.next();
             boolean ifSeqInteraction = 
-               firstApp.taclet().ifSequent() != Sequent.EMPTY_SEQUENT ;
+               !firstApp.taclet().ifSequent().isEmpty() ;
             if (stupidMode && !firstApp.complete()) {                
                 ListOfTacletApp ifSeqCandidates =
                     firstApp.findIfFormulaInstantiations(goal.sequent(),
@@ -568,6 +568,8 @@ public class KeYMediator {
                 if (reusePoint.source() != changeWish) {
                     currGoal.node().setReuseSource(reusePoint);
                     hook.removeRPConsumedGoal(currGoal);
+                    getProof().getServices().getNameRecorder().setProposals(
+                            reusePoint.getNameProposals());
                     ListOfGoal goalList = currGoal.apply(app);
                     hook.addRPOldMarkersNewGoals(goalList);
                     hook.addRPNewMarkersAllGoals(reusePoint.source());
@@ -827,7 +829,7 @@ public class KeYMediator {
      */
     public void startAutoMode() {
 	if (ensureProofLoaded()) {
-	    startAutoMode(getProof().openGoals());
+	    startAutoMode(getProof().openEnabledGoals());
 	}
     }
 

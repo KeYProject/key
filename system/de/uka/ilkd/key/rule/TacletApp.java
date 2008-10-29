@@ -740,7 +740,7 @@ public abstract class TacletApp implements RuleApp {
 	SetOfMetavariable newVars = newMetavariables ();
 	Constraint        constr = constraint ();
 
-	if ( newVars != SetAsListOfMetavariable.EMPTY_SET ) {
+	if ( !newVars.isEmpty() ) {
             // Replace temporary metavariables that were introduced
             // when matching the taclet with real MVs
             final IteratorOfMetavariable mvIt = newVars.iterator ();
@@ -1100,7 +1100,7 @@ public abstract class TacletApp implements RuleApp {
                                                    SchemaVariable depSV,
                                                    Term tempDepVar,
                                                    SetOfMetavariable mvs) {
-        if ( mvs == SetAsListOfMetavariable.EMPTY_SET ) {
+        if ( mvs.isEmpty() ) {
             // if the term contains no metavariables, we just use the
             // (nullary) constant <code>tempDepVar</code> as skolem symbol
             p_func_ns.add ( tempDepVar.op () );
@@ -1312,7 +1312,7 @@ public abstract class TacletApp implements RuleApp {
 	Debug.assertTrue ( ifInstantiations == null,
 			   "The if formulas have already been instantiated" );
 
-	if ( taclet ().ifSequent () == Sequent.EMPTY_SEQUENT )
+	if ( taclet ().ifSequent ().isEmpty() )
 	    return SLListOfTacletApp.EMPTY_LIST.prepend ( this );        
         
 	return
@@ -1352,7 +1352,7 @@ public abstract class TacletApp implements RuleApp {
 	  Services                      p_services,
 	  Constraint                    p_userConstraint ) {
 
-	while ( p_ifSeqTail == SLListOfConstrainedFormula.EMPTY_LIST ) {
+	while ( p_ifSeqTail.isEmpty() ) {
 	    if ( p_ifSeqTail2nd == null ) {
 		// All formulas have been matched, collect the results
 		TacletApp res = setAllInstantiations ( p_matchCond,
@@ -1448,7 +1448,7 @@ public abstract class TacletApp implements RuleApp {
      * using metavariables
      */
     public boolean instsSufficientlyComplete() {
-	return neededUninstantiatedVars () == SetAsListOfSchemaVariable.EMPTY_SET;
+	return neededUninstantiatedVars ().isEmpty();
     }
 
 
@@ -1458,7 +1458,7 @@ public abstract class TacletApp implements RuleApp {
      */
     public boolean ifInstsComplete() {
 	return ifInstantiations != null ||
-	    ( taclet ().ifSequent () == Sequent.EMPTY_SEQUENT );
+	    ( taclet ().ifSequent ().isEmpty() );
     }
 
 

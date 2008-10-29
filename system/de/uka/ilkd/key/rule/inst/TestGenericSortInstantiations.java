@@ -193,8 +193,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	svi = svi.add ( sva4, a4 );
 	
 	assertTrue ( "Instantiations should be equal",
-		     gsi ==
-		     GenericSortInstantiations.EMPTY_INSTANTIATIONS );
+		     gsi.isEmpty() );
     }
     */
 

@@ -213,7 +213,7 @@ public class InteractiveProver {
                 // Nothing to be saved. Exit successfully.
                 System.exit ( 0 );
             } else {
-                mediator ().popupWarning ( "No (more) goals", "Oops..." );
+                mediator ().popupWarning ( "No enabled goals available", "Oops..." );
                 return;
             }
         }

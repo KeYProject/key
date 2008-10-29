@@ -114,6 +114,7 @@ public class ProofSaver {
    //                ps.println(mediator.sort_ns());
           ps.println("\\proof {");
           ps.println(writeLog(proof));
+          ps.println("(autoModeTime \"" + proof.getAutoModeTime() + "\")\n");
           printUserConstraints(ps);
           ps.println(node2Proof(proof.root()));
           ps.println("}");
@@ -405,10 +406,15 @@ public class ProofSaver {
             }
             else
                 if (iff instanceof IfFormulaInstDirect) {
-                    throw new RuntimeException("IfFormulaInstDirect not yet supported");
+                    
+                    final String directInstantiation = printTerm(iff.getConstrainedFormula().formula(), 
+                            node.proof().getServices()).toString().replaceAll("\\\\","\\\\\\\\");
+                    
+                    s += " (ifdirectformula \"" + directInstantiation + "\")";
                 }
                 else throw new RuntimeException("Unknown If-Seq-Formula type");
         }
+      
         return s;
     }
 
