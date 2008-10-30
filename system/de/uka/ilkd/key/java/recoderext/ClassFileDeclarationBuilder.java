@@ -111,8 +111,8 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
      * create a new ClassDeclaration builder. The builder can be used to create a
      * ClassDeclaration for a single class file.
      * 
-     * @param programFactory the factory to be used to create elements
      * @param classFile class file to be investigated
+     * @param manager the manager to which this builder belongs 
      */
     public ClassFileDeclarationBuilder(ClassFileDeclarationManager manager, ClassFile classFile) {
         this.factory = manager.getProgramFactory();
@@ -258,8 +258,6 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
      * enclosing builder is stored to retrieve the type parameter
      * information, e.g.
      * 
-     * @param enclTD
-     *                the builder for enclosing class
      */
     public void attachToEnclosingDeclaration() {
         if(!isInnerClass())

@@ -439,7 +439,7 @@ public class Proof implements Named {
      * 
      * @param goals non-null list of goals
      * @return sublist such that every goal in the list is enabled
-     * @see Goal#isEnabled()
+     * @see Goal#isAutomatic()
      * @author mulbrich
      */
     private ListOfGoal filterEnabledGoals(ListOfGoal goals) {
