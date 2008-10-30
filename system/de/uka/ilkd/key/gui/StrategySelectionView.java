@@ -321,11 +321,16 @@ public class StrategySelectionView extends JPanel {
         ++yCoord;
 
         rdBut17 = new JRadioButtonHashMap("Default", StrategyProperties.STOPMODE_DEFAULT, true, false);
+	rdBut17.setToolTipText( "<html>Stop when (i) the maximum number of rule<br>" +
+                                "applications is reached or (ii) no more rules are<br>"+
+				"applicable on the proof tree.</html>");
         stopModeGroup.add(rdBut17);
         addJavaDLOption ( rdBut17, javaDLOptionsLayout, 2, yCoord, 2 );        
 
         rdBut18 = new JRadioButtonHashMap(
                 "Non-Closable Goal", StrategyProperties.STOPMODE_NONCLOSE, false, false);
+	rdBut18.setToolTipText( "<html>Stop as soon as the first not automatically<br>" +
+                                "closable goal is encountered.</html>");
         stopModeGroup.add(rdBut18);
         addJavaDLOption ( rdBut18, javaDLOptionsLayout, 4, yCoord, 2 );        
        
