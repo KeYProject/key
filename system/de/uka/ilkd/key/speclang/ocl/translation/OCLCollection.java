@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.speclang.ocl.translation;
 
-import de.uka.ilkd.key.casetool.Association;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
