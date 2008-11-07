@@ -190,7 +190,6 @@ public class Main extends JFrame implements IMain {
      * ATTENTION: to be deleted (Puse profiles to customize 
      * JML translation, TODO)
      * */ 
-
     public static boolean testMode = false;
     
     /** used to enable and initiate or to disable reuse */
