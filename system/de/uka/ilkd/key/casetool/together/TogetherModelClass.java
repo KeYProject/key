@@ -26,6 +26,10 @@ import de.uka.ilkd.key.collection.IteratorOfString;
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.collection.SLListOfString;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.speclang.ocl.translation.Association;
+import de.uka.ilkd.key.speclang.ocl.translation.AssociationEnd;
+import de.uka.ilkd.key.speclang.ocl.translation.ListOfAssociation;
+import de.uka.ilkd.key.speclang.ocl.translation.SLListOfAssociation;
 import de.uka.ilkd.key.util.Debug;
 
 /**

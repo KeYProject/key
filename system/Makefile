@@ -216,8 +216,8 @@ GENERATED_LISTS=logic/SLListOfTerm \
 	rule/export/SLListOfDisplayNameModelInfo \
 	rule/export/SLListOfCategoryModelInfo \
 	logic/SLListOfNamespace \
-	casetool/SLListOfAssociation \
-	casetool/SLListOfAssociationEnd \
+	speclang/ocl/translation/SLListOfAssociation \
+	speclang/ocl/translation/SLListOfAssociationEnd \
         speclang/ocl/translation/SLListOfOCLExpression \
 	speclang/translation/SLListOfSLExpression \
 	speclang/translation/SLListOfSLExpressionResolver \

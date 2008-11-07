@@ -3169,6 +3169,7 @@ public class Main extends JFrame implements IMain {
         private JFrame proofList;
         private HashMap<StringBuffer, String> test2model;
         private boolean autoMode = false;
+		private JList testList;
         
         public static final String AUTO_MODE_TEXT = "Create Tests";
         
@@ -3253,7 +3254,7 @@ public class Main extends JFrame implements IMain {
             JDialog tsw = new JDialog(this, "Select Test Case");
             tsw.getContentPane().setLayout(new BoxLayout(tsw.getContentPane(), 
                  BoxLayout.Y_AXIS));
-            final JList testList = new JList();
+            testList = new JList();
             testList.setListData(bubbleSortTests(createTestArray()));
             
             JScrollPane testListScroll = new
@@ -3286,6 +3287,13 @@ public class Main extends JFrame implements IMain {
             tsw.getContentPane().add(test);
             tsw.pack();
             tsw.setVisible(true);
+        }
+
+        public void updateTestSelection(){
+        	if(testList!=null){
+        		testList.setListData(bubbleSortTests(createTestArray()));
+        		testList.repaint();
+        	}        			
         }
         
         private Object[] bubbleSortTests(Object[] tams){
@@ -3654,7 +3662,7 @@ public class Main extends JFrame implements IMain {
                                         main.setStatusLine("Generating Tests");
                                         StringBuffer testPath = new StringBuffer();
                                         String modelDir = associatedProof.getJavaModel().getModelDir();
-                                        test2model.put(testPath, modelDir);
+                                        test2model.put(testPath, modelDir);                                        
                                         buttonPressed = false;
                                         if(openDialog){
                                             MethodSelectionDialog msd = MethodSelectionDialog.getInstance(mediator);
@@ -3670,6 +3678,7 @@ public class Main extends JFrame implements IMain {
                                             mediator.testCaseConfirmation(testPath.toString());
                                         }
                                         main.setStatusLine("Test Generation Completed");
+                                        updateTestSelection();
                                     }catch(Exception exc){
                                         new ExceptionDialog(testGui, exc);
                                     }
