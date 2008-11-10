@@ -33,7 +33,6 @@ import de.uka.ilkd.key.logic.op.RigidFunction;
 import de.uka.ilkd.key.logic.op.SetOfMetavariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.decproc.ConstraintSet;
-//import de.uka.ilkd.key.proof.decproc.DecisionProcedureSimplifyOp;
 import de.uka.ilkd.key.proof.decproc.NumberTranslation;
 import de.uka.ilkd.key.proof.decproc.SimplifyException;
 import de.uka.ilkd.key.proof.decproc.SimplifyTranslation;
