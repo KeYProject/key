@@ -1604,7 +1604,7 @@ primarysuffix[JMLExpression receiver, String fullyQualifiedName] returns [JMLExp
 	    }
 	}
     |
-	lbrack:"[" t=expression "]"
+	lbrack:LBRACKET t=expression RBRACKET
 	{
 	    if (receiver == null) {
 		raiseError("Array \"" + fullyQualifiedName + "\" not found.", lbrack);
@@ -1630,8 +1630,8 @@ new_expr throws SLTranslationException
     KeYJavaType typ = null;
 }
 :
-	"new" typ=type new_suffix
-	
+	NEW typ=type new_suffix
+        {	raiseNotSupported("'new' not supported in JML specifications."); }
     ;
 
 new_suffix throws SLTranslationException
@@ -1639,7 +1639,7 @@ new_suffix throws SLTranslationException
     ListOfTerm terms;
 }
 :
-	"(" ( terms=expressionlist )? ")" 
+	LPAREN ( terms=expressionlist )? RPAREN 
     ;
 
 expressionlist returns [ListOfTerm result=SLListOfTerm.EMPTY_LIST] throws SLTranslationException
