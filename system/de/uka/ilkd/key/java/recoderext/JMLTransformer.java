@@ -248,7 +248,7 @@ public class JMLTransformer extends RecoderModelTransformer {
             = originalComments[0].getParent().getASTParent();
         int childIndex
             = astParent.getIndexOfChild(originalComments[0].getParent());
-
+        
         //parse declaration, attach to AST
         Declaration ghostDecl;
         try {
@@ -268,7 +268,12 @@ public class JMLTransformer extends RecoderModelTransformer {
                 
                 attach((FieldDeclaration)ghostDecl, 
                        (TypeDeclaration) astParent, 
-                       childIndex);
+                       0);   //No matter what the javadoc for attach() may say, 
+                             //this value is *not* used as a child index but as 
+                             //an index into astParent.getMembers(), which only 
+                             //contains some of the children, not all. 0 is 
+                             //topmost position, which should be a safe choice
+                             //in any case.
             } else {
                 assert astParent instanceof StatementBlock;
                 List<Statement> declStatement = services.getProgramFactory()
@@ -279,7 +284,9 @@ public class JMLTransformer extends RecoderModelTransformer {
                 updatePositionInformation(ghostDecl, declWithMods.pos);
                 attach((LocalVariableDeclaration)ghostDecl, 
                        (StatementBlock) astParent, 
-                       childIndex);
+                       childIndex); //Unlike above, here the value is really a 
+                                    //child index, and here the position really
+                                    //matters. 
             }
         } catch(Throwable e) {
             throw new SLTranslationException(e.getMessage()
