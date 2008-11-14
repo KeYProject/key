@@ -5,10 +5,9 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.SetAsListOfMetavariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.decproc.ConstraintSet;
-import de.uka.ilkd.key.proof.decproc.SimplifyException;
 import de.uka.ilkd.key.rule.RuleApp;
 
-public class YicesSmtRule extends AbstractSmtRule {
+public class YicesSmtSolver extends AbstractSmtProver {
         
         /**
          * This rule's name.
@@ -28,7 +27,7 @@ public class YicesSmtRule extends AbstractSmtRule {
          * Set the abstract translator, that should be used to
          * @return the translator, that should be used.
          */
-        public AbstractSmtTranslator getTranslator(Goal goal, Services services, RuleApp ruleApp) throws SimplifyException {
+        public AbstractSmtTranslator getTranslator(Goal goal, Services services, RuleApp ruleApp) {
                 return new SmtLibTranslator(goal.sequent(), new ConstraintSet(goal, null), SetAsListOfMetavariable.EMPTY_SET, services);
         }
         
