@@ -14,6 +14,10 @@ import de.uka.ilkd.key.rule.RuleApp;
 
 public abstract class AbstractSmtProver {
         
+        public static final int VALID = 0;
+        public static final int INVALID = 1;
+        public static final int UNKNOWN = 2;
+        
         /**
          * The path for the file
          */
@@ -55,7 +59,7 @@ public abstract class AbstractSmtProver {
          * Get the abstract translator, that should be used to
          * @return the translator, that should be used.
          */
-        public abstract AbstractSmtTranslator getTranslator(Goal goal, Services services, RuleApp ruleApp);
+        protected abstract AbstractSmtTranslator getTranslator(Goal goal, Services services, RuleApp ruleApp);
         
         /**
          * Get the command for executing an external proofer.
@@ -63,7 +67,7 @@ public abstract class AbstractSmtProver {
          * @param formula the formula, that was created by the translator
          * @return Array of Strings, that can be used for executing an external decider.
          */
-        public abstract String[] getExecutionCommand(String filename, StringBuffer formula);
+        protected abstract String[] getExecutionCommand(String filename, StringBuffer formula);
         
         private static String toStringLeadingZeros ( int n, int width ) {
                 String rv = "" + n;
@@ -100,7 +104,7 @@ public abstract class AbstractSmtProver {
          * @param text the text to be stored.
          * @return the path, where the file was stored to.
          */
-        public final String storeToFile(StringBuffer text) throws IOException {
+        private final String storeToFile(StringBuffer text) throws IOException {
                 String loc = fileDir + getCurrentDateString();
                 new File( fileDir ).mkdirs();
                 BufferedWriter out = new BufferedWriter(new FileWriter(loc));
@@ -110,10 +114,6 @@ public abstract class AbstractSmtProver {
                 return loc;
         }
         
-        public static final int VALID = 0;
-        public static final int INVALID = 1;
-        public static final int UNKNOWN = 2;
-        
         /**
          * 
          * @param answer the String answered by the external programm
@@ -121,7 +121,7 @@ public abstract class AbstractSmtProver {
          *      INVALID, if the formula was proven invalid,
          *      UNKNOWN, if the formula could not be proved
          */
-        public abstract int answerType(String answer);
+        protected abstract int answerType(String answer);
         
         /** Read the input until end of file and return contents in a
          * single string containing all line breaks. */
@@ -140,7 +140,7 @@ public abstract class AbstractSmtProver {
         /**
          * called by the System. Here the actual decision is made.
          */
-        public final int solve(Goal goal, Services services, RuleApp ruleApp) {
+        public final int isValid(Goal goal, Services services, RuleApp ruleApp) {
                 int toReturn = UNKNOWN;
                 //toReturn.append(goal);
                 

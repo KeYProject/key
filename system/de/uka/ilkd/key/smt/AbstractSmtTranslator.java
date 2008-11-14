@@ -1,44 +1,16 @@
 package de.uka.ilkd.key.smt;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.collection.SLListOfString;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.ArrayOp;
-import de.uka.ilkd.key.logic.op.AttributeOp;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.IteratorOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Metavariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.RigidFunction;
-import de.uka.ilkd.key.logic.op.SetOfMetavariable;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.decproc.ConstraintSet;
-//import de.uka.ilkd.key.proof.decproc.DecisionProcedureSimplifyOp;
 import de.uka.ilkd.key.proof.decproc.NumberTranslation;
-import de.uka.ilkd.key.proof.decproc.SimplifyException;
-import de.uka.ilkd.key.proof.decproc.SimplifyTranslation;
-import de.uka.ilkd.key.proof.decproc.UninterpretedTermWrapper;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.java.Services;
@@ -46,6 +18,7 @@ import de.uka.ilkd.key.java.Services;
 import org.apache.log4j.Logger;
 
 public abstract class AbstractSmtTranslator {
+        static Logger logger = Logger.getLogger(AbstractSmtTranslator.class.getName());
         private HashMap cacheForUninterpretedSymbols = null;
         private ListOfString sortAxioms = SLListOfString.EMPTY_LIST;
         private boolean quantifiersOccur=false;   
@@ -112,8 +85,7 @@ public abstract class AbstractSmtTranslator {
         public AbstractSmtTranslator(Sequent sequent, ConstraintSet cs,
                                    SetOfMetavariable localmv, 
                                    Services services,
-                                   boolean lightWeight) 
-            throws SimplifyException {
+                                   boolean lightWeight) {
 //                super(sequent, cs, localmv, services);   
                 localMetavariables = localmv;
                 constraintSet = cs;
@@ -124,7 +96,7 @@ public abstract class AbstractSmtTranslator {
                 jcharSort = services.getTypeConverter().getCharLDT().targetSort();
                 integerSort = services.getTypeConverter().getIntegerLDT().targetSort();
                 cacheForUninterpretedSymbols = new HashMap();
-                StringBuffer hb = translate(sequent, lightWeight, services);
+//                StringBuffer hb = translate(sequent, lightWeight, services);
 //                text = predicate.toString() + produceClosure(hb);
 //                text = predicate.toString();
 //                logger.info("SimplifyTranslation:\n" + text);
@@ -135,21 +107,20 @@ public abstract class AbstractSmtTranslator {
 
         public AbstractSmtTranslator(Sequent sequent, ConstraintSet cs,
                                    SetOfMetavariable localmv, 
-                                   Services services) 
-                throws SimplifyException {
+                                   Services services) {
                 this(sequent, cs, localmv, services, false);
         }
 
         /**
          * For translating only terms and not complete sequents.
          */
-        public AbstractSmtTranslator(Services s) throws SimplifyException{
+        public AbstractSmtTranslator(Services s) {
                 this(null, null, null, s, false);
         }
 
 
         protected final StringBuffer translate(Sequent sequent, Services services)
-                throws SimplifyException {
+                throws IllegalFormulaException {
                 return translate(sequent, false, services);
         }
 
@@ -164,7 +135,7 @@ public abstract class AbstractSmtTranslator {
         protected final StringBuffer translate(Sequent sequent, 
                                                boolean lightWeight,
                                                Services services)
-                        throws SimplifyException {
+                        throws IllegalFormulaException {
             //          computeModuloConstraints(sequent); 
                 
                 //translate
@@ -217,7 +188,7 @@ public abstract class AbstractSmtTranslator {
                 //collect the quantify vars
                 ArrayList<StringBuffer> qVar = new ArrayList<StringBuffer>();
                 for (int i = 0; i < sorts.size()-1; i++){
-                        qVar.add(this.translateLocicalVar(new StringBuffer("tvar")));
+                        qVar.add(this.translateLogicalVar(new StringBuffer("tvar")));
                 }
                 
                 //left hand side of the type implication
@@ -328,7 +299,7 @@ public abstract class AbstractSmtTranslator {
          * @param types List of the used types.
          * @return The Stringbuffer that can be read by the decider
          */
-        public abstract StringBuffer buildCompleteText(StringBuffer formula
+        protected abstract StringBuffer buildCompleteText(StringBuffer formula
                         , ArrayList<ArrayList<StringBuffer>> functions
                         , ArrayList<ArrayList<StringBuffer>> predicates
                         , ArrayList<StringBuffer> types);
@@ -336,7 +307,7 @@ public abstract class AbstractSmtTranslator {
         protected final StringBuffer translate(Semisequent ss, 
                                                int skolemization,
                                                Services services)
-                throws SimplifyException {
+                throws IllegalFormulaException {
                 return translate(ss, skolemization, false, services);
         }
 
@@ -351,7 +322,7 @@ public abstract class AbstractSmtTranslator {
                                                int skolemization,
                                                boolean lightWeight,
                                                Services services)
-                        throws SimplifyException {
+                        throws IllegalFormulaException {
                 StringBuffer hb = new StringBuffer();
                 
                 //the semisequence is empty. so return the corresponding formular
@@ -404,7 +375,7 @@ public abstract class AbstractSmtTranslator {
          */
         protected final StringBuffer translate(ConstrainedFormula cf, 
                                                boolean lightWeight, Services services)
-                throws SimplifyException { 
+                throws IllegalFormulaException { 
                 StringBuffer hb = new StringBuffer();
                 Term t;
                 //if the cnstraintSet contains cf, make a syntactical replacement
@@ -434,21 +405,21 @@ public abstract class AbstractSmtTranslator {
          * structure is created.
          * @return true, if multi sorted logic is supported.
          */
-        public abstract boolean isMultiSorted();
+        protected abstract boolean isMultiSorted();
         
         /**
          * The String used for integer values.
          * This sort is also used in single sorted logics.
          * @return The String used for integers.
          */
-        public abstract StringBuffer getIntegerSort();
+        protected abstract StringBuffer getIntegerSort();
         
         /**
          * Build the Stringbuffer for a logical NOT.
          * @param arg The Formula to be negated.
          * @return The StringBuffer representing the resulting Formular
          */
-        public abstract StringBuffer translateLogicalNot(StringBuffer arg);
+        protected abstract StringBuffer translateLogicalNot(StringBuffer arg);
         
         /**
          * Build the logical konjunction.
@@ -456,7 +427,7 @@ public abstract class AbstractSmtTranslator {
          * @param arg2 The second formula.
          * @return The StringBuffer representing the resulting formular.
          */
-        public abstract StringBuffer translateLogicalAnd(StringBuffer arg1, StringBuffer arg2);
+        protected abstract StringBuffer translateLogicalAnd(StringBuffer arg1, StringBuffer arg2);
         
         /**
          * Build the logical disjunction.
@@ -464,7 +435,7 @@ public abstract class AbstractSmtTranslator {
          * @param arg2 The second formula.
          * @return The StringBuffer representing the resulting formular.
          */
-        public abstract StringBuffer translateLogicalOr(StringBuffer arg1, StringBuffer arg2);
+        protected abstract StringBuffer translateLogicalOr(StringBuffer arg1, StringBuffer arg2);
 
         /**
          * Build the logical implication.
@@ -472,7 +443,7 @@ public abstract class AbstractSmtTranslator {
          * @param arg2 The second formula.
          * @return The StringBuffer representing the resulting formular
          */
-        public abstract StringBuffer translateLogicalImply(StringBuffer arg1, StringBuffer arg2);
+        protected abstract StringBuffer translateLogicalImply(StringBuffer arg1, StringBuffer arg2);
 
         /**
          * Build the logical equivalence.
@@ -480,7 +451,7 @@ public abstract class AbstractSmtTranslator {
          * @param arg2 The second formula.
          * @return The StringBuffer representing the resulting formular
          */
-        public abstract StringBuffer translateLogicalEquivalence(StringBuffer arg1, StringBuffer arg2);
+        protected abstract StringBuffer translateLogicalEquivalence(StringBuffer arg1, StringBuffer arg2);
 
         /**
          * Build the logical forall formula.
@@ -489,7 +460,7 @@ public abstract class AbstractSmtTranslator {
          * @param form The formula containing the bounded variable.
          * @return The resulting formula.
          */
-        public abstract StringBuffer translateLogicalAll(StringBuffer var, StringBuffer type, StringBuffer form);
+        protected abstract StringBuffer translateLogicalAll(StringBuffer var, StringBuffer type, StringBuffer form);
 
         /**
          * Build the logical exists formula.
@@ -498,19 +469,19 @@ public abstract class AbstractSmtTranslator {
          * @param form The formula containing the bounded variable.
          * @return The resulting formula.
          */
-        public abstract StringBuffer translateLogicalExist(StringBuffer var, StringBuffer type, StringBuffer form);
+        protected abstract StringBuffer translateLogicalExist(StringBuffer var, StringBuffer type, StringBuffer form);
 
         /**
          * Translate the logical true.
          * @return The StringBuffer the logical true value.
          */
-        public abstract StringBuffer translateLogicalTrue();
+        protected abstract StringBuffer translateLogicalTrue();
 
         /**
          * Translate the logical false.
          * @return The StringBuffer the logical false value.
          */
-        public abstract StringBuffer translateLogicalFalse();
+        protected abstract StringBuffer translateLogicalFalse();
         
         /**
          * Build the Stringbuffer for an object equivalence.
@@ -518,19 +489,19 @@ public abstract class AbstractSmtTranslator {
          * @param arg2 The second formula of the equivalence.
          * @return The StringBuffer representing teh resulting Formular
          */
-        public abstract StringBuffer translateObjectEqual(StringBuffer arg1, StringBuffer arg2);
+        protected abstract StringBuffer translateObjectEqual(StringBuffer arg1, StringBuffer arg2);
 
         /**
          * Build the Stringbuffer for an variable.
          * @return The StringBuffer representing the resulting Formular
          */
-        public abstract StringBuffer translateLocicalVar(StringBuffer name);
+        protected abstract StringBuffer translateLogicalVar(StringBuffer name);
 
         /**
          * Build the Stringbuffer for an constant.
          * @return The StringBuffer representing the resulting Formular
          */
-        public abstract StringBuffer translateLocicalConstant(StringBuffer name);
+        protected abstract StringBuffer translateLogicalConstant(StringBuffer name);
         
         /**
          * Translate a predicate.
@@ -538,14 +509,14 @@ public abstract class AbstractSmtTranslator {
          * @param args The arguments of the predicate.
          * @return the formula representing the predicate.
          */
-        public abstract StringBuffer translatePredicate(StringBuffer name, ArrayList<StringBuffer> args);
+        protected abstract StringBuffer translatePredicate(StringBuffer name, ArrayList<StringBuffer> args);
         
         /**
          * Get the name for a predicate symbol.
          * @param name The name that can be used to create the symbol.
          * @return The unique predicate symbol.
          */
-        public abstract StringBuffer translatePredicateName(StringBuffer name);
+        protected abstract StringBuffer translatePredicateName(StringBuffer name);
         
         /**
          * Translate a function.
@@ -553,14 +524,14 @@ public abstract class AbstractSmtTranslator {
          * @param args The arguments of the function.
          * @return the formula representing the function.
          */
-        public abstract StringBuffer translateFunction(StringBuffer name, ArrayList<StringBuffer> args);
+        protected abstract StringBuffer translateFunction(StringBuffer name, ArrayList<StringBuffer> args);
         
         /**
          * Get the name for a function symbol.
          * @param name The name that can be used to create the symbol.
          * @return The unique function symbol.
          */
-        public abstract StringBuffer translateFunctionName(StringBuffer name);
+        protected abstract StringBuffer translateFunctionName(StringBuffer name);
         
         /**
          * Translate the integer plus.
@@ -568,7 +539,7 @@ public abstract class AbstractSmtTranslator {
          * @param arg2 second val of the sum.
          * @return The formula representing the integer plus.
          */
-        public abstract StringBuffer translateIntegerPlus(StringBuffer arg1, StringBuffer arg2);
+        protected abstract StringBuffer translateIntegerPlus(StringBuffer arg1, StringBuffer arg2);
         
         /**
          * Translate the integer minus.
@@ -576,14 +547,14 @@ public abstract class AbstractSmtTranslator {
          * @param arg2 second val of the substraction.
          * @return The formula representing the integer substraction.
          */
-        public abstract StringBuffer translateIntegerMinus(StringBuffer arg1, StringBuffer arg2);
+        protected abstract StringBuffer translateIntegerMinus(StringBuffer arg1, StringBuffer arg2);
         
         /**
          * Translate a unary minus.
          * @param arg the argument of the unary minus.
          * @return the formula representing tha unary minus function.
          */
-        public abstract StringBuffer translateIntegerUnaryMinus(StringBuffer arg);
+        protected abstract StringBuffer translateIntegerUnaryMinus(StringBuffer arg);
         
         /**
          * Translate the integer multiplication.
@@ -591,7 +562,7 @@ public abstract class AbstractSmtTranslator {
          * @param arg2 second val of the multiplication.
          * @return The formula representing the integer multiplication.
          */
-        public abstract StringBuffer translateIntegerMult(StringBuffer arg1, StringBuffer arg2);
+        protected abstract StringBuffer translateIntegerMult(StringBuffer arg1, StringBuffer arg2);
         
         /**
          * Translate the integer division.
@@ -599,7 +570,7 @@ public abstract class AbstractSmtTranslator {
          * @param arg2 second val of the division.
          * @return The formula representing the integer division.
          */
-        public abstract StringBuffer translateIntegerDiv(StringBuffer arg1, StringBuffer arg2);
+        protected abstract StringBuffer translateIntegerDiv(StringBuffer arg1, StringBuffer arg2);
         
         /**
          * Translate the integer modulo.
@@ -607,7 +578,7 @@ public abstract class AbstractSmtTranslator {
          * @param arg2 second val of the modulo.
          * @return The formula representing the integer modulo.
          */
-        public abstract StringBuffer translateIntegerMod(StringBuffer arg1, StringBuffer arg2);
+        protected abstract StringBuffer translateIntegerMod(StringBuffer arg1, StringBuffer arg2);
         
         /**
          * Translate the greater than.
@@ -615,7 +586,7 @@ public abstract class AbstractSmtTranslator {
          * @param arg2 second val of the greater than.
          * @return The formula representing the greater than.
          */
-        public abstract StringBuffer translateIntegerGt(StringBuffer arg1, StringBuffer arg2);
+        protected abstract StringBuffer translateIntegerGt(StringBuffer arg1, StringBuffer arg2);
         
         /**
          * Translate the less than.
@@ -623,7 +594,7 @@ public abstract class AbstractSmtTranslator {
          * @param arg2 second val of the less than.
          * @return The formula representing the less than.
          */
-        public abstract StringBuffer translateIntegerLt(StringBuffer arg1, StringBuffer arg2);
+        protected abstract StringBuffer translateIntegerLt(StringBuffer arg1, StringBuffer arg2);
         
         /**
          * Translate the greater or equal.
@@ -631,7 +602,7 @@ public abstract class AbstractSmtTranslator {
          * @param arg2 second val of the greater or equal.
          * @return The formula representing the greater or equal.
          */
-        public abstract StringBuffer translateIntegerGeq(StringBuffer arg1, StringBuffer arg2);
+        protected abstract StringBuffer translateIntegerGeq(StringBuffer arg1, StringBuffer arg2);
         
         /**
          * Translate the less or equal.
@@ -639,7 +610,7 @@ public abstract class AbstractSmtTranslator {
          * @param arg2 second val of the less or equal.
          * @return The formula representing the less or equal.
          */
-        public abstract StringBuffer translateIntegerLeq(StringBuffer arg1, StringBuffer arg2);
+        protected abstract StringBuffer translateIntegerLeq(StringBuffer arg1, StringBuffer arg2);
         
         /**
          * Translate a sort.
@@ -650,7 +621,7 @@ public abstract class AbstractSmtTranslator {
          * @return The String used for this sort. If Multisorted in Declarations, 
          *      esle for the typepredicates.
          */
-        public abstract StringBuffer translateSort(String name, boolean isIntVal);
+        protected abstract StringBuffer translateSort(String name, boolean isIntVal);
         
         
         /**
@@ -659,10 +630,10 @@ public abstract class AbstractSmtTranslator {
          * 
          * @return the sorts name
          */
-        public abstract StringBuffer translateIntegerValue(long val);
+        protected abstract StringBuffer translateIntegerValue(long val);
         
         /**
-         * Translates the given term into "Simplify" input syntax and adds the
+         * Translates the given term into input syntax and adds the
          * resulting string to the StringBuffer sb.
          * 
          * @param term
@@ -672,7 +643,7 @@ public abstract class AbstractSmtTranslator {
          *           super-terms. It is only used for the translation of modulo
          *           terms, but must be looped through until we get there.
          */
-        public final StringBuffer translate(Term term, Vector quantifiedVars, Services services) throws SimplifyException {
+        private final StringBuffer translate(Term term, Vector quantifiedVars, Services services) throws IllegalFormulaException {
                 Operator op = term.op();
                 if (op == Op.NOT) {
                         StringBuffer arg = translate(term.sub(0), quantifiedVars, services);
@@ -743,6 +714,7 @@ public abstract class AbstractSmtTranslator {
                         return this.translateLogicalFalse();
                 } else if(op == Op.NULL) {
                         //TODO translate NULL
+                        this.translateUnknown(term);
                         return new StringBuffer("null translation to be implemented");
                 } else if (op instanceof LogicVariable || op instanceof ProgramVariable) {
                         if (quantifiedVars.contains(op)) {
@@ -860,9 +832,20 @@ public abstract class AbstractSmtTranslator {
                         this.addFunction(operation, sorts, operation.sort());
                         
                         return translateFunc(operation, subterms);
-                }
-                //TODO AtributeAcessOp missing
-                else {
+                } else if (op instanceof AttributeOp) {
+                        AttributeOp atop = (AttributeOp)op;
+                        ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
+                        for (int i = 0; i < atop.arity(); i++) {
+                                subterms.add(translate(term.sub(i), quantifiedVars, services));
+                        }
+                        ArrayList<Sort> sorts = new ArrayList<Sort>();
+                        for (int i = 0; i < op.arity(); i++) {
+                                sorts.add(term.sub(i).sort());
+                        }
+                        this.addFunction(atop, sorts, atop.sort());
+                        
+                        return translateFunc(atop, subterms);
+                } else {
                         return translateUnknown(term);
                 }
         }
@@ -904,20 +887,19 @@ public abstract class AbstractSmtTranslator {
         
         
       
-      /**
-      * Takes care of sequent tree parts that were not matched in translate(term,
-      * skolemization). In this class it just produces a warning, nothing more.
-      * It is provided as a hook for subclasses.
-      * 
-      * @param term
-      *           The Term given to translate
-      * @throws SimplifyException
-      */
-     protected StringBuffer translateUnknown(Term term) throws SimplifyException {
-             //return (opNotKnownWarning(term));
-             //TODO Debug message
-             return new StringBuffer("unknown_Op");
-     }
+        /**
+         * Takes care of sequent tree parts that were not matched in translate(term,
+         * skolemization). In this class it just produces a warning, nothing more.
+         * It is provided as a hook for subclasses.
+         * 
+         * @param term The Term given to translate
+         * @throws IllegalFormulaException
+         */
+        protected final StringBuffer translateUnknown(Term term) throws IllegalFormulaException {
+                //return (opNotKnownWarning(term));
+                throw new IllegalFormulaException("Formular contains unsupported arguments"); 
+                //return new StringBuffer("unknown_Op");
+        }
         
 //        protected StringBuffer opNotKnownWarning(Term term)
 //                        throws SimplifyException {
@@ -964,7 +946,7 @@ public abstract class AbstractSmtTranslator {
                 if (usedVariableNames.containsKey(op)) {
                         return usedVariableNames.get(op);
                 } else {
-                        StringBuffer var = this.translateLocicalVar(new StringBuffer(op.name().toString()));
+                        StringBuffer var = this.translateLogicalVar(new StringBuffer(op.name().toString()));
                         usedVariableNames.put(op, var);
                         return var;
                 }
@@ -1070,7 +1052,7 @@ public abstract class AbstractSmtTranslator {
          * @param op
          *           The variable to get a new name.
          */
-        protected final StringBuffer getUniqueVariableName(Named op) {
+        private final StringBuffer getUniqueVariableName(Named op) {
             String name = op.name().toString();
             if(name.indexOf("undef(") != -1){
                 name = "_undef";
@@ -1087,50 +1069,47 @@ public abstract class AbstractSmtTranslator {
         }
         
     
-    /**
-     * For some terms (AttributeOps) the order in KeY is different than the
-     * order of the user or Simplify expects.
-     * 
-     * @return the simplified version of the Term t in reversed order
-     * @param t
-     *           the Term which should be written in Simplify syntax, but in
-     *           reverse order compared to the internal order in KeY
-     */
-    protected final StringBuffer printlastfirst(Term t) {
-        StringBuffer sbuff = new StringBuffer();
-        if (t.op().arity() > 0) {
-            Debug.assertTrue(t.op().arity() == 1);
-            sbuff.append(printlastfirst(t.sub(0)));
-            //sbuff.append('.');
-        }
-        sbuff.append(t.op().name()).append("\\|").append(
+        /**
+         * For some terms (AttributeOps) the order in KeY is different than the
+         * order of the user or Simplify expects.
+         * 
+         * @return the simplified version of the Term t in reversed order
+         * @param t
+         *           the Term which should be written in Simplify syntax, but in
+         *           reverse order compared to the internal order in KeY
+         */
+        private final StringBuffer printlastfirst(Term t) {
+                StringBuffer sbuff = new StringBuffer();
+                if (t.op().arity() > 0) {
+                        Debug.assertTrue(t.op().arity() == 1);
+                        sbuff.append(printlastfirst(t.sub(0)));
+                        //sbuff.append('.');
+                }
+                sbuff.append(t.op().name()).append("\\|").append(
                                                          getUniqueHashCode(t.op()));
-        return sbuff;
-    }
+                return sbuff;
+        }
     
     
-    static Logger logger = Logger.getLogger(SimplifyTranslation.class.getName());
+        /** 
+         * Used just to be called from DecProcTranslation
+         * @see de.uka.ilkd.key.proof.decproc.DecProcTranslation#translate(Semisequent, int)
+         */
+        protected final StringBuffer translate(Term term, int skolemization, Vector quantifiedVars, Services services)
+                throws IllegalFormulaException {
+                return translate(term, quantifiedVars, services);
+        }
     
-    
-    /** 
-     * Used just to be called from DecProcTranslation
-     * @see de.uka.ilkd.key.proof.decproc.DecProcTranslation#translate(Semisequent, int)
-     */
-    protected final StringBuffer translate(Term term, int skolemization, Vector quantifiedVars, Services services)
-            throws SimplifyException {
-        return translate(term, quantifiedVars, services);
-    }
-    
-    private boolean isSomeIntegerSort(Sort s) {
-        if (s == jbyteSort ||
-                s == jshortSort ||
-                s == jintSort ||
-                s == jlongSort ||
-                s == jcharSort ||
-                s == integerSort)
-            return true;
-        return false;
-    }
+        private boolean isSomeIntegerSort(Sort s) {
+                if (s == jbyteSort ||
+                                s == jshortSort ||
+                                s == jintSort ||
+                                s == jlongSort ||
+                                s == jcharSort ||
+                                s == integerSort)
+                        return true;
+                return false;
+        }
     
         /**
          * Returns a unique HashCode for the object qv.
@@ -1142,7 +1121,7 @@ public abstract class AbstractSmtTranslator {
          * @param qv the Object the hashcode should be returned.
          * @returns a unique hashcode for the variable gv.
          */
-        public int getUniqueHashCode(Object qv) {
+        private int getUniqueHashCode(Object qv) {
                 Integer number = (Integer) this.variableMap.get(qv);
                 if (number == null) {
                         number = new Integer(this.variableMap.size());
@@ -1160,10 +1139,10 @@ public abstract class AbstractSmtTranslator {
          * every new Object in O(n) (n number of Objects 
          * with the same .hashCode()) to all others.
          * It compares with .equalsModRenaming().
-         * @returns a unique hashcode for the term gv.
-         * @param term the Term the hashcode should be returned.
+         * returns a unique hashcode for the term gv.
+         * param term the Term the hashcode should be returned.
          */
-        public int getUniqueHashCodeForUninterpretedTerm(Term term) {
+/*        public int getUniqueHashCodeForUninterpretedTerm(Term term) {
                 Integer number = (Integer) this.variableMap
                                 .get(new UninterpretedTermWrapper(term));
                 if (number == null) {
@@ -1172,8 +1151,8 @@ public abstract class AbstractSmtTranslator {
                 }
                 return number.intValue();
         }
-        
-        public String getSortName(Sort s) {
+*/        
+        private String getSortName(Sort s) {
                 if (s.name().toString().indexOf("[") == s.name().toString().length()-2 &&
                                 s.name().toString().indexOf("]") == s.name().toString().length()-1 ) {
                         //an Array is used

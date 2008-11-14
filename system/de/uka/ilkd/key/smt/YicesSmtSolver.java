@@ -27,7 +27,7 @@ public class YicesSmtSolver extends AbstractSmtProver {
          * Set the abstract translator, that should be used to
          * @return the translator, that should be used.
          */
-        public AbstractSmtTranslator getTranslator(Goal goal, Services services, RuleApp ruleApp) {
+        protected AbstractSmtTranslator getTranslator(Goal goal, Services services, RuleApp ruleApp) {
                 return new SmtLibTranslator(goal.sequent(), new ConstraintSet(goal, null), SetAsListOfMetavariable.EMPTY_SET, services);
         }
         
@@ -37,7 +37,7 @@ public class YicesSmtSolver extends AbstractSmtProver {
          * @param formula the formula, that was created by the translator.
          * @return Array of Strings, that can be used for executing an external decider.
          */
-        public String[] getExecutionCommand(String filename, StringBuffer formula) {
+        protected String[] getExecutionCommand(String filename, StringBuffer formula) {
                 String[] toReturn = new String[4];
                 
                 toReturn[0] = "yices";
@@ -53,10 +53,10 @@ public class YicesSmtSolver extends AbstractSmtProver {
          * 
          * @param answer the String answered by the external programm
          * @return VALID, if the formula was proven valid, 
-         *      INVALID, if the formula was proven invalid,
-         *      UNKNOWN, if the formula could not be proved
+         *     INVALID, if the formula was proven invalid,
+         *     UNKNOWN, if the formula could not be proved
          */
-        public int answerType(String answer) {
+        protected int answerType(String answer) {
                 if (answer.equals("unsat\n")) {
                         return VALID;
                 } else if (answer.equals("sat\n")) {

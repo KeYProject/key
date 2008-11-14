@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.op.SetAsListOfMetavariable;
 import de.uka.ilkd.key.logic.op.SetOfMetavariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ListOfGoal;
+import de.uka.ilkd.key.proof.SLListOfGoal;
 import de.uka.ilkd.key.proof.decproc.AbstractDecisionProcedure;
 import de.uka.ilkd.key.proof.decproc.ConstraintSet;
 import de.uka.ilkd.key.proof.decproc.DecisionProcedureYices;
@@ -29,28 +30,35 @@ import de.uka.ilkd.key.rule.YicesIntegerRule;
 
 public class SMTRule implements BuiltInRule {
 
+        private AbstractSmtProver prover = null;
+        public SMTRule(AbstractSmtProver arg1) {
+                this.prover = arg1;
+        }
+        
         /**
          * This rule's name.
          */
         public String displayName() {
-                return "SMTRule";
+                return prover.displayName();
         }
         
         /**
          * This rule's name as Name object.
          */
         public Name name() {
-                return new Name(this.displayName());
+                return prover.name();
         }
         
         
         public boolean isApplicable(Goal goal, PosInOccurrence pio, Constraint userConstraint) {
                 boolean hasModality = false;
                 
+                return this.prover.isApplicable(goal, pio, userConstraint);
+                
 //                IteratorOfConstrainedFormula ante = goal.sequent().antecedent().iterator();
 //                IteratorOfConstrainedFormula succ = goal.sequent().succedent().iterator();
                 
-                ModalityChecker mc = new ModalityChecker();
+                /*ModalityChecker mc = new ModalityChecker();
                 
                 for (final ConstrainedFormula currentForm : goal.sequent()) {
                         currentForm.formula().execPreOrder(mc);   
@@ -58,7 +66,7 @@ public class SMTRule implements BuiltInRule {
                                 hasModality = true;
                         }
                         mc.reset();
-                }
+                }*/
                 
                 /*
                 while (ante.hasNext()) {
@@ -87,7 +95,7 @@ public class SMTRule implements BuiltInRule {
                 */
                 //TODO remove dummy-return
                 //return !modalityFound;
-                return true;
+                //return true;
         }
         
         public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
@@ -111,14 +119,22 @@ public class SMTRule implements BuiltInRule {
                 
                 //                IteratorOfMetavariable iom = mvc.mv();
               //  SetAsListOfMetavariable setofmv = new SetAsListOfMetavariable();
-                try {
+                /*try {
                         SMTTranslator trans = new SMTTranslator(goal.sequent(), new ConstraintSet(goal, null), SetAsListOfMetavariable.EMPTY_SET, services);
                         StringBuffer s = trans.translate(goal.sequent(), services);
                         System.out.println("Final Formular: " + s);
                 } catch (SimplifyException e) {
                         System.out.println("!!!    Simplify Exception thrown");
                 }
-                return null;
+                return null;*/
+                int valid = this.prover.isValid(goal, services, ruleApp);
+                if (valid == AbstractSmtProver.VALID) {
+                        return SLListOfGoal.EMPTY_LIST;
+                } else if (valid == AbstractSmtProver.UNKNOWN) {
+                        return null;
+                } else {
+                        return null;
+                }
         }
 
 }
