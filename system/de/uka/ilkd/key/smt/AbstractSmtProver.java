@@ -1,28 +1,18 @@
 package de.uka.ilkd.key.smt;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.Calendar;
 
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ConstrainedFormula;
-import de.uka.ilkd.key.logic.Constraint;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ListOfGoal;
 import de.uka.ilkd.key.proof.SLListOfGoal;
-import de.uka.ilkd.key.proof.decproc.SimplifyException;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 
-public abstract class AbstractSmtRule implements BuiltInRule {
+public abstract class AbstractSmtProver {
         
         /**
          * The path for the file
@@ -65,7 +55,7 @@ public abstract class AbstractSmtRule implements BuiltInRule {
          * Get the abstract translator, that should be used to
          * @return the translator, that should be used.
          */
-        public abstract AbstractSmtTranslator getTranslator(Goal goal, Services services, RuleApp ruleApp) throws SimplifyException;
+        public abstract AbstractSmtTranslator getTranslator(Goal goal, Services services, RuleApp ruleApp);
         
         /**
          * Get the command for executing an external proofer.
@@ -86,7 +76,7 @@ public abstract class AbstractSmtRule implements BuiltInRule {
         /**
          * Constructs a date for use in log filenames.
          */
-        protected static String getCurrentDateString () {
+        private static String getCurrentDateString () {
             Calendar c = Calendar.getInstance();
             StringBuffer sb = new StringBuffer();
             String dateSeparator = "-";
@@ -110,7 +100,7 @@ public abstract class AbstractSmtRule implements BuiltInRule {
          * @param text the text to be stored.
          * @return the path, where the file was stored to.
          */
-        public String storeToFile(StringBuffer text) throws IOException {
+        public final String storeToFile(StringBuffer text) throws IOException {
                 String loc = fileDir + getCurrentDateString();
                 new File( fileDir ).mkdirs();
                 BufferedWriter out = new BufferedWriter(new FileWriter(loc));
@@ -135,7 +125,7 @@ public abstract class AbstractSmtRule implements BuiltInRule {
         
         /** Read the input until end of file and return contents in a
          * single string containing all line breaks. */
-        protected static String read ( InputStream in ) throws IOException {
+        private static String read ( InputStream in ) throws IOException {
             BufferedReader reader = new BufferedReader
                 (new InputStreamReader(in));
             StringBuffer sb = new StringBuffer();
@@ -150,9 +140,9 @@ public abstract class AbstractSmtRule implements BuiltInRule {
         /**
          * called by the System. Here the actual decision is made.
          */
-        public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
-                ListOfGoal toReturn = SLListOfGoal.EMPTY_LIST;
-                toReturn.append(goal);
+        public final int solve(Goal goal, Services services, RuleApp ruleApp) {
+                int toReturn = UNKNOWN;
+                //toReturn.append(goal);
                 
                 try {
                         //get the translation
@@ -160,49 +150,59 @@ public abstract class AbstractSmtRule implements BuiltInRule {
                         String loc;
 //                        SMTTranslator trans = new SMTTranslator(goal.sequent(), new ConstraintSet(goal, null), SetAsListOfMetavariable.EMPTY_SET, services);
                         
-                        int status = 0;
-                        
-                        StringBuffer s = trans.translate(goal.sequent(), services);
                         try {
+                                StringBuffer s = trans.translate(goal.sequent(), services);
                                 //store the translation to a file                                
                                 loc = this.storeToFile(s);
-                                status = 1;
                                 //get the commands for execution
                                 String[] execCommand = this.getExecutionCommand(loc, s);
                                 
-                                Process p = Runtime.getRuntime().exec(execCommand);
                                 try {
-                                        p.waitFor();
-                                } catch (InterruptedException f) {
-                                        //TODO react
-                                        System.out.println("process was interrupted");
-                                }
-                                status = 2;
                                 
-                                InputStream in = p.getInputStream();
-                                String result = read(in);
-                                in.close();                                
-                                int validity = this.answerType(result);
-                                if (validity == VALID) {
-                                        toReturn = SLListOfGoal.EMPTY_LIST;
-                                } else if (validity == INVALID) {
-                                        toReturn = SLListOfGoal.EMPTY_LIST;
-                                        toReturn.append(goal);
-                                } else {
-                                        toReturn = SLListOfGoal.EMPTY_LIST;
-                                        toReturn.append(goal);
+                                        Process p = Runtime.getRuntime().exec(execCommand);
+                                        try {
+                                                p.waitFor();
+                                        } catch (InterruptedException f) {
+                                                //TODO react
+                                                System.out.println("process was interrupted");
+                                        }
+
+                                
+                                        InputStream in = p.getInputStream();
+                                        String result = read(in);
+                                        in.close();                                
+                                        int validity = this.answerType(result);
+                                        if (validity == VALID) {
+                                                //toReturn = SLListOfGoal.EMPTY_LIST;
+                                                toReturn = VALID;
+                                        } else if (validity == INVALID) {
+                                                //toReturn = SLListOfGoal.EMPTY_LIST;
+                                                //toReturn.append(goal);
+                                                toReturn = INVALID;
+                                        } else {
+                                                //toReturn = SLListOfGoal.EMPTY_LIST;
+                                                //toReturn.append(goal);
+                                                toReturn = UNKNOWN;
+                                        }
+                                } catch (IOException e) {
+                                        //TODO react
+                                        System.out.println("Program could not be executed");
+                                } finally {
+                                        //remove the created file
+                                        File f = new File(loc);
+                                        f.delete();
                                 }
                         } catch (IOException e) {
                                 //TODO react on this
-                                if (status == 0) {
-                                        //file could not be written
-                                        System.out.println("File could not be written");
-                                } else if (status == 1) {
-                                        System.out.println("Program could not be executed");
-                                }
+                                //file could not be written
+                                System.out.println("File could not be written");
                         }
-                } catch (SimplifyException e) {
-                        System.out.println("!!!    Simplify Exception thrown");
+                } catch (IllegalFormulaException e) {
+                        //toReturn = SLListOfGoal.EMPTY_LIST;
+                        //toReturn.append(goal);
+                        toReturn = UNKNOWN;
+                        //TODO log message
+                        System.out.println("!!!    Illegal Formula Exception thrown");
                 }
                 return toReturn;
         }
