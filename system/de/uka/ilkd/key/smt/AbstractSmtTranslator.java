@@ -2,11 +2,10 @@ package de.uka.ilkd.key.smt;
 
 import java.util.*;
 
-import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
-
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.collection.SLListOfString;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.ldt.BooleanLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.decproc.ConstraintSet;
@@ -28,7 +27,7 @@ public abstract class AbstractSmtTranslator {
         private Sort jlongSort;
         private Sort jcharSort;
         private Sort integerSort;
-        private static long counter = 0;
+//        private static long counter = 0;
         protected static final int ANTECEDENT = 0;
         protected static final int SUCCEDENT = 1;
         protected static final int YESNOT = 2;
@@ -69,6 +68,8 @@ public abstract class AbstractSmtTranslator {
         //used type predicates for constant values, e.g. 1, 2, ...
         private HashMap<Term, StringBuffer> constantTypePreds = new HashMap<Term, StringBuffer>();
         
+        private StringBuffer nullString = new StringBuffer();
+        private boolean nullUsed = false;
         
         /**
          * Just a constructor which starts the conversion to Simplify syntax. The
@@ -152,21 +153,74 @@ public abstract class AbstractSmtTranslator {
 //                hb.append(temp);
 //                hb.append(')');
                  
+                
                 //append type definitions, if neccessary
-                ante = this.translateLogicalAnd(this.getTypeDefinitions(), ante);
+                if (!this.isMultiSorted()) {
+                        //add the type definitions
+                        ante = this.translateLogicalAnd(this.getTypeDefinitions(), ante);
+                        //add the type hirarchy
+                        ante = this.translateLogicalAnd(this.getSortHirarchyPredicates(), ante);
+                }
                 
                 hb = this.translateLogicalImply(ante, succ);
                 hb = this.translateLogicalNot(hb);
 
                 return buildCompleteText(hb, this.buildTranslatedFuncDecls()
-                                , this.buildTranslatedPredDecls(), this.buildTranslatedSorts());
+                                , this.buildTranslatedPredDecls(), this.buildTranslatedSorts()
+                                , this.buildSortHirarchy());
+        }
+        
+        /**
+         * build the sorthirarchy for the sorts
+         * @return a sort hirarchy for the sorts
+         */
+        private SortHirarchy buildSortHirarchy() {
+                return new SortHirarchy(this.usedDisplaySort, this.typePredicates);
+        }
+        
+        private StringBuffer getSortHirarchyPredicates() {
+                SortHirarchy sh = this.buildSortHirarchy();
+                StringBuffer toReturn = new StringBuffer(this.translateLogicalTrue());
+                
+                
+                //add the typepredicates for functions.
+                HashMap<StringBuffer, ArrayList<StringBuffer>> predMap = sh.getDirectSuperSortPredicate();
+                for (StringBuffer leftPred : predMap.keySet()) {
+                        StringBuffer form = new StringBuffer();
+                        for (StringBuffer rightPred : predMap.get(leftPred)) {
+                                StringBuffer var = this.translateLogicalVar(new StringBuffer("tvar"));
+                                ArrayList<StringBuffer> varlist = new ArrayList<StringBuffer>();
+                                varlist.add(var);
+                                StringBuffer leftForm = this.translatePredicate(leftPred, varlist);
+                                
+                                StringBuffer rightForm = this.translatePredicate(rightPred, varlist);
+                                
+                                form = this.translateLogicalImply(leftForm, rightForm);
+                                form = this.translateLogicalAll(var, this.getIntegerSort(), form);
+                        }
+                        if (form.length() > 0) {
+                                toReturn = this.translateLogicalAnd(toReturn, form);
+                        }
+                }
+                
+                //add the typepredicates for null
+                if (this.nullUsed) {
+                        for (StringBuffer s : this.typePredicates.values()) {
+                                ArrayList<StringBuffer> argList = new ArrayList<StringBuffer>();
+                                argList.add(this.nullString);
+                                StringBuffer toAdd = this.translatePredicate(s, argList);
+                                toReturn = this.translateLogicalAnd(toAdd, toReturn);
+                        }
+                }
+                
+                return toReturn;
         }
         
         private StringBuffer getTypeDefinitions() {
                 StringBuffer toReturn;
                 toReturn = this.translateLogicalTrue();
                 
-                //add the type definitions fo functions
+                //add the type definitions for functions
                 for (Operator op : functionDecls.keySet()) {
                         StringBuffer currentForm = this.getSingleFunctionDef(
                                         this.usedFunctionNames.get(op), functionDecls.get(op));
@@ -174,8 +228,10 @@ public abstract class AbstractSmtTranslator {
                 }
                 
                 //add the type definitions for constant values
-                for (StringBuffer s : this.constantTypePreds.values()) {
-                        toReturn = this.translateLogicalAnd(s, toReturn);
+                ArrayList<StringBuffer> arglist = new ArrayList<StringBuffer>();
+                arglist.add(this.nullString);
+                for (StringBuffer s : this.typePredicates.values()) {
+                        toReturn = this.translateLogicalAnd(this.translatePredicate(s, arglist), toReturn);
                 }
                 
                 
@@ -196,7 +252,7 @@ public abstract class AbstractSmtTranslator {
                         toReturn = this.getTypePredicate(sorts.get(0), qVar.get(0));
                 }
                 for (int i = 1; i < qVar.size(); i++) {
-                        StringBuffer temp = getTypePredicate(sorts.get(1), qVar.get(1));
+                        StringBuffer temp = getTypePredicate(sorts.get(i), qVar.get(i));
                         toReturn = this.translateLogicalAnd(toReturn, temp);
                 }
                 
@@ -213,7 +269,7 @@ public abstract class AbstractSmtTranslator {
                 
                 //built the forall around it
                 for (int i = qVar.size()-1; i >= 0; i--) {
-                        this.translateLogicalAll(qVar.get(i)
+                        toReturn = this.translateLogicalAll(qVar.get(i)
                                         , this.usedDisplaySort.get(sorts.get(i))
                                         , toReturn);
                 }
@@ -236,12 +292,28 @@ public abstract class AbstractSmtTranslator {
                         }
                         toReturn.add(element);
                 }
+                
+                if (this.nullUsed) {
+                        if (this.isMultiSorted()) {
+                                ArrayList<StringBuffer> a = new ArrayList<StringBuffer>();
+                                a.add(this.nullString);
+                                a.add(this.translateNullSort());
+                                toReturn.add(a);
+                        } else {
+                                ArrayList<StringBuffer> a = new ArrayList<StringBuffer>();
+                                a.add(this.nullString);
+                                a.add(this.getIntegerSort());
+                                toReturn.add(a);
+                        }
+                }
+                
+                
                 return  toReturn;
         }
         
         /**
          * Build the translated predicate declarations.
-         * Each element in the ArrayList represents (functionname | argType1 | ... | argTypen)
+         * Each element in the ArrayList represents (predicatename | argType1 | ... | argTypen)
          * @return structured List of declaration.
          */
        private ArrayList<ArrayList<StringBuffer>> buildTranslatedPredDecls() {               
@@ -265,6 +337,9 @@ public abstract class AbstractSmtTranslator {
                                 toReturn.add(element);
                         }
                 }
+                
+                
+                
                 return  toReturn;
         }
         
@@ -280,7 +355,9 @@ public abstract class AbstractSmtTranslator {
                         //make sure, no sort is added twice!!
                         boolean alreadyIn = false;
                         for (int i = 0; !alreadyIn && i < toReturn.size(); i++) {
-                                if (toReturn.get(i).equals(newSort));
+                                if (toReturn.get(i).equals(newSort)) {
+                                        alreadyIn = true;
+                                }
                         }
                         if (!alreadyIn) {
                                 toReturn.add(newSort);
@@ -302,7 +379,8 @@ public abstract class AbstractSmtTranslator {
         protected abstract StringBuffer buildCompleteText(StringBuffer formula
                         , ArrayList<ArrayList<StringBuffer>> functions
                         , ArrayList<ArrayList<StringBuffer>> predicates
-                        , ArrayList<StringBuffer> types);
+                        , ArrayList<StringBuffer> types
+                        , SortHirarchy sortHirarchy);
         
         protected final StringBuffer translate(Semisequent ss, 
                                                int skolemization,
@@ -325,7 +403,7 @@ public abstract class AbstractSmtTranslator {
                         throws IllegalFormulaException {
                 StringBuffer hb = new StringBuffer();
                 
-                //the semisequence is empty. so return the corresponding formular
+                //if the sequent is empty, return true/false as formula
                 if (semi.size() == 0) {
                         if (skolemization == ANTECEDENT) {
                                 hb.append(translateLogicalTrue());
@@ -334,6 +412,9 @@ public abstract class AbstractSmtTranslator {
                         }
                         return hb;
                 }
+                
+                //translate the first semisequence
+                hb = translate(semi.get(0), lightWeight, services);
                 
 //              add the conjunctor only if it is really needed!
 //                if (semi.size() > 1) {
@@ -344,7 +425,8 @@ public abstract class AbstractSmtTranslator {
 //                                hb.append(ORSTRING);
 //                        }
 //                }
-                for (int i = 0; i < semi.size(); ++i) {
+                //translate the other semisequences, juncted with AND or OR
+                for (int i = 1; i < semi.size(); ++i) {
                         if (skolemization == ANTECEDENT) {
                                 hb = translateLogicalAnd(hb, translate(semi.get(i), lightWeight, services));
                         } else {
@@ -613,6 +695,18 @@ public abstract class AbstractSmtTranslator {
         protected abstract StringBuffer translateIntegerLeq(StringBuffer arg1, StringBuffer arg2);
         
         /**
+         * Translate the NULL element
+         * @return the Stringbuffer used for nullelement
+         */
+        protected abstract StringBuffer translateNull();
+        
+        /**
+         * Translate the NULL element's Sort.
+         * @return the StringBuffer used for Null.
+         */
+        protected abstract StringBuffer translateNullSort();
+        
+        /**
          * Translate a sort.
          * 
          * @param name the sorts name
@@ -664,10 +758,17 @@ public abstract class AbstractSmtTranslator {
                         StringBuffer arg1 = translate(term.sub(0), quantifiedVars, services);
                         StringBuffer arg2 = translate(term.sub(1), quantifiedVars, services);
                         return this.translateLogicalEquivalence(arg1, arg2);
-                } else if (op == Op.EQUALS) {            
-                        StringBuffer arg1 = translate(term.sub(0), quantifiedVars, services);
-                        StringBuffer arg2 = translate(term.sub(1), quantifiedVars, services);
-                        return this.translateObjectEqual(arg1, arg2);
+                } else if (op == Op.EQUALS) {
+                        //TODO HACK!!!!
+                        if (term.sub(0).sort().name().toString().equals("boolean")) {
+                                StringBuffer arg1 = translate(term.sub(0), quantifiedVars, services);
+                                StringBuffer arg2 = translate(term.sub(1), quantifiedVars, services);
+                                return this.translateLogicalEquivalence(arg1, arg2);
+                        } else {
+                                StringBuffer arg1 = translate(term.sub(0), quantifiedVars, services);
+                                StringBuffer arg2 = translate(term.sub(1), quantifiedVars, services);
+                                return this.translateObjectEqual(arg1, arg2);
+                        }
                 } else if (op == Op.ALL) {
                         ArrayOfQuantifiableVariable vars = term.varsBoundHere(0);
                         Debug.assertTrue(vars.size()==1);
@@ -713,31 +814,41 @@ public abstract class AbstractSmtTranslator {
                 } else if (op == Op.FALSE) {
                         return this.translateLogicalFalse();
                 } else if(op == Op.NULL) {
-                        //TODO translate NULL
-                        this.translateUnknown(term);
-                        return new StringBuffer("null translation to be implemented");
+                        this.nullString = this.translateNull();
+                        this.nullUsed = true;
+                        return this.nullString;
                 } else if (op instanceof LogicVariable || op instanceof ProgramVariable) {
-                        if (quantifiedVars.contains(op)) {
-                                //This variable is used in the scope of a quantifier
-                                //so translate it as a variable
-                                return (translateVariable(op));
+                        //TODO: Hack!!!!
+                        if ( op instanceof ProgramVariable &&
+                                        ((ProgramVariable)op).sort().name().toString().equals("boolean")) {
+                                //translate the op as predicate
+                                this.addPredicate(op, new ArrayList<Sort>());
+                                return this.translatePred(op, new ArrayList<StringBuffer>());
                         } else {
-                                //this Variable is a free Variable.
-                                //translate it as a constant.
-                                ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
-                                for (int i = 0; i < op.arity(); i++) {
-                                        subterms.add(translate(term.sub(i), quantifiedVars, services));
+                                //translate as variable or constant
+                                if (quantifiedVars.contains(op)) {
+                                        //This variable is used in the scope of a quantifier
+                                        //so translate it as a variable
+                                        return (translateVariable(op));
+                                } else {
+                                        //this Variable is a free Variable.
+                                        //translate it as a constant.
+                                        ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
+                                        for (int i = 0; i < op.arity(); i++) {
+                                                subterms.add(translate(term.sub(i), quantifiedVars, services));
+                                        }
+                                        
+                                        addFunction(op, new ArrayList<Sort>(), term.sort());
+                                        
+                                        return translateFunc(op, subterms);
+//                                        addFunction(term, getUniqueVariableName(op));
+//                                        return getUniqueVariableName(op);
                                 }
-                                
-                                addFunction(op, new ArrayList<Sort>(), term.sort());
-                                
-                                return translateFunc(op, subterms);
-//                                addFunction(term, getUniqueVariableName(op));
-//                                return getUniqueVariableName(op);
                         }
                 } else if (op instanceof Function) {
                         Function fun = (Function)op;
-                        if (fun.sort() == Sort.FORMULA) {
+                        //TODO Hack!!!!
+                        if (fun.sort() == Sort.FORMULA || fun.sort() == services.getTypeConverter().getBooleanLDT().getFalseConst().sort()) {
                                 //This Function is a predicate, so translate it as such
                                 if (fun == services.getTypeConverter().getIntegerLDT().getLessThan() ) {        
                                         StringBuffer arg1 = translate(term.sub(0), quantifiedVars, services);
@@ -755,7 +866,12 @@ public abstract class AbstractSmtTranslator {
                                         StringBuffer arg1 = translate(term.sub(0), quantifiedVars, services);
                                         StringBuffer arg2 = translate(term.sub(1), quantifiedVars, services);
                                         return this.translateIntegerGeq(arg1, arg2);
+                                } else if (fun == services.getTypeConverter().getBooleanLDT().getTrueConst()){
+                                        return this.translateLogicalTrue();
+                                } else if (fun == services.getTypeConverter().getBooleanLDT().getFalseConst()){
+                                        return this.translateLogicalFalse();
                                 } else {
+                                        
                                         ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
                                         for (int i = 0; i < op.arity(); i++) {
                                                 subterms.add(translate(term.sub(i), quantifiedVars, services));
@@ -980,13 +1096,21 @@ public abstract class AbstractSmtTranslator {
                 if (!this.functionDecls.containsKey(op)) {
                      sorts.add(result);
                      this.functionDecls.put(op, sorts);
+//                   add all sorts
+                     for (Sort s : sorts) {
+                             this.translateSort(s);
+                     }
                 }
         }
         
         private void addPredicate(Operator op, ArrayList<Sort> sorts) {
                 if (!this.predicateDecls.containsKey(op)) {
                         this.predicateDecls.put(op, sorts);
-                   }
+                        //add all sorts
+                        for (Sort s : sorts) {
+                                this.translateSort(s);
+                        }
+                }
         }
         
         /**

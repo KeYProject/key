@@ -32,6 +32,8 @@ public class SmtLibTranslator extends AbstractSmtTranslator {
         private static StringBuffer GTSTRING = new StringBuffer(">");
         private static StringBuffer LEQSTRING = new StringBuffer("<=");
         private static StringBuffer GEQSTRING = new StringBuffer(">=");
+        private static StringBuffer NULLSTRING = new StringBuffer("null");
+        private static StringBuffer NULLSORTSTRING = new StringBuffer("NULLSORT");
         
         
         /**
@@ -71,12 +73,20 @@ public class SmtLibTranslator extends AbstractSmtTranslator {
                 super(s);
         }
         
+        protected StringBuffer translateNull() {
+                return NULLSTRING;
+        }
+        
+        protected StringBuffer translateNullSort() {
+                return NULLSORTSTRING;
+        }
         
         @Override
         protected StringBuffer buildCompleteText(StringBuffer formula
                         , ArrayList<ArrayList<StringBuffer>> functions
                         , ArrayList<ArrayList<StringBuffer>> predicates
-                        , ArrayList<StringBuffer> types) {
+                        , ArrayList<StringBuffer> types
+                        , SortHirarchy sortHirarchy) {
                StringBuffer toReturn = new StringBuffer("( benchmark KeY-translation\n");
                //add the sortdeclarations
                //as sortshirarchies are not supported by smt-lib, only one sort should be used
@@ -419,6 +429,23 @@ public class SmtLibTranslator extends AbstractSmtTranslator {
         //TODO remove illegal chars
         private StringBuffer makeUnique(StringBuffer name) {
                 StringBuffer toReturn = new StringBuffer(name);
+                int index;
+                //replace array brackets
+                index = name.indexOf("[]");
+                if (index >= 0) {
+                        toReturn.replace(index, index+2, "_Array");
+                } else {
+                        index = -1;
+                }
+                
+//              replace dots brackets
+                index = name.indexOf(".");
+                if (index >= 0) {
+                        toReturn.replace(index, index+1, "_dot_");
+                } else {
+                        index = -1;
+                }
+                
                 toReturn.append("_").append(counter);
                 counter++;
                 return toReturn;

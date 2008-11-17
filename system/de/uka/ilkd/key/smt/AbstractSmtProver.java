@@ -170,6 +170,8 @@ public abstract class AbstractSmtProver {
                                 
                                         InputStream in = p.getInputStream();
                                         String result = read(in);
+System.out.println("Result:");         
+System.out.println(result);   
                                         in.close();                                
                                         int validity = this.answerType(result);
                                         if (validity == VALID) {
