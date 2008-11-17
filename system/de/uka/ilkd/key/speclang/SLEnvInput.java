@@ -97,9 +97,7 @@ public class SLEnvInput extends AbstractEnvInput {
             sortKJTs(allKeYJavaTypes.toArray(new KeYJavaType[allKeYJavaTypes.size()]));
         
         //create specifications for all types
-        for(int i = 0; i < kjts.length; i++) {
-            final KeYJavaType kjt = kjts[i];
-            
+        for(KeYJavaType kjt : kjts) {
             //class invariants
             specRepos.addClassInvariants(
                         specExtractor.extractClassInvariants(kjt));

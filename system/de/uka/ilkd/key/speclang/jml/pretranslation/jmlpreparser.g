@@ -142,6 +142,7 @@ classlevel_element[ListOfString mods]
     |   result=readable_if_clause[mods]
     |   result=writable_if_clause[mods]
     |   result=datagroup_clause[mods]
+    |   result=set_statement[mods] //RecodeR workaround 
     |   EOF
 ;
 

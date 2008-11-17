@@ -1526,7 +1526,7 @@ postfixexpr returns [JMLExpression result=null] throws SLTranslationException
 	
 	{
 	    if (expr == null) {
-		raiseError("Expression " + fullyQualifiedName + " not found!");
+		raiseError("Expression " + fullyQualifiedName + " cannot be resolved.");
 	    }
 	    result = expr; //.getTerm();
 	}
