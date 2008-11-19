@@ -759,16 +759,16 @@ public abstract class AbstractSmtTranslator {
                         StringBuffer arg2 = translate(term.sub(1), quantifiedVars, services);
                         return this.translateLogicalEquivalence(arg1, arg2);
                 } else if (op == Op.EQUALS) {
-                        //TODO HACK!!!!
-                        if (term.sub(0).sort().name().toString().equals("boolean")) {
-                                StringBuffer arg1 = translate(term.sub(0), quantifiedVars, services);
-                                StringBuffer arg2 = translate(term.sub(1), quantifiedVars, services);
-                                return this.translateLogicalEquivalence(arg1, arg2);
-                        } else {
+                        // TODO HACK!!!!
+//                        if (term.sub(0).sort().name().toString().equals("boolean")) {
+//                                StringBuffer arg1 = translate(term.sub(0), quantifiedVars, services);
+//                                StringBuffer arg2 = translate(term.sub(1), quantifiedVars, services);
+//                                return this.translateLogicalEquivalence(arg1, arg2);
+//                        } else {
                                 StringBuffer arg1 = translate(term.sub(0), quantifiedVars, services);
                                 StringBuffer arg2 = translate(term.sub(1), quantifiedVars, services);
                                 return this.translateObjectEqual(arg1, arg2);
-                        }
+//                        }
                 } else if (op == Op.ALL) {
                         ArrayOfQuantifiableVariable vars = term.varsBoundHere(0);
                         Debug.assertTrue(vars.size()==1);
@@ -818,13 +818,13 @@ public abstract class AbstractSmtTranslator {
                         this.nullUsed = true;
                         return this.nullString;
                 } else if (op instanceof LogicVariable || op instanceof ProgramVariable) {
-                        //TODO: Hack!!!!
-                        if ( op instanceof ProgramVariable &&
-                                        ((ProgramVariable)op).sort().name().toString().equals("boolean")) {
-                                //translate the op as predicate
-                                this.addPredicate(op, new ArrayList<Sort>());
-                                return this.translatePred(op, new ArrayList<StringBuffer>());
-                        } else {
+                        // TODO: Hack!!!!
+//                        if ( op instanceof ProgramVariable &&
+//                                        ((ProgramVariable)op).sort().name().toString().equals("boolean")) {
+//                                //translate the op as predicate
+//                                this.addPredicate(op, new ArrayList<Sort>());
+//                                return this.translatePred(op, new ArrayList<StringBuffer>());
+//                        } else {
                                 //translate as variable or constant
                                 if (quantifiedVars.contains(op)) {
                                         //This variable is used in the scope of a quantifier
@@ -844,11 +844,12 @@ public abstract class AbstractSmtTranslator {
 //                                        addFunction(term, getUniqueVariableName(op));
 //                                        return getUniqueVariableName(op);
                                 }
-                        }
+//                        }
                 } else if (op instanceof Function) {
                         Function fun = (Function)op;
-                        //TODO Hack!!!!
-                        if (fun.sort() == Sort.FORMULA || fun.sort() == services.getTypeConverter().getBooleanLDT().getFalseConst().sort()) {
+                        // TODO Hack!!!!
+                        //if (fun.sort() == Sort.FORMULA || fun.sort() == services.getTypeConverter().getBooleanLDT().getFalseConst().sort()) {
+                        if (fun.sort() == Sort.FORMULA) {        
                                 //This Function is a predicate, so translate it as such
                                 if (fun == services.getTypeConverter().getIntegerLDT().getLessThan() ) {        
                                         StringBuffer arg1 = translate(term.sub(0), quantifiedVars, services);
@@ -866,10 +867,10 @@ public abstract class AbstractSmtTranslator {
                                         StringBuffer arg1 = translate(term.sub(0), quantifiedVars, services);
                                         StringBuffer arg2 = translate(term.sub(1), quantifiedVars, services);
                                         return this.translateIntegerGeq(arg1, arg2);
-                                } else if (fun == services.getTypeConverter().getBooleanLDT().getTrueConst()){
-                                        return this.translateLogicalTrue();
-                                } else if (fun == services.getTypeConverter().getBooleanLDT().getFalseConst()){
-                                        return this.translateLogicalFalse();
+//                                } else if (fun == services.getTypeConverter().getBooleanLDT().getTrueConst()){
+//                                        return this.translateLogicalTrue();
+//                                } else if (fun == services.getTypeConverter().getBooleanLDT().getFalseConst()){
+//                                        return this.translateLogicalFalse();
                                 } else {
                                         
                                         ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
