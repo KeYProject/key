@@ -185,13 +185,19 @@ public class Recoder2KeYTypeConverter {
 			s = Sort.NULL;
 			addKeYJavaType(t, s);
 		} else if (t instanceof ParameterizedType) {
-		        ParameterizedType pt = (ParameterizedType) t;
-		        return getKeYJavaType(pt.getGenericType());
+			ParameterizedType pt = (ParameterizedType) t;
+			return getKeYJavaType(pt.getGenericType());
 		} else if (t instanceof ClassType) {
 			recoder.abstraction.ClassType ct = (recoder.abstraction.ClassType) t;
 			if (ct.isInterface()) {
+				KeYJavaType objectType = getKeYJavaType("java.lang.Object");
+				if(objectType == null) {
+					throw new RuntimeException(
+						"Missing core class: java.lang.Object must always be present");
+				}
+
 				s = createObjectSort(ct, directSuperSorts(ct).add(
-						getKeYJavaType("java.lang.Object").getSort()));
+						objectType.getSort()));
 			} else {
 				s = createObjectSort(ct, directSuperSorts(ct));
 			}
@@ -214,11 +220,20 @@ public class Recoder2KeYTypeConverter {
 
 			kjt = getKeYJavaType(bt);
 
+			KeYJavaType objectType = getKeYJavaType("java.lang.Object");
+			KeYJavaType cloneableType = getKeYJavaType("java.lang.Cloneable");
+			KeYJavaType serializableType = getKeYJavaType("java.io.Serializable");
+			// I may not use JavaInfo here because the classes may not yet be cached!
+			if(objectType == null || cloneableType == null || serializableType == null) {
+				throw new RuntimeException(
+					"Missing core classes: java.lang.Object, java.lang.Cloneable, java.io.Serializable must always be present");
+			}
+			
 			// I may not use JavaInfo here because the classes may not yet be cached!
 			s = ArraySortImpl.getArraySort(kjt.getSort(), 
-			                getKeYJavaType("java.lang.Object").getSort(),
-			                getKeYJavaType("java.lang.Cloneable").getSort(),
-			                getKeYJavaType("java.io.Serializable").getSort());
+					objectType.getSort(),
+					cloneableType.getSort(),
+					serializableType.getSort());
 			addKeYJavaType(t, s);
 		}
 
