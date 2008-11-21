@@ -38,7 +38,29 @@ tokens {
     FALSE = "false";
 }
 
+{
+    private int lineOffset = 0;
 
+    public KeYHoareLexer(InputStream in, int lineOffset){
+        this(in);
+        this.lineOffset = lineOffset;
+    }
+       
+    public KeYHoareLexer(Reader in, int lineOffset) {
+        this(in);
+        this.lineOffset = lineOffset;
+    }
+
+    public int getLine() {
+        return super.getLine() + lineOffset;
+    }
+
+    protected Token makeToken(int id) {
+        Token t = super.makeToken(id);
+        t.setLine(getLine());
+        return t;
+    } 
+}
 
 protected
 VOCAB

@@ -11,6 +11,7 @@ import de.uka.ilkd.key.parser.*;
 import de.uka.ilkd.key.proof.CountingBufferedInputStream;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 public class HoareUserProblemFile extends KeYUserProblemFile {
@@ -72,9 +73,13 @@ public class HoareUserProblemFile extends KeYUserProblemFile {
 
             lastParser = problemParser;
         } catch (antlr.ANTLRException e) {
+            close();
             throw new ProofInputException(e);
         } catch (FileNotFoundException fnfe) {
             throw new ProofInputException(fnfe);
+        } catch (ExceptionHandlerException ehe) {
+            close();
+            throw ehe;
         }
     }
 

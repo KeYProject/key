@@ -37,22 +37,16 @@ options {
     
     private Namespace pvs;
     
-    private int lineOffset;
-   
-    
-    public KeYHoareParser(KeYHoareLexer khl, Namespace pvs, int lineOffset) {
+    public KeYHoareParser(KeYHoareLexer khl, Namespace pvs) {
         this(khl);       
-        this.pvs = pvs;
-        this.lineOffset = lineOffset;        
+        this.pvs = pvs;       
     }
     
-    public int resolveLocationType(String id) {
+    public int resolveLocationType(String id) throws antlr.SemanticException {
         int type = NONE;
-        ProgramVariable pv = (ProgramVariable)pvs.lookup(new Name(id));
-        
-        
+        ProgramVariable pv = (ProgramVariable)pvs.lookup(new Name(id));        
         if (pv == null) {
-            reportError("Programvariable " + id + " not declared.");
+            reportError("Programvariable '" + id + "' not declared.", getLine(), getColumn());
         } 
         if (pv.sort().name().toString().equals("boolean")) {
             type = BOOLEAN;
@@ -63,7 +57,7 @@ options {
         } else  if (pv.sort().name().toString().equals("boolean[]")) {
             type = BOOLEAN_ARRAY;        
         } else {
-            reportError("Programvariable " + pv + " of unknown type " + pv.sort());
+            reportError("Programvariable " + pv + " of unknown type " + pv.sort(), getLine(), getColumn());
         }
         return type;
     }
@@ -87,9 +81,9 @@ options {
         }
         return col;
     }   
-      
+
     public void reportError(String s, int line, int column) throws antlr.SemanticException {
-        throw new antlr.SemanticException(s, getFilename(), line+lineOffset, column);
+        throw new antlr.SemanticException(s, getFilename(), line, column);
     }
     
     public static void main(String[] args) throws Throwable {
@@ -272,18 +266,27 @@ strongIntExpression returns [int type = NONE]
     Token op = null;
     int rightType = NONE;
 } :
-        type=atomicExpression (op=strongOp rightType=atomicExpression { 
+        type=unaryIntExpression (op=strongOp rightType=unaryIntExpression { 
                 if (type==INT && rightType==INT) {
                     type = INT;
                 } else {
-            reportError("The arithmetic operator " + op + " requires int typed arguments.", 
-                getLine(), getColumn());
-        }
-    }
-    )* 
+                    reportError("The arithmetic operator " + op + " requires int typed arguments.", 
+                                getLine(), getColumn());
+                }
+            }
+    )*
 ;
 
+unaryIntExpression  returns [int type = NONE]
+ : 
+        (m:MINUS)? type = atomicExpression {
+            if (m != null && type!=INT) 
+                reportError("The arithmetic unary minus operator '-' requires an int typed argument.", 
+                            getLine(), getColumn());
+       }
+        
 
+    ;
 
 atomicExpression returns [int type = NONE]
 {
@@ -324,7 +327,8 @@ arrayAccessExpression returns [int type = NONE]
     arrayType = simpleLocation LBRACKET indexType = atomicExpression {
     	    if (arrayType == INT_ARRAY || arrayType == BOOLEAN_ARRAY) {
     	    	if (indexType != INT) {
-    	    	   reportError("Index of an array access expression must be of type 'int'.");
+    	    	   reportError("Index of an array access expression must be of type 'int'.",
+                               getLine(), getColumn());
     	    	} else {
     	    	   type = (arrayType == INT_ARRAY ? INT : BOOLEAN);
     	    	}

@@ -366,7 +366,7 @@ options {
 	return parserMode == ParserMode.PROBLEM;
     }
 
-    public void reportError(RecognitionException ex){
+    public void reportError(RecognitionException ex){        
         keh.reportException(ex);
     }
 
@@ -4726,16 +4726,16 @@ problem returns [ Term a = null ]
 		index = text.indexOf('{');
 		text = text.substring(index+1,text.lastIndexOf('}'));
 	
-		KeYHoareLexer khl = new KeYHoareLexer(new StringReader(text));	
+		KeYHoareLexer khl = new KeYHoareLexer(new StringReader(text), getLine() - 1);	
 		khl.setFilename(getFilename());	
 		Namespace programVariableAndArrays = arrays.copy();
 		programVariableAndArrays.add(programVariables());
-		KeYHoareParser khp = new KeYHoareParser(khl, programVariableAndArrays, getLine()-1);
+		KeYHoareParser khp = new KeYHoareParser(khl, programVariableAndArrays);
 		khp.setFilename(getFilename());
 		try {
 		   khp.program();
-		} catch(Exception pe) {
-	            keh.reportException(pe);	           
+		} catch(Exception pe) {            
+            keh.reportException(pe);	                           
 		}
 		
                 sjb = getJavaBlock(modality);
