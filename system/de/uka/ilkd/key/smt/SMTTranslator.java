@@ -275,19 +275,6 @@ public class SMTTranslator {
                 complete.append("\n)\n");
                 complete.append(")");
 
-
-/*TODO Maybe uncomment again!
-                if (sortAxioms!=SLListOfString.EMPTY_LIST && quantifiersOccur) {
-                    String sar[] = sortAxioms.toArray();
-                    String axioms=sar[0];
-                    for (int i=1; i<sar.length; i++) {
-                        axioms="("+DecisionProcedureSimplifyOp.AND+" "+axioms+" "+sar[i]+")";
-                    }
-                    hb.insert(0, "("+DecisionProcedureSimplifyOp.IMP+" "+axioms);
-                    hb.append(')');
-                    //System.out.println(axioms);
-                }
-*/
                 return complete;
         }
 
@@ -317,7 +304,6 @@ public class SMTTranslator {
                         if (skolemization == ANTECEDENT) {
                                 hb.append(TRUESTRING);
                         } else {
-                                //TODO: verify, if this makes sense!!
                                 hb.append(FALSESTRING);
                         }
                         return hb;
@@ -353,8 +339,7 @@ public class SMTTranslator {
          * @param cf
          *           the ConstrainedFormula which should be written in Simplify
          *           syntax
-         *           
-         * TODO now: translation out of constraintSet context          
+         *                    
          */
         protected final StringBuffer translate(ConstrainedFormula cf, 
                                                boolean lightWeight, Services services)
@@ -645,11 +630,6 @@ public class SMTTranslator {
                         else
                                 sort = op.sort(null);
                         String ax = "("+getUniqueVariableName(sort).toString()+" "+res+")";
-//TODO: needed??
-//                        if (!sortAxioms.contains(ax)) {
-//                                sortAxioms = sortAxioms.prepend(new String[]{ax});                                                       
-//                                //addPredicate(getUniqueVariableName(sort).toString(),1); 
-//                        }
                 }
                 return res;
         }

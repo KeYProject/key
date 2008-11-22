@@ -759,16 +759,10 @@ public abstract class AbstractSmtTranslator {
                         StringBuffer arg2 = translate(term.sub(1), quantifiedVars, services);
                         return this.translateLogicalEquivalence(arg1, arg2);
                 } else if (op == Op.EQUALS) {
-                        // TODO HACK!!!!
-//                        if (term.sub(0).sort().name().toString().equals("boolean")) {
-//                                StringBuffer arg1 = translate(term.sub(0), quantifiedVars, services);
-//                                StringBuffer arg2 = translate(term.sub(1), quantifiedVars, services);
-//                                return this.translateLogicalEquivalence(arg1, arg2);
-//                        } else {
-                                StringBuffer arg1 = translate(term.sub(0), quantifiedVars, services);
-                                StringBuffer arg2 = translate(term.sub(1), quantifiedVars, services);
-                                return this.translateObjectEqual(arg1, arg2);
-//                        }
+                        StringBuffer arg1 = translate(term.sub(0), quantifiedVars, services);
+                        StringBuffer arg2 = translate(term.sub(1), quantifiedVars, services);
+                        return this.translateObjectEqual(arg1, arg2);
+
                 } else if (op == Op.ALL) {
                         ArrayOfQuantifiableVariable vars = term.varsBoundHere(0);
                         Debug.assertTrue(vars.size()==1);
@@ -818,37 +812,25 @@ public abstract class AbstractSmtTranslator {
                         this.nullUsed = true;
                         return this.nullString;
                 } else if (op instanceof LogicVariable || op instanceof ProgramVariable) {
-                        // TODO: Hack!!!!
-//                        if ( op instanceof ProgramVariable &&
-//                                        ((ProgramVariable)op).sort().name().toString().equals("boolean")) {
-//                                //translate the op as predicate
-//                                this.addPredicate(op, new ArrayList<Sort>());
-//                                return this.translatePred(op, new ArrayList<StringBuffer>());
-//                        } else {
-                                //translate as variable or constant
-                                if (quantifiedVars.contains(op)) {
-                                        //This variable is used in the scope of a quantifier
-                                        //so translate it as a variable
-                                        return (translateVariable(op));
-                                } else {
-                                        //this Variable is a free Variable.
-                                        //translate it as a constant.
-                                        ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
-                                        for (int i = 0; i < op.arity(); i++) {
-                                                subterms.add(translate(term.sub(i), quantifiedVars, services));
-                                        }
-                                        
-                                        addFunction(op, new ArrayList<Sort>(), term.sort());
-                                        
-                                        return translateFunc(op, subterms);
-//                                        addFunction(term, getUniqueVariableName(op));
-//                                        return getUniqueVariableName(op);
+                        //translate as variable or constant
+                        if (quantifiedVars.contains(op)) {
+                                //This variable is used in the scope of a quantifier
+                                //so translate it as a variable
+                                return (translateVariable(op));
+                        } else {
+                                //this Variable is a free Variable.
+                                //translate it as a constant.
+                                ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
+                                for (int i = 0; i < op.arity(); i++) {
+                                        subterms.add(translate(term.sub(i), quantifiedVars, services));
                                 }
-//                        }
+                                
+                                addFunction(op, new ArrayList<Sort>(), term.sort());
+                                        
+                                return translateFunc(op, subterms);
+                        }
                 } else if (op instanceof Function) {
                         Function fun = (Function)op;
-                        // TODO Hack!!!!
-                        //if (fun.sort() == Sort.FORMULA || fun.sort() == services.getTypeConverter().getBooleanLDT().getFalseConst().sort()) {
                         if (fun.sort() == Sort.FORMULA) {        
                                 //This Function is a predicate, so translate it as such
                                 if (fun == services.getTypeConverter().getIntegerLDT().getLessThan() ) {        

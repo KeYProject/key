@@ -93,7 +93,6 @@ public class SMTRule implements BuiltInRule {
                         pioiter.next();
                 }
                 */
-                //TODO remove dummy-return
                 //return !modalityFound;
                 //return true;
         }

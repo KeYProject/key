@@ -8,9 +8,13 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.SetOfMetavariable;
 import de.uka.ilkd.key.proof.decproc.ConstraintSet;
 import de.uka.ilkd.key.proof.decproc.SimplifyException;
+import org.apache.log4j.Logger;
 
 public class SmtLibTranslator extends AbstractSmtTranslator {
 
+        private static final Logger 
+        logger = Logger.getLogger( SmtLibTranslator.class.getName() );
+        
         //counter used for making names unique
         private int counter = 0;
         
@@ -131,8 +135,9 @@ public class SmtLibTranslator extends AbstractSmtTranslator {
                toReturn.append("\n:formula ").append(formula).append("\n");
                
                toReturn.append(")");
-               
-               System.out.println(toReturn);
+               logger.info("Resulting formula after translation:");
+               logger.info(toReturn);
+               //System.out.println(toReturn);
                return toReturn;
                 
         }

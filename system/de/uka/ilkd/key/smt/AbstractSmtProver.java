@@ -4,7 +4,6 @@ import java.io.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.java.Services;
@@ -14,12 +13,16 @@ import de.uka.ilkd.key.proof.ListOfGoal;
 import de.uka.ilkd.key.proof.SLListOfGoal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
+import org.apache.log4j.Logger;
 
 public abstract class AbstractSmtProver {
         
         public static final int VALID = 0;
         public static final int INVALID = 1;
         public static final int UNKNOWN = 2;
+        
+        private static final Logger 
+        logger = Logger.getLogger( AbstractSmtProver.class.getName() );
         
         /**
          * The path for the file
@@ -175,8 +178,8 @@ public abstract class AbstractSmtProver {
                                         try {
                                                 p.waitFor();
                                         } catch (InterruptedException f) {
-                                                //TODO react
-                                                System.out.println("process was interrupted");
+                                                logger.debug("Process for smt formula proving interrupted.", f);
+                                                //System.out.println("process was interrupted");
                                         } finally {
                                                 t.cancel();
                                         }
@@ -189,9 +192,10 @@ public abstract class AbstractSmtProver {
                                                 //the process terminated as it sould
                                                 InputStream in = p.getInputStream();
                                                 String result = read(in);
-                                                //TODO remove
-System.out.println("Result:");         
-System.out.println(result);   
+//System.out.println("Result:");         
+//System.out.println(result);   
+                                                logger.debug("Answer for created formula: ");
+                                                logger.debug(result);
                                                 in.close();                                
                                                 int validity = this.answerType(result);
                                                 if (validity == VALID) {
@@ -208,24 +212,23 @@ System.out.println(result);
                                                 }
                                         }
                                 } catch (IOException e) {
-                                        //TODO react
-                                        System.out.println("Program could not be executed");
+                                        logger.error("The program for proving a Formula with external tool could not be executed.", e);
                                 } finally {
                                         //remove the created file
                                         File f = new File(loc);
                                         f.delete();
                                 }
                         } catch (IOException e) {
-                                //TODO react on this
+                                logger.error("The file with the formula could not be written.", e);
                                 //file could not be written
-                                System.out.println("File could not be written");
+                                //System.out.println("File could not be written");
                         }
                 } catch (IllegalFormulaException e) {
                         //toReturn = SLListOfGoal.EMPTY_LIST;
                         //toReturn.append(goal);
                         toReturn = UNKNOWN;
-                        //TODO log message
-                        System.out.println("!!!    Illegal Formula Exception thrown");
+                        logger.error("The formula could not be translated.", e);
+                        //System.out.println("!!!    Illegal Formula Exception thrown");
                 }
                 return toReturn;
         }
