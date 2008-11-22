@@ -127,7 +127,7 @@ public class SMTRule implements BuiltInRule {
                         System.out.println("!!!    Simplify Exception thrown");
                 }
                 return null;*/
-                int valid = this.prover.isValid(goal, services, ruleApp);
+                int valid = this.prover.isValid(goal, 30, services, ruleApp);
                 if (valid == AbstractSmtProver.VALID) {
                         return SLListOfGoal.EMPTY_LIST;
                 } else if (valid == AbstractSmtProver.UNKNOWN) {

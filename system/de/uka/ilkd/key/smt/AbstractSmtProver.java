@@ -2,6 +2,9 @@ package de.uka.ilkd.key.smt;
 
 import java.io.*;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.java.Services;
@@ -138,9 +141,15 @@ public abstract class AbstractSmtProver {
         }
         
         /**
-         * called by the System. Here the actual decision is made.
+         * Check, if the formula in the goal is valid.
+         * @param goal The goal to be proven.
+         * @param timeout The maximum time, that should be used to execute the external solver.
+         *      Given in seconds. If the time is exceeded, UNKNOWN is returned.
+         * @param services The service object wrapping different settings and variables.
+         * @param ruleApp The Rule Application
+         * @return VALID, INVALID or UNKNOWN.
          */
-        public final int isValid(Goal goal, Services services, RuleApp ruleApp) {
+        public final int isValid(Goal goal, int timeout, Services services, RuleApp ruleApp) {
                 int toReturn = UNKNOWN;
                 //toReturn.append(goal);
                 
@@ -160,31 +169,42 @@ public abstract class AbstractSmtProver {
                                 try {
                                 
                                         Process p = Runtime.getRuntime().exec(execCommand);
+                                        ExecutionWatchDog tt = new ExecutionWatchDog(timeout, p);
+                                        Timer t = new Timer();
+                                        t.schedule(tt, new Date(System.currentTimeMillis()), 1000);
                                         try {
                                                 p.waitFor();
                                         } catch (InterruptedException f) {
                                                 //TODO react
                                                 System.out.println("process was interrupted");
+                                        } finally {
+                                                t.cancel();
                                         }
 
                                 
-                                        InputStream in = p.getInputStream();
-                                        String result = read(in);
+                                        if (tt.destroyed()) {
+                                                toReturn = UNKNOWN;
+                                        } else {
+                                                
+                                                InputStream in = p.getInputStream();
+                                                String result = read(in);
+                                                //TODO remove
 System.out.println("Result:");         
 System.out.println(result);   
-                                        in.close();                                
-                                        int validity = this.answerType(result);
-                                        if (validity == VALID) {
-                                                //toReturn = SLListOfGoal.EMPTY_LIST;
-                                                toReturn = VALID;
-                                        } else if (validity == INVALID) {
-                                                //toReturn = SLListOfGoal.EMPTY_LIST;
-                                                //toReturn.append(goal);
-                                                toReturn = INVALID;
-                                        } else {
-                                                //toReturn = SLListOfGoal.EMPTY_LIST;
-                                                //toReturn.append(goal);
-                                                toReturn = UNKNOWN;
+                                                in.close();                                
+                                                int validity = this.answerType(result);
+                                                if (validity == VALID) {
+                                                        //toReturn = SLListOfGoal.EMPTY_LIST;
+                                                        toReturn = VALID;
+                                                } else if (validity == INVALID) {
+                                                        //toReturn = SLListOfGoal.EMPTY_LIST;
+                                                        //toReturn.append(goal);
+                                                        toReturn = INVALID;
+                                                } else {
+                                                        //toReturn = SLListOfGoal.EMPTY_LIST;
+                                                        //toReturn.append(goal);
+                                                        toReturn = UNKNOWN;
+                                                }
                                         }
                                 } catch (IOException e) {
                                         //TODO react
