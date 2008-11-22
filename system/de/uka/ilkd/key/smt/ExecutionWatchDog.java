@@ -7,7 +7,6 @@ public final class ExecutionWatchDog extends TimerTask {
         private int timeout;
         private Process proc;
         private long starttime = -1;
-        private boolean destroyed = false;
         
         /**
          * Construct a new Watch dog.
@@ -28,17 +27,8 @@ public final class ExecutionWatchDog extends TimerTask {
                 
                 if (System.currentTimeMillis() - this.starttime > timeout * 1000) {
                         proc.destroy();
-                        this.destroyed = true;
                 }
 
-        }
-        
-        /**
-         * check, if the process was destroyed.
-         * @return true, if the task was terminated.
-         */
-        public boolean destroyed() {
-                return this.destroyed;
         }
 
 }

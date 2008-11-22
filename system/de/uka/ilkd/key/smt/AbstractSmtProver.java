@@ -182,10 +182,11 @@ public abstract class AbstractSmtProver {
                                         }
 
                                 
-                                        if (tt.destroyed()) {
+                                        if (p.exitValue() != 0) {
+                                                //the process was terminated by force.
                                                 toReturn = UNKNOWN;
                                         } else {
-                                                
+                                                //the process terminated as it sould
                                                 InputStream in = p.getInputStream();
                                                 String result = read(in);
                                                 //TODO remove
