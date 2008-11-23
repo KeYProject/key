@@ -2,10 +2,7 @@ package de.uka.ilkd.key.smt;
 
 import java.util.*;
 
-import de.uka.ilkd.key.collection.ListOfString;
-import de.uka.ilkd.key.collection.SLListOfString;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.ldt.BooleanLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.decproc.ConstraintSet;
@@ -20,11 +17,11 @@ public abstract class AbstractSmtTranslator {
     static Logger logger = Logger.getLogger(AbstractSmtTranslator.class
 	    .getName());
 
-    private HashMap cacheForUninterpretedSymbols = null;
+//    private HashMap cacheForUninterpretedSymbols = null;
 
-    private ListOfString sortAxioms = SLListOfString.EMPTY_LIST;
+//    private ListOfString sortAxioms = SLListOfString.EMPTY_LIST;
 
-    private boolean quantifiersOccur = false;
+//    private boolean quantifiersOccur = false;
 
     private Sort jbyteSort;
 
@@ -76,13 +73,13 @@ public abstract class AbstractSmtTranslator {
 
     protected final SetOfMetavariable localMetavariables;
 
-    protected final HashMap variableMap = new HashMap();
+//    private final HashMap variableMap = new HashMap();
 
     private HashMap<Operator, ArrayList<Sort>> functionDecls = new HashMap<Operator, ArrayList<Sort>>();
 
     private HashMap<Operator, ArrayList<Sort>> predicateDecls = new HashMap<Operator, ArrayList<Sort>>();
 
-    private HashSet<Sort> usedSorts = new HashSet<Sort>();
+    //private HashSet<Sort> usedSorts = new HashSet<Sort>();
 
     private HashMap<Operator, StringBuffer> usedVariableNames = new HashMap<Operator, StringBuffer>();
 
@@ -126,7 +123,7 @@ public abstract class AbstractSmtTranslator {
 	jlongSort = services.getTypeConverter().getLongLDT().targetSort();
 	jcharSort = services.getTypeConverter().getCharLDT().targetSort();
 	integerSort = services.getTypeConverter().getIntegerLDT().targetSort();
-	cacheForUninterpretedSymbols = new HashMap();
+//	cacheForUninterpretedSymbols = new HashMap();
 	// StringBuffer hb = translate(sequent, lightWeight, services);
 	// text = predicate.toString() + produceClosure(hb);
 	// text = predicate.toString();
@@ -200,7 +197,8 @@ public abstract class AbstractSmtTranslator {
     }
 
     /**
-     * build the sorthirarchy for the sorts
+     * Build the sorthirarchy for the sorts
+     * If null was used, add typepredicates for all types.
      * 
      * @return a sort hirarchy for the sorts
      */
@@ -253,7 +251,6 @@ public abstract class AbstractSmtTranslator {
     /**
      * Returns a formula, that defines the resulttypes of functions,
      * all constants and other elements (i.e. constant number symbols).
-     * Also contains the typedefinition for the null type, if it was used.
      * @return see above
      */
     private StringBuffer getTypeDefinitions() {
@@ -273,20 +270,19 @@ public abstract class AbstractSmtTranslator {
 //	    StringBuffer predString = this.
 //	}
 	//add the type predicates for constant values like number symbols
-	ArrayList<StringBuffer> arglist = new ArrayList<StringBuffer>();
 	for (StringBuffer s : this.constantTypePreds.values()) {
 	    toReturn = this.translateLogicalAnd(s, toReturn);
 	}
 	
 	//add the type definitions for null
-	if (this.nullString != null && this.nullString.length() > 0) {
+/*	if (this.nullString != null && this.nullString.length() > 0) {
 	    arglist = new ArrayList<StringBuffer>();
 	    arglist.add(this.nullString);
 	    for (StringBuffer s : this.typePredicates.values()) {
 		toReturn = this.translateLogicalAnd(this.translatePredicate(s,
 		    arglist), toReturn);
 	    }
-	}
+	}*/
 	
 
 	return toReturn;
@@ -1088,6 +1084,7 @@ public abstract class AbstractSmtTranslator {
 		    // add the type predicate for this
 		    // constant
 		    if (!this.constantTypePreds.containsKey(term)) {
+			this.translateSort(term.sort());
 			StringBuffer typePred = this.getTypePredicate(term
 				.sort(), numVal);
 			this.constantTypePreds.put(term, typePred);
@@ -1360,7 +1357,7 @@ public abstract class AbstractSmtTranslator {
      * @param op
      *           The variable to get a new name.
      */
-    private final StringBuffer getUniqueVariableName(Named op) {
+/*    private final StringBuffer getUniqueVariableName(Named op) {
 	String name = op.name().toString();
 	if (name.indexOf("undef(") != -1) {
 	    name = "_undef";
@@ -1373,7 +1370,7 @@ public abstract class AbstractSmtTranslator {
 	}
 	return new StringBuffer("KeY_").append(name).append("_").append(
 		getUniqueHashCode(op));
-    }
+    }*/
 
     /**
      * For some terms (AttributeOps) the order in KeY is different than the
@@ -1384,7 +1381,7 @@ public abstract class AbstractSmtTranslator {
      *           the Term which should be written in Simplify syntax, but in
      *           reverse order compared to the internal order in KeY
      */
-    private final StringBuffer printlastfirst(Term t) {
+/*    private final StringBuffer printlastfirst(Term t) {
 	StringBuffer sbuff = new StringBuffer();
 	if (t.op().arity() > 0) {
 	    Debug.assertTrue(t.op().arity() == 1);
@@ -1394,7 +1391,7 @@ public abstract class AbstractSmtTranslator {
 	sbuff.append(t.op().name()).append("\\|").append(
 		getUniqueHashCode(t.op()));
 	return sbuff;
-    }
+    }*/
 
     /** 
      * Used just to be called from DecProcTranslation
@@ -1423,14 +1420,14 @@ public abstract class AbstractSmtTranslator {
      * @param qv the Object the hashcode should be returned.
      * @returns a unique hashcode for the variable gv.
      */
-    private int getUniqueHashCode(Object qv) {
+/*    private int getUniqueHashCode(Object qv) {
 	Integer number = (Integer) this.variableMap.get(qv);
 	if (number == null) {
 	    number = new Integer(this.variableMap.size());
 	    this.variableMap.put(qv, number);
 	}
 	return number.intValue();
-    }
+    }*/
 
     /**
      * Returns a unique HashCode for the term qv.
@@ -1454,7 +1451,7 @@ public abstract class AbstractSmtTranslator {
      return number.intValue();
      }
      */
-    private String getSortName(Sort s) {
+/*    private String getSortName(Sort s) {
 	if (s.name().toString().indexOf("[") == s.name().toString().length() - 2
 		&& s.name().toString().indexOf("]") == s.name().toString()
 			.length() - 1) {
@@ -1469,6 +1466,6 @@ public abstract class AbstractSmtTranslator {
 	} else {
 	    return s.name().toString();
 	}
-    }
+    }*/
 
 }
