@@ -206,6 +206,11 @@ public abstract class AbstractSmtTranslator {
 	return new SortHirarchy(this.usedDisplaySort, this.typePredicates);
     }
 
+    /**
+     * Get the expression for that defines the typepredicates for sort hirarchy.
+     * Also the null type is added to the formula if used before.
+     * @return The well defined formula.
+     */
     private StringBuffer getSortHirarchyPredicates() {
 	SortHirarchy sh = this.buildSortHirarchy();
 	StringBuffer toReturn = new StringBuffer(this.translateLogicalTrue());
@@ -288,6 +293,13 @@ public abstract class AbstractSmtTranslator {
 	return toReturn;
     }
 
+    /**
+     * Get the type predicate definition for a given function
+     * @param funName the name of the function.
+     * @param sorts the sorts, the function is defined for. 
+     * 		Last element is the return type.
+     * @return well formed expression that defines the type of the function.
+     */
     private StringBuffer getSingleFunctionDef(StringBuffer funName,
 	    ArrayList<Sort> sorts) {
 	StringBuffer toReturn = new StringBuffer();
@@ -1173,6 +1185,13 @@ public abstract class AbstractSmtTranslator {
     // return (opNotKnownWarning(term));
     // }
 
+
+    /**
+     * Get the type predicate for the given sort and the given expression.
+     * @param s The sort, the type predicate is wanted for.
+     * @param arg The expression, whose type should be defined.
+     * @return The well formed type predicate expression.
+     */
     private StringBuffer getTypePredicate(Sort s, StringBuffer arg) {
 	ArrayList<StringBuffer> arguments = new ArrayList<StringBuffer>();
 	arguments.add(arg);
