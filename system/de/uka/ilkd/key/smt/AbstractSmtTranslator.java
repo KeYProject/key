@@ -17,12 +17,6 @@ public abstract class AbstractSmtTranslator {
     static Logger logger = Logger.getLogger(AbstractSmtTranslator.class
 	    .getName());
 
-//    private HashMap cacheForUninterpretedSymbols = null;
-
-//    private ListOfString sortAxioms = SLListOfString.EMPTY_LIST;
-
-//    private boolean quantifiersOccur = false;
-
     private Sort jbyteSort;
 
     private Sort jshortSort;
@@ -54,16 +48,13 @@ public abstract class AbstractSmtTranslator {
     /** remember all printed predicates */
     protected final Set<Operator> predicateSet = new HashSet<Operator>();
 
-    // protected final ArrayList<String> predicatedecls = new
-    // ArrayList<String>();
     /** remember all printed functions */
     protected final Set<Operator> functionSet = new HashSet<Operator>();
 
     protected final Set<Sort> sortSet = new HashSet<Sort>();
 
     /** remember all function declarations */
-    // protected final ArrayList<String> functiondecls = new
-    // ArrayList<String>();
+
     /** The Constraint under which the sequent is to be proven */
     protected final ConstraintSet constraintSet;
 
@@ -73,13 +64,9 @@ public abstract class AbstractSmtTranslator {
 
     protected final SetOfMetavariable localMetavariables;
 
-//    private final HashMap variableMap = new HashMap();
-
     private HashMap<Operator, ArrayList<Sort>> functionDecls = new HashMap<Operator, ArrayList<Sort>>();
 
     private HashMap<Operator, ArrayList<Sort>> predicateDecls = new HashMap<Operator, ArrayList<Sort>>();
-
-    //private HashSet<Sort> usedSorts = new HashSet<Sort>();
 
     private HashMap<Operator, StringBuffer> usedVariableNames = new HashMap<Operator, StringBuffer>();
 
@@ -114,7 +101,6 @@ public abstract class AbstractSmtTranslator {
      */
     public AbstractSmtTranslator(Sequent sequent, ConstraintSet cs,
 	    SetOfMetavariable localmv, Services services, boolean lightWeight) {
-	// super(sequent, cs, localmv, services);
 	localMetavariables = localmv;
 	constraintSet = cs;
 	jbyteSort = services.getTypeConverter().getByteLDT().targetSort();
@@ -123,14 +109,6 @@ public abstract class AbstractSmtTranslator {
 	jlongSort = services.getTypeConverter().getLongLDT().targetSort();
 	jcharSort = services.getTypeConverter().getCharLDT().targetSort();
 	integerSort = services.getTypeConverter().getIntegerLDT().targetSort();
-//	cacheForUninterpretedSymbols = new HashMap();
-	// StringBuffer hb = translate(sequent, lightWeight, services);
-	// text = predicate.toString() + produceClosure(hb);
-	// text = predicate.toString();
-	// logger.info("SimplifyTranslation:\n" + text);
-	// if (notes.length() > 0) {
-	// logger.info(notes);
-	// }
     }
 
     public AbstractSmtTranslator(Sequent sequent, ConstraintSet cs,
@@ -160,20 +138,14 @@ public abstract class AbstractSmtTranslator {
     protected final StringBuffer translate(Sequent sequent,
 	    boolean lightWeight, Services services)
 	    throws IllegalFormulaException {
-	// computeModuloConstraints(sequent);
 
 	// translate
 	StringBuffer hb = new StringBuffer();
 	StringBuffer ante;
-	// hb.append('(').append(IMPLYSTRING).append(' ');
 	ante = translate(sequent.antecedent(), ANTECEDENT, lightWeight,
 		services);
-	// hb.append(temp);
-	// hb.append("\n");
 	StringBuffer succ;
 	succ = translate(sequent.succedent(), SUCCEDENT, lightWeight, services);
-	// hb.append(temp);
-	// hb.append(')');
 
 	// append type definitions, if neccessary
 	if (!this.isMultiSorted()) {
@@ -269,27 +241,11 @@ public abstract class AbstractSmtTranslator {
 	    toReturn = this.translateLogicalAnd(currentForm, toReturn);
 	}
 
-	// add the type definitions for constant values
-//	for (Term t : this.constantTypePreds.keySet()) {
-//	    StringBuffer termstring = this.constantTypePreds.get(t);
-//	    StringBuffer predString = this.
-//	}
 	//add the type predicates for constant values like number symbols
 	for (StringBuffer s : this.constantTypePreds.values()) {
 	    toReturn = this.translateLogicalAnd(s, toReturn);
 	}
 	
-	//add the type definitions for null
-/*	if (this.nullString != null && this.nullString.length() > 0) {
-	    arglist = new ArrayList<StringBuffer>();
-	    arglist.add(this.nullString);
-	    for (StringBuffer s : this.typePredicates.values()) {
-		toReturn = this.translateLogicalAnd(this.translatePredicate(s,
-		    arglist), toReturn);
-	    }
-	}*/
-	
-
 	return toReturn;
     }
 
@@ -481,15 +437,6 @@ public abstract class AbstractSmtTranslator {
 	// translate the first semisequence
 	hb = translate(semi.get(0), lightWeight, services);
 
-	// add the conjunctor only if it is really needed!
-	// if (semi.size() > 1) {
-	// hb.append('(');
-	// if (skolemization == ANTECEDENT) {
-	// hb.append(ANDSTRING);
-	// } else {
-	// hb.append(ORSTRING);
-	// }
-	// }
 	// translate the other semisequences, juncted with AND or OR
 	for (int i = 1; i < semi.size(); ++i) {
 	    if (skolemization == ANTECEDENT) {
@@ -499,19 +446,7 @@ public abstract class AbstractSmtTranslator {
 		hb = translateLogicalOr(hb, translate(semi.get(i), lightWeight,
 			services));
 	    }
-	    // hb.append(' ');
-	    // hb.append(translate(semi.get(i), lightWeight,
-	    // services));
 	}
-	// if (skolemization == ANTECEDENT) {
-	// hb.append(' ');
-	// hb.append(DecisionProcedureSimplifyOp.LIMIT_FACTS);
-	// hb.append('\n').append(translate(moduloConjoin(), new
-	// Vector()));
-	// }
-	// add the brackets for the conjunctor only if it makes sense
-	// if (semi.size() > 1)
-	// hb.append(')');
 
 	return hb;
     }
@@ -1030,12 +965,6 @@ public abstract class AbstractSmtTranslator {
 		    StringBuffer arg2 = translate(term.sub(1), quantifiedVars,
 			    services);
 		    return this.translateIntegerGeq(arg1, arg2);
-		    // } else if (fun ==
-		    // services.getTypeConverter().getBooleanLDT().getTrueConst()){
-		    // return this.translateLogicalTrue();
-		    // } else if (fun ==
-		    // services.getTypeConverter().getBooleanLDT().getFalseConst()){
-		    // return this.translateLogicalFalse();
 		} else {
 
 		    ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
@@ -1156,36 +1085,6 @@ public abstract class AbstractSmtTranslator {
 	}
     }
 
-    // /**
-    // * Just copies the quantified variables of term into quantifiedVars
-    // * @param quantifiedVars
-    // * @param term
-    // */
-    // protected void collectQuantifiedVars (Vector quantifiedVars, Term
-    // term) {
-    // ArrayOfQuantifiableVariable vars = term.varsBoundHere(0);
-    // for (int i = 0; i < vars.size(); ++i) {
-    // quantifiedVars.add(vars.getQuantifiableVariable(i));
-    // }
-    // }
-
-    // /**
-    // * Takes care of sequent tree parts that were not matched in
-    // translate(term,
-    // * skolemization). In this class it just produces a warning, nothing
-    // more.
-    // * It is provided as a hook for subclasses.
-    // *
-    // * @param term
-    // * The Term given to translate
-    // * @throws SimplifyException
-    // */
-    // protected StringBuffer translateUnknown(Term term) throws
-    // SimplifyException {
-    // return (opNotKnownWarning(term));
-    // }
-
-
     /**
      * Get the type predicate for the given sort and the given expression.
      * @param s The sort, the type predicate is wanted for.
@@ -1212,46 +1111,9 @@ public abstract class AbstractSmtTranslator {
      */
     protected final StringBuffer translateUnknown(Term term)
 	    throws IllegalFormulaException {
-	// return (opNotKnownWarning(term));
 	throw new IllegalFormulaException(
 		"Formular contains unsupported arguments");
-	// return new StringBuffer("unknown_Op");
     }
-
-    // protected StringBuffer opNotKnownWarning(Term term)
-    // throws SimplifyException {
-    // logger
-    // .warn("Warning: unknown operator while translating into Simplify "
-    // + "syntax. Translation to Simplify will be stopped here.\n"
-    // + "opClass="
-    // + term.op().getClass().getName()
-    // + ", opName="
-    // + term.op().name()
-    // + ", sort="
-    // + term.sort().name());
-    // throw new SimplifyException(term.op().name() + " not known by
-    // Simplify");
-    // }
-
-    // /**
-    // * Used to give a variable (program, logic, meta) a unique name.
-    // *
-    // * @param op
-    // * The variable to be translated/renamed.
-    // */
-    /*
-     * protected final StringBuffer translateVariable(Operator op) {
-     * //Exception e = new Exception(); //e.printStackTrace(); StringBuffer
-     * res = new StringBuffer("?"); res.append(getUniqueVariableName(op));
-     * if (op instanceof ProgramVariable || op instanceof Metavariable) {
-     * final Sort sort; if (isSomeIntegerSort(op.sort(null))) sort =
-     * integerSort; else sort = op.sort(null); String ax =
-     * "("+getUniqueVariableName(sort).toString()+" "+res+")"; // if
-     * (!sortAxioms.contains(ax)) { // sortAxioms = sortAxioms.prepend(new
-     * String[]{ax}); //
-     * //addPredicate(getUniqueVariableName(sort).toString(),1); // } }
-     * return res; }
-     */
 
     protected final StringBuffer translateVariable(Operator op) {
 	if (usedVariableNames.containsKey(op)) {
@@ -1369,48 +1231,6 @@ public abstract class AbstractSmtTranslator {
 	}
     }
 
-    /**
-     * produces a unique name for the given Variable, starting with "KeY_" and with a
-     * unique hashcode.
-     * 
-     * @param op
-     *           The variable to get a new name.
-     */
-/*    private final StringBuffer getUniqueVariableName(Named op) {
-	String name = op.name().toString();
-	if (name.indexOf("undef(") != -1) {
-	    name = "_undef";
-	}
-	if (name.indexOf("::") == -1 && name.indexOf(".") == -1
-		&& name.indexOf("-") == -1 && !name.startsWith("_")
-		&& name.indexOf("[") == -1 && name.indexOf("]") == -1) {
-	    return new StringBuffer(name).append("_").append(
-		    getUniqueHashCode(op));
-	}
-	return new StringBuffer("KeY_").append(name).append("_").append(
-		getUniqueHashCode(op));
-    }*/
-
-    /**
-     * For some terms (AttributeOps) the order in KeY is different than the
-     * order of the user or Simplify expects.
-     * 
-     * @return the simplified version of the Term t in reversed order
-     * @param t
-     *           the Term which should be written in Simplify syntax, but in
-     *           reverse order compared to the internal order in KeY
-     */
-/*    private final StringBuffer printlastfirst(Term t) {
-	StringBuffer sbuff = new StringBuffer();
-	if (t.op().arity() > 0) {
-	    Debug.assertTrue(t.op().arity() == 1);
-	    sbuff.append(printlastfirst(t.sub(0)));
-	    //sbuff.append('.');
-	}
-	sbuff.append(t.op().name()).append("\\|").append(
-		getUniqueHashCode(t.op()));
-	return sbuff;
-    }*/
 
     /** 
      * Used just to be called from DecProcTranslation
@@ -1428,63 +1248,5 @@ public abstract class AbstractSmtTranslator {
 	    return true;
 	return false;
     }
-
-    /**
-     * Returns a unique HashCode for the object qv.
-     * Unique means unique for the goal given to the calling class.
-     * This function does not depend on .hashcode() to deliver unique 
-     * hash codes like the memory address of the object. It uses a 
-     * hashMap and compares every new Object in O(n) (n number of 
-     * Objects with the same .hashCode()) to all others.
-     * @param qv the Object the hashcode should be returned.
-     * @returns a unique hashcode for the variable gv.
-     */
-/*    private int getUniqueHashCode(Object qv) {
-	Integer number = (Integer) this.variableMap.get(qv);
-	if (number == null) {
-	    number = new Integer(this.variableMap.size());
-	    this.variableMap.put(qv, number);
-	}
-	return number.intValue();
-    }*/
-
-    /**
-     * Returns a unique HashCode for the term qv.
-     * Unique means unique for the goal given to the calling class.
-     * This function does not depend on .hashcode() to deliver 
-     * unique hash codes like the memory address of the object. 
-     * It uses a hashMap and compares
-     * every new Object in O(n) (n number of Objects 
-     * with the same .hashCode()) to all others.
-     * It compares with .equalsModRenaming().
-     * returns a unique hashcode for the term gv.
-     * param term the Term the hashcode should be returned.
-     */
-    /*        public int getUniqueHashCodeForUninterpretedTerm(Term term) {
-     Integer number = (Integer) this.variableMap
-     .get(new UninterpretedTermWrapper(term));
-     if (number == null) {
-     number = new Integer(this.variableMap.size());
-     this.variableMap.put(new UninterpretedTermWrapper(term), number);
-     }
-     return number.intValue();
-     }
-     */
-/*    private String getSortName(Sort s) {
-	if (s.name().toString().indexOf("[") == s.name().toString().length() - 2
-		&& s.name().toString().indexOf("]") == s.name().toString()
-			.length() - 1) {
-	    //an Array is used
-	    String res = s.name().toString().substring(0,
-		    s.name().toString().length() - 2);
-	    res = "Array_" + res;
-	    return res;
-	} else if (isSomeIntegerSort(s)) {
-	    return integerSort.name().toString();
-
-	} else {
-	    return s.name().toString();
-	}
-    }*/
 
 }

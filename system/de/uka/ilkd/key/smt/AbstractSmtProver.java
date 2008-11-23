@@ -61,8 +61,6 @@ public abstract class AbstractSmtProver {
      */
     public boolean isApplicable(Term term) {
 	
-	//boolean toReturn = true;
-	
 	Operator op = term.op();
 	if (op == Op.NOT) {
 	    return isApplicable(term.sub(0));
@@ -210,14 +208,12 @@ public abstract class AbstractSmtProver {
     public final int isValid(Goal goal, int timeout, Services services,
 	    RuleApp ruleApp) {
 	int toReturn = UNKNOWN;
-	//toReturn.append(goal);
 
 	try {
 	    //get the translation
 	    AbstractSmtTranslator trans = this.getTranslator(goal, services,
 		    ruleApp);
 	    String loc;
-	    //                      SMTTranslator trans = new SMTTranslator(goal.sequent(), new ConstraintSet(goal, null), SetAsListOfMetavariable.EMPTY_SET, services);
 
 	    try {
 		StringBuffer s = trans.translate(goal.sequent(), services);
@@ -250,22 +246,16 @@ public abstract class AbstractSmtProver {
 			//the process terminated as it sould
 			InputStream in = p.getInputStream();
 			String result = read(in);
-			//                                              System.out.println("Result:");         
-			//                                              System.out.println(result);   
+   
 			logger.debug("Answer for created formula: ");
 			logger.debug(result);
 			in.close();
 			int validity = this.answerType(result);
 			if (validity == VALID) {
-			    //toReturn = SLListOfGoal.EMPTY_LIST;
 			    toReturn = VALID;
 			} else if (validity == INVALID) {
-			    //toReturn = SLListOfGoal.EMPTY_LIST;
-			    //toReturn.append(goal);
 			    toReturn = INVALID;
 			} else {
-			    //toReturn = SLListOfGoal.EMPTY_LIST;
-			    //toReturn.append(goal);
 			    toReturn = UNKNOWN;
 			}
 		    }
@@ -282,15 +272,10 @@ public abstract class AbstractSmtProver {
 	    } catch (IOException e) {
 		logger.error("The file with the formula could not be written.",
 			e);
-		//file could not be written
-		//System.out.println("File could not be written");
 	    }
 	} catch (IllegalFormulaException e) {
-	    //toReturn = SLListOfGoal.EMPTY_LIST;
-	    //toReturn.append(goal);
 	    toReturn = UNKNOWN;
 	    logger.error("The formula could not be translated.", e);
-	    //System.out.println("!!!    Illegal Formula Exception thrown");
 	}
 	return toReturn;
     }
