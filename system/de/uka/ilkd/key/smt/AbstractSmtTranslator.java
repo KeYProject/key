@@ -532,7 +532,7 @@ public abstract class AbstractSmtTranslator {
 	if (!lightWeight || !(op instanceof Modality)
 		&& !(op instanceof IUpdateOperator)
 		&& !(op instanceof IfThenElse) && op != Op.ALL && op != Op.EX) {
-	    hb.append(translate(t, new Vector(), services));
+	    hb.append(translate(t, new Vector<QuantifiableVariable>(), services));
 	}
 	return hb;
     }
@@ -886,7 +886,7 @@ public abstract class AbstractSmtTranslator {
      *                modulo terms, but must be looped through until we get
      *                there.
      */
-    private final StringBuffer translate(Term term, Vector quantifiedVars,
+    private final StringBuffer translate(Term term, Vector<QuantifiableVariable> quantifiedVars,
 	    Services services) throws IllegalFormulaException {
 	Operator op = term.op();
 	if (op == Op.NOT) {
@@ -1398,7 +1398,7 @@ public abstract class AbstractSmtTranslator {
      * @see de.uka.ilkd.key.proof.decproc.DecProcTranslation#translate(Semisequent, int)
      */
     protected final StringBuffer translate(Term term, int skolemization,
-	    Vector quantifiedVars, Services services)
+	    Vector<QuantifiableVariable> quantifiedVars, Services services)
 	    throws IllegalFormulaException {
 	return translate(term, quantifiedVars, services);
     }
