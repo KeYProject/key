@@ -8,6 +8,13 @@ import java.util.Timer;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.ArrayOp;
+import de.uka.ilkd.key.logic.op.AttributeOp;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ListOfGoal;
 import de.uka.ilkd.key.proof.SLListOfGoal;
@@ -42,26 +49,79 @@ public abstract class AbstractSmtProver {
      */
     public abstract Name name();
 
+    public boolean isApplicable(Goal goal, PosInOccurrence pio,
+	    Constraint userConstraint) {
+	boolean toReturn = true;
+	Semisequent ant = goal.sequent().antecedent();
+	for (ConstrainedFormula c : ant) {
+	    toReturn = toReturn && this.isApplicable(c.formula());
+	}
+	
+	Semisequent succ = goal.sequent().succedent();
+	for (ConstrainedFormula c : succ) {
+	    toReturn = toReturn && this.isApplicable(c.formula());
+	}
+	
+	return toReturn;
+    }
+    
     /**
      * TODO overwork
      */
-    public boolean isApplicable(Goal goal, PosInOccurrence pio,
-	    Constraint userConstraint) {
-	boolean hasModality = false;
+    public boolean isApplicable(Term term) {
+	
+	//boolean toReturn = true;
+	
+	Operator op = term.op();
+	if (op == Op.NOT) {
+	    return isApplicable(term.sub(0));
+	} else if (op == Op.AND) {
+	    return (isApplicable(term.sub(0)) && isApplicable(term.sub(1)));
+	} else if (op == Op.OR) {
+	    return (isApplicable(term.sub(0)) && isApplicable(term.sub(1)));
+	} else if (op == Op.IMP) {
+	    return (isApplicable(term.sub(0)) && isApplicable(term.sub(1)));
+	} else if (op == Op.EQV) {
+	    return (isApplicable(term.sub(0)) && isApplicable(term.sub(1)));
+	} else if (op == Op.EQUALS) {
+	    return (isApplicable(term.sub(0)) && isApplicable(term.sub(1)));
 
-	//              IteratorOfConstrainedFormula ante = goal.sequent().antecedent().iterator();
-	//              IteratorOfConstrainedFormula succ = goal.sequent().succedent().iterator();
-
-	ModalityChecker mc = new ModalityChecker();
-
-	for (final ConstrainedFormula currentForm : goal.sequent()) {
-	    currentForm.formula().execPreOrder(mc);
-	    if (mc.hasModality()) {
-		hasModality = true;
+	} else if (op == Op.ALL) {
+	    return isApplicable(term.sub(0));
+	} else if (op == Op.EX) {
+	    return isApplicable(term.sub(0));
+	} else if (op == Op.TRUE) {
+	    return true;
+	} else if (op == Op.FALSE) {
+	    return true;
+	} else if (op == Op.NULL) {
+	    return true;
+	} else if (op instanceof LogicVariable || op instanceof ProgramVariable) {
+	    // translate as variable or constant
+	    return true;
+	} else if (op instanceof Function) {
+	    boolean temp = true;
+	    for (int i = 0; i < term.arity(); i++) {
+		temp = temp && this.isApplicable(term.sub(i));
 	    }
-	    mc.reset();
+	    return temp;
+	} else if (op instanceof ArrayOp) {
+	    boolean temp = true;
+	    ArrayOp operation = (ArrayOp) op;
+	    temp = temp && this.isApplicable(operation.referencePrefix(term));
+	    temp = temp && this.isApplicable(operation.index(term));
+	    return temp;
+	} else if (op instanceof AttributeOp) {
+	    AttributeOp atop = (AttributeOp) op;
+	    boolean temp = true;
+	    for (int i = 0; i < atop.arity(); i++) {
+		temp = temp && isApplicable(term.sub(i));
+	    }
+	    return temp;
+	} else {
+	    return false;
 	}
-	return true;
+	
     }
 
     /**

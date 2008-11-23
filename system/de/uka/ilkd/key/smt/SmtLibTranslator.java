@@ -449,7 +449,7 @@ public class SmtLibTranslator extends AbstractSmtTranslator {
 	StringBuffer toReturn = new StringBuffer(name);
 	int index;
 	// replace array brackets
-	index = name.indexOf("[]");
+	index = toReturn.indexOf("[]");
 	if (index >= 0) {
 	    toReturn.replace(index, index + 2, "_Array");
 	} else {
@@ -457,13 +457,20 @@ public class SmtLibTranslator extends AbstractSmtTranslator {
 	}
 
 	// replace dots brackets
-	index = name.indexOf(".");
+	index = toReturn.indexOf(".");
 	if (index >= 0) {
 	    toReturn.replace(index, index + 1, "_dot_");
 	} else {
 	    index = -1;
 	}
-
+	
+	//replace colons
+	index = toReturn.indexOf(":");
+	while (index >= 0) {
+	    toReturn.replace(index, index + 1, "_");
+	    index = toReturn.indexOf(":");
+	}
+	
 	toReturn.append("_").append(counter);
 	counter++;
 	return toReturn;

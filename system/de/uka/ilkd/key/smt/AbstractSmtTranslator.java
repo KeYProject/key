@@ -181,8 +181,12 @@ public abstract class AbstractSmtTranslator {
 	// append type definitions, if neccessary
 	if (!this.isMultiSorted()) {
 	    // add the type definitions
+	    //this means all predicates that are needed for functions to define
+	    //their result type, all predicates for constants (like number symbols)
 	    ante = this.translateLogicalAnd(this.getTypeDefinitions(), ante);
 	    // add the type hirarchy
+	    //this means, add the typepredicates, that are needed to define
+	    //for every type, what type they are (direct) subtype of
 	    ante = this.translateLogicalAnd(this.getSortHirarchyPredicates(),
 		    ante);
 	}
@@ -246,6 +250,12 @@ public abstract class AbstractSmtTranslator {
 	return toReturn;
     }
 
+    /**
+     * Returns a formula, that defines the resulttypes of functions,
+     * all constants and other elements (i.e. constant number symbols).
+     * Also contains the typedefinition for the null type, if it was used.
+     * @return see above
+     */
     private StringBuffer getTypeDefinitions() {
 	StringBuffer toReturn;
 	toReturn = this.translateLogicalTrue();
@@ -258,12 +268,26 @@ public abstract class AbstractSmtTranslator {
 	}
 
 	// add the type definitions for constant values
+//	for (Term t : this.constantTypePreds.keySet()) {
+//	    StringBuffer termstring = this.constantTypePreds.get(t);
+//	    StringBuffer predString = this.
+//	}
+	//add the type predicates for constant values like number symbols
 	ArrayList<StringBuffer> arglist = new ArrayList<StringBuffer>();
-	arglist.add(this.nullString);
-	for (StringBuffer s : this.typePredicates.values()) {
-	    toReturn = this.translateLogicalAnd(this.translatePredicate(s,
-		    arglist), toReturn);
+	for (StringBuffer s : this.constantTypePreds.values()) {
+	    toReturn = this.translateLogicalAnd(s, toReturn);
 	}
+	
+	//add the type definitions for null
+	if (this.nullString != null && this.nullString.length() > 0) {
+	    arglist = new ArrayList<StringBuffer>();
+	    arglist.add(this.nullString);
+	    for (StringBuffer s : this.typePredicates.values()) {
+		toReturn = this.translateLogicalAnd(this.translatePredicate(s,
+		    arglist), toReturn);
+	    }
+	}
+	
 
 	return toReturn;
     }
@@ -1060,7 +1084,7 @@ public abstract class AbstractSmtTranslator {
 		    long num = NumberTranslation.translate(term.sub(0))
 			    .longValue();
 		    StringBuffer numVal = translateIntegerValue(num);
-
+		    
 		    // add the type predicate for this
 		    // constant
 		    if (!this.constantTypePreds.containsKey(term)) {
