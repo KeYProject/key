@@ -9,8 +9,9 @@
 //
 
 
-package de.uka.ilkd.key.casetool;
+package de.uka.ilkd.key.speclang.ocl.translation;
 
+import de.uka.ilkd.key.casetool.ModelClass;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.SetAsListOfTerm;

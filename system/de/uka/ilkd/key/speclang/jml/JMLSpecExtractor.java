@@ -17,11 +17,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.ArrayOfFieldSpecification;
-import de.uka.ilkd.key.java.declaration.ArrayOfMemberDeclaration;
-import de.uka.ilkd.key.java.declaration.FieldDeclaration;
-import de.uka.ilkd.key.java.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.reference.ArrayOfTypeReference;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Name;
@@ -38,7 +34,6 @@ import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 import de.uka.ilkd.key.speclang.SetOfOperationContract;
 import de.uka.ilkd.key.speclang.SpecExtractor;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
-import de.uka.ilkd.key.speclang.jml.pretranslation.IteratorOfTextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.SLListOfTextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassInv;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
@@ -230,9 +225,8 @@ public class JMLSpecExtractor implements SpecExtractor {
                     String fieldName = field.getProgramName();
                     // add invariant only for fields of reference types
                     // and not for implicit fields.
-                    // [TODO] is there a better way to check this?
                     if(services.getTypeConverter().isReferenceType(field.getType())
-                            && !fieldName.startsWith("<")) {
+                            && !(field instanceof ImplicitFieldSpecification)) {
                         if(!JMLInfoExtractor.isNullable(fieldName, kjt)) {
                             PositionedString ps 
                                 = new PositionedString(fieldName + " != null", 
@@ -245,20 +239,26 @@ public class JMLSpecExtractor implements SpecExtractor {
             }
         }
         
-        //iterate over all children
-        for(int i = 0, n = td.getChildCount(); i < n; i++) {
-            ProgramElement child = td.getChildAt(i);
-            Comment[] comments = child.getComments();
+        //iterate over all children 
+        for(int i = 0, n = td.getChildCount(); i <= n; i++) {
+            //collect comments 
+            //(last position are comments of type declaration itself)
+            Comment[] comments = null;
+            if(i < n) {
+                ProgramElement child = td.getChildAt(i);
+                comments = child.getComments();
+                //skip model and ghost elements 
+                //(their comments are duplicates of other comments)
+                if((child instanceof FieldDeclaration
+                        && ((FieldDeclaration) child).isGhost())
+                    || (child instanceof ProgramMethod
+                        && ((ProgramMethod) child).isModel())) {
+                    continue;
+                }
+            } else if(td.getComments() != null) {
+                comments = td.getComments();
+            }      
             if(comments.length == 0) {
-                continue;
-            }
-            
-            //skip model and ghost elements 
-            //(their comments are duplicates of other comments)
-            if((child instanceof FieldDeclaration
-                    && ((FieldDeclaration) child).isGhost())
-                || (child instanceof ProgramMethod
-                    && ((ProgramMethod) child).isModel())) {
                 continue;
             }
             
@@ -273,9 +273,7 @@ public class JMLSpecExtractor implements SpecExtractor {
                 = preParser.parseClasslevelComment();
             
             //create class invs out of textual constructs, add them to result
-            for(IteratorOfTextualJMLConstruct it = constructs.iterator(); 
-                it.hasNext(); ) {
-                TextualJMLConstruct c = it.next();
+            for(TextualJMLConstruct c : constructs) {
                 if(c instanceof TextualJMLClassInv) {
                     TextualJMLClassInv textualInv = (TextualJMLClassInv) c;
                     ClassInvariant inv 

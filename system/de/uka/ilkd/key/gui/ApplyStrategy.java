@@ -24,12 +24,16 @@ package de.uka.ilkd.key.gui;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.proofevent.IteratorOfNodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -67,6 +71,8 @@ public class ApplyStrategy {
 
     /** time in ms after which rule application shall be aborted, -1 disables timeout */
     private long timeout = -1;
+    
+    private String usedCoalChooserOptionsKey="";
 
     
     // Please create this object beforehand and re-use it.
@@ -74,8 +80,7 @@ public class ApplyStrategy {
     // can cause a ConcurrentModificationException during ongoing operation
     public ApplyStrategy(KeYMediator medi) {
 	this.medi = medi;
-        medi.addRuleAppListener( proofListener );
-        this.goalChooser = medi.getProfile().getSelectedGoalChooserBuilder().create();        
+        medi.addRuleAppListener( proofListener );        
     }
     
     
@@ -105,9 +110,27 @@ public class ApplyStrategy {
                 
                 app = g.getRuleAppManager().next();
 
-                if ( app == null )
-                    goalChooser.removeGoal ( g );
-                else
+                if (app == null) {
+                    if (medi.getProof().getSettings().getStrategySettings()
+                            .getActiveStrategyProperties().getProperty(
+                                    StrategyProperties.STOPMODE_OPTIONS_KEY)
+                            .equals(StrategyProperties.STOPMODE_NONCLOSE)) {
+                        // iff Stop on non-closeable Goal is selected a little
+                        // popup is generated and proof is stopped
+                        JOptionPane pane = new JOptionPane(
+                                "Couldn't close Goal Nr. "
+                                        + g.node().serialNr()
+                                        + " automatically",
+                                JOptionPane.INFORMATION_MESSAGE,
+                                JOptionPane.DEFAULT_OPTION);
+                        JDialog dialog = pane.createDialog(medi.mainFrame(),
+                                "The KeY Project");
+                        dialog.setVisible(true);
+			medi.goalChosen(g);
+			return false;
+                    }
+                    goalChooser.removeGoal(g);
+                }else
                     break;
             }
             if (app == null) return false;      
@@ -194,7 +217,17 @@ public class ApplyStrategy {
         this.proof = proof;
         maxApplications = maxSteps;
         this.timeout = timeout;
-        countApplied = 0;
+        countApplied = 0; 
+        
+        if(usedCoalChooserOptionsKey.compareTo(medi.getProof().getSettings().getStrategySettings().getActiveStrategyProperties().getProperty(StrategyProperties.GOALCHOOSER_OPTIONS_KEY))!=0){
+        	usedCoalChooserOptionsKey = medi.getProof().getSettings().getStrategySettings().getActiveStrategyProperties().getProperty(StrategyProperties.GOALCHOOSER_OPTIONS_KEY);
+        	if(usedCoalChooserOptionsKey.equals(StrategyProperties.GOALCHOOSER_DEFAULT)){
+        		medi.getProfile().setSelectedGoalChooserBuilder(DefaultGoalChooserBuilder.NAME);
+        	}else if(usedCoalChooserOptionsKey.equals(StrategyProperties.GOALCHOOSER_DEPTH)){
+        		medi.getProfile().setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);
+        	}
+        	this.goalChooser = medi.getProfile().getSelectedGoalChooserBuilder().create();
+    	}        
         goalChooser.init ( proof, goals );
         setAutoModeActive(true);
         startedAsInteractive = !mediator().autoMode();
@@ -266,17 +299,27 @@ public class ApplyStrategy {
                 (new GeneralFailureEvent("An exception occurred during" 
                         + " strategy execution."));  
             } else {
-                if (startedAsInteractive) mediator().startInterface(true);
+                if (startedAsInteractive){
+                    if (medi.getProof().getSettings().getStrategySettings()
+			.getActiveStrategyProperties().getProperty(
+			       StrategyProperties.STOPMODE_OPTIONS_KEY)
+			.equals(StrategyProperties.STOPMODE_NONCLOSE)){
+			Goal g = mediator().getSelectedGoal();
+			mediator().startInterface(true);
+			mediator().goalChosen(g);
+		    }else{
+			mediator().startInterface(true);
+		    }
+		}
             }
-
             proof.addAutoModeTime(time);
             fireTaskFinished (new DefaultTaskFinishedInfo(ApplyStrategy.this, result, 
                     proof, time, 
                     countApplied, mediator().getNrGoalsClosedByAutoMode()));	  
-            
+
             mediator().resetNrGoalsClosedByHeuristics();
             
-            mediator().setInteractive( true );            
+            mediator().setInteractive( true );  
         }
     }
     
