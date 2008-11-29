@@ -15,7 +15,8 @@ import de.uka.ilkd.key.rule.ListOfBuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.SLListOfBuiltInRule;
 import de.uka.ilkd.key.rule.YicesIntegerRule;
-import de.uka.ilkd.key.smt.YicesSmtRule;
+import de.uka.ilkd.key.smt.SMTRule;
+import de.uka.ilkd.key.smt.YicesSmtSolver;
 import de.uka.ilkd.key.strategy.IteratorOfStrategyFactory;
 import de.uka.ilkd.key.strategy.SetAsListOfStrategyFactory;
 import de.uka.ilkd.key.strategy.SetOfStrategyFactory;
@@ -128,7 +129,7 @@ public abstract class AbstractProfile implements Profile {
             main.setStandardStatusLine();
         }
         
-        builtInRules = builtInRules.prepend(new YicesSmtRule());
+        builtInRules = builtInRules.prepend(new SMTRule(new YicesSmtSolver()));
 
         return builtInRules;
     }
