@@ -35,7 +35,7 @@ public class SMTRule implements BuiltInRule {
     public boolean isApplicable(Goal goal, PosInOccurrence pio,
 	    Constraint userConstraint) {
 
-	return this.prover.isApplicable(goal, pio, userConstraint);
+	return this.prover.isApplicable(goal);
     }
 
     public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {

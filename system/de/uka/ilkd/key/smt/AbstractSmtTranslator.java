@@ -29,7 +29,7 @@ public abstract class AbstractSmtTranslator {
 
     private Sort integerSort;
 
-    // private static long counter = 0;
+    // private static long counter = 0;    
     protected static final int ANTECEDENT = 0;
 
     protected static final int SUCCEDENT = 1;
@@ -123,6 +123,13 @@ public abstract class AbstractSmtTranslator {
 	this(null, null, null, s, false);
     }
 
+    /**
+     * Translate a sequent into a given syntax.
+     * @param sequent the sequent to translate.
+     * @param services wrapper object for service attributes.
+     * @return A StringBuffer representing the sequent in the given syntax.
+     * @throws IllegalFormulaException if the sequent could not be translated.
+     */
     protected final StringBuffer translate(Sequent sequent, Services services)
 	    throws IllegalFormulaException {
 	return translate(sequent, false, services);
@@ -168,6 +175,47 @@ public abstract class AbstractSmtTranslator {
 		.buildSortHirarchy());
     }
 
+    /**
+     * Translate s term into the given syntax.
+     * @param t The term to translate.
+     * @param services a service wrapper object.
+     * @return A StringBuffer, representing the term in the given syntax.
+     * @throws IllegalArgumentException if the term is not of type FORMULA or could not be translated.
+     */
+    protected final StringBuffer translate(Term t, Services services) 
+    		throws IllegalArgumentException {
+	//check, if the term is of type formula. otherwise a translation does not make sense
+	if (t.sort() != Sort.FORMULA) {
+	    throw new IllegalArgumentException("The given Term is not Type of Formula");
+	}
+//	 translate
+	try {
+	    StringBuffer hb = new StringBuffer();
+	    StringBuffer form;
+	    form = translateTerm(t, new Vector<QuantifiableVariable>(), services);
+
+	    //append type definitions, if neccessary
+	    if (!this.isMultiSorted()) {
+		// add the type definitions
+		//this means all predicates that are needed for functions to define
+		//their result type, all predicates for constants (like number symbols)
+		StringBuffer pre = this.getTypeDefinitions();
+		//add the sort hirarchy
+		pre = this.translateLogicalAnd(this.getSortHirarchyPredicates(), pre);
+		//definitions imply the valid formula
+		form = this.translateLogicalImply(pre, form);
+	    }
+
+	    hb = this.translateLogicalNot(form);
+
+	    return buildCompleteText(hb, this.buildTranslatedFuncDecls(), this
+		    .buildTranslatedPredDecls(), this.buildTranslatedSorts(), this
+		    .buildSortHirarchy());
+	} catch (IllegalFormulaException e) {
+	    throw new IllegalArgumentException("Illegal formula. Can not be translated");
+	}
+    }
+    
     /**
      * Build the sorthirarchy for the sorts
      * If null was used, add typepredicates for all types.
@@ -459,6 +507,7 @@ public abstract class AbstractSmtTranslator {
      *                the ConstrainedFormula which should be written in
      *                Simplify syntax
      * 
+     * TODO overwork. makes sense?
      */
     protected final StringBuffer translate(ConstrainedFormula cf,
 	    boolean lightWeight, Services services)
@@ -479,11 +528,11 @@ public abstract class AbstractSmtTranslator {
 	if (!lightWeight || !(op instanceof Modality)
 		&& !(op instanceof IUpdateOperator)
 		&& !(op instanceof IfThenElse) && op != Op.ALL && op != Op.EX) {
-	    hb.append(translate(t, new Vector<QuantifiableVariable>(), services));
+	    hb.append(translateTerm(t, new Vector<QuantifiableVariable>(), services));
 	}
 	return hb;
     }
-
+    
     /**
      * Returns, wheather the Structer, this translator creates should be a
      * Structur, that is multi sorted with inheritance of Sorts. If false, a
@@ -833,31 +882,31 @@ public abstract class AbstractSmtTranslator {
      *                modulo terms, but must be looped through until we get
      *                there.
      */
-    private final StringBuffer translate(Term term, Vector<QuantifiableVariable> quantifiedVars,
+    private final StringBuffer translateTerm(Term term, Vector<QuantifiableVariable> quantifiedVars,
 	    Services services) throws IllegalFormulaException {
 	Operator op = term.op();
 	if (op == Op.NOT) {
-	    StringBuffer arg = translate(term.sub(0), quantifiedVars, services);
+	    StringBuffer arg = translateTerm(term.sub(0), quantifiedVars, services);
 	    return this.translateLogicalNot(arg);
 	} else if (op == Op.AND) {
-	    StringBuffer arg1 = translate(term.sub(0), quantifiedVars, services);
-	    StringBuffer arg2 = translate(term.sub(1), quantifiedVars, services);
+	    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars, services);
+	    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars, services);
 	    return this.translateLogicalAnd(arg1, arg2);
 	} else if (op == Op.OR) {
-	    StringBuffer arg1 = translate(term.sub(0), quantifiedVars, services);
-	    StringBuffer arg2 = translate(term.sub(1), quantifiedVars, services);
+	    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars, services);
+	    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars, services);
 	    return this.translateLogicalOr(arg1, arg2);
 	} else if (op == Op.IMP) {
-	    StringBuffer arg1 = translate(term.sub(0), quantifiedVars, services);
-	    StringBuffer arg2 = translate(term.sub(1), quantifiedVars, services);
+	    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars, services);
+	    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars, services);
 	    return this.translateLogicalImply(arg1, arg2);
 	} else if (op == Op.EQV) {
-	    StringBuffer arg1 = translate(term.sub(0), quantifiedVars, services);
-	    StringBuffer arg2 = translate(term.sub(1), quantifiedVars, services);
+	    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars, services);
+	    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars, services);
 	    return this.translateLogicalEquivalence(arg1, arg2);
 	} else if (op == Op.EQUALS) {
-	    StringBuffer arg1 = translate(term.sub(0), quantifiedVars, services);
-	    StringBuffer arg2 = translate(term.sub(1), quantifiedVars, services);
+	    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars, services);
+	    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars, services);
 	    return this.translateObjectEqual(arg1, arg2);
 
 	} else if (op == Op.ALL) {
@@ -870,7 +919,7 @@ public abstract class AbstractSmtTranslator {
 		    .getQuantifiableVariable(0));
 	    StringBuffer sort = this.translateSort(vars
 		    .getQuantifiableVariable(0).sort());
-	    StringBuffer form = this.translate(term.sub(0), quantifiedVars,
+	    StringBuffer form = this.translateTerm(term.sub(0), quantifiedVars,
 		    services);
 
 	    if (!this.isMultiSorted()) {
@@ -893,7 +942,7 @@ public abstract class AbstractSmtTranslator {
 		    .getQuantifiableVariable(0));
 	    StringBuffer sort = this.translateSort(vars
 		    .getQuantifiableVariable(0).sort());
-	    StringBuffer form = this.translate(term.sub(0), quantifiedVars,
+	    StringBuffer form = this.translateTerm(term.sub(0), quantifiedVars,
 		    services);
 
 	    if (!this.isMultiSorted()) {
@@ -924,7 +973,7 @@ public abstract class AbstractSmtTranslator {
 		// translate it as a constant.
 		ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
 		for (int i = 0; i < op.arity(); i++) {
-		    subterms.add(translate(term.sub(i), quantifiedVars,
+		    subterms.add(translateTerm(term.sub(i), quantifiedVars,
 			    services));
 		}
 
@@ -939,37 +988,37 @@ public abstract class AbstractSmtTranslator {
 		// as such
 		if (fun == services.getTypeConverter().getIntegerLDT()
 			.getLessThan()) {
-		    StringBuffer arg1 = translate(term.sub(0), quantifiedVars,
+		    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars,
 			    services);
-		    StringBuffer arg2 = translate(term.sub(1), quantifiedVars,
+		    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars,
 			    services);
 		    return this.translateIntegerLt(arg1, arg2);
 		} else if (fun == services.getTypeConverter().getIntegerLDT()
 			.getGreaterThan()) {
-		    StringBuffer arg1 = translate(term.sub(0), quantifiedVars,
+		    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars,
 			    services);
-		    StringBuffer arg2 = translate(term.sub(1), quantifiedVars,
+		    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars,
 			    services);
 		    return this.translateIntegerGt(arg1, arg2);
 		} else if (fun == services.getTypeConverter().getIntegerLDT()
 			.getLessOrEquals()) {
-		    StringBuffer arg1 = translate(term.sub(0), quantifiedVars,
+		    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars,
 			    services);
-		    StringBuffer arg2 = translate(term.sub(1), quantifiedVars,
+		    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars,
 			    services);
 		    return this.translateIntegerLeq(arg1, arg2);
 		} else if (fun == services.getTypeConverter().getIntegerLDT()
 			.getGreaterOrEquals()) {
-		    StringBuffer arg1 = translate(term.sub(0), quantifiedVars,
+		    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars,
 			    services);
-		    StringBuffer arg2 = translate(term.sub(1), quantifiedVars,
+		    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars,
 			    services);
 		    return this.translateIntegerGeq(arg1, arg2);
 		} else {
 
 		    ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
 		    for (int i = 0; i < op.arity(); i++) {
-			subterms.add(translate(term.sub(i), quantifiedVars,
+			subterms.add(translateTerm(term.sub(i), quantifiedVars,
 				services));
 		    }
 		    ArrayList<Sort> sorts = new ArrayList<Sort>();
@@ -984,35 +1033,35 @@ public abstract class AbstractSmtTranslator {
 		// this Function is a function, so translate it
 		// as such
 		if (fun == services.getTypeConverter().getIntegerLDT().getAdd()) {
-		    StringBuffer arg1 = translate(term.sub(0), quantifiedVars,
+		    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars,
 			    services);
-		    StringBuffer arg2 = translate(term.sub(1), quantifiedVars,
+		    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars,
 			    services);
 		    return this.translateIntegerPlus(arg1, arg2);
 		} else if (fun == services.getTypeConverter().getIntegerLDT()
 			.getSub()) {
-		    StringBuffer arg1 = translate(term.sub(0), quantifiedVars,
+		    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars,
 			    services);
-		    StringBuffer arg2 = translate(term.sub(1), quantifiedVars,
+		    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars,
 			    services);
 		    return this.translateIntegerMinus(arg1, arg2);
 		} else if (fun == services.getTypeConverter().getIntegerLDT()
 			.getNeg()) {
-		    StringBuffer arg1 = translate(term.sub(0), quantifiedVars,
+		    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars,
 			    services);
 		    return this.translateIntegerUnaryMinus(arg1);
 		} else if (fun == services.getTypeConverter().getIntegerLDT()
 			.getMul()) {
-		    StringBuffer arg1 = translate(term.sub(0), quantifiedVars,
+		    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars,
 			    services);
-		    StringBuffer arg2 = translate(term.sub(1), quantifiedVars,
+		    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars,
 			    services);
 		    return this.translateIntegerMult(arg1, arg2);
 		} else if (fun == services.getTypeConverter().getIntegerLDT()
 			.getDiv()) {
-		    StringBuffer arg1 = translate(term.sub(0), quantifiedVars,
+		    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars,
 			    services);
-		    StringBuffer arg2 = translate(term.sub(1), quantifiedVars,
+		    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars,
 			    services);
 		    return this.translateIntegerDiv(arg1, arg2);
 		} else if (fun == services.getTypeConverter().getIntegerLDT()
@@ -1037,7 +1086,7 @@ public abstract class AbstractSmtTranslator {
 		    // translate it as such
 		    ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
 		    for (int i = 0; i < fun.arity(); i++) {
-			subterms.add(translate(term.sub(i), quantifiedVars,
+			subterms.add(translateTerm(term.sub(i), quantifiedVars,
 				services));
 		    }
 		    ArrayList<Sort> sorts = new ArrayList<Sort>();
@@ -1052,9 +1101,9 @@ public abstract class AbstractSmtTranslator {
 
 	} else if (op instanceof ArrayOp) {
 	    ArrayOp operation = (ArrayOp) op;
-	    StringBuffer refPrefix = this.translate(operation
+	    StringBuffer refPrefix = this.translateTerm(operation
 		    .referencePrefix(term), quantifiedVars, services);
-	    StringBuffer loc = this.translate(operation.index(term),
+	    StringBuffer loc = this.translateTerm(operation.index(term),
 		    quantifiedVars, services);
 	    ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
 	    subterms.add(refPrefix);
@@ -1071,7 +1120,7 @@ public abstract class AbstractSmtTranslator {
 	    AttributeOp atop = (AttributeOp) op;
 	    ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
 	    for (int i = 0; i < atop.arity(); i++) {
-		subterms.add(translate(term.sub(i), quantifiedVars, services));
+		subterms.add(translateTerm(term.sub(i), quantifiedVars, services));
 	    }
 	    ArrayList<Sort> sorts = new ArrayList<Sort>();
 	    for (int i = 0; i < op.arity(); i++) {
@@ -1239,7 +1288,7 @@ public abstract class AbstractSmtTranslator {
     protected final StringBuffer translate(Term term, int skolemization,
 	    Vector<QuantifiableVariable> quantifiedVars, Services services)
 	    throws IllegalFormulaException {
-	return translate(term, quantifiedVars, services);
+	return translateTerm(term, quantifiedVars, services);
     }
 
     private boolean isSomeIntegerSort(Sort s) {
