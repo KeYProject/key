@@ -13,7 +13,7 @@ import de.uka.ilkd.key.java.Services;
 
 import org.apache.log4j.Logger;
 
-public abstract class AbstractSmtTranslator {
+public abstract class AbstractSmtTranslator implements SmtTranslator{
     static Logger logger = Logger.getLogger(AbstractSmtTranslator.class
 	    .getName());
 
@@ -30,11 +30,6 @@ public abstract class AbstractSmtTranslator {
     private Sort integerSort;
 
     // private static long counter = 0;   
-    protected static enum TERMPOSITION {ANTECEDENT, SUCCEDENT}
-    //protected static final int ANTECEDENT = 0;
-
-    //protected static final int SUCCEDENT = 1;
-
     protected static final int YESNOT = 2;
 
     /** The translation result is stored in this variable. */
@@ -131,7 +126,7 @@ public abstract class AbstractSmtTranslator {
      * @return A StringBuffer representing the sequent in the given syntax.
      * @throws IllegalFormulaException if the sequent could not be translated.
      */
-    protected final StringBuffer translate(Sequent sequent, Services services)
+    public final StringBuffer translate(Sequent sequent, Services services)
 	    throws IllegalFormulaException {
 	return translate(sequent, false, services);
     }
@@ -143,17 +138,17 @@ public abstract class AbstractSmtTranslator {
      * @param sequent
      *                the Sequent which should be written in Simplify syntax
      */
-    protected final StringBuffer translate(Sequent sequent,
+    public final StringBuffer translate(Sequent sequent,
 	    boolean lightWeight, Services services)
 	    throws IllegalFormulaException {
 
 	// translate
 	StringBuffer hb = new StringBuffer();
 	StringBuffer ante;
-	ante = translate(sequent.antecedent(), TERMPOSITION.ANTECEDENT, lightWeight,
+	ante = translate(sequent.antecedent(), SmtTranslator.TERMPOSITION.ANTECEDENT, lightWeight,
 		services);
 	StringBuffer succ;
-	succ = translate(sequent.succedent(), TERMPOSITION.SUCCEDENT, lightWeight, services);
+	succ = translate(sequent.succedent(), SmtTranslator.TERMPOSITION.SUCCEDENT, lightWeight, services);
 
 	// append type definitions, if neccessary
 	if (!this.isMultiSorted()) {
@@ -183,7 +178,7 @@ public abstract class AbstractSmtTranslator {
      * @return A StringBuffer, representing the term in the given syntax.
      * @throws IllegalArgumentException if the term is not of type FORMULA or could not be translated.
      */
-    protected final StringBuffer translate(Term t, Services services) 
+    public final StringBuffer translate(Term t, Services services) 
     		throws IllegalArgumentException {
 	//check, if the term is of type formula. otherwise a translation does not make sense
 	if (t.sort() != Sort.FORMULA) {
@@ -455,7 +450,7 @@ public abstract class AbstractSmtTranslator {
 	    ArrayList<ArrayList<StringBuffer>> predicates,
 	    ArrayList<StringBuffer> types, SortHirarchy sortHirarchy);
 
-    protected final StringBuffer translate(Semisequent ss, TERMPOSITION skolemization,
+    protected final StringBuffer translate(Semisequent ss, SmtTranslator.TERMPOSITION skolemization,
 	    Services services) throws IllegalFormulaException {
 	return translate(ss, skolemization, false, services);
     }
@@ -468,14 +463,14 @@ public abstract class AbstractSmtTranslator {
      *                the SemiSequent which should be written in Simplify
      *                syntax
      */
-    protected final StringBuffer translate(Semisequent semi, TERMPOSITION skolemization,
+    private final StringBuffer translate(Semisequent semi, SmtTranslator.TERMPOSITION skolemization,
 	    boolean lightWeight, Services services)
 	    throws IllegalFormulaException {
 	StringBuffer hb = new StringBuffer();
 
 	// if the sequent is empty, return true/false as formula
 	if (semi.size() == 0) {
-	    if (skolemization == TERMPOSITION.ANTECEDENT) {
+	    if (skolemization == SmtTranslator.TERMPOSITION.ANTECEDENT) {
 		hb.append(translateLogicalTrue());
 	    } else {
 		hb.append(translateLogicalFalse());
@@ -488,7 +483,7 @@ public abstract class AbstractSmtTranslator {
 
 	// translate the other semisequences, juncted with AND or OR
 	for (int i = 1; i < semi.size(); ++i) {
-	    if (skolemization == TERMPOSITION.ANTECEDENT) {
+	    if (skolemization == SmtTranslator.TERMPOSITION.ANTECEDENT) {
 		hb = translateLogicalAnd(hb, translate(semi.get(i),
 			lightWeight, services));
 	    } else {
@@ -510,7 +505,7 @@ public abstract class AbstractSmtTranslator {
      * 
      * TODO overwork. makes sense?
      */
-    protected final StringBuffer translate(ConstrainedFormula cf,
+    private final StringBuffer translate(ConstrainedFormula cf,
 	    boolean lightWeight, Services services)
 	    throws IllegalFormulaException {
 	StringBuffer hb = new StringBuffer();
@@ -1286,7 +1281,7 @@ public abstract class AbstractSmtTranslator {
      * Used just to be called from DecProcTranslation
      * @see de.uka.ilkd.key.proof.decproc.DecProcTranslation#translate(Semisequent, int)
      */
-    protected final StringBuffer translate(Term term, int skolemization,
+    private final StringBuffer translate(Term term, int skolemization,
 	    Vector<QuantifiableVariable> quantifiedVars, Services services)
 	    throws IllegalFormulaException {
 	return translateTerm(term, quantifiedVars, services);

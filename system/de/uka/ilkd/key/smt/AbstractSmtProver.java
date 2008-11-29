@@ -13,7 +13,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import org.apache.log4j.Logger;
 
-public abstract class AbstractSmtProver {
+public abstract class AbstractSmtProver implements SmtSolver{
 
     //public static final int VALID = 0;
 
@@ -21,8 +21,6 @@ public abstract class AbstractSmtProver {
 
     //public static final int UNKNOWN = 2;
 
-    public static enum RESULTTYPE {VALID, INVALID, UNKNOWN};
-    
     private static final Logger logger = Logger
 	    .getLogger(AbstractSmtProver.class.getName());
 
@@ -118,7 +116,7 @@ public abstract class AbstractSmtProver {
      * Get the abstract translator, that should be used to
      * @return the translator, that should be used.
      */
-    protected abstract AbstractSmtTranslator getTranslator(Goal goal,
+    protected abstract SmtTranslator getTranslator(Goal goal,
 	    Services services, RuleApp ruleApp);
 
     /**
@@ -182,7 +180,7 @@ public abstract class AbstractSmtProver {
      *      INVALID, if the formula was proven invalid,
      *      UNKNOWN, if the formula could not be proved
      */
-    protected abstract RESULTTYPE answerType(String answer);
+    protected abstract SmtSolver.RESULTTYPE answerType(String answer);
 
     /** Read the input until end of file and return contents in a
      * single string containing all line breaks. */
@@ -206,17 +204,17 @@ public abstract class AbstractSmtProver {
      * @param ruleApp The Rule Application
      * @return VALID, INVALID or UNKNOWN.
      */
-    public final RESULTTYPE isValid(Goal goal, int timeout, Services services,
+    public final SmtSolver.RESULTTYPE isValid(Goal goal, int timeout, Services services,
 	    RuleApp ruleApp) {
-	RESULTTYPE toReturn = RESULTTYPE.UNKNOWN;
+	SmtSolver.RESULTTYPE toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
 
 	if (!this.isApplicable(goal)) {
-	    return RESULTTYPE.UNKNOWN;
+	    return SmtSolver.RESULTTYPE.UNKNOWN;
 	}
 	
 	try {
 	    //get the translation
-	    AbstractSmtTranslator trans = this.getTranslator(goal, services,
+	    SmtTranslator trans = this.getTranslator(goal, services,
 		    ruleApp);
 	    String loc;
 
@@ -246,7 +244,7 @@ public abstract class AbstractSmtProver {
 
 		    if (p.exitValue() != 0) {
 			//the process was terminated by force.
-			toReturn = RESULTTYPE.UNKNOWN;
+			toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
 		    } else {
 			//the process terminated as it sould
 			InputStream in = p.getInputStream();
@@ -255,13 +253,13 @@ public abstract class AbstractSmtProver {
 			logger.debug("Answer for created formula: ");
 			logger.debug(result);
 			in.close();
-			RESULTTYPE validity = this.answerType(result);
-			if (validity == RESULTTYPE.VALID) {
-			    toReturn = RESULTTYPE.VALID;
-			} else if (validity == RESULTTYPE.INVALID) {
-			    toReturn = RESULTTYPE.INVALID;
+			SmtSolver.RESULTTYPE validity = this.answerType(result);
+			if (validity == SmtSolver.RESULTTYPE.VALID) {
+			    toReturn = SmtSolver.RESULTTYPE.VALID;
+			} else if (validity == SmtSolver.RESULTTYPE.INVALID) {
+			    toReturn = SmtSolver.RESULTTYPE.INVALID;
 			} else {
-			    toReturn = RESULTTYPE.UNKNOWN;
+			    toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
 			}
 		    }
 		} catch (IOException e) {
@@ -279,7 +277,7 @@ public abstract class AbstractSmtProver {
 			e);
 	    }
 	} catch (IllegalFormulaException e) {
-	    toReturn = RESULTTYPE.UNKNOWN;
+	    toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
 	    logger.error("The formula could not be translated.", e);
 	}
 	return toReturn;

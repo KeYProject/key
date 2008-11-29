@@ -63,13 +63,13 @@ public class YicesSmtSolver extends AbstractSmtProver {
      *         formula was proven invalid, UNKNOWN, if the formula could not
      *         be proved
      */
-    protected AbstractSmtProver.RESULTTYPE answerType(String answer) {
+    protected SmtSolver.RESULTTYPE answerType(String answer) {
 	if (answer.equals("unsat\n")) {
-	    return AbstractSmtProver.RESULTTYPE.VALID;
+	    return SmtSolver.RESULTTYPE.VALID;
 	} else if (answer.equals("sat\n")) {
-	    return AbstractSmtProver.RESULTTYPE.INVALID;
+	    return SmtSolver.RESULTTYPE.INVALID;
 	} else {
-	    return AbstractSmtProver.RESULTTYPE.UNKNOWN;
+	    return SmtSolver.RESULTTYPE.UNKNOWN;
 	}
     }
 }

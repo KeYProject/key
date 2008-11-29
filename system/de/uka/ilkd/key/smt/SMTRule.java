@@ -12,9 +12,9 @@ import de.uka.ilkd.key.rule.RuleApp;
 
 public class SMTRule implements BuiltInRule {
 
-    private AbstractSmtProver prover = null;
+    private SmtSolver prover = null;
 
-    public SMTRule(AbstractSmtProver arg1) {
+    public SMTRule(SmtSolver arg1) {
 	this.prover = arg1;
     }
 
@@ -35,17 +35,19 @@ public class SMTRule implements BuiltInRule {
     public boolean isApplicable(Goal goal, PosInOccurrence pio,
 	    Constraint userConstraint) {
 
-	return this.prover.isApplicable(goal);
+	//TODO overwork
+	return true;
+	//return this.prover.isApplicable(goal);
     }
 
     public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
 
-	AbstractSmtProver.RESULTTYPE valid = this.prover.isValid(goal, 30, services, ruleApp);
-	if (valid == AbstractSmtProver.RESULTTYPE.VALID) {
+	SmtSolver.RESULTTYPE valid = this.prover.isValid(goal, 30, services, ruleApp);
+	if (valid == SmtSolver.RESULTTYPE.VALID) {
 	    return SLListOfGoal.EMPTY_LIST;
-	} else if (valid == AbstractSmtProver.RESULTTYPE.UNKNOWN) {
+	} else if (valid == SmtSolver.RESULTTYPE.UNKNOWN) {
 	    return null;
-	} else if (valid == AbstractSmtProver.RESULTTYPE.INVALID) {
+	} else if (valid == SmtSolver.RESULTTYPE.INVALID) {
 	    ListOfGoal toReturn = SLListOfGoal.EMPTY_LIST;
 	    //TODO add new goal, that implies invalidity
 	    return null;
