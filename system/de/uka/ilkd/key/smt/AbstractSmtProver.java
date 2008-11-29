@@ -40,8 +40,7 @@ public abstract class AbstractSmtProver {
      */
     public abstract Name name();
 
-    public boolean isApplicable(Goal goal, PosInOccurrence pio,
-	    Constraint userConstraint) {
+    protected boolean isApplicable(Goal goal) {
 	boolean toReturn = true;
 	Semisequent ant = goal.sequent().antecedent();
 	for (ConstrainedFormula c : ant) {
@@ -59,7 +58,7 @@ public abstract class AbstractSmtProver {
     /**
      * TODO overwork
      */
-    public boolean isApplicable(Term term) {
+    protected boolean isApplicable(Term term) {
 	
 	Operator op = term.op();
 	if (op == Op.NOT) {
@@ -209,6 +208,10 @@ public abstract class AbstractSmtProver {
 	    RuleApp ruleApp) {
 	int toReturn = UNKNOWN;
 
+	if (!this.isApplicable(goal)) {
+	    return UNKNOWN;
+	}
+	
 	try {
 	    //get the translation
 	    AbstractSmtTranslator trans = this.getTranslator(goal, services,
