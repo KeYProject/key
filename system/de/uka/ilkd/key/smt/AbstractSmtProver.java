@@ -15,12 +15,14 @@ import org.apache.log4j.Logger;
 
 public abstract class AbstractSmtProver {
 
-    public static final int VALID = 0;
+    //public static final int VALID = 0;
 
-    public static final int INVALID = 1;
+    //public static final int INVALID = 1;
 
-    public static final int UNKNOWN = 2;
+    //public static final int UNKNOWN = 2;
 
+    public static enum RESULTTYPE {VALID, INVALID, UNKNOWN};
+    
     private static final Logger logger = Logger
 	    .getLogger(AbstractSmtProver.class.getName());
 
@@ -180,7 +182,7 @@ public abstract class AbstractSmtProver {
      *      INVALID, if the formula was proven invalid,
      *      UNKNOWN, if the formula could not be proved
      */
-    protected abstract int answerType(String answer);
+    protected abstract RESULTTYPE answerType(String answer);
 
     /** Read the input until end of file and return contents in a
      * single string containing all line breaks. */
@@ -204,12 +206,12 @@ public abstract class AbstractSmtProver {
      * @param ruleApp The Rule Application
      * @return VALID, INVALID or UNKNOWN.
      */
-    public final int isValid(Goal goal, int timeout, Services services,
+    public final RESULTTYPE isValid(Goal goal, int timeout, Services services,
 	    RuleApp ruleApp) {
-	int toReturn = UNKNOWN;
+	RESULTTYPE toReturn = RESULTTYPE.UNKNOWN;
 
 	if (!this.isApplicable(goal)) {
-	    return UNKNOWN;
+	    return RESULTTYPE.UNKNOWN;
 	}
 	
 	try {
@@ -244,7 +246,7 @@ public abstract class AbstractSmtProver {
 
 		    if (p.exitValue() != 0) {
 			//the process was terminated by force.
-			toReturn = UNKNOWN;
+			toReturn = RESULTTYPE.UNKNOWN;
 		    } else {
 			//the process terminated as it sould
 			InputStream in = p.getInputStream();
@@ -253,13 +255,13 @@ public abstract class AbstractSmtProver {
 			logger.debug("Answer for created formula: ");
 			logger.debug(result);
 			in.close();
-			int validity = this.answerType(result);
-			if (validity == VALID) {
-			    toReturn = VALID;
-			} else if (validity == INVALID) {
-			    toReturn = INVALID;
+			RESULTTYPE validity = this.answerType(result);
+			if (validity == RESULTTYPE.VALID) {
+			    toReturn = RESULTTYPE.VALID;
+			} else if (validity == RESULTTYPE.INVALID) {
+			    toReturn = RESULTTYPE.INVALID;
 			} else {
-			    toReturn = UNKNOWN;
+			    toReturn = RESULTTYPE.UNKNOWN;
 			}
 		    }
 		} catch (IOException e) {
@@ -277,7 +279,7 @@ public abstract class AbstractSmtProver {
 			e);
 	    }
 	} catch (IllegalFormulaException e) {
-	    toReturn = UNKNOWN;
+	    toReturn = RESULTTYPE.UNKNOWN;
 	    logger.error("The formula could not be translated.", e);
 	}
 	return toReturn;

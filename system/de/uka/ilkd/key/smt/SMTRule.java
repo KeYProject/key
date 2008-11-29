@@ -40,12 +40,12 @@ public class SMTRule implements BuiltInRule {
 
     public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
 
-	int valid = this.prover.isValid(goal, 30, services, ruleApp);
-	if (valid == AbstractSmtProver.VALID) {
+	AbstractSmtProver.RESULTTYPE valid = this.prover.isValid(goal, 30, services, ruleApp);
+	if (valid == AbstractSmtProver.RESULTTYPE.VALID) {
 	    return SLListOfGoal.EMPTY_LIST;
-	} else if (valid == AbstractSmtProver.UNKNOWN) {
+	} else if (valid == AbstractSmtProver.RESULTTYPE.UNKNOWN) {
 	    return null;
-	} else if (valid == AbstractSmtProver.INVALID) {
+	} else if (valid == AbstractSmtProver.RESULTTYPE.INVALID) {
 	    ListOfGoal toReturn = SLListOfGoal.EMPTY_LIST;
 	    //TODO add new goal, that implies invalidity
 	    return null;

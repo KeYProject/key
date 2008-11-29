@@ -29,10 +29,11 @@ public abstract class AbstractSmtTranslator {
 
     private Sort integerSort;
 
-    // private static long counter = 0;    
-    protected static final int ANTECEDENT = 0;
+    // private static long counter = 0;   
+    protected static enum TERMPOSITION {ANTECEDENT, SUCCEDENT}
+    //protected static final int ANTECEDENT = 0;
 
-    protected static final int SUCCEDENT = 1;
+    //protected static final int SUCCEDENT = 1;
 
     protected static final int YESNOT = 2;
 
@@ -149,10 +150,10 @@ public abstract class AbstractSmtTranslator {
 	// translate
 	StringBuffer hb = new StringBuffer();
 	StringBuffer ante;
-	ante = translate(sequent.antecedent(), ANTECEDENT, lightWeight,
+	ante = translate(sequent.antecedent(), TERMPOSITION.ANTECEDENT, lightWeight,
 		services);
 	StringBuffer succ;
-	succ = translate(sequent.succedent(), SUCCEDENT, lightWeight, services);
+	succ = translate(sequent.succedent(), TERMPOSITION.SUCCEDENT, lightWeight, services);
 
 	// append type definitions, if neccessary
 	if (!this.isMultiSorted()) {
@@ -454,7 +455,7 @@ public abstract class AbstractSmtTranslator {
 	    ArrayList<ArrayList<StringBuffer>> predicates,
 	    ArrayList<StringBuffer> types, SortHirarchy sortHirarchy);
 
-    protected final StringBuffer translate(Semisequent ss, int skolemization,
+    protected final StringBuffer translate(Semisequent ss, TERMPOSITION skolemization,
 	    Services services) throws IllegalFormulaException {
 	return translate(ss, skolemization, false, services);
     }
@@ -467,14 +468,14 @@ public abstract class AbstractSmtTranslator {
      *                the SemiSequent which should be written in Simplify
      *                syntax
      */
-    protected final StringBuffer translate(Semisequent semi, int skolemization,
+    protected final StringBuffer translate(Semisequent semi, TERMPOSITION skolemization,
 	    boolean lightWeight, Services services)
 	    throws IllegalFormulaException {
 	StringBuffer hb = new StringBuffer();
 
 	// if the sequent is empty, return true/false as formula
 	if (semi.size() == 0) {
-	    if (skolemization == ANTECEDENT) {
+	    if (skolemization == TERMPOSITION.ANTECEDENT) {
 		hb.append(translateLogicalTrue());
 	    } else {
 		hb.append(translateLogicalFalse());
@@ -487,7 +488,7 @@ public abstract class AbstractSmtTranslator {
 
 	// translate the other semisequences, juncted with AND or OR
 	for (int i = 1; i < semi.size(); ++i) {
-	    if (skolemization == ANTECEDENT) {
+	    if (skolemization == TERMPOSITION.ANTECEDENT) {
 		hb = translateLogicalAnd(hb, translate(semi.get(i),
 			lightWeight, services));
 	    } else {
