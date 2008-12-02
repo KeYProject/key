@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ListOfString;
@@ -28,20 +29,9 @@ import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.Constructor;
 import recoder.abstraction.Method;
 import recoder.io.DataLocation;
-import recoder.java.Comment;
-import recoder.java.CompilationUnit;
-import recoder.java.Declaration;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.Statement;
-import recoder.java.StatementBlock;
+import recoder.java.*;
 import recoder.java.SourceElement.Position;
-import recoder.java.declaration.ConstructorDeclaration;
-import recoder.java.declaration.DeclarationSpecifier;
-import recoder.java.declaration.FieldDeclaration;
-import recoder.java.declaration.LocalVariableDeclaration;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.TypeDeclaration;
+import recoder.java.declaration.*;
 import recoder.java.expression.operator.CopyAssignment;
 import recoder.java.statement.EmptyStatement;
 import recoder.list.generic.*;
@@ -528,20 +518,23 @@ public class JMLTransformer extends RecoderModelTransformer {
             for(int i = 0, m = getUnits().size(); i < m; i++) {
                 CompilationUnit unit = getUnits().get(i);
                 
-                //iterate over all classes
-                for(int j = 0, n = unit.getTypeDeclarationCount(); j < n; j++) {
-                    TypeDeclaration td = unit.getTypeDeclarationAt(j);
-                    
-                    //copy comments of unit to type declaration
-                    if(unit.getComments() != null) {
-                        ASTList<Comment> tdComments 
-                            = td.getComments() == null 
-                              ? new ASTArrayList<Comment>() 
-                              : td.getComments();
-                        tdComments.addAll(unit.getComments().deepClone());
-                        td.setComments(tdComments);
-                    }
-                    
+                //copy comments of compilation unit to primary type declaration
+                if(unit.getComments() != null 
+                        && unit.getTypeDeclarationCount() > 0) {
+                    TypeDeclaration td = unit.getPrimaryTypeDeclaration();
+                    ASTList<Comment> tdComments 
+                        = td.getComments() == null 
+                          ? new ASTArrayList<Comment>() 
+                          : td.getComments();
+                    tdComments.addAll(unit.getComments().deepClone());
+                    td.setComments(tdComments);
+                }
+                
+                //iterate over all type declarations of the compilation unit
+                TypeDeclarationCollector tdc = new TypeDeclarationCollector();
+                tdc.walk(unit);
+                HashSet<TypeDeclaration> typeDeclarations = tdc.result();               
+                for(TypeDeclaration td : typeDeclarations) {                    
                     //collect pre-existing operations
                     List<? extends Constructor> constructorList 
                         = td.getConstructors();
@@ -586,6 +579,40 @@ public class JMLTransformer extends RecoderModelTransformer {
             		               + ", column " + e.getColumn());
             runtimeE.setStackTrace(e.getStackTrace());
             throw runtimeE;
+        }
+    }
+    
+    
+    //-------------------------------------------------------------------------
+    //inner classes
+    //-------------------------------------------------------------------------
+    
+    private static class TypeDeclarationCollector extends SourceVisitor{
+        
+        HashSet<TypeDeclaration> result = new HashSet<TypeDeclaration>();
+                
+        public void walk(SourceElement s){
+            s.accept(this);
+            if(s instanceof NonTerminalProgramElement){
+                NonTerminalProgramElement pe = (NonTerminalProgramElement) s;
+                for(int i=0; i<pe.getChildCount(); i++){
+                    walk(pe.getChildAt(i));
+                }
+            }
+        }
+        
+        public void visitClassDeclaration(ClassDeclaration td){
+            result.add(td);
+            super.visitClassDeclaration(td);
+        }
+        
+        public void visitInterfaceDeclaration(InterfaceDeclaration td) {
+            result.add(td);
+            super.visitInterfaceDeclaration(td);
+        }
+               
+        public HashSet<TypeDeclaration> result(){           
+            return result;
         }
     }
 }
