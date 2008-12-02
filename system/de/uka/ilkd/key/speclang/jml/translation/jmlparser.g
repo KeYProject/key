@@ -1037,7 +1037,7 @@ logicalorexpr returns [Term result=null] throws SLTranslationException
 	(
 	    LOGICALOR t=logicalorexpr
 	    {
-		result = intHelper.buildOrExpression(t,result);
+		result = tb.or(convertToFormula(result), convertToFormula(t));
 	    }
 	)?
 ;
@@ -1051,7 +1051,7 @@ logicalandexpr returns [Term result=null] throws SLTranslationException
 	(
 	    LOGICALAND t=logicalandexpr
 	    {
-		result = intHelper.buildAndExpression(t,result);
+		result = tb.and(convertToFormula(result), convertToFormula(t));
 	    }
 	)?
 ;
@@ -1066,7 +1066,11 @@ inclusiveorexpr returns [Term result=null] throws SLTranslationException
 	(
 	    INCLUSIVEOR t=inclusiveorexpr
 	    {
-	       result = intHelper.buildPromotedOrExpression(result,t);
+	       if(intHelper.isIntegerTerm(result)) {
+                   result = intHelper.buildPromotedOrExpression(result,t);
+               } else {
+                   result = tb.or(convertToFormula(result), convertToFormula(t));
+               }
 	    }
 	)?
 ;
@@ -1081,7 +1085,14 @@ exclusiveorexpr returns [Term result=null] throws SLTranslationException
 	(
 	    XOR t=exclusiveorexpr
 	    {
-	    result = intHelper.buildPromotedXorExpression(result,t);
+	       if(intHelper.isIntegerTerm(result)) {
+                   result = intHelper.buildPromotedXorExpression(result,t);
+               } else {
+                   Term resultFormula = convertToFormula(result);
+                   Term tFormula = convertToFormula(t);
+                   result = tb.or(tb.and(resultFormula, tb.not(tFormula)), 
+                                  tb.and(tb.not(resultFormula), tFormula));
+               }
 	    }
 	)?
 ;
@@ -1104,7 +1115,11 @@ andexpr returns [Term result=null] throws SLTranslationException
 	(
 	    AND t=andexpr
 	    { 
-		result = intHelper.buildPromotedAndExpression(result,t);
+	       if(intHelper.isIntegerTerm(result)) {
+                   result = intHelper.buildPromotedAndExpression(result,t);
+               } else {
+                   result = tb.and(convertToFormula(result), convertToFormula(t));
+               }
 	    }
 	)?
 ;
