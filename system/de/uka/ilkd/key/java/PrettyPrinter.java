@@ -990,14 +990,14 @@ public class PrettyPrinter {
     }
     
     public void printAssert(Assert x) throws java.io.IOException {
-        printHeader(x);       
+        printHeader(x);
+        writeInternalIndentation(x);
 
         // Mark statement start ...
         markStart(0,x);
        
         boolean wasNoLinefeed  = noLinefeed;
         boolean wasNoSemicolon = noSemicolons;
-        
 
         write("assert ");        
 
@@ -1017,8 +1017,9 @@ public class PrettyPrinter {
 
         output();
         // Mark statement end ...
-        markEnd(0,x);                
-
+        markEnd(0,x);
+        
+        printFooter(x);
     }
  
     public void printArrayDeclaration(ArrayDeclaration type) throws java.io.IOException {
