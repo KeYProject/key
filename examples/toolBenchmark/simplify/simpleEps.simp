@@ -1,0 +1,7 @@
+(DEFPRED (int_1 x46))
+(DEFPRED (A_2))
+(DEFPRED (P_3 x47))
+(FORALL ()(EXISTS ()
+ (IMPLIES (AND (int_1 x_4) (int_1 x_0))(IMPLIES (AND)
+(OR (OR (FORALL (x_0) (IMPLIES(int_1 x_0 )(IMPLIES (A_2) (P_3 x_0)))) (FORALL (x_4) (IMPLIES(int_1 x_4 )(IMPLIES (P_3 x_4) (A_2))))))))
+))

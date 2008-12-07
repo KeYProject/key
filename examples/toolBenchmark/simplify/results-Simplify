@@ -1,0 +1,29 @@
+Solved with Simplify
+
+Problem				time until decission	result
+
+count.smt			immediatly 		solved
+count2.smt			immediatly		solved
+count3.smt			immediatly		solved
+equalities.smt			immediatly		solved
+decproc1.smt			immediatly		solved? (invalid) wrong?
+decproc2.smt			immediatly		unknown
+decproc3.smt			after ca 10 sec		solved
+decproc3-shortened.smt		after ca 2 sec		solved
+equalities2.smt			immediatly		solved
+equalities3.smt			immediatly		solved
+exist1.smt			immediatly 		solved? (valid)
+functions.smt			immediatly		solved
+ics_ist_uberfordert.smt		immediatly		solved
+mv1.smt				immediatly		solved
+mv2.smt				immediatly		solved
+mv3.smt				immediatly		solved
+PUZ001p1-eq.smt			
+PUZ001p1.smt			
+PUZ031p1.smt			
+PUS047p1.smt			
+quantifiers.smt			immediatly		solved
+sameName1.smt			immediatly		solved?
+simpleEps.smt			immediatly		solved
+subsorts.smt			immediatly		solved? wrong
+

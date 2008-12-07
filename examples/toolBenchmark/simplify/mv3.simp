@@ -1,0 +1,7 @@
+(DEFPRED (int_1 x18))
+(DEFPRED (p_2 x19))
+(DEFPRED (q_3 x20))
+(FORALL ()(EXISTS ()
+ (IMPLIES (AND (AND (AND (int_1 12) (int_1 1)) (int_1 0)) (int_1 mv0_0))(IMPLIES (AND)
+(OR (IMPLIES (AND (AND (FORALL (mv0_0) (IMPLIES(int_1 mv0_0 )(IMPLIES (p_2 mv0_0) (q_3 mv0_0)))) (p_2 0)) (p_2 1)) (q_3 12)))))
+))

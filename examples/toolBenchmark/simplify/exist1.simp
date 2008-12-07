@@ -1,0 +1,6 @@
+(DEFPRED (s_1 x7))
+(DEFPRED (p_3 x8 x9))
+(FORALL ()(EXISTS ()
+ (IMPLIES (AND (s_1 y_2) (s_1 x_0))(IMPLIES (AND)
+(OR (EXISTS (x_0) (AND(s_1 x_0 )(EXISTS (y_2) (AND(s_1 y_2 )(IFF (p_3 x_0 y_2) (p_3 y_2 x_0)))))))))
+))

@@ -1,0 +1,6 @@
+(DEFPRED (int_1 x56))
+(DEFPRED (|jint[]_5| x57))
+(FORALL ()(EXISTS ()
+ (IMPLIES (AND (AND (AND (AND (AND (AND (AND (AND (AND (AND (AND (int_1 (ArrayOp a_4 x_6)) (int_1 (ArrayOp a_4 (- x_6 1)))) (int_1 (- x_6 1))) (int_1 1)) (int_1 x_6)) (int_1 (ArrayOp a_4 y_2))) (int_1 (ArrayOp a_4 x_0))) (int_1 (|.length_3| a_4))) (|jint[]_5| a_4)) (int_1 y_2)) (int_1 x_0)) (int_1 0))(IMPLIES (AND)
+(OR (IMPLIES (FORALL (x_0) (IMPLIES(int_1 x_0 )(FORALL (y_2) (IMPLIES(int_1 y_2 )(IMPLIES (AND (AND (<= 0 x_0) (<= x_0 y_2)) (< y_2 (|.length_3| a_4))) (<= (ArrayOp a_4 x_0) (ArrayOp a_4 y_2))))))) (FORALL (x_6) (IMPLIES(int_1 x_6 )(IMPLIES (AND (< 0 x_6) (< x_6 (|.length_3| a_4))) (<= (ArrayOp a_4 (- x_6 1)) (ArrayOp a_4 x_6)))))))))
+))

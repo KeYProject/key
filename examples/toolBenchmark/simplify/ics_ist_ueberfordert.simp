@@ -1,0 +1,4 @@
+(FORALL ()(EXISTS ()
+ (IMPLIES (AND)
+(OR TRUE))
+))

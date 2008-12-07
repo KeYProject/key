@@ -1,0 +1,29 @@
+Solved with z3-2008
+
+Problem				time until decission	result
+
+count.simp			
+count2.simp			
+count3.simp			
+equalities.simp			
+decproc1.simp			
+decproc2.simp			
+decproc3.simp			
+decproc3-shortened.simp		
+equalities2.simp			
+equalities3.simp			
+exist1.simp			
+functions.simp			
+ics_ist_uberfordert.simp		
+mv1.simp				
+mv2.simp				
+mv3.simp				
+PUZ001p1-eq.simp			
+PUZ001p1.simp			
+PUZ031p1.simp			
+PUS047p1.simp			
+quantifiers.simp			
+sameName1.simp			
+simpleEps.simp			
+subsorts.simp			
+

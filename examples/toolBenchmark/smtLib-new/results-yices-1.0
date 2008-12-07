@@ -1,0 +1,29 @@
+Solved with yices 1.0
+
+Problem				time until decission	result
+
+count.smt			immediatly 		solved
+count2.smt			immediatly 		solved
+count3.smt			immediatly 		solved
+equalities.smt			immediatly 		solved
+decproc1.smt			after ca 2 min 		unknown
+decproc2.smt			after ca 17 sec 	solved
+decproc3.smt			
+decproc3-shortened.smt		after about 10 sec 	solved
+equalities2.smt			non linear
+equalities3.smt			non linear
+exist1.smt			immediatly 		unknown
+functions.smt			immediatly 		solved
+ics_ist_uberfordert.smt		immediatly 		solved
+mv1.smt				immediatly 		solved
+mv2.smt				immediatly 		solved
+mv3.smt				immediatly 		unknown
+PUZ001p1-eq.smt			immediatly 		solved
+PUZ001p1.smt			immediatly 		solved
+PUZ031p1.smt			after ca 2 sec 		solved
+PUS047p1.smt			after ca 3 sec 		unknown
+quantifiers.smt			immediatly 		solved
+sameName.smt			immediatly		solved
+simpleEps.smt			immideatly 		solved
+subsorts.smt			immediatly 		solved
+
