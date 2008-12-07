@@ -943,7 +943,8 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 
 	    if (!this.isMultiSorted()) {
 		// add the typepredicate
-		form = this.translateLogicalImply(this.getTypePredicate(vars
+		//a and is needed!!
+		form = this.translateLogicalAnd(this.getTypePredicate(vars
 			.getQuantifiableVariable(0).sort(), qv), form);
 	    }
 	    quantifiedVars.remove(vars.getQuantifiableVariable(0));

@@ -17,7 +17,7 @@ public class SmtLibTranslator extends AbstractSmtTranslator {
     // counter used for making names unique
     private int counter = 0;
 
-    private static StringBuffer INTSTRING = new StringBuffer("int");
+    private static StringBuffer INTSTRING = new StringBuffer("Int");
 
     private static StringBuffer FALSESTRING = new StringBuffer("false");
 
@@ -104,6 +104,9 @@ public class SmtLibTranslator extends AbstractSmtTranslator {
 	// sort should be used
 	// no extra sorts needed
 
+	//add the logic definition
+	toReturn.append("\n :logic AUFLIA");
+	
 	// add the sort declarations
 	toReturn.append("\n :extrasorts (");
 	for (StringBuffer s : types) {

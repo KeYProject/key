@@ -35,14 +35,18 @@ public class SMTRule implements BuiltInRule {
     public boolean isApplicable(Goal goal, PosInOccurrence pio,
 	    Constraint userConstraint) {
 
-	//TODO overwork
-	return true;
+	//only make applicable, if the complete goal should be proved
+	if (pio == null) {
+	    return true;
+	} else {
+	    return false;
+	}
 	//return this.prover.isApplicable(goal);
     }
 
     public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
 
-	SmtSolver.RESULTTYPE valid = this.prover.isValid(goal, 30, services, ruleApp);
+	SmtSolver.RESULTTYPE valid = this.prover.isValid(goal, 60*60*1, services, ruleApp);
 	if (valid == SmtSolver.RESULTTYPE.VALID) {
 	    return SLListOfGoal.EMPTY_LIST;
 	} else if (valid == SmtSolver.RESULTTYPE.UNKNOWN) {
