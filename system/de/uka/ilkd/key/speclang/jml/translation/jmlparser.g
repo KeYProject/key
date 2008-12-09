@@ -716,7 +716,7 @@ storereflist returns [SetOfLocationDescriptor result=SetAsListOfLocationDescript
 storeref returns [SetOfLocationDescriptor result = SetAsListOfLocationDescriptor.EMPTY_SET] throws SLTranslationException
 :
 	result=storerefexpression
-    |   LPAREN MULT { raiseError("informal descriptions not supported (for obvious reason)"); } //TODO: should be a warning!
+    |   LPAREN MULT { raiseNotSupported("informal descriptions"); }
     |   result=storerefkeyword
     ;
 
@@ -1647,7 +1647,7 @@ new_expr throws SLTranslationException
 :
 	NEW typ=type new_suffix
         {	
-        	raiseNotSupported("'new' not supported in JML specifications."); 
+        	raiseNotSupported("'new' within specifications"); 
         }
     ;
 
