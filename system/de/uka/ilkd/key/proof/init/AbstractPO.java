@@ -42,7 +42,7 @@ import de.uka.ilkd.key.speclang.*;
 public abstract class AbstractPO implements ProofOblInput {
 
     protected static final TermFactory TF = TermFactory.DEFAULT;
-    protected static final CreatedAttributeTermFactory createdFactory
+    protected static final CreatedAttributeTermFactory CATF
                                    = CreatedAttributeTermFactory.INSTANCE;
     protected static final TermBuilder TB = TermBuilder.DF;
     protected static final AtPreFactory APF = AtPreFactory.INSTANCE;

@@ -230,6 +230,9 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     public boolean isPure(Services services) {
         if (method == null) {
             resolveMethod(services);
+            if(method == null) {//HACK, seems to happen for anon-method
+                return true;
+            }
         }
         return services.getSpecificationRepository().isStrictlyPure(method);
     }
