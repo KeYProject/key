@@ -80,7 +80,7 @@ POSSIBILITY OF SUCH DAMAGES.
 
   <plugin id="ProofVisualization" download-size="0" install-size="0" version="1.1.16" unpack="false"/> 
 
-<!-- commented out until release of rotheVis Debug <plugin id="VisualDebugger" download-size="0" install-size="0" version="1.1.16" unpack="false"/> -->
+  <plugin id="VisualDebugger" download-size="0" install-size="0" version="1.1.16" unpack="false"/>
 
   <plugin id="KeYExternalLibraries" download-size="0" install-size="0" version="1.1.16" unpack="false"/> 
   
