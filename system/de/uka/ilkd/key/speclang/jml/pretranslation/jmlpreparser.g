@@ -142,7 +142,10 @@ classlevel_element[ListOfString mods]
     |   result=readable_if_clause[mods]
     |   result=writable_if_clause[mods]
     |   result=datagroup_clause[mods]
-    |   result=set_statement[mods] //RecodeR workaround 
+    |   result=set_statement[mods]    //RecodeR workaround
+    |   result=assert_statement[mods] //RecodeR workaround
+    |   result=assume_statement[mods] //RecodeR workaround
+    |   result=nowarn_pragma[mods] 
     |   EOF
 ;
 
@@ -171,6 +174,9 @@ methodlevel_element[ListOfString mods]
         result=field_declaration[mods]
     |   result=set_statement[mods]
     |   result=loop_specification[mods]
+    |   result=assert_statement[mods]
+    |   result=assume_statement[mods]
+    |   result=nowarn_pragma[mods]
 ;
 
 
@@ -910,6 +916,20 @@ maps_keyword
 ;
 
 
+nowarn_pragma[ListOfString mods] 
+	returns [ListOfTextualJMLConstruct result = null]
+	throws SLTranslationException
+{
+    PositionedString ps;
+}
+:
+    NOWARN ps=expression
+    {
+    	raiseNotSupported("nowarn pragmas");
+    }
+;
+
+
 
 //-----------------------------------------------------------------------------
 //set statements
@@ -994,6 +1014,53 @@ decreasing_keyword
     |   DECREASING_REDUNDANTLY
     |   DECREASES
     |   DECREASES_REDUNDANTLY
+;
+
+
+
+//-----------------------------------------------------------------------------
+//unsupported methodlevel stuff
+//-----------------------------------------------------------------------------
+
+assert_statement[ListOfString mods] 
+	returns [ListOfTextualJMLConstruct result = null] 
+	throws SLTranslationException
+{
+    PositionedString ps;
+}
+:
+    assert_keyword ps=expression
+    {
+        raiseNotSupported("JML assert statements");
+    } 
+;
+
+
+assert_keyword
+:
+	ASSERT
+    |	ASSERT_REDUNDANTLY
+;
+
+
+assume_statement[ListOfString mods] 
+	returns [ListOfTextualJMLConstruct result = null] 
+	throws SLTranslationException
+{
+    PositionedString ps;
+}
+:
+    assume_keyword ps=expression
+    {
+        raiseNotSupported("assume statements");
+    } 
+;
+
+
+assume_keyword
+:
+	ASSUME
+    |	ASSUME_REDUNDANTLY
 ;
 
 

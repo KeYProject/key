@@ -76,33 +76,6 @@ public class EnsuresPostPO extends EnsuresPO {
                                     exceptionVar,
                                     atPreFunctions);
        
-        //add implicit postcondition (see discussion for Bug #789) 
-        /*
-        Term implicitPostTerm = TB.tt();
-        if(resultVar != null) {
-            if(resultVar.sort() instanceof ObjectSort) {       
-                implicitPostTerm 
-                   = createdFactory.createCreatedOrNullTerm(services, 
-                                                            TB.var(resultVar));
-            } else {
-        	LDT ldt 
-        	    = services.getTypeConverter().getModelFor(resultVar.sort());
-        	if(ldt instanceof AbstractIntegerLDT) {
-        	    Function inBoundsPredicate 
-        	    	= ((AbstractIntegerLDT)ldt).getInBoundsPredicate();
-        	    if(inBoundsPredicate != null) {
-        		implicitPostTerm = TB.func(inBoundsPredicate, 
-        					   TB.var(resultVar));
-        	    }
-        	}
-            }
-        }
-	Term excNotNullTerm = TB.not(TB.equals(TB.var(exceptionVar), 
-			                       TB.NULL(services)));
-        implicitPostTerm = TB.or(implicitPostTerm, excNotNullTerm);
-        result = TB.and(result, implicitPostTerm);
-        */
-
         return result;
     }
     

@@ -709,14 +709,14 @@ storereflist returns [SetOfLocationDescriptor result=SetAsListOfLocationDescript
 }
 :
     mod=storeref { result = result.union(mod); } 
-	("," mod=storeref { result = result.union(mod); } )*
+	(COMMA mod=storeref { result = result.union(mod); } )*
     ;
 
 
 storeref returns [SetOfLocationDescriptor result = SetAsListOfLocationDescriptor.EMPTY_SET] throws SLTranslationException
 :
 	result=storerefexpression
-    |   LPAREN MULT { raiseError("informal descriptions not supported (for obvious reason)"); } //TODO: should be a warning!
+    |   LPAREN MULT { raiseNotSupported("informal descriptions"); }
     |   result=storerefkeyword
     ;
 
@@ -752,11 +752,11 @@ storerefname returns [JMLExpression result = null] throws SLTranslationException
 	    raiseError("identifier not found: " + id.getText());
 	}
     }
-    | "super"
+    | SUPER
     {
 	raiseNotSupported("location \"super\"");
     }
-    | "this"
+    | THIS
     {
 	result = new JMLExpression(tb.var(selfVar));
     }
@@ -780,11 +780,11 @@ storerefnamesuffix[JMLExpression receiver] returns [BasicLocationDescriptor ld=n
 	    raiseError(e.getMessage());
 	}
     }
-    | DOT "this"
+    | DOT THIS
     {
 	raiseNotSupported("location \"this\" as store-ref-suffix");
     }
-    | "[" ld=specarrayrefexpr[receiver] "]"
+    | LBRACKET ld=specarrayrefexpr[receiver] RBRACKET
     | DOT MULT
     {
 	raiseNotSupported("location \"*\" as store-ref-suffix");
@@ -854,7 +854,7 @@ signalsonlyclause returns [ListOfKeYJavaType result = SLListOfKeYJavaType.EMPTY_
 }
 :
 	NOTHING
-    |   t=referencetype { result = result.append(t); } ("," t=referencetype { result = result.append(t); })*
+    |   t=referencetype { result = result.append(t); } (COMMA t=referencetype { result = result.append(t); })*
     ;
     
 signalsclause returns [Term result=null] throws SLTranslationException
@@ -899,7 +899,7 @@ signalsclause returns [Term result=null] throws SLTranslationException
 predornot returns [Term result=null] throws SLTranslationException
 :
 	result=predicate
-    |   "\\not_specified"
+    |   NOT_SPECIFIED
     |   "\\same"
     ;
     
@@ -918,7 +918,7 @@ spec_expression_list throws SLTranslationException
     Term t;
 }
 :
-	t=specexpression ("," t=specexpression)*
+	t=specexpression (COMMA t=specexpression)*
     ;
 
 expression returns [Term result=null] throws SLTranslationException
@@ -963,7 +963,7 @@ conditionalexpr returns [Term result=null] throws SLTranslationException
 :
 	result=equivalenceexpr 
 	(
-	    "?" a=conditionalexpr ":" b=conditionalexpr
+	    QUESTIONMARK a=conditionalexpr ":" b=conditionalexpr
 	    {
 		result = tb.ife(convertToFormula(result),a,b);
 	    }
@@ -999,14 +999,14 @@ impliesexpr returns [Term result=null] throws SLTranslationException
 :
 	result=logicalorexpr 
 	(
-	    "==>" t=impliesnonbackwardexpr
+	    IMPLIES t=impliesnonbackwardexpr
 	    {
 		result = tb.imp(convertToFormula(result),convertToFormula(t));
 	    }
 	    
 	  |
 	    (
-		"<==" t=logicalorexpr
+		IMPLIESBACKWARD t=logicalorexpr
 		{
 		    result = tb.imp(convertToFormula(t),convertToFormula(result));
 		}
@@ -1021,7 +1021,7 @@ impliesnonbackwardexpr returns [Term result=null] throws SLTranslationException
 :
 	result=logicalorexpr
 	(
-	    "==>" t=impliesnonbackwardexpr
+	    IMPLIES t=impliesnonbackwardexpr
 	    {
 		result = tb.imp(convertToFormula(result),convertToFormula(t));
 	    }
@@ -1035,9 +1035,9 @@ logicalorexpr returns [Term result=null] throws SLTranslationException
 :
 	result=logicalandexpr
 	(
-	    "||" t=logicalorexpr
+	    LOGICALOR t=logicalorexpr
 	    {
-		result = intHelper.buildOrExpression(t,result);
+		result = tb.or(convertToFormula(result), convertToFormula(t));
 	    }
 	)?
 ;
@@ -1049,9 +1049,9 @@ logicalandexpr returns [Term result=null] throws SLTranslationException
 :
 	result=inclusiveorexpr
 	(
-	    "&&" t=logicalandexpr
+	    LOGICALAND t=logicalandexpr
 	    {
-		result = intHelper.buildAndExpression(t,result);
+		result = tb.and(convertToFormula(result), convertToFormula(t));
 	    }
 	)?
 ;
@@ -1064,9 +1064,13 @@ inclusiveorexpr returns [Term result=null] throws SLTranslationException
 :
 	result=exclusiveorexpr 
 	(
-	    "|" t=inclusiveorexpr
+	    INCLUSIVEOR t=inclusiveorexpr
 	    {
-	       result = intHelper.buildPromotedOrExpression(result,t);
+	       if(intHelper.isIntegerTerm(result)) {
+                   result = intHelper.buildPromotedOrExpression(result,t);
+               } else {
+                   result = tb.or(convertToFormula(result), convertToFormula(t));
+               }
 	    }
 	)?
 ;
@@ -1081,7 +1085,14 @@ exclusiveorexpr returns [Term result=null] throws SLTranslationException
 	(
 	    XOR t=exclusiveorexpr
 	    {
-	    result = intHelper.buildPromotedXorExpression(result,t);
+	       if(intHelper.isIntegerTerm(result)) {
+                   result = intHelper.buildPromotedXorExpression(result,t);
+               } else {
+                   Term resultFormula = convertToFormula(result);
+                   Term tFormula = convertToFormula(t);
+                   result = tb.or(tb.and(resultFormula, tb.not(tFormula)), 
+                                  tb.and(tb.not(resultFormula), tFormula));
+               }
 	    }
 	)?
 ;
@@ -1102,9 +1113,13 @@ andexpr returns [Term result=null] throws SLTranslationException
 	    result = left.getTerm();
 	}
 	(
-	    "&" t=andexpr
+	    AND t=andexpr
 	    { 
-		result = intHelper.buildPromotedAndExpression(result,t);
+	       if(intHelper.isIntegerTerm(result)) {
+                   result = intHelper.buildPromotedAndExpression(result,t);
+               } else {
+                   result = tb.and(convertToFormula(result), convertToFormula(t));
+               }
 	    }
 	)?
 ;
@@ -1117,7 +1132,7 @@ equalityexpr returns [JMLExpression result=null] throws SLTranslationException
 :
 	result=relationalexpr 
 	(
-	    eq:"==" right=equalityexpr
+	    eq: EQUAL right=equalityexpr
 	    {
 		if (result.isType() ^ right.isType()) {
 		    raiseError("Cannot build equality expression between term " +
@@ -1126,7 +1141,7 @@ equalityexpr returns [JMLExpression result=null] throws SLTranslationException
 		result = new JMLExpression(buildEqualityTerm(result, right));
 	    }
 	|
-	    ne:"!=" right=equalityexpr
+	    ne: NOTEQUAL right=equalityexpr
 	    {
 		if (result.isType() ^ right.isType()) {
 		    raiseError("Cannot build equality expression between term " +
@@ -1241,7 +1256,7 @@ shiftexpr returns [JMLExpression result=null] throws SLTranslationException
 :
     result=additiveexpr
     (
-	">>" e=additiveexpr
+	SHIFTRIGHT e=additiveexpr
 	{
 	    if (result.isType()) {
 		raiseError("Cannot build shift expression from type " +
@@ -1258,7 +1273,7 @@ shiftexpr returns [JMLExpression result=null] throws SLTranslationException
 		intHelper.buildRightShiftExpression(result.getTerm(),e.getTerm()));
 	}
     |   
-	"<<" e=additiveexpr 
+	SHIFTLEFT e=additiveexpr 
 	{
 	    if (result.isType()) {
 		raiseError("Cannot build shift expression from type " +
@@ -1275,7 +1290,7 @@ shiftexpr returns [JMLExpression result=null] throws SLTranslationException
 		intHelper.buildLeftShiftExpression(result.getTerm(),e.getTerm()));
 	}
     |   
-	">>>" e=additiveexpr 
+	UNSIGNEDSHIFTRIGHT e=additiveexpr 
 	{
 	    if (result.isType()) {
 		raiseError("Cannot build shift expression from type " +
@@ -1302,7 +1317,7 @@ additiveexpr returns [JMLExpression result=null] throws SLTranslationException
 :
     result=multexpr
     (
-	"+" e=multexpr
+	PLUS e=multexpr
 	{
 	    if (result.isType()) {
 		raiseError("Cannot build additive expression from type " +
@@ -1319,7 +1334,7 @@ additiveexpr returns [JMLExpression result=null] throws SLTranslationException
 		intHelper.buildAddExpression(result.getTerm(),e.getTerm()));
 	}
     |
-	"-" e=multexpr
+	MINUS e=multexpr
 	{
 	    if (result.isType()) {
 		raiseError("Cannot build additive expression from type " +
@@ -1380,7 +1395,7 @@ multexpr returns [JMLExpression result=null] throws SLTranslationException
 		intHelper.buildDivExpression(result.getTerm(),e.getTerm()));
 	}
     |
-	"%" e=unaryexpr
+	MOD e=unaryexpr
 	{
 	    if (result.isType()) {
 		raiseError("Cannot build multiplicative expression from type " +
@@ -1406,7 +1421,7 @@ unaryexpr returns [JMLExpression result=null] throws SLTranslationException
 }
 :
 (
-       "+" result=unaryexpr
+       PLUS result=unaryexpr
 	{
 	    if (result.isType()) {
 		raiseError("Cannot build  +" + result.getType().getName() + ".");
@@ -1417,7 +1432,7 @@ unaryexpr returns [JMLExpression result=null] throws SLTranslationException
 		intHelper.buildPromotedUnaryPlusExpression(result.getTerm()));
 	}
     |
-	"-" result=unaryexpr
+	MINUS result=unaryexpr
 	{
 	    if (result.isType()) {
 		raiseError("Cannot build  -" + result.getType().getName() + ".");
@@ -1428,8 +1443,8 @@ unaryexpr returns [JMLExpression result=null] throws SLTranslationException
 		intHelper.buildUnaryMinusExpression(result.getTerm()));
 	}
     |
-	("(" typespec ")" ) => 
-	   "(" type=typespec ")" result=unaryexpr
+	(LPAREN typespec RPAREN ) => 
+	   LPAREN type=typespec RPAREN result=unaryexpr
 	
     |
 	result=unaryexprnotplusminus
@@ -1469,7 +1484,7 @@ unaryexprnotplusminus returns [JMLExpression result=null] throws SLTranslationEx
     JMLExpression e;
 }
 :
-	"!" e=unaryexpr
+	NOT e=unaryexpr
 	{
 	    if (e.isType()) {
 		raiseError("Cannot negate type " + e.getType().getName() + ".");
@@ -1487,7 +1502,7 @@ unaryexprnotplusminus returns [JMLExpression result=null] throws SLTranslationEx
 	    }
 	}
     |   
-	"~" e=unaryexpr
+	BITWISENOT e=unaryexpr
 	{
 	    if (e.isType()) {
 		raiseError("Cannot negate type " + e.getType().getName() + ".");
@@ -1540,11 +1555,11 @@ primaryexpr returns [JMLExpression result=null] throws SLTranslationException
 :
 	t=constant   { result = new JMLExpression(t); }
     |   id:IDENT     { result = lookupIdentifier(id.getText(), null, null, id); }
-    |   "true"       { result = new JMLExpression(tb.tt()); }
-    |   "false"      { result = new JMLExpression(tb.ff()); }
-    |   "null"       { result = new JMLExpression(tb.NULL(services)); }
+    |   TRUE         { result = new JMLExpression(tb.tt()); }
+    |   FALSE        { result = new JMLExpression(tb.ff()); }
+    |   NULL         { result = new JMLExpression(tb.NULL(services)); }
     |   result=jmlprimary 
-    |   "this"       
+    |   THIS       
         { 
             if(selfVar == null) {
             	raiseError("Cannot access \"this\" in a static context!"); 
@@ -1631,7 +1646,9 @@ new_expr throws SLTranslationException
 }
 :
 	NEW typ=type new_suffix
-        {	raiseNotSupported("'new' not supported in JML specifications."); }
+        {	
+        	raiseNotSupported("'new' within specifications"); 
+        }
     ;
 
 new_suffix throws SLTranslationException
@@ -1719,12 +1736,12 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	    result = new JMLExpression(tb.var(resultVar));
 	}
     |
-	("(" QUANTIFIER) => t=specquantifiedexpression
+	(LPAREN QUANTIFIER) => t=specquantifiedexpression
 	{
 	    result = new JMLExpression(t);
 	}
     |
-	(OLD | PRE) "(" t=specexpression ")"
+	(OLD | PRE) LPAREN t=specexpression RPAREN
 	{
 	    if (atPreFunctions == null) {
 		raiseError("JML construct " +
@@ -1734,7 +1751,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	    result = new JMLExpression(convertToOld(t));
 	}
     |   
-	CREATED "(" t=specexpression ")"
+	CREATED LPAREN t=specexpression RPAREN
 	{
 	    if (t.sort() instanceof ObjectSort) {
 		result = new JMLExpression(
@@ -1746,7 +1763,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	}
 	
     |
-	NONNULLELEMENTS "(" t=specexpression ")"
+	NONNULLELEMENTS LPAREN t=specexpression RPAREN
 	{
 	    Term resTerm = tb.not(tb.equals(t, tb.NULL(services)));
 
@@ -1774,44 +1791,44 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	{
 	    raiseNotSupported("informal predicates");
 	}
-//    |   NOT_MODIFIED "(" storereflist ")" 
+//    |   NOT_MODIFIED LPAREN storereflist RPAREN 
 	
-    |   FRESH "(" spec_expression_list ")"
+    |   FRESH LPAREN spec_expression_list RPAREN
 	{
 	    raiseNotSupported("\\fresh");
 	} 
 	
-    |   REACH "(" t=specexpression ")"
+    |   REACH LPAREN t=specexpression RPAREN
 	{
 	    raiseNotSupported("\\reach");
 	} 
 	
-    |   DURATION "(" t=expression ")" 
+    |   DURATION LPAREN t=expression RPAREN 
 	{
 	    raiseNotSupported("\\duration");
 	} 
 	
-    |   SPACE "(" t=specexpression ")" 
+    |   SPACE LPAREN t=specexpression RPAREN
 	{
 	    raiseNotSupported("\\space");
 	} 
 	
-    |   WORKINGSPACE "(" t=expression ")"
+    |   WORKINGSPACE LPAREN t=expression RPAREN
 	{
 	    raiseNotSupported("\\working_space");
 	} 
 	
-    |   TYPEOF "(" t=specexpression ")"
+    |   TYPEOF LPAREN t=specexpression RPAREN
 	{
 	    result = new JMLExpression(services.getTypeConverter().getKeYJavaType(t),t);
 	} 
 	
-    |   ELEMTYPE "(" t=specexpression ")" 
+    |   ELEMTYPE LPAREN t=specexpression RPAREN 
 	{
 	    raiseNotSupported("\\elemtype");
 	} 
 	
-    |   TYPE_SMALL "(" typ=typespec ")" 
+    |   TYPE_SMALL LPAREN typ=typespec RPAREN 
 	{
 	    result = new JMLExpression(typ);
 	} 
@@ -1821,7 +1838,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	    raiseNotSupported("\\lockset");
 	} 
 	
-    |   IS_INITIALIZED "(" typ=referencetype ")" 
+    |   IS_INITIALIZED LPAREN typ=referencetype RPAREN 
 	{
 	    Term resTerm = tb.equals(
 		tb.var(
@@ -1831,18 +1848,18 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	    result = new JMLExpression(resTerm);
 	} 
 	
-    |   INVARIANT_FOR "(" t=specexpression ")" 
+    |   INVARIANT_FOR LPAREN t=specexpression RPAREN 
 	{
 	    raiseNotSupported("\\invariant_for");
 	} 
 	
-    |   ( "(" LBLNEG ) => "(" LBLNEG IDENT t=specexpression ")"
+    |   ( LPAREN LBLNEG ) => LPAREN LBLNEG IDENT t=specexpression RPAREN
 	{
 	    result = new JMLExpression(t);
 //	    raiseNotSupported("\\lblneg");
 	} 
 	
-    |   ( "(" LBLPOS ) => "(" LBLPOS IDENT t=specexpression ")" 
+    |   ( LPAREN LBLPOS ) => LPAREN LBLPOS IDENT t=specexpression RPAREN 
 	{
 	    result = new JMLExpression(t);
 //	    raiseNotSupported("\\lblpos");
@@ -1854,8 +1871,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	    raiseNotSupported("\\nowarn");
 	} 
 
-    |   
-	"(" t=expression ")"
+    |   LPAREN t=expression RPAREN
 	{
 	    result = new JMLExpression(t);
 	}
@@ -1873,7 +1889,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
     ListOfLogicVariable declVars = null;
 }
 :
-	"("
+	LPAREN
 	q:QUANTIFIER (nullable=boundvarmodifiers)? declVars=quantifiedvardecls ";"
 	
 	{
@@ -1883,7 +1899,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	(
 	    ((predicate)? ";" ) => (p=predicate)? ";" t=specexpression
 	|
-	    (";")? t=specexpression 
+	    (SEMI)? t=specexpression 
 	)
 	
 	{
@@ -1957,7 +1973,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 		raiseError("Unknown quantifier: " + q.getText() + "!");
 	    }
 	}
-	")"
+	RPAREN
 ;
 
 quantifiedvardecls returns [ListOfLogicVariable vars = SLListOfLogicVariable.EMPTY_LIST] throws SLTranslationException
@@ -1971,7 +1987,7 @@ quantifiedvardecls returns [ListOfLogicVariable vars = SLListOfLogicVariable.EMP
 	{ vars = vars.append(v); }
 	
 	(
-	    "," v=quantifiedvariabledeclarator[t]
+	    COMMA v=quantifiedvariabledeclarator[t]
 	    
 	    { vars = vars.append(v); }
 	)*
@@ -2011,7 +2027,7 @@ typespec returns [KeYJavaType t = null] throws SLTranslationException
 
 dims returns [int dimension = 0] throws SLTranslationException
 :
-	("[" "]" { dimension++; } )+
+	(LBRACKET RBRACKET { dimension++; } )+
     ;
 
 type returns [KeYJavaType t = null] throws SLTranslationException
