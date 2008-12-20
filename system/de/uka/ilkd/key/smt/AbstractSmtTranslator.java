@@ -62,6 +62,8 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 
     private HashMap<Operator, ArrayList<Sort>> functionDecls = new HashMap<Operator, ArrayList<Sort>>();
 
+    private HashSet<Function> specialFunctions = new HashSet<Function>();
+    
     private HashMap<Operator, ArrayList<Sort>> predicateDecls = new HashMap<Operator, ArrayList<Sort>>();
 
     private HashMap<Operator, StringBuffer> usedVariableNames = new HashMap<Operator, StringBuffer>();
@@ -170,7 +172,7 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 	    this.translateFunc(l, new ArrayList<StringBuffer>());
 	}
 	
-	ArrayList<StringBuffer> assumptions = this.getAssumptions();
+	ArrayList<StringBuffer> assumptions = this.getAssumptions(services);
 	
 	hb = this.translateLogicalImply(ante, succ);
 	//hb = this.translateLogicalNot(hb);
@@ -185,7 +187,7 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      * get the assumptions made by the logic.
      * @return ArrayList of Formulas, that are assumed to be true.
      */
-    private ArrayList<StringBuffer> getAssumptions() {
+    private ArrayList<StringBuffer> getAssumptions(Services services) {
 	ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
 	
 	if (!this.isMultiSorted()) {
@@ -198,6 +200,124 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 	    //this means, add the typepredicates, that are needed to define
 	    //for every type, what type they are (direct) subtype of
 	    toReturn.addAll(this.getSortHirarchyPredicates());
+	    //add the formulas, that make sure, type correctness is kept, also
+	    //for interpreted functions
+	    toReturn.addAll(this.getSpecialSortPredicates(services));
+	}
+	
+	return toReturn;
+    }
+    
+    /**
+     * build the formulas, that make sure, special functions keep
+     * typing
+     * @return ArrayList of formulas, assuring the assumption.
+     */
+    private ArrayList<StringBuffer> getSpecialSortPredicates(Services services) {
+	ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
+	
+	for (Function o : this.specialFunctions) {
+	    if (o == services.getTypeConverter().getIntegerLDT().getAdd()) {
+		StringBuffer var1 = this.translateLogicalVar(new StringBuffer("tvar1"));
+		ArrayList<StringBuffer> varlist = new ArrayList<StringBuffer>();
+		varlist.add(var1);
+		StringBuffer pred1 = this.typePredicates.get(o.argSort(0));
+		pred1 = this.translatePredicate(pred1, varlist);
+		
+		StringBuffer var2 = this.translateLogicalVar(new StringBuffer("tvar2"));
+		varlist = new ArrayList<StringBuffer>();
+		varlist.add(var2);
+		StringBuffer pred2 = this.typePredicates.get(o.argSort(1));
+		pred2 = this.translatePredicate(pred2, varlist);
+		
+		StringBuffer leftForm = this.translateLogicalAnd(pred1, pred2);
+
+		StringBuffer rightForm = this.translateIntegerPlus(var1, var2);
+		StringBuffer pred3 = this.typePredicates.get(o.sort());
+		varlist = new ArrayList<StringBuffer>();
+		varlist.add(rightForm);
+		rightForm = this.translatePredicate(pred3, varlist);
+
+		StringBuffer form = this.translateLogicalImply(leftForm, rightForm);
+		form = this.translateLogicalAll(var1, this.getIntegerSort(),form);
+		form = this.translateLogicalAll(var2, this.getIntegerSort(),form);
+		toReturn.add(form);
+	    } else if (o == services.getTypeConverter().getIntegerLDT().getSub()) {
+		StringBuffer var1 = this.translateLogicalVar(new StringBuffer("tvar1"));
+		ArrayList<StringBuffer> varlist = new ArrayList<StringBuffer>();
+		varlist.add(var1);
+		StringBuffer pred1 = this.typePredicates.get(o.argSort(0));
+		pred1 = this.translatePredicate(pred1, varlist);
+		
+		StringBuffer var2 = this.translateLogicalVar(new StringBuffer("tvar2"));
+		varlist = new ArrayList<StringBuffer>();
+		varlist.add(var2);
+		StringBuffer pred2 = this.typePredicates.get(o.argSort(1));
+		pred2 = this.translatePredicate(pred2, varlist);
+		
+		StringBuffer leftForm = this.translateLogicalAnd(pred1, pred2);
+
+		StringBuffer rightForm = this.translateIntegerMinus(var1, var2);
+		StringBuffer pred3 = this.typePredicates.get(o.sort());
+		varlist = new ArrayList<StringBuffer>();
+		varlist.add(rightForm);
+		rightForm = this.translatePredicate(pred3, varlist);
+
+		StringBuffer form = this.translateLogicalImply(leftForm, rightForm);
+		form = this.translateLogicalAll(var1, this.getIntegerSort(),form);
+		form = this.translateLogicalAll(var2, this.getIntegerSort(),form);
+		toReturn.add(form);
+	    } else if (o == services.getTypeConverter().getIntegerLDT().getMul()) {
+		StringBuffer var1 = this.translateLogicalVar(new StringBuffer("tvar1"));
+		ArrayList<StringBuffer> varlist = new ArrayList<StringBuffer>();
+		varlist.add(var1);
+		StringBuffer pred1 = this.typePredicates.get(o.argSort(0));
+		pred1 = this.translatePredicate(pred1, varlist);
+		
+		StringBuffer var2 = this.translateLogicalVar(new StringBuffer("tvar2"));
+		varlist = new ArrayList<StringBuffer>();
+		varlist.add(var2);
+		StringBuffer pred2 = this.typePredicates.get(o.argSort(1));
+		pred2 = this.translatePredicate(pred2, varlist);
+		
+		StringBuffer leftForm = this.translateLogicalAnd(pred1, pred2);
+
+		StringBuffer rightForm = this.translateIntegerMult(var1, var2);
+		StringBuffer pred3 = this.typePredicates.get(o.sort());
+		varlist = new ArrayList<StringBuffer>();
+		varlist.add(rightForm);
+		rightForm = this.translatePredicate(pred3, varlist);
+
+		StringBuffer form = this.translateLogicalImply(leftForm, rightForm);
+		form = this.translateLogicalAll(var1, this.getIntegerSort(),form);
+		form = this.translateLogicalAll(var2, this.getIntegerSort(),form);
+		toReturn.add(form);
+	    } else if (o == services.getTypeConverter().getIntegerLDT().getDiv()) {
+		StringBuffer var1 = this.translateLogicalVar(new StringBuffer("tvar1"));
+		ArrayList<StringBuffer> varlist = new ArrayList<StringBuffer>();
+		varlist.add(var1);
+		StringBuffer pred1 = this.typePredicates.get(o.argSort(0));
+		pred1 = this.translatePredicate(pred1, varlist);
+		
+		StringBuffer var2 = this.translateLogicalVar(new StringBuffer("tvar2"));
+		varlist = new ArrayList<StringBuffer>();
+		varlist.add(var2);
+		StringBuffer pred2 = this.typePredicates.get(o.argSort(1));
+		pred2 = this.translatePredicate(pred2, varlist);
+		
+		StringBuffer leftForm = this.translateLogicalAnd(pred1, pred2);
+
+		StringBuffer rightForm = this.translateIntegerDiv(var1, var2);
+		StringBuffer pred3 = this.typePredicates.get(o.sort());
+		varlist = new ArrayList<StringBuffer>();
+		varlist.add(rightForm);
+		rightForm = this.translatePredicate(pred3, varlist);
+
+		StringBuffer form = this.translateLogicalImply(leftForm, rightForm);
+		form = this.translateLogicalAll(var1, this.getIntegerSort(),form);
+		form = this.translateLogicalAll(var2, this.getIntegerSort(),form);
+		toReturn.add(form);
+	    }
 	}
 	
 	return toReturn;
@@ -238,7 +358,7 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 	    //hb = this.translateLogicalNot(form);
 	    
 
-	    return buildCompleteText(form, this.getAssumptions(), this.buildTranslatedFuncDecls(), this
+	    return buildCompleteText(form, this.getAssumptions(services), this.buildTranslatedFuncDecls(), this
 		    .buildTranslatedPredDecls(), this.buildTranslatedSorts(), this
 		    .buildSortHirarchy());
 	} catch (IllegalFormulaException e) {
@@ -1081,6 +1201,11 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 			    services);
 		    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars,
 			    services);
+		    //add the function to the used ones
+		    if (!specialFunctions.contains(fun)) {
+			specialFunctions.add(fun);
+		    }
+		    //return the final translation
 		    return this.translateIntegerPlus(arg1, arg2);
 		} else if (fun == services.getTypeConverter().getIntegerLDT()
 			.getSub()) {
@@ -1088,6 +1213,11 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 			    services);
 		    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars,
 			    services);
+//		    //add the function to the used ones
+		    if (!specialFunctions.contains(fun)) {
+			specialFunctions.add(fun);
+		    }
+//		    //return the final translation
 		    return this.translateIntegerMinus(arg1, arg2);
 		} else if (fun == services.getTypeConverter().getIntegerLDT()
 			.getNeg()) {
@@ -1100,6 +1230,11 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 			    services);
 		    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars,
 			    services);
+//		  add the function to the used ones
+		    if (!specialFunctions.contains(fun)) {
+			specialFunctions.add(fun);
+		    }
+//		    //return the final translation
 		    return this.translateIntegerMult(arg1, arg2);
 		} else if (fun == services.getTypeConverter().getIntegerLDT()
 			.getDiv()) {
@@ -1107,6 +1242,11 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 			    services);
 		    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars,
 			    services);
+//		  add the function to the used ones
+		    if (!specialFunctions.contains(fun)) {
+			specialFunctions.add(fun);
+		    }
+//		    //return the final translation
 		    return this.translateIntegerDiv(arg1, arg2);
 		} else if (fun == services.getTypeConverter().getIntegerLDT()
 			.getNumberSymbol()) {
