@@ -94,6 +94,7 @@ public class SmtLibTranslator extends AbstractSmtTranslator {
 
     @Override
     protected StringBuffer buildCompleteText(StringBuffer formula,
+	    ArrayList<StringBuffer> assumptions,
 	    ArrayList<ArrayList<StringBuffer>> functions,
 	    ArrayList<ArrayList<StringBuffer>> predicates,
 	    ArrayList<StringBuffer> types, SortHirarchy sortHirarchy) {
@@ -141,7 +142,19 @@ public class SmtLibTranslator extends AbstractSmtTranslator {
 	}
 	toReturn.append(")");
 
+	for (StringBuffer s : assumptions) {
+	    toReturn.append("\n:assumption ").append(s);
+	}
+	
 	// add the formula
+	/*if (assumptions.size() > 0) {
+	    StringBuffer assump = assumptions.get(0);
+	    for (int i = 1; i < assumptions.size(); i++) {
+		this.translateLogicalAnd(assump, assumptions.get(i));
+	    }
+	    formula = this.translateLogicalImply(assump, formula);
+	}*/
+	formula = this.translateLogicalNot(formula);
 	toReturn.append("\n:formula ").append(formula).append("\n");
 
 	toReturn.append(")");

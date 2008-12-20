@@ -150,7 +150,7 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 	StringBuffer succ;
 	succ = translate(sequent.succedent(), SmtTranslator.TERMPOSITION.SUCCEDENT, lightWeight, services);
 
-	// append type definitions, if neccessary
+/*	// append type definitions, if neccessary
 	if (!this.isMultiSorted()) {
 	    // add the type definitions
 	    //this means all predicates that are needed for functions to define
@@ -162,15 +162,47 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 	    ante = this.translateLogicalAnd(this.getSortHirarchyPredicates(),
 		    ante);
 	}
-
+*/
+	//add one variable for each sort
+	for (Sort s : this.usedRealSort.keySet()) {
+	    LogicVariable l = new LogicVariable(new Name("dummy_" + s.name().toString()), s);
+	    this.addFunction(l, new ArrayList<Sort>(), s);
+	    this.translateFunc(l, new ArrayList<StringBuffer>());
+	}
+	
+	ArrayList<StringBuffer> assumptions = this.getAssumptions();
+	
 	hb = this.translateLogicalImply(ante, succ);
-	hb = this.translateLogicalNot(hb);
+	//hb = this.translateLogicalNot(hb);
 
-	return buildCompleteText(hb, this.buildTranslatedFuncDecls(), this
+	return buildCompleteText(hb, assumptions, this.buildTranslatedFuncDecls(), this
 		.buildTranslatedPredDecls(), this.buildTranslatedSorts(), this
 		.buildSortHirarchy());
     }
 
+    
+    /**
+     * get the assumptions made by the logic.
+     * @return ArrayList of Formulas, that are assumed to be true.
+     */
+    private ArrayList<StringBuffer> getAssumptions() {
+	ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
+	
+	if (!this.isMultiSorted()) {
+	    
+	    // add the type definitions
+	    //this means all predicates that are needed for functions to define
+	    //their result type, all predicates for constants (like number symbols)
+	    toReturn.addAll(this.getTypeDefinitions());
+	    // add the type hirarchy
+	    //this means, add the typepredicates, that are needed to define
+	    //for every type, what type they are (direct) subtype of
+	    toReturn.addAll(this.getSortHirarchyPredicates());
+	}
+	
+	return toReturn;
+    }
+    
     /**
      * Translate s term into the given syntax.
      * @param t The term to translate.
@@ -186,10 +218,10 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 	}
 //	 translate
 	try {
-	    StringBuffer hb = new StringBuffer();
+	    //StringBuffer hb = new StringBuffer();
 	    StringBuffer form;
 	    form = translateTerm(t, new Vector<QuantifiableVariable>(), services);
-
+/*
 	    //append type definitions, if neccessary
 	    if (!this.isMultiSorted()) {
 		// add the type definitions
@@ -201,10 +233,12 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 		//definitions imply the valid formula
 		form = this.translateLogicalImply(pre, form);
 	    }
+*/
+	    
+	    //hb = this.translateLogicalNot(form);
+	    
 
-	    hb = this.translateLogicalNot(form);
-
-	    return buildCompleteText(hb, this.buildTranslatedFuncDecls(), this
+	    return buildCompleteText(form, this.getAssumptions(), this.buildTranslatedFuncDecls(), this
 		    .buildTranslatedPredDecls(), this.buildTranslatedSorts(), this
 		    .buildSortHirarchy());
 	} catch (IllegalFormulaException e) {
@@ -227,10 +261,11 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      * Also the null type is added to the formula if used before.
      * @return The well defined formula.
      */
-    private StringBuffer getSortHirarchyPredicates() {
+    private ArrayList<StringBuffer> getSortHirarchyPredicates() {
 	SortHirarchy sh = this.buildSortHirarchy();
-	StringBuffer toReturn = new StringBuffer(this.translateLogicalTrue());
-
+	//StringBuffer toReturn = new StringBuffer(this.translateLogicalTrue());
+	ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
+	
 	// add the typepredicates for functions.
 	HashMap<StringBuffer, ArrayList<StringBuffer>> predMap = sh
 		.getDirectSuperSortPredicate();
@@ -252,7 +287,8 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 			form);
 	    }
 	    if (form.length() > 0) {
-		toReturn = this.translateLogicalAnd(toReturn, form);
+		//toReturn = this.translateLogicalAnd(toReturn, form);
+		toReturn.add(form);
 	    }
 	}
 
@@ -262,7 +298,8 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 		ArrayList<StringBuffer> argList = new ArrayList<StringBuffer>();
 		argList.add(this.nullString);
 		StringBuffer toAdd = this.translatePredicate(s, argList);
-		toReturn = this.translateLogicalAnd(toAdd, toReturn);
+		//toReturn = this.translateLogicalAnd(toAdd, toReturn);
+		toReturn.add(toAdd);
 	    }
 	}
 
@@ -270,24 +307,26 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
     }
 
     /**
-     * Returns a formula, that defines the resulttypes of functions,
+     * Returns a set of formula s, that defines the resulttypes of functions,
      * all constants and other elements (i.e. constant number symbols).
      * @return see above
      */
-    private StringBuffer getTypeDefinitions() {
-	StringBuffer toReturn;
-	toReturn = this.translateLogicalTrue();
+    private ArrayList<StringBuffer> getTypeDefinitions() {
+	ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
+	//toReturn = this.translateLogicalTrue();
 
 	// add the type definitions for functions
 	for (Operator op : functionDecls.keySet()) {
 	    StringBuffer currentForm = this.getSingleFunctionDef(
 		    this.usedFunctionNames.get(op), functionDecls.get(op));
-	    toReturn = this.translateLogicalAnd(currentForm, toReturn);
+	    //toReturn = this.translateLogicalAnd(currentForm, toReturn);
+	    toReturn.add(currentForm);
 	}
 
 	//add the type predicates for constant values like number symbols
 	for (StringBuffer s : this.constantTypePreds.values()) {
-	    toReturn = this.translateLogicalAnd(s, toReturn);
+	    //toReturn = this.translateLogicalAnd(s, toReturn);
+	    toReturn.add(s);
 	}
 	
 	return toReturn;
@@ -348,6 +387,7 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      */
     private ArrayList<ArrayList<StringBuffer>> buildTranslatedFuncDecls() {
 	ArrayList<ArrayList<StringBuffer>> toReturn = new ArrayList<ArrayList<StringBuffer>>();
+	//add the function declarations for each used function
 	for (Operator op : this.functionDecls.keySet()) {
 	    ArrayList<StringBuffer> element = new ArrayList<StringBuffer>();
 	    element.add(usedFunctionNames.get(op));
@@ -358,6 +398,7 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 	}
 
 	if (this.nullUsed) {
+	    //add the null constant to the declarations
 	    if (this.isMultiSorted()) {
 		ArrayList<StringBuffer> a = new ArrayList<StringBuffer>();
 		a.add(this.nullString);
@@ -431,10 +472,15 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 
     /**
      * Build the text, that can be read by the final decider.
+     * If the assumptions should be added to the formula, add them like
+     * assumtions impliy formula.
      * 
      * @param formula
      *                The formula, that was built out of the internal
-     *                representation.
+     *                representation. It is built by ante implies succ.
+     * @param assumptions
+     * 		      Assumptions made in this logic. Set of formulas, that
+     * 		      are assumed to be true.             
      * @param functions
      *                List of functions. Each Listelement is built up like
      *                (name | sort1 | ... | sortn | resultsort)
@@ -446,6 +492,7 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      * @return The Stringbuffer that can be read by the decider
      */
     protected abstract StringBuffer buildCompleteText(StringBuffer formula,
+	    ArrayList<StringBuffer> assumptions,
 	    ArrayList<ArrayList<StringBuffer>> functions,
 	    ArrayList<ArrayList<StringBuffer>> predicates,
 	    ArrayList<StringBuffer> types, SortHirarchy sortHirarchy);
