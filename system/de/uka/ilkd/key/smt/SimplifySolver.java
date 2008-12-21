@@ -37,9 +37,9 @@ public class SimplifySolver extends AbstractSmtProver {
     }
     
     protected SmtSolver.RESULTTYPE answerType(String answer) {
-	if (answer.equals("valid")) {
+	if (answer.indexOf("Valid") != -1) {
 	    return SmtSolver.RESULTTYPE.VALID;
-	} else if (answer.equals("invalid")) {
+	} else if (answer.indexOf("Invalid") != -1) {
 	    return SmtSolver.RESULTTYPE.INVALID;
 	} else {
 	    return SmtSolver.RESULTTYPE.UNKNOWN;
