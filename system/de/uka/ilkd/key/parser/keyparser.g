@@ -719,12 +719,26 @@ options {
     private TermSymbol getAttribute(Sort prefixSort, String attributeName) 
            throws SemanticException {
         final JavaInfo javaInfo = getJavaInfo();
-        TermSymbol result = null;
 
-        if (!inSchemaMode()) {
-            if (attributeName.indexOf(':') != -1) {     
+        TermSymbol result = null;
+        
+        if (inSchemaMode()) {
+            // if we are currently reading taclets we look for schema variables first
+            result = (SortedSchemaVariable)variables().lookup(new Name(attributeName));
+        }
+        
+        assert inSchemaMode() || result == null; 
+        if (result == null) {
+            
+            final boolean unambigousAttributeName = attributeName.indexOf(':') != -1;
+
+            if (unambigousAttributeName) {     
                 result = javaInfo.getAttribute(attributeName);
             } else {
+                if (inSchemaMode()) {
+                    semanticError("Either undeclared schmema variable '" + 
+                                  attributeName + "' or a not fully qualified attribute in taclet.");
+                }
                 final KeYJavaType prefixKJT = javaInfo.getKeYJavaType(prefixSort);
                 if (prefixKJT == null) {
                     semanticError("Could not find type '"+prefixSort+"'. Maybe mispelled or "+
@@ -762,9 +776,8 @@ options {
                     }
                 }              
             }
-        }else{
-            result = (SortedSchemaVariable)variables().lookup(new Name(attributeName));
         }
+
         if ( result == null && !("length".equals(attributeName)) ) {
             throw new NotDeclException ("Attribute ", attributeName,
                 getFilename(), getLine(), getColumn());
@@ -774,25 +787,30 @@ options {
 
    
     public Term createAttributeTerm(Term prefix, TermSymbol attribute,
-              Term shadowNumber) {
+                                    Term shadowNumber) throws SemanticException {
         Term result = prefix;
-	if (!inSchemaMode()) {
-          if (((ProgramVariable)attribute).isStatic()){
-              result = tf.createVariableTerm((ProgramVariable)attribute);
-          } else {
-              if (shadowNumber != null) {
-                  result = tf.createShadowAttributeTerm((ProgramVariable)attribute, 
-                                                        result, shadowNumber);
-              } else {
-                  result = tf.createAttributeTerm((ProgramVariable)attribute, result);
-              }
-          }
-	} else {
-        if (shadowNumber != null) {
+
+        if (attribute instanceof SchemaVariable) {
+            if (!inSchemaMode()) {
+                semanticError("Schemavariables may only occur inside taclets.");
+            }
+            if (shadowNumber != null) {
                 result = tf.createShadowAttributeTerm((SchemaVariable)attribute, result, shadowNumber);
-	    } else
+            } else {
                 result = tf.createAttributeTerm((SchemaVariable)attribute, result);         
-	}
+            }
+        } else {
+            if (((ProgramVariable)attribute).isStatic()){
+                result = tf.createVariableTerm((ProgramVariable)attribute);
+            } else {
+                if (shadowNumber != null) {
+                    result = tf.createShadowAttributeTerm((ProgramVariable)attribute, 
+                                                          result, shadowNumber);
+                } else {
+                    result = tf.createAttributeTerm((ProgramVariable)attribute, result);
+                }
+            }
+        }
         return result;
     }
 
