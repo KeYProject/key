@@ -38,4 +38,11 @@ public interface SpecExtractor {
     public LoopInvariant extractLoopInvariant(ProgramMethod pm, 
                                               LoopStatement loop)
         throws SLTranslationException;
+    
+    /**
+     * Returns all warnings generated so far in the translation process.
+     * (e.g. this may warn about unsupported features which have been ignored 
+     * by the translation)
+     */
+    public SetOfPositionedString getWarnings();
 }

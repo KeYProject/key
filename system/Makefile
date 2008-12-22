@@ -257,7 +257,8 @@ GENERATED_SETS=logic/SetAsListOfTerm collection/SetAsListOfString \
 	java/statement/SetAsListOfLoopStatement \
         proof/SetAsListOfGoalChooserBuilder \
 	strategy/SetAsListOfStrategyFactory \
-	logic/op/SetAsListOfLocation
+	logic/op/SetAsListOfLocation \
+	speclang/SetAsListOfPositionedString
 
 GENERATED_MAPS=	collection/MapAsListFromIntegerToString \
 	logic/op/MapAsListFromQuantifiableVariableToInteger \

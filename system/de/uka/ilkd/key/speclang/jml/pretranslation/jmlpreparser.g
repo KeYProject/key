@@ -16,11 +16,8 @@ header {
     import de.uka.ilkd.key.collection.ListOfString;
     import de.uka.ilkd.key.collection.SLListOfString;
     import de.uka.ilkd.key.java.Position;
-    import de.uka.ilkd.key.speclang.ListOfPositionedString;
-    import de.uka.ilkd.key.speclang.PositionedString;
-    import de.uka.ilkd.key.speclang.SLListOfPositionedString;
-    import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-    import de.uka.ilkd.key.speclang.translation.SLTranslationExceptionManager;
+    import de.uka.ilkd.key.speclang.*;
+    import de.uka.ilkd.key.speclang.translation.*;
 }
 
 
@@ -37,6 +34,8 @@ options {
 {
     private KeYJMLPreLexer lexer;
     private SLTranslationExceptionManager excManager;
+    private SetOfPositionedString warnings 	
+    	= SetAsListOfPositionedString.EMPTY_SET;
     
     
     private KeYJMLPreParser(KeYJMLPreLexer lexer,
@@ -71,9 +70,10 @@ options {
     
     
     private void raiseNotSupported(String feature) 
-    		throws SLTranslationException {
-    	throw excManager.createException("JML feature not supported: " 
-    					 + feature);
+    		throws SLTranslationException {    		
+	PositionedString warning 
+		= excManager.createPositionedString(feature + " not supported");
+    	warnings = warnings.add(warning);
     }
         
     
@@ -94,7 +94,12 @@ options {
         } catch(ANTLRException e) {
 	    throw excManager.convertException(e);
         }
-    }   
+    }
+    
+    
+    public SetOfPositionedString getWarnings() {
+    	return warnings;
+    }
 }
 
 
@@ -518,7 +523,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=signals_clause        { sc.addSignals(ps); }
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
-    |   ps=name_clause           { sc.addName(ps);}
+	|   ps=name_clause           { sc.addName(ps);}
 	|   captures_clause 
 	|   when_clause
 	|   working_space_clause
@@ -649,9 +654,9 @@ name_clause
 	throws SLTranslationException
 :
     spec:SPEC_NAME name:STRING_LITERAL SEMICOLON 
-        {
-            result=createPositionedString(name.getText(), spec);
-        }    
+    {
+	result=createPositionedString(name.getText(), spec);
+    }    
 ;
 
 
@@ -782,6 +787,7 @@ history_constraint[ListOfString mods]
     constraint_keyword ps=expression
     {
     	raiseNotSupported("history constraints");
+    	result = SLListOfTextualJMLConstruct.EMPTY_LIST;
     } 
 ;
 
@@ -803,6 +809,7 @@ represents_clause[ListOfString mods]
     represents_keyword ps=expression
     {
     	raiseNotSupported("represents clauses");
+	result = SLListOfTextualJMLConstruct.EMPTY_LIST;
     }
 ;
 
@@ -824,6 +831,7 @@ initially_clause[ListOfString mods]
     INITIALLY ps=expression
     {
     	raiseNotSupported("initially clauses");
+    	result = SLListOfTextualJMLConstruct.EMPTY_LIST;
     }
 ;
     
@@ -838,6 +846,7 @@ monitors_for_clause[ListOfString mods]
     MONITORS_FOR ps=expression
     {
     	raiseNotSupported("monitors_for clauses");
+    	result = SLListOfTextualJMLConstruct.EMPTY_LIST;    	
     }    
 ;
     
@@ -852,6 +861,7 @@ readable_if_clause[ListOfString mods]
     READABLE ps=expression
     {
     	raiseNotSupported("readable-if clauses");
+    	result = SLListOfTextualJMLConstruct.EMPTY_LIST;    	
     }    
 ;
 
@@ -866,6 +876,7 @@ writable_if_clause[ListOfString mods]
     WRITABLE ps=expression
     {
     	raiseNotSupported("writable-if clauses");
+    	result = SLListOfTextualJMLConstruct.EMPTY_LIST;    	
     }   
 ;
 
@@ -926,6 +937,7 @@ nowarn_pragma[ListOfString mods]
     NOWARN ps=expression
     {
     	raiseNotSupported("nowarn pragmas");
+    	result = SLListOfTextualJMLConstruct.EMPTY_LIST;    	
     }
 ;
 
@@ -1032,6 +1044,7 @@ assert_statement[ListOfString mods]
     assert_keyword ps=expression
     {
         raiseNotSupported("JML assert statements");
+    	result = SLListOfTextualJMLConstruct.EMPTY_LIST;        
     } 
 ;
 
@@ -1053,6 +1066,7 @@ assume_statement[ListOfString mods]
     assume_keyword ps=expression
     {
         raiseNotSupported("assume statements");
+    	result = SLListOfTextualJMLConstruct.EMPTY_LIST;        
     } 
 ;
 

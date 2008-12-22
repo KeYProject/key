@@ -341,8 +341,8 @@ public class JMLSpecFactory {
         FormulaWithAxioms post = post1.conjoin(post2);
         if(diverges.equals(FormulaWithAxioms.FF)) {
             String name = getContractName(originalBehavior);        
-            String customStr = (customName.toString().length() > 0 
-                                ? customName + "[" + name + "]" 
+            String customStr = (customName.text.length() > 0 
+                                ? customName.text + " [" + name + "]" 
                                 : name); 
             OperationContract contract
                 = new OperationContractImpl(name,

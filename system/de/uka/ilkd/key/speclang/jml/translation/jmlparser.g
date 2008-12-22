@@ -17,53 +17,16 @@ header {
     import de.uka.ilkd.key.java.JavaInfo;
     import de.uka.ilkd.key.java.Position;
     import de.uka.ilkd.key.java.Services;
-    import de.uka.ilkd.key.java.abstraction.ArrayType;
-    import de.uka.ilkd.key.java.abstraction.Field;
-    import de.uka.ilkd.key.java.abstraction.IteratorOfField;
-    import de.uka.ilkd.key.java.abstraction.IteratorOfKeYJavaType;
-    import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-    import de.uka.ilkd.key.java.abstraction.ListOfField;
-    import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
-    import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-    import de.uka.ilkd.key.java.abstraction.SLListOfKeYJavaType;
+    import de.uka.ilkd.key.java.abstraction.*;
     import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
     import de.uka.ilkd.key.java.declaration.ClassDeclaration;
     import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
     import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-    import de.uka.ilkd.key.logic.BasicLocationDescriptor;
-    import de.uka.ilkd.key.logic.EverythingLocationDescriptor;
-    import de.uka.ilkd.key.logic.IteratorOfTerm;
-    import de.uka.ilkd.key.logic.ListOfTerm;
-    import de.uka.ilkd.key.logic.LocationDescriptor;
-    import de.uka.ilkd.key.logic.Name;
-    import de.uka.ilkd.key.logic.SetAsListOfLocationDescriptor;
-    import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
-    import de.uka.ilkd.key.logic.SLListOfTerm;
-    import de.uka.ilkd.key.logic.Term;
-    import de.uka.ilkd.key.logic.TermBuilder;
-    import de.uka.ilkd.key.logic.TermCreationException;
+    import de.uka.ilkd.key.logic.*;
     import de.uka.ilkd.key.logic.ldt.LDT;
     import de.uka.ilkd.key.logic.ldt.AbstractIntegerLDT;
-    import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
-    import de.uka.ilkd.key.logic.op.ExactInstanceSymbol;
-    import de.uka.ilkd.key.logic.op.Function;
-    import de.uka.ilkd.key.logic.op.InstanceofSymbol;
-    import de.uka.ilkd.key.logic.op.IteratorOfLogicVariable;
-    import de.uka.ilkd.key.logic.op.IteratorOfParsableVariable;
-    import de.uka.ilkd.key.logic.op.ListOfLogicVariable;
-    import de.uka.ilkd.key.logic.op.ListOfParsableVariable;
-    import de.uka.ilkd.key.logic.op.LogicVariable;
-    import de.uka.ilkd.key.logic.op.NonRigid;
-    import de.uka.ilkd.key.logic.op.Operator;
-    import de.uka.ilkd.key.logic.op.ParsableVariable;
-    import de.uka.ilkd.key.logic.op.ProgramVariable;
-    import de.uka.ilkd.key.logic.op.RigidFunction;
-    import de.uka.ilkd.key.logic.op.SLListOfLogicVariable;
-    import de.uka.ilkd.key.logic.sort.AbstractSort;
-    import de.uka.ilkd.key.logic.sort.ArraySort;
-    import de.uka.ilkd.key.logic.sort.ObjectSort;
-    import de.uka.ilkd.key.logic.sort.Sort;
-    import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
+    import de.uka.ilkd.key.logic.op.*;
+    import de.uka.ilkd.key.logic.sort.*;
     import de.uka.ilkd.key.proof.AtPreFactory;
     import de.uka.ilkd.key.proof.OpReplacer;
     import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
@@ -203,8 +166,7 @@ options {
     
     private void raiseNotSupported(String feature) 
 	    throws SLTranslationException {
-	throw excManager.createException("JML feature not supported: " 
-			 + feature);
+	throw excManager.createWarningException(feature + " not supported"); 
     }
 	
 

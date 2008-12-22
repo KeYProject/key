@@ -18,12 +18,9 @@ import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.collection.SLListOfString;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
-import de.uka.ilkd.key.speclang.jml.pretranslation.ListOfTextualJMLConstruct;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLFieldDecl;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSetStatement;
+import de.uka.ilkd.key.speclang.SetAsListOfPositionedString;
+import de.uka.ilkd.key.speclang.SetOfPositionedString;
+import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.Constructor;
@@ -47,6 +44,8 @@ public class JMLTransformer extends RecoderModelTransformer {
                                                          "public", 
                                                          "static"});    
     
+    private static SetOfPositionedString warnings;
+    
 
     /**
      * Creates a transformation that adds JML specific elements, for example
@@ -64,13 +63,14 @@ public class JMLTransformer extends RecoderModelTransformer {
     public JMLTransformer(CrossReferenceServiceConfiguration services,
                           TransformerCache cache) {
         super(services, cache);
+        warnings = SetAsListOfPositionedString.EMPTY_SET;
     }
 
    
     
-    // -------------------------------------------------------------------------
-    // private helper methods
-    // -------------------------------------------------------------------------
+    //-------------------------------------------------------------------------
+    //private helper methods
+    //-------------------------------------------------------------------------
     
     /**
      * Concatenates the passed comments in a position-preserving way.
@@ -204,9 +204,9 @@ public class JMLTransformer extends RecoderModelTransformer {
     
     
     
-    // -------------------------------------------------------------------------
-    // private transformation methods
-    // -------------------------------------------------------------------------
+    //-------------------------------------------------------------------------
+    //private transformation methods
+    //-------------------------------------------------------------------------
     
     private void transformFieldDecl(TextualJMLFieldDecl decl, 
                                     Comment[] originalComments) 
@@ -416,6 +416,7 @@ public class JMLTransformer extends RecoderModelTransformer {
                 = new KeYJMLPreParser(concatenatedComment, fileName, pos);
             ListOfTextualJMLConstruct constructs 
                 = preParser.parseClasslevelComment();
+            warnings = warnings.union(preParser.getWarnings());
             
             //handle model and ghost declarations in textual constructs
             //(and set assignments which RecodeR evilly left hanging *behind* 
@@ -475,6 +476,7 @@ public class JMLTransformer extends RecoderModelTransformer {
             = new KeYJMLPreParser(concatenatedComment, fileName, pos);
         ListOfTextualJMLConstruct constructs 
             = preParser.parseMethodlevelComment();
+        warnings = warnings.union(preParser.getWarnings());
 
         //handle ghost declarations and set assignments in textual constructs
         for(TextualJMLConstruct c : constructs) {
@@ -498,9 +500,9 @@ public class JMLTransformer extends RecoderModelTransformer {
 
     
     
-    // -------------------------------------------------------------------------
-    // RecoderModelTransformer - abstract methods implementation
-    // -------------------------------------------------------------------------
+    //-------------------------------------------------------------------------
+    //RecoderModelTransformer - abstract methods implementation
+    //-------------------------------------------------------------------------
 
     protected void makeExplicit(TypeDeclaration td) {
         assert false;
@@ -544,6 +546,7 @@ public class JMLTransformer extends RecoderModelTransformer {
                     // use getOriginalDataLocation instead
                     DataLocation dl = unit.getOriginalDataLocation();
                     String fileName = dl == null ? "" : dl.toString();
+                    fileName = fileName.replaceFirst("FILE:", "");
                     
                     transformClasslevelComments(td, fileName);
                     
@@ -554,7 +557,7 @@ public class JMLTransformer extends RecoderModelTransformer {
                             ConstructorDeclaration cd 
                                 = (ConstructorDeclaration) 
                                    constructorList.get(k);
-                            transformMethodlevelComments(cd, unit.getName());
+                            transformMethodlevelComments(cd, fileName);
                         }
                     }               
                                         
@@ -564,7 +567,7 @@ public class JMLTransformer extends RecoderModelTransformer {
                             MethodDeclaration md 
                                 = (MethodDeclaration) 
                                    methodList.get(k);
-                            transformMethodlevelComments(md, unit.getName());
+                            transformMethodlevelComments(md, fileName);
                         }
                     }               
                     
@@ -580,6 +583,11 @@ public class JMLTransformer extends RecoderModelTransformer {
             runtimeE.setStackTrace(e.getStackTrace());
             throw runtimeE;
         }
+    }
+    
+    
+    public static SetOfPositionedString getWarningsOfLastInstance() {
+        return warnings;
     }
     
     
