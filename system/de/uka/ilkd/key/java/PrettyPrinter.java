@@ -184,7 +184,7 @@ public class PrettyPrinter {
     private boolean isPrintingSingleLineComments = false;
 
 
-    private HashMap indentMap=new HashMap();
+    protected HashMap indentMap=new HashMap();
 
     /**
        Set a new stream to write to. Useful to redirect the output
@@ -374,7 +374,7 @@ public class PrettyPrinter {
         elem.prettyPrint(this);
     }
 
-    private Position getRelativePosition(SourceElement first) {
+    protected Position getRelativePosition(SourceElement first) {
 	//	System.out.println(indentMap);
 	if (indentMap.containsKey(first)) {
 	    return (Position)indentMap.get(first);
