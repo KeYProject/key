@@ -50,7 +50,7 @@ public class TestGenerator{
 
     private MethodReference oracle = null;
 
-    static int counter = 0;
+    public static int counter = 0;
 
     private HashMap translatedFormulas;
     private String directory=System.getProperty("user.home")+ File.separator+"testFiles";
@@ -444,7 +444,6 @@ public class TestGenerator{
 				       new Expression[]{str, result}), 
 				   new ProgramElementName("assertTrue"),
 				   null);
-
 	Statement body = new StatementBlock(ib);
 	
 	// nested loops for executing the tested code with every possible 
@@ -480,9 +479,8 @@ public class TestGenerator{
 				 length, testArray[0]));
 //	    Expression guard = 
 //		new LessThan(partCounter, new IntLiteral(partCount));
-	    Expression update = new PostIncrement(partCounter);
-	    body = new For(new LoopInitializer[]{counterDecl}, guard, 
-			   new Expression[]{update}, body);
+	    body = new For(new LoopInitializer[]{counterDecl}, guard,
+	            new Expression[]{new PostIncrement(partCounter)} , body);
 	}
 	
 	s = s.append(body);
@@ -712,7 +710,7 @@ public class TestGenerator{
                getFileName().indexOf(serv.getProof().getJavaModel().getModelDir())!=-1){
 
 		StringWriter sw = new StringWriter();
-		PrettyPrinter pp = new PrettyPrinter(sw, false, true);
+		PrettyPrinter pp = new CompilableJavaPP(sw,false);
 		try{
 		    // write the implementation under test to the testFiles
 		    // directory
@@ -944,14 +942,24 @@ public class TestGenerator{
 						  children));
 	    } else if (name.equals("Z")) {
 		result = translateTerm(t.sub(0), buffer, children);
+	    } else if(t.op() instanceof CastFunctionSymbol){
+	        result = translateTerm(t.sub(0), buffer, children);
 	    }
 	    if(result!=null){
 		result = new ParenthesizedExpression(result);
 	    }
 	}
 	if(result==null){
-	    result = convertToProgramElement(t);
-	}
+                try {
+                    result = convertToProgramElement(t);
+                } catch (Exception e) {
+                    throw new RuntimeException(
+                            "The exception \n"
+                                    + e.getMessage()
+                                    + "\nwas thrown. It is possible, that this is caused by the wrong default behavior in translateTerm !");
+                }
+
+            }
 	return result;
     }
 
