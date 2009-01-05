@@ -457,8 +457,8 @@ public class UseOperationContractRule implements BuiltInRule {
        
         //create "Pre" branch
         Term reachablePre = TB.and(new Term[]{
-                TB.inReachableState(services), 
-                CATF.createCreatedAndNotNullTerm(services, TB.var(selfVar)),
+                TB.inReachableState(services),
+                selfVar != null ? CATF.createCreatedAndNotNullTerm(services, TB.var(selfVar)) : TB.tt(),
                 CATF.createReachableVariableValuesTerm(services, 
                                                        paramVarsAsProgVars)});
         Term preTerm = uf.prepend(
