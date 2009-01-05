@@ -598,8 +598,8 @@ public class JMLSpecFactory {
                 assert translated.getAxioms().isEmpty();
                 invariant = TB.and(invariant, translated.getFormula());
             }
+            invariant = TB.and(invariant, TB.inReachableState(services));
         }
-        invariant = TB.and(invariant, TB.inReachableState(services));
         
         //translate skolem declarations
         ListOfParsableVariable freeVars = SLListOfParsableVariable.EMPTY_LIST;
