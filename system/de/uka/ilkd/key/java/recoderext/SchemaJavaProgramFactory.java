@@ -101,8 +101,16 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 
     public ContextStatementBlock createContextStatementBlock(TypeSVWrapper typeRef,
             ExpressionSVWrapper memoryArea,
+            ExpressionSVWrapper runtime,
+            ExpressionSVWrapper callerMemoryArea,
+            ExpressionSVWrapper constructedMemoryArea) {
+	return new ContextStatementBlock(typeRef, memoryArea, runtime, callerMemoryArea, constructedMemoryArea);
+    }
+    
+    public ContextStatementBlock createContextStatementBlock(TypeSVWrapper typeRef,
+            ExpressionSVWrapper memoryArea,
             ExpressionSVWrapper runtime) {
-	return new ContextStatementBlock(typeRef, memoryArea, runtime);
+        return new ContextStatementBlock(typeRef, memoryArea, runtime, null, null);
     }
 
     public ContextStatementBlock createContextStatementBlock(ExecCtxtSVWrapper ec) {

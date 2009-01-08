@@ -289,7 +289,13 @@ public class TypeConverter extends TermBuilder {
 	if("javax.realtime.MemoryArea::currentMemoryArea".
 	               equals(fr.getName().toString())){
 	    return convertToLogicElement(ec.getMemoryArea());
-	}else if (var.isStatic()) {
+	}else if("javax.realtime.MemoryArea::callerScope".
+                       equals(fr.getName().toString())){
+            return convertToLogicElement(ec.getCallerMemoryArea());
+        }else if("javax.realtime.MemoryArea::constructedScope".
+                       equals(fr.getName().toString())){
+            return convertToLogicElement(ec.getConstructedMemoryArea());
+        }else if (var.isStatic()) {
 	    return var(var);
 	} else if (prefix == null) {
 	    if (var.isMember()) {

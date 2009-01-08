@@ -172,11 +172,11 @@ public class Test extends SuperTest{
     }
 
     /*@ public normal_behavior
-      @  requires a>0 && \outerScope(\currentMemoryArea, \memoryArea(oArr));
+      @  requires a>0;
       @  assignable \nothing;
       @  working_space 16+a*4;
       @ also public normal_behavior
-      @  requires a<=0 && \outerScope(\currentMemoryArea, \memoryArea(oArr));
+      @  requires a<=0;
       @  assignable \nothing;
       @  working_space 0;
       @*/
@@ -188,7 +188,7 @@ public class Test extends SuperTest{
 	}
 	return null;*/
 	if(a>0){
-	    return oArr = new Object[a];
+	    return new Object[a];
 	}
 	return null;
     }

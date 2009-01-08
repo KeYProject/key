@@ -1069,6 +1069,14 @@ public class PrettyPrinter {
                 "javax.realtime.MemoryArea::currentMemoryArea".
                 equals(x.getName().toString())){
             write("<currentMemoryArea>");
+        }else if (x.getName()!=null && 
+                "javax.realtime.MemoryArea::callerScope".
+                equals(x.getName().toString())){
+            write("<callerScope>");
+        }else if (x.getName()!=null && 
+                "javax.realtime.MemoryArea::constructedScope".
+                equals(x.getName().toString())){
+            write("<construcedScope>");
         }else{
             if (x.getReferencePrefix() != null) {     
                 boolean wasNoSemicolons = noSemicolons;
@@ -2559,6 +2567,14 @@ public class PrettyPrinter {
 	    write(",this=");
 	    writeElement(x.getRuntimeInstance());
 	}
+        if(x.getCallerMemoryArea() != null){
+            write(",callerMemoryArea=");
+            writeElement(x.getCallerMemoryArea());
+        }
+        if(x.getConstructedMemoryArea() != null){
+            write(",constructedMemoryArea=");
+            writeElement(x.getConstructedMemoryArea());
+        }
     }
 
 

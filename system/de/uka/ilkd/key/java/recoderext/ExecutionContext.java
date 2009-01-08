@@ -35,6 +35,16 @@ public class ExecutionContext
     private ReferencePrefix runtimeInstance;
     
     private ReferencePrefix memoryArea;
+    
+    /**
+     * PERC Pico specific: the memory area for creating the returned object in
+     */
+    protected ReferencePrefix callerMemoryArea;
+    
+    /**
+     * PERC Pico specific: the constructed memory area
+     */
+    protected ReferencePrefix constructedMemoryArea;
 
     protected ExecutionContext() {}
 
@@ -47,11 +57,28 @@ public class ExecutionContext
      */
     public ExecutionContext(TypeReference classContext, 
             ReferencePrefix memoryArea,
-            ReferencePrefix runtimeInstance) {
+            ReferencePrefix runtimeInstance,
+            ReferencePrefix callerMemoryArea,
+            ReferencePrefix constructedMemoryArea) {
 	this.classContext = classContext;
 	this.runtimeInstance  = runtimeInstance;
 	this.memoryArea = memoryArea;
+        this.callerMemoryArea = callerMemoryArea; 
+        this.constructedMemoryArea = constructedMemoryArea; 
 	makeParentRoleValid();
+    }
+    
+    /**
+     * creates an execution context reference
+     * @param classContext the TypeReference refering to the next enclosing
+     * class 
+     * @param runtimeInstance a ReferencePrefix to the object that
+     * is currently active/executed
+     */
+    public ExecutionContext(TypeReference classContext, 
+            ReferencePrefix memoryArea,
+            ReferencePrefix runtimeInstance) {
+        this(classContext, memoryArea, runtimeInstance, null, null);
     }
     
     /**
@@ -63,6 +90,8 @@ public class ExecutionContext
 	if (runtimeInstance != null) count++;
 	if (classContext != null) count++;
 	if (memoryArea != null) count++;
+        if (constructedMemoryArea != null) count++;
+        if (callerMemoryArea != null) count++;
 	return count;
     }
 
@@ -87,6 +116,14 @@ public class ExecutionContext
 	    if (index == 0) return runtimeInstance;
 	    index--;
 	}
+        if (callerMemoryArea != null) {
+            if (index == 0) return callerMemoryArea;
+            index--;
+        }
+        if (constructedMemoryArea != null) {
+            if (index == 0) return constructedMemoryArea;
+            index--;
+        }
 	throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -105,6 +142,12 @@ public class ExecutionContext
 	if (memoryArea != null) {
 	    if (child == memoryArea) return (1 << 5 | 1);
 	}
+        if (callerMemoryArea != null) {
+            if (child == callerMemoryArea) return (1 << 6 | 1);
+        }
+        if (constructedMemoryArea != null) {
+            if (child == constructedMemoryArea) return (1 << 6 | 1);
+        }
 	return -1;
     }
 
@@ -112,7 +155,8 @@ public class ExecutionContext
     }
 
     public ExecutionContext deepClone() {
-	return new ExecutionContext(classContext, memoryArea, runtimeInstance);
+	return new ExecutionContext(classContext, memoryArea, runtimeInstance, 
+                callerMemoryArea, constructedMemoryArea);
     }
 
     public NonTerminalProgramElement getASTParent() {

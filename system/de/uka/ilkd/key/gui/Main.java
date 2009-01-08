@@ -18,13 +18,11 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
+import java.awt.Dimension;
 import java.awt.event.*;
 import java.io.*;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -33,22 +31,14 @@ import javax.swing.text.JTextComponent;
 
 import org.apache.log4j.Logger;
 
-import de.uka.ilkd.key.gui.assistant.ProofAssistant;
-import de.uka.ilkd.key.gui.assistant.ProofAssistantAI;
-import de.uka.ilkd.key.gui.assistant.ProofAssistantController;
+import de.uka.ilkd.key.gui.assistant.*;
 import de.uka.ilkd.key.gui.configuration.*;
 import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
-import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
-import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
-import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
-import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.gui.notification.events.*;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.jmltest.JMLTestFileCreator;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
@@ -57,15 +47,11 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.decproc.DecProcRunner;
 import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAuflia;
 import de.uka.ilkd.key.proof.init.*;
-import de.uka.ilkd.key.proof.mgt.BasicTask;
-import de.uka.ilkd.key.proof.mgt.NonInterferenceCheck;
-import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
+import de.uka.ilkd.key.proof.mgt.*;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
-import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.key.util.*;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -2601,6 +2587,8 @@ public class Main extends JFrame implements IMain {
                     visible = false;
 		} else if (opt[index].equals("RTSJ")) {
                     ProofSettings.DEFAULT_SETTINGS.setProfile(new RTSJProfile());
+                } else if (opt[index].equals("PERC")) {
+                    ProofSettings.DEFAULT_SETTINGS.setProfile(new PercProfile());
                 } else if (opt[index].equals("TESTING") || opt[index].equals("UNIT")) {
                     if(opt[index].equals("TESTING")){
                         testStandalone = true;
