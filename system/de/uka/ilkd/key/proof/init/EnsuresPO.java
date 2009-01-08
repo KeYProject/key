@@ -336,14 +336,12 @@ public abstract class EnsuresPO extends AbstractPO {
         
         //build general assumption
         Term gaTerm = buildGeneralAssumption(selfVar, paramVars);
-        System.out.println("General Assumptions:"+gaTerm);
         //get precondition defined by subclass
         Term preTerm = getPreTerm(selfVar, 
                                   paramVars, 
                                   resultVar, 
                                   exceptionVar, 
                                   atPreFunctions);
-        System.out.println("Additional preconditions:"+preTerm);
         
         //get postcondition defined by subclass
         Term postTerm = getPostTerm(selfVar, 
@@ -351,7 +349,6 @@ public abstract class EnsuresPO extends AbstractPO {
                                     resultVar, 
                                     exceptionVar, 
                                     atPreFunctions);
-        System.out.println("Post term:"+postTerm);
         
         //build program term
         Term programTerm = buildProgramTerm(paramVars.toArray(),
@@ -360,7 +357,6 @@ public abstract class EnsuresPO extends AbstractPO {
                                             resultVar,
                                             exceptionVar,
                                             postTerm);
-        System.out.println("ProgTerm:"+programTerm);
         
         //build definitions for @pre-functions
         Update atPreDefinitions = APF.createAtPreDefinitions(atPreFunctions, 
