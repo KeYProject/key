@@ -12,7 +12,7 @@ decproc3.smt
 decproc3-shortened.smt		after about 10 sec 	solved
 equalities2.smt			non linear
 equalities3.smt			non linear
-exist1.smt			immediatly 		unknown
+exist1.smt			immediatly 		solved
 functions.smt			immediatly 		solved
 ics_ist_uberfordert.smt		immediatly 		solved
 mv1.smt				immediatly 		solved

@@ -1,0 +1,3 @@
+(DEFPRED (p_3 x_7))
+(DEFPRED (type_of_int_1_2 x_8))
+(FORALL () (EXISTS () (IMPLIES (AND (AND (AND (AND (type_of_int_1_2 (dummy_int_4)) (type_of_int_1_2 2)) (type_of_int_1_2 0)) (type_of_int_1_2 1)) (FORALL (tvar1_6) (FORALL (tvar0_5) (IMPLIES (AND (type_of_int_1_2 tvar0_5) (type_of_int_1_2 tvar1_6)) (type_of_int_1_2 (+ tvar0_5 tvar1_6)))))) (IMPLIES TRUE (IMPLIES (AND (FORALL (x_0) (IMPLIES (type_of_int_1_2 x_0) (IMPLIES (p_3 x_0) (p_3 (+ x_0 1))))) (p_3 0)) (p_3 2))))))

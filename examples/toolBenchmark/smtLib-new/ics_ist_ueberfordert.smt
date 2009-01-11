@@ -4,5 +4,5 @@
  :extrasorts ()
 :extrapreds ()
 :extrafuns ()
-:formula (not (implies (and true (and true true)) true))
+:formula (not (implies true true))
 )

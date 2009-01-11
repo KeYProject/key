@@ -9,7 +9,7 @@ equalities.smt			immediatly 		solved
 decproc1.smt			
 decproc2.smt			
 decproc3.smt			
-decproc3-shortened.smt		
+decproc3-shortened.smt		after ca 4:30 min	solved
 equalities2.smt			non linear
 equalities3.smt			non linear
 exist1.smt			immediatly 		unknown

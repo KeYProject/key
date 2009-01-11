@@ -90,7 +90,9 @@ public class SimplifyTranslator extends AbstractSmtTranslator {
 	for (ArrayList<StringBuffer> s : predicates) {
 	    toReturn.append("(DEFPRED (" + s.get(0));
 	    for (int i = 1; i < s.size(); i++) {
-		toReturn.append(" x");
+		StringBuffer var = new StringBuffer("x");
+		var = this.makeUnique(var);
+		toReturn.append(" " + var);
 	    }
 	    toReturn.append("))\n");
 	}
@@ -102,6 +104,15 @@ public class SimplifyTranslator extends AbstractSmtTranslator {
 	    }
 	    formula = this.translateLogicalImply(ass, formula);
 	}
+	
+	/* CAUTION!! For some reason, the solver gives the correct result,
+	 * if this part is added. The reason, why this is, is not clear ro me yet!
+	 */
+	StringBuffer temp = new StringBuffer ();
+	temp.append("(").append(ALLSTRING).append(" () (").append(EXISTSTRING)
+		.append(" () ").append(formula).append("))");
+	formula = temp;
+	/* End of adding part */
 	
 	toReturn.append(formula);
 	

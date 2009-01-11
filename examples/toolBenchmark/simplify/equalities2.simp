@@ -1,5 +1,4 @@
 (DEFPRED (int_0 x5))
-(FORALL ()(EXISTS ()
- (IMPLIES (AND)
-(OR (IMPLIES (AND (EQ 5 (a_1)) (EQ 15 (+ (b_2) -3))) (EQ (* (a_1) (b_2)) 90))))
-))
+(FORALL () (EXISTS () (IMPLIES (AND (EQ 5 (a_1)) (EQ 15 (+ (b_2) -3))) (EQ (* (a_1) (b_2)) 90))))
+
+
