@@ -198,16 +198,18 @@ public abstract class EnsuresPO extends AbstractPO {
         
         //build disjunction of preconditions
         if(!skipPreconditions) {
-            Term anyPreTerm = TB.ff();
             SetOfOperationContract contracts 
-                = specRepos.getOperationContracts(programMethod);
-            for(OperationContract contract : contracts) {
-                Term term = translatePre(contract, selfVar, toPV(paramVars));
-                anyPreTerm = TB.or(anyPreTerm, term); 
+            = specRepos.getOperationContracts(programMethod);
+            if (contracts.size() > 0) {
+                Term anyPreTerm = TB.ff();
+                for(OperationContract contract : contracts) {
+                    Term term = translatePre(contract, selfVar, toPV(paramVars));
+                    anyPreTerm = TB.or(anyPreTerm, term); 
+                }
+                result = TB.and(result, anyPreTerm);
             }
-            result = TB.and(result, anyPreTerm);
         }
-        
+
         //build "self.<created> = TRUE & self != null"
         if(selfVar != null) {
             Term selfCreatedAndNotNullTerm
@@ -334,7 +336,6 @@ public abstract class EnsuresPO extends AbstractPO {
         
         //build general assumption
         Term gaTerm = buildGeneralAssumption(selfVar, paramVars);
-        
         //get precondition defined by subclass
         Term preTerm = getPreTerm(selfVar, 
                                   paramVars, 
