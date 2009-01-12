@@ -466,63 +466,63 @@ options {
     }
 
 
-    /**
-     * @param maxmin <code>true</code> for max-Axiom, <code>false</code> for min-Axiom
-     *
-     * See minor thesis "A translation from JML to Java DL" by Christian Engel, p. 40
-     */
-    private Term buildMaxMinAxiom(boolean maxmin, Function y, ListOfLogicVariable qVars, Term pred, Term body) {
-
-	Term result = tb.not(tb.ex(qVars.toArray(), pred));
-
-	ProgramVariable n;
-	String progVarName;
-	String className;
-	if (maxmin) {
-	    progVarName = "MIN_VALUE";
-	} else {
-	    progVarName = "MAX_VALUE";
-	}
-
+//    /**
+//     * @param maxmin <code>true</code> for max-Axiom, <code>false</code> for min-Axiom
+//     *
+//     * See minor thesis "A translation from JML to Java DL" by Christian Engel, p. 40
+//     */
+//    private Term buildMaxMinAxiom(boolean maxmin, Function y, ListOfLogicVariable qVars, Term pred, Term body) {
+//
+//	Term result = tb.not(tb.ex(qVars.toArray(), pred));
+//
+//	ProgramVariable n;
+//	String progVarName;
+//	String className;
+//	if (maxmin) {
+//	    progVarName = "MIN_VALUE";
+//	} else {
+//	    progVarName = "MAX_VALUE";
+//	}
+//
 //	System.out.println();
 //	System.out.println(qVars.head().sort().toString());
 //	System.out.println();
-
-	if (qVars.head().sort().toString().equals("jlong")) {
-	    className = "java.lang.Long";
-	} else {
-	    className = "java.lang.Integer";
-	}
-
-	n = javaInfo.getAttribute(progVarName, className);
-
-	result = tb.and(result,
-	    tb.equals(
-		tb.func(y),
-		tb.var(n)));
-
-	Term t = tb.func(y);
-
-	if (maxmin) {
-	    t = tb.geq(t,body, services);
-	} else {
-	    t = tb.leq(t,body, services);
-	}
-
-	t = tb.all(qVars.toArray(), tb.imp(pred,t));
-	t = tb.and(
-	    t,
-	    tb.ex(qVars.toArray(),
-		tb.and(
-		    pred,
-		    tb.equals(
-			body,
-			tb.func(y)))));
-
-	result = tb.or(result, t);
-
-	return result;
-    }
+//
+//	if (qVars.head().sort().toString().equals("jlong")) {
+//	    className = "java.lang.Long";
+//	} else {
+//	    className = "java.lang.Integer";
+//	}
+//
+//	n = javaInfo.getAttribute(progVarName, className);
+//
+//	result = tb.and(result,
+//	    tb.equals(
+//		tb.func(y),
+//		tb.var(n)));
+//
+//	Term t = tb.func(y);
+//
+//	if (maxmin) {
+//	    t = tb.geq(t,body, services);
+//	} else {
+//	    t = tb.leq(t,body, services);
+//	}
+//
+//	t = tb.all(qVars.toArray(), tb.imp(pred,t));
+//	t = tb.and(
+//	    t,
+//	    tb.ex(qVars.toArray(),
+//		tb.and(
+//		    pred,
+//		    tb.equals(
+//			body,
+//			tb.func(y)))));
+//
+//	result = tb.or(result, t);
+//
+//	return result;
+//  }
     
     
     private SetOfLocationDescriptor getObjectCreationModSet(KeYJavaType kjt) {
@@ -1903,24 +1903,26 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 		result = tb.ex(declVars.toArray(), t);
 	    }
 	    else if (q.getText().equals("\\min")) {
-		Function y = new RigidFunction(
-		    new Name("_jml_ymin"+(varCounter++)),
-		    declVars.head().sort(),
-		    new Sort[] {});
-		axiomCollector.collectAxiom(y,
-		    buildMaxMinAxiom(false, y, declVars, p, t));
-		result = tb.func(y);
-		services.getNamespaces().functions().addSafely(y);
+	    	raiseNotSupported("\\min");
+//		Function y = new RigidFunction(
+//		    new Name("_jml_ymin"+(varCounter++)),
+//		    declVars.head().sort(),
+//		    new Sort[] {});
+//		axiomCollector.collectAxiom(y,
+//		    buildMaxMinAxiom(false, y, declVars, p, t));
+//		result = tb.func(y);
+//		services.getNamespaces().functions().addSafely(y);
 	    }
 	    else if (q.getText().equals("\\max")) {
-		Function y = new RigidFunction(
-		    new Name("_jml_ymax"+(varCounter++)),
-		    declVars.head().sort(),
-		    new Sort[] {});
-		axiomCollector.collectAxiom(y,
-		    buildMaxMinAxiom(true, y, declVars, p, t));
-		result = tb.func(y);
-		services.getNamespaces().functions().addSafely(y);
+	        raiseNotSupported("\\max");
+//		Function y = new RigidFunction(
+//		    new Name("_jml_ymax"+(varCounter++)),
+//		    declVars.head().sort(),
+//		    new Sort[] {});
+//		axiomCollector.collectAxiom(y,
+//		    buildMaxMinAxiom(true, y, declVars, p, t));
+//		result = tb.func(y);
+//		services.getNamespaces().functions().addSafely(y);
 	    }
 	    else if (q.getText().equals("\\num_of")) {
 		raiseNotSupported("\\num_of");
