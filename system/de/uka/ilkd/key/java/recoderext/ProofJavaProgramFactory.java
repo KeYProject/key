@@ -28,8 +28,7 @@ import recoder.io.PropertyNames;
 import recoder.java.*;
 import recoder.java.SourceElement.Position;
 import recoder.java.declaration.*;
-import recoder.java.reference.MethodReference;
-import recoder.java.reference.TypeReference;
+import recoder.java.reference.*;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.util.StringUtils;
@@ -396,6 +395,12 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 							 Expression resVar,
 							 MethodReference methRef) {
 	return new MethodBodyStatement(bodySource, resVar, methRef);
+    }
+    
+    public MethodReferenceWrapper createMethodReferenceWrapper(ReferencePrefix accessPath, 
+            Identifier name, ASTList<Expression> args, 
+            ASTList<TypeArgumentDeclaration> typeArgs, Identifier scope){
+        return new MethodReferenceWrapper(accessPath, name, args, typeArgs, scope);
     }
 
     /**

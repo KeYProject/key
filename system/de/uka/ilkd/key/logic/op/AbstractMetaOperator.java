@@ -57,7 +57,13 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     
     public static final AbstractMetaOperator META_HEAP_SPACE = new HeapSpace();
     
+    public static final AbstractMetaOperator META_NEXT_TO_CREATE_STACK = new MetaNextToCreateStack();
+    
+    public static final AbstractMetaOperator META_STACK_AT_INDEX = new StackAtIndex();
+    
     public static final AbstractMetaOperator META_UNIQUE_ANON_UPDATE = new UniqueAnonUpdate(); 
+    
+    public static final AbstractMetaOperator META_STACK_FOR_CONSTRUCTED_SCOPE = new StackForConstructedScope();
     
     public static final AbstractMetaOperator META_CALCULATE_ARRAY_SIZE = 
         new CalculateArraySize();

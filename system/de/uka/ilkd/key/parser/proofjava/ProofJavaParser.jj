@@ -292,6 +292,11 @@ public class ProofJavaParser {
          *  it is an explicit generic method invocation
          */
         ASTList<TypeArgumentDeclaration> typeArgs = null;
+        
+        /**
+         * valid iff <tt>type</tt> is <tt>ARGUMENTS</tt>
+         */
+        Identifier scope = null;
     }
 
 
@@ -482,8 +487,10 @@ TOKEN :
 | < VARARGDENOTER: "..." >
 | < STRICTFP: "strictfp" >
 | < CURRENTMEMORYAREA: "<currentMemoryArea>" >
+| < LOCALSCOPE: "<localScope>" >
 | < CALLERSCOPE: "<callerScope>" >
 | < CONSTRUCTEDSCOPE: "<constructedScope>" >
+| < REENTRANTSCOPE: "<reentrantScope>" >
 }
 
 /* LITERALS */
@@ -1659,9 +1666,6 @@ ASTList<ParameterDeclaration> FormalParameters() :
 {
     ParameterDeclaration pd;
     ASTList<ParameterDeclaration> result = new ASTArrayList<ParameterDeclaration>();
-    pd = factory.createParameterDeclaration(
-    	factory.createUncollatedReferenceQualifier(factory.createIdentifier("javax.realtime.MemoryArea")).toTypeReference(),
-    	factory.createIdentifier("callerScope"));
 }
 {
   "("
@@ -2962,10 +2966,10 @@ Expression PrimaryExpression() :
           // method call -determine the kind of method
           if (tmpResult instanceof UncollatedReferenceQualifier) {
               // this is a normal method call
-              tmpResult = factory.createMethodReference
+              tmpResult = factory.createMethodReferenceWrapper
               (((UncollatedReferenceQualifier)tmpResult).getReferencePrefix(),
                ((UncollatedReferenceQualifier)tmpResult).getIdentifier(),
-               suffix.args, ((UncollatedReferenceQualifier)tmpResult).getTypeArguments());
+               suffix.args, ((UncollatedReferenceQualifier)tmpResult).getTypeArguments(), suffix.scope);
               
               setPrefixInfo(tmpResult);
               setPostfixInfo(tmpResult);
@@ -3109,9 +3113,10 @@ PrimarySuffixReturnValue PrimarySuffix() :
     // reuses global suffix field
     Expression               expr;
     ASTList<Expression>    args;
-    Identifier               id;
+    Identifier               id=null;
     Literal                  lit;
     ASTList<TypeArgumentDeclaration> typeArgs;
+    UncollatedReferenceQualifier qn = null;
 }
 {
 (
@@ -3154,10 +3159,26 @@ PrimarySuffixReturnValue PrimarySuffix() :
       suffix.type = PrimarySuffixReturnValue.IDENTIFIER;
   }
 |
-  args = Arguments()
+  args = Arguments() 
+  [LOOKAHEAD(2)  "@" 
+  	(
+  		"<localScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.LOCAL_SCOPE);}
+  		|
+  		"<callerScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.CALLER_SCOPE);}
+  		|
+  		"<constructedScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.CONSTRUCTED_SCOPE);}
+  		|
+  		"<reentrantScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.REENTRANT_SCOPE);}
+  	)
+  ]
   {
       suffix.type = PrimarySuffixReturnValue.ARGUMENTS;
       suffix.args = args;
+      if(id!=null){
+      	suffix.scope = id;
+      }else{
+       	suffix.scope = factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.LOCAL_SCOPE);
+      }
   }
 )
   {
@@ -3254,8 +3275,7 @@ ASTList<Expression> Arguments() :
       if (result != null)
       {
           checkConstruction(result);
-          
-          }
+      }
       return result;
   }
 }
@@ -3563,11 +3583,11 @@ ExecutionContext ExecutionContext() :
 
   "source="
   classContext = Type() 
-  ",memoryArea=" memoryArea = Expression()
+  [",<currentMemoryArea>=" memoryArea = Expression() | ",<localScope>=" memoryArea = Expression()]
+  [ ",<callerScope>=" callerScope = Expression() ]
+  [ ",<constructedScope>=" constructedScope = Expression() ]
   [ ",this=" runtimeInstance = Expression() ]
-  [ ",callerMemoryArea=" callerScope = Expression() ]
-  [ ",constructedMemoryArea=" constructedScope = Expression() ]
-
+  
   { return new ExecutionContext
 	(classContext, (ReferencePrefix)memoryArea,
         (ReferencePrefix)runtimeInstance, (ReferencePrefix)callerScope, (ReferencePrefix)constructedScope);

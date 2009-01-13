@@ -99,12 +99,12 @@ public class ExecutionContext
 	children.remove(this.classContext);
         this.memoryArea = (ReferencePrefix) children.removeFirstOccurrence(
                 ReferencePrefix.class); 
-	this.runtimeInstance = (ReferencePrefix) children.removeFirstOccurrence(
-	        ReferencePrefix.class);
         this.callerMemoryArea = (ReferencePrefix) children.removeFirstOccurrence(
                 ReferencePrefix.class); 
         this.constructedMemoryArea = (ReferencePrefix) children.removeFirstOccurrence(
                 ReferencePrefix.class); 
+        this.runtimeInstance = (ReferencePrefix) children.removeFirstOccurrence(
+                ReferencePrefix.class);
     }
 
 
@@ -140,10 +140,6 @@ public class ExecutionContext
 	    if (index == 0) return memoryArea;
 	    index--;
 	}
-	if (runtimeInstance != null) {
-	    if (index == 0) return runtimeInstance;
-	    index--;
-	}
         if (callerMemoryArea != null) {
             if (index == 0) return callerMemoryArea;
             index--;
@@ -152,7 +148,11 @@ public class ExecutionContext
             if (index == 0) return constructedMemoryArea;
             index--;
         }
-	throw new ArrayIndexOutOfBoundsException();
+        if (runtimeInstance != null) {
+            if (index == 0) return runtimeInstance;
+            index--;
+        }
+        throw new ArrayIndexOutOfBoundsException();
     }
 
     /**
@@ -197,8 +197,9 @@ public class ExecutionContext
 
     public String toString() {
         return "Context: "+classContext+" MemoryArea: "+memoryArea+
-        " Instance: "+runtimeInstance+" CallerMemoryArea: "+callerMemoryArea+
-        " ConstructedMemoryArea: "+constructedMemoryArea;
+        " CallerMemoryArea: "+callerMemoryArea+
+        " ConstructedMemoryArea: "+constructedMemoryArea+
+        " Instance: "+runtimeInstance;
     }
     
 }

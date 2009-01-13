@@ -10,30 +10,26 @@
 
 package de.uka.ilkd.key.java;
 
+import java.lang.reflect.*;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.*;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
 import recoder.java.NonTerminalProgramElement;
 import recoder.list.generic.ASTList;
-import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.Ghost;
 import de.uka.ilkd.key.java.declaration.modifier.Model;
-import de.uka.ilkd.key.java.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.expression.PassiveExpression;
+import de.uka.ilkd.key.java.expression.*;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
+import de.uka.ilkd.key.java.recoderext.MethodReferenceWrapper;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -1326,7 +1322,8 @@ public class Recoder2KeYConverter {
         
         return new MethodReference(children,
                 pm == null ? new ProgramElementName(mr.getName()) : pm
-                        .getProgramElementName(), prefix, positionInfo(mr));
+                        .getProgramElementName(), prefix, positionInfo(mr), 
+                        (mr instanceof MethodReferenceWrapper ? ((MethodReferenceWrapper) mr).getScope().toSource() : null));
     }
 
     // --------------Special treatment because of ambiguities ----------

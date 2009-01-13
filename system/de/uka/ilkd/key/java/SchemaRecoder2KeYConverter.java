@@ -3,62 +3,17 @@ package de.uka.ilkd.key.java;
 import java.util.List;
 
 import recoder.list.generic.ASTList;
-
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.Modifier;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.recoderext.ProgramVariableSVWrapper;
 import de.uka.ilkd.key.java.recoderext.TypeSVWrapper;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.java.reference.MethodName;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.PackageReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.SchemaTypeReference;
-import de.uka.ilkd.key.java.reference.SchematicFieldReference;
-import de.uka.ilkd.key.java.reference.SuperReference;
-import de.uka.ilkd.key.java.reference.ThisReference;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.EnhancedFor;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.IForUpdates;
-import de.uka.ilkd.key.java.statement.IGuard;
-import de.uka.ilkd.key.java.statement.ILoopInit;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.rule.metaconstruct.ArrayLength;
-import de.uka.ilkd.key.rule.metaconstruct.ArrayPostDecl;
-import de.uka.ilkd.key.rule.metaconstruct.ConstructorCall;
-import de.uka.ilkd.key.rule.metaconstruct.CreateObject;
-import de.uka.ilkd.key.rule.metaconstruct.DoBreak;
-import de.uka.ilkd.key.rule.metaconstruct.EnhancedForElimination;
-import de.uka.ilkd.key.rule.metaconstruct.EvaluateArgs;
-import de.uka.ilkd.key.rule.metaconstruct.ExpandMethodBody;
-import de.uka.ilkd.key.rule.metaconstruct.ForToWhile;
-import de.uka.ilkd.key.rule.metaconstruct.InitArrayCreation;
-import de.uka.ilkd.key.rule.metaconstruct.IsStatic;
-import de.uka.ilkd.key.rule.metaconstruct.MethodCall;
-import de.uka.ilkd.key.rule.metaconstruct.MethodCallContract;
-import de.uka.ilkd.key.rule.metaconstruct.MultipleVarDecl;
-import de.uka.ilkd.key.rule.metaconstruct.PostWork;
-import de.uka.ilkd.key.rule.metaconstruct.ProgramMetaConstruct;
-import de.uka.ilkd.key.rule.metaconstruct.SpecialConstructorCall;
-import de.uka.ilkd.key.rule.metaconstruct.StaticInitialisation;
-import de.uka.ilkd.key.rule.metaconstruct.SwitchToIf;
-import de.uka.ilkd.key.rule.metaconstruct.TypeOf;
-import de.uka.ilkd.key.rule.metaconstruct.Unpack;
-import de.uka.ilkd.key.rule.metaconstruct.UnwindLoop;
+import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
@@ -129,6 +84,17 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         } else if ("#expand-method-body".equals(mcName)) {
             return new ExpandMethodBody((SchemaVariable) list
                     .get(SchemaVariable.class));
+        } else if ("#expand-method-body-perc".equals(mcName)) {
+            ProgramSV[] svw = mc.getSV();
+            if(svw.length==6){
+                return new ExpandMethodBodyPerc((SchemaVariable) list
+                        .get(SchemaVariable.class), svw[0], svw[1], svw[2], svw[3], 
+                        svw[4], svw[5]);
+            }else{
+                return new ExpandMethodBodyPerc((SchemaVariable) list
+                        .get(SchemaVariable.class), svw[0], null, svw[1], svw[2], 
+                        svw[3], svw[4]);
+            }
         } else if ("#method-call".equals(mcName)
                 || "#method-call-contract".equals(mcName)) {
             ProgramSV[] svw = mc.getSV();
@@ -268,6 +234,8 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             de.uka.ilkd.key.java.recoderext.ExecutionContext ec) {
         return new ExecutionContext((TypeReference) callConvert(ec.getTypeReference()), 
                                     ec.getMemoryArea()!=null? (ReferencePrefix)callConvert(ec.getMemoryArea()) : null,
+                                    ec.getCallerMemoryArea()!=null? (ReferencePrefix)callConvert(ec.getCallerMemoryArea()) : null,
+                                    ec.getConstructedMemoryArea()!=null? (ReferencePrefix)callConvert(ec.getConstructedMemoryArea()) : null,
 				    ec.getRuntimeInstance()!=null? (ReferencePrefix)callConvert(ec.getRuntimeInstance()) : null);
     }
 

@@ -112,10 +112,6 @@ public class ExecutionContext
 	    if (index == 0) return memoryArea;
 	    index--;
 	}
-	if (runtimeInstance != null) {
-	    if (index == 0) return runtimeInstance;
-	    index--;
-	}
         if (callerMemoryArea != null) {
             if (index == 0) return callerMemoryArea;
             index--;
@@ -124,7 +120,11 @@ public class ExecutionContext
             if (index == 0) return constructedMemoryArea;
             index--;
         }
-	throw new ArrayIndexOutOfBoundsException();
+        if (runtimeInstance != null) {
+            if (index == 0) return runtimeInstance;
+            index--;
+        }
+        throw new ArrayIndexOutOfBoundsException();
     }
 
     /**
@@ -137,13 +137,13 @@ public class ExecutionContext
 	    if (child == classContext) return 0;
 	}
 	if (runtimeInstance != null) {
-	    if (child == runtimeInstance) return (1 << 4 | 1);
+	    if (child == runtimeInstance) return (1 << 7 | 1);
 	}
 	if (memoryArea != null) {
-	    if (child == memoryArea) return (1 << 5 | 1);
+	    if (child == memoryArea) return (1 << 4 | 1);
 	}
         if (callerMemoryArea != null) {
-            if (child == callerMemoryArea) return (1 << 6 | 1);
+            if (child == callerMemoryArea) return (1 << 5 | 1);
         }
         if (constructedMemoryArea != null) {
             if (child == constructedMemoryArea) return (1 << 6 | 1);
@@ -175,6 +175,10 @@ public class ExecutionContext
 	    runtimeInstance = (ReferencePrefix)newChild;
 	} else if (child == memoryArea) {
             memoryArea = (ReferencePrefix)newChild;
+        } else if (child == callerMemoryArea) {
+            callerMemoryArea = (ReferencePrefix)newChild;
+        } else if (child == constructedMemoryArea) {
+            constructedMemoryArea = (ReferencePrefix)newChild;
         } else {
 	    return false;
 	}
@@ -195,6 +199,12 @@ public class ExecutionContext
         }
         if (memoryArea != null) {
             ((Expression)memoryArea).setExpressionContainer(this);
+        }
+        if (callerMemoryArea != null) {
+            ((Expression)callerMemoryArea).setExpressionContainer(this);
+        }
+        if (constructedMemoryArea != null) {
+            ((Expression) constructedMemoryArea).setExpressionContainer(this);
         }
     }
     
@@ -221,6 +231,14 @@ public class ExecutionContext
             if (index == 0) return (Expression) runtimeInstance;
             index--;
         }
+        if (callerMemoryArea != null) {
+            if (index == 0) return (Expression) callerMemoryArea;
+            index--;
+        }
+        if (constructedMemoryArea != null) {
+            if (index == 0) return (Expression) constructedMemoryArea;
+            index--;
+        }
 	throw new ArrayIndexOutOfBoundsException();
     }
 
@@ -228,6 +246,8 @@ public class ExecutionContext
         int count = 0;
         if (memoryArea != null) count++;
         if (runtimeInstance != null) count++;
+        if (constructedMemoryArea != null) count++;
+        if (callerMemoryArea != null) count++;
         return count;
     }
 
@@ -250,6 +270,14 @@ public class ExecutionContext
     
     public ReferencePrefix getMemoryArea() {
         return memoryArea;
+    }
+    
+    public ReferencePrefix getCallerMemoryArea() {
+        return callerMemoryArea;
+    }
+    
+    public ReferencePrefix getConstructedMemoryArea() {
+        return constructedMemoryArea;
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

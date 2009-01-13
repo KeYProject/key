@@ -2020,11 +2020,14 @@ ExecutionContext ExecutionContext() :
     TypeSVWrapper tr = null;
     ExpressionSVWrapper instance = null;
     ExpressionSVWrapper memoryArea = null;
+    ExpressionSVWrapper callerScope = null;
+    ExpressionSVWrapper constructedScope = null;
 }
 {
-    tr = TypeSV() "(" ( memoryArea = ExpressionSV() ("," instance = ExpressionSV())?)? ")" 
+    tr = TypeSV() "(" ( memoryArea = ExpressionSV() ("," callerScope = ExpressionSV()  ("," constructedScope = ExpressionSV() 
+    	(","  instance = ExpressionSV())?)?)?)? ")"  
     {
-	return new ExecutionContext(tr, memoryArea, instance);
+	return new ExecutionContext(tr, memoryArea, instance, callerScope, constructedScope);
     } 
 } 
 
@@ -3682,23 +3685,24 @@ StatementBlock StartBlock() :
     StatementBlock result = null;
     ASTList<Statement> sl = new ASTArrayList<Statement>();
     Statement stat;
-    ExecCtxtSVWrapper ec = null;
+    ExecutionContext ec = null;
     TypeSVWrapper tr = null;
     ExpressionSVWrapper sv = null, sv1 = null;
 }
 { 
    "{" (   LOOKAHEAD(2)
            ( <DOT> ( LOOKAHEAD(2) 
-		     tr = TypeSV() "(" (sv = ExpressionSV() (","
-					sv1 = ExpressionSV())?)? ")" |  
+		//     tr = TypeSV() "(" (sv = ExpressionSV() (","
+		//			sv1 = ExpressionSV())?)? ")" |  
+		     ec = ExecutionContext()  |
 	             ec = ExecutionContextSV() ))? 
             <CONTEXTSTART> 
             {
-              if (tr == null) {
+//              if (tr == null) {
                  result = factory.createContextStatementBlock(ec);
-	      } else { 
-                 result = factory.createContextStatementBlock(tr, sv, sv1);
-	      }
+//	      } else { 
+//                 result = factory.createContextStatementBlock(tr, sv, sv1);
+//	      }
               setPrefixInfo(result);
             }        
            (stat = BlockStatement() { sl.add(stat); } )*
@@ -4243,6 +4247,24 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
 		  return result;
 	      }
 	   ) 
+	  |
+	  (
+	   "#expand-method-body-perc" "(" stat = Statement()
+	      {
+		  result = factory.createRKeYMetaConstruct();
+		  setPrefixInfo(result);
+		  result.setChild(stat);
+		  result.setName("#expand-method-body-perc");
+	      }
+	      ("," sv = VariableSV()
+	      {
+	      	result.addSV(sv);
+	      }
+	      )*   ")" ";" 
+	      {
+	      	return result;
+	      }
+	   ) 	   
 	  |  
 	  (
 	   "#constructor-call" "("	

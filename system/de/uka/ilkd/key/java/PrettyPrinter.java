@@ -18,13 +18,11 @@ import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.declaration.modifier.Final;
-import de.uka.ilkd.key.java.declaration.modifier.Private;
-import de.uka.ilkd.key.java.declaration.modifier.Protected;
-import de.uka.ilkd.key.java.declaration.modifier.Public;
+import de.uka.ilkd.key.java.declaration.modifier.*;
 import de.uka.ilkd.key.java.expression.*;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.*;
@@ -34,11 +32,11 @@ import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.Range;
+import de.uka.ilkd.key.proof.init.PercProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramMetaConstruct;
 import de.uka.ilkd.key.rule.soundness.ProgramSVProxy;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.java.recoderext.StatementSVWrapper;
 
 /**
    A configurable pretty printer for Java source elements originally from COMPOST.
@@ -2537,6 +2535,9 @@ public class PrettyPrinter {
             writeCommaList(x.getArguments());
         }	
 	write(")");
+        if(!fileWriterMode && ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
+            write("@<"+x.getScope()+">");
+        }
 	if (withSemicolon) {
             write(";");           
         }
@@ -2560,20 +2561,24 @@ public class PrettyPrinter {
 	write("source=");
 	writeElement(x.getTypeReference());
 	if(x.getMemoryArea() != null){
-	    write(",memoryArea=");
+            if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
+                write(",<localScope>=");
+            }else{
+                write(",<currentMemoryArea>=");
+            }
 	    writeElement(x.getMemoryArea());
 	}
-	if (x.getRuntimeInstance() != null) {
-	    write(",this=");
-	    writeElement(x.getRuntimeInstance());
-	}
         if(x.getCallerMemoryArea() != null){
-            write(",callerMemoryArea=");
+            write(",<callerScope>=");
             writeElement(x.getCallerMemoryArea());
         }
         if(x.getConstructedMemoryArea() != null){
-            write(",constructedMemoryArea=");
+            write(",<constructedScope>=");
             writeElement(x.getConstructedMemoryArea());
+        }
+        if (x.getRuntimeInstance() != null) {
+            write(",this=");
+            writeElement(x.getRuntimeInstance());
         }
     }
 

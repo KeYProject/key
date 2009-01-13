@@ -1194,7 +1194,7 @@ public class JavaInfo {
                 getKeYJavaTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);                     
             defaultExecutionContext = 
                 new ExecutionContext(new TypeRef(kjt), getDefaultMemoryArea(),
-                        null);
+                        null, getDefaultMemoryArea(), getDefaultMemoryArea());
         }
         return defaultExecutionContext;
     }
