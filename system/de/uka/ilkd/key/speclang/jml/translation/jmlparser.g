@@ -618,7 +618,7 @@ options {
     LocationVariable dma = javaInfo.getDefaultMemoryArea();
     
     ProgramVariable consumed
-		= javaInfo.getAttribute("consumed", dma.getKeYJavaType());
+		= javaInfo.getAttribute("consumed", "javax.realtime.MemoryArea");
 		
 	//create logic variable, guard
         Sort integerSort 

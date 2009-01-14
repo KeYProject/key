@@ -42,7 +42,6 @@ public class StackForConstructedScope extends AbstractMetaOperator {
     private MethodReference getMethodReference(Term t){
         ProgramElement p = t.javaBlock().program();
         while(!(p instanceof MethodBodyStatement)){
-            System.out.println("StackForConstructedScope - p.getClass: "+p.getClass());
             if(p instanceof StatementBlock){
                 p = ((StatementBlock) p).getStatementAt(0);
             }else{

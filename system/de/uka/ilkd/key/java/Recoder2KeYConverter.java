@@ -774,7 +774,7 @@ public class Recoder2KeYConverter {
         }
 
         final MethodReference mr = new MethodReference(new ArrayOfExpression(
-                keyArgs), methodName, invocationTarget);
+                keyArgs), methodName, invocationTarget, rmbs.getScope()==null ? null : rmbs.getScope().getText());
 
         return new MethodBodyStatement(bodySource, resultVar, mr);
     }
@@ -1320,10 +1320,14 @@ public class Recoder2KeYConverter {
             children.remove(prefixPos);
         }
         
+        String scope = (mr instanceof MethodReferenceWrapper &&  
+                ((MethodReferenceWrapper) mr).getScope()!=null ? 
+                ((MethodReferenceWrapper) mr).getScope().toSource() : null);
+        
         return new MethodReference(children,
                 pm == null ? new ProgramElementName(mr.getName()) : pm
                         .getProgramElementName(), prefix, positionInfo(mr), 
-                        (mr instanceof MethodReferenceWrapper ? ((MethodReferenceWrapper) mr).getScope().toSource() : null));
+                        scope);
     }
 
     // --------------Special treatment because of ambiguities ----------

@@ -1207,7 +1207,7 @@ public class JavaInfo {
             }
             defaultMemoryArea = (LocationVariable) services.getNamespaces().
                 programVariables().lookup(new Name("initialMemoryArea"));
-            KeYJavaType kjt = getTypeByClassName("javax.realtime.MemoryArea");
+            KeYJavaType kjt = getTypeByClassName("javax.realtime.LTMemory");
             if(defaultMemoryArea == null){
                 defaultMemoryArea = 
                     new LocationVariable(new ProgramElementName("initialMemoryArea"),

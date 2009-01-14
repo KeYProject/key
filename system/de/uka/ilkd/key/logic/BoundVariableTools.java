@@ -178,7 +178,7 @@ public class BoundVariableTools {
                                      int subtermsEnd) {
         // at least one subterms belongs to the entry (value)
         ArrayOfQuantifiableVariable unifiedVariable = boundVarsPerSub[subtermsBegin];
-
+        
         final Map<QuantifiableVariable, QuantifiableVariable> variableRenamings = 
             new HashMap<QuantifiableVariable, QuantifiableVariable> ();
         for ( int i = subtermsBegin + 1; i < subtermsEnd; ++i ) {

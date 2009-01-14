@@ -15,13 +15,10 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.*;
+import java.util.HashMap;
 
 import recoder.CrossReferenceServiceConfiguration;
-import recoder.java.Expression;
-import recoder.java.Identifier;
-import recoder.java.Statement;
-import recoder.java.StatementBlock;
+import recoder.java.*;
 import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Public;
 import recoder.java.declaration.modifier.Static;
@@ -69,6 +66,10 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
 	result.add(local);
 
 	final ASTList<Expression> arguments = new ASTArrayList<Expression>(0);
+        
+        arguments.add(new FieldReference(new TypeReference(new PackageReference(new PackageReference(new Identifier("javax")), 
+                new Identifier("realtime")), new Identifier("MemoryArea")), 
+                new Identifier("callerScope")));
        
         result.add
             (assign(new VariableReference

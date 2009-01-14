@@ -3174,11 +3174,11 @@ PrimarySuffixReturnValue PrimarySuffix() :
   {
       suffix.type = PrimarySuffixReturnValue.ARGUMENTS;
       suffix.args = args;
-      if(id!=null){
+//      if(id!=null){
       	suffix.scope = id;
-      }else{
-       	suffix.scope = factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.LOCAL_SCOPE);
-      }
+//      }else{
+//       	suffix.scope = factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.LOCAL_SCOPE);
+//      }
   }
 )
   {
@@ -3538,7 +3538,7 @@ MethodBodyStatement MethodBodyStatement() :
   Expression tmp;
   VariableReference resVar = null;
   UncollatedReferenceQualifier qn;
-  MethodReference methRef;
+  MethodReferenceWrapper methRef;
   MethodBodyStatement result;
 }
 {
@@ -3558,9 +3558,9 @@ MethodBodyStatement MethodBodyStatement() :
   ";"
   
   {
-    if (tmp instanceof MethodReference)
+    if (tmp instanceof MethodReferenceWrapper)
     {
-        methRef = (MethodReference)tmp;
+        methRef = (MethodReferenceWrapper)tmp;
     }
     else
     {

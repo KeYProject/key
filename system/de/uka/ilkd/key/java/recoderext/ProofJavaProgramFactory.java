@@ -393,7 +393,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
      */
     public MethodBodyStatement createMethodBodyStatement(TypeReference bodySource,
 							 Expression resVar,
-							 MethodReference methRef) {
+							 MethodReferenceWrapper methRef) {
 	return new MethodBodyStatement(bodySource, resVar, methRef);
     }
     

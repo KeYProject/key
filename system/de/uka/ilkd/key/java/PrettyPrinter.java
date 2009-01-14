@@ -2535,8 +2535,8 @@ public class PrettyPrinter {
             writeCommaList(x.getArguments());
         }	
 	write(")");
-        if(!fileWriterMode && ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
-            write("@<"+x.getScope()+">");
+        if(!fileWriterMode && ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile && x.getScope()!=null){
+            write("@<"+x.getScope().toString()+">");
         }
 	if (withSemicolon) {
             write(";");           

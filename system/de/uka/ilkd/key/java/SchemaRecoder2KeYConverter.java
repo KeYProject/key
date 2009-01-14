@@ -471,7 +471,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         for (int i = 0, sz = keyArgs.length; i < sz; i++) {
             keyArgs[i] = (Expression) callConvert(recoderArgs.get(i));
         }
-
+        
         return new MethodReference(new ArrayOfExpression(keyArgs), name, prefix);
     }
 

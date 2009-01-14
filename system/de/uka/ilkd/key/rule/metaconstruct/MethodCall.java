@@ -187,6 +187,8 @@ public class MethodCall extends ProgramMetaConstruct {
 	}
 
 	methRef = (MethodReference) pe;
+        
+        System.out.println("methRef.getScope(): "+methRef.getScope());
 
 	ReferencePrefix refPrefix = methRef.getReferencePrefix();
 	if (refPrefix == null) {
@@ -238,7 +240,7 @@ public class MethodCall extends ProgramMetaConstruct {
             newContext = null;
 	    ProgramMethod staticMethod = getMethod(staticPrefixType, methRef, services);	                
             result = new MethodBodyStatement(staticMethod, newContext,
-					     pvar, arguments); 
+					     pvar, arguments, methRef.getScope().toString()); 
 	} else if (refPrefix instanceof SuperReference) {
 	    Debug.out("method-call: super invocation of method detected." + 
 		      "Requires static resolving.");
@@ -246,7 +248,7 @@ public class MethodCall extends ProgramMetaConstruct {
 						       methRef, services);
 	    result = new MethodBodyStatement
 		(superMethod, execContext.getRuntimeInstance(), pvar,
-		 arguments);
+		 arguments, methRef.getScope().toString());
 	} else {    // Instance invocation mode
 	    if (pm.isPrivate()) { // private methods are bound statically
 		Debug.out("method-call: invocation of private method detected." + 
@@ -288,7 +290,7 @@ public class MethodCall extends ProgramMetaConstruct {
     private Statement makeMbs(KeYJavaType t, Services services) {
 	ProgramMethod meth = getMethod(t, methRef, services);
 	return new MethodBodyStatement(meth, newContext,
-				       pvar, arguments);
+				       pvar, arguments, methRef.getScope().toString());
     }
 
     public Expression makeIOf(Type t) {

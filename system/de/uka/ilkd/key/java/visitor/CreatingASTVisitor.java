@@ -268,7 +268,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             }
             changeList.remove(rp);
             MethodName name = (MethodName) changeList.get(MethodName.class);
-            MethodReference mr = new MethodReference(changeList, name, rp, pi, x.getScope());
+            MethodReference mr = new MethodReference(changeList, name, rp, pi, x.getScope().toString());
             addChild(mr);
             changed();
         } else {

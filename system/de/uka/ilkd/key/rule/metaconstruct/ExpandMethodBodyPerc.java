@@ -74,7 +74,8 @@ public class ExpandMethodBodyPerc extends ProgramMetaConstruct {
                                             newCalled :
                                                 svInst.getExecutionContext().
                                                 getMemoryArea(),
-                                    newCalled),
+                                    newCalled, svInst.getExecutionContext().getCallerMemoryArea(),
+                                    svInst.getExecutionContext().getConstructedMemoryArea()),
                             result,
                             pm, PositionInfo.UNDEFINED); 
     }

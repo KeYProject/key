@@ -34,6 +34,7 @@ public class MethodBodyStatement extends JavaStatement implements
     private Identifier methodName;
     private ReferencePrefix methodReferencePrefix;
     private ASTList<Expression> arguments;
+    private Identifier scope;
     
     /**
      *      Construct a method body shortcut
@@ -45,7 +46,7 @@ public class MethodBodyStatement extends JavaStatement implements
     
     public MethodBodyStatement(TypeReference bodySource, 
 			       Expression resultVar,
-			       MethodReference methRef) {
+			       MethodReferenceWrapper methRef) {
         setBodySource(bodySource);
 	this.resultVar  = resultVar;        
         setMethodReference(methRef);        
@@ -93,14 +94,19 @@ public class MethodBodyStatement extends JavaStatement implements
     /**
      *      Set the MethodReference that caused this call.
      */
-    public void setMethodReference(MethodReference methRef) {	
+    public void setMethodReference(MethodReferenceWrapper methRef) {	
         this.methodName = methRef.getIdentifier();
         this.methodReferencePrefix = methRef.getReferencePrefix();
         this.arguments = methRef.getArguments();
+        this.scope = methRef.getScope();
     }
 
     public NonTerminalProgramElement getASTParent() {
 	return astParent;
+    }
+    
+    public Identifier getScope(){
+        return scope;
     }
 
     public StatementContainer getStatementContainer() {

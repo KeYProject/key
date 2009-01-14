@@ -121,7 +121,7 @@ public class ConstructorCall extends ProgramMetaConstruct {
 	Debug.assertTrue(method != null, "Call to non-existent constructor.");
     
 	final MethodBodyStatement mbs = new MethodBodyStatement(method, newObject, null, 
-               new ArrayOfExpression(argumentVariables)); 
+               new ArrayOfExpression(argumentVariables), MethodReference.CALLER_SCOPE); 
 	
         //   the assignment statements + the method body statement + <allocateArea> for memory areas  
         Statement[] stmnts;

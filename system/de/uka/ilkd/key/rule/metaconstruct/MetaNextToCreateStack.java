@@ -21,7 +21,7 @@ public class MetaNextToCreateStack extends AbstractMetaOperator implements Locat
     public Term calculate(Term term, SVInstantiations svInst, 
                           Services services) {  
     
-        final ObjectSort s = (ObjectSort) services.getJavaInfo().getKeYJavaType("javax.realtime.MemoryStack").getSort();      
+        final ObjectSort s = (ObjectSort) services.getJavaInfo().getKeYJavaType("javax.realtime.LTMemory").getSort();      
           
         return termFactory.createVariableTerm(services.getJavaInfo().
                 getAttribute(ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE, s));
