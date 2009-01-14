@@ -137,10 +137,7 @@ public class SequentView extends JEditorPane implements Autoscroll {
 	
 	currentHighlight = defaultHighlight;
 	updateHighlights = new Vector<Object>();
-	
-	Config.DEFAULT.addConfigChangeListener(configChangeListener);
-	//Must be removed uopn finalize() invocation to prevent memory leaks
-	
+		
         setSequentViewFont();
 
 	listener = new SequentViewListener(this, mediator());
@@ -214,8 +211,23 @@ public class SequentView extends JEditorPane implements Autoscroll {
 	addHierarchyBoundsListener(changeListener);
     
     }
+    
+    public void addNotify() {
+        super.addNotify();
+        Config.DEFAULT.addConfigChangeListener(configChangeListener);
+        updateUI();
+    }
+    
+    public void removeNotify(){
+        super.removeNotify();
+        Config.DEFAULT.removeConfigChangeListener(configChangeListener);
+        if(MethodCallInfo.MethodCallCounterOn){
+            MethodCallInfo.Local.incForClass(this.getClass().toString(), "removeNotify()");
+        }
+    }
 
-   protected void finalize(){
+
+    protected void finalize(){
         try{
             Config.DEFAULT.removeConfigChangeListener(configChangeListener);
             configChangeListener=null;
@@ -226,11 +238,11 @@ public class SequentView extends JEditorPane implements Autoscroll {
         } catch (Throwable e) {
             Main.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
         }finally{
-                try {
-                    super.finalize();
-                } catch (Throwable e) {
-                    Main.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
-                }
+            try {
+                super.finalize();
+            } catch (Throwable e) {
+                Main.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
+            }
         }
     }
     

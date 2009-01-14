@@ -13,6 +13,6 @@ public class ConfigChangeAdapter implements ConfigChangeListener {
     }
     
     public void configChanged(ConfigChangeEvent e) {
-             compRef.updateUI();
+        compRef.updateUI();
     }
 }
