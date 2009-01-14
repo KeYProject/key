@@ -1269,10 +1269,7 @@ public class Main extends JFrame implements IMain {
             public void configChanged(ConfigChangeEvent e) {
                 smaller.setEnabled(!Config.DEFAULT.isMinimumSize());
                 larger.setEnabled(!Config.DEFAULT.isMaximumSize());
-            }
-            public void clear(){
-                Config.DEFAULT.removeConfigChangeListener(this);
-            };
+            }            
         });
         
         fontSize.add(smaller);

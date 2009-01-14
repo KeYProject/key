@@ -140,8 +140,7 @@ public class NonGoalInfoView extends JTextArea {
 
     public void unregisterListener(){
         if(configChangeListener!=null){
-            Config.DEFAULT.removeConfigChangeListener(configChangeListener);
-            configChangeListener.clear();
+            Config.DEFAULT.removeConfigChangeListener(configChangeListener);            
             configChangeListener=null;
         }
     }

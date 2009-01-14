@@ -62,10 +62,7 @@ public class ProofTreeView extends JPanel {
     private ConfigChangeListener configChangeListener =  new ConfigChangeListener() {
                                             public void configChanged(ConfigChangeEvent e) {
                                                 setProofTreeFont();
-                                            }
-                                            public void clear(){
-                                                Config.DEFAULT.removeConfigChangeListener(this);
-                                            }
+                                            }                                           
                                         };
     /**
      * Roots of subtrees containing all nodes to which rules have been
@@ -138,7 +135,7 @@ public class ProofTreeView extends JPanel {
 
 	setMediator(mediator);
 
-	Config.DEFAULT.addConfigChangeListener( configChangeListener);
+        Config.DEFAULT.addConfigChangeListener(configChangeListener);
 
 	setProofTreeFont();
 	delegateView.setLargeModel(true);
@@ -167,6 +164,11 @@ public class ProofTreeView extends JPanel {
 	registerKeyboardAction(keyboardAction, 
 	        searchKeyStroke,
 	                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    }
+    
+    protected void finalize() {
+        Config.DEFAULT.removeConfigChangeListener(configChangeListener);
+        configChangeListener = null;
     }
 
     private void setProofTreeFont() {
@@ -210,7 +212,6 @@ public class ProofTreeView extends JPanel {
 	mediator.addAutoModeListener(proofListener);
 	mediator.addRuleAppListener(proofListener);
 	mediator.addGUIListener(guiListener);
-        Config.DEFAULT.addConfigChangeListener( configChangeListener);
     }
 
     private void unregister() {
@@ -218,7 +219,6 @@ public class ProofTreeView extends JPanel {
 	mediator.removeAutoModeListener(proofListener);
 	mediator.removeRuleAppListener(proofListener);
 	mediator.removeGUIListener(guiListener);
-	configChangeListener.clear();
     }
 
     public void removeNotify () {
