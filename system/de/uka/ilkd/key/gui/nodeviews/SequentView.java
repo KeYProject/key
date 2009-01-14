@@ -149,17 +149,11 @@ public class SequentView extends JEditorPane implements Autoscroll {
 		/** invoked if a frame that wants modal access is opened */
 		public void modalDialogOpened(GUIEvent e){
 		 
-
-		    if (e.getSource() instanceof ApplyTacletDialog){
-			// enable drag'n'drop ...
-			listener.setModalDragNDropEnabled(true);
-			listener.setRefreshHighlightning(true);
-
-		    } else {
-			// disable drag'n'drop and highlightning ...
-			listener.setModalDragNDropEnabled(false);
-			listener.setRefreshHighlightning(false);
-		    }
+		    // enable textual DnD in case that the opened model dialog
+		    // is the ApplyTacletDialog
+		    final boolean enableDnD = e.getSource() instanceof ApplyTacletDialog;
+		    listener.setModalDragNDropEnabled(enableDnD);
+		    listener.setRefreshHighlightning(enableDnD);
                     
                     // disable drag and drop instantiation of taclets
                     getDropTarget().setActive(false);
@@ -170,10 +164,10 @@ public class SequentView extends JEditorPane implements Autoscroll {
 		    if (e.getSource() instanceof ApplyTacletDialog){
 			// disable drag'n'drop ...
 			listener.setModalDragNDropEnabled(false);
-			listener.setRefreshHighlightning(true);
-		    } else {
-			listener.setRefreshHighlightning(true);
-		    }
+		    } 
+
+		    listener.setRefreshHighlightning(true);
+		    
                     
 		    // enable drag and drop instantiation of taclets
                     getDropTarget().setActive(true);
