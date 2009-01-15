@@ -306,7 +306,9 @@ public class ApplyStrategy {
 			.equals(StrategyProperties.STOPMODE_NONCLOSE)){
 			Goal g = mediator().getSelectedGoal();
 			mediator().startInterface(true);
-			mediator().goalChosen(g);
+			if(g != null) {
+			    mediator().goalChosen(g);
+			}
 		    }else{
 			mediator().startInterface(true);
 		    }

@@ -71,7 +71,7 @@ public class Main extends JFrame implements IMain {
 	KeYResourceManager.getManager().getVersion() + 
 	"-beta (internal: "+INTERNAL_VERSION+")";
 
-    private static final String COPYRIGHT="(C) Copyright 2001-2008 "
+    private static final String COPYRIGHT="(C) Copyright 2001-2009 "
         +"Universit\u00e4t Karlsruhe, Universit\u00e4t Koblenz-Landau, "
         +"and Chalmers University of Technology";
     
