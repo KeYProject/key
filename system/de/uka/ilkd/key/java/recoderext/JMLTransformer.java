@@ -404,7 +404,7 @@ public class JMLTransformer extends RecoderModelTransformer {
                 continue;
             }
             
-            //concatenate comments of child, determine position
+            //concatenate comments of child, determine position           
             String concatenatedComment = concatenate(comments);
             Position recoderPos = comments[0].getStartPosition();
             de.uka.ilkd.key.java.Position pos 
@@ -524,10 +524,7 @@ public class JMLTransformer extends RecoderModelTransformer {
                 if(unit.getComments() != null 
                         && unit.getTypeDeclarationCount() > 0) {
                     TypeDeclaration td = unit.getPrimaryTypeDeclaration();
-                    ASTList<Comment> tdComments 
-                        = td.getComments() == null 
-                          ? new ASTArrayList<Comment>() 
-                          : td.getComments();
+                    ASTList<Comment> tdComments = new ASTArrayList<Comment>(); 
                     tdComments.addAll(unit.getComments().deepClone());
                     td.setComments(tdComments);
                 }
