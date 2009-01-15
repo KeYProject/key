@@ -928,6 +928,11 @@ conditionalexpr returns [Term result=null] throws SLTranslationException
 	    QUESTIONMARK a=conditionalexpr ":" b=conditionalexpr
 	    {
 		result = tb.ife(convertToFormula(result),a,b);
+		if(intHelper.isIntegerTerm(result)) {
+		    result = intHelper.castToLDTSort(result, 
+					             services.getTypeConverter()
+					                     .getIntLDT());
+		}
 	    }
 	)?
     ;

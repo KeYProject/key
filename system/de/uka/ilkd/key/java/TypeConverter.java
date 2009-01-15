@@ -538,13 +538,11 @@ public class TypeConverter extends TermBuilder {
 	if (term.op()==Op.NULL) {
 	    return NullLiteral.NULL;
 	} else if (term.op() instanceof Function) {
-        final IteratorOfLDT it = models.iterator();
-        while (it.hasNext() ) {
-            final LDT model = it.next();
-            if (model.hasLiteralFunction((Function)term.op())) {
-                return model.translateTerm(term, null);	       
+	    for(LDT model : models) {
+                if (model.hasLiteralFunction((Function)term.op())) {
+                    return model.translateTerm(term, null);	       
+                }
             }
-        }
 	}
         
 	final ExtList children = new ExtList();
@@ -554,12 +552,10 @@ public class TypeConverter extends TermBuilder {
 	if (term.op() instanceof ProgramInLogic) {
 	    return ((ProgramInLogic)term.op()).convertToProgram(term, children);
 	} else if (term.op() instanceof Function) {
-        final IteratorOfLDT it = models.iterator();
-        while (it.hasNext() ) {
-            final LDT model = it.next();
-            if (model.containsFunction((Function)term.op())) {             
-                return model.translateTerm(term, children);
-            }  
+	    for(LDT model : models) {
+                if (model.containsFunction((Function)term.op())) {             
+                    return model.translateTerm(term, children);
+                }  
 	    }
 	} 
 	throw new RuntimeException("Cannot convert term to program: "+term
