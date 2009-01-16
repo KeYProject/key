@@ -32,6 +32,7 @@ import de.uka.ilkd.key.logic.UpdateFactory;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.AtPreFactory;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
@@ -135,4 +136,9 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
             = APF.createAtPreDefinitions(atPreFunctions, services);
         return uf.apply(atPreUpdate, target);
     }
+    
+    public Sort sort(Term[] term) {
+        return Sort.FORMULA;
+    }
+    
 }

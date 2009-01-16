@@ -11,19 +11,19 @@
 package de.uka.ilkd.key.speclang.jml;
 
 import de.uka.ilkd.key.collection.SLListOfString;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.abstraction.*;
-import de.uka.ilkd.key.java.declaration.ArrayOfFieldSpecification;
-import de.uka.ilkd.key.java.declaration.ArrayOfMemberDeclaration;
-import de.uka.ilkd.key.java.declaration.FieldDeclaration;
-import de.uka.ilkd.key.java.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.reference.ArrayOfTypeReference;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.NonRigidHeapDependentFunction;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.logic.sort.ArrayOfSort;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.RTSJProfile;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
@@ -351,7 +351,7 @@ public class JMLSpecExtractor implements SpecExtractor {
                 }
             }
             
-            if(JMLInfoExtractor.arbitraryScopeThis(pm)){
+            if(!JMLInfoExtractor.arbitraryScopeThis(pm) && !pm.isStatic()){
                 specCase.addRequires(new PositionedString("\\outerScope(\\memoryArea(this),\\currentMemoryArea)", 
                         fileName, 
                         pm.getStartPosition()));
@@ -398,7 +398,8 @@ public class JMLSpecExtractor implements SpecExtractor {
                             fileName, 
                             pm.getStartPosition()));
                 }
-                if(!JMLInfoExtractor.resultArbitraryScope(pm)){
+                if(!JMLInfoExtractor.resultArbitraryScope(pm) &&
+                        ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile){
                     String outerScope = "\\outerScope(\\memoryArea(\\result),\\currentMemoryArea)";
                     specCase.addEnsures(new PositionedString(
                             outerScope, 

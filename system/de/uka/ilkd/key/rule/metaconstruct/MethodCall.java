@@ -37,6 +37,7 @@ public class MethodCall extends ProgramMetaConstruct {
     private ProgramMethod pm;
     protected ReferencePrefix newContext;
     protected ProgramVariable pvar;
+    protected ProgramElement scope;
     private IExecutionContext execContextSV;
     private ExecutionContext execContext;
     protected ArrayOfExpression arguments;
@@ -188,7 +189,11 @@ public class MethodCall extends ProgramMetaConstruct {
 
 	methRef = (MethodReference) pe;
         
-        System.out.println("methRef.getScope(): "+methRef.getScope());
+	if(methRef.getScope() instanceof SchemaVariable){
+            scope = (ProgramElement) svInst.getInstantiation((ProgramSV) methRef.getScope());
+        }else{
+            scope = (ProgramElement) methRef.getScope();
+        }
 
 	ReferencePrefix refPrefix = methRef.getReferencePrefix();
 	if (refPrefix == null) {
@@ -240,7 +245,7 @@ public class MethodCall extends ProgramMetaConstruct {
             newContext = null;
 	    ProgramMethod staticMethod = getMethod(staticPrefixType, methRef, services);	                
             result = new MethodBodyStatement(staticMethod, newContext,
-					     pvar, arguments, methRef.getScope().toString()); 
+					     pvar, arguments, scope); 
 	} else if (refPrefix instanceof SuperReference) {
 	    Debug.out("method-call: super invocation of method detected." + 
 		      "Requires static resolving.");
@@ -248,7 +253,7 @@ public class MethodCall extends ProgramMetaConstruct {
 						       methRef, services);
 	    result = new MethodBodyStatement
 		(superMethod, execContext.getRuntimeInstance(), pvar,
-		 arguments, methRef.getScope().toString());
+		 arguments, scope);
 	} else {    // Instance invocation mode
 	    if (pm.isPrivate()) { // private methods are bound statically
 		Debug.out("method-call: invocation of private method detected." + 
@@ -290,7 +295,7 @@ public class MethodCall extends ProgramMetaConstruct {
     private Statement makeMbs(KeYJavaType t, Services services) {
 	ProgramMethod meth = getMethod(t, methRef, services);
 	return new MethodBodyStatement(meth, newContext,
-				       pvar, arguments, methRef.getScope().toString());
+				       pvar, arguments, scope);
     }
 
     public Expression makeIOf(Type t) {

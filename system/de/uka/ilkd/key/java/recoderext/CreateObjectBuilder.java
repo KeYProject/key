@@ -27,6 +27,8 @@ import recoder.java.statement.Return;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.proof.init.PercProfile;
 
 /**
  * If an allocation expression <code>new Class(...)</code> occurs, a new object
@@ -67,9 +69,9 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
 
 	final ASTList<Expression> arguments = new ASTArrayList<Expression>(0);
         
-        arguments.add(new FieldReference(new TypeReference(new PackageReference(new PackageReference(new Identifier("javax")), 
-                new Identifier("realtime")), new Identifier("MemoryArea")), 
-                new Identifier("callerScope")));
+//        arguments.add(new FieldReference(new TypeReference(new PackageReference(new PackageReference(new Identifier("javax")), 
+//                new Identifier("realtime")), new Identifier("MemoryArea")), 
+//                new Identifier("callerScope")));
        
         result.add
             (assign(new VariableReference
@@ -80,11 +82,20 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
                          (InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
                          arguments)));
 
+        String scopeForObj;
+        
+        if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
+            scopeForObj = de.uka.ilkd.key.java.reference.MethodReference.CALLER_SCOPE;
+        }else{
+            scopeForObj = de.uka.ilkd.key.java.reference.MethodReference.LOCAL_SCOPE;
+        }
+        
 	result.add
-	    (new MethodReference(new VariableReference
+	    (new MethodReferenceWrapper(new VariableReference
 				 (new Identifier(NEW_OBJECT_VAR_NAME)), 
 				 new ImplicitIdentifier
-				 (CreateBuilder.IMPLICIT_CREATE)));
+				 (CreateBuilder.IMPLICIT_CREATE),
+                                 new Identifier(scopeForObj)));
 
 	result.add(new Return
 		 (new VariableReference(new Identifier(NEW_OBJECT_VAR_NAME))));

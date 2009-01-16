@@ -62,6 +62,6 @@ public class CreateObject extends ProgramMetaConstruct {
 				   new ProgramElementName
                                    (CreateObjectBuilder.IMPLICIT_OBJECT_CREATE), 
 				   classReference,
-                                   MethodReference.CALLER_SCOPE);					   
+                                   ((New)pe).getScope());					   
     }
 }

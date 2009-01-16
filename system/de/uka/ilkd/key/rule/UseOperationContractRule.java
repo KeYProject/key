@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.init.PercProfile;
 import de.uka.ilkd.key.proof.init.RTSJProfile;
 import de.uka.ilkd.key.proof.mgt.*;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
@@ -523,7 +524,8 @@ public class UseOperationContractRule implements BuiltInRule {
        
         //create "Pre" branch
         Term preF = pre.getFormula();
-        if(services.getProof().getSettings().getProfile() instanceof RTSJProfile){
+        if(services.getProof().getSettings().getProfile() instanceof RTSJProfile ||
+                services.getProof().getSettings().getProfile() instanceof PercProfile){
             Term wsPre = cwi.contract.getWorkingSpace(selfVar, paramVars, services);
             Function leq = (Function) nss.functions().lookup(new Name("leq"));
             wsPre = TB.tf().createFunctionTerm(leq, TB.tf().createFunctionTerm(add, mCons, wsPre),
@@ -570,7 +572,8 @@ public class UseOperationContractRule implements BuiltInRule {
         }
     
         Term wsEq = TB.tt();
-        if(services.getProof().getSettings().getProfile() instanceof RTSJProfile){    
+        if(services.getProof().getSettings().getProfile() instanceof RTSJProfile ||
+                services.getProof().getSettings().getProfile() instanceof PercProfile){    
             wsEq = TB.equals(ws, cwi.contract.getWorkingSpace(selfVar, paramVars, services));
             wsEq = uf.apply(uf.sequential(new Update[]{selfParamsUpdate,
                     atPreUpdate}),wsEq);

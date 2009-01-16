@@ -13,9 +13,9 @@ package de.uka.ilkd.key.java.expression.operator;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
@@ -45,6 +45,8 @@ public class NewArray extends TypeOperator
 
     protected final int dimensions;
 
+    protected final ProgramElement scope;    
+    
     /**
      *      Array initializer.
      */
@@ -66,13 +68,29 @@ public class NewArray extends TypeOperator
      */
 
     public NewArray(ExtList children, KeYJavaType keyJavaType, 
-		    ArrayInitializer init, int dimensions) {
+		    ArrayInitializer init, int dimensions, ProgramElement scope) {
 	super(children);
 	this.arrayInitializer = init;
         this.dimensions  = dimensions;
 	this.keyJavaType = keyJavaType;
+        if(scope==null){
+            this.scope = new ProgramElementName(MethodReference.LOCAL_SCOPE);
+        }else{
+            this.scope = scope;
+        }
     }
-
+    
+    public NewArray(ExtList children, KeYJavaType keyJavaType, 
+            ArrayInitializer init, int dimensions){
+        this(children, keyJavaType, init, dimensions, null);
+    }
+    
+    
+    public NewArray(Expression[] arguments, TypeReference typeRef, 
+            KeYJavaType keyJavaType, ArrayInitializer init, 
+            int dimensions){
+        this(arguments, typeRef, keyJavaType, init, dimensions, null);
+    }
 
     /**
      *      New array.
@@ -84,11 +102,16 @@ public class NewArray extends TypeOperator
      */
     public NewArray(Expression[] arguments, TypeReference typeRef, 
 		    KeYJavaType keyJavaType, ArrayInitializer init, 
-		    int dimensions) {
+		    int dimensions, ProgramElement scope) {
 	super(arguments, typeRef);
 	this.arrayInitializer = init;
         this.dimensions  = dimensions;
 	this.keyJavaType = keyJavaType;
+        if(scope==null){
+            this.scope = new ProgramElementName(MethodReference.LOCAL_SCOPE);
+        }else{
+            this.scope = scope;
+        }
     }
 
     public SourceElement getLastElement() {
@@ -96,6 +119,10 @@ public class NewArray extends TypeOperator
             return arrayInitializer;
         }
         return this;
+    }
+    
+    public ProgramElement getScope(){
+        return scope;
     }
 
     /**
@@ -154,6 +181,7 @@ public class NewArray extends TypeOperator
         if (typeReference    != null) result++;
         if (children         != null) result += children.size();
         if (arrayInitializer != null) result++;
+        if (scope            != null) result++;
         return result;
     }
 
@@ -178,6 +206,10 @@ public class NewArray extends TypeOperator
                 return children.getExpression(index);
             }
             index -= len;
+        }
+        if(scope!=null){
+            if(index==0) return scope;
+            index--;
         }
         if (arrayInitializer != null) {
             if (index == 0) return arrayInitializer;
@@ -251,6 +283,34 @@ public class NewArray extends TypeOperator
 
     public KeYJavaType getKeYJavaType() {
 	return keyJavaType;
+    }
+    
+    /**
+     * @return true iff the returned object is allocated in the current reentrant scope
+     */
+    public boolean reentrantScope(){
+        return MethodReference.REENTRANT_SCOPE.equals(getScope().toString());
+    }
+    
+    /**
+     * @return true iff the returned object is allocated in the current constructed scope
+     */
+    public boolean constructedScope(){
+        return MethodReference.CONSTRUCTED_SCOPE.equals(getScope().toString());
+    }
+    
+    /**
+     * @return true iff the returned object is allocated in the current local scope
+     */
+    public boolean localScope(){
+        return MethodReference.LOCAL_SCOPE.equals(getScope().toString());
+    }
+    
+    /**
+     * @return true iff the returned object is allocated in the current caller scope
+     */
+    public boolean callerScope(){
+        return MethodReference.CALLER_SCOPE.equals(getScope().toString());
     }
 
 }

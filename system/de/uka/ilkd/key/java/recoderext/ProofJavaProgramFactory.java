@@ -121,6 +121,14 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         cml.add(c);
     }
     
+    public NewWrapper createNewWrapper(Identifier scope){
+        return new NewWrapper(super.createNew(), scope);
+    }
+    
+    public NewArrayWrapper createNewArrayWrapper(Identifier scope){
+        return new NewArrayWrapper(super.createNewArray(), scope);
+    }
+    
 /*    public CurrentMemoryAreaReference createCurrentMemoryAreaReference(){
         return new CurrentMemoryAreaReference();
     }*/

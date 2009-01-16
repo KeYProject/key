@@ -26,12 +26,16 @@ import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.Ghost;
 import de.uka.ilkd.key.java.declaration.modifier.Model;
 import de.uka.ilkd.key.java.expression.*;
+import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
-import de.uka.ilkd.key.java.recoderext.MethodReferenceWrapper;
+import de.uka.ilkd.key.java.expression.operator.SetAssignment;
+import de.uka.ilkd.key.java.recoderext.*;
 import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.statement.CatchAllStatement;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
@@ -631,8 +635,16 @@ public class Recoder2KeYConverter {
         recoder.abstraction.Type javaType = getServiceConfiguration()
         .getCrossReferenceSourceInfo().getType(newArr);
 
+        ProgramElement scope = null;
+        String s = (newArr instanceof NewArrayWrapper &&  
+                ((NewArrayWrapper) newArr).getScope()!=null ? 
+                ((NewArrayWrapper) newArr).getScope().toSource() : null);
+        if(s!=null){
+            scope = new ProgramElementName(s);
+        }        
+        
         return new NewArray(children, getKeYJavaType(javaType), arrInit, newArr
-                .getDimensions());
+                .getDimensions(), scope);
     }
 
     // ------------------- literals --------------------------------------
@@ -1541,13 +1553,21 @@ public class Recoder2KeYConverter {
             KeYJavaType kjt = getKeYJavaType(n.getClassDeclaration());
             maybeAnonClass = new TypeRef(kjt);
         }
+        
+        ProgramElementName scope = null;
+        String s = (n instanceof NewWrapper &&  
+                ((NewWrapper) n).getScope()!=null ? 
+                ((NewWrapper) n).getScope().toSource() : null);
+        if(s!=null){
+            scope = new ProgramElementName(s);
+        }
 
         if (rp == null) {
             return new New(arguments, maybeAnonClass,
-                    (ReferencePrefix) null);
+                    (ReferencePrefix) null, scope);
         } else {
             return new New(arguments, maybeAnonClass,
-                    (ReferencePrefix) callConvert(rp));
+                    (ReferencePrefix) callConvert(rp), scope);
         }
     }
 

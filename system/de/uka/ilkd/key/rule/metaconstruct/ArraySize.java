@@ -3,8 +3,11 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.operator.NewArray;
+import de.uka.ilkd.key.java.reference.FieldReference;
+import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -19,7 +22,7 @@ public class ArraySize extends AbstractMetaOperator {
 
   
     public ArraySize() {
-        super(new Name("#arraySize"), 2);
+        super(new Name("#arraySize"), 1);
     }
 
     /**
@@ -51,9 +54,26 @@ public class ArraySize extends AbstractMetaOperator {
             return term.sub(0);
         }
         Namespace funcs = services.getNamespaces().functions();
+        
+        Term scopeTerm;
+        ReferencePrefix callerScope=null;
+        if(na.callerScope()){
+            callerScope = svInst.getExecutionContext().getCallerMemoryArea();
+        }else if(na.constructedScope()){
+            callerScope = svInst.getExecutionContext().getConstructedMemoryArea();
+        }else if(na.reentrantScope()){
+            KeYJavaType ot = services.getJavaInfo().getJavaLangObject();     
+            ProgramVariable ma = services.getJavaInfo().getAttribute("memoryArea", ot);
+            callerScope = new FieldReference(ma, svInst.getExecutionContext().getRuntimeInstance());
+        }else{
+            callerScope = svInst.getExecutionContext().getMemoryArea();
+        }
+        scopeTerm =  services.getTypeConverter().convertToLogicElement(callerScope, svInst.getExecutionContext());
+        
         ProgramVariable consumed = services.getJavaInfo().getAttribute("consumed", 
                 services.getJavaInfo().getKeYJavaTypeByClassName("javax.realtime.MemoryArea"));
-        Term heapSpaceTerm = tf.createAttributeTerm(consumed, term.sub(1));
+        Term heapSpaceTerm = tf.createAttributeTerm(consumed, scopeTerm);
+//        Term heapSpaceTerm = tf.createAttributeTerm(consumed, term.sub(1));
 //        ProgramVariable heapSpace = (ProgramVariable) services.getNamespaces().
 //            programVariables().lookup(new Name(ProblemInitializer.heapSpaceName));
 //        Term heapSpaceTerm = tf.createVariableTerm(heapSpace);

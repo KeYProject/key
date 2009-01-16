@@ -6,10 +6,11 @@ import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.recoderext.ProgramVariableSVWrapper;
-import de.uka.ilkd.key.java.recoderext.TypeSVWrapper;
+import de.uka.ilkd.key.java.recoderext.*;
 import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -86,15 +87,8 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
                     .get(SchemaVariable.class));
         } else if ("#expand-method-body-perc".equals(mcName)) {
             ProgramSV[] svw = mc.getSV();
-            if(svw.length==6){
-                return new ExpandMethodBodyPerc((SchemaVariable) list
-                        .get(SchemaVariable.class), svw[0], svw[1], svw[2], svw[3], 
-                        svw[4], svw[5]);
-            }else{
-                return new ExpandMethodBodyPerc((SchemaVariable) list
-                        .get(SchemaVariable.class), svw[0], null, svw[1], svw[2], 
-                        svw[3], svw[4]);
-            }
+            return new ExpandMethodBodyPerc((SchemaVariable) list
+                    .get(SchemaVariable.class), svw[0], svw[1]);
         } else if ("#method-call".equals(mcName)
                 || "#method-call-contract".equals(mcName)) {
             ProgramSV[] svw = mc.getSV();
@@ -472,7 +466,13 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             keyArgs[i] = (Expression) callConvert(recoderArgs.get(i));
         }
         
-        return new MethodReference(new ArrayOfExpression(keyArgs), name, prefix);
+        ProgramSV scope = null;
+        
+        if(mr instanceof MethodReferenceWrapper && ((MethodReferenceWrapper) mr).getScope()!=null){
+            scope = (ProgramSV) callConvert(((MethodReferenceWrapper) mr).getScope());
+         }
+        
+        return new MethodReference(new ArrayOfExpression(keyArgs), name, prefix, scope);
     }
 
     /**

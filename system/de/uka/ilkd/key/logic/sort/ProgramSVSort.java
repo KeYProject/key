@@ -116,6 +116,9 @@ public abstract class ProgramSVSort extends PrimitiveSort {
     public static final ProgramSVSort METHODNAME
 	= new MethodNameSort();
     
+    public static final ProgramSVSort SCOPENAME
+        = new ScopeNameSort();
+    
     public static final ProgramSVSort LABEL
 	= new LabelSort();
     
@@ -985,6 +988,27 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	    }
 	    return false;
 	}
+
+    }
+    
+    private static class ScopeNameSort extends ProgramSVSort{
+        
+        public ScopeNameSort() {
+            super(new Name("ScopeName"));
+        }
+
+        protected ScopeNameSort(Name n) {
+            super(n);
+        }
+        
+        protected boolean canStandFor(ProgramElement pe,
+                                      Services services) {          
+            if(pe instanceof ProgramElementName && pe!=null) {
+                Name name = (ProgramElementName) pe;
+                return MethodReference.isLegalScopeAnnotation(name.toString());
+            }
+            return false;
+        }
 
     }
 

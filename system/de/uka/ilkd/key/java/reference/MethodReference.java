@@ -35,7 +35,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
     */
     protected final ReferencePrefix prefix;
     
-    protected final ProgramElementName scope;
+    protected final ProgramElement scope;
 
     public static final String LOCAL_SCOPE = "localScope";
     
@@ -62,19 +62,45 @@ public class MethodReference extends JavaNonTerminalProgramElement
 	Debug.assertTrue(name != null, "Tried to reference unnamed method.");
 	this.arguments = args;
         if(scope == null){
-            //          this.scope = LOCAL_SCOPE;
-            this.scope = null;
+            this.scope = new ProgramElementName(LOCAL_SCOPE);
+            // this.scope = null;
         }else{
-            Debug.assertTrue(scope.equals(LOCAL_SCOPE)||scope.equals(CALLER_SCOPE)||
-                    scope.equals(CONSTRUCTED_SCOPE)||scope.equals(REENTRANT_SCOPE),
+            Debug.assertTrue(isLegalScopeAnnotation(scope),
                     "Unknown scope annotation.");
             this.scope = new ProgramElementName(scope);
         }
     }
     
+    public MethodReference(ExtList args, MethodName n, 
+                   ReferencePrefix p, PositionInfo pos, ProgramElement scope) {
+        super(pos);
+        this.prefix = p;
+        name = n;
+        Debug.assertTrue(name != null, "Tried to reference unnamed method.");
+        this.arguments = new ArrayOfExpression((Expression[]) args.collect(Expression.class));
+        if(scope == null){
+            this.scope = new ProgramElementName(LOCAL_SCOPE);
+        }else{
+            this.scope = scope;
+        }
+    }
+    
+    public MethodReference(ArrayOfExpression args, MethodName n, 
+            ReferencePrefix p, ProgramElement scope) {
+        this.prefix = p;
+        name = n;
+        Debug.assertTrue(name != null, "Tried to reference unnamed method.");
+        this.arguments = args;
+        if(scope == null){
+            this.scope = new ProgramElementName(LOCAL_SCOPE);
+        }else{
+            this.scope = scope;
+        }
+    }
+    
     public MethodReference(ArrayOfExpression args, MethodName n, 
                    ReferencePrefix p) {
-        this(args, n, p, LOCAL_SCOPE);
+        this(args, n, p, (String) null);
     }
     
     
@@ -87,11 +113,10 @@ public class MethodReference extends JavaNonTerminalProgramElement
 	Debug.assertTrue(name != null, "Tried to reference unnamed method.");
 	this.arguments=args;
         if(scope == null){
-  //          this.scope = LOCAL_SCOPE;
-            this.scope = null;
+            this.scope = new ProgramElementName(LOCAL_SCOPE);
+//            this.scope = null;
         }else{
-            Debug.assertTrue(scope.equals(LOCAL_SCOPE)||scope.equals(CALLER_SCOPE)||
-                    scope.equals(CONSTRUCTED_SCOPE)||scope.equals(REENTRANT_SCOPE),
+            Debug.assertTrue(isLegalScopeAnnotation(scope),
                     "Unknown scope annotation.");
             this.scope = new ProgramElementName(scope);
         }
@@ -100,7 +125,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
    public MethodReference(ExtList children, MethodName n, ReferencePrefix p) {
 	this(new ArrayOfExpression((Expression[]) 
 				   children.collect(Expression.class)),
-	     n, p, (PositionInfo) children.get(PositionInfo.class), null);
+	     n, p, (PositionInfo) children.get(PositionInfo.class), (String) null);
     }
 
     public MethodReference(ExtList children, MethodName n, ReferencePrefix p,
@@ -127,36 +152,36 @@ public class MethodReference extends JavaNonTerminalProgramElement
     /**
      * @return the scope for allocating the object returned by this method reference.
      */
-    public String getScope(){
-        return scope != null? scope.toString() : null;
+    public ProgramElement getScope(){
+        return scope;
     }
     
     /**
      * @return true iff the returned object is allocated in the current reentrant scope
      */
     public boolean reentrantScope(){
-        return REENTRANT_SCOPE.equals(getScope());
+        return REENTRANT_SCOPE.equals(getScope().toString());
     }
     
     /**
      * @return true iff the returned object is allocated in the current constructed scope
      */
     public boolean constructedScope(){
-        return CONSTRUCTED_SCOPE.equals(getScope());
+        return CONSTRUCTED_SCOPE.equals(getScope().toString());
     }
     
     /**
      * @return true iff the returned object is allocated in the current local scope
      */
     public boolean localScope(){
-        return LOCAL_SCOPE.equals(getScope());
+        return LOCAL_SCOPE.equals(getScope().toString());
     }
     
     /**
      * @return true iff the returned object is allocated in the current caller scope
      */
     public boolean callerScope(){
-        return CALLER_SCOPE.equals(getScope());
+        return CALLER_SCOPE.equals(getScope().toString());
     }
 
     /**
@@ -207,6 +232,8 @@ public class MethodReference extends JavaNonTerminalProgramElement
     public int getTypeReferenceCount() {
         return (prefix instanceof TypeReference) ? 1 : 0;
     }
+    
+    
 
     /*
       Return the type reference at the specified index in this node's
@@ -312,6 +339,11 @@ public class MethodReference extends JavaNonTerminalProgramElement
 	    }
 	}
 	return signature;
+    }
+    
+    public static boolean isLegalScopeAnnotation(String s){
+        return s!=null && (s.equals(CALLER_SCOPE) || s.equals(CONSTRUCTED_SCOPE) ||
+                s.equals(LOCAL_SCOPE) || s.equals(CONSTRUCTED_SCOPE));
     }
 
     /**

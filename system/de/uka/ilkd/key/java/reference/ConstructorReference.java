@@ -11,8 +11,7 @@
 
 package de.uka.ilkd.key.java.reference;
 
-import de.uka.ilkd.key.java.ArrayOfExpression;
-import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.*;
 
 /**
  *  Constructor reference.
@@ -26,5 +25,7 @@ public interface ConstructorReference extends MemberReference, Statement {
      *      @return the array wrapper of the argument expressions .
      */
     ArrayOfExpression getArguments();
+    
+    ProgramElement getScope();
 
 }

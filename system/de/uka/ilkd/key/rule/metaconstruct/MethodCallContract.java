@@ -34,7 +34,7 @@ public class MethodCallContract extends MethodCall {
     protected Statement makeIfCascade(ListOfKeYJavaType imps, Services services) {        
         ProgramMethod meth = getMethod(staticPrefixType, methRef, services);
         return new MethodBodyStatement(meth, newContext,
-                                       pvar, arguments, true, methRef.getScope().toString()); 
+                                       pvar, arguments, true, methRef.getScope()); 
     }
 
 

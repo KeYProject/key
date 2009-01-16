@@ -3304,14 +3304,26 @@ TypeOperator AllocationExpression() :
     ASTList<MemberDeclaration> body = null;
     ClassDeclaration cd = null;
     NewArray na;
+    Identifier id=null;
     ASTList<TypeArgumentDeclaration> typeArgs;
 }
 {
 (
   LOOKAHEAD(2)
   "new" 
+      [LOOKAHEAD(2)  "@" 
+  	(
+  		"<localScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.LOCAL_SCOPE);}
+  		|
+  		"<callerScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.CALLER_SCOPE);}
+  		|
+  		"<constructedScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.CONSTRUCTED_SCOPE);}
+  		|
+  		"<reentrantScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.REENTRANT_SCOPE);}
+  	)
+  ]  
     {
-        na = factory.createNewArray();
+        na = factory.createNewArrayWrapper(id);
         setPrefixInfo(na);
     }
     tr = PrimitiveType()
@@ -3321,8 +3333,19 @@ TypeOperator AllocationExpression() :
     result = ArrayDimsAndInits(na)
 |
   "new"
+    [LOOKAHEAD(2)  "@" 
+  	(
+  		"<localScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.LOCAL_SCOPE);}
+  		|
+  		"<callerScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.CALLER_SCOPE);}
+  		|
+  		"<constructedScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.CONSTRUCTED_SCOPE);}
+  		|
+  		"<reentrantScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.REENTRANT_SCOPE);}
+  	)
+  ]  
   {
-      result = factory.createNew();
+      result = factory.createNewWrapper(id);
       setPrefixInfo(result);
   }
   qn = TypedName()
@@ -3349,7 +3372,7 @@ TypeOperator AllocationExpression() :
      }
    |
      {        
-        na = factory.createNewArray();
+        na = factory.createNewArrayWrapper(id);
         copyPrefixInfo(result, na);
         na.setTypeReference(qn.toTypeReference());
      }

@@ -3,7 +3,9 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.HashMap;
 
 import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -15,10 +17,15 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class ExpandMethodBodyPerc extends ProgramMetaConstruct {
 
-    public ExpandMethodBodyPerc(SchemaVariable mb, SchemaVariable localScope, SchemaVariable self,
-            SchemaVariable callerScope, SchemaVariable constructedScope, SchemaVariable newLocalScope,
+    private final SchemaVariable newLocalScope;
+    private final SchemaVariable newConstructedScope;
+    
+    
+    public ExpandMethodBodyPerc(SchemaVariable mb, SchemaVariable newLocalScope,
             SchemaVariable newConstructedScope) {
         super(new Name("expand-method-body-perc"), (ProgramSV)mb);
+        this.newConstructedScope = newConstructedScope;
+        this.newLocalScope = newLocalScope;
     }
 
     /** 
@@ -34,7 +41,7 @@ public class ExpandMethodBodyPerc extends ProgramMetaConstruct {
                                             SVInstantiations svInst) {
 
         MethodBodyStatement mbs = (MethodBodyStatement) pe;
-        //        MethodReference mr = mbs.getMethodReference();
+        MethodReference mr = mbs.getMethodReference();
 
         ProgramMethod pm = mbs.getProgramMethod(services);
         //mr.method(services, mbs.getBodySource());
@@ -66,16 +73,27 @@ public class ExpandMethodBodyPerc extends ProgramMetaConstruct {
             new ProgVarReplaceVisitor(result, map, services); 
         paramRepl.start();      
         result = (StatementBlock) paramRepl.result();
-
+        ReferencePrefix callerScope=null;
+        if(mr.callerScope()){
+            callerScope = svInst.getExecutionContext().getCallerMemoryArea();
+        }else if(mr.constructedScope()){
+            callerScope = svInst.getExecutionContext().getConstructedMemoryArea();
+        }else if(mr.reentrantScope()){
+            KeYJavaType ot = services.getJavaInfo().getJavaLangObject();     
+            ProgramVariable ma = services.getJavaInfo().getAttribute("memoryArea", ot);
+            callerScope = new FieldReference(ma, svInst.getExecutionContext().getRuntimeInstance());
+        }else{
+            callerScope = svInst.getExecutionContext().getMemoryArea();
+        }
+        
         return 
             new MethodFrame(mbs.getResultVariable(),
                             new ExecutionContext(classContext, 
                                     pm.getName().equals("<runRunnable>")?
                                             newCalled :
-                                                svInst.getExecutionContext().
-                                                getMemoryArea(),
-                                    newCalled, svInst.getExecutionContext().getCallerMemoryArea(),
-                                    svInst.getExecutionContext().getConstructedMemoryArea()),
+                                                (ReferencePrefix) svInst.getInstantiation(newLocalScope),
+                                    newCalled, callerScope,
+                                    (ReferencePrefix) svInst.getInstantiation(newConstructedScope)),
                             result,
                             pm, PositionInfo.UNDEFINED); 
     }

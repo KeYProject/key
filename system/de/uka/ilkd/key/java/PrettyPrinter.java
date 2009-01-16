@@ -2279,6 +2279,13 @@ public class PrettyPrinter {
         }
         writeInternalIndentation(x);
         write("new ");
+        
+        if(!fileWriterMode && ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile && x.getScope()!=null){
+            write("@<");
+            writeElement(x.getScope());
+            write(">");
+        }
+        
         writeElement(1, x.getTypeReference());
         int i = 0;
         if (x.getArguments() != null) {
@@ -2359,6 +2366,13 @@ public class PrettyPrinter {
         }
         writeInternalIndentation(x);
         write("new ");
+        
+        if(!fileWriterMode && ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile && x.getScope()!=null){
+            write("@<");
+            writeElement(x.getScope());
+            write(">");
+        }
+        
         writeElement(1, x.getTypeReference());
 	write(" (");
         if (x.getArguments() != null) {
@@ -2536,7 +2550,9 @@ public class PrettyPrinter {
         }	
 	write(")");
         if(!fileWriterMode && ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile && x.getScope()!=null){
-            write("@<"+x.getScope().toString()+">");
+            write("@<");
+            writeElement(x.getScope());
+            write(">");
         }
 	if (withSemicolon) {
             write(";");           

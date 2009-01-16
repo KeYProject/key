@@ -22,8 +22,7 @@ import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.*;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.RTSJProfile;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
@@ -186,7 +185,8 @@ public class LoopInvariantProposer implements InstantiationProposer {
                 assert var.isListSV();
                 assert var.matchType() == LocationDescriptor.class;
                 SetOfLocationDescriptor locs = inv.getModifies(selfTerm, atPreFunctions, services);
-                if(services.getProof().getSettings().getProfile() instanceof RTSJProfile){
+                if(services.getProof().getSettings().getProfile() instanceof RTSJProfile ||
+                        services.getProof().getSettings().getProfile() instanceof PercProfile){
                     Term mCons = TermBuilder.DF.dot(mTerm, services.getJavaInfo().getAttribute(
                             "consumed", "javax.realtime.MemoryArea"));
                     LocationDescriptor cons = new BasicLocationDescriptor(mCons);

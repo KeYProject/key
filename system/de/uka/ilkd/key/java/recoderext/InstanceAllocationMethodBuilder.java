@@ -40,10 +40,10 @@ public class InstanceAllocationMethodBuilder extends RecoderModelTransformer {
         
         ASTArrayList<ParameterDeclaration> pdal = new ASTArrayList<ParameterDeclaration>(1);
         
-        pdal.add(new ParameterDeclaration(
+/*        pdal.add(new ParameterDeclaration(
                 new TypeReference(new PackageReference(new PackageReference(new Identifier("javax")), 
                         new Identifier("realtime")), new Identifier("MemoryArea")), 
-                new Identifier("scope")));
+                new Identifier("scope")));*/
   
         MethodDeclaration md =  new MethodDeclaration
             (modifiers, 

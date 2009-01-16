@@ -114,7 +114,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
                                IProgramVariable res, 
                                ArrayOfExpression args,
                                boolean useSpecification,
-                               String scope) {
+                               ProgramElement scope) {
         this.method = method;
         this.bodySource = 
             new TypeRef(method.getContainerType());
@@ -161,7 +161,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
             ReferencePrefix newContext, 
             IProgramVariable res, 
             ArrayOfExpression args,
-            String scope) {
+            ProgramElement scope) {
         this(method, newContext, res, args, false, scope);
     }
     

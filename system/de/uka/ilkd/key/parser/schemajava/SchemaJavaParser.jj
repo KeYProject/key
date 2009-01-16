@@ -379,6 +379,9 @@ public class SchemaJavaParser {
     
 	/** valid iff <tt>type</tt> is <tt>ARGUMENTS</tt> */
 	ASTList<Expression> args = null;
+	
+	/** valid iff <tt>type</tt> is <tt>ARGUMENTS</tt> */
+	Identifier            scope  = null;
         
         /** valid iff <tt>type</tt> is <tt>IDENTIFIER</tt> and 
          *  it is an explicit generic method invocation
@@ -3025,25 +3028,25 @@ Expression PrimaryExpression() :
 	    // method call -determine the kind of method
 	    if (tmpResult instanceof UncollatedReferenceQualifier) {
 		// this is a normal method call
-		tmpResult = factory.createMethodReference
+		tmpResult = factory.createMethodReferenceWrapper
 		    (((UncollatedReferenceQualifier)tmpResult).getReferencePrefix(),
 		     ((UncollatedReferenceQualifier)tmpResult).getIdentifier(),
-               suffix.args, ((UncollatedReferenceQualifier)tmpResult).getTypeArguments());
+               suffix.args, ((UncollatedReferenceQualifier)tmpResult).getTypeArguments(), suffix.scope);
               
 		setPrefixInfo(tmpResult);
 	    } else if (tmpResult instanceof MethodReference &&
 		       ((MethodReference)tmpResult).getIdentifier()
 		       instanceof ProgramVariableSVWrapper) {
 			   // this is a method call with svidentifier
-			   tmpResult = factory.createMethodReference
+			   tmpResult = factory.createMethodReferenceWrapper
 			   (((MethodReference)tmpResult).getReferencePrefix(),
-			    ((MethodReference)tmpResult).getIdentifier(), suffix.args);
+			    ((MethodReference)tmpResult).getIdentifier(), suffix.args, suffix.scope);
 		       } else if (ProgramSVSort.METHODNAME.
 		       		getClass().isInstance(((SortedSchemaVariable)
 				   ((SVWrapper)tmpResult).getSV()).sort())) {
 				       // this is a method call with svidentifier
-				       tmpResult = factory.createMethodReference
-				       (null, new LabelSVWrapper(((SVWrapper)tmpResult).getSV()), suffix.args);
+				       tmpResult = factory.createMethodReferenceWrapper
+				       (null, new LabelSVWrapper(((SVWrapper)tmpResult).getSV()), suffix.args, suffix.scope);
 				   } else {
 				       throw new ParseException("Arguments without method name?");
 				   }
@@ -3195,6 +3198,7 @@ PrimarySuffixReturnValue PrimarySuffix() :
     Expression               expr;
     ASTList<Expression>    args;
     Identifier               id;
+    Identifier               scope;
     ASTList<TypeArgumentDeclaration> typeArgs;
     Literal                  lit;
 }
@@ -3256,9 +3260,10 @@ PrimarySuffixReturnValue PrimarySuffix() :
 	 }
 	)
      |
-     args = Arguments()
-	{
-	    suffix.type = PrimarySuffixReturnValue.ARGUMENTS;
+     args = Arguments() {suffix.scope=null;} 
+     [LOOKAHEAD(2)  "@"  <SVIDENTIFIER>  {suffix.scope = factory.getProgramVariableSV(token.image);}] 
+ 	{
+            suffix.type = PrimarySuffixReturnValue.ARGUMENTS;
 	    suffix.args = args;
 	}
      )

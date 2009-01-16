@@ -11,20 +11,13 @@
 
 package de.uka.ilkd.key.java.expression.operator;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
-import de.uka.ilkd.key.java.declaration.TypeDeclarationContainer;
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
-import de.uka.ilkd.key.java.reference.ConstructorReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.ReferenceSuffix;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
@@ -51,6 +44,8 @@ public class New
      *      Anonymous class.
      */
     protected final ClassDeclaration anonymousClass;
+    
+    protected final ProgramElement scope;
 
     /**
      *      Access path.
@@ -72,6 +67,11 @@ public class New
     public New(ExtList children, ReferencePrefix rp) {
 	super(children);
 	anonymousClass=(ClassDeclaration)children.get(ClassDeclaration.class);
+        if(children.get(ProgramSV.class)==null){
+            scope = (ProgramSV) children.get(ProgramSV.class);
+        }else{
+            scope = (ProgramElementName) children.get(ProgramElementName.class);
+        }
 	accessPath=rp;
     }
 
@@ -90,6 +90,11 @@ public class New
     public New(ExtList children, ReferencePrefix rp, PositionInfo pi) {
 	super(children, pi);
 	anonymousClass=(ClassDeclaration)children.get(ClassDeclaration.class);
+        if(children.get(ProgramSV.class)==null){
+            scope = (ProgramSV) children.get(ProgramSV.class);
+        }else{
+            scope = (ProgramElementName) children.get(ProgramElementName.class);
+        }
 	accessPath=rp;
     }
 
@@ -99,10 +104,19 @@ public class New
      * @param type a TypeReference (the referred type)
      * @param rp a ReferencePrefix as access path for the constructor     
      */
-    public New(Expression[] arguments, TypeReference type, ReferencePrefix rp) {
+    public New(Expression[] arguments, TypeReference type, ReferencePrefix rp, ProgramElementName scope) {
 	super(arguments, type);
 	anonymousClass = null;
 	accessPath = rp;
+        if(scope==null){
+            this.scope = new ProgramElementName(MethodReference.LOCAL_SCOPE);
+        }else{
+            this.scope = scope;
+        }
+    }
+    
+    public New(Expression[] arguments, TypeReference type, ReferencePrefix rp) {
+        this(arguments, type, rp, null);
     }
 
     public SourceElement getFirstElement() {
@@ -219,6 +233,10 @@ public class New
      */
     public ReferencePrefix getReferencePrefix() {
         return accessPath;
+    }
+    
+    public ProgramElement getScope(){
+        return scope;
     }
 
     /** calls the corresponding method of a visitor in order to

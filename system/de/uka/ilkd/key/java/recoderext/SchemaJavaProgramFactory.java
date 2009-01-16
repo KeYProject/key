@@ -104,6 +104,17 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 	return new ContextStatementBlock(typeRef, memoryArea, runtime, callerMemoryArea, constructedMemoryArea);
     }
     
+    public MethodReferenceWrapper createMethodReferenceWrapper(ReferencePrefix accessPath, 
+            Identifier name, ASTList<Expression> args, 
+            ASTList<TypeArgumentDeclaration> typeArgs, Identifier scope){
+        return new MethodReferenceWrapper(accessPath, name, args, typeArgs, scope);
+    }
+    
+    public MethodReferenceWrapper createMethodReferenceWrapper(ReferencePrefix accessPath, 
+            Identifier name, ASTList<Expression> args, Identifier scope){
+        return new MethodReferenceWrapper(accessPath, name, args, scope);
+    }
+    
     public ContextStatementBlock createContextStatementBlock(TypeSVWrapper typeRef,
             ExpressionSVWrapper memoryArea,
             ExpressionSVWrapper runtime) {
