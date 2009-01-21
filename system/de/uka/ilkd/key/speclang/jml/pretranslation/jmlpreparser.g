@@ -514,6 +514,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
 	|   ps=working_space_clause  { sc.setWorkingSpace(ps);}
+	|   ps=constructed_working_space_clause  { sc.setConstructedWorkingSpace(ps);}
 	|   captures_clause 
 	|   when_clause
 	|   duration_clause
@@ -575,7 +576,13 @@ ensures_keyword
 working_space_clause returns [PositionedString result = null]
 	throws SLTranslationException
 :
-	working_space_keyword result=expression
+	working_space_keyword  result=expression
+;
+
+constructed_working_space_clause returns [PositionedString result = null]
+	throws SLTranslationException
+:
+	WORKING_SPACE_CONSTRUCTED result=expression
 ;
 
 signals_clause 
@@ -667,6 +674,7 @@ working_space_keyword
 :
     	WORKING_SPACE 
     |   WORKING_SPACE_RED
+    |   WORKING_SPACE_LOCAL
 ;
 
 

@@ -116,6 +116,8 @@ tokens {
     WORKING_SPACE 		= "working_space";
     WORKING_SPACE_RED 		= "working_space_redundantly";   
     WORKING_SPACE_SINGLE_ITERATION	= "working_space_single_iteration";
+    WORKING_SPACE_CONSTRUCTED 		= "working_space_constructed";
+    WORKING_SPACE_LOCAL 		= "working_space_local";
     WRITABLE			= "writable";    
 }
 

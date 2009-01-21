@@ -87,6 +87,14 @@ public interface OperationContract {
                 ListOfParsableVariable paramVars,
                 Services services);
     
+    public Term getConstructedWorkingSpace(Term self, 
+            ListOfTerm params,
+            Services services);
+
+    public Term getConstructedWorkingSpace(ParsableVariable selfVar, 
+            ListOfParsableVariable paramVars,
+            Services services);
+    
     public FormulaWithAxioms getWorkingSpacePost(ParsableVariable selfVar, 
             ListOfParsableVariable paramVars, 
             ParsableVariable resultVar, 

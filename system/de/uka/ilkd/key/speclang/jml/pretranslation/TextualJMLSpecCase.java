@@ -33,6 +33,7 @@ public class TextualJMLSpecCase extends TextualJMLConstruct {
     private ListOfPositionedString diverges     
             = SLListOfPositionedString.EMPTY_LIST;
     private PositionedString workingSpace = null;
+    private PositionedString constructedWorkingSpace = null;
 
 
     
@@ -76,6 +77,13 @@ public class TextualJMLSpecCase extends TextualJMLConstruct {
         workingSpace = ps;
     }
     
+    public void setLocalWorkingSpace(PositionedString ps){
+        workingSpace = ps;
+    }
+    
+    public void setConstructedWorkingSpace(PositionedString ps){
+        constructedWorkingSpace = ps;
+    }
 
     public void addDiverges(PositionedString ps) {
         diverges = diverges.append(ps);
@@ -113,6 +121,14 @@ public class TextualJMLSpecCase extends TextualJMLConstruct {
     
     public PositionedString getWorkingSpace(){
         return workingSpace;
+    }
+    
+    public PositionedString getLocalWorkingSpace(){
+        return workingSpace;
+    }
+    
+    public PositionedString getConstructedWorkingSpace(){
+        return constructedWorkingSpace;
     }
     
 

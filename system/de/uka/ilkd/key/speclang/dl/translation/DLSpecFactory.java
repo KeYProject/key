@@ -280,6 +280,7 @@ public class DLSpecFactory {
                                          wsPost,
                                          modifies,
                                          ws,
+                                         ws,
                                          selfVar,
                                          paramVars,
                                          resultVar,

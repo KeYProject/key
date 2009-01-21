@@ -14,6 +14,7 @@ header {
 
     import java.io.StringReader;
 
+	import de.uka.ilkd.key.gui.configuration.ProofSettings;
     import de.uka.ilkd.key.java.JavaInfo;
     import de.uka.ilkd.key.java.Position;
     import de.uka.ilkd.key.java.Services;
@@ -61,6 +62,7 @@ header {
     import de.uka.ilkd.key.proof.AtPreFactory;
     import de.uka.ilkd.key.proof.OpReplacer;
     import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
+    import de.uka.ilkd.key.proof.init.PercProfile;
     import de.uka.ilkd.key.speclang.FormulaWithAxioms;
     import de.uka.ilkd.key.speclang.PositionedString;
     import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
@@ -1869,9 +1871,15 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	            		int size = determineElementSize(typ, d);
     	    	    	t = createArraySizeTerm(size, dimTerms);
         			}else{
-    	    			int size = services.getJavaInfo().getSizeInBytes(typ);
-	        			IntLiteral sizeLit = new IntLiteral(size+"");
-            			t = services.getTypeConverter().convertToLogicElement(sizeLit);
+        				if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
+        					// no concrete object sizes for PERC
+    	    				ProgramVariable s = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_EXACT_SIZE,	typ);
+    						t = tb.var(s);
+        				}else{
+        					int size = services.getJavaInfo().getSizeInBytes(typ);
+	        				IntLiteral sizeLit = new IntLiteral(size+"");
+            				t = services.getTypeConverter().convertToLogicElement(sizeLit);
+        				}
         			}
             		result = new JMLExpression(t);
         		}

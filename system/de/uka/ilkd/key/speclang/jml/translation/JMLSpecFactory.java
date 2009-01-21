@@ -213,7 +213,8 @@ public class JMLSpecFactory {
                                 ListOfPositionedString originalSignals,
                                 ListOfPositionedString originalSignalsOnly,
                                 ListOfPositionedString originalDiverges,
-                                PositionedString originalWorkingSpace) 
+                                PositionedString originalWorkingSpace,
+                                PositionedString originalConstructedWorkingSpace) 
             throws SLTranslationException {
         assert programMethod != null;
         assert originalBehavior != null;
@@ -258,6 +259,7 @@ public class JMLSpecFactory {
         
         //translate working_space
         Term workingSpace = null;
+        Term constructedWorkingSpace = null;
         FormulaWithAxioms wsPost = new FormulaWithAxioms(TB.tt());
         Term imCons=null;
         ProgramVariable initialMemoryArea = services.getJavaInfo().
@@ -302,7 +304,20 @@ public class JMLSpecFactory {
                     resultVar, 
                     excVar,
                     atPreFunctions).getFormula();
-        }       
+        }     
+        
+        
+        if(originalConstructedWorkingSpace!=null){
+            constructedWorkingSpace
+                = translator.translateExpression(
+                    originalConstructedWorkingSpace,
+                    programMethod.getContainerType(),
+                    selfVar, 
+                    paramVars, 
+                    resultVar, 
+                    excVar,
+                    atPreFunctions).getFormula();
+        } 
         
         //translate assignable
         SetOfLocationDescriptor assignable;
@@ -419,6 +434,7 @@ public class JMLSpecFactory {
                                             wsPost,
                                             assignable,
                                             workingSpace,
+                                            constructedWorkingSpace,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -437,6 +453,7 @@ public class JMLSpecFactory {
                                             wsPost,
                                             assignable,
                                             workingSpace,
+                                            constructedWorkingSpace,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -456,6 +473,7 @@ public class JMLSpecFactory {
                                             wsPost,
                                             assignable,
                                             workingSpace,
+                                            constructedWorkingSpace,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -471,6 +489,7 @@ public class JMLSpecFactory {
                                             wsPost,
                                             assignable,
                                             workingSpace,
+                                            constructedWorkingSpace,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -496,7 +515,8 @@ public class JMLSpecFactory {
                                     textualSpecCase.getSignals(),
                                     textualSpecCase.getSignalsOnly(),
                                     textualSpecCase.getDiverges(),
-                                    textualSpecCase.getWorkingSpace());
+                                    textualSpecCase.getWorkingSpace(),
+                                    textualSpecCase.getConstructedWorkingSpace());
     }
     
     

@@ -18,12 +18,12 @@ package de.uka.ilkd.key.proof.init;
 
 import java.util.Map;
 
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.ListOfProgramVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 
@@ -73,16 +73,23 @@ public class EnsuresPostPO extends EnsuresPO {
         result = TB.and(result, initialMemCreatedAndNotNullTerm);
         
         Term workingSpace = contract.getWorkingSpace(selfVar, toPV(paramVars), services);
-        if(contract.getWorkingSpace(selfVar, toPV(paramVars), services)!=null){
-            final ProgramVariable size = services.getJavaInfo().getAttribute(
-                    "size", "javax.realtime.MemoryArea");
-            final ProgramVariable consumed = services.getJavaInfo().getAttribute(
-                    "consumed", "javax.realtime.MemoryArea");
-            Function add = (Function) services.getNamespaces().functions().lookup(new Name("add"));
-            Function leq = (Function) services.getNamespaces().functions().lookup(new Name("leq")); 
+        final ProgramVariable size = services.getJavaInfo().getAttribute(
+                "size", "javax.realtime.MemoryArea");
+        final ProgramVariable consumed = services.getJavaInfo().getAttribute(
+                "consumed", "javax.realtime.MemoryArea");
+        Function add = (Function) services.getNamespaces().functions().lookup(new Name("add"));
+        Function leq = (Function) services.getNamespaces().functions().lookup(new Name("leq")); 
+        
+        if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
+            workingSpace = TB.var(services.getJavaInfo().
+                    getAttribute(ImplicitFieldAdder.IMPLICIT_SIZE, contract.getProgramMethod().getKeYJavaType()));
+            result = TB.and(result, TB.func(leq, TB.func(add, TB.dot(t_mem,consumed), 
+                    workingSpace), TB.dot(t_mem, size)));
+        }else if(contract.getWorkingSpace(selfVar, toPV(paramVars), services)!=null){
             result = TB.and(result, TB.func(leq, TB.func(add, TB.dot(t_mem,consumed), 
                     workingSpace), TB.dot(t_mem, size)));
         }
+
         return result;
     }
     

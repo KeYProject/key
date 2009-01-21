@@ -36,6 +36,7 @@ public class OperationContractImpl implements OperationContract {
     private final FormulaWithAxioms originalPost;    
     private final FormulaWithAxioms originalWorkingSpacePost;
     private final Term originalWorkingSpace;
+    private final Term originalConstructedWorkingSpace;
     private final SetOfLocationDescriptor originalModifies;
     private final ParsableVariable originalSelfVar;
     private final ListOfParsableVariable originalParamVars;
@@ -72,6 +73,7 @@ public class OperationContractImpl implements OperationContract {
                                  FormulaWithAxioms workingSpacePost,
             		         SetOfLocationDescriptor modifies,
                                  Term workingSpace,
+                                 Term constructedWorkingSpace,
             		         ParsableVariable selfVar,
             		         ListOfParsableVariable paramVars,
             		         ParsableVariable resultVar,
@@ -98,6 +100,7 @@ public class OperationContractImpl implements OperationContract {
 	this.originalPre              = pre;
 	this.originalPost             = post;
         this.originalWorkingSpace     = workingSpace;
+        this.originalConstructedWorkingSpace     = constructedWorkingSpace;
         this.originalWorkingSpacePost = workingSpacePost;
 	this.originalModifies         = modifies;
 	this.originalSelfVar          = selfVar;
@@ -329,6 +332,37 @@ public class OperationContractImpl implements OperationContract {
                 services);
         OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalWorkingSpace);
+    }
+    
+    public Term getConstructedWorkingSpace(Term self, 
+            ListOfTerm params,
+            Services services){
+        assert (self == null) == (originalSelfVar == null);
+        assert params != null;
+        assert params.size() == originalParamVars.size();
+        assert services != null;
+        Map<Term, Term> replaceMap = getReplaceMap(self, 
+                params, 
+                services);
+        OpReplacer or = new OpReplacer(replaceMap);
+        return or.replace(originalConstructedWorkingSpace);
+    }
+    
+    public Term getConstructedWorkingSpace(ParsableVariable selfVar, 
+                    ListOfParsableVariable paramVars,
+                    Services services) {
+        assert (selfVar == null) == (originalSelfVar == null);
+        assert paramVars != null;
+        assert paramVars.size() == originalParamVars.size();
+        assert services != null;
+        Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, 
+                paramVars, 
+                null, 
+                null,
+                null, 
+                services);
+        OpReplacer or = new OpReplacer(replaceMap);
+        return or.replace(originalConstructedWorkingSpace);
     }
 
     

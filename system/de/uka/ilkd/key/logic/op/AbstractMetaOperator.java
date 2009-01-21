@@ -78,6 +78,12 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     public static final AbstractMetaOperator META_BC_ARRAY_SIZE = 
         new BestCaseArraySize();
     
+    public static final AbstractMetaOperator META_LOCAL_SCOPE_SPEC = 
+        new LocalScopeSpec();
+    
+    public static final AbstractMetaOperator META_CONSTRUCTED_SCOPE_SPEC = 
+        new ConstructedScopeSpec();
+    
     public static final AbstractMetaOperator META_PRECONDITION_FOR_WS = 
         new PreconditionForWS();
     
