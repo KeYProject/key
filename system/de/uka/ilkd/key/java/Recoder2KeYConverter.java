@@ -20,9 +20,11 @@ import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
 import recoder.java.NonTerminalProgramElement;
 import recoder.list.generic.ASTList;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.java.declaration.modifier.*;
 import de.uka.ilkd.key.java.declaration.modifier.Ghost;
 import de.uka.ilkd.key.java.declaration.modifier.Model;
 import de.uka.ilkd.key.java.expression.*;
@@ -39,6 +41,7 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.proof.init.PercProfile;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -639,7 +642,7 @@ public class Recoder2KeYConverter {
         String s = (newArr instanceof NewArrayWrapper &&  
                 ((NewArrayWrapper) newArr).getScope()!=null ? 
                 ((NewArrayWrapper) newArr).getScope().toSource() : null);
-        if(s!=null){
+        if(s!=null && (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile)){
             scope = new ProgramElementName(s);
         }        
         
@@ -1336,6 +1339,10 @@ public class Recoder2KeYConverter {
                 ((MethodReferenceWrapper) mr).getScope()!=null ? 
                 ((MethodReferenceWrapper) mr).getScope().toSource() : null);
         
+        if(!(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile)){
+            scope = null;
+        }
+        
         return new MethodReference(children,
                 pm == null ? new ProgramElementName(mr.getName()) : pm
                         .getProgramElementName(), prefix, positionInfo(mr), 
@@ -1370,6 +1377,10 @@ public class Recoder2KeYConverter {
         return new For(convertLoopInitializers(f), convertGuard(f),
                 convertUpdates(f), convertBody(f), collectComments(f),
                 positionInfo(f));
+    }
+    
+    public AnnotationUseSpecification convert(recoder.java.declaration.AnnotationUseSpecification aus){
+        return new AnnotationUseSpecification((TypeReference) callConvert(aus.getTypeReference()));
     }
 
     /**
@@ -1558,7 +1569,7 @@ public class Recoder2KeYConverter {
         String s = (n instanceof NewWrapper &&  
                 ((NewWrapper) n).getScope()!=null ? 
                 ((NewWrapper) n).getScope().toSource() : null);
-        if(s!=null){
+        if(s!=null && (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile)){
             scope = new ProgramElementName(s);
         }
 

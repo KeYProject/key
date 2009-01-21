@@ -3309,9 +3309,9 @@ TypeOperator AllocationExpression() :
 }
 {
 (
-  LOOKAHEAD(2)
+  LOOKAHEAD(4)
   "new" 
-      [LOOKAHEAD(2)  "@" 
+      [LOOKAHEAD(3)  "@" 
   	(
   		"<localScope>" {id=factory.createIdentifier(de.uka.ilkd.key.java.reference.MethodReference.LOCAL_SCOPE);}
   		|
@@ -4327,7 +4327,7 @@ ASTList<Statement> GeneralizedStatements() :
 AnnotationUseSpecification AnnotationUse() :
 {
 	TypeReference tr;	
-	AnnotationUseSpecification result = factory.createAnnotationUseSpecification();
+	AnnotationUseSpecification result = factory.createKeYAnnotationUseSpecification();
 	Expression ev = null;
 	ASTList<AnnotationElementValuePair> list = null;
 	AnnotationPropertyReference id;

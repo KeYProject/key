@@ -312,7 +312,9 @@ public class Recoder2KeYTypeConverter {
 		List<ClassType> supers = classType.getSupertypes();
 		SetOfSort ss = SetAsListOfSort.EMPTY_SET;
 		for (int i = 0; i < supers.size(); i++) {
-		    ss = ss.add(getKeYJavaType(supers.get(i)).getSort());
+                    if(supers.get(i)!=null){
+                        ss = ss.add(getKeYJavaType(supers.get(i)).getSort());
+                    }
 		}       
 
 		/* ??
@@ -582,20 +584,25 @@ public class Recoder2KeYTypeConverter {
 		ListOfField fields = filterField(members);
 
 		ProgramVariable length = len;// find("length", fields);
+                
+                AnnotationUseSpecification ecs = 
+                    new AnnotationUseSpecification(new TypeRef(getKeYJavaType("ExternallyConstructedScope")));
+                AnnotationUseSpecification nls = 
+                    new AnnotationUseSpecification(new TypeRef(getKeYJavaType("NoLocalScope")));
 
 		if (arrayMethodBuilder == null) {
 			initArrayMethodBuilder();
 		}
 		final ProgramMethod prepare = arrayMethodBuilder.getPrepareArrayMethod(
-				parentReference, length, defaultValue, fields);
+				parentReference, length, defaultValue, fields, ecs, nls);
 
 		members.add(arrayMethodBuilder
 				.getArrayInstanceAllocatorMethod(parentReference));
 		members.add(prepare);
 		members.add(arrayMethodBuilder.getCreateArrayHelperMethod(
-				parentReference, length, fields));
+				parentReference, length, fields, ecs, nls));
 		members.add(arrayMethodBuilder.getCreateArrayMethod(parentReference,
-				prepare, fields));
+				prepare, fields, ecs, nls));
 		members.add(transientArrayMethodBuilder
 				.getCreateTransientArrayHelperMethod(parentReference, length,
 						fields));

@@ -15,29 +15,16 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Field;
-import recoder.java.Identifier;
-import recoder.java.Statement;
-import recoder.java.StatementBlock;
-import recoder.java.declaration.ClassDeclaration;
-import recoder.java.declaration.DeclarationSpecifier;
-import recoder.java.declaration.FieldDeclaration;
-import recoder.java.declaration.FieldSpecification;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.ParameterDeclaration;
-import recoder.java.declaration.TypeDeclaration;
+import recoder.java.*;
+import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Private;
 import recoder.java.declaration.modifier.Protected;
-import recoder.java.reference.MethodReference;
-import recoder.java.reference.ReferencePrefix;
-import recoder.java.reference.SuperReference;
-import recoder.java.reference.ThisReference;
+import recoder.java.reference.*;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
@@ -192,6 +179,12 @@ public class PrepareObjectBuilder
     public MethodDeclaration createMethod(TypeDeclaration type) {
 	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(1);
 	modifiers.add(new Protected());	
+        
+        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+                new Identifier("ExternallyConstructedScope"))));
+        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+                new Identifier("NoLocalScope"))));
+        
 	MethodDeclaration md =  new MethodDeclaration
 	    (modifiers, 
 	     null, 
@@ -213,6 +206,12 @@ public class PrepareObjectBuilder
     public MethodDeclaration createMethodPrepareEnter(TypeDeclaration type) {
 	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(1);
 	modifiers.add(new Private());	
+        
+        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+                new Identifier("ExternallyConstructedScope"))));
+        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+                new Identifier("NoLocalScope"))));
+        
 	MethodDeclaration md =  new MethodDeclaration
 	    (modifiers, 
 	     null, 

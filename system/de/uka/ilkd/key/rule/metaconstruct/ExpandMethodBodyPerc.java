@@ -85,15 +85,17 @@ public class ExpandMethodBodyPerc extends ProgramMetaConstruct {
         }else{
             callerScope = svInst.getExecutionContext().getMemoryArea();
         }
-        
+        ReferencePrefix constructedScope = (ReferencePrefix) svInst.getInstantiation(newConstructedScope);
+        if(mbs.getProgramMethod(services).getMethodDeclaration().externallyConstructedScope()){
+            constructedScope = callerScope;
+        }
         return 
             new MethodFrame(mbs.getResultVariable(),
                             new ExecutionContext(classContext, 
                                     pm.getName().equals("<runRunnable>")?
                                             newCalled :
                                                 (ReferencePrefix) svInst.getInstantiation(newLocalScope),
-                                    newCalled, callerScope,
-                                    (ReferencePrefix) svInst.getInstantiation(newConstructedScope)),
+                                    newCalled, callerScope, constructedScope),
                             result,
                             pm, PositionInfo.UNDEFINED); 
     }

@@ -129,6 +129,10 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         return new NewArrayWrapper(super.createNewArray(), scope);
     }
     
+    public KeYAnnotationUseSpecification createKeYAnnotationUseSpecification(){
+        return new KeYAnnotationUseSpecification();
+    }
+    
 /*    public CurrentMemoryAreaReference createCurrentMemoryAreaReference(){
         return new CurrentMemoryAreaReference();
     }*/

@@ -16,8 +16,7 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.CrossReferenceServiceConfiguration;
-import recoder.java.Statement;
-import recoder.java.StatementBlock;
+import recoder.java.*;
 import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Public;
 import recoder.java.declaration.ParameterDeclaration;
@@ -91,7 +90,13 @@ public class CreateBuilder extends RecoderModelTransformer {
      */
     public MethodDeclaration createMethod(ClassDeclaration type) {
 	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(2);
-	modifiers.add(new Public());        
+	modifiers.add(new Public());   
+        
+        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+                new Identifier("ExternallyConstructedScope"))));
+        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+                new Identifier("NoLocalScope"))));
+        
 	MethodDeclaration md =  new MethodDeclaration
 	    (modifiers, 
 	     new TypeReference(getId(type)), 

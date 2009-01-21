@@ -14,6 +14,8 @@
 
 java/lang/Object.java
 
+com/percpico/util/sc/ExternallyConstructedScope.java
+com/percpico/util/sc/NoLocalScope.java
 java/lang/ArithmeticException.java
 java/lang/ArrayIndexOutOfBoundsException.java
 java/lang/ArrayStoreException.java
