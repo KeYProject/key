@@ -2589,6 +2589,7 @@ public class Main extends JFrame implements IMain {
                     ProofSettings.DEFAULT_SETTINGS.setProfile(new RTSJProfile());
                 } else if (opt[index].equals("PERC")) {
                     ProofSettings.DEFAULT_SETTINGS.setProfile(new PercProfile());
+                    System.out.println("PERC Pico extensions enabled");
                 } else if (opt[index].equals("TESTING") || opt[index].equals("UNIT")) {
                     if(opt[index].equals("TESTING")){
                         testStandalone = true;

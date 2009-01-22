@@ -80,7 +80,8 @@ public class EnsuresPostPO extends EnsuresPO {
         Function add = (Function) services.getNamespaces().functions().lookup(new Name("add"));
         Function leq = (Function) services.getNamespaces().functions().lookup(new Name("leq")); 
         
-        if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
+        if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile &&
+                contract.getProgramMethod().getKeYJavaType()!=null){
             workingSpace = TB.var(services.getJavaInfo().
                     getAttribute(ImplicitFieldAdder.IMPLICIT_SIZE, contract.getProgramMethod().getKeYJavaType()));
             result = TB.and(result, TB.func(leq, TB.func(add, TB.dot(t_mem,consumed), 

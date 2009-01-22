@@ -64,7 +64,15 @@ public interface OperationContract {
     public FormulaWithAxioms getPre(Term self, 
                                     ListOfTerm params,
                                     Services services);
-
+    
+    /**
+     * Returns the precondition of the contract.
+     */
+    public FormulaWithAxioms getPre(ParsableVariable selfVar, 
+                                    ListOfParsableVariable paramVars,
+                                    Term memoryArea,
+                                    Services services);
+    
     /**
      * Returns the postcondition of the contract.
      * @param atPreFunctions map containing functions to use as atPre-functions.
@@ -78,6 +86,21 @@ public interface OperationContract {
                                      ParsableVariable excVar,
                                      /*inout*/ Map<Operator, Function/* at pre */> atPreFunctions,
                                      Services services);
+    
+    /**
+     * Returns the postcondition of the contract.
+     * @param atPreFunctions map containing functions to use as atPre-functions.
+     *                       If the method needs an atPre-function which is not
+     *                       in this map, it creates a fresh one and adds it to 
+     *                       the map.˙
+     */
+    public FormulaWithAxioms getPost(ParsableVariable selfVar, 
+            ListOfParsableVariable paramVars, 
+            ParsableVariable resultVar, 
+            ParsableVariable excVar,
+            Term memoryArea,
+            /*inout*/ Map<Operator, Function/* at pre */> atPreFunctions,
+            Services services);
     
     public Term getWorkingSpace(Term self, 
                 ListOfTerm params,

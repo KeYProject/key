@@ -413,6 +413,9 @@ public class ConstructorNormalformBuilder
 	     parameters,
 	     recThrows,
 	     body);
+        if(cons instanceof ConstructorDeclaration){
+            nf.setComments(((ConstructorDeclaration)cons).getComments());
+        }
 	nf.makeAllParentRolesValid();
 	return nf;
     }

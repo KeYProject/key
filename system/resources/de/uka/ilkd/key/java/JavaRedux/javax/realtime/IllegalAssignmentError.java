@@ -4,6 +4,6 @@ public class IllegalAssignmentError extends Error{
 
     public IllegalAssignmentError(){}
 
-    public IllegalAssignmentError(String s){}
+    public IllegalAssignmentError(String arg0){}
 
 }

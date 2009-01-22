@@ -4,8 +4,8 @@ public class InaccessibleAreaException extends RuntimeException{
 
     public InaccessibleAreaException(){ super();}
 
-    public InaccessibleAreaException(String s){
-	super(s);
+    public InaccessibleAreaException(String arg0){
+	super(arg0);
     }
 
 }

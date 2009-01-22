@@ -78,8 +78,8 @@ public class IfThenElse extends Op {
         else if (s2.extendsTrans(s1)) return s1;
         
         Sort result = Sort.ANY;
-        final SetOfSort set1 = s1.extendsSorts();
-        final SetOfSort set2 = s2.extendsSorts();
+        final SetOfSort set1 = transExtSorts(s1);
+        final SetOfSort set2 = transExtSorts(s2);
         
         final IteratorOfSort sort1It = set1.iterator();
         while (sort1It.hasNext()) {
@@ -87,13 +87,25 @@ public class IfThenElse extends Op {
             if (set2.contains(sort1)) {
                 if (result == Sort.ANY) {
                     result = sort1;
-                } else {
-                    // not uniquely determinable
-                    return Sort.ANY;
+                } else if(sort1.extendsTrans(result)){
+                    result = sort1;
                 }
             } 
         }        
         return result;
+    }
+    
+    private SetOfSort transExtSorts(Sort sort){
+        SetOfSort ext = sort.extendsSorts();
+        SetOfSort oldExt;
+        do{
+            oldExt = ext;
+            Sort[] ea = ext.toArray();
+            for(Sort s:ea){
+                ext = ext.union(s.extendsSorts());
+            }
+        }while(!oldExt.equals(ext));
+        return ext;
     }
     
     public int arity () {

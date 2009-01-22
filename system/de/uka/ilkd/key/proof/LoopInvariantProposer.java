@@ -203,6 +203,12 @@ public class LoopInvariantProposer implements InstantiationProposer {
 	    } else if(varName.equals("wsOneIt")
                     && inv.getWorkingSpace(selfTerm, atPreFunctions, services) != null) {
                 inst = inv.getWorkingSpace(selfTerm, atPreFunctions, services);
+            } else if(varName.equals("wsOneItCons")
+                    && inv.getWorkingSpaceConstructed(selfTerm, atPreFunctions, services) != null) {
+                inst = inv.getWorkingSpaceConstructed(selfTerm, atPreFunctions, services);
+            } else if(varName.equals("wsOneItReent")
+                    && inv.getWorkingSpaceReentrant(selfTerm, atPreFunctions, services) != null) {
+                inst = inv.getWorkingSpaceReentrant(selfTerm, atPreFunctions, services);
             } else if(varName.equals("heapSpace")){
                 inst = TermBuilder.DF.var((ProgramVariable)
                         services.getNamespaces().programVariables().

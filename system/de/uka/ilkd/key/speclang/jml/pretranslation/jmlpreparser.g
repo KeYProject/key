@@ -942,7 +942,9 @@ loop_specification[ListOfString mods]
         |   ps=loop_predicates      { ls.addPredicates(ps); }
         |   ps=assignable_clause    { ls.addAssignable(ps); }
         |   ps=variant_function     { ls.setVariant(ps); } 
-        |   ps=working_space_single_iteration {ls.setWorkingSpace(ps);}
+        |   ps=working_space_single_iteration {ls.setWorkingSpaceLocal(ps);}
+        |   ps=working_space_single_iteration_constructed {ls.setWorkingSpaceConstructed(ps);}
+        |   ps=working_space_single_iteration_reentrant {ls.setWorkingSpaceReentrant(ps);}
     )+
 ;
 
@@ -954,8 +956,20 @@ loop_invariant returns [PositionedString result = null]
 
 working_space_single_iteration returns [PositionedString result = null]
 :
-	WORKING_SPACE_SINGLE_ITERATION result=expression
+	(WORKING_SPACE_SINGLE_ITERATION | WORKING_SPACE_SINGLE_ITERATION_LOCAL) result=expression
 ;
+
+working_space_single_iteration_constructed returns [PositionedString result = null]
+:
+	WORKING_SPACE_SINGLE_ITERATION_CONSTRUCTED result=expression
+;
+
+
+working_space_single_iteration_reentrant returns [PositionedString result = null]
+:
+	WORKING_SPACE_SINGLE_ITERATION_REENTRANT  result=expression
+;
+
 
 
 maintaining_keyword 

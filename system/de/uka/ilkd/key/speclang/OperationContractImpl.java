@@ -289,6 +289,22 @@ public class OperationContractImpl implements OperationContract {
 	return or.replace(originalPre);
     }
     
+    public FormulaWithAxioms getPre(ParsableVariable selfVar, 
+                        ListOfParsableVariable paramVars,
+                        Term memoryArea,
+                        Services services) {
+        assert (selfVar == null) == (originalSelfVar == null);
+        assert paramVars != null;
+        assert paramVars.size() == originalParamVars.size();
+        assert services != null;
+        Map<Term, Term> replaceMap = getReplaceMap(selfVar, 
+                memoryArea,
+                paramVars, 
+                services);
+        OpReplacer or = new OpReplacer(replaceMap);
+        return or.replace(originalPre);
+    }
+    
     public FormulaWithAxioms getPre(Term self, 
                     ListOfTerm params,
                     Services services) {
@@ -387,6 +403,35 @@ public class OperationContractImpl implements OperationContract {
                                        services);
 	OpReplacer or = new OpReplacer(replaceMap);
 	return or.replace(originalPost);
+    }
+    
+    public FormulaWithAxioms getPost(ParsableVariable selfVar, 
+            ListOfParsableVariable paramVars, 
+            ParsableVariable resultVar, 
+            ParsableVariable excVar,
+            Term memoryArea,
+            /*inout*/ Map<Operator, Function> atPreFunctions,
+            Services services) {
+        assert (selfVar == null) == (originalSelfVar == null);
+        assert paramVars != null;
+        assert paramVars.size() == originalParamVars.size();
+        assert (resultVar == null) == (originalResultVar == null);
+        assert excVar != null;
+        assert atPreFunctions != null;
+        assert services != null;
+        Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, 
+                paramVars, 
+                resultVar, 
+                excVar, 
+                atPreFunctions, 
+                services);
+        OpReplacer or = new OpReplacer(replaceMap);
+        Map<Term, Term> replaceMap2 = getReplaceMap(selfVar, 
+                memoryArea,
+                paramVars, 
+                services);
+        OpReplacer or2 = new OpReplacer(replaceMap2);
+        return or2.replace(or.replace(originalPost));
     }
     
     public FormulaWithAxioms getWorkingSpacePost(ParsableVariable selfVar, 

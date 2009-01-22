@@ -16,6 +16,7 @@ import java.util.Map;
 import de.uka.ilkd.key.gui.ContractConfigurator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
@@ -435,17 +436,34 @@ public class UseOperationContractRule implements BuiltInRule {
             = new LinkedHashMap<Operator, Function>();
         
         ExecutionContext ec = getExecutionContext(pio);
-        Term mTerm = services.getTypeConverter().convertToLogicElement(
-                ec.getMemoryArea(), ec);
-        
+        Term mTerm;
+        if(mbs.getMethodReference().callerScope()){
+            mTerm = services.getTypeConverter().convertToLogicElement(
+                    ec.getCallerMemoryArea(), ec);
+        }else if(mbs.getMethodReference().constructedScope()){
+            mTerm = services.getTypeConverter().convertToLogicElement(
+                    ec.getConstructedMemoryArea(), ec);
+        }else if(mbs.getMethodReference().reentrantScope()){
+            mTerm = TB.dot(
+                        services.getTypeConverter().convertToLogicElement(
+                                ec.getRuntimeInstance(), ec),
+                                services.getJavaInfo().getAttribute
+                                ("memoryArea", services.getJavaInfo().getJavaLangObject()));
+        }else{
+            mTerm = services.getTypeConverter().convertToLogicElement(
+                    ec.getMemoryArea(), ec);
+        }
+            
         //translate the contract and the invariants
         FormulaWithAxioms pre = cwi.contract.getPre(selfVar, 
                                                     paramVars, 
+                                                    mTerm,
                                                     services);
         FormulaWithAxioms post = cwi.contract.getPost(selfVar, 
                                                       paramVars, 
                                                       resultVar, 
-                                                      excVar, 
+                                                      excVar,
+                                                      mTerm,
                                                       atPreFunctions,
                                                       services);
         SetOfLocationDescriptor modifies = cwi.contract.getModifies(selfVar,
@@ -524,10 +542,17 @@ public class UseOperationContractRule implements BuiltInRule {
        
         //create "Pre" branch
         Term preF = pre.getFormula();
-        if(services.getProof().getSettings().getProfile() instanceof RTSJProfile ||
-                services.getProof().getSettings().getProfile() instanceof PercProfile){
+        Function leq = (Function) nss.functions().lookup(new Name("leq"));
+        if(services.getProof().getSettings().getProfile() instanceof RTSJProfile){
             Term wsPre = cwi.contract.getWorkingSpace(selfVar, paramVars, services);
-            Function leq = (Function) nss.functions().lookup(new Name("leq"));
+            wsPre = TB.tf().createFunctionTerm(leq, TB.tf().createFunctionTerm(add, mCons, wsPre),
+                    TB.dot(mTerm, services.getJavaInfo().getAttribute(
+                            "size", "javax.realtime.MemoryArea")));
+            preF = TB.and(wsPre, preF);
+        }else if(services.getProof().getSettings().getProfile() instanceof PercProfile &&
+                pm.getKeYJavaType()!=null){
+            Term wsPre = TB.var(services.getJavaInfo().
+                    getAttribute(ImplicitFieldAdder.IMPLICIT_SIZE, pm.getKeYJavaType()));
             wsPre = TB.tf().createFunctionTerm(leq, TB.tf().createFunctionTerm(add, mCons, wsPre),
                     TB.dot(mTerm, services.getJavaInfo().getAttribute(
                             "size", "javax.realtime.MemoryArea")));
@@ -572,14 +597,21 @@ public class UseOperationContractRule implements BuiltInRule {
         }
     
         Term wsEq = TB.tt();
-        if(services.getProof().getSettings().getProfile() instanceof RTSJProfile ||
-                services.getProof().getSettings().getProfile() instanceof PercProfile){    
+        if(services.getProof().getSettings().getProfile() instanceof RTSJProfile){    
             wsEq = TB.equals(ws, cwi.contract.getWorkingSpace(selfVar, paramVars, services));
             wsEq = uf.apply(uf.sequential(new Update[]{selfParamsUpdate,
                     atPreUpdate}),wsEq);
-            postTerm = TB.imp(wsEq, postTerm);
+        }else if(services.getProof().getSettings().getProfile() instanceof PercProfile &&
+                pm.getKeYJavaType()!=null){
+                Term size = TB.var(services.getJavaInfo().
+                        getAttribute(ImplicitFieldAdder.IMPLICIT_SIZE, pm.getKeYJavaType()));
+                wsEq = TB.equals(ws, size);
+                wsEq = uf.apply(uf.sequential(new Update[]{selfParamsUpdate,
+                        atPreUpdate}),wsEq);
         }
-                                                        
+            
+        postTerm = TB.imp(wsEq, postTerm);
+        
         replaceInGoal(postTerm, postGoal, pio);
         
         //create "Exceptional Post" branch

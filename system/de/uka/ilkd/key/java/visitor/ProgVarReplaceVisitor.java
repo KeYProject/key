@@ -294,11 +294,21 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                                     atPreFunctions, 
                                                     services));
         
-        //variant
-        Term newWorkingSpace
+        //working spaces
+        Term newWorkingSpaceLocal
             = replaceVariablesInTerm(inv.getWorkingSpace(selfTerm, 
                                                     atPreFunctions, 
                                                     services));
+        
+        Term newWorkingSpaceConstructed
+            = replaceVariablesInTerm(inv.getWorkingSpaceConstructed(selfTerm, 
+                    atPreFunctions, 
+                    services));
+        
+        Term newWorkingSpaceReentrant
+            = replaceVariablesInTerm(inv.getWorkingSpaceReentrant(selfTerm, 
+                    atPreFunctions, 
+                    services));
         
         Term newSelfTerm = replaceVariablesInTerm(selfTerm); 
         Map newAtPreFunctions = replaceVariablesInMap(atPreFunctions);
@@ -311,7 +321,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                     newPredicates,
                                     newModifies, 
                                     newVariant, 
-                                    newWorkingSpace,
+                                    newWorkingSpaceLocal,
+                                    newWorkingSpaceConstructed,
+                                    newWorkingSpaceReentrant,
                                     newSelfTerm,
                                     newAtPreFunctions,
                                     newPredicateHeuristicsAllowed);

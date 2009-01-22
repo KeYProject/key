@@ -267,57 +267,59 @@ public class JMLSpecFactory {
         Term imTerm = TB.var(initialMemoryArea);
         imCons = TB.dot(imTerm, services.getJavaInfo().getAttribute(
         "consumed", "javax.realtime.MemoryArea"));
-        if(originalWorkingSpace!=null){
-            String ws = originalWorkingSpace.text.trim();
-            Term oldCons = translator.translateExpression(
-                    new PositionedString("\\old(\\currentMemoryArea.consumed)",
-                            originalWorkingSpace.fileName,
-                            new Position(originalWorkingSpace.pos.getLine(), 
-                                    originalWorkingSpace.pos.getColumn())),
-                    programMethod.getContainerType(),
-                    selfVar, 
-                    paramVars, 
-                    resultVar, 
-                    excVar,
-                    atPreFunctions).getFormula();
-            Term oldWS = translator.translateExpression(
-                    new PositionedString("\\old("+ws.substring(0, ws.length()-1)+")",
-                            originalWorkingSpace.fileName,
-                            new Position(originalWorkingSpace.pos.getLine(), 
-                                    originalWorkingSpace.pos.getColumn()-5)),
-                    programMethod.getContainerType(),
-                    selfVar, 
-                    paramVars, 
-                    resultVar, 
-                    excVar,
-                    atPreFunctions).getFormula();
-            Function add = (Function) services.getNamespaces().functions().lookup(new Name("add"));
-            Function leq = (Function) services.getNamespaces().functions().lookup(new Name("leq"));
-            wsPost = new FormulaWithAxioms(TB.func(leq, imCons, TB.func(add, oldCons, oldWS)));
-            
-            workingSpace
-                = translator.translateExpression(
-                    originalWorkingSpace,
-                    programMethod.getContainerType(),
-                    selfVar, 
-                    paramVars, 
-                    resultVar, 
-                    excVar,
-                    atPreFunctions).getFormula();
-        }     
+        if(originalWorkingSpace==null){
+            originalWorkingSpace = new PositionedString("0;");
+        }
+        String ws = originalWorkingSpace.text.trim();
+        Term oldCons = translator.translateExpression(
+                new PositionedString("\\old(\\currentMemoryArea.consumed)",
+                        originalWorkingSpace.fileName,
+                        new Position(originalWorkingSpace.pos.getLine(), 
+                                originalWorkingSpace.pos.getColumn())),
+                                programMethod.getContainerType(),
+                                selfVar, 
+                                paramVars, 
+                                resultVar, 
+                                excVar,
+                                atPreFunctions).getFormula();
+        Term oldWS = translator.translateExpression(
+                new PositionedString("\\old("+ws.substring(0, ws.length()-1)+")",
+                        originalWorkingSpace.fileName,
+                        new Position(originalWorkingSpace.pos.getLine(), 
+                                originalWorkingSpace.pos.getColumn()-5)),
+                                programMethod.getContainerType(),
+                                selfVar, 
+                                paramVars, 
+                                resultVar, 
+                                excVar,
+                                atPreFunctions).getFormula();
+        Function add = (Function) services.getNamespaces().functions().lookup(new Name("add"));
+        Function leq = (Function) services.getNamespaces().functions().lookup(new Name("leq"));
+        wsPost = new FormulaWithAxioms(TB.func(leq, imCons, TB.func(add, oldCons, oldWS)));
+                
+        workingSpace = translator.translateExpression(
+                originalWorkingSpace,
+                programMethod.getContainerType(),
+                selfVar, 
+                paramVars, 
+                resultVar, 
+                excVar,
+                atPreFunctions).getFormula();
+             
         
         
-        if(originalConstructedWorkingSpace!=null){
-            constructedWorkingSpace
-                = translator.translateExpression(
-                    originalConstructedWorkingSpace,
-                    programMethod.getContainerType(),
-                    selfVar, 
-                    paramVars, 
-                    resultVar, 
-                    excVar,
-                    atPreFunctions).getFormula();
-        } 
+        if(originalConstructedWorkingSpace==null){
+            originalConstructedWorkingSpace = new PositionedString("0;");
+        }
+        constructedWorkingSpace = translator.translateExpression(
+                        originalConstructedWorkingSpace,
+                        programMethod.getContainerType(),
+                        selfVar, 
+                        paramVars, 
+                        resultVar, 
+                        excVar,
+                        atPreFunctions).getFormula();
+         
         
         //translate assignable
         SetOfLocationDescriptor assignable;
@@ -545,7 +547,9 @@ public class JMLSpecFactory {
                             ListOfPositionedString originalPredicates,
                             ListOfPositionedString originalAssignable,
                             PositionedString originalVariant,
-                            PositionedString originalWorkingSpace) 
+                            PositionedString originalWorkingSpaceLocal,
+                            PositionedString originalWorkingSpaceConstructed,
+                            PositionedString originalWorkingSpaceReentrant) 
             throws SLTranslationException {                
         assert programMethod != null;
         assert loop != null;
@@ -625,11 +629,11 @@ public class JMLSpecFactory {
             }
         }
         
-        Term workingSpace = null;
-        if(originalWorkingSpace!=null){
+        Term workingSpaceLocal = null;
+        if(originalWorkingSpaceLocal!=null){
             FormulaWithAxioms translated 
                 = translator.translateExpression(
-                        originalWorkingSpace,
+                        originalWorkingSpaceLocal,
                         programMethod.getContainerType(),
                         selfVar,
                         paramVars,
@@ -637,7 +641,35 @@ public class JMLSpecFactory {
                         null,
                         atPreFunctions);
             assert translated.getAxioms().isEmpty();
-            workingSpace = translated.getFormula(); 
+            workingSpaceLocal = translated.getFormula(); 
+        }
+        
+        Term workingSpaceConstructed = null;
+        if(originalWorkingSpaceConstructed!=null){
+            FormulaWithAxioms translated 
+                = translator.translateExpression(
+                        originalWorkingSpaceConstructed,
+                        programMethod.getContainerType(),
+                        selfVar,
+                        paramVars,
+                        null,
+                        null,
+                        atPreFunctions);
+            workingSpaceConstructed = translated.getFormula(); 
+        }
+        
+        Term workingSpaceReentrant = null;
+        if(originalWorkingSpaceConstructed!=null){
+            FormulaWithAxioms translated 
+                = translator.translateExpression(
+                        originalWorkingSpaceReentrant,
+                        programMethod.getContainerType(),
+                        selfVar,
+                        paramVars,
+                        null,
+                        null,
+                        atPreFunctions);
+            workingSpaceReentrant = translated.getFormula(); 
         }
         
         //translate assignable
@@ -689,7 +721,9 @@ public class JMLSpecFactory {
                                      predicates,
                                      assignable,
                                      variant,
-                                     workingSpace,
+                                     workingSpaceLocal,
+                                     workingSpaceConstructed,
+                                     workingSpaceReentrant,
                                      selfTerm,
                                      atPreFunctions,
                                      true);
@@ -708,6 +742,8 @@ public class JMLSpecFactory {
                                       textualLoopSpec.getPredicates(),
                                       textualLoopSpec.getAssignable(),
                                       textualLoopSpec.getVariant(),
-                                      textualLoopSpec.getWorkingSpace());
+                                      textualLoopSpec.getWorkingSpaceLocal(),
+                                      textualLoopSpec.getWorkingSpaceConstructed(),
+                                      textualLoopSpec.getWorkingSpaceReentrant());
     }
 }
