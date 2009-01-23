@@ -29,20 +29,20 @@ public class Z3Solver extends AbstractSmtProver {
     
     @Override
     protected String[] getExecutionCommand(String filename, StringBuffer formula) {
-	String[] toReturn = new String[2];
+	String[] toReturn = new String[3];
 
 	toReturn[0] = "z3";
-	toReturn[1] = "< " + filename;
-//	toReturn[2] = "\"" + formula.toString() + "\"";
+	toReturn[1] = "-smt";
+	toReturn[2] = filename;
 	
 	return toReturn;
     }
     
     @Override
     protected RESULTTYPE answerType(String answer) {
-	if (answer.equals("unsat")) {
+	if (answer.contains("unsat")) {
 	    return SmtSolver.RESULTTYPE.VALID;
-	} else if (answer.equals("sat")) {
+	} else if (answer.contains("sat")) {
 	    return SmtSolver.RESULTTYPE.INVALID;
 	} else {
 	    return SmtSolver.RESULTTYPE.UNKNOWN;
