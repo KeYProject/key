@@ -121,6 +121,8 @@ tokens {
     WORKING_SPACE_SINGLE_ITERATION_REENTRANT	= "working_space_single_iteration_reentrant";
     WORKING_SPACE_CONSTRUCTED 		= "working_space_constructed";
     WORKING_SPACE_LOCAL 		= "working_space_local";
+    WORKING_SPACE_CALLER 		= "working_space_caller";
+    WORKING_SPACE_REENTRANT 		= "working_space_reentrant";
     WRITABLE			= "writable";    
 }
 

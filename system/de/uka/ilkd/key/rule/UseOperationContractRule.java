@@ -603,11 +603,12 @@ public class UseOperationContractRule implements BuiltInRule {
                     atPreUpdate}),wsEq);
         }else if(services.getProof().getSettings().getProfile() instanceof PercProfile &&
                 pm.getKeYJavaType()!=null){
-                Term size = TB.var(services.getJavaInfo().
-                        getAttribute(ImplicitFieldAdder.IMPLICIT_SIZE, pm.getKeYJavaType()));
-                wsEq = TB.equals(ws, size);
-                wsEq = uf.apply(uf.sequential(new Update[]{selfParamsUpdate,
-                        atPreUpdate}),wsEq);
+//                Term size = TB.var(services.getJavaInfo().
+//                        getAttribute(ImplicitFieldAdder.IMPLICIT_SIZE, pm.getKeYJavaType()));
+//                wsEq = TB.equals(ws, size);
+            wsEq = TB.equals(ws, cwi.contract.getCallerWorkingSpace(selfVar, paramVars, services));
+            wsEq = uf.apply(uf.sequential(new Update[]{selfParamsUpdate,
+                    atPreUpdate}),wsEq);
         }
             
         postTerm = TB.imp(wsEq, postTerm);

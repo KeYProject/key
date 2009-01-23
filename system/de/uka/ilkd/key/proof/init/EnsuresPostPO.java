@@ -72,7 +72,7 @@ public class EnsuresPostPO extends EnsuresPO {
             = createdFactory.createCreatedAndNotNullTerm(services, t_mem);
         result = TB.and(result, initialMemCreatedAndNotNullTerm);
         
-        Term workingSpace = contract.getWorkingSpace(selfVar, toPV(paramVars), services);
+        Term workingSpace=null;
         final ProgramVariable size = services.getJavaInfo().getAttribute(
                 "size", "javax.realtime.MemoryArea");
         final ProgramVariable consumed = services.getJavaInfo().getAttribute(
@@ -82,13 +82,26 @@ public class EnsuresPostPO extends EnsuresPO {
         
         if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile &&
                 contract.getProgramMethod().getKeYJavaType()!=null){
-            workingSpace = TB.var(services.getJavaInfo().
-                    getAttribute(ImplicitFieldAdder.IMPLICIT_SIZE, contract.getProgramMethod().getKeYJavaType()));
-            result = TB.and(result, TB.func(leq, TB.func(add, TB.dot(t_mem,consumed), 
-                    workingSpace), TB.dot(t_mem, size)));
+            workingSpace = contract.getCallerWorkingSpace(selfVar, toPV(paramVars), services);
+//            workingSpace = TB.var(services.getJavaInfo().
+//                    getAttribute(ImplicitFieldAdder.IMPLICIT_SIZE, contract.getProgramMethod().getKeYJavaType()));
         }else if(contract.getWorkingSpace(selfVar, toPV(paramVars), services)!=null){
+            workingSpace = contract.getWorkingSpace(selfVar, toPV(paramVars), services);
+        }
+        if(workingSpace!=null){
             result = TB.and(result, TB.func(leq, TB.func(add, TB.dot(t_mem,consumed), 
                     workingSpace), TB.dot(t_mem, size)));
+        }
+        
+        if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile &&
+                !contract.getProgramMethod().isStatic()){
+            final ProgramVariable memoryArea = services.getJavaInfo().getAttribute(
+                    ImplicitFieldAdder.IMPLICIT_MEMORY_AREA, services.getJavaInfo().getJavaLangObject());
+            Term reentrantWorkingSpace = contract.getReentrantWorkingSpace(selfVar, toPV(paramVars), services);
+            Term thisCons = TB.dot(TB.dot(TB.var(selfVar), memoryArea), consumed);
+            Term thisSize = TB.dot(TB.dot(TB.var(selfVar), memoryArea), size);
+            result = TB.and(result, TB.func(leq, TB.func(add, thisCons, 
+                    reentrantWorkingSpace), thisSize));
         }
 
         return result;

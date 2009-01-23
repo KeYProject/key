@@ -281,6 +281,8 @@ public class DLSpecFactory {
                                          modifies,
                                          ws,
                                          ws,
+                                         ws,
+                                         ws,
                                          selfVar,
                                          paramVars,
                                          resultVar,

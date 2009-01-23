@@ -515,6 +515,8 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
 	|   ps=working_space_clause  { sc.setWorkingSpace(ps);}
 	|   ps=constructed_working_space_clause  { sc.setConstructedWorkingSpace(ps);}
+	|   ps=reentrant_working_space_clause  { sc.setReentrantWorkingSpace(ps);}
+	|   ps=caller_working_space_clause  { sc.setCallerWorkingSpace(ps);}
 	|   captures_clause 
 	|   when_clause
 	|   duration_clause
@@ -583,6 +585,18 @@ constructed_working_space_clause returns [PositionedString result = null]
 	throws SLTranslationException
 :
 	WORKING_SPACE_CONSTRUCTED result=expression
+;
+
+caller_working_space_clause returns [PositionedString result = null]
+	throws SLTranslationException
+:
+	WORKING_SPACE_CALLER result=expression
+;
+
+reentrant_working_space_clause returns [PositionedString result = null]
+	throws SLTranslationException
+:
+	WORKING_SPACE_REENTRANT result=expression
 ;
 
 signals_clause 

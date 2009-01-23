@@ -293,8 +293,7 @@ public class POBrowser extends JDialog {
 
         //RespectsWorkingSpace
         if(specRepos.getOperationContracts(pm).size() > 0 && 
-                (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile ||
-                        ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile)) {
+                (ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof RTSJProfile)) {
             pos = pos.append("RespectsWorkingSpace");           
         }
         

@@ -110,6 +110,14 @@ public interface OperationContract {
                 ListOfParsableVariable paramVars,
                 Services services);
     
+    public Term getCallerWorkingSpace(ParsableVariable selfVar, 
+            ListOfParsableVariable paramVars,
+            Services services);
+    
+    public Term getReentrantWorkingSpace(ParsableVariable selfVar, 
+            ListOfParsableVariable paramVars,
+            Services services);
+    
     public Term getConstructedWorkingSpace(Term self, 
             ListOfTerm params,
             Services services);

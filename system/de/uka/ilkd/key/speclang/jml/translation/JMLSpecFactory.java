@@ -214,7 +214,9 @@ public class JMLSpecFactory {
                                 ListOfPositionedString originalSignalsOnly,
                                 ListOfPositionedString originalDiverges,
                                 PositionedString originalWorkingSpace,
-                                PositionedString originalConstructedWorkingSpace) 
+                                PositionedString originalConstructedWorkingSpace,
+                                PositionedString originalCallerWorkingSpace,
+                                PositionedString originalReentrantWorkingSpace) 
             throws SLTranslationException {
         assert programMethod != null;
         assert originalBehavior != null;
@@ -313,6 +315,32 @@ public class JMLSpecFactory {
         }
         constructedWorkingSpace = translator.translateExpression(
                         originalConstructedWorkingSpace,
+                        programMethod.getContainerType(),
+                        selfVar, 
+                        paramVars, 
+                        resultVar, 
+                        excVar,
+                        atPreFunctions).getFormula();
+        
+        Term callerWorkingSpace = null;
+        if(originalCallerWorkingSpace==null){
+            originalCallerWorkingSpace = new PositionedString("0;");
+        }
+        callerWorkingSpace = translator.translateExpression(
+                        originalCallerWorkingSpace,
+                        programMethod.getContainerType(),
+                        selfVar, 
+                        paramVars, 
+                        resultVar, 
+                        excVar,
+                        atPreFunctions).getFormula();
+        
+        Term reentrantWorkingSpace = null;
+        if(originalReentrantWorkingSpace==null){
+            originalReentrantWorkingSpace = new PositionedString("0;");
+        }
+        reentrantWorkingSpace = translator.translateExpression(
+                        originalReentrantWorkingSpace,
                         programMethod.getContainerType(),
                         selfVar, 
                         paramVars, 
@@ -437,6 +465,8 @@ public class JMLSpecFactory {
                                             assignable,
                                             workingSpace,
                                             constructedWorkingSpace,
+                                            reentrantWorkingSpace,
+                                            callerWorkingSpace,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -456,6 +486,8 @@ public class JMLSpecFactory {
                                             assignable,
                                             workingSpace,
                                             constructedWorkingSpace,
+                                            reentrantWorkingSpace,
+                                            callerWorkingSpace,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -476,6 +508,8 @@ public class JMLSpecFactory {
                                             assignable,
                                             workingSpace,
                                             constructedWorkingSpace,
+                                            reentrantWorkingSpace,
+                                            callerWorkingSpace,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -492,6 +526,8 @@ public class JMLSpecFactory {
                                             assignable,
                                             workingSpace,
                                             constructedWorkingSpace,
+                                            reentrantWorkingSpace,
+                                            callerWorkingSpace,
                                             selfVar,
                                             paramVars,
                                             resultVar,
@@ -518,7 +554,9 @@ public class JMLSpecFactory {
                                     textualSpecCase.getSignalsOnly(),
                                     textualSpecCase.getDiverges(),
                                     textualSpecCase.getWorkingSpace(),
-                                    textualSpecCase.getConstructedWorkingSpace());
+                                    textualSpecCase.getConstructedWorkingSpace(),
+                                    textualSpecCase.getCallerWorkingSpace(),
+                                    textualSpecCase.getReentrantWorkingSpace());
     }
     
     
