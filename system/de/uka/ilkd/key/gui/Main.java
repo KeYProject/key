@@ -2311,7 +2311,7 @@ public class Main extends JFrame implements IMain {
             smtZipProblemDirOption.setSelected( currentSetting.doZipProblemDir() );*/
                         
             // Inform the decproc classes that the selected proof has changed!
-            DecisionProcedureSmtAuflia.fireSelectedProofChanged( proof );                       
+            //DecisionProcedureSmtAuflia.fireSelectedProofChanged( proof );                       
         }
         
         /**

@@ -65,6 +65,9 @@ public class DecisionProcedureSettings implements Settings {
     /** the currently active rule */
     int activeRule = -1;
     
+    /** the String for the classes of Solver **/
+    String solver = "de.uka.ilkd.key.smt.SimplifySolver:de.uka.ilkd.key.smt.Z3Solver:de.uka.ilkd.key.smt.YicesSmtSolver";
+    
     // getter
 /*    public String getDecisionProcedure() {
         return decision_procedure;
@@ -98,7 +101,9 @@ public class DecisionProcedureSettings implements Settings {
         }
     }
 */  
-    
+    public DecisionProcedureSettings() {
+	super();
+    }
     
     /** Enables archiving of SMT benchmarks (which were translated from sequents) during execution
      * of SMT compliant external decision procedures  
@@ -244,21 +249,24 @@ public class DecisionProcedureSettings implements Settings {
      */
     public void readSettings(Properties props) {
 	String ar = props.getProperty(AVAILABLE_RULES);
-	if (ar == null) {
-	    ar = "de.uka.ilkd.key.smt.SimplifySolver";
+	if (true || ar == null) {
+//TODO: Reading from settings does not work yet!	    
+	    ar = "de.uka.ilkd.key.smt.SimplifySolver:de.uka.ilkd.key.smt.Z3Solver:de.uka.ilkd.key.smt.YicesSmtSolver";
 	}
-	String[] availableRules = ar.split(":");		
+	this.solver = ar;
+	String[] availableRules = ar.split(":");
+	ArrayList<String> errors = new ArrayList<String>();
 	for (int i = 0; i < availableRules.length; i++) {
 	    try {
 		Class rule = Class.forName(availableRules[i]);
 		SmtSolver s = (SmtSolver)rule.newInstance();
 		rules.add(new SMTRule(s));
 	    } catch (ClassNotFoundException e) {
-		//TODO implement warning
+		errors.add("Class " + availableRules[i] + " could not be found.");
 	    } catch (InstantiationException e) {
-		//TODO handle exception
+		errors.add("Class " + availableRules[i] + " could not be instantiated.");
 	    } catch (IllegalAccessException e) {
-		//TODO handle exception
+		errors.add("IllegalAccessException while loading Class " + availableRules[i]);
 	    }
 	}		
 	int curr = Integer.parseInt(props.getProperty(ACTIVE_RULE));
@@ -266,6 +274,14 @@ public class DecisionProcedureSettings implements Settings {
 	    this.activeRule = curr;
 	} else {
 	    this.activeRule = -1;
+	}
+	
+	if (errors.size() > 0) {
+	    String s = "";
+	    for (String temp : errors) {
+		s = s + temp + "\n";
+	    }
+	    throw new RuntimeException(s);
 	}
 	
 /*        String dec_proc_string = 
@@ -323,6 +339,7 @@ public class DecisionProcedureSettings implements Settings {
      */
     public void writeSettings(Properties props) {
         props.setProperty(ACTIVE_RULE, "" + this.activeRule);
+        props.setProperty(AVAILABLE_RULES, this.solver);
         //props.setProperty(DECISION_PROCEDURE_FOR_TEST, getDecisionProcedureForTest());        
         //props.setProperty( SMT_BENCHMARK_ARCHIVING, "" + smt_benchmark_archiving );
         //props.setProperty( SMT_ZIP_PROBLEM_DIR,     "" + smt_zip_problem_dir );

@@ -58,46 +58,81 @@ public class DecProcRunner implements Runnable {
          * the worker is interrupted because we catch the
          * InterruptedException in doWork().
          */
-        SwingWorker worker = new SwingWorker() {
-            public Object construct() {
-                Object res = doWork();
-                return res;
-            }
-            public void finished() {
-                final KeYMediator mediator = main.mediator();
-                mediator.startInterface(true);		
-                String msg = (String) get();
-                if(!"".equals(msg)) {
-                    if(Main.batchMode){
-                        System.exit(-1);
-                    } else {
-//                      mediator.notify(new GeneralFailureEvent(re.getMessage()));
-                        new ExceptionDialog(Main.hasInstance() ? Main.getInstance() :
-                            null, exceptionHandler.getExceptions());
-                        exceptionHandler.clear();
-                    }
-                } else {
-                    int nrGoalsClosed = mediator.getNrGoalsClosedByAutoMode();
-                    main.setStatusLine( simpRule.displayName() + ": " + totalGoals + 
-                            (totalGoals != 1 ? " goals" : " goal" ) + " processed, " + nrGoalsClosed + 
-                            (nrGoalsClosed != 1 ? " goals" : " goal" )+ " could be closed!" );
-                    if (nrGoalsClosed > 0 && !proof.closed()) {
-                        final String informationMsg =
-                            nrGoalsClosed + ((nrGoalsClosed > 1) ? 
-                                    " goals have been closed": 
-                            " goal has been closed");
-                        mediator.notify(
-                                new GeneralInformationEvent(informationMsg));			   
-                    }
-
-                }
-            }
-        };
+//        SwingWorker worker = new SwingWorker() {
+//            public Object construct() {
+//                Object res = doWork();
+//                return res;
+//            }
+//            public void finished() {
+//                final KeYMediator mediator = main.mediator();
+//                mediator.startInterface(true);		
+//                String msg = (String) get();
+//                if(!"".equals(msg)) {
+//                    if(Main.batchMode){
+//                        System.exit(-1);
+//                    } else {
+////                      mediator.notify(new GeneralFailureEvent(re.getMessage()));
+//                        new ExceptionDialog(Main.hasInstance() ? Main.getInstance() :
+//                            null, exceptionHandler.getExceptions());
+//                        exceptionHandler.clear();
+//                    }
+//                } else {
+//                    int nrGoalsClosed = mediator.getNrGoalsClosedByAutoMode();
+//                    main.setStatusLine( simpRule.displayName() + ": " + totalGoals + 
+//                            (totalGoals != 1 ? " goals" : " goal" ) + " processed, " + nrGoalsClosed + 
+//                            (nrGoalsClosed != 1 ? " goals" : " goal" )+ " could be closed!" );
+//                    if (nrGoalsClosed > 0 && !proof.closed()) {
+//                        final String informationMsg =
+//                            nrGoalsClosed + ((nrGoalsClosed > 1) ? 
+//                                    " goals have been closed": 
+//                            " goal has been closed");
+//                        mediator.notify(
+//                                new GeneralInformationEvent(informationMsg));			   
+//                    }
+//
+//                }
+//            }
+//        };
         main.mediator().stopInterface(true);
-        worker.start();
+        //worker.start();
+        Object res = construct();
+        finished(res);
     }
 
+    public void finished(Object res) {
+        final KeYMediator mediator = main.mediator();
+        mediator.startInterface(true);		
+        String msg = (String) res;
+        if(!"".equals(msg)) {
+            if(Main.batchMode){
+                System.exit(-1);
+            } else {
+//              mediator.notify(new GeneralFailureEvent(re.getMessage()));
+                new ExceptionDialog(Main.hasInstance() ? Main.getInstance() :
+                    null, exceptionHandler.getExceptions());
+                exceptionHandler.clear();
+            }
+        } else {
+            int nrGoalsClosed = mediator.getNrGoalsClosedByAutoMode();
+            main.setStatusLine( simpRule.displayName() + ": " + totalGoals + 
+                    (totalGoals != 1 ? " goals" : " goal" ) + " processed, " + nrGoalsClosed + 
+                    (nrGoalsClosed != 1 ? " goals" : " goal" )+ " could be closed!" );
+            if (nrGoalsClosed > 0 && !proof.closed()) {
+                final String informationMsg =
+                    nrGoalsClosed + ((nrGoalsClosed > 1) ? 
+                            " goals have been closed": 
+                    " goal has been closed");
+                mediator.notify(
+                        new GeneralInformationEvent(informationMsg));			   
+            }
 
+        }
+    }
+    
+    public Object construct() {
+        Object res = doWork();
+        return res;
+    }
 
     private Object doWork() {
         String status = "";

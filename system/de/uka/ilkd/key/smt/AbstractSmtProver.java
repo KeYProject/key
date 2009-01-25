@@ -267,7 +267,7 @@ public abstract class AbstractSmtProver implements SmtSolver{
 			    .error(
 				    "The program for proving a Formula with external tool could not be executed.",
 				    e);
-		    throw new RuntimeException(e.getMessage() + "\nMake shure the command is in your PATH variable.");
+		    throw new RuntimeException(e.getMessage() + "\nMake sure the command is in your PATH variable.");
 		} finally {
 		    //remove the created file
 		    File f = new File(loc);
