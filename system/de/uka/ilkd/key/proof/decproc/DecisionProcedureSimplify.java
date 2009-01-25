@@ -164,10 +164,10 @@ public class DecisionProcedureSimplify extends AbstractDecisionProcedure {
 	    if (response.indexOf("Valid.") > 0) {
 		logger.info("Simplify has decided and found the formula to be valid.");
 		return new DecisionProcedureResult
-		    (true, response, constraintSet.chosenConstraint, st);
+		    (true, response, constraintSet.chosenConstraint(), st);
 	    } else {
 		return new DecisionProcedureResult
-		    (false, response, constraintSet.chosenConstraint, st);
+		    (false, response, constraintSet.chosenConstraint(), st);
 	    }
 	} catch (IOException ioe) {
 	    final String errorMessage = "\"Simplify\" execution failed:\n\n"+
@@ -181,7 +181,7 @@ public class DecisionProcedureSimplify extends AbstractDecisionProcedure {
             throw new RuntimeException(errorMessage);
 	} catch (SimplifyException se) {
 	    return new DecisionProcedureResult(false, se.toString(), 
-					       constraintSet.chosenConstraint);
+					       constraintSet.chosenConstraint());
         }	
     }
 
