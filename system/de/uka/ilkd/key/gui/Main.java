@@ -1556,6 +1556,14 @@ public class Main extends JFrame implements IMain {
 	    ruleButton.add(b);
 	    decisionProcedureOption.add(b);
 	}
+	//check only the active radio box
+	for (int i = 0; i < ruleButton.size(); i++) {
+	    if (i == ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveRuleIndex()) {
+		ruleButton.get(i).setSelected(true);
+	    } else {
+		ruleButton.get(i).setSelected(false);
+	    }
+	}
 	
 	
 	
@@ -2349,8 +2357,14 @@ public class Main extends JFrame implements IMain {
             for (int i = 0; i < ruleButton.size(); i++) {
         	if (e.getSource() == ruleButton.get(i)) {
         	    currentSettings.getDecisionProcedureSettings().setActiveRule(i);
+        	    ruleButton.get(i).setSelected(true);
+        	} else {
+        	    ruleButton.get(i).setSelected(false);
         	}
             }
+            //update the radion group
+            
+            //update the button for invoking the rule
             updateDecisionProcedureButton();
             
             /*if (e.getSource() == simplifyButton) {
@@ -3525,6 +3539,8 @@ public class Main extends JFrame implements IMain {
          */
         private void setupDecisionProcedureGroup(ButtonGroup decisionProcGroup, 
                 JMenu decisionProcedureOption) {
+            
+            System.out.println("just test");
             
             /*final JRadioButtonMenuItem simplifyButton = 
                 new JRadioButtonMenuItem("Simplify", ProofSettings.DEFAULT_SETTINGS.

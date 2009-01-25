@@ -267,6 +267,7 @@ public abstract class AbstractSmtProver implements SmtSolver{
 			    .error(
 				    "The program for proving a Formula with external tool could not be executed.",
 				    e);
+		    throw new RuntimeException(e.getMessage() + "\nMake shure the command is in your PATH variable.");
 		} finally {
 		    //remove the created file
 		    File f = new File(loc);
@@ -275,10 +276,12 @@ public abstract class AbstractSmtProver implements SmtSolver{
 	    } catch (IOException e) {
 		logger.error("The file with the formula could not be written.",
 			e);
+		throw new RuntimeException(e.getMessage());
 	    }
 	} catch (IllegalFormulaException e) {
 	    toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
 	    logger.error("The formula could not be translated.", e);
+	    throw new RuntimeException("The formula could not be translated.\n" + e.getMessage());
 	}
 	return toReturn;
     }
