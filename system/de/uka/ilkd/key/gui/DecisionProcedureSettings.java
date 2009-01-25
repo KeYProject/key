@@ -244,10 +244,10 @@ public class DecisionProcedureSettings implements Settings {
      */
     public void readSettings(Properties props) {
 	String ar = props.getProperty(AVAILABLE_RULES);
-System.out.println("+++++++++++ Here");	
-ar = "de.uka.ilkd.key.smt.SimplifySolver:de.uka.ilkd.key.smt.Z3Solver:de.uka.ilkd.key.smt.YicesSmtSolver";
-	String[] availableRules = ar.split(":");
-	System.out.println("+++++++++++ Here2");		
+	if (ar == null) {
+	    ar = "de.uka.ilkd.key.smt.SimplifySolver";
+	}
+	String[] availableRules = ar.split(":");		
 	for (int i = 0; i < availableRules.length; i++) {
 	    try {
 		Class rule = Class.forName(availableRules[i]);
@@ -260,10 +260,8 @@ ar = "de.uka.ilkd.key.smt.SimplifySolver:de.uka.ilkd.key.smt.Z3Solver:de.uka.ilk
 	    } catch (IllegalAccessException e) {
 		//TODO handle exception
 	    }
-	}
-	System.out.println("+++++++++++ Here3");		
+	}		
 	int curr = Integer.parseInt(props.getProperty(ACTIVE_RULE));
-	System.out.println("+++++++++++ Here3 : " + curr);
 	if (curr >= 0 && curr < rules.size()) {
 	    this.activeRule = curr;
 	} else {
