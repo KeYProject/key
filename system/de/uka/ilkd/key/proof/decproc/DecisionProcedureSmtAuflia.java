@@ -225,16 +225,21 @@ public abstract class DecisionProcedureSmtAuflia extends AbstractDecisionProcedu
         // Translate given sequent
         logger.info( "Issuing new translation request at time: " + 
                      getCurrentDateString().substring( 11, 20 ) );
+        //HACK!!
+        //SmtAufliaTranslation sequentTranslation = 
+        //    dptf.createSmtAufliaTranslation( goal.sequent(), this.services, 
+        //                                     currentDecprocSettings.useQuantifiers() );
         SmtAufliaTranslation sequentTranslation = 
             dptf.createSmtAufliaTranslation( goal.sequent(), this.services, 
-                                             currentDecprocSettings.useQuantifiers() );
+                                             true );
         logger.info( "Retrieving translation result" );
         resultBenchmark = sequentTranslation.getBenchmark();
         DecisionProcedureResult result;
         
         // Check if a backend decision procedure should be called or only archiving is to be done
-        if ( !currentDecprocSettings.useSMT_Translation() ) {
-
+        //HACK!!
+        //if ( !currentDecprocSettings.useSMT_Translation() ) {
+        if ( false ) {
             // Backend decision procedure part
             try {    
                 // Write result to file
@@ -271,10 +276,11 @@ public abstract class DecisionProcedureSmtAuflia extends AbstractDecisionProcedu
                 
         
         // At last, archive the created benchmark
-       
-        if ( currentDecprocSettings.doBenchmarkArchiving() ||
-             currentDecprocSettings.useSMT_Translation() ) {
-
+       //HACK!!
+        //if ( currentDecprocSettings.doBenchmarkArchiving() ||
+        //     currentDecprocSettings.useSMT_Translation() ) {
+        if (false) {
+        
             // If archiving of benchmarks is enabled, extend benchmarks with notes and archive them 
             logger.info( "Setting extended benchmark attributes" );
             resultBenchmark.setSource();
@@ -290,8 +296,10 @@ public abstract class DecisionProcedureSmtAuflia extends AbstractDecisionProcedu
                 File archDir = new File( currentArchiveDir );
                 archDir.mkdirs();
                 if ( loadedProblem.isDirectory() ) {
-                    if ( ! currentProof.getSettings().getDecisionProcedureSettings()
-                           .doZipProblemDir() ) {
+                    //HACK!!
+                    //if ( ! currentProof.getSettings().getDecisionProcedureSettings()
+                    //       .doZipProblemDir() ) {
+                    if (false) {
                         // Just save path to problem...
                         logger.info( "Directory zipping disabled. Saving problem file path");
                         File pathFile = new File( archDir, loadedProblem.getName() );

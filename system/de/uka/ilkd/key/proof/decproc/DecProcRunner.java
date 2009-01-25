@@ -28,8 +28,9 @@ import de.uka.ilkd.key.util.KeYExceptionHandler;
 public class DecProcRunner implements Runnable {
 
     private final IMain main;
-    private final String currentDecProc;
-
+    //private final String currentDecProc;
+    //private final int activeRule;
+    
     private final Proof proof;
     private int totalGoals = 0;
     private final KeYExceptionHandler exceptionHandler;
@@ -43,8 +44,10 @@ public class DecProcRunner implements Runnable {
         this.userConstraint = userConstraint;
         
         this.simpRule = getIntegerDecisionProcedure();
-        currentDecProc = proof.getSettings().
-            getDecisionProcedureSettings().getDecisionProcedure();          
+        //currentDecProc = proof.getSettings().
+        //    getDecisionProcedureSettings().getDecisionProcedure();
+        //activeRule = proof.getSettings().
+        //    getDecisionProcedureSettings().getActiveRuleIndex();
         exceptionHandler = main.mediator().getExceptionHandler();
     }
 
@@ -75,7 +78,7 @@ public class DecProcRunner implements Runnable {
                     }
                 } else {
                     int nrGoalsClosed = mediator.getNrGoalsClosedByAutoMode();
-                    main.setStatusLine( currentDecProc + ": " + totalGoals + 
+                    main.setStatusLine( simpRule.displayName() + ": " + totalGoals + 
                             (totalGoals != 1 ? " goals" : " goal" ) + " processed, " + nrGoalsClosed + 
                             (nrGoalsClosed != 1 ? " goals" : " goal" )+ " could be closed!" );
                     if (nrGoalsClosed > 0 && !proof.closed()) {
@@ -108,7 +111,7 @@ public class DecProcRunner implements Runnable {
                 mediator.stopInterface(true);
                 mediator.setInteractive(false);
                 main.setStatusLine("Running external decision procedure: " +
-                        currentDecProc, totalGoals);
+                        simpRule.displayName(), totalGoals);
                 
                 // TODO: use always only one rule instance and register the rule at 
                 // a central place 
@@ -138,8 +141,8 @@ public class DecProcRunner implements Runnable {
 
     // TODO remove creation of new rules
     private BuiltInRule getIntegerDecisionProcedure() {
-        BuiltInRule rule = null;
-        final DecisionProcedureSettings decProcSettings = proof.getSettings()
+        BuiltInRule rule = proof.getSettings().getDecisionProcedureSettings().getActiveRule();
+        /*final DecisionProcedureSettings decProcSettings = proof.getSettings()
                 .getDecisionProcedureSettings();
         if (decProcSettings.useSimplify())
             rule = new SimplifyIntegerRule(false,
@@ -161,7 +164,7 @@ public class DecProcRunner implements Runnable {
                     new JavaDecisionProcedureTranslationFactory());
         else if (decProcSettings.useSMT_Translation())
             rule = new SmtTranslationIntegerRule(false,
-                    new JavaDecisionProcedureTranslationFactory());
+                    new JavaDecisionProcedureTranslationFactory());*/
         return rule;
     }
 

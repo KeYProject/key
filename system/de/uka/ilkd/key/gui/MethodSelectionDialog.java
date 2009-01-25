@@ -3,6 +3,7 @@ package de.uka.ilkd.key.gui;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -21,10 +22,11 @@ public class MethodSelectionDialog extends JDialog {
     private UnitTestBuilder testBuilder;
     private KeYMediator mediator; 
     private JList methodList;
-    private final JCheckBox simplify = new JCheckBox("Simplify");
+    private ArrayList<JCheckBox> RuleBoxes = new ArrayList<JCheckBox>();
+    /*private final JCheckBox simplify = new JCheckBox("Simplify");
     private final JCheckBox cogent = new JCheckBox("Cogent");
     private final JCheckBox completeEx = new JCheckBox("Only completely "+
-						       "executed traces");
+						       "executed traces");*/
     private static MethodSelectionDialog instance=null;
     private StringBuffer latestTests=new StringBuffer();
 
@@ -44,11 +46,11 @@ public class MethodSelectionDialog extends JDialog {
 	    instance.dispose();
 	}
 	instance = new MethodSelectionDialog(mediator);
-	instance.cogent.setSelected(ModelGenerator.decProdForTestGen ==
+	/*instance.cogent.setSelected(ModelGenerator.decProdForTestGen ==
 				    ModelGenerator.COGENT);
 	instance.simplify.setSelected(ModelGenerator.decProdForTestGen ==
 				      ModelGenerator.SIMPLIFY);
-	instance.completeEx.setSelected(UnitTestBuilder.requireCompleteExecution);
+	instance.completeEx.setSelected(UnitTestBuilder.requireCompleteExecution);*/
 	return instance;
     }
 
@@ -131,7 +133,10 @@ public class MethodSelectionDialog extends JDialog {
 		}
 	    });
   	buttonPanel.add(testSel);
-	simplify.addActionListener(new ActionListener() {
+  	//add all checkboxes needed for the Rule testing
+  	//TODO: add selction of the Rules to be tested here
+  	
+	/*simplify.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    if(simplify.isSelected()){
 		        ModelGenerator.decProdForTestGen = 
@@ -198,7 +203,7 @@ public class MethodSelectionDialog extends JDialog {
 	if(ModelGenerator.decProdForTestGen == ModelGenerator.SIMPLIFY){
 	    buttonPanel.add(simplifyDataTupleNumber);	    
 	}
-   	buttonPanel.add(exit);
+   	buttonPanel.add(exit);*/
 	getContentPane().add(buttonPanel);
     }
 

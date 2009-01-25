@@ -14,6 +14,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -54,6 +55,7 @@ import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.NonInterferenceCheck;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
+import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
 import de.uka.ilkd.key.util.Debug;
@@ -222,7 +224,9 @@ public class Main extends JFrame implements IMain {
     /** menu for configuration of decision procedure */
     JMenu decisionProcedureOption = new JMenu("Decision Procedures");
     
-    JRadioButtonMenuItem simplifyButton = new JRadioButtonMenuItem("Simplify", true);
+    ArrayList<JRadioButtonMenuItem> ruleButton = new ArrayList<JRadioButtonMenuItem>();
+    
+    /*JRadioButtonMenuItem simplifyButton = new JRadioButtonMenuItem("Simplify", true);
     
     JRadioButtonMenuItem icsButton = new JRadioButtonMenuItem("ICS", false);
     
@@ -240,7 +244,7 @@ public class Main extends JFrame implements IMain {
     
     JMenuItem smtBenchmarkArchivingOption;
     
-    JMenuItem smtZipProblemDirOption;
+    JMenuItem smtZipProblemDirOption;*/
         
     private ProverTaskListener taskListener;
     
@@ -740,19 +744,23 @@ public class Main extends JFrame implements IMain {
     
     /** creates the toolbar button invoking decision procedures like ICS, Simplify */
     private JButton createDecisionProcedureButton() {
-        String toolTipText = "Run "
-            + ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings()
-            .getDecisionProcedure();
-        if ( ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().useSMT_Translation() ) {
-            toolTipText = "Run SMT Translation";
-        }
+	SMTRule r = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveRule();
+	
+	if (r != null) {
+            String toolTipText = "Run " + r.displayName();
         
-        decisionProcedureButton = new JButton();
-        decisionProcedureButton.setToolTipText(toolTipText);
-        decisionProcedureButton.setText(toolTipText);
+            //if ( ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().useSMT_Translation() ) {
+        //	toolTipText = "Run SMT Translation";
+        //    }
         
-        // select icon
-        if (ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().useSimplify()) {
+            decisionProcedureButton = new JButton();
+            decisionProcedureButton.setToolTipText(toolTipText);
+            decisionProcedureButton.setText(toolTipText);
+        
+            // select icon
+            decisionProcedureButton.setIcon(IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));
+        
+        /*if (ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().useSimplify()) {
             decisionProcedureButton.setIcon(IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));
         } else if (ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().useICS()) {
             decisionProcedureButton.setIcon(IconFactory.icsLogo(TOOLBAR_ICON_SIZE));
@@ -763,16 +771,21 @@ public class Main extends JFrame implements IMain {
                 || ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().useSMT_Translation()) {
             // TODO: use different logos?!
             decisionProcedureButton.setIcon(IconFactory.icsLogo(TOOLBAR_ICON_SIZE));
-        }
+        }*/
         
-        decisionProcedureButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (!mediator.ensureProofLoaded()) return;
-                final Proof proof = mediator.getProof();
-                new DecProcRunner(Main.this, proof, 
-                        proof.getUserConstraint().getConstraint()).run();
-            }
-        });
+            decisionProcedureButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        	    if (!mediator.ensureProofLoaded()) return;
+        	    final Proof proof = mediator.getProof();
+        	    new DecProcRunner(Main.this, proof, 
+        		    proof.getUserConstraint().getConstraint()).run();
+        	}
+            });
+	} else {
+	    decisionProcedureButton = new JButton();
+	    decisionProcedureButton.setText("no solver selected");
+	    decisionProcedureButton.setToolTipText("no solver selected");
+	}
         
         return decisionProcedureButton;
     }
@@ -1532,7 +1545,21 @@ public class Main extends JFrame implements IMain {
 
 
     private void setupDecisionProcedureGroup(ButtonGroup decisionProcGroup) {
-        simplifyButton.setSelected(ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings()
+        //add all available Rules to the ButtonGroup
+	this.ruleButton = new ArrayList<JRadioButtonMenuItem>();
+	DecisionProcButtonListener decisionProcButtonListener = new DecisionProcButtonListener();
+	for (String s : ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getAvailableRules()) {
+	    JRadioButtonMenuItem b = new JRadioButtonMenuItem();
+	    b.setText(s);
+	    b.setIcon(IconFactory.simplifyLogo(15));
+	    b.addActionListener(decisionProcButtonListener);
+	    ruleButton.add(b);
+	    decisionProcedureOption.add(b);
+	}
+	
+	
+	
+	/*simplifyButton.setSelected(ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings()
                 .useSimplify());
         simplifyButton.setIcon(IconFactory.simplifyLogo(15));
         decisionProcGroup.add(simplifyButton);
@@ -1605,7 +1632,7 @@ public class Main extends JFrame implements IMain {
                                       .getDecisionProcedureSettings().doZipProblemDir();
         smtZipProblemDirOption = new JCheckBoxMenuItem("Zip problem dir into archive", zipProblemDir);
         decisionProcedureOption.add(smtZipProblemDirOption);
-        smtZipProblemDirOption.addActionListener(decisionProcButtonListener);
+        smtZipProblemDirOption.addActionListener(decisionProcButtonListener);*/
     }    
     
     
@@ -2256,7 +2283,15 @@ public class Main extends JFrame implements IMain {
             if ( proof != null ) {
                 currentSetting = proof.getSettings().getDecisionProcedureSettings();
             }    
-            simplifyButton.setSelected( currentSetting.useSimplify() );
+            int currentActive = currentSetting.getActiveRuleIndex();
+            for (int i = 0; i < ruleButton.size(); i++) {
+        	if (currentActive == i) {
+        	    ruleButton.get(i).setSelected(true);
+        	} else {
+        	    ruleButton.get(i).setSelected(false);
+        	}
+            }
+            /*simplifyButton.setSelected( currentSetting.useSimplify() );
             icsButton.setSelected( currentSetting.useICS() );
             cvcLiteButton.setSelected( currentSetting.useCVCLite() );
             cvc3Button.setSelected( currentSetting.useCVC3() );
@@ -2265,7 +2300,7 @@ public class Main extends JFrame implements IMain {
             smtButton.setSelected( currentSetting.useSMT_Translation() );
             smtUseQuantifiersOption.setSelected( currentSetting.useQuantifiers() );
             smtBenchmarkArchivingOption.setSelected( currentSetting.doBenchmarkArchiving() );
-            smtZipProblemDirOption.setSelected( currentSetting.doZipProblemDir() );
+            smtZipProblemDirOption.setSelected( currentSetting.doZipProblemDir() );*/
                         
             // Inform the decproc classes that the selected proof has changed!
             DecisionProcedureSmtAuflia.fireSelectedProofChanged( proof );                       
@@ -2311,7 +2346,14 @@ public class Main extends JFrame implements IMain {
             if (currentProof != null)
                 currentSettings = currentProof.getSettings();
             
-            if (e.getSource() == simplifyButton) {
+            for (int i = 0; i < ruleButton.size(); i++) {
+        	if (e.getSource() == ruleButton.get(i)) {
+        	    currentSettings.getDecisionProcedureSettings().setActiveRule(i);
+        	}
+            }
+            updateDecisionProcedureButton();
+            
+            /*if (e.getSource() == simplifyButton) {
                 currentSettings.getDecisionProcedureSettings().setDecisionProcedure(
                         DecisionProcedureSettings.SIMPLIFY);
             } else if (e.getSource() == icsButton) {
@@ -2350,7 +2392,7 @@ public class Main extends JFrame implements IMain {
 	    if (currentProof != null){
 		ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setDecisionProcedure(
                     currentSettings.getDecisionProcedureSettings().getDecisionProcedure());
-	    }
+	    }*/
         }
     }
     
@@ -2359,7 +2401,11 @@ public class Main extends JFrame implements IMain {
         DecisionProcedureSettings decSettings = (currentProof == null) ? ProofSettings.DEFAULT_SETTINGS
                 .getDecisionProcedureSettings()
                 : currentProof.getSettings().getDecisionProcedureSettings();
-                if (decSettings.useSimplify()) {
+                decisionProcedureButton.setIcon(IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));
+                decisionProcedureButton.setToolTipText("Run " + decSettings.getActiveRule().displayName());
+                decisionProcedureButton.setText("Run " + decSettings.getActiveRule().displayName());
+                
+                /*if (decSettings.useSimplify()) {
                     decisionProcedureButton.setIcon(IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));
                     decisionProcedureButton.setToolTipText("Run Simplify");
                     decisionProcedureButton.setText("Run Simplify");
@@ -2387,7 +2433,7 @@ public class Main extends JFrame implements IMain {
                     decisionProcedureButton.setIcon(IconFactory.icsLogo(TOOLBAR_ICON_SIZE));
                     decisionProcedureButton.setToolTipText("Run SMT Translation");
                     decisionProcedureButton.setText("Run SMT Translation");
-                }
+                }*/
     }
         
     /**
@@ -3472,9 +3518,15 @@ public class Main extends JFrame implements IMain {
             return options;
         }
         
+        /**
+         * TODO: implement??
+         * @param decisionProcGroup
+         * @param decisionProcedureOption
+         */
         private void setupDecisionProcedureGroup(ButtonGroup decisionProcGroup, 
                 JMenu decisionProcedureOption) {
-            final JRadioButtonMenuItem simplifyButton = 
+            
+            /*final JRadioButtonMenuItem simplifyButton = 
                 new JRadioButtonMenuItem("Simplify", ProofSettings.DEFAULT_SETTINGS.
                         getDecisionProcedureSettings().useSimplifyForTest());
             decisionProcGroup.add(simplifyButton);
@@ -3527,7 +3579,7 @@ public class Main extends JFrame implements IMain {
                     cogentButton.setSelected(
                             ModelGenerator.decProdForTestGen == ModelGenerator.COGENT);
                 }
-            });
+            });*/
         }    
         
        

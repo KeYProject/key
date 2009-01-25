@@ -126,12 +126,19 @@ public abstract class AbstractDecisionProcedure {
      * single string containing all line breaks. */
     protected static String read ( InputStream in ) throws IOException {
         String lineSeparator = System.getProperty("line.separator");
+        InputStreamReader isr = new InputStreamReader(in);
         BufferedReader reader = new BufferedReader
             (new InputStreamReader(in));
         StringBuffer sb = new StringBuffer();
         String line;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line).append(lineSeparator);
+//        while ((line = reader.readLine()) != null) {
+//            sb.append(line).append(lineSeparator);
+//        }
+        boolean test = reader.ready();
+        int x = reader.read();
+        while(x > -1) {
+                sb.append((char)x);
+                x = reader.read();
         }
         return sb.toString();
     }

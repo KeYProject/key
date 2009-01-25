@@ -71,6 +71,11 @@ public class DecisionProcedureYices extends DecisionProcedureSmtAuflia {
             
             String[] cmdArray = { YicesCommand , YicesSmtFlag, super.getTempFile().getPath() };
             Process p = Runtime.getRuntime().exec( cmdArray );
+            try {
+                    p.waitFor();
+            } catch (InterruptedException e) {
+                    //do nothing?!
+            }
             logger.info( "Yices exection finished, processing results..." );
             
             // Retrieve results

@@ -9,12 +9,15 @@
 //
 package de.uka.ilkd.key.gui;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Properties;
 
 import de.uka.ilkd.key.gui.configuration.Settings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
+import de.uka.ilkd.key.smt.SMTRule;
+import de.uka.ilkd.key.smt.SmtSolver;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 
 /** This class encapsulates the information which 
@@ -23,7 +26,7 @@ import de.uka.ilkd.key.unittest.ModelGenerator;
 public class DecisionProcedureSettings implements Settings {
 
 
-    private static final String DECISION_PROCEDURE      = "[DecisionProcedure]";
+/*    private static final String DECISION_PROCEDURE      = "[DecisionProcedure]";
     private static final String DECISION_PROCEDURE_FOR_TEST = "[DecisionProcedureForTest]";
     private static final String SMT_BENCHMARK_ARCHIVING = "[DecisionProcedure]SmtBenchmarkArchiving";
     private static final String SMT_ZIP_PROBLEM_DIR     = "[DecisionProcedure]SmtZipProblemDir";
@@ -45,14 +48,30 @@ public class DecisionProcedureSettings implements Settings {
     private boolean smt_use_quantifiers = true;
 
     private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
+*/
+    
+    /** String used in the Settings to store the active rule */
+    private static final String ACTIVE_RULE  = "[DecisionProcedure]ActiveRule";
+    
+    /** String used in the Settings to store the available rules */
+    private static final String AVAILABLE_RULES  = "[DecisionProcedure]AvailableRules";
+    
+    /** the list of registered SettingListener */
+    private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
 
-
+    /** the list of available SMTRules */
+    private ArrayList<SMTRule> rules = new ArrayList<SMTRule>();
+    
+    /** the currently active rule */
+    int activeRule = -1;
+    
     // getter
-    public String getDecisionProcedure() {
+/*    public String getDecisionProcedure() {
         return decision_procedure;
     }
-        
+*/        
 
+/*    
     // setter
     public void setDecisionProcedure(String s) {
         if(!s.equals(decision_procedure)) {
@@ -60,13 +79,17 @@ public class DecisionProcedureSettings implements Settings {
             fireSettingsChanged();
         }
     }
+*/
     
+/*    
     // getter
     public String getDecisionProcedureForTest() {
         return decision_procedure_for_test;
     }
-        
+*/        
 
+    
+/*
     // setter
     public void setDecisionProcedureForTest(String s) {
         if(!s.equals(decision_procedure_for_test)) {
@@ -74,32 +97,92 @@ public class DecisionProcedureSettings implements Settings {
             fireSettingsChanged();
         }
     }
+*/  
+    
     
     /** Enables archiving of SMT benchmarks (which were translated from sequents) during execution
      * of SMT compliant external decision procedures  
      * @param b if set to <tt>true</tt>, the benchmarks will be archived
      */
-    public void setDoBenchmarkArchiving( boolean b ) {
+/*    public void setDoBenchmarkArchiving( boolean b ) {
         smt_benchmark_archiving = b;
         fireSettingsChanged();
     }
+*/
+    
     
     /** Enables zipping of archived problem directories during SMT benchmark archiving
      * @param b if set to <tt>true</tt>, the problem dirs will be zipped
      */
-    public void setDoZipProblemDir( boolean b ) {
+/*    public void setDoZipProblemDir( boolean b ) {
         smt_zip_problem_dir = b;
         fireSettingsChanged();
+    }
+*/
+    
+    /**
+     * Get the names of all available active rules
+     */
+    public ArrayList<String> getAvailableRules() {
+	ArrayList<String> toReturn = new ArrayList<String>();
+	for (SMTRule r : this.rules) {
+	    toReturn.add(r.displayName());
+	}
+	return toReturn;
+    }
+    
+    /**
+     * get the index of the currently active rule
+     */
+    public int getActiveRuleIndex() {
+	if (this.rules.size() == 0) {
+	    this.activeRule = -1;
+	} else if (this.activeRule < 0 || this.activeRule >= this.rules.size()) {
+	    this.activeRule = 0;
+	    this.fireSettingsChanged();
+	}
+	return this.activeRule;
+    }
+    
+    public SMTRule getActiveRule() {
+	if (this.activeRule < 0 || this.activeRule >= this.rules.size()) {
+	    return null;
+	} else {
+	    return this.rules.get(this.activeRule);
+	}
+    }
+    
+    /**
+     * Set the active Rule
+     */
+    public void setActiveRule(int ar) {
+	if (0 <= ar && ar < this.rules.size()) {
+	    this.activeRule = ar;
+	    this.fireSettingsChanged();
+	} else {
+	    //TODO handle illegal argument
+	}
     }
     
     /** Enables translation of quantified terms during SMT translation
      * @param b if set to <tt>true</tt>, quantifiers will be translated
      */
-    public void setUseQuantifier( boolean b ) {
+/*    public void setUseQuantifier( boolean b ) {
         smt_use_quantifiers = b;
         fireSettingsChanged();
+    }  
+*/  
+
+    /**
+     * true, if the argument should be used for test
+     * TODO implement
+     */
+    public boolean useRuleForTest(int arg) {
+	return true;
     }
     
+    
+/*  
     public boolean useSimplifyForTest() {
         return decision_procedure_for_test.equals(SIMPLIFY);
     }
@@ -135,29 +218,59 @@ public class DecisionProcedureSettings implements Settings {
     public boolean useSMT_Translation() {
         return decision_procedure.equals( SMT );
     }
+*/    
     
     /** @return <tt>true</tt> if SMT benchmark archiving is enabled */
-    public boolean doBenchmarkArchiving() {
+/*    public boolean doBenchmarkArchiving() {
         return smt_benchmark_archiving;     
     }
+*/
     
     /** @return <tt>true</tt> if problem directories will be zipped during SMT benchmark archiving */
-    public boolean doZipProblemDir() {
+/*    public boolean doZipProblemDir() {
         return smt_zip_problem_dir;
     }
+*/
     
     /** @return <tt>true</tt> if quantifiers will be translated in SMT translation */
-    public boolean useQuantifiers() {
+/*    public boolean useQuantifiers() {
         return smt_use_quantifiers;
     }
-
+*/
 
     /** gets a Properties object and has to perform the necessary
      * steps in order to change this object in a way that it
      * represents the stored settings
      */
     public void readSettings(Properties props) {
-        String dec_proc_string = 
+	String ar = props.getProperty(AVAILABLE_RULES);
+System.out.println("+++++++++++ Here");	
+ar = "de.uka.ilkd.key.smt.SimplifySolver:de.uka.ilkd.key.smt.Z3Solver:de.uka.ilkd.key.smt.YicesSmtSolver";
+	String[] availableRules = ar.split(":");
+	System.out.println("+++++++++++ Here2");		
+	for (int i = 0; i < availableRules.length; i++) {
+	    try {
+		Class rule = Class.forName(availableRules[i]);
+		SmtSolver s = (SmtSolver)rule.newInstance();
+		rules.add(new SMTRule(s));
+	    } catch (ClassNotFoundException e) {
+		//TODO implement warning
+	    } catch (InstantiationException e) {
+		//TODO handle exception
+	    } catch (IllegalAccessException e) {
+		//TODO handle exception
+	    }
+	}
+	System.out.println("+++++++++++ Here3");		
+	int curr = Integer.parseInt(props.getProperty(ACTIVE_RULE));
+	System.out.println("+++++++++++ Here3 : " + curr);
+	if (curr >= 0 && curr < rules.size()) {
+	    this.activeRule = curr;
+	} else {
+	    this.activeRule = -1;
+	}
+	
+/*        String dec_proc_string = 
             props.getProperty(DECISION_PROCEDURE);
         
         if (dec_proc_string==null ||
@@ -201,7 +314,7 @@ public class DecisionProcedureSettings implements Settings {
         
         val = props.getProperty( SMT_USE_QUANTIFIERS );
         if ( val != null ) smt_use_quantifiers = Boolean.valueOf(val).booleanValue();
-        else smt_use_quantifiers = true;
+        else smt_use_quantifiers = true; */
     }
 
 
@@ -211,12 +324,13 @@ public class DecisionProcedureSettings implements Settings {
      * @param props the Properties object where to write the settings as (key, value) pair
      */
     public void writeSettings(Properties props) {
-        props.setProperty(DECISION_PROCEDURE, getDecisionProcedure());
-        props.setProperty(DECISION_PROCEDURE_FOR_TEST, getDecisionProcedureForTest());        
-        props.setProperty( SMT_BENCHMARK_ARCHIVING, "" + smt_benchmark_archiving );
-        props.setProperty( SMT_ZIP_PROBLEM_DIR,     "" + smt_zip_problem_dir );
-        props.setProperty( SMT_USE_QUANTIFIERS,      "" + smt_use_quantifiers );
+        props.setProperty(ACTIVE_RULE, "" + this.activeRule);
+        //props.setProperty(DECISION_PROCEDURE_FOR_TEST, getDecisionProcedureForTest());        
+        //props.setProperty( SMT_BENCHMARK_ARCHIVING, "" + smt_benchmark_archiving );
+        //props.setProperty( SMT_ZIP_PROBLEM_DIR,     "" + smt_zip_problem_dir );
+        //props.setProperty( SMT_USE_QUANTIFIERS,      "" + smt_use_quantifiers );
     }
+    
 
     /** sends the message that the state of this setting has been
      * changed to its registered listeners (not thread-safe)
@@ -228,6 +342,8 @@ public class DecisionProcedureSettings implements Settings {
         }
     }
 
+    
+    
     /** adds a listener to the settings object 
      * @param l the listener
      */

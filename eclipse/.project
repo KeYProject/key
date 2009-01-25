@@ -19,9 +19,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>key_lib</name>
+			<name>KeYExternalLibraries</name>
 			<type>2</type>
-			<locationURI>key_lib</locationURI>
+			<locationURI>KeYExternalLibraries</locationURI>
 		</link>
 		<link>
 			<name>tcc_modules</name>

@@ -85,6 +85,7 @@ public class SmtAufliaTranslation {
         // Initialize all neccessary objects before starting translation!
         benchmark = translate( sequent );  
         benchmark.setLogic( useQuantifiers );
+System.out.println("Created translation: \n" + benchmark.toString());        
         logger.info( "Translation completed!" );
     }
     
@@ -169,7 +170,7 @@ public class SmtAufliaTranslation {
         
         
         // Set formula in Benchmark and return
-        smtTranslation.setFormula( finalTranslation );
+        smtTranslation.setFormula( finalTranslation );      
         return smtTranslation;
     }
     
