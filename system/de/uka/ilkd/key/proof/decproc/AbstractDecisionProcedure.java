@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.smt.ConstraintSet;
 
 
 /**

@@ -24,6 +24,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SetOfMetavariable;
+import de.uka.ilkd.key.smt.ConstraintSet;
 /**
  * Represents a try to remove code duplication.
  */

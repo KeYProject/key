@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.proof.decproc;
+package de.uka.ilkd.key.smt;
 
 import java.util.HashSet;
 import java.util.Iterator;

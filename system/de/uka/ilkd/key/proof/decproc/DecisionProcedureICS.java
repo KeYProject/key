@@ -20,6 +20,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.smt.ConstraintSet;
 
 
 /**

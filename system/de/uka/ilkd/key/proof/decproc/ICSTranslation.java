@@ -27,6 +27,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
+import de.uka.ilkd.key.smt.ConstraintSet;
+import de.uka.ilkd.key.smt.NumberTranslation;
 import de.uka.ilkd.key.util.Debug;
 
 

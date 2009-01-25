@@ -17,6 +17,7 @@ package de.uka.ilkd.key.proof.decproc;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.SetOfMetavariable;
+import de.uka.ilkd.key.smt.ConstraintSet;
 
 /**
  * Implementors will know whether to create a DecProcTranslation object for Java

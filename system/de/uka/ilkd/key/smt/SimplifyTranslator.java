@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.SetOfMetavariable;
-import de.uka.ilkd.key.proof.decproc.ConstraintSet;
 
 public class SimplifyTranslator extends AbstractSmtTranslator {
 

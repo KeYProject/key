@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.proof.decproc;
 
 import java.io.*;
-import de.uka.ilkd.key.proof.decproc.ConstraintSet;
 import de.uka.ilkd.key.proof.Node;
 import org.apache.log4j.Logger;
 
@@ -21,6 +20,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.smt.ConstraintSet;
 
 
 /**

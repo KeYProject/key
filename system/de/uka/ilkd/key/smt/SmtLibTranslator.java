@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.SetOfMetavariable;
-import de.uka.ilkd.key.proof.decproc.ConstraintSet;
 import de.uka.ilkd.key.proof.decproc.SimplifyException;
 import org.apache.log4j.Logger;
 

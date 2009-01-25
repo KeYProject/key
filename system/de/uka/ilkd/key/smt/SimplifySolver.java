@@ -4,7 +4,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.SetAsListOfMetavariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.decproc.ConstraintSet;
 import de.uka.ilkd.key.rule.RuleApp;
 
 public class SimplifySolver extends AbstractSmtProver {

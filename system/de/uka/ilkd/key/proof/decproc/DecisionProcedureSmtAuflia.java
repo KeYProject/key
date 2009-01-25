@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.decproc.smtlib.Benchmark;
+import de.uka.ilkd.key.smt.ConstraintSet;
 
 
 /** Represents a basic class for the invocation of decisison procedures accepting the SMT-LIB
