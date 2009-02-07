@@ -27,10 +27,8 @@ public class YicesSmtSolver extends AbstractSmtProver {
      * 
      * @return the translator, that should be used.
      */
-    protected AbstractSmtTranslator getTranslator(Goal goal, Services services,
-	    RuleApp ruleApp) {
-	return new SmtLibTranslator(goal.sequent(), new ConstraintSet(goal,
-		null), SetAsListOfMetavariable.EMPTY_SET, services);
+    protected AbstractSmtTranslator getTranslator(Services services) {
+	return new SmtLibTranslator(services);
     }
 
     /**

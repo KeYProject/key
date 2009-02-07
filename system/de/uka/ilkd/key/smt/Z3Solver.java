@@ -21,9 +21,12 @@ public class Z3Solver extends AbstractSmtProver {
     }
     
     @Override
-    protected SmtTranslator getTranslator(Goal goal, Services services, RuleApp ruleApp) {
+    /*protected SmtTranslator getTranslator(Goal goal, Services services, RuleApp ruleApp) {
 	return new SmtLibTranslator(goal.sequent(), new ConstraintSet(goal,
 		null), SetAsListOfMetavariable.EMPTY_SET, services);
+    }*/
+    protected SmtTranslator getTranslator(Services services) {
+	return new SmtLibTranslator(services);
     }
     
     @Override

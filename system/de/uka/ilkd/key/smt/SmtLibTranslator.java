@@ -79,7 +79,7 @@ public class SmtLibTranslator extends AbstractSmtTranslator {
     /**
      * For translating only terms and not complete sequents.
      */
-    public SmtLibTranslator(Services s) throws SimplifyException {
+    public SmtLibTranslator(Services s) {
 	super(s);
     }
 

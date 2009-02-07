@@ -77,6 +77,10 @@ public class SimplifyTranslator extends AbstractSmtTranslator {
 	super(sequent, cs, localmv, services);
     }
     
+    public SimplifyTranslator(Services services) {
+	super(services);
+    }
+    
     @Override
     protected StringBuffer buildCompleteText(StringBuffer formula,
 	    ArrayList<StringBuffer> assumptions,

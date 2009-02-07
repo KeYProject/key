@@ -37,5 +37,5 @@ public interface SmtTranslator {
      * @throws IllegalArgumentException if the term is not of type FORMULA or could not be translated.
      */
     public StringBuffer translate(Term t, Services services) 
-    		throws IllegalArgumentException;
+    		throws IllegalFormulaException;
 }

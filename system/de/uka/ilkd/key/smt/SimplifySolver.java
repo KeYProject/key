@@ -15,9 +15,8 @@ public class SimplifySolver extends AbstractSmtProver {
     }
     
     @Override
-    protected SmtTranslator getTranslator(Goal goal, Services services, RuleApp rule) {
-	return new SimplifyTranslator(goal.sequent(), new ConstraintSet(goal,
-		null), SetAsListOfMetavariable.EMPTY_SET, services);
+    protected SmtTranslator getTranslator(Services services) {
+	return new SimplifyTranslator(services);
     }
     
     @Override

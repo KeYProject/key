@@ -51,7 +51,7 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
     /** remember all function declarations */
 
     /** The Constraint under which the sequent is to be proven */
-    protected final ConstraintSet constraintSet;
+   // protected final ConstraintSet constraintSet;
 
     protected final HashSet usedGlobalMv = new HashSet();
 
@@ -99,7 +99,7 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
     public AbstractSmtTranslator(Sequent sequent, ConstraintSet cs,
 	    SetOfMetavariable localmv, Services services, boolean lightWeight) {
 	localMetavariables = localmv;
-	constraintSet = cs;
+//	constraintSet = cs;
 	jbyteSort = services.getTypeConverter().getByteLDT().targetSort();
 	jshortSort = services.getTypeConverter().getShortLDT().targetSort();
 	jintSort = services.getTypeConverter().getIntLDT().targetSort();
@@ -604,17 +604,6 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 
 	return hb;
     }
-
-    /**
-     * public implementation for translating a Term.
-     * @param t the term to be translated.
-     * @param services the service object.
-     * @return Stringbuffer representing the translated formula.
-     */
-    public final StringBuffer translateTerm(Term t, Services services) throws IllegalFormulaException{
-	StringBuffer translation = translateTerm(t, new Vector<QuantifiableVariable>(), services);
-	return translation;
-    }
     
     /**
      * Translates the given ConstrainedFormula into "Simplify" input syntax
@@ -633,14 +622,15 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 	Term t;
 	// if the cnstraintSet contains cf, make a syntactical
 	// replacement
-	if (constraintSet.used(cf)) {
+	/*if (constraintSet.used(cf)) {
 	    SyntacticalReplaceVisitor srVisitor = new SyntacticalReplaceVisitor(
 		    constraintSet.chosenConstraint());
 	    cf.formula().execPostOrder(srVisitor);
 	    t = srVisitor.getTerm();
 	} else {
 	    t = cf.formula();
-	}
+	}*/
+	t = cf.formula();
 	Operator op = t.op();
 	if (!lightWeight || !(op instanceof Modality)
 		&& !(op instanceof IUpdateOperator)

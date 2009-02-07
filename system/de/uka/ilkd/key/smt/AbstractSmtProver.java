@@ -116,8 +116,9 @@ public abstract class AbstractSmtProver implements SmtSolver{
      * Get the abstract translator, that should be used to
      * @return the translator, that should be used.
      */
-    protected abstract SmtTranslator getTranslator(Goal goal,
-	    Services services, RuleApp ruleApp);
+//    protected abstract SmtTranslator getTranslator(Goal goal,
+//	    Services services, RuleApp ruleApp);
+    protected abstract SmtTranslator getTranslator(Services services);
 
     /**
      * Get the command for executing an external proofer.
@@ -206,84 +207,116 @@ public abstract class AbstractSmtProver implements SmtSolver{
      */
     public final SmtSolver.RESULTTYPE isValid(Goal goal, int timeout, Services services,
 	    RuleApp ruleApp) {
+	
 	SmtSolver.RESULTTYPE toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
-
 	if (!this.isApplicable(goal)) {
 	    return SmtSolver.RESULTTYPE.UNKNOWN;
 	}
 	
+//	get the translation
+	//SmtTranslator trans = this.getTranslator(goal, services,
+	//    ruleApp);
+	SmtTranslator trans = this.getTranslator(services);
+	
 	try {
-	    //get the translation
-	    SmtTranslator trans = this.getTranslator(goal, services,
-		    ruleApp);
-	    String loc;
-
-	    try {
-		StringBuffer s = trans.translate(goal.sequent(), services);
-		//store the translation to a file                                
-		loc = this.storeToFile(s);
-		//get the commands for execution
-		String[] execCommand = this.getExecutionCommand(loc, s);
-
-		try {
-
-		    Process p = Runtime.getRuntime().exec(execCommand);
-		    ExecutionWatchDog tt = new ExecutionWatchDog(timeout, p);
-		    Timer t = new Timer();
-		    t.schedule(tt, new Date(System.currentTimeMillis()), 1000);
-		    try {
-			p.waitFor();
-		    } catch (InterruptedException f) {
-			logger.debug(
-				"Process for smt formula proving interrupted.",
-				f);
-			//System.out.println("process was interrupted");
-		    } finally {
-			t.cancel();
-		    }
-
-		    if (p.exitValue() != 0) {
-			//the process was terminated by force.
-			toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
-		    } else {
-			//the process terminated as it sould
-			InputStream in = p.getInputStream();
-			String result = read(in);
-   
-			logger.debug("Answer for created formula: ");
-			logger.debug(result);
-			in.close();
-			SmtSolver.RESULTTYPE validity = this.answerType(result);
-			if (validity == SmtSolver.RESULTTYPE.VALID) {
-			    toReturn = SmtSolver.RESULTTYPE.VALID;
-			} else if (validity == SmtSolver.RESULTTYPE.INVALID) {
-			    toReturn = SmtSolver.RESULTTYPE.INVALID;
-			} else {
-			    toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
-			}
-		    }
-		} catch (IOException e) {
-		    logger
-			    .error(
-				    "The program for proving a Formula with external tool could not be executed.",
-				    e);
-		    throw new RuntimeException(e.getMessage() + "\nMake sure the command is in your PATH variable.");
-		} finally {
-		    //remove the created file
-		    File f = new File(loc);
-		    f.delete();
-		}
-	    } catch (IOException e) {
-		logger.error("The file with the formula could not be written.",
-			e);
-		throw new RuntimeException(e.getMessage());
-	    }
-	} catch (IllegalFormulaException e) {
+	    StringBuffer s = trans.translate(goal.sequent(), services);
+	    toReturn = this.runProver(s, timeout, services);
+    	} catch (IllegalFormulaException e) {
 	    toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
 	    logger.error("The formula could not be translated.", e);
 	    throw new RuntimeException("The formula could not be translated.\n" + e.getMessage());
 	}
-	return toReturn;
+    	
+    	return toReturn;
     }
 
+    public SmtSolver.RESULTTYPE isValid(Term t, int timeout, Services services) {
+	SmtSolver.RESULTTYPE toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
+	if (!this.isApplicable(t)) {
+	    return SmtSolver.RESULTTYPE.UNKNOWN;
+	}
+	
+//	get the translation
+	SmtTranslator trans = this.getTranslator(services);
+	
+	try {
+	    StringBuffer s = trans.translate(t, services);
+	    toReturn = this.runProver(s, timeout, services);
+    	} catch (IllegalFormulaException e) {
+	    toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
+	    logger.error("The formula could not be translated.", e);
+	    throw new RuntimeException("The formula could not be translated.\n" + e.getMessage());
+	}
+    	
+    	return toReturn;
+    }
+    
+    private final SmtSolver.RESULTTYPE runProver(StringBuffer input, int timeout, Services services) {
+	SmtSolver.RESULTTYPE toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
+	    
+	String loc;
+
+	try {
+	
+	    //store the translation to a file                                
+	    loc = this.storeToFile(input);
+	    //get the commands for execution
+	    String[] execCommand = this.getExecutionCommand(loc, input);
+
+	    try {
+
+		Process p = Runtime.getRuntime().exec(execCommand);
+		ExecutionWatchDog tt = new ExecutionWatchDog(timeout, p);
+		Timer t = new Timer();
+		t.schedule(tt, new Date(System.currentTimeMillis()), 1000);
+		try {
+		    p.waitFor();
+		} catch (InterruptedException f) {
+		    logger.debug(
+			    "Process for smt formula proving interrupted.",
+			    f);
+		    //System.out.println("process was interrupted");
+		} finally {
+		    t.cancel();
+		}
+
+		if (p.exitValue() != 0) {
+		    //the process was terminated by force.
+		    toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
+		} else {
+		    //the process terminated as it sould
+		    InputStream in = p.getInputStream();
+		    String result = read(in);
+   
+		    logger.debug("Answer for created formula: ");
+		    logger.debug(result);
+		    in.close();
+		    SmtSolver.RESULTTYPE validity = this.answerType(result);
+		    if (validity == SmtSolver.RESULTTYPE.VALID) {
+			toReturn = SmtSolver.RESULTTYPE.VALID;
+		    } else if (validity == SmtSolver.RESULTTYPE.INVALID) {
+			toReturn = SmtSolver.RESULTTYPE.INVALID;
+		    } else {
+			toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
+		    }
+		}
+	    } catch (IOException e) {
+		logger.error(
+			"The program for proving a Formula with external tool could not be executed.",
+			e);
+		throw new RuntimeException(e.getMessage() + "\nMake sure the command is in your PATH variable.");
+	    } finally {
+		//remove the created file
+		File f = new File(loc);
+		f.delete();
+	    }
+	} catch (IOException e) {
+	    logger.error("The file with the formula could not be written.",
+			e);
+	    throw new RuntimeException(e.getMessage());
+	}
+	
+	return toReturn;
+    }
+    
 }
