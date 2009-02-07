@@ -17,7 +17,10 @@ import java.util.Properties;
 import de.uka.ilkd.key.gui.configuration.Settings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.smt.SMTRule;
+import de.uka.ilkd.key.smt.SimplifySolver;
 import de.uka.ilkd.key.smt.SmtSolver;
+import de.uka.ilkd.key.smt.YicesSmtSolver;
+import de.uka.ilkd.key.smt.Z3Solver;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 
 /** This class encapsulates the information which 
@@ -54,7 +57,7 @@ public class DecisionProcedureSettings implements Settings {
     private static final String ACTIVE_RULE  = "[DecisionProcedure]ActiveRule";
     
     /** String used in the Settings to store the available rules */
-    private static final String AVAILABLE_RULES  = "[DecisionProcedure]AvailableRules";
+    //private static final String AVAILABLE_RULES  = "[DecisionProcedure]AvailableRules";
     
     /** the list of registered SettingListener */
     private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
@@ -66,7 +69,7 @@ public class DecisionProcedureSettings implements Settings {
     int activeRule = -1;
     
     /** the String for the classes of Solver **/
-    String solver = "de.uka.ilkd.key.smt.SimplifySolver:de.uka.ilkd.key.smt.Z3Solver:de.uka.ilkd.key.smt.YicesSmtSolver";
+    //String solver = "de.uka.ilkd.key.smt.SimplifySolver:de.uka.ilkd.key.smt.Z3Solver:de.uka.ilkd.key.smt.YicesSmtSolver";
     
     // getter
 /*    public String getDecisionProcedure() {
@@ -165,7 +168,9 @@ public class DecisionProcedureSettings implements Settings {
 	    this.activeRule = ar;
 	    this.fireSettingsChanged();
 	} else {
-	    //TODO handle illegal argument
+	    //use 0 as default
+	    this.activeRule = 0;
+	    this.fireSettingsChanged();
 	}
     }
     
@@ -248,9 +253,15 @@ public class DecisionProcedureSettings implements Settings {
      * represents the stored settings
      */
     public void readSettings(Properties props) {
-	String ar = props.getProperty(AVAILABLE_RULES);
+	//Load the available Solver
+	rules = new ArrayList<SMTRule>();
+	rules.add(new SMTRule(new SimplifySolver()));
+	rules.add(new SMTRule(new Z3Solver()));
+	rules.add(new SMTRule(new YicesSmtSolver()));
+	
+	/*String ar = props.getProperty(AVAILABLE_RULES);
 	if (true || ar == null) {
-//TODO: Reading from settings does not work yet!	    
+// Reading from settings does not work yet!	    
 	    ar = "de.uka.ilkd.key.smt.SimplifySolver:de.uka.ilkd.key.smt.Z3Solver:de.uka.ilkd.key.smt.YicesSmtSolver";
 	}
 	this.solver = ar;
@@ -268,7 +279,7 @@ public class DecisionProcedureSettings implements Settings {
 	    } catch (IllegalAccessException e) {
 		errors.add("IllegalAccessException while loading Class " + availableRules[i]);
 	    }
-	}		
+	}*/		
 	int curr = Integer.parseInt(props.getProperty(ACTIVE_RULE));
 	if (curr >= 0 && curr < rules.size()) {
 	    this.activeRule = curr;
@@ -276,13 +287,13 @@ public class DecisionProcedureSettings implements Settings {
 	    this.activeRule = -1;
 	}
 	
-	if (errors.size() > 0) {
+	/*if (errors.size() > 0) {
 	    String s = "";
 	    for (String temp : errors) {
 		s = s + temp + "\n";
 	    }
 	    throw new RuntimeException(s);
-	}
+	}*/
 	
 /*        String dec_proc_string = 
             props.getProperty(DECISION_PROCEDURE);
@@ -339,7 +350,7 @@ public class DecisionProcedureSettings implements Settings {
      */
     public void writeSettings(Properties props) {
         props.setProperty(ACTIVE_RULE, "" + this.activeRule);
-        props.setProperty(AVAILABLE_RULES, this.solver);
+        //props.setProperty(AVAILABLE_RULES, this.solver);
         //props.setProperty(DECISION_PROCEDURE_FOR_TEST, getDecisionProcedureForTest());        
         //props.setProperty( SMT_BENCHMARK_ARCHIVING, "" + smt_benchmark_archiving );
         //props.setProperty( SMT_ZIP_PROBLEM_DIR,     "" + smt_zip_problem_dir );

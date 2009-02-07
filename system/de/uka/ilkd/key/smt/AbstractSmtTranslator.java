@@ -606,6 +606,17 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
     }
 
     /**
+     * public implementation for translating a Term.
+     * @param t the term to be translated.
+     * @param services the service object.
+     * @return Stringbuffer representing the translated formula.
+     */
+    public final StringBuffer translateTerm(Term t, Services services) throws IllegalFormulaException{
+	StringBuffer translation = translateTerm(t, new Vector<QuantifiableVariable>(), services);
+	return translation;
+    }
+    
+    /**
      * Translates the given ConstrainedFormula into "Simplify" input syntax
      * and adds the resulting string to the StringBuffer sb.
      * 
