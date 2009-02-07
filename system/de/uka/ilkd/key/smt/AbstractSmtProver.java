@@ -55,9 +55,6 @@ public abstract class AbstractSmtProver implements SmtSolver{
 	return toReturn;
     }
     
-    /**
-     * TODO overwork
-     */
     protected boolean isApplicable(Term term) {
 	
 	Operator op = term.op();
@@ -116,8 +113,6 @@ public abstract class AbstractSmtProver implements SmtSolver{
      * Get the abstract translator, that should be used to
      * @return the translator, that should be used.
      */
-//    protected abstract SmtTranslator getTranslator(Goal goal,
-//	    Services services, RuleApp ruleApp);
     protected abstract SmtTranslator getTranslator(Services services);
 
     /**
@@ -204,10 +199,6 @@ public abstract class AbstractSmtProver implements SmtSolver{
      * @param services The service object wrapping different settings and variables.
      * @return VALID, INVALID or UNKNOWN.
      */
-//TODO clean up    
-//    public final SmtSolver.RESULTTYPE isValid(Goal goal, int timeout, Services services,
-//	    RuleApp ruleApp) {
-	
     public final SmtSolver.RESULTTYPE isValid(Goal goal, int timeout, Services services) {
     
 	SmtSolver.RESULTTYPE toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
@@ -215,9 +206,6 @@ public abstract class AbstractSmtProver implements SmtSolver{
 	    return SmtSolver.RESULTTYPE.UNKNOWN;
 	}
 	
-//	get the translation
-	//SmtTranslator trans = this.getTranslator(goal, services,
-	//    ruleApp);
 	SmtTranslator trans = this.getTranslator(services);
 	
 	try {
@@ -232,6 +220,13 @@ public abstract class AbstractSmtProver implements SmtSolver{
     	return toReturn;
     }
 
+    /**
+     * Check, if the given term is valid.
+     * @param t the term to be checked.
+     * @param timeout the maximum amount of seconds used to check the term.
+     * @param services the services to be used.
+     * @return VALID, INVALID or UNKNOWN.
+     */
     public SmtSolver.RESULTTYPE isValid(Term t, int timeout, Services services) {
 	SmtSolver.RESULTTYPE toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
 	if (!this.isApplicable(t)) {

@@ -151,19 +151,6 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 	StringBuffer succ;
 	succ = translate(sequent.succedent(), SmtTranslator.TERMPOSITION.SUCCEDENT, lightWeight, services);
 
-/*	// append type definitions, if neccessary
-	if (!this.isMultiSorted()) {
-	    // add the type definitions
-	    //this means all predicates that are needed for functions to define
-	    //their result type, all predicates for constants (like number symbols)
-	    ante = this.translateLogicalAnd(this.getTypeDefinitions(), ante);
-	    // add the type hirarchy
-	    //this means, add the typepredicates, that are needed to define
-	    //for every type, what type they are (direct) subtype of
-	    ante = this.translateLogicalAnd(this.getSortHirarchyPredicates(),
-		    ante);
-	}
-*/
 	//add one variable for each sort
 	for (Sort s : this.usedRealSort.keySet()) {
 	    LogicVariable l = new LogicVariable(new Name("dummy_" + s.name().toString()), s);
@@ -174,7 +161,6 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 	ArrayList<StringBuffer> assumptions = this.getAssumptions(services);
 	
 	hb = this.translateLogicalImply(ante, succ);
-	//hb = this.translateLogicalNot(hb);
 
 	return buildCompleteText(hb, assumptions, this.buildTranslatedFuncDecls(), this
 		.buildTranslatedPredDecls(), this.buildTranslatedSorts(), this
@@ -284,23 +270,7 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 	    //StringBuffer hb = new StringBuffer();
 	    StringBuffer form;
 	    form = translateTerm(t, new Vector<QuantifiableVariable>(), services);
-/*
-	    //append type definitions, if neccessary
-	    if (!this.isMultiSorted()) {
-		// add the type definitions
-		//this means all predicates that are needed for functions to define
-		//their result type, all predicates for constants (like number symbols)
-		StringBuffer pre = this.getTypeDefinitions();
-		//add the sort hirarchy
-		pre = this.translateLogicalAnd(this.getSortHirarchyPredicates(), pre);
-		//definitions imply the valid formula
-		form = this.translateLogicalImply(pre, form);
-	    }
-*/
 	    
-	    //hb = this.translateLogicalNot(form);
-	    
-
 	    return buildCompleteText(form, this.getAssumptions(services), this.buildTranslatedFuncDecls(), this
 		    .buildTranslatedPredDecls(), this.buildTranslatedSorts(), this
 		    .buildSortHirarchy());
@@ -350,7 +320,6 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 			form);
 	    }
 	    if (form.length() > 0) {
-		//toReturn = this.translateLogicalAnd(toReturn, form);
 		toReturn.add(form);
 	    }
 	}
@@ -361,7 +330,6 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 		ArrayList<StringBuffer> argList = new ArrayList<StringBuffer>();
 		argList.add(this.nullString);
 		StringBuffer toAdd = this.translatePredicate(s, argList);
-		//toReturn = this.translateLogicalAnd(toAdd, toReturn);
 		toReturn.add(toAdd);
 	    }
 	}
@@ -376,19 +344,16 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      */
     private ArrayList<StringBuffer> getTypeDefinitions() {
 	ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
-	//toReturn = this.translateLogicalTrue();
 
 	// add the type definitions for functions
 	for (Operator op : functionDecls.keySet()) {
 	    StringBuffer currentForm = this.getSingleFunctionDef(
 		    this.usedFunctionNames.get(op), functionDecls.get(op));
-	    //toReturn = this.translateLogicalAnd(currentForm, toReturn);
 	    toReturn.add(currentForm);
 	}
 
 	//add the type predicates for constant values like number symbols
 	for (StringBuffer s : this.constantTypePreds.values()) {
-	    //toReturn = this.translateLogicalAnd(s, toReturn);
 	    toReturn.add(s);
 	}
 	
@@ -1147,9 +1112,6 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 			    services);
 		    //add the function to the used ones
 		    this.addSpecialFunction(fun);
-		    //if (!specialFunctions.contains(fun)) {
-		//	specialFunctions.add(fun);
-		 //   }
 		    //return the final translation
 		    return this.translateIntegerPlus(arg1, arg2);
 		} else if (fun == services.getTypeConverter().getIntegerLDT()
@@ -1160,9 +1122,6 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 			    services);
 //		    //add the function to the used ones
 		    this.addSpecialFunction(fun);
-		    //if (!specialFunctions.contains(fun)) {
-			//specialFunctions.add(fun);
-		    //}
 //		    //return the final translation
 		    return this.translateIntegerMinus(arg1, arg2);
 		} else if (fun == services.getTypeConverter().getIntegerLDT()
@@ -1178,9 +1137,6 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 			    services);
 //		  add the function to the used ones
 		    this.addSpecialFunction(fun);
-		    //if (!specialFunctions.contains(fun)) {
-			//specialFunctions.add(fun);
-		    //}
 //		    //return the final translation
 		    return this.translateIntegerMult(arg1, arg2);
 		} else if (fun == services.getTypeConverter().getIntegerLDT()
@@ -1191,9 +1147,6 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 			    services);
 //		  add the function to the used ones
 		    this.addSpecialFunction(fun);
-		    //if (!specialFunctions.contains(fun)) {
-		//	specialFunctions.add(fun);
-		//    }
 //		    //return the final translation
 		    return this.translateIntegerDiv(arg1, arg2);
 		} else if (fun == services.getTypeConverter().getIntegerLDT()

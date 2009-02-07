@@ -146,13 +146,6 @@ public class SmtLibTranslator extends AbstractSmtTranslator {
 	}
 	
 	// add the formula
-	/*if (assumptions.size() > 0) {
-	    StringBuffer assump = assumptions.get(0);
-	    for (int i = 1; i < assumptions.size(); i++) {
-		this.translateLogicalAnd(assump, assumptions.get(i));
-	    }
-	    formula = this.translateLogicalImply(assump, formula);
-	}*/
 	formula = this.translateLogicalNot(formula);
 	toReturn.append("\n:formula ").append(formula).append("\n");
 
@@ -177,15 +170,7 @@ public class SmtLibTranslator extends AbstractSmtTranslator {
      *         declarations, Argument2 is the sort used for type predicates
      */
     protected StringBuffer translateSort(String name, boolean isIntVal) {
-	// ArrayList<StringBuffer> toReturn = new
-	// ArrayList<StringBuffer>();
 	StringBuffer uniqueName = makeUnique(new StringBuffer(name));
-	// if (isIntVal) {
-	// toReturn.add(INTSTRING);
-	// } else {
-	// toReturn.add(uniqueName);
-	// }
-	// toReturn.add(uniqueName);
 	return uniqueName;
     }
 
@@ -213,9 +198,6 @@ public class SmtLibTranslator extends AbstractSmtTranslator {
     @Override
     protected StringBuffer translateIntegerDiv(StringBuffer arg1,
 	    StringBuffer arg2) {
-	// ArrayList<StringBuffer> args = new ArrayList<StringBuffer>();
-	// args.add(arg1);
-	// args.add(arg2);
 	return new StringBuffer("unknownOp");
     }
 
