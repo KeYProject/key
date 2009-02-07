@@ -202,12 +202,14 @@ public abstract class AbstractSmtProver implements SmtSolver{
      * @param timeout The maximum time, that should be used to execute the external solver.
      *      Given in seconds. If the time is exceeded, UNKNOWN is returned.
      * @param services The service object wrapping different settings and variables.
-     * @param ruleApp The Rule Application
      * @return VALID, INVALID or UNKNOWN.
      */
-    public final SmtSolver.RESULTTYPE isValid(Goal goal, int timeout, Services services,
-	    RuleApp ruleApp) {
+//TODO clean up    
+//    public final SmtSolver.RESULTTYPE isValid(Goal goal, int timeout, Services services,
+//	    RuleApp ruleApp) {
 	
+    public final SmtSolver.RESULTTYPE isValid(Goal goal, int timeout, Services services) {
+    
 	SmtSolver.RESULTTYPE toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
 	if (!this.isApplicable(goal)) {
 	    return SmtSolver.RESULTTYPE.UNKNOWN;
