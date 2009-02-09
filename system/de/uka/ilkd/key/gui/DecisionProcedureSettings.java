@@ -293,13 +293,15 @@ public class DecisionProcedureSettings implements Settings {
 		errors.add("IllegalAccessException while loading Class " + availableRules[i]);
 	    }
 	}*/		
-	int curr = Integer.parseInt(props.getProperty(ACTIVE_RULE));
-	if (curr >= 0 && curr < rules.size()) {
-	    this.activeRule = curr;
-	} else {
-	    this.activeRule = -1;
+	String ruleString = props.getProperty(ACTIVE_RULE);
+	this.activeRule = -1;
+	if(ruleString != null) {
+	    int curr = Integer.parseInt(ruleString);
+	    if (curr >= 0 && curr < rules.size()) {
+		this.activeRule = curr;
+	    }
 	}
-	
+ 	
 	/*if (errors.size() > 0) {
 	    String s = "";
 	    for (String temp : errors) {
