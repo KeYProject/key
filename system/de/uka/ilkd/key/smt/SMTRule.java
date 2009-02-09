@@ -47,7 +47,7 @@ public class SMTRule implements BuiltInRule {
 
     public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
 
-	SmtSolver.RESULTTYPE valid = this.prover.isValid(goal, 60*60*1, services);
+	SmtSolver.RESULTTYPE valid = this.prover.isValid(goal, 30, services);
 	if (valid == SmtSolver.RESULTTYPE.VALID) {
 	    return SLListOfGoal.EMPTY_LIST;
 	} else if (valid == SmtSolver.RESULTTYPE.UNKNOWN) {
