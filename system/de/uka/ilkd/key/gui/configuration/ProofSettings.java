@@ -73,7 +73,7 @@ public class ProofSettings {
 	    new SimultaneousUpdateSimplifierSettings(),
             new GeneralSettings(),
 	    new ChoiceSettings(),
-	    new DecisionProcedureSettings(),
+	    DecisionProcedureSettings.getInstance(),
 	    new ViewSettings(),
             new LibrariesSettings()
 	};

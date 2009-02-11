@@ -154,6 +154,7 @@ public class DecProcRunner implements Runnable {
                         de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
                 
                 final IteratorOfGoal goals = proof.openGoals().iterator();
+                main.getProgressMonitor().setMaximum(totalGoals);
                 while (goals.hasNext()) {      
                     BuiltInRuleApp birApp = new BuiltInRuleApp(simpRule, null, 
                             userConstraint);                    						

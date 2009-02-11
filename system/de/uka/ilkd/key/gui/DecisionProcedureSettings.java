@@ -104,8 +104,21 @@ public class DecisionProcedureSettings implements Settings {
         }
     }
 */  
-    public DecisionProcedureSettings() {
+    private static DecisionProcedureSettings instance;
+    
+    /**
+     * This is a singelton.
+     */
+    private DecisionProcedureSettings() {
 	super();
+    }
+    
+    public static DecisionProcedureSettings getInstance() {
+	if (instance == null) {
+	    instance = new DecisionProcedureSettings();
+	}
+	
+	return instance;
     }
     
     /** Enables archiving of SMT benchmarks (which were translated from sequents) during execution
