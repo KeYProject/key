@@ -50,9 +50,6 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 
     /** remember all function declarations */
 
-    /** The Constraint under which the sequent is to be proven */
-   // protected final ConstraintSet constraintSet;
-
     protected final HashSet usedGlobalMv = new HashSet();
 
     protected final HashSet usedLocalMv = new HashSet();
@@ -94,12 +91,9 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      *                The local metavariables, should be the ones introduced
      *                after the last branch.
      */
-//    public AbstractSmtTranslator(Sequent sequent, ConstraintSet cs,
-//	    SetOfMetavariable localmv, Services services, boolean lightWeight) {
     public AbstractSmtTranslator(Sequent sequent,
 	    SetOfMetavariable localmv, Services services, boolean lightWeight) {
     	localMetavariables = localmv;
-//	constraintSet = cs;
 	jbyteSort = services.getTypeConverter().getByteLDT().targetSort();
 	jshortSort = services.getTypeConverter().getShortLDT().targetSort();
 	jintSort = services.getTypeConverter().getIntLDT().targetSort();
@@ -108,8 +102,6 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 	integerSort = services.getTypeConverter().getIntegerLDT().targetSort();
     }
 
-//    public AbstractSmtTranslator(Sequent sequent, ConstraintSet cs,
-//	    SetOfMetavariable localmv, Services services) {
     public AbstractSmtTranslator(Sequent sequent,
 	    SetOfMetavariable localmv, Services services) {
 	this(sequent, localmv, services, false);
@@ -269,7 +261,6 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 	}
 //	 translate
 	try {
-	    //StringBuffer hb = new StringBuffer();
 	    StringBuffer form;
 	    form = translateTerm(t, new Vector<QuantifiableVariable>(), services);
 	    
@@ -298,7 +289,6 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      */
     private ArrayList<StringBuffer> getSortHirarchyPredicates() {
 	SortHirarchy sh = this.buildSortHirarchy();
-	//StringBuffer toReturn = new StringBuffer(this.translateLogicalTrue());
 	ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
 	
 	// add the typepredicates for functions.
@@ -587,16 +577,6 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 	    throws IllegalFormulaException {
 	StringBuffer hb = new StringBuffer();
 	Term t;
-	// if the cnstraintSet contains cf, make a syntactical
-	// replacement
-	/*if (constraintSet.used(cf)) {
-	    SyntacticalReplaceVisitor srVisitor = new SyntacticalReplaceVisitor(
-		    constraintSet.chosenConstraint());
-	    cf.formula().execPostOrder(srVisitor);
-	    t = srVisitor.getTerm();
-	} else {
-	    t = cf.formula();
-	}*/
 	t = cf.formula();
 	Operator op = t.op();
 	if (!lightWeight || !(op instanceof Modality)
@@ -1382,7 +1362,6 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 
     /** 
      * Used just to be called from DecProcTranslation
-     * @see de.uka.ilkd.key.proof.decproc.DecProcTranslation#translate(Semisequent, int)
      */
     private final StringBuffer translate(Term term, int skolemization,
 	    Vector<QuantifiableVariable> quantifiedVars, Services services)

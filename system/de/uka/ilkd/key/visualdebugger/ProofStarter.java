@@ -261,10 +261,6 @@ public class ProofStarter {
             proof.getSettings().getProfile().getStandardRules().getStandardBuiltInRules().iterator();
         while (builtinRules.hasNext()) {
             final BuiltInRule bir = builtinRules.next();
-/*            if (bir instanceof SimplifyIntegerRule) {
-                decisionProcedureRule = bir;
-                break;
-            }*/
         }
         return decisionProcedureRule;
     }

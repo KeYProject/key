@@ -60,8 +60,6 @@ public class SmtLibTranslator extends AbstractSmtTranslator {
      * 
      * @param sequent
      *                The sequent which shall be translated.
-     * @param cs
-     *                The constraints which shall be incorporated.
      * @param localmv
      *                The local metavariables, should be the ones introduced
      *                after the last branch.
@@ -152,7 +150,6 @@ public class SmtLibTranslator extends AbstractSmtTranslator {
 	toReturn.append(")");
 	logger.info("Resulting formula after translation:");
 	logger.info(toReturn);
-	// System.out.println(toReturn);
 	return toReturn;
 
     }
@@ -440,7 +437,6 @@ public class SmtLibTranslator extends AbstractSmtTranslator {
 	return toReturn;
     }
 
-    // TODO remove illegal chars
     private StringBuffer makeUnique(StringBuffer name) {
 	StringBuffer toReturn = new StringBuffer(name);
 	int index;

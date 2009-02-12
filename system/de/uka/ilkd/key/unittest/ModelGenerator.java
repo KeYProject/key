@@ -5,8 +5,6 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.proof.*;
-//import de.uka.ilkd.key.proof.decproc.*;
-import de.uka.ilkd.key.unittest.simplify.*;
 import de.uka.ilkd.key.unittest.cogent.*;
 import java.util.*;
 
@@ -119,12 +117,7 @@ public class ModelGenerator{
 	}
 	if(!(t.op() instanceof Modality || t.op() instanceof IUpdateOperator ||
 	     t.op() instanceof Quantifier)){
-/*	    if(t.op() instanceof IUpdateOperator){
-		IUpdateOperator uop = (IUpdateOperator) t.op();
-		for(int i = 0; i<uop.locationCount(); i++){
-		    collectLocations(uop.value(t, i));
-		}
-		}*/
+
 	    for(int i=0; i<t.arity(); i++){
 		collectLocations(t.sub(i));
 	    }
@@ -336,14 +329,6 @@ public class ModelGenerator{
 		term2class, locations);
 	    intModelSet = dmg.createModels();
 	}
-//	if(decProdForTestGen == SIMPLIFY /*|| intModelSet.isEmpty()*/){
-//	    dmg = new SimplifyModelGenerator(
-//		new DecisionProcedureSimplify(
-//		    node, userConstraint, 
-//		    new JavaDecisionProcedureTranslationFactory(), serv), serv,
-//		term2class, locations);
-//	    intModelSet = dmg.createModels();
-//	}
 	Set modelSet = new HashSet();
 	Iterator it = intModelSet.iterator();
 	while(it.hasNext()){

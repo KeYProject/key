@@ -35,7 +35,7 @@ import de.uka.ilkd.key.util.Array;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.ProgressMonitor;
-//import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAuflia;
+
 
 public class ProblemLoader implements Runnable {
 

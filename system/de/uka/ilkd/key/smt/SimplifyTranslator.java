@@ -61,8 +61,6 @@ public class SimplifyTranslator extends AbstractSmtTranslator {
      * 
      * @param sequent
      *                The sequent which shall be translated.
-     * @param cs
-     *                The constraints which shall be incorporated.
      * @param localmv
      *                The local metavariables, should be the ones introduced
      *                after the last branch.

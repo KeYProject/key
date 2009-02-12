@@ -45,15 +45,6 @@ public abstract class AbstractProfile implements Profile {
     protected AbstractProfile(String standardRuleFilename, 
             SetOfGoalChooserBuilder supportedGCB, IMain main) {
         
-        // First initialise execDecproc, because it is used in initBuiltInRules()!
-//        int concreteDecprocs = ConcreteExecDecproc.getDecprocNumber();
-//        execDecprocs = new AbstractExecDecproc[ concreteDecprocs + 1 ]; // +1 for later added dec procs!
-//        for ( int i = 0; i < concreteDecprocs; i++ ) {
-//            execDecprocs[i] =  new ConcreteExecDecproc( i );
-//        }
-        // Add dec procs that cannot be treated uniformly within ConcreteExecDecproc
-//        execDecprocs[ concreteDecprocs++ ] = new ExecSVC();
-        
         standardRules = new RuleCollection(RuleSource
                 .initRuleFile(standardRuleFilename), 
                 initBuiltInRules());
@@ -102,34 +93,6 @@ public abstract class AbstractProfile implements Profile {
 
         final ProgressMonitor monitor = main == null ? null : main
                 .getProgressMonitor();
-/*        if (monitor != null) {
-            monitor.setMaximum(execDecprocs.length);
-        }
-        if (main != null) {
-            main.setStatusLine("Check for available decision procedures");
-        }
-        
-        // check whether decisionProcedure is in $PATH. If not, the
-        // taclet "Run Decision Procedure" won't be available.
-        
-        for (int i = 0; i < execDecprocs.length; i++) {
-            
-            if ( execDecprocs[i].isAvailable() ) {
-                final AbstractIntegerRule iRule = execDecprocs[i].getRule(); 
-                        
-                builtInRules = builtInRules.prepend(iRule
-                        .clone(new JavaDecisionProcedureTranslationFactory()));
-                if (main != null) {
-                    main.setStatusLine("Found: " + execDecprocs[i].getCmd() );
-                }
-            }
-            if (monitor != null) {
-                monitor.setProgress(i);
-            }
-        }
-        if (main != null) {
-            main.setStandardStatusLine();
-        }*/
         
         builtInRules = builtInRules.prepend(new SMTRule(new YicesSmtSolver()));
         builtInRules = builtInRules.prepend(new SMTRule(new SimplifySolver()));
