@@ -343,7 +343,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
     
     public static boolean isLegalScopeAnnotation(String s){
         return s!=null && (s.equals(CALLER_SCOPE) || s.equals(CONSTRUCTED_SCOPE) ||
-                s.equals(LOCAL_SCOPE) || s.equals(CONSTRUCTED_SCOPE));
+                s.equals(LOCAL_SCOPE) || s.equals(REENTRANT_SCOPE));
     }
 
     /**

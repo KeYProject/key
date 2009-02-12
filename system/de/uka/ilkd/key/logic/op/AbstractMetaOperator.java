@@ -61,6 +61,14 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     
     public static final AbstractMetaOperator META_NO_LOCAL_SCOPE = new NoLocalScope();
     
+    public static final AbstractMetaOperator META_AT_LOCAL_SCOPE = new AtLocalScope();
+    
+    public static final AbstractMetaOperator META_CALLER_ALLOC_RESULT_CONTEXT = new CallerAllocResContext();
+    
+    public static final AbstractMetaOperator META_EXACT_SIZE_SCOPE = new ExactSizeScope();
+    
+    public static final AbstractMetaOperator META_AT_REENTRANT_SCOPE = new AtReentrantScope();
+    
     public static final AbstractMetaOperator META_EXTERNALLY_CONSTRUCTED_SCOPE = new ExternallyConstructedScope();
     
     public static final AbstractMetaOperator META_STACK_AT_INDEX = new StackAtIndex();

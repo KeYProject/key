@@ -80,7 +80,7 @@ public class ExpandMethodBodyPerc extends ProgramMetaConstruct {
             callerScope = svInst.getExecutionContext().getConstructedMemoryArea();
         }else if(mr.reentrantScope()){
             KeYJavaType ot = services.getJavaInfo().getJavaLangObject();     
-            ProgramVariable ma = services.getJavaInfo().getAttribute("memoryArea", ot);
+            ProgramVariable ma = services.getJavaInfo().getAttribute(ImplicitFieldAdder.IMPLICIT_MEMORY_AREA, ot);
             callerScope = new FieldReference(ma, svInst.getExecutionContext().getRuntimeInstance());
         }else{
             callerScope = svInst.getExecutionContext().getMemoryArea();

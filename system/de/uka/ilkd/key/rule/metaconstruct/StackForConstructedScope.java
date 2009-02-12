@@ -2,6 +2,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Name;
@@ -28,8 +29,9 @@ public class StackForConstructedScope extends AbstractMetaOperator {
             mem=term.sub(3);
         }else if(mr.reentrantScope()){
             mem = termFactory.createAttributeTerm
-            (services.getJavaInfo().getAllAttributes
-             ("memoryArea", services.getJavaInfo().getJavaLangObject()).head(),
+            (services.getJavaInfo().
+                    getAttribute(ImplicitFieldAdder.IMPLICIT_MEMORY_AREA, 
+                            services.getJavaInfo().getJavaLangObject()),
              term.sub(2));
         }else if(mr.constructedScope()){
             mem=term.sub(3);

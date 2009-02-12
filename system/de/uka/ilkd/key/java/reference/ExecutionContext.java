@@ -61,6 +61,7 @@ public class ExecutionContext
         this(classContext, memoryArea, runtimeInstance, null, null); 
     }
     
+   
     /**
      * creates an execution context reference
      * @param classContext the TypeReference refering to the next enclosing

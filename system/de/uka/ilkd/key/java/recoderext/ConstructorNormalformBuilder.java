@@ -119,6 +119,8 @@ public class ConstructorNormalformBuilder
 
 		ASTList<DeclarationSpecifier> mods = new ASTArrayList<DeclarationSpecifier>(1);
 		mods.add(new Private());
+	        mods.add(new KeYAnnotationUseSpecification(new TypeReference(
+	                new Identifier("CallerAllocatedResult"))));
 		String name = OBJECT_INITIALIZER_IDENTIFIER + mdl.size();
 		MethodDeclaration initializerMethod = 
 		    new MethodDeclaration

@@ -367,6 +367,10 @@ public class MethodDeclaration
     public boolean noLocalScope(){
         return isAnnotatedWith("@NoLocalScope");
     }
+    
+    public boolean callerAllocatedResult(){
+        return isAnnotatedWith("@CallerAllocatedResult");
+    }
 
     /**
      * Test whether the declaration is private.
