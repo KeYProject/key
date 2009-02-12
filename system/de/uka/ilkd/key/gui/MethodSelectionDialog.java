@@ -15,7 +15,7 @@ import de.uka.ilkd.key.logic.op.SetAsListOfProgramMethod;
 import de.uka.ilkd.key.logic.op.SetOfProgramMethod;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
-import de.uka.ilkd.key.unittest.simplify.SimplifyModelGenerator;
+//import de.uka.ilkd.key.unittest.simplify.SimplifyModelGenerator;
 
 public class MethodSelectionDialog extends JDialog {
 
@@ -58,10 +58,10 @@ public class MethodSelectionDialog extends JDialog {
 	getContentPane().setLayout(new BoxLayout(getContentPane(), 
 						 BoxLayout.Y_AXIS));
 	final MethodSelectionDialog thisRef = this;
-	final JTextField simplifyDataTupleNumber =
-	    new JTextField(""+SimplifyModelGenerator.modelLimit, 2);
-	simplifyDataTupleNumber.setToolTipText("Minimal number of data tuples"+
-					       "per test method");
+//	final JTextField simplifyDataTupleNumber =
+//	    new JTextField(""+SimplifyModelGenerator.modelLimit, 2);
+//	simplifyDataTupleNumber.setToolTipText("Minimal number of data tuples"+
+//					       "per test method");
 	// methodlist
 	methodList = new JList();
 	methodList.setCellRenderer(new DefaultListCellRenderer(){
@@ -113,7 +113,7 @@ public class MethodSelectionDialog extends JDialog {
 	JButton testAll = new JButton("Create Test For Proof");
 	testAll.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-		    setSimplifyCount(simplifyDataTupleNumber.getText());
+//		    setSimplifyCount(simplifyDataTupleNumber.getText());
 		    createTest(null);
 		}
 	    });
@@ -127,7 +127,7 @@ public class MethodSelectionDialog extends JDialog {
 			    "No Methods Selected", 
 			    JOptionPane.ERROR_MESSAGE);
 		    }else{
-			setSimplifyCount(simplifyDataTupleNumber.getText());
+//			setSimplifyCount(simplifyDataTupleNumber.getText());
 			createTest(methodList.getSelectedValues());
 		    }
 		}
@@ -209,7 +209,7 @@ public class MethodSelectionDialog extends JDialog {
 
     public void setSimplifyCount(String s){
 	try{
-	    SimplifyModelGenerator.modelLimit = Integer.parseInt(s);
+//	    SimplifyModelGenerator.modelLimit = Integer.parseInt(s);
 	}catch(NumberFormatException ex){
 	    System.out.println(ex);
 	    // do nothing

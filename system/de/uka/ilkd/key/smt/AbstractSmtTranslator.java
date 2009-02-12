@@ -90,15 +90,15 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      * 
      * @param sequent
      *                The sequent which shall be translated.
-     * @param cs
-     *                The constraints which shall be incorporated.
      * @param localmv
      *                The local metavariables, should be the ones introduced
      *                after the last branch.
      */
-    public AbstractSmtTranslator(Sequent sequent, ConstraintSet cs,
+//    public AbstractSmtTranslator(Sequent sequent, ConstraintSet cs,
+//	    SetOfMetavariable localmv, Services services, boolean lightWeight) {
+    public AbstractSmtTranslator(Sequent sequent,
 	    SetOfMetavariable localmv, Services services, boolean lightWeight) {
-	localMetavariables = localmv;
+    	localMetavariables = localmv;
 //	constraintSet = cs;
 	jbyteSort = services.getTypeConverter().getByteLDT().targetSort();
 	jshortSort = services.getTypeConverter().getShortLDT().targetSort();
@@ -108,16 +108,18 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 	integerSort = services.getTypeConverter().getIntegerLDT().targetSort();
     }
 
-    public AbstractSmtTranslator(Sequent sequent, ConstraintSet cs,
+//    public AbstractSmtTranslator(Sequent sequent, ConstraintSet cs,
+//	    SetOfMetavariable localmv, Services services) {
+    public AbstractSmtTranslator(Sequent sequent,
 	    SetOfMetavariable localmv, Services services) {
-	this(sequent, cs, localmv, services, false);
+	this(sequent, localmv, services, false);
     }
 
     /**
      * For translating only terms and not complete sequents.
      */
     public AbstractSmtTranslator(Services s) {
-	this(null, null, null, s, false);
+	this(null, null, s, false);
     }
 
     /**

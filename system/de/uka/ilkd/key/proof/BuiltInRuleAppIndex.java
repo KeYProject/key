@@ -20,7 +20,7 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
     private NewRuleListener  newRuleListener =
         NullNewRuleListener.INSTANCE;
 
-    private SimplifyIntegerRule simplify = null;
+    //private SimplifyIntegerRule simplify = null;
     
     
     public BuiltInRuleAppIndex(BuiltInRuleIndex index) {
@@ -83,7 +83,7 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
 //	scanDecProcRule(goal, userConstraint, getNewRulePropagator () );
     }
 
-    private void scanDecProcRule(Goal goal,
+/*    private void scanDecProcRule(Goal goal,
 				 Constraint userConstraint, 
 				 NewRuleListener listener){
 	BuiltInRule bir = findDecProcRule();
@@ -91,9 +91,9 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
 						  null,
 						  userConstraint );
 	listener.ruleAdded ( app, null );
-    }
+    }*/
 
-    private SimplifyIntegerRule findDecProcRule(){
+/*    private SimplifyIntegerRule findDecProcRule(){
 	if(simplify != null) return simplify;
 	IteratorOfBuiltInRule it = index.rules().iterator();
 	while (it.hasNext()) {
@@ -103,7 +103,7 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
 	    }
 	}
 	return simplify;
-    }
+    }*/
 
     private void scanSimplificationRule ( Goal       goal,
 					  Constraint userConstraint, 

@@ -6,15 +6,15 @@ import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.decproc.DecisionProcedureYices;
-import de.uka.ilkd.key.proof.decproc.JavaDecisionProcedureTranslationFactory;
+//import de.uka.ilkd.key.proof.decproc.DecisionProcedureYices;
+//import de.uka.ilkd.key.proof.decproc.JavaDecisionProcedureTranslationFactory;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
-import de.uka.ilkd.key.rule.AbstractIntegerRule;
+//import de.uka.ilkd.key.rule.AbstractIntegerRule;
 import de.uka.ilkd.key.rule.ListOfBuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.SLListOfBuiltInRule;
-import de.uka.ilkd.key.rule.YicesIntegerRule;
+//import de.uka.ilkd.key.rule.YicesIntegerRule;
 import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.smt.SimplifySolver;
 import de.uka.ilkd.key.smt.YicesSmtSolver;
@@ -29,7 +29,7 @@ public abstract class AbstractProfile implements Profile {
 
     private IMain                       main;
 
-    private AbstractExecDecproc[] execDecprocs;
+//    private AbstractExecDecproc[] execDecprocs;
     
     private final RuleCollection       standardRules;
 
@@ -46,13 +46,13 @@ public abstract class AbstractProfile implements Profile {
             SetOfGoalChooserBuilder supportedGCB, IMain main) {
         
         // First initialise execDecproc, because it is used in initBuiltInRules()!
-        int concreteDecprocs = ConcreteExecDecproc.getDecprocNumber();
-        execDecprocs = new AbstractExecDecproc[ concreteDecprocs + 1 ]; // +1 for later added dec procs!
-        for ( int i = 0; i < concreteDecprocs; i++ ) {
-            execDecprocs[i] =  new ConcreteExecDecproc( i );
-        }
+//        int concreteDecprocs = ConcreteExecDecproc.getDecprocNumber();
+//        execDecprocs = new AbstractExecDecproc[ concreteDecprocs + 1 ]; // +1 for later added dec procs!
+//        for ( int i = 0; i < concreteDecprocs; i++ ) {
+//            execDecprocs[i] =  new ConcreteExecDecproc( i );
+//        }
         // Add dec procs that cannot be treated uniformly within ConcreteExecDecproc
-        execDecprocs[ concreteDecprocs++ ] = new ExecSVC();
+//        execDecprocs[ concreteDecprocs++ ] = new ExecSVC();
         
         standardRules = new RuleCollection(RuleSource
                 .initRuleFile(standardRuleFilename), 
@@ -102,7 +102,7 @@ public abstract class AbstractProfile implements Profile {
 
         final ProgressMonitor monitor = main == null ? null : main
                 .getProgressMonitor();
-        if (monitor != null) {
+/*        if (monitor != null) {
             monitor.setMaximum(execDecprocs.length);
         }
         if (main != null) {
@@ -129,7 +129,7 @@ public abstract class AbstractProfile implements Profile {
         }
         if (main != null) {
             main.setStandardStatusLine();
-        }
+        }*/
         
         builtInRules = builtInRules.prepend(new SMTRule(new YicesSmtSolver()));
         builtInRules = builtInRules.prepend(new SMTRule(new SimplifySolver()));

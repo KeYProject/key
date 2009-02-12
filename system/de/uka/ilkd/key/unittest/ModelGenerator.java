@@ -5,7 +5,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.decproc.*;
+//import de.uka.ilkd.key.proof.decproc.*;
 import de.uka.ilkd.key.unittest.simplify.*;
 import de.uka.ilkd.key.unittest.cogent.*;
 import java.util.*;
@@ -336,14 +336,14 @@ public class ModelGenerator{
 		term2class, locations);
 	    intModelSet = dmg.createModels();
 	}
-	if(decProdForTestGen == SIMPLIFY /*|| intModelSet.isEmpty()*/){
-	    dmg = new SimplifyModelGenerator(
-		new DecisionProcedureSimplify(
-		    node, userConstraint, 
-		    new JavaDecisionProcedureTranslationFactory(), serv), serv,
-		term2class, locations);
-	    intModelSet = dmg.createModels();
-	}
+//	if(decProdForTestGen == SIMPLIFY /*|| intModelSet.isEmpty()*/){
+//	    dmg = new SimplifyModelGenerator(
+//		new DecisionProcedureSimplify(
+//		    node, userConstraint, 
+//		    new JavaDecisionProcedureTranslationFactory(), serv), serv,
+//		term2class, locations);
+//	    intModelSet = dmg.createModels();
+//	}
 	Set modelSet = new HashSet();
 	Iterator it = intModelSet.iterator();
 	while(it.hasNext()){

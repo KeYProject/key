@@ -48,7 +48,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAuflia;
+//import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAuflia;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.NonInterferenceCheck;
@@ -357,7 +357,7 @@ public class Main extends JFrame implements IMain {
         else {
             org.apache.log4j.BasicConfigurator.configure();
             Logger.getRootLogger().setLevel(org.apache.log4j.Level.ERROR);            
-            DecisionProcedureSmtAuflia.configureLogger(org.apache.log4j.Level.DEBUG);  //Debugging of SMT Translation
+//            DecisionProcedureSmtAuflia.configureLogger(org.apache.log4j.Level.DEBUG);  //Debugging of SMT Translation
         }
     }
     

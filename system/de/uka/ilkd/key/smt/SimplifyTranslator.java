@@ -67,14 +67,14 @@ public class SimplifyTranslator extends AbstractSmtTranslator {
      *                The local metavariables, should be the ones introduced
      *                after the last branch.
      */
-    public SimplifyTranslator(Sequent sequent, ConstraintSet cs,
+    public SimplifyTranslator(Sequent sequent,
 	    SetOfMetavariable localmv, Services services, boolean lightWeight) {
-	super(sequent, cs, localmv, services, lightWeight);
+	super(sequent, localmv, services, lightWeight);
     }
 
-    public SimplifyTranslator(Sequent sequent, ConstraintSet cs,
+    public SimplifyTranslator(Sequent sequent,
 	    SetOfMetavariable localmv, Services services) {
-	super(sequent, cs, localmv, services);
+	super(sequent, localmv, services);
     }
     
     public SimplifyTranslator(Services services) {
