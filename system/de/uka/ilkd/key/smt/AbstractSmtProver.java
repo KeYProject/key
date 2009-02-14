@@ -268,6 +268,10 @@ public abstract class AbstractSmtProver implements SmtSolver{
 		t.schedule(tt, new Date(System.currentTimeMillis()), 1000);
 		try {
 		    p.waitFor();
+		    if (tt.wasInterrupted()) {
+			logger.debug(
+				"Process for smt formula proving interrupted because of timeout.");
+		    }
 		} catch (InterruptedException f) {
 		    logger.debug(
 			    "Process for smt formula proving interrupted.",

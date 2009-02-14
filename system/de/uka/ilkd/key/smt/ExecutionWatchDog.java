@@ -9,6 +9,8 @@ public final class ExecutionWatchDog extends TimerTask {
     private Process proc;
 
     private long starttime = -1;
+    
+    private boolean wasInterrupted = false;
 
     /**
      * Construct a new Watch dog.
@@ -19,6 +21,7 @@ public final class ExecutionWatchDog extends TimerTask {
 	super();
 	this.timeout = timeout;
 	this.proc = p;
+	this.wasInterrupted = false;
     }
 
     @Override
@@ -28,9 +31,14 @@ public final class ExecutionWatchDog extends TimerTask {
 	}
 
 	if (System.currentTimeMillis() - this.starttime > timeout * 1000) {
+	    this.wasInterrupted = true;
 	    proc.destroy();
 	}
 
+    }
+    
+    public boolean wasInterrupted() {
+	return this.wasInterrupted;
     }
 
 }
