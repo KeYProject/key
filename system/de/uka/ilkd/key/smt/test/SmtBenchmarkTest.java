@@ -15,15 +15,14 @@ import de.uka.ilkd.key.smt.SimplifySolver;
 import de.uka.ilkd.key.smt.SmtSolver;
 import de.uka.ilkd.key.smt.YicesSmtSolver;
 import de.uka.ilkd.key.smt.Z3Solver;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 public class SmtBenchmarkTest extends TestCase implements FilenameFilter{
 
-    private static String VALID = "val";
-    private static String INVALID = "inv";
-    private static String UNKNOWN = "unk";
-    private static String NOTAVAILABLE = "N/A";
+    private static String VALID = "valid";
+    private static String INVALID = "not valid";
+    private static String UNKNOWN = "unknown";
+    private static String NOTAVAILABLE = "not installed";
     private int maxExecutionTime = 10;
     
     public static final String folderPath = System.getProperty("key.home")
