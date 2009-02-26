@@ -1,6 +1,0 @@
-(DEFPRED (int_1 x0))
-(DEFPRED (p_2 x1))
-(FORALL ()(EXISTS ()
- (IMPLIES (AND (AND (AND (AND (int_1 2) (int_1 0)) (int_1 (+ x_0 1))) (int_1 1)) (int_1 x_0))(IMPLIES (AND)
-(OR (IMPLIES (AND (FORALL (x_0) (IMPLIES(int_1 x_0 )(IMPLIES (p_2 x_0) (p_2 (+ x_0 1))))) (p_2 0)) (p_2 2)))))
-))

@@ -1,5 +1,0 @@
-(DEFPRED (S_1 x45))
-(FORALL ()(EXISTS ()
- (IMPLIES (AND (AND (S_1 x_3) (S_1 x_0)) (S_1 y_2))(IMPLIES (AND)
-(OR (FORALL (x_0) (IMPLIES(S_1 x_0 )(FORALL (y_2) (IMPLIES(S_1 y_2 )(AND (EQ y_2 x_0) (FORALL (x_3) (IMPLIES(S_1 x_3 )(EQ y_2 x_3)))))))))))
-))

@@ -1,5 +1,0 @@
-(DEFPRED (s_1 x2))
-(FORALL ()(EXISTS ()
- (IMPLIES (AND (AND (AND (AND (AND (AND (AND (s_1 (f_2 (f_2 (f_2 (f_2 (a_3)))))) (s_1 (f_2 (f_2 (f_2 (a_3)))))) (s_1 (f_2 (f_2 (a_3))))) (s_1 (f_2 (a_3)))) (s_1 (b_4))) (s_1 (a_3))) (s_1 (f_2 x_0))) (s_1 x_0))(IMPLIES (AND)
-(OR (IMPLIES (AND (FORALL (x_0) (IMPLIES(s_1 x_0 )(EQ x_0 (f_2 x_0)))) (EQ (a_3) (b_4))) (EQ (f_2 (f_2 (f_2 (f_2 (a_3))))) (b_4))))))
-))

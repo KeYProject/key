@@ -1,3 +1,0 @@
-(DEFPRED (p_3 x_6))
-(DEFPRED (type_of_S_1_2 x_7))
-(FORALL () (EXISTS () (IMPLIES (AND (type_of_S_1_2 (a_4)) (type_of_S_1_2 (dummy_S_5))) (IMPLIES TRUE (IMPLIES (FORALL (x_0) (IMPLIES (type_of_S_1_2 x_0) (p_3 x_0))) (p_3 (a_4)))))))

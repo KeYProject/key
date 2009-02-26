@@ -1,4 +1,0 @@
-(DEFPRED (A_3))
-(DEFPRED (P_4 x_7))
-(DEFPRED (type_of_int_1_2 x_8))
-(FORALL () (EXISTS () (IMPLIES (type_of_int_1_2 (dummy_int_6)) (IMPLIES TRUE (OR (FORALL (x_0) (IMPLIES (type_of_int_1_2 x_0) (IMPLIES (A_3) (P_4 x_0)))) (FORALL (x_5) (IMPLIES (type_of_int_1_2 x_5) (IMPLIES (P_4 x_5) (A_3)))))))))

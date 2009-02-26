@@ -27,8 +27,7 @@ public class SmtBenchmarkTest extends TestCase implements FilenameFilter{
     
     public static final String folderPath = System.getProperty("key.home")
     + File.separator + "examples"
-    + File.separator + "toolBenchmark"
-    + File.separator + "keyFiles"
+    + File.separator + "smtBenchmark"
     + File.separator;
     
     public void testBenchmarks() {

@@ -1,4 +1,0 @@
-(DEFPRED (q_4 x_6))
-(DEFPRED (p_3 x_7))
-(DEFPRED (type_of_int_1_2 x_8))
-(FORALL () (EXISTS () (IMPLIES (AND (AND (AND (type_of_int_1_2 (dummy_int_5)) (type_of_int_1_2 12)) (type_of_int_1_2 0)) (type_of_int_1_2 1)) (IMPLIES TRUE (IMPLIES (AND (AND (FORALL (mv0_0) (IMPLIES (type_of_int_1_2 mv0_0) (IMPLIES (p_3 mv0_0) (q_4 mv0_0)))) (p_3 0)) (p_3 1)) (q_4 12))))))

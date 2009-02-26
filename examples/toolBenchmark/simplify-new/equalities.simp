@@ -1,2 +1,0 @@
-(DEFPRED (type_of_s_0_1 x_6))
-(FORALL () (EXISTS () (IMPLIES (AND (AND (AND (type_of_s_0_1 (c_4)) (type_of_s_0_1 (dummy_s_5))) (type_of_s_0_1 (b_3))) (type_of_s_0_1 (a_2))) (IMPLIES TRUE (IMPLIES (AND (EQ (a_2) (b_3)) (EQ (c_4) (b_3))) (EQ (a_2) (c_4)))))))

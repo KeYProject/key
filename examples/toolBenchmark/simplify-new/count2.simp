@@ -1,2 +1,0 @@
-(DEFPRED (type_of_s_1_2 x_8))
-(FORALL () (EXISTS () (IMPLIES (AND (AND (AND (type_of_s_1_2 (b_5)) (FORALL (tvar_7) (IMPLIES (type_of_s_1_2 tvar_7) (type_of_s_1_2 (f_3 tvar_7))))) (type_of_s_1_2 (dummy_s_6))) (type_of_s_1_2 (a_4))) (IMPLIES TRUE (IMPLIES (AND (FORALL (x_0) (IMPLIES (type_of_s_1_2 x_0) (EQ x_0 (f_3 x_0)))) (EQ (a_4) (b_5))) (EQ (f_3 (f_3 (f_3 (f_3 (a_4))))) (b_5)))))))

@@ -1,3 +1,0 @@
-(DEFPRED (type_of_java_dot_lang_dot_Object_1_2 x_9))
-(DEFPRED (type_of_java_dot_lang_dot_String_Array_3_4 x_10))
-(FORALL () (EXISTS () (IMPLIES (AND (AND (AND (AND (AND (type_of_java_dot_lang_dot_String_Array_3_4 (dummy_java_dot_lang.String_Array_7)) (type_of_java_dot_lang_dot_Object_1_2 (dummy_java_dot_lang.Object_6))) (type_of_java_dot_lang_dot_String_Array_3_4 (oldAr_5))) (FORALL (tvar_8) (IMPLIES (type_of_java_dot_lang_dot_String_Array_3_4 tvar_8) (type_of_java_dot_lang_dot_Object_1_2 tvar_8)))) (type_of_java_dot_lang_dot_Object_1_2 null)) (type_of_java_dot_lang_dot_String_Array_3_4 null)) (IMPLIES TRUE (IMPLIES (FORALL (o_0) (IMPLIES (type_of_java_dot_lang_dot_Object_1_2 o_0) (EQ o_0 null))) (EQ (oldAr_5) null))))))

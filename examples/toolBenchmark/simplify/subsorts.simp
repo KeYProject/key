@@ -1,7 +1,0 @@
-(DEFPRED (|java.lang.Object_1| x51))
-(DEFPRED (Null_3 x52))
-(DEFPRED (|java.lang.String[]_5| x53))
-(FORALL ()(EXISTS ()
- (IMPLIES (AND (AND (|java.lang.String[]_5| oldAr_4) (Null_3 (null_2))) (|java.lang.Object_1| o_0))(IMPLIES (AND)
-(OR (IMPLIES (FORALL (o_0) (IMPLIES(|java.lang.Object_1| o_0 )(EQ o_0 (null_2)))) (EQ oldAr_4 (null_2))))))
-))

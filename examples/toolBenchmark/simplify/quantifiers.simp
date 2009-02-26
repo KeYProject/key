@@ -1,6 +1,0 @@
-(DEFPRED (s_1 x41))
-(DEFPRED (p_3 x42 x43))
-(FORALL ()(EXISTS ()
- (IMPLIES (AND (AND (AND (s_1 v_4) (s_1 u_5)) (s_1 y_2)) (s_1 x_0))(IMPLIES (AND)
-(OR (IMPLIES (EXISTS (x_0) (AND(s_1 x_0 )(FORALL (y_2) (IMPLIES(s_1 y_2 )(p_3 x_0 y_2))))) (FORALL (v_4) (IMPLIES(s_1 v_4 )(EXISTS (u_5) (AND(s_1 u_5 )(p_3 u_5 v_4)))))))))
-))
