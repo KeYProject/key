@@ -33,51 +33,6 @@ public abstract class AbstractSolverTest extends TestCase {
      */
     public abstract SmtSolver getSolver();
     
-    
-    public void testCount() {
-	Assert.assertTrue(correctResult(testFile + "count.key", true));
-    }
-    
-    public void testCount2() {
-	Assert.assertTrue(correctResult(testFile + "count2.key", true));
-    }
-    
-    public void testCount3() {
-	Assert.assertTrue(correctResult(testFile + "count3.key", true));
-    }
-    
-    public void testSameName() {
-	Assert.assertTrue(correctResult(testFile + "sameName1.key", false));
-    }
-    
-    public void testMv3() {
-	Assert.assertTrue( correctResult(testFile + "mv3.key", false));
-    }
-    
-    public void testExist() {
-	Assert.assertTrue(correctResult(testFile + "exist1.key", true));
-    }
-    
-    public void testSubsorts() {
-	Assert.assertTrue(correctResult(testFile + "subsorts.key", true));
-    }
-    
-    public void testEqualities() {
-	Assert.assertTrue(correctResult(testFile + "equalities.key", true));
-    }
-    
-    public void testImply() {
-	Assert.assertTrue(correctResult(testFile + "imply.key", true));
-    }
-    
-    public void testImply2() {
-	Assert.assertTrue(correctResult(testFile + "imply2.key", false));
-    }
-    
-    public void testFunctions() {
-	Assert.assertTrue(correctResult(testFile + "functions.key", true));
-    }
-    
     public void testAndnot() {
 	Assert.assertTrue(correctResult(testFile + "andnot.key", false));
     }
@@ -87,15 +42,63 @@ public abstract class AbstractSolverTest extends TestCase {
     }
     
     public void testAndornot() {
-	Assert.assertTrue(correctResult(testFile + "andornot.key", true));
+	Assert.assertTrue(correctResult(testFile + "andornot.key", false));
     }
     
     public void testAndornot2() {
-	Assert.assertTrue(correctResult(testFile + "andornot2.key", false));
+	Assert.assertTrue(correctResult(testFile + "andornot2.key", true));
+    }
+    
+    public void testImply() {
+	Assert.assertTrue(correctResult(testFile + "imply.key", true));
+    }
+    
+    public void testImply2() {
+	Assert.assertTrue(correctResult(testFile + "imply2.key", true));
+    }
+    
+    public void testImply3() {
+	Assert.assertTrue(correctResult(testFile + "imply3.key", false));
+    }
+    
+    public void testEqui1() {
+	Assert.assertTrue(correctResult(testFile + "equi1.key", true));
+    }
+    
+    public void testEqui2() {
+	Assert.assertTrue(correctResult(testFile + "equi2.key", false));
+    }
+    
+    public void testAllex1() {
+	Assert.assertTrue(correctResult(testFile + "allex1.key", true));
+    }
+    
+    public void testAllex2() {
+	Assert.assertTrue(correctResult(testFile + "allex2.key", false));
+    }
+    
+    public void testAllex3() {
+	Assert.assertTrue(correctResult(testFile + "allex3.key", true));
+    }
+    
+    public void testEqual1() {
+	Assert.assertTrue(correctResult(testFile + "equal1.key", true));
+    }
+    
+    public void testEqual2() {
+	Assert.assertTrue(correctResult(testFile + "equal2.key", false));
+    }
+    
+    public void testSubsort1() {
+	Assert.assertTrue(correctResult(testFile + "subsort1.key", true));
+    }
+    
+    public void testSubsort2() {
+	Assert.assertTrue(correctResult(testFile + "subsort2.key", false));
     }
     
     private boolean correctResult(String filepath, boolean isGeneralValid) {
-	if (this.toolNotInstalled) {
+	if (toolNotInstalled) {
 	    return true;
 	}
 	
