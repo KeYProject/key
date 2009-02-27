@@ -230,8 +230,8 @@ public abstract class AbstractSmtProver implements SmtSolver{
 	    toReturn = this.runProver(s, timeout, services);
     	} catch (IllegalFormulaException e) {
 	    toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
-	    logger.error("The formula could not be translated.", e);
-	    throw new RuntimeException("The formula could not be translated.\n" + e.getMessage());
+	    logger.debug("The formula could not be translated.", e);
+	    //throw new RuntimeException("The formula could not be translated.\n" + e.getMessage());
 	}
     	
     	return toReturn;
@@ -258,8 +258,8 @@ public abstract class AbstractSmtProver implements SmtSolver{
 	    toReturn = this.runProver(s, timeout, services);
     	} catch (IllegalFormulaException e) {
 	    toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
-	    logger.error("The formula could not be translated.", e);
-	    throw new RuntimeException("The formula could not be translated.\n" + e.getMessage());
+	    logger.debug("The formula could not be translated.", e);
+	    //throw new RuntimeException("The formula could not be translated.\n" + e.getMessage());
 	}
     	
     	return toReturn;

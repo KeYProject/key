@@ -81,6 +81,22 @@ public abstract class AbstractSolverTest extends TestCase {
 	Assert.assertTrue(correctResult(testFile + "allex3.key", true));
     }
     
+    public void testLogicalIte1() {
+	Assert.assertTrue(correctResult(testFile + "logicalite1.key", true));
+    }
+    
+    public void testLogicalIte2() {
+	Assert.assertTrue(correctResult(testFile + "logicalite2.key", false));
+    }
+    
+    public void testTermIte1() {
+	Assert.assertTrue(correctResult(testFile + "termite1.key", true));
+    }
+    
+    public void testTermlIte2() {
+	Assert.assertTrue(correctResult(testFile + "termite2.key", false));
+    }
+    
     public void testEqual1() {
 	Assert.assertTrue(correctResult(testFile + "equal1.key", true));
     }
@@ -115,8 +131,9 @@ public abstract class AbstractSolverTest extends TestCase {
 	    return true;
 	}
 	
+	//unknown is always allowed. But wron answeres are not allowed
 	if (isGeneralValid) {
-	    if (result == SmtSolver.RESULTTYPE.VALID) {
+	    if (result == SmtSolver.RESULTTYPE.VALID || result == SmtSolver.RESULTTYPE.UNKNOWN) {
 		return true;
 	    } else {
 		return false;

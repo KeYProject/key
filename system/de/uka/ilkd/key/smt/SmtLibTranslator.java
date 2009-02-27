@@ -56,6 +56,8 @@ public class SmtLibTranslator extends AbstractSmtTranslator {
     
     private static StringBuffer LOGICALIFTHENELSE = new StringBuffer("if_then_else");
 
+    private static StringBuffer TERMIFTHENELSE = new StringBuffer("ite");
+    
     /**
      * Just a constructor which starts the conversion to Simplify syntax.
      * The result can be fetched with
@@ -418,6 +420,15 @@ public class SmtLibTranslator extends AbstractSmtTranslator {
         args.add(ifterm);
         args.add(elseterm);
         return buildFunction(LOGICALIFTHENELSE, args);
+    }
+    
+    @Override
+    protected StringBuffer translateTermIfThenElse(StringBuffer cond, StringBuffer ifterm, StringBuffer elseterm) throws IllegalFormulaException {
+	ArrayList<StringBuffer> args = new ArrayList<StringBuffer>();
+        args.add(cond);
+        args.add(ifterm);
+        args.add(elseterm);
+        return buildFunction(TERMIFTHENELSE, args);
     }
     
     @Override
