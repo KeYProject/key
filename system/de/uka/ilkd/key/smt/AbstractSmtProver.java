@@ -11,6 +11,8 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.util.HelperClassForTests;
+
 import org.apache.log4j.Logger;
 
 public abstract class AbstractSmtProver implements SmtSolver{
@@ -41,6 +43,13 @@ public abstract class AbstractSmtProver implements SmtSolver{
     public abstract Name name();
 
     protected boolean isApplicable(Goal goal) {
+	/*Services s = new Services();
+	try {
+	    this.getTranslator(s).translate(goal.sequent(), s);
+	} catch (IllegalFormulaException e) {
+	    return false;
+	}
+	return true;*/
 	boolean toReturn = true;
 	Semisequent ant = goal.sequent().antecedent();
 	for (ConstrainedFormula c : ant) {
@@ -56,7 +65,13 @@ public abstract class AbstractSmtProver implements SmtSolver{
     }
     
     protected boolean isApplicable(Term term) {
-	
+	/*Services s = new Services();
+	try {
+	    this.getTranslator(s).translate(term, s);
+	} catch (IllegalFormulaException e) {
+	    return false;
+	}
+	return true;*/
 	Operator op = term.op();
 	if (op == Op.NOT) {
 	    return isApplicable(term.sub(0));
@@ -80,6 +95,8 @@ public abstract class AbstractSmtProver implements SmtSolver{
 	} else if (op == Op.FALSE) {
 	    return true;
 	} else if (op == Op.NULL) {
+	    return true;
+	} else if (op == Op.IF_THEN_ELSE) {
 	    return true;
 	} else if (op instanceof LogicVariable || op instanceof ProgramVariable) {
 	    // translate as variable or constant

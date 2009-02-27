@@ -110,6 +110,7 @@ public abstract class AbstractSolverTest extends TestCase {
 	    System.out.println();
 	    System.out.println("Error while execution of " + this.getSolver().displayName());
 	    System.out.println();
+	    e.printStackTrace();
 	    toolNotInstalled = true;
 	    return true;
 	}

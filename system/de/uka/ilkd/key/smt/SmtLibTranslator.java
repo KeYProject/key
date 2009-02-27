@@ -53,6 +53,8 @@ public class SmtLibTranslator extends AbstractSmtTranslator {
     private static StringBuffer NULLSTRING = new StringBuffer("null");
 
     private static StringBuffer NULLSORTSTRING = new StringBuffer("NULLSORT");
+    
+    private static StringBuffer LOGICALIFTHENELSE = new StringBuffer("if_then_else");
 
     /**
      * Just a constructor which starts the conversion to Simplify syntax.
@@ -409,6 +411,15 @@ public class SmtLibTranslator extends AbstractSmtTranslator {
 	return buildFunction(EQSTRING, args);
     }
 
+    @Override
+    protected StringBuffer translateLogicalIfThenElse(StringBuffer cond, StringBuffer ifterm, StringBuffer elseterm) {
+        ArrayList<StringBuffer> args = new ArrayList<StringBuffer>();
+        args.add(cond);
+        args.add(ifterm);
+        args.add(elseterm);
+        return buildFunction(LOGICALIFTHENELSE, args);
+    }
+    
     @Override
     protected StringBuffer translatePredicate(StringBuffer name,
 	    ArrayList<StringBuffer> args) {

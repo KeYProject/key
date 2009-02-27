@@ -6,7 +6,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 //import de.uka.ilkd.key.proof.decproc.ConstraintSet;
-import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
+//import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.java.Services;
 
@@ -166,7 +166,7 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      * get the assumptions made by the logic.
      * @return ArrayList of Formulas, that are assumed to be true.
      */
-    private ArrayList<StringBuffer> getAssumptions(Services services) {
+    private ArrayList<StringBuffer> getAssumptions(Services services) throws IllegalFormulaException {
 	ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
 	
 	if (!this.isMultiSorted()) {
@@ -192,7 +192,7 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      * typing
      * @return ArrayList of formulas, assuring the assumption.
      */
-    private ArrayList<StringBuffer> getSpecialSortPredicates(Services services) {
+    private ArrayList<StringBuffer> getSpecialSortPredicates(Services services) throws IllegalFormulaException{
 	ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
 	
 	for (Function o : this.specialFunctions) {
@@ -588,8 +588,8 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
     }
     
     /**
-     * Returns, wheather the Structer, this translator creates should be a
-     * Structur, that is multi sorted with inheritance of Sorts. If false, a
+     * Returns, wheather the Structure, this translator creates should be a
+     * Structure, that is multi sorted with inheritance of Sorts. If false, a
      * single sorted structure is created.
      * 
      * @return true, if multi sorted logic is supported.
@@ -780,8 +780,13 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      *                second val of the sum.
      * @return The formula representing the integer plus.
      */
-    protected abstract StringBuffer translateIntegerPlus(StringBuffer arg1,
-	    StringBuffer arg2);
+    protected StringBuffer translateIntegerPlus(StringBuffer arg1,
+	    StringBuffer arg2) throws IllegalFormulaException {
+	if (true) {
+	    throw new IllegalFormulaException("Integer addition is not supported by this translator.");
+	}
+	return new StringBuffer();
+    }
 
     /**
      * Translate the integer minus.
@@ -792,8 +797,13 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      *                second val of the substraction.
      * @return The formula representing the integer substraction.
      */
-    protected abstract StringBuffer translateIntegerMinus(StringBuffer arg1,
-	    StringBuffer arg2);
+    protected StringBuffer translateIntegerMinus(StringBuffer arg1,
+	    StringBuffer arg2) throws IllegalFormulaException {
+	if (true) {
+	    throw new IllegalFormulaException("Integer subtraction is not supported by this translator.");
+	}
+	return new StringBuffer();
+    }
 
     /**
      * Translate a unary minus.
@@ -802,7 +812,13 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      *                the argument of the unary minus.
      * @return the formula representing tha unary minus function.
      */
-    protected abstract StringBuffer translateIntegerUnaryMinus(StringBuffer arg);
+    protected StringBuffer translateIntegerUnaryMinus(StringBuffer arg) 
+    	throws IllegalFormulaException {
+	if (true) {
+	    throw new IllegalFormulaException("negative numbers are not supported by this translator.");
+	}
+	return new StringBuffer();
+    }
 
     /**
      * Translate the integer multiplication.
@@ -813,8 +829,13 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      *                second val of the multiplication.
      * @return The formula representing the integer multiplication.
      */
-    protected abstract StringBuffer translateIntegerMult(StringBuffer arg1,
-	    StringBuffer arg2);
+    protected StringBuffer translateIntegerMult(StringBuffer arg1,
+	    StringBuffer arg2) throws IllegalFormulaException {
+	if (true) {
+	    throw new IllegalFormulaException("Integer multiplication is not supported by this translator.");
+	}
+	return new StringBuffer();
+    }
 
     /**
      * Translate the integer division.
@@ -825,8 +846,13 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      *                second val of the division.
      * @return The formula representing the integer division.
      */
-    protected abstract StringBuffer translateIntegerDiv(StringBuffer arg1,
-	    StringBuffer arg2);
+    protected StringBuffer translateIntegerDiv(StringBuffer arg1,
+	    StringBuffer arg2) throws IllegalFormulaException {
+	if (true) {
+	    throw new IllegalFormulaException("Integer division is not supported by this translator.");
+	}
+	return new StringBuffer();
+    }
 
     /**
      * Translate the integer modulo.
@@ -837,8 +863,13 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      *                second val of the modulo.
      * @return The formula representing the integer modulo.
      */
-    protected abstract StringBuffer translateIntegerMod(StringBuffer arg1,
-	    StringBuffer arg2);
+    protected StringBuffer translateIntegerMod(StringBuffer arg1,
+	    StringBuffer arg2) throws IllegalFormulaException {
+	if (true) {
+	    throw new IllegalFormulaException("Integer modulo is not supported by this translator.");
+	}
+	return new StringBuffer();
+    }
 
     /**
      * Translate the greater than.
@@ -849,8 +880,13 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      *                second val of the greater than.
      * @return The formula representing the greater than.
      */
-    protected abstract StringBuffer translateIntegerGt(StringBuffer arg1,
-	    StringBuffer arg2);
+    protected StringBuffer translateIntegerGt(StringBuffer arg1,
+	    StringBuffer arg2) throws IllegalFormulaException {
+	if (true) {
+	    throw new IllegalFormulaException("Integer greater is not supported by this translator.");
+	}
+	return new StringBuffer();
+    }
 
     /**
      * Translate the less than.
@@ -861,8 +897,13 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      *                second val of the less than.
      * @return The formula representing the less than.
      */
-    protected abstract StringBuffer translateIntegerLt(StringBuffer arg1,
-	    StringBuffer arg2);
+    protected StringBuffer translateIntegerLt(StringBuffer arg1,
+	    StringBuffer arg2) throws IllegalFormulaException {
+	if (true) {
+	    throw new IllegalFormulaException("Integer less is not supported by this translator.");
+	}
+	return new StringBuffer();
+    }
 
     /**
      * Translate the greater or equal.
@@ -873,8 +914,13 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      *                second val of the greater or equal.
      * @return The formula representing the greater or equal.
      */
-    protected abstract StringBuffer translateIntegerGeq(StringBuffer arg1,
-	    StringBuffer arg2);
+    protected StringBuffer translateIntegerGeq(StringBuffer arg1,
+	    StringBuffer arg2) throws IllegalFormulaException {
+	if (true) {
+	    throw new IllegalFormulaException("Integer greater or equal is not supported by this translator.");
+	}
+	return new StringBuffer();
+    }
 
     /**
      * Translate the less or equal.
@@ -885,8 +931,13 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      *                second val of the less or equal.
      * @return The formula representing the less or equal.
      */
-    protected abstract StringBuffer translateIntegerLeq(StringBuffer arg1,
-	    StringBuffer arg2);
+    protected StringBuffer translateIntegerLeq(StringBuffer arg1,
+	    StringBuffer arg2) throws IllegalFormulaException {
+	if (true) {
+	    throw new IllegalFormulaException("Integer less or equal is not supported by this translator.");
+	}
+	return new StringBuffer();
+    }
 
     /**
      * Translate the NULL element
@@ -922,8 +973,41 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      * 
      * @return the sorts name
      */
-    protected abstract StringBuffer translateIntegerValue(long val);
+    protected StringBuffer translateIntegerValue(long val) throws IllegalFormulaException {
+	if (true) {
+	    throw new IllegalFormulaException("Integer numbers are not supported by this translator.");
+	}
+	return new StringBuffer();
+    }
 
+    /**
+     * Translate the logical if_then_else construct. 
+     * All attributes are logical formulas.
+     * If the underlying language does not support this contruct, it is equivalent with
+     * (cond IMPLIES ifterm) AND (NOT(cond) IMPLIES thenterm) and can be reduced to this.
+     * @param cond the condition term.
+     * @param ifterm the formula used, if cond=true
+     * @param elseterm the term used, if cond=false
+     * @return ther StringBuffer representing the if then else construct
+     */
+    protected abstract StringBuffer translateLogicalIfThenElse(StringBuffer cond, StringBuffer ifterm, StringBuffer elseterm);
+    
+    /**
+     * Translate the if_then_else construct for terms (i.e. ifterm and condterm are not of Sort FORMULA)
+     * @param cond the condition formula
+     * @param ifterm the term used if cond = true.
+     * @param elseterm the term used if cond = false.
+     * @return the StrinBuffer representing the if then else construct.
+     * @throws IllegalFormulaException if this construct is not supported.
+     */
+    protected StringBuffer translateTermIfThenElse (StringBuffer cond, StringBuffer ifterm, StringBuffer elseterm) 
+    	throws IllegalFormulaException {
+	if (true) {
+	    throw new IllegalFormulaException("The if then else construct for terms is not supported");
+	}
+	return new StringBuffer();
+    }
+    
     /**
      * Translates the given term into input syntax and adds the resulting
      * string to the StringBuffer sb.
@@ -936,7 +1020,7 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      *                modulo terms, but must be looped through until we get
      *                there.
      */
-    private final StringBuffer translateTerm(Term term, Vector<QuantifiableVariable> quantifiedVars,
+    private final StringBuffer translateTerm (Term term, Vector<QuantifiableVariable> quantifiedVars,
 	    Services services) throws IllegalFormulaException {
 	Operator op = term.op();
 	if (op == Op.NOT) {
@@ -962,7 +1046,20 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 	    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars, services);
 	    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars, services);
 	    return this.translateObjectEqual(arg1, arg2);
-
+	} else if (op == Op.IF_THEN_ELSE) {
+	    if (term.sub(1).sort() == Sort.FORMULA) {
+		//a logical if then else was used
+		StringBuffer cond = translateTerm(term.sub(0), quantifiedVars, services);
+		StringBuffer ifterm = translateTerm(term.sub(1), quantifiedVars, services);
+		StringBuffer elseterm = translateTerm(term.sub(2), quantifiedVars, services);
+		return translateLogicalIfThenElse(cond, ifterm, elseterm);
+	    } else {
+		//a term if then else was used
+		StringBuffer cond = translateTerm(term.sub(0), quantifiedVars, services);
+		StringBuffer ifterm = translateTerm(term.sub(1), quantifiedVars, services);
+		StringBuffer elseterm = translateTerm(term.sub(2), quantifiedVars, services);
+		return translateTermIfThenElse(cond, ifterm, elseterm);
+	    }
 	} else if (op == Op.ALL) {
 	    ArrayOfQuantifiableVariable vars = term.varsBoundHere(0);
 	    Debug.assertTrue(vars.size() == 1);
@@ -1070,7 +1167,7 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 			    services);
 		    return this.translateIntegerGeq(arg1, arg2);
 		} else {
-
+		    //op is non rigid, so it can be treated as uniterpreted predicate
 		    ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
 		    for (int i = 0; i < op.arity(); i++) {
 			subterms.add(translateTerm(term.sub(i), quantifiedVars,
@@ -1197,7 +1294,8 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 
 	    return translateFunc(atop, subterms);
 	} else {
-	    return translateUnknown(term);
+	    //return translateUnknown(term);
+	    throw new IllegalFormulaException("unknown term found");
 	}
     }
 

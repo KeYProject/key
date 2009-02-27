@@ -331,6 +331,15 @@ public class SimplifyTranslator extends AbstractSmtTranslator {
     }
 
     @Override
+    protected StringBuffer translateLogicalIfThenElse(StringBuffer cond, StringBuffer ifterm, StringBuffer elseterm) {
+        StringBuffer toReturn = this.translateLogicalImply(cond, ifterm);
+        StringBuffer temp = this.translateLogicalNot(cond);
+        temp = this.translateLogicalImply(temp, elseterm);
+        toReturn = this.translateLogicalAnd(toReturn, temp);
+        return toReturn;
+    }
+    
+    @Override
     protected StringBuffer translateObjectEqual(StringBuffer arg1,
 	    StringBuffer arg2) {
 	ArrayList<StringBuffer> args = new ArrayList<StringBuffer>();
