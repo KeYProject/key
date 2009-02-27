@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.smt;
 
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.gui.configuration.Settings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.Name;
@@ -47,7 +49,7 @@ public class SMTRule implements BuiltInRule {
 
     public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
 
-	SmtSolver.RESULTTYPE valid = this.prover.isValid(goal, 30, services);
+	SmtSolver.RESULTTYPE valid = this.prover.isValid(goal, ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getTimeout(), services);
 	if (valid == SmtSolver.RESULTTYPE.VALID) {
 	    return SLListOfGoal.EMPTY_LIST;
 	} else if (valid == SmtSolver.RESULTTYPE.UNKNOWN) {

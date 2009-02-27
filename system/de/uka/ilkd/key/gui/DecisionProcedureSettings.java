@@ -31,6 +31,8 @@ public class DecisionProcedureSettings implements Settings {
     /** String used in the Settings to store the active rule */
     private static final String ACTIVE_RULE  = "[DecisionProcedure]ActiveRule";
     
+    private static final String TIMEOUT="[DecisionProcedure]Timeout";
+    
     /** String used in the Settings to store the available rules */
     //private static final String AVAILABLE_RULES  = "[DecisionProcedure]AvailableRules";
     
@@ -42,6 +44,8 @@ public class DecisionProcedureSettings implements Settings {
     
     /** the currently active rule */
     int activeRule = -1;
+    
+    int timeout = 60;
     
     private static DecisionProcedureSettings instance;
     
@@ -105,6 +109,17 @@ public class DecisionProcedureSettings implements Settings {
 	    this.fireSettingsChanged();
 	}
     }
+    
+    public void setTimeout(int t) {
+	if (t > 0) {
+	    this.timeout = t;
+	    this.fireSettingsChanged();
+	}
+    }
+    
+    public int getTimeout() {
+	return this.timeout;
+    }
 
     /**
      * true, if the argument should be used for test
@@ -133,6 +148,14 @@ public class DecisionProcedureSettings implements Settings {
 		this.activeRule = curr;
 	    }
 	}
+	
+	String timeoutstring = props.getProperty(TIMEOUT);
+	if (timeoutstring != null) {
+	    int curr = Integer.parseInt(timeoutstring);
+	    if (curr > 0) {
+		this.timeout = curr;
+	    }
+	}
     }
 
 
@@ -143,6 +166,7 @@ public class DecisionProcedureSettings implements Settings {
      */
     public void writeSettings(Properties props) {
         props.setProperty(ACTIVE_RULE, "" + this.activeRule);
+        props.setProperty(TIMEOUT, "" + this.timeout);
     }
     
 

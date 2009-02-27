@@ -225,7 +225,11 @@ public class Main extends JFrame implements IMain {
     JMenu decisionProcedureOption = new JMenu("Decision Procedures");
     
     ArrayList<JRadioButtonMenuItem> ruleButton = new ArrayList<JRadioButtonMenuItem>();
-        
+    
+    JSlider ruletimeout = new JSlider(1, 5*60);
+    
+    JLabel ruletimeoutlabel = new JLabel();
+    
     private ProverTaskListener taskListener;
     
     private NotificationManager notificationManager;
@@ -1526,6 +1530,15 @@ public class Main extends JFrame implements IMain {
 		ruleButton.get(i).setSelected(false);
 	    }
 	}
+	
+	decisionProcedureOption.add(new JSeparator());
+	
+	//add possibility for timeout setting
+	this.ruletimeoutlabel.setText("timeout: " + ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getTimeout());
+	decisionProcedureOption.add(this.ruletimeoutlabel);
+	this.ruletimeout.setValue(ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getTimeout());
+	this.ruletimeout.addChangeListener(decisionProcButtonListener);
+	decisionProcedureOption.add(this.ruletimeout);
     }    
     
     
@@ -2219,7 +2232,7 @@ public class Main extends JFrame implements IMain {
         
     }
     
-    class DecisionProcButtonListener implements ActionListener {
+    class DecisionProcButtonListener implements ActionListener, ChangeListener {
         public void actionPerformed(ActionEvent e) {
             Proof currentProof = mediator.getProof();
             ProofSettings currentSettings = ProofSettings.DEFAULT_SETTINGS;
@@ -2238,7 +2251,13 @@ public class Main extends JFrame implements IMain {
             
             //update the button for invoking the rule
             updateDecisionProcedureButton();
-            
+        }
+        
+        public void stateChanged(ChangeEvent arg0) {
+            if (arg0.getSource() == ruletimeout) {
+        	ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setTimeout(ruletimeout.getValue());
+        	ruletimeoutlabel.setText("timeout: " + ruletimeout.getValue());
+            }
         }
     }
     
