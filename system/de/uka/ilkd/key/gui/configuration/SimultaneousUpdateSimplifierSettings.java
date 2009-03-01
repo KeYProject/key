@@ -92,6 +92,7 @@ public class SimultaneousUpdateSimplifierSettings implements Settings {
 	    eagerMode = Boolean.valueOf(eagerModeString).booleanValue();
 	}
 	
+	fireSettingsChanged();
     }
 
 
