@@ -113,6 +113,18 @@ public abstract class AbstractSolverTest extends TestCase {
 	Assert.assertTrue(correctResult(testFile + "subsort2.key", false));
     }
     
+    public void testAdd1() {
+	Assert.assertTrue(correctResult(testFile + "add1.key", true));
+    }
+    
+    /*public void testAdd2() {
+	Assert.assertTrue(correctResult(testFile + "add2.key", false));
+    }*/
+    
+    public void testMult1() {
+	Assert.assertTrue(correctResult(testFile + "mult1.key", true));
+    }
+    
     private boolean correctResult(String filepath, boolean isGeneralValid) {
 	if (toolNotInstalled) {
 	    return true;
