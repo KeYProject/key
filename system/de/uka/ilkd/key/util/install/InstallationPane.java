@@ -34,11 +34,6 @@ public abstract class InstallationPane extends JPanel {
 	return installer.keyLib ();
     }
 
-    public String togetherHome () {
-	return installer.togetherHome ();
-    }
-
-
     public void keyHome ( String dir ) {
 	installer.keyHome ( dir );
     }
@@ -47,10 +42,6 @@ public abstract class InstallationPane extends JPanel {
 	installer.keyLib ( dir );
     }
 
-    public void togetherHome ( String dir ) {
-	installer.togetherHome ( dir );
-    }
- 
     /**
      * returns path where to find key.jar 
      */
@@ -75,27 +66,6 @@ public abstract class InstallationPane extends JPanel {
 
     public void os ( String os ) {
 	installer.os ( os );
-    }
-
-    /**
-     * returns directory of Together version
-     */
-    public String togetherVersion () {
-	return installer.togetherVersion ();
-    }
-
-    /**
-     * returns list of all supported together version
-     */
-    public String[] supportedTgVersion () {
-	return installer.supportedTgVersion ();
-    }
-
-    /**
-     * sets version of together 
-     */
-    public void togetherVersion ( String vers ) {
-	installer.togetherVersion ( vers );
     }
 
     /**

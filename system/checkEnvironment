@@ -1,9 +1,4 @@
 #!/bin/sh
-if  [ -n '$1' ]; then
-    if [ "$1" = "--with-together" ]; then
-       TOGETHER_ENABLED="true"
-    fi
-fi
 resolve_symlink  ()
 { 
    TARGET=`ls -l $1| awk '/\ ->\ /{print $NF}'`
@@ -43,28 +38,9 @@ fi
 #echo "Using libraries from:             $KEY_LIB"
 
 
-if [ -n "$TOGETHER_ENABLED" ];
-then
-   if [ -z "$TOGETHER_HOME"  ]
-   then
-      if [ -d "$KEY_LIB/TOGETHER" ] ; then
-         TOGETHER_HOME=`resolve_symlink "$KEY_LIB/TOGETHER"`
-      else
-         echo
-         echo Please set the \$TOGETHER_HOME environment variable.
-         echo "( e.g. /home/togetherj/vers6.0/linux )"
-         exit 1
-      fi
-    fi
-fi
-#echo "Using Together installation from: $TOGETHER_HOME"
-
-
 key_ext_jars="antlr.jar recoderKey.jar dresden-ocl-demo.jar xerces.jar log4j.jar jargs.jar"
 
 key_dev_jars="javacc.jar junit.jar"
-
-together_jars="lib/openapi.jar lib/together.jar modules/"
 
 
 CLASSPATH=./binary/
@@ -81,20 +57,6 @@ for i in $key_ext_jars $key_dev_jars; do
        CLASSPATH=$CLASSPATH:$current_jar
     fi
 done
-
-if [ -n "$TOGETHER_ENABLED" ];
-then
-   for i in $together_jars; do
-       current_jar="$TOGETHER_HOME/$i"
-       if [ ! -r $current_jar ]
-       then
-          echo "Cannot find $current_jar. Check Together installation"
-          exit 1
-       else
-          CLASSPATH=$CLASSPATH:$current_jar
-       fi
-   done
-fi
 
 export CLASSPATH
 echo "CLASSPATH=$CLASSPATH" > Makefile.mk

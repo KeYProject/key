@@ -17,13 +17,15 @@
 
 package de.uka.ilkd.key.speclang.ocl.translation;
 
-import de.uka.ilkd.key.casetool.UMLInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.AbstractCollectionSort;
+import de.uka.ilkd.key.speclang.ocl.Association;
+import de.uka.ilkd.key.speclang.ocl.ListOfAssociation;
+import de.uka.ilkd.key.speclang.ocl.UMLInfo;
 import de.uka.ilkd.key.speclang.translation.SLResolverManager;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLExpressionResolver;

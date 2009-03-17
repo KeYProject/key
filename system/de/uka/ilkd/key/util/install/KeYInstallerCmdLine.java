@@ -6,13 +6,7 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.util.install;
 
 
@@ -362,12 +356,10 @@ public class KeYInstallerCmdLine extends KeYInstallerUI {
 	
 	if ( "linux".equals ( os () ) ) {
 	    try {
-		Runtime.getRuntime ().exec ( "chmod a+x " + startScriptFilePath () );
 		Runtime.getRuntime ().exec ( "chmod a+x " + startProverScriptFilePath () );
 	    } catch ( IOException e) { 
-		todo.append ( "Please set " + startScriptFilePath () +  
-			      " executable : chmod a+x " + startScriptFilePath () +
-			      "\n\t and chmod a+x " + startProverScriptFilePath () );
+		todo.append ( "Please set " + startProverScriptFilePath () +  
+			      " executable : chmod a+x " + startProverScriptFilePath ());
 		todo.append ( "\n" );
 	    }
 	}
@@ -397,12 +389,12 @@ public class KeYInstallerCmdLine extends KeYInstallerUI {
 	    print ( trim ( "Some things are left to do. Please read carefully.", 72 ) );
 	    print ( trim ( todo.toString (), 72 ) );
 	    print ( trim ( "After you have done the things above, you can start KeY." + 
-			   "Therefore you have to change to directory " + binaryPath () + 
-			   "and execute " + startScriptFileName (), 72 ) );
+			   "To do this, you have to change to directory " + binaryPath () + 
+			   "and execute " + startProverScriptFileName (), 72 ) );
 	} else 
 	    print ( trim ( "Installation finished. To start change to directory"
 			   + " " + binaryPath () +  
-			   "\n and execute " + startScriptFileName (), 72 ) );
+			   "\n and execute " + startProverScriptFileName (), 72 ) );
 	
     }
 

@@ -102,7 +102,7 @@ public class ComputeSpecificationView {
      * A facade for the user-interface, displaying the computed
      * specification of a program.
      * @param mediator the KeY-mediator containing the specification construction proof.
-     * @see de.uka.ilkd.key.casetool.together.FunctionalityOnModel#computeSpecification(de.uka.ilkd.key.casetool.ModelMethod)
+     * @see de.uka.ilkd.key.casetool.FunctionalityOnModel#computeSpecification(de.uka.ilkd.key.casetool.ModelMethod)
      */
     public static final void show(KeYMediator mediator) {
 	try{

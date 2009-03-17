@@ -9,7 +9,7 @@
 //
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.casetool.ModelClass;
+import de.uka.ilkd.key.speclang.ocl.ModelClass;
 
 
 public class CasetoolDLPO extends KeYUserProblemFile {
