@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry exported="true" kind="lib" path="antlr.jar"/>
 	<classpathentry exported="true" kind="lib" path="jargs.jar"/>
-	<classpathentry exported="true" kind="lib" path="javacc.jar"/>
 	<classpathentry exported="true" kind="lib" path="junit.jar"/>
 	<classpathentry exported="true" kind="lib" path="log4j.jar"/>
 	<classpathentry exported="true" kind="lib" path="recoderKey.jar"/>

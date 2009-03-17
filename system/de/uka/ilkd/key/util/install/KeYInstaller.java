@@ -27,12 +27,10 @@ public abstract class KeYInstaller {
 
     private static final String binaryPath = "bin";
     private static final String systemPath = "system";
-    private static final String configPath = "config";
     private static final String keyextjarsPath = "key-ext-jars";
     
     private static final String[] subdirs = { systemPath, 
-					      binaryPath, 
-					      configPath, 					   
+					      binaryPath,  					   
 					      keyextjarsPath };
 
 
@@ -159,24 +157,6 @@ public abstract class KeYInstaller {
 	return "linux".equals ( os ) ? "startProver" : "startProver.bat";
     }
 
-    protected String configPatternName ( ) {
-	return "key.config";
-    }
-
-    protected String configFileName ( ) {
-	return "key.config";
-    }
-    
-    protected String configPatternPath ( ) {
-	return "de.uka.ilkd.key.util.install.".
-	    replace ( '.', File.separatorChar ) + configPatternName ();
-    }
-
-    protected String configFilePath ( ) {
-	return configPath () + File.separatorChar + configFileName ();
-    }
-
-
     // create directories
     
     
@@ -231,19 +211,11 @@ public abstract class KeYInstaller {
 		     startProverScriptPatternPath (),
 		     jarFile );
     }
-       
-    private void createConfigFile ( JarFile jarFile ) 
-    throws KeYInstallerException {
-	createFile ( "",
-		     configFilePath ( ),
-		     configPatternPath (),
-		     jarFile );
-    }
+      
 
     public void generateScripts ( JarFile jarFile ) 
 	throws KeYInstallerException {
 	createStandAloneProverScript( jarFile );
-	createConfigFile ( jarFile );
     }
     
     private void createFile ( String preamble, 
@@ -449,13 +421,6 @@ public abstract class KeYInstaller {
      */
     public String binaryPath () {
 	return keyHome () + File.separatorChar + binaryPath;
-    }
-
-    /**
-     * returns directory where to put the config files
-     */
-    public String configPath () {
-	return keyHome () + File.separatorChar + configPath;
     }
 
     /**

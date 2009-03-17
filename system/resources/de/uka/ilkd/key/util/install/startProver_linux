@@ -72,7 +72,7 @@ fi
 
 key_ext_jars="antlr.jar jargs.jar recoderKey.jar log4j.jar"
 
-keyclasspath="$KEY_HOME/system/binary/"
+keyclasspath="$KEY_HOME/system/key.jar"
 
 for i in $key_ext_jars ; do
     current_jar="$KEY_LIB/$i"
