@@ -122,7 +122,6 @@ while [ $# -ne 0 ]; do
     esac
 done	
 
-
 if [ ! -d "$HOME/.key" ]
 then
 mkdir "$HOME/.key"

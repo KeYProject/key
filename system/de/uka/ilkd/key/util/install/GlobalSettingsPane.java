@@ -27,9 +27,6 @@ public class GlobalSettingsPane extends InstallationPane {
 
     private String localOs;
 
-    private String localTg;
-
-
 
     public GlobalSettingsPane ( KeYInstaller installer ) {
 	super ( "Global", installer );

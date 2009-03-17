@@ -28,8 +28,7 @@ JSwat requires a JDK 1.4 or better
 (2) Debugging KeY (stand-alone prover)
     
 In the following, let <key-dir> be the directory where your
-KeY-source resides and let <Together-home> be the directory
-where TogetherCC is installed.
+KeY-source resides 
 
  - Compile key using javac instead of jikes which seems 
    to cause some problems during debugging. This can e.g. be done
@@ -38,8 +37,7 @@ where TogetherCC is installed.
 -  Run script "runDebugger" if not already running and invoke
    "Options"->"Set Classpath". Then add the following paths:
    - <key-dir>/system/binary
-   - <Together-home>/lib/openapi.jar
-   - the jar-files for recoder, xerces, and antlr (these are
+   - the jar-files for recoder, and antlr (these are
      necessary to run KeY anyway)
 - Invoke "Options"->"SetSourcepath" and add <key-dir>
 - To start debugging invoke "VM"->"Start VM" and enter 

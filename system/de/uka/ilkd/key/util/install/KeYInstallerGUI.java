@@ -308,14 +308,6 @@ public class KeYInstallerGUI extends KeYInstallerUI {
  	}
 
 	try {
-	    extractTgScripts ( keyJarFile );
- 	} catch ( KeYInstallerException kie ) {
- 	    abortError ( "Could not generate the KeY scripts. Please " + 
-			 "resolve the problem first " + 
-			 "and redo the installation afterwards.\nDetail:" + kie );	    
- 	}
-
-	try {
 	    extractExamples( keyJarFile );
  	} catch ( KeYInstallerException kie ) {
  	    abortError ( "Could not unpack the examples. Please " + 

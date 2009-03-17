@@ -17,8 +17,6 @@ For optional UML/OCL support: Together Control Center, Version 6.2
 Needed additional Libraries:
 	antlr.jar Version >= 2.7.2: parser generator
 	javacc.jar Version >= 3.0 : parser generator
-	dresden-ocl-demo.jar: ocl parser
-	xerces.jar version 1.4.4: used by tudresden.jar
 	recoderKey.jar 
                  a transformation framework for java patched by the KeY group
 	junit.jar version 3.8.1: test framework

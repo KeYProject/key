@@ -1,15 +1,8 @@
-
-rem !!!!!!! Please read important information. !!!!!!
-rem Note: All environment variables before the first Java command in this batch file
-rem will be set in Together.exe and TogetherCon.exe.
 SET JDK=%JAVA_HOME%
-SET JRE=%JDK%
-SET JDK_RT_JAR=%JRE%\lib\rt.jar
-SET JDK_TOOLS_JAR=%JDK%\lib\tools.jar
 
 rem Do not use empty JAVA_OPTIONS under Win95/98/Me
 rem Do not use values with "=" under Win95/98/Me
-SET JAVA_OPTIONS="-noverify -Xms64m -Xmx768m"
+SET JAVA_OPTIONS="-Xms64m -Xmx768m"
 
 SET HOME=%HOMEDRIVE%%HOMEPATH%
 
@@ -17,17 +10,16 @@ rem #############
 rem KeY CLASSPATH
 rem #############
 
-set key_ext_jars=antlr.jar recoderKey.jar dresden-ocl-demo.jar xerces.jar jargs.jar
+set key_ext_jars=antlr.jar recoderKey.jar jargs.jar
 
-set keyclasspath=%KEY_HOME%\system\key.jar;
+set keyclasspath=%KEY_HOME%\system\key.jar
 
 if not exist "%KEY_LIB%\antlr.jar" (goto MISSING_LIBRARY ) else (set keyclasspath=%keyclasspath%;%KEY_LIB%\antlr.jar)
 if not exist "%KEY_LIB%\recoderKey.jar" (goto MISSING_LIBRARY ) else (set keyclasspath=%keyclasspath%;%KEY_LIB%\recoderKey.jar)
-if not exist "%KEY_LIB%\dresden-ocl-demo.jar" (goto MISSING_LIBRARY ) else (set keyclasspath=%keyclasspath%;%KEY_LIB%\dresden-ocl-demo.jar)
-if not exist "%KEY_LIB%\xerces.jar" (goto MISSING_LIBRARY ) else (set keyclasspath=%keyclasspath%;%KEY_LIB%\xerces.jar)
 if not exist "%KEY_LIB%\jargs.jar" (goto MISSING_LIBRARY ) else (set keyclasspath=%keyclasspath%;%KEY_LIB%\jargs.jar)
 if not exist "%KEY_LIB%\log4j.jar" (goto MISSING_LIBRARY ) else (set keyclasspath=%keyclasspath%;%KEY_LIB%\log4j.jar)
 set keysysprops=""
+
 
 if not exist "%HOME%\.key" goto CREATE_DEFAULT_CONFIG
 
@@ -42,17 +34,12 @@ if not .%OS%.==.Windows_NT. goto WIN95
 :WINNT
 SET PATH=%JDK%\bin;%PATH%
 
-rem This line is used only under Windows NT, but this value of JAVA_OPTIONS is used
-rem in Together.exe and TogetherCon.exe under all Windows platforms.
-
-"%JDK%\bin\java" -Dkey.home="%KEY_HOME%"  -Dkey.simplify.logdir="%KEY_SIMPLIFY_LOG_DIR%" -Djvm.dir="%JDK%\bin" "%JAVA_OPTIONS%" -cp "%JDK_TOOLS_JAR%;%JDK_RT_JAR%;%keyclasspath%" de.uka.ilkd.key.gui.Main %1 %2 %3 %4 %5 %6 %7
+"%JDK%\bin\java" -Dkey.home="%KEY_HOME%" -Dkey.simplify.logdir="%KEY_SIMPLIFY_LOG_DIR%" "%JAVA_OPTIONS%" -cp "%keyclasspath%" de.uka.ilkd.key.gui.Main %1 %2 %3 %4 %5 %6 %7
 exit /b
 
 :WIN95
 SET PATH="%JDK%\bin;%PATH%"
 if .%JDK%. == .. goto ERROR_IN_ENVIRONMENT
-if .%JDK_RT_JAR%. == .. goto ERROR_IN_ENVIRONMENT
-if .%JDK_TOOLS_JAR%. == .. echo No tools.jar found. No javac or javadoc for you. That's OK.
 if .%JAVA_OPTIONS%. == .. goto ERROR_IN_ENVIRONMENT
 if not errorlevel 1 goto AFTER_PATH
 :ERROR_IN_ENVIRONMENT
@@ -73,9 +60,9 @@ goto RETURN_TO_CALLER
 if .%1.==.-recursive. shift 1
 rem This Java command specifies the MaxPermSize parameter directly because under Win95/98/Me
 rem it is impossible to assign an environment variable value containing an equal sign (=)
-"%JDK%\bin\java" -Djvm.dir="%JDK%\bin" -Dkey.home="%KEY_HOME%"  -Dkey.simplify.logdir="%KEY_SIMPLIFY_LOG_DIR%" "%JAVA_OPTIONS%" "-XX:MaxPermSize=64m" -cp "%JDK_TOOLS_JAR%;%JDK_RT_JAR%;%keyclasspath%" de.uka.ilkd.key.gui.Main %1 %2 %3 %4 %5 %6 %7
+"%JDK%\bin\java" -Dkey.home="%KEY_HOME%"  -Dkey.simplify.logdir="%KEY_SIMPLIFY_LOG_DIR%" "%JAVA_OPTIONS%" "-XX:MaxPermSize=64m" -cp "%keyclasspath%" de.uka.ilkd.key.gui.Main %1 %2 %3 %4 %5 %6 %7
 
 :MISSING_LIBRARY
 echo Missing Library. Please copy all libraries to %KEY_LIB%.
-echo At least one of the following libraries has not been found: antlr.jar recoderKey.jar ocl-dresden-demo.jar xerces.jar
+echo At least one of the following libraries has not been found: antlr.jar recoderKey.jar 
 exit /b
