@@ -150,7 +150,14 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
    
     private int countJavaBlocks(Term t) {
         int p = 0;
-        if (!t.javaBlock().isEmpty()){
+        // mbender
+        // 'if (!t.javaBlock().isEmpty())' had to be switched back as it behaves
+        // differently than
+        // 'if (t.javaBlock() != JavaBlock.EMPTY_JAVABLOCK)'
+        // That is if a JavaBlock contains an empty StatementBlock
+        // 't.javaBlock() != JavaBlock.EMPTY_JAVABLOCK' is true but
+        // '!t.javaBlock().isEmpty()' is false
+        if (t.javaBlock() != JavaBlock.EMPTY_JAVABLOCK) {
             p++;
         }
         for (int i = 0; i < t.arity(); i++) {
