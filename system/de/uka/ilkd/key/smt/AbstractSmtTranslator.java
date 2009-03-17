@@ -81,6 +81,9 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 
     private boolean nullUsed = false;
 
+    //assumptions. they have to be added to the formula!
+    private ArrayList<StringBuffer> assumptions = new ArrayList<StringBuffer>();
+    
     /**
      * Just a constructor which starts the conversion to Simplify syntax.
      * The result can be fetched with
@@ -182,6 +185,9 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 	    //add the formulas, that make sure, type correctness is kept, also
 	    //for interpreted functions
 	    toReturn.addAll(this.getSpecialSortPredicates(services));
+	    //add the assuptions created during translation
+	    //for example while translating term if then else
+	    toReturn.addAll(this.assumptions);
 	}
 	
 	return toReturn;
@@ -991,9 +997,11 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      * @return ther StringBuffer representing the if then else construct
      */
     protected abstract StringBuffer translateLogicalIfThenElse(StringBuffer cond, StringBuffer ifterm, StringBuffer elseterm);
-    
+        
     /**
      * Translate the if_then_else construct for terms (i.e. ifterm and condterm are not of Sort FORMULA)
+     * If this method is nor overriden, a default implementation is used. This might me less effective than
+     * a language supported translation. So, if allowed by the target language, override this.
      * @param cond the condition formula
      * @param ifterm the term used if cond = true.
      * @param elseterm the term used if cond = false.
@@ -1006,6 +1014,34 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 	    throw new IllegalFormulaException("The if then else construct for terms is not supported");
 	}
 	return new StringBuffer();
+    }
+    
+    private final StringBuffer translateTermIte (Term iteTerm, Vector<QuantifiableVariable> quantifiedVars,
+	    Services services) throws IllegalFormulaException {
+	//Assert(iteTerm.op() == Op.IF_THEN_ELSE);
+	StringBuffer cond = translateTerm(iteTerm.sub(0), quantifiedVars, services);
+	StringBuffer ifterm = translateTerm(iteTerm.sub(1), quantifiedVars, services);
+	StringBuffer elseterm = translateTerm(iteTerm.sub(2), quantifiedVars, services);
+	try {
+	    return this.translateTermIfThenElse(cond, ifterm, elseterm);
+	} catch (IllegalFormulaException e) {
+	    //the translation of if then else for terms is not supported, so use default implementation
+	    //invent a new constant
+	    LogicVariable c = new LogicVariable(new Name("iteConst"), iteTerm.sort());
+	    //translate the constant
+	    Term t = new TermFactory().createVariableTerm(c);
+	    StringBuffer cstr = this.translateTerm(t, quantifiedVars, services);
+	    //build an assumption used to specify how c can be used
+	    StringBuffer assump = this.translateObjectEqual(cstr, ifterm);
+	    assump = this.translateLogicalImply(cond, assump);
+	    StringBuffer temp = this.translateObjectEqual(cstr, elseterm);
+	    temp = this.translateLogicalImply(
+		    this.translateLogicalNot(cond), temp);
+	    assump = this.translateLogicalAnd(assump, temp);
+	    this.assumptions.add(assump);
+	    
+	    return cstr;
+	}
     }
     
     /**
@@ -1055,10 +1091,11 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 		return translateLogicalIfThenElse(cond, ifterm, elseterm);
 	    } else {
 		//a term if then else was used
-		StringBuffer cond = translateTerm(term.sub(0), quantifiedVars, services);
-		StringBuffer ifterm = translateTerm(term.sub(1), quantifiedVars, services);
-		StringBuffer elseterm = translateTerm(term.sub(2), quantifiedVars, services);
-		return translateTermIfThenElse(cond, ifterm, elseterm);
+		return this.translateTermIte(term, quantifiedVars, services);
+		//StringBuffer cond = translateTerm(term.sub(0), quantifiedVars, services);
+		//StringBuffer ifterm = translateTerm(term.sub(1), quantifiedVars, services);
+		//StringBuffer elseterm = translateTerm(term.sub(2), quantifiedVars, services);
+		//return translateTermIfThenElse(cond, ifterm, elseterm);
 	    }
 	} else if (op == Op.ALL) {
 	    ArrayOfQuantifiableVariable vars = term.varsBoundHere(0);
