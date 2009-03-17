@@ -325,12 +325,10 @@ public class KeYInstallerGUI extends KeYInstallerUI {
 	
 	if ( "linux".equals ( os () ) ) {
 	    try {
-		Runtime.getRuntime ().exec ( "chmod a+x " + startScriptFilePath () );
 		Runtime.getRuntime ().exec ( "chmod a+x " + startProverScriptFilePath () );
 	    } catch ( IOException e) { 
-		todo.append ( "Please set " + startScriptFilePath () +  
-			      " executable : chmod a+x " + startScriptFilePath () +
-			      "\n chmod a+x " + startProverScriptFilePath () );
+		todo.append ( "Please set " + startProverScriptFilePath () +  
+			      " executable : chmod a+x " + startProverScriptFilePath ());
 		todo.append ( "\n" );
 	    }
 	}
@@ -362,9 +360,7 @@ public class KeYInstallerGUI extends KeYInstallerUI {
 		  trim (  "Something is left to do. " + todo.toString () + 
 			  "After you have done all from above, you can start KeY by" + 
 			  " changing to " + binaryPath () + 
-			  " and executing " + startScriptFileName () +
-			  " (Together front end) " + " or " + 
-			  startProverScriptFileName () + " (standalone KeY)", 60 ),
+			  " and executing " + startProverScriptFileName (), 60 ),
 			  "Please complete installation manually", 
 		  JOptionPane.INFORMATION_MESSAGE );
 	} else {
@@ -372,8 +368,7 @@ public class KeYInstallerGUI extends KeYInstallerUI {
 		( null, trim 
 		  ( "To start KeY, change directory to "
 		    + binaryPath () +  " and execute " + 
-		    startScriptFileName () + " (Together front end) " + 
-		    " or " + startProverScriptFileName () + " (standalone KeY)", 60 ),
+		    startProverScriptFileName (), 60 ),
 		  "Installation successfully completed",
 		  JOptionPane.INFORMATION_MESSAGE );
 	}

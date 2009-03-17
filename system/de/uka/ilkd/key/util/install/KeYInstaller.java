@@ -43,13 +43,13 @@ public abstract class KeYInstaller {
 
     /** array with names of required library files */
     private static final String[] libraries = new String[] {
-	"antlr.jar", "dresden-ocl-demo.jar", 
+	"antlr.jar", 
 	"recoderKey.jar", "xerces.jar", "jargs.jar", "log4j.jar"
     };
 
     /** optional external binaries */
     private static final String[] optBinaries = new String[] {
-	"gf", "Simplify"
+	"Simplify"
     };
 
     /* necessary environment information */
@@ -147,7 +147,6 @@ public abstract class KeYInstaller {
 	environment.append ( "linux".equals ( os ) ? "#!/bin/sh \n" : "" );
 	environment.append ( "win".equals ( os ) ? "@echo off \r\n" : "" );
 	environment.append ( comment ( " KeY-Environment Settings " ) );
-	environment.append ( variable ( "TOGETHER_HOME", togetherHome () ) );
 	environment.append ( variable ( "KEY_HOME", keyHome () ) );
 	environment.append ( variable ( "KEY_LIB", keyLib () ) );
 	environment.append ( variable ( "JAVA_HOME", javaHome () ) );
@@ -156,15 +155,6 @@ public abstract class KeYInstaller {
     }			     
 
     // selection of the correct shell-script
-
-    protected String startScriptPatternName ( ) {
-	return "startkey_" + os  + "_" + tgVersion;
-    }
-
-    protected String startScriptPatternPath ( ) {
-	return "de.uka.ilkd.key.util.install."
-	    .replace ( '.', File.separatorChar ) + startScriptPatternName ();
-    }
 
     protected String startProverScriptPatternName ( ) {
 	return "startProver_" + os  + "_" + tgVersion;
@@ -175,16 +165,8 @@ public abstract class KeYInstaller {
 	    .replace ( '.', File.separatorChar ) + startProverScriptPatternName ();
     }
 
-    protected String startScriptFilePath ( ) {
-	return binaryPath () + File.separatorChar  + startScriptFileName ();
-    }
-
     protected String startProverScriptFilePath ( ) {
 	return binaryPath () + File.separatorChar  + startProverScriptFileName ();
-    }
-
-    protected String startScriptFileName ( ) {
-	return "linux".equals ( os ) ? "startkey" : "startkey.bat";
     }
 
     protected String startProverScriptFileName ( ) {
@@ -256,15 +238,6 @@ public abstract class KeYInstaller {
 
     // write shellscript
     
-    private void createStartScript ( JarFile jarFile ) 
-	throws KeYInstallerException {
-
-	createFile ( environment (), 
-		     startScriptFilePath (), 
-		     startScriptPatternPath (),
-		     jarFile );
-    }
-
     private void createStandAloneProverScript ( JarFile jarFile )
 	throws KeYInstallerException {
 	createFile ( environment (), 
@@ -283,7 +256,6 @@ public abstract class KeYInstaller {
 
     public void generateScripts ( JarFile jarFile ) 
 	throws KeYInstallerException {
-	createStartScript ( jarFile );
 	createStandAloneProverScript( jarFile );
 	createConfigFile ( jarFile );
     }
