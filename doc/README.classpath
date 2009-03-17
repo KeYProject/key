@@ -128,6 +128,23 @@ mysterious errors at runtime of KeY.
 - Private inner classes are difficult to map.
 
 
+5. Troubleshooting
+------------------
+
+What does the error message "Type references to undefined classes may
+only appear if they are fully qualified" mean?
+
+As described in Section 2.5 "Open sets", stubs are created for all
+classes that are referenced in the classpath but are not defined
+anywhere in it. A problem arises if the referenced class name is not
+fully qualified and there are import statements in the source file where
+the reference appears. In this case, the correct location for the stub
+cannot be determined, which leads to the error message. A possible
+solution is to import byte code instead of source code, since the former
+always contains fully qualified names.
+
+
+
 A. List of internally stored classes:
 -------------------------------------
 

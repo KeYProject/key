@@ -32,7 +32,7 @@ public class TextualJMLSpecCase extends TextualJMLConstruct {
             = SLListOfPositionedString.EMPTY_LIST;
     private ListOfPositionedString diverges     
             = SLListOfPositionedString.EMPTY_LIST;
-
+    private PositionedString name = new PositionedString("");
 
     
     public TextualJMLSpecCase(ListOfString mods, Behavior behavior) {
@@ -41,7 +41,10 @@ public class TextualJMLSpecCase extends TextualJMLConstruct {
         this.behavior = behavior;
     }
     
-    
+    public void addName(PositionedString name) {
+	this.name = name;
+    }
+
     public void addRequires(PositionedString ps) {
         requires = requires.append(ps);
     }
@@ -95,7 +98,10 @@ public class TextualJMLSpecCase extends TextualJMLConstruct {
     public ListOfPositionedString getEnsures() {
         return ensures;
     }
-       
+
+    public PositionedString getName() {
+	return name;
+    }
 
     public ListOfPositionedString getSignals() {
         return signals;

@@ -66,6 +66,8 @@ public class WatchpointUtil {
                     if (WatchpointUtil.evalutateWatchpoint(node, watchpoint,
                             node.sequent(), pos, node.proof(), 250, watchpoints)) {
                         temp.add(watchpoint);
+                        System.out.println("wp true in subset");
+                        etn.addWatchpointTrueInSubset(watchpoint);
                     }
                 }
             }
@@ -156,22 +158,17 @@ public class WatchpointUtil {
      * 
      * @return the hash set< node>
      */
-    private static HashSet<Node> findLeaves(Node currentNode,
+    private static boolean hasChildrenInSet(Node currentNode,
             List<Node> proofnodes) {
 
-        HashSet<Node> result = new HashSet<Node>(3);
         IteratorOfNode iter = currentNode.childrenIterator();
         while (iter.hasNext()) {
             Node child = (Node) iter.next();
             if (proofnodes.contains(child)) {
-                proofnodes.remove(child);
-                result.addAll(findLeaves(child, proofnodes));
+               return true;
             }
         }
-        if (result.isEmpty()) {
-            result.add(currentNode);
-        }
-        return result;
+        return false;
     }
 
     /**
@@ -193,45 +190,26 @@ public class WatchpointUtil {
             Sequent seq, PosInOccurrence pos, Proof proof, int maxsteps,
             List<WatchPoint> watchpoints) {
 
+        System.out.println(watchpoint.getRawTerm());
         if(!watchpoint.isEnabled()) return false;
-        Term wp = watchpoint.getWatchpointAsTerm();
-
+        VariableNameTracker vnt = new VariableNameTracker(node, watchpoints);
+        vnt.start();
+        if(watchpoint.isLocal() && !vnt.getActiveMethod().equals(watchpoint.getProgramMethod())) return false;
+       
         TermBuilder tb = TermBuilder.DF;
         UpdateFactory updateFactory = new UpdateFactory(proof.getServices(),
                 proof.simplifier());
 
         LinkedList<Update> updates = new LinkedList<Update>();
 
-        // start tracking names if necessary
-        if (watchpoint.getLocalVariables() != null
-                && watchpoint.getLocalVariables().size() > 0) {
-            VariableNameTracker vnt = new VariableNameTracker(node, watchpoints);
-            vnt.start();
-            updates.add(buildNameUpdates(updateFactory, vnt.result()));
-            updates.add(updateSelfVar(updateFactory, watchpoint, vnt
-                    .getSelfVar()));
-        } else {
-            LogicVariable lv = new LogicVariable(new Name(watchpoint.getSelf()
-                    .name()+ "_lv"), watchpoint.getSelf().getKeYJavaType().getSort());
-
-            watchpoint.setWatchpointTerm(updateFactory.prepend(updateFactory
-                    .elementaryUpdate(
-                            TermFactory.DEFAULT.createVariableTerm(watchpoint.getSelf()),
-                            TermFactory.DEFAULT.createVariableTerm(lv)),watchpoint.getWatchpointAsTerm()));
-            
-            wp = watchpoint.getWatchpointAsTerm();
-            // quantify according to users decision
-            if (watchpoint.getFlavor() == ALL) {
-                watchpoint.setWatchpointTerm(tb.all(lv, wp));
-            } else {
-                watchpoint.setWatchpointTerm(tb.ex(lv, wp));
-            }
-        }
-        wp = watchpoint.getWatchpointAsTerm();
+        composeWatchpointTerm(node, watchpoint, vnt, tb, updateFactory, updates);
+        
+        Term wp = watchpoint.getComposedTerm();
         updates.addAll(collectUpdates(pos));
         for (Update update : updates) {
             wp = updateFactory.prepend(update, wp);
         }
+        System.out.println("++++++ starting side proof with watchpoint: "+wp);
         boolean result = startSideProof(seq, pos, proof, maxsteps, wp);
         if (!watchpoint.testPossible()) {
             return result;
@@ -241,7 +219,44 @@ public class WatchpointUtil {
             wp = tb.not(wp);
             return !startSideProof(seq, pos, proof, maxsteps, wp);
         }
+    }
 
+    /**
+     * @param node
+     * @param watchpoint
+     * @param tb
+     * @param updateFactory
+     * @param updates
+     */
+    private static void composeWatchpointTerm(Node node, WatchPoint watchpoint,
+            VariableNameTracker vnt, TermBuilder tb,
+            UpdateFactory updateFactory, LinkedList<Update> updates) {
+        
+        Term wp;
+        // start tracking names if necessary (local watchpoints)
+        if (watchpoint.isLocal()) {
+
+            updates.add(buildNameUpdates(updateFactory, vnt.result()));
+            updates.add(updateSelfVar(updateFactory, watchpoint, vnt
+                    .getSelfVar()));
+            watchpoint.setComposedTerm(watchpoint.getRawTerm());
+        } else {
+            LogicVariable lv = new LogicVariable(new Name(watchpoint.getSelf()
+                    .name()+ "_lv"), watchpoint.getSelf().getKeYJavaType().getSort());
+            //update self variable
+            watchpoint.setComposedTerm(updateFactory.prepend(updateFactory
+                    .elementaryUpdate(
+                            TermFactory.DEFAULT.createVariableTerm(watchpoint.getSelf()),
+                            TermFactory.DEFAULT.createVariableTerm(lv)),watchpoint.getRawTerm()));
+            
+            wp = watchpoint.getComposedTerm();
+            // quantify term
+            if (watchpoint.getFlavor() == ALL) {
+                watchpoint.setComposedTerm(tb.all(lv, wp));
+            } else {
+                watchpoint.setComposedTerm(tb.ex(lv, wp));
+            }
+        }
     }
 
     /**
@@ -280,7 +295,7 @@ public class WatchpointUtil {
     }
 
     /**
-     * updateSelfVar updates the self variable of a local watchpoint 
+     * updateSelfVar updates the self variable of a local watchpoint.
      * 
      * @param uf
      * @param watchpoint
@@ -364,27 +379,26 @@ public class WatchpointUtil {
                 .toArray()[0];
                 return WatchpointUtil.evalutateWatchpoint(node, wp, seq, pos, proof, maxsteps, watchpoints);
             }
-            // start tracking names if necessary
-            if (WatchPointManager.existsWatchPointContainingLocals()) {
 
-                VariableNameTracker vnt = new VariableNameTracker(node, watchpoints);
-                vnt.start();
-                updates.add(
-                        buildNameUpdates(updateFactory,vnt.result()));
+            VariableNameTracker vnt = new VariableNameTracker(node,
+                    watchpoints);           
+            for (WatchPoint wp : watchpoints) {
+                if(wp.isEnabled()) {
+                    composeWatchpointTerm(node, wp, vnt, TermBuilder.DF, updateFactory, updates);
+                }
             }
-
             updates.addAll(collectUpdates(pos));
 
             final TermFactory tf = TermFactory.DEFAULT;
             Iterator<WatchPoint> iter = watchpoints.iterator();
 
             Term watchpoint = (Op.OR == junctor ? tf.createJunctorTerm(junctor,
-                    ((WatchPoint)iter.next()).getWatchpointAsTerm(), tf.createJunctorTerm(Op.FALSE)) : tf
-                    .createJunctorTerm(junctor, ((WatchPoint)iter.next()).getWatchpointAsTerm(), tf
+                    ((WatchPoint)iter.next()).getComposedTerm(), tf.createJunctorTerm(Op.FALSE)) : tf
+                    .createJunctorTerm(junctor, ((WatchPoint)iter.next()).getComposedTerm(), tf
                             .createJunctorTerm(Op.TRUE)));
 
             while (iter.hasNext()) {
-                watchpoint = tf.createJunctorTerm(junctor, ((WatchPoint)iter.next()).getWatchpointAsTerm(),
+                watchpoint = tf.createJunctorTerm(junctor, ((WatchPoint)iter.next()).getComposedTerm(),
                         watchpoint);
             }
             if (negateJunctor) {
@@ -499,24 +513,29 @@ public class WatchpointUtil {
             theNode.add(nodes[0]);
             return theNode;
         }
+
         List<Node> proofnodes = new LinkedList<Node>(Arrays.asList(nodes));
         // not more than 4 children expected
         final int INITIALCAPACITY = 4;
-        HashSet<Node> candidates = new HashSet<Node>(INITIALCAPACITY);
+        HashSet<Node> result = new HashSet<Node>(INITIALCAPACITY);
+        
         while (!proofnodes.isEmpty()) {
 
             Node currentNode = proofnodes.get(0);
             proofnodes.remove(currentNode);
+            
+            if(!hasChildrenInSet(currentNode, proofnodes)){
+                result.add(currentNode);
+            }
             Node parentNode = currentNode.parent();
             while (parentNode != null && proofnodes.contains(parentNode)) {
                 proofnodes.remove(parentNode);
                 parentNode = parentNode.parent();
 
             }
-            candidates.addAll(findLeaves(currentNode, proofnodes));
         }
-        System.out.println("candiates.size: " + candidates.size());
-        return candidates;
+        System.out.println("result.size: " + result.size());
+        return result;
     }
 
     /**
@@ -544,7 +563,8 @@ public class WatchpointUtil {
     }
 
     /**
-     * Gets the executiontree as list.
+     * Gets the executiontree as list. The method works top-down, 
+     * so pass the root node of the (sub) tree you need as list.
      * 
      * @param etn the ETNode containing the current ET
      * 
@@ -564,6 +584,7 @@ public class WatchpointUtil {
 
     /**
      * Value to key.
+     * Swaps the values of the given map to its keys.
      * 
      * @param map the map
      * 

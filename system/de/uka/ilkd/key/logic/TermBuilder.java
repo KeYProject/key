@@ -288,5 +288,9 @@ public class TermBuilder {
         t = func((Function)v,t);
         return t;
     }
-
+    
+    
+    public Term inReachableState(Services services) {
+        return func(services.getJavaInfo().getInReachableState());
+    }
 }

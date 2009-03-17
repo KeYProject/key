@@ -173,11 +173,11 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
     }
     
     private void scanAddedFormulas ( Goal goal, boolean antec, SequentChangeInfo sci, final Constraint userConstraint ) {
-        final IteratorOfBuiltInRule ruleIt = index.rules().iterator();
         ListOfConstrainedFormula cfmas = sci.addedFormulas( antec );
         final NewRuleListener listener = getNewRulePropagator();
         while ( !cfmas.isEmpty() ) {
             final ConstrainedFormula cfma = cfmas.head();
+            final IteratorOfBuiltInRule ruleIt = index.rules().iterator();
             while (ruleIt.hasNext()) {
                 final BuiltInRule rule = ruleIt.next();            
                 scanSimplificationRule( rule, goal, antec, 
@@ -189,7 +189,6 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
 
 
     private void scanModifiedFormulas ( Goal goal, boolean antec, SequentChangeInfo sci, final Constraint userConstraint ) {
-        final IteratorOfBuiltInRule ruleIt = index.rules().iterator();
         
         final NewRuleListener listener = getNewRulePropagator();
         ListOfFormulaChangeInfo fcis = sci.modifiedFormulas( antec );
@@ -197,6 +196,7 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
         while ( !fcis.isEmpty() ) {
             final FormulaChangeInfo fci = fcis.head();               
             final ConstrainedFormula cfma = fci.getNewFormula();
+            final IteratorOfBuiltInRule ruleIt = index.rules().iterator();
             while (ruleIt.hasNext()) {
                 final BuiltInRule rule = ruleIt.next();
                 scanSimplificationRule( rule, goal, antec, userConstraint, cfma, listener );

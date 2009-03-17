@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -170,15 +169,12 @@ public abstract class EnsuresPO extends AbstractPO {
         Term result = TB.func(javaInfo.getInReachableState());
         
         //assumed invariants
-        final IteratorOfClassInvariant it = assumedInvs.iterator();
-        while(it.hasNext()) {
-            result = TB.and(result, translateInv(it.next()));
+        for(ClassInvariant assumedInv : assumedInvs) {
+            result = TB.and(result, translateInv(assumedInv));
         }
         
         //implicit invariants as taclets
-        final Iterator<KeYJavaType> it2 = javaInfo.getAllKeYJavaTypes().iterator();
-        while(it2.hasNext()) {
-            KeYJavaType kjt = it2.next();
+        for(KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
             if(kjt.getJavaType() instanceof ClassType) {
                 buildInvariantTacletsForClass(kjt);
             }
@@ -202,50 +198,30 @@ public abstract class EnsuresPO extends AbstractPO {
         
         //build disjunction of preconditions
         if(!skipPreconditions) {
-            Term anyPreTerm = TB.ff();
             SetOfOperationContract contracts 
-                = specRepos.getOperationContracts(programMethod);
-            IteratorOfOperationContract it = contracts.iterator();
-            while(it.hasNext()) {
-                OperationContract contract = it.next();
-                Term term = translatePre(contract, selfVar, toPV(paramVars));
-                anyPreTerm = TB.or(anyPreTerm, term); 
+            = specRepos.getOperationContracts(programMethod);
+            if (contracts.size() > 0) {
+                Term anyPreTerm = TB.ff();
+                for(OperationContract contract : contracts) {
+                    Term term = translatePre(contract, selfVar, toPV(paramVars));
+                    anyPreTerm = TB.or(anyPreTerm, term); 
+                }
+                result = TB.and(result, anyPreTerm);
             }
-            result = TB.and(result, anyPreTerm);
         }
-        
+
         //build "self.<created> = TRUE & self != null"
         if(selfVar != null) {
             Term selfCreatedAndNotNullTerm
-                = createdFactory.createCreatedAndNotNullTerm(services,
-                                                             TB.var(selfVar));
+                = CATF.createCreatedAndNotNullTerm(services, TB.var(selfVar));
             result = TB.and(result, selfCreatedAndNotNullTerm);
         }
         
         //build conjunction of... 
         //- "p_i.<created> = TRUE | p_i = null" for object parameters, and
         //- "inBounds(p_i)" for integer parameters
-        Term paramsLegalTerm = TB.tt();
-        IteratorOfProgramVariable it2 = paramVars.iterator();
-        while(it2.hasNext()) {
-            ProgramVariable paramVar = it2.next();
-            Term paramLegalTerm = TB.tt();
-            if(paramVar.sort() instanceof ObjectSort) {
-                paramLegalTerm
-                    = createdFactory.createCreatedOrNullTerm(services, 
-                                                             TB.var(paramVar)); 
-            } else {
-                Type paramType = paramVar.getKeYJavaType().getJavaType();
-                LDT ldt = services.getTypeConverter().getModelFor(paramType);
-                
-                if(ldt instanceof AbstractIntegerLDT) {
-                    Function inBoundsPred 
-                        = ((AbstractIntegerLDT) ldt).getInBounds();
-                    paramLegalTerm = TB.func(inBoundsPred, TB.var(paramVar));
-                }
-            }
-            paramsLegalTerm = TB.and(paramsLegalTerm, paramLegalTerm);
-        }
+        Term paramsLegalTerm = CATF.createReachableVariableValuesTerm(services, 
+                                                                      paramVars);
         result = TB.and(result, paramsLegalTerm);
         
         return result;        
@@ -360,7 +336,6 @@ public abstract class EnsuresPO extends AbstractPO {
         
         //build general assumption
         Term gaTerm = buildGeneralAssumption(selfVar, paramVars);
-        
         //get precondition defined by subclass
         Term preTerm = getPreTerm(selfVar, 
                                   paramVars, 

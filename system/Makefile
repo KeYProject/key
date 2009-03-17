@@ -211,8 +211,8 @@ GENERATED_LISTS=logic/SLListOfTerm \
 	rule/export/SLListOfDisplayNameModelInfo \
 	rule/export/SLListOfCategoryModelInfo \
 	logic/SLListOfNamespace \
-	casetool/SLListOfAssociation \
-	casetool/SLListOfAssociationEnd \
+	speclang/ocl/translation/SLListOfAssociation \
+	speclang/ocl/translation/SLListOfAssociationEnd \
         speclang/ocl/translation/SLListOfOCLExpression \
 	speclang/translation/SLListOfSLExpression \
 	speclang/translation/SLListOfSLExpressionResolver \
@@ -260,7 +260,8 @@ GENERATED_SETS=logic/SetAsListOfTerm collection/SetAsListOfString \
 	java/statement/SetAsListOfLoopStatement \
         proof/SetAsListOfGoalChooserBuilder \
 	strategy/SetAsListOfStrategyFactory \
-	logic/op/SetAsListOfLocation
+	logic/op/SetAsListOfLocation \
+	speclang/SetAsListOfPositionedString
 
 GENERATED_MAPS=	collection/MapAsListFromIntegerToString \
 	logic/op/MapAsListFromQuantifiableVariableToInteger \

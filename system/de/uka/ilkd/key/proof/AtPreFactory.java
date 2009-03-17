@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
@@ -61,14 +63,17 @@ public class AtPreFactory {
      * Returns an available name constructed by affixing a counter to the passed 
      * base name.
      */
-    private String getNewName(Name baseName, Services services) {
+    private String getNewName(String baseName, 
+                              Services services, 
+                              List<String> locallyUsedNames) {
         NamespaceSet namespaces = services.getNamespaces();
             
         int i = 0;
         String result;
         do {
             result = baseName + "_" + i++;
-        } while(namespaces.lookup(new Name(result)) != null);
+        } while(namespaces.lookup(new Name(result)) != null
+                || locallyUsedNames.contains(result));
         
         return result;
     }
@@ -149,38 +154,34 @@ public class AtPreFactory {
     }
     
     
-    
-    //-------------------------------------------------------------------------
-    //public interface
-    //-------------------------------------------------------------------------    
-    
-    /**
-     * Creates an atPre-function for the passed operator, i.e., a new function
-     * symbol with the same signature.
-     */
-    public Function createAtPreFunction(Operator normalOp, Services services) {
-        Name baseName = normalOp instanceof AttributeOp ? 
-                ((AttributeOp) normalOp).attribute().name()
-                : normalOp instanceof ArrayOp ? new Name("get")
-                        : normalOp.name();
 
-        if (baseName instanceof ProgramElementName) {
-            baseName = new 
-                Name(((ProgramElementName)baseName).getProgramName());
+    private Function createAtPreFunction(Operator normalOp, 
+                                         Services services,
+                                         List<String> locallyUsedNames) {
+        String baseName;
+        if(normalOp instanceof AttributeOp) {
+            AttributeOp aop = (AttributeOp) normalOp;
+            baseName = ((ProgramVariable)aop.attribute()).getProgramElementName()
+                                                         .getProgramName(); 
+        } else if(normalOp instanceof ArrayOp) {
+            baseName = "get";
+        } else {
+            baseName = normalOp.name() instanceof ProgramElementName
+                       ? ((ProgramElementName)normalOp.name()).getProgramName()
+                       : normalOp.name().toString();
         }
         
-        String s = baseName.toString();
-        if (s.startsWith("<") && s.endsWith(">")) {
-            baseName = new Name(s.substring(1, s.length() - 1));
-        } else if(s.startsWith(".")) {
-            baseName = new Name(s.substring(1));
+        if (baseName.startsWith("<") && baseName.endsWith(">")) {
+            baseName = baseName.substring(1, baseName.length() - 1);
+        } else if(baseName.startsWith(".")) {
+            baseName = baseName.substring(1);
         }
         
-        baseName = new Name(baseName.toString() + "AtPre");        
+        baseName = baseName + "AtPre";
+        String uniqueName = getNewName(baseName, services, locallyUsedNames);
 
         Function result 
-            = new NonRigidFunctionLocation(new Name(getNewName(baseName, 
-                                                               services)),
+            = new NonRigidFunctionLocation(new Name(uniqueName),
                                            getSort(normalOp),
                                            getArgSorts(normalOp, 
                                                        services));
@@ -194,12 +195,16 @@ public class AtPreFactory {
     public void createAtPreFunctionsForTerm(
             Term term,
             /*inout*/ Map<Operator,Function/*atPre*/> atPreFunctions,
-            Services services) {
+            Services services,
+            List<String> locallyUsedNames) {
         int arity = term.arity();
         Sort[] subSorts = new Sort[arity];
         for(int i = 0; i < arity; i++) {
             Term subTerm = term.sub(i);
-            createAtPreFunctionsForTerm(subTerm, atPreFunctions, services);
+            createAtPreFunctionsForTerm(subTerm, 
+                                        atPreFunctions, 
+                                        services, 
+                                        locallyUsedNames);
             subSorts[i] = subTerm.sort();
         }
 
@@ -208,12 +213,45 @@ public class AtPreFactory {
            || term.op() instanceof ProgramMethod) {
             Function atPreFunc = atPreFunctions.get(term.op());
             if(atPreFunc == null) {
-                atPreFunc = AtPreFactory.INSTANCE.createAtPreFunction(term.op(), 
-                                                                      services);
+                atPreFunc = createAtPreFunction(term.op(), 
+                                                services, 
+                                                locallyUsedNames);
                 atPreFunctions.put(term.op(), atPreFunc);
+                locallyUsedNames.add(atPreFunc.name().toString());
             }
         }
     }
+    
+    
+    
+    //-------------------------------------------------------------------------
+    //public interface
+    //-------------------------------------------------------------------------    
+    
+    /**
+     * Creates an atPre-function for the passed operator, i.e., a new function
+     * symbol with the same signature.
+     */
+    public Function createAtPreFunction(Operator normalOp, Services services) {
+        return createAtPreFunction(normalOp, 
+                                   services, 
+                                   new LinkedList<String>());
+    }
+    
+    
+    /**
+     * Creates atPre-functions for all relevant operators in the passed term.
+     */
+    public void createAtPreFunctionsForTerm(
+            Term term,
+            /*inout*/ Map<Operator,Function/*atPre*/> atPreFunctions,
+            Services services) {
+        createAtPreFunctionsForTerm(term,
+                                    atPreFunctions,
+                                    services,
+                                    new LinkedList<String>());
+    }
+
     
 
     /**

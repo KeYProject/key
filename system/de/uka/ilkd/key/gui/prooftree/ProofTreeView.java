@@ -29,7 +29,6 @@ import de.uka.ilkd.key.util.Debug;
 
 public class ProofTreeView extends JPanel {
 
-
     private static final Color PASTEL_COLOR = new Color(255,255,204);
     private static final Color BISQUE_COLOR = new Color(240,228,196);
     private static final Color PALE_RED_COLOR = new Color(255,153,153);
@@ -63,10 +62,7 @@ public class ProofTreeView extends JPanel {
     private ConfigChangeListener configChangeListener =  new ConfigChangeListener() {
                                             public void configChanged(ConfigChangeEvent e) {
                                                 setProofTreeFont();
-                                            }
-                                            public void clear(){
-                                                Config.DEFAULT.removeConfigChangeListener(this);
-                                            }
+                                            }                                           
                                         };
     /**
      * Roots of subtrees containing all nodes to which rules have been
@@ -114,42 +110,32 @@ public class ProofTreeView extends JPanel {
 	delegateView.setScrollsOnExpand(true);
         ToolTipManager.sharedInstance().registerComponent(delegateView);
 	
-	MouseListener ml = new MouseAdapter() {
-		public void mousePressed(MouseEvent e) {
-		    if (e.isPopupTrigger()) {
-			TreePath selPath = delegateView.getPathForLocation
-			    (e.getX(), e.getY());
-			if (selPath!=null && (selPath.getLastPathComponent() 
-				instanceof GUIProofTreeNode || 
-				selPath.getLastPathComponent() instanceof 
-				GUIBranchNode)) {
-			    JPopupMenu popup = new ProofTreePopupMenu(selPath);
-			    popup.show(e.getComponent(),
-					e.getX(), e.getY());
-			}
-		    }
-		}
-                
-                public void mouseReleased(MouseEvent e) {
-                    mousePressed(e);
+        MouseListener ml = new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    TreePath selPath = delegateView.getPathForLocation
+                        (e.getX(), e.getY());
+                    if (selPath!=null && (selPath.getLastPathComponent() 
+                            instanceof GUIProofTreeNode || 
+                            selPath.getLastPathComponent() instanceof 
+                            GUIBranchNode)) {
+                        JPopupMenu popup = new ProofTreePopupMenu(selPath);
+                        popup.show(e.getComponent(),
+                                    e.getX(), e.getY());
+                    }
                 }
-	    };	    	
+            }
+            
+            public void mouseReleased(MouseEvent e) {
+                mousePressed(e);
+            }
+        };          
 	
 	delegateView.addMouseListener(ml);
 
 	setMediator(mediator);
 
-// 	UIManager.addPropertyChangeListener(
-// 	    new PropertyChangeListener() {
-// 		    public void propertyChange(PropertyChangeEvent e) {
-// 			if (Config.KEY_FONT_PROOF_TREE.
-// 			    equals(e.getPropertyName())) {
-// 			    setProofTreeFont();
-// 			}
-// 		    }
-// 		});
-
-	Config.DEFAULT.addConfigChangeListener( configChangeListener);
+        Config.DEFAULT.addConfigChangeListener(configChangeListener);
 
 	setProofTreeFont();
 	delegateView.setLargeModel(true);
@@ -178,6 +164,11 @@ public class ProofTreeView extends JPanel {
 	registerKeyboardAction(keyboardAction, 
 	        searchKeyStroke,
 	                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    }
+    
+    protected void finalize() {
+        Config.DEFAULT.removeConfigChangeListener(configChangeListener);
+        configChangeListener = null;
     }
 
     private void setProofTreeFont() {
@@ -221,7 +212,6 @@ public class ProofTreeView extends JPanel {
 	mediator.addAutoModeListener(proofListener);
 	mediator.addRuleAppListener(proofListener);
 	mediator.addGUIListener(guiListener);
-        Config.DEFAULT.addConfigChangeListener( configChangeListener);
     }
 
     private void unregister() {
@@ -229,7 +219,6 @@ public class ProofTreeView extends JPanel {
 	mediator.removeAutoModeListener(proofListener);
 	mediator.removeRuleAppListener(proofListener);
 	mediator.removeGUIListener(guiListener);
-	configChangeListener.clear();
     }
 
     public void removeNotify () {
@@ -635,10 +624,9 @@ public class ProofTreeView extends JPanel {
 	    DefaultTreeCellRenderer tree_cell =  
 		(DefaultTreeCellRenderer) super.getTreeCellRendererComponent
 		(tree, nodeText, sel, expanded, leaf, row, hasFocus);
-		
-	    tree_cell.setFont(tree.getFont());	    	    
-	    tree_cell.setText(nodeText);            
                                 
+	    
+	    
 	    if (node.leaf()) {
 		Goal goal = proof.getGoal(node);
 		if ( goal == null ||
@@ -648,17 +636,22 @@ public class ProofTreeView extends JPanel {
 		    ProofTreeView.this.setToolTipText("Closed Goal");
 		    tree_cell.setToolTipText("A closed goal");
 		} else {
-		    if ( goal.getClosureConstraint ().isSatisfiable () ) {
+		    if ( !goal.isAutomatic() ) {
+		        tree_cell.setForeground(Color.orange);
+		        tree_cell.setIcon(IconFactory.keyHoleInteractive(20, 20));
+		        ProofTreeView.this.setToolTipText("Disabled Goal");
+		        tree_cell.setToolTipText("Interactive goal - no automatic rule application");
+		    } else if ( goal.getClosureConstraint ().isSatisfiable () ) {
 			tree_cell.setForeground(Color.blue);
 			tree_cell.setIcon(IconFactory.keyHole(20, 20));
 			ProofTreeView.this.setToolTipText("Closable Goal");
 			tree_cell.setToolTipText("A goal that can be closed");
 		    } else {
 			tree_cell.setForeground(Color.red);
+			tree_cell.setIcon(IconFactory.keyHole(20, 20));
 			ProofTreeView.this.setToolTipText("Open Goal");
 			tree_cell.setToolTipText("An open goal");
 		    }                                                            
-		    tree_cell.setIcon(IconFactory.keyHole(20, 20));
 		}
 	    } else {
 		/*
@@ -686,7 +679,7 @@ public class ProofTreeView extends JPanel {
                 }
 		tree_cell.setToolTipText(tooltipText);
 	    }
-
+	    
             if (node.getReuseSource() != null) {
 		tree_cell.setBackgroundNonSelectionColor(PASTEL_COLOR);
                 if (!node.getReuseSource().isConnect()) { 
@@ -699,6 +692,9 @@ public class ProofTreeView extends JPanel {
                 tree_cell.setBackgroundNonSelectionColor(Color.white);
             }
 	    if (sel) tree_cell.setBackground(Color.blue);
+	    
+	    tree_cell.setFont(tree.getFont());
+	    tree_cell.setText(nodeText);
 	    
 	    return tree_cell;
 	}
@@ -785,6 +781,11 @@ public class ProofTreeView extends JPanel {
 	    this.add(search);
 	    search.addActionListener(this);
 	    this.add(new JSeparator());
+	    // disable goals
+	    this.add(new SetGoalsBelowEnableStatus(false));
+	    // enable goals
+	    this.add(new SetGoalsBelowEnableStatus(true));
+	    this.add(new JSeparator());
 	    this.add(goalBack);
 	    if (branch != path) {
 		goalBack.addActionListener(this);
@@ -802,7 +803,7 @@ public class ProofTreeView extends JPanel {
 		this.add(visualize);
 		visualize.addActionListener(this);
 		visualize.setEnabled(true);
-		((ProofTreePopupMenu)this).add(test);
+		this.add(test);
 		test.addActionListener(this);
 		test.setEnabled(true);
 		if (proof != null) {
@@ -826,8 +827,7 @@ public class ProofTreeView extends JPanel {
 		delegateModel.setAttentive(true);
 		makeNodeVisible(mediator.getSelectedNode());
 	    } else if (e.getSource() == runStrategy) {
-		mediator().startAutoMode
-		    (proof.getSubtreeGoals(invokedNode));
+		runStrategyOnNode();
 	    } else if (e.getSource() == mark) {
 		mediator().mark(invokedNode);
                 delegateView.treeDidChange(); // redraw with mark
@@ -935,7 +935,7 @@ public class ProofTreeView extends JPanel {
 		}
             } else if (e.getSource() == search) {
 		proofTreeSearchPanel.setVisible(true);
-            }  else if (e.getSource() == visualize) {
+            } else if (e.getSource() == visualize) {
                 new ProofVisTreeView(mediator.visualizeProof().getVisualizationModel());                
             }else if (e.getSource() == test) {
 		mediator.generateTestCaseForSelectedNode();
@@ -944,6 +944,72 @@ public class ProofTreeView extends JPanel {
             }
 	}
 
+	/**
+	 * run automatic on the currently selected node.
+	 * All enabled goals below the current node are taken into consideration. 
+	 * 
+	 * CAUTION: If the node itself is a goal then allow applying rules
+	 *   to it even if it were disabled. Desired behaviour? 
+	 * 
+	 */
+	private void runStrategyOnNode() {
+	    Goal invokedGoal = proof.getGoal(invokedNode);
+	    // is the node a goal?
+            if(invokedGoal == null) {
+                ListOfGoal enabledGoals = proof.getSubtreeEnabledGoals(invokedNode);
+                mediator().startAutoMode(enabledGoals);
+            } else {
+                mediator().startAutoMode(SLListOfGoal.EMPTY_LIST.prepend(invokedGoal));
+            }
+	}
+	
+	/**
+	 * Action for enabling/disabling all goals below "node".
+         * 
+         * @author mulbrich
+         */
+	private final class SetGoalsBelowEnableStatus extends DisableGoal {
+
+	    public SetGoalsBelowEnableStatus(boolean enableGoals) {
+	        this.enableGoals = enableGoals;
+	        
+	        String action = enableGoals ? "Automatic" : "Interactive";
+	        putValue(NAME, "Set All Goals Below to " + action);
+	        if(enableGoals) {
+	            putValue(SHORT_DESCRIPTION, "Include this node and all goals in the subtree in automatic rule application");
+	            putValue(SMALL_ICON, KEY_HOLE_PULL_DOWN_MENU);
+	        } else {
+	            putValue(SHORT_DESCRIPTION, "Exclude this node and all goals in the subtree from automatic rule application");
+                    putValue(SMALL_ICON, KEY_HOLE_DISABLED_PULL_DOWN_MENU);
+	        }	       
+            }
+	    
+	    /*
+	     * return all subgoals of the current node. 
+	     */
+            @Override
+            public Iterable<Goal> getGoalList() {
+                ListOfGoal goals = proof.getSubtreeGoals(invokedNode);
+                return goals;
+            }
+
+            /* 
+             * In addition to marking setting goals, update the tree model
+             * so that the label sizes are recalculated
+             */
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                super.actionPerformed(e);
+                for (Goal goal : getGoalList()) {
+                    delegateModel.updateTree(goal.node());
+                }
+                // trigger repainting the tree after the completion of this event.
+                delegateView.repaint();
+            }
+            
+            
+	}
+	
         public void itemStateChanged(ItemEvent e) {
             if (e.getSource() == hideIntermediate) {
                 delegateModel.hideIntermediateProofsteps(e.getStateChange()

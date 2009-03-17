@@ -238,7 +238,7 @@ public class WatchpointView extends ViewPart {
         
         column = new TableColumn(table, SWT.NONE, 6);
         column.setWidth(40);
-        column.setText("All Quantification");
+        column.setText("Universal Quantification");
         return table;
     }
 
@@ -466,12 +466,17 @@ public class WatchpointView extends ViewPart {
         disableAction = new Action() {
             public void run() {
 
-                IStructuredSelection sel = (IStructuredSelection) tableViewer
-                .getSelection();
-                Iterator<WatchPoint> i = sel.iterator();
-                while(i.hasNext()){
-                    WatchPoint element = i.next();
-                        ((WatchPoint) element).setEnabled(false);
+                try {
+                    IStructuredSelection sel = (IStructuredSelection) tableViewer
+                    .getSelection();
+                    Iterator<WatchPoint> i = sel.iterator();
+                    while(i.hasNext()){
+                        WatchPoint element = i.next();
+                            ((WatchPoint) element).setEnabled(false);
+                    }
+                } catch (RuntimeException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
                 tableViewer.refresh();
                 setFocus();

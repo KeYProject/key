@@ -71,7 +71,7 @@ public class KeYCrossReferenceNameInfo extends DefaultNameInfo {
     }
 
     /**
-     * unregister a class type. This happes for instance when removing an
+     * unregister a class type. This happens for instance when removing an
      * EnumDeclaration and inserting an EnumClassDeclaration instead
      * 
      * @param fullname
