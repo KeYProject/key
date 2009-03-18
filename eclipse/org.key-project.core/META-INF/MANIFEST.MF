@@ -97,7 +97,5 @@ Export-Package: .,
  de.uka.ilkd.key.visualdebugger.executiontree,
  de.uka.ilkd.key.visualdebugger.statevisualisation,
  de.uka.ilkd.key.visualdebugger.watchpoints,
- de.uka.ilkd.key.visualization,
- examples._testcase.classpath.classpath,
- examples.staticInitialisation.java
+ de.uka.ilkd.key.visualization
 Require-Bundle: KeYExternalLibraries
