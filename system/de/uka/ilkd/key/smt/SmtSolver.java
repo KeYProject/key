@@ -1,24 +1,18 @@
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
+
 
 public interface SmtSolver {
 
     public static enum RESULTTYPE {VALID, INVALID, UNKNOWN}
     
     /**
-     * This rule's name.
+     * This solver's name.
      */
-    public String displayName();
-    
-    /**
-     * This rule's name as Name object.
-     */
-    public abstract Name name();
+    public String name();
     
     /**
      * Check, if the formula in the goal is valid.

@@ -136,7 +136,7 @@ public abstract class AbstractSolverTest extends TestCase {
 	    result = checkFile(filepath);
 	} catch (RuntimeException e) {
 	    System.out.println();
-	    System.out.println("Error while execution of " + this.getSolver().displayName());
+	    System.out.println("Error while execution of " + this.getSolver().name());
 	    System.out.println();
 	    e.printStackTrace();
 	    toolNotInstalled = true;

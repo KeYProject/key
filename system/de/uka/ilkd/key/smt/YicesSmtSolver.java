@@ -1,25 +1,12 @@
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.op.SetAsListOfMetavariable;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
 
-public class YicesSmtSolver extends AbstractSmtProver {
 
-    /**
-     * This rule's name.
-     */
-    public String displayName() {
+public class YicesSmtSolver extends AbstractSmtSolver {
+
+    public String name() {
 	return "Yices";
-    }
-
-    /**
-     * This rule's name as Name object.
-     */
-    public Name name() {
-	return new Name(this.displayName());
     }
 
     /**

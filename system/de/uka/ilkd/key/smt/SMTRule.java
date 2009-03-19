@@ -1,12 +1,10 @@
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.gui.configuration.Settings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ListOfGoal;
 import de.uka.ilkd.key.proof.SLListOfGoal;
@@ -15,7 +13,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 
 public class SMTRule implements BuiltInRule {
 
-    private SmtSolver prover = null;
+    private final SmtSolver prover;
 
     public SMTRule(SmtSolver arg1) {
 	this.prover = arg1;
@@ -25,14 +23,14 @@ public class SMTRule implements BuiltInRule {
      * This rule's name.
      */
     public String displayName() {
-	return prover.displayName();
+	return prover.name();
     }
 
     /**
      * This rule's name as Name object.
      */
     public Name name() {
-	return prover.name();
+	return new Name(displayName());
     }
 
     public boolean isApplicable(Goal goal, PosInOccurrence pio,
@@ -44,7 +42,6 @@ public class SMTRule implements BuiltInRule {
 	} else {
 	    return false;
 	}
-	//return this.prover.isApplicable(goal);
     }
 
     public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
@@ -52,12 +49,6 @@ public class SMTRule implements BuiltInRule {
 	SmtSolver.RESULTTYPE valid = this.prover.isValid(goal, ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getTimeout(), services);
 	if (valid == SmtSolver.RESULTTYPE.VALID) {
 	    return SLListOfGoal.EMPTY_LIST;
-	} else if (valid == SmtSolver.RESULTTYPE.UNKNOWN) {
-	    return null;
-	} else if (valid == SmtSolver.RESULTTYPE.INVALID) {
-	    ListOfGoal toReturn = SLListOfGoal.EMPTY_LIST;
-	    //TODO add new goal, that implies invalidity
-	    return null;
 	} else {
 	    return null;
 	}

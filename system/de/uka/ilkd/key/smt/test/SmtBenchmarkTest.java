@@ -48,7 +48,7 @@ public class SmtBenchmarkTest extends TestCase implements FilenameFilter{
 	//print header
 	output = "Problem\tFile\t";
 	for (int i = 0; i < solver.size(); i++) {
-	    output = output + solver.get(i).displayName() + "\t\t";
+	    output = output + solver.get(i).name() + "\t\t";
 	}
 	output = output + "\n";
 	

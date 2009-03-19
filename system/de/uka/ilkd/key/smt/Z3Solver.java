@@ -1,24 +1,15 @@
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.op.SetAsListOfMetavariable;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
-//import de.uka.ilkd.key.smt.SmtSolver.RESULTTYPE;
 
-public class Z3Solver extends AbstractSmtProver {
+
+public class Z3Solver extends AbstractSmtSolver {
 
     
-    @Override
-    public String displayName() {
+    public String name() {
         return "Z3";
     }
     
-    @Override
-    public Name name() {
-	return new Name(this.displayName());
-    }
     
     @Override
     protected SmtTranslator getTranslator(Services services) {

@@ -10,6 +10,7 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.proofevent.IteratorOfNodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -261,6 +262,11 @@ public class ProofStarter {
             proof.getSettings().getProfile().getStandardRules().getStandardBuiltInRules().iterator();
         while (builtinRules.hasNext()) {
             final BuiltInRule bir = builtinRules.next();
+            //TODO: do we really want to hardcode "Simplify" here?
+            if (bir instanceof SMTRule && bir.displayName().contains("Simplify")) {
+        	decisionProcedureRule = bir;
+        	break;
+            }
         }
         return decisionProcedureRule;
     }

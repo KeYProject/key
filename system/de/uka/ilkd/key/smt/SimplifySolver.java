@@ -1,16 +1,12 @@
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.op.SetAsListOfMetavariable;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
 
-public class SimplifySolver extends AbstractSmtProver {
+
+public class SimplifySolver extends AbstractSmtSolver {
 
     
-    @Override
-    public String displayName() {
+    public String name() {
         return "Simplify";
     }
     
@@ -19,10 +15,6 @@ public class SimplifySolver extends AbstractSmtProver {
 	return new SimplifyTranslator(services);
     }
     
-    @Override
-    public Name name() {
-	return new Name(this.displayName());
-    }
     
     @Override
     protected String[] getExecutionCommand(String filename, StringBuffer formula) {

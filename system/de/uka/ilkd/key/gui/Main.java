@@ -1534,7 +1534,10 @@ public class Main extends JFrame implements IMain {
 	decisionProcedureOption.add(new JSeparator());
 	
 	//add possibility for timeout setting
-	this.ruletimeoutlabel.setText("timeout: " + ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getTimeout());
+	this.ruletimeoutlabel.setText(
+		"timeout: " + ProofSettings.DEFAULT_SETTINGS
+					   .getDecisionProcedureSettings()
+					   .getTimeout() + " s");
 	decisionProcedureOption.add(this.ruletimeoutlabel);
 	this.ruletimeout.setValue(ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getTimeout());
 	this.ruletimeout.addChangeListener(decisionProcButtonListener);
@@ -2256,7 +2259,7 @@ public class Main extends JFrame implements IMain {
         public void stateChanged(ChangeEvent arg0) {
             if (arg0.getSource() == ruletimeout) {
         	ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setTimeout(ruletimeout.getValue());
-        	ruletimeoutlabel.setText("timeout: " + ruletimeout.getValue());
+        	ruletimeoutlabel.setText("timeout: " + ruletimeout.getValue() + " s");
             }
         }
     }

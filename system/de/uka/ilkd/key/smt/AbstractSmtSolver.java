@@ -15,16 +15,11 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.apache.log4j.Logger;
 
-public abstract class AbstractSmtProver implements SmtSolver{
+public abstract class AbstractSmtSolver implements SmtSolver {
 
-    //public static final int VALID = 0;
-
-    //public static final int INVALID = 1;
-
-    //public static final int UNKNOWN = 2;
 
     private static final Logger logger = Logger
-	    .getLogger(AbstractSmtProver.class.getName());
+	    .getLogger(AbstractSmtSolver.class.getName());
 
     /**
      * The path for the file
@@ -32,15 +27,6 @@ public abstract class AbstractSmtProver implements SmtSolver{
     private static final String fileDir = PathConfig.KEY_CONFIG_DIR
 	    + File.separator + "smt_formula";
 
-    /**
-     * This rule's name.
-     */
-    public abstract String displayName();
-
-    /**
-     * This rule's name as Name object.
-     */
-    public abstract Name name();
 
     protected boolean isApplicable(Goal goal) {
 	/*Services s = new Services();
