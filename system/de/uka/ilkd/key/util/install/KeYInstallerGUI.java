@@ -25,8 +25,8 @@ import javax.swing.event.ChangeListener;
 public class KeYInstallerGUI extends KeYInstallerUI {
 
 
-    private JTabbedPane tabbedPane;
-    private JFrame installerFrame;
+    private final JTabbedPane tabbedPane;
+    private final JFrame installerFrame;
 
     
     public KeYInstallerGUI ( String keyHome, 
@@ -188,6 +188,11 @@ public class KeYInstallerGUI extends KeYInstallerUI {
                 }
 	    }
 	});
+	
+	// disable the tabbed pane in order to prevent the user from 
+	// circumventing the consistency checking and model updating 
+	// done by the "next" button 
+	tabbedPane.setEnabled(false);
 	
 	// add buttons
 	buttonBox.add(prev);
