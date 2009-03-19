@@ -6,7 +6,7 @@
 
 
        Universitaet Karlsruhe (TH)
-       Institut fuer Logik, Komplexitaet und Deduktionssysteme
+       Institut fuer Theoretische Informatik
        Am Fasanengarten 5
        D-76131 Karlsruhe
        Germany
@@ -14,7 +14,7 @@
 
        Universitaet Koblenz-Landau
        Institute for Informatics
-       Jun.-Prof. Dr. Bernhard Beckert
+       Prof. Dr. Bernhard Beckert
        D-56070 Koblenz
        Germany
 

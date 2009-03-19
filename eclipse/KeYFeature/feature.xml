@@ -21,14 +21,20 @@ specification and verification can be introduced incrementally.
 
    <copyright url="http://www.key-project.org/download/LICENSE">
 KeY - INTEGRATED DEDUCTIVE SOFTWARE DESIGN 
-Copyright (C) 2001-2006 Universitaet Karlsruhe (TH), Germany,
+Copyright (C) 2001-2009 Universitaet Karlsruhe (TH), Germany,
 Universitaet Koblenz-Landau, Koblenz, Germany,
 and Chalmers University of Technology, Sweden.
 
 Universitaet Karlsruhe (TH)
-Institut fuer Logik, Komplexitaet und Deduktionssysteme
+Institut fuer Theoretische Informatik
 Am Fasanengarten 5
 D-76131 Karlsruhe
+Germany
+and
+Universitaet Koblenz-Landau
+Institute for Informatics
+Prof. Dr. Bernhard Beckert
+D-56070 Koblenz
 Germany
 and
 Chalmers University of Technology
