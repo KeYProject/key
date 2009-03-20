@@ -3,24 +3,28 @@ package de.uka.ilkd.key.gui;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.SetAsListOfProgramMethod;
 import de.uka.ilkd.key.logic.op.SetOfProgramMethod;
+import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
-
+import de.uka.ilkd.key.unittest.simplify.SimplifyModelGenerator;
 
 public class MethodSelectionDialog extends JDialog {
 
     private UnitTestBuilder testBuilder;
     private KeYMediator mediator; 
     private JList methodList;
-    private ArrayList<JCheckBox> RuleBoxes = new ArrayList<JCheckBox>();
+    private final JCheckBox simplify = new JCheckBox("Simplify");
+    private final JCheckBox cogent = new JCheckBox("Cogent");
+    private final JCheckBox completeEx = new JCheckBox("Only completely "+
+						       "executed traces");
     private static MethodSelectionDialog instance=null;
     private StringBuffer latestTests=new StringBuffer();
 
@@ -40,6 +44,11 @@ public class MethodSelectionDialog extends JDialog {
 	    instance.dispose();
 	}
 	instance = new MethodSelectionDialog(mediator);
+	instance.cogent.setSelected(ModelGenerator.decProdForTestGen ==
+				    ModelGenerator.COGENT);
+	instance.simplify.setSelected(ModelGenerator.decProdForTestGen ==
+				      ModelGenerator.SIMPLIFY);
+	instance.completeEx.setSelected(UnitTestBuilder.requireCompleteExecution);
 	return instance;
     }
 
@@ -47,6 +56,10 @@ public class MethodSelectionDialog extends JDialog {
 	getContentPane().setLayout(new BoxLayout(getContentPane(), 
 						 BoxLayout.Y_AXIS));
 	final MethodSelectionDialog thisRef = this;
+	final JTextField simplifyDataTupleNumber =
+	    new JTextField(""+SimplifyModelGenerator.modelLimit, 2);
+	simplifyDataTupleNumber.setToolTipText("Minimal number of data tuples"+
+					       "per test method");
 	// methodlist
 	methodList = new JList();
 	methodList.setCellRenderer(new DefaultListCellRenderer(){
@@ -98,6 +111,7 @@ public class MethodSelectionDialog extends JDialog {
 	JButton testAll = new JButton("Create Test For Proof");
 	testAll.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
+		    setSimplifyCount(simplifyDataTupleNumber.getText());
 		    createTest(null);
 		}
 	    });
@@ -111,18 +125,86 @@ public class MethodSelectionDialog extends JDialog {
 			    "No Methods Selected", 
 			    JOptionPane.ERROR_MESSAGE);
 		    }else{
+			setSimplifyCount(simplifyDataTupleNumber.getText());
 			createTest(methodList.getSelectedValues());
 		    }
 		}
 	    });
   	buttonPanel.add(testSel);
-  	//add all checkboxes needed for the Rule testing
-  	//TODO: add selction of the Rules to be tested here
+	simplify.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    if(simplify.isSelected()){
+		        ModelGenerator.decProdForTestGen = 
+		            ModelGenerator.SIMPLIFY;
+                        ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().
+                        setDecisionProcedureForTest(DecisionProcedureSettings.SIMPLIFY);  
+			buttonPanel.add(simplifyDataTupleNumber, 
+					buttonPanel.getComponentCount()-1);
+			simplifyDataTupleNumber.setText(
+			    ""+SimplifyModelGenerator.modelLimit);
+			cogent.setSelected(false);
+			thisRef.pack();
+		    }else{
+			ModelGenerator.decProdForTestGen = 
+			    ModelGenerator.COGENT;
+                        ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().
+                        setDecisionProcedureForTest(DecisionProcedureSettings.COGENT);
+			buttonPanel.remove(simplifyDataTupleNumber);
+			simplify.setSelected(false);
+			cogent.setSelected(true);
+			thisRef.pack();
+		    }
+		}
+	    });
+	cogent.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    if(cogent.isSelected()){
+			ModelGenerator.decProdForTestGen = 
+			    ModelGenerator.COGENT;
+			buttonPanel.remove(simplifyDataTupleNumber);
+			simplify.setSelected(false);
+			thisRef.pack();
+		    }else{
+			ModelGenerator.decProdForTestGen = 
+			    ModelGenerator.SIMPLIFY;
+			buttonPanel.add(simplifyDataTupleNumber, 
+					buttonPanel.getComponentCount()-1);
+			simplifyDataTupleNumber.setText(
+			    ""+SimplifyModelGenerator.modelLimit);
+			cogent.setSelected(false);
+			simplify.setSelected(true);
+			thisRef.pack();
+		    }
+		}
+	    });
+	completeEx.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    UnitTestBuilder.requireCompleteExecution = 
+			completeEx.isSelected();
+		}
+	    });
+	JButton exit = new JButton("Exit");
+	exit.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    setSimplifyCount(simplifyDataTupleNumber.getText());
+		    setVisible(false);
+		    dispose();
+		    instance = null;
+		}
+	    });
+	buttonPanel.add(completeEx);
+	buttonPanel.add(cogent);
+	buttonPanel.add(simplify);
+	if(ModelGenerator.decProdForTestGen == ModelGenerator.SIMPLIFY){
+	    buttonPanel.add(simplifyDataTupleNumber);	    
+	}
+   	buttonPanel.add(exit);
 	getContentPane().add(buttonPanel);
     }
 
     public void setSimplifyCount(String s){
 	try{
+	    SimplifyModelGenerator.modelLimit = Integer.parseInt(s);
 	}catch(NumberFormatException ex){
 	    System.out.println(ex);
 	    // do nothing
