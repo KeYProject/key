@@ -20,9 +20,12 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-public abstract class AbstractSolverTest extends TestCase {
+public abstract class TestSMTSolver extends TestCase {
 
-    SMTSolver solver;
+    private SMTSolver solver;
+    
+    private HelperClassForTests helper;
+
     
     static boolean toolNotInstalled = false;
     
@@ -35,6 +38,7 @@ public abstract class AbstractSolverTest extends TestCase {
     
     protected void setUp() {
 	solver = this.getSolver();
+	helper = new HelperClassForTests();
     }
     
     /**
@@ -135,7 +139,7 @@ public abstract class AbstractSolverTest extends TestCase {
 	Assert.assertTrue(correctResult(testFile + "mult1.key", true));
     }
     
-    private boolean correctResult(String filepath, boolean isGeneralValid) {
+    private boolean correctResult(String filepath, boolean isValid) {
 	if (toolNotInstalled) {
 	    return true;
 	}
@@ -154,7 +158,7 @@ public abstract class AbstractSolverTest extends TestCase {
 	}
 	
 	//unknown is always allowed. But wrong answers are not allowed
-	if (isGeneralValid) {
+	if (isValid) {
 	    return result.isValid() != SMTSolverResult.ThreeValuedTruth.FALSE; 
 	} else {
 	    return result.isValid() != SMTSolverResult.ThreeValuedTruth.TRUE;
@@ -166,15 +170,13 @@ public abstract class AbstractSolverTest extends TestCase {
      * @param filepath the path to the file
      * @return the resulttype of the external solver 
      */
-    private SMTSolverResult checkFile(String filepath) {	
-	HelperClassForTests x = new HelperClassForTests();	
-	ProofAggregate p = x.parse(new File(filepath));
+    private SMTSolverResult checkFile(String filepath) {
+	ProofAggregate p = helper.parse(new File(filepath));
 	Assert.assertTrue(p.getProofs().length == 1);
 	Proof proof = p.getProofs()[0];	    
 	Assert.assertTrue(proof.openGoals().size() == 1);		
 	Goal g = proof.openGoals().iterator().next();
-	
-	SMTSolverResult toReturn = solver.run(g, 60, proof.getServices());
+	SMTSolverResult toReturn = solver.run(g, 20, proof.getServices());
 	return toReturn;
     }
     

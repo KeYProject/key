@@ -24,7 +24,7 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
-public class SmtBenchmarkTest extends TestCase implements FilenameFilter{
+public class TestSMTBenchmark extends TestCase implements FilenameFilter{
 
     private static String VALID = "valid";
     private static String INVALID = "not valid";

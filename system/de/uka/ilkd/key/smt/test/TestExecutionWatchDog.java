@@ -8,7 +8,7 @@ import de.uka.ilkd.key.smt.ExecutionWatchDog;
 
 import junit.framework.TestCase;
 
-public class ExecutionWatchDogTest extends TestCase {
+public class TestExecutionWatchDog extends TestCase {
 
     
     public void testWatchdog() {
@@ -19,9 +19,9 @@ public class ExecutionWatchDogTest extends TestCase {
 	    Timer t = new Timer();
 	    t.schedule(wd, new Date(System.currentTimeMillis()), 1000);
 	    try {
-		System.out.println("waiting");
+		//System.out.println("waiting");
 		int i = p.waitFor();
-		System.out.println("Result from waiting: " + i);
+		//System.out.println("Result from waiting: " + i);
 		wasInterrupted = wd.wasInterrupted();
 	    } catch (InterruptedException e) {
 		wasInterrupted = true;

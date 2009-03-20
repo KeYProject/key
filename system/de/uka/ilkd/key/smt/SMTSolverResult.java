@@ -52,4 +52,24 @@ public class SMTSolverResult {
     public ThreeValuedTruth isValid() {
 	return isValid;
     }
+    
+    
+    public String toString() {
+	return isValid + " (" + text + ")";
+    }
+    
+    
+    public boolean equals(Object o) {
+        if(!(o instanceof SMTSolverResult)) {
+            return false;
+        }
+        SMTSolverResult ssr = (SMTSolverResult) o;
+        return text.equals(ssr.text) && isValid == ssr.isValid;
+    }
+    
+    
+    public int hashCode() {
+        return text.hashCode() + isValid.hashCode();
+    }
+
 }

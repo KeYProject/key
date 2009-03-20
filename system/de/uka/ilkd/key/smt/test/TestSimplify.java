@@ -5,7 +5,7 @@ import de.uka.ilkd.key.smt.SMTSolver;
 
 
 
-public class SimplifyTest extends AbstractSolverTest {
+public class TestSimplify extends TestSMTSolver {
 
     public SMTSolver getSolver() {
 	return new SimplifySolver();
