@@ -27,7 +27,7 @@ public abstract class TestSMTSolver extends TestCase {
     private HelperClassForTests helper;
 
     
-    static boolean toolNotInstalled = false;
+    boolean toolNotInstalled = false;
     
     public static final String testFile = System.getProperty("key.home")
     + File.separator + "examples"
