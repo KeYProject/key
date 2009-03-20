@@ -39,14 +39,6 @@ public class TestKey extends TestCase {
   	de.uka.ilkd.key.rule.metaconstruct.TestProgramMetaConstructs.class,
  	de.uka.ilkd.key.rule.soundness.TestProofObligationCreation.class
      };
-     
-     static Class[] smtTests = new Class[] {
-		de.uka.ilkd.key.smt.test.SimplifyTest.class,
-		de.uka.ilkd.key.smt.test.Z3Test.class,
-		de.uka.ilkd.key.smt.test.YicesTest.class,
-		de.uka.ilkd.key.smt.test.ExecutionWatchDogTest.class
-	  	
-	     };
 
 
      static Class[] proofConstructionTests = new Class[] {
@@ -89,6 +81,13 @@ public class TestKey extends TestCase {
         de.uka.ilkd.key.speclang.ocl.translation.TestOCLTranslator.class,
         de.uka.ilkd.key.speclang.jml.pretranslation.TestJMLPreTranslator.class
       };
+     
+      static Class[] smtTests = new Class[] {
+	  de.uka.ilkd.key.smt.test.SimplifyTest.class,
+	  de.uka.ilkd.key.smt.test.Z3Test.class,
+	  de.uka.ilkd.key.smt.test.YicesTest.class,
+	  de.uka.ilkd.key.smt.test.ExecutionWatchDogTest.class
+      };
 
      
      public static TestSuite createSuite(Class[] testClasses, final String msg) {
@@ -119,7 +118,7 @@ public class TestKey extends TestCase {
 	suite.addTest(createSuite(javaTests, "Testing Java Datastructures"));
 	suite.addTest(createSuite(logicModelTests, "Testing Logic Engine"));
         suite.addTest(createSuite(speclangTests, "Testing JML/OCL support"));
-        suite.addTest(createSuite(smtTests, "Testing smt tool support"));
+        suite.addTest(createSuite(smtTests, "Testing integration of external SMT solvers"));
         
 	return suite;
     }

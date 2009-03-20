@@ -1,3 +1,13 @@
+//This file is part of KeY - Integrated Deductive Software Design
+//Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                    Universitaet Koblenz-Landau, Germany
+//                    Chalmers University of Technology, Sweden
+//
+//The KeY system is protected by the GNU General Public License. 
+//See LICENSE.TXT for details.
+//
+//
+
 package de.uka.ilkd.key.smt.test;
 
 import java.io.File;
@@ -5,14 +15,14 @@ import java.io.File;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.smt.SmtSolver;
+import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
 public abstract class AbstractSolverTest extends TestCase {
 
-    SmtSolver solver;
+    SMTSolver solver;
     
     static boolean toolNotInstalled = false;
     
@@ -31,7 +41,7 @@ public abstract class AbstractSolverTest extends TestCase {
      * returns the solver that should be tested.
      * @return the solver to be tested.
      */
-    public abstract SmtSolver getSolver();
+    public abstract SMTSolver getSolver();
     
     public void testAndnot() {
 	Assert.assertTrue(correctResult(testFile + "andnot.key", false));
@@ -130,7 +140,7 @@ public abstract class AbstractSolverTest extends TestCase {
 	    return true;
 	}
 	
-	SmtSolver.RESULTTYPE result = SmtSolver.RESULTTYPE.UNKNOWN;
+	SMTSolverResult result;
 	
 	try {
 	    result = checkFile(filepath);
@@ -143,19 +153,11 @@ public abstract class AbstractSolverTest extends TestCase {
 	    return true;
 	}
 	
-	//unknown is always allowed. But wron answeres are not allowed
+	//unknown is always allowed. But wrong answers are not allowed
 	if (isGeneralValid) {
-	    if (result == SmtSolver.RESULTTYPE.VALID || result == SmtSolver.RESULTTYPE.UNKNOWN) {
-		return true;
-	    } else {
-		return false;
-	    }
+	    return result.isValid() != SMTSolverResult.ThreeValuedTruth.FALSE; 
 	} else {
-	    if (!(result == SmtSolver.RESULTTYPE.VALID)) {
-		return true;
-	    } else {
-		return false;
-	    }
+	    return result.isValid() != SMTSolverResult.ThreeValuedTruth.TRUE;
 	}
     }
     
@@ -164,16 +166,15 @@ public abstract class AbstractSolverTest extends TestCase {
      * @param filepath the path to the file
      * @return the resulttype of the external solver 
      */
-    private SmtSolver.RESULTTYPE checkFile(String filepath) {	
+    private SMTSolverResult checkFile(String filepath) {	
 	HelperClassForTests x = new HelperClassForTests();	
 	ProofAggregate p = x.parse(new File(filepath));
-	SmtSolver.RESULTTYPE toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
 	Assert.assertTrue(p.getProofs().length == 1);
 	Proof proof = p.getProofs()[0];	    
 	Assert.assertTrue(proof.openGoals().size() == 1);		
 	Goal g = proof.openGoals().iterator().next();
-	toReturn = solver.isValid(g, 60, proof.getServices());
 	
+	SMTSolverResult toReturn = solver.run(g, 60, proof.getServices());
 	return toReturn;
     }
     

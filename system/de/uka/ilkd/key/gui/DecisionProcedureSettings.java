@@ -18,8 +18,8 @@ import de.uka.ilkd.key.gui.configuration.Settings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.smt.SimplifySolver;
-import de.uka.ilkd.key.smt.SmtSolver;
-import de.uka.ilkd.key.smt.YicesSmtSolver;
+import de.uka.ilkd.key.smt.SMTSolver;
+import de.uka.ilkd.key.smt.YicesSolver;
 import de.uka.ilkd.key.smt.Z3Solver;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 
@@ -138,7 +138,7 @@ public class DecisionProcedureSettings implements Settings {
 	rules = new ArrayList<SMTRule>();
 	rules.add(new SMTRule(new SimplifySolver()));
 	rules.add(new SMTRule(new Z3Solver()));
-	rules.add(new SMTRule(new YicesSmtSolver()));
+	rules.add(new SMTRule(new YicesSolver()));
 		
 	String ruleString = props.getProperty(ACTIVE_RULE);
 	this.activeRule = -1;

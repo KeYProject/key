@@ -8,7 +8,7 @@ import de.uka.ilkd.key.logic.op.SetOfMetavariable;
 //import de.uka.ilkd.key.proof.decproc.SimplifyException;
 import org.apache.log4j.Logger;
 
-public class SmtLibTranslator extends AbstractSmtTranslator {
+public class SmtLibTranslator extends AbstractSMTTranslator {
 
     private static final Logger logger = Logger
 	    .getLogger(SmtLibTranslator.class.getName());

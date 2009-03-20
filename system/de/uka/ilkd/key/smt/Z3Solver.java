@@ -1,23 +1,32 @@
+//This file is part of KeY - Integrated Deductive Software Design
+//Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                    Universitaet Koblenz-Landau, Germany
+//                    Chalmers University of Technology, Sweden
+//
+//The KeY system is protected by the GNU General Public License. 
+//See LICENSE.TXT for details.
+//
+//
+
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.java.Services;
 
 
-public class Z3Solver extends AbstractSmtSolver {
+public final class Z3Solver extends AbstractSMTSolver {
 
-    
     public String name() {
         return "Z3";
     }
     
     
-    @Override
-    protected SmtTranslator getTranslator(Services services) {
+    public SMTTranslator getTranslator(Services services) {
 	return new SmtLibTranslator(services);
     }
     
+    
     @Override
-    protected String[] getExecutionCommand(String filename, StringBuffer formula) {
+    protected String[] getExecutionCommand(String filename, String formula) {
 	String[] toReturn = new String[3];
 
 	toReturn[0] = "z3";
@@ -27,15 +36,15 @@ public class Z3Solver extends AbstractSmtSolver {
 	return toReturn;
     }
     
+    
     @Override
-    protected RESULTTYPE answerType(String answer) {
-	if (answer.contains("unsat")) {
-	    return SmtSolver.RESULTTYPE.VALID;
-	} else if (answer.contains("sat")) {
-	    return SmtSolver.RESULTTYPE.INVALID;
+    protected SMTSolverResult interpretAnswer(String text) {
+	if (text.contains("unsat")) {
+	    return SMTSolverResult.createValidResult(text);
+	} else if (text.contains("sat")) {
+	    return SMTSolverResult.createInvalidResult(text);
 	} else {
-	    return SmtSolver.RESULTTYPE.UNKNOWN;
+	    return SMTSolverResult.createUnknownResult(text);
 	}
     }
-    
 }

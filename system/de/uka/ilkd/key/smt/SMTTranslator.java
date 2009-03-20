@@ -1,15 +1,26 @@
+//This file is part of KeY - Integrated Deductive Software Design
+//Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                    Universitaet Koblenz-Landau, Germany
+//                    Chalmers University of Technology, Sweden
+//
+//The KeY system is protected by the GNU General Public License. 
+//See LICENSE.TXT for details.
+//
+//
+
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 
-public interface SmtTranslator {
+
+public interface SMTTranslator {
 
     public static enum TERMPOSITION {ANTECEDENT, SUCCEDENT}
     
     /**
-     * Translate a sequent into a given syntax.
+     * Translate a sequent.
      * @param sequent the sequent to translate.
      * @param services wrapper object for service attributes.
      * @return A StringBuffer representing the sequent in the given syntax.

@@ -1,3 +1,13 @@
+//This file is part of KeY - Integrated Deductive Software Design
+//Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                    Universitaet Koblenz-Landau, Germany
+//                    Chalmers University of Technology, Sweden
+//
+//The KeY system is protected by the GNU General Public License. 
+//See LICENSE.TXT for details.
+//
+//
+
 package de.uka.ilkd.key.smt;
 
 import java.util.ArrayList;
@@ -8,7 +18,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.SetOfMetavariable;
 
-public class SimplifyTranslator extends AbstractSmtTranslator {
+public class SimplifyTranslator extends AbstractSMTTranslator {
 
     private static final Logger logger = Logger
     .getLogger(SimplifyTranslator.class.getName());

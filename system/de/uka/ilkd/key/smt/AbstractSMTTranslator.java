@@ -1,3 +1,13 @@
+//This file is part of KeY - Integrated Deductive Software Design
+//Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                    Universitaet Koblenz-Landau, Germany
+//                    Chalmers University of Technology, Sweden
+//
+//The KeY system is protected by the GNU General Public License. 
+//See LICENSE.TXT for details.
+//
+//
+
 package de.uka.ilkd.key.smt;
 
 import java.util.*;
@@ -12,8 +22,8 @@ import de.uka.ilkd.key.java.Services;
 
 import org.apache.log4j.Logger;
 
-public abstract class AbstractSmtTranslator implements SmtTranslator{
-    static Logger logger = Logger.getLogger(AbstractSmtTranslator.class
+public abstract class AbstractSMTTranslator implements SMTTranslator {
+    static Logger logger = Logger.getLogger(AbstractSMTTranslator.class
 	    .getName());
 
     private Sort jbyteSort;
@@ -94,7 +104,7 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      *                The local metavariables, should be the ones introduced
      *                after the last branch.
      */
-    public AbstractSmtTranslator(Sequent sequent,
+    public AbstractSMTTranslator(Sequent sequent,
 	    SetOfMetavariable localmv, Services services, boolean lightWeight) {
     	localMetavariables = localmv;
 	jbyteSort = services.getTypeConverter().getByteLDT().targetSort();
@@ -105,7 +115,7 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 	integerSort = services.getTypeConverter().getIntegerLDT().targetSort();
     }
 
-    public AbstractSmtTranslator(Sequent sequent,
+    public AbstractSMTTranslator(Sequent sequent,
 	    SetOfMetavariable localmv, Services services) {
 	this(sequent, localmv, services, false);
     }
@@ -113,7 +123,7 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
     /**
      * For translating only terms and not complete sequents.
      */
-    public AbstractSmtTranslator(Services s) {
+    public AbstractSMTTranslator(Services s) {
 	this(null, null, s, false);
     }
 
@@ -143,10 +153,10 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 	// translate
 	StringBuffer hb = new StringBuffer();
 	StringBuffer ante;
-	ante = translate(sequent.antecedent(), SmtTranslator.TERMPOSITION.ANTECEDENT, lightWeight,
+	ante = translate(sequent.antecedent(), SMTTranslator.TERMPOSITION.ANTECEDENT, lightWeight,
 		services);
 	StringBuffer succ;
-	succ = translate(sequent.succedent(), SmtTranslator.TERMPOSITION.SUCCEDENT, lightWeight, services);
+	succ = translate(sequent.succedent(), SMTTranslator.TERMPOSITION.SUCCEDENT, lightWeight, services);
 
 	//add one variable for each sort
 	for (Sort s : this.usedRealSort.keySet()) {
@@ -523,7 +533,7 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 	    ArrayList<ArrayList<StringBuffer>> predicates,
 	    ArrayList<StringBuffer> types, SortHirarchy sortHirarchy);
 
-    protected final StringBuffer translate(Semisequent ss, SmtTranslator.TERMPOSITION skolemization,
+    protected final StringBuffer translate(Semisequent ss, SMTTranslator.TERMPOSITION skolemization,
 	    Services services) throws IllegalFormulaException {
 	return translate(ss, skolemization, false, services);
     }
@@ -536,14 +546,14 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
      *                the SemiSequent which should be written in Simplify
      *                syntax
      */
-    private final StringBuffer translate(Semisequent semi, SmtTranslator.TERMPOSITION skolemization,
+    private final StringBuffer translate(Semisequent semi, SMTTranslator.TERMPOSITION skolemization,
 	    boolean lightWeight, Services services)
 	    throws IllegalFormulaException {
 	StringBuffer hb = new StringBuffer();
 
 	// if the sequent is empty, return true/false as formula
 	if (semi.size() == 0) {
-	    if (skolemization == SmtTranslator.TERMPOSITION.ANTECEDENT) {
+	    if (skolemization == SMTTranslator.TERMPOSITION.ANTECEDENT) {
 		hb.append(translateLogicalTrue());
 	    } else {
 		hb.append(translateLogicalFalse());
@@ -556,7 +566,7 @@ public abstract class AbstractSmtTranslator implements SmtTranslator{
 
 	// translate the other semisequences, juncted with AND or OR
 	for (int i = 1; i < semi.size(); ++i) {
-	    if (skolemization == SmtTranslator.TERMPOSITION.ANTECEDENT) {
+	    if (skolemization == SMTTranslator.TERMPOSITION.ANTECEDENT) {
 		hb = translateLogicalAnd(hb, translate(semi.get(i),
 			lightWeight, services));
 	    } else {

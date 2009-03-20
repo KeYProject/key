@@ -1,3 +1,13 @@
+//This file is part of KeY - Integrated Deductive Software Design
+//Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                    Universitaet Koblenz-Landau, Germany
+//                    Chalmers University of Technology, Sweden
+//
+//The KeY system is protected by the GNU General Public License. 
+//See LICENSE.TXT for details.
+//
+//
+
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -13,17 +23,18 @@ import de.uka.ilkd.key.rule.RuleApp;
 
 public class SMTRule implements BuiltInRule {
 
-    private final SmtSolver prover;
+    private final SMTSolver solver;
 
-    public SMTRule(SmtSolver arg1) {
-	this.prover = arg1;
+    
+    public SMTRule(SMTSolver arg1) {
+	this.solver = arg1;
     }
 
     /**
      * This rule's name.
      */
     public String displayName() {
-	return prover.name();
+	return solver.name();
     }
 
     /**
@@ -46,12 +57,11 @@ public class SMTRule implements BuiltInRule {
 
     public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
 
-	SmtSolver.RESULTTYPE valid = this.prover.isValid(goal, ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getTimeout(), services);
-	if (valid == SmtSolver.RESULTTYPE.VALID) {
+	SMTSolverResult result = this.solver.run(goal, ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getTimeout(), services);
+	if (result.isValid() == SMTSolverResult.ThreeValuedTruth.TRUE) {
 	    return SLListOfGoal.EMPTY_LIST;
 	} else {
 	    return null;
 	}
     }
-
 }

@@ -13,24 +13,26 @@ package de.uka.ilkd.key.smt;
 import de.uka.ilkd.key.java.Services;
 
 
-public final class SimplifySolver extends AbstractSMTSolver {
-    
+public final class YicesSolver extends AbstractSMTSolver {
+
     public String name() {
-        return "Simplify";
+	return "Yices";
     }
     
     
     public SMTTranslator getTranslator(Services services) {
-	return new SimplifyTranslator(services);
+	return new SmtLibTranslator(services);
     }
-    
-    
+
+
     @Override
     protected String[] getExecutionCommand(String filename, String formula) {
-	String[] toReturn = new String[2];
+	String[] toReturn = new String[4];
 
-	toReturn[0] = "simplify";
-	toReturn[1] = filename;
+	toReturn[0] = "yices";
+	toReturn[1] = "-tc";
+	toReturn[2] = "-smt";
+	toReturn[3] = filename;
 
 	return toReturn;
     }
@@ -38,12 +40,12 @@ public final class SimplifySolver extends AbstractSMTSolver {
     
     @Override
     protected SMTSolverResult interpretAnswer(String text) {
-	if (text.contains("Valid")) {
+	if (text.equals("unsat\n")) {
 	    return SMTSolverResult.createValidResult(text);
-	} else if (text.contains("Invalid")) {
+	} else if (text.equals("sat\n")) {
 	    return SMTSolverResult.createInvalidResult(text);
 	} else {
 	    return SMTSolverResult.createUnknownResult(text);
 	}
-    }    
+    }
 }

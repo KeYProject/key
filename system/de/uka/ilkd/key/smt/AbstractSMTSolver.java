@@ -1,3 +1,13 @@
+//This file is part of KeY - Integrated Deductive Software Design
+//Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                    Universitaet Koblenz-Landau, Germany
+//                    Chalmers University of Technology, Sweden
+//
+//The KeY system is protected by the GNU General Public License. 
+//See LICENSE.TXT for details.
+//
+//
+
 package de.uka.ilkd.key.smt;
 
 import java.io.*;
@@ -9,25 +19,44 @@ import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.apache.log4j.Logger;
 
-public abstract class AbstractSmtSolver implements SmtSolver {
+
+public abstract class AbstractSMTSolver implements SMTSolver {
 
 
     private static final Logger logger = Logger
-	    .getLogger(AbstractSmtSolver.class.getName());
+	    .getLogger(AbstractSMTSolver.class.getName());
 
     /**
      * The path for the file
      */
     private static final String fileDir = PathConfig.KEY_CONFIG_DIR
 	    + File.separator + "smt_formula";
+    
+    
+    /**
+     * Get the command for executing the external prover.
+     * @param filename the location, where the file is stored.
+     * @param formula the formula, that was created by the translator
+     * @return Array of Strings, that can be used for executing an external decider.
+     */
+    protected abstract String[] getExecutionCommand(String filename,
+	    				            String formula);
+    
+    
+    /**
+     * @param text the String answered by the external programm
+     */
+    protected abstract SMTSolverResult interpretAnswer(String text);
 
 
+    
     protected boolean isApplicable(Goal goal) {
 	/*Services s = new Services();
 	try {
@@ -112,20 +141,7 @@ public abstract class AbstractSmtSolver implements SmtSolver {
 	
     }
 
-    /**
-     * Get the abstract translator, that should be used to
-     * @return the translator, that should be used.
-     */
-    protected abstract SmtTranslator getTranslator(Services services);
-
-    /**
-     * Get the command for executing an external proofer.
-     * @param filename the location, where the file is stored.
-     * @param formula the formula, that was created by the translator
-     * @return Array of Strings, that can be used for executing an external decider.
-     */
-    protected abstract String[] getExecutionCommand(String filename,
-	    StringBuffer formula);
+  
 
     private static String toStringLeadingZeros(int n, int width) {
 	String rv = "" + n;
@@ -162,24 +178,16 @@ public abstract class AbstractSmtSolver implements SmtSolver {
      * @param text the text to be stored.
      * @return the path, where the file was stored to.
      */
-    private final String storeToFile(StringBuffer text) throws IOException {
+    private final String storeToFile(String text) throws IOException {
 	String loc = fileDir + getCurrentDateString();
 	new File(fileDir).mkdirs();
 	BufferedWriter out = new BufferedWriter(new FileWriter(loc));
-	out.write(text.toString());
+	out.write(text);
 	out.close();
 
 	return loc;
     }
 
-    /**
-     * 
-     * @param answer the String answered by the external programm
-     * @return VALID, if the formula was proven valid, 
-     *      INVALID, if the formula was proven invalid,
-     *      UNKNOWN, if the formula could not be proved
-     */
-    protected abstract SmtSolver.RESULTTYPE answerType(String answer);
 
     /** Read the input until end of file and return contents in a
      * single string containing all line breaks. */
@@ -194,28 +202,21 @@ public abstract class AbstractSmtSolver implements SmtSolver {
 	return sb.toString();
     }
 
-    /**
-     * Check, if the formula in the goal is valid.
-     * @param goal The goal to be proven.
-     * @param timeout The maximum time, that should be used to execute the external solver.
-     *      Given in seconds. If the time is exceeded, UNKNOWN is returned.
-     * @param services The service object wrapping different settings and variables.
-     * @return VALID, INVALID or UNKNOWN.
-     */
-    public final SmtSolver.RESULTTYPE isValid(Goal goal, int timeout, Services services) {
     
-	SmtSolver.RESULTTYPE toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
+    public final SMTSolverResult run(Goal goal, int timeout, Services services) {
+	SMTSolverResult toReturn;
+	
 	if (!this.isApplicable(goal)) {
-	    return SmtSolver.RESULTTYPE.UNKNOWN;
+	    return SMTSolverResult.NO_IDEA;
 	}
 	
-	SmtTranslator trans = this.getTranslator(services);
+	SMTTranslator trans = this.getTranslator(services);
 	
 	try {
-	    StringBuffer s = trans.translate(goal.sequent(), services);
-	    toReturn = this.runProver(s, timeout, services);
+	    String s = trans.translate(goal.sequent(), services).toString();
+	    toReturn = this.run(s, timeout, services);
     	} catch (IllegalFormulaException e) {
-	    toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
+	    toReturn = SMTSolverResult.NO_IDEA;
 	    logger.debug("The formula could not be translated.", e);
 	    //throw new RuntimeException("The formula could not be translated.\n" + e.getMessage());
 	}
@@ -223,48 +224,43 @@ public abstract class AbstractSmtSolver implements SmtSolver {
     	return toReturn;
     }
 
-    /**
-     * Check, if the given term is valid.
-     * @param t the term to be checked.
-     * @param timeout the maximum amount of seconds used to check the term.
-     * @param services the services to be used.
-     * @return VALID, INVALID or UNKNOWN.
-     */
-    public SmtSolver.RESULTTYPE isValid(Term t, int timeout, Services services) {
-	SmtSolver.RESULTTYPE toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
+
+    public final SMTSolverResult run(Term t, int timeout, Services services) {
+	assert t.sort() == Sort.FORMULA;
+	SMTSolverResult toReturn;
+	
 	if (!this.isApplicable(t)) {
-	    return SmtSolver.RESULTTYPE.UNKNOWN;
+	    return SMTSolverResult.NO_IDEA;
 	}
 	
-//	get the translation
-	SmtTranslator trans = this.getTranslator(services);
+	SMTTranslator trans = this.getTranslator(services);
 	
 	try {
-	    StringBuffer s = trans.translate(t, services);
-	    toReturn = this.runProver(s, timeout, services);
+	    String s = trans.translate(t, services).toString();
+	    toReturn = this.run(s, timeout, services);
     	} catch (IllegalFormulaException e) {
-	    toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
+	    toReturn = SMTSolverResult.NO_IDEA;
 	    logger.debug("The formula could not be translated.", e);
 	    //throw new RuntimeException("The formula could not be translated.\n" + e.getMessage());
 	}
     	
     	return toReturn;
     }
-    
-    private final SmtSolver.RESULTTYPE runProver(StringBuffer input, int timeout, Services services) {
-	SmtSolver.RESULTTYPE toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
-	    
-	String loc;
 
-	try {
+    
+    public final SMTSolverResult run(String formula, 
+	    	                     int timeout, 
+	    			     Services services) {
+	SMTSolverResult toReturn;
 	
+	try {
 	    //store the translation to a file                                
-	    loc = this.storeToFile(input);
+	    final String loc = this.storeToFile(formula);
+	    
 	    //get the commands for execution
-	    String[] execCommand = this.getExecutionCommand(loc, input);
+	    String[] execCommand = this.getExecutionCommand(loc, formula);
 
 	    try {
-
 		Process p = Runtime.getRuntime().exec(execCommand);
 		ExecutionWatchDog tt = new ExecutionWatchDog(timeout, p);
 		Timer t = new Timer();
@@ -286,23 +282,17 @@ public abstract class AbstractSmtSolver implements SmtSolver {
 
 		if (p.exitValue() != 0) {
 		    //the process was terminated by force.
-		    toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
+		    toReturn = SMTSolverResult.NO_IDEA;
 		} else {
 		    //the process terminated as it sould
 		    InputStream in = p.getInputStream();
-		    String result = read(in);
+		    String text = read(in);
    
 		    logger.debug("Answer for created formula: ");
-		    logger.debug(result);
+		    logger.debug(text);
 		    in.close();
-		    SmtSolver.RESULTTYPE validity = this.answerType(result);
-		    if (validity == SmtSolver.RESULTTYPE.VALID) {
-			toReturn = SmtSolver.RESULTTYPE.VALID;
-		    } else if (validity == SmtSolver.RESULTTYPE.INVALID) {
-			toReturn = SmtSolver.RESULTTYPE.INVALID;
-		    } else {
-			toReturn = SmtSolver.RESULTTYPE.UNKNOWN;
-		    }
+		    
+		    toReturn = this.interpretAnswer(text);
 		}
 	    } catch (IOException e) {
 		logger.error(

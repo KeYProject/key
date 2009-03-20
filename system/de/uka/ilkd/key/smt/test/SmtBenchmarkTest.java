@@ -1,3 +1,13 @@
+//This file is part of KeY - Integrated Deductive Software Design
+//Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                    Universitaet Koblenz-Landau, Germany
+//                    Chalmers University of Technology, Sweden
+//
+//The KeY system is protected by the GNU General Public License. 
+//See LICENSE.TXT for details.
+//
+//
+
 package de.uka.ilkd.key.smt.test;
 
 import junit.framework.Assert;
@@ -11,10 +21,7 @@ import java.util.ArrayList;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.smt.SimplifySolver;
-import de.uka.ilkd.key.smt.SmtSolver;
-import de.uka.ilkd.key.smt.YicesSmtSolver;
-import de.uka.ilkd.key.smt.Z3Solver;
+import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 public class SmtBenchmarkTest extends TestCase implements FilenameFilter{
@@ -32,7 +39,7 @@ public class SmtBenchmarkTest extends TestCase implements FilenameFilter{
     
     public void testBenchmarks() {
 	String[] files = this.collectFilenames();
-	ArrayList<SmtSolver> rules = getRules();
+	ArrayList<SMTSolver> rules = getRules();
 	
 	ArrayList<ArrayList<Proof>> toProof = this.loadGoals(rules.size(), files);
 	ArrayList<ArrayList<String>> results = new ArrayList<ArrayList<String>>();
@@ -43,7 +50,7 @@ public class SmtBenchmarkTest extends TestCase implements FilenameFilter{
 	this.printResults(files, rules, results);
     }
     
-    private void printResults(String[] sources, ArrayList<SmtSolver> solver, ArrayList<ArrayList<String>> results) {
+    private void printResults(String[] sources, ArrayList<SMTSolver> solver, ArrayList<ArrayList<String>> results) {
 	String output = "";
 	//print header
 	output = "Problem\tFile\t";
@@ -97,15 +104,15 @@ public class SmtBenchmarkTest extends TestCase implements FilenameFilter{
 	return hasValid && hasInvalid;
     }
     
-    private ArrayList<String> proofOneGoal(ArrayList<Proof> goals, ArrayList<SmtSolver> rules) {
+    private ArrayList<String> proofOneGoal(ArrayList<Proof> goals, ArrayList<SMTSolver> rules) {
 	ArrayList<String> toReturn = new ArrayList<String>();
 	for (int i = 0; i < goals.size(); i++) {
 	    System.out.print(".");
-	    SmtSolver s = rules.get(i);
+	    SMTSolver s = rules.get(i);
 	    Proof p = goals.get(i);
 	    try {
 		long time = System.currentTimeMillis();
-	    	SmtSolver.RESULTTYPE result = s.isValid(p.openGoals().iterator().next(), maxExecutionTime, p.getServices());
+	    	SMTSolverResult result = s.run(p.openGoals().iterator().next(), maxExecutionTime, p.getServices());
 	    	time = System.currentTimeMillis() - time;
 	    	time = time / 100;
 	    	toReturn.add("" + time/10 + "." + time%10);
@@ -121,12 +128,12 @@ public class SmtBenchmarkTest extends TestCase implements FilenameFilter{
     }
     
     
-    private String translateResult(SmtSolver.RESULTTYPE r) {
-	if (r == SmtSolver.RESULTTYPE.VALID) {
+    private String translateResult(SMTSolverResult r) {
+	if (r.isValid() == SMTSolverResult.ThreeValuedTruth.TRUE) {
 	    return VALID;
-	} else if (r == SmtSolver.RESULTTYPE.UNKNOWN) {
+	} else if (r.isValid() == SMTSolverResult.ThreeValuedTruth.UNKNOWN) {
 	    return UNKNOWN;
-	} else if (r == SmtSolver.RESULTTYPE.INVALID) {
+	} else if (r.isValid() == SMTSolverResult.ThreeValuedTruth.FALSE) {
 	    return INVALID;
 	} else {
 	    Assert.assertTrue(false);
@@ -166,11 +173,11 @@ public class SmtBenchmarkTest extends TestCase implements FilenameFilter{
      * create all Solver, that should be tested
      * @return the Rules, that should be tested.
      */
-    private ArrayList<SmtSolver> getRules() {
-	ArrayList<SmtSolver> toReturn = new ArrayList<SmtSolver>();
+    private ArrayList<SMTSolver> getRules() {
+	ArrayList<SMTSolver> toReturn = new ArrayList<SMTSolver>();
 	toReturn.add(new SimplifySolver());
 	toReturn.add(new Z3Solver());
-	toReturn.add(new YicesSmtSolver());
+	toReturn.add(new YicesSolver());
 	return toReturn;
     }
     
