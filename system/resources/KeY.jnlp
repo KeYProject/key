@@ -21,7 +21,6 @@
 <jar href="key.jar"/> 
 <jar href="lib/antlr.jar" /> 
 <jar href="lib/recoderKey.jar" /> 
-<jar href="lib/javacc.jar" /> 
 <jar href="lib/log4j.jar" /> 
 </resources> 
 
