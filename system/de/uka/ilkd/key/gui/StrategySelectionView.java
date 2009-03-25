@@ -155,6 +155,54 @@ public class StrategySelectionView extends JPanel {
         ////////////////////////////////////////////////////////////////////////
 
         int yCoord = 0;
+
+        ////////////////////////////////////////////////////////////////////////
+        
+        addJavaDLOption ( new JLabel ( "Goal Chooser" ),
+                    javaDLOptionsLayout, 1, yCoord, 7 );
+        
+        ++yCoord;
+
+        rdBut15 = new JRadioButtonHashMap("Default", StrategyProperties.GOALCHOOSER_DEFAULT, true, false);
+        goalChooserGroup.add(rdBut15);
+        addJavaDLOption ( rdBut15, javaDLOptionsLayout, 2, yCoord, 2 );        
+
+        rdBut16 = new JRadioButtonHashMap(
+                "Depth First", StrategyProperties.GOALCHOOSER_DEPTH, false, false);
+        goalChooserGroup.add(rdBut16);
+        addJavaDLOption ( rdBut16, javaDLOptionsLayout, 4, yCoord, 2 );        
+       
+        
+        ++yCoord;
+        addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
+
+        ////////////////////////////////////////////////////////////////////////
+        ++yCoord;
+        
+        addJavaDLOption ( new JLabel ( "Stop at" ),
+                    javaDLOptionsLayout, 1, yCoord, 7 );
+        
+        ++yCoord;
+
+        rdBut17 = new JRadioButtonHashMap("Default", StrategyProperties.STOPMODE_DEFAULT, true, false);
+	rdBut17.setToolTipText( "<html>Stop when (i) the maximum number of rule<br>" +
+                                "applications is reached or (ii) no more rules are<br>"+
+				"applicable on the proof tree.</html>");
+        stopModeGroup.add(rdBut17);
+        addJavaDLOption ( rdBut17, javaDLOptionsLayout, 2, yCoord, 2 );        
+
+        rdBut18 = new JRadioButtonHashMap(
+                "Non-Closable Goal", StrategyProperties.STOPMODE_NONCLOSE, false, false);
+	rdBut18.setToolTipText( "<html>Stop as soon as the first not automatically<br>" +
+                                "closable goal is encountered.</html>");
+        stopModeGroup.add(rdBut18);
+        addJavaDLOption ( rdBut18, javaDLOptionsLayout, 4, yCoord, 2 );        
+       
+        
+        ++yCoord;
+        addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
+        ////////////////////////////////////////////////////////////////////////
+
         
         addJavaDLOption ( new JLabel ( "Logical splitting" ),
                     javaDLOptionsLayout, 1, yCoord, 7 );
@@ -291,54 +339,7 @@ public class StrategySelectionView extends JPanel {
         ++yCoord;
         addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
 
-        
-        ////////////////////////////////////////////////////////////////////////
-        ++yCoord;
-        
-        addJavaDLOption ( new JLabel ( "Goal Chooser" ),
-                    javaDLOptionsLayout, 1, yCoord, 7 );
-        
-        ++yCoord;
-
-        rdBut15 = new JRadioButtonHashMap("Default", StrategyProperties.GOALCHOOSER_DEFAULT, true, false);
-        goalChooserGroup.add(rdBut15);
-        addJavaDLOption ( rdBut15, javaDLOptionsLayout, 2, yCoord, 2 );        
-
-        rdBut16 = new JRadioButtonHashMap(
-                "Depth First", StrategyProperties.GOALCHOOSER_DEPTH, false, false);
-        goalChooserGroup.add(rdBut16);
-        addJavaDLOption ( rdBut16, javaDLOptionsLayout, 4, yCoord, 2 );        
-       
-        
-        ++yCoord;
-        addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
-        ////////////////////////////////////////////////////////////////////////
-        ++yCoord;
-        
-        addJavaDLOption ( new JLabel ( "Stop at" ),
-                    javaDLOptionsLayout, 1, yCoord, 7 );
-        
-        ++yCoord;
-
-        rdBut17 = new JRadioButtonHashMap("Default", StrategyProperties.STOPMODE_DEFAULT, true, false);
-	rdBut17.setToolTipText( "<html>Stop when (i) the maximum number of rule<br>" +
-                                "applications is reached or (ii) no more rules are<br>"+
-				"applicable on the proof tree.</html>");
-        stopModeGroup.add(rdBut17);
-        addJavaDLOption ( rdBut17, javaDLOptionsLayout, 2, yCoord, 2 );        
-
-        rdBut18 = new JRadioButtonHashMap(
-                "Non-Closable Goal", StrategyProperties.STOPMODE_NONCLOSE, false, false);
-	rdBut18.setToolTipText( "<html>Stop as soon as the first not automatically<br>" +
-                                "closable goal is encountered.</html>");
-        stopModeGroup.add(rdBut18);
-        addJavaDLOption ( rdBut18, javaDLOptionsLayout, 4, yCoord, 2 );        
-       
-        
-        ++yCoord;
-        addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
-        ////////////////////////////////////////////////////////////////////////
-
+  
         ++yCoord;
         
         addJavaDLOption ( new JLabel ( "Arithmetic treatment" ),
