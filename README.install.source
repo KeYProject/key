@@ -17,7 +17,6 @@ Needed additional Libraries:
 	recoderKey.jar 
                  a transformation framework for java patched by the KeY group
 	junit.jar version 3.8.1: test framework
-	jargs.jar
 	log4j.jar
 
 Optionally, KeY can make use of the following binaries:

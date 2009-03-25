@@ -72,7 +72,6 @@
       <include name="de/**" />
       <classpath>
         <pathelement location="${ext.dir}/antlr.jar" />
-        <pathelement location="${ext.dir}/jargs.jar" />
         <pathelement location="${ext.dir}/recoderKey.jar" />
         <pathelement location="${ext.dir}/log4j.jar" />
         <pathelement location="${ext.dir}/javacc.jar" />

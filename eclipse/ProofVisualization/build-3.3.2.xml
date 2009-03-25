@@ -63,7 +63,6 @@
 	    <classpath>
 	      <pathelement path="../KeYExternalLibraries/jcoverage.jar" />
 	      <pathelement path="../KeYExternalLibraries/antlr.jar" />
-	      <pathelement path="../KeYExternalLibraries/jargs.jar" />
 	      <pathelement path="../KeYExternalLibraries/javacc.jar" />
 	      <pathelement path="../KeYExternalLibraries/junit.jar" />
 	      <pathelement path="../KeYExternalLibraries/log4j.jar" />

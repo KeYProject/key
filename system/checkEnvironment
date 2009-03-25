@@ -1,27 +1,10 @@
 #!/bin/sh
-resolve_symlink  ()
-{ 
-   TARGET=`ls -l $1| awk '/\ ->\ /{print $NF}'`
-
-   if [ -n "$TARGET" ] ; then
-      RESULT="$TARGET"
-      case "$RESULT" in
-         /*) break ;;				# absolute symlink
-         *)  RESULT=`dirname $0`/"$RESULT" ;;	# relative symlink
-      esac
-   else
-      RESULT=$1
-   fi
-
-   echo "$RESULT"
-}
-
 # standard lib location
 if [ -z "$KEY_LIB" ] ; then
    KEY_LIB="../key-ext-jars"
 fi
 
-key_ext_jars="antlr.jar recoderKey.jar log4j.jar jargs.jar"
+key_ext_jars="antlr.jar recoderKey.jar log4j.jar"
 
 key_dev_jars="javacc.jar junit.jar"
 
