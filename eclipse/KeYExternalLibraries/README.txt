@@ -16,3 +16,9 @@ Version 0.5
 
 See the file "JUnit.License.txt" that is part of this distribution.
 
+-----------------------------------------------------------------------
+
+The library "log4j" is licensed under the Apache 2.0 License
+
+See the file "log4j.License.txt" that is part of this distribution.
+-----------------------------------------------------------------------
