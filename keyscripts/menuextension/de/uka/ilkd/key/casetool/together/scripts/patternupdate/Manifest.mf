@@ -1,3 +1,0 @@
-Name: Pattern Update
-Time: Startup
-Main-Class: de.uka.ilkd.key.casetool.together.scripts.patternupdate.PatternUpdate

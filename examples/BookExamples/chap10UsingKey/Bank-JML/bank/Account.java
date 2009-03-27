@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package bank;
 
 /**
@@ -8,7 +15,6 @@ package bank;
  * implementations of account methods.
  */
 public abstract class Account {
-
 
     /**
      * Account number of the account represented by <code>this</code> object
@@ -123,14 +129,13 @@ public abstract class Account {
     ////////////////////////////////////////////////////////////////////////////
     // Storage of transactions
     ////////////////////////////////////////////////////////////////////////////
-
+    
     /**
      * A list of transactions in which the most recent transaction is the first
      * element
      */
-    //@ private invariant transactions != null;    
     public /*@ spec_public @*/ TransactionList transactions =
-        TransactionList.EMPTY_LIST;    
+        TransactionList.EMPTY_LIST;
     
     /**
      * Add a transaction <code>trance</code> to the list of stored transaction

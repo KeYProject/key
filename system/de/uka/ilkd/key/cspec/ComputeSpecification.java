@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -28,10 +28,7 @@ import de.uka.ilkd.key.util.Debug;
  * This class is the <em>central</em> facade for computing the specification of a
  * program. It contains algorithms for and controls the computation of specifications.
  * <h3>Internals</h3>
- * Usually, the method {@link
- * de.uka.ilkd.key.casetool.FunctionalityOnModel#computeSpecification(de.uka.ilkd.key.casetool.ModelMethod)}
- * is triggered by the user interface, and will start the
- * specification construction process and thereby invoke {@link
+ * Usually, specification construction process is started by invoking {@link
  * de.uka.ilkd.key.proof.init.SpecExtPO} to construct the
  * specification computation proof obligation. Finally, the whole
  * system relies on the functionality of this class to
@@ -44,7 +41,6 @@ import de.uka.ilkd.key.util.Debug;
  * @version 0.1, 2003-01-28
  * @version-revision $Revision: 1.16.3.1.2.1.3.1.1.3.2.2 $, $Date: Mon, 22 Jan 2007 15:50:58 +0100 $
  * @see de.uka.ilkd.key.gui.ComputeSpecificationView
- * @see de.uka.ilkd.key.casetool.FunctionalityOnModel#computeSpecification(de.uka.ilkd.key.casetool.ModelMethod)
  */
 public class ComputeSpecification {
     /**

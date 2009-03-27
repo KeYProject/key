@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -153,23 +153,15 @@ public class KeYInstallerCmdLine extends KeYInstallerUI {
 	globals += "Directory where to install KeY."; 
 	globals += "\n(1) KEY_HOME : " + 
 	    ( "".equals ( keyHome () ) ? "(none)" : keyHome () );
+		
+	globals += "\nDirectory, where your Java is installed "; 
 	
-	globals += "\nDirectory where Together has been installed (ask your admin if unsure)"; 
-	globals += "\n(2) TOGETHER_HOME : " + 
-	    ( "".equals ( togetherHome () ) ? "(none)" : togetherHome () );
-	
-	globals += "\nInstalled TogetherCC version (6.0, 6.0.1)";
-	globals += "\n(3) TOGETHER_VERSION : " + togetherVersion ();
-
-	globals += "\nDirectory, where your Java is installed " +
-	    "(if TogetherCC uses another Java version than your system does " + 
-	    "(recommended: JDK 1.3.1)";
-	globals += "\n(4) JAVA_HOME : " + 
+	globals += "\n(2) JAVA_HOME : " +  
 	    	    ( "".equals ( javaHome () ) ? "(none)" : javaHome () );
 
 	globals += "\n(c)ontinue";
 
-	globals += "\nPress 1 to 4 to enter a directory, c for continue:";
+	globals += "\nPress 1 or 2 to enter a directory, c for continue:";
 
 	return globals;
     }
@@ -197,21 +189,7 @@ public class KeYInstallerCmdLine extends KeYInstallerUI {
 
 	return library;
     }
-
-    public String readTgVersion () {
-
-	char[] versionId = new char [ supportedTgVersion ().length ];
-
-	for ( int i = 0; i < supportedTgVersion ().length; i++ ) {
-	    print ( "(" + i + ")" + " " + supportedTgVersion ( ) [ i ] );
-	    versionId [ i ] = (char) (i + ( int ) '0' );
-	}
-	print ( "Enter number in brackets for your installed TogetherCC version:" );
-	
-	return supportedTgVersion ( )  
-	    [ ( int ) ( expect ( versionId  ) - '0' ) ];
-    }
-
+    
     public String[] checkLibraries () {
 
 	String[] missingLibs = super.checkLibraries ();
@@ -286,7 +264,7 @@ public class KeYInstallerCmdLine extends KeYInstallerUI {
 
 	print ( makeTitle ( titleGlobals () ) );
 	
-	char [] options = new char [] { '1', '2', '3', '4', 'c' }; 
+	char [] options = new char [] { '1', '2', 'c' }; 
 	char c;
 	print ( trim ( globals (), 72 ) );
 	while ( ( c = expect ( options  ) ) != 'c' ) {
@@ -297,15 +275,6 @@ public class KeYInstallerCmdLine extends KeYInstallerUI {
 		keyLib  ( keyHome () + File.separatorChar + "key-ext-jars" ); 
 		break;
 	    case '2' : 
-		print ( "TOGETHER_HOME : " );
-		togetherHome ( readDir ( true ) );
-		break;
-	    case '3' : 
-		print ( "TOGETHER_VERSION : " );
-		togetherVersion ( readTgVersion () );
-		print ( trim ( globals (), 72 ) );				
-		break;
-	    case '4' : 
 		print ( "JAVA_HOME : " );
 		javaHome ( readDir ( true ) );
 		break;
@@ -342,15 +311,6 @@ public class KeYInstallerCmdLine extends KeYInstallerUI {
  	    error ( "Could not generate the shell scripts. Please " + 
  		    "resolve the problem first " + 
  		    "and redo the installation afterwards.\n Detail: " + kie );
- 	    System.exit ( -1 );
- 	}
-
-	try {
-	    extractTgScripts ( keyJarFile );
- 	} catch ( KeYInstallerException kie ) {
- 	    error ( "Could not generate the keyscripts. Please " + 
- 		    "resolve the problem first " + 
- 		    "and redo the installation afterwards.\n Detail:" + kie );
  	    System.exit ( -1 );
  	}
 	

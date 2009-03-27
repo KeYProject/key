@@ -1,44 +1,9 @@
 #!/bin/sh
-resolve_symlink  ()
-{ 
-   TARGET=`ls -l $1| awk '/\ ->\ /{print $NF}'`
-
-   if [ -n "$TARGET" ] ; then
-      RESULT="$TARGET"
-      case "$RESULT" in
-         /*) break ;;				# absolute symlink
-         *)  RESULT=`dirname $0`/"$RESULT" ;;	# relative symlink
-      esac
-   else
-      RESULT=$1
-   fi
-
-   echo "$RESULT"
-}
-
-
-UNAME=`uname -s 2>/dev/null | tr '[:upper:]' '[:lower:]'`
-
-if [ "D""$JAVA_HOME" = "D" ]; then 
-    echo "Please set the \$JAVA_HOME environment for compiling KeY" 
-    echo "to the directory where you have installed Java." 
-    if [ "$UNAME" = "darwin" ] ; then
-	echo "... try to continue, but without warranty"
-    else
-	exit 1
-    fi
-fi
-#echo "Using JDK installation from:      $JAVA_HOME"
-
-
 # standard lib location
 if [ -z "$KEY_LIB" ] ; then
    KEY_LIB="../key-ext-jars"
 fi
-#echo "Using libraries from:             $KEY_LIB"
-
-
-key_ext_jars="antlr.jar recoderKey.jar dresden-ocl-demo.jar xerces.jar log4j.jar jargs.jar"
+key_ext_jars="antlr.jar recoderKey.jar log4j.jar"
 
 key_dev_jars="javacc.jar junit.jar"
 
