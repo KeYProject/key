@@ -23,10 +23,5 @@
 			<type>2</type>
 			<locationURI>KeYExternalLibraries</locationURI>
 		</link>
-		<link>
-			<name>tcc_modules</name>
-			<type>2</type>
-			<locationURI>tcc_modules</locationURI>
-		</link>
 	</linkedResources>
 </projectDescription>

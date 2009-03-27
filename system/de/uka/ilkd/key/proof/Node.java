@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.lang.ref.WeakReference;
 import java.util.*;
 
 import de.uka.ilkd.key.logic.*;

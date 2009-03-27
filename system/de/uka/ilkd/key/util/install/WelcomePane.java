@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -33,7 +33,7 @@ public class WelcomePane extends InstallationPane {
 	text.setText 
 	    ( "Dear User,\n"+
 	      "   thank you for choosing KeY. In case of any questions, problems " +
-	      "or suggestions please contact us: key@ira.uka.de\n" +  
+	      "or suggestions please contact us: support@key-project.org\n" +  
 	      "We would also be interested to know for which purpose you " + 
 	      "will use KeY, e.g. research, industry or teaching.\n" + 
 	      "\t Best regards,\n" +

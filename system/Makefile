@@ -46,7 +46,10 @@ endif
 GIT_REPOS_AVAILABLE=$(wildcard ../.git/objects)
 
 SHA1=ownVersion
-KEY_VERSION_SHORT=0.0.0
+
+ifeq "$(KEY_VERSION_SHORT)" "" 
+  KEY_VERSION_SHORT=0.0.0
+endif
 
 ifneq "$(GIT)" "" 
  ifneq "$(GIT_REPOS_AVAILABLE)" ""
@@ -55,7 +58,7 @@ ifneq "$(GIT)" ""
    ifeq "$(KEY_VERSION_SHORT)" "0.0.0" 
      KEY_VERSION_SHORT:=$(shell $(GIT) log --pretty=one | wc -l)
      KEY_VERSION_SHORT:=$(wordlist 1,1,$(KEY_VERSION_SHORT))
-     KEY_VERSION_SHORT:=1.3.$(KEY_VERSION_SHORT)
+     KEY_VERSION_SHORT:=1.5.$(KEY_VERSION_SHORT)
    endif
  endif
 endif

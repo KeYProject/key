@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package bank;
 
 /**
@@ -25,15 +32,15 @@ public class ATM {
                                          ( accountProxies[i] == null
                                            ||
                                            accountProxies[i].accountNumber == i ));
+	public invariant (\forall ATM a; a != self; a.insertedCard == null || a.insertedCard != self.insertedCard);
       @*/
-    private /*@ spec_public @*/ final OfflineAccountProxy[] accountProxies =
+    private /*@ spec_public, nullable @*/ final OfflineAccountProxy[] accountProxies =
         new OfflineAccountProxy [maxAccountNumber];
 
     /**
      * The central host of the bank. We suppose that the attribute is only
      * accessed if the ATM is online to abstract from the actual communication 
      */
-    //@ private invariant centralHost != null;
     private /*@ spec_public @*/ final CentralHost centralHost;
     
     /**
@@ -45,7 +52,7 @@ public class ATM {
     /**
      * A bank card that is possible inserted into the ATM at the time
      */
-    private /*@ spec_public @*/ BankCard insertedCard          = null;
+    private /*@ spec_public, nullable @*/ BankCard insertedCard          = null;
     /**
      * <code>true</code> iff there is a card inserted and the customer has
      * entered the right PIN
@@ -103,7 +110,7 @@ public class ATM {
         requires  accountNumber < maxAccountNumber;
         requires  centralHost.accounts[accountNumber] != null;
         ensures   \result.accountNumber == accountNumber;
-        assignable accountProxies[accountNumber];
+        assignable accountProxies[accountNumber],\object_creation(bank.OfflineAccountProxy);
       @*/
     private Account getAccount (int accountNumber) {
         if ( isOnline () ) return centralHost.getAccount ( accountNumber );
@@ -176,6 +183,7 @@ public class ATM {
         requires  card != null;
         requires  card.accountNumber >= 0;
         requires  card.accountNumber < maxAccountNumber;
+	requires  (\forall ATM a; a.insertedCard != card);
         ensures   card.invalid <==> insertedCard == null;
         ensures   !customerAuthenticated;
         ensures   wrongPINCounter == 0;
@@ -364,7 +372,7 @@ public class ATM {
     /*@
         private normal_behavior
         requires  customerAuthenticated;
-        assignable accountProxies[insertedCard.accountNumber];
+        assignable accountProxies[insertedCard.accountNumber],\object_creation(bank.OfflineAccountProxy);
       @*/
     private Account getAccount () {
         return getAccount ( getAccountNumber () );
@@ -387,7 +395,7 @@ public class ATM {
                   ==>
                   \result ==
                      centralHost.accounts[insertedCard.accountNumber].balance;
-        assignable accountProxies[insertedCard.accountNumber];
+        assignable accountProxies[insertedCard.accountNumber],\object_creation(bank.OfflineAccountProxy);
       @*/
     public int accountBalance () {
         if ( !customerIsAuthenticated () ) throw new RuntimeException ();
@@ -411,6 +419,7 @@ public class ATM {
         public normal_behavior
         requires  customerAuthenticated;
         requires  amount > 0;
+	assignable \object_creation(bank.OfflineAccountProxy),\object_creation(java.lang.RuntimeException);
       @*/
     public int withdraw (int amount) {
         if ( !( customerIsAuthenticated () && amount > 0 ) )
@@ -425,6 +434,7 @@ public class ATM {
     /*@
         public normal_behavior
         requires  customerAuthenticated;
+	assignable \object_creation(bank.OfflineAccountProxy),\object_creation(java.lang.RuntimeException);
       @*/
     public void requestAccountStatement () {
         if ( !customerIsAuthenticated () ) throw new RuntimeException ();

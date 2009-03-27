@@ -9,13 +9,7 @@
   <property name="gen.dir"  value="${basedir}/genSrc" />
   <property name="docs.dir"  value="${basedir}/doc"   />
   <property name="ext.dir"   value="${basedir}/../key-ext-jars"   />
-  <property name="tg.dir"    value="${ext.dir}/TOGETHER"   />
   <property name="instrument.dir" value="${basedir}/instrumented/" />
-
-
-  <property name="xerces.jar" value="${ext.dir}/xerces.jar" />
-  <property name="nsuml.jar"  value="${tg.dir}/lib/nsuml.jar" />
-  <property name="jdom.jar"   value="${tg.dir}/lib/jdom.jar" />
   <property name="junit.jar"  value="${ext.dir}/junit.jar"  />
 
   <property name="jcoverage.jar" value="${ext.dir}/jcoverage.jar" />
@@ -65,14 +59,7 @@
      </fileset>
     </instrument>
   </target>
-
-  <target name="coverage" depends="instrument, test">
-   <mkdir dir="${instrument.dir}" />
- srcdir="${src.dir}" destdir="${basedir}/coverage/" />
-   <delete dir="${instrument.dir}" />   
-   <delete file="${basedir}/jcoverage.ser" />
-  </target>
-
+	
   <target name="compile" depends="keyparser, schemajava, diffparser"
           description="Compiles all java files into the source directory.">
 <!--          depends="sablecc"> -->
@@ -83,17 +70,12 @@
            depend="${build.depend}"
            optimize="off">
       <include name="de/**" />
-      <include name="tudresden/**" />
       <classpath>
         <pathelement location="${ext.dir}/antlr.jar" />
-        <pathelement location="${ext.dir}/jargs.jar" />
         <pathelement location="${ext.dir}/recoderKey.jar" />
         <pathelement location="${ext.dir}/log4j.jar" />
-        <pathelement location="${ext.dir}/dresden-ocl-demo.jar" />
-        <pathelement location="${ext.dir}/mgtp.jar" />
         <pathelement location="${ext.dir}/javacc.jar" />
         <pathelement location="${ext.dir}/junit.jar" />
-        <pathelement location="${tg.dir}/lib/openapi.jar" />
       </classpath>
     </javac>
   </target>
@@ -107,9 +89,6 @@
   </taskdef>-->
 
   <target name="compile.clean">
-    <delete>
-      <fileset dir="${src.dir}/tudresden" includes="**/*.class" />
-    </delete>
   </target>
 
 
@@ -158,19 +137,6 @@
     <mkdir dir="${build.dir}"/>
   </target>
 
-
-  <!--taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask">
-    <classpath>
-      <pathelement location="/home/vladimir/labki/pmd-1.8/lib/pmd-1.8.jar"/>
-      <pathelement location="/home/vladimir/labki/pmd-1.8/lib/jaxen-core-1.0-fcs.jar"/>
-      <pathelement location="/home/vladimir/labki/pmd-1.8/lib/saxpath-1.0-fcs.jar"/>
-      <pathelement location="/home/vladimir/labki/pmd-1.8/lib/xmlParserAPIs-2.0.2.jar"/>
-      <pathelement location="/home/vladimir/labki/pmd-1.8/lib/xercesImpl-2.0.2.jar"/>
-    </classpath>
-  </taskdef> -->
-
-
-
 <target name="pmd">
     <pmd rulesetfiles="rulesets/basic.xml,rulesets/strings.xml, rulesets/codesize.xml, rulesets/strictexception.xml">
         <formatter type="html" toFile="pmd_report.html"/>
@@ -179,69 +145,5 @@
         </fileset>
     </pmd>
 </target>
-
-
-
-<!--
-  <target name="docs"
-          description="Builds Javadoc API documentation."
-          depends="sablecc">
-
-    <delete dir="${docs.dir}" />
-    <mkdir  dir="${docs.dir}" />
-
-    <javadoc
-        sourcepath="${src.dir}"
-        destdir="${docs.dir}"
-        maxmemory="60m"
-        private="on"
-        author="on"
-        windowtitle="Dresden OCL Toolkit"
-        doctitle=   "Dresden OCL Toolkit"
-        header=  "&lt;b&gt;Dresden OCL Toolkit&lt;/b&gt;"
-        footer=  "&lt;b&gt;Dresden OCL Toolkit&lt;/b&gt;"
-        splitindex="on"
-        bottom='
-&lt;small&gt;
-&lt;a href="http://sourceforge.net/bugs/?group_id=5840" target="_top"&gt;Submit a bug&lt;/a&gt;&lt;br&gt;
-Developed at the &lt;a href="http://www.inf.tu-dresden.de/welcome.html" target="_top"&gt;Dresden University of Technology&lt;/a&gt;.&lt;br&gt;
-This software is published under the &lt;a href="http://www.gnu.org/copyleft/lesser.html" target="_top"&gt;GNU Lesser General Public License&lt;/a&gt;.
-&lt;/small&gt;'
-        >
-      <link offline="on" packagelistLoc="package-list/jdk/"    href="http://java.sun.com/products/jdk/1.2/docs/api/" />
-      <link offline="on" packagelistLoc="package-list/xerces/" href="http://xml.apache.org/apiDocs/"  />
-      <link offline="on" packagelistLoc="package-list/junit/"  href="http://www.junit.org/junit/javadoc/" />
-      <link offline="on" packagelistLoc="package-list/ant/"    href="http://jakarta.apache.org/ant/manual/api/" />
-
-      <package name="tudresden.*" />
-      <excludepackage name="tudresden.ocl.check.bootstrap" />
-      <excludepackage name="tudresden.ocl.check.types.doc-files" />
-      <excludepackage name="tudresden.ocl.check.types.xmifacade.stress" />
-      <excludepackage name="tudresden.ocl.images" />
-      <excludepackage name="tudresden.ocl.injection.reverseeng.resources.*" />
-      <excludepackage name="tudresden.ocl.injection.reverseeng.test.*" />
-      <excludepackage name="tudresden.ocl.lib.doc-files.*" />
-      <excludepackage name="*.CVS" />
-
-      <classpath>
-        <pathelement location="${xerces.jar}" />
-        <pathelement location="${junit.jar}" />
-        <pathelement location="${nsuml.jar}" />
-        <pathelement location="${jdom.jar}" />
-        <pathelement location="${src.dir}" />
-        <pathelement location="${path.jar.ant}" />
-      </classpath>
-    </javadoc>
-
-  </target>
-
-  <target name="docs.clean"
-          description="Removes Javadoc API documentation.">
-    <delete dir="${docs.dir}" />
-  </target>
-
--->
-
-
 
 </project>

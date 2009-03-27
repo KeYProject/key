@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -25,8 +25,8 @@ import javax.swing.event.ChangeListener;
 public class KeYInstallerGUI extends KeYInstallerUI {
 
 
-    private JTabbedPane tabbedPane;
-    private JFrame installerFrame;
+    private final JTabbedPane tabbedPane;
+    private final JFrame installerFrame;
 
     
     public KeYInstallerGUI ( String keyHome, 
@@ -189,6 +189,11 @@ public class KeYInstallerGUI extends KeYInstallerUI {
 	    }
 	});
 	
+	// disable the tabbed pane in order to prevent the user from 
+	// circumventing the consistency checking and model updating 
+	// done by the "next" button 
+	tabbedPane.setEnabled(false);
+	
 	// add buttons
 	buttonBox.add(prev);
 	buttonBox.add(cancel);
@@ -305,14 +310,6 @@ public class KeYInstallerGUI extends KeYInstallerUI {
  	    abortError ( "Could not generate the shell scripts. Please " + 
  		    "resolve the problem first " + 
  		    "and redo the installation afterwards.\nDetail: " + kie );
- 	}
-
-	try {
-	    extractTgScripts ( keyJarFile );
- 	} catch ( KeYInstallerException kie ) {
- 	    abortError ( "Could not generate the KeY scripts. Please " + 
-			 "resolve the problem first " + 
-			 "and redo the installation afterwards.\nDetail:" + kie );	    
  	}
 
 	try {
