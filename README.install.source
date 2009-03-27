@@ -1,15 +1,16 @@
 		*********************************
 		* KeY Source Code Installation  * 
-		*        Version 1.4.0          *
-		*********************************
-
+		*        Version 1.5.x         *
+		*        Nightly Builds        *
+                *     (Development Version)    *
+		********************************
 
 (1) Requirements: 
 -------------------------------------
 
 Operating System: Linux/Unix 
 
-Java 2 SDK, Version 1.4.x or newer (already installed)
+Java 2 SDK, Version 1.5.x or newer (already installed)
 
 Needed additional Libraries:
 	antlr.jar Version >= 2.7.2: parser generator
