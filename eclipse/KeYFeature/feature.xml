@@ -70,7 +70,7 @@ POSSIBILITY OF SUCH DAMAGES.
 
 
    <url>
-     <update label="KeY 1.4 Update Site" url="http://www.key-project.org/download/releases/eclipse/"/>
+     <update label="KeY 1.5 Nightly Build Update Site" url="http://i12www.ira.uka.de/~key/KeYDists/KeY_Feature/"/>
      <discovery label="KeY Project" url="http://www.key-project.org/"/>
    </url>
   <requires>

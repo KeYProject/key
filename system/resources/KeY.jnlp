@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- JNLP file for KeY -->
-<jnlp spec="1.0+" codebase="http://www.key-project.org/download/releases/webstart/" href="KeY.jnlp">
+<jnlp spec="1.0+" codebase="http://i12www.ira.uka.de/~bubel/nightly/webstart/" href="KeY.jnlp">
 <information> 
-<title>KeY 1.4</title>
+<title>KeY 1.5 Nightly Build</title>
 <vendor>KeY-Project, Universität Karlsruhe, Chalmers University, Universität Koblenz</vendor> 
 <homepage href="http://www.key-project.org"/> 
 <description>
