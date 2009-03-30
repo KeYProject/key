@@ -224,15 +224,15 @@ public class ProblemInitializer {
             throws ProofInputException {
         reportStatus("Loading Libraries");
         
-        HashMap libraries = envInput.readLibrariesSettings().getLibraries();
-        if (libraries.size()==0)
+        HashMap<String,Boolean> libraries 
+            = envInput.readLibrariesSettings().getLibraries();
+        if (libraries.size()==0) {
             return;
+        }
         String path = LibrariesSettings.getLibrariesPath();
-        Iterator it = libraries.entrySet().iterator();
-        while (it.hasNext()){
-            final Entry entry = (Entry) it.next();
-            final String fileName = (String) entry.getKey();
-            final Boolean  sel =  (Boolean) entry.getValue();
+        for(Entry<String, Boolean> entry : libraries.entrySet()) {
+            final String fileName = entry.getKey();
+            final Boolean  sel    = entry.getValue();
             if (sel.booleanValue()) {
                 RuleSource rs;
                 if (!fileName.startsWith(File.separator)) {
