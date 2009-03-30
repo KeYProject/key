@@ -13,6 +13,8 @@ import java.io.File;
 import java.util.*;
 
 import de.uka.ilkd.key.gui.GUIEvent;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.util.KeYResourceManager;
 
 /** This class encapsulates the information about the active
  * libraries settings
@@ -20,7 +22,7 @@ import de.uka.ilkd.key.gui.GUIEvent;
 public class LibrariesSettings implements Settings {
 
    private static final String LIBRARIES_KEY = "[Libraries]Default";
-   private static final String LIBRARIES_PATH = "libraries"+File.separator;
+   private static final String LIBRARIES_PATH = PathConfig.KEY_CONFIG_DIR + File.separator + "libraries" + File.separator;
    private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
 
    /** keys:   the file names of the libraries,
@@ -37,12 +39,14 @@ public class LibrariesSettings implements Settings {
    
    private static String[] standardLibs= {"stringRules.key", "deprecatedRules.key", "acc.key"};
    
-   public LibrariesSettings(){
+   public LibrariesSettings() {
        /*adds the standard libraries to libToSel, maybe they will be
          replaced by readSettings  */ 
-       for(int i=0;i<standardLibs.length;i++){
-               libToSel.put(standardLibs[i],new Boolean(false));
-           }     
+       for (int i = 0; i < standardLibs.length; i++) {
+           KeYResourceManager.getManager().copyIfNotExists(Proof.class, 
+                   "rules/libraries/"+standardLibs[i], LIBRARIES_PATH + standardLibs[i]);
+           libToSel.put(LIBRARIES_PATH + standardLibs[i],new Boolean(false));
+       }     
    }
    
    
@@ -119,10 +123,4 @@ public class LibrariesSettings implements Settings {
     public boolean emptyProperties(){
         return emptyProperties;
     }
-    
-    /** @return the path of the libraries */
-    public static String getLibrariesPath(){
-        return LIBRARIES_PATH;
-    }
-
 }

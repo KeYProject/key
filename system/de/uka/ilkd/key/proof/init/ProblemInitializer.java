@@ -13,7 +13,6 @@ package de.uka.ilkd.key.proof.init;
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Vector;
@@ -26,7 +25,6 @@ import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.MethodCallInfo;
-import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.CompilationUnit;
 import de.uka.ilkd.key.java.Recoder2KeY;
@@ -34,7 +32,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.IteratorOfConstrainedFormula;
 import de.uka.ilkd.key.logic.IteratorOfNamed;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
@@ -171,8 +168,7 @@ public class ProblemInitializer {
      * Helper for readIncludes().
      */
     private void readLDTIncludes(Includes in, 
-				 InitConfig initConfig, 
-				 boolean readLibraries) 
+				 InitConfig initConfig) 
     		throws ProofInputException {
 	//avoid infinite recursion
 	if(in.getLDTIncludes().isEmpty()) {
@@ -190,7 +186,7 @@ public class ProblemInitializer {
         LDTInput ldtInp = new LDTInput(keyFile, main);
 	
 	//read the LDTInput
-	readEnvInput(ldtInp, initConfig, readLibraries);
+	readEnvInput(ldtInp, initConfig);
 	
         setUpSorts(initConfig);
     }
@@ -200,51 +196,20 @@ public class ProblemInitializer {
      * Helper for readEnvInput().
      */
     private void readIncludes(EnvInput envInput, 
-			      InitConfig initConfig, 
-			      boolean readLibraries) 
+			      InitConfig initConfig) 
     		throws ProofInputException {
 	envInput.setInitConfig(initConfig);
-	Includes in = envInput.readIncludes();
-			
-	//read LDT includes
-	readLDTIncludes(in, initConfig, readLibraries);
 	
+	Includes in = envInput.readIncludes();
+        
+        //read LDT includes
+        readLDTIncludes(in, initConfig);
+        
 	//read normal includes
 	for (String fileName : in.getIncludes()) {
 	    KeYFile keyFile = new KeYFile(fileName, in.get(fileName), pm);
-	    readEnvInput(keyFile, initConfig, readLibraries);
+	    readEnvInput(keyFile, initConfig);
 	}
-    }
-    
-    
-    /** 
-     * Helper for readEnvInput().
-     */
-    private void readLibraries(EnvInput envInput, InitConfig initConfig) 
-            throws ProofInputException {
-        reportStatus("Loading Libraries");
-        
-        HashMap<String,Boolean> libraries 
-            = envInput.readLibrariesSettings().getLibraries();
-        if (libraries.size()==0) {
-            return;
-        }
-        String path = LibrariesSettings.getLibrariesPath();
-        for(Entry<String, Boolean> entry : libraries.entrySet()) {
-            final String fileName = entry.getKey();
-            final Boolean  sel    = entry.getValue();
-            if (sel.booleanValue()) {
-                RuleSource rs;
-                if (!fileName.startsWith(File.separator)) {
-                    rs = RuleSource.initRuleFile(path+fileName);
-                } else {
-                    rs = RuleSource.initRuleFile(new File(fileName));
-                }
-                KeYFile keyFile = new KeYFile(fileName, rs, pm);
-                readEnvInput(keyFile, initConfig, true);
-            }
-        }
-        reportReady();
     }
     
         
@@ -365,21 +330,12 @@ public class ProblemInitializer {
     
     
     private void readEnvInput(EnvInput envInput, 
-			      InitConfig initConfig, 
-			      boolean readLibraries) 
+			      InitConfig initConfig) 
     		throws ProofInputException {
 	if(alreadyParsed.add(envInput)){
 	    //read includes
-	    readIncludes(envInput, initConfig, readLibraries);
+	    readIncludes(envInput, initConfig);
 	    	    
-	    //read Java
-//	    readJava(envInput, initConfig);
-	    
-	    //read libraries
-	    if(readLibraries) {
-	    	readLibraries(envInput, initConfig);
-	    }
-	    
             //read Java
             readJava(envInput, initConfig);	
             
@@ -514,7 +470,7 @@ public class ProblemInitializer {
     	    	    = new KeYFile("taclet base", 
     	    		          profile.getStandardRules().getTacletBase(),
 			          pm);
-    	    	readEnvInput(tacletBaseFile, lastBaseConfig, false);
+    	    	readEnvInput(tacletBaseFile, lastBaseConfig);
 	    }
 	}
 	
@@ -529,10 +485,24 @@ public class ProblemInitializer {
     	    initConfig.getProofEnv().registerRule(r, 
     		    				  profile.getJustification(r));
         }
-	
-	//read envInput
-	readEnvInput(envInput, initConfig, true);
-	
+		
+        //read envInput
+        readEnvInput(envInput, initConfig);
+        
+        // add includes for libraries
+        HashMap<String,Boolean> libraries 
+        = envInput.readLibrariesSettings().getLibraries();
+        final Includes in = envInput.readIncludes();
+        for(Entry<String, Boolean> entry : libraries.entrySet()) {
+            final String fileName = entry.getKey();
+            final Boolean  sel    = entry.getValue();
+            if (sel.booleanValue()) {              
+                in.put(fileName, RuleSource.initRuleFile(new File(fileName)));                
+            }
+        }
+        // read in libraries as includes
+        readIncludes(envInput, initConfig);        
+        
 	startInterface();	
 	return initConfig;
     }

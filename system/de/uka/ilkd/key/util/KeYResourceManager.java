@@ -173,6 +173,9 @@ public class KeYResourceManager {
 	    File targetFile = new File(targetLocation);
 	    if (!targetFile.exists()){
 		result = true;
+		if (targetFile.getParentFile() != null) {
+		    targetFile.getParentFile().mkdirs();
+		}
 		targetFile.createNewFile();	    
 		targetFile.deleteOnExit();
 		
