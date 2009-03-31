@@ -11,7 +11,7 @@
 [SimultaneousUpdateSimplifier]EagerSimplification=true
 [General]StupidMode=true
 [Strategy]MaximumNumberOfAutomaticApplications=20000
-[Libraries]Default=acc.key-false, stringRules.key-false, deprecatedRules.key-false
+
 [Choice]DefaultChoices=transactions-transactions\:transactionsOn , dfaPolicy-dfaPolicy\:on , programRules-programRules\:Java , throughout-throughout\:toutOn , transactionAbort-transactionAbort\:abortOn , initialisation-initialisation\:disableStaticInitialisation , intRules-intRules\:arithmeticSemanticsIgnoringOF , nullPointerPolicy-nullPointerPolicy\:nullCheck
 [OCLRef]Null=true
 [OCLRef]ExcThrown=true
