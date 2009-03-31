@@ -52,7 +52,6 @@ public class TestKey extends TestCase {
 
 
      static Class[] javaTests = new Class[] {
-	de.uka.ilkd.key.java.TestTypeConverter.class,
         de.uka.ilkd.key.java.TestJavaInfo.class,
         de.uka.ilkd.key.java.TestJavaCardDLJavaExtensions.class,
   	de.uka.ilkd.key.java.TestRecoder2KeY.class,
