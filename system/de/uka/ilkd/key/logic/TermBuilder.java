@@ -7,6 +7,7 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.logic.ldt.IntegerLDT;
@@ -299,5 +300,25 @@ public class TermBuilder {
     
     public Term inReachableState(Services services) {
         return func(services.getJavaInfo().getInReachableState());
+    }
+    
+    
+    public Term heap(Services services) {
+        return func(services.getJavaInfo().getHeap());
+    }
+    
+    
+    public Term select(Services services, Term h, Term o, Function f) {
+        return func(services.getJavaInfo().getSelect(), new Term[]{h, o, func(f)});
+    }
+    
+    
+    public Term store(Services services, Term h, Term o, Function f, Term v) {
+        return func(services.getJavaInfo().getStore(), new Term[]{h, o, func(f), v});
+    }
+    
+    
+    public Term dot(Services services, Term o, Function f) {
+        return select(services, heap(services), o, f);
     }
 }

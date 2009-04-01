@@ -123,7 +123,7 @@ public class ApplyOnModality extends AbstractUpdateRule {
      */
     private boolean isHeapLocation(Location loc) {        
         return (!(loc instanceof ProgramVariable) || ((ProgramVariable)loc).isMember())
-               && !(loc instanceof NonRigidFunctionLocation);
+               /*&& !(loc instanceof NonRigidFunctionLocation)*/;
     }
 
     /**

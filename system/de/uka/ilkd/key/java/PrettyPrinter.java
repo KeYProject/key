@@ -38,7 +38,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramMetaConstruct;
 import de.uka.ilkd.key.rule.soundness.ProgramSVProxy;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.java.recoderext.StatementSVWrapper;
 
 /**
    A configurable pretty printer for Java source elements originally from COMPOST.

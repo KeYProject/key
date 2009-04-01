@@ -118,7 +118,13 @@ public class JavaInfo {
     private boolean commonTypesCacheValid;
     
     /** caches the predicate used to express a lega java state */
-    private Function legalHeapStructure;
+    private Function inReachableState;
+    
+    /** caches the function symbols used to express a java heap */
+    private NonRigidFunctionLocation heap;
+    private Function select;
+    private Function store;
+    private Sort fieldSort;
     
     /** caches the arrays' length attribute*/
     private ProgramVariable length;
@@ -197,15 +203,59 @@ public class JavaInfo {
      * a java program
      */
     public Function getInReachableState() {
-        if (legalHeapStructure == null) {
-            legalHeapStructure = (Function) services.getNamespaces().lookup(new Name("inReachableState"));
-            if (legalHeapStructure == null) {
-                throw new RuntimeException("Legal pointer structure predicate not found.");
+        if (inReachableState == null) {
+            inReachableState = (Function) services.getNamespaces().lookup(new Name("inReachableState"));
+            if (inReachableState == null) {
+                throw new RuntimeException("inReachableState predicate not found.");
             }
         } 
-        return legalHeapStructure;        
+        return inReachableState;        
+    }
+    
+    
+    public NonRigidFunctionLocation getHeap() {
+        if (heap == null) {
+            heap = (NonRigidFunctionLocation) services.getNamespaces().functions().lookup(new Name("heap"));
+            if (heap == null) {
+                throw new RuntimeException("heap symbol not found.");
+            }
+        } 
+        return heap;        
+    }
+    
+    
+    public Function getStore() {
+        if (store == null) {
+            store = (Function) services.getNamespaces().functions().lookup(new Name("store"));
+            if (store == null) {
+                throw new RuntimeException("store symbol not found.");
+            }
+        } 
+        return store;                
     }
 
+    
+    public Function getSelect() {
+        if (select == null) {
+            select = (Function) services.getNamespaces().functions().lookup(new Name("select"));
+            if (select == null) {
+                throw new RuntimeException("select symbol not found.");
+            }
+        } 
+        return select;                
+    }
+
+    public Sort getFieldSort() {
+        if (fieldSort == null) {
+            fieldSort = (Sort) services.getNamespaces().sorts().lookup(new Name("Field"));
+            if (fieldSort == null) {
+                throw new RuntimeException("field sort not found.");
+            }
+        } 
+        return fieldSort;                
+    }
+
+    
     /**
      * returns the full name of a given {@link
      * de.uka.ilkd.key.java.abstraction.KeYJavaType}. 

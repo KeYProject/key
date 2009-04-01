@@ -475,7 +475,8 @@ public class ProblemInitializer {
 	}
 	
 	//create initConfig
-        InitConfig initConfig = lastBaseConfig.copy();	
+        InitConfig initConfig = lastBaseConfig.copy();
+        //initConfig.getServices().getJavaInfo().rec2key().parsedSpecial(true);
 
 	//register built in rules
 	final IteratorOfBuiltInRule builtInRules =
