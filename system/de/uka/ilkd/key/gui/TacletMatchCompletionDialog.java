@@ -387,7 +387,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
     private static class DataTable extends JTable 
 	implements ModelChangeListener {
 
-	JTextArea inputArea=new JTextArea("Nothing",3,16);
+	//JTextArea inputArea=new JTextArea("Nothing",3,16);
+        JTextArea inputArea=new BracketMatchingTextArea("Nothing",3,16);
 	final InputEditor iEditor = new InputEditor(inputArea);
 	final InputCellRenderer iRenderer = new InputCellRenderer();
 	
