@@ -49,6 +49,8 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     
     public static final AbstractMetaOperator META_MEMORY_AREA = new MetaMemoryArea();
     
+    public static final AbstractMetaOperator META_REENTRANT_SCOPE = new MetaReentrantScope();
+    
     public static final AbstractMetaOperator META_NEXT_TO_CREATE = new MetaNextToCreate();
 
     public static final AbstractMetaOperator META_ARRAY_SIZE = new ArraySize();

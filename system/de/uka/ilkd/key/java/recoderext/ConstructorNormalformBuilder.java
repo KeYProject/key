@@ -23,12 +23,16 @@ import recoder.java.*;
 import recoder.java.declaration.*;
 import recoder.java.declaration.modifier.Private;
 import recoder.java.declaration.modifier.Public;
-import recoder.java.expression.operator.CopyAssignment;
-import recoder.java.expression.operator.New;
+import recoder.java.expression.Assignment;
+import recoder.java.expression.literal.NullLiteral;
+import recoder.java.expression.operator.*;
 import recoder.java.reference.*;
+import recoder.java.statement.If;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.proof.init.PercProfile;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -344,21 +348,23 @@ public class ConstructorNormalformBuilder
 	    Statement first = body.getStatementCount() > 0 ?
 		body.getStatementAt(0) : null;
 	    
+	    Identifier cs = new Identifier(de.uka.ilkd.key.java.reference.MethodReference.CONSTRUCTED_SCOPE.toString());
+		
 	    // first statement has to be a this or super constructor call	
 	    if (!(first instanceof SpecialConstructorReference)) {
 		if (body.getBody() == null) {
 		    body.setBody(new ASTArrayList<Statement>());
 		}
-		attach(new MethodReference
+		attach(new MethodReferenceWrapper(new MethodReference
 		    (new SuperReference(), new ImplicitIdentifier
-			(CONSTRUCTOR_NORMALFORM_IDENTIFIER)), body, 0);
+			(CONSTRUCTOR_NORMALFORM_IDENTIFIER)), cs), body, 0);
 	    } else {
 		body.getBody().remove(0);
 		if(first instanceof ThisConstructorReference){
-		    attach(new MethodReference
+		    attach(new MethodReferenceWrapper(new MethodReference
 		            (new ThisReference(), new ImplicitIdentifier
 		                    (CONSTRUCTOR_NORMALFORM_IDENTIFIER), 
-		                    ((SpecialConstructorReference)first).getArguments()), body, 0);
+		                    ((SpecialConstructorReference)first).getArguments()), cs), body, 0);
 		}else{
 		    ReferencePrefix referencePrefix = ((SuperConstructorReference) first).getReferencePrefix();
 		    ASTList<Expression> args = ((SpecialConstructorReference)first).getArguments();
@@ -369,13 +375,53 @@ public class ConstructorNormalformBuilder
 		        if(args==null) args = new ASTArrayList<Expression>(1);
 		        args.add(new VariableReference(new Identifier(etId)));        
 		    }
-		    attach(new MethodReference
+		    attach(new MethodReferenceWrapper(new MethodReference
 		            (new SuperReference(), new ImplicitIdentifier
 		                    (CONSTRUCTOR_NORMALFORM_IDENTIFIER), 
-		                    args),
+		                    args), cs),
 		                    body, 0);	    
 		}
 	    }
+	    
+	    // initialize reentrant scope:
+	    // if(this.<rs>!=<coma>){
+	    //     if(this.<rs>!=null){
+	    //       <coma>.size += this.<rs>.size;
+	    //       <coma>.consumed += this.<rs>.consumed;
+	    //     }
+	    //     this.<rs> = <coma>;
+	    // }
+	    // -----------------------------------------------------------------------
+	    if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
+	        ThisReference thisRef = new ThisReference();
+	        ImplicitIdentifier rs = new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_REENTRANT_SCOPE);
+	        FieldReference thisRS = new FieldReference(thisRef, rs);
+	        Identifier size = new Identifier("size");
+	        Identifier consumed = new Identifier("consumed");
+	        FieldReference rsSize = new FieldReference(thisRS, size);
+	        FieldReference rsConsumed = new FieldReference(thisRS, consumed);
+	        FieldReference constrRef = new FieldReference(new TypeReference(
+	                new PackageReference(new PackageReference(new Identifier("javax")), new Identifier("realtime")),
+	                new Identifier("MemoryArea")), new Identifier("constructedScope"));
+	        FieldReference consSize = new FieldReference(constrRef, size);
+	        FieldReference consConsumed = new FieldReference(constrRef, consumed);
+	        Assignment assSize = new PlusAssignment(consSize, rsSize);
+	        Assignment assCons = new PlusAssignment(consConsumed, rsConsumed);
+	        Assignment assRS = new CopyAssignment(thisRS, constrRef);
+	        Expression neqCons = new NotEquals(thisRS, constrRef);
+	        Expression neqNull = new NotEquals(thisRS, new NullLiteral());
+	        ASTList<Statement> ifBody1 = new ASTArrayList<Statement>(2);
+	        ifBody1.add(assSize);
+	        ifBody1.add(assCons);
+	        Statement result = new If(neqNull, new StatementBlock(ifBody1));
+	        ASTList<Statement> ifBody2 = new ASTArrayList<Statement>(2);
+	        ifBody2.add(result);
+	        ifBody2.add(assRS);
+	        result = new If(neqCons, new StatementBlock(ifBody2));
+	        attach(result, body, 1);
+	    }	    
+	    // -----------------------------------------------------------------------
+	    
 	    // if the first statement is not a this constructor reference
 	    // the instance initializers have to be added in source code
 	    // order

@@ -7,10 +7,10 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Location;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-public class MetaMemoryArea extends MetaField implements Location {
+public class MetaReentrantScope extends MetaField implements Location {
 
-    public MetaMemoryArea() {
-        super("#memoryArea", false);
+    public MetaReentrantScope() {
+        super("#reentrantScope", false);
     }
 
     /** calculates the resulting term. 
@@ -30,11 +30,13 @@ public class MetaMemoryArea extends MetaField implements Location {
         }
         
         return termFactory.createAttributeTerm(services.getJavaInfo().
-                getAttribute(ImplicitFieldAdder.IMPLICIT_MEMORY_AREA, objectKJT), t);
+                getAttribute(ImplicitFieldAdder.IMPLICIT_REENTRANT_SCOPE, objectKJT), t);
     }
 
+ 
     public boolean mayBeAliasedBy(Location loc) {
         return true;
     }
-    
+
+  
 }

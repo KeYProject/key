@@ -50,6 +50,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
     public static final String IMPLICIT_CREATED = "<created>";
    
     public static final String IMPLICIT_MEMORY_AREA = "<memoryArea>";
+    public static final String IMPLICIT_REENTRANT_SCOPE = "<reentrantScope>";
        
     public static final String IMPLICIT_SIZE = "<size>";
     
@@ -148,6 +149,12 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
         (modifiers, new TypeReference(
                 new PackageReference(new PackageReference(new Identifier("javax")), new Identifier("realtime")),
                 new Identifier("MemoryArea")), new ImplicitIdentifier(IMPLICIT_MEMORY_AREA), null);
+        fd.makeAllParentRolesValid();
+        attach(fd, td, 0);
+        fd = new FieldDeclaration
+        (modifiers, new TypeReference(
+                new PackageReference(new PackageReference(new Identifier("javax")), new Identifier("realtime")),
+                new Identifier("MemoryArea")), new ImplicitIdentifier(IMPLICIT_REENTRANT_SCOPE), null);
         fd.makeAllParentRolesValid();
         attach(fd, td, 0);
     }

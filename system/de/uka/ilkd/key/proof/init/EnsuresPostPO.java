@@ -23,7 +23,6 @@ import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 
@@ -95,13 +94,13 @@ public class EnsuresPostPO extends EnsuresPO {
         
         if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile &&
                 !contract.getProgramMethod().isStatic()){
-            final ProgramVariable memoryArea = services.getJavaInfo().getAttribute(
-                    ImplicitFieldAdder.IMPLICIT_MEMORY_AREA, services.getJavaInfo().getJavaLangObject());
+            final ProgramVariable reentrantScope = services.getJavaInfo().getAttribute(
+                    ImplicitFieldAdder.IMPLICIT_REENTRANT_SCOPE, services.getJavaInfo().getJavaLangObject());
             Term reentrantWorkingSpace = contract.getReentrantWorkingSpace(selfVar, toPV(paramVars), services);
-            Term thisCons = TB.dot(TB.dot(TB.var(selfVar), memoryArea), consumed);
-            Term thisSize = TB.dot(TB.dot(TB.var(selfVar), memoryArea), size);
-            result = TB.and(result, TB.func(leq, TB.func(add, thisCons, 
-                    reentrantWorkingSpace), thisSize));
+            Term reentCons = TB.dot(TB.dot(TB.var(selfVar), reentrantScope), consumed);
+            Term reentSize = TB.dot(TB.dot(TB.var(selfVar), reentrantScope), size);
+            result = TB.and(result, TB.func(leq, TB.func(add, reentCons, 
+                    reentrantWorkingSpace), reentSize));
         }
 
         return result;

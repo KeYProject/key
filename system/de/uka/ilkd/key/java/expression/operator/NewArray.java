@@ -16,6 +16,7 @@ import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
@@ -74,7 +75,13 @@ public class NewArray extends TypeOperator
         this.dimensions  = dimensions;
 	this.keyJavaType = keyJavaType;
         if(scope==null){
-            this.scope = new ProgramElementName(MethodReference.LOCAL_SCOPE);
+            if(children.get(ProgramSV.class)!=null){
+                this.scope = (ProgramSV) children.get(ProgramSV.class);
+            }else if(children.get(ProgramElementName.class)!=null){
+                this.scope = (ProgramElementName) children.get(ProgramElementName.class);
+            }else{
+                this.scope = new ProgramElementName(MethodReference.LOCAL_SCOPE);
+            }
         }else{
             this.scope = scope;
         }

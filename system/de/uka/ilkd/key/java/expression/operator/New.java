@@ -67,7 +67,7 @@ public class New
     public New(ExtList children, ReferencePrefix rp) {
 	super(children);
 	anonymousClass=(ClassDeclaration)children.get(ClassDeclaration.class);
-        if(children.get(ProgramSV.class)==null){
+        if(children.get(ProgramSV.class)!=null){
             scope = (ProgramSV) children.get(ProgramSV.class);
         }else{
             scope = (ProgramElementName) children.get(ProgramElementName.class);
@@ -90,7 +90,7 @@ public class New
     public New(ExtList children, ReferencePrefix rp, PositionInfo pi) {
 	super(children, pi);
 	anonymousClass=(ClassDeclaration)children.get(ClassDeclaration.class);
-        if(children.get(ProgramSV.class)==null){
+        if(children.get(ProgramSV.class)!=null){
             scope = (ProgramSV) children.get(ProgramSV.class);
         }else{
             scope = (ProgramElementName) children.get(ProgramElementName.class);
@@ -192,6 +192,7 @@ public class New
         if (accessPath     != null) result++;
         if (typeReference  != null) result++;
         if (children       != null) result += children.size();
+        if (scope != null) result++;
         if (anonymousClass != null) result++;
         return result;
     }
@@ -220,6 +221,10 @@ public class New
                 return children.getExpression(index);
             }
             index -= len;
+        }
+        if (scope != null) {
+            if (index == 0) return scope;
+            index--;
         }
         if (anonymousClass != null) {
             if (index == 0) return anonymousClass;

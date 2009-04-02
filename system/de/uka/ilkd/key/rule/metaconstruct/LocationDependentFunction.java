@@ -7,7 +7,7 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import java.util.*;
+import java.util.Map;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
