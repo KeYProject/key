@@ -38,12 +38,50 @@ public final class SimplifySolver extends AbstractSMTSolver {
     
     @Override
     protected SMTSolverResult interpretAnswer(String text) {
-	if (text.contains("Valid")) {
+	if (meansValid(text)) {
 	    return SMTSolverResult.createValidResult(text);
-	} else if (text.contains("Invalid")) {
+	} else if (meansInvalid(text)) {
 	    return SMTSolverResult.createInvalidResult(text);
 	} else {
 	    return SMTSolverResult.createUnknownResult(text);
 	}
     }    
+    
+    private boolean meansValid(String text) {
+	boolean toReturn = false;
+	String wanted = "Valid.";
+	int pos = text.indexOf(wanted);
+	if (pos != -1) {
+	    //Valid. is found. check, if it is on the end of the String and if only \n are following
+	    toReturn = true;
+	    pos = pos + wanted.length();
+	    for (int i = pos + 1; i < text.length(); i++) {
+		if (text.charAt(i) != '\n'
+		    && text.charAt(i) != ' ') {
+		    toReturn = false;
+		}
+	    }
+	}
+	return toReturn;
+    }
+    
+    private boolean meansInvalid(String text) {
+	boolean toReturn = false;
+	String wanted = "Invalid.";
+	int pos = text.indexOf(wanted);
+	if (pos != -1) {
+	    //Valid. is found. check, if it is on the end of the String and if only \n are following
+	    toReturn = true;
+	    pos = pos + wanted.length();
+	    for (int i = pos + 1; i < text.length(); i++) {
+		if (text.charAt(i) != '\n'
+		    && text.charAt(i) != ' ') {
+		    toReturn = false;
+		}
+	    }
+	}
+	return toReturn;
+    }
+    
+    
 }

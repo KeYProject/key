@@ -566,11 +566,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	Term t;
 	t = cf.formula();
 	Operator op = t.op();
-	if (!(op instanceof Modality)
-		&& !(op instanceof IUpdateOperator)
-		&& !(op instanceof IfThenElse) && op != Op.ALL && op != Op.EX) {
-	    hb.append(translateTerm(t, new Vector<QuantifiableVariable>(), services));
-	}
+	hb.append(translateTerm(t, new Vector<QuantifiableVariable>(), services));
 	return hb;
     }
     
