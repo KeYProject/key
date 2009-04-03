@@ -66,7 +66,7 @@ public class ProgVarReplacer {
      *   (this implies that "next" contains exactly one removed and one added
      *   formula)
      */
-    private void mergeSemiCIs(SemisequentChangeInfo base,
+    public static void mergeSemiCIs(SemisequentChangeInfo base,
                               SemisequentChangeInfo next,
                               int idx) {
         assert next.modifiedFormulas().isEmpty();

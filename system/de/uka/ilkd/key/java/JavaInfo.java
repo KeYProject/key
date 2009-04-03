@@ -125,6 +125,8 @@ public class JavaInfo {
     private Function select;
     private Function store;
     private Sort fieldSort;
+    private Function arr;
+    private Function wellFormed;
     
     /** caches the arrays' length attribute*/
     private ProgramVariable length;
@@ -253,6 +255,26 @@ public class JavaInfo {
             }
         } 
         return fieldSort;                
+    }
+    
+    public Function getArrayField() {
+        if (arr == null) {
+            arr = (Function) services.getNamespaces().functions().lookup(new Name("arr"));
+            if (arr == null) {
+                throw new RuntimeException("array field symbol not found.");
+            }
+        } 
+        return arr;                        
+    }
+    
+    public Function getWellFormed() {
+        if (wellFormed == null) {
+            wellFormed = (Function) services.getNamespaces().functions().lookup(new Name("wellFormed"));
+            if (wellFormed == null) {
+                throw new RuntimeException("well-formed symbol not found.");
+            }
+        } 
+        return wellFormed;                        
     }
 
     

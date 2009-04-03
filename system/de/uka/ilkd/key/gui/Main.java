@@ -331,7 +331,7 @@ public class Main extends JFrame implements IMain {
      */
     public static Main getInstance(final boolean visible) {
         if (instance == null) {
-            instance = new Main("KeY -- Prover");
+            instance = new Main("KeY with Explicit Heap -- Prover");
         }
         if (!instance.isVisible()) {
             if (SwingUtilities.isEventDispatchThread()) {

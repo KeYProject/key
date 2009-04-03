@@ -303,22 +303,37 @@ public class TermBuilder {
     }
     
     
+    
+    
     public Term heap(Services services) {
         return func(services.getJavaInfo().getHeap());
     }
     
-    
-    public Term select(Services services, Term h, Term o, Function f) {
-        return func(services.getJavaInfo().getSelect(), new Term[]{h, o, func(f)});
+    public Term select(Services services, Term h, Term o, Term f) {
+        return func(services.getJavaInfo().getSelect(), new Term[]{h, o, f});
     }
     
-    
-    public Term store(Services services, Term h, Term o, Function f, Term v) {
-        return func(services.getJavaInfo().getStore(), new Term[]{h, o, func(f), v});
+    public Term store(Services services, Term h, Term o, Term f, Term v) {
+        return func(services.getJavaInfo().getStore(), new Term[]{h, o, f, v});
     }
-    
-    
+        
     public Term dot(Services services, Term o, Function f) {
-        return select(services, heap(services), o, f);
+        return select(services, heap(services), o, func(f));
+    }
+    
+    public Term arr(Services services, Term o, Term i) {
+        return select(services, heap(services), o, func(services.getJavaInfo().getArrayField(), i));
+    }
+   
+    public Term fieldStore(Services services, Term o, Function f, Term v) {
+        return store(services, heap(services), o, func(f), v);
+    }
+    
+    public Term arrayStore(Services services, Term o, Term i, Term v) {
+        return store(services, heap(services), o, func(services.getJavaInfo().getArrayField(), i), v);
+    }
+    
+    public Term wellFormedHeap(Services services) {
+        return func(services.getJavaInfo().getWellFormed(), heap(services));
     }
 }

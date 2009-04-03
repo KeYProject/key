@@ -1022,11 +1022,48 @@ public class LogicPrinter {
                                   Term t)
         throws IOException
     {
-        //For OCL simplification
-        if (oclPrettyPrinting && PresentationFeatures.ENABLED && t.arity()>0) {
-            printOCLUMLPropertyTerm(name, t);
+         //XXX
+        if(PresentationFeatures.ENABLED && t.op() == services.getJavaInfo().getSelect()) {
+            final Term heapTerm   = t.sub(0);
+            final Term objectTerm = t.sub(1);
+            final Term fieldTerm  = t.sub(2);
+            if(heapTerm.op() == services.getJavaInfo().getHeap()) {
+                startTerm(3);
+                
+                markStartSub();
+                //heap not printed
+                markEndSub();
+                
+                markStartSub();
+                printTerm(objectTerm);
+                markEndSub();
+                
+                final String fieldOpName = fieldTerm.op().name().toString();
+                if(fieldTerm.arity() == 0) {
+                    String shortFieldName
+                        =  fieldOpName.contains("::")
+                           ? fieldOpName.substring(fieldOpName.indexOf("::") + 2)
+                           : fieldOpName;
+                    layouter.print(".");
+                    markStartSub();
+                    startTerm(0);                    
+                    layouter.print(shortFieldName);
+                    markEndSub();                    
+                } else if(fieldTerm.op() == services.getJavaInfo().getArrayField()) {
+                    Term indexTerm = fieldTerm.sub(0);
+                    layouter.print("[");
+                    markStartSub();
+                    printTerm(indexTerm);
+                    markEndSub();
+                    layouter.print("]");
+                } else {
+                     assert false;
+                }
+            } else {
+                layouter.print("Huh.");
+            }
         }
-        //
+        
         else {
             startTerm(t.arity());
             layouter.print(name);
@@ -1049,11 +1086,21 @@ public class LogicPrinter {
     public void printCast(String pre, String post,
             Term t, int ass) throws IOException {
         final CastFunctionSymbol cast = (CastFunctionSymbol)t.op();
-        startTerm(t.arity());
-        layouter.print(pre);
-        layouter.print(cast.getSortDependingOn().toString());
-        layouter.print(post);
-        maybeParens(t.sub(0), ass);
+        
+        //XXX
+        if(PresentationFeatures.ENABLED && t.sub(0).op() == services.getJavaInfo().getSelect()) {
+            //just omit the cast
+            startTerm(t.arity());
+            markStartSub();
+            printFunctionTerm(null, t.sub(0));
+            markEndSub();
+        } else {
+            startTerm(t.arity());
+            layouter.print(pre);
+            layouter.print(cast.getSortDependingOn().toString());
+            layouter.print(post);
+            maybeParens(t.sub(0), ass);
+        }
     }
 
 

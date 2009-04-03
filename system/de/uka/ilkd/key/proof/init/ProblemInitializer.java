@@ -23,6 +23,7 @@ import recoder.io.ProjectSettings;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.ExplicitHeapConverter;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.MethodCallInfo;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -439,6 +440,9 @@ public class ProblemInitializer {
 	    proofs[i].setSimplifier(simplifier);
 	    proofs[i].setNamespaces(proofs[i].getNamespaces());//TODO: refactor Proof.setNamespaces() so this becomes unnecessary
 	    populateNamespaces(proofs[i]);
+	    
+	    //XXX
+	    ExplicitHeapConverter.INSTANCE.convertDestructive(proofs[i].openGoals(), proofs[i].getServices());
 	}
 	initConfig.getProofEnv().registerProof(problem, pl);
 	if (main != null) {
@@ -528,7 +532,7 @@ public class ProblemInitializer {
             reportStatus(po.name() + " failed");
             throw e;            
         } finally {
-            startInterface();
+            startInterface();            
         }
     
         if(MethodCallInfo.MethodCallCounterOn){

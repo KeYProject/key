@@ -146,7 +146,9 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     /** metaconstruct for strictly pure method calls */
     public static final AbstractMetaOperator META_METHOD_CALL_TO_UPDATE= new MethodCallToUpdate();
     
-    public static final AbstractMetaOperator CONVERT_TO_EXPLICIT_HEAP = new ConvertToExplicitHeap();
+    public static final AbstractMetaOperator SAME_FIELD = new SameField();
+    
+    public static final AbstractMetaOperator CAST_TO_SORT_OF_FIELD = new CastToSortOfField();
 
     public static final Sort METASORT = new PrimitiveSort(new Name("Meta"));
 

@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import de.uka.ilkd.key.ExplicitHeapConverter;
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IteratorOfProgramVariable;
@@ -684,6 +685,9 @@ public class Goal  {
         
         final ListOfGoal goalList = ruleApp.execute(this,  
                 proof.getServices());
+        
+        //XXX
+        ExplicitHeapConverter.INSTANCE.convertDestructive(goalList, proof().getServices());
 
         proof.getServices().saveNameRecorder(n);
         

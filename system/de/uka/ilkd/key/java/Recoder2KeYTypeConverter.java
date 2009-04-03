@@ -195,18 +195,21 @@ public class Recoder2KeYTypeConverter {
             ParameterizedType pt = (ParameterizedType) t;
             return getKeYJavaType(pt.getGenericType());
         } else if (t instanceof ClassType) {
-            recoder.abstraction.ClassType ct = (recoder.abstraction.ClassType) t;
-            if (ct.isInterface()) {
-                KeYJavaType objectType = getKeYJavaType("java.lang.Object");
-                if(objectType == null) {
-                    throw new RuntimeException(
-                    "Missing core class: java.lang.Object must always be present");
+            s = (Sort) namespaces.sorts().lookup(new Name(t.getFullName()));
+            if(s == null) {
+                recoder.abstraction.ClassType ct = (recoder.abstraction.ClassType) t;
+                if (ct.isInterface()) {
+                    KeYJavaType objectType = getKeYJavaType("java.lang.Object");
+                    if(objectType == null) {
+                        throw new RuntimeException(
+                        "Missing core class: java.lang.Object must always be present");
+                    }
+    
+                    s = createObjectSort(ct, directSuperSorts(ct).add(
+                            objectType.getSort()));
+                } else {
+                    s = createObjectSort(ct, directSuperSorts(ct));
                 }
-
-                s = createObjectSort(ct, directSuperSorts(ct).add(
-                        objectType.getSort()));
-            } else {
-                s = createObjectSort(ct, directSuperSorts(ct));
             }
 
             addKeYJavaType(t, s);
