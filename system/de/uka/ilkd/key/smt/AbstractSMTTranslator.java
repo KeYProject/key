@@ -15,8 +15,6 @@ import java.util.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-//import de.uka.ilkd.key.proof.decproc.ConstraintSet;
-//import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.java.Services;
 
@@ -64,8 +62,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
     protected final HashSet usedLocalMv = new HashSet();
 
-    protected final SetOfMetavariable localMetavariables;
-
     private HashMap<Operator, ArrayList<Sort>> functionDecls = new HashMap<Operator, ArrayList<Sort>>();
 
     private HashSet<Function> specialFunctions = new HashSet<Function>();
@@ -100,15 +96,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * 
      * @param sequent
      *                The sequent which shall be translated.
-     * @param localmv
-     *                The local metavariables, should be the ones introduced
-     *                after the last branch.
      * @param services
      * 		      The services object belonging to sequent.
      */
-    public AbstractSMTTranslator(Sequent sequent,
-	    SetOfMetavariable localmv, Services services) {
-    	localMetavariables = localmv;
+    public AbstractSMTTranslator(Sequent sequent, Services services) {
 	jbyteSort = services.getTypeConverter().getByteLDT().targetSort();
 	jshortSort = services.getTypeConverter().getShortLDT().targetSort();
 	jintSort = services.getTypeConverter().getIntLDT().targetSort();
@@ -122,7 +113,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * For translating only terms and not complete sequents.
      */
     public AbstractSMTTranslator(Services s) {
-	this(null, null, s);
+	this(null, s);
     }
 
     /**

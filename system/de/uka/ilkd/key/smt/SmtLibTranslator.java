@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.SetOfMetavariable;
-//import de.uka.ilkd.key.proof.decproc.SimplifyException;
 import org.apache.log4j.Logger;
 
 public class SmtLibTranslator extends AbstractSMTTranslator {
@@ -64,15 +63,11 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
      * 
      * @param sequent
      *                The sequent which shall be translated.
-     * @param localmv
-     *                The local metavariables, should be the ones introduced
-     *                after the last branch.
      *                
      * @param services The Services Object belonging to the sequent.
      */
-    public SmtLibTranslator(Sequent sequent,
-	    SetOfMetavariable localmv, Services services) {
-	super(sequent, localmv, services);
+    public SmtLibTranslator(Sequent sequent, Services services) {
+	super(sequent, services);
     }
 
     /**

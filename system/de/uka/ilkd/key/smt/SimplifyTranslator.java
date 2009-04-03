@@ -71,16 +71,12 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
      * 
      * @param sequent
      *                The sequent which shall be translated.
-     * @param localmv
-     *                The local metavariables, should be the ones introduced
-     *                after the last branch.
      *                
      * @param services
      * 		      The services Object belonging to the sequent.
      */
-    public SimplifyTranslator(Sequent sequent,
-	    SetOfMetavariable localmv, Services services) {
-	super(sequent, localmv, services);
+    public SimplifyTranslator(Sequent sequent, Services services) {
+	super(sequent, services);
     }
     
     public SimplifyTranslator(Services services) {
