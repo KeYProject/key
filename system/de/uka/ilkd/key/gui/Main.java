@@ -1289,6 +1289,8 @@ public class Main extends JFrame implements IMain {
         view.setMnemonic(KeyEvent.VK_V);
         
         JMenuItem pretty = new JCheckBoxMenuItem("Use pretty syntax");
+        pretty.setAccelerator(KeyStroke.getKeyStroke
+                            (KeyEvent.VK_P, ActionEvent.CTRL_MASK));        
         pretty.setToolTipText("If ticked, infix notations are used.");
         pretty.setSelected(PresentationFeatures.ENABLED);
 	pretty.addActionListener(new ActionListener() {

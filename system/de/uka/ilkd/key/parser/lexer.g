@@ -89,6 +89,7 @@ tokens {
 	ISLOCALVARIABLE = "\\isLocalVariable";
 	NOTISLOCALVARIABLE = "\\notIsLocalVariable";
 	ISUPDATED = "\\isUpdated";
+	ISFIELDCONSTANT = "\\isFieldConstant";
 
 
 	// Quantifiers, binding, substitution

@@ -13,6 +13,7 @@ package de.uka.ilkd.key.logic.op;
 
 import java.util.HashMap;
 
+import de.uka.ilkd.key.explicitheap.SameField;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
@@ -147,8 +148,6 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     public static final AbstractMetaOperator META_METHOD_CALL_TO_UPDATE= new MethodCallToUpdate();
     
     public static final AbstractMetaOperator SAME_FIELD = new SameField();
-    
-    public static final AbstractMetaOperator CAST_TO_SORT_OF_FIELD = new CastToSortOfField();
 
     public static final Sort METASORT = new PrimitiveSort(new Name("Meta"));
 

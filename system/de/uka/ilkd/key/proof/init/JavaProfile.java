@@ -7,6 +7,7 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.proof.init;
 
+import de.uka.ilkd.key.explicitheap.WhileInvariantRule;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.proof.SetOfGoalChooserBuilder;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
@@ -68,6 +69,9 @@ public class JavaProfile extends AbstractProfile {
         // update simplifier
         ListOfBuiltInRule builtInRules = super.initBuiltInRules().
             prepend(getUpdateSimplificationRule());
+        
+        //XXX
+        builtInRules = builtInRules.prepend(WhileInvariantRule.INSTANCE);
   
         //contract insertion rule, ATTENTION: ProofMgt relies on the fact 
         // that Contract insertion rule is the FIRST element of this list!

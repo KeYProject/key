@@ -23,7 +23,7 @@ import recoder.io.ProjectSettings;
 
 import org.apache.log4j.Logger;
 
-import de.uka.ilkd.key.ExplicitHeapConverter;
+import de.uka.ilkd.key.explicitheap.ExplicitHeapConverter;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.MethodCallInfo;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -480,7 +480,6 @@ public class ProblemInitializer {
 	
 	//create initConfig
         InitConfig initConfig = lastBaseConfig.copy();
-        //initConfig.getServices().getJavaInfo().rec2key().parsedSpecial(true);
 
 	//register built in rules
 	final IteratorOfBuiltInRule builtInRules =

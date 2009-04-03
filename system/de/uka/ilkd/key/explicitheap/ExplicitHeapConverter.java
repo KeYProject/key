@@ -7,7 +7,7 @@
 // See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key;
+package de.uka.ilkd.key.explicitheap;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -24,7 +24,11 @@ import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPairImpl;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
 
 
-
+/** 
+ * Called in:
+ *   - ProblemInitializer::setUpProofHelper()
+ *   - Goal::apply() 
+ */
 public class ExplicitHeapConverter {
 
     public static final ExplicitHeapConverter INSTANCE = new ExplicitHeapConverter();

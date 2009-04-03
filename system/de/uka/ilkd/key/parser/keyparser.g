@@ -56,6 +56,8 @@ header {
   import de.uka.ilkd.key.java.recoderext.*;
   import de.uka.ilkd.key.pp.AbbrevMap;
   import de.uka.ilkd.key.pp.LogicPrinter;
+  
+  import de.uka.ilkd.key.explicitheap.FieldConstantCondition;
 }
 
 /** 
@@ -3901,7 +3903,8 @@ varexp[TacletBuilder b]
     | varcond_non_implicit[b] | varcond_non_implicit_query[b]
     | varcond_enum_const[b]
     | varcond_inReachableState[b] 
-    | varcond_isupdated[b]    
+    | varcond_isupdated[b]
+    | varcond_isFieldConstant[b]    
   ) 
   | 
   ( (NOT {negated = true;} )? 
@@ -4234,6 +4237,17 @@ varcond_isupdated [TacletBuilder b]
         } 
 ;
 
+
+varcond_isFieldConstant [TacletBuilder b]
+{
+  ParsableVariable x = null;
+}
+:
+   ISFIELDCONSTANT 
+	LPAREN x=varId RPAREN {
+     	   b.addVariableCondition(new FieldConstantCondition((SchemaVariable) x));
+        } 
+;
 
 varcond_freeLabelIn [TacletBuilder b, boolean negated]
 {

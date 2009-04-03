@@ -9,7 +9,7 @@
 //
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.ExplicitHeapConverter;
+import de.uka.ilkd.key.explicitheap.ExplicitHeapConverter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;

@@ -1023,45 +1023,57 @@ public class LogicPrinter {
         throws IOException
     {
          //XXX
-        if(PresentationFeatures.ENABLED && t.op() == services.getJavaInfo().getSelect()) {
-            final Term heapTerm   = t.sub(0);
+        if(PresentationFeatures.ENABLED
+            && services != null
+            && t.op() == services.getJavaInfo().getSelect()
+            && t.sub(0).op() == services.getJavaInfo().getHeap()) {
+            assert t.arity() == 3;
+            startTerm(3);
+            
             final Term objectTerm = t.sub(1);
             final Term fieldTerm  = t.sub(2);
-            if(heapTerm.op() == services.getJavaInfo().getHeap()) {
-                startTerm(3);
                 
+            markStartSub();
+            //heap not printed
+            markEndSub();
+            
+            markStartSub();
+            printTerm(objectTerm);
+            markEndSub();
+            
+            final String fieldOpName = fieldTerm.op().name().toString();
+            if(fieldTerm.arity() == 0) {
+                final String shortFieldName
+                    =  fieldOpName.contains("::")
+                       ? fieldOpName.substring(fieldOpName.indexOf("::") + 2)
+                       : fieldOpName;
+                layouter.print(".");
                 markStartSub();
-                //heap not printed
-                markEndSub();
-                
+                startTerm(0);                    
+                layouter.print(shortFieldName);
+                markEndSub();                    
+            } else if(fieldTerm.op() == services.getJavaInfo().getArrayField()) {
+                Term indexTerm = fieldTerm.sub(0);
+                layouter.print("[");
                 markStartSub();
-                printTerm(objectTerm);
+                printTerm(indexTerm);
                 markEndSub();
-                
-                final String fieldOpName = fieldTerm.op().name().toString();
-                if(fieldTerm.arity() == 0) {
-                    String shortFieldName
-                        =  fieldOpName.contains("::")
-                           ? fieldOpName.substring(fieldOpName.indexOf("::") + 2)
-                           : fieldOpName;
-                    layouter.print(".");
-                    markStartSub();
-                    startTerm(0);                    
-                    layouter.print(shortFieldName);
-                    markEndSub();                    
-                } else if(fieldTerm.op() == services.getJavaInfo().getArrayField()) {
-                    Term indexTerm = fieldTerm.sub(0);
-                    layouter.print("[");
-                    markStartSub();
-                    printTerm(indexTerm);
-                    markEndSub();
-                    layouter.print("]");
-                } else {
-                     assert false;
-                }
+                layouter.print("]");
             } else {
-                layouter.print("Huh.");
+                 assert false;
             }
+        } else if(PresentationFeatures.ENABLED
+                  && services != null
+                  && t.sort() == services.getJavaInfo().getFieldSort() 
+                  && t.arity() == 0) {
+            startTerm(0);
+            
+            final String fieldOpName = t.op().name().toString();
+            final String shortFieldName
+                    =  fieldOpName.contains("::")
+                       ? fieldOpName.substring(fieldOpName.indexOf("::") + 2)
+                       : fieldOpName;            
+            layouter.print(shortFieldName);
         }
         
         else {
@@ -1088,11 +1100,14 @@ public class LogicPrinter {
         final CastFunctionSymbol cast = (CastFunctionSymbol)t.op();
         
         //XXX
-        if(PresentationFeatures.ENABLED && t.sub(0).op() == services.getJavaInfo().getSelect()) {
+        assert t.arity() == 1;
+        if(PresentationFeatures.ENABLED 
+           && services != null 
+           && t.sub(0).op() == services.getJavaInfo().getSelect()) {
             //just omit the cast
             startTerm(t.arity());
             markStartSub();
-            printFunctionTerm(null, t.sub(0));
+            printTerm(t.sub(0));
             markEndSub();
         } else {
             startTerm(t.arity());

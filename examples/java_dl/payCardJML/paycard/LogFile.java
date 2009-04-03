@@ -29,8 +29,8 @@ public class LogFile {
 
 
     /*@ public normal_behavior
-      @    name "Contract for addRecord";
       @    requires balance >= 0;
+      @    name "Contract for addRecord";      
       @    assignable currentRecord, logArray[*].transactionId, 
       @               logArray[*].balance, logArray[*].empty, 
       @               LogRecord.transactionCounter;
