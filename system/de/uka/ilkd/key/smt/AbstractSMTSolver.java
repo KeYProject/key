@@ -55,94 +55,6 @@ public abstract class AbstractSMTSolver implements SMTSolver {
      */
     protected abstract SMTSolverResult interpretAnswer(String text);
 
-
-    
-    protected boolean isApplicable(Goal goal) {
-	/*Services s = new Services();
-	try {
-	    this.getTranslator(s).translate(goal.sequent(), s);
-	} catch (IllegalFormulaException e) {
-	    return false;
-	}
-	return true;*/
-	boolean toReturn = true;
-	Semisequent ant = goal.sequent().antecedent();
-	for (ConstrainedFormula c : ant) {
-	    toReturn = toReturn && this.isApplicable(c.formula());
-	}
-	
-	Semisequent succ = goal.sequent().succedent();
-	for (ConstrainedFormula c : succ) {
-	    toReturn = toReturn && this.isApplicable(c.formula());
-	}
-	
-	return toReturn;
-    }
-    
-    protected boolean isApplicable(Term term) {
-	/*Services s = new Services();
-	try {
-	    this.getTranslator(s).translate(term, s);
-	} catch (IllegalFormulaException e) {
-	    return false;
-	}
-	return true;*/
-	Operator op = term.op();
-	if (op == Op.NOT) {
-	    return isApplicable(term.sub(0));
-	} else if (op == Op.AND) {
-	    return (isApplicable(term.sub(0)) && isApplicable(term.sub(1)));
-	} else if (op == Op.OR) {
-	    return (isApplicable(term.sub(0)) && isApplicable(term.sub(1)));
-	} else if (op == Op.IMP) {
-	    return (isApplicable(term.sub(0)) && isApplicable(term.sub(1)));
-	} else if (op == Op.EQV) {
-	    return (isApplicable(term.sub(0)) && isApplicable(term.sub(1)));
-	} else if (op == Op.EQUALS) {
-	    return (isApplicable(term.sub(0)) && isApplicable(term.sub(1)));
-
-	} else if (op == Op.ALL) {
-	    return isApplicable(term.sub(0));
-	} else if (op == Op.EX) {
-	    return isApplicable(term.sub(0));
-	} else if (op == Op.TRUE) {
-	    return true;
-	} else if (op == Op.FALSE) {
-	    return true;
-	} else if (op == Op.NULL) {
-	    return true;
-	} else if (op == Op.IF_THEN_ELSE) {
-	    return true;
-	} else if (op instanceof LogicVariable || op instanceof ProgramVariable) {
-	    // translate as variable or constant
-	    return true;
-	} else if (op instanceof Function) {
-	    boolean temp = true;
-	    for (int i = 0; i < term.arity(); i++) {
-		temp = temp && this.isApplicable(term.sub(i));
-	    }
-	    return temp;
-	} else if (op instanceof ArrayOp) {
-	    boolean temp = true;
-	    ArrayOp operation = (ArrayOp) op;
-	    temp = temp && this.isApplicable(operation.referencePrefix(term));
-	    temp = temp && this.isApplicable(operation.index(term));
-	    return temp;
-	} else if (op instanceof AttributeOp) {
-	    AttributeOp atop = (AttributeOp) op;
-	    boolean temp = true;
-	    for (int i = 0; i < atop.arity(); i++) {
-		temp = temp && isApplicable(term.sub(i));
-	    }
-	    return temp;
-	} else {
-	    return false;
-	}
-	
-    }
-
-  
-
     private static String toStringLeadingZeros(int n, int width) {
 	String rv = "" + n;
 	while (rv.length() < width) {
@@ -205,11 +117,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     
     public final SMTSolverResult run(Goal goal, int timeout, Services services) {
 	SMTSolverResult toReturn;
-	
-	if (!this.isApplicable(goal)) {
-	    return SMTSolverResult.NO_IDEA;
-	}
-	
+		
 	SMTTranslator trans = this.getTranslator(services);
 	
 	try {
@@ -228,11 +136,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     public final SMTSolverResult run(Term t, int timeout, Services services) {
 	assert t.sort() == Sort.FORMULA;
 	SMTSolverResult toReturn;
-	
-	if (!this.isApplicable(t)) {
-	    return SMTSolverResult.NO_IDEA;
-	}
-	
+		
 	SMTTranslator trans = this.getTranslator(services);
 	
 	try {
