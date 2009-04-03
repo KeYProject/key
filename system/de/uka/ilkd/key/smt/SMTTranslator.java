@@ -30,18 +30,7 @@ public interface SMTTranslator {
     		throws IllegalFormulaException;
     
     /**
-     * Translates the given sequent into "Simplify" input syntax and adds
-     * the resulting string to the StringBuffer sb.
-     * 
-     * @param sequent
-     *                the Sequent which should be written in Simplify syntax
-     */
-    public StringBuffer translate(Sequent sequent,
-	    boolean lightWeight, Services services)
-	    throws IllegalFormulaException;
-
-    /**
-     * Translate s term into the given syntax.
+     * Translate a term into the given syntax.
      * @param t The term to translate.
      * @param services a service wrapper object.
      * @return A StringBuffer, representing the term in the given syntax.

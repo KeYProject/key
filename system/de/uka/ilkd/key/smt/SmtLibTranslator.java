@@ -67,12 +67,9 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
      * @param localmv
      *                The local metavariables, should be the ones introduced
      *                after the last branch.
+     *                
+     * @param services The Services Object belonging to the sequent.
      */
-    public SmtLibTranslator(Sequent sequent,
-	    SetOfMetavariable localmv, Services services, boolean lightWeight) {
-	super(sequent, localmv, services, lightWeight);
-    }
-
     public SmtLibTranslator(Sequent sequent,
 	    SetOfMetavariable localmv, Services services) {
 	super(sequent, localmv, services);

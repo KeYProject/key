@@ -103,9 +103,11 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @param localmv
      *                The local metavariables, should be the ones introduced
      *                after the last branch.
+     * @param services
+     * 		      The services object belonging to sequent.
      */
     public AbstractSMTTranslator(Sequent sequent,
-	    SetOfMetavariable localmv, Services services, boolean lightWeight) {
+	    SetOfMetavariable localmv, Services services) {
     	localMetavariables = localmv;
 	jbyteSort = services.getTypeConverter().getByteLDT().targetSort();
 	jshortSort = services.getTypeConverter().getShortLDT().targetSort();
@@ -115,16 +117,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	integerSort = services.getTypeConverter().getIntegerLDT().targetSort();
     }
 
-    public AbstractSMTTranslator(Sequent sequent,
-	    SetOfMetavariable localmv, Services services) {
-	this(sequent, localmv, services, false);
-    }
 
     /**
      * For translating only terms and not complete sequents.
      */
     public AbstractSMTTranslator(Services s) {
-	this(null, null, s, false);
+	this(null, null, s);
     }
 
     /**
@@ -136,27 +134,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      */
     public final StringBuffer translate(Sequent sequent, Services services)
 	    throws IllegalFormulaException {
-	return translate(sequent, false, services);
-    }
-
-    /**
-     * Translates the given sequent into "Simplify" input syntax and adds
-     * the resulting string to the StringBuffer sb.
-     * 
-     * @param sequent
-     *                the Sequent which should be written in Simplify syntax
-     */
-    public final StringBuffer translate(Sequent sequent,
-	    boolean lightWeight, Services services)
-	    throws IllegalFormulaException {
 
 	// translate
 	StringBuffer hb = new StringBuffer();
 	StringBuffer ante;
-	ante = translate(sequent.antecedent(), SMTTranslator.TERMPOSITION.ANTECEDENT, lightWeight,
-		services);
+	ante = translate(sequent.antecedent(), SMTTranslator.TERMPOSITION.ANTECEDENT, services);
 	StringBuffer succ;
-	succ = translate(sequent.succedent(), SMTTranslator.TERMPOSITION.SUCCEDENT, lightWeight, services);
+	succ = translate(sequent.succedent(), SMTTranslator.TERMPOSITION.SUCCEDENT, services);
 
 	//add one variable for each sort
 	for (Sort s : this.usedRealSort.keySet()) {
@@ -533,10 +517,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    ArrayList<ArrayList<StringBuffer>> predicates,
 	    ArrayList<StringBuffer> types, SortHirarchy sortHirarchy);
 
-    protected final StringBuffer translate(Semisequent ss, SMTTranslator.TERMPOSITION skolemization,
+   /* protected final StringBuffer translate(Semisequent ss, SMTTranslator.TERMPOSITION skolemization,
 	    Services services) throws IllegalFormulaException {
 	return translate(ss, skolemization, false, services);
-    }
+    }*/
 
     /**
      * Translates the given Semisequent into "Simplify" input syntax and
@@ -546,8 +530,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      *                the SemiSequent which should be written in Simplify
      *                syntax
      */
-    private final StringBuffer translate(Semisequent semi, SMTTranslator.TERMPOSITION skolemization,
-	    boolean lightWeight, Services services)
+    private final StringBuffer translate(Semisequent semi, SMTTranslator.TERMPOSITION skolemization, Services services)
 	    throws IllegalFormulaException {
 	StringBuffer hb = new StringBuffer();
 
@@ -562,16 +545,14 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	}
 
 	// translate the first semisequence
-	hb = translate(semi.get(0), lightWeight, services);
+	hb = translate(semi.get(0), services);
 
 	// translate the other semisequences, juncted with AND or OR
 	for (int i = 1; i < semi.size(); ++i) {
 	    if (skolemization == SMTTranslator.TERMPOSITION.ANTECEDENT) {
-		hb = translateLogicalAnd(hb, translate(semi.get(i),
-			lightWeight, services));
+		hb = translateLogicalAnd(hb, translate(semi.get(i), services));
 	    } else {
-		hb = translateLogicalOr(hb, translate(semi.get(i), lightWeight,
-			services));
+		hb = translateLogicalOr(hb, translate(semi.get(i), services));
 	    }
 	}
 
@@ -588,14 +569,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * 
      * TODO overwork. makes sense?
      */
-    private final StringBuffer translate(ConstrainedFormula cf,
-	    boolean lightWeight, Services services)
+    private final StringBuffer translate(ConstrainedFormula cf, Services services)
 	    throws IllegalFormulaException {
 	StringBuffer hb = new StringBuffer();
 	Term t;
 	t = cf.formula();
 	Operator op = t.op();
-	if (!lightWeight || !(op instanceof Modality)
+	if (!(op instanceof Modality)
 		&& !(op instanceof IUpdateOperator)
 		&& !(op instanceof IfThenElse) && op != Op.ALL && op != Op.EX) {
 	    hb.append(translateTerm(t, new Vector<QuantifiableVariable>(), services));
