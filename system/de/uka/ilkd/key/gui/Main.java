@@ -744,8 +744,8 @@ public class Main extends JFrame implements IMain {
             decisionProcedureButton.setText(toolTipText);
         
             // select icon
-            decisionProcedureButton.setIcon(IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));
-        
+            decisionProcedureButton.setIcon(IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));            
+            
             decisionProcedureButton.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         	    if (!mediator.ensureProofLoaded()) return;
@@ -799,6 +799,7 @@ public class Main extends JFrame implements IMain {
         statusLine.reset();
         statusLine.setStatusText(s);
         statusLine.setProgressPanelVisible(false);
+        statusLine.repaint(5);
     }
     
     private void setStatusLineImmediately(String s, int totalChars) {
@@ -807,6 +808,7 @@ public class Main extends JFrame implements IMain {
         getProgressMonitor().setMaximum(totalChars);
         statusLine.setProgressPanelVisible(true);
         // statusLine.setAbortButtonEnabled(false);
+        statusLine.repaint(5);
     }
     
     /**

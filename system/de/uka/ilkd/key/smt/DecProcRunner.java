@@ -18,6 +18,9 @@
 package de.uka.ilkd.key.smt;
 
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.logic.Constraint;
@@ -80,7 +83,7 @@ public class DecProcRunner implements Runnable {
             int nrGoalsClosed = mediator.getNrGoalsClosedByAutoMode();
             main.setStatusLine( simpRule.displayName() + ": " + totalGoals + 
                     (totalGoals != 1 ? " goals" : " goal" ) + " processed, " + nrGoalsClosed + 
-                    (nrGoalsClosed != 1 ? " goals" : " goal" )+ " could be closed!" );
+                    (nrGoalsClosed != 1 ? " goals" : " goal" )+ " could be closed!");
             if (nrGoalsClosed > 0 && !proof.closed()) {
                 final String informationMsg =
                     nrGoalsClosed + ((nrGoalsClosed > 1) ? 
@@ -107,24 +110,23 @@ public class DecProcRunner implements Runnable {
             try {
                 totalGoals = proof.openGoals().size();
                 int cnt = 0;
-                mediator.stopInterface(true);
-                mediator.setInteractive(false);
-                main.setStatusLine("Running external decision procedure: " +
-                        simpRule.displayName(), totalGoals);
                 
-                // TODO: use always only one rule instance and register the rule at 
-                // a central place 
                 proof.env().registerRule(simpRule,
                         de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
+
+                main.setStatusLine("Running external decision procedure: " +
+                        simpRule.displayName(), totalGoals); 
                 
                 final IteratorOfGoal goals = proof.openGoals().iterator();
-                main.getProgressMonitor().setMaximum(totalGoals);
                 while (goals.hasNext()) {      
                     BuiltInRuleApp birApp = new BuiltInRuleApp(simpRule, null, 
-                            userConstraint);                    						
+                            userConstraint);                       
                     goals.next().apply(birApp);
                     cnt++;
-                    main.getProgressMonitor().setProgress(cnt);
+                   
+                    main.setStatusLine("Running external decision procedure: " +
+                            simpRule.displayName(), cnt); 
+                    
                 }
             } catch (ExceptionHandlerException e) {
                 throw e;
@@ -138,8 +140,6 @@ public class DecProcRunner implements Runnable {
         return status;
     }
 
-
-    // TODO remove creation of new rules
     private BuiltInRule getIntegerDecisionProcedure() {
         BuiltInRule rule = proof.getSettings().getDecisionProcedureSettings().getActiveRule();
         return rule;
