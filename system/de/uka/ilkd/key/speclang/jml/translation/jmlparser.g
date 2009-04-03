@@ -2041,7 +2041,14 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 		tb.TRUE(services));
 	    result = new JMLExpression(resTerm);
 	} 
-	
+	|   REENTRANT_SCOPE "(" t=specexpression ")"
+	{
+		Term resTerm = tb.dot(t, javaInfo.getAttribute(
+    				ImplicitFieldAdder.IMPLICIT_REENTRANT_SCOPE, 
+    				javaInfo.getJavaLangObject()));
+    	result = new JMLExpression(resTerm);			
+	}
+		
     |   INVARIANT_FOR "(" t=specexpression ")" 
 	{
 	    raiseNotSupported("\\invariant_for");

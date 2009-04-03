@@ -159,6 +159,7 @@ IN_IMMORTAL_MEMORY : "\\inImmortalMemory"; //KeY extension, not official JML
 MEMORY_AREA : "\\memoryArea"; //KeY extension, not official JML
 OUTER_SCOPE : "\\outerScope"; //KeY extension, not official JML
 IN_OUTER_SCOPE : "\\inOuterScope"; //KeY extension, not official JML
+REENTRANT_SCOPE : "\\reentrantScope"; //KeY extension, not official JML
 
 
 LPAREN

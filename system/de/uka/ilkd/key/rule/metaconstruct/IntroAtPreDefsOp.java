@@ -12,26 +12,12 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.IteratorOfLoopStatement;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.SetAsListOfLoopStatement;
-import de.uka.ilkd.key.java.statement.SetOfLoopStatement;
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
-import de.uka.ilkd.key.logic.SetOfTerm;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.UpdateFactory;
-import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.AtPreFactory;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -112,6 +98,10 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
                     = inv.getVariant(selfTerm, atPreFunctions, services);
                 Term newWorkingSpace
                     = inv.getWorkingSpace(selfTerm, atPreFunctions, services);
+                ListOfTerm newParametrizedWS
+                    = inv.getParametrizedWorkingSpaceTerms(selfTerm, atPreFunctions, services);
+                ListOfTerm newWSParams
+                    = inv.getWorkingSpaceParameters(selfTerm, atPreFunctions, services);
                 Term newWorkingSpaceConstructed
                     = inv.getWorkingSpaceConstructed(selfTerm, atPreFunctions, services);
                 Term newWorkingSpaceReentrant
@@ -125,6 +115,8 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
                                             newPredicates,
                                             newModifies, 
                                             newVariant, 
+                                            newParametrizedWS,
+                                            newWSParams,
                                             newWorkingSpace,
                                             newWorkingSpaceConstructed,
                                             newWorkingSpaceReentrant,

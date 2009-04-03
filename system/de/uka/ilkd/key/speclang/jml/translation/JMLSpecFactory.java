@@ -585,6 +585,7 @@ public class JMLSpecFactory {
                             ListOfPositionedString originalPredicates,
                             ListOfPositionedString originalAssignable,
                             PositionedString originalVariant,
+                            ListOfPositionedString originalParametrizedWorkingspace,
                             PositionedString originalWorkingSpaceLocal,
                             PositionedString originalWorkingSpaceConstructed,
                             PositionedString originalWorkingSpaceReentrant) 
@@ -635,6 +636,36 @@ public class JMLSpecFactory {
                 assert translated.getAxioms().isEmpty();
                 invariant = TB.and(invariant, translated.getFormula());
             }
+        }
+        
+        ListOfTerm wsParams = SLListOfTerm.EMPTY_LIST;
+        ListOfTerm parametrizedWS = SLListOfTerm.EMPTY_LIST;
+        for(PositionedString expr : originalParametrizedWorkingspace) {
+            String s = expr.toString();
+            String param = s.substring(s.indexOf("{")+1, s.indexOf("}"));
+            String ws = s.substring(s.indexOf("}")+1);
+            FormulaWithAxioms translatedParam 
+                = translator.translateExpression(
+                                        new PositionedString(param, expr.fileName, expr.pos), 
+                                        programMethod.getContainerType(),
+                                        selfVar, 
+                                        paramVars, 
+                                        null, 
+                                        null,
+                                        atPreFunctions);
+            FormulaWithAxioms translatedWS
+            = translator.translateExpression(
+                                    new PositionedString(ws, expr.fileName, expr.pos), 
+                                    programMethod.getContainerType(),
+                                    selfVar, 
+                                    paramVars, 
+                                    null, 
+                                    null,
+                                    atPreFunctions);
+            assert translatedWS.getAxioms().isEmpty();
+            assert translatedParam.getAxioms().isEmpty();
+            wsParams = wsParams.append(translatedParam.getFormula());
+            parametrizedWS = parametrizedWS.append(translatedWS.getFormula());
         }
         
         //translate skolem declarations
@@ -759,6 +790,8 @@ public class JMLSpecFactory {
                                      predicates,
                                      assignable,
                                      variant,
+                                     parametrizedWS,
+                                     wsParams,
                                      workingSpaceLocal,
                                      workingSpaceConstructed,
                                      workingSpaceReentrant,
@@ -780,6 +813,7 @@ public class JMLSpecFactory {
                                       textualLoopSpec.getPredicates(),
                                       textualLoopSpec.getAssignable(),
                                       textualLoopSpec.getVariant(),
+                                      textualLoopSpec.getParametrizedWorkingspace(),
                                       textualLoopSpec.getWorkingSpaceLocal(),
                                       textualLoopSpec.getWorkingSpaceConstructed(),
                                       textualLoopSpec.getWorkingSpaceReentrant());

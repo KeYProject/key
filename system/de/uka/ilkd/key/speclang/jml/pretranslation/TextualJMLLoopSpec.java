@@ -27,6 +27,8 @@ public class TextualJMLLoopSpec extends TextualJMLConstruct {
             = SLListOfPositionedString.EMPTY_LIST;
     private ListOfPositionedString assignable         
             = SLListOfPositionedString.EMPTY_LIST;
+    private ListOfPositionedString parametrizedWS          
+        = SLListOfPositionedString.EMPTY_LIST;
     private PositionedString workingSpaceLocal = null;
     private PositionedString workingSpaceConstructed = null;
     private PositionedString workingSpaceReentrant = null;
@@ -62,6 +64,10 @@ public class TextualJMLLoopSpec extends TextualJMLConstruct {
     public void setVariant(PositionedString ps) {
         assert variant == null;
         variant = ps;
+    }
+    
+    public void addParametrizedWorkingspace(PositionedString ps){
+        parametrizedWS = parametrizedWS.append(ps);
     }
     
     public void setWorkingSpaceLocal(PositionedString ps) {
@@ -102,6 +108,10 @@ public class TextualJMLLoopSpec extends TextualJMLConstruct {
     
     public PositionedString getVariant() {
         return variant;
+    }
+    
+    public ListOfPositionedString getParametrizedWorkingspace(){
+        return parametrizedWS;
     }
     
     public PositionedString getWorkingSpaceLocal() {

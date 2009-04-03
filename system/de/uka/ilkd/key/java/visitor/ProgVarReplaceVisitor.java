@@ -229,6 +229,14 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         return res;
     }
     
+    private ListOfTerm replaceVariablesInTerms(ListOfTerm terms) {
+        ListOfTerm res = SLListOfTerm.EMPTY_LIST;        
+        for (final Term term : terms) {
+            res = res.append(replaceVariablesInTerm(term));
+        }        
+        return res;
+    }
+    
     
     private Map /*Operator -> Function*/ replaceVariablesInMap(
                                         Map /*Operator -> Function*/ map) {
@@ -300,6 +308,16 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                                     atPreFunctions, 
                                                     services));
         
+        ListOfTerm newWSParams
+            = replaceVariablesInTerms(inv.getWorkingSpaceParameters(selfTerm, 
+                    atPreFunctions, 
+                    services));
+        
+        ListOfTerm newParametrizedWS
+            = replaceVariablesInTerms(inv.getParametrizedWorkingSpaceTerms(selfTerm, 
+                    atPreFunctions, 
+                    services));
+        
         Term newWorkingSpaceConstructed
             = replaceVariablesInTerm(inv.getWorkingSpaceConstructed(selfTerm, 
                     atPreFunctions, 
@@ -321,6 +339,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                     newPredicates,
                                     newModifies, 
                                     newVariant, 
+                                    newParametrizedWS,
+                                    newWSParams,
                                     newWorkingSpaceLocal,
                                     newWorkingSpaceConstructed,
                                     newWorkingSpaceReentrant,

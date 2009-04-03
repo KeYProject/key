@@ -10,19 +10,9 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
-import de.uka.ilkd.key.logic.BasicLocationDescriptor;
-import de.uka.ilkd.key.logic.EverythingLocationDescriptor;
-import de.uka.ilkd.key.logic.LocationDescriptor;
-import de.uka.ilkd.key.logic.SetAsListOfLocationDescriptor;
-import de.uka.ilkd.key.logic.SetAsListOfTerm;
-import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
-import de.uka.ilkd.key.logic.SetOfTerm;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.speclang.FormulaWithAxioms;
@@ -114,6 +104,17 @@ public class OpReplacer {
         SetOfTerm result = SetAsListOfTerm.EMPTY_SET;
         for (final Term term : terms) {
             result = result.add(replace(term));
+        }
+        return result;
+    }
+    
+    /**
+     * Replaces in a list of terms.
+     */
+    public ListOfTerm replace(ListOfTerm terms) {
+        ListOfTerm result = SLListOfTerm.EMPTY_LIST;
+        for (final Term term : terms) {
+            result = result.append(replace(term));
         }
         return result;
     }
