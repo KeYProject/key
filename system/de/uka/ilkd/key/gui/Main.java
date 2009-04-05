@@ -744,8 +744,8 @@ public class Main extends JFrame implements IMain {
             decisionProcedureButton.setText(toolTipText);
         
             // select icon
-            decisionProcedureButton.setIcon(IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));
-        
+            decisionProcedureButton.setIcon(IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));            
+            
             decisionProcedureButton.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         	    if (!mediator.ensureProofLoaded()) return;

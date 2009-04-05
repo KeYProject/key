@@ -18,6 +18,9 @@
 package de.uka.ilkd.key.smt;
 
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.logic.Constraint;
@@ -79,7 +82,7 @@ public class DecProcRunner implements Runnable {
             int nrGoalsClosed = mediator.getNrGoalsClosedByAutoMode();
             main.setStatusLine( simpRule.displayName() + ": " + totalGoals + 
                     (totalGoals != 1 ? " goals" : " goal" ) + " processed, " + nrGoalsClosed + 
-                    (nrGoalsClosed != 1 ? " goals" : " goal" )+ " could be closed!" );
+                    (nrGoalsClosed != 1 ? " goals" : " goal" )+ " could be closed!");
             if (nrGoalsClosed > 0 && !proof.closed()) {
                 final String informationMsg =
                     nrGoalsClosed + ((nrGoalsClosed > 1) ? 
@@ -109,10 +112,12 @@ public class DecProcRunner implements Runnable {
                 
                 proof.env().registerRule(simpRule,
                         de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
+
+                main.setStatusLine("Running external decision procedure: " +
+                        simpRule.displayName(), totalGoals); 
                 
                 final IteratorOfGoal goals = proof.openGoals().iterator();
-                main.setStatusLine("Decision procedure " +
-                        simpRule.displayName(), totalGoals);
+
                 while (goals.hasNext()) {      
                     BuiltInRuleApp birApp = new BuiltInRuleApp(simpRule, null, 
                             userConstraint);                    						
