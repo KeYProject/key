@@ -61,7 +61,7 @@ public class SMTRule implements BuiltInRule {
 	if (result.isValid() == SMTSolverResult.ThreeValuedTruth.TRUE) {
 	    return SLListOfGoal.EMPTY_LIST;
 	} else {
-	    return null;
+	    return SLListOfGoal.EMPTY_LIST.append(goal);
 	}
     }
 }

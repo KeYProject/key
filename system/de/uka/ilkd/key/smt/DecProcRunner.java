@@ -21,8 +21,7 @@ package de.uka.ilkd.key.smt;
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.logic.Constraint;
-import de.uka.ilkd.key.proof.IteratorOfGoal;
-import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
@@ -107,24 +106,41 @@ public class DecProcRunner implements Runnable {
             try {
                 totalGoals = proof.openGoals().size();
                 int cnt = 0;
-                mediator.stopInterface(true);
-                mediator.setInteractive(false);
-                main.setStatusLine("Running external decision procedure: " +
-                        simpRule.displayName(), totalGoals);
                 
-                // TODO: use always only one rule instance and register the rule at 
-                // a central place 
                 proof.env().registerRule(simpRule,
                         de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
                 
                 final IteratorOfGoal goals = proof.openGoals().iterator();
-                main.getProgressMonitor().setMaximum(totalGoals);
+                main.setStatusLine("Decision procedure " +
+                        simpRule.displayName(), totalGoals);
                 while (goals.hasNext()) {      
                     BuiltInRuleApp birApp = new BuiltInRuleApp(simpRule, null, 
                             userConstraint);                    						
-                    goals.next().apply(birApp);
+                    
+                    Goal g = goals.next();
+                    
                     cnt++;
-                    main.getProgressMonitor().setProgress(cnt);
+                    final int temp = cnt;
+                    
+                    
+                    ProofTreeListener ptl = new ProofTreeListener() {
+                	
+                	public void proofGoalRemoved(ProofTreeEvent e) {
+                	    main.getProgressMonitor().setProgress(temp);
+                	}
+                	
+                	public void proofIsBeingPruned(ProofTreeEvent e) {}
+                	public void proofPruned(ProofTreeEvent e) {}
+                	public void proofClosed(ProofTreeEvent e) {}
+                	public void proofStructureChanged(ProofTreeEvent e) {}
+                	public void proofGoalsAdded(ProofTreeEvent e) {}
+                	public void proofGoalsChanged(ProofTreeEvent e) {}
+                	public void proofExpanded(ProofTreeEvent e) {}
+                    };
+                    proof.addProofTreeListener(ptl);
+                    g.apply(birApp);
+                    proof.removeProofTreeListener(ptl);
+                    
                 }
             } catch (ExceptionHandlerException e) {
                 throw e;
@@ -138,8 +154,6 @@ public class DecProcRunner implements Runnable {
         return status;
     }
 
-
-    // TODO remove creation of new rules
     private BuiltInRule getIntegerDecisionProcedure() {
         BuiltInRule rule = proof.getSettings().getDecisionProcedureSettings().getActiveRule();
         return rule;

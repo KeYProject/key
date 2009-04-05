@@ -799,6 +799,8 @@ public class Main extends JFrame implements IMain {
         statusLine.reset();
         statusLine.setStatusText(s);
         statusLine.setProgressPanelVisible(false);
+        statusLine.validate();
+        statusLine.paintImmediately(0, 0, statusLine.getWidth(), statusLine.getHeight());
     }
     
     private void setStatusLineImmediately(String s, int totalChars) {
@@ -807,6 +809,8 @@ public class Main extends JFrame implements IMain {
         getProgressMonitor().setMaximum(totalChars);
         statusLine.setProgressPanelVisible(true);
         // statusLine.setAbortButtonEnabled(false);
+        statusLine.validate();
+        statusLine.paintImmediately(0, 0, statusLine.getWidth(), statusLine.getHeight());
     }
     
     /**
