@@ -51,7 +51,8 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     
     
     /**
-     * @param text the String answered by the external programm
+     * @param text the String answered by the external programm.
+     * @return A SMTSolverResult containing all information of the interpretation.
      */
     protected abstract SMTSolverResult interpretAnswer(String text);
 
@@ -114,7 +115,13 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	return sb.toString();
     }
 
-    
+    /**
+     * Run this solver on a goal.
+     * @param goal The goal that should be proven.
+     * @param timeout The maximum time, that should be used for proving.
+     * 		If it takes longer, UNKNOWN is returned.
+     * @param services the service object belonging to this goal.
+     */
     public final SMTSolverResult run(Goal goal, int timeout, Services services) {
 	SMTSolverResult toReturn;
 		
@@ -133,6 +140,12 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     }
 
 
+    /**
+     * Run the solver on a term.
+     * @param t the term to be proven.
+     * @param timeout the maximum time to be used for proving.
+     * 		If the time elapses, UNKNOWN is returned.
+     */
     public final SMTSolverResult run(Term t, int timeout, Services services) {
 	assert t.sort() == Sort.FORMULA;
 	SMTSolverResult toReturn;
@@ -151,7 +164,14 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     	return toReturn;
     }
 
-    
+    /**
+     * run the solver on a formula.
+     * @param formula The formula to be proven in syntax, this solver supports.
+     * 		Ususally it is not recommended to call this directly!
+     * @param timeout
+     * 		The maximum time, that should be used for the proof.
+     * @param services The services object to use.
+     */
     public final SMTSolverResult run(String formula, 
 	    	                     int timeout, 
 	    			     Services services) {

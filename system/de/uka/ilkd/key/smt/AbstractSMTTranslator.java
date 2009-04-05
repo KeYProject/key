@@ -111,6 +111,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
     /**
      * For translating only terms and not complete sequents.
+     * 		     The service object to be used.
+     * @param s
+     *  		 
      */
     public AbstractSMTTranslator(Services s) {
 	this(null, s);
@@ -152,6 +155,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     
     /**
      * get the assumptions made by the logic.
+     * @param services the services object to be used.
      * @return ArrayList of Formulas, that are assumed to be true.
      */
     private ArrayList<StringBuffer> getAssumptions(Services services) throws IllegalFormulaException {
@@ -238,7 +242,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
     
     /**
-     * Translate s term into the given syntax.
+     * Translate a term into the given syntax.
      * @param t The term to translate.
      * @param services a service wrapper object.
      * @return A StringBuffer, representing the term in the given syntax.
@@ -556,9 +560,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * 
      * @param cf
      *                the ConstrainedFormula which should be written in
-     *                Simplify syntax
-     * 
-     * TODO overwork. makes sense?
+     *                given syntax
      */
     private final StringBuffer translate(ConstrainedFormula cf, Services services)
 	    throws IllegalFormulaException {
@@ -822,6 +824,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
     /**
      * Translate the integer division.
+     * Override this, if integer division is supported.
      * 
      * @param arg1
      *                The first val of the division.
@@ -839,6 +842,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
     /**
      * Translate the integer modulo.
+     * Override this, if integer modulo is supported.
      * 
      * @param arg1
      *                The first val of the modulo.
@@ -856,6 +860,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
     /**
      * Translate the greater than.
+     * Override this, if integer greater is supported.
      * 
      * @param arg1
      *                The first val of the greater than.
@@ -873,6 +878,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
     /**
      * Translate the less than.
+     * Override this, if integer less is supported.
      * 
      * @param arg1
      *                The first val of the less than.
@@ -890,6 +896,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
     /**
      * Translate the greater or equal.
+     * Override this, if integer greater or equal is supported.
      * 
      * @param arg1
      *                The first val of the greater or equal.
@@ -907,6 +914,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
     /**
      * Translate the less or equal.
+     * Override this, if integer less or equal is supported.
      * 
      * @param arg1
      *                The first val of the less or equal.
@@ -945,14 +953,15 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      *                true, if the sort should represent some kind of
      *                integer
      * 
-     * @return The String used for this sort. If Multisorted in
-     *         Declarations, esle for the typepredicates.
+     * @return The String used for this sort. If Multisorted, used in
+     *         declarations, else for the typepredicates.
      */
     protected abstract StringBuffer translateSort(String name, boolean isIntVal);
 
     /**
      * Translate a sort. Return the StringBuffer, that should be displayed
      * at definitionpart. i.e. the name used for typepredicates an similair.
+     * Override this, if integers are supported.
      * 
      * @return the sorts name
      */
@@ -1421,7 +1430,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @param sub The terms representing the arguments.
      * @return a StringBuffer representing the complete predicate.
      */
-    protected final StringBuffer translatePred(Operator o,
+    private final StringBuffer translatePred(Operator o,
 	    ArrayList<StringBuffer> sub) {
 	StringBuffer name;
 	if (usedPredicateNames.containsKey(o)) {
@@ -1433,7 +1442,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	return translatePredicate(name, sub);
     }
 
-    protected final StringBuffer translateSort(Sort s) {
+    private final StringBuffer translateSort(Sort s) {
 	if (usedDisplaySort.containsKey(s)) {
 	    return usedDisplaySort.get(s);
 	} else {
