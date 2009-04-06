@@ -143,8 +143,8 @@ public class MethodSelectionDialog extends JDialog {
 		    if(simplify.isSelected()){
 		        ModelGenerator.decProdForTestGen = 
 		            ModelGenerator.SIMPLIFY;
-                        ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().
-                        setDecisionProcedureForTest(DecisionProcedureSettings.SIMPLIFY);  
+//                        ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().
+//                        setDecisionProcedureForTest(DecisionProcedureSettings.SIMPLIFY);  
 			buttonPanel.add(simplifyDataTupleNumber, 
 					buttonPanel.getComponentCount()-1);
 			simplifyDataTupleNumber.setText(
@@ -154,8 +154,8 @@ public class MethodSelectionDialog extends JDialog {
 		    }else{
 			ModelGenerator.decProdForTestGen = 
 			    ModelGenerator.COGENT;
-                        ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().
-                        setDecisionProcedureForTest(DecisionProcedureSettings.COGENT);
+//                        ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().
+//                        setDecisionProcedureForTest(DecisionProcedureSettings.COGENT);
 			buttonPanel.remove(simplifyDataTupleNumber);
 			simplify.setSelected(false);
 			cogent.setSelected(true);

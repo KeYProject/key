@@ -18,7 +18,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.decproc.NumberTranslation;
+import de.uka.ilkd.key.smt.NumberTranslation;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 
 public class CogentTranslation{

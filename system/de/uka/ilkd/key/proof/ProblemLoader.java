@@ -42,7 +42,7 @@ import de.uka.ilkd.key.util.Array;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.ProgressMonitor;
-import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAuflia;
+
 
 public class ProblemLoader implements Runnable {
 
@@ -303,7 +303,7 @@ public class ProblemLoader implements Runnable {
            // Inform the decproc classes that a new problem has been loaded
            // This is done here because all benchmarks resulting from one loaded problem should be
            // stored in the same directory
-           DecisionProcedureSmtAuflia.fireNewProblemLoaded( file, proof );
+           //DecisionProcedureSmtAuflia.fireNewProblemLoaded( file, proof );
            
 	   } catch (ExceptionHandlerException e) {
 	       throw e;
