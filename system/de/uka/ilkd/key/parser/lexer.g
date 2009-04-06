@@ -89,7 +89,7 @@ tokens {
 	ISLOCALVARIABLE = "\\isLocalVariable";
 	NOTISLOCALVARIABLE = "\\notIsLocalVariable";
 	ISUPDATED = "\\isUpdated";
-	ISFIELDCONSTANT = "\\isFieldConstant";
+	ISUNIQUE = "\\isUnique";
 
 
 	// Quantifiers, binding, substitution
@@ -150,6 +150,7 @@ tokens {
 	FUNCTIONS = "\\functions";
 //        NAME = "\\name";
 	NONRIGID = "\\nonRigid";
+	UNIQUE = "\\unique";
 
 	INTERSECTIONSORT = "\\inter";
 

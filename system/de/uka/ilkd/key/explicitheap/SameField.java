@@ -14,8 +14,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.RigidFunction;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -38,24 +37,23 @@ public class SameField extends AbstractMetaOperator {
     public Term calculate(Term term, SVInstantiations svInst, Services services) {
         Term fieldTerm0 = term.sub(0);
         Term fieldTerm1 = term.sub(1);
-        Function arr = services.getJavaInfo().getArrayField();
+        Operator fieldOp0 = fieldTerm0.op();
+        Operator fieldOp1 = fieldTerm1.op();
         
-        if(fieldTerm0.op() == arr && fieldTerm1.op() == arr) {
-            return TB.equals(fieldTerm0.sub(0), fieldTerm1.sub(0));
-        } else if((fieldTerm0.op() == arr && fieldTerm1.arity() == 0)
-                  || (fieldTerm0.arity() == 0 && fieldTerm1.op() == arr)) {
-            return TB.ff();
-        } else if(fieldTerm0.arity() == 0 
-                  && fieldTerm1.arity() == 0 
-                  && fieldTerm0.op() instanceof RigidFunction 
-                  && fieldTerm1.op() instanceof RigidFunction) {
-            if(fieldTerm0.op() ==  fieldTerm1.op()) {
-                return TB.tt();
+        if(fieldOp0 instanceof UniqueRigidFunction 
+           && fieldOp1 instanceof UniqueRigidFunction) {
+            if(fieldOp0 == fieldOp1) {
+                Term result = TB.tt();
+                for(int i = 0, n = fieldTerm0.arity(); i < n; i++) {
+                    result = TB.and(result, TB.equals(fieldTerm0.sub(i),                
+                                                      fieldTerm1.sub(i)));
+                }
+                return result;
             } else {
                 return TB.ff();
             }
         } else {
-            return TB.equals(fieldTerm0, fieldTerm1);
+            return TB.equals(fieldTerm0, fieldTerm1);            
         }
     }
     

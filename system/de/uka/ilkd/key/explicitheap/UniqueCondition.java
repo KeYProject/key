@@ -18,11 +18,11 @@ import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public class FieldConstantCondition extends VariableConditionAdapter {
+public class UniqueCondition extends VariableConditionAdapter {
     
     private final SchemaVariable var;
     
-    public FieldConstantCondition(SchemaVariable var) {
+    public UniqueCondition(SchemaVariable var) {
         this.var = var;
     }
 
@@ -44,13 +44,12 @@ public class FieldConstantCondition extends VariableConditionAdapter {
             return false;
         } else {
             Term candTerm = (Term)candidate;
-            return candTerm.op() == services.getJavaInfo().getArrayField() 
-                   || (candTerm.arity() == 0 && candTerm.op() instanceof RigidFunction);
+            return candTerm.op() instanceof UniqueRigidFunction;
         }
     }
     
 
     public String toString () {
-        return "\\isFieldConstant (" + var+ ")";
+        return "\\isUnique (" + var+ ")";
     }
 }

@@ -50,10 +50,15 @@ public class ExplicitHeapConverter {
         Function result 
             = (Function) services.getNamespaces().functions().lookup(name); 
         if(result == null) {
-            result = new RigidFunction(name, 
-                                       services.getJavaInfo().getFieldSort(), 
-                                       new Sort[0]);
+            result 
+                = new UniqueRigidFunction(name, 
+                                          services.getJavaInfo().getFieldSort(), 
+                                          new Sort[0]);
             services.getNamespaces().functions().add(result);
+        } else {
+            if(!(result instanceof UniqueRigidFunction)) {
+                warn("field symbol \"" + name + "\" is not unique!");
+            }
         }
         return result;
     }

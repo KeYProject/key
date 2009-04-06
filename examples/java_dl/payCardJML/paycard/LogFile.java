@@ -47,7 +47,8 @@ public class LogFile {
 
     /*@ public normal_behavior
       @    ensures (\forall int i; 0 <= i && i<logArray.length;
-      @             logArray[i].balance <= \result.balance);      
+      @             logArray[i].balance <= \result.balance);
+      @    diverges true; //XXX      
       @ */
     public /*@pure@*/ LogRecord getMaximumRecord(){
 	LogRecord max = logArray[0];

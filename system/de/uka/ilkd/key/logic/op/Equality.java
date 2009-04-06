@@ -96,9 +96,10 @@ public class Equality extends Op {
 	final Sort t0Sort = term.sub(0).sort();
 	final Sort t1Sort = term.sub(1).sort();
 
+	/*
 	if (t0Sort instanceof PrimitiveSort != t1Sort instanceof PrimitiveSort) {
 	    return false;
-	}	
+	}*/	
 
 	if ( targetSort == Sort.FORMULA || t0Sort == Sort.FORMULA || t1Sort == Sort.FORMULA ) { 
 	    return t0Sort == Sort.FORMULA && t1Sort == Sort.FORMULA && targetSort == Sort.FORMULA;

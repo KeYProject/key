@@ -12,17 +12,16 @@ package de.uka.ilkd.key.explicitheap;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ldt.BooleanLDT;
 import de.uka.ilkd.key.logic.op.*;
@@ -134,10 +133,28 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
     
     
-    private AnonymisationInfo getAnonymisation(SetOfLocationDescriptor mod,
-                                               Services services,
-                                               UpdateFactory uf) {
+    private AnonymisationInfo getAnonymisation(
+                                    SetOfLocationDescriptor mod,
+                                    ListOfProgramVariable relevantLocalVars,
+                                    Services services,
+                                    UpdateFactory uf) {
+        //build anon update
+        Update anonUpdate = uf.skip(); 
         AnonymisingUpdateFactory auf = new AnonymisingUpdateFactory(uf);
+        for(ProgramVariable pv : relevantLocalVars) {
+            LocationDescriptor loc = new BasicLocationDescriptor(TB.var(pv));
+            Update u = auf.createAnonymisingUpdate(
+                                SetAsListOfLocationDescriptor.EMPTY_SET.add(loc), 
+                                services);
+            anonUpdate = uf.parallel(anonUpdate, u);
+        }
+        {
+            LocationDescriptor loc = new BasicLocationDescriptor(TB.heap(services));
+            Update u = auf.createAnonymisingUpdate(
+                                    SetAsListOfLocationDescriptor.EMPTY_SET.add(loc), 
+                                    services);
+            anonUpdate = uf.parallel(anonUpdate, u);
+        }
         
         //prepare quantification over locations
         LogicVariable objVar 
@@ -148,18 +165,17 @@ public final class WhileInvariantRule implements BuiltInRule {
             = new LogicVariable(new Name("field"),
                                 services.getJavaInfo().getFieldSort());
         Term objVarTerm   = TB.func(objVar);
-        Term fieldVarTerm = TB.func(fieldVar);
-        
-        //build anon update and allowed-change condition
-        Update anonUpdate = uf.skip();
-        Term allowedChangeCondition = TB.ff();
-        boolean anonymiseHeap = false;
+        Term fieldVarTerm = TB.func(fieldVar);        
+       
+        //what is allowed to be changed by modifies clause?
+        Term allowedHeapChange = TB.ff();
+        ListOfProgramVariable allowedLocalVars 
+            = SLListOfProgramVariable.EMPTY_LIST;
         for(LocationDescriptor loc : mod) {
             if(loc instanceof BasicLocationDescriptor) {
                 BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
                 Term locTerm = bloc.getLocTerm();
                 if(locTerm.op() instanceof AttributeOp) {
-                    anonymiseHeap = true;
                     ProgramVariable fieldPV 
                         = (ProgramVariable)((AttributeOp)locTerm.op())
                                                             .attribute();
@@ -168,70 +184,68 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                .getFieldSymbol(fieldPV, 
                                                                services);
                     
-                    Term allowedChangeConditionEntry
+                    Term allowedHeapChangeConditionEntry
                         = TB.ex(bloc.getLocTerm().freeVars().toArray(), 
                                 TB.and(new Term[]{
                                         bloc.getFormula(),
                                         TB.equals(objVarTerm, locTerm.sub(0)),
                                         TB.equals(fieldVarTerm, 
                                                   TB.func(fieldSymbol))}));
-                    allowedChangeCondition = TB.or(allowedChangeCondition, 
-                                                   allowedChangeConditionEntry);
+                    allowedHeapChange = TB.or(allowedHeapChange, 
+                                                       allowedHeapChangeConditionEntry);
                 } else if(locTerm.op() instanceof ArrayOp) {
-                    anonymiseHeap = true;
-                    assert false; //TODO!
+                    Function arrayFieldSymbol 
+                        = services.getJavaInfo().getArrayField();
+                    Term allowedChangeConditionEntry
+                        = TB.ex(bloc.getLocTerm().freeVars().toArray(), 
+                                TB.and(new Term[]{
+                                        bloc.getFormula(),
+                                        TB.equals(objVarTerm, locTerm.sub(0)),
+                                        TB.equals(fieldVarTerm, 
+                                                  TB.func(arrayFieldSymbol, locTerm.sub(1)))}));
+                    allowedHeapChange = TB.or(allowedHeapChange, 
+                                                       allowedChangeConditionEntry);
                 } else {
-                    assert locTerm.arity() == 0;
-                    Update u = auf.createAnonymisingUpdate(
-                                SetAsListOfLocationDescriptor.EMPTY_SET.add(loc), 
-                                services);
-                    anonUpdate = uf.parallel(anonUpdate, u);
+                    assert locTerm.op() instanceof ProgramVariable;
+                    allowedLocalVars = allowedLocalVars.prepend(
+                                            (ProgramVariable)locTerm.op());
                 }
             } else {
                 assert loc instanceof EverythingLocationDescriptor;
-                assert false : "\"*\" modifies clauses are evil";
+                allowedHeapChange = TB.ff();
+                allowedLocalVars = SLListOfProgramVariable.EMPTY_LIST;
+                break;
             }
         }
         
-        
-        //anonymise heap, build frame condition and heapAtPre def
-        final Term frameCondition;
-        final Term heapAtPreDef;
-        if(anonymiseHeap) {
-            //update
-            Term heapTerm = TB.heap(services);
-            LocationDescriptor heapLoc 
-                = new BasicLocationDescriptor(TB.heap(services));
-            Function[] fs 
-                = AnonymisingUpdateFactory.createUninterpretedFunctions(
-                            new LocationDescriptor[]{heapLoc}, 
-                            services);
-            Term heapPrimeTerm = TB.func(fs[0]);
-            Update heapUpdate = uf.elementaryUpdate(heapTerm, heapPrimeTerm);
-            anonUpdate = uf.parallel(anonUpdate, heapUpdate);
-            
-            //frame condition, heapAtPre def
-            Term heapAtPreTerm 
+        //prepare frame condition, atPre definitions
+        Term heapTerm = TB.heap(services);
+        Term heapAtPreTerm 
                 = TB.func(APF.createAtPreFunction(heapTerm.op(), services));
-            heapAtPreDef = TB.equals(heapTerm, heapAtPreTerm);                        
-            frameCondition = 
-                TB.all(new QuantifiableVariable[]{objVar, fieldVar},
-                       TB.or(allowedChangeCondition,
-                             TB.equals(TB.select(services, 
-                                                 heapPrimeTerm, 
-                                                 objVarTerm, 
-                                                 fieldVarTerm),
-                                        TB.select(services, 
-                                                  heapAtPreTerm, 
-                                                  objVarTerm, 
-                                                  fieldVarTerm))));
-        } else {
-            frameCondition = TB.tt();
-            heapAtPreDef   = TB.tt();
+        Term atPreDef = TB.equals(heapTerm, heapAtPreTerm);                        
+        Term frameCondition 
+                = TB.all(new QuantifiableVariable[]{objVar, fieldVar},
+                         TB.or(allowedHeapChange,
+                               TB.equals(TB.select(services, 
+                                                   heapTerm, 
+                                                   objVarTerm, 
+                                                   fieldVarTerm),
+                                          TB.select(services, 
+                                                    heapAtPreTerm, 
+                                                    objVarTerm, 
+                                                    fieldVarTerm))));
+        for(ProgramVariable pv : relevantLocalVars) {
+            if(!allowedLocalVars.contains(pv)) {
+                Term pvTerm = TB.var(pv);
+                Term pvAtPreTerm 
+                    = TB.func(APF.createAtPreFunction(pv, services));
+                atPreDef = TB.and(atPreDef, TB.equals(pvTerm, pvAtPreTerm));
+                frameCondition
+                    = TB.and(frameCondition, TB.equals(pvTerm, pvAtPreTerm));
+            }
         }
         
-        
-        return new AnonymisationInfo(anonUpdate, frameCondition, heapAtPreDef);
+        return new AnonymisationInfo(anonUpdate, frameCondition, atPreDef);
     }
     
     
@@ -270,6 +284,12 @@ public final class WhileInvariantRule implements BuiltInRule {
         SetOfLocationDescriptor mod
             = inst.inv.getModifies(inst.selfTerm, atPreFunctions, services);
         
+        //get anonymising update, frame condition
+        UpdateFactory uf = new UpdateFactory(services, new UpdateSimplifier());        
+        FreePVCollector pc = new FreePVCollector(inst.loop, services);
+        pc.start();        
+        AnonymisationInfo anon = getAnonymisation(mod, pc.result(), services, uf);
+        
         //split goal into three branches
         ListOfGoal result = goal.split(3);
         Goal initGoal = result.tail().tail().head();
@@ -303,8 +323,6 @@ public final class WhileInvariantRule implements BuiltInRule {
                                        booleanLDT.getTrueTerm());
         Term guardFalseTerm = TB.equals(TB.var(guardVar), 
                                         booleanLDT.getFalseTerm());
-        UpdateFactory uf = new UpdateFactory(services, new UpdateSimplifier());
-        AnonymisationInfo anon = getAnonymisation(mod, services, uf);
         Update uAndAnonUpdate = uf.sequential(inst.u, anon.anonUpdate);
         
         //"Invariant Initially Valid":
@@ -319,13 +337,13 @@ public final class WhileInvariantRule implements BuiltInRule {
         //          #whileInvRule(\[{.. while (#e) #s ...}\]post, 
         //                                 #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post) & inv)),anon1));
         bodyGoal.addFormula(new ConstrainedFormula(uf.prepend(inst.u, 
-                                                              anon.heapAtPreDef)), 
+                                                              anon.atPreDef)), 
                            true, 
-                           true);
+                           false);
         bodyGoal.addFormula(new ConstrainedFormula(uf.prepend(uAndAnonUpdate, 
                                                               TB.and(invTerm, anon.frameCondition))), 
                            true, 
-                           true);
+                           false);
         
         WhileInvRule wir = (WhileInvRule) AbstractMetaOperator.WHILE_INV_RULE;
         SVInstantiations svInst 
@@ -356,13 +374,13 @@ public final class WhileInvariantRule implements BuiltInRule {
         //                     (\[{ method-frame(#ex):{#typeof(#e)  #v1 = #e;} }\]
         //                      (#v1=FALSE -> \[{..   ...}\]post)),anon2))
         useGoal.addFormula(new ConstrainedFormula(uf.prepend(inst.u, 
-                                                             anon.heapAtPreDef)), 
+                                                             anon.atPreDef)), 
                            true, 
-                           true);
+                           false);
         useGoal.addFormula(new ConstrainedFormula(uf.prepend(uAndAnonUpdate, 
                                                              TB.and(invTerm, anon.frameCondition))), 
                            true, 
-                           true);
+                           false);
         Term restPsi = TB.box(IIT.removeActiveStatement(inst.progPost.javaBlock(), 
         						services),
                               inst.progPost.sub(0));
@@ -429,17 +447,59 @@ public final class WhileInvariantRule implements BuiltInRule {
     private static final class AnonymisationInfo {
         public final Update anonUpdate;
         public final Term frameCondition;
-        public final Term heapAtPreDef;
+        public final Term atPreDef;
         
         public AnonymisationInfo(Update anonUpdate, 
                                  Term frameCondition,
-                                 Term heapAtPreDef) {
+                                 Term atPreDef) {
             assert anonUpdate != null;
             assert frameCondition != null;
-            assert heapAtPreDef != null;
+            assert atPreDef != null;
             this.anonUpdate     = anonUpdate;
             this.frameCondition = frameCondition;
-            this.heapAtPreDef   = heapAtPreDef;
+            this.atPreDef       = atPreDef;
         }
     }
+    
+    
+    private static final class FreePVCollector extends JavaASTVisitor {
+         private ListOfProgramVariable declaredPVs
+             = SLListOfProgramVariable.EMPTY_LIST;
+         private ListOfProgramVariable freePVs
+             = SLListOfProgramVariable.EMPTY_LIST;
+         public FreePVCollector(ProgramElement root, Services services) {
+             super(root, services);
+         }
+         protected void doDefaultAction(SourceElement node) {
+             if(node instanceof ProgramVariable) {
+                 ProgramVariable pv = (ProgramVariable) node;
+                 if(!pv.isMember() && !declaredPVs.contains(pv)) {
+                     freePVs = freePVs.prepend(pv);
+                 }
+             } else if(node instanceof VariableSpecification) {
+                 VariableSpecification vs = (VariableSpecification) node;
+                 ProgramVariable pv = (ProgramVariable) vs.getProgramVariable();
+                 if(!pv.isMember()) {
+                     assert !declaredPVs.contains(pv);
+                     declaredPVs = declaredPVs.prepend(pv);
+                     
+                     //occurrence in the declaration itself does not count
+                     assert freePVs.contains(pv); 
+                     freePVs = freePVs.removeFirst(pv);
+                 }
+             }
+         }
+         public ListOfProgramVariable result() {
+             //remove duplicates
+             ListOfProgramVariable result = SLListOfProgramVariable.EMPTY_LIST;
+             IteratorOfProgramVariable it = freePVs.iterator();
+             while(it.hasNext()) {
+                 ProgramVariable pv = it.next();
+                 if(!result.contains(pv)) {
+                     result = result.prepend(pv);
+                 }
+             }
+             return result;
+         }
+     }    
 } 

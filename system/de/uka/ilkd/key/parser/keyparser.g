@@ -57,7 +57,8 @@ header {
   import de.uka.ilkd.key.pp.AbbrevMap;
   import de.uka.ilkd.key.pp.LogicPrinter;
   
-  import de.uka.ilkd.key.explicitheap.FieldConstantCondition;
+  import de.uka.ilkd.key.explicitheap.UniqueCondition;
+  import de.uka.ilkd.key.explicitheap.UniqueRigidFunction;
 }
 
 /** 
@@ -2108,11 +2109,16 @@ func_decl
     String func_name;
     List dependencyListList = null;
     boolean nonRigid = false;
+    boolean unique = false;
     String id = null;
     int location = NORMAL_NONRIGID;
 }
     :
-        (NONRIGID {nonRigid=true;} (LBRACKET location = location_ident RBRACKET)?)?
+        (
+          NONRIGID {nonRigid=true;} (LBRACKET location = location_ident RBRACKET)?
+          |
+          UNIQUE {unique=true;}
+        )?
         retSort = sortId_check[!skip_functions]
         func_name = funcpred_name 
         (
@@ -2155,6 +2161,8 @@ func_decl
                  	     semanticError("Unknwon modifier used in declaration of non-rigid function "+fct_name);
                  	}
                     }
+                } else if(unique) {
+                    f = new UniqueRigidFunction(fct_name, retSort, argSorts);
                 } else {
                     f = new RigidFunction(fct_name, retSort, argSorts);
                 }
@@ -3904,7 +3912,7 @@ varexp[TacletBuilder b]
     | varcond_enum_const[b]
     | varcond_inReachableState[b] 
     | varcond_isupdated[b]
-    | varcond_isFieldConstant[b]    
+    | varcond_isUnique[b]    
   ) 
   | 
   ( (NOT {negated = true;} )? 
@@ -4238,14 +4246,14 @@ varcond_isupdated [TacletBuilder b]
 ;
 
 
-varcond_isFieldConstant [TacletBuilder b]
+varcond_isUnique [TacletBuilder b]
 {
   ParsableVariable x = null;
 }
 :
-   ISFIELDCONSTANT 
+   ISUNIQUE 
 	LPAREN x=varId RPAREN {
-     	   b.addVariableCondition(new FieldConstantCondition((SchemaVariable) x));
+     	   b.addVariableCondition(new UniqueCondition((SchemaVariable) x));
         } 
 ;
 
