@@ -13,6 +13,7 @@ public class TestExecutionWatchDog extends TestCase {
     
     public void testWatchdog() {
 	boolean wasInterrupted = false;
+	boolean notExecuteable = false;
 	try {
 	    Process p = Runtime.getRuntime().exec("yices");
 	    ExecutionWatchDog wd = new ExecutionWatchDog(1, p);
@@ -29,8 +30,9 @@ public class TestExecutionWatchDog extends TestCase {
 	} catch (IOException e) {
 	    System.out.println("IOException thrown");
 	    System.out.println(e.getMessage());
+	    notExecuteable = true;
 	}
-	assert(wasInterrupted);
+	assert(wasInterrupted | notExecuteable);
     }
     
 }
