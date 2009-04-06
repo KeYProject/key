@@ -2280,9 +2280,15 @@ public class Main extends JFrame implements IMain {
         DecisionProcedureSettings decSettings = (currentProof == null) ? ProofSettings.DEFAULT_SETTINGS
                 .getDecisionProcedureSettings()
                 : currentProof.getSettings().getDecisionProcedureSettings();
-                decisionProcedureButton.setIcon(IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));
-                decisionProcedureButton.setToolTipText("Run " + decSettings.getActiveRule().displayName());
-                decisionProcedureButton.setText("Run " + decSettings.getActiveRule().displayName());
+                if (decSettings.getActiveRule() != null) {
+                    decisionProcedureButton.setIcon(IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));
+                    decisionProcedureButton.setToolTipText("Run " + decSettings.getActiveRule().displayName());
+                    decisionProcedureButton.setText("Run " + decSettings.getActiveRule().displayName());
+                } else {
+                    decisionProcedureButton.setIcon(IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));
+                    decisionProcedureButton.setToolTipText("Not installed");
+                    decisionProcedureButton.setText("No decision procedure installed.");
+                }
     }
         
     /**
