@@ -43,4 +43,31 @@ class MyClass {
         }
     }
     
+    
+    /*@ normal_behavior
+      @   assignable a[*];
+      @   ensures (\forall int x, y; 0 < x && x < y && y < a.length; a[x] <= a[y]);
+      @   diverges true;
+      @*/
+    void selectionSort(int[] a) {
+        /*@ loop_invariant 0 <= i && i <= a.length 
+          @                && (\forall int x, y; 0 <= x && x < y && y < i; a[x] <= a[y])
+          @                && (\forall int x, y; 0 <= x && x < i && i <= y && y < a.length; a[x] <= a[y]);
+          @ assignable i, a[*];
+          @*/
+        for(int i = 0; i < a.length; i++) {
+            int minIndex = i;
+            /*@ loop_invariant i < j && j <= a.length
+              @                && i <= minIndex && minIndex < j
+              @                && (\forall int x; i <= x && x < j; a[minIndex] <= a[x]);
+              @ assignable j, minIndex; 
+              @*/
+            for(int j = i + 1; j < a.length; j++) {
+                if(a[j] < a[minIndex]) minIndex = j;
+            }
+            int temp = a[i];
+            a[i] = a[minIndex];
+            a[minIndex] = temp;
+        }
+    }
 }

@@ -46,7 +46,12 @@ public class ExplicitHeapConverter {
     
     
     public Function getFieldSymbol(ProgramVariable fieldPV, Services services) {
-        final Name name = new Name(fieldPV.toString());
+	final Name name;
+	if(fieldPV == services.getJavaInfo().getArrayLength()) {
+	    name = new Name("Array::length");
+	} else {
+	    name = new Name(fieldPV.toString());
+	}
         Function result 
             = (Function) services.getNamespaces().functions().lookup(name); 
         if(result == null) {
