@@ -79,28 +79,33 @@ public class EnsuresPostPO extends EnsuresPO {
         Function add = (Function) services.getNamespaces().functions().lookup(new Name("add"));
         Function leq = (Function) services.getNamespaces().functions().lookup(new Name("leq")); 
         
-        if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile &&
-                contract.getProgramMethod().getKeYJavaType()!=null){
+        if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
             workingSpace = contract.getCallerWorkingSpace(selfVar, toPV(paramVars), services);
 //            workingSpace = TB.var(services.getJavaInfo().
 //                    getAttribute(ImplicitFieldAdder.IMPLICIT_SIZE, contract.getProgramMethod().getKeYJavaType()));
         }else if(contract.getWorkingSpace(selfVar, toPV(paramVars), services)!=null){
             workingSpace = contract.getWorkingSpace(selfVar, toPV(paramVars), services);
+            if(contract.getProgramMethod().getMethodDeclaration().externallyConstructedScope()){
+                workingSpace = TB.func(add, workingSpace, 
+                        contract.getConstructedWorkingSpace(selfVar, toPV(paramVars), services));
+            }
         }
         if(workingSpace!=null){
             result = TB.and(result, TB.func(leq, TB.func(add, TB.dot(t_mem,consumed), 
                     workingSpace), TB.dot(t_mem, size)));
         }
         
-        if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile &&
-                !contract.getProgramMethod().isStatic()){
-            final ProgramVariable reentrantScope = services.getJavaInfo().getAttribute(
-                    ImplicitFieldAdder.IMPLICIT_REENTRANT_SCOPE, services.getJavaInfo().getJavaLangObject());
-            Term reentrantWorkingSpace = contract.getReentrantWorkingSpace(selfVar, toPV(paramVars), services);
-            Term reentCons = TB.dot(TB.dot(TB.var(selfVar), reentrantScope), consumed);
-            Term reentSize = TB.dot(TB.dot(TB.var(selfVar), reentrantScope), size);
-            result = TB.and(result, TB.func(leq, TB.func(add, reentCons, 
-                    reentrantWorkingSpace), reentSize));
+        if(ProofSettings.DEFAULT_SETTINGS.getProfile() instanceof PercProfile){
+            if( !contract.getProgramMethod().isStatic()){
+                final ProgramVariable reentrantScope = services.getJavaInfo().getAttribute(
+                        ImplicitFieldAdder.IMPLICIT_REENTRANT_SCOPE, services.getJavaInfo().getJavaLangObject());
+                Term reentrantWorkingSpace = contract.getReentrantWorkingSpace(selfVar, toPV(paramVars), services);
+                Term reentCons = TB.dot(TB.dot(TB.var(selfVar), reentrantScope), consumed);
+                Term reentSize = TB.dot(TB.dot(TB.var(selfVar), reentrantScope), size);
+                result = TB.and(result, TB.func(leq, TB.func(add, reentCons, 
+                        reentrantWorkingSpace), reentSize));
+            }
+
         }
 
         return result;

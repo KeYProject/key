@@ -151,6 +151,11 @@ public class TextualJMLLoopSpec extends TextualJMLConstruct {
             sb.append("decreases: " + variant);
         }
         
+        it = parametrizedWS.iterator();
+        while(it.hasNext()){
+            sb.append("workingSpace"+it.next()+"\n");
+        }
+        
         if(workingSpaceLocal != null){
             sb.append("working_space_single_iteration_local: "+workingSpaceLocal);
         }

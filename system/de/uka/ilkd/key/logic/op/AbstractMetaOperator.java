@@ -71,6 +71,14 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     
     public static final AbstractMetaOperator META_AT_REENTRANT_SCOPE = new AtReentrantScope();
     
+    public static final AbstractMetaOperator META_CONSUMED_AT_PRE = new ConsumedAtPre();
+    
+    public static final AbstractMetaOperator META_WS_AT_PRE = new WSAtPre();
+    
+    public static final AbstractMetaOperator META_CONSUMED_LOOP_UPDATE = new ConsumedLoopUpdate();
+    
+    public static final AbstractMetaOperator META_CONSUMED_LOOP_INVARIANT = new ConsumedLoopInvariants();
+    
     public static final AbstractMetaOperator META_EXTERNALLY_CONSTRUCTED_SCOPE = new ExternallyConstructedScope();
     
     public static final AbstractMetaOperator META_STACK_AT_INDEX = new StackAtIndex();

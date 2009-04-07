@@ -97,11 +97,7 @@ public interface LoopInvariant {
             /*inout*/Map<Operator, Function/* (atPre)*/> atPreFunctions,
             Services services);
     
-    public ListOfTerm getWorkingSpaceParameters(Term selfTerm, 
-            /*inout*/Map<Operator, Function/* (atPre)*/> atPreFunctions,
-            Services services);
-    
-    public ListOfTerm getParametrizedWorkingSpaceTerms(Term selfTerm, 
+    public Term getParametrizedWorkingSpaceTerms(Term selfTerm, 
             /*inout*/Map<Operator, Function/* (atPre)*/> atPreFunctions,
             Services services);
     

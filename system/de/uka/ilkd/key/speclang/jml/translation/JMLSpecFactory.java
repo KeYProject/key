@@ -638,21 +638,13 @@ public class JMLSpecFactory {
             }
         }
         
-        ListOfTerm wsParams = SLListOfTerm.EMPTY_LIST;
-        ListOfTerm parametrizedWS = SLListOfTerm.EMPTY_LIST;
+        Term parametrizedWS = TB.tt();
         for(PositionedString expr : originalParametrizedWorkingspace) {
             String s = expr.toString();
             String param = s.substring(s.indexOf("{")+1, s.indexOf("}"));
             String ws = s.substring(s.indexOf("}")+1);
-            FormulaWithAxioms translatedParam 
-                = translator.translateExpression(
-                                        new PositionedString(param, expr.fileName, expr.pos), 
-                                        programMethod.getContainerType(),
-                                        selfVar, 
-                                        paramVars, 
-                                        null, 
-                                        null,
-                                        atPreFunctions);
+            // HACK
+            ws = param.trim() +".consumed  <"+ ws;
             FormulaWithAxioms translatedWS
             = translator.translateExpression(
                                     new PositionedString(ws, expr.fileName, expr.pos), 
@@ -663,9 +655,7 @@ public class JMLSpecFactory {
                                     null,
                                     atPreFunctions);
             assert translatedWS.getAxioms().isEmpty();
-            assert translatedParam.getAxioms().isEmpty();
-            wsParams = wsParams.append(translatedParam.getFormula());
-            parametrizedWS = parametrizedWS.append(translatedWS.getFormula());
+            parametrizedWS = TB.and(translatedWS.getFormula(), parametrizedWS);
         }
         
         //translate skolem declarations
@@ -699,48 +689,45 @@ public class JMLSpecFactory {
         }
         
         Term workingSpaceLocal = null;
-        if(originalWorkingSpaceLocal!=null){
-            FormulaWithAxioms translated 
-                = translator.translateExpression(
-                        originalWorkingSpaceLocal,
-                        programMethod.getContainerType(),
-                        selfVar,
-                        paramVars,
-                        null,
-                        null,
-                        atPreFunctions);
-            assert translated.getAxioms().isEmpty();
-            workingSpaceLocal = translated.getFormula(); 
-        }
-        
+        if(originalWorkingSpaceLocal == null)
+            originalWorkingSpaceLocal = new PositionedString("0;");
+        FormulaWithAxioms translated = translator.translateExpression(
+                originalWorkingSpaceLocal,
+                programMethod.getContainerType(),
+                selfVar,
+                paramVars,
+                null,
+                null,
+                atPreFunctions);
+        assert translated.getAxioms().isEmpty();
+        workingSpaceLocal = translated.getFormula(); 
+                
         Term workingSpaceConstructed = null;
-        if(originalWorkingSpaceConstructed!=null){
-            FormulaWithAxioms translated 
-                = translator.translateExpression(
-                        originalWorkingSpaceConstructed,
-                        programMethod.getContainerType(),
-                        selfVar,
-                        paramVars,
-                        null,
-                        null,
-                        atPreFunctions);
-            workingSpaceConstructed = translated.getFormula(); 
-        }
+        if(originalWorkingSpaceConstructed == null)
+            originalWorkingSpaceConstructed = new PositionedString("0;");
+        translated = translator.translateExpression(
+                originalWorkingSpaceConstructed,
+                programMethod.getContainerType(),
+                selfVar,
+                paramVars,
+                null,
+                null,
+                atPreFunctions);
+        workingSpaceConstructed = translated.getFormula(); 
         
         Term workingSpaceReentrant = null;
-        if(originalWorkingSpaceConstructed!=null){
-            FormulaWithAxioms translated 
-                = translator.translateExpression(
-                        originalWorkingSpaceReentrant,
-                        programMethod.getContainerType(),
-                        selfVar,
-                        paramVars,
-                        null,
-                        null,
-                        atPreFunctions);
-            workingSpaceReentrant = translated.getFormula(); 
-        }
-        
+        if(originalWorkingSpaceReentrant == null)
+            originalWorkingSpaceReentrant = new PositionedString("0;");
+        translated = translator.translateExpression(
+                originalWorkingSpaceReentrant,
+                programMethod.getContainerType(),
+                selfVar,
+                paramVars,
+                null,
+                null,
+                atPreFunctions);
+        workingSpaceReentrant = translated.getFormula(); 
+                
         //translate assignable
         SetOfLocationDescriptor assignable;
         /*        Term imCons=null;
@@ -754,13 +741,13 @@ public class JMLSpecFactory {
         } else {
             assignable = SetAsListOfLocationDescriptor.EMPTY_SET;
             for(PositionedString expr : originalAssignable) {
-                SetOfLocationDescriptor translated 
+                SetOfLocationDescriptor translatedL 
                     = translator.translateAssignableExpression(
                                         expr, 
                                         programMethod.getContainerType(),
                                         selfVar, 
                                         paramVars);
-                assignable = assignable.union(translated);        
+                assignable = assignable.union(translatedL);        
             }
 //            if(imCons!=null) assignable = assignable.add(new BasicLocationDescriptor(imCons));
         }
@@ -770,7 +757,7 @@ public class JMLSpecFactory {
         if(originalVariant == null) {
             variant = null;
         } else {
-            FormulaWithAxioms translated 
+            translated 
                 = translator.translateExpression(
                                         originalVariant,
                                         programMethod.getContainerType(),
@@ -791,7 +778,6 @@ public class JMLSpecFactory {
                                      assignable,
                                      variant,
                                      parametrizedWS,
-                                     wsParams,
                                      workingSpaceLocal,
                                      workingSpaceConstructed,
                                      workingSpaceReentrant,

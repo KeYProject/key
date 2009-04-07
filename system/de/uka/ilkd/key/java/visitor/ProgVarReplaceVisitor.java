@@ -308,13 +308,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                                     atPreFunctions, 
                                                     services));
         
-        ListOfTerm newWSParams
-            = replaceVariablesInTerms(inv.getWorkingSpaceParameters(selfTerm, 
-                    atPreFunctions, 
-                    services));
-        
-        ListOfTerm newParametrizedWS
-            = replaceVariablesInTerms(inv.getParametrizedWorkingSpaceTerms(selfTerm, 
+        Term newParametrizedWS
+            = replaceVariablesInTerm(inv.getParametrizedWorkingSpaceTerms(selfTerm, 
                     atPreFunctions, 
                     services));
         
@@ -340,7 +335,6 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                     newModifies, 
                                     newVariant, 
                                     newParametrizedWS,
-                                    newWSParams,
                                     newWorkingSpaceLocal,
                                     newWorkingSpaceConstructed,
                                     newWorkingSpaceReentrant,

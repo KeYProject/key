@@ -28,7 +28,16 @@ public class List{
       @*/
     public @ExternallyConstructedScope void testList(Object o){
 	List l = new@<localScope> List();
-	l.add(o);
+	int i=0;
+	/*@ loop_invariant i>=0;
+	  @ assignable l.tail, l.head, \object_creation(Node);
+	  @ decreases 100-i;
+	  @ working_space_single_iteration_param {\reentrantScope(l)} \space(Node);
+	  @*/
+	while(i<100){
+	    l.add(o);
+	    i++;
+	}
     }
 
 }

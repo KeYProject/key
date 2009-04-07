@@ -81,6 +81,9 @@ public abstract class SchemaVariableModifierSet {
         protected boolean strictEnabled () {
             return true;
         }
+        protected boolean listEnabled () {
+            return true;
+        }
     }
 
     public static class FormulaSV extends SchemaVariableModifierSet {

@@ -161,7 +161,7 @@ public class LoopInvariantProposer implements InstantiationProposer {
                                    SchemaVariable var, 
                                    Services services) {
         Object inst = null;
-        if (app instanceof PosTacletApp 
+        if (app instanceof PosTacletApp
             && inLoopInvariantRuleSet(app.taclet())) {
             final PosInOccurrence pos = ((PosTacletApp) app).posInOccurrence();
             final LoopInvariant inv = getLoopInvariant(pos.subTerm(), services);
@@ -197,6 +197,9 @@ public class LoopInvariantProposer implements InstantiationProposer {
                     locs = locs.add(heap).add(cons);
                 }
                 inst = locs;
+            } else if(varName.equals("ws")){ 
+                inst = inv.getParametrizedWorkingSpaceTerms(selfTerm, atPreFunctions, services);
+                System.out.println("inst ws: "+inst);
             } else if(varName.equals("variant")) {
                 assert var.isTermSV();
                 inst = inv.getVariant(selfTerm, atPreFunctions, services);

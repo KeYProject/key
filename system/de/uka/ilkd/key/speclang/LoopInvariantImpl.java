@@ -34,8 +34,7 @@ public class LoopInvariantImpl implements LoopInvariant {
     private final Term originalWorkingSpaceLocal;
     private final Term originalWorkingSpaceReentrant;
     private final Term originalWorkingSpaceConstructed;
-    private final ListOfTerm originalParametrizedWorkingSpaceTerms;
-    private final ListOfTerm originalWorkingSpaceParameters;
+    private final Term originalParametrizedWorkingSpaceTerms;
     private final SetOfTerm originalPredicates;
     private final SetOfLocationDescriptor originalModifies;
     private final Term originalVariant;
@@ -65,8 +64,7 @@ public class LoopInvariantImpl implements LoopInvariant {
                              SetOfTerm predicates,
                              SetOfLocationDescriptor modifies,  
                              Term variant, 
-                             ListOfTerm parametrizedWorkingSpaceTerms,
-                             ListOfTerm workingSpaceParameters,
+                             Term parametrizedWorkingSpaceTerms,
                              Term workingSpaceLocal,
                              Term workingSpaceConstructed,
                              Term workingSpaceReentrant,
@@ -82,7 +80,6 @@ public class LoopInvariantImpl implements LoopInvariant {
         this.originalPredicates         = predicates;
         this.originalVariant            = variant;
         this.originalParametrizedWorkingSpaceTerms = parametrizedWorkingSpaceTerms;
-        this.originalWorkingSpaceParameters     = workingSpaceParameters;
         this.originalWorkingSpaceLocal  = workingSpaceLocal;
         this.originalWorkingSpaceConstructed = workingSpaceConstructed;
         this.originalWorkingSpaceReentrant = workingSpaceReentrant;
@@ -103,7 +100,6 @@ public class LoopInvariantImpl implements LoopInvariant {
              SetAsListOfTerm.EMPTY_SET, 
              SetAsListOfLocationDescriptor.EMPTY_SET, 
              null, 
-             null,
              null,
              null,
              null,
@@ -270,16 +266,7 @@ public class LoopInvariantImpl implements LoopInvariant {
         return or.replace(originalWorkingSpaceLocal);   
     }
     
-    public ListOfTerm getWorkingSpaceParameters(Term selfTerm, 
-            /*inout*/Map<Operator, Function/* (atPre)*/> atPreFunctions,
-            Services services){
-        assert (selfTerm == null) == (originalSelfTerm == null);
-        Map replaceMap = getReplaceMap(selfTerm, null, atPreFunctions, services);
-        OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(originalWorkingSpaceParameters);
-    }
-    
-    public ListOfTerm getParametrizedWorkingSpaceTerms(Term selfTerm, 
+    public Term getParametrizedWorkingSpaceTerms(Term selfTerm, 
             /*inout*/Map<Operator, Function/* (atPre)*/> atPreFunctions,
             Services services){
         assert (selfTerm == null) == (originalSelfTerm == null);
@@ -333,7 +320,6 @@ public class LoopInvariantImpl implements LoopInvariant {
                                      originalModifies,
                                      originalVariant,
                                      originalParametrizedWorkingSpaceTerms,
-                                     originalWorkingSpaceParameters,
                                      originalWorkingSpaceLocal,
                                      originalWorkingSpaceConstructed,
                                      originalWorkingSpaceReentrant,
@@ -357,7 +343,6 @@ public class LoopInvariantImpl implements LoopInvariant {
                                      originalModifies, 
                                      originalVariant,
                                      originalParametrizedWorkingSpaceTerms,
-                                     originalWorkingSpaceParameters,
                                      originalWorkingSpaceLocal,
                                      originalWorkingSpaceConstructed,
                                      originalWorkingSpaceReentrant,
@@ -381,7 +366,6 @@ public class LoopInvariantImpl implements LoopInvariant {
                                      originalModifies,
                                      originalVariant,
                                      originalParametrizedWorkingSpaceTerms,
-                                     originalWorkingSpaceParameters,
                                      originalWorkingSpaceLocal,
                                      originalWorkingSpaceConstructed,
                                      originalWorkingSpaceReentrant,
@@ -399,7 +383,6 @@ public class LoopInvariantImpl implements LoopInvariant {
                                      originalModifies,
                                      originalVariant,
                                      originalParametrizedWorkingSpaceTerms,
-                                     originalWorkingSpaceParameters,
                                      originalWorkingSpaceLocal,
                                      originalWorkingSpaceConstructed,
                                      originalWorkingSpaceReentrant,

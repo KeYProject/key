@@ -98,10 +98,8 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
                     = inv.getVariant(selfTerm, atPreFunctions, services);
                 Term newWorkingSpace
                     = inv.getWorkingSpace(selfTerm, atPreFunctions, services);
-                ListOfTerm newParametrizedWS
+                Term newParametrizedWS
                     = inv.getParametrizedWorkingSpaceTerms(selfTerm, atPreFunctions, services);
-                ListOfTerm newWSParams
-                    = inv.getWorkingSpaceParameters(selfTerm, atPreFunctions, services);
                 Term newWorkingSpaceConstructed
                     = inv.getWorkingSpaceConstructed(selfTerm, atPreFunctions, services);
                 Term newWorkingSpaceReentrant
@@ -116,7 +114,6 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
                                             newModifies, 
                                             newVariant, 
                                             newParametrizedWS,
-                                            newWSParams,
                                             newWorkingSpace,
                                             newWorkingSpaceConstructed,
                                             newWorkingSpaceReentrant,
