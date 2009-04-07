@@ -5,14 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
-//
 //
 
 package de.uka.ilkd.key.speclang.translation;
@@ -54,7 +46,6 @@ public abstract class SLResolverManager {
                                 ParsableVariable selfVar,
                                 boolean useLocalVarsAsImplicitReceivers) {
         assert excManager != null;
-        assert specInClass != null;
         this.excManager = excManager;
         this.specInClass = specInClass;
         this.selfVar = selfVar;
@@ -134,11 +125,14 @@ public abstract class SLResolverManager {
         
         // the class where the specification is written can be an implicit type receiver
         // (e.g. for static attributes or static methods)
-        SLExpression result = resolveExplicit(createSLExpression(specInClass),
-                                              name,
-                                              parameters);
-        if(result != null) {
-            return result;
+	if(specInClass != null) {
+	    SLExpression result 
+		= resolveExplicit(createSLExpression(specInClass),
+                                  name,
+                                  parameters);
+            if(result != null) {
+            	return result;
+            }
         }
 
         return null;
