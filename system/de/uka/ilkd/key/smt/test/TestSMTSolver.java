@@ -25,17 +25,13 @@ public abstract class TestSMTSolver extends TestCase {
     private SMTSolver solver;
     
     private HelperClassForTests helper;
-
-    
-    boolean toolNotInstalled = false;
-    
+   
     public static final String testFile = System.getProperty("key.home")
     + File.separator + "examples"
     + File.separator + "_testcase"
     + File.separator + "smt"
     + File.separator;
 
-    
     protected void setUp() {
 	solver = this.getSolver();
 	helper = new HelperClassForTests();
@@ -46,6 +42,11 @@ public abstract class TestSMTSolver extends TestCase {
      * @return the solver to be tested.
      */
     public abstract SMTSolver getSolver();
+
+    protected abstract boolean toolNotInstalled();
+
+    protected abstract void setToolNotInstalled(boolean b);
+
     
     public void testAndnot() {
 	Assert.assertTrue(correctResult(testFile + "andnot.key", false));
@@ -140,7 +141,7 @@ public abstract class TestSMTSolver extends TestCase {
     }
     
     private boolean correctResult(String filepath, boolean isValid) {
-	if (toolNotInstalled) {
+	if (toolNotInstalled()) {
 	    return true;
 	}
 	
@@ -149,11 +150,12 @@ public abstract class TestSMTSolver extends TestCase {
 	try {
 	    result = checkFile(filepath);
 	} catch (RuntimeException e) {
-	    System.out.println();
-	    System.out.println("Error while execution of " + this.getSolver().name());
-	    System.out.println();
-	    e.printStackTrace();
-	    toolNotInstalled = true;
+	    //System.out.println();
+	    System.out.println("Warning: " + this.getSolver().name() 
+                               + " not found, skipped.");
+	    //System.out.println();
+	    //e.printStackTrace();
+	    setToolNotInstalled(true);
 	    return true;
 	}
 	
