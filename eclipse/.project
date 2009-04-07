@@ -19,9 +19,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>KeYExternalLibraries</name>
+			<name>key_lib</name>
 			<type>2</type>
-			<locationURI>KeYExternalLibraries</locationURI>
+			<locationURI>key_lib</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

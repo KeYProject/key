@@ -43,7 +43,7 @@ import visualdebugger.draw2d.*;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.decproc.DecProcRunner;
+import de.uka.ilkd.key.smt.DecProcRunner;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.visualdebugger.DebuggerEvent;
