@@ -29,8 +29,8 @@ public class LogFile {
 
 
     /*@ public normal_behavior
-      @    name "Contract for addRecord";
       @    requires balance >= 0;
+      @    name "Contract for addRecord";      
       @    assignable currentRecord, logArray[*].transactionId, 
       @               logArray[*].balance, logArray[*].empty, 
       @               LogRecord.transactionCounter;
@@ -47,7 +47,7 @@ public class LogFile {
 
     /*@ public normal_behavior
       @    ensures (\forall int i; 0 <= i && i<logArray.length;
-      @             logArray[i].balance <= \result.balance);      
+      @             logArray[i].balance <= \result.balance);
       @ */
     public /*@pure@*/ LogRecord getMaximumRecord(){
 	LogRecord max = logArray[0];
