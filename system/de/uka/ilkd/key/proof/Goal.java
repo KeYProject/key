@@ -782,7 +782,7 @@ public class Goal  {
 	    ruleAppListenerList.add(p);
 	}
     }
-
+    
     public static void removeRuleAppListener(RuleAppListener p) { 
 	synchronized(ruleAppListenerList) {	
 	    ruleAppListenerList.remove(p);

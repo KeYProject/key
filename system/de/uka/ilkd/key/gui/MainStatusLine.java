@@ -102,6 +102,7 @@ class MainStatusLine extends JPanel {
      */
     public void setProgress(int value){
 	progressBar.setValue(value);
+	progressBar.paintImmediately(0, 0, progressBar.getWidth(), progressBar.getHeight());
     }
 
     /**

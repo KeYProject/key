@@ -81,6 +81,13 @@ public class TestKey extends TestCase {
         de.uka.ilkd.key.speclang.ocl.translation.TestOCLTranslator.class,
         de.uka.ilkd.key.speclang.jml.pretranslation.TestJMLPreTranslator.class
       };
+     
+      static Class[] smtTests = new Class[] {
+	  de.uka.ilkd.key.smt.test.TestSimplify.class,
+	  de.uka.ilkd.key.smt.test.TestZ3.class,
+	  de.uka.ilkd.key.smt.test.TestYices.class,
+	  de.uka.ilkd.key.smt.test.TestExecutionWatchDog.class
+      };
 
      
      public static TestSuite createSuite(Class[] testClasses, final String msg) {
@@ -111,6 +118,7 @@ public class TestKey extends TestCase {
 	suite.addTest(createSuite(javaTests, "Testing Java Datastructures"));
 	suite.addTest(createSuite(logicModelTests, "Testing Logic Engine"));
         suite.addTest(createSuite(speclangTests, "Testing JML/OCL support"));
+        suite.addTest(createSuite(smtTests, "Testing integration of external SMT solvers"));
         
 	return suite;
     }

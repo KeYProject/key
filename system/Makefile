@@ -175,7 +175,6 @@ GENERATED_LISTS=logic/SLListOfTerm \
 	proof/proofevent/SLListOfNodeChangesHolder \
 	proof/incclosure/SLListOfSink \
 	proof/SLListOfProof \
-        proof/decproc/translation/SLListOfIOperatorTranslation \
 	logic/sort/SLListOfGenericSort \
 	rule/inst/SLListOfGenericSortCondition \
 	logic/op/SLListOfSortDependingSymbol \

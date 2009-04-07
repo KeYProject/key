@@ -7,7 +7,8 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.unittest.simplify;
 
-import de.uka.ilkd.key.proof.decproc.*;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.unittest.simplify.ast.*;
 import de.uka.ilkd.key.unittest.*;
 import de.uka.ilkd.key.java.Services;
@@ -15,6 +16,7 @@ import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.parser.simplify.*;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Term;
 
 
 import java.io.StringReader;
@@ -37,8 +39,22 @@ public class SimplifyModelGenerator implements DecProdModelGenerator{
     // time
     private HashSet simplifyOutputs;
     private ListOfString placeHoldersForClasses = SLListOfString.EMPTY_LIST;
+    
+    
+    private static Term toFormula(Sequent s) {
+	TermBuilder tb = TermBuilder.DF;
+	Term ante = tb.tt();
+	for(ConstrainedFormula cf : s.antecedent()) {
+	    ante = tb.and(ante, cf.formula());
+	}
+	Term succ = tb.ff();
+	for(ConstrainedFormula cf : s.succedent()) {
+	    succ = tb.or(succ, cf.formula());
+	}
+	return tb.imp(ante, succ);
+    }
 
-    public SimplifyModelGenerator(DecisionProcedureSimplify dps, 
+    public SimplifyModelGenerator(Node node, 
 				  Services serv,
 				  HashMap term2class,
 				  SetOfTerm locations){
@@ -46,20 +62,24 @@ public class SimplifyModelGenerator implements DecProdModelGenerator{
 	this.serv = serv;
 	this.term2class = term2class;
 	
-	DecisionProcedureResult res = dps.run(true);
-	initialCounterExample = res.getText();
+	SMTSolver simplify = new SimplifySolver();
+	SMTSolverResult res = simplify.run(toFormula(node.sequent()), 60, serv);
+	
+	
+	initialCounterExample = res.text();
 	this.simplifyOutputs = new HashSet();
 	string2class = new HashMap();
 	IteratorOfTerm it = locations.iterator();
-	Vector v = new Vector();
-	SimplifyTranslation st = (SimplifyTranslation) res.getTranslation();
+	
+	SMTTranslator st = simplify.getTranslator(serv);
+
 	try{
 	    while(it.hasNext()){
 		de.uka.ilkd.key.logic.Term t = it.next();
-		String s = st.translate(t, v).toString();
+		String s = st.translate(t, serv).toString();
 		string2class.put(s, term2class.get(t));
 	    }
-	}catch(SimplifyException e){
+	}catch(IllegalFormulaException e){
 	    System.err.println(e);
 	}
 	intClasses = new HashSet();
@@ -76,12 +96,12 @@ public class SimplifyModelGenerator implements DecProdModelGenerator{
 		    intClasses.add(ec);
 		    de.uka.ilkd.key.logic.Term loc = 
 			ec.getLocations().iterator().next();
-		    String eq = "(EQ "+ph+" "+st.translate(loc,v)+")\n";
+		    String eq = "(EQ "+ph+" "+st.translate(loc,serv)+")\n";
 		    initialCounterExample = 
 			initialCounterExample.substring(0, index)+eq+
 			initialCounterExample.substring(index);
 		}
-	    }catch(SimplifyException e){
+	    }catch(IllegalFormulaException e){
 		System.err.println(e);
 	    }
 	}
@@ -198,8 +218,7 @@ public class SimplifyModelGenerator implements DecProdModelGenerator{
 	
     private String simplify(Conjunction c){
 	try{
-	    return DecisionProcedureSimplify.
-		execute("(NOT "+c.toSimplify()+")");
+	    return new SimplifySolver().run("(NOT "+c.toSimplify()+")", 60, serv).text();
 	}catch(Exception e){
 	    throw new RuntimeException(e);
 	}
