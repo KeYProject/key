@@ -9,19 +9,15 @@
 //
 package de.uka.ilkd.key.gui;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Properties;
+import java.util.*;
 
 import de.uka.ilkd.key.gui.configuration.Settings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
+import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.smt.SimplifySolver;
-import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.YicesSolver;
 import de.uka.ilkd.key.smt.Z3Solver;
-import de.uka.ilkd.key.unittest.ModelGenerator;
 
 /** This class encapsulates the information which 
  *  decision procedure should be used.
@@ -33,24 +29,31 @@ public class DecisionProcedureSettings implements Settings {
     
     private static final String TIMEOUT="[DecisionProcedure]Timeout";
     
-    /** String used in the Settings to store the available rules */
-    //private static final String AVAILABLE_RULES  = "[DecisionProcedure]AvailableRules";
-    
     /** the list of registered SettingListener */
     private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
 
     /** the list of available SMTRules */
     private ArrayList<SMTRule> rules = new ArrayList<SMTRule>();
+    {
+	//Load the available Solver
+	// Rules should not be created here! USe Profiles for this purpose %%RB
+	rules = new ArrayList<SMTRule>();
+	rules.add(new SMTRule(new SimplifySolver()));
+	rules.add(new SMTRule(new Z3Solver()));
+	rules.add(new SMTRule(new YicesSolver()));
+		
+    }
     
     /** the currently active rule */
-    int activeRule = -1;
+    private SMTRule activeRule;
     
-    int timeout = 60;
+    
+    private int timeout = 60;
     
     private static DecisionProcedureSettings instance;
     
     /**
-     * This is a singelton.
+     * This is a singleton.
      */
     private DecisionProcedureSettings() {
 	super();
@@ -64,59 +67,54 @@ public class DecisionProcedureSettings implements Settings {
 	return instance;
     }
     
+    
     /**
-     * Get the names of all available active rules
+     * Returns a list of all available rules
      */
-    public ArrayList<String> getAvailableRules() {
-	ArrayList<String> toReturn = new ArrayList<String>();
-	for (SMTRule r : this.rules) {
-	    toReturn.add(r.displayName());
-	}
-	return toReturn;
+    public List<SMTRule> getAvailableRules() {
+	return Collections.unmodifiableList(rules);
     }
     
     /**
-     * get the index of the currently active rule
+     * returns the active rule
+     * @return the active rule
      */
-    public int getActiveRuleIndex() {
-	if (this.rules.size() == 0) {
-	    this.activeRule = -1;
-	} else if (this.activeRule < 0 || this.activeRule >= this.rules.size()) {
-	    this.activeRule = 0;
-	    this.fireSettingsChanged();
-	}
-	return this.activeRule;
-    }
-    
     public SMTRule getActiveRule() {
-	if (this.activeRule < 0 || this.activeRule >= this.rules.size()) {
-	    return null;
-	} else {
-	    return this.rules.get(this.activeRule);
-	}
+	return activeRule;
     }
     
     /**
-     * Set the active Rule
+     * if the specified rule is known it is set as active rule, specifying <code>null</code>
+     * deactivatees the rule. Otherwise false is returned. 
+     * @param r the Rule to be used for external prover invocation
      */
-    public void setActiveRule(int ar) {
-	if (0 <= ar && ar < this.rules.size()) {
-	    this.activeRule = ar;
-	    this.fireSettingsChanged();
-	} else {
-	    //use 0 as default
-	    this.activeRule = 0;
-	    this.fireSettingsChanged();
+    public boolean setActiveRule(Rule r) {
+	if (rules.contains(r)) {
+	    if (r != activeRule) {
+		this.activeRule = (SMTRule) r;
+		fireSettingsChanged();
+	    }
+	    return true;
 	}
+	return false;
     }
     
+    /**
+     * sets the timeout until an external prover is terminated
+     * @param t the timeout in seconds
+     */
     public void setTimeout(int t) {
-	if (t > 0) {
+	if (t > 0 && t != timeout) {
 	    this.timeout = t;
 	    this.fireSettingsChanged();
 	}
     }
     
+    /**
+     * returns the timeout specifying the maximal amount of time an external prover
+     * is run
+     * @return the timeout in seconds
+     */
     public int getTimeout() {
 	return this.timeout;
     }
@@ -134,19 +132,12 @@ public class DecisionProcedureSettings implements Settings {
      * represents the stored settings
      */
     public void readSettings(Properties props) {
-	//Load the available Solver
-	rules = new ArrayList<SMTRule>();
-	rules.add(new SMTRule(new SimplifySolver()));
-	rules.add(new SMTRule(new Z3Solver()));
-	rules.add(new SMTRule(new YicesSolver()));
-		
+	
 	String ruleString = props.getProperty(ACTIVE_RULE);
-	this.activeRule = -1;
+	this.activeRule = null;
+	
 	if(ruleString != null) {
-	    int curr = Integer.parseInt(ruleString);
-	    if (curr >= 0 && curr < rules.size()) {
-		this.activeRule = curr;
-	    }
+	    this.activeRule = findRuleByName(ruleString);
 	}
 	
 	String timeoutstring = props.getProperty(TIMEOUT);
@@ -159,13 +150,29 @@ public class DecisionProcedureSettings implements Settings {
     }
 
 
+    /**
+     * retrieves the rule of the specified name or returns <code>null</code> if
+     * no such rule exists
+     * @param ruleName the String unambiguously specifying a rule 
+     * @return the found SMTRule or <code>null</code> 
+     */
+    public SMTRule findRuleByName(String ruleName) {
+	for (SMTRule r : rules) {	    
+	    if (r.name().toString().equals(ruleName)) {
+		return r;
+	    }
+	}
+	return null;
+    }
+
     /** implements the method required by the Settings interface. The
      * settings are written to the given Properties object. Only entries of the form 
      * <key> = <value> (,<value>)* are allowed.
      * @param props the Properties object where to write the settings as (key, value) pair
      */
     public void writeSettings(Properties props) {
-        props.setProperty(ACTIVE_RULE, "" + this.activeRule);
+        props.setProperty(ACTIVE_RULE, "" + (activeRule == null ? "N/A" : 
+            activeRule.name()));
         props.setProperty(TIMEOUT, "" + this.timeout);
     }
     
@@ -187,6 +194,14 @@ public class DecisionProcedureSettings implements Settings {
      */
     public void addSettingsListener(SettingsListener l) {
         listenerList.add(l);
+    }
+
+    /**
+     * removes the specified listener form the listener list
+     * @param l the listener
+     */
+    public void removeSettingsListener(SettingsListener l) {
+	listenerList.remove(l);
     }
 
 }

@@ -193,14 +193,6 @@ public class KeYMediator {
 	    return getProof ().getMetavariableDeliverer ();
     }
 
-//     /** returns the proof settings
-//      * @return  the proof settings
-//      */
-//     public ProofSettings proofSettings() {
-// 	return proofSettings;
-//     }
-   
-
     /** simplified user interface? */
     public boolean stupidMode() {
        return stupidMode;
@@ -1088,8 +1080,6 @@ public class KeYMediator {
 	 */ 
 	public void selectedProofChanged(KeYSelectionEvent e) {
 	    setProof(e.getSource().getSelectedProof());
-	    //should be obsolete...
-	    //ProofSettings.DEFAULT_SETTINGS.setLDTSettings(proof.getLDTSettings());
 	}
 	
     }
@@ -1140,6 +1130,8 @@ public class KeYMediator {
        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
     }
 
+    
+    
     /** 
      * returns the prover task listener of the main frame
      */
