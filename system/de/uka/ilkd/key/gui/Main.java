@@ -635,8 +635,7 @@ public class Main extends JFrame implements IMain {
     private JButton createDecisionProcedureButton() {	
 	decisionProcedureInvocationButton = new JButton();	
 	RuleDescriptor r = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveRule();
-	decisionProcedureInvocationButton.setAction(new DPInvokeAction(r != null ? r.getRuleName() : null, 
-		r != null ? r.getDisplayName() : null));
+	decisionProcedureInvocationButton.setAction(new DPInvokeAction(r));
 	return decisionProcedureInvocationButton;
     }
 
@@ -1508,7 +1507,7 @@ public class Main extends JFrame implements IMain {
 	final DecisionProcedureSettings dps = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings();
 	for (RuleDescriptor r : dps.getAvailableRules()) {
 	    final JRadioButtonMenuItem b = new JRadioButtonMenuItem();
-	    b.setAction(new DPSelectionAction(r.getRuleName(), b));
+	    b.setAction(new DPSelectionAction(r, b));
 	    decisionProcedureOption.add(b);
 	    dpButtonGroup.add(b);
 	}
@@ -1964,17 +1963,11 @@ public class Main extends JFrame implements IMain {
 	
 	public void update() {	   
 	    if (settings != null) {
-		RuleDescriptor activeRule = settings.getActiveRule();
-		
-		if (activeRule == null) {
-		    decisionProcedureInvocationButton.
-		    	setAction(new DPInvokeAction(null, null));
-		} else {
-		    decisionProcedureInvocationButton.
-		    	setAction(new DPInvokeAction(activeRule.getRuleName(), 
-			    activeRule.getDisplayName()));
-		    ruletimeoutlabel.setText("timeout: " + settings.getTimeout() + " s");
-		}
+		RuleDescriptor activeRule = settings.getActiveRule();				
+		decisionProcedureInvocationButton.
+		setAction(new DPInvokeAction(activeRule));
+		ruletimeoutlabel.setText("timeout: " + settings.getTimeout() + " s");
+
 	    } else {
 		assert false;
 	    }
@@ -2464,7 +2457,7 @@ public class Main extends JFrame implements IMain {
     
     public static void evaluateOptions(String[] opt) {
 	int index = 0;
-	ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());  
+	ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());
 	while (opt.length > index) {	    
 	    if ((new File(opt[index])).exists()) {
 		fileNameOnStartUp=opt[index];
@@ -2553,7 +2546,7 @@ public class Main extends JFrame implements IMain {
 	    System.out.println("Using assertions ...");	   
 	} else {
 	    System.out.println("Not using assertions ...");	   
-	}       
+	}
     }
 
     private static void printUsageAndExit() {
@@ -2866,25 +2859,26 @@ public class Main extends JFrame implements IMain {
      */
     private final class DPInvokeAction extends AbstractAction {
 
-	private final Name decisionProcedureName;
+	private final RuleDescriptor decisionProcedure;
 	
-	public DPInvokeAction(Name decisionProcedure, String dpDisplayname) {
-	    this.decisionProcedureName = decisionProcedure;
+	public DPInvokeAction(RuleDescriptor decisionProcedure) {
+	    assert decisionProcedure != null;
+	    this.decisionProcedure = decisionProcedure;
 
 	    putValue(SMALL_ICON, IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));	    
-	    
-	    if (this.decisionProcedureName != null) {
-		putValue(NAME, dpDisplayname);
-		putValue(SHORT_DESCRIPTION, "Invokes " + dpDisplayname);
-	    } else {
-		putValue(NAME, "N/A");
+	  
+	    putValue(NAME, decisionProcedure.getDisplayName());
+		
+	    if (!DecisionProcedureSettings.NOT_A_RULE.equals(decisionProcedure)) {
+		putValue(SHORT_DESCRIPTION, "Invokes " + decisionProcedure.getDisplayName());
+	    } else {		
 		putValue(SHORT_DESCRIPTION, "No supported external prover (SMT/Simplify) installed.");
 	    }
 	    
 	}
 	
 	public boolean isEnabled() {
-	    return super.isEnabled() && decisionProcedureName != null && 
+	    return super.isEnabled() && 
 	      mediator != null && mediator.getProof() != null && !mediator.getProof().closed();
 	}
 	  
@@ -2903,33 +2897,27 @@ public class Main extends JFrame implements IMain {
      * updates the decision procedure settings of the current proof settings. 
      */
     private final class DPSelectionAction extends AbstractAction {
-	private final Name decisionProcedure;
+	private final RuleDescriptor decisionProcedure;
 	// currently necessary as property SELECTED_KEY support first since JDK >= 1.6
 	private final JRadioButtonMenuItem radioButton;
 	
 
-	public DPSelectionAction(Name decisionProcedure, JRadioButtonMenuItem radioButton) {	    
+	public DPSelectionAction(RuleDescriptor decisionProcedure, JRadioButtonMenuItem radioButton) {	    
 	    this.decisionProcedure = decisionProcedure;
 	    this.radioButton = radioButton;
-	    
-	    final RuleDescriptor decProcRule = decisionProcedure == null ? null : getCurrentDPSettings().
-	    	findRuleByName(decisionProcedure.toString());
-	  
+	   	  
 	    final RuleDescriptor activeRule = getCurrentDPSettings().getActiveRule();
 	    
-	    if (activeRule == null && decisionProcedure == null) {
-		radioButton.setSelected(true);
-	    } else if (activeRule != null && activeRule.equals(decisionProcedure)) {
+	    if (activeRule.equals(decisionProcedure)) {
 		radioButton.setSelected(true);
 	    }
 
 	    putValue(SMALL_ICON, IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));	    
 
-	    if (decProcRule != null) {
-		putValue(NAME, decProcRule.getDisplayName());
-		putValue(SHORT_DESCRIPTION, "Use '" + decProcRule.getDisplayName() + "' as external prover.");
+	    putValue(NAME, decisionProcedure.getDisplayName());
+	    if (!decisionProcedure.equals(DecisionProcedureSettings.NOT_A_RULE)) {		
+		putValue(SHORT_DESCRIPTION, "Use '" + decisionProcedure.getDisplayName() + "' as external prover.");
 	    } else {
-		putValue(NAME, "None");
 		putValue(SHORT_DESCRIPTION, "Do not use any external prover.");
 	    }
 
@@ -2940,9 +2928,9 @@ public class Main extends JFrame implements IMain {
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-	    if (getCurrentDPSettings().setActiveRule(decisionProcedure)) {
-		radioButton.setSelected(true); // if we change to Java 6 delete radioButton and add here putValue(SELECTED_KEY, true)
-	    }
+	    getCurrentDPSettings().setActiveRule(decisionProcedure.getRuleName());
+	    radioButton.setSelected(true); // if we change to Java 6 delete radioButton and add here putValue(SELECTED_KEY, true)
+
 	}
 
 	private DecisionProcedureSettings getCurrentDPSettings() {

@@ -110,9 +110,9 @@ public class ProofSettings {
     
     
     public void setProfile(Profile profile) {
-        ensureInitialized();
         this.profile = profile;
         profile.updateSettings(this);
+        ensureInitialized();
     }
 
     public Profile getProfile() {                

@@ -23,10 +23,12 @@ import de.uka.ilkd.key.smt.SMTRule;
  */
 public class DecisionProcedureSettings implements Settings {
     
+    public static final RuleDescriptor NOT_A_RULE = 
+	    new RuleDescriptor(new Name("N/A"), "N/A");
     /**
      * Small data container wrapping name and display name of a rule     
      */
-    public class RuleDescriptor {
+    public static class RuleDescriptor {		
 	
 	private final Name ruleName;
 	private final String displayName;
@@ -42,6 +44,17 @@ public class DecisionProcedureSettings implements Settings {
 	public Name getRuleName() {
 	    return ruleName;
 	}
+	
+	public boolean equals(Object o) {
+	    if (o instanceof RuleDescriptor) {
+		return ((RuleDescriptor) o).ruleName.equals(ruleName);
+	    }
+	    return false;
+	}
+	
+	public String toString() {
+	    return ruleName + "(" + displayName + ")";
+	}
     }
     
     /** String used in the Settings to store the active rule */
@@ -56,7 +69,7 @@ public class DecisionProcedureSettings implements Settings {
     private ArrayList<RuleDescriptor> rules = new ArrayList<RuleDescriptor>();
     
     /** the currently active rule */
-    private RuleDescriptor activeRule;
+    private Name activeRule = NOT_A_RULE.getRuleName();
     
     private int timeout = 60;
     
@@ -88,7 +101,7 @@ public class DecisionProcedureSettings implements Settings {
 		return r;
 	    }
 	}
-	return null;
+	return NOT_A_RULE;
     }
     
     
@@ -107,7 +120,7 @@ public class DecisionProcedureSettings implements Settings {
      * @return the active rule
      */
     public RuleDescriptor getActiveRule() {
-	return activeRule;
+	return findRuleByName(activeRule.toString());
     }
     
     /**
@@ -130,14 +143,9 @@ public class DecisionProcedureSettings implements Settings {
      * steps in order to change this object in a way that it
      * represents the stored settings
      */
-    public void readSettings(Properties props) {
-	
+    public void readSettings(Properties props) {	
 	String ruleString = props.getProperty(ACTIVE_RULE);
-	this.activeRule = null;
-	
-	if(ruleString != null) {
-	    this.activeRule = findRuleByName(ruleString);
-	}
+	this.activeRule = new Name(ruleString);
 	
 	String timeoutstring = props.getProperty(TIMEOUT);
 	if (timeoutstring != null) {
@@ -157,21 +165,16 @@ public class DecisionProcedureSettings implements Settings {
     }
 
     /**
-     * if the specified rule is known it is set as active rule, specifying <code>null</code>
-     * deactivates the rule. Otherwise false is returned. 
-     * @param ruleName the Name of the rule to be used for external prover invocation
+     * if the specified rule is known it is set as active rule, otherwise or specifying <code>null</code>
+     * deactivates the rule. 
      */
-    public boolean setActiveRule(Name ruleName) {
+    public void setActiveRule(Name ruleName) {
 	final RuleDescriptor rule = ruleName == null ? 
-		null : findRuleByName(ruleName.toString());
-	if (rule != null || ruleName == null) {
-	    if (rule != activeRule) {
-		this.activeRule = rule;
-		fireSettingsChanged();
-	    }
-	    return true;
+		NOT_A_RULE : findRuleByName(ruleName.toString());
+	if (rule != findRuleByName(""+activeRule)) {
+	    this.activeRule = rule.getRuleName();
+	    fireSettingsChanged();
 	}
-	return false;
     }
 
 
@@ -218,9 +221,8 @@ public class DecisionProcedureSettings implements Settings {
      * <key> = <value> (,<value>)* are allowed.
      * @param props the Properties object where to write the settings as (key, value) pair
      */
-    public void writeSettings(Properties props) {
-        props.setProperty(ACTIVE_RULE, "" + (activeRule == null ? "N/A" : 
-            activeRule.getRuleName()));
+    public void writeSettings(Properties props) {	
+        props.setProperty(ACTIVE_RULE, "" + activeRule);
         props.setProperty(TIMEOUT, "" + this.timeout);
     }
 
