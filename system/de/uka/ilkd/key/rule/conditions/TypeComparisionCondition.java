@@ -12,8 +12,12 @@ package de.uka.ilkd.key.rule.conditions;
 
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.sort.NullSort;
+import de.uka.ilkd.key.logic.sort.SetAsListOfSort;
+import de.uka.ilkd.key.logic.sort.SetOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -37,6 +41,8 @@ public class TypeComparisionCondition extends VariableConditionAdapter {
     public static final int STRICT_SUBTYPE = 4;
     /** checks if sorts are same */
     public final static int SAME = 5;
+    /** checks if sorts are disjoint */
+    public final static int DISJOINT = 6; //XXX
 
   
     private final int mode;
@@ -82,10 +88,10 @@ public class TypeComparisionCondition extends VariableConditionAdapter {
         
         
 	return checkSorts(fst.resolveSort(var, subst, svInst, services), 
-                snd.resolveSort(var, subst, svInst, services));
+                snd.resolveSort(var, subst, svInst, services), services);
     }
 
-    private boolean checkSorts(final Sort fstSort, final Sort sndSort) {
+    private boolean checkSorts(final Sort fstSort, final Sort sndSort, Services services) {
         switch (mode) {
         case SAME:
             return fstSort == sndSort;
@@ -100,11 +106,34 @@ public class TypeComparisionCondition extends VariableConditionAdapter {
             return fstSort != sndSort && fstSort.extendsTrans(sndSort);
         case NOT_IS_SUBTYPE:	    
             return !fstSort.extendsTrans(sndSort);        
+        case DISJOINT:
+            return checkDisjointness(fstSort, sndSort, services);
         default:
             Debug.fail("TypeComparisionCondition: " + 
         	       "Unknown mode.");
             return false;
         }
+    }
+    
+    
+    /**
+     * Checks for disjointness modulo "null".
+     */
+    private boolean checkDisjointness(Sort fstSort, 
+	    			      Sort sndSort, 
+	    			      Services services) {
+	if(fstSort == sndSort) {
+	    return false;
+	}
+	for(Named n : services.getNamespaces().sorts().allElements()) {
+	    Sort s = (Sort) n;
+	    if(!(s instanceof NullSort) 
+	       && s.extendsTrans(fstSort) 
+	       && s.extendsTrans(sndSort)) {
+		return false;
+	    }
+	}
+	return true;
     }
 
     public String toString () {
@@ -121,6 +150,8 @@ public class TypeComparisionCondition extends VariableConditionAdapter {
             return "\\strict\\sub(" + fst +", "+snd+")";
 	case NOT_IS_SUBTYPE:
 	    return "\\not\\sub("+fst+", "+snd+")";
+	case DISJOINT:
+	    return "\\disjoint("+fst+", "+snd+")";
 	default:
 	    return "invalid type copmparision mode";         	    
 	}

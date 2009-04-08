@@ -69,6 +69,7 @@ tokens {
 	COMPATIBLE = "\\compatible";
 	ISSUBTYPE = "\\sub";
 	STRICT    = "\\strict";
+	DISJOINT  = "\\disjoint";
 	
         STATICMETHODREFERENCE = "\\staticMethodReference";
         NOTFREEIN = "\\notFreeIn";

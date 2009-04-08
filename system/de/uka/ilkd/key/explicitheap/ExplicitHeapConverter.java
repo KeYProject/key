@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
+import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ListOfGoal;
@@ -34,6 +35,7 @@ public class ExplicitHeapConverter {
     public static final ExplicitHeapConverter INSTANCE = new ExplicitHeapConverter();
     
     private static final TermBuilder TB = TermBuilder.DF;
+    private static final String ARRAY_LENGTH_FIELD_NAME = "Array::length"; 
 
     
     private ExplicitHeapConverter() {
@@ -48,7 +50,7 @@ public class ExplicitHeapConverter {
     public Function getFieldSymbol(ProgramVariable fieldPV, Services services) {
 	final Name name;
 	if(fieldPV == services.getJavaInfo().getArrayLength()) {
-	    name = new Name("Array::length");
+	    name = new Name(ARRAY_LENGTH_FIELD_NAME);
 	} else {
 	    name = new Name(fieldPV.toString());
 	}
@@ -69,10 +71,27 @@ public class ExplicitHeapConverter {
     }
     
     
-    public Sort getSortOfField(Function fieldSymbol, Services services) {
-        ProgramVariable fieldPV 
-            = services.getJavaInfo().getAttribute(fieldSymbol.name().toString());
-        return fieldPV.sort();
+    public Sort getSortOfSelect(Term selectTerm, Services services) {
+	assert selectTerm.op() == services.getJavaInfo().getSelect();
+	Term objectTerm = selectTerm.sub(1);
+	Term fieldTerm = selectTerm.sub(2);
+	assert fieldTerm.op() instanceof UniqueRigidFunction;
+	UniqueRigidFunction fieldSymbol = (UniqueRigidFunction) fieldTerm.op();
+	
+	if(fieldSymbol.name().toString().equals(ARRAY_LENGTH_FIELD_NAME)) {
+	    return services.getTypeConverter().getIntLDT().targetSort();
+	} else if(fieldSymbol.arity() == 0) {
+	    ProgramVariable fieldPV
+	    	= services.getJavaInfo().getAttribute(fieldSymbol.name().toString());
+	    assert fieldPV != null;
+	    return fieldPV.sort();
+	} else if(fieldSymbol == services.getJavaInfo().getArrayField()){
+	    assert objectTerm.sort() instanceof ArraySort;
+	    return ((ArraySort) objectTerm.sort()).elementSort();
+	} else {
+	    assert false;
+	    return null;
+	}
     }
     
     

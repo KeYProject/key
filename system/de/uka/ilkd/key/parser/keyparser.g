@@ -4013,6 +4013,9 @@ varcond_typecheck [TacletBuilder b, boolean negated]
 	} 
 	typecheckType = TypeComparisionCondition.STRICT_SUBTYPE;
       }
+    | DISJOINT {
+        typecheckType = TypeComparisionCondition.DISJOINT;
+      }
    ) 
    LPAREN fst = type_resolver COMMA snd = type_resolver RPAREN {
                b.addVariableCondition

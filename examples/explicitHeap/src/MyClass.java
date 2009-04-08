@@ -70,4 +70,15 @@ class MyClass {
             a[minIndex] = temp;
         }
     }
+    
+    
+    /*@ normal_behavior
+      @   requires n >= 0;
+      @   ensures \result.length == n;
+      @   ensures (\forall int x; 0 <= x && x < n; \result[x] == 0);
+      @*/
+    int[] createArray(int n) {
+	int[] a = new int[n];
+	return a;
+    }
 }
