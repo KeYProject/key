@@ -537,7 +537,7 @@ public class UseOperationContractRule implements BuiltInRule {
         nss.functions().add(ws.op());
         Function add = (Function) nss.functions().lookup(new Name("add"));
         Update wsUpd = uf.elementaryUpdate(mCons, TB.tf().createFunctionTerm(add, mCons, ws));
-
+        
         Term excNullTerm = TB.equals(TB.var(excVar), TB.NULL(services));
        
         //create "Pre" branch
@@ -549,13 +549,25 @@ public class UseOperationContractRule implements BuiltInRule {
                     TB.dot(mTerm, services.getJavaInfo().getAttribute(
                             "size", "javax.realtime.MemoryArea")));
             preF = TB.and(wsPre, preF);
-        }else if(services.getProof().getSettings().getProfile() instanceof PercProfile &&
-                pm.getKeYJavaType()!=null){
-            Term wsPre = TB.var(services.getJavaInfo().
-                    getAttribute(ImplicitFieldAdder.IMPLICIT_SIZE, pm.getKeYJavaType()));
+        }else if(services.getProof().getSettings().getProfile() instanceof PercProfile){
+            Term wsPre = cwi.contract.getCallerWorkingSpace(selfVar, paramVars, services);
             wsPre = TB.tf().createFunctionTerm(leq, TB.tf().createFunctionTerm(add, mCons, wsPre),
                     TB.dot(mTerm, services.getJavaInfo().getAttribute(
                             "size", "javax.realtime.MemoryArea")));
+            if(!pm.isStatic()){
+                Term wsReent = cwi.contract.getReentrantWorkingSpace(selfVar, paramVars, services);
+                Term rs = TB.dot(TB.var(selfVar), 
+                        services.getJavaInfo().getAttribute(ImplicitFieldAdder.IMPLICIT_REENTRANT_SCOPE, 
+                                services.getJavaInfo().getJavaLangObject()));
+                Term rsCons = TB.dot(rs, services.getJavaInfo().getAttribute(
+                        "consumed", "javax.realtime.MemoryArea"));
+                Term wsPreReent = TB.tf().createFunctionTerm(leq, TB.tf().createFunctionTerm(add, rsCons, wsReent),
+                        TB.dot(rs, services.getJavaInfo().getAttribute(
+                                "size", "javax.realtime.MemoryArea")));
+                wsPre = TB.and(wsPre, wsPreReent);
+                Update rsUpd = uf.elementaryUpdate(rsCons, TB.tf().createFunctionTerm(add, rsCons, wsReent));
+                wsUpd = uf.parallel(wsUpd, rsUpd);
+            }
             preF = TB.and(wsPre, preF);
         }
         Term preTerm = uf.apply(selfParamsUpdate, 
@@ -601,8 +613,7 @@ public class UseOperationContractRule implements BuiltInRule {
             wsEq = TB.equals(ws, cwi.contract.getWorkingSpace(selfVar, paramVars, services));
             wsEq = uf.apply(uf.sequential(new Update[]{selfParamsUpdate,
                     atPreUpdate}),wsEq);
-        }else if(services.getProof().getSettings().getProfile() instanceof PercProfile &&
-                pm.getKeYJavaType()!=null){
+        }else if(services.getProof().getSettings().getProfile() instanceof PercProfile){
 //                Term size = TB.var(services.getJavaInfo().
 //                        getAttribute(ImplicitFieldAdder.IMPLICIT_SIZE, pm.getKeYJavaType()));
 //                wsEq = TB.equals(ws, size);

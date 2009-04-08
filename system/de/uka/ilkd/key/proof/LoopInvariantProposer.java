@@ -199,7 +199,6 @@ public class LoopInvariantProposer implements InstantiationProposer {
                 inst = locs;
             } else if(varName.equals("ws")){ 
                 inst = inv.getParametrizedWorkingSpaceTerms(selfTerm, atPreFunctions, services);
-                System.out.println("inst ws: "+inst);
             } else if(varName.equals("variant")) {
                 assert var.isTermSV();
                 inst = inv.getVariant(selfTerm, atPreFunctions, services);

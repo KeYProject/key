@@ -15,7 +15,7 @@ public class ConsumedAtPre extends AbstractMetaOperator {
     public static SVInstantiations svInstRef = null;
     public static Function consAtPre = null;
     public static Function wsAtPre = null;
-    public static Operator cons = null;
+    public static AttributeOp cons = null;
     
     public ConsumedAtPre() {
         super(new Name("#consumedAtPre"), 2);
@@ -36,9 +36,11 @@ public class ConsumedAtPre extends AbstractMetaOperator {
             if(t.arity()>1){
                 t = t.sub(0);
             }
-            cons = t.op();
+            cons = (AttributeOp) t.op();
             consAtPre = APF.createAtPreFunction(cons, services);
+            services.getNamespaces().functions().add(consAtPre);
             wsAtPre = APF.createAtPreFunction(cons, services);
+            services.getNamespaces().functions().add(wsAtPre);
         }
     }
     

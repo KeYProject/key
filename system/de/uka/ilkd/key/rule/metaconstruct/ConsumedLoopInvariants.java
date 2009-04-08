@@ -5,10 +5,9 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.updatesimplifier.Update;
 
 public class ConsumedLoopInvariants extends AbstractMetaOperator {
 
@@ -26,9 +25,17 @@ public class ConsumedLoopInvariants extends AbstractMetaOperator {
         Iterator<Term> it = scope2ws.keySet().iterator();
         while(it.hasNext()){
             Term scope = it.next();
-//TODO
+            Term left = tb.func(sub, tb.dot(scope, (ProgramVariable) ConsumedAtPre.cons.attribute()), 
+                    tb.func(ConsumedAtPre.consAtPre, scope));
+            Term right = tb.func(ConsumedAtPre.wsAtPre, scope);
+            inv = tb.and(inv, tb.func(leq, left, right));
         }
         return inv;
     }
 
+    public Sort sort(Term[] term) {
+        return Sort.FORMULA;
+    }
+
+    
 }
