@@ -13,15 +13,11 @@ import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.*;
-//import de.uka.ilkd.key.proof.decproc.DecisionProcedureYices;
-//import de.uka.ilkd.key.proof.decproc.JavaDecisionProcedureTranslationFactory;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
-//import de.uka.ilkd.key.rule.AbstractIntegerRule;
 import de.uka.ilkd.key.rule.ListOfBuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.SLListOfBuiltInRule;
-//import de.uka.ilkd.key.rule.YicesIntegerRule;
 import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.smt.SimplifySolver;
 import de.uka.ilkd.key.smt.YicesSolver;
@@ -30,14 +26,9 @@ import de.uka.ilkd.key.strategy.IteratorOfStrategyFactory;
 import de.uka.ilkd.key.strategy.SetAsListOfStrategyFactory;
 import de.uka.ilkd.key.strategy.SetOfStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
-import de.uka.ilkd.key.util.ProgressMonitor;
 
 public abstract class AbstractProfile implements Profile {
 
-    private IMain                       main;
-
-//    private AbstractExecDecproc[] execDecprocs;
-    
     private final RuleCollection       standardRules;
 
     private final SetOfStrategyFactory strategies;
@@ -46,9 +37,7 @@ public abstract class AbstractProfile implements Profile {
     private final SetOfGoalChooserBuilder supportedGCB;
     
     private GoalChooserBuilder prototype;
-    
-    
-    
+            
     protected AbstractProfile(String standardRuleFilename, 
             SetOfGoalChooserBuilder supportedGCB, IMain main) {
         
@@ -97,9 +86,6 @@ public abstract class AbstractProfile implements Profile {
 
     protected ListOfBuiltInRule initBuiltInRules() {
         ListOfBuiltInRule builtInRules = SLListOfBuiltInRule.EMPTY_LIST;
-
-        final ProgressMonitor monitor = main == null ? null : main
-                .getProgressMonitor();
         
         builtInRules = builtInRules.prepend(new SMTRule(new YicesSolver()));
         builtInRules = builtInRules.prepend(new SMTRule(new SimplifySolver()));
@@ -180,7 +166,7 @@ public abstract class AbstractProfile implements Profile {
     }
 
     /**
-      * returns a copy of the selected goal choooser builder 
+      * returns a copy of the selected goal chooser builder 
       */
      public GoalChooserBuilder getSelectedGoalChooserBuilder(){
         return prototype.copy(); 
@@ -189,7 +175,7 @@ public abstract class AbstractProfile implements Profile {
      /**
       * any standard rule has is by default justified by an axiom rule 
       * justification 
-      * @return the justification for the standardrules             
+      * @return the justification for the standard rules             
       */
      public RuleJustification getJustification(Rule r) {
          return AxiomJustification.INSTANCE;
@@ -198,5 +184,7 @@ public abstract class AbstractProfile implements Profile {
      /**
       * sets the given settings to some default depending on the profile
       */
-     public void updateSettings(ProofSettings settings) {}   
+     public void updateSettings(ProofSettings settings) {
+	 settings.getDecisionProcedureSettings().updateSMTRules(this);	 
+     }   
 }

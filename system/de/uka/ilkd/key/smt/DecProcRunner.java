@@ -24,6 +24,7 @@ import java.util.TimerTask;
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.logic.Constraint;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
@@ -160,9 +161,15 @@ public class DecProcRunner implements Runnable {
     }
 
     private BuiltInRule getIntegerDecisionProcedure() {
-        BuiltInRule rule = proof.getSettings().getDecisionProcedureSettings().getActiveRule();
-        return rule;
-    }
+	final Name simpRuleName = proof.getSettings().getDecisionProcedureSettings().getActiveRule().getRuleName();
+	final ListOfBuiltInRule rules = proof.getSettings().getProfile().getStandardRules().getStandardBuiltInRules();
+        for (BuiltInRule r : rules) {
+            if (r.name().equals(simpRuleName)) {
+        	return r;
+            }
+        }	
+        return null;
+    }	
 
 
 

@@ -13,40 +13,50 @@ import java.util.*;
 
 import de.uka.ilkd.key.gui.configuration.Settings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.smt.SMTRule;
-import de.uka.ilkd.key.smt.SimplifySolver;
-import de.uka.ilkd.key.smt.YicesSolver;
-import de.uka.ilkd.key.smt.Z3Solver;
 
 /** This class encapsulates the information which 
  *  decision procedure should be used.
  */
 public class DecisionProcedureSettings implements Settings {
     
+    /**
+     * Small data container wrapping name and display name of a rule     
+     */
+    public class RuleDescriptor {
+	
+	private final Name ruleName;
+	private final String displayName;
+	
+	public RuleDescriptor(Name ruleName, String displayName) {
+	    this.ruleName    = ruleName;
+	    this.displayName = displayName; 
+	}
+	public String getDisplayName() {
+	    return displayName;
+	}
+
+	public Name getRuleName() {
+	    return ruleName;
+	}
+    }
+    
     /** String used in the Settings to store the active rule */
     private static final String ACTIVE_RULE  = "[DecisionProcedure]ActiveRule";
     
     private static final String TIMEOUT="[DecisionProcedure]Timeout";
-    
+
     /** the list of registered SettingListener */
     private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
-
+    
     /** the list of available SMTRules */
-    private ArrayList<SMTRule> rules = new ArrayList<SMTRule>();
-    {
-	//Load the available Solver
-	// Rules should not be created here! USe Profiles for this purpose %%RB
-	rules = new ArrayList<SMTRule>();
-	rules.add(new SMTRule(new SimplifySolver()));
-	rules.add(new SMTRule(new Z3Solver()));
-	rules.add(new SMTRule(new YicesSolver()));
-		
-    }
+    private ArrayList<RuleDescriptor> rules = new ArrayList<RuleDescriptor>();
     
     /** the currently active rule */
-    private SMTRule activeRule;
-    
+    private RuleDescriptor activeRule;
     
     private int timeout = 60;
     
@@ -59,55 +69,52 @@ public class DecisionProcedureSettings implements Settings {
 	super();
     }
     
-    public static DecisionProcedureSettings getInstance() {
-	if (instance == null) {
-	    instance = new DecisionProcedureSettings();
+    /** adds a listener to the settings object 
+     * @param l the listener
+     */
+    public void addSettingsListener(SettingsListener l) {
+        listenerList.add(l);
+    }
+    
+    /**
+     * retrieves the rule of the specified name or returns <code>null</code> if
+     * no such rule exists
+     * @param ruleName the String unambiguously specifying a rule 
+     * @return the found SMTRule or <code>null</code> 
+     */
+    public RuleDescriptor findRuleByName(String ruleName) {
+	for (RuleDescriptor r : rules) {	    
+	    if (r.getRuleName().toString().equals(ruleName)) {
+		return r;
+	    }
 	}
-	
-	return instance;
+	return null;
     }
     
     
-    /**
-     * Returns a list of all available rules
+    /** sends the message that the state of this setting has been
+     * changed to its registered listeners (not thread-safe)
      */
-    public List<SMTRule> getAvailableRules() {
-	return Collections.unmodifiableList(rules);
+    protected void fireSettingsChanged() {
+        Iterator<SettingsListener> it = listenerList.iterator();
+        while (it.hasNext()) {	    
+            it.next().settingsChanged(new GUIEvent(this));
+        }
     }
     
     /**
      * returns the active rule
      * @return the active rule
      */
-    public SMTRule getActiveRule() {
+    public RuleDescriptor getActiveRule() {
 	return activeRule;
     }
     
     /**
-     * if the specified rule is known it is set as active rule, specifying <code>null</code>
-     * deactivatees the rule. Otherwise false is returned. 
-     * @param r the Rule to be used for external prover invocation
+     * Returns a list of all available rules
      */
-    public boolean setActiveRule(Rule r) {
-	if (rules.contains(r)) {
-	    if (r != activeRule) {
-		this.activeRule = (SMTRule) r;
-		fireSettingsChanged();
-	    }
-	    return true;
-	}
-	return false;
-    }
-    
-    /**
-     * sets the timeout until an external prover is terminated
-     * @param t the timeout in seconds
-     */
-    public void setTimeout(int t) {
-	if (t > 0 && t != timeout) {
-	    this.timeout = t;
-	    this.fireSettingsChanged();
-	}
+    public List<RuleDescriptor> getAvailableRules() {
+	return Collections.unmodifiableList(rules);
     }
     
     /**
@@ -118,15 +125,7 @@ public class DecisionProcedureSettings implements Settings {
     public int getTimeout() {
 	return this.timeout;
     }
-
-    /**
-     * true, if the argument should be used for test
-     * TODO implement
-     */
-    public boolean useRuleForTest(int arg) {
-	return true;
-    }
-
+    
     /** gets a Properties object and has to perform the necessary
      * steps in order to change this object in a way that it
      * represents the stored settings
@@ -149,22 +148,71 @@ public class DecisionProcedureSettings implements Settings {
 	}
     }
 
-
     /**
-     * retrieves the rule of the specified name or returns <code>null</code> if
-     * no such rule exists
-     * @param ruleName the String unambiguously specifying a rule 
-     * @return the found SMTRule or <code>null</code> 
+     * removes the specified listener form the listener list
+     * @param l the listener
      */
-    public SMTRule findRuleByName(String ruleName) {
-	for (SMTRule r : rules) {	    
-	    if (r.name().toString().equals(ruleName)) {
-		return r;
-	    }
-	}
-	return null;
+    public void removeSettingsListener(SettingsListener l) {
+	listenerList.remove(l);
     }
 
+    /**
+     * if the specified rule is known it is set as active rule, specifying <code>null</code>
+     * deactivates the rule. Otherwise false is returned. 
+     * @param ruleName the Name of the rule to be used for external prover invocation
+     */
+    public boolean setActiveRule(Name ruleName) {
+	final RuleDescriptor rule = ruleName == null ? 
+		null : findRuleByName(ruleName.toString());
+	if (rule != null || ruleName == null) {
+	    if (rule != activeRule) {
+		this.activeRule = rule;
+		fireSettingsChanged();
+	    }
+	    return true;
+	}
+	return false;
+    }
+
+
+    /**
+     * sets the timeout until an external prover is terminated
+     * @param t the timeout in seconds
+     */
+    public void setTimeout(int t) {
+	if (t > 0 && t != timeout) {
+	    this.timeout = t;
+	    this.fireSettingsChanged();
+	}
+    }
+
+    /**
+     * updates the current available SMT rules
+     * @param profile the active Profile 
+     */
+    public void updateSMTRules(Profile profile) {
+	//Load the available Solver
+	// Rules should not be created here! Use Profiles for this purpose %%RB
+	rules = new ArrayList<RuleDescriptor>();
+	for (Rule r : profile.
+		getStandardRules().getStandardBuiltInRules()) {
+	    if (r instanceof SMTRule) {
+		rules.add(new RuleDescriptor(r.name(),r.displayName()));
+	    }
+	}	
+    }
+    
+
+    /**
+     * true, if the argument should be used for test
+     * TODO implement
+     */
+    public boolean useRuleForTest(int arg) {
+	return true;
+    }
+
+    
+    
     /** implements the method required by the Settings interface. The
      * settings are written to the given Properties object. Only entries of the form 
      * <key> = <value> (,<value>)* are allowed.
@@ -172,36 +220,16 @@ public class DecisionProcedureSettings implements Settings {
      */
     public void writeSettings(Properties props) {
         props.setProperty(ACTIVE_RULE, "" + (activeRule == null ? "N/A" : 
-            activeRule.name()));
+            activeRule.getRuleName()));
         props.setProperty(TIMEOUT, "" + this.timeout);
     }
-    
 
-    /** sends the message that the state of this setting has been
-     * changed to its registered listeners (not thread-safe)
-     */
-    protected void fireSettingsChanged() {
-        Iterator<SettingsListener> it = listenerList.iterator();
-        while (it.hasNext()) {	    
-            it.next().settingsChanged(new GUIEvent(this));
-        }
-    }
-
-    
-    
-    /** adds a listener to the settings object 
-     * @param l the listener
-     */
-    public void addSettingsListener(SettingsListener l) {
-        listenerList.add(l);
-    }
-
-    /**
-     * removes the specified listener form the listener list
-     * @param l the listener
-     */
-    public void removeSettingsListener(SettingsListener l) {
-	listenerList.remove(l);
+    public static DecisionProcedureSettings getInstance() {
+	if (instance == null) {
+	    instance = new DecisionProcedureSettings();
+	}
+	
+	return instance;
     }
 
 }

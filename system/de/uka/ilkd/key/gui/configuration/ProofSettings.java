@@ -112,12 +112,14 @@ public class ProofSettings {
     public void setProfile(Profile profile) {
         ensureInitialized();
         this.profile = profile;
+        profile.updateSettings(this);
     }
 
     public Profile getProfile() {                
         if (profile == null) {
             //the following line should be removed
-            profile = new JavaProfile();
+            setProfile(new JavaProfile());
+            
         }
         return profile;
     }

@@ -33,6 +33,7 @@ import javax.swing.text.JTextComponent;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.gui.DecisionProcedureSettings.RuleDescriptor;
 import de.uka.ilkd.key.gui.assistant.ProofAssistant;
 import de.uka.ilkd.key.gui.assistant.ProofAssistantAI;
 import de.uka.ilkd.key.gui.assistant.ProofAssistantController;
@@ -60,7 +61,6 @@ import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.NonInterferenceCheck;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
-import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.smt.DecProcRunner;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
 import de.uka.ilkd.key.util.Debug;
@@ -634,9 +634,9 @@ public class Main extends JFrame implements IMain {
 
     private JButton createDecisionProcedureButton() {	
 	decisionProcedureInvocationButton = new JButton();	
-	Rule r = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveRule();
-	decisionProcedureInvocationButton.setAction(new DPInvokeAction(r != null ? r.name() : null, 
-		r != null ? r.displayName() : null));
+	RuleDescriptor r = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveRule();
+	decisionProcedureInvocationButton.setAction(new DPInvokeAction(r != null ? r.getRuleName() : null, 
+		r != null ? r.getDisplayName() : null));
 	return decisionProcedureInvocationButton;
     }
 
@@ -1506,9 +1506,9 @@ public class Main extends JFrame implements IMain {
         final ButtonGroup dpButtonGroup = new ButtonGroup();
 
 	final DecisionProcedureSettings dps = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings();
-	for (Rule r : dps.getAvailableRules()) {
+	for (RuleDescriptor r : dps.getAvailableRules()) {
 	    final JRadioButtonMenuItem b = new JRadioButtonMenuItem();
-	    b.setAction(new DPSelectionAction(r.name(), b));
+	    b.setAction(new DPSelectionAction(r.getRuleName(), b));
 	    decisionProcedureOption.add(b);
 	    dpButtonGroup.add(b);
 	}
@@ -1964,10 +1964,17 @@ public class Main extends JFrame implements IMain {
 	
 	public void update() {	   
 	    if (settings != null) {
-		decisionProcedureInvocationButton.
-		setAction(new DPInvokeAction(settings.getActiveRule().name(), 
-			settings.getActiveRule().displayName()));
-		ruletimeoutlabel.setText("timeout: " + settings.getTimeout() + " s");
+		RuleDescriptor activeRule = settings.getActiveRule();
+		
+		if (activeRule == null) {
+		    decisionProcedureInvocationButton.
+		    	setAction(new DPInvokeAction(null, null));
+		} else {
+		    decisionProcedureInvocationButton.
+		    	setAction(new DPInvokeAction(activeRule.getRuleName(), 
+			    activeRule.getDisplayName()));
+		    ruletimeoutlabel.setText("timeout: " + settings.getTimeout() + " s");
+		}
 	    } else {
 		assert false;
 	    }
@@ -2457,6 +2464,7 @@ public class Main extends JFrame implements IMain {
     
     public static void evaluateOptions(String[] opt) {
 	int index = 0;
+	ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());  
 	while (opt.length > index) {	    
 	    if ((new File(opt[index])).exists()) {
 		fileNameOnStartUp=opt[index];
@@ -2476,7 +2484,7 @@ public class Main extends JFrame implements IMain {
 		    batchMode = true;
                     visible = false;
 		} else if (opt[index].equals("DEPTHFIRST")) {		
-            System.out.println("DepthFirst GoalChooser ...");
+		    	System.out.println("DepthFirst GoalChooser ...");
 			Profile p = ProofSettings.DEFAULT_SETTINGS.getProfile();
 			p.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);           
             
@@ -2496,8 +2504,7 @@ public class Main extends JFrame implements IMain {
                         index ++;
                     }
                     
-                    ProofSettings.DEFAULT_SETTINGS.setProfile(p);
-                    p.updateSettings(ProofSettings.DEFAULT_SETTINGS);
+                    ProofSettings.DEFAULT_SETTINGS.setProfile(p);                   
                     testMode = true;
 		} else if (opt[index].equals("DEBUGGER")) {                                     
                     System.out.println("Symbolic Execution Debugger Mode enabled ...");                                        
@@ -2508,13 +2515,9 @@ public class Main extends JFrame implements IMain {
                         //System.out.println("Balanced loop unwinding ...");
                         index ++;
                     }
-                    ProofSettings.DEFAULT_SETTINGS.setProfile(p);
-                    p.updateSettings(ProofSettings.DEFAULT_SETTINGS);
+                    ProofSettings.DEFAULT_SETTINGS.setProfile(p);                    
                     testMode = true;
-                } 
-                
-                
-                
+                }                                                 
                 else if (opt[index].equals("FOL")) {                     
                    ProofSettings.DEFAULT_SETTINGS.setProfile(new PureFOLProfile());
                 } else if (opt[index].equals("TIMEOUT")) {
@@ -2869,8 +2872,6 @@ public class Main extends JFrame implements IMain {
 	    this.decisionProcedureName = decisionProcedure;
 
 	    putValue(SMALL_ICON, IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));	    
-
-	    
 	    
 	    if (this.decisionProcedureName != null) {
 		putValue(NAME, dpDisplayname);
@@ -2911,29 +2912,27 @@ public class Main extends JFrame implements IMain {
 	    this.decisionProcedure = decisionProcedure;
 	    this.radioButton = radioButton;
 	    
+	    final RuleDescriptor decProcRule = decisionProcedure == null ? null : getCurrentDPSettings().
+	    	findRuleByName(decisionProcedure.toString());
+	  
+	    final RuleDescriptor activeRule = getCurrentDPSettings().getActiveRule();
 	    
-	    final Rule r = getRule();
-	    if (r == getCurrentDPSettings().getActiveRule()) {
+	    if (activeRule == null && decisionProcedure == null) {
+		radioButton.setSelected(true);
+	    } else if (activeRule != null && activeRule.equals(decisionProcedure)) {
 		radioButton.setSelected(true);
 	    }
 
 	    putValue(SMALL_ICON, IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));	    
 
-	    if (this.decisionProcedure != null) {
-		putValue(NAME, r.displayName());
-		putValue(SHORT_DESCRIPTION, "Use '" + r.displayName() + "' as external prover.");
+	    if (decProcRule != null) {
+		putValue(NAME, decProcRule.getDisplayName());
+		putValue(SHORT_DESCRIPTION, "Use '" + decProcRule.getDisplayName() + "' as external prover.");
 	    } else {
 		putValue(NAME, "None");
 		putValue(SHORT_DESCRIPTION, "Do not use any external prover.");
 	    }
 
-	}
-
-	private Rule getRule() {
-	    if (decisionProcedure != null) {
-		return getCurrentDPSettings().findRuleByName(decisionProcedure.toString());
-	    }
-	    return null;
 	}
 	
 	public boolean isEnabled() {
@@ -2941,7 +2940,7 @@ public class Main extends JFrame implements IMain {
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-	    if (getCurrentDPSettings().setActiveRule(getRule())) {
+	    if (getCurrentDPSettings().setActiveRule(decisionProcedure)) {
 		radioButton.setSelected(true); // if we change to Java 6 delete radioButton and add here putValue(SELECTED_KEY, true)
 	    }
 	}
