@@ -1,6 +1,7 @@
 class MyClass {
     int attr;
     int attr2;
+    MyClass next;
     
     
     /*@ normal_behavior

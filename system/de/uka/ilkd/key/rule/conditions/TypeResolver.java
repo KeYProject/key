@@ -40,6 +40,9 @@ public abstract class TypeResolver {
         return new GenericSortResolver(gs);
     }
     
+    public static TypeResolver createNonGenericSortResolver(Sort s) {
+	return new NonGenericSortResolver(s);
+    }
     
     
     public static class GenericSortResolver extends TypeResolver {
@@ -70,6 +73,35 @@ public abstract class TypeResolver {
             return gs.toString();
         }
     }
+    
+    public static class NonGenericSortResolver extends TypeResolver {
+
+        private final Sort s;
+        
+        public NonGenericSortResolver(Sort s) {          
+            this.s = s;
+        }
+
+        public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate, 
+                SVInstantiations instMap, Services services) {            
+            return true;
+        }
+
+        public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate, 
+                SVInstantiations instMap, Services services) {
+            return s;
+        }
+
+        public KeYJavaType resolveType(SchemaVariable sv, SVSubstitute instCandidate, 
+                SVInstantiations instMap, Services services) {            
+            return services.getJavaInfo().getKeYJavaType(s);
+        }
+        
+        public String toString() {
+            return s.toString();
+        }
+    }
+    
     public static class ElementTypeResolverForSV extends TypeResolver {
 
         private final SortedSchemaVariable resolveSV;
@@ -186,6 +218,7 @@ public abstract class TypeResolver {
             return "\\containerType(" + memberSV  + ")";
         }
     }
+    
     
     public abstract boolean isComplete(SchemaVariable sv, 
             SVSubstitute instCandidate, SVInstantiations instMap, Services services);

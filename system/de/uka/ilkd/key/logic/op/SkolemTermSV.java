@@ -57,8 +57,12 @@ class SkolemTermSV extends SortedSchemaVariable {
     /*    
      * @see de.uka.ilkd.key.logic.op.SortedSchemaVariable#match(de.uka.ilkd.key.logic.op.SVSubstitute, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
      */
-    public MatchConditions match(SVSubstitute subst, MatchConditions mc, Services services) {        
-        return null;
+    public MatchConditions match(SVSubstitute subst, MatchConditions mc, Services services) {
+	if(subst.equals(mc.getInstantiations().getInstantiation(this))) {
+	    return mc;
+	} else {
+	    return null;
+	}
     }
 	
 }

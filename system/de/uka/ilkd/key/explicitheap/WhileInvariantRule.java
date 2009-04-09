@@ -18,7 +18,6 @@ import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
@@ -324,6 +323,10 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term guardFalseTerm = TB.equals(TB.var(guardVar), 
                                         booleanLDT.getFalseTerm());
         Update uAndAnonUpdate = uf.sequential(inst.u, anon.anonUpdate);
+        Term invAndFrameAndWellFormed 
+        	= TB.and(new Term[]{invTerm, 
+        			    anon.frameCondition, 
+        			    TB.wellFormedHeap(services)});
         
         //"Invariant Initially Valid":
         //    \replacewith (==> inv );
@@ -341,7 +344,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                            true, 
                            false);
         bodyGoal.addFormula(new ConstrainedFormula(uf.prepend(uAndAnonUpdate, 
-                                                              TB.and(invTerm, anon.frameCondition))), 
+                                                              invAndFrameAndWellFormed)), 
                            true, 
                            false);
         
@@ -378,7 +381,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                            true, 
                            false);
         useGoal.addFormula(new ConstrainedFormula(uf.prepend(uAndAnonUpdate, 
-                                                             TB.and(invTerm, anon.frameCondition))), 
+                                                             invAndFrameAndWellFormed)), 
                            true, 
                            false);
         Term restPsi = TB.box(IIT.removeActiveStatement(inst.progPost.javaBlock(), 

@@ -321,6 +321,10 @@ public class TermBuilder {
         return select(services, heap(services), o, func(f));
     }
     
+    public Term staticDot(Services services, Function f) {
+        return select(services, heap(services), NULL(services), func(f));
+    }
+    
     public Term arr(Services services, Term o, Term i) {
         return select(services, heap(services), o, func(services.getJavaInfo().getArrayField(), i));
     }
@@ -329,10 +333,14 @@ public class TermBuilder {
         return store(services, heap(services), o, func(f), v);
     }
     
+    public Term staticFieldStore(Services services, Function f, Term v) {
+	return fieldStore(services, NULL(services), f, v);
+    }
+    
     public Term arrayStore(Services services, Term o, Term i, Term v) {
         return store(services, heap(services), o, func(services.getJavaInfo().getArrayField(), i), v);
     }
-    
+        
     public Term wellFormedHeap(Services services) {
         return func(services.getJavaInfo().getWellFormed(), heap(services));
     }

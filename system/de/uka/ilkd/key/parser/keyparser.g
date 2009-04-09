@@ -57,6 +57,7 @@ header {
   import de.uka.ilkd.key.pp.AbbrevMap;
   import de.uka.ilkd.key.pp.LogicPrinter;
   
+  import de.uka.ilkd.key.explicitheap.ExplicitHeapConverter;
   import de.uka.ilkd.key.explicitheap.UniqueCondition;
   import de.uka.ilkd.key.explicitheap.UniqueRigidFunction;
 }
@@ -3933,21 +3934,24 @@ type_resolver returns [TypeResolver tr = null]
 {
     Sort s = null;
     ParsableVariable y = null;
+    ParsableVariable z = null;
 } :
     s = any_sortId_check[true]      
     {
-        if ( !( s instanceof GenericSort ) ) {
-        throw new GenericSortException ( "sort",
-            "Generic sort expected", s,
-            getFilename (), getLine (), getColumn () );
+        if ( s instanceof GenericSort ) {
+            tr = TypeResolver.createGenericSortResolver((GenericSort)s);
+        } else {
+            tr = TypeResolver.createNonGenericSortResolver(s);
         }
-        tr = TypeResolver.createGenericSortResolver((GenericSort)s);
     } |
     ( TYPEOF LPAREN y = varId RPAREN  
         {  tr = TypeResolver.createElementTypeResolver((SchemaVariable)y); } )
     |
     ( CONTAINERTYPE LPAREN y = varId RPAREN  
         {  tr = TypeResolver.createContainerTypeResolver((SchemaVariable)y); } )
+    |
+    ( FIELDTARGETTYPE LPAREN y = varId COMMA z = varId RPAREN
+        {  tr = new ExplicitHeapConverter.FieldTargetTypeResolver((SchemaVariable)y, (SchemaVariable)z); } ) 
 ;
 
 varcond_new [TacletBuilder b]
@@ -4013,8 +4017,8 @@ varcond_typecheck [TacletBuilder b, boolean negated]
 	} 
 	typecheckType = TypeComparisionCondition.STRICT_SUBTYPE;
       }
-    | DISJOINT {
-        typecheckType = TypeComparisionCondition.DISJOINT;
+    | DISJOINTMODULONULL {
+        typecheckType = TypeComparisionCondition.DISJOINTMODULONULL;
       }
    ) 
    LPAREN fst = type_resolver COMMA snd = type_resolver RPAREN {

@@ -69,7 +69,7 @@ tokens {
 	COMPATIBLE = "\\compatible";
 	ISSUBTYPE = "\\sub";
 	STRICT    = "\\strict";
-	DISJOINT  = "\\disjoint";
+	DISJOINTMODULONULL  = "\\disjointModuloNull";
 	
         STATICMETHODREFERENCE = "\\staticMethodReference";
         NOTFREEIN = "\\notFreeIn";
@@ -167,6 +167,7 @@ tokens {
 	ISINREACHABLESTATE = "\\isInReachableState";
         IS_ABSTRACT_OR_INTERFACE = "\\isAbstractOrInterface";
         CONTAINERTYPE = "\\containerType";
+        FIELDTARGETTYPE = "\\fieldTargetType";
 }
 
 {

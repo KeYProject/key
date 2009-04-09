@@ -11,6 +11,9 @@
 package de.uka.ilkd.key.rule.conditions;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -42,7 +45,7 @@ public class TypeComparisionCondition extends VariableConditionAdapter {
     /** checks if sorts are same */
     public final static int SAME = 5;
     /** checks if sorts are disjoint */
-    public final static int DISJOINT = 6; //XXX
+    public final static int DISJOINTMODULONULL = 6; //XXX
 
   
     private final int mode;
@@ -106,7 +109,7 @@ public class TypeComparisionCondition extends VariableConditionAdapter {
             return fstSort != sndSort && fstSort.extendsTrans(sndSort);
         case NOT_IS_SUBTYPE:	    
             return !fstSort.extendsTrans(sndSort);        
-        case DISJOINT:
+        case DISJOINTMODULONULL:
             return checkDisjointness(fstSort, sndSort, services);
         default:
             Debug.fail("TypeComparisionCondition: " + 
@@ -116,24 +119,39 @@ public class TypeComparisionCondition extends VariableConditionAdapter {
     }
     
     
+    private Map<SetOfSort,Boolean> disjointnessCache 
+    	= new HashMap<SetOfSort,Boolean>();
+    
     /**
      * Checks for disjointness modulo "null".
      */
     private boolean checkDisjointness(Sort fstSort, 
 	    			      Sort sndSort, 
 	    			      Services services) {
+	//sorts identical?
 	if(fstSort == sndSort) {
 	    return false;
 	}
-	for(Named n : services.getNamespaces().sorts().allElements()) {
-	    Sort s = (Sort) n;
-	    if(!(s instanceof NullSort) 
-	       && s.extendsTrans(fstSort) 
-	       && s.extendsTrans(sndSort)) {
-		return false;
-	    }
-	}
-	return true;
+	
+	//result cached?
+	SetOfSort sorts = SetAsListOfSort.EMPTY_SET.add(fstSort).add(sndSort);	
+	Boolean result = disjointnessCache.get(sorts);
+	if(result == null) {
+	    //compute result
+	    result = true;
+    	    for(Named n : services.getNamespaces().sorts().allElements()) {
+    		Sort s = (Sort) n;
+    		if(!(s instanceof NullSort) 
+    			&& s.extendsTrans(fstSort) 
+    			&& s.extendsTrans(sndSort)) {
+    		    result = false;
+    		    break;
+    		}
+    	    }
+    	    disjointnessCache.put(sorts, result);
+    	}
+	
+	return result;
     }
 
     public String toString () {
@@ -150,8 +168,8 @@ public class TypeComparisionCondition extends VariableConditionAdapter {
             return "\\strict\\sub(" + fst +", "+snd+")";
 	case NOT_IS_SUBTYPE:
 	    return "\\not\\sub("+fst+", "+snd+")";
-	case DISJOINT:
-	    return "\\disjoint("+fst+", "+snd+")";
+	case DISJOINTMODULONULL:
+	    return "\\disjointModuloNull("+fst+", "+snd+")";
 	default:
 	    return "invalid type copmparision mode";         	    
 	}

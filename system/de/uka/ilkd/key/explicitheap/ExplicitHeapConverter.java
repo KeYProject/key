@@ -10,6 +10,7 @@
 package de.uka.ilkd.key.explicitheap;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
@@ -19,6 +20,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ListOfGoal;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
+import de.uka.ilkd.key.rule.conditions.TypeResolver;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.updatesimplifier.ArrayOfAssignmentPair;
 import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair;
 import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPairImpl;
@@ -42,15 +45,29 @@ public class ExplicitHeapConverter {
     }
     
     
+    
+    //-------------------------------------------------------------------------
+    //internal methods
+    //-------------------------------------------------------------------------
+    
     private void warn(String s) {
         System.out.println("ExplicitHeapConverter WARNING: " + s);
     }
+    
+    
+    //-------------------------------------------------------------------------
+    //public interface
+    //-------------------------------------------------------------------------
     
     
     public Function getFieldSymbol(ProgramVariable fieldPV, Services services) {
 	final Name name;
 	if(fieldPV == services.getJavaInfo().getArrayLength()) {
 	    name = new Name(ARRAY_LENGTH_FIELD_NAME);
+	} else if(fieldPV.isStatic()) {
+	    name = new Name(fieldPV.getContainerType().getSort().toString() 
+		    	    + "::" 
+		    	    + fieldPV.toString());
 	} else {
 	    name = new Name(fieldPV.toString());
 	}
@@ -71,14 +88,14 @@ public class ExplicitHeapConverter {
     }
     
     
-    public Sort getSortOfSelect(Term selectTerm, Services services) {
-	assert selectTerm.op() == services.getJavaInfo().getSelect();
-	Term objectTerm = selectTerm.sub(1);
-	Term fieldTerm = selectTerm.sub(2);
+    public Sort getFieldTargetSort(Term objectTerm, 
+	    			   Term fieldTerm, 
+	    			   Services services) {
 	assert fieldTerm.op() instanceof UniqueRigidFunction;
-	UniqueRigidFunction fieldSymbol = (UniqueRigidFunction) fieldTerm.op();
+	final UniqueRigidFunction fieldSymbol = (UniqueRigidFunction) fieldTerm.op();
+	final String fieldSymbolName = fieldSymbol.name().toString();
 	
-	if(fieldSymbol.name().toString().equals(ARRAY_LENGTH_FIELD_NAME)) {
+	if(fieldSymbolName.equals(ARRAY_LENGTH_FIELD_NAME)) {
 	    return services.getTypeConverter().getIntLDT().targetSort();
 	} else if(fieldSymbol.arity() == 0) {
 	    ProgramVariable fieldPV
@@ -100,6 +117,7 @@ public class ExplicitHeapConverter {
         final AssignmentPair[] newPairs = new AssignmentPair[pairs.size()];
         
         boolean changedPair = false;
+        Term heapTerm = TB.heap(services);
         for(int i = 0; i < newPairs.length; i++) {
             final AssignmentPair pair = pairs.getAssignmentPair(i);
             final Location lhsLoc = pair.location();
@@ -122,20 +140,39 @@ public class ExplicitHeapConverter {
                 
                 newLhsLoc = services.getJavaInfo().getHeap();
                 newLhsSubs = new Term[0];
-                newRhs = TB.fieldStore(services,  
-                                       convert(objectTerm, services), 
-                                       fieldSymbol, 
-                                       convert(rhs, services));
+                heapTerm = TB.store(services, 
+                		    heapTerm, 
+                		    convert(objectTerm, services), 
+                		    TB.func(fieldSymbol), 
+                		    convert(rhs, services));
+                newRhs = heapTerm;
+            } else if(lhsLoc instanceof ProgramVariable 
+        	      && ((ProgramVariable)lhsLoc).isStatic()) {
+        	final ProgramVariable fieldPV = (ProgramVariable) lhsLoc;
+        	final Function fieldSymbol = getFieldSymbol(fieldPV, services);
+        	
+        	newLhsLoc = services.getJavaInfo().getHeap();
+        	newLhsSubs = new Term[0];
+        	heapTerm = TB.store(services, 
+        			    heapTerm, 
+        			    TB.NULL(services), 
+        			    TB.func(fieldSymbol),
+        			    convert(rhs, services));
+        	newRhs = heapTerm;
             } else if(lhsLoc instanceof ArrayOp) {
                 final Term objectTerm = lhsSubs[0];
                 final Term indexTerm  = lhsSubs[1];
                 
                 newLhsLoc = services.getJavaInfo().getHeap();
                 newLhsSubs = new Term[0];
-                newRhs = TB.arrayStore(services,  
-                                       convert(objectTerm, services), 
-                                       convert(indexTerm, services), 
-                                       convert(rhs, services));
+                heapTerm = TB.store(services, 
+                		    heapTerm, 
+                		    convert(objectTerm, services), 
+                		    TB.func(services.getJavaInfo()
+                			            .getArrayField(), 
+                			    convert(indexTerm, services)), 
+                	            convert(rhs, services));
+                newRhs = heapTerm;
             } else {
                 newLhsLoc  = lhsLoc;
                 newLhsSubs = convert(lhsSubs, services);
@@ -184,6 +221,15 @@ public class ExplicitHeapConverter {
             final Term dotTerm = TB.dot(services, 
                                         convert(objectTerm, services), 
                                         fieldSymbol);
+            return TB.tf().createCastTerm((AbstractSort) t.sort(), 
+                                          dotTerm);
+        } else if(t.op() instanceof ProgramVariable 
+        	      && ((ProgramVariable)t.op()).isStatic()) {
+            final ProgramVariable fieldPV = (ProgramVariable)t.op();
+            final Function fieldSymbol 
+                = getFieldSymbol(fieldPV, services);
+            final Term dotTerm = TB.staticDot(services, 
+                                              fieldSymbol);
             return TB.tf().createCastTerm((AbstractSort) t.sort(), 
                                           dotTerm);
         } else if(t.op() instanceof ArrayOp) {
@@ -310,6 +356,52 @@ public class ExplicitHeapConverter {
             for(Goal g : goals) {
                 convertDestructive(g, services);
             }
+        }
+    }
+    
+    
+    
+    //-------------------------------------------------------------------------
+    //inner classes
+    //-------------------------------------------------------------------------
+    
+    public static final class FieldTargetTypeResolver extends TypeResolver {
+                
+	private final SchemaVariable objectSV;
+        private final SchemaVariable fieldSV;
+
+        public FieldTargetTypeResolver(SchemaVariable objectSV,
+        			       SchemaVariable fieldSV) {
+            this.objectSV = objectSV;
+            this.fieldSV  = fieldSV;
+        }
+
+        public boolean isComplete(SchemaVariable sv,
+                SVSubstitute instCandidate, SVInstantiations instMap,
+                Services services) {            
+            return sv == fieldSV || instMap.getInstantiation(fieldSV) != null;
+        }
+
+        public Sort resolveSort(SchemaVariable sv, SVSubstitute instCandidate,
+                SVInstantiations instMap, Services services) {
+            Term objectTerm = (Term) instMap.getInstantiation(objectSV);
+            Term fieldTerm  = (Term) instMap.getInstantiation(fieldSV);
+
+            return ExplicitHeapConverter.INSTANCE.getFieldTargetSort(objectTerm, 
+        	    						     fieldTerm, 
+        	    						     services);
+        }
+
+        public KeYJavaType resolveType(SchemaVariable sv,
+                SVSubstitute instCandidate, SVInstantiations instMap,
+                Services services) {
+            Sort s = resolveSort(sv, instCandidate, instMap, services);
+            return services.getJavaInfo().getKeYJavaType(s);
+        }
+
+        
+        public String toString() {
+            return "\\fieldTargetType(" + fieldSV  + ")";
         }
     }
 }
