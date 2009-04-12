@@ -178,6 +178,7 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
 	toReturn.add(new SimplifySolver());
 	toReturn.add(new Z3Solver());
 	toReturn.add(new YicesSolver());
+	toReturn.add(new CVC3Solver());
 	return toReturn;
     }
     

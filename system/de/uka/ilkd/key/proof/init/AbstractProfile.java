@@ -18,10 +18,7 @@ import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.ListOfBuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.SLListOfBuiltInRule;
-import de.uka.ilkd.key.smt.SMTRule;
-import de.uka.ilkd.key.smt.SimplifySolver;
-import de.uka.ilkd.key.smt.YicesSolver;
-import de.uka.ilkd.key.smt.Z3Solver;
+import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.strategy.IteratorOfStrategyFactory;
 import de.uka.ilkd.key.strategy.SetAsListOfStrategyFactory;
 import de.uka.ilkd.key.strategy.SetOfStrategyFactory;
@@ -88,6 +85,7 @@ public abstract class AbstractProfile implements Profile {
         ListOfBuiltInRule builtInRules = SLListOfBuiltInRule.EMPTY_LIST;
         
         builtInRules = builtInRules.prepend(new SMTRule(new YicesSolver()));
+        builtInRules = builtInRules.prepend(new SMTRule(new CVC3Solver()));
         builtInRules = builtInRules.prepend(new SMTRule(new SimplifySolver()));
         builtInRules = builtInRules.prepend(new SMTRule(new Z3Solver()));
         

@@ -4,9 +4,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Timer;
 
-import de.uka.ilkd.key.smt.ExecutionWatchDog;
-
 import junit.framework.TestCase;
+import de.uka.ilkd.key.smt.ExecutionWatchDog;
 
 public class TestExecutionWatchDog extends TestCase {
 
