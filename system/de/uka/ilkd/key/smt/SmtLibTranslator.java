@@ -92,7 +92,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	    ArrayList<ArrayList<StringBuffer>> predicates,
 	    ArrayList<StringBuffer> types, SortHirarchy sortHirarchy) {
 	StringBuffer toReturn = new StringBuffer(
-		"( benchmark KeY-translation\n");
+		"( benchmark KeY_translation\n");
 	// add the sortdeclarations
 	// as sortshirarchies are not supported by smt-lib, only one
 	// sort should be used
@@ -102,39 +102,46 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	toReturn.append("\n :logic AUFLIA");
 	
 	// add the sort declarations
-	toReturn.append("\n :extrasorts (");
+	StringBuffer extrasorts = new StringBuffer();	    
 	for (StringBuffer s : types) {
 	    if (!(s == INTSTRING || s.equals(INTSTRING))) {
-		toReturn.append(s);
-		toReturn.append(" ");
+		extrasorts.append(s);
+		extrasorts.append(" ");
 	    }
 	}
-	toReturn.append(")");
+	if (extrasorts.length() > 0) {
+	    toReturn.append("\n :extrasorts (");
+	    toReturn.append(")");
+	}
 
 	// add the predicate declarations
-	toReturn.append("\n:extrapreds (");
-	for (ArrayList<StringBuffer> a : predicates) {
-	    toReturn.append("(");
-	    for (StringBuffer s : a) {
-		toReturn.append(s);
-		toReturn.append(" ");
+	if (predicates.size() > 0) {
+	    toReturn.append("\n:extrapreds (");
+	    for (ArrayList<StringBuffer> a : predicates) {
+		toReturn.append("(");
+		for (StringBuffer s : a) {
+		    toReturn.append(s);
+		    toReturn.append(" ");
+		}
+		toReturn.append(") ");
 	    }
-	    toReturn.append(") ");
+	    toReturn.append(")");
 	}
-	toReturn.append(")");
-
+	
 	// add the function declarations
-	toReturn.append("\n:extrafuns (");
-	for (ArrayList<StringBuffer> a : functions) {
-	    toReturn.append("(");
-	    for (StringBuffer s : a) {
-		toReturn.append(s);
-		toReturn.append(" ");
+	if (functions.size() > 0) {
+	    toReturn.append("\n:extrafuns (");
+	    for (ArrayList<StringBuffer> a : functions) {
+		toReturn.append("(");
+		for (StringBuffer s : a) {
+		    toReturn.append(s);
+		    toReturn.append(" ");
+		}
+		toReturn.append(") ");
 	    }
-	    toReturn.append(") ");
+	    toReturn.append(")");
 	}
-	toReturn.append(")");
-
+	    
 	for (StringBuffer s : assumptions) {
 	    toReturn.append("\n:assumption ").append(s);
 	}

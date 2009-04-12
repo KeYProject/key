@@ -15,16 +15,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Timer;
 
+import org.apache.log4j.Logger;
+
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.util.HelperClassForTests;
-
-import org.apache.log4j.Logger;
 
 
 public abstract class AbstractSMTSolver implements SMTSolver {
@@ -180,10 +177,10 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	try {
 	    //store the translation to a file                                
 	    final String loc = this.storeToFile(formula);
-	    
+
 	    //get the commands for execution
 	    String[] execCommand = this.getExecutionCommand(loc, formula);
-
+	    	    
 	    try {
 		Process p = Runtime.getRuntime().exec(execCommand);
 		ExecutionWatchDog tt = new ExecutionWatchDog(timeout, p);
@@ -203,7 +200,6 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		} finally {
 		    t.cancel();
 		}
-
 		if (p.exitValue() != 0) {
 		    //the process was terminated by force.
 		    toReturn = SMTSolverResult.NO_IDEA;
@@ -232,7 +228,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	    logger.error("The file with the formula could not be written.",
 			e);
 	    throw new RuntimeException(e.getMessage());
-	}
+	} 
 	
 	return toReturn;
     }
