@@ -111,6 +111,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	}
 	if (extrasorts.length() > 0) {
 	    toReturn.append("\n :extrasorts (");
+	    toReturn.append(extrasorts);
 	    toReturn.append(")");
 	}
 
