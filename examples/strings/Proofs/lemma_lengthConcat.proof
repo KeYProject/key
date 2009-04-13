@@ -1,0 +1,114 @@
+\settings {
+"#Proof-Settings-Config-File
+#Sat Apr 11 19:08:37 CEST 2009
+[DecisionProcedure]SmtBenchmarkArchiving=false
+[SimultaneousUpdateSimplifier]DeleteEffectLessLocations=true
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+[Model]Source=1
+[Strategy]Timeout=-1
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[Choice]DefaultChoices=transactions-transactions\:transactionsOn , throughout-throughout\:toutOn , assertions-assertions\:on , programRules-programRules\:Java , intRules-intRules\:arithmeticSemanticsIgnoringOF , initialisation-initialisation\:disableStaticInitialisation , transactionAbort-transactionAbort\:abortOn , nullPointerPolicy-nullPointerPolicy\:nullCheck , javacard-javacard\:jcOff
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_EXPAND
+[View]HideIntermediateProofsteps=false
+[DecisionProcedureForTest]=Cogent
+[SimultaneousUpdateSimplifier]EagerSimplification=true
+[View]HideClosedSubtrees=false
+[General]UseOCL=false
+[DecisionProcedure]=SIMPLIFY
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[View]ShowWholeTaclet=false
+[Libraries]Default=acc.key-false, stringRules.key-false, deprecatedRules.key-false
+[DecisionProcedure]SmtZipProblemDir=false
+[General]StupidMode=true
+[General]UseJML=false
+[General]DnDDirectionSensitive=true
+[General]ProofAssistant=false
+[View]FontIndex=2
+[StrategyProperty]QUERY_OPTIONS_KEY=QUERY_NONE
+[DecisionProcedure]SmtUseQuantifiers=true
+[StrategyProperty]GOALCHOOSER_OPTIONS_KEY=GOALCHOOSER_DEFAULT
+[Strategy]MaximumNumberOfAutomaticApplications=1000
+[View]MaxTooltipLines=40
+[General]SoundNotification=false
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[Choice]Choices=transactions-transactions\:transactionsOn-transactions\:transactionsOff , throughout-throughout\:toutOn-throughout\:toutOff , assertions-assertions\:on-assertions\:off-assertions\:safe , programRules-programRules\:Java-programRules\:ODL , intRules-intRules\:javaSemantics-intRules\:arithmeticSemanticsIgnoringOF-intRules\:arithmeticSemanticsCheckingOF , initialisation-initialisation\:enableStaticInitialisation-initialisation\:disableStaticInitialisation , transactionAbort-transactionAbort\:abortOn-transactionAbort\:abortOff , nullPointerPolicy-nullPointerPolicy\:noNullCheck-nullPointerPolicy\:nullCheck , javacard-javacard\:jcOff-javacard\:jcOn
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+"
+}
+
+
+\functions {
+\nonRigid CharList l2_36;
+\nonRigid CharList l_8;
+\nonRigid CharList l1_37;
+\nonRigid int i_10;
+\nonRigid jchar c_7;
+\nonRigid int k_9;
+\nonRigid int j_11;
+}
+
+\problem {
+  length(concat(l1_37, l2_36))
+= length(l1_37) + length(l2_36)
+
+}
+
+\proof {
+(keyLog "0" (keyUser "geilmann" ) (keyVersion "fb65e9b19068cfc132748bf3c241b00bc338cee3"))
+
+(autoModeTime "194")
+
+(branch "dummy ID"
+(rule "cl_induct" (inst "phi=\\forall CharList lv2; 
+  length(concat(lv1, lv2)) = length(lv1) + length(lv2)") (inst "lv=lv1") (inst "cv=cv") (userinteraction))
+(branch " Base Case"
+   (rule "allRight" (formula "1") (inst "sk=lv2_0") (userinteraction))
+   (rule "cl_concatEmpty1" (formula "1") (term "0,0") (userinteraction))
+   (rule "cl_lengthEmpty" (formula "1") (term "0,1") (userinteraction))
+   (rule "add_zero_left" (formula "1") (term "1") (userinteraction))
+   (rule "eqClose" (formula "1") (userinteraction))
+   (rule "closeTrue" (formula "1") (userinteraction))
+)
+(branch " Step Case"
+   (rule "allRight" (formula "1") (inst "sk=lv1_0") (userinteraction))
+   (rule "hide_right" (formula "2") (userinteraction))
+   (rule "allRight" (formula "1") (inst "sk=cv_0") (userinteraction))
+   (rule "impRight" (formula "1") (userinteraction))
+   (rule "andLeft" (formula "1") (userinteraction))
+   (rule "allRight" (formula "3") (inst "sk=lv2_1") (userinteraction))
+   (rule "cl_concatCons" (formula "3") (term "0,0") (userinteraction))
+   (rule "cl_lengthCons" (formula "3") (term "0") (userinteraction))
+   (rule "cl_lengthCons" (formula "3") (term "0,1") (userinteraction))
+   (rule "instAll" (formula "3") (term "1,0,0,0") (ifseqformula "2") (userinteraction))
+   (rule "inChar" (formula "2"))
+   (rule "true_left" (formula "2"))
+   (rule "polySimp_homoEq" (formula "3"))
+   (rule "polySimp_mulComm0" (formula "3") (term "1,0"))
+   (rule "polySimp_addComm0" (formula "3") (term "0,0,0"))
+   (rule "polySimp_addComm0" (formula "3") (term "1,1,0"))
+   (rule "polySimp_rightDist" (formula "3") (term "1,0"))
+   (rule "mul_literals" (formula "3") (term "0,1,0"))
+   (rule "polySimp_addAssoc" (formula "3") (term "0"))
+   (rule "polySimp_addComm1" (formula "3") (term "0,0"))
+   (rule "polySimp_addComm1" (formula "3") (term "0,0,0"))
+   (rule "add_literals" (formula "3") (term "0,0,0,0"))
+   (rule "add_zero_left" (formula "3") (term "0,0,0"))
+   (rule "applyEqRigid" (formula "3") (term "0,1,0") (ifseqformula "1"))
+   (rule "polySimp_pullOutFactor1" (formula "3") (term "0"))
+   (rule "add_literals" (formula "3") (term "1,0"))
+   (rule "times_zero_1" (formula "3") (term "0"))
+   (rule "eqClose" (formula "3"))
+   (rule "closeTrue" (formula "3"))
+)
+(branch " Use Case"
+   (rule "instAll" (formula "2") (term "0,0,0") (ifseqformula "1") (userinteraction))
+   (rule "instAll" (formula "3") (term "1,0,0") (ifseqformula "1") (userinteraction))
+   (rule "closeAntec" (formula "1") (ifseqformula "4") (userinteraction))
+)
+)
+
+}

@@ -1,0 +1,69 @@
+\settings {
+"#Proof-Settings-Config-File
+#Mon Apr 13 10:43:03 CEST 2009
+[DecisionProcedure]SmtBenchmarkArchiving=false
+[SimultaneousUpdateSimplifier]DeleteEffectLessLocations=true
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+[Model]Source=1
+[Strategy]Timeout=-1
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_HIGH
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_HIGH
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_LOW
+[Choice]DefaultChoices=throughout-throughout\:toutOn , transactions-transactions\:transactionsOn , assertions-assertions\:on , intRules-intRules\:arithmeticSemanticsIgnoringOF , programRules-programRules\:Java , initialisation-initialisation\:disableStaticInitialisation , transactionAbort-transactionAbort\:abortOn , nullPointerPolicy-nullPointerPolicy\:nullCheck , javacard-javacard\:jcOff
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_EXPAND
+[View]HideIntermediateProofsteps=false
+[DecisionProcedureForTest]=Cogent
+[SimultaneousUpdateSimplifier]EagerSimplification=true
+[View]HideClosedSubtrees=false
+[General]UseOCL=false
+[DecisionProcedure]=SIMPLIFY
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[View]ShowWholeTaclet=false
+[Libraries]Default=acc.key-false, stringRules.key-false, deprecatedRules.key-false
+[DecisionProcedure]SmtZipProblemDir=false
+[General]StupidMode=true
+[General]UseJML=false
+[General]DnDDirectionSensitive=true
+[General]ProofAssistant=false
+[View]FontIndex=2
+[StrategyProperty]QUERY_OPTIONS_KEY=QUERY_NONE
+[DecisionProcedure]SmtUseQuantifiers=true
+[StrategyProperty]GOALCHOOSER_OPTIONS_KEY=GOALCHOOSER_DEFAULT
+[Strategy]MaximumNumberOfAutomaticApplications=300
+[View]MaxTooltipLines=40
+[General]SoundNotification=false
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[Choice]Choices=throughout-throughout\:toutOn-throughout\:toutOff , transactions-transactions\:transactionsOn-transactions\:transactionsOff , assertions-assertions\:on-assertions\:off-assertions\:safe , intRules-intRules\:javaSemantics-intRules\:arithmeticSemanticsIgnoringOF-intRules\:arithmeticSemanticsCheckingOF , programRules-programRules\:Java-programRules\:ODL , initialisation-initialisation\:enableStaticInitialisation-initialisation\:disableStaticInitialisation , transactionAbort-transactionAbort\:abortOn-transactionAbort\:abortOff , nullPointerPolicy-nullPointerPolicy\:noNullCheck-nullPointerPolicy\:nullCheck , javacard-javacard\:jcOff-javacard\:jcOn
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+"
+}
+
+
+\functions {
+\nonRigid int i_67;
+\nonRigid CharList l_63;
+\nonRigid jchar c1_65;
+\nonRigid jchar c2_64;
+\nonRigid int j_66;
+}
+
+\problem {
+  replace(c1_65, c2_64, substring(i_67, j_66, l_63))
+= substring(i_67, j_66, replace(c1_65, c2_64, l_63))
+
+}
+
+\proof {
+(keyLog "0" (keyUser "geilmann" ) (keyVersion "fb65e9b19068cfc132748bf3c241b00bc338cee3"))
+
+(autoModeTime "0")
+
+(branch "dummy ID"
+(rule "lemma_substringReplace" (formula "1") (term "1") (userinteraction))
+(rule "eqClose" (formula "1") (userinteraction))
+(rule "closeTrue" (formula "1") (userinteraction))
+)
+
+}
