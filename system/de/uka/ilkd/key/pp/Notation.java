@@ -204,6 +204,58 @@ public abstract class Notation {
     }
 
     /**
+     * The standard concrete syntax for numerical quantifiers.
+     */
+    public static class NumericalQuantifier extends Notation {
+        String name;
+
+        int ass1, ass2;
+
+        public NumericalQuantifier(String name, int prio, int ass1, int ass2) {
+            super(prio);
+            this.name = name;
+            this.ass1 = ass1;
+            this.ass2 = ass2;
+        }
+
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
+                sp.printTerm(t);
+            } else {
+                sp.printNumericalQuantifierTerm(name, t.varsBoundHere(0), t.sub(0), 
+                        t.sub(1), ass1, ass2);
+            }
+        }
+
+    }       
+
+    /**
+     * The standard concrete syntax for bounded numerical quantifiers.
+     */
+    public static class BoundedNumericalQuantifier extends Notation {
+        String name;
+
+        int ass1, ass2;
+
+        public BoundedNumericalQuantifier(String name, int prio, int ass1, int ass2) {
+            super(prio);
+            this.name = name;
+            this.ass1 = ass1;
+            this.ass2 = ass2;
+        }
+
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
+                sp.printTerm(t);
+            } else {
+                sp.printBoundedNumericalQuantifierTerm(name, t.varsBoundHere(0), t.sub(0), 
+                        t.sub(1), t.sub(2), ass1, ass2);
+            }
+        }
+
+    }
+
+    /**
          * The standard concrete syntax for DL modalities box and diamond.
          */
     public static class Modality extends Notation {

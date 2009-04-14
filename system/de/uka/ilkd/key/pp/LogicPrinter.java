@@ -1519,6 +1519,54 @@ public class LogicPrinter {
         layouter.end();
     }
 
+    public void printNumericalQuantifierTerm(String name,
+            ArrayOfQuantifiableVariable vars,
+            Term cond, Term summand, int ass, int ass2)
+    throws IOException
+    {
+        layouter.beginC(2);
+        layouter.print(name).print(" ");
+        printVariables(vars);
+        layouter.brk();
+        layouter.print("(");
+        startTerm(2);
+        markStartSub();
+        printTerm(cond);
+        markEndSub();
+        layouter.print(";").brk(1,0);
+        markStartSub();
+        printTerm(summand);
+        markEndSub();
+        layouter.print(")");
+        layouter.end();
+    }
+
+    public void printBoundedNumericalQuantifierTerm(String name,
+            ArrayOfQuantifiableVariable vars,
+            Term lower, Term upper, Term summand, int ass, int ass2)
+    throws IOException
+    {
+        layouter.beginC(2);
+        layouter.print(name).print(" ");
+        printVariables(vars);
+        layouter.brk();
+        layouter.print("(");
+        startTerm(3);
+        markStartSub();
+        printTerm(lower);
+        markEndSub();
+        layouter.print(";").brk(1,0);
+        markStartSub();
+        printTerm(upper);
+        markEndSub();
+        layouter.print(";").brk(1,0);
+        markStartSub();
+        printTerm(summand);
+        markEndSub();       
+        layouter.print(")");
+        layouter.end();
+    }
+
 
 
     /** Print a constant.  This just prints the string <code>s</code> and

@@ -713,7 +713,15 @@ public class TermFactory {
 	    throw new IllegalArgumentException("null-Operator at TermFactory");
 	} else if (op instanceof Quantifier) {
 	    return createQuantifierTerm((Quantifier)op, bv[0], subTerms[0]);
-	} else if (op instanceof QuanUpdateOperator) {
+	}  else if(op instanceof NumericalQuantifier){
+	    if(bv[0].size()!=1) throw new RuntimeException();
+            return createNumericalQuantifierTerm((NumericalQuantifier) op, subTerms[0], 
+                    subTerms[1], bv[0]);
+        }  else if(op instanceof BoundedNumericalQuantifier){
+            if(bv[0].size()!=1) throw new RuntimeException();
+            return createBoundedNumericalQuantifierTerm((BoundedNumericalQuantifier) op, subTerms[0], 
+                    subTerms[1], subTerms[2], bv[0]);
+        } else if (op instanceof QuanUpdateOperator) {
 	    final QuanUpdateOperator updOp = (QuanUpdateOperator)op;
 	    if ( bv == null ) {
 	        bv = new ArrayOfQuantifiableVariable [subTerms.length];
@@ -896,6 +904,15 @@ public class TermFactory {
             .normalize ( boundVars, guards, locs, values, target );
     }
 
+    public Term createNumericalQuantifierTerm(NumericalQuantifier op, 
+            Term cond, Term t, ArrayOfQuantifiableVariable va){
+        return new NumericalQuantifierTerm(op, new Term[]{cond, t}, va).checked();
+    }
+    
+    public Term createBoundedNumericalQuantifierTerm(BoundedNumericalQuantifier op, 
+            Term a, Term b, Term t, ArrayOfQuantifiableVariable va){
+        return new BoundedNumericalQuantifierTerm(op, new Term[]{a, b, t}, va).checked();
+    } 
 
     /** 
      * creates a term consisting of the given variable.

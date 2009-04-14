@@ -3124,6 +3124,8 @@ term130 returns [Term a = null]
     |   "false" { a = tf.createJunctorTerm(Op.FALSE); }
     |   a = ifThenElseTerm
     |   a = ifExThenElseTerm
+    |   a = sum_or_product_term
+    |   a = bounded_sum_term
     //Used for OCL Simplification.
     //WATCHOUT: Woj: some time we will need to have support for strings in Java DL too,
     // what then? This here is specific to OCL, isn't it?
@@ -3162,6 +3164,53 @@ abbreviation returns [Term a=null]
                 }                                
             }
         )
+    ;
+
+sum_or_product_term returns [Term result=null]
+{
+    Term cond, t;
+    NumericalQuantifier op=null;
+    ListOfQuantifiableVariable index = null;   
+}
+    :
+        (
+            SUM {op = Op.SUM;}
+        |
+            PRODUCT {op = Op.PRODUCT;}
+        )
+        index=bound_variables
+        LPAREN
+        cond=term 
+        SEMI t=term 
+        {
+            unbindVars();
+            result = tf.createNumericalQuantifierTerm(op, cond, t, 
+                new ArrayOfQuantifiableVariable(index.toArray()));
+        }
+        RPAREN
+    ;
+    
+bounded_sum_term returns [Term result=null]
+{
+    Term a, b, t;
+    BoundedNumericalQuantifier op=null;
+    ListOfQuantifiableVariable index = null;   
+}
+    :
+        BSUM {op = Op.BSUM;}
+        index=bound_variables
+        LPAREN
+        a=term 
+        SEMI
+        b=term 
+        SEMI
+        t=term 
+        {
+            unbindVars();
+            result = tf.createBoundedNumericalQuantifierTerm(op, a, b, t, 
+                new ArrayOfQuantifiableVariable(index.toArray()));
+        }
+        RPAREN
     ;
 
 ifThenElseTerm returns [Term result = null]
