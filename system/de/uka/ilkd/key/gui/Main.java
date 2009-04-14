@@ -2872,14 +2872,14 @@ public class Main extends JFrame implements IMain {
 	    if (!DecisionProcedureSettings.NOT_A_RULE.equals(decisionProcedure)) {
 		putValue(SHORT_DESCRIPTION, "Invokes " + decisionProcedure.getDisplayName());
 	    } else {		
-		putValue(SHORT_DESCRIPTION, "No supported external prover (SMT/Simplify) installed.");
+		putValue(SHORT_DESCRIPTION, "Please select an external prover under Options | Decision Procedures.");
 	    }
 	    
 	}
 	
 	public boolean isEnabled() {
-	    return super.isEnabled() && 
-	      mediator != null && mediator.getProof() != null && !mediator.getProof().closed();
+	    return super.isEnabled() && !decisionProcedure.equals(DecisionProcedureSettings.NOT_A_RULE) && 
+ 	      mediator != null && mediator.getProof() != null && !mediator.getProof().closed();
 	}
 	  
 	public void actionPerformed(ActionEvent e) {

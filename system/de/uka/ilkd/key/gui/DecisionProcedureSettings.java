@@ -24,7 +24,7 @@ import de.uka.ilkd.key.smt.SMTRule;
 public class DecisionProcedureSettings implements Settings {
     
     public static final RuleDescriptor NOT_A_RULE = 
-	    new RuleDescriptor(new Name("N/A"), "N/A");
+	    new RuleDescriptor(new Name("N/A"), "None Selected");
     /**
      * Small data container wrapping name and display name of a rule     
      */
