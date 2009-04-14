@@ -213,11 +213,18 @@ public class TermBuilder {
         return tf.createVariableTerm(v);
     }
     
+    public Term var(SchemaVariable v) {
+	return tf.createVariableTerm(v);
+    }
+    
+    
     public Term var(ParsableVariable v) {
 	if (v instanceof ProgramVariable) {
 	    return var((ProgramVariable) v);
 	} else if(v instanceof LogicVariable) {
 	    return var((LogicVariable) v);
+	} else if(v instanceof SchemaVariable) {
+	    return var((SchemaVariable) v); 
 	} else {
 	    throw new IllegalArgumentException("Wrong parsablevariable kind: " 
 	                                        + v.getClass());

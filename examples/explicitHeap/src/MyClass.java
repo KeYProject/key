@@ -1,7 +1,7 @@
 class MyClass {
     int attr;
     int attr2;
-    MyClass next;
+    /*@nullable@*/ MyClass next;
     
     
     /*@ normal_behavior
@@ -81,5 +81,26 @@ class MyClass {
     int[] createArray(int n) {
 	int[] a = new int[n];
 	return a;
+    }
+    
+    
+    
+        /*@
+      @ protected normal_behavior
+      @  ensures attr == \old(attr) + 1;
+      @  diverges true;
+      @  assignable contents, attr;
+      @*/
+    protected void incSize(int[] contents) {
+        ++attr;
+        contents = new int[33];
+        int i = 0;
+        /*@ loop_invariant 0 <= i && i <= contents.length;
+          @ modifies i, contents[*];
+          @*/
+        while ( i < contents.length ) {
+            contents[i] = 33;
+            ++i;
+        }
     }
 }

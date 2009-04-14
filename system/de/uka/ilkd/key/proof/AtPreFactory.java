@@ -63,7 +63,7 @@ public class AtPreFactory {
      * Returns an available name constructed by affixing a counter to the passed 
      * base name.
      */
-    private String getNewName(String baseName, 
+    public String getNewName(String baseName, 
                               Services services, 
                               List<String> locallyUsedNames) {
         NamespaceSet namespaces = services.getNamespaces();

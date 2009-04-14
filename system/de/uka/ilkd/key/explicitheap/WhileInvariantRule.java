@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.explicitheap;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.*;
@@ -24,13 +26,9 @@ import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ldt.BooleanLDT;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.proof.AtPreFactory;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.ListOfGoal;
-import de.uka.ilkd.key.proof.LoopInvariantProposer;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.UpdateSimplifier;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
 import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair;
@@ -38,9 +36,6 @@ import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
 
-/**
- * An implementation of the classical while invariant rule (without updates). 
- */
 public final class WhileInvariantRule implements BuiltInRule {
     
     public static final WhileInvariantRule INSTANCE = new WhileInvariantRule();
@@ -49,6 +44,8 @@ public final class WhileInvariantRule implements BuiltInRule {
     private static final TermBuilder TB = TermBuilder.DF;
     private static final InvInferenceTools IIT = InvInferenceTools.INSTANCE;
     private static final AtPreFactory APF = AtPreFactory.INSTANCE;
+    
+    private static final boolean FRAME_WITH_TACLETS = true;
     
     private Term lastFocusTerm;
     private Instantiation lastInstantiation;
@@ -132,39 +129,147 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
     
     
+    private SetOfTaclet buildHeapFrameTaclets(Update uAndAnonUpdate,
+	    		     		      Term heapTerm,
+	    				      Term heapAtPreTerm,
+	    				      Term allowedHeapChange,
+	    				      Term objVarTerm,
+	    				      Term fieldVarTerm,
+	    				      Services services,
+	    				      UpdateFactory uf,
+	    				      Goal goal) {
+	Sort objectSort = services.getJavaInfo().getJavaLangObjectAsSort();
+	Sort fieldSort  = services.getJavaInfo().getFieldSort();
+	Sort heapSort   = services.getJavaInfo().getHeap().sort();
+	SchemaVariable objSV = SchemaVariableFactory.createTermSV(
+        					new Name("o"),
+        					objectSort,
+        					false,
+        					false, 
+        					false);	
+	SchemaVariable fieldSV = SchemaVariableFactory.createTermSV(
+        					new Name("f"),
+        					fieldSort,
+        					false,
+        					false, 
+        					false);
+	//create schema variables
+        Term objSVTerm    = TB.var(objSV);
+        Term fieldSVTerm  = TB.var(fieldSV);
+        
+        //replace logic with schema vars
+        Map<Term,Term> map = new HashMap<Term,Term>();
+        map.put(objVarTerm, objSVTerm);
+        map.put(fieldVarTerm, fieldSVTerm);
+        OpReplacer or = new OpReplacer(map);
+        Term schemaAllowedHeapChange = or.replace(allowedHeapChange); 
+
+        //create "find" term
+        Term findTerm = TB.select(services, 
+        		          uf.apply(uAndAnonUpdate, heapTerm), 
+        		          objSVTerm, 
+        			  fieldSVTerm);
+        
+        //create "replacewith" term
+        String anonName = APF.getNewName("anon", 
+        				 services, new ArrayList<String>());
+        Function skolemFunc = new RigidFunction(new Name(anonName), 
+        					Sort.ANY, 
+        					new Sort[]{objectSort, 
+            						   fieldSort});
+        services.getNamespaces().functions().add(skolemFunc);
+        Term replaceWithTerm = uf.prepend(uAndAnonUpdate, 
+        				  TB.ife(schemaAllowedHeapChange, 
+        				         TB.func(skolemFunc, objSVTerm, fieldSVTerm), 
+        				         TB.select(services, 
+        				                   heapAtPreTerm, 
+        				                   objSVTerm, 
+        				                   fieldSVTerm)));
+        
+        //create taclet
+        RewriteTacletBuilder rtb = new RewriteTacletBuilder();
+        rtb.setName(new Name("selectFromLoopHeap" + goal.node().getUniqueTacletNr()));
+	rtb.setFind(findTerm);
+	rtb.addTacletGoalTemplate(new RewriteTacletGoalTemplate(
+					Sequent.EMPTY_SEQUENT,
+				        SLListOfTaclet.EMPTY_LIST,
+				        replaceWithTerm));
+	rtb.addRuleSet(new RuleSet(new Name("simplify")));
+	rtb.setStateRestriction(RewriteTaclet.IN_SEQUENT_STATE);
+	final Taclet baseTaclet = rtb.getTaclet();
+	
+	//variation 2
+	SchemaVariable heapSV = SchemaVariableFactory.createTermSV(
+        					new Name("h"),
+        					heapSort,
+        					false,
+        					false, 
+        					false);
+	Term heapSVTerm = TB.var(heapSV);
+	rtb.setFind(TB.select(services, heapSVTerm, objSVTerm, fieldSVTerm));
+	Term assumesTerm = TB.equals(uf.apply(uAndAnonUpdate, heapTerm), heapSVTerm);
+	rtb.setIfSequent(Sequent.EMPTY_SEQUENT
+		                .addFormula(new ConstrainedFormula(assumesTerm), 
+		                	    true, 
+		                	    true).sequent());
+	rtb.setName(new Name(rtb.getName().toString() + "_2"));
+	final Taclet variationTaclet2 = rtb.getTaclet(); 
+	
+	//variation 3
+	assumesTerm = TB.equals(heapSVTerm, uf.apply(uAndAnonUpdate, heapTerm));
+	rtb.setIfSequent(Sequent.EMPTY_SEQUENT
+		                .addFormula(new ConstrainedFormula(assumesTerm), 
+		                	    true, 
+		                	    true).sequent());
+	rtb.setName(new Name(rtb.getName().toString() + "_2"));
+	final Taclet variationTaclet3 = rtb.getTaclet();	
+	
+	return SetAsListOfTaclet.EMPTY_SET.add(baseTaclet)
+	                                  .add(variationTaclet2)
+	                                  .add(variationTaclet3);
+    }
+    
+    
     private AnonymisationInfo getAnonymisation(
+	    			    Update u,
                                     SetOfLocationDescriptor mod,
                                     ListOfProgramVariable relevantLocalVars,
                                     Services services,
-                                    UpdateFactory uf) {
+                                    UpdateFactory uf,
+                                    Goal goal) {
+	final Term heapTerm = TB.heap(services);
+
         //build anon update
-        Update anonUpdate = uf.skip(); 
-        AnonymisingUpdateFactory auf = new AnonymisingUpdateFactory(uf);
+        final AnonymisingUpdateFactory auf = new AnonymisingUpdateFactory(uf);	
+        Update anonUpdate = uf.skip();
         for(ProgramVariable pv : relevantLocalVars) {
             LocationDescriptor loc = new BasicLocationDescriptor(TB.var(pv));
-            Update u = auf.createAnonymisingUpdate(
+            Update pvAnonUpdate = auf.createAnonymisingUpdate(
                                 SetAsListOfLocationDescriptor.EMPTY_SET.add(loc), 
                                 services);
-            anonUpdate = uf.parallel(anonUpdate, u);
+            assert pvAnonUpdate.locationCount() == 1;
+            services.getNamespaces().functions().add(pvAnonUpdate.getAssignmentPair(0).value().op());
+            anonUpdate = uf.parallel(anonUpdate, pvAnonUpdate);
         }
-        {
-            LocationDescriptor loc = new BasicLocationDescriptor(TB.heap(services));
-            Update u = auf.createAnonymisingUpdate(
-                                    SetAsListOfLocationDescriptor.EMPTY_SET.add(loc), 
-                                    services);
-            anonUpdate = uf.parallel(anonUpdate, u);
+        {                    
+            String anonHeapName 
+        	= APF.getNewName("loopHeap", services, new ArrayList<String>());
+            Term anonHeapTerm 
+        	= TB.func(new RigidFunction(new Name(anonHeapName), 
+        		                    heapTerm.sort(), 
+        		                    new Sort[0]));
+            services.getNamespaces().functions().add(anonHeapTerm.op());
+            Update heapAnonUpdate = uf.elementaryUpdate(heapTerm, anonHeapTerm);
+            anonUpdate = uf.parallel(anonUpdate, heapAnonUpdate);
         }
         
         //prepare quantification over locations
-        LogicVariable objVar 
-            = new LogicVariable(new Name("obj"), 
-                                services.getJavaInfo()
-                                         .getJavaLangObjectAsSort());
-        LogicVariable fieldVar
-            = new LogicVariable(new Name("field"),
-                                services.getJavaInfo().getFieldSort());
-        Term objVarTerm   = TB.func(objVar);
-        Term fieldVarTerm = TB.func(fieldVar);        
+        final Sort objectSort = services.getJavaInfo().getJavaLangObjectAsSort();
+        final Sort fieldSort = services.getJavaInfo().getFieldSort();        
+        final LogicVariable objVar = new LogicVariable(new Name("o"), objectSort);
+        final LogicVariable fieldVar = new LogicVariable(new Name("f"), fieldSort);
+        final Term objVarTerm   = TB.var(objVar);
+        final Term fieldVarTerm = TB.var(fieldVar);
        
         //what is allowed to be changed by modifies clause?
         Term allowedHeapChange = TB.ff();
@@ -211,18 +316,17 @@ public final class WhileInvariantRule implements BuiltInRule {
                 }
             } else {
                 assert loc instanceof EverythingLocationDescriptor;
-                allowedHeapChange = TB.ff();
+                allowedHeapChange = TB.tt();
                 allowedLocalVars = SLListOfProgramVariable.EMPTY_LIST;
                 break;
             }
         }
         
-        //prepare frame condition, atPre definitions
-        Term heapTerm = TB.heap(services);
-        Term heapAtPreTerm 
+        //prepare heap frame condition, heap frame taclet, heap atPre definitions
+        final Term heapAtPreTerm
                 = TB.func(APF.createAtPreFunction(heapTerm.op(), services));
-        Term atPreDef = TB.equals(heapTerm, heapAtPreTerm);                        
-        Term frameCondition 
+        final Term heapAtPreDef = TB.equals(heapTerm, heapAtPreTerm);                        
+        final Term heapFrameCondition 
                 = TB.all(new QuantifiableVariable[]{objVar, fieldVar},
                          TB.or(allowedHeapChange,
                                TB.equals(TB.select(services, 
@@ -233,18 +337,43 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                     heapAtPreTerm, 
                                                     objVarTerm, 
                                                     fieldVarTerm))));
+        final SetOfTaclet heapFrameTaclets 
+        	= buildHeapFrameTaclets(uf.sequential(u, anonUpdate),
+        	  	                heapTerm,
+        			        heapAtPreTerm,
+        			        allowedHeapChange, 
+        			        objVarTerm, 
+        			        fieldVarTerm, 
+        			        services, 
+        			        uf,
+        			        goal);
+        
+        //prepare local frame condition, local atPre definitions
+        Term localFrameCondition = TB.tt();
+        Term localAtPreDef = TB.tt();
         for(ProgramVariable pv : relevantLocalVars) {
             if(!allowedLocalVars.contains(pv)) {
                 Term pvTerm = TB.var(pv);
                 Term pvAtPreTerm 
                     = TB.func(APF.createAtPreFunction(pv, services));
-                atPreDef = TB.and(atPreDef, TB.equals(pvTerm, pvAtPreTerm));
-                frameCondition
-                    = TB.and(frameCondition, TB.equals(pvTerm, pvAtPreTerm));
+                Term pvUnchangedTerm = TB.equals(pvTerm, pvAtPreTerm);                
+                localAtPreDef 	
+                    = TB.and(localAtPreDef, pvUnchangedTerm);
+                localFrameCondition
+                    = TB.and(localFrameCondition, pvUnchangedTerm);
             }
         }
         
-        return new AnonymisationInfo(anonUpdate, frameCondition, atPreDef);
+        
+        //put together
+        final Term frameCondition = TB.and(heapFrameCondition, localFrameCondition);
+        final Term atPreDef = TB.and(heapAtPreDef, localAtPreDef);
+        
+        return new AnonymisationInfo(anonUpdate, 
+        			     frameCondition,
+        			     heapFrameTaclets,
+        			     localFrameCondition,
+        			     atPreDef);
     }
     
     
@@ -287,7 +416,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         UpdateFactory uf = new UpdateFactory(services, new UpdateSimplifier());        
         FreePVCollector pc = new FreePVCollector(inst.loop, services);
         pc.start();        
-        AnonymisationInfo anon = getAnonymisation(mod, pc.result(), services, uf);
+        AnonymisationInfo anon = getAnonymisation(inst.u, mod, pc.result(), services, uf, goal);
         
         //split goal into three branches
         ListOfGoal result = goal.split(3);
@@ -325,7 +454,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         Update uAndAnonUpdate = uf.sequential(inst.u, anon.anonUpdate);
         Term invAndFrameAndWellFormed 
         	= TB.and(new Term[]{invTerm, 
-        			    anon.frameCondition, 
+        			    FRAME_WITH_TACLETS 
+        			       ? anon.localFrameCondition
+        		               : anon.frameCondition, 
         			    TB.wellFormedHeap(services)});
         
         //"Invariant Initially Valid":
@@ -394,6 +525,20 @@ public final class WhileInvariantRule implements BuiltInRule {
                                        guardFalseRestPsi)), 
                 ruleApp.posInOccurrence());
         
+        //add taclets
+        if(FRAME_WITH_TACLETS) {
+            for(Taclet t : anon.heapFrameTaclets) {
+                bodyGoal.addTaclet(t, 
+                                   SVInstantiations.EMPTY_SVINSTANTIATIONS, 
+                                   ruleApp.constraint(), 
+                                   false);
+                useGoal.addTaclet(t, 
+            	              SVInstantiations.EMPTY_SVINSTANTIATIONS, 
+            	              ruleApp.constraint(), 
+            	              false);        	
+            }
+        }
+        
         return result;
     }
     
@@ -450,17 +595,23 @@ public final class WhileInvariantRule implements BuiltInRule {
     private static final class AnonymisationInfo {
         public final Update anonUpdate;
         public final Term frameCondition;
+        public final SetOfTaclet heapFrameTaclets;
+        public final Term localFrameCondition;        
         public final Term atPreDef;
         
         public AnonymisationInfo(Update anonUpdate, 
                                  Term frameCondition,
+                                 SetOfTaclet heapFrameTaclets,
+                                 Term localFrameCondition,
                                  Term atPreDef) {
             assert anonUpdate != null;
             assert frameCondition != null;
             assert atPreDef != null;
-            this.anonUpdate     = anonUpdate;
-            this.frameCondition = frameCondition;
-            this.atPreDef       = atPreDef;
+            this.anonUpdate           = anonUpdate;
+            this.frameCondition       = frameCondition;
+            this.heapFrameTaclets     = heapFrameTaclets;
+            this.localFrameCondition  = localFrameCondition;
+            this.atPreDef             = atPreDef;
         }
     }
     

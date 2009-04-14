@@ -45,13 +45,19 @@ public class RuleJustificationByAddRules implements RuleJustification{
     }
 
     public String toString() {
-        LogicPrinter tacPrinter = new LogicPrinter 
-            (new ProgramPrinter(null),                       
-             NotationInfo.createInstance(),   
-             node.proof().getServices(),
-             true);      
-        tacPrinter.printTaclet((Taclet)(motherTaclet().rule()));
+	String mother;
+	if(motherTaclet().rule() instanceof Taclet) {
+            LogicPrinter tacPrinter = new LogicPrinter 
+                (new ProgramPrinter(null),                       
+                 NotationInfo.createInstance(),   
+                 node.proof().getServices(),
+                 true);      
+            tacPrinter.printTaclet((Taclet)(motherTaclet().rule()));
+            mother = tacPrinter.toString();
+	} else {
+	    mother = motherTaclet().rule().name().toString();
+	}
 	return "added rule justification \nintroduced at node "
-                + node.serialNr() + " by rule \n" + tacPrinter;
+                + node.serialNr() + " by rule \n" + mother;
     }
 }
