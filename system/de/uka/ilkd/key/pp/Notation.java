@@ -248,7 +248,7 @@ public abstract class Notation {
             if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
                 sp.printTerm(t);
             } else {
-                sp.printBoundedNumericalQuantifierTerm(name, t.varsBoundHere(0), t.sub(0), 
+                sp.printBoundedNumericalQuantifierTerm(name, t.varsBoundHere(2), t.sub(0), 
                         t.sub(1), t.sub(2), ass1, ass2);
             }
         }

@@ -718,9 +718,9 @@ public class TermFactory {
             return createNumericalQuantifierTerm((NumericalQuantifier) op, subTerms[0], 
                     subTerms[1], bv[0]);
         }  else if(op instanceof BoundedNumericalQuantifier){
-            if(bv[0].size()!=1) throw new RuntimeException();
+            if(bv[2].size()!=1) throw new RuntimeException();
             return createBoundedNumericalQuantifierTerm((BoundedNumericalQuantifier) op, subTerms[0], 
-                    subTerms[1], subTerms[2], bv[0]);
+                    subTerms[1], subTerms[2], bv[2]);
         } else if (op instanceof QuanUpdateOperator) {
 	    final QuanUpdateOperator updOp = (QuanUpdateOperator)op;
 	    if ( bv == null ) {

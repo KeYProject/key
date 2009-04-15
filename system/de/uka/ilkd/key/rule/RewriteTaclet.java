@@ -196,8 +196,8 @@ public class RewriteTaclet extends FindTaclet{
 	            subs, origvars, term.javaBlock());
 	} 
                                       
-	with = syntacticalReplace(with, services, mc);        
-               
+	with = syntacticalReplace(with, services, mc);   
+
         
         if (maxSort instanceof AbstractSort) {
             final boolean noCastNecessary = with.sort().extendsTrans(maxSort);            

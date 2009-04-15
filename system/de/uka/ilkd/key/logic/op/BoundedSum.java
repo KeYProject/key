@@ -7,5 +7,5 @@ public class BoundedSum extends BoundedNumericalQuantifier {
     BoundedSum(){
         super(new Name("\\bSum"));
     }
-    
+
 }

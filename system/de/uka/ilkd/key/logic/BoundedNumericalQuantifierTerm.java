@@ -14,7 +14,7 @@ class BoundedNumericalQuantifierTerm extends OpTerm.ArbitraryOpTerm {
     }
 
     public ArrayOfQuantifiableVariable varsBoundHere(int n) {
-	return varsBoundHere;
+	return n==2? varsBoundHere : EMPTY_VAR_LIST;
     }
     
 }

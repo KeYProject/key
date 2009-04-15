@@ -22,4 +22,8 @@ public class BoundedNumericalQuantifier extends Op {
         return term.arity()==arity();
     }
 
+    public Sort argSort(int i) {
+	return Sort.ANY;
+    }
+
 }
