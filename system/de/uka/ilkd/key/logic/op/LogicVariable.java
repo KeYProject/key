@@ -57,4 +57,16 @@ public class LogicVariable extends TermSymbol
 	return ""+name()+":"+sort();
     }
 
+    public boolean equals(Object o){
+	if(!(o instanceof LogicVariable)){
+	    return false;
+	}
+	LogicVariable lv = (LogicVariable) o;
+	return name().equals(lv.name()) && sort().equals(lv.sort());
+    }
+
+    public int hashCode(){
+	return 5*name().hashCode()+17*sort().hashCode()+7;
+    }
+
 }
