@@ -16,5 +16,13 @@ class BoundedNumericalQuantifierTerm extends OpTerm.ArbitraryOpTerm {
     public ArrayOfQuantifiableVariable varsBoundHere(int n) {
 	return n==2? varsBoundHere : EMPTY_VAR_LIST;
     }
+
+    public boolean equals(Object o){
+	return equalsModRenaming(o);
+    }
     
+    public int hashCode(){
+	return sub(0).hashCode()*3 + sub(1).hashCode()*7;
+    }
+
 }
