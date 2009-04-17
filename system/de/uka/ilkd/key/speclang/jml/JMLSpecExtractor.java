@@ -206,7 +206,7 @@ public class JMLSpecExtractor implements SpecExtractor {
 	SetOfPositionedString result = SetAsListOfPositionedString.EMPTY_SET; 
 	final Type varType  = kjt.getJavaType(); 
 
-	if (!services.getTypeConverter().isReferenceType(varType) && !isImplicitVar) {
+	if (services.getTypeConverter().isReferenceType(varType) && !isImplicitVar) {
 
 	    PositionedString ps 
 	    = new PositionedString(varName + " != null", fileName, pos);
