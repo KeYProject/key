@@ -25,10 +25,11 @@ public class DecisionProcedureSettings implements Settings {
     
     public static final RuleDescriptor NOT_A_RULE = 
 	    new RuleDescriptor(new Name("N/A"), "None Selected");
+    
     /**
      * Small data container wrapping name and display name of a rule     
      */
-    public static class RuleDescriptor {		
+    public static class RuleDescriptor implements Comparable<RuleDescriptor> {		
 	
 	private final Name ruleName;
 	private final String displayName;
@@ -54,6 +55,14 @@ public class DecisionProcedureSettings implements Settings {
 	
 	public String toString() {
 	    return ruleName + "(" + displayName + ")";
+	}
+	
+	public int hashCode() {
+	    return ruleName.hashCode();
+	}
+	
+	public int compareTo(RuleDescriptor rd) {
+	    return ruleName.compareTo(rd.ruleName);
 	}
     }
     
@@ -124,10 +133,13 @@ public class DecisionProcedureSettings implements Settings {
     }
     
     /**
-     * Returns a list of all available rules
+     * Returns a list of all available rules, sorted alphabetically by rule name.
      */
     public List<RuleDescriptor> getAvailableRules() {
-	return Collections.unmodifiableList(rules);
+	List<RuleDescriptor> sortedRules = new ArrayList<RuleDescriptor>();
+	sortedRules.addAll(rules);
+	Collections.sort(sortedRules);
+	return Collections.unmodifiableList(sortedRules);
     }
     
     /**
@@ -195,7 +207,6 @@ public class DecisionProcedureSettings implements Settings {
      */
     public void updateSMTRules(Profile profile) {
 	//Load the available Solver
-	// Rules should not be created here! Use Profiles for this purpose %%RB
 	rules = new ArrayList<RuleDescriptor>();
 	for (Rule r : profile.
 		getStandardRules().getStandardBuiltInRules()) {

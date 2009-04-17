@@ -84,10 +84,10 @@ public abstract class AbstractProfile implements Profile {
     protected ListOfBuiltInRule initBuiltInRules() {
         ListOfBuiltInRule builtInRules = SLListOfBuiltInRule.EMPTY_LIST;
         
+        builtInRules = builtInRules.prepend(new SMTRule(new Z3Solver()));        
         builtInRules = builtInRules.prepend(new SMTRule(new YicesSolver()));
+        builtInRules = builtInRules.prepend(new SMTRule(new SimplifySolver()));        
         builtInRules = builtInRules.prepend(new SMTRule(new CVC3Solver()));
-        builtInRules = builtInRules.prepend(new SMTRule(new SimplifySolver()));
-        builtInRules = builtInRules.prepend(new SMTRule(new Z3Solver()));
         
         return builtInRules;
     }
