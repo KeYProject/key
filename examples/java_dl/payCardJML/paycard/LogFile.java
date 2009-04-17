@@ -12,7 +12,7 @@ public class LogFile {
 
     /*@ public invariant logArray.length == logFileSize && 
       @     currentRecord < logFileSize && 
-      @     currentRecord >= 0 && \nonnullelements(logArray);
+      @     currentRecord >= 0;
       @*/
 
     private /*@ spec_public @*/ static final int logFileSize = 3;
