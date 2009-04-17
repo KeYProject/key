@@ -206,7 +206,7 @@ public class JMLSpecExtractor implements SpecExtractor {
 	SetOfPositionedString result = SetAsListOfPositionedString.EMPTY_SET; 
 	final Type varType  = kjt.getJavaType(); 
 
-	if(services.getTypeConverter().isReferenceType(varType)	&& !isImplicitVar) {
+	if (!services.getTypeConverter().isReferenceType(varType)	&& !isImplicitVar) {
 
 	    PositionedString ps 
 	    = new PositionedString(varName + " != null", fileName, pos);
@@ -254,14 +254,16 @@ public class JMLSpecExtractor implements SpecExtractor {
                     FieldSpecification field = fields.getFieldSpecification(j);
                     //add invariant only for fields of reference types
                     //and not for implicit fields.
-                    SetOfPositionedString nonNullInvs =
-                	createNonNullPositionedString(field.getProgramName(),
-                		field.getProgramVariable().getKeYJavaType(),
-                		field instanceof ImplicitFieldSpecification,
-                		fileName, fd.getEndPosition());
-                    for (PositionedString classInv : nonNullInvs) {
-                	result = result.add(jsf.createJMLClassInvariant(kjt,
-                                classInv));
+                    if (JMLInfoExtractor.isNullable(field.getProgramName(), kjt)) {
+                	SetOfPositionedString nonNullInvs =
+                	    createNonNullPositionedString(field.getProgramName(),
+                		    field.getProgramVariable().getKeYJavaType(),
+                		    field instanceof ImplicitFieldSpecification,
+                		    fileName, fd.getEndPosition());
+                	for (PositionedString classInv : nonNullInvs) {
+                	    result = result.add(jsf.createJMLClassInvariant(kjt,
+                		    classInv));
+                	}
                     }
                 }
             }
@@ -392,19 +394,22 @@ public class JMLSpecExtractor implements SpecExtractor {
                 //no additional precondition for primitive types!
                 final VariableSpecification paramDecl = pm.getParameterDeclarationAt(j)
 		        .getVariableSpecification();
-		final SetOfPositionedString nonNullParams = 
-                    createNonNullPositionedString(paramDecl.getName(),
-                	    paramDecl.getProgramVariable().getKeYJavaType(),
-                	    false,
-                	    fileName, pm.getStartPosition());
-                for (PositionedString nonNull : nonNullParams) {
-                    specCase.addRequires(nonNull);
+                if (!JMLInfoExtractor.parameterIsNullable(pm, j)) {
+                    final SetOfPositionedString nonNullParams = 
+                	createNonNullPositionedString(paramDecl.getName(),
+                		paramDecl.getProgramVariable().getKeYJavaType(),
+                		false,
+                		fileName, pm.getStartPosition());
+                    for (PositionedString nonNull : nonNullParams) {
+                	specCase.addRequires(nonNull);
+                    }
                 }
             }
 
             //add non-null postcondition
             KeYJavaType resultType = pm.getKeYJavaType();
             if(resultType != null &&
+        	    !JMLInfoExtractor.resultIsNullable(pm) &&
         	    specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
         	final SetOfPositionedString resultNonNull = 
         	    createNonNullPositionedString("\\result", resultType, false, 
