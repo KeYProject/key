@@ -21,7 +21,7 @@ class NumericalQuantifierTerm extends OpTerm.ArbitraryOpTerm {
     }
 
     public ArrayOfQuantifiableVariable varsBoundHere(int n) {
-	return n==0 ? varsBoundHere : EMPTY_VAR_LIST;
+	return varsBoundHere;
     }
     
 }

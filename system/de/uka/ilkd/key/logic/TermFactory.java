@@ -713,13 +713,23 @@ public class TermFactory {
 	    throw new IllegalArgumentException("null-Operator at TermFactory");
 	} else if (op instanceof Quantifier) {
 	    return createQuantifierTerm((Quantifier)op, bv[0], subTerms[0]);
-	}  else if(op instanceof NumericalQuantifier){
-	    if(bv[0].size()!=1) throw new RuntimeException();
-            return createNumericalQuantifierTerm((NumericalQuantifier) op, subTerms[0], 
-                    subTerms[1], bv[0]);
-        }  else if(op instanceof BoundedNumericalQuantifier){
+        } else if(op instanceof NumericalQuantifier){
+	    if(bv[0].size()!=1 || bv[1].size() != 1) {
+                throw new RuntimeException();
+	    }
+	    final Term[] resTerms = new Term [2];
+	    System.arraycopy ( subTerms, 0, resTerms, 0, 2 );
+	    final ArrayOfQuantifiableVariable exVars =
+		BoundVariableTools.DEFAULT.unifyBoundVariables (bv, resTerms, 
+								0, 1);
+	    return createNumericalQuantifierTerm((NumericalQuantifier) op, 
+						 resTerms[0],
+						 resTerms[1], 
+						 exVars); 
+	} else if(op instanceof BoundedNumericalQuantifier){
             if(bv[2].size()!=1) throw new RuntimeException();
-            return createBoundedNumericalQuantifierTerm((BoundedNumericalQuantifier) op, subTerms[0], 
+            return createBoundedNumericalQuantifierTerm(
+		    (BoundedNumericalQuantifier) op, subTerms[0], 
                     subTerms[1], subTerms[2], bv[2]);
         } else if (op instanceof QuanUpdateOperator) {
 	    final QuanUpdateOperator updOp = (QuanUpdateOperator)op;
