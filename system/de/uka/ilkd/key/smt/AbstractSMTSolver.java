@@ -215,9 +215,9 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		    toReturn = this.interpretAnswer(text);
 		}
 	    } catch (IOException e) {
-		logger.error(
-			"The program for proving a Formula with external tool could not be executed.",
-			e);
+		//logger.error(
+		//	"The program for proving a Formula with external tool could not be executed.",
+		//	e);
 		throw new RuntimeException(e.getMessage() + "\nMake sure the command is in your PATH variable.");
 	    } finally {
 		//remove the created file
