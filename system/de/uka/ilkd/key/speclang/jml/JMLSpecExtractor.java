@@ -206,7 +206,7 @@ public class JMLSpecExtractor implements SpecExtractor {
 	SetOfPositionedString result = SetAsListOfPositionedString.EMPTY_SET; 
 	final Type varType  = kjt.getJavaType(); 
 
-	if (!services.getTypeConverter().isReferenceType(varType)	&& !isImplicitVar) {
+	if (!services.getTypeConverter().isReferenceType(varType) && !isImplicitVar) {
 
 	    PositionedString ps 
 	    = new PositionedString(varName + " != null", fileName, pos);
@@ -254,7 +254,7 @@ public class JMLSpecExtractor implements SpecExtractor {
                     FieldSpecification field = fields.getFieldSpecification(j);
                     //add invariant only for fields of reference types
                     //and not for implicit fields.
-                    if (JMLInfoExtractor.isNullable(field.getProgramName(), kjt)) {
+                    if (!JMLInfoExtractor.isNullable(field.getProgramName(), kjt)) {
                 	SetOfPositionedString nonNullInvs =
                 	    createNonNullPositionedString(field.getProgramName(),
                 		    field.getProgramVariable().getKeYJavaType(),
