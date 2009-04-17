@@ -15,7 +15,7 @@ public class BoundedNumericalQuantifier extends Op {
     }
 
     public Sort sort(Term[] term) {
-        return term[2].sort ();
+        return term[2].sort();
     }
 
     public boolean validTopLevel(Term term) {

@@ -132,13 +132,13 @@ public abstract class Op implements Operator {
     public static final IfExThenElse IF_EX_THEN_ELSE = new IfExThenElse ();
 
     /** the sum operator */
-    public static final NumericalQuantifier SUM = new Sum();
+    public static final NumericalQuantifier SUM = new NumericalQuantifier(new Name("\\sum"));
     
     /** the bounded sum operator */
-    public static final BoundedNumericalQuantifier BSUM = new BoundedSum();
+    public static final BoundedNumericalQuantifier BSUM = new BoundedNumericalQuantifier(new Name("\\bSum"));
     
     /** the product operator */
-    public static final NumericalQuantifier PRODUCT = new Product();
+    public static final NumericalQuantifier PRODUCT = new NumericalQuantifier(new Name("\\product"));
     
     protected final Name name;
    	
