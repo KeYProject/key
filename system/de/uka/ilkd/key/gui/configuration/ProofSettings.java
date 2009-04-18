@@ -15,7 +15,6 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.gui.DecisionProcedureSettings;
 import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.gui.ModelSourceSettings;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.util.Debug;
@@ -69,7 +68,6 @@ public class ProofSettings {
     public ProofSettings() {       	
 	settings = new Settings[] {
             new StrategySettings(),
-	    new ModelSourceSettings(),
 	    new SimultaneousUpdateSimplifierSettings(),
             new GeneralSettings(),
 	    new ChoiceSettings(),
@@ -246,11 +244,6 @@ public class ProofSettings {
     public DecisionProcedureSettings getDecisionProcedureSettings() {
 	ensureInitialized();
 	return (DecisionProcedureSettings) settings[5];
-    }
-
-    public ModelSourceSettings getModelSourceSettings() {
-	ensureInitialized();
-	return (ModelSourceSettings) settings[1];
     }
 
     public SimultaneousUpdateSimplifierSettings 
