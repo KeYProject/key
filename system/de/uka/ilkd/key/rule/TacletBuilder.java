@@ -17,7 +17,10 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-/** subclasss build Schematic Theory Specific Rules (Taclets) */
+/** 
+ * abstract taclet builder class to be inherited from taclet builders
+ * specialised for their concrete taclet variant 
+ */
 public abstract class TacletBuilder {
 
     protected final static Name NONAME = new Name("unnamed");
