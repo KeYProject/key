@@ -51,7 +51,6 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.jmltest.JMLTestFileCreator;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.*;
@@ -63,9 +62,7 @@ import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.smt.DecProcRunner;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
-import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.key.util.*;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -1965,7 +1962,9 @@ public class Main extends JFrame implements IMain {
 	    if (settings != null) {
 		RuleDescriptor activeRule = settings.getActiveRule();				
 		decisionProcedureInvocationButton.
+				
 		setAction(new DPInvokeAction(activeRule));
+		
 		ruletimeoutlabel.setText("timeout: " + settings.getTimeout() + " s");
 
 	    } else {
@@ -2886,9 +2885,8 @@ public class Main extends JFrame implements IMain {
 	    if (!mediator.ensureProofLoaded()) return;
 	    final Proof proof = mediator.getProof();
 	    new DecProcRunner(Main.this, proof, 
-		    proof.getUserConstraint().getConstraint()).run();
-	}
-	
+			proof.getUserConstraint().getConstraint()).run();
+	}	
     }
     
     /**

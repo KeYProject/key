@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.smt.test;
 
 import java.io.File;
+import java.io.IOException;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -149,7 +150,7 @@ public abstract class TestSMTSolver extends TestCase {
 	
 	try {
 	    result = checkFile(filepath);
-	} catch (RuntimeException e) {
+	} catch (Exception e) {
 	    //System.out.println();
 	    System.out.println("Warning: " + this.getSolver().name() 
                                + " not found, skipped.");
@@ -172,7 +173,7 @@ public abstract class TestSMTSolver extends TestCase {
      * @param filepath the path to the file
      * @return the resulttype of the external solver 
      */
-    private SMTSolverResult checkFile(String filepath) {
+    private SMTSolverResult checkFile(String filepath) throws IOException {
 	ProofAggregate p = helper.parse(new File(filepath));
 	Assert.assertTrue(p.getProofs().length == 1);
 	Proof proof = p.getProofs()[0];	    

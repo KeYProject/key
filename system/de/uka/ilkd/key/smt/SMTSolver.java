@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.smt;
 
+import java.io.IOException;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -39,8 +41,10 @@ public interface SMTSolver {
      * @param timeout The maximum time that should be used to execute 
      *        the external solver, in seconds. If the time is exceeded, UNKNOWN 
      *        is returned.
+     * @throws IOException if the external prover could not be found, executed or if the SMT translation
+     * could not be written to a file
      */
-    public SMTSolverResult run(String formula, int timeout, Services services);
+    public SMTSolverResult run(String formula, int timeout, Services services) throws IOException;
 
     
     /**
@@ -49,8 +53,10 @@ public interface SMTSolver {
      * @param timeout The maximum time that should be used to execute 
      *        the external solver, in seconds. If the time is exceeded, UNKNOWN 
      *        is returned.
+     * @throws IOException if the external prover could not be found, executed or if the SMT translation
+     * could not be written to a file
      */
-    public SMTSolverResult run(Goal goal, int timeout, Services services);
+    public SMTSolverResult run(Goal goal, int timeout, Services services) throws IOException;
     
 
     /**
@@ -59,6 +65,8 @@ public interface SMTSolver {
      * @param timeout The maximum time that should be used to execute 
      *        the external solver, in seconds. If the time is exceeded, UNKNOWN 
      *        is returned.
+     * @throws IOException if the external prover could not be found, executed or if the SMT translation
+     * could not be written to a file
      */
-    public SMTSolverResult run(Term formula, int timeout, Services services);
+    public SMTSolverResult run(Term formula, int timeout, Services services) throws IOException;
 }

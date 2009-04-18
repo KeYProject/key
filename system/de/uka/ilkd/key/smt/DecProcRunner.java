@@ -17,16 +17,17 @@
 
 package de.uka.ilkd.key.smt;
 
-
-import java.util.Timer;
-import java.util.TimerTask;
-
-import de.uka.ilkd.key.gui.*;
+import de.uka.ilkd.key.gui.ExceptionDialog;
+import de.uka.ilkd.key.gui.IMain;
+import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.BuiltInRuleApp;
+import de.uka.ilkd.key.rule.ListOfBuiltInRule;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 

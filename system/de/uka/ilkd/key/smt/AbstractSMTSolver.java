@@ -90,7 +90,9 @@ public abstract class AbstractSMTSolver implements SMTSolver {
      */
     private final String storeToFile(String text) throws IOException {
 	String loc = fileDir + getCurrentDateString();
-	new File(fileDir).mkdirs();
+	File smtFile = new File(fileDir);
+	smtFile.mkdirs();
+	smtFile.deleteOnExit();
 	BufferedWriter out = new BufferedWriter(new FileWriter(loc));
 	out.write(text);
 	out.close();
@@ -118,8 +120,10 @@ public abstract class AbstractSMTSolver implements SMTSolver {
      * @param timeout The maximum time, that should be used for proving.
      * 		If it takes longer, UNKNOWN is returned.
      * @param services the service object belonging to this goal.
+     * @throws IOException if the external prover could not be found, executed or if the SMT translation
+     * could not be written to a file
      */
-    public final SMTSolverResult run(Goal goal, int timeout, Services services) {
+    public final SMTSolverResult run(Goal goal, int timeout, Services services) throws IOException {
 	SMTSolverResult toReturn;
 		
 	SMTTranslator trans = this.getTranslator(services);
@@ -142,8 +146,10 @@ public abstract class AbstractSMTSolver implements SMTSolver {
      * @param t the term to be proven.
      * @param timeout the maximum time to be used for proving.
      * 		If the time elapses, UNKNOWN is returned.
+     * @throws IOException if the external prover could not be found, executed or if the SMT translation
+     * could not be written to a file
      */
-    public final SMTSolverResult run(Term t, int timeout, Services services) {
+    public final SMTSolverResult run(Term t, int timeout, Services services) throws IOException {
 	assert t.sort() == Sort.FORMULA;
 	SMTSolverResult toReturn;
 		
@@ -156,8 +162,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	    toReturn = SMTSolverResult.NO_IDEA;
 	    logger.debug("The formula could not be translated.", e);
 	    //throw new RuntimeException("The formula could not be translated.\n" + e.getMessage());
-	}
-    	
+	}    	
     	return toReturn;
     }
 
@@ -168,68 +173,86 @@ public abstract class AbstractSMTSolver implements SMTSolver {
      * @param timeout
      * 		The maximum time, that should be used for the proof.
      * @param services The services object to use.
+     * @throws IOException if the external prover could not be found, executed or if the SMT translation
+     * could not be written to a file
      */
     public final SMTSolverResult run(String formula, 
 	    	                     int timeout, 
-	    			     Services services) {
+	    			     Services services) throws IOException{
 	SMTSolverResult toReturn;
 	
+	final String loc;
 	try {
 	    //store the translation to a file                                
-	    final String loc = this.storeToFile(formula);
+	    loc = this.storeToFile(formula);
+	} catch (IOException e) {
+	    logger.error("The file with the formula could not be written.", e);
+	    final IOException io = new IOException("Could not create or write the input file " +
+		    "for the external prover. Received error message:\n" + e.getMessage());
+	    io.initCause(e);
+	    throw io;
+	} 
 
-	    //get the commands for execution
-	    String[] execCommand = this.getExecutionCommand(loc, formula);
-	    	    
+	//get the commands for execution
+	String[] execCommand = this.getExecutionCommand(loc, formula);
+
+	try {
+	    Process p = Runtime.getRuntime().exec(execCommand);
+	    ExecutionWatchDog tt = new ExecutionWatchDog(timeout, p);
+	    Timer t = new Timer();
+	    t.schedule(tt, new Date(System.currentTimeMillis()), 1000);
 	    try {
-		Process p = Runtime.getRuntime().exec(execCommand);
-		ExecutionWatchDog tt = new ExecutionWatchDog(timeout, p);
-		Timer t = new Timer();
-		t.schedule(tt, new Date(System.currentTimeMillis()), 1000);
-		try {
-		    p.waitFor();
-		    if (tt.wasInterrupted()) {
-			logger.debug(
-				"Process for smt formula proving interrupted because of timeout.");
-		    }
-		} catch (InterruptedException f) {
+		p.waitFor();
+		if (tt.wasInterrupted()) {
 		    logger.debug(
-			    "Process for smt formula proving interrupted.",
-			    f);
-		    //System.out.println("process was interrupted");
-		} finally {
-		    t.cancel();
+		    "Process for smt formula proving interrupted because of timeout.");
 		}
-		if (p.exitValue() != 0) {
-		    //the process was terminated by force.
-		    toReturn = SMTSolverResult.NO_IDEA;
-		} else {
-		    //the process terminated as it sould
-		    InputStream in = p.getInputStream();
-		    String text = read(in);
-   
-		    logger.debug("Answer for created formula: ");
-		    logger.debug(text);
-		    in.close();
-		    
-		    toReturn = this.interpretAnswer(text);
-		}
-	    } catch (IOException e) {
-		//logger.error(
-		//	"The program for proving a Formula with external tool could not be executed.",
-		//	e);
-		throw new RuntimeException(e.getMessage() + "\nMake sure the command is in your PATH variable.");
+	    } catch (InterruptedException f) {
+		logger.debug(
+			"Process for smt formula proving interrupted.",
+			f);
+		//System.out.println("process was interrupted");
 	    } finally {
-		//remove the created file
-		File f = new File(loc);
-		f.delete();
+		t.cancel();
+	    }
+	    if (p.exitValue() != 0) {
+		//the process was terminated by force.
+		toReturn = SMTSolverResult.NO_IDEA;
+	    } else {
+		//the process terminated as it should
+		InputStream in = p.getInputStream();
+		String text = read(in);
+
+		logger.debug("Answer for created formula: ");
+		logger.debug(text);
+		in.close();
+
+		toReturn = this.interpretAnswer(text);
 	    }
 	} catch (IOException e) {
-	    logger.error("The file with the formula could not be written.",
-			e);
-	    throw new RuntimeException(e.getMessage());
+	    String cmdStr = "";
+	    for (String cmd : execCommand) {
+		cmdStr += cmd + " ";
+	    }
+	    IOException ioe = new IOException("Invocation of decision procedure\n\t\t" +
+		    this.name() + "\n with command \n\t\t" + cmdStr + "\n" +  
+		    "failed. The most common (but not all) reasons for this error are:\n" +
+		    "\n 1. the directory where you put the executable of the decision procedure is not in your PATH.\n " +
+		    "\t    Solution: Add the directory to your PATH environment variable." +
+		    "\n 2. we expect a different name than your executable " +
+		    "(prior to KeY 1.5 and later we expected 'Simplify' instead of 'simplify')" +
+		    "\n\t Solution: Change the name to " + (execCommand != null && execCommand.length > 0 ? 
+		        	execCommand[0] : "expected name") +
+		    "\n 3. you have not the permission to execute the decision procedure." +
+		    "\n\t Solution: *nix-like systems: try 'chmod u+x <path_to_executable>/<executable_filename>" +
+		    "\n 4. you use a too new or too old version of the decision procedure and the command " +
+		        "line parameters changed." +
+		    "\n\t Solution: Install a supported version (see http://www.key-project.org)\n" +
+		    "\n Original Error-Message: " + e.getMessage());
+	    ioe.initCause(e);
+	    throw ioe;
 	} 
-	
+
 	return toReturn;
     }
     

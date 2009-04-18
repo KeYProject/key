@@ -8,10 +8,7 @@
 //
 package de.uka.ilkd.key.gui;
 
-import java.awt.Component;
-import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -159,15 +156,22 @@ public class ExceptionDialog extends JDialog {
     private JScrollPane createExcTextAreaScroll(Object[] excArray) {
 	     JTextArea exTextArea = new JTextArea();
 	     exTextArea.setEditable(false);
-	     Dimension textPaneDim = new Dimension(500, 100);
+	     Dimension textPaneDim = new Dimension(500, 200);
 	     exTextArea.setColumns(120);
 	     exTextArea.setLineWrap(true);
-	     exTextArea.setWrapStyleWord(true);	 
-	     JScrollPane Scroll = new JScrollPane(exTextArea);
-	     Scroll.setBorder(new TitledBorder(""+excArray[0].getClass()));
-	          Scroll.setPreferredSize(textPaneDim);
-	     exTextArea.setText(((Throwable) excArray[0]).getMessage());            
-	     return Scroll;
+	     exTextArea.setWrapStyleWord(true);
+	     exTextArea.setText(((Throwable) excArray[0]).getMessage());	     
+
+	     exTextArea.setTabSize(2);
+	     
+	     // ensures that the dialog shows the error messaged scrolled to its start
+	     exTextArea.setCaretPosition(0);
+	     
+	     JScrollPane scroll = new JScrollPane(exTextArea);
+	     scroll.setBorder(new TitledBorder(excArray[0].getClass().getName()));
+	     scroll.setPreferredSize(textPaneDim);
+	     
+	     return scroll;
     }
 
 
