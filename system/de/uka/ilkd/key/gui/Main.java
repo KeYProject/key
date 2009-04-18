@@ -2890,7 +2890,7 @@ public class Main extends JFrame implements IMain {
     }
     
     /**
-     * This action controls the seclection of external provers. It provides the properties for the buttons 
+     * This action controls the selection of external provers. It provides the properties for the buttons 
      * displayed in the radio button group and if an external prover is selected this action is invoked and
      * updates the decision procedure settings of the current proof settings. 
      */

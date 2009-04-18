@@ -2,10 +2,10 @@ package de.uka.ilkd.key.smt;
 
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.op.SetOfMetavariable;
-import org.apache.log4j.Logger;
 
 public class SmtLibTranslator extends AbstractSMTTranslator {
 
@@ -90,11 +90,11 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	    ArrayList<StringBuffer> assumptions,
 	    ArrayList<ArrayList<StringBuffer>> functions,
 	    ArrayList<ArrayList<StringBuffer>> predicates,
-	    ArrayList<StringBuffer> types, SortHirarchy sortHirarchy) {
+	    ArrayList<StringBuffer> types, SortHierarchy sortHierarchy) {
 	StringBuffer toReturn = new StringBuffer(
 		"( benchmark KeY_translation\n");
 	// add the sortdeclarations
-	// as sortshirarchies are not supported by smt-lib, only one
+	// as sortshierarchies are not supported by smt-lib, only one
 	// sort should be used
 	// no extra sorts needed
 

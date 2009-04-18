@@ -88,7 +88,7 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	    ArrayList<StringBuffer> assumptions,
 	    ArrayList<ArrayList<StringBuffer>> functions,
 	    ArrayList<ArrayList<StringBuffer>> predicates,
-	    ArrayList<StringBuffer> types, SortHirarchy sortHirarchy) {
+	    ArrayList<StringBuffer> types, SortHierarchy sortHirarchy) {
 	
 	StringBuffer toReturn = new StringBuffer();
 	
