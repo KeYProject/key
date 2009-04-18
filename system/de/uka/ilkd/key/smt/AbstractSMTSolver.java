@@ -35,6 +35,11 @@ public abstract class AbstractSMTSolver implements SMTSolver {
      */
     private static final String fileDir = PathConfig.KEY_CONFIG_DIR
 	    + File.separator + "smt_formula";
+
+    /**
+     * the file base name to be used to store the SMT translation
+     */
+    private static final String FILE_BASE_NAME = "smt_formula";
     
     
     /**
@@ -86,18 +91,24 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     /**
      * store the text to a file.
      * @param text the text to be stored.
-     * @return the path, where the file was stored to.
+     * @return the path where the file was stored to.
      */
-    private final String storeToFile(String text) throws IOException {
-	String loc = fileDir + getCurrentDateString();
-	File smtFile = new File(fileDir);
-	smtFile.mkdirs();
+    private final File storeToFile(String text) throws IOException {
+	// create directory where to put the files marked as delete on exit
+	final File smtFileDir = new File(fileDir);
+	smtFileDir.mkdirs();
+	smtFileDir.deleteOnExit();
+	
+	// create the actual file marked as delete on exit
+	final File smtFile = new File(smtFileDir, FILE_BASE_NAME + getCurrentDateString());
 	smtFile.deleteOnExit();
-	BufferedWriter out = new BufferedWriter(new FileWriter(loc));
+	
+	// write the content out to the created file
+	final BufferedWriter out = new BufferedWriter(new FileWriter(smtFile));
 	out.write(text);
 	out.close();
 
-	return loc;
+	return smtFile;
     }
 
 
@@ -181,7 +192,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	    			     Services services) throws IOException{
 	SMTSolverResult toReturn;
 	
-	final String loc;
+	final File loc;
 	try {
 	    //store the translation to a file                                
 	    loc = this.storeToFile(formula);
@@ -194,7 +205,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	} 
 
 	//get the commands for execution
-	String[] execCommand = this.getExecutionCommand(loc, formula);
+	String[] execCommand = this.getExecutionCommand(loc.getAbsolutePath(), formula);
 
 	try {
 	    Process p = Runtime.getRuntime().exec(execCommand);
