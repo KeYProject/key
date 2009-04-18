@@ -116,8 +116,8 @@ public class ExceptionDialog extends JDialog {
  	 list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	 list.setSelectedIndex(0);
 	 JScrollPane elistScroll = 
-	     new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
-	             JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	     new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
+	             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	 elistScroll.getViewport().setView(list);
 	 elistScroll.setBorder(new TitledBorder("Exceptions/Errors"));
 	 Dimension paneDim = new Dimension(500, 100);

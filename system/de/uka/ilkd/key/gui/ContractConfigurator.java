@@ -19,12 +19,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -185,7 +180,7 @@ public class ContractConfigurator extends JDialog {
                             escapeListener,
                             "ESC",
                             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                            JButton.WHEN_IN_FOCUSED_WINDOW);
+                            JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         
         //show
