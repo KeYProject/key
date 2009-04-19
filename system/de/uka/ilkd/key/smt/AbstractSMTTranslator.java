@@ -15,6 +15,10 @@ import java.util.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.RewriteTaclet;
+import de.uka.ilkd.key.rule.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.java.Services;
 
@@ -147,9 +151,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	
 	hb = this.translateLogicalImply(ante, succ);
 
-	return buildCompleteText(hb, assumptions, this.buildTranslatedFuncDecls(), this
+	StringBuffer s = buildCompleteText(hb, assumptions, this.buildTranslatedFuncDecls(), this
 		.buildTranslatedPredDecls(), this.buildTranslatedSorts(), this
 		.buildSortHirarchy());
+	
+	//TODO remove after debugging
+	System.out.println(s);
+	return s;
     }
 
     
@@ -458,6 +466,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    }
 	}
 
+	//add the modality predicates
+	for (StringBuffer s : this.modalityPredicates.values()) {
+	    ArrayList<StringBuffer> temp = new ArrayList<StringBuffer>();
+	    temp.add(s);
+	    toReturn.add(temp);
+	}
+	
 	return toReturn;
     }
 
@@ -1068,6 +1083,14 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars, services);
 	    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars, services);
 	    return this.translateObjectEqual(arg1, arg2);
+	} else if (op instanceof Modality) {
+	    //op is a modality. So translate it as an uninterpreted predicate.
+	    //equal modalities are translated with the same predicate
+	    return this.getModalityPredicate(term, quantifiedVars, services);
+	} else if (op instanceof QuanUpdateOperator) {
+	    //op is a update. So translate it as an uninterpreted predicate.
+	    //equal updates are translated with the same predicate.
+	    return this.getModalityPredicate(term, quantifiedVars, services);
 	} else if (op == Op.IF_THEN_ELSE) {
 	    if (term.sub(1).sort() == Sort.FORMULA) {
 		//a logical if then else was used
@@ -1318,10 +1341,91 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    return translateFunc(atop, subterms);
 	} else {
 	    //return translateUnknown(term);
+	    //System.out.println("Found term: " + term.getClass());
+	    //System.out.println("Found op: " + term.op().getClass());
 	    throw new IllegalFormulaException("unknown term found");
 	}
     }
 
+    //TODO move to top after testing
+    /** map used for storing predicates representing modalities or updates */
+    private HashMap<Term, StringBuffer> modalityPredicates = new HashMap<Term, StringBuffer>();
+    
+    /**
+     * Get a predicate representing a modality. Make sure that equal modalities 
+     * return the same predicate.
+     * @param t The term representing the modality.
+     * @param quantifiedVars quantified variables.
+     * @param services the services object to use.
+     * @return a unique predicate representing a modality.
+     */
+    private StringBuffer getModalityPredicate(Term t, Vector<QuantifiableVariable> quantifiedVars,
+	    Services services) throws IllegalFormulaException{
+	//check, if the modality was already translated.
+	for (Term toMatch : modalityPredicates.keySet()) {
+	    //if (checkTermsEquality(t, toMatch, services)) {
+	    if (checkTermsEquality(t, toMatch, services) && checkTermsEquality(toMatch, t, services)) {
+		//t and toMatch are equal, so return the predicate translated for toMatch
+		return modalityPredicates.get(toMatch);
+	    }
+	}
+	
+	
+	//if the program comes here, term has to be translated.
+	
+	//invent a new predicate
+	TermFactory tf = new TermFactory();
+	Function fun = new NonRigidFunction(new Name("modConst"), Sort.FORMULA, new Sort[0]);
+	Term temp = tf.createFunctionTerm(fun);
+
+	//translate the predicate
+	StringBuffer cstr = this.translateTerm(temp, quantifiedVars, services);
+	    
+	modalityPredicates.put(t, cstr);
+	    
+	return cstr;
+	
+    }
+    
+    /**
+     * This method returens true, if t1 and t2 are equal.
+     * CAUTION! Only tested for Box, Diamond and Update Formulas
+     * @param t1 the first term to check
+     * @param t2 the second term to check
+     * @param services
+     * @return true, if t1 and t2 are equal.
+     */
+    private boolean checkTermsEquality(Term t1, Term t2, Services services) {
+
+	//two terms are equal, if the RewriteTaclet says, they are.
+		
+	TermFactory tf = new TermFactory();
+	//create a template, to check against
+	SchemaVariable v = SchemaVariableFactory.createFormulaSV(new Name("phi"), true);
+	Term comparator = tf.createVariableTerm(v);
+	
+	//create a RewriteTaclet that is used for checking
+	RewriteTaclet rt;
+	RewriteTacletBuilder rtb = new RewriteTacletBuilder();
+	rtb.setFind(comparator);
+	rt = rtb.getRewriteTaclet();
+	
+	//match t1 against the template
+	//returns matchcondition needed for the check of t2
+	MatchConditions m = MatchConditions.EMPTY_MATCHCONDITIONS;
+	m = rt.matchFind(t1, m, services, Constraint.BOTTOM);
+	Term found = null;
+	
+	//match t2 against t1 (by using the created matchconditions)
+	MatchConditions res = rt.matchFind(t2, m, services, Constraint.BOTTOM);
+	
+	if (res != null) {
+	    return true;
+	} else {
+	    return false;
+	}
+    }
+    
     /**
      * Add an interpreted function to the set of special functions.
      * Caution: If added here, make sure to handle the function in 
