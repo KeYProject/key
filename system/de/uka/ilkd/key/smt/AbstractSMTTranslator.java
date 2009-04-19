@@ -87,6 +87,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     // used type predicates for constant values, e.g. 1, 2, ...
     private HashMap<Term, StringBuffer> constantTypePreds = new HashMap<Term, StringBuffer>();
 
+
+    /** map used for storing predicates representing modalities or updates */
+    private HashMap<Term, StringBuffer> modalityPredicates = new HashMap<Term, StringBuffer>();
+    
     private StringBuffer nullString = new StringBuffer();
 
     private boolean nullUsed = false;
@@ -155,8 +159,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		.buildTranslatedPredDecls(), this.buildTranslatedSorts(), this
 		.buildSortHirarchy());
 	
-	//TODO remove after debugging
-	System.out.println(s);
 	return s;
     }
 
@@ -1346,10 +1348,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    throw new IllegalFormulaException("unknown term found");
 	}
     }
-
-    //TODO move to top after testing
-    /** map used for storing predicates representing modalities or updates */
-    private HashMap<Term, StringBuffer> modalityPredicates = new HashMap<Term, StringBuffer>();
     
     /**
      * Get a predicate representing a modality. Make sure that equal modalities 
