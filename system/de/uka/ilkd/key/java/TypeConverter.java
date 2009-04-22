@@ -442,7 +442,7 @@ public class TypeConverter extends TermBuilder {
         } else if (lit instanceof LongLiteral) {
             return intLDT.translateLiteral(lit);
         } else if (lit instanceof StringLiteral) {
-            return stringConverter.translateLiteral(lit,intLDT,services);
+            return stringConverter.translateLiteral(lit,charLDT,services);
         } else if (lit instanceof FloatLiteral) {
             return floatLDT.translateLiteral(lit);
         } else if (lit instanceof DoubleLiteral) {

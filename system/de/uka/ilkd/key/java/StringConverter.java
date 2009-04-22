@@ -11,7 +11,7 @@ package de.uka.ilkd.key.java;
 
 
 import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
@@ -27,41 +27,48 @@ import de.uka.ilkd.key.util.ExtList;
 public  class StringConverter{
 	
         /** used for the pretty printer*/ 
-        Function ppCat;
+        /*Function ppCat;
         static final String EPSILON="epsilon";
-        static final String CAT="cat";
+        static final String CAT="cat";*/
+
+    static final String EMPTY="empty";
+    static final String CONS="cons";
+
+    //private final TermBuilder TB = TermBuilder.DF;
 
         /** translates a given literal to its logic counterpart.
          *  the string has to be enclosed by quotation marks.
          */
         
-        public Term translateLiteral(Literal lit, LDT intLDT, Services serv){
+        public Term translateLiteral(Literal lit, LDT charLDT, Services serv){
 	    Namespace funcNs = serv.getNamespaces().functions();
-	    Function epsilon= (Function)funcNs.lookup(new Name(EPSILON));
-	    Function cat=(Function)funcNs.lookup(new Name(CAT));
-	    if(epsilon==null || cat==null){
-		throw new RuntimeException("Functions namespace does not know the string-related functions: "+EPSILON+" and "+CAT+". Try to enable Menu > Options > TacletLibraries > stringRules.key ");
-	    }
-	    assert epsilon != null;
-	    assert cat != null;
-	    ppCat = cat;
-	    Term  term_epsilon=TermFactory.DEFAULT.createFunctionTerm(epsilon);
+	    Function empty= (Function)funcNs.lookup(new Name(EMPTY));
+	    assert empty != null;
+	    Function cons=(Function)funcNs.lookup(new Name(CONS));
+	    assert cons != null;
+	    
+	    Term  term_empty=TermFactory.DEFAULT.createFunctionTerm(empty);
+
+	    // TB.func(empty) TB.func(cons, character)
 
 	    char[] charArray;
-	    Term result = term_epsilon;
+	    Term result = term_empty;
 
 	    if (lit instanceof StringLiteral)
 		charArray = ((StringLiteral) lit).getValue().toCharArray();
-	    else return null;
-	    if (intLDT==null) throw new IllegalArgumentException("IntLDT is needed for StringLiteral translation");//return term_epsilon;
-	    for (int i= charArray.length-2;i>=1;i--){
-		result = TermFactory.DEFAULT.createFunctionTerm(cat,
-		    intLDT.translateLiteral(new IntLiteral(charArray[i])),result);
+	    else
+		return null;
+	    if (charLDT==null)
+		throw new IllegalArgumentException("CharLDT is needed for StringLiteral translation");
+	    for (int i= charArray.length-2;i>=1;i--) {
+		result = TermFactory.DEFAULT.createFunctionTerm(cons,
+		    charLDT.translateLiteral(new CharLiteral(charArray[i])),result);
 	    }
+
 	    return result;
 	}
 
-	private StringBuffer printlastfirst(Term t) {
+    	private StringBuffer printlastfirst(Term t) {
 	    if (t.op().arity()==0) {
 		return new StringBuffer();
 	    } else {
@@ -84,7 +91,7 @@ public  class StringConverter{
 		throw new ConvertException(result +" is not of type char");
 	    } 		
 	    return new Character(charVal).toString();
-        }
+	}
      
 	/** translates a term that represents a string into a string literal
          *  that is enclosed by quotation marks 
@@ -100,9 +107,4 @@ public  class StringConverter{
 	    return new StringLiteral("\""+result+"\"");
 	}
 
-        /** @return the function symbol that is used to build strings*/         
-	public  Function  getStringSymbol(){
-	    return ppCat;
-	}
-	
     }

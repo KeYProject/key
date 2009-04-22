@@ -258,7 +258,8 @@ public abstract class ProgramSVSort extends PrimitiveSort {
         }
     };
 
-    public static final ProgramSVSort LITERAL = new LiteralSort();
+    public static final ProgramSVSort NONSTRINGLITERAL = new NonStringLiteralSort();
+    public static final ProgramSVSort STRINGLITERAL = new StringLiteralSort();
 
     //--------------- Specials that match on certain names-----------------
     
@@ -597,6 +598,9 @@ public abstract class ProgramSVSort extends PrimitiveSort {
  		return ((Negative)pe).getChildAt(0) instanceof Literal;
  	    }	   
 
+	    if (pe instanceof StringLiteral)
+		return false;
+
 	    if (pe instanceof Literal) {
 				return true;
 	    }
@@ -668,18 +672,41 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 
     }
 
+    /**
+     * This sort represents a type of program schema variables that match
+     * only string literals, e.g. "abc"
+     */
+    private static class StringLiteralSort extends ProgramSVSort {
+	public StringLiteralSort() {
+	    super(new Name("StringLiteral"));
+	}
+
+	protected StringLiteralSort(Name n) {
+	    super(n);
+	}
+
+	// do not match a term
+	public boolean canStandFor(Term t) {
+	    return false;
+	}
+
+	protected boolean canStandFor(ProgramElement pe,
+				      Services services) {
+	    return (pe instanceof StringLiteral);
+	}
+    }
 
     /**
      * This sort represents a type of program schema variables that match
-     * only on literals
+     * only on non-string literals
      */
-    private static class LiteralSort extends ProgramSVSort {
+    private static class NonStringLiteralSort extends ProgramSVSort {
 
-	public LiteralSort() {
-	    super(new Name("Literal"));
+	public NonStringLiteralSort() {
+	    super(new Name("NonStringLiteral"));
 	}
 
-	protected LiteralSort(Name n) {
+	protected NonStringLiteralSort(Name n) {
 	    super(n);
 	}
 
@@ -690,7 +717,8 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	
 	protected boolean canStandFor(ProgramElement pe,
 				      Services services) {
-	    return (pe instanceof Literal);
+	    return (pe instanceof Literal
+		    && !(pe instanceof StringLiteral));
 	}
     }
 

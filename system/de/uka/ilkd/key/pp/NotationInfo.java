@@ -249,7 +249,6 @@ public class NotationInfo {
 		createCharLitNotation(integerLDT.getCharSymbol());
 	    }
 	}
-	createStringLitNotation(de.uka.ilkd.key.java.TypeConverter.stringConverter.getStringSymbol(),null);
 
 	//For OCL Simplification
 	if (tbl.containsKey(op.name().toString())) {
@@ -311,14 +310,6 @@ public class NotationInfo {
     public void createCharLitNotation(Operator op) {
 	tbl.put(op, new Notation.CharLiteral());
     }
-
-
-    public void createStringLitNotation(Operator op, Operator eps) {
-	Notation.StringLiteral stringLiteral =  new Notation.StringLiteral();
-	tbl.put(op, stringLiteral);
-	tbl.put(eps, stringLiteral);
-    }
-
 
     /** 
      * Used for OCL Simplification.
