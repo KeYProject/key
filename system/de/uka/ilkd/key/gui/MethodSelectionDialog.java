@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package de.uka.ilkd.key.gui;
 
 import java.awt.Component;
@@ -7,7 +14,6 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.SetAsListOfProgramMethod;
@@ -136,8 +142,8 @@ public class MethodSelectionDialog extends JDialog {
 		    if(simplify.isSelected()){
 		        ModelGenerator.decProdForTestGen = 
 		            ModelGenerator.SIMPLIFY;
-                        ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().
-                        setDecisionProcedureForTest(DecisionProcedureSettings.SIMPLIFY);  
+//                        ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().
+//                        setDecisionProcedureForTest(DecisionProcedureSettings.SIMPLIFY);  
 			buttonPanel.add(simplifyDataTupleNumber, 
 					buttonPanel.getComponentCount()-1);
 			simplifyDataTupleNumber.setText(
@@ -147,8 +153,8 @@ public class MethodSelectionDialog extends JDialog {
 		    }else{
 			ModelGenerator.decProdForTestGen = 
 			    ModelGenerator.COGENT;
-                        ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().
-                        setDecisionProcedureForTest(DecisionProcedureSettings.COGENT);
+//                        ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().
+//                        setDecisionProcedureForTest(DecisionProcedureSettings.COGENT);
 			buttonPanel.remove(simplifyDataTupleNumber);
 			simplify.setSelected(false);
 			cogent.setSelected(true);

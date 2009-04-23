@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package de.uka.ilkd.key.visualization;
 
 import java.util.*;
@@ -150,7 +157,14 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
    
     private int countJavaBlocks(Term t) {
         int p = 0;
-        if (!t.javaBlock().isEmpty()){
+        // mbender
+        // 'if (!t.javaBlock().isEmpty())' had to be switched back as it behaves
+        // differently than
+        // 'if (t.javaBlock() != JavaBlock.EMPTY_JAVABLOCK)'
+        // That is if a JavaBlock contains an empty StatementBlock
+        // 't.javaBlock() != JavaBlock.EMPTY_JAVABLOCK' is true but
+        // '!t.javaBlock().isEmpty()' is false
+        if (t.javaBlock() != JavaBlock.EMPTY_JAVABLOCK) {
             p++;
         }
         for (int i = 0; i < t.arity(); i++) {

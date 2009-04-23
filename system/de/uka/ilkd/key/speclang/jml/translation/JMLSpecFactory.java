@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 //This file is part of KeY - Integrated Deductive Software Design
 //Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
 //                      Universitaet Koblenz-Landau, Germany
@@ -35,18 +42,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.ClassInvariantImpl;
-import de.uka.ilkd.key.speclang.FormulaWithAxioms;
-import de.uka.ilkd.key.speclang.ListOfPositionedString;
-import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.LoopInvariantImpl;
-import de.uka.ilkd.key.speclang.OperationContract;
-import de.uka.ilkd.key.speclang.OperationContractImpl;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.SetAsListOfOperationContract;
-import de.uka.ilkd.key.speclang.SetOfOperationContract;
-import de.uka.ilkd.key.speclang.SignatureVariablesFactory;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassInv;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
@@ -190,6 +186,256 @@ public class JMLSpecFactory {
         }
         return null;
     }
+    
+    
+    /**
+     * Creates operation contracts out of the passed JML specification.
+     * @param paramVars variables to be used as parameters in the 
+     * translation. If null, appropriate variables are created out of the 
+     * signature information for the programMethod. 
+     */
+    private SetOfOperationContract createJMLOperationContracts(
+                                ProgramMethod programMethod,
+                                Behavior originalBehavior,                              
+                                PositionedString customName,
+                                ListOfPositionedString originalRequires,
+                                ListOfPositionedString originalAssignable,
+                                ListOfPositionedString originalEnsures,
+                                ListOfPositionedString originalSignals,
+                                ListOfPositionedString originalSignalsOnly,
+                                ListOfPositionedString originalDiverges,
+                                ListOfParsableVariable paramVars) 
+            throws SLTranslationException {
+        assert programMethod != null;
+        assert originalBehavior != null;
+        assert originalRequires != null;
+        assert originalAssignable != null;
+        assert originalEnsures != null;
+        assert originalSignals != null;
+        assert originalSignalsOnly != null;
+        assert originalDiverges != null;
+
+        //create variables for self, parameters, result, exception,
+        //and the map for atPre-Functions
+        ParsableVariable selfVar = SVF.createSelfVar(services, 
+                                                     programMethod, 
+                                                     false);
+        if(paramVars == null) {
+            paramVars = SVF.createParamVars(services, programMethod, false);
+        }
+        ParsableVariable resultVar = SVF.createResultVar(services, 
+                                                         programMethod, 
+                                                         false);
+        ParsableVariable excVar = SVF.createExcVar(services,
+                                                   programMethod, 
+                                                   false);
+        Map<Operator, Function> atPreFunctions 
+            = new LinkedHashMap<Operator, Function>();
+
+        //translate requires
+        FormulaWithAxioms requires = FormulaWithAxioms.TT;
+        for(PositionedString expr : originalRequires) {
+            FormulaWithAxioms translated 
+                = translator.translateExpression(
+                    expr,
+                    programMethod.getContainerType(),
+                    selfVar, 
+                    paramVars, 
+                    null, 
+                    null,
+                    null);
+            requires = requires.conjoin(translated);        
+        }
+
+        //translate assignable
+        SetOfLocationDescriptor assignable;
+        if(originalAssignable.isEmpty()) {
+            assignable = EverythingLocationDescriptor.INSTANCE_AS_SET;
+        } else {
+            assignable = SetAsListOfLocationDescriptor.EMPTY_SET;
+            for(PositionedString expr : originalAssignable) {
+                SetOfLocationDescriptor translated 
+                    = translator.translateAssignableExpression(
+                        expr, 
+                        programMethod.getContainerType(),
+                        selfVar, 
+                        paramVars);
+                assignable = assignable.union(translated);        
+            }
+        }
+
+        //translate ensures
+        FormulaWithAxioms ensures = FormulaWithAxioms.TT;
+        for(PositionedString expr : originalEnsures) {
+            FormulaWithAxioms translated 
+                = translator.translateExpression(
+                    expr,
+                    programMethod.getContainerType(),
+                    selfVar, 
+                    paramVars, 
+                    resultVar, 
+                    excVar,
+                    atPreFunctions);
+            ensures = ensures.conjoin(translated);        
+        }
+
+        //translate signals
+        FormulaWithAxioms signals = FormulaWithAxioms.TT;
+        for(PositionedString expr : originalSignals) {
+            FormulaWithAxioms translated 
+                = translator.translateSignalsExpression(
+                    expr, 
+                    programMethod.getContainerType(),
+                    selfVar, 
+                    paramVars, 
+                    resultVar, 
+                    excVar,
+                    atPreFunctions);
+            signals = signals.conjoin(translated);        
+        }
+
+        //translate signals_only
+        FormulaWithAxioms signalsOnly = FormulaWithAxioms.TT;
+        for(PositionedString expr : originalSignalsOnly) {
+            FormulaWithAxioms translated 
+                = translator.translateSignalsOnlyExpression(
+                    expr,
+                    programMethod.getContainerType(),
+                    excVar);
+            signalsOnly = signalsOnly.conjoin(translated);        
+        }
+
+        //translate diverges
+        FormulaWithAxioms diverges = FormulaWithAxioms.FF;
+        for(PositionedString expr : originalDiverges) {
+            FormulaWithAxioms translated 
+                = translator.translateExpression(
+                    expr, 
+                    programMethod.getContainerType(),
+                    selfVar, 
+                    paramVars, 
+                    null, 
+                    null,
+                    null);
+            diverges = diverges.disjoin(translated);        
+        }
+
+        //translate normal_behavior / exceptional_behavior
+        if(originalBehavior == Behavior.NORMAL_BEHAVIOR) {
+            assert originalSignals.isEmpty();
+            assert originalSignalsOnly.isEmpty();
+            signals = FormulaWithAxioms.FF;
+            signalsOnly = FormulaWithAxioms.FF;
+        } else if(originalBehavior == Behavior.EXCEPTIONAL_BEHAVIOR) {
+            assert originalEnsures.isEmpty();
+            ensures = FormulaWithAxioms.FF;
+        }
+
+        //create contract(s)
+        SetOfOperationContract result 
+            = SetAsListOfOperationContract.EMPTY_SET;
+        FormulaWithAxioms excNull 
+            = new FormulaWithAxioms(TB.equals(TB.var(excVar), 
+                                              TB.NULL(services)));
+        FormulaWithAxioms post1 
+            = (originalBehavior == Behavior.NORMAL_BEHAVIOR
+               ? ensures
+               : excNull.imply(ensures));
+        FormulaWithAxioms post2 
+            = (originalBehavior == Behavior.EXCEPTIONAL_BEHAVIOR
+               ? signals.conjoin(signalsOnly)
+               : excNull.negate().imply(signals.conjoin(signalsOnly)));
+        FormulaWithAxioms post = post1.conjoin(post2);
+        String name = getContractName(originalBehavior);        
+        String displayName = (customName.text.length() > 0 
+                              ? customName.text + " [" + name + "]" 
+                              : name); 
+        
+        if(diverges.equals(FormulaWithAxioms.FF)) {
+            OperationContract contract
+                = new OperationContractImpl(name,
+                                            displayName,
+                                            programMethod,
+                                            Modality.DIA,
+                                            requires,
+                                            post,
+                                            assignable,
+                                            selfVar,
+                                            paramVars,
+                                            resultVar,
+                                            excVar,
+                                            atPreFunctions); 
+            result = result.add(contract);
+        } else if(diverges.equals(FormulaWithAxioms.TT)) {
+            OperationContract contract
+                = new OperationContractImpl(name,
+                                            displayName,
+                                            programMethod,
+                                            Modality.BOX,
+                                            requires,
+                                            post,
+                                            assignable,
+                                            selfVar,
+                                            paramVars,
+                                            resultVar,
+                                            excVar,
+                                            atPreFunctions); 
+            result = result.add(contract);
+        } else {
+            String name2 = getContractName(originalBehavior);
+            String displayName2 = (customName.text.length() > 0 
+                                   ? customName.text + "[" + name2 + "]" 
+                                   : name2);
+            OperationContract contract1
+                = new OperationContractImpl(name,
+                                            displayName,
+                                            programMethod,
+                                            Modality.DIA,
+                                            requires.conjoin(diverges.negate()),
+                                            post,
+                                            assignable,
+                                            selfVar,
+                                            paramVars,
+                                            resultVar,
+                                            excVar,
+                                            atPreFunctions);
+            OperationContract contract2
+                = new OperationContractImpl(name2,
+                                            displayName2,
+                                            programMethod,
+                                            Modality.BOX,
+                                            requires,
+                                            post,
+                                            assignable,
+                                            selfVar,
+                                            paramVars,
+                                            resultVar,
+                                            excVar,
+                                            atPreFunctions);
+            result = result.add(contract1).add(contract2);
+        }
+
+        return result;
+    }
+    
+    
+    private SetOfOperationContract createJMLOperationContracts(
+            ProgramMethod programMethod,
+            TextualJMLSpecCase textualSpecCase,
+            ListOfParsableVariable paramVars) 
+            throws SLTranslationException {
+        return createJMLOperationContracts(
+                                    programMethod,
+                                    textualSpecCase.getBehavior(),
+                                    textualSpecCase.getName(),
+                                    textualSpecCase.getRequires(),
+                                    textualSpecCase.getAssignable(),
+                                    textualSpecCase.getEnsures(),
+                                    textualSpecCase.getSignals(),
+                                    textualSpecCase.getSignalsOnly(),
+                                    textualSpecCase.getDiverges(),
+                                    paramVars);
+    }
 
     
     
@@ -244,220 +490,16 @@ public class JMLSpecFactory {
                                 ListOfPositionedString originalSignalsOnly,
                                 ListOfPositionedString originalDiverges) 
             throws SLTranslationException {
-        assert programMethod != null;
-        assert originalBehavior != null;
-        assert originalRequires != null;
-        assert originalEnsures != null;
-        assert originalSignals != null;
-        assert originalSignalsOnly != null;
-        assert originalDiverges != null;
-        assert originalAssignable != null;
-        
-        //create variables for self, parameters, result, exception,
-        //and the map for atPre-Functions
-        ParsableVariable selfVar = SVF.createSelfVar(services, 
-                                                     programMethod, 
-                                                     false);
-        ListOfParsableVariable paramVars = SVF.createParamVars(services, 
-                                                               programMethod, 
-                                                               false);
-        ParsableVariable resultVar = SVF.createResultVar(services, 
-                                                         programMethod, 
-                                                         false);
-        ParsableVariable excVar = SVF.createExcVar(services,
-                                                   programMethod, 
-                                                   false);
-        Map<Operator, Function> atPreFunctions = new LinkedHashMap<Operator, Function>();
-        
-        //translate requires
-        FormulaWithAxioms requires = FormulaWithAxioms.TT;
-        for(PositionedString expr : originalRequires) {
-            FormulaWithAxioms translated 
-                = translator.translateExpression(
-                                    expr,
-                                    programMethod.getContainerType(),
-                                    selfVar, 
-                                    paramVars, 
-                                    null, 
-                                    null,
-                                    null);
-            requires = requires.conjoin(translated);        
-        }
-        
-        //translate assignable
-        SetOfLocationDescriptor assignable;
-        if(originalAssignable.isEmpty()) {
-            assignable = EverythingLocationDescriptor.INSTANCE_AS_SET;
-        } else {
-            assignable = SetAsListOfLocationDescriptor.EMPTY_SET;
-            for(PositionedString expr : originalAssignable) {
-                SetOfLocationDescriptor translated 
-                    = translator.translateAssignableExpression(
-                                        expr, 
-                                        programMethod.getContainerType(),
-                                        selfVar, 
-                                        paramVars);
-                assignable = assignable.union(translated);        
-            }
-        }
-        
-        //translate ensures
-        FormulaWithAxioms ensures = FormulaWithAxioms.TT;
-        for(PositionedString expr : originalEnsures) {
-            FormulaWithAxioms translated 
-                = translator.translateExpression(
-                                    expr,
-                                    programMethod.getContainerType(),
-                                    selfVar, 
-                                    paramVars, 
-                                    resultVar, 
-                                    excVar,
-                                    atPreFunctions);
-            ensures = ensures.conjoin(translated);        
-        }
-        
-        //translate signals
-        FormulaWithAxioms signals = FormulaWithAxioms.TT;
-        for(PositionedString expr : originalSignals) {
-            FormulaWithAxioms translated 
-                = translator.translateSignalsExpression(
-                                    expr, 
-                                    programMethod.getContainerType(),
-                                    selfVar, 
-                                    paramVars, 
-                                    resultVar, 
-                                    excVar,
-                                    atPreFunctions);
-            signals = signals.conjoin(translated);        
-        }
-        
-        //translate signals_only
-        FormulaWithAxioms signalsOnly = FormulaWithAxioms.TT;
-        for(PositionedString expr : originalSignalsOnly) {
-            FormulaWithAxioms translated 
-                = translator.translateSignalsOnlyExpression(
-                                    expr,
-                                    programMethod.getContainerType(),
-                                    excVar);
-            signalsOnly = signalsOnly.conjoin(translated);        
-        }
-        
-        //translate diverges
-        FormulaWithAxioms diverges = FormulaWithAxioms.FF;
-        for(PositionedString expr : originalDiverges) {
-            FormulaWithAxioms translated 
-                = translator.translateExpression(
-                                    expr, 
-                                    programMethod.getContainerType(),
-                                    selfVar, 
-                                    paramVars, 
-                                    null, 
-                                    null,
-                                    null);
-            diverges = diverges.disjoin(translated);        
-        }
-        
-        //translate normal_behavior / exceptional_behavior
-        if(originalBehavior == Behavior.NORMAL_BEHAVIOR) {
-	    assert originalSignals.isEmpty();
-	    assert originalSignalsOnly.isEmpty();
-            signals = FormulaWithAxioms.FF;
-	    signalsOnly = FormulaWithAxioms.FF;
-        } else if(originalBehavior == Behavior.EXCEPTIONAL_BEHAVIOR) {
-	    assert originalEnsures.isEmpty();
-            ensures = FormulaWithAxioms.FF;
-        }
-        
-        //create contract(s)
-        SetOfOperationContract result 
-            = SetAsListOfOperationContract.EMPTY_SET;
-        FormulaWithAxioms excNull 
-            = new FormulaWithAxioms(TB.equals(TB.var(excVar), 
-                                              TB.NULL(services)));
-        FormulaWithAxioms post1 
-            = (originalBehavior == Behavior.NORMAL_BEHAVIOR
-               ? ensures
-	       : excNull.imply(ensures));
-        FormulaWithAxioms post2 
-            = (originalBehavior == Behavior.EXCEPTIONAL_BEHAVIOR
-	       ? signals.conjoin(signalsOnly)
-	       : excNull.negate().imply(signals.conjoin(signalsOnly)));
-        FormulaWithAxioms post 
-            = post1.conjoin(post2);
-        if(diverges.equals(FormulaWithAxioms.FF)) {
-            String name = getContractName(originalBehavior);	    
-	    String customStr = (customName.toString().length() > 0) ? 
-		customName + "[" + name + "]" : name; 
-            OperationContract contract
-                = new OperationContractImpl(name,
-                                            customStr,
-                                            programMethod,
-                                            Modality.DIA,
-                                            requires,
-                                            post,
-                                            assignable,
-                                            selfVar,
-                                            paramVars,
-                                            resultVar,
-                                            excVar,
-                                            atPreFunctions); 
-            result = result.add(contract);
-	} else if(diverges.equals(FormulaWithAxioms.TT)) {
-	    String name = getContractName(originalBehavior);
-	    String customStr = (customName.toString().length() > 0) ? 
-		customName + "[" + name + "]" : name; 
-            OperationContract contract
-                = new OperationContractImpl(name,
-                                            customStr,
-                                            programMethod,
-                                            Modality.BOX,
-                                            requires,
-                                            post,
-                                            assignable,
-                                            selfVar,
-                                            paramVars,
-                                            resultVar,
-                                            excVar,
-                                            atPreFunctions); 
-            result = result.add(contract);
-        } else {
-            String name1 = getContractName(originalBehavior);
-	    String customStr1 = (customName.toString().length() > 0) ? 
-		customName + "[" + name1 + "]" : name1; 
-
-            String name2 = getContractName(originalBehavior);
-	    String customStr2 = (customName.toString().length() > 0) ? 
-		customName + "[" + name2 + "]" : name2; 
-            OperationContract contract1
-                = new OperationContractImpl(name1,
-                                            customStr1,
-                                            programMethod,
-                                            Modality.DIA,
-                                            requires.conjoin(diverges.negate()),
-                                            post,
-                                            assignable,
-                                            selfVar,
-                                            paramVars,
-                                            resultVar,
-                                            excVar,
-                                            atPreFunctions);
-            OperationContract contract2
-                = new OperationContractImpl(name2,
-                                            customStr2,
-                                            programMethod,
-                                            Modality.BOX,
-                                            requires,
-                                            post,
-                                            assignable,
-                                            selfVar,
-                                            paramVars,
-                                            resultVar,
-                                            excVar,
-                                            atPreFunctions);
-            result = result.add(contract1).add(contract2);
-        }
-        
-        return result;
+        return createJMLOperationContracts(programMethod,
+                                           originalBehavior,
+                                           customName,
+                                           originalRequires,
+                                           originalAssignable,
+                                           originalEnsures,
+                                           originalSignals,
+                                           originalSignalsOnly,
+                                           originalDiverges,
+                                           null);
     }
     
     
@@ -465,29 +507,35 @@ public class JMLSpecFactory {
                                         ProgramMethod programMethod,
                                         TextualJMLSpecCase textualSpecCase) 
             throws SLTranslationException {
-        return createJMLOperationContracts(
-                                    programMethod,
-                                    textualSpecCase.getBehavior(),
-				    textualSpecCase.getName(),
-                                    textualSpecCase.getRequires(),
-                                    textualSpecCase.getAssignable(),
-                                    textualSpecCase.getEnsures(),
-                                    textualSpecCase.getSignals(),
-                                    textualSpecCase.getSignalsOnly(),
-                                    textualSpecCase.getDiverges());
+        return createJMLOperationContracts(programMethod, 
+                                           textualSpecCase, 
+                                           null);
     }
     
     
     public SetOfOperationContract createJMLOperationContractsAndInherit(
                                         ProgramMethod programMethod,
                                         TextualJMLSpecCase textualSpecCase) 
-            throws SLTranslationException {                    
-        SetOfOperationContract result 
-            = createJMLOperationContracts(programMethod, textualSpecCase);
+            throws SLTranslationException {
+        //parameter names of original method must be used for all inherited 
+        //instances of the contract
+        ListOfParsableVariable paramVars 
+            = SVF.createParamVars(services, programMethod, false);
         
+        //create contracts for original method
+        SetOfOperationContract result 
+            = createJMLOperationContracts(programMethod, 
+                                          textualSpecCase, 
+                                          paramVars);
+        
+        //create contracts for all overriding methods
         for(ProgramMethod subPm : getOverridingMethods(programMethod)) {
+            
+            
             SetOfOperationContract subContracts 
-                = createJMLOperationContracts(subPm, textualSpecCase);
+                = createJMLOperationContracts(subPm, 
+                                              textualSpecCase, 
+                                              paramVars);
             result = result.union(subContracts);
         }
         
@@ -550,6 +598,7 @@ public class JMLSpecFactory {
                 assert translated.getAxioms().isEmpty();
                 invariant = TB.and(invariant, translated.getFormula());
             }
+            invariant = TB.and(invariant, TB.inReachableState(services));
         }
         
         //translate skolem declarations

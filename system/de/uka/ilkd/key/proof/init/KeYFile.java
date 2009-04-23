@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -62,6 +62,8 @@ public class KeYFile implements EnvInput {
 
     // when parsing the key file store the classPaths here
     private ListOfString classPaths;
+
+    private Includes includes;
     
     //-------------------------------------------------------------------------
     //constructors
@@ -187,34 +189,37 @@ public class KeYFile implements EnvInput {
 
 
     public Includes readIncludes() throws ProofInputException{
-        try {
-            ParserConfig pc = new ParserConfig
+        if (includes == null) {
+            try {
+                ParserConfig pc = new ParserConfig
                 (new Services(), 
-                 new NamespaceSet());
-            // FIXME: there is no exception handler here, thus, when parsing errors are ecountered
-            // during collection of includes (it is enough to mispell \include) the error
-            // message is very uninformative - ProofInputException without filename, line and column
-            // numbers. Somebody please fix that. /Woj
-            KeYParser problemParser = new KeYParser(ParserMode.PROBLEM, 
-                                                    new KeYLexer(getNewStream(),
-                                                                 null), 
-                                                    file.toString(), 
-                                                    pc, 
-                                                    pc, 
-                                                    null, 
-                                                    null, 
-                                                    null); 
-            problemParser.parseIncludes(); 
-            return problemParser.getIncludes();
-        } catch (antlr.ANTLRException e) {
-            throw new ProofInputException(e);
-        } catch (FileNotFoundException fnfe) {
-            throw new ProofInputException(fnfe);
-        } catch(de.uka.ilkd.key.util.ExceptionHandlerException ehe){
-            throw new ProofInputException(ehe);
+                        new NamespaceSet());
+                // FIXME: there is no exception handler here, thus, when parsing errors are ecountered
+                // during collection of includes (it is enough to mispell \include) the error
+                // message is very uninformative - ProofInputException without filename, line and column
+                // numbers. Somebody please fix that. /Woj
+                KeYParser problemParser = new KeYParser(ParserMode.PROBLEM, 
+                        new KeYLexer(getNewStream(),
+                                null), 
+                                file.toString(), 
+                                pc, 
+                                pc, 
+                                null, 
+                                null, 
+                                null); 
+                problemParser.parseIncludes(); 
+                includes = problemParser.getIncludes();
+            } catch (antlr.ANTLRException e) {
+                throw new ProofInputException(e);
+            } catch (FileNotFoundException fnfe) {
+                throw new ProofInputException(fnfe);
+            } catch(de.uka.ilkd.key.util.ExceptionHandlerException ehe){
+                throw new ProofInputException(ehe);
+            }
         }
+        return includes;            
     }
-    
+
     
     public LibrariesSettings readLibrariesSettings() throws ProofInputException {
         if (initConfig==null) {

@@ -18,15 +18,11 @@
 	<property name="javacTarget" value="1.5" />
 	<property name="compilerArg" value="" />
 	<path id="Plug-in Dependencies.libraryclasspath">
-	  <pathelement path="../KeYExternalLibraries/jcoverage.jar" />
 	  <pathelement path="../KeYExternalLibraries/antlr.jar" />
-	  <pathelement path="../KeYExternalLibraries/dresden-ocl-demo.jar" />
-	  <pathelement path="../KeYExternalLibraries/jargs.jar" />
 	  <pathelement path="../KeYExternalLibraries/javacc.jar" />
 	  <pathelement path="../KeYExternalLibraries/junit.jar" />
 	  <pathelement path="../KeYExternalLibraries/log4j.jar" />
 	  <pathelement path="../KeYExternalLibraries/recoderKey.jar" />
-	  <pathelement path="../KeYExternalLibraries/xerces.jar" />
 	  <pathelement path="../org.key-project.core/key.jar" />
 	  <pathelement location="${eclipse_home}/plugins/org.eclipse.core.resources_3.3.1.R33x_v20080205.jar"/>
 	  <pathelement location="${eclipse_home}/plugins/org.eclipse.core.runtime_3.3.100.v20070530.jar"/>
@@ -136,7 +132,7 @@
 		<mkdir dir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" />
 		<copy file="${build.result.folder}/KeYPluginsrc.zip" todir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false" />
 		<copy todir="${destination.temp.folder}/KeYPlugin_${env.KEY_VERSION_SHORT}" failonerror="true" overwrite="false">
-			<fileset dir="${basedir}" includes="src/,jars/antlr.jar,jars/dresden-ocl-demo.jar,jars/jargs.jar,jars/javacc.jar,jars/jcoverage.jar,jars/junit.jar,jars/log4j.jar,jars/recoderKey.jar,jars/xerces.jar,plugin.xml,README,META-INF/,key-small.png" />
+			<fileset dir="${basedir}" includes="src/,jars/antlr.jar,jars/javacc.jar,jars/junit.jar,jars/log4j.jar,jars/recoderKey.jar,plugin.xml,README,META-INF/,key-small.png" />
 		</copy>
 	</target>
 

@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 // Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
@@ -76,33 +83,6 @@ public class EnsuresPostPO extends EnsuresPO {
                                     exceptionVar,
                                     atPreFunctions);
        
-        //add implicit postcondition (see discussion for Bug #789) 
-        /*
-        Term implicitPostTerm = TB.tt();
-        if(resultVar != null) {
-            if(resultVar.sort() instanceof ObjectSort) {       
-                implicitPostTerm 
-                   = createdFactory.createCreatedOrNullTerm(services, 
-                                                            TB.var(resultVar));
-            } else {
-        	LDT ldt 
-        	    = services.getTypeConverter().getModelFor(resultVar.sort());
-        	if(ldt instanceof AbstractIntegerLDT) {
-        	    Function inBoundsPredicate 
-        	    	= ((AbstractIntegerLDT)ldt).getInBoundsPredicate();
-        	    if(inBoundsPredicate != null) {
-        		implicitPostTerm = TB.func(inBoundsPredicate, 
-        					   TB.var(resultVar));
-        	    }
-        	}
-            }
-        }
-	Term excNotNullTerm = TB.not(TB.equals(TB.var(exceptionVar), 
-			                       TB.NULL(services)));
-        implicitPostTerm = TB.or(implicitPostTerm, excNotNullTerm);
-        result = TB.and(result, implicitPostTerm);
-        */
-
         return result;
     }
     

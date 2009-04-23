@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -29,10 +29,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.SetAsListOfProof;
 import de.uka.ilkd.key.proof.SetOfProof;
 import de.uka.ilkd.key.proof.init.EnsuresPO;
-import de.uka.ilkd.key.proof.init.EnsuresPostPO;
-import de.uka.ilkd.key.proof.init.PreservesInvPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.init.RespectsModifiesPO;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.OperationContract;
@@ -407,6 +404,7 @@ public class SpecificationRepository {
      * (except for abrupt termination, which is not considered a side effect).
      */
     public boolean isStrictlyPure(ProgramMethod pm) {
+        assert pm != null;
 	Boolean result = strictPurityCache.get(pm);
 	if(result != null) {
 	    return result;

@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 // Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
@@ -1508,6 +1515,54 @@ public class LogicPrinter {
         layouter.brk();
         startTerm(1);
         maybeParens(phi,ass);
+        layouter.end();
+    }
+
+    public void printNumericalQuantifierTerm(String name,
+            ArrayOfQuantifiableVariable vars,
+            Term cond, Term summand, int ass, int ass2)
+    throws IOException
+    {
+        layouter.beginC(2);
+        layouter.print(name).print(" ");
+        printVariables(vars);
+        layouter.brk();
+        layouter.print("(");
+        startTerm(2);
+        markStartSub();
+        printTerm(cond);
+        markEndSub();
+        layouter.print(";").brk(1,0);
+        markStartSub();
+        printTerm(summand);
+        markEndSub();
+        layouter.print(")");
+        layouter.end();
+    }
+
+    public void printBoundedNumericalQuantifierTerm(String name,
+            ArrayOfQuantifiableVariable vars,
+            Term lower, Term upper, Term summand, int ass, int ass2)
+    throws IOException
+    {
+        layouter.beginC(2);
+        layouter.print(name).print(" ");
+        printVariables(vars);
+        layouter.brk();
+        layouter.print("(");
+        startTerm(3);
+        markStartSub();
+        printTerm(lower);
+        markEndSub();
+        layouter.print(";").brk(1,0);
+        markStartSub();
+        printTerm(upper);
+        markEndSub();
+        layouter.print(";").brk(1,0);
+        markStartSub();
+        printTerm(summand);
+        markEndSub();       
+        layouter.print(")");
         layouter.end();
     }
 

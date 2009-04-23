@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -32,6 +32,8 @@ public class ViewSettings implements Settings {
     private static final String FONT_INDEX = "[View]FontIndex";
     private static final String HIDE_INTERMEDIATE_PROOFSTEPS =
         "[View]HideIntermediateProofsteps";
+    private static final String HIDE_CLOSED_SUBTREES =
+        "[View]HideClosedSubtrees";
 
 
     /** default max number of displayed tooltip lines is 40 */
@@ -43,6 +45,8 @@ public class ViewSettings implements Settings {
     private int sizeIndex = 2;
     /** do not hide intermediate proofsteps by default */
     private boolean hideIntermediateProofsteps = false;
+    /** do not hide closed subtrees by default */
+    private boolean hideClosedSubtrees = false;
 
 
     private LinkedList<SettingsListener> listenerList =
@@ -128,6 +132,23 @@ public class ViewSettings implements Settings {
         }
     }
 
+    /**
+     * @return true iff closed subtrees should be hidden
+     */
+    public boolean getHideClosedSubtrees() {
+        return hideClosedSubtrees;
+    }
+
+    /**
+     * @param hide Wether closed subtrees should be hidden
+     */
+    public void setHideClosedSubtrees(boolean hide) {
+        if (hide != hideClosedSubtrees) {
+            hideClosedSubtrees = hide;
+            fireSettingsChanged();
+        }
+    }
+
     /** gets a Properties object and has to perform the necessary
      * steps in order to change this object in a way that it
      * represents the stored settings
@@ -138,6 +159,7 @@ public class ViewSettings implements Settings {
 		String val2 = props.getProperty(FONT_INDEX);
 		String val3 = props.getProperty(SHOW_WHOLE_TACLET);
 		String val4 = props.getProperty(HIDE_INTERMEDIATE_PROOFSTEPS);
+		String val5 = props.getProperty(HIDE_CLOSED_SUBTREES);
 		if (val1 != null) {
 		        maxTooltipLines = Integer.valueOf(val1).intValue();
 		} 
@@ -149,6 +171,10 @@ public class ViewSettings implements Settings {
 		}
 		if (val4 != null) {
 			hideIntermediateProofsteps = Boolean.valueOf(val4)
+				.booleanValue();
+		}
+		if (val5 != null) {
+			hideClosedSubtrees = Boolean.valueOf(val5)
 				.booleanValue();
 		}
 	}
@@ -169,6 +195,8 @@ public class ViewSettings implements Settings {
     	props.setProperty(FONT_INDEX, "" + sizeIndex);
     	props.setProperty(HIDE_INTERMEDIATE_PROOFSTEPS, "" +
             hideIntermediateProofsteps);
+    	props.setProperty(HIDE_CLOSED_SUBTREES, "" +
+            hideClosedSubtrees);
     }
 
     /** sends the message that the state of this setting has been

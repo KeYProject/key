@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -213,7 +213,9 @@ class JMLInfoExtractor {
         // Collect all comments preceding the type declaration or the modifiers.
         ListOfComment coms = SLListOfComment.EMPTY_LIST;
         coms = coms.prepend(td.getComments());
-        if(td.getProgramElementName()!=null) coms = coms.prepend(td.getProgramElementName().getComments());
+        if(td.getProgramElementName() != null) {
+            coms = coms.prepend(td.getProgramElementName().getComments());
+        }
         ArrayOfModifier mods = td.getModifiers();
         for (int i=0; i < mods.size(); i++) {
             coms = coms.prepend(mods.getModifier(i).getComments());
@@ -247,7 +249,9 @@ class JMLInfoExtractor {
         // Collect all comments preceding the type declaration or the modifiers.
         ListOfComment coms = SLListOfComment.EMPTY_LIST;
         coms = coms.prepend(td.getComments());
-        coms = coms.prepend(td.getProgramElementName().getComments());
+        if(td.getProgramElementName() != null) {
+            coms = coms.prepend(td.getProgramElementName().getComments());
+        }
         ArrayOfModifier mods = td.getModifiers();
         for (int i=0; i < mods.size(); i++) {
             coms = coms.prepend(mods.getModifier(i).getComments());

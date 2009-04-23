@@ -1,4 +1,0 @@
-Name: Hello World (Java)
-Time: User
-Main-Class: de.uka.ilkd.key.casetool.together.scripts.probe.helloworldcall.HelloJava
-Folder: "KeY/Hello World"

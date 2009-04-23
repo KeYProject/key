@@ -14,7 +14,7 @@
 [SimultaneousUpdateSimplifier]EagerSimplification=false
 [General]StupidMode=false
 [Strategy]MaximumNumberOfAutomaticApplications=3000
-[Libraries]Default=acc.key-false, stringRules.key-false, deprecatedRules.key-false
+
 [StrategyProperty]QUERY_OPTIONS_KEY=QUERY_NONE
 [Choice]DefaultChoices=testGeneration-testGeneration\:testOff , transactions-transactions\:transactionsOn , programRules-programRules\:Java , initialisation-initialisation\:disableStaticInitialisation , transactionAbort-transactionAbort\:abortOn , throughout-throughout\:toutOn , intRules-intRules\:arithmeticSemanticsIgnoringOF , assertions-assertions\:on , nullPointerPolicy-nullPointerPolicy\:nullCheck
 [Model]Source=1

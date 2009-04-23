@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 //This file is part of KeY - Integrated Deductive Software Design
 //Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
 //                      Universitaet Koblenz-Landau, Germany
@@ -38,4 +45,11 @@ public interface SpecExtractor {
     public LoopInvariant extractLoopInvariant(ProgramMethod pm, 
                                               LoopStatement loop)
         throws SLTranslationException;
+    
+    /**
+     * Returns all warnings generated so far in the translation process.
+     * (e.g. this may warn about unsupported features which have been ignored 
+     * by the translation)
+     */
+    public SetOfPositionedString getWarnings();
 }

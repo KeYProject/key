@@ -16,7 +16,7 @@
 [SimultaneousUpdateSimplifier]EagerSimplification=true
 [General]StupidMode=true
 [Strategy]MaximumNumberOfAutomaticApplications=10000
-[Libraries]Default=acc.key-false, stringRules.key-false, deprecatedRules.key-false
+
 [StrategyProperty]QUERY_OPTIONS_KEY=QUERY_NONE
 [Choice]DefaultChoices=transactions-transactions\:transactionsOn , testGeneration-testGeneration\:testOff , programRules-programRules\:Java , initialisation-initialisation\:disableStaticInitialisation , transactionAbort-transactionAbort\:abortOn , throughout-throughout\:toutOn , intRules-intRules\:javaSemantics , assertions-assertions\:on , nullPointerPolicy-nullPointerPolicy\:nullCheck
 [DecisionProcedure]SmtZipProblemDir=false

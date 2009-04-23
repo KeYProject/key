@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -27,29 +27,22 @@ public abstract class KeYInstaller {
 
     private static final String binaryPath = "bin";
     private static final String systemPath = "system";
-    private static final String configPath = "config";
-    private static final String keypatternsPath = "keypatterns";
-    private static final String keyscriptsPath = "keyscripts" + File.separatorChar + "menuextension";
     private static final String keyextjarsPath = "key-ext-jars";
     
     private static final String[] subdirs = { systemPath, 
-					      binaryPath, 
-					      configPath, 
-					      keypatternsPath, 
-					      keyscriptsPath,
+					      binaryPath,  					   
 					      keyextjarsPath };
 
 
 
     /** array with names of required library files */
     private static final String[] libraries = new String[] {
-	"antlr.jar", "dresden-ocl-demo.jar", 
-	"recoderKey.jar", "xerces.jar", "jargs.jar", "log4j.jar"
+	"antlr.jar", "recoderKey.jar", "log4j.jar"
     };
 
     /** optional external binaries */
     private static final String[] optBinaries = new String[] {
-	"gf", "Simplify"
+	"Simplify"
     };
 
     /* necessary environment information */
@@ -62,15 +55,6 @@ public abstract class KeYInstaller {
     private String KEY_HOME = "";
     /** the directory where the key external libraries can be found */
     private String KEY_LIB = "";
-
-    /** 
-     * information about the supported together version
-     */
-    private String[] supportedTgVersion = new String[] { "6.2",
-							 "6.0.1", 
-							 "6.0" };
-
-    private String tgVersion = supportedTgVersion [0];
 
     /** the underlying operation system, default linux */
     private String[] supportedOS = {"linux", "win"}; 
@@ -147,7 +131,6 @@ public abstract class KeYInstaller {
 	environment.append ( "linux".equals ( os ) ? "#!/bin/sh \n" : "" );
 	environment.append ( "win".equals ( os ) ? "@echo off \r\n" : "" );
 	environment.append ( comment ( " KeY-Environment Settings " ) );
-	environment.append ( variable ( "TOGETHER_HOME", togetherHome () ) );
 	environment.append ( variable ( "KEY_HOME", keyHome () ) );
 	environment.append ( variable ( "KEY_LIB", keyLib () ) );
 	environment.append ( variable ( "JAVA_HOME", javaHome () ) );
@@ -157,17 +140,8 @@ public abstract class KeYInstaller {
 
     // selection of the correct shell-script
 
-    protected String startScriptPatternName ( ) {
-	return "startkey_" + os  + "_" + tgVersion;
-    }
-
-    protected String startScriptPatternPath ( ) {
-	return "de.uka.ilkd.key.util.install."
-	    .replace ( '.', File.separatorChar ) + startScriptPatternName ();
-    }
-
     protected String startProverScriptPatternName ( ) {
-	return "startProver_" + os  + "_" + tgVersion;
+	return "startProver_" + os;
     }
 
     protected String startProverScriptPatternPath ( ) {
@@ -175,39 +149,13 @@ public abstract class KeYInstaller {
 	    .replace ( '.', File.separatorChar ) + startProverScriptPatternName ();
     }
 
-    protected String startScriptFilePath ( ) {
-	return binaryPath () + File.separatorChar  + startScriptFileName ();
-    }
-
     protected String startProverScriptFilePath ( ) {
 	return binaryPath () + File.separatorChar  + startProverScriptFileName ();
-    }
-
-    protected String startScriptFileName ( ) {
-	return "linux".equals ( os ) ? "startkey" : "startkey.bat";
     }
 
     protected String startProverScriptFileName ( ) {
 	return "linux".equals ( os ) ? "startProver" : "startProver.bat";
     }
-
-    protected String configPatternName ( ) {
-	return "key.config";
-    }
-
-    protected String configFileName ( ) {
-	return "key.config";
-    }
-    
-    protected String configPatternPath ( ) {
-	return "de.uka.ilkd.key.util.install.".
-	    replace ( '.', File.separatorChar ) + configPatternName ();
-    }
-
-    protected String configFilePath ( ) {
-	return configPath () + File.separatorChar + configFileName ();
-    }
-
 
     // create directories
     
@@ -256,15 +204,6 @@ public abstract class KeYInstaller {
 
     // write shellscript
     
-    private void createStartScript ( JarFile jarFile ) 
-	throws KeYInstallerException {
-
-	createFile ( environment (), 
-		     startScriptFilePath (), 
-		     startScriptPatternPath (),
-		     jarFile );
-    }
-
     private void createStandAloneProverScript ( JarFile jarFile )
 	throws KeYInstallerException {
 	createFile ( environment (), 
@@ -272,20 +211,11 @@ public abstract class KeYInstaller {
 		     startProverScriptPatternPath (),
 		     jarFile );
     }
-       
-    private void createConfigFile ( JarFile jarFile ) 
-    throws KeYInstallerException {
-	createFile ( "",
-		     configFilePath ( ),
-		     configPatternPath (),
-		     jarFile );
-    }
+      
 
     public void generateScripts ( JarFile jarFile ) 
 	throws KeYInstallerException {
-	createStartScript ( jarFile );
 	createStandAloneProverScript( jarFile );
-	createConfigFile ( jarFile );
     }
     
     private void createFile ( String preamble, 
@@ -348,31 +278,6 @@ public abstract class KeYInstaller {
 	    }
 	}       
     }
-
-
-    protected void extractTgScripts ( JarFile jarFile ) 
-	throws KeYInstallerException {
-	String file = "Manifest.mf";
-
-	String keyscripts = "de.uka.ilkd.key.casetool.together.scripts";
-
-	String fromPath = keyscripts + ".";
-	
-	String toPath = keyscriptsPath () + File.separatorChar + fromPath
-	    .replace ( '.', File.separatorChar );
-
-	fromPath = fromPath.replace ( '.', '/' );
-
-	extractFromJar(  fromPath + "menuextension", 
-			toPath + "menuextension", "Manifest.mf", 
-			jarFile );  
-
-	extractFromJar( fromPath + "patternupdate",
-			toPath + "patternupdate", "Manifest.mf",
-			jarFile );
-
-    }
-    
     
     protected void extractExamples(JarFile jarFile) 
                                                throws KeYInstallerException {
@@ -497,20 +402,6 @@ public abstract class KeYInstaller {
     }
 
     /**
-     * returns directory of Together version
-     */
-    public String togetherVersion () {
-	return tgVersion;
-    }
-
-    /**
-     * returns list of all supported together version
-     */
-    public String[] supportedTgVersion () {
-	return supportedTgVersion;
-    }
-
-    /**
      * returns list of all supported os
      */
     public String[] supportedOS () {
@@ -530,27 +421,6 @@ public abstract class KeYInstaller {
      */
     public String binaryPath () {
 	return keyHome () + File.separatorChar + binaryPath;
-    }
-
-    /**
-     * returns subdirectory where to put the patterns
-     */
-    public String keypatternsPath () {
-	return keyHome () + File.separatorChar + keypatternsPath;
-    }
-
-    /**
-     * returns directory where to put the keyscripts
-     */
-    public String keyscriptsPath () {
-	return keyHome () + File.separatorChar + keyscriptsPath;
-    }
-
-    /**
-     * returns directory where to put the config files
-     */
-    public String configPath () {
-	return keyHome () + File.separatorChar + configPath;
     }
 
     /**
@@ -599,13 +469,6 @@ public abstract class KeYInstaller {
 	JAVA_HOME = trail ( dir ) ;
     }
 
-    /**
-     * sets version of together 
-     */
-    public void togetherVersion ( String vers ) {
-	tgVersion = vers;
-    }
- 
     /**
      * remove trailing file separatorchars
      */

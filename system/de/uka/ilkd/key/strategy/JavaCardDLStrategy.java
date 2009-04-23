@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -189,6 +189,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "simplify_instanceof_static",
                       add ( EqNonDuplicateAppFeature.INSTANCE,
                             longConst ( -500 ) ) );
+
+        bindRuleSet ( d, "comprehensions",
+                      add ( NonDuplicateAppModPositionFeature.INSTANCE,
+                            longConst ( 1000 ) ) );
+        
+        bindRuleSet ( d, "comprehensions_high_costs",
+                add ( NonDuplicateAppModPositionFeature.INSTANCE,
+                      longConst ( 10000 ) ) );
         
         bindRuleSet ( d, "evaluate_instanceof", longConst ( -500 ) );
         

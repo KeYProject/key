@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -25,8 +25,8 @@ import javax.swing.event.ChangeListener;
 public class KeYInstallerGUI extends KeYInstallerUI {
 
 
-    private JTabbedPane tabbedPane;
-    private JFrame installerFrame;
+    private final JTabbedPane tabbedPane;
+    private final JFrame installerFrame;
 
     
     public KeYInstallerGUI ( String keyHome, 
@@ -189,6 +189,11 @@ public class KeYInstallerGUI extends KeYInstallerUI {
 	    }
 	});
 	
+	// disable the tabbed pane in order to prevent the user from 
+	// circumventing the consistency checking and model updating 
+	// done by the "next" button 
+	tabbedPane.setEnabled(false);
+	
 	// add buttons
 	buttonBox.add(prev);
 	buttonBox.add(cancel);
@@ -308,14 +313,6 @@ public class KeYInstallerGUI extends KeYInstallerUI {
  	}
 
 	try {
-	    extractTgScripts ( keyJarFile );
- 	} catch ( KeYInstallerException kie ) {
- 	    abortError ( "Could not generate the KeY scripts. Please " + 
-			 "resolve the problem first " + 
-			 "and redo the installation afterwards.\nDetail:" + kie );	    
- 	}
-
-	try {
 	    extractExamples( keyJarFile );
  	} catch ( KeYInstallerException kie ) {
  	    abortError ( "Could not unpack the examples. Please " + 
@@ -325,12 +322,10 @@ public class KeYInstallerGUI extends KeYInstallerUI {
 	
 	if ( "linux".equals ( os () ) ) {
 	    try {
-		Runtime.getRuntime ().exec ( "chmod a+x " + startScriptFilePath () );
 		Runtime.getRuntime ().exec ( "chmod a+x " + startProverScriptFilePath () );
 	    } catch ( IOException e) { 
-		todo.append ( "Please set " + startScriptFilePath () +  
-			      " executable : chmod a+x " + startScriptFilePath () +
-			      "\n chmod a+x " + startProverScriptFilePath () );
+		todo.append ( "Please set " + startProverScriptFilePath () +  
+			      " executable : chmod a+x " + startProverScriptFilePath ());
 		todo.append ( "\n" );
 	    }
 	}
@@ -362,9 +357,7 @@ public class KeYInstallerGUI extends KeYInstallerUI {
 		  trim (  "Something is left to do. " + todo.toString () + 
 			  "After you have done all from above, you can start KeY by" + 
 			  " changing to " + binaryPath () + 
-			  " and executing " + startScriptFileName () +
-			  " (Together front end) " + " or " + 
-			  startProverScriptFileName () + " (standalone KeY)", 60 ),
+			  " and executing " + startProverScriptFileName (), 60 ),
 			  "Please complete installation manually", 
 		  JOptionPane.INFORMATION_MESSAGE );
 	} else {
@@ -372,8 +365,7 @@ public class KeYInstallerGUI extends KeYInstallerUI {
 		( null, trim 
 		  ( "To start KeY, change directory to "
 		    + binaryPath () +  " and execute " + 
-		    startScriptFileName () + " (Together front end) " + 
-		    " or " + startProverScriptFileName () + " (standalone KeY)", 60 ),
+		    startProverScriptFileName (), 60 ),
 		  "Installation successfully completed",
 		  JOptionPane.INFORMATION_MESSAGE );
 	}

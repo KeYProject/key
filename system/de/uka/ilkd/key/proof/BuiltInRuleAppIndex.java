@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -19,9 +19,6 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
 
     private NewRuleListener  newRuleListener =
         NullNewRuleListener.INSTANCE;
-
-    private SimplifyIntegerRule simplify = null;
-    
     
     public BuiltInRuleAppIndex(BuiltInRuleIndex index) {
 	this.index = index;
@@ -80,29 +77,6 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
     public void scanApplicableRules (Goal       goal,
 				     Constraint userConstraint) {
 	scanSimplificationRule ( goal, userConstraint, getNewRulePropagator () );
-//	scanDecProcRule(goal, userConstraint, getNewRulePropagator () );
-    }
-
-    private void scanDecProcRule(Goal goal,
-				 Constraint userConstraint, 
-				 NewRuleListener listener){
-	BuiltInRule bir = findDecProcRule();
-	BuiltInRuleApp app = new BuiltInRuleApp ( bir,
-						  null,
-						  userConstraint );
-	listener.ruleAdded ( app, null );
-    }
-
-    private SimplifyIntegerRule findDecProcRule(){
-	if(simplify != null) return simplify;
-	IteratorOfBuiltInRule it = index.rules().iterator();
-	while (it.hasNext()) {
-	    BuiltInRule bir = it.next();
-	    if(bir instanceof SimplifyIntegerRule){
-		simplify = (SimplifyIntegerRule) bir;
-	    }
-	}
-	return simplify;
     }
 
     private void scanSimplificationRule ( Goal       goal,
@@ -154,7 +128,6 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
                                  Goal goal,
                                  Constraint userConstraint ) {
         scanSimplificationRule( goal, userConstraint, l );
-//	scanDecProcRule( goal, userConstraint, l );
     }
     
     /** 
@@ -173,11 +146,11 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
     }
     
     private void scanAddedFormulas ( Goal goal, boolean antec, SequentChangeInfo sci, final Constraint userConstraint ) {
-        final IteratorOfBuiltInRule ruleIt = index.rules().iterator();
         ListOfConstrainedFormula cfmas = sci.addedFormulas( antec );
         final NewRuleListener listener = getNewRulePropagator();
         while ( !cfmas.isEmpty() ) {
             final ConstrainedFormula cfma = cfmas.head();
+            final IteratorOfBuiltInRule ruleIt = index.rules().iterator();
             while (ruleIt.hasNext()) {
                 final BuiltInRule rule = ruleIt.next();            
                 scanSimplificationRule( rule, goal, antec, 
@@ -189,7 +162,6 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
 
 
     private void scanModifiedFormulas ( Goal goal, boolean antec, SequentChangeInfo sci, final Constraint userConstraint ) {
-        final IteratorOfBuiltInRule ruleIt = index.rules().iterator();
         
         final NewRuleListener listener = getNewRulePropagator();
         ListOfFormulaChangeInfo fcis = sci.modifiedFormulas( antec );
@@ -197,6 +169,7 @@ public class BuiltInRuleAppIndex implements java.io.Serializable {
         while ( !fcis.isEmpty() ) {
             final FormulaChangeInfo fci = fcis.head();               
             final ConstrainedFormula cfma = fci.getNewFormula();
+            final IteratorOfBuiltInRule ruleIt = index.rules().iterator();
             while (ruleIt.hasNext()) {
                 final BuiltInRule rule = ruleIt.next();
                 scanSimplificationRule( rule, goal, antec, userConstraint, cfma, listener );

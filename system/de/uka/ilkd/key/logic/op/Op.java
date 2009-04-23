@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -130,6 +130,15 @@ public abstract class Op implements Operator {
 
     /** the 'ifEx-then-else' operator */
     public static final IfExThenElse IF_EX_THEN_ELSE = new IfExThenElse ();
+
+    /** the sum operator */
+    public static final NumericalQuantifier SUM = new NumericalQuantifier(new Name("\\sum"));
+    
+    /** the bounded sum operator */
+    public static final BoundedNumericalQuantifier BSUM = new BoundedNumericalQuantifier(new Name("\\bSum"));
+    
+    /** the product operator */
+    public static final NumericalQuantifier PRODUCT = new NumericalQuantifier(new Name("\\product"));
     
     protected final Name name;
    	

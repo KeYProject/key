@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -70,7 +70,7 @@ public class ErrorMessages {
 	c.insets = new Insets(5,20,5,20);
 	c.gridx = 0;
 	bp.add(okb, c);    
-	bp.setAlignmentY(JPanel.BOTTOM_ALIGNMENT);
+	bp.setAlignmentY(Component.BOTTOM_ALIGNMENT);
 	p.add(bp, BorderLayout.SOUTH);
 	f.getContentPane().add(p);
 	f.pack();

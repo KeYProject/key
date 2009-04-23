@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -253,9 +253,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 	JPanel panel = new JPanel(new BorderLayout());
 	// show instantiation
 	dataTable[i] = new DataTable(this, i);
-	tablePane = new JScrollPane(dataTable[i]);
-	dataTable[i].setRowHeight(48);
-	adaptSizes(dataTable[i]);	
+        dataTable[i].setRowHeight(48);
+        tablePane = new JScrollPane(dataTable[i]);
+        adaptSizes(dataTable[i]);       
 	panel.add(tablePane, 
 		  BorderLayout.CENTER);
 	return panel;
@@ -267,9 +267,11 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 	    dt.getRowCount();
 	int tableSize_y = (visible_rows + 1) * 48;  
 	Dimension tableDim = new Dimension(tableSize_x, tableSize_y);
- 	tablePane.setMinimumSize(tableDim);
+	// bugfix. march-09 m.u.:
+	// removed calls to tablePane.setMinimumSize and setMaximumSize
+	// because they prevented the scrollbar from appearing (esp. in
+	// low screen resolution)
  	tablePane.setPreferredSize(tableDim);
-	tablePane.setMaximumSize(tableDim);
 	validateTree();
     }
 
@@ -385,7 +387,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
     private static class DataTable extends JTable 
 	implements ModelChangeListener {
 
-	JTextArea inputArea=new JTextArea("Nothing",3,16);
+	//JTextArea inputArea=new JTextArea("Nothing",3,16);
+        JTextArea inputArea=new BracketMatchingTextArea("Nothing",3,16);
 	final InputEditor iEditor = new InputEditor(inputArea);
 	final InputCellRenderer iRenderer = new InputCellRenderer();
 	

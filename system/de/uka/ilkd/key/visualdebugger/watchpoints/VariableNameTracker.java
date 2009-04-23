@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package de.uka.ilkd.key.visualdebugger.watchpoints;
 
 import java.util.*;
@@ -44,6 +51,9 @@ public class VariableNameTracker {
     private Stack<ProgramMethod> methodStack = new Stack<ProgramMethod>();
     private Stack<ReferencePrefix> selfVarStack = new Stack<ReferencePrefix>();
     private ReferencePrefix selfVar = null;
+    /**The method we are currently in.*/
+    private ProgramMethod activeMethod = null;
+    
     /**
      * Instantiates a new VariableNameTracker.
      * 
@@ -273,14 +283,19 @@ public class VariableNameTracker {
      */
     private RenamingTable trackVariableNames(ProgramMethod pm, List<LocationVariable> initialRenamings) {
 
-        List<LocationVariable> orginialLocalVariables = getLocalsForMethod(pm);
+        List<LocationVariable> originalLocalVariables = getLocalsForMethod(pm);
+        
         HashMap<LocationVariable, SourceElement> nameMap = new HashMap<LocationVariable, SourceElement>();
+      
+//        List<LocationVariable> originalLocalVariables = Arrays.asList(olv
+//                .toArray(new LocationVariable[olv.size()]));
+        
+        // every local variable needs a corresponding renamed counterpart
+        assert originalLocalVariables.size() == initialRenamings.size();
 
-        assert orginialLocalVariables.size() == initialRenamings.size();
-
-        for(int k = 0; k<orginialLocalVariables.size(); k++) {
+        for(int k = 0; k<originalLocalVariables.size(); k++) {
             // create standard mapping from original var -> initially renamed var
-            LocationVariable originalVar = orginialLocalVariables.get(k);
+            LocationVariable originalVar = originalLocalVariables.get(k);
             LocationVariable initiallyRenamedVar = initialRenamings.get(k);
             nameMap.put(originalVar, initiallyRenamedVar);
             System.out.println("created initial mapping");
@@ -341,14 +356,23 @@ public class VariableNameTracker {
             }
         return locals;
     }
+    
     private List<LocationVariable> getLocalsForMethod(ProgramMethod pm){
         List<LocationVariable> locals = new LinkedList<LocationVariable>();
         for (WatchPoint watchPoint : watchpoints) {
-            if(watchPoint.getProgramMethod().equals(pm))
-            locals.addAll(watchPoint.getOrginialLocalVariables());
+            if(watchPoint.getProgramMethod().equals(pm)) {
+                
+                List<LocationVariable> currentlocals = watchPoint.getOrginialLocalVariables();
+                for (LocationVariable locationVariable : currentlocals) {
+                    // add distinct
+                    if (!locals.contains(locationVariable))
+                        locals.add(locationVariable);
+                }
             }
+        }
         return locals;
     }
+    
     private List<WatchPoint> getWatchpointsForMethod(ProgramMethod pm){
         List<WatchPoint> wps = new LinkedList<WatchPoint>();
         for (WatchPoint watchPoint : watchpoints) {
@@ -406,7 +430,9 @@ public class VariableNameTracker {
                             programMethod = mbs.getProgramMethod(node.proof()
                                     .getServices());
                             // keep method stack up to date
+                          //  if(isMethodOfInterest(programMethod));
                             methodStack.push(programMethod);
+                            activeMethod=programMethod;
                             System.out.println(methodStack.size()
                                     + " elements on stack after push");
                             if (!nameMaps.containsKey(programMethod)) {
@@ -481,6 +507,17 @@ public class VariableNameTracker {
  */
 public ReferencePrefix getSelfVar() {
     return selfVarStack.peek();
+}
+
+
+public ProgramMethod getActiveMethod() {
+    return activeMethod;
 }  
+private boolean isMethodOfInterest(ProgramMethod pm){
+    for (WatchPoint wp : watchpoints) {
+        if(wp.getProgramMethod().equals(pm)) return true;
+    }
+    return false;
+}
  
 }

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -9,10 +9,8 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.WeakHashMap;
 
 /**
  * A Namespace keeps track of already used {@link Name}s and the objects
@@ -34,18 +32,7 @@ public class Namespace implements java.io.Serializable {
     /** The hashmap that maps a name to a symbols of that name if it 
      * is defined in this Namespace. */
     protected HashMap<Name, Named> symbols=null;
- 
-    /**During proving temporary symbols are introduced. To prevent a memory leak these
-     * symbols must be removed if they are not needed. The WeakHashMap is used for this.
-     * The value-part of the hash map must be a weakReference, because otherwise
-     * it is a strong reference and Named strongly refers to Name.*/
-    protected WeakHashMap<Name, WeakReference<Named>> symbolRefs=null;
-    
-    /**A global flag. If it is true then symbols are stored in 
-     * the "normal" hash map {@code symbols}, otherwise they are stored 
-     * in the weak hash map {@code symbolRefs} */
-    public static boolean storeAsWeak=false;
-    
+     
     /** One defined symbol.  Many Namespaces, e.g. those generated when 
      * a quantified formula is parsed, define only one new symbol,
      * and it would be a waste of time and space to create a hashmap for that.
@@ -95,24 +82,6 @@ public class Namespace implements java.io.Serializable {
      * TODO:The problem of saving to localSym, symbols, and symbolRefs is not solved yet.*/
     public void add(Named sym) {
 	if (numLocalSyms>0) {
-            if (storeAsWeak) {
-                WeakReference<Named> symref = new WeakReference(sym);
-                if (symbolRefs == null) {
-                    symbolRefs = new WeakHashMap<Name, WeakReference<Named>>();
-                    if (localSym != null) {
-                        if (symbols == null) {
-                            symbols = new HashMap<Name, Named>();
-                            if (localSym != null) {
-                                symbols.put(localSym.name(), localSym);
-                                localSym = null;
-                            }
-                        }
-                        symbols.put(sym.name(), sym);
-                        localSym = null;
-                    }
-                }
-                symbolRefs.put(sym.name(), symref);
-            } else {
                 if (symbols == null) {
                     symbols = new HashMap<Name, Named>();
                     if (localSym != null) {
@@ -122,7 +91,6 @@ public class Namespace implements java.io.Serializable {
                 }
                 symbols.put(sym.name(), sym);
             }
-	}
 	else localSym=sym;
 	numLocalSyms++;
         if (protocol != null) {
@@ -163,9 +131,7 @@ public class Namespace implements java.io.Serializable {
 	if (numLocalSyms > 1) {
             if (symbols != null && symbols.containsKey(name)) {
                 return symbols.get(name);
-            } else if (symbolRefs != null && symbolRefs.containsKey(name)) {
-                return symbolRefs.get(name).get();
-            }
+            } 
             return null;
         }
 	if (localSym.name().equals(name)) {
@@ -217,16 +183,7 @@ public class Namespace implements java.io.Serializable {
 
 	if (numLocalSyms == 1) {
             list = list.prepend(localSym);
-        } else if (numLocalSyms > 1) {
-            if (symbolRefs != null) {
-                Iterator<WeakReference<Named>> it = symbolRefs.values().iterator();
-                while (it.hasNext()) {
-                    Named named = it.next().get();
-                    if (named != null) {
-                        list = list.prepend(named);
-                    }
-                }
-            }
+        } else if (numLocalSyms > 1) {          
             if (symbols != null) {
                 Iterator<Named> it = symbols.values().iterator();
                 while (it.hasNext()) {
@@ -257,7 +214,7 @@ public class Namespace implements java.io.Serializable {
     }
 
     public String toString() {
-	String res="Namespace: [local:"+localSym+", "+symbols+", "+symbolRefs;
+	String res="Namespace: [local:"+localSym+", "+symbols;
 	if (parent!=null) res=res+"; parent:"+parent;
 	return res+"]";
     }
@@ -294,8 +251,7 @@ public class Namespace implements java.io.Serializable {
     
     public void reset() {
 	parent=null;
-	symbols=null;
-	symbolRefs=null;
+	symbols=null;	
 	localSym=null;
 	numLocalSyms=0;
     }

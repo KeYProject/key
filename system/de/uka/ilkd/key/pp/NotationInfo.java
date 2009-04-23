@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -156,6 +156,9 @@ public class NotationInfo {
 
     	tbl.put(Op.ALL,new Notation.Quantifier("\\forall", 60, 60));
 	tbl.put(Op.EX, new Notation.Quantifier("\\exists", 60, 60));
+	tbl.put(Op.SUM, new Notation.NumericalQuantifier("\\sum", 60, 60, 70));
+	tbl.put(Op.BSUM, new Notation.BoundedNumericalQuantifier("\\bSum", 60, 60, 70));
+	tbl.put(Op.PRODUCT, new Notation.NumericalQuantifier("\\product", 60, 60, 70));
 	tbl.put(Op.DIA,new Notation.Modality("\\<","\\>", 60, 60));
 	tbl.put(Op.BOX,new Notation.Modality("\\[","\\]", 60, 60));
 	tbl.put(Op.TOUT,new Notation.Modality("\\[[","\\]]", 60, 60));

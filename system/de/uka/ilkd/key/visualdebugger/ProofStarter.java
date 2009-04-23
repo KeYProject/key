@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package de.uka.ilkd.key.visualdebugger;
 
 import java.util.*;
@@ -10,6 +17,7 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.proofevent.IteratorOfNodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -261,9 +269,10 @@ public class ProofStarter {
             proof.getSettings().getProfile().getStandardRules().getStandardBuiltInRules().iterator();
         while (builtinRules.hasNext()) {
             final BuiltInRule bir = builtinRules.next();
-            if (bir instanceof SimplifyIntegerRule) {
-                decisionProcedureRule = bir;
-                break;
+            //TODO: do we really want to hardcode "Simplify" here?
+            if (bir instanceof SMTRule && bir.displayName().contains("Simplify")) {
+        	decisionProcedureRule = bir;
+        	break;
             }
         }
         return decisionProcedureRule;

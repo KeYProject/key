@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 //This file is part of KeY - Integrated Deductive Software Design
 //Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
 //                      Universitaet Koblenz-Landau, Germany
@@ -24,6 +31,7 @@ import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
@@ -43,6 +51,8 @@ public class UseOperationContractRule implements BuiltInRule {
     private static final SignatureVariablesFactory SVF 
         = SignatureVariablesFactory.INSTANCE;
     private static final AtPreFactory APF = AtPreFactory.INSTANCE;
+    private static final CreatedAttributeTermFactory CATF 
+        = CreatedAttributeTermFactory.INSTANCE;
   
     public static final UseOperationContractRule INSTANCE 
                                             = new UseOperationContractRule();
@@ -139,9 +149,7 @@ public class UseOperationContractRule implements BuiltInRule {
                 = SVF.createSelfVar(services, pm, true);
             ListOfParsableVariable dummyParamVars 
                 = SVF.createParamVars(services, pm, true);
-            IteratorOfOperationContract it = result.iterator();
-            while(it.hasNext()) {
-                OperationContract contract = it.next();
+            for(OperationContract contract : result) {
                 if(contract.getModifies(dummySelfVar, dummyParamVars, services)
                            .contains(EverythingLocationDescriptor.INSTANCE)) {
                     result = result.remove(contract);
@@ -364,20 +372,25 @@ public class UseOperationContractRule implements BuiltInRule {
         
         ListOfParsableVariable paramVars 
             = SVF.createParamVars(services, pm, true);
+        ListOfProgramVariable paramVarsAsProgVars 
+            = SLListOfProgramVariable.EMPTY_LIST;
         for (ParsableVariable pvar : paramVars) {
-            assert pvar instanceof ProgramVariable : pvar + " is not a ProgramVariable";
+            assert pvar instanceof ProgramVariable 
+                   : pvar + " is not a ProgramVariable";
+            paramVarsAsProgVars 
+                = paramVarsAsProgVars.append((ProgramVariable)pvar);
             goal.addProgramVariable((ProgramVariable)pvar);
         }
         
-        ProgramVariable resultVar 
-            = SVF.createResultVar(services, pm, true);
-        if(resultVar != null)
+        ProgramVariable resultVar = SVF.createResultVar(services, pm, true);
+        if(resultVar != null) {
             goal.addProgramVariable(resultVar);
+        }
         
-        ProgramVariable excVar 
-            = SVF.createExcVar(services, pm, true);
-        if(excVar != null)
+        ProgramVariable excVar = SVF.createExcVar(services, pm, true);
+        if(excVar != null) {
             progVarNS.addSafely(excVar);
+        }
         
         Map<Operator, Function> atPreFunctions               
             = new LinkedHashMap<Operator, Function>();
@@ -426,7 +439,8 @@ public class UseOperationContractRule implements BuiltInRule {
         Term[] mvTerms = new Term[mvs.size()];
         final IteratorOfMetavariable it2 = mvs.iterator();
         for(int i = 0; i < mvTerms.length; i++) {
-            mvTerms[i] = TermBuilder.DF.func(it2.next());
+            assert it2.hasNext();
+            mvTerms[i] = TB.func(it2.next());
         }            
         Update anonUpdate = auf.createAnonymisingUpdate(modifies, 
                                                         mvTerms, 
@@ -449,15 +463,25 @@ public class UseOperationContractRule implements BuiltInRule {
         Term excNullTerm = TB.equals(TB.var(excVar), TB.NULL(services));
        
         //create "Pre" branch
-        Term preTerm = uf.prepend(selfParamsUpdate, 
-                                TB.imp(pre.getAxiomsAsFormula(), 
-                                       pre.getFormula()));
+        Term reachablePre = TB.and(new Term[]{
+                TB.inReachableState(services),
+                selfVar != null ? CATF.createCreatedAndNotNullTerm(services, TB.var(selfVar)) : TB.tt(),
+                CATF.createReachableVariableValuesTerm(services, 
+                                                       paramVarsAsProgVars)});
+        Term preTerm = uf.prepend(
+                selfParamsUpdate, 
+                TB.and(reachablePre, TB.imp(pre.getAxiomsAsFormula(), 
+                                            pre.getFormula())));
         replaceInGoal(preTerm, preGoal, pio);
         
         //create "Post" branch
+        Term reachablePost = TB.and(
+                TB.inReachableState(services), 
+                CATF.createReachableVariableValueTerm(services, resultVar));
         StatementBlock postSB = replaceStatement(jb, new StatementBlock());
         Term postTermWithoutUpdate 
             = TB.imp(TB.and(new Term[]{excNullTerm,
+                                       reachablePost,
                                        post.getAxiomsAsFormula(),
                                        post.getFormula()}),
                      TB.prog(modality,
@@ -489,10 +513,13 @@ public class UseOperationContractRule implements BuiltInRule {
         replaceInGoal(postTerm, postGoal, pio);
         
         //create "Exceptional Post" branch
+        Term reachableExcPost = TB.and(
+                TB.inReachableState(services),
+                CATF.createCreatedAndNotNullTerm(services, TB.var(excVar)));
         StatementBlock excPostSB 
             = replaceStatement(jb, new StatementBlock(new Throw(excVar)));
         Term excPostTermWithoutUpdate
-            = TB.imp(TB.and(new Term[]{TB.not(excNullTerm),
+            = TB.imp(TB.and(new Term[]{reachableExcPost,
                                        post.getAxiomsAsFormula(),
                                        post.getFormula()}),
                      TB.prog(modality,

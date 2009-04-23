@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -60,7 +60,7 @@ public class RuleSource {
 
     public static RuleSource initRuleFile(String filename) {
         URL u = KeYResourceManager.getManager().
-            getResourceFile(RuleSource.class, "rules/"+filename);
+            getResourceFile(RuleSource.class, "rules/" + filename);
         if (u == null) {
             // a more specific exception type woul probably be better
             throw new RuntimeException("Could not find rule file "+filename);

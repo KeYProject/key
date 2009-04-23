@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -12,13 +12,15 @@ package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.ldt.AbstractIntegerLDT;
+import de.uka.ilkd.key.logic.ldt.LDT;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.AbstractCollectionSort;
+import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 
 
@@ -34,44 +36,18 @@ public class CreatedAttributeTermFactory {
     private static final TermBuilder TB = TermBuilder.DF;
     
     
+    //-------------------------------------------------------------------------
+    //constructors
+    //------------------------------------------------------------------------- 
+    
     private CreatedAttributeTermFactory() {}
-       
-    
-    /**
-     * Creates the formula "objectTerm.<created> = TRUE".
-     */
-    public Term createCreatedTerm(Services services, Term objectTerm) {
-        JavaInfo javaInfo = services.getJavaInfo();
-        ProgramVariable createdAttribute
-                = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, 
-                                        javaInfo.getJavaLangObject());
-        Term createdTerm = TB.dot(objectTerm, createdAttribute);
-        
-        return TB.equals(createdTerm, TB.TRUE(services));
-    }
     
     
-    /**
-     * Creates the formula "objectTerm.<created> = TRUE | objectTerm = null"
-     */
-    public Term createCreatedOrNullTerm(Services services, Term objectTerm) {
-        Term objectCreatedTerm = createCreatedTerm(services, objectTerm);
-        Term objectNullTerm = TB.equals(objectTerm, TB.NULL(services));
-        return TB.or(objectCreatedTerm, objectNullTerm);
-    }
-
-
-    /**
-     * Creates the formula "objectTerm.<created> = TRUE & objectTerm != null"
-     */
-    public Term createCreatedAndNotNullTerm(Services services, Term objectTerm) {
-        Term objectCreatedTerm = createCreatedTerm(services, objectTerm);
-        Term objectNotNullTerm 
-            = TB.not(TB.equals(objectTerm, TB.NULL(services))); 
-        return TB.and(objectCreatedTerm, objectNotNullTerm);
-    }
-
-
+    
+    //-------------------------------------------------------------------------
+    //internal methods
+    //-------------------------------------------------------------------------
+    
     private Term createQuantifierTerm(Services services,
                                       Quantifier q,
                                       LogicVariable[] vars,
@@ -107,6 +83,47 @@ public class CreatedAttributeTermFactory {
     }
     
     
+    
+    //-------------------------------------------------------------------------
+    //public interface
+    //-------------------------------------------------------------------------     
+    
+    /**
+     * Creates the formula "objectTerm.<created> = TRUE".
+     */
+    public Term createCreatedTerm(Services services, Term objectTerm) {
+        JavaInfo javaInfo = services.getJavaInfo();
+        ProgramVariable createdAttribute
+                = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, 
+                                        javaInfo.getJavaLangObject());
+        Term createdTerm = TB.dot(objectTerm, createdAttribute);
+        
+        return TB.equals(createdTerm, TB.TRUE(services));
+    }
+    
+    
+    /**
+     * Creates the formula "objectTerm.<created> = TRUE | objectTerm = null"
+     */
+    public Term createCreatedOrNullTerm(Services services, Term objectTerm) {
+        Term objectCreatedTerm = createCreatedTerm(services, objectTerm);
+        Term objectNullTerm = TB.equals(objectTerm, TB.NULL(services));
+        return TB.or(objectCreatedTerm, objectNullTerm);
+    }
+
+
+    /**
+     * Creates the formula "objectTerm.<created> = TRUE & objectTerm != null"
+     */
+    public Term createCreatedAndNotNullTerm(Services services, Term objectTerm) {
+        Term objectCreatedTerm = createCreatedTerm(services, objectTerm);
+        Term objectNotNullTerm 
+            = TB.not(TB.equals(objectTerm, TB.NULL(services))); 
+        return TB.and(objectCreatedTerm, objectNotNullTerm);
+    }
+
+    
+    
     /**
      * Creates a quantifier term where the quantification only covers 
      * objects which have already been created and which are not null.
@@ -139,9 +156,9 @@ public class CreatedAttributeTermFactory {
      * objects which have already been created and which are not null.
      */
     public Term createCreatedOrNullQuantifierTerm(Services services,
-                                                   Quantifier q, 
-                                                   LogicVariable[] vars, 
-                                                   Term subTerm) {
+                                                  Quantifier q, 
+                                                  LogicVariable[] vars, 
+                                                  Term subTerm) {
         return createQuantifierTerm(services, q, vars, subTerm, false);
     }
     
@@ -159,4 +176,45 @@ public class CreatedAttributeTermFactory {
                                                   new LogicVariable[] {var},
                                                   subTerm);
     }
+    
+    
+    /**
+     * Creates a formula expressing that the value of the passed program 
+     * variable is "java-reachable", i.e.:
+     * - for an object type variable: the value is "null" or a created object
+     * - for an integer type variable: the value satisfies the corresponding 
+     *   in-bounds-predicate
+     */
+    public Term createReachableVariableValueTerm(Services services, 
+                                                 ProgramVariable var) {
+        if(var == null) {
+            return TB.tt();
+        } else if(var.sort() instanceof ObjectSort) {
+            return createCreatedOrNullTerm(services, TB.var(var)); 
+        } else {
+            Type varType = var.getKeYJavaType().getJavaType();
+            LDT ldt = services.getTypeConverter().getModelFor(varType);
+            if(ldt instanceof AbstractIntegerLDT) {
+                Function inBoundsPred 
+                    = ((AbstractIntegerLDT) ldt).getInBounds();
+                return TB.func(inBoundsPred, TB.var(var));
+            }
+        }
+        return TB.tt();
+    }    
+    
+    
+    /**
+     * Same as createReachableVariableValueTerm(), only for a *list* of 
+     * variables. 
+     */
+    public Term createReachableVariableValuesTerm(Services services, 
+                                                  ListOfProgramVariable vars) {
+        Term result = TB.tt();
+        for(ProgramVariable var : vars) {
+            Term varLegalTerm = createReachableVariableValueTerm(services, var);
+            result = TB.and(result, varLegalTerm);
+        }
+        return result;
+    }    
 }

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -195,17 +195,18 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
 	listenerList.remove(TreeModelListener.class, l);
     }
     
-    private boolean hideSubtrees = false;
 
     public boolean hideClosedSubtrees () {
-        return hideSubtrees;
+        return ProofSettings.DEFAULT_SETTINGS.getViewSettings()
+            .getHideClosedSubtrees();
     }
 
-    public void setHideClosedSubtrees (boolean hideSubtrees) {
-        if ( this.hideSubtrees == hideSubtrees )
-            return;
-        this.hideSubtrees = hideSubtrees;
-        updateTree((TreeNode) null);
+    public void setHideClosedSubtrees (boolean hide) {
+        if ( hide != hideClosedSubtrees() ) {
+            ProofSettings.DEFAULT_SETTINGS.getViewSettings()
+                .setHideClosedSubtrees(hide);
+            updateTree((TreeNode) null);
+        }
     }
 
     public boolean isHidingIntermediateProofsteps() {

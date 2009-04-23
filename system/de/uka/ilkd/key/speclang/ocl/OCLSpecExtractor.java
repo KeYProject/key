@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 //This file is part of KeY - Integrated Deductive Software Design
 //Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
 //                      Universitaet Koblenz-Landau, Germany
@@ -16,13 +23,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.SetAsListOfClassInvariant;
-import de.uka.ilkd.key.speclang.SetAsListOfOperationContract;
-import de.uka.ilkd.key.speclang.SetOfClassInvariant;
-import de.uka.ilkd.key.speclang.SetOfOperationContract;
-import de.uka.ilkd.key.speclang.SpecExtractor;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.ocl.translation.OCLSpecFactory;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
@@ -161,5 +162,12 @@ public class OCLSpecExtractor implements SpecExtractor {
     public LoopInvariant extractLoopInvariant(ProgramMethod pm, LoopStatement loop) 
             throws SLTranslationException {
         return null; //OCL has no loop invariants
+    }
+
+
+
+    public SetOfPositionedString getWarnings() {
+        //graceful treatment of unsupported features for OCL not implemented
+        return SetAsListOfPositionedString.EMPTY_SET; 
     }
 }

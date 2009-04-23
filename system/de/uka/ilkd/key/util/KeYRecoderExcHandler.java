@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,12 +11,7 @@
 package de.uka.ilkd.key.util;
 
 
-import java.util.*;
-
-import recoder.java.ProgramElement;
-import recoder.java.expression.operator.New;
-import recoder.java.reference.TypeReference;
-import recoder.service.UnresolvedReferenceException;
+import java.util.EventObject;
 
 
 public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl implements recoder.service.ErrorHandler{

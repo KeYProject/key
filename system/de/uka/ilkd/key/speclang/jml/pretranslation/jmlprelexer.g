@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -25,6 +25,10 @@ options {
 tokens {
     ABSTRACT 			= "abstract";
     ALSO 			= "also";
+    ASSERT                      = "assert";
+    ASSERT_REDUNDANTLY          = "assert_redundantly";
+    ASSUME                      = "assume";
+    ASSUME_REDUNDANTLY          = "assume_redundantly";
     ASSIGNABLE 			= "assignable";
     ASSIGNABLE_RED 		= "assignable_redundantly";
     BEHAVIOR 			= "behavior";
@@ -79,6 +83,7 @@ tokens {
     NON_NULL 			= "non_null";
     NORMAL_BEHAVIOR 		= "normal_behavior";
     NORMAL_BEHAVIOUR 		= "normal_behaviour";
+    NOWARN			= "nowarn";
     NULLABLE 			= "nullable";
     NULLABLE_BY_DEFAULT 	= "nullable_by_default";
     OLD				= "old";

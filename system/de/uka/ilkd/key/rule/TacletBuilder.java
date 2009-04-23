@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -17,7 +17,10 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-/** subclasss build Schematic Theory Specific Rules (Taclets) */
+/** 
+ * abstract taclet builder class to be inherited from taclet builders
+ * specialised for their concrete taclet variant 
+ */
 public abstract class TacletBuilder {
 
     protected final static Name NONAME = new Name("unnamed");

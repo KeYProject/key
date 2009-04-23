@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -193,14 +193,6 @@ public class KeYMediator {
 	else
 	    return getProof ().getMetavariableDeliverer ();
     }
-
-//     /** returns the proof settings
-//      * @return  the proof settings
-//      */
-//     public ProofSettings proofSettings() {
-// 	return proofSettings;
-//     }
-   
 
     /** simplified user interface? */
     public boolean stupidMode() {
@@ -562,25 +554,25 @@ public class KeYMediator {
                 final Goal currGoal = reusePoint.target(); // check proof!!!
                 assert currGoal != null : 
                     "Cannot apply this here. Forgot to unregister listener?";
-                final ReuseListener hook = getReuseListener();
-                hook.removeRPConsumedMarker(reusePoint.source());
+                final ReuseListener local_hook = getReuseListener();
+                local_hook.removeRPConsumedMarker(reusePoint.source());
                 RuleApp app = reusePoint.getReuseApp();
                 if (reusePoint.source() != changeWish) {
                     currGoal.node().setReuseSource(reusePoint);
-                    hook.removeRPConsumedGoal(currGoal);
+                    local_hook.removeRPConsumedGoal(currGoal);
                     getProof().getServices().getNameRecorder().setProposals(
                             reusePoint.getNameProposals());
                     ListOfGoal goalList = currGoal.apply(app);
-                    hook.addRPOldMarkersNewGoals(goalList);
-                    hook.addRPNewMarkersAllGoals(reusePoint.source());
-                    reuseStarted = hook.reusePossible();
+                    local_hook.addRPOldMarkersNewGoals(goalList);
+                    local_hook.addRPNewMarkersAllGoals(reusePoint.source());
+                    reuseStarted = local_hook.reusePossible();
                 } else {
                     // InteractiveProver will do the other 2 bookkeeping
                     reuseStarted=false;
                     changeWish=null;
-                    hook.addRPNewMarkersAllGoals(reusePoint.source());
+                    local_hook.addRPNewMarkersAllGoals(reusePoint.source());
                 }
-                hook.showState();
+                local_hook.showState();
                 if (reuseStarted) {
                     reusePoint = getReuseListener().getBestReusePoint();
                     if (!continuousReuse) {
@@ -1099,8 +1091,6 @@ public class KeYMediator {
 	 */ 
 	public void selectedProofChanged(KeYSelectionEvent e) {
 	    setProof(e.getSource().getSelectedProof());
-	    //should be obsolete...
-	    //ProofSettings.DEFAULT_SETTINGS.setLDTSettings(proof.getLDTSettings());
 	}
 	
     }
@@ -1151,6 +1141,8 @@ public class KeYMediator {
        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
     }
 
+    
+    
     /** 
      * returns the prover task listener of the main frame
      */

@@ -22,16 +22,19 @@ ARCH=`uname -pm 2>/dev/null | tr '[:upper:]' '[:lower:]' | tr ' ' '-'`
 
 
 if [ -z "$JAVA_HOME" ] ; then
+    JAVA=`which java`
+    if [ -z "$JAVA" ] ; then
+	echo "Cannot find JAVA. Please set your PATH or \$JAVA_HOME."
+	exit 1
+    fi
+else
     if [ "$UNAME" = "darwin" ] ; then
-	JAVA_HOME="/System/Library/Frameworks/JavaVM.framework"
+	JRE=$JAVA_HOME/Home
+	JAVA=$JRE/bin/java
+# other OS
     else
-	JAVA=`which java`
-	if [ -z "$JAVA" ] ; then
-	    echo "Cannot find JAVA. Please set your PATH or \$JAVA_HOME."
-	    exit 1
-	fi
-	JAVA_BIN=`dirname $JAVA`
-	JAVA_HOME="$JAVA_BIN/.."
+	JRE=$JAVA_HOME/jre
+	JAVA=$JRE/bin/java
     fi
 fi
 echo "Using JDK installation from:      $JAVA_HOME"
@@ -47,84 +50,6 @@ JAVA_OPTIONS=
 # Change that, if your java interpreter is different
 #
 # MAC OS X
-if [ "$UNAME" = "darwin" ] ; then
-    JRE=$JAVA_HOME/Home
-    JDK_RT_JAR=$JAVA_HOME/Classes/classes.jar
-    JDK_UI_JAR=$JAVA_HOME/Classes/ui.jar
-    # we do not need it in macosX
-    # JDK_TOOLS_JAR=$JAVA_HOME/Home/lib/ext/jpda.jar
-    JAVA=$JRE/bin/java
-# other OS
-else
-    JRE=$JAVA_HOME/jre
-    JDK_RT_JAR=$JRE/lib/rt.jar
-    JDK_TOOLS_JAR=$JAVA_HOME/lib/tools.jar
-    JAVA=$JRE/bin/java
-fi
-
-
-#LD_LIBRARY_PATH=$JAVA_HOME/lib/i386:$LD_LIBRARY_PATH
-#export LD_LIBRARY_PATH
-
-if [ "D""$JAVA_HOME" = "D" ]
-then
-    echo
-    echo Please provide a valid path to the recommended JDK by
-    echo either configuring the file "$0" or defining the
-    echo JAVA_HOME environment variable from the command line.
-    echo
-    echo If you have any problems or questions, please contact
-    echo "technical support (http://www.togethersoft.com/support/)"
-    exit
-else
-    if [ ! -x $JAVA ] ; then
-        echo Please be sure you have properly set the JAVA_HOME variable.
-        echo The executable file $JAVA is not found.
-        exit
-    fi
-
-    if [ ! -r $JDK_RT_JAR ] ; then
-        echo Please be sure you have properly set the JDK_RT_JAR variable.
-        echo The file $JDK_RT_JAR is not found.
-        echo
-        echo If you have any problems or questions, please contact
-        echo "technical support (http://www.togethersoft.com/support/)"
-        exit
-    fi
-
-    # we do not need this in MacOS X
-    if [ "$UNAME" != "darwin" ] ; then
-	if [ ! -r $JDK_TOOLS_JAR ] ; then
-            echo The file $JDK_TOOLS_JAR was not found. This is probably
-            echo because you are using a JRE instead of a JDK. You will
-            echo not be able to run javac or javadoc. This is probably OK.
-	fi
-    fi
-
-    if [ "$UNAME" = "darwin" ] ; then
-        if [ ! -r $JDK_UI_JAR ] ; then
-            echo Please be sure you have properly installed JDK 1.3.
-            echo The file $JDK_UI_JAR is not found.  
-            echo
-            echo If you have any problems or questions, please contact
-            echo "technical support (http://www.togethersoft.com/support/)"
-            exit
-        fi
-        JDK_RT_JAR=$JDK_RT_JAR:$JDK_UI_JAR 
-    fi
-fi
-
-
-# fixing of possible linux glibc bug for jdk 1.3.1
-# http://developer.java.sun.com/developer/bugParade/bugs/4466587.html
-#if [ "$UNAME" = "linux" ] ; then
-#    VERSION=`$JAVA $JAVA_OPTIONS -version 2>&1 | awk 'BEGIN {FS="\""}\
-#    { for(i = 2; i<NF; i++) printf "%s", \$i }'`
-#    if expr "$VERSION" : "1\\.3\\.1.*" > /dev/null 2>&1; then
-#       ulimit -s 2048
-#    fi
-#fi
-
 
 #
 # Now $KEY_HOME  
@@ -145,52 +70,13 @@ else
 echo "Using libraries from:             $KEY_LIB"
 fi
 
-
-##################### TOGETHER HOME ########################
-
-
-PATH=$JAVA_HOME:$JAVA_HOME/bin:$JAVA_HOME/lib:$PATH
-
-if [ -z "$TOGETHER_HOME"  ]
-then
-   if [ -d "$KEY_LIB/TOGETHER" ] ; then
-      TOGETHER_HOME=`resolve_symlink "$KEY_LIB/TOGETHER"`
-      TGH="$TOGETHER_HOME"
-      echo "Using Together installation from: $TGH"
-
-      PATH=$PATH:$TGH/bin/$UNAME/$ARCH:$TGH/bin/unix
-
-      if expr "`uname -s`" : "HP-UX" > /dev/null 2>&1; then
-	  hpfix="-Dhpux.im.disable=true"
-      fi
-
-      if [ -r "$TGH/lib/jndi.jar" ]; then
-	  JNDI=$TGH/lib/jndi.jar:
-      else
-	  JNDI=""
-      fi
-
-   else
-      echo "Your TOGETHER_HOME environment variable is not set, i.e. "
-      echo "at leasts tests that require Together will fail."
-   fi
-else
-    TGH="$TOGETHER_HOME"
-    echo "Using Together installation from: $TGH"    
-    PATH=$PATH:$TGH/bin/$UNAME/$ARCH:$TGH/bin/unix
-fi
-
 export PATH
-
-JVM_DIR=`expr $JAVA : '\(.*\)/.*' \| $JAVA`
-
 
 #
 # KeY CLASSPATH
 #
 
-key_ext_jars="antlr.jar recoderKey.jar dresden-ocl-demo.jar xerces.jar \
-junit.jar log4j.jar jargs.jar"
+key_ext_jars="antlr.jar recoderKey.jar junit.jar log4j.jar"
 
 keyclasspath="$KEY_HOME/system/binary/"
 
@@ -217,10 +103,6 @@ fi
 keyclasspath="$KEY_HOME/system/instrumented/:${keyclasspath}:$KEY_LIB/jcoverage.jar"
 
 
-#
-# User specific Together configuration
-#
-
 if [ ! -d "$HOME/.key" ]
 then
 mkdir "$HOME/.key"
@@ -234,41 +116,11 @@ else
     testcase=`echo $1 | tr '/' '.'`
 fi
 
-COMPLETEOPTIONS="$JAVA_OPTIONS $keysysprops  $hpfix \
--ea:de.uka.ilkd.key... -noverify -Djvm.dir=$JVM_DIR -Xms64m -Xmx256m \
+COMPLETEOPTIONS="$JAVA_OPTIONS $keysysprops \
+-ea:de.uka.ilkd.key... -noverify -Djvm.dir=$JVM_DIR -Xms64m -Xmx512m \
 -Dkey.home=$KEY_HOME \
 -Dkey.pattern.path=$HOME/.key/keypatterns/ \
--Djava5=false \
--Dasmkey.home.path=$KEY_HOME \
--Dasmkey.base.path=$KEY_HOME/system/resources-asmkey/base/ \
--classpath $TGH/lib/together.jar:\
-$TGH/lib/tgscilib.jar:\
-$TGH/lib/openapi.jar:\
-$TGH/modules:\
-$TGH/lib/gifs.zip:\
-$TGH/out/classes:\
-$TGH/lib/i18n:\
-$TGH/lib/jgl.zip:\
-$TGH/lib/jacl.jar:\
-$TGH/lib/uddi4j.jar:\
-$TGH/lib/mail.jar:\
-$TGH/lib/xalan.jar:\
-$TGH/lib/xerces.jar:\
-$JNDI\
-$TGH/lib/tcljava.jar:\
-$TGH/lib/jcvs/jars/jcvsii.jar:\
-$TGH/lib/jcpagelayout.jar:\
-$TGH/lib/misclib.zip:\
-$TGH/lib/javax.jar:\
-$JDK_TOOLS_JAR:\
-$TGH/lib/jhall.jar:\
-$TGH/help/together-help.jar:\
-$TGH/bundled/tomcat/lib/servlet.jar:\
-$TGH/lib/soap.jar:\
-$TGH/bundled/j2ee/lib/j2ee.jar:\
-$TGH/lib/guiBuilderBeanInfo.jar:\
-$keyclasspath:\
-$JDK_RT_JAR"
+-classpath $keyclasspath"
 
 $JAVA $COMPLETEOPTIONS junit.textui.TestRunner $testcase
 

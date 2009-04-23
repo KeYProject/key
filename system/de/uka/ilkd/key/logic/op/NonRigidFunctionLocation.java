@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -18,14 +18,22 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 public class NonRigidFunctionLocation extends Function implements NonRigid, Location {
 
+    /** boolean function indicating if the location shall be considered as part 
+     * of the heap. If true heap dependent function symbols may deend on this location 
+     */
+    private final boolean isHeap;
+
     /**
      * creates a non rigid function location with given signature
      * @param name the Name of the non-rigid function symbol
      * @param sort the Sort of the symbol
      * @param argSorts the array of Sort defining the argument sorts
+     * @param isHeap boolean indicating if the location shall be considered 
+     * as part of the heap 
      */
-    public NonRigidFunctionLocation(Name name, Sort sort, Sort[] argSorts) {
-        super(name, sort, argSorts);       
+    public NonRigidFunctionLocation(Name name, Sort sort, Sort[] argSorts, boolean isHeap) {
+        super(name, sort, argSorts);
+        this.isHeap = isHeap;
     }
 
     /**
@@ -33,9 +41,12 @@ public class NonRigidFunctionLocation extends Function implements NonRigid, Loca
      * @param name the Name of the non-rigid function symbol
      * @param sort the Sort of the symbol
      * @param argSorts the ArrayOfSort defining the argument sorts
+     * @param isHeap boolean indicating if the location shall be considered 
+     * as part of the heap 
      */
-    public NonRigidFunctionLocation(Name name, Sort sort, ArrayOfSort argSorts) {
-        super(name, sort, argSorts);      
+    public NonRigidFunctionLocation(Name name, Sort sort, ArrayOfSort argSorts, boolean isHeap) {
+        super(name, sort, argSorts);
+        this.isHeap = isHeap;
     }
     
     /**
@@ -53,5 +64,14 @@ public class NonRigidFunctionLocation extends Function implements NonRigid, Loca
     
     public String proofToString() {
         return "\\nonRigid[Location] " + super.proofToString();
+    }
+
+    /**
+     * signals if the location function should be considered as part of the heap
+     * this implies that heap dependant funtion may depend on it
+     * @return if this location shall be considered as part of he heap
+     */
+    public boolean isHeap() {
+	return isHeap;
     }
 }

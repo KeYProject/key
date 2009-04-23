@@ -1,3 +1,10 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
 package de.uka.ilkd.key.visualdebugger.watchpoints;
 
 import java.util.HashMap;
@@ -85,7 +92,7 @@ public class WatchPointManager {
                                 new ProgramElementName(wp.getName()), services
                                         .getTypeConverter().getBooleanType());
                         progVarNS.addSafely(var_self);
-                        progVarNS.addSafely(var_dummy);
+                        progVarNS.add(var_dummy);
     
                         if (wp.getLocalVariables() != null
                                 && wp.getLocalVariables().size() > 0) {
@@ -93,7 +100,7 @@ public class WatchPointManager {
                             watchPointsContainLocals = true;
                         }
     
-                        wp.setWatchpointTerm(createWatchpointTerm(services,
+                        wp.setRawTerm(createWatchpointTerm(services,
                                 progVarNS, wp, declaringType, selfName));
                     }
                 }

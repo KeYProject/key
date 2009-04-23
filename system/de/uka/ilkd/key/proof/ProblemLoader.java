@@ -1,4 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+// This file is part of KeY - Integrated Deductive Software Design
 // Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
@@ -30,7 +37,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.parser.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAuflia;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
 import de.uka.ilkd.key.rule.*;
@@ -39,6 +45,7 @@ import de.uka.ilkd.key.util.Array;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.ProgressMonitor;
+
 
 public class ProblemLoader implements Runnable {
 
@@ -67,10 +74,19 @@ public class ProblemLoader implements Runnable {
     Constraint matchConstraint = null;
 
 
+    /* Proofs with meta variables have a special issue.
+       When loading, rules are applied in an order different to the original
+       one, sometimes yielding shorter proofs. The goal we are looking
+       at might already have been closed. Then we need to ignore the
+       rest of the current branch in the proof script.
+    */
+    private int ignoreBranchRest;
+
+
     ProblemInitializer init;
     InitConfig iconfig;
 
-    /** if set uses the current problem instance instead of a new one */
+    /** if set, uses the current problem instance instead of a new one */
     boolean keepProblem;
 
     /** the profile to be used */
@@ -298,7 +314,7 @@ public class ProblemLoader implements Runnable {
            // Inform the decproc classes that a new problem has been loaded
            // This is done here because all benchmarks resulting from one loaded problem should be
            // stored in the same directory
-           DecisionProcedureSmtAuflia.fireNewProblemLoaded( file, proof );
+           //DecisionProcedureSmtAuflia.fireNewProblemLoaded( file, proof );
            
 	   } catch (ExceptionHandlerException e) {
 	       throw e;
@@ -331,6 +347,10 @@ public class ProblemLoader implements Runnable {
     // note: Expressions without parameters only emit the endExpr signal
     public void beginExpr(char id, String s) {
         //System.out.println("start "+id+"="+s);
+        
+        //start no new commands until the ignored branch closes
+        //count sub-branches though
+        if ((ignoreBranchRest > 0)&&(id!='b')) return; 
         switch (id) {
         case 'b' :
             stack.push(children);
@@ -340,6 +360,12 @@ public class ProblemLoader implements Runnable {
             if (currNode == null) currNode = children.next();
             // otherwise we already fetched the node at branch point
             currGoal      = proof.getGoal(currNode);
+            // the goal may already have been closed due to the metavariable
+            // issue described in the declaration of ignoreBranchRest
+            if (currGoal==null) {
+                ignoreBranchRest = stack.size();
+                break;
+            }
             mediator.getSelectionModel().setSelectedGoal(currGoal);
             currTacletName= s;
             // set default state
@@ -367,31 +393,14 @@ public class ProblemLoader implements Runnable {
 	    //             Debug.fail("Detected use of heuristics!");
 	    break;
 	case 'q' : // ifseqformula      
-	    // mu 2008-jan-09
-            // bugfix: without this if-check,
-	    // proofs with meta variables cannot be loaded.
-            // when loading, rules are applied in an order different to the original one
-            // Thus the goal might already have been closed.
-            // Just ignore this ifseqformula then
-            if(currGoal != null) {
-                Sequent seq = currGoal.sequent();
-                ifFormulaList = ifFormulaList.append(
-                        new IfFormulaInstSeq(seq, Integer.parseInt(s)));    
-            }
-            
+            Sequent seq = currGoal.sequent();
+            ifFormulaList = ifFormulaList.append(
+                    new IfFormulaInstSeq(seq, Integer.parseInt(s)));    
             break;
         case 'd' : // ifdirectformula      
-            // mu 2008-jan-09
-            // bugfix: without this if-check,
-            // proofs with meta variables cannot be loaded.
-            // when loading, rules are applied in an order different to the original one
-            // Thus the goal might already have been closed.
-            // Just ignore this ifdirectformula then
-            if(currGoal != null) {
-                ifFormulaList = ifFormulaList.append(
-                        new IfFormulaInstDirect(new ConstrainedFormula(parseTerm(s, proof))));
-            }
-
+            ifFormulaList = ifFormulaList.append(
+                new IfFormulaInstDirect(
+                    new ConstrainedFormula(parseTerm(s, proof))));
             break;
         case 'u' : //UserLog
             if(proof.userLog==null)
@@ -474,9 +483,13 @@ public class ProblemLoader implements Runnable {
 
     public void endExpr(char id, int linenr) {
         //System.out.println("end "+id);
+        //read no new commands until ignored branch closes
+        if ((ignoreBranchRest > 0)&&(id!='b')) return; 
         switch (id) {
         case 'b' :
             children = (Iterator<Node>) stack.pop();
+            // reached end of ignored branch?
+            if (stack.size() < ignoreBranchRest) ignoreBranchRest = 0;
             break;
         case 'a' :
             if (currNode != null) {
@@ -484,14 +497,6 @@ public class ProblemLoader implements Runnable {
             }
             break;
         case 'r' :
-            // mu 2008-jan-09
-            // bugfix: without this, proofs with meta variables cannot be loaded.
-            // when loading, rules are applied in an order different to the original one
-            // Thus the goal might already have been closed.
-            // Just ignore this rule then
-            if(currGoal == null)
-                break;
-            
             try{
                currGoal.apply(constructApp());
                children = currNode.childrenIterator();
@@ -502,14 +507,6 @@ public class ProblemLoader implements Runnable {
             }
             break;
         case 'n' :
-            // mu 2008-jan-09
-            // bugfix: without this, proofs with meta variables cannot be loaded.
-            // when loading, rules are applied in an order different to the original one
-            // Thus the goal might already have been closed.
-            // Just ignore this rule then
-            if(currGoal == null)
-                break;
-
             try {
                 currGoal.apply(constructBuiltinApp());
                 children = currNode.childrenIterator();

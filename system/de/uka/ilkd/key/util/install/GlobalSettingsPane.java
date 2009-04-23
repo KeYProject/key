@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -23,18 +23,14 @@ import javax.swing.*;
 public class GlobalSettingsPane extends InstallationPane {
 
     private InstallationPathChooser[] installPath=
-	new InstallationPathChooser [ 3 ];
+	new InstallationPathChooser [ 2 ];
 
     private String localOs;
-
-    private String localTg;
-
 
 
     public GlobalSettingsPane ( KeYInstaller installer ) {
 	super ( "Global", installer );
 	this.localOs = os ();
-	this.localTg = togetherVersion ();
 	setup();
     }
     
@@ -45,7 +41,7 @@ public class GlobalSettingsPane extends InstallationPane {
 
 	// which os
 	entries.add 
-	    ( createRadioPanel ( "Operation System: ", 
+	    ( createRadioPanel ( "Operating System: ", 
 				 supportedOS (),
 				 os (), 
 				 new ActionListener () {
@@ -65,26 +61,11 @@ public class GlobalSettingsPane extends InstallationPane {
 	    ( "Installation-Path", 
 	      keyHome (), 
 	      JFileChooser.DIRECTORIES_ONLY);
-	// "Where do you have installed TogetherCC?"
-	installPath [2] = new InstallationPathChooser
-	    ( "TogetherCC", 
-	      togetherHome (), 
-	      JFileChooser.DIRECTORIES_ONLY );
 
 	for (int i = 0; i < installPath.length; i++) {
 	    entries.add ( installPath [i] );	
 	}
 	
-	// which together version
-	entries.add ( createRadioPanel ( "Together Version",
-					 supportedTgVersion (),
-					 togetherVersion (),
-					 new ActionListener () {
-						 public void actionPerformed ( ActionEvent ae ) {
-						     if ( ae.getSource () instanceof JRadioButton ) {
-							 localTg = ((JRadioButton)ae.getSource()).getText();
-						     }
-						 } } ) );
 	add ( entries, BorderLayout.NORTH );
     }
 
@@ -153,10 +134,6 @@ public class GlobalSettingsPane extends InstallationPane {
 
 	keyHome ( path (1) );
 	
-	togetherHome ( path (2) );
-
-	togetherVersion ( localTg );
-
 	return true;
     }
 

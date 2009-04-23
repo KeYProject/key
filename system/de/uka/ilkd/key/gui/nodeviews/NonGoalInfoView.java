@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -46,8 +46,7 @@ public class NonGoalInfoView extends JTextArea {
     //protected LogicPrinter printer;	 
     protected SequentPrintFilter filter;
     protected InitialPositionTable posTable;
-    private ConfigChangeListener configChangeListener = new ConfigChangeAdapter(this);//keeps only a weak reference to objects of this class
-    
+    private ConfigChangeListener configChangeListener = new ConfigChangeAdapter(this);
     
     public NonGoalInfoView (Node node, KeYMediator mediator) {
         printInnerNode(node, mediator);
@@ -132,19 +131,22 @@ public class NonGoalInfoView extends JTextArea {
 	setEditable(false);
     }
     
+    public void addNotify() {
+        super.addNotify();
+        Config.DEFAULT.addConfigChangeListener(configChangeListener);
+    }
+    
     public void removeNotify(){
+        super.removeNotify();
         unregisterListener();
         if(MethodCallInfo.MethodCallCounterOn){
             MethodCallInfo.Local.incForClass(this.getClass().toString(), "removeNotify()");
         }
-        super.removeNotify();
     }
 
     public void unregisterListener(){
         if(configChangeListener!=null){
-            Config.DEFAULT.removeConfigChangeListener(configChangeListener);
-            configChangeListener.clear();
-            configChangeListener=null;
+            Config.DEFAULT.removeConfigChangeListener(configChangeListener);            
         }
     }
     

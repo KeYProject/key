@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -36,7 +36,6 @@ import javax.swing.text.Highlighter.HighlightPainter;
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
-import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -44,7 +43,6 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 
@@ -139,10 +137,7 @@ public class SequentView extends JEditorPane implements Autoscroll {
 	
 	currentHighlight = defaultHighlight;
 	updateHighlights = new Vector<Object>();
-	
-	Config.DEFAULT.addConfigChangeListener(configChangeListener);
-	//Must be removed uopn finalize() invocation to prevent memory leaks
-	
+		
         setSequentViewFont();
 
 	listener = new SequentViewListener(this, mediator());
@@ -151,17 +146,11 @@ public class SequentView extends JEditorPane implements Autoscroll {
 		/** invoked if a frame that wants modal access is opened */
 		public void modalDialogOpened(GUIEvent e){
 		 
-
-		    if (e.getSource() instanceof ApplyTacletDialog){
-			// enable drag'n'drop ...
-			listener.setModalDragNDropEnabled(true);
-			listener.setRefreshHighlightning(true);
-
-		    } else {
-			// disable drag'n'drop and highlightning ...
-			listener.setModalDragNDropEnabled(false);
-			listener.setRefreshHighlightning(false);
-		    }
+		    // enable textual DnD in case that the opened model dialog
+		    // is the ApplyTacletDialog
+		    final boolean enableDnD = e.getSource() instanceof ApplyTacletDialog;
+		    listener.setModalDragNDropEnabled(enableDnD);
+		    listener.setRefreshHighlightning(enableDnD);
                     
                     // disable drag and drop instantiation of taclets
                     getDropTarget().setActive(false);
@@ -172,10 +161,10 @@ public class SequentView extends JEditorPane implements Autoscroll {
 		    if (e.getSource() instanceof ApplyTacletDialog){
 			// disable drag'n'drop ...
 			listener.setModalDragNDropEnabled(false);
-			listener.setRefreshHighlightning(true);
-		    } else {
-			listener.setRefreshHighlightning(true);
-		    }
+		    } 
+
+		    listener.setRefreshHighlightning(true);
+		    
                     
 		    // enable drag and drop instantiation of taclets
                     getDropTarget().setActive(true);
@@ -223,25 +212,25 @@ public class SequentView extends JEditorPane implements Autoscroll {
     
     }
     
+    public void addNotify() {
+        super.addNotify();
+        Config.DEFAULT.addConfigChangeListener(configChangeListener);
+        updateUI();
+    }
+    
     public void removeNotify(){
-        unregisterListener();
+        super.removeNotify();
+        Config.DEFAULT.removeConfigChangeListener(configChangeListener);
         if(MethodCallInfo.MethodCallCounterOn){
             MethodCallInfo.Local.incForClass(this.getClass().toString(), "removeNotify()");
         }
-        super.removeNotify();
     }
 
-    public void unregisterListener(){
-        if(configChangeListener!=null){
-            Config.DEFAULT.removeConfigChangeListener(configChangeListener);
-            configChangeListener.clear();
-            configChangeListener=null;
-        }
-    }
 
-   protected void finalize(){
+    protected void finalize(){
         try{
-            unregisterListener();
+            Config.DEFAULT.removeConfigChangeListener(configChangeListener);
+            configChangeListener=null;
             if(MethodCallInfo.MethodCallCounterOn){
                 MethodCallInfo.Global.incForClass(this.getClass().toString(), MethodCallInfo.finalize);
                 MethodCallInfo.Local.incForClass(this.getClass().toString(), MethodCallInfo.finalize);
@@ -249,11 +238,11 @@ public class SequentView extends JEditorPane implements Autoscroll {
         } catch (Throwable e) {
             Main.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
         }finally{
-                try {
-                    super.finalize();
-                } catch (Throwable e) {
-                    Main.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
-                }
+            try {
+                super.finalize();
+            } catch (Throwable e) {
+                Main.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
+            }
         }
     }
     

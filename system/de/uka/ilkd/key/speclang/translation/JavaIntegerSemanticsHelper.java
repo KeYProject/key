@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -13,368 +13,305 @@ package de.uka.ilkd.key.speclang.translation;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.ldt.AbstractIntegerLDT;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
-import de.uka.ilkd.key.logic.sort.Sort;
 
+
+/**
+ * Helper class for sl-parsers dealing with Java's type promotion for integers.
+ */
 public class JavaIntegerSemanticsHelper {
 
-    private static final TermBuilder tb = TermBuilder.DF;
+    private static final TermBuilder TB = TermBuilder.DF;
 
     private final SLTranslationExceptionManager excManager;
-
     private final TypeConverter tc;
-    private final Term trueLitTerm;
-    private final Sort boolSort;
 
 
+    //-------------------------------------------------------------------------
+    //constructors
+    //-------------------------------------------------------------------------
 
     public JavaIntegerSemanticsHelper(Services services,
-			SLTranslationExceptionManager excManager) {
+			    SLTranslationExceptionManager excManager) {
 	assert services != null;
+	assert excManager != null;
 
 	this.excManager = excManager;
 	this.tc = services.getTypeConverter();
-	trueLitTerm = services.getTypeConverter().convertToLogicElement(
-		BooleanLiteral.TRUE);
-	boolSort = services.getJavaInfo().getKeYJavaType(
-		PrimitiveType.JAVA_BOOLEAN).getSort();
     }
-
+    
+    
+    
+    //-------------------------------------------------------------------------
+    //internal methods
+    //-------------------------------------------------------------------------
 
     private void raiseError(String message) throws SLTranslationException {
 	throw excManager.createException(message);
     }
+    
+    
+    private KeYJavaType getPromotedType(Term a, Term b) {
+        KeYJavaType result = tc.getPromotedType(tc.getKeYJavaType(a), 
+                                                tc.getKeYJavaType(b));
+        assert result != null;
+        return result;
+    }
+    
+    
+    private KeYJavaType getPromotedType(Term a) {
+        KeYJavaType result = tc.getPromotedType(tc.getKeYJavaType(a));
+        assert result != null;
+        return result;
+    }
+    
+    
+    private AbstractIntegerLDT getResponsibleIntegerLDT(KeYJavaType kjt) {
+        AbstractIntegerLDT result 
+            = (AbstractIntegerLDT) tc.getModelFor(kjt.getSort());
+        assert result != null;
+        return result;
+    }
+    
+    
+    
+    //-------------------------------------------------------------------------
+    //public interface
+    //-------------------------------------------------------------------------
 
-
-    /*
-     * If <code>a</code> is a boolean literal, the method returns the
-     * literal as a formula
-     */
-    private Term convertToFormula(Term a) {
-
-	if (a.sort() == boolSort) {
-	    return tb.equals(a, trueLitTerm);
-	}        
-	return a;
+    public boolean isIntegerTerm(Term a) throws SLTranslationException {
+        assert a != null;
+        try {
+            return a.sort().extendsTrans(tc.getIntegerLDT().targetSort());
+        } catch(RuntimeException e) {
+            raiseError("Cannot check whether " + a + " is an integer term.");
+            return false; //unreachable
+        }
     }
 
-
-    public Term castToLDTSort(Term intTerm, AbstractIntegerLDT ldt) {
-	return tb.tf().createCastTerm((AbstractSort) ldt.targetSort(), intTerm);
-    }
-
-
-    public Term buildOrExpression(Term a, Term b) throws SLTranslationException {
-
-	try {
-	    return tb.or(convertToFormula(b), convertToFormula(a));
-	} catch (TermCreationException e) {
-	    raiseError("Error in or-expression\n" + a.toString() + " || "
-		    + b.toString() + ".");
-	}
-
-	return null;
-    }
-
-
-    public Term buildAndExpression(Term a, Term b)
-	    throws SLTranslationException {
-
-	try {
-	    return tb.and(convertToFormula(b), convertToFormula(a));
-	} catch (TermCreationException e) {
-	    raiseError("Error in and-expression\n" + a.toString() + " && "
-		    + b.toString() + ".");
-	}
-
-	return null;
+   
+    public Term castToLDTSort(Term intTerm, AbstractIntegerLDT ldt) 
+            throws SLTranslationException {
+        assert intTerm != null;
+        try {
+            return TB.tf().createCastTerm((AbstractSort) ldt.targetSort(), 
+                                           intTerm);
+        } catch(RuntimeException e) {
+            raiseError("Error casting " + intTerm + " to an ldt sort.");
+            return null; //unreachable
+        }
     }
 
 
     public Term buildPromotedOrExpression(Term a, Term b)
 	    throws SLTranslationException {
-	KeYJavaType resultType = null;
-
-	if (a.sort() == Sort.FORMULA) {
-	    return buildOrExpression(a, b);
-	}
-
+        assert a != null;
+        assert b != null;
 	try {
-	    resultType = tc.getPromotedType(tc.getKeYJavaType(a), tc
-		    .getKeYJavaType(b));
+	    KeYJavaType resultType = getPromotedType(a, b);
+	    AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType);
+	    return castToLDTSort(TB.func(ldt.getBitwiseOr(), a, b), ldt);
 	} catch (RuntimeException e) {
-	    raiseError("Error in or expression " + a.toString() + " | "
-		    + b.toString() + ".");
-	}
-
-	assert resultType != null;
-
-	AbstractIntegerLDT ldt 
-	    = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
-	return castToLDTSort(tb.func(ldt.getBitwiseOr(), a, b), ldt);
+            raiseError("Error in or-expression " + a + " | " + b + ".");
+            return null; //unreachable
+        }
     }
 
 
     public Term buildPromotedAndExpression(Term a, Term b)
 	    throws SLTranslationException {
-	KeYJavaType resultType = null;
-
-	if (a.sort() == Sort.FORMULA) {
-	    return buildAndExpression(a, b);
-	}
-
+        assert a != null;
+        assert b != null;
 	try {
-	    resultType = tc.getPromotedType(tc.getKeYJavaType(a), tc
-		    .getKeYJavaType(b));
+	    KeYJavaType resultType = getPromotedType(a, b);
+	    AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType);
+	    return castToLDTSort(TB.func(ldt.getBitwiseAnd(), a, b), ldt);
 	} catch (RuntimeException e) {
-	    raiseError("Error in and expression " + a.toString() + " & "
-		    + b.toString() + ".");
-	}
-
-	assert resultType != null;
-
-	AbstractIntegerLDT ldt 
-	    = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
-	return castToLDTSort(tb.func(ldt.getBitwiseAnd(), a, b), ldt);
+            raiseError("Error in and-expression " + a + " & " + b + ".");
+            return null; //unreachable
+        }
     }
 
 
     public Term buildPromotedXorExpression(Term a, Term b)
 	    throws SLTranslationException {
-	KeYJavaType resultType = null;
-
+        assert a != null;
+        assert b != null;
 	try {
-	    resultType = tc.getPromotedType(tc.getKeYJavaType(a), tc
-		    .getKeYJavaType(b));
+	    KeYJavaType resultType = getPromotedType(a, b);
+	    AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType);
+	    return castToLDTSort(TB.func(ldt.getBitwiseXor(), a, b), ldt);
 	} catch (RuntimeException e) {
-	    raiseError("Error in xor expression " + a.toString() + " ^ "
-		    + b.toString() + ".");
-	}
-
-	assert resultType != null;
-
-	AbstractIntegerLDT ldt 
-	    = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
-	return castToLDTSort(tb.func(ldt.getBitwiseXor(), a, b), ldt);
+            raiseError("Error in xor-expression " + a + " ^ " + b + ".");
+            return null; //unreachable
+        }
     }
 
 
     public Term buildPromotedNegExpression(Term a)
 	    throws SLTranslationException {
-	KeYJavaType resultType = null;
-
+        assert a != null;
 	try {
-	    resultType = tc.getPromotedType(tc.getKeYJavaType(a));
+	    KeYJavaType resultType = getPromotedType(a);
+	    AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType);
+	    return castToLDTSort(TB.func(ldt.getBitwiseNegation(), a), ldt);
 	} catch (RuntimeException e) {
-	    raiseError("Error in neg expression " + a.toString() + ".");
-	}
-
-	assert resultType != null;
-
-	AbstractIntegerLDT ldt 
-	    = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
-	return castToLDTSort(tb.func(ldt.getBitwiseNegation(), a), ldt);
+            raiseError("Error in neg-expression " + a + ".");
+            return null; //unreachable
+        }
     }
 
 
     public Term buildAddExpression(Term a, Term b)
-	    throws SLTranslationException {
-	KeYJavaType resultType = null;
-
-	try {
-	    resultType = tc.getPromotedType(tc.getKeYJavaType(a), tc
-		    .getKeYJavaType(b));
-	} catch (RuntimeException e) {
-	    raiseError("Error in additive expression " + a.toString() + " + "
-		    + b.toString() + ".");
-	}
-
-	assert resultType != null;
-
-	AbstractIntegerLDT ldt 
-	    = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
-	return castToLDTSort(tb.func(ldt.getAdd(), a, b), ldt);
+            throws SLTranslationException {
+        assert a != null;
+        assert b != null;
+        try {
+            KeYJavaType resultType = getPromotedType(a, b); 
+            AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType);
+            return castToLDTSort(TB.func(ldt.getAdd(), a, b), ldt);
+        } catch (RuntimeException e) {
+            raiseError("Error in additive expression " + a + " + " + b + ".");
+            return null; //unreachable
+        }
     }
 
 
     public Term buildSubExpression(Term a, Term b)
-	    throws SLTranslationException {
-	KeYJavaType resultType = null;
-
-	try {
-	    resultType = tc.getPromotedType(tc.getKeYJavaType(a), tc
-		    .getKeYJavaType(b));
-	} catch (RuntimeException e) {
-	    raiseError("Error in additive expression " + a.toString() + " - "
-		    + b.toString() + ".");
-	}
-
-	assert resultType != null;
-	
-        AbstractIntegerLDT ldt 
-            = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
-	return castToLDTSort(tb.func(ldt.getSub(), a, b), ldt);
+            throws SLTranslationException {
+        assert a != null;
+        assert b != null;
+        try {
+            KeYJavaType resultType = getPromotedType(a, b);
+            AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType); 
+            return castToLDTSort(TB.func(ldt.getSub(), a, b), ldt);
+        } catch (RuntimeException e) {
+            raiseError("Error in subtract expression " + a + " - " + b + ".");
+            return null; //unreachable            
+        }
     }
 
 
     public Term buildMulExpression(Term a, Term b)
-	    throws SLTranslationException {
-	KeYJavaType resultType = null;
-
-	try {
-	    resultType = tc.getPromotedType(tc.getKeYJavaType(a), tc
-		    .getKeYJavaType(b));
-	} catch (RuntimeException e) {
-	    raiseError("Error in multiplicative expression " + a.toString() + " * "
-		    + b.toString() + ".");
-	}
-
-	assert resultType != null;
-
-        AbstractIntegerLDT ldt 
-            = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
-	return castToLDTSort(tb.func(((AbstractIntegerLDT) tc
-		.getModelFor(resultType.getSort())).getMul(), a, b), ldt);
+            throws SLTranslationException {
+        assert a != null;
+        assert b != null;
+        try {
+            KeYJavaType resultType = getPromotedType(a, b);
+            AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType); 
+            return castToLDTSort(TB.func(ldt.getMul(), a, b), ldt);
+        } catch (RuntimeException e) {
+            raiseError("Error in multiplicative expression " + a + " * "
+                       + b + ".");
+            return null; //unreachable            
+        }
     }
 
 
     public Term buildDivExpression(Term a, Term b)
-	    throws SLTranslationException {
-	KeYJavaType resultType = null;
-
-	try {
-	    resultType = tc.getPromotedType(tc.getKeYJavaType(a), tc
-		    .getKeYJavaType(b));
-	} catch (RuntimeException e) {
-	    raiseError("Error in division expression " + a.toString() + " / "
-		    + b.toString() + ".");
-	}
-
-	assert resultType != null;
-
-	AbstractIntegerLDT ldt 
-	    = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
-	return castToLDTSort(tb.func(ldt.getDiv(), a, b), ldt);
+            throws SLTranslationException {
+        try {
+            KeYJavaType resultType = getPromotedType(a, b);
+            AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType); 
+            return castToLDTSort(TB.func(ldt.getDiv(), a, b), ldt);         
+        } catch (RuntimeException e) {
+            raiseError("Error in division expression " + a + " / " + b + ".");
+            return null; //unreachable            
+        }
     }
 
 
     public Term buildModExpression(Term a, Term b)
-	    throws SLTranslationException {
-	KeYJavaType resultType = null;
-
-	try {
-	    resultType = tc.getPromotedType(tc.getKeYJavaType(a), tc
-		    .getKeYJavaType(b));
-	} catch (RuntimeException e) {
-	    raiseError("Error in modulo expression " + a.toString() + " % "
-		    + b.toString() + ".");
-	}
-
-	assert resultType != null;
-
-	AbstractIntegerLDT ldt 
-	    = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
-	return castToLDTSort(tb.func(ldt.getMod(), a, b), ldt);
+            throws SLTranslationException {
+        assert a != null;
+        assert b != null;
+        try {
+            KeYJavaType resultType = getPromotedType(a, b);
+            AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType);
+            return castToLDTSort(TB.func(ldt.getMod(), a, b), ldt);
+        } catch (RuntimeException e) {
+            raiseError("Error in modulo expression " + a + " % " + b + ".");
+            return null; //unreachable            
+        }        
     }
 
 
     public Term buildRightShiftExpression(Term a, Term b)
-	    throws SLTranslationException {
-	KeYJavaType resultType = null;
-
-	try {
-	    resultType = tc.getPromotedType(tc.getKeYJavaType(a), tc
-		    .getKeYJavaType(b));
-	} catch (RuntimeException e) {
-	    raiseError("Error in shift-right expression " + a.toString()
-		    + " >> " + b.toString() + ".");
-	}
-
-	assert resultType != null;
-	
-        AbstractIntegerLDT ldt 
-            = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
-	return castToLDTSort(tb.func(ldt.getShiftRight(), a, b), ldt);
+            throws SLTranslationException {
+        assert a != null;
+        assert b != null;
+        try {
+            KeYJavaType resultType = getPromotedType(a, b);
+            AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType);
+            return castToLDTSort(TB.func(ldt.getShiftRight(), a, b), ldt);
+        } catch (RuntimeException e) {
+            raiseError("Error in shift-right expression " + a + " >> " 
+                       + b + ".");
+            return null; //unreachable            
+        }
     }
 
 
     public Term buildLeftShiftExpression(Term a, Term b)
-	    throws SLTranslationException {
-	KeYJavaType resultType = null;
-
-	try {
-	    resultType = tc.getPromotedType(tc.getKeYJavaType(a), tc
-		    .getKeYJavaType(b));
-	} catch (RuntimeException e) {
-	    raiseError("Error in shift-left expression " + a.toString()
-		    + " << " + b.toString() + ".");
-	}
-
-	assert resultType != null;
-
-	AbstractIntegerLDT ldt 
-	    = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
-	return castToLDTSort(tb.func(ldt.getShiftLeft(), a, b), ldt);
+            throws SLTranslationException {
+        assert a != null;
+        assert b != null;
+        try {
+            KeYJavaType resultType = getPromotedType(a, b);
+            AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType);
+            return castToLDTSort(TB.func(ldt.getShiftLeft(), a, b), ldt);
+        } catch (RuntimeException e) {
+            raiseError("Error in shift-left expression " + a + " << " 
+                       + b + ".");
+            return null; //unreachable            
+        }
     }
 
 
     public Term buildUnsignedRightShiftExpression(Term a, Term b)
-	    throws SLTranslationException {
-	KeYJavaType resultType = null;
-
-	try {
-	    resultType = tc.getPromotedType(tc.getKeYJavaType(a), tc
-		    .getKeYJavaType(b));
-	} catch (RuntimeException e) {
-	    raiseError("Error in unsigned shift-right expression "
-		    + a.toString() + " >>> " + b.toString() + ".");
-	}
-
-	assert resultType != null;
-
-	AbstractIntegerLDT ldt 
-	    = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
-	return castToLDTSort(tb.func(ldt.getUnsignedShiftRight(), a, b), ldt);
+            throws SLTranslationException {
+        assert a != null;
+        assert b != null;
+        try {
+            KeYJavaType resultType = getPromotedType(a, b);
+            AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType);
+            return castToLDTSort(TB.func(ldt.getUnsignedShiftRight(), a, b), 
+                                 ldt);
+        } catch (RuntimeException e) {
+            raiseError("Error in unsigned shift-right expression " + a + " >>> "
+                       + b + ".");
+            return null; //unreachable            
+        }
     }
 
 
-    public Term buildUnaryMinusExpression(Term a) throws SLTranslationException {
-	KeYJavaType resultType = null;
-
-	try {
-	    resultType = tc.getPromotedType(tc.getKeYJavaType(a));
-	} catch (RuntimeException e) {
-	    raiseError("Error in unary minus expression -" + a.toString() + ".");
-	}
-
-	assert resultType != null;
-
-        AbstractIntegerLDT ldt 
-            = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
-	return castToLDTSort(tb.func(ldt.getNeg(), a), ldt);
+    public Term buildUnaryMinusExpression(Term a) 
+            throws SLTranslationException {
+        assert a != null;
+        try {
+            KeYJavaType resultType = getPromotedType(a);
+            AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType);
+            return castToLDTSort(TB.func(ldt.getNeg(), a), ldt);
+        } catch (RuntimeException e) {
+            raiseError("Error in unary minus expression -" + a + ".");
+            return null; //unreachable            
+        }
     }
 
 
     public Term buildPromotedUnaryPlusExpression(Term a)
-	    throws SLTranslationException {
-	KeYJavaType resultType = null;
-
-	try {
-	    resultType = tc.getPromotedType(tc.getKeYJavaType(a));
-	} catch (RuntimeException e) {
-	    raiseError("Error in unary plus expression +" + a.toString() + ".");
-	}
-
-	assert resultType != null;
-
-	AbstractIntegerLDT ldt 
-	    = (AbstractIntegerLDT) tc.getModelFor(resultType.getSort());
-	return castToLDTSort(a, ldt);
+            throws SLTranslationException {
+        assert a != null;
+        try {
+            KeYJavaType resultType = getPromotedType(a);
+            AbstractIntegerLDT ldt = getResponsibleIntegerLDT(resultType);
+            return castToLDTSort(a, ldt);
+        } catch (RuntimeException e) {
+            raiseError("Error in unary plus expression +" + a + ".");
+            return null; //unreachable                        
+        }
     }
 }

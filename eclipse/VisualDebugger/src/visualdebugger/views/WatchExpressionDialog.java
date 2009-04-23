@@ -1,9 +1,6 @@
 package visualdebugger.views;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.*;
@@ -186,6 +183,7 @@ public class WatchExpressionDialog {
         } else {
 
             // if no errors occurred keep track of positions
+            // the expression will help to find the position in the Java AST
             LocalVariableDetector lvd = new LocalVariableDetector(Util.parse(
                     expression, null));
             CompilationUnit unit = Util.parse(workingCopy, null);
@@ -221,6 +219,10 @@ public class WatchExpressionDialog {
              positions.add(positionInfo.get(variableBinding));
                             
              }
+             System.out.println(positions);
+             // establish order
+             Collections.sort(positions);
+             System.out.println(positions);
              // and clean up in the end
              workingCopy.discardWorkingCopy();
              setPositions(positions);

@@ -1,4 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+// This file is part of KeY - Integrated Deductive Software Design
 // Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
@@ -42,7 +49,7 @@ import de.uka.ilkd.key.speclang.*;
 public abstract class AbstractPO implements ProofOblInput {
 
     protected static final TermFactory TF = TermFactory.DEFAULT;
-    protected static final CreatedAttributeTermFactory createdFactory
+    protected static final CreatedAttributeTermFactory CATF
                                    = CreatedAttributeTermFactory.INSTANCE;
     protected static final TermBuilder TB = TermBuilder.DF;
     protected static final AtPreFactory APF = AtPreFactory.INSTANCE;

@@ -1,5 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
+// Copyright (C) 2001-2009 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -102,7 +102,6 @@ public class ComputeSpecificationView {
      * A facade for the user-interface, displaying the computed
      * specification of a program.
      * @param mediator the KeY-mediator containing the specification construction proof.
-     * @see de.uka.ilkd.key.casetool.together.FunctionalityOnModel#computeSpecification(de.uka.ilkd.key.casetool.ModelMethod)
      */
     public static final void show(KeYMediator mediator) {
 	try{
