@@ -387,7 +387,7 @@ doc: argfile $(JAVAFILES)
 
 ## create distribution package
 .PHONY: dist
-dist:	branding keybase
+dist:	branding all
 	@echo "[creating distribution directory structure]"
 	@mkdir -p ../dist
 	@mkdir -p dist/key/
