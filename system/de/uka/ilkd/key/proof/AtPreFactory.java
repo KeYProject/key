@@ -184,7 +184,7 @@ public class AtPreFactory {
             = new NonRigidFunctionLocation(new Name(uniqueName),
                                            getSort(normalOp),
                                            getArgSorts(normalOp, 
-                                                       services));
+                                                       services), false);
         return result;
     }
     

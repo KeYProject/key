@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.smt;
 
+import java.io.IOException;
+
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Constraint;
@@ -54,7 +56,19 @@ public class SMTRule implements BuiltInRule {
 	int timeout = ProofSettings.DEFAULT_SETTINGS
 	                           .getDecisionProcedureSettings()
 	                           .getTimeout();
-	SMTSolverResult result = this.solver.run(goal, timeout, services);
+	
+	SMTSolverResult result = SMTSolverResult.NO_IDEA;	
+	try {
+	    result = this.solver.run(goal, timeout, services);
+	} catch (IOException ioe) {	    	    
+	    if (services.getExceptionHandler() != null) {
+		services.getExceptionHandler().reportException(ioe);
+	    } else {
+		RuntimeException re = new RuntimeException(ioe.getMessage());
+		re.initCause(ioe);
+		throw re;
+	    }	    
+	}
 	if (result.isValid() == SMTSolverResult.ThreeValuedTruth.TRUE) {
 	    return SLListOfGoal.EMPTY_LIST;
 	} else {

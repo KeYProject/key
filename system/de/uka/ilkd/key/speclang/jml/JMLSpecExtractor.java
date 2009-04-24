@@ -199,8 +199,7 @@ public class JMLSpecExtractor implements SpecExtractor {
      * @param fileName the String containing the filename where the field/variable has been declared
      * @param pos the Position where to place this implicit specification
      * @return set of formulas specifying non-nullity for field/variables
-     */
-   
+     */  
     private SetOfPositionedString createNonNullPositionedString(String varName, KeYJavaType kjt, 
 	    boolean isImplicitVar, String fileName, Position pos) {
 	SetOfPositionedString result = SetAsListOfPositionedString.EMPTY_SET; 
@@ -389,8 +388,6 @@ public class JMLSpecExtractor implements SpecExtractor {
 
             //add non-null preconditions
             for(int j = 0, n = pm.getParameterDeclarationCount(); j < n; j++) {
-                Type t = pm.getParameterDeclarationAt(j).getTypeReference()
-                                                        .getKeYJavaType();
                 //no additional precondition for primitive types!
                 final VariableSpecification paramDecl = pm.getParameterDeclarationAt(j)
 		        .getVariableSpecification();

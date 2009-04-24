@@ -156,10 +156,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	hb = this.translateLogicalImply(ante, succ);
 
 	StringBuffer s = buildCompleteText(hb, assumptions, this.buildTranslatedFuncDecls(), this
-		.buildTranslatedPredDecls(), this.buildTranslatedSorts(), this
-		.buildSortHirarchy());
+		.buildTranslatedPredDecls(), this.buildTranslatedSorts(), this.buildSortHierarchy());
 	
 	return s;
+
     }
 
     
@@ -177,14 +177,14 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    //this means all predicates that are needed for functions to define
 	    //their result type, all predicates for constants (like number symbols)
 	    toReturn.addAll(this.getTypeDefinitions());
-	    // add the type hirarchy
+	    // add the type hierarchy
 	    //this means, add the typepredicates, that are needed to define
 	    //for every type, what type they are (direct) subtype of
-	    toReturn.addAll(this.getSortHirarchyPredicates());
+	    toReturn.addAll(this.getSortHierarchyPredicates());
 	    //add the formulas, that make sure, type correctness is kept, also
 	    //for interpreted functions
 	    toReturn.addAll(this.getSpecialSortPredicates(services));
-	    //add the assuptions created during translation
+	    //add the assumptions created during translation
 	    //for example while translating term if then else
 	    toReturn.addAll(this.assumptions);
 	}
@@ -271,29 +271,29 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    
 	    return buildCompleteText(form, this.getAssumptions(services), this.buildTranslatedFuncDecls(), this
 		    .buildTranslatedPredDecls(), this.buildTranslatedSorts(), this
-		    .buildSortHirarchy());
+		    .buildSortHierarchy());
 	} catch (IllegalFormulaException e) {
 	    throw new IllegalArgumentException("Illegal formula. Can not be translated");
 	}
     }
     
     /**
-     * Build the sorthirarchy for the sorts
+     * Build the sorthierarchy for the sorts
      * If null was used, add typepredicates for all types.
      * 
-     * @return a sort hirarchy for the sorts
+     * @return a sort hierarchy for the sorts
      */
-    private SortHirarchy buildSortHirarchy() {
-	return new SortHirarchy(this.usedDisplaySort, this.typePredicates);
+    private SortHierarchy buildSortHierarchy() {
+	return new SortHierarchy(this.usedDisplaySort, this.typePredicates);
     }
 
     /**
-     * Get the expression for that defines the typepredicates for sort hirarchy.
+     * Get the expression for that defines the typepredicates for sort hierarchy.
      * Also the null type is added to the formula if used before.
      * @return The well defined formula.
      */
-    private ArrayList<StringBuffer> getSortHirarchyPredicates() {
-	SortHirarchy sh = this.buildSortHirarchy();
+    private ArrayList<StringBuffer> getSortHierarchyPredicates() {
+	SortHierarchy sh = this.buildSortHierarchy();
 	ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
 	
 	// add the typepredicates for functions.
@@ -520,7 +520,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    ArrayList<StringBuffer> assumptions,
 	    ArrayList<ArrayList<StringBuffer>> functions,
 	    ArrayList<ArrayList<StringBuffer>> predicates,
-	    ArrayList<StringBuffer> types, SortHirarchy sortHirarchy);
+	    ArrayList<StringBuffer> types, SortHierarchy sortHierarchy);
 
    /* protected final StringBuffer translate(Semisequent ss, SMTTranslator.TERMPOSITION skolemization,
 	    Services services) throws IllegalFormulaException {
@@ -583,7 +583,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
     
     /**
-     * Returns, wheather the Structure, this translator creates should be a
+     * Returns, whether the Structure, this translator creates should be a
      * Structure, that is multi sorted with inheritance of Sorts. If false, a
      * single sorted structure is created.
      * 

@@ -7,20 +7,28 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.unittest.simplify;
 
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.smt.*;
-import de.uka.ilkd.key.unittest.simplify.ast.*;
-import de.uka.ilkd.key.unittest.*;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import de.uka.ilkd.key.collection.ListOfString;
+import de.uka.ilkd.key.collection.SLListOfString;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.util.ExtList;
-import de.uka.ilkd.key.parser.simplify.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.Term;
-
-
-import java.io.StringReader;
-import java.util.*;
+import de.uka.ilkd.key.parser.simplify.SimplifyLexer;
+import de.uka.ilkd.key.parser.simplify.SimplifyParser;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.unittest.DecProdModelGenerator;
+import de.uka.ilkd.key.unittest.EquivalenceClass;
+import de.uka.ilkd.key.unittest.Model;
+import de.uka.ilkd.key.unittest.ModelGenerator;
+import de.uka.ilkd.key.unittest.simplify.ast.*;
+import de.uka.ilkd.key.util.ExtList;
 
 public class SimplifyModelGenerator implements DecProdModelGenerator{
 
@@ -63,8 +71,20 @@ public class SimplifyModelGenerator implements DecProdModelGenerator{
 	this.term2class = term2class;
 	
 	SMTSolver simplify = new SimplifySolver();
-	SMTSolverResult res = simplify.run(toFormula(node.sequent()), 60, serv);
 	
+	SMTSolverResult res = SMTSolverResult.NO_IDEA; 
+	
+	try {
+	    res = simplify.run(toFormula(node.sequent()), 60, serv);
+	} catch (IOException ioe) {
+	    if (serv.getExceptionHandler() != null) {
+		serv.getExceptionHandler().reportException(ioe);
+	    } else {
+		RuntimeException re = new RuntimeException(ioe.getMessage());
+		re.initCause(ioe);
+		throw re;
+	    }	   
+	}
 	
 	initialCounterExample = res.text();
 	this.simplifyOutputs = new HashSet();

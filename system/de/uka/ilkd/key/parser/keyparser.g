@@ -2145,7 +2145,7 @@ func_decl
                         switch (location) {
                            case NORMAL_NONRIGID: f = new NonRigidFunction(fct_name, retSort, argSorts);
                               break;
-                           case LOCATION_MODIFIER: f = new NonRigidFunctionLocation(fct_name, retSort, argSorts);
+                           case LOCATION_MODIFIER: f = new NonRigidFunctionLocation(fct_name, retSort, argSorts, true);
                               break;
                  	  case HEAP_DEPENDENT: f = new NonRigidHeapDependentFunction(fct_name, retSort, argSorts);      
                  	      break;

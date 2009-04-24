@@ -543,25 +543,25 @@ public class KeYMediator {
                 final Goal currGoal = reusePoint.target(); // check proof!!!
                 assert currGoal != null : 
                     "Cannot apply this here. Forgot to unregister listener?";
-                final ReuseListener hook = getReuseListener();
-                hook.removeRPConsumedMarker(reusePoint.source());
+                final ReuseListener local_hook = getReuseListener();
+                local_hook.removeRPConsumedMarker(reusePoint.source());
                 RuleApp app = reusePoint.getReuseApp();
                 if (reusePoint.source() != changeWish) {
                     currGoal.node().setReuseSource(reusePoint);
-                    hook.removeRPConsumedGoal(currGoal);
+                    local_hook.removeRPConsumedGoal(currGoal);
                     getProof().getServices().getNameRecorder().setProposals(
                             reusePoint.getNameProposals());
                     ListOfGoal goalList = currGoal.apply(app);
-                    hook.addRPOldMarkersNewGoals(goalList);
-                    hook.addRPNewMarkersAllGoals(reusePoint.source());
-                    reuseStarted = hook.reusePossible();
+                    local_hook.addRPOldMarkersNewGoals(goalList);
+                    local_hook.addRPNewMarkersAllGoals(reusePoint.source());
+                    reuseStarted = local_hook.reusePossible();
                 } else {
                     // InteractiveProver will do the other 2 bookkeeping
                     reuseStarted=false;
                     changeWish=null;
-                    hook.addRPNewMarkersAllGoals(reusePoint.source());
+                    local_hook.addRPNewMarkersAllGoals(reusePoint.source());
                 }
-                hook.showState();
+                local_hook.showState();
                 if (reuseStarted) {
                     reusePoint = getReuseListener().getBestReusePoint();
                     if (!continuousReuse) {

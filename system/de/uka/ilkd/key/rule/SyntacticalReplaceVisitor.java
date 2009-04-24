@@ -63,7 +63,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
     /** used to indicate if variables have changed */
     private final BooleanContainer varsChanged = new BooleanContainer();
     
-    /** an empty array for resourse optimisation*/
+    /** an empty array for resource optimisation*/
     private static final 
       QuantifiableVariable[] EMPTY_QUANTIFIABLE_VARS = new QuantifiableVariable[0];
 

@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-// Universitaet Koblenz-Landau, Germany
-// Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
 //
 //
 
@@ -51,7 +44,6 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.jmltest.JMLTestFileCreator;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.*;
@@ -63,9 +55,7 @@ import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.smt.DecProcRunner;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
-import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.key.util.*;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -1965,7 +1955,9 @@ public class Main extends JFrame implements IMain {
 	    if (settings != null) {
 		RuleDescriptor activeRule = settings.getActiveRule();				
 		decisionProcedureInvocationButton.
+				
 		setAction(new DPInvokeAction(activeRule));
+		
 		ruletimeoutlabel.setText("timeout: " + settings.getTimeout() + " s");
 
 	    } else {
@@ -2886,13 +2878,12 @@ public class Main extends JFrame implements IMain {
 	    if (!mediator.ensureProofLoaded()) return;
 	    final Proof proof = mediator.getProof();
 	    new DecProcRunner(Main.this, proof, 
-		    proof.getUserConstraint().getConstraint()).run();
-	}
-	
+			proof.getUserConstraint().getConstraint()).run();
+	}	
     }
     
     /**
-     * This action controls the seclection of external provers. It provides the properties for the buttons 
+     * This action controls the selection of external provers. It provides the properties for the buttons 
      * displayed in the radio button group and if an external prover is selected this action is invoked and
      * updates the decision procedure settings of the current proof settings. 
      */

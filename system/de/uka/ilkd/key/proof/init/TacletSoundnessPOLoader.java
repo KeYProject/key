@@ -88,9 +88,6 @@ public class TacletSoundnessPOLoader implements Runnable {
 	    new ExceptionDialog(mediator.mainFrame(),
 		        mediator.getExceptionHandler().getExceptions());
 	    mediator.getExceptionHandler().clear();
-            main.setStatusLine ( "Exception occurred while creating proof obligation" );
-            status = e.toString ();
-            e.printStackTrace ();
         } finally {
             prob.close ();
         }

@@ -1668,32 +1668,26 @@ public abstract class Taclet implements Rule, Named {
      * given mode (interactive/non-interactive, activated rule sets)
      */
     public boolean admissible(boolean       interactive,
-			      ListOfRuleSet ruleSets) {
+			      ListOfRuleSet p_ruleSets) {
 	if ( interactive )
-	    return admissibleInteractive(ruleSets);
+	    return admissibleInteractive(p_ruleSets);
 	else
-	    return admissibleAutomatic(ruleSets);
+	    return admissibleAutomatic(p_ruleSets);
     }
 
-    protected boolean admissibleInteractive(ListOfRuleSet ruleSets) {
+    protected boolean admissibleInteractive(ListOfRuleSet notAdmissibleRuleSets) {
         if (noninteractive()) {
-            final IteratorOfRuleSet tacletRSIt = ruleSets();
-            
-            while ( tacletRSIt.hasNext () ) {
-                if ( ruleSets.contains ( tacletRSIt.next() ) ) return false;            
+            for (final RuleSet tacletRuleSet : getRuleSets() ) {
+                if ( notAdmissibleRuleSets.contains ( tacletRuleSet ) ) return false;
             }
-        }	
-        
+        }
         return true;
     }
 
-    protected boolean admissibleAutomatic(ListOfRuleSet ruleSets) {
-        final IteratorOfRuleSet tacletRSIt = ruleSets();
-        
-        while ( tacletRSIt.hasNext () ) {
-            if ( ruleSets.contains ( tacletRSIt.next() ) ) return true;         
+    protected boolean admissibleAutomatic(ListOfRuleSet admissibleRuleSets) {
+        for (final RuleSet tacletRuleSet : getRuleSets() ) {
+            if ( admissibleRuleSets.contains ( tacletRuleSet ) ) return true;
         }
-
         return false;
     }
         
