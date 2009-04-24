@@ -1373,24 +1373,20 @@ options {
         return pm;
     }
 
-    public void addSort(Sort s) {
-	sorts().add(s);
-    }
-
-    private void addSortAdditionals(Sort s) {
+    public static void addSortAdditionals(Sort s, Namespace functions, Namespace sorts) {
         if (s instanceof NonCollectionSort) {
             NonCollectionSort ns = (NonCollectionSort)s;
             final Sort[] addsort = {
                 ns.getSetSort(), ns.getSequenceSort(), ns.getBagSort() 
             };
-
+	    
             for (int i = 0; i<addsort.length; i++) {
-                addSort(addsort[i]);
-                addSortAdditionals(addsort[i]);
+                sorts.add(addsort[i]);
+                addSortAdditionals(addsort[i], functions, sorts);
             }
         }
         if ( s instanceof SortDefiningSymbols ) {                        
-           ((SortDefiningSymbols)s).addDefinedSymbols(defaultChoice.funcNS(), sorts());
+           ((SortDefiningSymbols)s).addDefinedSymbols(functions, sorts);
         }
     }
 
@@ -1610,7 +1606,7 @@ sort_decls
      {
         final IteratorOfSort it = lsorts.iterator();
         while (it.hasNext()) {                   
-             addSortAdditionals ( it.next() ); 
+             addSortAdditionals ( it.next(), defaultChoice.funcNS(), sorts() ); 
          }
       }
 
@@ -1643,7 +1639,7 @@ one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST]
                 if (isIntersectionSort) {                    
                     final Sort sort = getIntersectionSort(sortIds);
                     createdSorts = createdSorts.append(sort);
-                    addSort(sort); 
+                    sorts().add(sort); 
                 } else {
                     IteratorOfString it = sortIds.iterator ();        
                     while ( it.hasNext () ) {
@@ -1690,7 +1686,7 @@ one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST]
                             } else {
                                 s = new PrimitiveSort(sort_name);
                             }
-                            addSort ( s ); 
+                            sorts().add ( s ); 
 
                             createdSorts = createdSorts.append(s);
                         }
@@ -2340,7 +2336,7 @@ array_set_decls[Sort p] returns [Sort s = null]
                 Sort last = s;
                 do {
                     final ArraySort as = (ArraySort) last;
-                    addSort(as);                        
+                    sorts().add(as);                        
                     last = as.elementSort();
                 } while (last instanceof ArraySort && sorts().lookup(last.name()) == null);
             } else {
@@ -4583,7 +4579,6 @@ problem returns [ Term a = null ]
 }
     :
 
-
 	{ if (capturer != null) capturer.mark(); }
         (pref = preferences)
         { if ((pref!=null) && (capturer != null)) capturer.mark(); }
@@ -4595,7 +4590,6 @@ problem returns [ Term a = null ]
           if(stlist != null && stlist.size() > 1)
             Debug.fail("Don't know what to do with multiple java source entries.");
 	    }
-        
         decls
         { 
             if(parse_includes || onlyWith) return null;

@@ -22,18 +22,22 @@ import java.util.LinkedList;
 import java.util.List;
 
 import recoder.ServiceConfiguration;
+import recoder.abstraction.*;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Constructor;
 import recoder.abstraction.DefaultConstructor;
-import recoder.abstraction.ParameterizedType;
 import recoder.abstraction.Type;
 import recoder.bytecode.ClassFile;
-import recoder.service.*;
+import recoder.service.NameInfo;
 import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.java.abstraction.ArrayType;
+import de.uka.ilkd.key.java.abstraction.NullType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.*;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.recoderext.*;
+import de.uka.ilkd.key.java.recoderext.ClassFileDeclarationBuilder;
+import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.Name;
@@ -43,6 +47,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -312,17 +317,9 @@ public class Recoder2KeYTypeConverter {
      * by a sort to the function namespace (e.g. functions for collection sorts)
      */
     protected void setUpSort(Sort s) {
-        namespaces.sorts().add(s);
-        if (s instanceof NonCollectionSort) {
-            NonCollectionSort ns = (NonCollectionSort) s;
-            namespaces.sorts().add(ns.getSetSort());
-            namespaces.sorts().add(ns.getSequenceSort());
-            namespaces.sorts().add(ns.getBagSort());
-        }
-        if (s instanceof SortDefiningSymbols) {
-            ((SortDefiningSymbols) s).addDefinedSymbols(namespaces.functions(),
-                    namespaces.sorts());
-        }
+	namespaces.sorts().add(s);
+        KeYParser.addSortAdditionals(s, 
+        	namespaces.functions(), namespaces.sorts());
     }
 
     /**

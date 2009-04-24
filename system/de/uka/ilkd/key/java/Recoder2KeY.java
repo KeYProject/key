@@ -22,7 +22,6 @@ import recoder.java.CompilationUnit;
 import recoder.java.ProgramElement;
 import recoder.java.declaration.ClassInitializer;
 import recoder.java.declaration.MethodDeclaration;
-import recoder.java.reference.TypeReference;
 import recoder.list.generic.*;
 import recoder.parser.ParseException;
 import recoder.service.*;

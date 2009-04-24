@@ -113,7 +113,7 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
     /**
      * This method returns a cast into this sort.
      */
-    private SortDependingSymbol createCastSymbol(Namespace sort_ns) {
+    private SortDependingSymbol createCastSymbol() {
         Debug.assertTrue(castSymbol == null);
         castSymbol = new CastFunctionSymbol(Sort.ANY, this);
         return castSymbol;
@@ -133,7 +133,7 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
             }
             ListOfSortDependingSymbol l0 = 
                 SLListOfSortDependingSymbol.EMPTY_LIST;
-            l0 = l0.prepend(createCastSymbol(sort_ns)).prepend 
+            l0 = l0.prepend(createCastSymbol()).prepend 
             ( new InstanceofSymbol (this, booleanSort)).prepend
             ( new ExactInstanceSymbol (this, booleanSort)).prepend
             ( new InstanceofSymbol(new Name("contains"), this));

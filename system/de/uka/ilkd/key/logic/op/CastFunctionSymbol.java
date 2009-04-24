@@ -50,8 +50,7 @@ public class CastFunctionSymbol extends SortDependingFunction {
      */  
     public boolean possibleSub(int at, Term possibleSub) {        
         final Sort castTo = getSortDependingOn(); 
-        return super.possibleSub(at, possibleSub) && 
-        ((castTo instanceof PrimitiveSort) != (castTo instanceof ObjectSort)) ;
+        return super.possibleSub(at, possibleSub);
     }
     
     
