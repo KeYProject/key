@@ -89,7 +89,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
 
     /** map used for storing predicates representing modalities or updates */
-    private HashMap<Term, StringBuffer> modalityPredicates = new HashMap<Term, StringBuffer>();
+    private HashMap<Term, Function> modalityPredicates = new HashMap<Term, Function>();
     
     private StringBuffer nullString = new StringBuffer();
 
@@ -466,13 +466,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		element.add(this.usedDisplaySort.get(s));
 		toReturn.add(element);
 	    }
-	}
-
-	//add the modality predicates
-	for (StringBuffer s : this.modalityPredicates.values()) {
-	    ArrayList<StringBuffer> temp = new ArrayList<StringBuffer>();
-	    temp.add(s);
-	    toReturn.add(temp);
 	}
 	
 	return toReturn;
@@ -1362,31 +1355,67 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	//check, if the modality was already translated.
 	for (Term toMatch : modalityPredicates.keySet()) {
 	    //if (checkTermsEquality(t, toMatch, services)) {
-	    if (checkTermsEquality(t, toMatch, services) && checkTermsEquality(toMatch, t, services)) {
+	    if (toMatch.equalsModRenaming(t)) {
+	    //if (checkTermsEquality(t, toMatch, services) && checkTermsEquality(toMatch, t, services)) {
 		//t and toMatch are equal, so return the predicate translated for toMatch
-		return modalityPredicates.get(toMatch);
+		Function fun = modalityPredicates.get(toMatch);
+		TermFactory tf = new TermFactory();
+		//Build one term for each free variable in t
+		QuantifiableVariable[] args = t.freeVars().toArray();
+		Term[] subs = new Term[args.length];
+		for (int i = 0; i < args.length; i++) {
+		    QuantifiableVariable qv = args[i];
+		    if (qv instanceof LogicVariable) {
+			subs[i] = tf.createVariableTerm((LogicVariable)qv);
+		    } else {
+			logger.error("Schema variable found in formula.");
+		    }
+		}
+		
+		//Build the final predicate
+		Term temp = tf.createFunctionTerm(fun, subs);
+		StringBuffer s = this.translateTerm(temp, quantifiedVars, services);
+		
+		return s;
 	    }
 	}
-	
-	
+
 	//if the program comes here, term has to be translated.
 	
-	//invent a new predicate
 	TermFactory tf = new TermFactory();
-	Function fun = new NonRigidFunction(new Name("modConst"), Sort.FORMULA, new Sort[0]);
-	Term temp = tf.createFunctionTerm(fun);
 
+	//Collect all free Variable in the term
+	QuantifiableVariable[] args = t.freeVars().toArray();
+	Term[] subs = new Term[args.length];
+	Sort[] argsorts = new Sort[args.length];
+	for (int i = 0; i < args.length; i++) {
+	    QuantifiableVariable qv = args[i];
+	    if (qv instanceof LogicVariable) {
+		LogicVariable lv = (LogicVariable)qv;
+		subs[i] = tf.createVariableTerm(lv);
+		argsorts[i] = lv.sort();
+	    } else {
+		logger.error("Schema variable found in formula.");
+	    }
+	}
+	//invent a new predicate
+	Function fun = new NonRigidFunction(new Name("modConst"), Sort.FORMULA, argsorts);
+	
+	//Build the final predicate
+	Term temp = tf.createFunctionTerm(fun, subs);
+	
 	//translate the predicate
 	StringBuffer cstr = this.translateTerm(temp, quantifiedVars, services);
 	    
-	modalityPredicates.put(t, cstr);
+	modalityPredicates.put(t, fun);
 	    
 	return cstr;
 	
     }
+
     
     /**
-     * This method returens true, if t1 and t2 are equal.
+     * This method returns true, if t1 and t2 are equal.
      * CAUTION! Only tested for Box, Diamond and Update Formulas
      * @param t1 the first term to check
      * @param t2 the second term to check
