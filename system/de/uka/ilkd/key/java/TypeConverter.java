@@ -20,10 +20,16 @@ import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.ProgramInLogic;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.ldt.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.logic.sort.ArrayOfSort;
+import de.uka.ilkd.key.logic.sort.ObjectSort;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -40,6 +46,9 @@ public class TypeConverter extends TermBuilder {
     private BooleanLDT booleanLDT;
     private IntegerLDT integerLDT;
     private IntegerDomainLDT integerDomainLDT;
+    private FloatLDT floatLDT;
+    private DoubleLDT doubleLDT;
+
     private ListOfLDT models = SLListOfLDT.EMPTY_LIST;
 
     
@@ -72,7 +81,12 @@ public class TypeConverter extends TermBuilder {
             this.integerLDT = (IntegerLDT)ldt;
         } else if (ldt instanceof IntegerDomainLDT) {
             this.integerDomainLDT = (IntegerDomainLDT)ldt;
-        } 
+        } else if (ldt instanceof FloatLDT ) {
+            this.floatLDT = (FloatLDT)ldt;
+        } else if (ldt instanceof DoubleLDT) {
+            this.doubleLDT = (DoubleLDT)ldt;
+        }
+
         this.models = this.models.prepend(ldt);
         Debug.out("Initialize LDTs: ", ldt);
     }
@@ -100,6 +114,7 @@ public class TypeConverter extends TermBuilder {
                 charLDT == null) {
             return  null;
         }
+
         if (byteLDT.javaType().equals(t)) {
             return byteLDT;
         } else if (shortLDT.javaType().equals(t)) {
@@ -112,6 +127,10 @@ public class TypeConverter extends TermBuilder {
             return charLDT;
         } else if (booleanLDT.javaType().equals(t)) {
             return booleanLDT;
+        } else if (floatLDT.javaType().equals(t)) {
+            return floatLDT;
+        } else if (doubleLDT.javaType().equals(t)) {
+            return doubleLDT;
         }
         Debug.out("typeconverter: No LDT found for ", t);
         return null;
@@ -409,6 +428,10 @@ public class TypeConverter extends TermBuilder {
             return intLDT.translateLiteral(lit);
         } else if (lit instanceof StringLiteral) {
             return stringConverter.translateLiteral(lit,intLDT,services);
+        } else if (lit instanceof FloatLiteral) {
+            return floatLDT.translateLiteral(lit);
+        } else if (lit instanceof DoubleLiteral) {
+            return doubleLDT.translateLiteral(lit);
         } else {
             Debug.fail("Unknown literal type", lit);                 
             return null;
@@ -492,7 +515,8 @@ public class TypeConverter extends TermBuilder {
     }
 
     public Sort getPrimitiveSort(Type t) {
-        LDT result = getModelFor(t);
+	LDT result = getModelFor(t);
+
 	Debug.out("LDT found", t, result);
         return (result == null ? null : result.targetSort());
     }
