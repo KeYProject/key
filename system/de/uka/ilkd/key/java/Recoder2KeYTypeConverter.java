@@ -192,11 +192,10 @@ public class Recoder2KeYTypeConverter {
         	// if someone (including me) has some time and motivation we should restructure the test
         	// cases to work fine with the standard initialisation procedure.
         	
-        	// ugly  !!! To execute tests in a reasonable speed we allow
-        	// creation of tests here when this method has been invoked 
-        	// implicitly by junit.textui.TestRunner
-        	// This keeps the workaround local to here without introducing other
-        	// dependencies like testing for static variables
+        	// ugly!!! To execute tests in a reasonable speed sorts for primitive types we allow sort
+        	// creation here if and only if this method has been invoked implicitly by junit.textui.TestRunner
+        	// This way the workaround stays local and no global visible static fields or similar have
+        	// to be introduced.
         	boolean throwError = true;
 
         	Throwable stack = new Throwable(); 
