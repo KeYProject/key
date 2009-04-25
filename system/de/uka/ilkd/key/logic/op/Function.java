@@ -135,7 +135,8 @@ public abstract class Function extends TermSymbol {
     public String proofToString() {
        String s = null;
        if (sort() != null) {
-	   s = sort().toString()+" "+name();
+	   s = (sort() == Sort.FORMULA ? "" : sort().toString()) + " ";
+	   s += name();
        } else {
 	   s = "NO_SORT"+" "+name();
        }

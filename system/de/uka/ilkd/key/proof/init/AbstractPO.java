@@ -32,6 +32,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.UpdateFactory;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.AtPreFactory;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
@@ -256,6 +257,13 @@ public abstract class AbstractPO implements ProofOblInput {
         }
     }
 
+    protected void registerInNamespaces(Function f) {
+        if(f != null) {
+            services.getNameRecorder().addProposal(f.name());
+            initConfig.funcNS().add(f);
+        }
+    }
+
 
     protected void registerInNamespaces(ListOfProgramVariable pvs) {
         final IteratorOfProgramVariable it = pvs.iterator();
@@ -335,8 +343,17 @@ public abstract class AbstractPO implements ProofOblInput {
         while(it.hasNext()) {
             Function f = (Function)it.next();
             // only declare @pre-functions or anonymising functions, others will be generated automat. (hack)
-            if(f.name().toString().indexOf("AtPre")!=-1 || services.getNameRecorder().
-                    getProposals().contains(f.name())) {
+            if(f.sort() != Sort.FORMULA && (f.name().toString().indexOf("AtPre")!=-1 || services.getNameRecorder().
+                    getProposals().contains(f.name()))) {
+                header += f.proofToString();
+            }
+        }
+        header += "}\n\n\\predicates {\n";
+
+        it = initConfig.funcNS().allElements().iterator();
+        while(it.hasNext()) {
+            Function f = (Function)it.next();            
+            if(f.sort() == Sort.FORMULA && services.getNameRecorder().getProposals().contains(f.name())) {
                 header += f.proofToString();
             }
         }
