@@ -818,27 +818,6 @@ public class KeYProgModelInfo{
 
         List<recoder.abstraction.ClassType> classes = si.getSubtypes(ct);
 
-        //Ugly workaround: If "ct" is "java.lang.Object", then for some reason
-        //the "si.getSubtypes()" call above forgets to include the implicit 
-        //subtypes (i.e. those types which inherit from Object by default 
-        //instead of explicitly declaring any "extends" or "implements"). So we 
-        //add the missing subtypes manually.
-        if("java.lang.Object".equals(ct.getFullName())) {            
-            for(Object o: this.rec2key().elemsRec()) {
-        	if(o instanceof ClassType) {
-        	    ClassType classType = (ClassType) o;
-        	    assert isSubtype(classType, ct);
-        	    List<ClassType> directSupertypes = classType.getSupertypes();
-        	    if(directSupertypes != null 
-        	        && directSupertypes.contains(ct) 
-        	        && !classes.contains(classType)) {
-        		classes.add(classType);
-        	    }
-        	}
-            }
-        }
-
-
         //alpha sorting to make order deterministic
         recoder.abstraction.ClassType[] classesArray = 
             classes.toArray(new recoder.abstraction.ClassType[0]);

@@ -18,19 +18,13 @@ package de.uka.ilkd.key.proof.init;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.java.ArrayOfExpression;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.declaration.MethodDeclaration;
-import de.uka.ilkd.key.java.declaration.modifier.Static;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.SetOfClassInvariant;
-import de.uka.ilkd.key.util.ExtList;
 
 
 /**
@@ -57,6 +51,7 @@ public class RespectsModifiesPO extends EnsuresPO {
         this.contract = contract;
     }
     
+        
     
     private void buildUpdateAnonMethodTerm(ProgramVariable selfVar, 
                                            ListOfProgramVariable paramVars) 
@@ -64,36 +59,28 @@ public class RespectsModifiesPO extends EnsuresPO {
         if(updateAnonMethodTerm != null) {
             return;
         }
-               
-        //build method declaration
-        ExtList extList = new ExtList();
-        ProgramElementName methodName = new ProgramElementName("anonMethod");
-        extList.add(methodName);
-        extList.add(new Static());
-        MethodDeclaration methodDecl = new MethodDeclaration(extList, false);
+
+        //create uninterpreted heap dependent predicate symbol
         
-        //build program method
-        ProgramMethod programMethod = new ProgramMethod(methodDecl, 
-                                                        javaInfo.getJavaLangObject(), 
-                                                        null, 
-                                                        PositionInfo.UNDEFINED);
+        // find name
+        final Namespace functions = services.getNamespaces().functions();
+        final String anonPredBaseName = "anonHeapPred";
         
-        //build java block
-        MethodBodyStatement call 
-                = new MethodBodyStatement(programMethod,
-                                          javaInfo.createTypeReference(
-                                                 javaInfo.getJavaLangObject()),
-                                          null,
-                                          new ArrayOfExpression());
-        StatementBlock sb = new StatementBlock(call);
-        JavaBlock jb = JavaBlock.createJavaBlock(sb);
+        Name anonPredName = new Name(anonPredBaseName);
+        int cnt = 0;
+        while (functions.lookup(anonPredName) != null) {
+            anonPredName = new Name(anonPredBaseName + "_" + cnt);
+            cnt++;
+        }
         
-        //build program term
-        Term programTerm = TB.dia(jb, TB.tt());
+        final Function anonPred = new NonRigidHeapDependentFunction(anonPredName, Sort.FORMULA, new Sort[0]);        
+        registerInNamespaces(anonPred);
+        
+        final Term anonPredTerm = TB.func(anonPred);        
         
         //add update
         updateAnonMethodTerm = translateModifies(contract, 
-                                                 programTerm, 
+                                                 anonPredTerm, 
                                                  selfVar,
                                                  toPV(paramVars));
     }

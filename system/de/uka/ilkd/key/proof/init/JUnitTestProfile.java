@@ -22,7 +22,6 @@ import de.uka.ilkd.key.strategy.StrategyFactory;
 
 /**
  * This profile is only used by test cases written for and to test KeY.
- * @author bubel
  */
 public class JUnitTestProfile extends AbstractProfile {
 
