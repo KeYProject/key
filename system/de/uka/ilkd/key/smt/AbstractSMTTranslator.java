@@ -1399,7 +1399,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    }
 	}
 	//invent a new predicate
-	Function fun = new NonRigidFunction(new Name("modConst"), Sort.FORMULA, argsorts);
+	Function fun = new NonRigidFunction(new Name("modConst"), t.sort(), argsorts);
 	
 	//Build the final predicate
 	Term temp = tf.createFunctionTerm(fun, subs);
