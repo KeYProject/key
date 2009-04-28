@@ -676,6 +676,20 @@ TOKEN :
   < LT: "<" >
 }
 
+// The following two productions are there to allow reading of UTF8 encoded
+// source files. The byte order marker (BOM) FEFF must be ignored and
+// any other unicode character results in a token that does not match anywhere. 
+SKIP :
+{
+  < UNICODE_BYTE_ORDER_MARKER : "\ufeff" >
+}
+
+TOKEN :
+{
+  < UNKNOWN_CHARACTER_SEQUENCE: [ "\u0000" - "\uffff" ] >
+}
+
+
 
 /*****************************************
  * THE JAVA LANGUAGE GRAMMAR STARTS HERE *

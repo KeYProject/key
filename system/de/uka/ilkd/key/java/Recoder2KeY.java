@@ -314,10 +314,18 @@ public class Recoder2KeY implements JavaReader {
         parseSpecialClasses();
         try {
             for (String filename : cUnitStrings) {
-                CompilationUnit cu = servConf.getProgramFactory().parseCompilationUnit(new FileReader(filename));
+                CompilationUnit cu;
+                try {
+                    cu = servConf.getProgramFactory().parseCompilationUnit(new FileReader(filename));
+                } catch (Exception e) {
+                    throw (ParseException) 
+                       new ParseException("Error in file " + 
+                               filename + ": " + e.getMessage()).initCause(e); 
+                }
                 cu.setDataLocation(new DataFileLocation(filename));
                 cUnits.add(cu);
             }
+            
             final ChangeHistory changeHistory = servConf.getChangeHistory();
             for (int i = 0, sz = cUnits.size(); i < sz; i++) {
                 cUnits.get(i).makeAllParentRolesValid();
