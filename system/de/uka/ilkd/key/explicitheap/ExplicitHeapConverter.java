@@ -359,6 +359,60 @@ public class ExplicitHeapConverter {
         }
     }
     
+    //only converts heap locs
+    public Term convert(LocationDescriptor loc, Services services) {
+	if(loc instanceof BasicLocationDescriptor) {
+            BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
+            Term locTerm = bloc.getLocTerm();
+            if(!bloc.getFormula().equals(TB.tt())) {
+        	warn("ignoring location descriptor guard: " + bloc.getFormula());
+            }
+            
+            if(locTerm.op() instanceof AttributeOp) {
+                ProgramVariable fieldPV 
+                    = (ProgramVariable)((AttributeOp)locTerm.op())
+                                                        .attribute();
+                Function fieldSymbol = getFieldSymbol(fieldPV, services);
+                
+                if(locTerm.freeVars().isEmpty()) {
+                    return TB.singleton(services, 
+                	    		convert(locTerm.sub(0), services), 
+                	    		TB.func(fieldSymbol));
+                } else {
+                    return TB.allFields(services, 
+                	    		convert(locTerm.sub(0), services));
+                }
+            } else if(locTerm.op() instanceof ArrayOp) {
+                Function arrayFieldSymbol 
+                    = services.getJavaInfo().getArrayField();
+                
+                if(locTerm.freeVars().isEmpty()) {
+                    return TB.singleton(services, 
+                	    		convert(locTerm.sub(0), services), 
+                	    		TB.func(services.getJavaInfo().getArrayField(),
+                	    			convert(locTerm.sub(1), services)));
+                } else {
+                    return TB.allFields(services, 
+                	    		convert(locTerm.sub(0), services));
+                }
+            } else {
+                assert locTerm.op() instanceof ProgramVariable;
+                return TB.empty(services);
+            }
+	} else {
+	    assert loc instanceof EverythingLocationDescriptor;
+	    return TB.everything(services);
+	}
+    }
+    
+    
+    public Term convert(SetOfLocationDescriptor locs, Services services) {
+	Term result = TB.empty(services);
+	for(LocationDescriptor loc : locs) {
+	    result = TB.union(services, result, convert(loc, services));
+	}
+	return result;
+    }
     
     
     //-------------------------------------------------------------------------

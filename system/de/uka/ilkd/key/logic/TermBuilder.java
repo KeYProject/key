@@ -351,4 +351,44 @@ public class TermBuilder {
     public Term wellFormedHeap(Services services) {
         return func(services.getJavaInfo().getWellFormed(), heap(services));
     }
+    
+    public Term changeHeapAtLocs(Services services, Term h1, Term s, Term h2) {
+	return func(services.getJavaInfo().getChangeHeapAtLocs(), new Term[]{h1, s, h2});
+    }
+    
+    public Term empty(Services services) {
+	return func(services.getJavaInfo().getEmpty());
+    }
+    
+    public Term singleton(Services services, Term o, Term f) {
+	return func(services.getJavaInfo().getSingleton(), o, f);
+    }
+    
+    public Term union(Services services, Term s1, Term s2) {
+	return func(services.getJavaInfo().getUnion(), s1, s2);
+    }
+    
+    public Term intersect(Services services, Term s1, Term s2) {
+	return func(services.getJavaInfo().getIntersect(), s1, s2);
+    }
+    
+    public Term setMinus(Services services, Term s1, Term s2) {
+	return func(services.getJavaInfo().getSetMinus(), s1, s2);
+    }
+    
+    public Term complement(Services services, Term s) {
+	return func(services.getJavaInfo().getComplement(), s);
+    }
+    
+    public Term allFields(Services services, Term o) {
+	return func(services.getJavaInfo().getAllFields(), o);
+    }
+    
+    public Term everything(Services services) {
+	return func(services.getJavaInfo().getEverything());
+    }
+    
+    public Term elementOf(Services services, Term o, Term f, Term s) {
+	return func(services.getJavaInfo().getElementOf(), new Term[]{o, f, s});
+    }
 }

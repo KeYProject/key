@@ -127,6 +127,17 @@ public class JavaInfo {
     private Sort fieldSort;
     private Function arr;
     private Function wellFormed;
+    private Function changeHeapAtLocs;
+    private Function empty;
+    private Function singleton;
+    private Function union;
+    private Function intersect;
+    private Function setMinus;
+    private Function complement;
+    private Function allFields;
+    private Function everything;
+    private Function elementOf;
+    
     
     /** caches the arrays' length attribute*/
     private ProgramVariable length;
@@ -276,7 +287,113 @@ public class JavaInfo {
         } 
         return wellFormed;                        
     }
+    
+    public Function getChangeHeapAtLocs() {
+        if (changeHeapAtLocs == null) {
+            changeHeapAtLocs = (Function) services.getNamespaces().functions().lookup(new Name("changeHeapAtLocs"));
+            if (changeHeapAtLocs == null) {
+                throw new RuntimeException("changeHeapAtLocs symbol not found.");
+            }
+        } 
+        return changeHeapAtLocs;                        
+    }
+    
+    public Function getEmpty() {
+        if (empty == null) {
+            empty = (Function) services.getNamespaces().functions().lookup(new Name("empty"));
+            if (empty == null) {
+                throw new RuntimeException("empty symbol not found.");
+            }
+        } 
+        return empty;                        
+    }
+    
+    public Function getSingleton() {
+        if (singleton == null) {
+            singleton = (Function) services.getNamespaces().functions().lookup(new Name("singleton"));
+            if (singleton == null) {
+                throw new RuntimeException("singleton symbol not found.");
+            }
+        } 
+        return singleton;                        
+    }
+    
+    
+    public Function getUnion() {
+	if (union == null) {
+            union = (Function) services.getNamespaces().functions().lookup(new Name("union"));
+            if (union == null) {
+                throw new RuntimeException("union symbol not found.");
+            }
+        } 
+        return union;     
+    }
+    
+    
+    public Function getIntersect() {
+	if (intersect == null) {
+            intersect = (Function) services.getNamespaces().functions().lookup(new Name("intersect"));
+            if (intersect == null) {
+                throw new RuntimeException("intersect symbol not found.");
+            }
+        } 
+        return intersect;   
+    }
+    
+    
+    public Function getSetMinus() {
+	if (setMinus == null) {
+            setMinus = (Function) services.getNamespaces().functions().lookup(new Name("setMinus"));
+            if (setMinus == null) {
+                throw new RuntimeException("setMinus symbol not found.");
+            }
+        } 
+        return setMinus;   
+    }
+    
+    
+    public Function getComplement() {
+	if (complement == null) {
+            complement = (Function) services.getNamespaces().functions().lookup(new Name("complement"));
+            if (complement == null) {
+                throw new RuntimeException("complement symbol not found.");
+            }
+        } 
+        return complement;   
+    }
+    
+    
+    public Function getAllFields() {
+	if (allFields == null) {
+            allFields = (Function) services.getNamespaces().functions().lookup(new Name("allFields"));
+            if (allFields == null) {
+                throw new RuntimeException("allFields symbol not found.");
+            }
+        } 
+        return allFields;   
+    }
+    
+    public Function getEverything() {
+        if (everything == null) {
+            everything = (Function) services.getNamespaces().functions().lookup(new Name("everything"));
+            if (everything == null) {
+                throw new RuntimeException("everything symbol not found.");
+            }
+        } 
+        return everything;                        
+    }
+    
+    public Function getElementOf() {
+        if (elementOf == null) {
+            elementOf = (Function) services.getNamespaces().functions().lookup(new Name("elementOf"));
+            if (elementOf == null) {
+                throw new RuntimeException("elementOf symbol not found.");
+            }
+        } 
+        return elementOf;                        
+    }
 
+    
     
     /**
      * returns the full name of a given {@link
