@@ -338,7 +338,7 @@ public class ProblemInitializer {
 	    readIncludes(envInput, initConfig);
 	    	    
             //read Java
-            readJava(envInput, initConfig);	
+            if (!(envInput instanceof LDTInput)) readJava(envInput, initConfig);	
             
 	    //read envInput itself
 	    reportStatus("Reading "+envInput.name(), 

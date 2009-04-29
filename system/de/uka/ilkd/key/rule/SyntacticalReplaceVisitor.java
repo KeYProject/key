@@ -63,7 +63,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
     /** used to indicate if variables have changed */
     private final BooleanContainer varsChanged = new BooleanContainer();
     
-    /** an empty array for resourse optimisation*/
+    /** an empty array for resource optimisation*/
     private static final 
       QuantifiableVariable[] EMPTY_QUANTIFIABLE_VARS = new QuantifiableVariable[0];
 
@@ -528,17 +528,24 @@ public class SyntacticalReplaceVisitor extends Visitor {
     }
     
 
+    /**
+     * if in forceSVInst mode and a metavariable could not be created, execution is 
+     * aborted by a thrown IllegalInstantiationException. If you start this visitor in
+     * forceSVInst mode you have to take care of catching this exception
+     */
     public void visit(Term visited) {
-        // Sort equality has to be ensured before calling this method
+	// Sort equality has to be ensured before calling this method
         final Operator visitedOp = visited.op();
         if (visitedOp instanceof SortedSchemaVariable
                 && svInst.isInstantiated((SchemaVariable) visitedOp)
                 && (!((SchemaVariable) visitedOp).isListSV())) {
             pushNew(toTerm(svInst.getInstantiation((SchemaVariable) visitedOp)));
         } else if (forceSVInst && visitedOp instanceof SortedSchemaVariable
-                && ((SchemaVariable) visitedOp).isTermSV()
-                && instantiateWithMV(visited)) {
-            // then we are done ...
+                && ((SchemaVariable) visitedOp).isTermSV()) {
+            	if (!instantiateWithMV(visited)) {
+            	    throw new IllegalInstantiationException("Could not force instantiation with metavariable");
+            	}
+                // then we are done ...
         } else if ((visitedOp instanceof Metavariable)
                 && metavariableInst.getInstantiation((Metavariable) visitedOp) != visitedOp) {
             pushNew(metavariableInst.getInstantiation((Metavariable) visitedOp));

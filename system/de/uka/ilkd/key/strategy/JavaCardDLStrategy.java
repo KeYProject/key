@@ -193,6 +193,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "simplify_instanceof_static",
                       add ( EqNonDuplicateAppFeature.INSTANCE,
                             longConst ( -500 ) ) );
+
+        bindRuleSet ( d, "comprehensions",
+                      add ( NonDuplicateAppModPositionFeature.INSTANCE,
+                            longConst ( 1000 ) ) );
+        
+        bindRuleSet ( d, "comprehensions_high_costs",
+                add ( NonDuplicateAppModPositionFeature.INSTANCE,
+                      longConst ( 10000 ) ) );
         
         bindRuleSet ( d, "evaluate_instanceof", longConst ( -500 ) );
         

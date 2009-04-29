@@ -111,13 +111,13 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
 	    SMTSolver s = rules.get(i);
 	    Proof p = goals.get(i);
 	    try {
-		long time = System.currentTimeMillis();
+		long time = System.currentTimeMillis();		
 	    	SMTSolverResult result = s.run(p.openGoals().iterator().next(), maxExecutionTime, p.getServices());
 	    	time = System.currentTimeMillis() - time;
 	    	time = time / 100;
 	    	toReturn.add("" + time/10 + "." + time%10);
 		toReturn.add(this.translateResult(result));
-	    } catch (RuntimeException e) {
+	    } catch (Exception e) {
 		toReturn.add(NOTAVAILABLE);
 		toReturn.add(NOTAVAILABLE);
 	    }
@@ -178,6 +178,7 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
 	toReturn.add(new SimplifySolver());
 	toReturn.add(new Z3Solver());
 	toReturn.add(new YicesSolver());
+	toReturn.add(new CVC3Solver());
 	return toReturn;
     }
     

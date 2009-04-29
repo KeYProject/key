@@ -123,7 +123,8 @@ public class ApplyOnModality extends AbstractUpdateRule {
      */
     private boolean isHeapLocation(Location loc) {        
         return (!(loc instanceof ProgramVariable) || ((ProgramVariable)loc).isMember())
-               /*&& !(loc instanceof NonRigidFunctionLocation)*/;
+               && (!(loc instanceof NonRigidFunctionLocation) || 
+        	       ((NonRigidFunctionLocation)loc).isHeap());
     }
 
     /**
@@ -143,10 +144,10 @@ public class ApplyOnModality extends AbstractUpdateRule {
         if (targetOp instanceof ProgramVariable
             || targetOp instanceof NonRigidFunctionLocation) {
             foundProgVars.add(targetOp);
-        } else if (targetOp instanceof NonRigidHeapDependentFunction) {
+        } else if (targetOp instanceof NonRigidHeapDependentFunction ||
+        	targetOp instanceof ProgramMethod) {
             foundProgVars.add(PROTECT_HEAP);
-        } else if (targetOp instanceof NonRigidFunction && 
-                   !(targetOp instanceof ProgramMethod)) {
+        } else if (targetOp instanceof NonRigidFunction) {
             foundProgVars.add(PROTECT_ALL);
             return foundProgVars;
         }

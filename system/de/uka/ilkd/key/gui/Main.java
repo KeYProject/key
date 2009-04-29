@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-// Universitaet Koblenz-Landau, Germany
-// Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
 //
 //
 
@@ -21,7 +14,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -34,6 +26,7 @@ import javax.swing.text.JTextComponent;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.gui.DecisionProcedureSettings.RuleDescriptor;
 import de.uka.ilkd.key.gui.assistant.ProofAssistant;
 import de.uka.ilkd.key.gui.assistant.ProofAssistantAI;
 import de.uka.ilkd.key.gui.assistant.ProofAssistantController;
@@ -55,19 +48,14 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.*;
-//import de.uka.ilkd.key.proof.decproc.DecisionProcedureSmtAuflia;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.NonInterferenceCheck;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.smt.DecProcRunner;
-import de.uka.ilkd.key.smt.SMTRule;
-import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
-import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.key.util.*;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -207,8 +195,12 @@ public class Main extends JFrame implements IMain {
     /** undo the last proof step on the currently selected branch */
     private UndoLastStep undoAction = new UndoLastStep();
 
-    
-    private JButton decisionProcedureButton;
+    /** external prover GUI elements */
+    private DPSettingsListener dpSettingsListener;
+    private JSlider ruletimeout;
+    private JLabel ruletimeoutlabel;
+    private JButton decisionProcedureInvocationButton;
+
     
     private JButton testButton;
     
@@ -226,20 +218,12 @@ public class Main extends JFrame implements IMain {
     private Action createUnitTestAction = null;
     
     
-    protected static Main instance = null;
-    
-    /** menu for configuration of decision procedure */
-    JMenu decisionProcedureOption = new JMenu("Decision Procedures");
-    
-    ArrayList<JRadioButtonMenuItem> ruleButton = new ArrayList<JRadioButtonMenuItem>();
-    
-    JSlider ruletimeout = new JSlider(1, 5*60);
-    
-    JLabel ruletimeoutlabel = new JLabel();
+    protected static Main instance = null;    
     
     private ProverTaskListener taskListener;
     
     private NotificationManager notificationManager;
+
 
     
     
@@ -638,6 +622,13 @@ public class Main extends JFrame implements IMain {
     }
     
 
+    private JButton createDecisionProcedureButton() {	
+	decisionProcedureInvocationButton = new JButton();	
+	RuleDescriptor r = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveRule();
+	decisionProcedureInvocationButton.setAction(new DPInvokeAction(r));
+	return decisionProcedureInvocationButton;
+    }
+
     /**
      * *********************** UGLY INSPECTION CODE **********************
      */
@@ -730,37 +721,6 @@ public class Main extends JFrame implements IMain {
         testButton.setAction(new CreateUnitTestAction());
 
         return testButton;
-    }
-    
-    /** creates the toolbar button invoking decision procedures like ICS, Simplify */
-    private JButton createDecisionProcedureButton() {
-	SMTRule r = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveRule();
-	
-	if (r != null) {
-            String toolTipText = "Run " + r.displayName();
-        
-            decisionProcedureButton = new JButton();
-            decisionProcedureButton.setToolTipText(toolTipText);
-            decisionProcedureButton.setText(toolTipText);
-        
-            // select icon
-            decisionProcedureButton.setIcon(IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));            
-            
-            decisionProcedureButton.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        	    if (!mediator.ensureProofLoaded()) return;
-        	    final Proof proof = mediator.getProof();
-        	    new DecProcRunner(Main.this, proof, 
-        		    proof.getUserConstraint().getConstraint()).run();
-        	}
-            });
-	} else {
-	    decisionProcedureButton = new JButton();
-	    decisionProcedureButton.setText("no solver selected");
-	    decisionProcedureButton.setToolTipText("no solver selected");
-	}
-        
-        return decisionProcedureButton;
     }
     
     
@@ -1419,10 +1379,12 @@ public class Main extends JFrame implements IMain {
         registerAtMenu(options, librariesItem);
         
         // decision procedures
-        ButtonGroup decisionProcGroup = new ButtonGroup();
-        setupDecisionProcedureGroup(decisionProcGroup);
-        registerAtMenu(options, decisionProcedureOption);
-                        
+        registerAtMenu(options, createDecisionProcedureMenu());
+	dpSettingsListener = 
+	    new DPSettingsListener(ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings());
+       
+        
+        
         // specification extraction
         JMenuItem computeSpecificationOptions = 
             ComputeSpecificationView.createOptionMenuItems();
@@ -1522,39 +1484,52 @@ public class Main extends JFrame implements IMain {
         return options;
     }
 
+    /**
+     * creates a menu allowing to choose the external prover to be used
+     * @return the menu with a list of all available provers that can be used
+     */
+    private JMenu createDecisionProcedureMenu() {
+	/** menu for configuration of decision procedure */
+        final JMenu decisionProcedureOption = new JMenu("Decision Procedures");
+        
+        // the button group which takes care of selecting and unselecting not 
+        // activated entries
+        final ButtonGroup dpButtonGroup = new ButtonGroup();
 
-    private void setupDecisionProcedureGroup(ButtonGroup decisionProcGroup) {
-        //add all available Rules to the ButtonGroup
-	this.ruleButton = new ArrayList<JRadioButtonMenuItem>();
-	DecisionProcButtonListener decisionProcButtonListener = new DecisionProcButtonListener();
-	for (String s : ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getAvailableRules()) {
-	    JRadioButtonMenuItem b = new JRadioButtonMenuItem();
-	    b.setText(s);
-	    b.setIcon(IconFactory.simplifyLogo(15));
-	    b.addActionListener(decisionProcButtonListener);
-	    ruleButton.add(b);
+	final DecisionProcedureSettings dps = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings();
+	for (RuleDescriptor r : dps.getAvailableRules()) {
+	    final JRadioButtonMenuItem b = new JRadioButtonMenuItem();
+	    b.setAction(new DPSelectionAction(r, b));
 	    decisionProcedureOption.add(b);
+	    dpButtonGroup.add(b);
 	}
-	//check only the active radio box
-	for (int i = 0; i < ruleButton.size(); i++) {
-	    if (i == ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveRuleIndex()) {
-		ruleButton.get(i).setSelected(true);
-	    } else {
-		ruleButton.get(i).setSelected(false);
-	    }
-	}
-	
+		
 	decisionProcedureOption.add(new JSeparator());
 	
-	//add possibility for timeout setting
-	this.ruletimeoutlabel.setText(
-		"timeout: " + ProofSettings.DEFAULT_SETTINGS
-					   .getDecisionProcedureSettings()
-					   .getTimeout() + " s");
-	decisionProcedureOption.add(this.ruletimeoutlabel);
-	this.ruletimeout.setValue(ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getTimeout());
-	this.ruletimeout.addChangeListener(decisionProcButtonListener);
-	decisionProcedureOption.add(this.ruletimeout);
+	ruletimeoutlabel = new JLabel();	
+	ruletimeoutlabel.setText("timeout: " + dps.getTimeout() + " s");
+
+	decisionProcedureOption.add(ruletimeoutlabel);
+
+	
+	ruletimeout = new JSlider(1, 5*60);				
+	ruletimeout.setValue(dps.getTimeout());	
+	ruletimeout.addChangeListener(new ChangeListener() {
+	    public void stateChanged(ChangeEvent e) {
+		final int newTimeout =((JSlider) e.getSource()).getValue();
+		
+		ProofSettings ps = ProofSettings.DEFAULT_SETTINGS;
+		if (mediator().getProof() != null) {
+		    ps = mediator.getProof().getSettings();
+		}
+		ps.getDecisionProcedureSettings().setTimeout(newTimeout);
+	    }	    
+	});
+	
+	// add ruletimeout slider to menu
+	decisionProcedureOption.add(ruletimeout);
+	
+	return decisionProcedureOption;
     }    
     
     
@@ -1958,6 +1933,52 @@ public class Main extends JFrame implements IMain {
         }
     }
     
+    private final class DPSettingsListener implements SettingsListener {	
+	private DecisionProcedureSettings settings;
+
+	public DPSettingsListener(DecisionProcedureSettings dps) {
+	    this.settings = dps;
+	    register();
+	}
+
+	private void register() {
+	    if (settings != null) {
+		settings.addSettingsListener(this);
+	    }
+	}
+
+	private void unregister() {
+	    if (settings != null) {
+		settings.removeSettingsListener(this);
+	    }
+	}
+	
+	public void update() {	   
+	    if (settings != null) {
+		RuleDescriptor activeRule = settings.getActiveRule();				
+		decisionProcedureInvocationButton.
+				
+		setAction(new DPInvokeAction(activeRule));
+		
+		ruletimeoutlabel.setText("timeout: " + settings.getTimeout() + " s");
+
+	    } else {
+		assert false;
+	    }
+	}
+
+	public void settingsChanged(GUIEvent e) {
+	    if (e.getSource() instanceof DecisionProcedureSettings) {
+		if (e.getSource() != settings) {
+		    unregister();
+		    settings = (DecisionProcedureSettings) e.getSource();		    
+		    register();
+		}
+		update();
+	    }
+	}
+    }
+
     /**
      * Loads the last opened file
      */
@@ -2130,6 +2151,7 @@ public class Main extends JFrame implements IMain {
      */
     private boolean disableCurrentGoalView = false;
 
+   
 
     private synchronized void setProofNodeDisplay() {
         if (!disableCurrentGoalView) {
@@ -2154,9 +2176,8 @@ public class Main extends JFrame implements IMain {
         }
     }
     
-    class MainProofListener implements AutoModeListener, 
-    KeYSelectionListener,
-    SettingsListener {
+    class MainProofListener implements AutoModeListener, KeYSelectionListener,
+    	SettingsListener {	
         
         Logger logger = Logger.getLogger("key.threading");
         
@@ -2197,22 +2218,9 @@ public class Main extends JFrame implements IMain {
                 userConstraint
                 .addConstraintTableListener ( constraintListener );
             setProofNodeDisplay();
+            dpSettingsListener.settingsChanged(new GUIEvent((proof != null ? 
+        	    proof.getSettings() : ProofSettings.DEFAULT_SETTINGS).getDecisionProcedureSettings()));
             makePrettyView();
-            // update label of autoModeButton and update decproc options list
-            updateDecisionProcedureButton();
-            DecisionProcedureSettings currentSetting = 
-                ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings();
-            if ( proof != null ) {
-                currentSetting = proof.getSettings().getDecisionProcedureSettings();
-            }    
-            int currentActive = currentSetting.getActiveRuleIndex();
-            for (int i = 0; i < ruleButton.size(); i++) {
-        	if (currentActive == i) {
-        	    ruleButton.get(i).setSelected(true);
-        	} else {
-        	    ruleButton.get(i).setSelected(false);
-        	}
-            }
         }
         
         /**
@@ -2243,54 +2251,9 @@ public class Main extends JFrame implements IMain {
         public synchronized void settingsChanged ( GUIEvent e ) {
             if ( proof.getSettings().getStrategySettings() == (StrategySettings) e.getSource() ) {
                 // updateAutoModeConfigButton();
-            }
+            }         
         }
         
-    }
-    
-    class DecisionProcButtonListener implements ActionListener, ChangeListener {
-        public void actionPerformed(ActionEvent e) {
-            Proof currentProof = mediator.getProof();
-            ProofSettings currentSettings = ProofSettings.DEFAULT_SETTINGS;
-            if (currentProof != null)
-                currentSettings = currentProof.getSettings();
-            
-            for (int i = 0; i < ruleButton.size(); i++) {
-        	if (e.getSource() == ruleButton.get(i)) {
-        	    currentSettings.getDecisionProcedureSettings().setActiveRule(i);
-        	    ruleButton.get(i).setSelected(true);
-        	} else {
-        	    ruleButton.get(i).setSelected(false);
-        	}
-            }
-            //update the radion group
-            
-            //update the button for invoking the rule
-            updateDecisionProcedureButton();
-        }
-        
-        public void stateChanged(ChangeEvent arg0) {
-            if (arg0.getSource() == ruletimeout) {
-        	ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().setTimeout(ruletimeout.getValue());
-        	ruletimeoutlabel.setText("timeout: " + ruletimeout.getValue() + " s");
-            }
-        }
-    }
-    
-    public void updateDecisionProcedureButton() {
-        Proof currentProof = mediator.getProof();
-        DecisionProcedureSettings decSettings = (currentProof == null) ? ProofSettings.DEFAULT_SETTINGS
-                .getDecisionProcedureSettings()
-                : currentProof.getSettings().getDecisionProcedureSettings();
-                if (decSettings.getActiveRule() != null) {
-                    decisionProcedureButton.setIcon(IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));
-                    decisionProcedureButton.setToolTipText("Run " + decSettings.getActiveRule().displayName());
-                    decisionProcedureButton.setText("Run " + decSettings.getActiveRule().displayName());
-                } else {
-                    decisionProcedureButton.setIcon(IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));
-                    decisionProcedureButton.setToolTipText("Not installed");
-                    decisionProcedureButton.setText("No decision procedure installed.");
-                }
     }
         
     /**
@@ -2488,6 +2451,7 @@ public class Main extends JFrame implements IMain {
     
     public static void evaluateOptions(String[] opt) {
 	int index = 0;
+	ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());
 	while (opt.length > index) {	    
 	    if ((new File(opt[index])).exists()) {
 		fileNameOnStartUp=opt[index];
@@ -2507,7 +2471,7 @@ public class Main extends JFrame implements IMain {
 		    batchMode = true;
                     visible = false;
 		} else if (opt[index].equals("DEPTHFIRST")) {		
-            System.out.println("DepthFirst GoalChooser ...");
+		    	System.out.println("DepthFirst GoalChooser ...");
 			Profile p = ProofSettings.DEFAULT_SETTINGS.getProfile();
 			p.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);           
             
@@ -2527,8 +2491,7 @@ public class Main extends JFrame implements IMain {
                         index ++;
                     }
                     
-                    ProofSettings.DEFAULT_SETTINGS.setProfile(p);
-                    p.updateSettings(ProofSettings.DEFAULT_SETTINGS);
+                    ProofSettings.DEFAULT_SETTINGS.setProfile(p);                   
                     testMode = true;
 		} else if (opt[index].equals("DEBUGGER")) {                                     
                     System.out.println("Symbolic Execution Debugger Mode enabled ...");                                        
@@ -2539,13 +2502,9 @@ public class Main extends JFrame implements IMain {
                         //System.out.println("Balanced loop unwinding ...");
                         index ++;
                     }
-                    ProofSettings.DEFAULT_SETTINGS.setProfile(p);
-                    p.updateSettings(ProofSettings.DEFAULT_SETTINGS);
+                    ProofSettings.DEFAULT_SETTINGS.setProfile(p);                    
                     testMode = true;
-                } 
-                
-                
-                
+                }                                                 
                 else if (opt[index].equals("FOL")) {                     
                    ProofSettings.DEFAULT_SETTINGS.setProfile(new PureFOLProfile());
                 } else if (opt[index].equals("TIMEOUT")) {
@@ -2581,7 +2540,7 @@ public class Main extends JFrame implements IMain {
 	    System.out.println("Using assertions ...");	   
 	} else {
 	    System.out.println("Not using assertions ...");	   
-	}       
+	}
     }
 
     private static void printUsageAndExit() {
@@ -2887,6 +2846,98 @@ public class Main extends JFrame implements IMain {
         }
     }
     
+    
+    /**
+     * This action is responsible for the invocation of a decision procedure.
+     * For example the toolbar button is paramtrized with an instance of this action
+     */
+    private final class DPInvokeAction extends AbstractAction {
+
+	private final RuleDescriptor decisionProcedure;
+	
+	public DPInvokeAction(RuleDescriptor decisionProcedure) {
+	    assert decisionProcedure != null;
+	    this.decisionProcedure = decisionProcedure;
+
+	    putValue(SMALL_ICON, IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));	    
+	  
+	    putValue(NAME, decisionProcedure.getDisplayName());
+		
+	    if (!DecisionProcedureSettings.NOT_A_RULE.equals(decisionProcedure)) {
+		putValue(SHORT_DESCRIPTION, "Invokes " + decisionProcedure.getDisplayName());
+	    } else {		
+		putValue(SHORT_DESCRIPTION, "Please select an external prover under Options | Decision Procedures.");
+	    }
+	    
+	}
+	
+	public boolean isEnabled() {
+	    return super.isEnabled() && !decisionProcedure.equals(DecisionProcedureSettings.NOT_A_RULE) && 
+ 	      mediator != null && mediator.getProof() != null && !mediator.getProof().closed();
+	}
+	  
+	public void actionPerformed(ActionEvent e) {
+	    if (!mediator.ensureProofLoaded()) return;
+	    final Proof proof = mediator.getProof();
+	    new DecProcRunner(Main.this, proof, 
+			proof.getUserConstraint().getConstraint()).run();
+	}	
+    }
+    
+    /**
+     * This action controls the selection of external provers. It provides the properties for the buttons 
+     * displayed in the radio button group and if an external prover is selected this action is invoked and
+     * updates the decision procedure settings of the current proof settings. 
+     */
+    private final class DPSelectionAction extends AbstractAction {
+	private final RuleDescriptor decisionProcedure;
+	// currently necessary as property SELECTED_KEY support first since JDK >= 1.6
+	private final JRadioButtonMenuItem radioButton;
+	
+
+	public DPSelectionAction(RuleDescriptor decisionProcedure, JRadioButtonMenuItem radioButton) {	    
+	    this.decisionProcedure = decisionProcedure;
+	    this.radioButton = radioButton;
+	   	  
+	    final RuleDescriptor activeRule = getCurrentDPSettings().getActiveRule();
+	    
+	    if (activeRule.equals(decisionProcedure)) {
+		radioButton.setSelected(true);
+	    }
+
+	    putValue(SMALL_ICON, IconFactory.simplifyLogo(TOOLBAR_ICON_SIZE));	    
+
+	    putValue(NAME, decisionProcedure.getDisplayName());
+	    if (!decisionProcedure.equals(DecisionProcedureSettings.NOT_A_RULE)) {		
+		putValue(SHORT_DESCRIPTION, "Use '" + decisionProcedure.getDisplayName() + "' as external prover.");
+	    } else {
+		putValue(SHORT_DESCRIPTION, "Do not use any external prover.");
+	    }
+
+	}
+	
+	public boolean isEnabled() {
+	    return super.isEnabled();
+	}
+	
+	public void actionPerformed(ActionEvent e) {
+	    getCurrentDPSettings().setActiveRule(decisionProcedure.getRuleName());
+	    radioButton.setSelected(true); // if we change to Java 6 delete radioButton and add here putValue(SELECTED_KEY, true)
+
+	}
+
+	private DecisionProcedureSettings getCurrentDPSettings() {
+	    DecisionProcedureSettings dpSettings;
+	    if (mediator.getProof() != null) {
+		dpSettings = mediator.getProof().getSettings().getDecisionProcedureSettings();
+	    } else {
+		dpSettings = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings();
+	    }
+	    return dpSettings;
+	}
+    }
+    
+  
     private final class AutoModeAction extends AbstractAction {
         
         final Icon startLogo = 

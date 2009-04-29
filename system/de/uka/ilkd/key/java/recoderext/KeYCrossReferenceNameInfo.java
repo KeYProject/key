@@ -16,6 +16,7 @@ import recoder.abstraction.*;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.kit.UnitKit;
 import recoder.service.DefaultNameInfo;
+import recoder.service.KeYCrossReferenceSourceInfo;
 import de.uka.ilkd.key.java.ConvertException;
 
 
@@ -73,7 +74,7 @@ public class KeYCrossReferenceNameInfo extends DefaultNameInfo {
         }
         
         super.register(ct);
-        
+
         classtypes.put(name, ct);
     }
 

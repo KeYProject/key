@@ -1715,6 +1715,11 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	    result = new JMLExpression(t);
 	}
     |
+    ("(" BSUM) => t=bsumterm
+	{
+	    result = new JMLExpression(t);
+	}
+    |
 	(OLD | PRE) LPAREN t=specexpression RPAREN
 	{
 	    if (atPreFunctions == null) {
@@ -1951,6 +1956,36 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	}
 	RPAREN
 ;
+
+bsumterm returns [Term t=null] throws SLTranslationException
+{
+    Term a=null,b=null; 
+    ListOfLogicVariable decls=null;
+}:
+        "("
+        q:BSUM decls=quantifiedvardecls 
+        {	    
+            resolverManager.pushLocalVariablesNamespace();
+            resolverManager.putIntoTopLocalVariablesNamespace(decls);
+        } 
+        ";" 
+        (
+            a=specexpression ";"  b=specexpression ";" t=specexpression
+        )
+        {
+            LogicVariable lv = (LogicVariable) decls.head();
+            t = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(Op.BSUM, 
+                        a, b, t, new ArrayOfQuantifiableVariable(lv));
+            resolverManager.popLocalVariablesNamespace();
+        }
+        ")"
+;
+
+exception
+        catch [SLTranslationException ex] {
+        resolverManager.popLocalVariablesNamespace();
+        throw ex;
+        }   
 
 quantifiedvardecls returns [ListOfLogicVariable vars = SLListOfLogicVariable.EMPTY_LIST] throws SLTranslationException
 {

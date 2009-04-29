@@ -152,6 +152,7 @@ LBLNEG : "\\lblneg";
 LBLPOS : "\\lblpos";
 TYPE : "\\TYPE";
 NOWARN : "\\nowarn";
+BSUM : "\\bsum";  //KeY extension, not official JML
 
 
 LPAREN

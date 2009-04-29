@@ -811,13 +811,12 @@ public class KeYProgModelInfo{
 	    KeYJavaType r = (KeYJavaType)mapping.toKeY(ct);
 	    if (r==null) {
 		System.out.println("Type "+ct.getFullName()+":"+name+" not found");
-	    } else {
+	    } else if (!result.contains(r)){
 		result = result.prepend(r);
 	    }
         }
 
         List<recoder.abstraction.ClassType> classes = si.getSubtypes(ct);
-
 
         //alpha sorting to make order deterministic
         recoder.abstraction.ClassType[] classesArray = 

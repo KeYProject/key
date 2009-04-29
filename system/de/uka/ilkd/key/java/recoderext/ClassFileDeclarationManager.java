@@ -27,6 +27,7 @@ import recoder.bytecode.ClassFile;
 import recoder.io.DataLocation;
 import recoder.java.CompilationUnit;
 import recoder.java.JavaProgramFactory;
+import recoder.service.KeYCrossReferenceSourceInfo;
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.util.DirectoryFileCollection;
 import de.uka.ilkd.key.util.FileCollection;

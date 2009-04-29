@@ -10,6 +10,8 @@
 
 package de.uka.ilkd.key.smt;
 
+import java.io.IOException;
+
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Constraint;
@@ -46,22 +48,35 @@ public class SMTRule implements BuiltInRule {
 
     public boolean isApplicable(Goal goal, PosInOccurrence pio,
 	    Constraint userConstraint) {
-
 	//only make applicable, if the complete goal should be proved
-	if (pio == null) {
-	    return true;
-	} else {
-	    return false;
-	}
+	return pio == null;
     }
 
     public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
-
-	SMTSolverResult result = this.solver.run(goal, ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getTimeout(), services);
+	int timeout = ProofSettings.DEFAULT_SETTINGS
+	                           .getDecisionProcedureSettings()
+	                           .getTimeout();
+	
+	SMTSolverResult result = SMTSolverResult.NO_IDEA;	
+	try {
+	    result = this.solver.run(goal, timeout, services);
+	} catch (IOException ioe) {	    	    
+	    if (services.getExceptionHandler() != null) {
+		services.getExceptionHandler().reportException(ioe);
+	    } else {
+		RuntimeException re = new RuntimeException(ioe.getMessage());
+		re.initCause(ioe);
+		throw re;
+	    }	    
+	}
 	if (result.isValid() == SMTSolverResult.ThreeValuedTruth.TRUE) {
 	    return SLListOfGoal.EMPTY_LIST;
 	} else {
-	    return SLListOfGoal.EMPTY_LIST.append(goal);
+	    return null;
 	}
+    }
+    
+    public String toString() {
+	return name().toString();
     }
 }

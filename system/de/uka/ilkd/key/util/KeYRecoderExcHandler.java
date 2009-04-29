@@ -11,12 +11,7 @@
 package de.uka.ilkd.key.util;
 
 
-import java.util.*;
-
-import recoder.java.ProgramElement;
-import recoder.java.expression.operator.New;
-import recoder.java.reference.TypeReference;
-import recoder.service.UnresolvedReferenceException;
+import java.util.EventObject;
 
 
 public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl implements recoder.service.ErrorHandler{

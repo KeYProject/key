@@ -6,11 +6,11 @@ import java.util.HashMap;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
- * The SortHirarchy works as a wrapper class fot sorts.
+ * The SortHierarchy works as a wrapper class for sorts.
  * @author Simon Greiner
  *
  */
-public class SortHirarchy {
+public class SortHierarchy {
 
     private HashMap<Sort, StringBuffer> sortMap;
 
@@ -19,12 +19,11 @@ public class SortHirarchy {
     private HashMap<Sort, ArrayList<Sort>> directSuperSortList;
 
     /**
-     * Create a Sort Hirarchy.
-     * @sortnames A hashmap of sorts mapped to the Strings which
+     * Create a Sort Hierarchy.
+     * @param sortnames a HashMap of sorts mapped to the Strings which
      *      is displayed in Formulas
-     *
      */
-    protected SortHirarchy(HashMap<Sort, StringBuffer> sortnames,
+    protected SortHierarchy(HashMap<Sort, StringBuffer> sortnames,
 	    HashMap<Sort, StringBuffer> prednames) {
 	this.sortMap = sortnames;
 	this.predicateMap = prednames;
@@ -118,11 +117,11 @@ public class SortHirarchy {
      */
     protected HashMap<StringBuffer, ArrayList<StringBuffer>> getDirectSuperSortNames() {
 
-	HashMap<Sort, ArrayList<Sort>> hirarchy = this.getDirectSuperSorts();
+	HashMap<Sort, ArrayList<Sort>> hierarchy = this.getDirectSuperSorts();
 
 	HashMap<StringBuffer, ArrayList<StringBuffer>> toReturn = new HashMap<StringBuffer, ArrayList<StringBuffer>>();
-	for (Sort s : hirarchy.keySet()) {
-	    ArrayList<Sort> extended = hirarchy.get(s);
+	for (Sort s : hierarchy.keySet()) {
+	    ArrayList<Sort> extended = hierarchy.get(s);
 	    ArrayList<StringBuffer> supersorts = new ArrayList<StringBuffer>();
 	    for (Sort t : extended) {
 		supersorts.add(sortMap.get(t));
@@ -138,11 +137,11 @@ public class SortHirarchy {
      */
     protected HashMap<StringBuffer, ArrayList<StringBuffer>> getDirectSuperSortPredicate() {
 
-	HashMap<Sort, ArrayList<Sort>> hirarchy = this.getDirectSuperSorts();
+	HashMap<Sort, ArrayList<Sort>> hierarchy = this.getDirectSuperSorts();
 
 	HashMap<StringBuffer, ArrayList<StringBuffer>> toReturn = new HashMap<StringBuffer, ArrayList<StringBuffer>>();
-	for (Sort s : hirarchy.keySet()) {
-	    ArrayList<Sort> extended = hirarchy.get(s);
+	for (Sort s : hierarchy.keySet()) {
+	    ArrayList<Sort> extended = hierarchy.get(s);
 	    ArrayList<StringBuffer> supersorts = new ArrayList<StringBuffer>();
 	    for (Sort t : extended) {
 		supersorts.add(predicateMap.get(t));

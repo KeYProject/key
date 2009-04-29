@@ -15,6 +15,9 @@ import java.util.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.RewriteTaclet;
+import de.uka.ilkd.key.rule.RewriteTacletBuilder;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.java.Services;
 
@@ -83,6 +86,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     // used type predicates for constant values, e.g. 1, 2, ...
     private HashMap<Term, StringBuffer> constantTypePreds = new HashMap<Term, StringBuffer>();
 
+
+    /** map used for storing predicates representing modalities or updates */
+    private HashMap<Term, Function> modalityPredicates = new HashMap<Term, Function>();
+    
     private StringBuffer nullString = new StringBuffer();
 
     private boolean nullUsed = false;
@@ -147,9 +154,11 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	
 	hb = this.translateLogicalImply(ante, succ);
 
-	return buildCompleteText(hb, assumptions, this.buildTranslatedFuncDecls(), this
-		.buildTranslatedPredDecls(), this.buildTranslatedSorts(), this
-		.buildSortHirarchy());
+	StringBuffer s = buildCompleteText(hb, assumptions, this.buildTranslatedFuncDecls(), this
+		.buildTranslatedPredDecls(), this.buildTranslatedSorts(), this.buildSortHierarchy());
+	
+	return s;
+
     }
 
     
@@ -167,14 +176,14 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    //this means all predicates that are needed for functions to define
 	    //their result type, all predicates for constants (like number symbols)
 	    toReturn.addAll(this.getTypeDefinitions());
-	    // add the type hirarchy
+	    // add the type hierarchy
 	    //this means, add the typepredicates, that are needed to define
 	    //for every type, what type they are (direct) subtype of
-	    toReturn.addAll(this.getSortHirarchyPredicates());
+	    toReturn.addAll(this.getSortHierarchyPredicates());
 	    //add the formulas, that make sure, type correctness is kept, also
 	    //for interpreted functions
 	    toReturn.addAll(this.getSpecialSortPredicates(services));
-	    //add the assuptions created during translation
+	    //add the assumptions created during translation
 	    //for example while translating term if then else
 	    toReturn.addAll(this.assumptions);
 	}
@@ -261,29 +270,29 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    
 	    return buildCompleteText(form, this.getAssumptions(services), this.buildTranslatedFuncDecls(), this
 		    .buildTranslatedPredDecls(), this.buildTranslatedSorts(), this
-		    .buildSortHirarchy());
+		    .buildSortHierarchy());
 	} catch (IllegalFormulaException e) {
 	    throw new IllegalArgumentException("Illegal formula. Can not be translated");
 	}
     }
     
     /**
-     * Build the sorthirarchy for the sorts
+     * Build the sorthierarchy for the sorts
      * If null was used, add typepredicates for all types.
      * 
-     * @return a sort hirarchy for the sorts
+     * @return a sort hierarchy for the sorts
      */
-    private SortHirarchy buildSortHirarchy() {
-	return new SortHirarchy(this.usedDisplaySort, this.typePredicates);
+    private SortHierarchy buildSortHierarchy() {
+	return new SortHierarchy(this.usedDisplaySort, this.typePredicates);
     }
 
     /**
-     * Get the expression for that defines the typepredicates for sort hirarchy.
+     * Get the expression for that defines the typepredicates for sort hierarchy.
      * Also the null type is added to the formula if used before.
      * @return The well defined formula.
      */
-    private ArrayList<StringBuffer> getSortHirarchyPredicates() {
-	SortHirarchy sh = this.buildSortHirarchy();
+    private ArrayList<StringBuffer> getSortHierarchyPredicates() {
+	SortHierarchy sh = this.buildSortHierarchy();
 	ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
 	
 	// add the typepredicates for functions.
@@ -457,7 +466,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		toReturn.add(element);
 	    }
 	}
-
+	
 	return toReturn;
     }
 
@@ -510,7 +519,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    ArrayList<StringBuffer> assumptions,
 	    ArrayList<ArrayList<StringBuffer>> functions,
 	    ArrayList<ArrayList<StringBuffer>> predicates,
-	    ArrayList<StringBuffer> types, SortHirarchy sortHirarchy);
+	    ArrayList<StringBuffer> types, SortHierarchy sortHierarchy);
 
    /* protected final StringBuffer translate(Semisequent ss, SMTTranslator.TERMPOSITION skolemization,
 	    Services services) throws IllegalFormulaException {
@@ -573,7 +582,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
     
     /**
-     * Returns, wheather the Structure, this translator creates should be a
+     * Returns, whether the Structure, this translator creates should be a
      * Structure, that is multi sorted with inheritance of Sorts. If false, a
      * single sorted structure is created.
      * 
@@ -1068,6 +1077,14 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars, services);
 	    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars, services);
 	    return this.translateObjectEqual(arg1, arg2);
+	} else if (op instanceof Modality) {
+	    //op is a modality. So translate it as an uninterpreted predicate.
+	    //equal modalities are translated with the same predicate
+	    return this.getModalityPredicate(term, quantifiedVars, services);
+	} else if (op instanceof QuanUpdateOperator) {
+	    //op is a update. So translate it as an uninterpreted predicate.
+	    //equal updates are translated with the same predicate.
+	    return this.getModalityPredicate(term, quantifiedVars, services);
 	} else if (op == Op.IF_THEN_ELSE) {
 	    if (term.sub(1).sort() == Sort.FORMULA) {
 		//a logical if then else was used
@@ -1318,10 +1335,123 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    return translateFunc(atop, subterms);
 	} else {
 	    //return translateUnknown(term);
+	    //System.out.println("Found term: " + term.getClass());
+	    //System.out.println("Found op: " + term.op().getClass());
 	    throw new IllegalFormulaException("unknown term found");
 	}
     }
+    
+    /**
+     * Get a predicate representing a modality. Make sure that equal modalities 
+     * return the same predicate.
+     * @param t The term representing the modality.
+     * @param quantifiedVars quantified variables.
+     * @param services the services object to use.
+     * @return a unique predicate representing a modality.
+     */
+    private StringBuffer getModalityPredicate(Term t, Vector<QuantifiableVariable> quantifiedVars,
+	    Services services) throws IllegalFormulaException{
+	//check, if the modality was already translated.
+	for (Term toMatch : modalityPredicates.keySet()) {
+	    //if (checkTermsEquality(t, toMatch, services)) {
+	    if (toMatch.equalsModRenaming(t)) {
+	    //if (checkTermsEquality(t, toMatch, services) && checkTermsEquality(toMatch, t, services)) {
+		//t and toMatch are equal, so return the predicate translated for toMatch
+		Function fun = modalityPredicates.get(toMatch);
+		TermFactory tf = new TermFactory();
+		//Build one term for each free variable in t
+		QuantifiableVariable[] args = t.freeVars().toArray();
+		Term[] subs = new Term[args.length];
+		for (int i = 0; i < args.length; i++) {
+		    QuantifiableVariable qv = args[i];
+		    if (qv instanceof LogicVariable) {
+			subs[i] = tf.createVariableTerm((LogicVariable)qv);
+		    } else {
+			logger.error("Schema variable found in formula.");
+		    }
+		}
+		
+		//Build the final predicate
+		Term temp = tf.createFunctionTerm(fun, subs);
+		StringBuffer s = this.translateTerm(temp, quantifiedVars, services);
+		
+		return s;
+	    }
+	}
 
+	//if the program comes here, term has to be translated.
+	
+	TermFactory tf = new TermFactory();
+
+	//Collect all free Variable in the term
+	QuantifiableVariable[] args = t.freeVars().toArray();
+	Term[] subs = new Term[args.length];
+	Sort[] argsorts = new Sort[args.length];
+	for (int i = 0; i < args.length; i++) {
+	    QuantifiableVariable qv = args[i];
+	    if (qv instanceof LogicVariable) {
+		LogicVariable lv = (LogicVariable)qv;
+		subs[i] = tf.createVariableTerm(lv);
+		argsorts[i] = lv.sort();
+	    } else {
+		logger.error("Schema variable found in formula.");
+	    }
+	}
+	//invent a new predicate
+	Function fun = new NonRigidFunction(new Name("modConst"), t.sort(), argsorts);
+	
+	//Build the final predicate
+	Term temp = tf.createFunctionTerm(fun, subs);
+	
+	//translate the predicate
+	StringBuffer cstr = this.translateTerm(temp, quantifiedVars, services);
+	    
+	modalityPredicates.put(t, fun);
+	    
+	return cstr;
+	
+    }
+
+    
+    /**
+     * This method returns true, if t1 and t2 are equal.
+     * CAUTION! Only tested for Box, Diamond and Update Formulas
+     * @param t1 the first term to check
+     * @param t2 the second term to check
+     * @param services
+     * @return true, if t1 and t2 are equal.
+     */
+    private boolean checkTermsEquality(Term t1, Term t2, Services services) {
+
+	//two terms are equal, if the RewriteTaclet says, they are.
+		
+	TermFactory tf = new TermFactory();
+	//create a template, to check against
+	SchemaVariable v = SchemaVariableFactory.createFormulaSV(new Name("phi"), true);
+	Term comparator = tf.createVariableTerm(v);
+	
+	//create a RewriteTaclet that is used for checking
+	RewriteTaclet rt;
+	RewriteTacletBuilder rtb = new RewriteTacletBuilder();
+	rtb.setFind(comparator);
+	rt = rtb.getRewriteTaclet();
+	
+	//match t1 against the template
+	//returns matchcondition needed for the check of t2
+	MatchConditions m = MatchConditions.EMPTY_MATCHCONDITIONS;
+	m = rt.matchFind(t1, m, services, Constraint.BOTTOM);
+	Term found = null;
+	
+	//match t2 against t1 (by using the created matchconditions)
+	MatchConditions res = rt.matchFind(t2, m, services, Constraint.BOTTOM);
+	
+	if (res != null) {
+	    return true;
+	} else {
+	    return false;
+	}
+    }
+    
     /**
      * Add an interpreted function to the set of special functions.
      * Caution: If added here, make sure to handle the function in 

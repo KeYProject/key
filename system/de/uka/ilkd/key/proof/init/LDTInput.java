@@ -9,8 +9,8 @@
 //
 package de.uka.ilkd.key.proof.init;
 
-import java.util.List;
 import java.io.File;
+import java.util.List;
 
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
@@ -18,16 +18,7 @@ import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.IteratorOfNamed;
 import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.ldt.BooleanLDT;
-import de.uka.ilkd.key.logic.ldt.ByteLDT;
-import de.uka.ilkd.key.logic.ldt.CharLDT;
-import de.uka.ilkd.key.logic.ldt.IntLDT;
-import de.uka.ilkd.key.logic.ldt.IntegerDomainLDT;
-import de.uka.ilkd.key.logic.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.ldt.ListOfLDT;
-import de.uka.ilkd.key.logic.ldt.LongLDT;
-import de.uka.ilkd.key.logic.ldt.SLListOfLDT;
-import de.uka.ilkd.key.logic.ldt.ShortLDT;
+import de.uka.ilkd.key.logic.ldt.*;
 
 
 /** Represents the LDT .key files as a whole. Special treatment of these
@@ -146,7 +137,9 @@ public class LDTInput implements EnvInput {
                         	.prepend(new CharLDT(sorts, functions))
                         	.prepend(new IntegerLDT(sorts, functions))
                         	.prepend(new IntegerDomainLDT(sorts, functions))
-                        	.prepend(new BooleanLDT(sorts, functions));
+                        	.prepend(new BooleanLDT(sorts, functions))
+                        	.prepend(new FloatLDT(sorts, functions))
+                        	.prepend(new DoubleLDT(sorts, functions));
         initConfig.getServices().getTypeConverter().init(ldts);
     }
   

@@ -9,8 +9,8 @@
 //
 
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import junit.framework.TestResult;
+import junit.framework.TestSuite;
 
 public class TestKey extends TestCase {
 
@@ -86,6 +86,7 @@ public class TestKey extends TestCase {
 	  de.uka.ilkd.key.smt.test.TestSimplify.class,
 	  de.uka.ilkd.key.smt.test.TestZ3.class,
 	  de.uka.ilkd.key.smt.test.TestYices.class,
+	  de.uka.ilkd.key.smt.test.TestCvc3.class,
 	  de.uka.ilkd.key.smt.test.TestExecutionWatchDog.class
       };
 

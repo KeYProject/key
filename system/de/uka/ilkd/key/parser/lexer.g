@@ -103,6 +103,9 @@ tokens {
 	IF   = "\\if";
 	THEN = "\\then";
 	ELSE = "\\else";
+    SUM  = "\\sum";
+  	BSUM  = "\\bSum";
+    PRODUCT  = "\\product";
 	
 
         // inclusion and stuff, things that (usually) come at the beginnig 
