@@ -337,6 +337,32 @@ options {
 				  term.javaBlock());
     }
 
+    private boolean isBoundedSum(Term a, LogicVariable lv){
+        return lowerBound(a,lv)!=null && upperBound(a,lv)!=null;
+    }
+    
+    private Term lowerBound(Term a, LogicVariable lv){
+        if(a.arity()>0 && a.sub(0).op()==Op.AND){
+            a=a.sub(0);
+        }
+        if(a.arity()==2 && a.op()==Op.AND && a.sub(0).arity()==2 && a.sub(0).sub(1).op()==lv
+                && a.sub(0).op().equals(services.getTypeConverter().getIntegerLDT().getLessOrEquals())){
+            return a.sub(0).sub(0);
+        }
+        return null;
+    }
+   
+    private Term upperBound(Term a, LogicVariable lv){
+        if(a.arity()>0 && a.sub(0).op()==Op.AND){
+            a=a.sub(0);
+        }   
+        if(a.arity()==2 && a.op()==Op.AND && a.sub(1).arity()==2 && a.sub(1).sub(0).op()==lv
+                && a.sub(1).op().equals(services.getTypeConverter().getIntegerLDT().getLessThan())){
+            return a.sub(1).sub(1);
+        }
+        return null;
+    }
+
 
     private String createSignatureString(ListOfTerm signature) {
 	if (signature == null || signature.isEmpty()) {
@@ -1942,13 +1968,35 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 //		services.getNamespaces().functions().addSafely(y);
 	    }
 	    else if (q.getText().equals("\\num_of")) {
+            LogicVariable lv = declVars.head();
+            p=p.sub(0);
+            if(p!=null && isBoundedSum(p, lv) && p.sub(0).op()!=Op.AND){
+                return TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(Op.BSUM, 
+                        lowerBound(p, lv), upperBound(p, lv), tb.ife(
+                                t, tb.zTerm(services, "1"), tb.zTerm(services, "0")),
+                                new ArrayOfQuantifiableVariable(lv));                          
+            }else{
+                raiseError("only \\num_of expressions of form (\\sum int i; l<=i && i<u; t) are permitted");
+            }
+
 		raiseNotSupported("\\num_of");
 	    }
 	    else if (q.getText().equals("\\product")) {
 		raiseNotSupported("\\product");
 	    }
 	    else if (q.getText().equals("\\sum")) {
-		raiseNotSupported("\\sum");
+            LogicVariable lv = declVars.head();
+            p=p.sub(0);
+            if(isBoundedSum(p, lv)){
+                if(p.arity()>0 && p.sub(0).op()==Op.AND){
+                    t = tb.ife(p.sub(1), t, tb.zTerm(services, "0"));
+                }
+                return TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(Op.BSUM, 
+                        lowerBound(p, lv), upperBound(p, lv), t, new ArrayOfQuantifiableVariable(lv));
+            }else{
+                raiseError("only \\sum expressions of form (\\sum int i; l<=i && i<u; t) are permitted");
+            }
+
 	    }
 	    else {
 		raiseError("Unknown quantifier: " + q.getText() + "!");
