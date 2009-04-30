@@ -22,7 +22,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.IteratorOfNode;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
 import de.uka.ilkd.key.rule.*;
@@ -1305,9 +1304,23 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
                 print("Occurrence in Schema Variable: " + occInSV.sv
                         + "   occ ", occInSV.occ);
                 if (occInSV.isJavaBlock) {
-                    result.set(occOfFind.ant, occOfFind.cfm, 
-                            getOccurrenceOfJavaBlock(findTerm, inst),
-                            getTermWithJavaBlock(findTerm, inst));                   
+		    // author: mbender
+		    // Bugfix implemented by Christoph Gladisch caused an
+		    // exception (Cannot cast JavaBlock to Term) if the proof
+		    // tree contained the application of the invariant rule
+                    
+		    // result.set(occOfFind.ant, occOfFind.cfm,
+		    // getOccurrenceOfJavaBlock(findTerm, inst),
+		    // getTermWithJavaBlock(findTerm, inst));
+
+		    // This looks like a solution for the above mentioned bug,
+		    // but due to the complexity code we are not
+		    // sure if findTerm really equals the javablock-term in all
+		    // cases
+                    
+		    result.set(occOfFind.ant, occOfFind.cfm,
+			    getOccurrenceOfJavaBlock(findTerm, inst),
+			    findTerm);
                     return true;
                 } else {
                     occOfSV = getOccurrenceOfSV(findTerm, occInSV.sv, inst);
