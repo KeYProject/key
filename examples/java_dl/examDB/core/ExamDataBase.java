@@ -110,7 +110,6 @@ public abstract class ExamDataBase {
       @ also public exceptional_behavior
       @  requires !(0<newThreshold && newThreshold<=newMaxPoints 
       @             && 0<newStep && newStep<=(newMaxPoints-newThreshold)/10);
-      @  assignable \nothing;
       @  signals_only ExamDataBaseException;
       @*/  
     public abstract void setExamParameters(int newThreshold, 
@@ -163,7 +162,6 @@ public abstract class ExamDataBase {
       @             && (\forall int i; 
       @                     0<=i && i<students.length && students[i]!=null;
       @                         students[i].matrNr!=matrNr));
-      @  assignable \nothing;
       @  signals_only ExamDataBaseException;
       @*/
     public abstract void addStudent(int matrNr, 
@@ -203,7 +201,6 @@ public abstract class ExamDataBase {
       @  requires !(\exists int i; 
       @                 0<=i && i<students.length && students[i]!=null;
       @                     students[i].matrNr==matrNr);
-      @  assignable \nothing;
       @  signals_only ExamDataBaseException;
       @*/
     public abstract void deleteStudent(int matrNr) throws ExamDataBaseException;
@@ -236,7 +233,6 @@ public abstract class ExamDataBase {
       @                  0<=i && i<students.length && students[i]!=null
       @                  && students[i].matrNr==matrNr)
       @             && -1<=points && points<=maxPoints);
-      @  assignable \nothing;
       @  signals_only ExamDataBaseException;
       @*/
     public abstract void setPoints(int matrNr, int points) 
@@ -268,7 +264,6 @@ public abstract class ExamDataBase {
       @                  0<=i && i<students.length && students[i]!=null
       @                  && students[i].matrNr==matrNr)
       @             && 0<=bonusPoints && bonusPoints<=maxPoints);
-      @  assignable \nothing;
       @  signals_only ExamDataBaseException;
       @*/
     public abstract void setBonusPoints(int matrNr, int bonusPoints)
@@ -297,7 +292,6 @@ public abstract class ExamDataBase {
       @  requires !(\exists int i; 
       @                 0<=i && i<students.length && students[i]!=null
       @                 && students[i].matrNr==matrNr);
-      @  assignable \nothing;
       @  signals_only ExamDataBaseException;
       @*/
     public abstract void setBackedOut(int matrNr, boolean backedOut) 
