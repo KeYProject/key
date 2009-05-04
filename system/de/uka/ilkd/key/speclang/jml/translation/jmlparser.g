@@ -1971,15 +1971,13 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
             LogicVariable lv = declVars.head();
             p=p.sub(0);
             if(p!=null && isBoundedSum(p, lv) && p.sub(0).op()!=Op.AND){
-                return TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(Op.BSUM, 
+                result = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(Op.BSUM, 
                         lowerBound(p, lv), upperBound(p, lv), tb.ife(
                                 t, tb.zTerm(services, "1"), tb.zTerm(services, "0")),
                                 new ArrayOfQuantifiableVariable(lv));                          
             }else{
                 raiseError("only \\num_of expressions of form (\\sum int i; l<=i && i<u; t) are permitted");
             }
-
-		raiseNotSupported("\\num_of");
 	    }
 	    else if (q.getText().equals("\\product")) {
 		raiseNotSupported("\\product");
@@ -1991,7 +1989,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
                 if(p.arity()>0 && p.sub(0).op()==Op.AND){
                     t = tb.ife(p.sub(1), t, tb.zTerm(services, "0"));
                 }
-                return TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(Op.BSUM, 
+                result = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(Op.BSUM, 
                         lowerBound(p, lv), upperBound(p, lv), t, new ArrayOfQuantifiableVariable(lv));
             }else{
                 raiseError("only \\sum expressions of form (\\sum int i; l<=i && i<u; t) are permitted");

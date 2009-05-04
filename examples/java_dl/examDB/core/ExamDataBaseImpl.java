@@ -314,8 +314,8 @@ public class ExamDataBaseImpl extends ExamDataBase {
           @                  0<=j && j<i; students[j]!=null 
           @                  && !students[j].backedOut?
           @                      pointsToGrade(students[j].points, 
-          @                                    students[j].bonusPoints) : 0)
-          @     && num==(\num_of int j;
+          @                                    students[j].bonusPoints) : 0) 
+	  @     && num==(\num_of int j;
           @                  0<=j && j<i; students[j]!=null
           @                  && !students[j].backedOut);
 	  @ assignable i, sum, num;

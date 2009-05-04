@@ -555,13 +555,13 @@ public abstract class ExamDataBase {
       @  requires consistent();
       @  ensures \result==(getNumParticipants()==0
       @                    ? -1
-      @                    : (\sum int i; 
+      @                    : ((\sum int i; 
       @                           0<=i && i<students.length; 
       @                           students[i]!=null 
       @                           && !students[i].backedOut?
       @                               pointsToGrade(students[i].points, 
       @                                             students[i].bonusPoints):0)
-      @                      /getNumParticipants());
+      @                      /getNumParticipants()));
       @ also public exceptional_behavior
       @  requires !consistent();
       @  signals_only ExamDataBaseException;
@@ -580,14 +580,14 @@ public abstract class ExamDataBase {
       @  requires consistent();
       @  ensures \result==(getNumParticipants()-getNumWithGrade(500)==0
       @                    ? -1
-      @                    : (\sum int i; 
+      @                    : ((\sum int i; 
       @                           0<=i && i<students.length; students[i]!=null 
       @                           && !students[i].backedOut
       @                           && pointsToGrade(students[i].points,
       @                                            students[i].bonusPoints)<500?
       @                               pointsToGrade(students[i].points, 
       @                                             students[i].bonusPoints):0)
-      @                      /(getNumParticipants()-getNumWithGrade(500)));
+      @                      /(getNumParticipants()-getNumWithGrade(500))));
       @ also public exceptional_behavior
       @  requires !consistent();
       @  signals_only ExamDataBaseException;

@@ -39,8 +39,7 @@ public class Examples{
     {
 	int s = 0;
 	int n = 0;
-	/*@ loop_invariant n>=0 && n<=a.length &&
-	  @    s ==(\bsum int i; 0; n; a[i]);
+	/*@ loop_invariant s ==(\bsum int i; 0; n; a[i]);
 	  @ assignable s, n;
 	  @ decreasing a.length-n;
 	  @*/
@@ -59,8 +58,7 @@ public class Examples{
     public static int sum1(int[] a)
     {
 	int s = 0, n=0;
-	/*@ loop_invariant n>=0 && n<=a.length &&
-	  @    s + (\bsum int i; n; a.length; a[i])==(\bsum int i; 0; a.length; a[i]);
+	/*@ loop_invariant s + (\bsum int i; n; a.length; a[i])==(\bsum int i; 0; a.length; a[i]);
 	  @ assignable s, n;
 	  @ decreasing a.length-n;
 	  @*/
@@ -79,8 +77,7 @@ public class Examples{
     public static int sum2(int[] a)
     {
 	int s = 0, n = a.length;
-	/*@ loop_invariant n>=0 && n<=a.length &&
-	  @    s==(\bsum int i; n; a.length; a[i]);
+	/*@ loop_invariant s==(\bsum int i; n; a.length; a[i]);
 	  @ assignable s, n;
 	  @ decreasing n;
 	  @*/
@@ -98,8 +95,7 @@ public class Examples{
     public static int sum3(int[] a)
     {
 	int s = 0, n = a.length;
-	/*@ loop_invariant n>=0 && n<=a.length &&
-	  @    s + (\bsum int i; 0; n; a[i])==(\bsum int i; 0; a.length; a[i]);
+	/*@ loop_invariant s + (\bsum int i; 0; n; a[i])==(\bsum int i; 0; a.length; a[i]);
 	  @ assignable s, n;
 	  @ decreasing n;
 	  @*/

@@ -600,6 +600,7 @@ public class JMLSpecFactory {
             }
             invariant = TB.and(invariant, TB.inReachableState(services));
         }
+
         
         //translate skolem declarations
         ListOfParsableVariable freeVars = SLListOfParsableVariable.EMPTY_LIST;
