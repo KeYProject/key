@@ -1,0 +1,97 @@
+\settings {
+"#Proof-Settings-Config-File
+#Tue Apr 28 11:42:05 CEST 2009
+[General]SoundNotification=false
+[View]FontIndex=2
+[StrategyProperty]GOALCHOOSER_OPTIONS_KEY=GOALCHOOSER_DEFAULT
+[General]UseOCL=false
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_EXPAND
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_HIGH
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_HIGH
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_LOW
+[SimultaneousUpdateSimplifier]DeleteEffectLessLocations=true
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
+[DecisionProcedure]Timeout=60
+[View]ShowWholeTaclet=false
+[General]ProofAssistant=false
+[View]MaxTooltipLines=40
+[General]DnDDirectionSensitive=true
+[SimultaneousUpdateSimplifier]EagerSimplification=true
+[General]StupidMode=true
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=4000
+[Libraries]Default=acc.key-false, stringRules.key-false, /Users/geilmann/.key/libraries/deprecatedRules.key-false, /Users/geilmann/.key/libraries/acc.key-false, /Users/geilmann/.key/libraries/stringRules.key-false, deprecatedRules.key-false, /Users/geilmann/./Documents/Studienarbeit/CharList/stringsTheory.key-false
+[StrategyProperty]QUERY_OPTIONS_KEY=QUERY_NONE
+[Choice]DefaultChoices=transactions-transactions\:transactionsOn , throughout-throughout\:toutOn , assertions-assertions\:on , programRules-programRules\:Java , intRules-intRules\:arithmeticSemanticsIgnoringOF , initialisation-initialisation\:disableStaticInitialisation , transactionAbort-transactionAbort\:abortOn , nullPointerPolicy-nullPointerPolicy\:nullCheck , javacard-javacard\:jcOff
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[DecisionProcedure]ActiveRule=_noname_
+[General]UseJML=false
+[View]HideClosedSubtrees=false
+[Choice]Choices=transactions-transactions\:transactionsOn-transactions\:transactionsOff , throughout-throughout\:toutOn-throughout\:toutOff , assertions-assertions\:on-assertions\:off-assertions\:safe , programRules-programRules\:Java-programRules\:ODL , intRules-intRules\:javaSemantics-intRules\:arithmeticSemanticsIgnoringOF-intRules\:arithmeticSemanticsCheckingOF , initialisation-initialisation\:enableStaticInitialisation-initialisation\:disableStaticInitialisation , transactionAbort-transactionAbort\:abortOn-transactionAbort\:abortOff , nullPointerPolicy-nullPointerPolicy\:noNullCheck-nullPointerPolicy\:nullCheck , javacard-javacard\:jcOff-javacard\:jcOn
+[View]HideIntermediateProofsteps=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+"
+}
+
+
+\functions {
+\nonRigid CharList l2_32;
+\nonRigid CharList l1_33;
+\nonRigid CharList l1_6;
+\nonRigid CharList l2_7;
+}
+
+\problem {
+   !(concat(l1_33, l2_32) = l2_32 <-> false)
+-> l1_33 = empty
+
+}
+
+\proof {
+(keyLog "0" (keyUser "geilmann" ) (keyVersion "49e89255011484213292e3567319499e39f7e82a"))
+
+(autoModeTime "235")
+
+(branch "dummy ID"
+(rule "impRight" (formula "1") (userinteraction))
+(rule "notLeft" (formula "1") (userinteraction))
+(rule "concrete_eq_4" (formula "1"))
+(rule "notRight" (formula "1"))
+(rule "lemma_lengthNEq" (inst "l2=l2_32") (inst "l1=concat(l1_33, l2_32)") (userinteraction))
+(rule "impLeft" (formula "1") (userinteraction))
+(branch " Case 1"
+   (rule "notRight" (formula "2") (userinteraction))
+   (rule "lemma_lengthConcat" (formula "1") (term "0") (userinteraction))
+   (rule "polySimp_homoEq" (formula "1"))
+   (rule "polySimp_mulComm0" (formula "1") (term "1,0"))
+   (rule "polySimp_rightDist" (formula "1") (term "1,0"))
+   (rule "polySimp_mulComm0" (formula "1") (term "0,1,0"))
+   (rule "polySimp_addAssoc" (formula "1") (term "0"))
+   (rule "polySimp_addComm0" (formula "1") (term "0,0"))
+   (rule "polySimp_pullOutFactor1b" (formula "1") (term "0"))
+   (rule "add_literals" (formula "1") (term "1,1,0"))
+   (rule "times_zero_1" (formula "1") (term "1,0"))
+   (rule "add_zero_right" (formula "1") (term "0"))
+   (rule "polySimp_invertEq" (formula "1"))
+   (rule "polySimp_mulLiterals" (formula "1") (term "0"))
+   (rule "times_zero_2" (formula "1") (term "1"))
+   (rule "polySimp_elimOne" (formula "1") (term "0"))
+   (rule "lemma_length0" (inst "l=l1_33") (userinteraction))
+   (rule "impLeft" (formula "1") (userinteraction))
+   (branch " Case 1"
+      (rule "closeAntec" (formula "1") (ifseqformula "3") (userinteraction))
+   )
+   (branch " Case 2"
+      (rule "closeAntec" (formula "1") (ifseqformula "4") (userinteraction))
+   )
+)
+(branch " Case 2"
+   (rule "notLeft" (formula "1") (userinteraction))
+   (rule "close" (formula "2") (ifseqformula "1") (userinteraction))
+)
+)
+
+}
