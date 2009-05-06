@@ -1314,29 +1314,70 @@ public class LogicPrinter {
         startTerm ( t.arity () );
         for ( int i = 0; i < op.locationCount (); i++ ) {
             final Operator loc = op.location ( i );
-
-            layouter.beginC(0);
-            printUpdateQuantification ( t, op, i );
-
-            final String[] separator = setupUpdateSeparators ( loc,
-                                                               op.location(t, i));
-            for ( int j = loc.arity (); j >= 1; j-- ) {
-                final Term sub = t.sub ( op.valuePos ( i ) - j );
-
-                if (loc instanceof ShadowedOperator && j == 1) {
-                    printTransactionNumber(sub);
-                } else {
-                    markStartSub ();
-                    printTerm ( sub );
-                    markEndSub ();
-                    layouter.print ( separator[loc.arity () - j] );
-                }
+            
+            //XXX
+            Function heap = services.getJavaInfo().getHeap();
+            Function store = services.getJavaInfo().getStore();
+            Term nestedHeapTerm;
+            ListOfTerm nestedHeapTerms = SLListOfTerm.EMPTY_LIST;
+            for(nestedHeapTerm = op.value(t, i);
+                nestedHeapTerm.op() == store;
+        	nestedHeapTerm = nestedHeapTerm.sub(0)) {
+        	nestedHeapTerms = nestedHeapTerms.prepend(nestedHeapTerm);
             }
-            layouter.print ( asgn ).brk(0,0);
-            layouter.end();
-            maybeParens ( op.value ( t, i ), ass2 );
-            if ( i < op.locationCount () - 1 ) {
-                layouter.print ( " ||" ).brk ( 1, 0 );
+            if(PresentationFeatures.ENABLED
+               && loc == heap 
+       	       && op.value(t,i).op() == store
+       	       && nestedHeapTerm.op() == heap) {
+        	final boolean origPure = pure;
+        	pure = true;
+        	
+        	for(IteratorOfTerm it = nestedHeapTerms.iterator(); it.hasNext();) {
+        	    nestedHeapTerm = it.next();
+        	    
+                    printTerm(nestedHeapTerm.sub(1));
+                    
+                    layouter.print(".");
+                    
+                    printTerm(nestedHeapTerm.sub(2));
+                    
+                    layouter.print ( asgn ).brk(0,0);
+                    
+                    maybeParens ( nestedHeapTerm.sub(3), ass2 );
+                    
+                    if(it.hasNext()) {
+                	layouter.print ( " ||" ).brk ( 1, 0 );
+        	    }
+        	}   
+        	pure = origPure;
+        	markStartSub();
+        	markEndSub();
+            }
+
+            else {
+                layouter.beginC(0);
+                printUpdateQuantification ( t, op, i );
+    
+                final String[] separator = setupUpdateSeparators ( loc,
+                                                                   op.location(t, i));
+                for ( int j = loc.arity (); j >= 1; j-- ) {
+                    final Term sub = t.sub ( op.valuePos ( i ) - j );
+    
+                    if (loc instanceof ShadowedOperator && j == 1) {
+                        printTransactionNumber(sub);
+                    } else {
+                        markStartSub ();
+                        printTerm ( sub );
+                        markEndSub ();
+                        layouter.print ( separator[loc.arity () - j] );
+                    }
+                }
+                layouter.print ( asgn ).brk(0,0);
+                layouter.end();
+                maybeParens ( op.value ( t, i ), ass2 );
+                if ( i < op.locationCount () - 1 ) {
+                    layouter.print ( " ||" ).brk ( 1, 0 );
+                }
             }
         }
 
