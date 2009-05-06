@@ -379,21 +379,28 @@ public class ExplicitHeapConverter {
                 	    		convert(locTerm.sub(0), services), 
                 	    		TB.func(fieldSymbol));
                 } else {
-                    return TB.allFields(services, 
-                	    		convert(locTerm.sub(0), services));
+                    assert false; //not implemented
+                    return null;
                 }
             } else if(locTerm.op() instanceof ArrayOp) {
-                Function arrayFieldSymbol 
-                    = services.getJavaInfo().getArrayField();
-                
                 if(locTerm.freeVars().isEmpty()) {
                     return TB.singleton(services, 
                 	    		convert(locTerm.sub(0), services), 
                 	    		TB.func(services.getJavaInfo().getArrayField(),
                 	    			convert(locTerm.sub(1), services)));
+                } else if(locTerm.sub(0).freeVars().isEmpty()){
+                    Term arrTerm = convert(locTerm.sub(0), services);
+                    Term arrLengthTerm 
+                    	= TB.func(getFieldSymbol(services.getJavaInfo()
+                    		                         .getArrayLength(), 
+                    		  services));
+                    return TB.setMinus(services, 
+                	               TB.allFields(services, arrTerm),
+                	    	       TB.singleton(services, arrTerm, arrLengthTerm));
+                	    		          
                 } else {
-                    return TB.allFields(services, 
-                	    		convert(locTerm.sub(0), services));
+                    assert false; //not implemented
+                    return null;
                 }
             } else {
                 assert locTerm.op() instanceof ProgramVariable;

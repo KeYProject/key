@@ -85,13 +85,12 @@ class MyClass {
     
     
     
-        /*@
-      @ protected normal_behavior
+    /*@ normal_behavior
       @  ensures attr == \old(attr) + 1;
       @  diverges true;
       @  assignable contents, attr;
       @*/
-    protected void incSize(int[] contents) {
+    void incSize(int[] contents) {
         ++attr;
         contents = new int[33];
         int i = 0;

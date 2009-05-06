@@ -187,10 +187,12 @@ public final class WhileInvariantRule implements BuiltInRule {
         
         final Term heapAtPreTerm
                 = TB.func(APF.createAtPreFunction(heapTerm.op(), services));
+        services.getNamespaces().functions().add(heapAtPreTerm.op());
         final Function fakeModFunction 
         	= new RigidFunction(new Name("modSet"), modSet.sort(), new Sort[0]);
         final Term modSetAtPre
         	= TB.func(APF.createAtPreFunction(fakeModFunction, services));
+        services.getNamespaces().functions().add(modSetAtPre.op());
         final Term heapAtPreDef = TB.and(TB.equals(heapTerm, heapAtPreTerm),
         				 TB.equals(modSet, modSetAtPre));
         final Term heapFrameCondition 
