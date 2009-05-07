@@ -1316,8 +1316,8 @@ public class LogicPrinter {
             final Operator loc = op.location ( i );
             
             //XXX
-            Function heap = services.getJavaInfo().getHeap();
-            Function store = services.getJavaInfo().getStore();
+            Function heap = services == null ? null : services.getJavaInfo().getHeap();
+            Function store = services == null ? null : services.getJavaInfo().getStore();
             Term nestedHeapTerm;
             ListOfTerm nestedHeapTerms = SLListOfTerm.EMPTY_LIST;
             for(nestedHeapTerm = op.value(t, i);
@@ -1326,6 +1326,7 @@ public class LogicPrinter {
         	nestedHeapTerms = nestedHeapTerms.prepend(nestedHeapTerm);
             }
             if(PresentationFeatures.ENABLED
+               && services != null 
                && loc == heap 
        	       && op.value(t,i).op() == store
        	       && nestedHeapTerm.op() == heap) {

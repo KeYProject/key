@@ -72,11 +72,15 @@ public class ArrayStoreStaticAnalyse extends AbstractMetaOperator {
         while (elementDynamicTypesIt.hasNext()) {
             final IteratorOfKeYJavaType arrayElementDynamicTypesIt = 
                 arrayElementDynamicTypes.iterator();
-            final Sort dynamicElementSort = elementDynamicTypesIt.next().getSort();
+            final KeYJavaType kjt = elementDynamicTypesIt.next();
+            if(kjt == null) continue;
+            final Sort dynamicElementSort = kjt.getSort();
             boolean extTrans = false;           
             while (arrayElementDynamicTypesIt.hasNext()) {
+        	final KeYJavaType kjt2 = arrayElementDynamicTypesIt.next();
+        	if(kjt2 == null) continue;
                 final Sort arrayElementDynamicSort = 
-                    arrayElementDynamicTypesIt.next().getSort();
+                    kjt2.getSort();
                 extTrans = dynamicElementSort.extendsTrans(arrayElementDynamicSort);                
 
                 if (assignmentCompatibleSet && extTrans != assignmentCompatible) {
