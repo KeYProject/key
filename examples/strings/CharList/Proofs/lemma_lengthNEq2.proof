@@ -1,6 +1,6 @@
 \settings {
 "#Proof-Settings-Config-File
-#Wed May 06 12:34:07 CEST 2009
+#Wed May 06 12:31:25 CEST 2009
 [General]SoundNotification=false
 [View]FontIndex=2
 [StrategyProperty]GOALCHOOSER_OPTIONS_KEY=GOALCHOOSER_DEFAULT
@@ -43,7 +43,6 @@
 \nonRigid CharList l1_63;
 \nonRigid CharList l1_37;
 \nonRigid int i_10;
-\nonRigid CharList l_88;
 \nonRigid jchar c_7;
 \nonRigid int k_9;
 \nonRigid int j_11;
@@ -51,72 +50,22 @@
 }
 
 \problem {
-!l_88 = empty -> !length(l_88) = 0
+!length(l1_63) = length(l2_62) -> !l1_63 = l2_62
 
 }
 
 \proof {
 (keyLog "0" (keyUser "geilmann" ) (keyVersion "49e89255011484213292e3567319499e39f7e82a"))
 
-(autoModeTime "489")
+(autoModeTime "0")
 
 (branch "dummy ID"
 (rule "impRight" (formula "1") (userinteraction))
 (rule "notLeft" (formula "1") (userinteraction))
 (rule "notRight" (formula "2") (userinteraction))
-(rule "cl_induct" (inst "phi=length(l) = 0 -> l = empty") (inst "lv=l") (inst "cv=c") (userinteraction))
-(branch " Base Case"
-   (rule "impRight" (formula "2") (userinteraction))
-   (rule "eqClose" (formula "3") (userinteraction))
-   (rule "closeTrue" (formula "3") (userinteraction))
-)
-(branch " Step Case"
-   (rule "allRight" (formula "2") (inst "sk=l_0") (userinteraction))
-   (rule "allRight" (formula "2") (inst "sk=c_0") (userinteraction))
-   (rule "impRight" (formula "2") (userinteraction))
-   (rule "impRight" (formula "3") (userinteraction))
-   (rule "andLeft" (formula "2") (userinteraction))
-   (rule "impLeft" (formula "3") (userinteraction))
-   (branch " Case 1"
-      (rule "cl_equalFalse2" (formula "5") (userinteraction))
-      (rule "false_right" (formula "5") (userinteraction))
-      (rule "cl_lengthCons" (formula "1") (term "0") (userinteraction))
-      (rule "lemma_lengthGEq0" (inst "l=l_0") (userinteraction))
-      (rule "inChar" (formula "3"))
-      (rule "true_left" (formula "3"))
-      (rule "polySimp_addComm0" (formula "2") (term "0"))
-      (rule "polySimp_sepPosMonomial" (formula "2"))
-      (rule "mul_literals" (formula "2") (term "1"))
-      (rule "applyEqRigid" (formula "1") (term "0") (ifseqformula "2"))
-      (rule "qeq_literals" (formula "1"))
-      (rule "closeFalse" (formula "1"))
-   )
-   (branch " Case 2"
-      (rule "cl_lengthCons" (formula "1") (term "0") (userinteraction))
-      (rule "lemma_lengthGEq0" (inst "l=l_0") (userinteraction))
-      (rule "inChar" (formula "3"))
-      (rule "true_left" (formula "3"))
-      (rule "polySimp_addComm0" (formula "2") (term "0"))
-      (rule "applyEqRigid" (formula "1") (term "0,0") (ifseqformula "3"))
-      (rule "applyEq" (formula "5") (term "1,0") (ifseqformula "3"))
-      (rule "applyEqRigid" (formula "2") (term "0,1,0") (ifseqformula "3"))
-      (rule "polySimp_sepPosMonomial" (formula "2"))
-      (rule "mul_literals" (formula "2") (term "1"))
-      (rule "applyEq" (formula "1") (term "0") (ifseqformula "2"))
-      (rule "qeq_literals" (formula "1"))
-      (rule "closeFalse" (formula "1"))
-   )
-)
-(branch " Use Case"
-   (rule "instAll" (formula "2") (term "0,0") (ifseqformula "1") (userinteraction))
-   (rule "impLeft" (formula "2") (userinteraction))
-   (branch " Case 1"
-      (rule "close" (formula "3") (ifseqformula "2") (userinteraction))
-   )
-   (branch " Case 2"
-      (rule "closeAntec" (formula "2") (ifseqformula "4") (userinteraction))
-   )
-)
+(rule "applyEq" (formula "2") (term "0,0") (ifseqformula "1") (userinteraction))
+(rule "eqClose" (formula "2") (userinteraction))
+(rule "closeTrue" (formula "2") (userinteraction))
 )
 
 }
