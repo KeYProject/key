@@ -381,63 +381,50 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	return toReturn;
     }
     
+    private StringBuffer removeIllegalChars(StringBuffer template, ArrayList<String> toReplace, ArrayList<String> replacement) {
+//	replace one String
+	for (int i = 0; i < toReplace.size(); i++) {
+	    String toRep = toReplace.get(i);
+	    String replace = replacement.get(i);
+	    int index = template.indexOf(toRep);
+	    while (index >= 0) {
+		template.replace(index, index + toRep.length(), replace);
+		index = template.indexOf(toRep);
+	    }
+	}
+	
+	return template;
+    }
+    
     private StringBuffer makeUnique(StringBuffer name) {
 	StringBuffer toReturn = new StringBuffer(name);
-	int index;
-	// replace array brackets
-	index = toReturn.indexOf("[]");
-	if (index >= 0) {
-	    toReturn.replace(index, index + 2, "_Array");
-	} else {
-	    index = -1;
-	}
 	
-	//replace angular brackets
-	index = toReturn.indexOf("<");
-	if (index >= 0) {
-	    toReturn.replace(index, index + 1, "_abo_");
-	} else {
-	    index = -1;
-	}
+	//build the replacement pairs
+	ArrayList<String> toReplace = new ArrayList<String>();
+	ArrayList<String> replacement = new ArrayList<String>();
 	
-//	replace angular brackets
-	index = toReturn.indexOf(">");
-	if (index >= 0) {
-	    toReturn.replace(index, index + 1, "_abc_");
-	} else {
-	    index = -1;
-	}
+	toReplace.add("[]");
+	replacement.add("_Array");
 	
-//	replace curly brackets
-	index = toReturn.indexOf("{");
-	if (index >= 0) {
-	    toReturn.replace(index, index + 1, "_cbo_");
-	} else {
-	    index = -1;
-	}
+	toReplace.add("<");
+	replacement.add("_abo_");
 	
-//	replace curly brackets
-	index = toReturn.indexOf("}");
-	if (index >= 0) {
-	    toReturn.replace(index, index + 1, "_cbc_");
-	} else {
-	    index = -1;
-	}
-
-	// replace dots brackets
-	index = toReturn.indexOf(".");
-	if (index >= 0) {
-	    toReturn.replace(index, index + 1, "_dot_");
-	} else {
-	    index = -1;
-	}
+	toReplace.add(">");
+	replacement.add("_abc_");
 	
-	//replace colons
-	index = toReturn.indexOf(":");
-	while (index >= 0) {
-	    toReturn.replace(index, index + 1, "_");
-	    index = toReturn.indexOf(":");
-	}
+	toReplace.add("{");
+	replacement.add("_cbo_");
+	
+	toReplace.add("}");
+	replacement.add("_cbc_");
+	
+	toReplace.add(".");
+	replacement.add("_dot_");
+	
+	toReplace.add(":");
+	replacement.add("_col_");
+	
+	toReturn = this.removeIllegalChars(toReturn, toReplace, replacement);
 	
 	toReturn.append("_").append(counter);
 	counter++;
