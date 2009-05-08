@@ -88,7 +88,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
 
     /** map used for storing predicates representing modalities or updates */
-    private HashMap<Term, Function> modalityPredicates = new HashMap<Term, Function>();
+    private HashMap<Term, StringBuffer> modalityPredicates = new HashMap<Term, StringBuffer>();
     
     private StringBuffer nullString = new StringBuffer();
 
@@ -1357,25 +1357,25 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    if (toMatch.equalsModRenaming(t)) {
 	    //if (checkTermsEquality(t, toMatch, services) && checkTermsEquality(toMatch, t, services)) {
 		//t and toMatch are equal, so return the predicate translated for toMatch
-		Function fun = modalityPredicates.get(toMatch);
-		TermFactory tf = new TermFactory();
+//		Function fun = modalityPredicates.get(toMatch);
+//		TermFactory tf = new TermFactory();
 		//Build one term for each free variable in t
-		QuantifiableVariable[] args = t.freeVars().toArray();
-		Term[] subs = new Term[args.length];
-		for (int i = 0; i < args.length; i++) {
-		    QuantifiableVariable qv = args[i];
-		    if (qv instanceof LogicVariable) {
-			subs[i] = tf.createVariableTerm((LogicVariable)qv);
-		    } else {
-			logger.error("Schema variable found in formula.");
-		    }
-		}
+//		QuantifiableVariable[] args = t.freeVars().toArray();
+//		Term[] subs = new Term[args.length];
+//		for (int i = 0; i < args.length; i++) {
+//		    QuantifiableVariable qv = args[i];
+//		    if (qv instanceof LogicVariable) {
+//			subs[i] = tf.createVariableTerm((LogicVariable)qv);
+//		    } else {
+//			logger.error("Schema variable found in formula.");
+//		    }
+//		}
 		
 		//Build the final predicate
-		Term temp = tf.createFunctionTerm(fun, subs);
-		StringBuffer s = this.translateTerm(temp, quantifiedVars, services);
+//		Term temp = tf.createFunctionTerm(fun, subs);
+//		StringBuffer s = this.translateTerm(temp, quantifiedVars, services);
 		
-		return s;
+		return modalityPredicates.get(toMatch);
 	    }
 	}
 
@@ -1406,7 +1406,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	//translate the predicate
 	StringBuffer cstr = this.translateTerm(temp, quantifiedVars, services);
 	    
-	modalityPredicates.put(t, fun);
+	modalityPredicates.put(t, cstr);
 	    
 	return cstr;
 	

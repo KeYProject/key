@@ -469,8 +469,40 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	} else {
 	    index = -1;
 	}
+	
+//	replace angular brackets
+	index = toReturn.indexOf("<");
+	if (index >= 0) {
+	    toReturn.replace(index, index + 1, "_abo_");
+	} else {
+	    index = -1;
+	}
+	
+//	replace angular brackets
+	index = toReturn.indexOf(">");
+	if (index >= 0) {
+	    toReturn.replace(index, index + 1, "_abc_");
+	} else {
+	    index = -1;
+	}
+	
+//	replace curly brackets
+	index = toReturn.indexOf("{");
+	if (index >= 0) {
+	    toReturn.replace(index, index + 1, "_cbo_");
+	} else {
+	    index = -1;
+	}
+	
+//	replace curly brackets
+	index = toReturn.indexOf("}");
+	if (index >= 0) {
+	    toReturn.replace(index, index + 1, "_cbc_");
+	} else {
+	    index = -1;
+	}
 
-	// replace dots brackets
+	// replace dots
 	index = toReturn.indexOf(".");
 	if (index >= 0) {
 	    toReturn.replace(index, index + 1, "_dot_");
