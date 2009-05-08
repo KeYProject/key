@@ -211,7 +211,7 @@ public final class OperationContractImpl implements OperationContract {
 	    while(it1.hasNext()) {
 		ParsableVariable originalParamVar = it1.next();
 		ParsableVariable paramVar         = it2.next();
-		assert originalParamVar.sort().equals(paramVar.sort());
+		assert originalParamVar.sort().equals(paramVar.sort()) : originalParamVar.sort() + " does not equal " + paramVar.sort();
 		result.put(originalParamVar, paramVar);
 	    }
 	}
