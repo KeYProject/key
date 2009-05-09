@@ -10,9 +10,12 @@
 
 package de.uka.ilkd.key.smt;
 
+import java.util.Vector;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 
 public interface SMTTranslator {
@@ -38,4 +41,12 @@ public interface SMTTranslator {
      */
     public StringBuffer translate(Term t, Services services) 
     		throws IllegalFormulaException;
+    
+    //TODO remove after testing!!
+    /**
+     * Caution! This Method is just for testing!! Do not use it, it might be removed very soon!!
+     */
+    public StringBuffer translateTerm (Term term, Vector<QuantifiableVariable> quantifiedVars,
+	    Services services) throws IllegalFormulaException;
+    
 }

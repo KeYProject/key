@@ -13,12 +13,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.Vector;
 
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.collection.SLListOfString;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.parser.simplify.SimplifyLexer;
 import de.uka.ilkd.key.parser.simplify.SimplifyParser;
 import de.uka.ilkd.key.proof.Node;
@@ -96,7 +98,7 @@ public class SimplifyModelGenerator implements DecProdModelGenerator{
 	try{
 	    while(it.hasNext()){
 		de.uka.ilkd.key.logic.Term t = it.next();
-		String s = st.translate(t, serv).toString();
+		String s = st.translateTerm(t, new Vector<QuantifiableVariable>(), serv).toString();
 		string2class.put(s, term2class.get(t));
 	    }
 	}catch(IllegalFormulaException e){
@@ -116,7 +118,7 @@ public class SimplifyModelGenerator implements DecProdModelGenerator{
 		    intClasses.add(ec);
 		    de.uka.ilkd.key.logic.Term loc = 
 			ec.getLocations().iterator().next();
-		    String eq = "(EQ "+ph+" "+st.translate(loc,serv)+")\n";
+		    String eq = "(EQ "+ph+" "+st.translateTerm(loc, new Vector<QuantifiableVariable>(),serv)+")\n";
 		    initialCounterExample = 
 			initialCounterExample.substring(0, index)+eq+
 			initialCounterExample.substring(index);

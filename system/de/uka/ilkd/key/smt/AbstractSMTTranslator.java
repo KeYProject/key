@@ -1040,6 +1040,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
     
     /**
+     * CAUTION: Do not use this method from outside this class!!
+     * It is public just for test reasons! It will be private very soon!
+     * 
      * Translates the given term into input syntax and adds the resulting
      * string to the StringBuffer sb.
      * 
@@ -1051,7 +1054,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      *                modulo terms, but must be looped through until we get
      *                there.
      */
-    private final StringBuffer translateTerm (Term term, Vector<QuantifiableVariable> quantifiedVars,
+//  TODO make private again after testing!!
+    public final StringBuffer translateTerm (Term term, Vector<QuantifiableVariable> quantifiedVars,
 	    Services services) throws IllegalFormulaException {
 	Operator op = term.op();
 	if (op == Op.NOT) {
