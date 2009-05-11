@@ -8,6 +8,8 @@
 package de.uka.ilkd.key.visualization;
 
 import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.expression.*;
+import de.uka.ilkd.key.java.expression.operator.TypeCast;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
@@ -66,7 +68,7 @@ public class ExecutionTraceModelForTesting extends ExecutionTraceModel {
 
     /**Used by getProgramMethods to compute the class of the receiver object of a method reference.
      * The method reference is passed as the first parameter. This code is copied and pasted
-     * from key.rule.metaconstruct.MethodCall */
+     * from key.rule.metaconstruct.MethodCall and extended.*/
     private KeYJavaType getStaticPrefixType(ReferencePrefix refPrefix,ExecutionContext execContext, Services services) {
         if (refPrefix==null || refPrefix instanceof ThisReference && 
                 ((ThisReference) refPrefix).getReferencePrefix()==null){ 
@@ -89,11 +91,23 @@ public class ExecutionTraceModelForTesting extends ExecutionTraceModel {
             KeYJavaType st = services.getJavaInfo().getSuperclass
                     (execContext.getTypeReference().getKeYJavaType());
             return st;  
+        } else if (refPrefix instanceof ParenthesizedExpression) {//chrisg: 12.5.2009
+            int c=((ParenthesizedExpression) refPrefix).getChildCount();
+            ProgramElement pe = ((ParenthesizedExpression) refPrefix).getChildAt(0);
+            if(pe instanceof TypeCast){
+        	return ((TypeCast)pe).getKeYJavaType( services,execContext);
+            }else if (pe instanceof ReferencePrefix){
+            	return getStaticPrefixType((ReferencePrefix)pe, execContext, services);
+            }else{
+                throw new de.uka.ilkd.key.util.NotSupported
+                ("Resolving ReferencePrefix failed for the expression"+refPrefix+" because case distinction is not implemented for the subexpression :\n"+
+                 pe+ "\n of Type:"+pe.getClass());
+            }
         } else {
             throw new de.uka.ilkd.key.util.NotSupported
-            ("Unsupported method invocation mode\n"+
-             refPrefix.getClass()+
-             "\n The execution context is:"+execContext);
+            ("Resolving ReferencePrefix failed because case distinction is not implemented for case:\n"+
+                    refPrefix.getClass()+
+                    "\n The execution context is:"+execContext);
         }               
     }
 
