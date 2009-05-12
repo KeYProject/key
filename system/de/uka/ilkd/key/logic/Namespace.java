@@ -244,8 +244,7 @@ public class Namespace implements java.io.Serializable {
 	//%%%%make more efficient!!!
 	IteratorOfNamed it=allElements().iterator();
 	while (it.hasNext()) {
-	    Named n = it.next();
-	    copy.add(n);
+	    copy.add(it.next());
 	}
 	return copy;
     }
