@@ -23,7 +23,9 @@ header {
 class KeYJMLLexer extends Lexer;
 
 options {
-    charVocabulary = '\3'..'\377';  
+ 	charVocabulary='\3'..'\ufffe';
+ 	codeGenMakeSwitchThreshold = 2;  // Some optimizations
+	codeGenBitsetTestThreshold = 3;
 	k=7;
 }
 
@@ -296,7 +298,8 @@ options {
 	|	'\t'
 	|	'\n'  { newline(); }
 	|	'\r'
-    |   '@')
+        |       '\u000C'
+        |       '@')
 		{ $setType(Token.SKIP); }
 	;
 

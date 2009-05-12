@@ -17,7 +17,9 @@ class KeYJMLPreLexer extends Lexer;
 
 
 options {
-    charVocabulary = '\3'..'\377';
+    charVocabulary='\u0003'..'\ufffe';
+    codeGenMakeSwitchThreshold = 2;  // Some optimizations
+    codeGenBitsetTestThreshold = 3;
     k=2;
 }
 
@@ -316,6 +318,7 @@ options {
     	|  {braceCounter > 0}? '}'  { braceCounter--; ignoreAt = false; }
     	|  '\n'                     { newline(); ignoreAt = true; } 
     	|  ' '
+    	|  '\u000C'
     	|  '\t'
     	|  '\r'
     	|  {!ignoreAt}? '@'
