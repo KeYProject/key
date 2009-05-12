@@ -22,6 +22,7 @@ import de.uka.ilkd.key.util.*;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.logic.ldt.LDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.soundness.TermProgramVariableCollector;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
@@ -950,9 +951,17 @@ public class TestGenerator{
 	    } else if (name.equals("Z")) {
 		result = translateTerm(t.sub(0), buffer, children);
 	    } else if(t.op() instanceof CastFunctionSymbol){
-	        result = translateTerm(t.sub(0), buffer, children);
+		CastFunctionSymbol cast = (CastFunctionSymbol)t.op();
+		Type type=null;
+		try{
+		    type= serv.getTypeConverter().getModelFor(cast.getSortDependingOn()).javaType();
+		}catch(NullPointerException e){
+		    type = serv.getJavaInfo().getKeYJavaType(cast.getSortDependingOn());
+		}
+		result = translateTerm(t.sub(0), buffer, children); //chrisg 12.5.2009: A cast expression must be created
+		result = new TypeCast(result,new SyntacticalTypeRef(type));
 	    }
-	    if(result!=null){
+	    if(result!=null && !(result instanceof ParenthesizedExpression)){
 		result = new ParenthesizedExpression(result);
 	    }
 	}
@@ -980,6 +989,7 @@ public class TestGenerator{
     private Expression translateFormula(Term post, 
 					SyntacticalProgramVariable buffer,
 					ExtList children){
+	int tmp = post.toString().indexOf("banking.Account::cast");
 	ExtList l = new ExtList();
 	if(post.sort() != Sort.FORMULA){
 	    return translateTerm(post, buffer, children);
@@ -1090,7 +1100,7 @@ public class TestGenerator{
 	    throw new NotTranslatableException("quantified Term "+t);
 	}
 	ProgramVariable result = 
-	    new LocationVariable(new ProgramElementName("result"), b);
+	    new LocationVariable(new ProgramElementName("subFormResult"), b);//The name used to be "result" causing a clash with the program variable representing JMLs "\result"
 	body[0] = new LocalVariableDeclaration(
 	    new TypeRef(b), new VariableSpecification(result, 
 						      resInit,
