@@ -5,14 +5,7 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//Universitaet Koblenz-Landau, Germany
-//Chalmers University of Technology, Sweden
-
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
-
+//
 
 
 /* -*-antlr-*- */
@@ -895,7 +888,7 @@ predornot returns [Term result=null] throws SLTranslationException
 :
 	result=predicate
     |   NOT_SPECIFIED
-    |   "\\same"
+    |   SAME
     ;
     
 predicate returns [Term result=null] throws SLTranslationException
@@ -933,24 +926,7 @@ assignmentexpr returns [Term result=null] throws SLTranslationException
 //	)?
     ;
 
-
-/* not used JML expressions
-assignmentOp
-:
-	"=" 
-    |   "+="
-    |   "-="
-    |   "*="
-    |   "/="
-    |   "%="
-    |   ">>="  
-    |   ">>>="
-    |   "<<="
-    |   "&="
-    |   "|="
-    |   "^="
-    ;
-*/	
+	
 conditionalexpr returns [Term result=null] throws SLTranslationException
 {
     Term a,b;
@@ -958,7 +934,7 @@ conditionalexpr returns [Term result=null] throws SLTranslationException
 :
 	result=equivalenceexpr 
 	(
-	    QUESTIONMARK a=conditionalexpr ":" b=conditionalexpr
+	    QUESTIONMARK a=conditionalexpr COLON b=conditionalexpr
 	    {
 		result = tb.ife(convertToFormula(result),a,b);
 		if(intHelper.isIntegerTerm(result)) {
@@ -1664,7 +1640,7 @@ expressionlist returns [ListOfTerm result=SLListOfTerm.EMPTY_LIST] throws SLTran
     Term t;
 }
 :
-	t=expression { result = result.append(t); } ("," t=expression {result = result.append(t);} )* 
+	t=expression { result = result.append(t); } (COMMA t=expression {result = result.append(t);} )* 
 ;
 
 constant returns [Term result=null] throws SLTranslationException
@@ -1895,14 +1871,14 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 }
 :
 	LPAREN
-	q:QUANTIFIER (nullable=boundvarmodifiers)? declVars=quantifiedvardecls ";"
+	q:QUANTIFIER (nullable=boundvarmodifiers)? declVars=quantifiedvardecls SEMI
 	
 	{
 	    resolverManager.pushLocalVariablesNamespace();
 	    resolverManager.putIntoTopLocalVariablesNamespace(declVars);
 	} 
 	(
-	    ((predicate)? ";" ) => (p=predicate)? ";" t=specexpression
+	    ((predicate)? SEMI ) => (p=predicate)? SEMI t=specexpression
 	|
 	    (SEMI)? t=specexpression 
 	)
@@ -2008,15 +1984,15 @@ bsumterm returns [Term t=null] throws SLTranslationException
     Term a=null,b=null; 
     ListOfLogicVariable decls=null;
 }:
-        "("
+        LPAREN
         q:BSUM decls=quantifiedvardecls 
         {	    
             resolverManager.pushLocalVariablesNamespace();
             resolverManager.putIntoTopLocalVariablesNamespace(decls);
         } 
-        ";" 
+        SEMI
         (
-            a=specexpression ";"  b=specexpression ";" t=specexpression
+            a=specexpression SEMI  b=specexpression SEMI t=specexpression
         )
         {
             LogicVariable lv = (LogicVariable) decls.head();
@@ -2024,7 +2000,7 @@ bsumterm returns [Term t=null] throws SLTranslationException
                         a, b, t, new ArrayOfQuantifiableVariable(lv));
             resolverManager.popLocalVariablesNamespace();
         }
-        ")"
+        RPAREN
 ;
 
 exception
@@ -2118,32 +2094,32 @@ referencetype returns [KeYJavaType type = null] throws SLTranslationException
 builtintype returns [KeYJavaType type = null] throws SLTranslationException
 :
 	(
-	    "byte" 
+	    BYTE 
 	    {
 		type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_BYTE);
 	    }
 	|
-	    "short" 
+	    SHORT 
 	    {
 		type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_SHORT);
 	    }
 	|
-	    "int" 
+	    INT 
 	    {
 		type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT);
 	    }
 	|
-	    "long" 
+	    LONG 
 	    {
 		type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_LONG);
 	    }
 	|
-	    "boolean" 
+	    BOOLEAN 
 	    {
 		type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
 	    }
 	|
-	    "void" 
+	    VOID 
 	    {
 		type = null;
 	    }

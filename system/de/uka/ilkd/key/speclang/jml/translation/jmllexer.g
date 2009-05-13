@@ -6,13 +6,6 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2003 Universitaet Karlsruhe, Germany
-//                         and Chalmers University of Technology, Sweden          
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
 
 /* -*-Antlr-*- */
 
@@ -30,131 +23,90 @@ options {
 }
 
 tokens {
-    SET = "set";
-    NEW = "new";
-    BYTE = "byte";
-    SHORT = "short";
-    INT = "int";
-    LONG = "long";
     BOOLEAN = "boolean";
-    AT = "@";
-    PLUS = "+";
-    MINUS = "-";
-    IMPLIES = "==>";
-    IMPLIESBACKWARD = "<==";
-    LOGICALOR = "||";
-    LOGICALAND = "&&";
-    INCLUSIVEOR = "|";
-    XOR = "^";
-    AND = "&";
-    EQUAL = "==";
-    NOTEQUAL = "!=";
-    ALSO = "also";
-//    MULT = "*";
-//    DIV = "/";
-    MOD = "%";
-    TRUE = "true";
+    BYTE = "byte";
     FALSE = "false";
-    EQV = "<==>";
-    ANTIV = "<=!=>";
-    NOT = "!";
-    BITWISENOT = "~";
-    SEMI = ";";
-    COMMA = ",";
-    LPAREN = "(";
-    RPAREN = ")";
-    LBRACKET = "[";
-    RBRACKET = "]";
-    SHIFTRIGHT = ">>";
-    SHIFTLEFT = "<<";
-    UNSIGNEDSHIFTRIGHT = ">>>";
-    NULL = "null";
-    IF = "if";
-    INSTANCEOF = "instanceof";
-    COLON = ":";
-    QUESTIONMARK = "?";
+    INSTANCEOF = "instanceof";        
+    INT = "int";
+    LONG = "long";        
+    NEW = "new";
+    NULL = "null";    
+    SHORT = "short";
+    SUPER = "super";    
     THIS = "this";
-    SUPER = "super";
-    MODEL = "model";
-    RETURNS = "returns";
-    UNINITIALIZED = "uninitialized";
-    SPEC_JAVA_MATH = "spec_java_math";
-    SPEC_SAVE_MATH = "spec_safe_math";
-    SPEC_BIGINT_MATH = "spec_bigint_math";
-    CODE_JAVA_MATH = "code_java_math"; 
-    CODE_SAFE_MATH = "code_safe_math"; 
-    CODE_BIGINT_MATH = "code_bigint_math";
-    CODE_CONTRACT = "code_contract";
+    TRUE = "true";    
+    VOID = "void";
 }
 
-LARROW : "<-";
-NOT : "!";
-BITWISENOT : "~";
-LT : "<";
-GT : ">";
-LEQ : "<=";
-GEQ : ">=";
-ST : "<:";
-PLUS : "+";
-MINUS : "-";
-IMPLIES : "==>";
-IMPLIESBACKWARD : "<==";
-LOGICALOR : "||";
-LOGICALAND : "&&";
-INCLUSIVEOR : "|";
-SHIFTRIGHT : ">>";
-SHIFTLEFT : "<<";
-UNSIGNEDSHIFTRIGHT : ">>>";
-XOR : "^";
 AND : "&";
-EQUAL : "==";
-NOTEQUAL : "!=";
-MULT : "*";
-DIV : "/";
-MOD : "%";
-EQV : "<==>";
 ANTIV : "<=!=>";
-SEMI : ";";
-SUCH_THAT : "\\such_that";
-NOT_SPECIFIED : "\\not_specified";
-RESULT : "\\result";
-NOTHING : "\\nothing";
-EVERYTHING : "\\everything"; 
-PRIVATEDATA : "\\private_data";
-OBJECT_CREATION: "\\object_creation"; //KeY extension, not official JML
-INTO : "\\into";
-OLD : "\\old";
-PRE : "\\pre";
-CREATED : "\\created";
 BIGINT : "\\bigint";
+BITWISENOT : "~";
+BSUM : "\\bsum";  //KeY extension, not official JML
+COLON : ":";
 COMMA : ",";
+CREATED : "\\created";
+DIV : "/";
 DOT : ".";
 DOTDOT : "..";
-COLON : ":";
-QUESTIONMARK : "?";
-NOT_MODIFIED : "\\not_modified";
-NONNULLELEMENTS : "\\nonnullelements";
-OTHER : "\\other";
-LBRACE : "{";
-RBRACE : "}";
-
-FRESH : "\\fresh";
-REACH : "\\reach";
-REAL : "\\real";
 DURATION : "\\duration";
-SPACE : "\\space";
-WORKINGSPACE : "\\working_space";
-TYPEOF : "\\typeof";
 ELEMTYPE : "\\elemtype";
-TYPE_SMALL : "\\type";
-LOCKSET : "\\lockset";
-IS_INITIALIZED : "\\is_initialized";
+EQUAL : "==";
+EQV : "<==>";
+EVERYTHING : "\\everything";
+FRESH : "\\fresh"; 
+GEQ : ">=";
+GT : ">";
+IMPLIES : "==>";
+IMPLIESBACKWARD : "<==";
+INCLUSIVEOR : "|";
+INTO : "\\into";
 INVARIANT_FOR : "\\invariant_for";
+IS_INITIALIZED : "\\is_initialized";
+LARROW : "<-";
 LBLNEG : "\\lblneg";
 LBLPOS : "\\lblpos";
-TYPE : "\\TYPE";
+LBRACE : "{";
+LEQ : "<=";
+LOCKSET : "\\lockset";
+LOGICALAND : "&&";
+LOGICALOR : "||";
+LT : "<";
+MINUS : "-";
+MOD : "%";
+MULT : "*";
+NONNULLELEMENTS : "\\nonnullelements";
+NOT : "!";
+NOT_MODIFIED : "\\not_modified";
+NOT_SPECIFIED : "\\not_specified";
+NOTEQUAL : "!=";
+NOTHING : "\\nothing";
 NOWARN : "\\nowarn";
-BSUM : "\\bsum";  //KeY extension, not official JML
+OBJECT_CREATION: "\\object_creation"; //KeY extension, not official JML
+OLD : "\\old";
+OTHER : "\\other";
+PLUS : "+";
+PRE : "\\pre";
+PRIVATEDATA : "\\private_data";
+QUESTIONMARK : "?";
+RBRACE : "}";
+REACH : "\\reach";
+REAL : "\\real";
+RESULT : "\\result";
+SAME : "\\same";
+SEMI : ";";
+SHIFTLEFT : "<<";
+SHIFTRIGHT : ">>";
+SPACE : "\\space";
+ST : "<:";
+SUCH_THAT : "\\such_that";
+TYPE : "\\TYPE";
+TYPE_SMALL : "\\type";
+TYPEOF : "\\typeof";
+UNSIGNEDSHIFTRIGHT : ">>>";
+WORKINGSPACE : "\\working_space";
+XOR : "^";
+
 
 
 LPAREN
