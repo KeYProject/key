@@ -97,19 +97,5 @@ public class CompilableJavaPP extends PrettyPrinter {
         }
     }
 
-//    protected Position getRelativePosition(SourceElement first) {
-//	//	System.out.println(indentMap);
-//	try{
-//	if (indentMap.containsKey(first)) {
-//	    return (Position)indentMap.get(first);
-//	} else {
-//	    if (first!=null) return first.getRelativePosition();
-//	    else return Position.UNDEFINED;
-//	}
-//	}catch(NullPointerException e){
-//	    if (first!=null) return first.getRelativePosition();
-//	    else return Position.UNDEFINED;
-//	}
-//    }
 
 }
