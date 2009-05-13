@@ -13,6 +13,7 @@ package de.uka.ilkd.key.unittest.cogent;
 import java.util.*;
 import java.io.*;
 
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.unittest.*;
@@ -35,13 +36,13 @@ public class CogentModelGenerator implements DecProdModelGenerator{
 	Model model = new Model(term2class);
 	try{
 	    String trans = ct.translate();
-	    System.out.println("Cogent Input:\n"+trans);
-	    //trans="!((from_account>=-2147483648) && (from_account<=2147483647) &&((2 + amount)>=-2147483648) && ((2 + amount)<=2147483647) &&(2>=-2147483648) && (2<=2147483647) &&(amount>=-2147483648) && (amount<=2147483647) &&(to_account>=-2147483648) && (to_account<=2147483647) &&((1 + amount)>=-2147483648) && ((1 + amount)<=2147483647) &&(1>=-2147483648) && (1<=2147483647) &&(amount>=-2147483648) && (amount<=2147483647) &&(to_account>=-2147483648) && (to_account<=2147483647) &&((-1 + from_account)>=-2147483648) && ((-1 + from_account)<=2147483647) &&(-1>=-2147483648) && (-1<=2147483647) &&(from_account>=-2147483648) && (from_account<=2147483647) &&(self>=-2147483648) && (self<=2147483647) &&(null<=0)&&(null>=0)  &&1 && (from_account >= (2 + amount)) && (to_account >= (1 + amount)) && (to_account <= (-1 + from_account))) || (0 || (self == null))";
-	    //System.out.println("Overwritten Cogent Input:\n"+trans);
 	    CogentResult response = 
 		DecisionProcedureCogent.execute(trans);
-	    System.out.println("Response:\n"+response.toString());
 	    if(response.valid()){
+		if(response.error()){
+		    Main.getInstance().mediator().popupInformationMessage("Cogent execution reports an error. Check, e.g., if cogent does execute on your machine, or if there is another bug in KeY.", "Error");
+		    //throw new CogentException();
+		}
 		return models;
 	    }
 	    IteratorOfTerm it = locations.iterator();
