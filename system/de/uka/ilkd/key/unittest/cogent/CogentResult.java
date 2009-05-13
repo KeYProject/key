@@ -53,5 +53,9 @@ public class CogentResult{
 	    //throw new CogentException("Term not found");
 	}
     }
+    
+    public String toString(){
+	return "CogentResult: valid="+valid+" error="+error+" counterEx="+counterEx;
+    }
 
 }

@@ -428,7 +428,7 @@ public class TestGenerator{
 				testCase);
 */	Expression failure = 
 	    new StringLiteral("\\nPost evaluated to false.\\n"+
-			      "Variable/Location Assignments:\\n");
+			      "Variable or Location Assignments:\\n");//The "/" has caused a problem with GenUTest
 	for(int i=0; i<testLocation.length; i++){
 	    for(int j=0; j<testLocation[i].length; j++){
 		Expression assignment = 
@@ -574,7 +574,7 @@ public class TestGenerator{
 		new Modifier[0],
 		new TypeRef(ae),
 		new VariableSpecification(
-		    new LocationVariable(new ProgramElementName("e"), ae)), 
+		    new LocationVariable(new ProgramElementName("arrayIndexOutOfBoundsEx"), ae)), 
 		false);
 	    Branch c = new Catch(pd, new StatementBlock());
 	    return new Try(new StatementBlock(ca), new Branch[]{c});
@@ -649,7 +649,7 @@ public class TestGenerator{
 	it = mgs.iterator();
 	ExtList l = new ExtList();
 	l.add(suiteMethod);
-	int testMCounter = 0;
+	Vector<MethodDeclaration> testMethods= new Vector<MethodDeclaration>();//collect testmethods for use when creating the main() method. Also used to increment a counter of the test methods for automatic unique naming.
 	while(it.hasNext()){
 	    ModelGenerator mg = (ModelGenerator) it.next();
 	    Model[] models = mg.createModels();
@@ -675,12 +675,16 @@ public class TestGenerator{
 			models[j].getValueAsExpression(eqvArray[i]);
 		}
 	    }
-	    l.add(createTestMethod(code, oracle, testLocation, 
-				   testData, pvaNotDecl, 
-				   methodName+(testMCounter++), l, mg, 
-				   eqvArray));
+	    MethodDeclaration methDec = createTestMethod(code, oracle, testLocation, 
+			   				testData, pvaNotDecl, 
+			   				methodName+(testMethods.size()), l, mg, 
+			   				eqvArray);
+	    l.add(methDec);
+	    testMethods.add(methDec);
 	}
-
+	
+	l=createMain(l, testMethods);//Create main() method. Required for the KeYGenU Tool chain.
+	
         ClassDeclaration suite = createSuiteClass(l);
 	PrettyPrinter pp = new CompilableJavaPP(w, false);
 	try{
@@ -701,6 +705,59 @@ public class TestGenerator{
 	exportCodeUnderTest();
     }
 
+    /* In order to combine KeY with GenUTest the test suite must have a main method that calls the testmethods.
+     * This method extends the ExtList l with a declaration of the main() method.
+     * @author Christoph Gladisch 
+     */
+    private ExtList createMain(ExtList l, Vector<MethodDeclaration> testMethods){
+	ExtList el=new ExtList();
+	el.add(new ProgramElementName("main"));
+	el.add(new Public());
+	el.add(new Static());
+	LinkedList params = new LinkedList();
+	SyntacticalArrayType t= new SyntacticalArrayType("java.lang","String",1);
+	//Type t2=getArrayTypeAndEnsureExistence(t,1);
+	 SyntacticalProgramVariable syntArg = new SyntacticalProgramVariable(new ProgramElementName("arg"),t);
+            params.add(new ParameterDeclaration(
+                    new Modifier[0],
+                    new SyntacticalTypeRef(t),
+                    new VariableSpecification(syntArg,syntArg.type), 
+                    false));
+	el.addAll(params);
+	
+	
+	ProgramElementName className = new ProgramElementName(fileName);
+	SyntacticalTypeRef syntr2 = new SyntacticalTypeRef(new SyntacticalArrayType(null,className,0));
+	
+	New cons = new New(new Expression[0], syntr2, null);
+	SyntacticalProgramVariable testSuiteObject = 
+	    new SyntacticalProgramVariable(new ProgramElementName("testSuiteObject"), 
+	                                    syntr2.type);
+	int statementCount=0;
+	Statement[] ib = new Statement[testMethods.size()+2];
+
+	VariableSpecification varSpec =new VariableSpecification(testSuiteObject, testSuiteObject.type);
+	ib[statementCount++] = new LocalVariableDeclaration(
+	                            syntr2, 
+	                            varSpec);
+	ib[statementCount++] = new CopyAssignment(testSuiteObject, cons);
+	ReferencePrefix pref = testSuiteObject;
+//	ReferencePrefix pref =null;
+
+	for(int i=0;i<testMethods.size();i++){
+	    ib[statementCount++] = new MethodReference(new ArrayOfExpression(
+		       new Expression[]{}), 
+		   new ProgramElementName(testMethods.elementAt(i).getName()),
+		   pref);
+	}
+	Statement body = new StatementBlock(ib);
+	StatementBlock mBody = new StatementBlock(body);
+	el.add(mBody);
+	MethodDeclaration tm = new MethodDeclaration(el, false);
+	l.add(tm);
+	return l;
+    }
+	
     /**
      * Exports the code under test to files and adds get and set methods for
      * each field.
