@@ -83,7 +83,9 @@ public class DecisionProcedureSimplify {
      *            true iff only quantifier free formulas shall be considered.
      */
     public DecisionProcedureResult run(boolean lightWeight) {
-	ConstraintSet constraintSet = new ConstraintSet();
+	ConstraintSet constraintSet = new ConstraintSet(node.sequent(),
+		userConstraint);
+	constraintSet.chooseConstraintSet();
 	DecisionProcedureResult res = runInternal(constraintSet, lightWeight);
 	if (res.getResult()) {
 	    return res;

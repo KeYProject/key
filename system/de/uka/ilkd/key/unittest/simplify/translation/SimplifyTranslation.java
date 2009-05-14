@@ -536,6 +536,7 @@ public class SimplifyTranslation {
 	    boolean lightWeight) throws SimplifyException {
 	StringBuffer hb = new StringBuffer();
 	if (constraintSet.used(cf)) {
+	    
 	    SyntacticalReplaceVisitor srVisitor = new SyntacticalReplaceVisitor(
 		    constraintSet.getChosenConstraint());
 	    cf.formula().execPostOrder(srVisitor);
