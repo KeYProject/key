@@ -121,11 +121,26 @@ public class TestCodeExtractor {
         coll = new JavaASTCollector(sb, LocalVariableDeclaration.class);
         coll.start();
         l = coll.getNodes();
+        coll = new JavaASTCollector(sb, ParameterDeclaration.class); //chrisg:14.5.2009; The argument in the head of a catch-block is a ParameterDeclaration. If declarations are missing in the generated test file, then try to remove this code.
+        coll.start();
+        if(l.isEmpty()){
+            l=coll.getNodes(); //Warningg l.append(coll.getNodes()) does not give the expected result.
+        }else{
+            l.append(coll.getNodes());
+        }
+        
         it = l.iterator();
         ListOfNamed lon = newPVs.allElements();
         while (it.hasNext()) {
-            LocalVariableDeclaration lvd = (LocalVariableDeclaration) it.next();
-            ArrayOfVariableSpecification vars = lvd.getVariables();
+            ArrayOfVariableSpecification vars=null;
+            Object pvDecl =it.next();
+            if(pvDecl instanceof LocalVariableDeclaration){
+        	LocalVariableDeclaration lvd = (LocalVariableDeclaration)pvDecl;
+        	vars = lvd.getVariables();
+            }else if(pvDecl instanceof ParameterDeclaration){
+        	ParameterDeclaration pd = (ParameterDeclaration)pvDecl;
+        	vars = pd.getVariables();
+            }
             for (int i = 0; i < vars.size(); i++) {
                 IProgramVariable pv = vars.getVariableSpecification(i)
                         .getProgramVariable();

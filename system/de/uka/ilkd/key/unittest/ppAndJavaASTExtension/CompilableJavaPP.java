@@ -8,8 +8,11 @@
 package de.uka.ilkd.key.unittest.ppAndJavaASTExtension;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.Writer;
 
+import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.SourceElement;
@@ -97,5 +100,26 @@ public class CompilableJavaPP extends PrettyPrinter {
         }
     }
 
+    /**This field is set to true after the first error. This is to prevent multiple notifications about similar errors. */
+    protected boolean errorOccurred=false;
 
+    /*This is a bit dirty solution to handle the case that a SyntacticalXXX class has been
+     *used with the ordinary PrettyPrinter. E.g. if SyntacticalTypeRef.prettyPrint is
+     *called with the normal PrettyPrinter. This should not happen.
+     *
+     *The approach is to use temporarily a new CompilableJavaPP and then to print its
+     *content into the PrettyPrinter that is here expected as argument.
+     */
+    public void emergencyPrint(PrettyPrinter pp)throws IOException{
+	StringWriter sw = (StringWriter)out;
+	String s=sw.toString();
+	if(!errorOccurred){
+	    errorOccurred=true;
+	    String sshort = s.length()>80?s.substring(80)+"...":s; //Shorten the output to fit into the dialogbox
+	    Main.getInstance().notify(new GeneralFailureEvent("CodeError: Unexpected parametertype. The problem originates\n" +
+	    		"from the syntax tree of the substring:\n"+sshort));
+	    Thread.dumpStack();
+	}
+        pp.write(s);
+    }
 }

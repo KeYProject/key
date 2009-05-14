@@ -7,6 +7,8 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.unittest.ppAndJavaASTExtension;
 
+import java.io.StringWriter;
+
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.java.PrettyPrinter;
@@ -92,9 +94,16 @@ public class SyntacticalTypeRef extends TypeReferenceImp {
     /**
      * @param p must be an instance of CompilableJavaPP.
      */
+    
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        CompilableJavaPP cjpp = (CompilableJavaPP)p;
-        cjpp.printSyntacticalTypeReference(this);
+	if(!(p instanceof CompilableJavaPP)){
+	    CompilableJavaPP cjpp =new CompilableJavaPP(new StringWriter(),false);
+	    prettyPrint(cjpp);
+	    cjpp.emergencyPrint(p);
+	}else{
+	    CompilableJavaPP cjpp = (CompilableJavaPP)p;
+	    cjpp.printSyntacticalTypeReference(this);
+	}
     }
 
 }

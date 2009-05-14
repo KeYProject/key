@@ -10,14 +10,19 @@
 
 package de.uka.ilkd.key.java.visitor;
 
+import java.io.StringWriter;
+
 import de.uka.ilkd.key.java.ArrayOfExpression;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.unittest.ppAndJavaASTExtension.CompilableJavaPP;
 import de.uka.ilkd.key.util.ExtList;
 
 /** Replaces array references a[expr] by a[dat] where dat is the concrete 
@@ -77,10 +82,20 @@ public class IndexReplaceVisitor extends CreatingASTVisitor{
     }
 
     private int findLocIndex(Expression e){
+	StringWriter sw = new StringWriter();
+	CompilableJavaPP cjpp = new CompilableJavaPP(sw,true);
 	for(int i = 0; i<testLocation.length; i++){
 	    for(int j = 0; j<testLocation[i].length; j++){
-		if(testLocation[i][j].toString().equals(e.toString())){
-		    return i;
+		Expression e1 =testLocation[i][j];
+		if(e1 instanceof JavaSourceElement && e instanceof JavaSourceElement){
+		    String s1= ((JavaSourceElement)e1).toString(cjpp, sw);
+        		if(s1.equals(((JavaSourceElement)e).toString(cjpp,sw))){
+        		    return i;
+        		}
+		}else{//here follows the original code. But it's probably wrong because it leads to an invocation of PrettyPrinter.
+        		if(testLocation[i][j].toString().equals(e.toString())){
+        		    return i;
+        		}
 		}
 	    }
 	}
