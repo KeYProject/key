@@ -1109,13 +1109,15 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	    super(new Name(name));
 	}
 
+	/* Will only match on String variables */
 	public boolean canStandFor(ProgramElement check, 
 				   ExecutionContext ec,
 				   Services services) {
 	    if (!super.canStandFor(check, ec, services)) {
 		return false;
 	    }
-	    if (check instanceof StringLiteral) return true;
+	    //String Literal has SideEffects, but SimpleExpressionSort will not match
+	    //if (check instanceof StringLiteral) return false;
 	    if (check instanceof ProgramVariable) {
 		Namespace ns = services.getNamespaces().sorts();
 		Sort stringSort = (Sort)ns.lookup(new Name("java.lang.String"));
