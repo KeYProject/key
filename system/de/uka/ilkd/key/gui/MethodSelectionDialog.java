@@ -31,7 +31,6 @@ import de.uka.ilkd.key.logic.op.SetAsListOfProgramMethod;
 import de.uka.ilkd.key.logic.op.SetOfProgramMethod;
 import de.uka.ilkd.key.unittest.ModelGenerator;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
-import de.uka.ilkd.key.unittest.simplify.OldSimplifyModelGenerator;
 import de.uka.ilkd.key.unittest.simplify.SimplifyModelGenerator;
 
 public class MethodSelectionDialog extends JDialog {
@@ -114,8 +113,6 @@ public class MethodSelectionDialog extends JDialog {
 		.setSelected(UnitTestBuilder.requireCompleteExecution);
 	instance.simplifyDataTupleNumber.setText(Integer
 		.toString(SimplifyModelGenerator.modelLimit));
-	instance.simplifyDataTupleNumber.setText(Integer
-		.toString(OldSimplifyModelGenerator.modelLimit));
 	return instance;
     }
 
@@ -130,7 +127,6 @@ public class MethodSelectionDialog extends JDialog {
     public void setSimplifyCount(String s) {
 	try {
 	    SimplifyModelGenerator.modelLimit = Integer.parseInt(s);
-	    OldSimplifyModelGenerator.modelLimit = Integer.parseInt(s);
 	} catch (NumberFormatException ex) {
 	    System.out.println(ex);
 	    // do nothing
