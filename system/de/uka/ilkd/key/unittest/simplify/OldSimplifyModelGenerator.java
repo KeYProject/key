@@ -34,7 +34,7 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
     private String initialCounterExample;
 
     // first element has to be 0. Only positive values at even indices.
-    public static int modelLimit = 1;
+    
 
     private static final int[] genericTestValues = new int[] { 0, -1, 1, -10,
 	    10, -1000, 1000, -1000000, 1000000, -2000000000, 2000000000 };
@@ -45,6 +45,11 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
     private HashSet<String> simplifyOutputs;
 
     private ListOfString placeHoldersForClasses = SLListOfString.EMPTY_LIST;
+
+
+    public static int getModelLimit() {
+	return SimplifyModelGenerator.modelLimit;
+    }
 
     public OldSimplifyModelGenerator(DecisionProcedureSimplify dps,
 	    Services serv, HashMap<Term, EquivalenceClass> term2class,
@@ -98,7 +103,7 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
     public Set<Model> createModels() {
 	HashSet<Model> models = new HashSet<Model>();
 	int datCount = 1;
-	while (models.size() < modelLimit
+	while (models.size() < getModelLimit()
 		&& datCount <= genericTestValues.length) {
 	    models.addAll(createModelsHelp(initialCounterExample, new Model(
 		    term2class), datCount++));
@@ -111,7 +116,7 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
 	    int datCount) {
 	Set<Model> models = new HashSet<Model>();
 	if (counterEx.indexOf("Counterexample") == -1
-		|| models.size() >= modelLimit) {
+		|| models.size() >= getModelLimit()) {
 	    return models;
 	}
 	counterEx = counterEx.replaceAll("_ ", "_");
@@ -153,7 +158,7 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
 			    c.add(e);
 			    models.addAll(createModelsHelp(simplify(c), model
 				    .copy(), datCount));
-			    if (models.size() >= modelLimit) {
+			    if (models.size() >= getModelLimit()) {
 				return models;
 			    }
 			    c.removeLast();
@@ -168,7 +173,7 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
 		    c.add(lessEqToEq(leqs[i], genericTestValues[j]));
 		    models.addAll(createModelsHelp(simplify(c), model.copy(),
 			    datCount));
-		    if (models.size() >= modelLimit) {
+		    if (models.size() >= getModelLimit()) {
 			return models;
 		    }
 		    c.removeLast();
@@ -180,7 +185,7 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
 		    c.add(lessToEq(les[i], genericTestValues[j]));
 		    models.addAll(createModelsHelp(simplify(c), model.copy(),
 			    datCount));
-		    if (models.size() >= modelLimit) {
+		    if (models.size() >= getModelLimit()) {
 			return models;
 		    }
 		    c.removeLast();
@@ -192,7 +197,7 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
 		    c.add(ineqToEq(neq[i], genericTestValues[j]));
 		    models.addAll(createModelsHelp(simplify(c), model.copy(),
 			    datCount));
-		    if (models.size() >= modelLimit) {
+		    if (models.size() >= getModelLimit()) {
 			return models;
 		    }
 		    c.removeLast();

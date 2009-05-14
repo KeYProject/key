@@ -15,6 +15,7 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -37,24 +38,19 @@ public class MethodSelectionDialog extends JDialog {
     class Al implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
-	    if (e.getSource().equals(cogent)) {
-		ModelGenerator.decProdForTestGen = ModelGenerator.COGENT;
-		cogent.setSelected(true);
-		simplify.setSelected(false);
-		oldSimplify.setSelected(false);
-	    } else if (e.getSource().equals(simplify)) {
-		ModelGenerator.decProdForTestGen = ModelGenerator.SIMPLIFY;
-		cogent.setSelected(false);
-		simplify.setSelected(true);
-		oldSimplify.setSelected(false);
-	    } else if (e.getSource().equals(oldSimplify)) {
+	    if(e.getSource()!=solverChoice)
+		throw new RuntimeException("CodeError: ActionListener is used by wrong combobox.");
+	    if(solverChoice.getSelectedItem()==OLD_SIMPLIFY){
 		ModelGenerator.decProdForTestGen = ModelGenerator.OLD_SIMPLIFY;
-		cogent.setSelected(false);
-		simplify.setSelected(false);
-		oldSimplify.setSelected(true);
+	    }else if(solverChoice.getSelectedItem()==SIMPLIFY){
+		ModelGenerator.decProdForTestGen = ModelGenerator.SIMPLIFY;
+	    }else if(solverChoice.getSelectedItem()==COGENT){
+		ModelGenerator.decProdForTestGen = ModelGenerator.COGENT;
+	    }else{
+		throw new RuntimeException("Not implemented case in MethodSelectionDialog");
 	    }
-	    simplifyDataTupleNumber.setEnabled(simplify.isSelected()
-		    || oldSimplify.isSelected());
+	    simplifyDataTupleNumber.setEnabled(
+		    solverChoice.getSelectedItem()==OLD_SIMPLIFY||solverChoice.getSelectedItem()==SIMPLIFY);
 	}
     }
 
@@ -66,11 +62,10 @@ public class MethodSelectionDialog extends JDialog {
 
     private ActionListener actLi = new Al();
 
-    final JCheckBox simplify = new JCheckBox("Simplify");
-
-    final JCheckBox oldSimplify = new JCheckBox("Simplify(old)");
-
-    final JCheckBox cogent = new JCheckBox("Cogent");
+    final static String OLD_SIMPLIFY="Simplify (old interface)";
+    final static String SIMPLIFY="Simplify (new interface)";
+    final static String COGENT="Cogent";
+    JComboBox solverChoice = new JComboBox(new String[]{OLD_SIMPLIFY,SIMPLIFY,COGENT});
 
     final JCheckBox completeEx = new JCheckBox("Only completely "
 	    + "executed traces");
@@ -82,6 +77,7 @@ public class MethodSelectionDialog extends JDialog {
     private StringBuffer latestTests = new StringBuffer();
 
     private MethodSelectionDialog(KeYMediator mediator) {
+	super(mediator.mainFrame(),"Method selection dialog");
 	this.mediator = mediator;
 	testBuilder = new UnitTestBuilder(mediator.getServices(), mediator
 		.getProof());
@@ -99,12 +95,20 @@ public class MethodSelectionDialog extends JDialog {
 	    instance.dispose();
 	}
 	instance = new MethodSelectionDialog(mediator);
-	instance.cogent
-		.setSelected(ModelGenerator.decProdForTestGen == ModelGenerator.COGENT);
-	instance.simplify
-		.setSelected(ModelGenerator.decProdForTestGen == ModelGenerator.SIMPLIFY);
-	instance.oldSimplify
-		.setSelected(ModelGenerator.decProdForTestGen == ModelGenerator.OLD_SIMPLIFY);
+	switch(ModelGenerator.decProdForTestGen){
+		case ModelGenerator.COGENT:
+		    
+	}
+	
+	switch(ModelGenerator.decProdForTestGen){
+        	case ModelGenerator.OLD_SIMPLIFY:
+        	    instance.solverChoice.setSelectedItem(OLD_SIMPLIFY);break;
+        	case ModelGenerator.SIMPLIFY:
+        	    instance.solverChoice.setSelectedItem(SIMPLIFY);break;
+        	case ModelGenerator.COGENT:
+        	    instance.solverChoice.setSelectedItem(COGENT);break;
+        	default: throw new RuntimeException("Unhandled case in MethodSelecitonDialog.");
+	}
 	instance.completeEx
 		.setSelected(UnitTestBuilder.requireCompleteExecution);
 	instance.simplifyDataTupleNumber.setText(Integer
@@ -129,7 +133,10 @@ public class MethodSelectionDialog extends JDialog {
 	}
     }
 
+    private boolean layoutWasCalled=false;
     private void layoutMethodSelectionDialog() {
+	if(layoutWasCalled) throw new RuntimeException("Method  \"layoutMethodSelectionDialog\" must not be called multiple times.");
+	layoutWasCalled = true;
 	getContentPane().setLayout(
 		new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
@@ -204,10 +211,6 @@ public class MethodSelectionDialog extends JDialog {
 	});
 	buttonPanel.add(testSel);
 
-	simplify.addActionListener(actLi);
-	cogent.addActionListener(actLi);
-	oldSimplify.addActionListener(actLi);
-
 	completeEx.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent e) {
 		UnitTestBuilder.requireCompleteExecution = completeEx
@@ -223,14 +226,28 @@ public class MethodSelectionDialog extends JDialog {
 		instance = null;
 	    }
 	});
-	buttonPanel.add(completeEx);
-	buttonPanel.add(cogent);
-	buttonPanel.add(simplify);
-	buttonPanel.add(oldSimplify);
+	
+	solverChoice.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    if(e.getSource()!=solverChoice)
+			throw new RuntimeException("CodeError: ActionListener is used by wrong combobox.");
+		    if(solverChoice.getSelectedItem()==OLD_SIMPLIFY){
+			ModelGenerator.decProdForTestGen = ModelGenerator.OLD_SIMPLIFY;
+		    }else if(solverChoice.getSelectedItem()==SIMPLIFY){
+			ModelGenerator.decProdForTestGen = ModelGenerator.SIMPLIFY;
+		    }else if(solverChoice.getSelectedItem()==COGENT){
+			ModelGenerator.decProdForTestGen = ModelGenerator.COGENT;
+		    }else{
+			throw new RuntimeException("Not implemented case in MethodSelectionDialog");
+		    }
+		    simplifyDataTupleNumber.setEnabled(
+			    solverChoice.getSelectedItem()==OLD_SIMPLIFY||solverChoice.getSelectedItem()==SIMPLIFY);
+		}});
+	buttonPanel.add(solverChoice);
 
 	buttonPanel.add(simplifyDataTupleNumber);
-	simplifyDataTupleNumber.setEnabled(simplify.isSelected()
-		|| oldSimplify.isSelected());
+
+	simplifyDataTupleNumber.setEnabled(solverChoice.getSelectedItem()==OLD_SIMPLIFY||solverChoice.getSelectedItem()==SIMPLIFY);
 	buttonPanel.add(exit);
 	getContentPane().add(buttonPanel);
     }

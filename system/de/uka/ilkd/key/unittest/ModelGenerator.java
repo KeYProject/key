@@ -25,7 +25,7 @@ public class ModelGenerator{
     public static final int COGENT = 0;
     public static final int SIMPLIFY = 1;
     public static final int OLD_SIMPLIFY = 2;
-    public static int decProdForTestGen=COGENT;
+    public static int decProdForTestGen=OLD_SIMPLIFY;
 
     private ListOfTerm ante, succ;
     private HashMap term2class;
