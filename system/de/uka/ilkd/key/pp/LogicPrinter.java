@@ -1022,7 +1022,7 @@ public class LogicPrinter {
                                   Term t)
         throws IOException
     {
-         //XXX
+        //XXX
         if(PresentationFeatures.ENABLED
             && services != null
             && t.op() == services.getJavaInfo().getSelect()
@@ -1032,32 +1032,57 @@ public class LogicPrinter {
             
             final Term objectTerm = t.sub(1);
             final Term fieldTerm  = t.sub(2);
+            final String fieldOpName = fieldTerm.op().name().toString();            
+            final String shortFieldName
+                    =  fieldOpName.contains("::")
+                       ? fieldOpName.substring(fieldOpName.indexOf("::") + 2)
+                       : fieldOpName;            
                 
             markStartSub();
             //heap not printed
             markEndSub();
             
-            markStartSub();
-            printTerm(objectTerm);
-            markEndSub();
-            
-            final String fieldOpName = fieldTerm.op().name().toString();
-            if(fieldTerm.arity() == 0) {
-                final String shortFieldName
-                    =  fieldOpName.contains("::")
-                       ? fieldOpName.substring(fieldOpName.indexOf("::") + 2)
-                       : fieldOpName;
+            ProgramVariable fieldPV;
+            try {
+        	fieldPV = services.getJavaInfo().getAttribute(fieldTerm.toString()); 
+            } catch(Throwable e) {
+        	fieldPV = null;
+            }             	
+            if(fieldPV != null 
+        	 && fieldPV.isStatic() 
+        	 && objectTerm.equals(TermBuilder.DF.NULL(services))) {
+        	assert fieldTerm.arity() == 0;
+        	
+        	markStartSub();
+        	//"null" not printed
+        	markEndSub();
+        	
+                markStartSub();
+                startTerm(0);                    
+                layouter.print(shortFieldName);
+                markEndSub();                    
+            } else if(fieldTerm.arity() == 0) {
+        	markStartSub();
+                printTerm(objectTerm);
+                markEndSub();
+        	
                 layouter.print(".");
+                
                 markStartSub();
                 startTerm(0);                    
                 layouter.print(shortFieldName);
                 markEndSub();                    
             } else if(fieldTerm.op() == services.getJavaInfo().getArrayField()) {
-                Term indexTerm = fieldTerm.sub(0);
-                layouter.print("[");
-                markStartSub();
-                printTerm(indexTerm);
+        	markStartSub();
+                printTerm(objectTerm);
                 markEndSub();
+        	
+                layouter.print("[");
+                
+                markStartSub();
+                printTerm(fieldTerm.sub(0));
+                markEndSub();
+                
                 layouter.print("]");
             } else {
                  assert false;

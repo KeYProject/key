@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.explicitheap;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.*;
@@ -46,8 +45,6 @@ public final class WhileInvariantRule implements BuiltInRule {
     private static final AtPreFactory APF = AtPreFactory.INSTANCE;
     private static final ExplicitHeapConverter EHC 
     	= ExplicitHeapConverter.INSTANCE;
-    
-    private static final boolean FRAME_WITH_TACLETS = true;
     
     private Term lastFocusTerm;
     private Instantiation lastInstantiation;
