@@ -54,6 +54,7 @@ import de.uka.ilkd.key.proof.mgt.NonInterferenceCheck;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.smt.DecProcRunner;
+import de.uka.ilkd.key.strategy.VBTStrategy;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
 import de.uka.ilkd.key.util.*;
 import de.uka.ilkd.key.util.ProgressMonitor;
@@ -2471,7 +2472,8 @@ public class Main extends JFrame implements IMain {
 		} else if (opt[index].equals("DEPTHFIRST")) {		
 		    	System.out.println("DepthFirst GoalChooser ...");
 			Profile p = ProofSettings.DEFAULT_SETTINGS.getProfile();
-			p.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);           
+			p.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);  
+			VBTStrategy.preferedGoalChooser = DepthFirstGoalChooserBuilder.NAME;
             
 		} else if (opt[index].equals("TESTING") || opt[index].equals("UNIT")) {
                     if(opt[index].equals("TESTING")){
@@ -2480,11 +2482,12 @@ public class Main extends JFrame implements IMain {
                     }
                     System.out.println("VBT optimizations enabled ...");                    
                     
-                    final Profile p = new JavaTestGenerationProfile(null);
+                    final JavaTestGenerationProfile p = new JavaTestGenerationProfile(null);
                     
                     if (index + 1 < opt.length && 
                             opt[index + 1].toUpperCase().equals("LOOP")) {
-                        p.setSelectedGoalChooserBuilder(BalancedGoalChooserBuilder.NAME);
+                        VBTStrategy.preferedGoalChooser = BalancedGoalChooserBuilder.NAME;
+                        p.setSelectedGoalChooserBuilder(VBTStrategy.preferedGoalChooser);
                         System.out.println("Balanced loop unwinding ...");
                         index ++;
                     }

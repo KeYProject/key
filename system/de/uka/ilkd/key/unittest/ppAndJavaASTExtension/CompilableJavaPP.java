@@ -101,7 +101,7 @@ public class CompilableJavaPP extends PrettyPrinter {
     }
 
     /**This field is set to true after the first error. This is to prevent multiple notifications about similar errors. */
-    protected boolean errorOccurred=false;
+    protected static boolean errorOccurred=false;
 
     /*This is a bit dirty solution to handle the case that a SyntacticalXXX class has been
      *used with the ordinary PrettyPrinter. E.g. if SyntacticalTypeRef.prettyPrint is

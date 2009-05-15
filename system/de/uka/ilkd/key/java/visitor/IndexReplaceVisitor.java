@@ -86,17 +86,19 @@ public class IndexReplaceVisitor extends CreatingASTVisitor{
 	CompilableJavaPP cjpp = new CompilableJavaPP(sw,true);
 	for(int i = 0; i<testLocation.length; i++){
 	    for(int j = 0; j<testLocation[i].length; j++){
-		Expression e1 =testLocation[i][j];
-		if(e1 instanceof JavaSourceElement && e instanceof JavaSourceElement){
-		    String s1= ((JavaSourceElement)e1).toString(cjpp, sw);
-        		if(s1.equals(((JavaSourceElement)e).toString(cjpp,sw))){
-        		    return i;
-        		}
-		}else{//here follows the original code. But it's probably wrong because it leads to an invocation of PrettyPrinter.
-        		if(testLocation[i][j].toString().equals(e.toString())){
-        		    return i;
-        		}
-		}
+		Expression testLoc =testLocation[i][j];
+		String testLocStr,eStr;
+		if(testLoc instanceof JavaSourceElement){
+		    testLocStr= ((JavaSourceElement)testLoc).toString(cjpp, sw);
+		}else{  testLocStr= testLoc.toString(); }
+		
+		if(e instanceof JavaSourceElement){
+		    eStr= ((JavaSourceElement)e).toString(cjpp, sw);
+		}else{  eStr= e.toString(); }
+		
+       		if(testLocStr.equals(eStr)){
+       		    return i;
+       		}
 	    }
 	}
 	return -1;

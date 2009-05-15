@@ -25,7 +25,7 @@ public class JavaTestGenerationProfile extends JavaProfile {
    
     private final static StrategyFactory DEFAULT = 
         new VBTStrategy.Factory();
-    
+        
     public JavaTestGenerationProfile(IMain main) {
         super("standardRules-testGen.key", 
                 SetAsListOfGoalChooserBuilder.EMPTY_SET.
