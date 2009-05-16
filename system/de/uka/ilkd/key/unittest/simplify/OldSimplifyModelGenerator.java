@@ -114,6 +114,7 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
 
     public Set<Model> createModelsHelp(String counterEx, Model model,
 	    int datCount) {
+	String counterExOLD = new String(counterEx);
 	Set<Model> models = new HashSet<Model>();
 	if (counterEx.indexOf("Counterexample") == -1
 		|| models.size() >= getModelLimit()) {
@@ -132,7 +133,10 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
 	try {
 	    c = parser.top();
 	} catch (Exception e) {
-	    throw new RuntimeException(e);
+	    String errMsg = e.getMessage()+ "\nThe input of the SimplifyParser that reads the output from simplify was (between the \"====\"):\n=====START======\n"+
+	    	counterEx + "\n=====END=======\nThe original output of simplify before cleanup was:\n=====START======\n"+
+	    	counterExOLD;
+	    throw new RuntimeException(errMsg);
 	}
 	removeNegativeArrayIndices(c);
 	Equation[] eqs = c.getEquations();

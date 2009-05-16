@@ -19,12 +19,14 @@ import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.collection.SLListOfString;
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.ArrayOp;
 import de.uka.ilkd.key.logic.op.AttributeOp;
@@ -215,6 +217,7 @@ public class SimplifyTranslation {
 	jcharSort = services.getTypeConverter().getCharLDT().targetSort();
 	integerSort = services.getTypeConverter().getIntegerLDT().targetSort();
 	cacheForUninterpretedSymbols = new HashMap<Term, StringBuffer>();
+	String s = sequent.toString();
 	StringBuffer hb = translate(sequent, lightWeight);
 	text = predicate.toString() + produceClosure(hb);
 	logger.info("SimplifyTranslation:\n" + text);
@@ -276,6 +279,68 @@ public class SimplifyTranslation {
 	return number.intValue();
     }
 
+    /**Build a new copy of t, except that any occurence of an if-then-else term 
+     * whose if-part equals @param ifPart is replaced by the 
+     * then-part (if @param part is true) or by the 
+     * else-part (if @param part is false). 
+     * @author gladisch */
+    protected Term replaceIfThenElse(Term t, Term ifPart, boolean part){
+	TermFactory tf = TermFactory.DEFAULT;
+	
+	if(t.arity()==0){
+	    return t;
+	}
+	
+ 	if(ifPart.sort()!=Sort.FORMULA){
+	    throw new RuntimeException("Unexpected parameter 2\nParam1=\n"+
+		    t.toString()+"\nParam2= (sort:"+ifPart.sort()+")\n"+ifPart.toString());
+	}
+
+	//Base case
+	if(t.sub(0)==ifPart){
+	    if(!(t.op() instanceof IfThenElse)){
+		    throw new RuntimeException("Unexpected parameter combination. Firs parameter should be an if-then-else term\nParam1=\n"+
+			    t.toString()+"\nParam2=\n"+ifPart.toString());
+	    }
+	    if(part){
+		return replaceIfThenElse(t.sub(1),ifPart,part);
+	    }else{
+		return replaceIfThenElse(t.sub(2),ifPart,part);
+	    }
+	}
+	
+	//Recursive replacement
+	Term[] subs = new Term[t.arity()];
+	for(int i=0;i<t.arity();i++){
+	    subs[i] = replaceIfThenElse(t.sub(i),ifPart,part);
+	}
+	
+	//collect bound variables
+	final ArrayOfQuantifiableVariable[] vars = 
+		new ArrayOfQuantifiableVariable[t.arity()];
+	for(int i = 0; i < t.arity(); i++) {
+	    vars[i] = t.varsBoundHere(i);
+	}
+	
+	//build the new term
+	return tf.createTerm(t.op(), subs, vars, t.javaBlock());
+    }
+    
+    /**If an if-then-else term is found in t, then the if-condition of the if-then-else
+     * is returned. Otherwise null is returned. 
+     * @author gladisch */
+    protected Term findIfThenElse(Term t){
+	if((t.op() instanceof IfThenElse) && t.sort()!=Sort.FORMULA){
+	    return t.sub(0);
+	}
+	for(int i=0;i<t.arity();i++){
+	    Term res=findIfThenElse(t.sub(i));
+	    if(res!=null){
+		return res;
+	    }
+	}
+	return null;
+    }
     /**
      * Translates the given term into "Simplify" input syntax and adds the
      * resulting string to the StringBuffer sb.
@@ -291,6 +356,20 @@ public class SimplifyTranslation {
 	    Vector<QuantifiableVariable> quantifiedVars)
 	    throws SimplifyException {
 	Operator op = term.op();
+	
+	//replace if-then-else terms
+	if(term.sort()==Sort.FORMULA && term.arity()>0 && term.sub(0).sort()!=Sort.FORMULA){
+	    Term if_cond=null; //This will be the if-condition of the found if-then-else term
+	    TermFactory tf= TermFactory.DEFAULT;
+	    while((if_cond=findIfThenElse(term))!=null){
+		Term term1 = replaceIfThenElse(term,if_cond,true);
+		Term term2 = replaceIfThenElse(term,if_cond,false);
+		term= tf.createJunctorTerm(Op.AND, 
+		    	tf.createJunctorTerm(Op.IMP, if_cond, term1), 
+		    	tf.createJunctorTerm(Op.IMP, tf.createJunctorTerm(Op.NOT, if_cond), term2));
+	    }
+	}
+	
 	if (op == Op.NOT) {
 	    return (translateSimpleTerm(term, NOT, quantifiedVars));
 	} else if (op == Op.AND) {
@@ -413,9 +492,11 @@ public class SimplifyTranslation {
 			.toString(), quantifiedVars));
 	    }
 	} else if ((op instanceof Modality) || (op instanceof IUpdateOperator)
-		|| (op instanceof IfThenElse)) {
+		/* ||(op instanceof IfThenElse)*/) {
 	    return (uninterpretedTerm(term, true));
-	} else {
+	}if((op instanceof IfThenElse) && term.sort()!=Sort.FORMULA){
+	    throw new RuntimeException("The if-then-else term should have been replaced at this place.\n"+term.toString());
+	}  else {
 	    return (translateUnknown(term));
 	}
     }
