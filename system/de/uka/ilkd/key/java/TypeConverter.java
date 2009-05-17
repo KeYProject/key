@@ -51,11 +51,12 @@ public class TypeConverter extends TermBuilder {
     private IntegerDomainLDT integerDomainLDT;
     private FloatLDT floatLDT;
     private DoubleLDT doubleLDT;
+    private StringLDT stringLDT;
 
     private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
 
     
-    public static StringConverter stringConverter =new StringConverter();
+    //public static StringConverter stringConverter =new StringConverter();
     
 
     TypeConverter(Services s){
@@ -88,7 +89,9 @@ public class TypeConverter extends TermBuilder {
             this.floatLDT = (FloatLDT)ldt;
         } else if (ldt instanceof DoubleLDT) {
             this.doubleLDT = (DoubleLDT)ldt;
-        }
+        } else if (ldt instanceof StringLDT) {
+	    this.stringLDT = (StringLDT)ldt;
+	}
 
         this.models = this.models.prepend(ldt);
         Debug.out("Initialize LDTs: ", ldt);
@@ -442,7 +445,8 @@ public class TypeConverter extends TermBuilder {
         } else if (lit instanceof LongLiteral) {
             return intLDT.translateLiteral(lit);
         } else if (lit instanceof StringLiteral) {
-            return stringConverter.translateLiteral(lit,charLDT,services);
+	    return stringLDT.translateLiteral(lit);
+            //return stringConverter.translateLiteral(lit,charLDT,services);
         } else if (lit instanceof FloatLiteral) {
             return floatLDT.translateLiteral(lit);
         } else if (lit instanceof DoubleLiteral) {
@@ -501,7 +505,8 @@ public class TypeConverter extends TermBuilder {
                         t2 == PrimitiveType.JAVA_INT||
                         t2 == PrimitiveType.JAVA_CHAR||
                         t2 == PrimitiveType.JAVA_LONG)) 
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);		    
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
+	//TODO String: When one operand is a String, then the expression is promoted to String (only the '+' operator)	    
         throw new RuntimeException("Could not determine promoted type "+
                 "of "+t1+" and "+t2);
     }
