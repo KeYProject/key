@@ -308,7 +308,13 @@ public class ProblemInitializer {
             //r2k.setKeYFile(envInput.)
             if (javaPath.length() == 0) {
                 r2k.parseSpecialClasses();
-                initConfig.getProofEnv().setJavaModel(JavaModel.NO_MODEL);
+                JavaModel jm = initConfig.getProofEnv().getJavaModel();
+                if(jm==null){ /*This condition is bug fix. After loading java files a model is setup. 
+                	However if later a .key file is loaded, then the existing model may be 
+                	overwritten by NO_MODEL. This check prevents this problem. The described situation
+                	may occur when using e.g. TacletLibraries from the Options menu.*/
+                    initConfig.getProofEnv().setJavaModel(JavaModel.NO_MODEL);
+                }
             } else {                 
                 String[] cus = getClasses(javaPath).toArray(new String[]{});
                 CompilationUnit[] compUnits = r2k.readCompilationUnitsAsFiles(cus);

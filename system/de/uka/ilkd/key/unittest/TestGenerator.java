@@ -767,12 +767,20 @@ public class TestGenerator{
 	final Iterator<KeYJavaType> it = kjts.iterator();
 	while(it.hasNext()){
 	    final KeYJavaType kjt = it.next();
+
+	    if(kjt.getJavaType() instanceof PrimitiveType || kjt.getJavaType() instanceof NullType)
+		continue; //gladisch: I'm not sure if this is a correct fix but without this fix the cast below gives sometimes a cast exception
+	    String s1 = ((TypeDeclaration) kjt.getJavaType()).getPositionInfo().getFileName();
+	    String s2 = serv.getProof().getJavaModel().getModelDir();
+	    boolean cond5 =false;
+	    if(s1!=null && s2!=null){
+	     cond5= s1.indexOf(s2)!=-1;
+	    }
 	    if((kjt.getJavaType() instanceof ClassDeclaration ||
 		kjt.getJavaType() instanceof InterfaceDeclaration) &&
 	       ((TypeDeclaration) kjt.getJavaType()).getPositionInfo().
 	       getFileName() != null &&
-               ((TypeDeclaration) kjt.getJavaType()).getPositionInfo().
-               getFileName().indexOf(serv.getProof().getJavaModel().getModelDir())!=-1){
+               cond5){
 
 		StringWriter sw = new StringWriter();
 		PrettyPrinter pp = new CompilableJavaPP(sw,false);
