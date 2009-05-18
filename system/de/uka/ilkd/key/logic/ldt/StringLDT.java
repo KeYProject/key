@@ -40,10 +40,8 @@ public class StringLDT extends LDT {
     public StringLDT(Namespace sorts, Namespace functions) {
 	super(new Name("CharList"), sorts, null);
 	charLDT = new CharLDT(sorts,functions);//TODO where to get?!
-	cons=(Function)functions().lookup(new Name("cons"));
-	empty=(Function)functions().lookup(new Name("empty"));
-	if (cons == null || empty == null)
-	    System.out.println ("Cons or Empty not found!");
+	cons  = addFunction (functions, "cons");
+	empty = addFunction (functions, "empty");
     }
 
     /**
@@ -127,8 +125,7 @@ public class StringLDT extends LDT {
 	    charArray = ((StringLiteral) lit).getValue().toCharArray();
 	else
 	    return null;
-	if (charLDT==null)
-	    throw new IllegalArgumentException("CharLDT is needed for StringLiteral translation");
+
 	for (int i= charArray.length-2;i>=1;i--) {
 	    result = TermFactory.DEFAULT.createFunctionTerm(cons,
 							    charLDT.translateLiteral(new CharLiteral(charArray[i])),result);

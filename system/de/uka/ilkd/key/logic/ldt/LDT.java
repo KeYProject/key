@@ -90,7 +90,7 @@ public abstract class LDT {
     public Function addFunction(Namespace funcNS, String funcName) {
         final Function f = (Function)funcNS.lookup(new Name(funcName));
         if (f==null) {
-            throw new RuntimeException("IntegerLDT: Function " + funcName + " not found");
+            throw new RuntimeException("LDT: Function " + funcName + " not found");
         }
         addFunction(f);
         return f;

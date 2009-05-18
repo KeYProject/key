@@ -507,8 +507,9 @@ public class TypeConverter extends TermBuilder {
                         t2 == PrimitiveType.JAVA_LONG)) 
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
 	//TODO String: When one operand is a String, then the expression is promoted to String (only the '+' operator)	    
-        throw new RuntimeException("Could not determine promoted type "+
-                "of "+t1+" and "+t2);
+        return type1;
+	/*throw new RuntimeException("Could not determine promoted type "+
+	  "of "+t1+" and "+t2);*/
     }
 
 
