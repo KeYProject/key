@@ -56,8 +56,6 @@ public class TypeConverter extends TermBuilder {
     private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
 
     
-    //public static StringConverter stringConverter =new StringConverter();
-    
 
     TypeConverter(Services s){
         services = s;       
@@ -193,9 +191,12 @@ public class TypeConverter extends TermBuilder {
         return  charLDT;
     }
     
-
     public BooleanLDT getBooleanLDT() {
 	return booleanLDT;
+    }
+
+    public StringLDT getStringLDT() {
+	return stringLDT;
     }
     
     private final HashMap<String, Term> mcrMap = new HashMap<String, Term>(10);
@@ -446,7 +447,6 @@ public class TypeConverter extends TermBuilder {
             return intLDT.translateLiteral(lit);
         } else if (lit instanceof StringLiteral) {
 	    return stringLDT.translateLiteral(lit);
-            //return stringConverter.translateLiteral(lit,charLDT,services);
         } else if (lit instanceof FloatLiteral) {
             return floatLDT.translateLiteral(lit);
         } else if (lit instanceof DoubleLiteral) {
@@ -506,10 +506,11 @@ public class TypeConverter extends TermBuilder {
                         t2 == PrimitiveType.JAVA_CHAR||
                         t2 == PrimitiveType.JAVA_LONG)) 
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
-	//TODO String: When one operand is a String, then the expression is promoted to String (only the '+' operator)	    
-        return type1;
-	/*throw new RuntimeException("Could not determine promoted type "+
-	  "of "+t1+" and "+t2);*/
+	KeYJavaType strType = services.getJavaInfo().getTypeByName("java.lang.String");
+	if (t1 == strType.getJavaType() || t2 == strType.getJavaType())
+	    return strType;
+	throw new RuntimeException("Could not determine promoted type "+
+	  "of "+t1+" and "+t2);
     }
 
 

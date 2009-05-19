@@ -37,9 +37,11 @@ public class StringLDT extends LDT {
     Function cons;
     Function empty;
 
-    public StringLDT(Namespace sorts, Namespace functions) {
+    public StringLDT(Services services, Namespace sorts, Namespace functions, CharLDT charLDT) {
 	super(new Name("CharList"), sorts, null);
-	charLDT = new CharLDT(sorts,functions);//TODO where to get?!
+	// instead of null should be: services.getJavaInfo().getTypeByName("java.lang.String").getJavaType();
+	// but getTypeName yields null!
+	this.charLDT = charLDT;
 	cons  = addFunction (functions, "cons");
 	empty = addFunction (functions, "empty");
     }
@@ -52,7 +54,7 @@ public class StringLDT extends LDT {
      * @return true if the LDT is responsible for this kind of literals
      */
     public boolean isResponsible(Literal lit) {
-	return false;
+	return lit instanceof StringLiteral;
     }
 
     /**
