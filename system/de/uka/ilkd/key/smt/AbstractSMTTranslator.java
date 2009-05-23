@@ -1057,6 +1057,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 //  TODO make private again after testing!!
     public final StringBuffer translateTerm (Term term, Vector<QuantifiableVariable> quantifiedVars,
 	    Services services) throws IllegalFormulaException {
+	
+	if (term.op() instanceof Metavariable) {
+	    throw new IllegalFormulaException("The Formula contains a metavariable:\n" +
+	    		term.op().toString() + "\n" +
+	    		"Metavariables can not be translated.");
+	}
+	
 	Operator op = term.op();
 	if (op == Op.NOT) {
 	    StringBuffer arg = translateTerm(term.sub(0), quantifiedVars, services);
