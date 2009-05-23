@@ -424,6 +424,9 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	toReplace.add(":");
 	replacement.add("_col_");
 	
+	toReplace.add("\\");
+	replacement.add("_");
+	
 	toReturn = this.removeIllegalChars(toReturn, toReplace, replacement);
 	
 	toReturn.append("_").append(counter);

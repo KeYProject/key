@@ -20,6 +20,7 @@ import de.uka.ilkd.key.collection.SLListOfString;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.parser.simplify.SimplifyLexer;
 import de.uka.ilkd.key.parser.simplify.SimplifyParser;
@@ -50,6 +51,7 @@ public class SimplifyModelGenerator implements DecProdModelGenerator{
     private HashSet simplifyOutputs;
     private ListOfString placeHoldersForClasses = SLListOfString.EMPTY_LIST;
     
+    private SMTSolver simplify = new SimplifySolver();
     
     private static Term toFormula(Sequent s) {
 	TermBuilder tb = TermBuilder.DF;
@@ -72,10 +74,11 @@ public class SimplifyModelGenerator implements DecProdModelGenerator{
 	this.serv = serv;
 	this.term2class = term2class;
 	
-	SMTSolver simplify = new SimplifySolver();
+	//SMTSolver simplify = new SimplifySolver();
 	
 	SMTSolverResult res = SMTSolverResult.NO_IDEA; 
 	
+	//Get a result for the Problem
 	try {
 	    res = simplify.run(toFormula(node.sequent()), 60, serv);
 	} catch (IOException ioe) {
@@ -95,6 +98,7 @@ public class SimplifyModelGenerator implements DecProdModelGenerator{
 	
 	SMTTranslator st = simplify.getTranslator(serv);
 
+	//build the translated terms for each location
 	try{
 	    while(it.hasNext()){
 		de.uka.ilkd.key.logic.Term t = it.next();
@@ -104,6 +108,8 @@ public class SimplifyModelGenerator implements DecProdModelGenerator{
 	}catch(IllegalFormulaException e){
 	    System.err.println(e);
 	}
+	
+	//build equivalence classes
 	intClasses = new HashSet();
 	Iterator itc = term2class.values().iterator();
 	int index = initialCounterExample.indexOf("AND")+4;
@@ -130,8 +136,10 @@ public class SimplifyModelGenerator implements DecProdModelGenerator{
     }
 
     public Set createModels(){
+	//create models
 	HashSet models = new HashSet();	
 	int datCount = 1;
+	//collect all models
 	while(models.size() < modelLimit && 
 	      datCount <= genericTestValues.length){
 	    models.addAll(createModelsHelp(initialCounterExample, 
@@ -240,6 +248,8 @@ public class SimplifyModelGenerator implements DecProdModelGenerator{
 	
     private String simplify(Conjunction c){
 	try{
+	    //Term t = (new TermFactory()).createJunctorTerm(Op.NOT, c);
+	    //return this.simplify.run(t, 60, serv).text();
 	    return new SimplifySolver().run("(NOT "+c.toSimplify()+")", 60, serv).text();
 	}catch(Exception e){
 	    throw new RuntimeException(e);

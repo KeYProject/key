@@ -1338,10 +1338,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
 	    return translateFunc(atop, subterms);
 	} else {
-	    //return translateUnknown(term);
+	    return translateUnknown(term, quantifiedVars, services);
 	    //System.out.println("Found term: " + term.getClass());
 	    //System.out.println("Found op: " + term.op().getClass());
-	    throw new IllegalFormulaException("unknown term found");
+	    //throw new IllegalFormulaException("unknown term found");
 	}
     }
     
@@ -1492,10 +1492,48 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      *                The Term given to translate
      * @throws IllegalFormulaException
      */
-    protected final StringBuffer translateUnknown(Term term)
+    protected final StringBuffer translateUnknown(Term term, Vector<QuantifiableVariable> quantifiedVars,
+	    Services services)
 	    throws IllegalFormulaException {
-	throw new IllegalFormulaException(
-		"Formular contains unsupported arguments");
+	
+	//translate the term as uninterpreted function/predicate
+	    Operator op = term.op();
+	    if (term.sort() == Sort.FORMULA) {
+		//predicate
+		logger.debug("Translated as uninterpreted predicate:\n" + term.toString());
+		ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
+		for (int i = 0; i < op.arity(); i++) {
+		    subterms.add(translateTerm(term.sub(i), quantifiedVars,
+				services));
+		}
+		ArrayList<Sort> sorts = new ArrayList<Sort>();
+		for (int i = 0; i < op.arity(); i++) {
+		    sorts.add(term.sub(i).sort());
+		}
+		this.addPredicate(op, sorts);
+
+		return translatePred(op, subterms);
+	    } else {
+		//function
+		logger.debug("Translated as uninterpreted function:\n" + term.toString());
+		ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
+		for (int i = 0; i < op.arity(); i++) {
+		    subterms.add(translateTerm(term.sub(i), quantifiedVars,
+			services));
+		}
+		ArrayList<Sort> sorts = new ArrayList<Sort>();
+		for (int i = 0; i < op.arity(); i++) {
+		    sorts.add(term.sub(i).sort());
+		}
+		this.addFunction(op, sorts, term.sort());
+
+		return translateFunc(op, subterms);
+	    }
+	    //throw new IllegalFormulaException("The formula could not be translated\n" +
+	    //		"The (sub)term\n" + term.toString() + "\n" +
+	    //				"could not be translated.");
+	
+	
     }
 
     protected final StringBuffer translateVariable(Operator op) {
