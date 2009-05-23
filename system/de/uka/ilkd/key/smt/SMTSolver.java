@@ -69,4 +69,11 @@ public interface SMTSolver {
      * could not be written to a file
      */
     public SMTSolverResult run(Term formula, int timeout, Services services) throws IOException;
+    
+    /**
+     * check, if this solver is installed and can be used.
+     * @param recheck if false, the solver is not checked again, if a cached value for this exists.
+     * @return true, if it is installed.
+     */
+    public boolean isInstalled(boolean recheck);
 }

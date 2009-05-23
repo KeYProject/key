@@ -15,12 +15,12 @@ public class TestSimplify extends TestSMTSolver {
     }
 
     @Override
-    protected boolean toolNotInstalled() {
+    protected boolean toolNotInstalledChecked() {
 	return simplifyNotInstalled;
     }
 
     @Override
-    protected void setToolNotInstalled(boolean b) {
+    protected void setToolNotInstalledChecked(boolean b) {
 	simplifyNotInstalled = b;
     }
 }

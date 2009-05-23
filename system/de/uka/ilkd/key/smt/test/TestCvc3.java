@@ -13,12 +13,12 @@ public class TestCvc3 extends TestSMTSolver {
     }
 
     @Override
-    protected boolean toolNotInstalled() {
+    protected boolean toolNotInstalledChecked() {
 	return cvc3NotInstalled;
     }
 
     @Override
-    protected void setToolNotInstalled(boolean b) {
+    protected void setToolNotInstalledChecked(boolean b) {
 	cvc3NotInstalled = b;
     }
 }

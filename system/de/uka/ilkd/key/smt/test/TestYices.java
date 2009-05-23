@@ -13,12 +13,12 @@ public class TestYices extends TestSMTSolver {
     }
 
     @Override
-    protected boolean toolNotInstalled() {
+    protected boolean toolNotInstalledChecked() {
 	return yicesNotInstalled;
     }
 
     @Override
-    protected void setToolNotInstalled(boolean b) {
+    protected void setToolNotInstalledChecked(boolean b) {
 	yicesNotInstalled = b;
     }
 }

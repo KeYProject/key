@@ -25,6 +25,9 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.util.HelperClassForTests;
 
 
 public abstract class AbstractSMTSolver implements SMTSolver {
@@ -328,19 +331,33 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     public boolean isInstalled(boolean recheck) {
 	if (recheck | !installwaschecked) {
 	    //build valid formula
-	    TermFactory tf = new TermFactory();
-	    Term t = tf.createJunctorTerm(Op.OR, tf.createJunctorTerm(Op.TRUE), tf.createJunctorTerm(Op.FALSE));
+	    HelperClassForTests helper = new HelperClassForTests();	
+	    ProofAggregate p = helper.parse(new File(this.getTestFile()));
+	    Proof pr = p.getFirstProof();
+	    Goal g = pr.openGoals().iterator().next();
 	    //try to solve the formula
 	    try {
-		this.run(t, 1, new Services());
+		//TODO work here! translation doesn't work this way!
+		this.run(g, 1, pr.getServices());
 		isinstalled = true;
-	    } catch (RuntimeException e) {
-		//if exception: not installed
+//	    } catch (RuntimeException e) {
+//		if this exception: some problem, but not with insatllation
+//		isinstalled = true;
+	    } catch (IOException e2) {
+//		if exception: not installed
 		isinstalled = false;
 	    }
 	    installwaschecked = true;
 	}
 	return isinstalled;
+    }
+    
+    protected String getTestFile() {
+	return System.getProperty("key.home")
+	    + File.separator + "examples"
+	    + File.separator + "_testcase"
+	    + File.separator + "smt"
+	    + File.separator + "ornot.key";
     }
     
 }
