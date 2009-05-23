@@ -20,6 +20,9 @@ import org.apache.log4j.Logger;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -310,6 +313,34 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	} 
 
 	return toReturn;
+    }
+    
+    /** true, if this solver was checked if installed */
+    private boolean installwaschecked = false;
+    /** true, if last check showed solver is installed */
+    private boolean isinstalled = false;
+    
+    /**
+     * check, if this solver is installed and can be used.
+     * @param recheck if false, the solver is not checked again, if a cached value for this exists.
+     * @return true, if it is installed.
+     */
+    public boolean isInstalled(boolean recheck) {
+	if (recheck | !installwaschecked) {
+	    //build valid formula
+	    TermFactory tf = new TermFactory();
+	    Term t = tf.createJunctorTerm(Op.OR, tf.createJunctorTerm(Op.TRUE), tf.createJunctorTerm(Op.FALSE));
+	    //try to solve the formula
+	    try {
+		this.run(t, 1, new Services());
+		isinstalled = true;
+	    } catch (RuntimeException e) {
+		//if exception: not installed
+		isinstalled = false;
+	    }
+	    installwaschecked = true;
+	}
+	return isinstalled;
     }
     
 }
