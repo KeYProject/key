@@ -39,13 +39,20 @@ public final class YicesSolver extends AbstractSMTSolver {
 
     
     @Override
-    protected SMTSolverResult interpretAnswer(String text) {
-	if (text.equals("unsat\n")) {
-	    return SMTSolverResult.createValidResult(text);
-	} else if (text.equals("sat\n")) {
-	    return SMTSolverResult.createInvalidResult(text);
+    protected SMTSolverResult interpretAnswer(String input, String error, int val) {
+	if (val == 0) {
+	    //no error occured
+	    if (input.equals("unsat\n")) {
+		return SMTSolverResult.createValidResult(input);
+	    } else if (input.equals("sat\n")) {
+		return SMTSolverResult.createInvalidResult(input);
+	    } else {
+		return SMTSolverResult.createUnknownResult(input);
+	    }
 	} else {
-	    return SMTSolverResult.createUnknownResult(text);
+	    throw new IllegalArgumentException(error);
 	}
+	
+	
     }
 }

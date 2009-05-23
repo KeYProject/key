@@ -37,14 +37,22 @@ public final class SimplifySolver extends AbstractSMTSolver {
 
     
     @Override
-    protected SMTSolverResult interpretAnswer(String text) {
-	if (meansValid(text)) {
-	    return SMTSolverResult.createValidResult(text);
-	} else if (meansInvalid(text)) {
-	    return SMTSolverResult.createInvalidResult(text);
+    protected SMTSolverResult interpretAnswer(String text, String error, int val) {	
+	
+	if (val == 0) {
+	    //no error occured
+	    if (meansValid(text)) {
+		return SMTSolverResult.createValidResult(text);
+	    } else if (meansInvalid(text)) {
+		return SMTSolverResult.createInvalidResult(text);
+	    } else {
+		return SMTSolverResult.createUnknownResult(text);
+	    } 
 	} else {
-	    return SMTSolverResult.createUnknownResult(text);
+	    //error occured
+	    throw new IllegalArgumentException(error);
 	}
+	
     }    
     
     private boolean meansValid(String text) {
@@ -82,6 +90,5 @@ public final class SimplifySolver extends AbstractSMTSolver {
 	}
 	return toReturn;
     }
-    
     
 }

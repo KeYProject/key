@@ -1058,6 +1058,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     public final StringBuffer translateTerm (Term term, Vector<QuantifiableVariable> quantifiedVars,
 	    Services services) throws IllegalFormulaException {
 	
+	//added, because meatavariables should not be translated.
 	if (term.op() instanceof Metavariable) {
 	    throw new IllegalFormulaException("The Formula contains a metavariable:\n" +
 	    		term.op().toString() + "\n" +
@@ -1345,6 +1346,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
 	    return translateFunc(atop, subterms);
 	} else {
+	    //if none of the above works, the symbol can be translated as uninterpreted function
+	    //or predicate. The idea is, tht if a formula is valid with a interpreted function,
+	    //it has to be valid with an uninterpreted.
+	    //Caution: Counterexamples might be affected by this.
 	    return translateUnknown(term, quantifiedVars, services);
 	    //System.out.println("Found term: " + term.getClass());
 	    //System.out.println("Found op: " + term.op().getClass());

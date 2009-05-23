@@ -38,13 +38,22 @@ public final class Z3Solver extends AbstractSMTSolver {
     
     
     @Override
-    protected SMTSolverResult interpretAnswer(String text) {
-	if (text.contains("unsat")) {
-	    return SMTSolverResult.createValidResult(text);
-	} else if (text.contains("sat")) {
-	    return SMTSolverResult.createInvalidResult(text);
-	} else {
+    protected SMTSolverResult interpretAnswer(String text, String error, int val) {
+	if (val == 0) {
+	    //no error occured
+	    if (text.contains("unsat")) {
+		return SMTSolverResult.createValidResult(text);
+	    } else if (text.contains("sat")) {
+		return SMTSolverResult.createInvalidResult(text);
+	    } else {
+		return SMTSolverResult.createUnknownResult(text);
+	    }
+	} else if (val == 112 && text.contains("unknown")) {
+	    //the result was unknown
 	    return SMTSolverResult.createUnknownResult(text);
+	} else {
+	    //something went wrong
+	    throw new IllegalArgumentException(error);
 	}
     }
 }
