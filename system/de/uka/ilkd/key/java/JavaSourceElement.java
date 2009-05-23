@@ -164,8 +164,13 @@ public abstract class JavaSourceElement implements SourceElement {
     /** toString */
     public String toString() {
 	StringWriter sw=new StringWriter();
+	PrettyPrinter pp=new PrettyPrinter(sw, true);
+	return toString(pp,sw);
+    }
+    
+    /*Sometimes CompilableJavaPP must be given as argument instead of the ordinary PrettyPrinter */
+    public String toString(PrettyPrinter pp, StringWriter sw){
 	try {
-	    PrettyPrinter pp=new PrettyPrinter(sw, true);
 	    pp.setIndentationLevel(0);
 	    prettyPrint(pp);
 	} catch (IOException e) {

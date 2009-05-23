@@ -38,8 +38,11 @@ public  class StringConverter{
         public Term translateLiteral(Literal lit, LDT intLDT, Services serv){
 	    Namespace funcNs = serv.getNamespaces().functions();
 	    Function epsilon= (Function)funcNs.lookup(new Name(EPSILON));
-	    assert epsilon != null;
 	    Function cat=(Function)funcNs.lookup(new Name(CAT));
+	    if(epsilon==null || cat==null){
+		throw new RuntimeException("Functions namespace does not know the string-related functions: "+EPSILON+" and "+CAT+". Try to enable Menu > Options > TacletLibraries > stringRules.key ");
+	    }
+	    assert epsilon != null;
 	    assert cat != null;
 	    ppCat = cat;
 	    Term  term_epsilon=TermFactory.DEFAULT.createFunctionTerm(epsilon);

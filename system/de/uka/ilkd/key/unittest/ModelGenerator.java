@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.unittest.simplify.*;
+import de.uka.ilkd.key.unittest.simplify.translation.DecisionProcedureSimplify;
 import de.uka.ilkd.key.unittest.cogent.*;
 import java.util.*;
 
@@ -23,7 +24,8 @@ public class ModelGenerator{
 
     public static final int COGENT = 0;
     public static final int SIMPLIFY = 1;
-    public static int decProdForTestGen=COGENT;
+    public static final int OLD_SIMPLIFY = 2;
+    public static int decProdForTestGen=OLD_SIMPLIFY;
 
     private ListOfTerm ante, succ;
     private HashMap term2class;
@@ -345,6 +347,13 @@ public class ModelGenerator{
 	if(decProdForTestGen == SIMPLIFY /*|| intModelSet.isEmpty()*/){
 	    dmg = new SimplifyModelGenerator(node, serv,
 		term2class, locations);
+	    intModelSet = dmg.createModels();
+	}
+	if (decProdForTestGen == OLD_SIMPLIFY /* || intModelSet.isEmpty() */) {
+	    dmg = new OldSimplifyModelGenerator(new DecisionProcedureSimplify(
+		    node, userConstraint,
+		     serv), serv,
+		    term2class, locations);
 	    intModelSet = dmg.createModels();
 	}
 	Set modelSet = new HashSet();

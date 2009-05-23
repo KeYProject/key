@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.feature.*;
 
@@ -20,6 +21,10 @@ import de.uka.ilkd.key.strategy.feature.*;
  */
 public class VBTStrategy extends JavaCardDLStrategy {
 
+    /** This is the default value when changing back from a different Strategy back to VBTStrategy */
+    public static String preferedGoalChooser=DefaultGoalChooserBuilder.NAME;//Maybe set to BalancedGoalChooser
+
+    public static String VBTStrategy="VBTStrategy";
     protected static StrategyProperties setupStrategyProperties() {
         final StrategyProperties res = new StrategyProperties ();
         res.setProperty( StrategyProperties.SPLITTING_OPTIONS_KEY,
@@ -79,7 +84,7 @@ public class VBTStrategy extends JavaCardDLStrategy {
     }   
     
     public Name name () {
-        return new Name("VBTStrategy");
+        return new Name(VBTStrategy);
     }
 
     public static class Factory extends StrategyFactory {
@@ -93,7 +98,7 @@ public class VBTStrategy extends JavaCardDLStrategy {
         }
         
         public Name name () {
-            return new Name("VBTStrategy");
+            return new Name(VBTStrategy);
         }
     }
 }

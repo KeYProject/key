@@ -9,6 +9,8 @@
 //
 package recoder.service;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 import recoder.ParserException;
@@ -138,7 +140,39 @@ public class KeYCrossReferenceSourceInfo
     }
 
     void registerSubtype(ClassType c1, ClassType c2) {
-	super.registerSubtype(c1, c2);
+
+	try {
+	    super.registerSubtype(c1, c2);
+	} catch (IllegalAccessError iae) {
+	    // eclipse uses different classloaders and they cause an exception here
+	    // TODO: package new recoder library with protected registerSubtype
+	    // and delete the exception handling code below
+	    eclipseWorkaroundMethodAccess(c1, c2);
+	}
+	
+	
+	
+    }
+
+    // Woraround for eclipse as we need to access a package private method from the superclass
+    // even this class is logically in the same package, eclipse uses different classloaders
+    // and will not allow this trick
+    // TODO: package new recoder library with protected registerSubtype
+    // and delete the exception handling code below
+    private void eclipseWorkaroundMethodAccess(ClassType c1, ClassType c2) {
+	try {
+	    Method m = DefaultProgramModelInfo.class.getDeclaredMethod("registerSubtype", ClassType.class, ClassType.class);
+	    m.setAccessible(true);
+	    m.invoke(this, c1, c2);
+	} catch (IllegalAccessException e) {
+	    throw (IllegalAccessError)new IllegalAccessError().initCause(e);
+	} catch (InvocationTargetException e) {
+	    throw (IllegalAccessError)new IllegalAccessError().initCause(e);
+	} catch (SecurityException e) {
+	    throw (IllegalAccessError)new IllegalAccessError().initCause(e);
+	} catch (NoSuchMethodException e) {
+	    throw (IllegalAccessError)new IllegalAccessError().initCause(e);
+	}
     }
 
     public Variable getVariable(String name, ProgramElement context) {

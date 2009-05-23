@@ -8,6 +8,7 @@
 package de.uka.ilkd.key.unittest.ppAndJavaASTExtension;
 
 import java.io.IOException;
+import java.io.StringWriter;
 
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Expression;
@@ -190,8 +191,14 @@ public class SyntacticalProgramVariable extends TermSymbol implements
 
     /** @param w must be an instance of CompilableJavaPP */
     public void prettyPrint(PrettyPrinter w) throws IOException {
-        CompilableJavaPP cjpp = (CompilableJavaPP)w;
-        cjpp.printSyntacticalProgramVariable(this);
+	if(!(w instanceof CompilableJavaPP)){
+	    CompilableJavaPP cjpp =new CompilableJavaPP(new StringWriter(),false);
+	    prettyPrint(cjpp);
+	    cjpp.emergencyPrint(w);
+	}else{
+	    CompilableJavaPP cjpp = (CompilableJavaPP)w;
+	    cjpp.printSyntacticalProgramVariable(this);
+	}
     }
 
     /**
