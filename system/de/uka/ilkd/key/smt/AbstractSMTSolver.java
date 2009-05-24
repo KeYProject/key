@@ -331,14 +331,17 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     public boolean isInstalled(boolean recheck) {
 	if (recheck | !installwaschecked) {
 	    //build valid formula
-	    HelperClassForTests helper = new HelperClassForTests();	
-	    ProofAggregate p = helper.parse(new File(this.getTestFile()));
-	    Proof pr = p.getFirstProof();
-	    Goal g = pr.openGoals().iterator().next();
+	    //helper class causes infinite loop
+	    //HelperClassForTests helper = new HelperClassForTests();	
+	    //ProofAggregate p = helper.parse(new File(this.getTestFile()));
+	    //Proof pr = p.getFirstProof();
+	    //Goal g = pr.openGoals().iterator().next();
 	    //try to solve the formula
 	    try {
-		//TODO work here! translation doesn't work this way!
-		this.run(g, 1, pr.getServices());
+		//This will cause an error, but no IOException, if installed.
+		//avoid to call the translator. A fakeds service element will
+		//cause trouble this way.
+		this.run("test", 1, new Services());
 		isinstalled = true;
 //	    } catch (RuntimeException e) {
 //		if this exception: some problem, but not with insatllation
@@ -350,6 +353,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	    installwaschecked = true;
 	}
 	return isinstalled;
+	//return this.getExecutionCommand("a", "b")[0].contains("z");
     }
     
     protected String getTestFile() {

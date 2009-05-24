@@ -79,4 +79,13 @@ public class SMTRule implements BuiltInRule {
     public String toString() {
 	return name().toString();
     }
+    
+    /**
+     * check, if this solver is installed and can be used.
+     * @param recheck if false, the solver is not checked again, if a cached value for this exists.
+     * @return true, if it is installed.
+     */
+    public boolean isInstalled(boolean recheck) {
+	return this.solver.isInstalled(recheck);
+    }
 }

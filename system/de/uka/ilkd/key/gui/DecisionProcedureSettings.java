@@ -74,8 +74,11 @@ public class DecisionProcedureSettings implements Settings {
     /** the list of registered SettingListener */
     private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
     
-    /** the list of available SMTRules */
+    /** the list of RuleDescriptors of available SMTRules */
     private ArrayList<RuleDescriptor> rules = new ArrayList<RuleDescriptor>();
+    
+    /** the list of all ruledescriptors of all rules that are installed */
+    private ArrayList<RuleDescriptor> installedrules = new ArrayList<RuleDescriptor>();
     
     /** the currently active rule */
     private Name activeRule = NOT_A_RULE.getRuleName();
@@ -113,6 +116,16 @@ public class DecisionProcedureSettings implements Settings {
 	return NOT_A_RULE;
     }
     
+    /**
+     * retrieves the rule of the specified name or returns <code>null</code> if
+     * no such rule exists
+     * @param ruleName the String unambiguously specifying a rule 
+     * @return the found SMTRule or <code>null</code> 
+     */
+    public RuleDescriptor findRuleByName(Name ruleName) {
+	return this.findRuleByName(ruleName.toString());
+    }
+    
     
     /** sends the message that the state of this setting has been
      * changed to its registered listeners (not thread-safe)
@@ -129,17 +142,37 @@ public class DecisionProcedureSettings implements Settings {
      * @return the active rule
      */
     public RuleDescriptor getActiveRule() {
-	return findRuleByName(activeRule.toString());
+	RuleDescriptor rd = this.findRuleByName(this.activeRule);
+	if (this.installedrules.contains(rd)) {
+	    return rd;
+	} else if (this.installedrules.size() == 0) {
+	    this.activeRule = NOT_A_RULE.getRuleName();
+	    return NOT_A_RULE;
+	} else {
+	    rd = this.installedrules.get(0);
+	    this.setActiveRule(rd.getRuleName());
+	    return this.findRuleByName(this.activeRule);
+	}
     }
     
     /**
-     * Returns a list of all available rules, sorted alphabetically by rule name.
+     * Returns a list of all installed rules, sorted alphabetically by rule name.
      */
-    public List<RuleDescriptor> getAvailableRules() {
+    public List<RuleDescriptor> getAllRules() {
 	List<RuleDescriptor> sortedRules = new ArrayList<RuleDescriptor>();
 	sortedRules.addAll(rules);
 	Collections.sort(sortedRules);
 	return Collections.unmodifiableList(sortedRules);
+    }
+    
+    /**
+     * Returns a list of all installed rules, sorted alphabetically by rule name.
+     */
+    public List<RuleDescriptor> getAvailableRules() {
+	List<RuleDescriptor> toReturn = new ArrayList<RuleDescriptor>();
+	toReturn.addAll(this.installedrules);
+	Collections.sort(toReturn);
+	return Collections.unmodifiableList(toReturn);
     }
     
     /**
@@ -206,14 +239,19 @@ public class DecisionProcedureSettings implements Settings {
      * @param profile the active Profile 
      */
     public void updateSMTRules(Profile profile) {
-	//Load the available Solver
+	//Load the available Solver	
 	rules = new ArrayList<RuleDescriptor>();
+	this.installedrules = new ArrayList<RuleDescriptor>();
 	for (Rule r : profile.
 		getStandardRules().getStandardBuiltInRules()) {
 	    if (r instanceof SMTRule) {
 		rules.add(new RuleDescriptor(r.name(),r.displayName()));
+		SMTRule smtr = (SMTRule)r;
+		if (smtr.isInstalled(false)) {
+		    installedrules.add(new RuleDescriptor(r.name(),r.displayName()));
+		}
 	    }
-	}	
+	}
     }
     
 
