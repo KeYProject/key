@@ -26,13 +26,13 @@ public final class YicesSolver extends AbstractSMTSolver {
 
 
     @Override
-    protected String[] getExecutionCommand(String filename, String formula) {
-	String[] toReturn = new String[4];
+    protected String getExecutionCommand(String filename, String formula) {
+	//String[] toReturn = new String[4];
 
-	toReturn[0] = "yices";
-	toReturn[1] = "-tc";
-	toReturn[2] = "-smt";
-	toReturn[3] = filename;
+	String toReturn = "yices -tc -smt " + filename;
+	//toReturn[1] = "-tc";
+	//toReturn[2] = "-smt";
+	//toReturn[3] = filename;
 
 	return toReturn;
     }

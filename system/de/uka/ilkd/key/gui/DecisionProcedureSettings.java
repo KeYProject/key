@@ -16,6 +16,7 @@ import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.smt.AbstractSMTSolver;
 import de.uka.ilkd.key.smt.SMTRule;
 
 /** This class encapsulates the information which 
@@ -199,6 +200,65 @@ public class DecisionProcedureSettings implements Settings {
 		this.timeout = curr;
 	    }
 	}
+	
+	this.readExecutionString(props);
+    }
+    
+    private static String EXECSTR = "[DecisionProcedure]Exec";
+    private HashMap<RuleDescriptor, String> execCommands = new HashMap<RuleDescriptor, String>();
+    
+    /**
+     * read the execution strings from the properties file
+     * @param props
+     */
+    private void readExecutionString(Properties props) {
+	String allCommands = props.getProperty(EXECSTR);
+	//all value pairs are stored separated by a |
+	if (allCommands != null) {
+	    String[] valuepairs = allCommands.split("||");
+	    for (String s : valuepairs) {
+		String[] vals = s.split("|");
+		RuleDescriptor rd = findRuleByName(vals[0]);
+		execCommands.put(rd, vals[1]);
+	    }
+	}
+    }
+    
+    /**
+     * write the Execution Commands to the file
+     * @param prop
+     */
+    private void writeExecutionString(Properties prop) {
+	String toStore = "";
+	for (RuleDescriptor rd : execCommands.keySet()) {
+	    String comm = execCommands.get(rd);
+	    if (comm == null) {
+		comm = " ";
+	    }
+	    toStore = toStore + rd.ruleName.toString() + "|" + comm + "||";
+	}
+	//remove the las two || again
+	toStore = toStore.substring(0, toStore.length()-2);
+	prop.setProperty(EXECSTR, toStore);
+    }
+    
+    /**
+     * Set a execution command for a certain rule.
+     * @param r the rule, which uses this command.
+     * @param command the command to use
+     */
+    public void setExecutionCommand(AbstractSMTSolver r, String command) {
+	RuleDescriptor rd = this.findRuleByName(r.name());
+	this.execCommands.put(rd, command);
+    }
+    
+    /**
+     * get the execution command for a certain rule.
+     * @param r the rule
+     * @return the execution command
+     */
+    public String getExecutionCommand(AbstractSMTSolver r) {
+	return this.execCommands.get(r);
     }
 
     /**
@@ -273,6 +333,7 @@ public class DecisionProcedureSettings implements Settings {
     public void writeSettings(Properties props) {	
         props.setProperty(ACTIVE_RULE, "" + activeRule);
         props.setProperty(TIMEOUT, "" + this.timeout);
+        this.writeExecutionString(props);
     }
 
     public static DecisionProcedureSettings getInstance() {

@@ -17,6 +17,7 @@ import java.util.Timer;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.gui.DecisionProcedureSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -54,9 +55,19 @@ public abstract class AbstractSMTSolver implements SMTSolver {
      * @param formula the formula, that was created by the translator
      * @return Array of Strings, that can be used for executing an external decider.
      */
-    protected abstract String[] getExecutionCommand(String filename,
+    protected abstract String getExecutionCommand(String filename,
 	    				            String formula);
+  
     
+    private String getStoredExecutionCommand(String filename, String formula) {
+	String comm = DecisionProcedureSettings.getInstance().getExecutionCommand(this);
+	if (comm != null && comm.length() != 0 && comm != " ") {
+	    comm.replace(" %f", filename);
+	    return comm;
+	} else {
+	    return this.getExecutionCommand(filename, formula);
+	}
+    }
     
     /**
      * Interpret the answer of the program.
@@ -217,7 +228,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	} 
 
 	//get the commands for execution
-	String[] execCommand = this.getExecutionCommand(loc.getAbsolutePath(), formula);
+	String execCommand = this.getStoredExecutionCommand(loc.getAbsolutePath(), formula);
 
 	try {
 	    //execute the external solver
@@ -292,10 +303,10 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	    	}
 	    }*/
 	} catch (IOException e) {
-	    String cmdStr = "";
-	    for (String cmd : execCommand) {
-		cmdStr += cmd + " ";
-	    }
+	    String cmdStr = execCommand;
+	    //for (String cmd : execCommand) {
+		//cmdStr += cmd + " ";
+	    //}
 	    IOException ioe = new IOException("Invocation of decision procedure\n\t\t" +
 		    this.name() + "\n with command \n\t\t" + cmdStr + "\n" +  
 		    "failed. The most common (but not all) reasons for this error are:\n" +
@@ -303,8 +314,8 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		    "\t    Solution: Add the directory to your PATH environment variable." +
 		    "\n 2. we expect a different name than your executable " +
 		    "(prior to KeY 1.5 and later we expected 'Simplify' instead of 'simplify')" +
-		    "\n\t Solution: Change the name to " + (execCommand != null && execCommand.length > 0 ? 
-		        	execCommand[0] : "expected name") +
+		    "\n\t Solution: Change the name to " + (execCommand != null ? 
+		        	execCommand : "expected name") +
 		    "\n 3. you have not the permission to execute the decision procedure." +
 		    "\n\t Solution: *nix-like systems: try 'chmod u+x <path_to_executable>/<executable_filename>" +
 		    "\n 4. you use a too new or too old version of the decision procedure and the command " +
