@@ -51,24 +51,24 @@ public class GenericParser {
      * a dependency of SetOfString
      */
     public static String[][] dep={
-	{"HashMapFrom<S>To<T>.gjava","IteratorOf%1.java"},//,"IteratorOf%2.java"},
-	{"ListOf<T>.gjava","IteratorOf%1.java"},
-	{"SLListOf<T>.gjava","ListOf%1.java"},	
-	{"SetOf<T>.gjava"},
-	{"SetAsListOf<T>.gjava","SetOf%1.java","SLListOf%1.java"},
-	{"IteratorOf<T>.gjava"},
-	{"MapFrom<S>To<T>.gjava"},
-	{"EntryOf<S>And<T>.gjava"},
-	{"MapAsListFrom<S>To<T>.gjava","MapFrom%1To%2.java",
+	{"HashMapFrom(S)To(T).gjava","IteratorOf%1.java"},//,"IteratorOf%2.java"},
+	{"ListOf(T).gjava","IteratorOf%1.java"},
+	{"SLListOf(T).gjava","ListOf%1.java"},	
+	{"SetOf(T).gjava"},
+	{"SetAsListOf(T).gjava","SetOf%1.java","SLListOf%1.java"},
+	{"IteratorOf(T).gjava"},
+	{"MapFrom(S)To(T).gjava"},
+	{"EntryOf(S)And(T).gjava"},
+	{"MapAsListFrom(S)To(T).gjava","MapFrom%1To%2.java",
 	 "SLListOfEntryOf%1And%2.java", 
 	 "EntryOf%1And%2.java",//"SLListOf%1.java","SLListOf%2.java", disabled 
 	                       // because of distributed packages
 	 "IteratorOfEntryOf%1And%2.java"},
-	{"ArrayOf<S>.gjava"},
-	{"VectorOf<T>.gjava","IteratorOf%1.java"},
-	{"HeapOf<T>.gjava","IteratorOf%1.java"},
-	{"LeftistHeapOf<T>.gjava","HeapOf%1.java"},
-	{"SimpleStackOf<T>.gjava","IteratorOf%1.java"}
+	{"ArrayOf(S).gjava"},
+	{"VectorOf(T).gjava","IteratorOf%1.java"},
+	{"HeapOf(T).gjava","IteratorOf%1.java"},
+	{"LeftistHeapOf(T).gjava","HeapOf%1.java"},
+	{"SimpleStackOf(T).gjava","IteratorOf%1.java"}
     };
     
     public static String generatedSrcPath;
@@ -221,8 +221,8 @@ public class GenericParser {
 // 	}
 
 	// the char < has to be declared as \<
-	replaceAll(action,"<","\\<");
-	replaceAll(action,">","\\>");	
+	replaceAll(action,"(","\\(");
+	replaceAll(action,")","\\)");	
 	
 	return action.toString();
     }
