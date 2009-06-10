@@ -258,7 +258,7 @@ public abstract class ExamDataBase {
       @  ensures (\forall int i; 
       @                0<=i && i<students.length && students[i]!=null;
       @                students[i].matrNr==matrNr ? students[i].bonusPoints == bonusPoints : 
-      @                                             students[i].bonusPoints==\old(students[i].points));
+      @                                             students[i].bonusPoints==\old(students[i].bonusPoints));
       @ also public exceptional_behavior
       @  requires !((\exists int i; 
       @                  0<=i && i<students.length && students[i]!=null
