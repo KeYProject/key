@@ -1717,7 +1717,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	    result = new JMLExpression(t);
 	}
     |
-    ("(" BSUM) => t=bsumterm
+    (LPAREN BSUM) => t=bsumterm
 	{
 	    result = new JMLExpression(t);
 	}
