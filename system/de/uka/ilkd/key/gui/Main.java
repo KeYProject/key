@@ -238,7 +238,6 @@ public class Main extends JFrame implements IMain {
         super(title);
         setIconImage(IconFactory.keyLogo());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-        configureLogger();
         proofListener = new MainProofListener();
         guiListener = new MainGUIListener();
         constraintListener = new MainConstraintTableListener();
@@ -3070,6 +3069,7 @@ public class Main extends JFrame implements IMain {
         // does no harm on non macs
         System.setProperty("apple.laf.useScreenMenuBar","true"); 
  	
+        configureLogger();
         Main.evaluateOptions(args);        
  	Main key = getInstance(visible);   
  	key.loadCommandLineFile();
