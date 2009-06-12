@@ -10,12 +10,12 @@ public class ExamDataBaseImpl extends ExamDataBase {
     }
 
     /*@ private normal_behavior
-      @  assignable students;
+      @  assignable students, \object_creation(Student[]);
       @  ensures (\forall int i; 0<=i && i<students.length; 
       @               students[i] == (i<\old(students.length) 
       @                               ? \old(students)[i] 
       @                               : null));
-      @  ensures students!=null && students.length > \old(students.length);
+      @  ensures students!=null && students.length > \old(students.length) && (\exists Student[] s; s==students; !\old(\created(s)));
       @*/
     private void increaseStudents(){
 	Student[] oldStudents = students;

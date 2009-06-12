@@ -138,7 +138,7 @@ public abstract class ExamDataBase {
       @           && (\forall int i; 
       @                   0<=i && i<students.length && students[i]!=null;
       @                       students[i].matrNr!=matrNr);
-      @  assignable students, students[*];
+      @  assignable students, students[*], \object_creation(Student[]), \object_creation(Student);
       @  ensures (\exists int i; 
       @               0<=i && i<students.length && students[i]!=null; 
       @	                  students[i].matrNr==matrNr 
@@ -162,6 +162,7 @@ public abstract class ExamDataBase {
       @             && (\forall int i; 
       @                     0<=i && i<students.length && students[i]!=null;
       @                         students[i].matrNr!=matrNr));
+      @  assignable \object_creation(ExamDataBaseException);
       @  signals_only ExamDataBaseException;
       @*/
     public abstract void addStudent(int matrNr, 
@@ -332,8 +333,9 @@ public abstract class ExamDataBase {
       @               0<=k && k<\result.length 
       @               && 0<=l && l<\result.length && k!=l;
       @                   \result[k]!=\result[l]);
+      @  assignable \object_creation(int[]);
       @*/
-    public abstract /*@pure@*/ int[] getMatrNrs();
+    public abstract int[] getMatrNrs();
 
 
     /**
@@ -538,6 +540,7 @@ public abstract class ExamDataBase {
       @                                        students[i].bonusPoints)==grade);
       @ also public exceptional_behavior
       @  requires !consistent();
+      @  assignable \object_creation(ExamDataBaseException);
       @  signals_only ExamDataBaseException;
       @*/
     public abstract /*@pure@*/ int getNumWithGrade(int grade) 
@@ -564,6 +567,7 @@ public abstract class ExamDataBase {
       @                      /getNumParticipants()));
       @ also public exceptional_behavior
       @  requires !consistent();
+      @  assignable \object_creation(ExamDataBaseException);
       @  signals_only ExamDataBaseException;
       @*/
     public abstract /*@pure@*/ int getAverage() throws ExamDataBaseException;
@@ -590,6 +594,7 @@ public abstract class ExamDataBase {
       @                      /(getNumParticipants()-getNumWithGrade(500))));
       @ also public exceptional_behavior
       @  requires !consistent();
+      @  assignable \object_creation(ExamDataBaseException);
       @  signals_only ExamDataBaseException;
       @*/
     public abstract /*@pure@*/ int getPassedAverage() 
