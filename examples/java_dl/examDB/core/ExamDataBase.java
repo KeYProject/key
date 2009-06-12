@@ -360,7 +360,7 @@ public abstract class ExamDataBase {
       @                 && students[i].matrNr==matrNr);
       @  signals_only ExamDataBaseException;
       @*/
-    public abstract /*@pure@*/ String getFirstname(int matrNr) 
+    public abstract String getFirstname(int matrNr) 
 						throws ExamDataBaseException;
 
     /**
@@ -385,7 +385,7 @@ public abstract class ExamDataBase {
       @                 && students[i].matrNr==matrNr);
       @  signals_only ExamDataBaseException;
       @*/
-    public abstract /*@pure@*/ String getSurname(int matrNr) 
+    public abstract String getSurname(int matrNr) 
 						throws ExamDataBaseException;
 
     /**
@@ -410,7 +410,7 @@ public abstract class ExamDataBase {
       @                 && students[i].matrNr==matrNr);
       @  signals_only ExamDataBaseException;
       @*/
-    public abstract /*@pure@*/ int getPoints(int matrNr) 
+    public abstract int getPoints(int matrNr) 
 						throws ExamDataBaseException;
 
     /**
@@ -435,7 +435,7 @@ public abstract class ExamDataBase {
       @                 && students[i].matrNr==matrNr);
       @  signals_only ExamDataBaseException;
       @*/
-    public abstract /*@pure@*/ int getBonusPoints(int matrNr) 
+    public abstract int getBonusPoints(int matrNr) 
 						throws ExamDataBaseException;
 
 
@@ -462,7 +462,7 @@ public abstract class ExamDataBase {
      @                 && students[i].matrNr==matrNr);
      @  signals_only ExamDataBaseException;
      @*/
-    public abstract /*@pure@*/ boolean getBackedOut(int matrNr) 
+    public abstract boolean getBackedOut(int matrNr) 
 						throws ExamDataBaseException;
 
 
@@ -490,7 +490,7 @@ public abstract class ExamDataBase {
       @                 && students[i].matrNr==matrNr &&!students[i].backedOut);
       @  signals_only ExamDataBaseException;
       @*/
-    public abstract /*@pure@*/ int getGrade(int matrNr) 
+    public abstract int getGrade(int matrNr) 
 						throws ExamDataBaseException;
 
     /**
@@ -543,7 +543,7 @@ public abstract class ExamDataBase {
       @  assignable \object_creation(ExamDataBaseException);
       @  signals_only ExamDataBaseException;
       @*/
-    public abstract /*@pure@*/ int getNumWithGrade(int grade) 
+    public abstract int getNumWithGrade(int grade) 
 						throws ExamDataBaseException;
 
     /** 
@@ -570,7 +570,7 @@ public abstract class ExamDataBase {
       @  assignable \object_creation(ExamDataBaseException);
       @  signals_only ExamDataBaseException;
       @*/
-    public abstract /*@pure@*/ int getAverage() throws ExamDataBaseException;
+    public abstract int getAverage() throws ExamDataBaseException;
 
     /** 
      * Gibt den Notendurchschnitt der bestandenen Klausuren zur&uuml;ck,
@@ -597,6 +597,5 @@ public abstract class ExamDataBase {
       @  assignable \object_creation(ExamDataBaseException);
       @  signals_only ExamDataBaseException;
       @*/
-    public abstract /*@pure@*/ int getPassedAverage() 
-						throws ExamDataBaseException;
+    public abstract int getPassedAverage() throws ExamDataBaseException;
 }
