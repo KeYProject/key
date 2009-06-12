@@ -15,7 +15,7 @@ public class ExamDataBaseImpl extends ExamDataBase {
       @               students[i] == (i<\old(students.length) 
       @                               ? \old(students)[i] 
       @                               : null));
-      @  ensures students!=null && students.length > \old(students.length) && (\exists Student[] s; s==students; !\old(\created(s)));
+      @  ensures students!=null && students.length > \old(students.length) && \fresh(students);
       @*/
     private void increaseStudents(){
 	Student[] oldStudents = students;

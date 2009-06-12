@@ -901,12 +901,12 @@ specexpression returns [Term result=null] throws SLTranslationException
 	result=expression
     ;
 
-spec_expression_list throws SLTranslationException
+spec_expression_list returns [ListOfTerm result=SLListOfTerm.EMPTY_LIST] throws SLTranslationException
 {
     Term t;
 }
 :
-	t=specexpression (COMMA t=specexpression)*
+	t=specexpression {result = result.append(t);} (COMMA t=specexpression {result = result.append(t);})*
     ;
 
 expression returns [Term result=null] throws SLTranslationException
@@ -1701,6 +1701,7 @@ decimalnumeral returns [Term result=null] throws SLTranslationException
 jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 {
     Term t;
+    ListOfTerm sl;
     KeYJavaType typ;
 }
 :
@@ -1774,9 +1775,30 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	}
 //    |   NOT_MODIFIED LPAREN storereflist RPAREN 
 	
-    |   FRESH LPAREN spec_expression_list RPAREN
+    |   FRESH LPAREN sl=spec_expression_list RPAREN
 	{
-	    raiseNotSupported("\\fresh");
+	    if (atPreFunctions == null) {
+                raiseError("JML construct " +
+                    "\\fresh not allowed in this context.");
+	    }
+    	ProgramVariable createdAttribute
+            = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, 
+					javaInfo.getJavaLangObject());
+        AttributeOp ao = AttributeOp.getAttributeOp(createdAttribute);
+        Function atPreFunc = (Function) atPreFunctions.get(ao);
+	    if(atPreFunc == null) {
+                atPreFunc = APF.createAtPreFunction(ao, services);
+                atPreFunctions.put(ao, atPreFunc);
+                assert atPreFunc != null;
+	    }	    
+	    t = tb.tt();
+        IteratorOfTerm it = sl.iterator();
+        while(it.hasNext()){
+            Term n = it.next();
+            Term fn = tb.and(tb.not(tb.equals(n, tb.NULL(services))), tb.equals(tb.func(atPreFunc, n), tb.FALSE(services)));
+            t = tb.and(t, fn);
+        }
+        result = new JMLExpression(t);
 	} 
 	
     |   REACH LPAREN t=specexpression RPAREN
