@@ -37,13 +37,14 @@ public class ExamDataBaseImpl extends ExamDataBase {
       @  ensures (\exists int i; 
       @               0<=i && i<students.length && students[i]!=null
       @               && students[i].matrNr==matrNr && \result==i);
+      @  assignable \object_creation(ExamDataBaseException);
       @  signals (ExamDataBaseException) 
       @      !(\exists int i; 
       @            0<=i && i<students.length && students[i]!=null
       @            && students[i].matrNr==matrNr);
       @  signals_only ExamDataBaseException;
       @*/
-    private /*@pure@*/ int getIndex(int matrNr) throws ExamDataBaseException{
+    private int getIndex(int matrNr) throws ExamDataBaseException{
 	/*@ loop_invariant 
           @     (\forall int j; 
           @          0<=j && j<i && students[j]!=null;
