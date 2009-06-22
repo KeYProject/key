@@ -148,7 +148,7 @@ public class LDTInput implements EnvInput {
                         	.prepend(new FloatLDT(sorts, functions))
 	                        .prepend(new DoubleLDT(sorts, functions));
 	CharLDT charLDT = new CharLDT(sorts, functions);
-	ldts = ldts.prepend (charLDT).prepend (new StringLDT(initConfig.getServices(), sorts, functions, charLDT));
+	ldts = ldts.prepend (charLDT);//.prepend (new StringLDT(initConfig.getServices(), sorts, functions, charLDT));
 
         initConfig.getServices().getTypeConverter().init(ldts);
     }

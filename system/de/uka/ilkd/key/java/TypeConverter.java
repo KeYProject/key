@@ -52,6 +52,7 @@ public class TypeConverter extends TermBuilder {
     private FloatLDT floatLDT;
     private DoubleLDT doubleLDT;
     private StringLDT stringLDT;
+    private StringConverter stringConverter = new StringConverter(); //TODO replace with stringLDT when library problem solved
 
     private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
 
@@ -446,7 +447,8 @@ public class TypeConverter extends TermBuilder {
         } else if (lit instanceof LongLiteral) {
             return intLDT.translateLiteral(lit);
         } else if (lit instanceof StringLiteral) {
-	    return stringLDT.translateLiteral(lit);
+	    return stringConverter.translateLiteral(lit,charLDT,services);
+	    //	    return stringLDT.translateLiteral(lit);
         } else if (lit instanceof FloatLiteral) {
             return floatLDT.translateLiteral(lit);
         } else if (lit instanceof DoubleLiteral) {
@@ -506,9 +508,9 @@ public class TypeConverter extends TermBuilder {
                         t2 == PrimitiveType.JAVA_CHAR||
                         t2 == PrimitiveType.JAVA_LONG)) 
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
-	KeYJavaType strType = services.getJavaInfo().getTypeByName("java.lang.String");
+	/*KeYJavaType strType = services.getJavaInfo().getTypeByName("java.lang.String");
 	if (t1 == strType.getJavaType() || t2 == strType.getJavaType())
-	    return strType;
+	return strType;*/
 	throw new RuntimeException("Could not determine promoted type "+
 	  "of "+t1+" and "+t2);
     }
