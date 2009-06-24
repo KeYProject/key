@@ -10,14 +10,19 @@
 
 package de.uka.ilkd.key.java.visitor;
 
+import java.io.StringWriter;
+
 import de.uka.ilkd.key.java.ArrayOfExpression;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.unittest.ppAndJavaASTExtension.CompilableJavaPP;
 import de.uka.ilkd.key.util.ExtList;
 
 /** Replaces array references a[expr] by a[dat] where dat is the concrete 
@@ -77,11 +82,23 @@ public class IndexReplaceVisitor extends CreatingASTVisitor{
     }
 
     private int findLocIndex(Expression e){
+	StringWriter sw = new StringWriter();
+	CompilableJavaPP cjpp = new CompilableJavaPP(sw,true);
 	for(int i = 0; i<testLocation.length; i++){
 	    for(int j = 0; j<testLocation[i].length; j++){
-		if(testLocation[i][j].toString().equals(e.toString())){
-		    return i;
-		}
+		Expression testLoc =testLocation[i][j];
+		String testLocStr,eStr;
+		if(testLoc instanceof JavaSourceElement){
+		    testLocStr= ((JavaSourceElement)testLoc).toString(cjpp, sw);
+		}else{  testLocStr= testLoc.toString(); }
+		
+		if(e instanceof JavaSourceElement){
+		    eStr= ((JavaSourceElement)e).toString(cjpp, sw);
+		}else{  eStr= e.toString(); }
+		
+       		if(testLocStr.equals(eStr)){
+       		    return i;
+       		}
 	    }
 	}
 	return -1;

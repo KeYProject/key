@@ -20,8 +20,14 @@ import org.apache.log4j.Logger;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.util.HelperClassForTests;
 
 
 public abstract class AbstractSMTSolver implements SMTSolver {
@@ -53,10 +59,16 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     
     
     /**
-     * @param text the String answered by the external programm.
+     * Interpret the answer of the program.
+     * This is very solverdepending. Usually, an exitcode of 0 inicates no error.
+     * But not every solver returns 0 if successfull termination was reached.
+     * @param output the String answered by the external programm.
+     * @param error the String answered as error
+     * @param exitstatus the status of the exit
      * @return A SMTSolverResult containing all information of the interpretation.
+     * @throws IllegalArgumentException If the solver caused an error.
      */
-    protected abstract SMTSolverResult interpretAnswer(String text);
+    protected abstract SMTSolverResult interpretAnswer(String output, String error, int exitstatus) throws IllegalArgumentException;
 
     private static String toStringLeadingZeros(int n, int width) {
 	String rv = "" + n;
@@ -170,9 +182,9 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	    String s = trans.translate(t, services).toString();
 	    toReturn = this.run(s, timeout, services);
     	} catch (IllegalFormulaException e) {
-	    toReturn = SMTSolverResult.NO_IDEA;
-	    logger.debug("The formula could not be translated.", e);
-	    //throw new RuntimeException("The formula could not be translated.\n" + e.getMessage());
+	    //toReturn = SMTSolverResult.NO_IDEA;
+	    //logger.debug("The formula could not be translated.", e);
+	    throw new RuntimeException("The formula could not be translated.\n" + e.getMessage());
 	}    	
     	return toReturn;
     }
@@ -189,7 +201,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
      */
     public final SMTSolverResult run(String formula, 
 	    	                     int timeout, 
-	    			     Services services) throws IOException{
+	    			     Services services) throws IOException {
 	SMTSolverResult toReturn;
 	
 	final File loc;
@@ -208,13 +220,16 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	String[] execCommand = this.getExecutionCommand(loc.getAbsolutePath(), formula);
 
 	try {
+	    //execute the external solver
 	    Process p = Runtime.getRuntime().exec(execCommand);
 	    ExecutionWatchDog tt = new ExecutionWatchDog(timeout, p);
 	    Timer t = new Timer();
 	    t.schedule(tt, new Date(System.currentTimeMillis()), 1000);
+	    boolean interruptedByWatchdog = false;
 	    try {
 		p.waitFor();
 		if (tt.wasInterrupted()) {
+		    interruptedByWatchdog = true;
 		    logger.debug(
 		    "Process for smt formula proving interrupted because of timeout.");
 		}
@@ -226,20 +241,56 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	    } finally {
 		t.cancel();
 	    }
-	    if (p.exitValue() != 0) {
+	    
+	    if (interruptedByWatchdog) {
+		//the solving was interrupted. So return unknown
+		return SMTSolverResult.NO_IDEA;
+	    } else {
+		//solver terminated without watchdog.
+		//collect information
+		InputStream in = p.getInputStream();
+		String text = read(in);
+		in.close();
+		
+		in = p.getErrorStream();
+		String error = read(in);
+		in.close();
+		try {
+		    toReturn = this.interpretAnswer(text, error, p.exitValue());
+		} catch (IllegalArgumentException e) {
+		    //the interpretation found an error.
+		    throw new RuntimeException("Error while executing solver:\n" + e.getMessage());
+		}
+	    }
+	    
+	    /*
+	    if (tt.wasInterrupted()) {
 		//the process was terminated by force.
 		toReturn = SMTSolverResult.NO_IDEA;
 	    } else {
-		//the process terminated as it should
-		InputStream in = p.getInputStream();
-		String text = read(in);
-
-		logger.debug("Answer for created formula: ");
-		logger.debug(text);
-		in.close();
-
-		toReturn = this.interpretAnswer(text);
-	    }
+		if (p.exitValue() == 0) {
+		    //the process terminated as it should
+		    InputStream in = p.getInputStream();
+		    String text = read(in);
+		    in.close();
+		
+		    logger.debug("Answer for created formula: ");
+		    logger.debug(text);
+		    
+		    toReturn = this.interpretAnswer(text);
+		    
+	    	} else {
+	    	    //programm terminated with an error
+	    	    InputStream in = p.getErrorStream();
+		    String text = read(in);
+		    in.close();
+		
+		    logger.debug("Error in created formula: ");
+		    logger.debug(text);
+		    
+		    throw new RuntimeException("Error while executing solver:\n" + text);
+	    	}
+	    }*/
 	} catch (IOException e) {
 	    String cmdStr = "";
 	    for (String cmd : execCommand) {
@@ -265,6 +316,48 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	} 
 
 	return toReturn;
+    }
+    
+    /** true, if this solver was checked if installed */
+    private boolean installwaschecked = false;
+    /** true, if last check showed solver is installed */
+    private boolean isinstalled = false;
+    
+    /**
+     * check, if this solver is installed and can be used.
+     * @param recheck if false, the solver is not checked again, if a cached value for this exists.
+     * @return true, if it is installed.
+     */
+    public boolean isInstalled(boolean recheck) {
+	if (recheck | !installwaschecked) {
+	    //build valid formula
+	    HelperClassForTests helper = new HelperClassForTests();	
+	    ProofAggregate p = helper.parse(new File(this.getTestFile()));
+	    Proof pr = p.getFirstProof();
+	    Goal g = pr.openGoals().iterator().next();
+	    //try to solve the formula
+	    try {
+		//TODO work here! translation doesn't work this way!
+		this.run(g, 1, pr.getServices());
+		isinstalled = true;
+//	    } catch (RuntimeException e) {
+//		if this exception: some problem, but not with insatllation
+//		isinstalled = true;
+	    } catch (IOException e2) {
+//		if exception: not installed
+		isinstalled = false;
+	    }
+	    installwaschecked = true;
+	}
+	return isinstalled;
+    }
+    
+    protected String getTestFile() {
+	return System.getProperty("key.home")
+	    + File.separator + "examples"
+	    + File.separator + "_testcase"
+	    + File.separator + "smt"
+	    + File.separator + "ornot.key";
     }
     
 }

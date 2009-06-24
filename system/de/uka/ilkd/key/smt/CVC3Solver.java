@@ -28,13 +28,20 @@ public class CVC3Solver extends AbstractSMTSolver {
 
     
     @Override
-    protected SMTSolverResult interpretAnswer(String text) {
-	if (text.equals("unsat\n")) {
-	    return SMTSolverResult.createValidResult(text);
-	} else if (text.equals("sat\n")) {
-	    return SMTSolverResult.createInvalidResult(text);
+    protected SMTSolverResult interpretAnswer(String text, String error, int val) {
+	if (val == 0) {
+	    //normal termination, no error
+	    if (text.equals("unsat\n")) {
+		return SMTSolverResult.createValidResult(text);
+	    } else if (text.equals("sat\n")) {
+		return SMTSolverResult.createInvalidResult(text);
+	    } else {
+		return SMTSolverResult.createUnknownResult(text);
+	    }
 	} else {
-	    return SMTSolverResult.createUnknownResult(text);
+	    //error termination
+	    throw new IllegalArgumentException(error);
 	}
+	
     }
 }

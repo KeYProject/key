@@ -13,12 +13,12 @@ public class TestZ3 extends TestSMTSolver {
     }
 
     @Override
-    protected boolean toolNotInstalled() {
+    protected boolean toolNotInstalledChecked() {
 	return z3NotInstalled;
     }
 
     @Override
-    protected void setToolNotInstalled(boolean b) {
+    protected void setToolNotInstalledChecked(boolean b) {
 	z3NotInstalled = b;
     }
 }

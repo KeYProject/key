@@ -201,6 +201,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "comprehensions_high_costs",
                 add ( NonDuplicateAppModPositionFeature.INSTANCE,
                       longConst ( 10000 ) ) );
+
+        bindRuleSet ( d, "comprehensions_low_costs",
+                add ( NonDuplicateAppModPositionFeature.INSTANCE,
+                      longConst ( -5000 ) ) );
         
         bindRuleSet ( d, "evaluate_instanceof", longConst ( -500 ) );
         
@@ -361,6 +365,16 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 		// not only within an update
 		not(NotInScopeOfModalityFeature.INSTANCE),
                 longConst (-10) } ));
+
+        bindRuleSet ( d, "query_normalize_high_costs", 
+	    SumFeature.createSum ( new Feature [] {
+                SomeWhereBelowOpClassFeature.create ( ProgramMethod.class ),
+                SomeWhereBelowOpClassFeature.create ( IUpdateOperator.class ),
+                applyTF("t", IsNonRigidTermFeature.INSTANCE),
+		// we actually have to be in the scope of an update,
+		// not only within an update
+		not(NotInScopeOfModalityFeature.INSTANCE),
+                longConst (10) } ));
 
         if ( expandQueries () )
             bindRuleSet ( d, "queries",

@@ -5,14 +5,7 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//Universitaet Koblenz-Landau, Germany
-//Chalmers University of Technology, Sweden
-
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
-
+//
 
 
 /* -*-antlr-*- */
@@ -335,6 +328,32 @@ options {
 		  		  newSubTerms, 
 				  vars, 
 				  term.javaBlock());
+    }
+
+    private boolean isBoundedSum(Term a, LogicVariable lv){
+        return lowerBound(a,lv)!=null && upperBound(a,lv)!=null;
+    }
+    
+    private Term lowerBound(Term a, LogicVariable lv){
+        if(a.arity()>0 && a.sub(0).op()==Op.AND){
+            a=a.sub(0);
+        }
+        if(a.arity()==2 && a.op()==Op.AND && a.sub(0).arity()==2 && a.sub(0).sub(1).op()==lv
+                && a.sub(0).op().equals(services.getTypeConverter().getIntegerLDT().getLessOrEquals())){
+            return a.sub(0).sub(0);
+        }
+        return null;
+    }
+   
+    private Term upperBound(Term a, LogicVariable lv){
+        if(a.arity()>0 && a.sub(0).op()==Op.AND){
+            a=a.sub(0);
+        }   
+        if(a.arity()==2 && a.op()==Op.AND && a.sub(1).arity()==2 && a.sub(1).sub(0).op()==lv
+                && a.sub(1).op().equals(services.getTypeConverter().getIntegerLDT().getLessThan())){
+            return a.sub(1).sub(1);
+        }
+        return null;
     }
 
 
@@ -869,7 +888,7 @@ predornot returns [Term result=null] throws SLTranslationException
 :
 	result=predicate
     |   NOT_SPECIFIED
-    |   "\\same"
+    |   SAME
     ;
     
 predicate returns [Term result=null] throws SLTranslationException
@@ -882,12 +901,12 @@ specexpression returns [Term result=null] throws SLTranslationException
 	result=expression
     ;
 
-spec_expression_list throws SLTranslationException
+spec_expression_list returns [ListOfTerm result=SLListOfTerm.EMPTY_LIST] throws SLTranslationException
 {
     Term t;
 }
 :
-	t=specexpression (COMMA t=specexpression)*
+	t=specexpression {result = result.append(t);} (COMMA t=specexpression {result = result.append(t);})*
     ;
 
 expression returns [Term result=null] throws SLTranslationException
@@ -907,24 +926,7 @@ assignmentexpr returns [Term result=null] throws SLTranslationException
 //	)?
     ;
 
-
-/* not used JML expressions
-assignmentOp
-:
-	"=" 
-    |   "+="
-    |   "-="
-    |   "*="
-    |   "/="
-    |   "%="
-    |   ">>="  
-    |   ">>>="
-    |   "<<="
-    |   "&="
-    |   "|="
-    |   "^="
-    ;
-*/	
+	
 conditionalexpr returns [Term result=null] throws SLTranslationException
 {
     Term a,b;
@@ -932,7 +934,7 @@ conditionalexpr returns [Term result=null] throws SLTranslationException
 :
 	result=equivalenceexpr 
 	(
-	    QUESTIONMARK a=conditionalexpr ":" b=conditionalexpr
+	    QUESTIONMARK a=conditionalexpr COLON b=conditionalexpr
 	    {
 		result = tb.ife(convertToFormula(result),a,b);
 		if(intHelper.isIntegerTerm(result)) {
@@ -1638,7 +1640,7 @@ expressionlist returns [ListOfTerm result=SLListOfTerm.EMPTY_LIST] throws SLTran
     Term t;
 }
 :
-	t=expression { result = result.append(t); } ("," t=expression {result = result.append(t);} )* 
+	t=expression { result = result.append(t); } (COMMA t=expression {result = result.append(t);} )* 
 ;
 
 constant returns [Term result=null] throws SLTranslationException
@@ -1699,6 +1701,7 @@ decimalnumeral returns [Term result=null] throws SLTranslationException
 jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 {
     Term t;
+    ListOfTerm sl;
     KeYJavaType typ;
 }
 :
@@ -1715,7 +1718,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	    result = new JMLExpression(t);
 	}
     |
-    ("(" BSUM) => t=bsumterm
+    (LPAREN BSUM) => t=bsumterm
 	{
 	    result = new JMLExpression(t);
 	}
@@ -1772,9 +1775,30 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	}
 //    |   NOT_MODIFIED LPAREN storereflist RPAREN 
 	
-    |   FRESH LPAREN spec_expression_list RPAREN
+    |   FRESH LPAREN sl=spec_expression_list RPAREN
 	{
-	    raiseNotSupported("\\fresh");
+	    if (atPreFunctions == null) {
+                raiseError("JML construct " +
+                    "\\fresh not allowed in this context.");
+	    }
+    	ProgramVariable createdAttribute
+            = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, 
+					javaInfo.getJavaLangObject());
+        AttributeOp ao = AttributeOp.getAttributeOp(createdAttribute);
+        Function atPreFunc = (Function) atPreFunctions.get(ao);
+	    if(atPreFunc == null) {
+                atPreFunc = APF.createAtPreFunction(ao, services);
+                atPreFunctions.put(ao, atPreFunc);
+                assert atPreFunc != null;
+	    }	    
+	    t = tb.tt();
+        IteratorOfTerm it = sl.iterator();
+        while(it.hasNext()){
+            Term n = it.next();
+            Term fn = tb.and(tb.not(tb.equals(n, tb.NULL(services))), tb.equals(tb.func(atPreFunc, n), tb.FALSE(services)));
+            t = tb.and(t, fn);
+        }
+        result = new JMLExpression(t);
 	} 
 	
     |   REACH LPAREN t=specexpression RPAREN
@@ -1869,14 +1893,14 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 }
 :
 	LPAREN
-	q:QUANTIFIER (nullable=boundvarmodifiers)? declVars=quantifiedvardecls ";"
+	q:QUANTIFIER (nullable=boundvarmodifiers)? declVars=quantifiedvardecls SEMI
 	
 	{
 	    resolverManager.pushLocalVariablesNamespace();
 	    resolverManager.putIntoTopLocalVariablesNamespace(declVars);
 	} 
 	(
-	    ((predicate)? ";" ) => (p=predicate)? ";" t=specexpression
+	    ((predicate)? SEMI ) => (p=predicate)? SEMI t=specexpression
 	|
 	    (SEMI)? t=specexpression 
 	)
@@ -1942,13 +1966,33 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 //		services.getNamespaces().functions().addSafely(y);
 	    }
 	    else if (q.getText().equals("\\num_of")) {
-		raiseNotSupported("\\num_of");
+            LogicVariable lv = declVars.head();
+            p=p.sub(0);
+            if(p!=null && isBoundedSum(p, lv) && p.sub(0).op()!=Op.AND){
+                result = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(Op.BSUM, 
+                        lowerBound(p, lv), upperBound(p, lv), tb.ife(
+                                t, tb.zTerm(services, "1"), tb.zTerm(services, "0")),
+                                new ArrayOfQuantifiableVariable(lv));                          
+            }else{
+                raiseError("only \\num_of expressions of form (\\sum int i; l<=i && i<u; t) are permitted");
+            }
 	    }
 	    else if (q.getText().equals("\\product")) {
 		raiseNotSupported("\\product");
 	    }
 	    else if (q.getText().equals("\\sum")) {
-		raiseNotSupported("\\sum");
+            LogicVariable lv = declVars.head();
+            p=p.sub(0);
+            if(isBoundedSum(p, lv)){
+                if(p.arity()>0 && p.sub(0).op()==Op.AND){
+                    t = tb.ife(p.sub(1), t, tb.zTerm(services, "0"));
+                }
+                result = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(Op.BSUM, 
+                        lowerBound(p, lv), upperBound(p, lv), t, new ArrayOfQuantifiableVariable(lv));
+            }else{
+                raiseError("only \\sum expressions of form (\\sum int i; l<=i && i<u; t) are permitted");
+            }
+
 	    }
 	    else {
 		raiseError("Unknown quantifier: " + q.getText() + "!");
@@ -1962,15 +2006,15 @@ bsumterm returns [Term t=null] throws SLTranslationException
     Term a=null,b=null; 
     ListOfLogicVariable decls=null;
 }:
-        "("
+        LPAREN
         q:BSUM decls=quantifiedvardecls 
         {	    
             resolverManager.pushLocalVariablesNamespace();
             resolverManager.putIntoTopLocalVariablesNamespace(decls);
         } 
-        ";" 
+        SEMI
         (
-            a=specexpression ";"  b=specexpression ";" t=specexpression
+            a=specexpression SEMI  b=specexpression SEMI t=specexpression
         )
         {
             LogicVariable lv = (LogicVariable) decls.head();
@@ -1978,7 +2022,7 @@ bsumterm returns [Term t=null] throws SLTranslationException
                         a, b, t, new ArrayOfQuantifiableVariable(lv));
             resolverManager.popLocalVariablesNamespace();
         }
-        ")"
+        RPAREN
 ;
 
 exception
@@ -2072,32 +2116,32 @@ referencetype returns [KeYJavaType type = null] throws SLTranslationException
 builtintype returns [KeYJavaType type = null] throws SLTranslationException
 :
 	(
-	    "byte" 
+	    BYTE 
 	    {
 		type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_BYTE);
 	    }
 	|
-	    "short" 
+	    SHORT 
 	    {
 		type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_SHORT);
 	    }
 	|
-	    "int" 
+	    INT 
 	    {
 		type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT);
 	    }
 	|
-	    "long" 
+	    LONG 
 	    {
 		type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_LONG);
 	    }
 	|
-	    "boolean" 
+	    BOOLEAN 
 	    {
 		type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
 	    }
 	|
-	    "void" 
+	    VOID 
 	    {
 		type = null;
 	    }

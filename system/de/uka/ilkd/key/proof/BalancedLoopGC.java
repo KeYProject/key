@@ -31,7 +31,6 @@ public class BalancedLoopGC extends DefaultGoalChooser {
      */
     public Goal getNextGoal () {
         Goal result;
-        
         if(selectedList.isEmpty()) return null;
         selectedList = rotateList ( selectedList );
         Goal first = selectedList.head();

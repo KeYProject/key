@@ -14,7 +14,7 @@ class BoundedNumericalQuantifierTerm extends OpTerm.ArbitraryOpTerm {
     private final ArrayOfQuantifiableVariable varsBoundHere;
 
     BoundedNumericalQuantifierTerm(BoundedNumericalQuantifier op, Term[] subTerm, 
-            ArrayOfQuantifiableVariable varsBoundHere) {
+				   ArrayOfQuantifiableVariable varsBoundHere) {
         super(op, subTerm);
 	this.varsBoundHere = varsBoundHere;
     }

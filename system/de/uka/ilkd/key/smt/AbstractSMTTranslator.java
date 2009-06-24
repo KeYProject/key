@@ -88,7 +88,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
 
     /** map used for storing predicates representing modalities or updates */
-    private HashMap<Term, Function> modalityPredicates = new HashMap<Term, Function>();
+    private HashMap<Term, StringBuffer> modalityPredicates = new HashMap<Term, StringBuffer>();
     
     private StringBuffer nullString = new StringBuffer();
 
@@ -1040,6 +1040,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
     
     /**
+     * CAUTION: Do not use this method from outside this class!!
+     * It is public just for test reasons! It will be private very soon!
+     * 
      * Translates the given term into input syntax and adds the resulting
      * string to the StringBuffer sb.
      * 
@@ -1051,8 +1054,17 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      *                modulo terms, but must be looped through until we get
      *                there.
      */
-    private final StringBuffer translateTerm (Term term, Vector<QuantifiableVariable> quantifiedVars,
+//  TODO make private again after testing!!
+    public final StringBuffer translateTerm (Term term, Vector<QuantifiableVariable> quantifiedVars,
 	    Services services) throws IllegalFormulaException {
+	
+	//added, because meatavariables should not be translated.
+	if (term.op() instanceof Metavariable) {
+	    throw new IllegalFormulaException("The Formula contains a metavariable:\n" +
+	    		term.op().toString() + "\n" +
+	    		"Metavariables can not be translated.");
+	}
+	
 	Operator op = term.op();
 	if (op == Op.NOT) {
 	    StringBuffer arg = translateTerm(term.sub(0), quantifiedVars, services);
@@ -1334,10 +1346,14 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
 	    return translateFunc(atop, subterms);
 	} else {
-	    //return translateUnknown(term);
+	    //if none of the above works, the symbol can be translated as uninterpreted function
+	    //or predicate. The idea is, tht if a formula is valid with a interpreted function,
+	    //it has to be valid with an uninterpreted.
+	    //Caution: Counterexamples might be affected by this.
+	    return translateUnknown(term, quantifiedVars, services);
 	    //System.out.println("Found term: " + term.getClass());
 	    //System.out.println("Found op: " + term.op().getClass());
-	    throw new IllegalFormulaException("unknown term found");
+	    //throw new IllegalFormulaException("unknown term found");
 	}
     }
     
@@ -1357,25 +1373,25 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    if (toMatch.equalsModRenaming(t)) {
 	    //if (checkTermsEquality(t, toMatch, services) && checkTermsEquality(toMatch, t, services)) {
 		//t and toMatch are equal, so return the predicate translated for toMatch
-		Function fun = modalityPredicates.get(toMatch);
-		TermFactory tf = new TermFactory();
+//		Function fun = modalityPredicates.get(toMatch);
+//		TermFactory tf = new TermFactory();
 		//Build one term for each free variable in t
-		QuantifiableVariable[] args = t.freeVars().toArray();
-		Term[] subs = new Term[args.length];
-		for (int i = 0; i < args.length; i++) {
-		    QuantifiableVariable qv = args[i];
-		    if (qv instanceof LogicVariable) {
-			subs[i] = tf.createVariableTerm((LogicVariable)qv);
-		    } else {
-			logger.error("Schema variable found in formula.");
-		    }
-		}
+//		QuantifiableVariable[] args = t.freeVars().toArray();
+//		Term[] subs = new Term[args.length];
+//		for (int i = 0; i < args.length; i++) {
+//		    QuantifiableVariable qv = args[i];
+//		    if (qv instanceof LogicVariable) {
+//			subs[i] = tf.createVariableTerm((LogicVariable)qv);
+//		    } else {
+//			logger.error("Schema variable found in formula.");
+//		    }
+//		}
 		
 		//Build the final predicate
-		Term temp = tf.createFunctionTerm(fun, subs);
-		StringBuffer s = this.translateTerm(temp, quantifiedVars, services);
+//		Term temp = tf.createFunctionTerm(fun, subs);
+//		StringBuffer s = this.translateTerm(temp, quantifiedVars, services);
 		
-		return s;
+		return modalityPredicates.get(toMatch);
 	    }
 	}
 
@@ -1406,7 +1422,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	//translate the predicate
 	StringBuffer cstr = this.translateTerm(temp, quantifiedVars, services);
 	    
-	modalityPredicates.put(t, fun);
+	modalityPredicates.put(t, cstr);
 	    
 	return cstr;
 	
@@ -1488,10 +1504,48 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      *                The Term given to translate
      * @throws IllegalFormulaException
      */
-    protected final StringBuffer translateUnknown(Term term)
+    protected final StringBuffer translateUnknown(Term term, Vector<QuantifiableVariable> quantifiedVars,
+	    Services services)
 	    throws IllegalFormulaException {
-	throw new IllegalFormulaException(
-		"Formular contains unsupported arguments");
+	
+	//translate the term as uninterpreted function/predicate
+	    Operator op = term.op();
+	    if (term.sort() == Sort.FORMULA) {
+		//predicate
+		logger.debug("Translated as uninterpreted predicate:\n" + term.toString());
+		ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
+		for (int i = 0; i < op.arity(); i++) {
+		    subterms.add(translateTerm(term.sub(i), quantifiedVars,
+				services));
+		}
+		ArrayList<Sort> sorts = new ArrayList<Sort>();
+		for (int i = 0; i < op.arity(); i++) {
+		    sorts.add(term.sub(i).sort());
+		}
+		this.addPredicate(op, sorts);
+
+		return translatePred(op, subterms);
+	    } else {
+		//function
+		logger.debug("Translated as uninterpreted function:\n" + term.toString());
+		ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
+		for (int i = 0; i < op.arity(); i++) {
+		    subterms.add(translateTerm(term.sub(i), quantifiedVars,
+			services));
+		}
+		ArrayList<Sort> sorts = new ArrayList<Sort>();
+		for (int i = 0; i < op.arity(); i++) {
+		    sorts.add(term.sub(i).sort());
+		}
+		this.addFunction(op, sorts, term.sort());
+
+		return translateFunc(op, subterms);
+	    }
+	    //throw new IllegalFormulaException("The formula could not be translated\n" +
+	    //		"The (sub)term\n" + term.toString() + "\n" +
+	    //				"could not be translated.");
+	
+	
     }
 
     protected final StringBuffer translateVariable(Operator op) {

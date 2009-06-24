@@ -599,6 +599,7 @@ public class JMLSpecFactory {
                 invariant = TB.and(invariant, translated.getFormula());
             }
         }
+
         
         //translate skolem declarations
         ListOfParsableVariable freeVars = SLListOfParsableVariable.EMPTY_LIST;

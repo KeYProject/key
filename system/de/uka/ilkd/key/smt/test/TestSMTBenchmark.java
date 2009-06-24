@@ -30,6 +30,7 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
     private static String INVALID = "not valid";
     private static String UNKNOWN = "unknown";
     private static String NOTAVAILABLE = "not installed";
+    private static String ERROR = "error";
     private int maxExecutionTime = 10;
     
     public static final String folderPath = System.getProperty("key.home")
@@ -110,14 +111,19 @@ public class TestSMTBenchmark extends TestCase implements FilenameFilter{
 	    System.out.print(".");
 	    SMTSolver s = rules.get(i);
 	    Proof p = goals.get(i);
-	    try {
-		long time = System.currentTimeMillis();		
-	    	SMTSolverResult result = s.run(p.openGoals().iterator().next(), maxExecutionTime, p.getServices());
-	    	time = System.currentTimeMillis() - time;
-	    	time = time / 100;
-	    	toReturn.add("" + time/10 + "." + time%10);
-		toReturn.add(this.translateResult(result));
-	    } catch (Exception e) {
+	    if (s.isInstalled(false)) {
+		try {
+		    long time = System.currentTimeMillis();		
+	    	    SMTSolverResult result = s.run(p.openGoals().iterator().next(), maxExecutionTime, p.getServices());
+	    	    time = System.currentTimeMillis() - time;
+	    	    time = time / 100;
+	    	    toReturn.add("" + time/10 + "." + time%10);
+	    	    toReturn.add(this.translateResult(result));
+		} catch (Exception e) {
+		    toReturn.add(ERROR);
+		    toReturn.add(ERROR);
+		}
+	    } else {
 		toReturn.add(NOTAVAILABLE);
 		toReturn.add(NOTAVAILABLE);
 	    }

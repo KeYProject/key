@@ -64,26 +64,27 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         }
 
         final TacletApp cmp = (TacletApp)ruleCmp;
-    
+	
         // compare the position of application
         if ( newPio != null ) {
             if ( ! ( cmp instanceof PosTacletApp ) ) return false;
             final PosInOccurrence oldPio = ((PosTacletApp)cmp).posInOccurrence ();
             if ( !comparePio ( newApp, cmp, newPio, oldPio ) ) return false;
         }
+
         
         if ( !newApp.constraint ().equals ( cmp.constraint () ) )
             return false;
+
         
         // compare the if-sequent instantiations
         if ( newApp.ifFormulaInstantiations () == null
-                || cmp.ifFormulaInstantiations () == null ) {        
+                || cmp.ifFormulaInstantiations () == null ) {  
             if ( newApp.ifFormulaInstantiations () != null
                     || cmp.ifFormulaInstantiations () != null ) { 
                 return false;
             } 
         } else { 
-
             final IteratorOfIfFormulaInstantiation it0 =
                 newApp.ifFormulaInstantiations ().iterator ();
             final IteratorOfIfFormulaInstantiation it1 =
@@ -97,7 +98,6 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
             }
         }
         
-           
         return equalInterestingInsts ( newApp.instantiations (),
                                        cmp.instantiations () );
     }

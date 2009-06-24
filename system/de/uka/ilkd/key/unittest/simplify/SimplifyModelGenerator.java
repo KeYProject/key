@@ -13,12 +13,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.Vector;
 
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.collection.SLListOfString;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.parser.simplify.SimplifyLexer;
 import de.uka.ilkd.key.parser.simplify.SimplifyParser;
 import de.uka.ilkd.key.proof.Node;
@@ -48,6 +51,7 @@ public class SimplifyModelGenerator implements DecProdModelGenerator{
     private HashSet simplifyOutputs;
     private ListOfString placeHoldersForClasses = SLListOfString.EMPTY_LIST;
     
+    private SMTSolver simplify = new SimplifySolver();
     
     private static Term toFormula(Sequent s) {
 	TermBuilder tb = TermBuilder.DF;
@@ -70,10 +74,11 @@ public class SimplifyModelGenerator implements DecProdModelGenerator{
 	this.serv = serv;
 	this.term2class = term2class;
 	
-	SMTSolver simplify = new SimplifySolver();
+	//SMTSolver simplify = new SimplifySolver();
 	
 	SMTSolverResult res = SMTSolverResult.NO_IDEA; 
 	
+	//Get a result for the Problem
 	try {
 	    res = simplify.run(toFormula(node.sequent()), 60, serv);
 	} catch (IOException ioe) {
@@ -93,15 +98,18 @@ public class SimplifyModelGenerator implements DecProdModelGenerator{
 	
 	SMTTranslator st = simplify.getTranslator(serv);
 
+	//build the translated terms for each location
 	try{
 	    while(it.hasNext()){
 		de.uka.ilkd.key.logic.Term t = it.next();
-		String s = st.translate(t, serv).toString();
+		String s = st.translateTerm(t, new Vector<QuantifiableVariable>(), serv).toString();
 		string2class.put(s, term2class.get(t));
 	    }
 	}catch(IllegalFormulaException e){
 	    System.err.println(e);
 	}
+	
+	//build equivalence classes
 	intClasses = new HashSet();
 	Iterator itc = term2class.values().iterator();
 	int index = initialCounterExample.indexOf("AND")+4;
@@ -116,7 +124,7 @@ public class SimplifyModelGenerator implements DecProdModelGenerator{
 		    intClasses.add(ec);
 		    de.uka.ilkd.key.logic.Term loc = 
 			ec.getLocations().iterator().next();
-		    String eq = "(EQ "+ph+" "+st.translate(loc,serv)+")\n";
+		    String eq = "(EQ "+ph+" "+st.translateTerm(loc, new Vector<QuantifiableVariable>(),serv)+")\n";
 		    initialCounterExample = 
 			initialCounterExample.substring(0, index)+eq+
 			initialCounterExample.substring(index);
@@ -128,8 +136,10 @@ public class SimplifyModelGenerator implements DecProdModelGenerator{
     }
 
     public Set createModels(){
+	//create models
 	HashSet models = new HashSet();	
 	int datCount = 1;
+	//collect all models
 	while(models.size() < modelLimit && 
 	      datCount <= genericTestValues.length){
 	    models.addAll(createModelsHelp(initialCounterExample, 
@@ -238,6 +248,8 @@ public class SimplifyModelGenerator implements DecProdModelGenerator{
 	
     private String simplify(Conjunction c){
 	try{
+	    //Term t = (new TermFactory()).createJunctorTerm(Op.NOT, c);
+	    //return this.simplify.run(t, 60, serv).text();
 	    return new SimplifySolver().run("(NOT "+c.toSimplify()+")", 60, serv).text();
 	}catch(Exception e){
 	    throw new RuntimeException(e);

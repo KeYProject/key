@@ -184,9 +184,7 @@ public class ProofSaver {
 	     createLogicPrinter(proof.getServices(), false);
 
          logicPrinter.printSequent(node.sequent());
-	 // WATCHOUT Woj: replaceAll... is necessary for the newly introduced backslash
-	 // notation in the parser
-         tree.append(printer.result().toString().replace('\n',' ').replaceAll("\\\\","\\\\\\\\"));
+         tree.append(escapeCharacters(printer.result().toString().replace('\n',' ')));
          tree.append("\")\n");
          return;
       }
@@ -255,7 +253,7 @@ public class ProofSaver {
       while (childrenIt.hasNext()) {
          Node child = childrenIt.next();
          tree.append(prefix);            
-         tree.append("(branch \" "+child.getNodeInfo().getBranchLabel().replaceAll("\\\\","\\\\\\\\")+"\"\n");
+         tree.append("(branch \" " + escapeCharacters(child.getNodeInfo().getBranchLabel()) + "\"\n");
 	 collectProof(child, prefix+"   ", tree);
          tree.append(prefix+")\n");
       }
@@ -307,34 +305,37 @@ public class ProofSaver {
       while (pairIt.hasNext()) {
          EntryOfSchemaVariableAndInstantiationEntry pair = pairIt.next();
          SchemaVariable var = pair.key();
-	 s += " (inst \""+var.name()+"=";
+	 
+         String singleInstantiation = var.name()+ "="; 
 	 Object value = pair.value();
 	 if (value instanceof TermInstantiation) {
-	     s += printTerm(((TermInstantiation) value).getTerm(), 
+	     singleInstantiation += printTerm(((TermInstantiation) value).getTerm(), 
 	                    proof.getServices());
 	 }
          else
 	 if (value instanceof ProgramInstantiation) {
 	     ProgramElement pe = 
 		 ((ProgramInstantiation) value).getProgramElement();
-	     s += printProgramElement(pe);
+	     singleInstantiation += printProgramElement(pe);
 	 }
          else
 	 if (value instanceof NameInstantiationEntry) {
-	     s += ((NameInstantiationEntry) value).getInstantiation();
+	     singleInstantiation += ((NameInstantiationEntry) value).getInstantiation();
 	 }
          else 
          if (value instanceof ListInstantiation) {
              ListOfObject l = (ListOfObject) ((ListInstantiation) value).getInstantiation();
-             s += printListInstantiation(l, proof.getServices());
+             singleInstantiation += printListInstantiation(l, proof.getServices());
          }
          else
              throw new RuntimeException("Saving failed.\n"+
            "FIXME: Unhandled instantiation type: " +  value.getClass());
-	 s += "\")";
+	 
+	 singleInstantiation = escapeCharacters(singleInstantiation);
+	
+	 s += " (inst \"" + singleInstantiation + "\")";
       }
-      // WATCHOUT: Woj: again, quote backslashes
-      s = s.replaceAll("\\\\","\\\\\\\\");
+      
       return s;
    }
    
@@ -374,9 +375,9 @@ public class ProofSaver {
                 if (iff instanceof IfFormulaInstDirect) {
                     
                     final String directInstantiation = printTerm(iff.getConstrainedFormula().formula(), 
-                            node.proof().getServices()).toString().replaceAll("\\\\","\\\\\\\\");
-                    
-                    s += " (ifdirectformula \"" + directInstantiation + "\")";
+                            node.proof().getServices()).toString();
+
+                    s += " (ifdirectformula \"" + escapeCharacters(directInstantiation) + "\")";
                 }
                 else throw new RuntimeException("Unknown If-Seq-Formula type");
         }
@@ -384,6 +385,23 @@ public class ProofSaver {
         return s;
     }
 
+
+    /**
+     * double escapes quotation marks and backslashes to be storeable in a text file 
+     * @param toEscape the String to double escape
+     * @return the escaped version of the string
+     */
+    public static String escapeCharacters(String toEscape) {
+	
+	String result = toEscape;	
+	
+	// first escape backslash
+	result = result.replaceAll("\\\\","\\\\\\\\");
+	// then escape quotation marks
+	result = result.replaceAll("\"", "\\\\\"");
+
+	return result;
+    }
 
     public static String printProgramElement(ProgramElement pe) {
         java.io.StringWriter sw = new java.io.StringWriter();
