@@ -328,7 +328,7 @@ public class SimpleVisualizationStrategy implements VisualizationStrategy {
         if (lastTraceElement != TraceElement.END) {
             return new ExecutionTraceModel(lastTraceElement, firstTraceElement,
                     (ContextTraceElement) lastSource, rating, currentNode,
-                    node, type, occ);
+                    node, type);
         }
         return null;
     }

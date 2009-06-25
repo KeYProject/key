@@ -34,7 +34,6 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
     private String initialCounterExample;
 
     // first element has to be 0. Only positive values at even indices.
-    
 
     private static final int[] genericTestValues = new int[] { 0, -1, 1, -10,
 	    10, -1000, 1000, -1000000, 1000000, -2000000000, 2000000000 };
@@ -45,7 +44,6 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
     private HashSet<String> simplifyOutputs;
 
     private ListOfString placeHoldersForClasses = SLListOfString.EMPTY_LIST;
-
 
     public static int getModelLimit() {
 	return SimplifyModelGenerator.modelLimit;
@@ -112,7 +110,7 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
 	return models;
     }
 
-    public Set<Model> createModelsHelp(String counterEx, Model model,
+    private Set<Model> createModelsHelp(String counterEx, Model model,
 	    int datCount) {
 	String counterExOLD = new String(counterEx);
 	Set<Model> models = new HashSet<Model>();
@@ -133,9 +131,11 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
 	try {
 	    c = parser.top();
 	} catch (Exception e) {
-	    String errMsg = e.getMessage()+ "\nThe input of the SimplifyParser that reads the output from simplify was (between the \"====\"):\n=====START======\n"+
-	    	counterEx + "\n=====END=======\nThe original output of simplify before cleanup was:\n=====START======\n"+
-	    	counterExOLD;
+	    String errMsg = e.getMessage()
+		    + "\nThe input of the SimplifyParser that reads the output from simplify was (between the \"====\"):\n=====START======\n"
+		    + counterEx
+		    + "\n=====END=======\nThe original output of simplify before cleanup was:\n=====START======\n"
+		    + counterExOLD;
 	    throw new RuntimeException(errMsg);
 	}
 	removeNegativeArrayIndices(c);

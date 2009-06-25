@@ -29,8 +29,8 @@ public class ExecutionTraceModelForTesting extends ExecutionTraceModel {
 
     public ExecutionTraceModelForTesting(TraceElement start, TraceElement end,
                ContextTraceElement she, long rating, Node startN, Node endN, 
-               Integer type, SimpleVisualizationStrategy.Occ startOcc){
-        super(start, end, she, rating, startN, endN, type,startOcc);
+               Integer type){
+        super(start, end, she, rating, startN, endN, type);
     }
 
     /** Returns all ProgramMethods occuring in this trace.
