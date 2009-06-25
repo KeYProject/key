@@ -475,8 +475,6 @@ public class StrategySelectionView extends JPanel {
         
         JButton go = new JButton(Main.autoModeAction);
 
-        
-        JCheckBox resumeAutoMode = createResumeAutoModeCheckBox();
         JPanel timeout = createTimeoutSpinner();
 
         JPanel goPanel = new JPanel ();
@@ -505,8 +503,6 @@ public class StrategySelectionView extends JPanel {
         gbcpanel5.weighty = 0;
         gbcpanel5.anchor = GridBagConstraints.WEST;
         gbcpanel5.insets = new Insets (0, 0, 0, 0);
-        goLayout.setConstraints(resumeAutoMode, gbcpanel5);
-        goPanel.add(resumeAutoMode);
         
         gbcpanel5.gridx = 2;
         gbcpanel5.gridy = 0;
@@ -669,42 +665,6 @@ public class StrategySelectionView extends JPanel {
         return timeoutPanel;
     }
     
-    private JCheckBox createResumeAutoModeCheckBox() {
-	JCheckBox resumeAutoMode = new JCheckBox("Autoresume strategy");
-	resumeAutoMode.setToolTipText("Restart strategy after an interactive proof step?");
-	resumeAutoMode.setBorderPaintedFlat(true);
-
-/* Sorry, but the icon was concealing the checkbox nature of  this
-thing. People were thinking it was a button.
-	resumeAutoMode.setIcon
-	    (IconFactory.resumeDisabledLogo(toolbarIconSize));		
-*/
-	
-	resumeAutoMode.setMaximumSize(resumeAutoMode.getPreferredSize());
-	resumeAutoMode.addItemListener(new ItemListener() {
-		public void itemStateChanged(ItemEvent e) {
-		    if (e.getStateChange() == ItemEvent.SELECTED) {
-//			resumeAutoMode.
-//			    setIcon(IconFactory.resumeLogo(toolbarIconSize));
-			mediator.setResumeAutoMode(true);
-		    } 
-		    else if (e.getStateChange() == ItemEvent.DESELECTED) {
-//			resumeAutoMode.
-//			    setIcon(IconFactory.
-//				    resumeDisabledLogo(toolbarIconSize));
-			mediator.setResumeAutoMode(false);
-		    }
-		    else System.err.println(
-		        "Automode checkbox undefined state: "+
-			    e.getStateChange());
-		    
-	       }
-	    });
-	return resumeAutoMode;
-    }
-    
-    
-
     public void setMediator(KeYMediator mediator) {
         this.mediator = mediator;
         maxSlider.setMediator(mediator);

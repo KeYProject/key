@@ -306,9 +306,6 @@ ANTLR_PARSER= \
 	$(GENERATED_SRC_PATH)$(PFX)parser/KeYLexer.java \
 	$(GENERATED_SRC_PATH)$(PFX)parser/KeYLexerTokenTypes.java \
 	$(GENERATED_SRC_PATH)$(PFX)parser/KeYParser.java \
-	$(GENERATED_SRC_PATH)$(PFX)parser/dictionary/DictionaryLexer.java \
-	$(GENERATED_SRC_PATH)$(PFX)parser/dictionary/DictionaryLexerTokenTypes.java \
-	$(GENERATED_SRC_PATH)$(PFX)parser/dictionary/DictionaryParser.java \
 	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/KeYJMLPreLexer.java \
 	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/KeYJMLPreParser.java \
 	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation/KeYJMLLexer.java \
@@ -550,22 +547,6 @@ $(DIFF_PARSER) \
 	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)parser/diffparser
 	@rm -f $(GENERATED_SRC_PATH)$(PFX)parser/diffparser/*.java $@
 	@$(JAVA) -cp $(CLASSPATH) $(JAVACC_MAIN) -OUTPUT_DIRECTORY=$(GENERATED_SRC_PATH)$(PFX)parser/diffparser $< 
-
-$(GENERATED_SRC_PATH)$(PFX)parser/dictionary/DictionaryLexer.java \
-$(GENERATED_SRC_PATH)$(PFX)parser/dictionary/DictionaryLexerTokenTypes.txt \
-$(GENERATED_SRC_PATH)$(PFX)parser/dictionary/DictionaryLexerTokenTypes.java \
-	: $(PFX)parser/dictionary/dictionaryLexer.g
-	@echo [creating DictionaryLexer]
-	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)parser/dictionary
-	@$(ANTLR)  -o $(GENERATED_SRC_PATH)$(PFX)parser/dictionary $<
-
-$(GENERATED_SRC_PATH)$(PFX)parser/dictionary/DictionaryParser.java \
-	: $(PFX)parser/dictionary/dictionary.g \
-	  $(GENERATED_SRC_PATH)$(PFX)parser/dictionary/DictionaryLexerTokenTypes.txt
-	@echo [creating dictionary parser]
-	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)parser/dictionary
-	@$(ANTLR)  -glib $(PFX)parser/dictionary/dictionaryLexer.g \
-			 -o $(GENERATED_SRC_PATH)$(PFX)parser/dictionary $<
 
 $(GENERATED_SRC_PATH)$(PFX)parser/KeYLexer.java \
 $(GENERATED_SRC_PATH)$(PFX)parser/KeYLexerTokenTypes.txt \

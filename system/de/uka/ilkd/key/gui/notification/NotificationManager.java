@@ -53,11 +53,8 @@ public class NotificationManager {
     private NotificationListener notificationListener;
     
     
-    /**
-     * %%HACK: move these methods
-     * set default with or without sound
-     */
-    public void setDefaultNotification(boolean sound) {
+
+    public void setDefaultNotification() {
        
         notificationTasks.clear();
         
@@ -67,14 +64,6 @@ public class NotificationManager {
             new GeneralInformationNotification();
         final AbandonNotification an = new AbandonNotification();
         final ExitKeYNotification en = new ExitKeYNotification();
-
-        if (sound) {            
-            pcn.addNotificationAction(new ProofClosedSoundPlay());                                     
-            gfn.addNotificationAction(new GeneralFailureSoundPlay());            
-            gin.addNotificationAction(new GeneralInformationSoundPlay());
-            an.addNotificationAction(new AbandonTaskSoundPlay());                      
-            en.addNotificationAction(new ExitKeYSoundPlay());                 
-        }
         
         gfn.addNotificationAction(new GeneralFailureJTextPaneDisplay(mediator.mainFrame()));
         gin.addNotificationAction(new GeneralInformationJTextPaneDisplay(mediator.mainFrame()));
@@ -95,7 +84,8 @@ public class NotificationManager {
         
         notificationListener = new NotificationListener();
         this.mediator = mediator;
-        mediator.addAutoModeListener(notificationListener);         
+        mediator.addAutoModeListener(notificationListener);
+        setDefaultNotification();
     }
     
             
@@ -103,7 +93,7 @@ public class NotificationManager {
      * adds a notification task to this manager     
      * @param task the NotificationTask to be added
      */
-    public void addNotificationTask(NotificationTask task) {
+    public void addNotificationTask(NotificationTask task) {	
         notificationTasks.add(task);
     }
     
@@ -168,7 +158,7 @@ public class NotificationManager {
     }
 
     /**
-     * dispatches the received notification event an triggers
+     * dispatches the received notification event and triggers
      * the corresponding task
      * @param event
      */

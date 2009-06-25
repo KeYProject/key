@@ -182,13 +182,6 @@ public class TaskTree extends JPanel {
 			(((EnvNode)selPath.getLastPathComponent()));
 		    popup.show(e.getComponent(), e.getX(), e.getY());
 		}
-		if (selPath!=null 
-		    && selPath.getLastPathComponent() instanceof BasicTask) {
-		    JPopupMenu popup = new BasicTaskPopupMenu
-			(((BasicTask)selPath.getLastPathComponent()));
-		    popup.show(e.getComponent(), e.getX(), e.getY());
-		}
-		    
 	    }
 	}
         
@@ -316,54 +309,6 @@ public class TaskTree extends JPanel {
 
     }
 
-
-    class BasicTaskPopupMenu extends JPopupMenu implements ActionListener {	
-	
-        private JMenuItem mcList=new JMenuItem("Show Used Specifications");
-        private JMenuItem loadProof=new JMenuItem("Load Proof from File");
-        private JMenuItem removeTask=new JMenuItem("Abandon Task");
-	
-	private BasicTask invokedNode;
-
-	public BasicTaskPopupMenu(BasicTask node) {
-	    super("Choose Action");
-	    invokedNode = node;
-	    create();
-	}
-
-	private void create() {	    
-	    this.add(mcList);
-	    mcList.addActionListener(this);
-	    this.add(loadProof);
-	    loadProof.addActionListener(this);
-            this.add(removeTask);
-            removeTask.addActionListener(this);
-	}
-
-
-	public void actionPerformed(ActionEvent e) {
-	    if (e.getSource() == mcList) {
-                new UsedSpecificationsDialog(
-                            mediator.getServices(), 
-                            invokedNode.getUsedSpecs());
-	    } else if (e.getSource() == removeTask) {
-	        Main.getInstance().closeTask(invokedNode);
-            } else if (e.getSource() == loadProof) {
-                Main mainFrame = Main.getInstance();
-                KeYFileChooser localFileChooser = Main.getFileChooser(
-                    "Choose file from which to load proof...");
-                
-	        boolean loaded = localFileChooser.showOpenDialog(mainFrame);
-	        if (loaded) {
-		    File file = localFileChooser.getSelectedFile(); 
-		    final ProblemLoader pl = new ProblemLoader(file, mainFrame, 
-                                        mediator.getProfile(), true);
-                    pl.addTaskListener(mainFrame.getProverTaskListener());
-                    pl.run();
-	        }
-            }
-	}
-    }
 
     class TaskTreeSelectionListener implements KeYSelectionListener {
 	/** focused node has changed */

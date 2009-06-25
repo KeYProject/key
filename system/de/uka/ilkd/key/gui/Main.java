@@ -24,9 +24,6 @@ import javax.swing.text.JTextComponent;
 import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.gui.DecisionProcedureSettings.RuleDescriptor;
-import de.uka.ilkd.key.gui.assistant.ProofAssistant;
-import de.uka.ilkd.key.gui.assistant.ProofAssistantAI;
-import de.uka.ilkd.key.gui.assistant.ProofAssistantController;
 import de.uka.ilkd.key.gui.configuration.*;
 import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
@@ -151,6 +148,9 @@ public class Main extends JFrame implements IMain {
     
     /** action for saving a proof (attempt) */
     public static SaveFile saveFileAction;
+    
+    /** action for opening the PO browser */
+    public static POBrowserAction poBrowserAction;
     
 
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
@@ -402,6 +402,7 @@ public class Main extends JFrame implements IMain {
         autoModeAction = new AutoModeAction();
         openFileAction = new OpenFile();
         saveFileAction = new SaveFile();
+        poBrowserAction = new POBrowserAction();
 
 	// ============================================================
 	// ==================  create empty views =====================
@@ -457,6 +458,8 @@ public class Main extends JFrame implements IMain {
         fileOperations.add(createOpenFile());
         fileOperations.add(createOpenMostRecentFile());
         fileOperations.add(createSaveFile());
+        fileOperations.addSeparator();
+        fileOperations.add(createPOBrowserComponent());
         
         goalView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW ).put(
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK), 
@@ -624,6 +627,12 @@ public class Main extends JFrame implements IMain {
         return button;
     }
 
+    private JComponent createPOBrowserComponent() {
+        final JButton button = new JButton();
+        button.setAction(poBrowserAction);
+        button.setText("Proof Obligations");
+        return button;
+    }
 
     public ProverTaskListener getProverTaskListener() {
         return taskListener;
@@ -755,12 +764,6 @@ public class Main extends JFrame implements IMain {
             mediator.fireShutDown(new GUIEvent(this));
 
             if (standalone) {
-                // wait some seconds; give notification sound a bit time
-                try {
-                    Thread.sleep(1000);
-                } catch(InterruptedException ie) {
-                    Debug.out("Thread has been interrupted.");
-                }
                 System.out.println("Have a nice day.");
                 System.exit(-1);
             }
@@ -1320,60 +1323,6 @@ public class Main extends JFrame implements IMain {
         
         registerAtMenu(options, dndDirectionSensitivityOption);        
         
-	// sound settings
-	final boolean soundNotification = 
-	    ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().soundNotification();
-	final JMenuItem soundNotificationOption =
-	    new JCheckBoxMenuItem("Sound", soundNotification);
-	if (notificationManager!=null) {
-            notificationManager.setDefaultNotification(soundNotification);
-        }
-	soundNotificationOption.addActionListener(new ActionListener() {
-	    public void actionPerformed(ActionEvent e) {
-	        boolean b = ((JCheckBoxMenuItem)e.getSource()).isSelected();	       
-	        if (notificationManager!=null) {
-                    notificationManager.setDefaultNotification(b);                
-	        }
-	        ProofSettings.DEFAULT_SETTINGS.
-	        getGeneralSettings().setSoundNotification(b);	        
-        }});
-	
-	registerAtMenu(options, soundNotificationOption);
-
-	// proof assistant
-	final JMenuItem assistantOption = new JCheckBoxMenuItem
-	    ("Proof Assistant", 
-	     ProofSettings.DEFAULT_SETTINGS.
-	     getGeneralSettings().proofAssistantMode());
-
-	final ProofAssistantController assistant = new ProofAssistantController
-	    (mediator, 
-	     ProofSettings.DEFAULT_SETTINGS.getGeneralSettings(),
-	     new ProofAssistantAI(), new ProofAssistant());
-
- 	// listen to the state of the assistant in order to hold the
- 	// item and state consistent
-	assistant.addChangeListener(new ChangeListener() {
-	    public void stateChanged(ChangeEvent e) {
-	        final boolean assistentEnabled = 
-                    ((ProofAssistantController)e.getSource()).getState();
-	        assistantOption.setSelected(assistentEnabled);
-	        // setSelected does not trigger an action event so we have
-	        // to make the change explicitly permanent
-	        ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().
-	        setProofAssistantMode(assistentEnabled);
-	    }
-	});
-
-	assistantOption.addActionListener(new ActionListener() {
-	    public void actionPerformed(ActionEvent e) {
-		ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().
-		    setProofAssistantMode
-		    (((JCheckBoxMenuItem)e.getSource()).isSelected());
-	    }});
-
-	registerAtMenu(options, assistantOption);
-	        
         return options;
     }
 
@@ -1499,24 +1448,6 @@ public class Main extends JFrame implements IMain {
         return help;
     }
     
-    protected JMenu createToolsMenu() {
-	JMenu tools = new JMenu("Tools");
-	tools.setMnemonic(KeyEvent.VK_T);
-	getJMenuBar().add(tools);
-
-	JMenuItem specificationBrowser = 
-	    new JMenuItem("Proof Obligation Browser...");
-	specificationBrowser.setAccelerator(KeyStroke.getKeyStroke
-					    (KeyEvent.VK_B, 
-					     ActionEvent.CTRL_MASK));
-	specificationBrowser.addActionListener(new ActionListener() {
-	    public void actionPerformed(ActionEvent e) {
-    	        showPOBrowser();
-    	    }});
-	registerAtMenu(tools, specificationBrowser);
-                 
-        return tools;
-    }
     
     protected JMenu createDebugMenu() {
         JMenu debug = new JMenu("Debug");
@@ -1538,7 +1469,6 @@ public class Main extends JFrame implements IMain {
         menuBar.add(createViewMenu());
         menuBar.add(createProofMenu());
         menuBar.add(createOptionsMenu());
-        menuBar.add(createToolsMenu());
         menuBar.add(Box.createHorizontalGlue());
         menuBar.add(createHelpMenu());
         if (Debug.ENABLE_DEBUG)
@@ -1872,6 +1802,48 @@ public class Main extends JFrame implements IMain {
             }
         }
     }
+    
+    
+    /**
+     * Shows the proof obligation browser.
+     */
+    private final class POBrowserAction extends AbstractAction {
+        
+        public POBrowserAction() {
+            putValue(NAME, "PO Browser");
+            //putValue(SMALL_ICON, IconFactory.saveFile(TOOLBAR_ICON_SIZE));
+            putValue(SHORT_DESCRIPTION, "Proof Obligation Browser.");
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_B, ActionEvent.CTRL_MASK));
+            
+            setEnabled(enabled());
+            
+            mediator.addKeYSelectionListener(new KeYSelectionListener() {
+                /** focused node has changed */
+                public void selectedNodeChanged(KeYSelectionEvent e) {
+                }
+                
+                /**
+                 * the selected proof has changed. Enable or disable action depending whether a proof is
+                 * available or not
+                 */ 
+                public void selectedProofChanged(KeYSelectionEvent e) {
+                    setEnabled(enabled());
+                }
+            });
+        }
+        
+        private boolean enabled() {
+            return mediator.getProof() != null 
+                   && mediator.getProof().getJavaModel() != null
+                   && !mediator.getProof().getJavaModel().isEmpty();
+        }
+        
+        
+        public void actionPerformed(ActionEvent e) {
+            showPOBrowser();
+        }
+    }
+    
     
     /**
      * The progress monitor that displays a progress bar in a corner of the main window.
@@ -2564,7 +2536,7 @@ public class Main extends JFrame implements IMain {
 	    putValue(NAME, decisionProcedure.getDisplayName());
 		
 	    if (!DecisionProcedureSettings.NOT_A_RULE.equals(decisionProcedure)) {
-		putValue(SHORT_DESCRIPTION, "Invokes " + decisionProcedure.getDisplayName());
+		putValue(SHORT_DESCRIPTION, "Invoke " + decisionProcedure.getDisplayName());
 	    } else {		
 		putValue(SHORT_DESCRIPTION, "Please select an external prover under Options | Decision Procedures.");
 	    }
