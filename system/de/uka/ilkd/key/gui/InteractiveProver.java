@@ -58,10 +58,6 @@ public class InteractiveProver {
     
     private boolean resumeAutoMode = false;
 
- 
-    //private static Logger threadLogger = Logger.getLogger("key.threading");
-    
-    
 
     /** creates a new interactive prover object 
      */
@@ -148,22 +144,8 @@ public class InteractiveProver {
 
         ListOfGoal goalList = goal.apply(app);
         
-        
-        
         if (!getProof ().closed ()) {
-            if ( resumeAutoMode () ) {
-                startAutoMode ();
-            } else {
-                ReuseListener rl = mediator().getReuseListener();
-                rl.removeRPConsumedGoal(goal);
-                rl.addRPOldMarkersNewGoals(goalList);
-                if (rl.reusePossible()) {
-                    mediator().indicateReuse(rl.getBestReusePoint());
-                } else {
-                    mediator().indicateNoReuse();
-                    Goal.applyUpdateSimplifier ( goalList );
-                }
-            }
+            Goal.applyUpdateSimplifier ( goalList );
         }
     }
 
@@ -172,13 +154,14 @@ public class InteractiveProver {
         int rv = mediator ().getMaxAutomaticSteps();
         
         if ( Main.batchMode ) {
-            //Allow much more steps in batchMode then in regular mode.
+            //Allow much more steps in batchMode than in regular mode.
             rv *= 100;
         }
         
         return rv;
     }
 
+    
     private long getTimeout() {
         return mediator().getAutomaticApplicationTimeout();
     }
@@ -190,14 +173,6 @@ public class InteractiveProver {
     public Proof getProof() {
 	return proof;
     }    
-
-    /** 
-     * starts the execution of rules with active strategy 
-     */
-    public void startAutoMode () {
-	startAutoMode( proof.openGoals () );
-    }
-
 
     /** starts the execution of rules with active strategy. The
      * strategy will only be applied on the goals of the list that

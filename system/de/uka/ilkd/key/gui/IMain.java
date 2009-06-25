@@ -5,10 +5,11 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
-import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 /** 
@@ -81,17 +82,4 @@ public interface IMain {
      */
     public abstract void notify(NotificationEvent event);
 
-    /**
-     * called when a ReusePoint has been found so that the GUI can offer reuse for
-     * the current point to the user
-     * @param bestReusePoint the ReusePoint found, precise the best found candidate for 
-     * 
-     */
-    public abstract void indicateReuse(ReusePoint bestReusePoint);
-
-    /**
-     * invoked when currently no reuse is possible
-     */
-    public abstract void indicateNoReuse();
-    
 }

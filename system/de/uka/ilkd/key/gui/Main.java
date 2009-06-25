@@ -14,10 +14,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -48,10 +45,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.*;
-import de.uka.ilkd.key.proof.mgt.BasicTask;
-import de.uka.ilkd.key.proof.mgt.NonInterferenceCheck;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
-import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.smt.DecProcRunner;
 import de.uka.ilkd.key.strategy.VBTStrategy;
 import de.uka.ilkd.key.util.*;
@@ -172,18 +166,7 @@ public class Main extends JFrame implements IMain {
 
     public static String statisticsFile = null;
 
-    /** if true then the prover starts in 
-     * a unit test generation optimized mode.
-     * ATTENTION: to be deleted (Puse profiles to customize 
-     * JML translation, TODO)
-     * */ 
-
-    public static boolean testMode = false;
     
-    /** used to enable and initiate or to disable reuse */
-    private ReuseAction reuseAction = new ReuseAction();
-    private JPopupMenu reusePopup = new JPopupMenu();
-
     
     /** undo the last proof step on the currently selected branch */
     private UndoLastStep undoAction = new UndoLastStep();
@@ -194,9 +177,6 @@ public class Main extends JFrame implements IMain {
     private JLabel ruletimeoutlabel;
     private JButton decisionProcedureInvocationButton;
 
-    
-    private JButton testButton;
-    
     
     protected static String fileNameOnStartUp = null;
     
@@ -472,54 +452,11 @@ public class Main extends JFrame implements IMain {
         
         toolBar.add(goalBackButton);
         toolBar.addSeparator();
-               
-        final JButton reuseButton = new JButton();
-        reuseButton.setEnabled(false);
-        reuseButton.setToolTipText("Start proof reuse (when template available)");
-        JMenuItem singleStepReuse = new JCheckBoxMenuItem("Single step");
-        singleStepReuse.setSelected(false);
-        singleStepReuse.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                mediator.setContinuousReuse(
-                        !((JCheckBoxMenuItem)e.getSource()).isSelected());
-            }
-        });
-        reusePopup.add(singleStepReuse);
-        reuseButton.addMouseListener(new MouseAdapter() {
-            public void mousePressed(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    reusePopup.show(e.getComponent(), e.getX(), e.getY());
-                }
-            }
-        });
-        reuseButton.setAction(reuseAction);
-
-        toolBar.add(reuseButton);
-
-        toolBar.addSeparator();
-        
+                       
         JToolBar fileOperations = new JToolBar("File Operations");
         fileOperations.add(createOpenFile());
         fileOperations.add(createOpenMostRecentFile());
         fileOperations.add(createSaveFile());
-        
-        goalView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW ).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.CTRL_MASK),
-        "show_reuse_state");
-        goalView.getActionMap().put("show_reuse_state", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                mediator().showReuseState();
-            }
-        });
-
-        goalView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW ).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, ActionEvent.ALT_MASK),
-        "show_reuse_cntd");
-        goalView.getActionMap().put("show_reuse_cntd", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                mediator().showPreImage();
-            }
-        });
         
         goalView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW ).put(
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK), 
@@ -2132,22 +2069,6 @@ public class Main extends JFrame implements IMain {
         
     }
         
-    /**
-     * called when a ReusePoint has been found so that the GUI can offer reuse for
-     * the current point to the user
-     * @param p the ReusePoint found, precise the best found candidate for 
-     * 
-     */
-    public void indicateReuse(ReusePoint p) {
-        reuseAction.setReusePoint(p);
-    }
-    
-    /**
-     * invoked when currently no reuse is possible
-     */
-    public void indicateNoReuse() {
-        reuseAction.setReusePoint(null);
-    }
 
     /** displays some status information */
     private void displayResults ( long time, int appliedRules, int closedGoals ) {
@@ -2627,44 +2548,6 @@ public class Main extends JFrame implements IMain {
     
     
     /**
-     * This action is enabled if in the current proof situation reuse has
-     * been requested and is possible, i.e. a reuse candidate has been found.
-     * 
-     * The actions {@link ReuseAction#actionPerformed(ActionEvent)} method
-     * starts the reuse when invoked. 
-     */
-    private final class ReuseAction extends AbstractAction {        
-        public ReusePoint rP;
-        
-        public ReuseAction() {
-            setReusePoint(null);
-            putValue(SMALL_ICON, IconFactory.reuseLogo());
-            putValue(NAME, "Reuse");
-        }
-        
-        public void setReusePoint(ReusePoint reusePoint) {
-            this.rP = reusePoint;
-            setEnabled(rP != null);
-            if (rP == null) {
-                putValue(SHORT_DESCRIPTION, "Start proof reuse (when template available)");
-            } else {
-                putValue(SHORT_DESCRIPTION, rP.toString());
-            }
-        }
-                
-        public boolean isEnabled() {
-            return super.isEnabled() && rP != null;
-        }
-                
-        public void actionPerformed(ActionEvent e) {
-            final ReusePoint reusePoint = rP;
-            setReusePoint(null);
-            mediator.startReuse(reusePoint);                       
-        }
-    }
-    
-    
-    /**
      * This action is responsible for the invocation of a decision procedure.
      * For example the toolbar button is paramtrized with an instance of this action
      */
@@ -2907,7 +2790,5 @@ public class Main extends JFrame implements IMain {
 
     public static boolean hasInstance() {
         return instance != null;
-    }
-
-   
+    }   
 }

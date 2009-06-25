@@ -661,31 +661,24 @@ public class ProofTreeView extends JPanel {
 		*/
 		tree_cell.setForeground(Color.black);
                 String tooltipText = "An inner node of the proof";
-                if (node.isReuseCandidate()) {
-		   tree_cell.setIcon(IconFactory.reuseLogo());
+                
+                Icon defaultIcon;
+                if (node.getNodeInfo().getInteractiveRuleApplication()) {
+                    defaultIcon = IconFactory.interactiveAppLogo(16);
+                    tooltipText = "An inner node (rule applied by user)";
                 } else {
-                    Icon defaultIcon;
-                    if (node.getNodeInfo().getInteractiveRuleApplication()) {
-                        defaultIcon = IconFactory.interactiveAppLogo(16);
-                        tooltipText = "An inner node (rule applied by user)";
-                    } else {
-                        defaultIcon = null;
-                    }
-                    if (isBranch) {
-                        defaultIcon = getOpenIcon();
-                        tooltipText = "A branch node with all siblings hidden";
-                    }
-                    tree_cell.setIcon(defaultIcon);
+                    defaultIcon = null;
                 }
+                if (isBranch) {
+                    defaultIcon = getOpenIcon();
+                    tooltipText = "A branch node with all siblings hidden";
+                }
+                tree_cell.setIcon(defaultIcon);
+                
 		tree_cell.setToolTipText(tooltipText);
 	    }
 	    
-            if (node.getReuseSource() != null) {
-		tree_cell.setBackgroundNonSelectionColor(PASTEL_COLOR);
-                if (!node.getReuseSource().isConnect()) { 
-                   tree_cell.setBackgroundNonSelectionColor(PALE_RED_COLOR);
-                }
-            } else if (node.getNodeInfo().getActiveStatement() != null ) {
+            if (node.getNodeInfo().getActiveStatement() != null ) {
                 tree_cell.setBackgroundNonSelectionColor(LIGHT_BLUE_COLOR);
 
             } else {
@@ -722,9 +715,6 @@ public class ProofTreeView extends JPanel {
 	private JMenuItem goalBack    = new JMenuItem("Prune Proof");
 	private JMenuItem runStrategy = new JMenuItem("Apply Strategy",
 	    IconFactory.autoModeStartLogo(10));
-        private JMenuItem mark        = new JMenuItem("Mark for Re-Use");
-	
-        private JMenuItem change      = new JMenuItem("Change This Node");
 
 	private TreePath path;
 	private TreePath branch;
@@ -804,10 +794,6 @@ public class ProofTreeView extends JPanel {
 		        goalBack.setEnabled(true);
 		    }
 		}
-	        this.add(change);
-	        change.addActionListener(this);
-	        this.add(mark);
-	        mark.addActionListener(this);
 	    }
 	}
 
@@ -820,10 +806,7 @@ public class ProofTreeView extends JPanel {
 		makeNodeVisible(mediator.getSelectedNode());
 	    } else if (e.getSource() == runStrategy) {
 		runStrategyOnNode();
-	    } else if (e.getSource() == mark) {
-		mediator().mark(invokedNode);
-                delegateView.treeDidChange(); // redraw with mark
-            } else if (e.getSource() == expandAll) {
+	    } else if (e.getSource() == expandAll) {
 		ExpansionState.expandAll(delegateView);
             } else if (e.getSource() == expandAllBelow) {
 		ExpansionState.expandAll(delegateView, branch);
@@ -927,8 +910,6 @@ public class ProofTreeView extends JPanel {
 		}
             } else if (e.getSource() == search) {
 		proofTreeSearchPanel.setVisible(true);
-            } else if (e.getSource() == change) {
-                mediator.changeNode(invokedNode);
             }
 	}
 

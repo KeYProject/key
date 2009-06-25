@@ -15,7 +15,6 @@ import java.util.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.incclosure.*;
-import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.Debug;
 
@@ -50,12 +49,6 @@ public class Node {
 
     /** contains non-logical content, used for user feedback */
     private NodeInfo             nodeInfo;
-
-    int                          reuseCandidate      = 0;
-
-    private boolean              persistentCandidate = false;
-
-    private ReusePoint           reuseSource;
 
     int                          serialNr;
 
@@ -522,59 +515,6 @@ public class Node {
         }
         return text;
     }   
-    
-    private static Vector<Node> reuseCandidates = new Vector<Node>(20);
-    
-    public static Iterator<Node> reuseCandidatesIterator() {
-        return reuseCandidates.iterator();
-    }
-
-    public static int reuseCandidatesNumber() {
-        return reuseCandidates.size();
-    }
-
-    public void markReuseCandidate() {
-       reuseCandidate++;
-       reuseCandidates.add(this);
-    }
-        
-    public void markPersistentCandidate() {
-       persistentCandidate = true;
-    }
-
-    public void unmarkReuseCandidate() {
-       if ((reuseCandidate>1) || !persistentCandidate) {
-          reuseCandidate--;
-          reuseCandidates.remove(this);
-       }
-    }
-    
-    public static void clearReuseCandidates() {
-       for (Node n : reuseCandidates) {
-           n.reuseCandidate = 0;
-           n.persistentCandidate = false;
-       }
-       reuseCandidates = new Vector<Node>(20);
-    }
-    
-    public static void clearReuseCandidates(Proof p) {
-        for (Iterator<Node> it = reuseCandidates.iterator(); it.hasNext();) {
-            Node n = it.next();
-            if (n.proof() == p) it.remove();
-        }
-    }
-    
-    public boolean isReuseCandidate() {
-       return reuseCandidate>0;
-    }
-        
-    public void setReuseSource(ReusePoint rp) {
-       reuseSource = rp;
-    }
-
-    public ReusePoint getReuseSource() {
-       return reuseSource;
-    }
     
 
     /**

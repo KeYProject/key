@@ -15,9 +15,9 @@ import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProgressMonitor;
+
 
 /**
  * This class is an example how to implement the IMain interface. It offers

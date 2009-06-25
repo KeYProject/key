@@ -51,7 +51,6 @@ public class TaskTreeModel extends DefaultTreeModel {
 	Proof[] allProofs = p.allProofs();
 	for (int i=0; i<allProofs.length; i++) {
 	    proofToTask.remove(allProofs[i]);
-            Node.clearReuseCandidates(allProofs[i]); // yes, listeners...
 	    p.decoupleFromEnv();
 	}
 	if (p.getParent().getChildCount()==1) { // remove env if p is single
@@ -84,7 +83,4 @@ public class TaskTreeModel extends DefaultTreeModel {
 	addTask(bp);
 	return bp;
     }
-
-
-
 } 

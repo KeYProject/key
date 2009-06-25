@@ -103,16 +103,7 @@ public class NonGoalInfoView extends JTextArea {
             
 	}
 
-/* Removed for the book version
-        s = s + "\nActive statement from:\n"+
-           node.getNodeInfo().getExecStatementParentClass()+":"+
-           node.getNodeInfo().getExecStatementPosition()+"\n";
-*/
            
-        if (node.getReuseSource() != null) {
-            s += "\n"+node.getReuseSource().scoringInfo();
-        }
-
 	Config.DEFAULT.addConfigChangeListener(configChangeListener);
 
 	updateUI();

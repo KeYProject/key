@@ -26,7 +26,6 @@ header {
   import de.uka.ilkd.key.logic.*;
   import de.uka.ilkd.key.logic.op.*;
   import de.uka.ilkd.key.logic.sort.*;
-  import de.uka.ilkd.key.logic.sort.oclsort.OclSort;
 
   import de.uka.ilkd.key.proof.*;
   import de.uka.ilkd.key.proof.init.*;
@@ -3136,7 +3135,7 @@ term130 returns [Term a = null]
     //Used for OCL Simplification.
     //WATCHOUT: Woj: some time we will need to have support for strings in Java DL too,
     // what then? This here is specific to OCL, isn't it?
-    |   literal:STRING_LITERAL
+    /*|   literal:STRING_LITERAL
         {
             String s = literal.getText(); 
             Name name = new Name(s);
@@ -3147,7 +3146,7 @@ term130 returns [Term a = null]
                 addFunction((Function)stringLit);
             }
             a = tf.createFunctionTerm(stringLit);
-        }
+        }*/
    ; exception
         catch [TermCreationException ex] {
               keh.reportException

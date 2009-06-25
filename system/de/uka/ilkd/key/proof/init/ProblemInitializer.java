@@ -405,20 +405,6 @@ public class ProblemInitializer {
 	RuleConfig ruleConfig = new RuleConfig(initConfig.getActivatedChoices());
 	env.setRuleConfig(ruleConfig);
 	
-	//possibly reuse an existing proof environment
-	if(main != null && po.askUserForEnvironment()) {
-    	    ProofEnvironment envChosen = 
-    	    GlobalProofMgt.getInstance().getProofEnvironment(
-    						env.getJavaModel(), 
-    						env.getRuleConfig());
-        	
-            if(envChosen != null) {
-        	assert envChosen.getInitConfig().getProofEnv() == envChosen;
-        	return envChosen.getInitConfig();
-            } 
-	}
-	
-	
 	//register the proof environment
 	if(main != null) {
 	    GlobalProofMgt.getInstance().registerProofEnvironment(env);
@@ -454,7 +440,7 @@ public class ProblemInitializer {
 	if (main != null) {
             main.addProblem(pl);
         }
-	GlobalProofMgt.getInstance().tryReuse(pl);	
+	//GlobalProofMgt.getInstance().tryReuse(pl);	
     }
     
     
