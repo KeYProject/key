@@ -510,7 +510,7 @@ public class Recoder2KeY implements JavaReader {
         if(classPath != null) {
             for(File cp : classPath) {
                 // marker for no_default classes
-                if(cp == null) { 
+                if(cp == null) {
                     parseDefault = false; 
                 } else {
                     if(cp.isDirectory())

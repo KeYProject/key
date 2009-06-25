@@ -18,7 +18,6 @@
 package de.uka.ilkd.key.java;
 
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import recoder.ServiceConfiguration;
@@ -27,16 +26,17 @@ import recoder.abstraction.ClassType;
 import recoder.abstraction.Constructor;
 import recoder.abstraction.DefaultConstructor;
 import recoder.abstraction.Type;
-import recoder.bytecode.ClassFile;
 import recoder.service.NameInfo;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.NullType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.declaration.modifier.*;
+import de.uka.ilkd.key.java.declaration.modifier.Final;
+import de.uka.ilkd.key.java.declaration.modifier.Private;
+import de.uka.ilkd.key.java.declaration.modifier.Public;
+import de.uka.ilkd.key.java.declaration.modifier.Static;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.recoderext.ClassFileDeclarationBuilder;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
@@ -231,7 +231,6 @@ public class Recoder2KeYTypeConverter {
                         throw new RuntimeException(
                         "Missing core class: java.lang.Object must always be present");
                     }
-    
                     s = createObjectSort(ct, directSuperSorts(ct).add(
                             objectType.getSort()));
                 } else {
@@ -397,122 +396,6 @@ public class Recoder2KeYTypeConverter {
         final boolean abstractOrInterface = ct.isAbstract() || ct.isInterface();
         return new ClassInstanceSortImpl(new Name(Recoder2KeYConverter.makeAdmissibleName(ct.getFullName())), 
                 supers,	abstractOrInterface);
-    }
-
-    private KeYJavaType makeSimpleKeYType(ClassType ct, Sort s) {
-        ProgramElementName name = new ProgramElementName(Recoder2KeYConverter.makeAdmissibleName(ct.getName()));
-        ProgramElementName fullname = new ProgramElementName(Recoder2KeYConverter.makeAdmissibleName(ct.getFullName()));
-        MemberDeclaration[] members = new MemberDeclaration[0];
-        Modifier[] modifiers = new Modifier[0];
-        Extends ext = null;
-        Implements impl = null;
-        boolean parentIsInterface = false;
-
-        TypeDeclaration td = new ClassDeclaration(modifiers, name, ext, fullname, impl,
-                members, parentIsInterface , true);
-        KeYJavaType kjt = new KeYJavaType(s);
-        kjt.setJavaType(td);
-        return kjt;
-    }
-
-    /**
-     * retrieve information from a bytecode class file and store it into the
-     * type repository.
-     * 
-     * @param cf
-     *            class file to model
-     *            
-     * @deprecated now supported in {@link ClassFileDeclarationBuilder}
-     */
-    private void createTypeDeclaration(ClassFile cf) {
-
-        KeYJavaType classType = getKeYJavaType(cf);
-
-        Modifier[] modifiers = getModifiers(cf);
-        ProgramElementName name = new ProgramElementName(Recoder2KeYConverter.makeAdmissibleName(cf.getName()));
-        ProgramElementName fullname = new ProgramElementName(Recoder2KeYConverter.makeAdmissibleName(cf.getFullName()));
-
-        List<ClassType> supertype = cf.getSupertypes();
-
-        TypeReference[] implementsTypes = null;
-        TypeReference extendType = null;
-
-        // fetch all interfaces.
-        LinkedList implementsList = new LinkedList();
-        if (supertype != null) {
-            for (int i = 0; i < supertype.size(); i++) {
-                recoder.abstraction.ClassType ct = supertype.get(i);
-                final KeYJavaType kjt = getKeYJavaType(ct);
-                final TypeReference tr = new TypeRef(new ProgramElementName(ct
-                        .getFullName()), 0, null, kjt);
-                if (ct.isInterface()) {
-                    implementsList.add(tr);
-                } else {
-                    Debug.assertTrue(extendType == null);
-                    extendType = tr;
-                }
-            }
-            implementsTypes = (TypeReference[]) implementsList
-            .toArray(new TypeReference[implementsList.size()]);
-        }
-
-        final Extends ext = (extendType == null ? null
-                : new Extends(extendType));
-
-        final Implements impl = implementsTypes == null ? null
-                : new Implements(implementsTypes);
-
-        final boolean parentIsInterface = cf.getContainingClassType() != null ? cf
-                .getContainingClassType().isInterface()
-                : false;
-
-                // for the moment no members
-
-                MemberDeclaration[] members = new MemberDeclaration[0];
-
-                TypeDeclaration td;
-                if (cf.isInterface()) {
-                    td = new InterfaceDeclaration(modifiers, name, fullname, ext,
-                            members, true);
-                } else {
-                    td = new ClassDeclaration(modifiers, name, ext, fullname, impl,
-                            members, parentIsInterface, true);
-                }
-                classType.setJavaType(td);
-
-                // now void
-                // return td;
-    }
-
-    /**
-     * retrieve the modiefiers of <tt>cf</tt>
-     * 
-     * @param cf
-     *            the ByteCodeElement whose modifiers are determined
-     * @return cf's modifiers
-     */
-    private Modifier[] getModifiers(recoder.bytecode.ByteCodeElement cf) {
-        LinkedList mods = new LinkedList();
-        if (cf.isNative()) {
-            mods.add(new Native());
-        }
-        if (cf.isAbstract()) {
-            mods.add(new Abstract());
-        }
-        if (cf.isPublic()) {
-            mods.add(new Public());
-        } else if (cf.isPrivate()) {
-            mods.add(new Private());
-        } else if (cf.isProtected()) {
-            mods.add(new Protected());
-        }
-        if (cf.isFinal()) {
-            mods.add(new Final());
-        }
-        if (cf.isSynchronized()) {
-            mods.add(new Synchronized());
-        }
-        return (Modifier[]) mods.toArray(new Modifier[mods.size()]);
     }
 
     /**
