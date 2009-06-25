@@ -22,27 +22,15 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
-import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.*;
 
+
 public class StrategySelectionView extends JPanel {
 
-    final JRadioButtonHashMap bSimpleFOLStrategy = new JRadioButtonHashMap(
-        "FOL", "FOLStrategy", false, false);
     final JRadioButtonHashMap bSimpleJavaCardDLStrategy = new JRadioButtonHashMap(
         "Java DL", "JavaCardDLStrategy", false, false);
-    final JRadioButtonHashMap bSimplificationOfOCLStrategy = new JRadioButtonHashMap(
-        "OCL simplification", "SimplificationOfOCLStrategy", false, false);
-    final JRadioButtonHashMap bComputeSpecificationStrategy = new JRadioButtonHashMap(
-        "Specification extraction", "ComputeSpecificationStrategy", false, false);
-    final JRadioButtonHashMap bVBTStrategy = new JRadioButtonHashMap(
-	"VBT Strategy", "VBTStrategy", false, false);
-    final JRadioButtonHashMap bDebuggerStrategy = new JRadioButtonHashMap(
-        "Debugger Strategy", "DebuggerStrategy", false, false);
-
-    
+   
     ButtonGroup stratGroup = new ButtonGroup();
     ButtonGroup splittingGroup = new ButtonGroup();
     ButtonGroup loopGroup = new ButtonGroup();
@@ -80,8 +68,6 @@ public class StrategySelectionView extends JPanel {
     private JRadioButtonHashMap quantifierNonSplitting;
     private JRadioButtonHashMap quantifierNonSplittingWithProgs;
     private JRadioButtonHashMap quantifierInstantiate;
-    private JRadioButton rdButDefaultGC;
-    private JRadioButton rdButDepthGC;
     
     private KeYMediator mediator;
     
@@ -479,11 +465,7 @@ public class StrategySelectionView extends JPanel {
         ////////////////////////////////////////////////////////////////////////
 
         Box box = Box.createVerticalBox();
-        stratGroup.add(bSimpleFOLStrategy);
         stratGroup.add(bSimpleJavaCardDLStrategy);
-        stratGroup.add(bSimplificationOfOCLStrategy);
-        stratGroup.add(bVBTStrategy);
-        stratGroup.add(bComputeSpecificationStrategy);
         javaDLOptionsPanel.setEnabled(bSimpleJavaCardDLStrategy.isSelected());
         bSimpleJavaCardDLStrategy.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
@@ -550,18 +532,11 @@ public class StrategySelectionView extends JPanel {
         maxSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
         box.add(maxSlider);
         box.add(Box.createVerticalStrut(8));
-        bSimpleFOLStrategy.setAlignmentX(Component.LEFT_ALIGNMENT);
-        box.add(bSimpleFOLStrategy);
         bSimpleJavaCardDLStrategy.setAlignmentX(Component.LEFT_ALIGNMENT);
         box.add(bSimpleJavaCardDLStrategy);
         javaDLOptionsScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         box.add(javaDLOptionsScrollPane);       
-        box.add(bVBTStrategy);
 	
-        bSimplificationOfOCLStrategy.setAlignmentX(Component.LEFT_ALIGNMENT);
-        box.add(bSimplificationOfOCLStrategy);
-        bComputeSpecificationStrategy.setAlignmentX(Component.LEFT_ALIGNMENT);
-        box.add(bComputeSpecificationStrategy);        
        
         // HACK but I really do not know enough about the GridBagLayout :-(
 //        final JPanel verticalGlue = new JPanel();
@@ -572,11 +547,7 @@ public class StrategySelectionView extends JPanel {
         this.add(box);
         //  add the ActionListener to the Buttons and ActionCommands 
         //  for identifying Buttons
-        bSimpleFOLStrategy.addActionListener(stratListener);
         bSimpleJavaCardDLStrategy.addActionListener(stratListener);
-        bSimplificationOfOCLStrategy.addActionListener(stratListener);
-        bVBTStrategy.addActionListener(stratListener);
-        bComputeSpecificationStrategy.addActionListener(stratListener);
         rdBut9.addActionListener(optListener);	
         rdBut10.addActionListener(optListener);       
         rdBut11.addActionListener(optListener);    
@@ -951,9 +922,7 @@ thing. People were thinking it was a button.
         return p;
     }
 
-    /**
-     * 
-     */
+    
     private void updateStrategySettings(String strategyName) {
         final Proof proof = mediator.getProof();
         final StrategyProperties p = getProperties();

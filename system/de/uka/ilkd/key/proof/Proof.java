@@ -21,7 +21,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.SpecExtPO;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.DefaultProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
@@ -111,8 +110,6 @@ public class Proof implements Named {
     private long autoModeTime = 0;
     
     private Strategy activeStrategy;
-//    implemented by mbender for jmltest
-    private SpecExtPO specExtPO;
     
 
     /** constructs a new empty proof with name */
@@ -875,26 +872,4 @@ public class Proof implements Named {
 	result.append(root.toString());
 	return result.toString();
     }
-
-    // implemented by mbender for jmltest
-
-    /**
-     * This method is just used for jmltest
-     * 
-     * @param specExtPO
-     *                The Specification Extraction Proof Obligation to be set
-     */
-    public void setPO(SpecExtPO specExtPO) {
-        this.specExtPO = specExtPO;
-    }
-
-    /**
-     * This method is just used for jmltest
-     * 
-     * @return The Specification Extraction Proof Obligation used for this proof
-     */
-    public SpecExtPO getPO() {
-        return specExtPO;
-    }
-
 }

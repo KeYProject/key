@@ -42,7 +42,6 @@ import de.uka.ilkd.key.proof.init.PreservesInvPO;
 import de.uka.ilkd.key.proof.init.PreservesOwnInvPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.RespectsModifiesPO;
-import de.uka.ilkd.key.proof.init.SpecExtPO;
 import de.uka.ilkd.key.proof.init.StrongOperationContractPO;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 
@@ -310,13 +309,7 @@ public class POBrowser extends JDialog {
 	if(specRepos.getOperationContracts(pm).size() > 0) {
 	    pos = pos.append("RespectsModifies");	    
 	}
-	
-	//implemented by mbender for jmltest
-	//Specification Extraction
-        if(specRepos.getOperationContracts(pm).size() > 0) {
-            pos = pos.append("SpecificationExtraction");
-        }
-	
+		
 	//PreservesGuard
 	pos = pos.append("PreservesGuard");
 	
@@ -403,9 +396,6 @@ public class POBrowser extends JDialog {
         } else if (poString.equals("PreservesGuard")) {
             assert selectedEntry.pm != null;
             return createPreservesGuardPO(selectedEntry.pm);
-        } else if (poString.equals("SpecificationExtraction")) {
-            assert selectedEntry.pm != null;
-            return createSpecExtPO(selectedEntry.pm);
         } else
             assert false;
         return null;
@@ -547,25 +537,6 @@ public class POBrowser extends JDialog {
             } else {
         	return null;
             }
-        } else {
-            return null;
-        }
-    }
-    
-//    implemented by mbender for jmltest
-    private ProofOblInput createSpecExtPO(ProgramMethod pm) {
-        ContractConfigurator cc = new ContractConfigurator(this,
-                                                           services, 
-                                                           pm, 
-                                                           null, 
-                                                           true,
-                                                           true,
-                                                           true,
-                                                           false);
-        if(cc.wasSuccessful()) {
-            return new SpecExtPO(initConfig, 
-                                     cc.getContract(), 
-                                     cc.getAssumedInvs(),pm);
         } else {
             return null;
         }

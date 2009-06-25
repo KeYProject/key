@@ -20,7 +20,6 @@ public class TestKey extends TestCase {
    	de.uka.ilkd.key.collection.TestMapAsListFromIntegerToString.class,
  	de.uka.ilkd.key.collection.TestLeftistHeapOfInteger.class,
 	de.uka.ilkd.key.util.pp.TestLayouter.class,
-        de.uka.ilkd.key.unittest.TestTestGenerator.class
      }; 
 
      static Class[] parserTests = new Class[] {

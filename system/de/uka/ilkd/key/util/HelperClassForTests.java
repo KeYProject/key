@@ -26,14 +26,14 @@ import de.uka.ilkd.key.proof.init.*;
  */
 public class HelperClassForTests {
     
-    private static Profile JUNIT_PROFILE = new JUnitTestProfile();
+    private static final Profile profile = new JavaProfile();
     
     public HelperClassForTests() {
         
     }
     
     public ProofAggregate parse(File file) {
-        return parse(file, JUNIT_PROFILE);
+        return parse(file, profile);
     }
     
     public ProofAggregate parse(File file, Profile profile) {
@@ -56,7 +56,7 @@ public class HelperClassForTests {
     }
     
     public ProofAggregate parseThrowException(File file) throws ProofInputException{        
-        return parseThrowException(file, JUNIT_PROFILE);
+        return parseThrowException(file, profile);
     }
        
     

@@ -48,7 +48,7 @@ public class TacletForTests {
     public static Services services;
     public static File lastFile=null;
 
-    public static Profile profile = new JUnitTestProfile() {
+    public static Profile profile = new JavaProfile() {
             //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
             public RuleCollection getStandardRules() {
                 return new RuleCollection(

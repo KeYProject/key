@@ -723,8 +723,6 @@ public class ProofTreeView extends JPanel {
 	private JMenuItem runStrategy = new JMenuItem("Apply Strategy",
 	    IconFactory.autoModeStartLogo(10));
         private JMenuItem mark        = new JMenuItem("Mark for Re-Use");
-        private JMenuItem visualize   = new JMenuItem("Visualize");
-        private JMenuItem test        = new JMenuItem("Create Test For Node");
 	
         private JMenuItem change      = new JMenuItem("Change This Node");
 
@@ -800,12 +798,6 @@ public class ProofTreeView extends JPanel {
 		//}
 	    }
 	    if (branch != path) {
-		this.add(visualize);
-		visualize.addActionListener(this);
-		visualize.setEnabled(true);
-		this.add(test);
-		test.addActionListener(this);
-		test.setEnabled(true);
 		if (proof != null) {
 		    if (proof.isGoal(invokedNode) || 
 		        proof.getSubtreeGoals(invokedNode).size()>0) {
@@ -935,10 +927,6 @@ public class ProofTreeView extends JPanel {
 		}
             } else if (e.getSource() == search) {
 		proofTreeSearchPanel.setVisible(true);
-            } else if (e.getSource() == visualize) {
-                new ProofVisTreeView(mediator.visualizeProof().getVisualizationModel());                
-            }else if (e.getSource() == test) {
-		mediator.generateTestCaseForSelectedNode();
             } else if (e.getSource() == change) {
                 mediator.changeNode(invokedNode);
             }

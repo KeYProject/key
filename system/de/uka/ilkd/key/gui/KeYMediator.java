@@ -37,11 +37,9 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.updatesimplifier.ApplyOnModality;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature;
 import de.uka.ilkd.key.strategy.feature.IfThenElseMalusFeature;
-import de.uka.ilkd.key.unittest.UnitTestBuilder;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
-import de.uka.ilkd.key.visualization.ProofVisualization;
 
 
 public class KeYMediator {
@@ -260,39 +258,6 @@ public class KeYMediator {
     }
 
     
-    public ProofVisualization visualizeProof(){
-	if (ensureProofLoaded()) {
-	    return new ProofVisualization(getSelectedNode(),getServices());
-	}
-	return null;
-    }
-
-    public void testCaseConfirmation(String path){
-	JOptionPane.showMessageDialog(
-	    null, "A unittest was generated and written to "+path,
-	    "Unittest generated", JOptionPane.INFORMATION_MESSAGE);
-    }
-    
-    public void testCaseConfirmation(String path, int coverage){
-        JOptionPane.showMessageDialog(
-            null, "A unittest was generated and written to "+path+
-                "\nTop-Level Statement Coverage: "+coverage,
-            "Unittest generated", JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    public void generateTestCaseForSelectedNode(){
-	if (ensureProofLoaded()) {
-	    UnitTestBuilder testBuilder = new UnitTestBuilder(getServices(), 
-							      getProof());
-	    try {
-		testCaseConfirmation(
-		    testBuilder.createTestForNode(getSelectedNode()));
-	    } catch(Exception e){
-		new ExceptionDialog(mainFrame(), e);
-	    }
-	}
-    }
-
     /** 
      * initializes proof (this is Swing thread-safe) 
      */

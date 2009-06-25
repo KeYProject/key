@@ -17,7 +17,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.visualdebugger.VisualDebuggerState;
 
 
 /**
@@ -49,11 +48,6 @@ public class NodeInfo {
     /** has the rule app of the node been applied interactively? */
     private boolean interactiveApplication = false;    
      
-    // ALL fields below are for the eclipse symbolic debugger plug-in
-    // THEY HAVE TO BE MOVED OUT TO THE DEBUGGER package
-    // where a separate mapping node <-> debugger status has to be maintained
-    private final VisualDebuggerState visualDebuggerState = largeProofMode ? null : new VisualDebuggerState();
-   
     
     public NodeInfo(Node node) {
         this.node = node;
@@ -222,14 +216,5 @@ public class NodeInfo {
      */
     public boolean getInteractiveRuleApplication() {
         return interactiveApplication;
-    }
-   
-    /**
-     * returns the visual debugger state
-     * @return the visual debugger state
-     */
-    public VisualDebuggerState getVisualDebuggerState() {
-        return visualDebuggerState;
-    }
-
+    }   
 }

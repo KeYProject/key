@@ -219,7 +219,6 @@ GENERATED_LISTS=logic/SLListOfTerm \
 	strategy/feature/instantiator/SLListOfCPBranch \
 	java/SLListOfComment \
 	strategy/SetAsListOfStrategyFactory \
-	visualdebugger/SLListOfLabel \
 	pp/SLListOfRange
 
 GENERATED_SETS=logic/SetAsListOfTerm collection/SetAsListOfString \
@@ -314,8 +313,6 @@ ANTLR_PARSER= \
 	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/KeYJMLPreParser.java \
 	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation/KeYJMLLexer.java \
 	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation/KeYJMLParser.java \
-	$(GENERATED_SRC_PATH)$(PFX)parser/simplify/SimplifyLexer.java \
-	$(GENERATED_SRC_PATH)$(PFX)parser/simplify/SimplifyParser.java \
 	$(GENERATED_SRC_PATH)$(PFX)speclang/ocl/translation/KeYOCLLexer.java \
 	$(GENERATED_SRC_PATH)$(PFX)speclang/ocl/translation/KeYOCLParser.java \
 	$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocLexer.java \

@@ -17,7 +17,6 @@ import de.uka.ilkd.key.rule.ListOfBuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UpdateSimplificationRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
-import de.uka.ilkd.key.strategy.FOLStrategy;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.SetOfStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -52,7 +51,6 @@ public class JavaProfile extends AbstractProfile {
     protected SetOfStrategyFactory getStrategyFactories() {
         SetOfStrategyFactory set = super.getStrategyFactories();
         set = set.add(DEFAULT);
-        set = set.add(new FOLStrategy.Factory());
         return set;
     }
 

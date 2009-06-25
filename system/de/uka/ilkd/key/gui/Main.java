@@ -43,7 +43,6 @@ import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.jmltest.JMLTestFileCreator;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.*;
@@ -55,7 +54,6 @@ import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.smt.DecProcRunner;
 import de.uka.ilkd.key.strategy.VBTStrategy;
-import de.uka.ilkd.key.unittest.UnitTestBuilder;
 import de.uka.ilkd.key.util.*;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -106,12 +104,6 @@ public class Main extends JFrame implements IMain {
     
     /** the view of a sequent */
     private SequentView sequentView;
-    
-    /** the KeY test generator GUI*/
-    private UnitTestGeneratorGui unitKeY;
-    
-    /** the user constraint view */
-    private UserConstraintView userConstraintView = null;
     
     /** the rule view */
     private RuleView ruleView = null;
@@ -215,9 +207,6 @@ public class Main extends JFrame implements IMain {
     public Object monitor = new Object();
     
     private static final String TACLET_OPTIONS_MENU_STRING = "ToolTip options ";
-    
-    private Action createUnitTestAction = null;
-    
     
     protected static Main instance = null;    
     
@@ -346,8 +335,6 @@ public class Main extends JFrame implements IMain {
             proofView.updateUI();
         if (openGoalsView != null)
             openGoalsView.updateUI();
-        if (userConstraintView != null)
-            userConstraintView.updateUI();
         if (ruleView != null)
             ruleView.updateUI();
         if (proofListView != null)
@@ -435,7 +422,6 @@ public class Main extends JFrame implements IMain {
         autoModeAction = new AutoModeAction();
         openFileAction = new OpenFile();
         saveFileAction = new SaveFile();
-        createUnitTestAction = new CreateUnitTestAction();
 
 	// ============================================================
 	// ==================  create empty views =====================
@@ -451,11 +437,6 @@ public class Main extends JFrame implements IMain {
 
 	openGoalsView = new JScrollPane();
 	paintEmptyViewComponent(openGoalsView, "Open Goals");
-
-	userConstraintView = new UserConstraintView ();
-	if ( mediator != null ) {
-	    userConstraintView.setMediator(mediator);
-	}
 
 	strategySelectionView = new StrategySelectionView();
 	if ( mediator != null ) {
@@ -514,11 +495,6 @@ public class Main extends JFrame implements IMain {
         reuseButton.setAction(reuseAction);
 
         toolBar.add(reuseButton);
-        
-        if (mediator.getProfile() instanceof JavaTestGenerationProfile) {
-            toolBar.addSeparator();
-            toolBar.add(createUnitTestButton());
-        }
 
         toolBar.addSeparator();
         
@@ -571,9 +547,6 @@ public class Main extends JFrame implements IMain {
         addTab("Proof", proofView, "The current state of the " + "proof as tree");
         
         addTab("Goals", openGoalsView, "The currently open goals");
-        
-        tabbedPane.addTab("User Constraint", null, userConstraintView,
-        "Currently chosen metavariable instantiations");
         
         tabbedPane.addTab("Proof Search Strategy", null, strategySelectionView,
         "Select strategy for automated proof search");
@@ -715,15 +688,6 @@ public class Main extends JFrame implements IMain {
     }
 
 
-
-    private JButton createUnitTestButton(){
-        testButton = new JButton();
-        testButton.setAction(new CreateUnitTestAction());
-
-        return testButton;
-    }
-    
-    
     public ProverTaskListener getProverTaskListener() {
         return taskListener;
     }
@@ -1011,7 +975,6 @@ public class Main extends JFrame implements IMain {
                         .func_ns());
             }
             mediator().getSelectedProof().updateProof();
-            userConstraintView.updateTableDisplay(); // %%% HACK
         }
         
     }
@@ -1382,14 +1345,7 @@ public class Main extends JFrame implements IMain {
         registerAtMenu(options, createDecisionProcedureMenu());
 	dpSettingsListener = 
 	    new DPSettingsListener(ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings());
-       
-        
-        
-        // specification extraction
-        JMenuItem computeSpecificationOptions = 
-            ComputeSpecificationView.createOptionMenuItems();
-        registerAtMenu(options, computeSpecificationOptions);
-                
+               
         // specification languages
         JMenuItem speclangItem = setupSpeclangMenu();
         registerAtMenu(options, speclangItem);
@@ -1611,28 +1567,6 @@ public class Main extends JFrame implements IMain {
 	tools.setMnemonic(KeyEvent.VK_T);
 	getJMenuBar().add(tools);
 
-	JMenuItem extractSpecification = new JMenuItem("Extract Specification");
-	extractSpecification.setAccelerator(KeyStroke.getKeyStroke
-			    (KeyEvent.VK_E, ActionEvent.CTRL_MASK));
-
-	extractSpecification.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    if (mediator().ensureProofLoaded()) {
-			//@internal we don't want to block UI just
-			//because we are about to calculate a lot of
-			//things, now. Also the interactive prover
-			//might want to run during the execution of
-			//ComputeSpecification
-			new Thread(new Runnable() {
-				public void run() {
-				    ComputeSpecificationView.show(mediator());
-				}
-			    }).start();
-		    }
-		}
-	    });
-	tools.add(extractSpecification);
-
 	JMenuItem specificationBrowser = 
 	    new JMenuItem("Proof Obligation Browser...");
 	specificationBrowser.setAccelerator(KeyStroke.getKeyStroke
@@ -1643,60 +1577,7 @@ public class Main extends JFrame implements IMain {
     	        showPOBrowser();
     	    }});
 	registerAtMenu(tools, specificationBrowser);
-        
-        JMenuItem nonInterference = new JMenuItem("Check Non-Interference");
-        nonInterference.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                BasicTask[] selProofs = proofList.getAllSelectedBasicTasks();
-                if (selProofs.length==2) {
-                    new NonInterferenceCheck(selProofs).run();
-                } else {
-                    mediator().popupWarning(
-                            "Please select 2 proofs", "Non-Interference Check");
-                }
-            }
-        });
-        
-        tools.add(nonInterference);
-        
-        JMenuItem testItem = new JMenuItem();
-        testItem.setAction(createUnitTestAction);
-        
-        tools.add(testItem);
-        
-     // implemented by mbender for jmltest
-        final JMenuItem createWrapper = new JMenuItem("Create JML-Wrapper");
-        
-        createWrapper.setAccelerator(KeyStroke.getKeyStroke
-                (KeyEvent.VK_J, 
-                 ActionEvent.CTRL_MASK));
-
-        createWrapper.setEnabled(mediator.getProof() != null);
-
-        mediator.addKeYSelectionListener(new KeYSelectionListener() {
-            /** focused node has changed */
-            public void selectedNodeChanged(KeYSelectionEvent e) {
-            }
-
-            /**
-             * the selected proof has changed. Enable or disable action
-             * depending whether a proof is available or not
-             */
-            public void selectedProofChanged(KeYSelectionEvent e) {
-                createWrapper
-                        .setEnabled(e.getSource().getSelectedProof() != null);
-            }
-        });
-
-        createWrapper.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                JMLTestFileCreator jmltfc = new JMLTestFileCreator();
-                jmltfc.createWrapper();
-            }
-        });
-        tools.add(createWrapper);
-        
+                 
         return tools;
     }
     
@@ -1824,9 +1705,6 @@ public class Main extends JFrame implements IMain {
     
     protected void loadProblem(File file) {
 	recentFiles.addRecentFile(file.getAbsolutePath());
-        if(unitKeY!=null){
-            unitKeY.recent.addRecentFile(file.getAbsolutePath());
-        }
         final ProblemLoader pl = 
             new ProblemLoader(file, this, mediator.getProfile(), false);
         pl.addTaskListener(getProverTaskListener());
@@ -2111,7 +1989,6 @@ public class Main extends JFrame implements IMain {
                 Main.this.goalView.setEnabled(false);
                 Main.this.proofView.setEnabled(false);
                 Main.this.openGoalsView.setEnabled(false);
-                Main.this.userConstraintView.setEnabled(false);
                 Main.this.strategySelectionView.setEnabled(false);
                 Main.this.ruleView.setEnabled(false);
                 setToolBarDisabled();
@@ -2129,7 +2006,6 @@ public class Main extends JFrame implements IMain {
                 Main.this.goalView.setEnabled(true);
                 Main.this.proofView.setEnabled(true);
                 Main.this.openGoalsView.setEnabled(true);
-                Main.this.userConstraintView.setEnabled(true);
                 Main.this.strategySelectionView.setEnabled(true);
                 Main.this.ruleView.setEnabled(true);
                 setToolBarEnabled();
@@ -2476,40 +2352,7 @@ public class Main extends JFrame implements IMain {
 			p.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);  
 			VBTStrategy.preferedGoalChooser = DepthFirstGoalChooserBuilder.NAME;
             
-		} else if (opt[index].equals("TESTING") || opt[index].equals("UNIT")) {
-                    if(opt[index].equals("TESTING")){
-                        testStandalone = true;
-                        visible = false;
-                    }
-                    System.out.println("VBT optimizations enabled ...");                    
-                    
-                    final JavaTestGenerationProfile p = new JavaTestGenerationProfile(null);
-                    
-                    if (index + 1 < opt.length && 
-                            opt[index + 1].toUpperCase().equals("LOOP")) {
-                        VBTStrategy.preferedGoalChooser = BalancedGoalChooserBuilder.NAME;
-                        p.setSelectedGoalChooserBuilder(VBTStrategy.preferedGoalChooser);
-                        System.out.println("Balanced loop unwinding ...");
-                        index ++;
-                    }
-                    
-                    ProofSettings.DEFAULT_SETTINGS.setProfile(p);                   
-                    testMode = true;
-		} else if (opt[index].equals("DEBUGGER")) {                                     
-                    System.out.println("Symbolic Execution Debugger Mode enabled ...");                                        
-                    final Profile p = new DebuggerProfile(null);                    
-                    if (index + 1 < opt.length && 
-                            opt[index + 1].equals("LOOP")) {
-                        p.setSelectedGoalChooserBuilder(BalancedGoalChooserBuilder.NAME);
-                        //System.out.println("Balanced loop unwinding ...");
-                        index ++;
-                    }
-                    ProofSettings.DEFAULT_SETTINGS.setProfile(p);                    
-                    testMode = true;
-                }                                                 
-                else if (opt[index].equals("FOL")) {                     
-                   ProofSettings.DEFAULT_SETTINGS.setProfile(new PureFOLProfile());
-                } else if (opt[index].equals("TIMEOUT")) {
+		} else if (opt[index].equals("TIMEOUT")) {
                     long timeout = -1;
                     try {
                         timeout = Long.parseLong(opt[index + 1]);
@@ -2690,34 +2533,6 @@ public class Main extends JFrame implements IMain {
         }
     }
     
-    private final class CreateUnitTestAction extends AbstractAction {
-        final Icon icon = IconFactory.junitLogo(TOOLBAR_ICON_SIZE);
-        
-        public CreateUnitTestAction() {            
-            putValue(NAME, "Create Unittests");          
-            putValue(Action.SHORT_DESCRIPTION, "Create JUnit test cases from proof.");
-            putValue(Action.SMALL_ICON, icon);            
-            
-            setEnabled(mediator.getSelectedProof() != null);
-            
-            mediator.addKeYSelectionListener(new KeYSelectionListener() {
-                /** focused node has changed */
-                public void selectedNodeChanged(KeYSelectionEvent e) {}
-                
-                /**
-                 * the selected proof has changed. Enable or disable action depending whether a
-                 * proof is available or not
-                 */ 
-                public void selectedProofChanged(KeYSelectionEvent e) {
-                    setEnabled(e.getSource().getSelectedProof() != null);
-                }
-            });             
-        }
-        
-        public void actionPerformed(ActionEvent e) {
-            MethodSelectionDialog.getInstance(mediator);
-        }
-    }
     
     /**
      * This action undoes the last rule application on the currently selected
@@ -3075,9 +2890,6 @@ public class Main extends JFrame implements IMain {
         Main.evaluateOptions(args);        
  	Main key = getInstance(visible);   
  	key.loadCommandLineFile();
-        if(testStandalone){
-            key.unitKeY = new UnitTestGeneratorGui(key);
-        }
     }
     
     /**
@@ -3092,512 +2904,6 @@ public class Main extends JFrame implements IMain {
         }
     }
     
-    private final static class UnitTestGeneratorGui extends JFrame {
-        
-        protected final Main main;
-        final protected KeYMediator mediator;
-        private int toolbarIconSize = 15;
-        private static UnitTestGeneratorGui testGui;
-        private boolean openDialog=false;
-        private RecentFileMenu recent=null;
-        private JButton run;
-        private JFrame proofList;
-        private HashMap<StringBuffer, String> test2model;
-        private boolean autoMode = false;
-		private JList testList;
-        
-        public static final String AUTO_MODE_TEXT = "Create Tests";
-        
-        public UnitTestGeneratorGui(Main main){
-            super("KeY Unit Test Generator");
-            this.main = main;
-            mediator = main.mediator();
-            test2model = new HashMap<StringBuffer, String>();
-            setIconImage(IconFactory.keyLogo());
-            createProofList();
-            layoutGui();
-            setLocation(70, 70);
-            addWindowListener(new UnitTestGeneratorGuiListener());
-            pack();     
-            Dimension d = getSize();
-            d.setSize(400, (int) d.getHeight()+3);
-            setSize(d);
-            setVisible(true);
-            testGui = this;
-        }
-        
-       protected void createProofList(){
-            proofList = new JFrame("Test Requirements");
-            proofList.getContentPane().add(main.proofListView);
-            proofList.setSize(400, 170);
-            proofList.addWindowListener(new WindowAdapter(){
-                public void windowClosing(WindowEvent e) {
-                    proofList.setVisible(false);
-                }
-            });
-            proofList.setVisible(true);            
-        }
-        
-        protected void layoutGui(){
-            setJMenuBar(new JMenuBar());
-            getJMenuBar().add(createFileMenu());
-            getJMenuBar().add(createToolsMenu());
-            getJMenuBar().add(createOptionsMenu());
-            getJMenuBar().add(Box.createHorizontalGlue());
-            getJMenuBar().add(main.createHelpMenu());
-            run = new JButton(new AutoModeAction());
-            getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
-            JPanel buttonPanel = new JPanel();
-            buttonPanel.add(run);
-            JPanel sliderPanel = new JPanel();
-            sliderPanel.setLayout(new BoxLayout(sliderPanel, BoxLayout.Y_AXIS));
-            sliderPanel.add(new MaxRuleAppSlider (mediator));
-            buttonPanel.add(sliderPanel);
-            buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-            getContentPane().add(buttonPanel);
-            MainStatusLine msl = main.getStatusLine();
-            getContentPane().add(msl);
-        }
-        
-        class UnitTestGeneratorGuiListener extends WindowAdapter {
-            public void windowClosing(WindowEvent e) {
-                main.exitMain();             
-            }
-        }  
-        
-        private void runTest(String testPath, String modelDir) throws IOException{
-            String testDir = testPath.substring(0, testPath.lastIndexOf(File.separator))+modelDir;
-            String test = testPath.substring(testPath.lastIndexOf(File.separator)+1);
-            Runtime.getRuntime().exec("cp "+testPath+" "+testDir);
-            File testDirFile = new File(testDir);
-            Runtime rt = Runtime.getRuntime();
-            Process compile = rt.exec("javac "+test, null, testDirFile);
-            String compileError = read(compile.getErrorStream()).trim();
-            if(!"".equals(compileError)){
-                throw new RuntimeException(compileError);
-            }
-            
-            Process runJUnit = rt.exec("java junit.swingui.TestRunner "+
-                    test.substring(0, test.lastIndexOf(".")), null, testDirFile);
-            String junitError = read(runJUnit.getErrorStream());
-            if(!"".equals(junitError)){
-                throw new RuntimeException(junitError);
-            }   
-        }
-        
-        private void createTestSelectionWindow(){
-            JDialog tsw = new JDialog(this, "Select Test Case");
-            tsw.getContentPane().setLayout(new BoxLayout(tsw.getContentPane(), 
-                 BoxLayout.Y_AXIS));
-            testList = new JList();
-            testList.setListData(bubbleSortTests(createTestArray()));
-            
-            JScrollPane testListScroll = new
-                JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
-                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            testListScroll.getViewport().setView(testList);
-            testListScroll.setBorder(
-                    new TitledBorder("Created Tests"));
-            testListScroll.setMinimumSize(new java.awt.Dimension(150, 400));
-            tsw.getContentPane().add(testListScroll);
-            
-            JButton test = new JButton("Run Test");
-            test.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    if(testList.getSelectedValue() == null){
-                        JOptionPane.showMessageDialog(
-                            null, "You must select a test first!",
-                            "No Test Selected", 
-                            JOptionPane.ERROR_MESSAGE);
-                    }else{
-                        TestAndModel tam = (TestAndModel) testList.getSelectedValue();
-                        try{
-                            runTest(tam.test, tam.model);
-                        }catch(Exception exc){
-                            new ExceptionDialog(testGui, exc);    
-                        }
-                    }
-                }
-            });
-            tsw.getContentPane().add(test);
-            tsw.pack();
-            tsw.setVisible(true);
-        }
-
-        public void updateTestSelection(){
-        	if(testList!=null){
-        		testList.setListData(bubbleSortTests(createTestArray()));
-        		testList.repaint();
-        	}        			
-        }
-        
-        private Object[] bubbleSortTests(Object[] tams){
-            boolean sorted = false;
-            while(!sorted){
-                sorted = true;
-                for(int i=0; i<tams.length-1; i++){
-                    if(tams[i].toString().compareTo(tams[i+1].toString())>0){
-                        Object temp = tams[i];
-                        tams[i] = tams[i+1];
-                        tams[i+1] = temp;
-                        sorted = false;
-                    }
-                }
-            }
-            return tams;
-        }
-        
-        private Object[] createTestArray(){
-            final Iterator<Map.Entry<StringBuffer, String>> it = 
-                test2model.entrySet().iterator();
-            Vector<TestAndModel> v = new Vector<TestAndModel>();
-            while(it.hasNext()){
-                final Map.Entry<StringBuffer, String> e = it.next();
-                String test = e.getKey().toString();
-                String model = e.getValue();
-                while(!"".equals(test.trim())){
-                    v.add(new TestAndModel(test.substring(0, test.indexOf(" ")), model));
-                    test = test.substring(test.indexOf(" ")+1);
-                }
-            }
-            return v.toArray();
-        }
-        
-        class TestAndModel{
-            public String test;
-            public String model;
-            
-            public TestAndModel(String test, String model){
-                this.test = test;
-                this.model = model;
-            }
-            
-            public String toString(){
-                return test;
-            }
-        }
-        
-        /** Read the input until end of file and return contents in a
-         * single string containing all line breaks. */
-        protected String read ( InputStream in ) throws IOException {
-            String lineSeparator = System.getProperty("line.separator");
-            BufferedReader reader = new BufferedReader
-                (new InputStreamReader(in));
-            StringBuffer sb = new StringBuffer();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line).append(lineSeparator);
-            }
-            return sb.toString();
-        }
-        
-        protected JMenu createFileMenu() {
-            JMenu fileMenu = new JMenu("File");
-            fileMenu.setMnemonic(KeyEvent.VK_F);
-            
-            JMenuItem load = new JMenuItem();
-            load.setAction(openFileAction);
-       
-            fileMenu.add(load);
-   
-            JMenuItem exit = new JMenuItem("Exit");
-            exit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
-            exit.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    main.exitMain();
-                }
-            });
-            
-            fileMenu.addSeparator();
-            
-            recent = new RecentFileMenu(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    main.loadProblem(new File(recent.getAbsolutePath((JMenuItem) e.getSource())));
-                }
-            }, MAX_RECENT_FILES, null);
-            
-            recent.load(PathConfig.RECENT_FILES_STORAGE);
-            
-            fileMenu.add(recent.getMenu());
-            
-            fileMenu.addSeparator();
-            fileMenu.add(exit);
-            return fileMenu;
-        }
-      
-        protected JMenu createToolsMenu() {
-            JMenu toolsMenu = new JMenu("Tools");
-            
-            JMenuItem specificationBrowser = 
-                new JMenuItem("Proof Obligation Browser...");
-            specificationBrowser.setAccelerator(KeyStroke.getKeyStroke
-                                                (KeyEvent.VK_B, 
-                                                ActionEvent.CTRL_MASK));
-            specificationBrowser.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    main.showPOBrowser();
-                }});
-            toolsMenu.add(specificationBrowser);
-            
-            final JMenuItem showProver = new JMenuItem("Show Prover",
-                    IconFactory.keyLogo(toolbarIconSize, toolbarIconSize));
-            showProver.setAccelerator(KeyStroke.getKeyStroke
-                    (KeyEvent.VK_P, ActionEvent.CTRL_MASK));
-            showProver.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    Main.visible = !Main.visible;
-                    main.setVisible(Main.visible);
-                    showProver.setText(Main.visible ? "Hide Prover" : "Show Prover");
-                }});
-            toolsMenu.add(showProver);
-            
-            final JMenuItem runTest = new JMenuItem("Run Created Tests", 
-                    IconFactory.junitLogo(toolbarIconSize));
-            runTest.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    createTestSelectionWindow();    
-                }});
-            toolsMenu.add(runTest);
-            
-            final JMenuItem showRequirements = new JMenuItem("Hide Test Requirements");
-            showRequirements.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    proofList.setVisible(!proofList.isVisible());
-                    showRequirements.setText(proofList.isVisible() ? 
-                            "Hide Test Requirements" : "Show Test Requirements"); 
-                }});
-            toolsMenu.add(showRequirements);
-            
-            toolsMenu.addMenuListener(new MenuListener() {
-                public void menuCanceled(MenuEvent arg0) {}
-
-                public void menuDeselected(MenuEvent arg0) {}
-
-                public void menuSelected(MenuEvent arg0) {
-                    showProver.setText(Main.visible ? "Hide Prover" : "Show Prover"); 
-                    showRequirements.setText(proofList.isVisible() ? 
-                            "Hide Test Requirements" : "Show Test Requirements"); 
-                }});
-            return toolsMenu;
-        }
-        
-        protected JMenu createOptionsMenu() {
-            JMenu options = new JMenu("Options");
-            options.setMnemonic(KeyEvent.VK_O);
-            JMenuItem choiceItem = new JMenuItem("Taclet options defaults");
-            choiceItem.setAccelerator(KeyStroke.getKeyStroke
-                    (KeyEvent.VK_T, ActionEvent.CTRL_MASK));
-
-            choiceItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    main.selectChoices();
-                }});
-            options.add(choiceItem);    
-
-            ButtonGroup decisionProcGroup = new ButtonGroup();
-     
-            JMenu decisionProcedureOption = new JMenu("Decision Procedure Config");     
-            setupDecisionProcedureGroup(decisionProcGroup, decisionProcedureOption);
-            options.add(decisionProcedureOption);
-            
-            final JRadioButtonMenuItem completeEx = 
-                new JRadioButtonMenuItem("Require Complete Execution", false);
-            completeEx.setToolTipText("Use only completely executed traces for test" +
-                        " generation.");
-            completeEx.setSelected(UnitTestBuilder.requireCompleteExecution);
-            completeEx.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    UnitTestBuilder.requireCompleteExecution = completeEx.isSelected();
-                }
-            });
-            options.add(completeEx);
-                        
-            final JRadioButtonMenuItem methodSelectionButton = 
-                new JRadioButtonMenuItem("Method Selection Dialog", false);
-            methodSelectionButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    openDialog = methodSelectionButton.isSelected();
-                }
-            });
-            methodSelectionButton.setToolTipText("<html><pre>"+
-                    "If checked, a dialog for selecting"+
-                    " method calls that the created test shall cover" +
-                    "\nopens after "+
-                    "termination of the symbolic execution.</pre>");
-            options.add(methodSelectionButton);
-            
-            return options;
-        }
-        
-        /**
-         * TODO: implement??
-         * @param decisionProcGroup
-         * @param decisionProcedureOption
-         */
-        private void setupDecisionProcedureGroup(ButtonGroup decisionProcGroup, 
-                JMenu decisionProcedureOption) {
-            
-            System.out.println("just test");
-        }    
-        
-       
-        private final class AutoModeAction extends AbstractAction {
-            
-            private boolean buttonPressed = false;
-            private boolean creatingTests = false;
-            
-            final Icon startLogo = 
-                IconFactory.autoModeStartLogo ( toolbarIconSize );
-            final Icon stopLogo = 
-                IconFactory.autoModeStopLogo ( toolbarIconSize );
-                
-            private Proof associatedProof;
-                
-            private final ProofTreeListener ptl = new ProofTreeAdapter() {
-                    
-                public void proofStructureChanged(ProofTreeEvent e) {
-                    if (e.getSource() == associatedProof) {
-                        enable();
-                    }
-                        
-                }
-                    
-                public void proofClosed(ProofTreeEvent e) {
-                    if (e.getSource() == associatedProof) {
-                        enable();
-                    }
-                }
-                
-                public void proofGoalsAdded(ProofTreeEvent e) { }
-            };
-                
-            public void enable() {
-                setEnabled(associatedProof != null && !associatedProof.closed() &&
-                        !creatingTests);            
-            }
-            public AutoModeAction() {
-                putValue("hideActionText", Boolean.TRUE);
-                putValue(Action.SHORT_DESCRIPTION, AUTO_MODE_TEXT);
-                putValue(Action.SMALL_ICON, startLogo);
-                
-                associatedProof = mediator.getProof();        
-                
-                enable();
-                
-                if (associatedProof != null && !associatedProof.containsProofTreeListener(ptl)) {
-                    associatedProof.addProofTreeListener(ptl);                
-                }
-                
-                
-                mediator.addKeYSelectionListener(new KeYSelectionListener() {
-                    /** focused node has changed */
-                    public void selectedNodeChanged(KeYSelectionEvent e) {}
-                    
-                    /**
-                     * the selected proof has changed. Enable or disable action depending whether a proof is
-                     * available or not
-                     */ 
-                    public void selectedProofChanged(KeYSelectionEvent e) {
-                        if (associatedProof != null) {
-                            associatedProof.removeProofTreeListener(ptl);
-                        }
-                        
-                        associatedProof = e.getSource().getSelectedProof();                     
-                        enable();            
-                        
-                        if (associatedProof != null) {
-                            associatedProof.addProofTreeListener(ptl);
-                        }
-                    }
-                });
-                
-                mediator.addAutoModeListener(new AutoModeListener() {
-                    
-                    /** 
-                     * invoked if automatic execution has started
-                     */
-                    public void autoModeStarted(ProofEvent e) {  
-                        autoMode = true;
-                        if (associatedProof != null) {
-                            associatedProof.removeProofTreeListener(ptl);                        
-                        }
-                        putValue(Action.SMALL_ICON, stopLogo);
-                    }
-                    
-                    /**
-                     * invoked if automatic execution has stopped
-                     */
-                    public void autoModeStopped(ProofEvent e) {
-                        autoMode = false;
-                        if(associatedProof!=null){
-                            run.setToolTipText("<html><pre>Create Test for:\n"+associatedProof.name()+
-                                    "</pre>");
-                        }
-                        if (associatedProof != null && 
-                                associatedProof == e.getSource() && 
-                                !associatedProof.containsProofTreeListener(ptl) ) {
-                            associatedProof.addProofTreeListener(ptl);
-                        }
-                        if (associatedProof != null && 
-                                buttonPressed &&
-                                associatedProof == e.getSource() &&
-                                associatedProof.countNodes()>1){ 
-                            creatingTests = true;
-                            new Thread(new Runnable() {
-                                public void run() {
-                                    try{
-                                        setEnabled(false);
-                                        main.setStatusLine("Generating Tests");
-                                        StringBuffer testPath = new StringBuffer();
-                                        String modelDir = associatedProof.getJavaModel().getModelDir();
-                                        test2model.put(testPath, modelDir);                                        
-                                        buttonPressed = false;
-                                        if(openDialog){
-                                            MethodSelectionDialog msd = MethodSelectionDialog.getInstance(mediator);
-                                            msd.setLatestTests(testPath);
-                                        }else{
-                                            UnitTestBuilder testBuilder = 
-                                                new UnitTestBuilder(mediator.getServices(), 
-                                                        mediator.getProof());
-                                            testPath.append(testBuilder.createTestForProof(
-                                                    associatedProof)+" ");
-                                            
-                                            main.setStatusLine("Test Generation Completed");
-                                            mediator.testCaseConfirmation(testPath.toString());
-                                        }
-                                        main.setStatusLine("Test Generation Completed");
-                                        updateTestSelection();
-                                    }catch(Exception exc){
-                                        new ExceptionDialog(testGui, exc);
-                                    }
-                                    creatingTests = false;
-                                    enable();
-                                }
-                            }).start();
-                        }
-                        putValue(Action.SMALL_ICON, startLogo);     
-                    }
-                    
-                });
-                
-            }
-            
-            public void actionPerformed(ActionEvent e) {
-                // Unfortunately, when clicking the button twice
-                // (very fast), the glasspane won't be quick
-                // enough to catch the second event. Therefore
-                // we make a second check (which is a %%%HACK)
-                if (!autoMode){
-     //               setEnabled(false);
-                    buttonPressed = true;
-                    mediator.startAutoMode();
-                }else{
-                    mediator.stopAutoMode();
-                }
-            }
-            
-        }
-    }
 
     public static boolean hasInstance() {
         return instance != null;
