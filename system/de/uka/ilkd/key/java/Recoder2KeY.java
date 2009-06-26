@@ -25,6 +25,7 @@ import recoder.java.declaration.MethodDeclaration;
 import recoder.list.generic.*;
 import recoder.parser.ParseException;
 import recoder.service.*;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.recoderext.*;
@@ -182,7 +183,8 @@ public class Recoder2KeY implements JavaReader {
      * @throws IllegalArgumentException
      *             if arguments are not valid (null e.g.)
      */
-    public Recoder2KeY(KeYCrossReferenceServiceConfiguration servConf, String classPath, KeYRecoderMapping rec2key, NamespaceSet nss, TypeConverter tc) {
+    public Recoder2KeY(KeYCrossReferenceServiceConfiguration servConf, String classPath, 
+	    KeYRecoderMapping rec2key, NamespaceSet nss, TypeConverter tc) {
 
         if (servConf == null)
             throw new IllegalArgumentException("service configuration is null");
@@ -200,7 +202,7 @@ public class Recoder2KeY implements JavaReader {
         this.mapping = rec2key;
         this.converter = makeConverter();
         this.typeConverter = new Recoder2KeYTypeConverter(tc, nss, this);
-
+        
         // set up recoder:
         recoder.util.Debug.setLevel(500);
         
@@ -441,10 +443,14 @@ public class Recoder2KeY implements JavaReader {
      */
     private void parseInternalClasses(ProgramFactory pf, List<recoder.java.CompilationUnit> rcuList) 
                     throws IOException, ParseException, ParserException {
-        URL jlURL = KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class, JAVA_SRC_DIR + "/" + "JAVALANG.TXT");
+	
+        URL jlURL = KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class, 
+        	JAVA_SRC_DIR + "/" + ProofSettings.DEFAULT_SETTINGS.getProfile().getInternalClasslistFilename());
         
         if (jlURL == null) {
-            throw new FileNotFoundException("Resource " + JAVA_SRC_DIR + "/JAVALANG.TXT cannot be opened.");
+            throw new FileNotFoundException("Resource " + JAVA_SRC_DIR + 
+        	    "/" + 
+        	    ProofSettings.DEFAULT_SETTINGS.getProfile().getInternalClasslistFilename()+ " cannot be opened.");
         }
         
         BufferedReader r = new BufferedReader(new InputStreamReader(jlURL.openStream()));

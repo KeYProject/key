@@ -88,6 +88,14 @@ public class JUnitTestProfile extends AbstractProfile {
         return DEFAULT;
     }
 
+    /**
+     * returns the file name of the internal class list
+     * @return the file name of the internal class list
+     */
+    public String getInternalClasslistFilename() {
+	 return "JAVALANGTESTGEN.TXT";
+    }
+    
  
 
 }

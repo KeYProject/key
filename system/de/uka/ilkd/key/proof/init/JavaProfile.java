@@ -88,6 +88,7 @@ public class JavaProfile extends AbstractProfile {
             super.getJustification(r);
     }
 
+    
     /**
      * the name of the profile
      */

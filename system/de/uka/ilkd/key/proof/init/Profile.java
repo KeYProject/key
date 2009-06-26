@@ -98,4 +98,10 @@ public interface Profile {
      * this profile
      */
     void updateSettings(ProofSettings settings);
+
+    /**
+     * returns the file name of the internal class list
+     * @return the file name of the internal class list
+     */
+    String getInternalClasslistFilename();
 }
