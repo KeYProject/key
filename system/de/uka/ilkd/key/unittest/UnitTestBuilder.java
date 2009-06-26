@@ -77,16 +77,16 @@ public class UnitTestBuilder {
 	return result;
     }
 
-    // private SetOfProgramMethod getProgramMethods(ListOfNode nodes) {
-    // IteratorOfNode it = nodes.iterator();
-    // SetOfProgramMethod result = SetAsListOfProgramMethod.EMPTY_SET;
-    // while (it.hasNext()) {
-    // Node n = it.next();
-    // ExecutionTraceModel[] tr = getTraces(n);
-    // result = result.union(getProgramMethods(tr));
-    // }
-    // return result;
-    // }
+    private SetOfProgramMethod getProgramMethods(ListOfNode nodes) {
+	IteratorOfNode it = nodes.iterator();
+	SetOfProgramMethod result = SetAsListOfProgramMethod.EMPTY_SET;
+	while (it.hasNext()) {
+	    Node n = it.next();
+	    ExecutionTraceModel[] tr = getTraces(n);
+	    result = result.union(getProgramMethods(tr));
+	}
+	return result;
+    }
 
     private ExecutionTraceModel[] getTraces(Node n) {
 	ExecutionTraceModel[] tr = node2trace.get(n);
@@ -269,6 +269,11 @@ public class UnitTestBuilder {
 		getProgramMethods(tr));
     }
 
+    public String createTestForNodes(ListOfNode l){        
+	return createTestForNodes(Arrays.asList(l.toArray()).iterator(), 
+	                getProgramMethods(l));
+    }
+    
     // private void computeStatementCoverage(HashSet<Position>
     // executedStatements,
     // HashSet<Statement> sourceStatements) {
