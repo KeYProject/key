@@ -313,7 +313,7 @@ public class TermBuilder {
     
     
     public Term heap(Services services) {
-        return func(services.getJavaInfo().getHeap());
+        return var(services.getJavaInfo().getHeap());
     }
     
     public Term select(Services services, Term h, Term o, Term f) {

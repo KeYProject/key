@@ -881,6 +881,7 @@ public class Recoder2KeY implements JavaReader {
 
             String typeName = "";
             Type javaType = var.getKeYJavaType().getJavaType();
+            if(javaType == null) continue;
             typeName = javaType.getFullName();
 
             recoder.java.declaration.FieldDeclaration recVar = new recoder.java.declaration.FieldDeclaration(null, name2typeReference(typeName),

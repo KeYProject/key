@@ -10,10 +10,10 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
 
 
 /**
@@ -53,6 +53,6 @@ public interface SortDependingSymbol extends Named {
      * POSTCONDITION: result==null || (this.isSimilar(result) &&
      * result.getSortDependingOn()==p_sort)
      */
-    SortDependingSymbol getInstanceFor ( SortDefiningSymbols p_sort );
+    SortDependingSymbol getInstanceFor (Sort instanceSort, Services services);
 
 }

@@ -625,7 +625,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
                                        .getRealSort ( depSort, getServices() );
         
         
-        final Operator res = (Operator)depOp.getInstanceFor ( realDepSort );
+        final Operator res = (Operator)depOp.getInstanceFor ( realDepSort, services );
         Debug.assertFalse ( res == null,
                             "Did not find instance of symbol "
                             + op + " for sort " + realDepSort );

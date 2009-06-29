@@ -1,7 +1,0 @@
-
-[Group] "observer_constraint1.1.1", "Observer 1.1.1"
-	[Void] "Make sure that the subject association-end has multiplicity 0..1.               "
-	[String] "flavor", "Flavor", "'one'"
-	[Context] Observer
-	[Invariant] <:Observer_class:>.allSubtypes()->forAll(s:OclType | s.allInstances()->forAll(i:OclClassifier | if <:flavor:> = 'one' then i.<:subject_ass:>->size() <= 1 else true endif)) 
-[EndGroup]

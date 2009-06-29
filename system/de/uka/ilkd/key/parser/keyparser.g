@@ -58,7 +58,6 @@ header {
   
   import de.uka.ilkd.key.explicitheap.ExplicitHeapConverter;
   import de.uka.ilkd.key.explicitheap.UniqueCondition;
-  import de.uka.ilkd.key.explicitheap.UniqueRigidFunction;
 }
 
 /** 
@@ -1114,18 +1113,39 @@ options {
         if (v != null && (args == null || (inSchemaMode() && v instanceof OperatorSV))) {
             return v;
         }
+        
         // case 2: function
         v = (TermSymbol) functions().lookup(new Name(varfunc_name));
         if (v != null) { // we allow both args==null (e.g. `c')
                          // and args.length=0 (e.g. 'c())' here 
             return v;
         }
+        
         // case 3: program variable
         v = (TermSymbol) programVariables().lookup
             (new ProgramElementName(varfunc_name));
         if (v != null && args==null) {
             return v;
         }
+        
+        // case 4: instantiation of generic function which has to be created on 
+        // demand
+        int separatorIndex = varfunc_name.indexOf("::"); 
+        if (separatorIndex > 0) {
+            String sortName = varfunc_name.substring(0, separatorIndex);
+            String baseName = varfunc_name.substring(separatorIndex + 2);
+            Sort sort = lookupSort(sortName);
+            Operator baseSymbol = lookupVarfuncId(Sort.ANY + "::" + baseName, args);
+                        
+            if(sort != null && baseSymbol instanceof SortDependingFunction) {
+                v = (RigidFunction) ((SortDependingFunction) baseSymbol).getInstanceFor(sort, getServices());
+                if(v != null) {
+                    return v;
+                }
+            } 
+        }
+        
+        // not found
         if (args==null) {
             throw new NotDeclException
                 ("(program) variable or constant", varfunc_name,
@@ -1794,7 +1814,15 @@ keyjavatype returns [KeYJavaType kjt=null]
           }          
        }
      }
-	
+     
+     //XXX
+     if(kjt == null) {
+	Sort sort = lookupSort(type);
+	if(sort != null) {
+           kjt = new KeYJavaType(null, sort);
+        }
+     }
+     
      if (kjt == null) {
        semanticError("Unknown type: " + type);
      }
@@ -2104,66 +2132,58 @@ func_decl
     Sort retSort;
     String func_name;
     List dependencyListList = null;
-    boolean nonRigid = false;
     boolean unique = false;
     String id = null;
-    int location = NORMAL_NONRIGID;
 }
     :
         (
-          NONRIGID {nonRigid=true;} (LBRACKET location = location_ident RBRACKET)?
-          |
-          UNIQUE {unique=true;}
+            UNIQUE {unique=true;}
         )?
-        retSort = sortId_check[!skip_functions]
+        
+        retSort = any_sortId_check[!skip_functions]
+        
         func_name = funcpred_name 
-        (
-            LBRACKET
-            dependencyListList = dependency_list_list
-            RBRACKET
-            {
-                if (!nonRigid)
-                {
-                    semanticError(func_name+
-		      ": Function declarations with attribute lists	must use the '\\nonRigid' modifier");
-                }
-                func_name = KeYParser.createDependencyName(func_name,
-                                                           dependencyListList);
-            }
-        )?
+
         argSorts = arg_sorts[!skip_functions]
+                
         {
             if (!skip_functions) {
-                Name fct_name = new Name(func_name);
                 Function f = null;
-                if (lookup(fct_name) != null) {
-                    throw new AmbigiousDeclException
-                    (func_name, getFilename(), getLine(), getColumn());
-                } else if (nonRigid) {
-                    if (dependencyListList != null) {
-                        f = NRFunctionWithExplicitDependencies.getSymbol
-                            (fct_name, retSort, 
-                             new ArrayOfSort(argSorts),
-                             extractPartitionedLocations(dependencyListList));
-                    } else {
-                        switch (location) {
-                           case NORMAL_NONRIGID: f = new NonRigidFunction(fct_name, retSort, argSorts);
-                              break;
-                           case LOCATION_MODIFIER: f = new NonRigidFunctionLocation(fct_name, retSort, argSorts, true);
-                              break;
-                 	  case HEAP_DEPENDENT: f = new NonRigidHeapDependentFunction(fct_name, retSort, argSorts);      
-                 	      break;
-                 	  default:
-                 	     semanticError("Unknwon modifier used in declaration of non-rigid function "+fct_name);
-                 	}
-                    }
-                } else if(unique) {
-                    f = new UniqueRigidFunction(fct_name, retSort, argSorts);
-                } else {
-                    f = new RigidFunction(fct_name, retSort, argSorts);
-                }
-                assert f != null;
-                addFunction(f);
+                
+	        int separatorIndex = func_name.indexOf("::"); 
+	        if (separatorIndex > 0) {
+	            String sortName = func_name.substring(0, separatorIndex);
+	            String baseName = func_name.substring(separatorIndex + 2);
+		    Sort genSort = lookupSort(sortName);
+		    
+		    if(genSort instanceof GenericSort) {	        
+	            	assert !unique : "not implemented; " + func_name;
+	            	
+		    	SortDependingFunction temp 
+		    	    = new SortDependingFunction(new Name(baseName),
+		                                                retSort,
+		                                                argSorts,
+		                                                new Name(baseName),
+		                                                genSort);
+			f = (Function)temp.getInstanceFor(Sort.ANY, getServices());
+		    }
+	        }
+	        
+	        if(f == null) {
+	            f = new RigidFunction(new Name(func_name), 
+	                                  retSort, 
+	                                  argSorts, 
+	                                  unique);                    
+	        }
+	        
+		if (lookup(f.name()) != null) {
+		    throw new AmbigiousDeclException(f.name().toString(), 
+		                                     getFilename(), 
+		                                     getLine(), 
+		                                     getColumn());
+		}
+	        
+	        addFunction(f);
             } 
         }
         SEMI
@@ -3689,11 +3709,27 @@ funcpredvarterm returns [Term a = null]
                 }
             )
         )?
+        
 	((LPAREN)=>argsWithBoundVars = argument_list)? 
         //argsWithBoundVars==null indicates no argument list
         //argsWithBoundVars.size()==0 indicates open-close-parens ()
         {  
-            Operator op = lookupVarfuncId(varfuncid, argsWithBoundVars);            
+            Operator op = lookupVarfuncId(varfuncid, argsWithBoundVars);     
+            
+            //sanity check: if signature of function symbol is base
+            //sort depending function, then we must be in schema mode
+            if(!inSchemaMode()
+               && op instanceof SortDependingFunction 
+               && ((SortDependingFunction)op).getSortDependingOn() instanceof GenericSort) {
+		throw new GenericSortException ( "sort",
+   		     			        "Unexpected generic sort for symbol " + op, 
+   		     			         ((SortDependingFunction)op).getSortDependingOn(),
+   					         getFilename (), 
+   					         getLine (), 
+   					         getColumn () );
+	    }
+            
+                   
             if (op instanceof ParsableVariable) {
                 a = termForParsedVariable((ParsableVariable)op);
             } else  if (op instanceof TermSymbol) {

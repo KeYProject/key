@@ -121,7 +121,7 @@ public class JavaInfo {
     private Function inReachableState;
     
     /** caches the function symbols used to express a java heap */
-    private NonRigidFunctionLocation heap;
+    private LocationVariable heap;
     private Function select;
     private Function store;
     private Sort fieldSort;
@@ -226,9 +226,9 @@ public class JavaInfo {
     }
     
     
-    public NonRigidFunctionLocation getHeap() {
+    public LocationVariable getHeap() {
         if (heap == null) {
-            heap = (NonRigidFunctionLocation) services.getNamespaces().functions().lookup(new Name("heap"));
+            heap = (LocationVariable) services.getNamespaces().lookup(new Name("heap"));
             if (heap == null) {
                 throw new RuntimeException("heap symbol not found.");
             }
@@ -250,7 +250,7 @@ public class JavaInfo {
     
     public Function getSelect() {
         if (select == null) {
-            select = (Function) services.getNamespaces().functions().lookup(new Name("select"));
+            select = (Function) services.getNamespaces().functions().lookup(new Name("any::select"));
             if (select == null) {
                 throw new RuntimeException("select symbol not found.");
             }

@@ -15,23 +15,33 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 
 public class RigidFunction extends Function {
-	/**
-	 * Creates a rigid function with given signature.
-	 * @param name
-	 * @param sort
-	 * @param argSorts
-	 */
-	public RigidFunction(Name name, Sort sort, Sort[] argSorts) {
-	    super(name, sort, argSorts);
-	}
+    
+    private final boolean unique;
 
-	/**
-	 * Creates a rigid function with given signature.
-	 * @param name
-	 * @param sort
-	 * @param argSorts
-	 */
-	public RigidFunction(Name name, Sort sort, ArrayOfSort argSorts) {
-	    super(name, sort, argSorts);            
-	}
+    public RigidFunction(Name name, Sort sort, Sort[] argSorts) {
+	super(name, sort, argSorts);
+	unique = false;
+    }
+
+
+    public RigidFunction(Name name, Sort sort, ArrayOfSort argSorts) {
+	super(name, sort, argSorts);
+	unique = false;
+    }
+
+
+    public RigidFunction(Name name, Sort sort, Sort[] argSorts, boolean unique) {
+	super(name, sort, argSorts);
+	this.unique = unique;
+    }
+
+
+    public RigidFunction(Name name, Sort sort, ArrayOfSort argSorts, boolean unique) {
+	super(name, sort, argSorts);
+	this.unique = unique;
+    }
+    
+    public boolean isUnique() {
+	return unique;
+    }
 }

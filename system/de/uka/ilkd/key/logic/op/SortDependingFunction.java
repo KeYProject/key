@@ -86,17 +86,42 @@ public class SortDependingFunction extends RigidFunction
 	return kind;
     }
 
-    /**
-     * Get the instance of this term symbol defined by the given sort
-     * "p_sort"
-     * @return a term symbol similar to this one, or null if this
-     * symbol is not defined by "p_sort"
-     *
-     * POSTCONDITION: result==null || (this.isSimilar(result) &&
-     * result.getSortDependingOn()==p_sort)
-     */
-    public SortDependingSymbol getInstanceFor ( SortDefiningSymbols p_sort ) {
-	return p_sort.lookupSymbol ( getKind () );
+
+    public SortDependingSymbol getInstanceFor (Sort instanceSort, 
+	    				       Services services) {
+	Name instanceName = new Name(instanceSort.name() + "::" + kind);
+	
+	SortDependingSymbol result 
+	      = (SortDependingSymbol) services.getNamespaces()
+	                                      .lookup(instanceName); 
+
+	if(result == null 
+	   && instanceSort instanceof SortDefiningSymbols) {
+            result = ((SortDefiningSymbols) instanceSort).lookupSymbol ( getKind () );	    
+	}
+	
+	if(result == null) {
+	    Sort instanceResultSort = (sort() == sortDependingOn
+		                       ? instanceSort
+		                       : sort());
+	    Sort[] instanceArgSorts = new Sort[arity()];
+	    for(int i = 0; i < instanceArgSorts.length; i++) {
+		instanceArgSorts[i] = (argSort(i) == sortDependingOn
+		                       ? instanceSort
+		                       : argSort(i));
+	    }
+	    result = new SortDependingFunction(instanceName,
+		    			       instanceResultSort,
+		                               instanceArgSorts,
+		                               kind,
+		                               instanceSort);
+	    services.getNamespaces().functions().add(result);
+	}
+
+	assert result == null 
+	       || (this.isSimilar(result) 
+		    && result.getSortDependingOn() == instanceSort);
+	return result;
     }
 
     

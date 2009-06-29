@@ -1340,7 +1340,7 @@ public class LogicPrinter {
             final Operator loc = op.location ( i );
             
             //XXX
-            Function heap = services == null ? null : services.getJavaInfo().getHeap();
+            LocationVariable heap = services == null ? null : services.getJavaInfo().getHeap();
             Function store = services == null ? null : services.getJavaInfo().getStore();
             Term nestedHeapTerm;
             ListOfTerm nestedHeapTerms = SLListOfTerm.EMPTY_LIST;

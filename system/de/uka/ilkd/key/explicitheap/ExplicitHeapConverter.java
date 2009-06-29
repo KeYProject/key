@@ -75,12 +75,12 @@ public class ExplicitHeapConverter {
             = (Function) services.getNamespaces().functions().lookup(name); 
         if(result == null) {
             result 
-                = new UniqueRigidFunction(name, 
-                                          services.getJavaInfo().getFieldSort(), 
-                                          new Sort[0]);
+                = new RigidFunction(name, 
+                		    services.getJavaInfo().getFieldSort(), 
+                		    new Sort[0], true);
             services.getNamespaces().functions().add(result);
         } else {
-            if(!(result instanceof UniqueRigidFunction)) {
+            if(!(result instanceof RigidFunction && ((RigidFunction)result).isUnique())) {
                 warn("field symbol \"" + name + "\" is not unique!");
             }
         }
@@ -91,8 +91,9 @@ public class ExplicitHeapConverter {
     public Sort getFieldTargetSort(Term objectTerm, 
 	    			   Term fieldTerm, 
 	    			   Services services) {
-	assert fieldTerm.op() instanceof UniqueRigidFunction;
-	final UniqueRigidFunction fieldSymbol = (UniqueRigidFunction) fieldTerm.op();
+	assert fieldTerm.op() instanceof RigidFunction
+	       && ((RigidFunction)fieldTerm.op()).isUnique();
+	final RigidFunction fieldSymbol = (RigidFunction) fieldTerm.op();
 	final String fieldSymbolName = fieldSymbol.name().toString();
 	
 	if(fieldSymbolName.equals(ARRAY_LENGTH_FIELD_NAME)) {

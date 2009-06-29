@@ -264,7 +264,7 @@ public class ArrayOp extends AccessOp implements SortDependingSymbol {
         return "[]("+arraySort()+")";
     }
 
-    public SortDependingSymbol getInstanceFor(SortDefiningSymbols p_sort) {                
+    public SortDependingSymbol getInstanceFor(Sort p_sort, Services services) {                
         return getArrayOp(p_sort);
     }
 
