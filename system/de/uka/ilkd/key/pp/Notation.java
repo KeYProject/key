@@ -15,10 +15,10 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.ldt.AbstractIntegerLDT;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.ldt.AbstractIntegerLDT;
-import de.uka.ilkd.key.logic.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.IteratorOfObject;

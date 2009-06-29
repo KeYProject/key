@@ -22,9 +22,9 @@ header {
     import de.uka.ilkd.key.java.declaration.ClassDeclaration;
     import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
     import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+    import de.uka.ilkd.key.ldt.AbstractIntegerLDT;
+    import de.uka.ilkd.key.ldt.LDT;
     import de.uka.ilkd.key.logic.*;
-    import de.uka.ilkd.key.logic.ldt.LDT;
-    import de.uka.ilkd.key.logic.ldt.AbstractIntegerLDT;
     import de.uka.ilkd.key.logic.op.*;
     import de.uka.ilkd.key.logic.sort.*;
     import de.uka.ilkd.key.proof.AtPreFactory;

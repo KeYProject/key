@@ -7,106 +7,135 @@
 // See LICENSE.TXT for details.
 //
 //
-package de.uka.ilkd.key.logic.ldt;
+package de.uka.ilkd.key.ldt;
 
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 
-public class IntegerLDT extends AbstractIntegerLDT {
-      
-    public IntegerLDT(Namespace sorts, Namespace functions) {
-        super(new Name("int"), sorts, functions, null);
+public final class ByteLDT extends AbstractIntegerLDT {
+    
+    private static final Name NAME = new Name("jbyte");
+    
+    
+    public ByteLDT(Namespace sorts, Namespace functions) {
+        super((Sort)sorts.lookup(NAME), PrimitiveType.JAVA_BYTE, functions);
     }
     
     
+    @Override
+    public Name name() {
+	return NAME;
+    }
+
+    
+    @Override
     public Function getAdd() {
-        return plus;
+        return javaAddInt;
     }
     
     
+    @Override
     public Function getSub() {
-        return minus;
+        return javaSubInt;
     }
     
     
+    @Override
     public Function getMul() {
-        return times;
+        return javaMulInt;
     }
     
     
+    @Override
     public Function getDiv() {
-        return divide;
+        return javaDivInt;
     }
     
     
+    @Override
     public Function getMod() {
-        return modulo;
-    }
-    
-    
-    public Function getShiftRight() {
-        return null;
+        return javaMod;
     }
     
 
+    @Override
     public Function getShiftLeft() {
-        return null;
+        return javaShiftLeftInt;
     }
 
     
+    @Override
+    public Function getShiftRight() {
+        return javaShiftRightInt;
+    }
+    
+    
+    @Override
     public Function getUnsignedShiftRight() {
-        return null;
+        return javaUnsignedShiftRightInt;
     }
     
     
+    @Override
     public Function getBitwiseOr() {
-        return null;
+        return javaBitwiseOrInt;
     }
     
     
+    @Override
     public Function getBitwiseAnd() {
-        return null;
+        return javaBitwiseAndInt;
     }
     
     
+    @Override
     public Function getBitwiseXor() {
-        return null;
+        return javaBitwiseXOrInt;
     }
     
     
+    @Override
     public Function getBitwiseNegation() {
-        return null;
+        return javaBitwiseNegation;
     }
     
     
+    @Override
     public Function getCast() {
-        return null;
+        return javaCastByte;
     }
     
     
+    @Override
     public Function getLessThan() {
         return lessThan;
     }
     
     
+    @Override
     public Function getGreaterThan() {
         return greaterThan;
     }
     
     
+    @Override
     public Function getGreaterOrEquals() {
         return greaterOrEquals;
     }
     
     
+    @Override
     public Function getLessOrEquals() {
         return lessOrEquals;
     }
     
     
+    @Override
     public Function getInBounds() {
-        return null;
+        return inByte;
     }
 }

@@ -14,11 +14,12 @@ import java.util.List;
 
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
-import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.IteratorOfNamed;
 import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.ldt.*;
+import de.uka.ilkd.key.ldt.ListOfLDT;
+import de.uka.ilkd.key.ldt.SLListOfLDT;
 
 
 /** Represents the LDT .key files as a whole. Special treatment of these
@@ -49,11 +50,6 @@ public class LDTInput implements EnvInput {
     
     public String name() {
 	return NAME;
-    }
-    
-    
-    public RecoderModelTransformer getTransformer() {
-        return null;
     }
     
     
@@ -92,6 +88,8 @@ public class LDTInput implements EnvInput {
     public String readJavaPath() throws ProofInputException {
 	return "";
     }
+    
+    
     public List<File> readClassPath() throws ProofInputException {
         return null;
     }
@@ -137,9 +135,11 @@ public class LDTInput implements EnvInput {
                         	.prepend(new CharLDT(sorts, functions))
                         	.prepend(new IntegerLDT(sorts, functions))
                         	.prepend(new IntegerDomainLDT(sorts, functions))
-                        	.prepend(new BooleanLDT(sorts, functions))
                         	.prepend(new FloatLDT(sorts, functions))
-                        	.prepend(new DoubleLDT(sorts, functions));
+                        	.prepend(new DoubleLDT(sorts, functions))
+                        	.prepend(new BooleanLDT(sorts, functions))
+                        	.prepend(new SetLDT(sorts, functions))
+                        	.prepend(new HeapLDT(sorts, functions, initConfig.progVarNS()));
         initConfig.getServices().getTypeConverter().init(ldts);
     }
   
@@ -178,7 +178,4 @@ public class LDTInput implements EnvInput {
 	}
 	return result;
     }
-
-
-
 }

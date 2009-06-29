@@ -340,18 +340,17 @@ public class ProblemInitializer {
 			      InitConfig initConfig) 
     		throws ProofInputException {
 	if(alreadyParsed.add(envInput)){
-	    //read includes
-	    readIncludes(envInput, initConfig);
-	    	    
-            //read Java
-            if (!(envInput instanceof LDTInput)) readJava(envInput, initConfig);	
-            
+	    //read includes, java
+	    if(!(envInput instanceof LDTInput)) {
+		readIncludes(envInput, initConfig);
+		readJava(envInput, initConfig);	
+	    }
+	    
 	    //read envInput itself
 	    reportStatus("Reading "+envInput.name(), 
 		    	 envInput.getNumberOfChars());
-//	    System.out.println("Reading envInput: " + envInput.name());
 	    envInput.setInitConfig(initConfig);
-	    envInput.read(ModStrategy.NO_VARS_GENSORTS);//envInput.read(ModStrategy.NO_VARS_FUNCS_GENSORTS);	    
+	    envInput.read(ModStrategy.NO_VARS);	    
 	    reportReady();
 	    
 	    setUpSorts(initConfig);

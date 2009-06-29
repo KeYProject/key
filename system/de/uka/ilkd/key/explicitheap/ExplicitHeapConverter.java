@@ -11,6 +11,7 @@ package de.uka.ilkd.key.explicitheap;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
@@ -38,7 +39,7 @@ public class ExplicitHeapConverter {
     public static final ExplicitHeapConverter INSTANCE = new ExplicitHeapConverter();
     
     private static final TermBuilder TB = TermBuilder.DF;
-    private static final String ARRAY_LENGTH_FIELD_NAME = "Array::length"; 
+    private static final String ARRAY_LENGTH_FIELD_NAME = "Array::length";
 
     
     private ExplicitHeapConverter() {
@@ -61,6 +62,7 @@ public class ExplicitHeapConverter {
     
     
     public Function getFieldSymbol(ProgramVariable fieldPV, Services services) {
+	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Name name;
 	if(fieldPV == services.getJavaInfo().getArrayLength()) {
 	    name = new Name(ARRAY_LENGTH_FIELD_NAME);
@@ -76,7 +78,7 @@ public class ExplicitHeapConverter {
         if(result == null) {
             result 
                 = new RigidFunction(name, 
-                		    services.getJavaInfo().getFieldSort(), 
+                		    heapLDT.getFieldSort(), 
                 		    new Sort[0], true);
             services.getNamespaces().functions().add(result);
         } else {
@@ -91,8 +93,10 @@ public class ExplicitHeapConverter {
     public Sort getFieldTargetSort(Term objectTerm, 
 	    			   Term fieldTerm, 
 	    			   Services services) {
+	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();	
 	assert fieldTerm.op() instanceof RigidFunction
 	       && ((RigidFunction)fieldTerm.op()).isUnique();
+	
 	final RigidFunction fieldSymbol = (RigidFunction) fieldTerm.op();
 	final String fieldSymbolName = fieldSymbol.name().toString();
 	
@@ -103,7 +107,7 @@ public class ExplicitHeapConverter {
 	    	= services.getJavaInfo().getAttribute(fieldSymbol.name().toString());
 	    assert fieldPV != null;
 	    return fieldPV.sort();
-	} else if(fieldSymbol == services.getJavaInfo().getArrayField()){
+	} else if(fieldSymbol == heapLDT.getArr()){
 	    assert objectTerm.sort() instanceof ArraySort;
 	    return ((ArraySort) objectTerm.sort()).elementSort();
 	} else {
@@ -114,6 +118,7 @@ public class ExplicitHeapConverter {
     
     
     public Update convert(Update u, Services services) {
+	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();	
         final ArrayOfAssignmentPair pairs = u.getAllAssignmentPairs();
         final AssignmentPair[] newPairs = new AssignmentPair[pairs.size()];
         
@@ -139,7 +144,7 @@ public class ExplicitHeapConverter {
                     = (ProgramVariable)((AttributeOp)lhsLoc).attribute();
                 final Function fieldSymbol = getFieldSymbol(fieldPV, services);
                 
-                newLhsLoc = services.getJavaInfo().getHeap();
+                newLhsLoc = heapLDT.getHeap();
                 newLhsSubs = new Term[0];
                 heapTerm = TB.store(services, 
                 		    heapTerm, 
@@ -152,7 +157,7 @@ public class ExplicitHeapConverter {
         	final ProgramVariable fieldPV = (ProgramVariable) lhsLoc;
         	final Function fieldSymbol = getFieldSymbol(fieldPV, services);
         	
-        	newLhsLoc = services.getJavaInfo().getHeap();
+        	newLhsLoc = heapLDT.getHeap();
         	newLhsSubs = new Term[0];
         	heapTerm = TB.store(services, 
         			    heapTerm, 
@@ -164,13 +169,12 @@ public class ExplicitHeapConverter {
                 final Term objectTerm = lhsSubs[0];
                 final Term indexTerm  = lhsSubs[1];
                 
-                newLhsLoc = services.getJavaInfo().getHeap();
+                newLhsLoc = heapLDT.getHeap();
                 newLhsSubs = new Term[0];
                 heapTerm = TB.store(services, 
                 		    heapTerm, 
                 		    convert(objectTerm, services), 
-                		    TB.func(services.getJavaInfo()
-                			            .getArrayField(), 
+                		    TB.func(heapLDT.getArr(), 
                 			    convert(indexTerm, services)), 
                 	            convert(rhs, services));
                 newRhs = heapTerm;
@@ -362,6 +366,7 @@ public class ExplicitHeapConverter {
     
     //only converts heap locs
     public Term convert(LocationDescriptor loc, Services services) {
+        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	if(loc instanceof BasicLocationDescriptor) {
             BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
             Term locTerm = bloc.getLocTerm();
@@ -387,7 +392,7 @@ public class ExplicitHeapConverter {
                 if(locTerm.freeVars().isEmpty()) {
                     return TB.singleton(services, 
                 	    		convert(locTerm.sub(0), services), 
-                	    		TB.func(services.getJavaInfo().getArrayField(),
+                	    		TB.func(heapLDT.getArr(),
                 	    			convert(locTerm.sub(1), services)));
                 } else if(locTerm.sub(0).freeVars().isEmpty()){
                     Term arrTerm = convert(locTerm.sub(0), services);
@@ -395,9 +400,11 @@ public class ExplicitHeapConverter {
                     	= TB.func(getFieldSymbol(services.getJavaInfo()
                     		                         .getArrayLength(), 
                     		  services));
-                    return TB.setMinus(services, 
+                    assert false;
+                    return null;
+                    /*return TB.setMinus(services, 
                 	               TB.allFields(services, arrTerm),
-                	    	       TB.singleton(services, arrTerm, arrLengthTerm));
+                	    	       TB.singleton(services, arrTerm, arrLengthTerm));*/
                 	    		          
                 } else {
                     assert false; //not implemented

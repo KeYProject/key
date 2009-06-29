@@ -7,9 +7,8 @@
 // See LICENSE.TXT for details.
 //
 //
-package de.uka.ilkd.key.logic.ldt;
+package de.uka.ilkd.key.ldt;
 
-import java.util.HashMap;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -22,132 +21,114 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.SetAsListOfTaclet;
-import de.uka.ilkd.key.rule.SetOfTaclet;
 import de.uka.ilkd.key.util.ExtList;
 
-/** this class extends the class ADT and is used to represent language
- * datatype models e.g. a model for the java type int, boolean etc.
- * It contains the necessary function symbols, sorts and Taclets. The
- * class TypeConverter needs this class to convert java-program
- * constructs to logic terms.
- */
+
 public abstract class LDT {
     
-    /** the ldts name */
-    private final Name name;
+    /** the sort, type and kjt represented by the LDT */
+    private final Sort sort;   
+    private final Type type;
+    private final KeYJavaType kjt;
     
-    /** the function namespace */
+    /** the namespace of functions this LDT feels responsible for */
     private Namespace functions = new Namespace();
 
-    /** the model specific rules */
-    private SetOfTaclet rules = SetAsListOfTaclet.EMPTY_SET;
     
-    /** the sort represented by the LDT */
-    protected final Sort sort;
     
-    /** 
-     * one LDT may model several program types; this is the list
-     * of these types
-     */
-    protected final Type type;
+    //-------------------------------------------------------------------------
+    //constructors
+    //-------------------------------------------------------------------------
     
-    protected HashMap keyJavaType = new HashMap();
-
-    /**
-     * creates a new LDT complete with the target sort of the language
-     * datatype, the java datatype, and sorts
-     * @param name the name of the language datatype model and the 
-     * corresponding sort
-     * @param sorts  namespace which contains the target sort
-     * @param type the type used in the java program esp. in the AST
-     * of the java program
-     */
-    public LDT(Name name, Namespace sorts, Type type) {
-        this.name = name;
-        this.sort = (Sort) sorts.lookup(name);
+    public LDT(Sort sort, Type type) {
+	assert sort != null;
+        this.sort = sort;
         this.type = type;
-	keyJavaType.put(type, new KeYJavaType(type, sort));	
+	this.kjt  = new KeYJavaType(type, sort);	
     }
+    
+    
+    //-------------------------------------------------------------------------
+    //internal methods
+    //-------------------------------------------------------------------------
+    
 
     /**
      * adds a function to the LDT 
      * @return the added function (for convenience reasons)
      */
-    public Function addFunction(Function f) {
+    protected Function addFunction(Function f) {
 	functions.add(f);
 	return f;
     }
     
+    
     /**
-     * looks up a function in the namespace and add it to the LDT 
+     * looks up a function in the namespace and adds it to the LDT 
      * @param funcNS a Namespace with symbols
      * @param funcName the String with the name of the function to look up
      * @return the added function (for convenience reasons)
      */
-    public Function addFunction(Namespace funcNS, String funcName) {
+    protected Function addFunction(Namespace funcNS, String funcName) {
         final Function f = (Function)funcNS.lookup(new Name(funcName));
-        if (f==null) {
-            throw new RuntimeException("IntegerLDT: Function " + funcName + " not found");
-        }
-        addFunction(f);
-        return f;
+        assert f != null : "LDT: Function " + funcName + " not found";
+        return addFunction(f);
+    }
+    
+    
+    /** returns the basic functions of the model
+     * @return the basic functions of the model
+     */
+    protected Namespace functions() {
+	return functions;
     }
 
+    
+    
+    
+    //-------------------------------------------------------------------------
+    //internal methods
+    //-------------------------------------------------------------------------
+    
 
-    /** returns the sort the java type is mapped to
-     * @return  the sort the java type is mapped to
+    /** 
+     * Returns the sort associated with the LDT.
      */
-    public Sort targetSort(){
+    public Sort targetSort() {
 	return sort;
     }
 
-    /** returns the java type the model describes
-     * @return the java type the model describes
+    
+    /** 
+     * Returns the Java type associated with the LDT (may be null!).
      */
     public Type javaType() {
 	return type;
     }
 
-    /** returns the KeYJavaType for the the given type 
-     * @param t the Type for which the coressponding KeYJavaType has to be
-     * returned 
-     * @return the KeYJavaType the the given type t
+    
+    /** 
+     * Returns the KeYJavaType associated with the LDT.
      */
-    public KeYJavaType getKeYJavaType(Type t) {
-	return (KeYJavaType)keyJavaType.get(t);
-    }
-
-    /** returns the basic functions of the model
-     * @return the basic functions of the model
-     */
-    public Namespace functions() {
-	return functions;
-    }
-
-    /** returns the model specific rules 
-     * @return the model specific rules 
-     */
-    public SetOfTaclet rules() {
-	return rules;
-    }
-
-    /** returns the name of the LDT */
-    public Name name() {
-        return name;
+    public KeYJavaType getKeYJavaType() {
+	return kjt;
     }
     
-    /** toString */
+    
     public String toString() {
 	return "LDT "+name()+" ("+targetSort()+"<->"+javaType()+")";
     }
-
-    /** returns the file ID for the parser */
-    public String getFile() {
-       return name().toString();
-    }
-        
-
+    
+    
+    public boolean containsFunction(Function op) {
+	Named n=functions.lookup(op.name());
+	return (n==op);
+    }    
+    
+    
+    public abstract Name name();
+    
+    
     /** returns true if the LDT offers an operation for the given java
      * operator and the logic subterms 
      * @param op the de.uka.ilkd.key.java.expression.Operator to
@@ -158,10 +139,13 @@ public abstract class LDT {
      * @return  true if the LDT offers an operation for the given java
      * operator and the subterms 
      */
-    public abstract boolean isResponsible
-	(de.uka.ilkd.key.java.expression.Operator op, 
-                Term[] subs, Services services, ExecutionContext ec);
+    public abstract boolean isResponsible(
+	    		de.uka.ilkd.key.java.expression.Operator op, 
+                        Term[] subs, 
+                        Services services, 
+                        ExecutionContext ec);
 
+    
     /** returns true if the LDT offers an operation for the given
      * binary java operator and the logic subterms 
      * @param op the de.uka.ilkd.key.java.expression.Operator to
@@ -173,10 +157,13 @@ public abstract class LDT {
      * @return  true if the LDT offers an operation for the given java
      * operator and the subterms 
      */
-    public abstract boolean isResponsible
-	(de.uka.ilkd.key.java.expression.Operator op, 
-                Term left, Term right, Services services, ExecutionContext ec);
+    public abstract boolean isResponsible(
+	    		de.uka.ilkd.key.java.expression.Operator op, 
+	    		Term left, 
+	    		Term right, 
+	    		Services services, ExecutionContext ec);
 
+    
     /** returns true if the LDT offers an operation for the given
      * unary java operator and the logic subterms 
      * @param op the de.uka.ilkd.key.java.expression.Operator to
@@ -187,9 +174,11 @@ public abstract class LDT {
      * @return  true if the LDT offers an operation for the given java
      * operator and the subterm
      */
-    public abstract boolean isResponsible
-	(de.uka.ilkd.key.java.expression.Operator op, Term sub, 
-                Services services, ExecutionContext ec);
+    public abstract boolean isResponsible(
+	    		de.uka.ilkd.key.java.expression.Operator op, 
+	    		Term sub, 
+	    		Services services, 
+	    		ExecutionContext ec);
 
 
     /** translates a given literal to its logic counterpart 
@@ -202,14 +191,10 @@ public abstract class LDT {
     /** returns the function symbol for the given operation 
      * @return  the function symbol for the given operation 
      */
-    public abstract Function getFunctionFor
-	(de.uka.ilkd.key.java.expression.Operator op, Services serv, 
-                ExecutionContext ec);
-
-    public boolean containsFunction(Function op) {
-	Named n=functions.lookup(op.name());
-	return (n==op);
-    }
+    public abstract Function getFunctionFor(
+	    		de.uka.ilkd.key.java.expression.Operator op, 
+	    		Services serv, 
+	    		ExecutionContext ec);
 
     public abstract boolean hasLiteralFunction(Function f);
 

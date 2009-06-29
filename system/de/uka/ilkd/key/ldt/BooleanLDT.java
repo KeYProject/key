@@ -7,7 +7,7 @@
 // See LICENSE.TXT for details.
 //
 //
-package de.uka.ilkd.key.logic.ldt;
+package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -27,7 +28,9 @@ import de.uka.ilkd.key.util.ExtList;
 /** This class inherits from LDT and implements all method that are
  * necessary to handle the primitive type boolean.
  */
-public class BooleanLDT extends LDT {
+public final class BooleanLDT extends LDT {
+    
+    private static final Name NAME = new Name("boolean");
     
     /** the boolean literals as function symbols and terms */
     private final Function bool_true;
@@ -37,31 +40,48 @@ public class BooleanLDT extends LDT {
     
 
     public BooleanLDT(Namespace sorts, Namespace functions) {
-        super(new Name("boolean"), sorts, PrimitiveType.JAVA_BOOLEAN);
+        super((Sort)sorts.lookup(NAME), PrimitiveType.JAVA_BOOLEAN);
         
-        bool_true  = addFunction((Function)functions.lookup(new Name("TRUE")));
+        bool_true       = addFunction((Function)functions.lookup(new Name("TRUE")));
 	term_bool_true  = TermFactory.DEFAULT.createFunctionTerm(bool_true);
-	bool_false = addFunction((Function)functions.lookup(new Name("FALSE")));
-	term_bool_false  = TermFactory.DEFAULT.createFunctionTerm(bool_false);
+	bool_false      = addFunction((Function)functions.lookup(new Name("FALSE")));
+	term_bool_false = TermFactory.DEFAULT.createFunctionTerm(bool_false);
+    }
+    
+    
+    public Term getFalseTerm() {
+        return term_bool_false;
     }
 
-
-    /** returns true if the LDT is responsible for this kind of literals 
-     * @param lit the Literal 
-     * @return true if the LDT is responsible for this kind of literals
-     */
-    public boolean isResponsible(Literal lit) {
-	return (lit instanceof BooleanLiteral);
+    
+    public Term getTrueTerm() {
+        return term_bool_true;
     }
 
-    /** returns true if the LDT offers an operation for the given java
-     * operator and the logic subterms 
-     * @param op the de.uka.ilkd.key.java.expression.Operator to
-     * translate
-     * @param subs the logic subterms of the java operator
-     * @return  true if the LDT offers an operation for the given java
-     * operator and the subterms 
+    
+    /**
+     * returns the function representing the boolean value <tt>FALSE</tt>
      */
+    public Function getFalseConst() {
+        return bool_false;
+    }
+
+    
+    /**
+     * returns the function representing the boolean value <tt>TRUE</tt>
+     */
+    public Function getTrueConst() {
+        return bool_true;
+    }
+
+        
+    @Override
+    public Name name() {
+	return NAME;
+    }
+
+    
+    @Override
     public boolean isResponsible
 	(de.uka.ilkd.key.java.expression.Operator op, Term[] subs, 
                 Services services, ExecutionContext ec) {
@@ -73,39 +93,23 @@ public class BooleanLDT extends LDT {
 	return false;	
     }
 
-    /** returns true if the LDT offers an operation for the given
-     * binary java operator and the logic subterms 
-     * @param op the de.uka.ilkd.key.java.expression.Operator to
-     * translate
-     * @param left the left subterm of the java operator
-     * @param right the right subterm of the java operator
-     * @return  true if the LDT offers an operation for the given java
-     * operator and the subterms 
-     */
+    
+    @Override
     public boolean isResponsible
 	(de.uka.ilkd.key.java.expression.Operator op, Term left, Term right, Services services, ExecutionContext ec) {
 	return false;
 
     }
 
-    /** returns true if the LDT offers an operation for the given
-     * unary java operator and the logic subterms 
-     * @param op the de.uka.ilkd.key.java.expression.Operator to
-     * translate
-     * @param sub the logic subterms of the java operator
-     * @return  true if the LDT offers an operation for the given java
-     * operator and the subterm
-     */
+    
+    @Override
     public boolean isResponsible
 	(de.uka.ilkd.key.java.expression.Operator op, Term sub, Services services, ExecutionContext ec) {
 	return false;
     }
 
-    /** translates a given literal to its logic counterpart 
-     * @param lit the Literal to be translated
-     * @return the Term that represents the given literal in its logic
-     * form
-     */ 
+    
+    @Override 
     public Term translateLiteral(Literal lit) {
 	if (lit instanceof BooleanLiteral) {
 	    return (((BooleanLiteral)lit).getValue() ? 
@@ -115,45 +119,23 @@ public class BooleanLDT extends LDT {
 	return null;
     }
 
-    /** returns the function symbol for the given operation 
-     * @return  the function symbol for the given operation 
-     */
+    
+    @Override
     public Function getFunctionFor
 	(de.uka.ilkd.key.java.expression.Operator op, Services services, 
-                ExecutionContext ec) {	
+                ExecutionContext ec) {
+	assert false;
 	return null;
     }   
 
 
-    public Term getFalseTerm() {
-        return term_bool_false;
-    }
-
-    public Term getTrueTerm() {
-        return term_bool_true;
-    }
-
-    /**
-     * returns the function representing the boolean value <tt>FALSE</tt>
-     * @return the function representing the boolean value <tt>FALSE</tt>
-     */
-    public Function getFalseConst() {
-        return bool_false;
-    }
-
-    /**
-     * returns the function representing the boolean value <tt>TRUE</tt>
-     * @return the function representing the boolean value <tt>TRUE</tt>
-     */
-    public Function getTrueConst() {
-        return bool_true;
-    }
-
-   
+    @Override
     public boolean hasLiteralFunction(Function f) {
 	return containsFunction(f) && f.arity()==0;
     }
 
+    
+    @Override
     public Expression translateTerm(Term t, ExtList children) {
 	if (t.op()==bool_true) return BooleanLiteral.TRUE;
 	if (t.op()==bool_false) return BooleanLiteral.FALSE;

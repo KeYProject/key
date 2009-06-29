@@ -7,10 +7,9 @@
 // See LICENSE.TXT for details.
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.logic.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -18,15 +17,11 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * <p>Use this class if you intend to build complex terms by hand. It is 
  * more convenient than the @link{TermFactory} class.</p>
  * 
- * <p>Most convenient is its use when being subclassed. Therefore move the term 
- * constructing methods of your application to a separate class and let the new
- * class extend the TermBuilder.</p> 
- * 
  * <p>Attention: some methods of this class try to simplify some terms. So if you 
  * want to be sure that the term looks exactly as you built it, you
  * will have to use the TermFactory.</p>
  */
-public class TermBuilder {
+public final class TermBuilder {
     
     public static final TermBuilder DF = new TermBuilder();
     
@@ -313,15 +308,15 @@ public class TermBuilder {
     
     
     public Term heap(Services services) {
-        return var(services.getJavaInfo().getHeap());
+        return var(services.getTypeConverter().getHeapLDT().getHeap());
     }
     
     public Term select(Services services, Term h, Term o, Term f) {
-        return func(services.getJavaInfo().getSelect(), new Term[]{h, o, f});
+        return func(services.getTypeConverter().getHeapLDT().getSelect(), new Term[]{h, o, f});
     }
     
     public Term store(Services services, Term h, Term o, Term f, Term v) {
-        return func(services.getJavaInfo().getStore(), new Term[]{h, o, f, v});
+        return func(services.getTypeConverter().getHeapLDT().getStore(), new Term[]{h, o, f, v});
     }
         
     public Term dot(Services services, Term o, Function f) {
@@ -333,7 +328,7 @@ public class TermBuilder {
     }
     
     public Term arr(Services services, Term o, Term i) {
-        return select(services, heap(services), o, func(services.getJavaInfo().getArrayField(), i));
+        return select(services, heap(services), o, func(services.getTypeConverter().getHeapLDT().getArr(), i));
     }
    
     public Term fieldStore(Services services, Term o, Function f, Term v) {
@@ -345,50 +340,50 @@ public class TermBuilder {
     }
     
     public Term arrayStore(Services services, Term o, Term i, Term v) {
-        return store(services, heap(services), o, func(services.getJavaInfo().getArrayField(), i), v);
+        return store(services, heap(services), o, func(services.getTypeConverter().getHeapLDT().getArr(), i), v);
     }
         
     public Term wellFormedHeap(Services services) {
-        return func(services.getJavaInfo().getWellFormed(), heap(services));
+        return func(services.getTypeConverter().getHeapLDT().getWellFormed(), heap(services));
     }
     
     public Term changeHeapAtLocs(Services services, Term h1, Term s, Term h2) {
-	return func(services.getJavaInfo().getChangeHeapAtLocs(), new Term[]{h1, s, h2});
+	return func(services.getTypeConverter().getHeapLDT().getChangeHeapAtLocs(), new Term[]{h1, s, h2});
     }
     
     public Term empty(Services services) {
-	return func(services.getJavaInfo().getEmpty());
+	return func(services.getTypeConverter().getSetLDT().getEmpty());
     }
     
     public Term singleton(Services services, Term o, Term f) {
-	return func(services.getJavaInfo().getSingleton(), o, f);
+	return func(services.getTypeConverter().getSetLDT().getSingleton(), o, f);
     }
     
     public Term union(Services services, Term s1, Term s2) {
-	return func(services.getJavaInfo().getUnion(), s1, s2);
+	return func(services.getTypeConverter().getSetLDT().getUnion(), s1, s2);
     }
     
     public Term intersect(Services services, Term s1, Term s2) {
-	return func(services.getJavaInfo().getIntersect(), s1, s2);
+	return func(services.getTypeConverter().getSetLDT().getIntersect(), s1, s2);
     }
     
     public Term setMinus(Services services, Term s1, Term s2) {
-	return func(services.getJavaInfo().getSetMinus(), s1, s2);
+	return func(services.getTypeConverter().getSetLDT().getSetMinus(), s1, s2);
     }
     
     public Term complement(Services services, Term s) {
-	return func(services.getJavaInfo().getComplement(), s);
+	return func(services.getTypeConverter().getSetLDT().getComplement(), s);
     }
     
-    public Term allFields(Services services, Term o) {
+    /*public Term allFields(Services services, Term o) {
 	return func(services.getJavaInfo().getAllFields(), o);
-    }
+    }*/
     
     public Term everything(Services services) {
-	return func(services.getJavaInfo().getEverything());
+	return func(services.getTypeConverter().getSetLDT().getEverything());
     }
     
     public Term elementOf(Services services, Term o, Term f, Term s) {
-	return func(services.getJavaInfo().getElementOf(), new Term[]{o, f, s});
+	return func(services.getTypeConverter().getSetLDT().getElementOf(), new Term[]{o, f, s});
     }
 }

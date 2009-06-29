@@ -1135,7 +1135,7 @@ options {
             String sortName = varfunc_name.substring(0, separatorIndex);
             String baseName = varfunc_name.substring(separatorIndex + 2);
             Sort sort = lookupSort(sortName);
-            Operator baseSymbol = lookupVarfuncId(Sort.ANY + "::" + baseName, args);
+            Operator baseSymbol = lookupVarfuncId(Sort.NULL + "::" + baseName, args);
                         
             if(sort != null && baseSymbol instanceof SortDependingFunction) {
                 v = (RigidFunction) ((SortDependingFunction) baseSymbol).getInstanceFor(sort, getServices());
@@ -1672,10 +1672,7 @@ one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST]
                             Sort s;
                             if (isObjectSort) {
                                 if (sort_name.toString().equals("java.lang.Object")) {
-                                    if (sorts().lookup(new Name("java.lang.Object")) == null) {
-                                        s = new ClassInstanceSortImpl(sort_name, false);
-                                    }
-                                    s=(Sort)sorts().lookup(new Name("java.lang.Object"));
+				    s = new ClassInstanceSortImpl(sort_name, false);
                                 } else {
                                     s = new ClassInstanceSortImpl(sort_name,
                                         (Sort)sorts().lookup(new Name("java.lang.Object")), false);
@@ -1709,6 +1706,7 @@ one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST]
                             } else {
                                 s = new PrimitiveSort(sort_name);
                             }
+                            assert s != null;
                             sorts().add ( s ); 
 
                             createdSorts = createdSorts.append(s);
@@ -2165,7 +2163,7 @@ func_decl
 		                                                argSorts,
 		                                                new Name(baseName),
 		                                                genSort);
-			f = (Function)temp.getInstanceFor(Sort.ANY, getServices());
+			f = (Function)temp.getInstanceFor(Sort.NULL, getServices());
 		    }
 	        }
 	        

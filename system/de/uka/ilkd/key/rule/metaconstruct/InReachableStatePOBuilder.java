@@ -30,7 +30,9 @@ import de.uka.ilkd.key.util.Debug;
  * legal pointer structure, i.e. that serveral system invariants are satisfied,
  * like no created object references a non-created one.
  */
-public class InReachableStatePOBuilder extends TermBuilder {
+public class InReachableStatePOBuilder {
+    
+    private static final TermBuilder TB = TermBuilder.DF;
 
     private final UpdateFactory uf;
     private final Services services;
@@ -49,8 +51,8 @@ public class InReachableStatePOBuilder extends TermBuilder {
                         ImplicitFieldAdder.IMPLICIT_CREATED,
                         services.getJavaInfo().getJavaLangObject());
         this.arraylength = services.getJavaInfo().getArrayLength();
-        this.TRUE = TRUE(services);
-        this.FALSE = FALSE(services);
+        this.TRUE = TB.TRUE(services);
+        this.FALSE = TB.FALSE(services);
     }
 
     /**
@@ -102,7 +104,7 @@ public class InReachableStatePOBuilder extends TermBuilder {
                         if (pv == implicitFields[4]) {
                             result = nextToCreateUpdatedSafely(update, pv);
                             if (pv.getContainerType().getJavaType() instanceof EnumClassDeclaration) {
-                                result = and(result, addNextToCreateEnumPO(pv, update));
+                                result = TB.and(result, addNextToCreateEnumPO(pv, update));
                             }
                         } else {
                             // if one of these fields is updated we need an
@@ -131,16 +133,16 @@ public class InReachableStatePOBuilder extends TermBuilder {
                                 // can exist) than no objects
                                 // are created
                                 final Term notErroneous =
-                                        equals(var(implicitFields[0]), FALSE);
+                                        TB.equals(TB.var(implicitFields[0]), FALSE);
                                 final Term notInitialized =
-                                        equals(var(implicitFields[1]), FALSE);
+                                        TB.equals(TB.var(implicitFields[1]), FALSE);
                                 final Term notInInit =
-                                        equals(var(implicitFields[2]), FALSE);
+                                        TB.equals(TB.var(implicitFields[2]), FALSE);
                                 final Term ntcIsZero =
-                                        equals(var(implicitFields[4]),
-                                                zero(services));
+                                        TB.equals(TB.var(implicitFields[4]),
+                                                TB.zero(services));
                                 result =
-                                        and(update(update, imp(and(and(
+                                        TB.and(update(update, TB.imp(TB.and(TB.and(
                                                 notErroneous, notInitialized),
                                                 notInInit), ntcIsZero)), result);
                             }
@@ -161,11 +163,11 @@ public class InReachableStatePOBuilder extends TermBuilder {
                         final Term[] tPre = var(vPre);
                         final Term preAx = preAx(tPre, pair.locationSubs());
                         result =
-                                update(update, imp(equals(
-                                        dot(tPre[0], created), TRUE),
+                                update(update, TB.imp(TB.equals(
+                                        TB.dot(tPre[0], created), TRUE),
                                         createdOrNull(dot(tPre,
                                                 (AttributeOp) loc))));
-                        result = all(vPre, imp(preAx, result));
+                        result = TB.all(vPre, TB.imp(preAx, result));
                     } else if (pv == created) {
                         if (refPrefix.op() instanceof SortDependingFunction
                                 && ((SortDependingFunction) refPrefix.op()).getKind().equals(
@@ -192,12 +194,12 @@ public class InReachableStatePOBuilder extends TermBuilder {
                     final Term atPreArrayTerm = array((ArrayOp) loc, tPre);
 
                     result =
-                            update(update, and(imp(equals(
-                                    dot(tPre[0], created), TRUE),
+                            update(update, TB.and(TB.imp(TB.equals(
+                                    TB.dot(tPre[0], created), TRUE),
                                     createdOrNull(atPreArrayTerm)),
                                     arrayStoreValid(tPre[0], atPreArrayTerm)));
 
-                    result = all(vPre, imp(preAx, result));
+                    result = TB.all(vPre, TB.imp(preAx, result));
                 }
             }
             if (result != null) {
@@ -221,7 +223,7 @@ public class InReachableStatePOBuilder extends TermBuilder {
                 (Function) services.getNamespaces().functions().lookup(
                         new Name("arrayStoreValid"));
         assert f != null : "ArrayStoreValid predicate not found.";
-        return func(f, arrayRef, arrayValue);
+        return TB.func(f, arrayRef, arrayValue);
     }
 
     /**
@@ -253,7 +255,7 @@ public class InReachableStatePOBuilder extends TermBuilder {
 
         final Term idx = t_get.sub(0);
         final LogicVariable idxPre = atPre(idx, 0);
-        final Term t_idxPre = var(idxPre);
+        final Term t_idxPre = TB.var(idxPre);
 
         /*
          * pair = (T::<get>(idx).created:=b) <code> U( T::<get>(idx@pre).created =
@@ -261,14 +263,14 @@ public class InReachableStatePOBuilder extends TermBuilder {
          * T::<get>(idx@pre)) </code>
          * 
          */
-        final Term getPreIdx = func(get, t_idxPre);
+        final Term getPreIdx = TB.func(get, t_idxPre);
 
         result =
-                equiv(equals(dot(getPreIdx, created), TRUE), ex(lv, and(
-                        interval(zero(services), var(lv), var(ntc(os))),
-                        equals(func(get, var(lv)), getPreIdx))));
+                TB.equiv(TB.equals(TB.dot(getPreIdx, created), TRUE), TB.ex(lv, TB.and(
+                        interval(TB.zero(services), TB.var(lv), TB.var(ntc(os))),
+                        TB.equals(TB.func(get, TB.var(lv)), getPreIdx))));
 
-        return all(idxPre, imp(equals(idx, t_idxPre), update(update, result)));
+        return TB.all(idxPre, TB.imp(TB.equals(idx, t_idxPre), update(update, result)));
     }
 
     /**
@@ -289,11 +291,11 @@ public class InReachableStatePOBuilder extends TermBuilder {
             Term relevantInvariants) {
         Term closure = relevantInvariants;
         if (pair.nontrivialGuard()) {
-            closure = imp(pair.guard(), closure);
+            closure = TB.imp(pair.guard(), closure);
         }
         if (pair.boundVars().size() > 0) {
             closure =
-                    tf.createQuantifierTerm(Op.ALL, pair.boundVars(), closure);
+                    TB.tf().createQuantifierTerm(Op.ALL, pair.boundVars(), closure);
         }
         return closure;
     }
@@ -327,8 +329,8 @@ public class InReachableStatePOBuilder extends TermBuilder {
         final LogicVariable o =
                 new LogicVariable(new Name("o"),
                         services.getJavaInfo().getJavaLangObjectAsSort());
-        final Term o_created = equals(dot(var(o), created), TRUE);
-        return all(o, imp(o_created, update(update, o_created)));
+        final Term o_created = TB.equals(TB.dot(TB.var(o), created), TRUE);
+        return TB.all(o, TB.imp(o_created, update(update, o_created)));
     }
 
     /**
@@ -352,7 +354,7 @@ public class InReachableStatePOBuilder extends TermBuilder {
                 services.getJavaInfo().getAttribute(
                         ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED,
                         (((ProgramVariable) pair.location())).getContainerType());
-        return update(update, imp(equals(var(classInit), TRUE),
+        return update(update, TB.imp(TB.equals(TB.var(classInit), TRUE),
                 createdOrNull(pair.locationAsTerm())));
     }
 
@@ -389,17 +391,17 @@ public class InReachableStatePOBuilder extends TermBuilder {
         final ObjectSort os = (ObjectSort) pv.getContainerType().getSort();
         final LogicVariable iv = new LogicVariable(new Name("i"), intSort);
 
-        final Term updatedPV = update(update, var(pv));
+        final Term updatedPV = update(update, TB.var(pv));
 
-        result = geq(updatedPV, zero(services), services);
+        result = TB.geq(updatedPV, TB.zero(services), services);
 
-        final Term interval = interval(var(pv), var(iv), updatedPV);
+        final Term interval = interval(TB.var(pv), TB.var(iv), updatedPV);
 
         result =
-                and(result, all(iv, imp(interval, update(update, equals(dot(
-                        func(rep(os), var(iv)), created), TRUE(services))))));
+                TB.and(result, TB.all(iv, TB.imp(interval, update(update, TB.equals(TB.dot(
+                        TB.func(rep(os), TB.var(iv)), created), TB.TRUE(services))))));
 
-        result = and(result, leq(var(pv), updatedPV, services));
+        result = TB.and(result, TB.leq(TB.var(pv), updatedPV, services));
 
         return result;
     }
@@ -444,8 +446,8 @@ public class InReachableStatePOBuilder extends TermBuilder {
                 services.getTypeConverter().convertToLogicElement(
                         new IntLiteral(count));
 
-        return update(update, imp(equals(var(clInit), TRUE(services)), equals(
-                var(pv), countLit)));
+        return update(update, TB.imp(TB.equals(TB.var(clInit), TB.TRUE(services)), TB.equals(
+                TB.var(pv), countLit)));
 
     }
 
@@ -477,7 +479,7 @@ public class InReachableStatePOBuilder extends TermBuilder {
                 services.getTypeConverter().convertToLogicElement(
                         new IntLiteral(index));
 
-        return update(update, equals(var(pv), func(rep(objSort), indexLit)));
+        return update(update, TB.equals(TB.var(pv), TB.func(rep(objSort), indexLit)));
     }
     
     /**
@@ -516,7 +518,7 @@ public class InReachableStatePOBuilder extends TermBuilder {
     private Term classErroneousUpdateIRSConform(Update update,
             ProgramVariable[] implicitFields) {
 
-        final Term classErroneous = equals(var(implicitFields[0]), TRUE);
+        final Term classErroneous = TB.equals(TB.var(implicitFields[0]), TRUE);
 
         Term result =
                 classFieldUpdateConform(update, implicitFields[0],
@@ -527,17 +529,17 @@ public class InReachableStatePOBuilder extends TermBuilder {
 
         if (!directSubTypes.isEmpty()) {
             final IteratorOfKeYJavaType it = directSubTypes.iterator();
-            Term subsNotInit = tt();
+            Term subsNotInit = TB.tt();
             while (it.hasNext()) {
                 final ProgramVariable subsCInitPV =
                         cInitialized((ObjectSort) it.next().getSort());
-                subsNotInit = and(subsNotInit, equals(var(subsCInitPV), FALSE));
+                subsNotInit = TB.and(subsNotInit, TB.equals(TB.var(subsCInitPV), FALSE));
             }
-            result = and(result, update(update, subsNotInit));
+            result = TB.and(result, update(update, subsNotInit));
         }
 
         result =
-                and(result, imp(classErroneous, update(update, classErroneous)));
+                TB.and(result, TB.imp(classErroneous, update(update, classErroneous)));
 
         return result;
     }
@@ -621,7 +623,7 @@ public class InReachableStatePOBuilder extends TermBuilder {
     private Term classInitializedUpdateIRSConform(Update update,
             ProgramVariable[] implicitFields) {
 
-        final Term classInitialized = equals(var(implicitFields[1]), TRUE);
+        final Term classInitialized = TB.equals(TB.var(implicitFields[1]), TRUE);
 
         Term result =
                 classFieldUpdateConform(update, implicitFields[1],
@@ -634,21 +636,21 @@ public class InReachableStatePOBuilder extends TermBuilder {
 
         if (!directSuperTypes.isEmpty()) {
             final IteratorOfKeYJavaType it = directSuperTypes.iterator();
-            Term superTypesInit = tt();
+            Term superTypesInit = TB.tt();
             while (it.hasNext()) {
                 final ProgramVariable superCInitPV =
                         cInitialized((ObjectSort) it.next().getSort());
                 superTypesInit =
-                        and(superTypesInit, equals(var(superCInitPV), TRUE));
+                        TB.and(superTypesInit, TB.equals(TB.var(superCInitPV), TRUE));
             }
             result =
-                    and(result, update(update, imp(classInitialized,
+                    TB.and(result, update(update, TB.imp(classInitialized,
                             superTypesInit)));
         }
 
         // reachable <tt>inReachableState</tt> state
         result =
-                and(result, imp(classInitialized, update(update,
+                TB.and(result, TB.imp(classInitialized, update(update,
                         classInitialized)));
 
         return result;
@@ -662,10 +664,10 @@ public class InReachableStatePOBuilder extends TermBuilder {
      */
     private Term arrayLengthIsIRSConform(Term arrayReference, Update u) {
         final LogicVariable preRef = atPre(arrayReference, 0);
-        return all(preRef, imp(and(equals(var(preRef), arrayReference),
-                not(equals(var(preRef), NULL(services)))), update(u, imp(
-                equals(dot(var(preRef), created), TRUE(services)), geq(dot(
-                        var(preRef), arraylength), zero(services), services)))));
+        return TB.all(preRef, TB.imp(TB.and(TB.equals(TB.var(preRef), arrayReference),
+                TB.not(TB.equals(TB.var(preRef), TB.NULL(services)))), update(u, TB.imp(
+                TB.equals(TB.dot(TB.var(preRef), created), TB.TRUE(services)), TB.geq(TB.dot(
+                        TB.var(preRef), arraylength), TB.zero(services), services)))));
     }
 
     // helper method for class field pos
@@ -696,23 +698,23 @@ public class InReachableStatePOBuilder extends TermBuilder {
             ProgramVariable fieldB, ProgramVariable fieldC,
             ProgramVariable fieldD) {
 
-        final Term classA = equals(var(fieldA), TRUE);
-        final Term classNotB = equals(var(fieldB), FALSE);
-        final Term classNotC = equals(var(fieldC), FALSE);
+        final Term classA = TB.equals(TB.var(fieldA), TRUE);
+        final Term classNotB = TB.equals(TB.var(fieldB), FALSE);
+        final Term classNotC = TB.equals(TB.var(fieldC), FALSE);
 
         if (fieldD != null) {
-            return update(update, imp(classA, and(and(classNotB, classNotC),
-                    equals(var(fieldD), TRUE))));
+            return update(update, TB.imp(classA, TB.and(TB.and(classNotB, classNotC),
+                    TB.equals(TB.var(fieldD), TRUE))));
         }
 
-        return update(update, imp(classA, and(classNotB, classNotC)));
+        return update(update, TB.imp(classA, TB.and(classNotB, classNotC)));
     }
 
     // Helpers to build term
     private Term conjunction(IteratorOfTerm it) {
-        Term result = tt();
+        Term result = TB.tt();
         while (it.hasNext()) {
-            result = and(result, it.next());
+            result = TB.and(result, it.next());
         }
         return result;
     }
@@ -722,8 +724,8 @@ public class InReachableStatePOBuilder extends TermBuilder {
     }
 
     private Term createdOrNull(final Term t_o_a) {
-        return or(equals(dot(t_o_a, created), TRUE), equals(t_o_a,
-                NULL(services)));
+        return TB.or(TB.equals(TB.dot(t_o_a, created), TRUE), TB.equals(t_o_a,
+                TB.NULL(services)));
     }
 
     private ProgramVariable ntc(ObjectSort os) {
@@ -752,7 +754,7 @@ public class InReachableStatePOBuilder extends TermBuilder {
     }
 
     private Term interval(Term lower, Term i, Term upper) {
-        return and(geq(i, lower, services), lt(i, upper, services));
+        return TB.and(TB.geq(i, lower, services), TB.lt(i, upper, services));
     }
 
     private Function rep(ObjectSort os) {
@@ -761,26 +763,26 @@ public class InReachableStatePOBuilder extends TermBuilder {
 
     /** creates an attribute term and takes care of shadowed attributes as well */
     private Term dot(Term[] subs, AttributeOp op) {
-        return tf.createAttributeTerm(op, subs);
+        return TB.tf().createAttributeTerm(op, subs);
     }
 
     /** creates an array term and takes care of shadowed attributes as well */
     private Term array(ArrayOp op, Term[] subs) {
-        return tf.createArrayTerm(op, subs);
+        return TB.tf().createArrayTerm(op, subs);
     }
 
     private Term[] var(LogicVariable[] v) {
         final Term[] result = new Term[v.length];
         for (int i = 0; i < result.length; i++) {
-            result[i] = var(v[i]);
+            result[i] = TB.var(v[i]);
         }
         return result;
     }
 
     private Term preAx(Term[] t1, Term[] t2) {
-        Term result = tt();
+        Term result = TB.tt();
         for (int i = 0; i < t1.length; i++) {
-            result = and(result, equals(t1[i], t2[i]));
+            result = TB.and(result, TB.equals(t1[i], t2[i]));
         }
         return result;
     }

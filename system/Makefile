@@ -115,11 +115,10 @@ export COMPILE_GF
 GENERATED_ITERATORS=proof/IteratorOfNode \
 	logic/op/IteratorOfBoolean \
 	rule/IteratorOfListOfNoPosTacletApp \
-	logic/ldt/IteratorOfLDT \
+	ldt/IteratorOfLDT \
 	java/abstraction/IteratorOfListOfType \
 	rule/IteratorOfVariableCondition \
-	logic/op/IteratorOfOperator \
-	logic/ldt/IteratorOfLDT
+	logic/op/IteratorOfOperator
 
 GENERATED_LISTS=logic/SLListOfTerm \
 	logic/op/SLListOfQuantifiableVariable \
@@ -214,7 +213,7 @@ GENERATED_LISTS=logic/SLListOfTerm \
         speclang/jml/pretranslation/SLListOfTextualJMLConstruct \
         rule/encapsulation/SLListOfTypeSchemeTerm \
         rule/encapsulation/SLListOfTypeSchemeConstraint \
-	logic/ldt/SLListOfLDT \
+	ldt/SLListOfLDT \
         rule/metaconstruct/arith/SLListOfMonomial \
 	strategy/feature/instantiator/SLListOfCPBranch \
 	java/SLListOfComment \

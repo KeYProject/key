@@ -20,8 +20,8 @@ import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.ldt.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.IteratorOfSort;
@@ -120,25 +120,6 @@ public class JavaInfo {
     /** caches the predicate used to express a lega java state */
     private Function inReachableState;
     
-    /** caches the function symbols used to express a java heap */
-    private LocationVariable heap;
-    private Function select;
-    private Function store;
-    private Sort fieldSort;
-    private Function arr;
-    private Function wellFormed;
-    private Function changeHeapAtLocs;
-    private Function empty;
-    private Function singleton;
-    private Function union;
-    private Function intersect;
-    private Function setMinus;
-    private Function complement;
-    private Function allFields;
-    private Function everything;
-    private Function elementOf;
-    
-    
     /** caches the arrays' length attribute*/
     private ProgramVariable length;
     
@@ -224,175 +205,6 @@ public class JavaInfo {
         } 
         return inReachableState;        
     }
-    
-    
-    public LocationVariable getHeap() {
-        if (heap == null) {
-            heap = (LocationVariable) services.getNamespaces().lookup(new Name("heap"));
-            if (heap == null) {
-                throw new RuntimeException("heap symbol not found.");
-            }
-        } 
-        return heap;        
-    }
-    
-    
-    public Function getStore() {
-        if (store == null) {
-            store = (Function) services.getNamespaces().functions().lookup(new Name("store"));
-            if (store == null) {
-                throw new RuntimeException("store symbol not found.");
-            }
-        } 
-        return store;                
-    }
-
-    
-    public Function getSelect() {
-        if (select == null) {
-            select = (Function) services.getNamespaces().functions().lookup(new Name("any::select"));
-            if (select == null) {
-                throw new RuntimeException("select symbol not found.");
-            }
-        } 
-        return select;                
-    }
-
-    public Sort getFieldSort() {
-        if (fieldSort == null) {
-            fieldSort = (Sort) services.getNamespaces().sorts().lookup(new Name("Field"));
-            if (fieldSort == null) {
-                throw new RuntimeException("field sort not found.");
-            }
-        } 
-        return fieldSort;                
-    }
-    
-    public Function getArrayField() {
-        if (arr == null) {
-            arr = (Function) services.getNamespaces().functions().lookup(new Name("arr"));
-            if (arr == null) {
-                throw new RuntimeException("array field symbol not found.");
-            }
-        } 
-        return arr;                        
-    }
-    
-    public Function getWellFormed() {
-        if (wellFormed == null) {
-            wellFormed = (Function) services.getNamespaces().functions().lookup(new Name("wellFormed"));
-            if (wellFormed == null) {
-                throw new RuntimeException("well-formed symbol not found.");
-            }
-        } 
-        return wellFormed;                        
-    }
-    
-    public Function getChangeHeapAtLocs() {
-        if (changeHeapAtLocs == null) {
-            changeHeapAtLocs = (Function) services.getNamespaces().functions().lookup(new Name("changeHeapAtLocs"));
-            if (changeHeapAtLocs == null) {
-                throw new RuntimeException("changeHeapAtLocs symbol not found.");
-            }
-        } 
-        return changeHeapAtLocs;                        
-    }
-    
-    public Function getEmpty() {
-        if (empty == null) {
-            empty = (Function) services.getNamespaces().functions().lookup(new Name("empty"));
-            if (empty == null) {
-                throw new RuntimeException("empty symbol not found.");
-            }
-        } 
-        return empty;                        
-    }
-    
-    public Function getSingleton() {
-        if (singleton == null) {
-            singleton = (Function) services.getNamespaces().functions().lookup(new Name("singleton"));
-            if (singleton == null) {
-                throw new RuntimeException("singleton symbol not found.");
-            }
-        } 
-        return singleton;                        
-    }
-    
-    
-    public Function getUnion() {
-	if (union == null) {
-            union = (Function) services.getNamespaces().functions().lookup(new Name("union"));
-            if (union == null) {
-                throw new RuntimeException("union symbol not found.");
-            }
-        } 
-        return union;     
-    }
-    
-    
-    public Function getIntersect() {
-	if (intersect == null) {
-            intersect = (Function) services.getNamespaces().functions().lookup(new Name("intersect"));
-            if (intersect == null) {
-                throw new RuntimeException("intersect symbol not found.");
-            }
-        } 
-        return intersect;   
-    }
-    
-    
-    public Function getSetMinus() {
-	if (setMinus == null) {
-            setMinus = (Function) services.getNamespaces().functions().lookup(new Name("setMinus"));
-            if (setMinus == null) {
-                throw new RuntimeException("setMinus symbol not found.");
-            }
-        } 
-        return setMinus;   
-    }
-    
-    
-    public Function getComplement() {
-	if (complement == null) {
-            complement = (Function) services.getNamespaces().functions().lookup(new Name("complement"));
-            if (complement == null) {
-                throw new RuntimeException("complement symbol not found.");
-            }
-        } 
-        return complement;   
-    }
-    
-    
-    public Function getAllFields() {
-	if (allFields == null) {
-            allFields = (Function) services.getNamespaces().functions().lookup(new Name("allFields"));
-            if (allFields == null) {
-                throw new RuntimeException("allFields symbol not found.");
-            }
-        } 
-        return allFields;   
-    }
-    
-    public Function getEverything() {
-        if (everything == null) {
-            everything = (Function) services.getNamespaces().functions().lookup(new Name("everything"));
-            if (everything == null) {
-                throw new RuntimeException("everything symbol not found.");
-            }
-        } 
-        return everything;                        
-    }
-    
-    public Function getElementOf() {
-        if (elementOf == null) {
-            elementOf = (Function) services.getNamespaces().functions().lookup(new Name("elementOf"));
-            if (elementOf == null) {
-                throw new RuntimeException("elementOf symbol not found.");
-            }
-        } 
-        return elementOf;                        
-    }
-
     
     
     /**
@@ -590,7 +402,7 @@ public class JavaInfo {
         for (final LDT model : getTypeConverter().getModels()) {           
             if (model.javaType() != null && 
                     model.javaType().getFullName().equals(typename)) {
-                return model.getKeYJavaType(model.javaType());
+                return model.getKeYJavaType();
             }
         }
         return null;

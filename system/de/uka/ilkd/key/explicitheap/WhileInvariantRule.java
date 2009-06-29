@@ -22,8 +22,8 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.ldt.BooleanLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
@@ -176,7 +176,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     
         //prepare heap frame condition, heap frame taclet, heap atPre definitions
         final Sort objectSort = services.getJavaInfo().getJavaLangObjectAsSort();
-        final Sort fieldSort = services.getJavaInfo().getFieldSort();        
+        final Sort fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
         final LogicVariable objVar = new LogicVariable(new Name("o"), objectSort);
         final LogicVariable fieldVar = new LogicVariable(new Name("f"), fieldSort);
         final Term objVarTerm   = TB.var(objVar);

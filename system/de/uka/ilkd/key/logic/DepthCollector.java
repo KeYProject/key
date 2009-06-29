@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.ldt.AbstractIntegerLDT;
+import de.uka.ilkd.key.ldt.AbstractIntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
 
 /** 

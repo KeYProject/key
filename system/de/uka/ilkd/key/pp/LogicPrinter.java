@@ -27,6 +27,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ObjectSort;
@@ -1022,10 +1023,11 @@ public class LogicPrinter {
         throws IOException
     {
         //XXX
+	HeapLDT heapLDT = services == null ? null : services.getTypeConverter().getHeapLDT();
         if(PresentationFeatures.ENABLED
-            && services != null
-            && t.op() == services.getJavaInfo().getSelect()
-            && t.sub(0).op() == services.getJavaInfo().getHeap()) {
+            && heapLDT != null
+            && t.op() == heapLDT.getSelect()
+            && t.sub(0).op() == heapLDT.getHeap()) {
             assert t.arity() == 3;
             startTerm(3);
             
@@ -1071,7 +1073,7 @@ public class LogicPrinter {
                 startTerm(0);                    
                 layouter.print(shortFieldName);
                 markEndSub();                    
-            } else if(fieldTerm.op() == services.getJavaInfo().getArrayField()) {
+            } else if(fieldTerm.op() == heapLDT.getArr()) {
         	markStartSub();
                 printTerm(objectTerm);
                 markEndSub();
@@ -1088,7 +1090,7 @@ public class LogicPrinter {
             }
         } else if(PresentationFeatures.ENABLED
                   && services != null
-                  && t.sort() == services.getJavaInfo().getFieldSort() 
+                  && t.sort() == heapLDT.getFieldSort() 
                   && t.arity() == 0) {
             startTerm(0);
             
@@ -1123,23 +1125,11 @@ public class LogicPrinter {
             Term t, int ass) throws IOException {
         final CastFunctionSymbol cast = (CastFunctionSymbol)t.op();
         
-        //XXX
-        assert t.arity() == 1;
-        if(PresentationFeatures.ENABLED 
-           && services != null 
-           && t.sub(0).op() == services.getJavaInfo().getSelect()) {
-            //just omit the cast
-            startTerm(t.arity());
-            markStartSub();
-            printTerm(t.sub(0));
-            markEndSub();
-        } else {
-            startTerm(t.arity());
-            layouter.print(pre);
-            layouter.print(cast.getSortDependingOn().toString());
-            layouter.print(post);
-            maybeParens(t.sub(0), ass);
-        }
+        startTerm(t.arity());
+        layouter.print(pre);
+        layouter.print(cast.getSortDependingOn().toString());
+        layouter.print(post);
+        maybeParens(t.sub(0), ass);
     }
 
 
@@ -1340,8 +1330,9 @@ public class LogicPrinter {
             final Operator loc = op.location ( i );
             
             //XXX
-            LocationVariable heap = services == null ? null : services.getJavaInfo().getHeap();
-            Function store = services == null ? null : services.getJavaInfo().getStore();
+            HeapLDT heapLDT = services == null ? null : services.getTypeConverter().getHeapLDT();            
+            LocationVariable heap = heapLDT == null ? null : heapLDT.getHeap();
+            Function store = heapLDT == null ? null : heapLDT.getStore();
             Term nestedHeapTerm;
             ListOfTerm nestedHeapTerms = SLListOfTerm.EMPTY_LIST;
             for(nestedHeapTerm = op.value(t, i);
@@ -1350,7 +1341,7 @@ public class LogicPrinter {
         	nestedHeapTerms = nestedHeapTerms.prepend(nestedHeapTerm);
             }
             if(PresentationFeatures.ENABLED
-               && services != null 
+               && heapLDT != null 
                && loc == heap 
        	       && op.value(t,i).op() == store
        	       && nestedHeapTerm.op() == heap) {

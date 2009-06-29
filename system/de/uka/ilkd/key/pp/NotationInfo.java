@@ -13,7 +13,7 @@ package de.uka.ilkd.key.pp;
 import java.util.HashMap;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.Service;
 

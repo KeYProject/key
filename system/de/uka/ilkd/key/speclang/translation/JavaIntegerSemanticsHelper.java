@@ -13,9 +13,9 @@ package de.uka.ilkd.key.speclang.translation;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.ldt.AbstractIntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.ldt.AbstractIntegerLDT;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
 
 

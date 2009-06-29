@@ -16,10 +16,11 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.ExpressionOperator;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.NonRigidFunction;
@@ -67,18 +68,18 @@ public class InTypeOperator extends ExpressionOperator {
     private Term createConstraintTerm(Expression expr, Type type,
 				      ExecutionContext ec,
 				      Services services) {
-        IntegerLDT aiLDT = services.getTypeConverter().getIntegerLDT();
+        Namespace functions = services.getNamespaces().functions();
 	Function pred=null;
 	if (type == PrimitiveType.JAVA_BYTE) {
-	    pred = (Function)aiLDT.functions().lookup(new Name("inByte"));
+	    pred = (Function)functions.lookup(new Name("inByte"));
 	} else if (type == PrimitiveType.JAVA_SHORT) {
-	    pred = (Function)aiLDT.functions().lookup(new Name("inShort"));
+	    pred = (Function)functions.lookup(new Name("inShort"));
 	} else if (type == PrimitiveType.JAVA_INT) {
-	    pred = (Function)aiLDT.functions().lookup(new Name("inInt"));
+	    pred = (Function)functions.lookup(new Name("inInt"));
         } else if (type == PrimitiveType.JAVA_LONG) {
-	    pred = (Function)aiLDT.functions().lookup(new Name("inLong"));
+	    pred = (Function)functions.lookup(new Name("inLong"));
         } else if (type == PrimitiveType.JAVA_CHAR) {
-	    pred = (Function)aiLDT.functions().lookup(new Name("inChar"));
+	    pred = (Function)functions.lookup(new Name("inChar"));
 	}
 	return TermFactory.DEFAULT.createFunctionTerm
 	    (pred, services.getTypeConverter().convertToLogicElement(expr, ec)); 

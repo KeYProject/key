@@ -20,11 +20,14 @@ import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.ldt.*;
+import de.uka.ilkd.key.ldt.IteratorOfLDT;
+import de.uka.ilkd.key.ldt.ListOfLDT;
+import de.uka.ilkd.key.ldt.SLListOfLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.ObjectSort;
@@ -34,40 +37,38 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
 
-public class TypeConverter extends TermBuilder {
+public final class TypeConverter {
+    
+    private static final TermBuilder TB = TermBuilder.DF;
 
-    private Services services;
-  
+    private final Services services;
+      
     private ByteLDT byteLDT;
     private ShortLDT shortLDT;
     private IntLDT intLDT;
     private LongLDT longLDT;
     private CharLDT charLDT;
-    private BooleanLDT booleanLDT;
     private IntegerLDT integerLDT;
     private IntegerDomainLDT integerDomainLDT;
-    private FloatLDT floatLDT;
-    private DoubleLDT doubleLDT;
-
+    private BooleanLDT booleanLDT;    
+    private SetLDT setLDT;
+    private HeapLDT heapLDT;
+    
     private ListOfLDT models = SLListOfLDT.EMPTY_LIST;
 
-    
-    public static StringConverter stringConverter =new StringConverter();
+    public static StringConverter stringConverter = new StringConverter();
     
 
     TypeConverter(Services s){
         services = s;       
     }
 
+    
     /**
-     * initializes the type converter with the integer and boolean 
-     * language datatype definition to be used
-     * @param ldt the LDT 
+     * initializes the type converter with an LDT
      */
     public void init(LDT ldt) {	
-        if (ldt instanceof BooleanLDT ) {
-            this.booleanLDT = (BooleanLDT)ldt;
-        } else if (ldt instanceof ByteLDT) {
+        if (ldt instanceof ByteLDT) {
             this.byteLDT = (ByteLDT)ldt;
         } else if (ldt instanceof ShortLDT) {
             this.shortLDT = (ShortLDT)ldt;
@@ -81,22 +82,25 @@ public class TypeConverter extends TermBuilder {
             this.integerLDT = (IntegerLDT)ldt;
         } else if (ldt instanceof IntegerDomainLDT) {
             this.integerDomainLDT = (IntegerDomainLDT)ldt;
-        } else if (ldt instanceof FloatLDT ) {
-            this.floatLDT = (FloatLDT)ldt;
-        } else if (ldt instanceof DoubleLDT) {
-            this.doubleLDT = (DoubleLDT)ldt;
+        } else if (ldt instanceof BooleanLDT) {
+            this.booleanLDT = (BooleanLDT)ldt;
+        } else if (ldt instanceof SetLDT) {
+            this.setLDT = (SetLDT) ldt;
+        } else if (ldt instanceof HeapLDT) {
+            this.heapLDT = (HeapLDT)ldt;
         }
 
         this.models = this.models.prepend(ldt);
         Debug.out("Initialize LDTs: ", ldt);
     }
     
+    
     public void init(ListOfLDT ldts) {
-        IteratorOfLDT it = ldts.iterator();
-        while (it.hasNext()) {
-            init(it.next());
-        }
+	for(LDT ldt : ldts) {
+	    init(ldt);
+	}
     }
+    
     
     public ListOfLDT getModels() {
         return models;
@@ -106,83 +110,59 @@ public class TypeConverter extends TermBuilder {
     public Services getServices() {
 	return services;
     }
+    
 
-    public LDT getModelFor(Type t) {
-        if (t == null || booleanLDT == null ||
-                byteLDT == null || shortLDT == null || 
-                intLDT == null || longLDT == null || 
-                charLDT == null) {
-            return  null;
-        }
-
-        if (byteLDT.javaType().equals(t)) {
-            return byteLDT;
-        } else if (shortLDT.javaType().equals(t)) {
-            return shortLDT;
-        } else if (intLDT.javaType().equals(t)) {
-            return intLDT;
-        } else if (longLDT.javaType().equals(t)) {
-            return longLDT;
-        } else if (charLDT.javaType().equals(t)) {
-            return charLDT;
-        } else if (booleanLDT.javaType().equals(t)) {
-            return booleanLDT;
-        } else if (floatLDT.javaType().equals(t)) {
-            return floatLDT;
-        } else if (doubleLDT.javaType().equals(t)) {
-            return doubleLDT;
-        }
+    public LDT getModelFor(Type t) {	
+	for(LDT ldt : models) {	    
+	    if(t.equals(ldt.javaType())) {
+		return ldt;		
+	    }
+	}
         Debug.out("typeconverter: No LDT found for ", t);
         return null;
     }
+    
 
     public LDT getModelFor(Sort s) {
-        if (s == null || booleanLDT == null ||
-                byteLDT == null || shortLDT == null || 
-                intLDT == null || longLDT == null || 
-                charLDT == null) {
-            return  null;
-        }	
-        if (byteLDT.targetSort() == s) {
-            return byteLDT;
-        } else if (shortLDT.targetSort() == s) {
-            return shortLDT;  
-        } else if (intLDT.targetSort() == s) {
-            return intLDT;  
-        } else if (longLDT.targetSort() == s) {
-            return longLDT;  
-        } else if (charLDT.targetSort() == s) {
-            return charLDT;  
-        } else if (booleanLDT.targetSort() == s) {	    
-            return booleanLDT;
-        }
+	for(LDT ldt : models) {
+	    if(s.equals(ldt.targetSort())) {
+		return ldt;
+	    }
+	}
         Debug.out("No LDT found for ", s);
         return null;
     }
 
+    
     public IntegerLDT getIntegerLDT() {
         return integerLDT;
     }
+    
     
     public IntegerDomainLDT getIntegerDomainLDT() {
         return integerDomainLDT;
     }
     
+    
     public ByteLDT getByteLDT() {
         return  byteLDT;
     }
+    
     
     public ShortLDT getShortLDT() {
         return  shortLDT;
     }
     
+    
     public IntLDT getIntLDT() {
         return  intLDT;
     }
     
+    
     public LongLDT getLongLDT() {
         return  longLDT;
     }
+    
     
     public CharLDT getCharLDT() {
         return  charLDT;
@@ -193,21 +173,16 @@ public class TypeConverter extends TermBuilder {
 	return booleanLDT;
     }
     
-    private final HashMap<String, Term> mcrMap = new HashMap<String, Term>(10);
     
-    private Term translateMetaClassReference(MetaClassReference mcr) {
-//	    throw new IllegalArgumentException("Convert MCR to a constant");
-//            return intLDT.translateLiteral( new CharLiteral('X'));
-        String name = mcr.getTypeReference().getName().intern();
-        
-        if (mcrMap.containsKey(name)) return mcrMap.get(name);
-
-        final Sort dummySort = services.getJavaInfo().getJavaLangObjectAsSort();       
-        final Term tMCR = func(new RigidFunction(new Name(name), 
-                dummySort, new ArrayOfSort()));
-        mcrMap.put(name, tMCR);
-        return tMCR;
+    public SetLDT getSetLDT() {
+	return setLDT;
     }
+    
+    
+    public HeapLDT getHeapLDT() {
+	return heapLDT;
+    }
+    
 
     private Term translateOperator
 	(de.uka.ilkd.key.java.expression.Operator op,
@@ -232,7 +207,7 @@ public class TypeConverter extends TermBuilder {
 	    throw new IllegalArgumentException("TypeConverter could not handle"
 					       +" this");
 	}
-	return func(responsibleLDT.getFunctionFor(op, services, ec), subs);
+	return TB.func(responsibleLDT.getFunctionFor(op, services, ec), subs);
     }
    
 
@@ -249,11 +224,11 @@ public class TypeConverter extends TermBuilder {
 					       +" this");
 	} else 	if (prefix instanceof ProgramVariable) {
 	    // the base case: the leftmost item is a local variable
-	    return var((ProgramVariable)prefix);
+	    return TB.var((ProgramVariable)prefix);
 	} else 	if (prefix instanceof VariableReference) {
 	    Debug.out("typeconverter: "+
 		      "variablereference:", (((VariableReference)prefix).getProgramVariable()));
-	    return var(((VariableReference)prefix).getProgramVariable());
+	    return TB.var(((VariableReference)prefix).getProgramVariable());
 	}  else if (prefix instanceof ArrayReference) {	   
 	    return convertArrayReference((ArrayReference)prefix, ec);
 	} else if (prefix instanceof ThisReference) {	 
@@ -271,11 +246,13 @@ public class TypeConverter extends TermBuilder {
 	}
     }
     
+    
     public Term findThisForSortExact(Sort s, ExecutionContext ec){
         ProgramElement pe = ec.getRuntimeInstance();
         if(pe == null) return null;
         Term inst = convertToLogicElement(pe, ec);
         return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType(), true);
+    
     }
     
     public Term findThisForSort(Sort s, ExecutionContext ec){
@@ -285,6 +262,7 @@ public class TypeConverter extends TermBuilder {
         return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType(), false);
     }
     
+    
     public Term findThisForSort(Sort s, Term self, KeYJavaType context, boolean exact){
         Term result = self;
         ProgramVariable inst;
@@ -292,27 +270,28 @@ public class TypeConverter extends TermBuilder {
                  exact && !context.getSort().equals(s)){
             inst = services.getJavaInfo().getAttribute(
                     ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, context);
-            result = dot(result, inst);
+            result = TB.dot(result, inst);
             context = inst.getKeYJavaType();
         }
         return result;      
     }
 
+    
     public Term convertVariableReference(VariableReference fr,
 					 ExecutionContext ec) {	       
 	Debug.out("TypeConverter: FieldReference: ",fr);
 	final ReferencePrefix prefix = fr.getReferencePrefix();
 	final ProgramVariable var = fr.getProgramVariable();
 	if (var.isStatic()) {
-	    return var(var);
+	    return TB.var(var);
 	} else if (prefix == null) {
 	    if (var.isMember()) {
-		return dot(findThisForSort(var.getContainerType().getSort(), ec), 
+		return TB.dot(findThisForSort(var.getContainerType().getSort(), ec), 
 		        var);
 	    }
-	    return var(var); 
+	    return TB.var(var); 
 	} else if (!(prefix instanceof PackageReference) ) {
-	    return dot(convertReferencePrefix(prefix, ec), var);
+	    return TB.dot(convertReferencePrefix(prefix, ec), var);
 	} 
 	Debug.out("typeconverter: Not supported reference type (fr, class):",
 		  fr, fr.getClass());
@@ -329,7 +308,7 @@ public class TypeConverter extends TermBuilder {
             index[i] = 
                 convertToLogicElement(ar.getDimensionExpressions().getExpression(i), ec);
         }
-        return tf.createArrayTerm(ArrayOp.getArrayOp(t.sort()), t, index);
+        return TB.tf().createArrayTerm(ArrayOp.getArrayOp(t.sort()), t, index);
     }
 
     private Term convertToInstanceofTerm(Instanceof io, 
@@ -344,21 +323,21 @@ public class TypeConverter extends TermBuilder {
 	// in JavaDL S::instance(o) is also true if o (for reference types S)
 	// is null in opposite to Java
 	// we create here if (obj = null) then FALSE else S::instance(obj) 				      
-	return ife(equals(obj, NULL(services)), FALSE(services), 
-                func(instanceOfSymbol, obj));
+	return TB.ife(TB.equals(obj, TB.NULL(services)), TB.FALSE(services), 
+                TB.func(instanceOfSymbol, obj));
     }
-
   
 
     public Term convertToLogicElement(ProgramElement pe) {
 	return convertToLogicElement(pe, null);	
     }
 
+    
     public Term convertToLogicElement(ProgramElement pe, 				    
 				      ExecutionContext ec) {
 	Debug.out("typeconverter: called for:", pe, pe.getClass());
 	if (pe instanceof ProgramVariable) {	  
-	    return var((ProgramVariable)pe);
+	    return TB.var((ProgramVariable)pe);
 	} else if (pe instanceof FieldReference) {
 	    return convertVariableReference((FieldReference)pe, ec);
 	} else if (pe instanceof VariableReference) {
@@ -403,13 +382,14 @@ public class TypeConverter extends TermBuilder {
 	    throw new IllegalArgumentException("TypeConverter could not handle"
 					       +" this primitive type");
 	} else if (pe instanceof MetaClassReference) {
-            return translateMetaClassReference((MetaClassReference)pe);
+	    assert false : "not supported";
         }  
 	throw new IllegalArgumentException
 	    ("TypeConverter: Unknown or not convertable ProgramElement " + pe+
              " of type "+pe.getClass());
     }
 
+    
     /**
      * dispatches the given literal and converts it
      * @param lit the Literal to be converted
@@ -428,15 +408,12 @@ public class TypeConverter extends TermBuilder {
             return intLDT.translateLiteral(lit);
         } else if (lit instanceof StringLiteral) {
             return stringConverter.translateLiteral(lit,intLDT,services);
-        } else if (lit instanceof FloatLiteral) {
-            return floatLDT.translateLiteral(lit);
-        } else if (lit instanceof DoubleLiteral) {
-            return doubleLDT.translateLiteral(lit);
         } else {
             Debug.fail("Unknown literal type", lit);                 
             return null;
         }
     }
+    
 
     public static boolean isArithmeticOperator
 	(de.uka.ilkd.key.java.expression.Operator op) {
@@ -453,6 +430,7 @@ public class TypeConverter extends TermBuilder {
 	return false;
     }
 
+    
     /**
      * performs binary numeric promotion on the argument types
      */
@@ -511,16 +489,16 @@ public class TypeConverter extends TermBuilder {
 
 
     public KeYJavaType getBooleanType() {
-	return booleanLDT.getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
+	return booleanLDT.getKeYJavaType();
     }
 
+    
     public Sort getPrimitiveSort(Type t) {
 	LDT result = getModelFor(t);
-
-	Debug.out("LDT found", t, result);
         return (result == null ? null : result.targetSort());
     }
 
+    
     /** 
      * Retrieves the static type of the expression. This method may only be called
      * if the expressions type can be determined without knowledge of context 
@@ -535,6 +513,7 @@ public class TypeConverter extends TermBuilder {
     public KeYJavaType getKeYJavaType(Expression e){
 	return getKeYJavaType(e, null);
     }
+    
 
     /** 
      * retrieves the type of the expression <tt>e</tt> with respect to 
@@ -586,6 +565,7 @@ public class TypeConverter extends TermBuilder {
 				   +" "+term.op().getClass());
     }
 
+    
     public KeYJavaType getKeYJavaType(Term t) {	
         if (t.sort() instanceof ObjectSort) {
 	    return services.getJavaInfo().getKeYJavaType(t.sort());
@@ -599,12 +579,13 @@ public class TypeConverter extends TermBuilder {
 	return result;
     }
 
+    
     public KeYJavaType getKeYJavaType(Type t) {        
 	if ( t instanceof KeYJavaType )
 	    return (KeYJavaType)t;
 	final LDT model = getModelFor(t);
 	if (model != null) {
-	    return model.getKeYJavaType(t);
+	    return model.getKeYJavaType();
 	} else {
 	    Debug.out("javainfo: no predefined model for type ",t);
 	    return null;
@@ -613,7 +594,6 @@ public class TypeConverter extends TermBuilder {
 
 
     /** These methods are taken from recoder (and modified) */
-
     public boolean isWidening(PrimitiveType from, PrimitiveType to) {
 	// we do not handle null's
 	if (from == null || to == null) return false;
@@ -644,10 +624,12 @@ public class TypeConverter extends TermBuilder {
 		to == PrimitiveType.JAVA_SHORT);
     }
 
+    
     public boolean isWidening(ClassType from, ClassType to) {
 	return isWidening ( getKeYJavaType ( from ),
 			    getKeYJavaType ( to   ) );
     }
+    
 
     public boolean isWidening(ArrayType from, ArrayType to) {
 	KeYJavaType toBase   =  to.getBaseType().getKeYJavaType();
@@ -661,6 +643,7 @@ public class TypeConverter extends TermBuilder {
 	}
 	return isWidening(fromBase, toBase);
     }
+    
     
     public boolean isWidening(Type from, Type to) {
 	if ( from instanceof KeYJavaType )
@@ -688,6 +671,7 @@ public class TypeConverter extends TermBuilder {
 	return false;
     }    
 
+    
     // this also handles class types
     public boolean isWidening(KeYJavaType from, KeYJavaType to) {
 	Type a = from.getJavaType ();
@@ -741,16 +725,19 @@ public class TypeConverter extends TermBuilder {
 	return (minValue <= value) && (value <= maxValue);	
     }
 
+    
     public boolean isIdentical ( Type from, Type to ) {
 	from = getKeYJavaType ( from );
 	to   = getKeYJavaType ( to   );
 	return from == to;
     }
 
+    
     public boolean isAssignableTo ( Type from, Type to ) {
 	return isIdentical ( from, to ) || isWidening ( from, to );
     }
 
+    
     public boolean isAssignableTo ( Expression expr, Type to, ExecutionContext ec ) {
 	return
 	    ( to instanceof PrimitiveType &&
@@ -759,6 +746,7 @@ public class TypeConverter extends TermBuilder {
 	    isWidening  ( expr.getKeYJavaType ( getServices (), ec ), to );
     }
 
+    
     // this also handles class types
     public boolean isNarrowing(KeYJavaType from, KeYJavaType to) {
 	Type a = from.getJavaType ();
@@ -778,6 +766,7 @@ public class TypeConverter extends TermBuilder {
 	}
     }
 
+    
     public boolean isNarrowing(PrimitiveType from, PrimitiveType to) {
 	// we do not handle null's
 	if (from == null || to == null) return false;
@@ -821,11 +810,13 @@ public class TypeConverter extends TermBuilder {
 	}
 	return false;
     }
+    
 
     public boolean isNarrowing(ClassType from, ClassType to) {
 	return isNarrowing ( getKeYJavaType ( from ),
 			     getKeYJavaType ( to   ) );
     }
+    
 
     public boolean isNarrowing(ArrayType from, ArrayType to) {
 	KeYJavaType toBase   = to.getBaseType().getKeYJavaType();
@@ -835,6 +826,7 @@ public class TypeConverter extends TermBuilder {
 	    isReferenceType ( fromBase ) &&
 	    isNarrowing(fromBase, toBase);
     }
+    
 
     public boolean isNarrowing(Type from, Type to) {
 	if ( from instanceof KeYJavaType )
@@ -859,6 +851,7 @@ public class TypeConverter extends TermBuilder {
 	return false;
     }
 
+    
     public boolean isCastingTo ( Type from, Type to ) {
 	// there is currently no interface handling
 
@@ -879,6 +872,7 @@ public class TypeConverter extends TermBuilder {
 	return isNarrowing ( from, to );
     }
 
+    
     public boolean isArithmeticType ( Type t ) {
 	if ( t instanceof KeYJavaType )
 	    t = ((KeYJavaType)t).getJavaType ();
@@ -892,6 +886,7 @@ public class TypeConverter extends TermBuilder {
 	    t == PrimitiveType.JAVA_DOUBLE;
     }
 
+    
     public boolean isIntegralType ( Type t ) {
 	if ( t instanceof KeYJavaType )
 	    t = ((KeYJavaType)t).getJavaType ();
@@ -903,6 +898,7 @@ public class TypeConverter extends TermBuilder {
 	    t == PrimitiveType.JAVA_LONG;
     }
 
+    
     public boolean isReferenceType ( Type t ) {
 	if ( t instanceof KeYJavaType )
 	    t = ((KeYJavaType)t).getJavaType ();
@@ -912,6 +908,7 @@ public class TypeConverter extends TermBuilder {
 	    ( t instanceof ClassType && !( t instanceof NullType ) ) ||
 	    t instanceof ArrayType;
     }
+    
 
     public boolean isNullType ( Type t ) {
 	if ( t instanceof KeYJavaType )
@@ -919,6 +916,7 @@ public class TypeConverter extends TermBuilder {
 	return
 	    t == NullType.JAVA_NULL;
     }
+    
 
     public boolean isBooleanType ( Type t ) {
 	if ( t instanceof KeYJavaType )
@@ -926,11 +924,11 @@ public class TypeConverter extends TermBuilder {
 	return
 	    t == PrimitiveType.JAVA_BOOLEAN;
     }
+    
 
     public TypeConverter copy(Services services) {
 	final TypeConverter tc = new TypeConverter(services);
 	tc.init(models);
 	return tc;
     }
- 
 }

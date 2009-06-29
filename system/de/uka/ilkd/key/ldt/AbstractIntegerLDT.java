@@ -7,7 +7,7 @@
 // See LICENSE.TXT for details.
 //
 //
-package de.uka.ilkd.key.logic.ldt;
+package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -24,6 +24,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -129,11 +130,10 @@ public abstract class AbstractIntegerLDT extends LDT {
     //constructors
     //-------------------------------------------------------------------------
 
-    protected AbstractIntegerLDT(Name name, 
-	    			 Namespace sorts, 
-	    			 Namespace functions, 
-	    			 Type javaType) {
-	super(name, sorts, javaType);
+    protected AbstractIntegerLDT(Sort sort,  
+	    			 Type javaType,
+	    			 Namespace functions) {
+	super(sort, javaType);
 
         //initialise caches for function symbols from integerHeader.key 
         sharp               = addFunction(functions, "#");
@@ -280,51 +280,21 @@ public abstract class AbstractIntegerLDT extends LDT {
 
     
     public abstract Function getSub();
-    
-    
     public abstract Function getMul();
-    
-    
     public abstract Function getDiv();
-    
-    
     public abstract Function getMod();
-    
-    public abstract Function getShiftLeft();    
-    
+    public abstract Function getShiftLeft();        
     public abstract Function getShiftRight();
-    
-        
     public abstract Function getUnsignedShiftRight();
-    
-    
     public abstract Function getBitwiseOr();
-    
-    
     public abstract Function getBitwiseAnd();
-    
-    
     public abstract Function getBitwiseXor();
-    
-    
     public abstract Function getBitwiseNegation();
-    
-    
     public abstract Function getCast();
-    
-    
     public abstract Function getLessThan();
-    
-    
     public abstract Function getGreaterThan();
-    
-    
     public abstract Function getGreaterOrEquals();
-    
-    
     public abstract Function getLessOrEquals();
-    
-    
     public abstract Function getInBounds();    
     
 
@@ -332,6 +302,7 @@ public abstract class AbstractIntegerLDT extends LDT {
      * null if no function is found for the given operator
      * @return  the function symbol for the given operation 
     */
+    @Override
     public Function getFunctionFor
         (de.uka.ilkd.key.java.expression.Operator op, 
                 Services serv, ExecutionContext ec) {
@@ -378,15 +349,8 @@ public abstract class AbstractIntegerLDT extends LDT {
         }
     }
     
-    
-    /** returns true if the LDT offers an operation for the given java
-     * operator and the logic subterms 
-     * @param op the de.uka.ilkd.key.java.expression.Operator to
-     * translate
-     * @param subs the logic subterms of the java operator
-     * @return  true if the LDT offers an operation for the given java
-     * operator and the subterms 
-     */
+
+    @Override
     public boolean isResponsible(Operator op, Term[] subs, Services services, ExecutionContext ec) {
         if (subs.length == 1) {
             return isResponsible(op, subs[0], services, ec);
@@ -397,15 +361,8 @@ public abstract class AbstractIntegerLDT extends LDT {
     }
     
 
-    /** returns true if the LDT offers an operation for the given
-     * binary java operator and the logic subterms 
-     * @param op the de.uka.ilkd.key.java.expression.Operator to
-     * translate
-     * @param left the left subterm of the java operator
-     * @param right the right subterm of the java operator
-     * @return  true if the LDT offers an operation for the given java
-     * operator and the subterms 
-     */
+
+    @Override
     public boolean isResponsible(Operator op, Term left, Term right, 
             Services services, ExecutionContext ec) {
         if (left!=null && left.sort().extendsTrans(targetSort()) 
@@ -418,14 +375,7 @@ public abstract class AbstractIntegerLDT extends LDT {
     }
     
     
-    /** returns true if the LDT offers an operation for the given
-     * unary java operator and the logic subterms 
-     * @param op the de.uka.ilkd.key.java.expression.Operator to
-     * translate
-     * @param sub the logic subterms of the java operator
-     * @return  true if the LDT offers an operation for the given java
-     * operator and the subterm
-     */
+    @Override
     public boolean isResponsible(Operator op, Term sub, Services services, ExecutionContext ec) {
         if (sub != null && sub.sort().extendsTrans(targetSort())) {
             if (op instanceof Negative) {
@@ -436,12 +386,8 @@ public abstract class AbstractIntegerLDT extends LDT {
     }
     
 
-    /** translates a given integer literal to its logic counterpart 
-     * @param lit the Literal to be translated (has to be an
-     * IntLiteral of an LongLiteral
-     * @result the Term that represent the given integer in its logic
-     * form
-     */ 
+
+    @Override
     public Term translateLiteral(Literal lit) {
         int length=0;
         boolean minusFlag = false;
@@ -526,11 +472,13 @@ public abstract class AbstractIntegerLDT extends LDT {
     }
     
     
+    @Override
     public boolean hasLiteralFunction(Function f) {
         return containsFunction(f) && (f.arity()==0 || isNumberLiteral(f));
     }
     
-
+    
+    @Override
     public Expression translateTerm(Term t, ExtList children) {
         if (!containsFunction((Function) t.op())) return null;
         Function f = (Function)t.op();

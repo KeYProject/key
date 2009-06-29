@@ -81,15 +81,13 @@ public class MetaDiv extends AbstractMetaOperator {
 	    BigInteger(convertToDecimalString(arg2, services));
 	if (bigIntArg2.compareTo(new BigInteger("0"))==0) {
 	    Name undefName = new Name("undef("+term+")");
-	    Function undef = (Function)(services.getTypeConverter().getIntegerLDT().
-					functions().lookup(undefName));
+	    Function undef = (Function)services.getNamespaces().functions().lookup(undefName);
 	    if (undef==null) {
 		undef = new RigidFunction(undefName,
 				     services.getTypeConverter().
 				     getIntegerLDT().targetSort(), 
 				     new Sort[0]);
-		services.getTypeConverter().
-		    getIntegerLDT().addFunction(undef);
+		services.getNamespaces().functions().add(undef);
 	    }
 	    return termFactory.createFunctionTerm(undef);
 	}

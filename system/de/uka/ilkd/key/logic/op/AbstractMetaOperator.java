@@ -15,11 +15,11 @@ import java.util.HashMap;
 
 import de.uka.ilkd.key.explicitheap.SameField;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.ldt.LDT;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -205,8 +205,7 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
       	String result = "";
 	boolean neg = false;
 	Operator top = term.op();
-	LDT intModel = services.getTypeConverter().getIntegerLDT();	    
-	Namespace intFunctions = intModel.functions();
+	Namespace intFunctions = services.getNamespaces().functions();
 	Operator numbers = (Operator)intFunctions.lookup(new Name("Z"));
 	Operator base = (Operator)intFunctions.lookup(new Name("#"));
 	Operator minus =(Operator) intFunctions.lookup(new Name("neglit"));
