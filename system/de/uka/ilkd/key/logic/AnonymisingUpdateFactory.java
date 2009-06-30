@@ -82,9 +82,6 @@ public class AnonymisingUpdateFactory {
                 } else {
                     result[0] = kjt.getSort();
                 }
-            } else if(op instanceof ArrayOp) {
-                result[0] = ((ArrayOp)op).arraySort();
-                result[1] = integerSort;
             } else {
                 Debug.fail("Unexpected location operator."+op);
             }
@@ -130,8 +127,7 @@ public class AnonymisingUpdateFactory {
         if (result == null) {
             Name baseName = locTerm.op() instanceof AttributeOp ? 
                     ((AttributeOp) locTerm.op()).attribute().name()
-                    : locTerm.op() instanceof ArrayOp ? new Name("get")
-                            : locTerm.op().name();
+                    : locTerm.op().name();
 
             if (baseName instanceof ProgramElementName) {
                 baseName = new 

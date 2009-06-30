@@ -151,7 +151,7 @@ public class ApplyOnNonRigidWithExplicitDependencies extends AbstractUpdateRule 
         }
 
         result = (updates[0] != null ? UpdateSimplifierTermFactory.DEFAULT.createUpdateTerm(
-                updates[0].getAllAssignmentPairs(), result) : result);                
+                services, updates[0].getAllAssignmentPairs(), result) : result);                
         logExit(result);
         return result;
     }

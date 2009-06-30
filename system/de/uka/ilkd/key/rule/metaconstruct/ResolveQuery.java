@@ -163,7 +163,7 @@ public class ResolveQuery extends AbstractMetaOperator {
 	Term result = tf.createBoxTerm(addJavaBlock, eq1);
 	if (addUpdatesLoc!=null && addUpdatesLoc.length>0) {
 	    addUpdatesTarget = result;
-	    result = tf.createUpdateTerm(addUpdatesLoc, 
+	    result = tf.createUpdateTerm(services, addUpdatesLoc, 
                 addUpdatesVal, addUpdatesTarget);
 	}
 	if (addDecls!=null) {

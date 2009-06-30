@@ -554,13 +554,6 @@ public class QuanUpdateOperator implements IUpdateOperator {
             
             cmpResult = pv1.name ().compareTo ( pv2.name () );
             
-            ////////////////////////////////////////////////////////////////////
-            // beware, ugly HACK ahead:
-            // because different array operators are different, but can still clash,
-            // we must not reorder assignments to arrays
-            if ( pv1 instanceof ArrayOp && pv2 instanceof ArrayOp ) cmpResult = 0;
-            ////////////////////////////////////////////////////////////////////
-            
             if ( cmpResult != 0 ) return cmpResult;
             
             final boolean bPV1 = pv1 instanceof ProgramVariable;

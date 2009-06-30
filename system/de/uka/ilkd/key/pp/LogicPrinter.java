@@ -823,15 +823,6 @@ public class LogicPrinter {
         for (int i = 0;  i<2; i++) {
             maybeParens(t.sub(i), ass[i]);
             layouter.print(arraySep[i]);
-            final Sort arraySortOfOperator = ((ArrayOp)t.op()).arraySort();
-            if (i==1 && t.sub(0).sort() != arraySortOfOperator) {
-                layouter.print("@(");
-                layouter.print(arraySortOfOperator.name().toString());
-                layouter.print(")");
-            }
-        }
-        if (t.op() instanceof ShadowedOperator) {
-            printTransactionNumber(t.sub(2));
         }
     }
 
@@ -1026,7 +1017,7 @@ public class LogicPrinter {
 	HeapLDT heapLDT = services == null ? null : services.getTypeConverter().getHeapLDT();
         if(PresentationFeatures.ENABLED
             && heapLDT != null
-            && t.op() == heapLDT.getSelect()
+            && t.op() == heapLDT.getSelect(Sort.ANY, services)
             && t.sub(0).op() == heapLDT.getHeap()) {
             assert t.arity() == 3;
             startTerm(3);
@@ -1522,10 +1513,11 @@ public class LogicPrinter {
         if ( loc instanceof AttributeOp ) {
             separator[0] = Notation.
                Attribute.printName(((AttributeOp)loc), t.sub(0), this);
-        } else if ( loc instanceof ArrayOp ) {
+        } /*XXX
+          else if ( loc instanceof ArrayOp ) {
             separator[0] = "[";
             separator[1] = "]";
-        } else if ( loc.arity () == 0 ) {
+        } */else if ( loc.arity () == 0 ) {
             layouter.print( loc.name ().toString ().replaceAll ( "::", "." ) );
         } else {
             layouter.print ( loc.name().toString() + "(" );

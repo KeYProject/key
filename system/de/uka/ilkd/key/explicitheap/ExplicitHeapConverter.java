@@ -116,6 +116,7 @@ public class ExplicitHeapConverter {
 	}
     }
     
+        
     
     public Update convert(Update u, Services services) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();	
@@ -165,19 +166,6 @@ public class ExplicitHeapConverter {
         			    TB.func(fieldSymbol),
         			    convert(rhs, services));
         	newRhs = heapTerm;
-            } else if(lhsLoc instanceof ArrayOp) {
-                final Term objectTerm = lhsSubs[0];
-                final Term indexTerm  = lhsSubs[1];
-                
-                newLhsLoc = heapLDT.getHeap();
-                newLhsSubs = new Term[0];
-                heapTerm = TB.store(services, 
-                		    heapTerm, 
-                		    convert(objectTerm, services), 
-                		    TB.func(heapLDT.getArr(), 
-                			    convert(indexTerm, services)), 
-                	            convert(rhs, services));
-                newRhs = heapTerm;
             } else {
                 newLhsLoc  = lhsLoc;
                 newLhsSubs = convert(lhsSubs, services);
@@ -237,15 +225,6 @@ public class ExplicitHeapConverter {
                                               fieldSymbol);
             return TB.tf().createCastTerm((AbstractSort) t.sort(), 
                                           dotTerm);
-        } else if(t.op() instanceof ArrayOp) {
-            final Term objectTerm = t.sub(0);
-            final Term indexTerm  = t.sub(1);
-
-            final Term arrTerm = TB.arr(services, 
-                                        convert(objectTerm, services), 
-                                        convert(indexTerm, services));
-            return TB.tf().createCastTerm((AbstractSort) t.sort(), 
-                                          arrTerm);
         } else if(t.op() == services.getJavaInfo().getInReachableState()){
             return TB.wellFormedHeap(services);
         } else {
@@ -384,28 +363,6 @@ public class ExplicitHeapConverter {
                     return TB.singleton(services, 
                 	    		convert(locTerm.sub(0), services), 
                 	    		TB.func(fieldSymbol));
-                } else {
-                    assert false; //not implemented
-                    return null;
-                }
-            } else if(locTerm.op() instanceof ArrayOp) {
-                if(locTerm.freeVars().isEmpty()) {
-                    return TB.singleton(services, 
-                	    		convert(locTerm.sub(0), services), 
-                	    		TB.func(heapLDT.getArr(),
-                	    			convert(locTerm.sub(1), services)));
-                } else if(locTerm.sub(0).freeVars().isEmpty()){
-                    Term arrTerm = convert(locTerm.sub(0), services);
-                    Term arrLengthTerm 
-                    	= TB.func(getFieldSymbol(services.getJavaInfo()
-                    		                         .getArrayLength(), 
-                    		  services));
-                    assert false;
-                    return null;
-                    /*return TB.setMinus(services, 
-                	               TB.allFields(services, arrTerm),
-                	    	       TB.singleton(services, arrTerm, arrLengthTerm));*/
-                	    		          
                 } else {
                     assert false; //not implemented
                     return null;

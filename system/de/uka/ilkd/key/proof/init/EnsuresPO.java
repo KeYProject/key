@@ -311,7 +311,7 @@ public abstract class EnsuresPO extends AbstractPO {
             locs[i]   = TB.var(formalParVars[i]);
             values[i] = TB.var(parVars[i]);
         }
-        Term updateTerm = TF.createUpdateTerm(locs, values, programTerm);
+        Term updateTerm = TF.createUpdateTerm(services, locs, values, programTerm);
         
         return updateTerm;
     }

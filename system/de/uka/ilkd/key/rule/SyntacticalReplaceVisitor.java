@@ -362,12 +362,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
 		updateLocation(newOps[i], computedLocation, posInStack, 
 			       mop.arity(), true);
 	    } else {
-                if (originalOp instanceof ArrayOp) {
-                    final int posInStack = op.arity() - op.locationSubtermsEnd(i);
-                    newOps[i] = (Location) instantiateArrayOperator((ArrayOp) originalOp, posInStack);
-                } else {
-                    newOps[i] = (Location) instantiateOperator(originalOp);
-                }
+		newOps[i] = (Location) instantiateOperator(originalOp);
 	    }	   
 	    changed = (changed || (newOps[i] != originalOp));
 	}		
@@ -398,24 +393,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
         }
         return op;
     }
-    
-    private ArrayOp instantiateArrayOperator(ArrayOp op, int pos) {       
-        final Sort sortDependingOn = op.getSortDependingOn();
-        final Sort s;
-        if (sortDependingOn == null) {
-            s = peek(pos, op.arity())[0].sort();
-        } else if (sortDependingOn instanceof GenericSort) {
-            s = svInst.getGenericSortInstantiations().
-                getInstantiation((GenericSort) sortDependingOn);
-        } else {
-            return op;
-        }       
-        assert s instanceof ArraySort : "Expected array sort but is " + s;
-        return op instanceof ShadowedOperator ? 
-                ShadowArrayOp.getShadowArrayOp(s) : ArrayOp.getArrayOp(s);        
-
-    }
-    
+        
     private Operator instantiateOperatorSV(OperatorSV op) {
         Operator newOp = (Operator) svInst.getInstantiation(op);
         Debug.assertTrue(newOp != null, "No instantiation found for " + op);
@@ -427,15 +405,10 @@ public class SyntacticalReplaceVisitor extends Visitor {
             return instantiateOperatorSV((OperatorSV) op);
         } else if (op instanceof AttributeOp) {
 	    return instantiateAttributeOperator((AttributeOp)op);
-	} else if (op instanceof ArrayOp) {
-	    return instantiateArrayOperator((ArrayOp)op, 0);
-        } else if (op instanceof SortDependingSymbol) {
+	} else if (op instanceof SortDependingSymbol) {
             return handleSortDependingSymbol(op);
         } else if (op instanceof IUpdateOperator) {        
 	    return instantiateUpdateOperator((IUpdateOperator)op);       
-	} else if (op instanceof NRFunctionWithExplicitDependencies) { 
-	    return instantiateNRFunctionWithExplicitDependencies
-	    	((NRFunctionWithExplicitDependencies)op);
 	} else if (op instanceof SortedSchemaVariable &&
                     ((SortedSchemaVariable)op).isListSV()){
             return op;
@@ -443,42 +416,6 @@ public class SyntacticalReplaceVisitor extends Visitor {
 	    return (Operator)svInst.getInstantiation((SchemaVariable)op);
 	} 
 	return op;
-    }
-
-    /**
-     */
-    private Operator instantiateNRFunctionWithExplicitDependencies
-    	(NRFunctionWithExplicitDependencies nrFunc) {
-        final Location[] locs = new Location[nrFunc.dependencies().size()];
-        final ArrayOfLocation patternDeps = nrFunc.dependencies();
-        boolean instantiationNecessary = false;
-        for (int i = 0; i<locs.length; i++) {
-            Location loc = patternDeps.getLocation(i);            
-            if (loc instanceof SchemaVariable) {                
-                Object o = svInst.getInstantiation((SchemaVariable)loc); 
-                if (o instanceof Term) {
-                    loc =(Location) ((Term)o).op();
-                } else {
-                    Debug.assertTrue(o instanceof Location);
-                    loc = (Location)o;
-                }
-                instantiationNecessary = true;
-            }
-            locs[i] = loc;
-        }
-        
-        if (!instantiationNecessary) return nrFunc;
-        
-        // HACK
-        String name = nrFunc.name().toString();
-        name = name.substring(0, name.indexOf("[")+1);
-        for (int i = 0; i<locs.length; i++) {
-            name += locs[i].name();
-            name += ";";
-        }
-        name += "]";
-        return NRFunctionWithExplicitDependencies.
-        	getSymbol(new Name(name), new ArrayOfLocation(locs));
     }
     
     private ArrayOfQuantifiableVariable[] instantiateBoundVariables(Term visited) {

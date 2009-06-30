@@ -71,12 +71,13 @@ options {
 }
 
 {
-    static final Sort[] AN_ARRAY_OF_SORTS = new Sort[0];
-    static final Term[] AN_ARRAY_OF_TERMS = new Term[0];
+    private static final TermBuilder TB = TermBuilder.DF;
+    private static final Sort[] AN_ARRAY_OF_SORTS = new Sort[0];
+    private static final Term[] AN_ARRAY_OF_TERMS = new Term[0];
 
-    private final static int NORMAL_NONRIGID = 0;
-    private final static int LOCATION_MODIFIER = 1;
-    private final static int HEAP_DEPENDENT = 2;
+    private static final int NORMAL_NONRIGID = 0;
+    private static final int LOCATION_MODIFIER = 1;
+    private static final int HEAP_DEPENDENT = 2;
 
     static HashMap<String, Character> prooflabel2tag = new HashMap<String, Character>(15);
     static {
@@ -816,89 +817,7 @@ options {
         return result;
     }
 
-    public de.uka.ilkd.key.logic.op.Location[] extractLocations(List /*String, KeYJavaType*/ locNames)
-    throws SemanticException {
-        de.uka.ilkd.key.logic.op.Location[] vars = 
-	    new de.uka.ilkd.key.logic.op.Location[locNames.size()];
-        for (int i = 0; i<vars.length; i++) {
-            final String strLocName;
-            if(locNames.get(i) instanceof KeYJavaType) { //array op
-            	strLocName = "[](" + ((KeYJavaType)(locNames.get(i))).getSort().name() + ")";
-            } else {
-	            strLocName = (String)locNames.get(i);
-            }
-            final Name locName = new Name(strLocName);
-            if(isProblemParser()) {
-               vars[i] = (SortedSchemaVariable)
-                   schemaConfig.namespaces().variables().lookup(locName);
-            }
-            if ((vars[i] == null && isProblemParser()) || !isProblemParser()) {
-                if(locNames.get(i) instanceof KeYJavaType) { //array op
-                    Sort componentSort 
-                    		= ((KeYJavaType)(locNames.get(i))).getSort();
-                    Sort objectSort 
-                    		= getJavaInfo().getJavaLangObjectAsSort();
-                    Sort cloneableSort 
-                    		= getJavaInfo().getJavaLangCloneableAsSort();
-                    Sort serializableSort 
-                    		= getJavaInfo().getJavaIoSerializableAsSort();
-                    Sort arraySort 
-                    	= ArraySortImpl.getArraySort(componentSort,
-                    								 objectSort,
-                                                     cloneableSort,
-                                                     serializableSort);
-                    vars[i] = ArrayOp.getArrayOp(arraySort);
-                } else {
-                    Object o = programVariables().lookup(locName);
-                    if (o != null) {
-                        vars[i] = (de.uka.ilkd.key.logic.op.Location) o;
-                    } else {
-                        vars[i] = (de.uka.ilkd.key.logic.op.Location) getAttribute(null, strLocName);
-                    }
-                }
-            }
-        }
-        return vars;
-    }
 
-    public List /*ArrayOfLocation*/ extractPartitionedLocations(List /*List (String, KeYJavaType)*/ locListList)
-    throws SemanticException {
-        List result = new ArrayList();
-        Iterator it = locListList.iterator();
-        while(it.hasNext()) {
-            List locNames = (List) it.next();
-            de.uka.ilkd.key.logic.op.Location[] locs
-                        = extractLocations(locNames);
-            result.add(new de.uka.ilkd.key.logic.op.ArrayOfLocation(locs));
-        }
-        return result;
-    }
-
-    public static String createDependencyName(String name, List dependencyListList) {
-	StringBuffer result = new StringBuffer(name);
-        result.append("[");
-        Iterator it = dependencyListList.iterator();
-        while (it.hasNext()) {
-            List dependencyList = (List) it.next();
-		    Iterator it2 = dependencyList.iterator();
-            while (it2.hasNext()) {
-            	Object dep = it2.next();
-            	if(dep instanceof KeYJavaType) { //array op
-            		result.append("[](" + ((KeYJavaType)dep).getSort().name() + ")");
-            	} else {
-		        	result.append((String) dep);
-            	}
-                result.append(";");
-	    	}
-        	if (it.hasNext()) {
-                result.append("|");
-            }
-        }
-        result.append("]");
-        
-	return result.toString();
-    }
-     
     private LogicVariable bindVar(String id, Sort s) {
         if(isGlobalDeclTermParser())
   	  Debug.fail("bindVar was called in Global Declaration Term parser.");
@@ -2027,26 +1946,12 @@ pred_decl
 {
     Sort[] argSorts;    
     String pred_name;
-    List dependencyListList = null;
     boolean nonRigid = false;
     int location = NORMAL_NONRIGID;
 }
     :
         (NONRIGID {nonRigid=true;}(LBRACKET location = location_ident RBRACKET)?)?
         pred_name = funcpred_name
-        (
-            LBRACKET
-            dependencyListList = dependency_list_list
-            RBRACKET
-            {
-                if (!nonRigid) {
-                    semanticError(pred_name+
-		      ": Predicate declarations with attribute lists must use the '\\nonRigid' modifier");
-                }
-                pred_name = KeYParser.createDependencyName(pred_name,
-                                                           dependencyListList);
-            }
-        )?
         argSorts = arg_sorts[!skip_predicates]
         {
             if (!skip_predicates) {
@@ -2056,24 +1961,17 @@ pred_decl
                     throw new AmbigiousDeclException
                     (pred_name, getFilename(), getLine(), getColumn());
                 } else if (nonRigid) {
-                    if (dependencyListList != null) {
-                        p = NRFunctionWithExplicitDependencies.getSymbol
-                            (predicate, Sort.FORMULA, 
-                             new ArrayOfSort(argSorts),
-                             extractPartitionedLocations(dependencyListList));
-                    } else {
 	        	switch (location) {
-                           case NORMAL_NONRIGID:                         
-                              p = new NonRigidFunction(predicate, Sort.FORMULA, argSorts);                           
-                              break;
-                           case LOCATION_MODIFIER: 
-                              semanticError("Modifier 'Location' not allowed for non-rigid predicates.");
-                              break;
-                 	  case HEAP_DEPENDENT: p = new NonRigidHeapDependentFunction(predicate, Sort.FORMULA, argSorts);      
-                 	      break;
-                 	  default:
-                 	     semanticError("Unknown modifier used in declaration of non-rigid predicate "+predicate);
-                 	}
+	                   case NORMAL_NONRIGID:                         
+	                      p = new NonRigidFunction(predicate, Sort.FORMULA, argSorts);                           
+	                      break;
+	                   case LOCATION_MODIFIER: 
+	                      semanticError("Modifier 'Location' not allowed for non-rigid predicates.");
+	                      break;
+	         	  case HEAP_DEPENDENT: p = new NonRigidHeapDependentFunction(predicate, Sort.FORMULA, argSorts);      
+	         	      break;
+	         	  default:
+	         	     semanticError("Unknown modifier used in declaration of non-rigid predicate "+predicate);
                     }
 
                 } else {
@@ -2129,7 +2027,6 @@ func_decl
     Sort[] argSorts;
     Sort retSort;
     String func_name;
-    List dependencyListList = null;
     boolean unique = false;
     String id = null;
 }
@@ -2206,30 +2103,6 @@ func_decls
     }
     ;
 
-dependency_list_list returns [List dependencyListList = new LinkedList()]
-{
-    List dependencyList;
-}
-    :
-        dependencyList = dependency_list {dependencyListList.add(dependencyList);}
-        (OR dependencyList = dependency_list {dependencyListList.add(dependencyList);})*
-    ;
-
-dependency_list returns [List dependencyList = new LinkedList()]
-{
-    String attribute;
-    KeYJavaType componentType;
-}
-    :
-        (
-            (
-                (attribute = attrid) {dependencyList.add(attribute);}
-            |
-                (componentType = arrayopid) {dependencyList.add(componentType);}
-            )
-            SEMI
-        )+
-    ;
 
 arrayopid returns [KeYJavaType componentType = null]
     :
@@ -3073,7 +2946,6 @@ array_access_suffix [Term arrayReference] returns [Term result = arrayReference]
     Term shadowNumber = null;
     Term rangeFrom = null;
     Term rangeTo   = null;     
-    Sort arraySort = null;
 }
 	:
   	LBRACKET 
@@ -3088,21 +2960,8 @@ array_access_suffix [Term arrayReference] returns [Term result = arrayReference]
 	        ((DOTRANGE) => DOTRANGE rangeTo = logicTermReEntry
 		                 {rangeFrom = indexTerm;})?
     )
-    RBRACKET (AT LPAREN arraySort = any_sortId_check[true] RPAREN)? ( shadowNumber = transactionNumber )? 
-    {
-       if (arraySort == null) {
-       	if ( inSchemaMode() ) {
-          if ( parsingFind ) {
-		semanticError("Array operators occuring in the focus term must be fully qualified"+
-			      " (e.g. a[i]@(int[]).");
-          }
-          arraySort = result.sort(); 
-       	} else {
-       	  arraySort = result.sort();	
-       	}
-       }
-       
-       
+    RBRACKET ( shadowNumber = transactionNumber )? 
+    {       
 	if(rangeTo != null) {
 		if(quantifiedArrayGuard == null) {
 			semanticError(
@@ -3121,11 +2980,10 @@ array_access_suffix [Term arrayReference] returns [Term result = arrayReference]
 		   						  guardTerm);
 		}
         if (shadowNumber != null) {
-            result = tf.createShadowArrayTerm
-                      (ShadowArrayOp.getShadowArrayOp(arraySort), result, indexTerm, 
-                       shadowNumber);
+            //Shadowing unsupported...
+            result = TB.array(getServices(), result, indexTerm);
         } else {
-            result = tf.createArrayTerm(ArrayOp.getArrayOp(arraySort), result, indexTerm);
+            result = TB.array(getServices(), result, indexTerm); 
         }  
     }            
     ;exception
@@ -3407,7 +3265,7 @@ simple_updateterm returns [Term a = null]
 :
   LBRACE v = varId ASSIGN a1=term RBRACE ( a2 = term110 | a2 = unary_formula )
   { 
-	a = tf.createUpdateTerm ( tf.createVariableTerm ( (ProgramVariable) v ), a1, a2 );
+	a = tf.createUpdateTerm ( getServices(), tf.createVariableTerm ( (ProgramVariable) v ), a1, a2 );
   }
 ;
 
@@ -3449,7 +3307,7 @@ updateterm returns [Term result = null]
         {   
 
             result = tf.createQuanUpdateTerm
-		((ArrayOfQuantifiableVariable[])boundVars.toArray
+		(getServices(), (ArrayOfQuantifiableVariable[])boundVars.toArray
                      (new ArrayOfQuantifiableVariable[boundVars.size()]),
 		 (Term[])guards.toArray(new Term[guards.size()]),
 		 (Term[])locations.toArray(new Term[locations.size()]),
@@ -3577,10 +3435,11 @@ lhsSingle returns[Term result = null]
  :
         result = logicTermReEntry
         { 
-            if (!(result.sort() instanceof ProgramSVSort ||
-                  result.op() instanceof de.uka.ilkd.key.logic.op.Location))  {
-                semanticError("Only locations can be updated, but " + 
-                	result.op() + " is no location, but a " + 
+            if (!(result.sort() instanceof ProgramSVSort 
+                  || result.op() instanceof de.uka.ilkd.key.logic.op.Location
+                  || getServices().getTypeConverter().getHeapLDT().getSortOfSelect(result.op()) != null))  {
+                semanticError("Only locations and select-terms can be updated, but " + 
+                	result.op() + " is a " + 
                 	result.op().getClass().getName());
             }
         }
@@ -3668,7 +3527,6 @@ argument_list returns [PairOfTermArrayAndBoundVarsArray ts = null]
 
 funcpredvarterm returns [Term a = null]
 {
-    List dependencyListList = null;
     PairOfTermArrayAndBoundVarsArray argsWithBoundVars = null;
     String varfuncid;
     String neg = "";
@@ -3695,18 +3553,6 @@ funcpredvarterm returns [Term a = null]
         { a = toZNotation(neg+number.getText(), functions(), tf);}    
     | AT a = abbreviation
     | varfuncid = funcpred_name 
-        (   (LBRACKET dependency_list_list RBRACKET) =>
-            (
-                LBRACKET
-                dependencyListList = dependency_list_list
-                RBRACKET
-                {
-                    varfuncid
-                        = KeYParser.createDependencyName(varfuncid,
-                                                         dependencyListList);
-                }
-            )
-        )?
         
 	((LPAREN)=>argsWithBoundVars = argument_list)? 
         //argsWithBoundVars==null indicates no argument list

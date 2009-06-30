@@ -308,7 +308,8 @@ public final class TypeConverter {
             index[i] = 
                 convertToLogicElement(ar.getDimensionExpressions().getExpression(i), ec);
         }
-        return TB.tf().createArrayTerm(ArrayOp.getArrayOp(t.sort()), t, index);
+        assert index.length == 1 : "multi-dimensional arrays not implemented";
+        return TB.array(services, t, index[0]);
     }
 
     private Term convertToInstanceofTerm(Instanceof io, 

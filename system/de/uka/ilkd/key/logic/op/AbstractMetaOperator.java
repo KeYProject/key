@@ -59,9 +59,6 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     /** general access to nonstatic fields in classes */
     public static final AbstractMetaOperator META_FIELDREF = new MetaFieldReference(); 
 
-    /** the shadow operator for transactions */
-    public static final AbstractMetaOperator META_SHADOW = new MetaShadow();
-
     /** used to add integers */
     public static final AbstractMetaOperator META_ADD = new MetaAdd();
 
@@ -123,8 +120,6 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     
     public static final AbstractMetaOperator ENUM_CONSTANT_VALUE = new EnumConstantValue();
     
-    public static final AbstractMetaOperator UNIVERSES = new Universes();
-
     public static final AbstractMetaOperator DIVIDE_MONOMIALS = new DivideMonomials ();
 
     public static final AbstractMetaOperator DIVIDE_LCR_MONOMIALS = new DivideLCRMonomials ();
@@ -137,13 +132,7 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     public static final AbstractMetaOperator AT_PRE_EQUATIONS = new AtPreEquations();
     
     public static final AbstractMetaOperator LOCATION_DEPENDENT_FUNCTION = new LocationDependentFunction();
-    
-    /** metaconstructs for OCL simplification */
-    public static final AbstractMetaOperator METAALLSUBTYPES = new MetaAllSubtypes();
-    
-    /** metaconstruct for the updateCut rule*/
-    public static final AbstractMetaOperator METAEQUALUPDATES = new MetaEquivalentUpdates();
-
+        
     /** metaconstruct for strictly pure method calls */
     public static final AbstractMetaOperator META_METHOD_CALL_TO_UPDATE= new MethodCallToUpdate();
     

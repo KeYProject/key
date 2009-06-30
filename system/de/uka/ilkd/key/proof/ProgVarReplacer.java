@@ -326,7 +326,7 @@ public class ProgVarReplacer {
         
         if (changed) {
             result = TermFactory.DEFAULT.createQuanUpdateTerm
-            (qvars, guards, locs, vals, target);
+            (services, qvars, guards, locs, vals, target);
         }        
         
         return result; 

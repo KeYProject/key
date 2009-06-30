@@ -51,6 +51,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 public class EnhancedForInvRule extends AbstractMetaOperator {
 
     private static final boolean FORMALPARAM_AS_STATEMENT = false;
+    private static final TermBuilder TB = TermBuilder.DF;    
 
     /*
      * list of breaks that lead to abrupt termination of the loop to be
@@ -78,8 +79,6 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
      * the services provided at init()
      */
     private Services services;
-    
-    private TermBuilder tb = new TermBuilder();
 
     /**
      * the for loop under inspection
@@ -389,10 +388,10 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
         } else {
             // OR add the formal parameter declaration as an update
 
-            Term arrayAccess = tb.array(arrayvar, counter);
+            Term arrayAccess = TB.array(services, arrayvar, counter);
             ProgramVariable var =
                     (ProgramVariable) formalParam.getProgramVariable();
-            return tf.createUpdateTerm(tb.var(var), arrayAccess, resultTerm);
+            return tf.createUpdateTerm(services, TB.var(var), arrayAccess, resultTerm);
         }
 
     }
@@ -651,5 +650,4 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
         return JavaBlock.createJavaBlock((StatementBlock) replaceWhile.result());
 
     }
-
 }

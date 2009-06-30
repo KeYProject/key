@@ -13,6 +13,8 @@ package de.uka.ilkd.key.logic;
 
 import java.util.*;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.rule.ListOfUpdatePair;
@@ -107,120 +109,6 @@ public class TermFactory {
 
     private static final Term[] NO_SUBTERMS = new Term[0];
 
-    /** creates t[index] with top operand op
-     */
-    public Term createArrayTerm(ArrayOp op, Term t, Term index){
-	if (op==null) {
-            throw new IllegalArgumentException("null-Operator at"+                    
-							 "TermFactory");
-        }      
-        return OpTerm.createBinaryOpTerm(op, t, index).checked();
-    }
-
-
-    /** 
-     * creates a term representing a shadowed array access on the
-     * <code>index</code>-th component of <code>t</code>
-     * @param op the ShadowArrayOp used to access "shadowed memory
-     * areas"
-     * @param t the Term representing the array whose
-     * <code>index</code> component is accessed
-     * @param index the Term describing the index of the array
-     * component to be accessed
-     * @param shadownum the Term describing the nested scope of
-     * shadowed access
-     * @returns the term representing a shadowed array access on the
-     * <code>index</code> component of <code>t</code> with a shadow
-     * depth of <code>shadownum</code>
-     */
-    public Term createShadowArrayTerm(ShadowArrayOp op, Term t, Term index, Term shadownum){
-	if (op==null) {
-	    throw new IllegalArgumentException("Creation of a shadowed array access term" +
-                        "failed due to missing operator."); 
-	}
-	return OpTerm.createOpTerm(op, new Term[]{t, index, shadownum}).checked();
-    }
-
-    /** 
-     * creates a term representing a shadowed access on a multi
-     * dimensional array. The exact component is specified by the
-     * array of indices.
-     * @param op the ShadowArrayOp used to access "shadowed memory
-     * areas"
-     * @param t the Term representing the array whose
-     * <code>index</code> component is accessed
-     * @param index an array of Term specifying the array component to
-     * be accessed
-     * @param shadownum the Term describing the nested scope of
-     * shadowed access
-     * @returns the term representing a shadowed array access on the
-     * specified component of <code>t</code> with a shadow
-     * depth of <code>shadownum</code>
-     */
-    public Term createShadowArrayTerm(ShadowArrayOp op, Term t, Term[] index, Term shadownum){
-	if (op==null) {
-	    throw new IllegalArgumentException("null-Operator at TermFactory"); 
-	}
-        final Term[] t1 = new Term[3];
-        t1[0] = t;
-        
-        for(int i=0;i<index.length;i++){
-	    t1[1] = index[i];
-	    t1[2] = shadownum;
-	    t1[0] = OpTerm.createOpTerm(op, t1).checked();
-	}
-	
-        return t1[0];
-    }
-	
-    /** 
-     * creates a term representing an array access on the
-     * <code>index</code>-th component of <code>t</code> 
-     * @param op the ArrayOp used to access an array of type of
-     * <code>t</code>
-     * @param t the Term representing the array to be accessed
-     * @param index the Term describing the index of the array
-     * component to be accessed
-     */
-    public Term createArrayTerm(ArrayOp op, Term t, Term[] index){
-	if (op == null) {
-	    throw new IllegalArgumentException("null-Operator at TermFactory"); 
-	}
-        Term array = t;
-        for(int i=0;i<index.length;i++){
-	    final Term idx = index[i];
-	    array = OpTerm.createBinaryOpTerm(op, array, idx).checked();
-	}
-	return array;
-    }
-
-    /**
-     * @param arrayOp the shadowed or normal version of the array
-     * access operator 
-     * @param subs array of subterms
-     * @return the term representing an array access
-     */
-    public Term createArrayTerm(ArrayOp arrayOp, Term[] subs) {
-       if (arrayOp==null) {
-           throw new IllegalArgumentException
-               ("null-Operator at TermFactory");
-       }       
-       Term arrayTerm;
-       if (subs.length == 2) {
-           // we cache only the most common case
-           final CacheKey key = new CacheKey(arrayOp, subs[0], subs[1]);
-           arrayTerm = cache.get(key);
-           if (arrayTerm == null) {
-               arrayTerm = OpTerm.createOpTerm(arrayOp, subs).checked();
-               cache.put(key, arrayTerm);
-           }
-           
-       } else {
-           arrayTerm = OpTerm.createOpTerm(arrayOp, subs).checked();
-       }
- 
-       return arrayTerm;
-    }
 
     
     public Term createAttributeTerm(AttributeOp op, Term term) {
@@ -685,8 +573,6 @@ public class TermFactory {
 						 subTerms[0], subTerms[1]);
 	    } else if (op instanceof AttributeOp) {
 		return createAttributeTerm((AttributeOp)op, subTerms[0]);
-	    } else if (op instanceof ArrayOp) {
-		return createArrayTerm((ArrayOp)op, subTerms);
 	    } else {
 		Debug.fail("Unknown access operator" + op);
 		return null;
@@ -786,8 +672,8 @@ public class TermFactory {
      * @param target the Term on which the update is applied
      * @return the update term described above
      */
-    public Term createUpdateTerm(Term loc, Term value, Term target) {
-        return createUpdateTerm(new Term[] {loc}, new Term[] {value}, target);
+    public Term createUpdateTerm(Services services, Term loc, Term value, Term target) {
+        return createUpdateTerm(services, new Term[] {loc}, new Term[] {value}, target);
     }
     
    
@@ -801,7 +687,8 @@ public class TermFactory {
      * @param target the Term on which the update is applied to
      * @return the update term as described above
      */
-    public Term createUpdateTerm(Term[] locs, 
+    public Term createUpdateTerm(Services services,
+	    			 Term[] locs, 
                                  Term[] values,
                                  Term target) {
         final ArrayOfQuantifiableVariable[] boundVars =
@@ -810,7 +697,7 @@ public class TermFactory {
         final Term[] guards = new Term [locs.length];
         Arrays.fill ( guards, createJunctorTerm ( Op.TRUE ) );
         
-        return createQuanUpdateTerm ( boundVars, guards, locs, values, target );
+        return createQuanUpdateTerm ( services, boundVars, guards, locs, values, target );
     }
 
     public Term createUpdateTerm(UpdatePair pair, 
@@ -904,12 +791,36 @@ public class TermFactory {
      *            the Term on which the update is applied to
      * @return the update term as described above
      */
-    public Term createQuanUpdateTerm (ArrayOfQuantifiableVariable[] boundVars,
+    public Term createQuanUpdateTerm (Services services,
+	    			      ArrayOfQuantifiableVariable[] boundVars,
 				      Term[] guards,
 				      Term[] locs,
 				      Term[] values,
 				      Term target) {
-        
+	//XXX
+        TermBuilder TB = TermBuilder.DF;
+        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        for(int i = 0; i < locs.length; i++) {
+            final Term loc = locs[i];
+            final Term value = values[i];
+
+            Sort sortOfSelect = heapLDT.getSortOfSelect(loc.op());
+            if(sortOfSelect != null) {
+        	final Term heapTerm = loc.sub(0);
+        	assert heapTerm.equals(TB.heap(services));
+                final Term objectTerm = loc.sub(1);
+                final Term fieldTerm = loc.sub(2);
+                
+                locs[i]   = TB.heap(services);
+                values[i] = TB.store(services, 
+                		     TB.heap(services), 
+                		     objectTerm, 
+                		     fieldTerm, 
+                		     value);
+            }
+        }
+	
+	
         return QuanUpdateOperator
             .normalize ( boundVars, guards, locs, values, target );
     }

@@ -92,7 +92,7 @@ public class ApplyAnonymousUpdateOnNonRigid extends AbstractUpdateRule {
 	// add anonymous update in front of the term
 
 	result = UpdateSimplifierTermFactory.DEFAULT.
-	    createUpdateTerm(update.getAllAssignmentPairs(), result);
+	    createUpdateTerm(services, update.getAllAssignmentPairs(), result);
 
 	logExit(result);
 	return result;

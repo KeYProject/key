@@ -211,8 +211,6 @@ GENERATED_LISTS=logic/SLListOfTerm \
 	speclang/translation/SLListOfSLExpressionResolver \
 	speclang/SLListOfPositionedString \
         speclang/jml/pretranslation/SLListOfTextualJMLConstruct \
-        rule/encapsulation/SLListOfTypeSchemeTerm \
-        rule/encapsulation/SLListOfTypeSchemeConstraint \
 	ldt/SLListOfLDT \
         rule/metaconstruct/arith/SLListOfMonomial \
 	strategy/feature/instantiator/SLListOfCPBranch \
@@ -236,8 +234,6 @@ GENERATED_SETS=logic/SetAsListOfTerm collection/SetAsListOfString \
 	logic/op/SetAsListOfMetavariable \
 	logic/SetAsListOfChoice \
 	logic/SetAsListOfNamed \
-	rule/encapsulation/SetAsListOfTypeScheme \
-        rule/encapsulation/SetAsListOfTypeSchemeVariable \
 	logic/SetAsListOfLocationDescriptor \
         logic/op/SetAsListOfLogicVariable \
         proof/SetAsListOfGoalChooserBuilder \

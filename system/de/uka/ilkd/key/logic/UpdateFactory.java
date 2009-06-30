@@ -82,7 +82,7 @@ public class UpdateFactory {
      */
     public Term prepend(Update update, Term target) {
         return UpdateSimplifierTermFactory.DEFAULT
-               .createUpdateTerm ( update.getAllAssignmentPairs (), target );
+               .createUpdateTerm ( services, update.getAllAssignmentPairs (), target );
     }
     
     /**

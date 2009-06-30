@@ -49,7 +49,7 @@ options {
 }
 
 {
-    private static final TermBuilder tb = TermBuilder.DF;
+    private static final TermBuilder TB = TermBuilder.DF;
     private static final AtPreFactory APF = AtPreFactory.INSTANCE;
 
     private Services services;
@@ -220,7 +220,7 @@ options {
 	// Build appropriate term out of the parsed list of types
 	// i.e. disjunction of "excVar instanceof ExcType"
 	// for every ExcType in the list
-	Term result = tb.ff();
+	Term result = TB.ff();
 
 	IteratorOfKeYJavaType it = signalsonly.iterator();
 	while (it.hasNext()) {
@@ -228,9 +228,9 @@ options {
 	    SortDefiningSymbols os = (SortDefiningSymbols)(kjt.getSort());
 		Function instance
 			= (InstanceofSymbol) os.lookupSymbol(InstanceofSymbol.NAME);
-	    result = tb.or( result,
-		tb.equals(
-		    tb.func(instance, tb.var(this.excVar)),
+	    result = TB.or( result,
+		TB.equals(
+		    TB.func(instance, TB.var(this.excVar)),
 		    trueLitTerm));
 	}
 
@@ -324,7 +324,7 @@ options {
 	    vars[i] = term.varsBoundHere(i);
 	}
 	
-	return tb.tf().createTerm(newOp, 
+	return TB.tf().createTerm(newOp, 
 		  		  newSubTerms, 
 				  vars, 
 				  term.javaBlock());
@@ -427,7 +427,7 @@ options {
     private static Term convertToFormula(Term a) {
 
 	if(a.sort() == boolSort) {
-	    return tb.equals(a,trueLitTerm);
+	    return TB.equals(a,trueLitTerm);
 	}
 
 	return a;
@@ -458,8 +458,8 @@ options {
 	    SortDefiningSymbols os = (SortDefiningSymbols)(typeExpr.getType().getSort());
 	    Function ioFunc = (Function) os.lookupSymbol(ExactInstanceSymbol.NAME);
 	     
-	    return tb.equals(
-		tb.func(ioFunc, typeofExpr.getTypeofTerm()),
+	    return TB.equals(
+		TB.func(ioFunc, typeofExpr.getTypeofTerm()),
 		trueLitTerm);
 	}
 	
@@ -473,9 +473,9 @@ options {
 
 	try {
 	    if(a.sort() != Sort.FORMULA && b.sort() != Sort.FORMULA) {
-		result = tb.equals(a,b);
+		result = TB.equals(a,b);
 	    } else {
-		result = tb.equiv(convertToFormula(a), convertToFormula(b));
+		result = TB.equiv(convertToFormula(a), convertToFormula(b));
 	    }
 	} catch (IllegalArgumentException e) {
 	    try {
@@ -499,7 +499,7 @@ options {
 //     */
 //    private Term buildMaxMinAxiom(boolean maxmin, Function y, ListOfLogicVariable qVars, Term pred, Term body) {
 //
-//	Term result = tb.not(tb.ex(qVars.toArray(), pred));
+//	Term result = TB.not(TB.ex(qVars.toArray(), pred));
 //
 //	ProgramVariable n;
 //	String progVarName;
@@ -522,30 +522,30 @@ options {
 //
 //	n = javaInfo.getAttribute(progVarName, className);
 //
-//	result = tb.and(result,
-//	    tb.equals(
-//		tb.func(y),
-//		tb.var(n)));
+//	result = TB.and(result,
+//	    TB.equals(
+//		TB.func(y),
+//		TB.var(n)));
 //
-//	Term t = tb.func(y);
+//	Term t = TB.func(y);
 //
 //	if (maxmin) {
-//	    t = tb.geq(t,body, services);
+//	    t = TB.geq(t,body, services);
 //	} else {
-//	    t = tb.leq(t,body, services);
+//	    t = TB.leq(t,body, services);
 //	}
 //
-//	t = tb.all(qVars.toArray(), tb.imp(pred,t));
-//	t = tb.and(
+//	t = TB.all(qVars.toArray(), TB.imp(pred,t));
+//	t = TB.and(
 //	    t,
-//	    tb.ex(qVars.toArray(),
-//		tb.and(
+//	    TB.ex(qVars.toArray(),
+//		TB.and(
 //		    pred,
-//		    tb.equals(
+//		    TB.equals(
 //			body,
-//			tb.func(y)))));
+//			TB.func(y)))));
 //
-//	result = tb.or(result, t);
+//	result = TB.or(result, t);
 //
 //	return result;
 //  }
@@ -577,33 +577,33 @@ options {
         	= services.getTypeConverter().getIntegerLDT().targetSort();
         LogicVariable lv 
         	= new LogicVariable(new Name("x"), integerSort);
-	Term lvTerm = tb.var(lv);
+	Term lvTerm = TB.var(lv);
 	Function repos
 		= (Function) ((SortDefiningSymbols) kjt.getSort())
 		             .lookupSymbol(AbstractSort.OBJECT_REPOSITORY_NAME);
-	Term objectTerm = tb.func(repos, lvTerm); 
-	Term guardFma = tb.leq(tb.dot(null, nextToCreate), lvTerm, services); 
+	Term objectTerm = TB.func(repos, lvTerm); 
+	Term guardFma = TB.leq(TB.dot(null, nextToCreate), lvTerm, services); 
 	
 	//<nextToCreate>
-	Term nextToCreateTerm = tb.dot(null, nextToCreate);
+	Term nextToCreateTerm = TB.dot(null, nextToCreate);
 	BasicLocationDescriptor nextToCreateLd
 		= new BasicLocationDescriptor(nextToCreateTerm);
 	result = result.add(nextToCreateLd);
 		
 	//<created>
-	Term createdTerm = tb.dot(objectTerm, createdAttribute);
+	Term createdTerm = TB.dot(objectTerm, createdAttribute);
 	BasicLocationDescriptor createdLd 
 		= new BasicLocationDescriptor(guardFma, createdTerm);
 	result = result.add(createdLd);
 		
 	//<initialized>
-	Term initializedTerm = tb.dot(objectTerm, initializedAttribute);
+	Term initializedTerm = TB.dot(objectTerm, initializedAttribute);
 	BasicLocationDescriptor initializedLd
 		= new BasicLocationDescriptor(guardFma, initializedTerm);
 	result = result.add(initializedLd); 
 	
 	//<transient>
-	Term transientTerm   = tb.dot(objectTerm, transientAttribute);
+	Term transientTerm   = TB.dot(objectTerm, transientAttribute);
 	BasicLocationDescriptor transientLd
 		= new BasicLocationDescriptor(guardFma, transientTerm);
 	result = result.add(transientLd);
@@ -611,7 +611,7 @@ options {
 	//objectTimesFinalized (a ghost field in java.lang.Object)
 	if(objectTimesFinalizedAttribute != null) {
 	    Term objectTimesFinalizedTerm 
-			     = tb.dot(objectTerm, objectTimesFinalizedAttribute);
+			     = TB.dot(objectTerm, objectTimesFinalizedAttribute);
 	    BasicLocationDescriptor objectTimesFinalizedLd
 		= new BasicLocationDescriptor(guardFma, objectTimesFinalizedTerm);
 	    result = result.add(objectTimesFinalizedLd); 
@@ -630,7 +630,7 @@ options {
                     Field f = it.next();
                     ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
                     if(!pv.isStatic()) {
-                        Term fieldTerm = tb.dot(objectTerm, pv);
+                        Term fieldTerm = TB.dot(objectTerm, pv);
                         BasicLocationDescriptor fieldLd 
                             = new BasicLocationDescriptor(guardFma, fieldTerm);
                         result = result.add(fieldLd);
@@ -642,7 +642,7 @@ options {
 	    assert kjt.getJavaType() instanceof ArrayDeclaration;
 	    
 	    //length
-	    Term lengthTerm = tb.dot(objectTerm, javaInfo.getArrayLength());
+	    Term lengthTerm = TB.dot(objectTerm, javaInfo.getArrayLength());
 	    BasicLocationDescriptor lengthLd
 		= new BasicLocationDescriptor(guardFma, lengthTerm);
 	    result = result.add(lengthLd);
@@ -651,7 +651,7 @@ options {
 	    LogicVariable idxLv 
 	    	= new LogicVariable(new Name("idx"), integerSort);
 	    Term arrTerm 
-	    	= tb.array(objectTerm, tb.var(idxLv));
+	    	= TB.array(services, objectTerm, TB.var(idxLv));
 	    BasicLocationDescriptor arrLd
 	    	= new BasicLocationDescriptor(guardFma, arrTerm);
 	    result = result.add(arrLd);
@@ -666,9 +666,9 @@ options {
     		= javaInfo.getAttribute(
     				ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE, 
     				kjt);
-	Term nextToCreateTerm = tb.dot(null, nextToCreate);
+	Term nextToCreateTerm = TB.dot(null, nextToCreate);
 	Term oldNextToCreateTerm = convertToOld(nextToCreateTerm);
-	return tb.leq(oldNextToCreateTerm, nextToCreateTerm, services);
+	return TB.leq(oldNextToCreateTerm, nextToCreateTerm, services);
     }
 }
 
@@ -746,7 +746,7 @@ storerefname returns [JMLExpression result = null] throws SLTranslationException
     }
     | THIS
     {
-	result = new JMLExpression(tb.var(selfVar));
+	result = new JMLExpression(TB.var(selfVar));
     }
     ;
     
@@ -798,23 +798,23 @@ specarrayrefexpr[JMLExpression receiver] returns [BasicLocationDescriptor result
 	    // those out of bound. This makes proving easier.	    
 	    LogicVariable indexVar = new LogicVariable(new Name("i"), 
 			     services.getTypeConverter().getIntegerLDT().targetSort());
-	    indexTerm = tb.var(indexVar);	
-	    guardTerm = tb.tt();	    
+	    indexTerm = TB.var(indexVar);	
+	    guardTerm = TB.tt();	    
 	} else if (rangeTo != null) {
 	    LogicVariable indexVar = new LogicVariable(new Name("i"), 
 			     services.getTypeConverter().getIntegerLDT().targetSort());
-	    indexTerm = tb.var(indexVar);
-	    guardTerm = tb.and(
-		tb.leq(rangeFrom, indexTerm, services),
-		tb.leq(indexTerm, rangeTo, services)
+	    indexTerm = TB.var(indexVar);
+	    guardTerm = TB.and(
+		TB.leq(rangeFrom, indexTerm, services),
+		TB.leq(indexTerm, rangeTo, services)
 		);
 	} else {
 	    indexTerm = rangeFrom;
-	    guardTerm = tb.tt();
+	    guardTerm = TB.tt();
 	}
  
 	try {
-	    Term resTerm = tb.array(receiver.getTerm(), indexTerm);
+	    Term resTerm = TB.array(services, receiver.getTerm(), indexTerm);
 	    result = new BasicLocationDescriptor(guardTerm, resTerm);
 	} catch (TermCreationException e) {
 	    raiseError(e.getMessage());
@@ -867,7 +867,7 @@ signalsclause returns [Term result=null] throws SLTranslationException
 		resolverManager.popLocalVariablesNamespace();
 	    }
 	    if (result == null) {
-		result = tb.tt();
+		result = TB.tt();
 	    } else {
 		Map /* Operator -> Operator */ replaceMap = new LinkedHashMap();
 		replaceMap.put(eVar, excVar);
@@ -877,8 +877,8 @@ signalsclause returns [Term result=null] throws SLTranslationException
 		Function instance
 		    = (InstanceofSymbol) os.lookupSymbol(InstanceofSymbol.NAME);
 		
-		result = tb.imp(
-		    tb.equals(tb.func(instance, tb.var(excVar)), trueLitTerm),
+		result = TB.imp(
+		    TB.equals(TB.func(instance, TB.var(excVar)), trueLitTerm),
 		    convertToFormula(excVarReplacer.replace(result)));
 	    }
 	}
@@ -936,7 +936,7 @@ conditionalexpr returns [Term result=null] throws SLTranslationException
 	(
 	    QUESTIONMARK a=conditionalexpr COLON b=conditionalexpr
 	    {
-		result = tb.ife(convertToFormula(result),a,b);
+		result = TB.ife(convertToFormula(result),a,b);
 		if(intHelper.isIntegerTerm(result)) {
 		    result = intHelper.castToLDTSort(result, 
 					             services.getTypeConverter()
@@ -962,7 +962,7 @@ equivalenceexpr returns [Term result=null] throws SLTranslationException
 	    ANTIV t=equivalenceexpr
 	    {
 		t = buildEqualityTerm(result,t);
-		result = tb.not(t);
+		result = TB.not(t);
 	    } 
 	    
 	)?
@@ -977,14 +977,14 @@ impliesexpr returns [Term result=null] throws SLTranslationException
 	(
 	    IMPLIES t=impliesnonbackwardexpr
 	    {
-		result = tb.imp(convertToFormula(result),convertToFormula(t));
+		result = TB.imp(convertToFormula(result),convertToFormula(t));
 	    }
 	    
 	  |
 	    (
 		IMPLIESBACKWARD t=logicalorexpr
 		{
-		    result = tb.imp(convertToFormula(t),convertToFormula(result));
+		    result = TB.imp(convertToFormula(t),convertToFormula(result));
 		}
 	    )+
 	)?
@@ -999,7 +999,7 @@ impliesnonbackwardexpr returns [Term result=null] throws SLTranslationException
 	(
 	    IMPLIES t=impliesnonbackwardexpr
 	    {
-		result = tb.imp(convertToFormula(result),convertToFormula(t));
+		result = TB.imp(convertToFormula(result),convertToFormula(t));
 	    }
 	)?
 ;	
@@ -1013,7 +1013,7 @@ logicalorexpr returns [Term result=null] throws SLTranslationException
 	(
 	    LOGICALOR t=logicalorexpr
 	    {
-		result = tb.or(convertToFormula(result), convertToFormula(t));
+		result = TB.or(convertToFormula(result), convertToFormula(t));
 	    }
 	)?
 ;
@@ -1027,7 +1027,7 @@ logicalandexpr returns [Term result=null] throws SLTranslationException
 	(
 	    LOGICALAND t=logicalandexpr
 	    {
-		result = tb.and(convertToFormula(result), convertToFormula(t));
+		result = TB.and(convertToFormula(result), convertToFormula(t));
 	    }
 	)?
 ;
@@ -1045,7 +1045,7 @@ inclusiveorexpr returns [Term result=null] throws SLTranslationException
 	       if(intHelper.isIntegerTerm(result)) {
                    result = intHelper.buildPromotedOrExpression(result,t);
                } else {
-                   result = tb.or(convertToFormula(result), convertToFormula(t));
+                   result = TB.or(convertToFormula(result), convertToFormula(t));
                }
 	    }
 	)?
@@ -1066,8 +1066,8 @@ exclusiveorexpr returns [Term result=null] throws SLTranslationException
                } else {
                    Term resultFormula = convertToFormula(result);
                    Term tFormula = convertToFormula(t);
-                   result = tb.or(tb.and(resultFormula, tb.not(tFormula)), 
-                                  tb.and(tb.not(resultFormula), tFormula));
+                   result = TB.or(TB.and(resultFormula, TB.not(tFormula)), 
+                                  TB.and(TB.not(resultFormula), tFormula));
                }
 	    }
 	)?
@@ -1094,7 +1094,7 @@ andexpr returns [Term result=null] throws SLTranslationException
 	       if(intHelper.isIntegerTerm(result)) {
                    result = intHelper.buildPromotedAndExpression(result,t);
                } else {
-                   result = tb.and(convertToFormula(result), convertToFormula(t));
+                   result = TB.and(convertToFormula(result), convertToFormula(t));
                }
 	    }
 	)?
@@ -1123,7 +1123,7 @@ equalityexpr returns [JMLExpression result=null] throws SLTranslationException
 		    raiseError("Cannot build equality expression between term " +
 			"and type.", ne);
 		}
-		result = new JMLExpression(tb.not(buildEqualityTerm(result, right)));
+		result = new JMLExpression(TB.not(buildEqualityTerm(result, right)));
 	    }
 	    
 	)?
@@ -1187,8 +1187,8 @@ relationalexpr returns [JMLExpression result=null] throws SLTranslationException
 		Function ioFunc = (InstanceofSymbol) os.lookupSymbol(InstanceofSymbol.NAME);
 		
 		result = new JMLExpression(
-		    tb.equals(
-			tb.func(ioFunc, result.getTypeofTerm()),
+		    TB.equals(
+			TB.func(ioFunc, result.getTypeofTerm()),
 			trueLitTerm));
 	    }
 	)?
@@ -1205,7 +1205,7 @@ relationalexpr returns [JMLExpression result=null] throws SLTranslationException
 			if (right == null) {
 			    // instanceof-expression
 			    result = new JMLExpression(
-				tb.func(f, result.getTerm()));
+				TB.func(f, result.getTerm()));
 			} else {
 			    if (right.isType()) {
 			    raiseError("Cannot build relational expression from type " +
@@ -1214,7 +1214,7 @@ relationalexpr returns [JMLExpression result=null] throws SLTranslationException
 			    assert right.isTerm();
 			    
 			    result = new JMLExpression(
-				tb.func(f,result.getTerm(),right.getTerm()));
+				TB.func(f,result.getTerm(),right.getTerm()));
 			}
 		} catch (TermCreationException e) {
 		    raiseError("Error in relational expression.");
@@ -1442,14 +1442,14 @@ unaryexpr returns [JMLExpression result=null] throws SLTranslationException
 		    getIntegerLDT().targetSort())) {
 		      castFunction = ((AbstractIntegerLDT)services.getTypeConverter().
 			getModelFor(type.getSort())).getCast();	
-		    resultTerm = tb.func(castFunction, resultTerm);
+		    resultTerm = TB.func(castFunction, resultTerm);
 		 } 
 		 
 		 castFunction = ((AbstractSort) type.getSort()).getCastSymbol();
 		 
 		 
 		 result = new JMLExpression(
-		     tb.func(castFunction, resultTerm));
+		     TB.func(castFunction, resultTerm));
 	     }
 	}
 ;
@@ -1470,9 +1470,9 @@ unaryexprnotplusminus returns [JMLExpression result=null] throws SLTranslationEx
 	    assert t != null;
 	    
 	    if (t.sort() == Sort.FORMULA) {
-		result = new JMLExpression(tb.not(t));
+		result = new JMLExpression(TB.not(t));
 	    } else if (t.sort() == boolSort) {
-		result = new JMLExpression(tb.not(tb.equals(t,trueLitTerm)));
+		result = new JMLExpression(TB.not(TB.equals(t,trueLitTerm)));
 	    } else {
 		raiseError("Wrong type in not-expression: " + t);
 	    }
@@ -1531,16 +1531,16 @@ primaryexpr returns [JMLExpression result=null] throws SLTranslationException
 :
 	t=constant   { result = new JMLExpression(t); }
     |   id:IDENT     { result = lookupIdentifier(id.getText(), null, null, id); }
-    |   TRUE         { result = new JMLExpression(tb.tt()); }
-    |   FALSE        { result = new JMLExpression(tb.ff()); }
-    |   NULL         { result = new JMLExpression(tb.NULL(services)); }
+    |   TRUE         { result = new JMLExpression(TB.tt()); }
+    |   FALSE        { result = new JMLExpression(TB.ff()); }
+    |   NULL         { result = new JMLExpression(TB.NULL(services)); }
     |   result=jmlprimary 
     |   THIS       
         { 
             if(selfVar == null) {
             	raiseError("Cannot access \"this\" in a static context!"); 
             }
-            result = new JMLExpression(tb.var(selfVar));
+            result = new JMLExpression(TB.var(selfVar));
         }
     |   new_expr
 ;   
@@ -1575,7 +1575,7 @@ primarysuffix[JMLExpression receiver, String fullyQualifiedName] returns [JMLExp
     DOT THIS
     {
     	result = new JMLExpression(services.getTypeConverter().findThisForSort(receiver.getSort(),
-    		tb.var(selfVar), javaInfo.getKeYJavaType(selfVar.sort()), true));
+    		TB.var(selfVar), javaInfo.getKeYJavaType(selfVar.sort()), true));
     }
     |
 	l:LPAREN (callingParameters=expressionlist)? RPAREN
@@ -1606,7 +1606,7 @@ primarysuffix[JMLExpression receiver, String fullyQualifiedName] returns [JMLExp
 	    }
 	    
 	    try {
-		    result = new JMLExpression(tb.array(receiver.getTerm(),t));
+		    result = new JMLExpression(TB.array(services, receiver.getTerm(),t));
 	    } catch (TermCreationException e) {
 		raiseError(e.getMessage());
 	    } catch (IllegalArgumentException e) {
@@ -1675,7 +1675,7 @@ hexintegerliteral returns [Term result=null] throws SLTranslationException
     n:HEXNUMERAL
     {
 	BigInteger decInteger = new BigInteger(n.getText(),16);
-	Term intTerm = tb.zTerm(services,decInteger.toString());
+	Term intTerm = TB.zTerm(services,decInteger.toString());
 	result = intHelper.castToLDTSort(intTerm, 
 					 services.getTypeConverter()
 					         .getIntLDT());
@@ -1691,7 +1691,7 @@ decimalnumeral returns [Term result=null] throws SLTranslationException
 :
     n:DIGITS
     {
-	Term intTerm = tb.zTerm(services,n.getText());
+	Term intTerm = TB.zTerm(services,n.getText());
 	result = intHelper.castToLDTSort(intTerm, 
 					 services.getTypeConverter()
 					     	 .getIntLDT());
@@ -1710,7 +1710,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	    if (resultVar==null) {
 		raiseError("\\result used in wrong context");
 	    }
-	    result = new JMLExpression(tb.var(resultVar));
+	    result = new JMLExpression(TB.var(resultVar));
 	}
     |
 	(LPAREN QUANTIFIER) => t=specquantifiedexpression
@@ -1747,7 +1747,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
     |
 	NONNULLELEMENTS LPAREN t=specexpression RPAREN
 	{
-	    Term resTerm = tb.not(tb.equals(t, tb.NULL(services)));
+	    Term resTerm = TB.not(TB.equals(t, TB.NULL(services)));
 
 	    if (t.sort() instanceof ArraySort) {
 		LogicVariable i = new LogicVariable(new Name("i"), javaInfo
@@ -1756,16 +1756,16 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 
 		// See JML reference manual
 		// http://www.cs.iastate.edu/~leavens/JML/jmlrefman/jmlrefman_11.html#SEC139		
-		Term range = tb.and(
-		    tb.leq(tb.zTerm(services, "0"), tb.var(i), services),
-		    tb.leq(tb.var(i), tb.dot(t,javaInfo.getArrayLength()), services));
-		Term body = tb.equals(
-		    tb.array(t, tb.var(i)),
-		    tb.NULL(services));
-		body = tb.not(body);
-		body = tb.imp(range, body);
+		Term range = TB.and(
+		    TB.leq(TB.zTerm(services, "0"), TB.var(i), services),
+		    TB.leq(TB.var(i), TB.dot(t,javaInfo.getArrayLength()), services));
+		Term body = TB.equals(
+		    TB.array(services, t, TB.var(i)),
+		    TB.NULL(services));
+		body = TB.not(body);
+		body = TB.imp(range, body);
 
-		result = new JMLExpression(tb.and(resTerm, tb.all(i, body)));
+		result = new JMLExpression(TB.and(resTerm, TB.all(i, body)));
 	    }
 	}
 	
@@ -1791,12 +1791,12 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
                 atPreFunctions.put(ao, atPreFunc);
                 assert atPreFunc != null;
 	    }	    
-	    t = tb.tt();
+	    t = TB.tt();
         IteratorOfTerm it = sl.iterator();
         while(it.hasNext()){
             Term n = it.next();
-            Term fn = tb.and(tb.not(tb.equals(n, tb.NULL(services))), tb.equals(tb.func(atPreFunc, n), tb.FALSE(services)));
-            t = tb.and(t, fn);
+            Term fn = TB.and(TB.not(TB.equals(n, TB.NULL(services))), TB.equals(TB.func(atPreFunc, n), TB.FALSE(services)));
+            t = TB.and(t, fn);
         }
         result = new JMLExpression(t);
 	} 
@@ -1843,11 +1843,11 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	
     |   IS_INITIALIZED LPAREN typ=referencetype RPAREN 
 	{
-	    Term resTerm = tb.equals(
-		tb.var(
+	    Term resTerm = TB.equals(
+		TB.var(
 		    javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED, 
 					  typ)),
-		tb.TRUE(services));
+		TB.TRUE(services));
 	    result = new JMLExpression(resTerm);
 	} 
 	
@@ -1887,7 +1887,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 specquantifiedexpression returns [Term result = null] throws SLTranslationException
 {
     Term t = null;
-    Term p = tb.tt();
+    Term p = TB.tt();
     boolean nullable = false;
     ListOfLogicVariable declVars = null;
 }
@@ -1913,35 +1913,35 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	    
 	    //add implicit "non-null" guards for reference types, 
 	    //"in-bounds" guards for integer types
-	    Term nullTerm = tb.NULL(services);
+	    Term nullTerm = TB.NULL(services);
 	    for(IteratorOfLogicVariable it = declVars.iterator(); 
 	        it.hasNext(); ) {
 	        LogicVariable lv = it.next();
 	        
 	    	if(lv.sort() instanceof ObjectSort && !nullable) {
-		    p = tb.and(p, tb.not(tb.equals(tb.var(lv), nullTerm)));
+		    p = TB.and(p, TB.not(TB.equals(TB.var(lv), nullTerm)));
 		} else {
 	    	    LDT ldt 
 	    	    	= services.getTypeConverter().getModelFor(lv.sort());
 		    if(ldt instanceof AbstractIntegerLDT) {
 	    		Function inBounds 
 	    			= ((AbstractIntegerLDT) ldt).getInBounds();
-	    	    	p = tb.and(p, tb.func(inBounds, tb.var(lv)));
+	    	    	p = TB.and(p, TB.func(inBounds, TB.var(lv)));
 	    	    }
 	    	}
 	    }	    
 	    	    
 	    if (q.getText().equals("\\forall")) {
 		if (p != null) {
-		    t = tb.imp(p, t);
+		    t = TB.imp(p, t);
 		}
-		result = tb.all(declVars.toArray(), t);
+		result = TB.all(declVars.toArray(), t);
 	    }
 	    else if (q.getText().equals("\\exists")) {
 		if (p != null) {
-		    t = tb.and(p, t);
+		    t = TB.and(p, t);
 		}
-		result = tb.ex(declVars.toArray(), t);
+		result = TB.ex(declVars.toArray(), t);
 	    }
 	    else if (q.getText().equals("\\min")) {
 	    	raiseNotSupported("\\min");
@@ -1951,7 +1951,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 //		    new Sort[] {});
 //		axiomCollector.collectAxiom(y,
 //		    buildMaxMinAxiom(false, y, declVars, p, t));
-//		result = tb.func(y);
+//		result = TB.func(y);
 //		services.getNamespaces().functions().addSafely(y);
 	    }
 	    else if (q.getText().equals("\\max")) {
@@ -1962,7 +1962,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 //		    new Sort[] {});
 //		axiomCollector.collectAxiom(y,
 //		    buildMaxMinAxiom(true, y, declVars, p, t));
-//		result = tb.func(y);
+//		result = TB.func(y);
 //		services.getNamespaces().functions().addSafely(y);
 	    }
 	    else if (q.getText().equals("\\num_of")) {
@@ -1970,8 +1970,8 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
             p=p.sub(0);
             if(p!=null && isBoundedSum(p, lv) && p.sub(0).op()!=Op.AND){
                 result = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(Op.BSUM, 
-                        lowerBound(p, lv), upperBound(p, lv), tb.ife(
-                                t, tb.zTerm(services, "1"), tb.zTerm(services, "0")),
+                        lowerBound(p, lv), upperBound(p, lv), TB.ife(
+                                t, TB.zTerm(services, "1"), TB.zTerm(services, "0")),
                                 new ArrayOfQuantifiableVariable(lv));                          
             }else{
                 raiseError("only \\num_of expressions of form (\\sum int i; l<=i && i<u; t) are permitted");
@@ -1985,7 +1985,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
             p=p.sub(0);
             if(isBoundedSum(p, lv)){
                 if(p.arity()>0 && p.sub(0).op()==Op.AND){
-                    t = tb.ife(p.sub(1), t, tb.zTerm(services, "0"));
+                    t = TB.ife(p.sub(1), t, TB.zTerm(services, "0"));
                 }
                 result = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(Op.BSUM, 
                         lowerBound(p, lv), upperBound(p, lv), t, new ArrayOfQuantifiableVariable(lv));

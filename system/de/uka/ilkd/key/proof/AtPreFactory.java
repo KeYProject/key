@@ -24,7 +24,6 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.UpdateFactory;
 import de.uka.ilkd.key.logic.op.AccessOp;
 import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.ArrayOp;
 import de.uka.ilkd.key.logic.op.AttributeOp;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -120,13 +119,6 @@ public class AtPreFactory {
             Sort[] argSorts = new Sort[] {selfSort};
             
             return new ArrayOfSort(argSorts);
-        } else if(op instanceof ArrayOp) {
-            ArrayOp aop = (ArrayOp) op;
-            Sort[] argSorts = new Sort[] {aop.arraySort(), 
-                                          services.getTypeConverter()
-                                                  .getIntegerLDT()
-                                                  .targetSort()};
-            return new ArrayOfSort(argSorts);
         } else if(op instanceof ProgramVariable && op.arity() == 0) {
             return new ArrayOfSort();
         } else {
@@ -163,8 +155,6 @@ public class AtPreFactory {
             AttributeOp aop = (AttributeOp) normalOp;
             baseName = ((ProgramVariable)aop.attribute()).getProgramElementName()
                                                          .getProgramName(); 
-        } else if(normalOp instanceof ArrayOp) {
-            baseName = "get";
         } else {
             baseName = normalOp.name() instanceof ProgramElementName
                        ? ((ProgramElementName)normalOp.name()).getProgramName()

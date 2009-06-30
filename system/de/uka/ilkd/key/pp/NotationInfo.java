@@ -199,9 +199,11 @@ public class NotationInfo {
 	tbl.put(AnonymousUpdate.class, new Notation.AnonymousUpdate());
 	tbl.put(ShadowAttributeOp.class, new Notation.ShadowAttribute(121,121));
 	tbl.put(AttributeOp.class, new Notation.Attribute(121,121));
+/*XXX
 	tbl.put(ShadowArrayOp.class, new Notation.ArrayNot
 		(new String[]{"[", "]", ""}, 130, new int[]{121, 0, 0}));
 	tbl.put(ArrayOp.class, new Notation.ArrayNot(new String[]{ "[","]" } ,130, new int[]{121, 0}));
+*/	
 	tbl.put(CastFunctionSymbol.class, new Notation.CastFunction("(",")",120, 140));
 	tbl.put(NRFunctionWithExplicitDependencies.class, 
 		new Notation.NRFunctionWithDependenciesNotation());               

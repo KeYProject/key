@@ -48,7 +48,7 @@ public class ApplyOnNonRigidTerm extends AbstractUpdateRule {
     public Term apply(Update update, Term target, Services services) {       
 	
         return UpdateSimplifierTermFactory.DEFAULT.
-            createUpdateTerm(update.getAllAssignmentPairs(), 
+            createUpdateTerm(services, update.getAllAssignmentPairs(), 
                     updateSimplifier().simplify(target, services));
     }
 

@@ -11,6 +11,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.ArraySort;
+import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -183,14 +186,33 @@ public final class TermBuilder {
         return services.getJavaInfo().getNullTerm();
     }
     
-    public Term array(Term ref, Term idx) {
+    public Term array(Services services, Term ref, Term idx) {
         if (ref == null || idx == null) {
             throw new TermCreationException("Tried to build an array access "+
                     "term without providing an " +
                     (ref==null ? "array reference." : "index.") + 
                     "("+ref+"["+idx+"])");
-        }        
-        return tf.createArrayTerm(ArrayOp.getArrayOp(ref.sort()), ref, idx);
+        }   
+        
+        final Function arr = services.getTypeConverter().getHeapLDT().getArr();        
+        final Sort elementSort;
+        if(ref.sort() instanceof ArraySort) {
+            elementSort = ((ArraySort) ref.sort()).elementSort();
+        } else if(ref.sort() instanceof GenericSort 
+        	  || ref.sort() instanceof ProgramSVSort
+        	  || ref.sort() == AbstractMetaOperator.METASORT) {
+            elementSort = ProgramSVSort.NONSIMPLEEXPRESSION;
+        } else {
+            throw new TermCreationException("Tried to build an array access "+
+                    "on an inacceptable sort: " + ref.sort().getClass() + "\n" +
+                    "("+ref+"["+idx+"])");
+        }
+        
+        return select(services, 
+        	      elementSort, 
+        	      heap(services), 
+        	      ref, 
+        	      func(arr, idx));
     }
     
     public Term dot(Term o, ProgramVariable a) {
@@ -311,8 +333,16 @@ public final class TermBuilder {
         return var(services.getTypeConverter().getHeapLDT().getHeap());
     }
     
+    public Term select(Services services, Sort asSort, Term h, Term o, Term f) {
+	return func(services.getTypeConverter().getHeapLDT().getSelect(
+			asSort, 
+			services), 
+		    new Term[]{h, o, f});
+    }
+
+    //TODO: remove
     public Term select(Services services, Term h, Term o, Term f) {
-        return func(services.getTypeConverter().getHeapLDT().getSelect(), new Term[]{h, o, f});
+        return func(services.getTypeConverter().getHeapLDT().getSelect(Sort.ANY, services), new Term[]{h, o, f});
     }
     
     public Term store(Services services, Term h, Term o, Term f, Term v) {

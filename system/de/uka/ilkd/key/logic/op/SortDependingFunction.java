@@ -72,8 +72,8 @@ public class SortDependingFunction extends RigidFunction
      * @return true iff this and p are instances of the same kind of
      * symbol, but possibly instantiated for different sorts
      */
-    public boolean isSimilar          ( SortDependingSymbol p ) {
-	return getKind ().equals ( p.getKind () );
+    public boolean isSimilar(SortDependingSymbol p) {
+	return getKind().equals(p.getKind());
     }
 
     /**

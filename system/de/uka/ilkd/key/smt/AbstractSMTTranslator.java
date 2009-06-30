@@ -1315,23 +1315,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		}
 	    }
 
-	} else if (op instanceof ArrayOp) {
-	    ArrayOp operation = (ArrayOp) op;
-	    StringBuffer refPrefix = this.translateTerm(operation
-		    .referencePrefix(term), quantifiedVars, services);
-	    StringBuffer loc = this.translateTerm(operation.index(term),
-		    quantifiedVars, services);
-	    ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
-	    subterms.add(refPrefix);
-	    subterms.add(loc);
-
-	    ArrayList<Sort> sorts = new ArrayList<Sort>();
-	    sorts.add(operation.referencePrefix(term).sort());
-	    sorts.add(operation.index(term).sort());
-
-	    this.addFunction(operation, sorts, operation.sort());
-
-	    return translateFunc(operation, subterms);
 	} else if (op instanceof AttributeOp) {
 	    AttributeOp atop = (AttributeOp) op;
 	    ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();

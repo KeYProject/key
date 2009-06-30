@@ -182,7 +182,8 @@ public class InReachableStatePOBuilder {
                         result = arrayLengthIsIRSConform(refPrefix, update);
                     }
                 }
-            } else if (loc instanceof ArrayOp) {
+            } /*XXX
+            else if (loc instanceof ArrayOp) {
                 final Sort elementSort =
                         ((ArraySort) ((ArrayOp) loc).arraySort()).elementSort();
                 if (elementSort instanceof ObjectSort) {
@@ -201,7 +202,7 @@ public class InReachableStatePOBuilder {
 
                     result = TB.all(vPre, TB.imp(preAx, result));
                 }
-            }
+            }*/
             if (result != null) {
                 // take care of quantified updates
                 result = quanUpdateClosure(pair, result);
@@ -764,11 +765,6 @@ public class InReachableStatePOBuilder {
     /** creates an attribute term and takes care of shadowed attributes as well */
     private Term dot(Term[] subs, AttributeOp op) {
         return TB.tf().createAttributeTerm(op, subs);
-    }
-
-    /** creates an array term and takes care of shadowed attributes as well */
-    private Term array(ArrayOp op, Term[] subs) {
-        return TB.tf().createArrayTerm(op, subs);
     }
 
     private Term[] var(LogicVariable[] v) {

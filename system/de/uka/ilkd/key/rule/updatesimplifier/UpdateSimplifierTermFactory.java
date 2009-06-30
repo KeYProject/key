@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BoundVariableTools;
 import de.uka.ilkd.key.logic.ClashFreeSubst;
 import de.uka.ilkd.key.logic.Term;
@@ -102,7 +103,7 @@ public class UpdateSimplifierTermFactory {
      * @param target the term evaluated under the update
      * @return the update term <tt>{l1:=r1,...,ln:=rn}target</tt>
      */
-    public Term createUpdateTerm(ArrayOfAssignmentPair assignmentPairs,
+    public Term createUpdateTerm(Services services, ArrayOfAssignmentPair assignmentPairs,
             Term target) {
 
         if (assignmentPairs.size() == 0) {
@@ -131,7 +132,7 @@ public class UpdateSimplifierTermFactory {
                         assignmentPair.value().op().name(), target);
             }
         }
-        return tf.createQuanUpdateTerm(boundVars, guards, lhss, values, target);
+        return tf.createQuanUpdateTerm(services, boundVars, guards, lhss, values, target);
     }
 
     /**
@@ -143,9 +144,9 @@ public class UpdateSimplifierTermFactory {
      * @param target the term evaluated under the update
      * @return the update term <tt>{l1:=r1,...,ln:=rn}target</tt>
      */
-    public Term createUpdateTerm(AssignmentPair[] update, Term target) 
+    public Term createUpdateTerm(Services services, AssignmentPair[] update, Term target) 
     {
-        return createUpdateTerm(new ArrayOfAssignmentPair(update), 
+        return createUpdateTerm(services, new ArrayOfAssignmentPair(update), 
                 target);
     }
     /**

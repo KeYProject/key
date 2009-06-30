@@ -19,6 +19,8 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -28,7 +30,7 @@ public final class HeapLDT extends LDT {
     private static final Name NAME = new Name("Heap");
     
     private final LocationVariable heap;
-    private final Function select;
+    private final SortDependingFunction select;
     private final Function store;
     private final Function arr;
     private final Function wellFormed;
@@ -39,7 +41,7 @@ public final class HeapLDT extends LDT {
     public HeapLDT(Namespace sorts, Namespace functions, Namespace progVars) {
 	super((Sort)sorts.lookup(NAME), null);
         heap	          = (LocationVariable) progVars.lookup(new Name("heap"));
-        select            = addFunction(functions, "Null::select");
+        select            = (SortDependingFunction) addFunction(functions, "Null::select");
         store             = addFunction(functions, "store");
         arr               = addFunction(functions, "arr");
         wellFormed        = addFunction(functions, "wellFormed");
@@ -53,8 +55,18 @@ public final class HeapLDT extends LDT {
     }
     
     
-    public Function getSelect() {
-	return select;
+    public Function getSelect(Sort instanceSort, Services services) {
+	return (Function) select.getInstanceFor(instanceSort, services);
+    }
+    
+    
+    public Sort getSortOfSelect(Operator op) {
+	if(op instanceof SortDependingFunction 
+           && ((SortDependingFunction)op).isSimilar(select)) {
+	   return ((SortDependingFunction)op).getSortDependingOn(); 
+	} else {
+	    return null;
+	}
     }
     
     

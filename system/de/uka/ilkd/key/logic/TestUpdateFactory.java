@@ -30,6 +30,9 @@ import de.uka.ilkd.key.rule.updatesimplifier.Update;
  *
  */
 public class TestUpdateFactory extends TestCase {
+    
+    private static final TermBuilder TB = TermBuilder.DF;
+    private static final TermFactory tf = TermFactory.DEFAULT;
 
     private Proof proof;
     
@@ -38,8 +41,6 @@ public class TestUpdateFactory extends TestCase {
     private Namespace sorts     = new Namespace();
     
     private ProgramVariable[] pv;
-
-    private TermFactory tf = TermFactory.DEFAULT;
 
     private Sort testSort0;
     private Sort testSort1;
@@ -192,8 +193,8 @@ public class TestUpdateFactory extends TestCase {
         a = tf.createFunctionTerm ( a_var );
         b = tf.createFunctionTerm ( b_var );      
 
-	integerSort = TacletForTests.services().getTypeConverter()
-				    .getIntegerLDT().targetSort();
+        final Services services = TacletForTests.services();
+	integerSort = services.getTypeConverter().getIntegerLDT().targetSort();
         sorts.add(integerSort);
         
         nonRigidTargetOp = new NonRigidFunction ( new Name ( "target" ),
@@ -221,18 +222,17 @@ public class TestUpdateFactory extends TestCase {
         var = new LogicVariable ( new Name ( "var" ), integerSort );
         varT = tf.createVariableTerm ( (LogicVariable)var );
         
-        avar = tf.createArrayTerm ( ArrayOp.getArrayOp ( a.sort () ), a, varT );
-        bvar = tf.createArrayTerm ( ArrayOp.getArrayOp ( b.sort () ), b, varT );
+        avar = TB.array(services, a, varT);
+        bvar = TB.array(services, b, varT);
             
         var2 = new LogicVariable ( new Name ( "var2" ), integerSort );
         var2T = tf.createVariableTerm ( (LogicVariable)var2 );
         
-        avar2 = tf.createArrayTerm ( ArrayOp.getArrayOp ( a.sort () ), a, var2T );
-        bvar2 = tf.createArrayTerm ( ArrayOp.getArrayOp ( b.sort () ), b, var2T );
+        avar2 = TB.array(services, a, var2T);
+        bvar2 = TB.array(services, b, var2T);
 
         fvarvar2 = tf.createFunctionTerm ( f, varT, var2T );
-        avarvar2 = tf.createArrayTerm ( ArrayOp.getArrayOp ( a.sort () ), a, fvarvar2 );
-            
+        avarvar2 = TB.array(services, a, fvarvar2);            
         
         woRelation = new RigidFunction ( new Name ( "quanUpdateLeqInt" ),
                                     Sort.FORMULA,
@@ -312,7 +312,8 @@ public class TestUpdateFactory extends TestCase {
         assertEquals ( proof.simplifier().simplify ( u2, 
         					     nonRigidTarget, 
         					     services ),
-                       tf.createUpdateTerm ( new Term [0],
+                       tf.createUpdateTerm ( services,
+                	       		     new Term [0],
                                              new Term [0],
                                              nonRigidTarget ) );
 
@@ -631,7 +632,6 @@ public class TestUpdateFactory extends TestCase {
         this.functions = functions;
         this.sorts = sorts;
         this.pv = pv;      
-        this.tf = tf;
         this.testSort0 = testSort0;
         this.testSort1 = testSort1;
         this.testSort2 = testSort2;

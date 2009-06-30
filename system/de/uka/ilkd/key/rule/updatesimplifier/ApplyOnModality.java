@@ -74,7 +74,7 @@ public class ApplyOnModality extends AbstractUpdateRule {
         : update.getAllAssignmentPairs();
   
         return pairs.size() == 0   ? target : UpdateSimplifierTermFactory.DEFAULT
-                        .createUpdateTerm(pairs, target);   
+                        .createUpdateTerm(services, pairs, target);   
     }
 
     /**
