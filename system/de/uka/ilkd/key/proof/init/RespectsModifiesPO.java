@@ -73,7 +73,8 @@ public class RespectsModifiesPO extends EnsuresPO {
             cnt++;
         }
         
-        final Function anonPred = new NonRigidHeapDependentFunction(anonPredName, Sort.FORMULA, new Sort[0]);        
+        assert false : "RespectsModifies not implemented";
+        final Function anonPred = null;//new NonRigidHeapDependentFunction(anonPredName, Sort.FORMULA, new Sort[0]);        
         registerInNamespaces(anonPred);
         
         final Term anonPredTerm = TB.func(anonPred);        

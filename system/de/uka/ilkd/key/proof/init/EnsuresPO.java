@@ -166,7 +166,7 @@ public abstract class EnsuresPO extends AbstractPO {
     
     private Term buildAssumedInvs() throws ProofInputException {
         //inReachableState
-        Term result = TB.func(javaInfo.getInReachableState());
+	Term result = TB.wellFormedHeap(services);
         
         //assumed invariants
         for(ClassInvariant assumedInv : assumedInvs) {

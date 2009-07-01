@@ -75,7 +75,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     
     public void performActionOnLoopInvariant(LoopInvariant x) {
         TermProgramVariableCollector tpvc = 
-            new TermProgramVariableCollector(services, collectFunctionLocations);
+            new TermProgramVariableCollector(services);
         Term selfTerm = x.getInternalSelfTerm();
         Map<Operator, Function> atPreFunctions = x.getInternalAtPreFunctions();
         

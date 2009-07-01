@@ -90,8 +90,6 @@ class ProgramTerm extends Term {
 	    sb.append("\\<").append(javaBlock).append("\\> ");
 	} else if ( op() == Op.BOX ) {
 	    sb.append("\\[").append(javaBlock).append("\\] ");
-	} else if ( op() == Op.TOUT ) {
-	    sb.append("\\[[").append(javaBlock).append("\\]] ");
 	} else {
 	    //	    sb.append("???Some Strange Modality???").append(javaBlock);
 	    sb.append("\\modality{"+op().name()).append("}").append(javaBlock).append("\\endmodality ");

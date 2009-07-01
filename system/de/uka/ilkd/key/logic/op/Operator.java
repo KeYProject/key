@@ -11,23 +11,17 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
+
 
 /** 
  * All symbols acting as members of a term e.g. logical operators, predicates, 
  * functions, variables etc. have to implement this interface.  
  */
 public interface Operator extends Named, SVSubstitute {
-
-    /**
-     * returns the name of the operator 
-     * @return name of the operator 
-     */
-    Name name();
 
     /**
      * checks whether the top level structure of the given @link Term
@@ -75,6 +69,7 @@ public interface Operator extends Named, SVSubstitute {
      * @return the resulting match conditions (e.g. with new added
      * instantiations of schema variables)
      */
-    MatchConditions match(SVSubstitute subst, MatchConditions mc, Services services); 
-
+    MatchConditions match(SVSubstitute subst, 
+	                  MatchConditions mc, 
+	                  Services services); 
 }

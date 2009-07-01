@@ -285,12 +285,6 @@ public class UpdateFactory {
         final AssignmentPair[] newPairs = new AssignmentPair [oldPairs.size ()];
         for ( int locNum = 0; locNum != oldPairs.size (); ++locNum ) {
             final AssignmentPair pair = oldPairs.getAssignmentPair ( locNum );
-
-            assert oldPairs.size () == 1
-            || !( pair.location () instanceof ShadowedOperator ):
-                "UpdateFactory.quantify cannot handle shadowed"
-                + " operators at the time.\n"
-                + "Please ask a wizard to improve me.";
             
             final Term newGuard;
             if ( pair.locationAsTerm().freeVars ().contains ( var ) ) {

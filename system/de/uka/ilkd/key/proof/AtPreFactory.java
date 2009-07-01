@@ -25,7 +25,6 @@ import de.uka.ilkd.key.logic.UpdateFactory;
 import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.NonRigidFunctionLocation;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -135,11 +134,12 @@ public class AtPreFactory {
         baseName = baseName + "AtPre";
         String uniqueName = getNewName(baseName, services, locallyUsedNames);
 
-        Function result 
-            = new NonRigidFunctionLocation(new Name(uniqueName),
-                                           getSort(normalOp),
-                                           getArgSorts(normalOp, 
-                                                       services), false);
+        assert false;
+        Function result=null; 
+//            = new NonRigidFunctionLocation(new Name(uniqueName),
+//                                           getSort(normalOp),
+//                                           getArgSorts(normalOp, 
+//                                                       services), false);
         return result;
     }
     

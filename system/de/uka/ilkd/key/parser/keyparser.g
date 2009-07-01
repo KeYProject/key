@@ -77,7 +77,6 @@ options {
 
     private static final int NORMAL_NONRIGID = 0;
     private static final int LOCATION_MODIFIER = 1;
-    private static final int HEAP_DEPENDENT = 2;
 
     static HashMap<String, Character> prooflabel2tag = new HashMap<String, Character>(15);
     static {
@@ -680,7 +679,7 @@ options {
         
     }
 
-    public static Term toZNotation(String number, Namespace functions, TermFactory tf){
+    public static Term toZNotation(String number, Namespace functions, TermFactory tf){    
 	String s = number;
         final boolean negative = (s.charAt(0) == '-');
 	if (negative) {
@@ -1974,8 +1973,6 @@ pred_decl
 	                   case LOCATION_MODIFIER: 
 	                      semanticError("Modifier 'Location' not allowed for non-rigid predicates.");
 	                      break;
-	         	  case HEAP_DEPENDENT: p = new NonRigidHeapDependentFunction(predicate, Sort.FORMULA, argSorts);      
-	         	      break;
 	         	  default:
 	         	     semanticError("Unknown modifier used in declaration of non-rigid predicate "+predicate);
                     }
@@ -2017,8 +2014,6 @@ location_ident returns [int kind = NORMAL_NONRIGID]
        { 
           if ("Location".equals(id)) {
              kind = LOCATION_MODIFIER;
-          } else if ("HeapDependent".equals(id)) {
-             kind = HEAP_DEPENDENT;
           } else if (!"Location".equals(id)) {
             semanticError(
                 id+": Attribute of a Non Rigid Function can only be 'Location'");        
@@ -3474,7 +3469,7 @@ funcpredvarterm returns [Term a = null]
     boolean opSV = false;
 }
     :
-        ch:CHAR_LITERAL {
+      ch:CHAR_LITERAL {
             String s = ch.getText();
             int intVal = 0;
             if (s.length()==3) {
@@ -3499,32 +3494,36 @@ funcpredvarterm returns [Term a = null]
         //argsWithBoundVars==null indicates no argument list
         //argsWithBoundVars.size()==0 indicates open-close-parens ()
         {  
-            Operator op = lookupVarfuncId(varfuncid, argsWithBoundVars);     
-            
-            //sanity check: if signature of function symbol is base
-            //sort depending function, then we must be in schema mode
-            if(!inSchemaMode()
-               && op instanceof SortDependingFunction 
-               && ((SortDependingFunction)op).getSortDependingOn() instanceof GenericSort) {
-		throw new GenericSortException ( "sort",
-   		     			        "Unexpected generic sort for symbol " + op, 
-   		     			         ((SortDependingFunction)op).getSortDependingOn(),
-   					         getFilename (), 
-   					         getLine (), 
-   					         getColumn () );
+            //XXX, backwards compatibility
+            if(varfuncid.equals("inReachableState") && argsWithBoundVars == null) {
+	        a = TB.inReachableState(getServices());
+	    } else {
+	            Operator op = lookupVarfuncId(varfuncid, argsWithBoundVars);     
+	            
+	            //sanity check: if signature of function symbol is base
+	            //sort depending function, then we must be in schema mode
+	            if(!inSchemaMode()
+	               && op instanceof SortDependingFunction 
+	               && ((SortDependingFunction)op).getSortDependingOn() instanceof GenericSort) {
+			throw new GenericSortException ( "sort",
+	   		     			        "Unexpected generic sort for symbol " + op, 
+	   		     			         ((SortDependingFunction)op).getSortDependingOn(),
+	   					         getFilename (), 
+	   					         getLine (), 
+	   					         getColumn () );
+		    }
+	            
+	                   
+	            if (op instanceof ParsableVariable) {
+	                a = termForParsedVariable((ParsableVariable)op);
+	            } else  if (op instanceof TermSymbol) {
+	                if (argsWithBoundVars==null) {
+	                    argsWithBoundVars = new PairOfTermArrayAndBoundVarsArray(new LinkedList());
+	                }
+	
+	                a = tf.createFunctionWithBoundVarsTerm((TermSymbol)op, argsWithBoundVars);
+	            }
 	    }
-            
-                   
-            if (op instanceof ParsableVariable) {
-                a = termForParsedVariable((ParsableVariable)op);
-            } else  if (op instanceof TermSymbol) {
-                if (argsWithBoundVars==null) {
-                    argsWithBoundVars = new PairOfTermArrayAndBoundVarsArray(new LinkedList());
-                }
-
-                a = tf.createFunctionWithBoundVarsTerm((TermSymbol)op, argsWithBoundVars);
-
-            }
         }
 ; exception
         catch [TermCreationException ex] {

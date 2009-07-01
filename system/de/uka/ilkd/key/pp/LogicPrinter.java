@@ -1369,15 +1369,11 @@ public class LogicPrinter {
                                                                    op.location(t, i));
                 for ( int j = loc.arity (); j >= 1; j-- ) {
                     final Term sub = t.sub ( op.valuePos ( i ) - j );
-    
-                    if (loc instanceof ShadowedOperator && j == 1) {
-                        printTransactionNumber(sub);
-                    } else {
-                        markStartSub ();
-                        printTerm ( sub );
-                        markEndSub ();
-                        layouter.print ( separator[loc.arity () - j] );
-                    }
+                    
+                    markStartSub ();
+                    printTerm ( sub );
+                    markEndSub ();
+                    layouter.print ( separator[loc.arity () - j] );
                 }
                 layouter.print ( asgn ).brk(0,0);
                 layouter.end();

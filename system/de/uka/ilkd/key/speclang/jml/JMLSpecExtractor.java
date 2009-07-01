@@ -30,7 +30,6 @@ import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.java.reference.ArrayOfTypeReference;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.op.NonRigidHeapDependentFunction;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -144,12 +143,12 @@ public class JMLSpecExtractor implements SpecExtractor {
                                              decl.getDecl().pos, 
                                              e.getStackTrace());
         }
-
-        NonRigidHeapDependentFunction f 
-            = new NonRigidHeapDependentFunction(new Name(fieldName), 
-                                                sort, 
-                                                argSorts);
-        services.getNamespaces().functions().add(f);
+        assert false : "model fields not implemented";
+//        NonRigidHeapDependentFunction f 
+//            = new NonRigidHeapDependentFunction(new Name(fieldName), 
+//                                                sort, 
+//                                                argSorts);
+//        services.getNamespaces().functions().add(f);
     }
 
     

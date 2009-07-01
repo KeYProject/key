@@ -79,21 +79,6 @@ public class SLAttributeResolver extends SLExpressionResolver {
                         "Wrong attribute reference " + name + ".");
             }
         }   
-        
-        //try non-rigid heap-dependent function symbol instead of attribute
-        Function f = (Function) javaInfo.getServices()
-                                        .getNamespaces()
-                                        .functions().lookup(new Name(name));
-        if(f instanceof NonRigidHeapDependentFunction) {
-            if(receiver.isTerm() 
-               && f.possibleSubs(new Term[]{receiver.getTerm()})) {
-                Term functionTerm = TB.func(f, receiver.getTerm());
-                return manager.createSLExpression(functionTerm);                
-            } else if(receiver.isType() && f.arity() == 0) {
-                Term functionTerm = TB.func(f);
-                return manager.createSLExpression(functionTerm);
-            }
-        }
     
         return null;
 

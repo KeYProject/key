@@ -370,14 +370,6 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
 
         Modality loopBodyModality = modality;
 
-        // This here is crucial for transactions. If you wonder why the
-        // conversion
-        // is so "irregular", well, that's the way it is ;) /Wojtek
-        if (modality == BOXTRC || modality == TOUTTRC)
-            loopBodyModality = BOX;
-        if (modality == DIATRC)
-            loopBodyModality = DIA;
-
         final Term resultTerm =
                 tf.createProgramTerm(loopBodyModality,
                         JavaBlock.createJavaBlock(new StatementBlock(resSta)),

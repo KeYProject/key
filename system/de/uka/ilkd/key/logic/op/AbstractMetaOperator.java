@@ -118,9 +118,7 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     public static final AbstractMetaOperator INTRODUCE_ATPRE_DEFINITIONS = new IntroAtPreDefsOp();
     
     public static final AbstractMetaOperator AT_PRE_EQUATIONS = new AtPreEquations();
-    
-    public static final AbstractMetaOperator LOCATION_DEPENDENT_FUNCTION = new LocationDependentFunction();
-        
+            
     /** metaconstruct for strictly pure method calls */
     public static final AbstractMetaOperator META_METHOD_CALL_TO_UPDATE= new MethodCallToUpdate();
     

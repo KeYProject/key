@@ -30,22 +30,26 @@ public abstract class Op implements Operator {
     
     // OPERATORS
     /** the ususal 'negation' operator '-' */
-    public static final Junctor NOT = new Junctor(new Name("not"),1);	
+    public static final Junctor NOT = new Junctor(new Name("not"),1);
+    
     /** 
      * the ususal 'and' operator '/\' (be A, B formulae then 'A /\ B'
      * is true if and only if A is true and B is true 
      */
     public static final Junctor AND = new Junctor(new Name("and"),2);
+    
     /** 
      * the ususal 'or' operator '\/' (be A, B formulae then 'A \/ B'
      * is true if and only if A is true or B is true 
      */
     public static final Junctor OR = new Junctor(new Name("or"),2);
+    
     /**
      * the ususal 'implication' operator '->' (be A, B formulae then
      * 'A -> B' is true if and only if A is false or B is true 
      */
     public static final Junctor IMP = new Junctor(new Name("imp"),2);
+    
     /** 
      * the ususal 'equivalence' operator '<->' (be A, B formulae then       
      * 'A <->  B' is true if and only if A and B have the same truth
@@ -53,64 +57,30 @@ public abstract class Op implements Operator {
      */ 
     public static final Equality EQV = new Equality(new Name("equiv"),
 						    Sort.FORMULA);
+    
     /** the ususal 'equality' operator '=' */
     public static final Equality EQUALS = new Equality(new Name("equals"));
+    
     /** the ususal 'forall' operator 'all' (be A a formula then       
      * 'all x.A' is true if and only if for all elements d of the
      * universe A{x<-d} (x substitued with d) is true */     
     public static final Quantifier ALL = new Quantifier(new Name("all"));
+    
     /** the ususal 'exists' operator 'ex' (be A a formula then       
      * 'ex x.A' is true if and only if there is at least one elements
      * d of the universe such that A{x<-d} (x substitued with d) is true */     
     public static final Quantifier EX = new Quantifier(new Name("exist"));
+    
     /** the diamond operator of dynamic logic. A formula
      * <alpha;>Phi can be read as after processing the program alpha
      * there exists a state such that Phi holds. */    
     public static final Modality DIA = new Modality(new Name("diamond"));
+    
     /** the box operator of dynamic logic. A formula
      * [alpha;]Phi can be read as 'In all states reachable
      * processing the program alpha the formula Phi holds'.*/
     public static final Modality BOX = new Modality(new Name("box"));
-    /** the throughout operator of dynamic logic. A formula
-     * [[alpha;]]Phi can be read as 'In all intermediate states during
-     * processing the program alpha the formula Phi holds'.*/
-    public static final Modality TOUT = new Modality(new Name("throughout"));
-    /**
-     * Diamond operator used for a transaction that is going to commit 
-     */
-    public static final Modality DIATRC = new Modality(new Name("diamond_trc"));
-    /**
-     * Box operator used for a transaction that is going to commit 
-     */
-    public static final Modality BOXTRC = new Modality(new Name("box_trc"));
-    /**
-     * Throughout operator used for a transaction that is going to commit 
-     */
-    public static final Modality TOUTTRC = new Modality(new Name("throughout_trc"));
-    /**
-     * Diamond operator used for a transaction that is going to abort
-     */
-    public static final Modality DIATRA = new Modality(new Name("diamond_tra"));
-    /**
-     * Box operator used for a transaction that is going to abort
-     */
-    public static final Modality BOXTRA = new Modality(new Name("box_tra"));
-    /**
-     * Throughout operator used for a transaction that is going to abort
-     */
-    public static final Modality TOUTTRA = new Modality(new Name("throughout_tra"));
-    /**
-     * Diamond operator used for a transaction that is suspended
-     */
-    public static final Modality DIASUSP = new Modality(new Name("diamond_susp"));
-    /**
-     * Box operator used for a transaction that is suspended
-     */
-    public static final Modality BOXSUSP = new Modality(new Name("box_susp"));
-    /**
-     * Throughout operator used for a transaction that is suspended
-     */
-    public static final Modality TOUTSUSP = new Modality(new Name("throughout_susp"));
+    
     /** the wary substitution operator {var<-term}'. {x<-d}'A(x) means
      * replace all free occurrences of variable x in A with d, however
      * without replacing x with a non-rigid A below modalities */
@@ -118,8 +88,10 @@ public abstract class Op implements Operator {
 
     /** the true constant */
     public static final Junctor TRUE = new Junctor(new Name("true"),0);
+    
     /** the false constant */
     public static final Junctor FALSE = new Junctor(new Name("false"),0);
+    
     /** the null pointer */
     public static final Function NULL = new RigidFunction(new Name("null"),
 						     Sort.NULL, 
@@ -142,6 +114,7 @@ public abstract class Op implements Operator {
     
     protected final Name name;
    	
+    
     protected Op(Name name) {
 	this.name=name;
     }

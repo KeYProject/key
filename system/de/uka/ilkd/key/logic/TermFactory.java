@@ -178,6 +178,9 @@ public class TermFactory {
     }
 
     public Term createFunctionTerm(TermSymbol op, Term s1, Term s2) {	
+	if(op == null || s1 == null || s2 == null) {
+	    throw new TermCreationException("null not allowed");
+	}
         final CacheKey key = new CacheKey(op, s1, s2);
         Term result = cache.get(key);
         if (result == null) {

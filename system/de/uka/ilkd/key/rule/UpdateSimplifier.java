@@ -65,7 +65,6 @@ public class UpdateSimplifier {
         append(new ApplyOnModality(this, deletionEnabled)).
         append(new ApplyOnRigidTerm(this)).
         append(new ApplyOnRigidOperatorTerm(this)).
-        append(new ApplyOnHeapDependentLocation(this, deletionEnabled)).
         append(new ApplyOnProgramMethod(this, deletionEnabled)).
         append(new ApplyOnNonRigidTerm(this));
         

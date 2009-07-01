@@ -14,33 +14,22 @@ import java.util.HashSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.Location;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.NonRigidFunctionLocation;
+
 
 public class TermProgramVariableCollector extends Visitor {
 
     private final HashSet<Location> result = new HashSet<Location> ();
     private final Services services;
-    private final boolean collectFunctionLocations;
 
     
-    public TermProgramVariableCollector(Services services, 
-                                        boolean collectFunctionLocations) {
+    public TermProgramVariableCollector(Services services) {
         this.services = services;
-        this.collectFunctionLocations = collectFunctionLocations;
     }
         
-    
-    
-    public TermProgramVariableCollector(Services services) {
-        this(services, false);        
-    }
-    
-    
 
     /** is called by the execPostOrder-method of a term 
      * @param t the Term to checked if it is a program variable and if true the
@@ -49,13 +38,11 @@ public class TermProgramVariableCollector extends Visitor {
     public void visit(Term t) {
 	if ( t.op() instanceof LocationVariable ) {
 	    result.add ( (Location) t.op() );
-	} else if(t.op() instanceof NonRigidFunctionLocation && collectFunctionLocations) {
-	    result.add( (Location) t.op() );
 	}
 	
 	if ( !t.javaBlock ().isEmpty() ) {
 	    ProgramVariableCollector pvc
-		= new ProgramVariableCollector ( t.javaBlock ().program (), services, collectFunctionLocations );
+		= new ProgramVariableCollector ( t.javaBlock ().program (), services );
 	    pvc.start();
 	    result.addAll ( pvc.result () );
 	}

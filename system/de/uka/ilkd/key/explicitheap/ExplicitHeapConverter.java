@@ -199,8 +199,6 @@ public class ExplicitHeapConverter {
                                               fieldSymbol);
             return TB.tf().createCastTerm((AbstractSort) t.sort(), 
                                           dotTerm);
-        } else if(t.op() == services.getJavaInfo().getInReachableState()){
-            return TB.wellFormedHeap(services);
         } else {
             if(t.op() instanceof NonRigidFunction) {
                 warn("encountered an unexpected non rigid symbol: " + t.op());

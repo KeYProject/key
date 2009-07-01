@@ -12,7 +12,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Location;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.NonRigidFunctionLocation;
 import de.uka.ilkd.key.logic.op.SetAsListOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
 import de.uka.ilkd.key.rule.AbstractUpdateRule;
@@ -43,9 +42,7 @@ public class ApplyOnLocalVariableOrStaticField extends AbstractUpdateRule {
      * variable
      */
     public boolean isApplicable(Update update, Term target) {	
-	return target.op() instanceof LocationVariable
-               || target.op() instanceof NonRigidFunctionLocation 
-                     && target.op().arity() == 0;	    
+	return target.op() instanceof LocationVariable;
     }
 
     /**     

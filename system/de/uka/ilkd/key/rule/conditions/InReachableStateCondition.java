@@ -51,7 +51,7 @@ public class InReachableStateCondition extends VariableConditionAdapter {
            return false;
         }
                 
-        return t.op() == services.getJavaInfo().getInReachableState() && 
+        return t.op() == services.getTypeConverter().getHeapLDT().getWellFormed() && 
           svInst.getUpdateContext().isEmpty();
     }
 

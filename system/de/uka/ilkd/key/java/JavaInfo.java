@@ -193,21 +193,6 @@ public class JavaInfo {
     //------------------- common services ----------------------
 
     /**
-     * returns the predicate expressing that we are in a state reachable by executing a
-     * a java program
-     */
-    public Function getInReachableState() {
-        if (inReachableState == null) {
-            inReachableState = (Function) services.getNamespaces().lookup(new Name("inReachableState"));
-            if (inReachableState == null) {
-                throw new RuntimeException("inReachableState predicate not found.");
-            }
-        } 
-        return inReachableState;        
-    }
-    
-    
-    /**
      * returns the full name of a given {@link
      * de.uka.ilkd.key.java.abstraction.KeYJavaType}. 
      * @param t the KeYJavaType including the package prefix
