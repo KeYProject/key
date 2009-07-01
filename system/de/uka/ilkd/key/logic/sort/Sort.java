@@ -20,9 +20,7 @@ public interface Sort extends Named {
     
     Sort FORMULA  = new PrimitiveSort(new Name("Formula"));
     Sort NULL     = new NullSortImpl(new Name("Null"));
-    /** this sort is the mother of all sorts for java dl 
-     *  TODO: should OCLSorts extendTrans this sort too?
-     */
+
     Sort ANY      = new AbstractNonCollectionSort(new Name("any")) {
 
         public SetOfSort extendsSorts() {            

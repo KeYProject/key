@@ -82,7 +82,6 @@ NOT_SPECIFIED : "\\not_specified";
 NOTEQUAL : "!=";
 NOTHING : "\\nothing";
 NOWARN : "\\nowarn";
-OBJECT_CREATION: "\\object_creation"; //KeY extension, not official JML
 OLD : "\\old";
 OTHER : "\\other";
 PLUS : "+";

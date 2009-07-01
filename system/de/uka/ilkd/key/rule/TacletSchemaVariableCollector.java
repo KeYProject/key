@@ -76,15 +76,6 @@ public class TacletSchemaVariableCollector extends Visitor {
 	prgSVColl.start();
 	return prgSVColl.getSchemaVariables();
     }
-
-    private ListOfSchemaVariable collectSVInAttributeOp(AttributeOp op) {
-        ListOfSchemaVariable result = SLListOfSchemaVariable.EMPTY_LIST;
-        final IProgramVariable attribute = op.attribute();
-        if (attribute instanceof SchemaVariable) {
-             result = result.prepend((SchemaVariable)attribute);
-        }
-        return result;
-    }
     
     /** 
      * visits the Term in post order {@link Term#execPostOrder(Visitor)} and 
@@ -96,9 +87,7 @@ public class TacletSchemaVariableCollector extends Visitor {
         if (op instanceof Modality || 
                 op instanceof ModalOperatorSV) {
 	    varList = collectSVInProgram(t.javaBlock(), varList);
-	} else if (op instanceof AttributeOp) {
-            varList = varList.prepend(collectSVInAttributeOp((AttributeOp)op));
-        } else if (op instanceof QuanUpdateOperator) {
+	} else if (op instanceof QuanUpdateOperator) {
             varList = collectSVInQuanUpdateOperator(op, varList);
         } else if (op instanceof WhileInvRule) {
  	    varList = collectSVInProgram(t, varList);
@@ -137,9 +126,6 @@ public class TacletSchemaVariableCollector extends Visitor {
             final Location currentLocation = quan.location(i);
             if (currentLocation instanceof SchemaVariable) {
                 result = result.prepend((SchemaVariable) currentLocation);
-            } else if (currentLocation instanceof AttributeOp) {
-                result = result
-                        .prepend(collectSVInAttributeOp((AttributeOp) currentLocation));
             }
         }
         return result;

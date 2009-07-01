@@ -112,13 +112,6 @@ public class PreservesGuardPO extends EnsuresPO {
                if(op instanceof ProgramVariable) { 
                    containingKjt 
                        = ((ProgramVariable) op).getContainerType();
-               } else if (op instanceof AttributeOp) {
-                   AttributeOp aop = (AttributeOp) op;
-                   if(aop.attribute() instanceof ProgramVariable) {
-                       containingKjt 
-                           = ((ProgramVariable) aop.attribute())
-                             .getContainerType();
-                   }
                }
                
                if(containingKjt != null) {

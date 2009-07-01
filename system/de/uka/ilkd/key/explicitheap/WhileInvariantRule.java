@@ -194,15 +194,17 @@ public final class WhileInvariantRule implements BuiltInRule {
         				 TB.equals(modSet, modSetAtPre));
         final Term heapFrameCondition 
                 = TB.all(new QuantifiableVariable[]{objVar, fieldVar},
-                         TB.or(TB.elementOf(services, 
-                        	            objVarTerm, 
-                        	            fieldVarTerm, 
-                        	            modSetAtPre),
-                               TB.equals(TB.select(services, 
+                         TB.or(TB.pairElementOf(services, 
+                        	                objVarTerm, 
+                        	                fieldVarTerm, 
+                        	                modSetAtPre),
+                               TB.equals(TB.select(services,
+                        	       		   Sort.ANY,
                                                    heapTerm, 
                                                    objVarTerm, 
                                                    fieldVarTerm),
-                                          TB.select(services, 
+                                          TB.select(services,
+                                        	    Sort.ANY,
                                                     heapAtPreTerm, 
                                                     objVarTerm, 
                                                     fieldVarTerm))));

@@ -93,12 +93,13 @@ public class SortDependingFunction extends RigidFunction
 	
 	SortDependingSymbol result 
 	      = (SortDependingSymbol) services.getNamespaces()
-	                                      .lookup(instanceName); 
-
+	                                      .lookup(instanceName);
+	
 	if(result == null 
 	   && instanceSort instanceof SortDefiningSymbols) {
-            result = ((SortDefiningSymbols) instanceSort).lookupSymbol ( getKind () );	    
+            result = ((SortDefiningSymbols) instanceSort).lookupSymbol ( getKind () );
 	}
+		
 	
 	if(result == null) {
 	    Sort instanceResultSort = (sort() == sortDependingOn
@@ -117,10 +118,15 @@ public class SortDependingFunction extends RigidFunction
 		                               instanceSort);
 	    services.getNamespaces().functions().add(result);
 	}
+	
+        if(result != null) {
+            assert this.isSimilar(result) 
+                   : result + " should be similar to " + this; 
+            assert result.getSortDependingOn() == instanceSort 
+                   : result + " depends on " + result.getSortDependingOn() 
+                     + " but should depend on " + instanceSort;
+        }
 
-	assert result == null 
-	       || (this.isSimilar(result) 
-		    && result.getSortDependingOn() == instanceSort);
 	return result;
     }
 

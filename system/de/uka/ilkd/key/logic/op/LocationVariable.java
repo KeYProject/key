@@ -5,6 +5,8 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -23,16 +25,6 @@ public class LocationVariable extends ProgramVariable implements Location {
     public LocationVariable(ProgramElementName name, 
             KeYJavaType        t, 
             KeYJavaType        containingType,
-            boolean            isStatic,
-            boolean            isModel,
-            boolean            isGhost) {
-        super(name, t.getSort(), t, containingType, 
-                isStatic, isModel, isGhost);
-    }
-
-    public LocationVariable(ProgramElementName name, 
-            KeYJavaType        t, 
-            KeYJavaType        containingType,
             boolean            isStatic) {
         super(name, t.getSort(), t, containingType, isStatic, false, false);
     }
@@ -45,6 +37,7 @@ public class LocationVariable extends ProgramVariable implements Location {
         super(name, t.getSort(), t, null, false, false, false, isFinal);
     }
 
+    
     public LocationVariable(ProgramElementName name, Sort s) {
         super(name, s, null, null, false, false, false);
     }

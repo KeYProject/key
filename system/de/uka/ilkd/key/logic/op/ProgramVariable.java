@@ -252,8 +252,11 @@ public abstract class ProgramVariable extends TermSymbol
 	final String typeName;
 	if (javaType instanceof ArrayType) {
 	    typeName = ((ArrayType)javaType).getAlternativeNameRepresentation();
-	} else {
+	} else if (javaType != null) {
 	    typeName = javaType.getFullName();
+	} else {
+	    //XXX
+	    typeName = type.getSort().name().toString();
 	}
 	return typeName + " " + name() + ";\n";
     }

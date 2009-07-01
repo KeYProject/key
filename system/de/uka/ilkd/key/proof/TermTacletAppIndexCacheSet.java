@@ -224,8 +224,7 @@ public class TermTacletAppIndexCacheSet {
      *         which we are caching
      */
     private boolean isAcceptedOperator(Operator op) {
-        return op instanceof AccessOp
-               || op instanceof IfThenElse
+        return op instanceof IfThenElse
                || op instanceof Function
                || op instanceof Junctor
                || op instanceof Equality

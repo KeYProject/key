@@ -41,12 +41,12 @@ public class GenericSort extends AbstractNonCollectionSort
 	= SetAsListOfSort.EMPTY_SET;
 
     /** direct supersorts */
-    SetOfSort        ext        = EMPTY_SORT_SET;
+    private SetOfSort        ext        = EMPTY_SORT_SET;
     /**
      * list of sorts this generic sort may be instantiated with;
      * EMPTY_SORT_SORT means that every sort may be used
      */
-    SetOfSort        oneOf      = EMPTY_SORT_SET;
+    private SetOfSort        oneOf      = EMPTY_SORT_SET;
 
     /**
      * creates a generic sort (with a new equality symbol for this

@@ -350,7 +350,7 @@ public class ProblemInitializer {
 	    reportStatus("Reading "+envInput.name(), 
 		    	 envInput.getNumberOfChars());
 	    envInput.setInitConfig(initConfig);
-	    envInput.read(ModStrategy.NO_VARS);	    
+	    envInput.read(ModStrategy.NO_VARS_GENSORTS);	    
 	    reportReady();
 	    
 	    setUpSorts(initConfig);

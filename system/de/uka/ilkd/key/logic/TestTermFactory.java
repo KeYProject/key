@@ -67,10 +67,6 @@ public class TestTermFactory extends TestCase {
 	et1=et_px;       
     }
 
-    private ProgramVariable attribute(Term t) {
-	return (ProgramVariable)((AttributeOp)t.op()).attribute();
-    }
-
     private Term t1(){
 	Term t_x=tf.createFunctionTerm(x, new Term[0]);
 	Term t_px=tf.createFunctionTerm(p, new Term[]{t_x});
@@ -226,59 +222,6 @@ public class TestTermFactory extends TestCase {
 	Assert.assertEquals(t_pxx,
 			    OpTerm.createOpTerm(p, new Term[]{
 					       OpTerm.createOpTerm(xx, new Term[0])}));
-    }
-
-
-    public void testAttributeTerm() {
-	Sort s_int = new PrimitiveSort(new Name("int"));
-	ProgramVariable attribute = new LocationVariable(new ProgramElementName("size"), 
-							new KeYJavaType(s_int));
-	Sort s_list = new ClassInstanceSortImpl(new Name("list"), osort4, false);
-	ProgramVariable prefix 
-	    = new LocationVariable(new ProgramElementName("persons"), 
-				  new KeYJavaType(s_list));
-	Term sub = tf.createVariableTerm(prefix);
-	Term t = tf.createAttributeTerm(attribute, sub);
-	assertTrue("Operator should be of type AttributeOp", 
-	       t.op() instanceof AttributeOp); 
-	assertSame("Sub term should be "+sub+" but is "+t.sub(0), 
-		   t.sub(0), sub); 
-	assertSame("Wrong attribute.",
-		   attribute(t), attribute); 
-	prefix = new LocationVariable(new ProgramElementName("persons"), 
-				     new KeYJavaType(osort3));
-	sub = tf.createVariableTerm(prefix);
-	t = tf.createAttributeTerm(attribute, sub);
-	Exception exc=new Exception();
-	try {
-	    prefix = new LocationVariable(new ProgramElementName("persons"), 
-					 new KeYJavaType(osort1));
-	    sub = tf.createVariableTerm(prefix);
-	    t = tf.createAttributeTerm(attribute, sub);
-	} catch (TermCreationException e) {
-	    exc=e;	    
-	}
-	exc=new Exception();
-	try {
-	    prefix = new LocationVariable(new ProgramElementName("persons"), 
-					 new KeYJavaType(s_int));
-	    sub = tf.createVariableTerm(prefix);
-	    t = tf.createAttributeTerm(attribute, sub);
-	} catch (TermCreationException e) {
-	    exc=e;	    
-	}
-	assertTrue(exc instanceof TermCreationException);
-	
-
-// 	de.uka.ilkd.key.gui.PureSequentPrinter pseq = 
-// 	    new de.uka.ilkd.key.gui.PureSequentPrinter
-// 	    (null, new de.uka.ilkd.key.gui.NotationInfo(),
-// 	     Sequent.createAnteSequent
-// 	     (Semisequent.EMPTY_SEMISEQUENT.insertFirst(new ConstrainedFormula
-// 							(tf.createEqualityTerm(t,t)))));
-// 	pseq.printSequent();
-// 	System.out.println("Prettyprint:"+pseq);
-// 	System.out.println("toString:"+t);
     }
 
 

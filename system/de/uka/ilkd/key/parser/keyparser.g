@@ -737,6 +737,8 @@ options {
 
             if (unambigousAttributeName) {     
                 result = javaInfo.getAttribute(attributeName);
+            } else if(inSchemaMode() && attributeName.equals("length")) {
+                result = javaInfo.getArrayLength();
             } else {
                 if (inSchemaMode()) {
                     semanticError("Either undeclared schmema variable '" + 
@@ -789,29 +791,33 @@ options {
     }
 
    
-    public Term createAttributeTerm(Term prefix, TermSymbol attribute,
-                                    Term shadowNumber) throws SemanticException {
+    private static GenericSort wahSort;
+    public Term createAttributeTerm(Term prefix, 
+    				    TermSymbol attribute) throws SemanticException {
         Term result = prefix;
 
         if (attribute instanceof SchemaVariable) {
             if (!inSchemaMode()) {
                 semanticError("Schemavariables may only occur inside taclets.");
             }
-            if (shadowNumber != null) {
-                result = tf.createShadowAttributeTerm((SchemaVariable)attribute, result, shadowNumber);
-            } else {
-                result = tf.createAttributeTerm((SchemaVariable)attribute, result);         
-            }
-        } else {
-            if (((ProgramVariable)attribute).isStatic()){
-                result = tf.createVariableTerm((ProgramVariable)attribute);
-            } else {
-                if (shadowNumber != null) {
-                    result = tf.createShadowAttributeTerm((ProgramVariable)attribute, 
-                                                          result, shadowNumber);
-                } else {
-                    result = tf.createAttributeTerm((ProgramVariable)attribute, result);
+            //XXX
+            if(wahSort == null) {
+               try {
+                wahSort = new GenericSort(new Name("WAH!"),
+                			  SetAsListOfSort.EMPTY_SET.add(getServices().getJavaInfo().getJavaLangObjectAsSort()),
+                                          SetAsListOfSort.EMPTY_SET);
+                } catch(GenericSupersortException e) {
+                    assert false;
                 }
+            }
+            result = TB.select(getServices(), wahSort, TB.heap(getServices()), prefix, TB.func(attribute));
+        } else {
+            ProgramVariable pv = (ProgramVariable) attribute;
+            Function fieldSymbol = ExplicitHeapConverter.INSTANCE.getFieldSymbol(pv, getServices());        
+            if (pv.isStatic()){
+                result = TB.staticDot(getServices(), pv.sort(), fieldSymbol);
+            } else {            
+                result = TB.dot(getServices(), pv.sort(), result, fieldSymbol);                
             }
         }
         return result;
@@ -2680,38 +2686,6 @@ classReference returns [String classReference = ""]
 */
 
 
-transactionNumber returns [Term trans = null]
-:
-     EXP LPAREN trans = term60 RPAREN
-     |
-     p:PRIMES {
-       int primes = p.getText().length();
-       if(parsingContracts) {
-         if(primes != 1) {
-           semanticError("In contracts only one prime is allowed "+
-	     "(equivalent to ^(de.uka.ilkd.key.javacard.KeYJCSystem.<transactionCounter>)).");
-	 }
-         // Woj's solution
-         //TermSymbol v = getAttribute(
-         //  getTypeByClassName("de.uka.ilkd.key.javacard.KeYJCSystem").getSort(),
-         //  "de.uka.ilkd.key.javacard.KeYJCSystem::<transactionCounter>"); 
-	 //trans = createAttributeTerm(null, v, null);
-	 // Richard's solution
-	 final ProgramVariable op = getServices().getJavaInfo().getAttribute
-           (JVMIsTransientMethodBuilder.IMPLICIT_TRANSACTION_COUNTER, 
-            "de.uka.ilkd.key.javacard.KeYJCSystem");
-         if(op == null) {
-           semanticError("Attribute " +
-            JVMIsTransientMethodBuilder.IMPLICIT_TRANSACTION_COUNTER +
-            " of type " + "de.uka.ilkd.key.javacard.KeYJCSystem" + " not known. " + 
-            "Did you place appropriate Java Card API to your sources?");
-         }
-         trans = tf.createVariableTerm(op);
-       }else{
-         trans = toZNotation(""+primes, functions(), tf);
-       }
-     }
-;
 
 
 staticAttributeOrQueryReference returns [String attrReference = ""]
@@ -2765,7 +2739,6 @@ staticAttributeOrQueryReference returns [String attrReference = ""]
 static_attribute_suffix returns [Term result = null]
 {
     TermSymbol v = null;
-    Term shadowNumber  = null;
     String attributeName = "";
 }    
     :   
@@ -2781,8 +2754,7 @@ static_attribute_suffix returns [Term result = null]
             }	
 	       	v = getAttribute(getTypeByClassName(className).getSort(), attributeName); 
 	    }
-        (shadowNumber = transactionNumber)?
-        { result = createAttributeTerm(null, v, shadowNumber); }                   
+        { result = createAttributeTerm(null, v); }                   
  ; exception
         catch [TermCreationException ex] {
               keh.reportException
@@ -2794,25 +2766,15 @@ static_attribute_suffix returns [Term result = null]
 attribute_or_query_suffix[Term prefix] returns [Term result = null]
 {
     TermSymbol v = null;
-    Term shadowNumber = null;
     result = prefix;
     String attributeName = "";    
 }    
     :   
-        DOT 
-        ((IDENT (AT LPAREN simple_ident_dots RPAREN)? LPAREN)=>( result = query[prefix])
-         | 
-            attributeName = attrid 
-            {   
-            	v = getAttribute(prefix.sort(), attributeName);             	
-            }   
-            ( 
-
-                ( shadowNumber = transactionNumber )?
-                {
-                    result = createAttributeTerm(prefix, v, shadowNumber);
-                }        
-            ))
+        DOT attributeName = attrid 
+        {   
+            v = getAttribute(prefix.sort(), attributeName);             	
+            result = createAttributeTerm(prefix, v);
+        }   
  ; exception
         catch [TermCreationException ex] {
               keh.reportException
@@ -2943,7 +2905,6 @@ accessterm returns [Term result = null]
 array_access_suffix [Term arrayReference] returns [Term result = arrayReference] 
 {
     Term indexTerm  = null;
-    Term shadowNumber = null;
     Term rangeFrom = null;
     Term rangeTo   = null;     
 }
@@ -2951,7 +2912,7 @@ array_access_suffix [Term arrayReference] returns [Term result = arrayReference]
   	LBRACKET 
 	(   STAR {
            	rangeFrom = toZNotation("0", functions(), tf);
-           	Term lt = createAttributeTerm(result, getAttribute(result.sort(), "length"), null);
+           	Term lt = createAttributeTerm(result, getAttribute(result.sort(), "length"));
            	Term one = toZNotation("1", functions(), tf);
   	   		rangeTo = tf.createFunctionTerm
            		((Function) functions().lookup(new Name("sub")), lt, one); 
@@ -2960,7 +2921,7 @@ array_access_suffix [Term arrayReference] returns [Term result = arrayReference]
 	        ((DOTRANGE) => DOTRANGE rangeTo = logicTermReEntry
 		                 {rangeFrom = indexTerm;})?
     )
-    RBRACKET ( shadowNumber = transactionNumber )? 
+    RBRACKET 
     {       
 	if(rangeTo != null) {
 		if(quantifiedArrayGuard == null) {
@@ -2979,12 +2940,7 @@ array_access_suffix [Term arrayReference] returns [Term result = arrayReference]
 		   						  quantifiedArrayGuard, 
 		   						  guardTerm);
 		}
-        if (shadowNumber != null) {
-            //Shadowing unsupported...
-            result = TB.array(getServices(), result, indexTerm);
-        } else {
             result = TB.array(getServices(), result, indexTerm); 
-        }  
     }            
     ;exception
         catch [TermCreationException ex] {
@@ -3008,21 +2964,6 @@ term130 returns [Term a = null]
     |   a = ifExThenElseTerm
     |   a = sum_or_product_term
     |   a = bounded_sum_term
-    //Used for OCL Simplification.
-    //WATCHOUT: Woj: some time we will need to have support for strings in Java DL too,
-    // what then? This here is specific to OCL, isn't it?
-    /*|   literal:STRING_LITERAL
-        {
-            String s = literal.getText(); 
-            Name name = new Name(s);
-            TermSymbol stringLit = (TermSymbol)functions().lookup(name);
-            if (stringLit == null) {
-                stringLit = new RigidFunction(name, 
-                        OclSort.STRING, new Sort[0]);
-                addFunction((Function)stringLit);
-            }
-            a = tf.createFunctionTerm(stringLit);
-        }*/
    ; exception
         catch [TermCreationException ex] {
               keh.reportException
@@ -3772,9 +3713,11 @@ seq returns [Sequent s] {Semisequent ant,suc; s = null; } :
     ;
 exception
      catch [RuntimeException ex] {
-         keh.reportException
-  	    (new KeYSemanticException
-			(ex.getMessage(), getFilename(), getLine(), getColumn()));
+         KeYSemanticException betterEx = 
+         
+  	 new KeYSemanticException(ex.getMessage(), getFilename(), getLine(), getColumn());
+	 betterEx.setStackTrace(ex.getStackTrace());	
+	 keh.reportException(betterEx);			
      }
 termorseq returns [Object o]
 {

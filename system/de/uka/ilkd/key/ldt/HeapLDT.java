@@ -33,6 +33,9 @@ public final class HeapLDT extends LDT {
     private final SortDependingFunction select;
     private final Function store;
     private final Function arr;
+    private final Function length;
+    private final Function created;
+    private final SortDependingFunction nextToCreate;
     private final Function wellFormed;
     private final Function changeHeapAtLocs;
     private final Sort fieldSort;
@@ -44,6 +47,9 @@ public final class HeapLDT extends LDT {
         select            = (SortDependingFunction) addFunction(functions, "Null::select");
         store             = addFunction(functions, "store");
         arr               = addFunction(functions, "arr");
+        length            = addFunction(functions, "Array::length");
+        created           = addFunction(functions, "java.lang.Object::<created>");
+        nextToCreate      = (SortDependingFunction) addFunction(functions, "Null::<nextToCreate>");
         wellFormed        = addFunction(functions, "wellFormed");
         changeHeapAtLocs  = addFunction(functions, "changeHeapAtLocs");
         fieldSort         = (Sort) sorts.lookup(new Name("Field"));
@@ -77,6 +83,21 @@ public final class HeapLDT extends LDT {
     
     public Function getArr() {
 	return arr;
+    }
+    
+    
+    public Function getLength() {
+	return length;
+    }
+    
+    
+    public Function getCreated() {
+	return created;
+    }
+    
+    
+    public Function getNextToCreateFor(Sort instanceSort, Services services) {
+	return (Function) nextToCreate.getInstanceFor(instanceSort, services);
     }
     
     

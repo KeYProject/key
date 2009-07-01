@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.op.*;
+
 /**
  * This class is used to collect all appearing variables that can
  * represent logic variables in a term. Duplicates are not removed
@@ -18,7 +19,6 @@ import de.uka.ilkd.key.logic.op.*;
  * have a SetAsList-implementation causing to 
  * have O(sqr(n)) if it would used.
  */
-
 public class LVRCollector extends Visitor{
     /** collects all found variables */
     private ListOfQuantifiableVariable varList;

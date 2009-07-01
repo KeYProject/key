@@ -22,9 +22,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.UpdateFactory;
-import de.uka.ilkd.key.logic.op.AccessOp;
 import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.AttributeOp;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.NonRigidFunctionLocation;
@@ -93,32 +91,6 @@ public class AtPreFactory {
     private ArrayOfSort getArgSorts(Operator op, Services services) {
         if(op instanceof Function) {
             return ((Function)op).argSort();
-        } else if(op instanceof AttributeOp) {
-            AttributeOp aop = (AttributeOp) op;
-            
-            //HACK: Oddly, the length attribute is contained in a kjt "(SuperArray, null)",
-            //i.e. its argument does not have a sort. Therefore, we have to treat this case 
-            //separately.
-            //This hack works to a point, but it can lead to unparseable 
-            //formulas, since the length attribute is not actually defined on 
-            //java.lang.Object. We need a SuperArray sort! /BW
-            //(see also bug #875)
-            if(aop.attribute().equals(services.getJavaInfo()
-                                              .getArrayLength())) {
-                Sort objectSort 
-                    = services.getJavaInfo().getJavaLangObjectAsSort();
-                return new ArrayOfSort(new Sort[]{objectSort});
-            }
-            
-            if(((ProgramVariable)aop.attribute()).isStatic()) {
-                return new ArrayOfSort();
-            }
-            
-            Sort selfSort = aop.getContainerType().getSort();            
-            assert selfSort != null;
-            Sort[] argSorts = new Sort[] {selfSort};
-            
-            return new ArrayOfSort(argSorts);
         } else if(op instanceof ProgramVariable && op.arity() == 0) {
             return new ArrayOfSort();
         } else {
@@ -150,16 +122,9 @@ public class AtPreFactory {
     private Function createAtPreFunction(Operator normalOp, 
                                          Services services,
                                          List<String> locallyUsedNames) {
-        String baseName;
-        if(normalOp instanceof AttributeOp) {
-            AttributeOp aop = (AttributeOp) normalOp;
-            baseName = ((ProgramVariable)aop.attribute()).getProgramElementName()
-                                                         .getProgramName(); 
-        } else {
-            baseName = normalOp.name() instanceof ProgramElementName
-                       ? ((ProgramElementName)normalOp.name()).getProgramName()
-                       : normalOp.name().toString();
-        }
+        String baseName = normalOp.name() instanceof ProgramElementName
+                   ? ((ProgramElementName)normalOp.name()).getProgramName()
+                   : normalOp.name().toString();
         
         if (baseName.startsWith("<") && baseName.endsWith(">")) {
             baseName = baseName.substring(1, baseName.length() - 1);
@@ -198,8 +163,7 @@ public class AtPreFactory {
             subSorts[i] = subTerm.sort();
         }
 
-        if(term.op() instanceof AccessOp
-           || term.op() instanceof ProgramVariable
+        if(term.op() instanceof ProgramVariable
            || term.op() instanceof ProgramMethod) {
             Function atPreFunc = atPreFunctions.get(term.op());
             if(atPreFunc == null) {
@@ -252,25 +216,6 @@ public class AtPreFactory {
                                         Services services) {
         assert normalOp != null;
         assert atPreFunc != null;
-        
-        //HACK. Special treatment for static attributes, necessary
-        //because they have arity 1, and because TermFactory.createTerm()
-        //indeed expects to get an argument for them 
-        //(although it's discarded later).
-        if(normalOp instanceof AttributeOp 
-           && ((ProgramVariable)((AttributeOp) normalOp).attribute())
-                                                        .isStatic()) {
-            assert normalOp.arity() == 1;
-            assert atPreFunc.arity() == 0;
-            Term atPreTerm = TB.func(atPreFunc);
-            Term normalTerm = TB.dot(null, 
-                                     (ProgramVariable)((AttributeOp) normalOp)
-                                          .attribute());
-            UpdateFactory uf = new UpdateFactory(services, new UpdateSimplifier());
-            Update result = uf.elementaryUpdate(atPreTerm, normalTerm);
-            return result;
-        }
-        
         
         int arity = normalOp.arity();
         assert arity == atPreFunc.arity();

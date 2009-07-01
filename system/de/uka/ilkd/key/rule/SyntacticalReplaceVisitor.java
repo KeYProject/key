@@ -372,28 +372,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
 	return op.replaceLocations ( newOps );
     }
 
-  
-
-    private AttributeOp instantiateAttributeOperator(AttributeOp op) {
-        if (op.attribute() instanceof SchemaVariable) {
-            final IProgramVariable attribute = 
-                (ProgramVariable)svInst.getInstantiation
-                ((SchemaVariable)op.attribute());   
-            if (attribute == null) {
-                // illegal inst. exception required for matchMV to fail
-                throw new IllegalInstantiationException
-                ("No instantiation found for " + op);
-            }
-            
-            if (op instanceof ShadowedOperator) {
-                op = ShadowAttributeOp.getShadowAttributeOp(attribute);
-            } else {
-                op = AttributeOp.getAttributeOp(attribute);
-            }
-        }
-        return op;
-    }
-        
+          
     private Operator instantiateOperatorSV(OperatorSV op) {
         Operator newOp = (Operator) svInst.getInstantiation(op);
         Debug.assertTrue(newOp != null, "No instantiation found for " + op);
@@ -403,9 +382,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
     private Operator instantiateOperator(Operator op) {	
 	if (op instanceof OperatorSV){	 
             return instantiateOperatorSV((OperatorSV) op);
-        } else if (op instanceof AttributeOp) {
-	    return instantiateAttributeOperator((AttributeOp)op);
-	} else if (op instanceof SortDependingSymbol) {
+        } else if (op instanceof SortDependingSymbol) {
             return handleSortDependingSymbol(op);
         } else if (op instanceof IUpdateOperator) {        
 	    return instantiateUpdateOperator((IUpdateOperator)op);       

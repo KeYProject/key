@@ -7,10 +7,10 @@
 // See LICENSE.TXT for details.
 //
 //
+
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Location;
 import de.uka.ilkd.key.logic.sort.ObjectSort;
@@ -43,8 +43,8 @@ public class MetaNextToCreate extends MetaField implements Location {
             throw new RuntimeException("Wrong usage of meta operator " + this +
                     ". Sort of subterm is not an ObjectSort, but "+s);
         }
-        return termFactory.createVariableTerm(services.getJavaInfo().
-                getAttribute(ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE, (ObjectSort)s));
+        
+        return TB.nextToCreate(services, s);        
     }
 
     public boolean mayBeAliasedBy(Location loc) {
@@ -54,5 +54,4 @@ public class MetaNextToCreate extends MetaField implements Location {
     public Sort sort() {        
         return METASORT;
     }
-
 }

@@ -1315,19 +1315,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		}
 	    }
 
-	} else if (op instanceof AttributeOp) {
-	    AttributeOp atop = (AttributeOp) op;
-	    ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
-	    for (int i = 0; i < atop.arity(); i++) {
-		subterms.add(translateTerm(term.sub(i), quantifiedVars, services));
-	    }
-	    ArrayList<Sort> sorts = new ArrayList<Sort>();
-	    for (int i = 0; i < op.arity(); i++) {
-		sorts.add(term.sub(i).sort());
-	    }
-	    this.addFunction(atop, sorts, atop.sort());
-
-	    return translateFunc(atop, subterms);
 	} else {
 	    //if none of the above works, the symbol can be translated as uninterpreted function
 	    //or predicate. The idea is, tht if a formula is valid with a interpreted function,

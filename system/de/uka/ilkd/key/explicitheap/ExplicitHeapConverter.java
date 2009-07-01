@@ -60,7 +60,6 @@ public class ExplicitHeapConverter {
     //public interface
     //-------------------------------------------------------------------------
     
-    
     public Function getFieldSymbol(ProgramVariable fieldPV, Services services) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Name name;
@@ -139,21 +138,7 @@ public class ExplicitHeapConverter {
             Term[] newLhsSubs;
             Term newRhs;
             
-            if(lhsLoc instanceof AttributeOp) {                
-                final Term objectTerm = lhsSubs[0];
-                final ProgramVariable fieldPV 
-                    = (ProgramVariable)((AttributeOp)lhsLoc).attribute();
-                final Function fieldSymbol = getFieldSymbol(fieldPV, services);
-                
-                newLhsLoc = heapLDT.getHeap();
-                newLhsSubs = new Term[0];
-                heapTerm = TB.store(services, 
-                		    heapTerm, 
-                		    convert(objectTerm, services), 
-                		    TB.func(fieldSymbol), 
-                		    convert(rhs, services));
-                newRhs = heapTerm;
-            } else if(lhsLoc instanceof ProgramVariable 
+            if(lhsLoc instanceof ProgramVariable 
         	      && ((ProgramVariable)lhsLoc).isStatic()) {
         	final ProgramVariable fieldPV = (ProgramVariable) lhsLoc;
         	final Function fieldSymbol = getFieldSymbol(fieldPV, services);
@@ -204,24 +189,13 @@ public class ExplicitHeapConverter {
             } else {
                 return t;
             }
-        } else if(t.op() instanceof AttributeOp) {
-            final Term objectTerm = t.sub(0);
-            final ProgramVariable fieldPV 
-                = (ProgramVariable)((AttributeOp)t.op()).attribute();
-            final Function fieldSymbol 
-                = getFieldSymbol(fieldPV, services);
-            
-            final Term dotTerm = TB.dot(services, 
-                                        convert(objectTerm, services), 
-                                        fieldSymbol);
-            return TB.tf().createCastTerm((AbstractSort) t.sort(), 
-                                          dotTerm);
         } else if(t.op() instanceof ProgramVariable 
         	      && ((ProgramVariable)t.op()).isStatic()) {
             final ProgramVariable fieldPV = (ProgramVariable)t.op();
             final Function fieldSymbol 
                 = getFieldSymbol(fieldPV, services);
-            final Term dotTerm = TB.staticDot(services, 
+            final Term dotTerm = TB.staticDot(services,
+        	    			      fieldPV.sort(),
                                               fieldSymbol);
             return TB.tf().createCastTerm((AbstractSort) t.sort(), 
                                           dotTerm);
@@ -351,26 +325,9 @@ public class ExplicitHeapConverter {
             Term locTerm = bloc.getLocTerm();
             if(!bloc.getFormula().equals(TB.tt())) {
         	warn("ignoring location descriptor guard: " + bloc.getFormula());
-            }
-            
-            if(locTerm.op() instanceof AttributeOp) {
-                ProgramVariable fieldPV 
-                    = (ProgramVariable)((AttributeOp)locTerm.op())
-                                                        .attribute();
-                Function fieldSymbol = getFieldSymbol(fieldPV, services);
-                
-                if(locTerm.freeVars().isEmpty()) {
-                    return TB.singleton(services, 
-                	    		convert(locTerm.sub(0), services), 
-                	    		TB.func(fieldSymbol));
-                } else {
-                    assert false; //not implemented
-                    return null;
-                }
-            } else {
-                assert locTerm.op() instanceof ProgramVariable;
-                return TB.empty(services);
-            }
+            }            
+            assert locTerm.op() instanceof ProgramVariable;
+            return TB.empty(services);
 	} else {
 	    assert loc instanceof EverythingLocationDescriptor;
 	    return TB.everything(services);

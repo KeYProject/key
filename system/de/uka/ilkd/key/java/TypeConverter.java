@@ -13,6 +13,7 @@ package de.uka.ilkd.key.java;
 import java.util.HashMap;
 
 import recoder.service.ConstantEvaluator;
+import de.uka.ilkd.key.explicitheap.ExplicitHeapConverter;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
@@ -40,6 +41,7 @@ import de.uka.ilkd.key.util.ExtList;
 public final class TypeConverter {
     
     private static final TermBuilder TB = TermBuilder.DF;
+    private static final ExplicitHeapConverter EHC = ExplicitHeapConverter.INSTANCE;
 
     private final Services services;
       
@@ -50,7 +52,8 @@ public final class TypeConverter {
     private CharLDT charLDT;
     private IntegerLDT integerLDT;
     private IntegerDomainLDT integerDomainLDT;
-    private BooleanLDT booleanLDT;    
+    private BooleanLDT booleanLDT;
+    private PairLDT pairLDT;
     private SetLDT setLDT;
     private HeapLDT heapLDT;
     
@@ -84,6 +87,8 @@ public final class TypeConverter {
             this.integerDomainLDT = (IntegerDomainLDT)ldt;
         } else if (ldt instanceof BooleanLDT) {
             this.booleanLDT = (BooleanLDT)ldt;
+        } else if (ldt instanceof PairLDT) {
+            this.pairLDT = (PairLDT) ldt;
         } else if (ldt instanceof SetLDT) {
             this.setLDT = (SetLDT) ldt;
         } else if (ldt instanceof HeapLDT) {
@@ -172,12 +177,17 @@ public final class TypeConverter {
     public BooleanLDT getBooleanLDT() {
 	return booleanLDT;
     }
-    
+
+ 
+    public PairLDT getPairLDT() {
+	return pairLDT;
+    }
+
     
     public SetLDT getSetLDT() {
 	return setLDT;
     }
-    
+
     
     public HeapLDT getHeapLDT() {
 	return heapLDT;
@@ -270,7 +280,8 @@ public final class TypeConverter {
                  exact && !context.getSort().equals(s)){
             inst = services.getJavaInfo().getAttribute(
                     ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, context);
-            result = TB.dot(result, inst);
+            final Function fieldSymbol = EHC.getFieldSymbol(inst, services);
+            result = TB.dot(services, inst.sort(), result, fieldSymbol);
             context = inst.getKeYJavaType();
         }
         return result;      
@@ -283,15 +294,18 @@ public final class TypeConverter {
 	final ReferencePrefix prefix = fr.getReferencePrefix();
 	final ProgramVariable var = fr.getProgramVariable();
 	if (var.isStatic()) {
-	    return TB.var(var);
+	    final Function fieldSymbol = EHC.getFieldSymbol(var, services);
+	    return TB.staticDot(services, var.sort(), fieldSymbol);
 	} else if (prefix == null) {
 	    if (var.isMember()) {
-		return TB.dot(findThisForSort(var.getContainerType().getSort(), ec), 
-		        var);
+		final Function fieldSymbol = EHC.getFieldSymbol(var, services);
+		return TB.dot(services, var.sort(), findThisForSort(var.getContainerType().getSort(), ec), 
+		        fieldSymbol);
 	    }
 	    return TB.var(var); 
 	} else if (!(prefix instanceof PackageReference) ) {
-	    return TB.dot(convertReferencePrefix(prefix, ec), var);
+	    final Function fieldSymbol = EHC.getFieldSymbol(var, services);
+	    return TB.dot(services, var.sort(), convertReferencePrefix(prefix, ec), fieldSymbol);
 	} 
 	Debug.out("typeconverter: Not supported reference type (fr, class):",
 		  fr, fr.getClass());

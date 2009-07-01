@@ -550,7 +550,7 @@ options {
 //	return result;
 //  }
     
-    
+/*    
     private SetOfLocationDescriptor getObjectCreationModSet(KeYJavaType kjt) {
     	SetOfLocationDescriptor result = SetAsListOfLocationDescriptor.EMPTY_SET;
     	
@@ -659,7 +659,7 @@ options {
     	
 	return result;
     }    
-    
+
     
     private Term getObjectCreationFma(KeYJavaType kjt) {
 	ProgramVariable nextToCreate 
@@ -670,6 +670,7 @@ options {
 	Term oldNextToCreateTerm = convertToOld(nextToCreateTerm);
 	return TB.leq(oldNextToCreateTerm, nextToCreateTerm, services);
     }
+*/        
 }
 
 
@@ -832,7 +833,6 @@ storerefkeyword returns [SetOfLocationDescriptor result = SetAsListOfLocationDes
     NOTHING
     | EVERYTHING { result = EverythingLocationDescriptor.INSTANCE_AS_SET; }
     | NOT_SPECIFIED { result = EverythingLocationDescriptor.INSTANCE_AS_SET; }
-    | OBJECT_CREATION LPAREN t=typespec RPAREN  { result = getObjectCreationModSet(t); }
 ;
 
 
@@ -1757,8 +1757,8 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 		// See JML reference manual
 		// http://www.cs.iastate.edu/~leavens/JML/jmlrefman/jmlrefman_11.html#SEC139		
 		Term range = TB.and(
-		    TB.leq(TB.zTerm(services, "0"), TB.var(i), services),
-		    TB.leq(TB.var(i), TB.dot(t,javaInfo.getArrayLength()), services));
+		    TB.leq(TB.zero(services), TB.var(i), services),
+		    TB.leq(TB.var(i), TB.dotLength(services, t), services));
 		Term body = TB.equals(
 		    TB.array(services, t, TB.var(i)),
 		    TB.NULL(services));
@@ -1777,7 +1777,8 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	
     |   FRESH LPAREN sl=spec_expression_list RPAREN
 	{
-	    if (atPreFunctions == null) {
+	    assert false : "not implemented";
+/*	    if (atPreFunctions == null) {
                 raiseError("JML construct " +
                     "\\fresh not allowed in this context.");
 	    }
@@ -1799,6 +1800,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
             t = TB.and(t, fn);
         }
         result = new JMLExpression(t);
+*/
 	} 
 	
     |   REACH LPAREN t=specexpression RPAREN
@@ -1878,10 +1880,6 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
 	{
 	    result = new JMLExpression(t);
 	}
-    |   OBJECT_CREATION LPAREN typ=referencetype RPAREN
-    	{
-    	    result = new JMLExpression(getObjectCreationFma(typ));
-    	}
 ;
 
 specquantifiedexpression returns [Term result = null] throws SLTranslationException

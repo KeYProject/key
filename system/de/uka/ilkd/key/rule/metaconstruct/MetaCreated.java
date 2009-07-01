@@ -45,8 +45,7 @@ public class MetaCreated extends MetaField implements Location {
                     ", but this is of type " + t.sort() );
         }
         
-        return termFactory.createAttributeTerm(services.getJavaInfo().
-                getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, objectKJT), t);
+        return TB.dotCreated(services, t);        
     }
 
  

@@ -1536,8 +1536,6 @@ public abstract class ProgramSVSort extends PrimitiveSort {
             }
             return false;
         }
-        
-        
     }
     
     private static class ExecutionContextSort extends ProgramSVSort {

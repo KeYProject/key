@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.proof.init;
 
+import de.uka.ilkd.key.explicitheap.ExplicitHeapConverter;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -96,7 +97,8 @@ public class CreatedAttributeTermFactory {
         ProgramVariable createdAttribute
                 = javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, 
                                         javaInfo.getJavaLangObject());
-        Term createdTerm = TB.dot(objectTerm, createdAttribute);
+        final Function fieldSymbol = ExplicitHeapConverter.INSTANCE.getFieldSymbol(createdAttribute, services);
+        Term createdTerm = TB.dot(services, createdAttribute.sort(), objectTerm, fieldSymbol);
         
         return TB.equals(createdTerm, TB.TRUE(services));
     }

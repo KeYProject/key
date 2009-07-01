@@ -5,8 +5,11 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.speclang.translation;
 
+import de.uka.ilkd.key.explicitheap.ExplicitHeapConverter;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
@@ -15,7 +18,7 @@ import de.uka.ilkd.key.logic.op.*;
 
 public class SLAttributeResolver extends SLExpressionResolver {
 
-    private static TermBuilder tb = TermBuilder.DF;
+    private static final ExplicitHeapConverter EHC = ExplicitHeapConverter.INSTANCE;
 
     
     public SLAttributeResolver(JavaInfo javaInfo, SLResolverManager manager) {
@@ -47,7 +50,8 @@ public class SLAttributeResolver extends SLExpressionResolver {
                 if(et!=null && attribute==null){
                     containingType = et.getKeYJavaType();
                     if(recTerm!=null){
-                        recTerm = tb.dot(recTerm, et);
+                	final Function fieldSymbol = EHC.getFieldSymbol(et, services);
+                        recTerm = TB.dot(services, et.sort(), recTerm, fieldSymbol);
                     }
                 }else{
                     break;
@@ -62,7 +66,13 @@ public class SLAttributeResolver extends SLExpressionResolver {
                         attribute.name());
             }
             try {
-                Term attributeTerm = tb.dot(recTerm, attribute);
+        	final Function fieldSymbol = EHC.getFieldSymbol(attribute, services);
+        	Term attributeTerm;
+        	if(attribute.isStatic()) {
+        	    attributeTerm = TB.staticDot(services, attribute.sort(), fieldSymbol);
+        	} else {
+        	    attributeTerm = TB.dot(services, attribute.sort(), recTerm, fieldSymbol);
+        	}
                 return manager.createSLExpression(attributeTerm);
             } catch (TermCreationException e) {
                 throw manager.excManager.createException(
@@ -77,10 +87,10 @@ public class SLAttributeResolver extends SLExpressionResolver {
         if(f instanceof NonRigidHeapDependentFunction) {
             if(receiver.isTerm() 
                && f.possibleSubs(new Term[]{receiver.getTerm()})) {
-                Term functionTerm = tb.func(f, receiver.getTerm());
+                Term functionTerm = TB.func(f, receiver.getTerm());
                 return manager.createSLExpression(functionTerm);                
             } else if(receiver.isType() && f.arity() == 0) {
-                Term functionTerm = tb.func(f);
+                Term functionTerm = TB.func(f);
                 return manager.createSLExpression(functionTerm);
             }
         }

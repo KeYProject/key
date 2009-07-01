@@ -7,18 +7,17 @@
 // See LICENSE.TXT for details.
 //
 //
+
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import org.apache.log4j.Logger;
 
+import de.uka.ilkd.key.explicitheap.ExplicitHeapConverter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
-import de.uka.ilkd.key.logic.op.Location;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.RigidFunction;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -68,8 +67,9 @@ public class MetaFieldReference extends AbstractMetaOperator implements
             KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(sort);
             ProgramVariable attr =
                     services.getJavaInfo().getAttribute(attrName, kjt);
-
-            return termFactory.createAttributeTerm(attr, t);
+            
+            Function fieldSymbol = ExplicitHeapConverter.INSTANCE.getFieldSymbol(attr, services);
+            return TB.dot(services, attr.sort(), t, fieldSymbol);
         } catch (Exception e) {
             logger.error("calculating #fiedref failed", e);
             logger.debug(term.toString());

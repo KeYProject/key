@@ -105,6 +105,9 @@ public class LDTInput implements EnvInput {
 	if (initConfig==null) {
 	    throw new IllegalStateException("LDTInput: InitConfig not set.");
 	}
+	
+	mod = ModStrategy.NO_VARS;
+	
 	for (int i=0; i<keyFiles.length; i++) {
 	    keyFiles[i].readSorts(mod);
 	}
@@ -122,7 +125,7 @@ public class LDTInput implements EnvInput {
 	//create LDTs
         Namespace sorts     = initConfig.sortNS();
         Namespace functions = new Namespace(initConfig.funcNS());
-        IteratorOfNamed it = initConfig.choiceNS().allElements().iterator();
+        IteratorOfNamed it  = initConfig.choiceNS().allElements().iterator();
         while(it.hasNext()) {
             Choice c = (Choice) it.next();
             functions.add(c.funcNS());
@@ -138,6 +141,7 @@ public class LDTInput implements EnvInput {
                         	.prepend(new FloatLDT(sorts, functions))
                         	.prepend(new DoubleLDT(sorts, functions))
                         	.prepend(new BooleanLDT(sorts, functions))
+                        	.prepend(new PairLDT(sorts, functions))
                         	.prepend(new SetLDT(sorts, functions))
                         	.prepend(new HeapLDT(sorts, functions, initConfig.progVarNS()));
         initConfig.getServices().getTypeConverter().init(ldts);

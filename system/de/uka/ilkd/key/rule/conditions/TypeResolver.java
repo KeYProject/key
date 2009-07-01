@@ -206,8 +206,6 @@ public abstract class TypeResolver {
             KeYJavaType resolvedType = null;
             if (inst instanceof ProgramVariable) {
                 resolvedType  = ((ProgramVariable)inst).getContainerType();
-            } else if (inst instanceof AttributeOp) {
-                resolvedType = ((AttributeOp)inst).getContainerType();
             } else {
                 Debug.fail("Unknown member type: ", inst);
             }

@@ -118,13 +118,6 @@ public class TacletIndex  {
 		// indexed independent of sort
 		indexObj=((SortDependingSymbol)indexObj).getKind ();
 	    }
-	    if (indexObj instanceof NRFunctionWithExplicitDependencies) {
-		// indexed independent of dependencies
-		indexObj=NRFunctionWithExplicitDependencies.class;
-	    } 
-	    if (indexObj instanceof AccessOp) {
-	        indexObj = AccessOp.class;
-	    }
 	}
 	if (indexObj instanceof SchemaVariable) {
 	    if (((SchemaVariable)indexObj).isTermSV() 
@@ -457,13 +450,9 @@ public class TacletIndex  {
 
 	ListOfNoPosTacletApp inMap;
 
-	if (term.op() instanceof NRFunctionWithExplicitDependencies)
-	    inMap = map.get(NRFunctionWithExplicitDependencies.class);	
-	else if (term.op () instanceof SortDependingSymbol)
+	if (term.op () instanceof SortDependingSymbol)
 	    inMap = map.get(((SortDependingSymbol)term.op()).getKind ());
-	else if (term.op() instanceof AccessOp) {
-	    inMap = map.get(AccessOp.class);
-	} else {
+	else {
 	    inMap = map.get(term.op());
 	}
 	if (inMap != null) {

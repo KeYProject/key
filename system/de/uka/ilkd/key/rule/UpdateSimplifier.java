@@ -62,14 +62,11 @@ public class UpdateSimplifier {
         append(new ApplyAnonymousUpdateOnNonRigid(this)).
         append(new ApplyOnUpdate(this)).
         append(new ApplyOnLocalVariableOrStaticField(this)).
-        append(new ApplyOnAttributeAccess(this)).
-        append(new ApplyOnArrayAccess(this)).
         append(new ApplyOnModality(this, deletionEnabled)).
         append(new ApplyOnRigidTerm(this)).
         append(new ApplyOnRigidOperatorTerm(this)).
         append(new ApplyOnHeapDependentLocation(this, deletionEnabled)).
         append(new ApplyOnProgramMethod(this, deletionEnabled)).
-        append(new ApplyOnNonRigidWithExplicitDependencies(this)).
         append(new ApplyOnNonRigidTerm(this));
         
         this.setSimplificationRules(usRules);        

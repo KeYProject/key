@@ -59,15 +59,8 @@ public class TermHelper {
         final Sort newMaxSort;
         if (op instanceof Function) {
             newMaxSort = ((Function)op).argSort(i);
-        } else if (i == 0 && op instanceof AttributeOp) {          
-            newMaxSort = ((AttributeOp)op).getContainerType().getSort();
-        } else if (i == 0 && op instanceof ArrayOp) {
-            newMaxSort = ((ArrayOp)op).arraySort();
         } else if (op instanceof BoundedNumericalQuantifier) {
             newMaxSort = ((BoundedNumericalQuantifier)op).argSort(i);
-        } else if (op instanceof AccessOp) {
-            newMaxSort = 
-        	services.getTypeConverter().getIntegerLDT().targetSort();
         } else if (op instanceof Equality) {
             newMaxSort = ((Equality)op).argSort(i);
         } else if (op instanceof IUpdateOperator) {

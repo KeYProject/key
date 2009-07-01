@@ -7,21 +7,20 @@
 // See LICENSE.TXT for details.
 //
 //
+
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import de.uka.ilkd.key.explicitheap.ExplicitHeapConverter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.logic.op.MetaOperator;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-/** this class implements the interface for
- * MetaAdderators. MetaAdderators are used to do complex term
- * transformation when applying a taclet. Often these transformation
- * caanot be described with the taclet scheme (or trying to do so would
- * result in a huge number of rules)
- */
+
 public class MetaAttribute extends MetaField {
 
     private String attrName;
@@ -38,10 +37,11 @@ public class MetaAttribute extends MetaField {
     /** calculates the resulting term. */
     public Term calculate(Term term, SVInstantiations svInst, Services services) {
         // This is still not really right, one would need something of the `@' notation thing
-        return termFactory.createAttributeTerm
-	    (services.getJavaInfo().getAllAttributes
-	     (attrName, services.getJavaInfo().getKeYJavaType(term.sub(0).sort())).head(),
-	     term.sub(0));
+	ProgramVariable attr 
+	    = services.getJavaInfo().getAllAttributes(attrName, 
+		                                      services.getJavaInfo().getKeYJavaType(term.sub(0).sort())).head();
+	Function fieldSymbol = ExplicitHeapConverter.INSTANCE.getFieldSymbol(attr, services);
+	return TB.dot(services, attr.sort(), term.sub(0), fieldSymbol);
     }
     
     /** (non-Javadoc)

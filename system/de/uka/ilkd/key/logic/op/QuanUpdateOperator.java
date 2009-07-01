@@ -577,8 +577,6 @@ public class QuanUpdateOperator implements IUpdateOperator {
                     return 1;
                 else
                     return 0;
-            } else if ( location instanceof AccessOp ) {
-                return 2;
             } else
                 return 3;
         }

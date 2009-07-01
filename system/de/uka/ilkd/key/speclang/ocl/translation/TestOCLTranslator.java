@@ -13,6 +13,7 @@ import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.explicitheap.ExplicitHeapConverter;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -122,7 +123,8 @@ public class TestOCLTranslator extends TestCase {
         assertTrue(result != null);
 
         assert result != null;
-        assertTrue(result.getFormula().equals(tb.dot(tb.var(selfVar), i)));
+        final Function fieldSymbol = ExplicitHeapConverter.INSTANCE.getFieldSymbol(i, services);
+        assertTrue(result.getFormula().equals(tb.dot(services, i.sort(), tb.var(selfVar), fieldSymbol)));
         assertTrue(result.getAxioms().isEmpty());
     }
 

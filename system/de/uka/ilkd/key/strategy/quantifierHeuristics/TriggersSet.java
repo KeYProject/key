@@ -316,9 +316,9 @@ class TriggersSet {
             final Operator op = term.op();
 
             // we do not want to match on expressions a.<created>
-            if (op instanceof AttributeOp) {
-                final AttributeOp attrOp = (AttributeOp) op;                
-                if (attrOp.attribute().name().toString().endsWith(ImplicitFieldAdder.IMPLICIT_CREATED)) {
+            
+            if(term.op() == services.getTypeConverter().getHeapLDT().getSelect(term.sort(), services)) {
+        	if(term.sub(2).op().name().toString().endsWith(ImplicitFieldAdder.IMPLICIT_CREATED)) {
                     return false;
                 }
             }

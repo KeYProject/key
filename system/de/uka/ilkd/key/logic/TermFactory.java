@@ -110,66 +110,6 @@ public class TermFactory {
     private static final Term[] NO_SUBTERMS = new Term[0];
 
 
-    
-    public Term createAttributeTerm(AttributeOp op, Term term) {
-	Debug.assertFalse(op instanceof ShadowedOperator, 
-			  "Tried to create a shadowed attribute.");
-	if (op.attribute() instanceof ProgramVariable && 
-	    ((ProgramVariable)op.attribute()).isStatic()) {
-	    return OpTerm.createConstantOpTerm(op.attribute()).checked();
-	} 
-	return OpTerm.createUnaryOpTerm(op, term).checked();
-    }
-    
-    /**
-     * creates a term representing an attribute access
-     * @param attrOp the AttributeOp representing the attribute to be accessed
-     * @param subs an array of Term containing the subterms (usually of 
-     * length 1 but may have length 2 for shadowed accesses) 
-     * @return the term <code>subs[0].attr</code> 
-     * (or <code>subs[0]^(subs[1]).attr)</code>)
-     */
-    public Term createAttributeTerm(AttributeOp attrOp, Term[] subs) {
-        if (attrOp instanceof ShadowedOperator) {
-            return createShadowAttributeTerm
-                ((ShadowAttributeOp)attrOp, subs[0], subs[1]);
-        }
-        return createAttributeTerm(attrOp, subs[0]);
-    }
-
-    /** creates an attribute term that references to a field of a class
-     * @param var the variable the attribute term references to
-     * @param term the Term describing the class/object of which the
-     * attribute value has to be determined
-     * @return the attribute term "term.var"
-     */
-    public Term createAttributeTerm(ProgramVariable var, 
-            Term term) {
-	if (var.isStatic()) {
-	    return createVariableTerm(var);
-	}        
-        
-        final CacheKey key = new CacheKey(var, term);
-        Term attrTerm = cache.get(key);
-        if (attrTerm == null){
-            attrTerm = OpTerm.createUnaryOpTerm(AttributeOp.getAttributeOp(var), term).checked();
-            cache.put(key, attrTerm);
-        } 
-        return attrTerm;
-    }
-    
-    /** 
-     * creates an attribute term that references to a field of a class 
-     * @param var the variable the attribute term references to
-     * @param term the Term describing the class/object of which the
-     * attribute value has to be determined      
-     * @return the attribute term "term.var"
-     */
-    public Term createAttributeTerm(SchemaVariable var, Term term) {
-	return OpTerm.createUnaryOpTerm(AttributeOp.getAttributeOp((IProgramVariable)var), term).checked();
-    }
-
-
     public Term createBoxTerm(JavaBlock javaBlock, Term subTerm) {
 	return createProgramTerm(Op.BOX, javaBlock, subTerm);
     }
@@ -508,22 +448,6 @@ public class TermFactory {
 	    (varsBoundHere), subTerm);
     }
 
-    public Term createShadowAttributeTerm(ProgramVariable var, 
-					    Term term, Term shadownum) {
-	return OpTerm.createOpTerm(ShadowAttributeOp.getShadowAttributeOp(var), new Term[]{term, shadownum}).checked();
-    }
-
-
-    public Term createShadowAttributeTerm(SchemaVariable var,
-					    Term term, Term shadownum) {
-	return OpTerm.createOpTerm(ShadowAttributeOp.getShadowAttributeOp((IProgramVariable)var), new Term[]{term, shadownum}).checked();
-    }
-    
-    public Term createShadowAttributeTerm(ShadowAttributeOp op, 
-					    Term term, Term shadownum) {
-	return OpTerm.createOpTerm(op, new Term[]{term, shadownum}).checked();
-    }
-
 
      /** creates a substitution term
      * @param substVar the QuantifiableVariable to be substituted
@@ -567,16 +491,6 @@ public class TermFactory {
 	    ((AnonymousUpdate)op, subTerms[0]);
 	} else if (op instanceof Modality) {
 	    return createProgramTerm((Modality)op, javaBlock, subTerms[0]); 
-	} else if (op instanceof AccessOp) {
-	    if (op instanceof ShadowAttributeOp) {
-		return createShadowAttributeTerm((ShadowAttributeOp)op, 
-						 subTerms[0], subTerms[1]);
-	    } else if (op instanceof AttributeOp) {
-		return createAttributeTerm((AttributeOp)op, subTerms[0]);
-	    } else {
-		Debug.fail("Unknown access operator" + op);
-		return null;
-	    }
 	} else if (op instanceof IfThenElse) {
 	    return createIfThenElseTerm ( subTerms[0], subTerms[1], subTerms[2] );
 	} else if (op instanceof MetaOperator) {

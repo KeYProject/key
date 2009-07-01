@@ -1510,14 +1510,7 @@ public class LogicPrinter {
     private String[] setupUpdateSeparators (final Operator loc, final Term t)
                                                 throws IOException {
         String[] separator = new String [loc.arity ()];
-        if ( loc instanceof AttributeOp ) {
-            separator[0] = Notation.
-               Attribute.printName(((AttributeOp)loc), t.sub(0), this);
-        } /*XXX
-          else if ( loc instanceof ArrayOp ) {
-            separator[0] = "[";
-            separator[1] = "]";
-        } */else if ( loc.arity () == 0 ) {
+        if ( loc.arity () == 0 ) {
             layouter.print( loc.name ().toString ().replaceAll ( "::", "." ) );
         } else {
             layouter.print ( loc.name().toString() + "(" );

@@ -67,28 +67,6 @@ public class AnonymisingUpdateFactory {
         
         if(op instanceof ProgramVariable) {
             Debug.assertTrue(op.arity() == 0);
-        } else if(op instanceof AccessOp) {
-            Sort integerSort = services.getTypeConverter().getIntegerLDT()
-                                                          .targetSort();
-
-            if(op instanceof AttributeOp) {
-                AttributeOp aop = (AttributeOp) op;
-                KeYJavaType kjt = ((ProgramVariable) aop.attribute())
-                                  .getContainerType();
-                if(services.getJavaInfo().rec2key().getSuperArrayType() == kjt
-                   && "length".equals(aop.attribute().name().toString())) {
-                    result[0] 
-                         = services.getJavaInfo().getJavaLangObjectAsSort();
-                } else {
-                    result[0] = kjt.getSort();
-                }
-            } else {
-                Debug.fail("Unexpected location operator."+op);
-            }
-
-            if(((AccessOp)op).isShadowed()) {
-                result[op.arity() - 1] = integerSort; 
-            }
         } else if(op instanceof Function) {           
             Function func = (Function) op;               
             for(int i = 0; i < op.arity(); i++) {
@@ -125,9 +103,7 @@ public class AnonymisingUpdateFactory {
         RigidFunction result = (RigidFunction) functions.get(locTerm.op());
         
         if (result == null) {
-            Name baseName = locTerm.op() instanceof AttributeOp ? 
-                    ((AttributeOp) locTerm.op()).attribute().name()
-                    : locTerm.op().name();
+            Name baseName =  locTerm.op().name();
 
             if (baseName instanceof ProgramElementName) {
                 baseName = new 

@@ -15,11 +15,7 @@ import java.util.HashMap;
 
 import de.uka.ilkd.key.explicitheap.SameField;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.LDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -47,14 +43,6 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     public static final AbstractMetaOperator META_CREATED = new MetaCreated();
     
     public static final AbstractMetaOperator META_NEXT_TO_CREATE = new MetaNextToCreate();
-
-
-    public static final AbstractMetaOperator META_TRAINITIALIZED = new MetaTraInitialized();
-
-    public static final AbstractMetaOperator META_TRANSIENT = new MetaTransient();
-
-    public static final AbstractMetaOperator META_TRANSACTIONCOUNTER = 
-	new MetaTransactionCounter();
     
     /** general access to nonstatic fields in classes */
     public static final AbstractMetaOperator META_FIELDREF = new MetaFieldReference(); 
@@ -141,7 +129,8 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     public static final Sort METASORT = new PrimitiveSort(new Name("Meta"));
 
     
-    protected TermFactory termFactory = TermFactory.DEFAULT;
+    protected static final TermFactory termFactory = TermFactory.DEFAULT;
+    protected static final TermBuilder TB = TermBuilder.DF;
 
     private int arity;
 

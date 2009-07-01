@@ -5,8 +5,11 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import de.uka.ilkd.key.explicitheap.ExplicitHeapConverter;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.IteratorOfKeYJavaType;
@@ -33,6 +36,7 @@ import de.uka.ilkd.key.util.Debug;
 public class InReachableStatePOBuilder {
     
     private static final TermBuilder TB = TermBuilder.DF;
+    private static final ExplicitHeapConverter EHC = ExplicitHeapConverter.INSTANCE;
 
     private final UpdateFactory uf;
     private final Services services;
@@ -62,7 +66,7 @@ public class InReachableStatePOBuilder {
      * to a legal pointer structure reachable from the current state.
      */
     public Term generatePO(Term updateInReachableState) {
-
+/*XXX
         if (!(updateInReachableState.op() instanceof IUpdateOperator)) {
             return updateInReachableState;
         }
@@ -182,7 +186,7 @@ public class InReachableStatePOBuilder {
                         result = arrayLengthIsIRSConform(refPrefix, update);
                     }
                 }
-            } /*XXX
+            } 
             else if (loc instanceof ArrayOp) {
                 final Sort elementSort =
                         ((ArraySort) ((ArrayOp) loc).arraySort()).elementSort();
@@ -202,7 +206,7 @@ public class InReachableStatePOBuilder {
 
                     result = TB.all(vPre, TB.imp(preAx, result));
                 }
-            }*/
+            }
             if (result != null) {
                 // take care of quantified updates
                 result = quanUpdateClosure(pair, result);
@@ -216,7 +220,9 @@ public class InReachableStatePOBuilder {
         // no free variables on top level
         Debug.assertTrue(po.freeVars().size() == 0);
 
-        return po;
+        return po;*/
+	assert false : "uh oh";
+	return null;
     }
 
     private Term arrayStoreValid(Term arrayRef, Term arrayValue) {
@@ -248,31 +254,31 @@ public class InReachableStatePOBuilder {
      * @param t_get the Term T::<get>(idx)
      * @return the relevant invariant
      */
-    private Term createdInvariantForReposInstance(Update update, Term t_get) {
-        Term result;
-        final SortDependingFunction get = ((SortDependingFunction) t_get.op());
-        final ObjectSort os = (ObjectSort) get.getSortDependingOn();
-        final LogicVariable lv = new LogicVariable(new Name("i"), intSort);
-
-        final Term idx = t_get.sub(0);
-        final LogicVariable idxPre = atPre(idx, 0);
-        final Term t_idxPre = TB.var(idxPre);
-
-        /*
-         * pair = (T::<get>(idx).created:=b) <code> U( T::<get>(idx@pre).created =
-         * TRUE <-> \exists int i; (i>=0 & i<T.<nextToCreate> & T::<get>(i) =
-         * T::<get>(idx@pre)) </code>
-         * 
-         */
-        final Term getPreIdx = TB.func(get, t_idxPre);
-
-        result =
-                TB.equiv(TB.equals(TB.dot(getPreIdx, created), TRUE), TB.ex(lv, TB.and(
-                        interval(TB.zero(services), TB.var(lv), TB.var(ntc(os))),
-                        TB.equals(TB.func(get, TB.var(lv)), getPreIdx))));
-
-        return TB.all(idxPre, TB.imp(TB.equals(idx, t_idxPre), update(update, result)));
-    }
+//    private Term createdInvariantForReposInstance(Update update, Term t_get) {
+//        Term result;
+//        final SortDependingFunction get = ((SortDependingFunction) t_get.op());
+//        final ObjectSort os = (ObjectSort) get.getSortDependingOn();
+//        final LogicVariable lv = new LogicVariable(new Name("i"), intSort);
+//
+//        final Term idx = t_get.sub(0);
+//        final LogicVariable idxPre = atPre(idx, 0);
+//        final Term t_idxPre = TB.var(idxPre);
+//
+//        /*
+//         * pair = (T::<get>(idx).created:=b) <code> U( T::<get>(idx@pre).created =
+//         * TRUE <-> \exists int i; (i>=0 & i<T.<nextToCreate> & T::<get>(i) =
+//         * T::<get>(idx@pre)) </code>
+//         * 
+//         */
+//        final Term getPreIdx = TB.func(get, t_idxPre);
+//
+//        result =
+//                TB.equiv(TB.equals(TB.dot(getPreIdx, created), TRUE), TB.ex(lv, TB.and(
+//                        interval(TB.zero(services), TB.var(lv), TB.var(ntc(os))),
+//                        TB.equals(TB.func(get, TB.var(lv)), getPreIdx))));
+//
+//        return TB.all(idxPre, TB.imp(TB.equals(idx, t_idxPre), update(update, result)));
+//    }
 
     /**
      * for each assignment pair of an update a formula is created with the
@@ -311,9 +317,9 @@ public class InReachableStatePOBuilder {
      *            the Update to be checked to preserve <tt>inReachableState</tt>
      * @return global invariants
      */
-    private Term globalInvariants(Update update) {
-        return noObjectDeletion(update);
-    }
+//    private Term globalInvariants(Update update) {
+//        return noObjectDeletion(update);
+//    }
 
     /**
      * Generates a formula ensuring that an update (U) does not delete a former
@@ -326,13 +332,13 @@ public class InReachableStatePOBuilder {
      * @return a formula that evaluates to true if the update does not delete
      *         objects
      */
-    private Term noObjectDeletion(Update update) {
-        final LogicVariable o =
-                new LogicVariable(new Name("o"),
-                        services.getJavaInfo().getJavaLangObjectAsSort());
-        final Term o_created = TB.equals(TB.dot(TB.var(o), created), TRUE);
-        return TB.all(o, TB.imp(o_created, update(update, o_created)));
-    }
+//    private Term noObjectDeletion(Update update) {
+//        final LogicVariable o =
+//                new LogicVariable(new Name("o"),
+//                        services.getJavaInfo().getJavaLangObjectAsSort());
+//        final Term o_created = TB.equals(TB.dot(TB.var(o), created), TRUE);
+//        return TB.all(o, TB.imp(o_created, update(update, o_created)));
+//    }
 
     /**
      * Generates a formula checking that the given static field <tt>T.sv</tt>
@@ -350,14 +356,14 @@ public class InReachableStatePOBuilder {
      * @return a formula that evaluates to true iff the update U does not update
      *         the static field loc to an "illegal" value
      */
-    private Term staticFieldLiveRef(Update update, AssignmentPair pair) {
-        final ProgramVariable classInit =
-                services.getJavaInfo().getAttribute(
-                        ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED,
-                        (((ProgramVariable) pair.location())).getContainerType());
-        return update(update, TB.imp(TB.equals(TB.var(classInit), TRUE),
-                createdOrNull(pair.locationAsTerm())));
-    }
+//    private Term staticFieldLiveRef(Update update, AssignmentPair pair) {
+//        final ProgramVariable classInit =
+//                services.getJavaInfo().getAttribute(
+//                        ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED,
+//                        (((ProgramVariable) pair.location())).getContainerType());
+//        return update(update, TB.imp(TB.equals(TB.var(classInit), TRUE),
+//                createdOrNull(pair.locationAsTerm())));
+//    }
 
     /**
      * generates a formula that ensures that all ensuring that the updated field
@@ -386,26 +392,26 @@ public class InReachableStatePOBuilder {
      * @return a formula that evaluates to true if the update U does not destroy
      *         the system invariants of <tt>T.<nextToCreate></tt>
      */
-    private Term nextToCreateUpdatedSafely(final Update update,
-            final ProgramVariable pv) {
-        Term result;
-        final ObjectSort os = (ObjectSort) pv.getContainerType().getSort();
-        final LogicVariable iv = new LogicVariable(new Name("i"), intSort);
-
-        final Term updatedPV = update(update, TB.var(pv));
-
-        result = TB.geq(updatedPV, TB.zero(services), services);
-
-        final Term interval = interval(TB.var(pv), TB.var(iv), updatedPV);
-
-        result =
-                TB.and(result, TB.all(iv, TB.imp(interval, update(update, TB.equals(TB.dot(
-                        TB.func(rep(os), TB.var(iv)), created), TB.TRUE(services))))));
-
-        result = TB.and(result, TB.leq(TB.var(pv), updatedPV, services));
-
-        return result;
-    }
+//    private Term nextToCreateUpdatedSafely(final Update update,
+//            final ProgramVariable pv) {
+//        Term result;
+//        final ObjectSort os = (ObjectSort) pv.getContainerType().getSort();
+//        final LogicVariable iv = new LogicVariable(new Name("i"), intSort);
+//
+//        final Term updatedPV = update(update, TB.var(pv));
+//
+//        result = TB.geq(updatedPV, TB.zero(services), services);
+//
+//        final Term interval = interval(TB.var(pv), TB.var(iv), updatedPV);
+//
+//        result =
+//                TB.and(result, TB.all(iv, TB.imp(interval, update(update, TB.equals(TB.dot(
+//                        TB.func(rep(os), TB.var(iv)), created), TB.TRUE(services))))));
+//
+//        result = TB.and(result, TB.leq(TB.var(pv), updatedPV, services));
+//
+//        return result;
+//    }
 
     /**
      * generate a formula that ensures that for an enum type <code>E</code> an
@@ -663,13 +669,13 @@ public class InReachableStatePOBuilder {
      *    \forall x; ((x = arrayReference & x!=null -> U(x.<created>=TRUE -> x.length >= 0)))
      * </code>
      */
-    private Term arrayLengthIsIRSConform(Term arrayReference, Update u) {
-        final LogicVariable preRef = atPre(arrayReference, 0);
-        return TB.all(preRef, TB.imp(TB.and(TB.equals(TB.var(preRef), arrayReference),
-                TB.not(TB.equals(TB.var(preRef), TB.NULL(services)))), update(u, TB.imp(
-                TB.equals(TB.dot(TB.var(preRef), created), TB.TRUE(services)), TB.geq(TB.dot(
-                        TB.var(preRef), arraylength), TB.zero(services), services)))));
-    }
+//    private Term arrayLengthIsIRSConform(Term arrayReference, Update u) {
+//        final LogicVariable preRef = atPre(arrayReference, 0);
+//        return TB.all(preRef, TB.imp(TB.and(TB.equals(TB.var(preRef), arrayReference),
+//                TB.not(TB.equals(TB.var(preRef), TB.NULL(services)))), update(u, TB.imp(
+//                TB.equals(TB.dot(TB.var(preRef), created), TB.TRUE(services)), TB.geq(TB.dot(
+//                        TB.var(preRef), arraylength), TB.zero(services), services)))));
+//    }
 
     // helper method for class field pos
 
@@ -724,10 +730,10 @@ public class InReachableStatePOBuilder {
         return uf.prepend(update, target);
     }
 
-    private Term createdOrNull(final Term t_o_a) {
-        return TB.or(TB.equals(TB.dot(t_o_a, created), TRUE), TB.equals(t_o_a,
-                TB.NULL(services)));
-    }
+//    private Term createdOrNull(final Term t_o_a) {
+//        return TB.or(TB.equals(TB.dot(t_o_a, created), TRUE), TB.equals(t_o_a,
+//                TB.NULL(services)));
+//    }
 
     private ProgramVariable ntc(ObjectSort os) {
         return services.getJavaInfo().getAttribute(
@@ -763,9 +769,9 @@ public class InReachableStatePOBuilder {
     }
 
     /** creates an attribute term and takes care of shadowed attributes as well */
-    private Term dot(Term[] subs, AttributeOp op) {
-        return TB.tf().createAttributeTerm(op, subs);
-    }
+//    private Term dot(Term[] subs, AttributeOp op) {
+//        return TB.tf().createAttributeTerm(op, subs);
+//    }
 
     private Term[] var(LogicVariable[] v) {
         final Term[] result = new Term[v.length];

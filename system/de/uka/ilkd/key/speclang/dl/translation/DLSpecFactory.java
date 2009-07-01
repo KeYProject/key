@@ -34,7 +34,6 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.AttributeOp;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ListOfParsableVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -160,7 +159,7 @@ public class DLSpecFactory {
         String nameString = op.name().toString();
         if(nameString.endsWith("@pre")) {
             assert op instanceof Function;
-            
+assert false : "not implemented";            
             //retrieve operator corresponding to the atPre function
             Name normalName 
                 = new Name(nameString.substring(0, nameString.length() - 4));
@@ -171,7 +170,7 @@ public class DLSpecFactory {
                         = services.getJavaInfo()
                                   .getAttribute(normalName.toString());
                 assert attrPV != null;
-                normalOp = AttributeOp.getAttributeOp(attrPV);
+//                normalOp = AttributeOp.getAttributeOp(attrPV);
             }
             assert normalOp != null;
             

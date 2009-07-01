@@ -17,10 +17,11 @@
 
 package de.uka.ilkd.key.speclang.ocl.translation;
 
+import de.uka.ilkd.key.explicitheap.ExplicitHeapConverter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.translation.SLResolverManager;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
@@ -34,12 +35,9 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
  */
 class OCLAttributeResolver extends SLExpressionResolver {
     
-    private static final TermFactory tf = TermFactory.DEFAULT;
-    private final Services services;
     
     public OCLAttributeResolver(Services services, SLResolverManager manager) {
         super(services.getJavaInfo(), manager);
-        this.services = services;
     }    
     
     
@@ -78,10 +76,9 @@ class OCLAttributeResolver extends SLExpressionResolver {
         if(attribute != null) {
             OCLCollection recCollection = (OCLCollection) receiver.getCollection();
             
-
             Term recVarTerm = recCollection.getPredVarAsTerm();
-            Term attributeTerm = tf.createAttributeTerm(attribute, 
-                                                        recVarTerm);                
+            Function fieldSymbol = ExplicitHeapConverter.INSTANCE.getFieldSymbol(attribute, services);
+            Term attributeTerm = TB.dot(services, attribute.sort(), recVarTerm, fieldSymbol); 
             OCLCollection newCollection 
                     = recCollection.collect(services, attributeTerm);
             return new OCLExpression(newCollection);

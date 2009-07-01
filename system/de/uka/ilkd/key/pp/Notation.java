@@ -388,55 +388,6 @@ public abstract class Notation {
     }
 
     /**
-         * The standard concrete syntax for a non rigid function with explicit
-         * known dependencies.
-         */
-    public static class NRFunctionWithDependenciesNotation extends Notation {
-
-	public NRFunctionWithDependenciesNotation() {
-	    super(130);
-	}
-
-	public void print(Term t, LogicPrinter sp) throws IOException {
-	    if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
-		sp.printTerm(t);
-	    } else {
-		final NRFunctionWithExplicitDependencies func = (NRFunctionWithExplicitDependencies) t
-			.op();
-		StringBuffer name = new StringBuffer(func.classifier());
-		name
-			.append(NRFunctionWithExplicitDependencies.DEPENDENCY_LIST_STARTER);
-
-		final int depSize = func.dependencies().size();
-		for (int i = 0; i < depSize; i++) {
-
-		    Location loc = func.dependencies().getLocation(i);
-		    if (loc instanceof ProgramVariable
-			    && ((ProgramVariable) loc).isMember()) {
-			loc = AttributeOp.getAttributeOp((ProgramVariable) loc);
-		    }
-
-		    if (loc instanceof AttributeOp) {
-			name.append(Attribute.printName((AttributeOp) loc,
-				null, null).substring(1));
-		    } else {
-			name.append(loc.name());
-		    }
-		    name
-			    .append(NRFunctionWithExplicitDependencies.DEPENDENCY_LIST_SEPARATOR);
-		}
-		if (depSize == 0) {
-		    name
-			    .append(NRFunctionWithExplicitDependencies.DEPENDENCY_LIST_SEPARATOR);
-		}
-		name
-			.append(NRFunctionWithExplicitDependencies.DEPENDENCY_LIST_END);
-		sp.printFunctionTerm(name.toString(), t);
-	    }
-	}
-    }
-
-    /**
          * The standard concrete syntax for arrays.
          */
     public static class CastFunction extends Notation {
@@ -517,78 +468,30 @@ public abstract class Notation {
     /**
          * The standard concrete syntax for attribute terms <code>o.a</code>.
          */
-    public static class Attribute extends Notation {
-
-	private int associativity;
-
-	public Attribute(int priority, int associativity) {
-	    super(priority);
-	    this.associativity = associativity;
-	}
-
-	/**
-         * prints an attribute operator
-         */
-	public static String printName(AttributeOp op, Term refPrefix,
-		LogicPrinter sp) {
-	    final IProgramVariable ivar = op.attribute();
-	    if (!(ivar instanceof ProgramVariable)) {
-		return op.toString();
-	    }
-	    final ProgramVariable pvar = ((ProgramVariable) ivar);
-
-	    final String qualifier = pvar.getProgramElementName()
-		    .getQualifier();
-	    final String programName = pvar.getProgramElementName()
-		    .getProgramName();
-
-	    if (qualifier.length() == 0
-		    || (refPrefix != null && sp != null && sp.printInShortForm(
-			    programName, refPrefix))) {
-		return "." + programName;
-	    }
-
-	    return "." + programName + "@(" + qualifier + ")";
-
-	}
-
-	public void print(Term t, LogicPrinter sp) throws IOException {
-	    if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
-		sp.printTerm(t);
-	    } else {
-		if (t.op() instanceof AttributeOp) {
-		    sp.printPostfixTerm(t.sub(0), associativity, printName(
-			    (AttributeOp) t.op(), t.sub(0), sp));
-		} else {
-		    sp.printPostfixTerm(t.sub(0), associativity, "."
-			    + t.op().name());
-		}
-	    }
-	}
-    }
-
-    /**
-         * The standard concrete syntax for attribute terms <code>o.a</code>.
-         */
-    public static class ShadowAttribute extends Notation {
-
-	private int associativity;
-
-	public ShadowAttribute(int priority, int associativity) {
-	    super(priority);
-	    this.associativity = associativity;
-	}
-
-	public void print(Term t, LogicPrinter sp) throws IOException {
-	    if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
-		sp.printTerm(t);
-	    } else {
-		sp.printShadowedAttribute(t.sub(0), associativity, Attribute
-			.printName(((AttributeOp) t.op()), t.sub(0), sp), t
-			.sub(1));
-	    }
-	}
-    }
+    //XXX
+//    public static class Attribute extends Notation {
+//
+//	private int associativity;
+//
+//	public Attribute(int priority, int associativity) {
+//	    super(priority);
+//	    this.associativity = associativity;
+//	}
+//
+//	public void print(Term t, LogicPrinter sp) throws IOException {
+//	    if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
+//		sp.printTerm(t);
+//	    } else {
+//		if (t.op() instanceof AttributeOp) {
+//		    sp.printPostfixTerm(t.sub(0), associativity, printName(
+//			    (AttributeOp) t.op(), t.sub(0), sp));
+//		} else {
+//		    sp.printPostfixTerm(t.sub(0), associativity, "."
+//			    + t.op().name());
+//		}
+//	    }
+//	}
+//    }
 
     /**
          * The standard concrete syntax for conditional terms

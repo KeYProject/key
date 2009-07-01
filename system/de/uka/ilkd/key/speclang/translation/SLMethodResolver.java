@@ -5,21 +5,22 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.speclang.translation;
 
+import de.uka.ilkd.key.explicitheap.ExplicitHeapConverter;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.ListOfKeYJavaType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 public class SLMethodResolver extends SLExpressionResolver {
-
-    private TermBuilder tb = TermBuilder.DF;
-    
+  
     public SLMethodResolver(JavaInfo javaInfo, SLResolverManager manager) {
         super(javaInfo, manager);
     }
@@ -55,7 +56,8 @@ public class SLMethodResolver extends SLExpressionResolver {
             if(et!=null && pm==null){
                 containingType = et.getKeYJavaType();
                 if(recTerm!=null){
-                    recTerm = tb.dot(recTerm, et);
+                    final Function fieldSymbol = ExplicitHeapConverter.INSTANCE.getFieldSymbol(et, services);
+                    recTerm = TB.dot(services, et.sort(), recTerm, fieldSymbol);
                 }
             }else{
                 break;
@@ -96,7 +98,7 @@ public class SLMethodResolver extends SLExpressionResolver {
             		"method \"" + methodName + "\" in specification expression.");
         }
         
-        return manager.createSLExpression(tb.func(pm,subs));
+        return manager.createSLExpression(TB.func(pm,subs));
     }
 
 

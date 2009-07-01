@@ -48,8 +48,6 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
  */
 class BuiltInPropertyResolver extends SLExpressionResolver {
 
-    private static final TermBuilder TB = TermBuilder.DF;
-
     private static final CreatedAttributeTermFactory createdFactory = CreatedAttributeTermFactory.INSTANCE;
 
     private static final Term trueTerm = TB.tt();

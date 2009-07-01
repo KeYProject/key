@@ -18,10 +18,16 @@
 package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.TermBuilder;
+
 
 public abstract class SLExpressionResolver {
+    
+    protected static final TermBuilder TB = TermBuilder.DF;
 
     protected final JavaInfo javaInfo;
+    protected final Services services;
     protected final SLResolverManager manager;
     
     public SLExpressionResolver(JavaInfo javaInfo, SLResolverManager manager) {
@@ -29,6 +35,7 @@ public abstract class SLExpressionResolver {
         assert manager  != null;
         
         this.javaInfo = javaInfo;
+        this.services = javaInfo.getServices();
         this.manager = manager;
     }
 
