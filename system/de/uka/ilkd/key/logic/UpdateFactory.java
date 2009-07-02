@@ -293,7 +293,7 @@ public class UpdateFactory {
                                                          pair,
                                                          firstNPairs ( oldPairsP,
                                                                        locNum ) );
-                newGuard = tf.createJunctorTermAndSimplify ( Op.AND,
+                newGuard = tf.createJunctorTermAndSimplify ( Junctor.AND,
                                                              clashCond,
                                                              pair.guard () );                
             } else {
@@ -336,19 +336,19 @@ public class UpdateFactory {
                                   AssignmentPair pair,
                                   Update prefix) {
         Term res = getSimplifier().matchingCondition ( prefix, pair.locationAsTerm (), services );
-        if ( res.op () == Op.FALSE )
+        if ( res.op () == Junctor.FALSE )
             return UpdateSimplifierTermFactory.DEFAULT.getValidGuard ();
 
 // Bug in the first implementation: It is wrong to add quanifiers here        
 //        if ( pair.boundVars ().size () > 0 )
 //            res = tf.createQuantifierTerm ( Op.EX, pair.boundVars (), res );
-        res = tf.createJunctorTerm ( Op.NOT, res );
+        res = tf.createJunctorTerm ( Junctor.NOT, res );
         
         final Term var2varPComparison =
             wellOrder ( tf.createVariableTerm ( (LogicVariable)var ),
                         tf.createVariableTerm ( varP ) );
 
-        res = tf.createJunctorTermAndSimplify ( Op.OR, var2varPComparison, res );
+        res = tf.createJunctorTermAndSimplify ( Junctor.OR, var2varPComparison, res );
         return tf.createQuantifierTerm ( Op.ALL, varP, res );
     }
 
@@ -387,7 +387,7 @@ public class UpdateFactory {
         for ( int i = 0; i != oldPairs.size (); ++i ) {
             final AssignmentPair pair = oldPairs.getAssignmentPair ( i );
             final Term newGuard =
-                tf.createJunctorTermAndSimplify ( Op.AND, guard, pair.guard () );
+                tf.createJunctorTermAndSimplify ( Junctor.AND, guard, pair.guard () );
             newPairs[i] = new AssignmentPairImpl ( pair.boundVars (),
                                                    newGuard,
                                                    pair.location (),

@@ -18,7 +18,7 @@ import de.uka.ilkd.key.logic.IteratorOfNamed;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.rule.ListOfTacletApp;
 import de.uka.ilkd.key.rule.SLListOfTacletApp;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
@@ -208,7 +208,7 @@ public class POBuilder {
             poTerm = p_formula;
         else
             poTerm = TermFactory.DEFAULT.createJunctorTerm
-        	( Op.AND, p_formula, poTerm );
+        	( Junctor.AND, p_formula, poTerm );
     }
 
     private SkolemSet collectPrefixes(SkolemSet p_ss) {
@@ -249,7 +249,7 @@ public class POBuilder {
 
     public Term      getPOTerm    () {
 	if ( poTerm == null )
-	    return TermFactory.DEFAULT.createJunctorTerm ( Op.TRUE );
+	    return TermFactory.DEFAULT.createJunctorTerm ( Junctor.TRUE );
 	else
 	    return poTerm;
     }

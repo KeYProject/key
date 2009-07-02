@@ -28,7 +28,7 @@ public class Metavariable extends TermSymbol
     }
 
     private Metavariable(Name name, Sort sort, boolean isTemporaryVariable) {
-	super(name, sort);
+	super(name, 0, sort);
 	if ( sort == Sort.FORMULA ) {
 	    throw new RuntimeException(
 		 "Attempt to create metavariable of type formula");
@@ -54,11 +54,6 @@ public class Metavariable extends TermSymbol
 
     public String toString() {
 	return name()+":"+sort();
-    }
-
-   /** @return arity of the Metavariable as int */
-    public int arity() {
-	return 0;
     }
 
     public int compareTo ( Metavariable p_mr ) {

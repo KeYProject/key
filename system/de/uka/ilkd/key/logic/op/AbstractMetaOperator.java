@@ -19,22 +19,19 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.rule.metaconstruct.arith.*;
 import de.uka.ilkd.key.util.Debug;
 
-/** 
- * this class implements the interface for
- * MetaOperators. MetaOperators are used to do complex term
- * transformation when applying a taclet. Often these transformation
- * caanot be described with the taclet scheme (or trying to do so would
- * result in a huge number of rules)
- */
-public abstract class AbstractMetaOperator extends Op implements MetaOperator {
+
+public abstract class AbstractMetaOperator extends TermSymbol 
+                                           implements MetaOperator {
 
     private static HashMap<String, AbstractMetaOperator> name2metaop = 
         new HashMap<String, AbstractMetaOperator>(70);
+    
+    //must be first
+    public static final Sort METASORT = new PrimitiveSort(new Name("Meta"));    
 
     public static final AbstractMetaOperator META_LENGTH = new MetaLength();
 
@@ -44,10 +41,8 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     
     public static final AbstractMetaOperator META_NEXT_TO_CREATE = new MetaNextToCreate();
     
-    /** general access to nonstatic fields in classes */
     public static final AbstractMetaOperator META_FIELDREF = new MetaFieldReference(); 
 
-    /** used to add integers */
     public static final AbstractMetaOperator META_ADD = new MetaAdd();
 
     public static final AbstractMetaOperator META_SUB = new MetaSub();
@@ -119,60 +114,33 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
     
     public static final AbstractMetaOperator AT_PRE_EQUATIONS = new AtPreEquations();
             
-    /** metaconstruct for strictly pure method calls */
     public static final AbstractMetaOperator META_METHOD_CALL_TO_UPDATE= new MethodCallToUpdate();
     
     public static final AbstractMetaOperator SAME_FIELD = new SameField();
-
-    public static final Sort METASORT = new PrimitiveSort(new Name("Meta"));
 
     
     protected static final TermFactory termFactory = TermFactory.DEFAULT;
     protected static final TermBuilder TB = TermBuilder.DF;
 
-    private int arity;
-
     public AbstractMetaOperator(Name name, int arity) {
-	super(name);
-	this.arity = arity;
+	super(name, arity, METASORT);
+	assert METASORT != null;
+	assert sort() != null && sort() == METASORT;
 	name2metaop.put(name.toString(), this);
     }
 
-    /**
-     * checks whether the top level structure of the given {@link Term}
-     * is syntactically valid, given the assumption that the top level
-     * operator of the term is the same as this Operator. The
-     * assumption that the top level operator and the term are equal
-     * is NOT checked.  
-     * @return true iff the top level structure of
-     * the @link Term is valid.
-     */
+    
+    @Override
     public boolean validTopLevel(Term term) {
 	// a meta operator accepts almost everything
 	return term.op() instanceof AbstractMetaOperator;
     }
 
+    
     public static MetaOperator name2metaop(String s) {
 	return name2metaop.get(s);
     }
 
-    /**
-     * determines the sort of the {@link Term} if it would be created using this
-     * Operator as top level operator and the given terms as sub terms. The
-     * assumption that the constructed term would be allowed is not checked.
-     * @param term an array of Term containing the subterms of a (potential)
-     * term with this operator as top level operator
-     * @return sort of the term with this operator as top level operator of the
-     * given substerms
-     */
-    public Sort sort(Term[] term) {
-	return METASORT;
-    }
-
-    /** @return arity of the Operator as int */
-    public int arity() {
-	return arity;
-    }
 
     /** @return String representing a logical integer literal 
      *  in decimal representation
@@ -212,8 +180,9 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
 	    return result;
     }
     
+    
     public MetaOperator getParamMetaOperator(String param) {
-      return null;
+	return null;
     }
     
 
@@ -221,11 +190,9 @@ public abstract class AbstractMetaOperator extends Op implements MetaOperator {
      * by default meta operators do not match anything 
      * @see de.uka.ilkd.key.logic.op.Operator#match(SVSubstitute, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
      */
+    @Override    
     public MatchConditions match(SVSubstitute subst, MatchConditions mc,
             Services services) {
         return null;
-    }
-    /** calculates the resulting term. */
-    public abstract Term calculate(Term term, SVInstantiations svInst, Services services);
-
+    }    
 }

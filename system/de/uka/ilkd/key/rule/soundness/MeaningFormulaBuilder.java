@@ -15,7 +15,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.rule.*;
 
 /**
@@ -128,8 +128,7 @@ public class MeaningFormulaBuilder {
     }
 
     private Term createRWPartRewrite ( RewriteTacletGoalTemplate p ) {
-    	final Equality eq = getFind ().sort ().getEqualitySymbol();
-    	return getTF ().createEqualityTerm(eq, getFind (), p.replaceWith() );
+    	return getTF ().createEqualityTerm(getFind (), p.replaceWith() );
     }
 
     private Term createMF ( Sequent p ){
@@ -149,23 +148,23 @@ public class MeaningFormulaBuilder {
     }
 
     private Term And ( Term p0, Term p1 ) {
-	return getTF ().createJunctorTermAndSimplify ( Op.AND, p0, p1 );
+	return getTF ().createJunctorTermAndSimplify ( Junctor.AND, p0, p1 );
     }
 
     private Term Or ( Term p0, Term p1 ) {
-	return getTF ().createJunctorTermAndSimplify ( Op.OR, p0, p1 );
+	return getTF ().createJunctorTermAndSimplify ( Junctor.OR, p0, p1 );
     }
 
     private Term Imp ( Term p0, Term p1 ) {
-	return getTF ().createJunctorTermAndSimplify ( Op.IMP, p0, p1 );
+	return getTF ().createJunctorTermAndSimplify ( Junctor.IMP, p0, p1 );
     }
 
     private Term True () {
-    	return getTF ().createJunctorTerm(Op.TRUE);
+    	return getTF ().createJunctorTerm(Junctor.TRUE);
     }
 
     private Term False () {
-	return getTF ().createJunctorTerm(Op.FALSE);
+	return getTF ().createJunctorTerm(Junctor.FALSE);
     }
 
     private boolean isFindTaclet() {

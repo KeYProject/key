@@ -78,9 +78,9 @@ public class TestTacletPopup {
 	SchemaVariable b0 = SchemaVariableFactory.createFormulaSV(new Name("b0"), false);
 	Term t_b=tf.createFunctionTerm((SortedSchemaVariable)b,new Term[0]);
 	Term t_b0=tf.createFunctionTerm((SortedSchemaVariable)b0,new Term[0]);
-	Term t_bimpb0=tf.createJunctorTerm(Op.IMP,new Term[]{t_b, t_b0});
-	Term t_bandb0 = tf.createJunctorTerm(Op.AND, t_b, t_b0);
-	Term t_borb0 = tf.createJunctorTerm(Op.OR, t_b, t_b0);
+	Term t_bimpb0=tf.createJunctorTerm(Junctor.IMP,new Term[]{t_b, t_b0});
+	Term t_bandb0 = tf.createJunctorTerm(Junctor.AND, t_b, t_b0);
+	Term t_borb0 = tf.createJunctorTerm(Junctor.OR, t_b, t_b0);
 
 	impleftbuilder.setFind(t_bimpb0);
 	impleftbuilder.setName(new Name("imp-left"));
@@ -120,7 +120,7 @@ public class TestTacletPopup {
 
 	// not-left rule
 	// find(not b=>) replacewith(=>b)
-	Term t_notb=tf.createJunctorTerm(Op.NOT, new Term[]{t_b});
+	Term t_notb=tf.createJunctorTerm(Junctor.NOT, new Term[]{t_b});
 	AntecTacletBuilder notleftbuilder=new AntecTacletBuilder();
 	notleftbuilder.setFind(t_notb);
 	seq=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,
@@ -183,8 +183,8 @@ public class TestTacletPopup {
 
 	// contradiction rule
 	// find(b->b0) replacewith(-b0 -> -b)
-	Term t_notb0=tf.createJunctorTerm(Op.NOT, new Term[]{t_b0});
-	Term t_notb0impnotb=tf.createJunctorTerm(Op.IMP,new Term[]{t_notb0, t_notb});
+	Term t_notb0=tf.createJunctorTerm(Junctor.NOT, new Term[]{t_b0});
+	Term t_notb0impnotb=tf.createJunctorTerm(Junctor.IMP,new Term[]{t_notb0, t_notb});
 
 	RewriteTacletBuilder rwbuilder=new RewriteTacletBuilder();
 	rwbuilder.setFind(t_bimpb0);
@@ -533,7 +533,7 @@ public class TestTacletPopup {
 						 new Term[]{t_d,t_cplus1});
 	Term t_eq2=tf.createEqualityTerm
 	    (t_cplus1plusd, t_dpluscplus1);
-	Term tnat=tf.createJunctorTerm(Op.IMP, t_eq1, t_eq2);
+	Term tnat=tf.createJunctorTerm(Junctor.IMP, t_eq1, t_eq2);
 
 	// => (c+d) = ((d -1 +1) +c) -> (c +1)+d = (d+c) +1
 	seq_testNat=Sequent.createSequent

@@ -5,6 +5,8 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.logic.op;
 
 import java.util.Collections;
@@ -26,9 +28,6 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class OperatorSV extends SchemaVariableAdapter {
   
-    /** the arity of the operators this sv can be instantiated to */
-    private final int arity;
-    
     /** the set of operators this sv can match */
     private final Set operators;
     
@@ -44,8 +43,7 @@ public class OperatorSV extends SchemaVariableAdapter {
     OperatorSV(Name name, Sort sort, 
             int arity, HashSet set) {
         
-        super(name, Operator.class, sort, false);
-        this.arity = arity;
+        super(name, arity, Operator.class, sort, false);
         this.operators = (HashSet) set.clone();
     }
     
@@ -63,8 +61,7 @@ public class OperatorSV extends SchemaVariableAdapter {
     protected OperatorSV(Name name, Class matchingType, Sort sort, 
             int arity, HashSet set) {
         
-        super(name, matchingType, sort, false);
-        this.arity = arity;
+        super(name, arity, matchingType, sort, false);
         this.operators = (HashSet) set.clone();
     }
     
@@ -82,12 +79,7 @@ public class OperatorSV extends SchemaVariableAdapter {
         if (term.arity() != this.arity()) return false;       
         return true;
     }   
-    
-    /** returns the arity of this operator */
-    public int arity() {
-        return arity;
-    }
-    
+
     /**
      * returns true if the schemavariable is an operator sv
      */

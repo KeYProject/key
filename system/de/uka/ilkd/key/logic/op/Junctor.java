@@ -15,39 +15,57 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-public class Junctor extends Op {
 
-    private final int arity;
+public final class Junctor extends TermSymbol {
+   
+    /** 
+     * the true constant 
+     */
+    public static final Junctor TRUE = new Junctor(new Name("true"),0);
 
     /** 
-     * Visibility set to protected as needs to be subclassed in ASMKeY.
-     * Creates a Junctor operator of the given name and arity.
+     * the false constant 
      */
-    protected Junctor(Name name, int arity) {
-	super(name);
-	this.arity=arity;
-    }
-
-    public int arity() {
-	return arity;
-    }
-
-    /** @return true iff all of the subterms of the given subterms 
-     * have Sort.FORMULA
+    public static final Junctor FALSE = new Junctor(new Name("false"),0);
+    
+    /** 
+     * the ususal 'and' operator '/\' (be A, B formulae then 'A /\ B'
+     * is true if and only if A is true and B is true 
      */
+    public static final Junctor AND = new Junctor(new Name("and"),2);
+    
+    /** 
+     * the ususal 'or' operator '\/' (be A, B formulae then 'A \/ B'
+     * is true if and only if A is true or B is true 
+     */
+    public static final Junctor OR = new Junctor(new Name("or"),2);
+    
+    /** 
+     * the ususal 'negation' operator '-' 
+     */
+    public static final Junctor NOT = new Junctor(new Name("not"), 1);
+
+    /**
+     * the ususal 'implication' operator '->' (be A, B formulae then
+     * 'A -> B' is true if and only if A is false or B is true 
+     */
+    public static final Junctor IMP = new Junctor(new Name("imp"),2);
+
+    private Junctor(Name name, int arity) {
+	super(name, arity, Sort.FORMULA);
+    }
+   
+    
+    @Override
     public boolean validTopLevel(Term term){
-	if (arity()!=term.arity()) return false;
-        for (int i = 0; i<term.arity(); i++){
-            if (!term.sub(i).sort().equals(Sort.FORMULA)) return false;
+	if(arity() != term.arity()) {
+	    return false;
+	}
+        for(int i = 0; i < term.arity(); i++){
+            if(!term.sub(i).sort().equals(Sort.FORMULA)) {
+        	return false;
+            }
 	}
         return true;    
-    }
-
-    /** 
-     * 
-     * @return Sort.FORMULA
-     */
-    public Sort sort(Term[] term) {
-	return Sort.FORMULA;
     }
 }

@@ -12,7 +12,7 @@ package de.uka.ilkd.key.rule.updatesimplifier;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.QuanUpdateOperator;
 import de.uka.ilkd.key.util.Debug;
 
@@ -46,7 +46,7 @@ public class QuanAssignmentPairLazy extends AbstractAssignmentPairLazy {
      * @see de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair#nontrivialGuard()
      */
     public boolean nontrivialGuard () {
-        return guard ().op () != Op.TRUE;
+        return guard ().op () != Junctor.TRUE;
     }
 
     private QuanUpdateOperator getQuanUpdateOp () {

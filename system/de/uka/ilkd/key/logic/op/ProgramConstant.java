@@ -5,6 +5,8 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -32,6 +34,7 @@ public class ProgramConstant extends ProgramVariable {
         this.compileTimeConstant = compileTimeConstant;
     }
     
+    
     /**
      * @return the value of the initializer as a literal, if this
      * variable is a compile-time constant, </code>null</code>
@@ -41,18 +44,22 @@ public class ProgramConstant extends ProgramVariable {
         return compileTimeConstant;
     }
     
-    /**
-     * @return true if the value of "term" having this operator as
-     * top-level operator and may not be changed by modalities
-     */
-    public boolean isRigid(Term t) {
-        return t.arity() == 0 && t.op() == this;
+    
+    @Override
+    public boolean validTopLevel(Term term){
+        return term.arity() == 0;
+    }
+
+    
+    
+    @Override
+    public boolean isRigid() {
+        return true;
     }
     
-    /** calls the corresponding method of a visitor in order to    
-     * perform some action/transformation on this element
-     * @param v the Visitor
-     */
+    
+
+    @Override
     public void visit(de.uka.ilkd.key.java.visitor.Visitor v) {
         v.performActionOnProgramConstant(this);
     }

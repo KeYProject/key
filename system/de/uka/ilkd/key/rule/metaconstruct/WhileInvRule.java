@@ -191,7 +191,7 @@ public class WhileInvRule extends AbstractMetaOperator {
         if (w.continueOccurred()) {
             stmnt.add(contFlagDecl(contFlag));
             contFlagTerm = tf.createEqualityTerm
-            (Op.EQUALS, 
+            (Equality.EQUALS, 
              typeConv.convertToLogicElement(contFlag), 
              typeConv.getBooleanLDT().getTrueTerm());
         }
@@ -242,7 +242,7 @@ public class WhileInvRule extends AbstractMetaOperator {
         (normalCaseAndContinue(contFlagTerm, returnFlagTerm,
                                breakFlagTerm, excFlagTerm, inv));
         
-        Term result = createLongJunctorTerm(Op.AND, resultSubterms); 
+        Term result = createLongJunctorTerm(Junctor.AND, resultSubterms); 
         
         stmnt.add(w.result());
         StatementBlock s = new StatementBlock
@@ -363,8 +363,8 @@ public class WhileInvRule extends AbstractMetaOperator {
              post);
         
         return tf.createJunctorTerm
-            (Op.IMP, 
-             tf.createEqualityTerm(Op.EQUALS, 
+            (Junctor.IMP, 
+             tf.createEqualityTerm(Equality.EQUALS, 
                                    typeConv.convertToLogicElement(returnFlag), 
                                    typeConv.getBooleanLDT().getTrueTerm()), 
              executeReturn);
@@ -394,8 +394,8 @@ public class WhileInvRule extends AbstractMetaOperator {
                         (breakIfCascade.toArray(new Statement[0]))),
              post);
         return tf.createJunctorTerm
-            (Op.IMP, 
-             tf.createEqualityTerm(Op.EQUALS, 
+            (Junctor.IMP, 
+             tf.createEqualityTerm(Equality.EQUALS, 
                                    typeConv.convertToLogicElement(breakFlag), 
                                    typeConv.getBooleanLDT().getTrueTerm()), 
              executeBreak); 
@@ -413,27 +413,27 @@ public class WhileInvRule extends AbstractMetaOperator {
         ArrayList<Term> al = new ArrayList<Term>();
 
         if (returnFlagTerm != null)
-            al.add(tf.createEqualityTerm(Op.EQUALS, returnFlagTerm, TRUE_TERM));
+            al.add(tf.createEqualityTerm(Equality.EQUALS, returnFlagTerm, TRUE_TERM));
         if (breakFlagTerm != null)
-            al.add(tf.createEqualityTerm(Op.EQUALS, breakFlagTerm, TRUE_TERM));
+            al.add(tf.createEqualityTerm(Equality.EQUALS, breakFlagTerm, TRUE_TERM));
         if (excFlagTerm != null)
-            al.add(tf.createEqualityTerm(Op.EQUALS, excFlagTerm, TRUE_TERM));
+            al.add(tf.createEqualityTerm(Equality.EQUALS, excFlagTerm, TRUE_TERM));
 
         if (al.size() == 0) {
             if (contFlagTerm == null)
                 return inv;
             else 
-                return tf.createJunctorTerm(Op.IMP, contFlagTerm, inv);
+                return tf.createJunctorTerm(Junctor.IMP, contFlagTerm, inv);
         } else {
-            Term premiss = tf.createJunctorTerm(Op.NOT, 
-                                                createLongJunctorTerm(Op.OR, al));
+            Term premiss = tf.createJunctorTerm(Junctor.NOT, 
+                                                createLongJunctorTerm(Junctor.OR, al));
             if (contFlagTerm != null)
-                premiss = tf.createJunctorTerm(Op.OR, 
+                premiss = tf.createJunctorTerm(Junctor.OR, 
                                                contFlagTerm,
                                                premiss);            
             
             return 
-                tf.createJunctorTerm(Op.IMP, premiss, inv);
+                tf.createJunctorTerm(Junctor.IMP, premiss, inv);
         }       
     }
     
@@ -448,8 +448,8 @@ public class WhileInvRule extends AbstractMetaOperator {
               (KeYJavaASTFactory.throwClause(thrownException))), 
              post);
         return tf.createJunctorTerm
-            (Op.IMP, 
-             tf.createEqualityTerm(Op.EQUALS, 
+            (Junctor.IMP, 
+             tf.createEqualityTerm(Equality.EQUALS, 
                                    typeConv.convertToLogicElement(excFlag), 
                                    typeConv.getBooleanLDT().getTrueTerm()), 
              throwException);

@@ -21,7 +21,7 @@ import de.uka.ilkd.key.logic.SLListOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -83,7 +83,7 @@ public class RootsGenerator implements TermGenerator {
             return toIterator ( breakDownLeq ( var, lit, pow, services ) );
         } else if ( op == numbers.getGreaterOrEquals() ) {
             return toIterator ( breakDownGeq ( var, lit, pow, services ) );
-        } else if (op == Op.EQUALS) {
+        } else if (op == Equality.EQUALS) {
             return toIterator ( breakDownEq ( var, lit, pow, services ) );
         }
         

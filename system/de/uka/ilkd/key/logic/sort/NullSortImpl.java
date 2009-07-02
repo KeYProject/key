@@ -12,7 +12,6 @@ package de.uka.ilkd.key.logic.sort;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Op;
 
 public class NullSortImpl extends ClassInstanceSortImpl implements NullSort {
 
@@ -30,7 +29,7 @@ public class NullSortImpl extends ClassInstanceSortImpl implements NullSort {
 
     /** @return equality symbol of this sort */
     public Equality getEqualitySymbol(){
-	return Op.EQUALS;
+	return Equality.EQUALS;
     }
 
     /**

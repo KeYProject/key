@@ -161,7 +161,7 @@ public class AssignmentPairImpl implements AssignmentPair {
      * @see de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair#nontrivialGuard()
      */
     public boolean nontrivialGuard () {
-        return guard ().op () != Op.TRUE;
+        return guard ().op () != Junctor.TRUE;
     }
     
     /**

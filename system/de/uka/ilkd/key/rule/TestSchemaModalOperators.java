@@ -130,7 +130,7 @@ public class TestSchemaModalOperators extends TestCase {
 	Term replace = tf.createProgramTerm(
 	    osv,
             JavaBlock.EMPTY_JAVABLOCK,
-            new Term[]{tf.createJunctorTerm(Op.TRUE)});
+            new Term[]{tf.createJunctorTerm(Junctor.TRUE)});
 
 	rtb.setName(new Name("test_schema_modal1"));
 	rtb.setFind(find); 
@@ -144,7 +144,7 @@ public class TestSchemaModalOperators extends TestCase {
 	Term goal = tf.createProgramTerm(
 	    Op.DIA, 
             JavaBlock.EMPTY_JAVABLOCK,
-            tf.createJunctorTerm(Op.FALSE));
+            tf.createJunctorTerm(Junctor.FALSE));
 
          MatchConditions mc=(t.match                                                   
                             (goal,                                                        

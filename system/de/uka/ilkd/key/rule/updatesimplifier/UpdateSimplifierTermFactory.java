@@ -17,10 +17,7 @@ import de.uka.ilkd.key.logic.BoundVariableTools;
 import de.uka.ilkd.key.logic.ClashFreeSubst;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.Debug;
 
 public class UpdateSimplifierTermFactory {
@@ -59,9 +56,9 @@ public class UpdateSimplifierTermFactory {
     public final static UpdateSimplifierTermFactory DEFAULT = 
         new UpdateSimplifierTermFactory();
       
-    private final Term unsatisfiableGuardCache = tf.createJunctorTerm ( Op.FALSE );
+    private final Term unsatisfiableGuardCache = tf.createJunctorTerm ( Junctor.FALSE );
 
-    private final Term validGuardCache = tf.createJunctorTerm ( Op.TRUE );
+    private final Term validGuardCache = tf.createJunctorTerm ( Junctor.TRUE );
 		
     
     public Term createIfExCascade (IfExCascade cascade, Term defaultTerm) {
@@ -123,10 +120,6 @@ public class UpdateSimplifierTermFactory {
             guards   [i] = assignmentPair.guard();
             lhss     [i] = assignmentPair.locationAsTerm();
             values   [i] = assignmentPair.valueUnsafe();
-            if (assignmentPair.location() == Update.StarLocation.ALL) {
-        	assert false : "anonymous updates not supported any more";
-            	return null;
-            }
         }
         return tf.createQuanUpdateTerm(services, boundVars, guards, lhss, values, target);
     }
@@ -175,7 +168,7 @@ public class UpdateSimplifierTermFactory {
                 new GuardSatisfiabilityFormulaBuilder ( cascade.getCondition (),
                                                         cascade.getMinimizedVars () );
             res = getBasicTermFactory ()
-                  .createJunctorTermAndSimplify ( Op.OR,
+                  .createJunctorTermAndSimplify ( Junctor.OR,
                                                   builder.createFormula (),
                                                   res );
         }

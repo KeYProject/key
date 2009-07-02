@@ -15,13 +15,7 @@ import de.uka.ilkd.key.logic.IteratorOfTerm;
 import de.uka.ilkd.key.logic.SetAsListOfTerm;
 import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IteratorOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SetAsListOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.*;
 
 class TriggerUtils {
 
@@ -72,6 +66,6 @@ class TriggerUtils {
     
     public static boolean isTrueOrFalse(Term res) {
         final Operator op = res.op ();
-        return op == Op.TRUE || op == Op.FALSE;
+        return op == Junctor.TRUE || op == Junctor.FALSE;
     }
 }

@@ -24,10 +24,7 @@ import de.uka.ilkd.key.logic.IteratorOfTerm;
 import de.uka.ilkd.key.logic.SetAsListOfTerm;
 import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SetAsListOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.LRUCache;
 
 /**
@@ -187,9 +184,9 @@ class ClausesGraph {
 
     private SetOfTerm computeClauses(Term formula) {
         final Operator op = formula.op ();
-        if ( op == Op.NOT )
+        if ( op == Junctor.NOT )
             return computeClauses ( formula.sub ( 0 ) );
-        else if ( op == Op.AND ) {
+        else if ( op == Junctor.AND ) {
             return computeClauses ( formula.sub ( 0 ) )
                    .union ( computeClauses ( formula.sub ( 1 ) ) );
         } else {

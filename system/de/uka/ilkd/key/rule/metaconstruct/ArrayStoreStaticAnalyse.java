@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ClassInstanceSortImpl;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
@@ -95,8 +95,8 @@ public class ArrayStoreStaticAnalyse extends AbstractMetaOperator {
         }
 
         final TermFactory tf = TermFactory.DEFAULT;
-        return assignmentCompatible ? tf.createJunctorTerm(Op.TRUE) : tf
-                .createJunctorTerm(Op.FALSE);
+        return assignmentCompatible ? tf.createJunctorTerm(Junctor.TRUE) : tf
+                .createJunctorTerm(Junctor.FALSE);
     }
 
     

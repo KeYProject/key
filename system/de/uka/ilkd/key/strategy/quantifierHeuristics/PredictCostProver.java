@@ -27,6 +27,8 @@ import de.uka.ilkd.key.logic.SetAsListOfTerm;
 import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.Operator;
 
@@ -67,9 +69,9 @@ class PredictCostProver {
 
 	//init context 
 	private void initClauses(Term instance) {
-		IteratorOfTerm it = TriggerUtils.iteratorByOperator(instance, Op.AND);
+		IteratorOfTerm it = TriggerUtils.iteratorByOperator(instance, Junctor.AND);
 		while (it.hasNext()) {
-			SetOfTerm literals = TriggerUtils.setByOperator(it.next(),Op.OR);
+			SetOfTerm literals = TriggerUtils.setByOperator(it.next(),Junctor.OR);
 			//clauses.add(new Clause(literals));
 			Iterator<SetOfTerm> lit = createClause(literals.toArray(), 0).iterator();
 			while (lit.hasNext()) {
@@ -125,7 +127,7 @@ class PredictCostProver {
 		boolean positive = true;
         Term pro = problem;
         Operator op = pro.op ();
-        while ( op == Op.NOT ) {
+        while ( op == Junctor.NOT ) {
             pro = pro.sub ( 0 );
             op = pro.op ();
             positive = !positive;
@@ -143,7 +145,7 @@ class PredictCostProver {
 		boolean temp =true;
 		Term pro = problem;
 		Operator op = pro.op();
-		while(op==Op.NOT){
+		while(op==Junctor.NOT){
 			pro = pro.sub(0);
 			op = pro.op();
 			temp=!temp;
@@ -161,12 +163,12 @@ class PredictCostProver {
 		boolean temp = true;
 		Term pro = problem;
 		Operator op = pro.op();
-		if (op == Op.NOT) {
+		if (op == Junctor.NOT) {
 			temp = !temp;
 			pro = pro.sub(0);
 			op = pro.op();
 		}
-		if (op == Op.EQUALS && pro.sub(0).equals(pro.sub(1)))
+		if (op == Equality.EQUALS && pro.sub(0).equals(pro.sub(1)))
 			return temp ? trueT : falseT;
 		Term arithRes = HandleArith.provedByArith(pro, services);
 		if(TriggerUtils.isTrueOrFalse(arithRes))
@@ -182,12 +184,12 @@ class PredictCostProver {
 	private Term provedByequal(Term problem, Term axiom) {
 		boolean temp = true;
 		Term pro = problem;
-		if (pro.op() == Op.NOT) {
+		if (pro.op() == Junctor.NOT) {
 			pro = pro.sub(0);
 			temp = !temp;
 		}
 		Term ax = axiom;
-		if (ax.op() == Op.NOT) {
+		if (ax.op() == Junctor.NOT) {
 			ax = ax.sub(0);
 			temp = !temp;
 		}
@@ -358,11 +360,11 @@ class PredictCostProver {
 				Term lit = it.next();
 				Term temp = proveLiteral(lit, assertLits);
 				final Operator op = temp.op();
-                if (op == Op.TRUE) {
+                if (op == Junctor.TRUE) {
 					res = SetAsListOfTerm.EMPTY_SET.add(trueT);
 					break;
 				}
-				if (op == Op.FALSE) {
+				if (op == Junctor.FALSE) {
 					continue;
 				}
 				res = res.add(lit);
@@ -385,13 +387,13 @@ class PredictCostProver {
 			if(lits.size()<=1)return false;
 			Term[] terms = lits.toArray();
 			SetOfTerm next = lits.remove(terms[0]);
-			boolean opNot    = terms[0].op()==Op.NOT;
+			boolean opNot    = terms[0].op()==Junctor.NOT;
 			Term axiom = opNot?terms[0].sub(0): tb.not(terms[0]);
 			for(int j=1;j<terms.length ;j++){
 			     Term pro = provedByAnother(terms[j],axiom);
 			     final Operator op = pro.op();
-                 if(op == Op.TRUE)return true;
-			     if(op == Op.FALSE&&terms[0].equals(terms[j])){
+                 if(op == Junctor.TRUE)return true;
+			     if(op == Junctor.FALSE&&terms[0].equals(terms[j])){
 				next = next.remove(terms[j]);
 			        literals = literals.remove(terms[j]);
 			     }

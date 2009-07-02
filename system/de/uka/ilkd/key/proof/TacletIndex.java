@@ -720,7 +720,7 @@ public class TacletIndex  {
 	 * @return true if the value of "term" having this operator as
 	 * top-level operator and may not be changed by modalities
 	 */
-	public boolean isRigid (Term term) {
+	public boolean isRigid () {
 	    return false;
 	}
 	

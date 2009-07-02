@@ -12,7 +12,6 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
@@ -27,39 +26,6 @@ import de.uka.ilkd.key.util.Debug;
  * names. 
  */
 public abstract class Op implements Operator {
-    
-    // OPERATORS
-    /** the ususal 'negation' operator '-' */
-    public static final Junctor NOT = new Junctor(new Name("not"),1);
-    
-    /** 
-     * the ususal 'and' operator '/\' (be A, B formulae then 'A /\ B'
-     * is true if and only if A is true and B is true 
-     */
-    public static final Junctor AND = new Junctor(new Name("and"),2);
-    
-    /** 
-     * the ususal 'or' operator '\/' (be A, B formulae then 'A \/ B'
-     * is true if and only if A is true or B is true 
-     */
-    public static final Junctor OR = new Junctor(new Name("or"),2);
-    
-    /**
-     * the ususal 'implication' operator '->' (be A, B formulae then
-     * 'A -> B' is true if and only if A is false or B is true 
-     */
-    public static final Junctor IMP = new Junctor(new Name("imp"),2);
-    
-    /** 
-     * the ususal 'equivalence' operator '<->' (be A, B formulae then       
-     * 'A <->  B' is true if and only if A and B have the same truth
-     * value 
-     */ 
-    public static final Equality EQV = new Equality(new Name("equiv"),
-						    Sort.FORMULA);
-    
-    /** the ususal 'equality' operator '=' */
-    public static final Equality EQUALS = new Equality(new Name("equals"));
     
     /** the ususal 'forall' operator 'all' (be A a formula then       
      * 'all x.A' is true if and only if for all elements d of the
@@ -86,12 +52,6 @@ public abstract class Op implements Operator {
      * without replacing x with a non-rigid A below modalities */
     public static final SubstOp SUBST = new WarySubstOp(new Name("subst"));
 
-    /** the true constant */
-    public static final Junctor TRUE = new Junctor(new Name("true"),0);
-    
-    /** the false constant */
-    public static final Junctor FALSE = new Junctor(new Name("false"),0);
-    
     /** the null pointer */
     public static final Function NULL = new RigidFunction(new Name("null"),
 						     Sort.NULL, 
@@ -112,11 +72,14 @@ public abstract class Op implements Operator {
     /** the product operator */
     public static final NumericalQuantifier PRODUCT = new NumericalQuantifier(new Name("\\product"));
     
-    protected final Name name;
+    private final Name name;
+    
+    private final int arity;
    	
     
-    protected Op(Name name) {
-	this.name=name;
+    protected Op(Name name, int arity) {
+	this.name = name;
+	this.arity = arity;
     }
     
     /**
@@ -127,24 +90,25 @@ public abstract class Op implements Operator {
 	return (Modality)Modality.getNameMap().get(str);
     }
 
-    /**
-     * returns the name of the operator
-     * @return the operator's name
-     */
-    public Name name() {
+
+    @Override
+    public final Name name() {
 	return name;
     }
-	
-    public String toString() {
-	return name().toString();
+    
+    @Override
+    public final int arity() {
+        return arity;
     }
+
 
     /**
      * @return true if the value of "term" having this operator as
      * top-level operator and may not be changed by modalities
      */
-    public boolean isRigid (Term term) {
-	return term.hasRigidSubterms ();
+    @Override
+    public boolean isRigid () {
+	return true;
     }
         
     /** 
@@ -152,6 +116,7 @@ public abstract class Op implements Operator {
      * that the compared object have to be equal otherwise
      * matching fails
      */
+    @Override
     public MatchConditions match(SVSubstitute subst, MatchConditions mc,
             Services services) {
         if (subst == this) {
@@ -159,5 +124,11 @@ public abstract class Op implements Operator {
         }
         Debug.out("FAILED. Operators are different(template, candidate)", this, subst);
         return null;
+    }
+    
+    
+    @Override
+    public String toString() {
+	return name().toString();
     }
 }

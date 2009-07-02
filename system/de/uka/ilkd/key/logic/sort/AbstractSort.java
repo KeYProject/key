@@ -22,10 +22,6 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
     /** name of the Sort */
     protected Name name;
 
-    /**
-     * equality symbol for this sort
-     */
-    protected final Equality equality = Op.EQUALS;
 
     /**
      * cast symbol casting any sort to <em>this</em> one  
@@ -38,7 +34,7 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
 
     protected boolean symbolsCreated = false;
 
-    /** creates a Sort (with a new equality symbol for this sort) */
+    /** creates a Sort */
     public AbstractSort(Name name) {
         this.name = name;
     }
@@ -88,11 +84,6 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
     public Name name() {
         return name;
     }
-
-    /** @return equality symbol of this sort */
-    public Equality getEqualitySymbol() {
-        return (this == Sort.FORMULA ? Op.EQV : equality);
-    }    
 
     /**
      * returns the cast symbol of this Sort

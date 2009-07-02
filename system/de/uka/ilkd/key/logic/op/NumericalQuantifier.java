@@ -11,11 +11,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public class NumericalQuantifier extends Op {
 
     NumericalQuantifier(Name name) {
-        super(name);
-    }
-
-    public int arity() {
-        return 2;
+        super(name, 2);
     }
 
     public Sort sort(Term[] term) {

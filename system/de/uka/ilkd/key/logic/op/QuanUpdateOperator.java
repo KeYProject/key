@@ -421,8 +421,8 @@ public class QuanUpdateOperator implements IUpdateOperator {
      * @return true if the value of "term" having this operator as top-level
      *         operator and may not be changed by modalities
      */
-    public boolean isRigid(Term term) {
-        return target(term).isRigid();
+    public boolean isRigid() {
+        return false;
     }
 
     /**
@@ -843,7 +843,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
     private static boolean[] determineNontrivialGuards (Term[] guards) {
         final boolean[] res = new boolean [guards.length];
         for ( int i = 0; i != guards.length; ++i )
-            res[i] = guards[i].op () != Op.TRUE;
+            res[i] = guards[i].op () != Junctor.TRUE;
         return res;
     }
 
@@ -978,7 +978,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
         return false;
     }
     
-    private final static Term validGuardCache = tf.createJunctorTerm ( Op.TRUE );
+    private final static Term validGuardCache = tf.createJunctorTerm ( Junctor.TRUE );
     private static Term getValidGuard () {
         return validGuardCache;
     }

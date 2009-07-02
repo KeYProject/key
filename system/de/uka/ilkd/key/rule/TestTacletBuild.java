@@ -15,10 +15,7 @@ import java.io.File;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 /**
@@ -134,7 +131,7 @@ public class TestTacletBuild extends TestCase {
 	     NO_SUBTERMS);
 	Term t1=tf.createQuantifierTerm(Op.ALL, u, A);
 	SuccTacletBuilder sb=new SuccTacletBuilder();
-	sb.setFind(tf.createJunctorTerm(Op.AND,t1,t1));
+	sb.setFind(tf.createJunctorTerm(Junctor.AND,t1,t1));
 	try {
 	    sb.getTaclet();
 	} catch (IllegalArgumentException e) {

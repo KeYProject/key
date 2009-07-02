@@ -94,7 +94,7 @@ class TriggersSet {
                 allTerm.varsBoundHere(0).getQuantifiableVariable(0);
         final IteratorOfTerm it =
                 TriggerUtils.iteratorByOperator(TriggerUtils.discardQuantifiers(allTerm),
-                Op.AND);
+                Junctor.AND);
         while (it.hasNext()) {
             final Term clause = it.next();
             // a trigger should contain the first variable of allTerm
@@ -183,13 +183,13 @@ class TriggersSet {
          */
         public void createTriggers(Services services) {
             final IteratorOfTerm it =
-                    TriggerUtils.iteratorByOperator(clause, Op.OR);
+                    TriggerUtils.iteratorByOperator(clause, Junctor.OR);
             while (it.hasNext()) {
                 final Term oriTerm = it.next();
                 final Iterator<Term> it2 = expandIfThenElse(oriTerm).iterator();
                 while (it2.hasNext()) {
                     Term t = it2.next();
-                    if (t.op() == Op.NOT) {
+                    if (t.op() == Junctor.NOT) {
                         t = t.sub(0);
                     }
                     recAddTriggers(t, services);
@@ -326,7 +326,7 @@ class TriggersSet {
             final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
             // matching on equations and inequalities does not seem to have any
             // positive effect for the time being
-            if (op == Op.EQUALS || 
+            if (op == Equality.EQUALS || 
                     op == integerLDT.getLessOrEquals() || 
                     op == integerLDT.getGreaterOrEquals()) {
                 return false;

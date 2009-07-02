@@ -331,14 +331,14 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
         if (w.continueOccurred()) {
             stmnt.add(contFlagDecl(contFlag));
             contFlagTerm =
-                    tf.createEqualityTerm(Op.EQUALS,
+                    tf.createEqualityTerm(Equality.EQUALS,
                             typeConv.convertToLogicElement(contFlag),
                             typeConv.getBooleanLDT().getTrueTerm());
         }
         resultSubterms.add(normalCaseAndContinue(contFlagTerm, returnFlagTerm,
                 breakFlagTerm, excFlagTerm, inv));
 
-        Term result = createLongJunctorTerm(Op.AND, resultSubterms);
+        Term result = createLongJunctorTerm(Junctor.AND, resultSubterms);
 
         if (FORMALPARAM_AS_STATEMENT) {
             //
@@ -500,7 +500,7 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
                                 new StatementBlock(
                                         breakIfCascade.toArray(new Statement[0]))),
                         post);
-        return tf.createJunctorTerm(Op.IMP, tf.createEqualityTerm(Op.EQUALS,
+        return tf.createJunctorTerm(Junctor.IMP, tf.createEqualityTerm(Equality.EQUALS,
                 typeConv.convertToLogicElement(breakFlag),
                 typeConv.getBooleanLDT().getTrueTerm()), executeBreak);
     }
@@ -539,19 +539,19 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
         ArrayList<Term> al = new ArrayList<Term>();
 
         if (returnFlagTerm != null)
-            al.add(tf.createEqualityTerm(Op.EQUALS, returnFlagTerm, TRUE_TERM));
+            al.add(tf.createEqualityTerm(Equality.EQUALS, returnFlagTerm, TRUE_TERM));
         if (breakFlagTerm != null)
-            al.add(tf.createEqualityTerm(Op.EQUALS, breakFlagTerm, TRUE_TERM));
+            al.add(tf.createEqualityTerm(Equality.EQUALS, breakFlagTerm, TRUE_TERM));
         if (excFlagTerm != null)
-            al.add(tf.createEqualityTerm(Op.EQUALS, excFlagTerm, TRUE_TERM));
+            al.add(tf.createEqualityTerm(Equality.EQUALS, excFlagTerm, TRUE_TERM));
 
         if (al.size() == 0) {
             return inv;
         } else {
             Term premiss =
-                    tf.createJunctorTerm(Op.NOT, createLongJunctorTerm(Op.OR,
+                    tf.createJunctorTerm(Junctor.NOT, createLongJunctorTerm(Junctor.OR,
                             al));
-            return tf.createJunctorTerm(Op.IMP, premiss, inv);
+            return tf.createJunctorTerm(Junctor.IMP, premiss, inv);
         }
     }
 
@@ -587,7 +587,7 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
                                         KeYJavaASTFactory.returnClause(returnExpression))),
                         post);
 
-        return tf.createJunctorTerm(Op.IMP, tf.createEqualityTerm(Op.EQUALS,
+        return tf.createJunctorTerm(Junctor.IMP, tf.createEqualityTerm(Equality.EQUALS,
                 typeConv.convertToLogicElement(returnFlag),
                 typeConv.getBooleanLDT().getTrueTerm()), executeReturn);
 
@@ -618,7 +618,7 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
                         addContext(root, new StatementBlock(
                                 KeYJavaASTFactory.throwClause(thrownException))),
                         post);
-        return tf.createJunctorTerm(Op.IMP, tf.createEqualityTerm(Op.EQUALS,
+        return tf.createJunctorTerm(Junctor.IMP, tf.createEqualityTerm(Equality.EQUALS,
                 typeConv.convertToLogicElement(excFlag),
                 typeConv.getBooleanLDT().getTrueTerm()), throwException);
     }

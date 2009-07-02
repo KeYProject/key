@@ -12,11 +12,7 @@
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.*;
 
 public class AtomTermFeature extends BinaryTermFeature {
 
@@ -27,7 +23,7 @@ public class AtomTermFeature extends BinaryTermFeature {
     protected boolean filter(Term term) {
         final Operator op = term.op ();
         return ! ( op instanceof Junctor
-                   || op == Op.EQV
+                   || op == Equality.EQV
                    || op instanceof IfThenElse
                    || op instanceof Quantifier );
     }

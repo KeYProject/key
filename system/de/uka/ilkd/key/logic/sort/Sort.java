@@ -13,8 +13,7 @@ package de.uka.ilkd.key.logic.sort;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Op;
+
 
 public interface Sort extends Named {
     
@@ -23,17 +22,13 @@ public interface Sort extends Named {
 
     Sort ANY      = new AbstractNonCollectionSort(new Name("any")) {
 
-        public SetOfSort extendsSorts() {            
-            return SetAsListOfSort.EMPTY_SET;
-        }
-
-        public boolean extendsTrans(Sort s) {        
-            return s == this;
-        }
-
-        public Equality getEqualitySymbol() {            
-            return Op.EQUALS;
-        }
+            public SetOfSort extendsSorts() {            
+                return SetAsListOfSort.EMPTY_SET;
+            }
+    
+            public boolean extendsTrans(Sort s) {        
+                return s == this;
+            }
         
     };
     
@@ -53,9 +48,5 @@ public interface Sort extends Named {
      * returns true iff the given sort is a transitive supersort of this sort
      * or it is the same.
      */
-    boolean extendsTrans(Sort s);
-
-    /** @return equality symbol of this sort */
-    Equality getEqualitySymbol();
-    
+    boolean extendsTrans(Sort s);    
 }

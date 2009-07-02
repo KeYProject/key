@@ -51,13 +51,22 @@ public abstract class SchemaVariableAdapter extends TermSymbol
      * to match a list of syntactical elements
      */    
     protected SchemaVariableAdapter(Name name,
+	    			    int arity,
 				    Class matchType,
 				    Sort sort,
 				    boolean listSV) {
-	super(name, sort);
+	super(name, arity, sort);
 	this.matchType = matchType;
 	this.listSV    = listSV;
     }
+    
+    protected SchemaVariableAdapter(Name name,
+				    Class matchType,
+				    Sort sort,
+				    boolean listSV) {
+	this(name, 0, matchType, sort, listSV);
+    }
+    
     
     protected SchemaVariableAdapter(Name name,
 				    Class matchType) {
@@ -155,11 +164,6 @@ public abstract class SchemaVariableAdapter extends TermSymbol
     public boolean isStrict () {
         return true; 
     }
-
-    /** @return arity of the Variable as int */
-    public int arity() {
-	return 0;
-    }
     
     /**
      * @return true if the value of "term" having this operator as
@@ -173,13 +177,17 @@ public abstract class SchemaVariableAdapter extends TermSymbol
 	return false;
     } 
 
-    /** toString */
     public String toString(String sortSpec) {
 	return name()+" ("+sortSpec+")"; 
     }
 
-    /* default toString for schema variables witho sortSpec, e.g. ModifiesSV */
     public String toString() {
 	return name().toString(); 
+    }
+    
+    
+    @Override
+    public boolean validTopLevel(Term term){
+        return term.arity() == this.arity();
     }
 }

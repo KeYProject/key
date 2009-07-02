@@ -259,7 +259,7 @@ public class TestTermParser extends TestCase {
     }
 
     public void testNotEqual() {
-	Term t = tf.createJunctorTerm(Op.NOT,
+	Term t = tf.createJunctorTerm(Junctor.NOT,
 	    tf.createEqualityTerm
 	    (tf.createFunctionTerm
 	     (head,
@@ -275,19 +275,19 @@ public class TestTermParser extends TestCase {
 
     public void test6() {
 	Term t = tf.createJunctorTerm
-	    (Op.EQV,
+	    (Equality.EQV,
 	     tf.createJunctorTerm
-	     (Op.IMP,
+	     (Junctor.IMP,
 	      tf.createJunctorTerm
-	      (Op.OR,
+	      (Junctor.OR,
 	       tf.createEqualityTerm(t_x,t_x),
 	       tf.createEqualityTerm(t_y,t_y)),
 	      tf.createJunctorTerm
-	      (Op.AND,
+	      (Junctor.AND,
 	       tf.createEqualityTerm(t_z,t_z),
 	       tf.createEqualityTerm(t_xs,t_xs))),
 	     tf.createJunctorTerm
-	     (Op.NOT,
+	     (Junctor.NOT,
 	      tf.createEqualityTerm(t_ys,t_ys)));
 
 	     
@@ -313,7 +313,7 @@ public class TestTermParser extends TestCase {
 	     tf.createQuantifierTerm
 	     (Op.ALL,l1,
 	      tf.createJunctorTerm
-	      (Op.NOT,
+	      (Junctor.NOT,
 	       tf.createEqualityTerm(tf.createVariableTerm(thisx),
 				     tf.createVariableTerm(l1)))));
 	
@@ -357,7 +357,7 @@ public class TestTermParser extends TestCase {
 	Term t1 = tf.createQuantifierTerm
 	    (Op.EX,thisx,
 	     tf.createJunctorTerm
-	     (Op.NOT,
+	     (Junctor.NOT,
 	      tf.createFunctionTerm(isempty,tf.createVariableTerm(thisx))));
 	      
 	assertTrue("new variable in quantifier", thisx != x);
@@ -605,7 +605,7 @@ public class TestTermParser extends TestCase {
         }
         assertTrue ( "Failed parsing propositional ifEx-then-else term",
                      t.op () == Op.IF_EX_THEN_ELSE
-                     && t.sub ( 0 ).op() == Op.EQUALS
+                     && t.sub ( 0 ).op() == Equality.EQUALS
                      && t.sub ( 0 ).sub ( 0 ).op () == t.varsBoundHere ( 0 ).getQuantifiableVariable ( 0 )
                      && t.sub ( 0 ).sub ( 1 ).op () == t.varsBoundHere ( 0 ).getQuantifiableVariable ( 1 )
                      && t.sub ( 1 ).equals ( parseTerm ( "1=2" ) )

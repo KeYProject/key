@@ -42,18 +42,20 @@ public class LocationVariable extends ProgramVariable implements Location {
         super(name, s, null, null, false, false, false);
     }
     
-    /**
-     * @return true if the value of "term" having this operator as
-     * top-level operator and may not be changed by modalities
-     */
-    public boolean isRigid (Term term) {
+    
+    @Override
+    public boolean validTopLevel(Term term){
+        return term.arity() == 0;
+    }
+    
+
+    @Override
+    public boolean isRigid () {
         return false;
     }
     
-    /** calls the corresponding method of a visitor in order to    
-     * perform some action/transformation on this element
-     * @param v the Visitor
-     */
+
+    @Override
     public void visit(de.uka.ilkd.key.java.visitor.Visitor v) {
         v.performActionOnLocationVariable(this);
     }

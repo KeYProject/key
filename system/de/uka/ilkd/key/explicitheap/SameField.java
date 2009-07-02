@@ -59,9 +59,4 @@ public class SameField extends AbstractMetaOperator {
             return TB.equals(fieldTerm0, fieldTerm1);            
         }
     }
-    
-
-    public Sort sort(Term[] term) {
-        return Sort.FORMULA;
-    }
 }

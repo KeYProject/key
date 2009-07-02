@@ -315,7 +315,7 @@ public abstract class Notation {
 		sp.printTerm(t);
 	    } else {
 		final int assTarget = (t.sort() == Sort.FORMULA ? (((IUpdateOperator) t
-			.op()).target(t).op() == Op.EQUALS ? 75 : 60)
+			.op()).target(t).op() == Equality.EQUALS ? 75 : 60)
 			: 110);
 		sp.printAnonymousUpdate(t, assTarget);
 	    }
@@ -362,7 +362,7 @@ public abstract class Notation {
 	    } else {
 		QuantifiableVariable v = instQV(t, sp, 1);
 		final int assTarget = (t.sort() == Sort.FORMULA ? (t.sub(1)
-			.op() == Op.EQUALS ? 75 : 60) : 110);
+			.op() == Equality.EQUALS ? 75 : 60) : 110);
 		sp.printSubstTerm("{\\subst ", v, t.sub(0), 0, "}", t.sub(1),
 			assTarget);
 	    }

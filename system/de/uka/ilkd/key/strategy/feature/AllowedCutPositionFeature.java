@@ -12,7 +12,7 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
@@ -46,11 +46,11 @@ public class AllowedCutPositionFeature extends BinaryFeature {
             final int child = it.getChild ();
             final Operator op = it.getSubTerm ().op ();
             
-            if ( op == Op.NOT ) {
+            if ( op == Junctor.NOT ) {
                 negated = !negated;
-            } else if ( op == ( negated ? Op.OR : Op.AND ) ) {
+            } else if ( op == ( negated ? Junctor.OR : Junctor.AND ) ) {
                 /* nothing */
-            } else if ( negated && op == Op.IMP ) {
+            } else if ( negated && op == Junctor.IMP ) {
                 if ( child == 0 ) negated = !negated;
             } else if ( op instanceof Quantifier ) {
                 return true;

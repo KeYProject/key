@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -42,7 +43,7 @@ class OCLPredicativeCollection {
     private static final TermBuilder tb = TermBuilder.DF;
     private static final CreatedAttributeTermFactory createdFactory
             = CreatedAttributeTermFactory.INSTANCE;
-    private static final Term falseTerm = tf.createJunctorTerm(Op.FALSE);
+    private static final Term falseTerm = tf.createJunctorTerm(Junctor.FALSE);
     private static int varCounter;
     
     private final LogicVariable var;
@@ -96,7 +97,7 @@ class OCLPredicativeCollection {
         this.var = createVar(lowerBound.sort());
         Term lowerTerm = tf.createFunctionTerm(leq, lowerBound, getVarAsTerm());
         Term upperTerm = tf.createFunctionTerm(leq, getVarAsTerm(), upperBound);
-        this.restriction = tf.createJunctorTermAndSimplify(Op.AND, lowerTerm, upperTerm); 
+        this.restriction = tf.createJunctorTermAndSimplify(Junctor.AND, lowerTerm, upperTerm); 
     }
     
     
@@ -160,7 +161,7 @@ class OCLPredicativeCollection {
     
     private Term getConvertedRestriction(Services services,
                                          Term additionalRestriction) {
-        Term andTerm = tf.createJunctorTermAndSimplify(Op.AND, 
+        Term andTerm = tf.createJunctorTermAndSimplify(Junctor.AND, 
                                                        restriction, 
                                                        additionalRestriction);
         return createdFactory.createCreatedNotNullQuantifierTerm(services, 
@@ -199,7 +200,7 @@ class OCLPredicativeCollection {
      * Creates a collection which is a subset of this one.
      */
     protected OCLPredicativeCollection narrow(Term additionalRestriction) {
-        Term newRestriction = tf.createJunctorTermAndSimplify(Op.AND, 
+        Term newRestriction = tf.createJunctorTermAndSimplify(Junctor.AND, 
                                                    restriction, 
                                                    additionalRestriction);
         return new OCLPredicativeCollection(var, newRestriction);
@@ -211,7 +212,7 @@ class OCLPredicativeCollection {
      */
     protected OCLPredicativeCollection union(OCLCollection c) {
         Term cRestriction = replaceVar(c.getPredVar(), var, c.getPredicativeRestriction());
-        Term newRestriction = tf.createJunctorTermAndSimplify(Op.OR, 
+        Term newRestriction = tf.createJunctorTermAndSimplify(Junctor.OR, 
                                                    restriction, 
                                                    cRestriction);
         return new OCLPredicativeCollection(

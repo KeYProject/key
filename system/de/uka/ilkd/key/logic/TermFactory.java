@@ -149,12 +149,12 @@ public class TermFactory {
      * the sorts involved, according to {@link Sort#getEqualitySymbol}
      */
     public Term createEqualityTerm(Term[] terms) {
-        Equality eq = terms[0].sort().getEqualitySymbol();
-        if (terms[0].op() instanceof SchemaVariable) {
-            eq = terms[1].sort().getEqualitySymbol();
-        } 
-        if (eq == null) eq = Op.EQUALS;
-        
+	Equality eq;
+	if(terms[0].sort() == Sort.FORMULA) {
+	    eq = Equality.EQV;
+	} else {
+	    eq = Equality.EQUALS;
+	}        
         return createEqualityTerm(eq, terms);
     }
     
@@ -264,14 +264,14 @@ public class TermFactory {
     }
 
     public Term createJunctorTermAndSimplify(Equality op, Term t1, Term t2) {
-        if ( op == Op.EQV ) {
-            if ( t1.op () == Op.TRUE ) return t2;
-            if ( t2.op () == Op.TRUE ) return t1;
-            if ( t1.op () == Op.FALSE )
-                return createJunctorTermAndSimplify ( Op.NOT, t2 );
-            if ( t2.op () == Op.FALSE )
-                return createJunctorTermAndSimplify ( Op.NOT, t1 );
-            if ( t1.equals ( t2 ) ) return createJunctorTerm ( Op.TRUE );
+        if ( op == Equality.EQV ) {
+            if ( t1.op () == Junctor.TRUE ) return t2;
+            if ( t2.op () == Junctor.TRUE ) return t1;
+            if ( t1.op () == Junctor.FALSE )
+                return createJunctorTermAndSimplify ( Junctor.NOT, t2 );
+            if ( t2.op () == Junctor.FALSE )
+                return createJunctorTermAndSimplify ( Junctor.NOT, t1 );
+            if ( t1.equals ( t2 ) ) return createJunctorTerm ( Junctor.TRUE );
         }
         return createEqualityTerm ( op, new Term [] { t1, t2 } );
     }
@@ -306,12 +306,12 @@ public class TermFactory {
      * Currently only the AND, OR, IMP Operators will be simplified (if possible)
      */
     public Term createJunctorTermAndSimplify(Junctor op, Term t1) {
-        if (op == Op.NOT) {
-            if (t1.op() == Op.TRUE) {
-                return createJunctorTerm(Op.FALSE);
-            } else if (t1.op() == Op.FALSE) {
-                return createJunctorTerm(Op.TRUE);
-            } else if (t1.op() == Op.NOT) {
+        if (op == Junctor.NOT) {
+            if (t1.op() == Junctor.TRUE) {
+                return createJunctorTerm(Junctor.FALSE);
+            } else if (t1.op() == Junctor.FALSE) {
+                return createJunctorTerm(Junctor.TRUE);
+            } else if (t1.op() == Junctor.NOT) {
 		return t1.sub(0);
 	    }
         }
@@ -323,39 +323,39 @@ public class TermFactory {
      * Currently only the AND, OR, IMP Operators will be simplified (if possible)
      */
     public Term createJunctorTermAndSimplify(Junctor op, Term t1, Term t2) {
-	if (op == Op.AND) {
+	if (op == Junctor.AND) {
 	    // if one of the terms is false the expression is false as a whole
-	    if (t1.op() == Op.FALSE || t2.op() == Op.FALSE)
-	        return createJunctorTerm(Op.FALSE);
+	    if (t1.op() == Junctor.FALSE || t2.op() == Junctor.FALSE)
+	        return createJunctorTerm(Junctor.FALSE);
 	    // if one of the terms is true skip the subterm.
-	    if (t1.op() == Op.TRUE) {
+	    if (t1.op() == Junctor.TRUE) {
 		return  t2;
-	    } else if(t2.op() == Op.TRUE) {
+	    } else if(t2.op() == Junctor.TRUE) {
 		return t1;
 	    } else { // nothing to simplifiy ...
 		return createJunctorTerm(op, t1, t2);
 	    }
-	} else if (op == Op.OR) {
+	} else if (op == Junctor.OR) {
 	    // if one of the terms is true the expression is true as a whole
-	    if (t1.op() == Op.TRUE || t2.op() == Op.TRUE)
-		return createJunctorTerm(Op.TRUE);
+	    if (t1.op() == Junctor.TRUE || t2.op() == Junctor.TRUE)
+		return createJunctorTerm(Junctor.TRUE);
 	    // if one of the terms is false skip the subterm.
-	    if (t1.op() == Op.FALSE) {
+	    if (t1.op() == Junctor.FALSE) {
 		return t2;
-	    } else if(t2.op() == Op.FALSE) {
+	    } else if(t2.op() == Junctor.FALSE) {
 		return t1;
 	    } else { // nothing to simplifiy ...
 		return createJunctorTerm(op, t1, t2);
 	    } 
-	} else if (op == Op.IMP) {
-	    if (t1.op() == Op.FALSE || t2.op() == Op.TRUE)
+	} else if (op == Junctor.IMP) {
+	    if (t1.op() == Junctor.FALSE || t2.op() == Junctor.TRUE)
 		// then the expression is true as a whole
-		return createJunctorTerm(Op.TRUE);
+		return createJunctorTerm(Junctor.TRUE);
 	    // if t1 is true or t2 is false skip that subterm.
-	    if (t1.op() == Op.TRUE) {
+	    if (t1.op() == Junctor.TRUE) {
 		return t2;
-	    } else if(t2.op() == Op.FALSE) {
-		return createJunctorTermAndSimplify(Op.NOT, t1);
+	    } else if(t2.op() == Junctor.FALSE) {
+		return createJunctorTermAndSimplify(Junctor.NOT, t1);
 	    } else { // nothing to simplifiy ...
 		return createJunctorTerm(op, t1, t2);
 	    }
@@ -374,7 +374,7 @@ public class TermFactory {
      */
     public Term createMetaTerm(MetaOperator op, Term[] subTerms) {
 	if (op==null) throw new IllegalArgumentException("null-Operator at"+
-							 "TermFactory");    
+							 "TermFactory");    	
 	return OpTerm.createOpTerm(op, subTerms).checked();
     }
 
@@ -609,7 +609,7 @@ public class TermFactory {
             new ArrayOfQuantifiableVariable [locs.length];
         Arrays.fill ( boundVars, new ArrayOfQuantifiableVariable () );
         final Term[] guards = new Term [locs.length];
-        Arrays.fill ( guards, createJunctorTerm ( Op.TRUE ) );
+        Arrays.fill ( guards, createJunctorTerm ( Junctor.TRUE ) );
         
         return createQuanUpdateTerm ( services, boundVars, guards, locs, values, target );
     }

@@ -41,7 +41,7 @@ public abstract class Function extends TermSymbol {
      * @param argSorts ArrayOfSort of the function's arguments
      */   
     public Function(Name name, Sort sort, ArrayOfSort argSorts) {
-	super(name, sort);
+	super(name, argSorts.size(), sort);
 	this.argSorts = argSorts;
     }
 
@@ -54,12 +54,6 @@ public abstract class Function extends TermSymbol {
     public Sort argSort(int n) {
 	return argSorts.getSort(n);
     }
-    
-    /** @return arity of the Function as int */
-    public int arity() {
-	return argSorts.size();
-    }
-
 
     /**
      * checks if a given Term could be subterm (at the atth subterm

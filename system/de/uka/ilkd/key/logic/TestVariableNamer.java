@@ -75,7 +75,7 @@ public class TestVariableNamer extends TestCase {
     	JavaBlock javaBlock = JavaBlock.createJavaBlock(statementBlock);
 
 	TermFactory termFactory = TermFactory.DEFAULT;
-	Term subterm = termFactory.createJunctorTerm(Op.TRUE);
+	Term subterm = termFactory.createJunctorTerm(Junctor.TRUE);
 	Term term = termFactory.createDiamondTerm(javaBlock, subterm);
 
 	return new ConstrainedFormula(term);
@@ -121,7 +121,7 @@ public class TestVariableNamer extends TestCase {
     }
     
     private void addTacletApp(Goal goal, ProgramVariable containedVar) {
-	Term findTerm = TermFactory.DEFAULT.createJunctorTerm(Op.TRUE);
+	Term findTerm = TermFactory.DEFAULT.createJunctorTerm(Junctor.TRUE);
    	AntecTacletBuilder builder = new AntecTacletBuilder();
 	builder.setFind(findTerm);
     	AntecTaclet taclet = builder.getAntecTaclet();

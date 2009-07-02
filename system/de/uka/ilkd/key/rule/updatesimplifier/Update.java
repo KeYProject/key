@@ -156,14 +156,7 @@ public abstract class Update {
         public UpdateWithUpdateTerm(Term update) {
             this.update = update;	    
             this.updateOp = (IUpdateOperator) update.op();
-            this.loc2assignmentPairs = new HashMap<Location, ArrayOfAssignmentPair>();
-            
-            for ( int i = 0; i < updateOp.locationCount (); i++ ) {
-                if ( updateOp.location ( i ) == StarLocation.ALL )
-                    Debug.fail ( "Anonymous update shall not be created using this "
-                                 + "class. (at least as long no generalized terms are "
-                                 + "supported)" );
-            }
+            this.loc2assignmentPairs = new HashMap<Location, ArrayOfAssignmentPair>();            
         }
 
         /**
@@ -308,7 +301,7 @@ public abstract class Update {
      * returns true if this update object describes an anonymous update
      */
     public boolean isAnonymousUpdate() {
-        return hasLocation(StarLocation.ALL);
+        return  false;
     }
     
     /**
@@ -327,65 +320,6 @@ public abstract class Update {
         }
         result.append("}");
         return result.toString();
-    }
-
-    // these classes are used to unify treatment of anonymous and 
-    // normal updates. May become obsolete with generalized terms 
-    public static class StarLocation extends NonRigidFunction 
-    	implements Location {
-
-        // important "name" must be initialized before ALL!
-        private final static Name name = new Name("*");
-
-        public final static StarLocation ALL = new StarLocation();
-        
-        
-        private StarLocation() {
-            super(name, SPECIAL_SORT, new Sort[0]);
-        }
-        
-        /* (non-Javadoc)
-         * @see de.uka.ilkd.key.logic.op.Location#mayBeAliasedBy(de.uka.ilkd.key.logic.op.Location)
-         */
-        public boolean mayBeAliasedBy(Location loc) {            
-            return false;
-        }
-
-        /* (non-Javadoc)
-         * @see de.uka.ilkd.key.logic.op.Operator#name()
-         */
-        public Name name() {            
-            return name;
-        }
-
-        /* (non-Javadoc)
-         * @see de.uka.ilkd.key.logic.op.Operator#validTopLevel(de.uka.ilkd.key.logic.Term)
-         */
-        public boolean validTopLevel(Term term) {
-            return term.arity() == 0 && term.sort() != Sort.FORMULA;
-        }
-
-        /* (non-Javadoc)
-         * @see de.uka.ilkd.key.logic.op.Operator#sort(de.uka.ilkd.key.logic.Term[])
-         */
-        public Sort sort(Term[] term) {            
-            return SPECIAL_SORT;
-        }
-        
-        /* (non-Javadoc)
-         * @see de.uka.ilkd.key.logic.op.Operator#arity()
-         */
-        public int arity() {            
-            return 0;
-        }
-
-        /* (non-Javadoc)
-         * @see de.uka.ilkd.key.logic.op.Operator#isRigid(de.uka.ilkd.key.logic.Term)
-         */
-        public boolean isRigid(Term term) {          
-            return true;
-        }
-    
     }
 
     public abstract AssignmentPair getAssignmentPair (int locPos);    

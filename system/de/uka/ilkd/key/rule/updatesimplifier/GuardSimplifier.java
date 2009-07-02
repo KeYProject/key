@@ -36,11 +36,11 @@ public abstract class GuardSimplifier {
     }
 
     public boolean isValidGuard () {
-        return getCondition().op () == Op.TRUE;
+        return getCondition().op () == Junctor.TRUE;
     }
 
     public boolean isUnsatisfiableGuard () {
-        return getCondition().op () == Op.FALSE;            
+        return getCondition().op () == Junctor.FALSE;            
     }
     
     /**
@@ -127,7 +127,7 @@ public abstract class GuardSimplifier {
         final UpdateSimplifierTermFactory utf = UpdateSimplifierTermFactory.DEFAULT;
         final TermFactory tf = utf.getBasicTermFactory ();
         
-        if ( formula.op () == Op.EQUALS ) {
+        if ( formula.op () == Equality.EQUALS ) {
             if ( formula.sub ( 0 ).equalsModRenaming ( formula.sub ( 1 ) ) )
                 return utf.getValidGuard ();
         } else if ( formula.op () instanceof Junctor ) {
@@ -187,13 +187,13 @@ public abstract class GuardSimplifier {
      *         equation found), <code>null</code> otherwise
      */
     private PairOfQuantifiableVariableAndTerm findSimpleEquation (Term formula) {
-        if ( formula.op () == Op.EQUALS ) {
+        if ( formula.op () == Equality.EQUALS ) {
             final PairOfQuantifiableVariableAndTerm pair =
                 isSimpleEquation ( formula, 0 );
             if ( pair != null ) return pair;
             
             return isSimpleEquation ( formula, 1 );
-        } else if ( formula.op () == Op.AND ) {
+        } else if ( formula.op () == Junctor.AND ) {
             final PairOfQuantifiableVariableAndTerm pair =
                 findSimpleEquation ( formula.sub ( 0 ) );
             if ( pair != null ) return pair;

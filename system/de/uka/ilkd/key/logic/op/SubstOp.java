@@ -26,7 +26,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public class SubstOp extends Op {
     
     SubstOp(Name name) {
-	super(name);
+	super(name, 2);
     }
 
     /**
@@ -54,11 +54,6 @@ public class SubstOp extends Op {
 	    return term[1].sort();
 	else throw new IllegalArgumentException("Cannot determine sort of "+
 						"invalid term (Wrong arity).");
-    }
-
-    /** @return arity of the Substitution operator as int */
-    public int arity() {
-	return 2;
     }
 
     /**

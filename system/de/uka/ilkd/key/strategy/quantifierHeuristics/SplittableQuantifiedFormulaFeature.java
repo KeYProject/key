@@ -13,10 +13,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.SetAsListOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.BinaryFeature;
@@ -36,13 +33,13 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
         if ( !analyser.analyse ( pos.constrainedFormula ().formula () ) )
             return false;
 
-        if ( analyser.binOp == Op.AND )
+        if ( analyser.binOp == Junctor.AND )
             return TriggerUtils.intersect (
                    TriggerUtils.intersect (
                           analyser.left.freeVars (),
                           analyser.right.freeVars () ),
                           analyser.existentialVars )     .size () == 0;
-        else if ( analyser.binOp == Op.OR )
+        else if ( analyser.binOp == Junctor.OR )
             return TriggerUtils.intersect ( analyser.left.freeVars (),
                                                analyser.right.freeVars () )
                    .union ( analyser.existentialVars ).size ()
@@ -75,7 +72,7 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
                 return analyse ( formula.sub ( 0 ) );
             }
 
-            if ( op == Op.AND || op == Op.OR ) {
+            if ( op == Junctor.AND || op == Junctor.OR ) {
                 binOp = op;
                 left = formula.sub ( 0 );
                 right = formula.sub ( 1 );

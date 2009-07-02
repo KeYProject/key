@@ -147,13 +147,13 @@ public class NotationInfo {
      * and associativities correspond to the parser syntax.  
      */
    protected void createDefaultOpNotation() {
-	tbl.put(Op.TRUE ,new Notation.Constant("true", 130));
-	tbl.put(Op.FALSE,new Notation.Constant("false", 130));
-	tbl.put(Op.NOT,new Notation.Prefix("!" ,60,60));
-	tbl.put(Op.AND,new Notation.Infix("&"  ,50,50,60));
-	tbl.put(Op.OR, new Notation.Infix("|"  ,40,40,50));
-	tbl.put(Op.IMP,new Notation.Infix("->" ,30,40,30));
-	tbl.put(Op.EQV,new Notation.Infix("<->",20,20,30));
+	tbl.put(Junctor.TRUE ,new Notation.Constant("true", 130));
+	tbl.put(Junctor.FALSE,new Notation.Constant("false", 130));
+	tbl.put(Junctor.NOT,new Notation.Prefix("!" ,60,60));
+	tbl.put(Junctor.AND,new Notation.Infix("&"  ,50,50,60));
+	tbl.put(Junctor.OR, new Notation.Infix("|"  ,40,40,50));
+	tbl.put(Junctor.IMP,new Notation.Infix("->" ,30,40,30));
+	tbl.put(Equality.EQV,new Notation.Infix("<->",20,20,30));
 
     	tbl.put(Op.ALL,new Notation.Quantifier("\\forall", 60, 60));
 	tbl.put(Op.EX, new Notation.Quantifier("\\exists", 60, 60));

@@ -13,6 +13,8 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.Operator;
 
@@ -41,9 +43,9 @@ public abstract class AbstractPolarityFeature {
             final Term t = it.getSubTerm ();
             final Operator op = t.op ();
 
-            if ( op == Op.NOT || op == Op.IMP && it.getChild () == 0 )
+            if ( op == Junctor.NOT || op == Junctor.IMP && it.getChild () == 0 )
                 formulaPol = invert ( formulaPol );
-            else if ( op == Op.EQV || 
+            else if ( op == Equality.EQV || 
                     (op == Op.IF_THEN_ELSE && it.getChild () == 0))
                 return null;
         }

@@ -181,7 +181,7 @@ public class TestOCLTranslator extends TestCase {
         // There sould be 1 axiom defining allInstances (in functional representation)
         assertTrue(result.getAxioms().size() == 1);
         assertTrue(result.getFormula().op().equals(Op.ALL));
-        assertTrue(result.getFormula().sub(0).op().equals(Op.IMP));
+        assertTrue(result.getFormula().sub(0).op().equals(Junctor.IMP));
         assertTrue(result.getFormula().varsBoundHere(0).size() == 1);
         LogicVariable q = (LogicVariable) result.getFormula().varsBoundHere(0)
                 .getQuantifiableVariable(0);
@@ -227,7 +227,7 @@ public class TestOCLTranslator extends TestCase {
         // and 1 axiom defining the call to select
         assertTrue(result.getAxioms().size() == 2);
         assertTrue(result.getFormula().op().equals(Op.EX));
-        assertTrue(result.getFormula().sub(0).op().equals(Op.AND));
+        assertTrue(result.getFormula().sub(0).op().equals(Junctor.AND));
         assertTrue(result.getFormula().varsBoundHere(0).size() == 1);
     }
 
@@ -253,7 +253,7 @@ public class TestOCLTranslator extends TestCase {
         assert result != null;
         assertTrue(result.getAxioms().isEmpty());
         assertTrue(atPreDefs.size() == 1);
-        assertTrue(result.getFormula().op().equals(Op.EQUALS));
+        assertTrue(result.getFormula().op().equals(Equality.EQUALS));
     }
 
     public void testComplexQueryResolving1() {

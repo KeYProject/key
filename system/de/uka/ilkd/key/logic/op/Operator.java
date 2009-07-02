@@ -22,17 +22,13 @@ import de.uka.ilkd.key.rule.MatchConditions;
  * functions, variables etc. have to implement this interface.  
  */
 public interface Operator extends Named, SVSubstitute {
-
+    
     /**
-     * checks whether the top level structure of the given @link Term
-     * is syntactically valid, given the assumption that the top level
-     * operator of the term is the same as this Operator. The
-     * assumption that the top level operator and the term are equal
-     * is NOT checked.  
-     * @return true iff the top level structure of
-     * the {@link Term} is valid.
+     * the arity of this operator  
+     * @return arity of the Operator as int 
      */
-    boolean validTopLevel(Term term);
+    int arity();
+    
 
     /**
      * determines the sort of the {@link Term} if it would be created using this
@@ -44,20 +40,27 @@ public interface Operator extends Named, SVSubstitute {
      * given substerms
      */
     Sort sort(Term[] term);
-
-
+    
+    
     /**
-     * the arity of this operator  
-     * @return arity of the Operator as int 
+     * checks whether the top level structure of the given @link Term
+     * is syntactically valid, given the assumption that the top level
+     * operator of the term is the same as this Operator. The
+     * assumption that the top level operator and the term are equal
+     * is NOT checked.  
+     * @return true iff the top level structure of
+     * the {@link Term} is valid.
      */
-    int arity();
+    boolean validTopLevel(Term term);
+    
 
+    
     /**
-     * @return true if the value of "term" having this operator as
-     * top-level operator and may not be changed by modalities
+     * @return true if the operator is rigid
      */
-    boolean isRigid (Term term);  
+    boolean isRigid();  
 
+    
     /**
      * tests if this operator (plays role of a template) matches 
      * the given operator with respect to the given match 

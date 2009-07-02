@@ -15,7 +15,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -86,14 +86,14 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
         if ( t1Def > t2Def ) return true;
         if ( t1Def < t2Def ) return false;
 
-        if ( t1.op () == Op.OR ) {
-            if ( t2.op () == Op.OR ) {
+        if ( t1.op () == Junctor.OR ) {
+            if ( t2.op () == Junctor.OR ) {
                 return super.lessThan ( t1, t2 );
             } else {
                 return false;
             }
         } else {
-            if ( t2.op () == Op.OR ) {
+            if ( t2.op () == Junctor.OR ) {
                 return true;
             } else {
                 return litComparator.compareTerms ( t1, t2, focus, services );
@@ -104,7 +104,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
     private class ClauseCollector extends Collector {
         protected void collect(Term te) {
             final Operator op = te.op ();
-            if ( op == Op.AND ) {
+            if ( op == Junctor.AND ) {
                 collect ( te.sub ( 0 ) );
                 collect ( te.sub ( 1 ) );
             } else {

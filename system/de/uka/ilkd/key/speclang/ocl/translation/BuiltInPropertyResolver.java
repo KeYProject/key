@@ -122,10 +122,10 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
 	    Junctor j;
 	    if (name.equals("forAll")) {
 		q = Op.ALL;
-		j = Op.IMP;
+		j = Junctor.IMP;
 	    } else {
 		q = Op.EX;
-		j = Op.AND;
+		j = Junctor.AND;
 	    }
 
 	    Term restrictions = trueTerm;
@@ -135,7 +135,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
 		Term t = replaceVar(((OCLCollection) receiver.getCollection())
 			.getPredVar(), it.next(), ((OCLCollection) receiver
 			.getCollection()).getPredicativeRestriction());
-		restrictions = TB.tf().createJunctorTermAndSimplify(Op.AND,
+		restrictions = TB.tf().createJunctorTermAndSimplify(Junctor.AND,
 			restrictions, t);
 	    }
 
@@ -164,7 +164,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
 		    oclParameters.getEntities().head().getTerm());
 
 	    if (name.equals("reject")) {
-		selectTerm = TB.tf().createJunctorTerm(Op.NOT, selectTerm);
+		selectTerm = TB.tf().createJunctorTerm(Junctor.NOT, selectTerm);
 	    }
 
 	    LogicVariable selectVar = ((OCLCollection) receiver.getCollection())
@@ -228,12 +228,12 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
 	    Quantifier q;
 	    Junctor j;
 	    if (name.equals("excludes")) {
-		opTerm = TB.tf().createJunctorTerm(Op.NOT, opTerm);
+		opTerm = TB.tf().createJunctorTerm(Junctor.NOT, opTerm);
 		q = Op.ALL;
-		j = Op.IMP;
+		j = Junctor.IMP;
 	    } else {
 		q = Op.EX;
-		j = Op.AND;
+		j = Junctor.AND;
 	    }
 
 	    opTerm = TB.tf().createJunctorTermAndSimplify(
@@ -262,11 +262,11 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
 	    Term opTerm;
 	    if (name.equals("isEmpty")) {
 		q = Op.ALL;
-		j = Op.IMP;
+		j = Junctor.IMP;
 		opTerm = falseTerm;
 	    } else {
 		q = Op.EX;
-		j = Op.AND;
+		j = Junctor.AND;
 		opTerm = trueTerm;
 	    }
 
@@ -305,20 +305,20 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
 		    .getPredVar(), lv2, ((OCLCollection) receiver
 		    .getCollection()).getPredicativeRestriction());
 
-	    restrictions = TB.tf().createJunctorTermAndSimplify(Op.AND, t1, t2);
+	    restrictions = TB.tf().createJunctorTermAndSimplify(Junctor.AND, t1, t2);
 
 	    t1 = replaceVar(temp, lv1, oclParameters.getEntities().head()
 		    .getTerm());
 	    t2 = replaceVar(temp, lv2, oclParameters.getEntities().head()
 		    .getTerm());
 
-	    restrictions = TB.tf().createJunctorTermAndSimplify(Op.AND,
+	    restrictions = TB.tf().createJunctorTermAndSimplify(Junctor.AND,
 		    restrictions, TB.tf().createEqualityTerm(t1, t2));
 
 	    t1 = TB.tf().createVariableTerm(lv1);
 	    t2 = TB.tf().createVariableTerm(lv2);
 
-	    Term subTerm = TB.tf().createJunctorTermAndSimplify(Op.IMP,
+	    Term subTerm = TB.tf().createJunctorTermAndSimplify(Junctor.IMP,
 		    restrictions, TB.tf().createEqualityTerm(t1, t2));
 	    Term resTerm = createdFactory
 		    .createCreatedNotNullQuantifierTerm(services, Op.ALL,

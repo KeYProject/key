@@ -27,15 +27,12 @@ public class Modality extends Op implements NonRigid {
 
     private static final HashMap<String, Modality> nameMap = 
         new HashMap<String, Modality>(10);
-    
-    private int arity=0;
 
     /** creates a modal operator with the given name and default arity
      * @param name the Name of the modality 
      */
     Modality(Name name) {
-	super(name);
-	this.arity = 1;
+	super(name, 1);
 	nameMap.put(name.toString(), this);
     }
 
@@ -44,8 +41,7 @@ public class Modality extends Op implements NonRigid {
      * @param arity the arity of the modality 
      */
     Modality(Name name, int arity) {
-	super(name);
-	this.arity = arity;
+	super(name, arity);
 	nameMap.put(name.toString(), this);
     }
 
@@ -75,19 +71,9 @@ public class Modality extends Op implements NonRigid {
         return term.sub(0).sort().equals(Sort.FORMULA);
     }
 
-    /** @return arity of the Diamond operator as int */
-    public int arity() {
-	return this.arity;
-    }
 
-    /**
-     * @return true if the value of "term" having this operator as
-     * top-level operator and may not be changed by modalities
-     */
-    public boolean isRigid (Term term) {
-	return
-	    super.isRigid ( term ) &&
-	    term.javaBlock ().isEmpty();
+    @Override
+    public boolean isRigid () {
+	return false;
     }
-
 }

@@ -15,15 +15,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.TermSymbol;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -347,9 +339,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "replace_known_left", commonF );
         bindRuleSet ( d, "replace_known_right",
             add ( commonF,
-                  ifZero ( DirectlyBelowSymbolFeature.create ( Op.IMP, 1 ),
+                  ifZero ( DirectlyBelowSymbolFeature.create ( Junctor.IMP, 1 ),
                            longConst ( 100 ),
-                  ifZero ( DirectlyBelowSymbolFeature.create ( Op.EQV ),
+                  ifZero ( DirectlyBelowSymbolFeature.create ( Equality.EQV ),
                            longConst ( 100 ) ) ) ) );
     }
 
@@ -955,7 +947,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermBuffer focus = new TermBuffer ();
 
         final TermFeature atLeastTwoLCEquation =
-            opSub ( Op.EQUALS,
+            opSub ( Equality.EQUALS,
                     opSub ( tf.mul, tf.atom, tf.atLeastTwoLiteral ),
                     tf.intF );
         
@@ -1559,9 +1551,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
               add ( isRootInferenceProducer ( intRel ),
                     forEach ( rootInf, RootsGenerator.create ( intRel ),
                               add ( instantiate ( "cutFormula", rootInf ),
-                                    ifZero ( applyTF ( rootInf, op ( Op.OR ) ),
+                                    ifZero ( applyTF ( rootInf, op ( Junctor.OR ) ),
                                              longConst ( 50 ) ),
-                                    ifZero ( applyTF ( rootInf, op ( Op.AND ) ),
+                                    ifZero ( applyTF ( rootInf, op ( Junctor.AND ) ),
                                              longConst ( 20 ) ) ) ),
                     longConst ( IN_EQ_SIMP_NON_LIN_COST )
               ) );
@@ -1983,7 +1975,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             jmod = numbers.getJModulo ();
             jdiv = numbers.getJDivision ();
             
-            eq = Op.EQUALS;
+            eq = Equality.EQUALS;
             leq = numbers.getLessOrEquals ();
             geq = numbers.getGreaterOrEquals ();
             
@@ -2137,25 +2129,25 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         public FormulaTermFeatures () {
             forF = extendsTrans ( Sort.FORMULA );
             
-            orF = op ( Op.OR );
-            andF = op ( Op.AND );
-            impF = op ( Op.IMP );
-            notF = op ( Op.NOT );
+            orF = op ( Junctor.OR );
+            andF = op ( Junctor.AND );
+            impF = op ( Junctor.IMP );
+            notF = op ( Junctor.NOT );
             ifThenElse = OperatorClassTF.create ( IfThenElse.class );
             
             query = OperatorClassTF.create ( ProgramMethod.class );
             
             atom = AtomTermFeature.INSTANCE;
             propJunctor = or ( OperatorClassTF.create ( Junctor.class ),
-                               op ( Op.EQV ) );
-            literal = or ( atom, opSub ( Op.NOT, atom ) );
+                               op ( Equality.EQV ) );
+            literal = or ( atom, opSub ( Junctor.NOT, atom ) );
             
             // left-associatively arranged clauses
-            clause = rec ( orF, or ( opSub ( Op.OR, any (), not ( orF ) ),
+            clause = rec ( orF, or ( opSub ( Junctor.OR, any (), not ( orF ) ),
                                      literal ) ); 
 
             // left-associatively arranged sets of clauses
-            clauseSet = rec ( andF, or ( opSub ( Op.AND, any (), not ( andF ) ),
+            clauseSet = rec ( andF, or ( opSub ( Junctor.AND, any (), not ( andF ) ),
                                          clause ) ); 
 
             quantifiedFor = or ( op ( Op.ALL ), op ( Op.EX ) );

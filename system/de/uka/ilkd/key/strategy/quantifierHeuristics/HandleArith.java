@@ -20,8 +20,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 
@@ -71,12 +72,12 @@ class HandleArith {
         Term pro = problem;
         Operator op = pro.op ();
         // may be here we should check wehre sub0 and sub1 is integer.
-        while ( op == Op.NOT ) {
+        while ( op == Junctor.NOT ) {
             pro = pro.sub ( 0 );
             op = pro.op ();
             temp = !temp;
         }
-        if ( op == Op.EQUALS ) {
+        if ( op == Equality.EQUALS ) {
             Term sub0 = problem.sub ( 0 );
             Term sub1 = problem.sub ( 1 );
             Polynomial poly1 = Polynomial.create ( sub0, services );
@@ -102,19 +103,19 @@ class HandleArith {
     public static Term provedByArith(Term problem, Term axiom, Services services) {
         Term cd = formatArithTerm ( problem, services );
         Term ab = formatArithTerm ( axiom, services );
-        if ( cd.op() == Op.FALSE || ab.op() == Op.FALSE ) return problem;
+        if ( cd.op() == Junctor.FALSE || ab.op() == Junctor.FALSE ) return problem;
         Function addfun = services.getTypeConverter ().getIntegerLDT ().getAdd();
         Term arithTerm = tb.geq ( tb.func ( addfun, cd.sub ( 0 ), ab.sub ( 1 ) ),
                                   tb.func ( addfun, ab.sub ( 0 ), cd.sub ( 1 ) ),
                                   services );
         Term res = provedByArith ( arithTerm, services );
-        if ( res.op() == Op.TRUE ) return trueT;
+        if ( res.op() == Junctor.TRUE ) return trueT;
         Term t0 = formatArithTerm ( tb.not ( problem ), services );
         arithTerm = tb.geq ( tb.func ( addfun, t0.sub ( 0 ), ab.sub ( 1 ) ),
                              tb.func ( addfun, ab.sub ( 0 ), t0.sub ( 1 ) ),
                              services );
         res = provedByArith ( arithTerm, services );
-        if ( res.op() == Op.TRUE ) return falseT;
+        if ( res.op() == Junctor.TRUE ) return falseT;
         return problem;
     }
 
@@ -129,7 +130,7 @@ class HandleArith {
         Term pro = problem;
         Operator op = pro.op ();
         boolean opNot = false;
-        while ( op == Op.NOT ) {
+        while ( op == Junctor.NOT ) {
             opNot = !opNot;
             pro = pro.sub ( 0 );
             op = pro.op ();

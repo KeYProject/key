@@ -1472,14 +1472,14 @@ public abstract class Taclet implements Rule, Named {
 		    // negate formulas of the if succedent
 		    if ( i <= 0 )
 			ifPart = TermFactory.DEFAULT.createJunctorTerm
-			    ( Op.NOT, ifPart );		    
+			    ( Junctor.NOT, ifPart );		    
 
 		    if ( res == null ) {
 			res   = p_goal.split( p_numberOfNewGoals + 1 );
 			ifObl = ifPart;
 		    } else
 			ifObl = TermFactory.DEFAULT.createJunctorTerm
-			    ( Op.AND, ifObl, ifPart );
+			    ( Junctor.AND, ifObl, ifPart );
 		    
 		    // UGLY: We create a flat structure of the new
 		    // goals, thus the if formulas have to be added to

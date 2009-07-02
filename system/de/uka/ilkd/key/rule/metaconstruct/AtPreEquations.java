@@ -81,7 +81,7 @@ public class AtPreEquations extends AbstractMetaOperator {
                                         null,
                                         null);
             Term f2Term = TermBuilder.DF.func(f2, argTerms);
-            Term equalsTerm = tf.createJunctorTerm(Op.EQUALS, f1Term, f2Term);
+            Term equalsTerm = tf.createJunctorTerm(Equality.EQUALS, f1Term, f2Term);
             Term quantifTerm;
             if(arity > 0) {
                 quantifTerm = TermBuilder.DF.all(args, equalsTerm);

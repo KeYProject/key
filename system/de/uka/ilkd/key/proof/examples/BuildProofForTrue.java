@@ -10,7 +10,7 @@ package de.uka.ilkd.key.proof.examples;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.*;
 
 /** The {@link #run} method of this class will construct a proof object
@@ -41,7 +41,7 @@ public class BuildProofForTrue {
     /** Return the formula <code>true</code> */
     public Term buildFormula() {
 	TermFactory tf = TermFactory.DEFAULT;
-	return tf.createJunctorTerm(Op.TRUE, new Term[0]);
+	return tf.createJunctorTerm(Junctor.TRUE, new Term[0]);
     }
 
     /** return a sequent containing the formula true. */

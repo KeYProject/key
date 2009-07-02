@@ -15,7 +15,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /** this class implements the interface for
@@ -62,9 +62,9 @@ public class MetaEqual extends AbstractMetaOperator {
 	boolean result = bigIntArg1.compareTo(bigIntArg2) == 0;
 	
 	if (result)
-	    return termFactory.createJunctorTerm(Op.TRUE);
+	    return termFactory.createJunctorTerm(Junctor.TRUE);
 	else
-	    return termFactory.createJunctorTerm(Op.FALSE);
+	    return termFactory.createJunctorTerm(Junctor.FALSE);
 
     }
 

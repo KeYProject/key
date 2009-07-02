@@ -843,7 +843,7 @@ public class LogicPrinter {
                 layouter.end();
             }
 
-            if(bloc.getFormula().op() != Op.TRUE) {
+            if(bloc.getFormula().op() != Junctor.TRUE) {
                 layouter.print("\\if (").beginC();
                 printTerm(bloc.getFormula());
                 layouter.print(") ").end();

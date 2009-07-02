@@ -10,7 +10,7 @@ package de.uka.ilkd.key.proof.examples;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.ListOfTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -65,7 +65,7 @@ public class CloseProofForTrue {
 
     public Term buildFormula() {
 	TermFactory tf = TermFactory.DEFAULT;
-	return tf.createJunctorTerm(Op.TRUE, new Term[0]);
+	return tf.createJunctorTerm(Junctor.TRUE, new Term[0]);
     }
 
     /** return a sequent containing the formula true. */

@@ -8,30 +8,40 @@
 //
 //
 
-/** this class represents a logical variable */
+
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
+
 
 public class LogicVariable extends TermSymbol 
     implements QuantifiableVariable, ParsableVariable {
 
     public LogicVariable(Name name,Sort sort) {
-	super(name, sort);
+	super(name, 0, sort);
 	if ( sort == Sort.FORMULA ) {
 	    throw new RuntimeException(
 		"Attempt to create logic variable of type formula");
 	}
     }
     
+    
+    @Override
+    public boolean validTopLevel(Term term){
+        return term.arity() == 0;
+    }
+
+    
     /** 
      * a match between two logic variables is possible if they have been assigned
      * they are same or have been assigned to the same abstract name and the sorts
      *  are equal.
      */
+    @Override
     public MatchConditions match(SVSubstitute subst, MatchConditions mc,
             Services services) {
         
@@ -47,14 +57,10 @@ public class LogicVariable extends TermSymbol
         return null;
     }
     
-    /** @return arity of the Variable as int */
-    public int arity() {
-	return 0;
-    }
     
-    /** toString */
+    @Override
     public String toString() {
-	return ""+name()+":"+sort();
+	return name() + ":" + sort();
     }
 
 }

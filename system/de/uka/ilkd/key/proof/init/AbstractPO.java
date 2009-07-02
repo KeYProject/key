@@ -435,7 +435,7 @@ public abstract class AbstractPO implements ProofOblInput {
         for(int i = 0; i < proofs.length; i++) {
             Term axioms = getRequiredAxioms(poTerms[i]);
             proofs[i] = createProof(poNames != null ? poNames[i] : name,
-                                    poTerms[i].op() == Op.IMP
+                                    poTerms[i].op() == Junctor.IMP
                                     ? TB.imp(TB.and(axioms, poTerms[i].sub(0)),
                                              poTerms[i].sub(1))
                                     : TB.imp(axioms, poTerms[i]));

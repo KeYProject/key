@@ -7,13 +7,9 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public class BoundedNumericalQuantifier extends Op {
      
     BoundedNumericalQuantifier(Name name) {
-        super(name);
+        super(name, 3);
     }
     
-    public int arity() {
-        return 3;
-    }
-
     public Sort sort(Term[] term) {
         return term[2].sort();
     }
@@ -25,5 +21,4 @@ public class BoundedNumericalQuantifier extends Op {
     public Sort argSort(int i) {
 	return Sort.ANY;
     }
-
 }

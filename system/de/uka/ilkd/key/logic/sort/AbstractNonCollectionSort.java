@@ -24,7 +24,7 @@ public abstract class AbstractNonCollectionSort extends AbstractSort implements
     protected AbstractCollectionSort sequenceSort;
   
 
-    /** creates a Sort (with a new equality symbol for this sort) */
+    /** creates a Sort  */
     public AbstractNonCollectionSort(Name name) {
         super(name);
         setSort      = new SetSort(this);

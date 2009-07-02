@@ -261,7 +261,7 @@ public class TestMatchTaclet extends TestCase {
 
 
 	Term match = TermFactory.DEFAULT.createDiamondTerm
-	    (javaBlock, TermFactory.DEFAULT.createJunctorTerm(Op.TRUE));
+	    (javaBlock, TermFactory.DEFAULT.createJunctorTerm(Junctor.TRUE));
 	
 	FindTaclet taclet=(FindTaclet)TacletForTests
 	    .getTaclet("TestMatchTaclet_preincrement").taclet();   

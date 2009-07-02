@@ -79,6 +79,8 @@ public abstract class Term implements SVSubstitute {
      * @param sort the Sort of the term
      */
     protected Term(Operator op, Sort sort) {
+	assert op != null;
+	assert sort != null;
 	this.op       = op;
 	this.sort     = sort;
     }
@@ -165,7 +167,7 @@ public abstract class Term implements SVSubstitute {
      * too pessimistic (but still valid)
      */
     private void determineRigidness () {
-	this.rigid = op ().isRigid ( this ) ;
+	this.rigid = op().isRigid() && hasRigidSubterms();
 	this.rigidComputed = true;
     }
 

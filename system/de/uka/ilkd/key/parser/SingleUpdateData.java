@@ -18,7 +18,7 @@ package de.uka.ilkd.key.parser;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Junctor;
 
 class SingleUpdateData {
     public Term a0 = null;
@@ -26,7 +26,7 @@ class SingleUpdateData {
     public boolean shadow_a0 = false;
     public boolean shadow_a1 = false;
     public Term guard =
-        TermFactory.DEFAULT.createJunctorTerm ( Op.TRUE );
+        TermFactory.DEFAULT.createJunctorTerm ( Junctor.TRUE );
     public ArrayOfQuantifiableVariable boundVars =
         new ArrayOfQuantifiableVariable ();
 }

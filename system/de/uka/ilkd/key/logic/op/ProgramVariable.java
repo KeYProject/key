@@ -51,7 +51,7 @@ public abstract class ProgramVariable extends TermSymbol
 			    boolean            isModel,
 			    boolean            isGhost,
 			    boolean            isFinal) {
-	super(name, s);
+	super(name, 0, s);
 	this.type = t;
 	this.containingType = containingType;	
 	this.isStatic = isStatic;
@@ -83,21 +83,11 @@ public abstract class ProgramVariable extends TermSymbol
 	return super.sort() == null ? type.getSort() : super.sort();
     }
 
-    /** @return arity of the Variable as int */
-    public int arity() {
-	return 0;
-    }
-
     /** @return name of the ProgramVariable */
     public ProgramElementName getProgramElementName() {
 	return (ProgramElementName) name();
     }
 
-    /** toString */
-    public String toString() {
-	return name().toString();
-    }
-	        
     /**
      * returns true if the program variable has been declared as static
      */
@@ -282,5 +272,10 @@ public abstract class ProgramVariable extends TermSymbol
             Debug.out("Program match failed. Not same program variable (pattern, source)", this, src);
             return null;
         }     
+    }
+    
+    @Override
+    public boolean isRigid() {
+	return false;
     }
 }

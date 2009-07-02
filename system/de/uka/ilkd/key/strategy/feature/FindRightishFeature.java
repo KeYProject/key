@@ -14,7 +14,7 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -49,7 +49,7 @@ public class FindRightishFeature implements Feature {
         while ( it.next () != -1 ) {
             final Operator op = it.getSubTerm ().op ();
             final int index = it.getChild ();
-            if ( index == 0 && op == add || index == 1 && op == Op.EQUALS )
+            if ( index == 0 && op == add || index == 1 && op == Equality.EQUALS )
                 res = res.add ( one );
         }
         

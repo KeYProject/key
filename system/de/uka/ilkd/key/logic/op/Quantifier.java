@@ -19,7 +19,7 @@ public class Quantifier extends Op {
     
     /** creates a quantifier */
     Quantifier(Name name) {
-	super(name);
+	super(name, 1);
     }
 
     /** 
@@ -45,11 +45,4 @@ public class Quantifier extends Op {
 	if (term.varsBoundHere(0).size()==0) return false;
         return term.sub(0).sort().equals(Sort.FORMULA);
     }
-
-
-   /** @return arity of the Quantifier as int. */
-    public int arity() {
-	return 1;
-    }
-
 }

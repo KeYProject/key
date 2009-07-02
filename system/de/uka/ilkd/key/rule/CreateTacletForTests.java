@@ -333,7 +333,7 @@ public class CreateTacletForTests extends TestCase {
 						 new Term[]{t_d,t_cplus1});
 	Term t_eq2=tf.createFunctionTerm
 	    (func_eq,new Term[]{ t_cplus1plusd, t_dpluscplus1});
-	Term tnat=tf.createJunctorTerm(Op.IMP, t_eq1, t_eq2);
+	Term tnat=tf.createJunctorTerm(Junctor.IMP, t_eq1, t_eq2);
 
 	// => (c+d) = ((d -1 +1) +c) -> (c +1)+d = (d+c) +1
 	seq_testNat=Sequent.createSequent

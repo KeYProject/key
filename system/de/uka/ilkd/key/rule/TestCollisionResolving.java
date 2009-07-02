@@ -76,7 +76,7 @@ public class TestCollisionResolving extends TestCase {
 	Term t_ex_q_x =
 	    TermFactory.DEFAULT.createQuantifierTerm(Op.EX, x, t_q_x);
 	Term term = 
-	    TermFactory.DEFAULT.createJunctorTerm(Op.AND, t_all_p_x,
+	    TermFactory.DEFAULT.createJunctorTerm(Junctor.AND, t_all_p_x,
 						  t_ex_q_x);
 	FindTaclet coll_varSV = (FindTaclet) TacletForTests.getTaclet
 	    ("TestCollisionResolving_coll_varSV").taclet();
@@ -122,7 +122,7 @@ public class TestCollisionResolving extends TestCase {
 	    TermFactory.DEFAULT.createQuantifierTerm(Op.EX, x, t_q_x);
 
 	Term t_px_and_exxqx = 
-	    TermFactory.DEFAULT.createJunctorTerm(Op.AND, t_p_x,
+	    TermFactory.DEFAULT.createJunctorTerm(Junctor.AND, t_p_x,
 						  t_ex_q_x);
 	Term term =
 	    TermFactory.DEFAULT.createQuantifierTerm(Op.ALL, x, t_px_and_exxqx);

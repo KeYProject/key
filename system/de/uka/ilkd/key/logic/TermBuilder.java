@@ -29,8 +29,8 @@ public final class TermBuilder {
     public static final TermBuilder DF = new TermBuilder();
     
     private static final TermFactory tf = TermFactory.DEFAULT;    
-    private static final Term tt = TermFactory.DEFAULT.createJunctorTerm(Op.TRUE); 
-    private static final Term ff = TermFactory.DEFAULT.createJunctorTerm(Op.FALSE); 
+    private static final Term tt = TermFactory.DEFAULT.createJunctorTerm(Junctor.TRUE); 
+    private static final Term ff = TermFactory.DEFAULT.createJunctorTerm(Junctor.FALSE); 
 
     
     private TermBuilder() {
@@ -164,12 +164,12 @@ public final class TermBuilder {
     
     
     public Term not(Term t) {
-        return tf.createJunctorTermAndSimplify(Op.NOT, t);
+        return tf.createJunctorTermAndSimplify(Junctor.NOT, t);
     }
     
     
     public Term and(Term t1, Term t2) {
-        return tf.createJunctorTermAndSimplify(Op.AND, t1, t2);
+        return tf.createJunctorTermAndSimplify(Junctor.AND, t1, t2);
     }
 
     
@@ -194,7 +194,7 @@ public final class TermBuilder {
     
     
     public Term or(Term t1, Term t2) {
-        return tf.createJunctorTermAndSimplify(Op.OR, t1, t2);
+        return tf.createJunctorTermAndSimplify(Junctor.OR, t1, t2);
     }
     
     
@@ -219,7 +219,7 @@ public final class TermBuilder {
 
     
     public Term imp(Term t1, Term t2) {
-        return tf.createJunctorTermAndSimplify(Op.IMP, t1, t2);
+        return tf.createJunctorTermAndSimplify(Junctor.IMP, t1, t2);
     }
     
     
@@ -240,7 +240,7 @@ public final class TermBuilder {
             throw new TermCreationException("Equivalence is defined on formulas not terms: " + 
                     t1 + ", " + t2);
         }
-        return tf.createJunctorTermAndSimplify(Op.EQV, t1, t2);
+        return tf.createJunctorTermAndSimplify(Equality.EQV, t1, t2);
     }
     
     

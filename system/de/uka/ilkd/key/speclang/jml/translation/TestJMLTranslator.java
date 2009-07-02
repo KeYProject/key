@@ -174,8 +174,8 @@ public class TestJMLTranslator extends TestCase {
 
         assertTrue(result != null);
         assertTrue(result.getAxioms().isEmpty());
-        assertTrue(result.getFormula().op().equals(Op.IMP));
-        assertTrue(result.getFormula().sub(0).op().equals(Op.AND));
+        assertTrue(result.getFormula().op().equals(Junctor.IMP));
+        assertTrue(result.getFormula().sub(0).op().equals(Junctor.AND));
         assertTrue(termContains(result.getFormula(), tb.zTerm(services, "5")));
         assertTrue(termContains(result.getFormula(), selfVar));
     }
@@ -239,7 +239,7 @@ public class TestJMLTranslator extends TestCase {
         assertTrue(result.getAxioms().isEmpty());
         assertTrue(result.getFormula().op().equals(Op.ALL));
         assertTrue(termContains(result.getFormula(), tb.zTerm(services, "2147483647")));
-        assertTrue(termContains(result.getFormula(), Op.AND));
+        assertTrue(termContains(result.getFormula(), Junctor.AND));
     }
 
     
@@ -258,7 +258,7 @@ public class TestJMLTranslator extends TestCase {
         assertTrue(result != null);
         assertTrue(result.getAxioms().isEmpty());
         assertTrue(result.getFormula().op().equals(Op.EX));
-        assertTrue(result.getFormula().sub(0).op().equals(Op.AND));
+        assertTrue(result.getFormula().sub(0).op().equals(Junctor.AND));
         assertTrue(termContains(result.getFormula(), tb.NULL(services)));
     }
 
@@ -284,7 +284,7 @@ public class TestJMLTranslator extends TestCase {
         assertTrue(result.getAxioms().isEmpty());
         assertTrue(atPreDefs.size() == 1); // for "i"
         //assertTrue(atPreDefs.containsKey(AttributeOp.getAttributeOp(i)));
-        assertTrue(result.getFormula().op().equals(Op.EQUALS));
+        assertTrue(result.getFormula().op().equals(Equality.EQUALS));
         assertTrue(termContains(result.getFormula(), (Function) atPreDefs.get(atPreDefs.keySet().iterator().next())));
     }
 
@@ -312,7 +312,7 @@ public class TestJMLTranslator extends TestCase {
 
         assertTrue(result != null);
         assertTrue(result.getAxioms().isEmpty());
-        assertTrue(result.getFormula().op().equals(Op.EQUALS));
+        assertTrue(result.getFormula().op().equals(Equality.EQUALS));
         assertTrue(termContains(result.getFormula(), resultVar));
         
     }
@@ -389,7 +389,7 @@ public class TestJMLTranslator extends TestCase {
         
         assertTrue(result != null);
         assertTrue(result.getAxioms().isEmpty());
-        assertTrue(result.getFormula().op().equals(Op.EQUALS));
+        assertTrue(result.getFormula().op().equals(Equality.EQUALS));
         assertTrue(termContains(result.getFormula(), tb.var(javaInfo
                 .getAttribute(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED,
                         testClassType))));
@@ -410,7 +410,7 @@ public class TestJMLTranslator extends TestCase {
         }
         
         assertTrue(result != null);
-        assertTrue(result.getFormula().op().equals(Op.EQUALS));
+        assertTrue(result.getFormula().op().equals(Equality.EQUALS));
         assertTrue(termContains(result.getFormula(),tb.zTerm(services, "18")));
     }
     

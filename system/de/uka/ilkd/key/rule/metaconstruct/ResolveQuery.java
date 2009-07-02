@@ -95,7 +95,7 @@ public class ResolveQuery extends AbstractMetaOperator {
 	ProgramMethod pm = (ProgramMethod) t.op();
 	if(t.arity() > 0 && !pm.isStatic() && !pm.isConstructor() && 
 	   t.sub(0).sort() instanceof NullSort){
-	    return tf.createJunctorTerm(Op.TRUE);
+	    return tf.createJunctorTerm(Junctor.TRUE);
 	}
 	addUpdatesLoc = new Term[t.arity()];
 	addUpdatesVal = new Term[t.arity()];

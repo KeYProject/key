@@ -1066,26 +1066,26 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	}
 	
 	Operator op = term.op();
-	if (op == Op.NOT) {
+	if (op == Junctor.NOT) {
 	    StringBuffer arg = translateTerm(term.sub(0), quantifiedVars, services);
 	    return this.translateLogicalNot(arg);
-	} else if (op == Op.AND) {
+	} else if (op == Junctor.AND) {
 	    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars, services);
 	    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars, services);
 	    return this.translateLogicalAnd(arg1, arg2);
-	} else if (op == Op.OR) {
+	} else if (op == Junctor.OR) {
 	    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars, services);
 	    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars, services);
 	    return this.translateLogicalOr(arg1, arg2);
-	} else if (op == Op.IMP) {
+	} else if (op == Junctor.IMP) {
 	    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars, services);
 	    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars, services);
 	    return this.translateLogicalImply(arg1, arg2);
-	} else if (op == Op.EQV) {
+	} else if (op == Equality.EQV) {
 	    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars, services);
 	    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars, services);
 	    return this.translateLogicalEquivalence(arg1, arg2);
-	} else if (op == Op.EQUALS) {
+	} else if (op == Equality.EQUALS) {
 	    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars, services);
 	    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars, services);
 	    return this.translateObjectEqual(arg1, arg2);
@@ -1157,9 +1157,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    quantifiedVars.remove(vars.getQuantifiableVariable(0));
 
 	    return this.translateLogicalExist(qv, sort, form);
-	} else if (op == Op.TRUE) {
+	} else if (op == Junctor.TRUE) {
 	    return this.translateLogicalTrue();
-	} else if (op == Op.FALSE) {
+	} else if (op == Junctor.FALSE) {
 	    return this.translateLogicalFalse();
 	} else if (op == Op.NULL) {
 	    this.nullString = this.translateNull();

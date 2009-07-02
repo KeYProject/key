@@ -32,14 +32,14 @@ public class IfThenElse extends Op {
      * creates the default if-else operator
      */
     IfThenElse () {
-        super ( new Name ( "if-then-else" ) );
+        super ( new Name ( "if-then-else" ), 3 );
     }
 
     /**
      * creates an if-else operator of the given name
      */
     IfThenElse (Name name) {
-        super ( name );
+        super ( name, 3 );
     }
 
     public boolean validTopLevel (Term term) {
@@ -95,8 +95,4 @@ public class IfThenElse extends Op {
         }        
         return result;
     }
-    
-    public int arity () {
-        return 3;
-    }   
 }

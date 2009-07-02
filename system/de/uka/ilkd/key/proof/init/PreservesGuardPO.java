@@ -154,7 +154,7 @@ public class PreservesGuardPO extends EnsuresPO {
             
             Term predLoc1Term = TF.createFunctionTerm(pred, 
                                                       bloc1.getLocTerm());
-            Term freeLoc1Term = TF.createJunctorTerm(Op.AND, 
+            Term freeLoc1Term = TF.createJunctorTerm(Junctor.AND, 
                                                      bloc1.getFormula(), 
                                                      predLoc1Term); 
             Term boundLoc1Term 
@@ -173,7 +173,7 @@ public class PreservesGuardPO extends EnsuresPO {
                 
                 Term predLoc2Term = TF.createFunctionTerm(pred, 
                                                           bloc2.getLocTerm());
-                Term freeLoc2Term = TF.createJunctorTerm(Op.AND, 
+                Term freeLoc2Term = TF.createJunctorTerm(Junctor.AND, 
                                                          bloc2.getFormula(), 
                                                          predLoc2Term); 
                 Term boundLoc2Term 
@@ -260,7 +260,7 @@ public class PreservesGuardPO extends EnsuresPO {
         }
         
         //create the formula
-        encapsulationFormula = TF.createJunctorTerm(Op.TRUE);
+        encapsulationFormula = TF.createJunctorTerm(Junctor.TRUE);
         IteratorOfLocationDescriptor it2 = dependsClause.iterator();
         while(it2.hasNext()) {
             LocationDescriptor loc = it2.next();
@@ -281,33 +281,33 @@ public class PreservesGuardPO extends EnsuresPO {
             Term accTerm = TF.createFunctionTerm(accPred, 
                                                  yTerm,
                                                  dTerm);
-            Term premiseTerm = TF.createJunctorTermAndSimplify(Op.AND, 
+            Term premiseTerm = TF.createJunctorTermAndSimplify(Junctor.AND, 
                                                                accTerm, 
                                                                phiTerm);
             
             //create disjunction of "C::Instance(y)" for all guards C
-            Term isGuardTerm = TF.createJunctorTerm(Op.FALSE);
+            Term isGuardTerm = TF.createJunctorTerm(Junctor.FALSE);
             IteratorOfKeYJavaType it3 = guard.iterator();
             while(it3.hasNext()) {
                 KeYJavaType guardKJT = it3.next();
                 Term instanceOfTerm = createInstanceOf(guardKJT, yTerm);
                 isGuardTerm 
-                    = TF.createJunctorTermAndSimplify(Op.OR, 
+                    = TF.createJunctorTermAndSimplify(Junctor.OR, 
                                                       isGuardTerm, 
                                                       instanceOfTerm);
             }
 
             //create "phi_k & y = d_k'"  
             Term yEqualTerm = TF.createEqualityTerm(yTerm, dTerm);
-            Term isWithinTerm = TF.createJunctorTermAndSimplify(Op.AND, 
+            Term isWithinTerm = TF.createJunctorTermAndSimplify(Junctor.AND, 
                                                                 phiTerm, 
                                                                 yEqualTerm);
             
             //create implication
             Term impTerm 
-                = TF.createJunctorTerm(Op.IMP,
+                = TF.createJunctorTerm(Junctor.IMP,
                                        premiseTerm,
-                                       TF.createJunctorTerm(Op.OR, 
+                                       TF.createJunctorTerm(Junctor.OR, 
                                                             isWithinTerm, 
                                                             isGuardTerm));
             
@@ -328,7 +328,7 @@ public class PreservesGuardPO extends EnsuresPO {
                                                         quantifierTerm));
             
             encapsulationFormula 
-                    = TF.createJunctorTermAndSimplify(Op.AND, 
+                    = TF.createJunctorTermAndSimplify(Junctor.AND, 
                                                       encapsulationFormula, 
                                                       quantifierTerm);
         } 
@@ -355,7 +355,7 @@ public class PreservesGuardPO extends EnsuresPO {
                               ProgramVariable resultVar,
                               ProgramVariable exceptionVar,
                               Map<Operator, Function/*atPre*/> atPreFunctions) throws ProofInputException {
-        Term result = TF.createJunctorTerm(Op.TRUE);
+        Term result = TF.createJunctorTerm(Junctor.TRUE);
         Function accPred = getAccPred();
         Sort javaLangObjectSort = javaInfo.getJavaLangObjectAsSort();
         
@@ -365,7 +365,7 @@ public class PreservesGuardPO extends EnsuresPO {
             Term paramAccTerm = createAccessedTerm(paramVar,
                                                    javaLangObjectSort, 
                                                    accPred);
-            result = TF.createJunctorTermAndSimplify(Op.AND, 
+            result = TF.createJunctorTermAndSimplify(Junctor.AND, 
                                                      result, 
                                                      paramAccTerm);
         }
@@ -375,14 +375,14 @@ public class PreservesGuardPO extends EnsuresPO {
             Term selfAccTerm = createAccessedTerm(selfVar, 
                                                   javaLangObjectSort, 
                                                   accPred); 
-            result = TF.createJunctorTermAndSimplify(Op.AND, 
+            result = TF.createJunctorTermAndSimplify(Junctor.AND, 
                                                      result, 
                                                      selfAccTerm);
         }
         
         //add main formula
         buildEncapsulationFormula();
-        result = TF.createJunctorTermAndSimplify(Op.AND, 
+        result = TF.createJunctorTermAndSimplify(Junctor.AND, 
                                                  result, 
                                                  encapsulationFormula);
         
@@ -395,7 +395,7 @@ public class PreservesGuardPO extends EnsuresPO {
                                ProgramVariable resultVar,
                                ProgramVariable exceptionVar,
                                Map<Operator, Function/*atPre*/> atPreFunctions) throws ProofInputException {
-        Term result = TF.createJunctorTerm(Op.TRUE);
+        Term result = TF.createJunctorTerm(Junctor.TRUE);
         Function accPred = getAccPred();
         Sort javaLangObjectSort = javaInfo.getJavaLangObjectAsSort();
 
@@ -406,7 +406,7 @@ public class PreservesGuardPO extends EnsuresPO {
         
         //add main formula
         buildEncapsulationFormula();
-        result = TF.createJunctorTermAndSimplify(Op.IMP, 
+        result = TF.createJunctorTermAndSimplify(Junctor.IMP, 
                                                  result, 
                                                  encapsulationFormula);
         

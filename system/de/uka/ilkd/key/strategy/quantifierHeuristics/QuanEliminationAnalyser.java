@@ -13,10 +13,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IteratorOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.*;
 
 public class QuanEliminationAnalyser {
     
@@ -74,9 +71,9 @@ public class QuanEliminationAnalyser {
 
     private boolean isBelowOr(Term t, Term env) {
         final Operator envOp = env.op ();
-        if ( envOp == Op.OR && ( env.sub ( 0 ) == t || env.sub ( 1 ) == t ) )
+        if ( envOp == Junctor.OR && ( env.sub ( 0 ) == t || env.sub ( 1 ) == t ) )
             return true;
-        if ( envOp == Op.OR || envOp == Op.AND )
+        if ( envOp == Junctor.OR || envOp == Junctor.AND )
             return isBelowOr ( t, env.sub ( 0 ) )
                    || isBelowOr ( t, env.sub ( 1 ) );
         return false;
@@ -94,7 +91,7 @@ public class QuanEliminationAnalyser {
         while ( !pio.isTopLevel () ) {
             final PosInOccurrence parent = pio.up ();
             final Operator parentOp = parent.subTerm ().op ();
-            if ( parentOp != Op.AND && parentOp != Op.OR ) return pio;
+            if ( parentOp != Junctor.AND && parentOp != Junctor.OR ) return pio;
             pio = parent;
         }
         return pio;
@@ -112,10 +109,10 @@ public class QuanEliminationAnalyser {
         
         final Operator op = matrix.op ();
 
-        if ( op == ( ex ? Op.OR : Op.AND ) ) {
+        if ( op == ( ex ? Junctor.OR : Junctor.AND ) ) {
             return isEliminableVariableSomePaths ( var, matrix.sub ( 0 ), ex )
                    && isEliminableVariableSomePaths ( var, matrix.sub ( 1 ), ex );
-        } else if ( op == ( ex ? Op.AND : Op.OR ) ) {
+        } else if ( op == ( ex ? Junctor.AND : Junctor.OR ) ) {
             return
             isEliminableVariableAllPaths ( var, matrix.sub ( 0 ), ex )
              || isEliminableVariableAllPaths ( var, matrix.sub ( 1 ), ex )
@@ -139,10 +136,10 @@ public class QuanEliminationAnalyser {
                                                 boolean ex) {
         final Operator op = matrix.op ();
 
-        if ( op == ( ex ? Op.OR : Op.AND ) ) {
+        if ( op == ( ex ? Junctor.OR : Junctor.AND ) ) {
             return isEliminableVariableAllPaths ( var, matrix.sub ( 0 ), ex )
                    && isEliminableVariableAllPaths ( var, matrix.sub ( 1 ), ex );
-        } else if ( op == ( ex ? Op.AND : Op.OR ) ) {
+        } else if ( op == ( ex ? Junctor.AND : Junctor.OR ) ) {
             return isEliminableVariableAllPaths ( var, matrix.sub ( 0 ), ex )
                    || isEliminableVariableAllPaths ( var, matrix.sub ( 1 ), ex );
         }
@@ -161,7 +158,7 @@ public class QuanEliminationAnalyser {
     }
     
     private boolean isDefinitionEx(Term t, QuantifiableVariable var) {
-        if ( t.op () == Op.OR ) {
+        if ( t.op () == Junctor.OR ) {
             return isDefinitionEx ( t.sub ( 0 ), var )
                    && isDefinitionEx ( t.sub ( 1 ), var );
         }
@@ -169,7 +166,7 @@ public class QuanEliminationAnalyser {
     }
     
     private boolean isDefiningEquationAll(Term t, QuantifiableVariable var) {
-        if ( t.op () != Op.NOT ) return false;
+        if ( t.op () != Junctor.NOT ) return false;
         return isDefiningEquation ( t.sub ( 0 ), var );
     }
 
@@ -178,7 +175,7 @@ public class QuanEliminationAnalyser {
     }
 
     private boolean isDefiningEquation(Term t, QuantifiableVariable var) {
-        if ( t.op () != Op.EQUALS ) return false;
+        if ( t.op () != Equality.EQUALS ) return false;
         final Term left = t.sub ( 0 );
         final Term right = t.sub ( 1 );
         final Operator leftOp = left.op ();

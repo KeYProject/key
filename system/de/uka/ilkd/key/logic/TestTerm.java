@@ -78,21 +78,21 @@ public class TestTerm extends TestCase {
   
     public void testFreeVars1() {
 	Term t_allxt2=tf.createQuantifierTerm(Op.ALL,new LogicVariable[]{x},t2());
-	Term t_allxt2_andt1=tf.createJunctorTerm(Op.AND,t_allxt2,t1());
+	Term t_allxt2_andt1=tf.createJunctorTerm(Junctor.AND,t_allxt2,t1());
 	assertTrue(t_allxt2_andt1.freeVars().contains(w) 
 		   && t_allxt2_andt1.freeVars().contains(x));
     }
 
    public void testFreeVars2() {
 	Term t_allxt2=tf.createQuantifierTerm(Op.ALL,new LogicVariable[]{w},t2());
-	Term t_allxt2_andt1=tf.createJunctorTerm(Op.AND,t_allxt2,t1());
+	Term t_allxt2_andt1=tf.createJunctorTerm(Junctor.AND,t_allxt2,t1());
 	assertTrue(!t_allxt2_andt1.freeVars().contains(w) 
 		   && t_allxt2_andt1.freeVars().contains(x));
     }
     
     public void testFreeVars3() {
 	Term t_allxt1=tf.createQuantifierTerm(Op.ALL,new LogicVariable[]{x},t2());
-	Term t_allxt1_andt2=tf.createJunctorTerm(Op.AND,t_allxt1,t1());
+	Term t_allxt1_andt2=tf.createJunctorTerm(Junctor.AND,t_allxt1,t1());
 	Term t_exw_allxt1_andt2=tf.createQuantifierTerm(Op.EX, 
 							new LogicVariable[]{w}, 
 							t_allxt1_andt2); 
@@ -102,7 +102,7 @@ public class TestTerm extends TestCase {
 
    public void testFreeVars4() {
 	Term t_allxt1=tf.createQuantifierTerm(Op.ALL,new LogicVariable[]{x},t2());
-	Term t_allxt1_andt2=tf.createJunctorTerm(Op.AND,t_allxt1,t1());
+	Term t_allxt1_andt2=tf.createJunctorTerm(Junctor.AND,t_allxt1,t1());
 	Term t_exw_allxt1_andt2=tf.createQuantifierTerm(Op.EX,
 							new LogicVariable[]{w,x}, 
 							t_allxt1_andt2); 

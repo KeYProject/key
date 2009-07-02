@@ -11,8 +11,6 @@
 package de.uka.ilkd.key.explicitheap;
 
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
@@ -74,7 +72,7 @@ class InvInferenceTools {
         while(!workingList.isEmpty()) {
             Term f = workingList.head();
             workingList = workingList.tail();
-            if(f.op() == Op.AND) {
+            if(f.op() == Junctor.AND) {
                 workingList = workingList.prepend(f.sub(1)).prepend(f.sub(0));
             } else {
                 result = result.add(f);

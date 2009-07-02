@@ -14,6 +14,7 @@
  */
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.*;
@@ -48,8 +49,12 @@ public class TermCreationException extends RuntimeException {
                 (op instanceof Function 
                  ? "; its expected arg sorts were:\n" + 
                 	 argsToString((Function)op) 
-                 : "\n") + 
-                "The subterms were:\n" + subsToString(subs);                       
+                 : "") + 
+                (op instanceof Equality 
+                 ? "; its expected arg sorts were:\n" + 
+                	 argsToString((Equality)op) 
+                 : "") + 
+                "\nThe subterms were:\n" + subsToString(subs);                       
         }
      
 	public String getMessage() {          
@@ -67,6 +72,16 @@ public class TermCreationException extends RuntimeException {
 	    return sb.toString();
 	}
 	
+	
+	private String argsToString(Equality e) {
+	    StringBuffer sb = new StringBuffer();
+      	    for(int i = 0; i < e.arity(); i++) {
+      		sb.append((i+1) + ".) ");
+    	        sb.append("sort: " + e.argSort(i) + 
+    	        	  ", sort hash: " + e.argSort(i).hashCode() + "\n");
+      	    }
+	    return sb.toString();
+	}
 	
         private String subsToString(Term[] subs) {
             StringBuffer sb = new StringBuffer();

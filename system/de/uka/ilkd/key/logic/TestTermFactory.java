@@ -121,7 +121,7 @@ public class TestTermFactory extends TestCase {
     public void testWithInvalidSubformulae() { 
 	Term invalidBuilt=OpTerm.createOpTerm(p, new Term[]{ OpTerm.createOpTerm(y, new Term[0])});
 	try {
-	    Term t_px_or_py=tf.createJunctorTerm(Op.OR,
+	    Term t_px_or_py=tf.createJunctorTerm(Junctor.OR,
 						 new Term[]{invalidBuilt, 
 							    t1()});
 	} catch (Exception e) {
@@ -130,8 +130,8 @@ public class TestTermFactory extends TestCase {
     }  
 
     public void testConstantTrue() {
-        Term t_true=tf.createJunctorTerm(Op.TRUE,new Term[0]);
-	Assert.assertEquals(t_true,OpTerm.createOpTerm(Op.TRUE, new Term[0]));
+        Term t_true=tf.createJunctorTerm(Junctor.TRUE,new Term[0]);
+	Assert.assertEquals(t_true,OpTerm.createOpTerm(Junctor.TRUE, new Term[0]));
     }
 
     public void testQuantifierTerm() {
@@ -142,13 +142,13 @@ public class TestTermFactory extends TestCase {
     }
 
     public void testJunctorTerm() {
-	Term  t_px_imp_ryw= tf.createJunctorTerm(Op.IMP, t1(), t2());
-	Assert.assertEquals(t_px_imp_ryw, OpTerm.createOpTerm(Op.IMP, new Term[]{ t1(), t2()}));
+	Term  t_px_imp_ryw= tf.createJunctorTerm(Junctor.IMP, t1(), t2());
+	Assert.assertEquals(t_px_imp_ryw, OpTerm.createOpTerm(Junctor.IMP, new Term[]{ t1(), t2()}));
     }
 
     public void testNegationTerm() {
-	Term t_not_ryw=tf.createJunctorTerm(Op.NOT, t2());
-	Assert.assertEquals(t_not_ryw, OpTerm.createOpTerm(Op.NOT, new Term[]{ t2()}));
+	Term t_not_ryw=tf.createJunctorTerm(Junctor.NOT, t2());
+	Assert.assertEquals(t_not_ryw, OpTerm.createOpTerm(Junctor.NOT, new Term[]{ t2()}));
     }
 
     public void testDiamondTerm() {
@@ -208,7 +208,7 @@ public class TestTermFactory extends TestCase {
     public void testJunctorTermWithWrongArity() {
 	Exception exc=new Exception();
 	try {
-	    tf.createJunctorTerm(Op.NOT,new Term[] {t1(), t2()});
+	    tf.createJunctorTerm(Junctor.NOT,new Term[] {t1(), t2()});
 	} catch (TermCreationException e) {
 	    exc=e;	    
 	}
@@ -270,7 +270,7 @@ public class TestTermFactory extends TestCase {
 	exc = null;
 	try {
 	    tf.createEqualityTerm(tf.createVariableTerm(x), 
-				  tf.createJunctorTerm(Op.TRUE));
+				  tf.createJunctorTerm(Junctor.TRUE));
 	} catch (TermCreationException e) {
 	    exc = e;	    
 	}
