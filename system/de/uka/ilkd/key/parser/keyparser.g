@@ -3214,32 +3214,26 @@ updateterm returns [Term result = null]
     List boundVars = new LinkedList();
     Term a2 = null;
 } :
-        LBRACE ((STAR ASSIGN)=> 
-          (STAR ASSIGN STAR
-             num:NUM_LITERAL RBRACE ( a2 = term110 | a2 = unary_formula ) {
-                return tf.createAnonymousUpdateTerm
-                   (new Name("*:=*"+num.getText()), a2);
-             }                  
-          )	  
-          | 
-          (sud = singleupdate {
-            locations.add(sud.a0); 
-            values.add(sud.a1); 
-            guards.add(sud.guard);
-            boundVars.add(sud.boundVars);
-          } (  ( COMMA {  
-                 	System.err.println(getFilename() + "(" + getLine() + 
-                 	", " + getColumn() + "): " + "The comma ',' " + 
-                 	"for parallel composition of updates is deprecated and " + 
-                 	"will be skipped in future. Please use '||' instead.");
-                 } | PARALLEL)
-                 
-                sud = singleupdate {
+        LBRACE 
+        (
+            sud = singleupdate 
+            {
                 locations.add(sud.a0); 
                 values.add(sud.a1); 
                 guards.add(sud.guard);
                 boundVars.add(sud.boundVars);
-          })*) RBRACE ( a2 = term110 | a2 = unary_formula )
+             } 
+             (  
+                PARALLEL sud = singleupdate 
+                {
+                    locations.add(sud.a0); 
+                    values.add(sud.a1); 
+                    guards.add(sud.guard);
+                    boundVars.add(sud.boundVars);
+                 }
+             )*
+        ) 
+        RBRACE ( a2 = term110 | a2 = unary_formula )
         {   
 
             result = tf.createQuanUpdateTerm
@@ -3249,7 +3243,7 @@ updateterm returns [Term result = null]
 		 (Term[])locations.toArray(new Term[locations.size()]),
 		 (Term[])values.toArray(new Term[values.size()]),
 		  a2);
-        })
+        }
    ; exception
         catch [TermCreationException ex] {
               keh.reportException

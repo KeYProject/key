@@ -121,19 +121,21 @@ public class CorrectDependsPO extends AbstractPO {
         //build post term
         UpdateFactory uf = new UpdateFactory(services, new UpdateSimplifier());
         Term updateTerm = uf.apply(createUpdate(uf, atPreFunctions), invTerm);
-        AnonymousUpdate au = AnonymousUpdate.getNewAnonymousOperator();
-        Term postTerm = TF.createAnonymousUpdateTerm(au, updateTerm);
+//        AnonymousUpdate au = AnonymousUpdate.getNewAnonymousOperator();
+        //Term postTerm = TF.createAnonymousUpdateTerm(au, updateTerm);
+        assert false;
+        
         
         //build definitions for @pre-functions
-        Update atPreDefinitions 
-            = APF.createAtPreDefinitions(atPreFunctions, services);
-
-        //put everyhing together
-        Term poTerm = TB.imp(invTerm, uf.apply(atPreDefinitions, postTerm));
-        poTerms = new Term[]{poTerm};
-
-        //register everything in namespaces
-        registerInNamespaces(atPreFunctions);
+//        Update atPreDefinitions 
+//            = APF.createAtPreDefinitions(atPreFunctions, services);
+//
+//        //put everyhing together
+//        Term poTerm = TB.imp(invTerm, uf.apply(atPreDefinitions, postTerm));
+//        poTerms = new Term[]{poTerm};
+//
+//        //register everything in namespaces
+//        registerInNamespaces(atPreFunctions);
     }
 
     

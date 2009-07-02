@@ -13,9 +13,7 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.logic.Term;
 
 
-/**
- *
- */
+
 public interface IUpdateOperator extends Operator, NonRigid {
 
     /**
@@ -119,5 +117,4 @@ public interface IUpdateOperator extends Operator, NonRigid {
      * @return the target of this update application
      */    
     Term target(Term t);
-    
 }

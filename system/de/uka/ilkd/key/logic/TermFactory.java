@@ -489,9 +489,6 @@ public class TermFactory {
 	    return createFunctionTerm((TermSymbol)op, subTerms);
 	} else if (op instanceof Junctor) {
 	    return createJunctorTerm((Junctor)op,subTerms);
-	} else if (op instanceof AnonymousUpdate) {
-            return createAnonymousUpdateTerm
-	    ((AnonymousUpdate)op, subTerms[0]);
 	} else if (op instanceof Modality) {
 	    return createProgramTerm((Modality)op, javaBlock, subTerms[0]); 
 	} else if (op instanceof IfThenElse) {
@@ -621,10 +618,6 @@ public class TermFactory {
                                  Term target) {
 
 	final IUpdateOperator op = pair.updateOperator();
-        
-        if ( op instanceof AnonymousUpdate ) {      
-            return createAnonymousUpdateTerm ( (AnonymousUpdate)op, target);
-        } 
         
         final Term[] subs = new Term[pair.arity() + 1];
 	
@@ -793,29 +786,6 @@ public class TermFactory {
         return varTerm;
     }
 
-
-    /**
-     * creates an anonymous update applied to the given target term 
-     * @param op the AnonymousUpdate operator 
-     * @param sub the Term the anonymous update is applied to 
-     * @return the created term
-     */
-    public Term createAnonymousUpdateTerm(AnonymousUpdate op, 
-            Term sub) {       
-        return new UpdateTerm(op, new Term[]{sub});
-    }
-
-    /**
-     * creates an anonymous update applied to the given target term 
-     * @param name 
-     * @param target
-     * @return the created term
-     */
-    public Term createAnonymousUpdateTerm(Name name, Term target) {       
-        return createAnonymousUpdateTerm
-        	(AnonymousUpdate.getAnonymousOperator(name),
-        	     target);
-    }
 
     /** creates a cast of term with to the given sort */    
     public Term createCastTerm(AbstractSort sort, Term with) {        

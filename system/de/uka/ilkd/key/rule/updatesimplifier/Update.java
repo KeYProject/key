@@ -179,9 +179,7 @@ public abstract class Update {
         }
 
         public AssignmentPair getAssignmentPair (int locPos) {
-            if ( updateOp instanceof AnonymousUpdate )
-                return new AssignmentPairLazy ( update, locPos );
-            else if ( updateOp instanceof QuanUpdateOperator )
+            if ( updateOp instanceof QuanUpdateOperator )
                 return new QuanAssignmentPairLazy ( update, locPos );
             else
                 Debug.fail ( "Unknown update operator" );            
@@ -262,16 +260,7 @@ public abstract class Update {
      * pairs is returned (only for temporarly representations)
      */
     public static Update createUpdate(Term t) {        
-        if (t.op() instanceof AnonymousUpdate) {
-           Term valueTerm = UpdateSimplifierTermFactory.
-           DEFAULT.getBasicTermFactory().
-           	createFunctionTerm
-           	(new RigidFunction(t.op().name(), SPECIAL_SORT, new Sort[0]));
-           AssignmentPair pair = new AssignmentPairImpl
-           	(StarLocation.ALL, new Term[0],valueTerm);
-           return createUpdate
-           	(new AssignmentPair[]{pair});
-        } else if (!(t.op() instanceof IUpdateOperator)) {
+        if (!(t.op() instanceof IUpdateOperator)) {
 	    return createUpdate(new AssignmentPair[0]);
 	}
         return new UpdateWithUpdateTerm(t);

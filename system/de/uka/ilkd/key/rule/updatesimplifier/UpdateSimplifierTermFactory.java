@@ -124,12 +124,8 @@ public class UpdateSimplifierTermFactory {
             lhss     [i] = assignmentPair.locationAsTerm();
             values   [i] = assignmentPair.valueUnsafe();
             if (assignmentPair.location() == Update.StarLocation.ALL) {
-                Debug.assertTrue(
-                                i == assignmentPairs.size() - 1,
-                                "Special star operator tried to escape. "
-                                        + "(not allowed as long as no generalized terms)");
-                return tf.createAnonymousUpdateTerm(
-                        assignmentPair.value().op().name(), target);
+        	assert false : "anonymous updates not supported any more";
+            	return null;
             }
         }
         return tf.createQuanUpdateTerm(services, boundVars, guards, lhss, values, target);

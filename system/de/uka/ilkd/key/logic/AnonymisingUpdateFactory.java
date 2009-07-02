@@ -229,9 +229,8 @@ public class AnonymisingUpdateFactory {
                         locations[i] instanceof EverythingLocationDescriptor);
                 
                 //create anonym*ous* update
-                AnonymousUpdate ao = AnonymousUpdate.getNewAnonymousOperator();
-                Term updateTerm = TF.createAnonymousUpdateTerm(ao, TF.createJunctorTerm(Op.TRUE));
-                return Update.createUpdate(updateTerm);
+                assert false;
+                return null;
             }
         }
 

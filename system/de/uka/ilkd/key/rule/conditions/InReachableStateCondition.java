@@ -5,11 +5,12 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.AnonymousUpdate;
 import de.uka.ilkd.key.logic.op.IUpdateOperator;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -43,8 +44,7 @@ public class InReachableStateCondition extends VariableConditionAdapter {
         
         Term t = (Term)subst;        
 
-        if (t.op() instanceof IUpdateOperator && 
-                !(t.op() instanceof AnonymousUpdate)) {
+        if (t.op() instanceof IUpdateOperator) {
             t = ((IUpdateOperator)t.op()).target(t);
         } else {
             // would otherwise return inReachableState, not wrong but useless
@@ -58,5 +58,4 @@ public class InReachableStateCondition extends VariableConditionAdapter {
     public String toString() {
         return "\\isInReachableState(" + inReachableState + ")";
     }
-    
 }

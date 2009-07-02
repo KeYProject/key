@@ -498,10 +498,11 @@ public class UseOperationContractRule implements BuiltInRule {
         //anonym*ous* updates; replace by "else" case once this is fixed
         Term postTerm;
         if(anonUpdate.isAnonymousUpdate()) {
+            assert false;
             postTerm = uf.prepend(resultUpdate, postTermWithoutUpdate);
-            postTerm = TB.tf().createAnonymousUpdateTerm(
-                                    AnonymousUpdate.getNewAnonymousOperator(), 
-                                    postTerm);
+//            postTerm = TB.tf().createAnonymousUpdateTerm(
+//                                    AnonymousUpdate.getNewAnonymousOperator(), 
+//                                    postTerm);
         } else {
             postTerm = uf.prepend(uf.sequential(new Update[]{selfParamsUpdate,
                                                            atPreUpdate,

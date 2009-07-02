@@ -106,10 +106,6 @@ public class TacletIndex  {
 	    } 
 	} else {
 	    indexObj = indexTerm.op();
-	    if (indexObj instanceof AnonymousUpdate) {
-	    //indexed independent of arity
-		indexObj=AnonymousUpdate.class;
-	    }
 	    if (indexObj instanceof QuanUpdateOperator) {
 	        //indexed independent of arity
 	        indexObj=QuanUpdateOperator.class;
@@ -499,10 +495,6 @@ public class TacletIndex  {
      */
     private ListOfNoPosTacletApp getList
 	(HashMap<Object, ListOfNoPosTacletApp> map, Term term) {
-	if (term.op() instanceof AnonymousUpdate) {
-	    ListOfNoPosTacletApp l = map.get(AnonymousUpdate.class);
-	    if ( l != null ) return getListHelp ( map, term ).append ( l );
-	}
 	if (term.op() instanceof QuanUpdateOperator) {
 	    ListOfNoPosTacletApp l = map.get(QuanUpdateOperator.class);
 	    if ( l != null ) return getListHelp ( map, term ).append ( l );
@@ -560,8 +552,9 @@ public class TacletIndex  {
       
         //TODO: afer KeY 1.0 replace the if statement with assert pos.isTopLevel
         // but currently I don't want to change the methods behaviour
-        if (!pos.isTopLevel()) 
-            return SLListOfNoPosTacletApp.EMPTY_LIST;
+        //if (!pos.isTopLevel()) 
+        //    return SLListOfNoPosTacletApp.EMPTY_LIST;
+        assert pos.isTopLevel();
         
         final Constraint termConstraint = 
             pos.constrainedFormula().constraint();
