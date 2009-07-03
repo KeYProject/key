@@ -434,3 +434,4 @@ public class MapAsListFrom<S>To<T> implements MapFrom<S>To<T> {
     }
 }
 
+END_OF_CLASS
