@@ -15,12 +15,9 @@ import recoder.ServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaJavaProgramFactory;
 import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public class TestSchemaJavaParser extends TestCase {
-
-    static ServiceConfiguration sc;
 
     static SchemaJavaProgramFactory factory;    
     

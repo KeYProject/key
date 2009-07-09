@@ -19,7 +19,7 @@ import de.uka.ilkd.key.logic.Name;
 
 
 
-public class DisplayNameModelInfo extends AbstractTacletContainer implements Comparable {
+public class DisplayNameModelInfo extends AbstractTacletContainer implements Comparable<DisplayNameModelInfo> {
     private final Name name;
     
     public DisplayNameModelInfo ( String n ) {
@@ -30,15 +30,32 @@ public class DisplayNameModelInfo extends AbstractTacletContainer implements Com
         this ( n.toString () );
     }
     
+    @Override
     public Name name () {
         return name;
     }
     
+    @Override
     public String toString () {
         return name.toString();
     }
     
-    public int compareTo ( Object other ) {
-        return name.compareTo ( ((DisplayNameModelInfo) other).name );
+    @Override
+    public int compareTo ( DisplayNameModelInfo other ) {
+        return name.compareTo ( other.name );
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+	if(!(o instanceof DisplayNameModelInfo)) {
+	    return false;
+	}
+	DisplayNameModelInfo dni = (DisplayNameModelInfo)o;
+	return compareTo(dni) == 0;
+    }
+    
+    @Override
+    public int hashCode() {
+	return name.hashCode();
     }
 }

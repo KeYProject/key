@@ -134,7 +134,7 @@ public class TextualJMLLoopSpec extends TextualJMLConstruct {
                && predicates.equals(ls.predicates)
                && assignable.equals(ls.assignable)
                && (variant == null && ls.variant == null
-                   || variant.equals(ls.variant));
+                   || variant != null && variant.equals(ls.variant));
     }
     
     

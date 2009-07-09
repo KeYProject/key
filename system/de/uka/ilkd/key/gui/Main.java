@@ -1573,7 +1573,7 @@ public class Main extends JFrame implements IMain {
     protected void loadProblem(File file) {
 	recentFiles.addRecentFile(file.getAbsolutePath());
         final ProblemLoader pl = 
-            new ProblemLoader(file, this, mediator.getProfile(), false);
+            new ProblemLoader(file, this, false);
         pl.addTaskListener(getProverTaskListener());
         pl.run();
     }
@@ -2309,7 +2309,7 @@ public class Main extends JFrame implements IMain {
      * 
      * This has been partly taken from the GlassPaneDemo of the Java Tutorial 
      */
-    class BlockingGlassPane extends JComponent {
+    private static class BlockingGlassPane extends JComponent {
         GlassPaneListener listener;
         
         public BlockingGlassPane(Container contentPane) {
@@ -2327,7 +2327,7 @@ public class Main extends JFrame implements IMain {
      * 
      * This has been partly taken from the GlassPaneDemo of the Java Tutorial
      */
-    class GlassPaneListener extends MouseInputAdapter {
+    private static class GlassPaneListener extends MouseInputAdapter {
         Component currentComponent = null;
         Component glassPane;
         Container contentPane;

@@ -82,19 +82,14 @@ public class ProblemLoader implements Runnable {
     /** if set, uses the current problem instance instead of a new one */
     boolean keepProblem;
 
-    /** the profile to be used */
-    private Profile profile;
-    
     private SwingWorker worker;
     private ProgressMonitor pm;
     private ProverTaskListener ptl;
     
-    public ProblemLoader(File file, IMain main, Profile profile, 
-            boolean keepProblem) {
+    public ProblemLoader(File file, IMain main, boolean keepProblem) {
         this.main = main;
         this.mediator  = main.mediator();        
         this.file = file;
-        this.profile = profile;
         this.exceptionHandler = mediator.getExceptionHandler();
         this.keepProblem = keepProblem;
 
@@ -784,7 +779,7 @@ public class ProblemLoader implements Runnable {
         return null; // handle this better!
     }
 
-    private class AppConstructionException extends Exception {
+    private static class AppConstructionException extends Exception {
 
         AppConstructionException(String s) {
             super(s);
@@ -800,7 +795,7 @@ public class ProblemLoader implements Runnable {
 
     }
 
-    private class BuiltInConstructionException extends Exception {
+    private static class BuiltInConstructionException extends Exception {
 
         BuiltInConstructionException(String s) {
             super(s);

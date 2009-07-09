@@ -134,7 +134,7 @@ public class RuleView extends JPanel implements TreeSelectionListener, java.io.S
 	
     }
 
-    class RuleRenderer extends DefaultTreeCellRenderer 
+    private static class RuleRenderer extends DefaultTreeCellRenderer 
 	implements TreeCellRenderer,
 		   java.io.Serializable {
 

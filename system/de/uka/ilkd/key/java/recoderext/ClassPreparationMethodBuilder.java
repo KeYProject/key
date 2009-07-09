@@ -109,18 +109,11 @@ public class ClassPreparationMethodBuilder
 	for (int i = 0; i < fields.size(); i++) {
 	    FieldSpecification spec = fields.get(i);
 	    if (spec.isStatic() && !isConstantField(spec)) {
-		Identifier ident = spec.getIdentifier();
-		if (ident instanceof ImplicitIdentifier) {	    
-		    result.add(new CopyAssignment
+		Identifier ident = spec.getIdentifier();	    
+		result.add(new CopyAssignment
 		            (new PassiveExpression
 		                    (new FieldReference(ident.deepClone())), 
 		                            getDefaultValue(spec.getType())));		    
-		} else {
-		   result.add(new CopyAssignment
-			(new PassiveExpression
-			 (new FieldReference(ident.deepClone())), 
-			 getDefaultValue(spec.getType())));
-		}
 	    }
 	}
 

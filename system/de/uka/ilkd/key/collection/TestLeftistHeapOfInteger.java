@@ -30,18 +30,18 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
     
     public void setUp() {
 	a = SLListOfInteger.EMPTY_LIST
-	    .prepend( new Integer ( 13 ) )
-	    .prepend( new Integer ( 20 ) )
-	    .prepend( new Integer ( 5 ) )
-	    .prepend( new Integer ( 7 ) )
-	    .prepend( new Integer ( 16 ) )
-	    .prepend( new Integer ( 60 ) )
-	    .prepend( new Integer ( 20 ) )
-	    .prepend( new Integer ( -34 ) );
+	    .prepend( Integer.valueOf ( 13 ) )
+	    .prepend( Integer.valueOf ( 20 ) )
+	    .prepend( Integer.valueOf ( 5 ) )
+	    .prepend( Integer.valueOf ( 7 ) )
+	    .prepend( Integer.valueOf ( 16 ) )
+	    .prepend( Integer.valueOf ( 60 ) )
+	    .prepend( Integer.valueOf ( 20 ) )
+	    .prepend( Integer.valueOf ( -34 ) );
 	b = SLListOfInteger.EMPTY_LIST
-	    .prepend( new Integer ( -1000 ) )
-	    .prepend( new Integer ( 1000 ) )
-	    .prepend( new Integer ( 8 ) );
+	    .prepend( Integer.valueOf ( -1000 ) )
+	    .prepend( Integer.valueOf ( 1000 ) )
+	    .prepend( Integer.valueOf ( 8 ) );
     }
 
     public void testInsertElements() {
@@ -49,11 +49,11 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 	assertTrue("Empty heap should be empty",
 		   h.isEmpty () && h.size () == 0);
 	
-	h.insert ( new Integer ( 1 ) );
+	h.insert ( Integer.valueOf ( 1 ) );
 	assertTrue("Empty heap should be empty",
 		   h.isEmpty () && h.size () == 0);
 
-	h = h.insert ( new Integer ( 1 ) );
+	h = h.insert ( Integer.valueOf ( 1 ) );
 	assertTrue("Heap should contain one element",
 		   !h.isEmpty () && h.size () == 1 &&
 		   h.findMin ().intValue () == 1);
@@ -62,7 +62,7 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 	assertTrue("Empty heap should be empty",
 		   h.isEmpty () && h.size () == 0);
 
-	h = h.insert ( new Integer ( 1 ) ).insert ( new Integer ( 2 ) );
+	h = h.insert ( Integer.valueOf ( 1 ) ).insert ( Integer.valueOf ( 2 ) );
 	assertTrue("Heap should contain two elements",
 		   !h.isEmpty () && h.size () == 2 &&
 		   h.findMin ().intValue () == 1 );
@@ -75,25 +75,6 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 		   h.isEmpty () && h.size () == 0);
     }
 
-    private ListOfInteger removeFirst ( ListOfInteger list, Integer element ) {
-	ListOfInteger remainder = SLListOfInteger.EMPTY_LIST;
-	Integer       i;
-	
-	while ( true ) {
-	    assertTrue ( "Cannot remove element from list",
-			 !list.isEmpty() );
-
-	    i    = list.head ();
-	    list = list.tail ();
-	    
-	    if ( i.equals ( element ) )
-		break;
-
-	    remainder = remainder.prepend ( i );
-	}
-
-	return list.prepend ( remainder );
-    }
 
     private boolean equals ( IteratorOfInteger t0, IteratorOfInteger t1 ) {
 	ExtList l0 = new ExtList (), l1 = new ExtList ();
@@ -197,8 +178,8 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 	checkHeap ( a.prepend( a ), h );
 
 	h = h.insert ( LeftistHeapOfInteger.EMPTY_HEAP.insert
-		       ( new Integer ( 123 ) ) );
-	checkHeap ( a.prepend( a ).prepend ( new Integer ( 123 ) ), h );
+		       ( Integer.valueOf ( 123 ) ) );
+	checkHeap ( a.prepend( a ).prepend ( Integer.valueOf ( 123 ) ), h );
     }
  
     public void testRemoveAll () {
@@ -227,7 +208,7 @@ public class TestLeftistHeapOfInteger extends junit.framework.TestCase {
 
 	int i = 1000;
 	while ( i-- != 0 )
-	    l = l.prepend ( new Integer ( rand.nextInt ( 1000000 ) ) );
+	    l = l.prepend ( Integer.valueOf ( rand.nextInt ( 1000000 ) ) );
 
 	h = h.insert ( l.iterator () );
 

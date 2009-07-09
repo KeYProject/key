@@ -74,7 +74,7 @@ public class RenameTable {
      */
     public boolean sameAbstractName(QuantifiableVariable n1, QuantifiableVariable n2) {
 	if (containsLocally(n1)) {
-	    return localRenamingTable.get(n1) == localRenamingTable.get(n2);
+	    return localRenamingTable.get(n1).equals(localRenamingTable.get(n2));
 	} else {
 	    return parent.sameAbstractName(n1, n2);
 	}
@@ -89,7 +89,7 @@ public class RenameTable {
 		 " + 1 variables to be renamed?");
 	} 
 	
-	return new Integer(max + 1);
+	return Integer.valueOf(max + 1);
     }
 
     /**

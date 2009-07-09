@@ -97,9 +97,9 @@ public class InitialPositionTable extends PositionTable{
 	p = prependPathBelowMV(p,pio, entryForCfma(pio.constrainedFormula(),
 	                                           filter));
 	p = prependPathInFormula(p,pio);
-	p = p.prepend(new Integer(indexOfCfma(pio.constrainedFormula(),
+	p = p.prepend(Integer.valueOf(indexOfCfma(pio.constrainedFormula(),
 					      filter)));
-	p = p.prepend(new Integer(0));
+	p = p.prepend(Integer.valueOf(0));
 	return p;
     }
 
@@ -111,7 +111,7 @@ public class InitialPositionTable extends PositionTable{
 
         IntIterator pit = pio.posInTermBelowMetavariable ().reverseIterator ();
         while ( pit.hasNext () ) {
-            p = p.prepend ( new Integer ( pit.next () ) );
+            p = p.prepend ( Integer.valueOf ( pit.next () ) );
         }
 
         return p;
@@ -152,7 +152,7 @@ public class InitialPositionTable extends PositionTable{
 					       PosInOccurrence pio) {
 	IntIterator pit = pio.posInTerm().reverseIterator();
 	while (pit.hasNext()) {
-	    p = p.prepend(new Integer(pit.next()));
+	    p = p.prepend(Integer.valueOf(pit.next()));
 	}
 	return p;
     }

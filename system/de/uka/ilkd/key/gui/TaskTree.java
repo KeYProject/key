@@ -266,7 +266,7 @@ public class TaskTree extends JPanel {
     } 
 
 
-    class ProofEnvPopupMenu extends JPopupMenu implements ActionListener {	
+    private static class ProofEnvPopupMenu extends JPopupMenu implements ActionListener {	
 	
 	private JMenuItem diffLast=new JMenuItem("Diff Last Env");
 	

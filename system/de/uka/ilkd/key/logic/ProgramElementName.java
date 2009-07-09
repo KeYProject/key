@@ -71,10 +71,10 @@ public class ProgramElementName extends Name
 
     public ProgramElementName(String n, String q) {
 	super(q + "::" + n);
-	if ((q != "") & logger.isDebugEnabled()) {
+	if ((!q.equals("")) & logger.isDebugEnabled()) {
 	    logger.debug(q + "::" + n);
 	}
-	assert q!=null && q.length() > 0 : "Tried to create qualified name with missing qualifier";
+	assert q.length() > 0 : "Tried to create qualified name with missing qualifier";
 
 	this.qualifierString = q.intern();
 	this.shortName = n.intern();
@@ -82,7 +82,6 @@ public class ProgramElementName extends Name
 	comments = new Comment[0];
     }
 
-    /** @return comments */
     public Comment[] getComments() {
 	return comments;
     }
@@ -189,4 +188,16 @@ public class ProgramElementName extends Name
             return null;
         }        
     }
+    
+    @Override
+    public boolean equals(Object o) {
+	return super.equals(o);
+    }
+    
+    @Override
+    public int hashCode() {
+	return super.hashCode();
+    }
+    
+
 }

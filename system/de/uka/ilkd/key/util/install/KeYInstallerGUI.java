@@ -264,7 +264,7 @@ public class KeYInstallerGUI extends KeYInstallerUI {
 // 	    System.exit ( -1 );
     }
     
-    private class NotCompleteException extends RuntimeException {
+    private static class NotCompleteException extends RuntimeException {
     }
     
 

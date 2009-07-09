@@ -16,36 +16,20 @@ import de.uka.ilkd.key.java.declaration.modifier.Static;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.ExtList;
 
-/**
- *  Class initializer.
- *  @author <TT>AutoDoc</TT>
- */
+
 
 public class ClassInitializer extends JavaDeclaration implements MemberDeclaration, StatementContainer {
 
 
 
-    /**
- *      Body.
-     */
-
     protected final StatementBlock body;
 
-    /**
- *      Class initializer.
-     */
-
+    
     public ClassInitializer() {
-	super((Modifier[])null);
+	super(new Modifier[0]);
 	body=null;
     }
 
-
-    /**
- *      Class initializer.
- *      @param modifier a static.
- *      @param body a statement block.
-     */
 
     public ClassInitializer(Static modifier, StatementBlock body) {
 	super(new Modifier[]{modifier});
@@ -64,19 +48,11 @@ public class ClassInitializer extends JavaDeclaration implements MemberDeclarati
     }
 
 
-    /**
- *      Get body.
- *      @return the statement block.
-     */
 
     public StatementBlock getBody() {
         return body;
     }
 
-    /**
- *      Get the number of statements in this container.
- *      @return the number of statements.
-     */
 
     public int getStatementCount() {
         return (body != null) ? 1 : 0;
@@ -98,11 +74,7 @@ public class ClassInitializer extends JavaDeclaration implements MemberDeclarati
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    /**
- *      Returns the number of children of this node.
- *      @return an int giving the number of children of this node
-    */
-
+    
     public int getChildCount() {
         int result = 0;
         if (modArray != null) result += modArray.size();
@@ -111,13 +83,13 @@ public class ClassInitializer extends JavaDeclaration implements MemberDeclarati
     }
 
     /**
- *      Returns the child at the specified index in this node's "virtual"
- *      child array
- *      @param index an index into this node's "virtual" child array
- *      @return the program element at the given position
- *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
- *                 of bounds
-    */
+     *      Returns the child at the specified index in this node's "virtual"
+     *      child array
+     *      @param index an index into this node's "virtual" child array
+     *      @return the program element at the given position
+     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                 of bounds
+     */
 
     public ProgramElement getChildAt(int index) {
         int len;

@@ -45,7 +45,7 @@ public class LibrariesSettings implements Settings {
        for (int i = 0; i < standardLibs.length; i++) {
            KeYResourceManager.getManager().copyIfNotExists(Proof.class, 
                    "rules/libraries/"+standardLibs[i], LIBRARIES_PATH + standardLibs[i]);
-           libToSel.put(LIBRARIES_PATH + standardLibs[i],new Boolean(false));
+           libToSel.put(LIBRARIES_PATH + standardLibs[i],Boolean.FALSE);
        }     
    }
    

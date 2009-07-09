@@ -53,7 +53,6 @@ public class TestTacletPopup {
 
     static SchemaVariable b;
     static SchemaVariable x;
-    static SchemaVariable x0;
     static SchemaVariable t0;
     static LogicVariable z;
 

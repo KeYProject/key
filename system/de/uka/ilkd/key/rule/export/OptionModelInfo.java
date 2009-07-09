@@ -21,7 +21,7 @@ import de.uka.ilkd.key.logic.Name;
 
 
 public class OptionModelInfo extends AbstractTacletContainer implements
-        Comparable {
+        Comparable<OptionModelInfo> {
     private final Choice choice;
     private CategoryModelInfo category;
     
@@ -33,12 +33,14 @@ public class OptionModelInfo extends AbstractTacletContainer implements
         return choice;
     }
     
+    @Override
     public Name name () {
         return choice.name();
     }
 
-    public int compareTo ( Object o ) {
-        return name().compareTo(((Choice)o).name());
+    @Override
+    public int compareTo ( OptionModelInfo o ) {
+        return name().compareTo(o.name());
     }
 
     /**
@@ -53,5 +55,19 @@ public class OptionModelInfo extends AbstractTacletContainer implements
      */
     public void setCategory ( CategoryModelInfo category ) {
         this.category = category;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+	if(!(o instanceof OptionModelInfo)) {
+	    return false;
+	}
+	OptionModelInfo omi = (OptionModelInfo)o;
+	return compareTo(omi) == 0;
+    }
+    
+    @Override
+    public int hashCode() {
+	return name().hashCode();
     }
 }

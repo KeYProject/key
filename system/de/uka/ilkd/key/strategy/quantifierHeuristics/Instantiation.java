@@ -150,7 +150,7 @@ class Instantiation {
         final Term inst = sub.getSubstitutedTerm ( firstVar );
         final Long oldCost = instancesWithCosts.get ( inst );
         if ( oldCost == null || oldCost.longValue () >= cost )
-            instancesWithCosts.put ( inst, new Long ( cost ) );
+            instancesWithCosts.put ( inst, Long.valueOf ( cost ) );
     }
 
     /**

@@ -431,26 +431,6 @@ public class Recoder2KeYConverter {
         }
     }
 
-    /**
-     * extracts all field specifications out of the given list. Therefore it
-     * descends into field declarations.
-     * 
-     * @param list
-     *            the ExtList with the members of a type declaration
-     * @return a ListOfField the includes all field specifications found int the
-     *         field declaration of the given list
-     */
-    private ListOfField filterField(ExtList list) {
-        ListOfField result = SLListOfField.EMPTY_LIST;
-        Iterator it = list.iterator();
-        while (it.hasNext()) {
-            Object pe = it.next();
-            if (pe instanceof FieldDeclaration) {
-                result = result.prepend(filterField((FieldDeclaration) pe));
-            }
-        }
-        return result;
-    }
 
     /**
      * extracts all fields out of fielddeclaration

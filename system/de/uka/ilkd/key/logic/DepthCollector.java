@@ -75,7 +75,7 @@ public class DepthCollector extends Visitor {
 	    Integer oldDepth = (Integer)varDepths.get ( op );
 
 	    if ( oldDepth == null || oldDepth.intValue () < curDepth )
-		varDepths.put ( op, new Integer ( curDepth ) );
+		varDepths.put ( op, Integer.valueOf ( curDepth ) );
 	}
     }
 

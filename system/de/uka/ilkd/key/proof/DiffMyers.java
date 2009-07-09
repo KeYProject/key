@@ -378,8 +378,8 @@ public class DiffMyers
   /** Scan the tables of which lines are inserted and deleted,
      producing an edit script in reverse order.  */
 
-  private change build_reverse_script() {
-    change script = null;
+  private Change build_reverse_script() {
+    Change script = null;
     final boolean[] changed0 = filevec[0].changed_flag;
     final boolean[] changed1 = filevec[1].changed_flag;
     final int len0 = filevec[0].buffered_lines;
@@ -400,7 +400,7 @@ public class DiffMyers
             while (changed1[1+i1]) ++i1;
 
             /* Record this change.  */
-            script = new change(line0, line1, i0 - line0, i1 - line1, script);
+            script = new Change(line0, line1, i0 - line0, i1 - line1, script);
           }
 
         /* We have reached lines in the two files that match each other.  */
@@ -411,14 +411,14 @@ public class DiffMyers
   }
   
   
-  mapping map;
+  Mapping map;
 
   /** Scan the tables of which lines are inserted and deleted,
      producing an edit script in forward order.  */
   // also builds a mapping (line correspondence)
 
-  private change build_script() {
-    change script = null;
+  private Change build_script() {
+    Change script = null;
     map = null;
     final boolean[] changed0 = filevec[0].changed_flag;
     final boolean[] changed1 = filevec[1].changed_flag;
@@ -439,28 +439,28 @@ public class DiffMyers
             while (changed1[i1]) --i1;
 
             /* Record this change.  */
-            script = new change(i0, i1, line0 - i0, line1 - i1, script);
+            script = new Change(i0, i1, line0 - i0, line1 - i1, script);
           }
 
         /* We have reached lines in the two files that match each other.  */
         i0--; i1--;
-        if (i0>=0) map = new mapping(i0,i1,map);
+        if (i0>=0) map = new Mapping(i0,i1,map);
       }
 
     return script;
   }
   
-  public mapping getMapping() {
+  public Mapping getMapping() {
      return map;
   }
   
   
-  public change diff_2() {
+  public Change diff_2() {
      return diff_2(false);
   }
 
   /* Report the differences of two files.  */
-  public change diff_2(final boolean reverse) {
+  public Change diff_2(final boolean reverse) {
 
     /* Some lines are obviously insertions or deletions
        because they don't match anything.  Detect them now,
@@ -511,9 +511,9 @@ public class DiffMyers
      If DELETED is 0 then LINE0 is the number of the line before
      which the insertion was done; vice versa for INSERTED and LINE1.  */
 
-  public static class change {
+  public static class Change {
     /** Previous or next edit command. */
-    public change link;                
+    public Change link;                
     /** # lines of file 1 changed here.  */
     public int inserted;        
     /** # lines of file 0 changed here.  */
@@ -530,7 +530,7 @@ public class DiffMyers
 
        If DELETED is 0 then LINE0 is the number of the line before
        which the insertion was done; vice versa for INSERTED and LINE1.  */
-    change(int line0, int line1, int deleted, int inserted, change old) {
+    Change(int line0, int line1, int deleted, int inserted, Change old) {
       this.line0 = line0;
       this.line1 = line1;
       this.inserted = inserted;
@@ -567,13 +567,13 @@ public class DiffMyers
 
 
 
-  public static class mapping {
+  public static class Mapping {
     /** Previous or next edit command. */
-    public mapping link;                
+    public Mapping link;                
     public int from;
     public int to;
 
-    mapping(int from, int to, mapping old) {
+    Mapping(int from, int to, Mapping old) {
       this.from = from;
       this.to = to;
       this.link = old;
@@ -594,7 +594,7 @@ public class DiffMyers
        return s;
     }
     
-    public mapping next() {
+    public Mapping next() {
        return link;
     }
     
@@ -828,7 +828,7 @@ public class DiffMyers
       for (int i = 0; i < data.size(); ++i) {
         Integer ir = (Integer)h.get(data.elementAt(i));
         if (ir == null)
-          h.put(data.elementAt(i),new Integer(equivs[i] = equiv_max++));
+          h.put(data.elementAt(i),Integer.valueOf(equivs[i] = equiv_max++));
         else
           equivs[i] = ir.intValue();
       }

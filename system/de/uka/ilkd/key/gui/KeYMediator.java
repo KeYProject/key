@@ -247,12 +247,8 @@ public class KeYMediator {
         AbstractBetaFeature.clearCache();
         IfThenElseMalusFeature.clearCache();
         
-        System.gc();//Runs Garbagecolletor
-        System.runFinalization();
-        if(MethodCallInfo.MethodCallCounterOn){
-            System.out.println(MethodCallInfo.Local.toString());
-            MethodCallInfo.Local.reset();
-        }
+        //System.gc();//Runs Garbagecolletor
+        //System.runFinalization();
     }
 
     
@@ -782,8 +778,7 @@ public class KeYMediator {
       final boolean b = fullStop;
       Runnable interfaceSignaller = new Runnable() {
          public void run() {
-	     if (mainFrame() instanceof JFrame) mainFrame().setCursor
-		 (new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));
+	     mainFrame().setCursor(new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));
             if (b) {
                interactiveProver.fireAutoModeStarted(
                   new ProofEvent(getProof()));
@@ -799,8 +794,7 @@ public class KeYMediator {
          public void run() {
             if ( b )
                interactiveProver.fireAutoModeStopped (new ProofEvent(getProof()));
-            if (mainFrame() instanceof JFrame) mainFrame().setCursor
-		(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+            mainFrame().setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
             if (getProof() != null)
                 keySelectionModel.fireSelectedProofChanged();
          }

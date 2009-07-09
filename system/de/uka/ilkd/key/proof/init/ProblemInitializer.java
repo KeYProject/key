@@ -25,9 +25,7 @@ import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.explicitheap.ExplicitHeapConverter;
 import de.uka.ilkd.key.gui.IMain;
-import de.uka.ilkd.key.gui.MethodCallInfo;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.CompilationUnit;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
@@ -78,8 +76,8 @@ public class ProblemInitializer {
     public ProblemInitializer(IMain main) {
         this.main       = main;
         this.pm         = main == null ? null : main.getProgressMonitor();
-        this.profile    = main.mediator().getProfile();
-        this.services   = new Services(main.mediator().getExceptionHandler());
+        this.profile    = main == null ? null : main.mediator().getProfile();
+        this.services   = main == null ? null : new Services(main.mediator().getExceptionHandler());
         this.simplifier = ProofSettings.DEFAULT_SETTINGS
                 .getSimultaneousUpdateSimplifierSettings().getSimplifier();
     }
@@ -251,7 +249,7 @@ public class ProblemInitializer {
     private JavaModel getJavaModel(String javaPath) throws ProofInputException {
         JavaModel jModel = JavaModel.NO_MODEL;
         if (javaPath != null) { 
-	    String modelTag = "KeY_"+new Long((new java.util.Date()).getTime());
+	    String modelTag = "KeY_" + new java.util.Date().getTime();
 	    jModel = new JavaModel(javaPath, modelTag);
             if (javaPath.equals(System.getProperty("user.home"))) { 
                 throw new ProofInputException("You do not want to have "+
@@ -318,7 +316,7 @@ public class ProblemInitializer {
                 }
             } else {                 
                 String[] cus = getClasses(javaPath).toArray(new String[]{});
-                CompilationUnit[] compUnits = r2k.readCompilationUnitsAsFiles(cus);
+                r2k.readCompilationUnitsAsFiles(cus);
                 initConfig.getServices().getJavaInfo().setJavaSourcePath(javaPath);               
 
                 //checkin Java model to CVS
@@ -523,11 +521,7 @@ public class ProblemInitializer {
             throw e;            
         } finally {
             startInterface();            
-        }
-    
-        if(MethodCallInfo.MethodCallCounterOn){
-            MethodCallInfo.Local.reset();
-        }
+        }    
     }
     
     

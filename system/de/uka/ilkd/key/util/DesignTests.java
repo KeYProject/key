@@ -217,7 +217,7 @@ public class DesignTests {
 		    failures += badClasses.size() > 0 ? 1 : 0;
 		    printBadClasses(badClasses);
 		} catch (Exception e) {
-		    System.err.println("Could not invoke method "+meth);
+		    System.err.println("Could not invoke method "+meth[i]);
 		}
 	    }
 	}	

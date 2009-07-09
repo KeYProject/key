@@ -39,7 +39,7 @@ public class MaxRuleAppSlider extends JSlider {
             int val = (int)Math.pow(10, n);
             JLabel l = new JLabel ( ""+val );
             l.setFont(l.getFont().deriveFont(9F));
-            labelTable.put(new Integer ( n*9 ), l);
+            labelTable.put(Integer.valueOf ( n*9 ), l);
         }
 
         setLabelTable ( labelTable );

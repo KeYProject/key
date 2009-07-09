@@ -414,18 +414,8 @@ public class KeYCrossReferenceSourceInfo
                 ClassType newResult = getInheritedType(name, td);
 
                 if (newResult != null) {
-                    if (result == null) {
-                        result = newResult;
-                        break;
-                    } else if (result != newResult) {
-                        // !!!!!!! Problematic if this is a speculative
-                        // question - do we really want to bail out?
-                        getErrorHandler().reportError(
-                                new AmbiguousReferenceException("Type " + Format.toString("%N", newResult)
-                                        + " is an inherited member type that is also defined as outer member type "
-                                        + Format.toString("%N", result), null, result, newResult));
-                        break;
-                    }
+                    result = newResult;
+                    break;
                 }
             }
             scope = s;

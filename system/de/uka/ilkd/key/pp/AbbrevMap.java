@@ -127,7 +127,7 @@ public class AbbrevMap{
 	termenabled.put(new AbbrevWrapper(t), enabled? Boolean.TRUE : Boolean.FALSE);
     }
 
-    public class AbbrevWrapper{
+    public static class AbbrevWrapper{
 
         private Term t;
 

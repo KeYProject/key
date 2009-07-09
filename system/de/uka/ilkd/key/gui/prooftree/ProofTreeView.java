@@ -168,7 +168,6 @@ public class ProofTreeView extends JPanel {
     
     protected void finalize() {
         Config.DEFAULT.removeConfigChangeListener(configChangeListener);
-        configChangeListener = null;
     }
 
     private void setProofTreeFont() {
@@ -1238,7 +1237,7 @@ public class ProofTreeView extends JPanel {
     }
     
     // to prevent memory leaks
-    private class CacheLessMetalTreeUI extends MetalTreeUI{
+    private static class CacheLessMetalTreeUI extends MetalTreeUI{
         
         public void clearDrawingCache(){
             drawingCache.clear();

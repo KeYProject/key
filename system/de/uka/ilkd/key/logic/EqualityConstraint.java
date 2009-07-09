@@ -909,7 +909,7 @@ public class EqualityConstraint implements Constraint {
                 h += getInstantiation ( mv ).hashCode ();
             }
 
-            hashCode = new Integer ( h );
+            hashCode = Integer.valueOf ( h );
         }
 
         return hashCode.intValue ();

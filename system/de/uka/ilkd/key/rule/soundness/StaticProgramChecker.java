@@ -847,7 +847,8 @@ public class StaticProgramChecker
     }
  
     public void performActionOnProgramConstant(ProgramConstant x) {
-        performActionOnProgramConstant(x);        
+	assert false;
+        //performActionOnProgramConstant(x);        
     }
 
     public void performActionOnProgramElementName(

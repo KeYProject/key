@@ -136,17 +136,17 @@ public class NameTermOrdering implements TermOrdering {
      */
     private Integer getWeight ( Operator p_op ) {
 	if ( p_op.name().equals(AbstractIntegerLDT.NUMBERS_NAME) )
-	    return new Integer ( 0 );
+	    return Integer.valueOf ( 0 );
 	if ( p_op.name().equals(AbstractIntegerLDT.CHAR_ID_NAME) )
-	    return new Integer ( 1 );
+	    return Integer.valueOf ( 1 );
 	if ( p_op instanceof Function && 
 	     ((Function) p_op).sort() == Sort.NULL)
-	    return new Integer ( 2 );
+	    return Integer.valueOf ( 2 );
 	if ( "TRUE".equals ( p_op.name ().toString () )
              || "FALSE".equals ( p_op.name ().toString () ) )
-	    return new Integer ( 3 );
+	    return Integer.valueOf ( 3 );
 	if ( p_op instanceof SortDependingSymbol )
-	    return new Integer ( 10 );
+	    return Integer.valueOf ( 10 );
 
 	return null;
     }

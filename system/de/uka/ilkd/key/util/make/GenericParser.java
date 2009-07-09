@@ -373,7 +373,7 @@ public class GenericParser {
 	return parse(str,null);
     }
    
-    class Template {
+    private static class Template {
 	private int id;
  	private String type;
 	private Template parent;

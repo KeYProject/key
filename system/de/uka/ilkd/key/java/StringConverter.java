@@ -83,7 +83,7 @@ public  class StringConverter{
 	    } catch (NumberFormatException ex) {
 		throw new ConvertException(result +" is not of type char");
 	    } 		
-	    return new Character(charVal).toString();
+	    return Character.valueOf(charVal).toString();
         }
      
 	/** translates a term that represents a string into a string literal

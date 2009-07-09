@@ -92,14 +92,6 @@ public class MethodCall extends ProgramMetaConstruct {
     }
 
 
-    private ProgramMethod assertImplementationPresent(ProgramMethod method,
-						      KeYJavaType t) {
-	if (method == null) {	    
-	    Debug.fail("methodcall:No implementation available for ", method);
-	}
-	return method;
-    }
-
 
     private KeYJavaType getStaticPrefixType(ReferencePrefix refPrefix, Services services) {
 	if (refPrefix==null || refPrefix instanceof ThisReference && 
@@ -199,16 +191,16 @@ public class MethodCall extends ProgramMetaConstruct {
 	
 	staticPrefixType = getStaticPrefixType(methRef.getReferencePrefix(), services);
 	if(execContext != null){
-	    pm = assertImplementationPresent
-		(methRef.method(services, staticPrefixType, execContext),
-		 staticPrefixType);
+	    pm = methRef.method(services, staticPrefixType, execContext);
 	}else{
-	    pm = assertImplementationPresent
-		(methRef.method(services, staticPrefixType, 
+	    pm = methRef.method(services, staticPrefixType, 
 		        methRef.getMethodSignature(services, null), 
-		        staticPrefixType), 
-		 staticPrefixType);	    
+		        staticPrefixType);	    
 	}
+	if (pm == null) {	    
+	    Debug.fail("methodcall:No implementation available for ", methRef);
+	}
+	
         newContext = methRef.getReferencePrefix();
 	if (newContext == null){
 	    Term self = services.getTypeConverter().findThisForSort(pm.getContainerType().getSort(), execContext);

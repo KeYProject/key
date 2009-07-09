@@ -23,14 +23,17 @@ public class NameSV extends SchemaVariableAdapter {
         this(new Name(s));
     }
     
+    @Override    
     public boolean isNameSV() {
 	return true;
     }
     
+    @Override    
     public String toString() {
 	return super.toString("name");
     }	
 
+    @Override    
     public boolean equals(Object o) {
 
         if (o instanceof NameSV) {
@@ -42,7 +45,11 @@ public class NameSV extends SchemaVariableAdapter {
         } else {
             return false;
         }
-
+    }
+    
+    @Override    
+    public int hashCode() {
+	return toString().hashCode();
     }
 
 }

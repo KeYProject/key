@@ -65,9 +65,6 @@ public class CreateTacletForTests extends TestCase {
     static Sequent seq_testAll;
 
     static SchemaVariable b;
-    static SchemaVariable x;
-    static SchemaVariable x0;
-    static SchemaVariable t0;
     static LogicVariable z;
     static Sort sort1;
     static TermFactory tf=TermFactory.DEFAULT;

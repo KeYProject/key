@@ -37,9 +37,6 @@ public class RuleSource {
 
     private RuleSource(URL url) {
 	this.url = url;
-	if (f!=null) {
-	    numberOfChars=f.length();
-	}
 	if (url.getProtocol().equals("file")) {
 	    numberOfChars = (new File(url.getFile())).length();
 	} else {

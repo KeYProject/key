@@ -494,7 +494,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         }
 
         private Long getAgeObject () {
-            return new Long ( getAge() );
+            return Long.valueOf( getAge() );
         }
 
 

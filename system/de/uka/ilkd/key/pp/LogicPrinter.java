@@ -2029,7 +2029,7 @@ public class LogicPrinter {
      */
     protected void startTerm(int size) {
         if (createPositionTable) {
-            mark(new Integer(size));
+            mark(Integer.valueOf(size));
         }
     }
 
@@ -2152,7 +2152,7 @@ public class LogicPrinter {
 
     /** Utility class for stack entries containing the position table
      * and the position of the start of the subterm in the result.  */
-    private class StackEntry {
+    private static class StackEntry {
 
         PositionTable posTbl;
         int p;
@@ -2179,7 +2179,7 @@ public class LogicPrinter {
      * layouter with the various static <code>MARK_</code> objects
      * declared {@link LogicPrinter}.
      */
-    private class PosTableStringBackend extends StringBackend {
+    private static class PosTableStringBackend extends StringBackend {
 
         /** The top PositionTable */
         private InitialPositionTable initPosTbl =

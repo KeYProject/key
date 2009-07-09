@@ -43,7 +43,7 @@ public abstract class AbstractMonomialSmallerThanFeature
         if ( op == add || op == mul || op == Z ) return -1;
         Integer res = (Integer)introductionTimeCache.get ( op );
         if ( res == null ) {
-            res = new Integer ( introductionTimeHelp ( op ) );
+            res = Integer.valueOf ( introductionTimeHelp ( op ) );
             introductionTimeCache.put ( op, res );
         }
         return res.intValue ();

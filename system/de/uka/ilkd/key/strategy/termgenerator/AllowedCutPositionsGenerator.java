@@ -36,7 +36,7 @@ public class AllowedCutPositionsGenerator implements TermGenerator {
                               pos.isInAntec () );
     }
 
-    private class Iterator implements IteratorOfTerm {
+    private static class Iterator implements IteratorOfTerm {
         private final Stack termStack = new Stack (); 
 
         public Iterator(Term t, boolean negated) {

@@ -34,7 +34,7 @@ public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl implements rec
     
     public KeYRecoderExcHandler(int errorThreshold) {
          super();
-	 setErrorThreshold(recoderErrorThreshold);
+	 setErrorThreshold(errorThreshold);
     }
 
     public void clear(){

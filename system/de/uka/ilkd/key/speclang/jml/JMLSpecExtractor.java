@@ -286,7 +286,7 @@ public class JMLSpecExtractor implements SpecExtractor {
             } else if(td.getComments() != null) {
                 comments = td.getComments();
             }
-            if(comments.length == 0) {
+            if(comments == null || comments.length == 0) {
                 continue;
             }
 
