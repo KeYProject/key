@@ -137,9 +137,9 @@ public class UseOperationContractRule implements BuiltInRule {
                           .getOperationContracts(pm, modality);
         
         //in box modalities, diamond contracts may be applied as well
-        if(modality == Op.BOX) {
+        if(modality == Modality.BOX) {
             result = result.union(services.getSpecificationRepository()
-                                          .getOperationContracts(pm, Op.DIA));
+                                          .getOperationContracts(pm, Modality.DIA));
         }
         
         //prevent application of contracts with "everything" modifier sets 

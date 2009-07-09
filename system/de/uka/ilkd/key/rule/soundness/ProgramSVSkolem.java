@@ -30,7 +30,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
  * used as operator together with the class <code>ProgramSVProxy</code>
  */
 public abstract class ProgramSVSkolem
-    implements StateDependingObject, NonTerminalProgramElement {
+    implements NonTerminalProgramElement {
 
     private final ProgramElementName name;
 

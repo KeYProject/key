@@ -64,7 +64,7 @@ public class AtPreNamespace extends Namespace {
                     }
                     n = createAtPreFunction(name, pv.sort(), new ArrayOfSort(argSorts));
                 } else if (atPost instanceof Function) {
-                    n = createAtPreFunction(name, ((Function)atPost).sort(), ((Function)atPost).argSort());
+                    n = createAtPreFunction(name, ((Function)atPost).sort(), ((Function)atPost).argSorts());
                 } 
                 atPreMapping.put(atPost, n);
             }

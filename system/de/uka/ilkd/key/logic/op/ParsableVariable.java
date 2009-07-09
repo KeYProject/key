@@ -8,13 +8,13 @@
 //
 //
 
-/** this interface represents the variables that can be recognized 
- * by one of the parsers. */
+/** 
+ * This interface represents the variables that can be recognized 
+ * by one of the parsers. 
+ */
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.sort.Sort;
-public interface ParsableVariable extends Operator{
 
-    /** @return Sort of the ParsableVariable */
-    Sort sort();
+
+public interface ParsableVariable extends SortedOperator{
 }

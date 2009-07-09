@@ -10,10 +10,9 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-public class Metavariable extends TermSymbol
+public class Metavariable extends AbstractSortedOperator
     implements ParsableVariable, Comparable<Metavariable> {
 
     // Used to define an alternative order of all existing
@@ -28,7 +27,7 @@ public class Metavariable extends TermSymbol
     }
 
     private Metavariable(Name name, Sort sort, boolean isTemporaryVariable) {
-	super(name, 0, sort);
+	super(name, new Sort[0], sort);
 	if ( sort == Sort.FORMULA ) {
 	    throw new RuntimeException(
 		 "Attempt to create metavariable of type formula");
@@ -46,16 +45,16 @@ public class Metavariable extends TermSymbol
     }
     
 
-    /** @return true iff number of subterms of term is 0
-     */
-    public boolean validTopLevel(Term term){
-        return term.arity()==0;
-    }
-
     public String toString() {
 	return name()+":"+sort();
     }
 
+    @Override
+    public boolean isRigid() {
+	return true;
+    }
+
+    
     @Override
     public int compareTo ( Metavariable p_mr ) {
 	if ( p_mr == this )

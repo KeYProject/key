@@ -7,7 +7,6 @@
 // See LICENSE.TXT for details.
 //
 //
-//
 
 package de.uka.ilkd.key.logic.op;
 
@@ -24,7 +23,7 @@ import de.uka.ilkd.key.rule.metaconstruct.arith.*;
 import de.uka.ilkd.key.util.Debug;
 
 
-public abstract class AbstractMetaOperator extends TermSymbol 
+public abstract class AbstractMetaOperator extends AbstractSortedOperator 
                                            implements MetaOperator {
 
     private static HashMap<String, AbstractMetaOperator> name2metaop = 
@@ -121,20 +120,29 @@ public abstract class AbstractMetaOperator extends TermSymbol
     
     protected static final TermFactory termFactory = TermFactory.DEFAULT;
     protected static final TermBuilder TB = TermBuilder.DF;
-
-    public AbstractMetaOperator(Name name, int arity) {
-	super(name, arity, METASORT);
-	assert METASORT != null;
-	assert sort() != null && sort() == METASORT;
-	name2metaop.put(name.toString(), this);
-    }
-
     
-    @Override
-    public boolean validTopLevel(Term term) {
-	// a meta operator accepts almost everything
-	return term.op() instanceof AbstractMetaOperator;
+    
+    private static Sort[] createAnySortArray(int arity) {
+	Sort[] result = new Sort[arity];
+	for(int i = 0; i < arity; i++) {
+	    result[i] = Sort.ANY;
+	}
+	return result;
     }
+    
+    
+    protected AbstractMetaOperator(Name name, int arity, Sort sort) {
+	super(name, createAnySortArray(arity), sort);
+	name2metaop.put(name.toString(), this);	
+    }
+    
+    
+   protected AbstractMetaOperator(Name name, int arity) {
+	this(name, arity, METASORT);
+	assert METASORT != null;
+	assert sort() == METASORT;
+    }
+
 
     
     public static MetaOperator name2metaop(String s) {
@@ -183,6 +191,12 @@ public abstract class AbstractMetaOperator extends TermSymbol
     
     public MetaOperator getParamMetaOperator(String param) {
 	return null;
+    }
+    
+    
+    @Override
+    public boolean isRigid() {
+	return false;
     }
     
 

@@ -61,13 +61,13 @@ public class TestConstraint extends TestCase {
     }
 
 
-    private Term term_p(TermSymbol var){
+    private Term term_p(Operator var){
 	Term t_x=tf.createFunctionTerm(var, new Term[]{});
 	Term t_px=tf.createFunctionTerm(p, new Term[]{t_x});
 	return t_px;
     }
   
-    private Term term_r(TermSymbol o1S1,TermSymbol o2S2){
+    private Term term_r(Operator o1S1, Operator o2S2){
 	Term t_x=tf.createFunctionTerm(o1S1, new Term[]{});
 	Term t_w=tf.createFunctionTerm(o2S2, new Term[]{});
 	return tf.createFunctionTerm(r, new Term[]{t_x,t_w});
@@ -289,11 +289,11 @@ public class TestConstraint extends TestCase {
 	Term p_lv1 = tf.createFunctionTerm
 	    (p, new Term[] { tf.createVariableTerm ( lv1 ) });
 
-	Term _term0 = tf.createQuantifierTerm ( Op.ALL, lv1, p_lv1 );
-	Term term0 = tf.createQuantifierTerm ( Op.ALL, lv0, _term0 );
+	Term _term0 = tf.createQuantifierTerm ( Quantifier.ALL, lv1, p_lv1 );
+	Term term0 = tf.createQuantifierTerm ( Quantifier.ALL, lv0, _term0 );
 
-	Term _term1 = tf.createQuantifierTerm ( Op.ALL, lv0, p_lv1 );
-	Term term1 = tf.createQuantifierTerm ( Op.ALL, lv1, _term1 );
+	Term _term1 = tf.createQuantifierTerm ( Quantifier.ALL, lv0, p_lv1 );
+	Term term1 = tf.createQuantifierTerm ( Quantifier.ALL, lv1, _term1 );
 
 	assertSame ( "Terms " + term0 + " and " + term1 +
 		     " should not be unifiable\n",

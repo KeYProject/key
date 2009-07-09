@@ -38,7 +38,7 @@ public class ResolveQuery extends AbstractMetaOperator {
 
     
     public ResolveQuery() {
-	super(new Name("#ResolveQuery"), 2);
+	super(new Name("#ResolveQuery"), 2, Sort.FORMULA);
     }
 
 
@@ -171,7 +171,7 @@ public class ResolveQuery extends AbstractMetaOperator {
 	}
 	ArrayOfQuantifiableVariable qvs = collectFreeVariables(t);
 	if(qvs.size() > 0){
-	    result = tf.createQuantifierTerm(Op.ALL, qvs, result);
+	    result = tf.createQuantifierTerm(Quantifier.ALL, qvs, result);
 	}
 	return result;
     }
@@ -202,9 +202,5 @@ public class ResolveQuery extends AbstractMetaOperator {
     public Term calculate(Term term, SVInstantiations svInst, 
 			  Services services) {
 	return createProgramMethodSubstitute(term.sub(0), term.sub(1), services);	
-    }
-
-    public Sort sort(Term[] term) {
-	return Sort.FORMULA;
     }
 }

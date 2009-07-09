@@ -50,8 +50,4 @@ public class MetaNextToCreate extends MetaField implements Location {
     public boolean mayBeAliasedBy(Location loc) {
         return true;
     }
-
-    public Sort sort() {        
-        return METASORT;
-    }
 }

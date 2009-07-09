@@ -89,7 +89,7 @@ public class AtPreFactory {
      */
     private ArrayOfSort getArgSorts(Operator op, Services services) {
         if(op instanceof Function) {
-            return ((Function)op).argSort();
+            return ((Function)op).argSorts();
         } else if(op instanceof ProgramVariable && op.arity() == 0) {
             return new ArrayOfSort();
         } else {

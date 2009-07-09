@@ -30,8 +30,8 @@ class ModalityClass {
      * the standard pre-defined classes.
      */
     private final static ModalityClass[] DEFAULT_CLASSES = new ModalityClass[] {
-        new ModalityClass(new Modality[]{Op.DIA}),
-        new ModalityClass(new Modality[]{Op.BOX}),
+        new ModalityClass(new Modality[]{Modality.DIA}),
+        new ModalityClass(new Modality[]{Modality.BOX}),
         new ModalityClass(new Modality[]{})
     };
     

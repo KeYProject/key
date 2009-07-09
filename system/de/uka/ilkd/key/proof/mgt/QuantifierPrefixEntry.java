@@ -13,7 +13,6 @@ package de.uka.ilkd.key.proof.mgt;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -69,7 +68,7 @@ public class QuantifierPrefixEntry {
         
         return new QuantifierPrefixEntry ( t.varsBoundHere ( 0 )
                                            .getQuantifiableVariable ( 0 ),
-                                           t.op () == Op.ALL );
+                                           t.op () == Quantifier.ALL );
     }
     
     /**

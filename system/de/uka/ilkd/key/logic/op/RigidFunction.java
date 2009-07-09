@@ -44,4 +44,9 @@ public class RigidFunction extends Function {
     public boolean isUnique() {
 	return unique;
     }
+    
+    @Override
+    public boolean isRigid() {
+	return true;
+    }    
 }

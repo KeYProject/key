@@ -22,7 +22,6 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
 import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.TermSymbol;
 import de.uka.ilkd.key.util.LRUCache;
 
 /**
@@ -197,7 +196,7 @@ public class Polynomial {
     }
     
     public Term toTerm (Services services) {
-        final TermSymbol add = 
+        final Operator add = 
             services.getTypeConverter().getIntegerLDT().getAdd();
         Term res = null;
         

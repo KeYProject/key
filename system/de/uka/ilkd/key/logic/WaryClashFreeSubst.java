@@ -177,7 +177,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      */
     private Term addWarySubst (Term t) {
         createVariable ();
-        return tf.createSubstitutionTerm ( Op.SUBST,
+        return tf.createSubstitutionTerm ( WarySubstOp.SUBST,
                                            newVar,
                                            getSubstitutedTerm (),
                                            t );

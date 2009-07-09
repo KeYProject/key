@@ -155,19 +155,19 @@ public class NotationInfo {
 	tbl.put(Junctor.IMP,new Notation.Infix("->" ,30,40,30));
 	tbl.put(Equality.EQV,new Notation.Infix("<->",20,20,30));
 
-    	tbl.put(Op.ALL,new Notation.Quantifier("\\forall", 60, 60));
-	tbl.put(Op.EX, new Notation.Quantifier("\\exists", 60, 60));
-	tbl.put(Op.SUM, new Notation.NumericalQuantifier("\\sum", 60, 60, 70));
-	tbl.put(Op.BSUM, new Notation.BoundedNumericalQuantifier("\\bSum", 60, 60, 70));
-	tbl.put(Op.PRODUCT, new Notation.NumericalQuantifier("\\product", 60, 60, 70));
-	tbl.put(Op.DIA,new Notation.Modality("\\<","\\>", 60, 60));
-	tbl.put(Op.BOX,new Notation.Modality("\\[","\\]", 60, 60));
-	tbl.put(Op.IF_THEN_ELSE, new Notation.IfThenElse(130, "\\if"));
-	tbl.put(Op.IF_EX_THEN_ELSE, new Notation.IfThenElse(130, "\\ifEx"));
+    	tbl.put(Quantifier.ALL,new Notation.Quantifier("\\forall", 60, 60));
+	tbl.put(Quantifier.EX, new Notation.Quantifier("\\exists", 60, 60));
+	tbl.put(NumericalQuantifier.SUM, new Notation.NumericalQuantifier("\\sum", 60, 60, 70));
+	tbl.put(BoundedNumericalQuantifier.BSUM, new Notation.BoundedNumericalQuantifier("\\bSum", 60, 60, 70));
+	tbl.put(NumericalQuantifier.PRODUCT, new Notation.NumericalQuantifier("\\product", 60, 60, 70));
+	tbl.put(Modality.DIA,new Notation.Modality("\\<","\\>", 60, 60));
+	tbl.put(Modality.BOX,new Notation.Modality("\\[","\\]", 60, 60));
+	tbl.put(IfThenElse.IF_THEN_ELSE, new Notation.IfThenElse(130, "\\if"));
+	tbl.put(IfExThenElse.IF_EX_THEN_ELSE, new Notation.IfThenElse(130, "\\ifEx"));
 
 	//createNumLitNotation(IntegerLDT.getStaticNumberSymbol());
 
-	tbl.put(Op.SUBST,new Notation.Subst());
+	tbl.put(WarySubstOp.SUBST,new Notation.Subst());
     }    
 
     /** 

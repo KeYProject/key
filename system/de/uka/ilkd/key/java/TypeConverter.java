@@ -553,7 +553,7 @@ public final class TypeConverter {
      * @throws RuntimeException iff a conversion is not possible
      */
     public Expression convertToProgramElement(Term term) {
-	if (term.op()==Op.NULL) {
+	if (term.op()==Function.NULL) {
 	    return NullLiteral.NULL;
 	} else if (term.op() instanceof Function) {
 	    for(LDT model : models) {

@@ -34,12 +34,12 @@ public interface Operator extends Named, SVSubstitute {
      * determines the sort of the {@link Term} if it would be created using this
      * Operator as top level operator and the given terms as sub terms. The
      * assumption that the constructed term would be allowed is not checked.
-     * @param term an array of Term containing the subterms of a (potential)
+     * @param terms an array of Term containing the subterms of a (potential)
      * term with this operator as top level operator
      * @return sort of the term with this operator as top level operator of the
      * given substerms
      */
-    Sort sort(Term[] term);
+    Sort sort(Term[] terms);
     
     
     /**
@@ -53,7 +53,6 @@ public interface Operator extends Named, SVSubstitute {
      */
     boolean validTopLevel(Term term);
     
-
     
     /**
      * @return true if the operator is rigid

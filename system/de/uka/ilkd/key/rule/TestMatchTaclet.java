@@ -589,7 +589,7 @@ public class TestMatchTaclet extends TestCase {
 	TermFactory tf=TermFactory.DEFAULT;
 	Function aPred = (Function)TacletForTests.getFunctions().lookup(new Name("A"));
 	Term sub = tf.createFunctionTerm(aPred);
-	Term match=tf.createQuantifierTerm(Op.ALL, 
+	Term match=tf.createQuantifierTerm(Quantifier.ALL, 
 					   new LogicVariable(new Name("lv"), osort4), 
 					   sub);
 	FindTaclet taclet=(FindTaclet)TacletForTests.getTaclet

@@ -23,7 +23,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * but should be integrated into this framework in the mid-future (this
  * was written 2005, may be you read this in the year 2035;-).
  */
-public class NonRigidFunction extends Function implements NonRigid {
+public class NonRigidFunction extends Function {
 
     /**
      * creates a non rigid function with given signature
@@ -45,11 +45,7 @@ public class NonRigidFunction extends Function implements NonRigid {
         super(name, sort, argSorts);      
     }
     
-    /**
-     * @return true if the value of "term" having this operator as
-     * top-level operator and may not be changed by modalities
-     */
-    public boolean isRigid (Term term) {
+    public boolean isRigid () {
 	return false;
     }
     

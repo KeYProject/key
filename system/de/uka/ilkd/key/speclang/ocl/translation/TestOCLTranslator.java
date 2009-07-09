@@ -180,7 +180,7 @@ public class TestOCLTranslator extends TestCase {
          */
         // There sould be 1 axiom defining allInstances (in functional representation)
         assertTrue(result.getAxioms().size() == 1);
-        assertTrue(result.getFormula().op().equals(Op.ALL));
+        assertTrue(result.getFormula().op().equals(Quantifier.ALL));
         assertTrue(result.getFormula().sub(0).op().equals(Junctor.IMP));
         assertTrue(result.getFormula().varsBoundHere(0).size() == 1);
         LogicVariable q = (LogicVariable) result.getFormula().varsBoundHere(0)
@@ -226,7 +226,7 @@ public class TestOCLTranslator extends TestCase {
         // There sould be 1 axiom defining allInstances (in functional representation)
         // and 1 axiom defining the call to select
         assertTrue(result.getAxioms().size() == 2);
-        assertTrue(result.getFormula().op().equals(Op.EX));
+        assertTrue(result.getFormula().op().equals(Quantifier.EX));
         assertTrue(result.getFormula().sub(0).op().equals(Junctor.AND));
         assertTrue(result.getFormula().varsBoundHere(0).size() == 1);
     }

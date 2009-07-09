@@ -13,7 +13,7 @@ package de.uka.ilkd.key.rule.updatesimplifier;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Quantifier;
 
 
 /**
@@ -35,7 +35,7 @@ public class GuardSatisfiabilityFormulaBuilder extends GuardSimplifier {
         final UpdateSimplifierTermFactory utf = UpdateSimplifierTermFactory.DEFAULT;
         final TermFactory tf = utf.getBasicTermFactory ();
         
-        return tf.createQuantifierTerm ( Op.EX,
+        return tf.createQuantifierTerm ( Quantifier.EX,
                                          getMinimizedVars ().toArray (),
                                          getCondition () );
     }

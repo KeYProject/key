@@ -24,7 +24,7 @@ import java.util.NoSuchElementException;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
@@ -97,7 +97,7 @@ public class InitConfig {
 	this.env       = new ProofEnvironment(this);
 	
         sortNS().add(Sort.NULL);
-        funcNS().add(Op.NULL);
+        funcNS().add(Function.NULL);
         category2DefaultChoice = ProofSettings.DEFAULT_SETTINGS.
             getChoiceSettings().getDefaultChoices();
     }

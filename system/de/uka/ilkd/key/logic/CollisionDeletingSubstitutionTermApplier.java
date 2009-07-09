@@ -68,7 +68,7 @@ public class CollisionDeletingSubstitutionTermApplier extends Visitor {
 	MapFromLogicVariableToTerm substToApply;
 	Term resultTerm;
 
-	if (visited.op()==Op.SUBST) {
+	if (visited.op()==WarySubstOp.SUBST) {
 	    // get completely processed childs ...
 	    Term[] neededsubs=neededSubs(visited.arity());
 	    substToApply = MapAsListFromLogicVariableToTerm.EMPTY_MAP;

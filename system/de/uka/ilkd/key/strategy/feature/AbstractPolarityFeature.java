@@ -14,8 +14,8 @@ import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.Operator;
 
 
@@ -46,7 +46,7 @@ public abstract class AbstractPolarityFeature {
             if ( op == Junctor.NOT || op == Junctor.IMP && it.getChild () == 0 )
                 formulaPol = invert ( formulaPol );
             else if ( op == Equality.EQV || 
-                    (op == Op.IF_THEN_ELSE && it.getChild () == 0))
+                    (op == IfThenElse.IF_THEN_ELSE && it.getChild () == 0))
                 return null;
         }
 

@@ -21,13 +21,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.CastFunctionSymbol;
-import de.uka.ilkd.key.logic.op.IteratorOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.MapAsListFromQuantifiableVariableToTerm;
-import de.uka.ilkd.key.logic.op.MapFromQuantifiableVariableToTerm;
-import de.uka.ilkd.key.logic.op.Op;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.strategy.LongRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
@@ -163,13 +157,13 @@ class Instantiation {
         for (final ConstrainedFormula cf : seq.antecedent()) {
             final Term atom = cf.formula ();
             final Operator op = atom.op ();
-            if ( !( op == Op.ALL || op == Op.EX ) )
+            if ( !( op == Quantifier.ALL || op == Quantifier.EX ) )
                 assertLits = assertLits.add ( atom );
         }
         for (final ConstrainedFormula cf : seq.succedent()) {
             final Term atom = cf.formula ();
             final Operator op = atom.op ();
-            if ( !( op == Op.ALL || op == Op.EX ) )
+            if ( !( op == Quantifier.ALL || op == Quantifier.EX ) )
                 assertLits = assertLits.add ( tb.not ( atom ) );
         }
         return assertLits;

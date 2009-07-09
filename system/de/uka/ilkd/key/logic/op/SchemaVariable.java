@@ -12,9 +12,8 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.Term;
 
-public interface SchemaVariable extends Operator {
+public interface SchemaVariable extends SortedOperator {
 
     /** 
      * this method tests on object identity
@@ -80,15 +79,6 @@ public interface SchemaVariable extends Operator {
      * This SV is never matched against anything in the sequent.
      */
     boolean isNameSV();
-
-    /** @return arity of the Variable as int */
-    int arity(); 
-
-    /**
-     * @return true if the value of "term" having this operator as
-     * top-level operator and may not be changed by modalities
-     */
-    boolean isRigid (Term term);
 
     /**     
      */

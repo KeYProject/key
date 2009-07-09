@@ -7,6 +7,7 @@
 // See LICENSE.TXT for details.
 //
 //
+
 package de.uka.ilkd.key.logic.op;
 
 import java.io.IOException;
@@ -24,7 +25,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
-public abstract class ProgramVariable extends TermSymbol 
+public abstract class ProgramVariable extends AbstractSortedOperator 
     implements SourceElement, ProgramElement, Expression, 
 	       ReferencePrefix, IProgramVariable, ParsableVariable, ReferenceSuffix, 
 	       ProgramInLogic {
@@ -51,7 +52,7 @@ public abstract class ProgramVariable extends TermSymbol
 			    boolean            isModel,
 			    boolean            isGhost,
 			    boolean            isFinal) {
-	super(name, 0, s);
+	super(name, new Sort[0], s == null ?  t.getSort() : s);
 	this.type = t;
 	this.containingType = containingType;	
 	this.isStatic = isStatic;
@@ -78,10 +79,6 @@ public abstract class ProgramVariable extends TermSymbol
 	return id;
     }
 
-    /** returns sort */
-    public Sort sort() {
-	return super.sort() == null ? type.getSort() : super.sort();
-    }
 
     /** @return name of the ProgramVariable */
     public ProgramElementName getProgramElementName() {

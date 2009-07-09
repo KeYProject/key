@@ -11,10 +11,8 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Location;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /** this class implements the interface for
@@ -52,9 +50,4 @@ public class MetaCreated extends MetaField implements Location {
     public boolean mayBeAliasedBy(Location loc) {
         return true;
     }
-
-    public Sort sort() {        
-        return METASORT;
-    }
-
 }

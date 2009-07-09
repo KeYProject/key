@@ -26,21 +26,30 @@ import de.uka.ilkd.key.logic.sort.Sort;
 /**
  * This implements a general conditional operator <tt>if (phi) (t1) (t2)</tt>
  */
-public class IfThenElse extends Op {
+public class IfThenElse extends AbstractOperator {
     
+    /** the 'if-then-else' operator */
+    public static final IfThenElse IF_THEN_ELSE = new IfThenElse ();
+
     /**
      * creates the default if-else operator
      */
-    IfThenElse () {
+    private IfThenElse () {
         super ( new Name ( "if-then-else" ), 3 );
     }
 
     /**
      * creates an if-else operator of the given name
      */
-    IfThenElse (Name name) {
+    protected IfThenElse (Name name) {
         super ( name, 3 );
     }
+    
+    @Override
+    public boolean isRigid() {
+	return true;
+    }
+    
 
     public boolean validTopLevel (Term term) {
         final Sort s0 = term.sub ( 0 ).sort ();

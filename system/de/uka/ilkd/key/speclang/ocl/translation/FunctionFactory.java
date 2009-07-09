@@ -121,7 +121,7 @@ class FunctionFactory {
         Term subTerm = tb.func(isIn,tb.func(allInst),tb.var(v));
         Term axiom = createdFactory.createCreatedNotNullQuantifierTerm(
                 services,
-                Op.ALL,
+                Quantifier.ALL,
                 v,
                 subTerm);
 
@@ -141,7 +141,7 @@ class FunctionFactory {
         
         axiom = createdFactory.createCreatedNotNullQuantifierTerm(
         		services,
-        		Op.ALL,
+        		Quantifier.ALL,
         		jObject,
         		subTerm);
         
@@ -227,7 +227,7 @@ class FunctionFactory {
                 tb.func(emptyCollection));
         
         if(qvars1.length>0) {
-            axiom1 = createdFactory.createCreatedNotNullQuantifierTerm(services,Op.ALL,qvars1,axiom1);
+            axiom1 = createdFactory.createCreatedNotNullQuantifierTerm(services,Quantifier.ALL,qvars1,axiom1);
         }
 
         axiomCollector.collectAxiom(selectE, axiom1);
@@ -250,7 +250,7 @@ class FunctionFactory {
                                 tb.func(selectE,varTerms2),
                                 tb.var(qvars2[1]))));
         
-        axiom2 = createdFactory.createCreatedNotNullQuantifierTerm(services,Op.ALL,qvars2,axiom2);
+        axiom2 = createdFactory.createCreatedNotNullQuantifierTerm(services,Quantifier.ALL,qvars2,axiom2);
         
         axiomCollector.collectAxiom(selectE, axiom2);
 
@@ -261,7 +261,7 @@ class FunctionFactory {
                         tb.func(selectE,varTerms1),
                         tb.func(selectE,varTerms2)));
         
-        axiom3 = createdFactory.createCreatedNotNullQuantifierTerm(services,Op.ALL,qvars2,axiom3);
+        axiom3 = createdFactory.createCreatedNotNullQuantifierTerm(services,Quantifier.ALL,qvars2,axiom3);
         
         axiomCollector.collectAxiom(selectE, axiom3);
 
@@ -365,7 +365,7 @@ class FunctionFactory {
                 tb.func(emptyCollectionS));
         
         if(qvars1.length>0) {
-            axiom1 = createdFactory.createCreatedNotNullQuantifierTerm(services,Op.ALL,qvars1,axiom1);
+            axiom1 = createdFactory.createCreatedNotNullQuantifierTerm(services,Quantifier.ALL,qvars1,axiom1);
         }
 
         axiomCollector.collectAxiom(collectE, axiom1);
@@ -406,7 +406,7 @@ class FunctionFactory {
                         tb.func(collectE,varTerms1),
                         eq2);
         
-        axiom2 = createdFactory.createCreatedNotNullQuantifierTerm(services,Op.ALL,qvars2,axiom2);
+        axiom2 = createdFactory.createCreatedNotNullQuantifierTerm(services,Quantifier.ALL,qvars2,axiom2);
         
         axiomCollector.collectAxiom(collectE, axiom2);
 
@@ -823,7 +823,7 @@ class FunctionFactory {
         
         Term axiom = createdFactory.createCreatedNotNullQuantifierTerm(
                 services,
-                Op.ALL,
+                Quantifier.ALL,
                 qvars,
                 subTerm);
         
@@ -850,7 +850,7 @@ class FunctionFactory {
         
         Term axiom2 = createdFactory.createCreatedNotNullQuantifierTerm(
                 services,
-                Op.ALL,
+                Quantifier.ALL,
                 qvars,
                 subTerm);
         
@@ -883,7 +883,7 @@ class FunctionFactory {
 
         Term axiom3 = createdFactory.createCreatedNotNullQuantifierTerm(
                 services,
-                Op.ALL,
+                Quantifier.ALL,
                 qvars,
                 subTerm);
         

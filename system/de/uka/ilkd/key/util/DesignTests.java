@@ -150,8 +150,8 @@ public class DesignTests {
     public LinkedList testConstructorInOpSubclasses() {
 	LinkedList badClasses = new LinkedList();
 	for (int i = 0; i<allClasses.length; i++) {
- 	    if (allClasses[i] != de.uka.ilkd.key.logic.op.Op.class &&
-		(de.uka.ilkd.key.logic.op.Op.class).
+ 	    if (allClasses[i] != de.uka.ilkd.key.logic.op.AbstractOperator.class &&
+		(de.uka.ilkd.key.logic.op.AbstractOperator.class).
 		isAssignableFrom(allClasses[i]) &&
 		!(de.uka.ilkd.key.logic.op.
 		  AbstractMetaOperator.class).isAssignableFrom(allClasses[i])) {

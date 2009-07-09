@@ -718,11 +718,11 @@ options {
 	return result.toString();
     }
 
-    private TermSymbol getAttribute(Sort prefixSort, String attributeName) 
+    private Operator getAttribute(Sort prefixSort, String attributeName) 
            throws SemanticException {
         final JavaInfo javaInfo = getJavaInfo();
 
-        TermSymbol result = null;
+        Operator result = null;
         
         if (inSchemaMode()) {
             // if we are currently reading taclets we look for schema variables first
@@ -792,7 +792,7 @@ options {
    
     private static GenericSort wahSort;
     public Term createAttributeTerm(Term prefix, 
-    				    TermSymbol attribute) throws SemanticException {
+    				    Operator attribute) throws SemanticException {
         Term result = prefix;
 
         if (attribute instanceof SchemaVariable) {
@@ -1033,20 +1033,20 @@ options {
     private Operator lookupVarfuncId(String varfunc_name, Term[] args) 
         throws NotDeclException{
         // case 1: variable
-        Operator v = (TermSymbol) variables().lookup(new Name(varfunc_name));
+        Operator v = (Operator) variables().lookup(new Name(varfunc_name));
         if (v != null && (args == null || (inSchemaMode() && v instanceof OperatorSV))) {
             return v;
         }
         
         // case 2: function
-        v = (TermSymbol) functions().lookup(new Name(varfunc_name));
+        v = (Operator) functions().lookup(new Name(varfunc_name));
         if (v != null) { // we allow both args==null (e.g. `c')
                          // and args.length=0 (e.g. 'c())' here 
             return v;
         }
         
         // case 3: program variable
-        v = (TermSymbol) programVariables().lookup
+        v = (Operator) programVariables().lookup
             (new ProgramElementName(varfunc_name));
         if (v != null && args==null) {
             return v;
@@ -1390,7 +1390,7 @@ options {
        	  Operator op;
        	  if (modalOp) {
        	    // modalities are not in the functions namespace
-       	    op = Op.getModality(opName);
+       	    op = Modality.getModality(opName);
        	  } else {
            op = (Operator) functions().lookup(new Name(opName));
           }
@@ -2733,7 +2733,7 @@ staticAttributeOrQueryReference returns [String attrReference = ""]
 
 static_attribute_suffix returns [Term result = null]
 {
-    TermSymbol v = null;
+    Operator v = null;
     String attributeName = "";
 }    
     :   
@@ -2760,7 +2760,7 @@ static_attribute_suffix returns [Term result = null]
 
 attribute_or_query_suffix[Term prefix] returns [Term result = null]
 {
-    TermSymbol v = null;
+    Operator v = null;
     result = prefix;
     String attributeName = "";    
 }    
@@ -2818,7 +2818,7 @@ static_query returns [Term result = null]
     String queryRef = "";
     Term[] args = null;
     PairOfTermArrayAndBoundVarsArray argsWithBoundVars = null; 
-    TermSymbol ts = null;
+    Operator ts = null;
 }
     :
     queryRef =  staticAttributeOrQueryReference argsWithBoundVars = argument_list
@@ -2992,9 +2992,9 @@ sum_or_product_term returns [Term result=null]
 }
     :
         (
-            SUM {op = Op.SUM;}
+            SUM {op = NumericalQuantifier.SUM;}
         |
-            PRODUCT {op = Op.PRODUCT;}
+            PRODUCT {op = NumericalQuantifier.PRODUCT;}
         )
         index=bound_variables
         LPAREN
@@ -3015,7 +3015,7 @@ bounded_sum_term returns [Term result=null]
     ListOfQuantifiableVariable index = null;   
 }
     :
-        BSUM {op = Op.BSUM;}
+        BSUM {op = BoundedNumericalQuantifier.BSUM;}
         index=bound_variables
         LPAREN
         a=term 
@@ -3135,8 +3135,8 @@ quantifierterm returns [Term a = null]
     Term a1 = null;
 }
 :
-        (   FORALL { op = Op.ALL; }
-          | EXISTS  { op = Op.EX;  })
+        (   FORALL { op = Quantifier.ALL; }
+          | EXISTS  { op = Quantifier.EX;  })
         vs = bound_variables a1 = term60
         {
             a = tf.createQuantifierTerm((Quantifier)op,
@@ -3161,7 +3161,7 @@ update_or_substitution returns [Term result = null]
 substitutionterm returns [Term result = null] 
 {
   QuantifiableVariable v = null;
-  SubstOp op = Op.SUBST;
+  SubstOp op = WarySubstOp.SUBST;
   Term a1 = null;
   Term a2 = null;
 }
@@ -3317,11 +3317,11 @@ one_bound_variable returns[QuantifiableVariable v=null]
 one_schema_bound_variable returns[QuantifiableVariable v=null]
 {
   String id = null;
-  TermSymbol ts = null;
+  Operator ts = null;
 }
 :
    id = simple_ident {
-      ts = (TermSymbol) variables().lookup(new Name(id));   
+      ts = (Operator) variables().lookup(new Name(id));   
       // It is my belief (Woj) that this check is obsolete
       // if ( ts == null || ts instanceof LogicVariable ) {
       //  throw new KeYSemanticException("Quantified variables need a sort.", 
@@ -3396,7 +3396,7 @@ modality_dl_term returns [Term a = null]
          }
          op = (SchemaVariable)variables().lookup(new Name(sjb.opName));
        } else {
-         op = Op.getModality(sjb.opName);
+         op = Modality.getModality(sjb.opName);
        }
        if(op == null) {
          semanticError("Unknown modal operator: "+sjb.opName);
@@ -3510,12 +3510,12 @@ funcpredvarterm returns [Term a = null]
 	                   
 	            if (op instanceof ParsableVariable) {
 	                a = termForParsedVariable((ParsableVariable)op);
-	            } else  if (op instanceof TermSymbol) {
+	            } else  if (op instanceof Operator) {
 	                if (argsWithBoundVars==null) {
 	                    argsWithBoundVars = new PairOfTermArrayAndBoundVarsArray(new LinkedList());
 	                }
 	
-	                a = tf.createFunctionWithBoundVarsTerm((TermSymbol)op, argsWithBoundVars);
+	                a = tf.createFunctionWithBoundVarsTerm((Operator)op, argsWithBoundVars);
 	            }
 	    }
         }

@@ -77,23 +77,23 @@ public class TestTerm extends TestCase {
     }
   
     public void testFreeVars1() {
-	Term t_allxt2=tf.createQuantifierTerm(Op.ALL,new LogicVariable[]{x},t2());
+	Term t_allxt2=tf.createQuantifierTerm(Quantifier.ALL,new LogicVariable[]{x},t2());
 	Term t_allxt2_andt1=tf.createJunctorTerm(Junctor.AND,t_allxt2,t1());
 	assertTrue(t_allxt2_andt1.freeVars().contains(w) 
 		   && t_allxt2_andt1.freeVars().contains(x));
     }
 
    public void testFreeVars2() {
-	Term t_allxt2=tf.createQuantifierTerm(Op.ALL,new LogicVariable[]{w},t2());
+	Term t_allxt2=tf.createQuantifierTerm(Quantifier.ALL,new LogicVariable[]{w},t2());
 	Term t_allxt2_andt1=tf.createJunctorTerm(Junctor.AND,t_allxt2,t1());
 	assertTrue(!t_allxt2_andt1.freeVars().contains(w) 
 		   && t_allxt2_andt1.freeVars().contains(x));
     }
     
     public void testFreeVars3() {
-	Term t_allxt1=tf.createQuantifierTerm(Op.ALL,new LogicVariable[]{x},t2());
+	Term t_allxt1=tf.createQuantifierTerm(Quantifier.ALL,new LogicVariable[]{x},t2());
 	Term t_allxt1_andt2=tf.createJunctorTerm(Junctor.AND,t_allxt1,t1());
-	Term t_exw_allxt1_andt2=tf.createQuantifierTerm(Op.EX, 
+	Term t_exw_allxt1_andt2=tf.createQuantifierTerm(Quantifier.EX, 
 							new LogicVariable[]{w}, 
 							t_allxt1_andt2); 
 	assertTrue(!t_exw_allxt1_andt2.freeVars().contains(w) 
@@ -101,9 +101,9 @@ public class TestTerm extends TestCase {
     }
 
    public void testFreeVars4() {
-	Term t_allxt1=tf.createQuantifierTerm(Op.ALL,new LogicVariable[]{x},t2());
+	Term t_allxt1=tf.createQuantifierTerm(Quantifier.ALL,new LogicVariable[]{x},t2());
 	Term t_allxt1_andt2=tf.createJunctorTerm(Junctor.AND,t_allxt1,t1());
-	Term t_exw_allxt1_andt2=tf.createQuantifierTerm(Op.EX,
+	Term t_exw_allxt1_andt2=tf.createQuantifierTerm(Quantifier.EX,
 							new LogicVariable[]{w,x}, 
 							t_allxt1_andt2); 
 	assertTrue(!t_exw_allxt1_andt2.freeVars().contains(w)
@@ -136,14 +136,14 @@ public class TestTerm extends TestCase {
     public void testEqualsModRenaming() {
         
         final Term px = tf.createFunctionTerm ( p, tf.createVariableTerm ( x ) );
-        final Term quant1 = tf.createQuantifierTerm ( Op.ALL, z,
-                               tf.createQuantifierTerm ( Op.ALL, zz,
-                                  tf.createQuantifierTerm ( Op.ALL, x, px ) ) );
+        final Term quant1 = tf.createQuantifierTerm ( Quantifier.ALL, z,
+                               tf.createQuantifierTerm ( Quantifier.ALL, zz,
+                                  tf.createQuantifierTerm ( Quantifier.ALL, x, px ) ) );
         
         final Term pz = tf.createFunctionTerm ( p, tf.createVariableTerm ( z ) );
-        final Term quant2 = tf.createQuantifierTerm ( Op.ALL, z,
-                               tf.createQuantifierTerm ( Op.ALL, z,
-                                  tf.createQuantifierTerm ( Op.ALL, z, pz ) ) );
+        final Term quant2 = tf.createQuantifierTerm ( Quantifier.ALL, z,
+                               tf.createQuantifierTerm ( Quantifier.ALL, z,
+                                  tf.createQuantifierTerm ( Quantifier.ALL, z, pz ) ) );
         
         assertTrue ( "Terms " + quant1 + " and " + quant2
                      + " should be equal mod renaming",

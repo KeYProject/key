@@ -170,9 +170,9 @@ public class TestClashFreeSubst extends TestCase {
 	public void visit(Term visited) {
 	    Operator op = visited.op();
 	    int arity = visited.arity();
-	    if ( op == Op.ALL ) {
+	    if ( op == Quantifier.ALL ) {
 		Term top = (Term) subStack.peek();
-		if ( top.op() == Op.ALL )  {
+		if ( top.op() == Quantifier.ALL )  {
 		    QuantifiableVariable[] bv = 
 			new QuantifiableVariable[visited.varsBoundHere(0).size()
 						+top.varsBoundHere(0).size()];
@@ -186,7 +186,7 @@ public class TestClashFreeSubst extends TestCase {
 		    }
 		    subStack.pop();
 		    subStack.push(tf.createQuantifierTerm(
-                                      Op.ALL, bv, top.sub(0)));
+                                      Quantifier.ALL, bv, top.sub(0)));
 		    return;
 		}
 	    }

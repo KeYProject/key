@@ -13,7 +13,6 @@ package de.uka.ilkd.key.rule.updatesimplifier;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.NonRigid;
 import de.uka.ilkd.key.rule.AbstractUpdateRule;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
 import de.uka.ilkd.key.util.Debug;
@@ -38,7 +37,7 @@ public class ApplyOnNonRigidTerm extends AbstractUpdateRule {
      * symbol
      */
     public boolean isApplicable(Update update, Term target) {       
-        return target.op() instanceof NonRigid;
+        return !target.op().isRigid();
     }
 
     /** 

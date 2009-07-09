@@ -75,12 +75,12 @@ class TriggersSet {
      */
     private SetOfQuantifiableVariable getAllUQS(Term allterm) {
         final Operator op = allterm.op();
-        if (op == Op.ALL) {
+        if (op == Quantifier.ALL) {
             QuantifiableVariable v =
                     allterm.varsBoundHere(0).getQuantifiableVariable(0);
             return getAllUQS(allterm.sub(0)).add(v);
         }
-        if (op == Op.EX) {
+        if (op == Quantifier.EX) {
             return getAllUQS(allterm.sub(0));
         }
         return SetAsListOfQuantifiableVariable.EMPTY_SET;
@@ -239,7 +239,7 @@ class TriggersSet {
             }
 
             final Set<Term> res = new HashSet<Term>();
-            if (t.op() == Op.IF_THEN_ELSE) {
+            if (t.op() == IfThenElse.IF_THEN_ELSE) {
                 res.addAll(possibleSubs[1]);
                 res.addAll(possibleSubs[2]);
             }

@@ -5,15 +5,11 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-/*
- * Created on 13.06.2005
- */
+
+
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
-import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -38,22 +34,7 @@ public class CastFunctionSymbol extends SortDependingFunction {
                 new Sort[]{ argSort }, NAME, castSort);      
     }
 
-    
-    /**
-     * overrides method in {@link  de.uka.ilkd.key.logic.op.Function} and 
-     * inserts an additional check disallowing which disallows side casts 
-     * between primitive and reference types
-     * @param at an int describing the planned sub term position of the given term
-     * @param possibleSub the Term designated to become the at-th sub term 
-     * @return an boolean indicating if the given term is allowed at the 
-     * given position
-     */  
-    public boolean possibleSub(int at, Term possibleSub) {        
-        final Sort castTo = getSortDependingOn(); 
-        return super.possibleSub(at, possibleSub);
-    }
-    
-    
+        
     /** toString */
     public String toString() {
         return "("+getSortDependingOn()+")";

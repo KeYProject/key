@@ -13,10 +13,7 @@ package de.uka.ilkd.key.proof.incclosure;
 import junit.framework.TestCase;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Metavariable;
-import de.uka.ilkd.key.logic.op.RigidFunction;
-import de.uka.ilkd.key.logic.op.TermSymbol;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -40,7 +37,7 @@ public class TestMerger extends TestCase {
 
    
     
-    private Term term_f(TermSymbol var){
+    private Term term_f(Operator var){
 	Term t_x=tf.createFunctionTerm(var, new Term[]{});
 	return term_f ( t_x );
     }

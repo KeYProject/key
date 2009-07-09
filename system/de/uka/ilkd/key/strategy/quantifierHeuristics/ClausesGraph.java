@@ -200,8 +200,8 @@ class ClausesGraph {
      */
     private SetOfQuantifiableVariable existentialVars(Term formula) {
         final Operator op = formula.op ();
-        if ( op == Op.ALL ) return existentialVars ( formula.sub ( 0 ) );
-        if ( op == Op.EX )
+        if ( op == Quantifier.ALL ) return existentialVars ( formula.sub ( 0 ) );
+        if ( op == Quantifier.EX )
             return
                 existentialVars ( formula.sub ( 0 ) )
                 .add ( formula.varsBoundHere ( 0 ).lastQuantifiableVariable () );

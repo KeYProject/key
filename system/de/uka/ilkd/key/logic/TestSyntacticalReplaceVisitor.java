@@ -67,7 +67,7 @@ public class TestSyntacticalReplaceVisitor extends TestCase {
 	insts=SVInstantiations.EMPTY_SVINSTANTIATIONS.add(b, t_px).add(v, t_y)
 	    .add(u, t_x).add(c, t_py);
 	
-	t_allxpxpx=tf.createQuantifierTerm(Op.ALL, x, tf.createJunctorTerm
+	t_allxpxpx=tf.createQuantifierTerm(Quantifier.ALL, x, tf.createJunctorTerm
 					   (Junctor.AND, t_px, t_px));
 
     }

@@ -20,10 +20,12 @@ import de.uka.ilkd.key.logic.Name;
  * and by
  * <tt>(ifEx (x1) (phi) (t1) (t2)) equiv (if (ex x1. phi) ({x1 (min x1. phi)}t1) (t2))</tt>
  */
-public class IfExThenElse extends IfThenElse {
+public final class IfExThenElse extends IfThenElse {
     
-    IfExThenElse () {
+    /** the 'ifEx-then-else' operator */
+    public static final IfExThenElse IF_EX_THEN_ELSE = new IfExThenElse ();
+
+    private IfExThenElse () {
         super ( new Name ( "ifEx-then-else" ) );
-    }
-    
+    }    
 }

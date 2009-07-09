@@ -8,15 +8,13 @@
 //
 //
 
-
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
-public final class Junctor extends TermSymbol {
+public final class Junctor extends AbstractSortedOperator {
    
     /** 
      * the true constant 
@@ -51,21 +49,23 @@ public final class Junctor extends TermSymbol {
      */
     public static final Junctor IMP = new Junctor(new Name("imp"),2);
 
-    private Junctor(Name name, int arity) {
-	super(name, arity, Sort.FORMULA);
+    
+    private static Sort[] createFormulaSortArray(int arity) {
+	Sort[] result = new Sort[arity];
+	for(int i = 0; i < arity; i++) {
+	    result[i] = Sort.FORMULA;
+	}
+	return result;
     }
-   
+    
+    
+    private Junctor(Name name, int arity) {
+	super(name, createFormulaSortArray(arity), Sort.FORMULA);
+    }
+    
     
     @Override
-    public boolean validTopLevel(Term term){
-	if(arity() != term.arity()) {
-	    return false;
-	}
-        for(int i = 0; i < term.arity(); i++){
-            if(!term.sub(i).sort().equals(Sort.FORMULA)) {
-        	return false;
-            }
-	}
-        return true;    
-    }
+    public boolean isRigid() {
+	return true;
+    }    
 }

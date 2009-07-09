@@ -216,7 +216,7 @@ options {
         assert atPreFunctions != null;
         
         Operator newOp;
-        if(term.op() instanceof NonRigid) {
+        if(!term.op().isRigid()) {
             Function atPreFunc = (Function) atPreFunctions.get(term.op());
             if(atPreFunc == null) {
                 atPreFunc = APF.createAtPreFunction(term.op(), services);
@@ -697,7 +697,7 @@ primaryExpression returns [OCLExpression result=null] throws SLTranslationExcept
     | 	t=ifExpression { result = new OCLExpression(t);}
     | 	TRUE { result=new OCLExpression(tb.tt()); }
     | 	FALSE { result=new OCLExpression(tb.ff()); }
-    | 	NULL { result=new OCLExpression(tb.func(Op.NULL)); }
+    | 	NULL { result=new OCLExpression(tb.NULL(services)); }
     {
     	if (result == null) {
     	    raiseError("Error in primary expression");

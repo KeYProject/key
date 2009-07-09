@@ -14,7 +14,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
-import de.uka.ilkd.key.logic.op.TermSymbol;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
@@ -45,7 +45,7 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
                                    Services services);
 
     private Term quotient(BigInteger monoCoeff, Term rightPoly, Services services) {
-        final TermSymbol add = 
+        final Operator add = 
             services.getTypeConverter ().getIntegerLDT ().getAdd ();
         if ( rightPoly.op () == add ) {
             final Term left = quotient ( monoCoeff, rightPoly.sub ( 0 ),

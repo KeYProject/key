@@ -1111,7 +1111,7 @@ public class JavaInfo {
      */
     public Term getNullConst() {
 	if (nullConst==null) {
-	    nullConst=TermFactory.DEFAULT.createFunctionTerm(Op.NULL);
+	    nullConst=TermFactory.DEFAULT.createFunctionTerm(Function.NULL);
 	}
 	return nullConst;
     }

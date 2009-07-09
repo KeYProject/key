@@ -33,7 +33,7 @@ import de.uka.ilkd.key.rule.updatesimplifier.Update;
 public class IntroNewAnonUpdateOp extends AbstractMetaOperator {
     
     public IntroNewAnonUpdateOp() {
-        super(new Name("#introNewAnonUpdate"), 3);
+        super(new Name("#introNewAnonUpdate"), 3, Sort.FORMULA);
     }
 
     
@@ -59,14 +59,7 @@ public class IntroNewAnonUpdateOp extends AbstractMetaOperator {
         return term.arity()==3 /*Mulbrich && term.sub(1).sort()==Sort.FORMULA*/;
     }
 
-    
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.logic.op.Operator#sort(de.uka.ilkd.key.logic.Term[])
-     */
-    public Sort sort(Term[] term) {
-        return term[1].sort();
-    }
-    
+        
 
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.logic.op.Operator#isRigid(de.uka.ilkd.key.logic.Term)

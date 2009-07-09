@@ -79,22 +79,22 @@ public final class TermBuilder {
     }
 
     
-    public Term func(TermSymbol op) {
+    public Term func(Operator op) {
         return tf.createFunctionTerm(op);
     }
     
     
-    public Term func(TermSymbol op, Term s) {
+    public Term func(Operator op, Term s) {
         return tf.createFunctionTerm(op, s);
     }
     
     
-    public Term func(TermSymbol op, Term s1, Term s2) {
+    public Term func(Operator op, Term s1, Term s2) {
         return tf.createFunctionTerm(op, s1, s2);
     }
     
     
-    public Term func(TermSymbol op, Term[] s) {
+    public Term func(Operator op, Term[] s) {
         return tf.createFunctionTerm(op, s);
     }
     
@@ -135,7 +135,7 @@ public final class TermBuilder {
 
     public Term all(QuantifiableVariable qv, Term t2) {
         if ( !t2.freeVars().contains ( qv ) ) return t2;
-        return tf.createQuantifierTerm ( Op.ALL, qv, t2 );
+        return tf.createQuantifierTerm ( Quantifier.ALL, qv, t2 );
     }
     
     
@@ -150,7 +150,7 @@ public final class TermBuilder {
     
     public Term ex(QuantifiableVariable qv, Term t2) {
         if ( !t2.freeVars().contains ( qv ) ) return t2;
-        return tf.createQuantifierTerm(Op.EX, qv, t2);
+        return tf.createQuantifierTerm(Quantifier.EX, qv, t2);
     }
     
     

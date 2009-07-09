@@ -113,7 +113,7 @@ public abstract class Term implements SVSubstitute {
      * TermCreationException is thrown.  
      * @return this Term if the top level of the Term is valid.
      */
-    public Term checked() {
+    public final Term checked() {
 	if (op().validTopLevel(this)) {
 	    return this;	    
 	} else {	   	    

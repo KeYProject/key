@@ -50,7 +50,7 @@ public class PreservesGuardPO extends EnsuresPO {
         super(initConfig,
               "PreservesGuard (" + programMethod + ")", 
               programMethod, 
-              Op.BOX, 
+              Modality.BOX, 
               SetAsListOfClassInvariant.EMPTY_SET,
               false);
         this.guardedInvs = guardedInvs;
@@ -87,7 +87,7 @@ public class PreservesGuardPO extends EnsuresPO {
             result = result.union(extractDependsClauseFromTerm(term.sub(i)));
         }
         
-        if(term.op() instanceof NonRigid) {
+        if(!term.op().isRigid()) {
             result = result.add(new BasicLocationDescriptor(term));
         }
 
@@ -158,7 +158,7 @@ public class PreservesGuardPO extends EnsuresPO {
                                                      bloc1.getFormula(), 
                                                      predLoc1Term); 
             Term boundLoc1Term 
-                = TF.createQuantifierTerm(Op.ALL, 
+                = TF.createQuantifierTerm(Quantifier.ALL, 
                                           freeLoc1Term.freeVars().toArray(), 
                                           freeLoc1Term);
             
@@ -177,7 +177,7 @@ public class PreservesGuardPO extends EnsuresPO {
                                                          bloc2.getFormula(), 
                                                          predLoc2Term); 
                 Term boundLoc2Term 
-                    = TF.createQuantifierTerm(Op.ALL, 
+                    = TF.createQuantifierTerm(Quantifier.ALL, 
                                               freeLoc2Term.freeVars().toArray(), 
                                               freeLoc2Term);
                 
@@ -316,14 +316,14 @@ public class PreservesGuardPO extends EnsuresPO {
                 CreatedAttributeTermFactory.INSTANCE
                                            .createCreatedNotNullQuantifierTerm(
                              services, 
-                             Op.ALL, 
+                             Quantifier.ALL, 
                              new LogicVariable[] {y}, 
                              impTerm);
             SetOfQuantifiableVariable freeVars 
                     = bloc.getLocTerm().freeVars();
             quantifierTerm = (freeVars.size() == 0
                               ? quantifierTerm
-                              : TF.createQuantifierTerm(Op.ALL, 
+                              : TF.createQuantifierTerm(Quantifier.ALL, 
                                                         freeVars.toArray(), 
                                                         quantifierTerm));
             
@@ -346,7 +346,7 @@ public class PreservesGuardPO extends EnsuresPO {
         Term accTerm = TF.createFunctionTerm(accPred, 
                                              TF.createVariableTerm(x), 
                                              TF.createVariableTerm(v));
-        return TF.createQuantifierTerm(Op.EX, x, accTerm);
+        return TF.createQuantifierTerm(Quantifier.EX, x, accTerm);
     }
     
     

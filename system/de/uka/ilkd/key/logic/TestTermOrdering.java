@@ -59,9 +59,7 @@ public class TestTermOrdering extends TestCase {
     }
     
     private Term term_const(Operator op){
-	if ( op instanceof TermSymbol )
-	    return tf.createFunctionTerm((TermSymbol)op);
-	return null;
+	return tf.createFunctionTerm(op);
     }
 
     // f(t)

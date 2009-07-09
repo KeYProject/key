@@ -569,17 +569,17 @@ public class TestApplyTaclet extends TestCase{
 		   goals.head().sequent(), 
 		   goals.head().sequent().antecedent().size()  == 1 &&
 		   goals.head().sequent().antecedent().iterator().
-		   next().formula().op()==Op.ALL &&
+		   next().formula().op()==Quantifier.ALL &&
 		   goals.head().sequent().succedent().size()  == 1 &&
 		   goals.head().sequent().succedent().iterator().
-		   next().formula().op()==Op.ALL);
+		   next().formula().op()==Quantifier.ALL);
 	goals = goals.tail();
 	assertTrue("Second goal should be '==>b', but is "+
 		   goals.head().sequent(), 
 		   goals.head().sequent().antecedent().size() == 0 &&
 		   goals.head().sequent().succedent().size()  == 1 &&
 		   goals.head().sequent().succedent().iterator().
-		   next().formula().op()==Op.ALL);
+		   next().formula().op()==Quantifier.ALL);
 	
     }
 

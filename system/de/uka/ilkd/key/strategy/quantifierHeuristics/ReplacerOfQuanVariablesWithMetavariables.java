@@ -23,7 +23,6 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.MapAsListFromQuantifiableVariableToTerm;
 import de.uka.ilkd.key.logic.op.MapFromQuantifiableVariableToTerm;
 import de.uka.ilkd.key.logic.op.Metavariable;
-import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -51,7 +50,7 @@ class ReplacerOfQuanVariablesWithMetavariables {
             QuantifiableVariable q =
                 t.varsBoundHere ( 0 ).getQuantifiableVariable ( 0 );
             Term m;
-            if ( op == Op.ALL ) {
+            if ( op == Quantifier.ALL ) {
                 Metavariable mv = new Metavariable ( ARBITRARY_NAME, q.sort () );
                 m = tb.func ( mv );
             } else {

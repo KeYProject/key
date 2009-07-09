@@ -1097,7 +1097,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    //op is a update. So translate it as an uninterpreted predicate.
 	    //equal updates are translated with the same predicate.
 	    return this.getModalityPredicate(term, quantifiedVars, services);
-	} else if (op == Op.IF_THEN_ELSE) {
+	} else if (op == IfThenElse.IF_THEN_ELSE) {
 	    if (term.sub(1).sort() == Sort.FORMULA) {
 		//a logical if then else was used
 		StringBuffer cond = translateTerm(term.sub(0), quantifiedVars, services);
@@ -1112,7 +1112,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		//StringBuffer elseterm = translateTerm(term.sub(2), quantifiedVars, services);
 		//return translateTermIfThenElse(cond, ifterm, elseterm);
 	    }
-	} else if (op == Op.ALL) {
+	} else if (op == Quantifier.ALL) {
 	    ArrayOfQuantifiableVariable vars = term.varsBoundHere(0);
 	    Debug.assertTrue(vars.size() == 1);
 
@@ -1135,7 +1135,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
 	    return this.translateLogicalAll(qv, sort, form);
 
-	} else if (op == Op.EX) {
+	} else if (op == Quantifier.EX) {
 	    ArrayOfQuantifiableVariable vars = term.varsBoundHere(0);
 	    Debug.assertTrue(vars.size() == 1);
 
@@ -1161,7 +1161,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    return this.translateLogicalTrue();
 	} else if (op == Junctor.FALSE) {
 	    return this.translateLogicalFalse();
-	} else if (op == Op.NULL) {
+	} else if (op == Function.NULL) {
 	    this.nullString = this.translateNull();
 	    this.nullUsed = true;
 	    return this.nullString;

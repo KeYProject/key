@@ -83,7 +83,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
         
         //focus (below update) must be box term
-        if(progPost.op() != Op.BOX) {
+        if(progPost.op() != Modality.BOX) {
             return null;
         }
         

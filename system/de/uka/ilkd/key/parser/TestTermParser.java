@@ -309,9 +309,9 @@ public class TestTermParser extends TestCase {
 	    .getQuantifiableVariable(0);
 
 	Term t1 = tf.createQuantifierTerm
-	    (Op.ALL,thisx,
+	    (Quantifier.ALL,thisx,
 	     tf.createQuantifierTerm
-	     (Op.ALL,l1,
+	     (Quantifier.ALL,l1,
 	      tf.createJunctorTerm
 	      (Junctor.NOT,
 	       tf.createEqualityTerm(tf.createVariableTerm(thisx),
@@ -333,7 +333,7 @@ public class TestTermParser extends TestCase {
 		.getQuantifiableVariable(0);
 	
 	    Term t1 = tf.createSubstitutionTerm
-		(Op.SUBST,
+		(WarySubstOp.SUBST,
 		 thisxs, t_headxs,
 		 tf.createFunctionTerm
 		 (cons, 
@@ -355,7 +355,7 @@ public class TestTermParser extends TestCase {
 	    .getQuantifiableVariable(0);
 
 	Term t1 = tf.createQuantifierTerm
-	    (Op.EX,thisx,
+	    (Quantifier.EX,thisx,
 	     tf.createJunctorTerm
 	     (Junctor.NOT,
 	      tf.createFunctionTerm(isempty,tf.createVariableTerm(thisx))));
@@ -537,7 +537,7 @@ public class TestTermParser extends TestCase {
             fail ();
         }
         assertTrue ( "Failed parsing integer if-then-else term",
-                     t.op () == Op.IF_THEN_ELSE
+                     t.op () == IfThenElse.IF_THEN_ELSE
                      && t.sub ( 0 ).equals ( parseTerm ( "3=4" ) )
                      && t.sub ( 1 ).equals ( parseTerm ( "1" ) )
                      && t.sub ( 2 ).equals ( parseTerm ( "2" ) ) );
@@ -549,7 +549,7 @@ public class TestTermParser extends TestCase {
             fail ();
         }
         assertTrue ( "Failed parsing nested integer if-then-else term",
-                     t2.op () == Op.IF_THEN_ELSE
+                     t2.op () == IfThenElse.IF_THEN_ELSE
                      && t2.sub ( 0 ).equals ( parseTerm ( "3=4 & 1=1" ) )
                      && t2.sub ( 1 ).equals ( t )
                      && t2.sub ( 2 ).equals ( parseTerm ( "2" ) ) );
@@ -561,7 +561,7 @@ public class TestTermParser extends TestCase {
             fail ();
         }
         assertTrue ( "Failed parsing propositional if-then-else term",
-                     t.op () == Op.IF_THEN_ELSE
+                     t.op () == IfThenElse.IF_THEN_ELSE
                      && t.sub ( 0 ).equals ( parseTerm ( "3=4" ) )
                      && t.sub ( 1 ).equals ( parseTerm ( "1=2" ) )
                      && t.sub ( 2 ).equals ( parseTerm ( "2=3" ) ) );
@@ -578,7 +578,7 @@ public class TestTermParser extends TestCase {
             fail ();
         }
         assertTrue ( "Failed parsing integer ifEx-then-else term",
-                     t.op () == Op.IF_EX_THEN_ELSE
+                     t.op () == IfExThenElse.IF_EX_THEN_ELSE
                      && t.varsBoundHere(0).size() == 1
                      && t.sub ( 0 ).equals ( parseTerm ( "3=4" ) )
                      && t.sub ( 1 ).equals ( parseTerm ( "1" ) )
@@ -591,7 +591,7 @@ public class TestTermParser extends TestCase {
             fail ();
         }
         assertTrue ( "Failed parsing nested integer ifEx-then-else term",
-                     t2.op () == Op.IF_EX_THEN_ELSE
+                     t2.op () == IfExThenElse.IF_EX_THEN_ELSE
                      && t.varsBoundHere ( 0 ).size () == 1
                      && t2.sub ( 0 ).equals ( parseTerm ( "3=4 & 1=1" ) )
                      && t2.sub ( 1 ).equals ( parseTerm ( "\\if (3=4) \\then (1) \\else (2)" ) )
@@ -604,7 +604,7 @@ public class TestTermParser extends TestCase {
             fail ();
         }
         assertTrue ( "Failed parsing propositional ifEx-then-else term",
-                     t.op () == Op.IF_EX_THEN_ELSE
+                     t.op () == IfExThenElse.IF_EX_THEN_ELSE
                      && t.sub ( 0 ).op() == Equality.EQUALS
                      && t.sub ( 0 ).sub ( 0 ).op () == t.varsBoundHere ( 0 ).getQuantifiableVariable ( 0 )
                      && t.sub ( 0 ).sub ( 1 ).op () == t.varsBoundHere ( 0 ).getQuantifiableVariable ( 1 )

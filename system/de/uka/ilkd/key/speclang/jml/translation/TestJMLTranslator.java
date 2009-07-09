@@ -237,7 +237,7 @@ public class TestJMLTranslator extends TestCase {
 
         assertTrue(result != null);
         assertTrue(result.getAxioms().isEmpty());
-        assertTrue(result.getFormula().op().equals(Op.ALL));
+        assertTrue(result.getFormula().op().equals(Quantifier.ALL));
         assertTrue(termContains(result.getFormula(), tb.zTerm(services, "2147483647")));
         assertTrue(termContains(result.getFormula(), Junctor.AND));
     }
@@ -257,7 +257,7 @@ public class TestJMLTranslator extends TestCase {
 
         assertTrue(result != null);
         assertTrue(result.getAxioms().isEmpty());
-        assertTrue(result.getFormula().op().equals(Op.EX));
+        assertTrue(result.getFormula().op().equals(Quantifier.EX));
         assertTrue(result.getFormula().sub(0).op().equals(Junctor.AND));
         assertTrue(termContains(result.getFormula(), tb.NULL(services)));
     }

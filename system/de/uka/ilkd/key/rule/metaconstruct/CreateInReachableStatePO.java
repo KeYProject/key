@@ -23,13 +23,9 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 public class CreateInReachableStatePO extends AbstractMetaOperator {
 
     public CreateInReachableStatePO() {
-        super(new Name("#createInReachableStatePO"), 1);
+        super(new Name("#createInReachableStatePO"), 1, Sort.FORMULA);
     }
     
-    public Sort sort(Term[] term) {
-        return Sort.FORMULA;
-    }
-       
     public Term calculate(Term term, SVInstantiations svInst, Services services) {   
         final InReachableStatePOBuilder po = new InReachableStatePOBuilder(services);
       

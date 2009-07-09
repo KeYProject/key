@@ -29,7 +29,6 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IteratorOfLogicVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
@@ -121,10 +120,10 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
 	    Quantifier q;
 	    Junctor j;
 	    if (name.equals("forAll")) {
-		q = Op.ALL;
+		q = Quantifier.ALL;
 		j = Junctor.IMP;
 	    } else {
-		q = Op.EX;
+		q = Quantifier.EX;
 		j = Junctor.AND;
 	    }
 
@@ -229,10 +228,10 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
 	    Junctor j;
 	    if (name.equals("excludes")) {
 		opTerm = TB.tf().createJunctorTerm(Junctor.NOT, opTerm);
-		q = Op.ALL;
+		q = Quantifier.ALL;
 		j = Junctor.IMP;
 	    } else {
-		q = Op.EX;
+		q = Quantifier.EX;
 		j = Junctor.AND;
 	    }
 
@@ -261,11 +260,11 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
 	    Junctor j;
 	    Term opTerm;
 	    if (name.equals("isEmpty")) {
-		q = Op.ALL;
+		q = Quantifier.ALL;
 		j = Junctor.IMP;
 		opTerm = falseTerm;
 	    } else {
-		q = Op.EX;
+		q = Quantifier.EX;
 		j = Junctor.AND;
 		opTerm = trueTerm;
 	    }
@@ -321,7 +320,7 @@ class BuiltInPropertyResolver extends SLExpressionResolver {
 	    Term subTerm = TB.tf().createJunctorTermAndSimplify(Junctor.IMP,
 		    restrictions, TB.tf().createEqualityTerm(t1, t2));
 	    Term resTerm = createdFactory
-		    .createCreatedNotNullQuantifierTerm(services, Op.ALL,
+		    .createCreatedNotNullQuantifierTerm(services, Quantifier.ALL,
 			    new LogicVariable[] { lv1, lv2 }, subTerm);
 
 	    return new OCLExpression(resTerm);

@@ -47,8 +47,8 @@ public class TestTacletBuild extends TestCase {
 	    TacletForTests.getVariables().lookup(new Name("v"));
 	Term b=tf.createFunctionTerm((SortedSchemaVariable) 
 	    TacletForTests.getVariables().lookup(new Name("b")), NO_SUBTERMS);
-	Term t1=tf.createQuantifierTerm(Op.EX, u, b);
-	Term t2=tf.createQuantifierTerm(Op.EX, v, b);
+	Term t1=tf.createQuantifierTerm(Quantifier.EX, u, b);
+	Term t2=tf.createQuantifierTerm(Quantifier.EX, v, b);
 	RewriteTacletBuilder sb=new RewriteTacletBuilder();
 	sb.setFind(t1);
 	sb.addTacletGoalTemplate
@@ -77,11 +77,11 @@ public class TestTacletBuild extends TestCase {
 	Term A=tf.createFunctionTerm
 	    ((Function)TacletForTests.getFunctions().lookup(new Name("A")), 
 	     NO_SUBTERMS);
-	Term t1=tf.createQuantifierTerm(Op.ALL, u, A);
+	Term t1=tf.createQuantifierTerm(Quantifier.ALL, u, A);
 	Sequent seq = Sequent.createSuccSequent
 	    (Semisequent.EMPTY_SEMISEQUENT.insert
 	     (0, new ConstrainedFormula(t1)).semisequent());
-	Term t2=tf.createQuantifierTerm(Op.EX, u, A);
+	Term t2=tf.createQuantifierTerm(Quantifier.EX, u, A);
 	SuccTacletBuilder sb=new SuccTacletBuilder();
 	sb.setIfSequent(seq);
 	sb.setFind(t2);
@@ -102,8 +102,8 @@ public class TestTacletBuild extends TestCase {
 	Term A=tf.createFunctionTerm
 	    ((Function)TacletForTests.getFunctions().lookup(new Name("A")), 
 	     NO_SUBTERMS);
-	Term t1=tf.createQuantifierTerm(Op.ALL, u, A);
-	Term t2=tf.createQuantifierTerm(Op.EX, u, A);
+	Term t1=tf.createQuantifierTerm(Quantifier.ALL, u, A);
+	Term t2=tf.createQuantifierTerm(Quantifier.EX, u, A);
 	Sequent seq = Sequent.createSuccSequent
 	    (Semisequent.EMPTY_SEMISEQUENT
 	     .insert(0, new ConstrainedFormula(t1)).semisequent()
@@ -129,7 +129,7 @@ public class TestTacletBuild extends TestCase {
 	Term A=tf.createFunctionTerm
 	    ((Function)TacletForTests.getFunctions().lookup(new Name("A")), 
 	     NO_SUBTERMS);
-	Term t1=tf.createQuantifierTerm(Op.ALL, u, A);
+	Term t1=tf.createQuantifierTerm(Quantifier.ALL, u, A);
 	SuccTacletBuilder sb=new SuccTacletBuilder();
 	sb.setFind(tf.createJunctorTerm(Junctor.AND,t1,t1));
 	try {

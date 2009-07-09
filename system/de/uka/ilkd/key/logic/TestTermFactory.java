@@ -135,10 +135,10 @@ public class TestTermFactory extends TestCase {
     }
 
     public void testQuantifierTerm() {
-	Term t_forallx_px=tf.createQuantifierTerm(Op.ALL,
+	Term t_forallx_px=tf.createQuantifierTerm(Quantifier.ALL,
 						  new LogicVariable[]{x},t1());
 	Assert.assertEquals(t_forallx_px,
-			    new QuantifierTerm(Op.ALL,new LogicVariable[]{x},t1()));
+			    new QuantifierTerm(Quantifier.ALL,new LogicVariable[]{x},t1()));
     }
 
     public void testJunctorTerm() {
@@ -154,20 +154,20 @@ public class TestTermFactory extends TestCase {
     public void testDiamondTerm() {
 	JavaBlock jb=JavaBlock.EMPTY_JAVABLOCK;
 	Term t_dia_ryw=tf.createDiamondTerm(jb, t2());
-	Assert.assertEquals(t_dia_ryw, new ProgramTerm(Op.DIA, jb, t2()));
+	Assert.assertEquals(t_dia_ryw, new ProgramTerm(Modality.DIA, jb, t2()));
     }
 
     public void testBoxTerm() {
 	JavaBlock jb=JavaBlock.EMPTY_JAVABLOCK;
 	Term t_dia_ryw=tf.createBoxTerm(jb, t2());
-	Assert.assertEquals(t_dia_ryw, new ProgramTerm(Op.BOX, jb, t2()));
+	Assert.assertEquals(t_dia_ryw, new ProgramTerm(Modality.BOX, jb, t2()));
     }
 
     public void testSubstitutionTerm() {
-	Term t_x_subst_fy_in_px=tf.createSubstitutionTerm(Op.SUBST, x, t3(),
+	Term t_x_subst_fy_in_px=tf.createSubstitutionTerm(WarySubstOp.SUBST, x, t3(),
 							  t1());
 	Assert.assertEquals(t_x_subst_fy_in_px, 
-			    new SubstitutionTerm(Op.SUBST,
+			    new SubstitutionTerm(WarySubstOp.SUBST,
 						 x, new Term[]{ t3(),t1() }));
     }
 
@@ -175,7 +175,7 @@ public class TestTermFactory extends TestCase {
     public void testWrongSubstTermForLogicVariable(){
 	Exception exc=new Exception();
 	try {
-	    Term t_x_subst_fy_in_px=tf.createSubstitutionTerm(Op.SUBST, 
+	    Term t_x_subst_fy_in_px=tf.createSubstitutionTerm(WarySubstOp.SUBST, 
 							      x, new Term[]{ t2(), t1()});
 	} catch (TermCreationException e) {
 	    exc=e;	    
@@ -197,7 +197,7 @@ public class TestTermFactory extends TestCase {
     public void testQuantifierWithNoBoundSubTerms() {
 	Exception exc=new Exception();
 	try {
-	    tf.createQuantifierTerm(Op.ALL,new LogicVariable[]{}, t1());
+	    tf.createQuantifierTerm(Quantifier.ALL,new LogicVariable[]{}, t1());
 	} catch (TermCreationException e) {
 	    exc=e;	    
 	}
@@ -281,18 +281,18 @@ public class TestTermFactory extends TestCase {
 	Term t = tf.createFunctionTerm(g, tf.createVariableTerm(v2), 
 				       tf.createVariableTerm(v1));
 	Function c=new RigidFunction(new Name("c"), osort2, new Sort[0]);
-	Term st = tf.createSubstitutionTerm(Op.SUBST, v2, 
+	Term st = tf.createSubstitutionTerm(WarySubstOp.SUBST, v2, 
 					    tf.createFunctionTerm(c), t);
 	c=new RigidFunction(new Name("c"), osort4, new Sort[0]);
-	st = tf.createSubstitutionTerm(Op.SUBST, v2, 
+	st = tf.createSubstitutionTerm(WarySubstOp.SUBST, v2, 
 					    tf.createFunctionTerm(c), t);
 	c=new RigidFunction(new Name("c"), osort3, new Sort[0]);
-	st = tf.createSubstitutionTerm(Op.SUBST, v1, 
+	st = tf.createSubstitutionTerm(WarySubstOp.SUBST, v1, 
 					    tf.createFunctionTerm(c), t);
 	Exception exc=new Exception();
 	try {
 	    c=new RigidFunction(new Name("c"), osort1, new Sort[0]);
-	    st = tf.createSubstitutionTerm(Op.SUBST, v2, 
+	    st = tf.createSubstitutionTerm(WarySubstOp.SUBST, v2, 
 					    tf.createFunctionTerm(c), t);
 	} catch (TermCreationException e) {
 	    exc=e;	    
@@ -301,7 +301,7 @@ public class TestTermFactory extends TestCase {
 	exc=new Exception();
 	try {
 	    c=new RigidFunction(new Name("c"), osort3, new Sort[0]);
-	    st = tf.createSubstitutionTerm(Op.SUBST, v2, 
+	    st = tf.createSubstitutionTerm(WarySubstOp.SUBST, v2, 
 					   tf.createFunctionTerm(c), t);
 	    
 	} catch (TermCreationException e) {

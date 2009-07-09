@@ -341,7 +341,7 @@ public class CreateTacletForTests extends TestCase {
 
 	z = new LogicVariable(new Name("z"),sort1);
        	Term t_z=tf.createFunctionTerm(z,new Term[0]);
-	Term t_allzpz=tf.createQuantifierTerm(Op.ALL,new
+	Term t_allzpz=tf.createQuantifierTerm(Quantifier.ALL,new
 	    LogicVariable[]{z}, tf.createFunctionTerm(func_p,new Term[]{t_z}));
  	ConstrainedFormula cf3=new ConstrainedFormula(t_allzpz, 
 						    Constraint.BOTTOM);

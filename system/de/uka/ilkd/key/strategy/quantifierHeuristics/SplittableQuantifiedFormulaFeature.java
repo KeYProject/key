@@ -57,7 +57,7 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
         public boolean analyse(Term formula) {
             final Operator op = formula.op();
             
-            if ( op == Op.ALL ) {
+            if ( op == Quantifier.ALL ) {
                 // might be that a variable is bound more than once
                 existentialVars =
                     existentialVars.remove ( formula.varsBoundHere ( 0 )
@@ -65,7 +65,7 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
                 return analyse ( formula.sub ( 0 ) );
             }
             
-            if ( op == Op.EX ) {
+            if ( op == Quantifier.EX ) {
                 existentialVars =
                     existentialVars.add ( formula.varsBoundHere ( 0 )
                                           .lastQuantifiableVariable () );

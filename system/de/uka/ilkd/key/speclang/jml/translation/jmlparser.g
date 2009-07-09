@@ -302,7 +302,7 @@ options {
     private Term convertToOld(Term term) {
 	assert atPreFunctions != null;
 	Operator newOp;
-	if(term.op() instanceof NonRigid && term.op() != selfVar) {
+	if(!term.op().isRigid() && term.op() != selfVar) {
 	    Function atPreFunc = (Function) atPreFunctions.get(term.op());
 	    if(atPreFunc == null) {
 		atPreFunc = APF.createAtPreFunction(term.op(), services);
@@ -1967,7 +1967,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
             LogicVariable lv = declVars.head();
             p=p.sub(0);
             if(p!=null && isBoundedSum(p, lv) && p.sub(0).op()!=Junctor.AND){
-                result = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(Op.BSUM, 
+                result = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(BoundedNumericalQuantifier.BSUM, 
                         lowerBound(p, lv), upperBound(p, lv), TB.ife(
                                 t, TB.zTerm(services, "1"), TB.zTerm(services, "0")),
                                 new ArrayOfQuantifiableVariable(lv));                          
@@ -1985,7 +1985,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
                 if(p.arity()>0 && p.sub(0).op()==Junctor.AND){
                     t = TB.ife(p.sub(1), t, TB.zTerm(services, "0"));
                 }
-                result = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(Op.BSUM, 
+                result = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(BoundedNumericalQuantifier.BSUM, 
                         lowerBound(p, lv), upperBound(p, lv), t, new ArrayOfQuantifiableVariable(lv));
             }else{
                 raiseError("only \\sum expressions of form (\\sum int i; l<=i && i<u; t) are permitted");
@@ -2016,7 +2016,7 @@ bsumterm returns [Term t=null] throws SLTranslationException
         )
         {
             LogicVariable lv = (LogicVariable) decls.head();
-            t = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(Op.BSUM, 
+            t = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(BoundedNumericalQuantifier.BSUM, 
                         a, b, t, new ArrayOfQuantifiableVariable(lv));
             resolverManager.popLocalVariablesNamespace();
         }

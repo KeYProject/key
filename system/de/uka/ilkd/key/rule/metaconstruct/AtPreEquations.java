@@ -96,7 +96,7 @@ public class AtPreEquations extends AbstractMetaOperator {
     
     
     public AtPreEquations() {
-        super(new Name("#atPreEqs"), 1);
+        super(new Name("#atPreEqs"), 1, Sort.FORMULA);
     }
     
     /* (non-Javadoc)
@@ -114,13 +114,6 @@ public class AtPreEquations extends AbstractMetaOperator {
         return term.arity()==1 && term.sub(0).sort()==Sort.FORMULA;
     }
 
-    
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.logic.op.Operator#sort(de.uka.ilkd.key.logic.Term[])
-     */
-    public Sort sort(Term[] term) {
-        return Sort.FORMULA;
-    }
     
 
     /* (non-Javadoc)

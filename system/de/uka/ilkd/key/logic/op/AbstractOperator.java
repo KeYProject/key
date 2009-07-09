@@ -6,56 +6,61 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-//
-
 
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.util.Debug;
 
 
-public final class LogicVariable extends AbstractSortedOperator 
-    implements QuantifiableVariable, ParsableVariable {
-
-    public LogicVariable(Name name, Sort sort) {
-	super(name, new Sort[0], sort);
-	assert sort != Sort.FORMULA;
+/** 
+ * Abstract operator class offering some common functionality.
+ */
+public abstract class AbstractOperator implements Operator {
+    
+    private final Name name;
+    
+    private final int arity;
+   	
+    
+    protected AbstractOperator(Name name, int arity) {
+	this.name = name;
+	this.arity = arity;
     }
     
     
     @Override
-    public boolean isRigid() {
-	return true;
+    public final Name name() {
+	return name;
     }
     
+    
+    @Override
+    public final int arity() {
+        return arity;
+    }
         
+    
     /** 
-     * a match between two logic variables is possible if they have been assigned
-     * they are same or have been assigned to the same abstract name and the sorts
-     *  are equal.
+     * implements the default operator matching rule which means 
+     * that the compared object have to be equal otherwise
+     * matching fails
      */
     @Override
     public MatchConditions match(SVSubstitute subst, MatchConditions mc,
             Services services) {
-        
         if (subst == this) {
             return mc;
         }
-        if (subst instanceof LogicVariable) {
-            final LogicVariable lv = (LogicVariable) subst;
-            if (lv.sort() == sort() && mc.renameTable().sameAbstractName(this, lv)) {
-                return mc;
-            }
-        }
+        Debug.out("FAILED. Operators are different(template, candidate)", this, subst);
         return null;
     }
     
     
     @Override
     public String toString() {
-	return name() + ":" + sort();
+	return name().toString();
     }
 }

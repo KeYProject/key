@@ -38,7 +38,6 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ListOfParsableVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
@@ -291,9 +290,9 @@ assert false : "not implemented";
 	if(excVar == null) {
             excVar = SVF.createExcVar(services, pm, false);
 	    Term excNullTerm = TB.equals(TB.var(excVar), TB.NULL(services));
-            if(modality == Op.DIA) {
+            if(modality == Modality.DIA) {
                 post = post.conjoin(new FormulaWithAxioms(excNullTerm));
-            } else if(modality == Op.BOX) {
+            } else if(modality == Modality.BOX) {
                 post = post.disjoin(new FormulaWithAxioms(TB.not(excNullTerm)));
             } else {
                 throw new ProofInputException(

@@ -30,7 +30,7 @@ public class ConstrainedFormula implements java.io.Serializable {
      */ 
     public ConstrainedFormula(Term term, Constraint constraint) {
 	if (term.sort() != Sort.FORMULA) {
-	    throw new RuntimeException("A Term instead of a Formula");
+	    throw new RuntimeException("A Term instead of a formula: " + term);
 	}
 	this.term = term;	
 	this.constraint = constraint;

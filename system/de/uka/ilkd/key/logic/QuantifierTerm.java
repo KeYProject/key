@@ -56,7 +56,7 @@ class QuantifierTerm extends Term {
      public QuantifierTerm(Quantifier op, 
 		 	   ArrayOfQuantifiableVariable varsBoundHere, 
 		 	   Term subTerm) {
-	super(op, op.sort(subTerm));
+	super(op, op.sort());
 	this.subTerm = subTerm;
 	this.depth   = subTerm.depth() + 1;
 	this.varsBoundHere = varsBoundHere;

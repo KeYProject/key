@@ -302,7 +302,7 @@ public class InReachableStatePOBuilder {
         }
         if (pair.boundVars().size() > 0) {
             closure =
-                    TB.tf().createQuantifierTerm(Op.ALL, pair.boundVars(), closure);
+                    TB.tf().createQuantifierTerm(Quantifier.ALL, pair.boundVars(), closure);
         }
         return closure;
     }

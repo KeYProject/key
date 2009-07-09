@@ -18,7 +18,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Location;
-import de.uka.ilkd.key.logic.op.NonRigid;
 import de.uka.ilkd.key.rule.AbstractUpdateRule;
 import de.uka.ilkd.key.rule.UpdateSimplifier;
 import de.uka.ilkd.key.util.Debug;
@@ -41,7 +40,7 @@ public class ApplyOnRigidOperatorTerm extends AbstractUpdateRule {
      * @see de.uka.ilkd.key.rule.UpdateRule#isApplicable(de.uka.ilkd.key.rule.updatesimplifier.Update, de.uka.ilkd.key.logic.Term)
      */
     public boolean isApplicable(Update update, Term target) {        
-        return !(target.op() instanceof NonRigid);
+        return (target.op().isRigid());
     }
 
     /*

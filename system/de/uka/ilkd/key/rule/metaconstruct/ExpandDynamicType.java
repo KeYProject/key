@@ -34,26 +34,8 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class ExpandDynamicType extends AbstractMetaOperator {
 
-    /**
-     * creates this meta construct
-     */
     public ExpandDynamicType() {
-        super(new Name("#expandDynamicType"), 1);
-    }
-
-    /**
-     * determines the sort of the {@link Term}if it would be created using this
-     * Operator as top level operator and the given terms as sub terms. The
-     * assumption that the constructed term would be allowed is not checked.
-     * 
-     * @param term
-     *            an array of Term containing the subterms of a (potential) term
-     *            with this operator as top level operator
-     * @return sort of the term with this operator as top level operator of the
-     *         given substerms
-     */
-    public Sort sort(Term[] term) {
-        return Sort.FORMULA;
+        super(new Name("#expandDynamicType"), 1, Sort.FORMULA);
     }
 
     

@@ -19,8 +19,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 
 
-public class SVSkolemFunction extends NonRigidFunction
-    implements StateDependingObject {
+public class SVSkolemFunction extends NonRigidFunction {
 
 
     private ArrayOfKeYJavaType influencingPVTypes;

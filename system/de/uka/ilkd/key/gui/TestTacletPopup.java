@@ -203,9 +203,9 @@ public class TestTacletPopup {
 	x = SchemaVariableFactory.createVariableSV(new Name("x"),nat, false);
 	t0 = SchemaVariableFactory.createTermSV(new Name("t0"),nat, false);
 	Term t_t0=tf.createFunctionTerm((SortedSchemaVariable)t0,new Term[0]);
-	Term t_allxb=tf.createQuantifierTerm(Op.ALL,
+	Term t_allxb=tf.createQuantifierTerm(Quantifier.ALL,
 					     new SortedSchemaVariable[]{(SortedSchemaVariable)x},t_b);
-	Term t_subxt0b=tf.createSubstitutionTerm(Op.SUBST,(SortedSchemaVariable)x,t_t0,t_b);
+	Term t_subxt0b=tf.createSubstitutionTerm(WarySubstOp.SUBST,(SortedSchemaVariable)x,t_t0,t_b);
 	allrightbuilder.setFind(t_allxb);
 	seq=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,
 		    Semisequent.EMPTY_SEMISEQUENT.insert(0,new
@@ -494,7 +494,7 @@ public class TestTacletPopup {
 	func_ns.add(p);
 	Term t_z=tf.createFunctionTerm(z,new Term[0]);
 	Term t_allzpz
-	    =tf.createQuantifierTerm(Op.ALL,
+	    =tf.createQuantifierTerm(Quantifier.ALL,
 				     new QuantifiableVariable[]{z}, 
 				     tf.createFunctionTerm(p,
 							 new Term[]{t_z}));

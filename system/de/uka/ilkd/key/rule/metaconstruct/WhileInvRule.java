@@ -62,15 +62,7 @@ public class WhileInvRule extends AbstractMetaOperator {
     private KeYJavaType returnType;
     
     public WhileInvRule() {
-        super(new Name("#whileInvRule"), 2);
-    }
-
-
-    /** Unlike other meta operators this one returns a formula
-     * not a term.
-     */
-    public Sort sort(Term[] term) {
-        return Sort.FORMULA;
+        super(new Name("#whileInvRule"), 2, Sort.FORMULA);
     }
 
 

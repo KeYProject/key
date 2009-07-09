@@ -12,7 +12,6 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.*;
 
 
@@ -22,9 +21,7 @@ import de.uka.ilkd.key.logic.sort.*;
  * equality symbol. For the special sort Formula the corresponding equality 
  * symbol is the equivalence-junctor {@link Equality#EQV}.
  */
-public final class Equality extends Op {
-
-    private final Sort targetSort;
+public final class Equality extends AbstractSortedOperator {
 
     /** 
      * the ususal 'equality' operator '=' 
@@ -42,63 +39,12 @@ public final class Equality extends Op {
     
     
     private Equality(Name name, Sort targetSort){
-	super(name, 2);
+	super(name, new Sort[]{targetSort, targetSort}, Sort.FORMULA);
 	assert targetSort != null : "creating " + name + " failed";
-	this.targetSort = targetSort;
-    }
-
-
-    public Sort sort(Term[] term) {
-	return Sort.FORMULA;
-    }
-
-    /** 
-     * returns the sort of the <tt>i</tt>-th argument
-     */
-    public Sort argSort(int i) {
-	return targetSort;
-    }
-
-    
-    /**
-     * checks if the given term is syntactically valid at its top
-     * level assumed the top level operator were this, i.e. if the
-     * direct subterms can be subterms of a term with this top level
-     * operator, the method returns true. Furthermore, it is checked
-     * that no variables are bound for none of the subterms.
-     * If a subterm is a schemavariable, the whole term is accepted.
-     * @param term the Term to be checked.  
-     * @return true iff the given term has
-     * subterms that are suitable for this function.
-     */
-    public boolean validTopLevel(Term term){
-	if (term.arity()!=arity()) {
-	    return false;
-	}
-	
-	for (int i=0; i<arity(); i++) {
-	    Sort sort = term.sub(i).sort();
-	    if (term.sub(i).op() instanceof SchemaVariable ||
-		sort instanceof ProgramSVSort || 
-		sort == AbstractMetaOperator.METASORT) {
-		return true;
-	    }   
-	}
-        
-	final Sort t0Sort = term.sub(0).sort();
-	final Sort t1Sort = term.sub(1).sort();
-
-	/*
-	if (t0Sort instanceof PrimitiveSort != t1Sort instanceof PrimitiveSort) {
-	    return false;
-	}*/	
-
-	if ( targetSort == Sort.FORMULA || t0Sort == Sort.FORMULA || t1Sort == Sort.FORMULA ) { 
-	    return t0Sort == Sort.FORMULA && t1Sort == Sort.FORMULA && targetSort == Sort.FORMULA;
-	}
-	
-	return t0Sort.extendsTrans(targetSort) && t1Sort.extendsTrans(targetSort);
     }
     
+    @Override
+    public boolean isRigid() {
+	return true;
+    }    
 }
-

@@ -648,7 +648,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "distrQuantifier",
            add ( or ( applyTF ( FocusProjection.create ( 0 ),
                                 add ( ff.quantifiedClauseSet,
-				      not ( opSub ( Op.ALL, ff.orF ) ),
+				      not ( opSub ( Quantifier.ALL, ff.orF ) ),
                                       EliminableQuantifierTF.INSTANCE ) ),
                       SumFeature.createSum ( new Feature[] {
                            OnlyInScopeOfQuantifiersFeature.INSTANCE,
@@ -726,10 +726,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             ifZero ( FocusInAntecFeature.INSTANCE,
               not ( sum ( superFor,
                           SuperTermGenerator.upwards ( any () ),
-                          not ( applyTF ( superFor, op ( Op.ALL ) ) ) ) ),
+                          not ( applyTF ( superFor, op ( Quantifier.ALL ) ) ) ) ),
               not ( sum ( superFor,
                           SuperTermGenerator.upwards ( any () ),
-                          not ( applyTF ( superFor, op ( Op.EX ) ) ) ) ) );
+                          not ( applyTF ( superFor, op ( Quantifier.EX ) ) ) ) ) );
        
         bindRuleSet ( d, "cnf_expandIfThenElse",
                       add ( not ( NotBelowQuantifierFeature.INSTANCE ),
@@ -2150,7 +2150,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             clauseSet = rec ( andF, or ( opSub ( Junctor.AND, any (), not ( andF ) ),
                                          clause ) ); 
 
-            quantifiedFor = or ( op ( Op.ALL ), op ( Op.EX ) );
+            quantifiedFor = or ( op ( Quantifier.ALL ), op ( Quantifier.EX ) );
             quantifiedClauseSet = rec ( quantifiedFor,
                                         or ( quantifiedFor, clauseSet ) );
             
@@ -2179,7 +2179,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 add ( notContainsExecutable,
                       tf.notContainsProduct,
                       or ( tf.eqF,
-                           OperatorClassTF.create ( TermSymbol.class ) ) );
+                           OperatorClassTF.create ( SortedOperator.class ) ) );
             cutAllowedBelowQuantifier = add ( not ( propJunctor ),
                                               notContainsExecutable );
             cutPriority = add ( ifZero ( tf.intInEquation,

@@ -8,14 +8,13 @@
 //
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /** 
  * Operators implementing this interface may stand for
  * locations as well. This means e.g. occur as top level operators on the 
  * left side of an assignment pair of an update. 
  */
-public interface Location extends Operator, NonRigid {
+public interface Location extends SortedOperator {
     /**
      * Checks if location <code>loc</code> may be an alias of the current
      * location.
@@ -25,9 +24,4 @@ public interface Location extends Operator, NonRigid {
      * @return true if <code>loc</loc> may be an alias of the current operator
      */
     boolean mayBeAliasedBy(Location loc);
-    
-    /**
-     * returns the sort of the location
-     */
-    Sort sort();
 }

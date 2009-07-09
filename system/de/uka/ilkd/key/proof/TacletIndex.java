@@ -670,21 +670,19 @@ public class TacletIndex  {
 	return sb.toString();
     }
 
-    private static class SchemaOp implements Operator {
+    private static class SchemaOp extends AbstractOperator {
 
-	static SchemaOp DEFAULTSVOP = new SchemaOp(); 
-	static SchemaOp PROGSVOP = new SchemaOp(); 
+	static final SchemaOp DEFAULTSVOP = new SchemaOp(); 
+	static final SchemaOp PROGSVOP = new SchemaOp(); 
 	
 	private static final Name name = new Name("SVOp");
 	private static final Sort svOpSort = 
 	    new PrimitiveSort(new Name("SVOp"));
 
 	private SchemaOp() {
+	    super(name, 0);
 	}
 
-	public Name name() {
-	    return name;
-	}
 
 	/**
 	 * checks whether the top level structure of the given @link Term
@@ -709,11 +707,6 @@ public class TacletIndex  {
 	 */
 	public Sort sort(Term[] term) {
 	    return svOpSort;
-	}
-
-	/** @return arity of the Operator as int */
-	public int arity() {
-	    return 0;
 	}
 
 	/**
@@ -822,7 +815,5 @@ public class TacletIndex  {
 	}
 
     }
-
-
 }
  

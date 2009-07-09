@@ -40,7 +40,6 @@ import javax.swing.event.ListSelectionListener;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.OperationContract;
@@ -158,9 +157,9 @@ class OperationContractSelectionPanel extends JPanel {
             result = specRepos.getOperationContracts(pm, modality);
             
             //in box modalities, diamond contracts may be applied as well
-            if(modality == Op.BOX) {
+            if(modality == Modality.BOX) {
                 result = result.union(services.getSpecificationRepository()
-                                              .getOperationContracts(pm, Op.DIA));
+                                              .getOperationContracts(pm, Modality.DIA));
             }
         } else {
             result = specRepos.getOperationContracts(pm);

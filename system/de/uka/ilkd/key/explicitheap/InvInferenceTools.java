@@ -46,7 +46,7 @@ class InvInferenceTools {
      */
     public Term open(Term formula) {
 	assert formula.sort() == Sort.FORMULA;
-	if(formula.op() == Op.ALL) {
+	if(formula.op() == Quantifier.ALL) {
 	    return open(formula.sub(0)); 
 	} else {
 	    return formula;

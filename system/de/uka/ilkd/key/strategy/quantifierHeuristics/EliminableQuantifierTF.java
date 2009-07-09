@@ -12,9 +12,9 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.strategy.termfeature.BinaryTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
@@ -29,19 +29,19 @@ public class EliminableQuantifierTF extends BinaryTermFeature {
     
     protected boolean filter(Term term) {
         final Operator op = term.op ();
-        assert op == Op.ALL || op == Op.EX;
+        assert op == Quantifier.ALL || op == Quantifier.EX;
         
         Term matrix = term;
         do {
             matrix = matrix.sub ( 0 );
         } while ( matrix.op () == term.op () );
 
-        if ( matrix.op () == Op.ALL || matrix.op () == Op.EX ) return false;
+        if ( matrix.op () == Quantifier.ALL || matrix.op () == Quantifier.EX ) return false;
 
         final QuantifiableVariable var =
             term.varsBoundHere ( 0 ).lastQuantifiableVariable ();
 
-        return quanAnalyser.isEliminableVariableAllPaths ( var, matrix, op == Op.EX );
+        return quanAnalyser.isEliminableVariableAllPaths ( var, matrix, op == Quantifier.EX );
     }
     
 }

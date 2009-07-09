@@ -80,9 +80,4 @@ public class MetaFieldReference extends AbstractMetaOperator implements
     public boolean mayBeAliasedBy(Location loc) {
         return true;
     }
-
-    public Sort sort() {
-        return METASORT;
-    }
-
 }

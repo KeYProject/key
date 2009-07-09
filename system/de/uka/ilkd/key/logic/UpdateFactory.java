@@ -349,7 +349,7 @@ public class UpdateFactory {
                         tf.createVariableTerm ( varP ) );
 
         res = tf.createJunctorTermAndSimplify ( Junctor.OR, var2varPComparison, res );
-        return tf.createQuantifierTerm ( Op.ALL, varP, res );
+        return tf.createQuantifierTerm ( Quantifier.ALL, varP, res );
     }
 
     private Update firstNPairs (ArrayOfAssignmentPair pairs, int n) {

@@ -14,7 +14,7 @@ import de.uka.ilkd.key.logic.Term;
 
 
 
-public interface IUpdateOperator extends Operator, NonRigid {
+public interface IUpdateOperator extends Operator {
 
     /**
      * Replace the locations of this operator without changing anything else.

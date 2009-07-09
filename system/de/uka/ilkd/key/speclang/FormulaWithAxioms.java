@@ -120,7 +120,7 @@ public class FormulaWithAxioms {
          CreatedAttributeTermFactory.INSTANCE
                                     .createCreatedNotNullQuantifierTerm(
                                                 services, 
-                                                Op.ALL, 
+                                                Quantifier.ALL, 
                                                 freeVarsArray, 
                                                 formula);
         

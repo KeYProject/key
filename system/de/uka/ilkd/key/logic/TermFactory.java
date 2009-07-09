@@ -111,12 +111,12 @@ public class TermFactory {
 
 
     public Term createBoxTerm(JavaBlock javaBlock, Term subTerm) {
-	return createProgramTerm(Op.BOX, javaBlock, subTerm);
+	return createProgramTerm(Modality.BOX, javaBlock, subTerm);
     }
 
 
     public Term createDiamondTerm(JavaBlock javaBlock, Term subTerm) {        
-	return createProgramTerm(Op.DIA, javaBlock, subTerm);
+	return createProgramTerm(Modality.DIA, javaBlock, subTerm);
     }
 
 
@@ -158,7 +158,7 @@ public class TermFactory {
         return createEqualityTerm(eq, terms);
     }
     
-    public Term createFunctionTerm(TermSymbol op) {
+    public Term createFunctionTerm(Operator op) {
         Term result = cache.get(op);
         if (result == null) {
             result = createFunctionTerm(op, NO_SUBTERMS);
@@ -167,7 +167,7 @@ public class TermFactory {
         return result;
     }
 
-    public Term createFunctionTerm(TermSymbol op, Term s1) {
+    public Term createFunctionTerm(Operator op, Term s1) {
         final CacheKey key = new CacheKey(op, s1);
         Term result = cache.get(key);
         if (result == null) {
@@ -177,7 +177,7 @@ public class TermFactory {
         return result;
     }
 
-    public Term createFunctionTerm(TermSymbol op, Term s1, Term s2) {	
+    public Term createFunctionTerm(Operator op, Term s1, Term s2) {	
 	if(op == null || s1 == null || s2 == null) {
 	    throw new TermCreationException("null not allowed");
 	}
@@ -200,7 +200,7 @@ public class TermFactory {
       * the terms in <code>subTerms</code> as arguments (direct
       * subterms)
       */
-    public Term createFunctionTerm(TermSymbol op, Term[] subTerms) {
+    public Term createFunctionTerm(Operator op, Term[] subTerms) {
 	if (op==null) throw new IllegalArgumentException("null-Operator at"+
 							 "TermFactory");
 	
@@ -218,12 +218,12 @@ public class TermFactory {
       *        expression in which the iterator variable is bound
       */
 
-    public Term createFunctionWithBoundVarsTerm(TermSymbol op,
+    public Term createFunctionWithBoundVarsTerm(Operator op,
 						PairOfTermArrayAndBoundVarsArray subs) {
 	return createFunctionWithBoundVarsTerm(op, subs.getTerms(), subs.getBoundVars());
     }
 
-    public Term createFunctionWithBoundVarsTerm(TermSymbol op,
+    public Term createFunctionWithBoundVarsTerm(Operator op,
 						Term[] subTerms,
 						ArrayOfQuantifiableVariable[] boundVars) {
 	if (boundVars != null) {
@@ -238,7 +238,7 @@ public class TermFactory {
      * Create an 'if-then-else' term (or formula)
      */
     public Term createIfThenElseTerm(Term condF, Term thenT, Term elseT) {
-        return OpTerm.createOpTerm(Op.IF_THEN_ELSE, new Term [] { condF, thenT, elseT });
+        return OpTerm.createOpTerm(IfThenElse.IF_THEN_ELSE, new Term [] { condF, thenT, elseT });
     }
     
 
@@ -247,7 +247,7 @@ public class TermFactory {
      */
     public Term createIfExThenElseTerm(ArrayOfQuantifiableVariable exVars,
                                        Term condF, Term thenT, Term elseT) {
-        return new IfExThenElseTerm ( Op.IF_EX_THEN_ELSE,
+        return new IfExThenElseTerm ( IfExThenElse.IF_EX_THEN_ELSE,
                                       new Term [] { condF, thenT, elseT },
                                       exVars ).checked();
     }
@@ -485,8 +485,8 @@ public class TermFactory {
 						JavaBlock javaBlock) {
 	if (op instanceof Equality) {
 	    return createEqualityTerm(subTerms);
-	} else if (op instanceof TermSymbol) {
-	    return createFunctionTerm((TermSymbol)op, subTerms);
+	} else if (op instanceof SortedOperator) {
+	    return createFunctionTerm(op, subTerms);
 	} else if (op instanceof Junctor) {
 	    return createJunctorTerm((Junctor)op,subTerms);
 	} else if (op instanceof Modality) {
@@ -552,9 +552,9 @@ public class TermFactory {
 	    return createSubstitutionTerm((SubstOp)op, 
 					  bv[1].getQuantifiableVariable(0),
 					  subTerms);
-	} else if (op instanceof TermSymbol) { 
+	} else if (op instanceof SortedOperator) { 
 	    // special treatment for OCL operators binding variables	    
-	    return createFunctionWithBoundVarsTerm((TermSymbol)op, subTerms, bv);	 
+	    return createFunctionWithBoundVarsTerm(op, subTerms, bv);	 
 	} else {
 	    return createTermWithNoBoundVariables(op, subTerms, javaBlock);
 	}       

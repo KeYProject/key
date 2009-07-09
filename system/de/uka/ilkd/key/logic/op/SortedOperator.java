@@ -8,18 +8,20 @@
 //
 //
 
+package de.uka.ilkd.key.logic.op;
 
-package de.uka.ilkd.key.rule.soundness;
-
-import de.uka.ilkd.key.java.abstraction.ArrayOfKeYJavaType;
-import de.uka.ilkd.key.logic.op.NonRigid;
-
+import de.uka.ilkd.key.logic.sort.ArrayOfSort;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 
-public interface StateDependingObject extends NonRigid {
+/** 
+ * Operator with well-defined argument and result sorts.
+ */
+public interface SortedOperator extends Operator {
+    
+    Sort sort();
 
-    //    public ListOfProgramVariable getInfluencingPV ();
-
-    ArrayOfKeYJavaType getInfluencingPVTypes ();
-
+    Sort argSort(int i);
+    
+    public ArrayOfSort argSorts();
 }

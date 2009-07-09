@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.NonRigidFunction;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.sort.AbstractCollectionSort;
 import de.uka.ilkd.key.logic.sort.AbstractNonCollectionSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -225,7 +225,7 @@ public class Association {
         	
 		Term axiom = createdFactory.createCreatedNotNullQuantifierTerm(
 				services,
-				Op.ALL,
+				Quantifier.ALL,
 				new LogicVariable[] {a1,a2},
 				tb.equiv(a2InFunc1,a1InFunc2));
 		
@@ -235,7 +235,7 @@ public class Association {
 		
 		axiom = createdFactory.createCreatedNotNullQuantifierTerm(
 				services,
-				Op.ALL,
+				Quantifier.ALL,
 				new LogicVariable[] {a1,a2},
 				tb.equiv(a2InFunc1,predTerm));
 		
@@ -245,7 +245,7 @@ public class Association {
 		
 		axiom = createdFactory.createCreatedNotNullQuantifierTerm(
 				services,
-				Op.ALL,
+				Quantifier.ALL,
 				new LogicVariable[] {a1,a2},
 				tb.equiv(a1InFunc2,predTerm));
 		

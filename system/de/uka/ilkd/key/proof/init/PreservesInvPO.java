@@ -36,7 +36,7 @@ public class PreservesInvPO extends EnsuresPO {
                              ProgramMethod programMethod,
                              SetOfClassInvariant assumedInvs,
                              SetOfClassInvariant ensuredInvs) {
-        super(initConfig, name, programMethod, Op.BOX, assumedInvs, false);
+        super(initConfig, name, programMethod, Modality.BOX, assumedInvs, false);
         this.ensuredInvs = ensuredInvs;
     }
     

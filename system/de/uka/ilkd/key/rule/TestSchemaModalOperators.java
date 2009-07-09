@@ -117,7 +117,7 @@ public class TestSchemaModalOperators extends TestCase {
 
 	SchemaVariable fsv = SchemaVariableFactory.createFormulaSV(new Name("post"), false, true);
 	HashSet modalities = new HashSet(2);
-	modalities.add(Op.DIA);	modalities.add(Op.BOX);
+	modalities.add(Modality.DIA);	modalities.add(Modality.BOX);
 	SchemaVariable osv = SchemaVariableFactory.createOperatorSV(
 	      new Name("diabox"), Modality.class, Sort.FORMULA, 1, modalities);
 	Term tpost = tf.createFunctionTerm((SortedSchemaVariable)fsv, new Term[0]);
@@ -142,7 +142,7 @@ public class TestSchemaModalOperators extends TestCase {
 	RewriteTaclet t = rtb.getRewriteTaclet();
 
 	Term goal = tf.createProgramTerm(
-	    Op.DIA, 
+	    Modality.DIA, 
             JavaBlock.EMPTY_JAVABLOCK,
             tf.createJunctorTerm(Junctor.FALSE));
 

@@ -143,15 +143,9 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
      * 
      */
     public EnhancedForInvRule() {
-        super(new Name("#foreachInvRule"), 4);
+        super(new Name("#foreachInvRule"), 4, Sort.FORMULA);
     }
 
-    /**
-     * Unlike other meta operators this one returns a formula not a term.
-     */
-    public Sort sort(Term[] term) {
-        return Sort.FORMULA;
-    }
 
     /**
      * initialises this meta operator.

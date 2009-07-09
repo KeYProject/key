@@ -28,8 +28,8 @@ import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.IfExThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.Operator;
 
 /**
@@ -85,7 +85,7 @@ class PredictCostProver {
 		if (i >= terms.length)
 			return res;
 		Term self = terms[i];
-		boolean ifthen = terms[i].op() == Op.IF_EX_THEN_ELSE;
+		boolean ifthen = terms[i].op() == IfExThenElse.IF_EX_THEN_ELSE;
 		Set<SetOfTerm> next = createClause(terms, i+1);
 		if(next.size()==0){
 		     if(ifthen){res.add(SetAsListOfTerm.EMPTY_SET

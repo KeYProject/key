@@ -11,7 +11,7 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 /*
  * A ProgramTerm represents a term with a modality operator like
@@ -86,9 +86,9 @@ class ProgramTerm extends Term {
 
     public String toString() {
 	StringBuffer sb = new StringBuffer();
-	if ( op() == Op.DIA ) {
+	if ( op() == Modality.DIA ) {
 	    sb.append("\\<").append(javaBlock).append("\\> ");
-	} else if ( op() == Op.BOX ) {
+	} else if ( op() == Modality.BOX ) {
 	    sb.append("\\[").append(javaBlock).append("\\] ");
 	} else {
 	    //	    sb.append("???Some Strange Modality???").append(javaBlock);

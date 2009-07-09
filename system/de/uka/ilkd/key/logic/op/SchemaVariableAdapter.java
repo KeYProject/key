@@ -24,7 +24,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * is specified by their type and sort. If a match fits these
  * conditions can be checked using the method isCompatible(TermSymbol t)
  */
-public abstract class SchemaVariableAdapter extends TermSymbol
+public abstract class SchemaVariableAdapter extends AbstractSortedOperator
     implements SchemaVariable {
 
     /** 
@@ -38,6 +38,15 @@ public abstract class SchemaVariableAdapter extends TermSymbol
      * elements 
      */
     private final boolean listSV;
+    
+ 
+    private static Sort[] createAnySortArray(int arity) {
+	Sort[] result = new Sort[arity];
+	for(int i = 0; i < arity; i++) {
+	    result[i] = Sort.ANY;
+	}
+	return result;
+    }
 
 
     /** 
@@ -55,7 +64,7 @@ public abstract class SchemaVariableAdapter extends TermSymbol
 				    Class matchType,
 				    Sort sort,
 				    boolean listSV) {
-	super(name, arity, sort);
+	super(name, createAnySortArray(arity), sort);
 	this.matchType = matchType;
 	this.listSV    = listSV;
     }
@@ -165,29 +174,11 @@ public abstract class SchemaVariableAdapter extends TermSymbol
         return true; 
     }
     
-    /**
-     * @return true if the value of "term" having this operator as
-     * top-level operator and may not be changed by modalities
-     */
-    public boolean isRigid (Term term) {
-	return isRigid ();
-    }
-
     public boolean isRigid () {
 	return false;
     } 
 
     public String toString(String sortSpec) {
 	return name()+" ("+sortSpec+")"; 
-    }
-
-    public String toString() {
-	return name().toString(); 
-    }
-    
-    
-    @Override
-    public boolean validTopLevel(Term term){
-        return term.arity() == this.arity();
     }
 }

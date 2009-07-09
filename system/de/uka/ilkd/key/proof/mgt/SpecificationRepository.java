@@ -22,7 +22,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ListOfParsableVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Op;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Proof;
@@ -417,7 +416,7 @@ public class SpecificationRepository {
         	= svf.createSelfVar(services, pm, true);
         ListOfParsableVariable paramVars 
         	= svf.createParamVars(services, pm, false);
-	for(OperationContract c : getOperationContracts(pm, Op.DIA)) {
+	for(OperationContract c : getOperationContracts(pm, Modality.DIA)) {
 	    if(c.getPre(selfVar, paramVars, services).getFormula().equals(tt)	   
 	       && c.getModifies(selfVar, paramVars, services).size() == 0) {
 		result = true;

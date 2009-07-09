@@ -33,9 +33,9 @@ public class QuanEliminationAnalyser {
         PosInOccurrence quantPIO = matrixPIO.up ();
         Term quantTerm = quantPIO.subTerm ();
         final boolean ex;
-        if ( quantTerm.op () == Op.EX ) {
+        if ( quantTerm.op () == Quantifier.EX ) {
             ex = true;
-        } else if ( quantTerm.op () == Op.ALL ) {
+        } else if ( quantTerm.op () == Quantifier.ALL ) {
             ex = false;
         } else {
             return Integer.MAX_VALUE;
@@ -57,7 +57,7 @@ public class QuanEliminationAnalyser {
             quantPIO = quantPIO.up ();
             quantTerm = quantPIO.subTerm ();
             
-            if ( quantTerm.op () != ( ex ? Op.EX : Op.ALL ) )
+            if ( quantTerm.op () != ( ex ? Quantifier.EX : Quantifier.ALL ) )
                 return Integer.MAX_VALUE;
             
             ++distance;

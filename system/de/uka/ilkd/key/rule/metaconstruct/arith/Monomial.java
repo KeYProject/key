@@ -18,7 +18,6 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.TermSymbol;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LRUCache;
 
@@ -197,7 +196,7 @@ public class Monomial {
     
     
     public Term toTerm (Services services) {
-        final TermSymbol mul = 
+        final Operator mul = 
 	    services.getTypeConverter().getIntegerLDT().getMul();
         Term res = null;
         

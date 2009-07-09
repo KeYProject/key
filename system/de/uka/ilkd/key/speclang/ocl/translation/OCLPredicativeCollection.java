@@ -30,7 +30,7 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Op;
+import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.CreatedAttributeTermFactory;
@@ -165,7 +165,7 @@ class OCLPredicativeCollection {
                                                        restriction, 
                                                        additionalRestriction);
         return createdFactory.createCreatedNotNullQuantifierTerm(services, 
-                                                          Op.EX, 
+                                                          Quantifier.EX, 
                                                           var, 
                                                           andTerm);
     }
