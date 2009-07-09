@@ -240,8 +240,8 @@ public class CvsRunner {
     
     private void initRep() throws CvsException {
        File rep = new File(REP_ROOT+File.separator+"CVSROOT");
-       File anchor = new File(PathConfig.KEY_CONFIG_DIR+File.separator+"CVS_ANCHOR_DIR"+
-                              File.separator+"KEY_CVS_ANCHOR");
+//       File anchor = new File(PathConfig.KEY_CONFIG_DIR+File.separator+"CVS_ANCHOR_DIR"+
+//                              File.separator+"KEY_CVS_ANCHOR");
                            
        try {
            if (!rep.exists()) {

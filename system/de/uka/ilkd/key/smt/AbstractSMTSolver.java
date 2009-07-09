@@ -303,7 +303,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		    "\t    Solution: Add the directory to your PATH environment variable." +
 		    "\n 2. we expect a different name than your executable " +
 		    "(prior to KeY 1.5 and later we expected 'Simplify' instead of 'simplify')" +
-		    "\n\t Solution: Change the name to " + (execCommand != null && execCommand.length > 0 ? 
+		    "\n\t Solution: Change the name to " + (execCommand.length > 0 ? 
 		        	execCommand[0] : "expected name") +
 		    "\n 3. you have not the permission to execute the decision procedure." +
 		    "\n\t Solution: *nix-like systems: try 'chmod u+x <path_to_executable>/<executable_filename>" +

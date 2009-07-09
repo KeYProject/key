@@ -22,12 +22,9 @@ public class Name {
 
     /** 
      * creates a name object 
-     * 
-     * 
      */
     public Name(String n) {
-        // .intern() is crucial for correct equals and performance
-	nameString = ((n==null) ? "_noname_" : n).intern(); 
+	nameString = (n==null ? "_noname_" : n.intern()); 
 	hashCode = nameString.hashCode();
     }
 

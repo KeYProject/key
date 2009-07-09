@@ -57,7 +57,7 @@ public class MetaJavaIntUnsignedShiftRight extends AbstractMetaOperator {
 	intArg2 = new
 	    BigInteger(convertToDecimalString(arg2, services));
 
-	Integer intResult = new Integer(intArg1.intValue() >>> intArg2.longValue());
+	Integer intResult = Integer.valueOf(intArg1.intValue() >>> intArg2.longValue());
 	
 	IntLiteral lit = new IntLiteral(intResult.toString());
 	return services.getTypeConverter().convertToLogicElement(lit);

@@ -677,7 +677,7 @@ public abstract class Notation {
 		return null;
 	    }
 
-	    return ("'" + new Character(charVal)).toString() + "'";
+	    return ("'" + Character.valueOf(charVal)).toString() + "'";
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {

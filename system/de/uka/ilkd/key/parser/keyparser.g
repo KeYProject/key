@@ -1419,7 +1419,7 @@ options {
         (message, getFilename(), getLine(), getColumn());
     }
 
-    class PairOfStringAndJavaBlock {
+    private static class PairOfStringAndJavaBlock {
       String opName;
       JavaBlock javaBlock;
     }
@@ -2381,12 +2381,12 @@ location_list returns [SetOfLocationDescriptor set = SetAsListOfLocationDescript
 location_descriptor returns [LocationDescriptor loc = null]
 {
 	ListOfQuantifiableVariable boundVars = null;
-	Term f = tf.createJunctorTerm(Op.TRUE);
+	Term f = tf.createJunctorTerm(Junctor.TRUE);
 	Term t;
 }
 :
    {
-		quantifiedArrayGuard = tf.createJunctorTerm(Op.TRUE);
+		quantifiedArrayGuard = tf.createJunctorTerm(Junctor.TRUE);
    }
    (
 	STAR {loc = EverythingLocationDescriptor.INSTANCE;}
@@ -2400,7 +2400,7 @@ location_descriptor returns [LocationDescriptor loc = null]
         	    boundVars = boundVars.tail();
              }
 	  }	  
-     	  quantifiedArrayGuard = tf.createJunctorTermAndSimplify(Op.AND, f, quantifiedArrayGuard);       
+     	  quantifiedArrayGuard = tf.createJunctorTermAndSimplify(Junctor.AND, f, quantifiedArrayGuard);       
 	  loc = new BasicLocationDescriptor(quantifiedArrayGuard, t);
 	}
       )
@@ -2417,7 +2417,7 @@ term20 returns [Term a = null]
 }
     :   a=term30 
         (EQV a1=term30 
-            { a = tf.createJunctorTerm(Op.EQV, new Term[]{a, a1});} )*
+            { a = tf.createJunctorTerm(Equality.EQV, new Term[]{a, a1});} )*
 ; exception
         catch [TermCreationException ex] {
               keh.reportException
@@ -2431,7 +2431,7 @@ term30 returns [Term a = null]
 }
     :   a=term40 
         (IMP a1=term30 
-            { a = tf.createJunctorTerm(Op.IMP, new Term[]{a, a1});} )?
+            { a = tf.createJunctorTerm(Junctor.IMP, new Term[]{a, a1});} )?
 ; exception
         catch [TermCreationException ex] {
               keh.reportException
@@ -2445,7 +2445,7 @@ term40 returns [Term a = null]
 }
     :   a=term50 
         (OR a1=term50 
-            { a = tf.createJunctorTerm(Op.OR, new Term[]{a, a1});} )*
+            { a = tf.createJunctorTerm(Junctor.OR, new Term[]{a, a1});} )*
 ; exception
         catch [TermCreationException ex] {
               keh.reportException
@@ -2459,7 +2459,7 @@ term50 returns [Term a = null]
 }
     :   a=term60 
         (AND a1=term60
-            { a = tf.createJunctorTerm(Op.AND, new Term[]{a, a1});} )*
+            { a = tf.createJunctorTerm(Junctor.AND, new Term[]{a, a1});} )*
 ; exception
         catch [TermCreationException ex] {
               keh.reportException
@@ -2481,7 +2481,7 @@ term60 returns [Term a = null]
 unary_formula returns [Term a = null] 
 { Term a1; }
     :  
-        NOT a1  = term60 { a = tf.createJunctorTerm(Op.NOT,new Term[]{a1}); }
+        NOT a1  = term60 { a = tf.createJunctorTerm(Junctor.NOT,new Term[]{a1}); }
     |	a = quantifierterm 
     |   a = modality_dl_term
 ; exception
@@ -2506,10 +2506,10 @@ term70 returns [Term a = null]
                     a1.sort() == Sort.FORMULA) {
                     String errorMessage = 
                     "The term equality \'=\'/\'!=\' is not "+
-                    "allowed between formulas.\n Please use \'" + Op.EQV +
-                    "\' in combination with \'" + Op.NOT + "\' instead.";
-                if (a.op() == Op.TRUE || a.op() == Op.FALSE ||
-                    a1.op() == Op.TRUE || a1.op() == Op.FALSE) {
+                    "allowed between formulas.\n Please use \'" + Equality.EQV +
+                    "\' in combination with \'" + Junctor.NOT + "\' instead.";
+                if (a.op() == Junctor.TRUE || a.op() == Junctor.FALSE ||
+                    a1.op() == Junctor.TRUE || a1.op() == Junctor.FALSE) {
                     errorMessage += 
                     " It seems as if you have mixed up the boolean " +
                     "constants \'TRUE\'/\'FALSE\' " +
@@ -2520,7 +2520,7 @@ term70 returns [Term a = null]
             a = tf.createEqualityTerm(a, a1);
 
             if (negated) {
-              a = tf.createJunctorTerm(Op.NOT, a);
+              a = tf.createJunctorTerm(Junctor.NOT, a);
             }
         })?
  ; exception
@@ -2930,8 +2930,8 @@ array_access_suffix [Term arrayReference] returns [Term result = arrayReference]
 		Function leq = (Function) functions().lookup(new Name("leq"));
 		Term fromTerm = tf.createFunctionTerm(leq, rangeFrom, indexTerm);
 		Term toTerm = tf.createFunctionTerm(leq, indexTerm, rangeTo);
-		Term guardTerm = tf.createJunctorTerm(Op.AND, fromTerm, toTerm);
-		quantifiedArrayGuard = tf.createJunctorTermAndSimplify(Op.AND, 
+		Term guardTerm = tf.createJunctorTerm(Junctor.AND, fromTerm, toTerm);
+		quantifiedArrayGuard = tf.createJunctorTermAndSimplify(Junctor.AND, 
 		   						  quantifiedArrayGuard, 
 		   						  guardTerm);
 		}
@@ -2953,8 +2953,8 @@ term130 returns [Term a = null]
         {isMetaOperator()}? a = specialTerm
     |   a = funcpredvarterm
     |   LPAREN a = term RPAREN 
-    |   "true"  { a = tf.createJunctorTerm(Op.TRUE); }
-    |   "false" { a = tf.createJunctorTerm(Op.FALSE); }
+    |   "true"  { a = tf.createJunctorTerm(Junctor.TRUE); }
+    |   "false" { a = tf.createJunctorTerm(Junctor.FALSE); }
     |   a = ifThenElseTerm
     |   a = ifExThenElseTerm
     |   a = sum_or_product_term
@@ -3530,11 +3530,6 @@ specialTerm returns [Term result = null]
 {
     Operator vf = null;
 }:
-        vf = expr_op 
-            {   
-                result = tf.createFunctionTerm((Function)vf, AN_ARRAY_OF_TERMS);
-            }                 
-     | 
      {isTacletParser() || isProblemParser()}?
        result = metaTerm
    ; exception
@@ -3553,56 +3548,6 @@ arith_op returns [String op = null]
   | PLUS { op = "+";}
 ;
 
-expr_op returns [Operator v = null] 
-{
-    ParsableVariable left_var0 = null;
-    ParsableVariable right_var0 = null;
-    ParsableVariable unary_var0 = null;
-    String op_str = null;
-}   
-    :
-
-        IN_TYPE LPAREN (
-	    (left_var0=varId (op_str = arith_op right_var0 = varId)?)
-	  |
-            ( MINUS unary_var0 = varId) 
-        ) RPAREN
-        {  
-            if (unary_var0!=null) {
-                // can only be unary minus
-                ProgramSV unary_var = (ProgramSV) unary_var0;
-                Sort type = de.uka.ilkd.key.logic.sort.Sort.FORMULA;
-                return new InTypeOperator
-                    (type, new de.uka.ilkd.key.java.expression.operator.Negative(unary_var));
-            }
-            else {
-                ProgramSV left_var = (ProgramSV) left_var0;
-                Sort type = de.uka.ilkd.key.logic.sort.Sort.FORMULA;
-                if (right_var0 != null) {
-                    ProgramSV right_var = (ProgramSV) right_var0;
-                    if ("+".equals(op_str)) {
-                        return new InTypeOperator
-                            (type, new de.uka.ilkd.key.java.expression.operator.Plus(left_var, right_var));
-                    } else if ("-".equals(op_str)) {
-                        return new InTypeOperator
-                            (type, new de.uka.ilkd.key.java.expression.operator.Minus(left_var, right_var));
-                    } else if ("*".equals(op_str)) {
-                        return new InTypeOperator
-                            (type, new de.uka.ilkd.key.java.expression.operator.Times(left_var, right_var));
-                    } else if ("/".equals(op_str)) {
-                        return new InTypeOperator
-                            (type, new de.uka.ilkd.key.java.expression.operator.Divide(left_var, right_var));
-                    } else if ("%".equals(op_str)) {
-                        return new InTypeOperator
-                            (type, new de.uka.ilkd.key.java.expression.operator.Modulo(left_var, right_var));
-                    } 
-                }
-                else {
-                    return new InTypeOperator(type, left_var);
-                }
-            }
-        }
-    ;
 
 varId returns [ParsableVariable v = null]
     :

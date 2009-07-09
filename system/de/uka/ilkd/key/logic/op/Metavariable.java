@@ -56,6 +56,7 @@ public class Metavariable extends TermSymbol
 	return name()+":"+sort();
     }
 
+    @Override
     public int compareTo ( Metavariable p_mr ) {
 	if ( p_mr == this )
 	    return 0;
@@ -74,6 +75,21 @@ public class Metavariable extends TermSymbol
 	    return serial < p_mr.serial ? -1 : 1;
 	return t;
     }
+    
+    @Override
+    public boolean equals(Object o) {
+	if(! (o instanceof Metavariable)) {
+	    return false;
+	}
+	return compareTo((Metavariable)o) == 0;
+    }
+    
+    
+    @Override
+    public int hashCode() {
+	return name().hashCode();
+    }
+    
     
     /**
      * @return Returns the isTemporaryVariable.

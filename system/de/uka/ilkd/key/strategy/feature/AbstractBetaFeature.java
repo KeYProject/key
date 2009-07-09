@@ -306,10 +306,10 @@ public abstract class AbstractBetaFeature implements Feature {
      */
     private static class TermInfo {
 
-        public static final Integer CAND_NEVER = new Integer ( 0 );
-        public static final Integer CAND_LEFT  = new Integer ( 1 );
-        public static final Integer CAND_RIGHT = new Integer ( 2 );
-        public static final Integer CAND_BOTH  = new Integer ( 3 );
+        public static final Integer CAND_NEVER = Integer.valueOf ( 0 );
+        public static final Integer CAND_LEFT  = Integer.valueOf ( 1 );
+        public static final Integer CAND_RIGHT = Integer.valueOf ( 2 );
+        public static final Integer CAND_BOTH  = Integer.valueOf ( 3 );
 
         /** formula is positive (not negated) */
         public int                  maxPosPath_positive;

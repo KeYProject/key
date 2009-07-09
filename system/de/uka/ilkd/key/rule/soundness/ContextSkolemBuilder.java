@@ -308,7 +308,7 @@ public class ContextSkolemBuilder extends AbstractSkolemBuilder {
      * this means that the old frame is made a direct subtree of the new frame  
      */
     private void up ( int p ) {
-	final Integer t = new Integer ( p );
+	final Integer t = Integer.valueOf ( p );
 	insertionPoint = insertionPoint.prepend ( t );
     }
 

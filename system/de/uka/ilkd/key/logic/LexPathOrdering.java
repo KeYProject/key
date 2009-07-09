@@ -214,7 +214,7 @@ public class LexPathOrdering implements TermOrdering {
     private int getSortDepth(Sort s) {
         Integer res = (Integer)sortDepthCache.get ( s );
         if ( res == null ) {
-            res = new Integer ( getSortDepthHelp ( s ) );
+            res = Integer.valueOf ( getSortDepthHelp ( s ) );
             sortDepthCache.put ( s, res );
         }
         return res.intValue ();
@@ -297,22 +297,22 @@ public class LexPathOrdering implements TermOrdering {
             final String opStr = p_op.name ().toString ();
 
             if ( intFunctionNames.contains ( opStr ) )
-                return new Integer ( 0 );
+                return Integer.valueOf ( 0 );
 
-            if ( opStr.equals ( "neg" ) ) return new Integer ( 1 );
+            if ( opStr.equals ( "neg" ) ) return Integer.valueOf ( 1 );
             if ( p_op.name ().equals ( AbstractIntegerLDT.CHAR_ID_NAME ) )
-                return new Integer ( 1 );
+                return Integer.valueOf ( 1 );
             if ( p_op instanceof Function
                  && ( (Function)p_op ).sort () == Sort.NULL )
                 return new Integer ( 2 );
             if ( p_op instanceof Function
-                 && ( opStr.equals ( "TRUE" ) | opStr.equals ( "FALSE" ) ) )
+                 && ( opStr.equals ( "TRUE" ) || opStr.equals ( "FALSE" ) ) )
                 return new Integer ( 3 );
 
-            if ( opStr.equals ( "add" ) ) return new Integer ( 6 );
-            if ( opStr.equals ( "mul" ) ) return new Integer ( 7 );
-            if ( opStr.equals ( "div" ) ) return new Integer ( 8 );
-            if ( opStr.equals ( "jdiv" ) ) return new Integer ( 9 );
+            if ( opStr.equals ( "add" ) ) return Integer.valueOf ( 6 );
+            if ( opStr.equals ( "mul" ) ) return Integer.valueOf ( 7 );
+            if ( opStr.equals ( "div" ) ) return Integer.valueOf ( 8 );
+            if ( opStr.equals ( "jdiv" ) ) return Integer.valueOf ( 9 );
 
             return null;
         }
@@ -326,8 +326,8 @@ public class LexPathOrdering implements TermOrdering {
         protected Integer getWeight(Operator p_op) {
             final String opStr = p_op.name ().toString ();
 
-            if ( opStr.endsWith ( "::<get>" ) ) return new Integer ( 10 );
-            if ( opStr.endsWith ( "<nextToCreate>" ) ) return new Integer ( 20 );
+            if ( opStr.endsWith ( "::<get>" ) ) return Integer.valueOf ( 10 );
+            if ( opStr.endsWith ( "<nextToCreate>" ) ) return Integer.valueOf ( 20 );
 
 /*            if ( p_op instanceof SortDependingSymbol ) return new Integer ( 10 );
 

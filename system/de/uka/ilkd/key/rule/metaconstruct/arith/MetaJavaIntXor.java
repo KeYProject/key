@@ -57,7 +57,7 @@ public class MetaJavaIntXor extends AbstractMetaOperator {
 	intArg2 = new
 	    BigInteger(convertToDecimalString(arg2, services));
 
-	Integer intResult = new Integer(intArg1.intValue() ^ intArg2.intValue());
+	Integer intResult = Integer.valueOf(intArg1.intValue() ^ intArg2.intValue());
 	
 	IntLiteral lit = new IntLiteral(intResult.toString());
 	return services.getTypeConverter().convertToLogicElement(lit);

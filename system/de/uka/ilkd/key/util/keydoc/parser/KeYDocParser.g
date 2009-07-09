@@ -17,8 +17,6 @@ options { k=1; buildAST=true; importVocab= KeYDocLexer; exportVocab= KeYDocParse
     // - STAR and WS should be ignored in newline situations
     
     boolean first= true; // true if this is the first line of text
-    boolean text= false; // true if there has been text yet.
-                         // Only if there has been any text yet, first will be set to false by newline.
     public int firstLength=0; // How long is the first line of Text?
     public StringBuffer htmlText= new StringBuffer();
 
@@ -57,7 +55,7 @@ normaltext {String temp=null;}:
                 MT {htmlText.append(">"); } |
                 RIGHTBRACKET {htmlText.append("}"); } |
                 LEFTBRACKET {htmlText.append("{"); } ) {nl=false;}
-            )  {text=true;} |
+            )  |
             
             NEWLINE! {nl= true;  htmlText.append("<br>"); } 
             ;

@@ -25,7 +25,6 @@ import javax.swing.text.Highlighter.HighlightPainter;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.MethodCallInfo;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
@@ -49,11 +48,6 @@ public class NonGoalInfoView extends JTextArea {
     private ConfigChangeListener configChangeListener = new ConfigChangeAdapter(this);
     
     public NonGoalInfoView (Node node, KeYMediator mediator) {
-        if(MethodCallInfo.MethodCallCounterOn){
-            MethodCallInfo.Global.incForClass(this.getClass().toString(), MethodCallInfo.constructor);
-            MethodCallInfo.Local.incForClass(this.getClass().toString(), MethodCallInfo.constructor);
-        }
-
 	filter = new ConstraintSequentPrintFilter 
 	    ( node.sequent (), 
 	      mediator.getUserConstraint ().getConstraint () );
@@ -127,9 +121,6 @@ public class NonGoalInfoView extends JTextArea {
     public void removeNotify(){
         super.removeNotify();
         unregisterListener();
-        if(MethodCallInfo.MethodCallCounterOn){
-            MethodCallInfo.Local.incForClass(this.getClass().toString(), "removeNotify()");
-        }
     }
 
     public void unregisterListener(){
@@ -141,10 +132,6 @@ public class NonGoalInfoView extends JTextArea {
     protected void finalize(){
         try{
             unregisterListener();
-            if(MethodCallInfo.MethodCallCounterOn){
-                MethodCallInfo.Global.incForClass(this.getClass().toString(), MethodCallInfo.finalize);
-                MethodCallInfo.Local.incForClass(this.getClass().toString(), MethodCallInfo.finalize);
-            }
         } catch (Throwable e) {
             Main.getInstance().notify(new GeneralFailureEvent(e.getMessage()));
         }finally{

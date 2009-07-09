@@ -57,7 +57,7 @@ public class MetaJavaLongXor extends AbstractMetaOperator {
 	intArg2 = new
 	    BigInteger(convertToDecimalString(arg2, services));
 
-	Long longResult = new Long(intArg1.longValue() ^ intArg2.longValue());
+	Long longResult = Long.valueOf(intArg1.longValue() ^ intArg2.longValue());
 	
 	IntLiteral lit = new IntLiteral(longResult.toString());
 	return services.getTypeConverter().convertToLogicElement(lit);

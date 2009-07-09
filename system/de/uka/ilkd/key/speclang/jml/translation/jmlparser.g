@@ -335,10 +335,10 @@ options {
     }
     
     private Term lowerBound(Term a, LogicVariable lv){
-        if(a.arity()>0 && a.sub(0).op()==Op.AND){
+        if(a.arity()>0 && a.sub(0).op()==Junctor.AND){
             a=a.sub(0);
         }
-        if(a.arity()==2 && a.op()==Op.AND && a.sub(0).arity()==2 && a.sub(0).sub(1).op()==lv
+        if(a.arity()==2 && a.op()==Junctor.AND && a.sub(0).arity()==2 && a.sub(0).sub(1).op()==lv
                 && a.sub(0).op().equals(services.getTypeConverter().getIntegerLDT().getLessOrEquals())){
             return a.sub(0).sub(0);
         }
@@ -346,10 +346,10 @@ options {
     }
    
     private Term upperBound(Term a, LogicVariable lv){
-        if(a.arity()>0 && a.sub(0).op()==Op.AND){
+        if(a.arity()>0 && a.sub(0).op()==Junctor.AND){
             a=a.sub(0);
         }   
-        if(a.arity()==2 && a.op()==Op.AND && a.sub(1).arity()==2 && a.sub(1).sub(0).op()==lv
+        if(a.arity()==2 && a.op()==Junctor.AND && a.sub(1).arity()==2 && a.sub(1).sub(0).op()==lv
                 && a.sub(1).op().equals(services.getTypeConverter().getIntegerLDT().getLessThan())){
             return a.sub(1).sub(1);
         }
@@ -1966,7 +1966,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	    else if (q.getText().equals("\\num_of")) {
             LogicVariable lv = declVars.head();
             p=p.sub(0);
-            if(p!=null && isBoundedSum(p, lv) && p.sub(0).op()!=Op.AND){
+            if(p!=null && isBoundedSum(p, lv) && p.sub(0).op()!=Junctor.AND){
                 result = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(Op.BSUM, 
                         lowerBound(p, lv), upperBound(p, lv), TB.ife(
                                 t, TB.zTerm(services, "1"), TB.zTerm(services, "0")),
@@ -1982,7 +1982,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
             LogicVariable lv = declVars.head();
             p=p.sub(0);
             if(isBoundedSum(p, lv)){
-                if(p.arity()>0 && p.sub(0).op()==Op.AND){
+                if(p.arity()>0 && p.sub(0).op()==Junctor.AND){
                     t = TB.ife(p.sub(1), t, TB.zTerm(services, "0"));
                 }
                 result = TermFactory.DEFAULT.createBoundedNumericalQuantifierTerm(Op.BSUM, 

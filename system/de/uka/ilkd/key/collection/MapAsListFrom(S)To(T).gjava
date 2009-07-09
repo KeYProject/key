@@ -344,6 +344,9 @@ public class MapAsListFrom<S>To<T> implements MapFrom<S>To<T> {
 	 * value 
 	 */ 
 	public boolean equals(Object obj) {
+	    if(! (obj instanceof EntryOf<S>And<T>)) {
+	        return false;
+	    }
 	    final EntryOf<S>And<T> cmp = (EntryOf<S>And<T>) obj; 
 	    final <S> cmpKey = cmp.key(); 
 	    final <T> cmpVal = cmp.value(); 

@@ -157,7 +157,7 @@ public class SetAsListOf<T> implements SetOf<T> {
 		h += p.next().hashCode();
 	    }
 
-	    hashCode = new Integer (h);
+	    hashCode = Integer.valueOf (h);
 	}
 
 	return hashCode.intValue ();

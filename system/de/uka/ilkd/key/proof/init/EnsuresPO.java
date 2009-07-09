@@ -326,7 +326,7 @@ public abstract class EnsuresPO extends AbstractPO {
         //prepare variables, program method and container for @pre-functions
         ListOfProgramVariable paramVars = buildParamVars(programMethod);
         ProgramVariable selfVar = null;
-        if(programMethod != null && !programMethod.isStatic()) {
+        if(!programMethod.isStatic()) {
             selfVar = buildSelfVarAsProgVar();
         }
         ProgramVariable resultVar = buildResultVar(programMethod);

@@ -679,7 +679,7 @@ public class StrategySelectionView extends JPanel {
     }
 
 
-    private final MaxRuleAppSlider maxSlider = new MaxRuleAppSlider(mediator);
+    private final MaxRuleAppSlider maxSlider = new MaxRuleAppSlider(null);
     
     
     private final class JavaDLOptionListener implements PropertyChangeListener, 
@@ -706,7 +706,7 @@ public class StrategySelectionView extends JPanel {
     class TimeoutSpinner extends JSpinner {        
         public TimeoutSpinner() {
             super(new SpinnerNumberModel
-                    (new Long(-1), new Long(-1), new Long(Long.MAX_VALUE), new Long(1))); 
+                    (Long.valueOf(-1), Long.valueOf(-1), Long.valueOf(Long.MAX_VALUE), Long.valueOf(1))); 
             if (this.getEditor() instanceof JSpinner.DefaultEditor) {
                 JFormattedTextField ftf = ((JSpinner.DefaultEditor)this.getEditor()).getTextField();
                 if (ftf != null) {
@@ -717,7 +717,7 @@ public class StrategySelectionView extends JPanel {
         }
         
         public void refresh() {
-            setValue(new Long(mediator.getAutomaticApplicationTimeout()));
+            setValue(Long.valueOf(mediator.getAutomaticApplicationTimeout()));
         }    
     }
 
@@ -841,9 +841,9 @@ public class StrategySelectionView extends JPanel {
                     return s.create(proof, properties);
                 }
             }
-        }
-        System.err.println("Selected Strategy '" + strategyName + "' not found falling back to "+ 
+            System.err.println("Selected Strategy '" + strategyName + "' not found falling back to "+ 
                 mediator.getProfile().getDefaultStrategyFactory().name());
+        }
         return mediator.getProfile().getDefaultStrategyFactory().create(proof, properties);
     }
   

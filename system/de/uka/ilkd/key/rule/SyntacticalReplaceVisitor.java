@@ -25,8 +25,6 @@ import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
@@ -460,12 +458,8 @@ public class SyntacticalReplaceVisitor extends Visitor {
             	    throw new IllegalInstantiationException("Could not force instantiation with metavariable");
             	}
                 // then we are done ...
-        } else if ((visitedOp instanceof Metavariable)
-                && metavariableInst.getInstantiation((Metavariable) visitedOp) != visitedOp) {
-            pushNew(metavariableInst.getInstantiation((Metavariable) visitedOp));
-        } else if (visitedOp instanceof ExpressionOperator) {
-            ExpressionOperator exprOp = (ExpressionOperator) visitedOp;
-            pushNew(exprOp.resolveExpression(svInst, getServices()));
+        } else if (visitedOp instanceof Metavariable) {
+            assert false;
         } else {
            
             Operator newOp = instantiateOperator(visitedOp);

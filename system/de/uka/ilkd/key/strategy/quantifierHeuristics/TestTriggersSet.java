@@ -26,9 +26,6 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.TacletForTests;
-import de.uka.ilkd.key.rule.UpdateSimplifier;
-import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPairImpl;
-import de.uka.ilkd.key.rule.updatesimplifier.Update;
 
 
 //most Code are copyed from Logic.TestUpdateFactory
@@ -36,9 +33,6 @@ import de.uka.ilkd.key.rule.updatesimplifier.Update;
 public class TestTriggersSet extends TestCase {
 
 	private Proof proof;
-
-	private TermFactory tf = TermFactory.DEFAULT;
-	private TermBuilder tb = TermBuilder.DF;
     
 	private Namespace variables = new Namespace();
 

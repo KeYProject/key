@@ -61,7 +61,7 @@ public class OCLSpecExtractor implements SpecExtractor {
             if(restString.startsWith("*")) {
                 restString = restString.substring(1).trim();
             }
-            if(restString.startsWith("@") | restString.startsWith("/")) {
+            if(restString.startsWith("@") || restString.startsWith("/")) {
                 return startString;
             } else {
                 return startString.concat(" " + shorten(restString));

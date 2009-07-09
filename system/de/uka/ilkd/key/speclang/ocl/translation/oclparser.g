@@ -596,7 +596,7 @@ additiveExpression returns [OCLExpression result=null] throws SLTranslationExcep
 	    (
 	        PLUS a=multiplicativeExpression
 	        {
-           		if (!result.isTerm() | !a.isTerm()) {
+           		if (!result.isTerm() || !a.isTerm()) {
 	       			raiseError("Wrong expression in additive expression. One of the summands is not a term.");
 	       		}
 	        		
@@ -608,7 +608,7 @@ additiveExpression returns [OCLExpression result=null] throws SLTranslationExcep
 
 	        MINUS a=multiplicativeExpression
 	        {
-        		if (!result.isTerm() | !a.isTerm()) {
+        		if (!result.isTerm() || !a.isTerm()) {
         			raiseError("Wrong expression in subtractive expression. One of the summands is not a term.");
         		}
 	        		
@@ -629,7 +629,7 @@ multiplicativeExpression returns [OCLExpression result=null] throws SLTranslatio
 	    ( 
 	        MULT a=unaryExpression
 	        {
-        		if (!result.isTerm() | !a.isTerm()) {
+        		if (!result.isTerm() || !a.isTerm()) {
         			raiseError("Wrong expression in multiplicative expression. One of the factors is not a term.");
         		}
         		
@@ -989,8 +989,8 @@ timeExpression
 
 
 logicalOperator returns [Junctor result=null] throws SLTranslationException
-	: 	AND     { result=Op.AND; }
-  	| 	OR      { result=Op.OR; }
+	: 	AND     { result=Junctor.AND; }
+  	| 	OR      { result=Junctor.OR; }
   	;
 
 

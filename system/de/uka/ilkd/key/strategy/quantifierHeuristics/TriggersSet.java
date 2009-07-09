@@ -367,28 +367,6 @@ class TriggersSet {
             }
         }
 
-        /**
-         * add a uni-trigger to triggers set or add an element of
-         * multi-triggers for this clause
-         * @return <code>true</code> if a uni-trigger was added
-         */
-        private boolean addMultiTrigger(Term term, Services services) {
-            if (!isAcceptableTrigger(term, services)) {
-                return false;
-            }
-            final boolean isUnify = !term.freeVars().subset(selfUQVS);
-            final boolean isElement = !selfUQVS.subset(term.freeVars());
-            final SetOfQuantifiableVariable uniVarsInTerm =
-                    TriggerUtils.intersect(term.freeVars(), selfUQVS);
-            Trigger t = createUniTrigger(term, uniVarsInTerm, isUnify, isElement);
-            if (isElement) {
-                elementsOfMultiTrigger = elementsOfMultiTrigger.add(t);
-                return false;
-            } else {
-                allTriggers = allTriggers.add(t);
-                return true;
-            }
-        }
 
         /**
          * find all possible combination of <code>ts</code>. Once a

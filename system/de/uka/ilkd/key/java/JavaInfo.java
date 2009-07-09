@@ -41,7 +41,7 @@ import de.uka.ilkd.key.util.LRUCache;
 public class JavaInfo {
 
 
-    public class CacheKey {
+    public static class CacheKey {
         Object o1;
         Object o2;
         

@@ -215,7 +215,7 @@ public class LibrariesConfiguration extends JDialog {
 	
     }
 
-    class LibrariesTableModel extends AbstractTableModel {
+    private static class LibrariesTableModel extends AbstractTableModel {
         private String[] columnNames = {"Library Name","Active"};
         
          String libraries[];
@@ -320,7 +320,7 @@ public class LibrariesConfiguration extends JDialog {
     
    
     
-    public class LibCellRenderer extends DefaultTableCellRenderer {
+    public static class LibCellRenderer extends DefaultTableCellRenderer {
         
         public String getFileName(String path){
             if (!path.startsWith(File.separator))

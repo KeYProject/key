@@ -219,10 +219,7 @@ public class TacletPrefixBuilder {
 	return prefixMap;
     }
     
-    class InvalidPrefixException extends IllegalStateException {
-        /**
-         * 
-         */
+    static class InvalidPrefixException extends IllegalStateException {
         private static final long serialVersionUID = 5855187579027274363L;
         
         InvalidPrefixException(String tacletName, 

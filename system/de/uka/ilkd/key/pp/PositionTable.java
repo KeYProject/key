@@ -111,7 +111,7 @@ public class PositionTable {
 	    return SLListOfInteger.EMPTY_LIST;
 	} else {
 	    return child[sub].pathForIndex(index-startPos[sub])
-		.prepend(new Integer(sub));
+		.prepend(Integer.valueOf(sub));
 	}
     }
 

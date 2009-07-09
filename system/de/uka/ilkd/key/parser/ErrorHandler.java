@@ -28,7 +28,7 @@ public class ErrorHandler {
     private int warnings=0;
 
     /** maximal allowed amount of errors */
-    private final int maxErrors=5;
+    private static final int MAX_ERRORS=5;
 
     /** create new errorhandler */
     public ErrorHandler() {
@@ -39,7 +39,7 @@ public class ErrorHandler {
      * @param ex the Exception thrown by the de.uka.ilkd.prins.parser
      */
     public void reportError(Exception ex) {
-	if (errors<maxErrors) { // more errors occured than allowed	
+	if (errors<MAX_ERRORS) { // more errors occured than allowed	
 	    errors++;
 	    errorStack.push(ex);
 	}
