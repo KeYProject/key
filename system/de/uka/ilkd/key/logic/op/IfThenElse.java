@@ -15,6 +15,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.logic.ArrayOfTerm;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.IteratorOfSort;
@@ -62,9 +63,9 @@ public class IfThenElse extends AbstractOperator {
                && ( s1 == Sort.FORMULA ) == ( s2 == Sort.FORMULA );
     }
 
-    public Sort sort (Term[] term) {
-        final Sort s2 = term[1].sort ();
-        final Sort s3 = term[2].sort ();
+    public Sort sort (ArrayOfTerm terms) {
+        final Sort s2 = terms.getTerm(1).sort ();
+        final Sort s3 = terms.getTerm(2).sort ();
         if (s2 instanceof ProgramSVSort
              || s2 == AbstractMetaOperator.METASORT )
             { return s3; }

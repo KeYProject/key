@@ -11,6 +11,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.logic.ArrayOfTerm;
 import de.uka.ilkd.key.logic.ClashFreeSubst;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -48,9 +49,9 @@ public abstract class SubstOp extends AbstractOperator {
      * @return sort of the second subterm or throws an
      * IllegalArgumentException if the given term has no correct (2=) arity
      */
-    public Sort sort(Term[] term) {
-	if (term.length==2)
-	    return term[1].sort();
+    public Sort sort(ArrayOfTerm terms) {
+	if (terms.size()==2)
+	    return terms.getTerm(1).sort();
 	else throw new IllegalArgumentException("Cannot determine sort of "+
 						"invalid term (Wrong arity).");
     }

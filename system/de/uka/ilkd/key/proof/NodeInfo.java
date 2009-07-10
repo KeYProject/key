@@ -75,7 +75,7 @@ public class NodeInfo {
             PosTacletApp pta = (PosTacletApp) ruleApp;
             if (!isSymbolicExecution(pta.taclet())) return;
             Term t = pta.posInOccurrence().subTerm();
-            final ProgramElement pe = t.executableJavaBlock().program();
+            final ProgramElement pe = t.javaBlock().program();
             if (pe != null) {
                 firstStatement = pe.getFirstElement();
                 firstStatementString = null;

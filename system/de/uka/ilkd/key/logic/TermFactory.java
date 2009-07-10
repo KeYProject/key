@@ -125,7 +125,7 @@ public class TermFactory {
      * CARE! THERE IS NO CHECK THAT THE EQUALITY OPERATOR MATCHES THE TERMS.
      */
     public Term createEqualityTerm(Equality op, Term[] subTerms) {	
-        return OpTerm.createOpTerm(op, subTerms).checked();
+        return new TermImpl(op, subTerms).checked();
     }
 
     /**
@@ -204,7 +204,7 @@ public class TermFactory {
 	if (op==null) throw new IllegalArgumentException("null-Operator at"+
 							 "TermFactory");
 	
-	return OpTerm.createOpTerm(op, subTerms).checked();
+	return new TermImpl(op, subTerms).checked();
     }
 
 
@@ -226,8 +226,11 @@ public class TermFactory {
     public Term createFunctionWithBoundVarsTerm(Operator op,
 						Term[] subTerms,
 						ArrayOfQuantifiableVariable[] boundVars) {
-	if (boundVars != null) {
-	   return new BoundVarsTerm(op, subTerms, boundVars).checked(); 
+	if (boundVars != null && boundVars.length > 0) {
+	   return new TermImpl(op, 
+		   	       new ArrayOfTerm(subTerms), 
+		   	       JavaBlock.EMPTY_JAVABLOCK, 
+		   	       boundVars[0]).checked(); 
 	} else {
 	    return createFunctionTerm(op, subTerms);
 	}
@@ -238,7 +241,7 @@ public class TermFactory {
      * Create an 'if-then-else' term (or formula)
      */
     public Term createIfThenElseTerm(Term condF, Term thenT, Term elseT) {
-        return OpTerm.createOpTerm(IfThenElse.IF_THEN_ELSE, new Term [] { condF, thenT, elseT });
+        return new TermImpl(IfThenElse.IF_THEN_ELSE, new Term [] { condF, thenT, elseT });
     }
     
 
@@ -247,9 +250,12 @@ public class TermFactory {
      */
     public Term createIfExThenElseTerm(ArrayOfQuantifiableVariable exVars,
                                        Term condF, Term thenT, Term elseT) {
-        return new IfExThenElseTerm ( IfExThenElse.IF_EX_THEN_ELSE,
-                                      new Term [] { condF, thenT, elseT },
-                                      exVars ).checked();
+        return new TermImpl ( IfExThenElse.IF_EX_THEN_ELSE,
+                               new ArrayOfTerm( new Term [] { condF, thenT, elseT }),
+                               JavaBlock.EMPTY_JAVABLOCK,
+                               new ArrayOfQuantifiableVariable[]{exVars,
+                                                                 exVars,
+                                                                 new ArrayOfQuantifiableVariable()} ).checked();
     }
     
 
@@ -298,7 +304,7 @@ public class TermFactory {
     public Term createJunctorTerm(Junctor op, Term[] subTerms) {
 	if (op==null) throw new IllegalArgumentException("null-Operator at"+
 							 "TermFactory");
-	return OpTerm.createOpTerm(op, subTerms).checked();
+	return new TermImpl(op, subTerms).checked();
     }
     
     /** some methods for the creation of junctor terms with automatically performed simplification
@@ -375,20 +381,26 @@ public class TermFactory {
     public Term createMetaTerm(MetaOperator op, Term[] subTerms) {
 	if (op==null) throw new IllegalArgumentException("null-Operator at"+
 							 "TermFactory");    	
-	return OpTerm.createOpTerm(op, subTerms).checked();
+	return new TermImpl(op, subTerms).checked();
     }
 
     public Term createProgramTerm(Operator op, 
             JavaBlock javaBlock, 
             Term subTerm) {
-	return new ProgramTerm(op, javaBlock, subTerm).checked();
+	return new TermImpl(op, 
+			    new ArrayOfTerm(subTerm), 
+			    javaBlock, 
+			    new ArrayOfQuantifiableVariable()).checked();
     }
 
 
     public Term createProgramTerm(Operator op, 
             JavaBlock javaBlock, 
             Term[] subTerms) {
-	return new ProgramTerm(op, javaBlock, subTerms).checked();
+	return new TermImpl(op, 
+		            new ArrayOfTerm(subTerms), 
+		            javaBlock, 
+		            new ArrayOfQuantifiableVariable()).checked();
     }
 
 
@@ -406,8 +418,10 @@ public class TermFactory {
 				     ArrayOfQuantifiableVariable varsBoundHere, 
 				     Term subTerm) {
 	if (varsBoundHere.size()<=1) {
-	    return new QuantifierTerm(quant, varsBoundHere, 
-	            subTerm).checked();
+	    return new TermImpl(quant, 
+		    		new ArrayOfTerm(subTerm),
+		    		JavaBlock.EMPTY_JAVABLOCK,
+		    		varsBoundHere).checked();
 	} else {
 	    Term qt = subTerm;
 	    for (int i=varsBoundHere.size()-1; i>=0; i--) {
@@ -460,8 +474,12 @@ public class TermFactory {
     public Term createSubstitutionTerm
 	(SubstOp op, QuantifiableVariable substVar, 
 	 Term substTerm, Term origTerm) {
-	return new SubstitutionTerm
-	    (op, substVar, new Term[]{substTerm, origTerm}).checked();
+	return new TermImpl
+	    (op, 
+	     new ArrayOfTerm(new Term[]{substTerm, origTerm}), 
+	     JavaBlock.EMPTY_JAVABLOCK, 
+	     new ArrayOfQuantifiableVariable[]{new ArrayOfQuantifiableVariable(), 
+		                               new ArrayOfQuantifiableVariable(substVar)}).checked();
     }
     
 
@@ -473,7 +491,12 @@ public class TermFactory {
       */
     public Term createSubstitutionTerm(SubstOp op,
             QuantifiableVariable substVar, Term[] subs) {
-	return new SubstitutionTerm(op, substVar, subs).checked();
+	return new TermImpl
+	    (op, 
+             new ArrayOfTerm(subs), 
+             JavaBlock.EMPTY_JAVABLOCK, 
+             new ArrayOfQuantifiableVariable[]{new ArrayOfQuantifiableVariable(), 
+		                               new ArrayOfQuantifiableVariable(substVar)}).checked();
     }
 
 
@@ -670,7 +693,8 @@ public class TermFactory {
                          ArrayOfQuantifiableVariable[] boundVarsPerSub) {
         final ArrayOfQuantifiableVariable[] boundVars =
             op.toBoundVarsPerAssignment ( boundVarsPerSub, subs );
-        return new QuanUpdateTerm ( op, subs, boundVars ).checked ();
+        
+        return new TermImpl ( op, new ArrayOfTerm(subs), JavaBlock.EMPTY_JAVABLOCK, boundVars ).checked ();
     }
 
     /**
@@ -684,7 +708,7 @@ public class TermFactory {
          Term[] subs,
          ArrayOfQuantifiableVariable[] boundVars) {
         
-        return new QuanUpdateTerm ( op, subs, boundVars ).checked ();
+        return new TermImpl ( op, new ArrayOfTerm(subs), JavaBlock.EMPTY_JAVABLOCK, boundVars ).checked ();
     }
 
     /**
@@ -737,12 +761,17 @@ public class TermFactory {
 
     public Term createNumericalQuantifierTerm(NumericalQuantifier op, 
             Term cond, Term t, ArrayOfQuantifiableVariable va){
-        return new NumericalQuantifierTerm(op, new Term[]{cond, t}, va).checked();
+        return new TermImpl(op, new ArrayOfTerm(new Term[]{cond, t}), JavaBlock.EMPTY_JAVABLOCK, va).checked();
     }
     
     public Term createBoundedNumericalQuantifierTerm(BoundedNumericalQuantifier op, 
             Term a, Term b, Term t, ArrayOfQuantifiableVariable va){
-        return new BoundedNumericalQuantifierTerm(op, new Term[]{a, b, t}, va).checked();
+        return new TermImpl(op, 
+        		    new ArrayOfTerm(new Term[]{a, b, t}), 
+        		    JavaBlock.EMPTY_JAVABLOCK, 
+        		    new ArrayOfQuantifiableVariable[]{new ArrayOfQuantifiableVariable(),
+            						      new ArrayOfQuantifiableVariable(),
+            						      va}).checked();
     } 
 
     /** 
@@ -752,7 +781,7 @@ public class TermFactory {
     public Term createVariableTerm(LogicVariable v) {
         Term varTerm = cache.get(v);
         if (varTerm == null) {
-            varTerm = OpTerm.createConstantOpTerm(v).checked();
+            varTerm = new TermImpl(v).checked();
             cache.put(v, varTerm);
         }
         return varTerm;
@@ -766,7 +795,7 @@ public class TermFactory {
     public Term createVariableTerm(ProgramVariable v) {
         Term varTerm = cache.get(v);
         if (varTerm == null) {
-            varTerm = OpTerm.createConstantOpTerm(v).checked();
+            varTerm = new TermImpl(v).checked();
             cache.put(v, varTerm);
         }
         return varTerm;
@@ -780,7 +809,7 @@ public class TermFactory {
     public Term createVariableTerm(SchemaVariable v) {
         Term varTerm = cache.get(v);
         if (varTerm == null) {
-            varTerm = OpTerm.createConstantOpTerm(v).checked();
+            varTerm = new TermImpl(v).checked();
             cache.put(v, varTerm);
         } 
         return varTerm;

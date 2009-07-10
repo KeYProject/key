@@ -9,6 +9,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.logic.ArrayOfTerm;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.ArrayOfSort;
@@ -41,9 +42,9 @@ public abstract class AbstractSortedOperator extends AbstractOperator
 	this(name, new ArrayOfSort(argSorts), sort);
     }
     
-    
+
     @Override
-    public final Sort sort(Term[] terms) {
+    public final Sort sort(ArrayOfTerm terms) {
 	return sort;
     }
     

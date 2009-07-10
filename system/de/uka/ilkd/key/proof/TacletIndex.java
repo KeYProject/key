@@ -705,7 +705,7 @@ public class TacletIndex  {
 	 * given Term assumed the top level operator correspnds to this
 	 * operator.
 	 */
-	public Sort sort(Term[] term) {
+	public Sort sort(ArrayOfTerm terms) {
 	    return svOpSort;
 	}
 

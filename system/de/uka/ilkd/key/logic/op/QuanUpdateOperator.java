@@ -336,7 +336,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
         
         final ArrayOfQuantifiableVariable[] vars = 
             new ArrayOfQuantifiableVariable[sub.length];
-        Arrays.fill(vars, Term.EMPTY_VAR_LIST);
+        Arrays.fill(vars, new ArrayOfQuantifiableVariable(new QuantifiableVariable[0]));
         
         return tf.createTerm ( location ( n ),
                                sub,
@@ -413,9 +413,15 @@ public class QuanUpdateOperator implements IUpdateOperator {
      * @return sort of the simultaneous update term consisting of the given
      *         subterms, if this op would be the top symbol
      */
-    public Sort sort(Term[] term) {
-        return term[targetPos()].sort();
+    public Sort sort(ArrayOfTerm terms) {
+        return terms.getTerm(targetPos()).sort();
     }
+    
+    
+    public Sort sort(Term[] terms) {
+	return sort(new ArrayOfTerm(terms));
+    }
+    
 
     /**
      * @return true if the value of "term" having this operator as top-level

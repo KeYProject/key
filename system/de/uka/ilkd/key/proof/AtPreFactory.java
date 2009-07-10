@@ -15,13 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.UpdateFactory;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -79,7 +73,7 @@ public class AtPreFactory {
      * Returns the sort of the passed operator.
      */
     private Sort getSort(Operator op) {
-        return op.sort(null);
+        return op.sort((ArrayOfTerm)null);
     }
     
     

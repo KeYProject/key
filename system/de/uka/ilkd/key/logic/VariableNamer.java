@@ -662,7 +662,7 @@ public abstract class VariableNamer implements InstantiationProposer {
                 rwgt = (RewriteTacletGoalTemplate) templs.next();
 	        Term t = findProgramInTerm(rwgt.replaceWith());
 	        ContextStatementBlock c =
-                    (ContextStatementBlock) t.executableJavaBlock().program();
+                    (ContextStatementBlock) t.javaBlock().program();
 		if (c.getStatementAt(0) instanceof LocalVariableDeclaration) {
 	            VariableSpecification v =
                 	((LocalVariableDeclaration) c.getStatementAt(0)).

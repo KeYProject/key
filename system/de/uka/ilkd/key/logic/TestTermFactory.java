@@ -12,7 +12,6 @@ package de.uka.ilkd.key.logic;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ClassInstanceSortImpl;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
@@ -62,8 +61,8 @@ public class TestTermFactory extends TestCase {
     }
 
     public void setUp() {
-	Term et_x=OpTerm.createOpTerm(x, new Term[0]);
-	Term et_px=OpTerm.createOpTerm(p, new Term[]{et_x});
+	Term et_x=new TermImpl(x, new Term[0]);
+	Term et_px=new TermImpl(p, new Term[]{et_x});
 	et1=et_px;       
     }
 
@@ -119,7 +118,7 @@ public class TestTermFactory extends TestCase {
      * constructed anyway, as subformulae are not checked
      */
     public void testWithInvalidSubformulae() { 
-	Term invalidBuilt=OpTerm.createOpTerm(p, new Term[]{ OpTerm.createOpTerm(y, new Term[0])});
+	Term invalidBuilt=new TermImpl(p, new Term[]{ new TermImpl(y, new Term[0])});
 	try {
 	    Term t_px_or_py=tf.createJunctorTerm(Junctor.OR,
 						 new Term[]{invalidBuilt, 
@@ -131,44 +130,44 @@ public class TestTermFactory extends TestCase {
 
     public void testConstantTrue() {
         Term t_true=tf.createJunctorTerm(Junctor.TRUE,new Term[0]);
-	Assert.assertEquals(t_true,OpTerm.createOpTerm(Junctor.TRUE, new Term[0]));
+	Assert.assertEquals(t_true,new TermImpl(Junctor.TRUE, new Term[0]));
     }
 
     public void testQuantifierTerm() {
 	Term t_forallx_px=tf.createQuantifierTerm(Quantifier.ALL,
 						  new LogicVariable[]{x},t1());
 	Assert.assertEquals(t_forallx_px,
-			    new QuantifierTerm(Quantifier.ALL,new LogicVariable[]{x},t1()));
+			    new TermImpl(Quantifier.ALL,new ArrayOfTerm(t1()), JavaBlock.EMPTY_JAVABLOCK, new ArrayOfQuantifiableVariable(x)));
     }
 
     public void testJunctorTerm() {
 	Term  t_px_imp_ryw= tf.createJunctorTerm(Junctor.IMP, t1(), t2());
-	Assert.assertEquals(t_px_imp_ryw, OpTerm.createOpTerm(Junctor.IMP, new Term[]{ t1(), t2()}));
+	Assert.assertEquals(t_px_imp_ryw, new TermImpl(Junctor.IMP, new Term[]{ t1(), t2()}));
     }
 
     public void testNegationTerm() {
 	Term t_not_ryw=tf.createJunctorTerm(Junctor.NOT, t2());
-	Assert.assertEquals(t_not_ryw, OpTerm.createOpTerm(Junctor.NOT, new Term[]{ t2()}));
+	Assert.assertEquals(t_not_ryw, new TermImpl(Junctor.NOT, new Term[]{ t2()}));
     }
 
     public void testDiamondTerm() {
 	JavaBlock jb=JavaBlock.EMPTY_JAVABLOCK;
 	Term t_dia_ryw=tf.createDiamondTerm(jb, t2());
-	Assert.assertEquals(t_dia_ryw, new ProgramTerm(Modality.DIA, jb, t2()));
+	Assert.assertEquals(t_dia_ryw, new TermImpl(Modality.DIA, new ArrayOfTerm(t2()), jb));
     }
 
     public void testBoxTerm() {
 	JavaBlock jb=JavaBlock.EMPTY_JAVABLOCK;
 	Term t_dia_ryw=tf.createBoxTerm(jb, t2());
-	Assert.assertEquals(t_dia_ryw, new ProgramTerm(Modality.BOX, jb, t2()));
+	Assert.assertEquals(t_dia_ryw, new TermImpl(Modality.BOX, new ArrayOfTerm(t2()), jb));
     }
 
     public void testSubstitutionTerm() {
 	Term t_x_subst_fy_in_px=tf.createSubstitutionTerm(WarySubstOp.SUBST, x, t3(),
 							  t1());
 	Assert.assertEquals(t_x_subst_fy_in_px, 
-			    new SubstitutionTerm(WarySubstOp.SUBST,
-						 x, new Term[]{ t3(),t1() }));
+			    new TermImpl(WarySubstOp.SUBST, new ArrayOfTerm(new Term[]{ t3(),t1() }),
+				    	  JavaBlock.EMPTY_JAVABLOCK, new ArrayOfQuantifiableVariable(x)));
     }
 
 
@@ -220,8 +219,8 @@ public class TestTermFactory extends TestCase {
 	Term t_mv=tf.createFunctionTerm(xx, new Term[0]);
 	Term t_pxx=tf.createFunctionTerm(p, new Term[]{t_mv});	
 	Assert.assertEquals(t_pxx,
-			    OpTerm.createOpTerm(p, new Term[]{
-					       OpTerm.createOpTerm(xx, new Term[0])}));
+			    new TermImpl(p, new Term[]{
+					       new TermImpl(xx, new Term[0])}));
     }
 
 

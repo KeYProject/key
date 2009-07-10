@@ -10,7 +10,10 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.ArrayOfTerm;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
 
@@ -41,7 +44,13 @@ public abstract class AbstractOperator implements Operator {
     public final int arity() {
         return arity;
     }
-        
+    
+    
+    @Override
+    public final Sort sort(Term[] terms) {
+	return sort(new ArrayOfTerm(terms));
+    }
+    
     
     /** 
      * implements the default operator matching rule which means 

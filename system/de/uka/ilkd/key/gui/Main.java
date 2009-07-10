@@ -531,7 +531,6 @@ public class Main extends JFrame implements IMain {
                 + "KeY is free software and comes with ABSOLUTELY NO WARRANTY."
                 + " See About | License.", getFont());
         getContentPane().add(statusLine, BorderLayout.SOUTH);
-        setupInternalInspection();
     }
     
 
@@ -540,67 +539,6 @@ public class Main extends JFrame implements IMain {
 	RuleDescriptor r = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getActiveRule();
 	decisionProcedureInvocationButton.setAction(new DPInvokeAction(r));
 	return decisionProcedureInvocationButton;
-    }
-
-    /**
-     * *********************** UGLY INSPECTION CODE **********************
-     */
-    private void setupInternalInspection() {
- /*MULBRICH       goalView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW ).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_U, ActionEvent.CTRL_MASK), 
-        "show_inspector");
-        goalView.getActionMap().put("show_inspector", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                new ObjectInspector("Term", sequentView.getMousePosInSequent().getPosInOccurrence().subTerm()).setVisible(true);
-            } });*/
-        
-        
-        goalView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW ).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK), 
-        "show_tree");
-        goalView.getActionMap().put("show_tree", new AbstractAction() {
-            
-            public void actionPerformed(ActionEvent e) {
-                System.err.println(sequentView.getMousePosInSequent().
-                        getPosInOccurrence().posInTerm());
-                
-                Term t = 
-                    sequentView.getMousePosInSequent().getPosInOccurrence().subTerm();
-                System.err.println("****************** "+t.op().getClass());
-                System.err.println(t.hashCode());
-                t.tree();
-                
-//              if (t instanceof ProgramTerm) {
-                de.uka.ilkd.key.java.visitor.JavaASTWalker w = 
-                    new de.uka.ilkd.key.java.visitor.JavaASTWalker(
-                            t.javaBlock().program()) {
-                    protected void walk(ProgramElement node) {
-                        if (node != root()) doAction(node);
-                        if (node instanceof NonTerminalProgramElement) {
-                            NonTerminalProgramElement nonTerminalNode = 
-                                (NonTerminalProgramElement) node;
-                            for (int i = 0; 
-                            i<nonTerminalNode.getChildCount(); 
-                            i++) {
-                                walk(nonTerminalNode.getChildAt(i));
-                            }	    
-                        }
-                    }
-                    
-                    protected void doAction(ProgramElement node) {
-                        if (node instanceof Statement &&
-                                !(node instanceof StatementBlock))
-                            System.err.println(node.getClass()+":- "+node);
-                        if (node instanceof 
-                                de.uka.ilkd.key.java.statement.MethodFrame)
-                            System.err.println(
-                                    ((de.uka.ilkd.key.java.statement.MethodFrame)node).
-                                    getExecutionContext());
-                    }
-                };
-                w.start();               
-            }
-        });
     }
     
     private JButton createAutoModeButton() {

@@ -17,6 +17,7 @@ package de.uka.ilkd.key.logic;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.*;
 
 /**
@@ -46,13 +47,9 @@ public class TermCreationException extends RuntimeException {
                 "is not compatible (e.g. like the \'2\' in \"true & 2\")\n" +
                 "The top level operator was " + 
                 op + "(Sort: " + op.sort(subs) + ")" +
-                (op instanceof Function 
+                (op instanceof SortedOperator 
                  ? "; its expected arg sorts were:\n" + 
-                	 argsToString((Function)op) 
-                 : "") + 
-                (op instanceof Equality 
-                 ? "; its expected arg sorts were:\n" + 
-                	 argsToString((Equality)op) 
+                	 argsToString((SortedOperator)op) 
                  : "") + 
                 "\nThe subterms were:\n" + subsToString(subs);                       
         }
@@ -62,7 +59,7 @@ public class TermCreationException extends RuntimeException {
 	}
 	
 	
-	private String argsToString(Function f) {
+	private String argsToString(SortedOperator f) {
 	    StringBuffer sb = new StringBuffer();
       	    for(int i = 0; i < f.arity(); i++) {
       		sb.append((i+1) + ".) ");
@@ -72,16 +69,6 @@ public class TermCreationException extends RuntimeException {
 	    return sb.toString();
 	}
 	
-	
-	private String argsToString(Equality e) {
-	    StringBuffer sb = new StringBuffer();
-      	    for(int i = 0; i < e.arity(); i++) {
-      		sb.append((i+1) + ".) ");
-    	        sb.append("sort: " + e.argSort(i) + 
-    	        	  ", sort hash: " + e.argSort(i).hashCode() + "\n");
-      	    }
-	    return sb.toString();
-	}
 	
         private String subsToString(Term[] subs) {
             StringBuffer sb = new StringBuffer();

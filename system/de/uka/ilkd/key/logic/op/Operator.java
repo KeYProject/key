@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.ArrayOfTerm;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -40,6 +41,8 @@ public interface Operator extends Named, SVSubstitute {
      * given substerms
      */
     Sort sort(Term[] terms);
+    
+    Sort sort(ArrayOfTerm terms);
     
     
     /**
