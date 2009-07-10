@@ -61,13 +61,13 @@ public class QuanUpdateOperator implements IUpdateOperator {
      */
     private static class QuanUpdateSignature {
         /** the locations access operators used by the update op */
-        public final ArrayOfLocation locations;
+        public final ArrayOfUpdateableOperator locations;
         /** which of the update entries are equipped with a guard? */
         public final boolean[] guards;
         
-        public QuanUpdateSignature (final Location[] locations,
+        public QuanUpdateSignature (final UpdateableOperator[] locations,
                                     final boolean[] guards) {
-            this.locations = new ArrayOfLocation ( locations );
+            this.locations = new ArrayOfUpdateableOperator ( locations );
             this.guards = (boolean[])guards.clone ();
         }
         
@@ -123,9 +123,9 @@ public class QuanUpdateOperator implements IUpdateOperator {
      */
     public static QuanUpdateOperator createUpdateOp(Term[] locs,
                                                     boolean[] guards) {
-        Location[] locOps = new Location[locs.length];
+        UpdateableOperator[] locOps = new UpdateableOperator[locs.length];
         for (int i = locs.length - 1; i >= 0; i--) {
-            locOps[i] = (Location) locs[i].op();
+            locOps[i] = (UpdateableOperator) locs[i].op();
         }
         return createUpdateOp(locOps, guards);
     }
@@ -136,7 +136,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
      *            guarded
      * @return the update operator for the given location order
      */
-    public static QuanUpdateOperator createUpdateOp(Location[] locs,
+    public static QuanUpdateOperator createUpdateOp(UpdateableOperator[] locs,
                                                     boolean[] guards) {
         final QuanUpdateSignature sig = new QuanUpdateSignature ( locs, guards );
         WeakReference<QuanUpdateOperator> qUpOp = updates.get(sig);
@@ -178,7 +178,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
      * This must not change the number of locations, i.e.
      * <code>newLocs.length==locationCount()</code>
      */
-    public IUpdateOperator replaceLocations (Location[] newLocs) {
+    public IUpdateOperator replaceLocations (UpdateableOperator[] newLocs) {
         Debug.assertTrue ( newLocs.length == locationCount () );
         return createUpdateOp ( newLocs, signature.guards );
     }
@@ -186,7 +186,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
     /**
      * returns the array of location operators which are updated
      */
-    public ArrayOfLocation locationsAsArray() {
+    public ArrayOfUpdateableOperator locationsAsArray() {
         return signature.locations;
     }
 
@@ -202,8 +202,8 @@ public class QuanUpdateOperator implements IUpdateOperator {
     /**
      * returns the operator of <tt>n</tt>-th location
      */
-    public Location location(int n) {
-        return locationsAsArray().getLocation(n);
+    public UpdateableOperator location(int n) {
+        return locationsAsArray().getUpdateableOperator(n);
     }
 
     /**
@@ -550,8 +550,8 @@ public class QuanUpdateOperator implements IUpdateOperator {
 
         public int compare(ElUpdateLocation elUpd1, ElUpdateLocation elUpd2) {
             // deliberately raise a ClassCastException for unsuitable o1, o2
-            final Location pv1 = elUpd1.getLocation ();
-            final Location pv2 = elUpd2.getLocation ();
+            final UpdateableOperator pv1 = elUpd1.getLocation ();
+            final UpdateableOperator pv2 = elUpd2.getLocation ();
             
             if ( elUpd1.locationNum == elUpd2.locationNum ) return 0;
             
@@ -576,7 +576,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
             return elUpd1.locationNum - elUpd2.locationNum;
         }
         
-        private int getLocationKind(Location location) {
+        private int getLocationKind(UpdateableOperator location) {
             if ( location instanceof ProgramVariable ) {
                 final ProgramVariable pv = (ProgramVariable)location;
                 if ( pv.isStatic () )
@@ -651,8 +651,8 @@ public class QuanUpdateOperator implements IUpdateOperator {
             return getLocation ().hashCode ();
         }
 
-        public Location getLocation () {
-            return (Location)getLhs().op ();
+        public UpdateableOperator getLocation () {
+            return (UpdateableOperator)getLhs().op ();
         }
 
         public Term getLocationSub (int subNum) {
@@ -827,8 +827,8 @@ public class QuanUpdateOperator implements IUpdateOperator {
         return res;
     }
 
-    private static Location[] locations (ElUpdateLocation[] elUpdates) {
-        final Location[] res = new Location [elUpdates.length];
+    private static UpdateableOperator[] locations (ElUpdateLocation[] elUpdates) {
+        final UpdateableOperator[] res = new UpdateableOperator [elUpdates.length];
         for ( int i = 0; i != elUpdates.length; ++i )
             res[i] = elUpdates[i].getLocation ();
         return res;
@@ -876,7 +876,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
             else
                 guards[locNum] = getValidGuard();
 
-            final Location loc = location ( locNum );
+            final UpdateableOperator loc = location ( locNum );
             final Term[] locSubs = new Term [loc.arity ()];
             System.arraycopy ( subs, locationSubtermsBegin ( locNum ),
                                locSubs, 0,
@@ -925,7 +925,7 @@ public class QuanUpdateOperator implements IUpdateOperator {
                                        locNum );
             if ( elUpd.isUnsatisfiableGuard () ) continue;
 
-            final Location location = elUpd.getLocation ();            
+            final UpdateableOperator location = elUpd.getLocation ();            
             if ( location instanceof SchemaVariable
                  || location instanceof MetaOperator ) {
                 return null;
@@ -941,11 +941,11 @@ public class QuanUpdateOperator implements IUpdateOperator {
             if ( elUpd.bindsVariables () ) laterQuanAssignments.add ( elUpd );
         }
 
-        final Set<Location> operators = new HashSet<Location> ();
+        final Set<UpdateableOperator> operators = new HashSet<UpdateableOperator> ();
         final Iterator<ElUpdateLocation> it = orderedAssignments.iterator ();
         while ( it.hasNext () ) {
             final ElUpdateLocation elUpd = it.next ();
-            final Location loc = elUpd.getLocation ();
+            final UpdateableOperator loc = elUpd.getLocation ();
 
             // delete trivial updates (left-hand and right-hand side are
             // equal), but only if there was no predecessing update that

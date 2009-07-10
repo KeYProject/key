@@ -5,6 +5,8 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.HashMap;
@@ -19,7 +21,6 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.AtPreFactory;
-import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class AtPreEquations extends AbstractMetaOperator {
@@ -99,38 +100,15 @@ public class AtPreEquations extends AbstractMetaOperator {
         super(new Name("#atPreEqs"), 1, Sort.FORMULA);
     }
     
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.logic.op.MetaOperator#calculate(de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.rule.inst.SVInstantiations, de.uka.ilkd.key.java.Services)
-     */
+
     public Term calculate(Term term, SVInstantiations svInst, Services services) {
         Map atPreFunctions = getAtPreFunctions(term.sub(0), services);
         return buildAtPreDefinitions(atPreFunctions);
     }
                 
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.logic.op.Operator#validTopLevel(de.uka.ilkd.key.logic.Term)
-     */
-    public boolean validTopLevel(Term term) {
-        return term.arity()==1 && term.sub(0).sort()==Sort.FORMULA;
-    }
 
-    
 
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.logic.op.Operator#isRigid(de.uka.ilkd.key.logic.Term)
-     */
     public boolean isRigid(Term term) {
         return false;
-    }
-
-    
-    /** (non-Javadoc)
-     * by default meta operators do not match anything 
-     * @see de.uka.ilkd.key.logic.op.Operator#match(SVSubstitute, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
-     */
-    public MatchConditions match(SVSubstitute subst, MatchConditions mc,
-            Services services) {
-        return null;
-    }
-    
+    }    
 }

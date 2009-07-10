@@ -1315,7 +1315,7 @@ public class LogicPrinter {
                                      int ass3) throws IOException {
         final QuanUpdateOperator op = (QuanUpdateOperator)t.op ();
         mark(MARK_START_UPDATE);
-        layouter.beginC ( 2 ).print ( l );
+        layouter.beginC (2).print ( l );
         startTerm ( t.arity () );
         for ( int i = 0; i < op.locationCount (); i++ ) {
             final Operator loc = op.location ( i );
@@ -1389,6 +1389,69 @@ public class LogicPrinter {
         layouter.brk ( 0 );
         maybeParens ( t.sub ( t.arity () - 1 ), ass3 );
         layouter.end ();
+    }
+    
+    
+    /**
+     * Print a term with an update. This looks like
+     * <code>{u} t</code>.  If line breaks are necessary, the
+     * format is
+     *
+     * <pre>
+     * {u}
+     *   t
+     * </pre>
+     *
+     * @param l       the left brace
+     * @param r       the right brace
+     * @param t       the update term
+     * @param ass3    associativity for phi
+     */
+    public void printUpdateApplicationTerm (String l,
+                                            String r,
+                                            Term t,
+                                            int ass3) throws IOException {
+	assert t.op() instanceof UpdateApplication && t.arity() == 2;
+
+	mark(MARK_START_UPDATE);
+        layouter.beginC(2).print(l);
+        startTerm(t.arity());
+        
+        markStartSub();
+        printTerm(t.sub(0));
+        markEndSub();        
+        
+        layouter.print(r);
+        mark(MARK_END_UPDATE);
+        layouter.brk(0);
+        
+        maybeParens(t.sub(1), ass3);
+        
+        layouter.end();
+    }    
+    
+    
+   /**
+     * Print an elementary update.  This looks like
+     * <code>loc := val</code>
+     *
+     * @param asgn    the assignment operator (including spaces)
+     * @param ass2    associativity for the new values
+     */
+
+    public void printElementaryUpdate(String asgn,
+                                      Term t,
+                                      int ass2) throws IOException {
+	assert t.op() instanceof ElementaryUpdate && t.arity() == 1;
+	ElementaryUpdate op = (ElementaryUpdate)t.op();
+	
+	startTerm(t.arity());
+	
+	layouter.print(op.pv().name().toString());
+	
+	layouter.print(asgn)/*.brk(0,0)*/;
+	
+	maybeParens(t.sub(0), ass2);
     }
 
     /**

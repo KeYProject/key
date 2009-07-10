@@ -35,9 +35,9 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class Notation {
 
     /**
-         * The priority of this operator in the given concrete syntax. This is
-         * used to determine whether parentheses are required around a subterm.
-         */
+     * The priority of this operator in the given concrete syntax. This is
+     * used to determine whether parentheses are required around a subterm.
+     */
     protected int priority;
 
     /** Create a Notation with a given priority. */
@@ -51,10 +51,10 @@ public abstract class Notation {
     }
 
     /**
-         * Print a term to a {@link LogicPrinter}. Concrete subclasses override
-         * this to call one of the <code>printXYZTerm</code> of
-         * {@link LogicPrinter}, which do the layout.
-         */
+     * Print a term to a {@link LogicPrinter}. Concrete subclasses override
+     * this to call one of the <code>printXYZTerm</code> of
+     * {@link LogicPrinter}, which do the layout.
+     */
     public void print(Term t, LogicPrinter sp) throws IOException {
 	if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
 	    sp.printTerm(t);
@@ -66,19 +66,19 @@ public abstract class Notation {
     }
 
     /**
-         * Print a term without beginning a new block. See
-         * {@link LogicPrinter#printTermContinuingBlock(Term)}for the idea
-         * behind this. The standard implementation just delegates to
-         * {@link #print(Term,LogicPrinter)}
-         */
+     * Print a term without beginning a new block. See
+     * {@link LogicPrinter#printTermContinuingBlock(Term)}for the idea
+     * behind this. The standard implementation just delegates to
+     * {@link #print(Term,LogicPrinter)}
+     */
     public void printContinuingBlock(Term t, LogicPrinter sp)
 	    throws IOException {
 	print(t, sp);
     }
 
     /**
-         * The standard concrete syntax for constants like true and false.
-         */
+     * The standard concrete syntax for constants like true and false.
+     */
     public static class Constant extends Notation {
 	String name;
 
@@ -93,8 +93,8 @@ public abstract class Notation {
     }
 
     /**
-         * The standard concrete syntax for prefix operators.
-         */
+     * The standard concrete syntax for prefix operators.
+     */
     public static class Prefix extends Notation {
 	String name;
 
@@ -117,8 +117,8 @@ public abstract class Notation {
     }
 
     /**
-         * The standard concrete syntax for infix operators.
-         */
+     * The standard concrete syntax for infix operators.
+     */
     public static class Infix extends Notation {
 	String name;
 
@@ -301,30 +301,10 @@ public abstract class Notation {
 	}
     }
 
-    /**
-         * The standard concrete syntax for terms with updates.
-         */
-    public static class AnonymousUpdate extends Notation {
-
-	public AnonymousUpdate() {
-	    super(115);
-	}
-
-	public void print(Term t, LogicPrinter sp) throws IOException {
-	    if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
-		sp.printTerm(t);
-	    } else {
-		final int assTarget = (t.sort() == Sort.FORMULA ? (((IUpdateOperator) t
-			.op()).target(t).op() == Equality.EQUALS ? 75 : 60)
-			: 110);
-		sp.printAnonymousUpdate(t, assTarget);
-	    }
-	}
-    }
 
     /**
-         * The standard concrete syntax for terms with updates.
-         */
+     * The standard concrete syntax for terms with updates.
+     */
     public static class QuanUpdate extends Notation {
 
 	public QuanUpdate() {
@@ -332,25 +312,69 @@ public abstract class Notation {
 	}
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
+	    if(sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
 		sp.printTerm(t);
 	    } else {
 		final Operator targetOp = ((IUpdateOperator) t.op()).target(t)
 			.op();
 		final int assTarget = (t.sort() == Sort.FORMULA ? (targetOp
 			.arity() == 1 ? 60 : 85) : 110);
-		if (t.op() instanceof AnonymousUpdate) {
-		    sp.printAnonymousUpdate(t, assTarget);
-		} else {
-		    sp.printQuanUpdateTerm("{", ":=", "}", t, 80, 0, assTarget);
-		}
+		
+		sp.printQuanUpdateTerm("{", ":=", "}", t, 80, 0, assTarget);
 	    }
 	}
     }
+    
+    /**
+     * The standard concrete syntax for update application.
+     */
+    public static class UpdateApplicationNotation extends Notation {
+
+	public UpdateApplicationNotation() {
+	    super(115);
+	}
+
+	public void print(Term t, LogicPrinter sp) throws IOException {
+	    if(sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
+		sp.printTerm(t);
+	    } else {
+		assert t.op() == UpdateApplication.UPDATE_APPLICATION;
+		final Operator targetOp 
+		    = UpdateApplication.UPDATE_APPLICATION.target(t).op();
+		final int assTarget 
+		    = (t.sort() == Sort.FORMULA 
+		       ? (targetOp.arity() == 1 ? 60 : 85) 
+		       : 110);
+		
+		sp.printUpdateApplicationTerm("{", "}", t, assTarget);
+	    }
+	}
+    }    
+
+    
+    /**
+     * The standard concrete syntax for elementary updates.
+     */
+    public static class ElementaryUpdateNotation extends Notation {
+
+	public ElementaryUpdateNotation() {
+	    super(150);
+	}
+
+	public void print(Term t, LogicPrinter sp) throws IOException {
+	    if(sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
+		sp.printTerm(t);
+	    } else {
+		ElementaryUpdate op = (ElementaryUpdate) t.op();
+		sp.printElementaryUpdate(":=", t, 0);
+	    }
+	}
+    }    
+    
 
     /**
-         * The standard concrete syntax for substitution terms.
-         */
+      * The standard concrete syntax for substitution terms.
+      */
     public static class Subst extends Notation {
 	public Subst() {
 	    super(120);
@@ -440,63 +464,11 @@ public abstract class Notation {
 	}
     }
     
-    //implemented by mbender for jmltest
-    public static class JMLProgramMethod extends Notation {
-        private final int ass;
-
-        public JMLProgramMethod(int ass) {
-            super(130);
-            this.ass = ass;
-        }
-
-        public void print(Term t, LogicPrinter sp) throws IOException {
-            if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
-                sp.printTerm(t);
-            } else if (((de.uka.ilkd.key.logic.op.ProgramMethod) t.op())
-                    .isStatic()) {
-
-                sp.printFunctionTerm(t.op().name().toString().replaceAll("::",
-                        "."), t);
-            } else {
-                final ProgramElementName name = (ProgramElementName) t.op()
-                        .name();
-                sp.printQueryTerm(name.getProgramName(), t, ass);
-            }
-        }
-    }
 
     /**
-         * The standard concrete syntax for attribute terms <code>o.a</code>.
-         */
-    //XXX
-//    public static class Attribute extends Notation {
-//
-//	private int associativity;
-//
-//	public Attribute(int priority, int associativity) {
-//	    super(priority);
-//	    this.associativity = associativity;
-//	}
-//
-//	public void print(Term t, LogicPrinter sp) throws IOException {
-//	    if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
-//		sp.printTerm(t);
-//	    } else {
-//		if (t.op() instanceof AttributeOp) {
-//		    sp.printPostfixTerm(t.sub(0), associativity, printName(
-//			    (AttributeOp) t.op(), t.sub(0), sp));
-//		} else {
-//		    sp.printPostfixTerm(t.sub(0), associativity, "."
-//			    + t.op().name());
-//		}
-//	    }
-//	}
-//    }
-
-    /**
-         * The standard concrete syntax for conditional terms
-         * <code>if (phi) (t1) (t2)</code>.
-         */
+     * The standard concrete syntax for conditional terms
+     * <code>if (phi) (t1) (t2)</code>.
+     */
     public static class IfThenElse extends Notation {
 
 	private final String keyword;
@@ -516,8 +488,8 @@ public abstract class Notation {
     }
 
     /**
-         * The standard concrete syntax for all kinds of variables.
-         */
+     * The standard concrete syntax for all kinds of variables.
+     */
     public static class VariableNotation extends Notation {
 	public VariableNotation() {
 	    super(1000);

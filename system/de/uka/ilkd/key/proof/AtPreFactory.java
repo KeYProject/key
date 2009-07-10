@@ -24,7 +24,7 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.UpdateSimplifier;
+import de.uka.ilkd.key.rule.OldUpdateSimplifier;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
 
 
@@ -230,7 +230,7 @@ public class AtPreFactory {
                                     null,
                                     null);
         
-        UpdateFactory uf = new UpdateFactory(services, new UpdateSimplifier());
+        UpdateFactory uf = new UpdateFactory(services, new OldUpdateSimplifier());
         Update result = uf.quantify(args,
                                     uf.elementaryUpdate(atPreTerm, normalTerm));
         
@@ -246,7 +246,7 @@ public class AtPreFactory {
          Services services) {
         assert atPreFunctions != null;
         
-        UpdateFactory uf = new UpdateFactory(services, new UpdateSimplifier());
+        UpdateFactory uf = new UpdateFactory(services, new OldUpdateSimplifier());
         Update result = uf.skip();
         
         for(Map.Entry<Operator,Function> entry : atPreFunctions.entrySet()) {

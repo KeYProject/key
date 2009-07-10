@@ -39,10 +39,8 @@ public final class Quantifier extends AbstractSortedOperator {
      * arity of the term is 1 and at least one variable is bound.
      */
     @Override
-    public boolean validTopLevel(Term term){
-	if (term.arity()==0) return false;
-	if (term.varsBoundHere(0).size()==0) return false;
-        return term.sub(0).sort().equals(Sort.FORMULA);
+    protected boolean additionalValidTopLevel(Term term){
+	return (term.varsBoundHere(0).size() > 0);
     }
     
     

@@ -14,7 +14,7 @@ package de.uka.ilkd.key.rule.updatesimplifier;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.AbstractUpdateRule;
-import de.uka.ilkd.key.rule.UpdateSimplifier;
+import de.uka.ilkd.key.rule.OldUpdateSimplifier;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -28,7 +28,7 @@ public class ApplyOnNonRigidTerm extends AbstractUpdateRule {
      * @param updateSimplifier the UpdateSimplifier to which this 
      * rule is attached
      */
-    public ApplyOnNonRigidTerm(UpdateSimplifier updateSimplifier) {
+    public ApplyOnNonRigidTerm(OldUpdateSimplifier updateSimplifier) {
         super(updateSimplifier);        
     }
 

@@ -1030,7 +1030,7 @@ public abstract class TacletApp implements RuleApp {
             (ListOfObject)insts.getInstantiation ( modifies );
         final AnonymisingUpdateFactory auf =
             new AnonymisingUpdateFactory
-            ( new UpdateFactory ( services, new UpdateSimplifier () ) );
+            ( new UpdateFactory ( services, new OldUpdateSimplifier () ) );
         final Term[] mvArgs = toTermArray ( determineArgMVs ( insts, updateSV ) );
         return insts.add ( updateSV,
                            auf.createAnonymisingUpdateAsFor

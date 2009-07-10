@@ -255,7 +255,7 @@ public abstract class ProgramVariable extends AbstractSortedOperator
     /* (non-Javadoc)
      * @see de.uka.ilkd.key.logic.op.Location#mayBeAliasedBy(de.uka.ilkd.key.logic.op.Location)
      */
-    public boolean mayBeAliasedBy(Location loc) {
+    public boolean mayBeAliasedBy(UpdateableOperator loc) {
         return loc instanceof SortedSchemaVariable || loc == this; 
     }
 

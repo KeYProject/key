@@ -67,20 +67,6 @@ public class OperatorSV extends SchemaVariableAdapter {
     
     
     /**
-     * checks whether the top level structure of the given @link Term
-     * is syntactically valid, given the assumption that the top level
-     * operator of the term is the same as this Operator. The
-     * assumption that the top level operator and the term are equal
-     * is NOT checked.  
-     * @return true iff the top level structure of
-     * the {@link Term} is valid.
-     */
-    public boolean validTopLevel(Term term){
-        if (term.arity() != this.arity()) return false;       
-        return true;
-    }   
-
-    /**
      * returns true if the schemavariable is an operator sv
      */
     public boolean isOperatorSV() {
@@ -126,7 +112,7 @@ public class OperatorSV extends SchemaVariableAdapter {
         return null; 
     }
     
-    /** toString */
+
     public String toString() {
         return toString(" (operator sv)");
     }

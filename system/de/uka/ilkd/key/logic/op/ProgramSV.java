@@ -30,7 +30,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
 public class ProgramSV extends SortedSchemaVariable 
-    implements ProgramConstruct, Location {
+    implements ProgramConstruct, UpdateableOperator {
 
     private static final ProgramList EMPTY_LIST_INSTANTIATION = 
         new ProgramList

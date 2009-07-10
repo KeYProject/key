@@ -50,7 +50,7 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.RuleConfig;
 import de.uka.ilkd.key.rule.IteratorOfBuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.UpdateSimplifier;
+import de.uka.ilkd.key.rule.OldUpdateSimplifier;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -62,7 +62,7 @@ public class ProblemInitializer {
     private final IMain main;
     private final Profile profile;
     private final Services services;
-    private final UpdateSimplifier simplifier;
+    private final OldUpdateSimplifier simplifier;
     
     private final ProgressMonitor pm;
     
@@ -429,15 +429,11 @@ public class ProblemInitializer {
 	    proofs[i].setSimplifier(simplifier);
 	    proofs[i].setNamespaces(proofs[i].getNamespaces());//TODO: refactor Proof.setNamespaces() so this becomes unnecessary
 	    populateNamespaces(proofs[i]);
-	    
-	    //XXX
-	    ExplicitHeapConverter.INSTANCE.convertDestructive(proofs[i].openGoals(), proofs[i].getServices());
 	}
 	initConfig.getProofEnv().registerProof(problem, pl);
 	if (main != null) {
             main.addProblem(pl);
         }
-	//GlobalProofMgt.getInstance().tryReuse(pl);	
     }
     
     

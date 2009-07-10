@@ -14,7 +14,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.UpdateSimplifier;
+import de.uka.ilkd.key.rule.OldUpdateSimplifier;
 import de.uka.ilkd.key.rule.updatesimplifier.*;
 
 
@@ -38,13 +38,13 @@ public class UpdateFactory {
     /**
      * the update simplifier to be used
      */
-    private final UpdateSimplifier simplifier;
+    private final OldUpdateSimplifier simplifier;
     
     private final TermFactory        tf            = TermFactory.DEFAULT;
     private final UpdateSimplifierTermFactory utf  =
                                             UpdateSimplifierTermFactory.DEFAULT;
    
-    public UpdateFactory (Services services, UpdateSimplifier simplifier) {
+    public UpdateFactory (Services services, OldUpdateSimplifier simplifier) {
         this.services = services;
         this.simplifier = simplifier;
     }
@@ -170,7 +170,7 @@ public class UpdateFactory {
             subs[i] = leftHandSide.sub ( i );
         
         final AssignmentPair ass =
-            new AssignmentPairImpl ( (Location)leftHandSide.op (), subs, value );
+            new AssignmentPairImpl ( (UpdateableOperator)leftHandSide.op (), subs, value );
         
         return Update.createUpdate ( new AssignmentPair [] { ass } );
     }
@@ -397,7 +397,7 @@ public class UpdateFactory {
         return Update.createUpdate ( newPairs );
     }
     
-    private UpdateSimplifier getSimplifier () {
+    private OldUpdateSimplifier getSimplifier () {
         return simplifier;
     }
 }

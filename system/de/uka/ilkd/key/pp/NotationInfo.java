@@ -95,7 +95,7 @@ import de.uka.ilkd.key.util.Service;
  * </li>
  * </ul>
  */
-public class NotationInfo {
+public final class NotationInfo {
 
     /** Factory method: creates a new NotationInfo instance. The
      * actual implementation depends on system properties or service
@@ -111,12 +111,12 @@ public class NotationInfo {
      * a Notation registered.  Otherwise, we see if there is one for the
      * <em>class</em> of the operator.
      */
-    protected HashMap tbl;
+    private HashMap tbl;
 
     /**
      * Maps terms to abbreviations and reverse.
      */
-    protected AbbrevMap scm;
+    private AbbrevMap scm;
 
 
     /** Create a new NotationInfo. Do not call this constructor
@@ -135,18 +135,18 @@ public class NotationInfo {
      * abbreviations, and a set of Notations for the built-in operators
      * which corresponds to the parser syntax. 
      */
-    protected void createDefaultNotationTable() {
-		tbl=new HashMap();
-		createDefaultOpNotation();
-		createDefaultTermSymbolNotation();
-		scm = new AbbrevMap();
+    private void createDefaultNotationTable() {
+	tbl=new HashMap();
+	createDefaultOpNotation();
+	createDefaultTermSymbolNotation();
+	scm = new AbbrevMap();
     }
 
     /**
      * Registers notations for the built-in operators.  The priorities
      * and associativities correspond to the parser syntax.  
      */
-   protected void createDefaultOpNotation() {
+    protected void createDefaultOpNotation() {
 	tbl.put(Junctor.TRUE ,new Notation.Constant("true", 130));
 	tbl.put(Junctor.FALSE,new Notation.Constant("false", 130));
 	tbl.put(Junctor.NOT,new Notation.Prefix("!" ,60,60));
@@ -154,8 +154,9 @@ public class NotationInfo {
 	tbl.put(Junctor.OR, new Notation.Infix("|"  ,40,40,50));
 	tbl.put(Junctor.IMP,new Notation.Infix("->" ,30,40,30));
 	tbl.put(Equality.EQV,new Notation.Infix("<->",20,20,30));
+	tbl.put(UpdateJunctor.PARALLEL_UPDATE, new Notation.Infix("||",100,10,10));
 
-    	tbl.put(Quantifier.ALL,new Notation.Quantifier("\\forall", 60, 60));
+	tbl.put(Quantifier.ALL,new Notation.Quantifier("\\forall", 60, 60));
 	tbl.put(Quantifier.EX, new Notation.Quantifier("\\exists", 60, 60));
 	tbl.put(NumericalQuantifier.SUM, new Notation.NumericalQuantifier("\\sum", 60, 60, 70));
 	tbl.put(BoundedNumericalQuantifier.BSUM, new Notation.BoundedNumericalQuantifier("\\bSum", 60, 60, 70));
@@ -168,12 +169,10 @@ public class NotationInfo {
 	//createNumLitNotation(IntegerLDT.getStaticNumberSymbol());
 
 	tbl.put(WarySubstOp.SUBST,new Notation.Subst());
+	tbl.put(UpdateApplication.UPDATE_APPLICATION, new Notation.UpdateApplicationNotation());
     }    
 
-    /** 
-     * Register notations for standard classes of operators.  This
-     * includes Function operators, all kinds of variables, etc.
-     */
+
     /** 
      * Register notations for standard classes of operators.  This
      * includes Function operators, all kinds of variables, etc.
@@ -181,13 +180,13 @@ public class NotationInfo {
    protected void createDefaultTermSymbolNotation() {
 	tbl.put(Function.class, new Notation.Function());               
 	tbl.put(LogicVariable.class, new Notation.VariableNotation());
-	//tbl.put(SchemaVariable.class, new Notation.Variable());
 	tbl.put(Metavariable.class, new Notation.MetavariableNotation());
 	tbl.put(LocationVariable.class, new Notation.VariableNotation());
         tbl.put(ProgramConstant.class, new Notation.VariableNotation());
 	tbl.put(ProgramMethod.class, new Notation.ProgramMethod(121));
 	tbl.put(Equality.class, new Notation.Infix("=", 70, 80, 80)); 
 	tbl.put(QuanUpdateOperator.class, new Notation.QuanUpdate());
+	tbl.put(ElementaryUpdate.class, new Notation.ElementaryUpdateNotation());
 	tbl.put(CastFunctionSymbol.class, new Notation.CastFunction("(",")",120, 140));
 	tbl.put(ModalOperatorSV.class, new Notation.ModalSVNotation(60, 60));
 	tbl.put(SortedSchemaVariable.class, new Notation.SortedSchemaVariableNotation());

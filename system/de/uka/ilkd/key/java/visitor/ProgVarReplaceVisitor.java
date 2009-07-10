@@ -179,10 +179,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 	    Operator op;
 	    if(t.op() instanceof IUpdateOperator){
 		IUpdateOperator uo = (IUpdateOperator) t.op();
-		ListOfLocation locs = SLListOfLocation.EMPTY_LIST;
+		ListOfUpdateableOperator locs = SLListOfUpdateableOperator.EMPTY_LIST;
 		for(int i = 0; i<uo.locationCount(); i++){
 		    if (replaceMap.containsKey(uo.location(i))){ 
-			locs = locs.append((Location)
+			locs = locs.append((UpdateableOperator)
 					   replaceMap.
 					   get(uo.location(i)));
 		    }else{

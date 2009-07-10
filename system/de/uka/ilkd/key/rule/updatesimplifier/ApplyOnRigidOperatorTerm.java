@@ -17,9 +17,9 @@ package de.uka.ilkd.key.rule.updatesimplifier;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Location;
+import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.rule.AbstractUpdateRule;
-import de.uka.ilkd.key.rule.UpdateSimplifier;
+import de.uka.ilkd.key.rule.OldUpdateSimplifier;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -32,7 +32,7 @@ public class ApplyOnRigidOperatorTerm extends AbstractUpdateRule {
     /**
      * @param us the UpdateSimplifier this rule is registered at
      */
-    public ApplyOnRigidOperatorTerm(UpdateSimplifier us) {
+    public ApplyOnRigidOperatorTerm(OldUpdateSimplifier us) {
         super(us);   
     }
 
@@ -73,7 +73,7 @@ public class ApplyOnRigidOperatorTerm extends AbstractUpdateRule {
 	    			   Services services) {
         // these rigid operators should not be locations,
         // otherwise something is very wrong
-        Debug.assertFalse ( target.op () instanceof Location, "Rewrite me!" );
+        Debug.assertFalse ( target.op () instanceof UpdateableOperator, "Rewrite me!" );
         Debug.fail ( "matchingCondition(...) must not be called for target "
                      + target );
         return null; // unreachable

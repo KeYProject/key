@@ -25,7 +25,7 @@ import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.DefaultProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.rule.UpdateSimplifier;
+import de.uka.ilkd.key.rule.OldUpdateSimplifier;
 import de.uka.ilkd.key.rule.updatesimplifier.ApplyOnModality;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -71,7 +71,7 @@ public class Proof implements Named {
     private String problemHeader = "";
 
     /** the update simplifier (may be moved to nodes)*/
-    private UpdateSimplifier upd_simplifier;
+    private OldUpdateSimplifier upd_simplifier;
 
     /** the java information object: JavaInfo+TypeConverter */
     private final Services services;
@@ -320,7 +320,7 @@ public class Proof implements Named {
      * specific simplifiers in the future)
      * @return the UpdateSimplifier to be used as default one
      */
-    public UpdateSimplifier simplifier() {
+    public OldUpdateSimplifier simplifier() {
 	return upd_simplifier;
     }
 
@@ -329,7 +329,7 @@ public class Proof implements Named {
      * @param upd_simplifier the UpdateSimplifier to be used as
      * default (may be overwritten by branch specific simplifiers in the future)
      */
-    public void setSimplifier(UpdateSimplifier upd_simplifier) {
+    public void setSimplifier(OldUpdateSimplifier upd_simplifier) {
 	this.upd_simplifier = upd_simplifier;
     }
 

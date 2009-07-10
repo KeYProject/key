@@ -64,7 +64,9 @@ public abstract class AbstractSortedOperator extends AbstractOperator
 	
 	if (possibleSub.op() instanceof SchemaVariable 
             || sort == AbstractMetaOperator.METASORT
-	    || sort instanceof ProgramSVSort) {
+	    || sort instanceof ProgramSVSort
+	    || argSort(at) == AbstractMetaOperator.METASORT
+	    || argSort(at) instanceof ProgramSVSort) {
 	    return true;
 	} else {
 	    return sort.extendsTrans(argSort(at));
@@ -72,8 +74,13 @@ public abstract class AbstractSortedOperator extends AbstractOperator
     }
     
     
+    protected boolean additionalValidTopLevel(Term term) {
+	return true;
+    }
+    
+    
     @Override
-    public /*final*/ boolean validTopLevel(Term term) {
+    public final boolean validTopLevel(Term term) {
 	if(term.arity() != arity()) {
 	    return false;
 	}
@@ -82,7 +89,7 @@ public abstract class AbstractSortedOperator extends AbstractOperator
 		return false;
 	    }
 	}
-        return true;
+	return additionalValidTopLevel(term);
     }
     
     

@@ -43,20 +43,12 @@ public class ProgramConstant extends ProgramVariable {
     public Literal getCompileTimeConstant () {
         return compileTimeConstant;
     }
-    
-    
-    @Override
-    public boolean validTopLevel(Term term){
-        return term.arity() == 0;
-    }
-
-    
+        
     
     @Override
     public boolean isRigid() {
         return true;
     }
-    
     
 
     @Override

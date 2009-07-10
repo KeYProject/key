@@ -48,7 +48,7 @@ public class TestSchemaModalOperators extends TestCase {
     public void setUp() {
 	TacletForTests.setStandardFile(TacletForTests.testRules);
 	TacletForTests.parse();
-	UpdateSimplifier sus = new UpdateSimplifier();
+	OldUpdateSimplifier sus = new OldUpdateSimplifier();
         proof = new Proof[strs.length/2];
         for (int i=0; i<proof.length; i++) {
 	    Semisequent antec = parseTermForSemisequent(strs[2*i]);

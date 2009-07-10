@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.WaryClashFreeSubst;
 
+
 public final class WarySubstOp extends SubstOp {
 
     /** the wary substitution operator {var<-term}'. {x<-d}'A(x) means
@@ -27,20 +28,16 @@ public final class WarySubstOp extends SubstOp {
     }
 
     
-    /**
-     * Apply this substitution operator to <code>term</code>, which
-     * has this operator as top-level operator
-     */
+    @Override
+    public boolean isRigid() {
+	return true;
+    }
+    
+    @Override
     public Term apply ( Term term ) {
 	QuantifiableVariable v=term.varsBoundHere(1).getQuantifiableVariable(0);
 	WaryClashFreeSubst cfSubst = new WaryClashFreeSubst(v, term.sub(0));
 	Term res = cfSubst.apply(term.sub(1));
 	return res;	
-    }    
-    
-    
-    @Override
-    public boolean isRigid() {
-	return true;
-    }    
+    }        
 }

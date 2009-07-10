@@ -14,14 +14,12 @@ package de.uka.ilkd.key.logic.op;
  * locations as well. This means e.g. occur as top level operators on the 
  * left side of an assignment pair of an update. 
  */
-public interface Location extends SortedOperator {
+public interface UpdateableOperator extends SortedOperator {
     /**
      * Checks if location <code>loc</code> may be an alias of the current
      * location.
      * The <code>mayBeAliasOf</code> relation is <strong>not</strong> necessary 
      * symmetric as e.g. for attributes and their shadowed variant. 
-     * @param loc the Location to check 
-     * @return true if <code>loc</loc> may be an alias of the current operator
      */
-    boolean mayBeAliasedBy(Location loc);
+    boolean mayBeAliasedBy(UpdateableOperator loc);
 }

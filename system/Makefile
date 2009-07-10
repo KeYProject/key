@@ -129,7 +129,7 @@ GENERATED_LISTS=logic/SLListOfTerm \
 	logic/op/SLListOfLogicVariable \
 	logic/op/SLListOfParsableVariable \
 	logic/op/SLListOfOperator \
-	logic/op/SLListOfLocation \
+	logic/op/SLListOfUpdateableOperator \
 	collection/SLListOfString \
 	logic/op/SLListOfMetavariable \
 	logic/SLListOfRenamingTable \
@@ -248,7 +248,7 @@ GENERATED_SETS=logic/SetAsListOfTerm collection/SetAsListOfString \
 	java/statement/SetAsListOfLoopStatement \
         proof/SetAsListOfGoalChooserBuilder \
 	strategy/SetAsListOfStrategyFactory \
-	logic/op/SetAsListOfLocation \
+	logic/op/SetAsListOfUpdateableOperator \
 	speclang/SetAsListOfPositionedString
 
 GENERATED_MAPS=	collection/MapAsListFromIntegerToString \
@@ -280,7 +280,7 @@ GENERATED_ARRAYS=java/ArrayOfProgramElementExtnullInnull \
 	java/statement/ArrayOfBranchExtProgramElementInde.uka.ilkd.key.java \
 	java/reference/ArrayOfTypeReferenceExtProgramElementInde.uka.ilkd.key.java \
 	logic/ArrayOfProgramPrefixExtnullInnull \
-	logic/op/ArrayOfLocationExtnullInnull \
+	logic/op/ArrayOfUpdateableOperatorExtnullInnull \
 	logic/op/ArrayOfQuantifiableVariableExtnullInnull \
 	logic/op/ArrayOfIProgramVariableExtProgramElementInde.uka.ilkd.key.java \
 	logic/ArrayOfTermExtnullInnull \

@@ -273,7 +273,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             = inst.inv.getModifies(inst.selfTerm, atPreFunctions, services);
         
         //get anonymising update, frame condition
-        UpdateFactory uf = new UpdateFactory(services, new UpdateSimplifier());        
+        UpdateFactory uf = new UpdateFactory(services, new OldUpdateSimplifier());        
         FreePVCollector pc = new FreePVCollector(inst.loop, services);
         pc.start();        
         AnonymisationInfo anon = getAnonymisation(inst.u, mod, pc.result(), services, uf, goal);

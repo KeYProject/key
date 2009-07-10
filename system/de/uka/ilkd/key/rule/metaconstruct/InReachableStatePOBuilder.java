@@ -22,7 +22,7 @@ import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.*;
-import de.uka.ilkd.key.rule.UpdateSimplifier;
+import de.uka.ilkd.key.rule.OldUpdateSimplifier;
 import de.uka.ilkd.key.rule.updatesimplifier.ArrayOfAssignmentPair;
 import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
@@ -47,7 +47,7 @@ public class InReachableStatePOBuilder {
     private final ProgramVariable arraylength;
 
     public InReachableStatePOBuilder(Services services) {
-        uf = new UpdateFactory(services, new UpdateSimplifier());
+        uf = new UpdateFactory(services, new OldUpdateSimplifier());
         this.services = services;
         this.intSort = services.getTypeConverter().getIntegerLDT().targetSort();
         this.created =

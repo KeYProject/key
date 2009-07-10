@@ -96,17 +96,6 @@ public class ProgramMethod extends NonRigidFunction
        return argSorts;
     }
    
-   /**
-    * BUG: remove this method bit first adopt the jml translation to take about the 
-    * correct type of parameters and automatic type conversion    
-    * @return true iff number of subterms of term is equal 
-    * to its own arity
-    *    
-    */   
-   public boolean validTopLevel(Term term){   
-       return term.arity()==this.arity(); //%%% needs more checking!!!!   
-   }   
-
 
     // convienience methods to access methods of the corresponding MethodDeclaration
     // in a direct way

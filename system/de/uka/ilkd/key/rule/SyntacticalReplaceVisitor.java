@@ -306,7 +306,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
 	return null;
     }
 
-    private void updateLocation (Location loc,
+    private void updateLocation (UpdateableOperator loc,
                                  Term location,
                                  int positionInStack,
                                  int oldLocationArity,
@@ -324,11 +324,11 @@ public class SyntacticalReplaceVisitor extends Visitor {
 
 
     private IUpdateOperator instantiateUpdateOperator(IUpdateOperator op) {
-	final Location[] newOps = new Location[op.locationCount()];	
+	final UpdateableOperator[] newOps = new UpdateableOperator[op.locationCount()];	
 	final int locCount      = op.locationCount();	
 	boolean changed = false;	    	    
 	for (int i = 0; i < locCount; i++) {	    
-	    final Location originalOp = op.location(i);	    
+	    final UpdateableOperator originalOp = op.location(i);	    
 	    if (originalOp instanceof SchemaVariable) {
 		final Object inst = svInst.getInstantiation
 		    ((SchemaVariable)originalOp);
@@ -340,12 +340,12 @@ public class SyntacticalReplaceVisitor extends Visitor {
 		    } else {                
 		        final int posInStack = op.arity() - op.locationSubtermsEnd(i);
 		        Term instantiation = toTerm(inst);
-		        newOps[i] = (Location)instantiation.op();
+		        newOps[i] = (UpdateableOperator)instantiation.op();
 		        updateLocation(newOps[i], instantiation, 
 		                posInStack, 0, false);
 		    }
 		} else {
-		    newOps[i] = (Location) inst;
+		    newOps[i] = (UpdateableOperator) inst;
 		}
 	    } else if (originalOp instanceof MetaOperator) {
 		final MetaOperator mop = (MetaOperator) originalOp;		
@@ -355,12 +355,12 @@ public class SyntacticalReplaceVisitor extends Visitor {
 		    mop.calculate(tf.createMetaTerm(mop,
 		                                    peek(posInStack, mop.arity())), 
 		                                    svInst, getServices());		
-		newOps[i] = (Location) computedLocation.op();
+		newOps[i] = (UpdateableOperator) computedLocation.op();
 
 		updateLocation(newOps[i], computedLocation, posInStack, 
 			       mop.arity(), true);
 	    } else {
-		newOps[i] = (Location) instantiateOperator(originalOp);
+		newOps[i] = (UpdateableOperator) instantiateOperator(originalOp);
 	    }	   
 	    changed = (changed || (newOps[i] != originalOp));
 	}		

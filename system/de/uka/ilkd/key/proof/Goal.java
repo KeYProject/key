@@ -106,7 +106,7 @@ public class Goal  {
     }
 
     /** returns the simplifier that has to be used */
-    public UpdateSimplifier simplifier() {
+    public OldUpdateSimplifier simplifier() {
 	return proof().simplifier();
     }
 
@@ -686,9 +686,6 @@ public class Goal  {
         final ListOfGoal goalList = ruleApp.execute(this,  
                 proof.getServices());
         
-        //XXX
-        ExplicitHeapConverter.INSTANCE.convertDestructive(goalList, proof().getServices());
-
         proof.getServices().saveNameRecorder(n);
         
         if ( goalList == null ) {

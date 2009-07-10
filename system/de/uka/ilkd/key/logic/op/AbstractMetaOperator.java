@@ -31,14 +31,6 @@ public abstract class AbstractMetaOperator extends AbstractSortedOperator
     
     //must be first
     public static final Sort METASORT = new PrimitiveSort(new Name("Meta"));    
-
-    public static final AbstractMetaOperator META_LENGTH = new MetaLength();
-
-    public static final AbstractMetaOperator META_ATTRIBUTE = new MetaAttribute();
-
-    public static final AbstractMetaOperator META_CREATED = new MetaCreated();
-    
-    public static final AbstractMetaOperator META_NEXT_TO_CREATE = new MetaNextToCreate();
     
     public static final AbstractMetaOperator META_FIELDREF = new MetaFieldReference(); 
 

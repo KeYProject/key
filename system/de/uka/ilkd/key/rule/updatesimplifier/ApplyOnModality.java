@@ -22,7 +22,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.AbstractUpdateRule;
-import de.uka.ilkd.key.rule.UpdateSimplifier;
+import de.uka.ilkd.key.rule.OldUpdateSimplifier;
 import de.uka.ilkd.key.util.LRUCache;
 
 /**
@@ -48,7 +48,7 @@ public class ApplyOnModality extends AbstractUpdateRule {
      * @param deletionEnabled a boolean flag indictaing if effectless
      * updates shall be deleted
      */
-    public ApplyOnModality(UpdateSimplifier updateSimplifier, 
+    public ApplyOnModality(OldUpdateSimplifier updateSimplifier, 
             boolean deletionEnabled) {
         super(updateSimplifier);   
         this.deletionEnabled = deletionEnabled;
@@ -89,7 +89,7 @@ public class ApplyOnModality extends AbstractUpdateRule {
 
         for (int i = 0, size=pairs.size(); i<size; i++) {
             final AssignmentPair pair =  pairs.getAssignmentPair(i);            
-            final Location loc = pair.location();
+            final UpdateableOperator loc = pair.location();
                        
             if ( protectedLocation ( loc, protectedProgVars ) )
                 result.add ( pair );
@@ -103,7 +103,7 @@ public class ApplyOnModality extends AbstractUpdateRule {
      * @param protectedProgVars
      * @return true if the given location is protected
      */
-    private boolean protectedLocation(Location loc, 
+    private boolean protectedLocation(UpdateableOperator loc, 
             HashSet<? extends Object> protectedProgVars) {
         // currently it would be safe to comment the PROTECTED_HEAP part out as 
         // heap locations are generally not thrown away. But in principle one can think
@@ -121,7 +121,7 @@ public class ApplyOnModality extends AbstractUpdateRule {
      * @param loc the Location to test
      * @return true iff the location denotes a heap location
      */
-    private boolean isHeapLocation(Location loc) {        
+    private boolean isHeapLocation(UpdateableOperator loc) {        
         return (!(loc instanceof ProgramVariable) || ((ProgramVariable)loc).isMember());
     }
 

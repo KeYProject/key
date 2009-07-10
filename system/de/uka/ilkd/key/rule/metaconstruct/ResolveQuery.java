@@ -25,8 +25,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-public class ResolveQuery extends AbstractMetaOperator {
 
+public class ResolveQuery extends AbstractMetaOperator {
 
     private Term[] addUpdatesLoc = null;
     private Term[] addUpdatesVal = null;
@@ -41,20 +41,6 @@ public class ResolveQuery extends AbstractMetaOperator {
 	super(new Name("#ResolveQuery"), 2, Sort.FORMULA);
     }
 
-
-    /**
-     * checks whether the top level structure of the given @link Term
-     * is syntactically valid, given the assumption that the top level
-     * operator of the term is the same as this Operator. The
-     * assumption that the top level operator and the term are equal
-     * is NOT checked.  
-     * @return true iff the top level structure of
-     * the @link Term is valid.
-     */
-    public boolean validTopLevel(Term term) {
-	// a meta operator accepts almost everything
-	return  term.arity()==arity();
-    }
 
     private ArrayOfExpression createArgumentPVs(Term t, Services services) {
 	final ProgramMethod pm = ((ProgramMethod)t.op());
@@ -198,7 +184,7 @@ public class ResolveQuery extends AbstractMetaOperator {
         return resultVarName;
     }
 
-    /** calculates the resulting term. */
+
     public Term calculate(Term term, SVInstantiations svInst, 
 			  Services services) {
 	return createProgramMethodSubstitute(term.sub(0), term.sub(1), services);	

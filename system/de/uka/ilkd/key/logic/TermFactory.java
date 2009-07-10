@@ -518,6 +518,8 @@ public class TermFactory {
 	    return createIfThenElseTerm ( subTerms[0], subTerms[1], subTerms[2] );
 	} else if (op instanceof MetaOperator) {
 	    return createMetaTerm((MetaOperator)op, subTerms);
+	} else if (op instanceof UpdateApplication) {
+	    return createFunctionTerm(op, subTerms);
 	} else {
 	    de.uka.ilkd.key.util.Debug.fail("Should never be"+
 					    " reached. Missing case for class", 

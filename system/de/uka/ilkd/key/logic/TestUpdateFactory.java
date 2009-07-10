@@ -21,7 +21,7 @@ import de.uka.ilkd.key.logic.sort.ClassInstanceSortImpl;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.TacletForTests;
-import de.uka.ilkd.key.rule.UpdateSimplifier;
+import de.uka.ilkd.key.rule.OldUpdateSimplifier;
 import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPairImpl;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
 

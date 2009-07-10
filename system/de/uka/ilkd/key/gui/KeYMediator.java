@@ -49,7 +49,7 @@ public class KeYMediator {
     private InteractiveProver interactiveProver;
 
     /** the update simplifier (may be moved to nodes)*/
-    private UpdateSimplifier upd_simplifier;
+    private OldUpdateSimplifier upd_simplifier;
 
     /** the notation info used to print sequents */
     private final NotationInfo notationInfo;
@@ -612,7 +612,7 @@ public class KeYMediator {
 
     
     /** sets the simultaneous update simplifier */
-    public void setSimplifier(UpdateSimplifier s) {
+    public void setSimplifier(OldUpdateSimplifier s) {
 	upd_simplifier = s;
 	if (getProof() != null) getProof().setSimplifier(s);
     }

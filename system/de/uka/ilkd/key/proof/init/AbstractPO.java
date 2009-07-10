@@ -39,7 +39,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.SetOfTaclet;
-import de.uka.ilkd.key.rule.UpdateSimplifier;
+import de.uka.ilkd.key.rule.OldUpdateSimplifier;
 import de.uka.ilkd.key.speclang.*;
 
 
@@ -81,7 +81,7 @@ public abstract class AbstractPO implements ProofOblInput {
         this.services   = initConfig.getServices();
         this.javaInfo   = initConfig.getServices().getJavaInfo();
         this.specRepos  = initConfig.getServices().getSpecificationRepository();
-        this.uf         = new UpdateFactory(services, new UpdateSimplifier());
+        this.uf         = new UpdateFactory(services, new OldUpdateSimplifier());
         this.name       = name;
         this.selfKJT    = selfKJT;
     }
@@ -179,7 +179,7 @@ public abstract class AbstractPO implements ProofOblInput {
                                                                  paramVars,
                                                                  services);
 
-        UpdateFactory uf = new UpdateFactory(services, new UpdateSimplifier());
+        UpdateFactory uf = new UpdateFactory(services, new OldUpdateSimplifier());
         AnonymisingUpdateFactory auf = new AnonymisingUpdateFactory(uf);
         return auf.createAnonymisingUpdateTerm(locations,
                 targetTerm,

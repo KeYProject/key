@@ -224,7 +224,7 @@ class TacletMenu extends JMenu {
     private boolean addSection(String title, ListOfTacletApp taclet, 
 			       MenuControl control) {
 	if (taclet.size() > 0) {
-	    //uncomment if you want submenus with subtitels
+	    //uncomment if you want submenus with subtitles
 	    //	    insert(createSubMenu(taclet, title, control), 1);
 	    //	    createSection(title);
 	    add(createMenuItems(taclet, control));

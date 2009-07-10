@@ -11,7 +11,6 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -20,7 +19,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * not initialised with a compile time constant.
  * 
  */
-public class LocationVariable extends ProgramVariable implements Location {
+public class LocationVariable extends ProgramVariable implements UpdateableOperator {
 
     public LocationVariable(ProgramElementName name, 
             KeYJavaType        t, 
@@ -42,12 +41,6 @@ public class LocationVariable extends ProgramVariable implements Location {
         super(name, s, null, null, false, false, false);
     }
     
-    
-    @Override
-    public boolean validTopLevel(Term term){
-        return term.arity() == 0;
-    }
-    
 
     @Override
     public boolean isRigid () {
@@ -59,5 +52,4 @@ public class LocationVariable extends ProgramVariable implements Location {
     public void visit(de.uka.ilkd.key.java.visitor.Visitor v) {
         v.performActionOnLocationVariable(this);
     }
-
 }

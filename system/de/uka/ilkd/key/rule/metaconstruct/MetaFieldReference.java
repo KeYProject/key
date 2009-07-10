@@ -35,7 +35,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * @author mulbrich
  */
 public class MetaFieldReference extends AbstractMetaOperator implements
-        Location {
+        UpdateableOperator {
 
     private static final Logger logger =
             Logger.getLogger(MetaFieldReference.class);
@@ -77,7 +77,7 @@ public class MetaFieldReference extends AbstractMetaOperator implements
         }
     }
 
-    public boolean mayBeAliasedBy(Location loc) {
+    public boolean mayBeAliasedBy(UpdateableOperator loc) {
         return true;
     }
 }

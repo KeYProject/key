@@ -165,7 +165,7 @@ public class TestVariableNamer extends TestCase {
 
 
     public void setUp() {
-	UpdateSimplifier sus = new UpdateSimplifier();
+	OldUpdateSimplifier sus = new OldUpdateSimplifier();
 	proof.setSimplifier(sus);
     }
 

@@ -26,7 +26,7 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class AssignmentPairImpl implements AssignmentPair {
 
-    private final Location accessOp;
+    private final UpdateableOperator accessOp;
     private final Term[] locSubs;
     private final Term value;
     
@@ -44,7 +44,7 @@ public class AssignmentPairImpl implements AssignmentPair {
     
     public AssignmentPairImpl (final ArrayOfQuantifiableVariable boundVars,
                                final Term guard,
-                               final Location accessOp,
+                               final UpdateableOperator accessOp,
                                final Term[] locSubs,
                                final Term value) {
         this.boundVars = boundVars;
@@ -60,7 +60,7 @@ public class AssignmentPairImpl implements AssignmentPair {
      * @param locSubs the subterms of the location
      * @param value the value the location is updated to
      */
-    public AssignmentPairImpl (final Location accessOp,
+    public AssignmentPairImpl (final UpdateableOperator accessOp,
                                final Term[] locSubs,
                                final Term value) {
         this ( new ArrayOfQuantifiableVariable (),
@@ -85,7 +85,7 @@ public class AssignmentPairImpl implements AssignmentPair {
      * returns the location descriptor
      * @see de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair#location()
      */
-    public Location location() {
+    public UpdateableOperator location() {
         return accessOp;
     }
 

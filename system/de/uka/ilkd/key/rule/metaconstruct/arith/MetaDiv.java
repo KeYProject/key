@@ -22,32 +22,14 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
-/** this class implements the interface for
- * MetaAdderators. MetaAdderators are used to do complex term
- * transformation when applying a taclet. Often these transformation
- * caanot be described with the taclet scheme (or trying to do so would
- * result in a huge number of rules)
- */
+
+
 public class MetaDiv extends AbstractMetaOperator {
 
     public MetaDiv() {
 	super(new Name("#div"), 2);
     }
 
-
-    /**
-     * checks whether the top level structure of the given @link Term
-     * is syntactically valid, given the assumption that the top level
-     * operator of the term is the same as this Operator. The
-     * assumption that the top level operator and the term are equal
-     * is NOT checked.  
-     * @return true iff the top level structure of
-     * the @link Term is valid.
-     */
-    public boolean validTopLevel(Term term) {
-	// a meta operator accepts almost everything
-	return term.op() instanceof MetaDiv && term.arity()==arity();
-    }
 
     /** 
      *  checks whether the result is consistent with the axiom div_axiom 
@@ -107,5 +89,4 @@ public class MetaDiv extends AbstractMetaOperator {
 	return services.getTypeConverter().convertToLogicElement(lit);
 
     }
-
 }

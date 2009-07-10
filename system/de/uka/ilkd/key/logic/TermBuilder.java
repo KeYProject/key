@@ -11,6 +11,7 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.*;
@@ -241,6 +242,67 @@ public final class TermBuilder {
                     t1 + ", " + t2);
         }
         return tf.createJunctorTermAndSimplify(Equality.EQV, t1, t2);
+    }
+    
+    
+    
+    //-------------------------------------------------------------------------
+    //updates    
+    //-------------------------------------------------------------------------
+    
+    public Term elemUpd(UpdateableOperator pv, Term rhs) {
+	Operator op = ElementaryUpdate.getInstance(pv);
+	return tf.createFunctionTerm(op, rhs);
+    }
+    
+    
+    public Term elemUpd(Services services, Term lhs, Term rhs) {
+	HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	if(lhs.op() instanceof UpdateableOperator) {
+	    assert lhs.arity() == 0 : "uh oh: " + lhs;
+	    return elemUpd((UpdateableOperator)lhs.op(), rhs);
+	} else if(heapLDT.getSortOfSelect(lhs.op()) != null
+		  && lhs.sub(0).op().equals(heapLDT.getHeap())) {
+	    final Term heapTerm   = lhs.sub(0);
+	    final Term objectTerm = lhs.sub(1);
+	    final Term fieldTerm  = lhs.sub(2);
+                
+	    final Term fullRhs = store(services, 
+               		               heapTerm, 
+                		       objectTerm, 
+                		       fieldTerm, 
+                		       rhs);
+	    return elemUpd(heapLDT.getHeap(), fullRhs);
+	} else {
+	    throw new TermCreationException("Not a legal lhs: " + lhs);
+	}
+    }    
+    
+    
+    public Term skip() {
+	return tf.createFunctionTerm(UpdateJunctor.SKIP);
+    }
+    
+    
+    public Term parallel(Term u1, Term u2) {
+	if(u1.sort() != Sort.UPDATE) {
+	    throw new TermCreationException("Not an update: " + u1);
+	} else if(u2.sort() != Sort.UPDATE) {
+	    throw new TermCreationException("Not an update: " + u2);
+	}
+	return tf.createFunctionTerm(UpdateJunctor.PARALLEL_UPDATE,
+		                     u1,
+		                     u2);
+    }
+    
+    
+    public Term applyUpd(Term u, Term t) {
+	if(u.sort() != Sort.UPDATE) {
+	    throw new TermCreationException("Not an update: " + u);
+	}
+	return tf.createFunctionTerm(UpdateApplication.UPDATE_APPLICATION,
+		                     u, 
+		                     t);
     }
     
     

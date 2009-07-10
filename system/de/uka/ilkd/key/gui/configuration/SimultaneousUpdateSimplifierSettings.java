@@ -14,7 +14,7 @@ import java.util.LinkedList;
 import java.util.Properties;
 
 import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.rule.UpdateSimplifier;
+import de.uka.ilkd.key.rule.OldUpdateSimplifier;
 
 /** This class encapsulates the information about the active
  * update simplifier settings
@@ -30,7 +30,7 @@ public class SimultaneousUpdateSimplifierSettings implements Settings {
     private boolean delete_effectless_updates = true;
     private boolean eagerMode = true;
  
-    private UpdateSimplifier sus;
+    private OldUpdateSimplifier sus;
 
     private LinkedList<SettingsListener> listenerList = 
         new LinkedList<SettingsListener>();
@@ -41,7 +41,7 @@ public class SimultaneousUpdateSimplifierSettings implements Settings {
     
     // 
     private void updateSimplifier() {
-	sus = new UpdateSimplifier(deleteEffectlessUpdates(), eagerMode());
+	sus = new OldUpdateSimplifier(deleteEffectlessUpdates(), eagerMode());
     }
 
     // getter
@@ -72,7 +72,7 @@ public class SimultaneousUpdateSimplifierSettings implements Settings {
 
 
     // 
-    public UpdateSimplifier getSimplifier() {
+    public OldUpdateSimplifier getSimplifier() {
 	return sus;
     }
 

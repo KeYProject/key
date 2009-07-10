@@ -21,12 +21,12 @@ public interface IUpdateOperator extends Operator {
      * This must not change the number of locations, i.e.
      * <code>newLocs.length==locationCount()</code>
      */
-    IUpdateOperator replaceLocations(Location[] newLocs);
+    IUpdateOperator replaceLocations(UpdateableOperator[] newLocs);
     
     /**
      * returns the array of location operators which are updated
      */
-    ArrayOfLocation locationsAsArray();
+    ArrayOfUpdateableOperator locationsAsArray();
 
     /**
      * returns the number of locations
@@ -38,7 +38,7 @@ public interface IUpdateOperator extends Operator {
     /**
      * returns the operator of <tt>n</tt>-th location
      */
-    Location location(int n);
+    UpdateableOperator location(int n);
 
     /**
      * returns the number of the subterm representing the value to which

@@ -29,14 +29,14 @@ import de.uka.ilkd.key.rule.updatesimplifier.UpdateSimplifierTermFactory;
  */
 public abstract class AbstractUpdateRule implements IUpdateRule {
 
-    private final UpdateSimplifier updateSimplifier;
+    private final OldUpdateSimplifier updateSimplifier;
 
     /**
      * creates an instance of this rule used by the given update
      * simplifier
      * @param updateSimplifier the UpdateSimplifier using this rule
      */
-    public AbstractUpdateRule(UpdateSimplifier updateSimplifier) {
+    public AbstractUpdateRule(OldUpdateSimplifier updateSimplifier) {
 	this.updateSimplifier = updateSimplifier;
     }
 
@@ -44,7 +44,7 @@ public abstract class AbstractUpdateRule implements IUpdateRule {
      * returns the update simplifier for which this rule has been
      * registered
      */
-    public UpdateSimplifier updateSimplifier() {
+    public OldUpdateSimplifier updateSimplifier() {
 	return updateSimplifier;
     }
 

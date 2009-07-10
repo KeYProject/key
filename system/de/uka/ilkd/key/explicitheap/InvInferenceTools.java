@@ -340,8 +340,8 @@ class InvInferenceTools {
     /**
      * Tells whether the passed sets of location symbols are disjoint.
      */
-    public boolean areDisjoint(SetOfLocation set1, SetOfLocation set2) {
-	for(Location loc : set1) {
+    public boolean areDisjoint(SetOfUpdateableOperator set1, SetOfUpdateableOperator set2) {
+	for(UpdateableOperator loc : set1) {
             if(set2.contains(loc)) {
                 return false;
             }
@@ -353,17 +353,17 @@ class InvInferenceTools {
     /**
      * Collects all location symbols occurring in the passed term.
      */
-    public SetOfLocation getOccurringLocationSymbols(Term t) {
-        SetOfLocation result = SetAsListOfLocation.EMPTY_SET;
-        if(t.op() instanceof Location) {
-            result = result.add((Location)t.op());
+    public SetOfUpdateableOperator getOccurringLocationSymbols(Term t) {
+        SetOfUpdateableOperator result = SetAsListOfUpdateableOperator.EMPTY_SET;
+        if(t.op() instanceof UpdateableOperator) {
+            result = result.add((UpdateableOperator)t.op());
         }
         if(t.javaBlock() != null && t.javaBlock().program() != null) {
             JavaASTCollector jac = new JavaASTCollector(t.javaBlock().program(), 
-                                                        Location.class);
+                                                        UpdateableOperator.class);
             jac.start();
             for(ProgramElement loc : jac.getNodes()) {
-                result = result.add((Location)loc);
+                result = result.add((UpdateableOperator)loc);
             }
         }
         for(int i = 0; i < t.arity(); i++) {

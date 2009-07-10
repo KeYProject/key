@@ -402,10 +402,7 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	}
 
 	public boolean canStandFor(Term t) {
-	    if (t.op() instanceof ProgramVariable) {
-		return true;
-	    }
-	    return false;
+	    return t.op() instanceof ProgramVariable;
 	}
 
 	protected boolean canStandFor(ProgramElement pe,

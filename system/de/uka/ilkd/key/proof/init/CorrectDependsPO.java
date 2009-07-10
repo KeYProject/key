@@ -21,7 +21,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.rule.UpdateSimplifier;
+import de.uka.ilkd.key.rule.OldUpdateSimplifier;
 import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 
@@ -119,7 +119,7 @@ public class CorrectDependsPO extends AbstractPO {
         Term invTerm = translateInv(inv);
                                        
         //build post term
-        UpdateFactory uf = new UpdateFactory(services, new UpdateSimplifier());
+        UpdateFactory uf = new UpdateFactory(services, new OldUpdateSimplifier());
         Term updateTerm = uf.apply(createUpdate(uf, atPreFunctions), invTerm);
 //        AnonymousUpdate au = AnonymousUpdate.getNewAnonymousOperator();
         //Term postTerm = TF.createAnonymousUpdateTerm(au, updateTerm);

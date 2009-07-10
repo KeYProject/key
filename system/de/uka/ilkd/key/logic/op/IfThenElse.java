@@ -5,12 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-// This file is part of KeY - Integrated Deductive Software Design 
-// Copyright (C) 2001-2003 Universitaet Karlsruhe, Germany
-//                         and Chalmers University of Technology, Sweden          
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
 //
 
 package de.uka.ilkd.key.logic.op;
@@ -29,55 +23,23 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 public class IfThenElse extends AbstractOperator {
     
-    /** the 'if-then-else' operator */
     public static final IfThenElse IF_THEN_ELSE = new IfThenElse ();
-
-    /**
-     * creates the default if-else operator
-     */
-    private IfThenElse () {
-        super ( new Name ( "if-then-else" ), 3 );
-    }
-
+    
+    
     /**
      * creates an if-else operator of the given name
      */
-    protected IfThenElse (Name name) {
+    protected IfThenElse(Name name) {
         super ( name, 3 );
     }
-    
-    @Override
-    public boolean isRigid() {
-	return true;
-    }
-    
-
-    public boolean validTopLevel (Term term) {
-        final Sort s0 = term.sub ( 0 ).sort ();
-        final Sort s1 = term.sub ( 1 ).sort ();
-        final Sort s2 = term.sub ( 2 ).sort ();
         
-        // TODO: like in <code>ConjCond</code>, but this is really bad!!! /PR
-        return term.arity () == arity ()
-               && s0 == Sort.FORMULA
-               && ( s1 == Sort.FORMULA ) == ( s2 == Sort.FORMULA );
-    }
-
-    public Sort sort (ArrayOfTerm terms) {
-        final Sort s2 = terms.getTerm(1).sort ();
-        final Sort s3 = terms.getTerm(2).sort ();
-        if (s2 instanceof ProgramSVSort
-             || s2 == AbstractMetaOperator.METASORT )
-            { return s3; }
-        if (s3 instanceof ProgramSVSort
-             || s3 == AbstractMetaOperator.METASORT ) {
-            return s2;
-        } else {           
-            // still a mess but a better one
-            return getCommonSuperSort(s2, s3);
-        }
+    
+    private IfThenElse () {
+        this(new Name("if-then-else"));
     }
     
+    
+
     private Sort getCommonSuperSort(Sort s1, Sort s2) {
         if (s1 == Sort.FORMULA) {
             assert s2 == Sort.FORMULA;
@@ -104,5 +66,41 @@ public class IfThenElse extends AbstractOperator {
             } 
         }        
         return result;
+    }        
+
+    
+    @Override
+    public Sort sort (ArrayOfTerm terms) {
+        final Sort s2 = terms.getTerm(1).sort ();
+        final Sort s3 = terms.getTerm(2).sort ();
+        if (s2 instanceof ProgramSVSort
+             || s2 == AbstractMetaOperator.METASORT )
+            { return s3; }
+        if (s3 instanceof ProgramSVSort
+             || s3 == AbstractMetaOperator.METASORT ) {
+            return s2;
+        } else {           
+            // still a mess but a better one
+            return getCommonSuperSort(s2, s3);
+        }
     }
+    
+
+    @Override
+    public boolean validTopLevel (Term term) {
+        final Sort s0 = term.sub(0).sort();
+        final Sort s1 = term.sub(1).sort();
+        final Sort s2 = term.sub(2).sort();
+        
+        // TODO: like in <code>ConjCond</code>, but this is really bad!!! /PR
+        return term.arity() == arity()
+               && s0 == Sort.FORMULA
+               && (s1 == Sort.FORMULA) == (s2 == Sort.FORMULA);
+    }
+    
+    
+    @Override
+    public boolean isRigid() {
+	return true;
+    }   
 }

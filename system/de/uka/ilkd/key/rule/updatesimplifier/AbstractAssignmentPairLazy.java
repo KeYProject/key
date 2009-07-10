@@ -13,7 +13,7 @@ package de.uka.ilkd.key.rule.updatesimplifier;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.IUpdateOperator;
-import de.uka.ilkd.key.logic.op.Location;
+import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
 
@@ -82,7 +82,7 @@ abstract class AbstractAssignmentPairLazy implements AssignmentPair {
      * returns the location operator
      * @return  the location specifying operator
      */
-    public Location location () {
+    public UpdateableOperator location () {
         return getUpdateOp ().location ( getLocationPos () );
     }
 

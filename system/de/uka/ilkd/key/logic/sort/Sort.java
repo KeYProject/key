@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.Named;
 public interface Sort extends Named {
     
     Sort FORMULA  = new PrimitiveSort(new Name("Formula"));
+    Sort UPDATE   = new PrimitiveSort(new Name("Update"));
     Sort NULL     = new NullSortImpl(new Name("Null"));
 
     Sort ANY      = new AbstractNonCollectionSort(new Name("any")) {

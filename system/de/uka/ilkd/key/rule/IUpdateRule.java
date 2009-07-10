@@ -6,12 +6,8 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-/*
- * Created on 16.12.2004
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
+
+
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.Services;

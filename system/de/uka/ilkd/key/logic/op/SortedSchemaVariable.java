@@ -30,7 +30,7 @@ import de.uka.ilkd.key.util.Debug;
  * isCompatible(TermSymbol t)
  */
 public abstract class SortedSchemaVariable extends SchemaVariableAdapter
-        implements ParsableVariable, QuantifiableVariable, Location {
+        implements ParsableVariable, QuantifiableVariable, UpdateableOperator {
 
     /**
      * creates a new SchemaVariable. That is used as placeholder for TermSymbols
@@ -171,7 +171,7 @@ public abstract class SortedSchemaVariable extends SchemaVariableAdapter
         return null;
     }
 
-    public boolean mayBeAliasedBy(Location loc) {
+    public boolean mayBeAliasedBy(UpdateableOperator loc) {
         return true;
     }
 

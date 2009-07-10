@@ -13,7 +13,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.UpdateFactory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.AbstractUpdateRule;
-import de.uka.ilkd.key.rule.UpdateSimplifier;
+import de.uka.ilkd.key.rule.OldUpdateSimplifier;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -26,7 +26,7 @@ public class ApplyOnUpdate extends AbstractUpdateRule {
      * creates an instance of this rule used by the given update
      * simplifier
      */
-    public ApplyOnUpdate(UpdateSimplifier us) {
+    public ApplyOnUpdate(OldUpdateSimplifier us) {
         super(us);
     }
 

@@ -123,7 +123,7 @@ public class TacletSchemaVariableCollector extends Visitor {
         ListOfSchemaVariable result = vars;
         final QuanUpdateOperator quan = (QuanUpdateOperator) op;
         for (int i = 0, locCount = quan.locationCount(); i < locCount; i++) {
-            final Location currentLocation = quan.location(i);
+            final UpdateableOperator currentLocation = quan.location(i);
             if (currentLocation instanceof SchemaVariable) {
                 result = result.prepend((SchemaVariable) currentLocation);
             }

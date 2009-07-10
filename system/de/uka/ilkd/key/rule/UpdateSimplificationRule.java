@@ -109,7 +109,7 @@ public class UpdateSimplificationRule implements BuiltInRule {
     }
 
     private ConstrainedFormulaContainer[]
-        applyOnSequent(Sequent seq, UpdateSimplifier sus,
+        applyOnSequent(Sequent seq, OldUpdateSimplifier sus,
                 Services services) {			
 
 	final List<ConstrainedFormulaContainer> result = 
@@ -123,7 +123,7 @@ public class UpdateSimplificationRule implements BuiltInRule {
 
     private void applyOnSemisequent(Semisequent semiSeq, 
             boolean semiSeqIsAntecedent,
-            UpdateSimplifier sus, 
+            OldUpdateSimplifier sus, 
             Services services, 
             final List<ConstrainedFormulaContainer> result) {
 
@@ -141,7 +141,7 @@ public class UpdateSimplificationRule implements BuiltInRule {
     }
 
     private ConstrainedFormulaContainer[] applyOnTerm
-    (UpdateSimplifier sus, PosInOccurrence pio, Services services) {
+    (OldUpdateSimplifier sus, PosInOccurrence pio, Services services) {
 	final ConstrainedFormulaContainer[] result;        
 	
 	ConstrainedFormula cf = pio.constrainedFormula();

@@ -6,6 +6,7 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
+
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.Services;
@@ -27,7 +28,7 @@ import de.uka.ilkd.key.util.Debug;
  * the apply methods. The simplify methods are only for recursive 
  * calls made by the update simplification rules.   
  */
-public class UpdateSimplifier {
+public class OldUpdateSimplifier {
     
 
     /**
@@ -45,7 +46,7 @@ public class UpdateSimplifier {
     
     private Constraint formulaConstraint = Constraint.BOTTOM;
 
-    public UpdateSimplifier() {       
+    public OldUpdateSimplifier() {       
         this(false, false);
     }
     
@@ -55,7 +56,7 @@ public class UpdateSimplifier {
      * effectless assignment pairs should be removed
      * @param eager boolean true if updates shall be applied eagerly
      */
-    public UpdateSimplifier(boolean deletionEnabled, boolean eager) {
+    public OldUpdateSimplifier(boolean deletionEnabled, boolean eager) {
 	this.eager = eager;
         ListOfIUpdateRule usRules = SLListOfIUpdateRule.EMPTY_LIST.    
         append(new ApplyOnUpdate(this)).

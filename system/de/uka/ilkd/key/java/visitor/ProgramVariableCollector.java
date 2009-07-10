@@ -31,7 +31,7 @@ import de.uka.ilkd.key.speclang.LoopInvariant;
  */
 public class ProgramVariableCollector extends JavaASTVisitor {
 
-    private final HashSet<Location> result = new HashSet<Location>();
+    private final HashSet<UpdateableOperator> result = new HashSet<UpdateableOperator>();
     private final boolean collectFunctionLocations;
 
     /**
@@ -58,7 +58,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
 	walk(root());	
     }
 
-    public HashSet<Location> result() { 
+    public HashSet<UpdateableOperator> result() { 
 	return result;
     }    
 

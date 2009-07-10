@@ -28,6 +28,20 @@ public abstract class SubstOp extends AbstractOperator {
     protected SubstOp(Name name) {
 	super(name, 2);
     }
+    
+
+    /**
+     * @return sort of the second subterm or throws an
+     * IllegalArgumentException if the given term has no correct (2=) arity
+     */
+    public Sort sort(ArrayOfTerm terms) {
+	if(terms.size() == 2) {
+	    return terms.getTerm(1).sort();
+	}
+	else throw new IllegalArgumentException("Cannot determine sort of "+
+						"invalid term (Wrong arity).");
+    }    
+    
 
     /**
      * @return true iff the sort of the subterm 0 of the given term
@@ -37,31 +51,27 @@ public abstract class SubstOp extends AbstractOperator {
      * for the 0th subterm and 1 for the 1st subterm.
      */
     public boolean validTopLevel(Term term){
-	if (term.arity() != 2) return false;
-	if (term.varsBoundHere(1).size() != 1) return false;
-	if (term.varsBoundHere(0).size() != 0) return false;
-	Sort substSort=term.sub(0).sort();
-	Sort varSort=term.varsBoundHere(1).getQuantifiableVariable(0).sort();       
+	if(term.arity() != arity()) {
+	    return false;
+	}
+	if(term.varsBoundHere(0).size() != 0) {
+	    return false;
+	}
+	if(term.varsBoundHere(1).size() != 1) { 
+	    return false;
+	}
+	Sort substSort = term.sub(0).sort();
+	Sort varSort = term.varsBoundHere(1).getQuantifiableVariable(0).sort();       
 	return substSort.extendsTrans(varSort);
     }
 
-    /**
-     * @return sort of the second subterm or throws an
-     * IllegalArgumentException if the given term has no correct (2=) arity
-     */
-    public Sort sort(ArrayOfTerm terms) {
-	if (terms.size()==2)
-	    return terms.getTerm(1).sort();
-	else throw new IllegalArgumentException("Cannot determine sort of "+
-						"invalid term (Wrong arity).");
-    }
-
+    
     /**
      * Apply this substitution operator to <code>term</code>, which
      * has this operator as top-level operator
      */
-    public Term apply ( Term term ) {
-	QuantifiableVariable v=term.varsBoundHere(1).getQuantifiableVariable(0);
+    public Term apply(Term term) {
+	QuantifiableVariable v = term.varsBoundHere(1).getQuantifiableVariable(0);
 	ClashFreeSubst cfSubst = new ClashFreeSubst(v, term.sub(0));
 	Term res = cfSubst.apply(term.sub(1));
 	return res;

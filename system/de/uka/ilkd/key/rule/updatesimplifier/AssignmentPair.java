@@ -10,7 +10,7 @@ package de.uka.ilkd.key.rule.updatesimplifier;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Location;
+import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.op.SetOfQuantifiableVariable;
 
 /**
@@ -53,7 +53,7 @@ public interface AssignmentPair {
      * returns the location operator
      * @return the location specifying operator
      */
-    Location location();
+    UpdateableOperator location();
 
     /**
      * returns the locations sub terms

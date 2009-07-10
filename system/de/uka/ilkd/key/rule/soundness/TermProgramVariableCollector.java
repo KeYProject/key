@@ -16,13 +16,13 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
-import de.uka.ilkd.key.logic.op.Location;
+import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
 
 public class TermProgramVariableCollector extends Visitor {
 
-    private final HashSet<Location> result = new HashSet<Location> ();
+    private final HashSet<UpdateableOperator> result = new HashSet<UpdateableOperator> ();
     private final Services services;
 
     
@@ -37,7 +37,7 @@ public class TermProgramVariableCollector extends Visitor {
      */  
     public void visit(Term t) {
 	if ( t.op() instanceof LocationVariable ) {
-	    result.add ( (Location) t.op() );
+	    result.add ( (UpdateableOperator) t.op() );
 	}
 	
 	if ( !t.javaBlock ().isEmpty() ) {
@@ -48,7 +48,7 @@ public class TermProgramVariableCollector extends Visitor {
 	}
     }
 
-    public HashSet<Location> result() { 
+    public HashSet<UpdateableOperator> result() { 
 	return result;
     }    
 }

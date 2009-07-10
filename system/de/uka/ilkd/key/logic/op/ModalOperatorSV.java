@@ -13,7 +13,6 @@ package de.uka.ilkd.key.logic.op;
 import java.util.HashSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -33,17 +32,8 @@ public class ModalOperatorSV extends OperatorSV  {
     }
     
 
-    /**
-     * checks whether the top level structure of the given @link Term
-     * is syntactically valid, given the assumption that the top level
-     * operator of the term is the same as this Operator. The
-     * assumption that the top level operator and the term are equal
-     * is NOT checked.  
-     * @return true iff the top level structure of
-     * the {@link Term} is valid.
-     */
-    public boolean validTopLevel(Term term){
-	if (term.arity() != this.arity()) return false;
+    @Override
+    public boolean additionalValidTopLevel(Term term){
 	boolean result = true;
 	for(int i=0;i<term.arity(); i++)
 	    result = result && term.sub(i).sort().equals(Sort.FORMULA);
@@ -72,9 +62,8 @@ public class ModalOperatorSV extends OperatorSV  {
         }  
         return super.match(subst, mc, services);
     }
-    // SchemaVariable methods
      
-    /** toString */
+
     public String toString() {
 	return toString(" (modal operator)");
     }

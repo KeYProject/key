@@ -40,9 +40,9 @@ public abstract class Update {
      */
     public static class UpdateInParts extends Update {
 
-        private final HashMap<Location, ArrayOfAssignmentPair> loc2assignmentPairs;
+        private final HashMap<UpdateableOperator, ArrayOfAssignmentPair> loc2assignmentPairs;
 
-        private final HashSet<Location> locationCache;
+        private final HashSet<UpdateableOperator> locationCache;
 
         private final ArrayOfAssignmentPair pairs;
 
@@ -53,8 +53,8 @@ public abstract class Update {
          */
         public UpdateInParts(final ArrayOfAssignmentPair pairs) {
             this.pairs = pairs;
-            loc2assignmentPairs = new HashMap<Location, ArrayOfAssignmentPair>();
-            this.locationCache = new HashSet<Location>();
+            loc2assignmentPairs = new HashMap<UpdateableOperator, ArrayOfAssignmentPair>();
+            this.locationCache = new HashSet<UpdateableOperator>();
 
             for (int i = 0; i < pairs.size(); i++) {
                 locationCache.add(pairs.getAssignmentPair(i).location());
@@ -76,12 +76,12 @@ public abstract class Update {
          * 
          * @see de.uka.ilkd.key.rule.updatesimplifier.Update#getAssignmentPairs(de.uka.ilkd.key.logic.op.Operator)
          */
-        public ArrayOfAssignmentPair getAssignmentPairs(Location loc) {
+        public ArrayOfAssignmentPair getAssignmentPairs(UpdateableOperator loc) {
             if (!loc2assignmentPairs.containsKey(loc)) {
                 ListOfAssignmentPair result = SLListOfAssignmentPair.EMPTY_LIST;
                 for (int i = pairs.size() - 1; i >= 0; i--) {
                     AssignmentPair assignmentPair = pairs.getAssignmentPair(i);
-                    final Location op = assignmentPair.location();
+                    final UpdateableOperator op = assignmentPair.location();
                     if (loc.mayBeAliasedBy(op)) {
                         result = result.prepend(assignmentPair);
                     }
@@ -98,7 +98,7 @@ public abstract class Update {
          * 
          * @see de.uka.ilkd.key.rule.updatesimplifier.Update#hasLocation(de.uka.ilkd.key.logic.op.Operator)
          */
-        public boolean hasLocation(Location loc) {
+        public boolean hasLocation(UpdateableOperator loc) {
             return locationCache.contains(loc);
         }
 
@@ -107,7 +107,7 @@ public abstract class Update {
          * 
          * @see de.uka.ilkd.key.rule.updatesimplifier.Update#location(int)
          */
-        public Location location(int n) {
+        public UpdateableOperator location(int n) {
             return pairs.getAssignmentPair(n).location();
         }
 
@@ -143,9 +143,9 @@ public abstract class Update {
 
     private static class UpdateWithUpdateTerm extends Update {
 
-        private final HashMap<Location, ArrayOfAssignmentPair> loc2assignmentPairs;
+        private final HashMap<UpdateableOperator, ArrayOfAssignmentPair> loc2assignmentPairs;
 
-        private HashSet<Location> locationCache;
+        private HashSet<UpdateableOperator> locationCache;
 
         private final Term update;
 
@@ -156,7 +156,7 @@ public abstract class Update {
         public UpdateWithUpdateTerm(Term update) {
             this.update = update;	    
             this.updateOp = (IUpdateOperator) update.op();
-            this.loc2assignmentPairs = new HashMap<Location, ArrayOfAssignmentPair>();            
+            this.loc2assignmentPairs = new HashMap<UpdateableOperator, ArrayOfAssignmentPair>();            
         }
 
         /**
@@ -183,7 +183,7 @@ public abstract class Update {
          * determines and returns all assignment pairs whose location part may 
          * be an alias of <code>loc</code>
          */
-        public ArrayOfAssignmentPair getAssignmentPairs(Location loc) {
+        public ArrayOfAssignmentPair getAssignmentPairs(UpdateableOperator loc) {
             if (!loc2assignmentPairs.containsKey(loc)) {
                 ListOfAssignmentPair result = SLListOfAssignmentPair.EMPTY_LIST;
                 for (int i = updateOp.locationCount() - 1; i >= 0; i--) {
@@ -197,9 +197,9 @@ public abstract class Update {
             return loc2assignmentPairs.get(loc);
         }
 
-        public boolean hasLocation (Location loc) {
+        public boolean hasLocation (UpdateableOperator loc) {
             if ( locationCache == null ) {
-                this.locationCache = new HashSet<Location> ();
+                this.locationCache = new HashSet<UpdateableOperator> ();
 
                 for ( int i = 0; i < updateOp.locationCount (); i++ ) {
                     locationCache.add ( updateOp.location ( i ) );
@@ -208,7 +208,7 @@ public abstract class Update {
             return locationCache.contains ( loc );
         }
 
-        public Location location(int n) {
+        public UpdateableOperator location(int n) {
             return updateOp.location(n);
         }
 
@@ -268,7 +268,7 @@ public abstract class Update {
      * determines and returns all assignment pairs whose location part has the
      * same top level operator as the given one
      */
-    public abstract ArrayOfAssignmentPair getAssignmentPairs(Location loc);
+    public abstract ArrayOfAssignmentPair getAssignmentPairs(UpdateableOperator loc);
 
     /**
      * returns true if the given location is updated by this update
@@ -278,7 +278,7 @@ public abstract class Update {
      * @return true if location occurs on the left side of an assignment pair in
      *         this update
      */
-    public abstract boolean hasLocation(Location loc);
+    public abstract boolean hasLocation(UpdateableOperator loc);
 
     /**
      * returns the n-th location operator
@@ -288,7 +288,7 @@ public abstract class Update {
      *            retrieved
      * @return the n-tl location operator
      */
-    public abstract Location location(int n);
+    public abstract UpdateableOperator location(int n);
 
     /**
      * returns the number of locations

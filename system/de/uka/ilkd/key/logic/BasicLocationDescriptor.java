@@ -16,7 +16,7 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.Location;
+import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 public class BasicLocationDescriptor implements LocationDescriptor {
@@ -28,7 +28,7 @@ public class BasicLocationDescriptor implements LocationDescriptor {
     
     public BasicLocationDescriptor(Term fma, Term locTerm) {
         assert fma != null && fma.sort() == Sort.FORMULA && locTerm != null;
-        if (!(locTerm.op() instanceof Location)) {
+        if (!(locTerm.op() instanceof UpdateableOperator)) {
             throw new IllegalArgumentException("Expected a location, but " + locTerm + 
                     " is a " + locTerm.op().getClass().getName());
         }

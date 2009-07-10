@@ -740,7 +740,7 @@ options {
                 result = javaInfo.getArrayLength();
             } else {
                 if (inSchemaMode()) {
-                    semanticError("Either undeclared schmema variable '" + 
+                    semanticError("Either undeclared schema variable '" + 
                                   attributeName + "' or a not fully qualified attribute in taclet.");
                 }
                 final KeYJavaType prefixKJT = javaInfo.getKeYJavaType(prefixSort);
@@ -3201,48 +3201,32 @@ simple_updateterm returns [Term a = null]
 :
   LBRACE v = varId ASSIGN a1=term RBRACE ( a2 = term110 | a2 = unary_formula )
   { 
-	a = tf.createUpdateTerm ( getServices(), tf.createVariableTerm ( (ProgramVariable) v ), a1, a2 );
+	a = TB.applyUpd(TB.elemUpd((LocationVariable) v, a1), a2);
   }
 ;
 
 updateterm returns [Term result = null] 
-{ 
-    SingleUpdateData sud = null;
-    List locations = new LinkedList();
-    List values    = new LinkedList();
-    List guards    = new LinkedList();
-    List boundVars = new LinkedList();
+{
+    Term su = null; 
+    Term pu = null;
     Term a2 = null;
 } :
         LBRACE 
         (
-            sud = singleupdate 
-            {
-                locations.add(sud.a0); 
-                values.add(sud.a1); 
-                guards.add(sud.guard);
-                boundVars.add(sud.boundVars);
+             su = singleupdate 
+             {
+                 pu = su;
              } 
              (  
-                PARALLEL sud = singleupdate 
+                PARALLEL su = singleupdate 
                 {
-                    locations.add(sud.a0); 
-                    values.add(sud.a1); 
-                    guards.add(sud.guard);
-                    boundVars.add(sud.boundVars);
-                 }
+                    pu = TB.parallel(pu, su);
+                }
              )*
         ) 
         RBRACE ( a2 = term110 | a2 = unary_formula )
         {   
-
-            result = tf.createQuanUpdateTerm
-		(getServices(), (ArrayOfQuantifiableVariable[])boundVars.toArray
-                     (new ArrayOfQuantifiableVariable[boundVars.size()]),
-		 (Term[])guards.toArray(new Term[guards.size()]),
-		 (Term[])locations.toArray(new Term[locations.size()]),
-		 (Term[])values.toArray(new Term[values.size()]),
-		  a2);
+	    result = TB.applyUpd(pu, a2);
         }
    ; exception
         catch [TermCreationException ex] {
@@ -3251,44 +3235,14 @@ updateterm returns [Term result = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
-singleupdate returns[SingleUpdateData sud=null]
+singleupdate returns[Term result=null]
 {
     Term a0 = null;
     Term a1 = null;
-    Term phi = null;
-    ListOfQuantifiableVariable boundVars = SLListOfQuantifiableVariable.EMPTY_LIST;
-    sud = new SingleUpdateData();
 }  :
-        (
-            FOR boundVars = bound_variables
-                   {
-                        sud.boundVars = new ArrayOfQuantifiableVariable
-                                               ( boundVars.toArray () );
-                   }
-        ) ?
-        (
-            (IF) => (
-                IF
-                LPAREN
-                phi=term
-                {
-                    if (phi.sort() != Sort.FORMULA) {
-                      semanticError("Guard of an update has to be a formula.");
-                    }
-                    sud.guard = phi;
-                }
-                RPAREN
-            ) | (
-                // nothing
-            )
-        )
-        (a0 = lhsSingle ) ASSIGN (a1 = rhsSingle) {
-            sud.a0 = a0;
-            sud.a1 = a1;
-            while ( !boundVars.isEmpty () ) {
-                unbindVars ();
-                boundVars = boundVars.tail ();
-            }
+        (a0 = lhsSingle) ASSIGN (a1 = rhsSingle) 
+        {
+            result = TB.elemUpd(getServices(), a0, a1);
         }
     ;
    
@@ -3365,10 +3319,9 @@ lhsSingle returns[Term result = null]
  :
         result = logicTermReEntry
         { 
-            if (!(result.sort() instanceof ProgramSVSort 
-                  || result.op() instanceof de.uka.ilkd.key.logic.op.Location
+            if (!(result.op() instanceof de.uka.ilkd.key.logic.op.UpdateableOperator
                   || getServices().getTypeConverter().getHeapLDT().getSortOfSelect(result.op()) != null))  {
-                semanticError("Only locations and select-terms can be updated, but " + 
+                semanticError("Only updateable operators and select-terms can be updated, but " + 
                 	result.op() + " is a " + 
                 	result.op().getClass().getName());
             }

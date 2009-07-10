@@ -82,7 +82,7 @@ public class TestApplyTaclet extends TestCase{
 
 	TacletForTests.setStandardFile(TacletForTests.testRules);
 	TacletForTests.parse();
-	UpdateSimplifier sus = new UpdateSimplifier();
+	OldUpdateSimplifier sus = new OldUpdateSimplifier();
 	Services services = new Services();
 	proof = new Proof[strs.length/2];
                         
