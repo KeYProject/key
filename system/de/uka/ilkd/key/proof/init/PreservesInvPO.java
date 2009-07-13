@@ -76,8 +76,10 @@ public class PreservesInvPO extends EnsuresPO {
             return false;
         }
         PreservesInvPO piPO = (PreservesInvPO) po;
-        return piPO.ensuredInvs.subset(ensuredInvs) 
-               && assumedInvs.subset(piPO.assumedInvs);
+        return programMethod.equals(piPO.programMethod)
+        	&& modality.equals(piPO.modality)
+        	&& piPO.ensuredInvs.subset(ensuredInvs) 
+                && assumedInvs.subset(piPO.assumedInvs);
     }
     
     
