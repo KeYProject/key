@@ -243,7 +243,10 @@ public class DecisionProcedureSettings implements Settings {
 	    toStore = toStore + rd.ruleName.toString() + "|" + comm + "||";
 	}
 	//remove the las two || again
-	toStore = toStore.substring(0, toStore.length()-2);
+	if (toStore.length() >= 2){
+	    //if the program comes here, a the end ad extra || was added.
+	    toStore = toStore.substring(0, toStore.length()-2);
+	}
 	prop.setProperty(EXECSTR, toStore);
     }
     
