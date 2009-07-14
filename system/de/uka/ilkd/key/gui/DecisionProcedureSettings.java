@@ -78,6 +78,8 @@ public class DecisionProcedureSettings implements Settings {
     /** the list of RuleDescriptors of available SMTRules */
     private ArrayList<RuleDescriptor> rules = new ArrayList<RuleDescriptor>();
     
+    private HashMap<RuleDescriptor, SMTRule> descriptorToRule = new HashMap<RuleDescriptor, SMTRule>();
+    
     /** the list of all ruledescriptors of all rules that are installed */
     private ArrayList<RuleDescriptor> installedrules = new ArrayList<RuleDescriptor>();
     
@@ -218,8 +220,11 @@ public class DecisionProcedureSettings implements Settings {
 	    String[] valuepairs = allCommands.split("||");
 	    for (String s : valuepairs) {
 		String[] vals = s.split("|");
-		RuleDescriptor rd = findRuleByName(vals[0]);
-		execCommands.put(rd, vals[1]);
+		if (vals.length == 2) {
+		    //if vals does not contain exactly two items, the entry in the settingsfile is not valid
+		    RuleDescriptor rd = findRuleByName(vals[0]);
+		    execCommands.put(rd, vals[1]);
+		}
 	    }
 	}
     }
@@ -244,12 +249,33 @@ public class DecisionProcedureSettings implements Settings {
     
     /**
      * Set a execution command for a certain rule.
+     * @param rd the ruledescriptor, which uses this command.
+     * @param command the command to use
+     */
+    public void setExecutionCommand(RuleDescriptor rd, String command) {
+	SMTRule r = this.descriptorToRule.get(rd);
+	this.execCommands.put(rd, command);
+	if (r.isInstalled(true)) {
+	    //add the rule to the installed rules (if not there yet)
+	    if (!this.installedrules.contains(rd)) {
+		this.installedrules.add(rd);
+	    }
+	} else {
+	    //remove from the installed rules
+	    if (this.installedrules.contains(rd)) {
+		this.installedrules.remove(rd);
+	    }
+	}
+    }
+    
+    /**
+     * Set a execution command for a certain rule.
      * @param r the rule, which uses this command.
      * @param command the command to use
      */
     public void setExecutionCommand(AbstractSMTSolver r, String command) {
 	RuleDescriptor rd = this.findRuleByName(r.name());
-	this.execCommands.put(rd, command);
+	this.setExecutionCommand(rd, command);
     }
     
     /**
@@ -258,9 +284,39 @@ public class DecisionProcedureSettings implements Settings {
      * @return the execution command
      */
     public String getExecutionCommand(AbstractSMTSolver r) {
-	return this.execCommands.get(r);
+	return this.execCommands.get(this.findRuleByName(r.name()));
     }
 
+    /**
+     * recheck, if the rule is installed
+     * @param rd the ruleDescriptor
+     * @return true, if the given command results in executeable result.
+     */
+    public boolean checkCommand(RuleDescriptor rd, String Command) {
+	SMTRule r = descriptorToRule.get(rd);
+	String oldCommand = this.execCommands.get(rd); 
+	this.execCommands.put(rd, Command);
+	boolean toReturn = r.isInstalled(true);
+	//remove the new connad again, as this is ust a test, no store
+	this.execCommands.put(rd, oldCommand);
+	r.isInstalled(true);
+	return toReturn;
+    }
+    
+    public boolean isInstalled(RuleDescriptor rd) {
+	return this.installedrules.contains(rd);
+    }
+    
+    public String getExecutionCommand(RuleDescriptor rd) {
+	String toReturn = this.execCommands.get(rd);
+	if (toReturn == null || toReturn.length()==0) {
+	    //the default setting is used. Read this one from the DecProc
+	    toReturn = this.descriptorToRule.get(rd).defaultExecutionCommand();
+	}
+	return toReturn;
+    }
+    
+    
     /**
      * removes the specified listener form the listener list
      * @param l the listener
@@ -305,10 +361,12 @@ public class DecisionProcedureSettings implements Settings {
 	for (Rule r : profile.
 		getStandardRules().getStandardBuiltInRules()) {
 	    if (r instanceof SMTRule) {
-		rules.add(new RuleDescriptor(r.name(),r.displayName()));
+		RuleDescriptor rd = new RuleDescriptor(r.name(),r.displayName());
+		rules.add(rd);
 		SMTRule smtr = (SMTRule)r;
+		this.descriptorToRule.put(rd, smtr);
 		if (smtr.isInstalled(false)) {
-		    installedrules.add(new RuleDescriptor(r.name(),r.displayName()));
+		    installedrules.add(rd);
 		}
 	    }
 	}
@@ -317,7 +375,7 @@ public class DecisionProcedureSettings implements Settings {
 
     /**
      * true, if the argument should be used for test
-     * TODO implement
+     * TODO implement?
      */
     public boolean useRuleForTest(int arg) {
 	return true;

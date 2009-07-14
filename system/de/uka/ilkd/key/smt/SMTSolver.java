@@ -76,4 +76,9 @@ public interface SMTSolver {
      * @return true, if it is installed.
      */
     public boolean isInstalled(boolean recheck);
+    
+    /**
+     * @return the command used for execution of the programm on default
+     */
+    public String getDefaultExecutionCommand();
 }

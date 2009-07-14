@@ -14,6 +14,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -1482,33 +1483,52 @@ public class Main extends JFrame implements IMain {
 	        
         return options;
     }
-
+    
+    private final ArrayList<JRadioButtonMenuItem> showndecProcRadioItems = new ArrayList<JRadioButtonMenuItem>();
+    private final JMenu decProcOptions = new JMenu("Decision Procedures");
+    
+    /**
+     * update the selection menu for Decisionprocedures.
+     * Remove those, that are not installed anymore, add those, that got installed.
+     */
+    public void updateDecisionProcedureSelectMenu() {
+	
+//	 the button group which takes care of selecting and unselecting not 
+        // activated entries
+        //final ButtonGroup dpButtonGroup = new ButtonGroup();
+	for (JRadioButtonMenuItem rbm : showndecProcRadioItems)
+	    decProcOptions.remove(rbm);
+	
+	showndecProcRadioItems.removeAll(showndecProcRadioItems);
+	
+	final DecisionProcedureSettings dps = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings();
+	for (RuleDescriptor r : dps.getAvailableRules()) {
+	    final JRadioButtonMenuItem b = new JRadioButtonMenuItem();
+	    b.setAction(new DPSelectionAction(r, b));
+	    decProcOptions.add(b);
+	    showndecProcRadioItems.add(b);
+	    //dpButtonGroup.add(b);
+	}
+    }
+    
     /**
      * creates a menu allowing to choose the external prover to be used
      * @return the menu with a list of all available provers that can be used
      */
     private JMenu createDecisionProcedureMenu() {
 	/** menu for configuration of decision procedure */
-        final JMenu decisionProcedureOption = new JMenu("Decision Procedures");
+        //final JMenu decisionProcedureOption = new JMenu("Decision Procedures");
         
-        // the button group which takes care of selecting and unselecting not 
-        // activated entries
-        final ButtonGroup dpButtonGroup = new ButtonGroup();
-
-	final DecisionProcedureSettings dps = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings();
-	for (RuleDescriptor r : dps.getAvailableRules()) {
-	    final JRadioButtonMenuItem b = new JRadioButtonMenuItem();
-	    b.setAction(new DPSelectionAction(r, b));
-	    decisionProcedureOption.add(b);
-	    dpButtonGroup.add(b);
-	}
-		
-	decisionProcedureOption.add(new JSeparator());
+        this.updateDecisionProcedureSelectMenu();
+        
+        //decisionProcedureOption.add(this.decProcSelectionMenu);
+        
+        final DecisionProcedureSettings dps = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings();
 	
 	ruletimeoutlabel = new JLabel();	
 	ruletimeoutlabel.setText("timeout: " + dps.getTimeout() + " s");
 
-	decisionProcedureOption.add(ruletimeoutlabel);
+	decProcOptions.add(ruletimeoutlabel);
 
 	
 	ruletimeout = new JSlider(1, 5*60);				
@@ -1526,9 +1546,22 @@ public class Main extends JFrame implements IMain {
 	});
 	
 	// add ruletimeout slider to menu
-	decisionProcedureOption.add(ruletimeout);
+	decProcOptions.add(ruletimeout);
 	
-	return decisionProcedureOption;
+	decProcOptions.add(new JSeparator());
+	
+//	add the button for settings
+	final JMenuItem setButton = new JMenuItem("Decision Procedure Settings");
+	setButton.addActionListener(new ActionListener() {
+	    public void actionPerformed(ActionEvent a) {
+		DecissionProcedureSettingsDialog.getInstance().resetInstance();
+		
+	    }
+	});
+	decProcOptions.add(setButton);
+	//dpButtonGroup.add(setButton);
+	
+	return decProcOptions;
     }    
     
     

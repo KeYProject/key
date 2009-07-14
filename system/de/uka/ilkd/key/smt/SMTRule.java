@@ -88,4 +88,12 @@ public class SMTRule implements BuiltInRule {
     public boolean isInstalled(boolean recheck) {
 	return this.solver.isInstalled(recheck);
     }
+    
+    /**
+     * returns the hard coded execution format.
+     * @return the hard coded execution command.
+     */
+    public String defaultExecutionCommand() {
+	return this.solver.getDefaultExecutionCommand();
+    }
 }

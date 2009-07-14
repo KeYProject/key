@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.gui.DecisionProcedureSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -51,6 +52,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     
     /**
      * Get the command for executing the external prover.
+     * This is a hardcoded default value. It might be overridden by user settings
      * @param filename the location, where the file is stored.
      * @param formula the formula, that was created by the translator
      * @return Array of Strings, that can be used for executing an external decider.
@@ -59,15 +61,29 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	    				            String formula);
   
     
-    private String getStoredExecutionCommand(String filename, String formula) {
+    private String getFinalExecutionCommand(String filename, String formula) {
+	//get the Command from user settings
+	String toReturn = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getExecutionCommand(this);
+	if (toReturn == null || toReturn.length() == 0) {
+	    toReturn = this.getExecutionCommand(filename, formula);
+	} else {
+	    //replace the placeholder with filename and fomula
+	    toReturn = toReturn.replaceAll("%f", filename);
+	    toReturn = toReturn.replaceAll("%p", formula);
+	}
+	return toReturn;
+    }
+    
+ /*   private String getStoredExecutionCommand(String filename, String formula) {
 	String comm = DecisionProcedureSettings.getInstance().getExecutionCommand(this);
 	if (comm != null && comm.length() != 0 && comm != " ") {
 	    comm.replace(" %f", filename);
 	    return comm;
 	} else {
-	    return this.getExecutionCommand(filename, formula);
+	    return this.getFinalExecutionCommand(filename, formula);
 	}
     }
+    */
     
     /**
      * Interpret the answer of the program.
@@ -228,7 +244,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	} 
 
 	//get the commands for execution
-	String execCommand = this.getStoredExecutionCommand(loc.getAbsolutePath(), formula);
+	String execCommand = this.getFinalExecutionCommand(loc.getAbsolutePath(), formula);
 
 	try {
 	    //execute the external solver
@@ -354,13 +370,14 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		//cause trouble this way.
 		this.run("test", 1, new Services());
 		isinstalled = true;
-//	    } catch (RuntimeException e) {
-//		if this exception: some problem, but not with insatllation
-//		isinstalled = true;
 	    } catch (IOException e2) {
 //		if exception: not installed
 		isinstalled = false;
+	    } catch (RuntimeException e) {
+		//if this exception: some problem, but not with insatllation
+		isinstalled = true;
 	    }
+	    
 	    installwaschecked = true;
 	}
 	return isinstalled;
@@ -373,6 +390,14 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	    + File.separator + "_testcase"
 	    + File.separator + "smt"
 	    + File.separator + "ornot.key";
+    }
+    
+    /**
+     * get the hard coded execution command from this solver.
+     * The filename od a problem is indicated by %f, the problem itsself with %p
+     */
+    public String getDefaultExecutionCommand() {
+	return this.getExecutionCommand("%f", "%p");
     }
     
 }
