@@ -10,12 +10,12 @@ public class ExamDataBaseImpl extends ExamDataBase {
     }
 
     /*@ private normal_behavior
-      @  assignable students;
+      @  assignable students, \object_creation(Student[]);
       @  ensures (\forall int i; 0<=i && i<students.length; 
       @               students[i] == (i<\old(students.length) 
       @                               ? \old(students)[i] 
       @                               : null));
-      @  ensures students!=null && students.length > \old(students.length);
+      @  ensures students!=null && students.length > \old(students.length) && \fresh(students);
       @*/
     private void increaseStudents(){
 	Student[] oldStudents = students;
@@ -37,13 +37,14 @@ public class ExamDataBaseImpl extends ExamDataBase {
       @  ensures (\exists int i; 
       @               0<=i && i<students.length && students[i]!=null
       @               && students[i].matrNr==matrNr && \result==i);
+      @  assignable \object_creation(ExamDataBaseException);
       @  signals (ExamDataBaseException) 
       @      !(\exists int i; 
       @            0<=i && i<students.length && students[i]!=null
       @            && students[i].matrNr==matrNr);
       @  signals_only ExamDataBaseException;
       @*/
-    private /*@pure@*/ int getIndex(int matrNr) throws ExamDataBaseException{
+    private int getIndex(int matrNr) throws ExamDataBaseException{
 	/*@ loop_invariant 
           @     (\forall int j; 
           @          0<=j && j<i && students[j]!=null;

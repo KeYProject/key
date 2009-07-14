@@ -37,3 +37,4 @@ public interface EntryOf<S>And<T> extends java.io.Serializable {
     /** @return the second part of the tupel */
     <T> value();
 }
+END_OF_CLASS

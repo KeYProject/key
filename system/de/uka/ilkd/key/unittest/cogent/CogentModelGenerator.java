@@ -14,47 +14,52 @@ import java.util.*;
 import java.io.*;
 
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.unittest.*;
 
-public class CogentModelGenerator implements DecProdModelGenerator{
-    
+public class CogentModelGenerator implements DecProdModelGenerator {
+
     private SetOfTerm locations;
-    private HashMap term2class;
+
+    private HashMap<Term, EquivalenceClass> term2class;
+
     private CogentTranslation ct;
 
-    public CogentModelGenerator(CogentTranslation ct, Services serv,
-				HashMap term2class, SetOfTerm locations){
-	this.ct = ct;	
+    public CogentModelGenerator(CogentTranslation ct,
+	    HashMap<Term, EquivalenceClass> term2class, SetOfTerm locations) {
+	this.ct = ct;
 	this.term2class = term2class;
-	this.locations = locations;	
+	this.locations = locations;
     }
 
-    public Set createModels(){
-	HashSet models = new HashSet();
+    public Set<Model> createModels() {
+	HashSet<Model> models = new HashSet<Model>();
 	Model model = new Model(term2class);
-	try{
+	try {
 	    String trans = ct.translate();
-	    CogentResult response = 
-		DecisionProcedureCogent.execute(trans);
-	    if(response.valid()){
-		if(response.error()){
-		    Main.getInstance().mediator().popupInformationMessage("Cogent execution reports an error. Check, e.g., if cogent does execute on your machine, or if there is another bug in KeY.", "Error");
-		    //throw new CogentException();
+	    CogentResult response = DecisionProcedureCogent.execute(trans);
+	    if (response.valid()) {
+		if (response.error()) {
+		    Main
+			    .getInstance()
+			    .mediator()
+			    .popupInformationMessage(
+				    "Cogent execution reports an error. Check, e.g., if cogent does execute on your machine, or if there is another bug in KeY.",
+				    "Error");
+		    // throw new CogentException();
 		}
 		return models;
 	    }
 	    IteratorOfTerm it = locations.iterator();
-	    while(it.hasNext()){
+	    while (it.hasNext()) {
 		Term t = it.next();
-		EquivalenceClass ec = (EquivalenceClass) term2class.get(t);
-		if(ec.isInt()){
+		EquivalenceClass ec = term2class.get(t);
+		if (ec.isInt()) {
 		    model.setValue(ec, response.getValueForTerm(t, ct));
 		}
 	    }
 	    models.add(model);
-	}catch(IOException e){
+	} catch (IOException e) {
 	    throw new CogentException(e);
 	}
 	return models;

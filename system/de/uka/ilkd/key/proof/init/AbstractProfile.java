@@ -185,4 +185,12 @@ public abstract class AbstractProfile implements Profile {
      public void updateSettings(ProofSettings settings) {
 	 settings.getDecisionProcedureSettings().updateSMTRules(this);	 
      }   
+     
+     /**
+      * returns the file name of the internal class list
+      * @return the file name of the internal class list
+      */
+     public String getInternalClasslistFilename() {
+	 return "JAVALANG.TXT";
+     }
 }

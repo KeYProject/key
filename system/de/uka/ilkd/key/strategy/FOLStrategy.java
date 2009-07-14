@@ -150,7 +150,7 @@ public class FOLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "swapQuantifiers", inftyConst () );
         bindRuleSet ( d, "pullOutQuantifierAll", inftyConst () );
         bindRuleSet ( d, "pullOutQuantifierEx", inftyConst () );
-     
+        bindRuleSet ( d, "query_normalize_high_costs", inftyConst() );
         
         bindRuleSet ( d, "javaIntegerSemantics", -100 );
 

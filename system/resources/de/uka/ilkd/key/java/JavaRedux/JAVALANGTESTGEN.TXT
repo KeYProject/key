@@ -48,3 +48,8 @@ java/util/Map.java
 java/util/Set.java
 java/io/IOException.java
 java/io/Serializable.java
+
+
+junit/framework/Test.java
+junit/framework/TestCase.java
+junit/framework/TestSuite.java

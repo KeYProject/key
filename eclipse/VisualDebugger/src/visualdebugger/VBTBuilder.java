@@ -82,27 +82,27 @@ public class VBTBuilder {
         
     }
     
-    
-    
-public void createTestCase(){    
-    ModelGenerator.decProdForTestGen=this.modelGenerator;
-    UnitTestBuilder testBuilder = new UnitTestBuilder(vd.getMediator().getServices(), 
-             vd.getMediator().getProof());
 
-     try{
-         file = (testBuilder.createTestForNodes(nodes));
-     }catch(Exception e){
-         this.error=true;
-         e.printStackTrace();
-     }
-    if (file.lastIndexOf(File.separator)>0){
-        int last = file.lastIndexOf(File.separator);
-        fileName =file.substring(last,file.length());
-        path = file.substring(0, last);
+
+    public void createTestCase(){    
+	ModelGenerator.decProdForTestGen=this.modelGenerator;
+	UnitTestBuilder testBuilder = new UnitTestBuilder(vd.getMediator().getServices(), 
+		vd.getMediator().getProof());
+
+	try{
+	    file = testBuilder.createTestForNodes(nodes);
+	}catch(Exception e){
+	    this.error=true;
+	    e.printStackTrace();
+	}
+	if (file.lastIndexOf(File.separator)>0){
+	    int last = file.lastIndexOf(File.separator);
+	    fileName =file.substring(last,file.length());
+	    path = file.substring(0, last);
+	}
+
     }
-    
-}
-         
+
      
     private IProject createTestCaseProject(String testFilePath) throws URISyntaxException, CoreException{
         String projectName = "TestCases";

@@ -217,7 +217,7 @@ public class VisualizationStrategyForTesting extends
             //This is modified with respect to the overwritten method of the parent class
             return new ExecutionTraceModelForTesting(lastTraceElement, firstTraceElement,
                     (ContextTraceElement) lastSource, rating, currentNode,
-                    node, type, occ);
+                    node, type);
         }
         return null;
     }

@@ -11,6 +11,6 @@ import java.util.Set;
 
 public interface DecProdModelGenerator{
 
-    public Set createModels();
+    public Set<Model> createModels();
 
 }

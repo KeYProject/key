@@ -366,6 +366,16 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 		not(NotInScopeOfModalityFeature.INSTANCE),
                 longConst (-10) } ));
 
+        bindRuleSet ( d, "query_normalize_high_costs", 
+	    SumFeature.createSum ( new Feature [] {
+                SomeWhereBelowOpClassFeature.create ( ProgramMethod.class ),
+                SomeWhereBelowOpClassFeature.create ( IUpdateOperator.class ),
+                applyTF("t", IsNonRigidTermFeature.INSTANCE),
+		// we actually have to be in the scope of an update,
+		// not only within an update
+		not(NotInScopeOfModalityFeature.INSTANCE),
+                longConst (10) } ));
+
         if ( expandQueries () )
             bindRuleSet ( d, "queries",
                 add ( normalSplitting () ?

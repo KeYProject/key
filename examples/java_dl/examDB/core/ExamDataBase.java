@@ -110,6 +110,7 @@ public abstract class ExamDataBase {
       @ also public exceptional_behavior
       @  requires !(0<newThreshold && newThreshold<=newMaxPoints 
       @             && 0<newStep && newStep<=(newMaxPoints-newThreshold)/10);
+      @  assignable \object_creation(ExamDataBaseException);
       @  signals_only ExamDataBaseException;
       @*/  
     public abstract void setExamParameters(int newThreshold, 
@@ -138,7 +139,7 @@ public abstract class ExamDataBase {
       @           && (\forall int i; 
       @                   0<=i && i<students.length && students[i]!=null;
       @                       students[i].matrNr!=matrNr);
-      @  assignable students, students[*];
+      @  assignable students, students[*], \object_creation(Student[]), \object_creation(Student);
       @  ensures (\exists int i; 
       @               0<=i && i<students.length && students[i]!=null; 
       @	                  students[i].matrNr==matrNr 
@@ -162,6 +163,7 @@ public abstract class ExamDataBase {
       @             && (\forall int i; 
       @                     0<=i && i<students.length && students[i]!=null;
       @                         students[i].matrNr!=matrNr));
+      @  assignable \object_creation(ExamDataBaseException);
       @  signals_only ExamDataBaseException;
       @*/
     public abstract void addStudent(int matrNr, 
@@ -201,6 +203,7 @@ public abstract class ExamDataBase {
       @  requires !(\exists int i; 
       @                 0<=i && i<students.length && students[i]!=null;
       @                     students[i].matrNr==matrNr);
+      @  assignable \object_creation(ExamDataBaseException);
       @  signals_only ExamDataBaseException;
       @*/
     public abstract void deleteStudent(int matrNr) throws ExamDataBaseException;
@@ -233,6 +236,7 @@ public abstract class ExamDataBase {
       @                  0<=i && i<students.length && students[i]!=null
       @                  && students[i].matrNr==matrNr)
       @             && -1<=points && points<=maxPoints);
+      @  assignable \object_creation(ExamDataBaseException);
       @  signals_only ExamDataBaseException;
       @*/
     public abstract void setPoints(int matrNr, int points) 
@@ -258,12 +262,13 @@ public abstract class ExamDataBase {
       @  ensures (\forall int i; 
       @                0<=i && i<students.length && students[i]!=null;
       @                students[i].matrNr==matrNr ? students[i].bonusPoints == bonusPoints : 
-      @                                             students[i].bonusPoints==\old(students[i].points));
+      @                                             students[i].bonusPoints==\old(students[i].bonusPoints));
       @ also public exceptional_behavior
       @  requires !((\exists int i; 
       @                  0<=i && i<students.length && students[i]!=null
       @                  && students[i].matrNr==matrNr)
       @             && 0<=bonusPoints && bonusPoints<=maxPoints);
+      @  assignable \object_creation(ExamDataBaseException);
       @  signals_only ExamDataBaseException;
       @*/
     public abstract void setBonusPoints(int matrNr, int bonusPoints)
@@ -292,6 +297,7 @@ public abstract class ExamDataBase {
       @  requires !(\exists int i; 
       @                 0<=i && i<students.length && students[i]!=null
       @                 && students[i].matrNr==matrNr);
+      @  assignable \object_creation(ExamDataBaseException);
       @  signals_only ExamDataBaseException;
       @*/
     public abstract void setBackedOut(int matrNr, boolean backedOut) 
@@ -332,8 +338,9 @@ public abstract class ExamDataBase {
       @               0<=k && k<\result.length 
       @               && 0<=l && l<\result.length && k!=l;
       @                   \result[k]!=\result[l]);
+      @  assignable \object_creation(int[]);
       @*/
-    public abstract /*@pure@*/ int[] getMatrNrs();
+    public abstract int[] getMatrNrs();
 
 
     /**
@@ -349,6 +356,7 @@ public abstract class ExamDataBase {
       @  requires (\exists int i; 
       @                0<=i && i<students.length && students[i]!=null
       @                && students[i].matrNr==matrNr);
+      @  assignable \nothing;
       @  ensures (\exists int i; 
       @               students[i].matrNr==matrNr
       @               && \result==students[i].firstname);
@@ -356,9 +364,10 @@ public abstract class ExamDataBase {
       @  requires !(\exists int i; 
       @                 0<=i && i<students.length && students[i]!=null
       @                 && students[i].matrNr==matrNr);
+      @  assignable \object_creation(ExamDataBaseException);
       @  signals_only ExamDataBaseException;
       @*/
-    public abstract /*@pure@*/ String getFirstname(int matrNr) 
+    public abstract String getFirstname(int matrNr) 
 						throws ExamDataBaseException;
 
     /**
@@ -374,6 +383,7 @@ public abstract class ExamDataBase {
       @  requires (\exists int i; 
       @                0<=i && i<students.length && students[i]!=null
       @                && students[i].matrNr==matrNr);
+      @  assignable \nothing;
       @  ensures (\exists int i; 
       @               students[i].matrNr==matrNr
       @               && \result==students[i].surname);
@@ -381,9 +391,10 @@ public abstract class ExamDataBase {
       @  requires !(\exists int i; 
       @                 0<=i && i<students.length && students[i]!=null
       @                 && students[i].matrNr==matrNr);
+      @  assignable \object_creation(ExamDataBaseException);
       @  signals_only ExamDataBaseException;
       @*/
-    public abstract /*@pure@*/ String getSurname(int matrNr) 
+    public abstract String getSurname(int matrNr) 
 						throws ExamDataBaseException;
 
     /**
@@ -399,6 +410,7 @@ public abstract class ExamDataBase {
       @  requires (\exists int i; 
       @                0<=i && i<students.length && students[i]!=null
       @                && students[i].matrNr==matrNr);
+      @  assignable \nothing;
       @  ensures (\exists int i; 
       @               students[i].matrNr==matrNr
       @               && \result==students[i].points);
@@ -406,9 +418,10 @@ public abstract class ExamDataBase {
       @  requires !(\exists int i; 
       @                 0<=i && i<students.length && students[i]!=null
       @                 && students[i].matrNr==matrNr);
+      @  assignable \object_creation(ExamDataBaseException);
       @  signals_only ExamDataBaseException;
       @*/
-    public abstract /*@pure@*/ int getPoints(int matrNr) 
+    public abstract int getPoints(int matrNr) 
 						throws ExamDataBaseException;
 
     /**
@@ -424,6 +437,7 @@ public abstract class ExamDataBase {
       @  requires (\exists int i; 
       @                0<=i && i<students.length && students[i]!=null
       @                && students[i].matrNr==matrNr);
+      @  assignable \nothing;
       @  ensures (\exists int i; 
       @               students[i].matrNr==matrNr
       @               && \result==students[i].bonusPoints);
@@ -431,9 +445,10 @@ public abstract class ExamDataBase {
       @  requires !(\exists int i; 
       @                 0<=i && i<students.length && students[i]!=null
       @                 && students[i].matrNr==matrNr);
+      @  assignable \object_creation(ExamDataBaseException);
       @  signals_only ExamDataBaseException;
       @*/
-    public abstract /*@pure@*/ int getBonusPoints(int matrNr) 
+    public abstract int getBonusPoints(int matrNr) 
 						throws ExamDataBaseException;
 
 
@@ -451,6 +466,7 @@ public abstract class ExamDataBase {
      @  requires (\exists int i; 
      @                0<=i && i<students.length && students[i]!=null
      @                && students[i].matrNr==matrNr);
+     @  assignable \nothing;
      @  ensures (\exists int i; 
      @               students[i].matrNr==matrNr
      @               && \result==students[i].backedOut);
@@ -458,9 +474,10 @@ public abstract class ExamDataBase {
      @  requires !(\exists int i; 
      @                 0<=i && i<students.length && students[i]!=null
      @                 && students[i].matrNr==matrNr);
+     @  assignable \object_creation(ExamDataBaseException);
      @  signals_only ExamDataBaseException;
      @*/
-    public abstract /*@pure@*/ boolean getBackedOut(int matrNr) 
+    public abstract boolean getBackedOut(int matrNr) 
 						throws ExamDataBaseException;
 
 
@@ -478,6 +495,7 @@ public abstract class ExamDataBase {
       @  requires (\exists int i; 
       @                0<=i && i<students.length && students[i]!=null 
       @                && students[i].matrNr==matrNr && !students[i].backedOut);
+      @  assignable \nothing;
       @  ensures (\exists int i; 
       @               students[i].matrNr==matrNr
       @               && \result==pointsToGrade(students[i].points, 
@@ -486,9 +504,10 @@ public abstract class ExamDataBase {
       @  requires !(\exists int i; 
       @                 0<=i && i<students.length && students[i]!=null 
       @                 && students[i].matrNr==matrNr &&!students[i].backedOut);
+      @  assignable \object_creation(ExamDataBaseException);
       @  signals_only ExamDataBaseException;
       @*/
-    public abstract /*@pure@*/ int getGrade(int matrNr) 
+    public abstract int getGrade(int matrNr) 
 						throws ExamDataBaseException;
 
     /**
@@ -531,6 +550,7 @@ public abstract class ExamDataBase {
      */ 
     /*@ public normal_behavior
       @  requires consistent();
+      @  assignable \nothing;
       @  ensures \result==(\num_of int i; 
       @                       0<=i && i<students.length; students[i]!=null 
       @                       && !students[i].backedOut
@@ -538,9 +558,10 @@ public abstract class ExamDataBase {
       @                                        students[i].bonusPoints)==grade);
       @ also public exceptional_behavior
       @  requires !consistent();
+      @  assignable \object_creation(ExamDataBaseException);
       @  signals_only ExamDataBaseException;
       @*/
-    public abstract /*@pure@*/ int getNumWithGrade(int grade) 
+    public abstract int getNumWithGrade(int grade) 
 						throws ExamDataBaseException;
 
     /** 
@@ -553,6 +574,7 @@ public abstract class ExamDataBase {
      */ 
     /*@ public normal_behavior
       @  requires consistent();
+      @  assignable \nothing;
       @  ensures \result==(getNumParticipants()==0
       @                    ? -1
       @                    : ((\sum int i; 
@@ -564,9 +586,10 @@ public abstract class ExamDataBase {
       @                      /getNumParticipants()));
       @ also public exceptional_behavior
       @  requires !consistent();
+      @  assignable \object_creation(ExamDataBaseException);
       @  signals_only ExamDataBaseException;
       @*/
-    public abstract /*@pure@*/ int getAverage() throws ExamDataBaseException;
+    public abstract int getAverage() throws ExamDataBaseException;
 
     /** 
      * Gibt den Notendurchschnitt der bestandenen Klausuren zur&uuml;ck,
@@ -578,6 +601,7 @@ public abstract class ExamDataBase {
      */
     /*@ public normal_behavior
       @  requires consistent();
+      @  assignable \nothing;
       @  ensures \result==(getNumParticipants()-getNumWithGrade(500)==0
       @                    ? -1
       @                    : ((\sum int i; 
@@ -590,8 +614,8 @@ public abstract class ExamDataBase {
       @                      /(getNumParticipants()-getNumWithGrade(500))));
       @ also public exceptional_behavior
       @  requires !consistent();
+      @  assignable \object_creation(ExamDataBaseException);
       @  signals_only ExamDataBaseException;
       @*/
-    public abstract /*@pure@*/ int getPassedAverage() 
-						throws ExamDataBaseException;
+    public abstract int getPassedAverage() throws ExamDataBaseException;
 }
