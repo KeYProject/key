@@ -12,10 +12,7 @@ package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
-import de.uka.ilkd.key.logic.op.Metavariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.ConstraintSequentPrintFilter;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.Debug;
@@ -495,8 +492,8 @@ public class TermTacletAppIndex {
         final Term newTerm = pathToModification.getSubTerm ();
         final int child = pathToModification.getChild ();
         
-        if ( newTerm.op () instanceof IUpdateOperator ) {
-            final int targetPos = ( (IUpdateOperator)newTerm.op () ).targetPos ();
+        if ( newTerm.op () instanceof UpdateApplication ) {
+            final int targetPos = ( (UpdateApplication)newTerm.op () ).targetPos ();
             if ( child != targetPos ) {
                 newSubIndices =
                     updateIUpdateTarget ( newSubIndices,
@@ -754,8 +751,8 @@ public class TermTacletAppIndex {
         final Term subTerm = pos.subTerm ();
         final int nextSubtermIndex = pathToModification.getChild ();
         
-        if ( subTerm.op () instanceof IUpdateOperator ) {
-            final int targetPos = ( (IUpdateOperator)subTerm.op () ).targetPos ();
+        if ( subTerm.op () instanceof UpdateApplication ) {
+            final int targetPos = ( (UpdateApplication)subTerm.op () ).targetPos ();
             if ( nextSubtermIndex != targetPos )
                 getSubIndex ( targetPos )
                     .reportTacletApps ( pos.down ( targetPos ), listener );

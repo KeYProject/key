@@ -121,11 +121,11 @@ public class CreateTacletForTests extends TestCase {
 	nss.functions().add(func_min1);
 	nss.functions().add(func_plus1);
 
-	SchemaVariable var_rn = SchemaVariableFactory.createTermSV(new Name("rn"),nat, false);
-	SchemaVariable var_rm = SchemaVariableFactory.createTermSV(new Name("rm"),nat, false);
+	SchemaVariable var_rn = SchemaVariableFactory.createTermSV(new Name("rn"),nat);
+	SchemaVariable var_rm = SchemaVariableFactory.createTermSV(new Name("rm"),nat);
 
-	Term t_rn = tf.createFunctionTerm((SortedSchemaVariable)var_rn,new Term[]{});
-	Term t_rm = tf.createFunctionTerm((SortedSchemaVariable)var_rm,new Term[]{});
+	Term t_rn = tf.createFunctionTerm(var_rn,new Term[]{});
+	Term t_rm = tf.createFunctionTerm(var_rm,new Term[]{});
 	Term t_0 = tf.createFunctionTerm(func_0,new Term[]{});	
 	Term t_rnminus1=tf.createFunctionTerm(func_min1,new Term[]{t_rn});
 	Term t_rnminus1plus1=tf.createFunctionTerm(func_plus1,

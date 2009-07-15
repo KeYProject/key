@@ -53,7 +53,7 @@ public class TestSyntacticalReplaceVisitor extends TestCase {
 	SchemaVariable v=(SchemaVariable)rw.sub(0).sub(1)
 	    .varsBoundHere(1).getQuantifiableVariable(0);
 
-	Sort s=((SortedSchemaVariable)u).sort();
+	Sort s=u.sort();
 
 	LogicVariable x=new LogicVariable(new Name("x"), s);
 	LogicVariable y=new LogicVariable(new Name("y"), s);

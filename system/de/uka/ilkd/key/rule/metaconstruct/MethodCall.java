@@ -173,7 +173,7 @@ public class MethodCall extends ProgramMetaConstruct {
 	if (execContextSV!=null) {
 	    execContext
 		= (ExecutionContext) svInst.getInstantiation
-		((SortedSchemaVariable)execContextSV);
+		((SchemaVariable)execContextSV);
 	} else {
 	    execContext = svInst.getContextInstantiation().activeStatementContext();
 	}

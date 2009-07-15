@@ -58,9 +58,10 @@ public abstract class AbstractOperator implements Operator {
      * matching fails
      */
     @Override
-    public MatchConditions match(SVSubstitute subst, MatchConditions mc,
-            Services services) {
-        if (subst == this) {
+    public MatchConditions match(SVSubstitute subst, 
+	    		         MatchConditions mc,
+	    		         Services services) {
+        if(subst == this) {
             return mc;
         }
         Debug.out("FAILED. Operators are different(template, candidate)", this, subst);

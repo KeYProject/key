@@ -26,16 +26,9 @@ public abstract class JavaProgramElement extends JavaSourceElement
                                          implements ProgramElement {
 
     private final static Comment[] NO_COMMENTS = new Comment[0];
-    /**
- *        Comments.
-    */
 
     private final Comment[] comments;
     
-
-    /**
- *      Java program element.
-     */
 
     public JavaProgramElement() {
 	comments = NO_COMMENTS;

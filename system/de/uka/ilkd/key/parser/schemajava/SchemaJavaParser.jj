@@ -43,8 +43,8 @@ import recoder.io.*;
 import recoder.abstraction.TypeArgument.WildcardMode;
 
 import de.uka.ilkd.key.java.recoderext.*;
+import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
@@ -164,7 +164,7 @@ public class SchemaJavaParser {
 
     private static void testLeftHandSide(Expression expr) throws ParseException{
 	if (expr instanceof ExpressionSVWrapper) {
-	    SortedSchemaVariable sv=(SortedSchemaVariable)(((ExpressionSVWrapper) expr).getSV());
+	    SchemaVariable sv=((ExpressionSVWrapper) expr).getSV();
 	    if ( !isLeftHandSide(sv.sort()) ) {
 		throw new ParseException
 		    ("Schema variable "+sv+" should be one of lefthandside"
@@ -251,7 +251,7 @@ public class SchemaJavaParser {
 						 ProgramElement exp) throws ParseException{
 	if (exp!=null && exp instanceof ExpressionSVWrapper) {
 	    SchemaVariable sv=((ExpressionSVWrapper)exp).getSV();
-	    if  (((SortedSchemaVariable)sv).sort()==notOfSort) {
+	    if  (sv.sort()==notOfSort) {
 		throw new ParseException(sv
 					 +": "+notOfSort
 					 +" not allowed here");
@@ -263,7 +263,7 @@ public class SchemaJavaParser {
 					    ProgramElement exp) throws ParseException{
 	if (exp!=null && exp instanceof LabelSVWrapper) {
 	    SchemaVariable sv=((LabelSVWrapper)exp).getSV();
-	    if  (((SortedSchemaVariable)sv).sort()==notOfSort) {
+	    if  (sv.sort()==notOfSort) {
 		throw new ParseException(sv
 					 +": "+notOfSort
 					 +" not allowed here");
@@ -2971,7 +2971,7 @@ Expression PrimaryExpression() :
 	    break;
 	    case PrimarySuffixReturnValue.INDEX_EXPR:
 	    if (tmpResult instanceof SVWrapper) {
-		s = ((SortedSchemaVariable)((SVWrapper)tmpResult).getSV()).sort();
+		s = ((SVWrapper)tmpResult).getSV().sort();
 	    }
 	    if (tmpResult instanceof UncollatedReferenceQualifier ||
 		tmpResult instanceof MethodReference ||
@@ -3000,7 +3000,7 @@ Expression PrimaryExpression() :
 	    break;
 	    case PrimarySuffixReturnValue.IDENTIFIER:
 	    if (tmpResult instanceof SVWrapper) {
-		s = ((SortedSchemaVariable)((SVWrapper)tmpResult).getSV()).sort();
+		s = ((SVWrapper)tmpResult).getSV().sort();
 	    }
 	    if ("length".equals(suffix.id.getText()) && isLeftHandSide(s)) {
 		    result = new ArrayLengthReference(tmpResult);
@@ -3032,8 +3032,8 @@ Expression PrimaryExpression() :
 			   (((MethodReference)tmpResult).getReferencePrefix(),
 			    ((MethodReference)tmpResult).getIdentifier(), suffix.args);
 		       } else if (ProgramSVSort.METHODNAME.
-		       		getClass().isInstance(((SortedSchemaVariable)
-				   ((SVWrapper)tmpResult).getSV()).sort())) {
+		       		getClass().isInstance((
+				   (SVWrapper)tmpResult).getSV().sort())) {
 				       // this is a method call with svidentifier
 				       tmpResult = factory.createMethodReference
 				       (null, new LabelSVWrapper(((SVWrapper)tmpResult).getSV()), suffix.args);
@@ -3043,7 +3043,7 @@ Expression PrimaryExpression() :
 	    break;
 	    case PrimarySuffixReturnValue.SVIDENTIFIER:
 	    ProgramVariableSVWrapper pv = (ProgramVariableSVWrapper) suffix.id;
-	    s = ((SortedSchemaVariable)pv.getSV()).sort();
+	    s = pv.getSV().sort();
 	    if (ProgramSVSort.METHODNAME.getClass().isInstance(s)) {
 		tmpResult = new MethodReference(tmpResult,pv);
 	    } else if (s != ProgramSVSort.NONSIMPLEEXPRESSION &&
@@ -4494,7 +4494,7 @@ LOOKAHEAD(<TYPEOF> "(" <SVIDENTIFIER> ")")
 	    } else {
 		if (exprs.size()==1
 		    && exprs.get(0) instanceof ExpressionSVWrapper
-		    && ((SortedSchemaVariable)((ExpressionSVWrapper)exprs.get(0)).getSV()).sort()
+		    && (((ExpressionSVWrapper)exprs.get(0)).getSV()).sort()
 		    ==ProgramSVSort.LOOPINIT) {
 		    result.add((LoopInitializer)exprs.get(0));
 		} else {
@@ -4531,7 +4531,9 @@ ASTList<Expression> ForUpdate() :
     { 
 	if (result.size()!=1 
 	    && result.get(0) instanceof ExpressionSVWrapper
-	    && !((ExpressionSVWrapper)result.get(0)).getSV().isListSV()){
+	    && !(((ExpressionSVWrapper)result.get(0)).getSV() instanceof ProgramSV
+	         && ((ProgramSV)((ExpressionSVWrapper)result.get(0)).getSV()).isListSV()
+	        )){
 		throw new ParseException("SchemaVariable stands for a"
 					 +" whole StatementExpressionList");
 	    } 

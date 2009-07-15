@@ -80,8 +80,6 @@ public abstract class AbstractMetaOperator extends AbstractSortedOperator
     
     public static final AbstractMetaOperator ENHANCEDFOR_INV_RULE = new EnhancedForInvRule();
 
-    public static final AbstractMetaOperator INTRODUCE_NEW_ANON_UPDATE = new IntroNewAnonUpdateOp();
-
     public static final AbstractMetaOperator ARRAY_BASE_INSTANCE_OF = new ArrayBaseInstanceOf();
 
     public static final AbstractMetaOperator ARRAY_STORE_STATIC_ANALYSE = new ArrayStoreStaticAnalyse();

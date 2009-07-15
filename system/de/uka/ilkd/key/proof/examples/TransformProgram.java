@@ -123,7 +123,6 @@ public class TransformProgram {
 	TacletForTests.parse();
 
 	Proof proof = buildInitialProof();
-        proof.setSimplifier(new OldUpdateSimplifier());
 	printProof("initial Proof",proof);
 
         oneStep(proof);

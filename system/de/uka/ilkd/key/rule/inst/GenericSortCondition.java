@@ -10,8 +10,9 @@
 
 package de.uka.ilkd.key.rule.inst;
 
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortDependingSymbol;
-import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
+import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.CollectionSort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -43,7 +44,7 @@ public abstract class GenericSortCondition {
             return null;
 
         final TermInstantiation ti = (TermInstantiation)p_entry;
-        final SortedSchemaVariable ssv = (SortedSchemaVariable)p_entry.getSchemaVariable ();
+        final SchemaVariable ssv = p_entry.getSchemaVariable ();
         
         return createCondition ( ssv.sort (),
                                  ti.getTerm ().sort (),
@@ -74,8 +75,8 @@ public abstract class GenericSortCondition {
      *         subtype of the type of <code>p_sv</code>. Otherwise the sorts
      *         have to match exactly
      */
-    static boolean subSortsAllowed (SortedSchemaVariable p_sv) {
-        return p_sv.isTermSV () && !p_sv.isStrict ();
+    static boolean subSortsAllowed (SchemaVariable p_sv) {
+        return p_sv instanceof TermSV && !p_sv.isStrict ();
     }
     
     /**

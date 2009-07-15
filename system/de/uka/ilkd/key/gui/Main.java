@@ -331,8 +331,6 @@ public class Main extends JFrame implements IMain {
         if (mediator != null)
             unregister();
         mediator = m;
-        mediator.setSimplifier(ProofSettings.DEFAULT_SETTINGS
-                .getSimultaneousUpdateSimplifierSettings().getSimplifier());
         
         // The following needs to be called before the SequentView
         // is created.
@@ -823,16 +821,6 @@ public class Main extends JFrame implements IMain {
         JOptionPane.showMessageDialog(Main.this, settingsPane, "Settings",
                 JOptionPane.INFORMATION_MESSAGE);
     }
-    
-    /** opens configuration dialog for the simultaneous update simplifier */
-    protected void configSimultaneousUpdateSimplifier() {
-	SimultaneousUpdateSimplifierConfiguration config = 
-	    new SimultaneousUpdateSimplifierConfiguration
-	    (mediator(), 
-	     ProofSettings.DEFAULT_SETTINGS.getSimultaneousUpdateSimplifierSettings());
-	config.setVisible(true);
-    }
-    
     /**
      * opens a configuration dialog for the loaded libraries
      */
@@ -1198,17 +1186,6 @@ public class Main extends JFrame implements IMain {
 		    selectChoices();
 		}});
 	registerAtMenu(options, choiceItem);	
-
-	// update simplifier
-	JMenuItem updateSimplifierItem = new JMenuItem("Update Simplifier...");
-	updateSimplifierItem.setAccelerator(KeyStroke.getKeyStroke
-			    (KeyEvent.VK_U, ActionEvent.CTRL_MASK));
-
-	updateSimplifierItem.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    configSimultaneousUpdateSimplifier();
-		}});
-	registerAtMenu(options, updateSimplifierItem);	
     
 	// taclet libraries
         JMenuItem librariesItem = new JMenuItem("Taclet Libraries...");

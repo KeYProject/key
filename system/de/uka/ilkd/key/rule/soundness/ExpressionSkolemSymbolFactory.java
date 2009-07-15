@@ -113,7 +113,7 @@ public class ExpressionSkolemSymbolFactory extends SkolemSymbolTacletFactory {
 	SchemaVariable          lhs       =
 	    SchemaVariableFactory.createProgramSV ( createUniquePEName("pv"),
 						    ProgramSVSort.VARIABLE,
-						    false );
+						    false);
 
 	ArrayOfIProgramVariable pvs       = createSVsForInfluencingPVs ( p );
         IProgramVariable        retVal    = pvs.getIProgramVariable(pvs.size()-2);
@@ -141,7 +141,7 @@ public class ExpressionSkolemSymbolFactory extends SkolemSymbolTacletFactory {
 	    findJT[i] = (Statement)SchemaVariableFactory.createProgramSV
 		( createUniquePEName("stmt"),
 		  ProgramSVSort.STATEMENT,
-		  false );
+		  false);
 
 	return findJT;
     }

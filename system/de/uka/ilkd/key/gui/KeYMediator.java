@@ -33,7 +33,6 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.updatesimplifier.ApplyOnModality;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature;
 import de.uka.ilkd.key.strategy.feature.IfThenElseMalusFeature;
 import de.uka.ilkd.key.util.Debug;
@@ -47,9 +46,6 @@ public class KeYMediator {
 
 
     private InteractiveProver interactiveProver;
-
-    /** the update simplifier (may be moved to nodes)*/
-    private OldUpdateSimplifier upd_simplifier;
 
     /** the notation info used to print sequents */
     private final NotationInfo notationInfo;
@@ -240,15 +236,13 @@ public class KeYMediator {
 	    }
 	}
     }
+    
+    
     private void finishSetBack(){
         TermTacletAppIndexCacheSet.clearCache();
-        ApplyOnModality.clearCache();
         TermFactory.clearCache();
         AbstractBetaFeature.clearCache();
         IfThenElseMalusFeature.clearCache();
-        
-        //System.gc();//Runs Garbagecolletor
-        //System.runFinalization();
     }
 
     
@@ -277,7 +271,6 @@ public class KeYMediator {
 	if (proof != null) {
 	    proof.addProofTreeListener(proofTreeListener);
 	    proof.mgt().setMediator(this);
-	    proof.setSimplifier(upd_simplifier);
 	}
         keySelectionModel.setSelectedProof(proof);
     }
@@ -608,13 +601,6 @@ public class KeYMediator {
 		((GUIListener)listeners[i+1]).shutDown(e);
 	    }
 	}
-    }
-
-    
-    /** sets the simultaneous update simplifier */
-    public void setSimplifier(OldUpdateSimplifier s) {
-	upd_simplifier = s;
-	if (getProof() != null) getProof().setSimplifier(s);
     }
    
   

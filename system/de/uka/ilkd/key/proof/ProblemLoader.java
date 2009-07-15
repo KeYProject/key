@@ -623,19 +623,16 @@ public class ProblemLoader implements Runnable {
         final Proof p = targetGoal.proof();
         final Services services = p.getServices();
         TacletApp result;
-        if (sv.isVariableSV()) {
+        if (sv instanceof VariableSV) {
             // ignore -- already done
             result = app;
-        } else if (sv.isProgramSV()) {
+        } else if (sv instanceof ProgramSV) {
 	    final ProgramElement pe = 
 	        TacletInstantiationsTableModel.getProgramElement(
 		    app, value, sv, services);
 	    result = app.addCheckedInstantiation(sv, pe, services, true);
-        } else if ( sv.isSkolemTermSV() ) {
+        } else if ( sv instanceof SkolemTermSV ) {
 	    result = app.createSkolemConstant ( value, sv, true, services );
-        } else if (sv.isListSV()) {
-            SetOfLocationDescriptor s = parseLocationList(value, targetGoal);
-            result = app.addInstantiation(sv, Array.reverse(s.toArray()), true);
         } else {
             Namespace varNS = p.getNamespaces().variables();
 	    varNS = app.extendVarNamespaceForSV(varNS, sv);
@@ -661,18 +658,6 @@ public class ProblemLoader implements Runnable {
             String varname = s.substring(0, eq);
             String value = s.substring(eq+1, s.length());
 
-            // reklov
-            // START TEMPORARY DOWNWARD COMPATIBILITY
-
-            if (varname.startsWith("_NAME")) {
-                app = app.addInstantiation(de.uka.ilkd.key.rule.inst.
-                        SVInstantiations.EMPTY_SVINSTANTIATIONS.add(
-                        new NameSV(varname), new Name(value)));
-                continue;
-            }
-
-            // END TEMPORARY DOWNWARD COMPATIBILITY
-
             SchemaVariable sv = lookupName(uninsts, varname);
             if (sv==null) {
 //                throw new IllegalStateException(
@@ -681,7 +666,7 @@ public class ProblemLoader implements Runnable {
                 continue;
             }
 
-            if (sv.isVariableSV()) {
+            if (sv instanceof VariableSV) {
                 app = parseSV1(app, sv, value, services);
             }
         }

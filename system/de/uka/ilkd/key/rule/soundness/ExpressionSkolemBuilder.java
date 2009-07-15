@@ -54,8 +54,8 @@ public class ExpressionSkolemBuilder extends StatementExpressionSkolemBuilder {
 	while ( it.hasNext () ) {
 	    sv = it.next ();
 
-	    if ( sv.isProgramSV () &&
-		 ((SortedSchemaVariable)sv).sort () == ProgramSVSort.EXPRESSION )
+	    if ( sv instanceof ProgramSV &&
+		 sv.sort () == ProgramSVSort.EXPRESSION )
 		res = res.prepend ( sv );
 	}
 

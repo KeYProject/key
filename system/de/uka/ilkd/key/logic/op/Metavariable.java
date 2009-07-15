@@ -27,7 +27,7 @@ public class Metavariable extends AbstractSortedOperator
     }
 
     private Metavariable(Name name, Sort sort, boolean isTemporaryVariable) {
-	super(name, new Sort[0], sort);
+	super(name, EMPTY_ARG_SORTS, sort);
 	if ( sort == Sort.FORMULA ) {
 	    throw new RuntimeException(
 		 "Attempt to create metavariable of type formula");

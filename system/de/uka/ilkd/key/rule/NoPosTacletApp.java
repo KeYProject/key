@@ -176,12 +176,10 @@ public class NoPosTacletApp extends TacletApp {
 	while ( it.hasNext () ) {
             final SchemaVariable sv = it.next ();
 
-	    if ( sv.isOperatorSV ()
-	         || sv.isProgramSV ()
-                 || sv.isVariableSV ()
-                 || sv.isSkolemTermSV ()
-                 || sv.isListSV()
-                 || sv.isNameSV())
+	    if ( sv instanceof ModalOperatorSV
+	         || sv instanceof ProgramSV
+                 || sv instanceof VariableSV
+                 || sv instanceof SkolemTermSV)
                 continue;
 
 	    final TacletPrefix prefix = taclet.getPrefix ( sv );
@@ -370,8 +368,9 @@ public class NoPosTacletApp extends TacletApp {
     public NoPosTacletApp matchFind(PosInOccurrence pos,
 				    Constraint      termConstraint,
 				    Services        services,
-				    Constraint      userConstraint) {        
-        return matchFind(pos, termConstraint, services, userConstraint, null);
+				    Constraint      userConstraint) {
+        NoPosTacletApp result = matchFind(pos, termConstraint, services, userConstraint, null);
+	return result;
     }
 
 

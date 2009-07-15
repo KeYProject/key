@@ -92,7 +92,7 @@ public class MethodCallToUpdate extends AbstractMetaOperator {
         Term location_value = TermFactory.DEFAULT.createFunctionTerm(
                 spmbs.getProgramMethod(services), param );
         
-        return TermFactory.DEFAULT.createUpdateTerm(services, location, location_value, term.sub(1));
+        return TB.applyElementary(services, location, location_value, term.sub(1));
         
         //return term.sub(1);
     }

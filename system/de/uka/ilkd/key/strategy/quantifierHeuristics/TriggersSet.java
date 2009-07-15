@@ -299,7 +299,7 @@ class TriggersSet {
                 return false;
             }
             final Operator op = term.op();
-            if (op instanceof Modality || op instanceof IUpdateOperator || op instanceof QuantifiableVariable) {
+            if (op instanceof Modality || op instanceof UpdateApplication || op instanceof QuantifiableVariable) {
                 return false;
             }
             if (!UniTrigger.passedLoopTest(term, allTerm)) {

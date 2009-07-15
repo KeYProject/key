@@ -14,16 +14,11 @@ import de.uka.ilkd.key.java.ArrayOfProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInProgram;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.rule.ListOfUpdatePair;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.SLListOfObject;
-import de.uka.ilkd.key.rule.SLListOfUpdatePair;
-import de.uka.ilkd.key.rule.UpdatePair;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -46,7 +41,8 @@ public class SVInstantiations {
                                 Services services) {
                             return true;
                         }
-                    }, false); // just a dummy SV for context
+                    },
+                    false); // just a dummy SV for context
 
 
     /** the map with the instantiations to logic terms */
@@ -63,7 +59,7 @@ public class SVInstantiations {
      * after the application around the added/replaced parts. These are stored
      * in this list
      */
-    private final ListOfUpdatePair updateContext;
+    private final ListOfTerm updateContext;
 
     /** instantiations of generic sorts */
     private GenericSortInstantiations genericSortInstantiations = GenericSortInstantiations.EMPTY_INSTANTIATIONS;
@@ -77,7 +73,7 @@ public class SVInstantiations {
     /** creates a new SVInstantions object with an empty map */
     private SVInstantiations() {
 	genericSortConditions = SLListOfGenericSortCondition.EMPTY_LIST;
-	updateContext = SLListOfUpdatePair.EMPTY_LIST;
+	updateContext = SLListOfTerm.EMPTY_LIST;
         map = MapAsListFromSchemaVariableToInstantiationEntry.EMPTY_MAP;
 	interesting = MapAsListFromSchemaVariableToInstantiationEntry.EMPTY_MAP;
     }
@@ -91,7 +87,7 @@ public class SVInstantiations {
      */
     private SVInstantiations(MapFromSchemaVariableToInstantiationEntry map,
             MapFromSchemaVariableToInstantiationEntry interesting,
-            ListOfUpdatePair updateContext,
+            ListOfTerm updateContext,
             ListOfGenericSortCondition genericSortConditions) {
         this(map, interesting, updateContext,
                 GenericSortInstantiations.EMPTY_INSTANTIATIONS,
@@ -100,7 +96,7 @@ public class SVInstantiations {
 
     private SVInstantiations(MapFromSchemaVariableToInstantiationEntry map,
             MapFromSchemaVariableToInstantiationEntry interesting,
-            ListOfUpdatePair updateContext,
+            ListOfTerm updateContext,
             GenericSortInstantiations genericSortInstantiations,
             ListOfGenericSortCondition genericSortConditions) {
         this.map = map;
@@ -133,7 +129,7 @@ public class SVInstantiations {
         return add(sv, new TermInstantiation(sv, subst));    
     }
 
-    public SVInstantiations add(OperatorSV sv, 
+    public SVInstantiations add(ModalOperatorSV sv, 
             de.uka.ilkd.key.logic.op.Operator op) {
         return add(sv, new OperatorInstantiation(sv, op));
     }
@@ -464,19 +460,20 @@ public class SVInstantiations {
 
     /** adds an update to the update context */
     public SVInstantiations addUpdate(Term update) {
+	assert update.sort() == Sort.UPDATE;
         return new SVInstantiations(map, interesting(), updateContext
-                .append(new UpdatePair(update)),
+                .append(update),
                 getGenericSortInstantiations(), getGenericSortConditions());
     }
 
-    public SVInstantiations addUpdateList(ListOfUpdatePair updates) {
+    public SVInstantiations addUpdateList(ListOfTerm updates) {
         return new SVInstantiations(map, interesting(), updates,
                 getGenericSortInstantiations(), getGenericSortConditions());
     }
 
     public SVInstantiations clearUpdateContext() {
         return new SVInstantiations(map, interesting(),
-                SLListOfUpdatePair.EMPTY_LIST, getGenericSortInstantiations(),
+                SLListOfTerm.EMPTY_LIST, getGenericSortInstantiations(),
                 getGenericSortConditions());
     }
 
@@ -529,7 +526,7 @@ public class SVInstantiations {
      * 
      * @return the update context
      */
-    public ListOfUpdatePair getUpdateContext() {
+    public ListOfTerm getUpdateContext() {
         return updateContext;
     }
 
@@ -589,7 +586,7 @@ public class SVInstantiations {
             result = result.put(entry.key(), entry.value());
         }
         
-        ListOfUpdatePair updates = SLListOfUpdatePair.EMPTY_LIST;
+        ListOfTerm updates = SLListOfTerm.EMPTY_LIST;
         
         if (other.getUpdateContext().isEmpty()) {
             updates = getUpdateContext();
@@ -609,7 +606,8 @@ public class SVInstantiations {
         return interesting;
     }
 
-    /** toString */
+
+    @Override
     public String toString() {
         StringBuffer result = new StringBuffer("SV Instantiations: ");
         return (result.append(map.toString())).toString();

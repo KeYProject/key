@@ -20,7 +20,6 @@ import javax.swing.SwingUtilities;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.*;
@@ -143,10 +142,6 @@ public class InteractiveProver {
         goal.node().getNodeInfo().setInteractiveRuleApplication(true);
 
         ListOfGoal goalList = goal.apply(app);
-        
-        if (!getProof ().closed ()) {
-            Goal.applyUpdateSimplifier ( goalList );
-        }
     }
 
 
@@ -213,25 +208,6 @@ public class InteractiveProver {
         
         if ( focus != null ) {
             // exchange the rule app manager of that goal to filter rule apps
-
-            // we also apply rules to directly preceding updates (usually this
-            // makes sense)
-            final PIOPathIterator it = focus.iterator();
-            it.next ();
-            focus = it.getPosInOccurrence (); 
-            while ( it.hasNext () ) {
-                if ( it.getSubTerm ().op () instanceof IUpdateOperator ) {
-                    final IUpdateOperator op =
-                        (IUpdateOperator)it.getSubTerm ().op ();
-                    if ( it.getChild () == op.targetPos() ) {
-                        it.next ();
-                        continue;
-                    }
-                }
-
-                it.next ();
-                focus = it.getPosInOccurrence (); 
-            }
                         
             final AutomatedRuleApplicationManager realManager = goal.getRuleAppManager ();
             goal.setRuleAppManager ( null );

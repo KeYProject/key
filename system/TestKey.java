@@ -34,7 +34,6 @@ public class TestKey extends TestCase {
   	de.uka.ilkd.key.rule.TestCollisionResolving.class,
   	de.uka.ilkd.key.rule.TestMatchTaclet.class,
         de.uka.ilkd.key.rule.TestApplyTaclet.class,
-	de.uka.ilkd.key.rule.TestUpdateSimplifier.class,
  	de.uka.ilkd.key.rule.inst.TestGenericSortInstantiations.class,
   	de.uka.ilkd.key.rule.metaconstruct.TestProgramMetaConstructs.class,
  	de.uka.ilkd.key.rule.soundness.TestProofObligationCreation.class
@@ -64,7 +63,6 @@ public class TestKey extends TestCase {
         de.uka.ilkd.key.logic.TestTerm.class,
         de.uka.ilkd.key.logic.TestNamespace.class,
         de.uka.ilkd.key.logic.TestConstraint.class,
-        de.uka.ilkd.key.logic.TestUpdateFactory.class,
         de.uka.ilkd.key.logic.TestUpdatetermNormalisation.class,
    	de.uka.ilkd.key.logic.TestSemisequent.class,
    	de.uka.ilkd.key.logic.TestPosInOcc.class,   	
@@ -126,6 +124,4 @@ public class TestKey extends TestCase {
     public TestKey(String name) {
 	super(name);        
     }
-
 }
-

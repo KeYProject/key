@@ -53,9 +53,7 @@ public class TestJMLTranslator extends TestCase {
     private static Services services;
     private static JMLTranslator translator;
     private static KeYJavaType testClassType;
-    
-    private static Term trueLitTerm;
-    
+        
 
     protected void setUp() {
         if(javaInfo != null) {
@@ -66,8 +64,6 @@ public class TestJMLTranslator extends TestCase {
         services = javaInfo.getServices();
         translator = new JMLTranslator(services);
         testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
-        trueLitTerm = services.getTypeConverter().convertToLogicElement(
-                BooleanLiteral.TRUE);
     }
 
     

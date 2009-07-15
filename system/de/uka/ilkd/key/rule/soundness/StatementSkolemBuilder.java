@@ -17,8 +17,8 @@ import de.uka.ilkd.key.java.ArrayOfStatement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.IteratorOfSchemaVariable;
 import de.uka.ilkd.key.logic.op.ListOfIProgramVariable;
+import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
 
@@ -48,8 +48,8 @@ public class StatementSkolemBuilder
 	while ( it.hasNext () ) {
 	    final SchemaVariable sv = it.next ();
 
-	    if ( sv.isProgramSV () &&
-		 ((SortedSchemaVariable)sv).sort () ==
+	    if ( sv instanceof ProgramSV &&
+		 sv.sort () ==
 		     ProgramSVSort.STATEMENT &&
 		 !isInstantiated ( sv ) )
 	        createSkolemStatementSV ( sv );

@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
 //
 
 package de.uka.ilkd.key.rule.metaconstruct;
@@ -35,13 +28,11 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
 import de.uka.ilkd.key.logic.SetOfTerm;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.UpdateFactory;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.AtPreFactory;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 
@@ -131,10 +122,8 @@ public class IntroAtPreDefsOp extends AbstractMetaOperator {
         }
         
         //define atPre symbols
-        UpdateFactory uf 
-            = new UpdateFactory(services, services.getProof().simplifier());
-        Update atPreUpdate 
+        Term atPreUpdate 
             = APF.createAtPreDefinitions(atPreFunctions, services);
-        return uf.apply(atPreUpdate, target);
+        return TB.apply(atPreUpdate, target);
     }
 }

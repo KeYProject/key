@@ -35,8 +35,7 @@ public class TacletPrefixBuilder {
 	ArrayOfQuantifiableVariable bdVars=visited.varsBoundHere(subTerm);
 	for (int i=0; i<bdVars.size(); i++) {
 	    QuantifiableVariable boundVar = bdVars.getQuantifiableVariable(i);
-	    if ( boundVar instanceof SchemaVariable &&
-		 ((SchemaVariable)boundVar).isVariableSV() ) {
+	    if ( boundVar instanceof VariableSV ) {
 		currentlyBoundVars = currentlyBoundVars.add
 		    ((SchemaVariable)boundVar);
 	    }
@@ -66,10 +65,10 @@ public class TacletPrefixBuilder {
     }
 
     private void visit(Term t) {
-	if (t.op() instanceof SortedSchemaVariable && 
-	    !((SchemaVariable)t.op()).isVariableSV() &&
-	    !((SchemaVariable)t.op()).isProgramSV() &&
-	    !((SchemaVariable)t.op()).isSkolemTermSV()) {    // see below /AR
+	if (t.op() instanceof SchemaVariable && 
+	    !(t.op() instanceof VariableSV) &&
+	    !(t.op() instanceof ProgramSV) &&
+	    !(t.op() instanceof SkolemTermSV)) { 
 	    SchemaVariable sv = (SchemaVariable)t.op();
 	    SetOfSchemaVariable relevantBoundVars = removeNotFreeIn(sv);
 	    TacletPrefix prefix = prefixMap.get(sv);

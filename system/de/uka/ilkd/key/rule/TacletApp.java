@@ -23,7 +23,6 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.rule.conditions.NewDepOnAnonUpdates;
 import de.uka.ilkd.key.rule.inst.*;
 import de.uka.ilkd.key.util.Debug;
 
@@ -239,7 +238,7 @@ public abstract class TacletApp implements RuleApp {
 	    insts.pairIterator();
 	while (it.hasNext()) {
 	    EntryOfSchemaVariableAndInstantiationEntry pair = it.next();
-	    if (pair.key().isVariableSV()) {
+	    if (pair.key() instanceof VariableSV) {
 		SchemaVariable varSV = pair.key();		
 		Term value = ((TermInstantiation)pair.value()).getTerm();
 		if (!collMap.containsKey((LogicVariable)value.op())) {
@@ -352,7 +351,7 @@ public abstract class TacletApp implements RuleApp {
 	LogicVariable x = (LogicVariable)
 	    ((Term)insts.getInstantiation(u)).op();
 	if (t.op() instanceof SchemaVariable) {
-	    if (!((SchemaVariable)t.op()).isVariableSV()) {
+	    if (!(t.op() instanceof VariableSV)) {
 		SchemaVariable sv=(SchemaVariable)t.op();
 		ClashFreeSubst cfSubst
 		    = new ClashFreeSubst(x,y); 
@@ -423,8 +422,7 @@ public abstract class TacletApp implements RuleApp {
 	    IteratorOfSchemaVariable it = coll.varIterator();
 	    while (it.hasNext()) {
 		SchemaVariable var=it.next();
-		if (!instantiations().isInstantiated(var) &&
-                        !isDependingOnModifiesSV(var)) {
+		if (!instantiations().isInstantiated(var)) {
 		    missingVars = missingVars.add(var);	
 		}
 	    }
@@ -432,34 +430,6 @@ public abstract class TacletApp implements RuleApp {
 	return missingVars;
     }
 
-
-    private NewDepOnAnonUpdates getDependingOnModifies(SchemaVariable var) {
-        if ( !var.isFormulaSV () ) return null;
-        
-        NewDepOnAnonUpdates result = null;
-        final IteratorOfVariableCondition it = taclet.getVariableConditions ();
-        while ( it.hasNext () ) {
-            final VariableCondition vc = it.next();
-            if ( vc instanceof NewDepOnAnonUpdates
-                 && ((NewDepOnAnonUpdates)vc).getUpdateSV() == var ) {
-                assert result == null :
-                    "" + vc + "is a duplicate dependency condition for " +
-                    "schema variable " + var;
-                result = (NewDepOnAnonUpdates)vc;
-            }
-        }
-
-        return result;        
-    }
-    
-    /**
-     * @param sv a schema variable
-     * @return true iff sv there is a variable condition of the form
-     *         \newDepOnMod(modifies,sv)
-     */
-    public boolean isDependingOnModifiesSV(SchemaVariable sv){
-        return getDependingOnModifies (sv ) != null;
-    }
 
     
     /** Calculate needed SchemaVariables that have not been
@@ -480,12 +450,11 @@ public abstract class TacletApp implements RuleApp {
 
             while ( it.hasNext () ) {
                 var = it.next ();
-                if ( isDependingOnModifiesSV ( var ) )
-                    continue;
+
                 if ( canUseMVAPriori ( var ) ) {
                     GenericSortCondition c =
                         GenericSortCondition.forceInstantiation
-                        ( ( (SortedSchemaVariable)var ).sort (), true );
+                        (  var.sort (), true );
                     if ( c == null )
                         continue; // then the sort is not generic
                     else {
@@ -518,19 +487,29 @@ public abstract class TacletApp implements RuleApp {
                                              Services services,
                                              boolean interesting) {
 
-	if (sv.isVariableSV() && 
+	if(sv instanceof VariableSV && 
 	    !(term.op() instanceof LogicVariable)) {
 	    throw new IllegalInstantiationException("Could not add "+
 	       "the instantiation of "+sv+" because "+
 		term+" is no variable.");
 	}               
-              
+
         
         MatchConditions cond = matchConditions();
         
-        if (sv instanceof SortedSchemaVariable) {
-            cond = ((SortedSchemaVariable)sv).match(term, cond, services);
-        } else {
+        //XXX??
+//        if (sv instanceof SortedSchemaVariable) {
+//            cond = ((SortedSchemaVariable)sv).match(term, cond, services);
+//        } else {
+//            cond = sv.match(term.op(), cond, services);
+//        }
+        if(sv instanceof FormulaSV 
+           || sv instanceof TermSV 
+           || sv instanceof UpdateSV 
+           || sv instanceof ProgramSV
+           || sv instanceof VariableSV) {
+            cond = sv.match(term, cond, services);
+        } else if(sv instanceof ModalOperatorSV || sv instanceof VariableSV) {
             cond = sv.match(term.op(), cond, services);
         }
         	        
@@ -588,75 +567,61 @@ public abstract class TacletApp implements RuleApp {
         TacletApp app = this;
         ListOfString proposals = SLListOfString.EMPTY_LIST;
 
-        for (final SchemaVariable var : uninstantiatedVars()) {
-            
-            if (LoopInvariantProposer.DEFAULT.inLoopInvariantRuleSet(taclet())){ 
-                Object inv = LoopInvariantProposer.DEFAULT.tryToInstantiate(this, var, services);              
-                if (inv instanceof Term){
-                    app = app.addCheckedInstantiation(var, (Term)inv, services, true);
-                } else if (inv instanceof ListOfTerm){
-                    app = app.addInstantiation(var, ((ListOfTerm)inv).toArray(), true);
-                } else if (inv instanceof SetOfLocationDescriptor) {
-                    app = app.addInstantiation(var, ((SetOfLocationDescriptor)inv).toArray(), true);
-                }   
-                if (inv != null) continue;
-            } 
-            if(var instanceof SortedSchemaVariable) {
-                SortedSchemaVariable sv = (SortedSchemaVariable)var;
-                if (sv.sort() == ProgramSVSort.VARIABLE) {
-                    String proposal = varNamer.getSuggestiveNameProposalForProgramVariable
-                    (sv, this, goal, services, proposals);
-                    ProgramElement pe = 
-                        TacletInstantiationsTableModel.getProgramElement(app, proposal, sv, services);
-                    app = app.addCheckedInstantiation(sv, pe, services, true);
-                    proposals = proposals.append(proposal);
-                } else if (sv.sort() == ProgramSVSort.LABEL) {
-                    boolean nameclash;
-                    do {
-                        String proposal = VariableNameProposer.DEFAULT.
-                            getProposal(this, sv, services, goal.node(), proposals);
-                        ProgramElement pe = TacletInstantiationsTableModel.
-                            getProgramElement(app, proposal, sv, services);
-                        proposals = proposals.prepend(proposal);
-                        try {
-                            app = app.addCheckedInstantiation(sv, pe, services, true);
-                        } catch (IllegalInstantiationException iie) {
-                            // name clash
-                            nameclash=true;
-                        }
-                        nameclash=false;
-                    } while (nameclash);                    
-                } else if ( sv.isSkolemTermSV () ) {
-                    // if the sort of the schema variable is generic,
-                    // ensure that it is instantiated
-                    app = forceGenericSortInstantiation(app, sv);
-                    if ( app == null ) return null;
-    
-                    String proposal = VariableNameProposer.DEFAULT
-                        .getProposal(app, sv, services, goal.node(), proposals);
+        for (final SchemaVariable sv : uninstantiatedVars()) {
+            if (sv.sort() == ProgramSVSort.VARIABLE) {
+        	String proposal = varNamer.getSuggestiveNameProposalForProgramVariable
+        	(sv, this, goal, services, proposals);
+        	ProgramElement pe = 
+        	    TacletInstantiationsTableModel.getProgramElement(app, proposal, sv, services);
+        	app = app.addCheckedInstantiation(sv, pe, services, true);
+        	proposals = proposals.append(proposal);
+            } else if (sv.sort() == ProgramSVSort.LABEL) {
+        	boolean nameclash;
+        	do {
+        	    String proposal = VariableNameProposer.DEFAULT.
+        	    getProposal(this, sv, services, goal.node(), proposals);
+        	    ProgramElement pe = TacletInstantiationsTableModel.
+        	    getProgramElement(app, proposal, sv, services);
+        	    proposals = proposals.prepend(proposal);
+        	    try {
+        		app = app.addCheckedInstantiation(sv, pe, services, true);
+        	    } catch (IllegalInstantiationException iie) {
+        		// name clash
+        		nameclash=true;
+        	    }
+        	    nameclash=false;
+        	} while (nameclash);                    
+            } else if ( sv instanceof SkolemTermSV ) {
+        	// if the sort of the schema variable is generic,
+        	// ensure that it is instantiated
+        	app = forceGenericSortInstantiation(app, sv);
+        	if ( app == null ) return null;
 
-                    proposals = proposals.append(proposal);
+        	String proposal = VariableNameProposer.DEFAULT
+        	.getProposal(app, sv, services, goal.node(), proposals);
 
-                    app = app.createSkolemConstant ( proposal,
-    						        sv,
-    						        true, services );
+        	proposals = proposals.append(proposal);
 
-                } else if ( sv.isVariableSV () ) {
-                    // if the sort of the schema variable is generic,
-                    // ensure that it is instantiated
-                    app = forceGenericSortInstantiation ( app, sv );
-                    if ( app == null ) return null;
-                    
-                    String proposal = VariableNameProposer.DEFAULT
-                    .getProposal( this, sv, services, goal.node(), null );
-                    final LogicVariable v = new LogicVariable ( new Name ( proposal ),
-                            getRealSort ( sv, services ) );                
-                    app = app.addCheckedInstantiation ( sv, tb.var(v), services, true );
-                } else if ( !( sv.isTermSV () && canUseMVAPriori ( sv ) ) ) {
-                    return null;
-                }
-            }      
-        }
+        	app = app.createSkolemConstant ( proposal,
+        		sv,
+        		true, services );
+
+            } else if (sv instanceof VariableSV) {
+        	// if the sort of the schema variable is generic,
+        	// ensure that it is instantiated
+        	app = forceGenericSortInstantiation ( app, sv );
+        	if ( app == null ) return null;
+
+        	String proposal = VariableNameProposer.DEFAULT
+        	.getProposal( this, sv, services, goal.node(), null );
+        	final LogicVariable v = new LogicVariable ( new Name ( proposal ),
+        		getRealSort ( sv, services ) );                
+        	app = app.addCheckedInstantiation ( sv, tb.var(v), services, true );
+            } else if ( !( sv instanceof TermSV && canUseMVAPriori ( sv ) ) ) {
+        	return null;
+            }
+        }      
+        
         
         if (app != this) {
             final MatchConditions appMC = 
@@ -684,7 +649,7 @@ public abstract class TacletApp implements RuleApp {
      */
     private static TacletApp
 	forceGenericSortInstantiation (TacletApp app,
-				       SortedSchemaVariable sv) {
+				       SchemaVariable sv) {
         final GenericSortCondition c =
             GenericSortCondition.forceInstantiation ( sv.sort (), false );
         if ( c != null ) {
@@ -712,7 +677,7 @@ public abstract class TacletApp implements RuleApp {
             for (final SchemaVariable sv : uninstantiatedVars()) {
                 final GenericSortCondition c =
                     GenericSortCondition.forceInstantiation
-                    ( ( (SortedSchemaVariable)sv ).sort (), true );
+                    ( sv.sort (), true );
                 if ( c != null ) 			                      
                     insts = insts.add ( c );                                                                        
             }
@@ -812,7 +777,7 @@ public abstract class TacletApp implements RuleApp {
             final EntryOfSchemaVariableAndInstantiationEntry entry = it.next ();
             final SchemaVariable sv = entry.key ();
 
-            if ( sv.isFormulaSV() || sv.isTermSV() ) {
+            if ( sv instanceof FormulaSV || sv instanceof TermSV ) {
                 final Object inst = entry.value().getInstantiation ();
                 // NB: this only works because of the implementation of
                 // <code>Metavariable.compareTo</code>, in which temporary MVs
@@ -854,7 +819,7 @@ public abstract class TacletApp implements RuleApp {
      */
     private boolean introduceMVFor (EntryOfSchemaVariableAndInstantiationEntry entry,
                                     SchemaVariable sv) {
-        return sv.isTermSV () && !sv.isListSV()
+        return sv instanceof TermSV 
                && !taclet ().getIfFindVariables ().contains ( sv )
                && canUseMVAPosteriori ( sv,
                             ( (TermInstantiation)entry.value () ).getTerm () );
@@ -875,8 +840,6 @@ public abstract class TacletApp implements RuleApp {
         insts = forceGenericSortInstantiations ( insts );
 
         for (final SchemaVariable sv : uninstantiatedVars()) {
-            if (isDependingOnModifiesSV(sv))
-                continue;
             Debug.assertTrue ( canUseMVAPriori ( sv ),
                                "Should be able to instantiate "
                                + sv
@@ -975,20 +938,6 @@ public abstract class TacletApp implements RuleApp {
         while ( svIt.hasNext () )
             insts = createTermSkolemFunctions ( svIt.next (), insts, p_func_ns );
         
-        // reklov
-        // START TEMPORARY DOWNWARD COMPATIBILITY
-        VariableNameProposer.DEFAULT.setOldAnonUpdateProposals((Name)
-                insts.getInstantiation(new NameSV("_NAME_ANON_UPDATES")));
-        // END TEMPORARY DOWNWARD COMPATIBILITY
-
-        final IteratorOfVariableCondition vcIt = taclet.getVariableConditions ();
-        while ( vcIt.hasNext () ) {
-            final VariableCondition vc = vcIt.next();
-            if ( vc instanceof NewDepOnAnonUpdates )
-                insts = createModifiesSkolemFunctions((NewDepOnAnonUpdates)vc,
-                                                      insts, services);
-        }
-        
         if ( insts == instantiations () ) return this;
         return setInstantiation ( insts );
     }
@@ -999,7 +948,7 @@ public abstract class TacletApp implements RuleApp {
     private SVInstantiations createTermSkolemFunctions(SchemaVariable depSV,
                                                        SVInstantiations insts,
                                                        Namespace p_func_ns) {
-        if ( !depSV.isSkolemTermSV () ) return insts;
+        if ( !(depSV instanceof SkolemTermSV) ) return insts;
 
         final Term tempDepVar = (Term)insts.getInstantiation ( depSV );
 
@@ -1008,46 +957,6 @@ public abstract class TacletApp implements RuleApp {
 
         return createSkolemFunction ( insts, p_func_ns, depSV, tempDepVar,
                                       determineArgMVs ( insts, depSV ) );
-    }
-        
-    /**
-     * Instantiate a schemavariable for an anonymous update (FormulaSV)
-     */
-    private SVInstantiations
-        createModifiesSkolemFunctions(NewDepOnAnonUpdates cond,
-                                      SVInstantiations insts,
-                                      Services services) {
-        final SchemaVariable modifies = cond.getModifiesSV ();
-        final SchemaVariable updateSV = cond.getUpdateSV ();
-        
-        if (insts.isInstantiated ( updateSV )) {
-            System.err.println(
-                "Modifies skolem functions already created - ignoring.");
-            return insts;
-        }
-        
-        final ListOfObject locationList =
-            (ListOfObject)insts.getInstantiation ( modifies );
-        final AnonymisingUpdateFactory auf =
-            new AnonymisingUpdateFactory
-            ( new UpdateFactory ( services, new OldUpdateSimplifier () ) );
-        final Term[] mvArgs = toTermArray ( determineArgMVs ( insts, updateSV ) );
-        return insts.add ( updateSV,
-                           auf.createAnonymisingUpdateAsFor
-                                  ( toLocationDescriptorArray ( locationList ),
-                                    mvArgs, services ) );
-    }
-    
-    private static LocationDescriptor[]
-               toLocationDescriptorArray(ListOfObject locationList) {
-        final LocationDescriptor[] locations =
-            new LocationDescriptor [locationList.size ()];
-
-        for ( int i = 0; i < locations.length; i++ ) {
-            locations[i] = (LocationDescriptor)locationList.head ();
-            locationList = locationList.tail ();
-        }
-        return locations;
     }
 
     
@@ -1081,15 +990,11 @@ public abstract class TacletApp implements RuleApp {
     }
 
     private SetOfMetavariable determineArgMVsFromUpdate(SVInstantiations insts) {
-        final IteratorOfUpdatePair it = insts.getUpdateContext ().iterator ();
+        final IteratorOfTerm it = insts.getUpdateContext ().iterator ();
         SetOfMetavariable mvs = SetAsListOfMetavariable.EMPTY_SET;
         while ( it.hasNext () ) {
-            final UpdatePair pair = it.next ();
-            final IUpdateOperator upOp = pair.updateOperator ();
-            for ( int i = 0; i != upOp.arity (); ++i ) {
-                if ( i == upOp.targetPos () ) continue;
-                mvs = mvs.union ( pair.sub ( i ).metaVars () );
-            }
+            final Term update = it.next();
+            mvs = mvs.union(update.metaVars());
         }
         return mvs;
     }
@@ -1560,7 +1465,7 @@ public abstract class TacletApp implements RuleApp {
         IteratorOfSchemaVariable it = instantiations.svIterator();
         while(it.hasNext()) {
             SchemaVariable sv = it.next();
-            if(sv.isSkolemTermSV()) {            
+            if(sv instanceof SkolemTermSV) {            
                 Term inst = (Term) instantiations.getInstantiation(sv);
                 ns.addSafely(inst.op());
             }
@@ -1581,7 +1486,7 @@ public abstract class TacletApp implements RuleApp {
 	IteratorOfSchemaVariable svIt=uninstantiatedVars().iterator();
 	while (svIt.hasNext()) { 
 	    SchemaVariable sv=svIt.next();
-	    if (sv.isTermSV() || sv.isFormulaSV()) {
+	    if (sv instanceof TermSV || sv instanceof FormulaSV) {
 		TacletPrefix prefix=taclet().getPrefix(sv);
 		HashSet<Name> names=new HashSet<Name>();	    
 		if (prefix.context()) {
@@ -1617,7 +1522,7 @@ public abstract class TacletApp implements RuleApp {
      * @return true iff p_var is a termSV with empty prefix
      */
     public boolean canUseMVAPriori ( SchemaVariable p_var ) {
-	if ( !p_var.isTermSV () ||
+	if ( !(p_var instanceof TermSV) ||
 	     fixedVars.contains ( p_var ) )
 	    return false;
 	else {
@@ -1675,7 +1580,7 @@ public abstract class TacletApp implements RuleApp {
         IteratorOfSchemaVariable it = instantiations.svIterator();
 	while (it.hasNext()) {
 	    SchemaVariable sv = it.next();
-	    if (sv.isTermSV() || sv.isFormulaSV()) {
+	    if (sv instanceof TermSV || sv instanceof FormulaSV) {
 		if (!((Term)instantiations.getInstantiation(sv)).
 		    freeVars().subset(boundAtOccurrenceSet
 				      (taclet.getPrefix(sv), 

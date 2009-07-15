@@ -55,7 +55,7 @@ public class ProgramMethod extends NonRigidFunction
         // but expand method body relies on a pm....
         super(new ProgramElementName(method.getProgramElementName().toString(), 
                 contKJT.getSort().toString()), 
-	      kjt == null ? null : kjt.getSort(), getArgumentSorts(method, contKJT));
+	      kjt == null ? Sort.NULL : kjt.getSort(), getArgumentSorts(method, contKJT));
                         
 	this.method  = method;
 	this.contKJT = contKJT;

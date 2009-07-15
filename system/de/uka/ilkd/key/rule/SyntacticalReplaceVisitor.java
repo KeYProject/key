@@ -33,7 +33,7 @@ import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
-public class SyntacticalReplaceVisitor extends Visitor { 	
+public final class SyntacticalReplaceVisitor extends Visitor { 	
 
     private final SVInstantiations svInst;
     private final Constraint metavariableInst;
@@ -306,88 +306,82 @@ public class SyntacticalReplaceVisitor extends Visitor {
 	return null;
     }
 
-    private void updateLocation (UpdateableOperator loc,
-                                 Term location,
-                                 int positionInStack,
-                                 int oldLocationArity,
-                                 boolean replace) {
-        final Term[] newSubterms = new Term [loc.arity ()];
-        for ( int j = 0; j < newSubterms.length; j++ ) {
-            newSubterms[j] = location.sub ( j );
-        }
-        if ( replace ) {
-            replaceAt ( newSubterms, positionInStack, oldLocationArity );
-        } else {
-            pushNewAt ( newSubterms, positionInStack );
-        }
-    }
+//    private void updateLocation (UpdateableOperator loc,
+//                                 Term location,
+//                                 int positionInStack,
+//                                 int oldLocationArity,
+//                                 boolean replace) {
+//        final Term[] newSubterms = new Term [loc.arity ()];
+//        for ( int j = 0; j < newSubterms.length; j++ ) {
+//            newSubterms[j] = location.sub ( j );
+//        }
+//        if ( replace ) {
+//            replaceAt ( newSubterms, positionInStack, oldLocationArity );
+//        } else {
+//            pushNewAt ( newSubterms, positionInStack );
+//        }
+//    }
 
 
-    private IUpdateOperator instantiateUpdateOperator(IUpdateOperator op) {
-	final UpdateableOperator[] newOps = new UpdateableOperator[op.locationCount()];	
-	final int locCount      = op.locationCount();	
-	boolean changed = false;	    	    
-	for (int i = 0; i < locCount; i++) {	    
-	    final UpdateableOperator originalOp = op.location(i);	    
-	    if (originalOp instanceof SchemaVariable) {
-		final Object inst = svInst.getInstantiation
-		    ((SchemaVariable)originalOp);
-		if (!(inst instanceof Operator)) {
-		    if (inst == null) {
-		        // we have only a partial instantiation
-		        // continue with schema
-		        newOps[i] = originalOp;
-		    } else {                
-		        final int posInStack = op.arity() - op.locationSubtermsEnd(i);
-		        Term instantiation = toTerm(inst);
-		        newOps[i] = (UpdateableOperator)instantiation.op();
-		        updateLocation(newOps[i], instantiation, 
-		                posInStack, 0, false);
-		    }
-		} else {
-		    newOps[i] = (UpdateableOperator) inst;
+    private ElementaryUpdate instantiateElementaryUpdate(ElementaryUpdate op) {
+	final UpdateableOperator originalLhs = op.lhs();
+	UpdateableOperator newLhs;
+	if (originalLhs instanceof SchemaVariable) {
+	    final Object inst 
+	    	= svInst.getInstantiation((SchemaVariable)originalLhs);
+	    if(!(inst instanceof UpdateableOperator)) {
+		if(inst == null) {
+		    // we have only a partial instantiation
+		    // continue with schema
+		    newLhs = originalLhs;
+		} else {                
+//		    final int posInStack = op.arity() - op.locationSubtermsEnd(i);
+		    Term instantiation = toTerm(inst);
+		    newLhs = (UpdateableOperator)instantiation.op();
+//		    updateLocation(newLhs, instantiation, 
+//			    posInStack, 0, false);
 		}
-	    } else if (originalOp instanceof MetaOperator) {
-		final MetaOperator mop = (MetaOperator) originalOp;		
-		final int posInStack = op.arity() - op.locationSubtermsEnd(i);
-
-		final Term computedLocation =
-		    mop.calculate(tf.createMetaTerm(mop,
-		                                    peek(posInStack, mop.arity())), 
-		                                    svInst, getServices());		
-		newOps[i] = (UpdateableOperator) computedLocation.op();
-
-		updateLocation(newOps[i], computedLocation, posInStack, 
-			       mop.arity(), true);
 	    } else {
-		newOps[i] = (UpdateableOperator) instantiateOperator(originalOp);
-	    }	   
-	    changed = (changed || (newOps[i] != originalOp));
-	}		
+		newLhs = (UpdateableOperator) inst;
+	    }
+	} else if (originalLhs instanceof MetaOperator) {
+	    assert false : "not implemented";
+	    newLhs = originalLhs;
+//	    final MetaOperator mop = (MetaOperator) originalLhs;		
+//	    final int posInStack = op.arity() - op.locationSubtermsEnd(i);
+//
+//	    final Term computedLocation =
+//		mop.calculate(tf.createMetaTerm(mop,
+//			peek(posInStack, mop.arity())), 
+//			svInst, getServices());		
+//	    newLhs = (UpdateableOperator) computedLocation.op();
 
-	if ( !changed ) return op;
-
-	return op.replaceLocations ( newOps );
+//	    updateLocation(newOps[i], computedLocation, posInStack, 
+//		    mop.arity(), true);
+	} else {
+	    newLhs = (UpdateableOperator) instantiateOperator(originalLhs);
+	}
+	
+	return newLhs == originalLhs ? op : ElementaryUpdate.getInstance(newLhs); 
     }
 
           
-    private Operator instantiateOperatorSV(OperatorSV op) {
+    private Operator instantiateOperatorSV(ModalOperatorSV op) {
         Operator newOp = (Operator) svInst.getInstantiation(op);
         Debug.assertTrue(newOp != null, "No instantiation found for " + op);
         return newOp;
     }
 
     private Operator instantiateOperator(Operator op) {	
-	if (op instanceof OperatorSV){	 
-            return instantiateOperatorSV((OperatorSV) op);
+	if (op instanceof ModalOperatorSV){	 
+            return instantiateOperatorSV((ModalOperatorSV) op);
         } else if (op instanceof SortDependingSymbol) {
             return handleSortDependingSymbol(op);
-        } else if (op instanceof IUpdateOperator) {        
-	    return instantiateUpdateOperator((IUpdateOperator)op);       
-	} else if (op instanceof SortedSchemaVariable &&
-                    ((SortedSchemaVariable)op).isListSV()){
+        } else if (op instanceof ElementaryUpdate) {        
+	    return instantiateElementaryUpdate((ElementaryUpdate)op);       
+	}  else if (op instanceof ProgramSV && ((ProgramSV)op).isListSV()){
             return op;
-        } else if (op instanceof SortedSchemaVariable) {
+        } else if (op instanceof SchemaVariable) {
 	    return (Operator)svInst.getInstantiation((SchemaVariable)op);
 	} 
 	return op;
@@ -410,8 +404,8 @@ public class SyntacticalReplaceVisitor extends Visitor {
                 containsBoundVars = true;
                 QuantifiableVariable boundVar = vBoundVars.getQuantifiableVariable(j);
                 if (boundVar instanceof SchemaVariable) {
-                    final SortedSchemaVariable boundSchemaVariable = 
-                        (SortedSchemaVariable) boundVar;
+                    final SchemaVariable boundSchemaVariable = 
+                        (SchemaVariable) boundVar;
                     if (svInst.isInstantiated(boundSchemaVariable)) {
                         boundVar = ((QuantifiableVariable) ((Term) svInst
                                 .getInstantiation(boundSchemaVariable))
@@ -422,7 +416,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
                         } else {
                             // this case may happen for PO generation of
                             // taclets
-                            boundVar = boundSchemaVariable;
+                            boundVar = (QuantifiableVariable)boundSchemaVariable;
                         }
                     }
                     varsChanged.setVal(true);
@@ -448,12 +442,12 @@ public class SyntacticalReplaceVisitor extends Visitor {
     public void visit(Term visited) {
 	// Sort equality has to be ensured before calling this method
         final Operator visitedOp = visited.op();
-        if (visitedOp instanceof SortedSchemaVariable
+        if (visitedOp instanceof SchemaVariable
                 && svInst.isInstantiated((SchemaVariable) visitedOp)
-                && (!((SchemaVariable) visitedOp).isListSV())) {
+                && (! (visitedOp instanceof ProgramSV && ((ProgramSV) visitedOp).isListSV()))) {                
             pushNew(toTerm(svInst.getInstantiation((SchemaVariable) visitedOp)));
-        } else if (forceSVInst && visitedOp instanceof SortedSchemaVariable
-                && ((SchemaVariable) visitedOp).isTermSV()) {
+        } else if (forceSVInst && visitedOp instanceof SchemaVariable
+                && visitedOp instanceof TermSV) {
             	if (!instantiateWithMV(visited)) {
             	    throw new IllegalInstantiationException("Could not force instantiation with metavariable");
             	}
@@ -508,7 +502,7 @@ public class SyntacticalReplaceVisitor extends Visitor {
      * @param boundSchemaVariable
      * @return the temporary variable to use
      */
-    private LogicVariable createTemporaryLV (SortedSchemaVariable boundSchemaVariable) {
+    private LogicVariable createTemporaryLV (SchemaVariable boundSchemaVariable) {
         final Term t = newInstantiations.get ( boundSchemaVariable );
         if ( t != null ) return (LogicVariable)t.op ();
         
@@ -629,6 +623,4 @@ public class SyntacticalReplaceVisitor extends Visitor {
 	    pushNew(mop.calculate((Term)subStack.pop(),svInst, getServices()));
 	} 
    }
-
-
 }

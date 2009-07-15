@@ -20,13 +20,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ListOfGoal;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
-import de.uka.ilkd.key.rule.OldUpdateSimplifier;
 import de.uka.ilkd.key.rule.conditions.TypeResolver;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.updatesimplifier.ArrayOfAssignmentPair;
-import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair;
-import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPairImpl;
-import de.uka.ilkd.key.rule.updatesimplifier.Update;
 
 
 /** 

@@ -41,14 +41,14 @@ public class TestTacletBuild extends TestCase {
     }
 
     public void test0() {
-	SortedSchemaVariable u=(SortedSchemaVariable) 
+	SchemaVariable u=(SchemaVariable) 
 	    TacletForTests.getVariables().lookup(new Name("u"));
-	SortedSchemaVariable v=(SortedSchemaVariable) 
+	SchemaVariable v=(SchemaVariable) 
 	    TacletForTests.getVariables().lookup(new Name("v"));
-	Term b=tf.createFunctionTerm((SortedSchemaVariable) 
+	Term b=tf.createFunctionTerm((SchemaVariable) 
 	    TacletForTests.getVariables().lookup(new Name("b")), NO_SUBTERMS);
-	Term t1=tf.createQuantifierTerm(Quantifier.EX, u, b);
-	Term t2=tf.createQuantifierTerm(Quantifier.EX, v, b);
+	Term t1=tf.createQuantifierTerm(Quantifier.EX, (QuantifiableVariable)u, b);
+	Term t2=tf.createQuantifierTerm(Quantifier.EX, (QuantifiableVariable)v, b);
 	RewriteTacletBuilder sb=new RewriteTacletBuilder();
 	sb.setFind(t1);
 	sb.addTacletGoalTemplate
@@ -72,16 +72,16 @@ public class TestTacletBuild extends TestCase {
 
     public void testUniquenessOfIfAndFindVarSVsInIfAndFind() {
 	boolean thrown=false;
-	SortedSchemaVariable u=(SortedSchemaVariable) 
+	SchemaVariable u=(SchemaVariable) 
 	    TacletForTests.getVariables().lookup(new Name("u"));
 	Term A=tf.createFunctionTerm
 	    ((Function)TacletForTests.getFunctions().lookup(new Name("A")), 
 	     NO_SUBTERMS);
-	Term t1=tf.createQuantifierTerm(Quantifier.ALL, u, A);
+	Term t1=tf.createQuantifierTerm(Quantifier.ALL, (QuantifiableVariable)u, A);
 	Sequent seq = Sequent.createSuccSequent
 	    (Semisequent.EMPTY_SEMISEQUENT.insert
 	     (0, new ConstrainedFormula(t1)).semisequent());
-	Term t2=tf.createQuantifierTerm(Quantifier.EX, u, A);
+	Term t2=tf.createQuantifierTerm(Quantifier.EX, (QuantifiableVariable)u, A);
 	SuccTacletBuilder sb=new SuccTacletBuilder();
 	sb.setIfSequent(seq);
 	sb.setFind(t2);
@@ -97,13 +97,13 @@ public class TestTacletBuild extends TestCase {
 
     public void testUniquenessOfIfAndFindVarSVBothInIf() {
 	boolean thrown=false;
-	SortedSchemaVariable u=(SortedSchemaVariable) 
+	SchemaVariable u=(SchemaVariable) 
 	    TacletForTests.getVariables().lookup(new Name("u"));
 	Term A=tf.createFunctionTerm
 	    ((Function)TacletForTests.getFunctions().lookup(new Name("A")), 
 	     NO_SUBTERMS);
-	Term t1=tf.createQuantifierTerm(Quantifier.ALL, u, A);
-	Term t2=tf.createQuantifierTerm(Quantifier.EX, u, A);
+	Term t1=tf.createQuantifierTerm(Quantifier.ALL, (QuantifiableVariable)u, A);
+	Term t2=tf.createQuantifierTerm(Quantifier.EX, (QuantifiableVariable)u, A);
 	Sequent seq = Sequent.createSuccSequent
 	    (Semisequent.EMPTY_SEMISEQUENT
 	     .insert(0, new ConstrainedFormula(t1)).semisequent()
@@ -124,12 +124,12 @@ public class TestTacletBuild extends TestCase {
 
     public void testUniquenessOfIfAndFindVarSVsInFind() {
 	boolean thrown=false;
-	SortedSchemaVariable u=(SortedSchemaVariable) 
+	SchemaVariable u=(SchemaVariable) 
 	    TacletForTests.getVariables().lookup(new Name("u"));
 	Term A=tf.createFunctionTerm
 	    ((Function)TacletForTests.getFunctions().lookup(new Name("A")), 
 	     NO_SUBTERMS);
-	Term t1=tf.createQuantifierTerm(Quantifier.ALL, u, A);
+	Term t1=tf.createQuantifierTerm(Quantifier.ALL, (QuantifiableVariable)u, A);
 	SuccTacletBuilder sb=new SuccTacletBuilder();
 	sb.setFind(tf.createJunctorTerm(Junctor.AND,t1,t1));
 	try {

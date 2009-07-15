@@ -67,7 +67,7 @@ class TwoSidedMatching {
             allsubs = allsubs.add ( sub );
         }
         final Operator op = target.op ();
-        if ( !( op instanceof Modality || op instanceof IUpdateOperator ) ) {
+        if ( !( op instanceof Modality || op instanceof UpdateApplication ) ) {
             for ( int i = 0; i < target.arity (); i++ ) {
                 allsubs = allsubs.union ( getAllSubstitutions ( target.sub ( i ), services ) );
             }

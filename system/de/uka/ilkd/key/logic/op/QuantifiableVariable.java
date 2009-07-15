@@ -11,7 +11,8 @@
 package de.uka.ilkd.key.logic.op;
 
 
-/** this interface represents the variables that can be bound */
-public interface QuantifiableVariable extends SortedOperator {
-
+/** 
+ * this interface represents the variables that can be bound 
+ */
+public interface QuantifiableVariable extends ParsableVariable {
 }

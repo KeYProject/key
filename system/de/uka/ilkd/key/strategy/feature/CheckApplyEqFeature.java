@@ -13,7 +13,7 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
@@ -63,7 +63,7 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
         it.next ();
 
         // leading updates are not interesting
-        while ( it.getSubTerm ().op () instanceof IUpdateOperator ) {
+        while ( it.getSubTerm ().op () instanceof UpdateApplication ) {
             if ( !it.hasNext () ) return true;
             it.next ();
         }

@@ -21,7 +21,7 @@ public final class LogicVariable extends AbstractSortedOperator
     implements QuantifiableVariable, ParsableVariable {
 
     public LogicVariable(Name name, Sort sort) {
-	super(name, new Sort[0], sort);
+	super(name, EMPTY_ARG_SORTS, sort);
 	assert sort != Sort.FORMULA;
     }
     

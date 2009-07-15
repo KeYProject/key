@@ -256,14 +256,14 @@ public abstract class Notation {
     }
 
     /**
-         * The standard concrete syntax for DL modalities box and diamond.
-         */
-    public static class Modality extends Notation {
+     * The standard concrete syntax for DL modalities box and diamond.
+     */
+    public static class ModalityNotation extends Notation {
 	String left, right;
 
 	int ass;
 
-	public Modality(String left, String right, int prio, int ass) {
+	public ModalityNotation(String left, String right, int prio, int ass) {
 	    super(prio);
 	    this.left = left;
 	    this.right = right;
@@ -274,15 +274,17 @@ public abstract class Notation {
 	    if (sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
 		sp.printTerm(t);
 	    } else {
+		assert t.op() instanceof Modality;
+		assert t.javaBlock() != null;
 		sp.printModalityTerm(left, t.javaBlock(), right, t, ass);
 	    }
 	}
     }
 
     /**
-         * The concrete syntax for DL modalities represented with a
-         * SchemaVariable.
-         */
+     * The concrete syntax for DL modalities represented with a
+     * SchemaVariable.
+     */
     public static class ModalSVNotation extends Notation {
 	int ass;
 
@@ -301,29 +303,6 @@ public abstract class Notation {
 	}
     }
 
-
-    /**
-     * The standard concrete syntax for terms with updates.
-     */
-    public static class QuanUpdate extends Notation {
-
-	public QuanUpdate() {
-	    super(115);
-	}
-
-	public void print(Term t, LogicPrinter sp) throws IOException {
-	    if(sp.getNotationInfo().getAbbrevMap().isEnabled(t)) {
-		sp.printTerm(t);
-	    } else {
-		final Operator targetOp = ((IUpdateOperator) t.op()).target(t)
-			.op();
-		final int assTarget = (t.sort() == Sort.FORMULA ? (targetOp
-			.arity() == 1 ? 60 : 85) : 110);
-		
-		sp.printQuanUpdateTerm("{", ":=", "}", t, 80, 0, assTarget);
-	    }
-	}
-    }
     
     /**
      * The standard concrete syntax for update application.
@@ -340,7 +319,7 @@ public abstract class Notation {
 	    } else {
 		assert t.op() == UpdateApplication.UPDATE_APPLICATION;
 		final Operator targetOp 
-		    = UpdateApplication.UPDATE_APPLICATION.target(t).op();
+		    = UpdateApplication.UPDATE_APPLICATION.getTarget(t).op();
 		final int assTarget 
 		    = (t.sort() == Sort.FORMULA 
 		       ? (targetOp.arity() == 1 ? 60 : 85) 
@@ -394,8 +373,8 @@ public abstract class Notation {
     }
 
     /**
-         * The standard concrete syntax for function and predicate terms.
-         */
+     * The standard concrete syntax for function and predicate terms.
+     */
     public static class Function extends Notation {
 
 	public Function() {
@@ -412,8 +391,8 @@ public abstract class Notation {
     }
 
     /**
-         * The standard concrete syntax for arrays.
-         */
+     * The standard concrete syntax for arrays.
+     */
     public static class CastFunction extends Notation {
 
 	final String pre, post;
@@ -437,8 +416,8 @@ public abstract class Notation {
     }
 
     /**
-         * The standard concrete syntax for query terms <code>o.q(x)</code>.
-         */
+     * The standard concrete syntax for query terms <code>o.q(x)</code>.
+     */
     static class ProgramMethod extends Notation {
 	private final int ass;
 
@@ -507,7 +486,7 @@ public abstract class Notation {
 	}
     }
 
-    public static class SortedSchemaVariableNotation extends VariableNotation {
+    public static class SchemaVariableNotation extends VariableNotation {
 	static Logger logger = Logger.getLogger(Notation.class.getName());
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
@@ -565,9 +544,9 @@ public abstract class Notation {
     }
 
     /**
-         * The standard concrete syntax for the number literal indicator `Z'.
-         * This is only used in the `Pretty&amp;Untrue' syntax.
-         */
+     * The standard concrete syntax for the number literal indicator `Z'.
+     * This is only used in the `Pretty&amp;Untrue' syntax.
+     */
     static class NumLiteral extends Notation {
 	public NumLiteral() {
 	    super(120);
@@ -620,8 +599,8 @@ public abstract class Notation {
     }
 
     /**
-         * The standard concrete syntax for the character literal indicator `C'.
-         */
+     * The standard concrete syntax for the character literal indicator `C'.
+     */
     static class CharLiteral extends Notation {
 	public CharLiteral() {
 	    super(1000);
@@ -663,9 +642,9 @@ public abstract class Notation {
     }
 
     /**
-         * The standard concrete syntax for the string literal indicator `cat'
-         * or `epsilon'.
-         */
+     * The standard concrete syntax for the string literal indicator `cat'
+     * or `epsilon'.
+     */
     static class StringLiteral extends Notation {
 
 	public StringLiteral() {
@@ -689,13 +668,7 @@ public abstract class Notation {
     }
 
 
-    /**
-         * @param t
-         * @param sp
-         * @param subTerm
-         *                TODO
-         * @return the quantified variable
-         */
+
     protected QuantifiableVariable instQV(Term t, LogicPrinter sp, int subTerm) {
 	QuantifiableVariable v = t.varsBoundHere(subTerm)
 		.getQuantifiableVariable(0);

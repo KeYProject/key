@@ -36,7 +36,6 @@ import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
-import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.speclang.*;
 
 
@@ -77,8 +76,8 @@ public class UseOperationContractRule implements BuiltInRule {
      * passed one, except below updates.
      */
     private PosInOccurrence goBelowUpdates(PosInOccurrence pio) {
-        if(pio != null && pio.subTerm().op() instanceof IUpdateOperator) {
-            int targetPos = ((IUpdateOperator)pio.subTerm().op()).targetPos();
+        if(pio != null && pio.subTerm().op() instanceof UpdateApplication) {
+            int targetPos = ((UpdateApplication)pio.subTerm().op()).targetPos();
             return goBelowUpdates(pio.down(targetPos));
         } else {
             return pio;
@@ -324,223 +323,224 @@ public class UseOperationContractRule implements BuiltInRule {
 
     
     public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
-        //collect information about sequent
-        PosInOccurrence pio = goBelowUpdates(ruleApp.posInOccurrence());
-        Modality modality = (Modality) pio.subTerm().op();
-        JavaBlock jb = pio.subTerm().javaBlock();
-        SourceElement activeStatement = getActiveStatement(jb);
-        MethodBodyStatement mbs = (MethodBodyStatement) activeStatement;
-        ProgramMethod pm = mbs.getProgramMethod(services);
-        Term actualSelf 
-            = (mbs.getDesignatedContext() instanceof Expression
-               ? services.getTypeConverter()
-                         .convertToLogicElement(mbs.getDesignatedContext())
-               : null);
-        ListOfTerm actualParams = SLListOfTerm.EMPTY_LIST;
-        ArrayOfExpression args = mbs.getArguments();
-        for(int i = 0; i < args.size(); i++) {
-            actualParams = actualParams.append(
-                    services.getTypeConverter()
-                            .convertToLogicElement(args.getProgramElement(i)));
-        }
-        ProgramVariable actualResult 
-            = (ProgramVariable) mbs.getResultVariable();
-        
-        //configure contract and assumed / ensured invariants
-        ContractWithInvs cwi;
-        if(ruleApp instanceof UseOperationContractRuleApp) {
-            //the contract and invariants are already fixed 
-            //(probably because we're in the process of reading in a 
-            //proof from a file)
-            cwi = ((UseOperationContractRuleApp) ruleApp).getInstantiation();            
-        } else { 
-            cwi = configureContract(services, pm, modality, pio);
-        }
-        if(cwi == null) {
-            return null;
-        }
-        assert cwi.contract.getProgramMethod().equals(pm);
-
-        //create variables for self, parameters, result, exception, and a map 
-        //for atPre-functions
-        //register the newly created program variables
-        Namespace progVarNS = services.getNamespaces().programVariables();
-        ProgramVariable selfVar          
-            = SVF.createSelfVar(services, pm, true);
-        if(selfVar != null)
-            goal.addProgramVariable(selfVar);
-        
-        ListOfParsableVariable paramVars 
-            = SVF.createParamVars(services, pm, true);
-        ListOfProgramVariable paramVarsAsProgVars 
-            = SLListOfProgramVariable.EMPTY_LIST;
-        for (ParsableVariable pvar : paramVars) {
-            assert pvar instanceof ProgramVariable 
-                   : pvar + " is not a ProgramVariable";
-            paramVarsAsProgVars 
-                = paramVarsAsProgVars.append((ProgramVariable)pvar);
-            goal.addProgramVariable((ProgramVariable)pvar);
-        }
-        
-        ProgramVariable resultVar = SVF.createResultVar(services, pm, true);
-        if(resultVar != null) {
-            goal.addProgramVariable(resultVar);
-        }
-        
-        ProgramVariable excVar = SVF.createExcVar(services, pm, true);
-        if(excVar != null) {
-            progVarNS.addSafely(excVar);
-        }
-        
-        Map<Operator, Function> atPreFunctions               
-            = new LinkedHashMap<Operator, Function>();
-        
-        //translate the contract and the invariants
-        FormulaWithAxioms pre = cwi.contract.getPre(selfVar, 
-                                                    paramVars, 
-                                                    services);
-        FormulaWithAxioms post = cwi.contract.getPost(selfVar, 
-                                                      paramVars, 
-                                                      resultVar, 
-                                                      excVar, 
-                                                      atPreFunctions,
-                                                      services);
-        SetOfLocationDescriptor modifies = cwi.contract.getModifies(selfVar, 
-                                                                    paramVars, 
-                                                                    services);           
-        for (final ClassInvariant inv : cwi.assumedInvs) {
-            pre = pre.conjoin(inv.getClosedInv(services));
-        }
-
-        for (final ClassInvariant inv : cwi.ensuredInvs) {
-            post = post.conjoin(inv.getClosedInv(services));
-        }
-        
-        //add "actual parameters" (which in fact already are
-        //program variables in a method body statement) to modifier set
-        for(Term t : actualParams) {
-            ProgramVariable pv = (ProgramVariable) t.op();
-            modifies = modifies.add(new BasicLocationDescriptor(TB.var(pv)));
-        }
-        
-        //split goal into three branches
-        ListOfGoal result = goal.split(3);
-        Goal preGoal = result.tail().tail().head();
-        preGoal.setBranchLabel("Pre");
-        Goal postGoal = result.tail().head();
-        postGoal.setBranchLabel("Post");
-        Goal excPostGoal = result.head();
-        excPostGoal.setBranchLabel("Exceptional Post");
-        
-        //prepare common stuff for the three branches
-        UpdateFactory uf = new UpdateFactory(services, goal.simplifier());
-        AnonymisingUpdateFactory auf = new AnonymisingUpdateFactory(uf);
-        SetOfMetavariable mvs = getAllMetavariables(pio.topLevel().subTerm());
-        Term[] mvTerms = new Term[mvs.size()];
-        final IteratorOfMetavariable it2 = mvs.iterator();
-        for(int i = 0; i < mvTerms.length; i++) {
-            assert it2.hasNext();
-            mvTerms[i] = TB.func(it2.next());
-        }            
-        Update anonUpdate = auf.createAnonymisingUpdate(modifies, 
-                                                        mvTerms, 
-                                                        services);
-        Update atPreUpdate = APF.createAtPreDefinitions(atPreFunctions, 
-                                                        services);
-        Update selfParamsUpdate = (selfVar == null
-                                   ? uf.skip()
-                                   : uf.elementaryUpdate(TB.var(selfVar), 
-                                                         actualSelf));
-        
-        final IteratorOfTerm actualParamsIt = actualParams.iterator();
-        for (final ParsableVariable paramVar : paramVars) {
-            assert actualParamsIt.hasNext();
-            selfParamsUpdate 
-                = uf.parallel(selfParamsUpdate, 
-                              uf.elementaryUpdate(TB.var(paramVar), 
-                                                  actualParamsIt.next()));
-        }
-        Term excNullTerm = TB.equals(TB.var(excVar), TB.NULL(services));
-       
-        //create "Pre" branch
-        Term reachablePre = TB.and(new Term[]{
-                TB.inReachableState(services),
-                selfVar != null ? CATF.createCreatedAndNotNullTerm(services, TB.var(selfVar)) : TB.tt(),
-                CATF.createReachableVariableValuesTerm(services, 
-                                                       paramVarsAsProgVars)});
-        Term preTerm = uf.prepend(
-                selfParamsUpdate, 
-                TB.and(reachablePre, TB.imp(pre.getAxiomsAsFormula(), 
-                                            pre.getFormula())));
-        replaceInGoal(preTerm, preGoal, pio);
-        
-        //create "Post" branch
-        Term reachablePost = TB.and(
-                TB.inReachableState(services), 
-                CATF.createReachableVariableValueTerm(services, resultVar));
-        StatementBlock postSB = replaceStatement(jb, new StatementBlock());
-        Term postTermWithoutUpdate 
-            = TB.imp(TB.and(new Term[]{excNullTerm,
-                                       reachablePost,
-                                       post.getAxiomsAsFormula(),
-                                       post.getFormula()}),
-                     TB.prog(modality,
-                             JavaBlock.createJavaBlock(postSB), 
-                             pio.subTerm().sub(0)));
-        
-        Update resultUpdate = (actualResult == null
-                               ? uf.skip()
-                               : uf.elementaryUpdate(TB.var(actualResult), 
-                                                     TB.var(resultVar)));
-        
-        //case distinction necessary because UpdateFactory is unable  
-        //to deal with update compositions involving both normal and 
-        //anonym*ous* updates; replace by "else" case once this is fixed
-        Term postTerm;
-        if(anonUpdate.isAnonymousUpdate()) {
-            assert false;
-            postTerm = uf.prepend(resultUpdate, postTermWithoutUpdate);
-//            postTerm = TB.tf().createAnonymousUpdateTerm(
-//                                    AnonymousUpdate.getNewAnonymousOperator(), 
-//                                    postTerm);
-        } else {
-            postTerm = uf.prepend(uf.sequential(new Update[]{selfParamsUpdate,
-                                                           atPreUpdate,
-                                                           anonUpdate,
-                                                           resultUpdate}),
-                                postTermWithoutUpdate);
-        }
-                                                        
-        replaceInGoal(postTerm, postGoal, pio);
-        
-        //create "Exceptional Post" branch
-        Term reachableExcPost = TB.and(
-                TB.inReachableState(services),
-                CATF.createCreatedAndNotNullTerm(services, TB.var(excVar)));
-        StatementBlock excPostSB 
-            = replaceStatement(jb, new StatementBlock(new Throw(excVar)));
-        Term excPostTermWithoutUpdate
-            = TB.imp(TB.and(new Term[]{reachableExcPost,
-                                       post.getAxiomsAsFormula(),
-                                       post.getFormula()}),
-                     TB.prog(modality,
-                             JavaBlock.createJavaBlock(excPostSB), 
-                             pio.subTerm().sub(0)));
-        Term excPostTerm = uf.prepend(uf.sequential(new Update[]{selfParamsUpdate,
-                                                               atPreUpdate,
-                                                               anonUpdate}),
-                                    excPostTermWithoutUpdate);
-                                                            
-        replaceInGoal(excPostTerm, excPostGoal, pio);
-        
-        //create justification
-        RuleJustificationBySpec just = new RuleJustificationBySpec(cwi);
-        ComplexRuleJustificationBySpec cjust 
-            = (ComplexRuleJustificationBySpec)
-              goal.proof().env().getJustifInfo().getJustification(this);
-        cjust.add(ruleApp, just);
-        
-        return result;
+//        //collect information about sequent
+//        PosInOccurrence pio = goBelowUpdates(ruleApp.posInOccurrence());
+//        Modality modality = (Modality) pio.subTerm().op();
+//        JavaBlock jb = pio.subTerm().javaBlock();
+//        SourceElement activeStatement = getActiveStatement(jb);
+//        MethodBodyStatement mbs = (MethodBodyStatement) activeStatement;
+//        ProgramMethod pm = mbs.getProgramMethod(services);
+//        Term actualSelf 
+//            = (mbs.getDesignatedContext() instanceof Expression
+//               ? services.getTypeConverter()
+//                         .convertToLogicElement(mbs.getDesignatedContext())
+//               : null);
+//        ListOfTerm actualParams = SLListOfTerm.EMPTY_LIST;
+//        ArrayOfExpression args = mbs.getArguments();
+//        for(int i = 0; i < args.size(); i++) {
+//            actualParams = actualParams.append(
+//                    services.getTypeConverter()
+//                            .convertToLogicElement(args.getProgramElement(i)));
+//        }
+//        ProgramVariable actualResult 
+//            = (ProgramVariable) mbs.getResultVariable();
+//        
+//        //configure contract and assumed / ensured invariants
+//        ContractWithInvs cwi;
+//        if(ruleApp instanceof UseOperationContractRuleApp) {
+//            //the contract and invariants are already fixed 
+//            //(probably because we're in the process of reading in a 
+//            //proof from a file)
+//            cwi = ((UseOperationContractRuleApp) ruleApp).getInstantiation();            
+//        } else { 
+//            cwi = configureContract(services, pm, modality, pio);
+//        }
+//        if(cwi == null) {
+//            return null;
+//        }
+//        assert cwi.contract.getProgramMethod().equals(pm);
+//
+//        //create variables for self, parameters, result, exception, and a map 
+//        //for atPre-functions
+//        //register the newly created program variables
+//        Namespace progVarNS = services.getNamespaces().programVariables();
+//        ProgramVariable selfVar          
+//            = SVF.createSelfVar(services, pm, true);
+//        if(selfVar != null)
+//            goal.addProgramVariable(selfVar);
+//        
+//        ListOfParsableVariable paramVars 
+//            = SVF.createParamVars(services, pm, true);
+//        ListOfProgramVariable paramVarsAsProgVars 
+//            = SLListOfProgramVariable.EMPTY_LIST;
+//        for (ParsableVariable pvar : paramVars) {
+//            assert pvar instanceof ProgramVariable 
+//                   : pvar + " is not a ProgramVariable";
+//            paramVarsAsProgVars 
+//                = paramVarsAsProgVars.append((ProgramVariable)pvar);
+//            goal.addProgramVariable((ProgramVariable)pvar);
+//        }
+//        
+//        ProgramVariable resultVar = SVF.createResultVar(services, pm, true);
+//        if(resultVar != null) {
+//            goal.addProgramVariable(resultVar);
+//        }
+//        
+//        ProgramVariable excVar = SVF.createExcVar(services, pm, true);
+//        if(excVar != null) {
+//            progVarNS.addSafely(excVar);
+//        }
+//        
+//        Map<Operator, Function> atPreFunctions               
+//            = new LinkedHashMap<Operator, Function>();
+//        
+//        //translate the contract and the invariants
+//        FormulaWithAxioms pre = cwi.contract.getPre(selfVar, 
+//                                                    paramVars, 
+//                                                    services);
+//        FormulaWithAxioms post = cwi.contract.getPost(selfVar, 
+//                                                      paramVars, 
+//                                                      resultVar, 
+//                                                      excVar, 
+//                                                      atPreFunctions,
+//                                                      services);
+//        SetOfLocationDescriptor modifies = cwi.contract.getModifies(selfVar, 
+//                                                                    paramVars, 
+//                                                                    services);           
+//        for (final ClassInvariant inv : cwi.assumedInvs) {
+//            pre = pre.conjoin(inv.getClosedInv(services));
+//        }
+//
+//        for (final ClassInvariant inv : cwi.ensuredInvs) {
+//            post = post.conjoin(inv.getClosedInv(services));
+//        }
+//        
+//        //add "actual parameters" (which in fact already are
+//        //program variables in a method body statement) to modifier set
+//        for(Term t : actualParams) {
+//            ProgramVariable pv = (ProgramVariable) t.op();
+//            modifies = modifies.add(new BasicLocationDescriptor(TB.var(pv)));
+//        }
+//        
+//        //split goal into three branches
+//        ListOfGoal result = goal.split(3);
+//        Goal preGoal = result.tail().tail().head();
+//        preGoal.setBranchLabel("Pre");
+//        Goal postGoal = result.tail().head();
+//        postGoal.setBranchLabel("Post");
+//        Goal excPostGoal = result.head();
+//        excPostGoal.setBranchLabel("Exceptional Post");
+//        
+//        //prepare common stuff for the three branches
+//        UpdateFactory uf = new UpdateFactory(services, goal.simplifier());
+//        AnonymisingUpdateFactory auf = new AnonymisingUpdateFactory(uf);
+//        SetOfMetavariable mvs = getAllMetavariables(pio.topLevel().subTerm());
+//        Term[] mvTerms = new Term[mvs.size()];
+//        final IteratorOfMetavariable it2 = mvs.iterator();
+//        for(int i = 0; i < mvTerms.length; i++) {
+//            assert it2.hasNext();
+//            mvTerms[i] = TB.func(it2.next());
+//        }            
+//        Update anonUpdate = auf.createAnonymisingUpdate(modifies, 
+//                                                        mvTerms, 
+//                                                        services);
+//        Update atPreUpdate = APF.createAtPreDefinitions(atPreFunctions, 
+//                                                        services);
+//        Update selfParamsUpdate = (selfVar == null
+//                                   ? uf.skip()
+//                                   : uf.elementaryUpdate(TB.var(selfVar), 
+//                                                         actualSelf));
+//        
+//        final IteratorOfTerm actualParamsIt = actualParams.iterator();
+//        for (final ParsableVariable paramVar : paramVars) {
+//            assert actualParamsIt.hasNext();
+//            selfParamsUpdate 
+//                = uf.parallel(selfParamsUpdate, 
+//                              uf.elementaryUpdate(TB.var(paramVar), 
+//                                                  actualParamsIt.next()));
+//        }
+//        Term excNullTerm = TB.equals(TB.var(excVar), TB.NULL(services));
+//       
+//        //create "Pre" branch
+//        Term reachablePre = TB.and(new Term[]{
+//                TB.inReachableState(services),
+//                selfVar != null ? CATF.createCreatedAndNotNullTerm(services, TB.var(selfVar)) : TB.tt(),
+//                CATF.createReachableVariableValuesTerm(services, 
+//                                                       paramVarsAsProgVars)});
+//        Term preTerm = uf.prepend(
+//                selfParamsUpdate, 
+//                TB.and(reachablePre, TB.imp(pre.getAxiomsAsFormula(), 
+//                                            pre.getFormula())));
+//        replaceInGoal(preTerm, preGoal, pio);
+//        
+//        //create "Post" branch
+//        Term reachablePost = TB.and(
+//                TB.inReachableState(services), 
+//                CATF.createReachableVariableValueTerm(services, resultVar));
+//        StatementBlock postSB = replaceStatement(jb, new StatementBlock());
+//        Term postTermWithoutUpdate 
+//            = TB.imp(TB.and(new Term[]{excNullTerm,
+//                                       reachablePost,
+//                                       post.getAxiomsAsFormula(),
+//                                       post.getFormula()}),
+//                     TB.prog(modality,
+//                             JavaBlock.createJavaBlock(postSB), 
+//                             pio.subTerm().sub(0)));
+//        
+//        Update resultUpdate = (actualResult == null
+//                               ? uf.skip()
+//                               : uf.elementaryUpdate(TB.var(actualResult), 
+//                                                     TB.var(resultVar)));
+//        
+//        //case distinction necessary because UpdateFactory is unable  
+//        //to deal with update compositions involving both normal and 
+//        //anonym*ous* updates; replace by "else" case once this is fixed
+//        Term postTerm;
+//        if(anonUpdate.isAnonymousUpdate()) {
+//            assert false;
+//            postTerm = uf.prepend(resultUpdate, postTermWithoutUpdate);
+////            postTerm = TB.tf().createAnonymousUpdateTerm(
+////                                    AnonymousUpdate.getNewAnonymousOperator(), 
+////                                    postTerm);
+//        } else {
+//            postTerm = uf.prepend(uf.sequential(new Update[]{selfParamsUpdate,
+//                                                           atPreUpdate,
+//                                                           anonUpdate,
+//                                                           resultUpdate}),
+//                                postTermWithoutUpdate);
+//        }
+//                                                        
+//        replaceInGoal(postTerm, postGoal, pio);
+//        
+//        //create "Exceptional Post" branch
+//        Term reachableExcPost = TB.and(
+//                TB.inReachableState(services),
+//                CATF.createCreatedAndNotNullTerm(services, TB.var(excVar)));
+//        StatementBlock excPostSB 
+//            = replaceStatement(jb, new StatementBlock(new Throw(excVar)));
+//        Term excPostTermWithoutUpdate
+//            = TB.imp(TB.and(new Term[]{reachableExcPost,
+//                                       post.getAxiomsAsFormula(),
+//                                       post.getFormula()}),
+//                     TB.prog(modality,
+//                             JavaBlock.createJavaBlock(excPostSB), 
+//                             pio.subTerm().sub(0)));
+//        Term excPostTerm = uf.prepend(uf.sequential(new Update[]{selfParamsUpdate,
+//                                                               atPreUpdate,
+//                                                               anonUpdate}),
+//                                    excPostTermWithoutUpdate);
+//                                                            
+//        replaceInGoal(excPostTerm, excPostGoal, pio);
+//        
+//        //create justification
+//        RuleJustificationBySpec just = new RuleJustificationBySpec(cwi);
+//        ComplexRuleJustificationBySpec cjust 
+//            = (ComplexRuleJustificationBySpec)
+//              goal.proof().env().getJustifInfo().getJustification(this);
+//        cjust.add(ruleApp, just);
+//        
+//        return result;
+return null;	
     }
     
     

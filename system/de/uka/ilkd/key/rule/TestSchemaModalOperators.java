@@ -13,7 +13,6 @@
  */
 package de.uka.ilkd.key.rule;
 
-import java.util.HashSet;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.java.Services;
@@ -24,11 +23,12 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.util.Debug;
 
 
+
 public class TestSchemaModalOperators extends TestCase {
 
     String[] strs={"i=5", "\\<{ while(i>0) {i--;} }\\> i=0",
 		   "i=3", "\\[{ if(i==3) {i++;} else {i--;} }\\] i=3",
-                   "i=3", "\\[[{ if(i==3) {i++;} else {i--;} }\\]] i=3" };
+                   "i=3", "\\[{ if(i==3) {i++;} else {i--;} }\\] i=3" };
     Proof[] proof;
     Proof   mvProof;
     // mv=f(X,c)
@@ -48,14 +48,12 @@ public class TestSchemaModalOperators extends TestCase {
     public void setUp() {
 	TacletForTests.setStandardFile(TacletForTests.testRules);
 	TacletForTests.parse();
-	OldUpdateSimplifier sus = new OldUpdateSimplifier();
         proof = new Proof[strs.length/2];
         for (int i=0; i<proof.length; i++) {
 	    Semisequent antec = parseTermForSemisequent(strs[2*i]);
 	    Semisequent succ = parseTermForSemisequent(strs[2*i+1]);
 	    Sequent s = Sequent.createSequent(antec, succ);	    
 	    proof[i]=new Proof(new Services());
-	    proof[i].setSimplifier(sus);
 	    proof[i].setRoot(new Node(proof[i], s));
 	}
 
@@ -115,12 +113,12 @@ public class TestSchemaModalOperators extends TestCase {
 	RewriteTacletBuilder rtb = new RewriteTacletBuilder();
 	TermFactory tf = TermFactory.DEFAULT;
 
-	SchemaVariable fsv = SchemaVariableFactory.createFormulaSV(new Name("post"), false, true);
-	HashSet modalities = new HashSet(2);
-	modalities.add(Modality.DIA);	modalities.add(Modality.BOX);
-	SchemaVariable osv = SchemaVariableFactory.createOperatorSV(
-	      new Name("diabox"), Modality.class, Sort.FORMULA, 1, modalities);
-	Term tpost = tf.createFunctionTerm((SortedSchemaVariable)fsv, new Term[0]);
+	SchemaVariable fsv = SchemaVariableFactory.createFormulaSV(new Name("post"), true);
+	SetOfModality modalities = SetAsListOfModality.EMPTY_SET;
+	modalities = modalities.add(Modality.DIA).add(Modality.BOX);
+	SchemaVariable osv = SchemaVariableFactory.createModalOperatorSV(
+	      new Name("diabox"), Sort.FORMULA, modalities);
+	Term tpost = tf.createFunctionTerm(fsv, new Term[0]);
 
 	Term find = tf.createProgramTerm(
 	    osv,
@@ -267,50 +265,6 @@ public class TestSchemaModalOperators extends TestCase {
        	assertEquals("Wrong succedent after testSchemaModal3",
 		             seq1.succedent().getFirst(), succ1.get(0));  	
        	assertEquals("Wrong succedent after testSchemaModal3",
-		             seq2.succedent().getFirst(), succ2.get(0));  	
-
-	//	Debug.ENABLE_DEBUG = false;
-
-    }
-
-    public void testSchemaModalities5() {
-	//	Debug.ENABLE_DEBUG = true;
-	NoPosTacletApp testmodal4 = TacletForTests.getRules().lookup("testSchemaModal4");
-	TacletIndex tacletIndex = new TacletIndex ();
-	tacletIndex.add ( testmodal4 );
-	Goal goal = createGoal ( proof[2].root(), tacletIndex );
-	PosInOccurrence applyPos= new 
-			PosInOccurrence(goal.sequent().succedent().getFirst(), 
-					PosInTerm.TOP_LEVEL,
-					false);
-	ListOfTacletApp rApplist = goal.ruleAppIndex().
-		    getTacletAppAt(TacletFilter.TRUE, applyPos, null, Constraint.BOTTOM);	
-	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
-	RuleApp rApp = rApplist.head();
-	assertTrue("Rule App should be complete", rApp.complete());
-	ListOfGoal goals = rApp.execute(goal, TacletForTests.services());
-	assertTrue("There should be 3 goals for testSchemaModal4 taclet, was "+goals.size(), goals.size()==3);	
-	Sequent seq0=goals.head().sequent();
-	goals = goals.tail();
-	Sequent seq1=goals.head().sequent();
-	goals = goals.tail();
-	Sequent seq2=goals.head().sequent();
-        Semisequent antec0 = parseTermForSemisequent("i=3");
-	Semisequent succ0  = parseTermForSemisequent("\\throughout_trc{ if(i==3) {i++;} else {i--;} }\\endmodality(i=3)");
-	Semisequent succ1  = parseTermForSemisequent("\\throughout_tra{ if(i==3) {i++;} else {i--;} }\\endmodality(i=3)");
-	Semisequent succ2  = parseTermForSemisequent("\\throughout{ if(i==3) {i++;} else {i--;} }\\endmodality(i=3)");
-
-	assertEquals("Wrong antecedent after testSchemaModal4",
-			     seq0.antecedent().get(0), antec0.get(0));  
-	assertEquals("Wrong antecedent after testSchemaModal4",
-			     seq1.antecedent().get(0), antec0.get(0));  
-	assertEquals("Wrong antecedent after testSchemaModal4",
-			     seq2.antecedent().get(0), antec0.get(0));  
-       	assertEquals("Wrong succedent after testSchemaModal4",
-		             seq0.succedent().getFirst(), succ0.get(0));  	
-       	assertEquals("Wrong succedent after testSchemaModal4",
-		             seq1.succedent().getFirst(), succ1.get(0));  	
-       	assertEquals("Wrong succedent after testSchemaModal4",
 		             seq2.succedent().getFirst(), succ2.get(0));  	
 
 	//	Debug.ENABLE_DEBUG = false;

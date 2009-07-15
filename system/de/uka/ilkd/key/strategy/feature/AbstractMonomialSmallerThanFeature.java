@@ -15,10 +15,7 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.ListOfTerm;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.EntryOfSchemaVariableAndInstantiationEntry;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IteratorOfEntryOfSchemaVariableAndInstantiationEntry;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.LRUCache;
@@ -72,7 +69,7 @@ public abstract class AbstractMonomialSmallerThanFeature
             tapp.instantiations().pairIterator();
         while ( it.hasNext () ) {
             final EntryOfSchemaVariableAndInstantiationEntry entry = it.next ();
-            if ( !entry.key ().isSkolemTermSV () ) continue;
+            if ( !(entry.key() instanceof SkolemTermSV) ) continue;
             if ( op == ( (Term)entry.value ().getInstantiation () ).op () )
                 return true;
         }

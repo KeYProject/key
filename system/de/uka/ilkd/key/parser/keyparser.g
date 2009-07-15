@@ -639,32 +639,28 @@ options {
     }
 
     private void schema_var_decl(String name, Sort s, boolean makeVariableSV,
-            boolean makeSkolemTermSV, boolean makeLocationsSV, boolean makeFunctionsSV,
+            boolean makeSkolemTermSV,
             SchemaVariableModifierSet mods) throws AmbigiousDeclException {
         if (!skip_schemavariables) {
 
             SchemaVariable v;
             if ( s == Sort.FORMULA ) {
                 v = SchemaVariableFactory.createFormulaSV
-                (new Name(name), mods.list(), mods.rigid());
+                (new Name(name), mods.rigid());
+            } else if (s == Sort.UPDATE) {
+                v = SchemaVariableFactory.createUpdateSV(new Name(name));
             } else if ( s instanceof ProgramSVSort ) {
                 v = SchemaVariableFactory.createProgramSV
                 (new ProgramElementName(name),(ProgramSVSort) s, mods.list());
             } else {
                 if ( makeVariableSV ) {
                     v=SchemaVariableFactory.createVariableSV
-                    (new Name(name), s, mods.list());
+                    (new Name(name), s);
                 } else if ( makeSkolemTermSV ) {
                     v = SchemaVariableFactory.createSkolemTermSV
-                    (new Name(name), s, mods.list());
-                } else if( makeLocationsSV ) {
-                	Debug.assertTrue(mods.list());
-	                v = SchemaVariableFactory.createListSV(new Name(name), LocationDescriptor.class);
-                } else if( makeFunctionsSV ) {
-                	Debug.assertTrue(mods.list());
-	                v = SchemaVariableFactory.createListSV(new Name(name), Function.class);
+                    (new Name(name), s);
                 } else { v = SchemaVariableFactory.createTermSV
-                    (new Name(name), s, mods.list(), mods.rigid(), mods.strict());
+                    (new Name(name), s, mods.rigid(), mods.strict());
                 }
             }          
 
@@ -726,7 +722,7 @@ options {
         
         if (inSchemaMode()) {
             // if we are currently reading taclets we look for schema variables first
-            result = (SortedSchemaVariable)variables().lookup(new Name(attributeName));
+            result = (SchemaVariable)variables().lookup(new Name(attributeName));
         }
         
         assert inSchemaMode() || result == null; 
@@ -1034,7 +1030,7 @@ options {
         throws NotDeclException{
         // case 1: variable
         Operator v = (Operator) variables().lookup(new Name(varfunc_name));
-        if (v != null && (args == null || (inSchemaMode() && v instanceof OperatorSV))) {
+        if (v != null && (args == null || (inSchemaMode() && v instanceof ModalOperatorSV))) {
             return v;
         }
         
@@ -1370,36 +1366,31 @@ options {
         return s;
     }
     
-    private HashSet lookupOperatorSV(String opName, HashSet operators) 
-    throws KeYSemanticException {
-	OperatorSV osv = (OperatorSV)variables().lookup(new Name(opName));
-        if(osv == null)
-           semanticError("Schema variable "+opName+" not defined.");
-        operators.addAll(osv.operators());
-        return operators;
+    private SetOfModality lookupOperatorSV(String opName, SetOfModality modalities) 
+    		throws KeYSemanticException {
+	ModalOperatorSV osv = (ModalOperatorSV)variables().lookup(new Name(opName));
+        if(osv == null) {
+	    semanticError("Schema variable "+opName+" not defined.");
+	}
+        modalities = modalities.union(osv.getModalities());
+        return modalities;
     } 
     
-    private HashSet opSVHelper(String opName, 
-                                HashSet operators,
-                                boolean modalOp) 
-       throws KeYSemanticException {
-       if(opName.charAt(0) == '#') {
-          return lookupOperatorSV(opName, operators);           
-       }else{
-       	  switchToNormalMode();
-       	  Operator op;
-       	  if (modalOp) {
-       	    // modalities are not in the functions namespace
-       	    op = Modality.getModality(opName);
-       	  } else {
-           op = (Operator) functions().lookup(new Name(opName));
-          }
-          switchToSchemaMode();
-          if(op == null)
-            semanticError("Unrecognised operator: "+opName);
-          operators.add(op);
+    private SetOfModality opSVHelper(String opName, 
+                                     SetOfModality modalities) 
+        	throws KeYSemanticException {
+        if(opName.charAt(0) == '#') {
+            return lookupOperatorSV(opName, modalities);           
+        } else {
+	    switchToNormalMode();
+       	    Modality m = Modality.getModality(opName);
+	    switchToSchemaMode();
+            if(m == null) {
+                semanticError("Unrecognised operator: "+opName);
+            }
+            modalities = modalities.add(m);
        }
-       return operators;
+       return modalities;
     }
 
     private void setChoiceHelper(SetOfChoice choices, String section){
@@ -1825,15 +1816,11 @@ one_schema_var_decl
     Sort s = null;
     boolean makeVariableSV  = false;
     boolean makeSkolemTermSV = false;
-    boolean makeLocationsSV	= false;
-    boolean makeFunctionsSV  = false;
-    boolean modalOpSV       = false;
     String id = null;
     ListOfString ids = null;
     SchemaVariableModifierSet mods = null;
 } :   
-   ((MODALOPERATOR {modalOpSV = true;} | OPERATOR {modalOpSV = false;} ) 
-       one_schema_op_decl[modalOpSV] SEMI)
+   (MODALOPERATOR one_schema_modal_op_decl SEMI)
  |
   ( 
    (
@@ -1853,15 +1840,10 @@ one_schema_var_decl
     ( schema_modifiers[mods] ) ?
     {s = Sort.FORMULA;}
     ids = simple_ident_comma_list 
-  | LOCATION
-    { makeLocationsSV = true; 
-      mods = new SchemaVariableModifierSet.ListSV(); }
-    ( schema_modifiers[mods] ) ?    
-    ids = simple_ident_comma_list 
-  | FUNCTION
-    { makeFunctionsSV = true; 
-      mods = new SchemaVariableModifierSet.ListSV(); }
+  | UPDATE
+    { mods = new SchemaVariableModifierSet.FormulaSV (); }
     ( schema_modifiers[mods] ) ?
+    {s = Sort.UPDATE;}
     ids = simple_ident_comma_list 
   | (    TERM
          { mods = new SchemaVariableModifierSet.TermSV (); }
@@ -1881,7 +1863,7 @@ one_schema_var_decl
      IteratorOfString it = ids.iterator();
      while(it.hasNext())
        schema_var_decl(it.next(),s,makeVariableSV,makeSkolemTermSV, 
-       				   makeLocationsSV, makeFunctionsSV, mods);
+       				   mods);
    }
  )
 
@@ -1906,16 +1888,16 @@ schema_modifiers[SchemaVariableModifierSet mods]
         }
     ;
 
-one_schema_op_decl[boolean modalOp]
+one_schema_modal_op_decl
 {
-    HashSet operators = new HashSet(50);
+    SetOfModality modalities = SetAsListOfModality.EMPTY_SET;
     String id = null;
     Sort sort = Sort.FORMULA;
     ListOfString ids = null;
 } 
     :
         (LPAREN sort = any_sortId_check[true] {
-           if (modalOp && sort != Sort.FORMULA) { 
+           if (sort != Sort.FORMULA) { 
                semanticError("Modal operator SV must be a FORMULA, not " + sort);
            }            
          } RPAREN)? 
@@ -1925,20 +1907,14 @@ one_schema_op_decl[boolean modalOp]
 	    }	        
             IteratorOfString it1 = ids.iterator();
             while(it1.hasNext()) {
-  	      operators = opSVHelper(it1.next(), operators, modalOp);
+  	      modalities = opSVHelper(it1.next(), modalities);
   	    }
             SchemaVariable osv = (SchemaVariable)variables().lookup(new Name(id));
             if(osv != null)
               semanticError("Schema variable "+id+" already defined.");
-	    Iterator it2 = operators.iterator();
-	    int arity = ((Operator)it2.next()).arity();
-	    while(it2.hasNext())
-              if(arity != ((Operator)it2.next()).arity())
-                semanticError("Arity mismatch for schema variable "+id);
 
-            osv = SchemaVariableFactory.createOperatorSV(new Name(id), 
-                        modalOp ? Modality.class : Operator.class, 
-                        sort, arity, operators);
+            osv = SchemaVariableFactory.createModalOperatorSV(new Name(id),  
+                        sort, modalities);
             
             if (inSchemaMode()) {
                 variables().add(osv);
@@ -2765,11 +2741,15 @@ attribute_or_query_suffix[Term prefix] returns [Term result = null]
     String attributeName = "";    
 }    
     :   
-        DOT attributeName = attrid 
-        {   
-            v = getAttribute(prefix.sort(), attributeName);             	
-            result = createAttributeTerm(prefix, v);
-        }   
+        DOT 
+        ( 
+           (IDENT (AT LPAREN simple_ident_dots RPAREN)? LPAREN)=>( result = query[prefix])
+           | 
+           attributeName = attrid 
+           {   
+              v = getAttribute(prefix.sort(), attributeName);             	
+           }   
+        )
  ; exception
         catch [TermCreationException ex] {
               keh.reportException
@@ -3201,7 +3181,7 @@ simple_updateterm returns [Term a = null]
 :
   LBRACE v = varId ASSIGN a1=term RBRACE ( a2 = term110 | a2 = unary_formula )
   { 
-	a = TB.applyUpd(TB.elemUpd((LocationVariable) v, a1), a2);
+	a = TB.apply(TB.elementary((LocationVariable) v, a1), a2);
   }
 ;
 
@@ -3226,7 +3206,7 @@ updateterm returns [Term result = null]
         ) 
         RBRACE ( a2 = term110 | a2 = unary_formula )
         {   
-	    result = TB.applyUpd(pu, a2);
+	    result = TB.apply(pu, a2);
         }
    ; exception
         catch [TermCreationException ex] {
@@ -3239,13 +3219,23 @@ singleupdate returns[Term result=null]
 {
     Term a0 = null;
     Term a1 = null;
+    String id = null;
 }  :
-        (a0 = lhsSingle) ASSIGN (a1 = rhsSingle) 
+        (lhsSingle ASSIGN)=> (a0 = lhsSingle) ASSIGN (a1 = rhsSingle) 
         {
-            result = TB.elemUpd(getServices(), a0, a1);
+            result = TB.elementary(getServices(), a0, a1);
         }
-    ;
-   
+        |  {inSchemaMode()}? id=simple_ident
+           {
+               Operator op = (Operator) variables().lookup(new Name(id));
+               if(! (op instanceof UpdateSV)) {
+                   semanticError(op + " is not allowed in an updates.");
+               }
+               return TB.func(op);
+           }
+;
+
+
 bound_variables returns[ListOfQuantifiableVariable list = SLListOfQuantifiableVariable.EMPTY_LIST]
 {
   QuantifiableVariable var = null;
@@ -3276,15 +3266,10 @@ one_schema_bound_variable returns[QuantifiableVariable v=null]
 :
    id = simple_ident {
       ts = (Operator) variables().lookup(new Name(id));   
-      // It is my belief (Woj) that this check is obsolete
-      // if ( ts == null || ts instanceof LogicVariable ) {
-      //  throw new KeYSemanticException("Quantified variables need a sort.", 
-      //          getFilename(), getLine(), getColumn());
-      // }
-      if ( ! (ts instanceof SchemaVariable && ((SchemaVariable)ts).isVariableSV())) {
+      if ( ! (ts instanceof VariableSV)) {
         semanticError(ts+" is not allowed in a quantifier.");
       }
-      v = (SortedSchemaVariable) ts;
+      v = (QuantifiableVariable) ts;
       bindVar();
    }
 ;
@@ -3441,7 +3426,6 @@ funcpredvarterm returns [Term a = null]
         //argsWithBoundVars==null indicates no argument list
         //argsWithBoundVars.size()==0 indicates open-close-parens ()
         {  
-            //XXX, backwards compatibility
             if(varfuncid.equals("inReachableState") && argsWithBoundVars == null) {
 	        a = TB.inReachableState(getServices());
 	    } else {
@@ -3670,7 +3654,6 @@ varexp[TacletBuilder b]
     | varcond_non_implicit[b] | varcond_non_implicit_query[b]
     | varcond_enum_const[b]
     | varcond_inReachableState[b] 
-    | varcond_isupdated[b]
     | varcond_isUnique[b]    
   ) 
   | 
@@ -3730,9 +3713,6 @@ varcond_new [TacletBuilder b]
       |
          DEPENDINGON LPAREN y=varId RPAREN {
 	    b.addVarsNewDependingOn((SchemaVariable)x,(SchemaVariable)y);
-	  }
-      |  DEPENDINGONMOD LPAREN y=varId RPAREN {
-          b.addVariableCondition(new NewDepOnAnonUpdates((SchemaVariable) x,(SchemaVariable)y));		  
 	  }
       | s=sortId_check[true] {
 		b.addVarsNew((SchemaVariable) x, s);
@@ -3909,18 +3889,6 @@ varcond_non_implicit_query [TacletBuilder b]
         }
     ;
 
-/*varcond_monomials [TacletBuilder b]
-{
-  ParsableVariable x = null, y = null;
-}
-:
-   MONOMIALSDIVIDE LPAREN x=varId COMMA y=varId RPAREN {
-     final VariableCondition c;
-     c = new MonomialsDivideCondition
-                  ((SchemaVariable)x,(SchemaVariable)y);
-     b.addVariableCondition ( c );
-   }
-;*/
          
 varcond_staticmethod [TacletBuilder b, boolean negated]
 {
@@ -3998,18 +3966,6 @@ varcond_localvariable [TacletBuilder b, boolean negated]
      	   b.addVariableCondition(new LocalVariableCondition((SchemaVariable) x, negated));
         } 
 ;
-
-varcond_isupdated [TacletBuilder b]
-{
-  ParsableVariable x = null;
-}
-:
-   ISUPDATED 
-	LPAREN x=varId RPAREN {
-     	   b.addVariableCondition(new IsUpdatedVariableCondition((SchemaVariable) x));
-        } 
-;
-
 
 varcond_isUnique [TacletBuilder b]
 {

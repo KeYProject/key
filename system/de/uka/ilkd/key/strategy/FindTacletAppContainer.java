@@ -16,9 +16,9 @@ import de.uka.ilkd.key.logic.ListOfFormulaChangeInfo;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -153,8 +153,8 @@ public class FindTacletAppContainer extends TacletAppContainer {
                 // invalidated
                 final Operator modOp = changePIO.getSubTerm ().op ();
 
-                return !( modOp instanceof IUpdateOperator
-                          && appIndex == ( (IUpdateOperator)modOp ).targetPos ()
+                return !( modOp instanceof UpdateApplication
+                          && appIndex == ( (UpdateApplication)modOp ).targetPos ()
                           && updateContextIsRecorded () );
             }
         }

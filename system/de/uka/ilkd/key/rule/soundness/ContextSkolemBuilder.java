@@ -188,7 +188,7 @@ public class ContextSkolemBuilder extends AbstractSkolemBuilder {
         final SchemaVariable        thVar  =
             SchemaVariableFactory.createProgramSV ( thName,
         					    ProgramSVSort.VARIABLE,
-        					    false );
+        					    false);
         final VariableSpecification thSpec = new VariableSpecification
             ( (IProgramVariable)thVar, thType );
         final ParameterDeclaration  thDecl =
@@ -250,7 +250,7 @@ public class ContextSkolemBuilder extends AbstractSkolemBuilder {
         final IProgramVariable res = (IProgramVariable)SchemaVariableFactory
 	    .createProgramSV ( createUniquePEName("frame_res"),
 			       ProgramSVSort.VARIABLE,
-			       false );
+			       false);
 
     	resultSVTypeInfo = new SVTypeInfo ( ((SchemaVariable)res),
 					    p_resultType );
@@ -297,7 +297,7 @@ public class ContextSkolemBuilder extends AbstractSkolemBuilder {
 	    res[i] = (Statement)SchemaVariableFactory
 		.createProgramSV ( name,
 				   ProgramSVSort.STATEMENT,
-				   false );
+				   false);
 	}
 	
 	return res;

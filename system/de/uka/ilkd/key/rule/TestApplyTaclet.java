@@ -82,7 +82,6 @@ public class TestApplyTaclet extends TestCase{
 
 	TacletForTests.setStandardFile(TacletForTests.testRules);
 	TacletForTests.parse();
-	OldUpdateSimplifier sus = new OldUpdateSimplifier();
 	Services services = new Services();
 	proof = new Proof[strs.length/2];
                         
@@ -91,13 +90,11 @@ public class TestApplyTaclet extends TestCase{
 	    Semisequent succ = parseTermForSemisequent(strs[2*i+1]);
 	    Sequent s = Sequent.createSequent(antec, succ);	    
 	    proof[i]=new Proof(services);
-	    proof[i].setSimplifier(sus);
 	    proof[i].setRoot(new Node(proof[i], s));
 	}
 
 	// proof required to test application with mv
 	mvProof = new Proof(services);
-	mvProof.setSimplifier(sus);
 	
 	Sort s = new PrimitiveSort(new Name("test"));
 
@@ -1015,24 +1012,6 @@ public class TestApplyTaclet extends TestCase{
 	return goal;
     }
 
-    public void testShadowedUpdateLocation () {
-        NoPosTacletApp shadowed_update = TacletForTests.getRules ().lookup ( "test_shadowed_update_location" );
-        TacletIndex tacletIndex = new TacletIndex ();
-        tacletIndex.add ( shadowed_update );
-        Goal goal = createGoal ( proof[0].root (), tacletIndex );
-        ListOfNoPosTacletApp rApplist = goal.ruleAppIndex ().getNoFindTaclet( TacletFilter.TRUE,
-                                                                              null,
-                                                                              Constraint.BOTTOM );
-        assertTrue ( "Too many or zero rule applications.",
-                     rApplist.size () == 1 );
-        RuleApp rApp = rApplist.head ();
-        assertTrue ( "Rule App should be complete", rApp.complete () );
-	
-        ListOfGoal goals = rApp.execute ( goal, TacletForTests.services () );
-        assertTrue ( "Too many or zero goals for test_shadowed_update_location.",
-                     goals.size () == 1 );
-    }
-    
     /**
      * tests if the variable sv collector pays attention to schema variables 
      * occuring as part of attributes and/or updates (there was a bug where 

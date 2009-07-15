@@ -19,6 +19,7 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.logic.op.IteratorOfSchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SetOfSchemaVariable;
+import de.uka.ilkd.key.logic.op.VariableSV;
 
 public class TacletPrefix {
 
@@ -70,7 +71,7 @@ public class TacletPrefix {
      * @return the new prefix
      */
     public TacletPrefix put(SchemaVariable var) {
-	if (!var.isVariableSV()) {
+	if (!(var instanceof VariableSV)) {
 	    throw new RuntimeException("var can match more than "+
 				       "bound variables");
 	}

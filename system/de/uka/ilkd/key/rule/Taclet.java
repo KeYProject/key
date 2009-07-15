@@ -71,15 +71,20 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class Taclet implements Rule, Named {
     
     private static final String AUTONAME = "_taclet";
+    private static final TermBuilder TB = TermBuilder.DF;
 
     /** name of the taclet */
     private final Name name;
+    
     /** name displayed by the pretty printer */
     private final String displayName;
+    
     /** list of old names for downward compatibility */
     private final ListOfName oldNames;
+    
     /** contains useful text explaining the taclet */
     private final String helpText = null;
+    
     /** the set of taclet options for this taclet */
     protected final SetOfChoice choices;
 
@@ -122,6 +127,7 @@ public abstract class Taclet implements Rule, Named {
      * should taclet be applied by strategies only 
      */
     private final boolean noninteractive;
+    
     /** 
      * constraint under which the Taclet is valid 
      */
@@ -142,6 +148,7 @@ public abstract class Taclet implements Rule, Named {
     /** tracks state of pre-computation */
     private boolean contextInfoComputed = false;
     private boolean contextIsInPrefix   = false;
+    
     /** true if one of the goal descriptions is a replacewith */
     private boolean hasReplaceWith      = false;
      
@@ -331,9 +338,11 @@ public abstract class Taclet implements Rule, Named {
 				    MatchConditions matchCond,
 				    Services        services,
 				    Constraint      userConstraint) {
+if(name.toString().equals("boxToDiamond")) Debug.ENABLE_DEBUG = true;
 	Debug.out("taclet: Start Matching rule: ", name);
 	matchCond = matchHelp(term, template, ignoreUpdates, matchCond, 
 		 services, userConstraint);	
+if(name.toString().equals("boxToDiamond")) Debug.ENABLE_DEBUG = false;	
 	return matchCond == null ? null : checkConditions(matchCond, services);
     }
 
@@ -569,7 +578,7 @@ public abstract class Taclet implements Rule, Named {
       
 	if (term.javaBlock().isEmpty()) {
 	    if (!template.javaBlock().isEmpty()){
-		Debug.out("Match Failes. No program to match.");
+		Debug.out("Match Failed. No program to match.");
 		return null; //FAILED
 	    }
             if (template.javaBlock().program()
@@ -617,15 +626,16 @@ public abstract class Taclet implements Rule, Named {
         final Operator templateOp = template.op ();
         
         if ( ignoreUpdates
-             && sourceOp instanceof IUpdateOperator
+             && sourceOp instanceof UpdateApplication
              && ( !( templateOp instanceof SchemaVariable )
                   || ( templateOp instanceof ModalOperatorSV ) )
-             && !( templateOp instanceof IUpdateOperator ) ) {
+             && !( templateOp instanceof UpdateApplication ) ) {
 	    // updates can be ignored
+            Term update = UpdateApplication.getUpdate(term);
 	    matchCond = matchCond
 		.setInstantiations ( matchCond.getInstantiations ().
-				     addUpdate (term) );
-	    return matchHelp(((IUpdateOperator)sourceOp).target(term), template,
+				     addUpdate (update) );
+	    return matchHelp(UpdateApplication.getTarget(term), template,
 			     true, matchCond, services, userConstraint);
 	}
     
@@ -652,10 +662,10 @@ public abstract class Taclet implements Rule, Named {
                                  userConstraint );
 	}
 
-	if ( templateOp instanceof SortedSchemaVariable ) {
-	    return ( (SortedSchemaVariable)templateOp ).match ( term,
-	                                                        matchCond,
-	                                                        services );
+	if ( templateOp instanceof SchemaVariable ) {
+	    return ( (SchemaVariable)templateOp ).match ( term,
+	                                                  matchCond,
+	                                                  services );
         }
     
 	matchCond = templateOp.match ( sourceOp, matchCond, services );
@@ -854,10 +864,10 @@ public abstract class Taclet implements Rule, Named {
 	if ( p_matchCond.getInstantiations ().getUpdateContext().isEmpty() )
 	    updateFormula = p_template;
 	else
-	    updateFormula = TermFactory.DEFAULT
-		.createUpdateTerm(p_matchCond.getInstantiations ()
-				  .getUpdateContext(),
-				  p_template);
+	    updateFormula 
+	    	= TB.applySequential(p_matchCond.getInstantiations()
+				                .getUpdateContext(), 
+				     p_template);
 
 	IfFormulaInstantiation           cf;
 	Constraint                       newConstraint;
@@ -1167,8 +1177,8 @@ public abstract class Taclet implements Rule, Named {
                     services, matchCond);
         
         if (!svInst.getUpdateContext().isEmpty()) {
-            instantiatedFormula = TermFactory.DEFAULT.
-              createUpdateTerm(svInst.getUpdateContext(), instantiatedFormula);         
+            instantiatedFormula = TB.applySequential(svInst.getUpdateContext(), 
+            		           	             instantiatedFormula);         
 	} 
 	        
 	return new ConstrainedFormula(instantiatedFormula, 
@@ -1690,18 +1700,4 @@ public abstract class Taclet implements Rule, Named {
         }
         return false;
     }
-        
-    /** returns the variables in a Taclet with a read access
-    */
-    public ListOfSchemaVariable readSet() {
-	return SLListOfSchemaVariable.EMPTY_LIST;
-    }
-
-    /** returns the variable in a Taclet to which is written to
-    */
-    public ListOfSchemaVariable writeSet() {
-	return SLListOfSchemaVariable.EMPTY_LIST; 
-    }
-  
-         
 }

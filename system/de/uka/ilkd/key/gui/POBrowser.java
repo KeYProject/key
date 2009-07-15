@@ -34,15 +34,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.SetAsListOfKeYJavaType;
 import de.uka.ilkd.key.java.abstraction.SetOfKeYJavaType;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.proof.init.BehaviouralSubtypingInvPO;
-import de.uka.ilkd.key.proof.init.EnsuresPostPO;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.PreservesGuardPO;
-import de.uka.ilkd.key.proof.init.PreservesInvPO;
-import de.uka.ilkd.key.proof.init.PreservesOwnInvPO;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.init.RespectsModifiesPO;
-import de.uka.ilkd.key.proof.init.StrongOperationContractPO;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 
 
@@ -310,9 +302,7 @@ public class POBrowser extends JDialog {
 	    pos = pos.append("RespectsModifies");	    
 	}
 		
-	//PreservesGuard
-	pos = pos.append("PreservesGuard");
-	
+
 	//show
 	poList.setListData(pos.toArray());
 	if(pos.size() > 0) {
@@ -393,9 +383,6 @@ public class POBrowser extends JDialog {
         } else if (poString.equals("RespectsModifies")) {
             assert selectedEntry.pm != null;
             return createRespectsModifiesPO(selectedEntry.pm);
-        } else if (poString.equals("PreservesGuard")) {
-            assert selectedEntry.pm != null;
-            return createPreservesGuardPO(selectedEntry.pm);
         } else
             assert false;
         return null;
@@ -508,39 +495,6 @@ public class POBrowser extends JDialog {
 	}
     }
     
-    
-    private ProofOblInput createPreservesGuardPO(ProgramMethod pm) {
-        //let the user select the guarded invariants 
-        ClassInvariantSelectionDialog dlg = new ClassInvariantSelectionDialog(
-                                        "Please select the guarded invariants",
-                                        initConfig.getServices(), 
-                                        false, 
-                                        pm.getContainerType());
-        if(dlg.wasSuccessful()) {
-            //let the user select the guard classes
-            SetOfKeYJavaType allKJTs = SetAsListOfKeYJavaType.EMPTY_SET;
-            final Iterator<KeYJavaType> it = javaInfo.getAllKeYJavaTypes().iterator();
-            while(it.hasNext()) {
-        	allKJTs = allKJTs.add(it.next());
-            }
-            ClassSelectionDialog dlg2
-                    = new ClassSelectionDialog("Please select the guard",
-                                               "Available classes",
-                                               allKJTs,
-                                               pm.getContainerType(),
-                                               true);
-            if(dlg2.wasSuccessful()) {
-        	return new PreservesGuardPO(initConfig, 
-					    pm, 
-					    dlg.getSelection(),
-					    dlg2.getSelection());
-            } else {
-        	return null;
-            }
-        } else {
-            return null;
-        }
-    }
     
     
     //-------------------------------------------------------------------------

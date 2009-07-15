@@ -7,6 +7,7 @@
 // See LICENSE.TXT for details.
 //
 //
+
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.Iterator;
@@ -154,9 +155,11 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     
     private Term replaceVariablesInTerm(Term t){  
-     	if(t==null) return null;
-	if (t.op() instanceof ProgramVariable){ 
-	    if (replaceMap.containsKey(t.op())){
+     	if(t==null) {
+     	    return null;
+     	}
+	if(t.op() instanceof ProgramVariable) { 
+	    if(replaceMap.containsKey(t.op())) {
 		Object o = replaceMap.get(t.op());
 		if(o instanceof ProgramVariable){
 		    return TermFactory.DEFAULT.createVariableTerm
@@ -165,7 +168,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 		    return TermFactory.DEFAULT.createVariableTerm
 			((SchemaVariable) replaceMap.get(t.op()));
 		}
-	    }else{
+	    } else {
 		return t;
 	    }
 	} else {
@@ -176,22 +179,14 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 		vars[i] = t.varsBoundHere(i);
 		subTerms[i] = replaceVariablesInTerm(t.sub(i));
 	    }
-	    Operator op;
-	    if(t.op() instanceof IUpdateOperator){
-		IUpdateOperator uo = (IUpdateOperator) t.op();
-		ListOfUpdateableOperator locs = SLListOfUpdateableOperator.EMPTY_LIST;
-		for(int i = 0; i<uo.locationCount(); i++){
-		    if (replaceMap.containsKey(uo.location(i))){ 
-			locs = locs.append((UpdateableOperator)
-					   replaceMap.
-					   get(uo.location(i)));
-		    }else{
-			locs = locs.append(uo.location(i));
-		    }
+	    Operator op = t.op();
+	    if(op instanceof ElementaryUpdate) {
+		ElementaryUpdate uop = (ElementaryUpdate) t.op();
+		if(replaceMap.containsKey(uop.lhs())) {
+		    UpdateableOperator replacedLhs 
+		    	= (UpdateableOperator) replaceMap.get(uop.lhs());
+		    op = ElementaryUpdate.getInstance(replacedLhs);
 		}
-		op = uo.replaceLocations ( locs.toArray () );
-	    }else{
-		op = t.op();
 	    }
 	    return TermFactory.DEFAULT.createTerm(op, subTerms, vars, t.javaBlock());
 	}

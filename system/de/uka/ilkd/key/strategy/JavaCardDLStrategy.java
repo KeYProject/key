@@ -73,8 +73,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     private Feature setupGlobalF(Feature dispatcher, Proof p_proof) {
-        final Feature simplifierF = selectSimplifier ( -10000 );
-        
+//        final Feature simplifierF = selectSimplifier ( -10000 );
+//        
         final Feature ifMatchedF = ifZero ( MatchedIfFeature.INSTANCE,
                                             longConst ( +1 ) );
     
@@ -108,7 +108,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
               dispatcher,
               NonDuplicateAppFeature.INSTANCE,
               strengthenConstraints, AgeFeature.INSTANCE,
-              simplifierF, methodSpecF, ifMatchedF,
+              /*simplifierF, */methodSpecF, ifMatchedF,
               ifThenElseF } );
     }
 
@@ -361,7 +361,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "query_normalize_high_costs", 
 	    SumFeature.createSum ( new Feature [] {
                 SomeWhereBelowOpClassFeature.create ( ProgramMethod.class ),
-                SomeWhereBelowOpClassFeature.create ( IUpdateOperator.class ),
+                SomeWhereBelowOpClassFeature.create ( UpdateApplication.class ),
                 applyTF("t", IsNonRigidTermFeature.INSTANCE),
 		// we actually have to be in the scope of an update,
 		// not only within an update
@@ -2165,7 +2165,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             quantifiedPureLitConjDisj = rec ( quantifiedFor,
                                               or ( quantifiedFor, pureLitConjDisj ) );
             
-            update = OperatorClassTF.create ( IUpdateOperator.class );
+            update = OperatorClassTF.create ( UpdateApplication.class );
             program = OperatorClassTF.create ( Modality.class );
             modalOperator = or ( update, program );
             

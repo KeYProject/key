@@ -377,7 +377,7 @@ public class EnhancedForInvRule extends AbstractMetaOperator {
             Term arrayAccess = TB.array(services, arrayvar, counter);
             ProgramVariable var =
                     (ProgramVariable) formalParam.getProgramVariable();
-            return tf.createUpdateTerm(services, TB.var(var), arrayAccess, resultTerm);
+            return TB.applyElementary(services, TB.var(var), arrayAccess, resultTerm);
         }
 
     }

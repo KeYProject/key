@@ -18,39 +18,23 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
 
-class VariableSV extends SortedSchemaVariable {
+public final class VariableSV extends AbstractSV implements QuantifiableVariable {
 
-    /** creates a new SchemaVariable. That is used as placeholder for
+    /** 
+     * Creates a new SchemaVariable that is used as placeholder for
      * bound(quantified) variables.
      * @param name the Name of the SchemaVariable
      * @param sort the Sort of the SchemaVariable and the matched type     
-     * @param listSV a boolean which is true iff the schemavariable is allowed
-     * to match a list of quantified variables
      */
-    VariableSV(Name name, Sort sort, boolean listSV) {
-	super(name, QuantifiableVariable.class, sort, listSV); 	
+    VariableSV(Name name, Sort sort) {
+	super(name, EMPTY_ARG_SORTS, sort, true, false); 	
     }
+
     
-    /** returns true iff this SchemaVariable is used to match
-     * bound (quantifiable) variables 
-     * @return true iff this SchemaVariable is used to match
-     * bound (quantifiable) variables 
-     */
-    public boolean isVariableSV() {
-	return true;
-    }
-    
-    public boolean isRigid () {
-	return true;
-    }
-    
-    
-    
-    /* (non-Javadoc)
-     * @see de.uka.ilkd.key.logic.op.Operator#match(de.uka.ilkd.key.logic.op.SVSubstitute, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
-     */
-    public MatchConditions 
-    	match(SVSubstitute substitute, MatchConditions mc, Services services) {                
+    @Override
+    public MatchConditions match(SVSubstitute substitute, 
+	    			 MatchConditions mc, 
+	    			 Services services) {                
         final Term subst;
         if (substitute instanceof LogicVariable) {
             subst = TermFactory.DEFAULT.createVariableTerm((LogicVariable)substitute);
@@ -72,9 +56,8 @@ class VariableSV extends SortedSchemaVariable {
     } 
     
     
-    /** toString */
+    @Override
     public String toString() {
 	return toString("variable");
     }
-
 }

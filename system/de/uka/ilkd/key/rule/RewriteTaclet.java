@@ -18,7 +18,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.util.TermHelper;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.updatesimplifier.Update;
 
 /** 
  * A RewriteTaclet represents a taclet, whose find can be matched against any
@@ -26,7 +25,7 @@ import de.uka.ilkd.key.rule.updatesimplifier.Update;
  * fulfilled is that the term matches the structure described by the term of the
  * find-part.
  */
-public class RewriteTaclet extends FindTaclet{
+public class RewriteTaclet extends FindTaclet {
 
     /** does not pose state restrictions on valid matchings */
     public static final int NONE = 0;
@@ -121,7 +120,7 @@ public class RewriteTaclet extends FindTaclet{
      * @return false if vetoing 
      */
     private boolean veto (Term t) {
-        return Update.createUpdate ( t ).freeVars ().size () > 0;
+        return t.freeVars ().size () > 0;
     }
 
     /**
@@ -149,12 +148,13 @@ public class RewriteTaclet extends FindTaclet{
 		final Term t = it.getSubTerm ();
 		op = t.op ();
 
-		if ( op instanceof IUpdateOperator &&
-		     it.getChild () == ((IUpdateOperator)op).targetPos()) {		    
+		if ( op instanceof UpdateApplication &&
+		     it.getChild () == ((UpdateApplication)op).targetPos()) {		    
 		    if ( getStateRestriction() == IN_SEQUENT_STATE || veto(t) ) {
 			return null;
 		    } else {
-			svi = svi.addUpdate ( it.getSubTerm () );
+			Term update = ((UpdateApplication) op).getUpdate(t);
+			svi = svi.addUpdate ( update );
 		    }
 		    
 		}
@@ -321,5 +321,4 @@ public class RewriteTaclet extends FindTaclet{
 	    res.append ( "\\inSequentState\n" );
 	return res;
     }
-
 }

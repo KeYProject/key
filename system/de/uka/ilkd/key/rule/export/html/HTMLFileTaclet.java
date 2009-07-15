@@ -5,13 +5,8 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design 
-//Copyright (C) 2001-2003 Universitaet Karlsruhe, Germany
-//                      and Chalmers University of Technology, Sweden
 //
-//The KeY system is protected by the GNU General Public License.
-//See LICENSE.TXT for details.
-//
+
 
 package de.uka.ilkd.key.rule.export.html;
 
@@ -19,7 +14,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Iterator;
 
-import de.uka.ilkd.key.logic.LocationDescriptor;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -232,32 +226,29 @@ public class HTMLFileTaclet extends HTMLFile {
     
     private static void writeSVModifiers(StringBuffer out, SchemaVariable sv) {        
         boolean started = false;        
-        if (sv.isRigid() && !sv.isVariableSV()) {
+        if (sv.isRigid() && !(sv instanceof VariableSV)) {
             if (!started) out.append("[");
             out.append("rigid");
             started = true;
         }        
-        if (sv.isListSV()) {
+        if (sv instanceof ProgramSV && ((ProgramSV)sv).isListSV()) {
             if (!started) out.append("[");
             else {
                 out.append(", ");
             }
             out.append("list");
             started = true;
-        }
+        }        
         
         if (started) out.append("]");        
     }
 
     public static void writeTacletSchemaVariable(StringBuffer out, SchemaVariable schemaVar) {
-	if (schemaVar.isOperatorSV()) {            
-	    final OperatorSV modalOpSV = (OperatorSV)schemaVar;
-	    final Iterator it = modalOpSV.operators().iterator();
-	    if (modalOpSV instanceof ModalOperatorSV) {
+	if (schemaVar instanceof ModalOperatorSV) {            
+	    final ModalOperatorSV modalOpSV = (ModalOperatorSV)schemaVar;
+	    final IteratorOfModality it = modalOpSV.getModalities().iterator();
+	    assert modalOpSV instanceof ModalOperatorSV;
                 out.append ( "\\modalOperator { " );
-            } else {
-                out.append ( "\\operator" );
-            }
 	    String sep = "";
 	    while (it.hasNext()) {
 		final Operator op = (Operator)it.next();
@@ -266,50 +257,27 @@ public class HTMLFileTaclet extends HTMLFile {
 		sep = ", ";
 	    }
 	    out.append ( " } " + modalOpSV.name() );
-	} else if (schemaVar instanceof ListSV) { 
-	    if (schemaVar.matchType() == Function.class) {
-	        out.append("\\function");
-            } else if (schemaVar.matchType() == LocationDescriptor.class) {
-                out.append("\\location");                
-            } else {
-                out.append("(unknown)"+schemaVar.getClass());
-            }
-            writeSVModifiers(out, schemaVar);
-            out.append(  " " + schemaVar.name() );
-        } else if (schemaVar instanceof SortedSchemaVariable) {       
-	    final SortedSchemaVariable sortedSV = (SortedSchemaVariable)schemaVar;
+	} else {       
+	    final SchemaVariable sortedSV = schemaVar;
 	                
-            if (sortedSV.isTermSV()) {
+            if (sortedSV instanceof TermSV) {
                 out.append ( "\\term");
-	    } else if (sortedSV.isFormulaSV()) {
+	    } else if (sortedSV instanceof FormulaSV) {
 	        out.append ( "\\formula" );
-	    } else if (sortedSV.isProgramSV()) {
+	    } else if (sortedSV instanceof ProgramSV) {
 	        out.append ( "\\program");
-	    } else if (sortedSV.isVariableSV()) {
+	    } else if (sortedSV instanceof VariableSV) {
 		out.append ( "\\variables");
-	    } else if (sortedSV.isSkolemTermSV()) {
+	    } else if (sortedSV instanceof SkolemTermSV) {
 		out.append ( "\\skolemTerm");
 	    } else {
                 out.append ( "?" );
 	    }                       
             writeSVModifiers(out, schemaVar);
-            if (!schemaVar.isFormulaSV()) {
+            if (!(schemaVar instanceof FormulaSV)) {
                 out.append(" " + sortedSV.sort());
             }
             out.append(  " " + sortedSV.name() );
-	} else if (schemaVar instanceof NameSV) {
-            out.append ( "?" );
-            writeSVModifiers(out, schemaVar);
-            out.append(  " " + schemaVar.name() );
-            System.err.println("NameSV in rule file? " +
-                        "Please adapt HTMLFileTaclet#writeTacletSchemaVariable");
-        }  else {        
-            out.append ( "?" );
-            writeSVModifiers(out, schemaVar);
-            out.append(  " " + schemaVar.name() );
-            System.err.println("Unknown schemavariable type " + schemaVar);
-        }
-        
-        
+	}
     }
 }

@@ -161,8 +161,8 @@ public final class NotationInfo {
 	tbl.put(NumericalQuantifier.SUM, new Notation.NumericalQuantifier("\\sum", 60, 60, 70));
 	tbl.put(BoundedNumericalQuantifier.BSUM, new Notation.BoundedNumericalQuantifier("\\bSum", 60, 60, 70));
 	tbl.put(NumericalQuantifier.PRODUCT, new Notation.NumericalQuantifier("\\product", 60, 60, 70));
-	tbl.put(Modality.DIA,new Notation.Modality("\\<","\\>", 60, 60));
-	tbl.put(Modality.BOX,new Notation.Modality("\\[","\\]", 60, 60));
+	tbl.put(Modality.DIA,new Notation.ModalityNotation("\\<","\\>", 60, 60));
+	tbl.put(Modality.BOX,new Notation.ModalityNotation("\\[","\\]", 60, 60));
 	tbl.put(IfThenElse.IF_THEN_ELSE, new Notation.IfThenElse(130, "\\if"));
 	tbl.put(IfExThenElse.IF_EX_THEN_ELSE, new Notation.IfThenElse(130, "\\ifEx"));
 
@@ -185,11 +185,10 @@ public final class NotationInfo {
         tbl.put(ProgramConstant.class, new Notation.VariableNotation());
 	tbl.put(ProgramMethod.class, new Notation.ProgramMethod(121));
 	tbl.put(Equality.class, new Notation.Infix("=", 70, 80, 80)); 
-	tbl.put(QuanUpdateOperator.class, new Notation.QuanUpdate());
 	tbl.put(ElementaryUpdate.class, new Notation.ElementaryUpdateNotation());
 	tbl.put(CastFunctionSymbol.class, new Notation.CastFunction("(",")",120, 140));
 	tbl.put(ModalOperatorSV.class, new Notation.ModalSVNotation(60, 60));
-	tbl.put(SortedSchemaVariable.class, new Notation.SortedSchemaVariableNotation());
+	tbl.put(SchemaVariable.class, new Notation.SchemaVariableNotation());
     }
 
     public AbbrevMap getAbbrevMap(){
@@ -222,8 +221,8 @@ public final class NotationInfo {
 	    return (Notation) tbl.get(op);
 	} else if (tbl.containsKey(op.getClass())) {
 	    return (Notation) tbl.get(op.getClass());
-	} else if (op instanceof SortedSchemaVariable){
-		return (Notation) tbl.get(SortedSchemaVariable.class);
+	} else if (op instanceof SchemaVariable){
+		return (Notation) tbl.get(SchemaVariable.class);
 	} else {
 	    return new Notation.Function();
 	}

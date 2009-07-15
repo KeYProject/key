@@ -581,8 +581,7 @@ public class LogicPrinter {
     protected void printSchemaVariable(SchemaVariable sv) throws IOException {
 	Object o = getInstantiations().getInstantiation(sv);
 	if (o == null) {
-	    if (sv.isProgramSV()) {
-		Debug.assertTrue(sv instanceof SortedSchemaVariable);
+	    if (sv instanceof ProgramSV) {
 		printProgramSV((ProgramSV)sv);
 	    } else {
 		printConstant(sv.name().toString());
@@ -1288,111 +1287,6 @@ public class LogicPrinter {
 
 
     /**
-     * Print a term with an (quantified) update.  This looks like
-     * <code>{loc1 := val1 || ... || locn := valn} t</code>.  If line breaks are necessary, the
-     * format is
-     *
-     * <pre>
-     * {loc1:=val1 || ... || locn:=valn}
-     *   t
-     * </pre>
-     *
-     * @param l       the left brace
-     * @param asgn    the assignment operator (including spaces)
-     * @param r       the right brace
-     * @param t       the update term
-     * @param ass1    associativity for the locations
-     * @param ass2    associativity for the new values
-     * @param ass3    associativity for phi
-     */
-
-    public void printQuanUpdateTerm (String l,
-                                     String asgn,
-                                     String r,
-                                     Term t,
-                                     int ass1,
-                                     int ass2,
-                                     int ass3) throws IOException {
-        final QuanUpdateOperator op = (QuanUpdateOperator)t.op ();
-        mark(MARK_START_UPDATE);
-        layouter.beginC (2).print ( l );
-        startTerm ( t.arity () );
-        for ( int i = 0; i < op.locationCount (); i++ ) {
-            final Operator loc = op.location ( i );
-            
-            //XXX
-            HeapLDT heapLDT = services == null ? null : services.getTypeConverter().getHeapLDT();            
-            LocationVariable heap = heapLDT == null ? null : heapLDT.getHeap();
-            Function store = heapLDT == null ? null : heapLDT.getStore();
-            Term nestedHeapTerm;
-            ListOfTerm nestedHeapTerms = SLListOfTerm.EMPTY_LIST;
-            for(nestedHeapTerm = op.value(t, i);
-                nestedHeapTerm.op() == store;
-        	nestedHeapTerm = nestedHeapTerm.sub(0)) {
-        	nestedHeapTerms = nestedHeapTerms.prepend(nestedHeapTerm);
-            }
-            if(PresentationFeatures.ENABLED
-               && heapLDT != null 
-               && loc == heap 
-       	       && op.value(t,i).op() == store
-       	       && nestedHeapTerm.op() == heap) {
-        	final boolean origPure = pure;
-        	pure = true;
-        	
-        	for(IteratorOfTerm it = nestedHeapTerms.iterator(); it.hasNext();) {
-        	    nestedHeapTerm = it.next();
-        	    
-                    printTerm(nestedHeapTerm.sub(1));
-                    
-                    layouter.print(".");
-                    
-                    printTerm(nestedHeapTerm.sub(2));
-                    
-                    layouter.print ( asgn ).brk(0,0);
-                    
-                    maybeParens ( nestedHeapTerm.sub(3), ass2 );
-                    
-                    if(it.hasNext()) {
-                	layouter.print ( " ||" ).brk ( 1, 0 );
-        	    }
-        	}   
-        	pure = origPure;
-        	markStartSub();
-        	markEndSub();
-            }
-
-            else {
-                layouter.beginC(0);
-                printUpdateQuantification ( t, op, i );
-    
-                final String[] separator = setupUpdateSeparators ( loc,
-                                                                   op.location(t, i));
-                for ( int j = loc.arity (); j >= 1; j-- ) {
-                    final Term sub = t.sub ( op.valuePos ( i ) - j );
-                    
-                    markStartSub ();
-                    printTerm ( sub );
-                    markEndSub ();
-                    layouter.print ( separator[loc.arity () - j] );
-                }
-                layouter.print ( asgn ).brk(0,0);
-                layouter.end();
-                maybeParens ( op.value ( t, i ), ass2 );
-                if ( i < op.locationCount () - 1 ) {
-                    layouter.print ( " ||" ).brk ( 1, 0 );
-                }
-            }
-        }
-
-        layouter.print ( r );
-        mark(MARK_END_UPDATE);
-        layouter.brk ( 0 );
-        maybeParens ( t.sub ( t.arity () - 1 ), ass3 );
-        layouter.end ();
-    }
-    
-    
-    /**
      * Print a term with an update. This looks like
      * <code>{u} t</code>.  If line breaks are necessary, the
      * format is
@@ -1447,7 +1341,7 @@ public class LogicPrinter {
 	
 	startTerm(t.arity());
 	
-	layouter.print(op.pv().name().toString());
+	layouter.print(op.lhs().name().toString());
 	
 	layouter.print(asgn)/*.brk(0,0)*/;
 	
@@ -1478,25 +1372,6 @@ public class LogicPrinter {
         }
     }
 
-
-    private void printUpdateQuantification (Term t,
-                                            QuanUpdateOperator op,
-                                            int locationNum) throws IOException {
-        final ArrayOfQuantifiableVariable boundVars =
-            t.varsBoundHere ( op.valuePos ( locationNum ) );
-        if ( boundVars.size () > 0 ) {
-            layouter.print ( "\\for " );
-            printVariables ( boundVars );
-        }
-
-        if ( op.guardExists ( locationNum ) ) {
-            layouter.print ( "\\if (" ).beginC ( 0 );
-            markStartSub ();
-            printTerm ( t.sub ( op.guardPos ( locationNum ) ) );
-            markEndSub ();
-            layouter.print ( ") " ).end ();
-        }
-    }
 
     protected void printVariables (ArrayOfQuantifiableVariable vars)
                                             throws IOException {
@@ -1860,6 +1735,8 @@ public class LogicPrinter {
                                   Term phi,
                                   int ass)
         throws IOException {
+	assert jb != null;
+	assert jb.program() != null;
         if (phi.op() instanceof ModalOperatorSV) {
             Object o = getInstantiations().getInstantiation((ModalOperatorSV) phi.op());
             if (o == null) {

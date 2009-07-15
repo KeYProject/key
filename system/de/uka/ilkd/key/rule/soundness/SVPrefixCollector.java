@@ -117,8 +117,8 @@ public class SVPrefixCollector extends TacletVisitor {
 	    programVariablePrefixes
 		.addPrefix ( sv, SLListOfIProgramVariable.EMPTY_LIST );
 
-	    if ( sv.isProgramSV () &&
-		 ((SortedSchemaVariable)sv).sort () == ProgramSVSort.VARIABLE )
+	    if ( sv instanceof ProgramSV &&
+		 sv.sort () == ProgramSVSort.VARIABLE )
 		programVariablePrefixes.addFreeSchemaVariable ( sv );
 	} else if ( t.op () instanceof IProgramVariable ) {
 	    // i.e. no schema variable!
@@ -278,8 +278,8 @@ public class SVPrefixCollector extends TacletVisitor {
 	    Object          o;
 	    ListOfStatement res           = SLListOfStatement.EMPTY_LIST;
 	    
-	    if ( x.isProgramSV () &&
-		 ((SortedSchemaVariable)x).sort () == ProgramSVSort.STATEMENT ) {
+	    if ( x instanceof ProgramSV &&
+		 x.sort () == ProgramSVSort.STATEMENT ) {
 		while ( i-- != 0 && ( o = prefixStack.get ( i ) ) != HORIZON ) {
 		    if ( o instanceof JumpStatement ) {
 			if ( o instanceof LabelJumpStatement &&
@@ -392,12 +392,12 @@ public class SVPrefixCollector extends TacletVisitor {
 
 	public void performActionOnSchemaVariable(SchemaVariable x) {
 	    if ( enter ) {
-		computeJumpStatementPrefix   ( (SortedSchemaVariable) x );
-		computeProgramVariablePrefix ( (SortedSchemaVariable)x );
+		computeJumpStatementPrefix   ( x );
+		computeProgramVariablePrefix ( x );
 	    }
 	}
 
-	private void computeJumpStatementPrefix ( SortedSchemaVariable x ) {
+	private void computeJumpStatementPrefix ( SchemaVariable x ) {
 	    ListOfStatement prefix    = createJumpTable ( x );
 	    ListOfStatement oldPrefix =	jumpStatementPrefixes.getPrefix ( x );
 
@@ -455,7 +455,7 @@ public class SVPrefixCollector extends TacletVisitor {
 		    containsModRenaming ( p_list.tail (), p_st, p_nat );
 	}
 
-	private void computeProgramVariablePrefix ( SortedSchemaVariable x ) {
+	private void computeProgramVariablePrefix ( SchemaVariable x ) {
 	    SetOfIProgramVariable  prefix    = getProgramVariablePrefix ();
 
 	    if ( x.sort () == ProgramSVSort.VARIABLE &&

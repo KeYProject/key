@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
 //
 //
 
@@ -22,7 +15,6 @@ import java.util.*;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.AnonymisingUpdateFactory;
 import de.uka.ilkd.key.logic.IteratorOfNamed;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.SetAsListOfChoice;
@@ -30,7 +22,6 @@ import de.uka.ilkd.key.logic.SetOfLocationDescriptor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.UpdateFactory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.AtPreFactory;
@@ -39,7 +30,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.SetOfTaclet;
-import de.uka.ilkd.key.rule.OldUpdateSimplifier;
 import de.uka.ilkd.key.speclang.*;
 
 
@@ -59,7 +49,6 @@ public abstract class AbstractPO implements ProofOblInput {
     protected final Services services;
     protected final JavaInfo javaInfo;
     protected final SpecificationRepository specRepos;
-    protected final UpdateFactory uf;
     protected final String name;
     protected final KeYJavaType selfKJT;
 
@@ -81,7 +70,6 @@ public abstract class AbstractPO implements ProofOblInput {
         this.services   = initConfig.getServices();
         this.javaInfo   = initConfig.getServices().getJavaInfo();
         this.specRepos  = initConfig.getServices().getSpecificationRepository();
-        this.uf         = new UpdateFactory(services, new OldUpdateSimplifier());
         this.name       = name;
         this.selfKJT    = selfKJT;
     }
@@ -175,15 +163,17 @@ public abstract class AbstractPO implements ProofOblInput {
                                      ParsableVariable selfVar,
                                      ListOfParsableVariable paramVars) 
     		throws ProofInputException {
-        SetOfLocationDescriptor locations = contract.getModifies(selfVar,
-                                                                 paramVars,
-                                                                 services);
-
-        UpdateFactory uf = new UpdateFactory(services, new OldUpdateSimplifier());
-        AnonymisingUpdateFactory auf = new AnonymisingUpdateFactory(uf);
-        return auf.createAnonymisingUpdateTerm(locations,
-                targetTerm,
-                services);
+	assert false : "not implemented";
+    	return null;
+//        SetOfLocationDescriptor locations = contract.getModifies(selfVar,
+//                                                                 paramVars,
+//                                                                 services);
+//
+//        UpdateFactory uf = new UpdateFactory(services, new OldUpdateSimplifier());
+//        AnonymisingUpdateFactory auf = new AnonymisingUpdateFactory(uf);
+//        return auf.createAnonymisingUpdateTerm(locations,
+//                targetTerm,
+//                services);
     }
     
     

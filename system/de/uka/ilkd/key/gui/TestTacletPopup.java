@@ -75,8 +75,8 @@ public class TestTacletPopup {
 	AntecTacletBuilder impleftbuilder=new AntecTacletBuilder();
 	b=SchemaVariableFactory.createFormulaSV(new Name("b"), false);
 	SchemaVariable b0 = SchemaVariableFactory.createFormulaSV(new Name("b0"), false);
-	Term t_b=tf.createFunctionTerm((SortedSchemaVariable)b,new Term[0]);
-	Term t_b0=tf.createFunctionTerm((SortedSchemaVariable)b0,new Term[0]);
+	Term t_b=tf.createFunctionTerm((SchemaVariable)b,new Term[0]);
+	Term t_b0=tf.createFunctionTerm((SchemaVariable)b0,new Term[0]);
 	Term t_bimpb0=tf.createJunctorTerm(Junctor.IMP,new Term[]{t_b, t_b0});
 	Term t_bandb0 = tf.createJunctorTerm(Junctor.AND, t_b, t_b0);
 	Term t_borb0 = tf.createJunctorTerm(Junctor.OR, t_b, t_b0);
@@ -200,12 +200,12 @@ public class TestTacletPopup {
 	// all-right
 	// find (=>Vx:b) add(=>b[x/t0])
 	SuccTacletBuilder allrightbuilder=new SuccTacletBuilder();
-	x = SchemaVariableFactory.createVariableSV(new Name("x"),nat, false);
-	t0 = SchemaVariableFactory.createTermSV(new Name("t0"),nat, false);
-	Term t_t0=tf.createFunctionTerm((SortedSchemaVariable)t0,new Term[0]);
+	x = SchemaVariableFactory.createVariableSV(new Name("x"),nat);
+	t0 = SchemaVariableFactory.createTermSV(new Name("t0"),nat);
+	Term t_t0=tf.createFunctionTerm((SchemaVariable)t0,new Term[0]);
 	Term t_allxb=tf.createQuantifierTerm(Quantifier.ALL,
-					     new SortedSchemaVariable[]{(SortedSchemaVariable)x},t_b);
-	Term t_subxt0b=tf.createSubstitutionTerm(WarySubstOp.SUBST,(SortedSchemaVariable)x,t_t0,t_b);
+					     new QuantifiableVariable[]{(QuantifiableVariable)x},t_b);
+	Term t_subxt0b=tf.createSubstitutionTerm(WarySubstOp.SUBST,(QuantifiableVariable)x,t_t0,t_b);
 	allrightbuilder.setFind(t_allxb);
 	seq=Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,
 		    Semisequent.EMPTY_SEMISEQUENT.insert(0,new
@@ -334,11 +334,11 @@ public class TestTacletPopup {
 	func_ns.add(func_min1);
 	Function func_plus1=new RigidFunction(new Name("succ"),nat,new Sort[]{nat});
 	func_ns.add(func_plus1);
-	SchemaVariable var_rn=SchemaVariableFactory.createTermSV(new Name("rn"),nat, false);
-	SchemaVariable var_rm=SchemaVariableFactory.createTermSV(new Name("rm"),nat, false);
+	SchemaVariable var_rn=SchemaVariableFactory.createTermSV(new Name("rn"),nat);
+	SchemaVariable var_rm=SchemaVariableFactory.createTermSV(new Name("rm"),nat);
 
-	Term t_rn=tf.createFunctionTerm((SortedSchemaVariable)var_rn,new Term[]{});
-	Term t_rm=tf.createFunctionTerm((SortedSchemaVariable)var_rm,new Term[]{});
+	Term t_rn=tf.createFunctionTerm(var_rn,new Term[]{});
+	Term t_rm=tf.createFunctionTerm(var_rm,new Term[]{});
 	Term t_0=tf.createFunctionTerm(func_0,new Term[]{});	
 	Term t_rnminus1=tf.createFunctionTerm(func_min1,new Term[]{t_rn});
 	Term t_rnminus1plus1=tf.createFunctionTerm(func_plus1,

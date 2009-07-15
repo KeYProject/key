@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IteratorOfSchemaVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
+import de.uka.ilkd.key.logic.op.VariableSV;
 
 
 
@@ -40,15 +40,15 @@ public class LogicVariableSkolemBuilder extends AbstractSkolemBuilder {
 	while ( it.hasNext () ) {
 	    sv = it.next ();
 
-	    if ( sv.isVariableSV () )
-		createSkolemVariableSV ( (SortedSchemaVariable)sv );
+	    if ( sv instanceof VariableSV )
+		createSkolemVariableSV ( sv );
 	}
 
 	return toIterator
 	    ( getOriginalSkolemSet ().add ( getSVI() ) );
     }
 
-    private void createSkolemVariableSV ( SortedSchemaVariable p_sv ) {	
+    private void createSkolemVariableSV ( SchemaVariable p_sv ) {	
 
 	if ( !isInstantiated(p_sv) ) {
             Name          name = createUniqueName(p_sv.name());
@@ -57,8 +57,5 @@ public class LogicVariableSkolemBuilder extends AbstractSkolemBuilder {
 
             addInstantiation(p_sv, term);
 	}
-
-
     }
-
 }

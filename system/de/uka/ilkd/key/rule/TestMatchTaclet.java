@@ -331,13 +331,14 @@ public class TestMatchTaclet extends TestCase {
     public void testVarOccursInIfAndAddRule() {
 
 	Term match = TacletForTests.parseTerm("\\forall testSort z; (p(z) -> A)");
+	assertTrue(match.arity() == 1);
 	
 	// test at the subformula p(z) -> A that has a free variable
 	// therefore no match should be found
 
 	Sequent seq = Sequent.createSequent
 	    (Semisequent.EMPTY_SEMISEQUENT.insert
-	     (0, new ConstrainedFormula(match.sub(1), 
+	     (0, new ConstrainedFormula(match.sub(0), 
 					Constraint.BOTTOM)).semisequent(), 
 	     Semisequent.EMPTY_SEMISEQUENT);
 
@@ -490,7 +491,7 @@ public class TestMatchTaclet extends TestCase {
     
     // test match of update terms
     public void testUpdateMatch() {           
-	Term match = TacletForTests.parseTerm("\\<{int i;}\\>{i:=2}(\\forall nat z; (q1(z)))");
+	Term match = TacletForTests.parseTerm("\\<{int i;}\\>{i:=(jint)2}(\\forall nat z; (q1(z)))");
 	match = match.sub(0);
 	assertTrue("Instantiations should be found as updates can be ignored if "+
 		   "only the term that is matched has an update and the "+
@@ -498,34 +499,13 @@ public class TestMatchTaclet extends TestCase {
 		   all_left.match(match, ((FindTaclet)all_left).find(), 
 				  true, MatchConditions.EMPTY_MATCHCONDITIONS, services, Constraint.BOTTOM)!=null);
 		
-	Term match2 = TacletForTests.parseTerm("\\<{int i;}\\>{i:=Z(2(#))} true");
+	Term match2 = TacletForTests.parseTerm("\\<{int i;}\\>{i:=(jint)Z(2(#))} true");
 	match2 = match2.sub(0);
+System.out.println("Template: " + ((FindTaclet)assign_n).find());	
+System.out.println("Term: " + match2);
 	assertTrue("Instantiations should be found.",
 		   assign_n.match(match2, ((FindTaclet)assign_n).find(), 
 				  true, MatchConditions.EMPTY_MATCHCONDITIONS, services, Constraint.BOTTOM)!=null);
-    }
-
-    public void testIgnoredQuantifiedUpdateEquals() {
-	Term match = TacletForTests.parseTerm("\\<{int im;}\\>({\\for int j; im := j }true & {\\for int k; im := k }true)");
-	
-	assertTrue("Updates should be equal modulo bound renaming (upd1, upd2)" +
-		   match.sub(0).sub(0) + "::"+ match.sub(0).sub(1), 
-		   new UpdatePair(match.sub(0).sub(0)).equals(new UpdatePair(match.sub(0).sub(1))));
-
-	Term match2 = TacletForTests.parseTerm
-	    ("\\<{ java.lang.Object obj; java.lang.String s; }\\>" + 
-	     "({\\for java.lang.String j; obj := j }true & {\\for java.lang.Object k; obj := k }true)");
-	
- 	assertFalse("Updates should not be equal modulo bound renaming (upd1, upd2) as " +
-		   "even if the quantified variables have not the same sorts (compatible ones, " +
-		   "yes...but not equal ones)" + match2.sub(0).sub(0) + "::"+ match2.sub(0).sub(1), 
-		   new UpdatePair(match2.sub(0).sub(0)).equals(new UpdatePair(match2.sub(0).sub(1))));
-
- 	assertFalse("Updates should not be equal modulo bound renaming (upd1, upd2) as " +
-		   "even if the quantified variables have not the same sorts (compatible ones, " +
-		   "yes...but not equal ones)" + match2.sub(0).sub(1) + "::"+ match2.sub(0).sub(0), 
-		   new UpdatePair(match2.sub(0).sub(1)).equals(new UpdatePair(match2.sub(0).sub(0))));
-
     }
 
 

@@ -5,6 +5,7 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
+
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.explicitheap.WhileInvariantRule;
@@ -15,7 +16,6 @@ import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.ListOfBuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.UpdateSimplificationRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.SetOfStrategyFactory;
@@ -58,15 +58,9 @@ public class JavaProfile extends AbstractProfile {
         return UseOperationContractRule.INSTANCE;
     }
     
-    protected UpdateSimplificationRule getUpdateSimplificationRule() {
-        return UpdateSimplificationRule.INSTANCE;
-    }
     
     protected ListOfBuiltInRule initBuiltInRules() {       
-       
-        // update simplifier
-        ListOfBuiltInRule builtInRules = super.initBuiltInRules().
-            prepend(getUpdateSimplificationRule());
+        ListOfBuiltInRule builtInRules = super.initBuiltInRules();
         
         //XXX
         builtInRules = builtInRules.prepend(WhileInvariantRule.INSTANCE);
@@ -103,6 +97,4 @@ public class JavaProfile extends AbstractProfile {
     public StrategyFactory getDefaultStrategyFactory() {        
         return DEFAULT;
     }
-
- 
 }

@@ -170,7 +170,7 @@ abstract class SkolemSymbolTacletFactory extends SkolemSymbolFactory {
 	    res[i] = (IProgramVariable)SchemaVariableFactory
 		.createProgramSV ( createUniquePEName("pv"),
 				   ProgramSVSort.VARIABLE,
-				   false );
+				   false);
 	
 	return new ArrayOfIProgramVariable ( res );
     }

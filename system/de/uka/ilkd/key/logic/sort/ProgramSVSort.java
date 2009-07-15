@@ -1560,8 +1560,8 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	Iterator it=l.iterator();
 	while (it.hasNext()) {
 	    Object o=it.next();
-	    if (o instanceof SortedSchemaVariable
-		&& (((SortedSchemaVariable)o).sort()==this)) {
+	    if (o instanceof SchemaVariable
+		&& (((SchemaVariable)o).sort()==this)) {
 		return (ProgramElement) o;
 	    }
 	    else if ((alternative.isInstance(o)) 

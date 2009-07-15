@@ -24,8 +24,6 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.OldUpdateSimplifier;
-import de.uka.ilkd.key.rule.updatesimplifier.Update;
 
 
 
@@ -202,60 +200,62 @@ public class AtPreFactory {
 
     
 
-    /**
-     * Creates a definition for an atPre function.
-     */
-    public Update createAtPreDefinition(Operator normalOp, 
-                                        Function atPreFunc,
-                                        Services services) {
-        assert normalOp != null;
-        assert atPreFunc != null;
-        
-        int arity = normalOp.arity();
-        assert arity == atPreFunc.arity();
-        LogicVariable[] args = new LogicVariable[arity];
-        if(arity == 1) {
-            args[0] = new LogicVariable(new Name("x"), atPreFunc.argSort(0));
-        } else {
-            for(int i = 0; i < arity; i++) {
-                args[i] = new LogicVariable(new Name("x" + i), atPreFunc.argSort(i));
-            }
-        }
-    
-        Term[] argTerms = getTerms(new ArrayOfQuantifiableVariable(args));
-        Term atPreTerm = TB.func(atPreFunc, argTerms);        
-        Term normalTerm = TermFactory.DEFAULT.createTerm(
-                                    normalOp,
-                                    argTerms,
-                                    null,
-                                    null);
-        
-        UpdateFactory uf = new UpdateFactory(services, new OldUpdateSimplifier());
-        Update result = uf.quantify(args,
-                                    uf.elementaryUpdate(atPreTerm, normalTerm));
-        
-        return result;
-    }
+//    /**
+//     * Creates a definition for an atPre function.
+//     */
+//    public Update createAtPreDefinition(Operator normalOp, 
+//                                        Function atPreFunc,
+//                                        Services services) {
+//        assert normalOp != null;
+//        assert atPreFunc != null;
+//        
+//        int arity = normalOp.arity();
+//        assert arity == atPreFunc.arity();
+//        LogicVariable[] args = new LogicVariable[arity];
+//        if(arity == 1) {
+//            args[0] = new LogicVariable(new Name("x"), atPreFunc.argSort(0));
+//        } else {
+//            for(int i = 0; i < arity; i++) {
+//                args[i] = new LogicVariable(new Name("x" + i), atPreFunc.argSort(i));
+//            }
+//        }
+//    
+//        Term[] argTerms = getTerms(new ArrayOfQuantifiableVariable(args));
+//        Term atPreTerm = TB.func(atPreFunc, argTerms);        
+//        Term normalTerm = TermFactory.DEFAULT.createTerm(
+//                                    normalOp,
+//                                    argTerms,
+//                                    null,
+//                                    null);
+//        
+//        UpdateFactory uf = new UpdateFactory(services, new OldUpdateSimplifier());
+//        Update result = uf.quantify(args,
+//                                    uf.elementaryUpdate(atPreTerm, normalTerm));
+//        
+//        return result;
+//    }
     
     
     /**
      * Creates definitions for a set of atPre functions.
      */
-    public Update createAtPreDefinitions(
+    public Term createAtPreDefinitions(
          /*in*/ Map<Operator,Function/*atPre*/> atPreFunctions, 
          Services services) {
         assert atPreFunctions != null;
         
-        UpdateFactory uf = new UpdateFactory(services, new OldUpdateSimplifier());
-        Update result = uf.skip();
-        
-        for(Map.Entry<Operator,Function> entry : atPreFunctions.entrySet()) {
-            Operator normalOp = entry.getKey();
-            Function atPreFunc = entry.getValue();
-            Update def = createAtPreDefinition(normalOp, atPreFunc, services);
-            result = uf.parallel(result, def);
-        }
-        
-        return result;
+//        UpdateFactory uf = new UpdateFactory(services, new OldUpdateSimplifier());
+//        Update result = uf.skip();
+//        
+//        for(Map.Entry<Operator,Function> entry : atPreFunctions.entrySet()) {
+//            Operator normalOp = entry.getKey();
+//            Function atPreFunc = entry.getValue();
+//            Update def = createAtPreDefinition(normalOp, atPreFunc, services);
+//            result = uf.parallel(result, def);
+//        }
+//        
+//        return result;
+        assert false : "not implemented";
+        return null;
     }
 }

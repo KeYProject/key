@@ -38,12 +38,7 @@ import de.uka.ilkd.key.util.Debug;
  * for different kinds of rules.
  */
 public class TacletIndex  {
-
-    /** @link aggregation 
-     * @label known rules
-     * @supplierCardinality **/
-    /*#Taclet lnkTaclet;*/
-    
+   
     /** contains rewrite Taclets */
     public HashMap<Object, ListOfNoPosTacletApp> rwList 
 	= new HashMap<Object, ListOfNoPosTacletApp>();
@@ -106,22 +101,18 @@ public class TacletIndex  {
 	    } 
 	} else {
 	    indexObj = indexTerm.op();
-	    if (indexObj instanceof QuanUpdateOperator) {
-	        //indexed independent of arity
-	        indexObj=QuanUpdateOperator.class;
-            }
 	    if (indexObj instanceof SortDependingSymbol) {
 		// indexed independent of sort
 		indexObj=((SortDependingSymbol)indexObj).getKind ();
 	    }
 	}
 	if (indexObj instanceof SchemaVariable) {
-	    if (((SchemaVariable)indexObj).isTermSV() 
-		|| ((SchemaVariable)indexObj).isFormulaSV()) {
-		indexObj=((SortedSchemaVariable)indexObj).sort();
+	    if (indexObj instanceof TermSV 
+		|| indexObj instanceof FormulaSV) {
+		indexObj=((SchemaVariable)indexObj).sort();
 		if ( indexObj instanceof GenericSort )
 		    indexObj = GenericSort.class;
-	    } else if (((SchemaVariable)indexObj).isProgramSV()) {
+	    } else if (indexObj instanceof ProgramSV) {
 		indexObj=SchemaOp.PROGSVOP;
 	    } else {
 		indexObj=SchemaOp.DEFAULTSVOP;
@@ -423,9 +414,8 @@ public class TacletIndex  {
             }
 	}
     
-	if (term.op() instanceof IUpdateOperator) {
-	    result = getListHelp ( map,
-                                   ( (IUpdateOperator)term.op () ).target ( term ) );
+	if (term.op() instanceof UpdateApplication) {
+	    result = getListHelp ( map, UpdateApplication.getTarget ( term ) );
 	    return result;
 	}		
     
@@ -495,10 +485,6 @@ public class TacletIndex  {
      */
     private ListOfNoPosTacletApp getList
 	(HashMap<Object, ListOfNoPosTacletApp> map, Term term) {
-	if (term.op() instanceof QuanUpdateOperator) {
-	    ListOfNoPosTacletApp l = map.get(QuanUpdateOperator.class);
-	    if ( l != null ) return getListHelp ( map, term ).append ( l );
-	}
 	return getListHelp(map, term);
     }
 
@@ -550,10 +536,6 @@ public class TacletIndex  {
 			   Services services,
 			   Constraint userConstraint) {
       
-        //TODO: afer KeY 1.0 replace the if statement with assert pos.isTopLevel
-        // but currently I don't want to change the methods behaviour
-        //if (!pos.isTopLevel()) 
-        //    return SLListOfNoPosTacletApp.EMPTY_LIST;
         assert pos.isTopLevel();
         
         final Constraint termConstraint = 
@@ -659,7 +641,8 @@ public class TacletIndex  {
         return result;
     }
 
-    /** toString */
+
+    @Override
     public String toString() {
 	StringBuffer sb=new StringBuffer();
 	sb.append("TacletIndex with applicable rules: ");
@@ -813,7 +796,6 @@ public class TacletIndex  {
 	    }
 	    return result;
 	}
-
     }
 }
  

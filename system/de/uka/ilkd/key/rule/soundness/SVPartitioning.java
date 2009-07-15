@@ -73,8 +73,8 @@ public class SVPartitioning {
      */
     public boolean isExpressionSV ( int p ) {
 	SchemaVariable sv = getPartition ( p ).head ();
-	return sv.isProgramSV () &&
-	    ((SortedSchemaVariable)sv).sort () == ProgramSVSort.EXPRESSION;
+	return sv instanceof ProgramSV &&
+	    ((SchemaVariable)sv).sort () == ProgramSVSort.EXPRESSION;
     }
 
     public boolean isNative ( int p ) {

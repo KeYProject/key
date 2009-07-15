@@ -68,7 +68,6 @@ public class ProofSettings {
     public ProofSettings() {       	
 	settings = new Settings[] {
             new StrategySettings(),
-	    new SimultaneousUpdateSimplifierSettings(),
             new GeneralSettings(),
 	    new ChoiceSettings(),
 	    DecisionProcedureSettings.getInstance(),
@@ -230,11 +229,11 @@ public class ProofSettings {
      */
     public ChoiceSettings getChoiceSettings() {
 	ensureInitialized();
-	return (ChoiceSettings) settings[3];
+	return (ChoiceSettings) settings[2];
     }
 
     public ProofSettings setChoiceSettings(ChoiceSettings cs) {
-	settings[3] = cs;
+	settings[2] = cs;
         return this;
     }
 
@@ -243,28 +242,22 @@ public class ProofSettings {
      */
     public DecisionProcedureSettings getDecisionProcedureSettings() {
 	ensureInitialized();
-	return (DecisionProcedureSettings) settings[4];
-    }
-
-    public SimultaneousUpdateSimplifierSettings 
-	getSimultaneousUpdateSimplifierSettings() {
-	ensureInitialized();
-	return (SimultaneousUpdateSimplifierSettings) settings[1];    
+	return (DecisionProcedureSettings) settings[3];
     }
     
     public LibrariesSettings getLibrariesSettings() {
         ensureInitialized();
-        return (LibrariesSettings) settings[6];    
+        return (LibrariesSettings) settings[5];    
     }
 
     public GeneralSettings getGeneralSettings() {
 	ensureInitialized();
-	return (GeneralSettings) settings[2];
+	return (GeneralSettings) settings[1];
     }
 
     public ViewSettings getViewSettings() {
 	ensureInitialized();
-	return (ViewSettings) settings[5];
+	return (ViewSettings) settings[4];
     }
 
     private class ProofSettingsListener implements SettingsListener {

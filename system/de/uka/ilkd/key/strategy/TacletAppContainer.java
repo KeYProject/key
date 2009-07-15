@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IteratorOfSchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SetOfSchemaVariable;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.Debug;
@@ -195,7 +196,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         final IteratorOfSchemaVariable it = needed.iterator ();
         while ( it.hasNext () ) {
             final SchemaVariable sv = it.next ();
-            if ( sv.isSkolemTermSV () ) continue;
+            if ( sv instanceof SkolemTermSV ) continue;
             return false;
         }
         return true;

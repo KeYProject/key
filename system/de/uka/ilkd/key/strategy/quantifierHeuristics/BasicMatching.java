@@ -18,13 +18,7 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
-import de.uka.ilkd.key.logic.op.MapAsListFromQuantifiableVariableToTerm;
-import de.uka.ilkd.key.logic.op.MapFromQuantifiableVariableToTerm;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.*;
 
 class BasicMatching {
     
@@ -43,7 +37,7 @@ class BasicMatching {
         final Substitution subst = match ( trigger, targetTerm );
         if ( subst != null ) allsubs = allsubs.add ( subst );
         final Operator op = targetTerm.op ();
-        if ( !( op instanceof Modality || op instanceof IUpdateOperator ) ) {
+        if ( !( op instanceof Modality || op instanceof UpdateApplication ) ) {
             for ( int i = 0; i < targetTerm.arity (); i++ )
                 allsubs =
                     allsubs.union ( getSubstitutions ( trigger,

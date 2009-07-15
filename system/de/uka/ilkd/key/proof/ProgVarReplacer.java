@@ -6,14 +6,6 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
-//
 //
 
 package de.uka.ilkd.key.proof;
@@ -31,10 +23,14 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.*;
 
+
 /**
  * Replaces program variables.
  */
-public class ProgVarReplacer {
+public final class ProgVarReplacer {
+    
+    private static final TermBuilder TB = TermBuilder.DF;
+    
     
     /**
      * map specifying the replacements to be done
@@ -282,7 +278,8 @@ public class ProgVarReplacer {
         return result;
     }
     
-    public Term replaceProgramVariable(Term t) {
+    
+    private Term replaceProgramVariable(Term t) {
         final ProgramVariable pv = (ProgramVariable) t.op();
         Object o = map.get(pv);
         if (o instanceof ProgramVariable) {
@@ -293,64 +290,8 @@ public class ProgVarReplacer {
         return t;
     }
     
-    protected Term replaceQuanUpdateTerm(Term t) {
-        assert t.op() instanceof QuanUpdateOperator;
-        
-        Term result = t;
-        boolean changed = false;
-        
-        final QuanUpdateOperator iuop = (QuanUpdateOperator) t.op();
-        
-        final Term locs[] = new Term[iuop.locationCount()];
-        final Term vals[] = new Term[iuop.locationCount()];
-        final Term guards[] = new Term[iuop.locationCount()];
-        final ArrayOfQuantifiableVariable[] qvars 
-            = new ArrayOfQuantifiableVariable[iuop.locationCount()];
-        
-        for (int i=0; i<iuop.locationCount(); i++) {
-            final Term location = iuop.location(t, i);
-            locs[i]   = replace(location);
-            changed   = changed || (locs[i] != location);
-            final Term value = iuop.value(t, i);
-            vals[i]   = replace(value);
-            changed   = changed || vals[i] != value;
-            final Term guard = iuop.guard(t, i);
-            guards[i] = replace(guard);
-            changed   = changed || guards[i] != guard;
-            final ArrayOfQuantifiableVariable boundVars = iuop.boundVars(t,i);
-            qvars[i]  = boundVars;
-            changed   = changed || qvars[i] != boundVars;
-        }        
-        final Term target =  replace(iuop.target(t));
-        changed = changed || target != iuop.target(t);
-        
-        if (changed) {
-            result = TermFactory.DEFAULT.createQuanUpdateTerm
-            (services, qvars, guards, locs, vals, target);
-        }        
-        
-        return result; 
-    }
     
-    /**
-     * replaces in a term
-     */
-    public Term replace(Term t) {
-        final Operator op = t.op();
-        if(op instanceof QuanUpdateOperator) {
-            return replaceQuanUpdateTerm(t);
-        } else if (op instanceof ProgramVariable) {
-            return replaceProgramVariable(t);       
-        } else {
-            return standardReplace(t);
-        }    
-    }
-
-    /**
-     * @param t the Term where to perform the replacement
-     * @return the replaced term
-     */
-    protected Term standardReplace(Term t) {
+    private Term standardReplace(Term t) {
         Term result = t;
         
         final Term newSubTerms[] = new Term[t.arity()];
@@ -385,8 +326,22 @@ public class ProgVarReplacer {
                     newJb);
         }
         return result;
+    }    
+    
+    
+    /**
+     * replaces in a term
+     */
+    public Term replace(Term t) {
+        final Operator op = t.op();
+        if (op instanceof ProgramVariable) {
+            return replaceProgramVariable(t);       
+        } else {
+            return standardReplace(t);
+        }    
     }
 
+    
     public LocationDescriptor replace(LocationDescriptor loc) {
         if(loc instanceof BasicLocationDescriptor) {
             BasicLocationDescriptor bloc = (BasicLocationDescriptor) loc;
@@ -396,6 +351,7 @@ public class ProgVarReplacer {
             return loc;
         }
     }
+    
 
     /**
      * replaces in a statement

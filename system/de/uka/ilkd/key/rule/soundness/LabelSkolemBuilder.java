@@ -14,8 +14,8 @@ package de.uka.ilkd.key.rule.soundness;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IteratorOfSchemaVariable;
+import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 
 
@@ -37,8 +37,8 @@ public class LabelSkolemBuilder extends AbstractSkolemBuilder {
 	while ( it.hasNext () ) {
 	    sv = it.next ();
 
-	    if ( sv.isProgramSV () &&
-		 ((SortedSchemaVariable)sv).sort () == ProgramSVSort.LABEL )
+	    if ( sv instanceof ProgramSV &&
+		 sv.sort () == ProgramSVSort.LABEL )
 		createSkolemLabel ( sv );
 	}
 
@@ -53,5 +53,4 @@ public class LabelSkolemBuilder extends AbstractSkolemBuilder {
 	}
 
     }
-
 }

@@ -17,8 +17,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.*;
-import de.uka.ilkd.key.rule.ListOfUpdatePair;
-import de.uka.ilkd.key.rule.UpdatePair;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LRUCache;
 
@@ -556,14 +554,7 @@ public class TermFactory {
             return createBoundedNumericalQuantifierTerm(
 		    (BoundedNumericalQuantifier) op, subTerms[0], 
                     subTerms[1], subTerms[2], bv[2]);
-        } else if (op instanceof QuanUpdateOperator) {
-	    final QuanUpdateOperator updOp = (QuanUpdateOperator)op;
-	    if ( bv == null ) {
-	        bv = new ArrayOfQuantifiableVariable [subTerms.length];
-                java.util.Arrays.fill ( bv, new ArrayOfQuantifiableVariable () );
-	    }
-	    return createQuanUpdateTerm (updOp, subTerms, bv);
-	} else if (op instanceof IfExThenElse) {
+        } else if (op instanceof IfExThenElse) {
 	    final Term[] resTerms = new Term [3];
             System.arraycopy ( subTerms, 0, resTerms, 0, 3 );
 	    final ArrayOfQuantifiableVariable exVars =
@@ -584,182 +575,6 @@ public class TermFactory {
 	    return createTermWithNoBoundVariables(op, subTerms, javaBlock);
 	}       
    }
-    //
-    // CHANGE these two methods!  vars should be something like an 
-    // array of arrays! 
-    //
-
-    /**
-     * creates an update term like
-     *    <code>{pair0}..{pairN}target</code>     
-     */
-    public Term createUpdateTerm(ListOfUpdatePair pairs, Term target) {
-	if (pairs.size()>1) {
-	    return createUpdateTerm(pairs.head(), 
-				    (createUpdateTerm(pairs.tail(), 
-						      target)));
-	} else {
-	    return createUpdateTerm(pairs.head(), target);
-	}
-    }
-     
-    
-    /**
-     * creates the update term <code>{loc:=value}target</code>
-     * @param loc the Term representing the location to be updated
-     * @param value the Term representing the value the location is updated to
-     * @param target the Term on which the update is applied
-     * @return the update term described above
-     */
-    public Term createUpdateTerm(Services services, Term loc, Term value, Term target) {
-        return createUpdateTerm(services, new Term[] {loc}, new Term[] {value}, target);
-    }
-    
-   
-    /** 
-     * creates an update term 
-     *   <code>{locs[0]:=values[0],...,locs[n]:=values[n]}target</code>
-     * where <code>n</code> is the length of the location array. 
-     * @param locs an array of Term describing the updates locations
-     * @param values an array of Term describing the values to which 
-     * the locations are updated
-     * @param target the Term on which the update is applied to
-     * @return the update term as described above
-     */
-    public Term createUpdateTerm(Services services,
-	    			 Term[] locs, 
-                                 Term[] values,
-                                 Term target) {
-        final ArrayOfQuantifiableVariable[] boundVars =
-            new ArrayOfQuantifiableVariable [locs.length];
-        Arrays.fill ( boundVars, new ArrayOfQuantifiableVariable () );
-        final Term[] guards = new Term [locs.length];
-        Arrays.fill ( guards, createJunctorTerm ( Junctor.TRUE ) );
-        
-        return createQuanUpdateTerm ( services, boundVars, guards, locs, values, target );
-    }
-
-    public Term createUpdateTerm(UpdatePair pair, 
-                                 Term target) {
-
-	final IUpdateOperator op = pair.updateOperator();
-        
-        final Term[] subs = new Term[pair.arity() + 1];
-	
-	for (int i = 0; i<subs.length-1; i++) {
-	    subs[i] = pair.sub(i);	    
-	}
-
-	subs[subs.length-1] = target;
-
-	if ( op instanceof QuanUpdateOperator ) {
-            final ArrayOfQuantifiableVariable[] boundVars =
-                new ArrayOfQuantifiableVariable [pair.arity () + 1];
-            for ( int i = 0; i < subs.length - 1; i++ )
-                boundVars[i] = pair.varsBoundHere ( i );
-            boundVars[subs.length - 1] = new ArrayOfQuantifiableVariable ();
-            return createQuanUpdateTerm ( (QuanUpdateOperator)op,
-                                          subs,
-                                          boundVars );
-        } else {
-            Debug.fail ( "Unknown update operator: " + op );
-            return null; // unreachable
-        }
-    }
-        
-    /**
-     * creates a normalized simultaneous update term
-     * 
-     * @param op
-     *            the UpdateOperator
-     * @param subs
-     *            the subterm of the simultaneous update term to be created
-     * @return the normalized simultaneous update term
-     */
-    public Term createNormalizedQuanUpdateTerm
-                        (QuanUpdateOperator op,
-                         Term[] subs,
-                         ArrayOfQuantifiableVariable[] boundVarsPerSub) {
-        return op.normalize ( boundVarsPerSub, subs );
-    }
-
-    /**
-     * creates a simultaneous update-term
-     * 
-     * @param subs
-     *            the sub-terms
-     */
-    public Term createQuanUpdateTerm
-                        (QuanUpdateOperator op,
-                         Term[] subs,
-                         ArrayOfQuantifiableVariable[] boundVarsPerSub) {
-        final ArrayOfQuantifiableVariable[] boundVars =
-            op.toBoundVarsPerAssignment ( boundVarsPerSub, subs );
-        
-        return new TermImpl ( op, new ArrayOfTerm(subs), JavaBlock.EMPTY_JAVABLOCK, boundVars ).checked ();
-    }
-
-    /**
-     * creates an update term which is not in normalform order (usually usage of
-     * this method is discouraged)
-     * 
-     * @return creates an update term which is not in normalform order
-     */
-    public Term createQuanUpdateTermUnordered
-        (QuanUpdateOperator op,
-         Term[] subs,
-         ArrayOfQuantifiableVariable[] boundVars) {
-        
-        return new TermImpl ( op, new ArrayOfTerm(subs), JavaBlock.EMPTY_JAVABLOCK, boundVars ).checked ();
-    }
-
-    /**
-     * creates a normalized update term
-     * <code>{locs[0]:=values[0],...,locs[n]:=values[n]}target</code> where
-     * <code>n</code> is the length of the location array.
-     * 
-     * @param locs
-     *            an array of Term describing the updates locations
-     * @param values
-     *            an array of Term describing the values to which the locations
-     *            are updated
-     * @param target
-     *            the Term on which the update is applied to
-     * @return the update term as described above
-     */
-    public Term createQuanUpdateTerm (Services services,
-	    			      ArrayOfQuantifiableVariable[] boundVars,
-				      Term[] guards,
-				      Term[] locs,
-				      Term[] values,
-				      Term target) {
-	//XXX
-        TermBuilder TB = TermBuilder.DF;
-        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        for(int i = 0; i < locs.length; i++) {
-            final Term loc = locs[i];
-            final Term value = values[i];
-
-            Sort sortOfSelect = heapLDT.getSortOfSelect(loc.op());
-            if(sortOfSelect != null) {
-        	final Term heapTerm = loc.sub(0);
-        	assert heapTerm.equals(TB.heap(services));
-                final Term objectTerm = loc.sub(1);
-                final Term fieldTerm = loc.sub(2);
-                
-                locs[i]   = TB.heap(services);
-                values[i] = TB.store(services, 
-                		     TB.heap(services), 
-                		     objectTerm, 
-                		     fieldTerm, 
-                		     value);
-            }
-        }
-	
-	
-        return QuanUpdateOperator
-            .normalize ( boundVars, guards, locs, values, target );
-    }
 
     public Term createNumericalQuantifierTerm(NumericalQuantifier op, 
             Term cond, Term t, ArrayOfQuantifiableVariable va){

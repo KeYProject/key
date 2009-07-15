@@ -161,13 +161,6 @@ public abstract class FindTaclet extends Taclet {
 	IteratorOfTacletGoalTemplate it               = goalTemplates().iterator();
 	IteratorOfGoal               goalIt           = newGoals.iterator();
 
-        // reklov
-        // START TEMPORARY DOWNWARD COMPATIBILITY
-        ((InnerVariableNamer) services.getVariableNamer()).
-                setOldProgVarProposals((Name) tacletApp.instantiations().
-                getInstantiation(new NameSV("_NAME_PROG_VARS")));
-        // END TEMPORARY DOWNWARD COMPATIBILITY
-
 	while (it.hasNext()) {
 	    TacletGoalTemplate gt          = it    .next();
 	    Goal               currentGoal = goalIt.next();
@@ -291,99 +284,9 @@ public abstract class FindTaclet extends Taclet {
         return !newConstraint.isAsWeakAs ( oriConstraint );
     }
     
-    
-    /** returns the variables in a Taclet with a read access
-    */
-    public ListOfSchemaVariable readSet() {
-
-	//List variables have to be collected to
-	ListOfSchemaVariable readFromVarialbes = 
-            SLListOfSchemaVariable.EMPTY_LIST;
-
-	//List of Variables in find-part
-	TacletSchemaVariableCollector tvarColl1 = new TacletSchemaVariableCollector() {
-            public void visit(Term t) {	
-	        if (t.op() instanceof Modality || 
-                    t.op() instanceof ModalOperatorSV) {
-	            varList = collectSVInProgram(t.javaBlock(),
-					         varList);
-	        }
-	        for (int j=0; j<t.arity(); j++) {
-	            for (int i=0;i<t.varsBoundHere(j).size();i++) {
-		        if (t.varsBoundHere(j).getQuantifiableVariable(i) 
-		            instanceof SchemaVariable) {
-		            varList = varList.prepend
-			        ((SchemaVariable)t.varsBoundHere(j)
-			         .getQuantifiableVariable(i)); 
-		        }
-	            }
-	        }
-            }
-        };
-	tvarColl1.visit(find()); 
-
-	//List of variables im add & replaceWith-Part
-	TacletSchemaVariableCollector tvarColl2 = new TacletSchemaVariableCollector() {
-    	    public void visit(Term t) {	
-		if (t.op() instanceof SchemaVariable) 
-                    varList=varList.prepend((SchemaVariable)t.op());
-    	    }	
-        };
-	tvarColl2.visitGoalTemplates(this, false); 
-	
-        // build intersection
-	IteratorOfSchemaVariable it1 = tvarColl1.varIterator();
-	while(it1.hasNext()){
-	        SchemaVariable sv1 = it1.next();
-		IteratorOfSchemaVariable it2 = tvarColl2.varIterator();
-
-		while(it2.hasNext()){
-		    SchemaVariable sv2 = it2.next();
-
-		    if(sv1 == sv2){
-			if(writeSet().head()!= null) {
-			    //if the variable belongs to the WriteSet, 
-                            //remove it from the ReadSet
-			    if (writeSet().head() != sv1 )
-			       readFromVarialbes = readFromVarialbes.prepend(sv1);
-			}
-			else readFromVarialbes = readFromVarialbes.prepend(sv1);
-			break; //variable found, no need to keep searching
-	            }
-		}
-	}
-	return readFromVarialbes; 
-    }
-
-    /** 
-     * returns the variable in a Taclet to which is written to
-     */
-    public ListOfSchemaVariable writeSet() {
-	IteratorOfTacletGoalTemplate it = goalTemplates().iterator();
-	ListOfSchemaVariable updateVar = SLListOfSchemaVariable.EMPTY_LIST; 
-	Term replWith = null; 
-	
-	while (it.hasNext()){
-	    TacletGoalTemplate goalTemp = it.next();
-
-	    if(goalTemp instanceof RewriteTacletGoalTemplate){
-		replWith = ((RewriteTacletGoalTemplate)goalTemp).replaceWith();
-
-		if (replWith.op() instanceof IUpdateOperator){
-		    try{                
-		        updateVar = updateVar.prepend((SchemaVariable)replWith.sub(0).op());
-		    } catch(ClassCastException e) {
-		        System.err.println(name()+" "+replWith.sub(0).op().getClass());
-		    }
-		}
-	    }
-	}
-	return updateVar;
-    } 
 
     /**
      * returns the variables that occur bound in the find part
-     * @return the variables that occur bound in the find part
      */
     protected SetOfQuantifiableVariable getBoundVariablesHelper() {
         final BoundVarsVisitor bvv = new BoundVarsVisitor();

@@ -30,22 +30,22 @@ import de.uka.ilkd.key.util.ExceptionHandlerException;
 
 public class TestTermParser extends TestCase {
     
-    private TermFactory tf = TermFactory.DEFAULT;
+    private static final TermFactory tf = TermFactory.DEFAULT;
 
-    NamespaceSet nss;
+    private static NamespaceSet nss;
 
-    Services serv;
+    private static Services serv;
 
-    Recoder2KeY r2k;
+    private static Recoder2KeY r2k;
 
-    Sort elem,list,int_sort;
+    private static Sort elem,list,int_sort;
 
-    Function head,tail,nil,cons,isempty,p; 
+    private static Function head,tail,nil,cons,isempty,p; 
 
-    LogicVariable x,y,z,xs,ys,zs;
+    private static LogicVariable x,y,z,xs,ys,zs;
 
-    Term t_x,t_y,t_z,t_xs,t_ys,t_zs;
-    Term t_headxs,t_tailxs,t_tailys,t_nil;
+    private static Term t_x,t_y,t_z,t_xs,t_ys,t_zs;
+    private static Term t_headxs,t_tailxs,t_tailys,t_nil;
 
     public TestTermParser(String name) {
 	super(name);
@@ -53,8 +53,11 @@ public class TestTermParser extends TestCase {
 
 
     public void setUp() {
-	nss = new NamespaceSet();
+	if(serv != null) {
+	    return;
+	}
 	serv = TacletForTests.services ();
+	nss = serv.getNamespaces().copy();
 	nss.sorts().add(Sort.NULL);
 	r2k = new Recoder2KeY(serv, nss);
 	r2k.parseSpecialClasses();	
@@ -64,25 +67,25 @@ public class TestTermParser extends TestCase {
 		   "  list tail(list);\n" +
 		   "  list nil;\n" +
 		   "  list cons(elem,list);\n"  +
-		   "numbers #;\n"+
-		   "numbers 0 (numbers);\n"+
-		   "numbers 1 (numbers);\n"+
-		   "numbers 2 (numbers);\n"+
-		   "numbers 3 (numbers);\n"+
-		   "numbers 4 (numbers);\n"+
-		   "numbers 5 (numbers);\n"+
-		   "numbers 6 (numbers);\n"+
-		   "numbers 7 (numbers);\n"+
-		   "numbers 8 (numbers);\n"+
-		   "numbers 9 (numbers);\n"+
-		   "numbers neglit (numbers);\n"+
-                   "int Z (numbers);\n"+
-		   "int neg (int);\n"+
-		   "int add (int,int);\n"+
-		   "int sub (int,int);\n"+
-		   "int mul (int,int);\n"+
-		   "int div (int,int);\n"+
-		   "int mod (int,int);\n"+
+//		   "numbers #;\n"+
+//		   "numbers 0 (numbers);\n"+
+//		   "numbers 1 (numbers);\n"+
+//		   "numbers 2 (numbers);\n"+
+//		   "numbers 3 (numbers);\n"+
+//		   "numbers 4 (numbers);\n"+
+//		   "numbers 5 (numbers);\n"+
+//		   "numbers 6 (numbers);\n"+
+//		   "numbers 7 (numbers);\n"+
+//		   "numbers 8 (numbers);\n"+
+//		   "numbers 9 (numbers);\n"+
+//		   "numbers neglit (numbers);\n"+
+//                   "int Z (numbers);\n"+
+//		   "int neg (int);\n"+
+//		   "int add (int,int);\n"+
+//		   "int sub (int,int);\n"+
+//		   "int mul (int,int);\n"+
+//		   "int div (int,int);\n"+
+//		   "int mod (int,int);\n"+
 		   "int aa ;\n"+
 		   "int bb ;\n"+
 		   "int cc ;\n"+
@@ -90,10 +93,10 @@ public class TestTermParser extends TestCase {
 		   "int ee ;\n"+
 		   "}\n" +
 		   "\\predicates {\n" +
-		   "  lt(int,int);\n" +
-                   "  leq(int,int);\n" +
+//		   "  lt(int,int);\n" +
+//                   "  leq(int,int);\n" +
 		   "  isempty(list);\n" +
-		   "  p(elem,list);\n" +
+//		   "  p(elem,list);\n" +
 		   "}\n"
 
 		   );
@@ -421,14 +424,14 @@ public class TestTermParser extends TestCase {
 	    String s="\\<{int i,j;}\\> {i:=j} i = j";
 	    Term t = parseTerm(s);
 	    assertTrue("expected {i:=j}(i=j) but is ({i:=j}i)=j)", 
-		       t.sub(0).op() instanceof IUpdateOperator);
+		       t.sub(0).op() instanceof UpdateApplication);
     }
 
     public void testBindingUpdateTerm() {
 	    String s="\\<{int i,j;}\\> {i:=j} i = j";
 	    Term t = parseTerm(s);
 	    assertFalse("expected ({i:=j}i)=j) but is {i:=j}(i=j)", 
-		       t.sub(0).op() instanceof IUpdateOperator);
+		       t.sub(0).op() instanceof UpdateApplication);
     }
 
     public void testParsingArray() {
@@ -450,8 +453,8 @@ public class TestTermParser extends TestCase {
     
     public void testAmbigiousFuncVarPred() {
 	// tests bug id 216
-	String s = "\\functions {} \\predicates{gt(int, int);}"+
-	    "\n\\problem {\\forall int x; gt(x, 0)}\n \\proof {\n"+
+	String s = "\\functions {} \\predicates{mypred(int, int);}"+
+	    "\n\\problem {\\forall int x; mypred(x, 0)}\n \\proof {\n"+
 	    "(branch \"dummy ID\""+
 	    "(opengoal \"  ==> true  -> true \") ) }";
 	try {
@@ -679,21 +682,5 @@ public class TestTermParser extends TestCase {
                         TacletForTests.getJavaInfo().rec2key(),
                         nss,
                         TacletForTests.services().getTypeConverter());                     
-    }
-    
-    public void testModifies() {
-        TacletForTests.getJavaInfo().readJavaBlock("{}");        
-        r2k.parseSpecialClasses();
-        r2k.readCompilationUnit("class ZMod { static ZMod z; int a; int[] b; }");              
-        
-        SetOfLocationDescriptor locs = null;
-        try {
-            locs = parseModifies("{\\for ZMod x; x.a@(ZMod), "
-                                 + "\\for int i; \\if(0 <= i & i <= 7) ZMod.z.b@(ZMod)[i], "
-                                 + "ZMod.z.b@(ZMod)[0..7]}");
-        } catch (Exception e) {
-            fail("Error parsing modifies clause. " + e);
-        }               
-        assertTrue("Modifies should contain 3 elements", (locs != null)&& (locs.size() == 3));
     }
 }

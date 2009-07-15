@@ -10,79 +10,21 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.SourceElement;
 
-public interface SchemaVariable extends SortedOperator {
-
-    /** 
-     * this method tests on object identity
-     */
-    boolean equalsModRenaming(SourceElement se, 
-			      NameAbstractionTable nat);
+/**
+ * This interface represents the root of a schema variable hierarchy to be
+ * express termstructures that match on logical terms. Schema variables
+ * are used in Taclets where they act as placeholders for other
+ * TermSymbols. The TermSymbols a SchemaVariable is allowed to match
+ * is specified by their type and sort.
+ */
+public interface SchemaVariable extends ParsableVariable {
     
-    
-    Class matchType();
-
-    /** returns true iff this SchemaVariable is used to match
-     * bound (quantifiable) variables 
-     * @return true iff this SchemaVariable is used to match
-     * bound (quantifiable) variables 
-     */
-
-    boolean isVariableSV();
-
-    /** returns true iff this SchemaVariable is used to match
-     * a term but not a formula
-     * @return true iff this SchemaVariable is used to match
-     * a term but not a formula
-     */
-    boolean isTermSV();
-
-    /** returns true iff this SchemaVariable is used to match
-     * a formula 
-     * @return true iff this SchemaVariable is used to match
-     * a formula
-     */
-    boolean isFormulaSV();
-
-    /** returns true iff this SchemaVariable is used to match
-     * a part of a program 
-     * @return true iff this SchemaVariable is used to match
-     * a part of a program
-     */
-    boolean isProgramSV();
-
     /**
-     * returns true if the schemavariable can match a list of syntactical
-     * elements 
-     * @return true if the schemavariable can match a list of syntactical
-     * elements 
+     * @return true if the schemavariable has the strict modifier which forces
+     *         the instantiation to have exactly the same sort as the
+     *         schemavariable (or if the sv is of generic sort - the
+     *         instantiation of the generic sort)
      */
-    boolean isListSV();
-
-    /** 
-     * @return true iff this SchemaVariable is used to match
-     * modal operators
-     */
-    boolean isOperatorSV();
- 
-    /** returns true iff this SchemaVariable is used to match (create)
-     * a skolem term
-     * @return true iff this SchemaVariable is used to match (create)
-     * a skolem term
-     */
-    boolean isSkolemTermSV(); 
-    
-    /** returns true iff this SchemaVariable is used to store a name
-     * (e.g. of taclets or metavariables).
-     * This SV is never matched against anything in the sequent.
-     */
-    boolean isNameSV();
-
-    /**     
-     */
-    boolean isRigid ();
-
-
+    boolean isStrict();
 }

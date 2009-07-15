@@ -25,8 +25,6 @@ import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.DefaultProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.rule.OldUpdateSimplifier;
-import de.uka.ilkd.key.rule.updatesimplifier.ApplyOnModality;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -69,9 +67,6 @@ public class Proof implements Named {
     
     /** declarations &c, read from a problem file or otherwise */
     private String problemHeader = "";
-
-    /** the update simplifier (may be moved to nodes)*/
-    private OldUpdateSimplifier upd_simplifier;
 
     /** the java information object: JavaInfo+TypeConverter */
     private final Services services;
@@ -315,23 +310,6 @@ public class Proof implements Named {
             it.next ().setGoalStrategy(ourStrategy);
     }
 
-    /** 
-     * returns the default simplifier to be used (may be overwritten by branch
-     * specific simplifiers in the future)
-     * @return the UpdateSimplifier to be used as default one
-     */
-    public OldUpdateSimplifier simplifier() {
-	return upd_simplifier;
-    }
-
-    /** 
-     * sets the default simplifier
-     * @param upd_simplifier the UpdateSimplifier to be used as
-     * default (may be overwritten by branch specific simplifiers in the future)
-     */
-    public void setSimplifier(OldUpdateSimplifier upd_simplifier) {
-	this.upd_simplifier = upd_simplifier;
-    }
 
     /** returns the user constraint (table model)
      * @return the user constraint

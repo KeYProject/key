@@ -20,7 +20,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
+import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.*;
 
 
@@ -188,7 +188,7 @@ public class TestDeclParser extends TestCase {
 		   ", but the type SchemaVariable was expected",
 		   o instanceof SchemaVariable);
 
-	assertTrue(msg, ((SchemaVariable)o).isVariableSV());
+	assertTrue(msg, o instanceof VariableSV);
     }
 
     /** asserts that the SchemaVariable matches to term but not to a
@@ -200,10 +200,8 @@ public class TestDeclParser extends TestCase {
 	assertTrue("The named object: "+o+" is of type "+o.getClass()+
 		   ", but the type SchemaVariable was expected",
 		   o instanceof SchemaVariable);
-	assertSame(msg,
-		   ((SchemaVariable)o).matchType(), Term.class);
 	assertTrue("Schemavariable is not allowed to match a term of sort FORMULA.",
-		   ((SortedSchemaVariable)o).sort() != Sort.FORMULA);
+		   ((SchemaVariable)o).sort() != Sort.FORMULA);
     }
 
     /** asserts that the SchemaVariable matches to a formula 
@@ -214,11 +212,9 @@ public class TestDeclParser extends TestCase {
 	assertTrue("The named object: "+o+" is of type "+o.getClass()+
 		   ", but the type SchemaVariable was expected",
 		   o instanceof SchemaVariable);
-	assertSame(msg,
-		   ((SchemaVariable)o).matchType(), Term.class);
 	assertSame("Only matches to terms of sort FORMULA allowed. "+
-		   "But term has sort "+((SortedSchemaVariable)o).sort(), 
-		   ((SortedSchemaVariable)o).sort(), Sort.FORMULA);
+		   "But term has sort "+((SchemaVariable)o).sort(), 
+		   ((SchemaVariable)o).sort(), Sort.FORMULA);
 
 	
     }
@@ -368,28 +364,28 @@ public class TestDeclParser extends TestCase {
 	assertTermSV("SV x type", 
 		     nss.variables().lookup(new Name("x"))); 
 	assertEquals("SV x sort", elem,
-		     ((SortedSchemaVariable)nss.variables().lookup(new Name("x"))).sort()); 
+		     ((SchemaVariable)nss.variables().lookup(new Name("x"))).sort()); 
 
 	assertEquals("find SV ", new Name("y"),
 		     nss.variables().lookup(new Name("y")).name()); 
 	assertTermSV("SV y type", 
 		     nss.variables().lookup(new Name("y"))); 
 	assertEquals("SV y sort", elem,
-		     ((SortedSchemaVariable)nss.variables().lookup(new Name("y"))).sort()); 
+		     ((SchemaVariable)nss.variables().lookup(new Name("y"))).sort()); 
 
 	assertEquals("find SV ", new Name("lv"),
 		     nss.variables().lookup(new Name("lv")).name()); 
 	assertVariableSV("SV lv type", 
 		     nss.variables().lookup(new Name("lv"))); 
 	assertEquals("SV lv sort", list,
-		     ((SortedSchemaVariable)nss.variables().lookup(new Name("lv"))).sort()); 
+		     ((SchemaVariable)nss.variables().lookup(new Name("lv"))).sort()); 
 	
 	assertEquals("find SV ", new Name("b"),
 		     nss.variables().lookup(new Name("b")).name()); 
 	assertFormulaSV("SV b type", 
 		     nss.variables().lookup(new Name("b"))); 
 	assertEquals("SV b sort", Sort.FORMULA,
-		     ((SortedSchemaVariable)nss.variables().lookup(new Name("b"))).sort()); 
+		     ((SchemaVariable)nss.variables().lookup(new Name("b"))).sort()); 
     }
     
 

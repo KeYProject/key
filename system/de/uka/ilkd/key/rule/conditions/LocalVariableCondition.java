@@ -12,6 +12,7 @@ package de.uka.ilkd.key.rule.conditions;
 
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -29,7 +30,7 @@ public class LocalVariableCondition extends VariableConditionAdapter {
     public LocalVariableCondition(SchemaVariable var, boolean neg) {
         this.var = var;
         this.neg = neg;
-        if (!var.isProgramSV()) {
+	if (!(var instanceof ProgramSV)) {   
             throw new IllegalArgumentException("Illegal schema variable");
         }
     }

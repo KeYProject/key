@@ -17,7 +17,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IHTacletFilter;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletFilter;
-import de.uka.ilkd.key.proof.UpdateSimplificationRuleFilter;
 import de.uka.ilkd.key.rule.ListOfRuleSet;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -175,15 +174,6 @@ public abstract class AbstractFeatureStrategy implements Strategy {
     protected Feature ifHeuristics (String[] names, int priority) {
         return ConditionalFeature.createConditional ( getFilterFor ( names ),
                 c ( priority ), c ( 0 ) );
-    }
-
-    /**
-     * @param priority
-     */
-    protected Feature selectSimplifier (long priority) {
-        return ConditionalFeature.createConditional(
-                UpdateSimplificationRuleFilter.INSTANCE, 
-                longConst ( priority ) );
     }
 
     private RuleAppCost c (long p) {

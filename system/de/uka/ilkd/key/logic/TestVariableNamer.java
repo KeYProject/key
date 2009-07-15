@@ -6,14 +6,6 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
-//
 //
 
 package de.uka.ilkd.key.logic;
@@ -46,7 +38,7 @@ public class TestVariableNamer extends TestCase {
     private final ConstrainedFormula formulaWithX    = constructFormula(x);
     private final ConstrainedFormula formulaWithX_1  = constructFormula(x_1);
     private final ConstrainedFormula formulaWithVar_1= constructFormula(var_1);
-    private final SortedSchemaVariable variableSV = (SortedSchemaVariable)
+    private final SchemaVariable variableSV =
     	  SchemaVariableFactory.createProgramSV(new ProgramElementName("sv"),
 						ProgramSVSort.VARIABLE,
 						false);
@@ -130,7 +122,7 @@ public class TestVariableNamer extends TestCase {
 	SchemaVariable sv
 		= SchemaVariableFactory.createProgramSV(new ProgramElementName("sv"),
 						        ProgramSVSort.STATEMENT,
-							false);
+						        false);
     	Statement statement = new PostIncrement(containedVar);
 	app = (NoPosTacletApp) app.addCheckedInstantiation(sv, statement, 
                 goal.proof().getServices(), false);
@@ -161,12 +153,6 @@ public class TestVariableNamer extends TestCase {
 	}
 	
 	return false;
-    }
-
-
-    public void setUp() {
-	OldUpdateSimplifier sus = new OldUpdateSimplifier();
-	proof.setSimplifier(sus);
     }
 
 
@@ -264,5 +250,4 @@ public class TestVariableNamer extends TestCase {
 	v = vn.rename(x, goal, pio);
 	assertTrue(v.getProgramElementName().getProgramName().equals("x_2"));
     }
-    
 }

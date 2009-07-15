@@ -14,7 +14,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
-public final class TermImpl implements Term {
+final class TermImpl implements Term {
 
     private static final ArrayOfTerm EMPTY_TERM_LIST 
     	= new ArrayOfTerm();
@@ -58,7 +58,7 @@ public final class TermImpl implements Term {
 	} else {
 	    this.boundVars = null;
 	}
-	assert this.boundVars == null || this.boundVars.length == arity() || op instanceof QuanUpdateOperator; //XXX
+	assert this.boundVars == null || this.boundVars.length == arity();
     }
     
     
@@ -169,7 +169,7 @@ public final class TermImpl implements Term {
     
         
     public ArrayOfQuantifiableVariable varsBoundHere(int n) {
-	if(boundVars == null || (op instanceof QuanUpdateOperator && n >= boundVars.length)) { //XXX
+	if(boundVars == null) {
 	    return EMPTY_VAR_LIST;
 	} else {
 	    return boundVars[n];

@@ -400,7 +400,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      */
     protected ProgramElementName getNameProposalForSchemaVariable(
                            String basename,
-                           SortedSchemaVariable sv,
+                           SchemaVariable sv,
                            PosInOccurrence posOfFind,
                            PosInProgram posOfDeclaration,
                            ListOfString previousProposals) {
@@ -513,15 +513,11 @@ public abstract class VariableNamer implements InstantiationProposer {
 	    }
         }
         
-        if(!(var instanceof SortedSchemaVariable)) {
-            return null;
-        }
-       
 	//get the proposal
         ProgramElementName name
 		    = getNameProposalForSchemaVariable(
                                                basename,
-                                               (SortedSchemaVariable)var,
+                                               var,
                                                app.posInOccurrence(),
                                                posOfDeclaration,
                                                previousProposals);
@@ -545,7 +541,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      *         checked, else false
      */
     public boolean isUniqueNameForSchemaVariable(String name,
-    					       SortedSchemaVariable sv,
+    					       SchemaVariable sv,
 					       PosInOccurrence posOfFind,
 					       PosInProgram posOfDeclaration) {
 	boolean result = true;
@@ -642,7 +638,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 
     // precondition: sv.sort()==ProgramSVSort.VARIABLE
     public String getSuggestiveNameProposalForProgramVariable(
-                                                SortedSchemaVariable sv,
+                                                SchemaVariable sv,
                                                 TacletApp app,
 						Goal goal,
 						Services services,
@@ -677,8 +673,8 @@ public abstract class VariableNamer implements InstantiationProposer {
 	        	CopyAssignment p2 = (CopyAssignment) c.getStatementAt(1);
                 	Expression lhs = p2.getExpressionAt(0);
                 	if (lhs.equals(sv)) {
-			     SortedSchemaVariable rhs =
-			         (SortedSchemaVariable) p2.getExpressionAt(1);
+			     SchemaVariable rhs =
+			         (SchemaVariable) p2.getExpressionAt(1);
                              name=app.instantiations().getInstantiation(rhs).
 			          toString();
                 	     break;

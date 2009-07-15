@@ -52,7 +52,7 @@ public abstract class ProgramVariable extends AbstractSortedOperator
 			    boolean            isModel,
 			    boolean            isGhost,
 			    boolean            isFinal) {
-	super(name, new Sort[0], s == null ?  t.getSort() : s);
+	super(name, EMPTY_ARG_SORTS, s == null ?  t.getSort() : s);
 	this.type = t;
 	this.containingType = containingType;	
 	this.isStatic = isStatic;
@@ -256,7 +256,7 @@ public abstract class ProgramVariable extends AbstractSortedOperator
      * @see de.uka.ilkd.key.logic.op.Location#mayBeAliasedBy(de.uka.ilkd.key.logic.op.Location)
      */
     public boolean mayBeAliasedBy(UpdateableOperator loc) {
-        return loc instanceof SortedSchemaVariable || loc == this; 
+        return loc instanceof SchemaVariable || loc == this; 
     }
 
 

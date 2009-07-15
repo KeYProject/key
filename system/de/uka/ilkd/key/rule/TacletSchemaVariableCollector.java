@@ -33,17 +33,18 @@ public class TacletSchemaVariableCollector extends Visitor {
 
     /** collects all found variables */
     protected ListOfSchemaVariable varList;
+    
     /** the instantiations needed for unwind loop constructs */
     private SVInstantiations instantiations = 
 	SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
-    /** creates the Variable collector.
-     */
+
     public TacletSchemaVariableCollector() {
 	varList = SLListOfSchemaVariable.EMPTY_LIST;
     }
 
-    /** creates the Variable collector.
+    
+    /**
      * @param svInsts the SVInstantiations that have been already found
      * (needed by unwind loop constructs to determine which labels are needed)
      */
@@ -52,6 +53,7 @@ public class TacletSchemaVariableCollector extends Visitor {
 	instantiations = svInsts;
     }
 
+    
     /** collects all SchemVariables that occur in the JavaBlock
      * @param jb the JavaBlock where to look for Schemavariables
      * @param vars the ListOfSchemaVariable where to add the found
@@ -66,6 +68,7 @@ public class TacletSchemaVariableCollector extends Visitor {
 	prgSVColl.start();
 	return prgSVColl.getSchemaVariables();
     }
+    
 
     private ListOfSchemaVariable collectSVInProgram
 	(Term t, ListOfSchemaVariable vars) {
@@ -77,23 +80,23 @@ public class TacletSchemaVariableCollector extends Visitor {
 	return prgSVColl.getSchemaVariables();
     }
     
+    
     /** 
      * visits the Term in post order {@link Term#execPostOrder(Visitor)} and 
      * collects all found schema variables 
      * @param t the Term whose schema variables are collected 
      */  
+    @Override
     public void visit(Term t) {	
 	final Operator op = t.op();
         if (op instanceof Modality || 
                 op instanceof ModalOperatorSV) {
 	    varList = collectSVInProgram(t.javaBlock(), varList);
-	} else if (op instanceof QuanUpdateOperator) {
-            varList = collectSVInQuanUpdateOperator(op, varList);
+	} else if (op instanceof ElementaryUpdate) {
+            varList = collectSVInElementaryUpdate((ElementaryUpdate)op, varList);
         } else if (op instanceof WhileInvRule) {
  	    varList = collectSVInProgram(t, varList);
- 	} else if (op instanceof SchemaVariableContainer) {
- 	    varList = varList.prepend(((SchemaVariableContainer)op).collectSV(varList));
-        }
+ 	}
         
 	for (int j=0, ar = t.arity(); j<ar; j++) {
 	    for (int i=0, sz = t.varsBoundHere(j).size(); i<sz; i++) {
@@ -107,47 +110,48 @@ public class TacletSchemaVariableCollector extends Visitor {
         
         if (op instanceof SchemaVariable) {
             varList=varList.prepend((SchemaVariable)op);
-        }        
+        }
     }
 
+    
     /**
-     * collects all schema variables occurring as part of a quantified update 
-     * operator
-     * @param op the {@link QuanUpdateOperator} to be scanned for schemavariables
+     * collects all schema variables occurring on the lhs of an elementary update
+     * @param op the ElementaryUpdate operator to be scanned for schemavariables
      * @param vars the ListOfSchemaVariables with already found schema variables
      * @return a list of schema variables containing the ones of <code>vars</code> 
      *   together with the schema variables found in <code>op</code>
      */
-    private ListOfSchemaVariable collectSVInQuanUpdateOperator(
-            final Operator op, ListOfSchemaVariable vars) {
+    private ListOfSchemaVariable collectSVInElementaryUpdate(
+	    	ElementaryUpdate op, 
+	    	ListOfSchemaVariable vars) {
         ListOfSchemaVariable result = vars;
-        final QuanUpdateOperator quan = (QuanUpdateOperator) op;
-        for (int i = 0, locCount = quan.locationCount(); i < locCount; i++) {
-            final UpdateableOperator currentLocation = quan.location(i);
-            if (currentLocation instanceof SchemaVariable) {
-                result = result.prepend((SchemaVariable) currentLocation);
-            }
+        
+        if(op.lhs() instanceof SchemaVariable) {
+            result = result.prepend((SchemaVariable) op.lhs());
         }
+
         return result;
     }
+    
     
     /** @return iterator of the found Variables */
     public IteratorOfSchemaVariable varIterator() {
 	return varList.iterator();
     }
+    
 
     /** @return number of the found variables */
     public int size() {
 	return varList.size();
     }
 
+    
     /** @return true iff term contains the given variable */
     public boolean contains(SchemaVariable var) {
 	return varList.contains(var);
     }
 
    
-    
     /** collects all variables in a Semisequent 
      * @param semiseq the Semisequent to visit
      */
@@ -158,6 +162,7 @@ public class TacletSchemaVariableCollector extends Visitor {
 	}
     }
 
+    
     /** goes through the given sequent an collects all vars found
      * @param seq the Sequent to visit
      */

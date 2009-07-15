@@ -18,18 +18,20 @@ public class PrimitiveSort extends AbstractNonCollectionSort {
     = SetAsListOfSort.EMPTY_SET;
 
     /** direct supersorts */
-    SetOfSort ext = EMPTY_SORT_SET;
+    private final SetOfSort ext;
+       
+    public PrimitiveSort(Name name, SetOfSort ext) {
+        super(name);
+        this.ext = ext;
+    }
     
     /** creates a Sort (with a new equality symbol for this sort) */
     public PrimitiveSort(Name name) {
-        super(name);        
+        this(name, EMPTY_SORT_SET);        
     }
     
-    public PrimitiveSort(Name name, SetOfSort ext) {
-        super( name );
-        this.ext = ext;        
-    }
-   
+
+    @Override    
     public SetOfSort extendsSorts () {
         return ext;
     }
@@ -37,6 +39,7 @@ public class PrimitiveSort extends AbstractNonCollectionSort {
     /**
      * @return the sorts of the predecessors of this sort
      */
+    @Override
     public boolean extendsTrans(Sort sort) {
         if (sort == this || sort == Sort.ANY) {
             return true;

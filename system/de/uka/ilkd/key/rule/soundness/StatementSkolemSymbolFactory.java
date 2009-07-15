@@ -181,7 +181,7 @@ public class StatementSkolemSymbolFactory extends SkolemSymbolTacletFactory {
         final SchemaVariable stmtSV  =
             SchemaVariableFactory.createProgramSV ( createUniquePEName("stmt"),
                                                     ProgramSVSort.STATEMENT,
-                                                    false );
+                                                    false);
         findJT[branchNum] = (Statement)stmtSV;
         
         final Then thenLeg = new Then ( (Statement)stmtSV );

@@ -22,7 +22,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.SetOfClassInvariant;
 
@@ -95,12 +94,12 @@ public class StrongOperationContractPO extends AbstractPO {
                                                 toPV(paramVars));
         
         //build definitions for @pre-functions
-        Update atPreDefinitions 
+        Term atPreDefinitions 
             = APF.createAtPreDefinitions(atPreFunctions, services);
    
         //put everyhing together
         Term poTerm = TB.imp(TB.and(preTerm, assumedInvsTerm), 
-                             uf.apply(atPreDefinitions, postUpdateTerm));
+                             TB.apply(atPreDefinitions, postUpdateTerm));
         poTerms = new Term[]{poTerm};
         
         //register everything in namespaces

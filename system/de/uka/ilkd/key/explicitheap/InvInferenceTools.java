@@ -156,8 +156,8 @@ class InvInferenceTools {
      */
     public MethodFrame getInnermostMethodFrame(Term term, Services services) {
         //ignore updates
-        while(term.op() instanceof IUpdateOperator) {
-            term = term.sub(((IUpdateOperator)term.op()).targetPos());
+        while(term.op() instanceof UpdateApplication) {
+            term = term.sub(((UpdateApplication)term.op()).targetPos());
         }
         
         //the remaining term should have a Java block 
@@ -260,8 +260,8 @@ class InvInferenceTools {
      * Removes leading updates from the passed term.
      */
     public Term goBelowUpdates(Term term) {
-        while(term.op() instanceof IUpdateOperator) {
-            term = term.sub(((IUpdateOperator)term.op()).targetPos());
+        while(term.op() instanceof UpdateApplication) {
+            term = term.sub(((UpdateApplication)term.op()).targetPos());
         }        
         return term;
     }

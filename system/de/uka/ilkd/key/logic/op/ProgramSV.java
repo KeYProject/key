@@ -29,29 +29,47 @@ import de.uka.ilkd.key.rule.inst.ProgramList;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
-public class ProgramSV extends SortedSchemaVariable 
+public final class ProgramSV extends AbstractSV 
     implements ProgramConstruct, UpdateableOperator {
-
+    
     private static final ProgramList EMPTY_LIST_INSTANTIATION = 
-        new ProgramList
-        (new ArrayOfProgramElement(new ProgramElement[0]));
+            new ProgramList(new ArrayOfProgramElement(new ProgramElement[0]));    
+    
+    private final boolean isListSV;
+
 
     /** 
      * creates a new SchemaVariable used as a placeholder for program
      * constructs
      * @param name the Name of the SchemaVariable
-     * @param listSV a boolean which is true iff the schemavariable is
      * allowed to match a list of program constructs
      */    
-    ProgramSV(Name name, ProgramSVSort s, boolean listSV) {
-	super(name, ProgramConstruct.class, s, listSV);	
+    ProgramSV(Name name, ProgramSVSort s, boolean isListSV) {
+	super(name, EMPTY_ARG_SORTS, s, false, false);
+	this.isListSV = isListSV;
     }
     
- 
-    @Override
-    public boolean isProgramSV() {
-	return true;
+    
+    public boolean isListSV() {
+	return isListSV;
     }
+    
+    
+    /** 
+     * this method tests on object identity
+     */
+    @Override
+    public boolean equalsModRenaming(SourceElement se, 
+				     NameAbstractionTable nat) {
+	return se == this;
+    }    
+    
+
+    @Override
+    public boolean mayBeAliasedBy(UpdateableOperator loc) {
+        return true;
+    }
+    
     
     /** @return comments if the schemavariable stands for programm
      * construct and has comments attached to it (not supported yet)
@@ -320,6 +338,39 @@ x     * @return the updated match conditions including mapping
         insts = insts.add(this, list);
         return insts == null ? null : matchCond.setInstantiations(insts);
     }
+    
+    
+    private MatchConditions matchListSV(SourceData source, MatchConditions matchCond) {
+	final Services services = source.getServices();
+	ProgramElement src = source.getSource();
+
+	if (src == null) {
+	    return addProgramInstantiation(EMPTY_LIST_INSTANTIATION, matchCond, services);
+	}
+
+	SVInstantiations instantiations = matchCond.getInstantiations();
+
+	final ExecutionContext ec = instantiations.getExecutionContext();        
+
+	final java.util.ArrayList<ProgramElement> matchedElements = 
+	    new java.util.ArrayList<ProgramElement>();        
+
+	while (src != null) {
+	    if (!check(src, ec, services)) {
+		Debug.out("taclet: Stopped list matching because of " +
+			"incompatible elements", this, src);
+		break;
+	    }
+	    matchedElements.add(src);            
+	    source.next();
+	    src = source.getSource();
+	}
+
+	Debug.out("Program list match: ", this, matchedElements);
+	return addProgramInstantiation(new ProgramList(new ArrayOfProgramElement(matchedElements)), 
+		matchCond, services);
+    }   
+    
 
     /** 
      * returns true, if the given SchemaVariable can stand for the
@@ -340,10 +391,11 @@ x     * @return the updated match conditions including mapping
         
 
     @Override
-    public MatchConditions match(SourceData source, MatchConditions matchCond) {        
-        if (isListSV()) {
-            return matchListSV(source, matchCond);
-        }
+    public MatchConditions match(SourceData source, MatchConditions matchCond) {  
+	if(isListSV()) {
+	    return matchListSV(source, matchCond);
+        }	
+	
         final Services services  = source.getServices();        
         final ProgramElement src = source.getSource();        
         Debug.out("Program match start (template, source)", this, src);
@@ -379,35 +431,4 @@ x     * @return the updated match conditions including mapping
         source.next();   
         return matchCond;
     }
-
-    private MatchConditions matchListSV(SourceData source, MatchConditions matchCond) {
-        final Services services = source.getServices();
-        ProgramElement src = source.getSource();
-        
-        if (src == null) {
-            return addProgramInstantiation(EMPTY_LIST_INSTANTIATION, matchCond, services);
-        }
-        
-        SVInstantiations instantiations = matchCond.getInstantiations();
-        
-        final ExecutionContext ec = instantiations.getExecutionContext();        
-        
-        final java.util.ArrayList<ProgramElement> matchedElements = 
-            new java.util.ArrayList<ProgramElement>();        
-
-        while (src != null) {
-            if (!check(src, ec, services)) {
-                Debug.out("taclet: Stopped list matching because of " +
-                                "incompatible elements", this, src);
-                break;
-            }
-            matchedElements.add(src);            
-            source.next();
-            src = source.getSource();
-        }
-
-        Debug.out("Program list match: ", this, matchedElements);
-        return addProgramInstantiation(new ProgramList(new ArrayOfProgramElement(matchedElements)), 
-                matchCond, services);
-    }	
 }

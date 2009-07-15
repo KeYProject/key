@@ -10,33 +10,39 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.util.Debug;
 
-class FormulaSV extends AbstractTermSV {
-    /** creates a new SchemaVariable. That is used as placeholder for
-     * formulae.
-     * @param name the Name of the SchemaVariable
-     * @param rigidness true iff this SV may only match rigid
-     * terms/formulas
-     * @param listSV a boolean which is true iff the schemavariable is allowed
-     * to match a list of formulas
-     */    
-    FormulaSV(Name name, boolean listSV, boolean rigidness) {
-	super(name, Sort.FORMULA, listSV, rigidness);
-    }
+public final class FormulaSV extends AbstractSV {
     
     /** 
-     * returns true iff this SchemaVariable is used to match
-     * a formula 
-     * @return true iff this SchemaVariable is used to match
-     * a formula
-     */
-    public boolean isFormulaSV() {
-	return true;
-    }    
+     * Creates a new SchemaVariable that is used as placeholder for
+     * formulae.
+     * @param name the name of the SchemaVariable
+     * @param isRigid true iff this SV may only match rigid formulas
+     */    
+    FormulaSV(Name name, boolean isRigid) {
+	super(name, EMPTY_ARG_SORTS, Sort.FORMULA, isRigid, true);
+    }
     
-    /** toString */
+
+    @Override
+    public MatchConditions match(SVSubstitute subst, 
+	    		         MatchConditions mc,
+	    		         Services services) {
+        if (subst instanceof Term) {
+            return addInstantiation((Term) subst, mc, services);
+        }
+        Debug.out("FAILED. Schemavariable of this kind only match terms.");
+        return null;
+    }
+
+    
+    @Override
     public String toString() {
 	return toString("formula");
     }	

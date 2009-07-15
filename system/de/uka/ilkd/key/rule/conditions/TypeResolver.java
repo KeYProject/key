@@ -104,14 +104,10 @@ public abstract class TypeResolver {
     
     public static class ElementTypeResolverForSV extends TypeResolver {
 
-        private final SortedSchemaVariable resolveSV;
+        private final SchemaVariable resolveSV;
         
         public ElementTypeResolverForSV(SchemaVariable sv) {
-            if (!(sv instanceof SortedSchemaVariable)) {
-                throw new IllegalArgumentException("Expected a SortedSchemaVariable," +
-                                " but is "+sv);
-            }
-            this.resolveSV = (SortedSchemaVariable) sv;
+            this.resolveSV = sv;
         }
         
         public boolean isComplete(SchemaVariable sv, SVSubstitute instCandidate, 

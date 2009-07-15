@@ -250,17 +250,17 @@ public final class TermBuilder {
     //updates    
     //-------------------------------------------------------------------------
     
-    public Term elemUpd(UpdateableOperator pv, Term rhs) {
-	Operator op = ElementaryUpdate.getInstance(pv);
-	return tf.createFunctionTerm(op, rhs);
+    public Term elementary(UpdateableOperator lhs, Term rhs) {
+	Operator op = ElementaryUpdate.getInstance(lhs);
+	return func(op, rhs);
     }
     
     
-    public Term elemUpd(Services services, Term lhs, Term rhs) {
+    public Term elementary(Services services, Term lhs, Term rhs) {
 	HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	if(lhs.op() instanceof UpdateableOperator) {
 	    assert lhs.arity() == 0 : "uh oh: " + lhs;
-	    return elemUpd((UpdateableOperator)lhs.op(), rhs);
+	    return elementary((UpdateableOperator)lhs.op(), rhs);
 	} else if(heapLDT.getSortOfSelect(lhs.op()) != null
 		  && lhs.sub(0).op().equals(heapLDT.getHeap())) {
 	    final Term heapTerm   = lhs.sub(0);
@@ -272,7 +272,7 @@ public final class TermBuilder {
                 		       objectTerm, 
                 		       fieldTerm, 
                 		       rhs);
-	    return elemUpd(heapLDT.getHeap(), fullRhs);
+	    return elementary(heapLDT.getHeap(), fullRhs);
 	} else {
 	    throw new TermCreationException("Not a legal lhs: " + lhs);
 	}
@@ -280,7 +280,7 @@ public final class TermBuilder {
     
     
     public Term skip() {
-	return tf.createFunctionTerm(UpdateJunctor.SKIP);
+	return func(UpdateJunctor.SKIP);
     }
     
     
@@ -290,20 +290,109 @@ public final class TermBuilder {
 	} else if(u2.sort() != Sort.UPDATE) {
 	    throw new TermCreationException("Not an update: " + u2);
 	}
-	return tf.createFunctionTerm(UpdateJunctor.PARALLEL_UPDATE,
-		                     u1,
-		                     u2);
+	if(u1.op() == UpdateJunctor.SKIP) {
+	    return u2;
+	} else if(u2.op() == UpdateJunctor.SKIP) {
+	    return u1;
+	}
+	return func(UpdateJunctor.PARALLEL_UPDATE, u1, u2);
     }
     
     
-    public Term applyUpd(Term u, Term t) {
-	if(u.sort() != Sort.UPDATE) {
-	    throw new TermCreationException("Not an update: " + u);
+    public Term parallel(Term[] updates) {
+	Term result = skip();
+	for(int i = 0; i < updates.length; i++) {
+	    result = parallel(result, updates[i]);
+	}
+	return result;
+    }
+    
+    
+    public Term parallel(ListOfTerm updates) {
+	return parallel(updates.toArray());
+    }
+    
+    
+    public Term parallel(Services services, Term[] lhss, Term[] values) {
+	if(lhss.length != values.length) {
+	    throw new TermCreationException(
+		    "Tried to create parallel update with " 
+		    + lhss.length + " locs and " + values.length + " values");
+	}
+	Term[] updates = new Term[lhss.length];
+	for(int i = 0; i < updates.length; i++) {
+	    updates[i] = elementary(services, lhss[i], values[i]);
+	}
+	return parallel(updates);
+    }
+    
+    
+    public Term sequential(Term u1, Term u2) {
+	return parallel(u1, apply(u1, u2));
+    }
+    
+    
+    public Term sequential(ListOfTerm updates) {
+	if(updates.size() == 0) {
+	    return skip();
+	} else if(updates.size() == 1) {
+	    return updates.head();
+	} else {
+	    return sequential(updates.head(), sequential(updates.tail()));
+	}    
+    }
+    
+
+    public Term apply(Term update, Term target) {
+	if(update.sort() != Sort.UPDATE) {
+	    throw new TermCreationException("Not an update: " + update);
 	}
 	return tf.createFunctionTerm(UpdateApplication.UPDATE_APPLICATION,
-		                     u, 
-		                     t);
+		                     update, 
+		                     target);
     }
+    
+    
+    //intention: does not simplify, unlike apply()
+    public Term prepend(Term update, Term target) {
+	return apply(update, target);
+    }
+    
+    
+    public Term applyElementary(Services services,
+	                        Term loc,
+	                        Term value,
+	                        Term target) {
+	return apply(elementary(services, loc, value), target);
+    }
+    
+    
+    public Term applyParallel(Term[] updates, Term target) {
+	return apply(parallel(updates), target);
+    }
+    
+    
+    public Term applyParallel(ListOfTerm updates, Term target) {	
+	return apply(parallel(updates), target);
+    }
+    
+    
+    public Term applyParallel(Services services, 
+	                      Term[] lhss, 
+	                      Term[] values, 
+	                      Term target) {
+	return apply(parallel(services, lhss, values), target);
+    }
+    
+    
+    public Term applySequential(ListOfTerm updates, Term target) {
+	if(updates.size() == 0) {
+	    return target;
+	} else {
+	    return apply(updates.head(), 
+		         applySequential(updates.tail(), target));
+	}    	
+    }    
     
     
     

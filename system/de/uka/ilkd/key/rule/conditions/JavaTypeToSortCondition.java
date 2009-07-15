@@ -16,7 +16,8 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
+import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -52,14 +53,16 @@ public class JavaTypeToSortCondition implements VariableCondition {
 
 
     public static boolean checkSortedSV(final SchemaVariable exprOrTypeSV) {
-        if ( !( exprOrTypeSV instanceof SortedSchemaVariable) && 
-                !exprOrTypeSV.isTermSV()) {
-            final Sort svSort = ( (SortedSchemaVariable)exprOrTypeSV ).sort ();
-            if ((svSort == ProgramSVSort.EXPRESSION || svSort == ProgramSVSort.TYPE) )  {
-                return false;
-            }
+        final Sort svSort = exprOrTypeSV.sort ();
+        if (svSort == ProgramSVSort.EXPRESSION
+             || svSort == ProgramSVSort.SIMPLEEXPRESSION
+             || svSort == ProgramSVSort.NONSIMPLEEXPRESSION
+             || svSort == ProgramSVSort.TYPE
+             || exprOrTypeSV instanceof TermSV
+             || exprOrTypeSV instanceof SkolemTermSV)  {
+            return true;
         }
-        return true;
+        return false;
     }
   
     

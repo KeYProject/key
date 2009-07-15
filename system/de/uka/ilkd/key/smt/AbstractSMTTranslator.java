@@ -1093,8 +1093,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    //op is a modality. So translate it as an uninterpreted predicate.
 	    //equal modalities are translated with the same predicate
 	    return this.getModalityPredicate(term, quantifiedVars, services);
-	} else if (op instanceof QuanUpdateOperator) {
-	    //op is a update. So translate it as an uninterpreted predicate.
+	} else if (op instanceof UpdateApplication) {
+	    //op is an update. So translate it as an uninterpreted predicate.
 	    //equal updates are translated with the same predicate.
 	    return this.getModalityPredicate(term, quantifiedVars, services);
 	} else if (op == IfThenElse.IF_THEN_ELSE) {

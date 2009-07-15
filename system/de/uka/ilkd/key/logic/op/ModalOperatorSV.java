@@ -10,8 +10,6 @@
 
 package de.uka.ilkd.key.logic.op;
 
-import java.util.HashSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -19,16 +17,22 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
 
-public class ModalOperatorSV extends OperatorSV  {
+public final class ModalOperatorSV extends AbstractSV  {
     
-    /** creates a new SchemaVariable. That is used as placeholder for
+    /** 
+     * the set of modalities this sv can match 
+     */
+    private final SetOfModality modalities;    
+    
+    
+    /** creates a new SchemaVariable that is used as placeholder for
      * modal operators.
      * @param name the Name of the SchemaVariable
-     * @param arity the arity of the modal operators matched by this SV
      * @param modalities modal operators matched by this SV
      */    
-    ModalOperatorSV(Name name, int arity, HashSet modalities) {
-        super(name, Modality.class, Sort.FORMULA, arity, modalities);	
+    ModalOperatorSV(Name name, SetOfModality modalities) {
+        super(name, new Sort[]{Sort.FORMULA}, Sort.FORMULA, false, false);
+        this.modalities = modalities;
     }
     
 
@@ -40,32 +44,49 @@ public class ModalOperatorSV extends OperatorSV  {
 	return result;
     }
 
-    /**
-     * @return true if the value of "term" having this operator as
-     * top-level operator and may not be
-     * changed by modalities
-     */
-    public boolean isRigid (Term term) {
-	return (term.javaBlock ().isEmpty());
-    }    
     
-    /**
-     * (non-Javadoc)
-     * @see de.uka.ilkd.key.logic.op.Operator#match(SVSubstitute, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
-     */
-    public MatchConditions match(SVSubstitute subst, MatchConditions mc,
-            Services services) {        
+    @Override
+    public MatchConditions match(SVSubstitute subst, 
+	    			 MatchConditions mc,
+	    			 Services services) {        
+        
         if (!(subst instanceof Modality)) {
-            Debug.out("FAILED. ModalitySV matches only modalities (template, orig)",
-                    this, subst);
+            Debug.out("FAILED. ModalOperatorSV matches only modalities " +
+                        "(template, orig)",
+                      this, subst);
             return null;
-        }  
-        return super.match(subst, mc, services);
+        }                
+        
+        final Modality m = (Modality) subst;
+        if(modalities.contains(m)) {
+            Operator o = (Operator) mc.getInstantiations().getInstantiation(this);
+            if(o == null) {
+                return mc.setInstantiations(mc.getInstantiations().add(this, m));
+            } else {
+                if(o != m) {
+                    Debug.out("FAILED. Already instantiated with a different operator.");
+                    return null;
+                }
+            }                           
+        }
+        
+        Debug.out("FAILED. template is a schema operator,"
+                +" term is an operator, but not a matching one");
+        return null; 
     }
+    
      
-
+    /**
+     * returns an unmodifiable set of operators this schemavariable can match
+     */
+    public SetOfModality getModalities() {
+        return modalities;
+    }
+    
+    
+    
+    @Override
     public String toString() {
 	return toString(" (modal operator)");
     }
-
 }

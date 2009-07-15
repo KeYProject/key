@@ -24,8 +24,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 public final class Modality extends AbstractSortedOperator {
 
-    private static final HashMap<String, Modality> nameMap = 
-        new HashMap<String, Modality>(10);
+    private static final HashMap<String, Modality> nameMap 
+    	= new HashMap<String, Modality>(10);
     
     /** 
      * The diamond operator of dynamic logic. A formula

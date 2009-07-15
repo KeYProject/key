@@ -17,8 +17,8 @@ import java.util.Set;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IteratorOfEntryOfSchemaVariableAndInstantiationEntry;
+import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
 import de.uka.ilkd.key.logic.sort.*;
 
 
@@ -111,15 +111,14 @@ public class GenericSortInstantiations {
      */
     public Boolean checkSorts ( InstantiationEntry p_entry ) {
 	if ( !( p_entry instanceof TermInstantiation ) ||
-	     p_entry.getSchemaVariable ().isProgramSV () )
+	     p_entry.getSchemaVariable() instanceof ProgramSV )
 	    return Boolean.TRUE;
 
 	final GenericSortCondition c =
 	    GenericSortCondition.createCondition ( p_entry );
 	if ( c != null ) return checkCondition ( c );
 	
-	final SortedSchemaVariable sv =
-	    (SortedSchemaVariable)p_entry.getSchemaVariable ();
+	final SchemaVariable sv = p_entry.getSchemaVariable ();
         final Term term = ( (TermInstantiation)p_entry ).getTerm ();
         
         if ( GenericSortCondition.subSortsAllowed ( sv ) )
@@ -191,7 +190,7 @@ public class GenericSortInstantiations {
      * not yet instantiated
      */
     public Sort getRealSort ( SchemaVariable p_sv, Services services ) {
-	return getRealSort ( ((SortedSchemaVariable)p_sv).sort (), services );
+	return getRealSort ( p_sv.sort (), services );
     }
 
     public Sort getRealSort ( Sort p_s, Services services ) {

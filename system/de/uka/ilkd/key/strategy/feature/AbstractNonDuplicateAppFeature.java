@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.EntryOfSchemaVariableAndInstantiationEntry;
 import de.uka.ilkd.key.logic.op.IteratorOfEntryOfSchemaVariableAndInstantiationEntry;
 import de.uka.ilkd.key.logic.op.MapFromSchemaVariableToInstantiationEntry;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.IteratorOfIfFormulaInstantiation;
@@ -122,7 +123,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
         while ( it.hasNext () ) {
             final EntryOfSchemaVariableAndInstantiationEntry entry0 = it.next ();
 
-            if ( entry0.key ().isNameSV () || entry0.key ().isSkolemTermSV () )
+            if ( entry0.key () instanceof SkolemTermSV )
                 continue;
                 
             final InstantiationEntry instEntry1 = insts1.get ( entry0.key () );

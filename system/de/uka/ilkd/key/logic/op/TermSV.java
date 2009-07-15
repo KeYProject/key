@@ -10,62 +10,43 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.util.Debug;
 
-class TermSV extends AbstractTermSV {
+public final class TermSV extends AbstractSV {
 
-    /**
-     * this flag indicates if the instantiation of this schemavariable must have
-     * the same static type (sort) as this SV itself
-     */
-    private final boolean strictSV;
-
-    /** creates a new SchemaVariable. That is used as placeholder for
-     * terms.
+    /** creates a new SchemaVariable that is used as placeholder for terms.
      * @param name the Name of the SchemaVariable
      * @param sort the Sort of the SchemaVariable and the matched type     
-     * @param listSV a boolean which is true iff the schemavariable is allowed
-     * to match a list of terms    
-     * @param rigidness true iff this SV may only match rigid
+     * @param isRigid true iff this SV may only match rigid
      * terms/formulas
-     * @param strictSV boolean indicating if the schemavariable is declared as strict
-     * forcing exact type match
+     * @param isStrict boolean indicating if the schemavariable is declared as 
+     * strict forcing exact type match
      */    
-    TermSV(Name    name,
-		   Sort    sort,
-		   boolean listSV,
-		   boolean rigidness, 
-                   boolean strictSV) {	
-        super(name, sort, listSV, rigidness);
-        this.strictSV = strictSV;
-	if (sort == Sort.FORMULA) {
-	    throw new RuntimeException("A TermSV is not allowed to"
-				       +" have the sort "+sort);
-	}	
-    }
-	
-    
-    /** returns true iff this SchemaVariable is used to match
-     * a term but not a formula
-     * @return true iff this SchemaVariable is used to match
-     * a term but not a formula
-     */
-    public boolean isTermSV() {
-	return true;
-    }
-	
-    /**
-     * @return true if the schemavariable has the strict modifier 
-     * which forces the instantiation to have exact the same sort
-     * as the schemavariable (or if the sv is of generic sort - 
-     * the instantiation of the generic sort)
-     */
-    public boolean isStrict () {
-        return strictSV;
+    TermSV(Name name, Sort sort, boolean isRigid, boolean isStrict) {	
+        super(name, EMPTY_ARG_SORTS, sort, isRigid, isStrict);
+        assert sort != Sort.FORMULA;
+        assert sort != Sort.UPDATE;
     }
     
-    /** toString */
+    
+    @Override
+    public MatchConditions match(SVSubstitute subst, 
+	    			 MatchConditions mc,
+	    			 Services services) {
+        if (subst instanceof Term) {
+            return addInstantiation((Term) subst, mc, services);
+        }
+        Debug.out("FAILED. Schemavariable of this kind only match terms.");
+        return null;
+    }
+
+    
+    @Override
     public String toString() {
         return toString(sort().toString()+" term");
     }

@@ -22,7 +22,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.speclang.OperationContract;
 
 
@@ -99,11 +98,11 @@ public class BehaviouralSubtypingOpPairPO extends AbstractPO {
                                                 toPV(paramVars));
         
         //build definitions for @pre-functions
-        Update atPreDefinitions 
+        Term atPreDefinitions 
             = APF.createAtPreDefinitions(atPreFunctions, services);
         
         //build postcondition implication
-        poTerms[1] = TB.imp(subPreTerm, uf.apply(atPreDefinitions, 
+        poTerms[1] = TB.imp(subPreTerm, TB.apply(atPreDefinitions, 
                                                  postUpdateTerm));
         poNames[1] = "Postconditions";
 

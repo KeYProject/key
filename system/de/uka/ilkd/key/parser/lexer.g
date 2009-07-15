@@ -47,10 +47,9 @@ tokens {
 	PROGRAM = "\\program";
 	FORMULA = "\\formula";
 	TERM = "\\term";
+	UPDATE = "\\update";
 	VARIABLES = "\\variables";
 	SKOLEMTERM = "\\skolemTerm";
-	LOCATION = "\\location";
-	FUNCTION = "\\function";
 	
         // used in contracts
 	MODIFIES = "\\modifies";
@@ -83,13 +82,11 @@ tokens {
 	ISNONIMPLICIT="\\isNonImplicit";
         ISENUMTYPE="\\isEnumType";
         DEPENDINGON = "\\dependingOn";
-        DEPENDINGONMOD = "\\dependingOnMod";
 	ISQUERY = "\\isQuery";
 	ISNONIMPLICITQUERY = "\\isNonImplicitQuery";
 	HASSORT = "\\hasSort";
 	ISLOCALVARIABLE = "\\isLocalVariable";
 	NOTISLOCALVARIABLE = "\\notIsLocalVariable";
-	ISUPDATED = "\\isUpdated";
 	ISUNIQUE = "\\isUnique";
 
 

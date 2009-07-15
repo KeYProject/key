@@ -185,10 +185,6 @@ GENERATED_LISTS=logic/SLListOfTerm \
 	logic/SLListOfFormulaChangeInfo \
 	proof/SLListOfTermTacletAppIndex \
 	strategy/SLListOfRuleAppContainer \
-	rule/updatesimplifier/SLListOfUpdate \
-	rule/updatesimplifier/SLListOfAssignmentPair \
-	rule/SLListOfIUpdateRule \
-	rule/SLListOfUpdatePair \
 	logic/SLListOfProgramElementName \
 	proof/mgt/SLListOfQuantifierPrefixEntry \
 	proof/SLListOfInstantiationProposer \
@@ -249,7 +245,8 @@ GENERATED_SETS=logic/SetAsListOfTerm collection/SetAsListOfString \
         proof/SetAsListOfGoalChooserBuilder \
 	strategy/SetAsListOfStrategyFactory \
 	logic/op/SetAsListOfUpdateableOperator \
-	speclang/SetAsListOfPositionedString
+	speclang/SetAsListOfPositionedString \
+        logic/op/SetAsListOfModality
 
 GENERATED_MAPS=	collection/MapAsListFromIntegerToString \
 	logic/op/MapAsListFromQuantifiableVariableToInteger \
@@ -286,8 +283,7 @@ GENERATED_ARRAYS=java/ArrayOfProgramElementExtnullInnull \
 	logic/ArrayOfTermExtnullInnull \
 	logic/sort/ArrayOfSortExtnullInnull \
 	java/abstraction/ArrayOfKeYJavaTypeExtnullInde.uka.ilkd.key.java.abstraction \
-	strategy/feature/ArrayOfFeatureExtnullInnull \
-	rule/updatesimplifier/ArrayOfAssignmentPairExtnullInnull
+	strategy/feature/ArrayOfFeatureExtnullInnull
 
 GENERATED_HEAPS= logic/LeftistHeapOfInteger \
 	strategy/LeftistHeapOfRuleAppContainer

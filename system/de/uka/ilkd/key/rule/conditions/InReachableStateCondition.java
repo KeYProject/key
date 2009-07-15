@@ -11,16 +11,16 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IUpdateOperator;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
  * This conditions checks if the update prefix is empty
  * and that the instantiation of the sv is the predicate 
- * <tt>inReachableState</tt> maybe proceeded by one Update
+ * <tt>inReachableState</tt> maybe preceeded by one Update
  */
 public class InReachableStateCondition extends VariableConditionAdapter {
 
@@ -44,8 +44,8 @@ public class InReachableStateCondition extends VariableConditionAdapter {
         
         Term t = (Term)subst;        
 
-        if (t.op() instanceof IUpdateOperator) {
-            t = ((IUpdateOperator)t.op()).target(t);
+        if (t.op() instanceof UpdateApplication) {
+            t = UpdateApplication.getTarget(t);
         } else {
             // would otherwise return inReachableState, not wrong but useless
            return false;

@@ -38,7 +38,6 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.speclang.*;
 
 
@@ -311,7 +310,7 @@ public abstract class EnsuresPO extends AbstractPO {
             locs[i]   = TB.var(formalParVars[i]);
             values[i] = TB.var(parVars[i]);
         }
-        Term updateTerm = TF.createUpdateTerm(services, locs, values, programTerm);
+        Term updateTerm = TB.applyParallel(services, locs, values, programTerm);
         
         return updateTerm;
     }
@@ -359,12 +358,12 @@ public abstract class EnsuresPO extends AbstractPO {
                                             postTerm);
         
         //build definitions for @pre-functions
-        Update atPreDefinitions = APF.createAtPreDefinitions(atPreFunctions, 
+        Term atPreDefinitions = APF.createAtPreDefinitions(atPreFunctions, 
                                                              services);
         
         //put everything together
-        Term result = TB.imp(TB.and(gaTerm, uf.apply(atPreDefinitions, preTerm)), 
-                             uf.apply(atPreDefinitions, programTerm));
+        Term result = TB.imp(TB.and(gaTerm, TB.apply(atPreDefinitions, preTerm)), 
+                             TB.apply(atPreDefinitions, programTerm));
         
         //save in field
         poTerms = new Term[]{result};

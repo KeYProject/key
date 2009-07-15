@@ -44,14 +44,25 @@ public final class UpdateApplication extends AbstractOperator {
     @Override
     public boolean isRigid() {
 	return true;
-    }    
+    }
+    
+    
+    public static int updatePos() {
+	return 0;
+    }
+    
+    
+    public static Term getUpdate(Term t) {
+	assert t.op() == UPDATE_APPLICATION;
+	return t.sub(updatePos());
+    }
     
     
     /**
      * @return the index of the subterm representing the formula/term the update
      *         is applied to
      */
-    public int targetPos() {
+    public static int targetPos() {
 	return 1;
     }
     
@@ -60,7 +71,8 @@ public final class UpdateApplication extends AbstractOperator {
      * returns the subterm representing the formula/term the update is applied to
      * @param t Term with this operator as top level operator
      */    
-    public Term target(Term t) {
+    public static Term getTarget(Term t) {
+	assert t.op() == UPDATE_APPLICATION;
 	return t.sub(targetPos());
     }
 }

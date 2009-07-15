@@ -22,10 +22,6 @@ import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.*;
-import de.uka.ilkd.key.rule.OldUpdateSimplifier;
-import de.uka.ilkd.key.rule.updatesimplifier.ArrayOfAssignmentPair;
-import de.uka.ilkd.key.rule.updatesimplifier.AssignmentPair;
-import de.uka.ilkd.key.rule.updatesimplifier.Update;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -38,7 +34,6 @@ public class InReachableStatePOBuilder {
     private static final TermBuilder TB = TermBuilder.DF;
     private static final ExplicitHeapConverter EHC = ExplicitHeapConverter.INSTANCE;
 
-    private final UpdateFactory uf;
     private final Services services;
     private final Sort intSort;
     private final ProgramVariable created;
@@ -47,7 +42,6 @@ public class InReachableStatePOBuilder {
     private final ProgramVariable arraylength;
 
     public InReachableStatePOBuilder(Services services) {
-        uf = new UpdateFactory(services, new OldUpdateSimplifier());
         this.services = services;
         this.intSort = services.getTypeConverter().getIntegerLDT().targetSort();
         this.created =
@@ -294,18 +288,18 @@ public class InReachableStatePOBuilder {
      *            preserveness
      * @return the closure of the relvant invariant formula
      */
-    private Term quanUpdateClosure(final AssignmentPair pair,
-            Term relevantInvariants) {
-        Term closure = relevantInvariants;
-        if (pair.nontrivialGuard()) {
-            closure = TB.imp(pair.guard(), closure);
-        }
-        if (pair.boundVars().size() > 0) {
-            closure =
-                    TB.tf().createQuantifierTerm(Quantifier.ALL, pair.boundVars(), closure);
-        }
-        return closure;
-    }
+//    private Term quanUpdateClosure(final AssignmentPair pair,
+//            Term relevantInvariants) {
+//        Term closure = relevantInvariants;
+//        if (pair.nontrivialGuard()) {
+//            closure = TB.imp(pair.guard(), closure);
+//        }
+//        if (pair.boundVars().size() > 0) {
+//            closure =
+//                    TB.tf().createQuantifierTerm(Quantifier.ALL, pair.boundVars(), closure);
+//        }
+//        return closure;
+//    }
 
     /**
      * conjunction of terms that state global invariants, i.e. which have to be
@@ -439,24 +433,24 @@ public class InReachableStatePOBuilder {
      * @param update the update U to prend
      * @return the formulae above, not null.
      */
-    private Term addNextToCreateEnumPO(ProgramVariable pv, Update update) {
-        assert pv.getContainerType().getJavaType() instanceof EnumClassDeclaration;
-        assert pv == ntc((ObjectSort) pv.getContainerType().getSort());
-
-        ObjectSort objSort = (ObjectSort) pv.getContainerType().getSort();
-        ProgramVariable clInit = cInitialized(objSort);
-
-        EnumClassDeclaration ed =
-                (EnumClassDeclaration) pv.getContainerType().getJavaType();
-        int count = ed.getNumberOfConstants();
-        Term countLit =
-                services.getTypeConverter().convertToLogicElement(
-                        new IntLiteral(count));
-
-        return update(update, TB.imp(TB.equals(TB.var(clInit), TB.TRUE(services)), TB.equals(
-                TB.var(pv), countLit)));
-
-    }
+//    private Term addNextToCreateEnumPO(ProgramVariable pv, Update update) {
+//        assert pv.getContainerType().getJavaType() instanceof EnumClassDeclaration;
+//        assert pv == ntc((ObjectSort) pv.getContainerType().getSort());
+//
+//        ObjectSort objSort = (ObjectSort) pv.getContainerType().getSort();
+//        ProgramVariable clInit = cInitialized(objSort);
+//
+//        EnumClassDeclaration ed =
+//                (EnumClassDeclaration) pv.getContainerType().getJavaType();
+//        int count = ed.getNumberOfConstants();
+//        Term countLit =
+//                services.getTypeConverter().convertToLogicElement(
+//                        new IntLiteral(count));
+//
+//        return update(update, TB.imp(TB.equals(TB.var(clInit), TB.TRUE(services)), TB.equals(
+//                TB.var(pv), countLit)));
+//
+//    }
 
     /**
      * generate a formula that ensures that for any enum constant the repository
@@ -477,18 +471,18 @@ public class InReachableStatePOBuilder {
      *            the update {U} to prepend the formula
      * @return the formula above, not null.
      */
-    private Term enumConstantPO(ProgramVariable pv, Update update) {
-        assert EnumClassDeclaration.isEnumConstant(pv);
-        ObjectSort objSort = (ObjectSort) pv.getKeYJavaType().getSort();
-
-        int index = EnumClassDeclaration.indexOf(pv);
-        Term indexLit =
-                services.getTypeConverter().convertToLogicElement(
-                        new IntLiteral(index));
-
-        return update(update, TB.equals(TB.var(pv), TB.func(rep(objSort), indexLit)));
-    }
-    
+//    private Term enumConstantPO(ProgramVariable pv, Update update) {
+//        assert EnumClassDeclaration.isEnumConstant(pv);
+//        ObjectSort objSort = (ObjectSort) pv.getKeYJavaType().getSort();
+//
+//        int index = EnumClassDeclaration.indexOf(pv);
+//        Term indexLit =
+//                services.getTypeConverter().convertToLogicElement(
+//                        new IntLiteral(index));
+//
+//        return update(update, TB.equals(TB.var(pv), TB.func(rep(objSort), indexLit)));
+//    }
+//    
     /**
      * A class that is marked as erroneous is neither initialized nor is its
      * initialization in progress.
@@ -522,34 +516,34 @@ public class InReachableStatePOBuilder {
      * @return a formula that evaluates to true if erroneous has been updated by
      *         U in an <tt>inReachableState</tt> comforming way
      */
-    private Term classErroneousUpdateIRSConform(Update update,
-            ProgramVariable[] implicitFields) {
-
-        final Term classErroneous = TB.equals(TB.var(implicitFields[0]), TRUE);
-
-        Term result =
-                classFieldUpdateConform(update, implicitFields[0],
-                        implicitFields[1], implicitFields[2], null);
-
-        final KeYJavaType currentType = implicitFields[0].getContainerType();
-        final ListOfKeYJavaType directSubTypes = getDirectSubtypes(currentType);
-
-        if (!directSubTypes.isEmpty()) {
-            final IteratorOfKeYJavaType it = directSubTypes.iterator();
-            Term subsNotInit = TB.tt();
-            while (it.hasNext()) {
-                final ProgramVariable subsCInitPV =
-                        cInitialized((ObjectSort) it.next().getSort());
-                subsNotInit = TB.and(subsNotInit, TB.equals(TB.var(subsCInitPV), FALSE));
-            }
-            result = TB.and(result, update(update, subsNotInit));
-        }
-
-        result =
-                TB.and(result, TB.imp(classErroneous, update(update, classErroneous)));
-
-        return result;
-    }
+//    private Term classErroneousUpdateIRSConform(Update update,
+//            ProgramVariable[] implicitFields) {
+//
+//        final Term classErroneous = TB.equals(TB.var(implicitFields[0]), TRUE);
+//
+//        Term result =
+//                classFieldUpdateConform(update, implicitFields[0],
+//                        implicitFields[1], implicitFields[2], null);
+//
+//        final KeYJavaType currentType = implicitFields[0].getContainerType();
+//        final ListOfKeYJavaType directSubTypes = getDirectSubtypes(currentType);
+//
+//        if (!directSubTypes.isEmpty()) {
+//            final IteratorOfKeYJavaType it = directSubTypes.iterator();
+//            Term subsNotInit = TB.tt();
+//            while (it.hasNext()) {
+//                final ProgramVariable subsCInitPV =
+//                        cInitialized((ObjectSort) it.next().getSort());
+//                subsNotInit = TB.and(subsNotInit, TB.equals(TB.var(subsCInitPV), FALSE));
+//            }
+//            result = TB.and(result, update(update, subsNotInit));
+//        }
+//
+//        result =
+//                TB.and(result, TB.imp(classErroneous, update(update, classErroneous)));
+//
+//        return result;
+//    }
 
     /**
      * A class that is being initialized is neither initialized nor erroneous.
@@ -574,15 +568,15 @@ public class InReachableStatePOBuilder {
      *   comforming way
      * 
      */
-    private Term classInitInProgressUpdateIRSConform(Update update,
-            ProgramVariable[] implicitFields) {
-
-        Term result =
-                classFieldUpdateConform(update, implicitFields[2],
-                        implicitFields[0], implicitFields[1], implicitFields[3]);
-
-        return result;
-    }
+//    private Term classInitInProgressUpdateIRSConform(Update update,
+//            ProgramVariable[] implicitFields) {
+//
+//        Term result =
+//                classFieldUpdateConform(update, implicitFields[2],
+//                        implicitFields[0], implicitFields[1], implicitFields[3]);
+//
+//        return result;
+//    }
 
     /**
      * A class that is marked as initialized is neither initialized nor is its
@@ -627,41 +621,41 @@ public class InReachableStatePOBuilder {
      *   comforming way
      * 
      */
-    private Term classInitializedUpdateIRSConform(Update update,
-            ProgramVariable[] implicitFields) {
-
-        final Term classInitialized = TB.equals(TB.var(implicitFields[1]), TRUE);
-
-        Term result =
-                classFieldUpdateConform(update, implicitFields[1],
-                        implicitFields[0], implicitFields[2], implicitFields[3]);
-        // direct supertypes
-
-        final ListOfKeYJavaType directSuperTypes =
-                services.getJavaInfo().getDirectSuperTypes(
-                        implicitFields[0].getContainerType());
-
-        if (!directSuperTypes.isEmpty()) {
-            final IteratorOfKeYJavaType it = directSuperTypes.iterator();
-            Term superTypesInit = TB.tt();
-            while (it.hasNext()) {
-                final ProgramVariable superCInitPV =
-                        cInitialized((ObjectSort) it.next().getSort());
-                superTypesInit =
-                        TB.and(superTypesInit, TB.equals(TB.var(superCInitPV), TRUE));
-            }
-            result =
-                    TB.and(result, update(update, TB.imp(classInitialized,
-                            superTypesInit)));
-        }
-
-        // reachable <tt>inReachableState</tt> state
-        result =
-                TB.and(result, TB.imp(classInitialized, update(update,
-                        classInitialized)));
-
-        return result;
-    }
+//    private Term classInitializedUpdateIRSConform(Update update,
+//            ProgramVariable[] implicitFields) {
+//
+//        final Term classInitialized = TB.equals(TB.var(implicitFields[1]), TRUE);
+//
+//        Term result =
+//                classFieldUpdateConform(update, implicitFields[1],
+//                        implicitFields[0], implicitFields[2], implicitFields[3]);
+//        // direct supertypes
+//
+//        final ListOfKeYJavaType directSuperTypes =
+//                services.getJavaInfo().getDirectSuperTypes(
+//                        implicitFields[0].getContainerType());
+//
+//        if (!directSuperTypes.isEmpty()) {
+//            final IteratorOfKeYJavaType it = directSuperTypes.iterator();
+//            Term superTypesInit = TB.tt();
+//            while (it.hasNext()) {
+//                final ProgramVariable superCInitPV =
+//                        cInitialized((ObjectSort) it.next().getSort());
+//                superTypesInit =
+//                        TB.and(superTypesInit, TB.equals(TB.var(superCInitPV), TRUE));
+//            }
+//            result =
+//                    TB.and(result, update(update, TB.imp(classInitialized,
+//                            superTypesInit)));
+//        }
+//
+//        // reachable <tt>inReachableState</tt> state
+//        result =
+//                TB.and(result, TB.imp(classInitialized, update(update,
+//                        classInitialized)));
+//
+//        return result;
+//    }
 
     /**
      * the length attribute of arrays is always creater or equal than zero
@@ -701,34 +695,34 @@ public class InReachableStatePOBuilder {
         return directSubTypes;
     }
 
-    private Term classFieldUpdateConform(Update update, ProgramVariable fieldA,
-            ProgramVariable fieldB, ProgramVariable fieldC,
-            ProgramVariable fieldD) {
+//    private Term classFieldUpdateConform(Update update, ProgramVariable fieldA,
+//            ProgramVariable fieldB, ProgramVariable fieldC,
+//            ProgramVariable fieldD) {
+//
+//        final Term classA = TB.equals(TB.var(fieldA), TRUE);
+//        final Term classNotB = TB.equals(TB.var(fieldB), FALSE);
+//        final Term classNotC = TB.equals(TB.var(fieldC), FALSE);
+//
+//        if (fieldD != null) {
+//            return update(update, TB.imp(classA, TB.and(TB.and(classNotB, classNotC),
+//                    TB.equals(TB.var(fieldD), TRUE))));
+//        }
+//
+//        return update(update, TB.imp(classA, TB.and(classNotB, classNotC)));
+//    }
 
-        final Term classA = TB.equals(TB.var(fieldA), TRUE);
-        final Term classNotB = TB.equals(TB.var(fieldB), FALSE);
-        final Term classNotC = TB.equals(TB.var(fieldC), FALSE);
-
-        if (fieldD != null) {
-            return update(update, TB.imp(classA, TB.and(TB.and(classNotB, classNotC),
-                    TB.equals(TB.var(fieldD), TRUE))));
-        }
-
-        return update(update, TB.imp(classA, TB.and(classNotB, classNotC)));
-    }
-
-    // Helpers to build term
-    private Term conjunction(IteratorOfTerm it) {
-        Term result = TB.tt();
-        while (it.hasNext()) {
-            result = TB.and(result, it.next());
-        }
-        return result;
-    }
-
-    private Term update(Update update, Term target) {          
-        return uf.prepend(update, target);
-    }
+//    // Helpers to build term
+//    private Term conjunction(IteratorOfTerm it) {
+//        Term result = TB.tt();
+//        while (it.hasNext()) {
+//            result = TB.and(result, it.next());
+//        }
+//        return result;
+//    }
+//
+//    private Term update(Update update, Term target) {          
+//        return uf.prepend(update, target);
+//    }
 
 //    private Term createdOrNull(final Term t_o_a) {
 //        return TB.or(TB.equals(TB.dot(t_o_a, created), TRUE), TB.equals(t_o_a,
@@ -795,12 +789,12 @@ public class InReachableStatePOBuilder {
         return new LogicVariable(name, t.sort());
     }
 
-    private LogicVariable[] atPre(AssignmentPair pair) {
-        final Term[] subs = pair.locationSubs();
-        final LogicVariable[] result = new LogicVariable[subs.length];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = atPre(subs[i], i);
-        }
-        return result;
-    }
+//    private LogicVariable[] atPre(AssignmentPair pair) {
+//        final Term[] subs = pair.locationSubs();
+//        final LogicVariable[] result = new LogicVariable[subs.length];
+//        for (int i = 0; i < result.length; i++) {
+//            result[i] = atPre(subs[i], i);
+//        }
+//        return result;
+//    }
 }

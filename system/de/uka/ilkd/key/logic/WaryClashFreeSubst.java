@@ -105,7 +105,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
 	if ( !getSubstitutedTerm ().isRigid () ) {
 	    if ( t.op () instanceof Modality )
 		return applyOnModality ( t );		
-	    if ( t.op () instanceof IUpdateOperator )
+	    if ( t.op () instanceof UpdateApplication )
 		return applyOnUpdate   ( t );
 	    if ( t.op () instanceof SVSkolemFunction )
 		return applyToSVSkolem ( t );
@@ -136,10 +136,10 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      * PRECONDITION: <code>warysvars != null</code>
      */
     private Term applyOnUpdate ( Term t ) {
-        final IUpdateOperator updOp = (IUpdateOperator)t.op ();
+        final UpdateApplication updOp = (UpdateApplication)t.op ();
         
 	// only the last child is below the update
-	final Term target = updOp.target ( t );
+	final Term target = updOp.getTarget ( t );
 	if ( !target.freeVars ().contains ( getVariable () ) )
 	    return super.apply1 ( t );
 

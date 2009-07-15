@@ -105,11 +105,6 @@ public class Goal  {
         tagManager = new FormulaTagManager ( this );
     }
 
-    /** returns the simplifier that has to be used */
-    public OldUpdateSimplifier simplifier() {
-	return proof().simplifier();
-    }
-
     /** this object manages the tags for all formulas of the sequent */
     public FormulaTagManager getFormulaTagManager () {
     	return tagManager;
@@ -709,48 +704,6 @@ public class Goal  {
     }
 
 
-
-
-    public static void applyUpdateSimplifier( ListOfGoal goalList ) {
-        final IteratorOfGoal it = goalList.iterator();
-        while ( it.hasNext() ) {
-            it.next ().applyUpdateSimplifier();
-        }
-    }
-    
-    public void applyUpdateSimplifier() {
-        applyUpdateSimplifier(true);
-        applyUpdateSimplifier(false);
-    }
-
-
-    private void applyUpdateSimplifier (boolean antec) {
-	    final Constraint userConstraint =
-	        proof().getUserConstraint ().getConstraint ();
-	    final BuiltInRule rule = UpdateSimplificationRule.INSTANCE;
-	    
-	    final IteratorOfConstrainedFormula it = ( antec ? sequent().antecedent()
-	            : sequent().succedent()).iterator();
-	
-	    while ( it.hasNext () ) {
-	        final ConstrainedFormula cfma = it.next ();
-	        final PosInOccurrence pos = new PosInOccurrence(cfma,
-	                                                        PosInTerm.TOP_LEVEL,
-	                                                        antec );	
-	        if ( rule.isApplicable ( this, pos, userConstraint ) ) {
-	            BuiltInRuleApp app = new BuiltInRuleApp ( rule,
-	                                                      pos,
-	                                                      userConstraint );
-	            apply(app);
-	        }
-	    }
-	}
-
-
-
-
-
-    /** toString */
     public String toString() {
 	String result = (node.sequent().prettyprint(proof().getServices()).toString());
 	return result;

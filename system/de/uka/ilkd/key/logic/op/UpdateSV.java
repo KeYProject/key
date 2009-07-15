@@ -15,37 +15,33 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.util.Debug;
 
-public final class SkolemTermSV extends AbstractSV {
+
+public final class UpdateSV extends AbstractSV {
 
     /** 
-     * creates a new SchemaVariable. That is used as placeholder for
-     * skolem terms.
-     * @param name the Name of the SchemaVariable
-     * @param sort the Sort of the SchemaVariable and the matched type     
-     * allowed to match a list of program constructs
+     * Creates a new SchemaVariable that is used as placeholder for updates.
      */    
-    SkolemTermSV(Name name, Sort sort) {
-	super(name, EMPTY_ARG_SORTS, sort, true, false);	
-	assert sort != Sort.FORMULA;
-	assert sort != Sort.UPDATE;
+    UpdateSV(Name name) {	
+        super(name, EMPTY_ARG_SORTS, Sort.UPDATE, false, true);
+    }
+    
+    
+    @Override
+    public MatchConditions match(SVSubstitute subst, 
+	    			 MatchConditions mc,
+	    			 Services services) {
+        if (subst instanceof Term) {
+            return addInstantiation((Term) subst, mc, services);
+        }
+        Debug.out("FAILED. Schemavariable of this kind only match terms.");
+        return null;
     }
 	
     
     @Override
     public String toString() {
-	return toString(sort().toString()+" skolem term");
-    }
-
-
-    @Override
-    public MatchConditions match(SVSubstitute subst, 
-	    			 MatchConditions mc,
-	    			 Services services) {
-	if(subst.equals(mc.getInstantiations().getInstantiation(this))) {
-	    return mc;
-	} else {
-	    return null;
-	}
+        return toString(sort().toString()+" term");
     }
 }

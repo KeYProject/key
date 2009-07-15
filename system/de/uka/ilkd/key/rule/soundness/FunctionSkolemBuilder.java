@@ -13,9 +13,10 @@ package de.uka.ilkd.key.rule.soundness;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.IteratorOfSchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortedSchemaVariable;
+import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
 
@@ -47,10 +48,11 @@ public class FunctionSkolemBuilder extends AbstractPVPrefixSkolemBuilder {
 	while ( it.hasNext () ) {
 	    sv = it.next ();
 
-	    if ( sv.isTermSV () )
-		createSkolemTermSV    ( (SortedSchemaVariable)sv );
-	    else if ( sv.isFormulaSV () )
-		createSkolemFormulaSV ( (SortedSchemaVariable)sv );
+	    if (sv instanceof TermSV) {
+		createSkolemTermSV    ( sv );
+	    } else if ( sv instanceof FormulaSV ) {
+		createSkolemFormulaSV ( sv );
+	    }
 	}
 
 	return toIterator
@@ -63,7 +65,7 @@ public class FunctionSkolemBuilder extends AbstractPVPrefixSkolemBuilder {
         skolemFunctions.add ( p_factory.getFunctions() );
     }
 
-    private Term createSkolemFunction ( SortedSchemaVariable p_sv,
+    private Term createSkolemFunction ( SchemaVariable p_sv,
 					Name                 p_name,
 					Sort                 p_sort ) {
 
@@ -81,7 +83,7 @@ public class FunctionSkolemBuilder extends AbstractPVPrefixSkolemBuilder {
     }
 
     // Very inefficient
-    private ListOfTerm createLogicArgs ( SortedSchemaVariable p_sv ) {
+    private ListOfTerm createLogicArgs ( SchemaVariable p_sv ) {
 	IteratorOfSchemaVariable it  = taclet.getPrefix ( p_sv ).iterator ();
 	ListOfTerm               res = SLListOfTerm.EMPTY_LIST;
 
@@ -91,7 +93,7 @@ public class FunctionSkolemBuilder extends AbstractPVPrefixSkolemBuilder {
 	return res;
     }
 
-    private void createSkolemTermSV ( SortedSchemaVariable p_sv ) {	
+    private void createSkolemTermSV ( SchemaVariable p_sv ) {	
 
 	if ( !isInstantiated ( p_sv ) ) {
 	    final Name name = createUniqueName(p_sv.name ());
@@ -102,7 +104,7 @@ public class FunctionSkolemBuilder extends AbstractPVPrefixSkolemBuilder {
 
     }
 
-    private void createSkolemFormulaSV ( SortedSchemaVariable p_sv ) {
+    private void createSkolemFormulaSV ( SchemaVariable p_sv ) {
     	// currently formula skolem symbols are created just
     	// like function skolem symbols
 	createSkolemTermSV ( p_sv );

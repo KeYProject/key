@@ -197,7 +197,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
     public ProgramElementName getProgramElementName() {
 	if (name instanceof ProgramElementName) {
 	    return (ProgramElementName) name; 	
-	} else if (name instanceof SortedSchemaVariable) {
+	} else if (name instanceof SchemaVariable) {
 	    return (((ProgramSV)name).getProgramElementName());
 	} else return null;
     }

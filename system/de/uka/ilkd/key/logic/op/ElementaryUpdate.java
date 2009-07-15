@@ -12,8 +12,11 @@ package de.uka.ilkd.key.logic.op;
 
 import java.util.WeakHashMap;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.util.Debug;
 
 
 public final class ElementaryUpdate extends AbstractSortedOperator {
@@ -43,6 +46,28 @@ public final class ElementaryUpdate extends AbstractSortedOperator {
 	}
 	return result;
     }
+    
+    
+    @Override
+    public MatchConditions match(SVSubstitute subst, 
+	    			 MatchConditions mc, 
+	    			 Services services) {
+	if(this == subst) {
+	    return mc;
+	} else if(! (subst instanceof ElementaryUpdate)) {
+	    Debug.out("FAILED. Incompatible operators " 
+		      + "(template, operator)", this, subst);
+	    return null;
+	} 
+	
+	final ElementaryUpdate eu = (ElementaryUpdate) subst;
+	final MatchConditions result = lhs.match(eu.lhs, mc, services);
+	if(result == null) {
+	    Debug.out("FAILED. Lhs mismatch " 
+		      + "(template, operator)", this, eu);
+	}
+	return result;
+    }
 
 
     @Override
@@ -51,7 +76,7 @@ public final class ElementaryUpdate extends AbstractSortedOperator {
     }
     
     
-    public Operator pv() {
+    public UpdateableOperator lhs() {
 	return lhs;
     }
 }

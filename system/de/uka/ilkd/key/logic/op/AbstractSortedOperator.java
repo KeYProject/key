@@ -23,6 +23,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public abstract class AbstractSortedOperator extends AbstractOperator 
                                              implements SortedOperator {
     
+    protected static final ArrayOfSort EMPTY_ARG_SORTS = new ArrayOfSort();
+    
     private final Sort sort;
     private final ArrayOfSort argSorts;
    	
@@ -31,6 +33,8 @@ public abstract class AbstractSortedOperator extends AbstractOperator
 	    			     ArrayOfSort argSorts,
 	    		             Sort sort) {
 	super(name, argSorts.size());
+	assert argSorts != null;
+	assert sort != null;
 	this.argSorts = argSorts;	
 	this.sort = sort;
     }
