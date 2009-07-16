@@ -90,6 +90,15 @@ public class DecisionProcedureSettings implements Settings {
     
     private static DecisionProcedureSettings instance;
     
+    private static String EXECSTR = "[DecisionProcedure]Exec";
+    /** mapping of rule name (key) to execution string (value) */
+    private HashMap<String, String> execCommands = new HashMap<String, String>();
+    
+    /** the string separating different solver-command values. */
+    private static final String execSeperator1 = ":"; 
+    /** The String separating solvernames from commands in the settingsfile */
+    private static final String execSeperator2 = "="; 
+    
     /**
      * This is a singleton.
      */
@@ -111,8 +120,10 @@ public class DecisionProcedureSettings implements Settings {
      * @return the found SMTRule or <code>null</code> 
      */
     public RuleDescriptor findRuleByName(String ruleName) {
-	for (RuleDescriptor r : rules) {	    
-	    if (r.getRuleName().toString().equals(ruleName)) {
+	for (RuleDescriptor r : rules) {	
+	    Name descNameObj = r.getRuleName();
+	    String descName = descNameObj.toString();
+	    if (descName.equals(ruleName)) {
 		return r;
 	    }
 	}
@@ -206,8 +217,7 @@ public class DecisionProcedureSettings implements Settings {
 	this.readExecutionString(props);
     }
     
-    private static String EXECSTR = "[DecisionProcedure]Exec";
-    private HashMap<RuleDescriptor, String> execCommands = new HashMap<RuleDescriptor, String>();
+
     
     /**
      * read the execution strings from the properties file
@@ -217,13 +227,15 @@ public class DecisionProcedureSettings implements Settings {
 	String allCommands = props.getProperty(EXECSTR);
 	//all value pairs are stored separated by a |
 	if (allCommands != null) {
-	    String[] valuepairs = allCommands.split("||");
+	    String[] valuepairs = allCommands.split(execSeperator1);
+	    for (String s : valuepairs)
+		System.out.println(s);
 	    for (String s : valuepairs) {
-		String[] vals = s.split("|");
+		String[] vals = s.split(execSeperator2);
 		if (vals.length == 2) {
 		    //if vals does not contain exactly two items, the entry in the settingsfile is not valid
-		    RuleDescriptor rd = findRuleByName(vals[0]);
-		    execCommands.put(rd, vals[1]);
+		    //RuleDescriptor rd = findRuleByName(vals[0]);
+		    execCommands.put(vals[0], vals[1]);
 		}
 	    }
 	}
@@ -235,17 +247,21 @@ public class DecisionProcedureSettings implements Settings {
      */
     private void writeExecutionString(Properties prop) {
 	String toStore = "";
-	for (RuleDescriptor rd : execCommands.keySet()) {
-	    String comm = execCommands.get(rd);
-	    if (comm == null) {
-		comm = " ";
+	for (String s : execCommands.keySet()) {
+	    RuleDescriptor rd = this.findRuleByName(s);
+	    if (rd != NOT_A_RULE) {
+		//do not save the execcommand for the not_a_rule dummy
+		String comm = execCommands.get(s);
+	    	if (comm == null) {
+			comm = "";
+	    	}
+	    	toStore = toStore + rd.ruleName.toString() + execSeperator2 + comm + execSeperator1;
 	    }
-	    toStore = toStore + rd.ruleName.toString() + "|" + comm + "||";
 	}
 	//remove the las two || again
-	if (toStore.length() >= 2){
+	if (toStore.length() >= execSeperator1.length()){
 	    //if the program comes here, a the end ad extra || was added.
-	    toStore = toStore.substring(0, toStore.length()-2);
+	    toStore = toStore.substring(0, toStore.length()-execSeperator1.length());
 	}
 	prop.setProperty(EXECSTR, toStore);
     }
@@ -257,7 +273,7 @@ public class DecisionProcedureSettings implements Settings {
      */
     public void setExecutionCommand(RuleDescriptor rd, String command) {
 	SMTRule r = this.descriptorToRule.get(rd);
-	this.execCommands.put(rd, command);
+	this.execCommands.put(rd.ruleName.toString(), command);
 	if (r.isInstalled(true)) {
 	    //add the rule to the installed rules (if not there yet)
 	    if (!this.installedrules.contains(rd)) {
@@ -269,6 +285,7 @@ public class DecisionProcedureSettings implements Settings {
 		this.installedrules.remove(rd);
 	    }
 	}
+	this.fireSettingsChanged();
     }
     
     /**
@@ -287,7 +304,7 @@ public class DecisionProcedureSettings implements Settings {
      * @return the execution command
      */
     public String getExecutionCommand(AbstractSMTSolver r) {
-	return this.execCommands.get(this.findRuleByName(r.name()));
+	return this.execCommands.get(this.findRuleByName(r.name()).ruleName.toString());
     }
 
     /**
@@ -298,10 +315,10 @@ public class DecisionProcedureSettings implements Settings {
     public boolean checkCommand(RuleDescriptor rd, String Command) {
 	SMTRule r = descriptorToRule.get(rd);
 	String oldCommand = this.execCommands.get(rd); 
-	this.execCommands.put(rd, Command);
+	this.execCommands.put(rd.ruleName.toString(), Command);
 	boolean toReturn = r.isInstalled(true);
 	//remove the new connad again, as this is ust a test, no store
-	this.execCommands.put(rd, oldCommand);
+	this.execCommands.put(rd.ruleName.toString(), oldCommand);
 	r.isInstalled(true);
 	return toReturn;
     }
@@ -311,7 +328,7 @@ public class DecisionProcedureSettings implements Settings {
     }
     
     public String getExecutionCommand(RuleDescriptor rd) {
-	String toReturn = this.execCommands.get(rd);
+	String toReturn = this.execCommands.get(rd.ruleName.toString());
 	if (toReturn == null || toReturn.length()==0) {
 	    //the default setting is used. Read this one from the DecProc
 	    toReturn = this.descriptorToRule.get(rd).defaultExecutionCommand();

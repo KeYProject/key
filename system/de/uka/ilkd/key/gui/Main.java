@@ -226,7 +226,11 @@ public class Main extends JFrame implements IMain {
     
     private NotificationManager notificationManager;
 
-
+    /** The radio items shown in the decproc menu for the different available solver */
+    private final ArrayList<JRadioButtonMenuItem> showndecProcRadioItems = new ArrayList<JRadioButtonMenuItem>();
+    
+    /** The menu for the decproc options */
+    private final JMenu decProcOptions = new JMenu("Decision Procedures");
     
     
     /**
@@ -1483,9 +1487,6 @@ public class Main extends JFrame implements IMain {
         return options;
     }
     
-    private final ArrayList<JRadioButtonMenuItem> showndecProcRadioItems = new ArrayList<JRadioButtonMenuItem>();
-    private final JMenu decProcOptions = new JMenu("Decision Procedures");
-    
     /**
      * update the selection menu for Decisionprocedures.
      * Remove those, that are not installed anymore, add those, that got installed.
@@ -1501,10 +1502,13 @@ public class Main extends JFrame implements IMain {
 	showndecProcRadioItems.removeAll(showndecProcRadioItems);
 	
 	final DecisionProcedureSettings dps = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings();
+	
+	int targetIndex = 0;
 	for (RuleDescriptor r : dps.getAvailableRules()) {
 	    final JRadioButtonMenuItem b = new JRadioButtonMenuItem();
 	    b.setAction(new DPSelectionAction(r, b));
-	    decProcOptions.add(b);
+	    decProcOptions.add(b, targetIndex);
+	    targetIndex++;
 	    showndecProcRadioItems.add(b);
 	    //dpButtonGroup.add(b);
 	}

@@ -60,9 +60,9 @@ public class DecissionProcedureSettingsDialog extends JDialog {
     
     public static void resetInstance() {
 	instance.setSize(400, 300);
-	instance.setPreferredSize(new Dimension(450, 300));
-	instance.setMaximumSize(new Dimension(450, 300));
-	instance.setMinimumSize(new Dimension(450, 300));
+	instance.setPreferredSize(new Dimension(490, 300));
+	instance.setMaximumSize(new Dimension(490, 300));
+	instance.setMinimumSize(new Dimension(490, 300));
 	instance.setVisible(true);
     }
     
@@ -77,9 +77,9 @@ public class DecissionProcedureSettingsDialog extends JDialog {
 	
 	JComponent rc = new JPanel();
 	rc.setLayout(new BoxLayout(rc, BoxLayout.Y_AXIS));
-	rc.setPreferredSize(new Dimension(320, 340));
-	rc.setMinimumSize(new Dimension(320, 340));
-	rc.setMaximumSize(new Dimension(320, 340));
+	rc.setPreferredSize(new Dimension(390, 340));
+	rc.setMinimumSize(new Dimension(390, 340));
+	rc.setMaximumSize(new Dimension(390, 340));
 	tp.setLeftComponent(lc);
 	tp.setRightComponent(rc);
 	//read the available rules from the Settings
