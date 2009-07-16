@@ -228,8 +228,6 @@ public class DecisionProcedureSettings implements Settings {
 	//all value pairs are stored separated by a |
 	if (allCommands != null) {
 	    String[] valuepairs = allCommands.split(execSeperator1);
-	    for (String s : valuepairs)
-		System.out.println(s);
 	    for (String s : valuepairs) {
 		String[] vals = s.split(execSeperator2);
 		if (vals.length == 2) {
