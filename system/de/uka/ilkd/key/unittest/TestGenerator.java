@@ -18,6 +18,7 @@ import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.*;
 import de.uka.ilkd.key.unittest.ppAndJavaASTExtension.*;
+import de.uka.ilkd.key.unittest.testing.DataStorage;
 import de.uka.ilkd.key.util.*;
 import de.uka.ilkd.key.visualdebugger.VisualDebugger;
 import de.uka.ilkd.key.logic.*;
@@ -80,6 +81,10 @@ public class TestGenerator {
 
     // private HashMap array2length;
 
+    private DataStorage data;
+
+    private final boolean testing;
+
     /**
      * creates a TestGenerator instance for the given compilation unit
      * 
@@ -88,7 +93,9 @@ public class TestGenerator {
      * @param fileName
      *            the name of the unittest file this TestGenerator creates.
      */
-    public TestGenerator(Services serv, String fileName) {
+    public TestGenerator(Services serv, String fileName, String directory,
+	    boolean testing) {
+	this.testing = testing;
 	ji = serv.getJavaInfo();
 	translatedFormulas = new HashMap<Term, Expression>();
 	// array2length = new HashMap();
@@ -123,10 +130,6 @@ public class TestGenerator {
 	// clean typesystem for JavaCard).
 	suiteMethod = createSuiteMethod();
 	rand = new Random();
-    }
-
-    public TestGenerator(Services serv, String fileName, String directory) {
-	this(serv, fileName);
 	if (directory != null)
 	    this.directory = directory;
     }
@@ -217,6 +220,7 @@ public class TestGenerator {
 
 	// put test data in array
 	ProgramVariable[] testArray = new ProgramVariable[testLocation.length];
+
 	boolean singleTuple = singleTuple(testData);
 	for (int i = 0; i < testData.length; i++) {
 	    KeYJavaType kjt = testLocEqvs[i].getKeYJavaType();
@@ -622,6 +626,7 @@ public class TestGenerator {
 	    programVars = programVars.union(mg.getProgramVariables());
 	}
 	pvaNotDecl = removeDublicates(programVars).toArray();
+	data.setPvs2(pvaNotDecl);
 	it = mgs.iterator();
 	ExtList l = new ExtList();
 	l.add(suiteMethod);
@@ -673,6 +678,10 @@ public class TestGenerator {
 			    .getValueAsExpression(eqvArray[i]);
 		}
 	    }
+	    // mbender: collect data for KeY junit tests (see
+	    // TestTestGenerator,TestHelper)
+	    data.addTestDat(testData);
+	    data.addTestLoc(testLocation);
 	    MethodDeclaration methDec = createTestMethod(code, oracle,
 		    testLocation, testData, pvaNotDecl, methodName
 			    + (testMethods.size()), l, mg, eqvArray);
@@ -688,18 +697,21 @@ public class TestGenerator {
 	try {
 	    // write the file to disk
 	    pp.printClassDeclaration(suite);
-	    File dir = new File(directory);
-	    if (!dir.exists()) {
-		dir.mkdirs();
+	    if (!testing) {
+		File dir = new File(directory);
+		if (!dir.exists()) {
+		    dir.mkdirs();
+		}
+		File pcFile = new File(dir, fileName + ".java");
+		path = pcFile.getAbsolutePath();
+		FileWriter fw = new FileWriter(pcFile);
+		BufferedWriter bw = new BufferedWriter(fw);
+		bw.write(addImports(clean(w.toString()), pr));
+		bw.close();
 	    }
-	    File pcFile = new File(dir, fileName + ".java");
-	    path = pcFile.getAbsolutePath();
-	    FileWriter fw = new FileWriter(pcFile);
-	    BufferedWriter bw = new BufferedWriter(fw);
-	    bw.write(addImports(clean(w.toString()), pr));
-	    bw.close();
 	} catch (IOException ioe) {
 	}
+
 	exportCodeUnderTest();
     }
 
@@ -799,20 +811,23 @@ public class TestGenerator {
 			    .getPositionInfo().getFileName();
 
 		    String header = getHeader(fn);
+		    if (!testing) {
+			File dir = new File(directory
+				+ fn.substring(fn.indexOf(File.separator), fn
+					.lastIndexOf(File.separator)));
+			fn = fn.substring(fn.lastIndexOf(File.separator) + 1);
+			if (!dir.exists()) {
+			    dir.mkdirs();
+			}
+			File pcFile = new File(dir, fn);
+			FileWriter fw = new FileWriter(pcFile);
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(header);
+			bw.write(clean(sw.toString()));
+			bw.close();
+		    } else {
 
-		    File dir = new File(directory
-			    + fn.substring(fn.indexOf(File.separator), fn
-				    .lastIndexOf(File.separator)));
-		    fn = fn.substring(fn.lastIndexOf(File.separator) + 1);
-		    if (!dir.exists()) {
-			dir.mkdirs();
 		    }
-		    File pcFile = new File(dir, fn);
-		    FileWriter fw = new FileWriter(pcFile);
-		    BufferedWriter bw = new BufferedWriter(fw);
-		    bw.write(header);
-		    bw.write(clean(sw.toString()));
-		    bw.close();
 		} catch (IOException ioe) {
 		    throw new UnitTestException(ioe);
 		}
@@ -1332,8 +1347,7 @@ public class TestGenerator {
     /**
      * Replaces rigid constants by program variables.
      */
-    protected static Term replaceConstants(Term t, Services serv,
-	    Namespace newPVs) {
+    static Term replaceConstants(Term t, Services serv, Namespace newPVs) {
 	TermFactory tf = TermFactory.DEFAULT;
 	Term result = null;
 	if (t.op() instanceof RigidFunction && t.arity() == 0
@@ -1370,6 +1384,14 @@ public class TestGenerator {
 	    result = tf.createTerm(t.op(), subTerms, quantVars, jb);
 	}
 	return result;
+    }
+
+    public DataStorage getData() {
+	return data;
+    }
+
+    public void setData(DataStorage data) {
+	this.data = data;
     }
 
 }
