@@ -66,7 +66,7 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
 	try {
 	    while (it.hasNext()) {
 		de.uka.ilkd.key.logic.Term t = it.next();
-		String s = st.translate(t, v).toString();
+		String s = st.pretranslate(t, v).toString();
 		string2class.put(s, term2class.get(t));
 	    }
 	} catch (SimplifyException e) {
@@ -86,7 +86,7 @@ public class OldSimplifyModelGenerator implements DecProdModelGenerator {
 		    intClasses.add(ec);
 		    de.uka.ilkd.key.logic.Term loc = ec.getLocations()
 			    .iterator().next();
-		    String eq = "(EQ " + ph + " " + st.translate(loc, v)
+		    String eq = "(EQ " + ph + " " + st.pretranslate(loc, v)
 			    + ")\n";
 		    initialCounterExample = initialCounterExample.substring(0,
 			    index)

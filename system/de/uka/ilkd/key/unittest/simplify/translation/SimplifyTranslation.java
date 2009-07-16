@@ -19,14 +19,15 @@ import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.collection.ListOfString;
 import de.uka.ilkd.key.collection.SLListOfString;
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ConstrainedFormula;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.ldt.AbstractIntegerLDT;
 import de.uka.ilkd.key.logic.op.ArrayOfQuantifiableVariable;
 import de.uka.ilkd.key.logic.op.ArrayOp;
 import de.uka.ilkd.key.logic.op.AttributeOp;
@@ -187,10 +188,14 @@ public class SimplifyTranslation {
 
     private Sort integerSort;
 
+    private AbstractIntegerLDT integerLDT;
+
     private static long counter = 0;
 
     static Logger logger = Logger
 	    .getLogger(SimplifyTranslation.class.getName());
+
+    final TermFactory tf = TermFactory.DEFAULT;
 
     /**
      * Just a constructor which starts the conversion to Simplify syntax. The
@@ -210,14 +215,14 @@ public class SimplifyTranslation {
 	// super(sequent, cs, localmv, services);
 	constraintSet = cs;
 	localMetavariables = localmv;
+	integerLDT = services.getTypeConverter().getIntegerLDT();
+	integerSort = integerLDT.targetSort();
 	jbyteSort = services.getTypeConverter().getByteLDT().targetSort();
 	jshortSort = services.getTypeConverter().getShortLDT().targetSort();
 	jintSort = services.getTypeConverter().getIntLDT().targetSort();
 	jlongSort = services.getTypeConverter().getLongLDT().targetSort();
 	jcharSort = services.getTypeConverter().getCharLDT().targetSort();
-	integerSort = services.getTypeConverter().getIntegerLDT().targetSort();
 	cacheForUninterpretedSymbols = new HashMap<Term, StringBuffer>();
-	String s = sequent.toString();
 	StringBuffer hb = translate(sequent, lightWeight);
 	text = predicate.toString() + produceClosure(hb);
 	logger.info("SimplifyTranslation:\n" + text);
@@ -279,68 +284,214 @@ public class SimplifyTranslation {
 	return number.intValue();
     }
 
-    /**Build a new copy of t, except that any occurence of an if-then-else term 
-     * whose if-part equals @param ifPart is replaced by the 
-     * then-part (if @param part is true) or by the 
-     * else-part (if @param part is false). 
-     * @author gladisch */
-    protected Term replaceIfThenElse(Term t, Term ifPart, boolean part){
-	TermFactory tf = TermFactory.DEFAULT;
-	
-	if(t.arity()==0){
+    /**
+     * Build a new copy of t, except that any occurence of an if-then-else term
+     * whose if-part equals @param ifPart is replaced by the then-part (if @param
+     * part is true) or by the else-part (if @param part is false).
+     * 
+     * @author gladisch
+     */
+    private Term replaceIfThenElse(Term t, Term ifPart, boolean part) {
+	if (t.arity() == 0) {
 	    return t;
 	}
-	
- 	if(ifPart.sort()!=Sort.FORMULA){
-	    throw new RuntimeException("Unexpected parameter 2\nParam1=\n"+
-		    t.toString()+"\nParam2= (sort:"+ifPart.sort()+")\n"+ifPart.toString());
+
+	if (ifPart.sort() != Sort.FORMULA) {
+	    throw new RuntimeException("Unexpected parameter 2\nParam1=\n"
+		    + t.toString() + "\nParam2= (sort:" + ifPart.sort() + ")\n"
+		    + ifPart.toString());
 	}
 
-	//Base case
-	if(t.sub(0)==ifPart){
-	    if(!(t.op() instanceof IfThenElse)){
-		    throw new RuntimeException("Unexpected parameter combination. Firs parameter should be an if-then-else term\nParam1=\n"+
-			    t.toString()+"\nParam2=\n"+ifPart.toString());
+	// Base case
+	if (t.sub(0) == ifPart) {
+	    if (!(t.op() instanceof IfThenElse)) {
+		throw new RuntimeException(
+			"Unexpected parameter combination. Firs parameter should be an if-then-else term\nParam1=\n"
+				+ t.toString()
+				+ "\nParam2=\n"
+				+ ifPart.toString());
 	    }
-	    if(part){
-		return replaceIfThenElse(t.sub(1),ifPart,part);
-	    }else{
-		return replaceIfThenElse(t.sub(2),ifPart,part);
+	    if (part) {
+		return replaceIfThenElse(t.sub(1), ifPart, part);
+	    } else {
+		return replaceIfThenElse(t.sub(2), ifPart, part);
 	    }
 	}
-	
-	//Recursive replacement
+
+	// Recursive replacement
 	Term[] subs = new Term[t.arity()];
-	for(int i=0;i<t.arity();i++){
-	    subs[i] = replaceIfThenElse(t.sub(i),ifPart,part);
+	for (int i = 0; i < t.arity(); i++) {
+	    subs[i] = replaceIfThenElse(t.sub(i), ifPart, part);
 	}
-	
-	//collect bound variables
-	final ArrayOfQuantifiableVariable[] vars = 
-		new ArrayOfQuantifiableVariable[t.arity()];
-	for(int i = 0; i < t.arity(); i++) {
+
+	// collect bound variables
+	final ArrayOfQuantifiableVariable[] vars = new ArrayOfQuantifiableVariable[t
+		.arity()];
+	for (int i = 0; i < t.arity(); i++) {
 	    vars[i] = t.varsBoundHere(i);
 	}
-	
-	//build the new term
+
+	// build the new term
 	return tf.createTerm(t.op(), subs, vars, t.javaBlock());
     }
-    
-    /**If an if-then-else term is found in t, then the if-condition of the if-then-else
-     * is returned. Otherwise null is returned. 
-     * @author gladisch */
-    protected Term findIfThenElse(Term t){
-	if((t.op() instanceof IfThenElse) && t.sort()!=Sort.FORMULA){
+
+    /**
+     * If an if-then-else term is found in t, then the if-condition of the
+     * if-then-else is returned. Otherwise null is returned.
+     * 
+     * @author gladisch
+     */
+    private Term findIfThenElse(Term t) {
+	if ((t.op() instanceof IfThenElse) && t.sort() != Sort.FORMULA) {
 	    return t.sub(0);
 	}
-	for(int i=0;i<t.arity();i++){
-	    Term res=findIfThenElse(t.sub(i));
-	    if(res!=null){
+	for (int i = 0; i < t.arity(); i++) {
+	    Term res = findIfThenElse(t.sub(i));
+	    if (res != null) {
 		return res;
 	    }
 	}
 	return null;
     }
+
+    /**
+     * If an division term is found in the formula t, then the term is returned.
+     * Otherwise null is returned.
+     * 
+     * @author mbender
+     */
+    private Term findDivIForm(Term t) {
+	Term sub;
+	Term res;
+	for (int i = 0; i < t.arity(); i++) {
+	    sub = t.sub(i);
+	    if (sub.sort() == Sort.FORMULA) {
+		if ((res = findDivIForm(sub)) != null) {
+		    return res;
+		}
+	    } else {
+		if ((res = findDivITerm(sub)) != null) {
+		    return t;
+		}
+	    }
+	}
+	return null;
+    }
+
+    /**
+     * If an division term is found in the term t, then the term is returned.
+     * Otherwise null is returned.
+     * 
+     * @author mbender
+     */
+    private Term findDivITerm(Term t) {
+	if ((t.op().equals(integerLDT.getDiv()))) {
+	    return t;
+	} else if (!(t.op().name().toString().equals(
+		AbstractIntegerLDT.NUMBERS_NAME) || t.arity() == 0)) {
+	    Term res;
+	    for (int i = 0; i < t.arity(); i++) {
+		if ((res = findDivITerm(t.sub(i))) != null) {
+		    return res;
+		}
+	    }
+	}
+	return null;
+    }
+
+    /**
+     * Build a new copy of @param term, except that any occurence of the term @param
+     * divForm is replaced by a term that equals @param divForm a variable
+     * instead of the division. Additionally a term is conjunctivly added to
+     * 'define' the value of the introduced variable. This procedure is needed
+     * to express the division through a multiplication
+     * 
+     * @author mbender
+     */
+    private Term replaceForm(Term form, Term divForm, Term divTerm, Term newVar) {
+	boolean isForm = form.equals(divForm);
+	final int l = form.arity();
+	final Term[] subs = new Term[l];
+	final ArrayOfQuantifiableVariable[] qVars = new ArrayOfQuantifiableVariable[l];
+	for (int i = 0; i < l; i++) {
+	    subs[i] = form.sub(i);
+	    if (isForm) {
+		subs[i] = replaceTerm(subs[i], divTerm, newVar);
+	    } else if (subs[i].sort() == Sort.FORMULA) {
+		subs[i] = replaceForm(subs[i], divForm, divTerm, newVar);
+	    }
+	    qVars[i] = subs[i].varsBoundHere(i);
+	}
+	return tf.createTerm(form.op(), subs, qVars, form.javaBlock());
+    }
+
+    private Term replaceTerm(Term term, Term divTerm, Term newVar) {
+	if (term.arity() == 0
+		|| term.op().name().toString().equals(
+			AbstractIntegerLDT.NUMBERS_NAME)) {
+	    return term;
+	} else if (term.equals(divTerm)) {
+	    return newVar;
+	} else {
+	    final int l = term.arity();
+	    final Term[] subs = new Term[l];
+	    final ArrayOfQuantifiableVariable[] qVars = new ArrayOfQuantifiableVariable[l];
+	    for (int i = 0; i < l; i++) {
+		subs[i] = replaceTerm(term.sub(i), divTerm, newVar);
+		qVars[i] = term.varsBoundHere(i);
+	    }
+	    return tf.createTerm(term.op(), subs, qVars, term.javaBlock());
+	}
+    }
+
+    private Term createAddConst(Term divTerm, Term newVar) {
+	final Term divident = divTerm.sub(0);
+	final Term divisor = divTerm.sub(1);
+	final Term multip = tf.createFunctionTerm(integerLDT.getMul(), newVar,
+		divisor);
+	return tf.createEqualityTerm(divident, multip);
+    }
+
+    public final StringBuffer pretranslate(Term term,
+	    Vector<QuantifiableVariable> quantifiedVars)
+	    throws SimplifyException {
+	// System.out.println("-Pretranslate");
+	// System.out.println(term);
+	// replace if-then-else terms
+	if (term.sort() == Sort.FORMULA && term.arity() > 0) {
+	    // This will be the if-condition of the found if-then-else term
+	    Term if_cond = null;
+	    while ((if_cond = findIfThenElse(term)) != null) {
+		Term term1 = replaceIfThenElse(term, if_cond, true);
+		Term term2 = replaceIfThenElse(term, if_cond, false);
+		term = tf.createJunctorTerm(Op.AND, tf.createJunctorTerm(
+			Op.IMP, if_cond, term1), tf.createJunctorTerm(Op.IMP,
+			tf.createJunctorTerm(Op.NOT, if_cond), term2));
+	    }
+	    Term divForm = null;
+	    Term divTerm = null;
+	    Term newVar = null;
+	    Term addConst = null;
+	    // System.out.println("---Term\n" + term);
+	    while ((divForm = findDivIForm(term)) != null) {
+		// System.out.println("\n");
+		// System.out.println("---DivForm\n" + divForm);
+		divTerm = findDivITerm(divForm);
+		// System.out.println("---divTerm\n" + divTerm);
+		newVar = tf.createVariableTerm(new LogicVariable(new Name(
+			getUniqueVariableName(divTerm.sort()).toString()),
+			divTerm.sort()));
+		// System.out.println("---newVar\n" + newVar);
+		addConst = createAddConst(divTerm, newVar);
+		// System.out.println("---AddConst\n" + addConst);
+		term = tf.createJunctorTerm(Op.AND, addConst, replaceForm(term,
+			divForm, divTerm, newVar));
+		// System.out.println("---ReplaceTerm\n" + term);
+	    }
+	}
+	return translate(term, quantifiedVars);
+    }
+
     /**
      * Translates the given term into "Simplify" input syntax and adds the
      * resulting string to the StringBuffer sb.
@@ -356,20 +507,6 @@ public class SimplifyTranslation {
 	    Vector<QuantifiableVariable> quantifiedVars)
 	    throws SimplifyException {
 	Operator op = term.op();
-	
-	//replace if-then-else terms
-	if(term.sort()==Sort.FORMULA && term.arity()>0 && term.sub(0).sort()!=Sort.FORMULA){
-	    Term if_cond=null; //This will be the if-condition of the found if-then-else term
-	    TermFactory tf= TermFactory.DEFAULT;
-	    while((if_cond=findIfThenElse(term))!=null){
-		Term term1 = replaceIfThenElse(term,if_cond,true);
-		Term term2 = replaceIfThenElse(term,if_cond,false);
-		term= tf.createJunctorTerm(Op.AND, 
-		    	tf.createJunctorTerm(Op.IMP, if_cond, term1), 
-		    	tf.createJunctorTerm(Op.IMP, tf.createJunctorTerm(Op.NOT, if_cond), term2));
-	    }
-	}
-	
 	if (op == Op.NOT) {
 	    return (translateSimpleTerm(term, NOT, quantifiedVars));
 	} else if (op == Op.AND) {
@@ -492,13 +629,30 @@ public class SimplifyTranslation {
 			.toString(), quantifiedVars));
 	    }
 	} else if ((op instanceof Modality) || (op instanceof IUpdateOperator)
-		/* ||(op instanceof IfThenElse)*/) {
+	/* ||(op instanceof IfThenElse) */) {
 	    return (uninterpretedTerm(term, true));
-	}if((op instanceof IfThenElse) && term.sort()!=Sort.FORMULA){
-	    throw new RuntimeException("The if-then-else term should have been replaced at this place.\n"+term.toString());
-	}  else {
+	}
+	if ((op instanceof IfThenElse)) {
+	    if (term.sort() != Sort.FORMULA) {
+		throw new RuntimeException(
+			"The if-then-else term should have been replaced at this place.\n"
+				+ term.toString());
+	    } else {
+		return translateIfThenElse(term, quantifiedVars);
+	    }
+	} else {
 	    return (translateUnknown(term));
 	}
+    }
+
+    private final StringBuffer translateIfThenElse(Term term,
+	    Vector<QuantifiableVariable> quantifiedVars)
+	    throws SimplifyException {
+	Term cond = term.sub(0);
+	term = tf.createJunctorTerm(Op.AND, tf.createJunctorTerm(Op.IMP, cond,
+		term.sub(1)), tf.createJunctorTerm(Op.IMP, tf
+		.createJunctorTerm(Op.NOT, cond), term.sub(2)));
+	return translate(term, quantifiedVars);
     }
 
     /**
@@ -617,7 +771,7 @@ public class SimplifyTranslation {
 	    boolean lightWeight) throws SimplifyException {
 	StringBuffer hb = new StringBuffer();
 	if (constraintSet.used(cf)) {
-	    
+
 	    SyntacticalReplaceVisitor srVisitor = new SyntacticalReplaceVisitor(
 		    constraintSet.getChosenConstraint());
 	    cf.formula().execPostOrder(srVisitor);
@@ -627,7 +781,7 @@ public class SimplifyTranslation {
 		    && !(op instanceof IUpdateOperator)
 		    && !(op instanceof IfThenElse) && op != Op.ALL
 		    && op != Op.EX) {
-		hb.append(translate(t, new Vector<QuantifiableVariable>()));
+		hb.append(pretranslate(t, new Vector<QuantifiableVariable>()));
 	    }
 	}
 	return hb;
