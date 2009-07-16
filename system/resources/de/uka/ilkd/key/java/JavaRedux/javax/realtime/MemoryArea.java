@@ -15,7 +15,7 @@ public abstract class MemoryArea{
 	return stack;
     }
 
-    // public invariant parent!=null ==> \outerScope(parent, this);
+    //@ public invariant parent==this <==> this==ImmortalMemory.instance;
     //@ public invariant parent==null <==> stack==null;
     //@ public invariant parent==null ==> consumed==0;
     public /*@nullable@*/ MemoryArea parent=null;
@@ -63,7 +63,7 @@ public abstract class MemoryArea{
 
     public void	enter(){
 	if(logic==null) throw new IllegalArgumentException();
-	if(stack!=null && outerScopeM(this, <currentMemoryArea>) ||
+	if(//stack!=null && outerScopeM(this, <currentMemoryArea>) ||
 	   parent!=null && parent!=<currentMemoryArea>){
 	    throw new ScopedCycleException();
 	}
@@ -90,7 +90,7 @@ public abstract class MemoryArea{
 
     public void	enter(java.lang.Runnable logic){
 	if(logic==null) throw new IllegalArgumentException();
-	if(stack!=null && outerScopeM(this, <currentMemoryArea>) ||
+	if(//stack!=null && outerScopeM(this, <currentMemoryArea>) ||
 	   parent!=null && parent!=<currentMemoryArea>){
 	    throw new ScopedCycleException();
 	}

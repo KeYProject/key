@@ -50,6 +50,20 @@ public class Test extends SuperTest{
     }
 
     /*@ public normal_behavior
+      @  requires \currentMemoryArea==sm1;
+      @  working_space \space(Runnable);
+      @*/
+    public void enterCurrentMem(final ScopedMemory sm1){
+	final Runnable hello = new Runnable(){
+		public void run(){
+		    int i=0;
+		    i++;
+		}
+	    };
+	sm1.enter(hello);
+    }
+
+    /*@ public normal_behavior
       @  requires \inImmortalMemory(next) && this.next.next!=null;
       @  ensures true;
       @*/
@@ -119,6 +133,11 @@ public class Test extends SuperTest{
       @*/
     public void testMemoryAreaOuter(){}
 
+    /*@ public normal_behavior
+      @  requires sm2.parent==sm1 || sm2.parent==null;
+      @  requires \outerScope(sm1, \currentMemoryArea);
+      @  working_space 2*\space(Runnable);
+      @*/
     public void enterArea(final ScopedMemory sm1, final ScopedMemory sm2){
 	final Runnable hello = new Runnable(){
 		public void run(){

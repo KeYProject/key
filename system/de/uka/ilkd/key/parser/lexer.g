@@ -96,7 +96,7 @@ tokens {
 	ISUPDATED = "\\isUpdated";
 	MEMORYAREA = "\\memoryArea";
 	PARENTSCOPE = "\\parentScope";
-
+	SCOPESTACK = "\\scopeStack";
 
 	// Quantifiers, binding, substitution
 	BIND   = "\\bind";

@@ -4008,6 +4008,7 @@ varexp[TacletBuilder b]
       | varcond_array[b, negated]
       | varcond_memory_area[b, negated]
       | varcond_parent_scope[b, negated]
+      | varcond_scope_stack[b, negated]
       | varcond_abstractOrInterface[b, negated]
       | varcond_interface[b, negated]
       | varcond_static[b,negated] 
@@ -4393,6 +4394,17 @@ varcond_parent_scope [TacletBuilder b, boolean negated]
    PARENTSCOPE
 	LPAREN x=varId RPAREN {
      	   b.addVariableCondition(new ParentScopeCondition((SchemaVariable) x, negated));
+        } 
+;
+
+varcond_scope_stack [TacletBuilder b, boolean negated]
+{
+  ParsableVariable x = null;
+}
+:
+   SCOPESTACK
+	LPAREN x=varId RPAREN {
+     	   b.addVariableCondition(new ScopeStackCondition((SchemaVariable) x, negated));
         } 
 ;
 

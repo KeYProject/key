@@ -14,7 +14,6 @@ public class MemoryAreaCondition extends VariableConditionAdapter {
     private boolean neg;
 
     /**
-     * creates an instance of this condition checking if var has reference type
      * @param var the SchemaVariable to be checked
      */
     public MemoryAreaCondition(SchemaVariable var, boolean neg) {

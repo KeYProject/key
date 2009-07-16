@@ -6,7 +6,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-public class ParentScopeCondition extends VariableConditionAdapter {
+public class ScopeStackCondition extends VariableConditionAdapter {
 
     private SchemaVariable var;
     private boolean neg;
@@ -14,7 +14,7 @@ public class ParentScopeCondition extends VariableConditionAdapter {
     /**
      * @param var the SchemaVariable to be checked
      */
-    public ParentScopeCondition(SchemaVariable var, boolean neg) {
+    public ScopeStackCondition(SchemaVariable var, boolean neg) {
         this.var = var; 
         this.neg = neg;
     }
@@ -32,7 +32,7 @@ public class ParentScopeCondition extends VariableConditionAdapter {
         }else{
             return true;
         }
-        boolean result = (pv.name().toString().indexOf(("parent"))!=-1);
+        boolean result = (pv.name().toString().indexOf(("stack"))!=-1);
         if(pv.getContainerType()!=null){
             result &= pv.getContainerType().getSort().extendsTrans(
                     services.getJavaInfo().getJavaxRealtimeMemoryArea().getSort());
@@ -43,7 +43,9 @@ public class ParentScopeCondition extends VariableConditionAdapter {
     }
     
     public String toString () {
-        return (neg ? "\\not " : "") + "\\parentScope(" + var + ")";
+        return (neg ? "\\not " : "") + "\\stack(" + var + ")";
     }
     
 }
+
+
