@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.strategy;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -66,7 +67,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         this.strategyProperties =
             (StrategyProperties)strategyProperties.clone ();
-        
+      
         this.tf = new ArithTermFeatures ( p_proof.getServices ()
                                           .getTypeConverter ().getIntegerLDT () );
         this.ff = new FormulaTermFeatures ();        
