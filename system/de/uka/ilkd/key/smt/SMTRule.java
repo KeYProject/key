@@ -55,7 +55,7 @@ public class SMTRule implements BuiltInRule {
     public ListOfGoal apply(Goal goal, Services services, RuleApp ruleApp) {
 	int timeout = ProofSettings.DEFAULT_SETTINGS
 	                           .getDecisionProcedureSettings()
-	                           .getTimeout();
+	                           .getTimeout()*100;
 	
 	SMTSolverResult result = SMTSolverResult.NO_IDEA;	
 	try {

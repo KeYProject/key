@@ -86,7 +86,8 @@ public class DecisionProcedureSettings implements Settings {
     /** the currently active rule */
     private Name activeRule = NOT_A_RULE.getRuleName();
     
-    private int timeout = 60;
+    /** the value of the timeout in tenth of seconds.*/
+    private int timeout = 600;
     
     private static DecisionProcedureSettings instance;
     
@@ -192,7 +193,7 @@ public class DecisionProcedureSettings implements Settings {
     /**
      * returns the timeout specifying the maximal amount of time an external prover
      * is run
-     * @return the timeout in seconds
+     * @return the timeout in tenth of seconds
      */
     public int getTimeout() {
 	return this.timeout;
@@ -359,7 +360,7 @@ public class DecisionProcedureSettings implements Settings {
 
     /**
      * sets the timeout until an external prover is terminated
-     * @param t the timeout in seconds
+     * @param t the timeout in tenth of seconds
      */
     public void setTimeout(int t) {
 	if (t > 0 && t != timeout) {

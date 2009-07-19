@@ -1528,18 +1528,38 @@ public class Main extends JFrame implements IMain {
         
         final DecisionProcedureSettings dps = ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings();
 	
-	ruletimeoutlabel = new JLabel();	
-	ruletimeoutlabel.setText("timeout: " + dps.getTimeout() + " s");
+	ruletimeoutlabel = new JLabel();
+	int time = dps.getTimeout();
+	
+	int h = time/(10*60*60);
+	int min = (time - 10*60*60* h)/(10*60);
+	int sec = (time - 10*60*min)/10;
+	ruletimeoutlabel.setText("timeout: " + h + "h " + min + "min " + sec + "." + time%10 + " s");
+	//ruletimeoutlabel.setText("timeout: " + time/10 + "." + time%10 + " s");
 
 	decProcOptions.add(ruletimeoutlabel);
 
 	
-	ruletimeout = new JSlider(1, 5*60);				
-	ruletimeout.setValue(dps.getTimeout());	
+	ruletimeout = new JSlider(0, 100);
+	//the slider is exponentially scaled. So find the correct position for the slider.
+	int sliderval = 0;
+	double temp = 1.0;
+	while (temp < time) {
+	    temp = temp*1.15;
+	    sliderval++;
+	}
+	ruletimeout.setValue(sliderval);	
 	ruletimeout.addChangeListener(new ChangeListener() {
 	    public void stateChanged(ChangeEvent e) {
-		final int newTimeout =((JSlider) e.getSource()).getValue();
+		final int sliderpos =((JSlider) e.getSource()).getValue();
 		
+		//scale the timeout value exponentially. This way small values can be set exactly
+		//bigger ones
+		double timeout = 1.0;
+		for (int i = 0; i < sliderpos; i++) {
+		    timeout = timeout * 1.15;
+		}
+		int newTimeout = (int)timeout;
 		ProofSettings ps = ProofSettings.DEFAULT_SETTINGS;
 		if (mediator().getProof() != null) {
 		    ps = mediator.getProof().getSettings();
@@ -1995,7 +2015,11 @@ public class Main extends JFrame implements IMain {
 				
 		setAction(new DPInvokeAction(activeRule));
 		
-		ruletimeoutlabel.setText("timeout: " + settings.getTimeout() + " s");
+		int timeout = settings.getTimeout();
+		int h = timeout/(10*60*60);
+		int min = (timeout - 10*60*60* h)/(10*60);
+		int sec = (timeout - 10*60*min)/10;
+		ruletimeoutlabel.setText("timeout: " + h + "h " + min + "min " + sec + "." + timeout%10 + " s");
 
 	    } else {
 		assert false;

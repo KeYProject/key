@@ -39,7 +39,7 @@ public interface SMTSolver {
      * (strongly recommended), use one of the other run() methods.
      * @param formula The formula to be proven.
      * @param timeout The maximum time that should be used to execute 
-     *        the external solver, in seconds. If the time is exceeded, UNKNOWN 
+     *        the external solver, in ,illiseconds. If the time is exceeded, UNKNOWN 
      *        is returned.
      * @throws IOException if the external prover could not be found, executed or if the SMT translation
      * could not be written to a file
@@ -51,7 +51,7 @@ public interface SMTSolver {
      * Check if the given goal is valid.
      * @param goal The goal to be proven.
      * @param timeout The maximum time that should be used to execute 
-     *        the external solver, in seconds. If the time is exceeded, UNKNOWN 
+     *        the external solver, in milliseconds. If the time is exceeded, UNKNOWN 
      *        is returned.
      * @throws IOException if the external prover could not be found, executed or if the SMT translation
      * could not be written to a file
@@ -63,7 +63,7 @@ public interface SMTSolver {
      * Check if the given formula is valid.
      * @param formula The formula to be proven.
      * @param timeout The maximum time that should be used to execute 
-     *        the external solver, in seconds. If the time is exceeded, UNKNOWN 
+     *        the external solver, in milliseconds. If the time is exceeded, UNKNOWN 
      *        is returned.
      * @throws IOException if the external prover could not be found, executed or if the SMT translation
      * could not be written to a file

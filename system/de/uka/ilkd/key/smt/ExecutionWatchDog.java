@@ -30,7 +30,7 @@ public final class ExecutionWatchDog extends TimerTask {
 	    this.starttime = System.currentTimeMillis();
 	}
 
-	if (System.currentTimeMillis() - this.starttime > timeout * 1000) {
+	if (System.currentTimeMillis() - this.starttime > timeout) {
 	    this.wasInterrupted = true;
 	    proc.destroy();
 	}
