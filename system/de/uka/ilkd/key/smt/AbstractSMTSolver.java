@@ -10,16 +10,22 @@
 
 package de.uka.ilkd.key.smt;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Timer;
 
+import javax.swing.JFileChooser;
+
 import org.apache.log4j.Logger;
 
 import de.uka.ilkd.key.gui.DecisionProcedureSettings;
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.gui.configuration.Settings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -34,7 +40,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 
 public abstract class AbstractSMTSolver implements SMTSolver {
 
-
+    
     private static final Logger logger = Logger
 	    .getLogger(AbstractSMTSolver.class.getName());
 
@@ -49,6 +55,12 @@ public abstract class AbstractSMTSolver implements SMTSolver {
      */
     private static final String FILE_BASE_NAME = "smt_formula";
     
+    /** true, if this solver was checked if installed */
+    private boolean installwaschecked = false;
+    /** true, if last check showed solver is installed */
+    private boolean isinstalled = false;
+    /** true, if the current run is for test uss only (for example checking, if the Solver is installed) */
+    private boolean inTestMode = false;
     
     /**
      * Get the command for executing the external prover.
@@ -147,6 +159,25 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	out.write(text);
 	out.close();
 
+	//store the text permanent to a file 
+	if (!this.inTestMode && ProofSettings.DEFAULT_SETTINGS.getDecisionProcedureSettings().getSaveFile() &&
+		Main.getInstance() != null) {
+	    JFileChooser fc = new JFileChooser();
+	    fc.setDialogTitle("Select a file to save the created problem");
+	    fc.setMultiSelectionEnabled(false);
+	    int returnVal = fc.showOpenDialog(Main.getInstance());
+	    File target = fc.getSelectedFile();
+	    if (returnVal == JFileChooser.APPROVE_OPTION) {
+		try {
+		    final BufferedWriter out2 = new BufferedWriter(new FileWriter(target));
+		    out2.write(text);
+		    out2.close();
+		} catch (IOException e) {
+		    throw new RuntimeException("Could not store to file " + target.getAbsolutePath() + ".");
+		}
+	    }
+	}
+	
 	return smtFile;
     }
 
@@ -345,11 +376,6 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	return toReturn;
     }
     
-    /** true, if this solver was checked if installed */
-    private boolean installwaschecked = false;
-    /** true, if last check showed solver is installed */
-    private boolean isinstalled = false;
-    
     /**
      * check, if this solver is installed and can be used.
      * @param recheck if false, the solver is not checked again, if a cached value for this exists.
@@ -364,6 +390,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	    //Proof pr = p.getFirstProof();
 	    //Goal g = pr.openGoals().iterator().next();
 	    //try to solve the formula
+	    this.inTestMode = true;
 	    try {
 		//This will cause an error, but no IOException, if installed.
 		//avoid to call the translator. A fakeds service element will
@@ -377,7 +404,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		//if this exception: some problem, but not with insatllation
 		isinstalled = true;
 	    }
-	    
+	    this.inTestMode = false;
 	    installwaschecked = true;
 	}
 	return isinstalled;

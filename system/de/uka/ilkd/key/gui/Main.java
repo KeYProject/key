@@ -1514,6 +1514,8 @@ public class Main extends JFrame implements IMain {
 	}
     }
     
+    JCheckBoxMenuItem saveSMTFile;
+    
     /**
      * creates a menu allowing to choose the external prover to be used
      * @return the menu with a list of all available provers that can be used
@@ -1583,6 +1585,16 @@ public class Main extends JFrame implements IMain {
 	});
 	decProcOptions.add(setButton);
 	//dpButtonGroup.add(setButton);
+	
+	//add a checkbox for saving a created problem file
+	saveSMTFile = new JCheckBoxMenuItem("Save created problemfile");
+	saveSMTFile.setSelected(dps.getSaveFile());
+	saveSMTFile.addActionListener(new ActionListener() {
+	   public void actionPerformed(ActionEvent e) {
+	       dps.setSaveFile(saveSMTFile.isSelected());
+	   }
+	});
+	decProcOptions.add(saveSMTFile);
 	
 	return decProcOptions;
     }    

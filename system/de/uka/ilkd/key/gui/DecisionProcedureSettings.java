@@ -71,6 +71,8 @@ public class DecisionProcedureSettings implements Settings {
     private static final String ACTIVE_RULE  = "[DecisionProcedure]ActiveRule";
     
     private static final String TIMEOUT="[DecisionProcedure]Timeout";
+    
+    private static final String SAVEFILE="[DecisionProcedure]savefile";
 
     /** the list of registered SettingListener */
     private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
@@ -216,6 +218,13 @@ public class DecisionProcedureSettings implements Settings {
 	}
 	
 	this.readExecutionString(props);
+	
+	String sf = props.getProperty(SAVEFILE);
+	if (!(sf == null) && sf.equals("true")) {
+	    this.saveFile = true;
+	} else {
+	    this.saveFile = false;
+	}
     }
     
 
@@ -391,7 +400,23 @@ public class DecisionProcedureSettings implements Settings {
 	}
     }
     
-
+    private boolean saveFile = false;
+    
+    public void setSaveFile(boolean sf) {
+	if (sf != this.saveFile) {
+	    this.saveFile = sf;
+	    this.fireSettingsChanged();
+	}
+    }
+    
+    /**
+     * returns true, if a created problem file should be saved.
+     * @return
+     */
+    public boolean getSaveFile() {
+	return this.saveFile;
+    }
+    
     /**
      * true, if the argument should be used for test
      * TODO implement?
@@ -410,6 +435,11 @@ public class DecisionProcedureSettings implements Settings {
     public void writeSettings(Properties props) {	
         props.setProperty(ACTIVE_RULE, "" + activeRule);
         props.setProperty(TIMEOUT, "" + this.timeout);
+        if (this.saveFile)
+            props.setProperty(SAVEFILE, "true");
+        else {
+            props.setProperty(SAVEFILE, "false");
+        }
         this.writeExecutionString(props);
     }
 
