@@ -69,26 +69,6 @@ public class SpecExtPO extends EnsuresPostPO {
         return ProofAggregate.createProofAggregate(proofs, name);
     }
 
-    protected ListOfProgramVariable buildParamVars(ProgramMethod programMethod) {
-        return params = super.buildParamVars(programMethod);
-    }
-
-    protected ProgramVariable buildResultVar(ProgramMethod programMethod) {
-        return result = super.buildResultVar(programMethod);
-    }
-
-    protected ProgramVariable buildSelfVarAsProgVar() {
-        return selfVarAsProgVar = super.buildSelfVarAsProgVar();
-    }
-
-    protected LogicVariable buildSelfVarAsLogicVar() {
-        return selfVarAsLogicVar = super.buildSelfVarAsLogicVar();
-    }
-
-    protected ProgramVariable buildExcVar() {
-        return excVar = super.buildExcVar();
-    }
-
     public ListOfProgramVariable getParams() {
         return params;
     }

@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 
@@ -90,6 +83,22 @@ public interface OperationContract {
                                    String name, 
                                    String displayName, 
                                    Services services);
+    
+    /**
+     * Returns another contract like this one, except that it refers to the 
+     * passed program method.
+     */
+    public OperationContract replaceProgramMethod(ProgramMethod pm,
+	    					  Services services);
+    
+    /**
+     * Returns another contract like this one, except that the passed term
+     * has been added as a precondition.
+     */
+    public OperationContract addPre(FormulaWithAxioms addedPre,
+	    			    ParsableVariable selfVar, 
+                                    ListOfParsableVariable paramVars,
+                                    Services services);
         
     /**
      * Returns the contract in pretty HTML format.

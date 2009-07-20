@@ -519,6 +519,10 @@ public class JavaInfo {
     public ListOfProgramMethod getAllProgramMethodsLocallyDeclared(KeYJavaType kjt) {        
         return kpmi.getAllProgramMethodsLocallyDeclared(kjt);
     }
+    
+    public ListOfProgramMethod getConstructors(KeYJavaType kjt) {
+	return kpmi.getConstructors(kjt);
+    }
 
     /**
      * returns the program methods defined in the given KeYJavaType with name

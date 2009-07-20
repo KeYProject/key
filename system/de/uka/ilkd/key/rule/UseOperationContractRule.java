@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 
@@ -24,6 +17,7 @@ import de.uka.ilkd.key.gui.ContractConfigurator;
 import de.uka.ilkd.key.gui.Main;
 
 import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Throw;
@@ -53,6 +47,9 @@ public class UseOperationContractRule implements BuiltInRule {
     private static final AtPreFactory APF = AtPreFactory.INSTANCE;
     private static final CreatedAttributeTermFactory CATF 
         = CreatedAttributeTermFactory.INSTANCE;
+    private static final String INIT_NAME 
+	= ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
+    
   
     public static final UseOperationContractRule INSTANCE 
                                             = new UseOperationContractRule();
@@ -367,8 +364,9 @@ public class UseOperationContractRule implements BuiltInRule {
         Namespace progVarNS = services.getNamespaces().programVariables();
         ProgramVariable selfVar          
             = SVF.createSelfVar(services, pm, true);
-        if(selfVar != null)
+        if(selfVar != null) {
             goal.addProgramVariable(selfVar);
+        }
         
         ListOfParsableVariable paramVars 
             = SVF.createParamVars(services, pm, true);
@@ -407,9 +405,16 @@ public class UseOperationContractRule implements BuiltInRule {
                                                       services);
         SetOfLocationDescriptor modifies = cwi.contract.getModifies(selfVar, 
                                                                     paramVars, 
-                                                                    services);           
-        for (final ClassInvariant inv : cwi.assumedInvs) {
-            pre = pre.conjoin(inv.getClosedInv(services));
+                                                                    services);
+        
+        if(pm.getName().equals(INIT_NAME)) {
+            for (final ClassInvariant inv : cwi.assumedInvs) {
+                pre = pre.conjoin(inv.getClosedInvExcludingOne(selfVar, services));
+            }
+        } else {
+            for (final ClassInvariant inv : cwi.assumedInvs) {
+                pre = pre.conjoin(inv.getClosedInv(services));
+            }
         }
 
         for (final ClassInvariant inv : cwi.ensuredInvs) {

@@ -5,13 +5,6 @@
 //
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
-//This file is part of KeY - Integrated Deductive Software Design
-//Copyright (C) 2001-2005 Universitaet Karlsruhe, Germany
-//                      Universitaet Koblenz-Landau, Germany
-//                      Chalmers University of Technology, Sweden
-//
-//The KeY system is protected by the GNU General Public License. 
-//See LICENSE.TXT for details.
 //
 //
 
@@ -24,6 +17,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
@@ -35,10 +29,11 @@ import de.uka.ilkd.key.proof.OpReplacer;
 /**
  * Standard implementation of the ClassInvariant interface. 
  */
-public class ClassInvariantImpl implements ClassInvariant {
+public final class ClassInvariantImpl implements ClassInvariant {
     
-    protected static final SignatureVariablesFactory SVN 
+    private static final SignatureVariablesFactory SVN 
         = SignatureVariablesFactory.INSTANCE;
+    private static final TermBuilder TB = TermBuilder.DF;
     
     private final String name;
     private final String displayName;
@@ -139,7 +134,22 @@ public class ClassInvariantImpl implements ClassInvariant {
         LogicVariable selfVar = new LogicVariable(new Name(name), sort);
         return getOpenInv(selfVar, services).allClose(services);
     }
-  
+    
+    
+    public FormulaWithAxioms getClosedInvExcludingOne(
+	    				ParsableVariable excludedVar, 
+	                                Services services) {
+        Sort sort = getKJT().getSort();
+        String baseName = sort.name().toString().substring(0, 1).toLowerCase();
+        String name = getNewName(baseName, services);
+        LogicVariable quantifVar = new LogicVariable(new Name(name), sort);
+        FormulaWithAxioms openInv = getOpenInv(quantifVar, services);
+        FormulaWithAxioms notSelf 
+        	= new FormulaWithAxioms(TB.not(TB.equals(TB.var(quantifVar), 
+        		                                 TB.var(excludedVar))));        
+        return notSelf.imply(openInv).allClose(services);
+    }
+    
     
     public FormulaWithAxioms getOpenInv(ParsableVariable selfVar, 
                                         Services services) {
