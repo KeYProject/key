@@ -14,11 +14,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -57,7 +53,9 @@ import de.uka.ilkd.key.proof.reuse.ReusePoint;
 import de.uka.ilkd.key.smt.DecProcRunner;
 import de.uka.ilkd.key.strategy.VBTStrategy;
 import de.uka.ilkd.key.unittest.UnitTestBuilder;
-import de.uka.ilkd.key.util.*;
+import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.KeYExceptionHandler;
+import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 
@@ -206,11 +204,11 @@ public class Main extends JFrame implements IMain {
     
     private JButton testButton;
     
+    /** are we in stand-alone mode? (or with TCC?) */
+    public static boolean standalone = true;
+
     
     protected static String fileNameOnStartUp = null;
-    
-    /** are we in stand-alone mode? (or with TCC?) */
-    public static boolean standalone = System.getProperty("key.together") == null;
     
     /** for locking of threads waiting for the prover to exit */
     public Object monitor = new Object();
@@ -564,7 +562,7 @@ public class Main extends JFrame implements IMain {
         toolBarPanel.add(toolBar);
         toolBarPanel.add(fileOperations);
         
-        getContentPane().add(clipBoardTextArea, BorderLayout.PAGE_START);
+        getContentPane().add(getClipBoardArea(), BorderLayout.PAGE_START);
         getContentPane().add(toolBarPanel, BorderLayout.PAGE_START);
         
         // ============================================================
@@ -1133,12 +1131,21 @@ public class Main extends JFrame implements IMain {
 	proofView.add(guiProofTree);
     }
     
-    static java.awt.TextArea clipBoardTextArea = new java.awt.TextArea(
-            "",10,10,java.awt.TextArea.SCROLLBARS_NONE) {
-        public java.awt.Dimension getMaximumSize() {
-            return new java.awt.Dimension(0,0);
-        }
-    };
+    
+    
+    private static java.awt.TextArea clipBoardTextArea;
+
+    private static TextArea getClipBoardArea() {
+	if (clipBoardTextArea == null) {
+	    clipBoardTextArea = new java.awt.TextArea(
+		    "",10,10,java.awt.TextArea.SCROLLBARS_NONE) {
+		public java.awt.Dimension getMaximumSize() {
+		    return new java.awt.Dimension(0,0);
+		}
+	    };
+	}
+	return clipBoardTextArea;
+    }
 
  
     
@@ -1147,10 +1154,11 @@ public class Main extends JFrame implements IMain {
         // now CLIPBOARD
         java.awt.datatransfer.StringSelection ss = 
             new java.awt.datatransfer.StringSelection(s);
-        clipBoardTextArea.getToolkit().getSystemClipboard().setContents(ss,ss);
+        final TextArea clipBoard = getClipBoardArea();
+        clipBoard.getToolkit().getSystemClipboard().setContents(ss,ss);
         // now PRIMARY
-        clipBoardTextArea.setText(s);
-        clipBoardTextArea.selectAll();
+        clipBoard.setText(s);
+        clipBoard.selectAll();
     }
     
     protected JMenu createFileMenu() {
