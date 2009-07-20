@@ -17,6 +17,10 @@
 
 package de.uka.ilkd.key.smt;
 
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.KeYMediator;
@@ -116,7 +120,7 @@ public class DecProcRunner implements Runnable {
                         de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
 
                 main.setStatusLine("Running external decision procedure: " +
-                        simpRule.displayName(), totalGoals); 
+                        simpRule.displayName(), 99); 
                 
                 final IteratorOfGoal goals = proof.openGoals().iterator();
 
@@ -128,12 +132,27 @@ public class DecProcRunner implements Runnable {
                     
                     cnt++;
                     final int temp = cnt;
-                    
-                    
+                    TimerTask tt = null;
+                    Timer t = null;
+                    //start a task to update the progressbar according to the timeprogress.
+                    if (simpRule instanceof SMTRule) {
+                	final SMTRule rule = (SMTRule) simpRule;
+                	tt = new TimerTask() {
+                	    public void run() {
+                		int step = 99/totalGoals;
+                		int base = (temp-1) * step;
+                		int prog = base + (step*rule.getProgress())/99;
+                		main.getProgressMonitor().setProgressImmediatly(prog);
+                	    }
+                	};
+                	t = new Timer();
+                	t.schedule(tt, 0, 300);
+                    }
                     ProofTreeListener ptl = new ProofTreeListener() {
                 	
                 	public void proofGoalRemoved(ProofTreeEvent e) {
-                	    main.getProgressMonitor().setProgress(temp);
+                	    int step = 100/totalGoals;
+                	    main.getProgressMonitor().setProgress(step*temp);
                 	}
                 	
                 	public void proofIsBeingPruned(ProofTreeEvent e) {}
@@ -146,6 +165,12 @@ public class DecProcRunner implements Runnable {
                     };
                     proof.addProofTreeListener(ptl);
                     g.apply(birApp);
+                    if (tt != null) {
+                	tt.cancel();
+                	t.cancel();
+                	t = null;
+                	tt = null;
+                    }
                     proof.removeProofTreeListener(ptl);
                     
                 }

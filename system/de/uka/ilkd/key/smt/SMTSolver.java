@@ -81,4 +81,10 @@ public interface SMTSolver {
      * @return the command used for execution of the programm on default
      */
     public String getDefaultExecutionCommand();
+    
+    /**
+     * 
+     * @return the progress made on the current task. Value 0..99
+     */
+    public int getProgress();
 }

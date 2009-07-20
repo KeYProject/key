@@ -85,6 +85,10 @@ public class SimpleStarter implements IMain {
                 
             }
             
+            public void setProgressImmediatly(int progress) {
+        	
+            }
+            
         };
     }
 

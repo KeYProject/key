@@ -96,4 +96,16 @@ public class SMTRule implements BuiltInRule {
     public String defaultExecutionCommand() {
 	return this.solver.getDefaultExecutionCommand();
     }
+    
+    /**
+     * 
+     * @return the progress made on the current task. Value 0..99
+     */
+    public int getProgress() {
+	if (this.solver != null) {
+	    return this.solver.getProgress();
+	} else {
+	    return 0;
+	}
+    }
 }

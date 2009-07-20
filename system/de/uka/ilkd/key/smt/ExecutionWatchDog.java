@@ -40,5 +40,24 @@ public final class ExecutionWatchDog extends TimerTask {
     public boolean wasInterrupted() {
 	return this.wasInterrupted;
     }
+    
+    /**
+     * 
+     * @return the progress made since start. Value between 0 and 99.
+     */
+    public int getProgress() {
+	if (this.starttime < 0) {
+	    return 0;
+	} else {
+	    int toReturn = (((int)(System.currentTimeMillis() - starttime)*100) / timeout);
+	    if (toReturn < 0) {
+		return 0;
+	    } else if (toReturn > 99) {
+		return 99;
+	    } else {
+		return toReturn;
+	    }
+	}
+    }
 
 }

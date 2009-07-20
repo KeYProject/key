@@ -16,6 +16,7 @@ import java.io.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JFileChooser;
 
@@ -248,6 +249,20 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     }
 
     /**
+     * 
+     * @return the progress made on the current task.
+     */
+    public int getProgress() {
+	if (this.execWatch == null) {
+	    return 0;
+	} else {
+	    return this.execWatch.getProgress();
+	}
+    }
+    
+    ExecutionWatchDog execWatch;
+    
+    /**
      * run the solver on a formula.
      * @param formula The formula to be proven in syntax, this solver supports.
      * 		Ususally it is not recommended to call this directly!
@@ -280,13 +295,22 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	try {
 	    //execute the external solver
 	    Process p = Runtime.getRuntime().exec(execCommand);
-	    ExecutionWatchDog tt = new ExecutionWatchDog(timeout, p);
+	    final int temptimeout = timeout;
+	    execWatch = new ExecutionWatchDog(timeout, p);
 	    Timer t = new Timer();
-	    t.schedule(tt, new Date(System.currentTimeMillis()), 1000);
+	    t.schedule(execWatch, new Date(System.currentTimeMillis()), 300);
+	    /*Timer t2 = new Timer();
+	    TimerTask tt2 = new TimerTask() {
+		public void run() {
+		    //set the progress.
+		    progress = ((int)(tt.elapsedTime()*100) / temptimeout);
+		}
+	    };
+	    t2.schedule(tt2, new Date(System.currentTimeMillis()), 300);*/
 	    boolean interruptedByWatchdog = false;
 	    try {
 		p.waitFor();
-		if (tt.wasInterrupted()) {
+		if (execWatch.wasInterrupted()) {
 		    interruptedByWatchdog = true;
 		    logger.debug(
 		    "Process for smt formula proving interrupted because of timeout.");
@@ -298,6 +322,7 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		//System.out.println("process was interrupted");
 	    } finally {
 		t.cancel();
+		this.execWatch = null;
 	    }
 	    
 	    if (interruptedByWatchdog) {
@@ -426,5 +451,6 @@ public abstract class AbstractSMTSolver implements SMTSolver {
     public String getDefaultExecutionCommand() {
 	return this.getExecutionCommand("%f", "%p");
     }
+    
     
 }
