@@ -36,7 +36,6 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramMetaConstruct;
-import de.uka.ilkd.key.rule.soundness.ProgramSVProxy;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -2786,38 +2785,6 @@ public class PrettyPrinter {
 	output();
     }    
 
-
-    public void printProgramSVProxy(ProgramSVProxy x) 
-	throws java.io.IOException {      
-
-	printHeader(x);
-        writeInternalIndentation(x);
-
-	// Mark statement start ...
-	markStart(0,x);
-
-	writeElement(x.op ());
- 
-	write(" (");
-	boolean wasNoSemicolons = noSemicolons;
-	boolean wasNoLinefeed   = noLinefeed;
-	noLinefeed   = true;
-	noSemicolons = true;      
-	writeCommaList ( 1, x.getInfluencingPVs () );
-	noSemicolons = false;
-	write("; ");
-	output();
-	noLinefeed   = wasNoLinefeed;
-	noSemicolons = wasNoSemicolons;
-	writeKeywordList ( x.getJumpTable      () );
-	write(")");
-	write(";");
-	output();
-
-	// Mark statement end ...
-	markEnd(0,x);
-	
-    }    
 
 
     public void printPassiveExpression(PassiveExpression x) 

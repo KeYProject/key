@@ -22,8 +22,6 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramMetaConstruct;
-import de.uka.ilkd.key.rule.soundness.ProgramSVProxy;
-import de.uka.ilkd.key.rule.soundness.ProgramSVSkolem;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
 /** 
@@ -485,15 +483,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     public void performActionOnProgramMethod(ProgramMethod x) {
 	doDefaultAction(x);
     }
- 
-    public void performActionOnProgramSVProxy(ProgramSVProxy x)     {
-	doDefaultAction(x);
-    }
- 
-    public void performActionOnProgramSVSkolem(ProgramSVSkolem x)     {
-	doDefaultAction(x);
-    }
- 
+  
     public void performActionOnProgramVariable(ProgramVariable x) {
 	doDefaultAction(x);
     }

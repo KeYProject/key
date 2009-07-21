@@ -26,8 +26,7 @@ import de.uka.ilkd.key.util.Debug;
  *     from f1.isSimilar(f2) and f1.getSortDependingOn() == f2.getSortDependingOn() <br/>
  *     follows f1 == f2 
  */
-public class SortDependingFunction extends RigidFunction
-    implements SortDependingSymbol {
+public class SortDependingFunction extends Function implements SortDependingSymbol {
     
     private final Name kind;
     private final Sort sortDependingOn;

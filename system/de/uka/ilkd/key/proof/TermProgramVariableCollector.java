@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.rule.soundness;
+package de.uka.ilkd.key.proof;
 
 import java.util.HashSet;
 
@@ -19,17 +19,26 @@ import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
-
 public class TermProgramVariableCollector extends Visitor {
 
     private final HashSet<UpdateableOperator> result = new HashSet<UpdateableOperator> ();
     private final Services services;
+    private final boolean collectFunctionLocations;
 
     
-    public TermProgramVariableCollector(Services services) {
+    public TermProgramVariableCollector(Services services, 
+                                        boolean collectFunctionLocations) {
         this.services = services;
+        this.collectFunctionLocations = collectFunctionLocations;
     }
         
+    
+    
+    public TermProgramVariableCollector(Services services) {
+        this(services, false);        
+    }
+    
+    
 
     /** is called by the execPostOrder-method of a term 
      * @param t the Term to checked if it is a program variable and if true the
@@ -38,11 +47,11 @@ public class TermProgramVariableCollector extends Visitor {
     public void visit(Term t) {
 	if ( t.op() instanceof LocationVariable ) {
 	    result.add ( (UpdateableOperator) t.op() );
-	}
+	} 
 	
 	if ( !t.javaBlock ().isEmpty() ) {
 	    ProgramVariableCollector pvc
-		= new ProgramVariableCollector ( t.javaBlock ().program (), services );
+		= new ProgramVariableCollector ( t.javaBlock ().program (), services, collectFunctionLocations );
 	    pvc.start();
 	    result.addAll ( pvc.result () );
 	}

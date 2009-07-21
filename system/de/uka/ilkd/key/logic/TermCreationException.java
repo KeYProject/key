@@ -56,8 +56,9 @@ public class TermCreationException extends RuntimeException {
 	StringBuffer sb = new StringBuffer();
 	for(int i = 0; i < f.arity(); i++) {
 	    sb.append((i+1) + ".) ");
-	    sb.append("sort: " + f.argSort(i) + 
-		    ", sort hash: " + f.argSort(i).hashCode() + "\n");
+	    sb.append("sort: " + f.argSort(i) 
+		      + (f.argSort(i) == null ? "" : ", sort hash: " + f.argSort(i).hashCode()) 
+		      + "\n");
 	}
 	return sb.toString();
     }

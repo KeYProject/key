@@ -544,7 +544,7 @@ public class TestMatchTaclet extends TestCase {
 	Sort osort4=new ClassInstanceSortImpl(new Name("os4"), 
 					      SetAsListOfSort.EMPTY_SET
 					      .add(osort2).add(osort3), false);
-	Function v4=new RigidFunction(new Name("v4"), osort4, new Sort[0]);	
+	Function v4=new Function(new Name("v4"), osort4, new Sort[0]);	
 	TermFactory tf=TermFactory.DEFAULT;
 	Term match=tf.createFunctionTerm(v4);
 	FindTaclet taclet=(FindTaclet)TacletForTests.getTaclet

@@ -13,7 +13,6 @@ package de.uka.ilkd.key.logic;
 import junit.framework.TestCase;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Metavariable;
-import de.uka.ilkd.key.logic.op.RigidFunction;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -31,8 +30,8 @@ public class TestPosInOcc extends TestCase {
 	TermFactory tf=TermFactory.DEFAULT;
 	Sort sort1=new PrimitiveSort(new Name("S1"));
 	Metavariable x=new Metavariable(new Name("x"),sort1);  
-	Function f=new RigidFunction(new Name("f"),sort1,new Sort[]{sort1});
-	Function p=new RigidFunction(new Name("p"),Sort.FORMULA,new Sort[]{sort1});
+	Function f=new Function(new Name("f"),sort1,new Sort[]{sort1});
+	Function p=new Function(new Name("p"),Sort.FORMULA,new Sort[]{sort1});
 
 	Term terms[] = new Term [ 3 ];
 	terms[0]     = tf.createFunctionTerm ( x );
@@ -166,11 +165,11 @@ public class TestPosInOcc extends TestCase {
         Sort sort1 = new PrimitiveSort ( new Name ( "S1" ) );
         Metavariable x = new Metavariable ( new Name ( "x" ), sort1 );
         Metavariable y = new Metavariable ( new Name ( "y" ), sort1 );
-        Function c = new RigidFunction ( new Name ( "c" ), sort1, new Sort[] {} );
-        Function f = new RigidFunction ( new Name ( "f" ),
+        Function c = new Function ( new Name ( "c" ), sort1, new Sort[] {} );
+        Function f = new Function ( new Name ( "f" ),
                                     sort1,
                                     new Sort[] { sort1 } );
-        Function p = new RigidFunction ( new Name ( "p" ),
+        Function p = new Function ( new Name ( "p" ),
                                     Sort.FORMULA,
                                     new Sort[] { sort1 } );
 

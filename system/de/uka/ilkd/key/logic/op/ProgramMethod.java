@@ -8,9 +8,7 @@
 //
 //
 
-/** This file represents a Java method in the logic. It is part of the
- * AST of a java program 
- */
+
 package de.uka.ilkd.key.logic.op;
 
 import java.io.IOException;
@@ -37,7 +35,7 @@ import de.uka.ilkd.key.util.ExtList;
  * In case of an instance method the first argument represents the 
  * object on which the method is invoked. 
  */
-public class ProgramMethod extends NonRigidFunction 
+public final class ProgramMethod extends AbstractSortedOperator 
     implements SourceElement, ProgramElement, 
     MemberDeclaration, ProgramInLogic {
 
@@ -51,11 +49,9 @@ public class ProgramMethod extends NonRigidFunction
 			 KeYJavaType contKJT, 
 			 KeYJavaType kjt,
                          PositionInfo pi) {
-	// for some reasons pm are created for void methods too. It's odd,
-        // but expand method body relies on a pm....
-        super(new ProgramElementName(method.getProgramElementName().toString(), 
-                contKJT.getSort().toString()), 
-	      kjt == null ? Sort.NULL : kjt.getSort(), getArgumentSorts(method, contKJT));
+        super(method.getProgramElementName(), 
+              getArgumentSorts(method, contKJT), 
+              kjt == null ? Sort.NULL : kjt.getSort()); 
                         
 	this.method  = method;
 	this.contKJT = contKJT;
@@ -75,18 +71,22 @@ public class ProgramMethod extends NonRigidFunction
        final boolean instanceMethod = !md.isStatic() && !(md instanceof Constructor);
        
        final int arity = instanceMethod ? 
-               md.getParameterDeclarationCount() + 1 : md.getParameterDeclarationCount();       
+               md.getParameterDeclarationCount() + 2 : md.getParameterDeclarationCount() + 1;       
        
        final Sort[] argSorts = new Sort[arity];
  
-       final int offset;
+       int offset;
        
        if (instanceMethod) {  
-           argSorts[0] = container.getSort();           
+           argSorts[0] = container.getSort();
+           assert argSorts[0] != null : "Bad KJT: " + container;
            offset = 1;
        } else {
            offset = 0;
        }
+       
+       argSorts[offset] = Sort.ANY; //XXX, should be heap
+       offset++;
        
        for (int i = offset; i<argSorts.length; i++) {
            argSorts[i] = 
@@ -97,9 +97,9 @@ public class ProgramMethod extends NonRigidFunction
     }
    
 
-    // convienience methods to access methods of the corresponding MethodDeclaration
+    // convenience methods to access methods of the corresponding MethodDeclaration
     // in a direct way
-    
+   
     public MethodDeclaration getMethodDeclaration() {
 	return method;
     }
@@ -118,23 +118,22 @@ public class ProgramMethod extends NonRigidFunction
         return getMethodDeclaration().getBody();
     }
 
-    /** toString */
-    public String toString() {
-	return name().toString();
-    }
-
+    @Override
     public SourceElement getFirstElement(){
 	return method.getFirstElement();
     }
 
+    @Override
     public SourceElement getLastElement(){
 	return method.getLastElement();
     }
 
+    @Override
     public Comment[] getComments() {
 	return method.getComments();
     }
 
+    @Override
     public void prettyPrint(PrettyPrinter w) throws IOException {
 	method.prettyPrint(w);
     }
@@ -144,42 +143,47 @@ public class ProgramMethod extends NonRigidFunction
      * perform some action/transformation on this element
      * @param v the Visitor
      */
+    @Override
     public void visit(Visitor v) {
 	v.performActionOnProgramMethod(this);
     }
 
     /**
- *        Returns the start position of the primary token of this element.
- *        To get the start position of the syntactical first token,
- *        call the corresponding method of <CODE>getFirstElement()</CODE>.
- *        @return the start position of the primary token.
+     *        Returns the start position of the primary token of this element.
+     *        To get the start position of the syntactical first token,
+     *        call the corresponding method of <CODE>getFirstElement()</CODE>.
+     *        @return the start position of the primary token.
     */
+    @Override    
     public Position getStartPosition(){
 	return pi.getStartPosition();
     }
 
     /**
- *        Returns the end position of the primary token of this element.
- *        To get the end position of the syntactical first token,
- *        call the corresponding method of <CODE>getLastElement()</CODE>.
- *        @return the end position of the primary token.
+     *        Returns the end position of the primary token of this element.
+     *        To get the end position of the syntactical first token,
+     *        call the corresponding method of <CODE>getLastElement()</CODE>.
+     *        @return the end position of the primary token.
      */
+    @Override
     public Position getEndPosition(){
 	return pi.getEndPosition();
     }
 
     /**
- *        Returns the relative position (number of blank heading lines and 
- *        columns) of the primary token of this element.
- *        To get the relative position of the syntactical first token,
- *        call the corresponding method of <CODE>getFirstElement()</CODE>.
- *        @return the relative position of the primary token.
+     *        Returns the relative position (number of blank heading lines and 
+     *        columns) of the primary token of this element.
+     *        To get the relative position of the syntactical first token,
+     *        call the corresponding method of <CODE>getFirstElement()</CODE>.
+     *        @return the relative position of the primary token.
      */
+    @Override
     public Position getRelativePosition(){
 	return  pi.getRelativePosition();
     }
 
 
+    @Override
     public PositionInfo getPositionInfo(){
 	return  pi;
     }
@@ -188,6 +192,7 @@ public class ProgramMethod extends NonRigidFunction
     /**
      * Test whether the declaration is private.
      */
+    @Override
     public boolean isPrivate(){
 	return method.isPrivate();
     }
@@ -195,6 +200,7 @@ public class ProgramMethod extends NonRigidFunction
     /**
      * Test whether the declaration is protected.
      */
+    @Override
     public boolean isProtected(){
 	return method.isProtected();
     }
@@ -202,6 +208,7 @@ public class ProgramMethod extends NonRigidFunction
     /**
      * Test whether the declaration is public.
      */
+    @Override
     public boolean isPublic(){
 	return method.isPublic();
     }
@@ -209,6 +216,7 @@ public class ProgramMethod extends NonRigidFunction
     /**
      * Test whether the declaration is static.
      */
+    @Override
     public boolean isStatic(){
 	return method.isStatic();
     }
@@ -230,18 +238,22 @@ public class ProgramMethod extends NonRigidFunction
     /**
      * Test whether the declaration is strictfp.
      */
+    @Override
     public boolean isStrictFp(){
 	return method.isStrictFp();
     }
     
+    @Override
     public ArrayOfModifier getModifiers(){
 	return method.getModifiers();
     }
 
+    @Override
     public int getChildCount() {
 	return method.getChildCount();
     }
 
+    @Override
     public ProgramElement getChildAt(int i){
 	return method.getChildAt(i);
     }
@@ -249,6 +261,7 @@ public class ProgramMethod extends NonRigidFunction
     /** equals modulo renaming is described in class
      * SourceElement.
      */
+    @Override
      public boolean equalsModRenaming(SourceElement se, 
 				      NameAbstractionTable nat) {
 	 if (se == null || !(se instanceof ProgramMethod)) {
@@ -266,6 +279,7 @@ public class ProgramMethod extends NonRigidFunction
 	return contKJT;
     }
 
+    @Override
     public Expression convertToProgram(Term t, ExtList l) {
 	ProgramElement called;
 	if (isStatic()) {
@@ -305,6 +319,7 @@ public class ProgramMethod extends NonRigidFunction
     public boolean isFinal() {
     	return getMethodDeclaration().isFinal();
     }
+
     public boolean isSynchronized() {
     	return getMethodDeclaration().isSynchronized();
     }
@@ -321,7 +336,9 @@ public class ProgramMethod extends NonRigidFunction
     	return getMethodDeclaration().getParameterDeclarationAt(index);
     }
     
-    /** returns the variablespecification of the i-th parameterdeclaration */
+    /** 
+     * Returns the variablespecification of the i-th parameterdeclaration 
+     */
     public VariableSpecification getVariableSpecification(int index) {
         return method.getParameterDeclarationAt(index).getVariableSpecification();
     }
@@ -330,10 +347,12 @@ public class ProgramMethod extends NonRigidFunction
     	return getMethodDeclaration().getParameterDeclarationCount();
     }
     
+
     public ArrayOfParameterDeclaration getParameters() {
     	return getMethodDeclaration().getParameters();
     }
 
+    @Override
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
         if (src == this) {
@@ -343,5 +362,10 @@ public class ProgramMethod extends NonRigidFunction
             Debug.out("Program match failed (pattern, source)", this, src);
             return null;
         }        
+    }
+    
+    @Override
+    public boolean isRigid () {
+	return false;
     }
 }

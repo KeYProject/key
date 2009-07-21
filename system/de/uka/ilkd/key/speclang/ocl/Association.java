@@ -19,7 +19,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.NonRigidFunction;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.sort.AbstractCollectionSort;
 import de.uka.ilkd.key.logic.sort.AbstractNonCollectionSort;
@@ -113,41 +112,42 @@ public class Association {
     
     
     private void initialiseFunctions(Services services) {
-
-        Sort[] argSorts = new Sort[ends.size()];
-        IteratorOfAssociationEnd it = ends.iterator();
-        int i = 0;
-        while(it.hasNext()) {
-            argSorts[i++] = getSort(services, it.next().getModelClass());
-        }
-        predicate = new NonRigidFunction(name, Sort.FORMULA, argSorts);
-        services.getNamespaces().functions().add(predicate);
-        
-        if (ends.size() == 2) {
-            AssociationEnd end1 = ends.head();
-            AssociationEnd end2 = ends.tail().head();
-            Sort sort1 = getSort(services, end1.getModelClass());
-            Sort sort2 = getSort(services, end2.getModelClass());
-            
-            //TODO: if there is a qualifier <<ordered>> then SequenceSort
-            //      instead of SetSort has to be used.
-            Sort resSort1 = sort1;
-            Sort resSort2 = sort2;
-            if (ends.head().getMultiplicity().getMax() != 1) {
-                resSort1 = ((AbstractNonCollectionSort) sort1).getSetSort();
-            }
-            if (ends.tail().head().getMultiplicity().getMax() != 1) {
-                resSort2 = ((AbstractNonCollectionSort) sort2).getSetSort();
-            }
-            func1 = new NonRigidFunction(end2.getRoleName(), 
-                                         resSort2,
-                                         new Sort[] {sort1});
-            func2 = new NonRigidFunction(end1.getRoleName(),
-                                         resSort1,
-                                         new Sort[] {sort2});
-            services.getNamespaces().functions().add(func1);
-            services.getNamespaces().functions().add(func2);
-        }
+assert false : "not implemented";
+	
+//        Sort[] argSorts = new Sort[ends.size()];
+//        IteratorOfAssociationEnd it = ends.iterator();
+//        int i = 0;
+//        while(it.hasNext()) {
+//            argSorts[i++] = getSort(services, it.next().getModelClass());
+//        }
+//        predicate = new NonRigidFunction(name, Sort.FORMULA, argSorts);
+//        services.getNamespaces().functions().add(predicate);
+//        
+//        if (ends.size() == 2) {
+//            AssociationEnd end1 = ends.head();
+//            AssociationEnd end2 = ends.tail().head();
+//            Sort sort1 = getSort(services, end1.getModelClass());
+//            Sort sort2 = getSort(services, end2.getModelClass());
+//            
+//            //TODO: if there is a qualifier <<ordered>> then SequenceSort
+//            //      instead of SetSort has to be used.
+//            Sort resSort1 = sort1;
+//            Sort resSort2 = sort2;
+//            if (ends.head().getMultiplicity().getMax() != 1) {
+//                resSort1 = ((AbstractNonCollectionSort) sort1).getSetSort();
+//            }
+//            if (ends.tail().head().getMultiplicity().getMax() != 1) {
+//                resSort2 = ((AbstractNonCollectionSort) sort2).getSetSort();
+//            }
+//            func1 = new NonRigidFunction(end2.getRoleName(), 
+//                                         resSort2,
+//                                         new Sort[] {sort1});
+//            func2 = new NonRigidFunction(end1.getRoleName(),
+//                                         resSort1,
+//                                         new Sort[] {sort2});
+//            services.getNamespaces().functions().add(func1);
+//            services.getNamespaces().functions().add(func2);
+//        }
     }
     
     

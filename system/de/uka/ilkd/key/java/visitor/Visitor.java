@@ -23,8 +23,6 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramMetaConstruct;
-import de.uka.ilkd.key.rule.soundness.ProgramSVProxy;
-import de.uka.ilkd.key.rule.soundness.ProgramSVSkolem;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
 /**
@@ -35,282 +33,278 @@ import de.uka.ilkd.key.speclang.LoopInvariant;
  */
 public interface Visitor {
 
-     void performActionOnAbstractProgramElement
-	(AbstractProgramElement x);
+    void performActionOnAbstractProgramElement
+    (AbstractProgramElement x);
 
-     void performActionOnProgramElementName(
-			    ProgramElementName x);
+    void performActionOnProgramElementName(
+	    ProgramElementName x);
 
-     void performActionOnProgramVariable(
-			    ProgramVariable x);
+    void performActionOnProgramVariable(
+	    ProgramVariable x);
 
-     void performActionOnIProgramVariable(
-             IProgramVariable x);
+    void performActionOnIProgramVariable(
+	    IProgramVariable x);
 
-     void performActionOnSchemaVariable(
-			    SchemaVariable x);
-    
-     void performActionOnProgramMethod(
-			    ProgramMethod x);
+    void performActionOnSchemaVariable(
+	    SchemaVariable x);
 
-     void performActionOnProgramMetaConstruct(
-			    ProgramMetaConstruct x);
+    void performActionOnProgramMethod(
+	    ProgramMethod x);
 
-     void performActionOnContextStatementBlock(
-			    ContextStatementBlock x);
+    void performActionOnProgramMetaConstruct(
+	    ProgramMetaConstruct x);
 
-     void performActionOnIntLiteral(IntLiteral x); 
+    void performActionOnContextStatementBlock(
+	    ContextStatementBlock x);
 
-     void performActionOnBooleanLiteral(BooleanLiteral x); 
+    void performActionOnIntLiteral(IntLiteral x); 
 
-     void performActionOnStringLiteral(StringLiteral x); 
+    void performActionOnBooleanLiteral(BooleanLiteral x); 
 
-     void performActionOnNullLiteral(NullLiteral x); 
+    void performActionOnStringLiteral(StringLiteral x); 
 
-     void performActionOnCharLiteral(CharLiteral x); 
+    void performActionOnNullLiteral(NullLiteral x); 
 
-     void performActionOnDoubleLiteral(DoubleLiteral x); 
+    void performActionOnCharLiteral(CharLiteral x); 
 
-     void performActionOnLongLiteral(LongLiteral x); 
+    void performActionOnDoubleLiteral(DoubleLiteral x); 
 
-     void performActionOnFloatLiteral(FloatLiteral x); 
+    void performActionOnLongLiteral(LongLiteral x); 
 
-     void performActionOnPackageSpecification(PackageSpecification x); 
+    void performActionOnFloatLiteral(FloatLiteral x); 
 
-     void performActionOnTypeReference(TypeReference x); 
+    void performActionOnPackageSpecification(PackageSpecification x); 
 
-     void performActionOnPackageReference(PackageReference x);     
+    void performActionOnTypeReference(TypeReference x); 
 
-     void performActionOnThrows(Throws x); 
+    void performActionOnPackageReference(PackageReference x);     
 
-     void performActionOnArrayInitializer(ArrayInitializer x); 
+    void performActionOnThrows(Throws x); 
 
-     void performActionOnCompilationUnit(CompilationUnit x); 
+    void performActionOnArrayInitializer(ArrayInitializer x); 
 
-     void performActionOnArrayDeclaration(ArrayDeclaration x);
+    void performActionOnCompilationUnit(CompilationUnit x); 
 
-     void performActionOnSuperArrayDeclaration(SuperArrayDeclaration x);
+    void performActionOnArrayDeclaration(ArrayDeclaration x);
 
-     void performActionOnClassDeclaration(ClassDeclaration x); 
+    void performActionOnSuperArrayDeclaration(SuperArrayDeclaration x);
 
-     void performActionOnInterfaceDeclaration(InterfaceDeclaration x); 
+    void performActionOnClassDeclaration(ClassDeclaration x); 
 
-     void performActionOnFieldDeclaration(FieldDeclaration x); 
+    void performActionOnInterfaceDeclaration(InterfaceDeclaration x); 
 
-     void performActionOnLocalVariableDeclaration(LocalVariableDeclaration x); 
+    void performActionOnFieldDeclaration(FieldDeclaration x); 
 
-     void performActionOnVariableDeclaration(VariableDeclaration x); 
+    void performActionOnLocalVariableDeclaration(LocalVariableDeclaration x); 
 
-     void performActionOnParameterDeclaration(ParameterDeclaration x); 
+    void performActionOnVariableDeclaration(VariableDeclaration x); 
 
-     void performActionOnMethodDeclaration(MethodDeclaration x); 
+    void performActionOnParameterDeclaration(ParameterDeclaration x); 
 
-     void performActionOnClassInitializer(ClassInitializer x); 
+    void performActionOnMethodDeclaration(MethodDeclaration x); 
 
-     void performActionOnStatementBlock(StatementBlock x); 
+    void performActionOnClassInitializer(ClassInitializer x); 
 
-     void performActionOnBreak(Break x); 
+    void performActionOnStatementBlock(StatementBlock x); 
 
-     void performActionOnContinue(Continue x); 
+    void performActionOnBreak(Break x); 
 
-     void performActionOnReturn(Return x); 
+    void performActionOnContinue(Continue x); 
 
-     void performActionOnThrow(Throw x);
+    void performActionOnReturn(Return x); 
 
-     void performActionOnDo(Do x); 
+    void performActionOnThrow(Throw x);
 
-     void performActionOnFor(For x);
-     
-     void performActionOnEnhancedFor(EnhancedFor x);
+    void performActionOnDo(Do x); 
 
-     void performActionOnWhile(While x); 
+    void performActionOnFor(For x);
 
-     void performActionOnIf(If x); 
+    void performActionOnEnhancedFor(EnhancedFor x);
 
-     void performActionOnSwitch(Switch x); 
+    void performActionOnWhile(While x); 
 
-     void performActionOnTry(Try x); 
+    void performActionOnIf(If x); 
 
-     void performActionOnLabeledStatement(LabeledStatement x); 
+    void performActionOnSwitch(Switch x); 
 
-     void performActionOnMethodFrame(MethodFrame x); 
+    void performActionOnTry(Try x); 
 
-     void performActionOnMethodBodyStatement(MethodBodyStatement x); 
+    void performActionOnLabeledStatement(LabeledStatement x); 
 
-     void performActionOnCatchAllStatement(CatchAllStatement x); 
+    void performActionOnMethodFrame(MethodFrame x); 
 
-     void performActionOnSynchronizedBlock(SynchronizedBlock x); 
+    void performActionOnMethodBodyStatement(MethodBodyStatement x); 
 
-     void performActionOnImport(Import x);
+    void performActionOnCatchAllStatement(CatchAllStatement x); 
 
-     void performActionOnExtends(Extends x);
+    void performActionOnSynchronizedBlock(SynchronizedBlock x); 
 
-     void performActionOnImplements(Implements x);
+    void performActionOnImport(Import x);
 
-     void performActionOnVariableSpecification(VariableSpecification x); 
+    void performActionOnExtends(Extends x);
 
-     void performActionOnFieldSpecification(FieldSpecification x); 
+    void performActionOnImplements(Implements x);
 
-     void performActionOnImplicitFieldSpecification(ImplicitFieldSpecification x); 
+    void performActionOnVariableSpecification(VariableSpecification x); 
 
-     void performActionOnBinaryAnd(BinaryAnd x); 
+    void performActionOnFieldSpecification(FieldSpecification x); 
 
-     void performActionOnBinaryAndAssignment(BinaryAndAssignment x); 
+    void performActionOnImplicitFieldSpecification(ImplicitFieldSpecification x); 
 
-     void performActionOnBinaryOrAssignment(BinaryOrAssignment x); 
+    void performActionOnBinaryAnd(BinaryAnd x); 
 
-     void performActionOnBinaryXOrAssignment(BinaryXOrAssignment x); 
+    void performActionOnBinaryAndAssignment(BinaryAndAssignment x); 
 
-     void performActionOnCopyAssignment(CopyAssignment x);
-     
-     void performActionOnSetAssignment(SetAssignment x);
+    void performActionOnBinaryOrAssignment(BinaryOrAssignment x); 
 
-     void performActionOnDivideAssignment(DivideAssignment x);
+    void performActionOnBinaryXOrAssignment(BinaryXOrAssignment x); 
 
-     void performActionOnMinusAssignment(MinusAssignment x); 
+    void performActionOnCopyAssignment(CopyAssignment x);
 
-     void performActionOnModuloAssignment(ModuloAssignment x);
+    void performActionOnSetAssignment(SetAssignment x);
 
-     void performActionOnPlusAssignment(PlusAssignment x); 
+    void performActionOnDivideAssignment(DivideAssignment x);
 
-     void performActionOnPostDecrement(PostDecrement x); 
+    void performActionOnMinusAssignment(MinusAssignment x); 
 
-     void performActionOnPostIncrement(PostIncrement x); 
+    void performActionOnModuloAssignment(ModuloAssignment x);
 
-     void performActionOnPreDecrement(PreDecrement x); 
+    void performActionOnPlusAssignment(PlusAssignment x); 
 
-     void performActionOnPreIncrement(PreIncrement x); 
+    void performActionOnPostDecrement(PostDecrement x); 
 
-     void performActionOnShiftLeftAssignment(ShiftLeftAssignment x); 
+    void performActionOnPostIncrement(PostIncrement x); 
 
-     void performActionOnShiftRightAssignment(ShiftRightAssignment x); 
+    void performActionOnPreDecrement(PreDecrement x); 
 
-     void performActionOnTimesAssignment(TimesAssignment x);
+    void performActionOnPreIncrement(PreIncrement x); 
 
-     void performActionOnUnsignedShiftRightAssignment 
-	(UnsignedShiftRightAssignment x); 
+    void performActionOnShiftLeftAssignment(ShiftLeftAssignment x); 
 
-     void performActionOnBinaryNot(BinaryNot x); 
+    void performActionOnShiftRightAssignment(ShiftRightAssignment x); 
 
-     void performActionOnBinaryOr(BinaryOr x); 
+    void performActionOnTimesAssignment(TimesAssignment x);
 
-     void performActionOnBinaryXOr(BinaryXOr x);
+    void performActionOnUnsignedShiftRightAssignment 
+    (UnsignedShiftRightAssignment x); 
 
-     void performActionOnConditional(Conditional x);
-	
-     void performActionOnDivide(Divide x);
+    void performActionOnBinaryNot(BinaryNot x); 
 
-     void performActionOnEquals(Equals x); 
+    void performActionOnBinaryOr(BinaryOr x); 
 
-     void performActionOnGreaterOrEquals(GreaterOrEquals x);
+    void performActionOnBinaryXOr(BinaryXOr x);
 
-     void performActionOnGreaterThan(GreaterThan x); 
+    void performActionOnConditional(Conditional x);
 
-     void performActionOnLessOrEquals(LessOrEquals x);
+    void performActionOnDivide(Divide x);
 
-     void performActionOnLessThan(LessThan x); 
+    void performActionOnEquals(Equals x); 
 
-     void performActionOnNotEquals(NotEquals x); 
+    void performActionOnGreaterOrEquals(GreaterOrEquals x);
 
-     void performActionOnNewArray(NewArray x); 
+    void performActionOnGreaterThan(GreaterThan x); 
 
-     void performActionOnInstanceof(Instanceof x);
+    void performActionOnLessOrEquals(LessOrEquals x);
 
-     void performActionOnExactInstanceof(ExactInstanceof x);
+    void performActionOnLessThan(LessThan x); 
 
-     void performActionOnNew(New x); 
+    void performActionOnNotEquals(NotEquals x); 
 
-     void performActionOnTypeCast(TypeCast x); 
+    void performActionOnNewArray(NewArray x); 
 
-     void performActionOnLogicalAnd(LogicalAnd x);
+    void performActionOnInstanceof(Instanceof x);
 
-     void performActionOnLogicalNot(LogicalNot x);
+    void performActionOnExactInstanceof(ExactInstanceof x);
 
-     void performActionOnLogicalOr(LogicalOr x);
+    void performActionOnNew(New x); 
 
-     void performActionOnMinus(Minus x); 
+    void performActionOnTypeCast(TypeCast x); 
 
-     void performActionOnModulo(Modulo x);
+    void performActionOnLogicalAnd(LogicalAnd x);
 
-     void performActionOnNegative(Negative x);
+    void performActionOnLogicalNot(LogicalNot x);
 
-     void performActionOnPlus(Plus x); 
+    void performActionOnLogicalOr(LogicalOr x);
 
-     void performActionOnPositive(Positive x); 
+    void performActionOnMinus(Minus x); 
 
-     void performActionOnShiftLeft(ShiftLeft x);
+    void performActionOnModulo(Modulo x);
 
-     void performActionOnShiftRight(ShiftRight x);
+    void performActionOnNegative(Negative x);
 
-     void performActionOnTimes(Times x); 
+    void performActionOnPlus(Plus x); 
 
-     void performActionOnUnsignedShiftRight(UnsignedShiftRight x); 
+    void performActionOnPositive(Positive x); 
 
-     void performActionOnArrayReference(ArrayReference x); 
+    void performActionOnShiftLeft(ShiftLeft x);
 
-     void performActionOnMetaClassReference(MetaClassReference x); 
+    void performActionOnShiftRight(ShiftRight x);
 
-     void performActionOnMethodReference(MethodReference x); 
+    void performActionOnTimes(Times x); 
 
-     void performActionOnFieldReference(FieldReference x); 
+    void performActionOnUnsignedShiftRight(UnsignedShiftRight x); 
 
-     void performActionOnSchematicFieldReference(SchematicFieldReference x); 
+    void performActionOnArrayReference(ArrayReference x); 
 
-     void performActionOnVariableReference(VariableReference x); 
+    void performActionOnMetaClassReference(MetaClassReference x); 
 
-     void performActionOnMethod(ProgramMethod x); 
+    void performActionOnMethodReference(MethodReference x); 
 
-     void performActionOnSuperConstructorReference(SuperConstructorReference x); 
+    void performActionOnFieldReference(FieldReference x); 
 
-     void performActionOnExecutionContext(ExecutionContext x); 
+    void performActionOnSchematicFieldReference(SchematicFieldReference x); 
 
-     void performActionOnConstructorDeclaration(ConstructorDeclaration x); 
+    void performActionOnVariableReference(VariableReference x); 
 
-     void performActionOnThisConstructorReference(ThisConstructorReference x); 
+    void performActionOnMethod(ProgramMethod x); 
 
-     void performActionOnSuperReference(SuperReference x); 
+    void performActionOnSuperConstructorReference(SuperConstructorReference x); 
 
-     void performActionOnThisReference(ThisReference x); 
+    void performActionOnExecutionContext(ExecutionContext x); 
 
-     void performActionOnArrayLengthReference(ArrayLengthReference x); 
+    void performActionOnConstructorDeclaration(ConstructorDeclaration x); 
 
-     void performActionOnThen(Then x);
+    void performActionOnThisConstructorReference(ThisConstructorReference x); 
 
-     void performActionOnElse(Else x);
+    void performActionOnSuperReference(SuperReference x); 
 
-     void performActionOnCase(Case x);
+    void performActionOnThisReference(ThisReference x); 
 
-     void performActionOnCatch(Catch x);
+    void performActionOnArrayLengthReference(ArrayLengthReference x); 
 
-     void performActionOnDefault(Default x);
+    void performActionOnThen(Then x);
 
-     void performActionOnFinally(Finally x);
+    void performActionOnElse(Else x);
 
-     void performActionOnModifier(Modifier x); 
+    void performActionOnCase(Case x);
 
-     void performActionOnEmptyStatement(EmptyStatement x);
+    void performActionOnCatch(Catch x);
 
-     void performActionOnComment(Comment x); 
+    void performActionOnDefault(Default x);
 
-     void performActionOnParenthesizedExpression(ParenthesizedExpression x); 
+    void performActionOnFinally(Finally x);
 
-     void performActionOnPassiveExpression(PassiveExpression x); 
+    void performActionOnModifier(Modifier x); 
 
-     void performActionOnForUpdates(ForUpdates x); 
+    void performActionOnEmptyStatement(EmptyStatement x);
 
-     void performActionOnGuard(Guard x); 
+    void performActionOnComment(Comment x); 
 
-     void performActionOnLoopInit(LoopInit x); 
+    void performActionOnParenthesizedExpression(ParenthesizedExpression x); 
 
-     void performActionOnProgramSVSkolem(ProgramSVSkolem x); 
+    void performActionOnPassiveExpression(PassiveExpression x); 
 
-     void performActionOnProgramSVProxy(ProgramSVProxy x);
+    void performActionOnForUpdates(ForUpdates x); 
 
-     void performActionOnAssert(Assert assert1);
+    void performActionOnGuard(Guard x); 
+
+    void performActionOnLoopInit(LoopInit x); 
+
+    void performActionOnAssert(Assert assert1);
 
     void performActionOnProgramConstant(ProgramConstant constant);
 
     void performActionOnLocationVariable(LocationVariable variable); 
-    
+
     void performActionOnLoopInvariant(LoopInvariant x);
 }

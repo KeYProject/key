@@ -11,7 +11,6 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.rule.soundness.SVSkolemFunction;
 
 public class WaryClashFreeSubst extends ClashFreeSubst {
 
@@ -107,8 +106,6 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
 		return applyOnModality ( t );		
 	    if ( t.op () instanceof UpdateApplication )
 		return applyOnUpdate   ( t );
-	    if ( t.op () instanceof SVSkolemFunction )
-		return applyToSVSkolem ( t );
 	}
 	return super.apply1 ( t );
     }
@@ -192,12 +189,4 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
                                                         newVarTerm );
         return cfs.apply ( t );
     }
-    
-    /**
-     * Apply the substitution to a non-rigid skolem function
-     */
-    private Term applyToSVSkolem ( Term t ) {
-    	return applyBelowModality(t);
-    }
-
 }

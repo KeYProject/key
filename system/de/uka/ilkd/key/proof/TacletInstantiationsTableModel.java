@@ -40,7 +40,6 @@ import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.inst.RigidnessException;
 import de.uka.ilkd.key.rule.inst.SortException;
-import de.uka.ilkd.key.util.Array;
 
 
 public class TacletInstantiationsTableModel extends AbstractTableModel {

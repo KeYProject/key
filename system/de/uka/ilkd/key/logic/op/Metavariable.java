@@ -12,7 +12,7 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-public class Metavariable extends AbstractSortedOperator
+public final class Metavariable extends AbstractSortedOperator
     implements ParsableVariable, Comparable<Metavariable> {
 
     // Used to define an alternative order of all existing
@@ -34,10 +34,12 @@ public class Metavariable extends AbstractSortedOperator
 	}
 	this.isTemporaryVariable = isTemporaryVariable;
 	setSerial ();
+//	assert false : "metavariables are disabled";
     }
 
     public Metavariable (Name name, Sort sort) {
         this ( name, sort, false );
+//	assert false : "metavariables are disabled";        
     }
 
     public static Metavariable createTemporaryVariable (Name name, Sort sort) {

@@ -35,18 +35,18 @@ public class TestTermFactory extends TestCase {
 						  SetAsListOfSort.EMPTY_SET
 						  .add(osort2).add(osort3), false);
     
-    Function p=new RigidFunction(new Name("p"),Sort.FORMULA,new Sort[]{sort1});  
+    Function p=new Function(new Name("p"),Sort.FORMULA,new Sort[]{sort1});  
         //p(:S1):BOOL
     LogicVariable x=new LogicVariable(new Name("x"),sort1);  //x:S1
-    Function q=new RigidFunction(new Name("q"),Sort.FORMULA,
+    Function q=new Function(new Name("q"),Sort.FORMULA,
 			    new Sort[]{new PrimitiveSort(new Name("Whatever"))}); 
         //q(:Whatever):BOOL
     LogicVariable z=new LogicVariable(new Name("z"),sort1); //z:S1
-    Function r=new RigidFunction(new Name("r"),Sort.FORMULA,new Sort[]{sort1, sort2});
+    Function r=new Function(new Name("r"),Sort.FORMULA,new Sort[]{sort1, sort2});
         //r(:S1, :S2):BOOL
     LogicVariable y=new LogicVariable(new Name("y"),sort3); //y:S3
     LogicVariable w=new LogicVariable(new Name("w"),sort2); //w:S2
-    Function f=new RigidFunction(new Name("f"),sort1, new Sort[]{sort3}); 
+    Function f=new Function(new Name("f"),sort1, new Sort[]{sort3}); 
         // f(:S3):S1
 
     LogicVariable v1=new LogicVariable(new Name("v1"), osort1);
@@ -54,7 +54,7 @@ public class TestTermFactory extends TestCase {
     LogicVariable v3=new LogicVariable(new Name("v3"), osort3);
     LogicVariable v4=new LogicVariable(new Name("v4"), osort4);
 
-    Function g=new RigidFunction(new Name("g"), osort3, new Sort[]{osort2, osort1});
+    Function g=new Function(new Name("g"), osort3, new Sort[]{osort2, osort1});
 
     public TestTermFactory(String name) {
 	super(name);
@@ -283,18 +283,18 @@ public class TestTermFactory extends TestCase {
     public void testSubSortsSubst() {
 	Term t = tf.createFunctionTerm(g, tf.createVariableTerm(v2), 
 				       tf.createVariableTerm(v1));
-	Function c=new RigidFunction(new Name("c"), osort2, new Sort[0]);
+	Function c=new Function(new Name("c"), osort2, new Sort[0]);
 	Term st = tf.createSubstitutionTerm(WarySubstOp.SUBST, v2, 
 					    tf.createFunctionTerm(c), t);
-	c=new RigidFunction(new Name("c"), osort4, new Sort[0]);
+	c=new Function(new Name("c"), osort4, new Sort[0]);
 	st = tf.createSubstitutionTerm(WarySubstOp.SUBST, v2, 
 					    tf.createFunctionTerm(c), t);
-	c=new RigidFunction(new Name("c"), osort3, new Sort[0]);
+	c=new Function(new Name("c"), osort3, new Sort[0]);
 	st = tf.createSubstitutionTerm(WarySubstOp.SUBST, v1, 
 					    tf.createFunctionTerm(c), t);
 	Exception exc=new Exception();
 	try {
-	    c=new RigidFunction(new Name("c"), osort1, new Sort[0]);
+	    c=new Function(new Name("c"), osort1, new Sort[0]);
 	    st = tf.createSubstitutionTerm(WarySubstOp.SUBST, v2, 
 					    tf.createFunctionTerm(c), t);
 	} catch (TermCreationException e) {
@@ -303,7 +303,7 @@ public class TestTermFactory extends TestCase {
 	assertTrue(exc instanceof TermCreationException);
 	exc=new Exception();
 	try {
-	    c=new RigidFunction(new Name("c"), osort3, new Sort[0]);
+	    c=new Function(new Name("c"), osort3, new Sort[0]);
 	    st = tf.createSubstitutionTerm(WarySubstOp.SUBST, v2, 
 					   tf.createFunctionTerm(c), t);
 	    

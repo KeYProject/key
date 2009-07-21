@@ -24,7 +24,6 @@ import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.rule.soundness.ProgramSVProxy;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.SimpleStackOfExtList;
 
@@ -1127,15 +1126,6 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
                     changeList.removeFirstOccurrence(PositionInfo.class);
 		}
                 return new LoopInit(changeList, pi);
-            }
-        };
-        def.doAction(x);
-    }
-
-    public void performActionOnProgramSVProxy(ProgramSVProxy x) {
-        DefaultAction def = new DefaultAction(x) {
-            ProgramElement createNewElement(ExtList changeList) {
-                return new ProgramSVProxy(changeList);
             }
         };
         def.doAction(x);

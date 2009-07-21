@@ -13,7 +13,7 @@ package de.uka.ilkd.key.logic;
 import junit.framework.TestCase;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Metavariable;
-import de.uka.ilkd.key.logic.op.RigidFunction;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -29,13 +29,13 @@ public class TestSemisequent extends TestCase {
     public void setUp() { 
 	TermFactory tf=TermFactory.DEFAULT;
 	
-       	Function p=new RigidFunction(new Name("p"),Sort.FORMULA,new Sort[]{});  
-	Function q=new RigidFunction(new Name("q"),Sort.FORMULA,new Sort[]{});
-	Function r=new RigidFunction(new Name("r"),Sort.FORMULA,new Sort[]{});
+       	Function p=new Function(new Name("p"),Sort.FORMULA,new Sort[]{});  
+	Function q=new Function(new Name("q"),Sort.FORMULA,new Sort[]{});
+	Function r=new Function(new Name("r"),Sort.FORMULA,new Sort[]{});
 
-       	Function a=new RigidFunction(new Name("a"),Sort.FORMULA,new Sort[]{});  
-	Function b=new RigidFunction(new Name("b"),Sort.FORMULA,new Sort[]{});
-	Function c=new RigidFunction(new Name("c"),Sort.FORMULA,new Sort[]{});
+       	Function a=new Function(new Name("a"),Sort.FORMULA,new Sort[]{});  
+	Function b=new Function(new Name("b"),Sort.FORMULA,new Sort[]{});
+	Function c=new Function(new Name("c"),Sort.FORMULA,new Sort[]{});
 
 
 	Term t_p=tf.createFunctionTerm(p, new Term[]{});
@@ -57,7 +57,7 @@ public class TestSemisequent extends TestCase {
 	con[6]=new ConstrainedFormula(t_c, Constraint.BOTTOM);
 
 	Sort s = new PrimitiveSort(new Name("test"));
-	Function f = new RigidFunction(new Name("f"), s, new Sort[]{});
+	Function f = new Function(new Name("f"), s, new Sort[]{});
  	Term t_f = tf.createFunctionTerm(f, new Term[]{});
 	Metavariable mv = new Metavariable(new Name("mv"), s);
  	Term t_mv = tf.createFunctionTerm(mv, new Term[]{});

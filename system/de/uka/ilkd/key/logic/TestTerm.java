@@ -30,19 +30,19 @@ public class TestTerm extends TestCase {
     private Sort sort3=new PrimitiveSort(new Name("S3"));
     	
 
-    Function p=new RigidFunction(new Name("p"),Sort.FORMULA,new Sort[]{sort1});  
+    Function p=new Function(new Name("p"),Sort.FORMULA,new Sort[]{sort1});  
         //p(:S1):BOOL
     LogicVariable x=new LogicVariable(new Name("x"),sort1);  //x:S1
-    Function q=new RigidFunction(new Name("q"),Sort.FORMULA,
+    Function q=new Function(new Name("q"),Sort.FORMULA,
 			    new Sort[]{new PrimitiveSort(new Name("Whatever"))}); 
         //q(:Whatever):BOOL
     LogicVariable z=new LogicVariable(new Name("z"),sort1); //z:S1
     LogicVariable zz=new LogicVariable(new Name("zz"),sort1); //zz:S1
-    Function r=new RigidFunction(new Name("r"),Sort.FORMULA,new Sort[]{sort1, sort2});
+    Function r=new Function(new Name("r"),Sort.FORMULA,new Sort[]{sort1, sort2});
         //r(:S1, :S2):BOOL
     LogicVariable y=new LogicVariable(new Name("y"),sort3); //y:S3
     LogicVariable w=new LogicVariable(new Name("w"),sort2); //w:S2
-    Function f=new RigidFunction(new Name("f"),sort1, new Sort[]{sort3}); 
+    Function f=new Function(new Name("f"),sort1, new Sort[]{sort3}); 
         // f(:S3):S1
 
     ProgramVariable pv0=new LocationVariable

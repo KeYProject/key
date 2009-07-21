@@ -64,8 +64,8 @@ public class TestCollisionResolving extends TestCase {
 	// the term has to be built manually because we have to ensure
 	// object equality of the LogicVariable x
 	LogicVariable x = new LogicVariable(new Name("x"), s);
-	Function p = new RigidFunction(new Name("p"), Sort.FORMULA, new Sort[]{s});
-	Function q = new RigidFunction(new Name("q"), Sort.FORMULA, new Sort[]{s});
+	Function p = new Function(new Name("p"), Sort.FORMULA, new Sort[]{s});
+	Function q = new Function(new Name("q"), Sort.FORMULA, new Sort[]{s});
 
 	Term t_x = TermFactory.DEFAULT.createVariableTerm(x);	
 	Term t_p_x = TermFactory.DEFAULT.createFunctionTerm(p, t_x);
@@ -111,8 +111,8 @@ public class TestCollisionResolving extends TestCase {
 	// the term has to be built manually because we have to ensure
 	// object equality of the LogicVariable x
 	LogicVariable x = new LogicVariable(new Name("x"), s);
-	Function p = new RigidFunction(new Name("p"), Sort.FORMULA, new Sort[]{s});
-	Function q = new RigidFunction(new Name("q"), Sort.FORMULA, new Sort[]{s});
+	Function p = new Function(new Name("p"), Sort.FORMULA, new Sort[]{s});
+	Function q = new Function(new Name("q"), Sort.FORMULA, new Sort[]{s});
 
 	Term t_x = TermFactory.DEFAULT.createVariableTerm(x);	
 	Term t_p_x = TermFactory.DEFAULT.createFunctionTerm(p, t_x);

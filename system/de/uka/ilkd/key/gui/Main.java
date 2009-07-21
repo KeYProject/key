@@ -989,17 +989,7 @@ public class Main extends JFrame implements IMain {
         
         registerAtMenu(fileMenu, load);
         registerAtMenu(fileMenu, save);
-        
-        JMenuItem tacletPOItem = new JMenuItem("Load Non-Axiom Lemma ...");
-        tacletPOItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (mediator().ensureProofLoaded()) {
-                    generateTacletPO();
-                }
-            }
-        });
-        registerAtMenu(fileMenu, tacletPOItem);
-        
+                
         JMenuItem exit = new JMenuItem("Exit");
         exit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
         exit.addActionListener(new ActionListener() {
@@ -1524,20 +1514,6 @@ public class Main extends JFrame implements IMain {
             proof.mgt().removeProofListener();
             ((ProofTreeView)proofView.getComponent(0)).removeProofs(rootTask.allProofs());
         }
-    }
-    
-    protected void generateTacletPO () {
-        final KeYFileChooser localFileChooser = getFileChooser ("Choose file to "
-                +"load taclets "
-                +"from ...");
-        boolean loaded = localFileChooser.showOpenDialog ( Main.this );
-        if (!loaded)
-            return;
-        
-        final File file = localFileChooser.getSelectedFile ();
-        
-        new TacletSoundnessPOLoader(file, this, Main.getInstance().mediator().getSelectedProof()
-                .openGoals()).run();
     }
     
     /**

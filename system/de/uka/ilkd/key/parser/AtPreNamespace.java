@@ -16,7 +16,6 @@ import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.RigidFunction;
 import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -75,7 +74,7 @@ public class AtPreNamespace extends Namespace {
     /**
      */
     private Named createAtPreFunction(Name name, Sort sort, ArrayOfSort argsort) {
-        return new RigidFunction(name, sort, argsort);
+        return new Function(name, sort, argsort);
     }
 
     public Map getAtPreMapping() {

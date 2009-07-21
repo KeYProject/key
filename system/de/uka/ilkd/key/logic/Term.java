@@ -15,7 +15,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 /** 
  * In contrast to the distinction of formulas and terms as made by most of the 
- * inductive definition of the syntax of a logic, an instance of this class can
+ * inductive definitions of the syntax of a logic, an instance of this class can
  * stand for a term or a formula. This is done for implementation reasons, as
  * their structure is quite similar and there are good reasons concerning the
  * software's design/architecture (for example using same visitors, reduction of

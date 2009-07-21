@@ -30,7 +30,6 @@ import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.rule.soundness.ProgramSVProxy;
 import de.uka.ilkd.key.util.ExtList;
 
 public abstract class ProgramSVSort extends PrimitiveSort {
@@ -1431,9 +1430,6 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	    if (pe instanceof ProgramVariable) {
 		return super.allowed(pe, services);
 	    }
-	    if (pe instanceof ProgramSVProxy) {
- 		return true;
-	    }
 	    return false;
 	}
 
@@ -1474,9 +1470,6 @@ public abstract class ProgramSVSort extends PrimitiveSort {
 	// %%% we should move information from the variable
 	// specification to the program variable %RB
 	protected boolean allowed(ProgramElement pe, Services services) {
-	    if (pe instanceof ProgramSVProxy) {
- 		return true;
-	    }
 	    return super.allowed(pe, services) ||  
 		(matchingNames[0] == null && pe instanceof ProgramVariable && implicit(pe));
 	}

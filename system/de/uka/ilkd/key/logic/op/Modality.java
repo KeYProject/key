@@ -19,7 +19,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * This class is used to represent a dynamic logic modality like
  * diamond and box (but also extensions of DL like
  * preserves and throughout are possible in the future).
- * For further information see @see PrpgramTerm.
  */
 
 public final class Modality extends AbstractSortedOperator {

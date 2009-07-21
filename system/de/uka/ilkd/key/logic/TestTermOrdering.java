@@ -27,15 +27,15 @@ public class TestTermOrdering extends TestCase {
 
     private Sort sort1=new PrimitiveSort(new Name("S1"));
 
-    Function f=new RigidFunction(new Name("f"),sort1, new Sort[]{sort1}); 
+    Function f=new Function(new Name("f"),sort1, new Sort[]{sort1}); 
         // f(:S1):S1
-    Function h=new RigidFunction(new Name("h"),sort1, new Sort[]{sort1}); 
+    Function h=new Function(new Name("h"),sort1, new Sort[]{sort1}); 
     // h(:S1):S1
-    Function g=new RigidFunction(new Name("g"),sort1, new Sort[]{sort1, sort1}); 
+    Function g=new Function(new Name("g"),sort1, new Sort[]{sort1, sort1}); 
         // g(:S1,S1):S1
-    Function c=new RigidFunction(new Name("c"),sort1, new Sort[]{}); 
+    Function c=new Function(new Name("c"),sort1, new Sort[]{}); 
         // c:S1
-    Function z=new RigidFunction(new Name("z"),sort1, new Sort[]{}); 
+    Function z=new Function(new Name("z"),sort1, new Sort[]{}); 
         // z:S1
 
     ProgramVariable pv=new LocationVariable (new ProgramElementName ("pv"), sort1);

@@ -57,7 +57,7 @@ public class TestSyntacticalReplaceVisitor extends TestCase {
 
 	LogicVariable x=new LogicVariable(new Name("x"), s);
 	LogicVariable y=new LogicVariable(new Name("y"), s);
-	Function p=new RigidFunction(new Name("p"), Sort.FORMULA, new Sort[]{s});
+	Function p=new Function(new Name("p"), Sort.FORMULA, new Sort[]{s});
 
 	Term t_x=tf.createVariableTerm(x);
 	Term t_px=tf.createFunctionTerm(p, t_x);

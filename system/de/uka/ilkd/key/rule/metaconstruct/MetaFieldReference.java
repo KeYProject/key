@@ -56,7 +56,7 @@ public class MetaFieldReference extends AbstractMetaOperator implements
             Term t = term.sub(0);
             Sort sort = t.sort();
             Term attrTerm = term.sub(1);
-            RigidFunction attrFct = (RigidFunction) attrTerm.op();
+            Function attrFct = (Function) attrTerm.op();
             String attrName = attrFct.name().toString();
 
             // strip away the " "

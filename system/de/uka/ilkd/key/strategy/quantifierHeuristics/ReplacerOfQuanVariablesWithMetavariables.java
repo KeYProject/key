@@ -26,7 +26,6 @@ import de.uka.ilkd.key.logic.op.Metavariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.RigidFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -54,8 +53,8 @@ class ReplacerOfQuanVariablesWithMetavariables {
                 Metavariable mv = new Metavariable ( ARBITRARY_NAME, q.sort () );
                 m = tb.func ( mv );
             } else {
-                Function f = new RigidFunction ( ARBITRARY_NAME, q.sort (),
-                                                 new Sort [0] );
+                Function f = new Function ( ARBITRARY_NAME, q.sort (),
+                                            new Sort [0] );
                 m = tb.func ( f );
             }
             res = res.put ( q, m );

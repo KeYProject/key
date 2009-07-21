@@ -89,7 +89,6 @@ class FunctionFactory {
 
     
     /**
-     * 
      * creates an appropriate function-symbol representing allInstances of the given sort
      * and the axiom that specifies the meaning of this function-symbol
      * 
@@ -107,10 +106,10 @@ class FunctionFactory {
         }
         
         // create function-Symbol
-        allInst = new NonRigidFunction(
+        allInst = new Function(
                 new Name(csort.elementSort().name().toString()+"::allInstances"),
                 csort,
-                new Sort[] {});
+                new Sort[] {services.getTypeConverter().getHeapLDT().targetSort()});
         
         this.functionNS.add(allInst);
         
@@ -118,7 +117,7 @@ class FunctionFactory {
         Function isIn = (Function) this.functions.lookup(new Name(csort.name().toString()+"::includes"));
         LogicVariable v = createVar(csort.elementSort());
         
-        Term subTerm = tb.func(isIn,tb.func(allInst),tb.var(v));
+        Term subTerm = tb.func(isIn,tb.func(allInst, tb.heap(services)),tb.var(v));
         Term axiom = createdFactory.createCreatedNotNullQuantifierTerm(
                 services,
                 Quantifier.ALL,
@@ -210,7 +209,7 @@ class FunctionFactory {
         sorts[0] = csort;
         
         //create new function-symbol
-        Function selectE = new RigidFunction( new Name(csort.elementSort().toString()+"::select["+selectTerm.toString()+"]"),
+        Function selectE = new Function( new Name(csort.elementSort().toString()+"::select["+selectTerm.toString()+"]"),
 //        Function selectE = new RigidFunction( new Name(csort.elementSort().toString()+"::select"),
                 csort,
                 sorts);
@@ -343,7 +342,7 @@ class FunctionFactory {
         signature[0] = csort;
         
         //create new function-symbol
-        Function collectE = new RigidFunction( new Name(csort.elementSort().toString()+"::collect"),
+        Function collectE = new Function( new Name(csort.elementSort().toString()+"::collect"),
                 resSort,
                 signature);
         
@@ -655,7 +654,7 @@ class FunctionFactory {
         }
         
         //create new function
-        Function setE = new RigidFunction( new Name("set::["+lowerBound.toString()+".."+upperBound.toString()+"]"),
+        Function setE = new Function( new Name("set::["+lowerBound.toString()+".."+upperBound.toString()+"]"),
                 getSetSort(lowerBound.sort()),
                 sorts);
         
@@ -699,7 +698,7 @@ class FunctionFactory {
         }
         
         //create new function
-        Function bagE = new RigidFunction( new Name("bag::["+lowerBound.toString()+".."+upperBound.toString()+"]"),
+        Function bagE = new Function( new Name("bag::["+lowerBound.toString()+".."+upperBound.toString()+"]"),
                 getBagSort(lowerBound.sort()),
                 sorts);
         
@@ -753,7 +752,7 @@ class FunctionFactory {
         }
         
         //create new function
-        Function sequenceE = new RigidFunction( new Name("sequence::["+lowerBound.toString()+".."+upperBound.toString()+"]"),
+        Function sequenceE = new Function( new Name("sequence::["+lowerBound.toString()+".."+upperBound.toString()+"]"),
                 getSequenceSort(lowerBound.sort()),
                 sorts);
         

@@ -926,7 +926,7 @@ public abstract class TacletApp implements RuleApp {
 					       SchemaVariable sv,
 					       Sort           sort,
 					       boolean        interesting ) {
-	Function c = new RigidFunction ( new Name ( instantiation ),
+	Function c = new Function ( new Name ( instantiation ),
 				    sort,
 				    new Sort [0] );
 	return addInstantiation ( sv,
@@ -1022,9 +1022,9 @@ public abstract class TacletApp implements RuleApp {
         }
 
         final Term[] argTerms = toTermArray ( mvs );
-        final Function skolemFunc = new RigidFunction ( tempDepVar.op ().name (),
-                                                        tempDepVar.sort (),
-                                                        extractSorts ( argTerms ) );
+        final Function skolemFunc = new Function ( tempDepVar.op ().name (),
+                                                   tempDepVar.sort (),
+                                                   extractSorts ( argTerms ) );
         final Term skolemTerm =
             TermFactory.DEFAULT.createFunctionTerm ( skolemFunc, argTerms );
 

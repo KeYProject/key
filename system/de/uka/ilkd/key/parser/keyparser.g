@@ -1058,7 +1058,7 @@ options {
             Operator baseSymbol = lookupVarfuncId(Sort.NULL + "::" + baseName, args);
                         
             if(sort != null && baseSymbol instanceof SortDependingFunction) {
-                v = (RigidFunction) ((SortDependingFunction) baseSymbol).getInstanceFor(sort, getServices());
+                v = (Function) ((SortDependingFunction) baseSymbol).getInstanceFor(sort, getServices());
                 if(v != null) {
                     return v;
                 }
@@ -1927,11 +1927,8 @@ pred_decl
 {
     Sort[] argSorts;    
     String pred_name;
-    boolean nonRigid = false;
-    int location = NORMAL_NONRIGID;
 }
     :
-        (NONRIGID {nonRigid=true;}(LBRACKET location = location_ident RBRACKET)?)?
         pred_name = funcpred_name
         argSorts = arg_sorts[!skip_predicates]
         {
@@ -1941,20 +1938,8 @@ pred_decl
                 if (lookup(predicate) != null) {
                     throw new AmbigiousDeclException
                     (pred_name, getFilename(), getLine(), getColumn());
-                } else if (nonRigid) {
-	        	switch (location) {
-	                   case NORMAL_NONRIGID:                         
-	                      p = new NonRigidFunction(predicate, Sort.FORMULA, argSorts);                           
-	                      break;
-	                   case LOCATION_MODIFIER: 
-	                      semanticError("Modifier 'Location' not allowed for non-rigid predicates.");
-	                      break;
-	         	  default:
-	         	     semanticError("Unknown modifier used in declaration of non-rigid predicate "+predicate);
-                    }
-
                 } else {
-                   p = new RigidFunction(predicate, Sort.FORMULA, argSorts);
+                   p = new Function(predicate, Sort.FORMULA, argSorts);
                 }
                 assert p != null;
                 addFunction(p);         
@@ -2042,10 +2027,10 @@ func_decl
 	        }
 	        
 	        if(f == null) {
-	            f = new RigidFunction(new Name(func_name), 
-	                                  retSort, 
-	                                  argSorts, 
-	                                  unique);                    
+	            f = new Function(new Name(func_name), 
+	                             retSort, 
+	                             argSorts, 
+	                             unique);                    
 	        }
 	        
 		if (lookup(f.name()) != null) {

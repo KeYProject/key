@@ -150,7 +150,6 @@ tokens {
 	PREDICATES = "\\predicates";
 	FUNCTIONS = "\\functions";
 //        NAME = "\\name";
-	NONRIGID = "\\nonRigid";
 	UNIQUE = "\\unique";
 
 	INTERSECTIONSORT = "\\inter";

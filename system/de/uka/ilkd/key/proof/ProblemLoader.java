@@ -38,7 +38,6 @@ import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.mgt.ContractWithInvs;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.speclang.SLEnvInput;
-import de.uka.ilkd.key.util.Array;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.ProgressMonitor;

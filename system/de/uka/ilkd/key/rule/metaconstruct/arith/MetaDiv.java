@@ -17,7 +17,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.RigidFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
@@ -65,7 +64,7 @@ public class MetaDiv extends AbstractMetaOperator {
 	    Name undefName = new Name("undef("+term+")");
 	    Function undef = (Function)services.getNamespaces().functions().lookup(undefName);
 	    if (undef==null) {
-		undef = new RigidFunction(undefName,
+		undef = new Function(undefName,
 				     services.getTypeConverter().
 				     getIntegerLDT().targetSort(), 
 				     new Sort[0]);

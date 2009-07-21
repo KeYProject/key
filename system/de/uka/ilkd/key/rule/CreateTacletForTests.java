@@ -107,13 +107,13 @@ public class CreateTacletForTests extends TestCase {
 
     public void createNatTaclets() {
 	//decls for nat
-	func_0=new RigidFunction(new Name("zero"),nat,new Sort[]{});
-	func_eq=new RigidFunction(new Name("="),Sort.FORMULA,
+	func_0=new Function(new Name("zero"),nat,new Sort[]{});
+	func_eq=new Function(new Name("="),Sort.FORMULA,
 				      new Sort[]{nat,nat});
-	func_plus=new RigidFunction(new Name("+"),nat,
+	func_plus=new Function(new Name("+"),nat,
 					new Sort[]{nat,nat});
-	func_min1=new RigidFunction(new Name("pred"),nat,new Sort[]{nat});
-	func_plus1=new RigidFunction(new Name("succ"),nat,new Sort[]{nat});
+	func_min1=new Function(new Name("pred"),nat,new Sort[]{nat});
+	func_plus1=new Function(new Name("succ"),nat,new Sort[]{nat});
 
 	nss.functions().add(func_0);
 	nss.functions().add(func_eq);
@@ -300,14 +300,14 @@ public class CreateTacletForTests extends TestCase {
 			       Semisequent.EMPTY_SEMISEQUENT.insert(0,cf2).semisequent()); 
 	
 	
-	func_p=new RigidFunction(new Name("P"),Sort.FORMULA,
+	func_p=new Function(new Name("P"),Sort.FORMULA,
 				new Sort[]{sort1});
 	nss.functions().add(func_p);
 
 	//nat problem:
-	Function const_c=new RigidFunction(new Name("c"),nat,new PrimitiveSort[0]);
+	Function const_c=new Function(new Name("c"),nat,new PrimitiveSort[0]);
 	nss.functions().add(const_c);
-	Function const_d=new RigidFunction(new Name("d"),nat,new PrimitiveSort[0]);
+	Function const_d=new Function(new Name("d"),nat,new PrimitiveSort[0]);
 	nss.functions().add(const_d);
 
 	Term t_c=tf.createFunctionTerm(const_c,new Term[]{});

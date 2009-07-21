@@ -325,14 +325,14 @@ public class TestTacletPopup {
 
 
 	//decls for nat
-	Function func_0=new RigidFunction(new Name("zero"),nat,new Sort[]{});
+	Function func_0=new Function(new Name("zero"),nat,new Sort[]{});
 	func_ns.add(func_0);
-	Function func_plus=new RigidFunction(new Name("plus"),nat,
+	Function func_plus=new Function(new Name("plus"),nat,
 					new Sort[]{nat,nat});
 	func_ns.add(func_plus);
-	Function func_min1=new RigidFunction(new Name("pred"),nat,new Sort[]{nat});
+	Function func_min1=new Function(new Name("pred"),nat,new Sort[]{nat});
 	func_ns.add(func_min1);
-	Function func_plus1=new RigidFunction(new Name("succ"),nat,new Sort[]{nat});
+	Function func_plus1=new Function(new Name("succ"),nat,new Sort[]{nat});
 	func_ns.add(func_plus1);
 	SchemaVariable var_rn=SchemaVariableFactory.createTermSV(new Name("rn"),nat);
 	SchemaVariable var_rm=SchemaVariableFactory.createTermSV(new Name("rm"),nat);
@@ -490,7 +490,7 @@ public class TestTacletPopup {
 	
 
 	z=new LogicVariable(new Name("z"),nat);
-	Function p=new RigidFunction(new Name("P"),Sort.FORMULA,new Sort[]{nat});
+	Function p=new Function(new Name("P"),Sort.FORMULA,new Sort[]{nat});
 	func_ns.add(p);
 	Term t_z=tf.createFunctionTerm(z,new Term[0]);
 	Term t_allzpz
@@ -508,9 +508,9 @@ public class TestTacletPopup {
 
 
 	//nat problem:
-	Function const_c=new RigidFunction(new Name("c"),nat,new Sort[0]);
+	Function const_c=new Function(new Name("c"),nat,new Sort[0]);
 	func_ns.add(const_c);
-	Function const_d=new RigidFunction(new Name("d"),nat,new Sort[0]);
+	Function const_d=new Function(new Name("d"),nat,new Sort[0]);
 	func_ns.add(const_d);
 
 	Term t_c=tf.createFunctionTerm(const_c,new Term[]{});

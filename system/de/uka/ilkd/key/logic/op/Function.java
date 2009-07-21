@@ -16,39 +16,59 @@ import de.uka.ilkd.key.logic.sort.ArrayOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
-public abstract class Function extends AbstractSortedOperator {
+public class Function extends AbstractSortedOperator {
         
     /** the null pointer */
-    public static final Function NULL = new RigidFunction(new Name("null"),
+    public static final Function NULL = new Function(new Name("null"),
         					     Sort.NULL, 
         					     new Sort[0]);
+    
+    private final boolean unique;
+    
 
-    /** creates a Function 
-     * @param name String with name of the function
-     * @param sort the Sort of the function (result type)
-     * @param argSorts ArrayOfSort of the function's arguments
-     */   
-    public Function(Name name, Sort sort, ArrayOfSort argSorts) {
+    public Function(Name name, 
+	            Sort sort, 
+	            ArrayOfSort argSorts, 
+	            boolean unique) {
 	super(name, argSorts, sort);
+	this.unique = unique;
+    }
+    
+    public Function(Name name, 
+	    	    Sort sort, 
+	    	    Sort[] argSorts, 
+	    	    boolean unique) {
+	this(name, sort, new ArrayOfSort(argSorts), unique);
+    }    
+    
+
+    public Function(Name name, Sort sort, ArrayOfSort argSorts) {
+	this(name, sort, argSorts, false);
     }    
     
     
-    /** creates a Function 
-     * @param name String with name of the function
-     * @param sort the Sort of the function (result type)
-     * @param argSorts an array of Sort with the sorts of 
-     * the function's arguments  
-     */   
     public Function(Name name, Sort sort, Sort[] argSorts) {
-	super(name, new ArrayOfSort(argSorts), sort);
+	this(name, sort, argSorts, false);
+    }
+    
+    
+    @Override
+    public boolean isRigid() {
+	return true;
     }
 
-  
+
+    @Override
     public String toString() {
 	return (name()+((sort()==Sort.FORMULA)? "" : ":"+sort()));
     }
-
     
+    
+    public boolean isUnique() {
+	return unique;
+    }    
+    
+
     public String proofToString() {
        String s = null;
        if (sort() != null) {

@@ -178,8 +178,6 @@ GENERATED_LISTS=logic/SLListOfTerm \
 	rule/inst/SLListOfGenericSortCondition \
 	logic/op/SLListOfSortDependingSymbol \
 	logic/SLListOfName \
-	rule/soundness/SLListOfSkolemSet \
-	rule/soundness/SLListOfSVTypeInfo \
 	logic/op/SLListOfIProgramVariable \
 	logic/SLListOfSequentChangeInfo \
 	logic/SLListOfFormulaChangeInfo \
@@ -193,7 +191,6 @@ GENERATED_LISTS=logic/SLListOfTerm \
 	speclang/ocl/SLListOfModelClass \
 	speclang/ocl/SLListOfModelMethod \
 	proof/init/SLListOfProofOblInput \
-	logic/op/SLListOfNonRigidFunction \
 	rule/export/SLListOfTacletModelInfo \
 	rule/export/SLListOfOptionModelInfo \
 	rule/export/SLListOfRuleSetModelInfo \

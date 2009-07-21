@@ -546,9 +546,10 @@ public class JavaInfo {
 				     Term[] args,
 				     String className) {
 	ListOfKeYJavaType sig = SLListOfKeYJavaType.EMPTY_LIST;
-	Term[] subs = new Term[args.length+1];
+	Term[] subs = new Term[args.length+2];
 	subs[0] = prefix;
-	for (int i = 1; i<subs.length; i++) {
+	subs[1] = TermBuilder.DF.heap(services);
+	for (int i = 2; i<subs.length; i++) {
               Term t = args[i-1];             
               sig=sig.append(getServices().getTypeConverter()
 			     .getKeYJavaType(t));

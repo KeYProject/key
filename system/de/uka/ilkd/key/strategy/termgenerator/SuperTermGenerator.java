@@ -19,7 +19,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.RigidFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -77,7 +76,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
                 services = goal.proof ().getServices ();
                 final IntegerLDT numbers = services.getTypeConverter ().getIntegerLDT ();
                 
-                binFunc = new RigidFunction
+                binFunc = new Function
                      ( new Name ( "SuperTermGenerated" ), Sort.ANY,
                        new Sort[] { Sort.ANY, numbers.getNumberSymbol ().sort () } );
             }

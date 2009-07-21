@@ -44,8 +44,8 @@ public class UniqueCondition extends VariableConditionAdapter {
             return false;
         } else {
             Term candTerm = (Term)candidate;
-            return candTerm.op() instanceof RigidFunction
-                   && ((RigidFunction)candTerm.op()).isUnique();
+            return candTerm.op() instanceof Function
+                   && ((Function)candTerm.op()).isUnique();
         }
     }
     
