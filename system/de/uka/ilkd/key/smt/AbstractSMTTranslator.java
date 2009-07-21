@@ -150,42 +150,70 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    this.translateFunc(l, new ArrayList<StringBuffer>());
 	}
 	
-	ArrayList<StringBuffer> assumptions = this.getAssumptions(services);
+	//ArrayList<StringBuffer> assumptions = this.getAssumptions(services);
 	
 	hb = this.translateLogicalImply(ante, succ);
 
-	StringBuffer s = buildCompleteText(hb, assumptions, this.buildTranslatedFuncDecls(), this
-		.buildTranslatedPredDecls(), this.buildTranslatedSorts(), this.buildSortHierarchy());
+	StringBuffer s = buildComplText(services, hb);
+	/*StringBuffer s = buildCompleteText(hb, assumptions, this.buildTranslatedFuncDecls(), this
+		.buildTranslatedPredDecls(), this.buildTranslatedSorts(), this.buildSortHierarchy());*/
 	
 	return s;
 
     }
 
+    protected static final int ASSUMPTION_FUNCTION_DEFINTION = 0;
+    protected static final int ASSUMPTION_TYPE_HIERARCHY = 1;
+    protected static final int ASSUMPTION_SORT_PREDICATES = 2;
+    protected static final int ASSUMPTION_DUMMY_IMPLEMENTATION = 3;
+    
+    
     
     /**
      * get the assumptions made by the logic.
      * @param services the services object to be used.
      * @return ArrayList of Formulas, that are assumed to be true.
      */
-    private ArrayList<StringBuffer> getAssumptions(Services services) throws IllegalFormulaException {
+    private ArrayList<StringBuffer> getAssumptions(Services services, ArrayList<int[]> assumptionTypes) throws IllegalFormulaException {
 	ArrayList<StringBuffer> toReturn = new ArrayList<StringBuffer>();
 	
 	if (!this.isMultiSorted()) {
-	    
+	     
 	    // add the type definitions
 	    //this means all predicates that are needed for functions to define
 	    //their result type, all predicates for constants (like number symbols)
+	    int [] values = new int[2];
+	    int start = toReturn.size();
 	    toReturn.addAll(this.getTypeDefinitions());
+	    values[0] = start;
+	    values[1] = toReturn.size()-1;
+	    assumptionTypes.add(values);
 	    // add the type hierarchy
 	    //this means, add the typepredicates, that are needed to define
 	    //for every type, what type they are (direct) subtype of
+	    start = toReturn.size();
 	    toReturn.addAll(this.getSortHierarchyPredicates());
+	    values = new int[2];
+	    values[0] = start;
+	    values[1] = toReturn.size()-1;
+	    assumptionTypes.add(values);
 	    //add the formulas, that make sure, type correctness is kept, also
 	    //for interpreted functions
+	    start = toReturn.size();
 	    toReturn.addAll(this.getSpecialSortPredicates(services));
+	    values = new int[2];
+	    values[0] = start;
+	    values[1] = toReturn.size()-1;
+	    assumptionTypes.add(values);
+	    
 	    //add the assumptions created during translation
 	    //for example while translating term if then else
+	    start = toReturn.size();
 	    toReturn.addAll(this.assumptions);
+	    values = new int[2];
+	    values[0] = start;
+	    values[1] = toReturn.size()-1;
+	    assumptionTypes.add(values);
 	}
 	
 	return toReturn;
@@ -267,13 +295,18 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	try {
 	    StringBuffer form;
 	    form = translateTerm(t, new Vector<QuantifiableVariable>(), services);
-	    
-	    return buildCompleteText(form, this.getAssumptions(services), this.buildTranslatedFuncDecls(), this
-		    .buildTranslatedPredDecls(), this.buildTranslatedSorts(), this
-		    .buildSortHierarchy());
+	    return buildComplText(services, form);
 	} catch (IllegalFormulaException e) {
 	    throw new IllegalArgumentException("Illegal formula. Can not be translated");
 	}
+    }
+    
+    private StringBuffer buildComplText(Services serv, StringBuffer formula) throws IllegalFormulaException {
+	ArrayList<int[]> assumptionTypes = new ArrayList<int[]>();
+	ArrayList<int[]> predicateTypes = new ArrayList<int[]>();
+	return buildCompleteText(formula, this.getAssumptions(serv, assumptionTypes),assumptionTypes, this.buildTranslatedFuncDecls(), this
+		    .buildTranslatedPredDecls(predicateTypes),predicateTypes, this.buildTranslatedSorts(), this
+		    .buildSortHierarchy());
     }
     
     /**
@@ -439,15 +472,30 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	return toReturn;
     }
 
+    
+    protected static final int PREDICATE_FORMULA = 0;
+    protected static final int PREDICATE_TYPE = 1;
+    
+    
     /**
      * Build the translated predicate declarations. Each element in the
      * ArrayList represents (predicatename | argType1 | ... | argTypen)
      * 
      * @return structured List of declaration.
      */
-    private ArrayList<ArrayList<StringBuffer>> buildTranslatedPredDecls() {
+    private ArrayList<ArrayList<StringBuffer>> buildTranslatedPredDecls(ArrayList<int[]> predicateTypes) {
 	ArrayList<ArrayList<StringBuffer>> toReturn = new ArrayList<ArrayList<StringBuffer>>();
+	
+	
+	    
+	   
+	    
+	    
+	   
+	int [] values = new int[2];
+	int start = toReturn.size();
 	// add the predicates
+	
 	for (Operator op : this.predicateDecls.keySet()) {
 	    ArrayList<StringBuffer> element = new ArrayList<StringBuffer>();
 	    element.add(usedPredicateNames.get(op));
@@ -456,8 +504,15 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	    }
 	    toReturn.add(element);
 	}
+	
+	values[0] = start;
+	values[1] = toReturn.size()-1;
+        predicateTypes.add(values);
+	
 
 	// add the typePredicates
+        values = new  int[2];
+        start = toReturn.size();
 	if (!this.isMultiSorted()) {
 	    for (Sort s : this.typePredicates.keySet()) {
 		ArrayList<StringBuffer> element = new ArrayList<StringBuffer>();
@@ -466,6 +521,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 		toReturn.add(element);
 	    }
 	}
+	values[0] = start;
+	values[1] = toReturn.size()-1;
+        predicateTypes.add(values);
 	
 	return toReturn;
     }
@@ -504,21 +562,33 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      *                representation. It is built by ante implies succ.
      * @param assumptions
      * 		      Assumptions made in this logic. Set of formulas, that
-     * 		      are assumed to be true.             
+     * 		      are assumed to be true.      
+     * @param assumptionTypes
+     * 		      List of start- and endvalues of the position of different
+     * 		      types of assumptions.Use these values to make detailed 
+     * 		      comments in the translations.       
      * @param functions
      *                List of functions. Each Listelement is built up like
      *                (name | sort1 | ... | sortn | resultsort)
      * @param predicates
      *                List of predicates. Each Listelement is built up like
      *                (name | sort1 | ... | sortn)
+     * @param predicateTypes
+     * 		      List of start- and endvalue of the types of the predicates
+     * 		      (position in the predicates argument).
+     * 		      Use offered constants or offered methods to get for the 
+     *                values for a certain type. This argument offers the possibility
+     * 		      to make use of detailed comments.
      * @param types
      *                List of the used types.
      * @return The Stringbuffer that can be read by the decider
      */
     protected abstract StringBuffer buildCompleteText(StringBuffer formula,
 	    ArrayList<StringBuffer> assumptions,
+	    ArrayList<int[]> assumptionTypes,
 	    ArrayList<ArrayList<StringBuffer>> functions,
 	    ArrayList<ArrayList<StringBuffer>> predicates,
+	    ArrayList<int[]> predicateTypes,
 	    ArrayList<StringBuffer> types, SortHierarchy sortHierarchy);
 
    /* protected final StringBuffer translate(Semisequent ss, SMTTranslator.TERMPOSITION skolemization,

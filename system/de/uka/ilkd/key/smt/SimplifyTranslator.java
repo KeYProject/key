@@ -86,9 +86,11 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
     @Override
     protected StringBuffer buildCompleteText(StringBuffer formula,
 	    ArrayList<StringBuffer> assumptions,
+	    ArrayList<int[]> assumptionTypes,
 	    ArrayList<ArrayList<StringBuffer>> functions,
 	    ArrayList<ArrayList<StringBuffer>> predicates,
-	    ArrayList<StringBuffer> types, SortHierarchy sortHirarchy) {
+	    ArrayList<int[]> predicateTypes,
+	    ArrayList<StringBuffer> types, SortHierarchy sortHierarchy) {
 	
 	StringBuffer toReturn = new StringBuffer();
 	

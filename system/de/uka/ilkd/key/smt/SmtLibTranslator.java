@@ -88,8 +88,10 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
     @Override
     protected StringBuffer buildCompleteText(StringBuffer formula,
 	    ArrayList<StringBuffer> assumptions,
+	    ArrayList<int[]> assumptionTypes,
 	    ArrayList<ArrayList<StringBuffer>> functions,
 	    ArrayList<ArrayList<StringBuffer>> predicates,
+	    ArrayList<int[]> predicateTypes,
 	    ArrayList<StringBuffer> types, SortHierarchy sortHierarchy) {
 	StringBuffer toReturn = new StringBuffer(
 		"( benchmark KeY_translation\n");
@@ -99,7 +101,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	// no extra sorts needed
 
 	//add the logic definition
-	toReturn.append("\n :logic AUFLIA");
+	toReturn.append("\n:logic AUFLIA");
 	
 	// add the sort declarations
 	StringBuffer extrasorts = new StringBuffer();	    
@@ -116,21 +118,65 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	}
 
 	// add the predicate declarations
-	if (predicates.size() > 0) {
-	    toReturn.append("\n:extrapreds (");
-	    for (ArrayList<StringBuffer> a : predicates) {
-		toReturn.append("(");
-		for (StringBuffer s : a) {
-		    toReturn.append(s);
-		    toReturn.append(" ");
+	// add the predicate declarations for formula predicates
+	ArrayList toRemove = new ArrayList();
+	int start = predicateTypes.get(PREDICATE_FORMULA)[0];
+	int end = predicateTypes.get(PREDICATE_FORMULA)[1];
+	StringBuffer preds = new StringBuffer();
+	if (start <= end) {
+	    preds.append("\n\n:notes \"Predicates used in the formula\"");
+	    preds.append("\n:extrapreds (");
+	    for (int i = start; i <= end; i++) {
+		preds.append("(");
+		toRemove.add(predicates.get(i));
+		for (StringBuffer s : predicates.get(i)) {
+		    preds.append(s);
+		    preds.append(" ");
 		}
-		toReturn.append(") ");
+		preds.append(") ");
 	    }
-	    toReturn.append(")");
+	    preds.append(")");
 	}
+	
+	// add the predicate declarations for types
+	start = predicateTypes.get(PREDICATE_TYPE)[0];
+	end = predicateTypes.get(PREDICATE_TYPE)[1];
+	if (start <= end) {
+	    preds = preds.append("\n\n:notes \"Types expressed by predicates\"");
+	    preds.append("\n:extrapreds (");
+	    for (int i = start; i <= end; i++) {
+		preds.append("(");
+		toRemove.add(predicates.get(i));
+		for (StringBuffer s : predicates.get(i)) {
+		    preds.append(s);
+		    preds.append(" ");
+		}
+		preds.append(") ");
+	    }
+	    preds.append(")");
+	}	
+	predicates.removeAll(toRemove);
+	
+	// add other predicates
+	if (predicates.size() > 0) {
+	    preds = preds.append("\n\n:notes \"Other predicates\"");
+	    preds.append("\n:extrapreds (");
+	    for (ArrayList<StringBuffer> a : predicates) {
+		preds.append("(");
+		for (StringBuffer s : a) {
+		    preds.append(s);
+		    preds.append(" ");
+		}
+		preds.append(") ");
+	    }
+	    preds.append(")");
+	}
+	
+	toReturn.append(preds);
 	
 	// add the function declarations
 	if (functions.size() > 0) {
+	    toReturn.append("\n\n:notes \"Function declarations\""); 
 	    toReturn.append("\n:extrafuns (");
 	    for (ArrayList<StringBuffer> a : functions) {
 		toReturn.append("(");
@@ -143,11 +189,71 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	    toReturn.append(")");
 	}
 	    
-	for (StringBuffer s : assumptions) {
-	    toReturn.append("\n:assumption ").append(s);
+	//add the assumptions
+	toRemove = new ArrayList();
+	
+	
+	    
+	
+	start = assumptionTypes.get(ASSUMPTION_SORT_PREDICATES)[0];
+	end = assumptionTypes.get(ASSUMPTION_SORT_PREDICATES)[1];
+	StringBuffer assump = new StringBuffer();	
+	if (start <= end) {
+	    assump.append("\n\n:notes \"assumptions for sort predicates\"");
+    	    for(int i=start; i <= end; i++){
+    		toRemove.add(assumptions.get(i));   
+    		assump.append("\n:assumption ").append(assumptions.get(i)); 
+    	    }
 	}
 	
+	start = assumptionTypes.get(ASSUMPTION_FUNCTION_DEFINTION)[0];
+	end = assumptionTypes.get(ASSUMPTION_FUNCTION_DEFINTION)[1];
+		
+	if (start <= end) {
+	    assump.append("\n\n:notes \"assumptions for function definitions\"");
+	    for(int i=start; i <= end; i++){
+		toRemove.add(assumptions.get(i));   
+		assump.append("\n:assumption ").append(assumptions.get(i)); 
+	    }
+	}
+	
+	start = assumptionTypes.get(ASSUMPTION_TYPE_HIERARCHY)[0];
+	end = assumptionTypes.get(ASSUMPTION_TYPE_HIERARCHY)[1];
+	
+	if (start <= end) {
+	    assump.append("\n\n:notes \"assumptions for type hierarchy\"");
+	    for(int i=start; i <= end; i++){
+		toRemove.add(assumptions.get(i));   
+		assump.append("\n:assumption ").append(assumptions.get(i)); 
+	    }
+	}
+	
+	
+	start = assumptionTypes.get(ASSUMPTION_DUMMY_IMPLEMENTATION)[0];
+	end = assumptionTypes.get(ASSUMPTION_DUMMY_IMPLEMENTATION)[1];
+		
+	if (start <= end) {
+	    assump.append("\n\n:notes \"assumptions for dummy variables\"");
+	    for(int i=start; i <= end; i++){
+		toRemove.add(assumptions.get(i));   
+		assump.append("\n:assumption ").append(assumptions.get(i)); 
+	    }
+	}
+	assumptions.removeAll(toRemove);
+	
+	
+	
+	if (assumptions.size() > 0) {
+	    assump.append("\n\n:notes \"other assumptions\"");    
+	    for (StringBuffer s : assumptions) {
+		assump.append("\n:assumption ").append(s);
+	    }
+	}
+	
+	toReturn.append(assump);
+	
 	// add the formula
+	toReturn.append("\n\n:notes \"the formula to proof\""); 
 	formula = this.translateLogicalNot(formula);
 	toReturn.append("\n:formula ").append(formula).append("\n");
 
