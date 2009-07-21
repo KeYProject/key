@@ -49,7 +49,6 @@ public final class ModalOperatorSV extends AbstractSV  {
     public MatchConditions match(SVSubstitute subst, 
 	    			 MatchConditions mc,
 	    			 Services services) {        
-        
         if (!(subst instanceof Modality)) {
             Debug.out("FAILED. ModalOperatorSV matches only modalities " +
                         "(template, orig)",
@@ -62,12 +61,12 @@ public final class ModalOperatorSV extends AbstractSV  {
             Operator o = (Operator) mc.getInstantiations().getInstantiation(this);
             if(o == null) {
                 return mc.setInstantiations(mc.getInstantiations().add(this, m));
+            } else if(o != m) {
+        	Debug.out("FAILED. Already instantiated with a different operator.");
+        	return null;
             } else {
-                if(o != m) {
-                    Debug.out("FAILED. Already instantiated with a different operator.");
-                    return null;
-                }
-            }                           
+        	return mc;
+            }
         }
         
         Debug.out("FAILED. template is a schema operator,"

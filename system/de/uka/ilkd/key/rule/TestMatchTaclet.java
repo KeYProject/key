@@ -501,8 +501,6 @@ public class TestMatchTaclet extends TestCase {
 		
 	Term match2 = TacletForTests.parseTerm("\\<{int i;}\\>{i:=(jint)Z(2(#))} true");
 	match2 = match2.sub(0);
-System.out.println("Template: " + ((FindTaclet)assign_n).find());	
-System.out.println("Term: " + match2);
 	assertTrue("Instantiations should be found.",
 		   assign_n.match(match2, ((FindTaclet)assign_n).find(), 
 				  true, MatchConditions.EMPTY_MATCHCONDITIONS, services, Constraint.BOTTOM)!=null);

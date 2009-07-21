@@ -338,11 +338,13 @@ public abstract class Taclet implements Rule, Named {
 				    MatchConditions matchCond,
 				    Services        services,
 				    Constraint      userConstraint) {
-if(name.toString().equals("boxToDiamond")) Debug.ENABLE_DEBUG = true;
-	Debug.out("taclet: Start Matching rule: ", name);
+//if(name.toString().equals("testSchemaModal1")) Debug.ENABLE_DEBUG = true;
+	Debug.out("Start Matching rule: ", name);
 	matchCond = matchHelp(term, template, ignoreUpdates, matchCond, 
 		 services, userConstraint);	
-if(name.toString().equals("boxToDiamond")) Debug.ENABLE_DEBUG = false;	
+	Debug.out(matchCond == null ? "Failed: " : "Succeeded: ", name);
+//if(matchCond != null) Debug.out("insts: ", matchCond.getInstantiations());	
+//if(name.toString().equals("testSchemaModal1")) Debug.ENABLE_DEBUG = false;
 	return matchCond == null ? null : checkConditions(matchCond, services);
     }
 
@@ -644,10 +646,10 @@ if(name.toString().equals("boxToDiamond")) Debug.ENABLE_DEBUG = false;
 	        
 	    if (c.isSatisfiable()) {
 	        return matchCond.setConstraint( c );
+	    } else {        
+		Debug.out("FAILED. 3a: constraint unsatisfiable");
+		return null;
 	    }
-        
-	    Debug.out("FAILED. 3a: constraint unsatisfiable");
-	    return null;
 	}
     
 	if ( !(templateOp instanceof SchemaVariable) && 
@@ -662,10 +664,9 @@ if(name.toString().equals("boxToDiamond")) Debug.ENABLE_DEBUG = false;
                                  userConstraint );
 	}
 
-	if ( templateOp instanceof SchemaVariable ) {
-	    return ( (SchemaVariable)templateOp ).match ( term,
-	                                                  matchCond,
-	                                                  services );
+	if ( templateOp instanceof SchemaVariable 
+              && templateOp.arity() == 0) {
+	    return templateOp.match ( term, matchCond, services );
         }
     
 	matchCond = templateOp.match ( sourceOp, matchCond, services );

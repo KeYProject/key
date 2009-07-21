@@ -143,7 +143,6 @@ public class TestSchemaModalOperators extends TestCase {
 	    Modality.DIA, 
             JavaBlock.EMPTY_JAVABLOCK,
             tf.createJunctorTerm(Junctor.FALSE));
-
          MatchConditions mc=(t.match                                                   
                             (goal,                                                        
                              find,                                                
@@ -158,8 +157,6 @@ public class TestSchemaModalOperators extends TestCase {
 	 Term instfind = t.syntacticalReplace(replace, null, mc);
 	 Debug.out("Instantiated replace: ", instreplace);
 	 Debug.out("Instantiated find: ", instfind);
-	 //	Debug.ENABLE_DEBUG = false;
-
     }
 
     public void testSchemaModalities2() {

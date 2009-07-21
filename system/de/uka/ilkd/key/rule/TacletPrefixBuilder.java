@@ -66,6 +66,7 @@ public class TacletPrefixBuilder {
 
     private void visit(Term t) {
 	if (t.op() instanceof SchemaVariable && 
+            t.arity() == 0 &&
 	    !(t.op() instanceof VariableSV) &&
 	    !(t.op() instanceof ProgramSV) &&
 	    !(t.op() instanceof SkolemTermSV)) { 

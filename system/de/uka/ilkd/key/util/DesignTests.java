@@ -6,18 +6,12 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2004 Universitaet Karlsruhe, Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
+
+
 package de.uka.ilkd.key.util;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Iterator;
@@ -143,35 +137,6 @@ public class DesignTests {
 	    (cl == de.uka.ilkd.key.logic.op.Junctor.class); // ASMKEY extends Junctor
     }
 
-    /**
-     * subclass of Op should have at most package private constructors
-     * (exception: metaop)
-     */
-    public LinkedList testConstructorInOpSubclasses() {
-	LinkedList badClasses = new LinkedList();
-	for (int i = 0; i<allClasses.length; i++) {
- 	    if (allClasses[i] != de.uka.ilkd.key.logic.op.AbstractOperator.class &&
-		(de.uka.ilkd.key.logic.op.AbstractOperator.class).
-		isAssignableFrom(allClasses[i]) &&
-		!(de.uka.ilkd.key.logic.op.
-		  AbstractMetaOperator.class).isAssignableFrom(allClasses[i])) {
- 		Constructor[] cons = allClasses[i].getConstructors();
- 		for (int j = 0; j<cons.length; j++) {
- 		    int mods = cons[j].getModifiers();
- 		    if ((Modifier.isProtected(mods) && !exception(allClasses[i])) ||
- 			Modifier.isPublic(mods)) {
- 			badClasses.add(allClasses[i]);
- 		    }
- 		}
- 	    }
-	}
-	if (badClasses.size()>0) {
-	    message = "Constructors of subclasses of 'Op'  ";
-	    message += "must have package private or private";
-	    message += "(except MetaOperators).\n";	    
-	}
-	return badClasses;
-    }
 
     /**
      * subclass of Term must be private or package private
@@ -221,7 +186,7 @@ public class DesignTests {
 		}
 	    }
 	}	
-	System.out.println("\n[Tests finished. ("+(testcases-failures)+
+	System.out.println("\n[Design tests finished. ("+(testcases-failures)+
 			   "/"+testcases+") tests passed.]");
     }
     
@@ -229,6 +194,4 @@ public class DesignTests {
 	DesignTests tests = new DesignTests();	
 	tests.runTests();
     }
-
-
 }

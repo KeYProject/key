@@ -129,7 +129,7 @@ public class TestRecoder2KeY extends TestCase {
 
     public void testReadBlockWithContext() {
 	ProgramVariable pv = new LocationVariable
-	    (new ProgramElementName("i"), new KeYJavaType(PrimitiveType.JAVA_INT));
+	    (new ProgramElementName("i"), TacletForTests.services().getTypeConverter().getIntLDT().getKeYJavaType());
 	ListOfProgramVariable list = SLListOfProgramVariable.EMPTY_LIST.prepend(pv);	
 	JavaBlock block = c2k.readBlock("{ i = 2; }", c2k.createContext(list));
 	ProgramVariable prgVarCmp = (ProgramVariable)	    

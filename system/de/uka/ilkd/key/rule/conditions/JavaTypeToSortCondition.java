@@ -58,8 +58,7 @@ public class JavaTypeToSortCondition implements VariableCondition {
              || svSort == ProgramSVSort.SIMPLEEXPRESSION
              || svSort == ProgramSVSort.NONSIMPLEEXPRESSION
              || svSort == ProgramSVSort.TYPE
-             || exprOrTypeSV instanceof TermSV
-             || exprOrTypeSV instanceof SkolemTermSV)  {
+             || exprOrTypeSV.arity() == 0)  {
             return true;
         }
         return false;

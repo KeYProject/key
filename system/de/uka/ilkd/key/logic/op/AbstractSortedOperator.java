@@ -85,7 +85,7 @@ public abstract class AbstractSortedOperator extends AbstractOperator
     
     @Override
     public final boolean validTopLevel(Term term) {
-	if(term.arity() != arity()) {
+	if(term.arity() != arity() || term.subs().size() != arity()) {
 	    return false;
 	}
 	for(int i = 0, n = arity(); i < n; i++) {

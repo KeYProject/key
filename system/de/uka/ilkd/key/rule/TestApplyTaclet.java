@@ -16,7 +16,6 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.*;
 
@@ -26,39 +25,55 @@ import de.uka.ilkd.key.proof.*;
  */
 public class TestApplyTaclet extends TestCase{
 
-    final static String[] strs={"","(A -> B) -> (!(!(A -> B)))",
-		   "","\\forall s z; p(z)",
-		   "(A -> B) -> (!(!(A -> B)))","(A -> B) -> (!(!(A -> B)))",
-		   "(A -> B) -> (!(!(A -> B)))","",		   
+    final static String[] strs={
+	           "",
+	           "(A -> B) -> (!(!(A -> B)))",
+		   "",
+		   "\\forall s z; p(z)",
+		   "(A -> B) -> (!(!(A -> B)))",
+		   "(A -> B) -> (!(!(A -> B)))",
+		   "(A -> B) -> (!(!(A -> B)))",
+		   "",		   
 		   "","\\<{try{while (1==1) {if (1==2) {break;}} return 1==3; int i=17; } catch (Exception e) { return null;}}\\>A",
-                   "A & B", "",
-		   "s{}::isEmpty(sset)","s{}::size(sset)=0",
+                   "A & B", 
+                   "",
+		   "s{}::isEmpty(sset)",
+		   "s{}::size(sset)=0",
 		   "A & (A & B)", "",
-		   "f(const)=const", "const=f(f(const))",
-		   "f(const)=const", "const=f(const)",
-		   "f(const)=const", "A & {i:=0}(const=f(const))",
-		   "f(const)=const", "A & {i:=0}(const=f(f(const)))",
-		   "{i:=0}(f(const)=const)", "{i:=1}(const=f(const)) & \\<{i=2;}\\>(const=f(const)) " +
-		   "& {i:=0}(const=f(const))",
-		   "{i:=0}(f(const)=const)", "{i:=1}(const=f(const)) & \\<{i=2;}\\>(const=f(const)) " +
-		   "& {i:=0}(const=const)",
-                   "", "\\<{ {} {break;} }\\> true",
-		   "", "\\<{ {{}} {{break;}} }\\> true",
-		   "", "\\<{ try {} catch ( Exception e ) {} catch ( Throwable e ) {} }\\> true",
-		   "", "\\<{ try {} catch ( Exception e ) {} try {} catch ( Throwable e ) {} }\\> true",
-		   "", "\\<{ try {} catch ( Exception e ) {break;} catch ( Throwable e ) {continue;} }\\> true",
-		   "", "\\<{ try {} catch ( Exception e ) {break;} try {} catch ( Throwable e ) {continue;} }\\> true",
-		   "", "\\<{ try {} catch ( Exception e ) {} catch ( Throwable e ) {} finally {} }\\> true",
-		   "", "\\<{ try {} catch ( Exception e ) {} finally {} try {} catch ( Throwable e ) {} }\\> true",
-                   "",  "\\<{try{while (1==1) {if (1==2) {break;}} return 1==3; int i=17; } catch (Exception e) { return null;}}\\>\\forall int i; i>0",
-                   "",  "\\<{try{ {} while (1==1) {if (1==2) {break;}} return 1==3; int i=17; } catch (Exception e) { return null;}}\\>\\forall int i; i>0"
+		   "f(const)=const", 
+		   "const=f(f(const))",
+		   "f(const)=const", 
+		   "const=f(const)",
+		   "f(const)=const", 
+		   "A & {i:=0}(const=f(const))",
+		   "f(const)=const", 
+		   "A & {i:=0}(const=f(f(const)))",
+		   "{i:=0}(f(const)=const)", 
+		   "{i:=1}(const=f(const)) & \\<{i=2;}\\>(const=f(const)) " + "& {i:=0}(const=f(const))",
+		   "{i:=0}(f(const)=const)", 
+		   "{i:=1}(const=f(const)) & \\<{i=2;}\\>(const=f(const)) " + "& {i:=0}(const=const)",
+                   "", 
+                   "\\<{ {} {break;} }\\> true",
+		   "", 
+		   "\\<{ {{}} {{break;}} }\\> true",
+		   "", 
+		   "\\<{ try {} catch ( Exception e ) {} catch ( Throwable e ) {} }\\> true",
+		   "", 
+		   "\\<{ try {} catch ( Exception e ) {} try {} catch ( Throwable e ) {} }\\> true",
+		   "", 
+		   "\\<{ try {} catch ( Exception e ) {break;} catch ( Throwable e ) {continue;} }\\> true",
+		   "", 
+		   "\\<{ try {} catch ( Exception e ) {break;} try {} catch ( Throwable e ) {continue;} }\\> true",
+		   "", 
+		   "\\<{ try {} catch ( Exception e ) {} catch ( Throwable e ) {} finally {} }\\> true",
+		   "", 
+		   "\\<{ try {} catch ( Exception e ) {} finally {} try {} catch ( Throwable e ) {} }\\> true",
+                   "", 
+                   "\\<{try{while (1==1) {if (1==2) {break;}} return 1==3; int i=17; } catch (Exception e) { return null;}}\\>\\forall int i; i>0",
+                   "", 
+                   "\\<{try{ {} while (1==1) {if (1==2) {break;}} return 1==3; int i=17; } catch (Exception e) { return null;}}\\>\\forall int i; i>0"
     };
     Proof[] proof;
-    Proof   mvProof;
-    // mv=f(X,c)
-    Constraint 	consMV_f_X_c;
-    // mv=f(c,X)
-    Constraint 	consMV_f_c_X;
     
 
     public TestApplyTaclet(String name) {
@@ -82,6 +97,8 @@ public class TestApplyTaclet extends TestCase{
 
 	TacletForTests.setStandardFile(TacletForTests.testRules);
 	TacletForTests.parse();
+	assert TacletForTests.services().getNamespaces().programVariables().lookup(new Name("i")) != null;
+	
 	Services services = new Services();
 	proof = new Proof[strs.length/2];
                         
@@ -92,49 +109,10 @@ public class TestApplyTaclet extends TestCase{
 	    proof[i]=new Proof(services);
 	    proof[i].setRoot(new Node(proof[i], s));
 	}
-
-	// proof required to test application with mv
-	mvProof = new Proof(services);
-	
-	Sort s = new PrimitiveSort(new Name("test"));
-
-	Function f = new RigidFunction(new Name("f"), s, new Sort[]{s, s});
-	Function c = new RigidFunction(new Name("c"), s, new Sort[]{});
-
-	Metavariable mv_x = new Metavariable(new Name("X"), s);
-	Metavariable mv = new Metavariable(new Name("mv"), s);
-
- 	Term t_mv   = tf.func(mv);
- 	Term t_mv_x = tf.func(mv_x);
-		
- 	Term t_c = tf.func(c);
- 	Term t_f_X_c = tf.func(f, new Term[]{t_mv_x, t_c});
- 	Term t_f_c_X = tf.func(f, new Term[]{t_c, t_mv_x});
-
-	consMV_f_c_X = Constraint.BOTTOM.unify(t_mv, t_f_c_X, null);
-	consMV_f_X_c = Constraint.BOTTOM.unify(t_mv, t_f_X_c, null);
-
-	assertTrue(consMV_f_c_X.isSatisfiable() && consMV_f_X_c.isSatisfiable());
-    
-	ConstrainedFormula cf1 = 
-	    new ConstrainedFormula(TacletForTests.parseTerm("A & B"), consMV_f_c_X);
-	ConstrainedFormula cf2 = 
-	    new ConstrainedFormula(TacletForTests.parseTerm("!(A | B)"), consMV_f_X_c);
-
-	Sequent seq = Sequent.createSequent
-	    (Semisequent.EMPTY_SEMISEQUENT.insertLast(cf1).semisequent(),
-	     Semisequent.EMPTY_SEMISEQUENT.insertLast(cf2).semisequent());
-
-	mvProof.setRoot(new Node(mvProof, seq));	
     }
 
     public void tearDown() {
         proof = null;
-        mvProof = null;
-        // mv=f(X,c)
-        consMV_f_X_c = null;
-        // mv=f(c,X)
-        consMV_f_c_X = null;        
     }
     
     
@@ -688,47 +666,6 @@ public class TestApplyTaclet extends TestCase{
 		   it.next().formula().equals(TacletForTests.parseTerm("B")));
     }
 
-    public void testConstraintApplication() {
-	NoPosTacletApp t_al = TacletForTests.getRules().
-	    lookup("TestApplyTaclet_and_left_alternative");
-	Sequent seq = mvProof.root().sequent();
-	PosInOccurrence pio = new PosInOccurrence
-	    (seq.antecedent().get(0),PosInTerm.TOP_LEVEL, true);
-	TacletIndex tacletIndex = new TacletIndex ();
-	tacletIndex.add ( t_al );
-
-	Goal goal = createGoal ( mvProof.root(), tacletIndex );
-
-	ListOfTacletApp rApplist = goal.ruleAppIndex().
-	    getTacletAppAt(TacletFilter.TRUE, pio, null, 
-			   Constraint.BOTTOM);
-	RuleApp rApp = rApplist.head();
-	
-	rApp = ((TacletApp)rApp).findIfFormulaInstantiations ( 
-	    goal.sequent (), new Services(), Constraint.BOTTOM ).head();
-	
-	assertTrue("Rule application should be complete.", rApp.complete());
-
-	ListOfGoal goals = rApp.execute(goal, TacletForTests.services());
-	Sequent result = goals.head().sequent();
-
-	assertTrue("Expected one goal", goals.size()==1);
-	
-	ConstrainedFormula antec_1 = new ConstrainedFormula
-	    (TacletForTests.parseTerm("A"), consMV_f_c_X.join(consMV_f_X_c, null));
-	assertTrue(antec_1.constraint().isSatisfiable());
-	Semisequent expected_antec =
-	    mvProof.root ().sequent ().antecedent ().insertFirst ( antec_1 ).semisequent();
-	Semisequent expected_succ =
-	    mvProof.root ().sequent ().succedent();
-    
-	assertTrue("Expected 'A<<mv=f_c_X, X=c ==> !(A | B)<<mv=f_X_c', but is " +
-		   result,
-		   result.antecedent().equals(expected_antec) &&
-		   result.succedent().equals(expected_succ));
-    }
-
-
     public void testSetTaclets0() {
         Services services = TacletForTests.services();
 	NoPosTacletApp set_isEmpty = TacletForTests.getRules().lookup
@@ -960,8 +897,8 @@ public class TestApplyTaclet extends TestCase{
 
 	assertTrue("Expected one goal.",goals.size()==1);
 	
-	Sequent correctSeq = proof[15].root ().sequent ();
-	assertEquals("Wrong result", goals.head().sequent(), correctSeq);
+	Sequent correctSeq = proof[15].root ().sequent ();	
+	assertEquals("Wrong result", correctSeq, goals.head().sequent());
     }
 
     public void testCatchList () {
@@ -1017,7 +954,6 @@ public class TestApplyTaclet extends TestCase{
      * occuring as part of attributes and/or updates (there was a bug where 
      * this has been forgotten, and as a result after applying a method contract
      * schemavariables have been introduces into a goal sequent)
-     *
      */
     public void testTacletVariableCollector () {
         TacletSchemaVariableCollector coll = new TacletSchemaVariableCollector();
@@ -1026,7 +962,8 @@ public class TestApplyTaclet extends TestCase{
         SetOfSchemaVariable collSet = SetAsListOfSchemaVariable.EMPTY_SET;
         IteratorOfSchemaVariable it = coll.varIterator();
         while (it.hasNext()) {
-            collSet = collSet.add(it.next());
+            SchemaVariable sv = it.next();
+            collSet = collSet.add(sv);
         }
         
         assertTrue("Expected four uninstantiated variables in taclet " +
@@ -1034,7 +971,7 @@ public class TestApplyTaclet extends TestCase{
     }
     
     /**
-     * tests a bug, which causedthe first statement in a context block to be discarded  
+     * tests a bug, which caused the first statement in a context block to be discarded  
      * in cases where the complete program has been matched by the prefix and suffix of the context 
      * block i.e.
      * a rule like

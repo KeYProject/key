@@ -35,15 +35,14 @@ public class TestKey extends TestCase {
   	de.uka.ilkd.key.rule.TestMatchTaclet.class,
         de.uka.ilkd.key.rule.TestApplyTaclet.class,
  	de.uka.ilkd.key.rule.inst.TestGenericSortInstantiations.class,
-  	de.uka.ilkd.key.rule.metaconstruct.TestProgramMetaConstructs.class,
- 	de.uka.ilkd.key.rule.soundness.TestProofObligationCreation.class
+  	de.uka.ilkd.key.rule.metaconstruct.TestProgramMetaConstructs.class//,
+ 	//de.uka.ilkd.key.rule.soundness.TestProofObligationCreation.class
      };
 
 
      static Class[] proofConstructionTests = new Class[] {
    	de.uka.ilkd.key.proof.TestTacletIndex.class,
    	de.uka.ilkd.key.proof.TestProofTree.class,
-	de.uka.ilkd.key.proof.incclosure.TestMerger.class,
    	de.uka.ilkd.key.proof.TestGoal.class,
 	de.uka.ilkd.key.proof.TestTermTacletAppIndex.class
      };
@@ -62,8 +61,6 @@ public class TestKey extends TestCase {
         de.uka.ilkd.key.logic.TestTermFactory.class,
         de.uka.ilkd.key.logic.TestTerm.class,
         de.uka.ilkd.key.logic.TestNamespace.class,
-        de.uka.ilkd.key.logic.TestConstraint.class,
-        de.uka.ilkd.key.logic.TestUpdatetermNormalisation.class,
    	de.uka.ilkd.key.logic.TestSemisequent.class,
    	de.uka.ilkd.key.logic.TestPosInOcc.class,   	
    	de.uka.ilkd.key.logic.TestClashFreeSubst.class,
@@ -74,9 +71,9 @@ public class TestKey extends TestCase {
 
 
      static Class[] speclangTests = new Class[] {
-        de.uka.ilkd.key.speclang.jml.translation.TestJMLTranslator.class,
-        de.uka.ilkd.key.speclang.ocl.translation.TestOCLTranslator.class,
-        de.uka.ilkd.key.speclang.jml.pretranslation.TestJMLPreTranslator.class
+//XXX        de.uka.ilkd.key.speclang.jml.translation.TestJMLTranslator.class,
+//        de.uka.ilkd.key.speclang.ocl.translation.TestOCLTranslator.class,
+//        de.uka.ilkd.key.speclang.jml.pretranslation.TestJMLPreTranslator.class
       };
      
       static Class[] smtTests = new Class[] {

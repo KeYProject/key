@@ -20,7 +20,8 @@ import de.uka.ilkd.key.java.StatementBlock;
 
 public class JavaBlock {
     
-    public static final JavaBlock EMPTY_JAVABLOCK=new JavaBlock(new StatementBlock());
+    public static final JavaBlock EMPTY_JAVABLOCK
+    	= new JavaBlock(new StatementBlock());
     private final JavaProgramElement prg;
 
 
@@ -36,11 +37,11 @@ public class JavaBlock {
      * TacletIndex relies on <code>prg</code> being indeed a StatementBlock.
      */
     public static JavaBlock createJavaBlock(StatementBlock prg) {
-	if (prg==null) {
+	assert prg != null;
+	/*if (prg.isEmpty() && ! ) {
 	    return EMPTY_JAVABLOCK;	   
-	} 
+	} */
 	return new JavaBlock(prg);
-
     }
     
 
@@ -107,7 +108,7 @@ public class JavaBlock {
 
     /** toString */
     public String toString() {
-	if (this==EMPTY_JAVABLOCK) return "";
+	//if (this==EMPTY_JAVABLOCK) return "";
 	StringWriter sw=new StringWriter();
 	try {
 	    PrettyPrinter pp=new PrettyPrinter(sw, true);

@@ -22,6 +22,7 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.IteratorOfSchemaVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -476,7 +477,7 @@ class TacletMenu extends JMenu {
 	    IteratorOfSchemaVariable it = c.varIterator();
 	    while (it.hasNext()) {
 		SchemaVariable sv = it.next();
-		if (sv.sort() == Sort.FORMULA) {
+		if (sv instanceof FormulaSV) {
 		    formulaSV++;
 		}
 	    }

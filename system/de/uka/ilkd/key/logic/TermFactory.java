@@ -13,8 +13,6 @@ package de.uka.ilkd.key.logic;
 
 import java.util.*;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.util.Debug;
@@ -227,7 +225,7 @@ public class TermFactory {
 	if (boundVars != null && boundVars.length > 0) {
 	   return new TermImpl(op, 
 		   	       new ArrayOfTerm(subTerms), 
-		   	       JavaBlock.EMPTY_JAVABLOCK, 
+		   	       null, 
 		   	       boundVars[0]).checked(); 
 	} else {
 	    return createFunctionTerm(op, subTerms);
@@ -250,7 +248,7 @@ public class TermFactory {
                                        Term condF, Term thenT, Term elseT) {
         return new TermImpl ( IfExThenElse.IF_EX_THEN_ELSE,
                                new ArrayOfTerm( new Term [] { condF, thenT, elseT }),
-                               JavaBlock.EMPTY_JAVABLOCK,
+                               null,
                                new ArrayOfQuantifiableVariable[]{exVars,
                                                                  exVars,
                                                                  new ArrayOfQuantifiableVariable()} ).checked();
@@ -385,6 +383,7 @@ public class TermFactory {
     public Term createProgramTerm(Operator op, 
             JavaBlock javaBlock, 
             Term subTerm) {
+	assert javaBlock != null;	
 	return new TermImpl(op, 
 			    new ArrayOfTerm(subTerm), 
 			    javaBlock, 
@@ -395,6 +394,7 @@ public class TermFactory {
     public Term createProgramTerm(Operator op, 
             JavaBlock javaBlock, 
             Term[] subTerms) {
+	assert javaBlock != null;
 	return new TermImpl(op, 
 		            new ArrayOfTerm(subTerms), 
 		            javaBlock, 
@@ -418,7 +418,7 @@ public class TermFactory {
 	if (varsBoundHere.size()<=1) {
 	    return new TermImpl(quant, 
 		    		new ArrayOfTerm(subTerm),
-		    		JavaBlock.EMPTY_JAVABLOCK,
+		    		null,
 		    		varsBoundHere).checked();
 	} else {
 	    Term qt = subTerm;
@@ -475,7 +475,7 @@ public class TermFactory {
 	return new TermImpl
 	    (op, 
 	     new ArrayOfTerm(new Term[]{substTerm, origTerm}), 
-	     JavaBlock.EMPTY_JAVABLOCK, 
+	     null, 
 	     new ArrayOfQuantifiableVariable[]{new ArrayOfQuantifiableVariable(), 
 		                               new ArrayOfQuantifiableVariable(substVar)}).checked();
     }
@@ -492,41 +492,11 @@ public class TermFactory {
 	return new TermImpl
 	    (op, 
              new ArrayOfTerm(subs), 
-             JavaBlock.EMPTY_JAVABLOCK, 
+             null, 
              new ArrayOfQuantifiableVariable[]{new ArrayOfQuantifiableVariable(), 
 		                               new ArrayOfQuantifiableVariable(substVar)}).checked();
     }
 
-
-    /**
-     * helper method for term creation (reduces duplicate code)
-     */
-    private Term createTermWithNoBoundVariables(Operator op, 
-						Term[] subTerms, 
-						JavaBlock javaBlock) {
-	if (op instanceof Equality) {
-	    return createEqualityTerm(subTerms);
-	} else if (op instanceof SortedOperator) {
-	    return createFunctionTerm(op, subTerms);
-	} else if (op instanceof Junctor) {
-	    return createJunctorTerm((Junctor)op,subTerms);
-	} else if (op instanceof Modality) {
-	    return createProgramTerm((Modality)op, javaBlock, subTerms[0]); 
-	} else if (op instanceof IfThenElse) {
-	    return createIfThenElseTerm ( subTerms[0], subTerms[1], subTerms[2] );
-	} else if (op instanceof MetaOperator) {
-	    return createMetaTerm((MetaOperator)op, subTerms);
-	} else if (op instanceof UpdateApplication) {
-	    return createFunctionTerm(op, subTerms);
-	} else {
-	    de.uka.ilkd.key.util.Debug.fail("Should never be"+
-					    " reached. Missing case for class", 
-					    op.getClass());
-	    return null;
-	}       	
-    }
-
-  
 
 
    public Term createTerm(Operator op, Term[] subTerms, 
@@ -534,6 +504,8 @@ public class TermFactory {
 			  JavaBlock javaBlock) {
 	if (op==null) {
 	    throw new IllegalArgumentException("null-Operator at TermFactory");
+	} else if (op instanceof Modality || op instanceof ModalOperatorSV) {
+	    return createProgramTerm(op, javaBlock, subTerms);	    
 	} else if (op instanceof Quantifier) {
 	    return createQuantifierTerm((Quantifier)op, bv[0], subTerms[0]);
         } else if(op instanceof NumericalQuantifier){
@@ -568,24 +540,21 @@ public class TermFactory {
 	    return createSubstitutionTerm((SubstOp)op, 
 					  bv[1].getQuantifiableVariable(0),
 					  subTerms);
-	} else if (op instanceof SortedOperator) { 
-	    // special treatment for OCL operators binding variables	    
-	    return createFunctionWithBoundVarsTerm(op, subTerms, bv);	 
-	} else {
-	    return createTermWithNoBoundVariables(op, subTerms, javaBlock);
+	}  else {
+	    return createFunctionWithBoundVarsTerm(op, subTerms, bv);	 	    
 	}       
    }
 
     public Term createNumericalQuantifierTerm(NumericalQuantifier op, 
             Term cond, Term t, ArrayOfQuantifiableVariable va){
-        return new TermImpl(op, new ArrayOfTerm(new Term[]{cond, t}), JavaBlock.EMPTY_JAVABLOCK, va).checked();
+        return new TermImpl(op, new ArrayOfTerm(new Term[]{cond, t}), null, va).checked();
     }
     
     public Term createBoundedNumericalQuantifierTerm(BoundedNumericalQuantifier op, 
             Term a, Term b, Term t, ArrayOfQuantifiableVariable va){
         return new TermImpl(op, 
         		    new ArrayOfTerm(new Term[]{a, b, t}), 
-        		    JavaBlock.EMPTY_JAVABLOCK, 
+        		    null, 
         		    new ArrayOfQuantifiableVariable[]{new ArrayOfQuantifiableVariable(),
             						      new ArrayOfQuantifiableVariable(),
             						      va}).checked();

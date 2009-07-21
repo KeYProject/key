@@ -503,13 +503,18 @@ public abstract class TacletApp implements RuleApp {
 //        } else {
 //            cond = sv.match(term.op(), cond, services);
 //        }
-        if(sv instanceof FormulaSV 
-           || sv instanceof TermSV 
-           || sv instanceof UpdateSV 
-           || sv instanceof ProgramSV
-           || sv instanceof VariableSV) {
+//        if(sv instanceof FormulaSV 
+//           || sv instanceof TermSV 
+//           || sv instanceof UpdateSV 
+//           || sv instanceof ProgramSV
+//           || sv instanceof VariableSV) {
+//            cond = sv.match(term, cond, services);
+//        } else if(sv instanceof ModalOperatorSV || sv instanceof VariableSV) {
+//            cond = sv.match(term.op(), cond, services);
+//        }
+        if(sv.arity() == 0) {
             cond = sv.match(term, cond, services);
-        } else if(sv instanceof ModalOperatorSV || sv instanceof VariableSV) {
+        } else { 
             cond = sv.match(term.op(), cond, services);
         }
         	        
@@ -568,6 +573,10 @@ public abstract class TacletApp implements RuleApp {
         ListOfString proposals = SLListOfString.EMPTY_LIST;
 
         for (final SchemaVariable sv : uninstantiatedVars()) {
+            if(sv.arity() != 0) {
+        	continue;
+            }
+            
             if (sv.sort() == ProgramSVSort.VARIABLE) {
         	String proposal = varNamer.getSuggestiveNameProposalForProgramVariable
         	(sv, this, goal, services, proposals);

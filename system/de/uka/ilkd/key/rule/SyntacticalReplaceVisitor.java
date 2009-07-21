@@ -302,7 +302,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 	    return getTypeConverter().
 		convertToLogicElement((ProgramElement)o, ec);
 	}
-        de.uka.ilkd.key.util.Debug.fail("Wrong instantiation in SRVisitor");
+        de.uka.ilkd.key.util.Debug.fail("Wrong instantiation in SRVisitor: " + o);
 	return null;
     }
 
@@ -443,10 +443,11 @@ public final class SyntacticalReplaceVisitor extends Visitor {
 	// Sort equality has to be ensured before calling this method
         final Operator visitedOp = visited.op();
         if (visitedOp instanceof SchemaVariable
+        	&& visitedOp.arity() == 0
                 && svInst.isInstantiated((SchemaVariable) visitedOp)
                 && (! (visitedOp instanceof ProgramSV && ((ProgramSV) visitedOp).isListSV()))) {                
             pushNew(toTerm(svInst.getInstantiation((SchemaVariable) visitedOp)));
-        } else if (forceSVInst && visitedOp instanceof SchemaVariable
+        } else if (forceSVInst && visitedOp instanceof SchemaVariable && visitedOp.arity() == 0
                 && visitedOp instanceof TermSV) {
             	if (!instantiateWithMV(visited)) {
             	    throw new IllegalInstantiationException("Could not force instantiation with metavariable");

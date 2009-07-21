@@ -46,10 +46,9 @@ final class TermImpl implements Term {
 	    	    ArrayOfQuantifiableVariable[] boundVars) {
 	assert op != null;
 	assert subs != null;
-	assert javaBlock != null;
 	this.op   = op;
 	this.subs = subs.size() == 0 ? EMPTY_TERM_LIST : subs;
-	this.javaBlock = javaBlock;
+	this.javaBlock = javaBlock == null ? JavaBlock.EMPTY_JAVABLOCK : javaBlock;
 	if(boundVars != null) {
 	    this.boundVars = new ArrayOfQuantifiableVariable[boundVars.length];
 	    for(int i = 0; i < boundVars.length; i++) {
@@ -68,10 +67,9 @@ final class TermImpl implements Term {
 	    	    ArrayOfQuantifiableVariable boundVars) {
 	assert op != null;
 	assert subs != null;
-	assert javaBlock != null;
 	this.op   = op;
 	this.subs = subs.size() == 0 ? EMPTY_TERM_LIST : subs;
-	this.javaBlock = javaBlock;
+	this.javaBlock = javaBlock == null ? JavaBlock.EMPTY_JAVABLOCK : javaBlock;
 	if(boundVars != null) {
 	    this.boundVars = new ArrayOfQuantifiableVariable[subs.size()];
 	    for(int i = 0; i < subs.size(); i++) {
@@ -91,12 +89,12 @@ final class TermImpl implements Term {
 
     
     public TermImpl(Operator op, ArrayOfTerm subs) {
-	this(op, subs, JavaBlock.EMPTY_JAVABLOCK);
+	this(op, subs, null);
     }
 
 
     public TermImpl(Operator op, Term[] subs) {
-	this(op, new ArrayOfTerm(subs), JavaBlock.EMPTY_JAVABLOCK);
+	this(op, new ArrayOfTerm(subs), null);
     }
     
     
@@ -335,27 +333,41 @@ final class TermImpl implements Term {
      * returns a linearized textual representation of this term 
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer(op().name().toString());
-        if (arity() == 0) return sb.toString();
-        sb.append("(");
-        for (int i = 0, ar = arity(); i<ar; i++) {
-            for (int j=0, vbSize = varsBoundHere(i).size(); j<vbSize; j++) {
-                if (j == 0) {
-                    sb.append("{");
+	StringBuffer sb = new StringBuffer();
+	if(!javaBlock.isEmpty()) {
+	    if(op() == Modality.DIA) {
+		sb.append("\\<").append(javaBlock).append("\\> ");
+	    } else if (op() == Modality.BOX) {
+		sb.append("\\[").append(javaBlock).append("\\] ");
+	    } else {
+		sb.append(op()).append("\\[").append(javaBlock).append("\\] ");
+	    }
+	    sb.append("(").append(sub(0)).append(")");
+	    return sb.toString();
+	} else {
+            sb.append(op().name().toString());
+            if (arity() == 0) return sb.toString();
+            sb.append("(");
+            for (int i = 0, ar = arity(); i<ar; i++) {
+                for (int j=0, vbSize = varsBoundHere(i).size(); j<vbSize; j++) {
+                    if (j == 0) {
+                        sb.append("{");
+                    }
+                    sb.append(varsBoundHere(i).getQuantifiableVariable(j));
+                    if (j!=varsBoundHere(i).size()-1) {
+                        sb.append(", ");
+                    } else {
+                        sb.append("}");
+                    }
                 }
-                sb.append(varsBoundHere(i).getQuantifiableVariable(j));
-                if (j!=varsBoundHere(i).size()-1) {
-                    sb.append(", ");
-                } else {
-                    sb.append("}");
+                sb.append(sub(i));
+                if (i < ar-1) {
+                    sb.append(",");
                 }
             }
-            sb.append(sub(i));
-            if (i < ar-1) {
-                sb.append(",");
-            }
-        }
-        sb.append(")");
+            sb.append(")");
+	}
+	
         return sb.toString();
     }
 }

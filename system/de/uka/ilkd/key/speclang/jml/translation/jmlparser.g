@@ -712,17 +712,18 @@ storeref returns [SetOfLocationDescriptor result = SetAsListOfLocationDescriptor
 storerefexpression returns [SetOfLocationDescriptor result = SetAsListOfLocationDescriptor.EMPTY_SET] throws SLTranslationException
 {
     JMLExpression expr;
-    BasicLocationDescriptor ld = null;
+    LocationDescriptor ld = null;
 }
 :
     expr=storerefname 
     (
-	ld=storerefnamesuffix[expr]   { expr = new JMLExpression(ld.getLocTerm()); }
+	ld=storerefnamesuffix[expr]   { expr = new JMLExpression(((BasicLocationDescriptor)ld).getLocTerm()); }
     )*
     {
 	if(ld == null) {
 	    try {
-		ld = new BasicLocationDescriptor(expr.getTerm());
+		//ld = new BasicLocationDescriptor(expr.getTerm()); //XXX
+		ld = EverythingLocationDescriptor.INSTANCE;
 	    } catch(IllegalArgumentException e) {
 		raiseError(e.getMessage());
 	    }

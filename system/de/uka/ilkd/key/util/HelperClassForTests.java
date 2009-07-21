@@ -16,7 +16,9 @@ import java.io.File;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.RuleSource;
 import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.rule.SLListOfBuiltInRule;
 
 /**
  * @author bubel
@@ -26,7 +28,14 @@ import de.uka.ilkd.key.proof.init.*;
  */
 public class HelperClassForTests {
     
-    private static final Profile profile = new JavaProfile();
+    private static final Profile profile = new JavaProfile() {
+            //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
+	    public RuleCollection getStandardRules() {
+                return new RuleCollection(
+                                RuleSource.initRuleFile("LDTsForTestsOnly.key"), 
+                                SLListOfBuiltInRule.EMPTY_LIST);
+            }
+        };
     
     public HelperClassForTests() {
         

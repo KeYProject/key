@@ -2747,7 +2747,8 @@ attribute_or_query_suffix[Term prefix] returns [Term result = null]
            | 
            attributeName = attrid 
            {   
-              v = getAttribute(prefix.sort(), attributeName);             	
+              v = getAttribute(prefix.sort(), attributeName);
+	      result = createAttributeTerm(prefix, v);
            }   
         )
  ; exception
@@ -3221,7 +3222,7 @@ singleupdate returns[Term result=null]
     Term a1 = null;
     String id = null;
 }  :
-        (lhsSingle ASSIGN)=> (a0 = lhsSingle) ASSIGN (a1 = rhsSingle) 
+        (lhsSingle ASSIGN)=> (a0=lhsSingle ASSIGN a1=rhsSingle) 
         {
             result = TB.elementary(getServices(), a0, a1);
         }

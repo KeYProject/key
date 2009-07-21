@@ -6,16 +6,10 @@
 // The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
-/*
- * Created on 01.02.2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
+
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
+
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.*;
@@ -25,75 +19,74 @@ import de.uka.ilkd.key.logic.sort.*;
  */
 public class TermCreationException extends RuntimeException {
 
-        private String errorMessage;
-        
-        public TermCreationException(String errorMessage) {
-            super(errorMessage);
-            this.errorMessage = errorMessage;
-        }
-    
-	public TermCreationException
-            (Operator op, Term failed) {
-            
-            Term[] subs = new Term[failed.arity()];
-            for (int i = 0; i<subs.length; i++) {
-                subs[i] = failed.sub(i);
-                assert subs[i] != null;
-            }            
-            
-            errorMessage = 
-                "Building a term failed. Normally there is an arity mismatch " +
-                "or one of the subterms' sorts " +
-                "is not compatible (e.g. like the \'2\' in \"true & 2\")\n" +
-                "The top level operator was " + 
-                op + "(Sort: " + op.sort(subs) + ")" +
-                (op instanceof SortedOperator 
-                 ? "; its expected arg sorts were:\n" + 
-                	 argsToString((SortedOperator)op) 
-                 : "") + 
-                "\nThe subterms were:\n" + subsToString(subs);                       
-        }
-     
-	public String getMessage() {          
-            return errorMessage;
+    private final String errorMessage;
+
+    public TermCreationException(String errorMessage) {
+	super(errorMessage);
+	this.errorMessage = errorMessage;
+    }
+
+    public TermCreationException(Operator op, Term failed) {
+	ArrayOfTerm subs = failed.subs();
+	for (int i = 0, n = subs.size(); i < n; i++) {
+	    Term sub = subs.getTerm(i);
+	    assert sub != null;
+	    assert sub == failed.subs().getTerm(i);
+	}            
+
+	errorMessage = 
+	    "Building a term failed. Normally there is an arity mismatch " +
+	    "or one of the subterms' sorts " +
+	    "is not compatible (e.g. like the \'2\' in \"true & 2\")\n" +
+	    "The top level operator was " + 
+	    op + "(Sort: " + op.sort(subs) + ")" +
+	    (op instanceof SortedOperator 
+		    ? "; its expected arg sorts were:\n" + 
+			    argsToString((SortedOperator)op) 
+			    : "") + 
+			    "\nThe subterms were:\n" + subsToString(subs);                       
+    }
+
+    public String getMessage() {          
+	return errorMessage;
+    }
+
+
+    private String argsToString(SortedOperator f) {
+	StringBuffer sb = new StringBuffer();
+	for(int i = 0; i < f.arity(); i++) {
+	    sb.append((i+1) + ".) ");
+	    sb.append("sort: " + f.argSort(i) + 
+		    ", sort hash: " + f.argSort(i).hashCode() + "\n");
 	}
-	
-	
-	private String argsToString(SortedOperator f) {
-	    StringBuffer sb = new StringBuffer();
-      	    for(int i = 0; i < f.arity(); i++) {
-      		sb.append((i+1) + ".) ");
-    	        sb.append("sort: " + f.argSort(i) + 
-    	        	  ", sort hash: " + f.argSort(i).hashCode() + "\n");
-      	    }
-	    return sb.toString();
+	return sb.toString();
+    }
+
+
+    private String subsToString(ArrayOfTerm subs) {
+	StringBuffer sb = new StringBuffer();
+	for (int i = 0, n = subs.size(); i < n; i++) {
+	    sb.append((i+1) + ".) ");
+	    Term subi = subs.getTerm(i);
+	    if(subi!=null){
+		sb.append(subi);
+		Sort subiSort = subi.sort();
+		if(subiSort!=null){
+		    sb.append("(sort: " + subi.sort()+
+			    ", sort hash: "+ subi.sort().hashCode()+")\n");
+		}else{
+		    sb.append("(Unknown sort, \"null pointer\")");
+		}
+	    }else{
+		sb.append(" !null! ");
+	    }
+
 	}
-	
-	
-        private String subsToString(Term[] subs) {
-            StringBuffer sb = new StringBuffer();
-            for (int i = 0; i<subs.length; i++) {
-                sb.append((i+1) + ".) ");
-                Term subi = subs[i];
-                if(subi!=null){
-                    sb.append(subi);
-                    Sort subiSort = subi.sort();
-                    if(subiSort!=null){
-                        sb.append("(sort: " + subi.sort()+
-                                  ", sort hash: "+ subi.sort().hashCode()+")\n");
-                    }else{
-                        sb.append("(Unknown sort, \"null pointer\")");
-                    }
-                }else{
-                    sb.append(" !null! ");
-                }
-        
-            }
-            return sb.toString();
-        }
-        
-        
-	public String toString() {
-	    return errorMessage;
-	}
+	return sb.toString();
+    }
+
+
+    public String toString() {
+	return errorMessage;
+    }
 }

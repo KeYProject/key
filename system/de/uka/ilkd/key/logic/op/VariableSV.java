@@ -13,13 +13,14 @@ package de.uka.ilkd.key.logic.op;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
 
 public final class VariableSV extends AbstractSV implements QuantifiableVariable {
 
+    
     /** 
      * Creates a new SchemaVariable that is used as placeholder for
      * bound(quantified) variables.
@@ -32,27 +33,29 @@ public final class VariableSV extends AbstractSV implements QuantifiableVariable
 
     
     @Override
-    public MatchConditions match(SVSubstitute substitute, 
+    public MatchConditions match(SVSubstitute subst, 
 	    			 MatchConditions mc, 
 	    			 Services services) {                
-        final Term subst;
-        if (substitute instanceof LogicVariable) {
-            subst = TermFactory.DEFAULT.createVariableTerm((LogicVariable)substitute);
-        } else if (substitute instanceof Term && 
-                ((Term)substitute).op() instanceof QuantifiableVariable) {
-            subst = (Term) substitute;
+        final Term substTerm;
+        if(subst instanceof LogicVariable) {
+            substTerm = TermBuilder.DF.var((LogicVariable)subst);
+        } else if(subst instanceof Term && 
+                 ((Term)subst).op() instanceof QuantifiableVariable) {
+            substTerm = (Term) subst;
         } else {
             Debug.out("Strange Exit of match in VariableSV. Check for bug");
             return null;
         }
-        final Term foundMapping = (Term)mc.getInstantiations ().
-        	getInstantiation(this);
-        if (foundMapping == null) {            		
-            return addInstantiation(subst, mc, services);
-        } else if (((QuantifiableVariable)foundMapping.op()) != subst.op()) {
-            return null; //FAILED;			    
-        } 
-        return mc;
+        final Term foundMapping 
+        	= (Term)mc.getInstantiations().getInstantiation(this);
+        if(foundMapping == null) {
+            return addInstantiation(substTerm, mc, services);
+        } else if (((QuantifiableVariable)foundMapping.op()) == substTerm.op()) {
+            return mc;
+        } else {
+            Debug.out("FAILED. Already instantiated with different variable.");
+            return null;	    
+        }
     } 
     
     

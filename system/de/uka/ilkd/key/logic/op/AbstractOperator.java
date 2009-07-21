@@ -26,6 +26,7 @@ public abstract class AbstractOperator implements Operator {
     private final Name name;
     
     private final int arity;
+    
    	
     
     protected AbstractOperator(Name name, int arity) {
