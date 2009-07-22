@@ -13,7 +13,7 @@ package de.uka.ilkd.key.rule.inst;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortDependingSymbol;
 import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.sort.CollectionSort;
+import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -92,7 +92,7 @@ public abstract class GenericSortCondition {
      */
     protected static GenericSortCondition createCondition
 	( Sort s0, Sort s1, boolean p_identity ) {
-	while ( s0 instanceof CollectionSort ) {
+	while ( s0 instanceof ArraySort ) {
 	    // Currently the sort hierarchy is not inherited by
 	    // collection sorts; therefore identity has to be ensured
 	    p_identity = true;
@@ -100,8 +100,8 @@ public abstract class GenericSortCondition {
 	    if ( !s0.getClass ().equals ( s1.getClass () ) )
 		return null;
 
-	    s0 = ((CollectionSort)s0).elementSort ();
-	    s1 = ((CollectionSort)s1).elementSort ();
+	    s0 = ((ArraySort)s0).elementSort ();
+	    s1 = ((ArraySort)s1).elementSort ();
 	}
 
 	if ( !( s0 instanceof GenericSort ) ||
@@ -132,8 +132,8 @@ public abstract class GenericSortCondition {
 	if ( p_s instanceof GenericSort )
 	    return createForceInstantiationCondition ( (GenericSort)p_s,
 						       p_maximum );
-	else if ( p_s instanceof CollectionSort )
-	    return forceInstantiation ( ((CollectionSort)p_s).elementSort (),
+	else if ( p_s instanceof ArraySort )
+	    return forceInstantiation ( ((ArraySort)p_s).elementSort (),
 					p_maximum );
 
 	return null;

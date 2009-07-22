@@ -19,7 +19,7 @@ import de.uka.ilkd.key.logic.Term;
  * a compile time constant. These fields cannot occur on the left side of an 
  * update.
  */
-public class ProgramConstant extends ProgramVariable {
+public final class ProgramConstant extends ProgramVariable {
 
     // the value of the initializer as a literal, if this variable is
     // a compile-time constant, <code>null</code> otherwise

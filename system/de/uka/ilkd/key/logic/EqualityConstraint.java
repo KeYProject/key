@@ -15,7 +15,6 @@ import java.util.*;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.IntersectionSort;
 import de.uka.ilkd.key.logic.sort.SetAsListOfSort;
 import de.uka.ilkd.key.logic.sort.SetOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -350,30 +349,31 @@ public class EqualityConstraint implements Constraint {
         
         final SetOfSort set = 
             SetAsListOfSort.EMPTY_SET.add(t0.sort()).add(t1.sort());
-
-        final Sort intersectionSort = 
-            IntersectionSort.getIntersectionSort(set, services);
-                      
-        if (intersectionSort == null) {
-            return Constraint.TOP;
-        }
-        
-        // I think these MV will never occur in saved proofs, or?
-        
-        final Metavariable newMV = 
-            new Metavariable(new Name("#MV"+(MV_COUNTER++)), intersectionSort);
-        final Term newMVTerm = TermFactory.DEFAULT.createFunctionTerm(newMV);
-        
-        final Constraint addFirst = normalize ( (Metavariable)t0.op (),
-                                                newMVTerm,
-                                                modifyThis,
-                                                services );
-        if ( !addFirst.isSatisfiable () ) return Constraint.TOP;
-        return ( (EqualityConstraint)addFirst )
-                                    .normalize ( (Metavariable)t1.op (),
-                                                 newMVTerm,
-                                                 modifyThis || addFirst != this,
-                                                 services );
+        assert false : "metavariables disabled";
+        return null;
+//        final Sort intersectionSort = 
+//            IntersectionSort.getIntersectionSort(set, services);
+//                      
+//        if (intersectionSort == null) {
+//            return Constraint.TOP;
+//        }
+//        
+//        // I think these MV will never occur in saved proofs, or?
+//        
+//        final Metavariable newMV = 
+//            new Metavariable(new Name("#MV"+(MV_COUNTER++)), intersectionSort);
+//        final Term newMVTerm = TermFactory.DEFAULT.createFunctionTerm(newMV);
+//        
+//        final Constraint addFirst = normalize ( (Metavariable)t0.op (),
+//                                                newMVTerm,
+//                                                modifyThis,
+//                                                services );
+//        if ( !addFirst.isSatisfiable () ) return Constraint.TOP;
+//        return ( (EqualityConstraint)addFirst )
+//                                    .normalize ( (Metavariable)t1.op (),
+//                                                 newMVTerm,
+//                                                 modifyThis || addFirst != this,
+//                                                 services );
     }
    
 

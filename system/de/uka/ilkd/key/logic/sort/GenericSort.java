@@ -19,8 +19,7 @@ import de.uka.ilkd.key.logic.Name;
  * a concrete sort, which has to be a subsort of the instantiations of
  * the supersorts of this sort
  */
-public class GenericSort extends AbstractNonCollectionSort 
-    implements ObjectSort {
+public class GenericSort extends AbstractSort {
     
 
     /**
@@ -80,10 +79,10 @@ public class GenericSort extends AbstractNonCollectionSort
 	Sort           s, t;
 	while ( it.hasNext () ) {
 	    s = it.next ();
-	    if ( s instanceof CollectionSort ) {
-		t = ((CollectionSort)s).elementSort ();
-		while ( t instanceof CollectionSort )
-		    t = ((CollectionSort)t).elementSort ();
+	    if ( s instanceof ArraySort ) {
+		t = ((ArraySort)s).elementSort ();
+		while ( t instanceof ArraySort )
+		    t = ((ArraySort)t).elementSort ();
 		if ( t instanceof GenericSort )
 		    throw new GenericSupersortException
 			( "Illegal supersort " + s +

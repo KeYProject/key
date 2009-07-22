@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public class MetaJavaLongUnsignedShiftRight extends AbstractMetaOperator {
+public final class MetaJavaLongUnsignedShiftRight extends AbstractMetaOperator {
 
     public MetaJavaLongUnsignedShiftRight() {
 	super(new Name("#JavaLongUnsignedShiftRight"), 2);

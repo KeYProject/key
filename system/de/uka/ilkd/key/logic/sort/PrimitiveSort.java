@@ -12,7 +12,7 @@ package de.uka.ilkd.key.logic.sort;
 
 import de.uka.ilkd.key.logic.Name;
 
-public class PrimitiveSort extends AbstractNonCollectionSort {
+public class PrimitiveSort extends AbstractSort {
     
     private static final SetOfSort EMPTY_SORT_SET 
     = SetAsListOfSort.EMPTY_SET;

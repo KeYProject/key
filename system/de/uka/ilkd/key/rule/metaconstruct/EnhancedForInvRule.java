@@ -48,7 +48,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * @author mulbrich
  */
 
-public class EnhancedForInvRule extends AbstractMetaOperator {
+public final class EnhancedForInvRule extends AbstractMetaOperator {
 
     private static final boolean FORMALPARAM_AS_STATEMENT = false;
     private static final TermBuilder TB = TermBuilder.DF;    

@@ -40,7 +40,7 @@ import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 /**
  * Creates an anonymising update for a modifies clause.
  */
-public class IntroAtPreDefsOp extends AbstractMetaOperator {
+public final class IntroAtPreDefsOp extends AbstractMetaOperator {
     
     private static final AtPreFactory APF = AtPreFactory.INSTANCE;
    

@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public class MetaGeq extends AbstractMetaOperator {
+public final class MetaGeq extends AbstractMetaOperator {
 
     public MetaGeq() {
 	super(new Name("#geq"), 2);

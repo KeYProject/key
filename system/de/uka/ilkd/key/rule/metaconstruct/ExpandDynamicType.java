@@ -21,7 +21,6 @@ import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
 import de.uka.ilkd.key.logic.op.ExactInstanceSymbol;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -32,7 +31,7 @@ import de.uka.ilkd.key.util.Debug;
  * returns <code>true</code> if no dynamic types are possible
  * <em>Attention</em> strong closed world assumption
  */
-public class ExpandDynamicType extends AbstractMetaOperator {
+public final class ExpandDynamicType extends AbstractMetaOperator {
 
     public ExpandDynamicType() {
         super(new Name("#expandDynamicType"), 1, Sort.FORMULA);
@@ -54,7 +53,7 @@ public class ExpandDynamicType extends AbstractMetaOperator {
 
         final JavaInfo ji = services.getJavaInfo();
         
-        if (!(term.sort() instanceof ObjectSort)
+        if (!(term.sort().extendsTrans(services.getJavaInfo().objectSort()))
                 || term.sort() == Sort.NULL
                 || ji.isAJavaCommonSort(term.sort())) {
             // the latter two cases cannot be expanded as their are 
@@ -131,7 +130,7 @@ public class ExpandDynamicType extends AbstractMetaOperator {
                 componentSort);
 
         ListOfKeYJavaType componentSubtypes = SLListOfKeYJavaType.EMPTY_LIST;
-        if (componentSort instanceof ObjectSort) {
+        if (componentSort.extendsTrans(services.getJavaInfo().objectSort())) {
             componentSubtypes = services.getJavaInfo().getAllSubtypes(kjt);
         }
         componentSubtypes = componentSubtypes.prepend(kjt);
@@ -200,7 +199,4 @@ public class ExpandDynamicType extends AbstractMetaOperator {
         }
         return result;
     }
-
 }
-
-

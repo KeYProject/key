@@ -20,7 +20,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
 
-public class MetaAdd extends AbstractMetaOperator {
+public final class MetaAdd extends AbstractMetaOperator {
 
     public MetaAdd() {
 	super(new Name("#add"), 2);

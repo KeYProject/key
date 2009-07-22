@@ -12,8 +12,6 @@ package de.uka.ilkd.key.logic;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Metavariable;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -47,7 +45,7 @@ public class TestSemisequent extends TestCase {
 	Term t_c=tf.createFunctionTerm(c, new Term[]{});
 
 	
-	con=new ConstrainedFormula[8];
+	con=new ConstrainedFormula[7];
 	con[0]=new ConstrainedFormula(t_p, Constraint.BOTTOM);
 	con[1]=new ConstrainedFormula(t_q, Constraint.BOTTOM);
 	con[2]=new ConstrainedFormula(t_r, Constraint.BOTTOM);
@@ -59,11 +57,6 @@ public class TestSemisequent extends TestCase {
 	Sort s = new PrimitiveSort(new Name("test"));
 	Function f = new Function(new Name("f"), s, new Sort[]{});
  	Term t_f = tf.createFunctionTerm(f, new Term[]{});
-	Metavariable mv = new Metavariable(new Name("mv"), s);
- 	Term t_mv = tf.createFunctionTerm(mv, new Term[]{});
-	Constraint cons = Constraint.BOTTOM.unify(t_mv, t_f, null);
-	assertTrue(cons.isSatisfiable());
-	con[7]=new ConstrainedFormula(t_c, cons);
     }
        
     public void tearDown() {
@@ -247,28 +240,6 @@ public class TestSemisequent extends TestCase {
 		     SLListOfConstrainedFormula.EMPTY_LIST.prepend(con[2]),
 		     result.removedFormulas());
 	assertEquals("Both semisequents should be equal.", expected, extract(result));
-	
-    }
-
-    public void testRemoveRedundantFormulaOfSequent() {
-	//[p,q,c<<mv=f]
-	Semisequent origin = extract(extract(extract(Semisequent.EMPTY_SEMISEQUENT.insertLast(con[0])).
-					     insertLast(con[1])).insertLast(con[7]));
-	//exp.:[p,q,a,c]
-	Semisequent expected = extract(extract(extract(origin.remove(2)).insertLast(con[4])).insertLast(con[6]));
-	//insert: [a,c,q,p]
-	ListOfConstrainedFormula insertionList = SLListOfConstrainedFormula.EMPTY_LIST.prepend(con[0]).prepend(con[1]).
-	    prepend(con[6]).prepend(con[4]);
-
-
-	SemisequentChangeInfo sci = origin.insert(origin.size(), insertionList);
-	assertEquals("SemisequentChangeInfo is corrupt due to wrong added formula list:",
-		     SLListOfConstrainedFormula.EMPTY_LIST.prepend(con[4]).prepend(con[6]),
-		     sci.addedFormulas());
-	assertEquals("SemisequentChangeInfo is corrupt due to wrong removed formula list:",
-		     SLListOfConstrainedFormula.EMPTY_LIST.prepend(con[7]),
-		     sci.removedFormulas());
-	assertEquals("Both semisequents should be equal.", expected, extract(sci));
 	
     }
 

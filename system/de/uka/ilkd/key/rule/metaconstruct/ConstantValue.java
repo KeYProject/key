@@ -22,7 +22,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * Replace a program variable that is a compile-time constant with the
  * value of the initializer
  */
-public class ConstantValue extends AbstractMetaOperator {
+public final class ConstantValue extends AbstractMetaOperator {
 
 
     public ConstantValue() {

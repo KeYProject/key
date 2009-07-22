@@ -29,7 +29,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * 
  * @author mulbrich
  */
-public class EnumConstantValue extends AbstractMetaOperator {
+public final class EnumConstantValue extends AbstractMetaOperator {
 
     public EnumConstantValue() {
         super(new Name("#enumconstantvalue"), 1);

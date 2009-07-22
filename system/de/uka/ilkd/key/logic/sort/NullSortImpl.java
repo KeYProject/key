@@ -24,7 +24,7 @@ public class NullSortImpl extends ClassInstanceSortImpl implements NullSort {
      * returns true iff the given sort is an object sort
      */
     public boolean extendsTrans(Sort s) {
-       return s==Sort.ANY || (s instanceof ObjectSort);
+       return true;//s==Sort.ANY || (s instanceof ObjectSort);
     }
 
     /** @return equality symbol of this sort */

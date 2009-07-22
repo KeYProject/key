@@ -13,7 +13,6 @@ package de.uka.ilkd.key.speclang.translation;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
 
 
 /**
@@ -99,16 +98,14 @@ public abstract class SLResolverManager {
         if(useLocalVarsAsImplicitReceivers) {
             for(Namespace ns : localVariablesNamespaces) {
                 for(Named n : ns.elements()) {
-                    ParsableVariable localVar = (ParsableVariable) n;
-                    if(localVar.sort() instanceof ObjectSort) {              
-                        Term recTerm = TB.var(localVar);
-                        SLExpression result 
-                               = resolveExplicit(createSLExpression(recTerm), 
-                                                name,
-                                                parameters);
-                        if(result != null) {
-                            return result;
-                        }
+                    ParsableVariable localVar = (ParsableVariable) n;              
+                    Term recTerm = TB.var(localVar);
+                    SLExpression result 
+                    	= resolveExplicit(createSLExpression(recTerm), 
+                    		          name,
+                    		          parameters);
+                    if(result != null) {
+                	return result;
                     }
                 }
             }

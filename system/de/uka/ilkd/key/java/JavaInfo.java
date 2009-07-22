@@ -23,9 +23,7 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.IteratorOfSort;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LRUCache;
@@ -446,17 +444,6 @@ public class JavaInfo {
         return getTypeConverter().getKeYJavaType(e);
     }
 
-    /**
-     * returns all ObjectSorts of the underlying Java model
-     * @return a namespace containing the object sorts
-     */
-    public Namespace getObjectSorts() {
-        final Namespace ns = new Namespace();
-        for (final ObjectSort os : kpmi.allObjectSorts()) {
-            ns.add(os);            
-        }
-        return ns;
-    }    
 
     /**
      * returns the KeYJavaType belonging to the given Type t
@@ -550,7 +537,7 @@ public class JavaInfo {
 	subs[0] = prefix;
 	subs[1] = TermBuilder.DF.heap(services);
 	for (int i = 2; i<subs.length; i++) {
-              Term t = args[i-1];             
+              Term t = args[i-2];             
               sig=sig.append(getServices().getTypeConverter()
 			     .getKeYJavaType(t));
               subs[i] = t;
@@ -929,7 +916,8 @@ public class JavaInfo {
      * returns an attribute named <tt>attributeName</tt> declared locally 
      * in object type <tt>s</tt>    
      */
-    public ProgramVariable getAttribute(String attributeName, ObjectSort s) {
+    public ProgramVariable getAttribute(String attributeName, Sort s) {
+	assert s.extendsTrans(objectSort());
         return getAttribute(attributeName, getKeYJavaType(s));
     }
 
@@ -954,7 +942,7 @@ public class JavaInfo {
         ListOfProgramVariable result = 
             SLListOfProgramVariable.EMPTY_LIST;      
         
-	if (!(type.getSort() instanceof ObjectSort)) {
+	if (!(type.getSort().extendsTrans(objectSort()))) {
 	    return result;
 	}
                
@@ -1040,21 +1028,25 @@ public class JavaInfo {
     /**
      * returns the KeYJavaType for class java.lang.Object
      */
-    public Sort getJavaLangObjectAsSort() {
-	return getJavaLangObject().getSort();	
+    public Sort objectSort() {
+	try {
+	    return getJavaLangObject().getSort();
+	} catch(RuntimeException e) {//XXX
+	    return null;
+	}
     }
 
     /**
      * returns the KeYJavaType for class java.lang.Cloneable
      */
-    public Sort getJavaLangCloneableAsSort() {   
+    public Sort cloneableSort() {   
         return getJavaLangCloneable().getSort();        
     }
 
     /**
      * returns the KeYJavaType for class java.io.Serializable
      */
-    public Sort getJavaIoSerializableAsSort() {   
+    public Sort serializableSort() {   
         return getJavaIoSerializable().getSort();        
     }
     
@@ -1135,7 +1127,7 @@ public class JavaInfo {
         if (type.getJavaType() instanceof ArrayType) {
             ListOfKeYJavaType arraySupertypes = SLListOfKeYJavaType.EMPTY_LIST;
             final IteratorOfSort it = 
-                ((ArraySort)type.getSort()).extendsSorts().iterator();
+                (type.getSort()).extendsSorts().iterator();
             while (it.hasNext()) {
                 arraySupertypes.append(getKeYJavaType(it.next()));
             }

@@ -20,8 +20,6 @@ import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.AbstractCollectionSort;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 
 
@@ -58,8 +56,7 @@ public class CreatedAttributeTermFactory {
         //non-primitive type
         Term guardConjunctionTerm = TB.tt();
         for(int i = 0; i < vars.length; i++) {
-            if(!(vars[i].sort() instanceof PrimitiveSort) &&
-               !(vars[i].sort() instanceof AbstractCollectionSort)) {
+            if(!(vars[i].sort().extendsTrans(services.getJavaInfo().objectSort()))) {
                 Term variableTerm = TB.var(vars[i]);
                 Term guardTerm
                         = (nullForbidden
@@ -191,7 +188,7 @@ public class CreatedAttributeTermFactory {
                                                  ProgramVariable var) {
         if(var == null) {
             return TB.tt();
-        } else if(var.sort() instanceof ObjectSort) {
+        } else if(var.sort().extendsTrans(services.getJavaInfo().objectSort())) {
             return createCreatedOrNullTerm(services, TB.var(var)); 
         } else {
             Type varType = var.getKeYJavaType().getJavaType();

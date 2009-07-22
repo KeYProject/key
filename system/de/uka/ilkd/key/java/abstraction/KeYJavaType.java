@@ -58,34 +58,16 @@ public class KeYJavaType implements Type {
                 return;
             }
             
-            final boolean b = 
-                (javaType instanceof ClassType ==  sort instanceof ObjectSort);
-            
-            if (!b) {
-                throw new IllegalStateException("A primitive sort/type cannot be mapped " +
-                        "for a reference type/sort (type:" + javaType + "," 
-                        +sort+")");
-            }
-                                    
-            boolean arrayTypeSort = 
-                (javaType instanceof ArrayType ==  sort instanceof ArraySort); 
-            
-            if (!arrayTypeSort) {
-                throw new IllegalStateException("A non-array sort/type cannot be mapped " +
-                        "to an array type/sort (type:" + javaType + "," 
-                        +sort+")");
-            }
             
             if (javaType instanceof ClassType) {                   
-                final ObjectSort os = (ObjectSort)sort;
-                if (os instanceof ClassInstanceSort) {
+                if (sort instanceof ClassInstanceSort) {
                     boolean conform = 
-                        ((ClassInstanceSort)os).representAbstractClassOrInterface() ==
+                        ((ClassInstanceSort)sort).representAbstractClassOrInterface() ==
                             (((ClassType)javaType).isAbstract() || 
                                     ((ClassType)javaType).isInterface());
                     if (!conform) {
                         throw new IllegalStateException("Java type " + javaType 
-                                + " cannot be mapped to sort " + os);
+                                + " cannot be mapped to sort " + sort);
                     }
                 }
             }

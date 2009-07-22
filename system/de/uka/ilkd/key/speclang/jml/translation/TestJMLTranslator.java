@@ -536,7 +536,7 @@ public class TestJMLTranslator extends TestCase {
 
         assertTrue(result != null);
 
-        SortDefiningSymbols sds = (SortDefiningSymbols) javaInfo.getJavaLangObjectAsSort();
+        SortDefiningSymbols sds = (SortDefiningSymbols) javaInfo.objectSort();
         Function ioFunc = (Function) sds.lookupSymbol(InstanceofSymbol.NAME);
         assertTrue(termContains(result.getFormula(), ioFunc));
     }

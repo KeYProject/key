@@ -216,15 +216,6 @@ public class TestTermFactory extends TestCase {
 	assertTrue(exc instanceof TermCreationException);
     }
 
-    public void testMetavariable() {
-	Metavariable xx=new Metavariable(new Name("xx"),sort1);
-	Term t_mv=tf.createFunctionTerm(xx, new Term[0]);
-	Term t_pxx=tf.createFunctionTerm(p, new Term[]{t_mv});	
-	Assert.assertEquals(t_pxx,
-			    new TermImpl(p, new Term[]{
-					       new TermImpl(xx, new Term[0])}));
-    }
-
 
     public void testSubSorts1() {
 	tf.createFunctionTerm(g, tf.createVariableTerm(v4), 

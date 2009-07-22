@@ -37,8 +37,8 @@ public class TestApplyTaclet extends TestCase{
 		   "","\\<{try{while (1==1) {if (1==2) {break;}} return 1==3; int i=17; } catch (Exception e) { return null;}}\\>A",
                    "A & B", 
                    "",
-		   "s{}::isEmpty(sset)",
-		   "s{}::size(sset)=0",
+		   "",//"s{}::isEmpty(sset)",
+		   "",//"s{}::size(sset)=0",
 		   "A & (A & B)", "",
 		   "f(const)=const", 
 		   "const=f(f(const))",
@@ -666,68 +666,6 @@ public class TestApplyTaclet extends TestCase{
 		   it.next().formula().equals(TacletForTests.parseTerm("B")));
     }
 
-    public void testSetTaclets0() {
-        Services services = TacletForTests.services();
-	NoPosTacletApp set_isEmpty = TacletForTests.getRules().lookup
-	    ("set_isEmpty");
-	TacletIndex tacletIndex = new TacletIndex ();
- 	tacletIndex.add ( set_isEmpty );
-	NoPosTacletApp set_isEmpty_Size = TacletForTests.getRules().lookup
-	    ("set_isEmpty_Size");
- 	tacletIndex.add ( set_isEmpty_Size );
-	Goal goal = createGoal ( proof[6].root(), tacletIndex );
-	PosInOccurrence pos
-	    = new PosInOccurrence(goal.sequent().antecedent().getFirst(), 
-				  PosInTerm.TOP_LEVEL,
-				  true);
- 	ListOfTacletApp rApplist=goal.ruleAppIndex().
-	    getTacletAppAt(TacletFilter.TRUE, pos, services, Constraint.BOTTOM);	
-
-	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
-	RuleApp rApp=rApplist.head();
-	SchemaVariable e1=(SchemaVariable)
-	    TacletForTests.getVariables().lookup(new Name("e1"));
-	Sort s = TacletForTests.sortLookup("s");
-	rApp = ((TacletApp)rApp).addInstantiation
-	    (e1,
-	     TermFactory.DEFAULT
-	     .createVariableTerm ( new LogicVariable (new Name ("var"), s) ),
-	     false);
-	assertTrue("Rule App should be complete", rApp.complete());
-	// This should apply the taclet set_isEmpty to the formula of the
-	// antecedent, creating the quantified formula below
-	ListOfGoal goals=rApp.execute(goal, TacletForTests.services());
-	assertTrue("Too many or zero goals.",goals.size()==1);	
-	Sequent seq=goals.head().sequent();
-	Term term=seq.antecedent().getFirst().formula();
-	assertTrue(term.equalsModRenaming(TacletForTests.parseTerm
-					  ("\\forall s x; ! s{}::includes(sset,x)")));
-
-	goal = goals.head ();
-	pos = new PosInOccurrence(goal.sequent().succedent().getFirst(), 
-				  PosInTerm.TOP_LEVEL,
-				  false);
- 	rApplist=goal.ruleAppIndex().
-	    getTacletAppAtAndBelow(TacletFilter.TRUE, pos, null, Constraint.BOTTOM);	
-	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
-	
-	rApplist = rApplist.head().findIfFormulaInstantiations(goal.sequent(),
-	                                                       TacletForTests.services(),
-							       Constraint.BOTTOM);
-	assertTrue("Too many or zero rule applications.",rApplist.size()==1);
-
-	rApp=rApplist.head();
-	assertTrue("Rule App should be complete", rApp.complete());
-	// This applies the taclet set_isEmpty_size to the formula of the
-	// succedent, using the quantified formula from above as instantiation
-	// of the if-formula
-	goals=rApp.execute(goal, TacletForTests.services());
-	assertTrue("Too many or zero goals.",goals.size()==1);	
-	seq=goals.head().sequent();
-	term=seq.succedent().getFirst().formula();
-	assertTrue(term.equalsModRenaming(TacletForTests.parseTerm
-					  ("0=0")));
-    }
 
     public void testModalityLevel0 () {
 	Services services = TacletForTests.services();

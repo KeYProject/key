@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * itself would remain sound even if we would syntactically allow such kind
  * of casts.   
  */
-public class CastFunctionSymbol extends SortDependingFunction {
+public final class CastFunctionSymbol extends SortDependingFunction {
 
     public static final Name NAME = new Name("cast"); 
     

@@ -26,12 +26,14 @@ import de.uka.ilkd.key.util.Debug;
  *     from f1.isSimilar(f2) and f1.getSortDependingOn() == f2.getSortDependingOn() <br/>
  *     follows f1 == f2 
  */
-public class SortDependingFunction extends Function implements SortDependingSymbol {
+public class SortDependingFunction extends Function 
+	implements SortDependingSymbol {
     
     private final Name kind;
     private final Sort sortDependingOn;
 
-    /** creates a Function 
+    
+    /** 
      * @param name String with name of the function
      * @param sort the Sort of the function (result type)
      * @param kind name of the kind this object belongs to
@@ -58,36 +60,27 @@ public class SortDependingFunction extends Function implements SortDependingSymb
 	this.sortDependingOn = sortDependingOn;
     }
 
-    /**
-     * @return the sort this object has been instantiated for
-     */
-    public Sort    getSortDependingOn () {
+    
+    @Override
+    public Sort getSortDependingOn() {
 	return sortDependingOn;
     }
 
-    /**
-     * Compares "this" and "p"
-     * @param p object to compare
-     * @return true iff this and p are instances of the same kind of
-     * symbol, but possibly instantiated for different sorts
-     */
+
+    @Override
     public boolean isSimilar(SortDependingSymbol p) {
 	return getKind().equals(p.getKind());
     }
 
-    /**
-     * Assign a name to this term symbol, independant of concrete
-     * instantiations for different sorts
-     * @return the kind of term symbol this object is an instantiation
-     * for
-     */
-    public Name    getKind            () {
+    @Override
+    public Name getKind() {
 	return kind;
     }
 
 
-    public SortDependingSymbol getInstanceFor (Sort instanceSort, 
-	    				       Services services) {
+    @Override
+    public SortDependingSymbol getInstanceFor(Sort instanceSort, 
+	    				      Services services) {
 	Name instanceName = new Name(instanceSort.name() + "::" + kind);
 	
 	SortDependingSymbol result 
@@ -145,24 +138,7 @@ public class SortDependingFunction extends Function implements SortDependingSymb
                 Debug.out("Not unifiable sorts.", s1, s2);
                 return null;
             }
-            if (s1 instanceof IntersectionSort) {
-                final IntersectionSort intersect1 = (IntersectionSort)s1;                
-                final IntersectionSort intersect2 = (IntersectionSort)s2;
-
-                if (intersect1.memberCount() != intersect2.memberCount()) {
-                    Debug.out("Should not happen as intersection sorts should always "+ 
-                              "have member count = 2");
-                    return null;
-                }                
-                for (int i = 0, sz = intersect1.memberCount(); i<sz; i++) {
-                    mc = matchSorts(intersect1.getComponent(i), 
-                                    intersect2.getComponent(i), mc);
-                    if (mc == null) {
-                        Debug.out("Failed matching ", intersect1, intersect2);
-                        return null;
-                    }
-                }
-            } if (s1 == s2) {
+            if (s1 == s2) {
                 return mc;
             } else {
                 Debug.out("FAIL. Sorts not identical.", s1, s2);
@@ -193,9 +169,10 @@ public class SortDependingFunction extends Function implements SortDependingSymb
     /**
      * Taking this sortdepending function as template to be matched against <code>op</code>, 
      * the necessary conditions are returned or null if not unifiable (matchable).
-     * A sortdepending function is matched successfull against another sortdepending function
+     * A sortdepending function is matched successfully against another sortdepending function
      * if the sorts can be matched and they are of same kind.      
      */
+    @Override    
     public MatchConditions match(SVSubstitute subst, 
                                  MatchConditions mc,
                                  Services services) {      

@@ -23,7 +23,6 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.ListOfProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.SLListOfProgramMethod;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 
@@ -74,25 +73,6 @@ public class KeYProgModelInfo{
         return rec2key().elemsKeY();
     }
     
-    
-    /**
-     * Returns all ObjectSorts mapped to java.Types in KeY.
-     * @return a Collection containing the ObjectSorts.
-     */
-    public Collection<ObjectSort> allObjectSorts(){
-	Set<ObjectSort> result=new HashSet<ObjectSort>();
-	for (final Object o : allElements()) {
-	    if (o instanceof KeYJavaType) {	        	   
-		KeYJavaType oKJT = (KeYJavaType)o;
-		if (oKJT.getSort() instanceof ObjectSort) {
-		    result.add((ObjectSort)oKJT.getSort());
-		}
-	    }
-	}
-        return result;
-    }
-
-
     private List<recoder.abstraction.Method> getAllRecoderMethods(KeYJavaType kjt){
 	if (kjt.getJavaType() instanceof TypeDeclaration) {
 	    Object o = rec2key().toRecoder(kjt);

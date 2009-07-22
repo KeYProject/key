@@ -7,15 +7,23 @@
 // See LICENSE.TXT for details.
 //
 //
+//
+//
 
 package de.uka.ilkd.key.logic.sort;
 
 
-public interface ArraySort extends CollectionSort, ObjectSort, SortDefiningSymbols {
+public interface ArraySort extends Sort {
 
-    /**
-     * returns the element sort of the array
-     */
+
     Sort elementSort();
+
+    
+    /**
+     * @return an object of this class with elementSort().equals(p),
+     * or null if such an object cannot be constructed (as p is an
+     * incompatible sort)
+     */
+    Sort cloneFor ( Sort p );
 
 }

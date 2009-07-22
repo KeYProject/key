@@ -30,7 +30,6 @@ public class TermCreationException extends RuntimeException {
 	ArrayOfTerm subs = failed.subs();
 	for (int i = 0, n = subs.size(); i < n; i++) {
 	    Term sub = subs.getTerm(i);
-	    assert sub != null;
 	    assert sub == failed.subs().getTerm(i);
 	}            
 

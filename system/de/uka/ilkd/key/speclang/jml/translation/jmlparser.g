@@ -1736,7 +1736,7 @@ jmlprimary returns [JMLExpression result=null] throws SLTranslationException
     |   
 	CREATED LPAREN t=specexpression RPAREN
 	{
-	    if (t.sort() instanceof ObjectSort) {
+	    if (t.sort().extendsTrans(services.getJavaInfo().objectSort())) {
 		result = new JMLExpression(
 		    CreatedAttributeTermFactory.INSTANCE.
 			createCreatedTerm(services, t));
@@ -1917,7 +1917,7 @@ specquantifiedexpression returns [Term result = null] throws SLTranslationExcept
 	        it.hasNext(); ) {
 	        LogicVariable lv = it.next();
 	        
-	    	if(lv.sort() instanceof ObjectSort && !nullable) {
+	    	if(lv.sort().extendsTrans(services.getJavaInfo().objectSort()) && !nullable) {
 		    p = TB.and(p, TB.not(TB.equals(TB.var(lv), nullTerm)));
 		} else {
 	    	    LDT ldt 

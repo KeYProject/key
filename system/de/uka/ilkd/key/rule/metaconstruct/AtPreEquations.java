@@ -23,7 +23,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.AtPreFactory;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-public class AtPreEquations extends AbstractMetaOperator {
+public final class AtPreEquations extends AbstractMetaOperator {
 
     private static Term updateFormula = null;
     private static HashMap atPreMapping = null;

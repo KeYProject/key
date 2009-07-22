@@ -21,7 +21,7 @@ public interface Sort extends Named {
     Sort UPDATE   = new PrimitiveSort(new Name("Update"));
     Sort NULL     = new NullSortImpl(new Name("Null"));
 
-    Sort ANY      = new AbstractNonCollectionSort(new Name("any")) {
+    Sort ANY      = new AbstractSort(new Name("any")) {
 
             public SetOfSort extendsSorts() {            
                 return SetAsListOfSort.EMPTY_SET;
@@ -33,21 +33,15 @@ public interface Sort extends Named {
         
     };
     
-    /** @return name of the Sort */
-    Name name();
     
     /**
-     * For finding out whether a certain sort is super- or subsort of another
-     * sort or not, please use <code>extendsTrans</code>. 
-     * Using <code>extendsSorts()</code> for this purpose may lead to 
-     * undesired results when dealing with array- and intersection sorts!
-     * @return the sorts of the predecessors of this sort
+     * Returns the direct supersorts of this sort.
      */
     SetOfSort extendsSorts();
 
     /**
-     * returns true iff the given sort is a transitive supersort of this sort
-     * or it is the same.
+     * Tells whether the given sort is a reflexive, transitive supersort of this 
+     * sort.
      */
     boolean extendsTrans(Sort s);    
 }

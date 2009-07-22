@@ -56,7 +56,7 @@ public class AtPreNamespace extends Namespace {
                     if (pv.isMember() && !pv.isStatic()) {
                         argSorts = new Sort[]{ pv.getContainerType().getSort()};
                         if (argSorts[0] == null) { // in the case of array length
-                            argSorts[0] = javaInfo.getJavaLangObjectAsSort();
+                            argSorts[0] = javaInfo.objectSort();
                         }                        
                     } else {
                         argSorts = new Sort[0];

@@ -14,7 +14,7 @@ package de.uka.ilkd.key.logic.sort;
 
 import de.uka.ilkd.key.logic.Name;
 
-public class ClassInstanceSortImpl extends AbstractNonCollectionSort 
+public class ClassInstanceSortImpl extends AbstractSort 
     implements ClassInstanceSort {
 
 

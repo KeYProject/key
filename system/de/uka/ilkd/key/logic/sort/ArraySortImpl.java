@@ -14,12 +14,14 @@ package de.uka.ilkd.key.logic.sort;
 import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
+import de.uka.ilkd.key.logic.Name;
 
 
-public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
 
-    private static WeakHashMap<SortKey, WeakReference<ArraySort>> aSH = 
-        new WeakHashMap<SortKey, WeakReference<ArraySort>>();
+public class ArraySortImpl extends AbstractSort implements ArraySort {
+
+    private static WeakHashMap<SortKey, WeakReference<ArraySortImpl>> aSH = 
+        new WeakHashMap<SortKey, WeakReference<ArraySortImpl>>();
     
     private final ArrayOfSort commonJavaSorts;  
     
@@ -32,7 +34,7 @@ public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
 
     private ArraySortImpl(SetOfSort extendsSorts, 			  
                           SortKey sk) {
-	super(sk.elemSort.name()+"[]", sk.elemSort);
+	super(new Name(sk.elemSort.name()+"[]"));
 	
         this.sk = sk;
         
@@ -51,6 +53,7 @@ public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
      * or null if such an object cannot be constructed (as p is an
      * incompatible sort).
      */
+    @Override
     public Sort cloneFor ( Sort p ) {
 	return getArraySort ( p, commonJavaSorts.getSort(0), 
                 commonJavaSorts.getSort(1), commonJavaSorts.getSort(2));
@@ -59,6 +62,7 @@ public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
     /**
      * @return the sorts of the predecessors of this sort
      */
+    @Override
     public SetOfSort extendsSorts() {
 	return extendsSorts;
     }
@@ -66,6 +70,7 @@ public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
     /**
      * returns the element sort of the array
      */
+    @Override
     public Sort elementSort() {
 	return sk.elemSort;
     }
@@ -90,7 +95,7 @@ public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
      * returns the ArraySort to the given elementsort. This method ensures that
      * only one ArraySort-object exists for each Arraysort.
      */
-    public static ArraySort getArraySort(Sort elemSort, 
+    public static ArraySortImpl getArraySort(Sort elemSort, 
                                          Sort objectSort,
                                          Sort cloneableSort,
                                          Sort serializableSort){
@@ -98,8 +103,8 @@ public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
         // several environments (int, boolean)
         final SortKey sortKey = new SortKey(elemSort, objectSort, 
                 cloneableSort, serializableSort);
-        ArraySort as = aSH.containsKey(sortKey) ? 
-                (ArraySort) aSH.get(sortKey).get() : null;          
+        ArraySortImpl as = aSH.containsKey(sortKey) ? 
+                (ArraySortImpl) aSH.get(sortKey).get() : null;          
 	
         if (as == null){ 
         // HACK: this simple handling of sort creation does not treat
@@ -108,7 +113,7 @@ public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
 							     cloneableSort, 
                                                              serializableSort);
 	    as = new ArraySortImpl(localExtendsSorts, sortKey);
-	    aSH.put(sortKey, new WeakReference<ArraySort>(as));
+	    aSH.put(sortKey, new WeakReference<ArraySortImpl>(as));
 	    
 	} 
         return as;
@@ -119,8 +124,8 @@ public class ArraySortImpl extends AbstractCollectionSort implements ArraySort{
 						Sort cloneableSort,
                                                 Sort serializableSort){
 	int i = 1;
-	while(elem instanceof ArraySort){
-	    elem = ((ArraySort) elem).elementSort();
+	while(elem instanceof ArraySortImpl){
+	    elem = ((ArraySortImpl) elem).elementSort();
 	    i++;
 	}
 	SetOfSort superSorts = elem.extendsSorts();

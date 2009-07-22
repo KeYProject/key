@@ -14,7 +14,6 @@ package de.uka.ilkd.key.rule.conditions;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -65,9 +64,9 @@ public class TypeCondition extends VariableConditionAdapter {
         final Sort s = resolver.resolveSort(p_var, candidate, svInst, services);
         
         if (isReference) {        
-            return (s instanceof ObjectSort && (!nonNull || s != Sort.NULL));
+            return (s.extendsTrans(services.getJavaInfo().objectSort()) && (!nonNull || s != Sort.NULL));
         } else {
-            return !(s instanceof ObjectSort);
+            return !(s.extendsTrans(services.getJavaInfo().objectSort()));
         }
     }
 

@@ -148,9 +148,9 @@ public class ArrayInitializer
         final JavaInfo javaInfo = javaServ.getJavaInfo(); 
 	return javaInfo.getKeYJavaType
 	    (ArraySortImpl.getArraySortForDim(s, n, 
-					      javaInfo.getJavaLangObjectAsSort(), 
-                                              javaInfo.getJavaLangCloneableAsSort(),
-                                              javaInfo.getJavaIoSerializableAsSort()));
+					      javaInfo.objectSort(), 
+                                              javaInfo.cloneableSort(),
+                                              javaInfo.serializableSort()));
     }
 
 

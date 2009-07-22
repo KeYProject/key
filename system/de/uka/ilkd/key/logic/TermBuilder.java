@@ -666,7 +666,7 @@ public final class TermBuilder {
             if(urghSort == null) {
         	try {
         	    urghSort = new GenericSort(new Name("urgh"),
-        		    		       SetAsListOfSort.EMPTY_SET.add(services.getJavaInfo().getJavaLangObjectAsSort()),
+        		    		       SetAsListOfSort.EMPTY_SET.add(services.getJavaInfo().objectSort()),
                                                SetAsListOfSort.EMPTY_SET);
                 } catch(GenericSupersortException e) {
                     assert false;

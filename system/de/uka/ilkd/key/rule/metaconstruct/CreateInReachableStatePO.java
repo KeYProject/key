@@ -20,7 +20,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * predicate
  * @see de.uka.ilkd.key.rule.metaconstruct.InReachableStatePOBuilder
  */
-public class CreateInReachableStatePO extends AbstractMetaOperator {
+public final class CreateInReachableStatePO extends AbstractMetaOperator {
 
     public CreateInReachableStatePO() {
         super(new Name("#createInReachableStatePO"), 1, Sort.FORMULA);

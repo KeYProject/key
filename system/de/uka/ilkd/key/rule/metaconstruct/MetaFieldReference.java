@@ -34,7 +34,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  *  
  * @author mulbrich
  */
-public class MetaFieldReference extends AbstractMetaOperator implements
+public final class MetaFieldReference extends AbstractMetaOperator implements
         UpdateableOperator {
 
     private static final Logger logger =

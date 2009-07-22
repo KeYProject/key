@@ -20,7 +20,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
 
-public class MetaJavaIntAnd extends AbstractMetaOperator {
+public final class MetaJavaIntAnd extends AbstractMetaOperator {
 
     public MetaJavaIntAnd() {
 	super(new Name("#JavaIntAnd"), 2);

@@ -272,7 +272,7 @@ public class Main extends JFrame implements IMain {
      */
     public static Main getInstance(final boolean visible) {
         if (instance == null) {
-            instance = new Main("KeY with Explicit Heap -- Prover");
+            instance = new Main("KeYHeap -- Prover");
         }
         if (!instance.isVisible()) {
             if (SwingUtilities.isEventDispatchThread()) {
@@ -1310,20 +1310,6 @@ public class Main extends JFrame implements IMain {
                     = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
                 gs.setUseJML(true);
                 gs.setUseOCL(false);
-            }
-        });
-        
-        JRadioButtonMenuItem oclButton 
-            = new JRadioButtonMenuItem("OCL", gs.useOCL());
-        result.add(oclButton);
-        group.add(oclButton);
-        oclButton.setIcon(IconFactory.umlLogo(15));
-        oclButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                GeneralSettings gs 
-                    = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
-                gs.setUseJML(false);
-                gs.setUseOCL(true);
             }
         });
         

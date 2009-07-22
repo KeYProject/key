@@ -26,7 +26,7 @@ public interface SortDependingSymbol extends Named {
     /**
      * @return the sort this object has been instantiated for
      */
-    Sort                getSortDependingOn ();
+    Sort getSortDependingOn();
 
     /**
      * Compares "this" and "p"
@@ -34,15 +34,15 @@ public interface SortDependingSymbol extends Named {
      * @return true iff this and p are instances of the same kind of
      * symbol, but possibly instantiated for different sorts
      */
-    boolean             isSimilar      ( SortDependingSymbol p );
+    boolean isSimilar(SortDependingSymbol p);
 
     /**
-     * Assign a name to this term symbol, independant of concrete
+     * Assign a name to this term symbol, independent of concrete
      * instantiations for different sorts
      * @return the kind of term symbol this object is an instantiation
      * for
      */
-    Name                getKind        ();
+    Name getKind();
 
     /**
      * Get the instance of this term symbol defined by the given sort
@@ -54,5 +54,4 @@ public interface SortDependingSymbol extends Named {
      * result.getSortDependingOn()==p_sort)
      */
     SortDependingSymbol getInstanceFor (Sort instanceSort, Services services);
-
 }

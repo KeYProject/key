@@ -18,7 +18,6 @@ import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
 import de.uka.ilkd.key.logic.op.ExactInstanceSymbol;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -28,7 +27,7 @@ import de.uka.ilkd.key.util.Debug;
  * Creates an <tt>Type::instance(..)</tt> term for the component type of the
  * array. The component type has to be a reference type.
  */
-public class ArrayBaseInstanceOf extends AbstractMetaOperator {
+public final class ArrayBaseInstanceOf extends AbstractMetaOperator {
 
     public ArrayBaseInstanceOf() {
         super(new Name("#arrayBaseInstanceOf"), 2);
@@ -58,7 +57,7 @@ public class ArrayBaseInstanceOf extends AbstractMetaOperator {
 
         Function instanceofSymbol = null;
         if (arrayElementSort instanceof SortDefiningSymbols) {
-            assert arrayElementSort instanceof ArraySort || arrayElementSort instanceof ObjectSort;
+            assert arrayElementSort.extendsTrans(services.getJavaInfo().objectSort());
             instanceofSymbol = (Function) ((SortDefiningSymbols) arrayElementSort)
                     .lookupSymbol(new Name("instance"));
         }

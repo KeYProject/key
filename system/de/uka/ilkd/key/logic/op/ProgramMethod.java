@@ -36,8 +36,8 @@ import de.uka.ilkd.key.util.ExtList;
  * object on which the method is invoked. 
  */
 public final class ProgramMethod extends AbstractSortedOperator 
-    implements SourceElement, ProgramElement, 
-    MemberDeclaration, ProgramInLogic {
+    			  	 implements SourceElement, ProgramElement, 
+    			  	            MemberDeclaration, ProgramInLogic {
 
     private final MethodDeclaration method; 
     private final KeYJavaType kjt;
@@ -49,7 +49,8 @@ public final class ProgramMethod extends AbstractSortedOperator
 			 KeYJavaType contKJT, 
 			 KeYJavaType kjt,
                          PositionInfo pi) {
-        super(method.getProgramElementName(), 
+        super(new ProgramElementName(method.getProgramElementName().toString(), 
+                		     contKJT.getSort().toString()), 
               getArgumentSorts(method, contKJT), 
               kjt == null ? Sort.NULL : kjt.getSort()); 
                         
@@ -57,7 +58,6 @@ public final class ProgramMethod extends AbstractSortedOperator
 	this.contKJT = contKJT;
 	this.kjt     = kjt;
         this.pi      = pi;
-        
     }
     
 

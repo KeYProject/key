@@ -30,7 +30,6 @@ public class TestTermTacletAppIndex extends TestCase{
      Taclet remove_f;
      Taclet remove_ff;
      Taclet remove_zero;
-     Metavariable x;
         
     public TestTermTacletAppIndex(String name) {
 	super(name);
@@ -54,14 +53,9 @@ public class TestTermTacletAppIndex extends TestCase{
         remove_f = taclet("remove_f");
         remove_ff = taclet("remove_ff");
         remove_zero = taclet("remove_zero");
-
-        x = new Metavariable (new Name ("X"), 
-                TacletForTests.sortLookup("nat"));
-        TacletForTests.getVariables().add(x);
     }
     
     public void tearDown() {
-        x = null;
         ruleRewriteNonH1H2 = null;
         ruleNoFindNonH1H2H3 = null;
         ruleAntecH1 = null;
@@ -130,69 +124,6 @@ public class TestTermTacletAppIndex extends TestCase{
         // now a real change
         Term term2 = TacletForTests.parseTerm ( "f(f(zero))=one" );
         ConstrainedFormula cfma2 = new ConstrainedFormula ( term2 );
-        PosInOccurrence pio2 = new PosInOccurrence ( cfma2,
-                                                     PosInTerm.TOP_LEVEL, false );
-
-        termIdx = termIdx.update ( pio2.down ( 0 ).down ( 0 ).down ( 0 ), serv,
-                                   Constraint.BOTTOM, ruleIdx,
-                                   NullNewRuleListener.INSTANCE, cache );
-        checkTermIndex2 ( pio2, termIdx );
-
-        // add a new taclet to the index
-        ruleIdx.add ( remove_ff );
-        SetRuleFilter filter = new SetRuleFilter ();
-        filter.addRuleToSet ( ruleIdx.lookup ( remove_ff.name () ).rule () );
-        termIdx = termIdx.addTaclets ( filter, pio2, serv, Constraint.BOTTOM,
-                                       ruleIdx, NullNewRuleListener.INSTANCE );
-        checkTermIndex3 ( pio2, termIdx );
-    }
-
-    public void testIndexWithMV() {
-        doTestIndexWithMV ( noCache );
-    }
-
-    public void testIndexWithMVWithCache() {
-        for ( int i = 0; i != 3; ++i )
-            doTestIndexWithMV ( realCache );
-    }
-
-    private void doTestIndexWithMV(TermTacletAppIndexCacheSet cache) {
-        Services serv = TacletForTests.services ();
-
-        TacletIndex ruleIdx = new TacletIndex ();
-        ruleIdx.add ( remove_f );
-        ruleIdx.add ( remove_zero );
-
-        Term t1 = TacletForTests.parseTerm ( "f(zero)" );
-        Term t2 = TacletForTests.parseTerm ( "X" );
-
-        Constraint c = Constraint.BOTTOM.unify ( t1, t2, null );
-        assertTrue ( c.isSatisfiable () );
-        Term term = TacletForTests.parseTerm ( "f(f(X))=one" );
-        ConstrainedFormula cfma = new ConstrainedFormula ( term, c );
-        // System.out.println(cfma);
-
-        PosInOccurrence pio = new PosInOccurrence ( cfma, PosInTerm.TOP_LEVEL,
-                                                    false );
-
-        TermTacletAppIndex termIdx =
-            TermTacletAppIndex.create ( pio, serv, Constraint.BOTTOM, ruleIdx,
-                                        NullNewRuleListener.INSTANCE,
-                                        TacletFilter.TRUE, cache );
-
-        checkTermIndex ( pio, termIdx );
-
-        // this should not alter the index, as the formula actually
-        // did not change
-        termIdx = termIdx.update ( pio.down ( 0 ), serv, Constraint.BOTTOM,
-                                   ruleIdx, NullNewRuleListener.INSTANCE,
-                                   cache );
-
-        checkTermIndex ( pio, termIdx );
-
-        // now a real change
-        Term term2 = TacletForTests.parseTerm ( "f(f(zero))=one" );
-        ConstrainedFormula cfma2 = new ConstrainedFormula ( term2, c );
         PosInOccurrence pio2 = new PosInOccurrence ( cfma2,
                                                      PosInTerm.TOP_LEVEL, false );
 

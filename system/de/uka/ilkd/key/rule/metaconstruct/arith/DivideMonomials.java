@@ -20,7 +20,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 /**
  * Metaoperator for computing the result of dividing one monomial by another
  */
-public class DivideMonomials extends AbstractMetaOperator {
+public final class DivideMonomials extends AbstractMetaOperator {
 
     public DivideMonomials() {
         super ( new Name ( "#divideMonomials" ), 2 );

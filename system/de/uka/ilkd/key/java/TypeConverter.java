@@ -10,8 +10,6 @@
 package de.uka.ilkd.key.java;
 
 
-import java.util.HashMap;
-
 import recoder.service.ConstantEvaluator;
 import de.uka.ilkd.key.explicitheap.ExplicitHeapConverter;
 import de.uka.ilkd.key.java.abstraction.*;
@@ -22,16 +20,12 @@ import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.ldt.*;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.ldt.IteratorOfLDT;
 import de.uka.ilkd.key.ldt.ListOfLDT;
 import de.uka.ilkd.key.ldt.SLListOfLDT;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ArrayOfSort;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortDefiningSymbols;
 import de.uka.ilkd.key.util.Debug;
@@ -581,11 +575,7 @@ public final class TypeConverter {
     }
 
     
-    public KeYJavaType getKeYJavaType(Term t) {	
-        if (t.sort() instanceof ObjectSort) {
-	    return services.getJavaInfo().getKeYJavaType(t.sort());
-	}
-        
+    public KeYJavaType getKeYJavaType(Term t) {
         KeYJavaType result = services.getJavaInfo().getKeYJavaType(t.sort());        
         if (result == null) {
            result = getKeYJavaType(convertToProgramElement(t));

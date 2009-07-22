@@ -23,7 +23,7 @@ import de.uka.ilkd.key.util.Debug;
 
 
 
-public class MetaDiv extends AbstractMetaOperator {
+public final class MetaDiv extends AbstractMetaOperator {
 
     public MetaDiv() {
 	super(new Name("#div"), 2);

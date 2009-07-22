@@ -19,7 +19,7 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public class MetaEqual extends AbstractMetaOperator {
+public final class MetaEqual extends AbstractMetaOperator {
 
 
     public MetaEqual() {

@@ -799,7 +799,7 @@ options {
             if(wahSort == null) {
                try {
                 wahSort = new GenericSort(new Name("WAH!"),
-                			  SetAsListOfSort.EMPTY_SET.add(getServices().getJavaInfo().getJavaLangObjectAsSort()),
+                			  SetAsListOfSort.EMPTY_SET.add(getServices().getJavaInfo().objectSort()),
                                           SetAsListOfSort.EMPTY_SET);
                 } catch(GenericSupersortException e) {
                     assert false;
@@ -1158,7 +1158,7 @@ options {
                IteratorOfProgramMethod it = javaInfo.getAllProgramMethods(kjt).iterator();
                while(it.hasNext()) {
                  final ProgramMethod pm = it.next();
-                 final String name = kjt.getFullName()+"::"+LT(n+2).getText();
+                 final String name = kjt.getFullName()+"::"+LT(n+2).getText();                 
                  if(pm != null && pm.isStatic() && pm.name().toString().equals(name) ) {
                    result = true;
 		   break;
@@ -1167,7 +1167,6 @@ options {
            }   
         }
     } catch (antlr.TokenStreamException tse) {
-        // System.out.println("an exception occured"+tse);
         result = false;
     }
     if(result && inputState.guessing > 0) {
@@ -1317,17 +1316,6 @@ options {
     }
 
     public static void addSortAdditionals(Sort s, Namespace functions, Namespace sorts) {
-        if (s instanceof NonCollectionSort) {
-            NonCollectionSort ns = (NonCollectionSort)s;
-            final Sort[] addsort = {
-                ns.getSetSort(), ns.getSequenceSort(), ns.getBagSort() 
-            };
-	    
-            for (int i = 0; i<addsort.length; i++) {
-                sorts.add(addsort[i]);
-                addSortAdditionals(addsort[i], functions, sorts);
-            }
-        }
         if ( s instanceof SortDefiningSymbols ) {                        
            ((SortDefiningSymbols)s).addDefinedSymbols(functions, sorts);
         }
@@ -1337,34 +1325,6 @@ options {
         functions().add(f);
     }
 
-    private Sort getIntersectionSort(ListOfString composites) 
-                                            throws NotDeclException, KeYSemanticException {
-        SetOfSort compositeSorts = SetAsListOfSort.EMPTY_SET;
-        final IteratorOfString it = composites.iterator(); 
-        while ( it.hasNext () ) {
-            final String sortName = it.next();
-            final Sort sort = lookupSort(sortName);
-            if ( sort == null) {
-                throw new NotDeclException("Sort", sortName, 
-                    getFilename(), getLine(), getColumn(), 
-                    "Components of intersection sorts have to be declared before.");
-            }
-            compositeSorts = compositeSorts.add(sort);
-        }
-        final Sort s = IntersectionSort.getIntersectionSort(compositeSorts, sorts(), functions());
-        if (!(s instanceof IntersectionSort)) {
-            String err = "Failed to create an intersection sort of " + composites;
-            if (s == null) {
-                err += " as the resulting intersection sort would be empty.";
-            } else {
-                err += ". Usually intersection is not required in these cases as \n" + 
-                "it is equal to one composite. In this case " + s;
-            }
-            semanticError(err);
-                            
-        }        
-        return s;
-    }
     
     private SetOfModality lookupOperatorSV(String opName, SetOfModality modalities) 
     		throws KeYSemanticException {
@@ -1555,7 +1515,6 @@ one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST]
     boolean isObjectSort  = false;
     boolean isGenericSort = false;
     boolean isSubSort = false;
-    boolean isIntersectionSort = false;
     Sort[] sortExt=new Sort [0];
     Sort[] sortOneOf=new Sort [0];
     String firstSort;
@@ -1566,7 +1525,6 @@ one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST]
         | GENERIC {isGenericSort=true;} sortIds = simple_ident_comma_list
             ( ONEOF sortOneOf = oneof_sorts )? 
             ( EXTENDS sortExt = extends_sorts )?
-        | sortIds = intersectionSortIdentifier { isIntersectionSort = true; }
         | firstSort = simple_ident_dots { sortIds = sortIds.prepend(firstSort); }
           (
               (EXTENDS sortExt = extends_sorts {  isSubSort = true ; } ) 
@@ -1574,11 +1532,6 @@ one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST]
           )?
         ) SEMI {   
             if (!skip_sorts) {
-                if (isIntersectionSort) {                    
-                    final Sort sort = getIntersectionSort(sortIds);
-                    createdSorts = createdSorts.append(sort);
-                    sorts().add(sort); 
-                } else {
                     IteratorOfString it = sortIds.iterator ();        
                     while ( it.hasNext () ) {
                         Name sort_name = new Name(it.next());   
@@ -1626,7 +1579,6 @@ one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST]
 
                             createdSorts = createdSorts.append(s);
                         }
-                    }
                 }
             }
         };
@@ -2162,8 +2114,8 @@ sortId_check_help [boolean checkSort] returns [Sort s = null]
             // don't allow generic sorts or collection sorts of
             // generic sorts at this point
             Sort t = s;
-            while ( t != Sort.NULL && t instanceof CollectionSort ) {
-            	t = ((CollectionSort)t).elementSort ();
+            while ( t != Sort.NULL && t instanceof ArraySort ) {
+            	t = ((ArraySort)t).elementSort ();
             }
 
             if ( t instanceof GenericSort ) {
@@ -2191,10 +2143,11 @@ array_set_decls[Sort p] returns [Sort s = null]
         { 
             if (n != 0){
                 final JavaInfo ji = getJavaInfo();
-                s = ArraySortImpl.getArraySortForDim(
-                                                     p, n, ji.getJavaLangObjectAsSort(),
-                                                     ji.getJavaLangCloneableAsSort(), 
-                                                     ji.getJavaIoSerializableAsSort());
+                s = ArraySortImpl.getArraySortForDim(p, 
+                			             n, 
+                			             ji.objectSort(),
+                                                     ji.cloneableSort(), 
+                                                     ji.serializableSort());
 
                 Sort last = s;
                 do {
@@ -2836,11 +2789,14 @@ accessterm returns [Term result = null]
         } 
       |
       (LPAREN any_sortId_check[false] RPAREN term110)=> 
-        LPAREN s = any_sortId_check[true] RPAREN result=term110 {
+        LPAREN s = any_sortId_check[true] RPAREN result=term110 
+        {
+         final Sort objectSort = getServices().getJavaInfo().objectSort();
          if(s==null) {
            semanticError("Tried to cast to unknown type.");
-         } else if ((s instanceof PrimitiveSort) && 
-             (result.sort() instanceof ObjectSort)) {
+         } else if (objectSort != null
+                    && !s.extendsTrans(objectSort) 
+                    && result.sort().extendsTrans(objectSort)) {
                 semanticError("Illegal cast from " + result.sort() + 
                     " to sort " + s +
                     ". Casts between primitive and reference types are not allowed. ");

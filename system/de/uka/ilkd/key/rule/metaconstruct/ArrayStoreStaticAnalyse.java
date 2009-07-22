@@ -21,8 +21,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ClassInstanceSortImpl;
+import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -35,7 +35,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * use of the final modifier of classes.
  * TODO: add features for multi-dimensional arrays 
  */
-public class ArrayStoreStaticAnalyse extends AbstractMetaOperator {
+public  final class ArrayStoreStaticAnalyse extends AbstractMetaOperator {
 
     /**
      * creates this metaconstruct
@@ -146,5 +146,4 @@ public class ArrayStoreStaticAnalyse extends AbstractMetaOperator {
 
         return term.sub(0);
     }
-
 }

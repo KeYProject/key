@@ -18,7 +18,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -72,7 +71,7 @@ public class ArrayComponentTypeCondition extends VariableConditionAdapter {
 	if (s==null || !(s instanceof ArraySort)) {
 	    return false;
 	}
-	return !(((ArraySort)s).elementSort() instanceof ObjectSort) ^ checkReferenceType;
+	return !(((ArraySort)s).elementSort().extendsTrans(services.getJavaInfo().objectSort())) ^ checkReferenceType;
     }
 
     public String toString () {

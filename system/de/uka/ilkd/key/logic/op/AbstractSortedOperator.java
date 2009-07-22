@@ -89,7 +89,8 @@ public abstract class AbstractSortedOperator extends AbstractOperator
 	    return false;
 	}
 	for(int i = 0, n = arity(); i < n; i++) {
-            if(!possibleSub(i, term.sub(i))) { 
+            if(term.sub(i) == null 
+               || !possibleSub(i, term.sub(i))) { 
 		return false;
 	    }
 	}

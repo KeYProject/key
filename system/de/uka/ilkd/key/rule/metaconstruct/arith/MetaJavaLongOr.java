@@ -19,7 +19,7 @@ import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public class MetaJavaLongOr extends AbstractMetaOperator {
+public final class MetaJavaLongOr extends AbstractMetaOperator {
 
     public MetaJavaLongOr() {
 	super(new Name("#JavaLongOr"), 2);

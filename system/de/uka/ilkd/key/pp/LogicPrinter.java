@@ -30,7 +30,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ObjectSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -2082,8 +2081,11 @@ public class LogicPrinter {
      */
     public static boolean printInShortForm(String programName, Sort sort,
                                    Services services) {
-        if ( ! ( services != null && sort != Sort.NULL && sort instanceof ObjectSort ) )
+        if ( ! ( services != null 
+        	  && sort != Sort.NULL 
+        	  && sort.extendsTrans(services.getJavaInfo().objectSort()))) {
             return false;
+        }
         final KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(sort);
         assert kjt != null : "Did not find KeYJavaType for " + sort;
         return 

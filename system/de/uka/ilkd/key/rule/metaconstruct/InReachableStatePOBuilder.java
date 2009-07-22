@@ -729,27 +729,27 @@ public class InReachableStatePOBuilder {
 //                TB.NULL(services)));
 //    }
 
-    private ProgramVariable ntc(ObjectSort os) {
+    private ProgramVariable ntc(Sort os) {
         return services.getJavaInfo().getAttribute(
                 ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE, os);
     }
 
-    private ProgramVariable cInInit(ObjectSort os) {
+    private ProgramVariable cInInit(Sort os) {
         return services.getJavaInfo().getAttribute(
                 ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS, os);
     }
 
-    private ProgramVariable cInitialized(ObjectSort os) {
+    private ProgramVariable cInitialized(Sort os) {
         return services.getJavaInfo().getAttribute(
                 ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED, os);
     }
 
-    private ProgramVariable cPrepared(ObjectSort os) {
+    private ProgramVariable cPrepared(Sort os) {
         return services.getJavaInfo().getAttribute(
                 ImplicitFieldAdder.IMPLICIT_CLASS_PREPARED, os);
     }
 
-    private ProgramVariable cErroneous(ObjectSort os) {
+    private ProgramVariable cErroneous(Sort os) {
         return services.getJavaInfo().getAttribute(
                 ImplicitFieldAdder.IMPLICIT_CLASS_ERRONEOUS, os);
     }
@@ -758,7 +758,7 @@ public class InReachableStatePOBuilder {
         return TB.and(TB.geq(i, lower, services), TB.lt(i, upper, services));
     }
 
-    private Function rep(ObjectSort os) {
+    private Function rep(Sort os) {
         return (Function) ((SortDefiningSymbols) os).lookupSymbol(AbstractSort.OBJECT_REPOSITORY_NAME);
     }
 

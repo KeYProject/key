@@ -13,7 +13,7 @@
 package de.uka.ilkd.key.logic.sort;
 
 
-public interface ClassInstanceSort extends ObjectSort {
+public interface ClassInstanceSort {
 
     /** 
      * returns true if this sort represents a java abstract class

@@ -188,8 +188,6 @@ GENERATED_LISTS=logic/SLListOfTerm \
 	proof/SLListOfInstantiationProposer \
         speclang/SLListOfOperationContract \
 	speclang/SLListOfClassInvariant \
-	speclang/ocl/SLListOfModelClass \
-	speclang/ocl/SLListOfModelMethod \
 	proof/init/SLListOfProofOblInput \
 	rule/export/SLListOfTacletModelInfo \
 	rule/export/SLListOfOptionModelInfo \
@@ -197,9 +195,6 @@ GENERATED_LISTS=logic/SLListOfTerm \
 	rule/export/SLListOfDisplayNameModelInfo \
 	rule/export/SLListOfCategoryModelInfo \
 	logic/SLListOfNamespace \
-	speclang/ocl/SLListOfAssociation \
-	speclang/ocl/SLListOfAssociationEnd \
-        speclang/ocl/translation/SLListOfOCLExpression \
 	speclang/translation/SLListOfSLExpression \
 	speclang/translation/SLListOfSLExpressionResolver \
 	speclang/SLListOfPositionedString \
@@ -298,8 +293,6 @@ ANTLR_PARSER= \
 	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/KeYJMLPreParser.java \
 	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation/KeYJMLLexer.java \
 	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation/KeYJMLParser.java \
-	$(GENERATED_SRC_PATH)$(PFX)speclang/ocl/translation/KeYOCLLexer.java \
-	$(GENERATED_SRC_PATH)$(PFX)speclang/ocl/translation/KeYOCLParser.java \
 	$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocLexer.java \
 	$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocParser.java \
 	$(GENERATED_SRC_PATH)$(PFX)util/keydoc/parser/KeYDocTreeWalker.java 
@@ -568,22 +561,6 @@ $(GENERATED_SRC_PATH)$(PFX)parser/simplify/SimplifyParser.java \
 	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)parser/simplify
 	@$(JAVA) -cp $(CLASSPATH) antlr.Tool  -glib $(PFX)parser/simplify/lexer.g \
 			 -o $(GENERATED_SRC_PATH)$(PFX)parser/simplify $<
-
-$(GENERATED_SRC_PATH)$(PFX)speclang/ocl/translation/KeYOCLLexer.java \
-$(GENERATED_SRC_PATH)$(PFX)speclang/ocl/translation/KeYOCLLexerTokenTypes.txt \
-$(GENERATED_SRC_PATH)$(PFX)speclang/ocl/translation/KeYOCLLexerTokenTypes.java \
-	: $(PFX)speclang/ocl/translation/ocllexer.g
-	@echo [creating OCL lexer]
-	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)speclang/ocl/translation
-	@$(JAVA) -cp $(CLASSPATH) antlr.Tool  -o $(GENERATED_SRC_PATH)$(PFX)speclang/ocl/translation $<
-
-$(GENERATED_SRC_PATH)$(PFX)speclang/ocl/translation/KeYOCLParser.java \
-	: $(PFX)speclang/ocl/translation/oclparser.g \
-	  $(GENERATED_SRC_PATH)$(PFX)speclang/ocl/translation/KeYOCLLexerTokenTypes.txt
-	@echo [creating OCL parser]
-	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)speclang/ocl/translation
-	@$(JAVA) -cp $(CLASSPATH) antlr.Tool  -glib $(PFX)speclang/ocl/translation/ocllexer.g \
-			 -o $(GENERATED_SRC_PATH)$(PFX)speclang/ocl/translation $<
 
 $(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/KeYJMLPreLexer.java \
 $(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/KeYJMLPreLexerTokenTypes.txt \

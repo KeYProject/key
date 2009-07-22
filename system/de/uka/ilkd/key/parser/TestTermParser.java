@@ -641,38 +641,6 @@ public class TestTermParser extends TestCase {
                 parseTerm("((int)3)+2"));
      }
     
-    public void testUnnecessaryIntersectionSort () {
-        // AZ is a subsort of Z, 
-        TacletForTests.getJavaInfo().readJavaBlock("{}");        
-        r2k.parseSpecialClasses();
-        r2k.readCompilationUnit("class Z { } " +
-                                "class SubZ extends Z {} " +
-                                "class AZ extends Z {} ");
-        
-        boolean unneccessaryIntersectionSortDetected = false;
-        try {
-           parseDecls("\\sorts { \\inter(AZ,Z); }");
-        } catch (Exception e) {
-            assertTrue("expected KeYSemanticException, but is " + e.getCause(),
-                       ((ExceptionHandlerException)(e.getCause())).getCause() 
-                       instanceof KeYSemanticException);
-            unneccessaryIntersectionSortDetected = true;
-            
-        }
-        
-        assertTrue("The given intersection sort is unnecessary as it is equal to one " +
-                   "of its components and" +
-                   "should not be parsed.", unneccessaryIntersectionSortDetected);   
-        
-        try {
-            parseDecls("\\sorts { \\inter(AZ, SubZ); }");
-         } catch (Exception e) {
-             fail("failed to parse intersection sort." + e);                        
-         }        
-     
-    
-    }
-
     public void testIntersectionSort() {
         // AZ is a subsort of Z, 
         TacletForTests.getJavaInfo().readJavaBlock("{}");        

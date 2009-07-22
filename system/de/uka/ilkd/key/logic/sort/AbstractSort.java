@@ -42,45 +42,35 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
     /**
      * @return the sorts of the successors of this sort
      */
+    @Override    
     public abstract SetOfSort extendsSorts();
 
     /**
      * returns true iff given sort is a part of the transitive closure of the
      * supersorts of this sort. One might optimize by hashing %%
      */
+    @Override    
     public boolean extendsTrans(Sort sort) {
-        if (sort == this || sort == Sort.ANY) {
+        if(sort == this) {
+            return true;
+        } else if(this == Sort.FORMULA || this == Sort.UPDATE) {
+            return false;
+        } else if(sort == Sort.ANY) {
             return true;
         }
         
-        if (!(sort instanceof ObjectSort || sort instanceof GenericSort)) {
-            return false;
+        for(Sort superSort : extendsSorts()) {
+            if(superSort == sort || superSort.extendsTrans(sort)) {
+        	return true;
+            }
         }
-                             
-       if (sort instanceof IntersectionSort) {            
-           final IntersectionSort intersect = (IntersectionSort)sort;
-           for (int i = 0, sz = intersect.memberCount(); i<sz; i++) {
-               final Sort s = intersect.getComponent(i);
-               Debug.assertTrue(s!=null);
-               if ( !this.extendsTrans(s) ) {
-                   return false;
-               }
-           }
-           return true;
-       } else {           
-           final IteratorOfSort it = extendsSorts().iterator();
-           while (it.hasNext()) {
-               final Sort s = it.next();
-               assert s != null;
-               if (s == sort || s.extendsTrans(sort)) {
-                   return true;
-               }
-           }
-       }
-       return false;
+        
+        return false;
     }
+    
 
-    /** @return name of the Sort as String */
+
+    @Override
     public Name name() {
         return name;
     }

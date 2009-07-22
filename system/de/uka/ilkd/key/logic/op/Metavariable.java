@@ -34,12 +34,12 @@ public final class Metavariable extends AbstractSortedOperator
 	}
 	this.isTemporaryVariable = isTemporaryVariable;
 	setSerial ();
-//	assert false : "metavariables are disabled";
+	assert false : "metavariables are disabled";
     }
 
     public Metavariable (Name name, Sort sort) {
         this ( name, sort, false );
-//	assert false : "metavariables are disabled";        
+	assert false : "metavariables are disabled";        
     }
 
     public static Metavariable createTemporaryVariable (Name name, Sort sort) {

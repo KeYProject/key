@@ -18,7 +18,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 /**
 * Metaoperator for computing the result of dividing one monomial by another
 */
-public class DivideLCRMonomials extends AbstractMetaOperator {
+public final class DivideLCRMonomials extends AbstractMetaOperator {
 
     public DivideLCRMonomials() {
         super ( new Name ( "#divideLCRMonomials" ), 2 );

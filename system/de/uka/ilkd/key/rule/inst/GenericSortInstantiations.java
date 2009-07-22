@@ -199,28 +199,10 @@ public class GenericSortInstantiations {
 	    if ( p_s == null ) {
 		throw GenericSortException.UNINSTANTIATED_GENERIC_SORT;
             }
-	} else if (p_s instanceof IntersectionSort) {
-            final IntersectionSort inter = (IntersectionSort)p_s; 
-            
-            SetOfSort sos = SetAsListOfSort.EMPTY_SET;
-            
-            for (int i = 0, sz = inter.memberCount(); i < sz; i++) {
-                sos = sos.add(getRealSort(inter.getComponent(i), services));
-            }
-            
-            final Sort res = IntersectionSort.getIntersectionSort(sos, services);
-            
-            if (res == null) {
-                throw new GenericSortException
-                ( "Generic sort is instantiated with an intersection sort" +
-                  " that has an empty domain." );
-            }
-            
-            return res;
-        } else if ( p_s instanceof CollectionSort ) {
-	    Sort s = getRealSort ( ((CollectionSort)p_s).elementSort (), services );
+	} else if ( p_s instanceof ArraySort ) {
+	    Sort s = getRealSort ( ((ArraySort)p_s).elementSort (), services );
 
-	    s = ((CollectionSort)p_s).cloneFor ( s );
+	    s = ((ArraySort)p_s).cloneFor ( s );
 
 	    if ( s == null )
 		throw new GenericSortException

@@ -19,7 +19,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * not initialised with a compile time constant.
  * 
  */
-public class LocationVariable extends ProgramVariable implements UpdateableOperator {
+public final class LocationVariable extends ProgramVariable implements UpdateableOperator {
 
     public LocationVariable(ProgramElementName name, 
             KeYJavaType        t, 

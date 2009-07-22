@@ -19,7 +19,7 @@ import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public class MetaJavaIntShiftRight extends AbstractMetaOperator {
+public final class MetaJavaIntShiftRight extends AbstractMetaOperator {
 
     public MetaJavaIntShiftRight() {
 	super(new Name("#JavaIntShiftRight"), 2);

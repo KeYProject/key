@@ -38,7 +38,6 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
-import de.uka.ilkd.key.speclang.ocl.OCLSpecExtractor;
 
 
 /** 
@@ -217,9 +216,6 @@ public class SLEnvInput extends AbstractEnvInput {
             = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
         if(gs.useJML()) {
             createSpecs(new JMLSpecExtractor(initConfig.getServices()));
-        }
-        if(gs.useOCL()) {
-            createSpecs(new OCLSpecExtractor(initConfig.getServices()));
         }
     }
 }

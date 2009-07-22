@@ -40,8 +40,8 @@ public class TestTermOrdering extends TestCase {
 
     ProgramVariable pv=new LocationVariable (new ProgramElementName ("pv"), sort1);
 
-    Metavariable x=new Metavariable(new Name("x"),sort1);  //x:S1
-    Metavariable y=new Metavariable(new Name("y"),sort1); //y:S1
+    LogicVariable x=new LogicVariable(new Name("x"),sort1);  //x:S1
+    LogicVariable y=new LogicVariable(new Name("y"),sort1); //y:S1
 
     TermOrdering depthO     = new DepthTermOrdering ();
     TermOrdering nameO      = new NameTermOrdering ();

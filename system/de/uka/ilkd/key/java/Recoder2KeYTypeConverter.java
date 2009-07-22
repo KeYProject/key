@@ -365,7 +365,7 @@ public class Recoder2KeYTypeConverter {
          */
 
         if (ss.isEmpty() && !isObject(classType)) {
-            ss = ss.add(getJavaInfo().getJavaLangObjectAsSort());
+            ss = ss.add(getJavaInfo().objectSort());
         }
         return ss;
     }
