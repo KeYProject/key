@@ -13,10 +13,7 @@ package de.uka.ilkd.key.smt;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 import javax.swing.JFileChooser;
 
@@ -37,6 +34,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import de.uka.ilkd.key.util.ProgressMonitor;
 
 
 public abstract class AbstractSMTSolver implements SMTSolver {
@@ -86,17 +84,6 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	}
 	return toReturn;
     }
-    
- /*   private String getStoredExecutionCommand(String filename, String formula) {
-	String comm = DecisionProcedureSettings.getInstance().getExecutionCommand(this);
-	if (comm != null && comm.length() != 0 && comm != " ") {
-	    comm.replace(" %f", filename);
-	    return comm;
-	} else {
-	    return this.getFinalExecutionCommand(filename, formula);
-	}
-    }
-    */
     
     /**
      * Interpret the answer of the program.
@@ -241,8 +228,6 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	    String s = trans.translate(t, services).toString();
 	    toReturn = this.run(s, timeout, services);
     	} catch (IllegalFormulaException e) {
-	    //toReturn = SMTSolverResult.NO_IDEA;
-	    //logger.debug("The formula could not be translated.", e);
 	    throw new RuntimeException("The formula could not be translated.\n" + e.getMessage());
 	}    	
     	return toReturn;
@@ -260,7 +245,23 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	}
     }
     
-    ExecutionWatchDog execWatch;
+    private ExecutionWatchDog execWatch;
+    
+    private ArrayList<ProgressMonitor> progressMonitors = new ArrayList<ProgressMonitor>();
+    
+    public void addProgressMonitor(ProgressMonitor p) {
+	progressMonitors.add(p);
+    }
+    
+    public boolean removeProgressMonitor(ProgressMonitor p) {
+	return progressMonitors.remove(p);
+    }
+    
+    public void removeAllProgressMonitors() {
+	while (progressMonitors.size() > 0) {
+	    progressMonitors.remove(0);
+	}
+    }
     
     /**
      * run the solver on a formula.
@@ -299,17 +300,28 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	    execWatch = new ExecutionWatchDog(timeout, p);
 	    Timer t = new Timer();
 	    t.schedule(execWatch, new Date(System.currentTimeMillis()), 300);
-	    /*Timer t2 = new Timer();
-	    TimerTask tt2 = new TimerTask() {
-		public void run() {
-		    //set the progress.
-		    progress = ((int)(tt.elapsedTime()*100) / temptimeout);
-		}
-	    };
-	    t2.schedule(tt2, new Date(System.currentTimeMillis()), 300);*/
+
+	    
 	    boolean interruptedByWatchdog = false;
 	    try {
-		p.waitFor();
+		//wait for the SMTSolver Thread and make popagate progress
+		boolean finished = false;
+		synchronized (p) {
+		while (!finished) {
+		    try {
+			p.wait(300);
+			p.exitValue();
+			//if the program comes here, p has been finished.
+			finished = true;
+		    } catch (IllegalThreadStateException e) {
+			//if program comes here, p has not been finished yet.
+			//update the progress.
+			for (ProgressMonitor pm : this.progressMonitors) {
+			    pm.setProgress(execWatch.getProgress());
+			}
+		    }
+		}
+		}
 		if (execWatch.wasInterrupted()) {
 		    interruptedByWatchdog = true;
 		    logger.debug(
@@ -319,7 +331,6 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		logger.debug(
 			"Process for smt formula proving interrupted.",
 			f);
-		//System.out.println("process was interrupted");
 	    } finally {
 		t.cancel();
 		this.execWatch = null;
@@ -345,35 +356,6 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 		    throw new RuntimeException("Error while executing solver:\n" + e.getMessage());
 		}
 	    }
-	    
-	    /*
-	    if (tt.wasInterrupted()) {
-		//the process was terminated by force.
-		toReturn = SMTSolverResult.NO_IDEA;
-	    } else {
-		if (p.exitValue() == 0) {
-		    //the process terminated as it should
-		    InputStream in = p.getInputStream();
-		    String text = read(in);
-		    in.close();
-		
-		    logger.debug("Answer for created formula: ");
-		    logger.debug(text);
-		    
-		    toReturn = this.interpretAnswer(text);
-		    
-	    	} else {
-	    	    //programm terminated with an error
-	    	    InputStream in = p.getErrorStream();
-		    String text = read(in);
-		    in.close();
-		
-		    logger.debug("Error in created formula: ");
-		    logger.debug(text);
-		    
-		    throw new RuntimeException("Error while executing solver:\n" + text);
-	    	}
-	    }*/
 	} catch (IOException e) {
 	    String cmdStr = execCommand;
 	    //for (String cmd : execCommand) {
@@ -408,13 +390,6 @@ public abstract class AbstractSMTSolver implements SMTSolver {
      */
     public boolean isInstalled(boolean recheck) {
 	if (recheck | !installwaschecked) {
-	    //build valid formula
-	    //helper class causes infinite loop
-	    //HelperClassForTests helper = new HelperClassForTests();	
-	    //ProofAggregate p = helper.parse(new File(this.getTestFile()));
-	    //Proof pr = p.getFirstProof();
-	    //Goal g = pr.openGoals().iterator().next();
-	    //try to solve the formula
 	    this.inTestMode = true;
 	    try {
 		//This will cause an error, but no IOException, if installed.
@@ -433,7 +408,6 @@ public abstract class AbstractSMTSolver implements SMTSolver {
 	    installwaschecked = true;
 	}
 	return isinstalled;
-	//return this.getExecutionCommand("a", "b")[0].contains("z");
     }
     
     protected String getTestFile() {

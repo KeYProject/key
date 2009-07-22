@@ -17,23 +17,14 @@
 
 package de.uka.ilkd.key.smt;
 
-import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import de.uka.ilkd.key.gui.ExceptionDialog;
-import de.uka.ilkd.key.gui.IMain;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.logic.Constraint;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.BuiltInRuleApp;
-import de.uka.ilkd.key.rule.ListOfBuiltInRule;
-import de.uka.ilkd.key.util.ExceptionHandlerException;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
+import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.util.*;
 
 
 /**
@@ -105,7 +96,7 @@ public class DecProcRunner implements Runnable {
         Object res = doWork();
         return res;
     }
-
+    
     private Object doWork() {
         String status = "";
         
@@ -120,7 +111,7 @@ public class DecProcRunner implements Runnable {
                         de.uka.ilkd.key.proof.mgt.AxiomJustification.INSTANCE);
 
                 main.setStatusLine("Running external decision procedure: " +
-                        simpRule.displayName(), 99); 
+                        simpRule.displayName(), 99*totalGoals); 
                 
                 final IteratorOfGoal goals = proof.openGoals().iterator();
 
@@ -132,26 +123,22 @@ public class DecProcRunner implements Runnable {
                     
                     cnt++;
                     final int temp = cnt;
-                    TimerTask tt = null;
-                    Timer t = null;
+
                     //start a task to update the progressbar according to the timeprogress.
+                    BaseProgressMonitor pm = null;
+                    
+                    //add a progress monitor to disply up to date progress.
                     if (simpRule instanceof SMTRule) {
-                	final SMTRule rule = (SMTRule) simpRule;
-                	tt = new TimerTask() {
-                	    public void run() {
-                		int step = 99/totalGoals;
-                		int base = (temp-1) * step;
-                		int prog = base + (step*rule.getProgress())/99;
-                		main.getProgressMonitor().setProgressImmediatly(prog);
-                	    }
-                	};
-                	t = new Timer();
-                	t.schedule(tt, 0, 300);
+                	SMTRule rule = (SMTRule) simpRule;
+                	int step = 99;
+        		int base = (cnt-1) * step;
+        		pm = new BaseProgressMonitor(base, main.getProgressMonitor());
+                	rule.addProgressMonitor(pm);
                     }
                     ProofTreeListener ptl = new ProofTreeListener() {
                 	
                 	public void proofGoalRemoved(ProofTreeEvent e) {
-                	    int step = 100/totalGoals;
+                	    int step = 99;
                 	    main.getProgressMonitor().setProgress(step*temp);
                 	}
                 	
@@ -165,12 +152,11 @@ public class DecProcRunner implements Runnable {
                     };
                     proof.addProofTreeListener(ptl);
                     g.apply(birApp);
-                    if (tt != null) {
-                	tt.cancel();
-                	t.cancel();
-                	t = null;
-                	tt = null;
+                    //remove the progress monitor again
+                    if (pm != null) {
+                	((SMTRule)simpRule).removeProgressMonitor(pm);
                     }
+
                     proof.removeProofTreeListener(ptl);
                     
                 }
@@ -197,9 +183,29 @@ public class DecProcRunner implements Runnable {
         return null;
     }	
 
-
-
-
-
-
+    /**
+     * this ProgressMonitor adds the progress it gets to basevalue and passes it on to 
+     * a registered progress monitor.
+     * @author Simon Greiner
+     *
+     */
+    private static class BaseProgressMonitor implements ProgressMonitor {
+	
+	private int baseval;
+	private ProgressMonitor delegate;
+	
+	public BaseProgressMonitor(int baseval, ProgressMonitor delegate) {
+	    this.baseval = baseval;
+	    this.delegate = delegate;
+	}
+	
+	public void setProgress(int val) {
+	    delegate.setProgress(val+baseval);
+	}
+	    
+	public void setMaximum(int val) {
+	    //do nothing.
+	}
+	
+    }
 }

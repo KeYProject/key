@@ -15,6 +15,7 @@ import java.io.IOException;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.util.ProgressMonitor;
 
 
 public interface SMTSolver {
@@ -81,6 +82,26 @@ public interface SMTSolver {
      * @return the command used for execution of the programm on default
      */
     public String getDefaultExecutionCommand();
+    
+    /**
+     * add a monitor to watch the Progress in the execution.
+     * During execution, all registered monitors are set to values between 0 and 99.
+     * @param p
+     */
+    public void addProgressMonitor(ProgressMonitor p);
+    
+    /**
+     * remove a registered progress monitor.
+     * @param p
+     * @return true, if remove was successful.
+     */
+    public boolean removeProgressMonitor(ProgressMonitor p);
+    
+    /**
+     * remove all registered progress monitors.
+     *
+     */
+    public void removeAllProgressMonitors();
     
     /**
      * 

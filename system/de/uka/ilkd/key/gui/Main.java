@@ -2147,10 +2147,6 @@ public class Main extends JFrame implements IMain {
             }
         }
         
-        public void setProgressImmediatly(int progress) {
-            statusLine.setProgress(progress);
-        }
-        
         public void setMaximum(int maximum) {
             statusLine.setProgressBarMaximum(maximum);
         }

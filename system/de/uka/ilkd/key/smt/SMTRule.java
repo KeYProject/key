@@ -22,6 +22,7 @@ import de.uka.ilkd.key.proof.ListOfGoal;
 import de.uka.ilkd.key.proof.SLListOfGoal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.util.ProgressMonitor;
 
 public class SMTRule implements BuiltInRule {
 
@@ -74,6 +75,32 @@ public class SMTRule implements BuiltInRule {
 	} else {
 	    return null;
 	}
+    }
+    
+    /**
+     * add a monitor to watch the Progress in the execution.
+     * During execution, all registered monitors are set to values between 0 and 99.
+     * @param p
+     */
+    public void addProgressMonitor(ProgressMonitor p) {
+	this.solver.addProgressMonitor(p);
+    }
+    
+    /**
+     * remove a registered progress monitor.
+     * @param p
+     * @return true, if remove was successful.
+     */
+    public boolean removeProgressMonitor(ProgressMonitor p) {
+	return this.solver.removeProgressMonitor(p);
+    }
+    
+    /**
+     * remove all registered progress monitors.
+     *
+     */
+    public void removeAllProgressMonitors() {
+	this.solver.removeAllProgressMonitors();
     }
     
     public String toString() {
