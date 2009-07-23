@@ -44,12 +44,12 @@ public final class HeapLDT extends LDT {
     public HeapLDT(Namespace sorts, Namespace functions, Namespace progVars) {
 	super((Sort)sorts.lookup(NAME), null);
         heap	          = (LocationVariable) progVars.lookup(new Name("heap"));
-        select            = (SortDependingFunction) addFunction(functions, "Null::select");
+        select            = (SortDependingFunction) addFunction(functions, Sort.ANY + "::select");
         store             = addFunction(functions, "store");
         arr               = addFunction(functions, "arr");
         length            = addFunction(functions, "Array::length");
         created           = addFunction(functions, "java.lang.Object::<created>");
-        nextToCreate      = (SortDependingFunction) addFunction(functions, "Null::<nextToCreate>");
+        nextToCreate      = (SortDependingFunction) addFunction(functions, Sort.ANY + "::<nextToCreate>");
         wellFormed        = addFunction(functions, "wellFormed");
         changeHeapAtLocs  = addFunction(functions, "changeHeapAtLocs");
         fieldSort         = (Sort) sorts.lookup(new Name("Field"));

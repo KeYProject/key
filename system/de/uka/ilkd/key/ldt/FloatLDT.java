@@ -23,7 +23,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
 
 
-public class FloatLDT extends LDT {
+public final class FloatLDT extends LDT {
     
     private static final Name NAME = new Name("jfloat");
 

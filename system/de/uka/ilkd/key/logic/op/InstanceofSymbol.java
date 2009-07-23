@@ -12,8 +12,6 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -39,18 +37,4 @@ public class InstanceofSymbol extends SortDependingFunction {
 		name,
 		p_sort );
     }
-
-
-    /**
-     * only type tests mixing primitive and reference types are omitted
-     */
-    public boolean possibleSub(int at, Term possibleSub) {
-        if (possibleSub.op() instanceof SchemaVariable) {
-	    return true;
-	}
-	return
-	    (possibleSub.sort() instanceof PrimitiveSort) == 
-                (getSortDependingOn() instanceof PrimitiveSort);
-    }
-
 }

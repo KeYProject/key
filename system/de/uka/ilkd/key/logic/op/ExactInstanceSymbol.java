@@ -31,18 +31,4 @@ public class ExactInstanceSymbol extends SortDependingFunction {
 		NAME,
 		p_sort );
     }
-
-    /**
-     * This operator can be used with arbitrary arguments 
-     * (only mixing primitive and reference sorts is not allowed)
-     */
-    public boolean possibleSub(int at, Term possibleSub) {
-	if (possibleSub.op() instanceof SchemaVariable) {
-	    return true;
-	}
-	return 
-            (possibleSub.sort() instanceof PrimitiveSort) == 
-                (getSortDependingOn() instanceof PrimitiveSort);
-	 
-    }
 }

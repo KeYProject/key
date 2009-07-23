@@ -199,5 +199,4 @@ public abstract class LDT {
     public abstract boolean hasLiteralFunction(Function f);
 
     public abstract Expression translateTerm(Term t, ExtList children);
-
 }

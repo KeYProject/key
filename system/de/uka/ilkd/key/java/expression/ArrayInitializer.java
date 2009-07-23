@@ -15,7 +15,7 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.sort.ArraySortImpl;
+import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -147,11 +147,9 @@ public class ArrayInitializer
 	s = i.getKeYJavaType(javaServ, ec).getSort();        
         final JavaInfo javaInfo = javaServ.getJavaInfo(); 
 	return javaInfo.getKeYJavaType
-	    (ArraySortImpl.getArraySortForDim(s, n, 
+	    (ArraySort.getArraySortForDim(s, n, 
 					      javaInfo.objectSort(), 
                                               javaInfo.cloneableSort(),
                                               javaInfo.serializableSort()));
     }
-
-
 }

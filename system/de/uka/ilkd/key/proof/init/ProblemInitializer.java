@@ -23,7 +23,6 @@ import recoder.io.ProjectSettings;
 
 import org.apache.log4j.Logger;
 
-import de.uka.ilkd.key.explicitheap.ExplicitHeapConverter;
 import de.uka.ilkd.key.gui.IMain;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Recoder2KeY;
@@ -470,20 +469,6 @@ public class ProblemInitializer {
 		
         //read envInput
         readEnvInput(envInput, initConfig);
-        
-        // add includes for libraries
-        HashMap<String,Boolean> libraries 
-        = envInput.readLibrariesSettings().getLibraries();
-        final Includes in = envInput.readIncludes();
-        for(Entry<String, Boolean> entry : libraries.entrySet()) {
-            final String fileName = entry.getKey();
-            final Boolean  sel    = entry.getValue();
-            if (sel != null && sel.booleanValue()) {              
-                in.put(fileName, RuleSource.initRuleFile(new File(fileName)));                
-            }
-        }
-        // read in libraries as includes
-        readIncludes(envInput, initConfig);        
         
 	startInterface();	
 	return initConfig;

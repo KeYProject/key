@@ -62,7 +62,7 @@ public class KeYJavaType implements Type {
             if (javaType instanceof ClassType) {                   
                 if (sort instanceof ClassInstanceSort) {
                     boolean conform = 
-                        ((ClassInstanceSort)sort).representAbstractClassOrInterface() ==
+                        ((ClassInstanceSort)sort).isAbstract() ==
                             (((ClassType)javaType).isAbstract() || 
                                     ((ClassType)javaType).isInterface());
                     if (!conform) {

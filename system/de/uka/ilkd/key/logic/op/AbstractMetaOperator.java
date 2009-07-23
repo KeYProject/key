@@ -84,8 +84,6 @@ public abstract class AbstractMetaOperator extends AbstractSortedOperator
 
     public static final AbstractMetaOperator ARRAY_STORE_STATIC_ANALYSE = new ArrayStoreStaticAnalyse();
 
-    public static final AbstractMetaOperator EXPAND_DYNAMIC_TYPE = new ExpandDynamicType();
-
     public static final AbstractMetaOperator RESOLVE_QUERY = new ResolveQuery();
 
     public static final AbstractMetaOperator CONSTANT_VALUE = new ConstantValue();
@@ -112,25 +110,23 @@ public abstract class AbstractMetaOperator extends AbstractSortedOperator
     protected static final TermBuilder TB = TermBuilder.DF;
     
     
-    private static Sort[] createAnySortArray(int arity) {
+    private static Sort[] createMetaSortArray(int arity) {
 	Sort[] result = new Sort[arity];
 	for(int i = 0; i < arity; i++) {
-	    result[i] = Sort.ANY;
+	    result[i] = METASORT;
 	}
 	return result;
     }
     
     
     protected AbstractMetaOperator(Name name, int arity, Sort sort) {
-	super(name, createAnySortArray(arity), sort);
+	super(name, createMetaSortArray(arity), sort);
 	name2metaop.put(name.toString(), this);	
     }
     
     
    protected AbstractMetaOperator(Name name, int arity) {
 	this(name, arity, METASORT);
-	assert METASORT != null;
-	assert sort() == METASORT;
     }
 
 

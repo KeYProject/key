@@ -16,7 +16,6 @@ import java.io.InputStream;
 import java.util.*;
 
 import de.uka.ilkd.key.collection.ListOfString;
-import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer;
@@ -220,26 +219,7 @@ public class KeYFile implements EnvInput {
         return includes;            
     }
 
-    
-    public LibrariesSettings readLibrariesSettings() throws ProofInputException {
-        if (initConfig==null) {
-            throw new IllegalStateException("KeYFile: InitConfig not set.");
-        }
         
-        if (settings == null) {           
-            getPreferences();            
-        }
-        
-        LibrariesSettings result;
-        if (settings == null || settings.getLibrariesSettings().emptyProperties()) {
-            result = ProofSettings.DEFAULT_SETTINGS.getLibrariesSettings();
-        } else {
-            result = settings.getLibrariesSettings(); 
-        }
-        
-        return result;
-    }
-    
     public List<File> readClassPath() {
         if(!javaPathAlreadyParsed)
             throw new IllegalStateException("Can access this only after 'readJavaPath' has been called");

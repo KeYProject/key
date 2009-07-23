@@ -19,7 +19,7 @@ import de.uka.ilkd.key.logic.Name;
  * a concrete sort, which has to be a subsort of the instantiations of
  * the supersorts of this sort
  */
-public class GenericSort extends AbstractSort {
+public final class GenericSort extends AbstractSort {
     
 
     /**
@@ -141,5 +141,10 @@ public class GenericSort extends AbstractSort {
 	}
 
 	return true;
+    }
+    
+    
+    public boolean isAbstract() {
+	return false;
     }
 }

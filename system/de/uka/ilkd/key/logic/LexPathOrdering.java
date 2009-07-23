@@ -303,7 +303,7 @@ public class LexPathOrdering implements TermOrdering {
             if ( p_op.name ().equals ( AbstractIntegerLDT.CHAR_ID_NAME ) )
                 return Integer.valueOf ( 1 );
             if ( p_op instanceof Function
-                 && ( (Function)p_op ).sort () == Sort.NULL )
+                 && ( opStr.equals("null"))) 
                 return new Integer ( 2 );
             if ( p_op instanceof Function
                  && ( opStr.equals ( "TRUE" ) || opStr.equals ( "FALSE" ) ) )

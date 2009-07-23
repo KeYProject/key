@@ -17,20 +17,22 @@ import de.uka.ilkd.key.logic.Named;
 
 public interface Sort extends Named {
     
-    Sort FORMULA  = new PrimitiveSort(new Name("Formula"));
-    Sort UPDATE   = new PrimitiveSort(new Name("Update"));
-    Sort NULL     = new NullSortImpl(new Name("Null"));
+    final Sort FORMULA  = new PrimitiveSort(new Name("Formula"));
+    final Sort UPDATE   = new PrimitiveSort(new Name("Update"));
+    final Sort NULL     = new NullSort(new Name("Null"));
 
-    Sort ANY      = new AbstractSort(new Name("any")) {
+    final Sort ANY      = new AbstractSort(new Name("any")) {
+	public SetOfSort extendsSorts() {            
+	    return SetAsListOfSort.EMPTY_SET;
+	}
 
-            public SetOfSort extendsSorts() {            
-                return SetAsListOfSort.EMPTY_SET;
-            }
-    
-            public boolean extendsTrans(Sort s) {        
-                return s == this;
-            }
-        
+	public boolean extendsTrans(Sort s) {        
+	    return s == this;
+	}
+	
+	public boolean isAbstract() {
+	    return false;
+	}
     };
     
     
@@ -43,5 +45,10 @@ public interface Sort extends Named {
      * Tells whether the given sort is a reflexive, transitive supersort of this 
      * sort.
      */
-    boolean extendsTrans(Sort s);    
+    boolean extendsTrans(Sort s);
+    
+    /**
+     * Tells whether this sort has no exact elements.
+     */
+    boolean isAbstract();
 }

@@ -266,7 +266,7 @@ public class Recoder2KeYTypeConverter {
             }
 
             // I may not use JavaInfo here because the classes may not yet be cached!
-            s = ArraySortImpl.getArraySort(kjt.getSort(), 
+            s = ArraySort.getArraySort(kjt.getSort(), 
                     objectType.getSort(),
                     cloneableType.getSort(),
                     serializableType.getSort());
@@ -394,7 +394,7 @@ public class Recoder2KeYTypeConverter {
      */
     private Sort createObjectSort(ClassType ct, SetOfSort supers) {
         final boolean abstractOrInterface = ct.isAbstract() || ct.isInterface();
-        return new ClassInstanceSortImpl(new Name(Recoder2KeYConverter.makeAdmissibleName(ct.getFullName())), 
+        return new ClassInstanceSort(new Name(Recoder2KeYConverter.makeAdmissibleName(ct.getFullName())), 
                 supers,	abstractOrInterface);
     }
 

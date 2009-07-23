@@ -52,7 +52,7 @@ public final class ProgramMethod extends AbstractSortedOperator
         super(new ProgramElementName(method.getProgramElementName().toString(), 
                 		     contKJT.getSort().toString()), 
               getArgumentSorts(method, contKJT), 
-              kjt == null ? Sort.NULL : kjt.getSort()); 
+              kjt == null ? Sort.ANY : kjt.getSort()); 
                         
 	this.method  = method;
 	this.contKJT = contKJT;

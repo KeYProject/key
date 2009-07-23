@@ -11,8 +11,6 @@ package de.uka.ilkd.key.proof.init;
 
 import java.util.List;
 import java.io.File;
-import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 
 
 
@@ -44,39 +42,39 @@ public abstract class AbstractEnvInput implements EnvInput {
     //public interface
     //-------------------------------------------------------------------------
 
-    public String name() {
+    @Override
+    public final String name() {
 	return name;
     }
     
 
-    public int getNumberOfChars() {
+    @Override
+    public final int getNumberOfChars() {
 	return 1;
     }
         
     
-    public void setInitConfig(InitConfig initConfig) {
+    @Override
+    public final void setInitConfig(InitConfig initConfig) {
 	this.initConfig = initConfig;
     }
     
     
-    public Includes readIncludes() throws ProofInputException {
+    @Override
+    public final Includes readIncludes() throws ProofInputException {
 	assert initConfig != null;
 	return includes;
     }
     
     
-    public LibrariesSettings readLibrariesSettings() 
-    		throws ProofInputException {
-	return ProofSettings.DEFAULT_SETTINGS.getLibrariesSettings();
-    }
-    
-    
-    public String readJavaPath() throws ProofInputException {
+    @Override
+    public final String readJavaPath() throws ProofInputException {
 	return javaPath;
     }
     
     // no class path elements here
-    public List<File> readClassPath() throws ProofInputException {
+    @Override
+    public final List<File> readClassPath() throws ProofInputException {
         return null;
     }
     

@@ -121,12 +121,11 @@ public class GenericSortInstantiations {
 	final SchemaVariable sv = p_entry.getSchemaVariable ();
         final Term term = ( (TermInstantiation)p_entry ).getTerm ();
         
-        if ( GenericSortCondition.subSortsAllowed ( sv ) )
-            return term.sort ().extendsTrans ( sv.sort () ) ? 
-                    Boolean.TRUE : Boolean.FALSE;
-
-        return sv.sort () == term.sort () ? 
-                Boolean.TRUE : Boolean.FALSE;
+        if(GenericSortCondition.subSortsAllowed(sv)) {
+            return term.sort().extendsTrans(sv.sort());
+        } else {
+            return sv.sort() == term.sort();
+        }
     }
 
 

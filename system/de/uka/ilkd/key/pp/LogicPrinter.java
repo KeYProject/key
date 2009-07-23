@@ -2079,10 +2079,10 @@ public class LogicPrinter {
      * @param services the Services class used to access the type hierarchy
      * @return true if the attribute is uniquely determined
      */
-    public static boolean printInShortForm(String programName, Sort sort,
-                                   Services services) {
-        if ( ! ( services != null 
-        	  && sort != Sort.NULL 
+    public static boolean printInShortForm(String programName, 
+	    				   Sort sort,
+	    				   Services services) {
+        if ( ! ( services != null  
         	  && sort.extendsTrans(services.getJavaInfo().objectSort()))) {
             return false;
         }

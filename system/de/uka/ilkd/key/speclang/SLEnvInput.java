@@ -207,6 +207,7 @@ public class SLEnvInput extends AbstractEnvInput {
     //public interface
     //-------------------------------------------------------------------------
 
+    @Override
     public void read(ModStrategy mod) throws ProofInputException {
         if(initConfig == null) {
             throw new IllegalStateException("InitConfig not set.");

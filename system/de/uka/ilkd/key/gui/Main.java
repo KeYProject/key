@@ -821,16 +821,7 @@ public class Main extends JFrame implements IMain {
         JOptionPane.showMessageDialog(Main.this, settingsPane, "Settings",
                 JOptionPane.INFORMATION_MESSAGE);
     }
-    /**
-     * opens a configuration dialog for the loaded libraries
-     */
-    protected void configLibraries() {
-        LibrariesConfiguration config = 
-            new LibrariesConfiguration
-            (mediator(), 
-             ProofSettings.DEFAULT_SETTINGS.getLibrariesSettings());
-        config.setVisible(true);
-    }
+
     
     protected void makePrettyView() {
         if (mediator().ensureProofLoadedSilent()) {
@@ -1177,15 +1168,6 @@ public class Main extends JFrame implements IMain {
 		}});
 	registerAtMenu(options, choiceItem);	
     
-	// taclet libraries
-        JMenuItem librariesItem = new JMenuItem("Taclet Libraries...");
-        librariesItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                configLibraries();
-            }
-        });
-        registerAtMenu(options, librariesItem);
-        
         // decision procedures
         registerAtMenu(options, createDecisionProcedureMenu());
 	dpSettingsListener = 

@@ -12,12 +12,48 @@
 
 package de.uka.ilkd.key.logic.sort;
 
+import de.uka.ilkd.key.logic.Name;
 
-public interface ClassInstanceSort {
+public class ClassInstanceSort extends AbstractSort {
 
-    /** 
-     * returns true if this sort represents a java abstract class
-     * or interface
+
+    final SetOfSort ext;
+    /** this field indicates if a <get> function shall be created or not */
+    final boolean representsAbstractJavaOrInterfaceSort;
+    
+    
+    /** creates a ClassInstanceSort*/
+    public ClassInstanceSort(Name name, SetOfSort ext, boolean abs) {
+	super(name);
+	this.ext = ext;	
+        this.representsAbstractJavaOrInterfaceSort = abs;
+    }
+
+    /** creates a ClassInstanceSort*/
+    public ClassInstanceSort(Name name, de.uka.ilkd.key.logic.sort.Sort ext,
+            boolean abs) {
+	this(name, SetAsListOfSort.EMPTY_SET.add(ext), abs);
+    }
+
+
+    /** creates a ClassInstanceSort*/
+    public ClassInstanceSort(Name name, boolean abs) {
+	this(name, SetAsListOfSort.EMPTY_SET, abs);
+    }
+
+   
+    /**
+     * @return the sorts of the predecessors of this sort
      */
-    boolean representAbstractClassOrInterface();
+    public SetOfSort extendsSorts() {
+        return ext;
+    }
+
+    public boolean representAbstractClassOrInterface() {        
+        return representsAbstractJavaOrInterfaceSort;
+    }   
+    
+    public boolean isAbstract() {
+	return representsAbstractJavaOrInterfaceSort;
+    }
 }

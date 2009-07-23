@@ -21,7 +21,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.AbstractMetaOperator;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.sort.ClassInstanceSortImpl;
+import de.uka.ilkd.key.logic.sort.ClassInstanceSort;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -44,7 +44,7 @@ public  final class ArrayStoreStaticAnalyse extends AbstractMetaOperator {
         super(new Name("#arrayStoreStaticAnalyse"), 1);
     }
 
-    private ListOfKeYJavaType determineDynamicTypes(ClassInstanceSortImpl s,
+    private ListOfKeYJavaType determineDynamicTypes(ClassInstanceSort s,
             Services serv) {        
         final KeYJavaType keYJavaType = serv.getJavaInfo().getKeYJavaType(s);
         final ListOfKeYJavaType result = serv.getJavaInfo().getAllSubtypes(keYJavaType);
@@ -59,8 +59,8 @@ public  final class ArrayStoreStaticAnalyse extends AbstractMetaOperator {
      * <tt> null </tt> is returned if some are and others are not 
      */
     private Term assignmentCompatible
-    	(ClassInstanceSortImpl arrayElementSort,
-    	        ClassInstanceSortImpl elementSort, Services serv) {
+    	(ClassInstanceSort arrayElementSort,
+    	        ClassInstanceSort elementSort, Services serv) {
         final IteratorOfKeYJavaType elementDynamicTypesIt = determineDynamicTypes(
                 elementSort, serv).iterator();
         final ListOfKeYJavaType arrayElementDynamicTypes = determineDynamicTypes(
@@ -126,11 +126,11 @@ public  final class ArrayStoreStaticAnalyse extends AbstractMetaOperator {
         final ArraySort arraySort = (ArraySort) array.sort();
         final Sort arrayElementSort = arraySort.elementSort();
         final Sort elementSort = element.sort();
-        if (arrayElementSort instanceof ClassInstanceSortImpl
-                && elementSort instanceof ClassInstanceSortImpl) {
+        if (arrayElementSort instanceof ClassInstanceSort
+                && elementSort instanceof ClassInstanceSort) {
             final Term result = assignmentCompatible(
-                    (ClassInstanceSortImpl) arrayElementSort,
-                    (ClassInstanceSortImpl) elementSort, services);
+                    (ClassInstanceSort) arrayElementSort,
+                    (ClassInstanceSort) elementSort, services);
             return result == null ? term.sub(0) : result;
         } else if (arrayElementSort instanceof PrimitiveSort) {
             if (!(elementSort instanceof PrimitiveSort)) {

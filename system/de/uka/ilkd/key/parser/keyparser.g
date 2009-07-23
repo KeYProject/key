@@ -747,13 +747,6 @@ options {
                 }
                 // WATCHOUT why not in DECLARATION MODE	   
                 if(!isDeclParser()) {			      	
-                    if (prefixSort == Sort.NULL) {
-                        semanticError
-                        ("Cannot uniquely determine attribute " + attributeName + 
-                            "\n Please specify exact type by attaching" +
-                            " @( delaredInType ) to the attribute name.");
-                    }
-
                     final ListOfProgramVariable vars = 	
                     javaInfo.getAllAttributes(attributeName, prefixKJT);
                     
@@ -1055,7 +1048,7 @@ options {
             String sortName = varfunc_name.substring(0, separatorIndex);
             String baseName = varfunc_name.substring(separatorIndex + 2);
             Sort sort = lookupSort(sortName);
-            Operator baseSymbol = lookupVarfuncId(Sort.NULL + "::" + baseName, args);
+            Operator baseSymbol = lookupVarfuncId(Sort.ANY + "::" + baseName, args);
                         
             if(sort != null && baseSymbol instanceof SortDependingFunction) {
                 v = (Function) ((SortDependingFunction) baseSymbol).getInstanceFor(sort, getServices());
@@ -1521,8 +1514,7 @@ one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST]
     ListOfString sortIds = SLListOfString.EMPTY_LIST; 
 } : 
         ( 
-          OBJECT  {isObjectSort =true;} sortIds = objectSortIdentifiers
-        | GENERIC {isGenericSort=true;} sortIds = simple_ident_comma_list
+         GENERIC {isGenericSort=true;} sortIds = simple_ident_comma_list
             ( ONEOF sortOneOf = oneof_sorts )? 
             ( EXTENDS sortExt = extends_sorts )?
         | firstSort = simple_ident_dots { sortIds = sortIds.prepend(firstSort); }
@@ -1540,9 +1532,9 @@ one_sort_decl returns [ListOfSort createdSorts = SLListOfSort.EMPTY_LIST]
                             Sort s;
                             if (isObjectSort) {
                                 if (sort_name.toString().equals("java.lang.Object")) {
-				    s = new ClassInstanceSortImpl(sort_name, false);
+				    s = new ClassInstanceSort(sort_name, false);
                                 } else {
-                                    s = new ClassInstanceSortImpl(sort_name,
+                                    s = new ClassInstanceSort(sort_name,
                                         (Sort)sorts().lookup(new Name("java.lang.Object")), false);
                                 }	
                             } else if (isGenericSort) {
@@ -1600,15 +1592,6 @@ intersectionSortIdentifier returns [ListOfString composites = SLListOfString.EMP
          composites = composites.prepend(right).prepend(left);
      }
 ;
-
-objectSortIdentifiers returns [ListOfString ids = SLListOfString.EMPTY_LIST]
-{
-  String id;
-}
- :
-  id = simple_ident_dots { ids = ids.append ( id );} 
-  (COMMA id = simple_ident_dots { ids = ids.append ( id );})*
- ;
 
 
 simple_ident_dots returns [ String ident = ""; ] 
@@ -1974,7 +1957,7 @@ func_decl
 		                                                argSorts,
 		                                                new Name(baseName),
 		                                                genSort);
-			f = (Function)temp.getInstanceFor(Sort.NULL, getServices());
+			f = (Function)temp.getInstanceFor(Sort.ANY, getServices());
 		    }
 	        }
 	        
@@ -2114,7 +2097,7 @@ sortId_check_help [boolean checkSort] returns [Sort s = null]
             // don't allow generic sorts or collection sorts of
             // generic sorts at this point
             Sort t = s;
-            while ( t != Sort.NULL && t instanceof ArraySort ) {
+            while ( t instanceof ArraySort ) {
             	t = ((ArraySort)t).elementSort ();
             }
 
@@ -2143,7 +2126,7 @@ array_set_decls[Sort p] returns [Sort s = null]
         { 
             if (n != 0){
                 final JavaInfo ji = getJavaInfo();
-                s = ArraySortImpl.getArraySortForDim(p, 
+                s = ArraySort.getArraySortForDim(p, 
                 			             n, 
                 			             ji.objectSort(),
                                                      ji.cloneableSort(), 
@@ -3129,26 +3112,55 @@ simple_updateterm returns [Term a = null]
 
 updateterm returns [Term result = null] 
 {
-    Term su = null; 
-    Term pu = null;
+    Term u = null; 
     Term a2 = null;
 } :
-        LBRACE 
-        (
-             su = singleupdate 
-             {
-                 pu = su;
-             } 
-             (  
-                PARALLEL su = singleupdate 
-                {
-                    pu = TB.parallel(pu, su);
-                }
-             )*
-        ) 
-        RBRACE ( a2 = term110 | a2 = unary_formula )
+        LBRACE u=update RBRACE 
+        ( 
+            a2=term110 
+            | 
+            a2=unary_formula 
+        )
         {   
-	    result = TB.apply(pu, a2);
+	    result = TB.apply(u, a2);
+        }
+   ; exception
+        catch [TermCreationException ex] {
+              keh.reportException
+		(new KeYSemanticException
+			(ex.getMessage(), getFilename(), getLine(), getColumn()));
+        }
+        
+update returns[Term result=null]
+{ 
+   Term u = null;
+}  :
+       result=non_parallel_update
+       (
+           PARALLEL u=non_parallel_update
+           {
+               result = TB.parallel(result, u);
+           }
+       )*
+   ;
+   
+non_parallel_update returns[Term result=null]
+   :
+       | (elementary_update) => result=elementary_update
+       | result=skip_or_schema_update          
+       | result=updated_update
+       | LPAREN result=update RPAREN
+   ;   
+        
+elementary_update returns[Term result=null]
+{
+    Term a0 = null;
+    Term a1 = null;
+    String id = null;
+}  :
+        a0=lhsSingle ASSIGN a1=rhsSingle 
+        {
+            result = TB.elementary(getServices(), a0, a1);
         }
    ; exception
         catch [TermCreationException ex] {
@@ -3157,27 +3169,51 @@ updateterm returns [Term result = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
-singleupdate returns[Term result=null]
+       
+skip_or_schema_update returns[Term result=null]
 {
-    Term a0 = null;
-    Term a1 = null;
     String id = null;
 }  :
-        (lhsSingle ASSIGN)=> (a0=lhsSingle ASSIGN a1=rhsSingle) 
-        {
-            result = TB.elementary(getServices(), a0, a1);
+         id=simple_ident
+         {
+              if(id.equals("skip")) {
+                  result = TB.skip();
+              } else if(inSchemaMode()) {
+                  Operator op = (Operator) variables().lookup(new Name(id));
+                  if(! (op instanceof UpdateSV)) {
+                       semanticError(id + " is not allowed in an update.");
+                  }
+              	  result = TB.func(op);                  
+              } else {
+                  semanticError("Illegal update: " + id);
+              }
+         }
+   ; exception
+        catch [TermCreationException ex] {
+              keh.reportException
+		(new KeYSemanticException
+			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
-        |  {inSchemaMode()}? id=simple_ident
-           {
-               Operator op = (Operator) variables().lookup(new Name(id));
-               if(! (op instanceof UpdateSV)) {
-                   semanticError(op + " is not allowed in an updates.");
-               }
-               return TB.func(op);
-           }
-;
-
-
+        
+updated_update returns[Term result = null] 
+{
+    Term u1 = null; 
+    Term u2 = null;
+} :
+        LBRACE u1=update RBRACE 
+        ( 
+            u2=non_parallel_update
+        )
+        {   
+	    result = TB.apply(u1, u2);
+        }
+   ; exception
+        catch [TermCreationException ex] {
+              keh.reportException
+		(new KeYSemanticException
+			(ex.getMessage(), getFilename(), getLine(), getColumn()));
+        }          
+        
 bound_variables returns[ListOfQuantifiableVariable list = SLListOfQuantifiableVariable.EMPTY_LIST]
 {
   QuantifiableVariable var = null;
@@ -3188,7 +3224,6 @@ bound_variables returns[ListOfQuantifiableVariable list = SLListOfQuantifiableVa
        (SEMI var = one_bound_variable { list = list.append(var); })*
       RPAREN
    | var = one_bound_variable { list = list.append(var); } SEMI 
-     
 ;
 
 one_bound_variable returns[QuantifiableVariable v=null]
@@ -3680,30 +3715,24 @@ varcond_typecheck [TacletBuilder b, boolean negated]
 }
 :
    (  SAME  { 	
-	typecheckType = negated ? TypeComparisionCondition.NOT_SAME : TypeComparisionCondition.SAME;
+	typecheckType = negated ? TypeComparisonCondition.NOT_SAME : TypeComparisonCondition.SAME;
 	} 
-    | COMPATIBLE { 
-      typecheckType = TypeComparisionCondition.NOT_COMPATIBLE;
-	if (!negated) {  
-	  semanticError("Compatible types condition only available as negated version.");
-	} 
-      }
     | ISSUBTYPE { typecheckType = negated ?  
-	  TypeComparisionCondition.NOT_IS_SUBTYPE: TypeComparisionCondition.IS_SUBTYPE; 
+	  TypeComparisonCondition.NOT_IS_SUBTYPE: TypeComparisonCondition.IS_SUBTYPE; 
       }
     | STRICT ISSUBTYPE {
          if (negated) {  
 	  semanticError("A negated strict subtype check does not make sense.");
 	} 
-	typecheckType = TypeComparisionCondition.STRICT_SUBTYPE;
+	typecheckType = TypeComparisonCondition.STRICT_SUBTYPE;
       }
     | DISJOINTMODULONULL {
-        typecheckType = TypeComparisionCondition.DISJOINTMODULONULL;
+        typecheckType = TypeComparisonCondition.DISJOINTMODULONULL;
       }
    ) 
    LPAREN fst = type_resolver COMMA snd = type_resolver RPAREN {
                b.addVariableCondition
-                 (new TypeComparisionCondition(fst, snd, typecheckType));
+                 (new TypeComparisonCondition(fst, snd, typecheckType));
             }
 ;
 

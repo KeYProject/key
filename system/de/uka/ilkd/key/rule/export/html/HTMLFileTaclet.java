@@ -244,7 +244,7 @@ public class HTMLFileTaclet extends HTMLFile {
     }
 
     public static void writeTacletSchemaVariable(StringBuffer out, SchemaVariable schemaVar) {
-	if (schemaVar instanceof ModalOperatorSV) {            
+	if(schemaVar instanceof ModalOperatorSV) {            
 	    final ModalOperatorSV modalOpSV = (ModalOperatorSV)schemaVar;
 	    final IteratorOfModality it = modalOpSV.getModalities().iterator();
 	    assert modalOpSV instanceof ModalOperatorSV;
@@ -256,28 +256,26 @@ public class HTMLFileTaclet extends HTMLFile {
 		out.append ( op.name() );
 		sep = ", ";
 	    }
-	    out.append ( " } " + modalOpSV.name() );
-	} else {       
-	    final SchemaVariable sortedSV = schemaVar;
-	                
-            if (sortedSV instanceof TermSV) {
-                out.append ( "\\term");
-	    } else if (sortedSV instanceof FormulaSV) {
-	        out.append ( "\\formula" );
-	    } else if (sortedSV instanceof ProgramSV) {
-	        out.append ( "\\program");
-	    } else if (sortedSV instanceof VariableSV) {
-		out.append ( "\\variables");
-	    } else if (sortedSV instanceof SkolemTermSV) {
-		out.append ( "\\skolemTerm");
-	    } else {
-                out.append ( "?" );
-	    }                       
-            writeSVModifiers(out, schemaVar);
-            if (!(schemaVar instanceof FormulaSV)) {
-                out.append(" " + sortedSV.sort());
-            }
-            out.append(  " " + sortedSV.name() );
+	    out.append(" } " + modalOpSV.name());
+	} else if(schemaVar instanceof TermSV) {
+	    out.append ("\\term");
+	} else if(schemaVar instanceof FormulaSV) {
+	    out.append ("\\formula");
+	} else if(schemaVar instanceof UpdateSV) {
+	    out.append("\\update");
+	} else if(schemaVar instanceof ProgramSV) {
+	    out.append ("\\program");
+	} else if(schemaVar instanceof VariableSV) {
+	    out.append ("\\variables");
+	} else if(schemaVar instanceof SkolemTermSV) {
+	    out.append ("\\skolemTerm");
+	} else {
+	    out.append ("?");
+	}                       
+	writeSVModifiers(out, schemaVar);
+	if(!(schemaVar instanceof FormulaSV || schemaVar instanceof UpdateSV)) {
+	    out.append(" " + schemaVar.sort());
 	}
+	out.append(  " " + schemaVar.name() );
     }
 }

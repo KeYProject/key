@@ -1397,46 +1397,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 	return cstr;
 	
     }
-
     
-    /**
-     * This method returns true, if t1 and t2 are equal.
-     * CAUTION! Only tested for Box, Diamond and Update Formulas
-     * @param t1 the first term to check
-     * @param t2 the second term to check
-     * @param services
-     * @return true, if t1 and t2 are equal.
-     */
-    private boolean checkTermsEquality(Term t1, Term t2, Services services) {
-
-	//two terms are equal, if the RewriteTaclet says, they are.
-		
-	TermFactory tf = new TermFactory();
-	//create a template, to check against
-	SchemaVariable v = SchemaVariableFactory.createFormulaSV(new Name("phi"), true);
-	Term comparator = tf.createVariableTerm(v);
-	
-	//create a RewriteTaclet that is used for checking
-	RewriteTaclet rt;
-	RewriteTacletBuilder rtb = new RewriteTacletBuilder();
-	rtb.setFind(comparator);
-	rt = rtb.getRewriteTaclet();
-	
-	//match t1 against the template
-	//returns matchcondition needed for the check of t2
-	MatchConditions m = MatchConditions.EMPTY_MATCHCONDITIONS;
-	m = rt.matchFind(t1, m, services, Constraint.BOTTOM);
-	Term found = null;
-	
-	//match t2 against t1 (by using the created matchconditions)
-	MatchConditions res = rt.matchFind(t2, m, services, Constraint.BOTTOM);
-	
-	if (res != null) {
-	    return true;
-	} else {
-	    return false;
-	}
-    }
     
     /**
      * Add an interpreted function to the set of special functions.

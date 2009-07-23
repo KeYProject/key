@@ -23,7 +23,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
 
 
-public class DoubleLDT extends LDT {
+public final class DoubleLDT extends LDT {
     
     private static final Name NAME = new Name("jdouble");
 

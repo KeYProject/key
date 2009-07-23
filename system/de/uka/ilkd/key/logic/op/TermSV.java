@@ -37,8 +37,8 @@ public final class TermSV extends AbstractSV {
     @Override
     public MatchConditions match(SVSubstitute subst, 
 	    			 MatchConditions mc,
-	    			 Services services) {
-        if (subst instanceof Term) {
+	    			 Services services) {	
+        if(subst instanceof Term) {
             return addInstantiation((Term) subst, mc, services);
         }
         Debug.out("FAILED. Schemavariable of this kind only match terms.");

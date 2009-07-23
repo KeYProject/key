@@ -13,7 +13,6 @@ import java.io.File;
 import java.util.List;
 
 import de.uka.ilkd.key.gui.IMain;
-import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.IteratorOfNamed;
@@ -78,13 +77,7 @@ public class LDTInput implements EnvInput {
 	return result;
     }
     
-    
-    public LibrariesSettings readLibrariesSettings() 
-    		throws ProofInputException {
-	return new LibrariesSettings();
-    }
-    
-    
+        
     public String readJavaPath() throws ProofInputException {
 	return "";
     }

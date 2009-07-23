@@ -13,7 +13,7 @@ package de.uka.ilkd.key.logic;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ClassInstanceSortImpl;
+import de.uka.ilkd.key.logic.sort.ClassInstanceSort;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.SetAsListOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -28,10 +28,10 @@ public class TestTermFactory extends TestCase {
     private Sort sort1=new PrimitiveSort(new Name("S1"));
     private Sort sort2=new PrimitiveSort(new Name("S2"));
     private Sort sort3=new PrimitiveSort(new Name("S3"));
-    private Sort osort1=new ClassInstanceSortImpl(new Name("os1"), false);
-    private Sort osort2=new ClassInstanceSortImpl(new Name("os2"), osort1, false);
-    private Sort osort3=new ClassInstanceSortImpl(new Name("os3"), osort1, false);
-    private Sort osort4=new ClassInstanceSortImpl(new Name("os4"), 
+    private Sort osort1=new ClassInstanceSort(new Name("os1"), false);
+    private Sort osort2=new ClassInstanceSort(new Name("os2"), osort1, false);
+    private Sort osort3=new ClassInstanceSort(new Name("os3"), osort1, false);
+    private Sort osort4=new ClassInstanceSort(new Name("os4"), 
 						  SetAsListOfSort.EMPTY_SET
 						  .add(osort2).add(osort3), false);
     

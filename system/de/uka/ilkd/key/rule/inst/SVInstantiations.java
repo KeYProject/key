@@ -125,7 +125,7 @@ public class SVInstantiations {
      * @return SVInstantiations the new SVInstantiations containing the given
      *         pair
      */
-    public SVInstantiations add(SchemaVariable sv, Term subst) {       
+    public SVInstantiations add(SchemaVariable sv, Term subst) {
         return add(sv, new TermInstantiation(sv, subst));    
     }
 
@@ -220,15 +220,17 @@ public class SVInstantiations {
                     + "(This exception object is static)");
 
     private SVInstantiations checkSorts(InstantiationEntry p_entry,
-            boolean p_forceRebuild) {
+            				boolean p_forceRebuild) {
         Boolean b = getGenericSortInstantiations().checkSorts(p_entry);
 
-        if (b == null)
+        if (b == null) {
             return rebuildSorts();
-        else if (!b.booleanValue())
+        } else if (!b.booleanValue()) {
             throw INCOMPATIBLE_INSTANTIATION_EXCEPTION;
-        if (p_forceRebuild)
+        }
+        if (p_forceRebuild) {
             return rebuildSorts();
+        }
         return this;
     }
 
@@ -263,9 +265,11 @@ public class SVInstantiations {
      *         pair
      */
     public SVInstantiations add(SchemaVariable sv, InstantiationEntry entry) {
-        return new SVInstantiations(map.put(sv, entry), interesting(),
-                getUpdateContext(), getGenericSortInstantiations(),
-                getGenericSortConditions()).checkSorts(entry, false);
+        return new SVInstantiations(map.put(sv, entry), 
+        			    interesting(),
+                		    getUpdateContext(), 
+                		    getGenericSortInstantiations(),
+                		    getGenericSortConditions()).checkSorts(entry, false);
     }
 
     public SVInstantiations addInteresting(SchemaVariable sv,

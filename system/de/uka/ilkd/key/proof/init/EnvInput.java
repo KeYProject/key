@@ -13,7 +13,6 @@ import java.io.File;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ListOfString;
-import de.uka.ilkd.key.gui.configuration.LibrariesSettings;
 
 
 /** 
@@ -43,11 +42,6 @@ public interface EnvInput {
      * Reads the include section and returns an Includes object.  
      */
     Includes readIncludes() throws ProofInputException;
-    
-    /** 
-     * Reads the libraries settings.
-     */
-    LibrariesSettings readLibrariesSettings() throws ProofInputException;
     
     /** 
      * Reads the Java path.

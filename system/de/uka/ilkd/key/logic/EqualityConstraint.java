@@ -49,9 +49,6 @@ public class EqualityConstraint implements Constraint {
 
     private Integer hashCode = null;
     
-    /** static meta variable counter */
-    private static long MV_COUNTER;
-    
     /** Don't use this constructor, use Constraint.BOTTOM instead */
     public EqualityConstraint() {
 	this ( new HashMap<Metavariable, Term> () );

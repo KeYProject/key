@@ -384,7 +384,6 @@ public class NoPosTacletApp extends TacletApp {
 				    Services        services,
 				    Constraint      userConstraint,
                                     Term t) {
-
         if ((t==null) && (pos!=null)) t = pos.subTerm ();
 
         MatchConditions mc = setupMatchConditions(pos, services, userConstraint);

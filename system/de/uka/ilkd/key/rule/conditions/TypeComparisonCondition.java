@@ -30,12 +30,11 @@ import de.uka.ilkd.key.util.Debug;
 /**
  * ensures that the types where the variables are declared are not the same
  */
-public class TypeComparisionCondition extends VariableConditionAdapter {
+public class TypeComparisonCondition extends VariableConditionAdapter {
     
     /** checks if sorts are not same */
     public final static int NOT_SAME = 0;
-    /** checks if sorts are not compatible */
-    public final static int NOT_COMPATIBLE = 1;
+
     /** checks subtype relationship */
     public final static int IS_SUBTYPE = 2;
     /** checks subtype relationship */
@@ -60,7 +59,7 @@ public class TypeComparisionCondition extends VariableConditionAdapter {
      * @param snd one of the SchemaVariable whose type is checked
      * @param mode an int encoding if testing of not same or not compatible
      */
-    public TypeComparisionCondition (TypeResolver fst, 
+    public TypeComparisonCondition (TypeResolver fst, 
 				     TypeResolver snd,
 				     int mode) {
 	this.fst = fst;
@@ -100,9 +99,6 @@ public class TypeComparisionCondition extends VariableConditionAdapter {
             return fstSort == sndSort;
         case NOT_SAME:
             return fstSort != sndSort;
-        case NOT_COMPATIBLE:
-            return !(fstSort.extendsTrans(sndSort) ||
-        	     sndSort.extendsTrans(fstSort));
         case IS_SUBTYPE:        
             return fstSort.extendsTrans(sndSort);
         case STRICT_SUBTYPE:
@@ -158,8 +154,6 @@ public class TypeComparisionCondition extends VariableConditionAdapter {
 	switch (mode) {
         case SAME:
             return "\\same("+fst+", "+snd+")";
-	case NOT_COMPATIBLE:
-	    return "\\not\\compatible("+fst+", "+snd+")";
 	case NOT_SAME:
 	    return "\\not\\same("+fst+", "+snd+")";
 	case IS_SUBTYPE:
@@ -171,8 +165,7 @@ public class TypeComparisionCondition extends VariableConditionAdapter {
 	case DISJOINTMODULONULL:
 	    return "\\disjointModuloNull("+fst+", "+snd+")";
 	default:
-	    return "invalid type copmparision mode";         	    
+	    return "invalid type comparison mode";         	    
 	}
     }
-
 }

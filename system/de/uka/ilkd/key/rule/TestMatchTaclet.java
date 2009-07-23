@@ -24,7 +24,7 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ClassInstanceSortImpl;
+import de.uka.ilkd.key.logic.sort.ClassInstanceSort;
 import de.uka.ilkd.key.logic.sort.PrimitiveSort;
 import de.uka.ilkd.key.logic.sort.SetAsListOfSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -468,10 +468,10 @@ public class TestMatchTaclet extends TestCase {
 	     (0, new ConstrainedFormula(closeable_two)).semisequent()); 	
 	TacletIndex index = new TacletIndex();
 	index.add(close_rule.taclet());
-        PosInOccurrence posAntec = new PosInOccurrence(new ConstrainedFormula(closeable_two, Constraint.BOTTOM),
+        PosInOccurrence pio = new PosInOccurrence(new ConstrainedFormula(closeable_two, Constraint.BOTTOM),
                 PosInTerm.TOP_LEVEL, false);
 
-	TacletApp tacletApp = index.getSuccedentTaclet(posAntec,
+	TacletApp tacletApp = index.getSuccedentTaclet(pio,
 	                                               new IHTacletFilter (true, SLListOfRuleSet.EMPTY_LIST),
 	                                               services, Constraint.BOTTOM).iterator().next();
 	assertTrue("Match should be possible(modulo renaming)",
@@ -539,9 +539,9 @@ public class TestMatchTaclet extends TestCase {
     //a term of sort B. (assertNotNull)
     public void testWithSubSortsTermSV() {
 	Sort osort1=(Sort)TacletForTests.getSorts().lookup(new Name("Obj"));
-	Sort osort2=new ClassInstanceSortImpl(new Name("os2"), osort1, false);
-	Sort osort3=new ClassInstanceSortImpl(new Name("os3"), osort1, false);
-	Sort osort4=new ClassInstanceSortImpl(new Name("os4"), 
+	Sort osort2=new ClassInstanceSort(new Name("os2"), osort1, false);
+	Sort osort3=new ClassInstanceSort(new Name("os3"), osort1, false);
+	Sort osort4=new ClassInstanceSort(new Name("os4"), 
 					      SetAsListOfSort.EMPTY_SET
 					      .add(osort2).add(osort3), false);
 	Function v4=new Function(new Name("v4"), osort4, new Sort[0]);	
@@ -559,9 +559,9 @@ public class TestMatchTaclet extends TestCase {
     //match a logic variable of sort B. (assertNull)
     public void testWithSubSortsVariableSV() {
 	Sort osort1=(Sort)TacletForTests.getSorts().lookup(new Name("Obj"));
-	Sort osort2=new ClassInstanceSortImpl(new Name("os2"), osort1, false);
-	Sort osort3=new ClassInstanceSortImpl(new Name("os3"), osort1, false);
-	Sort osort4=new ClassInstanceSortImpl(new Name("os4"), 
+	Sort osort2=new ClassInstanceSort(new Name("os2"), osort1, false);
+	Sort osort3=new ClassInstanceSort(new Name("os3"), osort1, false);
+	Sort osort4=new ClassInstanceSort(new Name("os4"), 
 					      SetAsListOfSort.EMPTY_SET
 					      .add(osort2).add(osort3), false);	
 	TermFactory tf=TermFactory.DEFAULT;

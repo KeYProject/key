@@ -74,30 +74,30 @@ public class TestGenericSortInstantiations extends TestCase {
     Sort        cloneable    = TacletForTests.services ().getJavaInfo ().cloneableSort ();
     Sort        serializable = TacletForTests.services ().getJavaInfo ().serializableSort();
     
-    Sort        objectArray = ArraySortImpl.getArraySort ( object,
+    Sort        objectArray = ArraySort.getArraySort ( object,
                                                            object, cloneable, serializable );    
     // these sorts are supposed to have no relations to other (object) sorts;
     // probably in this place primitive sorts should be used, but these sorts
     // do currently not support sort hierarchies
-    Sort A4 = new ClassInstanceSortImpl ( new Name ( "A4" ), emptySortSet, false );
-    Sort A3 = new ClassInstanceSortImpl ( new Name ( "A3" ), emptySortSet.add ( A4 ), false );
-    Sort A1 = new ClassInstanceSortImpl ( new Name ( "A1" ), emptySortSet.add ( A3 ), false );
-    Sort A2 = new ClassInstanceSortImpl ( new Name ( "A2" ), emptySortSet.add ( A3 ), false );
-    Sort A6 = new ClassInstanceSortImpl ( new Name ( "A6" ), emptySortSet, false );
-    Sort A5 = new ClassInstanceSortImpl ( new Name ( "A5" ), emptySortSet.add ( A1 ).add ( A6 ), false );
+    Sort A4 = new ClassInstanceSort ( new Name ( "A4" ), emptySortSet, false );
+    Sort A3 = new ClassInstanceSort ( new Name ( "A3" ), emptySortSet.add ( A4 ), false );
+    Sort A1 = new ClassInstanceSort ( new Name ( "A1" ), emptySortSet.add ( A3 ), false );
+    Sort A2 = new ClassInstanceSort ( new Name ( "A2" ), emptySortSet.add ( A3 ), false );
+    Sort A6 = new ClassInstanceSort ( new Name ( "A6" ), emptySortSet, false );
+    Sort A5 = new ClassInstanceSort ( new Name ( "A5" ), emptySortSet.add ( A1 ).add ( A6 ), false );
 
-    Sort B4 = new ClassInstanceSortImpl ( new Name ( "B4" ), emptySortSet.add ( object ), false );
-    Sort B2 = new ClassInstanceSortImpl ( new Name ( "B2" ), emptySortSet.add ( B4 ), false );
-    Sort B3 = new ClassInstanceSortImpl ( new Name ( "B3" ), emptySortSet.add ( B4 ), false );
-    Sort B1 = new ClassInstanceSortImpl ( new Name ( "B1" ), emptySortSet.add ( B2 ).add ( B3 ), false );
-    Sort B5 = new ClassInstanceSortImpl ( new Name ( "B5" ), emptySortSet.add ( B2 ), false );
+    Sort B4 = new ClassInstanceSort ( new Name ( "B4" ), emptySortSet.add ( object ), false );
+    Sort B2 = new ClassInstanceSort ( new Name ( "B2" ), emptySortSet.add ( B4 ), false );
+    Sort B3 = new ClassInstanceSort ( new Name ( "B3" ), emptySortSet.add ( B4 ), false );
+    Sort B1 = new ClassInstanceSort ( new Name ( "B1" ), emptySortSet.add ( B2 ).add ( B3 ), false );
+    Sort B5 = new ClassInstanceSort ( new Name ( "B5" ), emptySortSet.add ( B2 ), false );
 
     // This setup resembles the code of <code>Recoder2KeY</code>
-    Sort  D4 = ArraySortImpl.getArraySort ( B4, object, cloneable, serializable );
-    Sort  D2 = ArraySortImpl.getArraySort ( B2, object, cloneable, serializable );
-    Sort  D3 = ArraySortImpl.getArraySort ( B3, object, cloneable, serializable );
-    Sort  D1 = ArraySortImpl.getArraySort ( B1, object, cloneable, serializable );
-    Sort  D5 = ArraySortImpl.getArraySort ( B5, object, cloneable, serializable );
+    Sort  D4 = ArraySort.getArraySort ( B4, object, cloneable, serializable );
+    Sort  D2 = ArraySort.getArraySort ( B2, object, cloneable, serializable );
+    Sort  D3 = ArraySort.getArraySort ( B3, object, cloneable, serializable );
+    Sort  D1 = ArraySort.getArraySort ( B1, object, cloneable, serializable );
+    Sort  D5 = ArraySort.getArraySort ( B5, object, cloneable, serializable );
     
     Sort       C1 = new PrimitiveSort         ( new Name ( "C1" ) );
 
@@ -687,25 +687,23 @@ public class TestGenericSortInstantiations extends TestCase {
 	               .put ( G1, A1 ),
 	               gsi.getAllInstantiations () );
 	
-//XXX: Currently the Null sort is a subsort of all sorts, so it is possible to instantiate
-// a generic sort such that it is a supersort of primitive sort "C1" and "Null"
-//	cs = SLListOfGenericSortCondition.EMPTY_LIST;
-//	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, C1 ) );
-//	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, Sort.NULL ) );
-//
-//	try {
-//	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
-//	    fail ( "Expected GenericSortException" );
-//	} catch ( GenericSortException e ) {}
-//
-//	cs = SLListOfGenericSortCondition.EMPTY_LIST;
-//	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, Sort.NULL ) );
-//	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, C1 ) );
-//
-//	try {
-//	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
-//	    fail ( "Expected GenericSortException" );
-//	} catch ( GenericSortException e ) {}
+	cs = SLListOfGenericSortCondition.EMPTY_LIST;
+	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, C1 ) );
+	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, Sort.NULL ) );
+
+	try {
+	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	    fail ( "Expected GenericSortException" );
+	} catch ( GenericSortException e ) {}
+
+	cs = SLListOfGenericSortCondition.EMPTY_LIST;
+	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, Sort.NULL ) );
+	cs = cs.prepend ( GenericSortCondition.createSupersortCondition ( G1, C1 ) );
+
+	try {
+	    gsi = GenericSortInstantiations.create ( sorts ( cs ), cs );
+	    fail ( "Expected GenericSortException" );
+	} catch ( GenericSortException e ) {}
     }
 
 }

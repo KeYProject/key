@@ -36,27 +36,9 @@ public class PrimitiveSort extends AbstractSort {
         return ext;
     }
     
-    /**
-     * @return the sorts of the predecessors of this sort
-     */
+    
     @Override
-    public boolean extendsTrans(Sort sort) {
-        if (sort == this || sort == Sort.ANY) {
-            return true;
-        }
-        
-        if (!(sort instanceof PrimitiveSort)) {
-            return false;
-        }
-                             
-        final IteratorOfSort it = extendsSorts().iterator();
-        while (it.hasNext()) {
-            final Sort s = it.next();
-            assert s!=null;
-            if (s == sort || s.extendsTrans(sort)) {
-                return true;
-            }
-        }
-        return false;
+    public boolean isAbstract() {
+	return false;
     }
 }

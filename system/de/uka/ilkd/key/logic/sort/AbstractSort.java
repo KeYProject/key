@@ -20,7 +20,7 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
     public static final Name OBJECT_REPOSITORY_NAME = new Name("<get>");
 
     /** name of the Sort */
-    protected Name name;
+    private final Name name;
 
 
     /**
@@ -29,22 +29,22 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
     private CastFunctionSymbol castSymbol;
             
     
-    protected MapFromNameToSortDependingSymbol definedSymbols = 
+    private MapFromNameToSortDependingSymbol definedSymbols = 
         MapAsListFromNameToSortDependingSymbol.EMPTY_MAP;
 
-    protected boolean symbolsCreated = false;
+    private boolean symbolsCreated = false;
 
-    /** creates a Sort */
+    
     public AbstractSort(Name name) {
         this.name = name;
     }
 
-    /**
-     * @return the sorts of the successors of this sort
-     */
+    
+
     @Override    
     public abstract SetOfSort extendsSorts();
 
+    
     /**
      * returns true iff given sort is a part of the transitive closure of the
      * supersorts of this sort. One might optimize by hashing %%
@@ -71,7 +71,7 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
 
 
     @Override
-    public Name name() {
+    public final Name name() {
         return name;
     }
 
@@ -82,7 +82,7 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
      * @throws IllegalStateException
      *             if the symbols have not been created yet
      */
-    public CastFunctionSymbol getCastSymbol() {
+    public final CastFunctionSymbol getCastSymbol() {
         if (castSymbol == null) {
             throw new IllegalStateException(this+":"+
                     "Symbols have to be created before "
@@ -105,7 +105,7 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
      * Creates the functions depening on this sort and adds them to the functions
      * namespace. If the functions have been already created nothing is done.   
      */
-    protected void createSymbols(Namespace p_func_ns, Namespace sort_ns) {
+    private void createSymbols(Namespace p_func_ns, Namespace sort_ns) {
         if (!symbolsCreated) {
             final Sort booleanSort = (Sort)sort_ns.lookup(new Name("boolean"));
             final Sort intSort     = (Sort)sort_ns.lookup(new Name("int"));
@@ -127,9 +127,8 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
             if (!(this instanceof NullSort) && 
                     (this instanceof ArraySort || 
                             this instanceof GenericSort ||             
-                    (this instanceof ClassInstanceSortImpl &&                            
-                            !((ClassInstanceSort)this).
-                            representAbstractClassOrInterface()))) {
+                    (this instanceof ClassInstanceSort &&  
+                	    !this.isAbstract()))) {
                 l0 = l0.prepend(createInstanceRepository(intSort));
             } 
             
@@ -151,12 +150,12 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
      * @return Symbol with (kind) name "p_name"
      *         ("ret.getKind().equals(p_name)"), null if no such object exists
      */
-    public SortDependingSymbol lookupSymbol(Name p_name) {
+    public final SortDependingSymbol lookupSymbol(Name p_name) {
         return definedSymbols.get(p_name);
     }
 
     
-    protected void addSymbols(ListOfSortDependingSymbol p) {
+    private void addSymbols(ListOfSortDependingSymbol p) {
         final IteratorOfSortDependingSymbol it = p.iterator();        
         while (it.hasNext()) {
             final SortDependingSymbol s = it.next();
@@ -168,7 +167,7 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
      * Adds the sort depending functions to the given function namespace if
      * possible. Functions are created if not already done 
      */
-    public void addDefinedSymbols(Namespace functions, Namespace sorts) {
+    public final void addDefinedSymbols(Namespace functions, Namespace sorts) {
         if (!symbolsCreated) {
             createSymbols(functions, sorts);            
         } 
@@ -182,7 +181,9 @@ public abstract class AbstractSort implements Sort, SortDefiningSymbols {
         }
     }
     
-    public String toString() {
-        return name().toString();
-    }    
+    
+    @Override
+    public final String toString() {
+        return name.toString();
+    }
 }

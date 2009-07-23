@@ -37,7 +37,6 @@ tokens {
 	GENERIC = "\\generic";
         EXTENDS = "\\extends";
         ONEOF = "\\oneof";
-	OBJECT = "\\object";
 
         // Keywords used in schema variable declarations
 	SCHEMAVARIABLES = "\\schemaVariables";
@@ -65,7 +64,6 @@ tokens {
         NEWLABEL = "\\newLabel";
 	NOT = "\\not";
 	SAME = "\\same";
-	COMPATIBLE = "\\compatible";
 	ISSUBTYPE = "\\sub";
 	STRICT    = "\\strict";
 	DISJOINTMODULONULL  = "\\disjointModuloNull";
@@ -100,9 +98,9 @@ tokens {
 	IF   = "\\if";
 	THEN = "\\then";
 	ELSE = "\\else";
-    SUM  = "\\sum";
+    	SUM  = "\\sum";
   	BSUM  = "\\bSum";
-    PRODUCT  = "\\product";
+	PRODUCT  = "\\product";
 	
 
         // inclusion and stuff, things that (usually) come at the beginnig 
@@ -121,15 +119,6 @@ tokens {
 	TRUE = "true";
 	FALSE = "false";
 
-        // Unused?
-        // NOSTANDARDRULES = "nostandardrules";
-        // NUMBER = "number";
-    	// QUOTES = "quotes";
-    	// THISREFERENCE = "ThisReference";
-        // JML_SPECIFICATIONS = "jml_specifications";
-        // OCL = "ocl";
-	// LOCAL  = "local";
-
         // Keywords related to taclets
         SAMEUPDATELEVEL = "\\sameUpdateLevel";
         INSEQUENTSTATE = "\\inSequentState";
@@ -145,14 +134,11 @@ tokens {
         HEURISTICS = "\\heuristics";	
 	FIND = "\\find";
 	ADD = "\\add";
-	ASSUMES = "\\assumes"; // what used to be "if"
+	ASSUMES = "\\assumes";
 
 	PREDICATES = "\\predicates";
 	FUNCTIONS = "\\functions";
-//        NAME = "\\name";
 	UNIQUE = "\\unique";
-
-	INTERSECTIONSORT = "\\inter";
 
 	RULES = "\\rules";
         PROBLEM = "\\problem";

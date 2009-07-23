@@ -228,8 +228,8 @@ public class TestDeclParser extends TestCase {
 	Sort objectSort = serv.getJavaInfo().objectSort();
 	Sort cloneableSort = serv.getJavaInfo().cloneableSort();
         Sort serializableSort = serv.getJavaInfo().serializableSort();
-	Sort aSortArr = ArraySortImpl.getArraySort(aSort, objectSort, cloneableSort, serializableSort);
-	Sort aSortArr2 = ArraySortImpl.getArraySort(aSortArr, objectSort, cloneableSort, serializableSort);
+	Sort aSortArr = ArraySort.getArraySort(aSort, objectSort, cloneableSort, serializableSort);
+	Sort aSortArr2 = ArraySort.getArraySort(aSortArr, objectSort, cloneableSort, serializableSort);
 	assertTrue("aSort[] should extend Cloneable ", 
 		   aSortArr.extendsSorts().contains(cloneableSort)); 
  	assertTrue("aSort[] should transitively extend Object ", 
@@ -240,7 +240,7 @@ public class TestDeclParser extends TestCase {
 		   aSortArr2.extendsTrans(cloneableSort));
 	assertTrue("aSort[][] should extend Cloneable[] ", 
 		   aSortArr2.extendsSorts().contains
-		   (ArraySortImpl.getArraySort(cloneableSort, objectSort, cloneableSort, serializableSort)));
+		   (ArraySort.getArraySort(cloneableSort, objectSort, cloneableSort, serializableSort)));
   	assertTrue("Cloneable should extend Object ", 
 		   cloneableSort.extendsSorts().contains(objectSort));
     }
@@ -280,10 +280,10 @@ public class TestDeclParser extends TestCase {
 	assertEquals("tail return sort", list,
 		     ((Function)nss.functions().lookup(new Name("tail"))).sort());
 	assertEquals("tailarray arg sort 0", 
-                ArraySortImpl.getArraySort(elem, objectSort, cloneableSort, serializableSort),
+                ArraySort.getArraySort(elem, objectSort, cloneableSort, serializableSort),
 
 		     ((Function)nss.functions().lookup(new Name("tailarray"))).argSort(0));
-	assertEquals("tailarray return sort", ArraySortImpl.getArraySort(elem, 
+	assertEquals("tailarray return sort", ArraySort.getArraySort(elem, 
                 objectSort, cloneableSort, serializableSort),
 		     ((Function)nss.functions().lookup(new Name("tailarray"))).sort());
 

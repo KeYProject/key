@@ -66,15 +66,11 @@ public abstract class AbstractSortedOperator extends AbstractOperator
     private boolean possibleSub(int at, Term possibleSub) {
 	Sort sort = possibleSub.sort();
 	
-	if (possibleSub.op() instanceof SchemaVariable 
-            || sort == AbstractMetaOperator.METASORT
-	    || sort instanceof ProgramSVSort
-	    || argSort(at) == AbstractMetaOperator.METASORT
-	    || argSort(at) instanceof ProgramSVSort) {
-	    return true;
-	} else {
-	    return sort.extendsTrans(argSort(at));
-	}
+	return sort == AbstractMetaOperator.METASORT
+	       || sort instanceof ProgramSVSort
+	       || argSort(at) == AbstractMetaOperator.METASORT
+	       || argSort(at) instanceof ProgramSVSort
+	       || sort.extendsTrans(argSort(at));
     }
     
     

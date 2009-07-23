@@ -338,13 +338,13 @@ public abstract class Taclet implements Rule, Named {
 				    MatchConditions matchCond,
 				    Services        services,
 				    Constraint      userConstraint) {
-//if(name.toString().equals("testSchemaModal1")) Debug.ENABLE_DEBUG = true;
+if(name.toString().equals("unsoundlyKillUpdate")) Debug.ENABLE_DEBUG = true;
 	Debug.out("Start Matching rule: ", name);
 	matchCond = matchHelp(term, template, ignoreUpdates, matchCond, 
 		 services, userConstraint);	
 	Debug.out(matchCond == null ? "Failed: " : "Succeeded: ", name);
 //if(matchCond != null) Debug.out("insts: ", matchCond.getInstantiations());	
-//if(name.toString().equals("testSchemaModal1")) Debug.ENABLE_DEBUG = false;
+if(name.toString().equals("unsoundlyKillUpdate")) Debug.ENABLE_DEBUG = false;
 	return matchCond == null ? null : checkConditions(matchCond, services);
     }
 
@@ -480,38 +480,6 @@ public abstract class Taclet implements Rule, Named {
     
 
     /**
-     * Add a set of schema variable instantiations to the given match
-     * conditions object
-     * @param newInst the instantiations to be added; if the operator
-     * of any of the instantiations is a metavariable, this variable
-     * is also added to the set of new metavariable held by
-     * <code>matchCond</code>
-     * @return the match conditions after adding the new
-     * instantiations, or <code>null</code> if any of the new
-     * instantiations collide with older ones
-     */
-    private MatchConditions addNewInstantiations (MapFromSchemaVariableToTerm newInst,
-                                                  MatchConditions matchCond,
-                                                  Services services) {
-        final IteratorOfEntryOfSchemaVariableAndTerm it = newInst.entryIterator ();
-        while ( it.hasNext () ) {
-            final EntryOfSchemaVariableAndTerm entry = it.next ();
-            matchCond = addInstantiation ( entry.value (),
-                                           entry.key (),
-                                           matchCond,
-                                           services );
-            if ( matchCond == null ) return null;
-            final Operator op = entry.value ().op ();
-            if ( op instanceof Metavariable ) {
-                final SetOfMetavariable newMVs =
-                    matchCond.getNewMetavariables ().add ( (Metavariable)op );
-                matchCond = matchCond.setNewMetavariables ( newMVs );
-            }
-        }
-        return matchCond;
-    }
- 
-    /**
      * tries to match the bound variables of the given term against the one
      * described by the template
      * @param term the Term whose bound variables are matched against the
@@ -617,61 +585,41 @@ public abstract class Taclet implements Rule, Named {
     private MatchConditions matchHelp(final Term             term,
 				      final Term             template, 
 				      final boolean          ignoreUpdates,
-				      MatchConditions  matchCond,
+				      MatchConditions  	     matchCond,
 				      final Services         services,
 				      final Constraint       userConstraint) {
 	Debug.out("Match: ", template);
 	Debug.out("With: ",  term);
         
-        
 	final Operator sourceOp   = term.op ();
         final Operator templateOp = template.op ();
+        assert !(sourceOp instanceof Metavariable) : "metavariables are disabled";        
+        assert !(templateOp instanceof Metavariable) : "metavariables are disabled";
         
         if ( ignoreUpdates
              && sourceOp instanceof UpdateApplication
-             && ( !( templateOp instanceof SchemaVariable )
-                  || ( templateOp instanceof ModalOperatorSV ) )
-             && !( templateOp instanceof UpdateApplication ) ) {
+//             &&  !( templateOp instanceof SchemaVariable )
+//                  || templateOp instanceof ModalOperatorSV  
+             && !(templateOp instanceof UpdateApplication) ) {
 	    // updates can be ignored
             Term update = UpdateApplication.getUpdate(term);
 	    matchCond = matchCond
 		.setInstantiations ( matchCond.getInstantiations ().
 				     addUpdate (update) );
-	    return matchHelp(UpdateApplication.getTarget(term), template,
-			     true, matchCond, services, userConstraint);
+	    return matchHelp(UpdateApplication.getTarget(term), 
+		    	     template,
+			     true, 
+			     matchCond, 
+			     services, 
+			     userConstraint);
 	}
     
-	if ( templateOp instanceof Metavariable ) {		
-	    Constraint c = matchCond.getConstraint().unify( term, template, services );
-	        
-	    if (c.isSatisfiable()) {
-	        return matchCond.setConstraint( c );
-	    } else {        
-		Debug.out("FAILED. 3a: constraint unsatisfiable");
-		return null;
-	    }
-	}
-    
-	if ( !(templateOp instanceof SchemaVariable) && 
-	     sourceOp instanceof Metavariable ) {		
-	    // "term" is a metavariable, "template" neither a
-	    // schemavariable nor a metavariable
-	    return matchMVTerm ( term,
-                                 template,
-                                 ignoreUpdates,
-                                 matchCond,
-                                 services,
-                                 userConstraint );
-	}
-
-	if ( templateOp instanceof SchemaVariable 
-              && templateOp.arity() == 0) {
-	    return templateOp.match ( term, matchCond, services );
+	if(templateOp instanceof SchemaVariable && templateOp.arity() == 0) {
+	    return templateOp.match(term, matchCond, services);
         }
     
-	matchCond = templateOp.match ( sourceOp, matchCond, services );
-	
-	if (matchCond == null) {
+	matchCond = templateOp.match (sourceOp, matchCond, services);
+	if(matchCond == null) {
 	    Debug.out("FAILED 3x.");
 	    return null; ///FAILED
 	} 
@@ -692,9 +640,13 @@ public abstract class Taclet implements Rule, Named {
 	}
 	
 	    
-	for (int i = 0, arity=term.arity(); i < arity; i++) {
-	    matchCond = matchHelp(term.sub(i), template.sub(i), false,
-				  matchCond, services, userConstraint);
+	for (int i = 0, arity = term.arity(); i < arity; i++) {
+	    matchCond = matchHelp(term.sub(i), 
+		    		  template.sub(i), 
+		    		  false,
+				  matchCond, 
+				  services, 
+				  userConstraint);
 	    if (matchCond == null) {		      
 	        return null; //FAILED
 	    } 
@@ -703,139 +655,7 @@ public abstract class Taclet implements Rule, Named {
         return matchCond.shrinkRenameTable();
     }
     
-    /**
-     * Match a template which is neither a metavariable nor a schema
-     * variable against a term that is a metavariable
-     * @param term term whose operator is a metavariable
-     * @param template template whose operator is neither a
-     * metavariable nor a schema variable
-     */
-    private MatchConditions matchMVTerm (Term term,
-					 Term template,
-					 boolean ignoreUpdates,
-					 MatchConditions matchCond,
-					 Services services,
-					 Constraint userConstraint) {
 
-        // try to instantiate "term" according to the current constraint
-        final Term t = getInstantiationFor ( (Metavariable)term.op (),
-                                             matchCond.getConstraint () );
-        if ( t != null )
-            return matchHelp ( t,
-                               template,
-                               ignoreUpdates,
-                               matchCond,
-                               services,
-                               userConstraint );
-
-        return matchMVTermHelp ( term,
-				 template,
-				 ignoreUpdates,
-				 matchCond,
-				 services,
-				 userConstraint );
-    }
-
-    /**
-     * Match a template which is neither a metavariable nor a schema
-     * variable against a term that is a metavariable; try to use an
-     * instantiation of the metavariable given by the user constraint
-     * @param term term whose operator is a metavariable
-     * @param template template whose operator is neither a
-     * metavariable nor a schema variable
-     */
-    private MatchConditions matchMVTermHelp (Term term,
-					     Term template,
-					     boolean ignoreUpdates,
-					     MatchConditions matchCond,
-					     Services services,
-					     Constraint userConstraint) {
-        // try to instantiate "term" according to the current user constraint
-        final Term t = getInstantiationFor ( (Metavariable)term.op (),
-                                              userConstraint );
-
-        if ( t == null )
-            return matchMVTermWithMatchVariables
-		( term, template, matchCond, services );
-
-        final Constraint c = matchCond.getConstraint ().unify ( term, t, 
-                services );
-        if ( c.isSatisfiable () ) {
-            MatchConditions mc = matchHelp ( t,
-                                             template,
-                                             ignoreUpdates,
-                                             matchCond.setConstraint ( c ),
-                                             services,
-                                             userConstraint );
-            if ( mc != null ) return mc;
-        }
-
-        return matchMVTermWithMatchVariables
-	    ( term, template, matchCond, services );
-    }
-
-    private Term getInstantiationFor (Metavariable p_mv, Constraint p_constraint) {
-        if ( !( p_constraint instanceof EqualityConstraint ) ) return null;
-
-        final EqualityConstraint ec = (EqualityConstraint)p_constraint;
-        return ec.getDirectInstantiation ( p_mv );
-    }
-    
-    /**
-     * Match a template which is neither a metavariable nor a schema
-     * variable against a term that is a metavariable; try to replace
-     * schema variables that occur in the template with new metavariables
-     * @param term term whose operator is a metavariable
-     * @param template template whose operator is neither a
-     * metavariable nor a schema variable
-     */
-    private MatchConditions
-	matchMVTermWithMatchVariables (Term term,
-				       Term template,
-				       MatchConditions matchCond,
-				       Services services) {
-        // try to instantiate uninstantiated SVs by
-        // creating new metavariables or bound
-        // logicvariables
-        SyntacticalReplaceVisitor srVisitor;
-        try {
-            srVisitor = new SyntacticalReplaceVisitor ( services,
-                                                        matchCond.getInstantiations (),
-                                                        matchCond.getConstraint (),
-                                                        true,
-                                                        term.op ().name () );
-            template.execPostOrder ( srVisitor );
-        } catch ( IllegalInstantiationException e ) {
-            return null; //FAILED;
-        }
-
-        final MapFromSchemaVariableToTerm newInst = srVisitor.getNewInstantiations ();
-        if ( newInst == null ) return null; //FAILED;
-
-        final MatchConditions mc = addNewInstantiations ( newInst,
-                                                          matchCond,
-                                                          services );
-
-        if ( mc == null ) return null; //FAILED;              
-
-        return addConstraint ( term, srVisitor.getTerm (), mc, services );
-    }
-
-    /**
-     * Unify the given terms and add the result to the constraint held
-     * by <code>matchCond</code>
-     * @return the new match conditions, or <code>null</code> if the
-     * terms are not unifiable given the constraint already present
-     */
-    private MatchConditions addConstraint (Term term,
-                                           Term instantiatedTerm,
-                                           MatchConditions matchCond,
-                                           Services services) {
-        final Constraint c = matchCond.getConstraint ().unify ( term,
-                                                                instantiatedTerm, services );
-
-        return c.isSatisfiable () ? matchCond.setConstraint ( c ) : null;
-    }
 
     /**
      * Match the given template (which is probably a formula of the if

@@ -71,8 +71,7 @@ public class ProofSettings {
             new GeneralSettings(),
 	    new ChoiceSettings(),
 	    DecisionProcedureSettings.getInstance(),
-	    new ViewSettings(),
-            new LibrariesSettings()
+	    new ViewSettings()
 	};
 	for (int i = 0; i < settings.length; i++) { 
 	    settings[i].addSettingsListener(listener);
@@ -244,11 +243,6 @@ public class ProofSettings {
 	ensureInitialized();
 	return (DecisionProcedureSettings) settings[3];
     }
-    
-    public LibrariesSettings getLibrariesSettings() {
-        ensureInitialized();
-        return (LibrariesSettings) settings[5];    
-    }
 
     public GeneralSettings getGeneralSettings() {
 	ensureInitialized();
@@ -272,7 +266,5 @@ public class ProofSettings {
 	public void settingsChanged(GUIEvent e) {	    
 	    saveSettings();
 	}
-
     }
-    
 }
